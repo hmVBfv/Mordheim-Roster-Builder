@@ -1,0 +1,28 @@
+{
+ "HR_LABELS": {
+  "startGold": "Starting gold",
+  "min": "Min. models",
+  "max": "Max. models",
+  "heroes": "Max. Heroes",
+  "priceAll": "All equipment price",
+  "priceArmour": "Armour price",
+  "priceBP": "Blackpowder price",
+  "priceMissile": "Missile price",
+  "clubSurcharge": "Club/mace surcharge",
+  "slingSurcharge": "Sling surcharge",
+  "armourBodyOnly": "Armour: body only",
+  "freeDagger": "All daggers free",
+  "miscHench": "Henchmen may take misc. equipment",
+  "freeMarket": "Free market (any item)",
+  "allSkills": "All skill lists open",
+  "showRarity": "Show rarity",
+  "rangedCapOn": "Cap ranged weapons",
+  "rangedCap": "Ranged weapon cap",
+  "rerollOne": "Re-roll a single die",
+  "eqLimitOn": "Enforce equipment list",
+  "hsEquip": "HS/DP may buy equipment",
+  "hsGrades": "Hired Sword grades",
+  "dpGrades": "Dramatis Personae grades",
+  "notes": "Notes"
+ }
+}

@@ -1,0 +1,3075 @@
+{
+ "HIREDSWORDS": {
+  "ogre": {
+   "eqBase": "Light Armour",
+   "opts": {
+    "label": "Weapons",
+    "choices": [
+     "Two hand weapons (Swords/Axes/Clubs, any mix)",
+     "Double-Handed Weapon"
+    ]
+   },
+   "race": "ogre",
+   "name": "Ogre Bodyguard",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 80,
+   "upkeep": 30,
+   "rating": 25,
+   "profile": {
+    "M": 6,
+    "WS": 3,
+    "BS": 2,
+    "S": 4,
+    "T": 4,
+    "W": 3,
+    "I": 3,
+    "A": 2,
+    "Ld": 7
+   },
+   "maxprof": "ogre",
+   "eq": "Two hand weapons (Swords/Axes/Clubs, any mix) OR one Double-Handed Weapon; Light Armour",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Fear:</b> Ogres are large, threatening creatures that cause fear. <b>Large Target:</b> Ogres are Large Targets as defined in the shooting rules.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven"
+    ]
+   },
+   "faq": "Ogre racial max 6/6/5/5/5/5/6/5/9; Large-Target redefined to the shooting-rules wording (Ultimate FAQ, ERRATA p.148)."
+  },
+  "pitfighter": {
+   "race": "human",
+   "name": "Pit Fighter",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 22,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 1,
+    "I": 4,
+    "A": 2,
+    "Ld": 7
+   },
+   "eq": "Morning star, spiked gauntlet (= extra hand weapon + buckler), Helmet",
+   "sk": [
+    "combat",
+    "speed",
+    "strength"
+   ],
+   "sp": "<b>Spiked Gauntlet:</b> Counts as an additional hand weapon AND a buckler. Your Heroes cannot learn to use it.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "undead",
+     "skaven"
+    ]
+   }
+  },
+  "warlock": {
+   "race": "human",
+   "name": "Warlock",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Staff",
+   "sk": [
+    "academic"
+   ],
+   "magic": "lesserMagic",
+   "sp": "<b>Wizard:</b> Warlocks are magicians and have TWO spells generated at random from the Lesser Magic list. <b>New skill or new spell:</b> When he gains a skill he may take an Academic skill OR instead randomly determine a NEW spell from the Lesser Magic list.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "wh",
+     "sos"
+    ]
+   }
+  },
+  "elfranger": {
+   "hsSpecial": [
+    [
+     "Fey",
+     "Hostile magic spells will not affect the Elf on a D6 roll of 4+."
+    ],
+    [
+     "Luck",
+     "Blessed by Lileath. Once per game he may re-roll any dice roll HE makes (not one made by another member of the warband)."
+    ]
+   ],
+   "race": "elf",
+   "name": "Elf Ranger",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 40,
+   "upkeep": 20,
+   "rating": 12,
+   "profile": {
+    "M": 5,
+    "WS": 4,
+    "BS": 5,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 6,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Elf Bow, Sword, Elven Cloak",
+   "sk": [
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Seeker:</b> When rolling on the Exploration chart he lets you modify one dice roll by -1/+1. <b>Excellent Sight:</b> He spots hidden enemies from twice as far away as other warriors (twice his Initiative in inches). <b>Dwarf Grudge:</b> A warband including Dwarfs may hire him, but must pay 40 gc upkeep instead of 20.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ]
+   },
+   "grudge": {
+    "tag": "dwarf",
+    "upkeep": 40,
+    "note": "Warbands including Dwarfs pay 40 gc upkeep instead of 20."
+   }
+  },
+  "freelancer": {
+   "race": "human",
+   "name": "Freelancer",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 50,
+   "upkeep": 20,
+   "rating": 21,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Heavy Armour, Shield, Lance, Sword (save 3+ mounted / 4+ on foot)",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Warhorse:</b> With the optional mounted rules he rides a Warhorse and has the Ride Warhorse skill. <b>Armour save:</b> 3+ when mounted, 4+ on foot.",
+   "faq": "Freelancer errata (Ultimate FAQ p.150): rides a Warhorse under the optional mounted rules.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ]
+   }
+  },
+  "trollslayer": {
+   "hsSpecial": [
+    [
+     "Ferocious Charge",
+     "He may double his Attacks on the turn he charges, but suffers -1 to hit that turn."
+    ],
+    [
+     "Monster Slayer",
+     "He always wounds any opponent on a D6 roll of 4+ regardless of Toughness - unless his own Strength would need a lower result."
+    ],
+    [
+     "Berserker",
+     "He may add +1 to his to-hit rolls during the turn in which he charges."
+    ]
+   ],
+   "eqBase": "",
+   "opts": {
+    "label": "Weapons",
+    "choices": [
+     "Two Axes",
+     "Double-Handed Axe"
+    ]
+   },
+   "race": "dwarf",
+   "name": "Dwarf Troll Slayer",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 25,
+   "upkeep": 10,
+   "rating": 12,
+   "profile": {
+    "M": 3,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 4,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Two Axes OR a Double-Handed Axe (hiring player chooses)",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Deathwish:</b> Completely immune to all psychology; never needs to test when fighting alone. <b>Hard to Kill:</b> Only taken out of action on a D6 roll of 6 instead of 5-6 - treat a roll of 5 as stunned. <b>Hard Head:</b> He ignores the special rules for maces, clubs etc.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ]
+   },
+   "grudge": {
+    "tag": "elf",
+    "upkeep": 20,
+    "note": "Warbands including Elves pay 20 gc upkeep instead of 10."
+   }
+  },
+  "halfling": {
+   "race": "halfling",
+   "name": "Halfling Scout",
+   "grade": "1a",
+   "src": "Rulebook",
+   "hire": 15,
+   "upkeep": 5,
+   "rating": 5,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 4,
+    "S": 2,
+    "T": 2,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "maxprof": "halfling",
+   "eq": "Bow, Dagger, cooking pot (= Helmet)",
+   "sk": [
+    "speed",
+    "shooting"
+   ],
+   "sizeBonus": 1,
+   "sp": "<b>Cook:</b> A warband with a Halfling Scout may increase its MAXIMUM SIZE by +1 - but not its maximum number of Heroes.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "undead",
+     "possessed"
+    ]
+   },
+   "faq": "Halfling racial max 4/5/7/3/3/3/9/4/10 (Ultimate FAQ, added p.121)."
+  },
+  "arabmerchant": {
+   "race": "human",
+   "name": "Arabian Merchant",
+   "grade": "1a",
+   "src": "Town Cryer 22",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 10,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Scimitar (= Sword)",
+   "sk": [
+    "academic"
+   ],
+   "sp": "Haggle. Pawnbroker (+2D6 gc per sold item). Marketeer (post-battle Black Market / Foreign Wares / Fencer). Stone Cutter. Optional Guardian bodyguard.",
+   "rule": {
+    "type": "good"
+   }
+  },
+  "beasthunter": {
+   "race": "human",
+   "name": "Beast Hunter",
+   "grade": "1a",
+   "src": "Town Cryer 28",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 18,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 4,
+    "W": 1,
+    "I": 4,
+    "A": 2,
+    "Ld": 7
+   },
+   "eq": "Two Axes, Throwing Axe (= Throwing Knife +1 S), Light Armour",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Beastmen Vengeance:</b> He hates all Beastmen (Gors, Ungors, Centigors and Minotaurs) and fights for NO upkeep cost in battles against Beastmen. <b>Skull Rack:</b> He causes fear in all Beastmen. <b>Predator:</b> In any battle set in the wilderness (not within Mordheim) involving Beastmen, he may be set up after both warbands have deployed - anywhere hidden and outside the enemy deployment zone.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "beastmen",
+     "undead",
+     "orcsgoblins",
+     "possessed",
+     "carnival"
+    ]
+   }
+  },
+  "highwayman": {
+   "race": "human",
+   "name": "Highwayman",
+   "grade": "1a",
+   "src": "Town Cryer 26",
+   "hire": 35,
+   "upkeep": 20,
+   "rating": 20,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Dagger, Brace of pistols, Rapier, cloak (= Buckler); rides a Horse with mounted rules",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed",
+    "cavalry"
+   ],
+   "sp": "<b>Expert Pistolier:</b> He combines the effects of the Pistolier and Trick Shooter skills. <b>Expert Rider:</b> While mounted he counts as stationary for shooting (no -1 to hit) and reloads quickly on horseback. <b>Unscrupulous:</b> At the end of each battle roll a D6 - on a 1 the warband receives one less piece of Treasure (he has stolen it; it is lost, not spent on him). <b>Conflict:</b> He will never join a warband that contains a Roadwarden. <b>Armour save:</b> 6+ mounted, none on foot (his cloak acts as a Buckler).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "sos",
+     "wh",
+     "goodElves"
+    ]
+   },
+   "conflict": [
+    "roadwarden"
+   ]
+  },
+  "imperialassassin": {
+   "hsSpecial": [
+    [
+     "Backstabber",
+     "He may charge an opponent he cannot see, as long as the target is within charge reach. He surprises his opponent: +1 to hit and +1 on Injury rolls, for the first round of combat only."
+    ],
+    [
+     "Hide in Shadows",
+     "While within 1 inch of a wall or other linear obstacle, opposing models must pass an Initiative test in order to charge or shoot at him."
+    ]
+   ],
+   "race": "human",
+   "name": "Imperial Assassin",
+   "grade": "1a",
+   "src": "Mordheim Annual 2002",
+   "hire": 40,
+   "upkeep": 20,
+   "rating": 22,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 5,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Sword, Dagger, Throwing Daggers, Crossbow Pistol",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Poisoner:</b> He starts each game with his weapons poisoned with either Black Lotus or Dark Venom (you choose before the game; it need not be traded for). He cannot poison other warriors' weapons, nor lend his own. <b>Weapons Master:</b> He may use ANY weapon he finds and you may buy weapons for him as for any warrior - but whatever you give him is HIS to keep. He will never use a blackpowder weapon.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "wh",
+     "sos",
+     "orcsgoblins",
+     "skaven"
+    ]
+   }
+  },
+  "tileanmarksman": {
+   "race": "human",
+   "name": "Tilean Marksman",
+   "grade": "1a",
+   "src": "Mordheim Annual 2002",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Light Armour, Sword, Dagger, Crossbow",
+   "sk": [
+    "shooting"
+   ],
+   "sp": "<b>Steady Hands:</b> He ignores to-hit modifiers for LONG RANGE when shooting his crossbow. <b>Dead Eye Shot:</b> He ignores to-hit modifiers for COVER when shooting his crossbow.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "orcsgoblins",
+     "undead"
+    ]
+   }
+  },
+  "roadwarden": {
+   "race": "human",
+   "name": "Roadwarden",
+   "grade": "1a",
+   "src": "Town Cryer 26",
+   "hire": 40,
+   "upkeep": 20,
+   "rating": 22,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Crossbow, Horseman's Hammer, Dagger, Heavy Armour, three Torches; rides a Horse with mounted rules",
+   "sk": [
+    "combat",
+    "shooting",
+    "strength",
+    "cavalry"
+   ],
+   "sp": "<b>Expert Rider:</b> He counts as having the Nimble skill while on horseback and suffers no modifiers for moving and shooting. <b>Lethal Marksman:</b> He combines the skills Trick Shooter and Eagle Eyes. <b>Stern:</b> He may re-roll any failed Leadership test for fear and is immune to the rules for being all alone. <b>Conflict:</b> He will never join a warband that contains a Highwayman. <b>Armour save:</b> 4+ mounted, 5+ on foot.",
+   "rule": {
+    "type": "good"
+   },
+   "conflict": [
+    "highwayman"
+   ]
+  },
+  "bard": {
+   "race": "human",
+   "name": "Bard",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 8,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sword, Dagger, Light Armour",
+   "sk": [
+    "academic",
+    "speed"
+   ],
+   "sp": "<b>Songster:</b> Any friendly model within 6 inches of the Bard may re-roll a failed Leadership test with +1 Leadership. This includes Rout tests.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "sos",
+     "wh"
+    ]
+   }
+  },
+  "biggamehunter": {
+   "race": "human",
+   "name": "Big Game Hunter",
+   "grade": "1b",
+   "src": "Lustria",
+   "hire": 40,
+   "upkeep": 18,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sword, Dagger, Net, Light Armour, Hunting Rifle (= Hochland Long Rifle)",
+   "sk": [
+    "shooting",
+    "academic"
+   ],
+   "sp": "<b>Set Traps:</b> He places up to six trap counters at ground level immediately after he is deployed, at least 6 inches apart. Any model except the Hunter that moves within 3 inches must roll a D6: on 1-3 nothing happens, on 4-6 it takes an automatic hit at the Strength shown on the dice, and the counter is removed. A single model can only set off one trap at a time. Any animal put Out of Action by a trap is automatically captured after the game.",
+   "rule": {
+    "type": "human"
+   }
+  },
+  "blackorcoverseer": {
+   "race": "goblin",
+   "name": "Black Orc Overseer",
+   "grade": "1b",
+   "src": "Nemesis Crown",
+   "hire": 60,
+   "upkeep": 40,
+   "rating": 15,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Heavy Armour, two Choppas (= two hand weapons)",
+   "sk": [
+    "combat",
+    "shooting",
+    "strength",
+    "speed"
+   ],
+   "sp": "<b>I said 'shut it':</b> Any Orcs or Goblins within 6 inches of the Black Orc do not suffer from Animosity. The rest of the warband tests as normal. <b>Who'se Da Man!</b> If a Goblin leader is taken Out of Action, the Black Orc gains the Leader ability for the rest of the battle. If the Goblin leader is Killed after the battle, the Black Orc becomes the new warband leader - but he keeps his upkeep cost. He does not count towards warband size when selling treasure. <b>Skills note:</b> The original publication lists no skills; Mordheimer recommends following the Black Orcs (Combat, Shooting, Strength, Speed).",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "orcsgoblins"
+    ]
+   }
+  },
+  "bountyhunter": {
+   "race": "human",
+   "name": "Bounty Hunter",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 40,
+   "upkeep": 15,
+   "rating": 20,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Sword, Dagger, Pistol, Crossbow, Heavy Armour, Helmet, Rope & Hook, Lantern",
+   "sk": [
+    "combat",
+    "shooting",
+    "strength",
+    "speed"
+   ],
+   "sp": "<b>Capture:</b> At the start of each battle nominate one enemy Hero as his mark. He gets +1 to hit that model and must always move towards it if he can see it (unless he can shoot, in which case you choose). If he takes the mark Out of Action he gains the Hero's gold value as payment (giving the warband half) and +D3 experience if he survives and his side wins. Do not roll on the Serious Injury table for that Hero - he simply counts as captured.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "possessed",
+     "undead",
+     "skaven",
+     "orcsgoblins"
+    ]
+   }
+  },
+  "chameleonskink": {
+   "race": "skaven",
+   "name": "Chameleon Skink",
+   "grade": "1b",
+   "src": "Lustria",
+   "hire": 70,
+   "upkeep": 12,
+   "rating": 16,
+   "profile": {
+    "M": 6,
+    "WS": 4,
+    "BS": 4,
+    "S": 4,
+    "T": 2,
+    "W": 1,
+    "I": 5,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Blowpipe, Dagger, Hunting Spear",
+   "sk": [
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Chameleon Skin:</b> His camouflage is so effective that foes HALVE their Initiative when trying to detect him while Hidden, and he is at -2 to be hit with missile fire. <b>Infiltrator:</b> Place him anywhere on the board out of line of sight and at least 12 inches from any enemy model. <b>Lizardmen Skink rules:</b> Scaly Skin, Cold Blooded, Aquatic and Jungle Born all apply.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "lizardmen"
+    ]
+   }
+  },
+  "clanskryreratogre": {
+   "race": "ogre",
+   "name": "Clan Skryre Rat Ogre",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 100,
+   "upkeep": 0,
+   "rating": 25,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 5,
+    "T": 5,
+    "W": 3,
+    "I": 1,
+    "A": 3,
+    "Ld": 10
+   },
+   "eq": "Warpfire projector / bionic implants (fixed)",
+   "sk": [],
+   "noXP": true,
+   "upkeepNote": "Upkeep: 1 Wyrdstone shard between games (not gold).",
+   "sp": "<b>No experience:</b> A bio-mechanoid creation driven by Clan Skryre sorcery - it gains NO experience. <b>Large:</b> Any warrior may shoot at it even if it is not the closest target. <b>Fear.</b> <b>Bio Machinery:</b> Not truly alive - immune to psychology and never leaves combat. <b>Immune to Poison.</b> <b>May not run.</b> <b>Wyrdstone Powered:</b> It takes no gold, but requires a single Wyrdstone shard before each game to be powered up. <b>Warpfire Thrower:</b> Range 6 inches, Strength 4, save modifier -1; jet of flame 6 inches long and 2 inches wide, all models in its path are hit on a 4+ and suffer fire damage. <b>Unreliable:</b> Roll a D6 at the start of each turn - on a 1 roll on the Malfunction table (1 Explodes, 2 Goes berserk, 3 Shuts down, 4 Temporary loss of control, 5-6 Freezes).",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "skaven",
+     "skavenpest"
+    ]
+   },
+   "faq": "Rat Ogre Large Target redefined = shooting rules (Ultimate FAQ, ERRATA p.95)."
+  },
+  "darkelfassassin": {
+   "race": "elf",
+   "name": "Dark Elf Assassin",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 70,
+   "upkeep": 25,
+   "rating": 25,
+   "profile": {
+    "M": 5,
+    "WS": 5,
+    "BS": 5,
+    "S": 4,
+    "T": 4,
+    "W": 1,
+    "I": 7,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Two Swords, Repeater Crossbow, Light Armour",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Perfect Killer:</b> All his attacks, shooting and close combat, have an extra -1 save modifier. <b>Kindred Hatred:</b> All Dark Elves hate their High Elven kin. <b>Skills:</b> He may also choose from the unique Dark Elf special skill list.",
+   "rule": {
+    "type": "evil"
+   }
+  },
+  "duellist": {
+   "race": "human",
+   "name": "Duellist",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 18,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 2,
+    "Ld": 7
+   },
+   "eq": "Rapier (= Sword) + Main Gauche (= Buckler), Dagger",
+   "sk": [
+    "combat",
+    "shooting"
+   ],
+   "sp": "<b>Darting Steel:</b> He may parry using his sword AND his buckler (cloak) if he rolls under his Weapon Skill and not more than his opponent's highest to-hit roll, as per the normal rules.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "undead"
+    ]
+   }
+  },
+  "dwarfpathfinder": {
+   "hsSpecial": [
+    [
+     "Pathfinder",
+     "He learns to find hidden paths: the Dwarf Pathfinder is able to Infiltrate (as the Skaven skill of the same name)."
+    ]
+   ],
+   "race": "dwarf",
+   "name": "Dwarf Pathfinder",
+   "grade": "1b",
+   "src": "Nemesis Crown",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 12,
+   "profile": {
+    "M": 3,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 4,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Crossbow, Axe, Dagger, Light Armour",
+   "sk": [
+    "combat",
+    "shooting"
+   ],
+   "sp": "<b>Explorer:</b> A warband with a Dwarf Pathfinder may roll one MORE dice than normal in the Exploration phase and discard one die of the player's choice. <b>Hard to Kill:</b> Only taken out of action on a 6 instead of 5-6; treat a roll of 5 as stunned. <b>Hard Head:</b> He ignores the concussion special rule. <b>Hate Orcs and Goblins.</b> <b>Elf Grudge:</b> A warband that also contains an Elf must pay an additional 5 gc upkeep. <b>Magic:</b> Dwarfs may NEVER take the Arcane Lore skill - a Dwarf cannot learn to cast spells.",
+   "rule": {
+    "type": "humanOrDwarf",
+    "noChaos": true
+   },
+   "grudge": {
+    "tag": "elf",
+    "upkeep": 20,
+    "note": "+5 gc upkeep if the warband includes Elves."
+   }
+  },
+  "dwarftreasurehunter": {
+   "eqBase": "Crossbow, Heavy Armour",
+   "opts": {
+    "label": "Melee weapon",
+    "choices": [
+     "Double-Handed Weapon",
+     "Axe"
+    ]
+   },
+   "race": "dwarf",
+   "name": "Dwarf Treasure Hunter",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 55,
+   "upkeep": 30,
+   "rating": 24,
+   "profile": {
+    "M": 3,
+    "WS": 5,
+    "BS": 4,
+    "S": 3,
+    "T": 4,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Double-Handed Weapon or Axe, Crossbow, Heavy Armour",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Hard to Kill:</b> Only taken out of action on a 6 when rolling on the Injury chart (1-2 knocked down, 3-5 stunned, 6 out of action). <b>Hard Head:</b> He ignores the special rules for maces, clubs etc. <b>Hates Orcs & Goblins.</b> <b>Mining Pick:</b> A two-handed weapon using the rules for a double-handed axe. <b>Lantern Rig:</b> Lets him use the lantern and keep both hands free for weapons. <b>Treasure Maps:</b> Roll a D6 after each battle he survives without going out of action - 1 Ambush by D3 brigands, 2 Poor fake, 3 Looted hoard (+1 wyrdstone shard), 4 Cellar (barrel of Bugman's ale for D6 warriors), 5 Real map (one extra Exploration dice), 6 Jackpot (extra Exploration dice whose result you CHOOSE). Results are never cumulative. <b>Elf surcharge:</b> Warbands including Elves pay DOUBLE upkeep.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ]
+   },
+   "grudge": {
+    "tag": "elf",
+    "upkeep": 60,
+    "note": "Warbands including Elves pay double upkeep (60)."
+   }
+  },
+  "elfmage": {
+   "skills": [
+    "Sorcery"
+   ],
+   "race": "elf",
+   "name": "Elf Mage",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 45,
+   "upkeep": 0,
+   "rating": 23,
+   "profile": {
+    "M": 5,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 2,
+    "I": 6,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Sword, Dagger",
+   "sk": [],
+   "magic": "djedhi",
+   "upkeepNote": "Wanderer: stays only for the duration of one battle (no upkeep).",
+   "sp": "<b>Fey:</b> Hostile magic spells will not affect the Elf on a D6 roll of 4+. <b>Sorcery:</b> He counts as having the Sorcery skill. <b>Wanderer:</b> He only stays for the duration of a single battle. A warband that used an Elf Mage in its last battle may not seek out another until it has fought at least one battle without one. <b>Wizard:</b> He has THREE spells generated at random from the Spells of the Djed'hi list. <b>No new skills:</b> He will not stay long enough with a warband to learn new skills.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc"
+    ],
+    "flags": [
+     "human"
+    ]
+   }
+  },
+  "gaoler": {
+   "race": "human",
+   "name": "Gaoler",
+   "grade": "1b",
+   "src": "Nemesis Crown",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 18,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 2,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Torturer's Grapple (special), Whip, Light Armour",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "noArmour": false,
+   "sp": "<b>Torturer's grapple:</b> Instead of his normal attacks he may make one grapple attack that deals no damage. If it hits, the target must roll under its Strength with a -1 penalty or become immobile and unable to do anything at all (no fighting, items, spells or shooting) until it rolls under its Strength (-1) at the start of the next melee phase. Other models in his warband may attack the grappled enemy normally, but the Gaoler may do nothing else. Models not alive or immune to pain (Undead, Daemons) and Large models cannot be grappled. <b>Devout:</b> As long as there is a Sigmarite Priest in the warband he will not leave even if unpaid - but he will not fight in the next battle until he is paid. <b>Inured to pain:</b> All Injury rolls against him suffer -1; ignore results of 0. <b>Hatred:</b> He hates all members of Skaven, Possessed, Beastmen, Carnival of Chaos and Undead warbands.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "wh"
+    ]
+   }
+  },
+  "halflingthief": {
+   "hsSpecial": [
+    [
+     "Wily Thief",
+     "If the Thief takes any enemy out of action during a game (and is not taken Out of Action himself), his warband receives one ADDITIONAL Treasure - on top of the +1 from Cutpurse."
+    ],
+    [
+     "Stealthy",
+     "He can hide even after running, and may run while within 8 inches of enemy models if he starts and ends his move hidden."
+    ]
+   ],
+   "race": "halfling",
+   "name": "Halfling Thief",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 25,
+   "upkeep": 0,
+   "rating": 14,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 4,
+    "S": 2,
+    "T": 2,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sling, Dagger, Sword",
+   "sk": [
+    "speed",
+    "shooting"
+   ],
+   "maxprof": "halfling",
+   "upkeepNote": "Uneasy Ally: roll D6 after each game; special upkeep/leaving rules.",
+   "sp": "<b>Infiltrator:</b> He may always be placed after the opposing warband, anywhere out of sight and more than 12 inches from any enemy model. <b>Pick Locks:</b> When testing to open a locked door he only needs to pass an Initiative test. <b>Cutpurse:</b> If he took part in the game and was not taken Out of Action, the warband receives one ADDITIONAL Treasure. <b>Uneasy Ally:</b> Roll a D6 at the end of every game (whether or not he fought): 1 - Stop Thief! He absconds with ALL the warband's valuables (remove him and all Treasures from your stash); 2-5 - Tax Time, he charges his normal 15 gc upkeep; 6 - Ignorance is Bliss, he waives his upkeep entirely.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc"
+    ],
+    "wbs": [
+     "woodelf"
+    ],
+    "flags": [
+     "dwarf"
+    ]
+   }
+  },
+  "humanscout": {
+   "hsSpecial": [
+    [
+     "Expert Hunter",
+     "While Hidden he may only be detected by models within HALF their Initiative in inches. He may also fire his Bow without giving away his position (he fires and remains Hidden)."
+    ],
+    [
+     "Sit in Wait",
+     "The Human Scout is able to Infiltrate."
+    ]
+   ],
+   "race": "human",
+   "name": "Human Scout",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 10,
+   "upkeep": 5,
+   "rating": 9,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 6
+   },
+   "eq": "Bow, Sword, Dagger",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "sp": "<b>Not a Fighter:</b> If he is taken Out of Action during a game, he leaves on a roll of 1-3 instead of the normal 1-2. <b>Skills:</b> He may choose from Combat and Speed skills, or Quick Shot, Eagle Eyes or Trick Shooter from the Shooting list.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "orcsgoblins",
+     "beastmen",
+     "possessed"
+    ]
+   }
+  },
+  "kislevranger": {
+   "hsSpecial": [
+    [
+     "Animal Call",
+     "If hidden, she may use animal calls: any enemy within 18 inches that does not declare a charge must pass a Leadership test; on a failure the Ranger moves that model in any direction she wishes instead of its normal move."
+    ],
+    [
+     "Herb Lore",
+     "A friendly model in base contact may restore 1 wound on a 4+ in the recovery phase (she may also heal herself). She may not move that turn (but may shoot) and may not heal while in close combat."
+    ]
+   ],
+   "race": "human",
+   "name": "Kislev Ranger",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 15,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Bow, Sword, Hunter's Cloak",
+   "sk": [
+    "combat",
+    "shooting",
+    "academic",
+    "strength",
+    "speed"
+   ],
+   "sp": "<b>Heart Strike:</b> When shooting at a large monster (including large animals such as bears), a to-hit roll of 6 followed by a wound roll of 5+ kills the beast outright, regardless of wounds and with no save. <b>Hunter's Cloak:</b> A hidden Ranger does not reveal her position by shooting; the target may take an Initiative test to spot her, and only then is she no longer hidden. <b>Loner:</b> She is immune to all-alone tests. <b>Seeker:</b> If she did not go out of action she may modify one Exploration die by +/-1.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ],
+    "flags": [
+     "dwarf"
+    ]
+   }
+  },
+  "muleskinner": {
+   "skills": [
+    "Animal Handling"
+   ],
+   "hsSpecial": [
+    [
+     "Whip Master",
+     "He is so skilled with the whip that he may re-roll all failed to-hit rolls with it. Only one re-roll per attempt; the second result stands."
+    ]
+   ],
+   "race": "human",
+   "name": "Mule Skinner",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 20,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Whip, Sword, Dagger, Light Armour",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Animal Handler:</b> He starts with one Animal Handling skill (player's choice of animal). <b>Whip:</b> Range 4 inches, Strength as user -1; cannot be parried, has whipcrack, disarm and +1 armour save. <b>Disarm:</b> Instead of striking to injure he may try to make his opponent drop his weapon - roll to hit as normal; instead of rolling to wound the opponent gets a single Parry attempt, and if it fails he drops the weapon. <b>Skills:</b> Combat and Strength - in addition he may learn Streetwise and Haggle (both Academic).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "possessed",
+     "skaven",
+     "undead"
+    ]
+   }
+  },
+  "nomadscout": {
+   "race": "human",
+   "name": "Nomad Scout",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 12,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Bow, Scimitar (= Sword), Dagger",
+   "sk": [
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Son of the Desert:</b> He is adept at finding water - the warband may modify the result on the Supply Source table by +/-1.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "norseshaman": {
+   "race": "human",
+   "name": "Norse Shaman",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 45,
+   "upkeep": 25,
+   "rating": 25,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Staff, Dagger",
+   "sk": [
+    "combat",
+    "academic"
+   ],
+   "magic": "norseRunes",
+   "sp": "<b>Runes:</b> The Norse Shaman starts with TWO Runes from the Norse Runes chart. They are treated exactly like Sigmarite Prayers and can be cast while wearing armour. Abilities that grant saves against spells also grant saves against runes. <b>Skills:</b> He may choose from Combat and Academic - or, in lieu of a skill, roll for an additional Rune. Rolling a duplicate lowers the difficulty as normal for magic spells.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc"
+    ],
+    "wbs": [
+     "norse",
+     "maraudersofchaos"
+    ]
+   }
+  },
+  "oldprospector": {
+   "skills": [
+    "Wyrdstone Hunter",
+    "Resilient"
+   ],
+   "race": "human",
+   "name": "Old Prospector",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 0,
+   "upkeep": 0,
+   "rating": 15,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Pick (= hand weapon), Dagger, Lantern",
+   "sk": [
+    "strength",
+    "speed"
+   ],
+   "upkeepNote": "Hire: 2 Treasure; upkeep 1 Treasure (not gold).",
+   "sp": "<b>Hardened:</b> He has seen many strange things and is immune to the effects of Fear. <b>Finders Keepers:</b> In any scenario involving extra Treasure or Wyrdstone he keeps whatever he gets his hands on - it does NOT count as his upkeep. <b>Old Coot:</b> Roll a D6 at the end of each game - on a 1 the Prospector has left the warband. <b>Payment:</b> He is hired for 2 Treasures and his upkeep is a single Treasure (no gold).",
+   "rule": {
+    "type": "except",
+    "flags": [
+     "dwarf"
+    ]
+   }
+  },
+  "pathfinder": {
+   "hsSpecial": [
+    [
+     "Lookout!",
+     "Once per game he may cancel the effects of one trap or hazard on a roll of 4+."
+    ],
+    [
+     "This Way!",
+     "Any model in base contact with him at the start of his turn may traverse impassable terrain as if it had the same ability. If contact is lost before reaching safety, that model counts as out of action for the rest of the game."
+    ]
+   ],
+   "race": "human",
+   "name": "Pathfinder",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 60,
+   "upkeep": 15,
+   "rating": 25,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Bow, Sword, Dagger, Light Armour",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Lay of the Land:</b> He is unaffected by terrain modifiers and can circumvent even impassable obstacles. <b>Knowledge of Myths and Legends:</b> If he was not taken out of action you may re-roll one Exploration die, keeping the second result even if it is worse.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "runesmith": {
+   "hsSpecial": [
+    [
+     "Rune Use",
+     "He may inscribe Runes before a battle. He starts knowing one Rune and may learn more as spellcasters learn spells. Runes: Iron (6+ ward, armour, diff 6), Stone (+1 save, armour, 6), Fury (+1 A, weapon, 7), Striking (+1 WS, weapon, 6), Speed (+1 I, weapon, 5), Cleaving (+1 S, weapon, 8). A natural 2 destroys the item (gromril may re-roll one 2); a natural 12 makes the rune durable."
+    ]
+   ],
+   "race": "dwarf",
+   "name": "Runesmith Journeyman",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 15,
+   "profile": {
+    "M": 3,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 4,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Hammer, Crossbow, Heavy Armour",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Armourer:</b> If he did not go out of action, the warband may buy ONE item per post-battle trading session from axes, hammers, swords, two-handed weapons, helmets, shields, light and heavy armour at a 2D6 gc discount (minimum 1 gc). <b>Armour:</b> Dwarfs never suffer movement penalties for wearing armour. <b>Hate Orcs and Goblins.</b> <b>Hard to Kill:</b> Only taken out of action on a 6 instead of 5-6; treat a 5 as stunned. <b>Hard Head:</b> He ignores the special rules for maces, clubs etc. <b>Elf surcharge:</b> Warbands including Elves pay 30 gc upkeep instead of 15.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ]
+   },
+   "grudge": {
+    "tag": "elf",
+    "upkeep": 30,
+    "note": "Warbands including Elves pay 30 upkeep instead of 15."
+   }
+  },
+  "shadowwarriorHS": {
+   "race": "elf",
+   "name": "Shadow Warrior",
+   "grade": "1b",
+   "src": "Town Cryer 10",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 12,
+   "profile": {
+    "M": 5,
+    "WS": 4,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 6,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Sword, Longbow, Dagger, Shield, Light Armour",
+   "sk": [
+    "combat",
+    "shooting"
+   ],
+   "sp": "<b>Hates Dark Elves:</b> He follows the rules for hatred against Dark Elves. <b>Excellent Sight:</b> He spots Hidden enemies from twice his Initiative in inches. <b>Bitter Enemies:</b> If the last fight was against Dark Elves (or a warband containing a Dark Elf Hired Sword), his upkeep is waived for that game. <b>Infiltration:</b> A Shadow Warrior can infiltrate. <b>Skills:</b> Combat or Shooting - in addition he may choose from the Shadow Warrior special skill list.",
+   "rule": {
+    "type": "humanOrHighElf"
+   }
+  },
+  "snakecharmer": {
+   "race": "human",
+   "name": "Snake Charmer",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 40,
+   "upkeep": 10,
+   "rating": 5,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Flute, Dagger, up to 5 Snakes",
+   "sk": [
+    "academic",
+    "speed"
+   ],
+   "upkeepNote": "+5 gc upkeep and +5 rating per Snake in the entourage.",
+   "sp": "<b>Snake Charmer:</b> He controls up to FIVE snakes as long as they stay within 6 inches of him. A snake not within 6 inches in the Movement phase moves 1D6 inches in a random direction; if this brings it into contact with any model, friend or foe, it attacks as if charging. <b>Immune to Poison:</b> He has been bitten so often that he is immune to poisons. <b>Venomous:</b> The snakes count as attacking with Black Lotus. <b>Animals:</b> Snakes are animals and gain NO experience. <b>Snake hunter:</b> After each game (if not out of action) he may try to catch one more snake - roll under his Initiative. On a failed attempt roll a D6: on a 1 he suffers a Strength 3 hit. <b>Snake profile:</b> M 4, WS 3, BS 0, S 1(poison), T 2, W 1, I 5, A 1, Ld 5. He starts with three snakes; upkeep is +5 gc per snake.",
+   "rule": {
+    "type": "good"
+   }
+  },
+  "thief": {
+   "race": "human",
+   "name": "Thief",
+   "grade": "1b",
+   "src": "Araby",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 22,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sword, Dagger, Thief's Cloak",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "sp": "<b>Thief's Cloak:</b> Missile attacks against him suffer -1 to hit, and the distance required to spot him while Hidden is DOUBLED. <b>Tea-Leaf!</b> He may attempt to steal one item during the Trading phase: A common item is stolen on a 2+; a rare item is stolen by rolling higher than its availability number on 2D6. Stolen items are used exactly like bought ones. If he fails, roll a D6 - on 1-5 he is chased off and escapes, on a 6 he is captured and hanged (remove him from the roster).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "undead"
+    ]
+   }
+  },
+  "tombrobber": {
+   "skills": [
+    "Trap Expert"
+   ],
+   "race": "human",
+   "name": "Tomb Robber",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 20,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 5,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sword, Bow, Dagger, Light Armour",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Explorer:</b> He allows the warband to modify a single Exploration die by -1/+1. <b>Traps:</b> He has the Trap Expert skill. <b>Excellent Reflexes:</b> He has a special 5+ save against ANY attack - shooting, close combat, traps or spells. If he gains the Dodge skill this special save improves to 4+.",
+   "rule": {
+    "type": "good"
+   }
+  },
+  "warriorpriest": {
+   "race": "human",
+   "name": "Warrior Priest of Sigmar",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 40,
+   "upkeep": 20,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Warhammer (= Hammer), Dagger, Light Armour",
+   "sk": [
+    "academic"
+   ],
+   "magic": "prayersSigmar",
+   "sp": "<b>Prayers:</b> A Warrior-Priest is a servant of Sigmar and may use the Prayers of Sigmar. <b>New skill or new prayer:</b> When he gains a skill he may take an Academic skill OR instead randomly determine a new Prayer of Sigmar.",
+   "rule": {
+    "type": "nonChaosHuman",
+    "except": [
+     "wh"
+    ]
+   }
+  },
+  "witch": {
+   "race": "human",
+   "name": "Witch",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 14,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 2,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Dagger, Potions",
+   "sk": [
+    "academic"
+   ],
+   "magic": "charmsHexes",
+   "sp": "<b>Wizard:</b> The Witch casts spells like any other wizard - she has TWO spells generated at random from the Charms & Hexes list. <b>Recluse:</b> When attempting to hire her the warband leader must roll a D6: on a 4+ she can be hired, otherwise she shuns the warband and they must try again after their next battle. <b>Potions:</b> One Hero may drink a potion before the battle - roll a D6: 1 Debilitating (-1 T until he rolls a 6 in recovery), 2-3 Strength (+1 S until he rolls a 1), 4-5 Resilience (+1 T until he rolls a 1), 6 Fortitude (one extra wound for the battle; once lost it cannot be restored). <b>Reluctant:</b> She will NEVER charge (though she defends herself if charged) and always tries to stay at least 8 inches from enemy models, moving away if she is closer. <b>New skill or new spell:</b> She may take an Academic skill OR randomly determine a new spell from Charms & Hexes.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "wh",
+     "sos"
+    ]
+   }
+  },
+  "witchhunterHS": {
+   "race": "human",
+   "name": "Witch Hunter",
+   "grade": "1b",
+   "src": "Town Cryer",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 15,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Brace of Pistols, Sword, Dagger, Light Armour",
+   "sk": [
+    "combat",
+    "speed",
+    "shooting",
+    "academic",
+    "strength"
+   ],
+   "sp": "<b>Burn the Witch:</b> He hates all enemy spellcasters and will NOT work for a warband that includes a spellcaster - unless it is a priest of Sigmar, Ulric, Taal or Morr. <b>In Sigmar's name:</b> He may re-roll all failed Fear tests. <b>Sigmar's reward:</b> If the warband takes the leader of a Chaos or Undead warband out of action, he waives part of his fee and charges only 5 gc upkeep. <b>One battle only:</b> He will not stay with a Witch Hunter warband for more than one battle.",
+   "rule": {
+    "type": "nonChaosHuman"
+   }
+  },
+  "bonegoliath": {
+   "race": "graveguard",
+   "name": "Bone Goliath",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 225,
+   "upkeep": 0,
+   "rating": 50,
+   "profile": {
+    "M": 5,
+    "WS": 3,
+    "BS": 0,
+    "S": 5,
+    "T": 5,
+    "W": 3,
+    "I": 2,
+    "A": 3,
+    "Ld": 6
+   },
+   "eq": "None (never carries weapons or armour, no penalty)",
+   "sk": [],
+   "noXP": true,
+   "upkeepNote": "Built, not hired: 225 gc; the Liche loses D3 starting Wounds (min 1) and the warband may not search for rare items that post-battle. Only buildable with a Liche.",
+   "sp": "<b>Cause Fear:</b> A gargantuan undead construct. <b>May not run:</b> It may charge normally, but never run. <b>Immune to Psychology:</b> It is never affected by psychology and never leaves combat. <b>Immune to Poison.</b> <b>Undead Construct:</b> It ignores any injury result on a roll of 4+ and keeps fighting. This is NOT an armour save and is not modified by the Strength of the attack; it does not work against wounds caused by magic or magic weapons. <b>Large:</b> It counts as a large target for missile weapons. <b>No Pain:</b> Stunned results count as knocked down. <b>Mindless:</b> Bone Goliaths never gain experience. <b>Assembly:</b> It is BUILT, not hired - constructing one reduces the Liche's starting Wounds by D3 (minimum 1) and the warband may not look for rare items that post-battle. A warband without a Liche may not build one, but if the Liche dies afterwards the Goliath is unaffected.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "restless"
+    ]
+   }
+  },
+  "cathayanmerchant": {
+   "skills": [
+    "Haggle"
+   ],
+   "hsSpecial": [
+    [
+     "Stone Cutter",
+     "He refines wyrdstone before it is sold. Roll a D6 whenever the warband sells wyrdstone: 1-2 lose 2D6 gc, 3-5 gain 2D6 gc, 6 gain 3D6 gc."
+    ],
+    [
+     "Guardian",
+     "He has acquired a bodyguard (M 4, WS 4, BS 2, S 4, T 3, W 1, I 3, A 1, Ld 8; Sword, Light Armour, Shield, Helmet). It stays within 1 inch of the Merchant at all times, gains no experience and is not paid. Intercept: it intercepts any model shooting at or charging the Merchant; it will not charge unless the Merchant charges and cannot intercept while already engaged."
+    ]
+   ],
+   "race": "human",
+   "name": "Cathayan Merchant",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 10,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sword",
+   "sk": [
+    "academic"
+   ],
+   "sp": "<b>Haggle:</b> He may deduct 2D6 gc from the price of any single item (minimum 1 gc) once per post-battle sequence. <b>Pawnbroker:</b> If not taken out of action, the warband gains an extra 2D6 gold per item it sells (up to the item's full value). <b>Marketeer:</b> If not taken out of action, after each battle he may visit ONE of two markets - the Black Market or Exotic Wares - and roll a D6 on that table. All items bought this way are at BASE price (ignore the random gold modifiers). Black Market: 1 nothing, 2 Spider Spittle (D3 doses) 30 gc, 3 Fire Bomb 35 gc, 4 Fighting Claws 35 gc, 5 Cathayan Longsword 75 gc, 6 Lesser Artefact 75+D6x10 gc. Exotic Wares: 1 nothing, 2 Gromril Armour 150 gc, 3 Elf Bow 35 gc, 4 Ithilmar Armour 90 gc, 5 Tome of Magic 200 gc, 6 Elven Cloak 100 gc.",
+   "rule": {
+    "type": "only",
+    "flags": [
+     "human",
+     "dwarf"
+    ]
+   }
+  },
+  "chaoscentaur": {
+   "eqBase": "Throwing Axes (= Throwing Knives), Shield",
+   "opts": {
+    "label": "Extra weapon",
+    "choices": [
+     "Sword",
+     "Spear"
+    ]
+   },
+   "race": "bullcentaur",
+   "name": "Chaos Centaur",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 65,
+   "upkeep": 25,
+   "rating": 20,
+   "profile": {
+    "M": 8,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Throwing Axes (= Throwing Knives), Shield, plus Sword or Spear",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Drunken:</b> Roll a D6 at the start of each turn - on a 1 he must test for Stupidity that turn, on a 6 he becomes subject to Frenzy for that turn, on 2-5 nothing happens. While subject to either he is immune to all other forms of psychology. <b>Woodland Dwelling:</b> He suffers no movement penalties for moving through wooded areas. <b>Trample:</b> His hooves grant an ADDITIONAL attack, which gains no weapon bonuses or penalties. <b>Spear:</b> Treat it as a cavalry weapon (+1 Strength when charging). <b>Mutations:</b> When he gains a skill he may instead buy one new mutation.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "beastmen",
+     "hornedhunters",
+     "maraudersofchaos",
+     "maneaters",
+     "norse"
+    ]
+   }
+  },
+  "coachman": {
+   "race": "human",
+   "name": "Coachman",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 8,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Whip, Sword, Light Armour",
+   "sk": [
+    "speed"
+   ],
+   "sp": "<b>Driver:</b> A wagon driven by the Coachman may re-roll one result on the Out of Control chart. The second result must be accepted, even if it is worse. <b>Handyman:</b> If the wagon is stationary and he is in contact with it, he may repair one previously damaged wheel (even fit a new one if it flew off). He may do nothing else that turn and the wagon may not move. He cannot repair it while enemy models are in contact with the wagon.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "beastmen",
+     "orcsgoblins"
+    ]
+   }
+  },
+  "graverobber": {
+   "race": "human",
+   "name": "Grave Robber",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 45,
+   "upkeep": 18,
+   "rating": 15,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 6
+   },
+   "eq": "Pickaxe (= Axe), Dagger, Lantern, Toughened Leathers",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "sp": "<b>Hatred:</b> Any model that can use Prayers of Sigmar hates the Grave Robber. <b>Grave Robbing:</b> In the exploration phase, if not taken out of action, he loots a local cemetery - roll 2D6: 2 Discovered! (he is driven off - remove him from the roster), 3-4 Nothing, 5-7 Trinket (D6+3 gc), 8-9 Treasure (D6+8 gc), 10-11 Corpse (a FREE Zombie if you have room, or sell the corpse for D6+2 gc), 12 Artefact (roll on the Lesser Artefact chart).",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "undead",
+     "restless",
+     "tombguardians"
+    ]
+   }
+  },
+  "hobgoblinscout": {
+   "skills": [
+    "Ride Giant Wolf"
+   ],
+   "hsSpecial": [
+    [
+     "Spy",
+     "After deployment he may re-deploy D3 models (not himself) using the normal deployment rules. If he does not, he may instead be set up anywhere on the board more than 18 inches from any enemy model."
+    ],
+    [
+     "Potshot",
+     "He may fire a bow while running, at -2 to hit."
+    ]
+   ],
+   "race": "hobgoblin",
+   "name": "Hobgoblin Scout",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 45,
+   "upkeep": 20,
+   "rating": 19,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 6
+   },
+   "eq": "Dagger, Shortbow, Shield; rides a Giant Wolf (M9)",
+   "sk": [
+    "shooting"
+   ],
+   "sp": "<b>Ride:</b> He has the Ride Giant Wolf skill (Giant Wolf: M 9, WS 3, BS 0, S 3, T 3, W 1, I 4, A 1, Ld 4). <b>Loner:</b> He may NEVER use the warband leader's Leadership for any test. He never counts as all alone and may operate independently. <b>Traitor:</b> All greenskin races (Orcs & Goblins, Black Orcs) hate him, and a warband that hires him may never take any other greenskin Hired Sword.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "sonsofhashut",
+     "blackdwarfs",
+     "maneaters"
+    ]
+   }
+  },
+  "ninja": {
+   "skills": [
+    "Expert Swordsman",
+    "Knife-Fighter",
+    "Scale Sheer Surfaces",
+    "Art of Silent Death",
+    "Lightning Speed",
+    "Leap of Faith"
+   ],
+   "race": "human",
+   "name": "Ninja",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 70,
+   "upkeep": 0,
+   "rating": 45,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 5,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Pair of Swords, Throwing Stars, Rope & Hook, one Smoke Bomb",
+   "sk": [],
+   "upkeepNote": "Hire 70 +3D6 gc. Strictly Business: hired for one job — no upkeep, leaves after the battle, gains no experience.",
+   "sp": "<b>Strictly Business:</b> He is hired for one specific job - no upkeep, he automatically leaves after the battle he was hired for, and he therefore gains NO experience. <b>Secrecy:</b> He does not fight side by side with the warband and does NOT count as part of it for Rout tests.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "orcsgoblins",
+     "beastmen"
+    ],
+    "wbs": [
+     "maraudersofchaos",
+     "norse",
+     "sonsofhashut",
+     "blackdwarfs"
+    ]
+   }
+  },
+  "pyromaniac": {
+   "hsSpecial": [
+    [
+     "Rocket Science",
+     "He may modify the roll on the fireworks table by +1 or -1."
+    ],
+    [
+     "Display Artist",
+     "Instead of rolling the artillery die he may pass an Initiative test to make the rocket detonate immediately."
+    ]
+   ],
+   "race": "human",
+   "name": "Pyromaniac",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 25,
+   "upkeep": 10,
+   "rating": 9,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Fireworks, Firecrackers (unlimited)",
+   "sk": [],
+   "sp": "<b>Crazed Firestarter:</b> Each turn he either launches a rocket or throws firecrackers - he will move but NEVER run or charge. If attacked he fights back normally. <b>Rockets:</b> Each shooting phase he starts one rocket; use the artillery dice for distance (he controls the initial direction). Unless it hits something, place a marker - from then on it keeps flying each shooting phase (artillery dice for distance, scatter dice for direction) until it hits an object. Anything hit suffers an automatic Strength 4 hit and is set on fire on a 4+. On a misfire the rocket detonates immediately - roll a D6: 1 Nothing, 2-3 Zishh! (re-roll the artillery die and move it twice the score), 4-5 Spectacle (all models within 2D6 inches must pass a Ld test or be distracted for the turn - distracted models are hit automatically in close combat and cannot fight back), 6 Explosion (automatic S4 hit to all models within D6 inches). <b>Skills:</b> He MUST choose from his own special skills when he gains a new skill.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc"
+    ],
+    "wbs": [
+     "caravans",
+     "battlemonks"
+    ]
+   }
+  },
+  "swordsmith": {
+   "hsSpecial": [
+    [
+     "Honing",
+     "If he was not taken out of action he may hone up to THREE blades (swords and similar bladed weapons such as Dragon Swords), giving them the Cutting Edge special rule for the next battle."
+    ],
+    [
+     "Farrier",
+     "Between battles he shoes all equine beasts in the warband. Whenever a Horse, Mule, Warhorse, Elven Steed or Chaos Centaur is taken out of action, remove it from the roster only on a 1 (instead of 1-2)."
+    ]
+   ],
+   "race": "human",
+   "name": "Swordsmith",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 60,
+   "upkeep": 15,
+   "rating": 10,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Hammer, Toughened Leathers",
+   "sk": [
+    "academic",
+    "strength"
+   ],
+   "sp": "<b>Master Craftsman:</b> When your Heroes search for Cathayan Longswords and Dragon Swords, the rarity of those items is decreased by -1 for every TWO Experience points the Swordsmith has.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh",
+     "sos"
+    ],
+    "wbs": [
+     "caravans",
+     "battlemonks"
+    ]
+   }
+  },
+  "beggar": {
+   "race": "human",
+   "name": "Beggar",
+   "grade": "2a",
+   "src": "Fanatic Online 94",
+   "hire": 10,
+   "upkeep": 5,
+   "rating": 8,
+   "profile": {
+    "M": 4,
+    "WS": 1,
+    "BS": 1,
+    "S": 2,
+    "T": 2,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 5
+   },
+   "eq": "Club",
+   "sk": [
+    "speed"
+   ],
+   "upkeepNote": "Evil warbands pay 15 gc for the initial hire.",
+   "sp": "<b>Scrounge:</b> At the end of each battle in which he was not put out of action, he adds an EXTRA Exploration die to your pool. <b>Not a Threat:</b> Warbands may ignore the Beggar when choosing the nearest target for shooting, and may charge past another enemy within 2 inches of him. <b>Evil surcharge:</b> Evil warbands must pay 15 gc for the initial hire instead of 10.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "chaosfury": {
+   "race": "possessed",
+   "name": "Chaos Fury",
+   "grade": "2a",
+   "src": "Facebook Group",
+   "hire": 30,
+   "upkeep": 20,
+   "rating": 25,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 2,
+    "Ld": 10
+   },
+   "eq": "Razor claws (natural; magical attacks)",
+   "sk": [],
+   "noXP": true,
+   "upkeepNote": "Summoned: a spell-caster pays the fee and passes a Ld test after a game; 2 or 12 fails and the caster may miss the next game.",
+   "sp": "<b>Fear.</b> <b>Daemonic Flesh:</b> Base armour save of 5+ that is never modified - but completely negated by blessed or magic weapons and spells. Its own attacks count as magical. <b>Daemonic Mind:</b> Completely immune to all psychology - and it NEVER gains experience. <b>Daemonic Instability:</b> If taken out of action it is banished and destroyed on a D6 roll of 1-3 (do not roll for injury). If the spell-caster who summoned it is killed or leaves the warband, the Daemon is banished. <b>Fly:</b> Instead of moving normally it may move anywhere within 12 inches (counting as a charge if it reaches an enemy), move vertically without climbing, or jump from any height without falling. <b>Malicious:</b> After taking an enemy out of action it spends its next movement phase stationary tormenting the victim - this ends immediately if an enemy comes within 8 inches or if it is targeted by missiles or spells. <b>Summoning:</b> It can only be hired by a summoning ritual: a spell-caster pays the fee and passes a Leadership test after a game. On a 2 or 12 the ritual fails and the caster must pass a Toughness test or miss the next game. The fee is consumed either way.",
+   "rule": {
+    "type": "chaos"
+   }
+  },
+  "cursedhillman": {
+   "hsSpecial": [
+    [
+     "Control",
+     "He may transform into the Werewolf during the shooting phase on a D6 roll of 2+. If the roll fails he must remain static (counts as knocked down) and is fully transformed by the start of his next turn."
+    ],
+    [
+     "Rage",
+     "In wolf-form he gains +1 WS, +1 S, +1 I and an extra attack (his off-hand becomes a claw). This skill may only be taken if Control has already been chosen."
+    ]
+   ],
+   "race": "woc",
+   "name": "Cursed Hillman",
+   "grade": "2a",
+   "src": "Fanatic Online 49",
+   "hire": 60,
+   "upkeep": 25,
+   "rating": 20,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Axe, Dagger, Longbow, heavy fur cloak (5+ vs shooting, 6+ in close combat)",
+   "sk": [
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Hunter:</b> He may move at half rate and still fire his bow without penalty. <b>Thin Flesh:</b> He counts as having -1 Toughness in hand-to-hand combat. <b>Lycanthrope:</b> Whenever he loses a wound he must roll a D6 - on a 4+ the beast escapes and he transforms into a werewolf (ignore the injury roll). If he does not transform, roll on the injury table at -1 (knocked down 2-3, stunned 4-5, out of action only on a 6). In wolf-form he gains a bonus Bite attack resolved at -1 Strength. <b>Wolf-form:</b> M 7, WS 4, BS 0, S 4, T 4, W 2, I 5, A 2(3), Ld 6 - all garments and weapons are discarded (collected after the battle) and he fights with teeth and claws at no penalty. <b>Fur cloak:</b> 5+ save against shooting, 6+ in close combat.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "undead",
+     "restless",
+     "tombguardians",
+     "beastmen",
+     "hornedhunters",
+     "possessed"
+    ]
+   }
+  },
+  "darkmage": {
+   "race": "human",
+   "name": "Dark Mage",
+   "grade": "2a",
+   "src": "Letters of the Damned 6",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 18,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Staff",
+   "sk": [
+    "academic"
+   ],
+   "magic": "lesserMagic",
+   "sp": "<b>Wizard:</b> He randomly generates a spell from the Dark Magic list, and may gain further spells from Dark Magic OR from the Lesser Magic list. <b>Despise Despoilers:</b> He HATES Necromancers and anyone who casts spells from Necromancy or the Dreaded Scrolls of Nagash. <b>Self Assured:</b> Immune to All Alone tests - he will never flee as a result.",
+   "rule": {
+    "type": "good",
+    "except": [
+     "sos",
+     "wh"
+    ]
+   }
+  },
+  "dwarfslayerpirate": {
+   "race": "dwarf",
+   "name": "Dwarf Slayer Pirate",
+   "grade": "2a",
+   "src": "Fanatic Online 45",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 14,
+   "profile": {
+    "M": 3,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 4,
+    "W": 1,
+    "I": 2,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Sword, Superior Black Powder, many Pistols",
+   "sk": [
+    "combat",
+    "shooting"
+   ],
+   "sp": "<b>Deathwish:</b> Immune to psychology; he never needs to test when fighting alone. <b>Hard to Kill:</b> Only taken out of action on an injury roll of 6; treat a 5 as stunned. <b>Hard Head:</b> He ignores the concussion special rule. <b>Festooned with Pistols:</b> He never has to reload - a new pistol is always primed. Exception: In hand-to-hand combat he may only use pistols in the FIRST round; in later rounds the pistol counts as a club. He may draw another once he is out of combat or all his opponents are down. <b>Raging Drunk:</b> The warband treats Bugman's Ale as Rare 6, but must pay an extra 2D6 gc for what the Slayer Pirate drinks. <b>Elf surcharge:</b> A warband containing an Elf pays 20 gc upkeep instead of 15.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc",
+     "wh"
+    ],
+    "wbs": [
+     "averland",
+     "ostlander",
+     "kislev",
+     "tileans",
+     "dwarftreasure",
+     "hochland",
+     "pirates"
+    ]
+   },
+   "grudge": {
+    "tag": "elf",
+    "upkeep": 20,
+    "note": "+5 gc upkeep if the warband includes an Elf."
+   }
+  },
+  "emissary": {
+   "race": "woc",
+   "name": "Emissary of Chaos",
+   "grade": "2a",
+   "src": "Fanatic Online 94",
+   "hire": 50,
+   "upkeep": 20,
+   "rating": 25,
+   "profile": {
+    "M": 4,
+    "WS": 5,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Chaos Armour (4+ save), Helmet, Shield, Sword",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "personas": [
+    {
+     "name": "Mark of Khorne",
+     "eq": "Chaos Armour (4+ save), Helmet, Shield, Sword",
+     "sk": [
+      "combat",
+      "strength"
+     ],
+     "sp": "Mark of Khorne: Frenzy, +1 Attack."
+    },
+    {
+     "name": "Mark of Tzeentch",
+     "eq": "Chaos Armour (4+ save), Helmet, Shield, Sword",
+     "sk": [
+      "combat",
+      "academic"
+     ],
+     "magic": "chaosRituals",
+     "sp": "Mark of Tzeentch: Knows one Chaos Ritual spell and may cast while wearing armour."
+    },
+    {
+     "name": "Mark of Nurgle",
+     "eq": "Chaos Armour (4+ save), Helmet, Shield, Sword",
+     "sk": [
+      "combat",
+      "strength"
+     ],
+     "sp": "Mark of Nurgle: Poisoned attacks (as Black Lotus) and causes fear."
+    },
+    {
+     "name": "Mark of Slaanesh",
+     "eq": "Chaos Armour (4+ save), Helmet, Shield, Sword",
+     "sk": [
+      "combat",
+      "speed"
+     ],
+     "sp": "Mark of Slaanesh: Enemies must pass a Leadership test to charge him; −1 to hit him."
+    }
+   ],
+   "sp": "<b>Mark of a Chaos God:</b> Chosen when hired — it sets his special rules and skill lists. <b>Khorne:</b> Frenzy and +1 Attack. <b>Tzeentch:</b> One spell from the Chaos Rituals; may cast while wearing armour (and may take Academic skills). <b>Nurgle:</b> All attacks are poisoned (as Black Lotus) and he causes fear. <b>Slaanesh:</b> All enemies must pass a Leadership test to charge him; those engaging him in close combat suffer −1 to hit.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "darkelves",
+     "possessed",
+     "carnival",
+     "norse",
+     "beastmen",
+     "hornedhunters"
+    ]
+   }
+  },
+  "diestro": {
+   "race": "human",
+   "name": "Estalian Diestro",
+   "grade": "2a",
+   "src": "Letters of the Damned 2",
+   "hire": 35,
+   "upkeep": 15,
+   "rating": 18,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Rapier (Parry + Barrage), Main Gauche, Light Armour",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "sp": "<b>Rapier:</b> Parry, plus <b>Barrage</b> - if he hits but fails to wound, he may attack again as if he had another attack, at a cumulative -1 to hit (down to a maximum of needing a 6). Attacks gained this way also benefit from Barrage. <b>Main Gauche:</b> Each turn he chooses - use it as a dagger for an ADDITIONAL attack, OR parry a blow with it as if it were a sword (in which case he gains no extra attack).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "possessed",
+     "carnival",
+     "beastmen",
+     "skaven",
+     "undead"
+    ],
+    "wbs": [
+     "tileans",
+     "ostlander",
+     "hornedhunters"
+    ]
+   }
+  },
+  "fallensister": {
+   "race": "human",
+   "name": "The Fallen Sister",
+   "grade": "2a",
+   "src": "Fanatic Online 25",
+   "hire": 55,
+   "upkeep": 15,
+   "rating": 22,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Steel Whip, Sigmarite Warhammer, Dagger, Sling, Light Armour",
+   "sk": [
+    "combat",
+    "strength",
+    "speed"
+   ],
+   "magic": "lesserMagic",
+   "sp": "<b>Wizard:</b> She has ONE spell generated at random from the Lesser Magic list. <b>Warrior Wizard:</b> She may cast her spells while wearing her armour. <b>Ashamed and Afraid:</b> She must pass a Leadership test in order to charge any member of a Sisters of Sigmar warband, or a Warrior-Priest from a Witch Hunters warband. <b>New skill or new spell:</b> When she gains a level she may take a Combat, Strength or Speed skill, OR randomly choose a new spell from Lesser Magic.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "undead",
+     "wh",
+     "sos"
+    ]
+   }
+  },
+  "goblinlanternbearer": {
+   "race": "goblin",
+   "name": "Goblin Lantern Bearer",
+   "grade": "2a",
+   "src": "Fanatic Online 89",
+   "hire": 15,
+   "upkeep": 5,
+   "rating": 5,
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 5
+   },
+   "eq": "Lantern, Dagger",
+   "sk": [
+    "speed"
+   ],
+   "upkeepNote": "Mordheimer lists 'May be Hired: ?' — modelled here as greenskin warbands (goblin); House-Rule-overridable.",
+   "sp": "<b>Smart (for a Goblin):</b> He does not suffer from Animosity as most goblins do. <b>Very Lucky:</b> If taken out of action, roll for his injuries: 1 - lost, 2-6 - he survives. <b>Small Size:</b> If not taken out of action he helps search for wyrdstone - add +3 to the TOTAL of the wyrdstone dice roll (e.g. a total of 15 becomes 18, giving 4 shards instead of 3). <b>Note:</b> Mordheimer lists 'May be Hired: ?' - modelled here as greenskin warbands; House-Rule-overridable.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "orcsgoblins"
+    ]
+   }
+  },
+  "gravesman": {
+   "race": "human",
+   "name": "Gravesman",
+   "grade": "2a",
+   "src": "Letters of the Damned 5",
+   "hire": 25,
+   "upkeep": 15,
+   "rating": 15,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Shovel (= Halberd), Pry bar, Dagger",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>He's o'er dere:</b> Should a Hero die (11-15 on the Serious Injuries chart), you may retain his equipment on a D6 roll of 4+ - but ONLY if you pay the Gravesman's upkeep. If you do not, he keeps whatever he has found.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "undead",
+     "carnival"
+    ]
+   }
+  },
+  "halflingknight": {
+   "race": "halfling",
+   "name": "Halfling Knight",
+   "grade": "2a",
+   "src": "Fanatic Online 94",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 12,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 2,
+    "T": 2,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Cavalry Spear, Sword, Heavy Armour, Helmet, Shield, Hound, Barding",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "sp": "<b>Slay Large Creature:</b> When charging a Large creature he gains +1 Strength - in addition to the +1 Strength he already gains for charging with a cavalry spear. <b>Hound:</b> He rides a war hound (M 5 reduced by barding, WS 4, BS 0, S 4, T 3, W 1, I 4, A 1, Ld 5).",
+   "rule": {
+    "type": "good"
+   }
+  },
+  "imperialtactician": {
+   "hsSpecial": [
+    [
+     "Organized Search Party",
+     "The warband may re-roll one Exploration die."
+    ],
+    [
+     "Send False Signals",
+     "After all warbands have deployed (but before Expert Tactician is used), he may move 1 member of EACH opposing warband D6 inches in any direction. This may not move a model off the board nor place it in direct harm."
+    ]
+   ],
+   "race": "human",
+   "name": "Imperial Tactician",
+   "grade": "2a",
+   "src": "Fanatic Online 94",
+   "hire": 40,
+   "upkeep": 20,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 5,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Two-handed Sword, Plate Armour (4+, −1 M), Helmet, Dagger",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Expert Tactician:</b> After all warbands have deployed, he may change the starting position of up to D3+1 of your warriors. <b>Read the Battle:</b> As long as he is not out of action, the hiring warband automatically PASSES the first Rout test it has to make. <b>Plate armour:</b> 4+ save, -1 Movement.",
+   "rule": {
+    "type": "human"
+   }
+  },
+  "knightwhitewolf": {
+   "skills": [
+    "Unstoppable Charge",
+    "Ride Warhorse"
+   ],
+   "race": "human",
+   "name": "Knight of the White Wolf",
+   "grade": "2a",
+   "src": "Facebook Group",
+   "hire": 55,
+   "upkeep": 20,
+   "rating": 18,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Heavy Armour, Wolfcloak, great two-handed Hammer (= Horseman's Hammer)",
+   "sk": [
+    "combat",
+    "strength",
+    "cavalry"
+   ],
+   "sp": "<b>Pride of Ar-Ulric:</b> He may act as a Leader, letting comrades use his Leadership - but his Leadership may NOT be used for Rout tests. <b>Cavalryman:</b> He may be given a Warhorse (and no lesser steed) if the warband owns one, granting the usual Warhorse bonuses and +5 rating. <b>Among Wolves:</b> His upkeep is HALVED if hired by a Middenheim warband. <b>Opposing cult:</b> He will never join or stay with a warband that includes a Warrior Priest. <b>Starting skills:</b> He begins with Unstoppable Charge and Ride Warhorse.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc"
+    ]
+   }
+  },
+  "ninjagnoblar": {
+   "hsSpecial": [
+    [
+     "Expert Rooftop Jumper",
+     "He may jump up to 4 inches and may re-roll a failed Initiative test when jumping or making a diving charge."
+    ]
+   ],
+   "race": "goblin",
+   "name": "Ninja Gnoblar",
+   "grade": "2a",
+   "src": "Hired Sword Compendium",
+   "hire": 35,
+   "upkeep": 10,
+   "rating": 8,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 6
+   },
+   "eq": "Ninja Robe (= Hardened Leathers), Shurikens, Bo (extra attack, parry, two-handed)",
+   "sk": [
+    "shooting",
+    "speed"
+   ],
+   "upkeepNote": "Leaves immediately if the warband ever includes a fear-causing creature.",
+   "sp": "<b>Stealthy:</b> He may throw his shurikens while hidden without revealing his position. The target may take an Initiative test to spot him; only if it succeeds does he stop counting as hidden. <b>Rooftop to Rooftop:</b> He does not deduct the jumped distance from his movement - he can run 8 inches and still jump 3. <b>Fear:</b> He will LEAVE immediately if the warband ever gains a model that causes fear.",
+   "rule": {
+    "type": "except",
+    "wbs": [
+     "maneaters"
+    ]
+   }
+  },
+  "ogreslavemaster": {
+   "race": "ogre",
+   "name": "Ogre Slave Master",
+   "grade": "2a",
+   "src": "Fanatic Online 89",
+   "hire": 90,
+   "upkeep": 35,
+   "rating": 40,
+   "profile": {
+    "M": 6,
+    "WS": 3,
+    "BS": 2,
+    "S": 4,
+    "T": 4,
+    "W": 3,
+    "I": 4,
+    "A": 2,
+    "Ld": 7
+   },
+   "maxprof": "ogre",
+   "eq": "Axe, Club, Light Armour (6+ save)",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Slave Master:</b> Works like the Bounty Hunter's Capture, except the 'mark' becomes OWNED by the Slave Master at the end of the battle (no reward money, but he still gains D3 experience if he survives and the warband wins). The mark then fights for the Slave Master's warband and must always stay within 8 inches of him (a great chain). While holding the shackles he may only use one weapon. If the Slave Master goes out of action and no warband member is within 8 inches of the mark, the mark runs for the nearest safe area (off the board = lost forever, or back towards its original warband - if it comes within 8 inches of them it reverts to its original owner). If another warband member IS within 8 inches, the mark charges that model in rage (treat as Hatred). <b>Fear.</b> <b>Large Target.</b> <b>Save:</b> 6+.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "possessed",
+     "carnival",
+     "beastmen",
+     "hornedhunters"
+    ]
+   }
+  },
+  "slaver": {
+   "race": "human",
+   "name": "Slaver",
+   "grade": "2a",
+   "src": "Fanatic Online 94",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 12,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Spear, Net, Light Armour, Helmet, Dagger",
+   "sk": [
+    "combat",
+    "strength"
+   ],
+   "sp": "<b>Slaver:</b> Any Hero or Henchman put out of action by him is automatically Captured (as result 61 on the Heroes Serious Injuries chart). A captured model MUST be sold: Heroes for D6 x 10 gc, Henchmen for D6 x 3 gc. If the warband cannot pay this price, that Hero or Henchman is sold into slavery and removed from the roster.",
+   "rule": {
+    "type": "evil"
+   }
+  },
+  "swashbuckler": {
+   "race": "human",
+   "name": "Swashbuckler",
+   "grade": "2a",
+   "src": "Fanatic Online 94",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 5,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Rapier, Dagger, Light Armour, Duelling Pistol",
+   "sk": [
+    "speed",
+    "shooting",
+    "combat"
+   ],
+   "sp": "<b>Acrobatic:</b> He needs no Initiative test when wounded within 1 inch of a building edge. <b>Nimble:</b> He may run or charge while climbing. <b>Charismatic:</b> Any opponent of the opposite sex (Sisters of Sigmar, Amazons) must pass a Leadership test in order to charge him. <b>Scale Sheer Surfaces bonus:</b> If he takes that skill he also gains a further D3 inches of charge or run movement while climbing.",
+   "rule": {
+    "type": "nonEvil"
+   }
+  },
+  "ungortrapper": {
+   "hsSpecial": [
+    [
+     "Mutant",
+     "The Ungor may buy one mutation (see the Mutants special rules)."
+    ],
+    [
+     "Fearless",
+     "Immune to fear and to all-alone tests. Taking this skill also cancels his Just a Twit rule."
+    ],
+    [
+     "Manhater",
+     "He is subject to Hatred when fighting any Human warband."
+    ]
+   ],
+   "race": "gor",
+   "name": "Ungor Trapper",
+   "grade": "2a",
+   "src": "Facebook Group",
+   "hire": 20,
+   "upkeep": 10,
+   "rating": 12,
+   "profile": {
+    "M": 5,
+    "WS": 3,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 6
+   },
+   "eq": "Bow, Dagger, Club, Rope and Hook",
+   "sk": [
+    "speed",
+    "shooting"
+   ],
+   "sp": "<b>Set Traps:</b> He may set a trap if he spends a turn doing nothing else (not after recovering from Knocked Down). Place a marker in base contact. Any model, friend or foe, moving within 2 inches risks setting it off - roll a D6: on a 3+ it triggers and the model suffers a Strength 4 hit (he never triggers his own traps). If the trap wounds, the victim is placed Knocked Down or Stunned 2 inches from the marker. The marker is removed either way. <b>Hunter's Eye:</b> +1 on injury rolls after a successful wound caused by shooting. <b>Excellent Sight:</b> He spots Hidden enemies at twice his Initiative in inches. <b>Just a Twit:</b> If taken Out of Action he leaves the warband on a 1-3 and takes 10 gc upkeep with him. The Fearless skill cancels this rule.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "beastmen",
+     "hornedhunters",
+     "possessed",
+     "norse",
+     "maraudersofchaos"
+    ]
+   }
+  },
+  "weaponsmith": {
+   "race": "human",
+   "name": "Weaponsmith",
+   "grade": "2a",
+   "src": "E. Intrieri",
+   "hire": 30,
+   "upkeep": 15,
+   "rating": 16,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Hammer, Crossbow, Buckler, Light Armour, Helmet",
+   "sk": [
+    "strength",
+    "speed"
+   ],
+   "sp": "<b>Maintenance:</b> Before each game roll a D6 and apply the result to the equipment of your Heroes and the Weaponsmith (accept the first result even if nobody carries the relevant gear): 1 - nothing; 2 - Heavy armour gives 4+, Light armour 5+; 3 - Helmets give an additional +1 save; 4 - Bucklers give an additional +1 save; 5 - Shields may parry like bucklers in addition to their normal effect; 6 - Short bows, bows, crossbows and handguns gain +6 inches range, pistols and duelling pistols +3 inches (does not stack with other bonuses - the highest applies).",
+   "rule": {
+    "type": "nonEvil"
+   }
+  },
+  "woodelfhunter": {
+   "race": "elf",
+   "name": "Wood Elf Hunter",
+   "grade": "2a",
+   "src": "Letters of the Damned 2",
+   "hire": 50,
+   "upkeep": 20,
+   "rating": 22,
+   "profile": {
+    "M": 5,
+    "WS": 4,
+    "BS": 5,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 6,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Elf Bow, Sword, Light Armour, Hunting Arrows",
+   "sk": [
+    "speed",
+    "shooting"
+   ],
+   "sp": "<b>Stalk:</b> He may remain hidden after shooting his bow on a roll of 4+. <b>Hunted:</b> At the start of each game he chooses ONE enemy as his prey - all his attacks against that model, missile or close combat, are at +1 to hit. <b>Keen Eyed:</b> He spots hidden enemies at twice his Initiative value.",
+   "rule": {
+    "type": "good"
+   }
+  },
+  "priestofmorr": {
+   "race": "human",
+   "name": "Priest of Morr",
+   "grade": "1b",
+   "src": "Town Cryer 12",
+   "hire": 35,
+   "upkeep": 0,
+   "rating": 13,
+   "slot": "hero",
+   "profile": {
+    "M": 4,
+    "WS": 2,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 9
+   },
+   "eq": "Dagger, Scythe (S+1, two-handed, difficult to use); may never wear armour",
+   "sk": [
+    "academic",
+    "speed"
+   ],
+   "upkeepNote": "Occupies a HERO slot (replaces one of the warband's Heroes). Starts with 8 XP. Mordheimer lists no separate upkeep/rating — treated here as a Hero (rating derived).",
+   "sp": "<b>Loner:</b> Priests of Morr do not suffer from the all-alone rules. <b>Funerary Rites:</b> He is NOT a wizard, but may perform Funerary Rites using the rules for Magic. <b>Hero slot:</b> He replaces one of a Mercenary warband's Heroes and starts with 8 experience. <b>Weapons:</b> Only a Dagger and a Scythe (Strength as user +1, difficult to use, two-handed); he may never wear armour. <b>Not for:</b> Witch Hunters and Sisters of Sigmar.",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "merc"
+    ]
+   }
+  },
+  "wolfpriest": {
+   "race": "human",
+   "name": "Wolf Priest of Ulric",
+   "grade": "1b",
+   "src": "Town Cryer 8",
+   "hire": 60,
+   "upkeep": 0,
+   "rating": 13,
+   "slot": "champion",
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 1,
+    "I": 3,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Wolf-pelt cloak (6+ save, included); blunt weapons only (Hammer/Mace/Club/Flail/Morning Star + two-handed) plus Dagger; no armour",
+   "sk": [
+    "combat",
+    "academic",
+    "strength",
+    "speed"
+   ],
+   "upkeepNote": "Occupies a CHAMPION slot in a Middenheim Mercenary warband. Mordheimer lists no separate upkeep/rating — treated here as a Champion (rating derived). Wolf Companion (Henchman, 25 gc) available only while the Wolf Priest is present.",
+   "sp": "<b>Prayers:</b> A Wolf Priest is a servant of Ulric and may use the Prayers of Ulric. <b>Hatred:</b> He hates Witch Hunters (Templars of Sigmar), Warrior-Priests, Sigmarite Matriarchs and Sisters Superior - but NOT the other models in those warbands, whom he sees as misguided followers. <b>Wolf Companion:</b> He may be accompanied by a huge wolf (Henchman, 25 gc; M 6, WS 4, BS 0, S 4, T 4, W 1, I 4, A 2, Ld 5; 6+ save; an animal, so it gains no experience). <b>Armour:</b> No armour at all, except his white wolf pelt cloak (6+ save, included in his cost). <b>Weapons:</b> Blunt weapons only - Hammers, Maces, Clubs, Flails, Morning Stars and their two-handed versions, plus the ubiquitous Dagger. <b>Champion slot:</b> He replaces a Champion in a Middenheim Mercenary warband.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "merc"
+    ],
+    "subtype": "midd"
+   }
+  }
+ },
+ "HS_GRADE_ORDER": [
+  "1a",
+  "1b",
+  "1c",
+  "2a"
+ ],
+ "WBHIRE": {
+  "merc": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "possessed": {
+   "align": "evil",
+   "tags": [
+    "possessed"
+   ]
+  },
+  "wh": {
+   "align": "good",
+   "tags": [
+    "wh"
+   ]
+  },
+  "sos": {
+   "align": "good",
+   "tags": [
+    "sos"
+   ]
+  },
+  "undead": {
+   "align": "evil",
+   "tags": [
+    "undead"
+   ]
+  },
+  "skaven": {
+   "align": "evil",
+   "tags": [
+    "skaven"
+   ]
+  },
+  "woodelf": {
+   "align": "neutral",
+   "tags": [
+    "goodElves"
+   ],
+   "elf": true,
+   "noChaosHS": true
+  },
+  "ostlander": {
+   "align": "good",
+   "only": [
+    "ogre"
+   ]
+  },
+  "carnival": {
+   "align": "evil",
+   "tags": [
+    "carnival"
+   ]
+  },
+  "dwarftreasure": {
+   "align": "good",
+   "dwarf": true,
+   "noElfHS": true
+  },
+  "averland": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "orcmob": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "beastmen": {
+   "align": "evil",
+   "tags": [
+    "beastmen"
+   ]
+  },
+  "maraudersofchaos": {
+   "align": "evil",
+   "only": [
+    "pitfighter",
+    "ogre",
+    "norseshaman",
+    "imperialassassin",
+    "warlock",
+    "witch",
+    "chaoscentaur",
+    "chaosfury"
+   ]
+  },
+  "kislev": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "amazons": {
+   "align": "neutral",
+   "none": true
+  },
+  "arabian": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "blackorcs": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "bretonnian": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "darkelves": {
+   "align": "evil",
+   "elf": true,
+   "tags": [
+    "goodElves"
+   ]
+  },
+  "dwarfrangers": {
+   "align": "good",
+   "dwarf": true,
+   "noElfHS": true
+  },
+  "forestgoblins": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "gunnery": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "hochland": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "hornedhunters": {
+   "align": "evil",
+   "tags": [
+    "beastmen"
+   ]
+  },
+  "outriders": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ],
+   "only": [
+    "freelancer",
+    "roadwarden"
+   ]
+  },
+  "lizardmen": {
+   "align": "neutral",
+   "only": [
+    "chameleonskink"
+   ]
+  },
+  "mootlanders": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "norse": {
+   "align": "neutral",
+   "tags": [
+    "merc"
+   ]
+  },
+  "ostermark": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "outlaws": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "pirates": {
+   "align": "neutral",
+   "tags": [
+    "merc"
+   ]
+  },
+  "pitfighters": {
+   "align": "neutral",
+   "except": [
+    "elfranger"
+   ]
+  },
+  "skavenpest": {
+   "align": "evil",
+   "tags": [
+    "skaven"
+   ]
+  },
+  "tileans": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "tombguardians": {
+   "align": "evil",
+   "tags": [
+    "undead"
+   ]
+  },
+  "amazonslustria": {
+   "align": "neutral",
+   "none": true
+  },
+  "shadowwarriors": {
+   "align": "neutral",
+   "elf": true,
+   "tags": [
+    "goodElves"
+   ],
+   "noChaosHS": true
+  },
+  "sonsofhashut": {
+   "align": "evil",
+   "dwarf": true,
+   "only": [
+    "ogre",
+    "pitfighter",
+    "warlock",
+    "imperialassassin",
+    "hobgoblinscout"
+   ],
+   "noElfHS": true
+  },
+  "blackdwarfs": {
+   "align": "evil",
+   "dwarf": true,
+   "only": [
+    "ogre",
+    "pitfighter",
+    "warlock",
+    "imperialassassin",
+    "hobgoblinscout"
+   ],
+   "noElfHS": true
+  },
+  "battlemonks": {
+   "align": "neutral",
+   "only": [
+    "cathayanmerchant",
+    "ninja",
+    "pyromaniac",
+    "swordsmith"
+   ]
+  },
+  "bretchapel": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "cppleasures": {
+   "align": "evil",
+   "none": true
+  },
+  "cavalcade": {
+   "align": "evil",
+   "none": true
+  },
+  "reavers": {
+   "align": "neutral",
+   "only": [
+    "ogre",
+    "trollslayer",
+    "tileanmarksman",
+    "beasthunter"
+   ]
+  },
+  "maneaters": {
+   "align": "neutral",
+   "only": [
+    "halfling",
+    "halflingthief",
+    "ogre",
+    "chaoscentaur",
+    "hobgoblinscout"
+   ]
+  },
+  "caravans": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "nightgoblins": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "restless": {
+   "align": "evil",
+   "tags": [
+    "undead"
+   ],
+   "only": [
+    "bonegoliath",
+    "graverobber"
+   ]
+  }
+ }
+}

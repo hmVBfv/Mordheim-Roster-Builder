@@ -1,0 +1,658 @@
+{
+ "DISTRICTS": [
+  {
+   "id": "artisanquarter",
+   "name": "Artisan Quarter",
+   "area": "The West",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Cathayan silk clothes",
+      "Hunting arrows",
+      "Lantern",
+      "Net",
+      "Rope & hook",
+      "Superior blackpowder"
+     ],
+     "tier": "foothold",
+     "label": "½ price Cathayan Silk Clothes, Hunting Arrows, Lantern, Net, Rope & Hook, Superior Black Powder"
+    }
+   ]
+  },
+  {
+   "id": "steinhardt",
+   "name": "Count Steinhardt's Palace",
+   "area": "The West",
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "freelancer"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Freelancer"
+    },
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Horse",
+      "Warhorse",
+      "Wardog",
+      "Pferd",
+      "Kriegspferd",
+      "Reitpferd",
+      "Kriegshund"
+     ],
+     "tier": "foothold",
+     "label": "½ price Horse, Warhorse and Wardog"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "dwarvendistrict",
+   "name": "Dwarven District",
+   "area": "The West",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "trollslayer"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Dwarf Troll Slayer"
+    },
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Bugman's ale",
+      "Gromril armour",
+      "Gromril weapons",
+      "Gromril-Waffe",
+      "Gromril-Rüstung"
+     ],
+     "tier": "foothold",
+     "label": "½ price Bugman's Ale, Gromril Armour and Gromril Weapons"
+    }
+   ]
+  },
+  {
+   "id": "execsquare",
+   "name": "Executioner's Square",
+   "area": "The West",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Roll one extra dice in the Exploration Procedure"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "memorialgardens",
+   "name": "Memorial Gardens",
+   "area": "The West",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Roll 3D6 for experience when recruiting for existing, non-human Henchmen groups"
+    }
+   ]
+  },
+  {
+   "id": "ravenbarracks",
+   "name": "Raven Barracks",
+   "area": "The West",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "ogre"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Ogre Bodyguard"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "You can resell your weapons and armour at their purchase price"
+    }
+   ]
+  },
+  {
+   "id": "richquarter",
+   "name": "Rich Quarter",
+   "area": "The West",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Always find the maximum amount of gold or equipment at a location on the Exploration Chart"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "statuegotthard",
+   "name": "Statue of Count Gotthard",
+   "area": "The West",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "The warband's leader gains +1 Ld"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "templemorr",
+   "name": "Temple of Morr",
+   "area": "The West",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Injury 11-15 Dead → roll D6, on 5+ becomes 41-55 Full Recovery"
+    }
+   ]
+  },
+  {
+   "id": "cemetery",
+   "name": "The Cemetery",
+   "area": "The West",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "unitCost",
+     "map": {
+      "zombie": 10,
+      "ghoul": 30
+     },
+     "tier": "control",
+     "label": "Undead: Zombies 10 gc, Ghouls 30 gc (auto-applied when you control this district)"
+    },
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Other warbands: immune to Fear, and Terror is treated as Fear"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "gaol",
+   "name": "The Gaol",
+   "area": "The West",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "gaoler"
+     ],
+     "tier": "control",
+     "label": "½ price to hire Gaoler"
+    },
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Injury 61 Captured → becomes 41-55 Full Recovery"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "amphitheatre",
+   "name": "Amphitheatre",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "pitfighter"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Pit Fighter"
+    },
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Net"
+     ],
+     "tier": "foothold",
+     "label": "½ price Net"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Injury 65 Sold To The Pits → automatically win the Pit Fight"
+    }
+   ]
+  },
+  {
+   "id": "cityhall",
+   "name": "City Hall",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "During the Exploration Procedure, you may modify one dice by +1 or -1"
+    }
+   ]
+  },
+  {
+   "id": "clocktower",
+   "name": "Clock Tower",
+   "area": "The East",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Always find the maximum amount of gold or equipment at a location on the Exploration Chart"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "fencealley",
+   "name": "Fence Alley",
+   "area": "The East",
+   "hardFought": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Black lotus",
+      "Dark venom",
+      "Mad cap mushrooms",
+      "Crimson shade",
+      "Mandrake root",
+      "Reptile venom",
+      "Venom ring",
+      "Poisoned weapon"
+     ],
+     "tier": "control",
+     "label": "½ price Poisons and Drugs"
+    }
+   ]
+  },
+  {
+   "id": "littlemoot",
+   "name": "Little Moot",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "halfling"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Halfling Scout"
+    },
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Halfling cookbook"
+     ],
+     "tier": "foothold",
+     "label": "½ price Halfling Cookbook"
+    }
+   ]
+  },
+  {
+   "id": "merchantsquarter",
+   "name": "Merchants' Quarter",
+   "area": "The East",
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "elfranger"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Elf Ranger"
+    },
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Elf bow",
+      "Elven cloak",
+      "Ithilmar armour",
+      "Ithilmar weapon",
+      "Elfenbogen",
+      "Elfenumhang",
+      "Ithilmar-Rüstung",
+      "Ithilmar-Waffe",
+      "Ithilmar-Schwert",
+      "Ithilmar-Speer",
+      "Ithilmar-Zweihandwaffe"
+     ],
+     "tier": "foothold",
+     "label": "½ price Elf Bow, Elven Cloak, Ithilmar Armour and Ithilmar Weapons"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "marketsquare",
+   "name": "Market Square",
+   "area": "The East",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Add +2 on the rare items roll"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "poorquarter",
+   "name": "Poor Quarter",
+   "area": "The East",
+   "hardFought": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Roll one extra dice in the Exploration Procedure"
+    }
+   ]
+  },
+  {
+   "id": "quayside",
+   "name": "Quayside",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Roll 3D6 for experience when recruiting for existing human Henchmen groups"
+    }
+   ]
+  },
+  {
+   "id": "sageshall",
+   "name": "Sage's Hall",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "warlock"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Warlock"
+    },
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Tome of magic"
+     ],
+     "tier": "foothold",
+     "label": "½ price Tome of Magic"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "You may choose a spell rather than randomly generating it"
+    }
+   ]
+  },
+  {
+   "id": "templesigmar",
+   "name": "Temple of Sigmar",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Injury 22-35 → roll D6, on 5+ becomes 41-55 Full Recovery"
+    }
+   ]
+  },
+  {
+   "id": "greatlibrary",
+   "name": "The Great Library",
+   "area": "The East",
+   "coords": null,
+   "effects": [
+    {
+     "kind": "itemHalf",
+     "keys": [
+      "Halfling cookbook",
+      "Holy tome",
+      "Mordheim map",
+      "Tome of magic"
+     ],
+     "tier": "foothold",
+     "label": "½ price Halfling Cookbook, Holy Tome, Mordheim Map and Tome of Magic"
+    }
+   ]
+  },
+  {
+   "id": "thepit",
+   "name": "The Pit",
+   "area": "The East",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Exploration: may change a found location to The Pit (Heroes devoured on 1-2). Cult of the Possessed Heroes always return with maximum wyrdstone"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "middlebridge",
+   "name": "Middle Bridge",
+   "area": "The River",
+   "hardFought": true,
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "control",
+     "label": "Toll: the controlling warband gains 2D6 gc at the end of any game if another warband passes through here to reach a battle"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "therock",
+   "name": "The Rock",
+   "area": "The River",
+   "abundance": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Sisters of Sigmar: when selling wyrdstone, gain 20% more gold (always round down)"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Abundance of Wyrdstone ☄ — winner of a battle here gains +1D3 wyrdstone shards"
+    }
+   ]
+  },
+  {
+   "id": "westgate",
+   "name": "West Gate",
+   "area": "The Gates",
+   "gate": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "luthorwolfenbaum"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Luthor Wolfenbaum (a Hero sent to look for him finds him automatically)"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Without a foothold at a gate you pay 5 gc to battle in a district beyond it"
+    }
+   ]
+  },
+  {
+   "id": "rivergate",
+   "name": "River Gate",
+   "area": "The Gates",
+   "gate": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "luthorwolfenbaum"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Luthor Wolfenbaum (a Hero sent to look for him finds him automatically)"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Without a foothold at a gate you pay 5 gc to battle in a district beyond it"
+    }
+   ]
+  },
+  {
+   "id": "eastgate",
+   "name": "East Gate",
+   "area": "The Gates",
+   "gate": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "luthorwolfenbaum"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Luthor Wolfenbaum (a Hero sent to look for him finds him automatically)"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Without a foothold at a gate you pay 5 gc to battle in a district beyond it"
+    }
+   ]
+  },
+  {
+   "id": "southgate",
+   "name": "South Gate",
+   "area": "The Gates",
+   "gate": true,
+   "coords": null,
+   "effects": [
+    {
+     "kind": "hireHalf",
+     "keys": [
+      "luthorwolfenbaum"
+     ],
+     "tier": "foothold",
+     "label": "½ price to hire Luthor Wolfenbaum (a Hero sent to look for him finds him automatically)"
+    },
+    {
+     "kind": "other",
+     "tier": "foothold",
+     "label": "Without a foothold at a gate you pay 5 gc to battle in a district beyond it"
+    }
+   ]
+  }
+ ]
+}

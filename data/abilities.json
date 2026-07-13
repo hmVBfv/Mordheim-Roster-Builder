@@ -1,0 +1,1824 @@
+{
+ "ABILEN": {
+  "Furchtlos": "Fearless",
+  "Immun gegen Psychologie": "Immune to Psychology",
+  "Immun gegen Gift": "Immune to Poison",
+  "Keine Erfahrung": "Gains no Experience",
+  "Darf nicht rennen": "May not run",
+  "Zauberer": "Wizard",
+  "Sturmangriff": "Charge Bonus",
+  "Regeneration": "Regeneration",
+  "Blutgier": "Blood Greed",
+  "Sprint": "Sprint",
+  "Bissattacke": "Bite",
+  "Mutation": "Mutation",
+  "Infiltration": "Infiltration",
+  "Späher / Aufspüren": "Scout"
+ },
+ "ABILITYINFO": [
+  [
+   {
+    "__re": "not a wizard",
+    "__f": "i"
+   },
+   {
+    "name": "Not a Wizard",
+    "line": "Special rule",
+    "text": "Despite the name or appearance, this character is NOT a spellcaster — he knows no spells and never makes casting rolls."
+   }
+  ],
+  [
+   {
+    "__re": "immune to fear",
+    "__f": "i"
+   },
+   {
+    "name": "Immune to Fear",
+    "line": "Psychology",
+    "text": "Never has to take Fear tests. Note: this does NOT mean the model causes fear."
+   }
+  ],
+  [
+   {
+    "__re": "anf(ü|u)hrer:|\\bleader\\s*(\\([^)]*\\))?:",
+    "__f": "i"
+   },
+   {
+    "name": "Leader",
+    "line": "Special rule",
+    "text": "Friendly models within 6\" may use the leader's (usually better) Leadership value for their Leadership tests."
+   }
+  ],
+  [
+   {
+    "__re": "furchtlos|fearless",
+    "__f": "i"
+   },
+   {
+    "name": "Fearless",
+    "line": "Psychology",
+    "text": "Immune to fear, terror and all-alone tests."
+   }
+  ],
+  [
+   {
+    "__re": "angst|furcht\\b|causes? fear|fearsome|\\bfear\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Fear",
+    "line": "Psychology",
+    "text": "Causes fear. A model that wants to charge a fear-causing model must first pass a Leadership test; in close combat against one it only hits if a Leadership test is passed (otherwise only on a 6). Fear-causers are themselves immune to fear."
+   }
+  ],
+  [
+   {
+    "__re": "schrecken|terror",
+    "__f": "i"
+   },
+   {
+    "name": "Terror",
+    "line": "Psychology",
+    "text": "Like fear, but stronger: nearby models can be forced to flee, and charging a terror-causer requires a passed Leadership test."
+   }
+  ],
+  [
+   {
+    "__re": "gro(ß|ss)es ziel|large target|\\blarge\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Large Target",
+    "line": "Shooting",
+    "text": "May always be chosen as a shooting target, even if it is not the nearest. In addition, all shots against it gain +1 to hit."
+   }
+  ],
+  [
+   {
+    "__re": "\\btier\\b|\\banimal\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Animal",
+    "line": "Special rule",
+    "text": "Subject only to animal-relevant rules; gains no experience and cannot become a hero."
+   }
+  ],
+  [
+   {
+    "__re": "immun.*psych|psychologie",
+    "__f": "i"
+   },
+   {
+    "name": "Immune to Psychology",
+    "line": "Psychology",
+    "text": "Ignores all psychology rules (fear, terror, frenzy, hatred, stupidity, all-alone tests)."
+   }
+  ],
+  [
+   {
+    "__re": "immun.*gift|gegen gift|immune.*poison",
+    "__f": "i"
+   },
+   {
+    "name": "Immune to Poison",
+    "line": "Special rule",
+    "text": "Is not affected by poison or poisoned weapons."
+   }
+  ],
+  [
+   {
+    "__re": "kein schmerz|no pain",
+    "__f": "i"
+   },
+   {
+    "name": "No Pain",
+    "line": "Special rule",
+    "text": "Treats a \"stunned\" result as \"knocked down\" — these warriors feel no pain."
+   }
+  ],
+  [
+   {
+    "__re": "kein hirn|keine erfahrung|no brain",
+    "__f": "i"
+   },
+   {
+    "name": "No Experience",
+    "line": "Special rule",
+    "text": "This model gains no experience and never advances."
+   }
+  ],
+  [
+   {
+    "__re": "darf nicht rennen|may not run|nicht rennen",
+    "__f": "i"
+   },
+   {
+    "name": "May Not Run",
+    "line": "Movement",
+    "text": "Can never run; moves at most its normal movement distance."
+   }
+  ],
+  [
+   {
+    "__re": "raserei|frenzy|frenzied",
+    "__f": "i"
+   },
+   {
+    "name": "Frenzy",
+    "line": "Psychology",
+    "text": "Must charge if an enemy is within reach; doubles its attacks in close combat; immune to fear and terror. Ends as soon as the model is knocked down or stunned."
+   }
+  ],
+  [
+   {
+    "__re": "\\bhass\\b|hatred",
+    "__f": "i"
+   },
+   {
+    "name": "Hatred",
+    "line": "Psychology",
+    "text": "May re-roll failed to-hit rolls against the hated enemy in the first close-combat round."
+   }
+  ],
+  [
+   {
+    "__re": "dummheit|stupidity",
+    "__f": "i"
+   },
+   {
+    "name": "Stupidity",
+    "line": "Psychology",
+    "text": "Leadership test at the start of the turn. Failed: the model staggers aimlessly forward or stands idle and cannot charge, shoot or cast."
+   }
+  ],
+  [
+   {
+    "__re": "zauberer|magier|\\bwizard\\s*[:(]",
+    "__f": "i"
+   },
+   {
+    "name": "Wizard",
+    "line": "Magic",
+    "text": "Can cast spells or prayers — see the warband's magic/prayers panel."
+   }
+  ],
+  [
+   {
+    "__re": "sturmangriff|\\bcharge\\s*:",
+    "__f": "i"
+   },
+   {
+    "name": "Charge",
+    "line": "Close combat",
+    "text": "Gains extra attack(s) in the turn it charges — details in the unit text."
+   }
+  ],
+  [
+   {
+    "__re": "fights? unarmed|\\bunarmed\\s*[:.]",
+    "__f": "i"
+   },
+   {
+    "name": "Unarmed",
+    "line": "Special rule",
+    "text": "Fights without weapons at no penalty (does not grant the enemy the usual bonus against unarmed opponents)."
+   }
+  ],
+  [
+   {
+    "__re": "alleine|all alone",
+    "__f": "i"
+   },
+   {
+    "name": "All Alone",
+    "line": "Psychology",
+    "text": "If a model fights without friendly models within 6\" against several opponents, it must pass a Leadership test — otherwise it flees."
+   }
+  ],
+  [
+   {
+    "__re": "kaltbl(ü|u)tig|cold.?blood",
+    "__f": "i"
+   },
+   {
+    "name": "Cold Blooded",
+    "line": "Psychology",
+    "text": "For psychology and rout tests roll 3D6 and take the two lowest."
+   }
+  ],
+  [
+   {
+    "__re": "schuppenhaut|scaly",
+    "__f": "i"
+   },
+   {
+    "name": "Scaly Skin",
+    "line": "Armour",
+    "text": "Natural armour save from thick scales (not modifiable beyond 6; \"no save\" cancels it)."
+   }
+  ],
+  [
+   {
+    "__re": "regenerat",
+    "__f": "i"
+   },
+   {
+    "name": "Regeneration",
+    "line": "Special rule",
+    "text": "May recover lost wounds in the recovery phase (roll depends on the unit)."
+   }
+  ],
+  [
+   {
+    "__re": "blutgier|blood.?greed",
+    "__f": "i"
+   },
+   {
+    "name": "Blood Greed",
+    "line": "Psychology",
+    "text": "Tends to frenzy as enemies fall — details in the unit text."
+   }
+  ],
+  [
+   {
+    "__re": "\\bsprint\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Sprint",
+    "line": "Movement",
+    "text": "May run three times instead of twice its movement distance."
+   }
+  ],
+  [
+   {
+    "__re": "brennbar|flammable",
+    "__f": "i"
+   },
+   {
+    "name": "Flammable",
+    "line": "Special rule",
+    "text": "Fire attacks cause double the number of wounds."
+   }
+  ],
+  [
+   {
+    "__re": "bissattacke|bite attack|\\bbiss\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Bite Attack",
+    "line": "Close combat",
+    "text": "Extra close-combat attack with the teeth (strikes last, uses the model's own Strength)."
+   }
+  ],
+  [
+   {
+    "__re": "mutant|mutation",
+    "__f": "i"
+   },
+   {
+    "name": "Mutation",
+    "line": "Special rule",
+    "text": "May buy a mutation — see the warband's mutation list."
+   }
+  ],
+  [
+   {
+    "__re": "infiltrat",
+    "__f": "i"
+   },
+   {
+    "name": "Infiltration",
+    "line": "Deployment",
+    "text": "Is set up last, anywhere out of sight of the enemy (mind the minimum distance)."
+   }
+  ],
+  [
+   {
+    "__re": "natural stealth|nat(ü|u)rliche tarnung",
+    "__f": "i"
+   },
+   {
+    "name": "Natural Stealth",
+    "line": "Movement / hiding",
+    "text": "A master of moving unseen: while the model is Hidden, enemies trying to detect it halve their Initiative (i.e. it is far harder to spot). (Dark Elf Shade)"
+   }
+  ],
+  [
+   {
+    "__re": "sp(ä|a)her|\\bscout\\b|aufsp(ü|u)ren",
+    "__f": "i"
+   },
+   {
+    "name": "Scout",
+    "line": "Deployment",
+    "text": "May be deployed differently or helps in the exploration phase — details in the unit text."
+   }
+  ],
+  [
+   {
+    "__re": "animosit",
+    "__f": "i"
+   },
+   {
+    "name": "Animosity",
+    "line": "Psychology (Orcs & Goblins)",
+    "text": "At the start of your turn roll a D6 for each Orc/Goblin Henchman not already in close combat. On a 1, roll again: 1 = “I ’erd dat!” charges/shoots the nearest friendly Orc or Goblin; 2–5 = “Wud yoo say?” hurls insults and does nothing else; 6 = “I’ll show yer!” makes an extra move toward the nearest enemy, charging if able."
+   }
+  ],
+  [
+   {
+    "__re": "\\bhatred\\b|\\bhates?\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Hatred",
+    "line": "Psychology",
+    "text": "Hatred: in the first turn of any close combat against a hated enemy, may re-roll all missed to-hit rolls. (Cannot leave combat with a hated foe while able to fight.)"
+   }
+  ],
+  [
+   {
+    "__re": "aquatic|aquatisch",
+    "__f": "i"
+   },
+   {
+    "name": "Aquatic",
+    "line": "Movement",
+    "text": "Moves through water with no movement penalty and counts as being in cover while in or behind water."
+   }
+  ],
+  [
+   {
+    "__re": "berserk",
+    "__f": "i"
+   },
+   {
+    "name": "Berserk",
+    "line": "Psychology",
+    "text": "Subject to Frenzy: must charge any enemy in reach, doubles its Attacks in close combat, and is immune to fear and being All Alone (see Frenzy)."
+   }
+  ],
+  [
+   {
+    "__re": "bestial",
+    "__f": "i"
+   },
+   {
+    "name": "Bestial",
+    "line": "Psychology",
+    "text": "An animal mind: immune to all psychology and never takes All Alone tests, but can never be the warband leader."
+   }
+  ],
+  [
+   {
+    "__re": "disciple of sigmar|prayers of sigmar",
+    "__f": "i"
+   },
+   {
+    "name": "Prayers of Sigmar",
+    "line": "Faith (prayers)",
+    "text": "A devout servant of Sigmar: each turn may attempt one Prayer of Sigmar instead of casting a spell. May not use any other form of magic."
+   }
+  ],
+  [
+   {
+    "__re": "prayers of taal",
+    "__f": "i"
+   },
+   {
+    "name": "Prayers of Taal",
+    "line": "Faith (prayers)",
+    "text": "Each turn may call upon one Prayer of Taal instead of casting a spell."
+   }
+  ],
+  [
+   {
+    "__re": "hang the bandit",
+    "__f": "i"
+   },
+   {
+    "name": "Hang the Bandit",
+    "line": "Psychology (hatred)",
+    "text": "Hates Bandits and Outlaws: re-roll missed to-hit rolls in the first round of any close combat against them."
+   }
+  ],
+  [
+   {
+    "__re": "keen eyesight",
+    "__f": "i"
+   },
+   {
+    "name": "Keen Eyesight",
+    "line": "Perception",
+    "text": "Spots Hidden enemies at up to twice the model's Initiative in inches."
+   }
+  ],
+  [
+   {
+    "__re": "inspired cooking",
+    "__f": "i"
+   },
+   {
+    "name": "Inspired Cooking",
+    "line": "Special (Mootlanders)",
+    "text": "Friendly Halflings within 6\" of the Master Chef may re-roll failed to-hit rolls in close combat (once per turn)."
+   }
+  ],
+  [
+   {
+    "__re": "\\bpit fighter\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Pit Fighter",
+    "line": "Skill (Strength list)",
+    "text": "+1 WS and +1 Attack while fighting in ruins, buildings or The Pit."
+   }
+  ],
+  [
+   {
+    "__re": "\\bevade\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Evade",
+    "line": "Reaction (Pit Fighter Pursuer)",
+    "text": "Agile dodger: when an enemy charges this model it may try to evade — take an Initiative test; if passed, it counts as a failed charge."
+   }
+  ],
+  [
+   {
+    "__re": "grudgebearer",
+    "__f": "i"
+   },
+   {
+    "name": "Grudgebearers",
+    "line": "Special (Dwarfs)",
+    "text": "Dwarfs bear an ancient grudge against Elves: if the warband ever hires any Elven Hired Sword, this Dwarf leaves the warband immediately."
+   }
+  ],
+  [
+   {
+    "__re": "hard head",
+    "__f": "i"
+   },
+   {
+    "name": "Hard Head",
+    "line": "Special (Dwarfs)",
+    "text": "Ignores the special rules of maces, clubs and similar concussion weapons — not easily knocked out."
+   }
+  ],
+  [
+   {
+    "__re": "hard to kill",
+    "__f": "i"
+   },
+   {
+    "name": "Hard to Kill",
+    "line": "Special (Dwarfs)",
+    "text": "Tough and resilient: only taken Out of Action on a 6 (instead of 5–6); treat 1–2 as knocked down and 3–5 as stunned."
+   }
+  ],
+  [
+   {
+    "__re": "\\bskinny\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Skinny",
+    "line": "Special (Hobgoblin)",
+    "text": "Cowardly and frail: on a Serious Injury roll of 1-3 the Hobgoblin abandons the warband."
+   }
+  ],
+  [
+   {
+    "__re": "nobody cares",
+    "__f": "i"
+   },
+   {
+    "name": "Nobody cares about them",
+    "line": "Special (Hobgoblin)",
+    "text": "Hobgoblins count as only half a model when working out how many are down for a Rout test. Hobgoblins can never be promoted to Hero (re-roll \"The Lad's Got Talent\")."
+   }
+  ],
+  [
+   {
+    "__re": "nasty reputation",
+    "__f": "i"
+   },
+   {
+    "name": "Nasty Reputation",
+    "line": "Special (Gaoler)",
+    "text": "Gaolers are notorious for their brutality — the dread of being captured by them causes fear in Humans."
+   }
+  ],
+  [
+   {
+    "__re": "drudgery",
+    "__f": "i"
+   },
+   {
+    "name": "Drudgery",
+    "line": "Special (Informer)",
+    "text": "Their will is broken: Informers may never become Heroes. Re-roll any \"The Lad's Got Talent\" result for them."
+   }
+  ],
+  [
+   {
+    "__re": "art of silent death",
+    "__f": "i"
+   },
+   {
+    "name": "Art of Silent Death",
+    "line": "Special (Dragon Monk)",
+    "text": "Master of open-hand fighting: when fighting unarmed, scores a critical hit on a to-wound roll of 5-6 instead of 6. With a quarter staff, only the unarmed attacks crit on 5+."
+   }
+  ],
+  [
+   {
+    "__re": "ride horse",
+    "__f": "i"
+   },
+   {
+    "name": "Ride Horse",
+    "line": "Special",
+    "text": "Trained to ride Horses — may be mounted, using the mounted-model rules."
+   }
+  ],
+  [
+   {
+    "__re": "\\bdecree\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Decree",
+    "line": "Special (Emissary)",
+    "text": "If the Emissary dies, a new one must be hired before any other warrior or equipment is bought; he then reclaims leadership of the warband."
+   }
+  ],
+  [
+   {
+    "__re": "\\bmob\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Mob",
+    "line": "Special (Raging Peasant)",
+    "text": "+1 Leadership for each other friendly Peasant within 3\". Due to their rage, Peasants do not benefit from the Leader rule."
+   }
+  ],
+  [
+   {
+    "__re": "\\bignored\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Ignored",
+    "line": "Special (Raging Peasant)",
+    "text": "Peasants taken out of action are not counted toward the number of down models for Rout tests."
+   }
+  ],
+  [
+   {
+    "__re": "downtrodden",
+    "__f": "i"
+   },
+   {
+    "name": "Downtrodden",
+    "line": "Special (Raging Peasant)",
+    "text": "When a Peasant is wounded, do not roll for injury — the model is immediately taken out of action."
+   }
+  ],
+  [
+   {
+    "__re": "simple folk",
+    "__f": "i"
+   },
+   {
+    "name": "Simple folk",
+    "line": "Special (Raging Peasant)",
+    "text": "Peasants never gain Experience."
+   }
+  ],
+  [
+   {
+    "__re": "death wish",
+    "__f": "i"
+   },
+   {
+    "name": "Death Wish",
+    "line": "Psychology (Troll Slayer)",
+    "text": "Seeks an honourable death in combat: completely immune to all psychology."
+   }
+  ],
+  [
+   {
+    "__re": "slow.?witted",
+    "__f": "i"
+   },
+   {
+    "name": "Slow Witted",
+    "line": "Special (Ogre)",
+    "text": "Not the brightest: gains advances at half the normal rate (needs twice the usual experience for each advance)."
+   }
+  ],
+  [
+   {
+    "__re": "inconsistency",
+    "__f": "i"
+   },
+   {
+    "name": "Inconsistency",
+    "line": "Special (Chaos Spawn-to-be)",
+    "text": "The Condemned's body mutates constantly: its variable characteristics (WS, S, T and A) are re-rolled anew each turn until the player chooses to 'set' a value on an advance."
+   }
+  ],
+  [
+   {
+    "__re": "\\bfate\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Fate",
+    "line": "Special (Marauders)",
+    "text": "While any characteristic is still variable the Condemned carries no equipment but fights without penalty. Once all are set he equips normally — but if he reaches 90 Experience with a value still variable, he is lost and becomes a Chaos Spawn."
+   }
+  ],
+  [
+   {
+    "__re": "bear handler",
+    "__f": "i"
+   },
+   {
+    "name": "Bear Handler",
+    "line": "Special (Kislev Bear Tamer)",
+    "text": "A warband with a Bear Tamer may recruit a Trained Bear. The bear automatically passes Stupidity tests while within 6\" of the Tamer (even if the Tamer is Knocked Down or Stunned) and may not be fielded in a game the Tamer sits out."
+   }
+  ],
+  [
+   {
+    "__re": "fiercely loyal",
+    "__f": "i"
+   },
+   {
+    "name": "Fiercely Loyal",
+    "line": "Special (Kislev Trained Bear)",
+    "text": "The bear's devotion is absolute: it automatically passes Stupidity tests while within 6\" of its Bear Tamer — even if the Tamer has been Knocked Down or Stunned."
+   }
+  ],
+  [
+   {
+    "__re": "bear hug",
+    "__f": "i"
+   },
+   {
+    "name": "Bear Hug",
+    "line": "Close combat (Kislev Trained Bear)",
+    "text": "If the bear hits the same enemy with both attacks in a round, it may make a single Bear Hug instead: both roll D6 + Strength; if the bear's total is equal or higher the enemy suffers one automatic wound with no armour save; if lower, the enemy breaks free unharmed."
+   }
+  ],
+  [
+   {
+    "__re": "heirloom|inheritance",
+    "__f": "i"
+   },
+   {
+    "name": "Heirloom (Inheritance)",
+    "line": "Special (Kislev Druzhina)",
+    "text": "At warband creation the Captain buys one item from the Kislevite Warrior list at half price — a family heirloom. If it is ever lost (e.g. Robbed), he must rebuy the same item at 150% price; until replaced he suffers −1 to all tests and to-hit rolls."
+   }
+  ],
+  [
+   {
+    "__re": "gun.?rest",
+    "__f": "i"
+   },
+   {
+    "name": "Gun-Rest",
+    "line": "Shooting (Kislev Streltsi)",
+    "text": "A Streltsi armed with both a berdiche (halberd) and a handgun may brace the handgun on the halberd as a gun-rest, steadying the shot."
+   }
+  ],
+  [
+   {
+    "__re": "crack shot",
+    "__f": "i"
+   },
+   {
+    "name": "Crack Shot",
+    "line": "Shooting (Gunnery School)",
+    "text": "An expert pistol shot at close quarters: may turn a miss into a hit — re-roll a missed to-hit roll when shooting with a pistol."
+   }
+  ],
+  [
+   {
+    "__re": "quick reload",
+    "__f": "i"
+   },
+   {
+    "name": "Quick Reload",
+    "line": "Shooting (Gunnery School)",
+    "text": "Drilled to reload black-powder weapons at great speed under pressure — effectively may shoot every turn (no separate reload turn)."
+   }
+  ],
+  [
+   {
+    "__re": "expert weaponsmith",
+    "__f": "i"
+   },
+   {
+    "name": "Expert Weaponsmith",
+    "line": "Special (Gunnery School Instructor)",
+    "text": "While an Instructor is in the warband, all pistols gain +3\" range and all other black-powder weapons gain +6\" range."
+   }
+  ],
+  [
+   {
+    "__re": "burn the witch",
+    "__f": "i"
+   },
+   {
+    "name": "Burn the Witch!",
+    "line": "Psychology (Witch Hunters)",
+    "text": "The Witch Hunter Captain hates all models that can cast spells (wizards) — apply the rules for Hatred against them."
+   }
+  ],
+  [
+   {
+    "__re": "fanatical",
+    "__f": "i"
+   },
+   {
+    "name": "Fanatical",
+    "line": "Psychology (Flagellant)",
+    "text": "Convinced the end of the world is nigh: automatically passes every Leadership-based test it is required to take. A Flagellant may never become the warband leader."
+   }
+  ],
+  [
+   {
+    "__re": "expert swordsm(a|e)n",
+    "__f": "i"
+   },
+   {
+    "name": "Expert Swordsman",
+    "line": "Combat skill",
+    "text": "May re-roll missed to-hit rolls in close combat while armed with a sword (FAQ: only normal swords or weeping blades — not double-handed swords or any other weapon)."
+   }
+  ],
+  [
+   {
+    "__re": "crazed",
+    "__f": "i"
+   },
+   {
+    "name": "Crazed",
+    "line": "Psychology (Darksoul)",
+    "text": "Driven mad: automatically passes all Leadership-based tests it is required to take."
+   }
+  ],
+  [
+   {
+    "__re": "perfect killer",
+    "__f": "i"
+   },
+   {
+    "name": "Perfect Killer",
+    "line": "Special (Skaven Assassin)",
+    "text": "Strikes with deadly precision: enemies suffer an additional −1 to their armour save against this model's attacks (shooting and close combat)."
+   }
+  ],
+  [
+   {
+    "__re": "blessed sight",
+    "__f": "i"
+   },
+   {
+    "name": "Blessed Sight",
+    "line": "Special (Sisters of Sigmar Augur)",
+    "text": "The blind Augur has second sight: she may re-roll any failed characteristic test and any to-hit roll (close combat or shooting), but must accept the second result. If she is not taken Out of Action, in the exploration phase you may roll two dice for her and keep either."
+   }
+  ],
+  [
+   {
+    "__re": "\\bdrunk\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Drunk",
+    "line": "Psychology",
+    "text": "Meaning depends on the warrior: Ostlander Ruffians (and similar drunken zealots) automatically pass all Leadership-based tests, may never be the leader and carry no missile weapons. A Beastman Centigor instead must test each turn — on its own roll it is subject to Stupidity or Frenzy."
+   }
+  ],
+  [
+   {
+    "__re": "daemonic aura",
+    "__f": "i"
+   },
+   {
+    "name": "Daemonic Aura 5+",
+    "line": "Special save (Daemon)",
+    "text": "A protective daemonic field grants a 5+ special save against any wound (not modified by the attack's Strength)."
+   }
+  ],
+  [
+   {
+    "__re": "\\bdaemon",
+    "__f": "i"
+   },
+   {
+    "name": "Daemon",
+    "line": "Special (Carnival)",
+    "text": "A daemonic creature: causes fear, is immune to psychology and to poison, and gains no experience."
+   }
+  ],
+  [
+   {
+    "__re": "master weaponsmith",
+    "__f": "i"
+   },
+   {
+    "name": "Master Weaponsmith",
+    "line": "Special (Dwarf Engineer)",
+    "text": "While the Engineer is in the warband, the range of the warband's basic missile/black-powder weapons is increased (+3\" / +6\")."
+   }
+  ],
+  [
+   {
+    "__re": "set traps",
+    "__f": "i"
+   },
+   {
+    "name": "Set Traps",
+    "line": "Special (Mountain Hunter)",
+    "text": "May lay a hidden trap; a model that triggers it suffers a Strength 4 hit."
+   }
+  ],
+  [
+   {
+    "__re": "\\bweak\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Weak",
+    "line": "Special (Halfling)",
+    "text": "Too slight for heavy exertion: may not choose advances from the Strength skill list."
+   }
+  ],
+  [
+   {
+    "__re": "vomit attack",
+    "__f": "i"
+   },
+   {
+    "name": "Vomit Attack",
+    "line": "Close combat (Troll)",
+    "text": "Instead of attacking normally, the Troll may vomit over one enemy in base contact: a Strength 5 hit with no armour save allowed."
+   }
+  ],
+  [
+   {
+    "__re": "always hungry",
+    "__f": "i"
+   },
+   {
+    "name": "Always Hungry",
+    "line": "Upkeep (Troll)",
+    "text": "The ever-ravenous Troll must be fed: pay 15 gc upkeep after each game or it wanders off in search of food."
+   }
+  ],
+  [
+   {
+    "__re": "woodland.?dweller",
+    "__f": "i"
+   },
+   {
+    "name": "Woodland-dweller",
+    "line": "Movement (Beastmen)",
+    "text": "At home among the trees: ignores movement penalties for woods and rough terrain."
+   }
+  ],
+  [
+   {
+    "__re": "\\btrample\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Trample",
+    "line": "Close combat (Centigor)",
+    "text": "+1 Attack in close combat; this additional attack gains no weapon bonuses."
+   }
+  ],
+  [
+   {
+    "__re": "lowest of the low",
+    "__f": "i"
+   },
+   {
+    "name": "Lowest of the low",
+    "line": "Special (Ungor)",
+    "text": "Downtrodden brutes: can never become a Hero (never benefits from \"The Lad's Got Talent\")."
+   }
+  ],
+  [
+   {
+    "__re": "\\bhunter\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Hunter",
+    "line": "Shooting skill",
+    "text": "May fire each turn with a handgun or a Hochland long rifle (no separate reload turn needed)."
+   }
+  ],
+  [
+   {
+    "__re": "\\bundead\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Undead",
+    "line": "Psychology",
+    "text": "Undead: immune to all psychology, never runs, feels no pain, and gains no experience."
+   }
+  ],
+  [
+   {
+    "__re": "sneaky",
+    "__f": "i"
+   },
+   {
+    "name": "Sneaky",
+    "line": "Shooting (Halfling Thief)",
+    "text": "Small and furtive: −1 to hit when shot at (cumulative with other to-hit modifiers)."
+   }
+  ],
+  [
+   {
+    "__re": "stealthy",
+    "__f": "i"
+   },
+   {
+    "name": "Stealthy",
+    "line": "Deployment (Amazon Scout)",
+    "text": "Deploys at double the normal scouting distance and begins the game already Hidden."
+   }
+  ],
+  [
+   {
+    "__re": "one with the jungle",
+    "__f": "i"
+   },
+   {
+    "name": "One with the Jungle",
+    "line": "Movement (Amazons of Lustria)",
+    "text": "Suffers no movement penalty for moving through jungle or forest terrain."
+   }
+  ],
+  [
+   {
+    "__re": "black orc save",
+    "__f": "i"
+   },
+   {
+    "name": "Black Orc save (6+)",
+    "line": "Armour",
+    "text": "A thick, leathery hide grants a 6+ armour save that combines with any worn armour (improving the save by one)."
+   }
+  ],
+  [
+   {
+    "__re": "knight's virtue",
+    "__f": "i"
+   },
+   {
+    "name": "Knight's Virtue",
+    "line": "Psychology (Bretonnian)",
+    "text": "Chivalrous resolve: never panics or breaks from close combat, and never takes a Leadership test for being All Alone."
+   }
+  ],
+  [
+   {
+    "__re": "life of slavery",
+    "__f": "i"
+   },
+   {
+    "name": "Life of Slavery",
+    "line": "Special (Arabian Slave)",
+    "text": "A slave may gain experience, but if he rolls \"The Lad's Got Talent\" the Sheikh executes him (remove from roster) and the henchman group re-rolls the advance."
+   }
+  ],
+  [
+   {
+    "__re": "unstable, crazy|crazy, savage",
+    "__f": "i"
+   },
+   {
+    "name": "Crazy & Savage",
+    "line": "Close combat (Orc Nuttaz)",
+    "text": "Wild, unstable berserkers: +1 Attack in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "rides spiders",
+    "__f": "i"
+   },
+   {
+    "name": "Rides Spiders",
+    "line": "Mount (Forest Goblin)",
+    "text": "Mounted on a Giant or Gigantic Spider, gaining the spider's movement and special rules."
+   }
+  ],
+  [
+   {
+    "__re": "inscribe runes",
+    "__f": "i"
+   },
+   {
+    "name": "Inscribe Runes",
+    "line": "Special (Dwarf Runesmith)",
+    "text": "The Runesmith may inscribe magic runes onto the warband's weapons and armour (starts able to inscribe one minor rune); see the rune rules."
+   }
+  ],
+  [
+   {
+    "__re": "throws 3 times",
+    "__f": "i"
+   },
+   {
+    "name": "Three Throws",
+    "line": "Shooting (Forest Goblin Slugga)",
+    "text": "May make up to three thrown attacks in a single Shooting phase."
+   }
+  ],
+  [
+   {
+    "__re": "concealment",
+    "__f": "i"
+   },
+   {
+    "name": "Concealment",
+    "line": "Special (Hochland Footpad)",
+    "text": "Hard to spot: an enemy that wishes to charge a Footpad he cannot see (and who is not Hidden) must subtract 1 from his Initiative before taking the test to detect him."
+   }
+  ],
+  [
+   {
+    "__re": "convincing manner",
+    "__f": "i"
+   },
+   {
+    "name": "Convincing Manner",
+    "line": "Special (Hochland Huckster)",
+    "text": "When an enemy tries to charge any member of the Huckster's warband within 12\" of the Huckster, that enemy must first pass a Leadership test; on a failure it may not charge (treat as a failed charge). Creatures subject to Stupidity and animals are immune."
+   }
+  ],
+  [
+   {
+    "__re": "slick operator",
+    "__f": "i"
+   },
+   {
+    "name": "Slick Operator",
+    "line": "Post-battle (Hochland Huckster)",
+    "text": "Between games the Huckster may run a con: roll a D6 — on 2–6 the warband gains 2D6 gold crowns; on a 1 the con backfires (the Huckster misses the next game and no gold is earned)."
+   }
+  ],
+  [
+   {
+    "__re": "looting the dead",
+    "__f": "i"
+   },
+   {
+    "name": "Looting the Dead",
+    "line": "Post-battle (Hochland Looter)",
+    "text": "For each enemy taken Out of Action, the Looter may roll a D6; on a 4+ he strips all that warrior's equipment, which the warband keeps."
+   }
+  ],
+  [
+   {
+    "__re": "trailblazer",
+    "__f": "i"
+   },
+   {
+    "name": "Trailblazers",
+    "line": "Exploration (Hochland Poacher)",
+    "text": "Poachers know where to find game and safe camps: in the exploration phase the warband may re-roll one exploration die for each Poacher who took part."
+   }
+  ],
+  [
+   {
+    "__re": "utterly inept",
+    "__f": "i"
+   },
+   {
+    "name": "Utterly Inept",
+    "line": "Special (Hochland Gutterscum)",
+    "text": "Hopeless rabble: gains no experience and never improves."
+   }
+  ],
+  [
+   {
+    "__re": "hardened",
+    "__f": "i"
+   },
+   {
+    "name": "Hardened",
+    "line": "Psychology (Hochland Blackheart)",
+    "text": "Cold-blooded and pitiless: immune to fear and never takes a Leadership test for being All Alone."
+   }
+  ],
+  [
+   {
+    "__re": "swordmaster",
+    "__f": "i"
+   },
+   {
+    "name": "Swordmaster",
+    "line": "Close combat (Hochland Duelist)",
+    "text": "A master parrier: the Duelist parries when his parry roll equals OR beats the enemy's to-hit roll (not only when it beats it). He must be armed with a weapon that allows a Parry (e.g. a sword or buckler)."
+   }
+  ],
+  [
+   {
+    "__re": "weapon knowledge",
+    "__f": "i"
+   },
+   {
+    "name": "Weapon Knowledge",
+    "line": "Equipment (Hochland Duelist)",
+    "text": "Versed in every weapon: the Duelist may use any close combat or missile weapon — his starting equipment list merely shows what he begins with."
+   }
+  ],
+  [
+   {
+    "__re": "conch shell horn|conch",
+    "__f": "i"
+   },
+   {
+    "name": "Conch Shell Horn",
+    "line": "Wargear · Rare 8 · 25 gc (Piranha Warrior only)",
+    "text": "At the start of the game a Piranha Warrior with the horn may re-roll the roll that decides who deploys first and who takes the first turn. Multiple horns cannot force a second re-roll."
+   }
+  ],
+  [
+   {
+    "__re": "combat riding",
+    "__f": "i"
+   },
+   {
+    "name": "Combat Riding",
+    "line": "Mounted skill (Outriders)",
+    "text": "Trained to fight from horseback: the rider keeps his mount's advantages in close combat (per the Blazing Saddles mounted-combat rules)."
+   }
+  ],
+  [
+   {
+    "__re": "horse handling",
+    "__f": "i"
+   },
+   {
+    "name": "Horse Handling",
+    "line": "Mounted skill (Outriders)",
+    "text": "The Groom has the Animal Handling skill — he keeps his steed under control (e.g. stopping it from bolting), per the Blazing Saddles rules."
+   }
+  ],
+  [
+   {
+    "__re": "\\bRide\\b",
+    "__f": ""
+   },
+   {
+    "name": "Ride",
+    "line": "Mounted skill (Outriders)",
+    "text": "Allows the warrior to ride a Riding Horse or Warhorse and gain the benefits of a mounted warrior (Blazing Saddles / Mordheim mounted rules). A mounted warrior may not fight with two weapons, though a shield or buckler may still be used."
+   }
+  ],
+  [
+   {
+    "__re": "\\bhardy\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Hardy",
+    "line": "Special (Ostermarkers)",
+    "text": "Self-reliant and used to harsh odds: Heroes and Henchmen may re-roll a failed Leadership test for being All Alone or for Routing — but must accept the second result."
+   }
+  ],
+  [
+   {
+    "__re": "stubborn",
+    "__f": "i"
+   },
+   {
+    "name": "Stubborn",
+    "line": "Special (Dwarf Longbeard)",
+    "text": "Set in their ways and impossible to drive off: a Dwarf Longbeard may re-roll any failed Leadership test he is required to take (the second result always stands)."
+   }
+  ],
+  [
+   {
+    "__re": "chivalry",
+    "__f": "i"
+   },
+   {
+    "name": "Chivalry",
+    "line": "Special (Bretonnian Knight)",
+    "text": "Knights may never use any missile weapon (except Holy Water), nor any drug or poison, and may never learn spells (prayers are allowed)."
+   }
+  ],
+  [
+   {
+    "__re": "lord.?s boon",
+    "__f": "i"
+   },
+   {
+    "name": "Lord's Boon",
+    "line": "Special (Bretonnian Knight)",
+    "text": "On purchase a Knight may start with ONE of a Warhorse, Light Armour or Heavy Armour at half cost. It may never be traded, given away or sold; if the Knight dies it is removed from the warband."
+   }
+  ],
+  [
+   {
+    "__re": "\\bvain\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Vain",
+    "line": "Special (Knight Errant)",
+    "text": "Too proud to hide his face from the ladies: may never wear a helmet."
+   }
+  ],
+  [
+   {
+    "__re": "impetuous",
+    "__f": "i"
+   },
+   {
+    "name": "Impetuous",
+    "line": "Special (Knight Errant)",
+    "text": "If not in combat and it did not charge this turn, the Knight Errant must charge a viable standing enemy within range (auto-passing fear/psychology for that charge). You may instead pass a Leadership test to let it act normally."
+   }
+  ],
+  [
+   {
+    "__re": "knighthood",
+    "__f": "i"
+   },
+   {
+    "name": "Knighthood",
+    "line": "Special (Squire)",
+    "text": "On \"The Lad's Got Talent\" you may keep him a Squire (pick two of Combat/Academic/Strength/Speed) or promote him to a Knight Errant (gains Knight/Vain/Impetuous and the Knight equipment list; may exceed the Knight-Errant limit)."
+   }
+  ],
+  [
+   {
+    "__re": "low caste",
+    "__f": "i"
+   },
+   {
+    "name": "Low Caste",
+    "line": "Special (Bretonnian peasant)",
+    "text": "Gains Experience and advances normally, but re-rolls any \"The Lad's Got Talent\" result and may never become a Hero."
+   }
+  ],
+  [
+   {
+    "__re": "agony and ecstasy",
+    "__f": "i"
+   },
+   {
+    "name": "Agony and Ecstasy",
+    "line": "Special (Whipmaster)",
+    "text": "May spend one Hedonist Whip attack to scourge a friendly model within 3\" (auto-hit, +1 to wound); in reward he doubles his Toughness until he fails an Ld test at the start of one of his turns."
+   }
+  ],
+  [
+   {
+    "__re": "pain and pleasure",
+    "__f": "i"
+   },
+   {
+    "name": "Pain and Pleasure",
+    "line": "Special (Whipmaster)",
+    "text": "Whenever the Whipmaster suffers an unsaved wound he is subject to Frenzy until the end of his next turn — not negated by being knocked down or stunned."
+   }
+  ],
+  [
+   {
+    "__re": "strange allure",
+    "__f": "i"
+   },
+   {
+    "name": "Strange Allure",
+    "line": "Special (Danseuse)",
+    "text": "An enemy wishing to attack her in melee or with a missile must first pass a Leadership test; on a failure it must re-roll any successful hits against her."
+   }
+  ],
+  [
+   {
+    "__re": "pound of flesh",
+    "__f": "i"
+   },
+   {
+    "name": "Pound of Flesh",
+    "line": "Special (Flesh Merchant)",
+    "text": "A Wretch may be carried as a \"meat shield\": when the Merchant would take a wound, the Wretch is taken out of action instead. The Wretch still attacks in melee, has no base and cannot be targeted; it is lost if the Merchant dies."
+   }
+  ],
+  [
+   {
+    "__re": "cruel fate",
+    "__f": "i"
+   },
+   {
+    "name": "Cruel Fate",
+    "line": "Special (Flesh Merchant)",
+    "text": "Any captives the warband gains may be turned into Wretches at no cost (via lobotomy and torture)."
+   }
+  ],
+  [
+   {
+    "__re": "flesh reserve",
+    "__f": "i"
+   },
+   {
+    "name": "Flesh Reserve",
+    "line": "Special (Priest of Obscene)",
+    "text": "A Wretch may be carried as a \"sacrificial pawn\": when the Priest fails to cast a spell he may sacrifice it to re-roll the casting. The Wretch still attacks in melee, has no base and cannot be targeted; it is lost if the Priest dies."
+   }
+  ],
+  [
+   {
+    "__re": "fluctuating form",
+    "__f": "i"
+   },
+   {
+    "name": "Fluctuating Form",
+    "line": "Special (Devout)",
+    "text": "At the start of the battle and each Recovery phase (if not in combat) choose Male (+1 WS, S, T, A) or Female (+1 BS, +2 I, +2 Ld, +2 M)."
+   }
+  ],
+  [
+   {
+    "__re": "slaves to darkness",
+    "__f": "i"
+   },
+   {
+    "name": "Slaves to Darkness",
+    "line": "Special (Wretch)",
+    "text": "Immune to all psychology and All Alone tests while within 6\" of a friendly Hero. Wretches can never become Heroes; a repeated \"The Lad's Got Talent\" instead gives an immediate Serious Injury (as a Hero)."
+   }
+  ],
+  [
+   {
+    "__re": "danse macabre",
+    "__f": "i"
+   },
+   {
+    "name": "Danse Macabre",
+    "line": "Special (Cursed Piper)",
+    "text": "In the shooting phase target one enemy within 6\" who must pass an Ld test or be controlled — moved anywhere (even out of combat or off a height). It tests Ld each recovery phase to break free and meanwhile cannot shoot, charge, cast or attack. Only one victim at a time."
+   }
+  ],
+  [
+   {
+    "__re": "expert horseman",
+    "__f": "i"
+   },
+   {
+    "name": "Expert Horseman",
+    "line": "Special (Aristocrat)",
+    "text": "The Aristocrat has the Ride (Nightmare) skill and may ride a Nightmare."
+   }
+  ],
+  [
+   {
+    "__re": "magical adept",
+    "__f": "i"
+   },
+   {
+    "name": "Magical Adept",
+    "line": "Special (Twisted Scholar)",
+    "text": "When hired you may pay +10 gc to make the Scholar a Wizard; he then uses Lesser Magic and starts with one randomly generated spell."
+   }
+  ],
+  [
+   {
+    "__re": "story teller",
+    "__f": "i"
+   },
+   {
+    "name": "Story Teller",
+    "line": "Special (Twisted Scholar)",
+    "text": "If not upgraded to a Wizard, you may pay +10 gc to make the Scholar a Chronicler: re-roll one extra Exploration die and choose which two of the dice to keep."
+   }
+  ],
+  [
+   {
+    "__re": "maddened with pain",
+    "__f": "i"
+   },
+   {
+    "name": "Maddened With Pain",
+    "line": "Special (Great Bear)",
+    "text": "As soon as the Great Bear suffers a single wound it gains one additional Attack."
+   }
+  ],
+  [
+   {
+    "__re": "\\bsurvivor\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Survivor",
+    "line": "Special (Conqueror)",
+    "text": "Cannot be taken Out of Action unless already Knocked Down or Stunned (if standing, treat the result as Stunned instead). The first \"Dead\" rolled on the Serious Injury chart is treated as Multiple Injuries instead — once only."
+   }
+  ],
+  [
+   {
+    "__re": "\\branger\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Ranger",
+    "line": "Special (Mountain Guide)",
+    "text": "If the Guide is not put out of action, roll two dice for Exploration and pick one as the result (this is not a re-roll)."
+   }
+  ],
+  [
+   {
+    "__re": "\\bloner\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Loner",
+    "line": "Special (Mountain Guide)",
+    "text": "Immune to all All Alone tests, never claims or keeps a Gnoblar, and may never become the warband Leader."
+   }
+  ],
+  [
+   {
+    "__re": "feral instinct",
+    "__f": "i"
+   },
+   {
+    "name": "Feral Instinct",
+    "line": "Special (Sabretusk)",
+    "text": "At the start of your turn the Sabretusk must pass a Leadership test (use the Guide's Ld within 6\"). If it fails, the opponent moves it this turn — it may even charge models from its own warband."
+   }
+  ],
+  [
+   {
+    "__re": "\\btrained:",
+    "__f": "i"
+   },
+   {
+    "name": "Trained",
+    "line": "Special (Sabretusk)",
+    "text": "May use the Mountain Guide's Leadership within 6\". With no Guide in the warband (death/injury) the Sabretusks must be caged at camp and cannot be used until a Guide is hired again."
+   }
+  ],
+  [
+   {
+    "__re": "gluttony",
+    "__f": "i"
+   },
+   {
+    "name": "Gluttony",
+    "line": "Special (Ogre warband)",
+    "text": "Each Ogre counts as two models when selling wyrdstone or treasure. A captive (or any own member, animal or mount) may be devoured: reduce the warband's model count by 1 (2 for a Large captive) and an Ogre Hero gains XP equal to models eaten. Each Ogre always counts as at least one model."
+   }
+  ],
+  [
+   {
+    "__re": "lightning reflexes",
+    "__f": "i"
+   },
+   {
+    "name": "Lightning Reflexes",
+    "line": "Special (Knights Vanguard)",
+    "text": "When charged, the model strikes first; since chargers also strike first, resolve the order by comparing Initiative."
+   }
+  ],
+  [
+   {
+    "__re": "\\bhireling\\b|\\bhirelings\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Hireling",
+    "line": "Special (Caravan retinue)",
+    "text": "Paid by the Merchant — this warrior may never become the warband Leader."
+   }
+  ],
+  [
+   {
+    "__re": "unreliable hirelings",
+    "__f": "i"
+   },
+   {
+    "name": "Unreliable Hirelings",
+    "line": "Special (Blackguard)",
+    "text": "May never become Heroes — re-roll any \"The Lad's Got Talent\" result."
+   }
+  ],
+  [
+   {
+    "__re": "strongman",
+    "__f": "i"
+   },
+   {
+    "name": "Strongman",
+    "line": "Special / Skill",
+    "text": "May use a double-handed weapon (or a similar \"strike last\" weapon) without the usual penalty of always striking last — work out the order of combat as normal."
+   }
+  ],
+  [
+   {
+    "__re": "\\bwagon\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Wagon",
+    "line": "Special (Trade Wagon)",
+    "text": "Follows the Wagon rules (Empire in Flames). One warband model must drive it. If destroyed, all stored equipment and treasures are lost; if abandoned after a failed Rout test with no driver, it falls to the enemy."
+   }
+  ],
+  [
+   {
+    "__re": "animosity",
+    "__f": "i"
+   },
+   {
+    "name": "Animosity",
+    "line": "Special (Greenskins)",
+    "text": "At the start of each turn roll a D6 — on a 1 the warband squabbles and does nothing else that turn. Only Goblins are affected (not Trolls, Squigs, Snotlings or Fanatics)."
+   }
+  ],
+  [
+   {
+    "__re": "hate stunties|hates dwarfs",
+    "__f": "i"
+   },
+   {
+    "name": "Hate Stunties",
+    "line": "Special (Night Goblin)",
+    "text": "Night Goblins are subject to Hatred towards Dwarfs. Fanatics are too far gone to be affected."
+   }
+  ],
+  [
+   {
+    "__re": "\\baddict\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Addict",
+    "line": "Special (Fanatic)",
+    "text": "Must buy Mad Cap Mushrooms before each game; if none are available he stays in his cave and does not take part."
+   }
+  ],
+  [
+   {
+    "__re": "mushroom brain",
+    "__f": "i"
+   },
+   {
+    "name": "Mushroom Brain",
+    "line": "Special (Fanatic)",
+    "text": "Prolonged Mad Cap use has fried his brain — he cannot gain Experience."
+   }
+  ],
+  [
+   {
+    "__re": "\\blooney\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Looney",
+    "line": "Special (Fanatic)",
+    "text": "Subject to Frenzy, and must test for permanent damage after the battle (as for the Ball and Chain)."
+   }
+  ],
+  [
+   {
+    "__re": "\\bfrantic\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Frantic",
+    "line": "Special (Fanatic)",
+    "text": "Hyperactive — always strikes first in combat, ignoring weapon and Initiative modifiers."
+   }
+  ],
+  [
+   {
+    "__re": "minderz",
+    "__f": "i"
+   },
+   {
+    "name": "Minderz",
+    "line": "Special (Cave Squig)",
+    "text": "Must stay within 6\" of a Goblin or it goes wild: from then on it moves 2D6\" in a random direction each Movement phase, out of the player's control until the end of the game."
+   }
+  ],
+  [
+   {
+    "__re": "\\bweedy\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Weedy",
+    "line": "Special (Snotling)",
+    "text": "Fragile — when wounded, knocked down on a 1, stunned on 2-3, out of action on 4-6."
+   }
+  ],
+  [
+   {
+    "__re": "\\bdodgy\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Dodgy",
+    "line": "Special (Snotling)",
+    "text": "Constantly ducking and diving — a 6+ dodge save against shooting."
+   }
+  ],
+  [
+   {
+    "__re": "insignificant",
+    "__f": "i"
+   },
+   {
+    "name": "Insignificant",
+    "line": "Special (Snotling)",
+    "text": "The whole mob counts as a single model for Rout tests, maximum warband size and income. An enemy only gains Experience for taking the last Snotling out of action."
+   }
+  ],
+  [
+   {
+    "__re": "duellist",
+    "__f": "i"
+   },
+   {
+    "name": "Duellist",
+    "line": "Special (Saurus Slayer)",
+    "text": "When fighting a single opponent in melee, the Saurus Slayer may re-roll missed hits on the first turn of that combat, whether he charged or was charged."
+   }
+  ],
+  [
+   {
+    "__re": "silent hunter",
+    "__f": "i"
+   },
+   {
+    "name": "Silent Hunter",
+    "line": "Special (Jungle Shadow)",
+    "text": "Always counts as Hidden while touching any terrain ≥1\" high. Shooting does not reveal his position (casting a spell does)."
+   }
+  ],
+  [
+   {
+    "__re": "surprise attack",
+    "__f": "i"
+   },
+   {
+    "name": "Surprise Attack",
+    "line": "Special (Jungle Shadow)",
+    "text": "May re-roll missed to-hit rolls against an enemy attacked from its rear (a 180° arc behind its facing)."
+   }
+  ],
+  [
+   {
+    "__re": "canopy walker",
+    "__f": "i"
+   },
+   {
+    "name": "Canopy Walker",
+    "line": "Special (Jungle Shadow)",
+    "text": "Automatically passes all climbing, jumping and falling-off-ledges tests."
+   }
+  ],
+  [
+   {
+    "__re": "deadeye",
+    "__f": "i"
+   },
+   {
+    "name": "Deadeye",
+    "line": "Special (Trapmaster)",
+    "text": "Suffers no to-hit penalty for shooting at long range."
+   }
+  ],
+  [
+   {
+    "__re": "\\btraps\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Traps",
+    "line": "Special (Trapmaster)",
+    "text": "Starts with 1 Trap; may buy up to 5 more at 5 gc each (one use only). Used in the shooting phase: place a real and a false 1\" counter within 3\" of the Trapmaster (≥3\" from other models). A model moving within 2\" flips one — a real trap deals D3 Strength 5 hits (no criticals)."
+   }
+  ],
+  [
+   {
+    "__re": "war beasts",
+    "__f": "i"
+   },
+   {
+    "name": "War Beasts",
+    "line": "Special (Beastmaster)",
+    "text": "With a Beastmaster you may include up to 2 War Beasts (Warhound, Barbary Monkey, Hunting Hawk). They count toward the maximum warband size, must be bought at creation, and may use the Beastmaster's Leadership within 6\"."
+   }
+  ],
+  [
+   {
+    "__re": "promotion only",
+    "__f": "i"
+   },
+   {
+    "name": "Promotion Only",
+    "line": "Special (Prospect)",
+    "text": "Re-roll any \"The Lad's Got Talent\" result. A Prospect can only become a Hero via the Promotions rule (replacing a lost Hero); you may then hire a new Prospect."
+   }
+  ],
+  [
+   {
+    "__re": "\\bnimble\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Nimble",
+    "line": "Special (Barbary Monkey)",
+    "text": "Climbs any sheer surface without Initiative tests, re-rolls failed Diving Charge tests, and may enter buildings. Has a 5+ ward save against any wound (melee, shooting, magic or falling)."
+   }
+  ],
+  [
+   {
+    "__re": "expert riggers",
+    "__f": "i"
+   },
+   {
+    "name": "Expert Riggers",
+    "line": "Movement (Pirates)",
+    "text": "Boatswains move through rigging, masts and ropes without movement penalties and ignore climbing penalties."
+   }
+  ],
+  [
+   {
+    "__re": "\\brabble\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Rabble",
+    "line": "Special (Pirates)",
+    "text": "Lowly Swabbies: gain no experience and never count toward the minimum size of the warband."
+   }
+  ]
+ ]
+}

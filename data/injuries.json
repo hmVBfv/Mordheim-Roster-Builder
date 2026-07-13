@@ -1,0 +1,158 @@
+{
+ "INJEN": {
+  "22": "Leg Wound",
+  "23": "Arm Wound",
+  "24": "Madness",
+  "25": "Smashed Leg",
+  "26": "Chest Wound",
+  "31": "Blinded in one eye",
+  "32": "Old Battle Wound",
+  "33": "Nervous Condition",
+  "34": "Hand Injury",
+  "35": "Deep Wound",
+  "36": "Robbed",
+  "56": "Bitter Enmity",
+  "61": "Captured",
+  "64": "Horrible Scars",
+  "65": "Sold to the Pits",
+  "66": "Survives Against the Odds",
+  "11-15": "Dead",
+  "16-21": "Multiple Injuries",
+  "41-55": "Full Recovery",
+  "62-63": "Hardened"
+ },
+ "INJURIES": [
+  {
+   "code": "11-15",
+   "name": "Dead",
+   "text": "Remove from the warband; all equipment lost."
+  },
+  {
+   "code": "16-21",
+   "name": "Multiple Injuries",
+   "text": "Roll D6× on this table (re-roll Dead/Captured/Multiple)."
+  },
+  {
+   "code": "22",
+   "name": "Leg Wound",
+   "text": "Movement permanently −1.",
+   "mod": {
+    "M": -1
+   }
+  },
+  {
+   "code": "23a",
+   "name": "Arm Wound (1: arm amputated)",
+   "text": "Severe arm wound: may only use a single one-handed weapon from now on."
+  },
+  {
+   "code": "23b",
+   "name": "Arm Wound (2–6: misses next game)",
+   "miss": 1,
+   "text": "Light arm wound: misses the next game (tracked via the Out counter)."
+  },
+  {
+   "code": "24a",
+   "name": "Madness (1–3: Stupidity)",
+   "text": "Suffers from Stupidity (permanent)."
+  },
+  {
+   "code": "24b",
+   "name": "Madness (4–6: Frenzy)",
+   "text": "Suffers from Frenzy (permanent)."
+  },
+  {
+   "code": "25a",
+   "name": "Smashed Leg (1: may not run)",
+   "text": "May no longer run (but may still charge)."
+  },
+  {
+   "code": "25b",
+   "name": "Smashed Leg (2–6: misses next game)",
+   "miss": 1,
+   "text": "Misses the next game (tracked via the Out counter)."
+  },
+  {
+   "code": "26",
+   "name": "Chest Wound",
+   "text": "Toughness permanently −1.",
+   "mod": {
+    "T": -1
+   }
+  },
+  {
+   "code": "31",
+   "name": "Blinded in one eye",
+   "text": "Ballistic Skill permanently −1. Blinded again → must retire.",
+   "mod": {
+    "BS": -1
+   }
+  },
+  {
+   "code": "32",
+   "name": "Old Battle Wound",
+   "text": "At the start of each game roll a D6: on a 1 he cannot fight this game."
+  },
+  {
+   "code": "33",
+   "name": "Nervous Condition",
+   "text": "Initiative permanently −1.",
+   "mod": {
+    "I": -1
+   }
+  },
+  {
+   "code": "34",
+   "name": "Hand Injury",
+   "text": "Weapon Skill permanently −1.",
+   "mod": {
+    "WS": -1
+   }
+  },
+  {
+   "code": "35",
+   "name": "Deep Wound",
+   "text": "Misses the next D3 games (does nothing meanwhile)."
+  },
+  {
+   "code": "36",
+   "name": "Robbed",
+   "text": "All weapons, armour and equipment lost."
+  },
+  {
+   "code": "41-55",
+   "name": "Full Recovery",
+   "text": "No lasting damage."
+  },
+  {
+   "code": "56",
+   "name": "Bitter Enmity",
+   "text": "Hatred (D6: the attacker / his leader / his warband / all of that type)."
+  },
+  {
+   "code": "61",
+   "name": "Captured",
+   "text": "Captured by the enemy — ransom, exchange or sale (D6×5 gc)."
+  },
+  {
+   "code": "62-63",
+   "name": "Hardened",
+   "text": "Immune to fear from now on."
+  },
+  {
+   "code": "64",
+   "name": "Horrible Scars",
+   "text": "Causes fear from now on."
+  },
+  {
+   "code": "65",
+   "name": "Sold to the Pits",
+   "text": "Must fight a Pit Fighter (see rulebook)."
+  },
+  {
+   "code": "66",
+   "name": "Survives Against the Odds",
+   "text": "+1 Experience."
+  }
+ ]
+}
