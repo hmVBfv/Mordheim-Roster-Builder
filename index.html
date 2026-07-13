@@ -440,6 +440,9 @@
 
   .hr-en{margin-right:6px;flex:0 0 auto}
   .hr-dev{background:var(--blood);color:#fff;border-radius:8px;padding:0 5px;font-size:9.5px;font-weight:700;margin-left:6px}
+
+  .ulg{color:#7a6a4a;font-size:11.5px;font-variant-numeric:tabular-nums;flex-shrink:0;margin-left:auto;margin-right:8px}
+  .ulrow.ultot{border-top:2px solid var(--parch-edge);margin-top:4px;padding-top:4px;border-left-color:transparent}
 </style>
 </head>
 <body>
@@ -501,9 +504,7 @@
 
       <aside class="sidebar" style="margin-top:18px">
         <div class="panel"><details class="sec-details" open ontoggle="wbOpen=this.open"><summary class="sec-sum">Warband</summary><div class="sec-body">
-          <div class="stat-big"><span>Gold in store</span><span class="v" id="goldstart">0</span></div>
-          <div class="stat-big"><span>Spent</span><span class="v" id="spent">0</span></div>
-          <div class="stat-big rating-row"><span>Gold Crowns</span><span class="v" id="goldnow">0</span></div>
+          <div class="stat-big"><span>Gold</span><span class="v" id="goldnow">0</span></div>
           <div class="stat-big"><span>Models</span><span class="v" id="models">0</span></div>
           <div class="stat-big"><span>Heroes</span><span class="v" id="heroes">0</span></div>
           <div class="stat-big rating-row"><span>Warband&nbsp;Rating</span><span class="v" id="rating">0</span></div>
@@ -4039,8 +4040,15 @@ function startGold(){ const h=HR();
   const wb=WARBANDS[S.wb]; if(!wb) return 500;
   const sub=(S.subtype&&wb.subtypes)?wb.subtypes.find(x=>x.key===S.subtype):null;
   return (sub&&sub.gold!=null)?sub.gold:(wb.gold||500); }
-/* Verfügbares Gold = Gold in store (Stash). "Spent" zieht davon ab. */
-function goldAvailable(){ const g=(S.stash&&S.stash.gold); return (g==null||g==='')?startGold():Number(g)||0; }
+/* EIN Gold-Wert: das aktuelle Gold der Warband. Intern liegt im Stash die
+   "Kasse" (treasury); angezeigt wird überall treasury minus Ausgaben. Kauft man
+   etwas, sinkt der Wert sofort - oben im Warband-Panel wie unten im Stash. */
+function goldTreasury(){ const g=(S.stash&&S.stash.gold); return (g==null||g==='')?startGold():(Number(g)||0); }
+function goldCurrent(){ return goldTreasury()-totalSpent(); }
+function goldAvailable(){ return goldTreasury(); }
+function setGoldCurrent(v){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+  S.stash.gold=Math.max(0,(Number(v)||0))+totalSpent(); render(); }
+function adjGoldCurrent(d){ setGoldCurrent(goldCurrent()+d); }
 function totalSpent(){ return S.models.reduce((s,m)=>s+modelTotalCost(m),0)+ (typeof hsHireTotal==='function'?hsHireTotal():0)+ (typeof dpHireTotal==='function'?dpHireTotal():0)+ (typeof hsEqTotal==='function'?hsEqTotal():0); }
 function totalModels(){ return S.models.reduce((s,m)=>{const d=unitDef(m.uid_def); if(d&&d.vehicle) return s; return s+(d&&d.t==='hen'?m.qty:1);},0); }
 function isHeroModel(m){ const def=unitDef(m.uid_def); return (def&&def.t==='hero')||!!m.promoted; }
@@ -5051,7 +5059,7 @@ function renderStash(){
   el.innerHTML=`<h2 style="margin-top:0">Stash / Store</h2>
     <div class="stashtop">
       <div class="stashbox"><label>Wyrdstone shards</label><div class="stashctl"><button class="btnsm no-print" onclick="stashAdj('wyrd',-1)">−</button><input type="number" min="0" value="${st.wyrd}" class="stashnumin no-print" onchange="stashSet('wyrd',this.value)"><span class="stashq-print">${st.wyrd}</span><button class="btnsm no-print" onclick="stashAdj('wyrd',1)">+</button></div></div>
-      <div class="stashbox"><label>Gold in store (gc)</label><div class="stashctl"><button class="btnsm no-print" onclick="stashAdj('gold',-5)">−5</button><input type="number" min="0" value="${st.gold}" class="stashnumin no-print" onchange="stashSet('gold',this.value)"><span class="stashq-print">${st.gold} gc</span><button class="btnsm no-print" onclick="stashAdj('gold',5)">+5</button></div></div>
+      <div class="stashbox"><label>Gold (gc)</label><div class="stashctl"><button class="btnsm no-print" onclick="adjGoldCurrent(-5)">−5</button><input type="number" value="${goldCurrent()}" class="stashnumin no-print" onchange="setGoldCurrent(this.value)"><span class="stashq-print">${goldCurrent()} gc</span><button class="btnsm no-print" onclick="adjGoldCurrent(5)">+5</button></div></div>
     </div>
     <div class="stashitems">${rows}</div>
     <div class="stashadd no-print">
@@ -5260,11 +5268,9 @@ function renderRoster(){
 }
 function renderSidebar(){
   const wb=WARBANDS[S.wb];
-  const spent=totalSpent(), gold=goldAvailable(), remain=gold-spent, mc=totalModels(), hc=totalHeroes();
-  document.getElementById('spent').textContent=spent;
+  const gold=goldCurrent(), mc=totalModels(), hc=totalHeroes();
   const gEl=document.getElementById('goldnow');
-  if(gEl){ gEl.textContent=remain; gEl.className='v'+(remain<0?' bad':''); }
-  const g0=document.getElementById('goldstart'); if(g0) g0.textContent=gold;
+  if(gEl){ gEl.textContent=gold; gEl.className='v'+(gold<0?' bad':''); }
   document.getElementById('models').textContent=mc;
   document.getElementById('heroes').textContent=hc;
   document.getElementById('rating').textContent=totalRating();
@@ -5278,23 +5284,24 @@ function renderSidebar(){
     const udef=k=>WARBANDS[S.wb].units.find(u=>u.id===k);
     const heroK=order.filter(k=>{const d=udef(k);return d&&d.t==='hero'&&!d.vehicle;});
     const henK =order.filter(k=>{const d=udef(k);return d&&(d.t==='hen'||d.vehicle);});
-    const urow=(name,n,title)=>`<div class="ulrow"${title?` title="${title}"`:''}><span>${name}</span><span class="uln">×${n}</span></div>`;
+    const urow=(name,n,title,gold)=>`<div class="ulrow"${title?` title="${title}"`:''}><span>${name}</span>${gold!=null?`<span class="ulg">${gold} gc</span>`:''}<span class="uln">×${n}</span></div>`;
     const hsRows=(S.hired||[]).map(h=>{const hs=HIREDSWORDS[h.key];if(!hs)return '';const p=hs.profile;
       const tip=`${hs.name} (${hs.grade}) — ${[p.M,p.WS,p.BS,p.S,p.T,p.W,p.I,p.A,p.Ld].join('/')} · Hire ${hs.hire}, Upkeep ${hsUpkeepFor(h.key)}, Rating +${hs.rating}`;
-      return urow((h.name?h.name+' ('+hs.name+')':hs.name),1,tip.replace(/"/g,'&quot;'));}).join('');
-    const heroRows=heroK.map(k=>urow(counts[k].name,counts[k].n)).join('');
-    const henRows =henK.map(k=>urow(counts[k].name,counts[k].n)).join('');
+      return urow((h.name?h.name+' ('+hs.name+')':hs.name),1,tip.replace(/"/g,'&quot;'),(typeof hsHireCost==='function'?hsHireCost(h.key):hs.hire));}).join('');
+    const goldOf=k=>S.models.filter(m=>m.uid_def===k).reduce((a,m)=>a+modelTotalCost(m),0);
+    const heroRows=heroK.map(k=>urow(counts[k].name,counts[k].n,null,goldOf(k))).join('');
+    const henRows =henK.map(k=>urow(counts[k].name,counts[k].n,null,goldOf(k))).join('');
     const seg=(label,rows)=>rows?`<div class="ulsec">${label}</div>${rows}`:'';
     const dpRows=(S.dp||[]).map(d=>{const dp=DRAMATIS[d.key];if(!dp)return '';const p=dp.profile;
       const tip=`${dp.name} (${dp.grade}) — ${[p.M,p.WS,p.BS,p.S,p.T,p.W,p.I,p.A,p.Ld].join('/')} · Rating +${dp.rating}`;
-      return urow((d.name?d.name:dp.name),1,tip.replace(/"/g,'&quot;'));}).join('');
-    ulEl.innerHTML=(heroRows||hsRows||dpRows||henRows)?seg('Heroes',heroRows)+seg('Dramatis Personae',dpRows)+seg('Hired Swords',hsRows)+seg('Henchmen',henRows):'';
+      return urow((d.name?d.name:dp.name),1,tip.replace(/"/g,'&quot;'),(typeof dpHireCost==='function'?dpHireCost(d.key):dp.hire));}).join('');
+    ulEl.innerHTML=(heroRows||hsRows||dpRows||henRows)?seg('Heroes',heroRows)+seg('Dramatis Personae',dpRows)+seg('Hired Swords',hsRows)+seg('Henchmen',henRows)+`<div class="ulrow ultot"><span><b>Total spent</b></span><span class="ulg"><b>${totalSpent()} gc</b></span><span class="uln"></span></div>`:'';
   }
   // warnings
   const w=[]; const h=HR();
   const minReq=(h.min!==''&&h.min!=null)?Number(h.min):wb.min;
   const heroCap=Number(h.heroes)||6;
-  if(remain<0) w.push(`Over budget by ${-remain} gc.`);
+  if(gold<0) w.push(`Not enough gold — short by ${-gold} gc.`);
   if(mc<minReq) w.push(`At least ${minReq} models required (currently ${mc}).`);
   if(mc>warbandMax()) w.push(`At most ${warbandMax()} models allowed (currently ${mc}).`);
   if(hc>heroCap) w.push(`A warband may have at most ${heroCap} Heroes (currently ${hc}).`);
