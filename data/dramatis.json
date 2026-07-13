@@ -1,0 +1,1295 @@
+{
+ "DP_GRADE_ORDER": [
+  "core",
+  "1a",
+  "1b",
+  "1c",
+  "2a"
+ ],
+ "DRAMATIS": {
+  "aenur": {
+   "skills": [
+    "Strike to Injure",
+    "Expert Swordsman",
+    "Step Aside",
+    "Sprint",
+    "Lightning Reflexes",
+    "Dodge",
+    "Mighty Blow"
+   ],
+   "race": "elf",
+   "name": "Aenur, the Sword of Twilight",
+   "grade": "core",
+   "src": "Mordheim Rulebook",
+   "hire": 150,
+   "upkeep": 0,
+   "rating": 100,
+   "noXP": true,
+   "wanderer": true,
+   "profile": {
+    "M": 5,
+    "WS": 8,
+    "BS": 4,
+    "S": 4,
+    "T": 3,
+    "W": 2,
+    "I": 7,
+    "A": 3,
+    "Ld": 8
+   },
+   "eq": "Ithilmar Armour, Elven Cloak, Ienh-Khain (parry, +1 S, crits on 5-6 to wound)",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "Wanderer: stays for one battle only; no upkeep. May not be sought again until the warband has fought a battle without him.",
+   "sp": "<b>Invincible Swordsman:</b> Aenur always hits his opponents on a roll of 2+ in hand-to-hand combat. <b>Wanderer:</b> Aenur only ever stays with a warband for the duration of the battle. A warband who used Aenur in their last battle may not seek him out until they have fought at least one battle without him. <b>Ienh-Khain (the Hand of Khaine):</b> Allows Aenur to parry, adds +1 to his Strength and causes a critical hit on a roll of 5-6 when rolling to wound.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "undead",
+     "possessed"
+    ]
+   }
+  },
+  "bertha": {
+   "skills": [
+    "Mighty Blow",
+    "Unstoppable Charge",
+    "Righteous Fury"
+   ],
+   "race": "human",
+   "name": "Bertha Bestraufrung, High Matriarch",
+   "grade": "core",
+   "src": "Mordheim Rulebook",
+   "hire": 0,
+   "upkeep": 0,
+   "rating": 105,
+   "noXP": true,
+   "leader": true,
+   "magic": "prayersSigmar",
+   "profile": {
+    "M": 4,
+    "WS": 5,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 4,
+    "A": 3,
+    "Ld": 10
+   },
+   "eq": "Two Sigmarite Warhammers, Gromril Armour, Blessed Water, Holy Relic",
+   "sk": [
+    "combat"
+   ],
+   "upkeepNote": "No hire fee. Only aids a Sisters warband whose enemy has a higher rating (roll per battle: 50-99=6+, 100-149=5+, 150-199=4+, 200+=3+).",
+   "sp": "<b>High Matriarch:</b> Bertha automatically becomes the leader of any warband she joins. <b>Sigmar's Handmaiden:</b> +2 to all rolls to see whether her Prayers of Sigmar are granted. <b>Prayers of Sigmar:</b> Bertha knows all six Prayers of Sigmar.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "sos"
+    ]
+   }
+  },
+  "marianna": {
+   "skills": [
+    "Combat Master",
+    "Step Aside",
+    "Leap",
+    "Acrobat",
+    "Lightning Reflexes",
+    "Dodge",
+    "Jump Up",
+    "Scale Sheer Surfaces"
+   ],
+   "race": "vampire",
+   "name": "Countess Marianna Chevaux, Vampire Assassin",
+   "grade": "1a",
+   "src": "Town Cryer 22",
+   "hire": 150,
+   "upkeep": 75,
+   "rating": 90,
+   "noXP": true,
+   "profile": {
+    "M": 6,
+    "WS": 6,
+    "BS": 6,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 9,
+    "A": 3,
+    "Ld": 9
+   },
+   "eq": "Rapier, Dagger, Throwing Knives, Crossbow Pistol (bolts + rapier act as Black Lotus vs Vampires)",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "75 gc upkeep, but 'You can never escape your past' (D6 after each game): 1-3 leaves, 4-5 stays if paid, 6 Serutat's minions attack.",
+   "sp": "<b>Immune to Psychology:</b> As a Vampire she is completely immune to psychology and will never leave combat. <b>Immune to Poison.</b> <b>No Pain:</b> Treats a stunned result as knocked down instead. <b>Causes Fear.</b> <b>You can never escape your past:</b> Roll a D6 at the end of the game — 1-3 she leaves, 4-5 she stays if you pay upkeep, 6 Serutat's minions attack. <b>Fighting Undead:</b> All Vampires hate Marianna. <b>The Noctu:</b> −1 to hit her with shooting.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "wh",
+     "sos",
+     "undead"
+    ],
+    "flags": [
+     "elf"
+    ]
+   }
+  },
+  "johann": {
+   "skills": [
+    "Dodge",
+    "Scale Sheer Surfaces",
+    "Quick Shot",
+    "Eagle Eyes",
+    "Knife-Fighter"
+   ],
+   "race": "human",
+   "name": "Johann the Knife",
+   "grade": "core",
+   "src": "Mordheim Rulebook",
+   "hire": 70,
+   "upkeep": 30,
+   "rating": 60,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 6,
+    "S": 4,
+    "T": 3,
+    "W": 2,
+    "I": 6,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Countless Throwing Knives + long daggers (counts as two Swords in close combat), always coated with Black Lotus; may take Crimson Shade",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "sp": "<b>Knife Fighter Extraordinaire:</b> Unlike normal warriors, Johann can combine the Knife-Fighter and Quick Shot skills (he can throw six throwing knives in one turn if he does not move).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "undead",
+     "possessed"
+    ]
+   }
+  },
+  "nicodemus": {
+   "skills": [
+    "Sorcery",
+    "Fearsome"
+   ],
+   "race": "human",
+   "name": "Nicodemus, the Cursed Pilgrim",
+   "grade": "1a",
+   "src": "Mordheim Annual 2002",
+   "hire": 0,
+   "upkeep": 0,
+   "rating": 85,
+   "noXP": true,
+   "magic": "lesserMagic",
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 3,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Enormous Wizard's Staff (two-handed = Club + parry; or one-handed Club while casting Sword of Rezhebel)",
+   "sk": [
+    "academic"
+   ],
+   "upkeepNote": "Cursed: paid only in wyrdstone — 1 wyrdstone shard to hire and 1 shard after each battle. No shard (or unwilling) = he leaves for good.",
+   "sp": "<b>Cursed:</b> Nicodemus is paid in wyrdstone — one shard to hire and one after every battle. If you cannot or will not pay, he leaves for good. <b>Wizard's Staff:</b> Two-handed it counts as a Club and lets him parry as if armed with a buckler; alternatively he wields it one-handed as a Club while casting the Sword of Rezhebel. <b>Spells:</b> Knows all six Lesser Magic spells. <b>FAQ:</b> Witch Hunters may NOT hire Nicodemus (Ultimate FAQ, OMA2002 errata).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven",
+     "undead",
+     "possessed",
+     "wh"
+    ]
+   }
+  },
+  "ulli_marquand": {
+   "skills": [
+    "Strongman",
+    "Unstoppable Charge",
+    "Combat Master"
+   ],
+   "skills2": [
+    "Step Aside",
+    "Knife-Fighter",
+    "Lightning Reflexes"
+   ],
+   "race": "human",
+   "name": "Ulli & Marquand",
+   "grade": "1a",
+   "src": "Town Cryer 13",
+   "hire": 30,
+   "upkeep": 0,
+   "rating": 60,
+   "noXP": true,
+   "wanderer": true,
+   "pair": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 4,
+    "T": 3,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 7
+   },
+   "profile2": {
+    "name": "Marquand",
+    "p": {
+     "M": 4,
+     "WS": 5,
+     "BS": 4,
+     "S": 3,
+     "T": 3,
+     "W": 2,
+     "I": 5,
+     "A": 2,
+     "Ld": 8
+    }
+   },
+   "profileName": "Ulli",
+   "eq": "Ulli: Two-handed Warhammer, Light Armour. Marquand: Sword, Light Armour, Throwing Knives",
+   "sk": [
+    "combat"
+   ],
+   "upkeepNote": "Wanderers: stay for one battle only; hired as a pair for 30 gc. Inseparable (must stay within 4\").",
+   "sp": "<b>Wanderers:</b> The pair only ever stay for the duration of the battle; a warband that used them may not seek them out until it has fought at least one battle without them. <b>Inseparable:</b> Hired as a pair, they must remain within 4\" of each other; if one goes Out of Action the other drags him to safety. <b>A Fistful of Crowns:</b> Opposing players may secretly bid to bribe the pair into changing sides mid-battle. <b>Where's the Money?</b> If the warband cannot pay, the pair take equipment of equal value — or fight the leader to the death.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "sos",
+     "wh"
+    ]
+   }
+  },
+  "veskit": {
+   "skills": [],
+   "race": "skaven",
+   "name": "Veskit, High Executioner of Clan Eshin",
+   "grade": "core",
+   "src": "Mordheim Rulebook",
+   "hire": 80,
+   "upkeep": 35,
+   "rating": 70,
+   "noXP": true,
+   "profile": {
+    "M": 5,
+    "WS": 5,
+    "BS": 4,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 5,
+    "A": 4,
+    "Ld": 8
+   },
+   "eq": "Eshin Fighting Claws (S5, −3 save, parry twice) with built-in Warplock Pistols (may shoot every turn)",
+   "sk": [
+    "combat"
+   ],
+   "sp": "<b>Unfeeling:</b> Immune to all psychology. <b>No Pain:</b> Ignores knocked down and stunned results; he must lose his last wound to be taken out of action. <b>Unblinking Eye:</b> Spots hidden enemies within twice his Initiative in inches. <b>Metallic Body:</b> Gives his high Toughness and a 3+ armour save.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "skaven",
+     "skavenpest"
+    ]
+   }
+  },
+  "abdul": {
+   "skills": [
+    "Sorcery"
+   ],
+   "race": "human",
+   "name": "Abdul Alhazred, the Mad Sorcerer",
+   "grade": "1b",
+   "src": "Town Cryer 21",
+   "hire": 70,
+   "upkeep": 30,
+   "rating": 30,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 2,
+    "S": 3,
+    "T": 3,
+    "W": 2,
+    "I": 4,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Black Nomad Robes, Dagger, The Eye Pendant",
+   "sk": [
+    "academic"
+   ],
+   "sp": "<b>The Eye Pendant:</b> Any Undead warrior wishing to attack Abdul must first pass a Ld test; the pendant also grants him a 4+ ward save against all damage. <b>Psychology:</b> Quite mad — immune to all psychology tests. <b>Djinn Master:</b> If the warband acquires a Lamp of the Djinn he may assist a Hero using it (+1 on the Light table, −1 on the Dark table). <b>Master Wizard:</b> Knows every Elemental and Necromancy spell, but must roll at the start of each Shooting phase to see which he remembers (D6: 1-3 Elemental, 4-6 Necromancy, then D6 for the spell).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "wh",
+     "sos"
+    ]
+   }
+  },
+  "crowmaster": {
+   "skills": [
+    "Sorcery",
+    "Dodge"
+   ],
+   "race": "human",
+   "name": "The Crow Master",
+   "grade": "1b",
+   "src": "Town Cryer 25",
+   "hire": 65,
+   "upkeep": 15,
+   "rating": 85,
+   "noXP": true,
+   "magic": "necromancy",
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 4,
+    "W": 3,
+    "I": 5,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Mantle of Crows, Staff, Needle and Thread",
+   "sk": [
+    "academic",
+    "speed"
+   ],
+   "sp": "<b>Mantle of Crows:</b> Any enemy in base contact at the start of the close-combat phase suffers one automatic Strength 2 hit before blows are struck. <b>Needle and Thread:</b> If he stuns an opponent with no other enemies in base contact, he sews up its mouth — leaders cannot use the Leader ability and spellcasters cannot cast for the rest of the battle. <b>Payment in Blood:</b> If the warband loses the battle, roll a D6 — on a 1 Simius abducts the Hero or Henchman with the lowest experience (removed from the roster) and disappears. <b>Spells:</b> Knows all Necromancy spells plus his own spell Decay of Ages (Difficulty 9).",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "wh",
+     "sos"
+    ],
+    "flags": [
+     "dwarf",
+     "elf"
+    ]
+   }
+  },
+  "darkemissary": {
+   "skills": [],
+   "race": "human",
+   "name": "Dark Emissary",
+   "grade": "1b",
+   "src": "Town Cryer 15 (Albion)",
+   "hire": 0,
+   "upkeep": 0,
+   "rating": 0,
+   "noXP": true,
+   "magic": "loreOfDarkness",
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 2,
+    "I": 3,
+    "A": 1,
+    "Ld": 8
+   },
+   "eq": "Staff of Darkness, The Spiral",
+   "sk": [
+    "academic"
+   ],
+   "upkeepNote": "Albion scenario character (The Ogham Stones): no hire fee; Mordheimer states no rating (set 0 — house-rule as you see fit). Sought out per battle; the opposing Truthsayer may appear alongside the enemy.",
+   "sp": "<b>Staff of Darkness:</b> +1 to his casting rolls. <b>The Spiral:</b> Grants a 5+ save that cannot be reduced by anything. <b>Wizard:</b> Knows four randomly determined spells from the Lore of Darkness. <b>Alignment:</b> Only fights alongside evil warbands (Possessed, Undead, Skaven and other evil warbands). <b>The Ogham Stones:</b> Scenario character — no hire fee; if you find him and the enemy has no Truthsayer, on a 4+ the opposing character joins the enemy. If both warbands share an alignment, neither may be sought.",
+   "rule": {
+    "type": "evil"
+   }
+  },
+  "dijinkatal": {
+   "skills": [
+    "Strike to Injure",
+    "Quick Shot",
+    "Dodge",
+    "Lightning Reflexes",
+    "Trick Shooter"
+   ],
+   "race": "human",
+   "name": "Dijin Katal, the Renegade Assassin",
+   "grade": "1b",
+   "src": "Town Cryer 15 (Lustria)",
+   "hire": 85,
+   "upkeep": 0,
+   "rating": 70,
+   "noXP": true,
+   "wanderer": true,
+   "profile": {
+    "M": 5,
+    "WS": 7,
+    "BS": 5,
+    "S": 4,
+    "T": 3,
+    "W": 2,
+    "I": 7,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Druchii Assassin's Cloak, two Swords with Dark Venom, Repeater Crossbow",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "upkeepNote": "Wanderer: stays for one battle only. Also may not be hired by any warband that includes an Elven Hired Sword.",
+   "sp": "<b>Kindred Hatred:</b> Hates any High Elf warrior, including High Elf Hired Swords. <b>Excellent Sight:</b> Spots hidden enemies at twice his Initiative in inches. <b>Shadows Embrace:</b> In cover, a charging model may only charge him up to its Initiative in inches, and missiles suffer an extra −1 to hit on top of the cover penalty. <b>Perfect Killer:</b> All his attacks (shooting and close combat) have an extra −1 save modifier. <b>Renegade:</b> Dark Elves he fights against hate him. <b>Wanderer:</b> Stays only for the duration of the battle; a warband that used him may not seek him out until it has fought at least one battle without him. <b>Note:</b> He will not join a warband that includes any Elven Hired Sword.",
+   "rule": {
+    "type": "except",
+    "wbs": [
+     "amazons",
+     "amazonslustria",
+     "shadowwarriors",
+     "darkelves"
+    ]
+   }
+  },
+  "drenok": {
+   "skills": [
+    "Fearsome",
+    "Strongman",
+    "Combat Master",
+    "Step Aside"
+   ],
+   "race": "human",
+   "name": "Drenok Johansen, Wielder of the Great Axe",
+   "grade": "1b",
+   "src": "Town Cryer 15 (Lustria)",
+   "hire": 70,
+   "upkeep": 30,
+   "rating": 70,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 6,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Axe of the Icefang (double-handed, parries, +1 injury), Sabertooth Tiger Hide (6+/5+ save)",
+   "sk": [
+    "combat"
+   ],
+   "sp": "<b>Berserker:</b> If reduced to zero wounds, roll a D6 — on a 4+ he fights on until the end of the turn (roll again every turn or he goes Out of Action). <b>Icefang Axe:</b> A double-handed axe that may also parry and adds +1 to injury rolls. <b>Sabertooth Tiger Hide:</b> 6+ save in close combat, 5+ against missile fire.",
+   "rule": {
+    "type": "human"
+   }
+  },
+  "heinrich": {
+   "skills": [
+    "Tomb Explorer",
+    "Lightning Reflexes",
+    "Whip Master",
+    "Step Aside",
+    "Streetwise",
+    "Dodge",
+    "Luck"
+   ],
+   "race": "human",
+   "name": "Heinrich 'Altdorf' Schmidt",
+   "grade": "1b",
+   "src": "Town Cryer 21",
+   "hire": 75,
+   "upkeep": 0,
+   "rating": 75,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 3,
+    "T": 3,
+    "W": 2,
+    "I": 6,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Whip, Sword, Duelling Pistol, Light Armour, Lantern, Rope & Hook",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "Upkeep = 1 piece of treasure (paid in relics, not gold).",
+   "sp": "<b>Oh no, not Snakes!</b> He fears all snakes and serpents. <b>Whip Swing:</b> He may swing across a gap of up to 4\" without deducting it from his Movement (Initiative test not to fall); he may also swing down to a lower level, and may save himself from a pit trap with an Initiative test. <b>No time for you:</b> If an enemy henchman blocks his charge path, he may fire his Duelling Pistol first — if the henchman is knocked down, stunned or taken out of action he charges as if it were not there. <b>I'll Take That!</b> His upkeep is paid as one piece of treasure, not gold.",
+   "rule": {
+    "type": "human"
+   }
+  },
+  "kharmel": {
+   "skills": [],
+   "race": "human",
+   "name": "Khar-mel the Djinn",
+   "grade": "1b",
+   "src": "Town Cryer 21",
+   "hire": 80,
+   "upkeep": 30,
+   "rating": 45,
+   "noXP": true,
+   "magic": "elemental",
+   "profile": {
+    "M": 6,
+    "WS": 4,
+    "BS": 4,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 3,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Scimitar (= Sword), no armour",
+   "sk": [
+    "academic"
+   ],
+   "upkeepNote": "Summon: a Wizard/Priest in the warband (min. one battle) must pass a Ld test; if that caster dies or leaves, Khar-mel leaves too.",
+   "sp": "<b>Fear:</b> The Djinn radiates an aura of power and causes fear. <b>Ethereal:</b> 5+ save that is never modified (but useless against magical weapons). <b>Elemental Magic:</b> Knows D3 randomly determined Elemental Magic spells. <b>Djinn Powers:</b> She may declare one power in her Recovery phase; it lasts until her next Recovery phase and she may not use the same power twice in a row. <b>Whirlwind:</b> Triple Movement when running, may not charge or be charged, may not attack or cast, and is −1 to hit with missiles. <b>Djinn's Curse:</b> Enemies within 4\" suffer −1 to hit (shooting and close combat) and −1 to all saves. <b>Djinn's Luck:</b> 4+ ward save (6+ where no save would normally apply). <b>Summoning:</b> A Wizard or Priest who has been with the warband at least one battle must pass a Leadership test; if that caster dies or leaves, Khar-mel leaves too.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "maximilian": {
+   "skills": [
+    "Strongman"
+   ],
+   "race": "human",
+   "name": "Maximilian the Mad",
+   "grade": "1b",
+   "src": "Nemesis Crown",
+   "hire": 80,
+   "upkeep": 30,
+   "rating": 25,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 3,
+    "T": 4,
+    "W": 2,
+    "I": 3,
+    "A": 2,
+    "Ld": 10
+   },
+   "eq": "Double-handed Holy Weapon (+2 S; +1 to wound Undead/Possessed/Carnival/Beastmen)",
+   "sk": [
+    "combat"
+   ],
+   "upkeepNote": "May not be hired by Middenheim Mercenaries (Ulric/Sigmar rivalry).",
+   "sp": "<b>Fanatical:</b> Automatically passes all Leadership-based tests. He hates Orcs & Goblins, Black Orcs, Forest Goblins, Horned Hunters, Sisters of Sigmar, Middenheimers, Skaven, Undead, Beastmen, Possessed and Carnival of Chaos. <b>Religious Fervour:</b> Subject to Frenzy — he must always charge (even a diving charge) and must always end his turn closer to the enemy. <b>Fear:</b> He causes fear; friendly models within 3\" of him are immune to fear. <b>Holy Weapon:</b> Double-handed, +2 Strength, and +1 to wound against Undead, Possessed, Carnival of Chaos and Beastmen.",
+   "rule": {
+    "type": "humanOrDwarf",
+    "except": [
+     "sos",
+     "possessed",
+     "carnival",
+     "beastmen"
+    ],
+    "xsub": [
+     [
+      "merc",
+      "midd"
+     ]
+    ]
+   }
+  },
+  "penthesilea": {
+   "skills": [
+    "Mesmerising Dance",
+    "Savage Fury",
+    "Elixir of Life",
+    "Weapon Master",
+    "Concealment"
+   ],
+   "race": "human",
+   "name": "Penthesilea, Mark of the Serpent",
+   "grade": "1b",
+   "src": "Town Cryer 15 (Lustria)",
+   "hire": 0,
+   "upkeep": 0,
+   "rating": 70,
+   "noXP": true,
+   "profile": {
+    "M": 5,
+    "WS": 5,
+    "BS": 4,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 5,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Starsword, Starblade, Amulet of the Moon, Enchanted Skins",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "No hire fee. Only aids an Amazon warband whose enemy has a higher rating (roll per battle: 50-99=6+, 100-149=5+, 150-199=4+, 200+=3+).",
+   "sp": "<b>Amazon:</b> All Amazon special rules apply. <b>Mark of the Serpent:</b> +1 Movement and +1 Initiative (already shown in her profile). <b>Man-Hater:</b> Subject to Hatred of all human males. <b>Summoning:</b> No hire fee — she only aids an Amazon warband whose enemy has a higher rating (roll per battle: 50-99 = 6+, 100-149 = 5+, 150-199 = 4+, 200+ = 3+).",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "amazons",
+     "amazonslustria"
+    ]
+   }
+  },
+  "truthsayer": {
+   "skills": [],
+   "race": "human",
+   "name": "Truthsayer",
+   "grade": "1b",
+   "src": "Town Cryer 15 (Albion)",
+   "hire": 0,
+   "upkeep": 0,
+   "rating": 0,
+   "noXP": true,
+   "magic": "loreOfLight",
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 9
+   },
+   "eq": "Staff of Light (dispels a spell on 4+; counts as a Halberd), The Triskele",
+   "sk": [
+    "academic",
+    "combat"
+   ],
+   "upkeepNote": "Albion scenario character (The Ogham Stones): no hire fee; Mordheimer states no rating (set 0 — house-rule as you see fit). The opposing Dark Emissary may appear alongside the enemy.",
+   "sp": "<b>Staff of Light:</b> Dispels a single enemy spell per turn on a 4+; it also counts as a Halberd. <b>The Triskele:</b> Grants a 4+ save that cannot be reduced by anything. <b>Wizard:</b> Knows three randomly determined spells from the Lore of Light. <b>Alignment:</b> Only aids Sisters of Sigmar, Witch Hunters, Mercenaries and other good warbands. <b>The Ogham Stones:</b> Scenario character — no hire fee; if you find him and the enemy has no Dark Emissary, on a 4+ the opposing character joins the enemy. If both warbands share an alignment, neither may be sought.",
+   "rule": {
+    "type": "good"
+   }
+  },
+  "belandysh": {
+   "skills": [
+    "Fearsome",
+    "Strongman",
+    "Ride Tol’Agath"
+   ],
+   "race": "woc",
+   "name": "Belandysh, Condemned Champion of Chen",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 90,
+   "upkeep": 30,
+   "rating": 130,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": "D6",
+    "BS": 0,
+    "S": "D6",
+    "T": "D6",
+    "W": 3,
+    "I": "D6",
+    "A": "D3",
+    "Ld": 10
+   },
+   "eq": "Broadsword of Damnation (Chaos Artefact), Helmet, Chaos Armour; rides Tol'Agath (mutated Warhorse)",
+   "sk": [
+    "combat"
+   ],
+   "upkeepNote": "90 gc + 5 campaign points to hire; 30 gc + 1 campaign point upkeep. Inconsistency: variable stats (D6/D3) are rolled once each turn when needed.",
+   "sp": "<b>Immune to Psychology:</b> Belandysh automatically passes all Leadership tests. <b>Inconsistency:</b> His body mutates permanently — his variable characteristics (D6/D3) are rolled whenever needed, once every turn. <b>Regeneration:</b> Whenever an enemy inflicts a wound, roll a D6 — on a 4+ the wound is ignored. He may not regenerate wounds caused by fire or fire-based magic. <b>Tol’Agath:</b> His mutated steed acts as a Warhorse (including Battle Schooled) and is itself subject to Inconsistency. <b>Wrath of Tchar:</b> If a battle ends with Belandysh out of action and someone has picked up the Broadsword of Damnation, he is pulled into the Realm of Chaos and may not be hired again for the rest of the campaign.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "maraudersofchaos",
+     "beastmen",
+     "norse",
+     "possessed"
+    ]
+   }
+  },
+  "ippanshu": {
+   "skills": [
+    "Art of Silent Death",
+    "Strike to Injure",
+    "Step Aside",
+    "Mighty Blow",
+    "Leap",
+    "Sprint",
+    "Acrobat",
+    "Lightning Reflexes",
+    "Jump Up",
+    "Dodge",
+    "Scale Sheer Surfaces"
+   ],
+   "race": "human",
+   "name": "Grand Master Ippan Shu",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 75,
+   "upkeep": 0,
+   "rating": 110,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 7,
+    "BS": 7,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 6,
+    "A": 4,
+    "Ld": 10
+   },
+   "eq": "Iron Fan (parries blows and missiles, +1 I); other hand fights unarmed (+1 A)",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "75 gc + 3 campaign points to hire; 2 campaign points upkeep (no gold upkeep).",
+   "sp": "<b>Bare-handed Fighting:</b> Ippan Shu fights unarmed without penalty — his free hand counts as a second close-combat weapon and grants +1 Attack. <b>Iron Fan:</b> Grants +1 Initiative and allows him to parry blows and missile shots. The Art of Silent Death skill applies to his fan attacks as well. <b>Parry Missiles:</b> For each missile hit he parries the shot if he beats the to-hit roll. <b>Immune to Psychology:</b> He automatically passes all Leadership-based tests. <b>With the Elegance of a Feather:</b> When running or charging he may move up to half his total movement (6\") in ANY direction, not only along the ground — combinable with Leap for up to 6+D6\". He must still finish his move on solid ground. <b>Way of the Dragon:</b> He spits fire in the shooting phase — use the flame template; hit models suffer an automatic Strength 4 hit and are set on fire on a 4+. He may use this even while engaged in close combat. <b>Additional skill access:</b> He also has ALL Speed skills and every Battle Monk special skill except Warmonger.",
+   "rule": {
+    "type": "only",
+    "flags": [
+     "human",
+     "elf"
+    ],
+    "wbs": [
+     "battlemonks"
+    ],
+    "xwbs": [
+     "darkelves",
+     "outlaws",
+     "hochland"
+    ]
+   }
+  },
+  "innominatus": {
+   "skills": [
+    "Pit Fighter",
+    "Grizzled Veteran",
+    "Death without a Face"
+   ],
+   "race": "human",
+   "name": "Innominatus, the Tilean Gladiator",
+   "grade": "1c",
+   "src": "Facebook Group",
+   "hire": 120,
+   "upkeep": 40,
+   "rating": 90,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 5,
+    "BS": 3,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Dark Elf Blade, Javelins, Dwarf Axe, Helmet, Light Armour, Shield",
+   "sk": [
+    "combat",
+    "shooting"
+   ],
+   "upkeepNote": "40 gc upkeep, or 20 gc if he fought a challenge that battle.",
+   "sp": "<b>Pit Master:</b> He avoids any hit from close combat AND missile weapons on a D6 roll of 4+. The roll is taken as soon as a hit is scored, before rolling to wound and before any other skills or equipment. <b>Who is the hero?</b> Once per battle he may challenge any enemy Hero, Hired Sword or Dramatis Personae to a mortal duel (even the leader, even if hidden or out of sight). If the challenge is refused, that character is removed from the battlefield and misses the next game. If accepted, resolve the duel immediately; Innominatus benefits from Pit Fighter. If he loses, he is removed, injuries are rolled as usual and the winning hero gains 3 XP. <b>Thumbs Up / Thumbs Down:</b> If Innominatus wins, the losing player chooses — Thumbs Up: The loser lives but Innominatus takes ALL his equipment and he is subject to Stupidity for the rest of the game; Thumbs Down: The loser is slain and removed from the roster, all Heroes of his warband gain 1 XP and the losing player keeps the dead model’s equipment. <b>Grizzled Veteran:</b> Immune to psychology. <b>Death without a Face:</b> Causes fear. <b>Pit Fighter:</b> +1 WS and +1 Attack when fighting in ruins, buildings and the Pit.",
+   "rule": {
+    "type": "except",
+    "tags": [
+     "skaven"
+    ],
+    "wbs": [
+     "darkelves"
+    ]
+   }
+  },
+  "luthorwolfenbaum": {
+   "race": "human",
+   "name": "Luthor Wolfenbaum",
+   "grade": "1c",
+   "src": "Facebook Group",
+   "hire": 60,
+   "upkeep": 25,
+   "rating": 35,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Varies by persona",
+   "skills": [
+    "Step Aside",
+    "Dodge",
+    "Expert Swordsman",
+    "Sprint",
+    "Quick Shot"
+   ],
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "personas": [
+    {
+     "name": "Crimson Blade of Reikland",
+     "eq": "Custom Sword (two-handed for +1 S, or one-handed at normal Strength), Dagger, Heavy Armour, Helmet",
+     "sp": "<b>The Crimson Blade:</b> When attacking an enemy already engaged in melee with another opponent, Luthor gains +1 to hit, +1 to wound and +1 to Injury rolls. <b>Disengage:</b> In his own movement phase he may move away from any melee without the enemy getting attacks — he may even charge another enemy this way.",
+     "rule": {
+      "type": "only",
+      "flags": [
+       "human"
+      ],
+      "xsub": [
+       [
+        "merc",
+        "midd"
+       ]
+      ]
+     },
+     "note": "May be hired by all human warbands — except Middenheimers (who’d never seek help from a Reiklander)."
+    },
+    {
+     "name": "Dark Wizard Extraordinaire",
+     "eq": "Staff (with nailed fish), concealed Heavy Armour, Lucky Charm, Garlic, flask of “magic potion” (Bugman’s Beer — immune to Fear), Clay Orbs of Tilean Fire",
+     "sp": "<b>Fireballs:</b> He throws clay orbs of Tilean Fire in the missile phase, even while engaged in melee (choose any enemy in base contact). Range 8\\\", no long-range penalty; a hit causes one S2 hit and the target must roll under its Initiative at the start of its next turn or it may not charge or shoot that turn. <b>Fish-slapping Dance:</b> In close combat, on a to-hit roll of 6 the staff resolves the hit at double Strength (8 instead of 4). <b>Immune to Fear:</b> The flask of “magic potion” (really Bugman’s Beer) makes Luthor immune to fear. <b>Not a wizard:</b> Despite the name Luthor casts no spells at all — the “fireballs” are clay orbs of Tilean Fire.",
+     "rule": {
+      "type": "except",
+      "tags": [
+       "wh",
+       "sos"
+      ],
+      "xsub": [
+       [
+        "merc",
+        "reik"
+       ]
+      ]
+     },
+     "note": "May be hired by any warband — except Witch Hunters, Reiklanders or Sisters of Sigmar."
+    },
+    {
+     "name": "Master Archer of Drakwald",
+     "eq": "Longbow, Dagger, Hunting Arrows, Heavy Armour; his arrows are coated in Dark Venom",
+     "sp": "<b>Boast:</b> Before a shot he may boast. If the shot hits, roll a D6 — the result is a bonus usable (even after rolling) on any single to-hit roll or Leadership test, including Rout rolls, before his next Shooting phase. If he misses, the whole warband suffers a cumulative −1 Ld until Luthor hits a target. <b>Do you feel lucky, lad?</b> Pick any enemy model at the start of his Missile phase: It suffers −1 WS and −1 BS. He may not do this while engaged, stunned or knocked down; Undead, Daemons, animals and models immune to psychology are unaffected.",
+     "rule": {
+      "type": "only",
+      "flags": [
+       "human",
+       "elf",
+       "dwarf"
+      ],
+      "xsub": [
+       [
+        "merc",
+        "reik"
+       ]
+      ]
+     },
+     "note": "May be hired by any human, Elf or Dwarf warband — except Reiklanders (Luthor is too well known there as the Crimson Blade)."
+    }
+   ],
+   "upkeepNote": "After each battle roll a D6: on a 1 Luthor has “misplaced” one of your Wyrdstone shards.",
+   "sp": "<b>Evil Eye:</b> Luthor is immune to any and all Eye Injuries — ignore result 31 (Blinded in one eye) on the Serious Injury table. <b>I am Everywhere:</b> Two warbands fighting each other may each field a Luthor.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "luthorlooter": {
+   "skills": [
+    "Step Aside",
+    "Dodge",
+    "Expert Swordsman",
+    "Sprint",
+    "Pistolier",
+    "Jump Up"
+   ],
+   "race": "human",
+   "name": "Luthor the Looter",
+   "grade": "1c",
+   "src": "T. Pirinen (Facebook Group)",
+   "hire": 60,
+   "upkeep": 25,
+   "rating": 35,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Sword, Heavy Armour, Pistol",
+   "sk": [
+    "combat",
+    "shooting",
+    "speed"
+   ],
+   "upkeepNote": "After each battle roll D6: on a 1 Luthor 'misplaces' one Wyrdstone shard.",
+   "sp": "<b>Evil Eye is NOT included:</b> This is the Treasure-Hunter version of Luthor, a separate character sheet. <b>I Ain’t Got Time For You!</b> Luthor always succeeds when checking whether he can escape from close combat. <b>Looter:</b> Whenever he enters a new building (not Down, not engaged), he finds D6 gc of loot — once per building. At the end of the battle the warband leader takes a Leadership test: If he passes, the warband gains HALF the gold Luthor found; if he fails, Luthor keeps all of it. <b>Mordheim Guide:</b> When rolling on the Exploration chart you may consult Luthor: Roll +1 Exploration die and afterwards change one die to match any other result rolled. If you use this, the leader must pass a Leadership test — on a failure the Exploration result is ignored entirely (Luthor loots the location alone), though you still gain normal income and wyrdstone.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "maglahkhan": {
+   "skills": [
+    "Quick Shot",
+    "Eagle Eyes",
+    "Trick Shooter",
+    "Ride Giant Wolf",
+    "Horse Archer"
+   ],
+   "race": "hobgoblin",
+   "name": "Maglah Khan's Horde",
+   "grade": "1c",
+   "src": "Border Town Burning",
+   "hire": 80,
+   "upkeep": 25,
+   "rating": 60,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 5,
+    "BS": 5,
+    "S": 3,
+    "T": 3,
+    "W": 2,
+    "I": 4,
+    "A": 2,
+    "Ld": 7
+   },
+   "eq": "Spear, Sword, Bow, Shield, Heavy Armour, Helmet; rides a Giant Wolf (M9)",
+   "sk": [
+    "shooting",
+    "speed"
+   ],
+   "upkeepNote": "Maglah's Boyz: must hire 2-5 Hobgoblin Scout Hired Swords while he is in the warband (all but one leave when he does).",
+   "sp": "<b>Maglah’s Boyz:</b> A warband may not hire Maglah alone — it must also hire Hobgoblin Scout Hired Swords while he stays: minimum two, maximum five. When Maglah leaves, all Hobgoblin Scouts except one leave with him. <b>Hobgoblin Leader:</b> Maglah leads all Hobgoblin Scouts in the warband. Any Hobgoblin Scout within 6\" of him may use HIS Leadership for Ld tests — they may not use the warband leader’s Leadership. <b>Giant Wolf:</b> Maglah rides a Giant Wolf (M 9, WS 3, S 3, T 3, W 1, I 4, A 1, Ld 4).",
+   "rule": {
+    "type": "only",
+    "tags": [
+     "orcsgoblins",
+     "merc"
+    ],
+    "wbs": [
+     "maneaters",
+     "sonsofhashut",
+     "blackdwarfs",
+     "maraudersofchaos",
+     "norse",
+     "beastmen",
+     "possessed"
+    ]
+   }
+  },
+  "akshoakhash": {
+   "skills": [],
+   "race": "possessed",
+   "name": "Aksho'akhash the Vile Dreadwing",
+   "grade": "2a",
+   "src": "Facebook Group",
+   "hire": 30,
+   "upkeep": 30,
+   "rating": 35,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 5,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 3,
+    "I": 5,
+    "A": 2,
+    "Ld": 10
+   },
+   "eq": "Razor claws (made of raw magic; count as magical); no weapons or armour",
+   "sk": [],
+   "upkeepNote": "Summoned: a spell-caster with the Macabre Tome pays 30 gc and passes a Ld test after each game; the Tome is destroyed on success. If the summoner dies/leaves, the Daemon is banished.",
+   "sp": "<b>Fear:</b> Lesser Daemons cause fear in all who gaze upon them. <b>Daemonic Flesh:</b> Base armour save of 5+, never modified — but completely negated by blessed or magic weapons and spells. Its own attacks count as magical. <b>Daemonic Instability:</b> If taken out of action it is banished and destroyed on a D6 roll of 1-3 (do not roll for injury). If the spell-caster who summoned it is killed or leaves, the Daemon is banished. <b>Coward King:</b> Unlike other Daemons, Aksho’akhash is NOT immune to psychology — and although it causes fear, it is not itself immune to fear. <b>Fly:</b> Instead of moving normally it may move anywhere within 12\" (counting as a charge if it reaches an enemy), move vertically without climbing, and jump from any height without falling. <b>Aethereal Hoarder:</b> After each game (if not taken out of action) it may do ONE of: Re-roll one Exploration die; search for a rare item as if it were a Hero with +1 to the roll; or find trinkets worth 2D6 gold crowns. <b>Summoning:</b> A spell-caster with the Macabre Tome pays the fee and passes a Leadership test after a game; on success the Tome is destroyed and the Daemon appears. The fee is consumed either way.",
+   "rule": {
+    "type": "chaos"
+   }
+  },
+  "bustygwen": {
+   "skills": [
+    "Step Aside",
+    "Mighty Blow",
+    "Strike to Injure"
+   ],
+   "race": "human",
+   "name": "“Busty” Gwen",
+   "grade": "2a",
+   "src": "Fanatic Online 89",
+   "hire": 85,
+   "upkeep": 0,
+   "rating": 65,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 1,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 3,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Knives, reinforced Rolling Pin (= club, +1 S)",
+   "sk": [
+    "combat"
+   ],
+   "upkeepNote": "Normally found via the Stoat & Pitcher scenario (win = a free Hired Sword/DP next game). One-off game: treat as a normal DP at 85 gc, +65 rating (campaign: +40 plus 1 per XP).",
+   "sp": "<b>Rolling Pin:</b> Counts as a club, hand-made with a reinforced iron centre — +1 Strength on all attacks with it. <b>Massively Built:</b> In the shooting phase (not in close combat, not having run) she may “show her stuff” to any visible male target within 12\": the target must pass a Leadership test or lose its entire next turn. Females, Skaven, Orcs and other non-humans are immune; most Undead are immune, but Vampires and Necromancers are NOT. Elves and Dwarfs are affected. <b>Not Hired Muscle:</b> Gwen steers clear of Mordheim itself. She is always found automatically (no Initiative roll); the warband then plays the Stoat & Pitcher scenario with her as a Hired Sword — a win grants any single Hired Sword or Dramatis Personae free of charge for the next game, a loss costs 2D6×5 gc in repairs. <b>One-off game:</b> Treat her as a normal Dramatis Personae for 85 gc, +65 rating.",
+   "rule": {
+    "type": "any"
+   }
+  },
+  "darkjester": {
+   "skills": [
+    "Leap",
+    "Acrobat",
+    "Lightning Reflexes",
+    "Jump Up",
+    "Dodge"
+   ],
+   "race": "possessed",
+   "name": "The Dark Jester",
+   "grade": "2a",
+   "src": "Fanatic Online 17",
+   "hire": 75,
+   "upkeep": 30,
+   "rating": 55,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 3,
+    "BS": 3,
+    "S": 3,
+    "T": 3,
+    "W": 2,
+    "I": 6,
+    "A": 2,
+    "Ld": 7
+   },
+   "eq": "Skeleton hobby-horse (= club), sack of spikes (= morning star)",
+   "sk": [
+    "speed"
+   ],
+   "sp": "<b>Loner:</b> He never has to test for being All Alone. <b>Confound and Confuse:</b> At the start of each combat turn (his AND his opponent’s) he picks one trick for that round. <b>Sidestepper:</b> A special dodge save of 4+ in close combat that cannot be modified by the Strength of the attack. <b>Babbling Banter:</b> All enemies in base contact are at −1 to hit him in close combat — but their own opponents are at +1 to hit them. <b>Trip:</b> He may forgo rolling to wound after a single attack and instead trip his opponent: on a D6 roll of 2+ the enemy counts as knocked down.",
+   "rule": {
+    "type": "onlyWb",
+    "wbs": [
+     "carnival",
+     "possessed"
+    ]
+   }
+  },
+  "headlesshorseman": {
+   "skills": [
+    "Horse Archer",
+    "Pistolier",
+    "Eagle Eyes",
+    "Trick Shooter",
+    "Strongman"
+   ],
+   "race": "graveguard",
+   "name": "The Headless Horseman",
+   "grade": "2a",
+   "src": "Sylvania",
+   "hire": 100,
+   "upkeep": 0,
+   "rating": 80,
+   "noXP": true,
+   "wanderer": true,
+   "profile": {
+    "M": 8,
+    "WS": 4,
+    "BS": 5,
+    "S": 4,
+    "T": 4,
+    "W": 2,
+    "I": 6,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Brace of Duelling Pistols, Double-Handed Axe, Dagger, Light Armour, Superior Black Powder, Lantern; rides a Nightmare Steed (save 5+, never dismounts)",
+   "sk": [
+    "combat",
+    "shooting"
+   ],
+   "upkeepNote": "Wanderer: stays one battle only. Counts as Undead (Blessed Water etc.).",
+   "sp": "<b>Causes Fear.</b> <b>Immune to Psychology:</b> He and his steed are never affected by psychology and never leave combat — but if he suffers a wound he must roll on the Whoa Boy! table as normal. <b>Immune to Poison:</b> He and his steed are unaffected by all poisons. <b>Faithful Steed:</b> He may never dismount. <b>Undead:</b> Both he and his steed count as Undead (for Blessed Water etc.). <b>Expert Rider:</b> He counts as stationary when shooting even if he moved (no −1 to hit). <b>Rapid Reload:</b> He may fire BOTH duelling pistols every shooting phase. <b>Head Hewer:</b> On the turn he charges, all attacks with his double-handed axe cause +1 to injury rolls and score a critical hit on a 5-6 (charge turn only). <b>Wanderer:</b> He stays only for one battle; a warband that used him may not seek him out until it has fought at least one battle without him. <b>Nightmare Steed:</b> M 8, WS 2, S 3, T 4, W 2, I 2, A 1, Ld 5 — with his Light Armour this gives him a 5+ save.",
+   "rule": {
+    "type": "nonGood"
+   }
+  },
+  "thefoole": {
+   "skills": [
+    "Acrobat",
+    "Lightning Reflexes"
+   ],
+   "race": "human",
+   "name": "The Foole (Schleige)",
+   "grade": "2a",
+   "src": "Fanatic Online 89",
+   "hire": 40,
+   "upkeep": 0,
+   "rating": 30,
+   "noXP": true,
+   "wanderer": true,
+   "profile": {
+    "M": 4,
+    "WS": 4,
+    "BS": 4,
+    "S": 4,
+    "T": 3,
+    "W": 1,
+    "I": 4,
+    "A": 1,
+    "Ld": 7
+   },
+   "eq": "Sword, Dagger, Poison Ring (Giggle Juice)",
+   "sk": [
+    "speed"
+   ],
+   "upkeepNote": "Wanderer: never works for a warband two battles running. Witch Hunters, Sisters and Bretonnians automatically hate him.",
+   "sp": "<b>Unhinged:</b> Schleige is totally immune to all Psychology and All Alone tests. <b>“Bored now…”</b> He never works for the same warband twice in a row — a warband that used him may not seek him out until it has fought at least one battle without him. <b>Poison Ring:</b> Once per battle, instead of a normal attack, he may spray an opponent in close combat with Giggle Juice: An automatic Strength 2 hit with +1 to the Injury roll. If the victim is taken out of action by the poison, any post-battle result other than Dead or Full Recovery additionally inflicts the Nervous Condition injury. <b>Sadist:</b> If an enemy is Captured, Schleige demands the prisoner — the warrior counts as dead, though the capturing warband keeps his equipment. <b>Master Craftsman:</b> After the battle one warrior may ask him to improve a weapon (roll a D6): 1 — he only giggles; 2-5 — the weapon is improved (roll D6: 1-2 +1 Strength, 3-4 +1 Initiative to the wielder, 5-6 a vial of Giggle Juice, +1 S and +1 injury, enough for two battles); 6 — he attacks the warrior instead (single combat, the warrior fights without the offered weapon).",
+   "rule": {
+    "type": "nonGood",
+    "wbs": [
+     "merc"
+    ]
+   }
+  },
+  "sigmundspindle": {
+   "skills": [
+    "Sprint",
+    "Scale Sheer Surfaces",
+    "Dodge",
+    "Lightning Reflexes",
+    "Step Aside",
+    "Unstoppable Charge"
+   ],
+   "race": "possessed",
+   "name": "Sigmund Spindle, the Harvester of Flesh",
+   "grade": "2a",
+   "src": "Sylvania",
+   "hire": 70,
+   "upkeep": 35,
+   "rating": 65,
+   "noXP": true,
+   "profile": {
+    "M": 6,
+    "WS": 5,
+    "BS": 2,
+    "S": 5,
+    "T": 4,
+    "W": 2,
+    "I": 7,
+    "A": 3,
+    "Ld": 7
+   },
+   "eq": "Scythe (S+1, two-handed) — and nothing else",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "May instead be hired for one body part: a chosen Hero takes a Severe Arm Wound (one single-handed weapon only from then on).",
+   "sp": "<b>Maddened:</b> Sigmund is subject to Frenzy. <b>Causes Fear.</b> <b>Immune to Poison.</b> <b>No Pain:</b> He ignores all knocked down and stunned results on the Injury chart — he must lose his last wound and be taken out of action before he is removed. <b>Hire in flesh:</b> Instead of gold he may be hired for one body part — a chosen Hero suffers a Severe Arm Wound and may only use a single one-handed weapon from then on.",
+   "rule": {
+    "type": "evil"
+   }
+  },
+  "william": {
+   "skills": [
+    "Jump Up",
+    "Dodge",
+    "Lightning Reflexes",
+    "Ride Pantomime Horse",
+    "Swashbuckler"
+   ],
+   "race": "human",
+   "name": "William Schäkestange, Master Bard",
+   "grade": "2a",
+   "src": "Letters of the Damned 4",
+   "hire": 70,
+   "upkeep": 30,
+   "rating": 60,
+   "noXP": true,
+   "profile": {
+    "M": 4,
+    "WS": 5,
+    "BS": 3,
+    "S": 4,
+    "T": 3,
+    "W": 2,
+    "I": 5,
+    "A": 2,
+    "Ld": 8
+   },
+   "eq": "Rapier, Dagger, Light Armour, Lucky Rabbit's Foot; optional Pantomime Horse (+6 rating, no gold cost)",
+   "sk": [
+    "combat",
+    "speed"
+   ],
+   "upkeepNote": "Any good-aligned warband beyond Mercs/Sisters/Witch Hunters may hire him on a roll of 4+.",
+   "sp": "<b>Songster:</b> Any friendly model within 6\" of William may re-roll a failed Leadership test with +1 Leadership — this includes Rout tests. <b>Pantomime Horse:</b> Treated as a Warhorse in every way except that it never bolts (M 8, WS 3, S 3, T 3, W 1, I 3, A 1, Ld 5). William may also fight unmounted; fielding the horse adds +6 rating at no gold cost. <b>Pages of Couragio:</b> Usable only when you are NOT the highest-rated warband. Award a Couragio Point to any Hero or Henchmen group that intercepts a charge, takes an enemy out of action who was neither knocked down nor stunned, passes a Fear test to charge, makes a successful diving charge, or survives a combat phase outnumbered at least 2 to 1. At the end of the game randomly pick one who earned a point: a Hero gains D3 extra experience, a Henchmen group gains 1. Points do not carry over.",
+   "rule": {
+    "type": "good"
+   }
+  }
+ }
+}

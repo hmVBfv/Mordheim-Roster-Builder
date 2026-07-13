@@ -1,0 +1,170 @@
+{
+ "NAMEEN": {
+  "Anführer": "Leader",
+  "Perfekter Killer": "Perfect Killer",
+  "Zauberer": "Wizard",
+  "Magier": "Wizard",
+  "Gebete": "Prayers",
+  "Betet": "Prayers",
+  "Furchtlos": "Fearless",
+  "Angst": "Fear",
+  "Furcht": "Fear",
+  "Schrecken": "Terror",
+  "Großes Ziel": "Large Target",
+  "Tier": "Animal",
+  "Kein Schmerz": "No Pain",
+  "Keine Erfahrung": "Gains no Experience",
+  "Keine Ausrüstung": "No equipment",
+  "Keine Waffen/Rüstung": "No weapons/armour",
+  "Darf nicht rennen": "May not run",
+  "Raserei": "Frenzy",
+  "Hass": "Hatred",
+  "Dummheit": "Stupidity",
+  "Sturmangriff": "Charge bonus",
+  "Alleine-Test": "All Alone",
+  "Kaltblütig": "Cold Blooded",
+  "Schuppenhaut": "Scaly Skin",
+  "Regeneration": "Regeneration",
+  "Blutgier": "Blood Greed",
+  "Sprint": "Sprint",
+  "Brennbar": "Flammable",
+  "Bissattacke": "Bite",
+  "Mutation": "Mutation",
+  "Infiltration": "Infiltration",
+  "Späher": "Scout",
+  "Aufspüren": "Scout",
+  "Immun gegen Psychologie": "Immune to Psychology",
+  "Immun gegen jede Psychologie": "Immune to all Psychology",
+  "Immun gegen Gift": "Immune to Poison",
+  "Immun gegen Psychologie & Gift": "Immune to Psychology & Poison",
+  "Immun gegen Psych./Gift": "Immune to Psychology & Poison",
+  "Sonderbewegung": "Special Movement",
+  "Variable Attacken": "Variable Attacks",
+  "Inkonsistenz": "Inconsistent",
+  "Fate": "Fate",
+  "Meisterschwertkämpfer": "Expert Swordsman",
+  "Pedigree": "Pedigree",
+  "Reiter": "Mounted",
+  "Reittier": "Mount",
+  "Flieger": "Flying",
+  "Gift": "Poison",
+  "Unverwundbar": "Unbreakable",
+  "Wassergänger": "Aquatic",
+  "Gestank": "Stench"
+ },
+ "NR_CAT": {
+  "hero": "a0fce0bc-02e0-a064-7a39-5b97ff8a9c94",
+  "hen": "f9b08d8e-4922-78d5-78ad-2047bff52dc8",
+  "cfg": "4852-c4cb-82b0-b7fa",
+  "stash": "a31acb39-8ce9-d6d7-bcc9-f3144d63db48"
+ },
+ "NR_T": {
+  "M": "2a0bcc4c-8266-418f-13d6-a6b44def5e92",
+  "WS": "d5aca8ba-0204-b324-b976-c2b536e09924",
+  "BS": "5b4d181b-23ae-5ed7-9262-c1d2f79246a8",
+  "S": "7f1f0a4d-68dc-b0df-5703-c4d0d91a93b9",
+  "T": "54f4796b-dedb-c296-8b1a-ff7f8043293a",
+  "W": "3172c8dc-ebe4-0c40-72ab-8fd0076b9442",
+  "I": "a6fd52b0-be0a-655e-6314-87b392c9c90e",
+  "A": "bf393c37-9d10-fc85-c147-62b1c01a89fe",
+  "Ld": "e234eaea-a02a-2fb7-3e1f-605392aabb89"
+ },
+ "TERMEN": [
+  [
+   "Verbündete in 6\" dürfen seinen Mut-Wert nutzen",
+   "allies within 6\" may use his Leadership"
+  ],
+  [
+   "dürfen seinen Mut-Wert nutzen",
+   "may use his Leadership"
+  ],
+  [
+   "auf gegnerische Rüstungswürfe",
+   "to enemy armour saves"
+  ],
+  [
+   "gegnerische Rüstungswürfe",
+   "enemy armour saves"
+  ],
+  [
+   "Magie der Gehörnten Ratte",
+   "Magic of the Horned Rat"
+  ],
+  [
+   "nutzt Chaos-Magie",
+   "uses Chaos Magic"
+  ],
+  [
+   "nutzt Nekromantie",
+   "uses Necromancy"
+  ],
+  [
+   "nutzt",
+   "uses"
+  ],
+  [
+   "Rüstungswürfe",
+   "armour saves"
+  ],
+  [
+   "Rüstungswurf",
+   "armour save"
+  ],
+  [
+   "Mut-Wert",
+   "Leadership"
+  ],
+  [
+   "zusätzlich",
+   "additionally"
+  ],
+  [
+   "außer",
+   "except"
+  ],
+  [
+   "Skaven-Held",
+   "Skaven Hero"
+  ],
+  [
+   "geradeaus",
+   "straight ahead"
+  ],
+  [
+   "keine Erfahrung",
+   "gains no experience"
+  ],
+  [
+   "Keine Erfahrung",
+   "gains no experience"
+  ],
+  [
+   "darf nicht",
+   "may not"
+  ],
+  [
+   "rennen",
+   "run"
+  ],
+  [
+   "chargen",
+   "charge"
+  ],
+  [
+   "niedergeschlagen",
+   "knocked down"
+  ],
+  [
+   "betäubt",
+   "stunned"
+  ],
+  [
+   "Verbündete",
+   "allies"
+  ],
+  [
+   "Held",
+   "Hero"
+  ]
+ ]
+}

@@ -1,0 +1,152 @@
+{
+ "BLESSINGS": [
+  [
+   "Strom der Verderbnis",
+   25
+  ],
+  [
+   "Nurgles Fäule",
+   50
+  ],
+  [
+   "Fliegenschwarm",
+   25
+  ],
+  [
+   "Aufgeblähte Fäulnis",
+   40
+  ],
+  [
+   "Mal des Nurgle",
+   35
+  ],
+  [
+   "Scheußlich",
+   40
+  ]
+ ],
+ "MUTATIONS": [
+  [
+   "Dämonenseele",
+   20
+  ],
+  [
+   "Große Klaue",
+   50
+  ],
+  [
+   "Gespaltene Hufe",
+   40
+  ],
+  [
+   "Tentakel",
+   35
+  ],
+  [
+   "Schwarzblut",
+   30
+  ],
+  [
+   "Stacheln",
+   35
+  ],
+  [
+   "Skorpionschwanz",
+   40
+  ],
+  [
+   "Zusätzlicher Arm",
+   40
+  ],
+  [
+   "Scheußlich",
+   40
+  ]
+ ],
+ "MUTEN": {
+  "Dämonenseele": "Daemon Soul",
+  "Große Klaue": "Great Claw",
+  "Gespaltene Hufe": "Cloven Hooves",
+  "Tentakel": "Tentacles",
+  "Schwarzblut": "Black Blood",
+  "Stacheln": "Spines",
+  "Skorpionschwanz": "Scorpion Tail",
+  "Zusätzlicher Arm": "Extra Arm",
+  "Scheußlich": "Hideous",
+  "Strom der Verderbnis": "Stream of Corruption",
+  "Fliegenschwarm": "Swarm of Flies",
+  "Aufgeblähte Fäulnis": "Bloated Putrefaction",
+  "Mal des Nurgle": "Mark of Nurgle",
+  "Nurgles Fäule": "Nurgle's Rot"
+ },
+ "MUTLABEL": {
+  "chaos": "Mutations",
+  "nurgle": "Blessings of Nurgle"
+ },
+ "MUTSETS": {
+  "chaos": [
+   [
+    "Dämonenseele",
+    20
+   ],
+   [
+    "Große Klaue",
+    50
+   ],
+   [
+    "Gespaltene Hufe",
+    40
+   ],
+   [
+    "Tentakel",
+    35
+   ],
+   [
+    "Schwarzblut",
+    30
+   ],
+   [
+    "Stacheln",
+    35
+   ],
+   [
+    "Skorpionschwanz",
+    40
+   ],
+   [
+    "Zusätzlicher Arm",
+    40
+   ],
+   [
+    "Scheußlich",
+    40
+   ]
+  ],
+  "nurgle": [
+   [
+    "Strom der Verderbnis",
+    25
+   ],
+   [
+    "Nurgles Fäule",
+    50
+   ],
+   [
+    "Fliegenschwarm",
+    25
+   ],
+   [
+    "Aufgeblähte Fäulnis",
+    40
+   ],
+   [
+    "Mal des Nurgle",
+    35
+   ],
+   [
+    "Scheußlich",
+    40
+   ]
+  ]
+ }
+}

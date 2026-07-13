@@ -1,0 +1,101 @@
+{
+ "MARAUDER_MARKS": [
+  [
+   "eagle",
+   "Mark of Tchar — the Eagle (Tzeentch)",
+   "markTchar"
+  ],
+  [
+   "serpent",
+   "Mark of Shornaal — the Serpent (Slaanesh)",
+   "markShornaal"
+  ],
+  [
+   "crow",
+   "Mark of Onogal — the Crow (Nurgle)",
+   "markOnogal"
+  ],
+  [
+   "undivided",
+   "Mark of Chaos Undivided",
+   "chaosRituals"
+  ],
+  [
+   "khorne",
+   "Mark of Arkhar — the Dog (Khorne · Bloodfather, no magic)",
+   null
+  ]
+ ],
+ "MARK_RULES": {
+  "eagle": {
+   "seer": [
+    [
+     "Sorcerer of Tchar",
+     "A Seer of Tchar starts with TWO spells from the Tchar Rituals - one chosen freely, the second determined randomly."
+    ]
+   ],
+   "leader": [
+    [
+     "Touched by Tchar",
+     "The Hero becomes a spellcaster and immediately learns ONE random spell from the Tchar Rituals. He suffers -1 on all Difficulty rolls unless he was a wizard before."
+    ]
+   ]
+  },
+  "serpent": {
+   "seer": [
+    [
+     "Seer of Shornaal",
+     "Uses the Shornaal Rituals. If not taken out of action, instead of searching for rare items he may brew a strong drink for the warband (treat as Bugman's Ale). It may never be sold."
+    ]
+   ],
+   "leader": [
+    [
+     "Beguiling Presence",
+     "Enemy models that are not immune to psychology may not attack him in close combat unless they pass a Leadership test on 3D6 (discard the lowest die). If failed, they are hit automatically in close combat; once passed, no further test is needed that battle."
+    ]
+   ]
+  },
+  "crow": {
+   "seer": [
+    [
+     "Seer of Onogal",
+     "Uses the Onogal Rituals and is immune to poison. With the Mutation skill he may take a Blessing of Nurgle instead."
+    ]
+   ],
+   "leader": [
+    [
+     "Blessing of Onogal",
+     "+1 Toughness, immune to poison, and he may re-roll once on the Serious Injuries table."
+    ]
+   ]
+  },
+  "undivided": {
+   "seer": [
+    [
+     "Seer of Chaos Undivided",
+     "Uses the Chaos Rituals. The warband may include 0-3 Gors (counting towards the 15-model maximum); re-roll every 'The Lad's Got Talent' result for them."
+    ]
+   ],
+   "leader": [
+    [
+     "Voice of the Gods",
+     "Friendly models within 6 inches (12 with Battle Tongue) may re-roll failed Leadership tests."
+    ]
+   ]
+  },
+  "khorne": {
+   "seer": [
+    [
+     "Bloodfather",
+     "A Seer with the Mark of Arkhar is a war-priest and CANNOT cast spells. Instead he communes through visions: take a Leadership test each time he takes an enemy out of action in hand-to-hand combat - if passed, add +1 WS, S, T or I until the end of the battle (each characteristic only once). A Bloodfather may also take Strength skills."
+    ]
+   ],
+   "leader": [
+    [
+     "Blood for the Blood God",
+     "Subject to Frenzy. His save against magic increases to 2+ and he is immune to the effects of all Chaos rituals (including Rituals of Hashut)."
+    ]
+   ]
+  }
+ }
+}
