@@ -137,3 +137,26 @@ resolve through the new module.
 orphaned `}` behind — `node --check` accepted the file, but the ESM compiler
 rejected it at load with a bare "Unexpected token '}'". `vm.SourceTextModule`
 pinpointed the line where `--check` wouldn't.)
+
+## July 17, 2026 — armour-save maths to engine.js; pausing the render split
+
+Looked at extracting the Hired-Swords / Dramatis rendering next, but that
+region turned out to interleave three concerns line by line — the HS engine
+helpers (already imported back by engine.js), stat/save helpers, and the
+actual HTML rendering — with no clean block boundary. Forcing a render module
+out of it would have meant a dozen names shuttled back and forth for little
+gain, and exactly the kind of tangle that produced a stray-brace slip earlier.
+
+So instead of a shaky render split, took the one clean cut available there:
+the pure armour-save maths (`svFromText`, `_svCombine`, `svOfModel`,
+`svOfEntry`, `svLabel`, `statNum`) moved to `engine.js`, where they belong
+thematically — no HTML involved. `test/engine.mjs` now also checks the save
+parser (e.g. light armour → 6+, and deliberately not reading a "3+ to avoid
+being stunned" as an armour save).
+
+With state, engine, info and the save maths extracted, `app.js` is now down to
+rendering + UI actions — and those two are genuinely interwoven (render calls
+actions, actions call render). Splitting them further would be high-effort,
+low-reward, so the modularization pauses here by choice rather than pushing a
+split that costs more than it returns. Future energy goes to features (e.g.
+the Rare Items / Trading Post work on the roadmap).
