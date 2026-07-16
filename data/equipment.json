@@ -1810,6 +1810,158 @@
    "cost": 100,
    "rare": "Rare 7",
    "wb": ""
+  },
+  {
+   "de": "Lamellenrüstung",
+   "en": "Lamellar Armour",
+   "cat": "armour",
+   "cost": 120,
+   "rare": "Rare 9",
+   "wb": ""
+  },
+  {
+   "de": "Buch der Toten",
+   "en": "Book of the Dead",
+   "cat": "misc",
+   "cost": "200+D6×25",
+   "rare": "Rare 12",
+   "wb": "Vampires and Necromancers only"
+  },
+  {
+   "de": "Truhe",
+   "en": "Chest",
+   "cat": "misc",
+   "cost": 5,
+   "rare": "Common",
+   "wb": ""
+  },
+  {
+   "de": "Knallfrösche",
+   "en": "Firecrackers",
+   "cat": "misc",
+   "cost": 20,
+   "rare": "Rare 9",
+   "wb": ""
+  },
+  {
+   "de": "Große Leiter",
+   "en": "Large Ladder",
+   "cat": "misc",
+   "cost": 10,
+   "rare": "Rare 5",
+   "wb": ""
+  },
+  {
+   "de": "Karte von Cathay",
+   "en": "Map of Cathay",
+   "cat": "misc",
+   "cost": "20+4D6",
+   "rare": "Rare 9",
+   "wb": ""
+  },
+  {
+   "de": "Mantikor-Fährte",
+   "en": "Manticore Spoor",
+   "cat": "misc",
+   "cost": "30+2D6",
+   "rare": "Rare 9",
+   "wb": ""
+  },
+  {
+   "de": "Spinnenspucke",
+   "en": "Spider Spittle",
+   "cat": "misc",
+   "cost": "30+D6",
+   "rare": "Rare 7",
+   "wb": ""
+  },
+  {
+   "de": "Pulverfass",
+   "en": "Powder Keg",
+   "cat": "misc",
+   "cost": 15,
+   "rare": "Rare 7",
+   "wb": ""
+  },
+  {
+   "de": "Regenmantel",
+   "en": "Rain Coat",
+   "cat": "misc",
+   "cost": 10,
+   "rare": "Common",
+   "wb": ""
+  },
+  {
+   "de": "Rosenkranz",
+   "en": "Rosary",
+   "cat": "misc",
+   "cost": 10,
+   "rare": "Rare 6",
+   "wb": ""
+  },
+  {
+   "de": "Kleine Leiter",
+   "en": "Small Ladder",
+   "cat": "misc",
+   "cost": 5,
+   "rare": "Common",
+   "wb": ""
+  },
+  {
+   "de": "Rauchbombe",
+   "en": "Smoke Bomb",
+   "cat": "misc",
+   "cost": "30+2D6",
+   "rare": "Rare 10",
+   "wb": ""
+  },
+  {
+   "de": "Rikscha",
+   "en": "Rickshaw",
+   "cat": "misc",
+   "cost": 70,
+   "rare": "Rare 8",
+   "wb": "Humans only"
+  },
+  {
+   "de": "Proviant",
+   "en": "Victuals",
+   "cat": "misc",
+   "cost": 8,
+   "rare": "Common",
+   "wb": ""
+  },
+  {
+   "de": "Schubkarre",
+   "en": "Wheelbarrow",
+   "cat": "misc",
+   "cost": 5,
+   "rare": "Rare 5",
+   "wb": ""
+  },
+  {
+   "de": "Winterpelze",
+   "en": "Winter Furs",
+   "cat": "misc",
+   "cost": 5,
+   "rare": "Common",
+   "wb": "Not for Beastmen"
+  },
+  {
+   "de": "Wolfsumhang",
+   "en": "Wolfcloak",
+   "cat": "misc",
+   "cost": 10,
+   "rare": "Special",
+   "wb": "Middenheimers, Norse Explorers and Marauders only"
+  },
+  {
+   "de": "Wyrdstein-Pendel",
+   "en": "Wyrdstone Pendulum",
+   "cat": "misc",
+   "cost": "25+3D6",
+   "rare": "Rare 9",
+   "wb": ""
   }
  ],
  "EQEN": {

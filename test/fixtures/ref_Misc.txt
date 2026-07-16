@@ -1,0 +1,1539 @@
+Miscellaneous Equipment
+
+This section covers all the strange and unusual equipment your warriors can find in the ruins or buy from the merchants and pedlars in the settlements and villages around Mordheim.
+
+Only Heroes may buy and carry the equipment described in this section. You may not give it to Henchmen unless the rules specifically say so.
+Amulet of the Moon
+
+Town Cryer #15 & #23 (1b)
+
+Cost: 50 gc
+Availability: Rare 12 (Amazons only, Rare 11 for Amazons (Lustria))
+
+This ancient amulet creates a shimmering aura around the Amazon that makes it harder for enemies to see them.
+
+Special Rules
+Any missile fire directed at a model equipped with the amulet suffers a penalty of -1 to hit. The amulet also confers a special save of 5+ against missile fire.
+
+Asp Arrows
+
+Town Cryer 18 (1b)
+
+Cost: 10 gc
+Availability: Common (Tomb Guardians Tomb lord only)
+
+Made from the mummified remains of poisonous snakes, these are guided through the air by ancient magic.
+
+Special Rules
++1 to hit
+
+Rarity
+
+Note that no Rarity is given. They were also listed as a Missile Weapon originally even though they function more like special arrows such as hunting arrows which are purchased as Miscellaneous Equipment.
+Banner
+
+Opulent Goods, Mordheim Annual 2002 (1a)
+
+Cost: 10 gc
+Availability: Rare 5
+
+Many more established warbands carry a banner or flag, not only to announce their presence but to also act as a rallying point for the warband during a battle.
+
+Special Rules
+A banner requires one hand to use and can be carried by any Hero in the warband. Friendly warriors within 12" of the banner bearer may re-roll any failed 'All Alone' test; but remember, you can't re-roll a failed re-roll.
+
+Bear-Claw Necklace
+
+Town Cryer #11, Mordheim Annual 2002 (1b)
+
+Cost: 75 + 3D6 gc
+Availability: Rare 9 (Kislevite Heroes only)
+
+Bears are widely regarded as sacred in Kislev, and a necklace made of their claws (or sometimes their teeth) is considered magical and reputed to have magical powers.
+
+Special Rules
+A warrior wearing a bearclaw necklace receives some of the strength and wild ferocity of the bear it came from. A warrior wearing a bear-claw necklace becomes subject to Frenzy.
+
+Blessed Stag Hide
+
+Nemesis Crown Supplement (1b)
+
+Cost: 40 gc
+Availability: Rare 10 (Horned Hunters only)
+
+The animal skin is worn as a drape and is a symbol of honour once blessed by the hierarchs of Taal.
+
+Special Rules
+A blessed hide bestows unchallenged grace to the wearer allowing the re-roll of a failed Initiative test once per turn.
+
+Blessed Water
+
+Mordheim Rulebook (core)
+
+Cost: 10 + 3D6 gc
+Availability: Rare 6 (May not be bought by Undead, Common for Warrior-Priests and Sisters of Sigmar)
+
+The priests of Ulric, Sigmar, Mórr and Manann hold great power over evil. Pure water from a clear fountain, blessed by one of these priests, is said to burn things of darkness and evil.
+
+Special Rules
+A vial of blessed water contains enough liquid for just one use, and has a thrown range of twice the thrower's Strength in inches. Roll to hit using the model's BS. No modifiers for range or moving apply. Blessed water causes 1 wound on Undead, Daemon or Possessed models automatically. There is no armour save. Undead or Possessed models may not use blessed water.
+
+Book of the Dead
+
+Town Cryer #11 (1b)
+
+Cost: 200 + D6 x 25 gc
+Availability: Rare 12 (Vampires and Necromancers only)
+
+This is a book that contain transcripts from the famous books of Nagash, the Great Necromancer.
+
+Special Rules
+A Vampire can learn Necromantic magic with the Arcane Lore skill and this book and a Necromancer will gain a new spell permanently.
+
+Bota Bag
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 5 gc
+Availability: Common
+
+Special Rules
+Like a wine skin it allows the owner to carry one more water unit than normal. Each character may only take one Bota Bag.
+
+Bugman's Ale
+
+Mordheim Rulebook (core)
+
+Cost: 50 + 3D6 gc
+Availability: Rare 9
+
+Of all the Dwarf brewmasters, Josef Bugman is the most famous. His ale is known throughout the Old World, and widely regarded as the best.
+
+Special Rules
+A warband that drinks a barrel of Bugman's before a battle will be immune to fear for the whole of the battle. Elves may not drink Bugman's ale as they are far too delicate to cope with its effects. There is only enough ale to supply the warband for one battle.✏️
+
+Caltrops
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 15 + 2D6 gc
+Availability: Rare 6
+
+Originally used on the battlefield to impede cavalry charges, a caltrop is a small spiked iron ball. In the City of the Damned a pouch of these small items can be enough to deter any attacker who risks serious injury should they try to charge over them.
+
+Special Rules
+There are enough caltrops to last for one use only. They may be used when an opponent decides to charge. The defender simply throws the caltrops into the path of his attacker and they reduce his charge range by D6 inches. If this means that the attacker cannot reach his target then it is a failed charge.
+
+Cathayan Silk Clothes
+
+Mordheim Rulebook (core)
+
+Cost: 50 + 2D6 gc
+Availability: Rare 9
+
+Some rich warband leaders like to flaunt their wealth and purchase clothes made out of silk from distant Cathay. This silk is the most expensive fabric in the known world, and wearing such clothes is a sure way to attract attention – especially thieves and assassins!
+
+Special Rules
+Any Mercenary warband whose leader is wearing silk clothes may re-roll the first failed Rout test. However, after each battle in which the leader is taken out of action, roll a D6. On a roll of 1-3 the clothes are ruined and must be discarded.
+
+Chest
+
+Border Town Burning (1c)
+
+Cost: 5 gc
+Availability: Common
+
+Chests are often used to store weapons, equipment and victuals. And sometimes even more valuable luggage can be found inside the 'trunk'.
+
+Special Rules
+Cumbersome: A chest must be carried by two models. The carriers must remain in base contact with the chest or it is dropped. They may not use ranged weapons or attack in combat.
+
+Claimed Gnoblars
+
+Ogres find simple pleasure in the bickering of Gnoblars and some claim one as their pet for amusement. An astute Gnoblar puts his malice to good use and places the right action at the perfect moment to gain itself a master.
+
+Treat these Gnoblars in all aspects like miscellaneous equipment (they are not models and do not occupy their own bases!). However, if the Ogre owning them was taken out of action in a game, roll a D6 for each of his Gnoblars: on a 1-2 they are dead and removed from their master's equipment. Ogres may own up to two different Claimed Gnoblars. These can be represented on the model they accompany.
+Lookout-Gnoblar
+
+Border Town Burning (1c)
+
+Cost: 20 gc
+Availability: Rare 8 (Maneaters only)
+
+Special Rules
+An Ogre with a Lookout-Gnoblar gains the skill Dodge from the Speed skill list.
+
+Luck-Gnoblar
+
+Border Town Burning (1c)
+
+Cost: 25 gc
+Availability: Rare 9 (Maneaters only)
+
+Special Rules
+An Ogre with a Luck-Gnoblar may re-roll one dice during the battle. Remember you may never re-roll a re-roll.
+
+Sword-Gnoblar
+
+Border Town Burning (1c)
+
+Cost: 30 gc
+Availability: Rare 10 (Maneaters only)
+
+Special Rules
+An Ogre with a Sword-Gnoblar gains one extra Strength 2 attack in Close Combat, at the weapon skill of the owning model. This attack is made at the same time as the owning Hero's attacks and must be directed at a model the Ogre has directed attacks toward. The opponent's attention is on the Ogre!
+
+Clan Pestilens Banner
+
+Town Cryer #29 (1b)
+
+Cost: 10 gc
+Availability: Rare 5 (Skaven of Clan Pestilens only)
+
+Special Rules
+A model within 12" of the standard bearer of the band, usually a Plague Monk or a Monk Initiate, may reroll once every failed all alone test. The staff of the Clan Pestilens banner counts as a two-handed weapon. A warband may have a single Clan Pestilens banner at any one time. (Clan Pestilens members use this item instead of the normal Banner).
+
+Compass
+
+Town Cryer #9 (1b)
+
+Cost: 45 + 2D6 gc
+Availability: Rare 9 (Pirates only)
+
+A compass can be a big help on the land as well as at sea, by helping the pirates navigate faster and more accurately around the seemingly random ruins of the blasted city.
+
+Special Rules
+In any scenarios where players roll to see which side deploys first, then his warband may re-roll their result. This can only be done if the pirate with the compass is not missing the game though! Note that only one re-roll is allowed, even If multiple pirates have a Compass, and if both sides have one then no re-rolls are allowed.
+
+Conch Shell Horn
+
+Town Cryer #15 (1b)
+
+Cost: 25 gc
+Availability: Rare 8 (Amazons (Lustria) Piranha Warrior only)
+
+The Conch shell Horn is used by experienced Piranha warriors to warn the warband of approaching enemies.
+
+Special Rules
+At the beginning of the game a Piranha warrior may use the horn to re-roll when deciding who deploys first and who goes first. Multiple models that have the horn cannot force a second re-roll.
+
+Elven Boots
+
+Ye Old Curiosity Shoppe, Town Cryer 7, this was removed in the Mordheim Annual 2002 (1b)
+
+Cost: 75 + D6 x 10 gc
+Availability: Rare 12
+
+A rare but highly prized item, Elven boots are made from the finest materials. They are light weight and supple granting the wearer almost supernatural speed to match that of the fey race that created them.
+
+Special Rules
+Elven boots increase the wearer's move characteristic by +1. This can take a warrior's move value above its maximum.
+
+Elven Cloak
+
+Mordheim Rulebook (core)
+
+Cost: 100 + D6 x 10 gc
+Availability: Rare 12
+
+Made from the hair of Elven maidens and interwoven with living tree leaves, an Elven cloak is a wonder to behold. A warrior wearing such a cloak will blend into the shadows, making it very difficult to shoot at them with missile weapons. Elven cloaks rarely come up for sale, but are sometimes recovered from dead warriors or offered by Elves as rewards to men who have served them in some way.
+
+Special Rules
+A warrior aiming a missile weapon at a warrior wearing an Elven cloak suffers -1 on his to hit roll.
+
+Elven Runestones
+
+Town Cryer #10 (1b)
+
+Cost: 50 + 2D6 gc
+Availability: Rare 11 (Shadow Warrior Weavers only)
+
+High Elven mages are well known as the masters of defensive magic. To aid them, they have developed several mystic runes of power. They often inscribe these runes on semiprecious stones, which can help strengthen an Elven Mage's magical defenses.
+
+Special Rules
+A mage with Elven Runestones may use them to attempt to dispel a spell that has been successfully cast against himself or another member of his warband. To dispel such a spell, the mage must roll against the spell's Difficulty (Sorcery does not help here). If he succeeds, the spell fails to work. If the roll fails, the spell works normally
+
+Elven Wine
+
+Town Cryer #10 (1b)
+
+Cost: 50 + 3D6 gc
+Availability: Rare 10 (Shadow Warriors only)
+
+High Elven wines are well known to be the best in the world, and some are even rumoured to have magical qualities. A fine Elven Wine can cast out doubt and fear and leave a general feeling of well-being in a warrior.
+
+Special Rules
+A Shadow Warrior Warband that drinks Elven Wine before a battle will be immune to fear for the whole of the battle.
+
+Enchanted Skins
+
+Town Cryer #15 (1b)
+
+Cost: 20 gc
+Availability: Rare 6 (Amazons (Lustria) only)
+
+The protective skins and charms that the Amazons wear have been warded with defensive magic.
+
+Special Rules
+To represent this, any model wearing Skins and Charms receives a 6+ special save versus any wounds inflicted. In addition, the wearer of Skins and Charms is unaffected by enemy magic on a roll of 5+.
+
+Familiar
+
+Town Cryer #10 (1b)
+
+Cost: 20 + 1D6 gc (Gold is spent even on unsuccessful rare roll)
+Availability: Rare 8 (All warbands*, only spell casters may attempt to find)
+
+Wizards are often solitary, usually shunned by those who can barely conceive of, much less understand, the power these individuals wield. As such, they often share their lives with animal companions, rather than more ‘sentient' beings. Sometimes a magical link will develop between one of these animals and the wizard, to the extent that the wizard begins to see through the animal's eyes, and hear its thoughts. Wizards in different lands favour different types of familiars, depending on their environment: Shadow Weavers tend to favour darkly-coloured animals that can blend into the shadows with them easily-- ravens or darkly-coloured cats are most common. Regardless of their form, familiars are actually not normal members of their kind at all, but rather creatures that have somehow become attuned to the Winds of Magic.
+
+Special Rules
+Familiars cannot actually be purchased as normal equipment. The cost to ‘purchase' a familiar actually represents the cost of materials to cast the ritual to summon a familiar and form a magical bond with it; the Rarity level represents the chances of the ritual actually working. As such, the cost of the familiar must always be paid if the rarity roll is attempted, regardless of the success of the roll.
+
+Also, only spell-casters can attempt to ‘find' a familiar. If a familiar is found, it should be modelled on the spellcaster as with any other piece of equipment. A familiar may be placed on a separate base (in fact many of the familiars that GW sells come this way), but if this is done the familiar must always remain in base-to-base contact with the wizard, and it is ignored for game purposes (so it may not attack enemy models or be attacked itself, may not intercept attackers, does not increase the wizard's base size, etc.), other than the effect below.
+
+A wizard with a familiar is allowed to re-roll one failed roll to cast a spell each turn. The result of this re-roll must be accepted, even if it fails, and remember that you may never reroll a re-roll. Spell-users only (does not include users of Prayers). Note that unlike many of the warband specific items, this item is equipment that any warband with a spell-user may use, if he can summon it successfully.
+
+Fire Arrows
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 30 + 1D6 gc
+Availability: Rare 9
+
+Fire arrows are tied with rags soaked in oil bunched tip to a tight pouch that explodes when hitting the target, setting clothes and equipment alight.
+
+Special Rules
+If you hit with a fire arrow roll a D6. If you score a 4+ your opponent has been set on fire. They must roll a D6 in the recovery phase and score a 4+ to put themselves out or they will suffer a strength 4 hit and will be unable to do anything other than move for each turn they are on fire. Allies may also attempt to put the warrior out. They must be in base contact and need a 4+ to be successful. The fire arrows last for one battle only.
+
+Fire Bomb
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 35 + 2D6 gc
+Availability: Rare 9
+
+Designed by the dwarf engineers of the World's Edge Mountains, fire bombs are a rare and deadly weapon. A small batch of gunpowder is sealed within an iron casing with a short fuse fed into it.
+
+Special Rules
+The fire bomb may be thrown in the shooting phase in the same way as blessed water (see p53 Mordheim rule book). If the bomb lands on target the warrior hit takes D3 Strength 4 hits with no saves for armour and all warriors, friend or foe, within 1 inch of him take 1 Strength 3 hit with saves as normal. If the throwing warrior rolls a 1 when rolling to hit the bomb misfires and explodes just as if the throwing warrior had been hit by his own fire bomb!
+
+Firecrackers
+
+Border Town Burning (1c)
+
+Cost: 20 gc
+Availability: Rare 9
+
+These tiny explosives are too weak to set something on fire or to injure human beings. Firecrackers generate a loud noise, causing alarm in animals.
+
+Special Rules
+If an animal or mounted warrior tries to charge the model, while it is not in combat, knocked down or stunned, it may pass an Initiative test in order to use the firecrackers. If it succeeds the animal must pass an Ld test (animals may not use the Ld of the warband's leader and mounts may not use the Ld of its rider). If it fails the test, the charge has failed and mounted warriors have to roll on the Whoa Boy! table. If the mount has the battle schooled special rule, the rider may re-roll the result of the Whoa Boy! table once.
+
+The model can also throw the firecrackers in the shooting phase. It may throw them at any point in 8” distance. All Mounts or Animals in 3” around the detonation spot have to take a Ld test. If it fails, mounts have to roll on the Whoa Boy! table, and animals flee as if they failed an all alone test. There are enough firecrackers to last for one game.
+
+Flash Powder
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 25 + 2D6 gc
+Availability: Rare 8
+
+An ancient Dwarf creation, flash powder is used in mines to illuminate darkened fissures in the search for gold and other precious minerals.
+
+Special Rules
+Flash powder can be thrown as an enemy charges the wielder (as an interrupt). The charger must take an immediate Initiative test in order to cover their eyes. If he fails, he is temporarily blinded and it counts as a failed charge. There is only enough flash powder for one use during the battle.
+
+Fog-enhancing Warpstone Shards
+
+Town Cryer #29 (1b)
+
+Cost: 100 + D6 x 10 gc
+Availability: Rare 9 (Skaven of Clan Pestilens only)
+
+When put inside a censer these warpstone shards have the peculiar characteristic of making the resulting clouds of pestilential fumes thicker than usual.
+
+Special Rules
+The wielder of a censer who also have some fog-enhancing warpstone shards is a difficult target to shoot at, and other models suffer a -1 penalty to hit when targeting him with missile weapons (Clan Pestilens members use this item instead of the Elven Cloak).
+
+Forest Cloak
+
+Town Cryer #29 (1b)
+
+Cost: 50 gc
+Availability: Rare 10 (Heroes only)
+
+Some Outlaws use Forest Cloaks to camouflage themselves against being seen by their enemies.
+
+Special Rules
+So long as the wearer is beside a tree, bush or hedge, any enemy using any kind of missile weapon at a warrior wearing a Forest Cloak is at an additional –1BS to hit (in addition to all other modifiers). Similarly, if any spellcaster wishes to target a magical attack against an Outlaw camouflaged in this way, he can only do so by successfully rolling a 4+ on a D6. The only exception to this is if the shooting warrior or the spellcaster is already within their Initiative range in inches.
+
+Garlic
+
+Mordheim Rulebook (core)
+
+Cost: 1 gc
+Availability: Common (May not be bought by Undead)
+
+Garlic is a common herb grown in most gardens of the Empire. It is said to ward off Vampires and other denizens of the dark.
+
+Special Rules
+A Vampire must pass a Leadership test or it will be unable to charge a model carrying a clove of garlic. Garlic lasts for the duration of one battle only, whether it is used or not.
+
+Halfling Cookbook
+
+Mordheim Rulebook (core)
+
+Cost: 30 + 3D6 gc
+Availability: Rare 7 (Undead or the Carnival of Chaos may not use this item)
+
+All Halfling chefs have their own secret recipes, and these are recorded in tomes handwritten in Mootland, the home country of the Halflings. Food prepared according to these recipes will attract warriors during these lean times.
+
+Special Rules
+The maximum number of warriors allowed in your warband is increased by +1❓ (note that neither an Undead warband nor a Carnival of Chaos warband can use this item).✏️
+
+Hammer of Witches
+
+Opulent Goods, Mordheim Annual 2002 (1a)
+
+Cost: 100 gc
+Availability: Rare 10 (Witch Hunters only)
+
+The pages in this tome describe the servants of Chaos, witches, heretics, deviants, mutants, warlocks, blasphemers, necromancers, sinners and other enemies of Sigmar in all their foulness.
+
+Special Rules
+A Hero with the Hammer of Witches will hate all Possessed, Skaven, Beastmen, Chaos, Daemons, Dark Elf, Orc & Goblins and Sigmarite Sisters.
+
+Hardtack Biscuits
+
+Town Cryer #9 (1b)
+
+Cost: 5 gc
+Availability: Common (Pirates only)
+
+Any Pirate may bring some of these dense breads to eat during a battle, filling him with… well, something pretty dense and bread-like (the ship's cook refuses to divulge the exact ingredients).
+
+Special Rules
+At the start of any one of his turns the pirate may pop some in his mouth as long as he is not already in hand-to-hand combat. His Toughness is temporarily increased by +1 for the duration of that turn and the following enemy turn, with the effects generally wearing off afterwards. Roll a D6 after that turn; on a 1 his biscuits were tainted and filled with maggots (yuck!). Make a note of his name – the pirate must miss the next game as he recovers (and thumps the cook a few times to boot!). If the Pirate winds up missing a game because of other effects, the losses will add together and he will miss the next two games.
+
+Holy (Unholy) Relic
+
+Mordheim Rulebook (core)
+
+Cost: 15 + 3D6 gc
+Availability: Rare 8 (Rare 6 for Warrior-Priests and Sisters of Sigmar)
+
+In this age of superstition and religious fanaticism, holy objects are an important part of life. Relics abound in the Old World: hairs of Sigmar, pieces from Ulric's hammer, teeth of Daemon Princes, all are sold to men needing encouragement before battle and as charms against sorcery.
+
+Special Rules
+A model with a holy relic will automatically pass the first Leadership test he is required to make in the game. If worn by the leader, it will allow him to automatically pass the first Rout test if he has not taken any Leadership tests before.
+
+You can only ignore the first Leadership test in any single game – owning two or more holy relics will not allow you to ignore second and subsequent tests.
+
+Holy Tome
+
+Mordheim Rulebook (core)
+
+Cost: 100 + D6 x 10 gc
+Availability: Rare 8 (Warrior-Priests and Sisters of Sigmar only)
+
+Books of prayers and descriptions of the holy deeds of religious heroes like Sigmar Heldenhammer are copied by hand in the scriptoriums of Sigmar and Ulric, and given or sold to the faithful. Of these tomes, the Deus Sigmar is the most common and well known, but other texts such as the Scriptures of Sigmar are also sold to those who follow the faith. A holy man can recite his prayers from such a book, strengthening his faith and belief.
+
+Special Rules
+A Warrior Priest or Sister of Sigmar with a holy tome can add +1 to the score when determining whether he (or she) can recite a spell successfully or not.
+
+Hook Hand
+
+Town Cryer #9 (1b)
+
+Cost: 4 gc
+Availability: Common (Pirates only)
+
+Pirates who have lost a hand or arm due to a Hand Injury or Arm Wound can be fitted with a sharpened metal hook.
+
+Special Rules
+The wearer of the stylish new device cannot use any two-handed weapons, but will always count as having a close combat weapon in that hand. The hook strikes in close combat in the same manner as a dagger. A new pirate joining the warband, either during initial warband creation or as a new hire, may also start out with a Hook Hand. If the wearer gets a Hand Injury or Arm Wound in further battles, these can be ignored on a roll of 4+ as the hit was taken by the Hook Hand instead.
+
+Hunting Arrows
+
+Mordheim Rulebook (core)
+
+Cost: 25 + 1D6 gc
+Availability: Rare 8
+
+The best hunting arrows are made by the hunters of Drakwald forest. They have sharp, barbed arrowheads which cause excruciating pain when they hit their target. A skilled archer can severely injure his target with a single arrow.
+
+Special Rules
+A model using a Short Bow, Bow, Long Bow or Elf Bow may use these arrows. They add +1 to all Injury rolls.❓
+
+Iron Shod Boots
+
+Ye Old Curiosity Shoppe, Town Cryer 7, this was removed in the Mordheim Annual 2002 (1b)
+
+Cost: 20 + 3D6 gc
+Availability: Rare 8
+
+If a warrior looks hard enough he could be lucky enough to find a cobbler who will make him a pair of iron shod boots. They are tougher than even ordinary Reikland boots, so tough in fact that can be used to deliver a vicious kick attack.
+
+Special Rules
+Any warrior wearing a pair of iron shod boots may make an additional kick attack in hand-to-hand combat each turn. The attack is resolved at -1 to hit.
+
+Jolly Roger
+
+Town Cryer #9 (1b)
+
+Cost: 40 + 2D6 gc
+Availability: Rare 9 (Pirates only)
+
+Ah, the sight of the Jolly Roger waving in the wind is enough to bring a tear to the eye of even the toughest old salty dog.
+
+Special Rules
+Any Hero may carry the Jolly Roger; the cost represents the effort to have the ship's sail makers create a smaller version that one man may carry on a long pole.
+
+Any Pirates within 12" of the Jolly Roger never count as being all alone in combat. Carrying the banner takes up one hand though, so that model may not carry or use any two-handed weapons during the game. Note that Swabbies, lacking the true Pirate spirit, do not gain any benefit from the Jolly Roger.
+
+Lamp of the Djinn
+
+Khemri setting, Town Cryer #17 (1b)
+
+Cost: 50 + 2D6 gc
+Availability: Rare 12
+
+These are exceptionally rare items that date back to the time of the Sultan Jaffar. It was said that the Sultan used magic and dark ritual to bind strange daemonic entities to mundane, everyday items so that he could call upon their powers but hide their true identity. Occasionally, one of these items finds its way into the hands of those foolhardy or reckless enough to try to use the powers of the dread Djinn.
+
+Special Rules
+Each time a hero uses the lamp it grants him three wishes but each time you roll on the 'Light table' you must roll on the 'Dark table' and apply the results.
+
+D6	Light
+1	Gain D6 Experience points
+2	Gain one skill from your skill list
+3	Gain D6x10 gc
+4	Gain a random item from the equipment list
+5	Choose an item from the equipment list
+6	Roll twice more on this chart
+
+D6	Dark
+1	Nothing happens
+2	Nothing happens
+3	Lose D6x10 gc
+4	Lose D6 weapons
+5	Lose the lamp
+6	Roll once on the injury chart
+
+
+Lantern
+
+Mordheim Rulebook (core)
+
+Cost: 10 gc
+Availability: Common
+
+Special Rules
+A model that is in possession of a lantern may add +4" to the distance from which he is able to spot hidden enemies.
+
+Large Ladder
+
+Border Town Burning (1c)
+
+Cost: 10 gc
+Availability: Rare 5
+
+A ladder is a useful tool for reaching higher ground such as scaling walls or trees.
+
+Special Rules
+A ladder is placed on the board like any other model. If you have no adequate model, use a marker to represent the ladder. A Ladder requires two models, Heroes or Henchmen, (or a single large model) to carry it.✏️ However, one model can carry a ladder alone, but may then move at half speed only (quarter for large ladders). Models carrying a ladder may not run. They may drop the ladder any time they wish (e.g. when charged). A ladder may be set up in the Movement phase in base contact with any of the carriers. This requires a quarter of their Movement (half for large ladders). Note that if one of the models has a lower Movement than the other, both models are slowed down while carrying the ladder.
+
+Ladders are considered open ground and do not affect the model's movement rate (see Mordheim Rulebook). Any model in base contact with a ladder may try to knock it over in the hand-to-hand combat phase. The model must pass a Strength test with a –1 modifier for every model on the ladder after the first. If the test is successful treat the models as falling from where they were.
+
+Small ladders have a length of up to 3”, large ladders are longer than 3”.
+
+Liber Bubonicus
+
+Town Cryer #29 (1b)
+
+Cost: 200 + D6 x 25 gc
+Availability: Rare 12 (Skaven of Clan Pestilens only)
+
+Special Rules
+If a Clan Pestilens warband includes a Pestilens Sorcerer, he may use the Liber Bubonicus to permanently learn an additional spell randomly chosen from the Horned Rat spell list. A Plague Priest may use the Liber Bubonicus to learn the Horned Rat magic if he has the Magical Aptitude skill: that means he would gain the special rule "Spellcaster: is a spellcaster and may cast spells from the Horned Rat spell list." and permanently learn a randomly chosen spell from the Horned Rat spell List. The Liber Bubonicus may be used a single time, and a warband cannot have and use more than one Liber Bubonicus in a given campaign (Clan Pestilens members use this item instead of the Tome of Magic).
+
+Arcane Lore
+
+This item replaces the Tome of Magic for Skaven of Clan Pestilens. For the Tome of Magic, the skill Arcane Lore is used to learn Lesser Magic, it is assumed this was meant for the Liber Bubonicus as well. For gameplay purposes it matters little as the warrior is still required to learn an academic skill.
+Liturgicus Infecticus
+
+Town Cryer #29 (1b)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 8 (Skaven of Clan Pestilens only)
+
+Special Rules
+At the beginning of a turn, or just before taking a Rout Test, the warband may chant the Liturgicus Infecticus, and benefit of a +1 Leadership bonus until the end of the turn. (Clan Pestilens members use this item instead of the War horn).
+
+Lock Picks
+
+Empire in Flames supplement (1a)
+
+Cost: 15 gc
+Availability: Rare 8
+
+A standard piece of kit for less scrupulous characters. A set of lock picks may be used by those who rely more on skill-at-arms and speed of thought than brute strength to open doors that others have secured.
+
+Special Rules
+A model equipped with a set of lock picks may make his test to open doors on his Initiative rather than his Strength characteristic if he wishes. This is done at the end of his Movement phase as if the model were ripping the door off its hinges, though he uses his Initiative rather than Strength, there is no -1 modifier, and there is no chance that the door is too damaged to be locked again later.
+
+Lucky Charm
+
+Mordheim Rulebook (core)
+
+Cost: 10 gc
+Availability: Rare 6
+
+These take many shapes, but the most common are symbolic hammers that a pious Sigmarite Priest has touched, or carved heads of ancient Dwarf gods.
+
+Special Rules
+The first time a model with a lucky charm is hit in a battle they roll a D6. On a 4+ the hit is discarded and no damage is suffered. Owning two or more charms does not confer any extra benefits, the model may still only try to discard the first hit.✏️
+
+Magic Carpet
+
+Khemri setting, Town Cryer #17 (1b)
+
+Cost: 50 + 4D6 gc
+Availability: Rare 12
+
+These wondrous items from a forgotten age are even rarer than the lamps of the Djinn and are thought to have originated from the distant long dead Sorcerer's Isles.
+
+Special Rules
+A magic carpet is indeed just that – a carpet that flies! It counts as a mount and allows movement of 16" with no restrictions for terrain. You can move onto the roofs of buildings and other high places with no penalty. The carpet may carry up to three men or one large creature and a man. One of the riders must be a character. Due to its magical nature it cannot be destroyed.
+
+Magic Gourd
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 10 gc
+Availability: Rare 7
+
+Special Rules
+The power of the gourd may be used at the end of each battle. It will supply 1D3 units of water. Once the amount of water is determined, roll an additional D6 – on a roll of 6, the gourd's magic is exhausted and it shatters.
+
+Magic Gubbinz
+
+Nemesis Crown Supplement (1b)
+
+Cost: 50 gc
+Availability: Rare 9 (Forest Goblins only)
+
+These are odds and ends carried around by the Shaman to focus his powers. Most are bat feet, lizard lips, and the like, but still seem to provide benefits to their owner.
+
+Special Rules
+The Shaman may re-roll a failed magic test on a D6 roll of 4+.
+
+Map of Cathay
+
+Border Town Burning (1c)
+
+Cost: 20 + 4D6 gc
+Availability: Rare 9
+
+There are many maps circulating for various regions around Cathay and the borderlands. Most of them cannot be trusted but now and then a warband may get hold of a valuable chart.
+
+Special Rules
+Roll a D6 to determine what the map depicts.
+
+D6 Result	Outcome
+1	The map is fake and completely useless!
+2-3	The map shows the way to a mysterious lady. As the warband follows the depicted route, the first random happening to occur in the next battle will be "The Old Crone" (56) automatically.
+4-5	The next time a roll of 4+ is scored on the progress table, the warband with a map of Cathay automatically counts as having the most campaign points and thus may choose the next scenario. If both warbands have a map of Cathay, compare campaign points as usual.
+6	The map leads to the hideout of Belandysh! Whenever the warband with this map rolls a 1 for random happenings, they may choose to have the "Belandysh comes!" (42-43) event happen automatically instead of determining at random.
+
+
+Monkey's Paw
+
+Khemri setting, Town Cryer #17 (1b)
+
+Cost: 50 + 1D6 gc
+Availability: Rare 10
+
+Fashioned during the strange religious rites of the nomadic Tuareg people, this item is of similar potency to the Lamp of the Djinn. As with the fickle powers of the Djinn the, Monkey's paw is not always beneficial to its owner.
+
+Special Rules
+Each time a Hero uses the paw it grants three wishes but you only have to roll once on the dark side. If you roll this item you must take it. Every two games you have it and don't use it you have to roll on the dark side. You may not get rid of the paw unless you use it three times or roll lose the paw. After the third use it disappears.
+
+D6	Light
+1	Gain D6 Experience points
+2	Gain one skill from your skill list
+3	Gain D6x10 gc
+4	Gain an extra Hero even if it is above your maximum allowed
+5	Gain an extra Henchman even if it is above your maximum allowed
+6	Roll twice more on this chart
+
+D6	Dark
+1	Lose D6 Experience points
+2	Lose one random skill
+3	Lose D6x10 gc
+4	Lose a Hero
+5	Lose a Henchman
+6	Lose the paw
+
+
+Mordheim Map
+
+Mordheim Rulebook (core)
+
+Cost: 20 + 4D6 gc
+Availability: Rare 9
+
+Some survivors of the cataclysm still remain in the many settlements around Mordheim, and make a living by preparing maps of the city from memory. Many of these maps are faked, and even real ones are often crude and inaccurate.
+
+Special Rules
+A map can help a warband find their way through the confusing maze of streets and into areas with rich buildings to loot.
+
+When you buy a map, roll a D6:
+
+D6	Result
+1	Fake. The map is a fake, and is completely worthless. It leads you on a fool's errand. Your opponent may automatically choose the next scenario you play.
+2-3	Vague. Though crude, the map is generally accurate (well... parts of it are... perhaps!). You may re-roll any one dice during the next exploration phase if you wish but you must accept the result of the second roll.
+4	Catacomb map. The map shows a way through the catacombs into the city. You may automatically choose the scenario next time you fight a battle.
+5	Accurate. The map is recently made and very detailed. You may re-roll up to three dice during the next exploration phase if you wish. You must accept the result of the second roll.
+6	Master map. This is one of the twelve master maps of Mordheim made for Count von Steinhardt of Ostermark. From now on you may always re-roll❓ one dice when rolling on the Exploration chart as long as the Hero who possesses this map was not taken out of action in the battle.
+
+
+Nehekharan Map
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 20 + 4D6 gc
+Availability: Rare 10
+
+Special Rules
+Maps of the Land of the Dead are rare. Accurate ones are even rarer. The shifting sands and dry riverbeds can render a map obsolete in a season. Use the rules for the Mordheim map in the rulebook.
+
+Net
+
+Mordheim Rulebook (core)
+
+Cost: 5 gc
+Availability: Common
+
+Steel nets, such as those used by Pit Fighters, can be used in battles.
+
+Special Rules
+Once per game, the net may be thrown in the shooting phase instead of the model shooting a missile weapon. Treat the net as a missile weapon in all respects with a range of 8". Use the model's BS to determine whether the net hits or not – there are no movement or range penalties. If it hits, the target must immediately roll a D6. If the result is equal to, or lower than his Strength, he rips the net apart. If the result is higher, he may not move, shoot or cast spells in his next turn, although he is not otherwise affected. In either case the net is lost.❓
+
+Net
+
+"All one use only items are clearly identified as such. Net is not, so it can be recovered between battles. As indicated in the colour text, it can indeed be torn, cut etc. during battle, but the warrior will simply repair it. I mean swords get bent, shields splintered, armour battered, spear points get blunted during a typical Mordheim battle, and we simply consider the warriors have the basic skills to repair such damage. Same goes for the nets."
+- Tuomas Pirinen, Facebook
+Nomad Robes
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 25 gc
+Availability: Rare 8
+
+Special Rules
+Woven by native desert dwellers these robes enable the wearer to suffer only half penalties from Weather Conditions. The robes affect the following results on the Weather table:
+
+It's Raining: The robe protects the warrior's equipment. When rolling a D6 each time that you fire a black powder weapon, the shot is only wasted on a 1.
+
+Hot as Hades: A warrior wearing a Nomad Robe only suffers a penalty of -1 to WS and BS and he only requires the normal amount of water.
+
+Hot: A warrior wearing a Nomad Robe suffers no penalty to WS or BS. If at least half of the warband are wearing Nomad Robes, they only require the normal amount of water.
+
+Dust Storm: The robe has no effect – not even the Nomad Robes can protect the warrior from the ferocity of the storm. Apply rules for a Dust Storm as normal
+
+Parrot
+
+Town Cryer #9 (1b)
+
+Cost: 15 gc
+Availability: Rare 8 (Pirate Captain and Mates only)
+
+Squawk! Pieces of Wyrdstone, Pieces of Wyrdstone! A well trained parrot is excellent at distracting opponents, either by shouting out loud at them or flying around getting in their way.
+
+Special Rules
+All enemy in base contact with the owner will be at –1 to hit in their first round of combat with the pirate unless they can pass a Leadership Test.
+
+Peg Leg
+
+Town Cryer #9 (1b)
+
+Cost: 8 gc
+Availability: Common (Pirates only, one per model)
+
+Any Pirate suffering a Leg Wound or Smashed Leg can opt to have his ruined leg replaced with a stout wooden peg leg.
+
+Special Rules
+This will reduce his Movement (and maximum possible Movement characteristic) by -1, but offers a chance that stray hits will strike the leg instead. This gives him a special saving throw of 6+, which can be taken whenever he fails any other saving throws allowed against any wounding shooting or hand-to-hand hits. This save is not modified, and can be used even if no saving throw is normally allowed. A new pirate joining the warband, either during initial warband creation or as a new hire, may also start out with a Peg Leg. If the wearer gets a Leg Wound or Smashed Leg in further battles, these can be ignored on a roll of 4+ as the hit was taken by the Peg Leg instead.
+
+Poisoned Weapon
+
+Nemesis Crown Supplement (1b)
+
+Cost: +25 gc
+Availability: Common (Forest Goblins only)
+
+Forest Goblins commonly jab their weapon points into the bodies of giant spiders in hopes of coating them with deadly poison.
+
+Special Rules
+Once this poison is bought, it is applied to one weapon, and may not be traded or sold later on. The weapon in question, once poisoned, adds +1 to any injury rolls from then on.
+
+Poisons and Drugs
+
+The use of poison is almost universally abhorred, but in the ruthless and brutal battles fought in Mordheim, desperate warbands often resort to the use of envenomed blades.
+
+Poison may not be used with blackpowder weapons. When you buy a vial of poison, there is always only enough to last the duration of one battle. You can only poison a single weapon with one vial of poison.
+Black Lotus
+
+Mordheim Rulebook (core)
+
+Cost: 10 + 1D6 gc
+Availability: Rare 9 (Not available to Witch Hunters, Warrior-Priests or Sisters of Sigmar. Rare 7 for Skaven and Lizardmen, 10 gc and Common For Skink Heroes)
+
+In the deepest forests of the Southlands grows a plant that is extremely poisonous. It is known as Black Lotus and is much sought after by alchemists, assassins, wizards of the Western Coast and bored wives.
+
+Special Rules
+A weapon coated with the sap of the Black Lotus will wound its target automatically if you roll a 6 to hit. Note that you can still roll a dice for every wound inflicted in this way. If you roll a 6, you will inflict a critical hit with that roll. If you do not roll a 6, you will cause a normal wound. Take armour saves as normal.
+
+Crimson Shade
+
+Mordheim Rulebook (core)
+
+Cost: 35 + 1D6 gc
+Availability: Rare 8
+
+Crimson Shade is the name given by Old Worlders to the leaves of the blood oak of Estalia. It is an extremely addictive drug, but grants its users inhuman quickness and strength.
+
+Special Rules
+Effect: A model using Crimson Shade has his Initiative increased by +D3 points, and Movement and Strength by +1 (this effect lasts for one game). Crimson Shade has no effect on Undead such as Vampires and Zombies, or the Possessed.
+
+Side effects: After the battle, roll 2D6. On a roll of 2-3, the model becomes addicted and you must try to buy him a new batch of Crimson Shade before every battle from now on. If you fail to buy any, he will leave your warband. On a roll of 12 the model's Initiative is increased permanently by +1.
+
+Dark Venom
+
+Mordheim Rulebook (core)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 8 (Not available to Witch Hunters, Warrior-Priests or Sisters of Sigmar. Rare 6 for Dark Elves and Lizardmen, 20 gc and Common For Skink Heroes)
+
+This is a poison extracted from Heldrakes, gigantic sea serpents that plague the Western Ocean and the coast of Naggaroth. The slightest wound infected by Dark Venom causes excruciating pain, incapacitating the bravest of men.
+
+Special Rules
+Any hit caused by a weapon coated with Dark Venom counts as having +1 Strength, so, for example, if a warrior with Strength 3 wielding a poisoned sword hits an opponent, he will cause a Strength 4 hit instead. Armour saving throws are modified to take into account the increased Strength of the attack.
+
+Healing Herbs
+
+Mordheim Rulebook (core)
+
+Cost: 20 + 2D6 gc
+Availability: Rare 8 (Common for Amazons (Lustria))
+
+Certain plants that grow on the banks of the River Stir have curative properties. Herbalists collect their roots and leaves and use them to treat the sick and wounded.
+
+Special Rules
+A Hero with healing herbs can use them at the beginning of any of his recovery phases as long as he is not engaged in hand-to-hand combat. This restores all wounds he has previously lost during the game.❓
+
+Healing Herbs
+
+"Healing Herbs were meant to be under Poison and Drugs. This is an oversight. Should be one and done. But RAW, unlimited use, and therefore OP. Luckily this is Mordheim, and all players should agree this was an oversight."
+- Tuomas Pirinen, Facebook
+Mad Cap Mushrooms
+
+Mordheim Rulebook (core)
+
+Cost: 30 + 3D6 gc
+Availability: Rare 9 (Common if warband includes Goblins)
+
+The feared cult of Goblin Fanatics of the Worlds Edge Mountains use these hallucinogenic mushrooms to drive themselves into a frenzied state.
+
+Special Rules
+Effect: Any warrior who takes Mad Cap Mushrooms before a battle will be subject to frenzy. The Mad Cap Mushroom has no effect on Undead such as Vampires and Zombies, or the Possessed.
+
+Side effect: After the battle, roll a D6. On a roll of a 1 the model becomes permanently stupid.
+
+Mandrake Root
+
+Mordheim Rulebook (core)
+
+Cost: 25 + 1D6 gc
+Availability: Rare 8
+
+The man-shaped Mandrake Root grows in the rotting swamps of Sylvania. It is a noxious, deadly plant which is highly addictive and slowly kills its users, but also allows them to shrug off almost any pain.
+
+Special Rules
+Effect: Mandrake Root makes a man almost oblivious to pain. His Toughness is increased by +1 for the duration of a battle and he treats all stunned results as knocked down instead. Mandrake Root has no effect on Undead, such as Vampires and Zombies, or on the Possessed.
+
+Side effects: Mandrake Root is highly poisonous. At the end of the battle, roll 2D6. On a roll of 2-3 the model loses 1 point of Toughness permanently.
+
+Manticore Spoor
+
+Border Town Burning (1c)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 9
+
+A soporific substance just as lethal as the beast which excreted it. Penetration of the victim's flesh by a warrior's blade smeared with fresh dung from a Manticore induces a dreamless sleep state followed by near certain death.
+
+Special Rules
+Any model wounded by a weapon smeared with Manticore Spoor must roll a D6 at the beginning of its turn: On a roll of 1 the poisoned model loses one wound. On a roll of 6 the poison's effect ends and the model has to test no more. Multiple wounds caused by a weapon using Manticore Spoor do not cause the victim to test more than once per turn.
+
+Reptile Venom
+
+Lustria setting, Town Cryer #11 (1b)
+
+Cost: 5 gc
+Availability: Common (Skink Henchmen only)
+
+Special Rules
+Skink henchmen may buy low-strength Reptile Venom for their missile weapons at a cost of 5 pts per weapon. This poison is a common item. This adds +1 to the Strength of the weapon but does not grant the -1 save modifier. The poison only lasts for one battle and remember that all the henchmen in a group must be armed in the same manner.
+
+Spider Spittle
+
+Border Town Burning (1c)
+
+Cost: 30 + 1D6 gc
+Availability: Rare 7
+
+Toxins are harvested from small animals poisoned by spider bites to concoct a paralytic dose. A blade envenomed with the arachnid poison can be used to paralyze a foe in close quarters.
+
+Special Rules
+Any warrior hit by a weapon laced with Spider Spittle must pass an immediate Toughness test or becomes paralyzed. A paralyzed warrior cannot move or fight and is hit automatically in close combat. The model remains paralyzed until it passes a Toughness test in its recovery phase.
+
+Tears of Shallaya
+
+Mordheim Rulebook (core)
+
+Cost: 10 + 2D6 gc
+Availability: Rare 7 (Not available to Possessed or Undead models)
+
+Tears of Shallaya are vials of water from the holy spring in Couronne. Shallaya is the goddess of healing and mercy and it is said that this water has curative properties and is proof against any poison.
+
+Special Rules
+A model who drinks a vial of the Tears of Shallaya at the beginning of a battle will be completely immune to all poisons for the duration of combat. Undead and Possessed warriors may not use the Tears of Shallaya.
+
+There is enough liquid in a vial of the Tears of Shallaya to last for the duration of one battle.
+
+Vial of Pestilens
+
+Lustria setting, Town Cryer #11 (1b)
+
+Cost: 25 + 2D6 gc
+Availability: Rare 9 (Skaven only)
+
+This small crystal vial contains an extremely potent and rapid disease. A single sniff is enough to melt the airways and leave the victim drowning in its own blood. It is, however, short lived and only remains dangerous for a few seconds before it is neutralised in the air.
+
+Special Rules
+The vial may be opened and shoved in the face of the model in base contact that just took the Skaven Out of Action. The opponent must roll equal to or under its Toughness or automatically be taken Out of Action, no save is allowed. If the opponent succumbs to the disease, he didn't manage to go through with the attack and the Skaven is only Stunned not Out of Action. The vial may be used once.
+
+Powder Keg
+
+Border Town Burning (1c)
+
+Cost: 15 gc
+Availability: Rare 7
+
+A powder keg is treated as a chest with one exception: it can be caused to explode!
+
+Special Rules
+Warriors may shoot at a powder keg with blackpowder weapons, Cathayan candles, fire bombs and fire arrows and they may attack the keg in close combat using torches and brazier irons. Of course, they may also use all similar weapons and items that can ignite the powder inside.
+
+The model must hit and wound as usual (Toughness 4). Then roll a D6: on a 4+ the keg explodes (remove the keg from the game). If the model rolled a critical hit the keg automatically explodes.
+
+An exploding powder keg causes an automatic Strength 6 hit to all models within a range of D6+3”.
+
+When playing the Horrors of the Underground scenario, roll another D6: on a 4+ the explosion caused the tunnel to cave in. Place a marker at the powder keg's previous position as described in the Tunnel collapse event.
+
+Rabbit's Foot
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 10 gc
+Availability: Rare 5
+
+The rabbit's foot is it symbol of good luck and often worn about the neck on a thin cord of leather by superstitious warriors.
+
+Special Rules
+A rabbit's foot allows the warrior wearing it to reroll one dice during the battle. If not used in the battle it can be used to reroll one dice during the exploration phase providing the hero is able to search through the ruins.
+
+Rain Coat
+
+Border Town Burning (1c)
+
+Cost: 10 gc
+Availability: Common
+
+Rain Coats or Capes protect its wearer – and especially his equipment – from becoming soaked with water.
+
+Special Rules
+Note that this miscellaneous item is an exception to the normal rules as it is available to Henchmen.
+
+Red Toof Tribal Jewellery
+
+Nemesis Crown Supplement (1b)
+
+Cost: 40 gc
+Availability: Rare 9 (Forest Goblins only)
+
+Only proving one's prowess in battle can attract the attention of this cadre of warriors. Once inducted to the tribe, the warrior undertakes excessive body piercing!
+
+Special Rules
+This cannot be removed. The model will now be subject to the rules for Frenzy as described in the Mordheim rulebook.
+
+Rope & Hook
+
+Mordheim Rulebook (core)
+
+Cost: 5 gc
+Availability: Common
+
+A warrior using a rope & hook will find it much easier to move amongst the ruins of Mordheim.
+
+Special Rules
+A warrior equipped with a rope & hook may re-roll failed Initiative tests when climbing up and down.
+
+Rosary
+
+Border Town Burning (1c)
+
+Cost: 10 gc
+Availability: Rare 6
+
+A rosary is made of stone or ivory beads and other blessed ornaments lined up on a chain. It helps concentrate while praying or meditating.
+
+Special Rules
+A prayer user wearing a Rosary may re-roll a failed Difficulty test if he hasn't done anything that turn except moving (no running) or remaining stationary. A Rosary cannot be used in combat.
+
+Scorpion Ring
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 10 + 1D6 gc
+Availability: Rare 11
+
+Special Rules
+At the beginning of the battle the warrior is able to call forth a single Tomb Scorpion to fight for the warband if he can pass a Leadership test. The summoned scorpion will fight for a single battle only (use Tomb Scorpion from Tomb Guardians list).
+
+Scroll of the Rat Familiar
+
+Town Cryer #29 (1b)
+
+Cost: 25 + 1D6 gc
+Availability: Rare 8 (Skaven of Clan Pestilens only)
+
+Special Rules
+The Scroll of Familiar Rat has a spell inscribed on it, usable by a Pestilens Sorcerer as many times as he wants. If the warband includes at least one Giant Rat, the spell may be cast on it before the combat begins, transforming it in a Rat Familiar. If his Rat Familiar is within 6", the sorcerer may reroll once in a game the dice to overcome the difficulty of a spell. A sorcerer may only have one Rat Familiar at any one time, it is an henchman and it counts normally toward the maximum number of models permitted co the warband. If the sorcerer dies, his Rat Familiar turns back to Giant Rat form. (Clan Pestilens members use this item instead of the normal Familiar).
+
+Rat Familiar:
+
+The Rat Familiar is a Giant Rat enchanted with the Scroll of the Rat Familiar.
+Profile	M	WS	BS	S	T	W	I	A	Ld
+	6	2	0	3	3	1	4	1	4
+
+
+Enchanted Animal: The Rat Familiar earns experience as an henchman. A result of 10 - 12 on the henchmen advancement table, instead of the promotion to hero status gives as a result "Improved spellcasting: if the sorcerer is within 6" of the Rat Familiar, he gain a +1 bonus when rolling dice to overcome the difficulty of a spell. This ability is cumulative."
+
+Sea Dragon Cloak
+
+Town Cryer #12 (1b)
+
+Cost: 50 + 2D6 gc
+Availability: Rare 10 (Dark Elves only)
+
+Dark Elf Corsairs use special cloaks fashioned from Sea Monsters that dwell deep in the oceans depths. These cloaks are tough and resilient and offer Dark Elves with a very good amount of protection.
+
+Special Rules
+Scales: 5+ armour save in close combat, 4+ armour save against missiles.
+
+Armour
+
+It was never fully clarified whether the Sea Dragon Cloak may be combined with armour and shields. Some argue it may not, as the cloak specifies a base armour save, others state that as it is a Miscellaneous Equipment item, it should be possible to combine with a suit of armour, in which case it improves the save by 2 in melee, and 3 versus ranged attacks.
+Small Ladder
+
+Border Town Burning (1c)
+
+Cost: 5 gc
+Availability: Common
+
+A ladder is a useful tool for reaching higher ground such as scaling walls or trees.
+
+Special Rules
+A ladder is placed on the board like any other model. If you have no adequate model, use a marker to represent the ladder. A Ladder requires two models, Heroes or Henchmen, (or a single large model) to carry it.✏️ However, one model can carry a ladder alone, but may then move at half speed only (quarter for large ladders). Models carrying a ladder may not run. They may drop the ladder any time they wish (e.g. when charged). A ladder may be set up in the Movement phase in base contact with any of the carriers. This requires a quarter of their Movement (half for large ladders). Note that if one of the models has a lower Movement than the other, both models are slowed down while carrying the ladder.
+
+Ladders are considered open ground and do not affect the model's movement rate (see Mordheim Rulebook). Any model in base contact with a ladder may try to knock it over in the hand-to-hand combat phase. The model must pass a Strength test with a –1 modifier for every model on the ladder after the first. If the test is successful treat the models as falling from where they were.
+
+Small ladders have a length of up to 3”, large ladders are longer than 3”.
+
+Smoke Bomb
+
+Border Town Burning (1c)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 10
+
+The Cathayans are experts in working with blackpowder, poisons and other strange natural ingredients far superior to anything known to alchemists of the Old World. Smoke bombs are especially popular with thieves and assassins.
+
+Special Rules
+At the beginning of the Movement phase, a smoke bomb may be thrown at any point within 4" where it creates a thick smoke of 2" radius that lasts until the beginning of the model's next turn. If the model is in close combat, it must pass an Initiative test or suffer one automatic hit from each enemy model. After that the bomb detonates anyhow – even if the model is wounded.
+
+Models within the smoke may not attack/shoot or be attacked/shot at. Same applies to casting spells and prayers. Models engaged in close combat are immediately moved 1" away from each other.
+
+As models cannot see through the smoke, they cannot attack through it either.
+
+However, models can move in the smoke, out of it and through it as normal. Note that the Augur of the Sisters of Sigmar is not affected by smoke bombs due to her Blessed Sight.
+
+Whenever a model carrying a smoke bomb is knocked down, stunned or out of action, the bomb detonates on a roll of 4+. Note that no extra roll is needed when a stunned model turns knocked down at the beginning of its turn.
+
+Snake Charmer's flute
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 10 + 1D6 gc
+Availability: Rare 9
+
+Special Rules
+A warrior who possesses this item is able to transfix and control serpents. If the warrior does nothing for a whole turn, he may play the flute. If this happens, any serpent within 6" may not move or attack in their subsequent turn.
+
+Spy Glass
+
+Town Cryer #9 (1b)
+
+Cost: 20 gc
+Availability: Rare 8 (Pirates only)
+
+A pirate can use his trusty spy glass to examine the combat ground, spotting any yellow dogs who try to sneak about!
+
+Special Rules
+At the start of his turn, the owner can try to detect one Hidden enemy model to which he has normal Line of Sight. On a roll of 4+, the model looses his Hidden status. The spying Pirate can move as normal in that turn, but cannot run or charge.
+
+Squig Prodder
+
+Town Cryer #6 (1a)
+
+Cost: 15 gc
+Availability: Common (Goblins only)
+
+This item is a long pole with a trio of spikes at the end. It is used by Goblin Squig herders to keep their livestock in line. Cave Squigs will recognize a Squig prodder and automatically give the bearer more respect, as they've all been on its pointy end more than once!
+
+Special Rules
+To represent this, a Goblin with a Squig prodder can keep all Cave Squigs within 12" from going wild, instead of the normal 6" (see the Minderz special rule under the Cave Squig entry). In addition, a Squig prodder is treated exactly like a spear in hand-to-hand combat.
+
+Standard of Nagarythe
+
+Town Cryer #10 (1b)
+
+Cost: 75 + 3D6 gc
+Availability: Rare 9 (Shadow Warriors only, May only be purchased when the warband is created)
+
+While many Shadow Warrior Warbands are simply wandering, some represent groups that have been sent from Ulthuan on some special mission for the Phoenix King. Such bands are really closer to military units than loose bands of warriors. As such, they tend to retain their unit insignia and other trappings. Chief among these is the unit standard. A unit's colours can hold a lot of meaning, particularly when the warriors in that unit lack a true home. A Shadow Warrior band normally makes their standard by hand; cost and rarity represent the difficulty of finding the proper materials (fine silks and thread of gold, for example).
+
+Special Rules
+A Standard of Nagarythe can serve as a second rallying point (the Shadow Master is the first, represented by his Leader skill) for the unit. Any members of the Shadow Warrior warband within 12" of their standard may re-roll any failed Leadership tests, should the standard be captured by the enemy (model holding the standard is taken Out of Action), all members of the warband will be subject to Hatred for the remainder of the game, and may not voluntarily Rout. Note that these effects do not affect any Hired Swords in the warband, only actual Shadow Warriors (including Shadow Warrior heroes) are affected. A model carrying a standard requires one hand free to do so, so no weapons, shields, etc, may be carried in this hand, and no double-handed weapons may be used while the standard is carried. A standard may be used in close combat as a makeshift spear (use the rules for a spear but with -1 on the to hit rolls). A standard may only ever be purchased when the warband is created and may never be added later to the warband.
+
+Superior Blackpowder
+
+Mordheim Rulebook (core)
+
+Cost: 30 gc
+Availability: Rare 11
+
+The model has acquired a better quality of blackpowder than is normally available.
+
+Special Rules
+This new batch adds +1 Strength to all blackpowder weapons that the model has. There is enough superior blackpowder to last for one game.
+
+Tarot Cards
+
+Opulent Goods, Mordheim Annual 2002 (1a)
+
+Cost: 50 gc
+Availability: Rare 7 (Not available to Witch Hunters or Sisters of Sigmar)
+
+Though declared blasphemous and illegal by the Grand Theogonist, the Tarot of Stars is said to foretell the future for those who dare to consult it. Not available to Witch Hunters or Sisters of Sigmar.
+
+Special Rules
+A Hero with a deck of tarot cards may consult them before each game. Make a Leadership test. If successful, the Hero gains a favorable insight into the future and you may modify the result of any one dice in the Exploration phase by -1/+1 (even if the Hero with the cards is taken Out Of Action). If the Leadership test is failed by three or more (i.e., a Hero with Ld of 8 rolls 11 or 12) the cards show a portent of doom and despair and the Hero refuses to fight in the following battle and must miss the next game.
+
+Telescope
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 75 + 3D6 gc
+Availability: Rare 10
+
+Common to the great astronomers in the observatories at Nuln, telescopes are a useful, if highly rare, item to have in the City of the Damned. The keen view offered by these instruments makes shooting easier and gives an unparalleled awareness of a warrior's surroundings.
+
+Special Rules
+Any hero using a telescope may increase the range of any missile weapon he is using by D6 inches each turn. Furthermore, he triples the distance at which he can spot hidden enemies.
+
+Tome of Magic
+
+Mordheim Rulebook (core)
+
+Cost: 200 + D6 x 25 gc
+Availability: Rare 12 (Not available to Witch Hunters or Sisters of Sigmar)
+
+Sometimes books of forbidden lore are offered for sale in the markets and dark alleys of the settlements around Mordheim.
+
+Special Rules
+If a warband includes a wizard, he will gain an extra spell from the tome, permanently. He may randomly generate this new spell from his own list or the Lesser Magic list. See the Magic section for details. The benefits from each Tome of Magic apply to only one model.✏️❓
+
+Arcane Lore
+
+If the warband doesn't contain a wizard, a warrior with the Arcane Lore skill may use the Tome of Magic to learn Lesser Magic
+Torch
+
+Empire in Flames supplement (1a)
+
+Cost: 2 gc
+Availability: Common
+
+Warriors lacking the funds for a lantern may have to make do with torches.
+
+Special Rules
+Torches act exactly as lanterns, adding +4" to the range the model may spot hidden enemies, but has a few other special rules as well. A torch will only last one game. A model armed with a torch counts as causing fear in animals (Hunting Dogs, all riding steeds, Bears, Wolves, etc), and may use a torch as a makeshift club. When used in combat, a torch is treated as a normal club, though with a -1 to hit modifier. Any models that have a Regeneration special rule (like Trolls) will not be able to regenerate wounds caused by a torch during the battle. (Torches may also cause buildings to catch fire – see 'Let the Damned Burn', from Town Cryer 8).
+
+Treasure Map
+
+Town Cryer #9 (1b)
+
+Cost: 75 + 4D6 gc
+Availability: Rare 10 (Pirates only)
+
+Pirates may use a Treasure Map instead of regular exploration of the city ruins. It represents the location (possibly) of a treasure stash another pirate band was forced to bury, before they could bring the booty to a safe hide away.
+
+Special Rules
+Roll a D6 after the game to determine where the map leads you (note that any gold crowns found represent the profit after all shares have been given to the crew).
+D6	Result
+1	The map turns out to be a fake! However, you do manage to return and trounce the bilge-drinking swine who sold it to you, and he gives your Warband D6x5 gold crowns to make amends (and prevent himself getting keel-hauled!).
+2	The map leads your crew to a minor stash. After some hours digging, the find a chest containing 1 shard of wyrdstone and some jewels worth 2D6x10 gold crowns.
+3	The map reveals one of the fabled alestashes of Long Drong Slayer himself! You uncover several barrels of the finest rums, ales, and other assorted spirits. One is a barrel of Bugman's XXXX, which can be used as per the rules for Bugman's Ale. After 'sampling' many of the other barrels, the remainders are sold off for 2D6x10 gold crowns (after the crew wakes up, of course).
+4	Buried deep in the ruins of an unassuming hovel you find several chests filled with fine clothes, plus several notebooks outlining blackmail information for many of the local trading merchants. You realise this must be one of the stashes left by Facio, the great Tilean trickster and rogue. Armed with your new clothing and information, on your next visit to the trading posts you may buy any one item listed on the regular Price Chart as if it was Common (except any other Pirate Warband unique items, such as Swivel Guns or Treasure Maps), assuming you have the money. Once the transaction is complete, you turn around and sell the notebooks to his competitors for 2D6x10 gold crowns, and make any other trading post purchases as normal.
+
+Also, if in your next game your warband captures anyone, or finds any Stragglers or Prisoners, the fine clothing impresses them quite a bit! The Captain's Leadership is increased by +1 when testing to see if any join your warband.
+5	The treasure chest that is found has been carefully booby-trapped! One of your Heroes must try to penetrate the maze of poisoned dart-shooters and collapsing pathways that surround the chest by passing an Initiative test. If he passes, his expert approach reveals a Lucky Charm near the chest (which he claims for himself!), and 3D6x10 gold crowns in the chest itself. If he fails the test, he must sit out the next game as he recovers, but the crew do manage to open the chest now that the traps have been set off and gain the gold as above. They do not find the Lucky Charm though as it is drawn back into it's hiding place, there to await a more careful adventurer.
+6	Your crew bow their heads in reverent silence, as the map has lead them to one of the legendary secret burial spots used by Black-Wyrd the Pirate King, first and finest pirate to ever ravage Mordheim. Known for tying shards of Wyrdstone into the thick strands of his hair and beard and then setting them alight so they set off sparks of unholy fire, he was rightly feared by all Warbands throughout the land and sea. Though only a small chest is found at the site, when opened it reveals 2+D3 shards of Wyrdstone, plus a Mordheim Map!
+
+
+Trip Wire
+
+Nemesis Crown Supplement (1b)
+
+Cost: 15 gc
+Availability: Common (Horned Hunters only)
+
+Horned Hunters are expert trappers.
+
+Special Rules
+A Hero may set a trap if he spends a turn doing nothing else (he may not set traps if he's just recovered from being knocked down). Place a marker in base contact with the Hero.
+
+When a model, friend or foe, moves within 2" of the marker he risks setting off the trap – roll a D6. On a score of 3+ he has triggered the trap and suffers a S4 hit (note that the Hero won't trigger his own traps).
+If the trap did not wound the model or it didn't trigger, the victim may finish his move otherwise he is placed knocked down or stunned 2" from the marker. The marker is removed whether the trap was triggered or not.
+
+Vehicles
+
+The Wagons and Boats were included in Town Cryer #24, and expanded on in the Empire in Flames Supplement.
+Engine of Chaos
+
+Border Town Burning supplement (1c)
+
+Cost: 195 gc
+Availability: Rare 10 (Chaos Dwarfs only)
+
+Gaolers lock up their victims in a twisted daemonic machine crafted by the industrial insanity of Chaos Engineers. The vehicle is a living prison on wheels. Armoured engines transport captives to the Dark Lands, to feed fuel to furnaces or to become sacrifices.
+
+Profile	M	WS	BS	S	T	W	I	A	Ld
+Engine	-	-	-	-	8	4	-	-	-
+Wheel	-	-	-	-	6	1	-	-	-
+Daemon	6	-	-	-	6	3	-	-	-
+Special Rules
+Wagon: The Engine of Chaos follows all rules for Wagons (see Empire in Flames Supplement, p. 30–33) unless specified otherwise here.
+
+Daemon: The Engine of Chaos is powered by the binding of a daemon. All references to draft animals pulling the Wagon should be treated as referring to its daemon. Daemon movement is unaffected by cargo.
+
+Passengers: A Chaos Dwarf must function as the driver. No other models but captives may passage the Engine of Chaos. No more than six captives may be imprisoned in the Engine at a time – large creatures (Ogres, Minotaurs, etc.) count as two models.❓
+
+Pedal to the Metal: The driver may apply the effects of the lash. If an Engine of Chaos goes out of control for then refer to the Out of Control table. In the event of rolling the result ‘Loss of Control', replace a result of 5 (The wagon yoke pole snaps…) with;
+
+The Daemon has released itself from the sorcery which bound it to the Engine of Chaos. The Engine moves 6" straight ahead and then comes to a halt. The vehicle may no longer move for the remainder of this battle.
+
+Prisoners: Models always become captives when fighting a battle against a Chaos Dwarf warband that has an Engine of Chaos by rolling the Captured result on the Serious Injuries table or by being taken out of action by a Man-catcher. Note that in both cases their equipment is lost to the Chaos Dwarf warband. Some results on the Mordheim Exploration chart let Chaos Dwarfs acquire captives: Straggler (one) and Prisoners (D3). From the Empire in Flames Exploration chart: Raving Lunatic (one), Lost Children (two), Mordheim Refugees (D3), The Hanging Tree (one), Small Farm and Large Farm (two).
+
+Models held as captives can be set free by destroying the Engine of Chaos or by using the prison keys. If a model puts one of the Chaos Dwarf warband's Gaolers out of action they take the keys. A model that takes the keys may free the captives by moving into base contact with the engine. If the Chaos Dwarfs rout before this happens or if the model with the keys is taken out of action (losing the keys to a new keeper), the captives remain captured. Freed captives must always move towards the closest table edge. Captives not from participating warbands use the basic profile for human warriors (see Mercenary warband). Rescued captives return to their former warbands.
+
+Hashut's Reward: The Chaos Dwarfs may choose to send captives back to the Dark Lands after a battle. If they do this, any number of captives must be sacrificed to Hashut. The Engine of Chaos plus one Hero must miss the next battle. Unless there is another engine, no models may be captured until they return. Captives must be removed from their warbands rosters permanently. After the Hero rejoins the warband consult the following table.
+
+Captives	Hashut's Reward
+1-3	+1 Experience points for the leader.
+4-5	+D3 Experience points which can be distributed among the Heroes.
+6	+2D3 Experience points which can be distributed among the Heroes plus D6x5 gold crowns.
+
+
+Opulent Coach
+
+Opulent Goods, Mordheim Annual 2002 (1a)
+
+Cost: 250 gc
+Availability: Rare 10
+
+Truly successful warband leaders are quite willing to waste their money on extravagant excesses such as rare wines, jewel-encrusted weapons and armour and Cathayan spices. The height of such indulgence is an opulent coach, which the warband leader can use for driving around the settlements surrounding Mordheim. There are few things that will impress commoners, or incur the wrath and envy of other, less successful leaders, as much as an opulent coach.
+
+Special Rules
+The opulent coach impresses even the most suspicious merchant and they will flock to offer their most exotic wares to the obviously rich warband leader. The warband leader gains +3 to any rolls to locate rare items.
+
+EXPANDED RULES
+Border Town Burning
+
+Since the opulent coach was written long before the rules for wagons, we suggest that it is treated as a wagon with two draft horses, where the additional 70 gold crowns (100 gc wagon + 2 x 40 gc horses = 180 gold crowns total) spent, grants the +3 bonus for finding rare items.
+
+With respect to the previous rules whereby an opulent coach must not be placed on the table, we suggest the following. The warband may choose either to leave the opulent coach at their camp or to use the coach in battles. The warband may always use the coach when visiting the merchants after the battle.
+
+Note that a merchant caravan may not buy an opulent coach to replace a destroyed trade wagon with. They must have the trade wagon to transport goods and offer their specialist services. They can always buy a stage coach, wagon or opulent coach in addition to the trade wagon. That would be sure to impress!
+
+Rickshaw
+
+Border Town Burning (1c)
+
+Cost: 70 gc
+Availability: Rare 8 (Humans only)
+
+Rickshaws are two-wheeled carts pulled by a human runner. Affluent merchants, influential officials and other members of the social elite can be seen using this means of transport to move about in the city.
+
+Special Rules
+One non-animal warband member must be assigned as the runner in order to move the rickshaw. He cannot charge or run whilst pulling the cart. As long as he pulls the rickshaw it remains in base contact with the runner and both are moved together. The runner may stop pulling the rickshaw at any time and move normally the same turn (including declaring charges).
+
+There is one seat in the rickshaw for one passenger to sit down. Boarding and deboarding the cart works the same way as mounting and dismounting.
+
+Models shooting at a rickshaw get a +1 on their ‘to hit' rolls. For each hit, roll on the table below to determine which part of the rickshaw and crew is hit. Then apply ‘to wound' rolls accordingly.
+
+D6	Result
+1-2	Runner
+3-4	Rickshaw (Toughness 8, Wounds 2)
+5	Wheel (Toughness 6, Wounds 1)
+6	Passenger
+
+In hand-to-hand combat attackers may choose whether they want to attack the runner, a wheel, the rickshaw itself or the passenger as long as they are in base contact with the respective part. The passenger is hit on 6+ only.
+
+Note that as soon as one of the wheels is destroyed (i.e. loses its last wound) the rickshaw can be pulled no more. Unless the rickshaw is destroyed completely it can be repaired after the battle.
+
+River Barge
+
+Town Cryer #24, Empire in Flames (1b)
+
+Cost: 200 gc
+Availability: Rare 9
+
+Special Rules
+
+For all the rules on how to use Rowboats, Riverboats, and Barges in your campaign, see the Vehicles of the Empire section.
+
+
+Riverboat
+
+Town Cryer #24, Empire in Flames (1b)
+
+Cost: 100 gc
+Availability: Rare 8
+
+Special Rules
+
+For all the rules on how to use Rowboats, Riverboats, and Barges in your campaign, see the Vehicles of the Empire section.
+
+
+Rowboat
+
+Town Cryer #24, Empire in Flames (1b)
+
+Cost: 40 gc
+Availability: Rare 7
+
+Special Rules
+
+For all the rules on how to use Rowboats, Riverboats, and Barges in your campaign, see the Vehicles of the Empire section.
+
+
+Skeleton Chariot
+
+Town Cryer 18 (1b)
+
+Cost: 200 + 10D6 gc
+Availability: Common (Tomb Guardians only)
+
+A Skeleton Chariot is made from the bones of the dead, pulled by two Skeleton Steeds and ridden by a member of the warband.
+
+Profile	M	WS	BS	S	T	W	I	A	Ld
+Chariot	-	-	-	4	4	3	-	-	-
+Steed	8	2	2	3	3	1	2	1	5
+Special Rules
+Mounting: A charioteer may mount and dismount a chariot in the same way as a ridden steed.
+
+Movement: A Skeleton Chariot normally moves at 8" and may not run. However, it may double its normal move when charging.
+
+Difficult Ground: If a chariot moves over difficult ground it suffers D3 Strength 4 hits. If the chariot is charging over difficult ground, it suffers 2D3 Strength 6 hits.
+
+Steeds: If one steed dies, the chariot is reduced to half movement but may still charge (also at half normal charge distance). However impact hits will no longer be effective. If both steeds die, the chariot is immobile and the charioteer must fight on foot.
+
+Combat: Chariots are feared for their devastating charges that make use of their horrible scythed wheels that will cut down any warriors in their path. A charioteer is allowed to charge any enemy warrior that he can see who is in the open, he is not forced to charge the closest warrior. If the chariot moves more than half its normal move, it may make impact bits. Anyone directly in the path of a charging chariot is permitted an Initiative test to dodge out of the way and avoid being hit. The charioteer must roll to hit as normal, a successful hit causing a single wound at Strength 4 with a -2 armour save. At the end of the charge move, the charioteer may fight any enemy models in base contact, as if he had charged normally.
+
+In combat, enemy warriors in contact may elect to strike the chariot or its driver. If hitting the chariot, the attacker must still make a to hit roll against the charioteer. If in base contact with only a Skeletal Steed, then only the steed can be hit.
+
+Shooting: A chariot is a large target and a warrior gains +1 to hit when shooting at a chariot. If the chariot is hit, roll a D6 to see where it is hit: 1-2 steed, 3-4 chariot, 5-6 charioteer.
+
+Skill Requirement
+
+To use the Skeleton Chariot to it's full effect, Tomb Guardian have access to an additional skill:
+
+Drive Chariot (academic)
+
+Chariots are very difficult to control and a warrior must have this skill to drive a chariot effectively in combat. A charioteer without this skill cannot charge.
+Trade Wagon
+
+Border Town Burning (1c)
+
+Cost: 180 gc
+Availability: Common (Merchant Caravans only)
+
+The many vulnerable items such as Cathayan jewels, spices and silk cloths are stored in the Trade Cart.
+
+Profile	M	WS	BS	S	T	W	I	A	Ld
+Cart	-	-	-	-	8	4	-	-	-
+Wheel	-	-	-	-	6	1	-	-	-
+Draft Horse	8	1	0	3	3	1	3	0	5
+Special Rules
+Wagon: The Trade Wagon is a wagon and so follows all rules for Wagons (see Empire in Flames Supplement, p. 30–33). The cost of the Trade Wagon includes two draft horses. Remember that one model from the warband needs to act as the wagon driver.
+
+Storage: All the warband's stored equipment and treasures are stored inside the Trade Wagon. Note that this does not include the warband's gold crowns. If the Trade Wagon is destroyed, all the warband's stored equipment and treasures are lost. Until a new Trade Wagon (or Stage Coach, if the player wishes) is bought, equipment cannot be stored. Any treasures gained after a battle are lost if they are not sold before the next game.
+
+Reputation: For every five different rare items stored inside the Trade Wagon, the Merchant gets +1 to his rolls for finding rare items.
+
+Abandoned: If the warband fails its Rout test and no model is driving the Trade Wagon, then it is abandoned. The wagon falls into the winning warband's hands. They may choose to steal the contents, to keep the wagon for themselves if allowed to (treat as Wagon or Stage Coach), or agree to cut a deal (using the ransom rules in Captured from the Serious Injuries chart on page 119 of the Mordheim rulebook) with the Merchant. A warband capturing a Wagon from a Merchant Caravan may not search for rare items following the battle unless every model from the Merchant's warband was taken out of action, as word of it spreads and they are avoided by the fearful local traders.
+
+Wagon, Stagecoach
+
+Empire in Flames supplement (1b)
+
+Cost: 100 gc
+Availability: Rare 7 (without draft animals)
+
+Special Rules
+
+For all the rules on how to use Rowboats, Riverboats, and Barges in your campaign, see the Vehicles of the Empire section.
+
+
+Venom Ring
+
+Khemri setting, Town Cryer #18 (1b)
+
+Cost: 20 + 1D6 gc
+Availability: Rare 10
+
+The Venom Ring renders the wearer immune to the effects of all poisons.
+
+Special Rules
+The Venom Ring renders the wearer immune to the effects of all poisons.
+
+Victuals
+
+Border Town Burning (1c)
+
+Cost: 8 gc
+Availability: Common
+
+Special Rules
+Fire: Victuals may be used after a battle. If the warband sells Treasures, the warband is considered to be one size lower (so a warband with 10-12 members is considered to be comprised of 7-9 members instead). A warband may use as many victuals as they wish, but note that the warband size cannot be considered lower than 1-3 models.
+
+Vodka
+
+Town Cryer #11, Mordheim Annual 2002 (1b)
+
+Cost: 35 + 2D6 gc
+Availability: Rare 8 (Kislevite Heroes only)
+
+Kislevites live in a harsh land under constant threat of invasion. While this has instilled a seriousness in these people, it has not diluted their love of celebration one bit. If anything, their love of revelry has increased with the hardships they have had to endure, as they have learned that life is fleeting, and any excuse to enjoy what they have been given is not to be squandered. One of the products of this love of life and celebration is a strong alcoholic spirit called vodka. It is also one of the country's most famous exports, though most inhabitants of the Old World find it too harsh for their palates. Kislevites take such enjoyment in this drink and regard it as something almost magical. Mothers give vodka to their families to ward off sickness and to keep them warm in the long winter months, and warriors indulge both for luck and courage. Outsiders often scoff at the reputed properties of this liquor, but it must be said that a Kislevite army that is well supplied with vodka certainly fights better and in higher spirits than one without.
+
+Special Rules
+In game terms, vodka is a one-use item of equipment that a Kislevite Hero may give to the warband before the start of the game. Every warrior in the warband receives +1 Leadership (up to a maximum of 10) for that game. In addition, because of its nullifying alcoholic effects, every warband member must test against their Toughness before the start of the game — a failure resulting in -1 Initiative for the duration of the game.
+
+War Horn
+
+Ye Old Curiosity Shoppe, Mordheim Annual 2002 (1a)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 8
+
+The blaring sound of a war horn can be enough to stir the hearts of any warband which it is attempting to bolster. It grants men courage and gives them the will to fight on defiantly.
+
+Special Rules
+A war horn may be used once per battle at the beginning of any turn. It allows the warband to increase its Leadership by +1. The effect will last from the start of one turn to the start of the next. The war horn can be used just before a warband is about to take a rout test.
+
+War Horn of Nagarythe
+
+Town Cryer #10 (1b)
+
+Cost: 25 + 1D6 gc
+Availability: Rare 6 (Shadow Warriors only)
+
+Similar to the Standard of Nagarythe, units of Shadow Warriors sent into Mordheim often bring with them a war horn to rally around.
+
+Special Rules
+The rules for the War Horn of Nagarythe are the same as for a normal War Horn above (except for Rarity and price).
+
+Warpstone Amulet
+
+Town Cryer #29 (1b)
+
+Cost: 10 gc
+Availability: Rare 5 (Skaven of Clan Pestilens only)
+
+Special Rules
+The owner of a warpstone amulet may reroll a single die during the battle or, if not out of combat at the end of the game, a single die when looking for wyrdstone shards (Clan Pestilens members use this item instead of the Rabbit's Foot).
+
+Wheelbarrow
+
+Border Town Burning (1c)
+
+Cost: 5 gc
+Availability: Rare 5
+
+Probably the adventurer's best friend, wheelbarrows allow for convenient transport of all sorts of bulky objects like treasure chests and powder kegs.
+
+Special Rules
+A wheelbarrow is placed on the board like any other model. If you have no adequate model, use a marker to represent the wheelbarrow. A Hero or Henchman who is neither an animal nor stupid may push a wheelbarrow while he is in base-contact with it.
+
+Pushing a wheelbarrow does not affect the normal movement of the model. However, it cannot charge whilst pushing a wheelbarrow but it may let go of it at any time.
+
+A wheelbarrow can be used to transport cumbersome items such as chests and barrels. First, the item must be dropped on the wheelbarrow. After that, a model can push the wheelbarrow and its load. A wheelbarrow can contain no more than one cumbersome item at a time, but any number of smaller items (weapons, armour and small misc equipment).
+
+Winter Furs
+
+Border Town Burning (1c)
+
+Cost: 5 gc
+Availability: Common (Not available to Beastmen)
+
+Winter clothes include Snow Shoes and Pelts. A set of pelts includes gloves and snow shoes. A model wearing a pelt clothing is immune to the following special rules from Bitter Cold weather: Deep Snow and Chilling Cold.
+
+Special Rules
+If the pelt clothing becomes soaked with water, it is useless for the rest of the battle. Note that like Rain Coats, this item may be used by Henchmen also.
+
+Wolfcloak
+
+Opulent Goods, Mordheim Annual 2002, Border Town Burning Supplement (1b)
+
+Cost: 10 gc
+Availability: Common (Middenheimers, Norse Explorers and Marauders of Chaos only)
+
+In Middenheim it is still considered to be the feat of a true man to slay a great wolf single-handed. Warriors who accomplish such a deed will command the respect of their peers, and their cloaks will be blessed by the High Priest of the Cult of Ulric, the god of winter, war and wolves. Middenheimers only.
+
+Special Rules
+To acquire a Wolfcloak, a Hero must pay 10 gc (to represent the expense of traveling to Middenheim and taking part in a hunt). In addition, the Hero must roll equal to or under his Strength on a D6. If successful, the Hero finds and slays the wolf and can wear its cloak as a mark of his skill and prowess. Note that Middenheimers may buy Wolfcloaks when starting their warband without making a test for availability. A model wearing a Wolfcloak will gain +1 to his armour saves against all shooting attacks.
+
+Wyrdstone Pendulum
+
+Opulent Goods, Mordheim Annual 2002 (1a)
+
+Cost: 25 + 3D6 gc
+Availability: Rare 9
+
+Pendulums made of wyrdstone can reputedly be used to find even more of the magical stone.
+
+Special Rules
+If he was not taken out, the Hero using the Wyrdstone Pendulum may make a Leadership test after the battle. If he is successful, you may re-roll any one dice in the Exploration phase. This dice may not be re-rolled✏️

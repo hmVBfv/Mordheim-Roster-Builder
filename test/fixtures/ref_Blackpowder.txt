@@ -1,0 +1,385 @@
+Blackpowder Weapons
+
+Blackpowder weapons are only a very recent invention in the Warhammer world. They are often unreliable and temperamental but they do hit exceedingly hard and armour offers almost no protection, as their lead bullets can penetrate even the strongest breastplate or shield.
+
+Most blackpowder weapons are bought from Dwarfs at great expense, though some of the forges of Nuln and Altdorf have started to experiment with making handguns.
+Blunderbuss
+
+Mordheim Rulebook (core)
+
+Cost: 30 gc
+Availability: Rare 9
+
+A blunderbuss is a primitive blackpowder weapon, which fires a hail of lead balls, rusty bolts, bent nails, and other assorted scrap metal. It is a powerful, if erratic, weapon and takes such a long time to load that most warriors discard it after the first shot.
+
+Range: Special
+Strength: 3
+Special Rules
+Shot: When your model fires the blunderbuss, draw a line 16" long and 1" wide in any direction from the firer (the line must be absolutely straight). Any and all models in its path are automatically hit by a Strength 3 hit.❓
+
+Fire Once: It takes a very long time to load a blunderbuss so it may only be fired it once per battle.
+
+Chaos Dwarf Blunderbuss
+
+GW Troll Magazine (1c)
+
+Cost: 40 gc
+Availability: Rare 9 (Chaos Dwarfs only)
+
+Chaos Dwarfs are known in battle for using a large number of these infamous blunderbusses on their infantry troops. They employ this same tactic in combat on the streets of Mordheim.
+
+Range: 16"
+Strength: 3
+Special Rules
+Shot: When your model fires the blunderbuss, draw a line 16” long and 1” wide in any direction from the firer (the line must be absolutely straight). Any and all models in its path are automatically hit by a Strength 3 hit.❓
+
+Prepare Shot: A superior blunderbuss may be fired more than once per game; it takes a complete turn to reload❓, so you may only fire it every other turn.
+
+Double-barrelled Duelling Pistol
+
+Nemesis Crown Supplement (1b)
+
+Cost: 45 + 2D6 gc (80 + 4D6 gc for a brace)
+Availability: Rare 11 (Rare 12 for a brace) (Gunnery School of Nuln only)
+
+A natural evolution from the double-barrelled pistol, but it has proven less popular than envisaged. It had been thought that nobles would invest in them as a showpiece and put a stop to pointless duels, as who would want to shoot a rival who could shoot, miss, and then shoot again, even if you got two shots at them as well. Perhaps the designer should have put a few more hours thinking into it.
+
+Range: 9"
+Strength: 4
+Special Rules
+Accuracy: A duelling pistol is built for accuracy as a skilled duellist is able to hit a coin from twenty paces. All shots and close combat attacks from a duelling pistol have a +1 bonus to hit.
+
+Prepare shot: A duelling pistol takes a complete turn to reload❓, so your model may only fire every other turn. If he has a brace of duelling pistols he may fire every turn.
+
+Save modifier: Duelling pistols are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a duelling pistol must make his armour save with a -2 modifier.
+
+Hand-to-hand: Pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a pistol and another close combat weapon gains +1 Attack❓, which is resolved at Strength 4 with a -2 save modifier. This bonus attack can be used only once per combat. If you are firing a brace of pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model's Weapon Skill like any normal close combat attack and likewise may be parried.✏️ Successful hits are resolved at Strength 4 and with a -2 save modifier, regardless of the firer's Strength.
+
+Double-barrelled: A double-barrelled weapon is a tricky piece of engineering, but it's a wonderful piece for combat. When firing such a weapon, the bearer must declare whether he is firing one or both barrels. If firing a single barrel, treat the shot as you would a normal weapon. However when firing both barrels, the method changes slightly:
+
+- To hit: roll a single dice as you would normally. This allows for a narrow field of fire emanating from the weapon.
+- To wound: roll for each shot individually, as each shot can wound on it's own. Treat each shot that inflicts Critical Hits separately.
+- Reloading: After firing both barrels, place 2 tokens on the model. In your next shooting phase remove 1 token to represent one barrel having been reloaded. Token removal should be the last thing done in your shooting phase and you cannot shoot in the same phase as your reload.
+- Firing a Brace: If you fire both guns and barrels at the same time, place 4 tokens down, 2 each of different colours (one for each pistol in the brace). Remove one token of each colour every turn.
+
+Double-barrelled Handgun
+
+Nemesis Crown Supplement (1b)
+
+Cost: 60 + 2D6 gc
+Availability: Rare 10 (Gunnery School of Nuln only)
+
+Created from a request by a Nuln nobleman who had been impressed by a demonstration model, the gunsmiths slaved long and hard to replicate it until a final model was forged. By then the noble had forgotten about it and the Colleges were left with a job lot. These were given to the Gunnery School as a gift and sort of disappeared on route.
+
+Range: 24"
+Strength: 4
+Special Rules
+Prepare shot: A handgun takes a complete turn to reload❓, so you may only fire it every other turn.
+
+Move or fire: You may not move and fire a handgun in the same turn, other than to pivot on the spot to face your target or stand up.
+
+Save Modifier: Handguns are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a handgun must take its armour save with a -2 modifier.
+
+Double-barrelled: A double-barrelled weapon is a tricky piece of engineering, but it's a wonderful piece for combat. When firing such a weapon, the bearer must declare whether he is firing one or both barrels.
+
+- To hit: roll a single dice as you would normally. This allows for a narrow field of fire emanating from the weapon.
+- To wound: roll for each shot individually, as each shot can wound on it's own. Treat each shot that inflicts Critical Hits separately.
+- Reloading: After firing both barrels, place 2 tokens on the model. In your next shooting phase remove 1 token to represent one barrel having been reloaded. Token removal should be the last thing done in your shooting phase and you cannot shoot in the same phase as your reload.
+
+Double-barrelled Pistol
+
+Nemesis Crown Supplement (1b)
+
+Cost: 25 + 1D6 gc (46 + 2D6 gc for a brace)
+Availability: Rare 9 (Rare 10 for a brace) (Gunnery School of Nuln only)
+
+Originally created by a forward thinking blacksmith in Ostland for a vampire hunter, the engineers in the College at Nuln picked up on the trick very quickly. The design was simple enough; it is merely a pistol with a pair of barrels and a two-part trigger, which is capable of firing one or both barrels at a time, giving it the ability to punch a hole in even the toughest armour.
+
+Range: 6"
+Strength: 4
+Special Rules
+Prepare Shot: A pistol takes a complete turn to reload❓, so your model may only fire every other turn. If he has a brace of pistols he may fire every turn.
+
+Save Modifier: Pistols are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a pistol must make his armour save with a -2 modifier.
+
+Hand-to-hand: Pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a pistol and another close combat weapon gains +1 Attack❓, which is resolved at Strength 4 with a -2 save modifier. This bonus attack can be used only once per combat. If you are firing a brace of pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model's Weapon Skill like any normal close combat attack and likewise may be parried.✏️ Successful hits are resolved at Strength 4 and with a -2 save modifier, regardless of the firer's Strength.
+
+Double-barrelled: A double-barrelled weapon is a tricky piece of engineering, but it's a wonderful piece for combat. When firing such a weapon, the bearer must declare whether he is firing one or both barrels.
+
+If firing a single barrel, treat the shot as you would a normal weapon. However when firing both barrels, the method changes slightly:
+
+- To hit: roll a single dice as you would normally. This allows for a narrow field of fire emanating from the weapon.
+- To wound: roll for each shot individually, as each shot can wound on it's own. Treat each shot that inflicts Critical Hits separately.
+- Reloading: After firing both barrels, place 2 tokens on the model. In your next shooting phase remove 1 token to represent one barrel having been reloaded. Token removal should be the last thing done in your shooting phase and you cannot shoot in the same phase as your reload.
+- Firing a Brace: If you fire both guns and barrels at the same time, place 4 tokens down, 2 each of different colours (one for each pistol in the brace). Remove one token of each colour every turn.
+
+Duelling Pistol
+
+Mordheim Rulebook (core)
+
+Cost: 30 gc (60 gc for a brace)
+Availability: Rare 10
+
+A duelling pistol is a work of art, and a gunsmith labours long and hard to produce a single example. They are often carried by Imperial nobles to solve disputes over love and honour, and many a noble has died at dawn in a duel over some grievance.
+
+Duelling pistols are prohibitively expensive weapons and common warriors rarely have them. Even if they do manage to steal or buy one, the ammunition is prohibitively expensive.
+
+Some of the wealthiest warriors in Mordheim carry duelling pistols as status symbols, commanding great respect, admiration and envy.
+
+Range: 10"
+Strength: 4
+Special Rules
+Accuracy: A duelling pistol is built for accuracy as a skilled duellist is able to hit a coin from twenty paces. All shots and close combat attacks❓ from a duelling pistol have a +1 bonus to hit.✏️
+
+Prepare shot: A duelling pistol takes a complete turn to reload❓, so your model may only fire every other turn. If he has a brace of duelling pistols he may fire every turn.
+
+Save modifier: Duelling pistols are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a duelling pistol must make his armour save with a -2 modifier.
+
+Hand-to-hand: Duelling pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a duelling pistol and another close combat weapon gains +1 Attack❓, which is resolved at Strength 4 with a -2 save modifier. This bonus attack can be used only once per combat. If you are firing a brace of duelling pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model's Weapon Skill like any normal close combat attack and likewise may be parried.✏️ Successful hits are resolved at Strength 4 and with a -2 save modifier, regardless of the firer's Strength.
+
+Hand-held Mortar
+
+Nemesis Crown Supplement / Border Town Burning supplement (1b)
+
+Cost: 80 + 2D6 gc
+Availability: Rare 12 (Gunnery School of Nuln and Maneaters only)
+
+The explosive power of a mortar, in a small enough package to be carried by a single man, the Hand-Held Mortar enables a warrior to launch an explosive into the midst of the enemy, sowing death and disorder.
+
+Range: 24"
+Strength: 4
+Special Rules
+Prepare shot: A Hand-held Mortar takes a complete turn to reload❓, so you may only fire it every other turn.
+
+Move or fire: You may not move and fire a Hand-held Mortar in the same turn, other than to pivot on the spot to face your target or stand up.
+
+Save Modifier: Hand-held Mortar are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a Hand-held Mortar must take its armour save with a -2 modifier.
+
+Scatter: If the warrior misses his roll to hit, the shot will land 2D6” in a random direction (determined using a Warhammer directional die, using the “clockface method” of scattering, or whatever other method the players can agree to).
+
+Experimental: The Hand-held Mortar is always Experimental: subject to the optional Blackpowder Weapons rules from the Mordheim rulebook, even if they are not normally used in your campaign. On any result other than “BOOM!”, the weapon has jammed or run out of loaded barrels and must be reloaded.
+
+Explosive Radius: After determining the final landing spot, the explosion created by the bomb will cover a small area. The target and any models within 1 ½” of him each take a single S4 hit from the blast.
+
+Handgun
+
+Mordheim Rulebook (core)
+
+Cost: 35 gc
+Availability: Rare 8
+
+A handgun is a simple firearm. The quality of construction varies ranging from the crude wooden ‘hakbuts' of the artillery school of Nuln, to the more sophisticated Dwarf firearms that have levers and springs which hold the burning match, and triggers which release the firing mechanism and fire the gun. Handguns are not terribly reliable weapons: the gun barrel occasionally tends to explode violently or the powder fails to ignite. But the weapon has a great range and tremendous penetrating power, making a mockery of even the thickest armour. In Mordheim, handguns are rare and expensive, but a warband which can boast such a weapon will command respect from all its rivals.
+
+Range: 24"
+Strength: 4
+Special Rules
+Prepare shot: A handgun takes a complete turn to reload❓, so you may only fire it every other turn.
+
+Move or fire: You may not move and fire a handgun in the same turn, other than to pivot on the spot to face your target or stand up.
+
+Save Modifier: Handguns are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a handgun must take its armour save with a -2 modifier.
+
+Hersten-Wenkler Pigeon Bombs
+
+Nemesis Crown Supplement (1b)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 8 (Gunnery School of Nuln only)
+
+When the full potential of gunpowder was realized in the Empire, it became only a matter of time before some enterprising engineers combined explosives and small animals. After initial failures with attempts to use rats, bats, and dogs, promising results were realized with pigeons. While not completely accurate due to having something of a mind of their own, pigeons are able to get to even distant targets quickly, and are very hard to prevent from reaching their target once they have been launched. Once it gets there, pigeon's small metal harness will fall away, freeing the bomb to ravage a small area below, while the pigeon returns home.
+
+Range: Unlimited
+Strength: 4
+Special Rules
+Move or fire: You may not move and fire a Pigeon Bomb in the same turn, other than to pivot on the spot to face your target or stand up from knocked down.
+
+Explosive Radius: If the Pigeon Bomb lands on target, use the Explosive Radius rule under the Hand-Held Mortar above to determine the area of effect.
+
+Temperamental: When launching a pigeon bomb, do not use the BS of the warrior. Instead, roll a D6: on a 5-6, the a pigeon bomb hits its target; on a 2-4 the fuse wasn't cut properly and the pigeon explodes harmlessly in the air before reaching its target; on a result of 1, something has gone disastrously wrong and the pigeon explodes in the hero's hands… he and everyone within 1 ½” takes a S4 hit.
+
+Pigeon Roost: Once a Hero buys pigeon bombs, he has enough for the full game, and his supply gets replenished at the start of each new game.
+
+Hunting Rifle
+
+Mordheim Rulebook (core)
+
+Cost: 200 gc
+Availability: Rare 11
+
+Hochland is a province famed for its hunters, and the preferred weapon of its nobility when they go hunting is a long-ranged rifle. They are extremely rare and precious weapons, and only the most experienced weaponsmiths are capable of manufacturing them.
+
+Range: 48"
+Strength: 4
+Special Rules
+Move or fire: You may not move and fire a Hochland long rifle in the same turn, other than to pivot on the spot to face your target or stand up from knocked down.
+
+Prepare shot: A Hochland long rifle takes a complete turn to reload❓, so you may only fire it every other turn.
+
+Pick target: A model armed with a Hochland long rifle can target any enemy model in sight, not just the closest one.
+
+Save modifier: Hochland long rifles are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a long rifle must make his armour save with a -2 modifier.
+
+Ostlander Double-barrelled Hunting Rifle
+
+Town Cryer #11, revised in Mordheim Annual 2002 (1a)
+
+Cost: 300 gc
+Availability: Rare 12 (Ostlanders only)
+
+Knowing Ostlanders' penchant for impressive weaponry (and ready willingness to spend excessive amounts of money) a weaponsmith from Hochland decided to weld two barrels together on a pistol and sell it for twice the price. The warband was so impressed with their new weapon that they asked him to do the same to their hunting rifle. Since then, the weaponsmith has been flooded with orders from some of the most powerful warbands in Mordheim.
+
+Range: 48"
+Strength: 4
+Special Rules
+A double-barrelled gun (of any sort) is treated exactly like a normal version with one exception. Any enemy is hit by two blasts rather than one (ie, a pistol causes two S4 hits rather than one for each successful hit). However, each barrel takes a full turn to reload❓ (although if you reload only one barrel you can fire it like a normal pistol/rifle). If you own a brace of double-barreled pistols you may fire them every other round (rather than every round like a normal brace).
+
+Ostlander Double-barrelled Pistol
+
+Town Cryer #11, revised in Mordheim Annual 2002 (1a)
+
+Cost: 30 gc (60 gc for a brace)
+Availability: Rare 10 (Ostlanders only)
+
+Knowing Ostlanders' penchant for impressive weaponry (and ready willingness to spend excessive amounts of money) a weaponsmith from Hochland decided to weld two barrels together on a pistol and sell it for twice the price. The warband was so impressed with their new weapon that they asked him to do the same to their hunting rifle. Since then, the weaponsmith has been flooded with orders from some of the most powerful warbands in Mordheim.
+
+Range: 6"
+Strength: 4
+Special Rules
+A double-barrelled gun (of any sort) is treated exactly like a normal version with one exception. Any enemy is hit by two blasts rather than one (ie, a pistol causes two S4 hits rather than one for each successful hit). However, each barrel takes a full turn to reload❓ (although if you reload only one barrel you can fire it like a normal pistol/rifle). If you own a brace of double-barreled pistols you may fire them every other round (rather than every round like a normal brace).
+
+Pistol
+
+Mordheim Rulebook (core)
+
+Cost: 15 gc (30 gc for a brace)
+Availability: Rare 8
+
+A pistol is a small, simple blackpowder weapon fired by a spring mechanism. Most pistols are expensive, unreliable, and poorly constructed.
+
+Range: 6"
+Strength: 4
+Special Rules
+Prepare shot: A pistol takes a whole turn to reload❓, so you may only fire every other turn. If you have a brace of pistols (ie, two) you may fire every turn.
+
+Save modifier: Pistols are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a pistol must make his armour save with a -2 modifier.
+
+Hand-to-hand: Pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a pistol and another close combat weapon gains +1 Attack❓, which is resolved at Strength 4 with a -2 save modifier. This bonus attack can be used only once per combat. If you are firing a brace of pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model's Weapon Skill like any normal close combat attack and likewise may be parried.✏️ Successful hits are resolved at Strength 4 and with a -2 save modifier, regardless of the firer's Strength.
+
+Repeater Handgun
+
+Nemesis Crown Supplement (1b)
+
+Cost: 60 + 2D6 gc
+Availability: Rare 11 (Gunnery School of Nuln only)
+
+The next step in the evolution of multi-barrelled weapons, a Repeater Handgun mounts a number of handgun barrels around a rotating cylinder, each one firing in turn. Prone to misfiring or other malfunction, Repeater Handguns are still highly sought after items, as they will launch a veritable storm of lead at the enemy if they don't break down.
+
+Range: 24"
+Strength: 4
+Special Rules
+Save Modifier: Handguns are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a handgun must take its armour save with a -2 modifier.
+
+Move or Fire: You may not move and fire a handgun in the same turn, other than to pivot on the spot to face your target or stand up.
+
+Fire Thrice: The Repeater Handgun may fire up to three shots; if more than one shot is made the to hit roll is at -1. Resolve each shot individually, you may choose to shot later shots at a different target, but they must be within 3" of the previous target. Ordinary targeting restrictions apply to shots as per Mordheim rulebook.
+
+Experimental: The Repeater Handgun is always Experimental: subject to the optional Blackpowder Weapons rules from the Mordheim rulebook, even if they are not normally used in your campaign. On any result other than “BOOM!”, the weapon has jammed or run out of loaded barrels and must be reloaded.
+
+Slow Reload: To reload a Repeater Handgun takes a Slow Reload long time and a bit of focus. The warrior must do nothing (no moving, no shooting, no fighting in close combat, etc.) for a complete turn in order to reload the weapon.
+
+Repeater Pistol
+
+Nemesis Crown Supplement (1b)
+
+Cost: 30 + 2D6 gc
+Availability: Rare 9 (Gunnery School of Nuln only)
+
+It wasn't long after the invention of the repeater handgun that the same principle was being used on pistols. Still prone to misfiring or other malfunction, they have found a place in gunnery bands armouries. Stories of calm instructors gunning down hordes of foes within feet of themselves are legendary and in all likelihood untrue. But it just could happen...
+
+Range: 6"
+Strength: 4
+Special Rules
+Save Modifier: Pistols are even better at penetrating armour than their Strength 4 suggests. A warrior wounded by a handgun must take its armour save with a -2 modifier.
+
+Fire Thrice: The Repeater Pistol may fire up to three shots; if more than one shot is made the to hit roll is at -1. Resolve each shot individually, you may choose to shot later shots at a different target, but they must be within 3" of the previous target. Ordinary targeting restrictions apply to shots as per Mordheim rulebook.
+
+Experimental: The Repeater Pistol is always Experimental: subject to the optional Blackpowder Weapons rules from the Mordheim rulebook, even if they are not normally used in your campaign. On any result other than “BOOM!”, the weapon has jammed or run out of loaded barrels and must be reloaded.
+
+Quick Reload: The basic design of the pistol and number of barrels allows quick reloading, the pistol will always be able to fire at least one shot. After shooting more than one shot in a single turn the model must spend a complete shooting phase without shooting and without being in combat, before firing multiple shots (see Fire Thrice, above) may be taken again.
+
+Not a Club: The Repeater Pistol may be used as a normal pistol in the first round of combat. After that it doesn't count as an additional hand weapon as it is far too delicate to risk in such a crude fashion. Its owner will not willingly discard it in a fight and so must fight on without the use of an additional hand weapon.
+
+Swivel Gun
+
+Town Cryer #9 (1b)
+
+Cost: 65 gc
+Availability: Rare 8 (Pirate Gunners only, max one per warband Limit: 1 per warband)
+
+Pirate Gunners sometimes construct and carry into battle a smaller and lighter version of the real swivel cannons normally attached to pivoting mounts on the ship's railing or sides. Though smaller than regular cannons, swivel guns are larger than normal handguns, so big that they must be held up with the support of wooden support. They are cumbersome, and prone to failure due to imperfect castings or poorly mixed blackpowder, but most gunners agree that they make up for it in sheer power.
+
+Special Rules
+Prepare shot: A handgun takes a complete turn to reload❓, so you may only fire it every other turn.
+
+Move or fire: You may not move and fire a handgun in the same turn, other than to pivot on the spot to face your target or stand up.
+
+Maximum 1 per warband: A Pirate Warband may have only one Swivel Gun at a time, due to the time it takes the ship’s Master Gunner to construct one.
+
+Cumbersome: The user is at –1 Initiative and –1 Movement throughout the battle. Also, Swivel Guns may never be fired twice per turn, or fired if the user moved, no matter what Skills the user may have.
+
+Blackpowder Rules: The normally optional rules for Blackpowder weapons are always in effect for Swivel Guns, due to unpredictable nature of the local materials used in their construction.
+
+Special Ammunition: Swivel Guns use nonstandard ammunition types, which must be bought for each game. Each type only lasts one game, so if it is used in a game it cannot be used again until another supply is bought. Before firing, the Gunner must declare which type is being used, if he has more than one type available in the game.
+
+Ball Shot
+
+A Swivel Gun firing these heavy lead balls can stop even a charging Ogre dead in his tracks!
+
+Cost: 5 gc
+
+Maximum Range: 36";
+Strength: 5;
+Special Rule: Armour Save -2, Concussion.
+
+Concussion: The impact of the heavy lead projectile is enough to rattle even the hardiest warrior. Treat any resulting Injury Rolls of 2-4 as a Stunned result.
+Chain Shot
+
+These lengths of chain and linked metal don't cause as much damage, but can entangle an enemy model and bring him to his knees.
+
+Cost: 2 gc
+
+Maximum Range: 24";
+Strength: 4;
+Special Rule: Armour Save -1, All Wrapped Up!
+
+All Wrapped Up! Enemy hit by Chain Shot which are not wounded are Knocked Down on a roll of 4+, even if they normally can never be Knocked Down.
+Grape Shot
+
+Very small pellets, rocks, metal scrap, even rock salt are poured into the barrel from prepared canisters, producing a cloud of shrapnel when fired.
+
+Cost: 2 gc
+
+Maximum Range: 24";
+Strength: 3;
+Special Rule: It's Everywhere!
+
+It's Everywhere! If a hit is scored, D6 other enemy models within 4" of the target and also in Line of Sight will automatically take a single hit. If the original target was in the open, no hits can be applied to models in cover though (only if the original target was in cover can hits go to models in cover as well). The closest enemy model to the target must take the first hit, then the next closest, and so on. Models in Hiding will also count towards being close to the target, and can be hit as well. There is no Armour Save modifier from Grape Shot hits. Pirates know to duck out of the way when they hear a Swivel Gun going off, and thus are never hit by friendly Grape Shot.
+
+
+Warplock pistol
+
+Mordheim Rulebook (core)
+
+Cost: 35 gc (70 gc for a brace)
+Availability: Rare 11 (Skaven only)
+
+Warplock pistols are terrifying weapons, testimony to the mad genius of Clan Skryre engineers. Warplock pistols shoot ammunition made of magically treated warpstone and wounds caused by warplock pistols are horrible to behold and often cause infections.
+
+Range: 8"
+Strength: 5
+Special Rules
+Prepare shot: A pistol takes a whole turn to reload❓, so you may only fire every other turn. If you have a brace of pistols (ie, two) you may fire every turn.
+
+Save modifier: Warplock Pistols are even better at penetrating armour than their Strength 5 suggests. A warrior wounded by a pistol must make his armour save with a -3 modifier.
+
+Hand-to-hand: Pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a pistol and another close combat weapon gains +1 Attack❓, which is resolved at Strength 5 with a -3 save modifier. This bonus attack can be used only once per combat. If you are firing a brace of pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model’s Weapon Skill like any normal close combat attack and likewise may be parried. Successful hits are resolved at Strength 5 and with a -3 save modifier, regardless of the firer’s Strength.❓
