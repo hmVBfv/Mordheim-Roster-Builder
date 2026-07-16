@@ -1819,6 +1819,160 @@
     "line": "Special (Pirates)",
     "text": "Lowly Swabbies: gain no experience and never count toward the minimum size of the warband."
    }
+  ],
+  [
+   {
+    "__re": "stream of corruption",
+    "__f": "i"
+   },
+   {
+    "name": "Stream of Corruption",
+    "line": "Blessing of Nurgle (Carnival of Chaos)",
+    "text": "Shooting attack, range 6\", Strength 3, no armour saves allowed."
+   }
+  ],
+  [
+   {
+    "__re": "nurgle.?s rot",
+    "__f": "i"
+   },
+   {
+    "name": "Nurgle's Rot",
+    "line": "Blessing of Nurgle (Carnival of Chaos)",
+    "text": "Immune to all poisons. On an unmodified to-wound roll of 6 in close combat, the target contracts Nurgle's Rot (living models only). Before each battle the infected model tests Toughness or permanently loses 1 Toughness (dies at 0); rolling a 6 also passes the Rot to another random warband member."
+   }
+  ],
+  [
+   {
+    "__re": "cloud of flies",
+    "__f": "i"
+   },
+   {
+    "name": "Cloud of Flies",
+    "line": "Blessing of Nurgle (Carnival of Chaos)",
+    "text": "A swarm of flies buzzes around the bearer and his close-combat opponent. The opponent suffers a -1 to hit modifier on all attacks."
+   }
+  ],
+  [
+   {
+    "__re": "bloated foulness",
+    "__f": "i"
+   },
+   {
+    "name": "Bloated Foulness",
+    "line": "Blessing of Nurgle (Carnival of Chaos)",
+    "text": "A huge, disgusting mass of diseased flesh: +1 Wound and +1 Toughness, but Movement is reduced by -1."
+   }
+  ],
+  [
+   {
+    "__re": "mark of nurgle",
+    "__f": "i"
+   },
+   {
+    "name": "Mark of Nurgle",
+    "line": "Blessing of Nurgle (Carnival of Chaos)",
+    "text": "Branded with Nurgle's three spheres: +1 Wound and immune to all poisons."
+   }
+  ],
+  [
+   {
+    "__re": "\\bhideous\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Hideous",
+    "line": "Mutation / Blessing of Nurgle",
+    "text": "So disgusting to behold that the model causes fear."
+   }
+  ],
+  [
+   {
+    "__re": "daemon soul",
+    "__f": "i"
+   },
+   {
+    "name": "Daemon Soul",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "A Daemon lives within the mutant's soul, granting a 4+ save against the effects of spells or prayers."
+   }
+  ],
+  [
+   {
+    "__re": "great claw",
+    "__f": "i"
+   },
+   {
+    "name": "Great Claw",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "One arm ends in a great crab-like claw: may carry no weapon in that arm, but gains an extra close-combat attack at +1 Strength."
+   }
+  ],
+  [
+   {
+    "__re": "cloven ho(o|)(f|v)e?s",
+    "__f": "i"
+   },
+   {
+    "name": "Cloven Hooves",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "+1 Movement."
+   }
+  ],
+  [
+   {
+    "__re": "tentacle",
+    "__f": "i"
+   },
+   {
+    "name": "Tentacles",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "One arm ends in a tentacle. May grapple the close-combat opponent to reduce his Attacks by -1 (minimum 1); the mutant chooses which attack is lost."
+   }
+  ],
+  [
+   {
+    "__re": "black.?blood",
+    "__f": "i"
+   },
+   {
+    "name": "Black Blood",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "Whenever the model loses a Wound in close combat, anyone in base contact suffers a Strength 3 hit (no critical hits) from the corrosive, spurting blood."
+   }
+  ],
+  [
+   {
+    "__re": "\\bspines\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Spines",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "Any model in base contact suffers an automatic Strength 1 hit at the start of each close-combat phase. Spines never cause critical hits."
+   }
+  ],
+  [
+   {
+    "__re": "scorpion tail",
+    "__f": "i"
+   },
+   {
+    "name": "Scorpion Tail",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "A barbed, venomed tail grants an extra Strength 5 attack each close-combat phase (Strength 2 against models immune to poison)."
+   }
+  ],
+  [
+   {
+    "__re": "extra arm",
+    "__f": "i"
+   },
+   {
+    "name": "Extra Arm",
+    "line": "Mutation (Cult of the Possessed)",
+    "text": "May wield a single-handed weapon (or a shield/buckler) in the extra arm for +1 Attack in close combat."
+   }
   ]
  ]
 }

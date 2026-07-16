@@ -61,9 +61,11 @@ let loader = read(path.join('data', 'index.js'))
 chunks.push('/* ===== data/index.js ===== */\n' + deModule(loader));
 chunks.push('/* ===== data/_util.js ===== */\n' + deModule(read(path.join('data', '_util.js'))));
 
-/* Logik-Module. Reihenfolge ist unkritisch (Funktions-Deklarationen werden
-   gehoistet), app.js aber zuerst — dort liegt der Zustand. */
-const JS_FILES = ['app.js', 'pdf.js', 'tts.js'];
+/* Logik-Module. state.js zuerst — dort liegt der Zustand (`let S`, `let uid`),
+   und in der zusammengeklebten Single-File müssen diese Deklarationen vor
+   app.js' Top-Level-Code stehen. Ansonsten ist die Reihenfolge unkritisch,
+   weil Funktions-Deklarationen gehoistet werden. */
+const JS_FILES = ['state.js', 'engine.js', 'app.js', 'pdf.js', 'tts.js'];
 let app = JS_FILES
   .map(f => `/* ===== js/${f} ===== */\n` + deModule(read(path.join('js', f))))
   .join('\n\n');
