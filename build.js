@@ -65,7 +65,7 @@ chunks.push('/* ===== data/_util.js ===== */\n' + deModule(read(path.join('data'
    und in der zusammengeklebten Single-File müssen diese Deklarationen vor
    app.js' Top-Level-Code stehen. Ansonsten ist die Reihenfolge unkritisch,
    weil Funktions-Deklarationen gehoistet werden. */
-const JS_FILES = ['state.js', 'engine.js', 'app.js', 'pdf.js', 'tts.js'];
+const JS_FILES = ['state.js', 'engine.js', 'info.js', 'app.js', 'pdf.js', 'tts.js'];
 let app = JS_FILES
   .map(f => `/* ===== js/${f} ===== */\n` + deModule(read(path.join('js', f))))
   .join('\n\n');

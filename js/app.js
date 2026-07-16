@@ -9,6 +9,9 @@ import { ttsOpen, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
    at the bottom still expose these to inline onclick handlers. */
 import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, _stripParen } from './engine.js';
 export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, _stripParen };
+/* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
+import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild } from './info.js';
+export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild };
 
 /* ===================== DATA ===================== */
 // equipment item: [name, cost]  (cost in gc)
@@ -978,7 +981,6 @@ export function renderAddMenu(){
 }
 /* ===================== ITEM-EIGENSCHAFTEN (Tooltip) ===================== */
 
-export function itemInfo(nm){ const s=String(nm); for(const [re,info] of ITEMINFO){ if(re.test(s)) return info; } return null; }
 /* ===================== KATALOG-ELIGIBILITY (Tragbarkeits-Regel) =====================
    Regel (Design-Notiz / Nutzerwunsch): Eine Einheit darf einen Katalog-Gegenstand nur führen,
    wenn die zugehörige Waffen-/Rüstungs-KATEGORIE in ihrer Startausrüstung vorkommt.
@@ -1009,7 +1011,6 @@ export function catalogEligible(def,item){
 if(typeof window!=='undefined'){ window.catalogEligible=catalogEligible; window.itemFamily=itemFamily; window.unitFamilies=unitFamilies; }
 /* ===================== FÄHIGKEITEN / SCHLAGWORTE (Tooltip) ===================== */
 
-export function abilityInfo(nm){ const s=String(nm); for(const [re,info] of ABILITYINFO){ if(info.name===s) return info; } for(const [re,info] of ABILITYINFO){ if(re.test(s)) return info; } return null; }
 
 export function catLabel(cat){ const M={Nahkampf:'Melee',Fernkampf:'Missile',Rüstung:'Armour',Besonderes:'Special'};
   if(M[cat]) return M[cat];
@@ -2078,15 +2079,6 @@ export function flash(msg){
 
 /* ===================== ITEM-TOOLTIP ===================== */
 export let itipPinned=false;
-export function spellInfo(nm){ const lbl=spellLabel(nm); for(const k in SPELLS){ for(const s of SPELLS[k].spells){ if(String(s[0])[0]==='▸') continue; if(spellLabel(s[0])===lbl) return {name:lbl,line:'Spell · '+SPELLS[k].name,text:s[1]}; } } return null; }
-export function skillInfo(nm){ const lists=[]; for(const k in SKILLLISTS) lists.push(SKILLLISTS[k]); for(const k in SKILLSETS) lists.push(SKILLSETS[k]);
-  for(const L of lists){ const e=(L.skills||[]).find(x=>x[0]===nm); if(e) return {name:e[0],line:'Skill · '+L.name,text:e[1]}; } return null; }
-export function itipBuild(nm){
-  const i=itemInfo(nm)||abilityInfo(nm)||spellInfo(nm)||skillInfo(nm); if(!i) return null;
-  return `<div class="itip-h">${i.name||nm}</div>`+
-         (i.line?`<div class="itip-l">${i.line}</div>`:'')+
-         `<div class="itip-b">${i.text}</div>`;
-}
 export function showItipHTML(el,html,pin,maxW){
   const t=document.getElementById('itip'); if(!t||!html) return;
   t.innerHTML=html; t.style.display='block';
