@@ -7,8 +7,8 @@ import { ttsOpen, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
    render/action code below can call it, and re-exported so the window bindings
    at the bottom still expose these to inline onclick handlers. */
-import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, _stripParen } from './engine.js';
-export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, _stripParen };
+import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
+export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
 /* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
 import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild } from './info.js';
 export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild };
@@ -201,10 +201,6 @@ export function hsEqSection(rec){
 }
 export let hsFilter={stat:'',op:'>=',val:'',q:''}, dpFilter={stat:'',op:'>=',val:'',q:''};
 
-/* Profilwerte können "3(4)", "D6", "—" sein: numerisch auswerten (Klammerwert = effektiv) */
-export function statNum(v){ if(v==null) return null;
-  const s=String(v); const par=s.match(/\((\d+)\)/); if(par) return Number(par[1]);
-  const m=s.match(/\d+/); return m?Number(m[0]):null; }
 export function passNameFilter(entry,F){ const q=String((F&&F.q)||'').trim().toLowerCase();
   if(!q) return true; return String(entry.name||'').toLowerCase().includes(q); }
 export function passStatFilter(entry,F){ if(!passNameFilter(entry,F)) return false;
@@ -279,46 +275,6 @@ export function statBarHS(e,rec){ const k=["M","WS","BS","S","T","W","I","A","Ld
 /* Sv = permanenter Rüstungswurf. Bewusst OHNE Schild (optional nutzbar) und ohne
    Buckler (nur Parieren). Nur was IMMER gilt: getragene Rüstung + Fähigkeiten/Naturpanzer. */
 
-export function svFromText(t){ if(!t) return null; let best=null;
-  // Rüstungsstücke im Text
-  [[/gromril\s*armour/i,4],[/chaos\s*armour/i,4],[/ithilmar\s*armour/i,5],
-   [/heavy\s*armour/i,5],[/light\s*armour/i,6],[/toughened\s*leathers|hardened\s*leathers/i,6]]
-    .forEach(([re,v])=>{ if(re.test(t)&&(best==null||v<best)) best=v; });
-  // Naturpanzer / ausdrücklich genannte Rüstungswürfe.
-  // Bewusst NICHT: Saves gegen Betäubung ("3+ save to avoid being stunned", Thick Skull, 'Ard 'Ead)
-  // und keine Injury-Effekte ("taken out of action on a 6+").
-  const clean=String(t).replace(/[^.]*?(?:avoid being stunned|against being stunned|to avoid|out of action on)[^.]*\.?/gi,' ');
-  const pats=[/\b([2-6])\+\s*(?:armour\s*)?save\b/i, /\bsave\s*(?:of\s*)?([2-6])\+/i,
-              /\bscaly(?:\s*skin)?\s*([2-6])\+/i, /\bhide[^.]{0,20}?([2-6])\+\s*save/i];
-  pats.forEach(re=>{ const m=re.exec(clean); if(m){ const v=Number(m[1]); if(best==null||v<best) best=v; } });
-  return best; }
-/* Skills, die den permanenten Rüstungswurf verbessern — NUR wenn tatsächlich erlernt. */
-// +1 auf jeden Rüstungswurf
-// eigener 6+, mit Rüstung kombinierbar
-export function _svCombine(a,b){ if(a==null) return b; if(b==null) return a; return Math.max(2,Math.min(a,b)-1); }
-export function svOfModel(m){ const def=unitDef(m.uid_def); let eqSv=null;
-  for(const nm in (m.eq||{})){ if(!m.eq[nm]) continue; if(ARMOUR_SV[nm]!=null && (eqSv==null||ARMOUR_SV[nm]<eqSv)) eqSv=ARMOUR_SV[nm]; }
-  const innate=svFromText(def&&def.sp);
-  const combinable=/combines?\s*with\s*armour|combined with o/i.test((def&&def.sp)||'');
-  let best = combinable ? _svCombine(eqSv,innate)
-           : (eqSv==null?innate : (innate==null?eqSv:Math.min(eqSv,innate)));
-  if(def&&def.sv!=null && (best==null||def.sv<best)) best=def.sv;
-  // erlernte Skills
-  const sk=(m&&m.skills)||[]; let bonus=0, base=null;
-  sk.forEach(n=>{ if(SV_SKILL_BONUS[n]) bonus+=SV_SKILL_BONUS[n];
-                  if(SV_SKILL_BASE[n]!=null && (base==null||SV_SKILL_BASE[n]<base)) base=SV_SKILL_BASE[n]; });
-  if(base!=null) best=_svCombine(best,base);        // kombinierbarer Naturpanzer (Shaggy Hide)
-  if(best!=null && bonus) best=Math.max(2,best-bonus);
-  return best; }
-export function svOfEntry(e,rec){ let best=svFromText((typeof hsChosenEq==='function'&&rec)?hsChosenEq(rec,e):(e&&e.eq));
-  const t=svFromText(e&&e.sp); if(t!=null&&(best==null||t<best)) best=t;
-  if(rec&&typeof hsEquipOn==='function'&&hsEquipOn()&&typeof hsEqParts==='function'){
-    const ex=svFromText(hsEqParts(rec).join(', ')); if(ex!=null&&(best==null||ex<best)) best=ex; }
-  const sk=(rec&&rec.skills)||[]; let bonus=0;
-  sk.forEach(n=>{ if(SV_SKILL_BONUS[n]) bonus+=SV_SKILL_BONUS[n]; });
-  if(best!=null && bonus) best=Math.max(2,best-bonus);
-  return best; }
-export function svLabel(v){ return v==null?'\u2014':(v+'+'); }
 export function statTableHS(hs,rec,showMax){ const k=["M","WS","BS","S","T","W","I","A","Ld"];
   const p=(rec&&typeof hsEffProfile==='function'&&HIREDSWORDS[rec.key])?hsEffProfile(rec,hs):(hs.profile||{});
   let rows=`<tr><td class="rh">${hs.name}</td>${k.map(x=>`<td>${p[x]!==undefined?p[x]:'\u2014'}</td>`).join('')}</tr>`;

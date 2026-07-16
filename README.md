@@ -36,7 +36,7 @@ along the way and why certain design decisions were made.
 ```
 index.html            Markup + CSS (no logic)
 js/state.js             Warband state (S), model-id counter, house-rule defaults
-js/engine.js            Pure rules & cost calculation (no DOM)
+js/engine.js            Pure rules, cost & armour-save calculation (no DOM)
 js/info.js              Name -> tooltip lookups (item/ability/spell/skill) + HTML
 js/app.js               Rendering + UI actions (still to be split further)
 js/pdf.js               PDF export (official roster sheet)
@@ -165,7 +165,7 @@ node build.js             # builds the single file
 | `blessings.mjs`      | Blessing of Nurgle / Chaos Mutation English names match the official mordheimer.net names, and every one resolves to an ability tooltip. |
 | `pdf-order.mjs`      | PDF export lists heroes/henchmen in the warband's fixed roster order, not recruitment order. |
 | `state-module.mjs`   | The `S`/`uid` live-binding contract between `state.js` and `app.js` (replaceState, nextUid, resyncUid) actually holds. |
-| `engine.mjs`         | `app.js` re-exports the exact engine functions from `engine.js`, and the cost pipeline (unitDef → eqCost → modelUnitCost → totals) produces the right numbers end-to-end. |
+| `engine.mjs`         | `app.js` re-exports the exact engine functions from `engine.js`; the cost pipeline (unitDef → eqCost → modelUnitCost → totals) produces the right numbers end-to-end, and the armour-save maths (svFromText/svOfModel/svLabel) parse saves correctly (incl. not mistaking a stun save for an armour save). |
 | `info.mjs`           | `app.js` re-exports the info-lookup functions from `info.js`; item/ability/spell/skill names resolve to their tooltips (incl. the Blessing of Nurgle rules) and `itipBuild` composes the tooltip HTML. |
 | `parity.mjs`         | The modular version and the built single-file produce identical results for the same action sequence — so the build (deModule, concatenation order) never silently changes behaviour vs. the sources. `test/run.mjs` rebuilds `dist/` first so this always checks a current bundle. |
 

@@ -52,4 +52,23 @@ assert.strictEqual(engine.modelUnitCost(state.S.models[0]), mag.cost,
 assert.strictEqual(engine.totalModels(), 1, 'totalModels counts the Magister');
 assert.strictEqual(engine.isHeroModel(state.S.models[0]), true, 'Magister is a hero');
 
-console.log(`Engine split: OK (re-exports identical, Magister base cost ${mag.cost} gc verified end-to-end)`);
+// 3) Armour-save maths (svFromText / svOfModel / svLabel), moved from app.js.
+//    These are pure and re-exported by app.js, so app.* must equal engine.*.
+for (const fn of ['svFromText','svOfModel','svOfEntry','svLabel','_svCombine','statNum']) {
+  assert.strictEqual(app[fn], engine[fn], `app.${fn} must be the same function object as engine.${fn}`);
+}
+// svFromText reads a save out of rules text; light armour = 6+.
+assert.strictEqual(engine.svFromText('The model wears light armour.'), 6, 'light armour -> 6+ save');
+assert.strictEqual(engine.svFromText('Has a 4+ armour save.'), 4, 'explicit 4+ save parsed');
+// It must NOT mistake a stun/injury save for an armour save.
+assert.strictEqual(engine.svFromText('3+ save to avoid being stunned'), null,
+  'stun save must not be read as an armour save');
+// _svCombine improves the better of two saves by 1 (min 2+).
+assert.strictEqual(engine._svCombine(6, 5), 4, 'combining 6+ and 5+ gives 4+');
+assert.strictEqual(engine.svLabel(4), '4+');
+assert.strictEqual(engine.svLabel(null), '\u2014');
+// statNum pulls the effective value out of a profile cell like "3(4)".
+assert.strictEqual(engine.statNum('3(4)'), 4, 'bracketed value is the effective stat');
+assert.strictEqual(engine.statNum('D6'), 6);
+
+console.log(`Engine split: OK (re-exports identical, Magister base cost ${mag.cost} gc, armour-save maths verified)`);

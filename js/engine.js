@@ -12,9 +12,9 @@
  * already used across app.js/pdf.js/tts.js. It is safe because none of those
  * are called at module-evaluation time, only from inside function bodies.
  */
-import { BRACE_PLURAL, CATALOG, DRAMATIS, GSN_BRACE, HIREDSWORDS, LISTS, MUTATIONS, MUTSETS, UPGRADES, WARBANDS } from '../data/index.js';
+import { ARMOUR_SV, BRACE_PLURAL, CATALOG, DRAMATIS, GSN_BRACE, HIREDSWORDS, LISTS, MUTATIONS, MUTSETS, SV_SKILL_BASE, SV_SKILL_BONUS, UPGRADES, WARBANDS } from '../data/index.js';
 import { S, HR } from './state.js';
-import { activeDistrictEffects, catalogEligible, dpHireTotal, hsEqTotal, hsHireTotal, hsSizeBonus, itemFamily, itemHalfActive, priceMod } from './app.js';
+import { activeDistrictEffects, catalogEligible, dpHireTotal, hsChosenEq, hsEqParts, hsEqTotal, hsEquipOn, hsHireTotal, hsSizeBonus, itemFamily, itemHalfActive, priceMod } from './app.js';
 
 export function adjPrice(nm,pr){ const h=HR(); if(typeof pr!=='number') return pr; const fam=itemFamily(nm);
   let mult=(Number(h.priceAll)||100)/100;
@@ -202,3 +202,49 @@ export function isHeroModel(m){ const def=unitDef(m.uid_def); return (def&&def.t
 export function totalHeroes(){ return S.models.filter(m=>isHeroModel(m)).length + ((S.hired||[]).filter(h=>HIREDSWORDS[h.key]&&HIREDSWORDS[h.key].slot).length); }
 
 export function modelRating(m){ const def=unitDef(m.uid_def); return (def.large?20:5)+Number(m.exp||0); }
+
+/* ---- Save-value & stat helpers (moved from app.js; pure armour-save maths) ---- */
+/* Profilwerte können "3(4)", "D6", "—" sein: numerisch auswerten (Klammerwert = effektiv) */
+export function statNum(v){ if(v==null) return null;
+  const s=String(v); const par=s.match(/\((\d+)\)/); if(par) return Number(par[1]);
+  const m=s.match(/\d+/); return m?Number(m[0]):null; }
+export function svFromText(t){ if(!t) return null; let best=null;
+  // Rüstungsstücke im Text
+  [[/gromril\s*armour/i,4],[/chaos\s*armour/i,4],[/ithilmar\s*armour/i,5],
+   [/heavy\s*armour/i,5],[/light\s*armour/i,6],[/toughened\s*leathers|hardened\s*leathers/i,6]]
+    .forEach(([re,v])=>{ if(re.test(t)&&(best==null||v<best)) best=v; });
+  // Naturpanzer / ausdrücklich genannte Rüstungswürfe.
+  // Bewusst NICHT: Saves gegen Betäubung ("3+ save to avoid being stunned", Thick Skull, 'Ard 'Ead)
+  // und keine Injury-Effekte ("taken out of action on a 6+").
+  const clean=String(t).replace(/[^.]*?(?:avoid being stunned|against being stunned|to avoid|out of action on)[^.]*\.?/gi,' ');
+  const pats=[/\b([2-6])\+\s*(?:armour\s*)?save\b/i, /\bsave\s*(?:of\s*)?([2-6])\+/i,
+              /\bscaly(?:\s*skin)?\s*([2-6])\+/i, /\bhide[^.]{0,20}?([2-6])\+\s*save/i];
+  pats.forEach(re=>{ const m=re.exec(clean); if(m){ const v=Number(m[1]); if(best==null||v<best) best=v; } });
+  return best; }
+/* Skills, die den permanenten Rüstungswurf verbessern — NUR wenn tatsächlich erlernt. */
+// +1 auf jeden Rüstungswurf
+// eigener 6+, mit Rüstung kombinierbar
+export function _svCombine(a,b){ if(a==null) return b; if(b==null) return a; return Math.max(2,Math.min(a,b)-1); }
+export function svOfModel(m){ const def=unitDef(m.uid_def); let eqSv=null;
+  for(const nm in (m.eq||{})){ if(!m.eq[nm]) continue; if(ARMOUR_SV[nm]!=null && (eqSv==null||ARMOUR_SV[nm]<eqSv)) eqSv=ARMOUR_SV[nm]; }
+  const innate=svFromText(def&&def.sp);
+  const combinable=/combines?\s*with\s*armour|combined with o/i.test((def&&def.sp)||'');
+  let best = combinable ? _svCombine(eqSv,innate)
+           : (eqSv==null?innate : (innate==null?eqSv:Math.min(eqSv,innate)));
+  if(def&&def.sv!=null && (best==null||def.sv<best)) best=def.sv;
+  // erlernte Skills
+  const sk=(m&&m.skills)||[]; let bonus=0, base=null;
+  sk.forEach(n=>{ if(SV_SKILL_BONUS[n]) bonus+=SV_SKILL_BONUS[n];
+                  if(SV_SKILL_BASE[n]!=null && (base==null||SV_SKILL_BASE[n]<base)) base=SV_SKILL_BASE[n]; });
+  if(base!=null) best=_svCombine(best,base);        // kombinierbarer Naturpanzer (Shaggy Hide)
+  if(best!=null && bonus) best=Math.max(2,best-bonus);
+  return best; }
+export function svOfEntry(e,rec){ let best=svFromText((typeof hsChosenEq==='function'&&rec)?hsChosenEq(rec,e):(e&&e.eq));
+  const t=svFromText(e&&e.sp); if(t!=null&&(best==null||t<best)) best=t;
+  if(rec&&typeof hsEquipOn==='function'&&hsEquipOn()&&typeof hsEqParts==='function'){
+    const ex=svFromText(hsEqParts(rec).join(', ')); if(ex!=null&&(best==null||ex<best)) best=ex; }
+  const sk=(rec&&rec.skills)||[]; let bonus=0;
+  sk.forEach(n=>{ if(SV_SKILL_BONUS[n]) bonus+=SV_SKILL_BONUS[n]; });
+  if(best!=null && bonus) best=Math.max(2,best-bonus);
+  return best; }
+export function svLabel(v){ return v==null?'\u2014':(v+'+'); }
