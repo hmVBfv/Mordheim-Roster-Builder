@@ -117,3 +117,23 @@ rather than assuming it would work:
 
 The two GitHub Actions workflows (a CI-only build and the Pages deploy) were
 merged into one, to avoid them both firing on `main` and racing each other.
+
+## July 16, 2026 (cont.) — splitting app.js: info lookups
+
+Started peeling the rendering layer off `app.js` in small, individually
+tested slices rather than one big cut (the render code is far more
+interwoven than state or engine were — functions call each other, call the
+engine, and get called back by UI actions).
+
+First slice: **`info.js`** — the pure name→tooltip lookups (`itemInfo`,
+`abilityInfo`, `spellInfo`, `skillInfo`) plus `itipBuild`, which builds the
+tooltip HTML string but touches no live DOM. The tooltip *mechanics*
+(positioning, pinning, the `itipPinned` flag and its event listeners) stayed
+in `app.js`; this module only answers "what does this name mean, and what
+HTML shows it". `test/info.mjs` checks the Blessing of Nurgle tooltips still
+resolve through the new module.
+
+(A small extraction snag worth remembering: removing the functions left one
+orphaned `}` behind — `node --check` accepted the file, but the ESM compiler
+rejected it at load with a bare "Unexpected token '}'". `vm.SourceTextModule`
+pinpointed the line where `--check` wouldn't.)

@@ -37,6 +37,7 @@ along the way and why certain design decisions were made.
 index.html            Markup + CSS (no logic)
 js/state.js             Warband state (S), model-id counter, house-rule defaults
 js/engine.js            Pure rules & cost calculation (no DOM)
+js/info.js              Name -> tooltip lookups (item/ability/spell/skill) + HTML
 js/app.js               Rendering + UI actions (still to be split further)
 js/pdf.js               PDF export (official roster sheet)
 js/tts.js               Tabletop Simulator export
@@ -66,7 +67,8 @@ module that imported it. Everyday property mutation (`S.foo = …`) is fine
 from anywhere.
 
 Register any new logic module in `build.js` under `JS_FILES` — `state.js`
-must stay first in that list, then `engine.js`, since the single-file build
+must stay first in that list, then `engine.js` and `info.js`, since the
+single-file build
 concatenates everything into one flat script and `let S`/`let uid` and the
 pure engine functions need to be declared before app.js's own top-level code
 runs.
@@ -164,6 +166,7 @@ node build.js             # builds the single file
 | `pdf-order.mjs`      | PDF export lists heroes/henchmen in the warband's fixed roster order, not recruitment order. |
 | `state-module.mjs`   | The `S`/`uid` live-binding contract between `state.js` and `app.js` (replaceState, nextUid, resyncUid) actually holds. |
 | `engine.mjs`         | `app.js` re-exports the exact engine functions from `engine.js`, and the cost pipeline (unitDef → eqCost → modelUnitCost → totals) produces the right numbers end-to-end. |
+| `info.mjs`           | `app.js` re-exports the info-lookup functions from `info.js`; item/ability/spell/skill names resolve to their tooltips (incl. the Blessing of Nurgle rules) and `itipBuild` composes the tooltip HTML. |
 | `parity.mjs`         | The modular version and the built single-file produce identical results for the same action sequence — so the build (deModule, concatenation order) never silently changes behaviour vs. the sources. `test/run.mjs` rebuilds `dist/` first so this always checks a current bundle. |
 
 Earlier development also relied on a larger set of ad-hoc logic tests run
