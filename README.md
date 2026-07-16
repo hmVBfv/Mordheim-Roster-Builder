@@ -114,6 +114,31 @@ handed to someone as one file — Discord, USB stick, email. Rebuild it after
 editing data if you want the standalone file to reflect the change. The
 GitHub Actions workflow builds it automatically on every push.
 
+## Hosting on GitHub Pages
+
+GitHub Pages serves everything over `https://`, so the **modular version runs
+there directly** — no build required, the browser fetches the JSON just like
+against a local server. Live URL shape:
+`https://<user>.github.io/<repo>/`. The freshly built single file is also
+reachable, at `.../<repo>/dist/mordheim-roster.html`.
+
+The workflow in `.github/workflows/pages.yml` tests, rebuilds, and deploys on
+every push to `main`. To switch it on once:
+
+1. **Settings → Pages → Build and deployment → Source: "GitHub Actions".**
+2. Push to `main` (or run the workflow manually). Done.
+
+Two Pages-specific details, both already handled in the repo — worth knowing
+so nobody undoes them:
+
+* **`.nojekyll`** (empty file in the repo root) disables Jekyll. Pages runs
+  Jekyll by default, and Jekyll silently drops every path starting with an
+  underscore — which would include `data/_util.js` and break the app on load.
+* **All in-app paths are relative** (`new URL('./file.json', import.meta.url)`),
+  never absolute (`/data/...`). Pages serves under a `/<repo>/` subpath, where
+  absolute paths would 404. Keep new data/asset references relative.
+
+
 ## Editing data
 
 Game data lives in **JSON** (`data/*.json`) — plain tables, no code.
