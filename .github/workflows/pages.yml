@@ -1,0 +1,70 @@
+name: Test, build & deploy to GitHub Pages
+
+# Single workflow for CI + deployment. On every push to main it:
+#   1. runs the full test suite (which itself rebuilds the single-file and
+#      parity-checks modular vs. bundle),
+#   2. publishes the MODULAR version (index.html + js/ + data/) to Pages.
+#
+# Pages is a static HTTP server, so the fetch()-based data loading works there
+# — unlike double-clicking index.html locally over file://. The freshly built
+# dist/mordheim-roster.html is included in the same artifact, so the single-
+# file build is also reachable under the Pages URL.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push cancels an in-progress run.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      # Rebuilds dist/ and runs every test, including the modular<->single-file
+      # parity check.
+      - name: Test (rebuilds single-file + parity check)
+        run: node test/run.mjs
+
+      # .nojekyll disables Jekyll on Pages. Without it Jekyll drops every path
+      # starting with an underscore — including data/_util.js — and the modular
+      # app would 404 on load. Committed in the repo; re-asserted here so the
+      # published artifact always carries it.
+      - name: Ensure .nojekyll
+        run: touch .nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Publish the repo root: index.html, js/, data/, vendor/, assets/,
+          # and the freshly built dist/. All in-app paths are relative
+          # (new URL('./x', import.meta.url)), so they resolve correctly under
+          # the /<repo-name>/ Pages subpath.
+          path: .
+
+  # Deployment only runs for real pushes to main, not for pull requests.
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

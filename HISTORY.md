@@ -97,3 +97,23 @@ run the tests, rebuild).
   `app.js` re-exports the identical function objects (not divergent copies).
 
 Rendering and UI actions still live in `app.js` — that's the next split.
+
+## July 16, 2026 (cont.) — GitHub Pages hosting
+
+Wired up Pages deployment so the modular version can be used online without
+building the single file — the browser fetches the JSON over `https://`, the
+same way it does against a local dev server.
+
+Two Pages-specific traps, found by actually serving the repo under a subpath
+rather than assuming it would work:
+
+- Pages runs Jekyll by default, and **Jekyll silently drops files starting
+  with an underscore** — which would have made `data/_util.js` return 404 and
+  break the app on load. Fixed with an empty `.nojekyll` file.
+- Pages serves under a `/<repo>/` subpath, so any absolute path (`/data/...`)
+  would 404. The app already used relative paths
+  (`new URL('./x', import.meta.url)`) everywhere, confirmed by serving under a
+  simulated subpath before deploying.
+
+The two GitHub Actions workflows (a CI-only build and the Pages deploy) were
+merged into one, to avoid them both firing on `main` and racing each other.
