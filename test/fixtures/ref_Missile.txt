@@ -1,0 +1,340 @@
+Missile Weapons
+Belaying Pins
+
+Town Cryer #9 (1b)
+
+Cost: 3 gc
+Availability: Common (Pirates only)
+
+A typical ship contains hundreds of these short lengths of carved wood. They are set up in racks in convenient places in the ship, around which the running rigging can be secured or belayed. These also make good weapons, and pirates quickly become proficient with hurling them as short range weapons.
+
+Range: 6"
+Strength: As user -1
+Special Rules
+Awkward Thrown Weapon: Models using Belaying Pins do not suffer any penalties for range, but still suffer a -1 to hit penalty if they use them after moving that turn.
+
+Weak: They also do not hit very hard, so strike at User Strength -1 and give the target +1 to its armour save (or a 6+ if they have none), exactly as if the enemy had been hit by a bare fist.
+
+Blowpipe
+
+Mordheim Rulebook (core)
+
+Cost: 25 gc
+Availability: Rare 7 (Skaven, Lizardmen and Forest Goblins only. Common for Forest Goblins.)
+
+The blowpipe is a short hollow tube which can be used to shoot poisoned darts. While the darts by themselves are too small to cause significant damage, the poison used can cause searing agony and eventual death. The other advantage of a blowpipe is that it is silent, and a well-hidden shooter can fire the darts undetected.
+
+Range: 8"
+Strength: 1
+Special Rules
+Poison: The needles fired by a blowpipe are coated in a venom very similar in its effects to the Black Lotus (if you roll a 6 on the To Hit roll, the victim is automatically wounded). A blowpipe cannot cause critical hits. This weapon has a positive armour save modifier, so a model that normally has a save of 5+ will get a save of 4+ against a blowpipe dart. Even models that normally do not have an armour save will get a 6+ save to take into account protection offered by clothes, fur or the like.
+
+Stealthy: A model armed with a blowpipe can fire while hidden without revealing his position to the enemy. The target model can take an Initiative test in order to try to spot the firing model. If the test is successful, the model no longer counts as hidden.
+
+Bolas
+
+Town Cryer #11 (1b)
+
+Cost: 5 gc
+Availability: Common (Lizardmen, Amazons (Lustria) only)
+
+Bolas are a set of three bronze balls on strings tied together. They are thrown similar to a sling and are rotated around the head for speed. The bolas is a hunting weapon and doesn't harm the animal. It immobilises it and allows the hunter to either subdue it or put it out with his spear. The bolas has a range of 16" and can only be used once per battle. They are automatically recovered after each battle.
+
+Range: 16"
+Strength: Special
+Special Rules
+Dangerous: If the to hit roll is a natural 1, the bolas brain the wielder with a Strength 3 hit.
+
+Entangle: A model hit by bolas isn't hurt, but his legs are entangled and he is unable to move. The model also suffers a –2 Weapon Skill penalty in hand-to-hand combat, but may still shoot normally. The model may try to free himself in the Recovery phase. If the model rolls a 4+ on a D6 he is freed and may move and fight normally.
+
+Bow
+
+Mordheim Rulebook (core)
+
+Cost: 10 gc
+Availability: Common
+
+The bow is carried by most races and used extensively in warfare. It is a compact yet powerful weapon, that is cheap to make and easy to maintain.
+
+Range: 24"
+Strength: 3
+Cathayan Candles
+
+Border Town Burning Supplement (1c)
+
+Cost: 25 + 1D6 gc
+Availability: Rare 9
+
+Cathayan Candles are explosive pots or sticks, made with black powder and other foreign ingredients. These volatile Bombas as peddled by Arabyan dealers, ‘usually' detonate on impact, igniting objects and bodies with which they make contact.
+
+Range: 6"
+Strength: 6
+Special Rules
+Thrown Weapon: A model using Cathayan candles does not suffer penalties for range or moving.
+
+Volatile: On a roll of 1 to hit, Cathayan candles explode in the throwers hand. Roll to wound treating the throwing model as the target.
+
+Set on Fire: If you hit with the Cathayan candles roll a D6. If you score a 5+ your opponent has been set on fire. They must roll a D6 in the Recovery phase and score a 4+ to put themselves out or they will suffer a Strength 4 hit and will be unable to do anything other than move for each turn they are on fire. Allies may also attempt to put the warrior out. They must be in base contact and need a 4+ to be successful.
+
+Crossbow
+
+Mordheim Rulebook (core)
+
+Cost: 25 gc
+Availability: Common
+
+A crossbow consists of a short, strong bowstave mounted on a wooden or steel stock. The crossbows of the Empire are made of steel and often include a winding mechanism to draw back the string. It takes a long time to prepare a crossbow, but a bolt fired from one has a tremendous range and can penetrate armour easily.
+
+Crossbows take much longer than other bows to make, so they are expensive and relatively rare weapons. Still, they are the preferred weapon of many in Mordheim because of their power and long range.
+
+Range: 30"
+Strength: 4
+Special Rules
+Move or Fire: You may not move and fire a crossbow on the same turn, other than to pivot on the spot to face your target or to stand up.
+
+Crossbow pistol
+
+Mordheim Rulebook (core)
+
+Cost: 35 gc
+Availability: Rare 9
+
+Crossbow pistols are masterpieces made by expert weaponsmiths. They are miniature crossbows with all the power and accuracy of the real thing. As these weapons may be easily concealed, they are the favoured weapon of assassins.
+
+Range: 10"
+Strength: 4
+Special Rules
+Shoot In Hand-To-Hand Combat: A model armed with a crossbow pistol may shoot it in the first round of a hand-to-hand combat and this shot is always resolved first, before any blows are struck. This shot has an extra -2 to hit penalty. Use model's Ballistic Skill to see whether it hits or not. ❓This bonus attack is in addition to any close combat weapon attacks.✏️
+
+Hand-To-Hand: Pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a pistol and another close combat weapon gains +1 Attack❓, which is resolved at Strength 4. This bonus attack can be used only once per combat. If you are firing a brace of pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model's Weapon Skill like any normal close combat attack and likewise may be parried.✏️ Successful hits are resolved at Strength 4, regardless of the firer's Strength.❓
+
+Elf Bow
+
+Mordheim Rulebook (core)
+
+Cost: 35 + 3D6 gc
+Availability: Rare 12
+
+Elven bows are the finest missile weapons of their kind. Constructed from ithilmar or wood from the Elf forests, with strings woven from the hair of Elf maidens, Elven bows are far superior to any missile weapons made by other races. In the hands of an Elven archer, the Elf bow is a truly potent weapon, its long range and penetrating power making it far superior to any bow made by humans.
+
+Range: 36"
+Strength: 3
+Special Rules
+Save Modifier: An Elf bow has a -1 save modifier on armour saves against it.
+
+Firepots Miragliano
+
+Lustrian Reavers (1c)
+
+Availability: Common
+
+These primitive hand grenades made of clay contain alchemic Tilean Fire which bursts into flames when exposed to air.
+
+Range: 8"
+Strength: 2
+Special Rules
+Awkward Thrown Weapon: Models using Firepots Miragliano do not suffer any penalties for range, but still suffer a -1 to hit penalty if they use them after moving that turn.
+
+Smoke: If the orb hits, the target suffers 1 S2 hit from the bursting flames, and in addition the model needs to roll under the Initiative at the start of its next turn in order to see through the smoke. If the model fails, it cannot charge or shoot until the beginning of its next turn, though can otherwise move or act normally, and fight in hand-to-hand combat.
+
+Fish-Hook Shot
+
+Border Town Burning (1c)
+
+Cost: 10 gc
+Availability: Rare 7 (Battle Monks of Cathay only)
+
+Range: 3"
+Strength: 3
+Special Rules
+Thrown Weapon: Models using a fish-hook shot do not suffer penalties for range or moving as it is designed for short-range use anyway.
+
+Precise: A model using a fish-hook shot is so well-trained in the use of this weapon that he may attack enemy models that are engaged in close combat. However, the hook shot is useless when the monk himself is engaged in close combat.
+
+Caused Fall: The warrior may declare to try and cause an enemy model to fall instead of causing damage. The warrior must roll to hit as normal and then pass a Strength test. If the test is successful, the enemy model counts as knocked down. Apply a +1 modifier to the Strength test against large models. When a mount gets knocked down, the rider falls off (see 3-4 on the Whoa Boy! table).✏️
+
+Harpoon Crossbow
+
+Border Town Burning supplement (1c)
+
+Cost: 50 gc
+Availability: Rare 10 (Maneaters only)
+
+Little more than a crude crossbow hybrid, scaled up for the sake of a titanic marksman.
+
+Range: 30"
+Strength: 5
+Special Rules
+Move or fire: May not move and fire in the same turn.
+
+Prepare shot: Requires a full turn to prepare before shooting.
+
+Javelins
+
+Town Cryer #23 (1b)
+
+Cost: 5 gc
+Availability: Common (Amazons (Mordheim), Norse Explorers, Pit Fighters only)
+
+Javelins are short throwing spears specially weighted to travel quite a distance. Although they have a much reduced range when compared to an arrow they can cause quite considerable damage when thrown by a person of great strength.
+
+Range: 8"
+Strength: As user
+Special Rules
+Thrown weapon: Javelins are thrown weapons and the warrior suffers no penalty for range or moving.
+
+Conflicting Source Material
+
+There are entries for Javelin in TC #11, #14, #21, #23 and Border Town Burning. In all those issues there are no less than four different versions for the javelins' thrown weapon special rule and range.
+
+It was decided to use the thrown weapon rule from the original rulebook (used by throwing knives, blessed water, net, etc), which ignores both moving and range. This is the same as the most recent version of Javelins.
+
+4 out of 5 sources used 8" range, so this was decided as the norm (only new Pit Fighters had 10", whereas the Norse, Lizardmen, old Pit Fighters, and Amazons all are 8").
+Long Bow
+
+Mordheim Rulebook (core)
+
+Cost: 15 gc
+Availability: Common
+
+A long bow is made of alternating layers of either yew or elm. A skilled archer can hit a chosen leaf on a tree from three hundred paces with this weapon.
+
+The long bow is favoured by experienced archers due to its great reach and accuracy.
+
+Range: 30"
+Strength: 3
+Nehekharan Javelins
+
+Town Cryer 18 (1b)
+
+Cost: 10 gc
+Availability: Common (Tomb Guardians Tomb Lord only)
+
+These warriors throw javelins equipped with a becket; a string wound around the javelin. When it is thrown, the Javelin spins like a bullet increasing its accuracy.
+
+Range: 8"
+Strength: As user
+Special Rules
++1 to hit: These javelins receive +1 to hit when thrown.
+
+Range and movement penalty
+
+Note that the original writing merely had a +1 to hit included. Normal javelins are thrown weapons and the warrior suffers no penalty for range or moving, it is suggested to combine the rules for a normal javelin with the +1 to hit.
+Repeater Crossbow
+
+Mordheim Rulebook (core)
+
+Cost: 40 gc
+Availability: Rare 8
+
+Repeater crossbows are extremely complex devices, expensive to acquire and difficult to make. While this makes them rare, they certainly have their uses: they can rain a deadly hail of bolts on enemies, and a warrior using one may move quite fast and still fire his weapon.
+
+Range: 24"
+Strength: 3
+Special Rules
+Fire twice: A model armed with a repeater crossbow may choose to fire twice per turn with an extra -1 to hit penalty on both shots.
+
+Short Bow
+
+Mordheim Rulebook (core)
+
+Cost: 5 gc
+Availability: Common
+
+Short bows are small, short-ranged bows that are cheap and require little strength to use. Some cavalry carry a shortened bow which is easier to shoot from horseback than a larger bow. Halflings also use short bows, as they lack the strength and height required to use a long bow.
+
+Range: 16"
+Strength: 3
+Sling
+
+Mordheim Rulebook (core)
+
+Cost: 2 gc
+Availability: Common
+
+Slings are rarely used, mainly because they are no more powerful than bows and have a shorter range. A sling is little more than a looped strip of cloth or leather into which a stone is placed. The sling is whirled about the slinger's head and the sling stone is then released towards the target.
+
+While this weapon is looked down upon by most archers, a skilled slinger can slay a man from a considerable distance, and the ammunition is easy to find: rocks are everywhere and free!
+
+Range: 18"
+Strength: 3
+Special Rules
+Fire twice at half range: A slinger may fire twice in the shooting phase if he does not move in the movement phase. He cannot shoot over half range (9") though, if he fires twice.❓ If the model fires twice then each shot is at -1 to hit.✏️
+
+Sun Gauntlet
+
+Town Cryer #23 (1b)
+
+Cost: 40 gc
+Availability: Rare 12 (Amazons (Mordheim) only)
+
+This, as with all strange arcane Amazon items, is made from an unknown multicoloured metal that is impervious to damage or corrosion. It is covered in strange runes and a bright gemstone is set into the hilt. In many ways this weapon resembles a blackpowder pistol. It can be held in one hand and when pointed at an enemy unleashes a blinding beam of energy like the Sunstaff.
+
+Range: 12"
+Strength: 4
+Special Rules
+Accurate: The Sun Gauntlet does not suffer the usual -1 modifier to hit for long range.
+
+No Save: The beam from a Sun Gauntlet can literally cut through anything. A warrior wounded by a Sun Gauntlet receives no armour save whatsoever.
+
+Hand-To-Hand: The Sun Gauntlet can be used with another close combat weapon in hand-to-hand combat with Strength 4 and no armour save. Because it does not require prepared shot, this bonus attack may be used in each turn of combat.
+
+Sunstaff
+
+Town Cryer #23 (1b)
+
+Cost: 50 gc
+Availability: Rare 12 (Amazons (Mordheim) only)
+
+The Sunstaff is a long tubular stick that is made from a strange multicoloured metal with one end hollow like a tube. Strange runes are carved along its length and a large gemstone is set into the pommel. Despite being extremely ancient (Elf Loremasters of the White Tower of Hoeth claim to have found a similar device that they surmise is more than 20,000 years old – older than the Elven race itself!), the wielder of the Sunstaff can discharge a beam of energy akin to the rays of the sun.
+
+Range: 24"
+Strength: 4
+Special Rules
+Accurate: The Sunstaff does not suffer the usual -1 modifier to hit for long range.
+
+No Save: The beam from a Sunstaff can literally cut through anything. A warrior wounded by a Sunstaff receives no armour save whatsoever.
+
+Sunstaff (Lustria)
+
+Town Cryer #15 (1b)
+
+Cost: 35 gc
+Availability: Rare 10 (Amazons (Lustria) only)
+
+The Sunstaff is a long staff made from a strange multicoloured metal with one end hollow like a tube. Strange runes are carves along its length and a large gemstone is set into the pommel.
+
+Range: 12" / Close Combat
+Strength: As user
+Special Rules
+Sunbolt: The wielder of the sunstaff can discharge a beam of energy in the shooting phase that is akin to rays of the sun. The Sunbolt has a range of 12" and hits at Strength 4. Aside from ward and dodge saves a Sunbolt ignores armour saves and penalties for long range.
+
+Throwing Knives/Stars
+
+Mordheim Rulebook (core)
+
+Cost: 15 gc
+Availability: Rare 5
+
+Throwing stars are used mainly by the assassins of the sinister House of Shadows, or by street thugs who specialise in ambushing the unwary. A perfectly balanced knife thrown from behind has ended the life of many a noble and merchant in Mordheim. Throwing knives are not suitable for close combat, as their balance makes them unwieldy in close quarters.
+
+Range: 6"
+Strength: As user
+Special Rules
+Thrown Weapon: Models using throwing stars or knives do not suffer penalties for range or moving as these weapons are perfectly balanced for throwing. They cannot be used in close combat.
+
+Tufenk
+
+Khemri setting, Town Cryer #17 (1b)
+
+Cost: 15 gc
+Availability: Rare 10
+
+This is a blowpipe that projects alchemical fire about eight feet causing burning damage.
+
+Range: 8"
+Strength: 2
+Special Rules
+Fire: If you hit roll a D6, on a 4+ your opponent is set on fire. They must roll a D6 each Recovery phase, on a 4+ they extinguish the fire or they immediately suffer a S4 hit and may only move. Friendly models may help in extinguishing the model that is ablaze. They must be in base-to-base contact and need to roll a 4+ on a D6. Against dry targets like Mummies they are Strength 3 and on a 2+ on 1D6 the Mummy catches fire.
+
+Prepare Shot: The Tufenk takes a complete turn to reload❓, so your model may only fire every other turn.

@@ -160,3 +160,41 @@ actions, actions call render). Splitting them further would be high-effort,
 low-reward, so the modularization pauses here by choice rather than pushing a
 split that costs more than it returns. Future energy goes to features (e.g.
 the Rare Items / Trading Post work on the roadmap).
+
+## July 17, 2026 — Rare Items: test coverage + catalogue audit
+
+Turned attention from restructuring to hardening the most complex existing
+feature. The Rare Items / Trading Post system (a catalogue with an eligibility
+rule) was implemented but untested and, it turned out, incomplete.
+
+- **Eligibility test** (`test/rare-items.mjs`): pinned down the core rule —
+  a unit may only take a rare item whose base category is in its starting
+  equipment list — against real warband data (an Averland Captain with heavy
+  armour + spear may take those rare items; a Carnival Brute with only
+  two-handed + flail may not take heavy armour), plus the misc-is-heroes-only
+  gate and the cost summation.
+
+- **Catalogue audit**: extracted every item from the mordheimer.net
+  weapon/armour/equipment reference pages and diffed against the catalogue.
+  After filtering out name-variants (Belaying Pins ↔ Belaying pin, etc.), 20
+  genuine gaps remained — almost all from the Border Town Burning (1c)
+  supplement (ladders, smoke bombs, wolfcloak, wyrdstone pendulum, and so on,
+  plus Lamellar Armour). Added all 20 with their cost/rarity/warband
+  restrictions, reusing the existing string-cost format for the dice-based
+  prices ("20+4D6"). Catalogue went 224 → 244 items.
+
+- **Completeness guard** (`test/catalogue-complete.mjs`): the reference pages
+  are now checked in as fixtures, and the test fails if the catalogue ever
+  drops below them — with a curated allow-list for intentional variants so it
+  doesn't cry wolf.
+
+- **Verification pass** against the live mordheimer.net Border Town Burning
+  "Spoils of War" price chart (Jun 2026) caught four mistakes in the freshly
+  added items before they were committed: Spider Spittle's dice cost
+  (30+1D6 → 30+D6), Winter Furs' restriction wording, Wolfcloak's rarity
+  (it's "Special", not a numbered Rare value) and warband list, and Trade
+  Wagon — which turned out not to be a purchasable Trading Post item at all
+  but a Merchant-Caravan vehicle rule, so it was removed and allow-listed in
+  the completeness test. Catalogue settled at 243 items.
+
+Test suite: 10 files, all green.

@@ -165,6 +165,8 @@ node build.js             # builds the single file
 | `blessings.mjs`      | Blessing of Nurgle / Chaos Mutation English names match the official mordheimer.net names, and every one resolves to an ability tooltip. |
 | `pdf-order.mjs`      | PDF export lists heroes/henchmen in the warband's fixed roster order, not recruitment order. |
 | `state-module.mjs`   | The `S`/`uid` live-binding contract between `state.js` and `app.js` (replaceState, nextUid, resyncUid) actually holds. |
+| `rare-items.mjs`     | The Trading Post eligibility rule: a unit may only take a rare item whose base category is in its start list (verified for a heavy-armour hero vs. an armour-less unit); `rareEligibleItems` never offers forbidden categories; `rareCost` sums correctly. |
+| `catalogue-complete.mjs` | Every item on the mordheimer.net weapon/armour/equipment reference pages (checked in under `test/fixtures/`) is present in the catalogue; known name-variants are allow-listed with notes. |
 | `engine.mjs`         | `app.js` re-exports the exact engine functions from `engine.js`; the cost pipeline (unitDef → eqCost → modelUnitCost → totals) produces the right numbers end-to-end, and the armour-save maths (svFromText/svOfModel/svLabel) parse saves correctly (incl. not mistaking a stun save for an armour save). |
 | `info.mjs`           | `app.js` re-exports the info-lookup functions from `info.js`; item/ability/spell/skill names resolve to their tooltips (incl. the Blessing of Nurgle rules) and `itipBuild` composes the tooltip HTML. |
 | `parity.mjs`         | The modular version and the built single-file produce identical results for the same action sequence — so the build (deModule, concatenation order) never silently changes behaviour vs. the sources. `test/run.mjs` rebuilds `dist/` first so this always checks a current bundle. |
@@ -182,10 +184,23 @@ rules in mind: `data/houserules.json` and the house-rule checkboxes in the UI
 let deviations be toggled per group and get recorded automatically on export,
 rather than being hard-coded into the rules logic.
 
-## Roadmap
+## Status & roadmap
 
-- Remaining warband audits against mordheimer.net
-- Rare Items / Trading Post feature (eligibility: a unit may only equip a
-  rare/magic item whose base category appears in its starting equipment list)
+Done:
+
+- All 49 warbands audited against mordheimer.net (no pending entries)
+- Rare Items / Trading Post implemented — a 243-item catalogue with rarity
+  values and the category-eligibility rule (a unit may only take a rare/magic
+  item whose base category is in its starting equipment list), audited for
+  completeness against the mordheimer.net weapon/armour/equipment pages
+  (see `test/catalogue-complete.mjs`)
+- GitHub Pages hosting of the modular version (auto-deployed on push)
+
+Open / possible next steps:
+
 - Further Tabletop Simulator export refinements
-- GitHub Pages hosting of the built output
+- Dice-cost items (e.g. "20 + 4D6 gc") are stored as strings; the roster total
+  currently can't evaluate them numerically — a future improvement could roll
+  or range them
+- Surfacing the rarity value in the Trading Post UI (currently stored but not
+  shown), and an availability-roll helper for campaign play
