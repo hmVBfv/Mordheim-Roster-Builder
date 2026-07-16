@@ -1,73 +1,163 @@
 # Mordheim Roster Builder
 
-Warband-Builder für Mordheim mit Kampagnen-Layer, TTS-Export und Befüllung des
-offiziellen freebooters.org-Rostersheets.
+A warband builder for Mordheim (the Games Workshop skirmish game), with a
+campaign layer, Tabletop Simulator export, and official roster-sheet PDF
+export. Built for actual play with a regular group, not as a demo.
 
-## Struktur
+**Not affiliated with Games Workshop or with the original designers/publishers
+of any of the community rules referenced below.** This is a fan-made tool.
+Mordheim and all associated names are the property of Games Workshop.
+
+## Sources of truth
+
+Rule authority, highest first:
+
+1. **[mordheimer.net](https://mordheimer.net)** ("The New Mordheimer") — the
+   primary reference for warband rosters, stats, costs and equipment lists.
+   If a rule doesn't appear there, it doesn't go in this tool.
+2. **Ultimate FAQ** and **FAQ from Toumas** — override mordheimer.net whenever
+   they clarify or correct a rule; every change is checked against both.
+3. The original Mordheim rulebook and supplements (via
+   **[Broheim.net](https://broheim.net)**'s PDF archive), for anything not yet
+   covered by the above.
+
+Where mordheimer.net's unit table and its prose text disagree, the table
+(plus any annotation) wins. Thanks to the maintainers of mordheimer.net and
+Broheim.net for keeping these rules alive and accessible.
+
+## Project history
+
+See [`HISTORY.md`](HISTORY.md) for how this tool actually grew — from a single
+HTML file to a modular, tested codebase — including the bugs that turned up
+along the way and why certain design decisions were made.
+
+## Structure
 
 ```
-index.html          Markup + CSS (keine Logik)
-js/app.js           Kern: Zustand, Engine, Rendering
-js/pdf.js           PDF-Export (offizielles Rostersheet)
-js/tts.js           Tabletop-Simulator-Export
-data/*.json         Spieldaten als JSON — sprachunabhängig, auch von
-                    anderen Werkzeugen lesbar (z. B. einem TTS-Lua-Skript)
-data/index.js       Loader: holt die JSON, wandelt Regex-Felder zurück
-data/_util.js       kleine Helfer (Profil-Konstruktor)
-vendor/             pdf-lib
-assets/sheet.pdf    offizielles Rostersheet (Vorlage für den PDF-Export)
-build.js            baut daraus EINE eigenständige HTML
-dist/               Ergebnis des Builds
+index.html            Markup + CSS (no logic)
+js/state.js             Warband state (S), model-id counter, house-rule defaults
+js/engine.js            Pure rules & cost calculation (no DOM)
+js/app.js               Rendering + UI actions (still to be split further)
+js/pdf.js               PDF export (official roster sheet)
+js/tts.js               Tabletop Simulator export
+data/*.json            Game data as JSON — language-independent, readable by
+                       other tools too (e.g. a TTS Lua script)
+data/index.js            Loader: fetches the JSON, revives regex fields
+data/_util.js            small helpers (profile constructor)
+vendor/                 pdf-lib
+assets/sheet.pdf         official roster sheet (template for the PDF export)
+build.js                 bundles everything into ONE self-contained HTML file
+dist/                    build output
+test/                    automated regression tests (see below)
 ```
 
-**Quelle der Wahrheit sind die Dateien in `data/` und `js/`.** `dist/` wird
-generiert — dort niemals von Hand editieren.
+**The files in `data/` and `js/` are the source of truth.** `dist/` is
+generated — never edit it by hand.
 
-`js/pdf.js` und `js/tts.js` importieren Helfer aus `js/app.js` (zyklischer Import;
-funktioniert, weil Funktions-Deklarationen gehoistet werden). Neue Logik-Module in
-`build.js` unter `JS_FILES` eintragen.
+`js/app.js` imports `S` and the house-rule helpers from `js/state.js`, and
+`js/state.js` imports `render` back from `js/app.js` — a circular import,
+same as the existing one between `app.js`/`pdf.js`/`tts.js`. This works
+because `render` is only ever called from inside a function body, never at
+module-evaluation time. **`S` itself must never be reassigned (`S = {...}`)
+from outside `state.js`** — ES module imports are live but read-only
+bindings, so that throws. Use `replaceState(newState)` instead; it swaps the
+contents of `S` while keeping the same object reference alive for every
+module that imported it. Everyday property mutation (`S.foo = …`) is fine
+from anywhere.
 
-## Entwickeln
+Register any new logic module in `build.js` under `JS_FILES` — `state.js`
+must stay first in that list, then `engine.js`, since the single-file build
+concatenates everything into one flat script and `let S`/`let uid` and the
+pure engine functions need to be declared before app.js's own top-level code
+runs.
 
-Ein Server ist nötig (ES-Module laufen nicht über `file://`):
+`js/engine.js` holds the pure rules & cost calculation (unit lookup,
+equipment/mutation/rare-item costs, totals, gold, rating) — no DOM. It
+imports a few helpers back from `app.js` (item-family lookup, campaign
+district effects, Hired-Sword totals); `app.js` in turn imports the engine
+functions and re-exports them so the inline `onclick` handlers still reach
+them. Same live-binding circular-import pattern as everywhere else.
+
+## Running the tool — two equally valid ways
+
+**The modular version and the single-file build behave identically** (a test,
+`parity.mjs`, enforces this). Use whichever fits the moment:
+
+### A) Modular, straight from `data/` and `js/` — no build step
+
+This is the "edit a stat in JSON, reload, done" workflow. Start any static
+web server in the repo root and open it in a browser:
 
 ```bash
-python3 -m http.server 8000      # dann http://localhost:8000
+python3 -m http.server 8000      # then open http://localhost:8000
 ```
 
-## Single-File bauen
+Change a value in `data/*.json`, save, **reload the page** — the change is
+live. No `node build.js` needed; the browser fetches the JSON fresh each load.
+
+Why a server and not just double-clicking `index.html`? The modular version
+loads its data with `fetch(...)`, and browsers block `fetch` over the
+`file://` protocol for security. A local server serves everything over
+`http://localhost`, which is allowed. Any static server works (Python above,
+`npx serve`, VS Code "Live Server", etc.) — nothing gets installed or
+uploaded, it's purely local.
+
+### B) Single-file build — runs by double-click, no server
 
 ```bash
 node build.js                    # -> dist/mordheim-roster.html
 ```
 
-Die gebaute Datei läuft **ohne Server** per Doppelklick und lässt sich als eine
-Datei weitergeben. Der GitHub-Workflow baut sie bei jedem Push automatisch.
+`dist/mordheim-roster.html` opens by double-click (`file://` is fine here,
+because the data is baked in as a constant instead of fetched) and can be
+handed to someone as one file — Discord, USB stick, email. Rebuild it after
+editing data if you want the standalone file to reflect the change. The
+GitHub Actions workflow builds it automatically on every push.
 
-## Datenquellen
+## Editing data
 
-Reihenfolge der Autorität: **mordheimer.net → Ultimate FAQ → FAQ (Toumas) → Regelbuch.**
-Nichts wird eingetragen, was sich dort nicht belegen lässt.
+Game data lives in **JSON** (`data/*.json`) — plain tables, no code.
 
+Two conventions JSON itself can't express:
 
-## Daten bearbeiten
-
-Die Spieldaten sind **JSON** (`data/*.json`) — reine Tabellen, ohne Code.
-
-Zwei Konventionen, die JSON selbst nicht abbilden kann:
-
-* **Regex** wird als `{"__re": "muster", "__f": "flags"}` gespeichert und beim
-  Laden zu einem `RegExp` gemacht (siehe `data/index.js`).
-* **Profile** stehen ausgeschrieben: `{"M":4,"WS":3,"BS":3, …}`.
+* **Regex** is stored as `{"__re": "pattern", "__f": "flags"}` and turned into
+  a real `RegExp` on load (see `data/index.js`).
+* **Profiles** are spelled out explicitly: `{"M":4,"WS":3,"BS":3, …}`.
 
 ## Tests
 
 ```bash
-node test/smoke.mjs      # lädt die modulare Version wie im Browser
-node build.js            # baut die Single-File
+node test/run.mjs        # runs every test/*.mjs and prints a pass/fail summary
+node build.js             # builds the single file
 ```
 
-Der Smoke-Test fängt Fehler, die im Single-File-Build **nicht** auffallen —
-etwa doppelte Funktionsdeklarationen oder Importe auf nicht exportierte Namen.
-(Im klassischen `<script>` gewinnt die letzte Deklaration; ein ES-Modul lehnt
-sie ab.)
+| File                | Checks |
+| ------------------- | ------ |
+| `smoke.mjs`          | The modular version loads cleanly (catches duplicate declarations, imports of non-exported names — errors the single-file build hides, because a classic `<script>` silently lets the last declaration win where an ES module would reject it). |
+| `data-integrity.mjs` | Every warband/Hired Sword/Dramatis Personae entry resolves; no duplicate unit ids within a warband; regex fields are revived to real `RegExp` objects. |
+| `blessings.mjs`      | Blessing of Nurgle / Chaos Mutation English names match the official mordheimer.net names, and every one resolves to an ability tooltip. |
+| `pdf-order.mjs`      | PDF export lists heroes/henchmen in the warband's fixed roster order, not recruitment order. |
+| `state-module.mjs`   | The `S`/`uid` live-binding contract between `state.js` and `app.js` (replaceState, nextUid, resyncUid) actually holds. |
+| `engine.mjs`         | `app.js` re-exports the exact engine functions from `engine.js`, and the cost pipeline (unitDef → eqCost → modelUnitCost → totals) produces the right numbers end-to-end. |
+| `parity.mjs`         | The modular version and the built single-file produce identical results for the same action sequence — so the build (deModule, concatenation order) never silently changes behaviour vs. the sources. `test/run.mjs` rebuilds `dist/` first so this always checks a current bundle. |
+
+Earlier development also relied on a larger set of ad-hoc logic tests run
+directly against the built single-file HTML during working sessions (audit
+checks per warband, cost calculations, etc.). Those never made it into the
+repo as files — this `test/` folder is where new regression tests belong from
+now on, so fixes stay verifiable and don't silently regress.
+
+## House rules
+
+The tool follows official rules strictly by default, but is built with house
+rules in mind: `data/houserules.json` and the house-rule checkboxes in the UI
+let deviations be toggled per group and get recorded automatically on export,
+rather than being hard-coded into the rules logic.
+
+## Roadmap
+
+- Remaining warband audits against mordheimer.net
+- Rare Items / Trading Post feature (eligibility: a unit may only equip a
+  rare/magic item whose base category appears in its starting equipment list)
+- Further Tabletop Simulator export refinements
+- GitHub Pages hosting of the built output

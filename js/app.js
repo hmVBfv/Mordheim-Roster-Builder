@@ -4,6 +4,11 @@
 import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, NR_CAT, NR_T, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
 import { exportOfficialSheet, defaultWarbandName } from './pdf.js';
 import { ttsOpen, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
+/* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
+   render/action code below can call it, and re-exported so the window bindings
+   at the bottom still expose these to inline onclick handlers. */
+import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, _stripParen } from './engine.js';
+export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, _stripParen };
 
 /* ===================== DATA ===================== */
 // equipment item: [name, cost]  (cost in gc)
@@ -569,38 +574,9 @@ export function hsSetName(uid,v){ const h=hsList().find(x=>x.uid===uid); if(h){ 
 
 
 
-/* ===================== STATE ===================== */
-export let S={wb:null, subtype:null, name:"", budget:500, models:[]};
-export let uid=1;
-
-/* ===================== HAUSREGELN (House Rules) ===================== */
-export function houseDefaults(){ return {startGold:'',min:'',max:'',heroes:6,priceAll:100,priceArmour:100,priceBP:100,priceMissile:100,clubSurcharge:0,slingSurcharge:0,armourBodyOnly:false,freeDagger:false,miscHench:false,freeMarket:false,allSkills:false,showRarity:false,rangedCapOn:false,rangedCap:0,rerollOne:false,eqLimitOn:true,hsGrades:{'1a':true,'1b':true,'1c':true,'2a':true},dpGrades:{core:true,'1a':true,'1b':true,'1c':true,'2a':true},hsEquip:false,notes:''}; }
-export function HR(){ if(!S.house) S.house=houseDefaults(); else for(const k in houseDefaults()) if(!(k in S.house)) S.house[k]=houseDefaults()[k]; return S.house; }
-export function houseActive(){ const h=HR(),d=houseDefaults(); for(const k in d){ if(String(h[k])!==String(d[k])) return true; } return false; }
-export function setHouseNum(k,v){ HR()[k]=(v===''||v==null)?'':Math.max(0,Number(v)||0); render(); }
-export function setHouseBool(k,v){ HR()[k]=!!v; render(); }
-export function setHouseStr(k,v){ HR()[k]=v||''; render(); }
-export function setHouseNotes(v){ HR().notes=String(v); const el=document.getElementById('notesprint'); if(el){ el.textContent=v?('House rules / notes: '+v):''; el.style.display=v?'':'none'; } }
-export function resetHouse(){ S.house=houseDefaults(); render(); }
-export function adjPrice(nm,pr){ const h=HR(); if(typeof pr!=='number') return pr; const fam=itemFamily(nm);
-  let mult=(Number(h.priceAll)||100)/100;
-  if(['pistol','longgun','swivel'].includes(fam)) mult*=(Number(h.priceBP)||100)/100;
-  else if(['bow','crossbow','sling','thrown','blowpipe','sunweapon'].includes(fam)) mult*=(Number(h.priceMissile)||100)/100;
-  else if(['lightarmour','heavyarmour','toughenedleathers','gromrilarmour','ithilmararmour','chaosarmour','barding'].includes(fam)) mult*=(Number(h.priceArmour)||100)/100;
-  else if(['shield','buckler','helmet'].includes(fam) && !h.armourBodyOnly) mult*=(Number(h.priceArmour)||100)/100;
-  let p=Math.round(pr*mult);
-  if(fam==='blunt') p+=Number(h.clubSurcharge)||0;
-  if(fam==='sling') p+=Number(h.slingSurcharge)||0;
-  if(p>0 && typeof itemHalfActive==='function' && itemHalfActive(nm)) p=Math.floor(p*0.5);
-  return Math.max(0,p);
-}
-
-/* ============================================================================
-   DRAMATIS PERSONAE (Core + Grade 1a) — nutzt WBHIRE + hsHireRuleAllows +
-   hireEligibility(TABLE) + statTableHS/hsAbilitySection/ttsTextHS mit.
-   DP: kein XP, einzigartig (1 je Charakter), eigene Ausrüstung, Hire+Upkeep
-   nach jeder Schlacht, zählen NICHT zur Modell-/Heldenzahl (aber zum Rating).
-   ========================================================================== */
+/* ===================== STATE (see js/state.js) ===================== */
+import { S, uid, nextUid, resyncUid, replaceState, houseDefaults, HR, houseActive, setHouseNum, setHouseBool, setHouseStr, setHouseNotes, resetHouse } from './state.js';
+export { S, uid, nextUid, resyncUid, replaceState, houseDefaults, HR, houseActive, setHouseNum, setHouseBool, setHouseStr, setHouseNotes, resetHouse };
 
 
 
@@ -712,9 +688,6 @@ export function priceMod(kind,key){ let mult=1;
   return mult; }
 export function itemHalfActive(en){ if(!en) return false; const nz=x=>String(x).toLowerCase().replace(/[^a-z0-9]/g,'');
   const t=nz(en); for(const eff of activeDistrictEffects()){ if(eff.kind==='itemHalf'){ for(const k of (eff.keys||[])){ if(nz(k)===t) return true; } } } return false; }
-export function hireCostOf(TABLE,key){ const e=TABLE[key]; if(!e) return 0; return Math.floor((e.hire||0)*priceMod('hire',key)); }
-export function hsHireCost(key){ return hireCostOf(HIREDSWORDS,key); }
-export function dpHireCost(key){ return hireCostOf(DRAMATIS,key); }
 export function hireDiscounted(key){ const anyTab=HIREDSWORDS[key]||DRAMATIS[key]; return anyTab && priceMod('hire',key)<1; }
 
 export function renderCampaign(){
@@ -832,7 +805,7 @@ export function renderPicker(){
   });
 }
 export function chooseWb(key){
-  S={wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:"", budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}};
+  replaceState({wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:"", budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}});
   document.getElementById('picker-view').style.display='none';
   document.getElementById('builder-view').style.display='block';
   document.getElementById('wbname').value='';
@@ -930,28 +903,12 @@ export function pickSub(k){
 }
 
 /* ===================== ADD / REMOVE ===================== */
-export function unitDef(id){return WARBANDS[S.wb].units.find(u=>u.id===id);}
-export function countOf(id){return S.models.filter(m=>m.uid_def===id).length;}
-export function modelsOf(id){const def=unitDef(id); if(def.t==='hero') return countOf(id);
-  return S.models.filter(m=>m.uid_def===id&&!m.promoted).reduce((s,m)=>s+(m.qty||1),0);}
 /* --- Subtyp-Effekte (Marauder-Stämme) --- */
-export function unitMax(def){ if(S.wb==='maraudersofchaos'&&S.subtype==='kurgan'&&def.id==='warhound') return null; return def.max; }
-export function warbandMax(){ const h=HR(); if(h.max!==''&&h.max!=null) return Number(h.max); const wb=WARBANDS[S.wb]; if(S.wb==='maraudersofchaos'&&S.subtype==='hung') return 12; let mx=wb.max; if(S.wb==='carnival'&&(S.models||[]).some(m=>m.uid_def==='cart')) mx+=2; mx+= (typeof hsSizeBonus==='function'?hsSizeBonus():0); return mx; }
-export function eqListFor(def){ let list=LISTS[def.eq]; if(!list) return list;
-  if(S.wb==='maraudersofchaos'&&S.subtype==='kurgan'&&(def.eq==='marChaosHero'||def.eq==='marChaosHench')){
-    list=JSON.parse(JSON.stringify(list)); list.Fernkampf=list.Fernkampf||[];
-    if(!list.Fernkampf.some(x=>x[0]==='Bogen')) list.Fernkampf.push(['Bogen',10]);
-  } return list; }
 // Core rule: up to 2 close combat weapons (besides the free dagger) + up to 2 missile weapons (a brace of pistols = 1).
-export function eqWeaponLimit(m){ const def=unitDef(m.uid_def); const list=def?eqListFor(def):null; if(!list) return {cc:0,missile:0};
-  let cc=0,missile=0;
-  (list.Nahkampf||[]).forEach(([nm])=>{ const q=Number(m.eq[nm])||0; if(!q) return; cc += (nm.indexOf('1. gratis')>=0)?Math.max(0,q-1):q; });
-  (list.Fernkampf||[]).forEach(([nm])=>{ const q=Number(m.eq[nm])||0; if(!q) return; missile += (BRACE_PLURAL[nm]&&q>=2)?1:q; });
-  return {cc,missile}; }
 export function addUnit(id){
   const def=unitDef(id); const mx=unitMax(def);
   if(mx!==null && modelsOf(id)>=mx) return;
-  S.models.push({uid:uid++, uid_def:id, name:def.name, exp:def.exp, qty:def.t==='hen'?1:1, eq:{}, rare:{}, mut:[], adv:{}, skills:[], inj:[], spells:[]});
+  S.models.push({uid:nextUid(), uid_def:id, name:def.name, exp:def.exp, qty:def.t==='hen'?1:1, eq:{}, rare:{}, mut:[], adv:{}, skills:[], inj:[], spells:[]});
   if(typeof ensureFreeDagger==='function') ensureFreeDagger(S.models[S.models.length-1]);
   render();
 }
@@ -959,128 +916,20 @@ export function removeUnit(u){ S.models=S.models.filter(m=>m.uid!==u); render();
 
 /* ===================== COST ===================== */
 // Nuln-Paarpreise lt. NC-Liste
-export function eqCost(m){
-  const def=unitDef(m.uid_def); if(!def.eq) return 0;
-  let c=0; const list=eqListFor(def); const h=HR();
-  for(const cat in list) for(const [nm,pr] of list[cat]){
-    const qty=Number(m.eq[nm])||0; if(!qty) continue;
-    const price=adjPrice(nm,pr);
-    if(nm.startsWith("Dolch")){ if(h.freeDagger) c+=0; else c+=Math.max(0,qty-1)*price; } // erster Dolch gratis (Hausregel: alle gratis)
-    else if(S.wb==="gunnery"&&GSN_BRACE[nm]&&qty>=2){ const pairs=Math.floor(qty/2); c+=pairs*adjPrice(nm,GSN_BRACE[nm])+(qty%2)*price; }
-    else c+=qty*price;
-  }
-  return c;
-}
-export function mutKindFor(m){ const def=unitDef(m.uid_def); if(def.mut) return def.mut; if((m.skills||[]).some(sk=>/^mutant\b/i.test(String(sk)))) return 'chaos'; return null; }
-export function mutCost(m){
-  const def=unitDef(m.uid_def); const kind=mutKindFor(m);
-  if(!kind || !m.mut || !m.mut.length) return 0;
-  const set=MUTSETS[kind]||MUTATIONS;
-  // cheapest config for player: most expensive at single price, rest doubled
-  const prices=m.mut.map(nm=>{const e=set.find(x=>x[0]===nm); return e?e[1]:0;}).sort((a,b)=>b-a);
-  let c=prices[0]||0; for(let i=1;i<prices.length;i++) c+=prices[i]*2;
-  return c;
-}
-export function heirloomDiscount(m){ if(S.wb!=='kislev') return 0; const def=unitDef(m.uid_def); if(!def||def.id!=='capt') return 0; const nm=m.heirloom; if(!nm||!(m.eq&&m.eq[nm]>0)) return 0; const L=eqListFor(def); for(const c in L){ const it=(L[c]||[]).find(x=>x[0]===nm); if(it) return Math.floor(it[1]/2); } return 0; }
 export function setHeirloom(u,v){ const m=S.models.find(x=>x.uid===u); m.heirloom=v||null; render(); }
-export function unitBaseCost(def){ let c=def.cost;
-  if(typeof activeDistrictEffects==='function'){ for(const eff of activeDistrictEffects()){ if(eff.kind==='unitCost' && eff.map && eff.map[def.id]!=null) c=eff.map[def.id]; } }
-  return c; }
-/* Gratis-Dolch: Jede Einheit erhält automatisch den ersten Dolch gratis, sofern sie
-   ihn laut Ausrüstungsliste überhaupt führen darf. Einheiten ohne Dolch in der Liste
-   (z. B. Flagellants, Tiere, waffenlose Kreaturen) bekommen laut RAW KEINEN. */
-export function daggerNameFor(def){ if(!def||!def.eq) return null;
-  const list=eqListFor(def); if(!list) return null;
-  for(const cat in list) for(const it of list[cat]){ if(/^Dolch/i.test(it[0])) return it[0]; }
-  return null; }
-export function ensureFreeDagger(m){ const def=unitDef(m.uid_def); const nm=daggerNameFor(def);
-  if(!nm) return false;                       // darf keinen Dolch führen -> keiner
-  if(m._noDagger) return false;               // vom Spieler entfernt
-  if(!m.eq) m.eq={};
-  if(!m.eq[nm]) { m.eq[nm]=1; return true; }
-  return false; }
-export function applyFreeDaggers(){ let ch=false; (S.models||[]).forEach(function(m){ if(ensureFreeDagger(m)) ch=true; }); return ch; }
-export function modelUnitCost(m){ // cost for ONE model of this entry
-  const def=unitDef(m.uid_def);
-  return unitBaseCost(def) + eqCost(m) + mutCost(m) + rareCost(m) - heirloomDiscount(m);
-}
 /* --- Rare Items / Trading Post (Katalog-gefiltert) --- */
-export function _stripParen(s){ return String(s).replace(/\s*\([^)]*\)\s*/g,' ').trim(); }
-export function rareCost(m){ const r=m.rare||{}; let c=0; for(const de in r){ c+=(Number(r[de].q)||0)*(Number(r[de].paid)||0); } return c; }
-export function catalogDefaultPaid(item){ if(!item) return 0; let v;
-  if(typeof item.cost==='number') v=item.cost;
-  else { const s=String(item.cost); if(/×|x\s*Preis|Preis/i.test(s)) v=0; else { const mt=s.match(/\d+/); v=mt?Number(mt[0]):0; } }
-  if(v>0 && typeof itemHalfActive==='function' && itemHalfActive(item.en)) v=Math.floor(v*0.5);
-  return v; }
 /* --- Waffen-Upgrades (Dark Elf Blade, Dark Venom, Gromril/Ithilmar/Obsidian) --- */
 
 
-export function isUpgrade(de){ return !!UPGRADES[de]; }
-export function eqWeaponsOf(m){ const def=unitDef(m.uid_def); if(!def||!def.eq) return []; const list=eqListFor(def); const out=[];
-  if(list.Nahkampf) for(const [nm,pr] of list.Nahkampf){ if((Number(m.eq[nm])||0)>0) out.push({nm,price:pr,fam:itemFamily(nm)}); }
-  return out; }
-export function upgradeTargets(m,de){ const u=UPGRADES[de]; if(!u) return []; return eqWeaponsOf(m).filter(w=>u.fams.includes(w.fam)); }
-export function upgradePaid(m,de,targetNm){ const u=UPGRADES[de]; if(!u) return 0;
-  let paid;
-  if(u.mult){ const w=eqWeaponsOf(m).find(x=>x.nm===targetNm); let mu=u.mult; if(de==="Gromril-Waffe"&&(S.wb==="dwarftreasure"||S.wb==="dwarfrangers")) mu=3; paid=w?mu*w.price:0; }
-  else paid=u.base;
-  if(paid>0 && typeof itemHalfActive==='function' && itemHalfActive(de)) paid=Math.floor(paid*0.5);
-  return paid; }
 // Flat upgrades (mult 0, e.g. Dark Elf Blade / Dark Venom) are shown INLINE next to the weapon,
 // not in the Rare/Trading-Post section. inlineUpgradeActive = flat + warband matches current warband.
-export function inlineUpgradeActive(de){ const u=UPGRADES[de]; return !!(u && !u.mult && (!u.wb || u.wb.indexOf(S.wb)>=0)); }
-export function weaponUpgradesFor(m,nm){ const def=unitDef(m.uid_def); if(!def) return [];
-  const isHero=def.t==='hero'||m.promoted; const fam=itemFamily(nm); const out=[];
-  for(const de in UPGRADES){ const u=UPGRADES[de];
-    if(u.mult) continue;                              // material upgrades stay in the trading post
-    if(u.heroesOnly && !isHero) continue;
-    if(u.wb && u.wb.indexOf(S.wb)<0) continue;         // warband-specific (e.g. Dark Elf blade = Dark Elves)
-    if(u.fams.indexOf(fam)<0) continue;               // only weapons this upgrade can modify
-    out.push({de,u}); }
-  return out; }
 export function toggleWeaponUpgrade(uid,de,nm,on){ const m=S.models.find(x=>x.uid===uid); if(!m) return; m.rare=m.rare||{};
   if(on) m.rare[de]={q:1,on:nm,paid:(UPGRADES[de]&&UPGRADES[de].base)||0}; else delete m.rare[de];
   render(); }
-export function rareEligibleItems(m){ const def=unitDef(m.uid_def); if(!def||!def.eq) return [];
-  const list=eqListFor(def); const have=new Set(); const h=HR();
-  if(list) for(const cat in list) for(const [nm] of list[cat]) have.add(_stripParen(nm).toLowerCase());
-  const isHero=def.t==='hero'||m.promoted;
-  return CATALOG.filter(it=>{
-    if(def.noArmour && it.cat==='armour') return false;
-    if(def.noMissile && (it.cat==='missile'||it.cat==='bp')) return false;
-    if(def.noHeavy && itemFamily(it.de)==='heavyarmour') return false;
-    if(isUpgrade(it.de)){ const u=UPGRADES[it.de];
-      if(!u.mult && inlineUpgradeActive(it.de)){ if((!u.heroesOnly||isHero) && upgradeTargets(m,it.de).length>0) return false; } // shown inline next to the weapon
-      if(u.heroesOnly && !isHero) return false; return upgradeTargets(m,it.de).length>0; }
-    if(it.cat==='misc' && !isHero && !h.miscHench && !h.freeMarket) return false;   // Misc nur Helden (Hausregel hebt auf)
-    if(h.freeMarket) return true;                                                    // Hausregel: Freier Markt – Kategorieschranke ignorieren
-    if(have.has(_stripParen(it.de).toLowerCase())) return false;        // bereits Startoption
-    return catalogEligible(def,it).ok;
-  }); }
-export function modelTotalCost(m){
-  const def=unitDef(m.uid_def);
-  const q=def.t==='hen'?m.qty:1;
-  return modelUnitCost(m)*q;
-}
 /* Startgold der Warband (House-Rule-überschreibbar) */
-export function startGold(){ const h=HR();
-  if(h && h.startGold!=='' && h.startGold!=null && !isNaN(Number(h.startGold))) return Number(h.startGold);
-  const wb=WARBANDS[S.wb]; if(!wb) return 500;
-  const sub=(S.subtype&&wb.subtypes)?wb.subtypes.find(x=>x.key===S.subtype):null;
-  return (sub&&sub.gold!=null)?sub.gold:(wb.gold||500); }
-/* EIN Gold-Wert: das aktuelle Gold der Warband. Intern liegt im Stash die
-   "Kasse" (treasury); angezeigt wird überall treasury minus Ausgaben. Kauft man
-   etwas, sinkt der Wert sofort - oben im Warband-Panel wie unten im Stash. */
-export function goldTreasury(){ const g=(S.stash&&S.stash.gold); return (g==null||g==='')?startGold():(Number(g)||0); }
-export function goldCurrent(){ return goldTreasury()-totalSpent(); }
-export function goldAvailable(){ return goldTreasury(); }
 export function setGoldCurrent(v){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
   S.stash.gold=Math.max(0,(Number(v)||0))+totalSpent(); render(); }
 export function adjGoldCurrent(d){ setGoldCurrent(goldCurrent()+d); }
-export function totalSpent(){ return S.models.reduce((s,m)=>s+modelTotalCost(m),0)+ (typeof hsHireTotal==='function'?hsHireTotal():0)+ (typeof dpHireTotal==='function'?dpHireTotal():0)+ (typeof hsEqTotal==='function'?hsEqTotal():0); }
-export function totalModels(){ return S.models.reduce((s,m)=>{const d=unitDef(m.uid_def); if(d&&d.vehicle) return s; return s+(d&&d.t==='hen'?m.qty:1);},0); }
-export function isHeroModel(m){ const def=unitDef(m.uid_def); return (def&&def.t==='hero')||!!m.promoted; }
-export function totalHeroes(){ return S.models.filter(m=>isHeroModel(m)).length + ((S.hired||[]).filter(h=>HIREDSWORDS[h.key]&&HIREDSWORDS[h.key].slot).length); }
 export function totalRating(){
   let r=0;
   S.models.forEach(m=>{
@@ -1245,8 +1094,10 @@ export function eqSection(m){
       <div class="eqgrid">`;
     set.forEach(([nm,pr])=>{
       const checked=m.mut.includes(nm)?'checked':'';
+      const enNm=mutEN(nm); const escEn=enNm.replace(/'/g,"\\'");
+      const ii=abilityInfo(enNm)?`<span class="iinfo no-print" tabindex="0" onmouseenter="showItip(this,'${escEn}')" onmouseleave="hideItip()" onfocus="showItip(this,'${escEn}')" onblur="hideItip()" onclick="toggleItip(event,this,'${escEn}')">ⓘ</span>`:'';
       html+=`<label class="eqitem"><input type="checkbox" ${checked}
-        onchange="toggleMut(${m.uid},'${nm.replace(/'/g,"\\'")}',this.checked)"><span>${mutEN(nm)}</span><span class="pr">${pr} gc</span></label>`;
+        onchange="toggleMut(${m.uid},'${nm.replace(/'/g,"\\'")}',this.checked)"><span>${enNm}</span>${ii}<span class="pr">${pr} gc</span></label>`;
     });
     html+=`</div></details>`;
   }
@@ -1300,7 +1151,7 @@ export function abilitySection(def, m){
     else if(!/Leader:/i.test(sp)) sp='<b>Leader:</b> '+leaderRuleText()+' '+sp;
   }
   const acquired=(m&&m.skills)||[]; const muts=(m&&m.mut)||[];
-  const scan = sp+' '+muts.join(' ');   // innate special rules + mutations (acquired skills are shown separately)
+  const scan = sp+' '+muts.map(mutEN).join(' ');   // innate special rules + mutations/blessings (translated to EN so ABILITYINFO matches; acquired skills are shown separately)
   let found=[]; const seen=new Set();
   for(const [re,info] of ABILITYINFO){ if(re.test(scan) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
   if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
@@ -1426,7 +1277,7 @@ export function promoteHench(u){
   const def=unitDef(m.uid_def);
   if((Number(m.qty)||1)>1){
     m.qty=(Number(m.qty)||1)-1;
-    S.models.push({uid:uid++, uid_def:m.uid_def, name:(m.name?m.name+' (Hero)':def.name+' (Hero)'), exp:Number(m.exp)||0, qty:1,
+    S.models.push({uid:nextUid(), uid_def:m.uid_def, name:(m.name?m.name+' (Hero)':def.name+' (Hero)'), exp:Number(m.exp)||0, qty:1,
       eq:JSON.parse(JSON.stringify(m.eq||{})), mut:[...(m.mut||[])], adv:Object.assign({},m.adv||{}),
       skills:[...(m.skills||[])], inj:[...(m.inj||[])], spells:[...(m.spells||[])], miss:Number(m.miss)||0, promoted:true, promoCats:(def.promoCatsFixed?[...def.promoCatsFixed]:[]), _advOpen:true});
   } else { m.promoted=true; m.promoCats=(def.promoCatsFixed?[...def.promoCatsFixed]:(m.promoCats||[])); m._advOpen=true; }
@@ -2011,13 +1862,13 @@ export async function loadRoster(nm){
 }
 export async function delRoster(nm){ try{ await window.storage.delete('mh:'+nm,false); openLoad(); openLoad(); }catch(e){} }
 export function applyState(data){
-  S={wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]}};
+  replaceState({wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]}});
   S.house=Object.assign(houseDefaults(), data.house||{});
   S.mark=data.mark||'';
   if(!S.stash||typeof S.stash!=='object') S.stash={wyrd:0,gold:0,items:[]};
   if(!Array.isArray(S.stash.items)) S.stash.items=[];
   S.models.forEach(m=>{ if(!m.eq)m.eq={}; if(!m.mut)m.mut=[]; if(!m.adv)m.adv={}; if(!m.skills)m.skills=[]; if(!m.inj)m.inj=[]; if(!m.spells)m.spells=[]; });
-  uid=Math.max(1,...S.models.map(m=>m.uid))+1;
+  resyncUid();
   document.getElementById('picker-view').style.display='none';
   document.getElementById('builder-view').style.display='block';
   setupBuilder();
@@ -2037,7 +1888,6 @@ export function safeName(){
   return [base,type].filter(Boolean).join('_')||'mordheim-roster'; }
 export function rosterName(){ return (document.getElementById('savename')?.value||S.name||'roster'); }
 export function dl(content,filename,mime){ const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{ try{document.body.removeChild(a); URL.revokeObjectURL(a.href);}catch(e){} },100); }
-export function modelRating(m){ const def=unitDef(m.uid_def); return (def.large?20:5)+Number(m.exp||0); }
 export function eqSummaryParts(m){
   const def=unitDef(m.uid_def); const out=[];
   if(def.gear) def.gear.forEach(g=>out.push(g));
@@ -2363,4 +2213,3 @@ Object.assign(window, {
   vehRules, vehRulesBlock, warbandMax, wbTypeSlug, weaponUpgradesFor, xpBar,
   xpThresholds,
 });
-Object.defineProperty(window,'S',{ get:()=>S, set:v=>{S=v;}, configurable:true });

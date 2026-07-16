@@ -68,9 +68,16 @@ async function exportOfficialSheet(){
   const fb=await doc.embedFont(StandardFonts.HelveticaBold);
 
   const NOTES=new Map();
-  const heroes=S.models.filter(m=>isHeroModel(m));
-  const hench=S.models.filter(m=>!isHeroModel(m)&&!unitDef(m.uid_def).vehicle);
-  const veh=S.models.filter(m=>unitDef(m.uid_def).vehicle);
+  // Sort by the unit's fixed position in the warband's roster list (WARBANDS[wb].units),
+  // NOT by recruitment order — e.g. a Marauder Chieftain must print before a Seer even if
+  // the Seer was added to the warband first. Ties (several models of the same unit) keep
+  // their relative recruitment order via a stable sort.
+  const _rosterOrder=(WARBANDS[S.wb]&&WARBANDS[S.wb].units)||[];
+  const _orderIdx=(m)=>{ const i=_rosterOrder.findIndex(u=>u.id===m.uid_def); return i<0?_rosterOrder.length:i; };
+  const _byRosterOrder=(a,b)=>_orderIdx(a)-_orderIdx(b);
+  const heroes=S.models.filter(m=>isHeroModel(m)).sort(_byRosterOrder);
+  const hench=S.models.filter(m=>!isHeroModel(m)&&!unitDef(m.uid_def).vehicle).sort(_byRosterOrder);
+  const veh=S.models.filter(m=>unitDef(m.uid_def).vehicle).sort(_byRosterOrder);
   const dpAll=(S.dp||[]).map(d=>({rec:d,e:DRAMATIS[d.key],kind:'Dramatis Personae'}));
   const hsAll=(S.hired||[]).map(h=>({rec:h,e:HIREDSWORDS[h.key],kind:'Hired Sword'}));
   const extra=[...dpAll,...hsAll];
