@@ -305,3 +305,18 @@ a spell/prayer instead of their first Advance roll.
 Not yet done (flagged): granting the new leader access to the *leader's*
 equipment list — that needs equipment-list merging and will be a separate,
 careful change. Regression test `leader-death.mjs` added; suite 13/13.
+
+## July 17, 2026 — replacement-leader house rule + Merchant Caravans
+
+- **House rule "Allow hiring a replacement leader".** Off by default (standard
+  Mordheim: you may not hire a new leader). When enabled, it lifts the block so
+  the leader unit can be recruited again after the original is slain — both in
+  addUnit and the recruit picker — and it's recorded as a deviation on export.
+- **Merchant Caravans succession.** The existing logic already fit (only the
+  Merchant is the req unit, so buying an Apprentice was never blocked), but the
+  succession reminder is now warband-aware: if a model can take command it's
+  noted to count as the Merchant and gain the Merchant special skills; if no
+  model may lead (the Knight and Magician are hirelings that never can), the
+  tool prompts to buy an Apprentice to take over — matching the rule that the
+  Apprentice is the fallback leader, purchasable after the next game. Tests
+  extended; suite 13/13.

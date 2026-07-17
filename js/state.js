@@ -35,7 +35,7 @@ export function replaceState(newState) {
 }
 
 /* ===================== HAUSREGELN (House Rules) ===================== */
-export function houseDefaults(){ return {startGold:'',min:'',max:'',heroes:6,priceAll:100,priceArmour:100,priceBP:100,priceMissile:100,clubSurcharge:0,slingSurcharge:0,armourBodyOnly:false,freeDagger:false,miscHench:false,freeMarket:false,allSkills:false,showRarity:false,rangedCapOn:false,rangedCap:0,rerollOne:false,eqLimitOn:true,hsGrades:{'1a':true,'1b':true,'1c':true,'2a':true},dpGrades:{core:true,'1a':true,'1b':true,'1c':true,'2a':true},hsEquip:false,notes:''}; }
+export function houseDefaults(){ return {startGold:'',min:'',max:'',heroes:6,priceAll:100,priceArmour:100,priceBP:100,priceMissile:100,clubSurcharge:0,slingSurcharge:0,armourBodyOnly:false,freeDagger:false,miscHench:false,freeMarket:false,allSkills:false,showRarity:false,rangedCapOn:false,rangedCap:0,rerollOne:false,eqLimitOn:true,hireNewLeader:false,hsGrades:{'1a':true,'1b':true,'1c':true,'2a':true},dpGrades:{core:true,'1a':true,'1b':true,'1c':true,'2a':true},hsEquip:false,notes:''}; }
 export function HR(){ if(!S.house) S.house=houseDefaults(); else for(const k in houseDefaults()) if(!(k in S.house)) S.house[k]=houseDefaults()[k]; return S.house; }
 export function houseActive(){ const h=HR(),d=houseDefaults(); for(const k in d){ if(String(h[k])!==String(d[k])) return true; } return false; }
 export function setHouseNum(k,v){ HR()[k]=(v===''||v==null)?'':Math.max(0,Number(v)||0); render(); }

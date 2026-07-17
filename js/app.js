@@ -869,7 +869,7 @@ export function addUnit(id){
   if(mx!==null && modelsOf(id)>=mx) return;
   // Once the warband's leader (e.g. Chieftain) has died, you may not hire a new
   // one — a surviving Hero takes command instead.
-  if(def.req && leaderUnitDied()) return;
+  if(def.req && leaderUnitDied() && !HR().hireNewLeader) return;
   S.models.push({uid:nextUid(), uid_def:id, name:def.name, exp:def.exp, qty:def.t==='hen'?1:1, eq:{}, rare:{}, mut:[], adv:{}, skills:[], inj:[], spells:[]});
   if(typeof ensureFreeDagger==='function') ensureFreeDagger(S.models[S.models.length-1]);
   render();
@@ -926,7 +926,7 @@ export function renderAddMenu(){
     html+=`<div class="addgroup"><h2>${label}</h2>`;
     us.forEach(u=>{
       const cnt=modelsOf(u.id); const umx=unitMax(u);
-      const leaderGone=!!u.req && leaderUnitDied();
+      const leaderGone=!!u.req && leaderUnitDied() && !HR().hireNewLeader;
       const atMax=leaderGone || (umx!==null && cnt>=umx) || (t==='hero' && totalHeroes()>=(Number(HR().heroes)||6));
       const lim=umx===null?'any':(u.req?`=${umx}`:`0–${umx}`);
       html+=`<div class="addrow">
@@ -1809,6 +1809,12 @@ export function renderSidebar(){
       w.push('The Vampire is slain and no Necromancer remains to take over — the warband collapses into a pile of bones (you may buy a new Vampire after the next game).');
     else if(['possessed','carnival'].includes(S.wb) && leaderUid())
       w.push(`Leader slain: ${( (S.models.find(m=>m.uid===leaderUid())||{}).name )||'the successor'} takes command and, the first time they would advance, may learn a spell/prayer instead of rolling on the Advance table.`);
+    else if(S.wb==='caravans'){
+      if(leaderUid())
+        w.push(`Merchant slain: ${( (S.models.find(m=>m.uid===leaderUid())||{}).name )||'the successor'} takes command, counts as the Merchant for all purposes and may choose from the Merchant's special skills.`);
+      else
+        w.push('The Merchant is lost and no model can become the leader — buy an Apprentice as soon as possible (after the next game) to take over as the new Merchant.');
+    }
   }
   wb.units.forEach(u=>{ const umx=unitMax(u); if(umx!==null && modelsOf(u.id)>umx) w.push(`Too many ${u.name} (max. ${umx}).`); });
   wb.units.forEach(u=>{ if(u.min && modelsOf(u.id)<u.min) w.push(`At least ${u.min} ${u.name} required (currently ${modelsOf(u.id)}).`); });
@@ -1836,6 +1842,7 @@ export function houseDeviations(){ const d=houseDefaults(), h=HR(), out=[];
     if(JSON.stringify(h[k])!==JSON.stringify(d[k])){
       let v=h[k];
       if(k==='eqLimitOn') v = h[k] ? 'enforced' : 'NOT enforced (equipment beyond the list allowed)';
+      else if(k==='hireNewLeader') v = h[k] ? 'allowed (may re-hire a leader after the original is slain)' : null;
       else if(typeof v==='boolean') v = v?'on':'off';
       else if(v&&typeof v==='object') v = Object.keys(v).filter(function(x){return v[x]===false;}).length
         ? 'excluded: '+Object.keys(v).filter(function(x){return v[x]===false;}).join(', ') : null;
@@ -1892,6 +1899,7 @@ export function renderHouse(){
     </fieldset>
     <fieldset class="hr-fs"><legend>Discipline / limits</legend>
       ${bool('eqLimitOn','Enforce the equipment list (standard \u2014 untick only as a house rule to allow anything)')}
+      ${bool('hireNewLeader','Allow hiring a replacement leader after the original is slain (overrides the standard rule)')}
       ${bool('rangedCapOn','Limit ranged models')}
       ${num('rangedCap','↳ max ranged %',0,100,5,'% of warband (0 = pure melee)')}
       ${bool('rerollOne','Only one re-roll item / warband')}
