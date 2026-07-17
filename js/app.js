@@ -867,6 +867,9 @@ export function pickSub(k){
 export function addUnit(id){
   const def=unitDef(id); const mx=unitMax(def);
   if(mx!==null && modelsOf(id)>=mx) return;
+  // Once the warband's leader (e.g. Chieftain) has died, you may not hire a new
+  // one — a surviving Hero takes command instead.
+  if(def.req && leaderUnitDied()) return;
   S.models.push({uid:nextUid(), uid_def:id, name:def.name, exp:def.exp, qty:def.t==='hen'?1:1, eq:{}, rare:{}, mut:[], adv:{}, skills:[], inj:[], spells:[]});
   if(typeof ensureFreeDagger==='function') ensureFreeDagger(S.models[S.models.length-1]);
   render();
@@ -923,14 +926,15 @@ export function renderAddMenu(){
     html+=`<div class="addgroup"><h2>${label}</h2>`;
     us.forEach(u=>{
       const cnt=modelsOf(u.id); const umx=unitMax(u);
-      const atMax=(umx!==null && cnt>=umx) || (t==='hero' && totalHeroes()>=(Number(HR().heroes)||6));
+      const leaderGone=!!u.req && leaderUnitDied();
+      const atMax=leaderGone || (umx!==null && cnt>=umx) || (t==='hero' && totalHeroes()>=(Number(HR().heroes)||6));
       const lim=umx===null?'any':(u.req?`=${umx}`:`0–${umx}`);
       html+=`<div class="addrow">
         <span class="nm">${u.name}${cnt?` <span class="rec">×${cnt}</span>`:''}</span>
         <span class="lim" title="${umx===null?'any number':(u.req?('exactly '+umx):('0 to '+umx))}">${lim}</span>
         <span class="cost">${u.cost} gc</span>
         <span class="xp">${u.exp?`${u.exp} xp`:''}</span>
-        <button class="tiny blood" ${atMax?'disabled':''} onclick="addUnit('${u.id}')">+ recruit</button>
+        <button class="tiny blood" ${atMax?'disabled':''} ${leaderGone?'title="The warband leader has been slain — you may not hire a new one; a surviving Hero takes command."':''} onclick="addUnit('${u.id}')">+ recruit</button>
         <div class="desc">${u.vehicle?vehRulesBlock(u):(u.sp||'')}</div>
       </div>`;
     });
@@ -1283,9 +1287,21 @@ export function spellStartCount(defOrEntry,mdl){
 export function canBeLeader(m){ const def=unitDef(m.uid_def); if(!def) return false;
   if(!isHeroModel(m)) return false;
   return !/never become the warband leader|may not be the leader|cannot be the leader|never be the warband leader/i.test(def.sp||''); }
+function _ldOf(m){ const p=effProfile(m); if(!p) return 0; return Number(statNum(p.Ld))||0; }
+export function leaderUnitDied(){ const req=(WARBANDS[S.wb].units||[]).find(u=>u.req); if(!req) return false;
+  return (S.fallen||[]).some(e=>(e.uid_def||(e.m&&e.m.uid_def))===req.id); }
 export function defaultLeaderUid(){ const nat=S.models.find(m=>{ const d=unitDef(m.uid_def); return d&&/\bLeader:/.test(d.sp||''); });
   if(nat) return nat.uid;
-  const first=S.models.find(m=>canBeLeader(m)); return first?first.uid:null; }
+  // The natural leader (e.g. Chieftain) is gone. Undead are special: on the
+  // Vampire's death the Necromancer specifically must take command.
+  if(S.wb==='undead'){ const necro=S.models.find(m=>m.uid_def==='necro'&&canBeLeader(m)); if(necro) return necro.uid; }
+  // General rule: the eligible Hero with the highest Leadership takes command;
+  // ties broken by most Experience (a remaining D6 tie is left to manual choice).
+  const cands=S.models.filter(m=>canBeLeader(m));
+  if(!cands.length) return null;
+  cands.sort((a,b)=> (_ldOf(b)-_ldOf(a)) || ((Number(b.exp)||0)-(Number(a.exp)||0)) || (a.uid-b.uid));
+  return cands[0].uid;
+}
 export function leaderUid(){ if(S.leaderUid){ const m=S.models.find(x=>x.uid===S.leaderUid); if(m&&canBeLeader(m)) return S.leaderUid; }
   return defaultLeaderUid(); }
 export function isLeaderModel(m){ return !!m && m.uid===leaderUid(); }
@@ -1786,7 +1802,14 @@ export function renderSidebar(){
     if(lim.cc>2) w.push(`${m.name||d.name}: ${lim.cc} close combat weapons — max. 2 (in addition to the free dagger).`);
     if(lim.missile>2) w.push(`${m.name||d.name}: ${lim.missile} missile weapons — max. 2 (a brace of pistols counts as 1).`); }); }
   const req=wb.units.find(u=>u.req);
-  if(req && countOf(req.id)<1) w.push(`A leader (${req.name}) is required.`);
+  const leaderDead=leaderUnitDied();
+  if(req && !leaderDead && countOf(req.id)<1) w.push(`A ${req.name} is required.`);
+  if(leaderDead){
+    if(S.wb==='undead' && !S.models.some(m=>m.uid_def==='necro'))
+      w.push('The Vampire is slain and no Necromancer remains to take over — the warband collapses into a pile of bones (you may buy a new Vampire after the next game).');
+    else if(['possessed','carnival'].includes(S.wb) && leaderUid())
+      w.push(`Leader slain: ${( (S.models.find(m=>m.uid===leaderUid())||{}).name )||'the successor'} takes command and, the first time they would advance, may learn a spell/prayer instead of rolling on the Advance table.`);
+  }
   wb.units.forEach(u=>{ const umx=unitMax(u); if(umx!==null && modelsOf(u.id)>umx) w.push(`Too many ${u.name} (max. ${umx}).`); });
   wb.units.forEach(u=>{ if(u.min && modelsOf(u.id)<u.min) w.push(`At least ${u.min} ${u.name} required (currently ${modelsOf(u.id)}).`); });
   S.models.forEach(m=>{ const d=unitDef(m.uid_def); if(d.mutReq && (!m.mut||!m.mut.length)) w.push(`${m.name||d.name}: Mutant needs at least 1 mutation.`); });

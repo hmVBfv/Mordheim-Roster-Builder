@@ -279,3 +279,29 @@ henchman, taken from the death kind, which already respects promotion) and only
 then by unit type. A promoted Verminkin who dies now shows in its own Hero
 group (listed by name) rather than merging into the dead-Verminkin henchman
 tally. Regression test added.
+
+## July 17, 2026 — leader succession when the leader is slain
+
+Implemented the Mordheim rule for a slain warband leader. Previously the
+"a leader is required" validation kept firing after the Chieftain died, a new
+one could be recruited, and succession just took the first hero.
+
+Now, once the warband's leader unit (the req unit — Chieftain, Vampire,
+Magister, Carnival Master, …) is in Fallen:
+- the "<unit> is required" validation no longer applies (and the message names
+  the unit rather than saying "a leader (X)"),
+- recruiting a new one is blocked in both addUnit and the recruit picker (with
+  an explanatory tooltip) — you may not hire a new leader,
+- the eligible Hero with the highest Leadership takes command, ties broken by
+  most Experience (a remaining D6 tie is left to manual choice via the existing
+  leader radio). The successor already gains the Leader ability through the
+  existing leaderUid()/isLeaderModel() path.
+
+Warband-specific successions: Undead go specifically to the Necromancer, with a
+"warband collapses" warning if none remains (a Vampire may be bought after the
+next game); Possessed and Carnival show a reminder that the successor may learn
+a spell/prayer instead of their first Advance roll.
+
+Not yet done (flagged): granting the new leader access to the *leader's*
+equipment list — that needs equipment-list merging and will be a separate,
+careful change. Regression test `leader-death.mjs` added; suite 13/13.
