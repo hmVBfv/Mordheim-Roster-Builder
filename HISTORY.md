@@ -320,3 +320,32 @@ careful change. Regression test `leader-death.mjs` added; suite 13/13.
   tool prompts to buy an Apprentice to take over — matching the rule that the
   Apprentice is the fallback leader, purchasable after the next game. Tests
   extended; suite 13/13.
+
+## July 17, 2026 — playtest bug sweep (House Rules, TTS, advances, rare items)
+
+Six issues found in play:
+
+- **House Rules panel collapsed on every click.** The section-open flags
+  (hrOpen/hsOpen/dpOpen/campOpen) were exported `let`s reassigned by inline
+  `ontoggle` handlers — in the modular build those handlers run in a different
+  scope than the module, so the write never reached the value `renderHouse`
+  reads (the live-binding trap). Added a bound `setSecOpen(which,v)` that
+  reassigns the module variable, and pointed all section toggles at it, so the
+  open state now survives a re-render.
+- **Price sliders too coarse.** The equipment/armour cost sliders stepped by 5
+  and were hard to land on exactly. The slider is now step 1 and the % readout
+  is an editable number field, so a precise value like 50% can simply be typed.
+- **Rare items missing from the TTS export.** `eqDisplayParts` only covers
+  regular gear, so standalone rare/magic items never reached the TTS card. Added
+  `rareDisplayParts(m)` and appended it to the TTS equipment line.
+- **TTS showed "Haggle: [object Object]".** `skillInfo` returns an object; the
+  TTS card interpolated it directly. It now uses the skill's text field.
+- **Chosen rare items hidden when the Rare/Trading Post section was collapsed.**
+  A compact, always-visible "Rare / Trading Post: …" summary now sits above the
+  collapsible section, next to the equipment list.
+- **"Advance due!" stuck on.** The flag fired whenever XP sat on a threshold,
+  even after the advance was applied (e.g. a Merchant Caravans Apprentice at 2
+  XP with its advance taken). It now compares earned vs applied advances, the
+  same measure the Advances & Stats panel already uses.
+
+Regression test `tts-and-adv.mjs` added; suite 14/14.

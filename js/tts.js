@@ -1,6 +1,6 @@
 /* Tabletop-Simulator-Export: Beschreibungstexte für Modell-Karten. */
 import { DRAMATIS, HIREDSWORDS, INJEN } from '../data/index.js';
-import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, markRulesFor, noteLines, skillInfo, spellEffDiff, spellEffect, spellLabel, uid, unitDef } from './app.js';
+import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, markRulesFor, noteLines, skillInfo, spellEffDiff, spellEffect, spellLabel, uid, unitDef } from './app.js';
 
 function ttsAttached(def,m){
   const blocks=(typeof attachedBlocks==='function')?attachedBlocks(def,m):[];
@@ -23,10 +23,10 @@ function ttsText(m){
   const statline=hasProf?k.map(x=>x+' '+(x==='A'?String(aDisp(m,p)):String(p[x]!==undefined?p[x]:'-'))).join('   '):'';
   const rules=enRules(def.sp);
   if(typeof markRulesFor==='function'){ markRulesFor(m).forEach(x=>rules.push(x[0]+': '+x[1])); }
-  (m.skills||[]).forEach(s=>{ const d=skillInfo(s); rules.push(d?`${s}: ${d}`:s); });
+  (m.skills||[]).forEach(s=>{ const d=skillInfo(s); const t=d&&(typeof d==='object'?d.text:d); rules.push(t?`${s}: ${t}`:s); });
   (m.inj||[]).forEach(j=>rules.push(INJEN[j.code]||j.name));
   const rulesTxt=rules.length?rules.map(r=>'• '+r).join('\n'):'None';
-  const eq=eqDisplayParts(m); const eqTxt=eq.length?eq.join(', '):'None';
+  const eq=eqDisplayParts(m).concat((typeof rareDisplayParts==='function'?rareDisplayParts(m):[])); const eqTxt=eq.length?eq.join(', '):'None';
   const spx=(m.spells||[]).map(s=>{ const d=spellEffDiff(s); const e=spellEffect(s.name,casterLore(m)); return `${spellLabel(s.name)}${d!=null?` (${d})`:''}${e?': '+e:''}`; });
   const spLine = spx.length? `\n[5ACFFF]Spells:[-]\n${spx.map(x=>'• '+x).join('\n')}` : '';
   const missLine=(Number(m.miss)||0)>0?`\n[FF6961]⚑ Misses next ${m.miss} game${m.miss>1?'s':''}[-]`:'';

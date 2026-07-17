@@ -252,7 +252,7 @@ export function renderHiredSwords(){
     HS_GRADE_ORDER.map(g=>`<label class="hs-gbox"><input type="checkbox" ${hg[g]!==false?'checked':''} onchange="setHsGrade('${g}',this.checked)">${g}</label>`).join('')+`</span>`;
   const none=e.allowed.length===0?`<div class="hs-none">This warband may not hire any Hired Swords.</div>`:'';
   const upTotal=hsUpkeepTotal();
-  host.innerHTML=`<details class="sec-details" ${hsOpen?'open':''} ontoggle="hsOpen=this.open"><summary class="sec-sum">Hired Swords${hsList().length?' <span class="hr-on">'+hsList().length+'</span>':''}</summary><div class="sec-body"><div class="hs-head">${gradeSel}</div>${statFilterBar('hs',hsFilter,'setHsFilter')}
+  host.innerHTML=`<details class="sec-details" ${hsOpen?'open':''} ontoggle="setSecOpen('hs',this.open)"><summary class="sec-sum">Hired Swords${hsList().length?' <span class="hr-on">'+hsList().length+'</span>':''}</summary><div class="sec-body"><div class="hs-head">${gradeSel}</div>${statFilterBar('hs',hsFilter,'setHsFilter')}
     ${hired?`<div class="hs-hired-wrap">${hired}<div class="hs-uptotal">Total upkeep between games: <b>${upTotal} gc</b></div></div>`:''}
     ${none}
     ${rows?`<table class="hs-tbl"><thead><tr><th>Available</th><th>Grade</th>${hsFilter.stat?`<th class="num">${hsFilter.stat}</th>`:''}<th class="num">Hire</th><th class="num">Upk</th><th class="num">Rat</th><th></th></tr></thead><tbody>${rows}</tbody></table>`:(e.allowed.length&&!none?`<div class="hs-none">All eligible Hired Swords are already hired or filtered out by grade.</div>`:'')}
@@ -613,7 +613,7 @@ export function renderDramatis(){
     return `<tr><td class="hs-prev" onmouseenter="showPreview(this,'${a.key}')" onmouseleave="hideItip()" onclick="toggleItipPreview(event,this,'${a.key}')">${dp.name} \u24d8</td><td><span class="hs-badge">${dp.grade}</span></td>${dpFilter.stat?`<td class="num"><b>${dp.profile[dpFilter.stat]!==undefined?dp.profile[dpFilter.stat]:'\u2014'}</b></td>`:''}<td class="num">${c}</td><td class="num">${dp.upkeep||'\u2014'}</td><td class="num">+${dp.rating}</td><td class="num"><button class="tiny" onclick="hireDP('${a.key}')">Recruit</button></td></tr>`;
   }).join('');
   const none=e.allowed.length===0?`<div class="hs-none">No Dramatis Personae will join this warband.</div>`:'';
-  host.innerHTML=`<details class="sec-details" ${dpOpen?'open':''} ontoggle="dpOpen=this.open"><summary class="sec-sum">Dramatis Personae${dpList().length?' <span class="hr-on">'+dpList().length+'</span>':''}</summary><div class="sec-body"><div class="hs-head">${gradeSel}</div>${statFilterBar('dp',dpFilter,'setDpFilter')}
+  host.innerHTML=`<details class="sec-details" ${dpOpen?'open':''} ontoggle="setSecOpen('dp',this.open)"><summary class="sec-sum">Dramatis Personae${dpList().length?' <span class="hr-on">'+dpList().length+'</span>':''}</summary><div class="sec-body"><div class="hs-head">${gradeSel}</div>${statFilterBar('dp',dpFilter,'setDpFilter')}
     ${hired?`<div class="hs-hired-wrap">${hired}</div>`:''}
     ${none}
     ${rows?`<table class="hs-tbl"><thead><tr><th>Available</th><th>Grade</th>${dpFilter.stat?`<th class="num">${dpFilter.stat}</th>`:''}<th class="num">Hire</th><th class="num">Upk</th><th class="num">Rat</th><th></th></tr></thead><tbody>${rows}</tbody></table>`:(e.allowed.length&&!none?`<div class="hs-none">All available special characters are recruited or filtered out by grade.</div>`:'')}
@@ -653,7 +653,7 @@ export function renderCampaign(){
   const host=document.getElementById('campaignpanel'); if(!host) return;
   if(!S.wb){ host.innerHTML=''; return; }
   const on=(S.campaign&&S.campaign.on);
-  if(!on){ host.innerHTML=`<details class="sec-details" ${campOpen?'open':''} ontoggle="campOpen=this.open"><summary class="sec-sum">Campaign</summary><div class="sec-body"><label class="hs-gbox"><input type="checkbox" onchange="campToggle(this.checked)"> enable campaign layer</label>
+  if(!on){ host.innerHTML=`<details class="sec-details" ${campOpen?'open':''} ontoggle="setSecOpen('camp',this.open)"><summary class="sec-sum">Campaign</summary><div class="sec-body"><label class="hs-gbox"><input type="checkbox" onchange="campToggle(this.checked)"> enable campaign layer</label>
       <div class="hs-foot">Optional Control/Foothold layer (mordheim-map.com). Enable to set the districts your warband holds; \u00bd-price bonuses then apply to Hired Sword / Dramatis Personae hiring. Saved with your warband.</div></details>`; return; }
   const groups={}; DISTRICTS.forEach(d=>{ (groups[d.area]=groups[d.area]||[]).push(d); });
   const seg=Object.keys(groups).map(area=>{
@@ -680,7 +680,7 @@ export function renderCampaign(){
       +(auto.length?`<div class="camp-auto"><b>\u2713 Applied automatically</b><ul>${auto.map(l=>`<li>${l}</li>`).join('')}</ul></div>`:'')
       +(others.length?`<div class="camp-remind"><b>\u2691 Battle / campaign reminders</b><ul>${others.map(l=>`<li>${l}</li>`).join('')}</ul></div>`:'')
       +`</div>`:'';
-  host.innerHTML=`<details class="sec-details" ${campOpen?'open':''} ontoggle="campOpen=this.open"><summary class="sec-sum">Campaign <span class="hr-on">on</span></summary><div class="sec-body"><label class="hs-gbox"><input type="checkbox" checked onchange="campToggle(this.checked)"> enabled</label>
+  host.innerHTML=`<details class="sec-details" ${campOpen?'open':''} ontoggle="setSecOpen('camp',this.open)"><summary class="sec-sum">Campaign <span class="hr-on">on</span></summary><div class="sec-body"><label class="hs-gbox"><input type="checkbox" checked onchange="campToggle(this.checked)"> enabled</label>
     <div class="camp-io no-print"><button class="tiny" onclick="openCampaignIO()">\u2b06 Export</button> <button class="tiny" onclick="openCampaignIO()">\u2b07 Import</button></div>
     ${summary}
     ${seg}
@@ -1067,6 +1067,8 @@ export function eqSection(m){
   }
   // ---- Rare Items / Trading Post (only categories the unit may carry) ----
   if(def.eq){
+    const _owned=rareDisplayParts(m);
+    if(_owned.length) html+=`<div class="eq-rare-summary"><b>Rare / Trading Post:</b> ${_owned.map(x=>String(x).replace(/</g,'&lt;')).join(', ')}</div>`;
     const elig=rareEligibleItems(m);
     const CATLBL={cc:'Melee',missile:'Missile',bp:'Blackpowder',armour:'Armour',misc:'Misc / Trading Post'};
     let opts='';
@@ -1159,7 +1161,11 @@ export function xpBar(m){
     const cls = t<=start ? 'base' : (t<=xp ? 'on' : (t===next?'next':''));
     return `<span class="xppip ${cls}" title="Advance at ${t} exp – click to set" onclick="setExpJump(${m.uid},${t})">${t}</span>`;
   }).join('');
-  const due = xp>start && th.includes(xp);
+  const adv=m.adv||{}, skills=m.skills||[];
+  const spellStart=spellStartCount(def,m); const spellsSel=(m.spells||[]);
+  const spellAdv=Math.max(0,spellsSel.length-spellStart)+spellsSel.reduce((a,sp)=>a+(Number(sp.red)||0),0);
+  const applied=Object.values(adv).reduce((s,v)=>s+(Number(v)||0),0)+skills.length+spellAdv;
+  const due = earned>applied;
   const info = next!=null
     ? `Advances earned: <b>${earned}</b> · next at <b>${next}</b> Exp (${next-xp} to go)`
     : `Advances earned: <b>${earned}</b> · maximum experience reached`;
@@ -1831,6 +1837,8 @@ export function renderSidebar(){
 
 /* ===================== HAUSREGEL-PANEL ===================== */
 export let hrOpen=false, campOpen=false, hsOpen=false, dpOpen=false, ovOpen=true, stashOpen=true, wbOpen=true;
+export function setSecOpen(which,v){ v=!!v;
+  if(which==='hr')hrOpen=v; else if(which==='hs')hsOpen=v; else if(which==='dp')dpOpen=v; else if(which==='camp')campOpen=v; }
 /* House Rules: Eine Regel gilt als AKTIV, sobald sie vom Standard abweicht.
    Die Checkbox vor der Regel schaltet sie ein/aus (aus = Standardwert). Aktive
    Abweichungen werden automatisch im Export vermerkt. */
@@ -1865,10 +1873,10 @@ export function renderHouse(){
   function num(k,label,min,max,step,suffix){ const v=(h[k]===''||h[k]==null)?'':h[k];
     return `<label class="hr-row">${hrChk(k)}<span class="hl">${label}</span><span class="hc"><input type="number" min="${min}" ${max!=null?`max="${max}"`:''} ${step?`step="${step}"`:''} value="${v}" placeholder="—" onchange="setHouseNum('${k}',this.value)"></span><span class="hs">${suffix||''}</span></label>`; }
   function slider(k,label){ const v=Number(h[k])||100;
-    return `<label class="hr-row">${hrChk(k)}<span class="hl">${label}</span><span class="hc"><input type="range" min="25" max="200" step="5" value="${v}" oninput="HR().${k}=Number(this.value);document.getElementById('hv-${k}').textContent=this.value+'%';renderSidebar();renderRoster();" onchange="render()"></span><span id="hv-${k}" class="hv">${v}%</span></label>`; }
+    return `<label class="hr-row">${hrChk(k)}<span class="hl">${label}</span><span class="hc"><input type="range" min="25" max="200" step="1" value="${v}" oninput="HR().${k}=Number(this.value);document.getElementById('hv-${k}').value=this.value;renderSidebar();renderRoster();" onchange="render()"></span><span class="hv"><input id="hv-${k}" type="number" min="0" max="500" step="1" value="${v}" style="width:52px" onchange="setHouseNum('${k}',this.value)">%</span></label>`; }
   function bool(k,label){ return `<label class="hr-chk"><input type="checkbox" ${h[k]?'checked':''} onchange="setHouseBool('${k}',this.checked)"> <span>${label}</span>${hrIsDefault(k)?'':'<span class="hr-dev" title="Deviates from the standard \u2014 recorded on export">HR</span>'}</label>`; }
   const active=houseActive();
-  box.innerHTML=`<details class="sec-details no-print" ${hrOpen?'open':''} ontoggle="hrOpen=this.open"><summary class="sec-sum">⚖ House Rules ${active?'<span class="hr-on">active</span>':''}<button class="tiny ghost no-print" style="float:right" onclick="event.preventDefault();resetHouse()">reset all</button></summary><div class="sec-body">
+  box.innerHTML=`<details class="sec-details no-print" ${hrOpen?'open':''} ontoggle="setSecOpen('hr',this.open)"><summary class="sec-sum">⚖ House Rules ${active?'<span class="hr-on">active</span>':''}<button class="tiny ghost no-print" style="float:right" onclick="event.preventDefault();resetHouse()">reset all</button></summary><div class="sec-body">
    <div class="hr-grid no-print">
     <fieldset class="hr-fs"><legend>Warband limits</legend>
       ${num('startGold','Starting gold',0,null,5,'blank = warband default')}
@@ -2019,6 +2027,13 @@ export function eqDisplayParts(m){
       if(BRACE_PLURAL[base] && qty>=2){ out.push('Brace of '+BRACE_PLURAL[base]); if(qty>2) out.push((qty-2)+'× '+enItem(base)); }
       else out.push((qty>1?qty+'× ':'')+enItem(base)+_us);
     } }
+  return out;
+}
+/* Standalone rare/magic items carried by a model (inline weapon upgrades are
+   excluded — they already show attached to their base weapon in eqDisplayParts). */
+export function rareDisplayParts(m){ const out=[]; const r=m.rare||{};
+  for(const de in r){ if(inlineUpgradeActive(de)) continue; const it=CATALOG.find(x=>x.de===de);
+    const q=Number(r[de].q)||1; out.push((q>1?q+'× ':'')+(it?it.en:de)); }
   return out;
 }
 
@@ -2291,7 +2306,7 @@ Object.assign(window, {
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
   resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,
   saveRoster, setAdvOpen, setCaster, setDistrict, setDpFilter, setDpGrade,
-  setEqQty, setExp, setExpJump, setGoldCurrent, setHeirloom, setHouseActive,
+  setEqQty, setExp, setExpJump, setGoldCurrent, setHeirloom, setHouseActive, setSecOpen,
   setHouseBool, setHouseNotes, setHouseNum, setHouseStr, setHsAdvOpen, setHsEq,
   setHsExp, setHsFilter, setHsGrade, setHsSpOpen, setInjOpen, setLeader,
   setLore, setMark, setName, setQty, setRarePaid, setRareQty,
