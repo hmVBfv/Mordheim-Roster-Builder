@@ -1668,14 +1668,21 @@ export function renderRoster(){
     html+=`<details class="fallen-wrap no-print"><summary class="fallen-sum">☠ Fallen (${fallen.length}) — removed from the warband, equipment lost · ${fallenGoldLost()} gc lost</summary>
       <div class="fallen-tools"><button class="btnsm" onclick="undoFallen()" title="Undo the most recent death (press again to undo the one before, and so on)">↩ Undo last death</button></div>`;
     // Group all fallen by unit type (a type is either all-hero or all-henchman).
+    // Group first by grade (hero vs henchman — from the death kind, which
+    // respects Lad's-Got-Talent promotion), then by unit type. This keeps a
+    // promoted henchman (now a Hero) out of the regular henchman group even
+    // though they share a uid_def.
     const byType={}; const typeOrder=[];
-    fallen.forEach(e=>{ const ud=e.uid_def||(e.m&&e.m.uid_def); if(!byType[ud]){ byType[ud]=[]; typeOrder.push(ud); } byType[ud].push(e); });
-    typeOrder.forEach(uid_def=>{
-      const grp=byType[uid_def]; const def=unitDef(uid_def); const isHero=(def&&def.t==='hero');
+    fallen.forEach(e=>{ const ud=e.uid_def||(e.m&&e.m.uid_def); const key=e.kind+'|'+ud;
+      if(!byType[key]){ byType[key]=[]; typeOrder.push(key); } byType[key].push(e); });
+    typeOrder.forEach(key=>{
+      const grp=byType[key]; const uid_def=grp[0].uid_def||grp[0].m.uid_def; const def=unitDef(uid_def);
+      const isHero=(grp[0].kind==='hero');
       const totalExp=grp.reduce((s,e)=>s+(Number(e.m&&e.m.exp!=null?e.m.exp:e.exp)||0),0);
       const goldLost=grp.reduce((s,e)=>s+(modelUnitCost(e.m)||0),0);
       const eqAll=fallenEqAgg(grp.map(e=>e.m));
-      const open=!!(S._fallenOpen&&S._fallenOpen['t'+uid_def]);
+      const domKey='t'+grp[0].kind+'_'+uid_def;
+      const open=!!(S._fallenOpen&&S._fallenOpen[domKey]);
       let rows;
       if(isHero){ // one row per hero, listed by name (never merged)
         rows=`<table class="fallen-tbl"><tr><th>Name</th><th>Experience</th><th>Equipment lost</th></tr>`
@@ -1687,7 +1694,7 @@ export function renderRoster(){
           + Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(fallenEqAgg([s.ex]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
           + `</table>`;
       }
-      html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenGroupOpen('t${uid_def}',this.open)">
+      html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenGroupOpen('${domKey}',this.open)">
         <summary class="mhead fallen-head"><span class="badge fallen-badge">☠ Fallen</span>
           <span class="fallen-name">${grp.length}× ${def.name.replace(/</g,'&lt;')}</span>
           <span class="note">total ${totalExp} XP${eqAll.length?` · ${eqAll.map(x=>String(x).replace(/</g,'&lt;')).join(', ')}`:''} · ${goldLost} gc lost</span></summary>

@@ -268,3 +268,14 @@ Follow-up tweaks after playtesting the Fallen feature:
 
 Tests extended (fallen hero grouping, aggregate/free-dagger/gold-lost, sidebar
 order); suite 12/12.
+
+## July 17, 2026 — Fallen grouping fix for promoted henchmen
+
+A promoted henchman ("The Lad's Got Talent") is a Hero but keeps the uid_def of
+the group it came from. The Fallen section grouped purely by unit type, so when
+such a hero died it was lumped in with — and merged into — regular dead
+henchmen of the same base type. Fixed by grouping first by grade (hero vs
+henchman, taken from the death kind, which already respects promotion) and only
+then by unit type. A promoted Verminkin who dies now shows in its own Hero
+group (listed by name) rather than merging into the dead-Verminkin henchman
+tally. Regression test added.

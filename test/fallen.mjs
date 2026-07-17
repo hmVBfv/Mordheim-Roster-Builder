@@ -113,4 +113,24 @@ const agg=app.fallenEqAgg(state.S.fallen.map(e=>e.m));
 assert.deepStrictEqual(agg, ['3× Dagger (free)'], 'aggregate marks the free dagger and totals the count');
 assert.strictEqual(app.fallenGoldLost(), 3*35, 'gold lost = 3 marauders at 35 gc, free dagger costing 0');
 
-console.log('Fallen feature: OK (hero + henchman deaths, group removal at 0, exp grouping, hero name listing, aggregate eq + free dagger, gold lost, LIFO undo, PDF exclusion, remove-record)');
+// ---------- promoted henchman (Lad's Got Talent) dies as a HERO ----------
+// A promoted henchman shares its uid_def with the group it came from, but must
+// fall as a hero and never merge with regular dead henchmen of that type.
+state.replaceState({wb:'skaven',subtype:null,name:'Test',budget:500,models:[],hired:[],dp:[],
+  leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()});
+app.addUnit('vermin'); const vg=state.S.models.find(m=>m.uid_def==='vermin'); vg.qty=3; vg.exp=8;
+app.promoteHench(vg.uid);                       // one Verminkin becomes a Hero
+const promo=state.S.models.find(m=>m.promoted);
+assert.ok(promo && app.isHeroModel(promo), 'promoted henchman is a hero model');
+app.killHench(vg.uid);                           // a regular Verminkin dies
+app.killHero(promo.uid);                          // the promoted hero dies
+const kinds=state.S.fallen.map(e=>e.kind).sort();
+assert.deepStrictEqual(kinds, ['hench','hero'], 'promoted death is kind hero, regular death is kind hench');
+app.renderRoster();
+const ph=store['roster'].innerHTML; const pf=ph.slice(ph.indexOf('☠ Fallen'));
+// two separate Verminkin groups, not one merged group
+assert.strictEqual((pf.match(/Verminkin/g)||[]).length >= 2, true, 'promoted hero and henchman render as separate groups');
+assert.ok(pf.includes('<th>Name</th>') && pf.includes('<th>#</th>'),
+  'the hero group uses a Name column and the henchman group a # column');
+
+console.log('Fallen feature: OK (hero + henchman deaths, group removal at 0, exp grouping, hero name listing, promoted-henchman as hero, aggregate eq + free dagger, gold lost, LIFO undo, PDF exclusion, remove-record)');
