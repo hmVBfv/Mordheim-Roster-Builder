@@ -764,7 +764,7 @@ export function renderPicker(){
   });
 }
 export function chooseWb(key){
-  replaceState({wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:"", budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}});
+  replaceState({wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:"", budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}, fallen:[]});
   document.getElementById('picker-view').style.display='none';
   document.getElementById('builder-view').style.display='block';
   document.getElementById('wbname').value='';
@@ -892,7 +892,6 @@ export function adjGoldCurrent(d){ setGoldCurrent(goldCurrent()+d); }
 export function totalRating(){
   let r=0;
   S.models.forEach(m=>{
-    if(m.fallen) return;
     const def=unitDef(m.uid_def); const q=def.t==='hen'?m.qty:1;
     const base=def.large?20:5;
     r+=(base+ (def.t==='hero'?Number(m.exp||0):Number(m.exp||0)) )*q;
@@ -1373,13 +1372,53 @@ export function advSection(m){
 
 export function injModText(j){ return j.mod?' ('+Object.entries(j.mod).map(([k,v])=>(v>0?'+':'')+v+' '+k).join(', ')+')':''; }
 export function missAdj(u,d){ const m=S.models.find(x=>x.uid===u); if(!m) return; m.miss=Math.max(0,(Number(m.miss)||0)+d); render(); }
+/* ---- Fallen warriors (Dead 11-15) ----
+   Fallen units live in S.fallen (a chronological list), NOT in S.models, so
+   totals and exports exclude them automatically. Each entry is one death:
+     hero:  {kind:'hero', m:<full model snapshot>}
+     hench: {kind:'hench', uid_def, exp, m:<snapshot of ONE model>}
+   Heroes render as individual read-only cards; henchmen are grouped in the UI
+   by type (then by exp+equipment). A single LIFO "undo last death" reverses the
+   most recent entry (repeat to walk further back) — no per-unit selection. */
+function _fallenSnapshot(m){ return JSON.parse(JSON.stringify(m)); }
+export function fallenEqSig(m){ // canonical signature: same type+eq+adv+skills+mut+exp => identical
+  const eq={}; for(const k in (m.eq||{})) if(m.eq[k]) eq[k]=m.eq[k];
+  const rare={}; for(const k in (m.rare||{})) rare[k]=m.rare[k];
+  return JSON.stringify([m.uid_def, Number(m.exp)||0, eq, rare, (m.mut||[]).slice().sort(), (m.skills||[]).slice().sort(), m.adv||{}]);
+}
+export function killHero(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  if(typeof confirm==='function' && !confirm(`Mark ${m.name||unitDef(m.uid_def).name} as DEAD? They move to “Fallen”, stop counting toward the warband, and their equipment is locked (lost).`)) return;
+  S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:_fallenSnapshot(m)});
+  if(m.uid===S.leaderUid) S.leaderUid=null;
+  S.models=S.models.filter(x=>x.uid!==u); render(); }
+export function killHench(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  const def=unitDef(m.uid_def); const nm=m.name||def.name;
+  if(typeof confirm==='function' && !confirm(`One ${nm} model died. Remove it from the group (${m.qty} → ${m.qty-1})? It moves to “Fallen”.`)) return;
+  const snap=_fallenSnapshot(m); snap.qty=1;
+  S.fallen=S.fallen||[]; S.fallen.push({kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap});
+  m.qty=(Number(m.qty)||1)-1;
+  if(m.qty<=0) S.models=S.models.filter(x=>x.uid!==u);
+  render(); }
+export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
+  const e=S.fallen[S.fallen.length-1];
+  if(e.kind==='hero'){ S.models.push(e.m); }
+  else { // hench: return one model to a matching living group, or recreate it
+    const sig=fallenEqSig(e.m);
+    const grp=S.models.find(x=>!isHeroModel(x)&&fallenEqSig(x)===sig);
+    if(grp) grp.qty=(Number(grp.qty)||0)+1;
+    else { const nm=_fallenSnapshot(e.m); nm.uid=nextUid(); nm.qty=1; S.models.push(nm); }
+  }
+  S.fallen.pop(); render(); }
+export function removeFallenAt(i){ if(!S.fallen||!S.fallen[i]) return;
+  const e=S.fallen[i]; const eq=eqDisplayParts(e.m);
+  if(eq.length && typeof confirm==='function' && !confirm('Delete this fallen record permanently? Its equipment record will be lost too. (Undo cannot recover a deleted record.)')) return;
+  S.fallen.splice(i,1); render(); }
+export function setFallenGroupOpen(k,v){ S._fallenOpen=S._fallenOpen||{}; S._fallenOpen[k]=v; }
 export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('inj-'+u); const code=el&&el.value; const j=INJURIES.find(i=>i.code===code); if(!j) return;
-  if(j.code==='11-15'){ // Dead: remove from the active warband, keep as a (read-only) fallen record
-    if(typeof confirm==='function' && !confirm(`Mark ${m.name||unitDef(m.uid_def).name} as DEAD? They will be moved to “Fallen”, stop counting toward the warband, and their equipment becomes locked (lost).`)) { el.value=INJURIES[0]?INJURIES[0].code:''; return; }
-    m.fallen=true; if(m.uid===S.leaderUid) S.leaderUid=null; m._fallenOpen=false; render(); return; }
+  if(j.code==='11-15'){ // Dead — route to the right death path for hero vs henchman
+    if(el) el.value=INJURIES[0]?INJURIES[0].code:'';
+    if(isHeroModel(m)) killHero(u); else killHench(u); return; }
   if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; } m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null}); render(); }
-export function reviveFallen(u){ const m=S.models.find(x=>x.uid===u); if(!m) return; if(typeof confirm==='function' && !confirm('Restore this warrior to the active warband? (Use only to undo a misclick — a dead warrior does not normally come back.)')) return; delete m.fallen; render(); }
-export function setFallenOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._fallenOpen=v; }
 export function remInj(u,i){ const m=S.models.find(x=>x.uid===u); if(m.inj){ m.inj.splice(i,1); render(); } }
 export function setInjOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._injOpen=v; }
 export function injSection(m){
@@ -1560,7 +1599,7 @@ export function renderRoster(){
   ['hero','dp','hs','hen','vehicle'].forEach(t=>{
     if(t==='hs'){ html+=hsRosterCards(); return; }
     if(t==='dp'){ html+=dpRosterCards(); return; }
-    let ms=S.models.filter(m=> !m.fallen && groupOf(m)===t && !(t==='hen'&&m.promoted) );
+    let ms=S.models.filter(m=> groupOf(m)===t && !(t==='hen'&&m.promoted) );
     ms=ms.slice().sort((a,b)=>
       (t==='hero' ? ((isLeaderDef(unitDef(a.uid_def))?0:1)-(isLeaderDef(unitDef(b.uid_def))?0:1)) : 0)
       || (defIdx(a)-defIdx(b)) || (a.uid-b.uid) );
@@ -1579,6 +1618,7 @@ export function renderRoster(){
         <span class="note">${def.name}</span>
         <span class="missctl"><span class="misslbl no-print" title="Track games this warrior sits out (injuries that say “misses next game”, or unpaid Hired Sword upkeep). ▲ adds a game to miss, ▼ removes one.">⚑ miss games</span>${(Number(m.miss)||0)>0?`<b class="missbadge">out ${m.miss} game${m.miss>1?'s':''}</b>`:''}<button class="tiny ghost no-print" title="one fewer game to miss" ${(Number(m.miss)||0)<=0?'disabled':''} onclick="missAdj(${m.uid},-1)">▼</button><button class="tiny ghost no-print" title="miss one more game" onclick="missAdj(${m.uid},1)">▲</button></span>
         <button class="tiny ghost no-print" onclick="ttsOpen(${m.uid})" title="Description for Tabletop Simulator">⧉ TTS</button>
+        ${t==='vehicle'?'':`<button class="tiny ghost no-print death-btn" onclick="${t==='hen'?`killHench(${m.uid})`:`killHero(${m.uid})`}" title="${t==='hen'?'One model in this group died (Dead 11-15) — moves it to Fallen':'This warrior died (Dead 11-15) — moves them to Fallen'}">☠ ${t==='hen'?'a model died':'died'}</button>`}
         <button class="tiny ghost no-print" onclick="removeUnit(${m.uid})">remove</button>
       </div><div class="mbody">
         ${def.profile?statTableM(m):''}${attachedSection(def,m)}${vehRulesBlock(def)}
@@ -1602,23 +1642,44 @@ export function renderRoster(){
   });
   // Fallen (Dead 11-15): removed from the active warband, shown here read-only.
   // Collapsed by default; each unit collapsed too. Never exported (PDF/TTS/JSON).
-  const fallen=S.models.filter(m=>m.fallen);
+  const fallen=S.fallen||[];
   if(fallen.length){
-    html+=`<details class="fallen-wrap no-print"><summary class="fallen-sum">☠ Fallen (${fallen.length}) — removed from the warband, equipment lost</summary>`;
-    fallen.forEach(m=>{
-      const def=unitDef(m.uid_def);
-      const eq=eqDisplayParts(m);
-      const open=!!m._fallenOpen;
-      html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenOpen(${m.uid},this.open)">
+    const heroes=fallen.filter(e=>e.kind==='hero');
+    const hench=fallen.filter(e=>e.kind==='hench');
+    html+=`<details class="fallen-wrap no-print"><summary class="fallen-sum">☠ Fallen (${fallen.length}) — removed from the warband, equipment lost</summary>
+      <div class="fallen-tools"><button class="btnsm" onclick="undoFallen()" title="Undo the most recent death (press again to undo the one before, and so on)">↩ Undo last death</button></div>`;
+    // Heroes: one read-only card each.
+    heroes.forEach(e=>{ const m=e.m; const def=unitDef(m.uid_def); const idx=fallen.indexOf(e); const eq=eqDisplayParts(m); const open=!!(S._fallenOpen&&S._fallenOpen['h'+idx]);
+      html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenGroupOpen('h${idx}',this.open)">
         <summary class="mhead fallen-head"><span class="badge fallen-badge">☠ Fallen</span>
           <span class="fallen-name">${(m.name||def.name).replace(/</g,'&lt;')}</span>
-          <span class="note">${def.name}</span></summary>
+          <span class="note">${def.name}${m.exp?` · ${m.exp} XP`:''}</span></summary>
         <div class="mbody fallen-body">
-          <div class="note">This warrior is dead. Their record is read-only; the equipment below was lost with them and cannot be changed.</div>
+          <div class="note">This warrior is dead. The record is read-only; the equipment below was lost with them.</div>
           ${def.profile?statTableM(m):''}
           <div class="fallen-eq"><b>Equipment lost:</b> ${eq.length?eq.map(x=>String(x).replace(/</g,'&lt;')).join(', '):'—'}</div>
-          <button class="btnsm no-print" onclick="reviveFallen(${m.uid})" title="Undo a misclick — restore this warrior to the active warband">↩ Restore (undo misclick)</button>
-          <button class="tiny ghost no-print" onclick="removeUnit(${m.uid})" title="Delete this fallen record entirely">remove record</button>
+          <button class="tiny ghost no-print" onclick="removeFallenAt(${idx})" title="Delete this fallen record entirely">remove record</button>
+        </div></details>`;
+    });
+    // Henchmen: group by type (summary), then by exp+equipment (detail rows).
+    const byType={};
+    hench.forEach(e=>{ (byType[e.uid_def]=byType[e.uid_def]||[]).push(e); });
+    Object.keys(byType).forEach(uid_def=>{
+      const grp=byType[uid_def]; const def=unitDef(uid_def);
+      const totalExp=grp.reduce((s,e)=>s+(Number(e.exp)||0),0);
+      // sub-group by identical signature
+      const subs={}; grp.forEach(e=>{ const sig=fallenEqSig(e.m); (subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp}).n++; });
+      const open=!!(S._fallenOpen&&S._fallenOpen['t'+uid_def]);
+      const eqAll=eqDisplayParts(grp[0].m);
+      html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenGroupOpen('t${uid_def}',this.open)">
+        <summary class="mhead fallen-head"><span class="badge fallen-badge">☠ Fallen</span>
+          <span class="fallen-name">${grp.length}× ${def.name.replace(/</g,'&lt;')}</span>
+          <span class="note">total ${totalExp} XP${eqAll.length?` · ${eqAll.map(x=>String(x).replace(/</g,'&lt;')).join(', ')}`:''}</span></summary>
+        <div class="mbody fallen-body">
+          <div class="note">${grp.length} model${grp.length>1?'s':''} of this type died. Records are read-only; equipment was lost with them.</div>
+          <table class="fallen-tbl"><tr><th>#</th><th>Experience</th><th>Equipment lost</th></tr>
+          ${Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(eqDisplayParts(s.ex).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')}
+          </table>
         </div></details>`;
     });
     html+=`</details>`;
@@ -1849,11 +1910,12 @@ export async function loadRoster(nm){
 }
 export async function delRoster(nm){ try{ await window.storage.delete('mh:'+nm,false); openLoad(); openLoad(); }catch(e){} }
 export function applyState(data){
-  replaceState({wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]}});
+  replaceState({wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]},fallen:data.fallen||[]});
   S.house=Object.assign(houseDefaults(), data.house||{});
   S.mark=data.mark||'';
   if(!S.stash||typeof S.stash!=='object') S.stash={wyrd:0,gold:0,items:[]};
   if(!Array.isArray(S.stash.items)) S.stash.items=[];
+  if(!S.fallen) S.fallen=[];
   S.models.forEach(m=>{ if(!m.eq)m.eq={}; if(!m.mut)m.mut=[]; if(!m.adv)m.adv={}; if(!m.skills)m.skills=[]; if(!m.inj)m.inj=[]; if(!m.spells)m.spells=[]; });
   resyncUid();
   document.getElementById('picker-view').style.display='none';
@@ -1908,8 +1970,8 @@ export function eqDisplayParts(m){
 export function buildText(){
   const wb=WARBANDS[S.wb];
   const spent=totalSpent(), rating=totalRating();
-  const heroes=S.models.filter(m=>!m.fallen&&unitDef(m.uid_def).t==='hero');
-  const hench=S.models.filter(m=>!m.fallen&&unitDef(m.uid_def).t==='hen');
+  const heroes=S.models.filter(m=>unitDef(m.uid_def).t==='hero');
+  const hench=S.models.filter(m=>unitDef(m.uid_def).t==='hen');
   const sum=arr=>({gc:arr.reduce((s,m)=>s+modelTotalCost(m),0), r:arr.reduce((s,m)=>s+modelRating(m)*(unitDef(m.uid_def).t==='hen'?m.qty:1),0)});
   const hS=sum(heroes), nS=sum(hench);
   const det=m=>{ const def=unitDef(m.uid_def); const d=[];
@@ -2168,7 +2230,7 @@ Object.assign(window, {
   passNameFilter, passStatFilter, pickSub, priceMod, promoteHench, promotedSkillLists,
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
-  reviveFallen, setFallenOpen,
+  killHench, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
   render, renderAddMenu, renderCampaign, renderDramatis, renderExtra, renderHiredSwords,
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
   resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,
