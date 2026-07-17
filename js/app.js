@@ -892,6 +892,7 @@ export function adjGoldCurrent(d){ setGoldCurrent(goldCurrent()+d); }
 export function totalRating(){
   let r=0;
   S.models.forEach(m=>{
+    if(m.fallen) return;
     const def=unitDef(m.uid_def); const q=def.t==='hen'?m.qty:1;
     const base=def.large?20:5;
     r+=(base+ (def.t==='hero'?Number(m.exp||0):Number(m.exp||0)) )*q;
@@ -1210,7 +1211,7 @@ export function skillListsFor(def){ const out=[];
   let cats = (def.skSub && def.skSub[S.subtype]) || def.sk || ['combat','shooting','academic','strength','speed'];
   if(HR().allSkills) cats=['combat','shooting','academic','strength','speed'];
   cats.forEach(c=>{ if(SKILLLISTS[c]) out.push(['['+SKILLLISTS[c].name+']',SKILLLISTS[c].skills]); else if(SKILLSETS[c]) out.push(['['+SKILLSETS[c].name+']',SKILLSETS[c].skills]); });
-  const ex=WBEXTRA[S.wb]; if(ex&&ex.skills&&SKILLSETS[ex.skills]&&!def.noWbSkills) out.push(['['+SKILLSETS[ex.skills].name+']',SKILLSETS[ex.skills].skills]);
+  const ex=WBEXTRA[S.wb]; if(ex&&ex.skills&&SKILLSETS[ex.skills]&&!def.noWbSkills&&!cats.includes(ex.skills)) out.push(['['+SKILLSETS[ex.skills].name+']',SKILLSETS[ex.skills].skills]);
   return out; }
 export function skillOptions(def){ return skillListsFor(def).map(([lab,sk])=>sk.map(s=>`<option value="${s[0].replace(/"/g,'&quot;')}">${lab} ${s[1].slice(0,60)}</option>`).join('')).join(''); }
 export function skillOptionsFor(lists){ return lists.map(([lab,sk])=>sk.map(s=>`<option value="${s[0].replace(/"/g,'&quot;')}">${lab} ${s[1].slice(0,60)}</option>`).join('')).join(''); }
@@ -1311,7 +1312,7 @@ export function advSection(m){
   const applied=Object.values(adv).reduce((s,v)=>s+(Number(v)||0),0)+skills.length+spellAdv;
   const order=["M","WS","BS","S","T","W","I","A","Ld"];
   const chips=order.filter(x=>adv[x]).map(x=>`<span class="advchip">+${adv[x]} ${x}<button class="advx no-print" title="remove" onclick="remAdv(${m.uid},'${x}')">×</button></span>`).join('')
-    + skills.map((sk,i)=>`<span class="advchip skill" title="${skillText(sk,e).replace(/"/g,'&quot;')}">${String(sk).replace(/</g,'&lt;')}<button class="advx no-print" title="remove" onclick="remSkill(${m.uid},${i})">×</button></span>`).join('');
+    + skills.map((sk,i)=>`<span class="advchip skill" title="${skillText(sk).replace(/"/g,'&quot;')}">${String(sk).replace(/</g,'&lt;')}<button class="advx no-print" title="remove" onclick="remSkill(${m.uid},${i})">×</button></span>`).join('');
   const btns=order.map(x=>{ const ok=canAdv(m,x); return `<button class="btnsm advb" ${ok?'':'disabled'} title="${ok?('apply +1 '+x):'maximum reached'}" onclick="addAdv(${m.uid},'${x}')">+${x}</button>`; }).join('');
   const mi=maxInfo(m);
   const maxNote = mi ? `Maxima (${mi.label}): ${order.map(x=>`${x} ${mi.prof[x]}`).join(' · ')}.${!hero?' Henchmen: max +1 per stat.':''}` : `No racial maxima on file — please track manually.`;
@@ -1372,7 +1373,13 @@ export function advSection(m){
 
 export function injModText(j){ return j.mod?' ('+Object.entries(j.mod).map(([k,v])=>(v>0?'+':'')+v+' '+k).join(', ')+')':''; }
 export function missAdj(u,d){ const m=S.models.find(x=>x.uid===u); if(!m) return; m.miss=Math.max(0,(Number(m.miss)||0)+d); render(); }
-export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('inj-'+u); const code=el&&el.value; const j=INJURIES.find(i=>i.code===code); if(!j) return; if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; } m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null}); render(); }
+export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('inj-'+u); const code=el&&el.value; const j=INJURIES.find(i=>i.code===code); if(!j) return;
+  if(j.code==='11-15'){ // Dead: remove from the active warband, keep as a (read-only) fallen record
+    if(typeof confirm==='function' && !confirm(`Mark ${m.name||unitDef(m.uid_def).name} as DEAD? They will be moved to “Fallen”, stop counting toward the warband, and their equipment becomes locked (lost).`)) { el.value=INJURIES[0]?INJURIES[0].code:''; return; }
+    m.fallen=true; if(m.uid===S.leaderUid) S.leaderUid=null; m._fallenOpen=false; render(); return; }
+  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; } m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null}); render(); }
+export function reviveFallen(u){ const m=S.models.find(x=>x.uid===u); if(!m) return; if(typeof confirm==='function' && !confirm('Restore this warrior to the active warband? (Use only to undo a misclick — a dead warrior does not normally come back.)')) return; delete m.fallen; render(); }
+export function setFallenOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._fallenOpen=v; }
 export function remInj(u,i){ const m=S.models.find(x=>x.uid===u); if(m.inj){ m.inj.splice(i,1); render(); } }
 export function setInjOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._injOpen=v; }
 export function injSection(m){
@@ -1553,7 +1560,7 @@ export function renderRoster(){
   ['hero','dp','hs','hen','vehicle'].forEach(t=>{
     if(t==='hs'){ html+=hsRosterCards(); return; }
     if(t==='dp'){ html+=dpRosterCards(); return; }
-    let ms=S.models.filter(m=> groupOf(m)===t && !(t==='hen'&&m.promoted) );
+    let ms=S.models.filter(m=> !m.fallen && groupOf(m)===t && !(t==='hen'&&m.promoted) );
     ms=ms.slice().sort((a,b)=>
       (t==='hero' ? ((isLeaderDef(unitDef(a.uid_def))?0:1)-(isLeaderDef(unitDef(b.uid_def))?0:1)) : 0)
       || (defIdx(a)-defIdx(b)) || (a.uid-b.uid) );
@@ -1593,6 +1600,29 @@ export function renderRoster(){
       </div></div>`;
     });
   });
+  // Fallen (Dead 11-15): removed from the active warband, shown here read-only.
+  // Collapsed by default; each unit collapsed too. Never exported (PDF/TTS/JSON).
+  const fallen=S.models.filter(m=>m.fallen);
+  if(fallen.length){
+    html+=`<details class="fallen-wrap no-print"><summary class="fallen-sum">☠ Fallen (${fallen.length}) — removed from the warband, equipment lost</summary>`;
+    fallen.forEach(m=>{
+      const def=unitDef(m.uid_def);
+      const eq=eqDisplayParts(m);
+      const open=!!m._fallenOpen;
+      html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenOpen(${m.uid},this.open)">
+        <summary class="mhead fallen-head"><span class="badge fallen-badge">☠ Fallen</span>
+          <span class="fallen-name">${(m.name||def.name).replace(/</g,'&lt;')}</span>
+          <span class="note">${def.name}</span></summary>
+        <div class="mbody fallen-body">
+          <div class="note">This warrior is dead. Their record is read-only; the equipment below was lost with them and cannot be changed.</div>
+          ${def.profile?statTableM(m):''}
+          <div class="fallen-eq"><b>Equipment lost:</b> ${eq.length?eq.map(x=>String(x).replace(/</g,'&lt;')).join(', '):'—'}</div>
+          <button class="btnsm no-print" onclick="reviveFallen(${m.uid})" title="Undo a misclick — restore this warrior to the active warband">↩ Restore (undo misclick)</button>
+          <button class="tiny ghost no-print" onclick="removeUnit(${m.uid})" title="Delete this fallen record entirely">remove record</button>
+        </div></details>`;
+    });
+    html+=`</details>`;
+  }
   el.innerHTML=html;
 }
 export function renderSidebar(){
@@ -1878,8 +1908,8 @@ export function eqDisplayParts(m){
 export function buildText(){
   const wb=WARBANDS[S.wb];
   const spent=totalSpent(), rating=totalRating();
-  const heroes=S.models.filter(m=>unitDef(m.uid_def).t==='hero');
-  const hench=S.models.filter(m=>unitDef(m.uid_def).t==='hen');
+  const heroes=S.models.filter(m=>!m.fallen&&unitDef(m.uid_def).t==='hero');
+  const hench=S.models.filter(m=>!m.fallen&&unitDef(m.uid_def).t==='hen');
   const sum=arr=>({gc:arr.reduce((s,m)=>s+modelTotalCost(m),0), r:arr.reduce((s,m)=>s+modelRating(m)*(unitDef(m.uid_def).t==='hen'?m.qty:1),0)});
   const hS=sum(heroes), nS=sum(hench);
   const det=m=>{ const def=unitDef(m.uid_def); const d=[];
@@ -2095,8 +2125,7 @@ export function raceEN(k){ return k?(RACE_EN[k]||k):''; }
 
 
 
-/* Sheet-Template: modular per fetch, im Single-File-Build als Base64-Konstante. */
-export let _sheetBytes=null;
+
 
 /* ---- Globale Bindung ----
    Das Markup nutzt onclick="…"; im Modul-Scope sind Funktionen nicht global.
@@ -2139,6 +2168,7 @@ Object.assign(window, {
   passNameFilter, passStatFilter, pickSub, priceMod, promoteHench, promotedSkillLists,
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
+  reviveFallen, setFallenOpen,
   render, renderAddMenu, renderCampaign, renderDramatis, renderExtra, renderHiredSwords,
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
   resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,
