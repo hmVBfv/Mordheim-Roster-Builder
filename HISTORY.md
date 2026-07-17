@@ -237,3 +237,34 @@ section and each entry are collapsed by default; `S.fallen` is part of the tool
 JSON save, so the graveyard survives a reload.
 
 Tests: `ui-bugs.mjs` and `fallen.mjs` added; suite now 12 files, all green.
+
+## July 17, 2026 — Fallen polish + roster-order fix
+
+Follow-up tweaks after playtesting the Fallen feature:
+
+- **Confirmation logic flipped to match reversibility.** "Died" (killHero /
+  killHench) no longer asks to confirm — it's undoable via the LIFO undo. The
+  genuinely destructive action, the unit "remove" button, now asks for
+  confirmation when the unit has equipment (there is no undo for it); "remove
+  record" on a fallen entry keeps its confirmation too.
+- **Fallen summaries aggregate equipment**, e.g. "3× Dagger" across the whole
+  group rather than one model's worth, and the free (1st-gratis) dagger is
+  marked "(free)" so it's clear no gold was lost on it.
+- **Total gold lost** through the fallen is shown (unit cost + equipment; the
+  free dagger counts as 0), both per type-group and in the section header.
+- **Heroes are now grouped by type too**, like henchmen — but their detail
+  table lists each hero individually by name (never merged), with a Name
+  column instead of a count, since heroes are unique individuals even when two
+  share a type. Henchmen still merge identical models by exp + equipment.
+- The Fallen section now renders **even when no living warriors remain** (all
+  dead) instead of showing the empty "no warriors recruited" state.
+- **Name field falls back to the default.** Clearing a custom unit name now
+  shows the unit's default type name (as the field placeholder) instead of a
+  generic "Name" prompt.
+- **Roster-order bug fixed.** The right-hand roster *summary* listed heroes and
+  henchmen in recruitment order; it now follows the warband's unit-listing
+  order (leader pinned first), matching the main roster and the PDF. So a Seer
+  recruited before the Chieftain no longer sorts above it.
+
+Tests extended (fallen hero grouping, aggregate/free-dagger/gold-lost, sidebar
+order); suite 12/12.

@@ -87,4 +87,30 @@ app.addUnit('adept'); app.killHero(state.S.models.find(m=>m.uid_def==='adept').u
 app.removeFallenAt(0);
 assert.strictEqual(state.S.fallen.length, 0, 'removeFallenAt deletes the record');
 
-console.log('Fallen feature: OK (hero + henchman deaths, group removal at 0, exp grouping, LIFO undo, PDF exclusion, remove-record)');
+// ---------- HERO grouping: same type, listed individually by name ----------
+fresh();
+state.replaceState({wb:'skaven',subtype:null,name:'Test',budget:500,models:[],hired:[],dp:[],
+  leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()});
+app.addUnit('black'); app.addUnit('black');
+const blacks=state.S.models.filter(m=>m.uid_def==='black');
+blacks[0].name='Cookie'; blacks[0].exp=20; blacks[1].exp=20;
+app.killHero(blacks[0].uid); app.killHero(blacks[1].uid);
+app.renderRoster();
+const rhtml=store['roster'].innerHTML;
+const fseg=rhtml.slice(rhtml.indexOf('☠ Fallen'));
+assert.ok(fseg.includes('<th>Name</th>'), 'hero fallen group uses a Name column');
+assert.ok(fseg.includes('Cookie'), 'custom-named fallen hero is listed by name');
+assert.ok(/2× Black/.test(fseg), 'hero group summary shows the count and type');
+// even with no living models, the fallen section still renders
+assert.ok(fseg.includes('Fallen'), 'fallen section shows even when all warriors are dead');
+
+// ---------- aggregate equipment + free-dagger marking + gold lost ----------
+state.replaceState({wb:'maraudersofchaos',subtype:null,name:'Test',budget:500,models:[],hired:[],dp:[],
+  leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()});
+app.addUnit('marauder'); const mar=state.S.models.find(m=>m.uid_def==='marauder'); mar.qty=3;
+app.killHench(mar.uid); app.killHench(mar.uid); app.killHench(mar.uid);
+const agg=app.fallenEqAgg(state.S.fallen.map(e=>e.m));
+assert.deepStrictEqual(agg, ['3× Dagger (free)'], 'aggregate marks the free dagger and totals the count');
+assert.strictEqual(app.fallenGoldLost(), 3*35, 'gold lost = 3 marauders at 35 gc, free dagger costing 0');
+
+console.log('Fallen feature: OK (hero + henchman deaths, group removal at 0, exp grouping, hero name listing, aggregate eq + free dagger, gold lost, LIFO undo, PDF exclusion, remove-record)');
