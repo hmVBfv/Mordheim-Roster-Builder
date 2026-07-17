@@ -220,10 +220,20 @@ New feature — **Fallen warriors**: applying the Dead (11-15) serious injury no
 moves the warrior out of the active warband into a collapsed "Fallen" section
 instead of adding a text note. A fallen warrior no longer counts toward the
 warband size, hero count, gold spent or rating, and is excluded from the PDF
-and shareable-text exports. Their equipment stays visible as a read-only record
-(it was lost with them, and must not be silently editable afterwards), and the
-whole section — and each fallen card — is collapsed by default to save space.
-A guarded "Restore" button exists purely to undo a misclick. The fallen record
-is still kept in the tool's own JSON save so it survives a reload.
+and shareable-text exports. Their equipment stays visible as a read-only record.
+
+The first cut flagged models in place (m.fallen); a follow-up reworked it to a
+central `S.fallen` list (fallen units leave `S.models` entirely, so totals and
+exports exclude them with no per-model filters). This also handles henchmen
+correctly: a henchman death removes ONE model from the group (qty-1, the group
+vanishes when the last model dies) rather than wiping the whole group. Fallen
+henchmen are grouped in the UI by type, then by identical exp+equipment
+(e.g. "3× Verminkin, total 15 XP" expanding to per-exp detail rows), while
+being stored one-record-per-death so a single LIFO "Undo last death" button can
+walk back through the history — restoring a hero, or returning a henchman to its
+living group (recreating the group if it had been wiped). Deleting a fallen
+record asks for confirmation when equipment would be lost with it. The whole
+section and each entry are collapsed by default; `S.fallen` is part of the tool
+JSON save, so the graveyard survives a reload.
 
 Tests: `ui-bugs.mjs` and `fallen.mjs` added; suite now 12 files, all green.

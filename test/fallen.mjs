@@ -1,10 +1,10 @@
 /* Regression test for the "Fallen" (Dead 11-15) feature.
  *
- * When a hero suffers the Dead serious injury, the unit is flagged m.fallen and:
- *  - stops counting toward totalModels / totalHeroes / totalSpent / totalRating,
- *  - is excluded from the PDF and shareable-text exports,
- *  - keeps its equipment as a read-only record (still serialized in the tool's
- *    own JSON save so it survives a reload).
+ * Fallen units live in S.fallen (out of S.models), so totals and exports
+ * exclude them automatically. Heroes fall as whole models; henchmen fall one
+ * model at a time (group qty-1, group removed at 0). A single LIFO undo
+ * reverses the most recent death. Henchmen are grouped in the UI, but stored
+ * one-record-per-death so undo works per model.
  */
 import assert from 'assert';
 import * as fs from 'fs';
@@ -17,7 +17,7 @@ const store={};
 globalThis.document={getElementById:(id)=>store[id]||(store[id]=el(id)),createElement:el,addEventListener(){},body:{appendChild(){}},querySelectorAll:()=>[],querySelector:()=>null};
 globalThis.window={addEventListener(){},scrollTo(){},innerWidth:1000,matchMedia:()=>({matches:false,addEventListener(){}}),storage:{list:async()=>({keys:[]})}};
 globalThis.Blob=function(){ this.parts=arguments; }; globalThis.URL.createObjectURL=()=>'blob:x';
-globalThis.confirm=()=>true; // auto-confirm the destructive "mark dead" prompt
+globalThis.confirm=()=>true; // auto-confirm destructive prompts
 globalThis.fetch=async(u)=>{const p=decodeURIComponent(new URL(u).pathname);
   return {ok:fs.existsSync(p),json:async()=>JSON.parse(fs.readFileSync(p,'utf8')),arrayBuffer:async()=>fs.readFileSync(p).buffer};};
 
@@ -29,44 +29,62 @@ const eng=await import(new URL('../js/engine.js', import.meta.url).href);
 const pdf=await import(new URL('../js/pdf.js', import.meta.url).href);
 const state=await import(new URL('../js/state.js', import.meta.url).href);
 
-state.replaceState({wb:'skaven',subtype:null,name:'Test',budget:500,models:[],hired:[],dp:[],
-  leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},house:state.houseDefaults()});
-app.addUnit('adept'); app.addUnit('black');
-const [a,b]=state.S.models;
-a.eq={'Schwert':1};
+function fresh(){ state.replaceState({wb:'skaven',subtype:null,name:'Test',budget:500,models:[],hired:[],dp:[],
+  leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()}); }
 
-const modelsBefore=eng.totalModels(), heroesBefore=eng.totalHeroes(), spentBefore=eng.totalSpent();
-assert.strictEqual(modelsBefore, 2, 'two models before');
+// ---------- HERO death ----------
+fresh();
+app.addUnit('adept');   // hero
+app.addUnit('vermin');  // henchmen group
+const hero=state.S.models.find(m=>m.uid_def==='adept');
+const modelsBefore=eng.totalModels(), heroesBefore=eng.totalHeroes();
+app.killHero(hero.uid);
+assert.ok(!state.S.models.find(m=>m.uid===hero.uid), 'dead hero is removed from S.models');
+assert.strictEqual(state.S.fallen.length, 1, 'one fallen record added');
+assert.strictEqual(state.S.fallen[0].kind, 'hero');
+assert.strictEqual(eng.totalHeroes(), heroesBefore-1, 'fallen hero no longer counts');
+await assert.doesNotReject(()=>pdf.exportOfficialSheet(), 'PDF export runs with a fallen hero');
 
-// Mark unit A as dead via the injury flow.
-document.getElementById('inj-'+a.uid).value='11-15';
-app.addInj(a.uid);
-assert.strictEqual(a.fallen, true, 'unit A must be flagged fallen');
+// undo brings the hero back
+app.undoFallen();
+assert.strictEqual(state.S.fallen.length, 0, 'undo removes the fallen record');
+assert.ok(state.S.models.find(m=>m.uid_def==='adept'), 'undo restores the hero to S.models');
+assert.strictEqual(eng.totalHeroes(), heroesBefore, 'restored hero counts again');
 
-// Excluded from all counts/totals.
-assert.strictEqual(eng.totalModels(), modelsBefore-1, 'fallen unit no longer counts toward model total');
-assert.strictEqual(eng.totalHeroes(), heroesBefore-1, 'fallen unit no longer counts as a hero');
-assert.ok(eng.totalSpent() < spentBefore, 'fallen unit no longer adds to gold spent');
+// ---------- HENCHMAN death (decrement + group removal at 0) ----------
+fresh();
+app.addUnit('vermin');
+const grp=state.S.models.find(m=>m.uid_def==='vermin');
+grp.qty=3; grp.exp=5; grp.eq={'Schwert':1};
+const mBefore=eng.totalModels();
+app.killHench(grp.uid);
+assert.strictEqual(grp.qty, 2, 'henchman death decrements group qty by one');
+assert.strictEqual(eng.totalModels(), mBefore-1, 'total model count drops by one');
+assert.strictEqual(state.S.fallen.length, 1, 'one henchman fallen record');
+assert.strictEqual(state.S.fallen[0].exp, 5, 'fallen record captures exp snapshot');
 
-// Equipment preserved on the record (read-only), still in the tool JSON save.
-assert.strictEqual(a.eq['Schwert'], 1, 'fallen unit keeps its equipment data');
-const saved=JSON.parse(JSON.stringify(state.S));
-assert.ok(saved.models.find(m=>m.uid===a.uid && m.fallen), 'fallen unit is kept in the tool JSON save');
+// kill the remaining two -> group vanishes from roster
+app.killHench(grp.uid);
+app.killHench(grp.uid);
+assert.ok(!state.S.models.find(m=>m.uid_def==='vermin'), 'group removed from roster when last model dies');
+assert.strictEqual(state.S.fallen.length, 3, 'three henchman fallen records');
 
-// Excluded from the PDF export (must still run without throwing).
-await assert.doesNotReject(() => pdf.exportOfficialSheet(), 'PDF export runs with a fallen unit present');
+// all three died at exp 5 with same equipment -> one display sub-group of 3
+const sigs=new Set(state.S.fallen.map(e=>app.fallenEqSig(e.m)));
+assert.strictEqual(sigs.size, 1, 'three identical henchmen share one signature (group of 3× @5XP)');
 
-// Shareable text export must not list the fallen unit.
-const txt=app.buildText();
-// only unit B (living) should appear as an active roster line; fallen A excluded.
-// (Both share the same def name, so check the living count indirectly via totals text isn't reliable;
-//  instead assert the fallen flag kept A out of the heroes list used by buildText.)
-const livingHeroes=state.S.models.filter(m=>!m.fallen && app.unitDef(m.uid_def).t==='hero').length;
-assert.strictEqual(livingHeroes, 1, 'only the living hero remains in the active roster');
+// undo LIFO: restores one at a time; since group is gone, first undo recreates it
+app.undoFallen();
+assert.strictEqual(state.S.fallen.length, 2, 'undo pops one henchman record');
+const rebuilt=state.S.models.find(m=>m.uid_def==='vermin');
+assert.ok(rebuilt && rebuilt.qty===1, 'undo recreates the henchman group with qty 1');
+app.undoFallen();
+assert.strictEqual(rebuilt.qty, 2, 'next undo merges back into the living group (qty 2)');
 
-// Restore (undo misclick) brings it back.
-app.reviveFallen(a.uid);
-assert.ok(!a.fallen, 'reviveFallen clears the fallen flag');
-assert.strictEqual(eng.totalModels(), modelsBefore, 'restored unit counts again');
+// ---------- remove-record needs no crash and drops the entry ----------
+fresh();
+app.addUnit('adept'); app.killHero(state.S.models.find(m=>m.uid_def==='adept').uid);
+app.removeFallenAt(0);
+assert.strictEqual(state.S.fallen.length, 0, 'removeFallenAt deletes the record');
 
-console.log('Fallen feature: OK (excluded from totals/heroes/spent/PDF/text, equipment preserved read-only, restore works)');
+console.log('Fallen feature: OK (hero + henchman deaths, group removal at 0, exp grouping, LIFO undo, PDF exclusion, remove-record)');

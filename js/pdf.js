@@ -79,9 +79,9 @@ async function exportOfficialSheet(){
   const _rosterOrder=(WARBANDS[S.wb]&&WARBANDS[S.wb].units)||[];
   const _orderIdx=(m)=>{ const i=_rosterOrder.findIndex(u=>u.id===m.uid_def); return i<0?_rosterOrder.length:i; };
   const _byRosterOrder=(a,b)=>_orderIdx(a)-_orderIdx(b);
-  const heroes=S.models.filter(m=>!m.fallen&&isHeroModel(m)).sort(_byRosterOrder);
-  const hench=S.models.filter(m=>!m.fallen&&!isHeroModel(m)&&!unitDef(m.uid_def).vehicle).sort(_byRosterOrder);
-  const veh=S.models.filter(m=>!m.fallen&&unitDef(m.uid_def).vehicle).sort(_byRosterOrder);
+  const heroes=S.models.filter(m=>isHeroModel(m)).sort(_byRosterOrder);
+  const hench=S.models.filter(m=>!isHeroModel(m)&&!unitDef(m.uid_def).vehicle).sort(_byRosterOrder);
+  const veh=S.models.filter(m=>unitDef(m.uid_def).vehicle).sort(_byRosterOrder);
   const dpAll=(S.dp||[]).map(d=>({rec:d,e:DRAMATIS[d.key],kind:'Dramatis Personae'}));
   const hsAll=(S.hired||[]).map(h=>({rec:h,e:HIREDSWORDS[h.key],kind:'Hired Sword'}));
   const extra=[...dpAll,...hsAll];
@@ -103,7 +103,7 @@ async function exportOfficialSheet(){
       _sheetTxt(pg,f,gx,357,78,9,{right:true});
       _sheetTxt(pg,f,totalModels(),233,90,8,{center:true});
       _sheetTxt(pg,f,totalModels()*5,357,90,9,{right:true});
-      const lg=S.models.filter(m=>!m.fallen&&/large/i.test(unitDef(m.uid_def).sp||'')).reduce((s,m)=>s+(m.qty||1),0);
+      const lg=S.models.filter(m=>/large/i.test(unitDef(m.uid_def).sp||'')).reduce((s,m)=>s+(m.qty||1),0);
       _sheetTxt(pg,f,lg,264,101,8,{center:true});
       _sheetTxt(pg,f,lg*20,357,101,9,{right:true});
       _sheetTxt(pg,f,typeof hsRatingTotal==='function'?hsRatingTotal():0,357,112,9,{right:true});
@@ -195,7 +195,7 @@ async function exportOfficialSheet(){
       _sheetTxt(pg,fb,allHen.reduce((s,m)=>s+(m.exp||0),0),540,558,11,{center:true});
       const notes=[];
       [...NOTES.entries()].forEach(([nm,t])=>notes.push(nm+': '+String(t).replace(/<[^>]+>/g,'')));
-      S.models.filter(m=>!m.fallen&&(m.inj||[]).length).forEach(m=>notes.push('INJURY \u2014 '+(m.name||unitDef(m.uid_def).name)+': '+(m.inj||[]).map(j=>j.name||j.code).join(', ')));
+      S.models.filter(m=>(m.inj||[]).length).forEach(m=>notes.push('INJURY \u2014 '+(m.name||unitDef(m.uid_def).name)+': '+(m.inj||[]).map(j=>j.name||j.code).join(', ')));
       if(typeof houseDeviations==='function'){ houseDeviations().forEach(function(x){ notes.push('HOUSE RULE \u2014 '+x.label+': '+x.value); }); }
       else if(HR&&HR().notes) notes.push('HOUSE RULES: '+HR().notes);
       let ny=586;
