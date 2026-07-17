@@ -87,6 +87,19 @@
   .badge.hero{background:var(--blood)}
   .badge.hen{background:var(--green)}
   .badge.vehicle{background:var(--iron);color:var(--gold);border:1px solid var(--gold)}
+  /* Fallen (Dead) warriors: muted, clearly set apart from the active warband */
+  .fallen-wrap{margin:18px 0 6px;border:1px dashed var(--parch-edge);border-radius:4px;background:rgba(60,50,45,.06)}
+  .fallen-wrap>summary.fallen-sum{cursor:pointer;padding:9px 12px;font-family:'Pirata One',serif;font-size:17px;color:var(--iron);letter-spacing:.5px;list-style:none}
+  .fallen-wrap>summary.fallen-sum::-webkit-details-marker{display:none}
+  .fallen-wrap>summary.fallen-sum::before{content:'▸ ';color:var(--iron)}
+  .fallen-wrap[open]>summary.fallen-sum::before{content:'▾ '}
+  .model.fallen{opacity:.7;filter:grayscale(.4);border-color:var(--parch-edge);margin:8px 10px}
+  .model.fallen>summary.fallen-head{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:8px 12px}
+  .model.fallen>summary.fallen-head::-webkit-details-marker{display:none}
+  .badge.fallen-badge{background:#4a4038;color:var(--parch)}
+  .fallen-name{font-family:'Pirata One',serif;font-size:19px;color:var(--iron)}
+  .fallen-body{padding:8px 12px}
+  .fallen-eq{margin:8px 0;font-size:14px}
   .srule-intro{margin:0 0 6px}
   .srule{margin:3px 0;padding:3px 8px 3px 10px;border-left:3px solid var(--gold);background:rgba(154,123,50,.07);border-radius:0 4px 4px 0}
   .srule b{color:var(--blood)}
@@ -472,7 +485,7 @@
       <button onclick="openExport()">Export ▾</button>
       <button onclick="openImport()">Import</button>
       <input type="file" id="importfile" accept=".json,.txt" style="display:none" onchange="importJSON(event)">
-      <button class="blood" onclick="window.print()">Print</button> <button onclick="exportOfficialSheet()" title="Fill the official freebooters.org roster sheet (PDF) with your warband">⬇ Official sheet (PDF)</button>
+      <button class="blood" onclick="window.print()">Print</button> <button onclick="exportOfficialSheet()" title="Fill the official Mordheim roster sheet (PDF) with your warband">⬇ Official sheet (PDF)</button>
     </div>
     <div id="loadlist" class="panel no-print" style="margin-bottom:16px"></div>
 

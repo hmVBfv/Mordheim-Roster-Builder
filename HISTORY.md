@@ -198,3 +198,32 @@ rule) was implemented but untested and, it turned out, incomplete.
   the completeness test. Catalogue settled at 243 items.
 
 Test suite: 10 files, all green.
+
+## July 17, 2026 — bug sweep + Fallen warriors
+
+A round of in-play bug reports, fixed together.
+
+Three bugs (two of them modularization regressions):
+- The warband special-skill list showed up twice when a unit's own `sk` list
+  already named the warband skill set — it got appended a second time via
+  WBEXTRA. Now only appended if not already present.
+- Adding a skill to a hero froze the UI: `advSection` called `skillText(sk, e)`
+  with an undefined `e`, throwing a ReferenceError that aborted `render()`
+  mid-pass, so nothing updated afterwards. Dropped the stray argument.
+- The official-sheet PDF export silently did nothing: `loadSheetTemplate`
+  assigned to `_sheetBytes`, which `pdf.js` had come to import from `app.js`
+  as a read-only binding ("Assignment to constant variable"). Made
+  `_sheetBytes` module-local to `pdf.js`. (Also cleaned a stale freebooters.org
+  reference out of the PDF button tooltip.)
+
+New feature — **Fallen warriors**: applying the Dead (11-15) serious injury now
+moves the warrior out of the active warband into a collapsed "Fallen" section
+instead of adding a text note. A fallen warrior no longer counts toward the
+warband size, hero count, gold spent or rating, and is excluded from the PDF
+and shareable-text exports. Their equipment stays visible as a read-only record
+(it was lost with them, and must not be silently editable afterwards), and the
+whole section — and each fallen card — is collapsed by default to save space.
+A guarded "Restore" button exists purely to undo a misclick. The fallen record
+is still kept in the tool's own JSON save so it survives a reload.
+
+Tests: `ui-bugs.mjs` and `fallen.mjs` added; suite now 12 files, all green.

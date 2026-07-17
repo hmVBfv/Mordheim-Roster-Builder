@@ -193,13 +193,13 @@ export function goldCurrent(){ return goldTreasury()-totalSpent(); }
 
 export function goldAvailable(){ return goldTreasury(); }
 
-export function totalSpent(){ return S.models.reduce((s,m)=>s+modelTotalCost(m),0)+ (typeof hsHireTotal==='function'?hsHireTotal():0)+ (typeof dpHireTotal==='function'?dpHireTotal():0)+ (typeof hsEqTotal==='function'?hsEqTotal():0); }
+export function totalSpent(){ return S.models.reduce((s,m)=>m.fallen?s:s+modelTotalCost(m),0)+ (typeof hsHireTotal==='function'?hsHireTotal():0)+ (typeof dpHireTotal==='function'?dpHireTotal():0)+ (typeof hsEqTotal==='function'?hsEqTotal():0); }
 
-export function totalModels(){ return S.models.reduce((s,m)=>{const d=unitDef(m.uid_def); if(d&&d.vehicle) return s; return s+(d&&d.t==='hen'?m.qty:1);},0); }
+export function totalModels(){ return S.models.reduce((s,m)=>{if(m.fallen) return s; const d=unitDef(m.uid_def); if(d&&d.vehicle) return s; return s+(d&&d.t==='hen'?m.qty:1);},0); }
 
 export function isHeroModel(m){ const def=unitDef(m.uid_def); return (def&&def.t==='hero')||!!m.promoted; }
 
-export function totalHeroes(){ return S.models.filter(m=>isHeroModel(m)).length + ((S.hired||[]).filter(h=>HIREDSWORDS[h.key]&&HIREDSWORDS[h.key].slot).length); }
+export function totalHeroes(){ return S.models.filter(m=>!m.fallen&&isHeroModel(m)).length + ((S.hired||[]).filter(h=>HIREDSWORDS[h.key]&&HIREDSWORDS[h.key].slot).length); }
 
 export function modelRating(m){ const def=unitDef(m.uid_def); return (def.large?20:5)+Number(m.exp||0); }
 
