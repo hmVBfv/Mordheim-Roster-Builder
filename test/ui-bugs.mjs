@@ -55,4 +55,17 @@ state.S.models[0].skills=['Sprint'];
 await assert.doesNotReject(() => pdf.exportOfficialSheet(),
   'exportOfficialSheet() must not reject (was: Assignment to constant variable on _sheetBytes)');
 
-console.log('UI bugs: OK (no duplicate skill lists; render survives skill add; PDF export runs)');
+// --- Bug: sidebar roster summary listed heroes in recruitment order ---
+// Recruit the Seer before the Chieftain; the summary must still list the
+// Chieftain first (leader / warband list order), not recruitment order.
+state.replaceState({wb:'maraudersofchaos',subtype:null,name:'',budget:500,models:[],hired:[],dp:[],
+  leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()});
+app.addUnit('seer'); app.addUnit('chieftain');
+app.renderSidebar();
+let sidebarHtml='';
+for(const k in store){ const h=store[k].innerHTML; if(h && h.includes('Chieftain') && h.includes('Seer')){ sidebarHtml=h; break; } }
+assert.ok(sidebarHtml, 'sidebar summary rendered with both units');
+assert.ok(sidebarHtml.indexOf('Chieftain') < sidebarHtml.indexOf('Seer'),
+  'sidebar lists the Chieftain before the Seer regardless of recruitment order');
+
+console.log('UI bugs: OK (no duplicate skill lists; render survives skill add; PDF export runs; sidebar roster order follows warband list)');
