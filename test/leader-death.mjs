@@ -59,4 +59,29 @@ const uLead=state.S.models.find(m=>m.uid===app.leaderUid());
 assert.ok(uLead && uLead.uid_def==='necro', 'the Necromancer takes command of an Undead warband');
 assert.ok(!/collapses/.test(warnings()), 'no collapse while a Necromancer remains');
 
-console.log('Leader death: OK (highest-Ld succession, requirement dropped, re-hire blocked, Undead Necromancer/collapse)');
+// --- Merchant Caravans: only the Apprentice may succeed; else buy one ---
+fresh('caravans');
+app.addUnit('merchant'); app.addUnit('knight');   // Knight is a hireling, may never lead
+app.killHero(state.S.models.find(m=>m.uid_def==='merchant').uid);
+assert.strictEqual(app.leaderUid(), null, 'a hireling (Knight) cannot become leader');
+assert.ok(/buy an Apprentice/.test(warnings()), 'with no eligible model, the tool tells you to buy an Apprentice');
+// buying an Apprentice is NOT blocked (it is not the req unit)
+app.addUnit('apprentice');
+assert.ok(state.S.models.some(m=>m.uid_def==='apprentice'), 'an Apprentice can still be recruited after the Merchant dies');
+const capLead=state.S.models.find(m=>m.uid===app.leaderUid());
+assert.ok(capLead && capLead.uid_def==='apprentice', 'the Apprentice takes command');
+assert.ok(/counts as the Merchant/.test(warnings()), 'the successor is noted to count as the Merchant');
+
+// --- House rule: allow hiring a replacement leader ---
+fresh('maraudersofchaos');
+app.addUnit('chieftain');
+app.killHero(state.S.models.find(m=>m.uid_def==='chieftain').uid);
+app.addUnit('chieftain');
+assert.strictEqual(state.S.models.filter(m=>m.uid_def==='chieftain').length, 0,
+  'by default a replacement leader cannot be hired');
+state.S.house.hireNewLeader=true;
+app.addUnit('chieftain');
+assert.strictEqual(state.S.models.filter(m=>m.uid_def==='chieftain').length, 1,
+  'the hireNewLeader house rule permits recruiting a replacement leader');
+
+console.log('Leader death: OK (highest-Ld succession, requirement dropped, re-hire blocked, Undead Necromancer/collapse, Merchant Apprentice, house-rule override)');
