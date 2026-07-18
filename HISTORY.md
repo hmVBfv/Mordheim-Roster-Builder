@@ -567,3 +567,30 @@ doing what it is for — attribution of who inflicted what on whom — while the
 consequences are derived from it.
 
 `test/experience.mjs` added; suite 21/21.
+
+## July 17, 2026 — the snapshot is the whole warband state
+
+Adopted a better idea than the hand-picked field list: the warband export
+already contains everything there is, so that is what a stage snapshot should
+be. No guessing in advance which fields an analysis might later want.
+
+One cut is necessary, and it is not obvious. The export contains `S.campaign`,
+which contains the snapshots — so a naive full copy nests every earlier snapshot
+inside each new one. Measured before building it: exactly 2x per stage, turning
+a 2.8 KB warband into 710 KB by stage 8 and roughly 90 MB by stage 15. The
+campaign RECORDS (chronicle, battles, casualties, experience ledger, snapshots)
+are therefore left out — they live centrally and only once. Growth is now linear:
+31.5 KB after fifteen stages.
+
+The districts stay in, so who held what at which stage is answerable
+(`districtsAt`). Computed totals — rating, gold, warband size, fallen — are
+stored as they stood rather than recomputed later: if the data files change
+(an FAQ re-costs a unit), recomputing would silently rewrite history
+(`totalsAt`). Transient interface state (open panels, half-filled forms) is
+stripped out.
+
+`snapRows()` reads both the new full-state snapshots and the earlier flat ones,
+so campaign files written before this keep working. Everything else —
+`diffStages`, character timelines, the narrative — reads through it.
+
+`test/snapshots.mjs` added; suite 22/22.
