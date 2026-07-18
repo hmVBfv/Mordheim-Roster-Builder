@@ -144,6 +144,19 @@
   .loc-sum::-webkit-details-marker{display:none}
   .loc-sum::before{content:'▸ '}
   .loc-wrap[open] .loc-sum::before{content:'▾ '}
+  /* Campaign file (several players' warbands in one document) */
+  .cf-wrap{border:1px solid var(--gold);border-radius:4px;margin:8px 0;background:rgba(120,90,40,.05)}
+  .cf-sum{cursor:pointer;padding:7px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--blood);list-style:none}
+  .cf-sum::-webkit-details-marker{display:none}
+  .cf-sum::before{content:'▸ '}
+  .cf-wrap[open] .cf-sum::before{content:'▾ '}
+  .cf-body{padding:4px 10px 10px}
+  .cf-btns{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+  .filebtn{cursor:pointer;display:inline-block}
+  .cf-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+  .cf-tbl th,.cf-tbl td{text-align:left;padding:3px 7px;border-bottom:1px solid var(--parch-edge)}
+  .cf-tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--iron)}
+  .cf-hist{margin-top:10px;font-size:13px}
   .srule-intro{margin:0 0 6px}
   .srule{margin:3px 0;padding:3px 8px 3px 10px;border-left:3px solid var(--gold);background:rgba(154,123,50,.07);border-radius:0 4px 4px 0}
   .srule b{color:var(--blood)}

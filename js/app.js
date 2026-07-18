@@ -748,6 +748,7 @@ export function renderCampaign(){
       +`</div>`:'';
   host.innerHTML=`<details class="sec-details" ${campOpen?'open':''} ontoggle="setSecOpen('camp',this.open)"><summary class="sec-sum">Campaign <span class="hr-on">on</span></summary><div class="sec-body"><label class="hs-gbox"><input type="checkbox" checked onchange="campToggle(this.checked)"> enabled</label>
     <div class="camp-io no-print"><button class="tiny" onclick="openCampaignIO()">\u2b06 Export</button> <button class="tiny" onclick="openCampaignIO()">\u2b07 Import</button></div>
+    ${campaignFileBlock()}
     ${chronicleBlock()}
     ${summary}
     <details class="loc-wrap"><summary class="loc-sum">\ud83d\uddfa Locations \u2014 districts you hold</summary>
@@ -782,7 +783,7 @@ export function chronicleBlock(){
         <button class="tiny ghost no-print" onclick="removeLogAt(${e.id})">\u00d7</button></li>`).join('')}</ul>`:'<div class="chr-empty">Nothing recorded yet.</div>'}
     </div>`;
   }).join('');
-  return `<details class="chr-wrap" ${c._open?'open':''}><summary class="chr-sum">\u1f4dc Chronicle \u2014 ${roundLabel(c.round)} \u00b7 ${c.battles.length} battle${c.battles.length===1?'':'s'} \u00b7 ${c.log.length} entries</summary>
+  return `<details class="chr-wrap" ${c._open?'open':''} ontoggle="setChrOpen(this.open)"><summary class="chr-sum">\u1f4dc Chronicle \u2014 ${roundLabel(c.round)} \u00b7 ${c.battles.length} battle${c.battles.length===1?'':'s'} \u00b7 ${c.log.length} entries</summary>
     <div class="chr-tools no-print">
       <label>Stage: <select onchange="setRound(this.value)">${roundOpts}</select></label>
       <button class="tiny" onclick="advanceRound()" title="Move the campaign on to the next stage">\u25b6 next stage</button>
@@ -811,9 +812,11 @@ export function warbandOptions(sel){
 /* ---- Battle entry form ----
    Held in S.campaign._draft while being filled in, so a half-typed battle
    survives the re-renders that every field change triggers. */
+export function setChrOpen(v){ campState()._open=!!v; }
 export function battleDraft(){ return campState()._draft||null; }
 export function openBattleForm(){ const c=campState();
-  c._draft={opponents:[{name:'',wb:''}], district:'', outcome:'', notes:'', round:c.round+1}; render(); }
+  c._draft={opponents:[{name:'',wb:''}], district:'', outcome:'', notes:'', round:c.round+1};
+  c._open=true; render(); }
 export function cancelBattleForm(){ const c=campState(); delete c._draft; render(); }
 export function setDraftField(f,v){ const d=battleDraft(); if(!d) return; d[f]=v;
   if(f==='notes'||f==='outcome') return;   // typing fields must not lose focus
@@ -853,7 +856,7 @@ export function battleFormBlock(){
 /* Large free-text entry for the chronicle, in the same style as the printed
    House-Rule notes rather than a one-line prompt. */
 export function noteDraft(){ return campState()._note!=null?campState()._note:null; }
-export function openNoteForm(){ campState()._note=''; render(); }
+export function openNoteForm(){ const c=campState(); c._note=''; c._open=true; render(); }
 export function setNoteDraft(v){ const c=campState(); c._note=v; }
 export function cancelNoteForm(){ const c=campState(); delete c._note; render(); }
 export function saveNoteForm(){ const c=campState(); const t=(c._note||'').trim();
@@ -863,6 +866,135 @@ export function noteFormBlock(){ const n=noteDraft(); if(n==null) return '';
     <textarea rows="4" placeholder="What happened…" oninput="setNoteDraft(this.value)">${String(n).replace(/</g,'&lt;')}</textarea>
     <div class="bat-btns"><button class="btnsm" onclick="saveNoteForm()">Add entry</button>
       <button class="tiny ghost" onclick="cancelNoteForm()">cancel</button></div></div>`; }
+/* ================= Campaign file =================
+   A campaign is kept in its own document, separate from any single warband.
+   One person (the campaign master, or whoever hosts that evening) collects the
+   other players' warband exports into it and passes the updated file back.
+
+   {type:'mordheim-campaign-file', version:1, name, round,
+    warbands:[{id, player, name, wb, updated, roster:<a full warband save>}],
+    battles:[…], log:[…]}
+
+   This deliberately needs no server: GitHub Pages only serves static files, so
+   a shared live session is not possible there. Exchanging one file per evening
+   keeps the tool offline-capable and free of accounts. */
+export const CF_TYPE='mordheim-campaign-file';
+let CF=null;
+export function cfGet(){ return CF; }
+export function cfNew(name){ CF={type:CF_TYPE, version:1, name:String(name||'New campaign'), round:0,
+  warbands:[], battles:[], log:[]}; render(); return CF; }
+export function cfClose(){ CF=null; render(); }
+export function cfSetName(v){ if(CF){ CF.name=String(v||''); } }
+export function cfSetRound(n){ if(!CF) return; CF.round=Math.max(0,Number(n)||0); render(); }
+function _cfNextId(){ if(!CF) return 1; return CF.warbands.reduce((m,w)=>Math.max(m,Number(w.id)||0),0)+1; }
+/* Take a warband save (the tool's own JSON export) into the campaign. A warband
+   already in the file is updated in place, so re-importing after a game night
+   refreshes it instead of duplicating the player. */
+export function cfImportWarband(data,player){
+  if(!CF) cfNew('Campaign');
+  if(!data||!data.wb||!WARBANDS[data.wb]) return {ok:false,msg:'Unknown format or unknown warband.'};
+  const nm=String(data.name||'').trim()||wbName(data.wb);
+  const existing=CF.warbands.find(w=>w.name.toLowerCase()===nm.toLowerCase() && w.wb===data.wb);
+  const entry={ id: existing?existing.id:_cfNextId(),
+    player: String(player||(existing&&existing.player)||'').trim(),
+    name: nm, wb: data.wb, updated: new Date().toISOString().slice(0,10),
+    roster: JSON.parse(JSON.stringify(data)) };
+  if(existing) Object.assign(existing, entry); else CF.warbands.push(entry);
+  render(); return {ok:true, updated:!!existing, entry};
+}
+export function cfRemoveWarband(id){ if(!CF) return;
+  const i=CF.warbands.findIndex(w=>w.id===Number(id)); if(i<0) return;
+  if(typeof confirm==='function' && !confirm(`Remove ${CF.warbands[i].name} from the campaign? Their roster stays in their own file.`)) return;
+  CF.warbands.splice(i,1); render();
+}
+/* Pull the current warband in the builder into the campaign file. */
+export function cfAddCurrent(player){ return cfImportWarband(JSON.parse(JSON.stringify(S)), player); }
+export function cfExport(){ if(!CF) return;
+  dl(JSON.stringify(CF,null,2), (CF.name||'campaign').replace(/[^\w\-]+/g,'_')+'.campaign.json','application/json'); }
+export function cfImportFile(json){
+  let d=json; if(typeof d==='string'){ try{ d=JSON.parse(d); }catch(e){ return {ok:false,msg:'Could not read the file.'}; } }
+  if(!d||d.type!==CF_TYPE) return {ok:false,msg:'That is not a campaign file.'};
+  CF={type:CF_TYPE, version:Number(d.version)||1, name:String(d.name||'Campaign'), round:Number(d.round)||0,
+    warbands:Array.isArray(d.warbands)?d.warbands:[], battles:Array.isArray(d.battles)?d.battles:[],
+    log:Array.isArray(d.log)?d.log:[]};
+  render(); return {ok:true};
+}
+/* Every warband's own chronicle, merged into one campaign-wide history:
+   each entry tagged with whose warband it belongs to, ordered by stage. */
+export function cfMergedLog(){ if(!CF) return [];
+  const out=[];
+  (CF.log||[]).forEach(e=>out.push(Object.assign({},e,{who:null})));
+  CF.warbands.forEach(w=>{
+    const c=(w.roster&&w.roster.campaign)||{};
+    (c.log||[]).forEach(e=>out.push(Object.assign({},e,{who:w.name, wbKey:w.wb})));
+  });
+  return out.sort((a,b)=>(a.round-b.round)||((a.id||0)-(b.id||0)));
+}
+/* All battles known to the campaign: the file's own plus those each warband
+   recorded. Battles the players recorded from both sides stay separate — the
+   chronicle shows them as each participant told it. */
+export function cfAllBattles(){ if(!CF) return [];
+  const out=(CF.battles||[]).map(b=>Object.assign({},b,{who:null}));
+  CF.warbands.forEach(w=>{ const c=(w.roster&&w.roster.campaign)||{};
+    (c.battles||[]).forEach(b=>out.push(Object.assign({},b,{who:w.name, wbKey:w.wb}))); });
+  return out.sort((a,b)=>(a.round-b.round)||((a.id||0)-(b.id||0)));
+}
+/* File pickers for the campaign file. */
+export function cfPickFile(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  const rd=new FileReader(); rd.onload=()=>{ const r=cfImportFile(rd.result);
+    flash(r.ok?'Campaign file loaded.':(r.msg||'Could not read the file.')); }; rd.readAsText(f); ev.target.value=''; }
+export function cfPickWarband(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  const rd=new FileReader(); rd.onload=()=>{ let d=null; try{ d=JSON.parse(rd.result); }catch(e){}
+    const player=(typeof prompt==='function')?(prompt('Player name (optional)')||''):'';
+    const r=cfImportWarband(d,player);
+    flash(r.ok?(r.updated?`${r.entry.name} updated.`:`${r.entry.name} joined the campaign.`):(r.msg||'Could not read the file.')); };
+  rd.readAsText(f); ev.target.value=''; }
+export function cfAddCurrentPrompt(){ const player=(typeof prompt==='function')?(prompt('Player name (optional)')||''):'';
+  const r=cfAddCurrent(player); if(r&&r.ok) flash(r.updated?'Your warband was updated in the campaign.':'Your warband joined the campaign.'); }
+export function campaignFileBlock(){
+  if(!CF) return `<details class="cf-wrap"><summary class="cf-sum">\u2637 Campaign file — none open</summary>
+    <div class="cf-body"><div class="hs-foot">A campaign file gathers several players' warbands, the battles fought and one shared chronicle. Pass the file on after each game night — no server or account needed.</div>
+    <div class="cf-btns"><button class="btnsm" onclick="cfNew(prompt('Campaign name','Mordheim Campaign')||'Mordheim Campaign')">Start a campaign file</button>
+      <label class="tiny filebtn">Open campaign file<input type="file" accept="application/json,.json" style="display:none" onchange="cfPickFile(event)"></label></div></div></details>`;
+  const rows=CF.warbands.map(w=>{
+    const st=(cfStats()||[]).find(x=>x.id===w.id)||{};
+    return `<tr><td>${(w.player||'—').replace(/</g,'&lt;')}</td>
+      <td><b>${w.name.replace(/</g,'&lt;')}</b></td>
+      <td>${wbName(w.wb).replace(/</g,'&lt;')}</td>
+      <td>${st.warriors||0}</td><td>${st.fallen||0}</td><td>${st.battles||0}</td><td>${st.wins||0}</td>
+      <td class="no-print"><button class="tiny ghost" onclick="cfRemoveWarband(${w.id})">remove</button></td></tr>`;
+  }).join('');
+  return `<details class="cf-wrap" open><summary class="cf-sum">\u2637 Campaign file — ${CF.name.replace(/</g,'&lt;')} \u00b7 ${CF.warbands.length} warband${CF.warbands.length===1?'':'s'}</summary>
+    <div class="cf-body">
+      <div class="cf-btns no-print">
+        <button class="tiny" onclick="cfAddCurrentPrompt()" title="Put the warband currently open in the builder into the campaign">+ add my warband</button>
+        <label class="tiny filebtn">+ import a warband<input type="file" accept="application/json,.json" style="display:none" onchange="cfPickWarband(event)"></label>
+        <button class="tiny" onclick="cfExport()">\u2b06 export campaign file</button>
+        <label class="tiny filebtn">\u2b07 open another<input type="file" accept="application/json,.json" style="display:none" onchange="cfPickFile(event)"></label>
+        <button class="tiny ghost" onclick="cfClose()">close</button>
+      </div>
+      ${CF.warbands.length?`<table class="cf-tbl"><tr><th>Player</th><th>Warband</th><th>Type</th><th>Warriors</th><th>Fallen</th><th>Battles</th><th>Won</th><th></th></tr>${rows}</table>`
+        :'<div class="chr-empty">No warbands yet — add yours or import the others\u2019 export files.</div>'}
+      ${cfMergedLog().length?`<div class="cf-hist"><b>Campaign history</b><ul class="chr-list">${
+        cfMergedLog().map(e=>`<li class="chr-ev chr-${e.type}"><span class="chr-ic">\u2022</span>
+          <span class="chr-tx">${e.who?`<i>${String(e.who).replace(/</g,'&lt;')}:</i> `:''}${String(e.text).replace(/</g,'&lt;')}</span>
+          <span class="chr-tag">${roundLabel(e.round)}</span></li>`).join('')}</ul></div>`:''}
+    </div></details>`;
+}
+/* Campaign-wide tallies, the basis for later evaluation. */
+export function cfStats(){ if(!CF) return null;
+  return CF.warbands.map(w=>{
+    const r=w.roster||{}; const c=r.campaign||{};
+    const log=c.log||[];
+    return { id:w.id, player:w.player, name:w.name, wb:w.wb,
+      warriors:(r.models||[]).reduce((s,m)=>s+(Number(m.qty)||1),0),
+      fallen:(r.fallen||[]).length,
+      battles:(c.battles||[]).length,
+      wins:(c.battles||[]).filter(b=>/victor/i.test(b.outcome||'')).length,
+      advances:log.filter(e=>e.type==='advance').length,
+      items:log.filter(e=>e.type==='item').length };
+  });
+}
 export function campToggle(on){ if(!S.campaign) S.campaign={districts:{}}; S.campaign.on=!!on; render(); }
 export function exportCampaign(){ const data={type:'mordheim-campaign',wb:S.wb,name:S.name||'',campaign:S.campaign||{districts:{}}}; dl(JSON.stringify(data,null,2),(safeName?safeName():'warband')+'_campaign.json','application/json'); }
 export function importCampaign(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return; const rd=new FileReader();
@@ -2494,7 +2626,10 @@ Object.assign(window, {
   killHench, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
   logEvent, removeBattle, removeLogAt, roundLabel, setRound,
-  chronicleBlock, districtName, wbName, warbandOptions,
+  chronicleBlock, districtName, wbName, warbandOptions, setChrOpen,
+  cfGet, cfNew, cfClose, cfSetName, cfSetRound, cfImportWarband, cfRemoveWarband,
+  cfAddCurrent, cfExport, cfImportFile, cfMergedLog, cfAllBattles, cfStats,
+  cfPickFile, cfPickWarband, cfAddCurrentPrompt, campaignFileBlock,
   addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
   openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
   setDraftField, setDraftOpp, setNoteDraft,
