@@ -6799,7 +6799,8 @@
       "strength",
       "speed"
      ],
-     "sp": "A decorated soldier and custodian of Imperial law. (Equipped with weapons from the Soldier list — no armour.)"
+     "sp": "Equipped with weapons from the Soldier list; no armour.",
+     "desc": "A decorated soldier and custodian of Imperial law."
     },
     {
      "id": "dragon",
@@ -7229,7 +7230,7 @@
       "Ld": 6
      },
      "eq": "cppHen",
-     "sp": "A Beastman of Slaanesh — more agile and humanlike than common Gors."
+     "desc": "A Beastman of Slaanesh — more agile and humanlike than common Gors."
     },
     {
      "id": "cultist",
@@ -8016,7 +8017,7 @@
       "Ld": 7
      },
      "eq": "mcHench",
-     "sp": "Caravan bodyguard — roguish escort hired to protect the goods and their paymaster."
+     "desc": "Caravan bodyguard — roguish escort hired to protect the goods and their paymaster."
     },
     {
      "id": "marksman",

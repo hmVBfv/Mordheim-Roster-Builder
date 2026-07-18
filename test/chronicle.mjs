@@ -120,4 +120,27 @@ const camp=store['campaignpanel'].innerHTML;
 assert.ok(/<details class="loc-wrap"><summary/.test(camp), 'districts sit in a collapsible Locations section');
 assert.ok(!/loc-wrap" open/.test(camp), 'Locations start collapsed');
 
+// --- every entry row has the same cells, so the delete buttons line up ---
+// A row without a tag used to put its button in the tag column, leaving it out
+// of line with rows marked "manual" or "edited".
+fresh(true);
+app.addUnit('adept');
+const noteRow=app.addLogNote('Handwritten entry.');
+app.editLogText(noteRow.id,'Handwritten entry, corrected.');
+app.renderCampaign();
+const chron=store['campaignpanel'].innerHTML;
+const rows=chron.match(/<li class="chr-ev[\s\S]*?<\/li>/g)||[];
+assert.ok(rows.length>=2, 'there are rows with and without tags');
+const shape=r=>{ const out=[]; const re=/<(?:span|button)[^>]*class="(chr-ic|chr-tx|chr-tags|tiny ghost no-print)"/g;
+  let m; while((m=re.exec(r))) out.push(m[1]); return out.join('|'); };
+const shapes=new Set(rows.map(shape));
+assert.strictEqual(shapes.size, 1, 'every row has the same grid cells in the same order');
+assert.strictEqual([...shapes][0], 'chr-ic|chr-tx|chr-tags|tiny ghost no-print');
+
+// --- no broken characters in the interface ---
+// \u1f4dc and friends are five hex digits, but a \u escape takes only four, so
+// they used to render as a stray Greek letter followed by a loose digit.
+const panel=store['campaignpanel'].innerHTML;
+assert.ok(!/[\u1f00-\u1fff]/.test(panel), 'no half-parsed escape leaks into the panel: '+(panel.match(/[\u1f00-\u1fff]./)||[''])[0]);
+
 console.log('Campaign chronicle: OK (stages, automatic events, battles with several opponents, manual entries, battle form, old saves)');
