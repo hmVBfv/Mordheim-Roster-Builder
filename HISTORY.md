@@ -447,3 +447,27 @@ prompt.
 collapsed by default, so the campaign panel stays short.
 
 Suite 17/17.
+
+## July 17, 2026 — campaign file (several players in one document)
+
+Fixed first: opening the note or battle form appeared to close the Campaign
+section. The chronicle's `<details>` read its open state from a flag that
+nothing ever wrote, so it collapsed on every re-render — and the form sits
+inside it. The flag is now persisted from the chronicle's own toggle, and
+opening a form forces the chronicle open so the form is visible immediately.
+
+Then the campaign file itself: a document separate from any single warband,
+holding several players' warbands, the battles and one shared chronicle.
+Warband exports are taken into it and a warband already present is updated in
+place, so re-importing after a game night refreshes that player rather than
+duplicating them. It offers a campaign-wide history (each warband's own log
+merged and ordered by stage, tagged with whose it is), both sides' accounts of
+each battle kept as they were recorded, and per-warband tallies — warriors,
+fallen, battles, victories, advances, items — as the basis for evaluation.
+
+This is the file-exchange model rather than a live session, deliberately:
+GitHub Pages is static hosting with no server or database, so one file passed
+on after each game night keeps the tool offline-capable and free of accounts.
+The alternative would be an external backend, which costs exactly that.
+
+`test/campaign-file.mjs` added; suite 18/18.
