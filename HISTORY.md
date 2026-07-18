@@ -594,3 +594,35 @@ so campaign files written before this keep working. Everything else —
 `diffStages`, character timelines, the narrative — reads through it.
 
 `test/snapshots.mjs` added; suite 22/22.
+
+## July 18, 2026 — defaults, the campaign table, export names, and the TTS fields
+
+A batch of small things, each of which was a papercut in play.
+
+**Names default instead of staying blank.** A new warband is named after its
+type (so an export reads "Arabian Tomb Raiders", not "warband"), and a player
+imported into a campaign file without a name is numbered rather than left as an
+indistinguishable blank cell.
+
+**The campaign table shows the warband rating**, taken from the latest stored
+snapshot totals rather than recomputed — recomputing would need that warband's
+full state loaded and would drift if the data files change later.
+
+**Export file names carry the campaign stage and the date**
+(`Klaue_Skaven_battle1_2026-07-18`), so a folder of exports from several game
+nights can be told apart at a glance. Applies to the roster, the readable text,
+the New Recruit file, the campaign export, the chronicle and the analysis.
+
+**The TTS export gained a name field**, separate from the description, since
+the two go into different boxes in TTS. Heroes (and Hired Swords and Dramatis
+Personae) get a darker gold than the rank and file, so the notable models stand
+out on the tabletop. The dialog now shows both fields labelled with what they
+are for, each with its own copy button, plus a copy-both.
+
+**The stat line gained Sv.** The value was already there for the PDF sheet
+(`svOfModel` in engine.js): the permanent save from armour and skills,
+deliberately excluding shields and bucklers, which depend on what is being
+carried at the time. Heavy armour with helmet and shield therefore reads Sv 5+,
+not 4+.
+
+`test/naming-and-tts.mjs` added; suite 23/23.
