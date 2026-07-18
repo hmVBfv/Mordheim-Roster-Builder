@@ -672,35 +672,64 @@ export function setRound(n){ const c=campState(); const v=Math.max(0,Number(n)||
    single point change. */
 export function snapshotStage(round){ const c=campState();
   if(!c.snapshots||typeof c.snapshots!=='object') c.snapshots={};
-  const snap=m=>({uid:m.uid, uid_def:m.uid_def,
-    name:m.name||unitDef(m.uid_def).name, grade:isHeroModel(m)?'hero':'hench',
+  // The whole warband state, exactly as an export would hold it - anything the
+  // analysis might later want is in there without having to guess in advance.
+  //
+  // With one cut: the campaign RECORDS (log, battles, casualties, experience
+  // ledger and the snapshots themselves) are left out. They live centrally and
+  // only once; including them would nest every earlier snapshot inside each new
+  // one and double the file with every stage. The districts stay, so who held
+  // what at a given stage is preserved.
+  const st=JSON.parse(JSON.stringify(S));
+  st.campaign={on:!!c.on, round:Number(round)||0,
+    districts:JSON.parse(JSON.stringify(c.districts||{}))};
+  _stripTransient(st);
+  c.snapshots[String(round)]={
+    round:Number(round)||0,
+    at:(new Date()).toISOString().slice(0,10),
+    state:st,
+    // Computed values are stored as they stood, not recomputed later: if the
+    // data files change (an FAQ re-costs a unit), recomputing would silently
+    // rewrite history.
+    totals:{ rating:totalRating(), spent:totalSpent(), models:totalModels(),
+      heroes:totalHeroes(), gold:goldCurrent(), fallen:(S.fallen||[]).length }
+  };
+  return c.snapshots[String(round)]; }
+/* Working state of the interface (open panels, half-filled forms) has no place
+   in a historical record. */
+function _stripTransient(o){ if(!o||typeof o!=='object') return o;
+  if(Array.isArray(o)){ o.forEach(_stripTransient); return o; }
+  Object.keys(o).forEach(k=>{ if(k.charAt(0)==='_') delete o[k]; else _stripTransient(o[k]); });
+  return o; }
+/* One row per warrior of a snapshot, living and fallen alike. Reads both the
+   current full-state snapshots and the earlier flat ones, so older campaign
+   files keep working. */
+export function snapRows(snapshot){ if(!snapshot) return [];
+  if(Array.isArray(snapshot)) return snapshot;            // the earlier format
+  const st=snapshot.state||{};
+  const row=(m,alive)=>({uid:m.uid, uid_def:m.uid_def,
+    name:m.name||((unitDef(m.uid_def)||{}).name)||'?',
+    grade:(m.promoted||((unitDef(m.uid_def)||{}).t==='hero'))?'hero':'hench',
     qty:Number(m.qty)||1, exp:Number(m.exp)||0,
-    adv:Object.assign({},m.adv||{}),                    // per-stat advances
-    skills:[...(m.skills||[])], spells:(m.spells||[]).map(x=>x.name||x),
-    inj:(m.inj||[]).map(j=>j.name||j.code),
-    eq:Object.assign({},m.eq||{}), rare:Object.keys(m.rare||{}),
-    value:modelUnitCost(m)||0, alive:true});
-  const rows=S.models.map(snap);
-  // the fallen are kept in the snapshot too, marked dead, so a warrior who is
-  // present at one stage and gone at the next can be told apart from one who
-  // was simply never there
-  (S.fallen||[]).forEach(e=>{ if(!e.m) return; const r=snap(e.m); r.alive=false; r.qty=1; rows.push(r); });
-  c.snapshots[String(round)]=rows;
+    adv:Object.assign({},m.adv||{}), skills:[...(m.skills||[])],
+    spells:(m.spells||[]).map(x=>x.name||x), inj:(m.inj||[]).map(j=>j.name||j.code),
+    eq:Object.assign({},m.eq||{}), rare:Object.keys(m.rare||{}), alive});
+  const rows=(st.models||[]).map(m=>row(m,true));
+  (st.fallen||[]).forEach(e=>{ if(e&&e.m) rows.push(row(e.m,false)); });
   return rows; }
-/* What changed between two stages. Everything the analysis needs is derivable
-   here: who joined, who fell, which characteristic went up when, which skill
-   was learned, what was bought — without having to have logged each meaning
-   separately at the time. */
+/* What changed between two stages. This is where the analysis comes from: a
+   warrior present at one stage and dead at the next fell in that battle; whose
+   characteristic is higher gained it then. Nothing needs to have been logged
+   semantically at the time. */
 export function diffStages(a,b){ const snaps=stageSnapshots();
-  const A=snaps[String(a)]||[], B=snaps[String(b)]||[];
+  const A=snapRows(snaps[String(a)]), B=snapRows(snaps[String(b)]);
   const byUid=list=>{ const m={}; list.forEach(x=>m[x.uid]=x); return m; };
   const ma=byUid(A), mb=byUid(B);
   const out={from:Number(a), to:Number(b), joined:[], died:[], left:[], changed:[]};
   B.forEach(x=>{ const prev=ma[x.uid];
-    if(!prev){ out.joined.push({uid:x.uid,name:x.name,grade:x.grade,value:x.value}); return; }
-    if(prev.alive && !x.alive){ out.died.push({uid:x.uid,name:x.name,grade:x.grade,value:x.value}); }
-    const ch={uid:x.uid,name:x.name};
-    let any=false;
+    if(!prev){ out.joined.push({uid:x.uid,name:x.name,grade:x.grade}); return; }
+    if(prev.alive && !x.alive) out.died.push({uid:x.uid,name:x.name,grade:x.grade});
+    const ch={uid:x.uid,name:x.name}; let any=false;
     if(x.exp!==prev.exp){ ch.exp={from:prev.exp,to:x.exp,gained:x.exp-prev.exp}; any=true; }
     const stats={}; Object.keys(Object.assign({},prev.adv,x.adv)).forEach(k=>{
       const d=(Number(x.adv[k])||0)-(Number(prev.adv[k])||0); if(d) stats[k]=d; });
@@ -721,8 +750,15 @@ export function diffStages(a,b){ const snaps=stageSnapshots();
   A.forEach(x=>{ if(!mb[x.uid]) out.left.push({uid:x.uid,name:x.name}); });
   return out; }
 /* Who was there from the very beginning. */
-export function foundingMembers(){ const first=stageSnapshots()['0']||[];
-  return first.map(x=>({uid:x.uid,name:x.name,grade:x.grade})); }
+export function foundingMembers(){ return snapRows(stageSnapshots()['0'])
+  .map(x=>({uid:x.uid,name:x.name,grade:x.grade})); }
+/* Which districts the warband held at a given stage. */
+export function districtsAt(round){ const sn=stageSnapshots()[String(round)];
+  const d=(sn&&sn.state&&sn.state.campaign&&sn.state.campaign.districts)||{};
+  return Object.keys(d).filter(k=>d[k]&&d[k]!=='none').map(k=>({id:k, name:districtName(k), state:d[k]})); }
+/* The stored totals of a stage (rating, gold, size) as they stood then. */
+export function totalsAt(round){ const sn=stageSnapshots()[String(round)];
+  return (sn&&sn.totals)||null; }
 export function stageSnapshots(){ const c=campState();
   if(!c.snapshots||typeof c.snapshots!=='object') c.snapshots={}; return c.snapshots; }
 export function advanceRound(){ const c=campState(); snapshotStage(c.round); c.round=(Number(c.round)||0)+1;
@@ -1088,8 +1124,10 @@ export function characterTimeline(uid){ const c=campState(); uid=Number(uid);
   const suffered=(c.casualties||[]).filter(r=>r.victim.uid===uid)
     .map(r=>({round:r.round, type:'suffered', by:r.attacker, result:r.result, text:casualtyText(r)}));
   const curve=Object.keys(stageSnapshots()).map(Number).sort((a,b)=>a-b)
-    .map(rd=>{ const row=(stageSnapshots()[String(rd)]||[]).find(x=>x.uid===uid);
-      return row?{round:rd, exp:row.exp, advances:row.advances, skills:row.skills, value:row.value}:null; })
+    .map(rd=>{ const row=snapRows(stageSnapshots()[String(rd)]).find(x=>x.uid===uid);
+      return row?{round:rd, exp:row.exp,
+        advances:Object.values(row.adv||{}).reduce((x,y)=>x+(Number(y)||0),0),
+        skills:(row.skills||[]).length, alive:row.alive}:null; })
     .filter(Boolean);
   const all=events.concat(kills,suffered).sort((a,b)=>(a.round-b.round));
   const live=S.models.find(m=>m.uid===uid);
@@ -1163,7 +1201,12 @@ export function narrativeReport(){
     evs.filter(e=>!(e.data&&e.data.casualtyId) && e.type!=='battle' && e.type!=='round')
        .forEach(e=>L.push(`  ${e.text}`));
     const snap=stageSnapshots()[String(r)];
-    if(snap&&snap.length) L.push(`  Warband at the close of this stage: ${snap.map(x=>`${x.name} (${x.exp} XP)`).join(', ')}.`);
+    const rows=snapRows(snap).filter(x=>x.alive);
+    if(rows.length) L.push(`  Warband at the close of this stage: ${rows.map(x=>`${x.name} (${x.exp} XP)`).join(', ')}.`);
+    const held=districtsAt(r);
+    if(held.length) L.push(`  Districts held: ${held.map(x=>`${x.name} (${x.state})`).join(', ')}.`);
+    const tt=totalsAt(r);
+    if(tt) L.push(`  Warband rating ${tt.rating}, ${tt.models} warriors, ${tt.gold} gc in hand.`);
     L.push('');
   });
   const chars=characterRoster().filter(x=>x.events.length);
@@ -3018,6 +3061,7 @@ Object.assign(window, {
   characterTimeline, characterRoster, campaignAnalysis, narrativeReport,
   xpLedger, grantXp, pendingXp, pendingXpFor, pendingXpTotal, applyPendingXp,
   clearPendingXp, awardBattleXp, diffStages, foundingMembers, xpBarBlock,
+  snapRows, districtsAt, totalsAt,
   exportNarrative, exportAnalysis, snapshotStage, stageSnapshots,
   addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
   openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
