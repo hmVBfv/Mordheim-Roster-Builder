@@ -250,6 +250,10 @@
   .exnote b{color:#3a3327}
   #extext,#ttstext{width:100%;min-height:320px;margin-top:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;border:1px solid var(--parch-edge);border-radius:6px;padding:10px;background:#fffdf6;color:#2a2118;white-space:pre;resize:vertical}
   #ttstext{min-height:160px}
+  .tts-field{margin-top:10px}
+  .tts-lbl{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--iron);font-weight:700}
+  .tts-hint{text-transform:none;letter-spacing:0;font-weight:400;color:#7a6e54}
+  #ttsname{width:100%;min-height:0;margin-top:4px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.4;border:1px solid var(--parch-edge);border-radius:6px;padding:7px 10px;background:#fffdf6;color:#2a2118;white-space:pre;resize:none;overflow:hidden}
   .subnote{margin-top:7px;font-size:13px;color:#5a4f3c;line-height:1.55;background:rgba(255,250,235,.6);border:1px solid var(--parch-edge);border-radius:5px;padding:7px 10px}
   .subnote b{color:var(--blood)}
   .abil{margin-top:10px;border-top:1px dashed var(--parch-edge);padding-top:8px}
@@ -645,9 +649,18 @@
 <div id="ttsmodal" class="no-print" onclick="if(event.target===this)closeTts()">
   <div class="exbox">
     <div class="exhead"><span>Tabletop Simulator description</span><button class="tiny ghost" onclick="closeTts()">✕ close</button></div>
-    <div class="exnote">Paste into the model's <b>Description</b> Field in TTS. Colour codes (e.g. [7AD1A4]) show as colours in TTS. Values include advances &amp; injuries; equipment = currently selected items.</div>
-    <textarea id="ttstext" readonly spellcheck="false"></textarea>
-    <div class="exrow"><button class="blood" onclick="copyTts()">Copy</button></div>
+    <div class="exnote">Two fields, each copied separately. Colour codes (e.g. [7AD1A4]) show as colours in TTS. Values include advances &amp; injuries; equipment = currently selected items.</div>
+    <div class="tts-field">
+      <div class="tts-lbl"><span>Name <span class="tts-hint">&rarr; the model's <b>Name</b> field</span></span>
+        <button class="tiny" onclick="copyTtsName()">Copy name</button></div>
+      <textarea id="ttsname" class="tts-one" readonly spellcheck="false" rows="1"></textarea>
+    </div>
+    <div class="tts-field">
+      <div class="tts-lbl"><span>Description <span class="tts-hint">&rarr; the model's <b>Description</b> field</span></span>
+        <button class="tiny" onclick="copyTts()">Copy description</button></div>
+      <textarea id="ttstext" readonly spellcheck="false"></textarea>
+    </div>
+    <div class="exrow"><button class="blood" onclick="copyTtsBoth()">Copy both</button><button class="tiny ghost" onclick="closeTts()">close</button></div>
   </div>
 </div>
 <div id="itip" class="no-print"></div>

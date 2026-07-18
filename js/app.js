@@ -1222,8 +1222,8 @@ export function narrativeReport(){
   }
   return L.join('\n');
 }
-export function exportNarrative(){ dl(narrativeReport(), (safeName?safeName():'warband')+'_chronicle.md','text/markdown'); }
-export function exportAnalysis(){ dl(JSON.stringify(campaignAnalysis(),null,2), (safeName?safeName():'warband')+'_analysis.json','application/json'); }
+export function exportNarrative(){ dl(narrativeReport(), stampedName()+'_chronicle.md','text/markdown'); }
+export function exportAnalysis(){ dl(JSON.stringify(campaignAnalysis(),null,2), stampedName()+'_analysis.json','application/json'); }
 
 /* ---- Casualty entry ----
    Filled in during the battle, when only "who went down, and to whom" is known.
@@ -1311,10 +1311,16 @@ function _cfNextId(){ if(!CF) return 1; return CF.warbands.reduce((m,w)=>Math.ma
 export function cfImportWarband(data,player){
   if(!CF) cfNew('Campaign');
   if(!data||!data.wb||!WARBANDS[data.wb]) return {ok:false,msg:'Unknown format or unknown warband.'};
+  // An unnamed player leaves a blank column and cannot be told from the next
+  // unnamed one, so give them a number.
+  const _autoPlayer=()=>{ let n=CF.warbands.length+1;
+    const taken=CF.warbands.map(w=>w.player);
+    while(taken.includes('Player '+n)) n++;
+    return 'Player '+n; };
   const nm=String(data.name||'').trim()||wbName(data.wb);
   const existing=CF.warbands.find(w=>w.name.toLowerCase()===nm.toLowerCase() && w.wb===data.wb);
   const entry={ id: existing?existing.id:_cfNextId(),
-    player: String(player||(existing&&existing.player)||'').trim(),
+    player: String(player||(existing&&existing.player)||'').trim()||(existing&&existing.player)||_autoPlayer(),
     name: nm, wb: data.wb, updated: new Date().toISOString().slice(0,10),
     roster: JSON.parse(JSON.stringify(data)) };
   if(existing) Object.assign(existing, entry); else CF.warbands.push(entry);
@@ -1379,6 +1385,7 @@ export function campaignFileBlock(){
     return `<tr><td>${(w.player||'—').replace(/</g,'&lt;')}</td>
       <td><b>${w.name.replace(/</g,'&lt;')}</b></td>
       <td>${wbName(w.wb).replace(/</g,'&lt;')}</td>
+      <td>${st.rating!=null?st.rating:'\u2014'}</td>
       <td>${st.warriors||0}</td><td>${st.fallen||0}</td><td>${st.battles||0}</td><td>${st.wins||0}</td>
       <td class="no-print"><button class="tiny ghost" onclick="cfRemoveWarband(${w.id})">remove</button></td></tr>`;
   }).join('');
@@ -1391,7 +1398,7 @@ export function campaignFileBlock(){
         <label class="tiny filebtn">\u2b07 open another<input type="file" accept="application/json,.json" style="display:none" onchange="cfPickFile(event)"></label>
         <button class="tiny ghost" onclick="cfClose()">close</button>
       </div>
-      ${CF.warbands.length?`<table class="cf-tbl"><tr><th>Player</th><th>Warband</th><th>Type</th><th>Warriors</th><th>Fallen</th><th>Battles</th><th>Won</th><th></th></tr>${rows}</table>`
+      ${CF.warbands.length?`<table class="cf-tbl"><tr><th>Player</th><th>Warband</th><th>Type</th><th>Rating</th><th>Warriors</th><th>Fallen</th><th>Battles</th><th>Won</th><th></th></tr>${rows}</table>`
         :'<div class="chr-empty">No warbands yet — add yours or import the others\u2019 export files.</div>'}
       ${cfMergedLog().length?`<div class="cf-hist"><b>Campaign history</b><ul class="chr-list">${
         cfMergedLog().map(e=>`<li class="chr-ev chr-${e.type}"><span class="chr-ic">\u2022</span>
@@ -1404,7 +1411,14 @@ export function cfStats(){ if(!CF) return null;
   return CF.warbands.map(w=>{
     const r=w.roster||{}; const c=r.campaign||{};
     const log=c.log||[];
-    return { id:w.id, player:w.player, name:w.name, wb:w.wb,
+    // The rating as it stood when the warband was imported: recomputing it here
+    // would need that warband's full state loaded, and would drift if the data
+    // files change later.
+    const snaps=(c.snapshots&&typeof c.snapshots==='object')?c.snapshots:{};
+    const latest=Object.keys(snaps).map(Number).sort((a,b)=>b-a)[0];
+    const rating=(latest!=null && snaps[String(latest)] && snaps[String(latest)].totals)
+      ? snaps[String(latest)].totals.rating : null;
+    return { id:w.id, player:w.player, name:w.name, wb:w.wb, rating,
       warriors:(r.models||[]).reduce((s,m)=>s+(Number(m.qty)||1),0),
       fallen:(r.fallen||[]).length,
       battles:(c.battles||[]).length,
@@ -1414,7 +1428,7 @@ export function cfStats(){ if(!CF) return null;
   });
 }
 export function campToggle(on){ if(!S.campaign) S.campaign={districts:{}}; S.campaign.on=!!on; render(); }
-export function exportCampaign(){ const data={type:'mordheim-campaign',wb:S.wb,name:S.name||'',campaign:S.campaign||{districts:{}}}; dl(JSON.stringify(data,null,2),(safeName?safeName():'warband')+'_campaign.json','application/json'); }
+export function exportCampaign(){ const data={type:'mordheim-campaign',wb:S.wb,name:S.name||'',campaign:S.campaign||{districts:{}}}; dl(JSON.stringify(data,null,2),stampedName()+'_campaign.json','application/json'); }
 export function importCampaign(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return; const rd=new FileReader();
   rd.onload=()=>{ try{ const d=JSON.parse(rd.result); const camp=d.campaign||(d.districts?d:null); if(camp){ S.campaign=Object.assign({on:true},camp); render(); } }catch(e){ alert('Could not read campaign file.'); } };
   rd.readAsText(f); ev.target.value=''; }
@@ -1433,8 +1447,8 @@ export function closeCampaignIO(){ document.getElementById('campmodal').style.di
 export function campShowJSON(){ document.getElementById('campexport').value=campaignJSON(); }
 export function campShowText(){ document.getElementById('campexport').value=campaignTextReport(); }
 export function copyCampaign(){ const ta=document.getElementById('campexport'); ta.select(); ta.setSelectionRange(0,99999); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>{ if(typeof flash==='function') flash('Campaign copied.'); },()=>{}); } else { try{ document.execCommand('copy'); if(typeof flash==='function') flash('Campaign copied.'); }catch(e){} } }
-export function downloadCampaignJSON(){ dl(campaignJSON(),(typeof safeName==='function'?safeName():'warband')+'_campaign.json','application/json'); }
-export function downloadCampaignText(){ dl(campaignTextReport(),(typeof safeName==='function'?safeName():'warband')+'_campaign.txt','text/plain;charset=utf-8'); }
+export function downloadCampaignJSON(){ dl(campaignJSON(),stampedName()+'_campaign.json','application/json'); }
+export function downloadCampaignText(){ dl(campaignTextReport(),stampedName()+'_campaign.txt','text/plain;charset=utf-8'); }
 export function importCampaignText(str){ str=String(str||'').trim(); if(!str){ if(typeof flash==='function') flash('Nothing to import.'); return; }
   try{ const d=JSON.parse(str); const camp=d.campaign||(d.districts?d:null); if(!camp||typeof camp!=='object'){ if(typeof flash==='function') flash('No campaign data found.'); return; }
     S.campaign=Object.assign({on:true,districts:{}},camp); if(!S.campaign.districts) S.campaign.districts={};
@@ -1491,10 +1505,13 @@ export function renderPicker(){
   });
 }
 export function chooseWb(key){
-  replaceState({wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:"", budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}, fallen:[]});
+  // A blank name makes every export and every campaign list read "warband".
+  // Defaulting to the type gives something sensible that can still be renamed.
+  const defName=WARBANDS[key].name;
+  replaceState({wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:defName, budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}, fallen:[]});
   document.getElementById('picker-view').style.display='none';
   document.getElementById('builder-view').style.display='block';
-  document.getElementById('wbname').value='';
+  document.getElementById('wbname').value=defName;
   document.getElementById('savename').value='';
   
   setupBuilder(); render(); window.scrollTo(0,0);
@@ -2746,6 +2763,14 @@ export function safeName(){
   const type=wbTypeSlug();
   const base=given||(type?'':'mordheim-roster');
   return [base,type].filter(Boolean).join('_')||'mordheim-roster'; }
+/* A file name that says which warband, at what point in the campaign, and when
+   it was written - so a folder of exports from several game nights can be told
+   apart at a glance. */
+export function stampedName(){ const parts=[safeName()];
+  const c=(S.campaign&&S.campaign.on)?S.campaign:null;
+  if(c) parts.push(Number(c.round)>0?('battle'+Number(c.round)):'setup');
+  parts.push((new Date()).toISOString().slice(0,10));
+  return parts.join('_'); }
 export function rosterName(){ return (document.getElementById('savename')?.value||S.name||'roster'); }
 export function dl(content,filename,mime){ const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{ try{document.body.removeChild(a); URL.revokeObjectURL(a.href);}catch(e){} },100); }
 export function eqSummaryParts(m){
@@ -2904,14 +2929,25 @@ export function copyTts(){ const ta=document.getElementById('ttstext'); const tx
   const ok=()=>flash('TTS description copied.');
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,()=>{try{ta.select();document.execCommand('copy');ok();}catch(e){}}); }
   else { try{ta.select();document.execCommand('copy');ok();}catch(e){} } }
+/* Copying one field at a time matches how TTS is filled in: the name goes in
+   one box, the description in another. */
+function _copyFrom(id,msg){ const ta=document.getElementById(id); if(!ta) return;
+  const txt=ta.value; const ok=()=>flash(msg);
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,()=>{try{ta.select();document.execCommand('copy');ok();}catch(e){}}); }
+  else { try{ta.select();document.execCommand('copy');ok();}catch(e){} } }
+export function copyTtsName(){ _copyFrom('ttsname','Name copied.'); }
+export function copyTtsBoth(){ const n=document.getElementById('ttsname'), t=document.getElementById('ttstext');
+  const txt=((n&&n.value)||'')+'\n'+((t&&t.value)||'');
+  const ok=()=>flash('Name and description copied.');
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok,ok); else ok(); }
 export function openExport(){ if(!S.models.length){ flash('No warriors in the warband yet.'); return; }
   document.getElementById('extextwrap').style.display='none';
   document.getElementById('exportmodal').style.display='flex'; }
 export function closeExport(){ document.getElementById('exportmodal').style.display='none'; }
-export function exportTool(){ dl(JSON.stringify(S,null,2),safeName()+'.json','application/json'); closeExport(); }
-export function exportNR(){ dl(JSON.stringify(buildNR(),null,2),safeName()+'_newrecruit.json','application/json'); closeExport(); }
+export function exportTool(){ dl(JSON.stringify(S,null,2),stampedName()+'.json','application/json'); closeExport(); }
+export function exportNR(){ dl(JSON.stringify(buildNR(),null,2),stampedName()+'_newrecruit.json','application/json'); closeExport(); }
 export function exportText(){ const t=buildText(); document.getElementById('extext').value=t; document.getElementById('extextwrap').style.display='block'; }
-export function downloadText(){ dl(buildText(),safeName()+'.txt','text/plain;charset=utf-8'); }
+export function downloadText(){ dl(buildText(),stampedName()+'.txt','text/plain;charset=utf-8'); }
 export function copyExport(){ const ta=document.getElementById('extext'); ta.select(); ta.setSelectionRange(0,99999);
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>flash('Text copied.'),()=>flash('Selected — please copy manually.')); }
   else { try{ document.execCommand('copy'); flash('Text copied.'); }catch(e){ flash('Selected — please copy manually.'); } } }
@@ -3019,7 +3055,7 @@ Object.assign(window, {
   buildNR, buildText, campDistricts, campShowJSON, campShowText, campToggle,
   campaignJSON, campaignTextReport, canAdv, canBeLeader, casterLore, casterMagic,
   catLabel, catalogDefaultPaid, catalogEligible, chooseWb, closeCampaignIO, closeExport,
-  closeImport, closeTts, copyCampaign, copyExport, copyTts, countOf,
+  closeImport, closeTts, copyCampaign, copyExport, copyTts, copyTtsName, copyTtsBoth, countOf,
   daggerNameFor, defaultLeaderUid, defaultWarbandName, delHsSkill, delHsSpell, delRoster,
   dispMod, districtState, dl, downloadCampaignJSON, downloadCampaignText, downloadText,
   dpCount, dpEligibility, dpGradeAllowed, dpHireCost, dpHireTotal, dpList,
@@ -3061,7 +3097,7 @@ Object.assign(window, {
   characterTimeline, characterRoster, campaignAnalysis, narrativeReport,
   xpLedger, grantXp, pendingXp, pendingXpFor, pendingXpTotal, applyPendingXp,
   clearPendingXp, awardBattleXp, diffStages, foundingMembers, xpBarBlock,
-  snapRows, districtsAt, totalsAt,
+  snapRows, districtsAt, totalsAt, stampedName,
   exportNarrative, exportAnalysis, snapshotStage, stageSnapshots,
   addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
   openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
