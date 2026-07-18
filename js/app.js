@@ -750,7 +750,9 @@ export function renderCampaign(){
     <div class="camp-io no-print"><button class="tiny" onclick="openCampaignIO()">\u2b06 Export</button> <button class="tiny" onclick="openCampaignIO()">\u2b07 Import</button></div>
     ${chronicleBlock()}
     ${summary}
+    <details class="loc-wrap"><summary class="loc-sum">\ud83d\uddfa Locations \u2014 districts you hold</summary>
     ${seg}
+    </details>
     <div class="hs-foot">Control = you are the sole foothold holder (Hard Fought districts). Half-price always rounds down; rare items still need their availability roll.</div></details>`;
 }
 /* The chronicle: where the campaign stands, the battles fought, and the running
@@ -784,32 +786,83 @@ export function chronicleBlock(){
     <div class="chr-tools no-print">
       <label>Stage: <select onchange="setRound(this.value)">${roundOpts}</select></label>
       <button class="tiny" onclick="advanceRound()" title="Move the campaign on to the next stage">\u25b6 next stage</button>
-      <button class="tiny" onclick="promptBattle()" title="Record a battle: opponents, where on the map, and how it ended">\u2694 record battle</button>
-      <button class="tiny" onclick="promptNote()" title="Add your own entry to the chronicle">\u270e add note</button>
+      <button class="tiny" onclick="openBattleForm()" title="Record a battle: opponents, where on the map, and how it ended">\u2694 record battle</button>
+      <button class="tiny" onclick="openNoteForm()" title="Add your own entry to the chronicle">\u270e add note</button>
     </div>
+    ${battleFormBlock()}${noteFormBlock()}
     ${body||'<div class="chr-empty">The chronicle is empty. Record a battle or add a note.</div>'}
   </details>`;
 }
-/* Simple prompt-based entry for now — enough to capture a battle without a
-   modal; the fields are the ones the narrative later needs. */
-export function promptBattle(){
-  if(typeof prompt!=='function') return;
-  const who=prompt('Opponent(s) — name and warband, e.g. "Klaus (Reikland)" or several separated by ";"');
-  if(who===null) return;
-  const opponents=String(who).split(';').map(s=>s.trim()).filter(Boolean).map(s=>{
-    const m=s.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
-    if(!m) return {name:s,wb:''};
-    const key=Object.keys(WARBANDS).find(k=>WARBANDS[k].name.toLowerCase()===m[2].trim().toLowerCase())||'';
-    return {name:m[1].trim(), wb:key||m[2].trim()};
-  });
-  const district=prompt('Where on the map? (district name, or leave blank)')||'';
-  const dk=(DISTRICTS.find(d=>d.name.toLowerCase()===district.trim().toLowerCase())||{}).id||'';
-  const outcome=prompt('Outcome? e.g. Victory / Defeat / Draw')||'';
-  const notes=prompt('How did it go? (free text — this feeds the campaign story)')||'';
-  addBattle({opponents,district:dk||district.trim(),outcome,notes});
+/* Warband picker options, grouped by grade and alphabetical within each group
+   (leading articles ignored), matching the order of the warband picker.
+   A <select> also gives type-ahead, so a warband can be found by typing. */
+export function warbandOptions(sel){
+  const groups=[['core','Core — official'],['1a','Grade 1a — official supplements'],
+    ['1b','Grade 1b — official magazines'],['1c','Grade 1c — semi-official'],['2a','Grade 2a — fan-made, reliable']];
+  const sortName=n=>String(n).replace(/^(the|der|die|das)\s+/i,'').toLowerCase();
+  return `<option value="">— warband —</option>`+groups.map(([g,label])=>{
+    const entries=Object.entries(WARBANDS).filter(([k,wb])=>(wb.grade||'core')===g)
+      .sort((a,b)=>sortName(a[1].name).localeCompare(sortName(b[1].name)));
+    if(!entries.length) return '';
+    return `<optgroup label="${label}">`+entries.map(([k,wb])=>
+      `<option value="${k}"${sel===k?' selected':''}>${wb.name.replace(/</g,'&lt;')}</option>`).join('')+`</optgroup>`;
+  }).join('');
 }
-export function promptNote(){ if(typeof prompt!=='function') return;
-  const t=prompt('Chronicle entry'); if(t) addLogNote(t); }
+/* ---- Battle entry form ----
+   Held in S.campaign._draft while being filled in, so a half-typed battle
+   survives the re-renders that every field change triggers. */
+export function battleDraft(){ return campState()._draft||null; }
+export function openBattleForm(){ const c=campState();
+  c._draft={opponents:[{name:'',wb:''}], district:'', outcome:'', notes:'', round:c.round+1}; render(); }
+export function cancelBattleForm(){ const c=campState(); delete c._draft; render(); }
+export function setDraftField(f,v){ const d=battleDraft(); if(!d) return; d[f]=v;
+  if(f==='notes'||f==='outcome') return;   // typing fields must not lose focus
+  render(); }
+export function setDraftOpp(i,f,v){ const d=battleDraft(); if(!d||!d.opponents[i]) return;
+  d.opponents[i][f]=v; if(f==='wb') render(); }
+export function addDraftOpp(){ const d=battleDraft(); if(!d) return; d.opponents.push({name:'',wb:''}); render(); }
+export function remDraftOpp(i){ const d=battleDraft(); if(!d) return; d.opponents.splice(i,1);
+  if(!d.opponents.length) d.opponents.push({name:'',wb:''}); render(); }
+export function saveBattleForm(){ const d=battleDraft(); if(!d) return;
+  const c=campState(); delete c._draft;
+  addBattle(d); }
+export function battleFormBlock(){
+  const d=battleDraft(); if(!d) return '';
+  const dOpts=DISTRICTS.slice().sort((a,b)=>a.name.localeCompare(b.name))
+    .map(x=>`<option value="${x.id}"${d.district===x.id?' selected':''}>${x.name.replace(/</g,'&lt;')}</option>`).join('');
+  const oc=['Victory','Defeat','Draw','Routed','Ran away'].map(o=>`<option value="${o}"${d.outcome===o?' selected':''}>${o}</option>`).join('');
+  return `<div class="bat-form no-print">
+    <div class="bat-fhead">Record battle — ${roundLabel(d.round)}</div>
+    <div class="bat-oppgrid">
+      <div class="bat-oh">Name</div><div class="bat-oh">Warband</div><div></div>
+      ${d.opponents.map((o,i)=>`
+        <input class="bat-in" value="${String(o.name||'').replace(/"/g,'&quot;')}" placeholder="opponent's name"
+          oninput="setDraftOpp(${i},'name',this.value)">
+        <select class="bat-in" onchange="setDraftOpp(${i},'wb',this.value)">${warbandOptions(o.wb)}</select>
+        <button class="tiny ghost" onclick="remDraftOpp(${i})" title="Remove this opponent">×</button>`).join('')}
+    </div>
+    <button class="tiny" onclick="addDraftOpp()">+ another opponent</button>
+    <div class="bat-row"><label>Location <select onchange="setDraftField('district',this.value)"><option value="">— anywhere —</option>${dOpts}</select></label>
+      <label>Outcome <select onchange="setDraftField('outcome',this.value)"><option value="">— undecided —</option>${oc}</select></label></div>
+    <label class="bat-notes">How did it go? <span class="hs-foot">Free text — this is what the campaign story is later written from.</span>
+      <textarea rows="5" placeholder="The Skaven struck from the rooftops…" oninput="setDraftField('notes',this.value)">${String(d.notes||'').replace(/</g,'&lt;')}</textarea></label>
+    <div class="bat-btns"><button class="btnsm" onclick="saveBattleForm()">Save battle</button>
+      <button class="tiny ghost" onclick="cancelBattleForm()">cancel</button></div>
+  </div>`;
+}
+/* Large free-text entry for the chronicle, in the same style as the printed
+   House-Rule notes rather than a one-line prompt. */
+export function noteDraft(){ return campState()._note!=null?campState()._note:null; }
+export function openNoteForm(){ campState()._note=''; render(); }
+export function setNoteDraft(v){ const c=campState(); c._note=v; }
+export function cancelNoteForm(){ const c=campState(); delete c._note; render(); }
+export function saveNoteForm(){ const c=campState(); const t=(c._note||'').trim();
+  delete c._note; if(t) addLogNote(t); else render(); }
+export function noteFormBlock(){ const n=noteDraft(); if(n==null) return '';
+  return `<div class="bat-form no-print"><div class="bat-fhead">Chronicle entry — ${roundLabel(campRound())}</div>
+    <textarea rows="4" placeholder="What happened…" oninput="setNoteDraft(this.value)">${String(n).replace(/</g,'&lt;')}</textarea>
+    <div class="bat-btns"><button class="btnsm" onclick="saveNoteForm()">Add entry</button>
+      <button class="tiny ghost" onclick="cancelNoteForm()">cancel</button></div></div>`; }
 export function campToggle(on){ if(!S.campaign) S.campaign={districts:{}}; S.campaign.on=!!on; render(); }
 export function exportCampaign(){ const data={type:'mordheim-campaign',wb:S.wb,name:S.name||'',campaign:S.campaign||{districts:{}}}; dl(JSON.stringify(data,null,2),(safeName?safeName():'warband')+'_campaign.json','application/json'); }
 export function importCampaign(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return; const rd=new FileReader();
@@ -2441,7 +2494,10 @@ Object.assign(window, {
   killHench, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
   logEvent, removeBattle, removeLogAt, roundLabel, setRound,
-  chronicleBlock, promptBattle, promptNote, districtName, wbName,
+  chronicleBlock, districtName, wbName, warbandOptions,
+  addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
+  openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
+  setDraftField, setDraftOpp, setNoteDraft,
   render, renderAddMenu, renderCampaign, renderDramatis, renderExtra, renderHiredSwords,
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
   resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,

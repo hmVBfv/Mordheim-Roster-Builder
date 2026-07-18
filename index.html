@@ -126,6 +126,24 @@
   .chr-tag{font-size:10px;color:#7a6e54;border:1px solid var(--parch-edge);border-radius:3px;padding:0 4px}
   .chr-death .chr-ic{color:var(--blood)}
   .chr-empty{padding:6px 10px;font-size:12px;color:#7a6e54;font-style:italic}
+  /* Battle / note entry forms */
+  .bat-form{margin:6px 10px 10px;padding:8px 10px;border:1px solid var(--gold);border-radius:4px;background:#fffaf0}
+  .bat-fhead{font-family:'Pirata One',serif;font-size:16px;color:var(--blood);margin-bottom:6px}
+  .bat-oppgrid{display:grid;grid-template-columns:1fr 1.4fr auto;gap:5px;align-items:center;margin-bottom:6px}
+  .bat-oh{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#7a6e54}
+  .bat-in{font-family:inherit;font-size:13px;padding:3px 5px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px;min-width:0;width:100%}
+  .bat-row{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;font-size:13px}
+  .bat-row label{display:flex;align-items:center;gap:5px}
+  .bat-row select{font-family:inherit;font-size:13px;padding:3px 5px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px}
+  .bat-notes{display:block;font-size:13px;margin-top:4px}
+  .bat-form textarea{display:block;width:100%;margin-top:4px;font-family:inherit;font-size:13px;padding:5px 6px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px;resize:vertical}
+  .bat-btns{display:flex;gap:8px;align-items:center;margin-top:8px}
+  /* Locations (districts) — collapsed by default to keep the panel short */
+  .loc-wrap{border:1px solid var(--parch-edge);border-radius:4px;margin:8px 0}
+  .loc-sum{cursor:pointer;padding:6px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--iron);list-style:none}
+  .loc-sum::-webkit-details-marker{display:none}
+  .loc-sum::before{content:'▸ '}
+  .loc-wrap[open] .loc-sum::before{content:'▾ '}
   .srule-intro{margin:0 0 6px}
   .srule{margin:3px 0;padding:3px 8px 3px 10px;border-left:3px solid var(--gold);background:rgba(154,123,50,.07);border-radius:0 4px 4px 0}
   .srule b{color:var(--blood)}

@@ -89,4 +89,35 @@ assert.strictEqual(app.campRound(), 0, 'a campaign without a stage defaults to S
 assert.deepStrictEqual(app.campState().log, [], 'a campaign without a log gets an empty one');
 assert.deepStrictEqual(app.campState().battles, [], 'a campaign without battles gets an empty list');
 
-console.log('Campaign chronicle: OK (stages, automatic events, battles with several opponents, manual entries, old saves)');
+// --- the warband dropdown is grouped by grade and alphabetical within ---
+const opts=app.warbandOptions('');
+const groups=[...opts.matchAll(/<optgroup label="([^"]+)"/g)].map(m=>m[1]);
+assert.strictEqual(groups.length, 5, 'every grade group is offered');
+assert.ok(/^Core/.test(groups[0]), 'core warbands come first');
+const coreNames=[...opts.split('<optgroup')[1].matchAll(/>([^<]+)<\/option>/g)].map(m=>m[1]);
+assert.deepStrictEqual(coreNames.slice().sort((a,b)=>a.localeCompare(b)), coreNames,
+  'warbands are alphabetical within their grade');
+
+// --- the battle form collects opponents, location, outcome and account ---
+fresh(true);
+app.openBattleForm();
+assert.ok(app.battleDraft(), 'a draft battle is opened');
+app.setDraftOpp(0,'name','Klaus'); app.setDraftOpp(0,'wb','reikland');
+app.addDraftOpp();
+app.setDraftOpp(1,'name','Ulf'); app.setDraftOpp(1,'wb','middenheim');
+app.setDraftField('outcome','Victory');
+app.setDraftField('notes','Ambush at the bridge.');
+app.saveBattleForm();
+const saved=app.campState().battles[0];
+assert.strictEqual(saved.opponents.length, 2, 'both opponents are saved');
+assert.strictEqual(saved.opponents[1].wb, 'middenheim', 'the chosen warband is stored by key');
+assert.strictEqual(saved.notes, 'Ambush at the bridge.', 'the account is stored');
+assert.strictEqual(app.battleDraft(), null, 'the draft is cleared after saving');
+
+// --- locations are collapsible and collapsed by default ---
+app.renderCampaign();
+const camp=store['campaignpanel'].innerHTML;
+assert.ok(/<details class="loc-wrap"><summary/.test(camp), 'districts sit in a collapsible Locations section');
+assert.ok(!/loc-wrap" open/.test(camp), 'Locations start collapsed');
+
+console.log('Campaign chronicle: OK (stages, automatic events, battles with several opponents, manual entries, battle form, old saves)');
