@@ -471,3 +471,99 @@ on after each game night keeps the tool offline-capable and free of accounts.
 The alternative would be an external backend, which costs exactly that.
 
 `test/campaign-file.mjs` added; suite 18/18.
+
+## July 17, 2026 — casualties: who took out whom, and what became of them
+
+Decided where a campaign phase is cut: **a phase is one battle together with
+its post-battle sequence**, because purchases, hires and advances belong to the
+aftermath of the game just played, not to the next one. So the cut falls at the
+start of the next battle, which is also the natural point to sync rosters into
+the campaign file — the roster is stable then rather than half-updated.
+
+That has a direct consequence for recording kills. During a battle only two
+things are known: who went out of action, and who put them there. Whether that
+means death, a lasting injury or a full recovery is decided by the injury roll
+afterwards. Casualty records therefore have two stages: they are written as
+`pending` during the game and resolved later.
+
+Applying the injury roll to one of our own warriors resolves the existing
+record instead of creating a second one, retypes its chronicle entry (an
+out-of-action becomes a death or a wound, and reads accordingly), and a death
+is tied to its entry in the Fallen section — so casualty, roster and Fallen can
+be cross-referenced. Either side of a casualty may be one of our own models,
+picked from the roster (which is what makes the link possible), or a named
+enemy with their warband. Tallies count what each warrior dealt out (out of
+actions, kills) and suffered (out of actions, injuries, deaths).
+
+`test/casualties.mjs` added; suite 19/19.
+
+## July 17, 2026 — making the record answer the two questions asked of it
+
+Checked what the chronicle could actually deliver against the two goals — a
+written account good enough to be turned into a story, and real per-character
+analysis — and found the record too thin for the second. Three gaps, now closed.
+
+**No stable identity on events.** Every event carried only the unit *type*, so
+two Black Skaven were indistinguishable and a renamed warrior could not be
+followed. Recruitment, advances, skills, promotions, items and deaths now carry
+the model id and name.
+
+**No rank or worth on casualties.** "How many heroes did he kill" and "how much
+enemy gold did he destroy" were unanswerable. Both sides of a casualty now carry
+grade and gold worth — filled in from the roster for our own models, entered by
+hand for enemies.
+
+**No experience history.** Only the current value existed, so no progression
+could be shown. Each stage is now snapshotted as it closes (experience,
+advances, skills, worth per warrior), which gives curves cheaply without
+logging every single point.
+
+On top of that: `characterTimeline()` gives one warrior's whole story (joined,
+fate, kills split by grade, gold destroyed, injuries, experience curve, every
+event in order), `campaignAnalysis()` the campaign-wide figures, and
+`narrativeReport()` a stage-by-stage written account — the battles with the
+player's own words, casualties naming both sides, advances, and a closing roll
+of the warriors with their fates. Both are exportable, the account as markdown
+and the figures as JSON.
+
+Two bugs surfaced while testing it end to end: battles were filed one stage late
+(a leftover from when a stage meant "after battle N" — a phase is the battle
+plus its aftermath, so the battle belongs to the current stage), and a warrior
+killed through a resolved casualty had no recorded moment of death, because that
+entry is keyed by casualty rather than by warrior.
+
+`test/analysis.mjs` added; suite 20/20.
+
+## July 17, 2026 — experience earned from casualties, and snapshot diffing
+
+Reworked the analysis around a better idea: the difference between two stage
+snapshots *is* the analysis. Trying to log every meaning separately as it
+happened was the wrong approach — a warrior present at one stage and dead at
+the next fell in that battle; whose characteristic is higher gained it then.
+
+Snapshots are therefore comprehensive now: per warrior the experience, each
+characteristic advance, skills, spells, injuries, equipment, rare items, count
+and worth — and the fallen are kept in the snapshot too, marked dead, so a
+warrior who is gone can be told apart from one who was never there.
+`diffStages(a,b)` derives who joined, who fell, who left, and per warrior what
+changed (experience gained, which characteristic went up, which skill or spell
+was learned, what was bought). `foundingMembers()` answers who was there from
+the outset.
+
+Experience is now earned rather than typed in. Per the rules (checked against
+mordheimer.net): a Hero earns +1 for each enemy put out of action, every Hero
+and Henchman group earns +1 for surviving, and the leader of the winning
+warband earns +1. Only Heroes earn the per-enemy point — henchmen earn as a
+group by surviving. Scenarios vary the amounts (Mordheim's Burning grants +5 for
+surviving), so they are arguments rather than constants. NPCs count as enemies
+where the scenario treats them so, which the Necromancer's Tower does
+explicitly for its Zombies.
+
+Attributing a casualty to one of our Heroes therefore feeds an experience
+ledger, which holds the points rather than writing them straight onto the
+roster: the whole battle can be tallied and then applied with one button, and
+the reason each point was earned is kept. That also keeps the casualty record
+doing what it is for — attribution of who inflicted what on whom — while the
+consequences are derived from it.
+
+`test/experience.mjs` added; suite 21/21.

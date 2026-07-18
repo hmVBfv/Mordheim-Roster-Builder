@@ -643,6 +643,7 @@ export function campState(){ if(!S.campaign) S.campaign={on:false,districts:{}};
   if(S.campaign.round==null) S.campaign.round=0;
   if(!Array.isArray(S.campaign.log)) S.campaign.log=[];
   if(!Array.isArray(S.campaign.battles)) S.campaign.battles=[];
+  if(!Array.isArray(S.campaign.casualties)) S.campaign.casualties=[];
   return S.campaign; }
 export function campRound(){ return campState().round; }
 export function roundLabel(n){ n=Number(n)||0; return n===0?'Setup':`After battle ${n}`; }
@@ -666,7 +667,65 @@ export function removeLogAt(id){ const c=campState(); const i=c.log.findIndex(x=
   c.log.splice(i,1); render(); }
 export function setRound(n){ const c=campState(); const v=Math.max(0,Number(n)||0);
   if(v===c.round) return; c.round=v; render(); }
-export function advanceRound(){ const c=campState(); c.round=(Number(c.round)||0)+1;
+/* Snapshot every warrior at the close of a stage: the cheapest way to get
+   experience curves and warband worth over the campaign without logging every
+   single point change. */
+export function snapshotStage(round){ const c=campState();
+  if(!c.snapshots||typeof c.snapshots!=='object') c.snapshots={};
+  const snap=m=>({uid:m.uid, uid_def:m.uid_def,
+    name:m.name||unitDef(m.uid_def).name, grade:isHeroModel(m)?'hero':'hench',
+    qty:Number(m.qty)||1, exp:Number(m.exp)||0,
+    adv:Object.assign({},m.adv||{}),                    // per-stat advances
+    skills:[...(m.skills||[])], spells:(m.spells||[]).map(x=>x.name||x),
+    inj:(m.inj||[]).map(j=>j.name||j.code),
+    eq:Object.assign({},m.eq||{}), rare:Object.keys(m.rare||{}),
+    value:modelUnitCost(m)||0, alive:true});
+  const rows=S.models.map(snap);
+  // the fallen are kept in the snapshot too, marked dead, so a warrior who is
+  // present at one stage and gone at the next can be told apart from one who
+  // was simply never there
+  (S.fallen||[]).forEach(e=>{ if(!e.m) return; const r=snap(e.m); r.alive=false; r.qty=1; rows.push(r); });
+  c.snapshots[String(round)]=rows;
+  return rows; }
+/* What changed between two stages. Everything the analysis needs is derivable
+   here: who joined, who fell, which characteristic went up when, which skill
+   was learned, what was bought — without having to have logged each meaning
+   separately at the time. */
+export function diffStages(a,b){ const snaps=stageSnapshots();
+  const A=snaps[String(a)]||[], B=snaps[String(b)]||[];
+  const byUid=list=>{ const m={}; list.forEach(x=>m[x.uid]=x); return m; };
+  const ma=byUid(A), mb=byUid(B);
+  const out={from:Number(a), to:Number(b), joined:[], died:[], left:[], changed:[]};
+  B.forEach(x=>{ const prev=ma[x.uid];
+    if(!prev){ out.joined.push({uid:x.uid,name:x.name,grade:x.grade,value:x.value}); return; }
+    if(prev.alive && !x.alive){ out.died.push({uid:x.uid,name:x.name,grade:x.grade,value:x.value}); }
+    const ch={uid:x.uid,name:x.name};
+    let any=false;
+    if(x.exp!==prev.exp){ ch.exp={from:prev.exp,to:x.exp,gained:x.exp-prev.exp}; any=true; }
+    const stats={}; Object.keys(Object.assign({},prev.adv,x.adv)).forEach(k=>{
+      const d=(Number(x.adv[k])||0)-(Number(prev.adv[k])||0); if(d) stats[k]=d; });
+    if(Object.keys(stats).length){ ch.stats=stats; any=true; }
+    const newSk=(x.skills||[]).filter(v=>!(prev.skills||[]).includes(v));
+    if(newSk.length){ ch.skills=newSk; any=true; }
+    const newSp=(x.spells||[]).filter(v=>!(prev.spells||[]).includes(v));
+    if(newSp.length){ ch.spells=newSp; any=true; }
+    const newInj=(x.inj||[]).filter(v=>!(prev.inj||[]).includes(v));
+    if(newInj.length){ ch.injuries=newInj; any=true; }
+    const newEq=Object.keys(x.eq||{}).filter(k=>(Number(x.eq[k])||0)>(Number((prev.eq||{})[k])||0));
+    if(newEq.length){ ch.equipment=newEq; any=true; }
+    const newRare=(x.rare||[]).filter(v=>!(prev.rare||[]).includes(v));
+    if(newRare.length){ ch.rare=newRare; any=true; }
+    if(x.qty!==prev.qty){ ch.qty={from:prev.qty,to:x.qty}; any=true; }
+    if(any) out.changed.push(ch);
+  });
+  A.forEach(x=>{ if(!mb[x.uid]) out.left.push({uid:x.uid,name:x.name}); });
+  return out; }
+/* Who was there from the very beginning. */
+export function foundingMembers(){ const first=stageSnapshots()['0']||[];
+  return first.map(x=>({uid:x.uid,name:x.name,grade:x.grade})); }
+export function stageSnapshots(){ const c=campState();
+  if(!c.snapshots||typeof c.snapshots!=='object') c.snapshots={}; return c.snapshots; }
+export function advanceRound(){ const c=campState(); snapshotStage(c.round); c.round=(Number(c.round)||0)+1;
   logEvent('round',`Campaign moved to “${roundLabel(c.round)}”.`); render(); }
 /* ---- Battles ----
    A battle may involve more than one opponent, so `opponents` is a list of
@@ -674,7 +733,7 @@ export function advanceRound(){ const c=campState(); c.round=(Number(c.round)||0
    `notes` the player's own account of how it went — the raw material for the
    campaign narrative later on. */
 export function addBattle(b){ const c=campState(); b=b||{};
-  const bat={id:nextLogId(), round:(b.round==null?c.round+1:Number(b.round)||0),
+  const bat={id:nextLogId(), round:(b.round==null?c.round:Number(b.round)||0),
     opponents:Array.isArray(b.opponents)?b.opponents.filter(o=>o&&(o.name||o.wb)):[],
     district:b.district||'', outcome:b.outcome||'', notes:b.notes||''};
   c.battles.push(bat);
@@ -775,7 +834,9 @@ export function chronicleBlock(){
         <b>\u2694 ${b.opponents.length?b.opponents.map(o=>`${(o.name||'').replace(/</g,'&lt;')}${o.wb?` <i>(${wbName(o.wb).replace(/</g,'&lt;')})</i>`:''}`).join(' &amp; '):'unnamed foe'}</b>
         ${b.district?` \u2014 ${districtName(b.district).replace(/</g,'&lt;')}`:''}${b.outcome?` \u2014 <b>${String(b.outcome).replace(/</g,'&lt;')}</b>`:''}
         ${b.notes?`<div class="chr-notes">${String(b.notes).replace(/</g,'&lt;')}</div>`:''}
+        <button class="tiny no-print" onclick="awardBattleXp(${b.id})" title="Award the post-battle experience for this game: +1 to everyone who survived, +1 to the leader if you won">+ post-battle XP</button>
         <button class="tiny ghost no-print" onclick="removeBattle(${b.id})">remove</button></div>`).join('')}
+      ${casListBlock(r)}
       ${evs.length?`<ul class="chr-list">${evs.map(e=>`<li class="chr-ev chr-${e.type}">
         <span class="chr-ic">${ICON[e.type]||'\u2022'}</span>
         <span class="chr-tx" contenteditable="true" onblur="editLogText(${e.id},this.textContent)">${String(e.text).replace(/</g,'&lt;')}</span>
@@ -788,9 +849,13 @@ export function chronicleBlock(){
       <label>Stage: <select onchange="setRound(this.value)">${roundOpts}</select></label>
       <button class="tiny" onclick="advanceRound()" title="Move the campaign on to the next stage">\u25b6 next stage</button>
       <button class="tiny" onclick="openBattleForm()" title="Record a battle: opponents, where on the map, and how it ended">\u2694 record battle</button>
+      <button class="tiny" onclick="openCasForm()" title="Record who was put out of action, and by whom">\u2620 casualty</button>
       <button class="tiny" onclick="openNoteForm()" title="Add your own entry to the chronicle">\u270e add note</button>
+      <button class="tiny" onclick="exportNarrative()" title="A written account of the campaign, stage by stage \u2014 detailed enough to be written up as a story">\u1f4d6 chronicle text</button>
+      <button class="tiny" onclick="exportAnalysis()" title="Figures per warrior and per stage, as JSON">\u1f4ca analysis</button>
     </div>
-    ${battleFormBlock()}${noteFormBlock()}
+    ${xpBarBlock()}
+    ${battleFormBlock()}${casFormBlock()}${noteFormBlock()}
     ${body||'<div class="chr-empty">The chronicle is empty. Record a battle or add a note.</div>'}
   </details>`;
 }
@@ -815,7 +880,7 @@ export function warbandOptions(sel){
 export function setChrOpen(v){ campState()._open=!!v; }
 export function battleDraft(){ return campState()._draft||null; }
 export function openBattleForm(){ const c=campState();
-  c._draft={opponents:[{name:'',wb:''}], district:'', outcome:'', notes:'', round:c.round+1};
+  c._draft={opponents:[{name:'',wb:''}], district:'', outcome:'', notes:'', round:c.round};
   c._open=true; render(); }
 export function cancelBattleForm(){ const c=campState(); delete c._draft; render(); }
 export function setDraftField(f,v){ const d=battleDraft(); if(!d) return; d[f]=v;
@@ -866,6 +931,316 @@ export function noteFormBlock(){ const n=noteDraft(); if(n==null) return '';
     <textarea rows="4" placeholder="What happened…" oninput="setNoteDraft(this.value)">${String(n).replace(/</g,'&lt;')}</textarea>
     <div class="bat-btns"><button class="btnsm" onclick="saveNoteForm()">Add entry</button>
       <button class="tiny ghost" onclick="cancelNoteForm()">cancel</button></div></div>`; }
+/* ---- Casualties: who took out whom ----
+   A casualty has two stages, mirroring the rules. During the battle only two
+   things are known: who went out of action, and who put them there. What
+   becomes of them - dead, a lasting injury, or a full recovery - is decided by
+   the injury roll in the post-battle sequence, so a record starts as 'pending'
+   and is resolved afterwards.
+
+   {id, round, battleId,
+    victim:{uid?, name, wb},     uid is set when the victim is in THIS roster
+    attacker:{uid?, name, wb},   uid is set when the killer is in THIS roster
+    result:'pending'|'recovered'|'injured'|'dead', detail, fallenId}
+
+   Because the victim carries a uid when they are ours, a record can be
+   cross-referenced against the roster and the Fallen section. */
+export function campCasualties(){ const c=campState();
+  if(!Array.isArray(c.casualties)) c.casualties=[]; return c.casualties; }
+export function casualtyText(r){
+  const v=r.victim.name||'a warrior'; const a=r.attacker.name;
+  const by=a?`${a}${r.attacker.wb?` (${wbName(r.attacker.wb)})`:''}`:'an unknown hand';
+  const what={pending:'was put out of action',recovered:'recovered fully',injured:'was wounded',dead:'was slain'}[r.result]||'was put out of action';
+  return `${v}${(r.victim.wb&&r.victim.uid==null)?` (${wbName(r.victim.wb)})`:''} ${what} by ${by}${r.detail?` \u2014 ${r.detail}`:''}.`; }
+/* Fill in rank and gold worth for one side of a casualty. For our own models
+   both are known from the roster; for an enemy they are whatever was entered. */
+function _enrichSide(side){ if(side.uid!=null){ const m=S.models.find(x=>x.uid===side.uid);
+    if(m){ side.grade=isHeroModel(m)?'hero':'hench'; if(side.value==null) side.value=modelUnitCost(m)||0;
+      side.uid_def=m.uid_def; } }
+  if(side.value!=null) side.value=Number(side.value)||0;
+  return side; }
+export function casualtyType(r){ return r.result==='dead'?'death':(r.result==='injured'?'injury':'casualty'); }
+export function addCasualty(cas){ const c=campState(); const list=campCasualties(); cas=cas||{};
+  const rec={id:nextLogId(), round:(cas.round==null?c.round:Number(cas.round)||0),
+    battleId:cas.battleId||null,
+    victim:_enrichSide(Object.assign({uid:null,name:'',wb:'',grade:'',value:null},cas.victim||{})),
+    attacker:_enrichSide(Object.assign({uid:null,name:'',wb:'',grade:'',value:null},cas.attacker||{})),
+    result:cas.result||'pending', detail:cas.detail||'', fallenId:null};
+  list.push(rec);
+  logEventAt(rec.round,casualtyType(rec),casualtyText(rec),{casualtyId:rec.id});
+  // Only Heroes earn the +1 for putting an enemy out of action. Enemy NPCs
+  // count when the scenario treats them as enemies (the Necromancer's Tower
+  // counts its Zombies), which is why this is not restricted to player models.
+  if(rec.attacker.uid!=null && rec.attacker.grade==='hero' && rec.victim.uid==null && !cas.noXp){
+    const g=grantXp(rec.attacker.uid,1,`put ${rec.victim.name||'an enemy'} out of action`,rec.round);
+    if(g) rec.xpId=g.id;
+  }
+  render(); return rec; }
+/* Resolve a casualty once the injury has been rolled in the post-battle step. */
+export function resolveCasualty(id,result,detail){ const r=campCasualties().find(x=>x.id===Number(id));
+  if(!r) return null; r.result=result||'pending'; if(detail!=null) r.detail=String(detail);
+  const c=campState();
+  const ev=c.log.find(e=>e.data&&e.data.casualtyId===r.id);
+  if(ev){ ev.text=casualtyText(r); ev.type=casualtyType(r); }
+  else logEventAt(r.round,casualtyType(r),casualtyText(r),{casualtyId:r.id});
+  render(); return r; }
+export function removeCasualty(id){ const list=campCasualties(); const i=list.findIndex(x=>x.id===Number(id));
+  if(i<0) return;
+  if(typeof confirm==='function' && !confirm('Delete this casualty record?')) return;
+  const cid=list[i].id; list.splice(i,1);
+  const c=campState(); c.log=c.log.filter(e=>!(e.data&&e.data.casualtyId===cid));
+  render(); }
+/* An unresolved casualty for one of our own models, so applying the injury roll
+   to that model resolves the existing record instead of creating a second one. */
+export function pendingCasualtyFor(uid){ return campCasualties().find(r=>r.victim.uid===uid && r.result==='pending')||null; }
+/* Called from the injury/death flow: attach the outcome to the casualty record,
+   or record it after the fact if nobody noted who did it. */
+export function noteCasualtyOutcome(m,result,detail){ const c=campState(); if(!c.on) return null;
+  const r=pendingCasualtyFor(m.uid);
+  if(r){ r.result=result; if(detail) r.detail=detail;
+    const ev=c.log.find(e=>e.data&&e.data.casualtyId===r.id);
+    if(ev){ ev.text=casualtyText(r); ev.type=casualtyType(r); }
+    return r; }
+  return addCasualty({victim:{uid:m.uid, name:m.name||unitDef(m.uid_def).name, wb:S.wb}, result, detail});
+}
+/* Casualty tallies: what each of our warriors dealt out and suffered. */
+export function casualtyStats(){ const list=campCasualties(); const out={inflicted:{},suffered:{}};
+  list.forEach(r=>{
+    if(r.attacker.uid!=null){ const k=r.attacker.name||('#'+r.attacker.uid);
+      const t=out.inflicted[k]=out.inflicted[k]||{ooa:0,kills:0}; t.ooa++; if(r.result==='dead') t.kills++; }
+    if(r.victim.uid!=null){ const k=r.victim.name||('#'+r.victim.uid);
+      const t=out.suffered[k]=out.suffered[k]||{ooa:0,deaths:0,injuries:0}; t.ooa++;
+      if(r.result==='dead') t.deaths++; if(r.result==='injured') t.injuries++; }
+  });
+  return out; }
+
+/* ---- Experience earned, held until it is applied ----
+   Mordheim awards experience in the post-battle sequence: +1 to a Hero for
+   each enemy he puts out of action, +1 to every Hero and Henchman group that
+   survives, and +1 to the leader of the winning warband. Scenarios vary these
+   (Mordheim's Burning grants +5 for surviving), so the amounts are arguments
+   rather than constants.
+
+   Only HEROES earn the per-enemy point; henchmen earn as a group by surviving.
+   Earned points are held here rather than written straight onto the roster, so
+   the whole battle can be tallied and then applied in one go — and so the
+   record of WHY a warrior gained a point survives.
+
+   S.campaign.xp = [{id, round, uid, amount, reason, applied}] */
+export function xpLedger(){ const c=campState();
+  if(!Array.isArray(c.xp)) c.xp=[]; return c.xp; }
+export function grantXp(uid,amount,reason,round){ const c=campState(); if(!c.on) return null;
+  const m=S.models.find(x=>x.uid===Number(uid)); if(!m) return null;
+  const rec={id:nextLogId(), round:(round==null?c.round:Number(round)||0), uid:Number(uid),
+    name:m.name||unitDef(m.uid_def).name, amount:Number(amount)||0, reason:String(reason||''), applied:false};
+  xpLedger().push(rec); return rec; }
+export function pendingXp(){ return xpLedger().filter(x=>!x.applied); }
+export function pendingXpFor(uid){ return pendingXp().filter(x=>x.uid===Number(uid)).reduce((a,x)=>a+x.amount,0); }
+export function pendingXpTotal(){ return pendingXp().reduce((a,x)=>a+x.amount,0); }
+/* Write the held experience onto the roster in one step. */
+export function applyPendingXp(){ const list=pendingXp(); if(!list.length) return 0;
+  const per={}; list.forEach(x=>{ per[x.uid]=(per[x.uid]||0)+x.amount; });
+  let n=0;
+  Object.keys(per).forEach(uid=>{ const m=S.models.find(x=>x.uid===Number(uid)); if(!m) return;
+    m.exp=(Number(m.exp)||0)+per[uid]; n+=per[uid];
+    logEvent('xp',`${m.name||unitDef(m.uid_def).name} gained ${per[uid]} experience.`,
+      {uid:m.uid,name:m.name||unitDef(m.uid_def).name,gained:per[uid],exp:Number(m.exp)||0}); });
+  list.forEach(x=>x.applied=true);
+  render(); return n; }
+export function clearPendingXp(){ const c=campState();
+  if(typeof confirm==='function' && !confirm('Discard the experience that has not been applied yet?')) return;
+  c.xp=xpLedger().filter(x=>x.applied); render(); }
+/* The post-battle award for one battle. Amounts default to the rulebook and can
+   be overridden for scenarios that differ. */
+export function awardBattleXp(battleId,opts){ const c=campState(); if(!c.on) return 0;
+  opts=Object.assign({survives:1, winningLeader:1, won:null}, opts||{});
+  const bat=(c.battles||[]).find(b=>b.id===Number(battleId));
+  const round=bat?bat.round:c.round;
+  const won=opts.won!=null?!!opts.won:(bat?/victor/i.test(bat.outcome||''):false);
+  let total=0;
+  // +1 survives — every Hero, and every Henchman group, still standing
+  S.models.forEach(m=>{ const r=grantXp(m.uid,opts.survives,'survived the battle',round); if(r) total+=r.amount; });
+  // +1 to the leader of the winning warband
+  if(won){ const lu=leaderUid(); if(lu!=null){ const r=grantXp(lu,opts.winningLeader,'led the winning warband',round); if(r) total+=r.amount; } }
+  render(); return total; }
+/* The experience earned but not yet written onto the roster. */
+export function xpBarBlock(){ const list=pendingXp(); if(!list.length) return '';
+  const per={}; list.forEach(x=>{ (per[x.uid]=per[x.uid]||{name:x.name,amount:0,why:[]}); per[x.uid].amount+=x.amount; per[x.uid].why.push(x.reason); });
+  return `<div class="xp-pend no-print">
+    <div class="xp-head">\u2605 Experience earned \u2014 ${pendingXpTotal()} point${pendingXpTotal()===1?'':'s'} waiting</div>
+    <ul class="xp-list">${Object.keys(per).map(uid=>`<li><b>${String(per[uid].name).replace(/</g,'&lt;')}</b> +${per[uid].amount}
+      <span class="hs-foot">${per[uid].why.map(w=>String(w).replace(/</g,'&lt;')).join('; ')}</span></li>`).join('')}</ul>
+    <div class="bat-btns"><button class="btnsm" onclick="applyPendingXp()" title="Add this experience to the warriors on the roster">Apply to roster</button>
+      <button class="tiny ghost" onclick="clearPendingXp()">discard</button></div></div>`; }
+/* ================= Analysis & narrative =================
+   Two purposes are served from the same record:
+   - a chronicle detailed enough that a person (or a language model) can write
+     the campaign up as a story, and
+   - figures to analyse: who was present when, what they gained and when, what
+     they achieved, and how they developed. */
+
+/* Everything that ever happened to one warrior, in order. */
+export function characterTimeline(uid){ const c=campState(); uid=Number(uid);
+  const events=(c.log||[]).filter(e=>e.data&&e.data.uid===uid)
+    .map(e=>({round:e.round, type:e.type, text:e.text, data:e.data}));
+  const kills=(c.casualties||[]).filter(r=>r.attacker.uid===uid)
+    .map(r=>({round:r.round, type:'kill', victim:r.victim, result:r.result, text:casualtyText(r)}));
+  const suffered=(c.casualties||[]).filter(r=>r.victim.uid===uid)
+    .map(r=>({round:r.round, type:'suffered', by:r.attacker, result:r.result, text:casualtyText(r)}));
+  const curve=Object.keys(stageSnapshots()).map(Number).sort((a,b)=>a-b)
+    .map(rd=>{ const row=(stageSnapshots()[String(rd)]||[]).find(x=>x.uid===uid);
+      return row?{round:rd, exp:row.exp, advances:row.advances, skills:row.skills, value:row.value}:null; })
+    .filter(Boolean);
+  const all=events.concat(kills,suffered).sort((a,b)=>(a.round-b.round));
+  const live=S.models.find(m=>m.uid===uid);
+  const fallen=(S.fallen||[]).find(e=>e.m&&e.m.uid===uid);
+  const first=all.length?all[0].round:null;
+  const deathEv=events.filter(e=>e.type==='death').map(e=>e.round);
+  const deathCas=suffered.filter(x=>x.result==='dead').map(x=>x.round);
+  const last=(deathEv.concat(deathCas).sort((a,b)=>a-b))[0];
+  const died=(last==null?null:last);
+  return { uid,
+    name:(live&&(live.name||unitDef(live.uid_def).name))||(fallen&&(fallen.m.name||unitDef(fallen.m.uid_def).name))||'unknown',
+    alive:!!live, joined:first, died,
+    kills:kills.filter(k=>k.result==='dead').length,
+    outOfActionsInflicted:kills.length,
+    killsByGrade:{hero:kills.filter(k=>k.result==='dead'&&k.victim.grade==='hero').length,
+                  hench:kills.filter(k=>k.result==='dead'&&k.victim.grade==='hench').length},
+    goldDestroyed:kills.filter(k=>k.result==='dead').reduce((a,k)=>a+(Number(k.victim.value)||0),0),
+    injuries:suffered.filter(x=>x.result==='injured').length,
+    curve, events:all };
+}
+/* Every warrior the campaign has seen, living or fallen. */
+export function characterRoster(){ const seen=new Map();
+  S.models.forEach(m=>seen.set(m.uid,true));
+  (S.fallen||[]).forEach(e=>{ if(e.m) seen.set(e.m.uid,true); });
+  (campState().log||[]).forEach(e=>{ if(e.data&&e.data.uid!=null) seen.set(e.data.uid,true); });
+  return [...seen.keys()].map(uid=>characterTimeline(uid)); }
+/* Campaign-wide figures. */
+export function campaignAnalysis(){ const c=campState(); const chars=characterRoster();
+  const cas=c.casualties||[];
+  return {
+    warband:S.name||wbName(S.wb), warbandType:wbName(S.wb), stage:c.round,
+    battles:(c.battles||[]).length,
+    wins:(c.battles||[]).filter(b=>/victor/i.test(b.outcome||'')).length,
+    losses:(c.battles||[]).filter(b=>/defeat/i.test(b.outcome||'')).length,
+    warriorsEverFielded:chars.length,
+    fallen:(S.fallen||[]).length,
+    killsInflicted:cas.filter(r=>r.attacker.uid!=null&&r.result==='dead').length,
+    goldDestroyed:cas.filter(r=>r.attacker.uid!=null&&r.result==='dead')
+      .reduce((a,r)=>a+(Number(r.victim.value)||0),0),
+    goldLost:cas.filter(r=>r.victim.uid!=null&&r.result==='dead')
+      .reduce((a,r)=>a+(Number(r.victim.value)||0),0),
+    characters:chars.map(x=>({name:x.name, alive:x.alive, joined:x.joined, died:x.died,
+      kills:x.kills, killsByGrade:x.killsByGrade, goldDestroyed:x.goldDestroyed,
+      injuries:x.injuries, curve:x.curve}))
+  };
+}
+/* A written account of the campaign, stage by stage: complete and specific
+   enough to be handed to someone (or a language model) to turn into a story,
+   without being a story itself. */
+export function narrativeReport(){
+  const c=campState(); const L=[];
+  L.push(`CAMPAIGN CHRONICLE — ${S.name||wbName(S.wb)} (${wbName(S.wb)})`);
+  L.push(`Stage reached: ${roundLabel(c.round)}`);
+  L.push('');
+  const rounds=[...new Set([0,...(c.log||[]).map(e=>e.round),...(c.battles||[]).map(b=>b.round),c.round])]
+    .sort((a,b)=>a-b);
+  rounds.forEach(r=>{
+    const evs=(c.log||[]).filter(e=>e.round===r);
+    const bats=(c.battles||[]).filter(b=>b.round===r);
+    const cas=(c.casualties||[]).filter(x=>x.round===r);
+    if(!evs.length&&!bats.length&&!cas.length) return;
+    L.push(`## ${roundLabel(r)}`);
+    bats.forEach(b=>{
+      const who=b.opponents.length?b.opponents.map(o=>`${o.name||'?'}${o.wb?` of the ${wbName(o.wb)}`:''}`).join(' and '):'an unnamed foe';
+      L.push(`Battle against ${who}${b.district?` at ${districtName(b.district)}`:''}${b.outcome?`. Outcome: ${b.outcome}`:''}.`);
+      if(b.notes) L.push(`  Account: ${b.notes}`);
+    });
+    cas.forEach(x=>L.push(`  ${casualtyText(x)}`));
+    // battles and casualties are already written out above, and the stage
+    // markers are bookkeeping rather than story
+    evs.filter(e=>!(e.data&&e.data.casualtyId) && e.type!=='battle' && e.type!=='round')
+       .forEach(e=>L.push(`  ${e.text}`));
+    const snap=stageSnapshots()[String(r)];
+    if(snap&&snap.length) L.push(`  Warband at the close of this stage: ${snap.map(x=>`${x.name} (${x.exp} XP)`).join(', ')}.`);
+    L.push('');
+  });
+  const chars=characterRoster().filter(x=>x.events.length);
+  if(chars.length){
+    L.push('## The warriors');
+    chars.forEach(x=>{
+      const fate=x.alive?'still standing':(x.died!=null?`slain in ${roundLabel(x.died).toLowerCase()}`:'no longer with the warband');
+      L.push(`${x.name} — joined at ${x.joined!=null?roundLabel(x.joined).toLowerCase():'the outset'}, ${fate}.`
+        +` Kills: ${x.kills} (${x.killsByGrade.hero} heroes, ${x.killsByGrade.hench} henchmen), worth ${x.goldDestroyed} gc.`
+        +` Injuries suffered: ${x.injuries}.`
+        +(x.curve.length?` Experience: ${x.curve.map(p=>`${roundLabel(p.round).toLowerCase()} ${p.exp}`).join(', ')}.`:''));
+    });
+  }
+  return L.join('\n');
+}
+export function exportNarrative(){ dl(narrativeReport(), (safeName?safeName():'warband')+'_chronicle.md','text/markdown'); }
+export function exportAnalysis(){ dl(JSON.stringify(campaignAnalysis(),null,2), (safeName?safeName():'warband')+'_analysis.json','application/json'); }
+
+/* ---- Casualty entry ----
+   Filled in during the battle, when only "who went down, and to whom" is known.
+   Either side may be one of our own warriors (picked from the roster, which is
+   what makes the record cross-referable) or a named enemy. */
+export function casDraft(){ return campState()._cas||null; }
+export function openCasForm(){ const c=campState();
+  c._cas={vMine:'', vName:'', vWb:'', aMine:'', aName:'', aWb:'', result:'pending', detail:''};
+  c._open=true; render(); }
+export function cancelCasForm(){ const c=campState(); delete c._cas; render(); }
+export function setCasField(f,v){ const d=casDraft(); if(!d) return; d[f]=v;
+  if(f==='detail'||f==='vName'||f==='aName') return;   // typing must not lose focus
+  render(); }
+export function saveCasForm(){ const d=casDraft(); if(!d) return;
+  const c=campState(); delete c._cas;
+  const mine=u=>{ const m=S.models.find(x=>x.uid===Number(u)); return m?{uid:m.uid,name:m.name||unitDef(m.uid_def).name,wb:S.wb}:null; };
+  const victim = d.vMine? mine(d.vMine) : {uid:null,name:d.vName||'',wb:d.vWb||''};
+  const attacker = d.aMine? mine(d.aMine) : {uid:null,name:d.aName||'',wb:d.aWb||''};
+  if(!victim||!victim.name){ render(); return; }
+  const lastBat=c.battles.filter(b=>b.round===c.round).slice(-1)[0];
+  addCasualty({victim,attacker,result:d.result||'pending',detail:d.detail||'',battleId:lastBat?lastBat.id:null});
+}
+function _modelOpts(sel){ return S.models.map(m=>
+  `<option value="${m.uid}"${String(sel)===String(m.uid)?' selected':''}>${(m.name||unitDef(m.uid_def).name).replace(/</g,'&lt;')}</option>`).join(''); }
+export function casFormBlock(){ const d=casDraft(); if(!d) return '';
+  const res=['pending','recovered','injured','dead'].map(r=>
+    `<option value="${r}"${d.result===r?' selected':''}>${({pending:'not yet rolled',recovered:'full recovery',injured:'lasting injury',dead:'dead'})[r]}</option>`).join('');
+  return `<div class="bat-form no-print">
+    <div class="bat-fhead">Casualty \u2014 ${roundLabel(campRound())}</div>
+    <div class="cas-grid">
+      <div class="bat-oh">Who went down</div>
+      <select class="bat-in" onchange="setCasField('vMine',this.value)"><option value="">\u2014 an enemy \u2014</option>${_modelOpts(d.vMine)}</select>
+      ${d.vMine?'':`<input class="bat-in" placeholder="enemy warrior\u2019s name" value="${String(d.vName).replace(/"/g,'&quot;')}" oninput="setCasField('vName',this.value)">
+      <select class="bat-in" onchange="setCasField('vWb',this.value)">${warbandOptions(d.vWb)}</select>`}
+      <div class="bat-oh">Taken out by</div>
+      <select class="bat-in" onchange="setCasField('aMine',this.value)"><option value="">\u2014 an enemy \u2014</option>${_modelOpts(d.aMine)}</select>
+      ${d.aMine?'':`<input class="bat-in" placeholder="who did it (optional)" value="${String(d.aName).replace(/"/g,'&quot;')}" oninput="setCasField('aName',this.value)">
+      <select class="bat-in" onchange="setCasField('aWb',this.value)">${warbandOptions(d.aWb)}</select>`}
+    </div>
+    <div class="bat-row"><label>Outcome <select onchange="setCasField('result',this.value)">${res}</select></label>
+      <span class="hs-foot">Leave as \u201cnot yet rolled\u201d during the battle \u2014 applying the injury roll to your own warrior fills it in.</span></div>
+    <label class="bat-notes">Note <input class="bat-in" value="${String(d.detail).replace(/"/g,'&quot;')}" oninput="setCasField('detail',this.value)" placeholder="e.g. felled from the rooftop"></label>
+    <div class="bat-btns"><button class="btnsm" onclick="saveCasForm()">Save casualty</button>
+      <button class="tiny ghost" onclick="cancelCasForm()">cancel</button></div>
+  </div>`; }
+/* The casualties of one stage, with a dropdown to resolve those still open. */
+export function casListBlock(round){
+  const list=campCasualties().filter(r=>r.round===round); if(!list.length) return '';
+  const opt=(r,v,l)=>`<option value="${v}"${r.result===v?' selected':''}>${l}</option>`;
+  return `<div class="cas-list"><b>Casualties</b><table class="fallen-tbl">
+    <tr><th>Who</th><th>By</th><th>Outcome</th><th></th></tr>
+    ${list.map(r=>`<tr>
+      <td>${(r.victim.name||'?').replace(/</g,'&lt;')}${r.victim.uid!=null?' <i>(ours)</i>':''}</td>
+      <td>${(r.attacker.name||'\u2014').replace(/</g,'&lt;')}${r.attacker.uid!=null?' <i>(ours)</i>':''}</td>
+      <td><select class="bat-in" onchange="resolveCasualty(${r.id},this.value)">
+        ${opt(r,'pending','not yet rolled')}${opt(r,'recovered','full recovery')}${opt(r,'injured','lasting injury')}${opt(r,'dead','dead')}
+      </select>${r.detail?` <span class="hs-foot">${String(r.detail).replace(/</g,'&lt;')}</span>`:''}</td>
+      <td class="no-print"><button class="tiny ghost" onclick="removeCasualty(${r.id})">\u00d7</button></td></tr>`).join('')}
+  </table></div>`; }
+
 /* ================= Campaign file =================
    A campaign is kept in its own document, separate from any single warband.
    One person (the campaign master, or whoever hosts that evening) collects the
@@ -1181,7 +1556,8 @@ export function addUnit(id){
   if(def.req && leaderUnitDied() && !HR().hireNewLeader) return;
   S.models.push({uid:nextUid(), uid_def:id, name:def.name, exp:def.exp, qty:def.t==='hen'?1:1, eq:{}, rare:{}, mut:[], adv:{}, skills:[], inj:[], spells:[]});
   if(typeof ensureFreeDagger==='function') ensureFreeDagger(S.models[S.models.length-1]);
-  logEvent('recruit',`Recruited ${def.name} (${def.cost||0} gc).`,{uid_def:id,cost:def.cost||0});
+  const _new=S.models[S.models.length-1];
+  logEvent('recruit',`Recruited ${def.name} (${def.cost||0} gc).`,{uid:_new.uid,name:_new.name,uid_def:id,cost:def.cost||0,grade:def.t==='hero'?'hero':'hench'});
   render();
 }
 export function removeUnit(u){ const m=S.models.find(x=>x.uid===u);
@@ -1523,10 +1899,10 @@ export function canAdv(m,stat){ const def=unitDef(m.uid_def); const base=def.pro
   const mi=maxInfo(m); if(mi && typeof mi.prof[stat]==='number' && base+(Number((m.adv||{})[stat])||0)>=mi.prof[stat]) return false;
   return true; }
 export function addAdv(u,stat){ const m=S.models.find(x=>x.uid===u); if(!canAdv(m,stat)) return; m.adv=m.adv||{}; m.adv[stat]=(m.adv[stat]||0)+1;
-  logEvent('advance',`${m.name||unitDef(m.uid_def).name} advanced +1 ${stat}.`,{uid_def:m.uid_def,stat}); render(); }
+  logEvent('advance',`${m.name||unitDef(m.uid_def).name} advanced +1 ${stat}.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,stat,exp:Number(m.exp)||0}); render(); }
 export function remAdv(u,stat){ const m=S.models.find(x=>x.uid===u); if(m.adv&&m.adv[stat]){ m.adv[stat]--; if(m.adv[stat]<=0) delete m.adv[stat]; } render(); }
 export function addSkill(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('sk-'+u); const v=((el&&el.value)||'').trim(); if(!v) return; m.skills=m.skills||[]; m.skills.push(v);
-  logEvent('advance',`${m.name||unitDef(m.uid_def).name} learned ${v}.`,{uid_def:m.uid_def,skill:v}); render(); }
+  logEvent('advance',`${m.name||unitDef(m.uid_def).name} learned ${v}.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,skill:v,exp:Number(m.exp)||0}); render(); }
 export function remSkill(u,i){ const m=S.models.find(x=>x.uid===u); if(m.skills){ m.skills.splice(i,1); render(); } }
 export function setAdvOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._advOpen=v; }
 /* ----- Aufstiegs-Fertigkeiten (Auswahl aus verfügbaren Listen) ----- */
@@ -1563,7 +1939,7 @@ export function promoteHench(u){
       eq:JSON.parse(JSON.stringify(m.eq||{})), mut:[...(m.mut||[])], adv:Object.assign({},m.adv||{}),
       skills:[...(m.skills||[])], inj:[...(m.inj||[])], spells:[...(m.spells||[])], miss:Number(m.miss)||0, promoted:true, promoCats:(def.promoCatsFixed?[...def.promoCatsFixed]:[]), _advOpen:true});
   } else { m.promoted=true; m.promoCats=(def.promoCatsFixed?[...def.promoCatsFixed]:(m.promoCats||[])); m._advOpen=true; }
-  logEvent('promote',`${def.name} was promoted to Hero (The Lad's Got Talent).`,{uid_def:m.uid_def,exp:Number(m.exp)||0});
+  logEvent('promote',`${def.name} was promoted to Hero (The Lad's Got Talent).`,{uid:m.uid,name:m.name||def.name,uid_def:m.uid_def,exp:Number(m.exp)||0});
   render();
 }
 export function unpromote(u){ const m=S.models.find(x=>x.uid===u); if(m){ delete m.promoted; render(); } }
@@ -1573,7 +1949,7 @@ export function addSkillFromSel(u){ const m=S.models.find(x=>x.uid===u); if(!m) 
   if(!v||v==='\u2014') return;
   m.skills=m.skills||[]; if(m.skills.includes(v)) return;
   m.skills.push(v);
-  logEvent('advance',`${m.name||unitDef(m.uid_def).name} learned ${v}.`,{uid_def:m.uid_def,skill:v}); render(); }
+  logEvent('advance',`${m.name||unitDef(m.uid_def).name} learned ${v}.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,skill:v,exp:Number(m.exp)||0}); render(); }
 export function magicOfModel(m){ const def=unitDef(m.uid_def); if(!def) return null;
   if(m.magic&&SPELLS[m.magic]) return m.magic;
   if(def.magic&&SPELLS[def.magic]) return def.magic;
@@ -1728,13 +2104,17 @@ export function fallenEqSig(m){ // canonical signature: same type+eq+adv+skills+
 export function killHero(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:_fallenSnapshot(m)});
   if(m.uid===S.leaderUid) S.leaderUid=null;
-  logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
+  const _cas=noteCasualtyOutcome(m,'dead');
+  if(_cas) _cas.fallenId=S.fallen.length-1;   // ties the record to the Fallen entry
+  else logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
   S.models=S.models.filter(x=>x.uid!==u); render(); }
 export function killHench(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   const snap=_fallenSnapshot(m); snap.qty=1;
   S.fallen=S.fallen||[]; S.fallen.push({kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap});
   m.qty=(Number(m.qty)||1)-1;
-  logEvent('death',`One ${unitDef(m.uid_def).name} was slain.`,{uid_def:m.uid_def,exp:Number(m.exp)||0,hero:false});
+  const _cas=noteCasualtyOutcome(m,'dead');
+  if(_cas) _cas.fallenId=S.fallen.length-1;
+  else logEvent('death',`One ${unitDef(m.uid_def).name} was slain.`,{uid:m.uid,name:unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:false});
   if(m.qty<=0) S.models=S.models.filter(x=>x.uid!==u);
   render(); }
 export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
@@ -1777,7 +2157,9 @@ export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=documen
   if(j.code==='11-15'){ // Dead — route to the right death path for hero vs henchman
     if(el) el.value=INJURIES[0]?INJURIES[0].code:'';
     if(isHeroModel(m)) killHero(u); else killHench(u); return; }
-  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; } m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null}); render(); }
+  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; noteCasualtyOutcome(m,'injured',j.name||j.code); flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; }
+  m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null});
+  noteCasualtyOutcome(m,'injured',j.name||j.code); render(); }
 export function remInj(u,i){ const m=S.models.find(x=>x.uid===u); if(m.inj){ m.inj.splice(i,1); render(); } }
 export function setInjOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._injOpen=v; }
 export function injSection(m){
@@ -2253,7 +2635,7 @@ export function addRare(u,de){ if(!de) return; const m=S.models.find(x=>x.uid===
     if(isUpgrade(de)){ const t=upgradeTargets(m,de); o.on=t.length?t[0].nm:null; o.paid=upgradePaid(m,de,o.on); }
     m.rare[de]=o;
     const _it=CATALOG.find(x=>x.de===de);
-    logEvent('item',`${m.name||unitDef(m.uid_def).name} acquired ${_it?_it.en:de}${o.paid?` (${o.paid} gc)`:''}.`,{item:de,paid:o.paid||0}); }
+    logEvent('item',`${m.name||unitDef(m.uid_def).name} acquired ${_it?_it.en:de}${o.paid?` (${o.paid} gc)`:''}.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,item:de,itemEn:_it?_it.en:de,paid:o.paid||0}); }
   render(); }
 export function setRareTarget(u,de,nm){ const m=S.models.find(x=>x.uid===u); if(!m.rare||!m.rare[de]) return;
   m.rare[de].on=nm; if(UPGRADES[de]&&UPGRADES[de].mult) m.rare[de].paid=upgradePaid(m,de,nm); render(); }
@@ -2630,6 +3012,13 @@ Object.assign(window, {
   cfGet, cfNew, cfClose, cfSetName, cfSetRound, cfImportWarband, cfRemoveWarband,
   cfAddCurrent, cfExport, cfImportFile, cfMergedLog, cfAllBattles, cfStats,
   cfPickFile, cfPickWarband, cfAddCurrentPrompt, campaignFileBlock,
+  addCasualty, campCasualties, casualtyStats, casualtyText, casualtyType, noteCasualtyOutcome,
+  pendingCasualtyFor, removeCasualty, resolveCasualty,
+  casDraft, casFormBlock, casListBlock, cancelCasForm, openCasForm, saveCasForm, setCasField,
+  characterTimeline, characterRoster, campaignAnalysis, narrativeReport,
+  xpLedger, grantXp, pendingXp, pendingXpFor, pendingXpTotal, applyPendingXp,
+  clearPendingXp, awardBattleXp, diffStages, foundingMembers, xpBarBlock,
+  exportNarrative, exportAnalysis, snapshotStage, stageSnapshots,
   addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
   openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
   setDraftField, setDraftOpp, setNoteDraft,
