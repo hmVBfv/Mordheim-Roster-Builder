@@ -370,3 +370,58 @@ needs a default) is documented in the README.
 Known caveat, documented rather than fixed: a save containing fallen warriors
 opened in a build from before that feature loads its living warriors correctly
 but silently drops the fallen record. Suite 15/15.
+
+## July 17, 2026 — House Rules panel repaired and regrouped
+
+The panel had drifted out of shape. Each rule row renders four items (enable
+checkbox, label, control, value/hint) into a grid that only defined three
+columns, so the fourth wrapped and every row looked shifted; the editable
+percent field added with the slider fix then overflowed its 46px column and got
+clipped.
+
+Rebuilt the row grid with explicit columns, let hint text wrap onto its own line
+under the label instead of being cut off, and gave the price rows a dedicated
+layout where the value stays on the label line and the slider spans the full
+width below it — so it is long enough to aim with (and an exact figure can still
+be typed).
+
+Also regrouped the rules by subject, since several sat in the wrong place:
+"Warband composition" (gold, model and hero limits, ranged cap), "Leader &
+advancement" (replacement leader, free skill choice), "Equipment costs",
+"Equipment access" (list enforcement, free market, misc for henchmen, re-roll
+limit), "Hired Swords" and "Display" (item rarity, previously filed under
+Access).
+
+`test/houserules-ui.mjs` guards it: every key in houseDefaults() must still be
+rendered, rows must keep a complete structure, and the price rows must use the
+wide slider layout. Suite 16/16.
+
+## July 17, 2026 — campaign chronicle (foundation)
+
+Groundwork for running a whole campaign in the tool rather than just holding the
+current roster state.
+
+The campaign now has a **stage** (0 = Setup, 1 = after the 1st battle, and so
+on) and a **chronicle**: an event log in `S.campaign.log`, each entry stamped
+with the stage current when it happened, so the campaign can be replayed in
+order afterwards. The tool records automatically as you play — recruitment,
+deaths, promotions, rare-item purchases, skills and stat advances — and entries
+can also be written, corrected (they are then flagged as edited) or deleted by
+hand. Nothing is recorded while the campaign layer is switched off, so ordinary
+roster tinkering does not fill the log with noise.
+
+**Battles** are stored in `S.campaign.battles`: several opponents per battle
+(name plus warband), the map location, the outcome, and a free-text account of
+how it went — the raw material for turning a campaign into a story later.
+
+Additive and backward compatible: old saves without `round`/`log`/`battles` get
+empty defaults on load (guarded by `compat.mjs` and `chronicle.mjs`).
+
+Still open: the evaluation/narrative layer on top of this data, and sharing a
+campaign between players. Worth recording for that second point — GitHub Pages
+is static hosting with no server or database, so a shared live session is not
+possible with Pages alone; the realistic options are exchanging export files
+(works today), an external backend such as a Supabase free tier (costs the
+offline-standalone property), or GitHub itself as storage (needs OAuth, as a
+write token cannot safely live in a browser). The event log is required for all
+three, which is why it was built first. Suite 17/17.

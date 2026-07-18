@@ -630,6 +630,72 @@ export function renderDramatis(){
 
 
 export function campDistricts(){ if(!S.campaign) S.campaign={districts:{}}; if(!S.campaign.districts) S.campaign.districts={}; return S.campaign.districts; }
+/* ---- Campaign chronicle ----
+   S.campaign.round   0 = Setup, 1 = after the 1st battle, 2 = after the 2nd, …
+   S.campaign.log[]   {id, round, type, text, auto, data}
+                      auto:true  = recorded by the tool as it happened
+                      auto:false = written or corrected by hand
+   S.campaign.battles[] {id, round, opponents:[{name,wb}], district, outcome, notes}
+   Events are stamped with the round that is current when they happen, so the
+   chronicle can be replayed in order later. */
+export function campState(){ if(!S.campaign) S.campaign={on:false,districts:{}};
+  if(!S.campaign.districts) S.campaign.districts={};
+  if(S.campaign.round==null) S.campaign.round=0;
+  if(!Array.isArray(S.campaign.log)) S.campaign.log=[];
+  if(!Array.isArray(S.campaign.battles)) S.campaign.battles=[];
+  return S.campaign; }
+export function campRound(){ return campState().round; }
+export function roundLabel(n){ n=Number(n)||0; return n===0?'Setup':`After battle ${n}`; }
+let _logSeq=0;
+export function nextLogId(){ const c=campState(); const mx=c.log.reduce((m,e)=>Math.max(m,Number(e.id)||0),0);
+  const bx=c.battles.reduce((m,e)=>Math.max(m,Number(e.id)||0),0); _logSeq=Math.max(_logSeq,mx,bx)+1; return _logSeq; }
+/* Record an event. Only while the campaign is switched on — otherwise plain
+   roster editing would fill the chronicle with noise. */
+export function logEvent(type,text,data){ const c=campState(); if(!c.on) return null;
+  const e={id:nextLogId(), round:c.round, type:String(type), text:String(text), auto:true};
+  if(data) e.data=data;
+  c.log.push(e); return e; }
+export function addLogNote(text,round){ const c=campState();
+  const e={id:nextLogId(), round:(round==null?c.round:Number(round)||0), type:'note', text:String(text||''), auto:false};
+  c.log.push(e); render(); return e; }
+export function editLogText(id,text){ const c=campState(); const e=c.log.find(x=>x.id===Number(id));
+  if(e){ e.text=String(text||''); e.edited=true; } }
+export function removeLogAt(id){ const c=campState(); const i=c.log.findIndex(x=>x.id===Number(id));
+  if(i<0) return;
+  if(typeof confirm==='function' && !confirm('Delete this chronicle entry? This cannot be undone.')) return;
+  c.log.splice(i,1); render(); }
+export function setRound(n){ const c=campState(); const v=Math.max(0,Number(n)||0);
+  if(v===c.round) return; c.round=v; render(); }
+export function advanceRound(){ const c=campState(); c.round=(Number(c.round)||0)+1;
+  logEvent('round',`Campaign moved to “${roundLabel(c.round)}”.`); render(); }
+/* ---- Battles ----
+   A battle may involve more than one opponent, so `opponents` is a list of
+   {name, wb}. `district` is a Mordheim map location, `outcome` the result, and
+   `notes` the player's own account of how it went — the raw material for the
+   campaign narrative later on. */
+export function addBattle(b){ const c=campState(); b=b||{};
+  const bat={id:nextLogId(), round:(b.round==null?c.round+1:Number(b.round)||0),
+    opponents:Array.isArray(b.opponents)?b.opponents.filter(o=>o&&(o.name||o.wb)):[],
+    district:b.district||'', outcome:b.outcome||'', notes:b.notes||''};
+  c.battles.push(bat);
+  const who=bat.opponents.length?bat.opponents.map(o=>o.name||wbName(o.wb)).join(', '):'an unnamed foe';
+  logEventAt(bat.round,'battle',`Battle ${bat.round}: fought ${who}${bat.district?` at ${districtName(bat.district)}`:''}${bat.outcome?` — ${bat.outcome}`:''}.`,{battleId:bat.id});
+  render(); return bat; }
+export function editBattle(id,patch){ const c=campState(); const b=c.battles.find(x=>x.id===Number(id));
+  if(!b||!patch) return; Object.assign(b,patch); render(); }
+export function removeBattle(id){ const c=campState(); const i=c.battles.findIndex(x=>x.id===Number(id));
+  if(i<0) return;
+  if(typeof confirm==='function' && !confirm('Delete this battle record? This cannot be undone.')) return;
+  const bid=c.battles[i].id; c.battles.splice(i,1);
+  c.log=c.log.filter(e=>!(e.data&&e.data.battleId===bid));
+  render(); }
+/* Like logEvent, but stamped with a given round (a battle records itself under
+   the round it belongs to, which may be ahead of the current one). */
+export function logEventAt(round,type,text,data){ const c=campState(); if(!c.on) return null;
+  const e={id:nextLogId(), round:Number(round)||0, type:String(type), text:String(text), auto:true};
+  if(data) e.data=data; c.log.push(e); return e; }
+export function districtName(id){ const d=DISTRICTS.find(x=>x.id===id); return d?d.name:(id||''); }
+export function wbName(key){ return (WARBANDS[key]&&WARBANDS[key].name)||key||'unknown warband'; }
 export function districtState(id){ return campDistricts()[id]||'none'; }
 export function setDistrict(id,state){ campDistricts()[id]=state; render(); }
 export function activeDistrictEffects(){ const cd=campDistricts(); const out=[];
@@ -682,10 +748,68 @@ export function renderCampaign(){
       +`</div>`:'';
   host.innerHTML=`<details class="sec-details" ${campOpen?'open':''} ontoggle="setSecOpen('camp',this.open)"><summary class="sec-sum">Campaign <span class="hr-on">on</span></summary><div class="sec-body"><label class="hs-gbox"><input type="checkbox" checked onchange="campToggle(this.checked)"> enabled</label>
     <div class="camp-io no-print"><button class="tiny" onclick="openCampaignIO()">\u2b06 Export</button> <button class="tiny" onclick="openCampaignIO()">\u2b07 Import</button></div>
+    ${chronicleBlock()}
     ${summary}
     ${seg}
     <div class="hs-foot">Control = you are the sole foothold holder (Hard Fought districts). Half-price always rounds down; rare items still need their availability roll.</div></details>`;
 }
+/* The chronicle: where the campaign stands, the battles fought, and the running
+   log of what happened. Automatic entries are stamped as they occur; notes and
+   corrections can be added by hand. */
+export function chronicleBlock(){
+  const c=campState();
+  const rounds=[...new Set([0,c.round,...c.log.map(e=>e.round),...c.battles.map(b=>b.round)])]
+    .map(Number).filter(n=>!isNaN(n)).sort((a,b)=>b-a);
+  const roundOpts=Array.from({length:Math.max(c.round,...c.battles.map(b=>b.round),0)+2},(_,i)=>i)
+    .map(n=>`<option value="${n}"${n===c.round?' selected':''}>${roundLabel(n)}</option>`).join('');
+  const ICON={death:'\u2620',recruit:'+',item:'\u2696',advance:'\u2605',promote:'\u2605',battle:'\u2694',round:'\u25b6',note:'\u270e'};
+  const body=rounds.map(r=>{
+    const evs=c.log.filter(e=>e.round===r);
+    const bats=c.battles.filter(b=>b.round===r);
+    if(!evs.length && !bats.length && r!==c.round) return '';
+    return `<div class="chr-round"><div class="chr-rhead">${roundLabel(r)}${r===c.round?' <span class="chr-now">current</span>':''}</div>
+      ${bats.map(b=>`<div class="chr-bat">
+        <b>\u2694 ${b.opponents.length?b.opponents.map(o=>`${(o.name||'').replace(/</g,'&lt;')}${o.wb?` <i>(${wbName(o.wb).replace(/</g,'&lt;')})</i>`:''}`).join(' &amp; '):'unnamed foe'}</b>
+        ${b.district?` \u2014 ${districtName(b.district).replace(/</g,'&lt;')}`:''}${b.outcome?` \u2014 <b>${String(b.outcome).replace(/</g,'&lt;')}</b>`:''}
+        ${b.notes?`<div class="chr-notes">${String(b.notes).replace(/</g,'&lt;')}</div>`:''}
+        <button class="tiny ghost no-print" onclick="removeBattle(${b.id})">remove</button></div>`).join('')}
+      ${evs.length?`<ul class="chr-list">${evs.map(e=>`<li class="chr-ev chr-${e.type}">
+        <span class="chr-ic">${ICON[e.type]||'\u2022'}</span>
+        <span class="chr-tx" contenteditable="true" onblur="editLogText(${e.id},this.textContent)">${String(e.text).replace(/</g,'&lt;')}</span>
+        ${e.auto?'':'<span class="chr-tag">manual</span>'}${e.edited?'<span class="chr-tag">edited</span>':''}
+        <button class="tiny ghost no-print" onclick="removeLogAt(${e.id})">\u00d7</button></li>`).join('')}</ul>`:'<div class="chr-empty">Nothing recorded yet.</div>'}
+    </div>`;
+  }).join('');
+  return `<details class="chr-wrap" ${c._open?'open':''}><summary class="chr-sum">\u1f4dc Chronicle \u2014 ${roundLabel(c.round)} \u00b7 ${c.battles.length} battle${c.battles.length===1?'':'s'} \u00b7 ${c.log.length} entries</summary>
+    <div class="chr-tools no-print">
+      <label>Stage: <select onchange="setRound(this.value)">${roundOpts}</select></label>
+      <button class="tiny" onclick="advanceRound()" title="Move the campaign on to the next stage">\u25b6 next stage</button>
+      <button class="tiny" onclick="promptBattle()" title="Record a battle: opponents, where on the map, and how it ended">\u2694 record battle</button>
+      <button class="tiny" onclick="promptNote()" title="Add your own entry to the chronicle">\u270e add note</button>
+    </div>
+    ${body||'<div class="chr-empty">The chronicle is empty. Record a battle or add a note.</div>'}
+  </details>`;
+}
+/* Simple prompt-based entry for now — enough to capture a battle without a
+   modal; the fields are the ones the narrative later needs. */
+export function promptBattle(){
+  if(typeof prompt!=='function') return;
+  const who=prompt('Opponent(s) — name and warband, e.g. "Klaus (Reikland)" or several separated by ";"');
+  if(who===null) return;
+  const opponents=String(who).split(';').map(s=>s.trim()).filter(Boolean).map(s=>{
+    const m=s.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+    if(!m) return {name:s,wb:''};
+    const key=Object.keys(WARBANDS).find(k=>WARBANDS[k].name.toLowerCase()===m[2].trim().toLowerCase())||'';
+    return {name:m[1].trim(), wb:key||m[2].trim()};
+  });
+  const district=prompt('Where on the map? (district name, or leave blank)')||'';
+  const dk=(DISTRICTS.find(d=>d.name.toLowerCase()===district.trim().toLowerCase())||{}).id||'';
+  const outcome=prompt('Outcome? e.g. Victory / Defeat / Draw')||'';
+  const notes=prompt('How did it go? (free text — this feeds the campaign story)')||'';
+  addBattle({opponents,district:dk||district.trim(),outcome,notes});
+}
+export function promptNote(){ if(typeof prompt!=='function') return;
+  const t=prompt('Chronicle entry'); if(t) addLogNote(t); }
 export function campToggle(on){ if(!S.campaign) S.campaign={districts:{}}; S.campaign.on=!!on; render(); }
 export function exportCampaign(){ const data={type:'mordheim-campaign',wb:S.wb,name:S.name||'',campaign:S.campaign||{districts:{}}}; dl(JSON.stringify(data,null,2),(safeName?safeName():'warband')+'_campaign.json','application/json'); }
 export function importCampaign(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return; const rd=new FileReader();
@@ -872,6 +996,7 @@ export function addUnit(id){
   if(def.req && leaderUnitDied() && !HR().hireNewLeader) return;
   S.models.push({uid:nextUid(), uid_def:id, name:def.name, exp:def.exp, qty:def.t==='hen'?1:1, eq:{}, rare:{}, mut:[], adv:{}, skills:[], inj:[], spells:[]});
   if(typeof ensureFreeDagger==='function') ensureFreeDagger(S.models[S.models.length-1]);
+  logEvent('recruit',`Recruited ${def.name} (${def.cost||0} gc).`,{uid_def:id,cost:def.cost||0});
   render();
 }
 export function removeUnit(u){ const m=S.models.find(x=>x.uid===u);
@@ -1212,9 +1337,11 @@ export function canAdv(m,stat){ const def=unitDef(m.uid_def); const base=def.pro
   if(!isHeroModel(m) && (Number((m.adv||{})[stat])||0)>=1) return false;
   const mi=maxInfo(m); if(mi && typeof mi.prof[stat]==='number' && base+(Number((m.adv||{})[stat])||0)>=mi.prof[stat]) return false;
   return true; }
-export function addAdv(u,stat){ const m=S.models.find(x=>x.uid===u); if(!canAdv(m,stat)) return; m.adv=m.adv||{}; m.adv[stat]=(m.adv[stat]||0)+1; render(); }
+export function addAdv(u,stat){ const m=S.models.find(x=>x.uid===u); if(!canAdv(m,stat)) return; m.adv=m.adv||{}; m.adv[stat]=(m.adv[stat]||0)+1;
+  logEvent('advance',`${m.name||unitDef(m.uid_def).name} advanced +1 ${stat}.`,{uid_def:m.uid_def,stat}); render(); }
 export function remAdv(u,stat){ const m=S.models.find(x=>x.uid===u); if(m.adv&&m.adv[stat]){ m.adv[stat]--; if(m.adv[stat]<=0) delete m.adv[stat]; } render(); }
-export function addSkill(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('sk-'+u); const v=((el&&el.value)||'').trim(); if(!v) return; m.skills=m.skills||[]; m.skills.push(v); render(); }
+export function addSkill(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('sk-'+u); const v=((el&&el.value)||'').trim(); if(!v) return; m.skills=m.skills||[]; m.skills.push(v);
+  logEvent('advance',`${m.name||unitDef(m.uid_def).name} learned ${v}.`,{uid_def:m.uid_def,skill:v}); render(); }
 export function remSkill(u,i){ const m=S.models.find(x=>x.uid===u); if(m.skills){ m.skills.splice(i,1); render(); } }
 export function setAdvOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._advOpen=v; }
 /* ----- Aufstiegs-Fertigkeiten (Auswahl aus verfügbaren Listen) ----- */
@@ -1251,6 +1378,7 @@ export function promoteHench(u){
       eq:JSON.parse(JSON.stringify(m.eq||{})), mut:[...(m.mut||[])], adv:Object.assign({},m.adv||{}),
       skills:[...(m.skills||[])], inj:[...(m.inj||[])], spells:[...(m.spells||[])], miss:Number(m.miss)||0, promoted:true, promoCats:(def.promoCatsFixed?[...def.promoCatsFixed]:[]), _advOpen:true});
   } else { m.promoted=true; m.promoCats=(def.promoCatsFixed?[...def.promoCatsFixed]:(m.promoCats||[])); m._advOpen=true; }
+  logEvent('promote',`${def.name} was promoted to Hero (The Lad's Got Talent).`,{uid_def:m.uid_def,exp:Number(m.exp)||0});
   render();
 }
 export function unpromote(u){ const m=S.models.find(x=>x.uid===u); if(m){ delete m.promoted; render(); } }
@@ -1259,7 +1387,8 @@ export function addSkillFromSel(u){ const m=S.models.find(x=>x.uid===u); if(!m) 
   const el=document.getElementById('sksel-'+u); const v=el&&el.value;
   if(!v||v==='\u2014') return;
   m.skills=m.skills||[]; if(m.skills.includes(v)) return;
-  m.skills.push(v); render(); }
+  m.skills.push(v);
+  logEvent('advance',`${m.name||unitDef(m.uid_def).name} learned ${v}.`,{uid_def:m.uid_def,skill:v}); render(); }
 export function magicOfModel(m){ const def=unitDef(m.uid_def); if(!def) return null;
   if(m.magic&&SPELLS[m.magic]) return m.magic;
   if(def.magic&&SPELLS[def.magic]) return def.magic;
@@ -1414,11 +1543,13 @@ export function fallenEqSig(m){ // canonical signature: same type+eq+adv+skills+
 export function killHero(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:_fallenSnapshot(m)});
   if(m.uid===S.leaderUid) S.leaderUid=null;
+  logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
   S.models=S.models.filter(x=>x.uid!==u); render(); }
 export function killHench(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   const snap=_fallenSnapshot(m); snap.qty=1;
   S.fallen=S.fallen||[]; S.fallen.push({kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap});
   m.qty=(Number(m.qty)||1)-1;
+  logEvent('death',`One ${unitDef(m.uid_def).name} was slain.`,{uid_def:m.uid_def,exp:Number(m.exp)||0,hero:false});
   if(m.qty<=0) S.models=S.models.filter(x=>x.uid!==u);
   render(); }
 export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
@@ -1873,16 +2004,23 @@ export function renderHouse(){
   function num(k,label,min,max,step,suffix){ const v=(h[k]===''||h[k]==null)?'':h[k];
     return `<label class="hr-row">${hrChk(k)}<span class="hl">${label}</span><span class="hc"><input type="number" min="${min}" ${max!=null?`max="${max}"`:''} ${step?`step="${step}"`:''} value="${v}" placeholder="—" onchange="setHouseNum('${k}',this.value)"></span><span class="hs">${suffix||''}</span></label>`; }
   function slider(k,label){ const v=Number(h[k])||100;
-    return `<label class="hr-row">${hrChk(k)}<span class="hl">${label}</span><span class="hc"><input type="range" min="25" max="200" step="1" value="${v}" oninput="HR().${k}=Number(this.value);document.getElementById('hv-${k}').value=this.value;renderSidebar();renderRoster();" onchange="render()"></span><span class="hv"><input id="hv-${k}" type="number" min="0" max="500" step="1" value="${v}" style="width:52px" onchange="setHouseNum('${k}',this.value)">%</span></label>`; }
+    return `<label class="hr-row hr-slider">${hrChk(k)}<span class="hl">${label}</span><span class="hv"><input id="hv-${k}" type="number" min="0" max="500" step="1" value="${v}" onchange="setHouseNum('${k}',this.value)">%</span><span class="hc"><input type="range" min="25" max="200" step="1" value="${v}" oninput="HR().${k}=Number(this.value);document.getElementById('hv-${k}').value=this.value;renderSidebar();renderRoster();" onchange="render()"></span></label>`; }
   function bool(k,label){ return `<label class="hr-chk"><input type="checkbox" ${h[k]?'checked':''} onchange="setHouseBool('${k}',this.checked)"> <span>${label}</span>${hrIsDefault(k)?'':'<span class="hr-dev" title="Deviates from the standard \u2014 recorded on export">HR</span>'}</label>`; }
   const active=houseActive();
   box.innerHTML=`<details class="sec-details no-print" ${hrOpen?'open':''} ontoggle="setSecOpen('hr',this.open)"><summary class="sec-sum">⚖ House Rules ${active?'<span class="hr-on">active</span>':''}<button class="tiny ghost no-print" style="float:right" onclick="event.preventDefault();resetHouse()">reset all</button></summary><div class="sec-body">
    <div class="hr-grid no-print">
-    <fieldset class="hr-fs"><legend>Warband limits</legend>
+    <fieldset class="hr-fs"><legend>Warband composition</legend>
       ${num('startGold','Starting gold',0,null,5,'blank = warband default')}
       ${num('min','Min. models',0,null,1,'blank = default')}
       ${num('max','Max. models',0,null,1,'blank = default')}
       ${num('heroes','Max. Heroes',1,12,1,'default 6')}
+      ${bool('rangedCapOn','Limit ranged models')}
+      ${num('rangedCap','↳ max ranged %',0,100,5,'% of warband (0 = pure melee)')}
+    </fieldset>
+    <fieldset class="hr-fs"><legend>Leader &amp; advancement</legend>
+      ${bool('hireNewLeader','Allow hiring a replacement leader after the original is slain')}
+      <div class="hr-note">By the rules a slain leader is replaced by the Hero with the highest Leadership, and no new one may be hired.</div>
+      ${bool('allSkills','Heroes may pick any skill list')}
     </fieldset>
     <fieldset class="hr-fs"><legend>Equipment costs</legend>
       ${slider('priceAll','All equipment')}
@@ -1894,23 +2032,19 @@ export function renderHouse(){
       ${num('slingSurcharge','Sling',0,null,1,'+gc each')}
       ${bool('freeDagger','Daggers are free')}
     </fieldset>
+    <fieldset class="hr-fs"><legend>Equipment access</legend>
+      ${bool('eqLimitOn','Enforce the equipment list (standard — untick to allow anything)')}
+      ${bool('freeMarket','Free market (ignore eligibility)')}
+      ${bool('miscHench','Misc items available to Henchmen')}
+      ${bool('rerollOne','Only one re-roll item / warband')}
+    </fieldset>
     <fieldset class="hr-fs"><legend>Hired Swords</legend>
-      <label class="hr-row"><span class="hl">Grades</span><span class="hc">${['1a','1b','1c','2a'].map(g=>`<label class="hr-gbox"><input type="checkbox" ${(h.hsGrades&&h.hsGrades[g]!==false)?'checked':''} onchange="setHsGrade('${g}',this.checked)">${g}</label>`).join('')}</span><span class="hs">tick = included</span></label>
+      <label class="hr-row"><span></span><span class="hl">Grades</span><span class="hc">${['1a','1b','1c','2a'].map(g=>`<label class="hr-gbox"><input type="checkbox" ${(h.hsGrades&&h.hsGrades[g]!==false)?'checked':''} onchange="setHsGrade('${g}',this.checked)">${g}</label>`).join('')}</span><span class="hs">tick = included</span></label>
       ${bool('hsEquip','Hired Swords & Dramatis Personae may buy extra equipment')}
       <div class="hr-note">RAW their equipment is fixed \u2014 with this on they may buy from the warband\u2019s Hero equipment chart.</div>
     </fieldset>
-    <fieldset class="hr-fs"><legend>Access</legend>
-      ${bool('miscHench','Misc items available to Henchmen')}
-      ${bool('freeMarket','Free market (ignore eligibility)')}
-      ${bool('allSkills','Heroes may pick any skill list')}
+    <fieldset class="hr-fs"><legend>Display</legend>
       ${bool('showRarity','Show item rarity on cards')}
-    </fieldset>
-    <fieldset class="hr-fs"><legend>Discipline / limits</legend>
-      ${bool('eqLimitOn','Enforce the equipment list (standard \u2014 untick only as a house rule to allow anything)')}
-      ${bool('hireNewLeader','Allow hiring a replacement leader after the original is slain (overrides the standard rule)')}
-      ${bool('rangedCapOn','Limit ranged models')}
-      ${num('rangedCap','↳ max ranged %',0,100,5,'% of warband (0 = pure melee)')}
-      ${bool('rerollOne','Only one re-roll item / warband')}
     </fieldset>
    </div>
    <label class="hr-row no-print" style="grid-template-columns:96px 1fr;align-items:flex-start;margin-top:8px"><span class="hl">Notes (printed)</span><span class="hc" style="justify-content:stretch"><textarea rows="2" style="flex:1;width:100%" oninput="setHouseNotes(this.value)" placeholder="House-rule notes shown on the roster…">${(h.notes||'').replace(/</g,'&lt;')}</textarea></span></label></div></details>`;
@@ -1932,7 +2066,9 @@ export function addRare(u,de){ if(!de) return; const m=S.models.find(x=>x.uid===
   if(m.rare[de] && !isUpgrade(de)){ m.rare[de].q=(Number(m.rare[de].q)||1)+1; }
   else if(!m.rare[de]){ const o={q:1,paid:catalogDefaultPaid(CATALOG.find(x=>x.de===de))};
     if(isUpgrade(de)){ const t=upgradeTargets(m,de); o.on=t.length?t[0].nm:null; o.paid=upgradePaid(m,de,o.on); }
-    m.rare[de]=o; }
+    m.rare[de]=o;
+    const _it=CATALOG.find(x=>x.de===de);
+    logEvent('item',`${m.name||unitDef(m.uid_def).name} acquired ${_it?_it.en:de}${o.paid?` (${o.paid} gc)`:''}.`,{item:de,paid:o.paid||0}); }
   render(); }
 export function setRareTarget(u,de,nm){ const m=S.models.find(x=>x.uid===u); if(!m.rare||!m.rare[de]) return;
   m.rare[de].on=nm; if(UPGRADES[de]&&UPGRADES[de].mult) m.rare[de].paid=upgradePaid(m,de,nm); render(); }
@@ -1980,6 +2116,7 @@ export function applyState(data){
   if(!S.stash||typeof S.stash!=='object') S.stash={wyrd:0,gold:0,items:[]};
   if(!Array.isArray(S.stash.items)) S.stash.items=[];
   if(!S.fallen) S.fallen=[];
+  campState();   // fills in round/log/battles for saves written before the chronicle
   S.models.forEach(m=>{ if(!m.eq)m.eq={}; if(!m.mut)m.mut=[]; if(!m.adv)m.adv={}; if(!m.skills)m.skills=[]; if(!m.inj)m.inj=[]; if(!m.spells)m.spells=[]; });
   resyncUid();
   document.getElementById('picker-view').style.display='none';
@@ -2302,6 +2439,9 @@ Object.assign(window, {
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
   killHench, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
+  addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
+  logEvent, removeBattle, removeLogAt, roundLabel, setRound,
+  chronicleBlock, promptBattle, promptNote, districtName, wbName,
   render, renderAddMenu, renderCampaign, renderDramatis, renderExtra, renderHiredSwords,
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
   resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,
