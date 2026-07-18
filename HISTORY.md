@@ -425,3 +425,25 @@ possible with Pages alone; the realistic options are exchanging export files
 offline-standalone property), or GitHub itself as storage (needs OAuth, as a
 write token cannot safely live in a browser). The event log is required for all
 three, which is why it was built first. Suite 17/17.
+
+## July 17, 2026 — chronicle entry forms and a tidier campaign panel
+
+Replaced the placeholder prompt() dialogs with proper forms, in the style of the
+printed House-Rule notes rather than one-line prompts.
+
+**Record battle** is now a form: one row per opponent with a free-text name and
+a warband dropdown listing every warband, grouped by grade and alphabetical
+within each group (leading articles ignored), exactly like the warband picker —
+a select also gives type-ahead, so a warband can be found by typing. Opponents
+can be added and removed; location and outcome are dropdowns; the account of the
+battle is a large multi-line field, since that text is what the campaign story
+will later be written from. The half-filled battle lives in a draft so it
+survives the re-render each keystroke triggers.
+
+**Chronicle entries** get the same treatment: a multi-line form instead of a
+prompt.
+
+**Locations** (the district list) now sit in their own collapsible section,
+collapsed by default, so the campaign panel stays short.
+
+Suite 17/17.
