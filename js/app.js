@@ -3,7 +3,7 @@
    zusammen (Offline-/Single-File-Variante). */
 import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, NR_CAT, NR_T, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
 import { exportOfficialSheet, defaultWarbandName } from './pdf.js';
-import { ttsOpen, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
+import { ttsOpen, ttsOpenMember, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
    render/action code below can call it, and re-exported so the window bindings
    at the bottom still expose these to inline onclick handlers. */
@@ -713,7 +713,9 @@ export function snapRows(snapshot){ if(!snapshot) return [];
     qty:Number(m.qty)||1, exp:Number(m.exp)||0,
     adv:Object.assign({},m.adv||{}), skills:[...(m.skills||[])],
     spells:(m.spells||[]).map(x=>x.name||x), inj:(m.inj||[]).map(j=>j.name||j.code),
-    eq:Object.assign({},m.eq||{}), rare:Object.keys(m.rare||{}), alive});
+    eq:Object.assign({},m.eq||{}), rare:Object.keys(m.rare||{}),
+    names:(m.names||[]).slice(),        // who exactly was in the group at the time
+    alive});
   const rows=(st.models||[]).map(m=>row(m,true));
   (st.fallen||[]).forEach(e=>{ if(e&&e.m) rows.push(row(e.m,false)); });
   return rows; }
@@ -761,7 +763,26 @@ export function totalsAt(round){ const sn=stageSnapshots()[String(round)];
   return (sn&&sn.totals)||null; }
 export function stageSnapshots(){ const c=campState();
   if(!c.snapshots||typeof c.snapshots!=='object') c.snapshots={}; return c.snapshots; }
-export function advanceRound(){ const c=campState(); snapshotStage(c.round); c.round=(Number(c.round)||0)+1;
+/* Warriors who sat this battle out - an Old Battle Wound, a Hired Sword whose
+   upkeep went unpaid, and so on. Recorded before the stage closes, because it
+   belongs to the battle that was just fought, and the count is then served:
+   "misses the next game" means exactly one game. Nothing happens when Setup
+   closes, since no battle was played. */
+export function recordSitOuts(round){ const c=campState(); if(!c.on) return [];
+  if((Number(round)||0)<1) return [];
+  const out=[];
+  S.models.forEach(m=>{ const n=Number(m.miss)||0; if(n<=0) return;
+    const who=m.name||unitDef(m.uid_def).name;
+    // the reason is whatever put him out - a lasting injury from the list, or
+    // the temporary one that only costs a game
+    const why=m.missWhy||(m.inj||[]).map(j=>j.name||j.code).filter(x=>/old battle wound/i.test(x))[0];
+    logEventAt(round,'missed',`${who} sat out the battle${why?` (${why})`:''}.`,
+      {uid:m.uid,name:who,uid_def:m.uid_def,remaining:n-1});
+    m.miss=n-1; if(m.miss<=0) delete m.missWhy;
+    out.push({uid:m.uid,name:who});
+  });
+  return out; }
+export function advanceRound(){ const c=campState(); recordSitOuts(c.round); snapshotStage(c.round); c.round=(Number(c.round)||0)+1;
   logEvent('round',`Campaign moved to “${roundLabel(c.round)}”.`); render(); }
 /* ---- Battles ----
    A battle may involve more than one opponent, so `opponents` is a list of
@@ -846,7 +867,7 @@ export function renderCampaign(){
     ${campaignFileBlock()}
     ${chronicleBlock()}
     ${summary}
-    <details class="loc-wrap"><summary class="loc-sum">\ud83d\uddfa Locations \u2014 districts you hold</summary>
+    <details class="loc-wrap"><summary class="loc-sum">Locations \u2014 districts you hold</summary>
     ${seg}
     </details>
     <div class="hs-foot">Control = you are the sole foothold holder (Hard Fought districts). Half-price always rounds down; rare items still need their availability roll.</div></details>`;
@@ -876,19 +897,19 @@ export function chronicleBlock(){
       ${evs.length?`<ul class="chr-list">${evs.map(e=>`<li class="chr-ev chr-${e.type}">
         <span class="chr-ic">${ICON[e.type]||'\u2022'}</span>
         <span class="chr-tx" contenteditable="true" onblur="editLogText(${e.id},this.textContent)">${String(e.text).replace(/</g,'&lt;')}</span>
-        ${e.auto?'':'<span class="chr-tag">manual</span>'}${e.edited?'<span class="chr-tag">edited</span>':''}
+        <span class="chr-tags">${e.auto?'':'<span class="chr-tag">manual</span>'}${e.edited?'<span class="chr-tag">edited</span>':''}</span>
         <button class="tiny ghost no-print" onclick="removeLogAt(${e.id})">\u00d7</button></li>`).join('')}</ul>`:'<div class="chr-empty">Nothing recorded yet.</div>'}
     </div>`;
   }).join('');
-  return `<details class="chr-wrap" ${c._open?'open':''} ontoggle="setChrOpen(this.open)"><summary class="chr-sum">\u1f4dc Chronicle \u2014 ${roundLabel(c.round)} \u00b7 ${c.battles.length} battle${c.battles.length===1?'':'s'} \u00b7 ${c.log.length} entries</summary>
+  return `<details class="chr-wrap" ${c._open?'open':''} ontoggle="setChrOpen(this.open)"><summary class="chr-sum">Chronicle \u2014 ${roundLabel(c.round)} \u00b7 ${c.battles.length} battle${c.battles.length===1?'':'s'} \u00b7 ${c.log.length} entries</summary>
     <div class="chr-tools no-print">
       <label>Stage: <select onchange="setRound(this.value)">${roundOpts}</select></label>
       <button class="tiny" onclick="advanceRound()" title="Move the campaign on to the next stage">\u25b6 next stage</button>
       <button class="tiny" onclick="openBattleForm()" title="Record a battle: opponents, where on the map, and how it ended">\u2694 record battle</button>
       <button class="tiny" onclick="openCasForm()" title="Record who was put out of action, and by whom">\u2620 casualty</button>
       <button class="tiny" onclick="openNoteForm()" title="Add your own entry to the chronicle">\u270e add note</button>
-      <button class="tiny" onclick="exportNarrative()" title="A written account of the campaign, stage by stage \u2014 detailed enough to be written up as a story">\u1f4d6 chronicle text</button>
-      <button class="tiny" onclick="exportAnalysis()" title="Figures per warrior and per stage, as JSON">\u1f4ca analysis</button>
+      <button class="tiny" onclick="exportNarrative()" title="A written account of the campaign, stage by stage \u2014 detailed enough to be written up as a story">chronicle text</button>
+      <button class="tiny" onclick="exportAnalysis()" title="Figures per warrior and per stage, as JSON">analysis</button>
     </div>
     ${xpBarBlock()}
     ${battleFormBlock()}${casFormBlock()}${noteFormBlock()}
@@ -1028,16 +1049,22 @@ export function removeCasualty(id){ const list=campCasualties(); const i=list.fi
   render(); }
 /* An unresolved casualty for one of our own models, so applying the injury roll
    to that model resolves the existing record instead of creating a second one. */
-export function pendingCasualtyFor(uid){ return campCasualties().find(r=>r.victim.uid===uid && r.result==='pending')||null; }
+export function pendingCasualtyFor(uid,who){ const list=campCasualties();
+  // With a henchman group several members can be down at once, so a name
+  // narrows it to the right record; without one, take the oldest still open.
+  if(who) { const exact=list.find(r=>r.victim.uid===uid && r.result==='pending' && r.victim.name===who); if(exact) return exact; }
+  return list.find(r=>r.victim.uid===uid && r.result==='pending')||null; }
 /* Called from the injury/death flow: attach the outcome to the casualty record,
    or record it after the fact if nobody noted who did it. */
-export function noteCasualtyOutcome(m,result,detail){ const c=campState(); if(!c.on) return null;
-  const r=pendingCasualtyFor(m.uid);
+export function noteCasualtyOutcome(m,result,detail,who){ const c=campState(); if(!c.on) return null;
+  const name=who||m.name||unitDef(m.uid_def).name;
+  const r=pendingCasualtyFor(m.uid,who);
   if(r){ r.result=result; if(detail) r.detail=detail;
+    if(who) r.victim.name=who;
     const ev=c.log.find(e=>e.data&&e.data.casualtyId===r.id);
     if(ev){ ev.text=casualtyText(r); ev.type=casualtyType(r); }
     return r; }
-  return addCasualty({victim:{uid:m.uid, name:m.name||unitDef(m.uid_def).name, wb:S.wb}, result, detail});
+  return addCasualty({victim:{uid:m.uid, name, wb:S.wb}, result, detail});
 }
 /* Casualty tallies: what each of our warriors dealt out and suffered. */
 export function casualtyStats(){ const list=campCasualties(); const out={inflicted:{},suffered:{}};
@@ -1094,10 +1121,14 @@ export function awardBattleXp(battleId,opts){ const c=campState(); if(!c.on) ret
   const round=bat?bat.round:c.round;
   const won=opts.won!=null?!!opts.won:(bat?/victor/i.test(bat.outcome||''):false);
   let total=0;
-  // +1 survives — every Hero, and every Henchman group, still standing
-  S.models.forEach(m=>{ const r=grantXp(m.uid,opts.survives,'survived the battle',round); if(r) total+=r.amount; });
+  // +1 survives - every Hero, and every Henchman group, still standing.
+  // A warrior sitting the battle out did not survive it; he was not in it.
+  S.models.forEach(m=>{ if((Number(m.miss)||0)>0) return;
+    const r=grantXp(m.uid,opts.survives,'survived the battle',round); if(r) total+=r.amount; });
   // +1 to the leader of the winning warband
-  if(won){ const lu=leaderUid(); if(lu!=null){ const r=grantXp(lu,opts.winningLeader,'led the winning warband',round); if(r) total+=r.amount; } }
+  if(won){ const lu=leaderUid();
+    const lm=lu!=null?S.models.find(x=>x.uid===lu):null;
+    if(lm && (Number(lm.miss)||0)<=0){ const r=grantXp(lu,opts.winningLeader,'led the winning warband',round); if(r) total+=r.amount; } }
   render(); return total; }
 /* The experience earned but not yet written onto the roster. */
 export function xpBarBlock(){ const list=pendingXp(); if(!list.length) return '';
@@ -1989,17 +2020,88 @@ export function promotedSkillLists(m){
   const ex=WBEXTRA[S.wb]; if(ex&&ex.skills&&SKILLSETS[ex.skills]) out.push(['['+SKILLSETS[ex.skills].name+']',SKILLSETS[ex.skills].skills]);
   return out;
 }
-export function promoteHench(u){
+/* ---- Naming individual henchmen ----
+   A henchman group is one model with a count: by the rules the members share
+   experience, characteristics and equipment, and that stays so. What they did
+   not have was identity - "one Verminkin was slain" tells you nothing about
+   which of the three it was, and on the tabletop each miniature is a separate
+   piece anyway.
+
+   `m.names` holds a name per member, indexed alongside the count. It is sparse
+   and optional: a member without an entry falls back to a numbered default, and
+   a save written before this simply has no array. The group keeps its own
+   `m.name` for the unit as a whole; the two are different things.
+
+   The delicate part is that the array must stay aligned with the count when a
+   member dies or is promoted out of the group - which is exactly why death and
+   promotion now say WHICH member. */
+export function memberCount(m){ return Math.max(1, Number(m&&m.qty)||1); }
+export function memberDefaultName(m,i){ const def=unitDef(m.uid_def);
+  const base=(def&&def.name)||'Warrior';
+  return memberCount(m)>1? `${base} ${i+1}` : base; }
+export function memberName(m,i){ const n=(m&&m.names&&m.names[i]||'').trim();
+  return n||memberDefaultName(m,i); }
+/* True when the member has a name of their own rather than the fallback. */
+export function memberNamed(m,i){ return !!(m&&m.names&&(m.names[i]||'').trim()); }
+export function memberNames(m){ return Array.from({length:memberCount(m)},(_,i)=>memberName(m,i)); }
+export function setMemberName(u,i,v){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  if(!Array.isArray(m.names)) m.names=[];
+  while(m.names.length<memberCount(m)) m.names.push('');
+  m.names[i]=String(v||'').trim();
+  if(m.names.every(x=>!x)) delete m.names;   // keep saves clean when nothing is named
+}
+/* Remove one member's entry and close the gap, so the remaining names stay with
+   the right members. */
+function _dropMemberName(m,i){ if(!Array.isArray(m.names)) return;
+  m.names.splice(i,1);
+  if(!m.names.some(x=>(x||'').trim())) delete m.names; }
+export function setMemberOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._memOpen=!!v; }
+/* One named member of a group falls. Index-based, so the right name goes with
+   the right death. */
+export function killHenchMember(u,i){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  i=Number(i)||0; const who=memberName(m,i);
+  const snap=_fallenSnapshot(m); snap.qty=1; delete snap.names;
+  // Only a man who was actually given a name is remembered by one; a positional
+  // default like "Verminkin 2" says nothing and would clutter the Fallen list.
+  if(memberNamed(m,i)) snap.name=who;
+  const rec={kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap, memberIdx:i};
+  if(memberNamed(m,i)) rec.memberName=who;
+  S.fallen=S.fallen||[]; S.fallen.push(rec);
+  m.qty=memberCount(m)-1;
+  _dropMemberName(m,i);
+  const _wasPending=!!pendingCasualtyFor(m.uid,who);
+  const _cas=noteCasualtyOutcome(m,'dead',null,who);
+  if(_cas){ _cas.fallenId=S.fallen.length-1; rec.casualtyId=_cas.id; rec.casFromDeath=!_wasPending; }
+  else logEvent('death',`${who} was slain.`,{uid:m.uid,name:who,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:false});
+  if(m.qty<=0) S.models=S.models.filter(x=>x.uid!==u);
+  render(); }
+/* The Lad's Got Talent: one member leaves the group and becomes a Hero. Which
+   member matters now - he takes his own name with him, and the names of those
+   left behind must not shift onto the wrong men. */
+export function promoteHench(u,i){
   const m=S.models.find(x=>x.uid===u); if(!m) return;
   if(totalHeroes()>=(Number(HR().heroes)||6)){ alert('Maximum of '+(Number(HR().heroes)||6)+' Heroes per warband reached.'); return; }
   const def=unitDef(m.uid_def);
-  if((Number(m.qty)||1)>1){
-    m.qty=(Number(m.qty)||1)-1;
-    S.models.push({uid:nextUid(), uid_def:m.uid_def, name:(m.name?m.name+' (Hero)':def.name+' (Hero)'), exp:Number(m.exp)||0, qty:1,
+  const idx=(i==null? memberCount(m)-1 : Number(i)||0);
+  const who=memberName(m,idx);
+  const named=memberNamed(m,idx);
+  if(memberCount(m)>1){
+    m.qty=memberCount(m)-1;
+    _dropMemberName(m,idx);
+    S.models.push({uid:nextUid(), uid_def:m.uid_def,
+      // a man who had a name of his own keeps it; otherwise fall back to the
+      // group's name, as before
+      name: named? who : (m.name?m.name+' (Hero)':def.name+' (Hero)'),
+      exp:Number(m.exp)||0, qty:1,
       eq:JSON.parse(JSON.stringify(m.eq||{})), mut:[...(m.mut||[])], adv:Object.assign({},m.adv||{}),
       skills:[...(m.skills||[])], inj:[...(m.inj||[])], spells:[...(m.spells||[])], miss:Number(m.miss)||0, promoted:true, promoCats:(def.promoCatsFixed?[...def.promoCatsFixed]:[]), _advOpen:true});
-  } else { m.promoted=true; m.promoCats=(def.promoCatsFixed?[...def.promoCatsFixed]:(m.promoCats||[])); m._advOpen=true; }
-  logEvent('promote',`${def.name} was promoted to Hero (The Lad's Got Talent).`,{uid:m.uid,name:m.name||def.name,uid_def:m.uid_def,exp:Number(m.exp)||0});
+  } else {
+    m.promoted=true; m.promoCats=(def.promoCatsFixed?[...def.promoCatsFixed]:(m.promoCats||[])); m._advOpen=true;
+    if(named && !m.name){ m.name=who; delete m.names; }
+  }
+  const promoted=S.models[S.models.length-1];
+  logEvent('promote',`${who} was promoted to Hero (The Lad's Got Talent).`,
+    {uid:(memberCount(m)>0&&promoted&&promoted.promoted)?promoted.uid:m.uid,name:who,uid_def:m.uid_def,exp:Number(m.exp)||0});
   render();
 }
 export function unpromote(u){ const m=S.models.find(x=>x.uid===u); if(m){ delete m.promoted; render(); } }
@@ -2168,23 +2270,37 @@ export function killHero(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   if(_cas) _cas.fallenId=S.fallen.length-1;   // ties the record to the Fallen entry
   else logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
   S.models=S.models.filter(x=>x.uid!==u); render(); }
-export function killHench(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
-  const snap=_fallenSnapshot(m); snap.qty=1;
-  S.fallen=S.fallen||[]; S.fallen.push({kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap});
-  m.qty=(Number(m.qty)||1)-1;
-  const _cas=noteCasualtyOutcome(m,'dead');
-  if(_cas) _cas.fallenId=S.fallen.length-1;
-  else logEvent('death',`One ${unitDef(m.uid_def).name} was slain.`,{uid:m.uid,name:unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:false});
-  if(m.qty<=0) S.models=S.models.filter(x=>x.uid!==u);
-  render(); }
+/* Without a member given, the last of the group falls - the same behaviour as
+   before individual names existed. */
+export function killHench(u,i){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  killHenchMember(u, i==null? memberCount(m)-1 : Number(i)||0); }
 export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
   const e=S.fallen[S.fallen.length-1];
   if(e.kind==='hero'){ S.models.push(e.m); }
   else { // hench: return one model to a matching living group, or recreate it
     const sig=fallenEqSig(e.m);
     const grp=S.models.find(x=>!isHeroModel(x)&&fallenEqSig(x)===sig);
-    if(grp) grp.qty=(Number(grp.qty)||0)+1;
-    else { const nm=_fallenSnapshot(e.m); nm.uid=nextUid(); nm.qty=1; S.models.push(nm); }
+    if(grp){ grp.qty=(Number(grp.qty)||0)+1;
+      // Put him back where he stood, under his own name. Without this he
+      // returns as a nameless extra at the end of the group and the names of
+      // everyone after him are one place out.
+      if(e.memberName){ const at=(e.memberIdx==null?memberCount(grp)-1:Math.min(e.memberIdx,memberCount(grp)-1));
+        if(!Array.isArray(grp.names)) grp.names=[];
+        while(grp.names.length<at) grp.names.push('');
+        grp.names.splice(at,0,e.memberName); grp.names.length=memberCount(grp); }
+    }
+    else { const nm=_fallenSnapshot(e.m); nm.uid=nextUid(); nm.qty=1;
+      if(e.memberName) nm.names=[e.memberName];
+      S.models.push(nm); }
+  }
+  // A death that is taken back must not stay in the chronicle. One that was
+  // recorded during the battle goes back to awaiting its injury roll; one the
+  // death itself created is dropped entirely.
+  if(e.casualtyId!=null){
+    const c=campState();
+    if(e.casFromDeath){ c.casualties=(c.casualties||[]).filter(r=>r.id!==e.casualtyId);
+      c.log=(c.log||[]).filter(x=>!(x.data&&x.data.casualtyId===e.casualtyId)); }
+    else resolveCasualty(e.casualtyId,'pending','');
   }
   S.fallen.pop(); render(); }
 export function removeFallenAt(i){ if(!S.fallen||!S.fallen[i]) return;
@@ -2217,7 +2333,8 @@ export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=documen
   if(j.code==='11-15'){ // Dead — route to the right death path for hero vs henchman
     if(el) el.value=INJURIES[0]?INJURIES[0].code:'';
     if(isHeroModel(m)) killHero(u); else killHench(u); return; }
-  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; noteCasualtyOutcome(m,'injured',j.name||j.code); flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; }
+  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; m.missWhy=j.name||j.code;
+    noteCasualtyOutcome(m,'injured',j.name||j.code); flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; }
   m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null});
   noteCasualtyOutcome(m,'injured',j.name||j.code); render(); }
 export function remInj(u,i){ const m=S.models.find(x=>x.uid===u); if(m.inj){ m.inj.splice(i,1); render(); } }
@@ -2386,6 +2503,31 @@ export function attachedSection(def,m){
       (a.note?`<div class="atnote">${a.note}</div>`:'')+`</div>`;
   }).join('');
 }
+/* The members of a henchman group, by name.
+   Kept as a plain list rather than hidden behind a dialog: on the tabletop each
+   of these is a separate miniature, and when one of them goes down you want to
+   say which without hunting for it. It opens by itself once anybody has been
+   named, so groups nobody cares to name stay out of the way. */
+export function henchMembersBlock(m){
+  const n=memberCount(m); const def=unitDef(m.uid_def);
+  const anyNamed=Array.from({length:n},(_,i)=>memberNamed(m,i)).some(Boolean);
+  const open=(m._memOpen!=null? m._memOpen : anyNamed);
+  const canPromote=!def.noPromote && !def.noxp;
+  return `<details class="mem-wrap no-print" ${open?'open':''} ontoggle="setMemberOpen(${m.uid},this.open)">
+    <summary class="mem-sum">Members \u00b7 ${n}${anyNamed?` \u2014 ${memberNames(m).join(', ').replace(/</g,'&lt;')}`:' (unnamed)'}</summary>
+    <div class="mem-body">
+      <div class="mem-note">The group shares experience, characteristics and equipment \u2014 these are names only, so you can tell the miniatures apart.</div>
+      ${Array.from({length:n},(_,i)=>`<div class="mem-row">
+        <span class="mem-idx">${i+1}</span>
+        <input class="mem-in" value="${memberNamed(m,i)?String(m.names[i]).replace(/"/g,'&quot;'):''}"
+          placeholder="${memberDefaultName(m,i).replace(/"/g,'&quot;')}"
+          onchange="setMemberName(${m.uid},${i},this.value);render()">
+        ${canPromote?`<button class="tiny ghost" onclick="promoteHench(${m.uid},${i})" title="The Lad's Got Talent \u2014 this member becomes a Hero and keeps his name">\u2605 promote</button>`:''}
+        <button class="tiny ghost" onclick="ttsOpenMember(${m.uid},${i})" title="Tabletop Simulator text for this miniature">TTS</button>
+        <button class="tiny ghost" onclick="killHenchMember(${m.uid},${i})" title="This member died (Dead 11-15) \u2014 moves him to Fallen">\u2620 died</button>
+      </div>`).join('')}
+    </div></details>`;
+}
 export function renderRoster(){
   const el=document.getElementById('roster');
   if(!S.models.length && !hsList().length && !dpList().length && !(S.fallen&&S.fallen.length)){ el.innerHTML=`<div class="empty">No warriors recruited yet.<br>Use “Recruit Warriors” below.</div>`; return; }
@@ -2419,7 +2561,9 @@ export function renderRoster(){
         <span class="note">${def.name}</span>
         <span class="missctl"><span class="misslbl no-print" title="Track games this warrior sits out (injuries that say “misses next game”, or unpaid Hired Sword upkeep). ▲ adds a game to miss, ▼ removes one.">⚑ miss games</span>${(Number(m.miss)||0)>0?`<b class="missbadge">out ${m.miss} game${m.miss>1?'s':''}</b>`:''}<button class="tiny ghost no-print" title="one fewer game to miss" ${(Number(m.miss)||0)<=0?'disabled':''} onclick="missAdj(${m.uid},-1)">▼</button><button class="tiny ghost no-print" title="miss one more game" onclick="missAdj(${m.uid},1)">▲</button></span>
         <button class="tiny ghost no-print" onclick="ttsOpen(${m.uid})" title="Description for Tabletop Simulator">⧉ TTS</button>
-        ${t==='vehicle'?'':`<button class="tiny ghost no-print death-btn" onclick="${t==='hen'?`killHench(${m.uid})`:`killHero(${m.uid})`}" title="${t==='hen'?'One model in this group died (Dead 11-15) — moves it to Fallen':'This warrior died (Dead 11-15) — moves them to Fallen'}">☠ ${t==='hen'?'a model died':'died'}</button>`}
+        ${t==='vehicle'?'':(t==='hen'&&memberCount(m)>1
+          ? `<button class="tiny ghost no-print death-btn" onclick="setMemberOpen(${m.uid},true);render()" title="Say which member of the group was slain">☠ a model died…</button>`
+          : `<button class="tiny ghost no-print death-btn" onclick="${t==='hen'?`killHenchMember(${m.uid},0)`:`killHero(${m.uid})`}" title="${t==='hen'?'This model died (Dead 11-15) — moves it to Fallen':'This warrior died (Dead 11-15) — moves them to Fallen'}">☠ died</button>`)}
         <button class="tiny ghost no-print" onclick="removeUnit(${m.uid})">remove</button>
       </div><div class="mbody">
         ${def.profile?statTableM(m):''}${attachedSection(def,m)}${vehRulesBlock(def)}
@@ -2430,6 +2574,8 @@ export function renderRoster(){
              onchange="setQty(${m.uid},this.value)"></label>${hmaxNote}`):''}
           ${def.noxp?'<span class="note">No experience (equipment / animal)</span>':`<label>Experience: <input type="number" min="0" value="${m.exp}" onchange="setExp(${m.uid},this.value)"></label>`}
         </div>
+        ${def.desc?`<div class="unit-desc">${String(def.desc).replace(/</g,'&lt;')}</div>`:''}
+        ${t==='hen'?henchMembersBlock(m):''}
         ${def.noxp?'':`<div id="xp-${m.uid}" class="xpbar no-print">${xpBar(m)}</div>`}
         ${leaderSection(m)}
         ${def.noxp?'':advSection(m)}
@@ -2468,9 +2614,15 @@ export function renderRoster(){
         rows=`<table class="fallen-tbl"><tr><th>Name</th><th>Experience</th><th>Equipment lost</th></tr>`
           + grp.map(e=>`<tr><td>${(e.m.name||def.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
           + `</table>`;
-      } else { // henchmen: merge identical models by exp + equipment signature
-        const subs={}; grp.forEach(e=>{ const sig=fallenEqSig(e.m); (subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp}).n++; });
-        rows=`<table class="fallen-tbl"><tr><th>#</th><th>Experience</th><th>Equipment lost</th></tr>`
+      } else { // henchmen
+        // Anyone who was given a name is remembered by it; the nameless are
+        // merged by experience and equipment, since the count is all there is
+        // to say about them.
+        const isNamed=e=>{ const n=(e.m.name||'').trim(); return n && n!==def.name; };
+        const named=grp.filter(isNamed), plain=grp.filter(e=>!isNamed(e));
+        const subs={}; plain.forEach(e=>{ const sig=fallenEqSig(e.m); (subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp}).n++; });
+        rows=`<table class="fallen-tbl"><tr><th>${named.length?'Name':'#'}</th><th>Experience</th><th>Equipment lost</th></tr>`
+          + named.map(e=>`<tr><td>${String(e.m.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
           + Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(fallenEqAgg([s.ex]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
           + `</table>`;
       }
@@ -2684,6 +2836,10 @@ export function setQty(u,v){ const m=S.models.find(x=>x.uid===u); const def=unit
   let q=Math.min(5,Math.max(1,Number(v)||1)); const umx=unitMax(def);
   if(umx!==null){ const others=S.models.filter(x=>x.uid_def===m.uid_def&&x.uid!==m.uid).reduce((s,x)=>s+(x.qty||1),0);
     q=Math.max(1,Math.min(q, umx-others)); }
+  // Shrinking the group by hand removes members from the end; their names go
+  // with them, or they would reappear on different men later.
+  if(Array.isArray(m.names) && m.names.length>q){ m.names=m.names.slice(0,q);
+    if(!m.names.some(x=>(x||'').trim())) delete m.names; }
   m.qty=q; render(); }
 export function toggleEq(u,nm,on){ const m=S.models.find(x=>x.uid===u); if(on)m.eq[nm]=1; else delete m.eq[nm]; render(); }
 export function setEqQty(u,nm,q){
@@ -3084,7 +3240,9 @@ Object.assign(window, {
   passNameFilter, passStatFilter, pickSub, priceMod, promoteHench, promotedSkillLists,
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
-  killHench, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
+  killHench, killHenchMember, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
+  memberCount, memberName, memberNamed, memberNames, memberDefaultName, setMemberName, setMemberOpen,
+  henchMembersBlock, promoteHench,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
   logEvent, removeBattle, removeLogAt, roundLabel, setRound,
   chronicleBlock, districtName, wbName, warbandOptions, setChrOpen,
@@ -3097,7 +3255,7 @@ Object.assign(window, {
   characterTimeline, characterRoster, campaignAnalysis, narrativeReport,
   xpLedger, grantXp, pendingXp, pendingXpFor, pendingXpTotal, applyPendingXp,
   clearPendingXp, awardBattleXp, diffStages, foundingMembers, xpBarBlock,
-  snapRows, districtsAt, totalsAt, stampedName,
+  snapRows, districtsAt, totalsAt, stampedName, recordSitOuts,
   exportNarrative, exportAnalysis, snapshotStage, stageSnapshots,
   addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
   openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
@@ -3118,7 +3276,7 @@ Object.assign(window, {
   stashSet, statBarHS, statFilterBar, statNum, statTable, statTableHS,
   statTableM, svFromText, svLabel, svOfEntry, svOfModel, toggleEq,
   toggleItip, toggleItipPreview, toggleMut, togglePromoCat, toggleWeaponUpgrade, totalHeroes,
-  totalModels, totalRating, totalSpent, translateTerms, ttsOpen, ttsOpenDP,
+  totalModels, totalRating, totalSpent, translateTerms, ttsOpen, ttsOpenMember, ttsOpenDP,
   ttsOpenHS, ttsText, ttsTextHS, unhireDP, unhireHS, unitBaseCost,
   unitDef, unitFamilies, unitMax, unpromote, upgradePaid, upgradeTargets,
   vehRules, vehRulesBlock, warbandMax, wbTypeSlug, weaponUpgradesFor, xpBar,

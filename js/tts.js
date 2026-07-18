@@ -1,6 +1,6 @@
 /* Tabletop-Simulator-Export: Beschreibungstexte für Modell-Karten. */
 import { DRAMATIS, HIREDSWORDS, INJEN } from '../data/index.js';
-import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, isHeroModel, markRulesFor, noteLines, skillInfo, spellEffDiff, spellEffect, spellLabel, svOfModel, svOfEntry, uid, unitDef } from './app.js';
+import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, isHeroModel, markRulesFor, memberName, noteLines, skillInfo, spellEffDiff, spellEffect, spellLabel, svOfModel, svOfEntry, uid, unitDef } from './app.js';
 
 /* The model's name as its own field, so it can be pasted into the TTS Name box
    separately from the description. Heroes get a darker gold than the rank and
@@ -75,6 +75,12 @@ function _ttsShow(nameField,body){
   setTimeout(()=>{ try{ta.focus();ta.select();}catch(e){} },30); }
 function ttsOpen(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   _ttsShow(ttsName(m), ttsText(m)); }
+/* One miniature out of a henchman group. The stats and rules are the group's -
+   that is how the rules work - but the name is his own, which is what makes the
+   pieces on the table tellable apart. */
+function ttsOpenMember(u,i){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  const who=(typeof memberName==='function')?memberName(m,Number(i)||0):(m.name||'');
+  _ttsShow(ttsNameFor(who,false), ttsText(m)); }
 
 function ttsOpenHS(uid){ const h=hsList().find(x=>x.uid===uid); if(!h) return; const hs=HIREDSWORDS[h.key]; if(!hs) return;
   // Hired Swords and Dramatis Personae count as the notable sort, so they take
@@ -84,4 +90,4 @@ function ttsOpenHS(uid){ const h=hsList().find(x=>x.uid===uid); if(!h) return; c
 function ttsOpenDP(uid){ const d=dpList().find(x=>x.uid===uid); if(!d) return; const dp=DRAMATIS[d.key]; if(!dp) return;
   _ttsShow(ttsNameFor(d.name||dp.name,true), ttsTextHS(dp,d.name,d)); }
 
-export { ttsAttached, ttsText, ttsTextHS, ttsName, ttsNameFor, ttsOpen, ttsOpenHS, ttsOpenDP };
+export { ttsAttached, ttsText, ttsTextHS, ttsName, ttsNameFor, ttsOpen, ttsOpenMember, ttsOpenHS, ttsOpenDP };

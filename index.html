@@ -119,7 +119,11 @@
   .chr-bat{margin:4px 0;padding:5px 8px;background:rgba(120,90,40,.09);border-left:2px solid var(--gold);border-radius:2px;font-size:13px}
   .chr-notes{font-size:12px;color:#5d5344;margin-top:3px;font-style:italic}
   .chr-list{list-style:none;margin:3px 0 0;padding:0}
-  .chr-ev{display:grid;grid-template-columns:16px 1fr auto auto;gap:6px;align-items:baseline;font-size:13px;padding:1px 0}
+  /* Four fixed slots, and the tag cell is always present even when empty, so the
+     delete button of every row lands in the same place. Without it a row with no
+     tag put its button in the tag column and sat out of line with the rest. */
+  .chr-ev{display:grid;grid-template-columns:16px minmax(0,1fr) auto 20px;gap:6px;align-items:baseline;font-size:13px;padding:1px 0}
+  .chr-tags{display:flex;gap:4px;align-items:baseline}
   .chr-ic{text-align:center;color:var(--iron)}
   .chr-tx{min-width:0;overflow-wrap:anywhere}
   .chr-tx:focus{outline:1px dashed var(--gold);background:#fff7e6}
@@ -250,6 +254,17 @@
   .exnote b{color:#3a3327}
   #extext,#ttstext{width:100%;min-height:320px;margin-top:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;border:1px solid var(--parch-edge);border-radius:6px;padding:10px;background:#fffdf6;color:#2a2118;white-space:pre;resize:vertical}
   #ttstext{min-height:160px}
+  .unit-desc{font-size:12px;font-style:italic;color:#6b6050;margin:4px 0;line-height:1.3}
+  .mem-wrap{margin:6px 0;border:1px solid var(--parch-edge);border-radius:4px;background:rgba(60,50,45,.03)}
+  .mem-sum{cursor:pointer;padding:5px 8px;font-size:12px;color:var(--iron);list-style:none;font-weight:700}
+  .mem-sum::-webkit-details-marker{display:none}
+  .mem-sum::before{content:'\25b8 '}
+  .mem-wrap[open] .mem-sum::before{content:'\25be '}
+  .mem-body{padding:2px 8px 8px}
+  .mem-note{font-size:11px;color:#7a6e54;margin-bottom:5px;line-height:1.25}
+  .mem-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto auto auto;gap:6px;align-items:center;margin:3px 0}
+  .mem-idx{font-size:11px;color:#7a6e54;text-align:right}
+  .mem-in{font-family:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px;min-width:0;width:100%}
   .tts-field{margin-top:10px}
   .tts-lbl{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--iron);font-weight:700}
   .tts-hint{text-transform:none;letter-spacing:0;font-weight:400;color:#7a6e54}
