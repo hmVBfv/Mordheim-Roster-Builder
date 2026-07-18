@@ -349,3 +349,24 @@ Six issues found in play:
   same measure the Advances & Stats panel already uses.
 
 Regression test `tts-and-adv.mjs` added; suite 14/14.
+
+## July 17, 2026 — save-format compatibility guarded by a test
+
+Audited the recent changes (fallen list, rare items, new house rules) against
+older save files, since exports are the user's data and must keep loading.
+
+Result: all additions were already additive and defaulted — `applyState` fills
+in a missing `fallen` list, `Object.assign(houseDefaults(), data.house)` fills
+in house rules absent from the file, and the newer code paths tolerate models
+without a `rare` field. Old JSON exports and old readable-text exports (the
+embedded `MORDHEIM-DATA` block) both still import, and round trips preserve
+everything.
+
+To keep it that way, `test/compat.mjs` pins a frozen old-format save fixture and
+asserts it loads, defaults fill in, round trips are lossless, and every legacy
+key is still written. The rule (add keys, never rename or remove; every new key
+needs a default) is documented in the README.
+
+Known caveat, documented rather than fixed: a save containing fallen warriors
+opened in a build from before that feature loads its living warriors correctly
+but silently drops the fallen record. Suite 15/15.
