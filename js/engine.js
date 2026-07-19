@@ -199,15 +199,17 @@ export function startGold(){ const h=HR();
 
 export function goldTreasury(){ const g=(S.stash&&S.stash.gold); return (g==null||g==='')?startGold():(Number(g)||0); }
 
-/* What was spent on warriors who have since been killed. Their cost is gone -
-   the gold was paid and their equipment went with them - so it must keep
-   counting against the treasury. Without this, a death removed the warrior from
-   the spending and the warband appeared to be handed his cost back in gold. */
-export function fallenSunk(){ return (S.fallen||[]).reduce((s,e)=>{
-  if(!e||!e.m) return s;
-  const snap=Object.assign({},e.m,{qty:1});   // one man, whatever the group held
-  return s+modelUnitCost(snap); },0); }
-export function goldCurrent(){ return goldTreasury()-totalSpent()-fallenSunk(); }
+/* Gold in hand is the treasury less what the warband currently owns, and
+   nothing else. The Fallen list is deliberately NOT part of this sum: a loss is
+   settled once, at the moment it happens, by taking the warrior's worth out of
+   the treasury (see loseValueOnDeath in app.js). Deriving it from the Fallen
+   instead made every hand-set figure silently lose that amount again, which is
+   how the treasury drifted negative. */
+export function goldCurrent(){ return goldTreasury()-totalSpent(); }
+/* What a warrior is worth, himself and everything he carries. Recorded when he
+   falls, so the loss can be shown and taken back exactly. */
+export function lossValueOf(m){ if(!m) return 0;
+  return modelUnitCost(Object.assign({},m,{qty:1})); }
 
 export function goldAvailable(){ return goldTreasury(); }
 

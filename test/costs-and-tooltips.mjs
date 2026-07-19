@@ -41,22 +41,32 @@ state.replaceState({wb:'skaven',subtype:null,name:'Klaue',budget:500,models:[],h
 app.addUnit('vermin');
 const group=state.S.models.find(m=>m.uid_def==='vermin'); group.qty=3;
 
-// --- a death does not pay out ---
+// --- a death does not pay out, and does not cost anything either ---
 const goldBefore=eng.goldCurrent();
 const spentBefore=eng.totalSpent();
-// a man falls: he leaves the group and his snapshot joins the Fallen
-const snapshot=JSON.parse(JSON.stringify(group)); snapshot.qty=1;
-state.S.fallen.push({kind:'hench', uid_def:group.uid_def, exp:0, m:snapshot});
-group.qty=2;
+const worth=eng.lossValueOf(group);
+assert.ok(worth>0, 'a warrior is worth something, himself and what he carries');
+
+app.killHenchMember(group.uid, 0);
 assert.ok(eng.totalSpent()<spentBefore, 'the living cost less, as one of them is gone');
 assert.strictEqual(eng.goldCurrent(), goldBefore,
-  'but the treasury is unchanged: what was paid for him was not refunded');
-assert.ok(eng.fallenSunk()>0, 'his cost is counted as spent and lost');
+  'but the gold in hand is unchanged: a death is not a payout');
+assert.strictEqual(state.S.fallen[0].lostValue, worth,
+  'and what he was worth is written onto the Fallen record');
 
-// taking the death back restores the position exactly
-state.S.fallen.pop(); group.qty=3;
-assert.strictEqual(eng.goldCurrent(), goldBefore, 'and undoing a death changes nothing either');
-assert.strictEqual(eng.fallenSunk(), 0);
+// the gold stays exactly as it is set by hand - the Fallen never enter the sum
+app.setGoldCurrent(100);
+assert.strictEqual(eng.goldCurrent(), 100, 'a figure entered by hand reads back unchanged');
+app.killHenchMember(group.uid, 0);
+assert.strictEqual(eng.goldCurrent(), 100, 'and a further death does not move it');
+
+// taking a death back returns exactly what it took
+app.undoFallen();
+assert.strictEqual(eng.goldCurrent(), 100, 'undoing a death leaves the gold where it was');
+app.undoFallen();
+assert.strictEqual(eng.goldCurrent(), 100);
+assert.strictEqual(state.S.fallen.length, 0);
+app.setGoldCurrent(0);
 
 // --- a Henchman's experience is worth 2 gold crowns a point ---
 const plain=eng.modelUnitCost(group);
