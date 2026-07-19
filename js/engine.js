@@ -113,9 +113,19 @@ export function ensureFreeDagger(m){ const def=unitDef(m.uid_def); const nm=dagg
 
 export function applyFreeDaggers(){ let ch=false; (S.models||[]).forEach(function(m){ if(ensureFreeDagger(m)) ch=true; }); return ch; }
 
+/* Experience a Henchman group has earned raises what one of its men is worth:
+   "you must add 2 gold crowns to their cost for each extra Experience point
+   they add to the warband's total" (mordheimer, Trading). A new man joins with
+   the group's experience, so recruiting into a seasoned group costs that much
+   more than the bare price on the warband list.
+   Heroes are not priced this way - their experience is their own. */
+export const HENCH_XP_GC=2;
+export function henchXpCost(m){ const def=unitDef(m.uid_def);
+  if(!def || def.t!=='hen' || (typeof isHeroModel==='function' && isHeroModel(m))) return 0;
+  return HENCH_XP_GC*Math.max(0, Number(m.exp)||0); }
 export function modelUnitCost(m){ // cost for ONE model of this entry
   const def=unitDef(m.uid_def);
-  return unitBaseCost(def) + eqCost(m) + mutCost(m) + rareCost(m) - heirloomDiscount(m);
+  return unitBaseCost(def) + henchXpCost(m) + eqCost(m) + mutCost(m) + rareCost(m) - heirloomDiscount(m);
 }
 
 export function _stripParen(s){ return String(s).replace(/\s*\([^)]*\)\s*/g,' ').trim(); }
@@ -189,7 +199,15 @@ export function startGold(){ const h=HR();
 
 export function goldTreasury(){ const g=(S.stash&&S.stash.gold); return (g==null||g==='')?startGold():(Number(g)||0); }
 
-export function goldCurrent(){ return goldTreasury()-totalSpent(); }
+/* What was spent on warriors who have since been killed. Their cost is gone -
+   the gold was paid and their equipment went with them - so it must keep
+   counting against the treasury. Without this, a death removed the warrior from
+   the spending and the warband appeared to be handed his cost back in gold. */
+export function fallenSunk(){ return (S.fallen||[]).reduce((s,e)=>{
+  if(!e||!e.m) return s;
+  const snap=Object.assign({},e.m,{qty:1});   // one man, whatever the group held
+  return s+modelUnitCost(snap); },0); }
+export function goldCurrent(){ return goldTreasury()-totalSpent()-fallenSunk(); }
 
 export function goldAvailable(){ return goldTreasury(); }
 
