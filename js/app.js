@@ -791,6 +791,10 @@ export function advanceRound(){ const c=campState(); recordSitOuts(c.round); sna
    campaign narrative later on. */
 export function addBattle(b){ const c=campState(); b=b||{};
   const bat={id:nextLogId(), round:(b.round==null?c.round:Number(b.round)||0),
+    // every participant with the outcome from their own point of view; the
+    // opponents list is kept alongside it so anything reading the older shape
+    // still works
+    sides:Array.isArray(b.sides)?b.sides.filter(x=>x&&(x.name||x.wb)):[],
     opponents:Array.isArray(b.opponents)?b.opponents.filter(o=>o&&(o.name||o.wb)):[],
     district:b.district||'', outcome:b.outcome||'', notes:b.notes||''};
   c.battles.push(bat);
@@ -813,6 +817,76 @@ export function logEventAt(round,type,text,data){ const c=campState(); if(!c.on)
 export function districtName(id){ const d=DISTRICTS.find(x=>x.id===id); return d?d.name:(id||''); }
 export function wbName(key){ return (WARBANDS[key]&&WARBANDS[key].name)||key||'unknown warband'; }
 export function districtState(id){ return campDistricts()[id]||'none'; }
+/* ---- Footholds and control ----
+   Winning a battle at a location gives that warband a foothold there. Control
+   is not something a warband is given: a warband controls a location when it is
+   the ONLY one in the campaign holding a foothold there. That makes control a
+   derived fact about the whole campaign, not a value one warband can set for
+   itself - which is why it can only be answered when the campaign file is open
+   and every warband's claims are known.
+
+   A warband on its own still stores 'control' if it was set by hand; that is
+   left alone as a manual override so nothing that already exists breaks. */
+export function cfFootholdsAt(districtId){ const cf=cfGet(); const out=[];
+  const mineName=(S.name||wbName(S.wb));
+  const isMine=w=>(w.name||'').toLowerCase()===mineName.toLowerCase() && w.wb===S.wb;
+  // Our own warband counts too, and its live state is newer than whatever copy
+  // of it the campaign file holds - so take the live one and skip the copy.
+  const own=(campDistricts()||{})[districtId];
+  if(own==='foothold'||own==='control') out.push({id:null, name:mineName, wb:S.wb, mine:true});
+  if(cf) cf.warbands.forEach(w=>{ if(isMine(w)) return;
+    const d=((w.roster||{}).campaign||{}).districts||{};
+    if(d[districtId]==='foothold'||d[districtId]==='control') out.push({id:w.id,name:w.name,wb:w.wb}); });
+  return out; }
+/* Who controls a location, if anybody: exactly one holder and no other. */
+export function cfControlAt(districtId){ const held=cfFootholdsAt(districtId);
+  return held.length===1? held[0] : null; }
+/* Every contested and controlled location in the campaign. */
+export function cfTerritory(){ const cf=cfGet(); if(!cf) return [];
+  const ids=new Set();
+  Object.keys(campDistricts()||{}).forEach(k=>{ const v=campDistricts()[k]; if(v&&v!=='none') ids.add(k); });
+  cf.warbands.forEach(w=>{ const d=((w.roster||{}).campaign||{}).districts||{};
+    Object.keys(d).forEach(k=>{ if(d[k]&&d[k]!=='none') ids.add(k); }); });
+  return [...ids].map(id=>{ const held=cfFootholdsAt(id);
+    return {id, name:districtName(id), holders:held, control: held.length===1?held[0]:null}; })
+    .sort((a,b)=>a.name.localeCompare(b.name)); }
+/* What our own warband holds, with control worked out from the campaign file
+   when one is open. */
+export function districtStatus(id){ const raw=(campDistricts()||{})[id]||'none';
+  if(raw==='none') return 'none';
+  const cf=cfGet(); if(!cf) return raw;                 // no campaign to compare against
+  const ctl=cfControlAt(id);
+  return (ctl && ctl.mine)? 'control' : 'foothold'; }
+/* Winning a battle in a district gains a foothold there; the defeated warband
+   loses its foothold if it had one. Control is not stored - it follows from
+   being the only warband with a foothold, so taking one away can hand control
+   to whoever is left. */
+export function claimFoothold(districtId){ if(!districtId) return null;
+  const d=campDistricts();
+  if(d[districtId]!=='foothold' && d[districtId]!=='control'){ d[districtId]='foothold';
+    logEvent('district',`Gained a foothold at ${districtName(districtId)}.`,{district:districtId}); }
+  return d[districtId]; }
+export function loseFoothold(districtId){ if(!districtId) return null;
+  const d=campDistricts();
+  if(d[districtId]&&d[districtId]!=='none'){ d[districtId]='none';
+    logEvent('district',`Lost the foothold at ${districtName(districtId)}.`,{district:districtId}); }
+  return 'none'; }
+/* The same for another warband held in the campaign file. Their roster there is
+   the campaign master's copy, which is what the shared document is for. */
+export function cfSetFoothold(cfId,districtId,val){ const cf=cfGet(); if(!cf||!districtId) return;
+  const w=cf.warbands.find(x=>x.id===Number(cfId)); if(!w||!w.roster) return;
+  w.roster.campaign=w.roster.campaign||{}; w.roster.campaign.districts=w.roster.campaign.districts||{};
+  if(val==='none') delete w.roster.campaign.districts[districtId];
+  else w.roster.campaign.districts[districtId]=val; }
+/* Apply one battle's outcomes to the map, for every side at once. */
+export function applyBattleTerritory(sides,districtId){ if(!districtId||!Array.isArray(sides)) return;
+  sides.forEach((x,i)=>{
+    const won=/victor/i.test(x.outcome||''), lost=/defeat|routed/i.test(x.outcome||'');
+    if(!won && !lost) return;
+    if(x.key==='me'){ won?claimFoothold(districtId):loseFoothold(districtId); }
+    else if(x.key && String(x.key).startsWith('cf')){
+      cfSetFoothold(String(x.key).slice(2), districtId, won?'foothold':'none'); }
+  }); }
 export function setDistrict(id,state){ campDistricts()[id]=state; render(); }
 export function activeDistrictEffects(){ const cd=campDistricts(); const out=[];
   for(const d of DISTRICTS){ const st=cd[d.id]||'none'; if(st==='none') continue;
@@ -887,12 +961,19 @@ export function chronicleBlock(){
     const bats=c.battles.filter(b=>b.round===r);
     if(!evs.length && !bats.length && r!==c.round) return '';
     return `<div class="chr-round"><div class="chr-rhead">${roundLabel(r)}${r===c.round?' <span class="chr-now">current</span>':''}</div>
-      ${bats.map(b=>`<div class="chr-bat">
-        <b>\u2694 ${b.opponents.length?b.opponents.map(o=>`${(o.name||'').replace(/</g,'&lt;')}${o.wb?` <i>(${wbName(o.wb).replace(/</g,'&lt;')})</i>`:''}`).join(' &amp; '):'unnamed foe'}</b>
-        ${b.district?` \u2014 ${districtName(b.district).replace(/</g,'&lt;')}`:''}${b.outcome?` \u2014 <b>${String(b.outcome).replace(/</g,'&lt;')}</b>`:''}
-        ${b.notes?`<div class="chr-notes">${String(b.notes).replace(/</g,'&lt;')}</div>`:''}
-        <button class="tiny no-print" onclick="awardBattleXp(${b.id})" title="Award the post-battle experience for this game: +1 to everyone who survived, +1 to the leader if you won">+ post-battle XP</button>
-        <button class="tiny ghost no-print" onclick="removeBattle(${b.id})">remove</button></div>`).join('')}
+      ${bats.map(b=>{
+        const who=(b.sides&&b.sides.length?b.sides.slice(1):(b.opponents||[]))
+          .map(o=>`${(o.name||'').replace(/</g,'&lt;')}${o.wb?` <i>(${wbName(o.wb).replace(/</g,'&lt;')})</i>`:''}`).join(' &amp; ')||'unnamed foe';
+        return `<div class="chr-bat">
+        <div class="chr-batline">
+          <span class="chr-battext"><b>\u2694 ${who}</b>${b.district?` \u2014 ${districtName(b.district).replace(/</g,'&lt;')}`:''}${b.outcome?` \u2014 <b>${String(b.outcome).replace(/</g,'&lt;')}</b>`:''}</span>
+          <span class="chr-batbtns no-print">
+            <button class="tiny" onclick="awardBattleXp(${b.id})" title="Award the post-battle experience for this game: +1 to everyone who survived, +1 to the leader if you won">+ post-battle XP</button>
+            <button class="tiny" onclick="editBattleForm(${b.id})">edit</button>
+            <button class="tiny ghost" onclick="removeBattle(${b.id})">remove</button>
+          </span>
+        </div>
+        ${b.notes?`<div class="chr-notes">${String(b.notes).replace(/</g,'&lt;')}</div>`:''}</div>`; }).join('')}
       ${casListBlock(r)}
       ${evs.length?`<ul class="chr-list">${evs.map(e=>`<li class="chr-ev chr-${e.type}">
         <span class="chr-ic">${ICON[e.type]||'\u2022'}</span>
@@ -931,46 +1012,282 @@ export function warbandOptions(sel){
       `<option value="${k}"${sel===k?' selected':''}>${wb.name.replace(/</g,'&lt;')}</option>`).join('')+`</optgroup>`;
   }).join('');
 }
+/* ---- Who fought, and who felled whom ----
+   Participants come from the campaign file when one is open, so attacker and
+   victim can be picked from real rosters instead of typed. The rosters there
+   are the state as of the last import - which is the right state, since that is
+   the warband that marched out. A warband not in the file can still be entered
+   as free text and corrected later.
+
+   Individual henchmen are listed by name, because that is the whole point of
+   knowing who went down. */
+export function battleSides(){ const cf=cfGet(); const out=[
+  {key:'me', name:(S.name||wbName(S.wb)), wb:S.wb, mine:true}];
+  if(cf) cf.warbands.forEach(w=>{
+    // our own warband may also sit in the campaign file; do not offer it twice
+    if((w.name||'').toLowerCase()===(S.name||'').toLowerCase() && w.wb===S.wb) return;
+    out.push({key:'cf'+w.id, name:w.name, wb:w.wb, cfId:w.id}); });
+  return out; }
+/* Every model of one side that could put someone out of action or be put out,
+   henchmen listed man by man. */
+export function sideModels(key){
+  let models=[], fallen=[];
+  if(key==='me'){ models=S.models; fallen=S.fallen||[]; }
+  else if(String(key).startsWith('cf')){ const cf=cfGet(); if(!cf) return [];
+    const w=cf.warbands.find(x=>x.id===Number(String(key).slice(2)));
+    if(!w||!w.roster) return []; models=w.roster.models||[]; fallen=w.roster.fallen||[]; }
+  else return [];
+  const wbKey=(key==='me')?S.wb:_sideWb(key);
+  const defOf=m=>((WARBANDS[wbKey]||{}).units||[]).find(u=>u.id===m.uid_def)||{};
+  const out=[];
+  models.forEach(m=>{
+    const def=defOf(m);
+    const base=m.name||def.name||m.uid_def;
+    const qty=Math.max(1,Number(m.qty)||1);
+    const hero=!!(m.promoted||def.t==='hero');
+    if(hero||qty===1){ out.push({uid:m.uid, idx:0, label:base, hero}); }
+    else { for(let i=0;i<qty;i++){
+      const nm=(m.names&&(m.names[i]||'').trim())||`${def.name||base} ${i+1}`;
+      out.push({uid:m.uid, idx:i, label:nm, hero:false}); } }
+  });
+  // The fallen belong in this list too. Saying who killed a warrior is exactly
+  // the moment he is no longer among the living, so leaving them out made the
+  // attribution impossible for the deaths that matter most.
+  fallen.forEach((e,i)=>{ if(!e||!e.m) return; const def=defOf(e.m);
+    out.push({fallenIdx:i, uid:e.m.uid, idx:0, dead:true,
+      label:(e.m.name||def.name||e.m.uid_def), hero:(e.kind==='hero')}); });
+  return out; }
+function _sideWb(key){ const cf=cfGet(); if(!cf) return S.wb;
+  const w=cf.warbands.find(x=>x.id===Number(String(key).slice(2)));
+  return w?w.wb:S.wb; }
+export function sideName(key){ const s=battleSides().find(x=>x.key===key); return s?s.name:''; }
+export function sideWb(key){ const s=battleSides().find(x=>x.key===key); return s?s.wb:''; }
 /* ---- Battle entry form ----
    Held in S.campaign._draft while being filled in, so a half-typed battle
    survives the re-renders that every field change triggers. */
 export function setChrOpen(v){ campState()._open=!!v; }
 export function battleDraft(){ return campState()._draft||null; }
+/* Load an existing battle back into the form. Its casualties are already
+   recorded on their own, so the form edits the battle itself; casualties stay
+   editable in the list below where the injury rolls are. */
+export function editBattleForm(id){ const c=campState();
+  const b=(c.battles||[]).find(x=>x.id===Number(id)); if(!b) return;
+  c._draft={ editId:b.id, round:b.round, district:b.district||'', notes:b.notes||'',
+    sides:(b.sides&&b.sides.length? b.sides.map(x=>({...x}))
+      : [{key:'me', name:(S.name||wbName(S.wb)), wb:S.wb, outcome:b.outcome||''}]
+        .concat((b.opponents||[]).map(o=>({key:'', name:o.name||'', wb:o.wb||'', outcome:''})))),
+    cas:[] };
+  // bring this battle's casualties back into the form, tied to their records so
+  // editing corrects them instead of writing a second set
+  const sideOf=(v)=>{ const i=c._draft.sides.findIndex(x=>
+      (x.name||'').toLowerCase()===String(v.wb==='' && v.npc?'':(v.name||'')).toLowerCase());
+    return i; };
+  c._draft.cas=campCasualties().filter(x=>x.battleId===b.id).map(x=>{
+    const findSide=(who)=>{ if(who && who.npc) return 'env';
+      const i=c._draft.sides.findIndex(sd=>sd.key==='me'? who.uid!=null
+        : (sd.name||'').toLowerCase()===String((who&&who.wbName)||'').toLowerCase());
+      if(i>=0) return i;
+      const j=c._draft.sides.findIndex(sd=>sd.wb===(who&&who.wb));
+      return j>=0?j:0; };
+    return {id:x.id, vSide:findSide(x.victim), vPick:'', vName:x.victim.name||'',
+      aSide:findSide(x.attacker), aPick:'', aName:x.attacker.name||'', note:x.note||x.detail||''}; });
+  c._open=true; render(); }
 export function openBattleForm(){ const c=campState();
-  c._draft={opponents:[{name:'',wb:''}], district:'', outcome:'', notes:'', round:c.round};
+  // our own warband always fought; the others are added from the campaign file
+  c._draft={ round:c.round, district:'', notes:'',
+    sides:[{key:'me', name:(S.name||wbName(S.wb)), wb:S.wb, outcome:''}],
+    cas:[] };
   c._open=true; render(); }
 export function cancelBattleForm(){ const c=campState(); delete c._draft; render(); }
 export function setDraftField(f,v){ const d=battleDraft(); if(!d) return; d[f]=v;
-  if(f==='notes'||f==='outcome') return;   // typing fields must not lose focus
+  if(f==='notes') return;                   // typing must not lose focus
   render(); }
-export function setDraftOpp(i,f,v){ const d=battleDraft(); if(!d||!d.opponents[i]) return;
-  d.opponents[i][f]=v; if(f==='wb') render(); }
-export function addDraftOpp(){ const d=battleDraft(); if(!d) return; d.opponents.push({name:'',wb:''}); render(); }
-export function remDraftOpp(i){ const d=battleDraft(); if(!d) return; d.opponents.splice(i,1);
-  if(!d.opponents.length) d.opponents.push({name:'',wb:''}); render(); }
+/* --- participants --- */
+export function addDraftSideMe(){ const d=battleDraft(); if(!d||draftIncludesUs(d)) return;
+  d.sides.unshift({key:'me', name:(S.name||wbName(S.wb)), wb:S.wb, outcome:''}); render(); }
+export function addDraftSide(key){ const d=battleDraft(); if(!d) return;
+  if(!key){ d.sides.push({key:'', name:'', wb:'', outcome:''}); render(); return; }
+  if(d.sides.some(x=>x.key===key)) return;
+  const s0=battleSides().find(x=>x.key===key);
+  d.sides.push({key, name:s0?s0.name:'', wb:s0?s0.wb:'', outcome:''});
+  render(); }
+export function remDraftSide(i){ const d=battleDraft(); if(!d) return;
+  // Running the campaign does not mean fighting in every battle: our own
+  // warband can be taken out, and the battle is then filed in the campaign
+  // file rather than in our own chronicle.
+  if(d.sides.length<=1) return;
+  d.sides.splice(i,1);
+  d.cas=d.cas.filter(c=>c.vSide!==i && c.aSide!==i)
+    .map(c=>({...c, vSide:c.vSide>i?c.vSide-1:c.vSide, aSide:(typeof c.aSide==='number'&&c.aSide>i)?c.aSide-1:c.aSide}));
+  render(); }
+export function setDraftSide(i,f,v){ const d=battleDraft(); if(!d||!d.sides[i]) return;
+  d.sides[i][f]=v;
+  if(f==='key'){ const s0=battleSides().find(x=>x.key===v);
+    if(s0){ d.sides[i].name=s0.name; d.sides[i].wb=s0.wb; } }
+  if(f==='name') return;                     // free-text name, keep focus
+  render(); }
+/* --- casualties within the battle --- */
+export function addDraftCas(){ const d=battleDraft(); if(!d) return;
+  d.cas.push({vSide:d.sides.length>1?1:0, vPick:'', vName:'', aSide:0, aPick:'', aName:'', note:''});
+  render(); }
+export function remDraftCas(i){ const d=battleDraft(); if(!d) return; d.cas.splice(i,1); render(); }
+export function setDraftCas(i,f,v){ const d=battleDraft(); if(!d||!d.cas[i]) return;
+  d.cas[i][f]=(f==='vSide'||f==='aSide')&&v!=='env'?(v===''?'':Number(v)):v;
+  if(f==='vName'||f==='aName'||f==='note') return;
+  render(); }
+/* Turn one row of the form into the side object a casualty record expects. */
+function _casSide(d,sideIdx,pick,freeName){
+  if(sideIdx==='env') return {uid:null, name:'The surroundings', wb:'', npc:true};
+  const side=d.sides[sideIdx]; if(!side) return {uid:null, name:freeName||'', wb:''};
+  if(pick){ const opts=sideModels(side.key);
+    const hit=String(pick).charAt(0)==='f'
+      ? opts.find(o=>o.dead && String(o.fallenIdx)===String(pick).slice(1))
+      : (()=>{ const [uid,idx]=String(pick).split(':');
+          return opts.find(o=>!o.dead && String(o.uid)===uid && String(o.idx)===idx); })();
+    if(hit) return {uid: side.key==='me'?hit.uid:null, name:hit.label, wb:side.wb,
+      grade:hit.hero?'hero':'hench', dead:!!hit.dead,
+      memberIdx: hit.dead?undefined:hit.idx,
+      fallenIdx: hit.dead?hit.fallenIdx:undefined}; }
+  return {uid:null, name:freeName||side.name||'', wb:side.wb}; }
+/* Whose battle is this? If our own warband is among the sides it belongs in our
+   chronicle; if not, it is somebody else's battle that we are recording as the
+   campaign's keeper, and it belongs in the campaign file. */
+export function draftIncludesUs(d){ return (d.sides||[]).some(x=>x.key==='me'); }
+function _ourSide(d){ return (d.sides||[]).find(x=>x.key==='me')||null; }
 export function saveBattleForm(){ const d=battleDraft(); if(!d) return;
   const c=campState(); delete c._draft;
-  addBattle(d); }
+  if(!draftIncludesUs(d)){
+    // a battle between other warbands, kept in the shared document
+    const cf=cfGet()||cfNew('Campaign');
+    cf.battles=cf.battles||[];
+    const rec={id:(cf.battles.reduce((m,b)=>Math.max(m,Number(b.id)||0),0)+1),
+      round:d.round, district:d.district||'', notes:d.notes||'',
+      sides:d.sides.map(x=>({key:x.key,name:x.name,wb:x.wb,outcome:x.outcome})),
+      opponents:d.sides.map(x=>({name:x.name,wb:x.wb})), outcome:''};
+    if(d.editId!=null){ const i=cf.battles.findIndex(b=>b.id===d.editId);
+      if(i>=0){ rec.id=d.editId; cf.battles[i]=rec; } else cf.battles.push(rec); }
+    else cf.battles.push(rec);
+    applyBattleTerritory(d.sides, d.district);
+    render(); return;
+  }
+  if(d.editId!=null){
+    const b=(c.battles||[]).find(x=>x.id===d.editId);
+    if(b){ Object.assign(b, {round:d.round, district:d.district, notes:d.notes,
+        sides:d.sides.map(x=>({key:x.key, name:x.name, wb:x.wb, outcome:x.outcome})),
+        opponents:d.sides.filter(x=>x.key!=='me').map(x=>({name:x.name, wb:x.wb})),
+        outcome:(_ourSide(d)||{}).outcome||''});
+      const who=b.sides.slice(1).map(x=>x.name||wbName(x.wb)).join(', ')||'an unnamed foe';
+      const ev=c.log.find(e=>e.data&&e.data.battleId===b.id);
+      if(ev){ ev.text=`Battle ${b.round}: fought ${who}${b.district?` at ${districtName(b.district)}`:''}${b.outcome?` \u2014 ${b.outcome}`:''}.`; ev.edited=true; }
+      applyBattleTerritory(b.sides, b.district);
+      // reconcile the casualties: correct the ones that came from this battle,
+      // add the new ones, and drop those taken out of the form
+      const keep=new Set(d.cas.filter(r=>r.id!=null).map(r=>r.id));
+      campCasualties().filter(x=>x.battleId===b.id && !keep.has(x.id))
+        .forEach(x=>removeCasualty(x.id,true));
+      d.cas.forEach(row=>{
+        const victim=_casSide(d,row.vSide,row.vPick,row.vName);
+        if(!victim.name) return;
+        const attacker=_casSide(d,row.aSide,row.aPick,row.aName);
+        if(row.id!=null){ const rec=campCasualties().find(x=>x.id===row.id);
+          if(rec){ rec.victim=Object.assign({},rec.victim,victim); rec.attacker=attacker;
+            rec.note=row.note||''; _retypeCasualty(rec); return; } }
+        addCasualty({round:d.round, battleId:b.id, victim, attacker, note:row.note||'',
+          result: victim.dead?'dead':'pending', noXp: row.aSide==='env'});
+      });
+    }
+    render(); return;
+  }
+  const bat=addBattle({ round:d.round, district:d.district, notes:d.notes,
+    sides:d.sides.map(x=>({key:x.key, name:x.name, wb:x.wb, outcome:x.outcome})),
+    // kept so anything reading the older shape still works
+    opponents:d.sides.filter(x=>x.key!=='me').map(x=>({name:x.name, wb:x.wb})),
+    outcome:(_ourSide(d)||{}).outcome||'' });
+  d.cas.forEach(row=>{
+    const victim=_casSide(d,row.vSide,row.vPick,row.vName);
+    if(!victim.name) return;
+    const attacker=_casSide(d,row.aSide,row.aPick,row.aName);
+    const rec=addCasualty({round:d.round, battleId:bat.id, victim, attacker, detail:row.note||'',
+      // a warrior already in the Fallen list plainly did not survive it
+      result: victim.dead?'dead':'pending',
+      // the surroundings earn nobody experience
+      noXp: row.aSide==='env'});
+    if(rec && victim.dead && victim.fallenIdx!=null && d.sides[row.vSide] && d.sides[row.vSide].key==='me'){
+      rec.fallenId=victim.fallenIdx;                       // ties it to the Fallen entry
+      const fe=(S.fallen||[])[victim.fallenIdx];
+      if(fe) fe.casualtyId=rec.id;                         // and back again
+    }
+  });
+  // the map follows the outcome: winners gain a foothold, the defeated lose theirs
+  applyBattleTerritory(d.sides, d.district);
+  render();
+  render(); }
 export function battleFormBlock(){
   const d=battleDraft(); if(!d) return '';
   const dOpts=DISTRICTS.slice().sort((a,b)=>a.name.localeCompare(b.name))
     .map(x=>`<option value="${x.id}"${d.district===x.id?' selected':''}>${x.name.replace(/</g,'&lt;')}</option>`).join('');
-  const oc=['Victory','Defeat','Draw','Routed','Ran away'].map(o=>`<option value="${o}"${d.outcome===o?' selected':''}>${o}</option>`).join('');
+  const OUTCOMES=['Victory','Defeat','Draw','Routed'];
+  const oc=(v)=>`<option value=""> \u2014 </option>`+OUTCOMES.map(o=>`<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('');
+  const avail=battleSides().filter(x=>!d.sides.some(y=>y.key===x.key));
+  const modelOpts=(sideIdx,pick)=>{
+    if(sideIdx==='env') return '';
+    const side=d.sides[sideIdx]; if(!side||!side.key) return '';
+    const opts=sideModels(side.key);
+    if(!opts.length) return '';
+    return `<option value="">\u2014 name below \u2014</option>`+opts.map(o=>{
+      const v=o.dead?`f${o.fallenIdx}`:`${o.uid}:${o.idx}`;
+      return `<option value="${v}"${pick===v?' selected':''}>${o.label.replace(/</g,'&lt;')}${o.hero?' \u2605':''}${o.dead?' \u2620 (fallen)':''}</option>`;
+    }).join(''); };
+  const sideOpts=(sel,withEnv)=>d.sides.map((x,i)=>
+      `<option value="${i}"${String(sel)===String(i)?' selected':''}>${(x.name||('Side '+(i+1))).replace(/</g,'&lt;')}</option>`).join('')
+    +(withEnv?`<option value="env"${sel==='env'?' selected':''}>The surroundings</option>`:'');
+
   return `<div class="bat-form no-print">
-    <div class="bat-fhead">Record battle — ${roundLabel(d.round)}</div>
-    <div class="bat-oppgrid">
-      <div class="bat-oh">Name</div><div class="bat-oh">Warband</div><div></div>
-      ${d.opponents.map((o,i)=>`
-        <input class="bat-in" value="${String(o.name||'').replace(/"/g,'&quot;')}" placeholder="opponent's name"
-          oninput="setDraftOpp(${i},'name',this.value)">
-        <select class="bat-in" onchange="setDraftOpp(${i},'wb',this.value)">${warbandOptions(o.wb)}</select>
-        <button class="tiny ghost" onclick="remDraftOpp(${i})" title="Remove this opponent">×</button>`).join('')}
+    <div class="bat-fhead">${d.editId!=null?'Edit battle':'Record battle'} \u2014 ${roundLabel(d.round)}</div>
+
+    <div class="bat-sec">Who fought</div>
+    <div class="bat-sidegrid">
+      <div class="bat-oh">Warband</div><div class="bat-oh">Type</div><div class="bat-oh">Outcome</div><div></div>
+      ${d.sides.map((x,i)=>`
+        ${x.key?`<div class="bat-sidename">${(x.name||'').replace(/</g,'&lt;')}${i===0?' <i>(yours)</i>':''}</div>`
+              :`<input class="bat-in" value="${String(x.name||'').replace(/"/g,'&quot;')}" placeholder="warband name" oninput="setDraftSide(${i},'name',this.value)">`}
+        ${x.key?`<div class="bat-sidewb">${wbName(x.wb).replace(/</g,'&lt;')}</div>`
+              :`<select class="bat-in" onchange="setDraftSide(${i},'wb',this.value)">${warbandOptions(x.wb)}</select>`}
+        <select class="bat-in" onchange="setDraftSide(${i},'outcome',this.value)">${oc(x.outcome)}</select>
+        ${d.sides.length>1?`<button class="tiny ghost" onclick="remDraftSide(${i})" title="${x.key==='me'?'You did not fight in this battle':'Remove this warband'}">\u00d7</button>`:'<span></span>'}`).join('')}
     </div>
-    <button class="tiny" onclick="addDraftOpp()">+ another opponent</button>
-    <div class="bat-row"><label>Location <select onchange="setDraftField('district',this.value)"><option value="">— anywhere —</option>${dOpts}</select></label>
-      <label>Outcome <select onchange="setDraftField('outcome',this.value)"><option value="">— undecided —</option>${oc}</select></label></div>
-    <label class="bat-notes">How did it go? <span class="hs-foot">Free text — this is what the campaign story is later written from.</span>
-      <textarea rows="5" placeholder="The Skaven struck from the rooftops…" oninput="setDraftField('notes',this.value)">${String(d.notes||'').replace(/</g,'&lt;')}</textarea></label>
+    <div class="bat-btns">
+      ${avail.length?`<select class="bat-in" onchange="if(this.value)addDraftSide(this.value)">
+        <option value="">+ add a warband from the campaign\u2026</option>
+        ${avail.map(x=>`<option value="${x.key}">${x.name.replace(/</g,'&lt;')} (${wbName(x.wb).replace(/</g,'&lt;')})</option>`).join('')}
+      </select>`:''}
+      <button class="tiny" onclick="addDraftSide('')">+ someone not in the campaign</button>
+    </div>
+
+    <div class="bat-sec">Who was put out of action
+      <span class="hs-foot">Leave the outcome open \u2014 the injury roll afterwards decides what became of them.</span></div>
+    ${d.cas.length?`<div class="bat-casgrid">
+      <div class="bat-oh">Went down</div><div class="bat-oh"></div><div class="bat-oh">By</div><div class="bat-oh"></div><div></div>
+      ${d.cas.map((r,i)=>{
+        const vOpts=modelOpts(r.vSide,r.vPick), aOpts=modelOpts(r.aSide,r.aPick);
+        return `
+        <select class="bat-in" onchange="setDraftCas(${i},'vSide',this.value)">${sideOpts(r.vSide,false)}</select>
+        ${vOpts?`<select class="bat-in" onchange="setDraftCas(${i},'vPick',this.value)">${vOpts}</select>`
+               :`<input class="bat-in" value="${String(r.vName||'').replace(/"/g,'&quot;')}" placeholder="who went down" oninput="setDraftCas(${i},'vName',this.value)">`}
+        <select class="bat-in" onchange="setDraftCas(${i},'aSide',this.value)">${sideOpts(r.aSide,true)}</select>
+        ${r.aSide==='env'
+          ? `<input class="bat-in" value="${String(r.note||'').replace(/"/g,'&quot;')}" placeholder="a fall, a misfiring pistol\u2026" oninput="setDraftCas(${i},'note',this.value)">`
+          : (aOpts?`<select class="bat-in" onchange="setDraftCas(${i},'aPick',this.value)">${aOpts}</select>`
+                 :`<input class="bat-in" value="${String(r.aName||'').replace(/"/g,'&quot;')}" placeholder="who did it" oninput="setDraftCas(${i},'aName',this.value)">`)}
+        <button class="tiny ghost" onclick="remDraftCas(${i})">\u00d7</button>`; }).join('')}
+    </div>`:'<div class="chr-empty">Nobody down yet.</div>'}
+    <button class="tiny" onclick="addDraftCas()">+ a warrior went down</button>
+
+    <div class="bat-sec">Where and how it went</div>
+    <div class="bat-row"><label>Location <select onchange="setDraftField('district',this.value)"><option value="">\u2014 anywhere \u2014</option>${dOpts}</select></label>
+      <span class="hs-foot">Winning here gains you a foothold. You control a location when you are the only warband holding one there.</span></div>
+    <label class="bat-notes">How did it go? <span class="hs-foot">Free text \u2014 this is what the campaign story is later written from.</span>
+      <textarea rows="5" placeholder="The Skaven struck from the rooftops\u2026" oninput="setDraftField('notes',this.value)">${String(d.notes||'').replace(/</g,'&lt;')}</textarea></label>
     <div class="bat-btns"><button class="btnsm" onclick="saveBattleForm()">Save battle</button>
       <button class="tiny ghost" onclick="cancelBattleForm()">cancel</button></div>
   </div>`;
@@ -1020,9 +1337,10 @@ export function casualtyType(r){ return r.result==='dead'?'death':(r.result==='i
 export function addCasualty(cas){ const c=campState(); const list=campCasualties(); cas=cas||{};
   const rec={id:nextLogId(), round:(cas.round==null?c.round:Number(cas.round)||0),
     battleId:cas.battleId||null,
-    victim:_enrichSide(Object.assign({uid:null,name:'',wb:'',grade:'',value:null},cas.victim||{})),
+    victim:_enrichSide(Object.assign({uid:null,name:'',wb:'',grade:'',value:null,memberIdx:null},cas.victim||{})),
     attacker:_enrichSide(Object.assign({uid:null,name:'',wb:'',grade:'',value:null},cas.attacker||{})),
-    result:cas.result||'pending', detail:cas.detail||'', fallenId:null};
+    result:cas.result||'pending', detail:cas.detail||'', fallenId:null,
+    note:String(cas.note||'')};
   list.push(rec);
   logEventAt(rec.round,casualtyType(rec),casualtyText(rec),{casualtyId:rec.id});
   // Only Heroes earn the +1 for putting an enemy out of action. Enemy NPCs
@@ -1041,9 +1359,78 @@ export function resolveCasualty(id,result,detail){ const r=campCasualties().find
   if(ev){ ev.text=casualtyText(r); ev.type=casualtyType(r); }
   else logEventAt(r.round,casualtyType(r),casualtyText(r),{casualtyId:r.id});
   render(); return r; }
-export function removeCasualty(id){ const list=campCasualties(); const i=list.findIndex(x=>x.id===Number(id));
+/* Resolving a casualty by rolling on the proper table.
+   Heroes use the D66 Serious Injuries chart; Henchmen use their own D6 - 1-2
+   the man is gone for good, 3-6 he fights on as normal (mordheimer, Tools).
+   Applying the result here does what applying it on the roster would do, so the
+   two can never drift apart: Dead moves the warrior into the Fallen list, a
+   lasting injury is written onto him. */
+export const HENCH_INJ=[
+  {code:'1-2', name:'Dead', dead:true},
+  {code:'3-6', name:'Okay - fights on as normal', ok:true}
+];
+export function casualtyIsOurs(r){ return !!(r && r.victim && r.victim.uid!=null); }
+export function casualtyModel(r){ if(!casualtyIsOurs(r)) return null;
+  return S.models.find(x=>x.uid===r.victim.uid)||null; }
+export function casualtyIsHero(r){ const m=casualtyModel(r);
+  if(m) return isHeroModel(m);
+  if(r.victim.grade) return r.victim.grade==='hero';
+  const fe=(S.fallen||[])[r.fallenId]; return fe? fe.kind==='hero' : false; }
+/* Which member of a group the record refers to, by the name it was written with. */
+function _memberIndexOf(m,name){ if(!m||!name) return 0;
+  for(let i=0;i<memberCount(m);i++) if(memberName(m,i)===name) return i;
+  return 0; }
+/* Which man of the group the record means. The index written down when the
+   casualty was recorded is authoritative; the name is only a fallback, since a
+   positional default no longer points at the same man once the group shrinks. */
+function _casMemberIndex(r,m){
+  if(r.victim && r.victim.memberIdx!=null) return Math.min(Number(r.victim.memberIdx), memberCount(m)-1);
+  return _memberIndexOf(m, r.victim.name); }
+export function resolveCasualtyRoll(id,code){ const r=campCasualties().find(x=>x.id===Number(id));
+  if(!r) return null;
+  if(!code){ r.result='pending'; r.detail=''; delete r.code; delete r.applied;
+    _retypeCasualty(r); render(); return r; }
+  r.code=code;
+  const m=casualtyModel(r);
+  const hero=casualtyIsHero(r);
+  const j = hero ? INJURIES.find(x=>x.code===code) : HENCH_INJ.find(x=>x.code===code);
+  if(!j){ render(); return r; }
+  // not one of ours: nothing to apply to a roster, just record the outcome
+  if(!m){ r.result = (hero? code==='11-15' : !!j.dead) ? 'dead' : (hero&&/full recovery/i.test(j.name)?'recovered':(hero?'injured':'recovered'));
+    r.detail=(INJEN&&INJEN[code])||j.name; _retypeCasualty(r); render(); return r; }
+  const dead = hero ? (code==='11-15') : !!j.dead;
+  if(dead){
+    _resolvingCas=r;   // so the death below settles this record, not a namesake
+    // the death is applied exactly as it would be from the unit card, so the
+    // warrior lands in Fallen and the two records stay tied together
+    r.detail=(INJEN&&INJEN[code])||j.name;
+    if(isHeroModel(m)) killHero(m.uid);
+    else killHenchMember(m.uid, _casMemberIndex(r,m));
+    _resolvingCas=null;
+    const fe=(S.fallen||[]).length-1;
+    r.result='dead'; r.applied=true;      // the roster has been changed already
+    r.fallenId=fe; if(S.fallen[fe]) S.fallen[fe].casualtyId=r.id;
+    _retypeCasualty(r); render(); return r;
+  }
+  if(hero && j.miss){ m.miss=(Number(m.miss)||0)+j.miss; m.missWhy=INJEN[code]||j.name;
+    r.result='injured'; r.detail=INJEN[code]||j.name; r.applied=true; }
+  else if(hero && !/full recovery|knocked|dazed/i.test(INJEN[code]||j.name)){
+    m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null});
+    r.result='injured'; r.detail=INJEN[code]||j.name; r.applied=true; }
+  else { r.result='recovered'; r.detail=INJEN&&INJEN[code]?INJEN[code]:j.name; }
+  _retypeCasualty(r); render(); return r; }
+function _retypeCasualty(r){ const c=campState();
+  const ev=c.log.find(e=>e.data&&e.data.casualtyId===r.id);
+  if(ev){ ev.text=casualtyText(r); ev.type=casualtyType(r); } }
+/* The options for one casualty, from the table that actually applies to them. */
+export function casualtyRollOptions(r){
+  if(casualtyIsHero(r)) return INJURIES.map(j=>({code:j.code, label:`${j.code} \u00b7 ${(INJEN&&INJEN[j.code])||j.name}`}));
+  return HENCH_INJ.map(j=>({code:j.code, label:`${j.code} \u00b7 ${j.name}`})); }
+export function setCasNote(id,v){ const r=campCasualties().find(x=>x.id===Number(id));
+  if(r) r.note=String(v||''); }
+export function removeCasualty(id,silent){ const list=campCasualties(); const i=list.findIndex(x=>x.id===Number(id));
   if(i<0) return;
-  if(typeof confirm==='function' && !confirm('Delete this casualty record?')) return;
+  if(!silent && typeof confirm==='function' && !confirm('Delete this casualty record?')) return;
   const cid=list[i].id; list.splice(i,1);
   const c=campState(); c.log=c.log.filter(e=>!(e.data&&e.data.casualtyId===cid));
   render(); }
@@ -1056,9 +1443,10 @@ export function pendingCasualtyFor(uid,who){ const list=campCasualties();
   return list.find(r=>r.victim.uid===uid && r.result==='pending')||null; }
 /* Called from the injury/death flow: attach the outcome to the casualty record,
    or record it after the fact if nobody noted who did it. */
+let _resolvingCas=null;   // the record a deliberate resolution is working on
 export function noteCasualtyOutcome(m,result,detail,who){ const c=campState(); if(!c.on) return null;
   const name=who||m.name||unitDef(m.uid_def).name;
-  const r=pendingCasualtyFor(m.uid,who);
+  const r=_resolvingCas || pendingCasualtyFor(m.uid,who);
   if(r){ r.result=result; if(detail) r.detail=detail;
     if(who) r.victim.name=who;
     const ev=c.log.find(e=>e.data&&e.data.casualtyId===r.id);
@@ -1092,10 +1480,22 @@ export function casualtyStats(){ const list=campCasualties(); const out={inflict
    S.campaign.xp = [{id, round, uid, amount, reason, applied}] */
 export function xpLedger(){ const c=campState();
   if(!Array.isArray(c.xp)) c.xp=[]; return c.xp; }
+/* Beasts, wagons and the like never gain experience - the same flag that stops
+   the roster offering them an experience bar. */
+/* Henchmen earn experience as a group, so their entries have to say so - a bare
+   "Sell-sword" reads like one man. */
+export function modelLabel(m){ if(!m) return '';
+  const def=unitDef(m.uid_def)||{};
+  const base=m.name||def.name||m.uid_def;
+  const hero=isHeroModel(m);
+  return hero? base : `${base} (group${(Number(m.qty)||1)>1?` of ${Number(m.qty)||1}`:''})`; }
+export function canEarnXp(m){ if(!m) return false;
+  const def=unitDef(m.uid_def)||{}; return !def.noxp; }
 export function grantXp(uid,amount,reason,round){ const c=campState(); if(!c.on) return null;
   const m=S.models.find(x=>x.uid===Number(uid)); if(!m) return null;
+  if(!canEarnXp(m)) return null;
   const rec={id:nextLogId(), round:(round==null?c.round:Number(round)||0), uid:Number(uid),
-    name:m.name||unitDef(m.uid_def).name, amount:Number(amount)||0, reason:String(reason||''), applied:false};
+    name:modelLabel(m), amount:Number(amount)||0, reason:String(reason||''), applied:false};
   xpLedger().push(rec); return rec; }
 export function pendingXp(){ return xpLedger().filter(x=>!x.applied); }
 export function pendingXpFor(uid){ return pendingXp().filter(x=>x.uid===Number(uid)).reduce((a,x)=>a+x.amount,0); }
@@ -1110,6 +1510,36 @@ export function applyPendingXp(){ const list=pendingXp(); if(!list.length) retur
       {uid:m.uid,name:m.name||unitDef(m.uid_def).name,gained:per[uid],exp:Number(m.exp)||0}); });
   list.forEach(x=>x.applied=true);
   render(); return n; }
+/* Everything a battle leaves behind, applied to the sheet in one go.
+   Experience was only half of it: a casualty rolled as Dead has to actually
+   leave the roster, and a lasting injury has to be written onto the warrior,
+   or the chronicle and the sheet drift apart. Casualties that have not been
+   rolled for yet are left alone and reported back, since guessing at them
+   would be inventing dice results. */
+export function outstandingCasualties(round){ const r=(round==null?campRound():round);
+  return campCasualties().filter(c=>c.round===r && c.result==='dead' && !c.applied
+    && c.victim.uid!=null && S.models.some(m=>m.uid===c.victim.uid)); }
+export function unrolledCasualties(round){ const r=(round==null?campRound():round);
+  return campCasualties().filter(c=>c.round===r && c.result==='pending'); }
+export function applyBattleResults(){
+  const round=campRound();
+  const open=unrolledCasualties(round);
+  if(open.length && typeof confirm==='function'
+    && !confirm(`${open.length} casualt${open.length===1?'y has':'ies have'} not been rolled for yet. Apply the rest anyway?`)) return null;
+  // deaths first: a warrior who is leaving the roster should not also be
+  // handed experience for the battle he did not walk away from
+  let died=0;
+  outstandingCasualties(round).forEach(c=>{
+    const m=S.models.find(x=>x.uid===c.victim.uid); if(!m) return;
+    _resolvingCas=c;
+    if(isHeroModel(m)) killHero(m.uid); else killHenchMember(m.uid,_casMemberIndex(c,m));
+    _resolvingCas=null;
+    const fe=(S.fallen||[]).length-1;
+    c.fallenId=fe; c.applied=true; if(S.fallen[fe]) S.fallen[fe].casualtyId=c.id;
+    died++; });
+  const xp=applyPendingXp();
+  render();
+  return {died, xp, unrolled:open.length}; }
 export function clearPendingXp(){ const c=campState();
   if(typeof confirm==='function' && !confirm('Discard the experience that has not been applied yet?')) return;
   c.xp=xpLedger().filter(x=>x.applied); render(); }
@@ -1122,8 +1552,13 @@ export function awardBattleXp(battleId,opts){ const c=campState(); if(!c.on) ret
   const won=opts.won!=null?!!opts.won:(bat?/victor/i.test(bat.outcome||''):false);
   let total=0;
   // +1 survives - every Hero, and every Henchman group, still standing.
-  // A warrior sitting the battle out did not survive it; he was not in it.
+  // A warrior sitting the battle out did not survive it; he was not in it. Nor
+  // did one who was carried off dead, even if the roster has not caught up yet.
+  const slain=new Set((campState().casualties||[])
+    .filter(r=>r.round===round && r.result==='dead' && r.victim.uid!=null)
+    .map(r=>r.victim.uid));
   S.models.forEach(m=>{ if((Number(m.miss)||0)>0) return;
+    if(slain.has(m.uid) && (Number(m.qty)||1)<=1) return;
     const r=grantXp(m.uid,opts.survives,'survived the battle',round); if(r) total+=r.amount; });
   // +1 to the leader of the winning warband
   if(won){ const lu=leaderUid();
@@ -1132,13 +1567,24 @@ export function awardBattleXp(battleId,opts){ const c=campState(); if(!c.on) ret
   render(); return total; }
 /* The experience earned but not yet written onto the roster. */
 export function xpBarBlock(){ const list=pendingXp(); if(!list.length) return '';
-  const per={}; list.forEach(x=>{ (per[x.uid]=per[x.uid]||{name:x.name,amount:0,why:[]}); per[x.uid].amount+=x.amount; per[x.uid].why.push(x.reason); });
+  // The label is worked out now, not when the point was earned: a group that
+  // has lost a man since must not still read "group of 3".
+  const per={}; list.forEach(x=>{ const m=S.models.find(y=>y.uid===x.uid);
+    (per[x.uid]=per[x.uid]||{name:(m?modelLabel(m):x.name),amount:0,why:[]});
+    per[x.uid].amount+=x.amount; per[x.uid].why.push(x.reason); });
+  const others=cfXpOverview(campRound());
   return `<div class="xp-pend no-print">
     <div class="xp-head">\u2605 Experience earned \u2014 ${pendingXpTotal()} point${pendingXpTotal()===1?'':'s'} waiting</div>
     <ul class="xp-list">${Object.keys(per).map(uid=>`<li><b>${String(per[uid].name).replace(/</g,'&lt;')}</b> +${per[uid].amount}
       <span class="hs-foot">${per[uid].why.map(w=>String(w).replace(/</g,'&lt;')).join('; ')}</span></li>`).join('')}</ul>
-    <div class="bat-btns"><button class="btnsm" onclick="applyPendingXp()" title="Add this experience to the warriors on the roster">Apply to roster</button>
-      <button class="tiny ghost" onclick="clearPendingXp()">discard</button></div></div>`; }
+    <div class="bat-btns"><button class="btnsm" onclick="applyBattleResults()" title="Write this battle onto the roster: deaths and lasting injuries applied, experience added">Apply battle results</button>
+      <button class="tiny ghost" onclick="clearPendingXp()">discard experience</button></div>
+    ${others.length?`<div class="xp-others"><b>The other warbands this stage</b>
+      <div class="hs-foot">Read out at the table \u2014 only your own can be applied here.</div>
+      ${others.map(o=>`<div class="xp-oth"><i>${String(o.name).replace(/</g,'&lt;')}${o.player?` (${String(o.player).replace(/</g,'&lt;')})`:''}</i>
+        <ul class="xp-list">${o.rows.map(x=>`<li>${String(x.name).replace(/</g,'&lt;')} +${x.amount} <span class="hs-foot">${String(x.reason).replace(/</g,'&lt;')}</span></li>`).join('')}</ul></div>`).join('')}
+    </div>`:''}
+    </div>`; }
 /* ================= Analysis & narrative =================
    Two purposes are served from the same record:
    - a chronicle detailed enough that a person (or a language model) can write
@@ -1262,57 +1708,93 @@ export function exportAnalysis(){ dl(JSON.stringify(campaignAnalysis(),null,2), 
    what makes the record cross-referable) or a named enemy. */
 export function casDraft(){ return campState()._cas||null; }
 export function openCasForm(){ const c=campState();
-  c._cas={vMine:'', vName:'', vWb:'', aMine:'', aName:'', aWb:'', result:'pending', detail:''};
+  // default to our own warband on the losing end, since that is the usual case
+  c._cas={vSideKey:'me', vPick:'', vName:'', aSideKey:'', aPick:'', aName:'', detail:''};
   c._open=true; render(); }
 export function cancelCasForm(){ const c=campState(); delete c._cas; render(); }
 export function setCasField(f,v){ const d=casDraft(); if(!d) return; d[f]=v;
+  if(f==='vSideKey') d.vPick='';        // a different warband means a different list
+  if(f==='aSideKey') d.aPick='';
   if(f==='detail'||f==='vName'||f==='aName') return;   // typing must not lose focus
   render(); }
 export function saveCasForm(){ const d=casDraft(); if(!d) return;
   const c=campState(); delete c._cas;
-  const mine=u=>{ const m=S.models.find(x=>x.uid===Number(u)); return m?{uid:m.uid,name:m.name||unitDef(m.uid_def).name,wb:S.wb}:null; };
-  const victim = d.vMine? mine(d.vMine) : {uid:null,name:d.vName||'',wb:d.vWb||''};
-  const attacker = d.aMine? mine(d.aMine) : {uid:null,name:d.aName||'',wb:d.aWb||''};
-  if(!victim||!victim.name){ render(); return; }
+  /* One side of the record, from whichever warband was chosen. Our own warriors
+     carry their uid so the roster can be changed later; the others are names. */
+  const side=(key,pickVal,freeName)=>{
+    if(key==='env') return {uid:null, name:'The surroundings', wb:'', npc:true};
+    if(!key) return {uid:null, name:freeName||'', wb:''};
+    const meta=battleSides().find(x=>x.key===key)||{};
+    if(pickVal){ const opts=sideModels(key);
+      const hit=String(pickVal).charAt(0)==='f'
+        ? opts.find(o=>o.dead && String(o.fallenIdx)===String(pickVal).slice(1))
+        : (()=>{ const [uid,idx]=String(pickVal).split(':');
+            return opts.find(o=>!o.dead && String(o.uid)===uid && String(o.idx)===idx); })();
+      if(hit) return {uid:(key==='me'?hit.uid:null), name:hit.label, wb:meta.wb,
+        grade:hit.hero?'hero':'hench', dead:!!hit.dead,
+        memberIdx:hit.dead?undefined:hit.idx,
+        fallenIdx:hit.dead?hit.fallenIdx:undefined}; }
+    return {uid:null, name:freeName||'', wb:meta.wb}; };
+  const victim=side(d.vSideKey, d.vPick, d.vName);
+  if(!victim.name){ render(); return; }
+  const attacker=side(d.aSideKey, d.aPick, d.aName);
   const lastBat=c.battles.filter(b=>b.round===c.round).slice(-1)[0];
-  addCasualty({victim,attacker,result:d.result||'pending',detail:d.detail||'',battleId:lastBat?lastBat.id:null});
-}
-function _modelOpts(sel){ return S.models.map(m=>
-  `<option value="${m.uid}"${String(sel)===String(m.uid)?' selected':''}>${(m.name||unitDef(m.uid_def).name).replace(/</g,'&lt;')}</option>`).join(''); }
+  // a warrior already among the Fallen did not walk away from it
+  const rec=addCasualty({victim, attacker, result:victim.dead?'dead':'pending',
+    note:d.detail||'', detail:victim.dead?(d.detail||''):'',
+    battleId:lastBat?lastBat.id:null, noXp:d.aSideKey==='env'});
+  if(rec && victim.dead && victim.fallenIdx!=null){ rec.fallenId=victim.fallenIdx; rec.applied=true;
+    const fe=(S.fallen||[])[victim.fallenIdx]; if(fe) fe.casualtyId=rec.id; }
+  render(); }
 export function casFormBlock(){ const d=casDraft(); if(!d) return '';
-  const res=['pending','recovered','injured','dead'].map(r=>
-    `<option value="${r}"${d.result===r?' selected':''}>${({pending:'not yet rolled',recovered:'full recovery',injured:'lasting injury',dead:'dead'})[r]}</option>`).join('');
+  const sides=battleSides();
+  const sideSel=(cur,withEnv)=>`<option value="">\u2014 warband \u2014</option>`
+    + sides.map(x=>`<option value="${x.key}"${cur===x.key?' selected':''}>${x.name.replace(/</g,'&lt;')}</option>`).join('')
+    + (withEnv?`<option value="env"${cur==='env'?' selected':''}>The surroundings</option>`:'');
+  const pick=(sideKey,cur,field)=>{
+    if(!sideKey||sideKey==='env') return '';
+    const opts=sideModels(sideKey); if(!opts.length) return '';
+    return `<select class="bat-in" onchange="setCasField('${field}',this.value)">
+      <option value="">\u2014 name below \u2014</option>
+      ${opts.map(o=>{ const v=o.dead?`f${o.fallenIdx}`:`${o.uid}:${o.idx}`;
+        return `<option value="${v}"${cur===v?' selected':''}>${o.label.replace(/</g,'&lt;')}${o.hero?' \u2605':''}${o.dead?' \u2620':''}</option>`; }).join('')}
+    </select>`; };
+  const freeName=(cur,field,ph)=>`<input class="bat-in" placeholder="${ph}" value="${String(cur||'').replace(/"/g,'&quot;')}" oninput="setCasField('${field}',this.value)">`;
   return `<div class="bat-form no-print">
-    <div class="bat-fhead">Casualty \u2014 ${roundLabel(campRound())}</div>
-    <div class="cas-grid">
-      <div class="bat-oh">Who went down</div>
-      <select class="bat-in" onchange="setCasField('vMine',this.value)"><option value="">\u2014 an enemy \u2014</option>${_modelOpts(d.vMine)}</select>
-      ${d.vMine?'':`<input class="bat-in" placeholder="enemy warrior\u2019s name" value="${String(d.vName).replace(/"/g,'&quot;')}" oninput="setCasField('vName',this.value)">
-      <select class="bat-in" onchange="setCasField('vWb',this.value)">${warbandOptions(d.vWb)}</select>`}
+    <div class="bat-fhead">A warrior went down \u2014 ${roundLabel(campRound())}</div>
+    <div class="hs-foot">Both sides are drawn from the campaign, so warriors can be named rather than typed. The injury roll happens below, in the casualty list.</div>
+    <div class="cas-grid2">
+      <div class="bat-oh">Went down</div>
+      <select class="bat-in" onchange="setCasField('vSideKey',this.value)">${sideSel(d.vSideKey,false)}</select>
+      ${pick(d.vSideKey,d.vPick,'vPick') || freeName(d.vName,'vName','who went down')}
       <div class="bat-oh">Taken out by</div>
-      <select class="bat-in" onchange="setCasField('aMine',this.value)"><option value="">\u2014 an enemy \u2014</option>${_modelOpts(d.aMine)}</select>
-      ${d.aMine?'':`<input class="bat-in" placeholder="who did it (optional)" value="${String(d.aName).replace(/"/g,'&quot;')}" oninput="setCasField('aName',this.value)">
-      <select class="bat-in" onchange="setCasField('aWb',this.value)">${warbandOptions(d.aWb)}</select>`}
+      <select class="bat-in" onchange="setCasField('aSideKey',this.value)">${sideSel(d.aSideKey,true)}</select>
+      ${d.aSideKey==='env'
+        ? freeName(d.detail,'detail','a fall, a misfiring pistol\u2026')
+        : (pick(d.aSideKey,d.aPick,'aPick') || freeName(d.aName,'aName','who did it (optional)'))}
     </div>
-    <div class="bat-row"><label>Outcome <select onchange="setCasField('result',this.value)">${res}</select></label>
-      <span class="hs-foot">Leave as \u201cnot yet rolled\u201d during the battle \u2014 applying the injury roll to your own warrior fills it in.</span></div>
-    <label class="bat-notes">Note <input class="bat-in" value="${String(d.detail).replace(/"/g,'&quot;')}" oninput="setCasField('detail',this.value)" placeholder="e.g. felled from the rooftop"></label>
-    <div class="bat-btns"><button class="btnsm" onclick="saveCasForm()">Save casualty</button>
+    ${d.aSideKey==='env'?'':`<label class="bat-notes">Note <input class="bat-in" value="${String(d.detail||'').replace(/"/g,'&quot;')}" oninput="setCasField('detail',this.value)" placeholder="e.g. felled from the rooftop"></label>`}
+    <div class="bat-btns"><button class="btnsm" onclick="saveCasForm()">Save</button>
       <button class="tiny ghost" onclick="cancelCasForm()">cancel</button></div>
   </div>`; }
 /* The casualties of one stage, with a dropdown to resolve those still open. */
 export function casListBlock(round){
   const list=campCasualties().filter(r=>r.round===round); if(!list.length) return '';
-  const opt=(r,v,l)=>`<option value="${v}"${r.result===v?' selected':''}>${l}</option>`;
-  return `<div class="cas-list"><b>Casualties</b><table class="fallen-tbl">
-    <tr><th>Who</th><th>By</th><th>Outcome</th><th></th></tr>
-    ${list.map(r=>`<tr>
+  return `<div class="cas-list"><b>Casualties</b>
+    <div class="hs-foot">Roll on the chart that applies: the D66 Serious Injuries chart for Heroes, D6 for Henchmen (1-2 gone for good, 3-6 fights on). Applying it here does what applying it on the unit card would.</div>
+    <table class="fallen-tbl">
+    <tr><th>Who</th><th>By</th><th>Injury roll</th><th>Note</th><th></th></tr>
+    ${list.map(r=>{
+      const opts=casualtyRollOptions(r);
+      return `<tr>
       <td>${(r.victim.name||'?').replace(/</g,'&lt;')}${r.victim.uid!=null?' <i>(ours)</i>':''}</td>
       <td>${(r.attacker.name||'\u2014').replace(/</g,'&lt;')}${r.attacker.uid!=null?' <i>(ours)</i>':''}</td>
-      <td><select class="bat-in" onchange="resolveCasualty(${r.id},this.value)">
-        ${opt(r,'pending','not yet rolled')}${opt(r,'recovered','full recovery')}${opt(r,'injured','lasting injury')}${opt(r,'dead','dead')}
-      </select>${r.detail?` <span class="hs-foot">${String(r.detail).replace(/</g,'&lt;')}</span>`:''}</td>
-      <td class="no-print"><button class="tiny ghost" onclick="removeCasualty(${r.id})">\u00d7</button></td></tr>`).join('')}
+      <td><select class="bat-in" onchange="resolveCasualtyRoll(${r.id},this.value)">
+        <option value=""${!r.code?' selected':''}>\u2014 not yet rolled \u2014</option>
+        ${opts.map(o=>`<option value="${o.code}"${r.code===o.code?' selected':''}>${o.label.replace(/</g,'&lt;')}</option>`).join('')}
+      </select>${r.result!=='pending'?` <span class="cas-res cas-${r.result}">${r.result}</span>`:''}</td>
+      <td><input class="bat-in" value="${String(r.note||'').replace(/"/g,'&quot;')}" placeholder="a note\u2026" onchange="setCasNote(${r.id},this.value)"></td>
+      <td class="no-print"><button class="tiny ghost" onclick="removeCasualty(${r.id})">\u00d7</button></td></tr>`; }).join('')}
   </table></div>`; }
 
 /* ================= Campaign file =================
@@ -1395,6 +1877,63 @@ export function cfAllBattles(){ if(!CF) return [];
   return out.sort((a,b)=>(a.round-b.round)||((a.id||0)-(b.id||0)));
 }
 /* File pickers for the campaign file. */
+/* ---- Merging what other players send in ----
+   Two others can play a battle we were not at, record it in their own copy, and
+   send the file over. Merging must add what is new without duplicating what we
+   already have, and without overwriting our own record of a battle we were in.
+
+   A battle is recognised by the stage it was fought in, the warbands that
+   fought it and where - the same battle entered twice by two different players
+   is one battle, not two. */
+function _batSig(b){
+  const who=(b.sides&&b.sides.length? b.sides.map(x=>x.name||x.wb)
+            : (b.opponents||[]).map(o=>o.name||o.wb)).map(x=>String(x).toLowerCase().trim()).sort();
+  return JSON.stringify([Number(b.round)||0, who, String(b.district||'')]); }
+/* Accepts either another player's campaign file or a plain warband file, and
+   takes the battles out of it. Returns what it did, so the panel can say so. */
+export function cfMergeFrom(json){
+  let d=json; if(typeof d==='string'){ try{ d=JSON.parse(d); }catch(e){ return {ok:false,msg:'Could not read the file.'}; } }
+  if(!d||typeof d!=='object') return {ok:false,msg:'Could not read the file.'};
+  const cf=cfGet()||cfNew('Campaign');
+  cf.battles=cf.battles||[];
+  const have=new Set(cf.battles.map(_batSig));
+  // battles we already hold through our own chronicle should not come back as
+  // duplicates either
+  campState().battles.forEach(b=>have.add(_batSig(b)));
+  let incoming=[], warbands=0;
+  if(d.type===CF_TYPE){
+    incoming=(d.battles||[]).slice();
+    (d.warbands||[]).forEach(w=>{ if(w&&w.roster){
+      incoming=incoming.concat(((w.roster.campaign||{}).battles)||[]);
+      cfImportWarband(w.roster, w.player||''); warbands++; } });
+  } else if(d.wb){                       // a plain warband file
+    incoming=((d.campaign||{}).battles)||[];
+    cfImportWarband(d, d.player||''); warbands++;
+  } else return {ok:false,msg:'That is neither a campaign file nor a warband file.'};
+
+  let added=0;
+  incoming.forEach(b=>{ const sig=_batSig(b); if(have.has(sig)) return;
+    have.add(sig);
+    cf.battles.push(Object.assign({}, b,
+      {id:(cf.battles.reduce((m,x)=>Math.max(m,Number(x.id)||0),0)+1)}));
+    added++; });
+  render();
+  return {ok:true, added, warbands, seen:incoming.length}; }
+export function cfPickMerge(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ const res=cfMergeFrom(String(rd.result));
+    if(!res.ok) alert(res.msg);
+    else flash(res.added? `${res.added} new battle${res.added===1?'':'s'} merged in.`
+                        : 'Nothing new \u2014 every battle in that file was already recorded.');
+    ev.target.value=''; };
+  rd.readAsText(f); }
+/* Every battle of the campaign: ours and those only the others were in. */
+export function cfAllBattlesMerged(){
+  const cf=cfGet();
+  const mine=campState().battles.map(b=>({...b, mine:true}));
+  const seen=new Set(mine.map(_batSig));
+  const theirs=((cf&&cf.battles)||[]).filter(b=>!seen.has(_batSig(b))).map(b=>({...b, mine:false}));
+  return mine.concat(theirs).sort((a,b)=>(a.round-b.round)||(Number(a.id)-Number(b.id))); }
 export function cfPickFile(ev){ const f=ev.target.files&&ev.target.files[0]; if(!f) return;
   const rd=new FileReader(); rd.onload=()=>{ const r=cfImportFile(rd.result);
     flash(r.ok?'Campaign file loaded.':(r.msg||'Could not read the file.')); }; rd.readAsText(f); ev.target.value=''; }
@@ -1406,6 +1945,32 @@ export function cfPickWarband(ev){ const f=ev.target.files&&ev.target.files[0]; 
   rd.readAsText(f); ev.target.value=''; }
 export function cfAddCurrentPrompt(){ const player=(typeof prompt==='function')?(prompt('Player name (optional)')||''):'';
   const r=cfAddCurrent(player); if(r&&r.ok) flash(r.updated?'Your warband was updated in the campaign.':'Your warband joined the campaign.'); }
+/* Hand corrections to the map: a foothold can be given to or taken from any
+   warband in the campaign, and a location cleared entirely. Control follows on
+   its own, since it is only ever "the sole holder". */
+export function cfToggleFoothold(districtId,cfId,on){
+  if(cfId==null||cfId==='null'){ on?claimFoothold(districtId):loseFoothold(districtId); }
+  else cfSetFoothold(cfId,districtId,on?'foothold':'none');
+  render(); }
+export function cfClearDistrict(districtId){
+  if(typeof confirm==='function' && !confirm('Clear this location? Nobody will hold it any more.')) return;
+  loseFoothold(districtId);
+  const cf=cfGet(); if(cf) cf.warbands.forEach(w=>cfSetFoothold(w.id,districtId,'none'));
+  render(); }
+function _terrAddPicker(districtId){
+  const cf=cfGet(); const held=cfFootholdsAt(districtId).map(h=>h.mine?'me':String(h.id));
+  const opts=[]; 
+  if(!held.includes('me')) opts.push(`<option value="me">${(S.name||wbName(S.wb)).replace(/</g,'&lt;')}</option>`);
+  if(cf) cf.warbands.forEach(w=>{ if(!held.includes(String(w.id))) opts.push(`<option value="${w.id}">${w.name.replace(/</g,'&lt;')}</option>`); });
+  if(!opts.length) return '';
+  return `<select class="bat-in terr-add" onchange="if(this.value)cfToggleFoothold('${districtId}',this.value==='me'?null:this.value,true)">
+    <option value="">+ give a foothold\u2026</option>${opts.join('')}</select>`; }
+/* The experience each warband earned this battle. Only our own can be applied
+   here - the others are shown so the figures can be read out at the table. */
+export function cfXpOverview(round){ const cf=cfGet(); if(!cf) return [];
+  return cf.warbands.map(w=>{ const c=((w.roster||{}).campaign)||{};
+    const rows=(c.xp||[]).filter(x=>x.round===round);
+    return {name:w.name, player:w.player, rows}; }).filter(x=>x.rows.length); }
 export function campaignFileBlock(){
   if(!CF) return `<details class="cf-wrap"><summary class="cf-sum">\u2637 Campaign file — none open</summary>
     <div class="cf-body"><div class="hs-foot">A campaign file gathers several players' warbands, the battles fought and one shared chronicle. Pass the file on after each game night — no server or account needed.</div>
@@ -1431,6 +1996,29 @@ export function campaignFileBlock(){
       </div>
       ${CF.warbands.length?`<table class="cf-tbl"><tr><th>Player</th><th>Warband</th><th>Type</th><th>Rating</th><th>Warriors</th><th>Fallen</th><th>Battles</th><th>Won</th><th></th></tr>${rows}</table>`
         :'<div class="chr-empty">No warbands yet — add yours or import the others\u2019 export files.</div>'}
+      <div class="cf-merge">
+        <label class="btnsm">Merge a file from another player
+          <input type="file" accept="application/json" style="display:none" onchange="cfPickMerge(event)"></label>
+        <div class="hs-foot">Their campaign file or their warband file \u2014 battles they recorded are added, and one you both wrote down stays one battle.</div>
+      </div>
+      ${(()=>{ const all=cfAllBattlesMerged(); if(!all.length) return '';
+        return `<div class="cf-bats"><b>Battles in this campaign</b>
+          <table class="cf-tbl"><tr><th>Stage</th><th>Who fought</th><th>Where</th><th></th></tr>
+          ${all.map(b=>{ const who=(b.sides&&b.sides.length?b.sides:(b.opponents||[]))
+              .map(x=>`${String(x.name||wbName(x.wb)).replace(/</g,'&lt;')}${x.outcome?` <i>(${String(x.outcome).replace(/</g,'&lt;')})</i>`:''}`).join(' vs ');
+            return `<tr><td>${b.round}</td><td>${who}</td>
+              <td>${b.district?districtName(b.district).replace(/</g,'&lt;'):'\u2014'}</td>
+              <td>${b.mine?'<i>yours</i>':'<span class="hs-foot">reported</span>'}</td></tr>`; }).join('')}
+          </table></div>`; })()}
+      ${(()=>{ const terr=cfTerritory(); if(!terr.length) return '';
+        return `<div class="cf-terr"><b>Territory</b>
+          <div class="hs-foot">A warband controls a location when it is the only one holding a foothold there.</div>
+          <table class="cf-tbl"><tr><th>Location</th><th>Foothold</th><th>Control</th><th></th></tr>
+          ${terr.map(t=>`<tr><td>${t.name.replace(/</g,'&lt;')}</td>
+            <td>${t.holders.map(h=>`<label class="terr-h"><input type="checkbox" checked onchange="cfToggleFoothold('${t.id}',${h.mine?'null':h.id},false)"> ${h.name.replace(/</g,'&lt;')}</label>`).join(' ')||'\u2014'}</td>
+            <td>${t.control?`<b>${t.control.name.replace(/</g,'&lt;')}</b>`:'<i>contested</i>'}</td>
+            <td class="no-print">${_terrAddPicker(t.id)}<button class="tiny ghost" onclick="cfClearDistrict('${t.id}')" title="Nobody holds this location any more">\u00d7</button></td></tr>`).join('')}
+          </table></div>`; })()}
       ${cfMergedLog().length?`<div class="cf-hist"><b>Campaign history</b><ul class="chr-list">${
         cfMergedLog().map(e=>`<li class="chr-ev chr-${e.type}"><span class="chr-ic">\u2022</span>
           <span class="chr-tx">${e.who?`<i>${String(e.who).replace(/</g,'&lt;')}:</i> `:''}${String(e.text).replace(/</g,'&lt;')}</span>
@@ -2300,7 +2888,9 @@ export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
     const c=campState();
     if(e.casFromDeath){ c.casualties=(c.casualties||[]).filter(r=>r.id!==e.casualtyId);
       c.log=(c.log||[]).filter(x=>!(x.data&&x.data.casualtyId===e.casualtyId)); }
-    else resolveCasualty(e.casualtyId,'pending','');
+    else { const rec=(c.casualties||[]).find(r=>r.id===e.casualtyId);
+      if(rec){ rec.applied=false; delete rec.fallenId; }   // it can be applied again
+      resolveCasualty(e.casualtyId,'pending',''); }
   }
   S.fallen.pop(); render(); }
 export function removeFallenAt(i){ if(!S.fallen||!S.fallen[i]) return;
@@ -3249,21 +3839,29 @@ Object.assign(window, {
   cfGet, cfNew, cfClose, cfSetName, cfSetRound, cfImportWarband, cfRemoveWarband,
   cfAddCurrent, cfExport, cfImportFile, cfMergedLog, cfAllBattles, cfStats,
   cfPickFile, cfPickWarband, cfAddCurrentPrompt, campaignFileBlock,
+  cfToggleFoothold, cfClearDistrict, cfXpOverview, cfMergeFrom, cfPickMerge, cfAllBattlesMerged,
   addCasualty, campCasualties, casualtyStats, casualtyText, casualtyType, noteCasualtyOutcome,
-  pendingCasualtyFor, removeCasualty, resolveCasualty,
+  pendingCasualtyFor, removeCasualty, resolveCasualty, resolveCasualtyRoll, setCasNote,
+  casualtyRollOptions, casualtyIsHero, casualtyIsOurs, casualtyModel,
   casDraft, casFormBlock, casListBlock, cancelCasForm, openCasForm, saveCasForm, setCasField,
   characterTimeline, characterRoster, campaignAnalysis, narrativeReport,
   xpLedger, grantXp, pendingXp, pendingXpFor, pendingXpTotal, applyPendingXp,
-  clearPendingXp, awardBattleXp, diffStages, foundingMembers, xpBarBlock,
+  clearPendingXp, awardBattleXp, diffStages, foundingMembers, xpBarBlock, canEarnXp, modelLabel,
+  applyBattleResults, outstandingCasualties, unrolledCasualties,
   snapRows, districtsAt, totalsAt, stampedName, recordSitOuts,
   exportNarrative, exportAnalysis, snapshotStage, stageSnapshots,
-  addDraftOpp, battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
-  openBattleForm, openNoteForm, remDraftOpp, saveBattleForm, saveNoteForm,
-  setDraftField, setDraftOpp, setNoteDraft,
+  battleFormBlock, cancelBattleForm, cancelNoteForm, noteFormBlock,
+  openBattleForm, openNoteForm, saveBattleForm, saveNoteForm,
+  setDraftField, setNoteDraft, addDraftSide, remDraftSide, setDraftSide, editBattleForm,
+  draftIncludesUs, addDraftSideMe,
+  addDraftCas, remDraftCas, setDraftCas, battleDraft,
   render, renderAddMenu, renderCampaign, renderDramatis, renderExtra, renderHiredSwords,
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
   resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,
   saveRoster, setAdvOpen, setCaster, setDistrict, setDpFilter, setDpGrade,
+  cfFootholdsAt, cfControlAt, cfTerritory, districtStatus, claimFoothold,
+  loseFoothold, cfSetFoothold, applyBattleTerritory,
+  battleSides, sideModels, sideName, sideWb,
   setEqQty, setExp, setExpJump, setGoldCurrent, setHeirloom, setHouseActive, setSecOpen,
   setHouseBool, setHouseNotes, setHouseNum, setHouseStr, setHsAdvOpen, setHsEq,
   setHsExp, setHsFilter, setHsGrade, setHsSpOpen, setInjOpen, setLeader,

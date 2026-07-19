@@ -116,7 +116,19 @@
   .chr-round{border-top:1px solid var(--parch-edge);padding:6px 10px}
   .chr-rhead{font-weight:700;color:var(--blood);font-size:13px;margin-bottom:3px}
   .chr-now{background:var(--blood);color:#fff;border-radius:3px;padding:0 6px;font-size:11px;font-weight:400}
-  .chr-bat{margin:4px 0;padding:5px 8px;background:rgba(120,90,40,.09);border-left:2px solid var(--gold);border-radius:2px;font-size:13px}
+  .chr-bat{margin:4px 0;padding:6px 8px;background:rgba(120,90,40,.09);border-left:2px solid var(--gold);border-radius:2px;font-size:13px}
+  /* The account on the left, the controls hard right, vertically centred. */
+  .chr-batline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .chr-battext{min-width:0;overflow-wrap:anywhere}
+  .chr-batbtns{display:flex;gap:5px;align-items:center;flex:0 0 auto;margin-left:auto}
+  .cas-res{font-size:11px;border:1px solid var(--parch-edge);border-radius:3px;padding:0 5px;margin-left:5px}
+  .cas-dead{background:rgba(140,30,30,.14);color:var(--blood);font-weight:700}
+  .cas-injured{background:rgba(150,110,30,.14)}
+  .cas-recovered{background:rgba(60,120,60,.12)}
+  .terr-h{display:inline-flex;align-items:center;gap:3px;margin-right:8px;white-space:nowrap}
+  .terr-add{font-size:12px;padding:1px 3px;max-width:150px}
+  .xp-others{margin-top:10px;border-top:1px solid var(--parch-edge);padding-top:8px}
+  .xp-oth{margin-top:6px}
   .chr-notes{font-size:12px;color:#5d5344;margin-top:3px;font-style:italic}
   .chr-list{list-style:none;margin:3px 0 0;padding:0}
   /* Four fixed slots, and the tag cell is always present even when empty, so the
@@ -134,6 +146,12 @@
   .bat-form{margin:6px 10px 10px;padding:8px 10px;border:1px solid var(--gold);border-radius:4px;background:#fffaf0}
   .bat-fhead{font-family:'Pirata One',serif;font-size:16px;color:var(--blood);margin-bottom:6px}
   .bat-oppgrid{display:grid;grid-template-columns:1fr 1.4fr auto;gap:5px;align-items:center;margin-bottom:6px}
+  .bat-sec{margin:10px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--blood);font-weight:700;border-bottom:1px solid var(--parch-edge);padding-bottom:2px}
+  .bat-sec .hs-foot{display:block;text-transform:none;letter-spacing:0;font-weight:400}
+  .bat-sidegrid{display:grid;grid-template-columns:1.2fr 1.2fr .9fr auto;gap:5px;align-items:center;margin-bottom:6px}
+  .bat-sidename,.bat-sidewb{font-size:13px;min-width:0;overflow-wrap:anywhere}
+  .bat-sidewb{color:#6b6050;font-style:italic}
+  .bat-casgrid{display:grid;grid-template-columns:1fr 1.2fr 1fr 1.2fr auto;gap:5px;align-items:center;margin-bottom:6px}
   .bat-oh{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#7a6e54}
   .bat-in{font-family:inherit;font-size:13px;padding:3px 5px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px;min-width:0;width:100%}
   .bat-row{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;font-size:13px}
@@ -161,6 +179,11 @@
   .cf-tbl th,.cf-tbl td{text-align:left;padding:3px 7px;border-bottom:1px solid var(--parch-edge)}
   .cf-tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--iron)}
   .cf-hist{margin-top:10px;font-size:13px}
+  .cf-terr{margin-top:10px;font-size:13px}
+  .cf-bats{margin-top:10px;font-size:13px}
+  .cf-merge{margin-top:10px}
+  .cf-merge .btnsm{display:inline-block;cursor:pointer}
+  .cas-grid2{display:grid;grid-template-columns:auto 1fr 1.3fr;gap:5px;align-items:center;margin:6px 0}
   .cas-grid{display:grid;grid-template-columns:auto 1fr 1fr 1.2fr;gap:5px;align-items:center;margin-bottom:6px}
   .cas-list{margin:6px 0}
   .xp-pend{margin:6px 10px;padding:8px 10px;border:1px solid var(--gold);border-radius:4px;background:#fffaf0}
