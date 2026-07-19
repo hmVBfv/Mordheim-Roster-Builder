@@ -7,8 +7,8 @@ import { ttsOpen, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
    render/action code below can call it, and re-exported so the window bindings
    at the bottom still expose these to inline onclick handlers. */
-import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
-export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
+import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
+export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
 /* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
 import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild } from './info.js';
 export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild };
@@ -1719,6 +1719,23 @@ export function missAdj(u,d){ const m=S.models.find(x=>x.uid===u); if(!m) return
    Heroes render as individual read-only cards; henchmen are grouped in the UI
    by type (then by exp+equipment). A single LIFO "undo last death" reverses the
    most recent entry (repeat to walk further back) — no per-unit selection. */
+/* A warrior who falls takes his worth with him - himself and everything he was
+   carrying. That is taken out of the treasury once, here, and the amount is
+   written onto the Fallen record so it can be shown and given back exactly if
+   the death is undone. Gold in hand is never derived from the Fallen list:
+   doing that made every figure entered by hand silently lose the same amount
+   again, and the treasury drifted negative. */
+export function loseValueOnDeath(snapshot){
+  const lost=lossValueOf(snapshot);
+  if(lost>0){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+    // the treasury may still be the untouched starting sum; make it real first
+    S.stash.gold=Math.max(0, goldTreasury()-lost); }
+  return lost; }
+export function restoreValueOnUndo(rec){
+  const back=Number(rec&&rec.lostValue)||0;
+  if(back>0){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+    S.stash.gold=goldTreasury()+back; }
+  return back; }
 function _fallenSnapshot(m){ return JSON.parse(JSON.stringify(m)); }
 export function fallenEqSig(m){ // canonical signature: same type+eq+adv+skills+mut+exp => identical
   const eq={}; for(const k in (m.eq||{})) if(m.eq[k]) eq[k]=m.eq[k];
@@ -1726,19 +1743,22 @@ export function fallenEqSig(m){ // canonical signature: same type+eq+adv+skills+
   return JSON.stringify([m.uid_def, Number(m.exp)||0, eq, rare, (m.mut||[]).slice().sort(), (m.skills||[]).slice().sort(), m.adv||{}]);
 }
 export function killHero(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
-  S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:_fallenSnapshot(m)});
+  const snap=_fallenSnapshot(m);
+  S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:snap, lostValue:loseValueOnDeath(snap)});
   if(m.uid===S.leaderUid) S.leaderUid=null;
   logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
   S.models=S.models.filter(x=>x.uid!==u); render(); }
 export function killHench(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   const snap=_fallenSnapshot(m); snap.qty=1;
-  S.fallen=S.fallen||[]; S.fallen.push({kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap});
+  S.fallen=S.fallen||[]; S.fallen.push({kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap,
+    lostValue:loseValueOnDeath(snap)});
   m.qty=(Number(m.qty)||1)-1;
   logEvent('death',`One ${unitDef(m.uid_def).name} was slain.`,{uid_def:m.uid_def,exp:Number(m.exp)||0,hero:false});
   if(m.qty<=0) S.models=S.models.filter(x=>x.uid!==u);
   render(); }
 export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
   const e=S.fallen[S.fallen.length-1];
+  restoreValueOnUndo(e);        // the warrior comes back, and so does his worth
   if(e.kind==='hero'){ S.models.push(e.m); }
   else { // hench: return one model to a matching living group, or recreate it
     const sig=fallenEqSig(e.m);
@@ -1772,7 +1792,8 @@ export function fallenEqAgg(models){ const def=models[0]&&unitDef(models[0].uid_
   return out; }
 /* Gold lost through the fallen: unit cost + equipment for each fallen model.
    modelUnitCost already prices the free dagger at 0. */
-export function fallenGoldLost(){ return (S.fallen||[]).reduce((s,e)=> s + (modelUnitCost(e.m)||0), 0); }
+export function fallenGoldLost(){ return (S.fallen||[]).reduce((s,e)=>
+  s + (e.lostValue!=null?Number(e.lostValue)||0:(modelUnitCost(e.m)||0)), 0); }
 export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('inj-'+u); const code=el&&el.value; const j=INJURIES.find(i=>i.code===code); if(!j) return;
   if(j.code==='11-15'){ // Dead — route to the right death path for hero vs henchman
     if(el) el.value=INJURIES[0]?INJURIES[0].code:'';
@@ -1974,7 +1995,7 @@ export function renderRoster(){
         <span class="badge ${t==='hero'?'hero':(t==='vehicle'?'vehicle':'hen')}">${t==='hero'?(promoted?'Hero \u2605':'Hero'):(t==='vehicle'?'Vehicle':'Henchmen')}</span>
         <input class="namefld" value="${(m.name||'').replace(/"/g,'&quot;')}" placeholder="${def.name.replace(/"/g,'&quot;')}"
           oninput="setName(${m.uid},this.value)">
-        <span class="note">${def.name}</span>
+        <span class="note">${def.name}${promoted?' \u2014 promoted to Hero':''}</span>
         <span class="missctl"><span class="misslbl no-print" title="Track games this warrior sits out (injuries that say “misses next game”, or unpaid Hired Sword upkeep). ▲ adds a game to miss, ▼ removes one.">⚑ miss games</span>${(Number(m.miss)||0)>0?`<b class="missbadge">out ${m.miss} game${m.miss>1?'s':''}</b>`:''}<button class="tiny ghost no-print" title="one fewer game to miss" ${(Number(m.miss)||0)<=0?'disabled':''} onclick="missAdj(${m.uid},-1)">▼</button><button class="tiny ghost no-print" title="miss one more game" onclick="missAdj(${m.uid},1)">▲</button></span>
         <button class="tiny ghost no-print" onclick="ttsOpen(${m.uid})" title="Description for Tabletop Simulator">⧉ TTS</button>
         ${t==='vehicle'?'':`<button class="tiny ghost no-print death-btn" onclick="${t==='hen'?`killHench(${m.uid})`:`killHero(${m.uid})`}" title="${t==='hen'?'One model in this group died (Dead 11-15) — moves it to Fallen':'This warrior died (Dead 11-15) — moves them to Fallen'}">☠ ${t==='hen'?'a model died':'died'}</button>`}
@@ -2023,13 +2044,14 @@ export function renderRoster(){
       const open=!!(S._fallenOpen&&S._fallenOpen[domKey]);
       let rows;
       if(isHero){ // one row per hero, listed by name (never merged)
-        rows=`<table class="fallen-tbl"><tr><th>Name</th><th>Experience</th><th>Equipment lost</th></tr>`
-          + grp.map(e=>`<tr><td>${(e.m.name||def.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
+        rows=`<table class="fallen-tbl"><tr><th>Name</th><th>Experience</th><th>Equipment lost</th><th>Worth</th></tr>`
+          + grp.map(e=>`<tr><td>${(e.m.name||def.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td><td>${e.lostValue!=null?e.lostValue+' gc':'—'}</td></tr>`).join('')
           + `</table>`;
       } else { // henchmen: merge identical models by exp + equipment signature
-        const subs={}; grp.forEach(e=>{ const sig=fallenEqSig(e.m); (subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp}).n++; });
-        rows=`<table class="fallen-tbl"><tr><th>#</th><th>Experience</th><th>Equipment lost</th></tr>`
-          + Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(fallenEqAgg([s.ex]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
+        const subs={}; grp.forEach(e=>{ const sig=fallenEqSig(e.m);
+          (subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp,val:e.lostValue}).n++; });
+        rows=`<table class="fallen-tbl"><tr><th>#</th><th>Experience</th><th>Equipment lost</th><th>Worth</th></tr>`
+          + Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(fallenEqAgg([s.ex]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td><td>${s.val!=null?s.val+' gc':'—'}</td></tr>`).join('')
           + `</table>`;
       }
       html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenGroupOpen('${domKey}',this.open)">
@@ -2624,6 +2646,7 @@ Object.assign(window, {
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
   killHench, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
+  loseValueOnDeath, restoreValueOnUndo,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
   logEvent, removeBattle, removeLogAt, roundLabel, setRound,
   chronicleBlock, districtName, wbName, warbandOptions, setChrOpen,
