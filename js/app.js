@@ -1072,7 +1072,9 @@ export function renderPicker(){
     }
   });
 }
+function hideWelcome(){ const w=document.getElementById('welcome-view'); if(w) w.style.display='none'; }
 export function chooseWb(key){
+  hideWelcome();
   replaceState({wb:key, subtype:WARBANDS[key].subtypes?WARBANDS[key].subtypes[0].key:null, name:"", budget:WARBANDS[key].gold, models:[], hired:[], dp:[], leaderUid:null, campaign:{on:false,districts:{}}, stash:{wyrd:0,gold:null,items:[]}, fallen:[]});
   document.getElementById('picker-view').style.display='none';
   document.getElementById('builder-view').style.display='block';
@@ -1084,6 +1086,22 @@ export function chooseWb(key){
 export function backToPicker(){
   document.getElementById('builder-view').style.display='none';
   document.getElementById('picker-view').style.display='block';
+}
+/* ---- welcome screen ---- */
+export function welcomeNew(){ hideWelcome(); document.getElementById('picker-view').style.display='block'; }
+export function welcomeImport(){ openImport(); }
+/* Saved rosters straight on the welcome screen, so "continue where I left
+   off" is one click instead of New -> some warband -> Load. Quietly absent
+   when storage is unavailable or empty. */
+export async function renderWelcome(){
+  const wrap=document.getElementById('welcomecontinue'), box=document.getElementById('welcomelist');
+  if(!wrap||!box) return;
+  let keys=[];
+  try{ const r=await window.storage.list('mh:',false); keys=(r&&r.keys)||[]; }catch(e){}
+  if(!keys.length){ wrap.style.display='none'; return; }
+  box.innerHTML=keys.map(k=>{const nm=k.replace(/^mh:/,''); const esc=nm.replace(/'/g,"\\'").replace(/</g,'&lt;');
+    return `<div class="row"><button class="tiny" onclick="loadRoster('${esc}')">Load</button><span>${nm.replace(/</g,'&lt;')}</span></div>`;}).join('');
+  wrap.style.display='block';
 }
 
 /* ===================== BUILDER SETUP ===================== */
@@ -2449,6 +2467,7 @@ export async function loadRoster(nm){
 }
 export async function delRoster(nm){ try{ await window.storage.delete('mh:'+nm,false); openLoad(); openLoad(); }catch(e){} }
 export function applyState(data){
+  hideWelcome();
   replaceState({wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]},fallen:data.fallen||[]});
   S.house=Object.assign(houseDefaults(), data.house||{});
   S.mark=data.mark||'';
@@ -2690,7 +2709,7 @@ window.addEventListener('scroll',()=>{ if(!itipPinned) hideItip(); }, true);
 
 /* ===================== INIT ===================== */
 renderPicker();
-try{ if(typeof openLoad==='function') openLoad(); }catch(e){}
+try{ if(typeof renderWelcome==='function') renderWelcome(); }catch(e){}
 
 
 /* ============================================================================
@@ -2755,6 +2774,7 @@ Object.assign(window, {
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
   killHench, killHero, removeFallenAt, setFallenGroupOpen, setRareOpen, stripGearSettled, undoFallen,
+  welcomeNew, welcomeImport, renderWelcome,
   fallenGoldOf, fallenGoldLost, fallenExpEarned, fallenExpLost,
   loseValueOnDeath, restoreValueOnUndo, henchRecruitCost, henchRecruitSurcharge,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,

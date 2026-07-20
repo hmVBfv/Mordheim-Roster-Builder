@@ -34,6 +34,22 @@
     linear-gradient(90deg,transparent,var(--gold),var(--blood),var(--gold),transparent)}
   /* Warband picker */
   .picker{display:block}
+  /* --- welcome screen --- */
+  .welcome{max-width:720px;margin:6vh auto 0;text-align:center}
+  .welcome .tagline{color:#b8a87f;font-style:italic;margin:6px 0 28px}
+  .welcome-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .wcard{flex:1 1 240px;max-width:320px;background:var(--parch);border:1px solid var(--parch-edge);
+    border-radius:4px;padding:26px 20px;cursor:pointer;box-shadow:0 2px 8px rgba(20,15,8,.25);
+    transition:transform .08s ease, box-shadow .08s ease}
+  .wcard:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(20,15,8,.35)}
+  .wcard .wicon{font-size:34px;display:block;margin-bottom:10px}
+  .wcard h2{color:var(--blood);font-size:22px;margin:0 0 8px}
+  .wcard p{font-size:13px;color:#5b4d3a;margin:0;line-height:1.45}
+  .welcome-continue{margin-top:30px}
+  .welcome-continue h3{color:var(--blood);font-size:15px;border-bottom:1px dashed var(--parch-edge);
+    display:inline-block;padding-bottom:2px;margin-bottom:10px}
+  .wsaved{display:flex;flex-direction:column;gap:6px;align-items:center}
+  .wsaved .row{display:flex;gap:8px;align-items:center}
   .grade-head{color:var(--parch);font-size:26px;margin:22px 0 10px;border-bottom:1px solid rgba(154,123,50,.5);padding-bottom:4px;text-shadow:0 2px 0 #000}
   .picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
   .gradebadge{position:absolute;left:10px;top:8px;font-size:10px;letter-spacing:1px;background:var(--iron);color:var(--gold);border:1px solid var(--gold);padding:1px 5px;border-radius:3px}
@@ -534,8 +550,33 @@
     <div class="rule"></div>
   </header>
 
+  <!-- WELCOME -->
+  <section id="welcome-view">
+    <div class="welcome">
+      <p class="tagline">The City of the Damned awaits. What brings you to the gates?</p>
+      <div class="welcome-cards">
+        <div class="wcard" onclick="welcomeNew()" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter'||event.key===' ')welcomeNew()">
+          <span class="wicon">⚔</span>
+          <h2>New Warband</h2>
+          <p>Found a fresh warband — pick from all 49 rosters and spend your starting gold.</p>
+        </div>
+        <div class="wcard" onclick="welcomeImport()" role="button" tabindex="0"
+             onkeydown="if(event.key==='Enter'||event.key===' ')welcomeImport()">
+          <span class="wicon">📜</span>
+          <h2>Import Existing</h2>
+          <p>Bring back a warband from a tool file (JSON) or a readable-text export — paste it or pick the file.</p>
+        </div>
+      </div>
+      <div class="welcome-continue" id="welcomecontinue" style="display:none">
+        <h3>Continue</h3>
+        <div class="wsaved" id="welcomelist"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- WARBAND PICKER -->
-  <section id="picker-view">
+  <section id="picker-view" style="display:none">
     <p style="text-align:center;color:#b8a87f;font-style:italic;margin-top:-6px">
       Choose a warband. Only the options each warrior is allowed to take are shown.
     </p>

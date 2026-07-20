@@ -226,4 +226,23 @@ state.S.stash.gold=eng.goldTreasury();
 assert.strictEqual(app.totalRating(), 0, 'vehicles still excluded from Rating');
 assert.ok(app.warbandWorth()>0, 'vehicles DO count toward Warband Worth');
 
+/* ---------- 10) Welcome screen routes correctly ---------- */
+// New Warband: welcome disappears, picker appears
+store['welcome-view']=el('welcome-view'); store['picker-view']=el('picker-view');
+app.welcomeNew();
+assert.strictEqual(store['welcome-view'].style.display,'none','welcomeNew hides the welcome view');
+assert.strictEqual(store['picker-view'].style.display,'block','welcomeNew shows the picker');
+// Importing a save skips both welcome and picker straight into the builder
+store['welcome-view']=el('welcome-view'); store['picker-view']=el('picker-view'); store['builder-view']=el('builder-view');
+fresh();
+app.addUnit('vermin');
+const dump2=JSON.parse(JSON.stringify(app.exportState()));
+app.applyState(dump2);
+assert.strictEqual(store['welcome-view'].style.display,'none','applyState hides the welcome view');
+assert.strictEqual(store['builder-view'].style.display,'block','applyState lands in the builder');
+// Choosing a warband from the picker also hides the welcome view
+store['welcome-view']=el('welcome-view');
+app.chooseWb('skaven');
+assert.strictEqual(store['welcome-view'].style.display,'none','chooseWb hides the welcome view');
+
 console.log('Master fixes: OK (fallen real-gold + earned XP, xpPaid settlement, rating, sidebar sections, goldNow roundtrip, rare-details open state)');
