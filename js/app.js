@@ -7,8 +7,8 @@ import { ttsOpen, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
    render/action code below can call it, and re-exported so the window bindings
    at the bottom still expose these to inline onclick handlers. */
-import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
-export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
+import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelMarketValue, marketRarePrice, eqMarketValue, isTwoHanded, _loadoutValue, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
+export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
 /* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
 import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild } from './info.js';
 export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild };
@@ -1239,24 +1239,56 @@ export function totalRating(){
   return r;
 }
 
-/* Warband Worth (gc): what the warband is worth in gold, equipment included —
-   the dimension the official Rating deliberately ignores (Rating counts heads
-   and experience only). Worth = every warrior with all his gear and rare items
-   (Henchmen at veteran value: modelUnitCost + 2 gc per XP earned in play, per
-   model), what was invested in Hired Swords / Dramatis Personae, plus gold in
-   hand. Wyrdstone shards are excluded — they have no fixed sale price. */
+/* Warband Worth (gc): the MARKET value of the fighting force — the dimension
+   the official Rating deliberately ignores (Rating counts heads and
+   experience only, so a naked warband and a gromril-armoured one can rate
+   identically; that is exactly the false balance impression this figure is
+   for). Every warrior with all his gear, rare items and mutations at LIST
+   prices — a found sword or a half-price heirloom cuts just as well as one
+   bought at list, so what was paid is irrelevant here (modelMarketValue).
+   Henchmen add their veteran premium, 2 gc per XP earned in play per model —
+   the price the Trading rules themselves put on a seasoned recruit. Hired
+   Swords and Dramatis Personae count at their hire + equipment investment.
+   Gold in hand is deliberately EXCLUDED: coins don't fight, and counting them
+   would let a rich naked warband look equal to a poor equipped one — the
+   Rating problem all over again. Wyrdstone too: no fixed sale price. */
+/* Advancement component of Worth — priced by what actually LANDED on the
+   profile, not by experience. Raw XP is progress toward power, not power;
+   counting it as well as the outcomes would double-count, and "value at this
+   exact moment" precision is not the goal (a warrior's Ld, I or BS matter
+   whether or not this battle uses them — a stat is a stat). So: each applied
+   stat advance is worth WORTH_STAT_PTS, each acquired skill or spell (hero
+   privileges, chosen rather than rolled, never wasted on a capped stat)
+   double that, and each stat point LOST to a serious injury subtracts the
+   same 5 the advance would have added — a hero at −1 Toughness is worth less
+   than his gear says. Henchman group advances multiply by group size on their
+   own, since Worth is per model × qty: +1 S for three swordsmen is three
+   improved warriors on the table. */
+export const WORTH_STAT_PTS=5, WORTH_SKILL_PTS=10, WORTH_SPELL_PTS=10;
+export function worthAdvOf(m){
+  let p=0;
+  const adv=(m&&m.adv)||{};
+  for(const k in adv) p+=(Number(adv[k])||0)*WORTH_STAT_PTS;
+  ((m&&m.inj)||[]).forEach(j=>{ const mod=j.mod||{}; for(const k in mod) p+=(Number(mod[k])||0)*WORTH_STAT_PTS; });
+  p+=((m&&m.skills)||[]).length*WORTH_SKILL_PTS;
+  p+=((m&&m.spells)||[]).length*WORTH_SPELL_PTS;
+  return p;
+}
 export function warbandWorth(){
   let w=0;
   S.models.forEach(m=>{
     const def=unitDef(m.uid_def); if(!def) return;
-    if(def.t==='hen' && !isHeroModel(m)) w+=(modelUnitCost(m)+henchRecruitSurcharge(m))*(Number(m.qty)||1);
-    else w+=modelUnitCost(m);
+    const hen=def.t==='hen'&&!isHeroModel(m);
+    const per=modelMarketValue(m)+worthAdvOf(m);
+    w+=per*(hen?(Number(m.qty)||1):1);
   });
   w+=(typeof hsHireTotal==='function'?hsHireTotal():0);
   w+=(typeof hsEqTotal==='function'?hsEqTotal():0);
   w+=(typeof dpHireTotal==='function'?dpHireTotal():0);
-  w+=goldCurrent();
-  return w;
+  (S.hired||[]).forEach(h=>{ w+=worthAdvOf(h); });   // HS track adv/skills/spells the same way
+  // Everything above is summed unrounded (backup weapons and shields carry
+  // exact halves); one single round at the very end.
+  return Math.round(w);
 }
 
 /* ===================== RENDER ===================== */
@@ -2202,7 +2234,7 @@ export function renderSidebar(){
   document.getElementById('models').textContent=mc;
   document.getElementById('heroes').textContent=hc;
   document.getElementById('rating').textContent=totalRating();
-  const wEl=document.getElementById('worth'); if(wEl) wEl.textContent=warbandWorth()+' gc';
+  const wEl=document.getElementById('worth'); if(wEl) wEl.textContent=warbandWorth();
   // unit breakdown (aggregated per type; a Lad's-Got-Talent promotion gets its
   // own "Hero <type>" row under Heroes, Vehicles get their own section)
   const counts={}, order=[];
@@ -2774,7 +2806,7 @@ Object.assign(window, {
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
   killHench, killHero, removeFallenAt, setFallenGroupOpen, setRareOpen, stripGearSettled, undoFallen,
-  welcomeNew, welcomeImport, renderWelcome,
+  welcomeNew, welcomeImport, renderWelcome, worthAdvOf,
   fallenGoldOf, fallenGoldLost, fallenExpEarned, fallenExpLost,
   loseValueOnDeath, restoreValueOnUndo, henchRecruitCost, henchRecruitSurcharge,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,

@@ -616,3 +616,144 @@ and an export that *might* work is a support question waiting to happen. The
 tool now offers exactly two formats, both fully owned: the tool's own JSON
 and the readable text (which embeds that JSON anyway). Less surface, no
 half-promises.
+
+## July 20, 2026 — Worth, second draft: from wealth to market value
+
+The first cut of Warband Worth summed *paid* prices plus gold in hand — a
+wealth figure with a pleasing conservation property (buying gear didn't move
+it, gold merely changed form). Then the actual question it exists to answer
+was put more sharply: **is this matchup fair?** Two warbands of equal Rating
+can differ wildly in equipment, and that is the false impression the figure
+should correct. Against that goal the first draft had two flaws. Paid prices:
+a found sword, or a Kislevite heirloom at half price, cuts exactly as well as
+one bought at list — what was paid is history, not strength. And gold in
+hand: coins don't fight, so counting them let a rich naked warband look equal
+to a poor equipped one — the Rating problem reproduced in a new number.
+
+Worth is now the **market value of the fielded force**: every warrior with
+all his gear, rare items and mutations at list prices (the free founding
+dagger counts as a dagger, the heirloom discount is ignored, dice-priced
+items like "25+2D6" count at their expected value; only upgrade-style prices
+that depend on their host weapon fall back to what was paid), henchmen with
+their veteran premium, Hired Swords and Dramatis Personae included, cash and
+wyrdstone excluded. The conservation property flipped into the honest
+version: buying a sword now *raises* Worth by the sword's list price, and
+editing the gold figure doesn't move it at all — both pinned by tests.
+
+A definition changing one day after shipping is the method working as
+intended: the number existed, the group looked at it, the mismatch between
+"what it measures" and "what we ask it" surfaced immediately, and the fix is
+a paragraph of rationale plus a test that encodes the new meaning.
+
+## July 20, 2026 — Worth, third draft: hands, steps, and veterans
+
+Playgroup feedback sharpened the metric twice more, both times in the same
+direction: measure *fielded power*, not inventory.
+
+**Hands, not backpacks.** A warrior carrying a zweihander, two swords and a
+spare axe was priced as if he swung all four at once. Now only the active
+loadout counts fully — two one-handed melee weapons or one two-handed
+(whichever combination is worth more), plus one missile weapon — and every
+further weapon counts half: it is a genuine option he can switch to each
+combat round, but never wielded simultaneously. Handedness isn't hardcoded;
+it is read from the same rules text the tooltips show, so a weapon added to
+the catalogue tomorrow sorts itself. A nice side effect: the free founding
+dagger, being cheap, naturally lands in the half-counted backup pool — which
+is exactly what a backup dagger is.
+
+**Experience for everyone, steps on top.** The veteran premium (2 gc per XP
+earned in play) had only been applied to henchmen, because only they have an
+official market price. Heroes now borrow the same rate — and on top, every
+advance *milestone* reached adds a small fixed bonus (5 gc, a named constant,
+tunable). The reasoning is worth recording: the 2 gc rate already averages
+advances in (a henchman group at 9 XP costs 18 gc extra and owns three
+advances), so a large bonus would double-count; but power genuinely arrives
+in steps, and a hero one XP past a threshold should visibly outweigh one a
+point short. The bonus is deliberately modest for exactly that reason.
+Hired Swords count their experience the same way; Dramatis Personae are
+fixed and don't.
+
+Known, accepted gaps — recorded so they're decisions rather than oversights:
+serious injuries don't subtract yet (a hero at −1 Toughness is worth less
+than his gear says), all advances are priced equally (a spell is not +1 Ld),
+Hired-Sword equipment still counts at what was paid, duplicate armour isn't
+deduplicated, and the Gunnery School's brace discount is ignored in Worth —
+two pistols are two pistols, power-wise. Injuries-as-negatives is the most
+likely next refinement.
+
+Tests pin the new behaviour: a third sword adds exactly half its price, the
+dual-wield-vs-zweihander choice picks the better pair, one missile weapon is
+active, and crossing a milestone is worth the XP point plus the bonus while
+starting experience stays free. Suite 20/20.
+
+## July 20, 2026 — Worth, fourth draft: points, outcomes, and half a shield
+
+Three more turns of the same crank, all from playgroup review of the third
+draft.
+
+**Points, not gold.** Worth prices things in terms of market gold but
+measures fielded power — so it is now a unitless points figure like the
+Rating, not a gc amount. Small change, honest label.
+
+**Outcomes, not progress.** The exp-plus-milestone pricing was replaced
+wholesale: advancement now counts by what actually landed on the profile.
+Each applied stat advance is +5 points; each acquired skill or spell +10 —
+hero privileges, chosen rather than rolled and never wasted on a capped
+stat, hence double weight; each stat point lost to a serious injury is −5,
+which quietly closes the biggest gap flagged in the last entry (a hero at −1
+Toughness is finally worth less than his gear says). Raw experience dropped
+out entirely: it is progress toward power, not power, and pricing both the
+XP and its outcomes double-counts. Deliberately coarse on purpose — Ld on a
+close-combat brute is still a stat; chasing battle-situational precision was
+explicitly not the goal. A henchman group advance multiplies by group size
+on its own, since Worth is per model × qty: +1 S for three swordsmen is
+three improved warriors.
+
+**Half a shield, whole a horse.** Shields and bucklers joined the hand-slot
+logic — with the lowest carry priority. The first cut counted them flat half;
+review immediately produced the counter-example: a warrior with only a dagger
+*has* a free arm, and the shield on it is no backup. So weapons claim the two
+hand slots first (best pair or zweihander, as before), and only if a hand
+remains free does the most expensive shield slot in at full value — dagger +
+shield full, dagger + sword + shield half, zweihander + shield half, and
+never more than one shield on an arm. Shields deliberately bypass the price
+ordering: a warrior does not leave his sword sheathed because his shield cost
+more. Mounts and vehicles count at full price:
+their abilities are what the listing price buys. And the rounding question
+got the obvious answer: everything sums unrounded (backup weapons and
+shields carry exact halves) and one single round happens at the very end —
+per-item rounding would compound.
+
+Tests: dagger-plus-two-swords counts 21 not 22, the shield slot logic is
+pinned case by case (dagger+shield full, sword pair+shield half, zweihander
+half, one arm only), outcome pricing (±5/10/10) is pinned including the
+injury-cancels-advance case, a group advance pays per man, a mount found
+dynamically in the warband data counts full, the wagon is worth its 180, and
+Worth is always a whole number produced by a single final round. Suite 20/20.
+
+## July 20, 2026 — the wagon that was a Large Creature
+
+A one-line bug report from the printed sheet — "Large Creature (1): 20" on a
+warband whose only oversized possession is a cart — that unravelled into
+three fixes, a nice illustration of why bug reports deserve a look past the
+symptom.
+
+The sheet counted Large creatures by text-matching /large/i against each
+unit's rules blurb. That caught the Trade Wagon (whose rules discuss it as a
+Large *target*) — and, on inspection, also the Ogre Maneaters' Youngblood and
+Half-grown, whose rules say, verbatim, "is NOT a Large Target". Text-matching
+a rules paragraph for a boolean is asking for exactly this. The count now
+uses the same `def.large` flag the rating engine has always used
+(`totalLarge()`), so the sheet and the rating can never disagree again.
+
+While in there, the sheet's arithmetic got reconciled with the rulebook.
+Mordheimer, Warband Rating: rating is warriors ×5 plus experience, and
+"Large creatures such as Rat Ogres are worth 20 points" — worth 20 *instead
+of* 5, which the engine already implemented. But the sheet printed ALL
+members ×5 and then Large ×20 on top, so its line items summed to 5 more per
+Large creature than the printed total. The members line now excludes Large
+creatures; the breakdown adds up to the rating again.
+
+Tests pin all three: the wagon and the not-Large youths count zero, a
+genuinely flagged Large creature counts per model, and Large rates 20 flat.
+Suite 20/20.

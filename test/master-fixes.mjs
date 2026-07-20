@@ -209,16 +209,34 @@ assert.strictEqual(state.S.fallen.length, 1, 'lost captive lands in Fallen');
 assert.strictEqual(eng.goldCurrent(), gB5, 'losing a captive is gold-neutral (no refund)');
 globalThis.confirm=()=>true;
 
-/* ---------- 9) Warband Worth includes equipment; Rating does not ---------- */
+/* ---------- 9) Warband Worth = fielded MARKET value; Rating ignores gear ---------- */
 fresh();
 app.addUnit('adept');
 const hA=state.S.models.find(m=>m.uid_def==='adept');
 state.S.stash.gold=eng.goldTreasury();
 const r0=app.totalRating(), w0=app.warbandWorth();
-hA.eq={'Schwert':1};                           // buy gear: rating unchanged, worth unchanged (gold moved into gear)
+// a free founding dagger is still a dagger: it must already be priced into w0
+const dagKey=Object.keys(hA.eq||{}).find(k=>k.startsWith('Dolch'));
+if(dagKey){ const noDag={...hA,eq:{}};
+  assert.ok(eng.modelMarketValue(hA)>eng.modelMarketValue(noDag), 'the free dagger carries market value'); }
+hA.eq={...hA.eq,'Schwert':1};                  // arming up RAISES worth by the sword's list price
 assert.strictEqual(app.totalRating(), r0, 'equipment never changes the Rating');
-assert.strictEqual(app.warbandWorth(), w0, 'buying gear moves gold into equipment — worth is conserved');
-hA.exp=(Number(hA.exp)||0)+2;                  // XP raises both
+assert.ok(app.warbandWorth()>w0, 'equipping a warrior raises Worth — that is the whole point');
+// gold in hand is NOT part of Worth: coins do not fight
+const wArmed=app.warbandWorth();
+app.setGoldCurrent(9999);
+assert.strictEqual(app.warbandWorth(), wArmed, 'gold in hand never changes Worth');
+// found/half-price gear counts at full list price: paid figures are irrelevant
+const twin={...hA};
+assert.strictEqual(eng.modelMarketValue(twin), eng.modelMarketValue(hA), 'market value depends only on what is carried');
+// dice-priced rare items count at expected value (e.g. "10+1D6" -> 14)
+// dice check against a real catalogue entry with a dice cost
+const catDice=(await import(new URL('../data/index.js', import.meta.url).href)).CATALOG.find(x=>typeof x.cost==='string'&&/^\d+\+\d*[dD]\d+$/.test(String(x.cost).replace(/\([^)]*\)/g,'').trim()));
+if(catDice){ const s=String(catDice.cost).replace(/\([^)]*\)/g,'').trim();
+  const mt=s.match(/^(\d+)\+(\d*)[dD](\d+)$/);
+  const expect=Math.round(Number(mt[1])+Number(mt[2]||1)*(Number(mt[3])+1)/2);
+  assert.strictEqual(eng.marketRarePrice(catDice.de,{paid:1}), expect, 'dice prices count at expected value, not at what was haggled'); }
+hA.exp=(Number(hA.exp)||0)+2;                  // XP raises the Rating (hero XP has no market gold price)
 assert.strictEqual(app.totalRating(), r0+2, 'XP raises the Rating');
 fresh('caravans');
 app.addUnit('wagon');
@@ -244,5 +262,87 @@ assert.strictEqual(store['builder-view'].style.display,'block','applyState lands
 store['welcome-view']=el('welcome-view');
 app.chooseWb('skaven');
 assert.strictEqual(store['welcome-view'].style.display,'none','chooseWb hides the welcome view');
+
+/* ---------- 11) Worth: points, loadout, shields, outcomes, single rounding ---------- */
+// A dagger and two swords: both swords fight, the dagger is the backup
+assert.strictEqual(eng._loadoutValue([{p:10,twoH:false},{p:10,twoH:false},{p:2,twoH:false}],[]), 21,
+  'two swords count full, the dagger counts half');
+// Shields are melee-hand items with the LOWEST carry priority: weapons claim
+// the two slots first; the shield slots in at full value only if a hand is free
+assert.strictEqual(eng._loadoutValue([{p:2,twoH:false}],[],[5]), 7, 'dagger + shield: the shield is on the arm, full');
+assert.strictEqual(eng._loadoutValue([{p:10,twoH:false},{p:2,twoH:false}],[],[5]), 12+2.5, 'dagger + sword + shield: both hands fight, the shield counts half');
+assert.strictEqual(eng._loadoutValue([{p:15,twoH:true}],[],[5]), 15+2.5, 'a zweihander fills both hands — the shield stays on the back');
+assert.strictEqual(eng._loadoutValue([],[],[5,5]), 5+2.5, 'only one shield ever fits on an arm');
+assert.strictEqual(eng._loadoutValue([{p:2,twoH:false}],[],[5,5]), 7+2.5, 'dagger + two shields: one arm shield full, the spare half');
+// and at model level, unrounded halves survive until the final rounding
+fresh();
+app.addUnit('adept');
+const hB=state.S.models.find(m=>m.uid_def==='adept');
+const shieldIt=(()=>{const L=eng.eqListFor(eng.unitDef('adept'));for(const c in L){const it=(L[c]||[]).find(x=>/schild|shield|buckler/i.test(x[0]));if(it)return it;}return null;})();
+if(shieldIt){
+  const [shieldNm,shieldPr]=shieldIt; const sp=eng.adjPrice(shieldNm,shieldPr);
+  const base=eng.modelMarketValue({...hB,eq:{}});
+  assert.strictEqual(eng.modelMarketValue({...hB,eq:{[shieldNm]:1}})-base, sp, 'shield alone: a hand is free, full value');
+  const swordIt=(()=>{const L=eng.eqListFor(eng.unitDef('adept'));for(const c in L){const it=(L['Nahkampf']||[]).filter(x=>!eng.isTwoHanded(x[0]));if(it.length>=1)return it[0];}return null;})();
+  if(swordIt){
+    const withTwo=eng.modelMarketValue({...hB,eq:{[swordIt[0]]:2,[shieldNm]:1}});
+    const noSh=eng.modelMarketValue({...hB,eq:{[swordIt[0]]:2}});
+    assert.strictEqual(withTwo-noSh, sp/2, 'two weapons in hand: the shield counts half, exactly and unrounded');
+  }
+}
+// Advancement outcomes: stats ±5, skills and spells 10
+assert.strictEqual(app.worthAdvOf({adv:{S:1,WS:1}}), 10, 'an applied stat advance is worth 5 points');
+assert.strictEqual(app.worthAdvOf({skills:['Mighty Blow']}), 10, 'a skill is worth double a stat');
+assert.strictEqual(app.worthAdvOf({spells:['Fires of U\'Zhul']}), 10, 'a spell is worth double a stat');
+assert.strictEqual(app.worthAdvOf({adv:{S:1},inj:[{mod:{T:-1}}]}), 0, 'a stat lost to injury subtracts what the advance added');
+// A henchman group advance improves every man on the table
+fresh();
+app.addUnit('vermin');
+const g5=state.S.models.find(m=>m.uid_def==='vermin'); g5.qty=3;
+const wPlain=app.warbandWorth();
+g5.adv={S:1};
+assert.strictEqual(app.warbandWorth()-wPlain, 15, '+1 S for a group of three is three improved warriors (+5 each)');
+// Everything sums unrounded; ONE round at the very end
+fresh();
+app.addUnit('adept');
+const hD=state.S.models.find(m=>m.uid_def==='adept');
+hD.eq={};
+const raw=eng.modelMarketValue(hD);
+assert.ok(Number.isInteger(app.warbandWorth()), 'Worth is a whole, unitless number');
+assert.strictEqual(app.warbandWorth(), Math.round(raw), 'the single rounding happens at the end, not per item');
+// Mounts count at full price — their abilities are priced into the listing
+const WB=(await import(new URL('../data/index.js', import.meta.url).href)).WARBANDS;
+outer: for(const wk in WB){ for(const u of (WB[wk].units||[])){
+  if(!u.eq) continue;
+  let L=null; try{ state.replaceState({wb:wk,subtype:null,name:'t',budget:500,models:[],hired:[],dp:[],leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()}); L=eng.eqListFor(u); }catch(e){ continue; }
+  for(const c in L){ const mt=(L[c]||[]).find(x=>/warhorse|pferd|nightmare|riesenspinne|warhound|wolf/i.test(x[0]));
+    if(mt){ app.addUnit(u.id);
+      const mm=state.S.models.find(x=>x.uid_def===u.id);
+      const base=eng.modelMarketValue({...mm,eq:{}});
+      assert.strictEqual(eng.modelMarketValue({...mm,eq:{[mt[0]]:1}})-base, eng.adjPrice(mt[0],mt[1]), 'a mount counts at full price');
+      break outer; } } } }
+// Vehicles count at full price too
+fresh('caravans');
+app.addUnit('wagon');
+assert.strictEqual(app.warbandWorth(), 180, 'the Trade Wagon is worth its full 180');
+
+/* ---------- 12) Large-creature count: by flag, never by rules-text match ---------- */
+fresh('caravans');
+app.addUnit('wagon');
+assert.strictEqual(eng.totalLarge(), 0, 'the Trade Wagon is not a Large creature on the sheet');
+fresh('maneaters');
+for(const uid of ['youngblood','halfgrown']){ try{ app.addUnit(uid); }catch(e){} }
+assert.strictEqual(eng.totalLarge(), 0, '"is NOT a Large Target" youths never count as Large');
+// and a genuinely flagged Large creature does count, once per model
+const WB2=(await import(new URL('../data/index.js', import.meta.url).href)).WARBANDS;
+outer2: for(const wk in WB2){ for(const u of (WB2[wk].units||[])){
+  if(u.large && !u.vehicle){
+    fresh(wk); app.addUnit(u.id);
+    const mm=state.S.models.find(x=>x.uid_def===u.id);
+    if(!mm) continue;
+    const q=(u.t==='hen')?(Number(mm.qty)||1):1;
+    assert.strictEqual(eng.totalLarge(), q, 'a flagged Large creature counts on the sheet');
+    assert.strictEqual(eng.modelRating(mm), 20+(Number(mm.exp)||0), 'Large is worth 20 INSTEAD of 5 (mordheimer RAW)');
+    break outer2; } } }
 
 console.log('Master fixes: OK (fallen real-gold + earned XP, xpPaid settlement, rating, sidebar sections, goldNow roundtrip, rare-details open state)');

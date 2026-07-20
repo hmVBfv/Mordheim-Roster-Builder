@@ -80,12 +80,43 @@ Sword's own rating. Equipment doesn't count, and a Trade Wagon is equipment
 with wheels — vehicles add nothing.
 
 **Warband Worth** (this tool's own metric) answers the question Rating
-ignores: what is all of this *worth in gold*? Every warrior with all his
-gear and rare items — henchmen at veteran value, 2 gc per experience point
-earned in play, per model — plus what was invested in Hired Swords and
-Dramatis Personae, plus gold in hand. Two warbands with equal Rating can be
-worlds apart in Worth; now you can see it. (Wyrdstone shards are excluded:
-their sale price depends on when you sell.)
+ignores: what does the force that actually takes the field amount to, in
+gold? It is a *market* value, built for comparing warbands fairly. Three
+principles shape it:
+
+*List prices, not paid prices.* A found sword or a half-price heirloom cuts
+just as well as one bought at list, so what was paid is irrelevant
+(dice-priced items count at their expected value).
+
+*Hands, not backpacks.* A warrior fights with two one-handed melee weapons
+or one two-handed, plus one missile weapon — that active loadout counts at
+full value. Every further weapon counts **half**: it is a real option he can
+switch to each combat round, but never wielded at the same time. Shields and
+bucklers are melee-hand items with the *lowest carry priority*: weapons
+claim the two hand slots first, and only if a hand remains free does the
+shield slot in at full value — dagger + shield counts the shield full,
+dagger + sword + shield counts it half, and a zweihander leaves no hand for
+it at all. Armour, miscellaneous gear, **mounts and vehicles** count in
+full: their abilities are priced into their listing.
+
+*Outcomes, not progress.* Advancement counts by what actually landed on the
+profile: each applied stat advance is worth **+5 points**, each acquired
+skill or spell **+10** (hero privileges — chosen rather than rolled, never
+wasted on a capped stat), and each stat point lost to a serious injury
+subtracts the same 5 an advance would have added. Raw experience is progress
+toward power, not power, and is not counted — nor does the figure try to be
+battle-situationally exact (Ld, I or BS on a warrior without a missile
+weapon are still stats; a stat is a stat). Hired Swords count their
+advances, skills and spells the same way. Everything sums unrounded — backup
+weapons and shields carry exact halves — and is rounded **once** at the end.
+
+Worth is a **unitless points figure**, like the Rating — not gold: it prices
+things *in terms of* market gold but measures fielded power, not money.
+
+**Gold in hand is deliberately excluded** — coins don't fight, and counting
+them would let a rich naked warband look equal to a poor equipped one, which
+is exactly the false balance impression this figure exists to correct. Two
+warbands with equal Rating can be worlds apart in Worth; now you can see it.
 
 ## Sources of truth
 
