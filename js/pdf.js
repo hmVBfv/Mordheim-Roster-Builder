@@ -1,6 +1,6 @@
 /* PDF-Export: befüllt das offizielle freebooters.org-Rostersheet. */
 import { DRAMATIS, HIREDSWORDS, MAXPROF, SHEET, WARBANDS } from '../data/index.js';
-import { HR, S, aDisp, dl, dpRatingTotal, effProfile, enItem, enRules, eqDisplayParts, eqListFor, houseDeviations, hsChosenEq, hsEqParts, hsEquipOn, hsExp, hsRatingTotal, isHeroModel, isLeaderModel, leaderRuleText, markRulesFor, maxInfo, raceEN, safeName, skillText, spellLabel, svLabel, svOfEntry, svOfModel, totalModels, totalRating, unitDef } from './app.js';
+import { HR, S, aDisp, dl, dpRatingTotal, effProfile, enItem, enRules, eqDisplayParts, eqListFor, houseDeviations, hsChosenEq, hsEqParts, hsEquipOn, hsExp, hsRatingTotal, isHeroModel, isLeaderModel, leaderRuleText, markRulesFor, maxInfo, raceEN, safeName, skillText, spellLabel, svLabel, svOfEntry, svOfModel, totalLarge, totalModels, totalRating, unitDef } from './app.js';
 
 /* Cache for the roster-sheet PDF template bytes. Local to this module because
    loadSheetTemplate() assigns to it — an imported binding would be read-only. */
@@ -101,9 +101,14 @@ async function exportOfficialSheet(){
       _sheetTxt(pg,f,((S.stash&&S.stash.wyrd)||0)+' wyrdstone',88,100,8);
       const gx=S.models.reduce((t,m)=>t+((m.exp||0)*(m.qty||1)),0);
       _sheetTxt(pg,f,gx,357,78,9,{right:true});
-      _sheetTxt(pg,f,totalModels(),233,90,8,{center:true});
-      _sheetTxt(pg,f,totalModels()*5,357,90,9,{right:true});
-      const lg=S.models.filter(m=>/large/i.test(unitDef(m.uid_def).sp||'')).reduce((s,m)=>s+(m.qty||1),0);
+      // Large creatures are worth 20 INSTEAD of 5 (mordheimer, Warband
+      // Rating), so the members x5 line excludes them - the line items then
+      // sum to the printed rating. Counted by flag, not by text-matching the
+      // rules blurb (which falsely caught the Trade Wagon and the Maneaters'
+      // "is NOT a Large Target" youths).
+      const lg=totalLarge();
+      _sheetTxt(pg,f,totalModels()-lg,233,90,8,{center:true});
+      _sheetTxt(pg,f,(totalModels()-lg)*5,357,90,9,{right:true});
       _sheetTxt(pg,f,lg,264,101,8,{center:true});
       _sheetTxt(pg,f,lg*20,357,101,9,{right:true});
       _sheetTxt(pg,f,typeof hsRatingTotal==='function'?hsRatingTotal():0,357,112,9,{right:true});
