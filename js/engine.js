@@ -120,13 +120,25 @@ export function applyFreeDaggers(){ let ch=false; (S.models||[]).forEach(functio
    more than the bare price on the warband list.
    Heroes are not priced this way - their experience is their own. */
 export const HENCH_XP_GC=2;
-export function henchXpCost(m){ const def=unitDef(m.uid_def);
+/* "You must add 2 gold crowns to their cost for each extra Experience point
+   they add to the warband's total" (mordheimer, Trading). This is what ANOTHER
+   man costs to take into a group that has already been blooded - raw recruits
+   are easy to find, gnarled veterans are not. It is emphatically NOT a
+   revaluation of the men already there: warriors who earned their experience in
+   play must not become dearer in hindsight, or the gold already spent would
+   move under the player's feet. Hence it never enters modelUnitCost.
+   "Extra" is measured against what a fresh recruit of this type brings, so a
+   unit that starts with experience carries no surcharge for it.
+   Heroes are not recruited into groups and are unaffected. */
+export function henchRecruitSurcharge(m){ const def=unitDef(m.uid_def);
   if(!def || def.t!=='hen' || (typeof isHeroModel==='function' && isHeroModel(m))) return 0;
-  return HENCH_XP_GC*Math.max(0, Number(m.exp)||0); }
+  return HENCH_XP_GC*Math.max(0, (Number(m.exp)||0)-(Number(def.exp)||0)); }
 export function modelUnitCost(m){ // cost for ONE model of this entry
   const def=unitDef(m.uid_def);
-  return unitBaseCost(def) + henchXpCost(m) + eqCost(m) + mutCost(m) + rareCost(m) - heirloomDiscount(m);
+  return unitBaseCost(def) + eqCost(m) + mutCost(m) + rareCost(m) - heirloomDiscount(m);
 }
+/* What one more man of this group costs today. */
+export function henchRecruitCost(m){ return modelUnitCost(m)+henchRecruitSurcharge(m); }
 
 export function _stripParen(s){ return String(s).replace(/\s*\([^)]*\)\s*/g,' ').trim(); }
 
@@ -185,7 +197,9 @@ export function rareEligibleItems(m){ const def=unitDef(m.uid_def); if(!def||!de
 export function modelTotalCost(m){
   const def=unitDef(m.uid_def);
   const q=def.t==='hen'?m.qty:1;
-  return modelUnitCost(m)*q;
+  // m.xpPaid: the experience surcharge actually handed over for veterans taken
+  // into this group. A recorded sum, so later experience cannot change it.
+  return modelUnitCost(m)*q + (Number(m.xpPaid)||0);
 }
 
 export function startGold(){ const h=HR();
@@ -209,7 +223,9 @@ export function goldCurrent(){ return goldTreasury()-totalSpent(); }
 /* What a warrior is worth, himself and everything he carries. Recorded when he
    falls, so the loss can be shown and taken back exactly. */
 export function lossValueOf(m){ if(!m) return 0;
-  return modelUnitCost(Object.assign({},m,{qty:1})); }
+  // Real gold only: unit + gear + any experience surcharge actually PAID
+  // (m.xpPaid). Experience itself is never priced into a loss.
+  return modelUnitCost(Object.assign({},m,{qty:1})) + (Number(m.xpPaid)||0); }
 
 export function goldAvailable(){ return goldTreasury(); }
 
@@ -221,7 +237,9 @@ export function isHeroModel(m){ const def=unitDef(m.uid_def); return (def&&def.t
 
 export function totalHeroes(){ return S.models.filter(m=>isHeroModel(m)).length + ((S.hired||[]).filter(h=>HIREDSWORDS[h.key]&&HIREDSWORDS[h.key].slot).length); }
 
-export function modelRating(m){ const def=unitDef(m.uid_def); return (def.large?20:5)+Number(m.exp||0); }
+export function modelRating(m){ const def=unitDef(m.uid_def);
+  if(def&&def.vehicle) return 0;              // a wagon is equipment, not a warrior
+  return (def.large?20:5)+Number(m.exp||0); }
 
 /* ---- Save-value & stat helpers (moved from app.js; pure armour-save maths) ---- */
 /* Profilwerte können "3(4)", "D6", "—" sein: numerisch auswerten (Klammerwert = effektiv) */

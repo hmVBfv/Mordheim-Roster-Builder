@@ -215,6 +215,12 @@
   .btnsm{border:1px solid var(--parch-edge);background:rgba(255,255,255,.6);border-radius:5px;cursor:pointer;font-weight:600;color:var(--blood);padding:4px 11px;font-size:13px;white-space:nowrap;line-height:1.3}
   .btnsm:hover{background:rgba(122,20,16,.10)}
   .btnsm:disabled{opacity:.35;cursor:not-allowed}
+  /* .btnsm sets dark-red TEXT; combined with the dark-red .blood BACKGROUND that
+     was red-on-red (promote button, chosen skill-category chips). Parchment text
+     on blood ground, and keep the ground on hover instead of the light wash. */
+  .btnsm.blood{background:linear-gradient(180deg,var(--blood-br),var(--blood));border-color:#480a07;color:var(--parch)}
+  .btnsm.blood:hover{background:linear-gradient(180deg,var(--blood-br),var(--blood));filter:brightness(1.22)}
+  .btnsm.blood:disabled{color:var(--parch)}
   .qn{min-width:14px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
   .eqitem.qty .pr{margin-left:0;text-align:right;white-space:nowrap}
   .eqchosen{margin-top:6px;font-size:13.5px;color:#3a3327;background:rgba(255,255,255,.4);border:1px solid var(--parch-edge);border-radius:4px;padding:4px 8px}
@@ -583,6 +589,7 @@
           <div class="stat-big"><span>Models</span><span class="v" id="models">0</span></div>
           <div class="stat-big"><span>Heroes</span><span class="v" id="heroes">0</span></div>
           <div class="stat-big rating-row"><span>Warband&nbsp;Rating</span><span class="v" id="rating">0</span></div>
+          <div class="stat-big" title="Everything the warband is worth in gold: warriors with all their equipment and rare items (Henchmen at veteran value, 2 gc per experience point earned in play, per model), Hired Swords and Dramatis Personae at what was invested in them, plus gold in hand. Wyrdstone shards are excluded (no fixed sale price). Unlike the Warband Rating, this DOES account for equipment."><span>Warband&nbsp;Worth</span><span class="v" id="worth">0</span></div>
           <div class="warns" id="warns"></div>
         </div></details></div>
         <div id="overviewpanel" class="panel" style="margin-top:16px"><details class="sec-details" open ontoggle="ovOpen=this.open"><summary class="sec-sum">Roster</summary><div class="sec-body"><div id="unitlist" class="unitlist"></div></div></details></div>
@@ -599,10 +606,9 @@
     <div class="exhead"><span>Export</span><button class="tiny ghost" onclick="closeExport()">✕ close</button></div>
     <div class="exrow">
       <button class="blood" onclick="exportText()">📄 Readable text</button>
-      <button onclick="exportNR()">🧩 Newrecruit JSON</button>
       <button onclick="exportTool()">💾 Tool file (JSON)</button>
     </div>
-    <div class="exnote"><b>Tool file</b> Loads back into the tool later via Import. <b>Newrecruit JSON</b> Follows the BattleScribe schema (real characteristic IDs + Mordheim gameSystemId); a direct import at Newrecruit.eu is not guaranteed, as their importer expects internal per-warband catalogue IDs. <b>Readable text</b> is for reading/sharing.</div>
+    <div class="exnote"><b>Tool file</b> Loads back into the tool later via Import. <b>Readable text</b> is for reading/sharing.</div>
     <div id="extextwrap" style="display:none">
       <textarea id="extext" readonly spellcheck="false"></textarea>
       <div class="exrow">
