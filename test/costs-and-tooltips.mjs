@@ -1,22 +1,27 @@
-/* Three faults found in play, all in the pure engine and lookup layers.
+/* The pure engine and lookup layers: what things cost and what tooltips say.
  *
- *  - Gold was handed back when a warrior died. The treasury is worked out as
- *    what was raised minus what was spent, and the spending was summed over the
- *    living only, so a death quietly removed his cost from the total and the
- *    warband appeared richer for losing a man. What was paid for him is gone,
- *    and it has to keep counting.
+ * Gold in hand is the treasury less what the warband currently owns, and
+ * nothing else. The Fallen list is deliberately not part of that sum: an
+ * earlier attempt derived it from the Fallen, and because the figure was only
+ * subtracted when reading and not added back when writing, every gold amount
+ * entered by hand silently lost that much again and the treasury drifted
+ * negative. What a fallen warrior was worth is recorded once, when he falls,
+ * and `lossValueOf` is the figure used for it.
  *
- *  - A Henchman's price ignored his experience. "You must add 2 gold crowns to
- *    their cost for each extra Experience point they add to the warband's
- *    total" (mordheimer, Trading) — a new man joins a group with the group's
- *    experience, so recruiting into a seasoned group costs more than the bare
- *    price on the warband list. Heroes are not priced this way.
+ * A Henchman's price has to include his experience: "you must add 2 gold crowns
+ * to their cost for each extra Experience point they add to the warband's
+ * total" (mordheimer, Trading). A recruit joins a group with the group's
+ * experience, so recruiting into a seasoned group costs more than the bare
+ * price on the warband list. Heroes are not priced this way.
  *
- *  - Tooltips were looked up through the ability scanner before the skill
- *    lists. The scanner matches by regular expression, so loose patterns
- *    claimed names they had no business with: the Shooting skill "Nimble"
- *    showed the Barbary Monkey's special rule, and "Skink Hunter" showed the
- *    Hunter skill. An exact name in a curated list beats a fuzzy match.
+ * Tooltips were looked up through the ability scanner before the skill lists.
+ * The scanner matches by regular expression, so loose patterns claimed names
+ * they had no business with: the Shooting skill "Nimble" showed the Barbary
+ * Monkey's special rule, and "Skink Hunter" showed the Hunter skill. An exact
+ * name in a curated list beats a fuzzy match.
+ *
+ * What happens to the treasury at the moment of a death is roster behaviour and
+ * belongs to the Fallen test, not here.
  */
 import assert from 'assert';
 import * as fs from 'fs';
@@ -36,66 +41,70 @@ const eng=await import(new URL('../js/engine.js', import.meta.url).href);
 const info=await import(new URL('../js/info.js', import.meta.url).href);
 const state=await import(new URL('../js/state.js', import.meta.url).href);
 
-/* One man of a henchman group falls. The branch that names individual henchmen
-   takes the member's position; without it a death simply takes the last of the
-   group. The test only cares that somebody died, so it works on either. */
-const killOneOf = uid => (typeof app.killHenchMember==='function')
-  ? app.killHenchMember(uid, 0)
-  : app.killHench(uid);
-
 state.replaceState({wb:'skaven',subtype:null,name:'Klaue',budget:500,models:[],hired:[],dp:[],
   leaderUid:null,campaign:{on:false,districts:{}},stash:{wyrd:0,gold:null,items:[]},fallen:[],house:state.houseDefaults()});
 app.addUnit('vermin');
 const group=state.S.models.find(m=>m.uid_def==='vermin'); group.qty=3;
 
-// --- a death does not pay out, and does not cost anything either ---
-const goldBefore=eng.goldCurrent();
-const spentBefore=eng.totalSpent();
-const worth=eng.lossValueOf(group);
-assert.ok(worth>0, 'a warrior is worth something, himself and what he carries');
+// --- gold in hand is the treasury less what the warband owns, and nothing else ---
+// The Fallen list is deliberately not part of this sum. Deriving it from the
+// Fallen made every hand-set figure silently lose that amount again, which is
+// how the treasury drifted negative.
+assert.strictEqual(eng.goldCurrent(), eng.goldTreasury()-eng.totalSpent(),
+  'gold in hand is exactly treasury minus what is owned');
 
-killOneOf(group.uid);
-assert.ok(eng.totalSpent()<spentBefore, 'the living cost less, as one of them is gone');
-assert.strictEqual(eng.goldCurrent(), goldBefore,
-  'but the gold in hand is unchanged: a death is not a payout');
-// The amount is written onto the Fallen record so it can be given back exactly.
-// How that record is built differs slightly between branches, so this is only
-// checked when it is there - the gold assertions below catch a wrong figure
-// either way, since undoing a death has to return precisely what it took.
-if(state.S.fallen[0].lostValue!=null)
-  assert.strictEqual(state.S.fallen[0].lostValue, worth,
-    'what he was worth is written onto the Fallen record');
-
-// the gold stays exactly as it is set by hand - the Fallen never enter the sum
 app.setGoldCurrent(100);
 assert.strictEqual(eng.goldCurrent(), 100, 'a figure entered by hand reads back unchanged');
-killOneOf(group.uid);
-assert.strictEqual(eng.goldCurrent(), 100, 'and a further death does not move it');
-
-// taking a death back returns exactly what it took
-app.undoFallen();
-assert.strictEqual(eng.goldCurrent(), 100, 'undoing a death leaves the gold where it was');
-app.undoFallen();
-assert.strictEqual(eng.goldCurrent(), 100);
-assert.strictEqual(state.S.fallen.length, 0);
+state.S.fallen.push({kind:'hench', uid_def:group.uid_def, exp:0,
+  m:Object.assign({}, JSON.parse(JSON.stringify(group)), {qty:1})});
+assert.strictEqual(eng.goldCurrent(), 100,
+  'and an entry in the Fallen list does not move it');
+state.S.fallen.pop();
 app.setGoldCurrent(0);
 
-// --- a Henchman's experience is worth 2 gold crowns a point ---
+// --- what a warrior is worth, himself and everything he carries ---
+// This is the figure recorded when he falls, so a loss can be shown and taken
+// back exactly rather than recalculated later.
+const worth=eng.lossValueOf(group);
+assert.ok(worth>0, 'a warrior is worth something');
+assert.strictEqual(worth, eng.modelUnitCost(Object.assign({},group,{qty:1})),
+  'it is the cost of one man of the group, equipment included');
+assert.strictEqual(eng.lossValueOf(Object.assign({},group,{qty:3})), worth,
+  'and it is one man\u2019s worth however many the group holds');
+
+// --- the experience surcharge falls on NEW recruits only ---
+// Two gold crowns per experience point is what a veteran costs to take on. It
+// is not a revaluation of the men already in the group: warriors who earned
+// their experience in play must not become dearer in hindsight, or the gold
+// already spent would move under the player's feet.
 const plain=eng.modelUnitCost(group);
 group.exp=5;
-assert.strictEqual(eng.modelUnitCost(group), plain+10,
-  'five points add ten crowns to what one of these men costs');
-assert.strictEqual(eng.modelTotalCost(group), eng.modelUnitCost(group)*3,
-  'and every man of the group is priced the same, so another recruit costs the higher price');
+assert.strictEqual(eng.modelUnitCost(group), plain,
+  'men already in the group are not repriced when they earn experience');
+assert.strictEqual(eng.henchRecruitSurcharge(group), 10,
+  'but five points add ten crowns to the price of taking on another man');
+assert.strictEqual(eng.henchRecruitCost(group), plain+10,
+  'so one more of these costs the plain price plus that surcharge');
 group.exp=0;
-assert.strictEqual(eng.modelUnitCost(group), plain, 'no experience, no surcharge');
+assert.strictEqual(eng.henchRecruitSurcharge(group), 0, 'raw recruits carry no surcharge');
 
-// a Hero's experience is his own and does not raise his price
+// what was actually handed over is recorded, and stays put
+group.exp=5;
+group.xpPaid=10;
+assert.strictEqual(eng.modelTotalCost(group), plain*3+10,
+  'the surcharge paid is added to the group total');
+group.exp=40;
+assert.strictEqual(eng.modelTotalCost(group), plain*3+10,
+  'and later experience does not change what was paid');
+group.exp=0; group.xpPaid=0;
+
+// a Hero's experience is his own; he is never recruited into a group
 app.addUnit('adept');
 const hero=state.S.models.find(m=>m.uid_def==='adept');
 const heroPlain=eng.modelUnitCost(hero);
 hero.exp=20;
 assert.strictEqual(eng.modelUnitCost(hero), heroPlain, 'Heroes are not priced by experience');
+assert.strictEqual(eng.henchRecruitSurcharge(hero), 0);
 
 // --- tooltips resolve to the skill that was actually taken ---
 const nimble=info.itipBuild('Nimble');
@@ -114,4 +123,4 @@ assert.ok(wyrd && /Wyrdstone Hunter/.test(wyrd));
 const fear=info.itipBuild('Fear');
 assert.ok(fear, 'abilities are still found');
 
-console.log('Costs & tooltips: OK (no gold from the dead, henchman experience priced, skills beat fuzzy ability matches)');
+console.log('Costs & tooltips: OK (gold independent of the Fallen, loss value, henchman experience priced, skills beat fuzzy ability matches)');

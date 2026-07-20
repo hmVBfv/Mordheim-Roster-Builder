@@ -1,8 +1,50 @@
 # History
 
-Not a changelog — a short account of how this thing actually grew, and why it
-looks the way it does. Kept in the repo instead of scattered across chat logs,
+Not a changelog — an account of how this thing actually grew, and why it looks
+the way it does. Kept in the repo instead of scattered across chat logs,
 because "why is it built this way" is usually more useful than "what changed".
+
+## Why this exists
+
+My group plays Mordheim on Tabletop Simulator. Mordheim is a game from 2000
+whose rules survived through community effort: mordheimer.net keeps the
+canonical compilation, two big FAQs patch the arguments, and half the useful
+tooling is abandoned or predates the compiled rules. What I wanted didn't
+exist: a roster tool that treats those community sources as strict authority
+(with the FAQs overriding everything), tracks a whole campaign rather than a
+single list — experience, injuries, deaths, gold that actually adds up — and
+exports straight to the table: TTS description cards, the official PDF sheet,
+a readable text that carries its own save. And because we're a group of
+friends playing a twenty-year-old game, house rules had to be a feature, not
+a fork: toggles that are off by default and get declared on export, never
+silent edits to the rules data.
+
+## How it's built (method)
+
+This project is developed **with an AI assistant writing most of the code** —
+worth stating plainly, because the interesting part is the working method
+that makes that reliable rather than reckless. The division of labour: I own
+the product decisions, the rules interpretation and the auditing; the
+assistant implements, and nothing lands without verification. Concretely:
+
+- **A fixed hierarchy of truth.** mordheimer.net first; the Ultimate FAQ and
+  the FAQ from Toumas override it; the original rulebook fills the gaps. When
+  a rule was ambiguous, we went to the source and read it — several entries
+  below record cases where my own assumption (or the assistant's) lost the
+  argument against the printed table.
+- **Every fix arrives with its regression test.** The suite grew from 0 to 20
+  files this way; each test is a bug that once existed and can never come
+  back unnoticed. The build is verified too: a parity test proves the bundled
+  single file behaves identically to the modular sources.
+- **Changes are applied as anchored patches** — each edit asserts the exact
+  code it expects to replace and refuses to run otherwise. On a codebase this
+  size that discipline has repeatedly turned "silently patched the wrong
+  place" into a loud, harmless error.
+- **Session rhythm:** edit sources → syntax-check (`node --check`) → run the
+  logic tests against a stubbed DOM → rebuild the single file → concise
+  report. This file is the running record of those sessions, including the
+  wrong turns — the reverted "fix", the accounting hole, the CSS that ended
+  up red-on-red — because the wrong turns are where the understanding shows.
 
 ## June 2026 — a single HTML file
 
@@ -71,11 +113,6 @@ A few loose ends from the split:
   *recruitment* order instead of the warband's fixed roster order, so e.g. a
   Marauder Chieftain recruited after a Seer would print below him instead of
   above, as the roster listing requires.
-
-## What's next
-
-See the Roadmap section in `README.md` — remaining warband audits, the Rare
-Items / Trading Post feature, and further Tabletop Simulator export work.
 
 ## July 16, 2026 (cont.) — splitting app.js: state & engine
 
@@ -471,3 +508,111 @@ on after each game night keeps the tool offline-capable and free of accounts.
 The alternative would be an external backend, which costs exactly that.
 
 `test/campaign-file.mjs` added; suite 18/18.
+
+## July 18, 2026 — gold that drifts: the henchman experience surcharge
+
+The first bug found by *playing* rather than by testing: a warband's gold in
+hand crept into the red as its henchmen gained experience — and nudging the
+gold field by hand put it back. Classic sign of two accounting models
+fighting each other.
+
+The rule at fault (mordheimer, Trading): recruiting into an experienced
+henchman group costs 2 gc per experience point the recruit adds to the
+warband's total — veterans are hard to find, raw recruits are not. The first
+implementation folded that surcharge into `modelUnitCost`, which *repriced
+every man already in the group* each time the group earned experience. Since
+gold in hand is the treasury less what the warband owns, five Verminkin
+picking up 4 XP each silently pushed the gold 40 gc into the red; editing the
+gold figure re-synced the treasury and hid the evidence.
+
+The fix is conceptual, not cosmetic: the surcharge is the price of taking
+*another* man on, not a revaluation of men already serving. It is now charged
+once, at the moment the group grows, and recorded on the group as `xpPaid` —
+never re-derived from current experience. An earlier variant of the same
+disease was found in the Fallen accounting (a loss figure derived on read but
+never balanced on write) and fixed the same way: record the value once, at
+the moment it changes hands.
+
+Also in this pass: the ability scanner's fuzzy regexes were claiming skill
+names they had no business with (the Shooting skill "Nimble" showed a
+monkey's special rule). Exact names in the curated lists now win over fuzzy
+matches. `test/costs-and-tooltips.mjs` pins all of it; suite 19/19.
+
+## July 19, 2026 — bookkeeping sweep on master
+
+A list of in-play findings, all in the money-and-roster layer, fixed together
+because they share one principle: **experience is not gold, and death is not
+income.**
+
+- **Fallen losses show real gold only.** The "gc lost" figure is recomputed
+  from the death snapshot — the man, his gear, any recruit surcharge actually
+  paid for him — never a revaluation of his experience (records written by
+  older versions displayed the inflated figure). Lost experience is reported
+  separately, and only the part *earned in play*: a leader who starts at 20 XP
+  and dies at 23 lost 3 XP, not 23.
+- **The surcharge dies with the last man.** When a henchman group emptied,
+  its `xpPaid` vanished from the books and gold in hand *rose* — the tool was
+  refunding the veteran premium at the funeral. The remaining surcharge now
+  leaves with the last casualty (settled against the treasury), and the LIFO
+  undo brings it back. A test asserts that no death, and no undo, ever moves
+  gold in hand.
+- **Saved gold is adopted verbatim.** Every export now carries `goldNow`, the
+  figure as displayed when saving; import sets it directly instead of
+  re-deriving it from the imported models — so a data or price change between
+  versions can never shift a saved warband's money. (We trust the importer's
+  file; we're friends.)
+- **The roster sidebar tells the truth about ranks.** A Lad's-Got-Talent
+  promotion now files under Heroes as "Hero Verminkin" instead of hiding in
+  the henchman tally, and vehicles get their own section — in the sidebar and
+  the readable text export alike (the PDF was already correct). Vehicles also stopped adding +5 to the Warband Rating: a wagon is
+  equipment, not a warrior.
+- **Assorted honesty in the UI:** the Rare/Trading-Post section no longer
+  snaps shut on every change (its open state was never remembered), the
+  promote button and chosen skill-category chips are no longer dark-red text
+  on a dark-red ground, henchman subtotals show the group's veteran value
+  with a tooltip explaining that gold still counts what was paid, and the
+  last German strings left the UI (the project language is English).
+
+`test/master-fixes.mjs` added; suite 20/20.
+
+## July 20, 2026 — injuries that act, and a second number for the warband
+
+Two things a paper roster quietly relies on the player to get right, now done
+by the tool.
+
+**Serious injuries with consequences actually execute them.** Until now,
+"Robbed" was a text chip — and the natural next step, unticking the stolen
+equipment, *refunded its price*, because removing gear normally returns its
+cost to hand. Robbery-by-checkbox was profitable. The fix is a settled strip:
+the gear goes AND the same amount leaves the treasury in the same breath, so
+gold in hand doesn't move a single coin. On that foundation, the acting
+results of the injury chart (verified against mordheimer's Campaigns page)
+now play out when applied: **Robbed** takes everything; **Sold to the Pits**
+asks how the pit fight went — a win pays 50 gc and +2 XP, a loss strips
+weapons and armour only (miscellaneous gear survives, per the actual rule)
+and reminds you to roll 11–35 separately; **Captured** offers ransom (paid
+from the treasury), exchange, or the settled one-way trip to the Fallen;
+**Deep Wound** asks for the D3 and books the missed games; **Survives Against
+the Odds** grants its +1 XP instead of just saying it would.
+
+**Warband Worth.** The official Rating counts heads and experience — by
+design it ignores equipment entirely, so a naked warband and a
+gromril-armoured one can rate identically. The sidebar now shows a second
+figure alongside it: everything the warband is worth in gold. Warriors with
+all their gear and rare items (henchmen at veteran value, 2 gc per XP earned
+in play, per model), the investment in Hired Swords and Dramatis Personae,
+plus gold in hand; wyrdstone excluded, since its sale price depends on when
+you sell. The pleasing property that makes it trustworthy — and testable:
+buying equipment doesn't change Worth. The gold simply turns into gear.
+Vehicles, worthless to the Rating, are of course worth their price here.
+
+Tests extended for every injury path (each asserted gold-neutral or
+correctly priced) and for Worth's conservation property; suite 20/20.
+
+Also cut in this commit: the **Newrecruit/BattleScribe JSON export**. It was
+always best-effort — the schema fit, but Newrecruit.eu's importer expects its
+internal per-warband catalogue IDs, so a direct import was never guaranteed —
+and an export that *might* work is a support question waiting to happen. The
+tool now offers exactly two formats, both fully owned: the tool's own JSON
+and the readable text (which embeds that JSON anyway). Less surface, no
+half-promises.
