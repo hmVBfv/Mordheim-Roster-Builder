@@ -757,3 +757,51 @@ creatures; the breakdown adds up to the rating again.
 Tests pin all three: the wagon and the not-Large youths count zero, a
 genuinely flagged Large creature counts per model, and Large rates 20 flat.
 Suite 20/20.
+
+## July 20, 2026 — reading the word "NOT"
+
+Same day, same bug family, one layer up. The Ogre Maneaters' Half-grown was
+still being shown as a Large Target — this time not by the PDF but by the
+ability scanner, the thing that reads each unit's free rules text and offers
+keyword chips for the terms it finds. The unit's rules say, in full: "Causes
+Fear but is NOT a Large Target." The scanner matched the words and ignored
+the sentence.
+
+The fix is a general one rather than another special case — and the state of
+the code argued for it: the Hired-Sword scanner had already accumulated
+hand-patched exceptions ("not a wizard", "immune to fear"), which is what a
+missing rule looks like when you keep treating its symptoms. Rules text is
+now split into clauses and a keyword only counts if at least one clause
+mentioning it does not deny it. Three details decide whether this helps or
+hurts:
+
+* **Contrast conjunctions split.** "Causes Fear but is NOT a Large Target"
+  must keep Fear and drop Large Target. Splitting on "but", "however",
+  "although" and friends is what makes that possible; naive per-sentence
+  handling would have dropped both.
+* **Dashes split.** The Clan Skryre Rat Ogre reads "Not truly alive - immune
+  to psychology". Without treating the dash as a boundary, the denial in the
+  first half would have suppressed a rule the model genuinely has — the fix
+  would have introduced a worse bug than the one it repaired.
+* **"never" is not a denial.** The Gigantic Spider "never gains experience
+  (animal)" — it *is* an Animal. Only "not" and "n't" count. Likewise
+  "immune to X" is a rule *about* X worth showing, not a claim that X is
+  absent, so immunity chips survive.
+
+Measured against the full data set before shipping: 21 chips removed out of
+689, 668 untouched. Every removal was inspected by hand. The list is
+satisfying — the Orc Nuttaz who "does not suffer Animosity", the Chaos Dwarf
+Informer "not subject to Hard Head, Hard to Kill", the Night Goblin Fanatic
+"not affected by Animosity or Hate Stunties", and Aksho'akhash, who is
+pointedly "NOT immune to psychology" and was being advertised as immune.
+
+One removal came from a bug nobody was looking for. The Foole lost "Immune
+to Poison" — because two of the 178 keyword patterns use a wildcard
+(`immune.*poison`), and his text contains "immune to all Psychology tests"
+in one sentence and "Poison Ring" — an *attack* — in another. The wildcard
+happily spanned them. Clause splitting kills that class of match as a side
+effect: a pattern that only matches across a sentence boundary now matches
+nothing. Six genuinely poison-immune characters kept their chip.
+
+Tests pin all of it, including the two cases where the fix could have gone
+wrong: the but-clause pair and the dash clause. Suite 20/20.
