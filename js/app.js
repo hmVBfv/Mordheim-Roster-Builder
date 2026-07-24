@@ -319,13 +319,37 @@ export function skillChipRow(names,label,e){ if(!names||!names.length) return ''
     return t?`<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${nm.replace(/'/g,"\\'")}</b><br>${t}',false,300)" onmouseleave="hideItip()">${nm} \u24d8</span>`
             :`<span class="kwchip kw-plain">${nm}</span>`; };
   return `<div class="abil-sk"><b>${label||'Skills'}:</b> ${names.map(chip).join('')}</div>`; }
+/* ---- keyword scanning must respect negation ----
+   The ability scanner looks for rule keywords in a unit's free rules text.
+   Plain substring matching claims the opposite of what the text says whenever
+   a rule is DENIED: the Ogre Maneaters' Half-grown "is NOT a Large Target",
+   the Orc Nuttaz "does not suffer Animosity", Aksho'akhash "is NOT immune to
+   psychology". So the text is cut into clauses and a keyword only counts if
+   at least one clause mentioning it does not negate it.
+   Clause boundaries are sentence enders, dashes and contrast conjunctions —
+   the dash matters: "Not truly alive - immune to psychology" would otherwise
+   let the first half suppress a rule the model genuinely has.
+   Only "not"/"n't" count as negation, deliberately: "never gains experience
+   (animal)" still makes it an Animal, and "immune to X" is a rule ABOUT X
+   worth showing, not a denial that X applies. */
+export function abilityMentioned(re, text){
+  const cl=String(text||'').replace(/<[^>]*>/g,' ')
+    .replace(/([.;:!?])\s+/g,'$1\u0001').replace(/\s+[-\u2013\u2014]\s+/g,'\u0001')
+    .replace(/\s+(?:but|however|although|though|whereas|while|except)\s+/gi,'\u0001')
+    .split('\u0001');
+  for(const c of cl){ const i=c.search(re); if(i<0) continue;
+    if(!/\b(?:not|n't)\b/i.test(c.slice(0,i))) return true; }
+  return false;   // absent, or mentioned only where it is denied
+}
 export function hsAbilitySection(hs,rec){
   const pers=(rec&&hs.personas&&typeof hsPersona==='function')?hsPersona(rec,hs):null;
   const sp=[(pers&&pers.sp)||'',hs.sp||''].filter(Boolean).join(' ');
   let found=[]; const seen=new Set();
-  for(const [re,info] of ABILITYINFO){ if(re.test(sp) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
+  for(const [re,info] of ABILITYINFO){ if(abilityMentioned(re,sp) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
   if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
-  if(/not a wizard/i.test(sp)) found=found.filter(f=>f.name!=='Wizard');
+  // "not a wizard" is handled by abilityMentioned now. This one stays: being
+  // immune to Fear is not a denial that the word appears, it is a different
+  // rule — and a model that only RESISTS fear does not CAUSE it.
   if(/immune to fear/i.test(sp) && !/causes? fear|fearsome/i.test(sp)) found=found.filter(f=>f.name!=='Fear');
   const skFound=skillChipsIn(sp).filter(n=>!seen.has(n));
   const chip=(label,lookup)=>{ const esc=String(lookup).replace(/'/g,"\\'"); return `<span class="kwchip" tabindex="0" onmouseenter="showItip(this,'${esc}')" onmouseleave="hideItip()" onfocus="showItip(this,'${esc}')" onblur="hideItip()" onclick="toggleItip(event,this,'${esc}')">${label} \u24d8</span>`; };
@@ -1503,8 +1527,9 @@ export function abilitySection(def, m){
   const acquired=(m&&m.skills)||[]; const muts=(m&&m.mut)||[];
   const scan = sp+' '+muts.map(mutEN).join(' ');   // innate special rules + mutations/blessings (translated to EN so ABILITYINFO matches; acquired skills are shown separately)
   let found=[]; const seen=new Set();
-  for(const [re,info] of ABILITYINFO){ if(re.test(scan) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
+  for(const [re,info] of ABILITYINFO){ if(abilityMentioned(re,scan) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
   if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
+  if(/immune to fear/i.test(scan) && !/causes? fear|fearsome/i.test(scan)) found=found.filter(f=>f.name!=='Fear');
   // which special skill list(s) this unit can draw from
   const stdCats=['combat','shooting','academic','strength','speed']; const sets=[]; const setseen=new Set();
   (def.sk||[]).forEach(c=>{ if(!stdCats.includes(c)&&SKILLSETS[c]&&!setseen.has(c)){ setseen.add(c); sets.push(SKILLSETS[c]); } });
@@ -2806,7 +2831,7 @@ Object.assign(window, {
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
   killHench, killHero, removeFallenAt, setFallenGroupOpen, setRareOpen, stripGearSettled, undoFallen,
-  welcomeNew, welcomeImport, renderWelcome, worthAdvOf,
+  welcomeNew, welcomeImport, renderWelcome, worthAdvOf, abilityMentioned,
   fallenGoldOf, fallenGoldLost, fallenExpEarned, fallenExpLost,
   loseValueOnDeath, restoreValueOnUndo, henchRecruitCost, henchRecruitSurcharge,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,

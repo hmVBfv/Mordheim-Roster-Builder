@@ -345,4 +345,42 @@ outer2: for(const wk in WB2){ for(const u of (WB2[wk].units||[])){
     assert.strictEqual(eng.modelRating(mm), 20+(Number(mm.exp)||0), 'Large is worth 20 INSTEAD of 5 (mordheimer RAW)');
     break outer2; } } }
 
+/* ---------- 13) Keyword scanning respects negation and clause boundaries ---------- */
+const DATA=await import(new URL('../data/index.js', import.meta.url).href);
+const abilRe=nm=>DATA.ABILITYINFO.find(([r,i])=>i.name===nm)[0];
+const LT=abilRe('Large Target'), FEAR=abilRe('Fear'), IPSY=abilRe('Immune to Psychology'), ANIM=abilRe('Animal');
+// the reported case: an explicit denial must not become a claim
+assert.strictEqual(app.abilityMentioned(LT,'The warrior is NOT a Large Target.'), false,
+  '"is NOT a Large Target" does not make it a Large Target');
+assert.strictEqual(app.abilityMentioned(LT,'The warrior is a Large Target.'), true,
+  'a plain statement still counts');
+// contrast conjunctions split the clause: one half denies, the other affirms
+assert.strictEqual(app.abilityMentioned(FEAR,'Causes Fear but is NOT a Large Target.'), true,
+  '"Causes Fear but is NOT a Large Target" keeps Fear');
+assert.strictEqual(app.abilityMentioned(LT,'Causes Fear but is NOT a Large Target.'), false,
+  '…and drops Large Target');
+assert.strictEqual(app.abilityMentioned(FEAR,'Does NOT cause Fear and is NOT a Large Target.'), false,
+  'a denial that spans the whole sentence drops both');
+// a dash separates clauses too, or a denial would swallow a rule the model HAS
+assert.strictEqual(app.abilityMentioned(IPSY,'Not truly alive - immune to psychology and never leaves combat.'), true,
+  '"Not truly alive - immune to psychology" keeps the immunity');
+// "never" is not a denial: it often describes the rule itself
+assert.strictEqual(app.abilityMentioned(ANIM,'It never gains experience (animal).'), true,
+  '"never gains experience (animal)" still marks an Animal');
+// wildcard regexes must not span unrelated sentences
+const IPOI=abilRe('Immune to Poison');
+assert.strictEqual(app.abilityMentioned(IPOI,'He is immune to all Psychology tests. Poison Ring: he may spray an opponent.'), false,
+  '"immune…poison" spanning two unrelated sentences is not immunity to poison');
+assert.strictEqual(app.abilityMentioned(IPOI,'Immune to Poison.'), true, 'the real rule still registers');
+// end to end on the reported units: no Large Target chip on the Maneaters' youths
+fresh('maneaters');
+for(const uid of ['youngblood','halfgrown']){
+  const def=DATA.WARBANDS.maneaters.units.find(u=>u.id===uid);
+  if(!def) continue;
+  const html=app.abilitySection(def,null);
+  assert.ok(!/>Large Target/.test(html), uid+' shows no Large Target ability chip');
+}
+const hg=DATA.WARBANDS.maneaters.units.find(u=>u.id==='halfgrown');
+if(hg) assert.ok(/>Fear/.test(app.abilitySection(hg,null)), 'the Half-grown still causes Fear');
+
 console.log('Master fixes: OK (fallen real-gold + earned XP, xpPaid settlement, rating, sidebar sections, goldNow roundtrip, rare-details open state)');
