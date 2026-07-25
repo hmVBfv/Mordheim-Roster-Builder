@@ -14,6 +14,7 @@
  */
 import { ARMOUR_SV, BRACE_PLURAL, CATALOG, DRAMATIS, GSN_BRACE, HIREDSWORDS, LISTS, MUTATIONS, MUTSETS, SV_SKILL_BASE, SV_SKILL_BONUS, UPGRADES, WARBANDS } from '../data/index.js';
 import { S, HR } from './state.js';
+import { itemInfo } from './info.js';
 import { activeDistrictEffects, catalogEligible, dpHireTotal, hsChosenEq, hsEqParts, hsEqTotal, hsEquipOn, hsHireTotal, hsSizeBonus, itemFamily, itemHalfActive, priceMod } from './app.js';
 
 export function adjPrice(nm,pr){ const h=HR(); if(typeof pr!=='number') return pr; const fam=itemFamily(nm);
@@ -113,10 +114,132 @@ export function ensureFreeDagger(m){ const def=unitDef(m.uid_def); const nm=dagg
 
 export function applyFreeDaggers(){ let ch=false; (S.models||[]).forEach(function(m){ if(ensureFreeDagger(m)) ch=true; }); return ch; }
 
+/* Experience a Henchman group has earned raises what one of its men is worth:
+   "you must add 2 gold crowns to their cost for each extra Experience point
+   they add to the warband's total" (mordheimer, Trading). A new man joins with
+   the group's experience, so recruiting into a seasoned group costs that much
+   more than the bare price on the warband list.
+   Heroes are not priced this way - their experience is their own. */
+export const HENCH_XP_GC=2;
+/* "You must add 2 gold crowns to their cost for each extra Experience point
+   they add to the warband's total" (mordheimer, Trading). This is what ANOTHER
+   man costs to take into a group that has already been blooded - raw recruits
+   are easy to find, gnarled veterans are not. It is emphatically NOT a
+   revaluation of the men already there: warriors who earned their experience in
+   play must not become dearer in hindsight, or the gold already spent would
+   move under the player's feet. Hence it never enters modelUnitCost.
+   "Extra" is measured against what a fresh recruit of this type brings, so a
+   unit that starts with experience carries no surcharge for it.
+   Heroes are not recruited into groups and are unaffected. */
+export function henchRecruitSurcharge(m){ const def=unitDef(m.uid_def);
+  if(!def || def.t!=='hen' || (typeof isHeroModel==='function' && isHeroModel(m))) return 0;
+  return HENCH_XP_GC*Math.max(0, (Number(m.exp)||0)-(Number(def.exp)||0)); }
+/* ---- Market value: what things are WORTH, not what was paid ----
+   A found sword and a half-price heirloom cut exactly as well as one bought
+   at list. So the market value of a model prices every item at its list
+   price: the free founding dagger counts as a dagger, the Kislevite
+   heirloom discount is ignored, and rare items count at their catalogue
+   price rather than the haggled figure — dice prices ("25+2D6") at their
+   expected value. Only upgrade-style prices ("+15/+20", "4× Preis"), which
+   depend on the weapon they were applied to, fall back to what was paid. */
+/* A warrior fights with what his hands can hold: two one-handed melee
+   weapons or one two-handed, plus one missile weapon. That active loadout
+   counts at full market value; every further weapon counts HALF — it is a
+   real option he can switch to each combat round, but never wielded at the
+   same time. Armour and miscellaneous gear count in full. Handedness is
+   read from the same rules text the tooltips show. */
+/* A shield (or buckler) is a melee-hand item with the LOWEST carry priority:
+   weapons claim the two hand slots first (by the usual best-pair-or-zweihander
+   choice), and only if a hand remains free does the shield slot in at full
+   value — it bypasses the price ordering entirely. Dagger + shield: the
+   shield is on the arm, full. Dagger + sword + shield: both hands fight,
+   the shield counts half like any other spare. Only one shield can ever be
+   on an arm; further shields are baggage at half. */
+export function isHandShield(nm){ return /schild|shield|buckler/i.test(String(nm||'')); }
+export function isTwoHanded(nm){
+  if(!nm) return false;
+  const inf=itemInfo(String(nm));
+  if(!inf) return false;
+  return /two-handed|both hands|two hands/i.test(JSON.stringify(inf));
+}
+export function _loadoutValue(melee, ranged, shields){
+  shields=shields||[];
+  const sumM=melee.reduce((s,w)=>s+w.p,0);
+  const one=melee.filter(w=>!w.twoH).map(w=>w.p).sort((a,b)=>b-a);
+  const two=melee.filter(w=>w.twoH).map(w=>w.p).sort((a,b)=>b-a);
+  const optA=(one[0]||0)+(one[1]||0), optB=two[0]||0;
+  const active=Math.max(optA,optB);
+  // hands occupied by weapons: the zweihander takes both; otherwise as many
+  // one-handers as actually fight (weapons always outrank shields for a slot)
+  const slots=(optB>optA&&two.length)?2:Math.min(2,one.length);
+  const sh=shields.slice().sort((a,b)=>b-a);
+  const sumS=sh.reduce((s,p)=>s+p,0);
+  const shActive=(slots<2&&sh.length)?sh[0]:0;
+  const sumR=ranged.reduce((s,p)=>s+p,0);
+  const bestR=ranged.length?Math.max(...ranged):0;
+  return (active+(sumM-active)/2) + (shActive+(sumS-shActive)/2) + (bestR+(sumR-bestR)/2);
+}
+export function eqMarketValue(m){
+  const def=unitDef(m.uid_def); if(!def.eq) return 0;
+  const list=eqListFor(def);
+  let full=0; const melee=[], ranged=[], shields=[];
+  for(const cat in list) for(const [nm,pr] of list[cat]){
+    const qty=Number(m.eq[nm])||0; if(!qty) continue;
+    const price=adjPrice(nm,pr);   // every dagger at list price — no founding freebie here
+    if(cat==='Nahkampf'){ const th=isTwoHanded(nm); for(let i=0;i<qty;i++) melee.push({p:price,twoH:th}); }
+    else if(cat==='Fernkampf'){ for(let i=0;i<qty;i++) ranged.push(price); }
+    else if(isHandShield(nm)){ for(let i=0;i<qty;i++) shields.push(price); }
+    else full+=qty*price;
+  }
+  return full+_loadoutValue(melee,ranged,shields);
+}
+export function marketRarePrice(de, entry){
+  const it=CATALOG.find(x=>x.de===de);
+  const fallback=Number(entry&&entry.paid)||0;
+  if(!it) return fallback;
+  if(typeof it.cost==='number') return it.cost;
+  const s=String(it.cost).replace(/\([^)]*\)/g,'').trim();   // "30 (Paar 60)" -> "30"
+  const mt=s.match(/^(\d+)(?:\s*\+\s*(\d*)\s*[dD](\d+))?$/);
+  if(mt){ const base=Number(mt[1]);
+    if(!mt[3]) return base;
+    const n=Number(mt[2]||1), faces=Number(mt[3]);
+    return Math.round(base + n*(faces+1)/2); }
+  return fallback;   // "+15/+20", "4× Preis" and friends: price depends on the host weapon
+}
+export function modelMarketValue(m){
+  const def=unitDef(m.uid_def);
+  const list=def.eq?eqListFor(def):{};
+  let full=unitBaseCost(def)+mutCost(m);
+  const melee=[], ranged=[], shields=[];
+  for(const cat in list) for(const [nm,pr] of list[cat]){
+    const qty=Number((m.eq||{})[nm])||0; if(!qty) continue;
+    const price=adjPrice(nm,pr);
+    if(cat==='Nahkampf'){ const th=isTwoHanded(nm); for(let i=0;i<qty;i++) melee.push({p:price,twoH:th}); }
+    else if(cat==='Fernkampf'){ for(let i=0;i<qty;i++) ranged.push(price); }
+    else if(isHandShield(nm)){ for(let i=0;i<qty;i++) shields.push(price); }
+    else full+=qty*price;
+  }
+  // Rare weapons join the same hands-and-holsters pools; upgrades ride their
+  // host weapon, shields queue for a free hand, everything else counts full.
+  const r=m.rare||{};
+  for(const de in r){ const q=Number(r[de].q)||0; if(!q) continue;
+    const price=marketRarePrice(de,r[de]);
+    const it=CATALOG.find(x=>x.de===de); const cat=it&&it.cat;
+    if(cat==='cc'&&!isUpgrade(de)){ const th=isTwoHanded(de)||isTwoHanded(it&&it.en); for(let i=0;i<q;i++) melee.push({p:price,twoH:th}); }
+    else if((cat==='missile'||cat==='bp')&&!isUpgrade(de)){ for(let i=0;i<q;i++) ranged.push(price); }
+    else if(isHandShield(de)||isHandShield(it&&it.en)){ for(let i=0;i<q;i++) shields.push(price); }
+    else full+=q*price;
+  }
+  // Deliberately unrounded: halves from backup weapons and shields stay exact
+  // here; warbandWorth() sums everything and rounds ONCE at the very end.
+  return full+_loadoutValue(melee,ranged,shields);
+}
 export function modelUnitCost(m){ // cost for ONE model of this entry
   const def=unitDef(m.uid_def);
   return unitBaseCost(def) + eqCost(m) + mutCost(m) + rareCost(m) - heirloomDiscount(m);
 }
+/* What one more man of this group costs today. */
+export function henchRecruitCost(m){ return modelUnitCost(m)+henchRecruitSurcharge(m); }
 
 export function _stripParen(s){ return String(s).replace(/\s*\([^)]*\)\s*/g,' ').trim(); }
 
@@ -175,7 +298,9 @@ export function rareEligibleItems(m){ const def=unitDef(m.uid_def); if(!def||!de
 export function modelTotalCost(m){
   const def=unitDef(m.uid_def);
   const q=def.t==='hen'?m.qty:1;
-  return modelUnitCost(m)*q;
+  // m.xpPaid: the experience surcharge actually handed over for veterans taken
+  // into this group. A recorded sum, so later experience cannot change it.
+  return modelUnitCost(m)*q + (Number(m.xpPaid)||0);
 }
 
 export function startGold(){ const h=HR();
@@ -189,19 +314,38 @@ export function startGold(){ const h=HR();
 
 export function goldTreasury(){ const g=(S.stash&&S.stash.gold); return (g==null||g==='')?startGold():(Number(g)||0); }
 
+/* Gold in hand is the treasury less what the warband currently owns, and
+   nothing else. The Fallen list is deliberately NOT part of this sum: a loss is
+   settled once, at the moment it happens, by taking the warrior's worth out of
+   the treasury (see loseValueOnDeath in app.js). Deriving it from the Fallen
+   instead made every hand-set figure silently lose that amount again, which is
+   how the treasury drifted negative. */
 export function goldCurrent(){ return goldTreasury()-totalSpent(); }
+/* What a warrior is worth, himself and everything he carries. Recorded when he
+   falls, so the loss can be shown and taken back exactly. */
+export function lossValueOf(m){ if(!m) return 0;
+  // Real gold only: unit + gear + any experience surcharge actually PAID
+  // (m.xpPaid). Experience itself is never priced into a loss.
+  return modelUnitCost(Object.assign({},m,{qty:1})) + (Number(m.xpPaid)||0); }
 
 export function goldAvailable(){ return goldTreasury(); }
 
 export function totalSpent(){ return S.models.reduce((s,m)=>s+modelTotalCost(m),0)+ (typeof hsHireTotal==='function'?hsHireTotal():0)+ (typeof dpHireTotal==='function'?dpHireTotal():0)+ (typeof hsEqTotal==='function'?hsEqTotal():0); }
 
+/* Large creatures for the rating breakdown — by the same def.large flag the
+   rating uses, never by text-matching the rules blurb: "is NOT a Large
+   Target" contains the word Large, and a Trade Wagon is not a creature. */
+export function totalLarge(){ return S.models.reduce((s,m)=>{const d=unitDef(m.uid_def);
+  if(!d||!d.large||d.vehicle) return s; return s+(d.t==='hen'?(Number(m.qty)||1):1);},0); }
 export function totalModels(){ return S.models.reduce((s,m)=>{const d=unitDef(m.uid_def); if(d&&d.vehicle) return s; return s+(d&&d.t==='hen'?m.qty:1);},0); }
 
 export function isHeroModel(m){ const def=unitDef(m.uid_def); return (def&&def.t==='hero')||!!m.promoted; }
 
 export function totalHeroes(){ return S.models.filter(m=>isHeroModel(m)).length + ((S.hired||[]).filter(h=>HIREDSWORDS[h.key]&&HIREDSWORDS[h.key].slot).length); }
 
-export function modelRating(m){ const def=unitDef(m.uid_def); return (def.large?20:5)+Number(m.exp||0); }
+export function modelRating(m){ const def=unitDef(m.uid_def);
+  if(def&&def.vehicle) return 0;              // a wagon is equipment, not a warrior
+  return (def.large?20:5)+Number(m.exp||0); }
 
 /* ---- Save-value & stat helpers (moved from app.js; pure armour-save maths) ---- */
 /* Profilwerte können "3(4)", "D6", "—" sein: numerisch auswerten (Klammerwert = effektiv) */

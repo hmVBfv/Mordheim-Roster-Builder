@@ -19,7 +19,12 @@ export function spellInfo(nm){ const lbl=spellLabel(nm); for(const k in SPELLS){
 export function skillInfo(nm){ const lists=[]; for(const k in SKILLLISTS) lists.push(SKILLLISTS[k]); for(const k in SKILLSETS) lists.push(SKILLSETS[k]);
   for(const L of lists){ const e=(L.skills||[]).find(x=>x[0]===nm); if(e) return {name:e[0],line:'Skill · '+L.name,text:e[1]}; } return null; }
 export function itipBuild(nm){
-  const i=itemInfo(nm)||abilityInfo(nm)||spellInfo(nm)||skillInfo(nm); if(!i) return null;
+  /* A skill is looked up before the ability scanner. The scanner matches by
+     regular expression, so a loose pattern claimed names it had no business
+     with: the Shooting skill "Nimble" showed the Barbary Monkey's special rule,
+     and "Skink Hunter" or "Wyrdstone Hunter" showed the Hunter skill. An exact
+     name in a curated skill list is the better answer than a fuzzy match. */
+  const i=itemInfo(nm)||skillInfo(nm)||abilityInfo(nm)||spellInfo(nm); if(!i) return null;
   return `<div class="itip-h">${i.name||nm}</div>`+
          (i.line?`<div class="itip-l">${i.line}</div>`:'')+
          `<div class="itip-b">${i.text}</div>`;}

@@ -1,8 +1,50 @@
 # History
 
-Not a changelog — a short account of how this thing actually grew, and why it
-looks the way it does. Kept in the repo instead of scattered across chat logs,
+Not a changelog — an account of how this thing actually grew, and why it looks
+the way it does. Kept in the repo instead of scattered across chat logs,
 because "why is it built this way" is usually more useful than "what changed".
+
+## Why this exists
+
+My group plays Mordheim on Tabletop Simulator. Mordheim is a game from 2000
+whose rules survived through community effort: mordheimer.net keeps the
+canonical compilation, two big FAQs patch the arguments, and half the useful
+tooling is abandoned or predates the compiled rules. What I wanted didn't
+exist: a roster tool that treats those community sources as strict authority
+(with the FAQs overriding everything), tracks a whole campaign rather than a
+single list — experience, injuries, deaths, gold that actually adds up — and
+exports straight to the table: TTS description cards, the official PDF sheet,
+a readable text that carries its own save. And because we're a group of
+friends playing a twenty-year-old game, house rules had to be a feature, not
+a fork: toggles that are off by default and get declared on export, never
+silent edits to the rules data.
+
+## How it's built (method)
+
+This project is developed **with an AI assistant writing most of the code** —
+worth stating plainly, because the interesting part is the working method
+that makes that reliable rather than reckless. The division of labour: I own
+the product decisions, the rules interpretation and the auditing; the
+assistant implements, and nothing lands without verification. Concretely:
+
+- **A fixed hierarchy of truth.** mordheimer.net first; the Ultimate FAQ and
+  the FAQ from Toumas override it; the original rulebook fills the gaps. When
+  a rule was ambiguous, we went to the source and read it — several entries
+  below record cases where my own assumption (or the assistant's) lost the
+  argument against the printed table.
+- **Every fix arrives with its regression test.** The suite grew from 0 to 20
+  files this way; each test is a bug that once existed and can never come
+  back unnoticed. The build is verified too: a parity test proves the bundled
+  single file behaves identically to the modular sources.
+- **Changes are applied as anchored patches** — each edit asserts the exact
+  code it expects to replace and refuses to run otherwise. On a codebase this
+  size that discipline has repeatedly turned "silently patched the wrong
+  place" into a loud, harmless error.
+- **Session rhythm:** edit sources → syntax-check (`node --check`) → run the
+  logic tests against a stubbed DOM → rebuild the single file → concise
+  report. This file is the running record of those sessions, including the
+  wrong turns — the reverted "fix", the accounting hole, the CSS that ended
+  up red-on-red — because the wrong turns are where the understanding shows.
 
 ## June 2026 — a single HTML file
 
@@ -71,11 +113,6 @@ A few loose ends from the split:
   *recruitment* order instead of the warband's fixed roster order, so e.g. a
   Marauder Chieftain recruited after a Seer would print below him instead of
   above, as the roster listing requires.
-
-## What's next
-
-See the Roadmap section in `README.md` — remaining warband audits, the Rare
-Items / Trading Post feature, and further Tabletop Simulator export work.
 
 ## July 16, 2026 (cont.) — splitting app.js: state & engine
 
@@ -626,3 +663,300 @@ carried at the time. Heavy armour with helmet and shield therefore reads Sv 5+,
 not 4+.
 
 `test/naming-and-tts.mjs` added; suite 23/23.
+
+## July 18, 2026 — gold that drifts: the henchman experience surcharge
+
+The first bug found by *playing* rather than by testing: a warband's gold in
+hand crept into the red as its henchmen gained experience — and nudging the
+gold field by hand put it back. Classic sign of two accounting models
+fighting each other.
+
+The rule at fault (mordheimer, Trading): recruiting into an experienced
+henchman group costs 2 gc per experience point the recruit adds to the
+warband's total — veterans are hard to find, raw recruits are not. The first
+implementation folded that surcharge into `modelUnitCost`, which *repriced
+every man already in the group* each time the group earned experience. Since
+gold in hand is the treasury less what the warband owns, five Verminkin
+picking up 4 XP each silently pushed the gold 40 gc into the red; editing the
+gold figure re-synced the treasury and hid the evidence.
+
+The fix is conceptual, not cosmetic: the surcharge is the price of taking
+*another* man on, not a revaluation of men already serving. It is now charged
+once, at the moment the group grows, and recorded on the group as `xpPaid` —
+never re-derived from current experience. An earlier variant of the same
+disease was found in the Fallen accounting (a loss figure derived on read but
+never balanced on write) and fixed the same way: record the value once, at
+the moment it changes hands.
+
+Also in this pass: the ability scanner's fuzzy regexes were claiming skill
+names they had no business with (the Shooting skill "Nimble" showed a
+monkey's special rule). Exact names in the curated lists now win over fuzzy
+matches. `test/costs-and-tooltips.mjs` pins all of it; suite 19/19.
+
+## July 19, 2026 — bookkeeping sweep on master
+
+A list of in-play findings, all in the money-and-roster layer, fixed together
+because they share one principle: **experience is not gold, and death is not
+income.**
+
+- **Fallen losses show real gold only.** The "gc lost" figure is recomputed
+  from the death snapshot — the man, his gear, any recruit surcharge actually
+  paid for him — never a revaluation of his experience (records written by
+  older versions displayed the inflated figure). Lost experience is reported
+  separately, and only the part *earned in play*: a leader who starts at 20 XP
+  and dies at 23 lost 3 XP, not 23.
+- **The surcharge dies with the last man.** When a henchman group emptied,
+  its `xpPaid` vanished from the books and gold in hand *rose* — the tool was
+  refunding the veteran premium at the funeral. The remaining surcharge now
+  leaves with the last casualty (settled against the treasury), and the LIFO
+  undo brings it back. A test asserts that no death, and no undo, ever moves
+  gold in hand.
+- **Saved gold is adopted verbatim.** Every export now carries `goldNow`, the
+  figure as displayed when saving; import sets it directly instead of
+  re-deriving it from the imported models — so a data or price change between
+  versions can never shift a saved warband's money. (We trust the importer's
+  file; we're friends.)
+- **The roster sidebar tells the truth about ranks.** A Lad's-Got-Talent
+  promotion now files under Heroes as "Hero Verminkin" instead of hiding in
+  the henchman tally, and vehicles get their own section — in the sidebar and
+  the readable text export alike (the PDF was already correct). Vehicles also stopped adding +5 to the Warband Rating: a wagon is
+  equipment, not a warrior.
+- **Assorted honesty in the UI:** the Rare/Trading-Post section no longer
+  snaps shut on every change (its open state was never remembered), the
+  promote button and chosen skill-category chips are no longer dark-red text
+  on a dark-red ground, henchman subtotals show the group's veteran value
+  with a tooltip explaining that gold still counts what was paid, and the
+  last German strings left the UI (the project language is English).
+
+`test/master-fixes.mjs` added; suite 20/20.
+
+## July 20, 2026 — injuries that act, and a second number for the warband
+
+Two things a paper roster quietly relies on the player to get right, now done
+by the tool.
+
+**Serious injuries with consequences actually execute them.** Until now,
+"Robbed" was a text chip — and the natural next step, unticking the stolen
+equipment, *refunded its price*, because removing gear normally returns its
+cost to hand. Robbery-by-checkbox was profitable. The fix is a settled strip:
+the gear goes AND the same amount leaves the treasury in the same breath, so
+gold in hand doesn't move a single coin. On that foundation, the acting
+results of the injury chart (verified against mordheimer's Campaigns page)
+now play out when applied: **Robbed** takes everything; **Sold to the Pits**
+asks how the pit fight went — a win pays 50 gc and +2 XP, a loss strips
+weapons and armour only (miscellaneous gear survives, per the actual rule)
+and reminds you to roll 11–35 separately; **Captured** offers ransom (paid
+from the treasury), exchange, or the settled one-way trip to the Fallen;
+**Deep Wound** asks for the D3 and books the missed games; **Survives Against
+the Odds** grants its +1 XP instead of just saying it would.
+
+**Warband Worth.** The official Rating counts heads and experience — by
+design it ignores equipment entirely, so a naked warband and a
+gromril-armoured one can rate identically. The sidebar now shows a second
+figure alongside it: everything the warband is worth in gold. Warriors with
+all their gear and rare items (henchmen at veteran value, 2 gc per XP earned
+in play, per model), the investment in Hired Swords and Dramatis Personae,
+plus gold in hand; wyrdstone excluded, since its sale price depends on when
+you sell. The pleasing property that makes it trustworthy — and testable:
+buying equipment doesn't change Worth. The gold simply turns into gear.
+Vehicles, worthless to the Rating, are of course worth their price here.
+
+Tests extended for every injury path (each asserted gold-neutral or
+correctly priced) and for Worth's conservation property; suite 20/20.
+
+Also cut in this commit: the **Newrecruit/BattleScribe JSON export**. It was
+always best-effort — the schema fit, but Newrecruit.eu's importer expects its
+internal per-warband catalogue IDs, so a direct import was never guaranteed —
+and an export that *might* work is a support question waiting to happen. The
+tool now offers exactly two formats, both fully owned: the tool's own JSON
+and the readable text (which embeds that JSON anyway). Less surface, no
+half-promises.
+
+## July 20, 2026 — Worth, second draft: from wealth to market value
+
+The first cut of Warband Worth summed *paid* prices plus gold in hand — a
+wealth figure with a pleasing conservation property (buying gear didn't move
+it, gold merely changed form). Then the actual question it exists to answer
+was put more sharply: **is this matchup fair?** Two warbands of equal Rating
+can differ wildly in equipment, and that is the false impression the figure
+should correct. Against that goal the first draft had two flaws. Paid prices:
+a found sword, or a Kislevite heirloom at half price, cuts exactly as well as
+one bought at list — what was paid is history, not strength. And gold in
+hand: coins don't fight, so counting them let a rich naked warband look equal
+to a poor equipped one — the Rating problem reproduced in a new number.
+
+Worth is now the **market value of the fielded force**: every warrior with
+all his gear, rare items and mutations at list prices (the free founding
+dagger counts as a dagger, the heirloom discount is ignored, dice-priced
+items like "25+2D6" count at their expected value; only upgrade-style prices
+that depend on their host weapon fall back to what was paid), henchmen with
+their veteran premium, Hired Swords and Dramatis Personae included, cash and
+wyrdstone excluded. The conservation property flipped into the honest
+version: buying a sword now *raises* Worth by the sword's list price, and
+editing the gold figure doesn't move it at all — both pinned by tests.
+
+A definition changing one day after shipping is the method working as
+intended: the number existed, the group looked at it, the mismatch between
+"what it measures" and "what we ask it" surfaced immediately, and the fix is
+a paragraph of rationale plus a test that encodes the new meaning.
+
+## July 20, 2026 — Worth, third draft: hands, steps, and veterans
+
+Playgroup feedback sharpened the metric twice more, both times in the same
+direction: measure *fielded power*, not inventory.
+
+**Hands, not backpacks.** A warrior carrying a zweihander, two swords and a
+spare axe was priced as if he swung all four at once. Now only the active
+loadout counts fully — two one-handed melee weapons or one two-handed
+(whichever combination is worth more), plus one missile weapon — and every
+further weapon counts half: it is a genuine option he can switch to each
+combat round, but never wielded simultaneously. Handedness isn't hardcoded;
+it is read from the same rules text the tooltips show, so a weapon added to
+the catalogue tomorrow sorts itself. A nice side effect: the free founding
+dagger, being cheap, naturally lands in the half-counted backup pool — which
+is exactly what a backup dagger is.
+
+**Experience for everyone, steps on top.** The veteran premium (2 gc per XP
+earned in play) had only been applied to henchmen, because only they have an
+official market price. Heroes now borrow the same rate — and on top, every
+advance *milestone* reached adds a small fixed bonus (5 gc, a named constant,
+tunable). The reasoning is worth recording: the 2 gc rate already averages
+advances in (a henchman group at 9 XP costs 18 gc extra and owns three
+advances), so a large bonus would double-count; but power genuinely arrives
+in steps, and a hero one XP past a threshold should visibly outweigh one a
+point short. The bonus is deliberately modest for exactly that reason.
+Hired Swords count their experience the same way; Dramatis Personae are
+fixed and don't.
+
+Known, accepted gaps — recorded so they're decisions rather than oversights:
+serious injuries don't subtract yet (a hero at −1 Toughness is worth less
+than his gear says), all advances are priced equally (a spell is not +1 Ld),
+Hired-Sword equipment still counts at what was paid, duplicate armour isn't
+deduplicated, and the Gunnery School's brace discount is ignored in Worth —
+two pistols are two pistols, power-wise. Injuries-as-negatives is the most
+likely next refinement.
+
+Tests pin the new behaviour: a third sword adds exactly half its price, the
+dual-wield-vs-zweihander choice picks the better pair, one missile weapon is
+active, and crossing a milestone is worth the XP point plus the bonus while
+starting experience stays free. Suite 20/20.
+
+## July 20, 2026 — Worth, fourth draft: points, outcomes, and half a shield
+
+Three more turns of the same crank, all from playgroup review of the third
+draft.
+
+**Points, not gold.** Worth prices things in terms of market gold but
+measures fielded power — so it is now a unitless points figure like the
+Rating, not a gc amount. Small change, honest label.
+
+**Outcomes, not progress.** The exp-plus-milestone pricing was replaced
+wholesale: advancement now counts by what actually landed on the profile.
+Each applied stat advance is +5 points; each acquired skill or spell +10 —
+hero privileges, chosen rather than rolled and never wasted on a capped
+stat, hence double weight; each stat point lost to a serious injury is −5,
+which quietly closes the biggest gap flagged in the last entry (a hero at −1
+Toughness is finally worth less than his gear says). Raw experience dropped
+out entirely: it is progress toward power, not power, and pricing both the
+XP and its outcomes double-counts. Deliberately coarse on purpose — Ld on a
+close-combat brute is still a stat; chasing battle-situational precision was
+explicitly not the goal. A henchman group advance multiplies by group size
+on its own, since Worth is per model × qty: +1 S for three swordsmen is
+three improved warriors.
+
+**Half a shield, whole a horse.** Shields and bucklers joined the hand-slot
+logic — with the lowest carry priority. The first cut counted them flat half;
+review immediately produced the counter-example: a warrior with only a dagger
+*has* a free arm, and the shield on it is no backup. So weapons claim the two
+hand slots first (best pair or zweihander, as before), and only if a hand
+remains free does the most expensive shield slot in at full value — dagger +
+shield full, dagger + sword + shield half, zweihander + shield half, and
+never more than one shield on an arm. Shields deliberately bypass the price
+ordering: a warrior does not leave his sword sheathed because his shield cost
+more. Mounts and vehicles count at full price:
+their abilities are what the listing price buys. And the rounding question
+got the obvious answer: everything sums unrounded (backup weapons and
+shields carry exact halves) and one single round happens at the very end —
+per-item rounding would compound.
+
+Tests: dagger-plus-two-swords counts 21 not 22, the shield slot logic is
+pinned case by case (dagger+shield full, sword pair+shield half, zweihander
+half, one arm only), outcome pricing (±5/10/10) is pinned including the
+injury-cancels-advance case, a group advance pays per man, a mount found
+dynamically in the warband data counts full, the wagon is worth its 180, and
+Worth is always a whole number produced by a single final round. Suite 20/20.
+
+## July 20, 2026 — the wagon that was a Large Creature
+
+A one-line bug report from the printed sheet — "Large Creature (1): 20" on a
+warband whose only oversized possession is a cart — that unravelled into
+three fixes, a nice illustration of why bug reports deserve a look past the
+symptom.
+
+The sheet counted Large creatures by text-matching /large/i against each
+unit's rules blurb. That caught the Trade Wagon (whose rules discuss it as a
+Large *target*) — and, on inspection, also the Ogre Maneaters' Youngblood and
+Half-grown, whose rules say, verbatim, "is NOT a Large Target". Text-matching
+a rules paragraph for a boolean is asking for exactly this. The count now
+uses the same `def.large` flag the rating engine has always used
+(`totalLarge()`), so the sheet and the rating can never disagree again.
+
+While in there, the sheet's arithmetic got reconciled with the rulebook.
+Mordheimer, Warband Rating: rating is warriors ×5 plus experience, and
+"Large creatures such as Rat Ogres are worth 20 points" — worth 20 *instead
+of* 5, which the engine already implemented. But the sheet printed ALL
+members ×5 and then Large ×20 on top, so its line items summed to 5 more per
+Large creature than the printed total. The members line now excludes Large
+creatures; the breakdown adds up to the rating again.
+
+Tests pin all three: the wagon and the not-Large youths count zero, a
+genuinely flagged Large creature counts per model, and Large rates 20 flat.
+Suite 20/20.
+
+## July 20, 2026 — reading the word "NOT"
+
+Same day, same bug family, one layer up. The Ogre Maneaters' Half-grown was
+still being shown as a Large Target — this time not by the PDF but by the
+ability scanner, the thing that reads each unit's free rules text and offers
+keyword chips for the terms it finds. The unit's rules say, in full: "Causes
+Fear but is NOT a Large Target." The scanner matched the words and ignored
+the sentence.
+
+The fix is a general one rather than another special case — and the state of
+the code argued for it: the Hired-Sword scanner had already accumulated
+hand-patched exceptions ("not a wizard", "immune to fear"), which is what a
+missing rule looks like when you keep treating its symptoms. Rules text is
+now split into clauses and a keyword only counts if at least one clause
+mentioning it does not deny it. Three details decide whether this helps or
+hurts:
+
+* **Contrast conjunctions split.** "Causes Fear but is NOT a Large Target"
+  must keep Fear and drop Large Target. Splitting on "but", "however",
+  "although" and friends is what makes that possible; naive per-sentence
+  handling would have dropped both.
+* **Dashes split.** The Clan Skryre Rat Ogre reads "Not truly alive - immune
+  to psychology". Without treating the dash as a boundary, the denial in the
+  first half would have suppressed a rule the model genuinely has — the fix
+  would have introduced a worse bug than the one it repaired.
+* **"never" is not a denial.** The Gigantic Spider "never gains experience
+  (animal)" — it *is* an Animal. Only "not" and "n't" count. Likewise
+  "immune to X" is a rule *about* X worth showing, not a claim that X is
+  absent, so immunity chips survive.
+
+Measured against the full data set before shipping: 21 chips removed out of
+689, 668 untouched. Every removal was inspected by hand. The list is
+satisfying — the Orc Nuttaz who "does not suffer Animosity", the Chaos Dwarf
+Informer "not subject to Hard Head, Hard to Kill", the Night Goblin Fanatic
+"not affected by Animosity or Hate Stunties", and Aksho'akhash, who is
+pointedly "NOT immune to psychology" and was being advertised as immune.
+
+One removal came from a bug nobody was looking for. The Foole lost "Immune
+to Poison" — because two of the 178 keyword patterns use a wildcard
+(`immune.*poison`), and his text contains "immune to all Psychology tests"
+in one sentence and "Poison Ring" — an *attack* — in another. The wildcard
+happily spanned them. Clause splitting kills that class of match as a side
+effect: a pattern that only matches across a sentence boundary now matches
+nothing. Six genuinely poison-immune characters kept their chip.
+
+Tests pin all of it, including the two cases where the fix could have gone
+wrong: the but-clause pair and the dash clause. Suite 20/20.

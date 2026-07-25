@@ -1,14 +1,14 @@
 /* Mordheim Roster Builder — Anwendungslogik.
    Daten liegen in ../data/*.js. build.js fügt alles wieder zu EINER HTML
    zusammen (Offline-/Single-File-Variante). */
-import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, NR_CAT, NR_T, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
+import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
 import { exportOfficialSheet, defaultWarbandName } from './pdf.js';
 import { ttsOpen, ttsOpenMember, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
    render/action code below can call it, and re-exported so the window bindings
    at the bottom still expose these to inline onclick handlers. */
-import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
-export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
+import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelMarketValue, marketRarePrice, eqMarketValue, isTwoHanded, _loadoutValue, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
+export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
 /* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
 import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild } from './info.js';
 export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild };
@@ -319,13 +319,37 @@ export function skillChipRow(names,label,e){ if(!names||!names.length) return ''
     return t?`<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${nm.replace(/'/g,"\\'")}</b><br>${t}',false,300)" onmouseleave="hideItip()">${nm} \u24d8</span>`
             :`<span class="kwchip kw-plain">${nm}</span>`; };
   return `<div class="abil-sk"><b>${label||'Skills'}:</b> ${names.map(chip).join('')}</div>`; }
+/* ---- keyword scanning must respect negation ----
+   The ability scanner looks for rule keywords in a unit's free rules text.
+   Plain substring matching claims the opposite of what the text says whenever
+   a rule is DENIED: the Ogre Maneaters' Half-grown "is NOT a Large Target",
+   the Orc Nuttaz "does not suffer Animosity", Aksho'akhash "is NOT immune to
+   psychology". So the text is cut into clauses and a keyword only counts if
+   at least one clause mentioning it does not negate it.
+   Clause boundaries are sentence enders, dashes and contrast conjunctions —
+   the dash matters: "Not truly alive - immune to psychology" would otherwise
+   let the first half suppress a rule the model genuinely has.
+   Only "not"/"n't" count as negation, deliberately: "never gains experience
+   (animal)" still makes it an Animal, and "immune to X" is a rule ABOUT X
+   worth showing, not a denial that X applies. */
+export function abilityMentioned(re, text){
+  const cl=String(text||'').replace(/<[^>]*>/g,' ')
+    .replace(/([.;:!?])\s+/g,'$1\u0001').replace(/\s+[-\u2013\u2014]\s+/g,'\u0001')
+    .replace(/\s+(?:but|however|although|though|whereas|while|except)\s+/gi,'\u0001')
+    .split('\u0001');
+  for(const c of cl){ const i=c.search(re); if(i<0) continue;
+    if(!/\b(?:not|n't)\b/i.test(c.slice(0,i))) return true; }
+  return false;   // absent, or mentioned only where it is denied
+}
 export function hsAbilitySection(hs,rec){
   const pers=(rec&&hs.personas&&typeof hsPersona==='function')?hsPersona(rec,hs):null;
   const sp=[(pers&&pers.sp)||'',hs.sp||''].filter(Boolean).join(' ');
   let found=[]; const seen=new Set();
-  for(const [re,info] of ABILITYINFO){ if(re.test(sp) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
+  for(const [re,info] of ABILITYINFO){ if(abilityMentioned(re,sp) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
   if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
-  if(/not a wizard/i.test(sp)) found=found.filter(f=>f.name!=='Wizard');
+  // "not a wizard" is handled by abilityMentioned now. This one stays: being
+  // immune to Fear is not a denial that the word appears, it is a different
+  // rule — and a model that only RESISTS fear does not CAUSE it.
   if(/immune to fear/i.test(sp) && !/causes? fear|fearsome/i.test(sp)) found=found.filter(f=>f.name!=='Fear');
   const skFound=skillChipsIn(sp).filter(n=>!seen.has(n));
   const chip=(label,lookup)=>{ const esc=String(lookup).replace(/'/g,"\\'"); return `<span class="kwchip" tabindex="0" onmouseenter="showItip(this,'${esc}')" onmouseleave="hideItip()" onfocus="showItip(this,'${esc}')" onblur="hideItip()" onclick="toggleItip(event,this,'${esc}')">${label} \u24d8</span>`; };
@@ -524,7 +548,7 @@ export function hsRosterCards(){
         ${hsSpellSection(h,hs)}
         ${hsAdvSection(h,hs)}
         ${hsEqSection(h)}
-        <div class="subtotal">${hs.hire} GK</div>
+        <div class="subtotal">${hs.hire} gc</div>
       </div></div>`;
   }).join('');
 }
@@ -588,7 +612,7 @@ export function dpRosterCards(){
         ${hsOptSection(d,dp)}
         ${hsSpellSection(d,dp)}
         ${hsEqSection(d)}
-        <div class="subtotal">${dp.hire>0?dp.hire+' GK':'\u2014'}</div>
+        <div class="subtotal">${dp.hire>0?dp.hire+' gc':'\u2014'}</div>
       </div></div>`;
   }).join('');
 }
@@ -2117,13 +2141,15 @@ export function renderPicker(){
     p.appendChild(grid);
     if(g==="1a" && PENDING_1A.length){
       const note=document.createElement('div'); note.className='pending';
-      note.innerHTML="<b>Folgt (Werte werden geprüft):</b> "+PENDING_1A.join(" · ")+
-        "<br><span class='note'>Online kursieren für diese teils inoffizielle Homebrew-Werte; ich baue nur die geprüften offiziellen Listen ein.</span>";
+      note.innerHTML="<b>Coming (values under review):</b> "+PENDING_1A.join(" · ")+
+        "<br><span class='note'>Partly unofficial homebrew values circulate online for these; only the verified official lists are included.</span>";
       p.appendChild(note);
     }
   });
 }
+function hideWelcome(){ const w=document.getElementById('welcome-view'); if(w) w.style.display='none'; }
 export function chooseWb(key){
+  hideWelcome();
   // A blank name makes every export and every campaign list read "warband".
   // Defaulting to the type gives something sensible that can still be renamed.
   const defName=WARBANDS[key].name;
@@ -2138,6 +2164,22 @@ export function chooseWb(key){
 export function backToPicker(){
   document.getElementById('builder-view').style.display='none';
   document.getElementById('picker-view').style.display='block';
+}
+/* ---- welcome screen ---- */
+export function welcomeNew(){ hideWelcome(); document.getElementById('picker-view').style.display='block'; }
+export function welcomeImport(){ openImport(); }
+/* Saved rosters straight on the welcome screen, so "continue where I left
+   off" is one click instead of New -> some warband -> Load. Quietly absent
+   when storage is unavailable or empty. */
+export async function renderWelcome(){
+  const wrap=document.getElementById('welcomecontinue'), box=document.getElementById('welcomelist');
+  if(!wrap||!box) return;
+  let keys=[];
+  try{ const r=await window.storage.list('mh:',false); keys=(r&&r.keys)||[]; }catch(e){}
+  if(!keys.length){ wrap.style.display='none'; return; }
+  box.innerHTML=keys.map(k=>{const nm=k.replace(/^mh:/,''); const esc=nm.replace(/'/g,"\\'").replace(/</g,'&lt;');
+    return `<div class="row"><button class="tiny" onclick="loadRoster('${esc}')">Load</button><span>${nm.replace(/</g,'&lt;')}</span></div>`;}).join('');
+  wrap.style.display='block';
 }
 
 /* ===================== BUILDER SETUP ===================== */
@@ -2261,15 +2303,71 @@ export function setGoldCurrent(v){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
   S.stash.gold=Math.max(0,(Number(v)||0))+totalSpent(); render(); }
 export function adjGoldCurrent(d){ setGoldCurrent(goldCurrent()+d); }
 export function totalRating(){
+  /* Rating = 5 per warrior (20 for Large creatures) + all experience,
+     summed over the living warband; Hired Swords bring their own rating
+     (their 5-per-warrior is already included, per Tuomas FAQ) and Dramatis
+     Personae a fixed one. Vehicles are equipment, not warriors — no rating. */
   let r=0;
   S.models.forEach(m=>{
-    const def=unitDef(m.uid_def); const q=def.t==='hen'?m.qty:1;
-    const base=def.large?20:5;
-    r+=(base+ (def.t==='hero'?Number(m.exp||0):Number(m.exp||0)) )*q;
+    const def=unitDef(m.uid_def); if(!def||def.vehicle) return;
+    const q=def.t==='hen'?m.qty:1;
+    r+=modelRating(m)*q;
   });
   r+= (typeof hsRatingTotal==='function'?hsRatingTotal():0);
   r+= (typeof dpRatingTotal==='function'?dpRatingTotal():0);
   return r;
+}
+
+/* Warband Worth (gc): the MARKET value of the fighting force — the dimension
+   the official Rating deliberately ignores (Rating counts heads and
+   experience only, so a naked warband and a gromril-armoured one can rate
+   identically; that is exactly the false balance impression this figure is
+   for). Every warrior with all his gear, rare items and mutations at LIST
+   prices — a found sword or a half-price heirloom cuts just as well as one
+   bought at list, so what was paid is irrelevant here (modelMarketValue).
+   Henchmen add their veteran premium, 2 gc per XP earned in play per model —
+   the price the Trading rules themselves put on a seasoned recruit. Hired
+   Swords and Dramatis Personae count at their hire + equipment investment.
+   Gold in hand is deliberately EXCLUDED: coins don't fight, and counting them
+   would let a rich naked warband look equal to a poor equipped one — the
+   Rating problem all over again. Wyrdstone too: no fixed sale price. */
+/* Advancement component of Worth — priced by what actually LANDED on the
+   profile, not by experience. Raw XP is progress toward power, not power;
+   counting it as well as the outcomes would double-count, and "value at this
+   exact moment" precision is not the goal (a warrior's Ld, I or BS matter
+   whether or not this battle uses them — a stat is a stat). So: each applied
+   stat advance is worth WORTH_STAT_PTS, each acquired skill or spell (hero
+   privileges, chosen rather than rolled, never wasted on a capped stat)
+   double that, and each stat point LOST to a serious injury subtracts the
+   same 5 the advance would have added — a hero at −1 Toughness is worth less
+   than his gear says. Henchman group advances multiply by group size on their
+   own, since Worth is per model × qty: +1 S for three swordsmen is three
+   improved warriors on the table. */
+export const WORTH_STAT_PTS=5, WORTH_SKILL_PTS=10, WORTH_SPELL_PTS=10;
+export function worthAdvOf(m){
+  let p=0;
+  const adv=(m&&m.adv)||{};
+  for(const k in adv) p+=(Number(adv[k])||0)*WORTH_STAT_PTS;
+  ((m&&m.inj)||[]).forEach(j=>{ const mod=j.mod||{}; for(const k in mod) p+=(Number(mod[k])||0)*WORTH_STAT_PTS; });
+  p+=((m&&m.skills)||[]).length*WORTH_SKILL_PTS;
+  p+=((m&&m.spells)||[]).length*WORTH_SPELL_PTS;
+  return p;
+}
+export function warbandWorth(){
+  let w=0;
+  S.models.forEach(m=>{
+    const def=unitDef(m.uid_def); if(!def) return;
+    const hen=def.t==='hen'&&!isHeroModel(m);
+    const per=modelMarketValue(m)+worthAdvOf(m);
+    w+=per*(hen?(Number(m.qty)||1):1);
+  });
+  w+=(typeof hsHireTotal==='function'?hsHireTotal():0);
+  w+=(typeof hsEqTotal==='function'?hsEqTotal():0);
+  w+=(typeof dpHireTotal==='function'?dpHireTotal():0);
+  (S.hired||[]).forEach(h=>{ w+=worthAdvOf(h); });   // HS track adv/skills/spells the same way
+  // Everything above is summed unrounded (backup weapons and shields carry
+  // exact halves); one single round at the very end.
+  return Math.round(w);
 }
 
 /* ===================== RENDER ===================== */
@@ -2286,7 +2384,7 @@ export function statTable(p){
 export function renderAddMenu(){
   const wb=WARBANDS[S.wb]; const el=document.getElementById('addmenu');
   let html='';
-  [['hero','Helden'],['hen','Gefolge (Henchmen)'],['vehicle','Fahrzeug (zählt als Ausrüstung)']].forEach(([t,label])=>{
+  [['hero','Heroes'],['hen','Henchmen'],['vehicle','Vehicles (count as equipment)']].forEach(([t,label])=>{
     const us=wb.units.filter(u=> t==='vehicle' ? !!u.vehicle : (u.t===t && !u.vehicle)); if(!us.length) return;
     html+=`<div class="addgroup"><h2>${label}</h2>`;
     us.forEach(u=>{
@@ -2353,10 +2451,10 @@ export function eqSection(m){
   let html='';
   if(def.eq){
     const list=eqListFor(def);
-    html+=`<details class="eq" open><summary>Ausrüstung wählen (Waffen mit Anzahl, z. B. zwei Schwerter)</summary>`;
+    html+=`<details class="eq" open><summary>Choose equipment (weapons by quantity, e.g. two swords)</summary>`;
     if(S.wb==='kislev'&&def.id==='capt'){
       const owned=Object.keys(m.eq||{}).filter(k=>m.eq[k]>0);
-      html+=`<div class="note no-print">Erbstück (Gründung: 1 Item zum halben Preis): <select onchange="setHeirloom(${m.uid},this.value)"><option value="">—</option>${owned.map(nm=>`<option value="${nm}"${m.heirloom===nm?' selected':''}>${nm}</option>`).join('')}</select>${m.heirloom&&heirloomDiscount(m)>0?` −${heirloomDiscount(m)} gc (Ersatz später: 150%)`:''}</div>`;
+      html+=`<div class="note no-print">Heirloom (founding: one item at half price): <select onchange="setHeirloom(${m.uid},this.value)"><option value="">—</option>${owned.map(nm=>`<option value="${nm}"${m.heirloom===nm?' selected':''}>${nm}</option>`).join('')}</select>${m.heirloom&&heirloomDiscount(m)>0?` −${heirloomDiscount(m)} gc (later replacement: 150%)`:''}</div>`;
     }
     const _eqgroups=[];
     for(const cat in list){
@@ -2440,9 +2538,9 @@ export function eqSection(m){
     ['cc','missile','bp','armour','misc'].forEach(c=>{ const grp=elig.filter(it=>it.cat===c); if(!grp.length) return;
       opts+=`<optgroup label="${CATLBL[c]}">`+grp.map(it=>{ const up=UPGRADES[it.de]; const half=(!up && typeof itemHalfActive==='function' && itemHalfActive(it.en)); const cost=up?up.note:(typeof it.cost==='number'?(half?Math.floor(it.cost*0.5):it.cost)+' gc':it.cost); const rar=(it.rare&&it.rare!=='Common'&&it.rare!=='—')?' · '+it.rare:''; const tag=(up?' ⤴ Upgrade':'')+(half?' · ½ campaign':'');
         return `<option value="${String(it.de).replace(/"/g,'&quot;')}">${it.en}${tag} — ${cost}${rar}</option>`; }).join('')+`</optgroup>`; });
-    html+=`<details class="eq"><summary>Rare Items / Trading Post (Kategorie-gefiltert)</summary>`;
-    html+=`<div class="note">Angeboten werden nur Gegenstände, deren <b>Kategorie</b> die Einheit laut Startausrüstung führen darf (Sonstiges nur für Helden). Warband-/Raritäts-Beschränkung bitte selbst beachten; Preis ggf. anpassen (Würfelpreise wie „25+1D6").</div>`;
-    html+=`<div class="eqitem"><select class="no-print" style="flex:1;min-width:0" onchange="addRare(${m.uid},this.value);this.selectedIndex=0;"><option value="">+ Gegenstand hinzufügen …</option>${opts}</select></div>`;
+    html+=`<details class="eq" ${m._rareOpen?'open':''} ontoggle="setRareOpen(${m.uid},this.open)"><summary>Rare Items / Trading Post (category-filtered)</summary>`;
+    html+=`<div class="note">Only items whose <b>category</b> the unit may carry per its starting equipment list are offered (Misc: Heroes only). Mind warband/rarity restrictions yourself; adjust the price if needed (dice prices like "25+1D6").</div>`;
+    html+=`<div class="eqitem"><select class="no-print" style="flex:1;min-width:0" onchange="addRare(${m.uid},this.value);this.selectedIndex=0;"><option value="">+ Add item …</option>${opts}</select></div>`;
     const r=m.rare||{}; const keys=Object.keys(r); const vkeys=keys.filter(de=>!inlineUpgradeActive(de));
     if(vkeys.length){
       html+=`<div class="eqgrid">`;
@@ -2451,19 +2549,19 @@ export function eqSection(m){
         if(isUpgrade(de)){
           const tg=upgradeTargets(m,de); const cur=e.on||(tg[0]&&tg[0].nm)||'';
           const sel=tg.map(w=>`<option value="${w.nm.replace(/"/g,'&quot;')}" ${w.nm===cur?'selected':''}>${enItem(w.nm)}</option>`).join('');
-          html+=`<div class="eqitem qty rrow"><span class="eqnm">${nm}${ii} → <select class="no-print" style="max-width:140px" onchange="setRareTarget(${m.uid},'${esc}',this.value)">${sel}</select><span class="stashq-print"> auf ${cur?enItem(cur):'—'}</span></span>
+          html+=`<div class="eqitem qty rrow"><span class="eqnm">${nm}${ii} → <select class="no-print" style="max-width:140px" onchange="setRareTarget(${m.uid},'${esc}',this.value)">${sel}</select><span class="stashq-print"> on ${cur?enItem(cur):'—'}</span></span>
             <span class="pr"><input type="number" min="0" value="${Number(e.paid)||0}" class="no-print" style="width:52px" onchange="setRarePaid(${m.uid},'${esc}',this.value)"> gc<span class="stashq-print">${Number(e.paid)||0} gc</span></span>
-            <button class="advx no-print" title="entfernen" onclick="removeRare(${m.uid},'${esc}')">✕</button></div>`;
+            <button class="advx no-print" title="remove" onclick="removeRare(${m.uid},'${esc}')">✕</button></div>`;
         } else {
           html+=`<div class="eqitem qty rrow"><span class="eqnm">${nm}${ii}</span>
             <span class="qtyctl"><button class="qbtn no-print" onclick="setRareQty(${m.uid},'${esc}',${q-1})">−</button><span class="qn">${q}</span><button class="qbtn no-print" onclick="setRareQty(${m.uid},'${esc}',${q+1})">+</button></span>
             <span class="pr"><input type="number" min="0" value="${Number(e.paid)||0}" class="no-print" style="width:52px" onchange="setRarePaid(${m.uid},'${esc}',this.value)"> gc<span class="stashq-print">${Number(e.paid)||0} gc</span></span>
-            <button class="advx no-print" title="entfernen" onclick="removeRare(${m.uid},'${esc}')">✕</button></div>`;
+            <button class="advx no-print" title="remove" onclick="removeRare(${m.uid},'${esc}')">✕</button></div>`;
         }
       });
       html+=`</div>`;
       const parts=vkeys.map(de=>{ const it=CATALOG.find(x=>x.de===de); const q=Number(r[de].q)||1; const _rr=(HR().showRarity&&it&&it.rare&&it.rare!=='Common'&&it.rare!=='—')?` (${it.rare})`:''; const nm=(it?it.en:de)+_rr;
-        if(isUpgrade(de)) return `${nm}${r[de].on?` (auf ${enItem(r[de].on)})`:''}`;
+        if(isUpgrade(de)) return `${nm}${r[de].on?` (on ${enItem(r[de].on)})`:''}`;
         return q>1?`${q}× ${nm}`:nm; });
       html+=`<div class="eqchosen"><b>Rare:</b> ${parts.join(', ')}</div>`;
     }
@@ -2484,8 +2582,9 @@ export function abilitySection(def, m){
   const acquired=(m&&m.skills)||[]; const muts=(m&&m.mut)||[];
   const scan = sp+' '+muts.map(mutEN).join(' ');   // innate special rules + mutations/blessings (translated to EN so ABILITYINFO matches; acquired skills are shown separately)
   let found=[]; const seen=new Set();
-  for(const [re,info] of ABILITYINFO){ if(re.test(scan) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
+  for(const [re,info] of ABILITYINFO){ if(abilityMentioned(re,scan) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
   if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
+  if(/immune to fear/i.test(scan) && !/causes? fear|fearsome/i.test(scan)) found=found.filter(f=>f.name!=='Fear');
   // which special skill list(s) this unit can draw from
   const stdCats=['combat','shooting','academic','strength','speed']; const sets=[]; const setseen=new Set();
   (def.sk||[]).forEach(c=>{ if(!stdCats.includes(c)&&SKILLSETS[c]&&!setseen.has(c)){ setseen.add(c); sets.push(SKILLSETS[c]); } });
@@ -2652,7 +2751,13 @@ export function killHenchMember(u,i){ const m=S.models.find(x=>x.uid===u); if(!m
   // Only a man who was actually given a name is remembered by one; a positional
   // default like "Verminkin 2" says nothing and would clutter the Fallen list.
   if(memberNamed(m,i)) snap.name=who;
-  const rec={kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap, memberIdx:i};
+  /* The recruit surcharge (xpPaid) belongs to the GROUP: an ordinary death
+     leaves it on the group's books, and only when the LAST man falls does the
+     remainder go with him, so emptying the group does not hand that gold back.
+     The value he was worth is settled against the treasury here, once. */
+  const _last=(memberCount(m)-1)<=0;
+  snap.xpPaid=_last?(Number(m.xpPaid)||0):0;
+  const rec={kind:'hench', uid_def:m.uid_def, exp:Number(m.exp)||0, m:snap, memberIdx:i, lostValue:loseValueOnDeath(snap)};
   if(memberNamed(m,i)) rec.memberName=who;
   S.fallen=S.fallen||[]; S.fallen.push(rec);
   m.qty=memberCount(m)-1;
@@ -2845,18 +2950,37 @@ export function missAdj(u,d){ const m=S.models.find(x=>x.uid===u); if(!m) return
    Heroes render as individual read-only cards; henchmen are grouped in the UI
    by type (then by exp+equipment). A single LIFO "undo last death" reverses the
    most recent entry (repeat to walk further back) — no per-unit selection. */
+/* A warrior who falls takes his worth with him - himself and everything he was
+   carrying. That is taken out of the treasury once, here, and the amount is
+   written onto the Fallen record so it can be shown and given back exactly if
+   the death is undone. Gold in hand is never derived from the Fallen list:
+   doing that made every figure entered by hand silently lose the same amount
+   again, and the treasury drifted negative. */
+export function loseValueOnDeath(snapshot){
+  const lost=lossValueOf(snapshot);
+  if(lost>0){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+    // the treasury may still be the untouched starting sum; make it real first
+    S.stash.gold=Math.max(0, goldTreasury()-lost); }
+  return lost; }
+export function restoreValueOnUndo(rec){
+  const back=Number(rec&&rec.lostValue)||0;
+  if(back>0){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+    S.stash.gold=goldTreasury()+back; }
+  return back; }
 function _fallenSnapshot(m){ return JSON.parse(JSON.stringify(m)); }
 export function fallenEqSig(m){ // canonical signature: same type+eq+adv+skills+mut+exp => identical
   const eq={}; for(const k in (m.eq||{})) if(m.eq[k]) eq[k]=m.eq[k];
   const rare={}; for(const k in (m.rare||{})) rare[k]=m.rare[k];
   return JSON.stringify([m.uid_def, Number(m.exp)||0, eq, rare, (m.mut||[]).slice().sort(), (m.skills||[]).slice().sort(), m.adv||{}]);
 }
-export function killHero(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
-  S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:_fallenSnapshot(m)});
+export function killHero(u,msg){ const m=S.models.find(x=>x.uid===u); if(!m) return;
+  const snap=_fallenSnapshot(m);
+  S.fallen=S.fallen||[]; S.fallen.push({kind:'hero', m:snap, lostValue:loseValueOnDeath(snap)});
   if(m.uid===S.leaderUid) S.leaderUid=null;
   const _cas=noteCasualtyOutcome(m,'dead');
   if(_cas) _cas.fallenId=S.fallen.length-1;   // ties the record to the Fallen entry
-  else logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
+  if(msg) logEvent('death',msg,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
+  else if(!_cas) logEvent('death',`${m.name||unitDef(m.uid_def).name} (${unitDef(m.uid_def).name}) was slain.`,{uid:m.uid,name:m.name||unitDef(m.uid_def).name,uid_def:m.uid_def,exp:Number(m.exp)||0,hero:true});
   S.models=S.models.filter(x=>x.uid!==u); render(); }
 /* Without a member given, the last of the group falls - the same behaviour as
    before individual names existed. */
@@ -2864,6 +2988,7 @@ export function killHench(u,i){ const m=S.models.find(x=>x.uid===u); if(!m) retu
   killHenchMember(u, i==null? memberCount(m)-1 : Number(i)||0); }
 export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
   const e=S.fallen[S.fallen.length-1];
+  restoreValueOnUndo(e);        // the warrior comes back, and so does his worth
   if(e.kind==='hero'){ S.models.push(e.m); }
   else { // hench: return one model to a matching living group, or recreate it
     const sig=fallenEqSig(e.m);
@@ -2876,6 +3001,8 @@ export function undoFallen(){ if(!S.fallen||!S.fallen.length) return;
         if(!Array.isArray(grp.names)) grp.names=[];
         while(grp.names.length<at) grp.names.push('');
         grp.names.splice(at,0,e.memberName); grp.names.length=memberCount(grp); }
+      // The recruit surcharge that died with the last man comes back with him.
+      grp.xpPaid=(Number(grp.xpPaid)||0)+(Number(e.m&&e.m.xpPaid)||0);
     }
     else { const nm=_fallenSnapshot(e.m); nm.uid=nextUid(); nm.qty=1;
       if(e.memberName) nm.names=[e.memberName];
@@ -2916,19 +3043,94 @@ export function fallenEqAgg(models){ const def=models[0]&&unitDef(models[0].uid_
     } else out.push(`${n>1?n+'× ':''}${part}`);
   }
   return out; }
-/* Gold lost through the fallen: unit cost + equipment for each fallen model.
-   modelUnitCost already prices the free dagger at 0. */
-export function fallenGoldLost(){ return (S.fallen||[]).reduce((s,e)=> s + (modelUnitCost(e.m)||0), 0); }
+/* Gold lost through the fallen: REAL gold only — the man himself, his gear and
+   any recruit surcharge actually paid for him (snapshot xpPaid). Experience is
+   never priced in here; it is reported separately as XP lost. Recomputed from
+   the snapshot so records written by older versions (which folded 2 gc/XP into
+   the unit cost) display correctly; the treasury refund on undo still uses the
+   recorded lostValue, so undo returns exactly what was deducted. */
+export function fallenGoldOf(e){ return (modelUnitCost(e.m)||0)+(Number(e.m&&e.m.xpPaid)||0); }
+export function fallenGoldLost(){ return (S.fallen||[]).reduce((s,e)=>s+fallenGoldOf(e),0); }
+/* Experience EARNED IN PLAY (beyond the unit's starting exp) that died with the
+   fallen. A leader who starts at 20 XP and dies at 23 lost 3 XP, not 23. */
+export function fallenExpEarned(e){ const ud=e.uid_def||(e.m&&e.m.uid_def); const def=unitDef(ud);
+  return Math.max(0,(Number(e.m&&e.m.exp!=null?e.m.exp:e.exp)||0)-(Number(def&&def.exp)||0)); }
+export function fallenExpLost(){ return (S.fallen||[]).reduce((s,e)=>s+fallenExpEarned(e),0); }
+/* ---- Gear lost to an injury (Robbed, Sold to the Pits, …) ----
+   Removing items normally refunds their price (gold = treasury − spending, and
+   the spending just shrank). Stolen gear must NOT do that: the same amount is
+   taken out of the treasury in the same breath, so gold in hand stays exactly
+   where it was — the gear is gone AND the money stays spent. weaponsOnly
+   restricts the theft to weapons & armour (Pit-Fight loss, RAW), otherwise
+   everything goes: list equipment, rare/trading-post items and the heirloom. */
+export function stripGearSettled(m, weaponsOnly){
+  const before=modelUnitCost(m);
+  const def=unitDef(m.uid_def);
+  if(weaponsOnly){
+    const list=def.eq?eqListFor(def):null;
+    const armed=new Set();
+    if(list) ['Nahkampf','Fernkampf'].forEach(c=>(list[c]||[]).forEach(([nm])=>armed.add(nm)));
+    if(list) for(const c in list){ if(/^Rüstung/.test(c)) (list[c]||[]).forEach(([nm])=>armed.add(nm)); }
+    for(const nm in (m.eq||{})){ if(armed.has(nm)) delete m.eq[nm]; }
+    const r=m.rare||{};
+    for(const de in r){ const it=CATALOG.find(x=>x.de===de);
+      const cat=it&&it.cat;
+      // weapon upgrades ride on a weapon that is gone; weapon/armour items go too
+      if(isUpgrade(de) || cat==='cc'||cat==='missile'||cat==='bp'||cat==='armour') delete r[de]; }
+    if(m.heirloom && !((m.eq||{})[m.heirloom])) m.heirloom=null;
+  } else {
+    m.eq={}; m.rare={}; m.heirloom=null;
+  }
+  const lost=Math.max(0, before-modelUnitCost(m));
+  if(lost>0){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+    S.stash.gold=Math.max(0, goldTreasury()-lost); }
+  return lost;
+}
 export function addInj(u){ const m=S.models.find(x=>x.uid===u); const el=document.getElementById('inj-'+u); const code=el&&el.value; const j=INJURIES.find(i=>i.code===code); if(!j) return;
+  const nm=m.name||unitDef(m.uid_def).name;
   if(j.code==='11-15'){ // Dead — route to the right death path for hero vs henchman
     if(el) el.value=INJURIES[0]?INJURIES[0].code:'';
     if(isHeroModel(m)) killHero(u); else killHench(u); return; }
-  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; m.missWhy=j.name||j.code;
-    noteCasualtyOutcome(m,'injured',j.name||j.code); flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; }
+  if(j.code==='36'){ // Robbed — all weapons, armour and equipment lost, NO refund
+    if(typeof confirm==='function' && !confirm(`Robbed: ${nm} loses ALL weapons, armour, equipment and rare items. No gold is refunded — the loss is settled against the treasury. Apply?`)) return;
+    const lost=stripGearSettled(m,false);
+    logEvent('injury',`${nm} was Robbed — all equipment lost (${lost} gc, not refunded).`,{uid_def:m.uid_def});
+    m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:null});
+    flash(`Robbed: equipment worth ${lost} gc removed, gold unchanged.`); render(); return; }
+  if(j.code==='65'){ // Sold to the Pits — fight a Pit Fighter (RAW, mordheimer Campaigns)
+    const won=typeof confirm==='function' ? confirm(`Sold to the Pits: did ${nm} WIN the pit fight?\nOK = won (+50 gc, +2 XP, keeps all gear)\nCancel = lost (thrown out without weapons & armour; roll 11–35 on this chart separately)`) : true;
+    if(won){ S.stash=S.stash||{wyrd:0,gold:null,items:[]}; S.stash.gold=goldTreasury()+50;
+      m.exp=(Number(m.exp)||0)+2;
+      logEvent('injury',`${nm} won his pit fight — +50 gc, +2 XP.`,{uid_def:m.uid_def});
+      flash('Pit fight won: +50 gc, +2 XP.'); }
+    else { const lost=stripGearSettled(m,true);
+      logEvent('injury',`${nm} lost his pit fight — weapons & armour lost (${lost} gc, not refunded). Roll 11–35 for injuries separately.`,{uid_def:m.uid_def});
+      flash(`Pit fight lost: weapons & armour (${lost} gc) removed, no refund. Now roll 11–35 and apply it via + Injury.`); }
+    render(); return; }
+  if(j.code==='61'){ // Captured — ransom/exchange, or he is not coming back
+    const back=typeof confirm==='function' ? confirm(`Captured: is ${nm} coming back (ransomed or exchanged)?\nOK = yes — enter the ransom next (0 for an exchange)\nCancel = no — sold, killed or worse: he and his gear are lost (no refund)`) : true;
+    if(back){ let r=0;
+      if(typeof prompt==='function'){ r=Math.max(0,Number(prompt('Ransom paid (gc, 0 for an exchange):','0'))||0); }
+      if(r>0){ S.stash=S.stash||{wyrd:0,gold:null,items:[]}; S.stash.gold=Math.max(0,goldTreasury()-r); }
+      logEvent('injury',`${nm} was Captured and ${r>0?`ransomed for ${r} gc`:'exchanged'}.`,{uid_def:m.uid_def});
+      flash(r>0?`Ransom of ${r} gc paid.`:'Exchanged — no gold changed hands.'); render(); return; }
+    killHero(u,`${nm} was Captured and never returned — sold, killed or worse. He and his equipment are lost.`);
+    return; }
+  if(j.code==='35'){ // Deep Wound — misses the next D3 games
+    let n=1; if(typeof prompt==='function'){ n=Math.min(3,Math.max(1,Number(prompt('Deep Wound: result of the D3 (games to miss):','1'))||1)); }
+    m.miss=(Number(m.miss)||0)+n; flash(`Deep Wound: +${n} game${n>1?'s':''} to miss — tracked at the top of the unit card.`); render(); return; }
+  if(j.code==='66'){ // Survives Against the Odds — +1 Experience, one-off
+    m.exp=(Number(m.exp)||0)+1;
+    logEvent('injury',`${nm} Survives Against the Odds — +1 Experience.`,{uid_def:m.uid_def});
+    flash('+1 Experience.'); render(); return; }
+  if(j.miss){ m.miss=(Number(m.miss)||0)+j.miss; m.missWhy=j.name||j.code; noteCasualtyOutcome(m,'injured',j.name||j.code); flash(`+${j.miss} game to miss — tracked at the top of the unit card.`); render(); return; }
   m.inj=m.inj||[]; m.inj.push({code:j.code,name:j.name,text:j.text,mod:j.mod||null});
   noteCasualtyOutcome(m,'injured',j.name||j.code); render(); }
 export function remInj(u,i){ const m=S.models.find(x=>x.uid===u); if(m.inj){ m.inj.splice(i,1); render(); } }
 export function setInjOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._injOpen=v; }
+/* Rare/Trading-Post <details> re-collapsed on every render because its open
+   state was never remembered — every add/qty/price change folded it shut. */
+export function setRareOpen(u,v){ const m=S.models.find(x=>x.uid===u); if(m) m._rareOpen=v; }
 export function injSection(m){
   const def=unitDef(m.uid_def); if(def.t!=='hero'||!def.profile) return '';
   const inj=m.inj||[];
@@ -3148,7 +3350,7 @@ export function renderRoster(){
         <span class="badge ${t==='hero'?'hero':(t==='vehicle'?'vehicle':'hen')}">${t==='hero'?(promoted?'Hero \u2605':'Hero'):(t==='vehicle'?'Vehicle':'Henchmen')}</span>
         <input class="namefld" value="${(m.name||'').replace(/"/g,'&quot;')}" placeholder="${def.name.replace(/"/g,'&quot;')}"
           oninput="setName(${m.uid},this.value)">
-        <span class="note">${def.name}</span>
+        <span class="note">${def.name}${promoted?' \u2014 promoted to Hero':''}</span>
         <span class="missctl"><span class="misslbl no-print" title="Track games this warrior sits out (injuries that say “misses next game”, or unpaid Hired Sword upkeep). ▲ adds a game to miss, ▼ removes one.">⚑ miss games</span>${(Number(m.miss)||0)>0?`<b class="missbadge">out ${m.miss} game${m.miss>1?'s':''}</b>`:''}<button class="tiny ghost no-print" title="one fewer game to miss" ${(Number(m.miss)||0)<=0?'disabled':''} onclick="missAdj(${m.uid},-1)">▼</button><button class="tiny ghost no-print" title="miss one more game" onclick="missAdj(${m.uid},1)">▲</button></span>
         <button class="tiny ghost no-print" onclick="ttsOpen(${m.uid})" title="Description for Tabletop Simulator">⧉ TTS</button>
         ${t==='vehicle'?'':(t==='hen'&&memberCount(m)>1
@@ -3161,7 +3363,7 @@ export function renderRoster(){
           ${t==='hen'?(hcap<=1
              ? `<span class="note">Single model${def.max!=null?` · max ${def.max} per warband`:''}</span>`
              : `<label>Models in group (1–${hcap}): <input type="number" min="1" max="${hcap}" value="${m.qty}"
-             onchange="setQty(${m.uid},this.value)"></label>${hmaxNote}`):''}
+             onchange="setQty(${m.uid},this.value)"></label>${hmaxNote}${henchRecruitSurcharge(m)?` <span class="note" title="Veterans cost more to take on: 2 gc for each experience point they bring">one more costs ${henchRecruitCost(m)} gc (+${henchRecruitSurcharge(m)} for experience)</span>`:''}`):''}
           ${def.noxp?'<span class="note">No experience (equipment / animal)</span>':`<label>Experience: <input type="number" min="0" value="${m.exp}" onchange="setExp(${m.uid},this.value)"></label>`}
         </div>
         ${def.desc?`<div class="unit-desc">${String(def.desc).replace(/</g,'&lt;')}</div>`:''}
@@ -3173,7 +3375,9 @@ export function renderRoster(){
         ${spellSection(m)}
         ${eqSection(m)}
         ${abilitySection(def,m)}
-        <div class="subtotal">${t==='hen'?`${q} × ${modelUnitCost(m)} GK = `:''}${modelTotalCost(m)} GK</div>
+        <div class="subtotal">${t==='hen'
+          ?`<span title="Current value: 2 gc per experience point earned in play, per model. Gold in hand is still based on what was actually paid (${modelTotalCost(m)} gc).">${q} × ${modelUnitCost(m)+henchRecruitSurcharge(m)} gc = ${(modelUnitCost(m)+henchRecruitSurcharge(m))*q} gc</span>`
+          :`${modelTotalCost(m)} gc`}</div>
       </div></div>`;
     });
   });
@@ -3181,7 +3385,7 @@ export function renderRoster(){
   // Collapsed by default; each unit collapsed too. Never exported (PDF/TTS/JSON).
   const fallen=S.fallen||[];
   if(fallen.length){
-    html+=`<details class="fallen-wrap no-print"><summary class="fallen-sum">☠ Fallen (${fallen.length}) — removed from the warband, equipment lost · ${fallenGoldLost()} gc lost</summary>
+    html+=`<details class="fallen-wrap no-print"><summary class="fallen-sum">☠ Fallen (${fallen.length}) — removed from the warband, equipment lost · ${fallenGoldLost()} gc lost${fallenExpLost()?` · ${fallenExpLost()} XP earned in play lost`:''}</summary>
       <div class="fallen-tools"><button class="btnsm" onclick="undoFallen()" title="Undo the most recent death (press again to undo the one before, and so on)">↩ Undo last death</button></div>`;
     // Group all fallen by unit type (a type is either all-hero or all-henchman).
     // Group first by grade (hero vs henchman — from the death kind, which
@@ -3195,14 +3399,15 @@ export function renderRoster(){
       const grp=byType[key]; const uid_def=grp[0].uid_def||grp[0].m.uid_def; const def=unitDef(uid_def);
       const isHero=(grp[0].kind==='hero');
       const totalExp=grp.reduce((s,e)=>s+(Number(e.m&&e.m.exp!=null?e.m.exp:e.exp)||0),0);
-      const goldLost=grp.reduce((s,e)=>s+(modelUnitCost(e.m)||0),0);
+      const earnedExp=grp.reduce((s,e)=>s+fallenExpEarned(e),0);
+      const goldLost=grp.reduce((s,e)=>s+fallenGoldOf(e),0);
       const eqAll=fallenEqAgg(grp.map(e=>e.m));
       const domKey='t'+grp[0].kind+'_'+uid_def;
       const open=!!(S._fallenOpen&&S._fallenOpen[domKey]);
       let rows;
       if(isHero){ // one row per hero, listed by name (never merged)
-        rows=`<table class="fallen-tbl"><tr><th>Name</th><th>Experience</th><th>Equipment lost</th></tr>`
-          + grp.map(e=>`<tr><td>${(e.m.name||def.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
+        rows=`<table class="fallen-tbl"><tr><th>Name</th><th>Experience</th><th>Equipment lost</th><th>Worth</th></tr>`
+          + grp.map(e=>`<tr><td>${(e.m.name||def.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td><td>${fallenGoldOf(e)} gc</td></tr>`).join('')
           + `</table>`;
       } else { // henchmen
         // Anyone who was given a name is remembered by it; the nameless are
@@ -3210,16 +3415,17 @@ export function renderRoster(){
         // to say about them.
         const isNamed=e=>{ const n=(e.m.name||'').trim(); return n && n!==def.name; };
         const named=grp.filter(isNamed), plain=grp.filter(e=>!isNamed(e));
-        const subs={}; plain.forEach(e=>{ const sig=fallenEqSig(e.m); (subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp}).n++; });
-        rows=`<table class="fallen-tbl"><tr><th>${named.length?'Name':'#'}</th><th>Experience</th><th>Equipment lost</th></tr>`
-          + named.map(e=>`<tr><td>${String(e.m.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
-          + Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(fallenEqAgg([s.ex]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td></tr>`).join('')
+        const subs={}; plain.forEach(e=>{ const sig=fallenEqSig(e.m);
+          const su=(subs[sig]=subs[sig]||{n:0,ex:e.m,exp:e.exp,val:0}); su.n++; su.val+=fallenGoldOf(e); });
+        rows=`<table class="fallen-tbl"><tr><th>${named.length?'Name':'#'}</th><th>Experience</th><th>Equipment lost</th><th>Worth</th></tr>`
+          + named.map(e=>`<tr><td>${String(e.m.name).replace(/</g,'&lt;')}</td><td>${Number(e.m.exp)||0} XP</td><td>${(fallenEqAgg([e.m]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td><td>${fallenGoldOf(e)} gc</td></tr>`).join('')
+          + Object.values(subs).map(s=>`<tr><td>${s.n}×</td><td>${Number(s.exp)||0} XP</td><td>${(fallenEqAgg([s.ex]).map(x=>String(x).replace(/</g,'&lt;')).join(', '))||'—'}</td><td>${s.val} gc</td></tr>`).join('')
           + `</table>`;
       }
       html+=`<details class="model fallen" ${open?'open':''} ontoggle="setFallenGroupOpen('${domKey}',this.open)">
         <summary class="mhead fallen-head"><span class="badge fallen-badge">☠ Fallen</span>
           <span class="fallen-name">${grp.length}× ${def.name.replace(/</g,'&lt;')}</span>
-          <span class="note">total ${totalExp} XP${eqAll.length?` · ${eqAll.map(x=>String(x).replace(/</g,'&lt;')).join(', ')}`:''} · ${goldLost} gc lost</span></summary>
+          <span class="note">total ${totalExp} XP${earnedExp?` (${earnedExp} earned in play)`:''}${eqAll.length?` · ${eqAll.map(x=>String(x).replace(/</g,'&lt;')).join(', ')}`:''} · ${goldLost} gc lost</span></summary>
         <div class="mbody fallen-body">
           <div class="note">${grp.length} model${grp.length>1?'s':''} of this type died. Records are read-only; equipment was lost with them.</div>
           ${rows}
@@ -3237,32 +3443,39 @@ export function renderSidebar(){
   document.getElementById('models').textContent=mc;
   document.getElementById('heroes').textContent=hc;
   document.getElementById('rating').textContent=totalRating();
-  // unit breakdown (aggregated per type, regardless of group/gear)
+  const wEl=document.getElementById('worth'); if(wEl) wEl.textContent=warbandWorth();
+  // unit breakdown (aggregated per type; a Lad's-Got-Talent promotion gets its
+  // own "Hero <type>" row under Heroes, Vehicles get their own section)
   const counts={}, order=[];
   S.models.forEach(m=>{ const d=unitDef(m.uid_def); if(!d) return;
-    if(!(d.id in counts)){ counts[d.id]={name:d.name,n:0}; order.push(d.id); }
-    counts[d.id].n += (d.t==='hen'?(Number(m.qty)||1):1); });
+    const promo=!!m.promoted&&d.t==='hen'&&!d.vehicle;
+    const key=(promo?'promo:':'')+d.id;
+    if(!(key in counts)){ counts[key]={id:d.id,name:promo?('Hero '+d.name):d.name,promo,n:0}; order.push(key); }
+    counts[key].n += (d.t==='hen'&&!promo?(Number(m.qty)||1):1); });
   const ulEl=document.getElementById('unitlist');
   if(ulEl){
-    const udef=k=>WARBANDS[S.wb].units.find(u=>u.id===k);
-    const _listIdx=id=>{ const i=(WARBANDS[S.wb].units||[]).findIndex(u=>u.id===id); return i<0?999:i; };
-    const _isLead=id=>{ const d=udef(id); return !!(d&&/\bLeader:/.test(d.sp||'')); };
-    const heroK=order.filter(k=>{const d=udef(k);return d&&d.t==='hero'&&!d.vehicle;})
-      .sort((a,b)=> ((_isLead(a)?0:1)-(_isLead(b)?0:1)) || (_listIdx(a)-_listIdx(b)) );
-    const henK =order.filter(k=>{const d=udef(k);return d&&(d.t==='hen'||d.vehicle);})
+    const udef=k=>WARBANDS[S.wb].units.find(u=>u.id===counts[k].id);
+    const _listIdx=k=>{ const i=(WARBANDS[S.wb].units||[]).findIndex(u=>u.id===counts[k].id); return i<0?999:i; };
+    const _isLead=k=>{ const d=udef(k); return !!(d&&/\bLeader:/.test(d.sp||'')); };
+    const heroK=order.filter(k=>{const d=udef(k);return d&&!d.vehicle&&(d.t==='hero'||counts[k].promo);})
+      .sort((a,b)=> ((_isLead(a)?0:1)-(_isLead(b)?0:1)) || ((counts[a].promo?1:0)-(counts[b].promo?1:0)) || (_listIdx(a)-_listIdx(b)) );
+    const henK =order.filter(k=>{const d=udef(k);return d&&d.t==='hen'&&!d.vehicle&&!counts[k].promo;})
+      .sort((a,b)=> _listIdx(a)-_listIdx(b) );
+    const vehK =order.filter(k=>{const d=udef(k);return d&&d.vehicle;})
       .sort((a,b)=> _listIdx(a)-_listIdx(b) );
     const urow=(name,n,title,gold)=>`<div class="ulrow"${title?` title="${title}"`:''}><span>${name}</span>${gold!=null?`<span class="ulg">${gold} gc</span>`:''}<span class="uln">×${n}</span></div>`;
     const hsRows=(S.hired||[]).map(h=>{const hs=HIREDSWORDS[h.key];if(!hs)return '';const p=hs.profile;
       const tip=`${hs.name} (${hs.grade}) — ${[p.M,p.WS,p.BS,p.S,p.T,p.W,p.I,p.A,p.Ld].join('/')} · Hire ${hs.hire}, Upkeep ${hsUpkeepFor(h.key)}, Rating +${hs.rating}`;
       return urow((h.name?h.name+' ('+hs.name+')':hs.name),1,tip.replace(/"/g,'&quot;'),(typeof hsHireCost==='function'?hsHireCost(h.key):hs.hire));}).join('');
-    const goldOf=k=>S.models.filter(m=>m.uid_def===k).reduce((a,m)=>a+modelTotalCost(m),0);
+    const goldOf=k=>S.models.filter(m=>m.uid_def===counts[k].id && (!!m.promoted)===counts[k].promo).reduce((a,m)=>a+modelTotalCost(m),0);
     const heroRows=heroK.map(k=>urow(counts[k].name,counts[k].n,null,goldOf(k))).join('');
     const henRows =henK.map(k=>urow(counts[k].name,counts[k].n,null,goldOf(k))).join('');
+    const vehRows =vehK.map(k=>urow(counts[k].name,counts[k].n,null,goldOf(k))).join('');
     const seg=(label,rows)=>rows?`<div class="ulsec">${label}</div>${rows}`:'';
     const dpRows=(S.dp||[]).map(d=>{const dp=DRAMATIS[d.key];if(!dp)return '';const p=dp.profile;
       const tip=`${dp.name} (${dp.grade}) — ${[p.M,p.WS,p.BS,p.S,p.T,p.W,p.I,p.A,p.Ld].join('/')} · Rating +${dp.rating}`;
       return urow((d.name?d.name:dp.name),1,tip.replace(/"/g,'&quot;'),(typeof dpHireCost==='function'?dpHireCost(d.key):dp.hire));}).join('');
-    ulEl.innerHTML=(heroRows||hsRows||dpRows||henRows)?seg('Heroes',heroRows)+seg('Dramatis Personae',dpRows)+seg('Hired Swords',hsRows)+seg('Henchmen',henRows)+`<div class="ulrow ultot"><span><b>Total spent</b></span><span class="ulg"><b>${totalSpent()} gc</b></span><span class="uln"></span></div>`:'';
+    ulEl.innerHTML=(heroRows||hsRows||dpRows||henRows||vehRows)?seg('Heroes',heroRows)+seg('Dramatis Personae',dpRows)+seg('Hired Swords',hsRows)+seg('Henchmen',henRows)+seg('Vehicles',vehRows)+`<div class="ulrow ultot"><span><b>Total spent</b></span><span class="ulg"><b>${totalSpent()} gc</b></span><span class="uln"></span></div>`:'';
   }
   // warnings
   const w=[]; const h=HR();
@@ -3430,6 +3643,16 @@ export function setQty(u,v){ const m=S.models.find(x=>x.uid===u); const def=unit
   // with them, or they would reappear on different men later.
   if(Array.isArray(m.names) && m.names.length>q){ m.names=m.names.slice(0,q);
     if(!m.names.some(x=>(x||'').trim())) delete m.names; }
+  /* Men joining a blooded group are dearer: two gold crowns for each experience
+     point they bring. Charged once, here, and added to what this group has
+     already paid - never recalculated from its current experience, so the men
+     who earned that experience in play are not revalued behind the player's
+     back. Taking the number back down returns the surcharge for the men
+     removed, but never more than was actually paid. A warrior who DIES goes
+     through the death path instead, where nothing is refunded. */
+  const _was=Math.max(1,Number(m.qty)||1);
+  if(q>_was) m.xpPaid=(Number(m.xpPaid)||0)+(q-_was)*henchRecruitSurcharge(m);
+  else if(q<_was) m.xpPaid=Math.max(0,(Number(m.xpPaid)||0)-(_was-q)*henchRecruitSurcharge(m));
   m.qty=q; render(); }
 export function toggleEq(u,nm,on){ const m=S.models.find(x=>x.uid===u); if(on)m.eq[nm]=1; else delete m.eq[nm]; render(); }
 export function setEqQty(u,nm,q){
@@ -3454,9 +3677,15 @@ export function toggleMut(u,nm,on){ const m=S.models.find(x=>x.uid===u);
   if(on){ if(!m.mut.includes(nm)) m.mut.push(nm);} else { m.mut=m.mut.filter(x=>x!==nm);} render(); }
 
 /* ===================== SAVE / LOAD / EXPORT ===================== */
+/* Every save/export carries goldNow — the gold figure as DISPLAYED at the
+   moment of saving. On import it is taken over verbatim (treasury is set so
+   the display shows exactly this amount) instead of being re-derived from the
+   imported models, so price/data changes between versions can never shift a
+   saved warband's gold. We trust the importer's file. */
+export function exportState(){ return Object.assign({},S,{goldNow:goldCurrent()}); }
 export async function saveRoster(){
   const name=document.getElementById('savename').value.trim()|| (S.name||'roster');
-  const data={...S, name:S.name||name, _saved:name};
+  const data={...exportState(), name:S.name||name, _saved:name};
   try{
     await window.storage.set('mh:'+name, JSON.stringify(data), false);
     flash('Saved as "'+name+'".');
@@ -3483,6 +3712,7 @@ export async function loadRoster(nm){
 }
 export async function delRoster(nm){ try{ await window.storage.delete('mh:'+nm,false); openLoad(); openLoad(); }catch(e){} }
 export function applyState(data){
+  hideWelcome();
   replaceState({wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]},fallen:data.fallen||[]});
   S.house=Object.assign(houseDefaults(), data.house||{});
   S.mark=data.mark||'';
@@ -3491,6 +3721,9 @@ export function applyState(data){
   if(!S.fallen) S.fallen=[];
   campState();   // fills in round/log/battles for saves written before the chronicle
   S.models.forEach(m=>{ if(!m.eq)m.eq={}; if(!m.mut)m.mut=[]; if(!m.adv)m.adv={}; if(!m.skills)m.skills=[]; if(!m.inj)m.inj=[]; if(!m.spells)m.spells=[]; });
+  // Saved gold is adopted verbatim: display = goldNow, whatever the imported
+  // models would re-price to. (Older saves without goldNow keep the treasury.)
+  if(data.goldNow!=null && isFinite(Number(data.goldNow))) S.stash.gold=Number(data.goldNow)+totalSpent();
   resyncUid();
   document.getElementById('picker-view').style.display='none';
   document.getElementById('builder-view').style.display='block';
@@ -3559,10 +3792,13 @@ export function rareDisplayParts(m){ const out=[]; const r=m.rare||{};
 export function buildText(){
   const wb=WARBANDS[S.wb];
   const spent=totalSpent(), rating=totalRating();
-  const heroes=S.models.filter(m=>unitDef(m.uid_def).t==='hero');
-  const hench=S.models.filter(m=>unitDef(m.uid_def).t==='hen');
-  const sum=arr=>({gc:arr.reduce((s,m)=>s+modelTotalCost(m),0), r:arr.reduce((s,m)=>s+modelRating(m)*(unitDef(m.uid_def).t==='hen'?m.qty:1),0)});
-  const hS=sum(heroes), nS=sum(hench);
+  // Promoted henchmen (Lad's Got Talent) file under Heroes; a vehicle is
+  // equipment and gets its own section (and, via modelRating, no rating).
+  const heroes=S.models.filter(m=>isHeroModel(m)&&!unitDef(m.uid_def).vehicle);
+  const hench=S.models.filter(m=>!isHeroModel(m)&&unitDef(m.uid_def).t==='hen'&&!unitDef(m.uid_def).vehicle);
+  const vehicles=S.models.filter(m=>unitDef(m.uid_def).vehicle);
+  const sum=arr=>({gc:arr.reduce((s,m)=>s+modelTotalCost(m),0), r:arr.reduce((s,m)=>s+modelRating(m)*(isHeroModel(m)?1:m.qty),0)});
+  const hS=sum(heroes), nS=sum(hench), vS=sum(vehicles);
   const det=m=>{ const def=unitDef(m.uid_def); const d=[];
     if(m.exp) d.push(`${m.exp}× Experience`);
     if(m.mut&&m.mut.length) d.push('Mutations: '+m.mut.map(mutEN).join(', '));
@@ -3581,13 +3817,20 @@ export function buildText(){
   L.push(`# ++ Warband ++ [${rating} Warband Rating, ${spent} gc]`);
   L.push(`## Heroes [${hS.r} Warband Rating, ${hS.gc} gc]`);
   heroes.forEach(m=>{ const def=unitDef(m.uid_def);
-    const nm=(m.name&&m.name!==def.name)?`${def.name} „${m.name}“`:def.name;
+    const tnm=m.promoted?`Hero ${def.name}`:def.name;
+    const nm=(m.name&&m.name!==def.name)?`${tnm} „${m.name}“`:tnm;
     L.push(`${nm} [${modelUnitCost(m)} gc, ${modelRating(m)} Warband Rating]${det(m)}`); });
   L.push(`## Henchmen [${nS.r} Warband Rating, ${nS.gc} gc]`);
   hench.forEach(m=>{ const def=unitDef(m.uid_def);
     const nm=(m.name&&m.name!==def.name)?`${def.name} „${m.name}“`:def.name;
     L.push(`${nm} [${modelTotalCost(m)} gc, ${modelRating(m)*m.qty} Warband Rating]:`);
     L.push(`• ${m.qty}× ${def.name} [${modelUnitCost(m)} gc, ${modelRating(m)} Warband Rating]${det(m)}`); });
+  if(vehicles.length){
+    L.push(`## Vehicles [${vS.gc} gc]`);
+    vehicles.forEach(m=>{ const def=unitDef(m.uid_def);
+      const nm=(m.name&&m.name!==def.name)?`${def.name} „${m.name}“`:def.name;
+      L.push(`${nm} [${modelTotalCost(m)} gc]${det(m)}`); });
+  }
   const st=S.stash||{wyrd:0,gold:0,items:[]};
   if((st.wyrd||0)||(st.gold||0)||(st.items&&st.items.length)){
     L.push(`## Stash / Store`);
@@ -3597,42 +3840,8 @@ export function buildText(){
   }
   L.push('');
   L.push('— — — — — — — — — — — — — — — — — — — —');
-  L.push('MORDHEIM-DATA: '+JSON.stringify(S));
+  L.push('MORDHEIM-DATA: '+JSON.stringify(exportState()));
   return L.join('\n');
-}
-
-/* ---- Newrecruit / BattleScribe rosterSchema (Best-Effort) ---- */
-
-
-const NR_MODEL="e1beaa44-e54d-dd6b-d1f2-446b333c9bb9";
-export function rid(){const h=()=>Math.floor(Math.random()*65536).toString(16).padStart(4,'0');return `${h()}-${h()}-${h()}-${h()}`;}
-export function nrProfile(def){ const p=def.profile; if(!p) return [];
-  const ord=["M","WS","BS","S","T","W","I","A","Ld"];
-  return [{characteristics:ord.map(k=>({"$text":String(p[k]),name:k==='Ld'?'LD':k,typeId:NR_T[k]})),id:rid(),name:def.name,hidden:false,typeId:NR_MODEL,typeName:"Model",from:"entry"}];
-}
-export function nrInner(m){ const def=unitDef(m.uid_def); const cat=def.t==='hero'?NR_CAT.hero:NR_CAT.hen; const sels=[];
-  if(m.exp) sels.push({costs:[{name:" Warband Rating",typeId:"wb-rating",value:Number(m.exp)}],id:rid(),name:"Experience",number:Number(m.exp),type:"upgrade",from:"entry"});
-  if(def.eq){const list=eqListFor(def);for(const c in list)for(const [nm,pr] of list[c]){const qty=Number(m.eq[nm])||0;if(!qty)continue;const price=nm.startsWith("Dolch")?Math.max(0,qty-1)*pr:qty*pr;sels.push({costs:[{name:" gc",typeId:"points",value:price}],id:rid(),name:enItem(nm),number:qty,type:"upgrade",from:"entry"});}}
-  if(m.mut&&m.mut.length)m.mut.forEach(x=>sels.push({id:rid(),name:mutEN(x),number:1,type:"upgrade",from:"entry"}));
-  if(m.rare)for(const de in m.rare){const e=m.rare[de];const q=Number(e.q)||1;const it=CATALOG.find(x=>x.de===de);sels.push({costs:[{name:" gc",typeId:"points",value:q*(Number(e.paid)||0)}],id:rid(),name:(it?it.en:de),number:q,type:"upgrade",from:"entry"});}
-  return {profiles:nrProfile(def),selections:sels,costs:[{name:" gc",typeId:"points",value:modelUnitCost(m)},{name:" Warband Rating",typeId:"wb-rating",value:modelRating(m)}],categories:[{id:cat,entryId:cat,name:def.t==='hero'?"Heroes":"Henchmen",primary:true}],id:rid(),name:def.name,entryId:rid(),number:1,type:"model",from:"entry"};
-}
-export function nrSel(m){ const def=unitDef(m.uid_def); const inner=nrInner(m);
-  if(def.t!=='hen') return inner;
-  return {selections:[{...inner,number:m.qty}],costs:[{name:" gc",typeId:"points",value:modelTotalCost(m)},{name:" Warband Rating",typeId:"wb-rating",value:modelRating(m)*m.qty}],categories:[{id:NR_CAT.hen,entryId:NR_CAT.hen,name:"Henchmen",primary:true}],id:rid(),name:def.name,entryId:rid(),number:1,type:"unit",from:"entry"};
-}
-export function buildNR(){ const wb=WARBANDS[S.wb];
-  const force={rules:[],selections:S.models.map(nrSel),categories:[
-    {name:"Configuration",id:rid(),primary:false,entryId:NR_CAT.cfg},
-    {name:"Heroes",id:rid(),primary:false,entryId:NR_CAT.hero},
-    {name:"Henchmen",id:rid(),primary:false,entryId:NR_CAT.hen},
-    {name:"Stash",id:rid(),primary:false,entryId:NR_CAT.stash}],
-    id:rid(),name:"Warband",entryId:rid(),catalogueId:rid(),catalogueRevision:1,catalogueName:wb.name};
-  return {roster:{costs:[{name:" gc",typeId:"points",value:totalSpent()},{name:" Warband Rating",typeId:"wb-rating",value:totalRating()}],
-    costLimits:[{name:" gc",typeId:"points",value:S.budget}],forces:[force],id:rid(),name:rosterName(),
-    battleScribeVersion:2.03,generatedBy:"Mordheim Roster Builder",
-    gameSystemId:"9481a749-7900-614b-1695-bdc2899069c1",gameSystemName:"Mordheim",gameSystemRevision:18,
-    xmlns:"http://www.battlescribe.net/schema/rosterSchema"}};
 }
 
 /* ---- export chooser modal ---- */
@@ -3690,8 +3899,7 @@ export function openExport(){ if(!S.models.length){ flash('No warriors in the wa
   document.getElementById('extextwrap').style.display='none';
   document.getElementById('exportmodal').style.display='flex'; }
 export function closeExport(){ document.getElementById('exportmodal').style.display='none'; }
-export function exportTool(){ dl(JSON.stringify(S,null,2),stampedName()+'.json','application/json'); closeExport(); }
-export function exportNR(){ dl(JSON.stringify(buildNR(),null,2),stampedName()+'_newrecruit.json','application/json'); closeExport(); }
+export function exportTool(){ dl(JSON.stringify(exportState(),null,2),safeName()+'.json','application/json'); closeExport(); }
 export function exportText(){ const t=buildText(); document.getElementById('extext').value=t; document.getElementById('extextwrap').style.display='block'; }
 export function downloadText(){ dl(buildText(),stampedName()+'.txt','text/plain;charset=utf-8'); }
 export function copyExport(){ const ta=document.getElementById('extext'); ta.select(); ta.setSelectionRange(0,99999);
@@ -3765,7 +3973,7 @@ window.addEventListener('scroll',()=>{ if(!itipPinned) hideItip(); }, true);
 
 /* ===================== INIT ===================== */
 renderPicker();
-try{ if(typeof openLoad==='function') openLoad(); }catch(e){}
+try{ if(typeof renderWelcome==='function') renderWelcome(); }catch(e){}
 
 
 /* ============================================================================
@@ -3798,7 +4006,7 @@ Object.assign(window, {
   addHsSpell, addHsSpellFromAdv, addInj, addRare, addSkill, addSkillFromSel,
   addSpell, addSpellFromAdv, addUnit, adjGoldCurrent, adjPrice, advSection,
   applyFreeDaggers, applyState, attachedBlocks, attachedSection, availHeroCats, backToPicker,
-  buildNR, buildText, campDistricts, campShowJSON, campShowText, campToggle,
+  buildText, campDistricts, campShowJSON, campShowText, campToggle,
   campaignJSON, campaignTextReport, canAdv, canBeLeader, casterLore, casterMagic,
   catLabel, catalogDefaultPaid, catalogEligible, chooseWb, closeCampaignIO, closeExport,
   closeImport, closeTts, copyCampaign, copyExport, copyTts, copyTtsName, copyTtsBoth, countOf,
@@ -3807,7 +4015,7 @@ Object.assign(window, {
   dpCount, dpEligibility, dpGradeAllowed, dpHireCost, dpHireTotal, dpList,
   dpRatingTotal, dpRosterCards, dpSetName, dpUpkeepTotal, effProfile, enItem,
   enRules, ensureFreeDagger, entryOf, eqCost, eqDisplayParts, eqListFor,
-  eqSection, eqSummaryParts, eqWeaponLimit, eqWeaponsOf, exportCampaign, exportNR,
+  eqSection, eqSummaryParts, eqWeaponLimit, eqWeaponsOf, exportCampaign,
   exportOfficialSheet, exportText, exportTool, fixedSkills, flash, formatRules,
   goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, heroEqList, hideItip,
   hireCostOf, hireDP, hireDiscounted, hireEligibility, hireHS, houseActive,
@@ -3825,14 +4033,16 @@ Object.assign(window, {
   itemInfo, itipBuild, leaderRuleText, leaderSection, leaderUid, loadRoster,
   magicOfModel, marauderMarkSection, marauderStartSpells, markLore, markName, markRulesFor,
   maxInfo, missAdj, modelRating, modelTotalCost, modelUnitCost, modelsOf,
-  mutCost, mutEN, mutKindFor, netMod, noteLines, nrInner,
-  nrProfile, nrSel, openCampaignIO, openExport, openImport, openLoad,
+  mutCost, mutEN, mutKindFor, netMod, noteLines, openCampaignIO, openExport, openImport, openLoad,
   passNameFilter, passStatFilter, pickSub, priceMod, promoteHench, promotedSkillLists,
   raceEN, rangedModelCount, rareCost, rareEligibleItems, remAdv, remHsAdv,
   remHsSkillIdx, remInj, remSkill, remSpell2, removeRare, removeUnit,
-  killHench, killHenchMember, killHero, removeFallenAt, setFallenGroupOpen, undoFallen,
+  killHench, killHenchMember, killHero, removeFallenAt, setFallenGroupOpen, setRareOpen, stripGearSettled, undoFallen,
   memberCount, memberName, memberNamed, memberNames, memberDefaultName, setMemberName, setMemberOpen,
   henchMembersBlock, promoteHench,
+  welcomeNew, welcomeImport, renderWelcome, worthAdvOf, abilityMentioned,
+  fallenGoldOf, fallenGoldLost, fallenExpEarned, fallenExpLost,
+  loseValueOnDeath, restoreValueOnUndo, henchRecruitCost, henchRecruitSurcharge,
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
   logEvent, removeBattle, removeLogAt, roundLabel, setRound,
   chronicleBlock, districtName, wbName, warbandOptions, setChrOpen,
@@ -3857,7 +4067,7 @@ Object.assign(window, {
   addDraftCas, remDraftCas, setDraftCas, battleDraft,
   render, renderAddMenu, renderCampaign, renderDramatis, renderExtra, renderHiredSwords,
   renderHouse, renderPicker, renderRoster, renderSidebar, renderStash, rerollItemCount,
-  resetHouse, rid, rosterName, ruleNameEN, ruleSplitBold, safeName,
+  resetHouse, rosterName, ruleNameEN, ruleSplitBold, safeName,
   saveRoster, setAdvOpen, setCaster, setDistrict, setDpFilter, setDpGrade,
   cfFootholdsAt, cfControlAt, cfTerritory, districtStatus, claimFoothold,
   loseFoothold, cfSetFoothold, applyBattleTerritory,
