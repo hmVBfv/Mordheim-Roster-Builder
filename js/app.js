@@ -929,6 +929,164 @@ export function itemHalfActive(en){ if(!en) return false; const nz=x=>String(x).
   const t=nz(en); for(const eff of activeDistrictEffects()){ if(eff.kind==='itemHalf'){ for(const k of (eff.keys||[])){ if(nz(k)===t) return true; } } } return false; }
 export function hireDiscounted(key){ const anyTab=HIREDSWORDS[key]||DRAMATIS[key]; return anyTab && priceMod('hire',key)<1; }
 
+/* ============================================================================
+   POST-BATTLE SEQUENCE (mordheimer.net/docs/tools, /docs/campaigns/income)
+   The rulebook order, worked once per battle:
+     1 Injuries  2 Experience  3 Exploration  4 Sell wyrdstone
+     5 Available veterans  6 Rare items  7 Dramatis Personae
+     8 Recruits & common items  9 Reallocate equipment
+   Steps 1-2 drive the existing casualty/experience tools; 3 and 5 are the
+   dice steps (verified tables below); 4 and 6-9 are guided checklist items.
+   Progress is kept per round in S.campaign.postbattle so a sequence cannot be
+   walked twice and rides along in the save/campaign file. All values are house-
+   rule-neutral: the tool records what the dice said, it does not invent rules.
+   ========================================================================== */
+export const PB_STEPS=[
+  ['injuries','Injuries','Roll for every warrior taken out of action.'],
+  ['experience','Experience','+1 survives, +1 winning leader, +1 per enemy out of action.'],
+  ['exploration','Exploration','1D6 per Hero not taken out of action, +1 die if you won (max 6 dice).'],
+  ['wyrdstone','Sell wyrdstone','Once per sequence. Price depends on how many shards you sell.'],
+  ['veterans','Available veterans','Roll 2D6 for the experience pool of veterans you may hire.'],
+  ['rare','Rare items','Make rarity rolls and buy rare items into the stash.'],
+  ['dramatis','Dramatis Personae','Look for a special character, if you want one.'],
+  ['recruits','Recruits & common items','Hire new warriors and buy common equipment.'],
+  ['equipment','Reallocate equipment','Swap equipment between warriors as you like.'],
+];
+/* The round the sequence belongs to: the latest battle's round, else the
+   current stage. A battle bumps the round on save, so this is normally "now". */
+export function pbRound(){ const c=campState();
+  const rs=(c.battles||[]).map(b=>Number(b.round)||0); const latest=rs.length?Math.max(...rs):0;
+  return Math.max(latest, Number(c.round)||0); }
+export function postbattleAll(){ const c=campState(); if(!c.postbattle) c.postbattle={}; return c.postbattle; }
+export function postbattleState(round){ const all=postbattleAll(); const r=(round==null?pbRound():round);
+  if(!all[r]) all[r]={done:{}, explore:null, veterans:null, wyrd:null};
+  const s=all[r]; if(!s.done) s.done={}; return s; }
+export function pbStepDone(step,round){ return !!postbattleState(round).done[step]; }
+export function pbSetStepDone(step,on,round){ postbattleState(round).done[step]=!!on; render(); }
+/* Did our warband win a battle this round? Reads the side marked key==='me',
+   falling back to a legacy single outcome. */
+export function pbWonThisRound(round){ const c=campState(); const r=(round==null?pbRound():round);
+  return (c.battles||[]).filter(b=>Number(b.round)===r).some(b=>{
+    if(Array.isArray(b.sides)&&b.sides.length){ const me=b.sides.find(s=>s.key==='me'); if(me) return /victor/i.test(me.outcome||''); }
+    return /victor/i.test(b.outcome||''); }); }
+/* Heroes taken out of action this round: anyone recorded as a casualty victim,
+   whatever the injury result, does not search for wyrdstone. */
+export function pbHeroesOOA(round){ const c=campState(); const r=(round==null?pbRound():round);
+  const s=new Set(); (c.casualties||[]).forEach(x=>{ if(x.round===r && x.victim && x.victim.uid!=null) s.add(x.victim.uid); });
+  return s; }
+/* How many Exploration dice the warband may roll: one per surviving Hero who was
+   not taken out of action, plus one if it won, capped at six. */
+export function pbExploreDice(round){ const ooa=pbHeroesOOA(round);
+  const survivors=S.models.filter(m=>isHeroModel(m) && !ooa.has(m.uid)).length;
+  const winDie=pbWonThisRound(round)?1:0;
+  const base=survivors+winDie;
+  return {survivors, winDie, base, capped:Math.min(6,base)}; }
+/* Dice total -> shards found (mordheimer, Income). */
+export const EXPLORE_SHARDS=[[5,1],[11,2],[17,3],[24,4],[30,5],[35,6]];
+export function pbShardsFor(total){ total=Number(total)||0;
+  for(const [max,sh] of EXPLORE_SHARDS){ if(total<=max) return sh; } return 7; }
+/* Multiples -> unusual location (mordheimer, Income). Only the name is surfaced;
+   the player reads the full entry on the roster/Mordheimer. */
+export const EXPLORE_LOC={
+  2:{1:'Well',2:'Shop',3:'Corpse',4:'Straggler',5:'Overturned Cart',6:'Ruined Hovels'},
+  3:{1:'Tavern',2:'Smithy',3:'Prisoners',4:'Fletcher',5:'Market Hall',6:'Returning a Favour'},
+  4:{1:'Gunsmith',2:'Shrine',3:'Townhouse',4:'Armourer',5:'Graveyard',6:'Catacombs'},
+  5:{1:'Moneylender\u2019s House',2:'Alchemist\u2019s Laboratory',3:'Jewelsmith',4:'Merchant\u2019s House',5:'Shattered Building',6:'Entrance to the Catacombs'},
+  6:{1:'The Pit',2:'Hidden Treasure',3:'Dwarf Smithy',4:'Slaughtered Warband',5:'Fighting Arena',6:'Noble\u2019s Villa'},
+};
+/* Highest/most-numerous multiple in a set of dice -> {n, face, name}, or null.
+   Rule: the most numerous set wins; ties go to the highest face. */
+export function pbExploreMultiple(dice){ if(!Array.isArray(dice)) return null;
+  const cnt={}; dice.forEach(d=>{ d=Number(d); if(d>=1&&d<=6) cnt[d]=(cnt[d]||0)+1; });
+  let best=null;
+  for(const f in cnt){ const n=cnt[f], face=Number(f);
+    if(n<2) continue;
+    if(!best || n>best.n || (n===best.n && face>best.face)) best={n, face};
+  }
+  if(!best) return null;
+  const tier=EXPLORE_LOC[Math.min(6,best.n)]; return {n:best.n, face:best.face, name:(tier&&tier[best.face])||''}; }
+export function _rollD6(){ return 1+Math.floor(Math.random()*6); }
+export function pbRollExplore(round){ const st=postbattleState(round); const d=pbExploreDice(round);
+  const dice=[]; for(let i=0;i<d.capped;i++) dice.push(_rollD6());
+  const total=dice.reduce((a,b)=>a+b,0);
+  st.explore={dice, total, shards:pbShardsFor(total), mult:pbExploreMultiple(dice), dropped:d.base-d.capped};
+  render(); }
+export function pbClearExplore(round){ postbattleState(round).explore=null; render(); }
+/* Take the found shards into the stash (once; button then reads "added"). */
+export function pbTakeShards(round){ const st=postbattleState(round); const e=st.explore; if(!e||e.taken) return;
+  S.stash=S.stash||{wyrd:0,gold:null,items:[]}; S.stash.wyrd=(Number(S.stash.wyrd)||0)+(Number(e.shards)||0);
+  e.taken=true; logEvent('income',`Exploration: found ${e.shards} wyrdstone shard${e.shards===1?'':'s'}${e.mult?` and a location (${e.mult.name})`:''}.`,{round}); render(); }
+/* Available veterans: 2D6 experience pool, once per sequence. */
+export function pbRollVeterans(round){ const st=postbattleState(round); if(st.veterans!=null) return;
+  const a=_rollD6(), b=_rollD6(); st.veterans={dice:[a,b], pool:a+b};
+  logEvent('note',`Available veterans: experience pool of ${a+b} (2D6).`,{round}); render(); }
+export function pbClearVeterans(round){ postbattleState(round).veterans=null; render(); }
+
+/* The Post-Battle Sequence panel: the nine steps in order, scoped to the latest
+   battle's round, each with a done-tick. Injuries and experience reach into the
+   casualty/experience tools already built; exploration and veterans roll their
+   verified dice here; wyrdstone and the trading steps are guided reminders. */
+export function postbattleBlock(){
+  const c=campState(); const round=pbRound();
+  if(round<1 && !(c.battles||[]).length) return '';   // nothing has happened yet
+  const st=postbattleState(round);
+  const doneCount=PB_STEPS.filter(x=>st.done[x[0]]).length;
+  const open=!!c._pbOpen;
+  const rowHead=(key,label,hint,extra)=>{
+    const done=!!st.done[key];
+    return `<div class="pb-step${done?' pb-done':''}">
+      <label class="pb-check"><input type="checkbox" ${done?'checked':''} onchange="pbSetStepDone('${key}',this.checked,${round})">
+        <span class="pb-num">${PB_STEPS.findIndex(x=>x[0]===key)+1}</span><b>${label}</b></label>
+      <div class="pb-hint">${hint}</div>${extra||''}</div>`;
+  };
+  // 1 Injuries — hand off to the casualty tool
+  const unroll=(typeof unrolledCasualties==='function')?unrolledCasualties(round).length:0;
+  const outst=(typeof outstandingCasualties==='function')?outstandingCasualties(round).length:0;
+  const injExtra=`<div class="pb-body">${unroll?`<span class="pb-warn">${unroll} casualt${unroll===1?'y':'ies'} still to roll</span> \u2014 `:''}${outst?`${outst} death${outst===1?'':'s'} ready to apply. `:''}
+    <button class="tiny" onclick="applyBattleResults()" title="Resolve outstanding deaths, then award experience">Apply battle results</button>
+    <span class="pb-note">Records injuries and experience together (steps 1\u20132).</span></div>`;
+  // 2 Experience — same button; show the pending ledger size if any
+  const pend=(typeof unappliedXp==='function')?unappliedXp(round):0;
+  const expExtra=`<div class="pb-body">${pend?`<b>${pend}</b> experience point${pend===1?'':'s'} waiting to be applied. `:'Experience is awarded with the battle results above. '}<span class="pb-note">+1 survives \u00b7 +1 winning leader \u00b7 +1 per enemy out of action.</span></div>`;
+  // 3 Exploration
+  const d=pbExploreDice(round); const e=st.explore;
+  let expl=`<div class="pb-body"><div class="pb-dice-line">May roll <b>${d.capped}</b> dice \u2014 ${d.survivors} surviving Hero${d.survivors===1?'':'es'}${d.winDie?` + 1 for the win`:''}${d.base>6?` (of ${d.base}, capped at 6)`:''}.
+    <button class="tiny" onclick="pbRollExplore(${round})">${e?'Roll again':'Roll exploration'}</button></div>`;
+  if(e){
+    expl+=`<div class="pb-result">Dice: <b>${e.dice.join(' ')}</b> \u2014 total <b>${e.total}</b> \u2192 <b>${e.shards}</b> shard${e.shards===1?'':'s'}`
+      +(e.mult?` \u00b7 location: <b>${e.mult.name}</b> (${e.mult.n}\u00d7${e.mult.face})`:'')
+      +`. ${e.taken?'<span class="pb-ok">added to stash</span>':`<button class="tiny" onclick="pbTakeShards(${round})">+ add ${e.shards} to stash</button>`}
+      ${e.mult?'<span class="pb-note">Look the location up on the Exploration chart for its effect.</span>':''}</div>`;
+  }
+  expl+=`</div>`;
+  // 4 Sell wyrdstone (guided; price table read from the roster/Mordheimer)
+  const shards=Number((S.stash||{}).wyrd)||0;
+  const wyrd=`<div class="pb-body">Shards in stash: <b>${shards}</b>. Sell what you like (once per sequence), then add the gold to the treasury in the Stash panel.
+    <span class="pb-note">Price rises the fewer you sell and falls with warband size \u2014 see the Wyrdstone table.</span></div>`;
+  // 5 Available veterans
+  const v=st.veterans;
+  const vet=`<div class="pb-body">${v?`Experience pool: <b>${v.pool}</b> (rolled ${v.dice.join(' + ')}). <button class="tiny ghost" onclick="pbClearVeterans(${round})">clear</button>`
+    :`<button class="tiny" onclick="pbRollVeterans(${round})">Roll 2D6</button> for the veterans available to hire.`}
+    <span class="pb-note">You may hire recruits whose combined experience does not exceed the pool.</span></div>`;
+  // 6-9 guided reminders
+  const rare=`<div class="pb-body"><span class="pb-note">Rare items are bought per warrior in the roster (Rare / Trading Post), and go into the stash.</span></div>`;
+  const dram=`<div class="pb-body"><span class="pb-note">Look for a special character in the Dramatis Personae panel below.</span></div>`;
+  const recr=`<div class="pb-body"><span class="pb-note">Recruit from "Recruit Warriors"; new hires come with their free dagger and may buy common items only.</span></div>`;
+  const equ =`<div class="pb-body"><span class="pb-note">Swap equipment between warriors as desired. Newly hired warriors may receive rare items already in the stash.</span></div>`;
+  return `<details class="pb-wrap" ${open?'open':''} ontoggle="campState()._pbOpen=this.open">
+    <summary class="pb-sum">\u2694 Post-battle sequence \u2014 ${roundLabel(round)} \u00b7 ${doneCount}/${PB_STEPS.length} done</summary>
+    ${rowHead('injuries','Injuries',PB_STEPS[0][2],injExtra)}
+    ${rowHead('experience','Experience',PB_STEPS[1][2],expExtra)}
+    ${rowHead('exploration','Exploration',PB_STEPS[2][2],expl)}
+    ${rowHead('wyrdstone','Sell wyrdstone',PB_STEPS[3][2],wyrd)}
+    ${rowHead('veterans','Available veterans',PB_STEPS[4][2],vet)}
+    ${rowHead('rare','Rare items',PB_STEPS[5][2],rare)}
+    ${rowHead('dramatis','Dramatis Personae',PB_STEPS[6][2],dram)}
+    ${rowHead('recruits','Recruits & common items',PB_STEPS[7][2],recr)}
+    ${rowHead('equipment','Reallocate equipment',PB_STEPS[8][2],equ)}
+  </details>`;
+}
+
 export function renderCampaign(){
   const host=document.getElementById('campaignpanel'); if(!host) return;
   if(!S.wb){ host.innerHTML=''; return; }
@@ -964,6 +1122,7 @@ export function renderCampaign(){
     <div class="camp-io no-print"><button class="tiny" onclick="openCampaignIO()">\u2b06 Export</button> <button class="tiny" onclick="openCampaignIO()">\u2b07 Import</button></div>
     ${campaignFileBlock()}
     ${chronicleBlock()}
+    ${postbattleBlock()}
     ${summary}
     <details class="loc-wrap"><summary class="loc-sum">Locations \u2014 districts you hold</summary>
     ${seg}
@@ -4046,6 +4205,9 @@ Object.assign(window, {
   addBattle, addLogNote, advanceRound, campRound, campState, editBattle, editLogText,
   logEvent, removeBattle, removeLogAt, roundLabel, setRound,
   chronicleBlock, districtName, wbName, warbandOptions, setChrOpen,
+  postbattleBlock, postbattleState, pbRound, pbStepDone, pbSetStepDone,
+  pbExploreDice, pbShardsFor, pbExploreMultiple, pbRollExplore, pbClearExplore,
+  pbTakeShards, pbRollVeterans, pbClearVeterans, pbWonThisRound, pbHeroesOOA,
   cfGet, cfNew, cfClose, cfSetName, cfSetRound, cfImportWarband, cfRemoveWarband,
   cfAddCurrent, cfExport, cfImportFile, cfMergedLog, cfAllBattles, cfStats,
   cfPickFile, cfPickWarband, cfAddCurrentPrompt, campaignFileBlock,

@@ -123,6 +123,22 @@
   .death-btn{color:var(--blood)!important}
   .eq-rare-summary{margin:4px 0 2px;font-size:13px;padding:4px 8px;background:rgba(120,90,40,.08);border-left:2px solid var(--gold);border-radius:2px}
   /* Campaign chronicle */
+  .pb-wrap{border:1px solid var(--parch-edge);border-radius:4px;margin:8px 0;background:rgba(60,50,45,.04)}
+  .pb-sum{cursor:pointer;padding:7px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--iron);list-style:none}
+  .pb-sum::-webkit-details-marker{display:none}
+  .pb-sum::before{content:'▸ '}
+  .pb-wrap[open]>.pb-sum::before{content:'▾ '}
+  .pb-step{padding:6px 10px;border-top:1px solid var(--parch-edge)}
+  .pb-step.pb-done{background:rgba(90,120,70,.09)}
+  .pb-check{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:14px}
+  .pb-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--iron);color:var(--parch);font-size:11px;font-weight:700}
+  .pb-hint{color:#6a5f55;font-size:12px;margin:2px 0 0 25px}
+  .pb-body{margin:5px 0 2px 25px;font-size:13px}
+  .pb-note{color:#6a5f55;font-size:12px}
+  .pb-warn{color:#7a1410;font-weight:600}
+  .pb-ok{color:#3f6a2a;font-weight:600}
+  .pb-dice-line{margin-bottom:4px}
+  .pb-result{margin-top:4px;padding:5px 8px;background:rgba(60,50,45,.06);border-radius:3px}
   .chr-wrap{border:1px solid var(--parch-edge);border-radius:4px;margin:8px 0;background:rgba(60,50,45,.04)}
   .chr-sum{cursor:pointer;padding:7px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--iron);list-style:none}
   .chr-sum::-webkit-details-marker{display:none}
