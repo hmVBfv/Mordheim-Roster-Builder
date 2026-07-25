@@ -83,4 +83,31 @@ assert.strictEqual(app.pbStepDone('exploration', round+1), false, 'a different s
 const saved=JSON.parse(JSON.stringify(state.S));
 assert.ok(saved.campaign.postbattle[round].done.exploration, 'the sequence is part of the save');
 
-console.log('Post-battle sequence: OK (dice count, shards table, multiples, 2D6 veterans, per-round state)');
+// --- selling wyrdstone reads mordheimer's table (total gold, not per shard) ---
+// small warband (<=3): 1 shard 45, 2 together 60, 8+ 155
+assert.strictEqual(app.wyrdPrice(1, 3), 45, 'one shard, small warband');
+assert.strictEqual(app.wyrdPrice(2, 3), 60, 'two shards fetch 60 total, not 90');
+assert.strictEqual(app.wyrdPrice(8, 3), 155);
+assert.strictEqual(app.wyrdPrice(9, 3), 155, 'nine or more use the 8+ row');
+// size bands fall as the warband grows
+assert.strictEqual(app.wyrdSizeBand(3), 0);
+assert.strictEqual(app.wyrdSizeBand(4), 1);
+assert.strictEqual(app.wyrdSizeBand(16), 5);
+assert.strictEqual(app.wyrdSizeBand(99), 5);
+assert.strictEqual(app.wyrdPrice(1, 16), 25, 'a big warband earns less for the same shard');
+
+// selling moves gold to the treasury and shards out of the stash, once
+state.S.stash.wyrd=5; app.setGoldCurrent(100);
+const sz=app.warbandSize();
+const expect=app.wyrdPrice(3, sz);
+app.pbSellWyrd(round, 3);
+assert.strictEqual(app.goldCurrent(), 100+expect, 'the sale gold is added to the treasury');
+assert.strictEqual(Number(state.S.stash.wyrd), 2, 'the sold shards leave the stash');
+app.pbSellWyrd(round, 1);
+assert.strictEqual(app.goldCurrent(), 100+expect, 'a second sale in the same sequence does nothing');
+// undo returns exactly what the sale took
+app.pbClearWyrd(round);
+assert.strictEqual(app.goldCurrent(), 100, 'undoing the sale returns the gold');
+assert.strictEqual(Number(state.S.stash.wyrd), 5, 'and the shards');
+
+console.log('Post-battle sequence: OK (dice, shards, multiples, veterans, wyrdstone sale table, per-round state)');

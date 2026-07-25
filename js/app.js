@@ -1021,6 +1021,46 @@ export function pbRollVeterans(round){ const st=postbattleState(round); if(st.ve
   const a=_rollD6(), b=_rollD6(); st.veterans={dice:[a,b], pool:a+b};
   logEvent('note',`Available veterans: experience pool of ${a+b} (2D6).`,{round}); render(); }
 export function pbClearVeterans(round){ postbattleState(round).veterans=null; render(); }
+/* Selling wyrdstone (mordheimer, Income). The table gives the TOTAL gold for
+   selling that many shards at once, not a price per shard: one shard fetches 45
+   in a small warband, two together only 60, so a leader who can wait sells in
+   small lots. It also falls as the warband grows, since more mouths eat the
+   profit. Rows are shards sold (1..8, the last row covering 8 or more), columns
+   are the warband's size. Values transcribed from mordheimer's table. */
+export const WYRD_PRICE=[
+  /*1*/ [45,40,35,30,30,25],
+  /*2*/ [60,55,50,45,40,35],
+  /*3*/ [75,70,65,60,55,50],
+  /*4*/ [90,80,70,65,60,55],
+  /*5*/ [110,100,90,80,70,65],
+  /*6*/ [120,110,100,90,80,70],
+  /*7*/ [145,130,120,110,100,90],
+  /*8*/ [155,140,130,120,110,100],
+];
+export const WYRD_BANDS=[[3,'1\u20133'],[6,'4\u20136'],[9,'7\u20139'],[12,'10\u201312'],[15,'13\u201315'],[99,'16+']];
+export function wyrdSizeBand(n){ n=Number(n)||0; for(let i=0;i<WYRD_BANDS.length;i++){ if(n<=WYRD_BANDS[i][0]) return i; } return WYRD_BANDS.length-1; }
+/* How many models the warband fields - the figure the size bands are read from.
+   Hired Swords count too; they are mouths to feed like any other. */
+export function warbandSize(){ let n=(S.models||[]).reduce((s,m)=>{ const d=unitDef(m.uid_def); return s+((d&&d.t==='hen')?(Number(m.qty)||1):1); },0);
+  n+=(S.hired||[]).length + (S.dp||[]).length; return n; }
+export function wyrdPrice(shards, size){ shards=Math.max(1,Math.min(8,Number(shards)||1));
+  const band=wyrdSizeBand(size==null?warbandSize():size); return WYRD_PRICE[shards-1][band]; }
+/* Sell once per sequence: the gold goes to the treasury and the shards leave the
+   stash. Recorded so it can be shown and taken back. */
+export function pbSellWyrd(round, shards){ const st=postbattleState(round); if(st.wyrd&&st.wyrd.done) return;
+  const have=Number((S.stash||{}).wyrd)||0; shards=Math.max(1,Math.min(have,Number(shards)||0));
+  if(have<1||shards<1) return;
+  const size=warbandSize(); const gc=wyrdPrice(shards,size);
+  S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+  S.stash.gold=goldTreasury()+gc; S.stash.wyrd=have-shards;
+  st.wyrd={done:true, shards, gc, size};
+  logEvent('income',`Sold ${shards} wyrdstone shard${shards===1?'':'s'} for ${gc} gc.`,{round}); render(); }
+export function pbClearWyrd(round){ const st=postbattleState(round); const w=st.wyrd; if(!w||!w.done) return;
+  // give the gold back and return the shards, exactly as sold
+  S.stash=S.stash||{wyrd:0,gold:null,items:[]};
+  S.stash.gold=Math.max(0,goldTreasury()-(Number(w.gc)||0)); S.stash.wyrd=(Number(S.stash.wyrd)||0)+(Number(w.shards)||0);
+  st.wyrd=null; render(); }
+
 
 /* The Post-Battle Sequence panel: the nine steps in order, scoped to the latest
    battle's round, each with a done-tick. Injuries and experience reach into the
@@ -1061,8 +1101,23 @@ export function postbattleBlock(){
   expl+=`</div>`;
   // 4 Sell wyrdstone (guided; price table read from the roster/Mordheimer)
   const shards=Number((S.stash||{}).wyrd)||0;
-  const wyrd=`<div class="pb-body">Shards in stash: <b>${shards}</b>. Sell what you like (once per sequence), then add the gold to the treasury in the Stash panel.
-    <span class="pb-note">Price rises the fewer you sell and falls with warband size \u2014 see the Wyrdstone table.</span></div>`;
+  const w=st.wyrd; const size=warbandSize(); const band=WYRD_BANDS[wyrdSizeBand(size)][1];
+  let wyrd;
+  if(w&&w.done){
+    wyrd=`<div class="pb-body"><span class="pb-ok">Sold ${w.shards} shard${w.shards===1?'':'s'} for ${w.gc} gc</span> (warband of ${w.size}). <button class="tiny ghost" onclick="pbClearWyrd(${round})">undo sale</button>
+      <div class="pb-note">${shards} shard${shards===1?'':'s'} left in the stash.</div></div>`;
+  } else if(shards<1){
+    wyrd=`<div class="pb-body"><span class="pb-note">No wyrdstone in the stash to sell.</span></div>`;
+  } else {
+    const sell=Math.max(1,Math.min(shards, Number(st._wyrdSell)||shards));
+    const gc=wyrdPrice(sell,size);
+    const per=(gc/sell);
+    wyrd=`<div class="pb-body">Stash: <b>${shards}</b> shard${shards===1?'':'s'} \u00b7 warband of <b>${size}</b> (band ${band}).
+      <div class="pb-dice-line">Sell <input type="number" class="pb-sell" min="1" max="${shards}" value="${sell}" onchange="postbattleState(${round})._wyrdSell=this.value; render();" style="width:3.5em"> of them
+        \u2192 <b>${gc} gc</b> <span class="pb-note">(${per%1?per.toFixed(1):per} each)</span>
+        <button class="tiny" onclick="pbSellWyrd(${round}, postbattleState(${round})._wyrdSell||${shards})">Sell for ${gc} gc</button></div>
+      <span class="pb-note">Once per sequence. Fewer shards fetch more each; a bigger warband earns less. Gold goes straight to the treasury.</span></div>`;
+  }
   // 5 Available veterans
   const v=st.veterans;
   const vet=`<div class="pb-body">${v?`Experience pool: <b>${v.pool}</b> (rolled ${v.dice.join(' + ')}). <button class="tiny ghost" onclick="pbClearVeterans(${round})">clear</button>`
@@ -4208,6 +4263,7 @@ Object.assign(window, {
   postbattleBlock, postbattleState, pbRound, pbStepDone, pbSetStepDone,
   pbExploreDice, pbShardsFor, pbExploreMultiple, pbRollExplore, pbClearExplore,
   pbTakeShards, pbRollVeterans, pbClearVeterans, pbWonThisRound, pbHeroesOOA,
+  pbSellWyrd, pbClearWyrd, wyrdPrice, wyrdSizeBand, warbandSize,
   cfGet, cfNew, cfClose, cfSetName, cfSetRound, cfImportWarband, cfRemoveWarband,
   cfAddCurrent, cfExport, cfImportFile, cfMergedLog, cfAllBattles, cfStats,
   cfPickFile, cfPickWarband, cfAddCurrentPrompt, campaignFileBlock,
