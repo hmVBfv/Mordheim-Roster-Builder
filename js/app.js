@@ -939,22 +939,33 @@ export function hireDiscounted(key){ const anyTab=HIREDSWORDS[key]||DRAMATIS[key
    price from a table - it rolls nothing. Progress is kept per round in
    S.campaign.postbattle and rides along in the save.
    ========================================================================== */
-export const PB_TOOLS='https://mordheimer.net/docs/tools';
-export const PB_CAMP='https://mordheimer.net/docs/campaigns';
-export const PB_INCOME='https://mordheimer.net/docs/campaigns/income';
-export const PB_TRADE='https://mordheimer.net/docs/campaigns/trading';
+/* Deep links straight to the relevant section on Mordheimer. The tools page is
+   the post-battle sequence itself with a numbered anchor per step; injuries and
+   the exploration locations (the doubles/triples chart) live on their own pages
+   and are linked there. Anchors verified against the live pages. */
+export const PB_LINK={
+  injuries:'https://mordheimer.net/docs/campaigns#serious-injuries',
+  experience:'https://mordheimer.net/docs/tools#2-allocate-experience',
+  exploration:'https://mordheimer.net/docs/campaigns/income#exploration-chart',
+  wyrdstone:'https://mordheimer.net/docs/tools#4-sell-wyrdstone',
+  veterans:'https://mordheimer.net/docs/tools#5-check-available-veterans',
+  rare:'https://mordheimer.net/docs/tools#6-make-rarity-rolls-and-buy-rare-items',
+  dramatis:'https://mordheimer.net/docs/tools#7-look-for-dramatis-personae',
+  recruits:'https://mordheimer.net/docs/tools#8-hire-new-recruits--buy-common-items',
+  equipment:'https://mordheimer.net/docs/tools#9-reallocate-equipment',
+};
 /* [key, title, url]. The body is built in the panel so it can weave in live
    numbers (who searches, how many dice, what is in the stash). */
 export const PB_STEPS=[
-  ['injuries','Injuries',PB_CAMP],
-  ['experience','Experience',PB_TOOLS],
-  ['exploration','Exploration',PB_INCOME],
-  ['wyrdstone','Sell wyrdstone',PB_INCOME],
-  ['veterans','Available veterans',PB_TRADE],
-  ['rare','Rare items',PB_TRADE],
-  ['dramatis','Dramatis Personae',PB_TRADE],
-  ['recruits','Recruits & common items',PB_TRADE],
-  ['equipment','Reallocate equipment',PB_TOOLS],
+  ['injuries','Injuries',PB_LINK.injuries],
+  ['experience','Experience',PB_LINK.experience],
+  ['exploration','Exploration',PB_LINK.exploration],
+  ['wyrdstone','Sell wyrdstone',PB_LINK.wyrdstone],
+  ['veterans','Available veterans',PB_LINK.veterans],
+  ['rare','Rare items',PB_LINK.rare],
+  ['dramatis','Dramatis Personae',PB_LINK.dramatis],
+  ['recruits','Recruits & common items',PB_LINK.recruits],
+  ['equipment','Reallocate equipment',PB_LINK.equipment],
 ];
 export const PB_ORDER=PB_STEPS.map(s=>s[0]);
 /* The round the sequence belongs to: the latest battle's round, else the
@@ -1052,21 +1063,21 @@ export function pbStepBody(key, round){
     const unroll=(typeof unrolledCasualties==='function')?unrolledCasualties(round).length:0;
     return `<p>Test what became of every warrior taken out of action. <b>Heroes</b> roll on the Serious Injuries chart (D66). <b>Henchmen</b> roll a D6: <b>1\u20132</b> the man is dead, <b>3\u20136</b> he recovers. Resolve each one in the <b>Casualties</b> list below.</p>
       ${unroll?`<p class="pb-warn">${unroll} casualt${unroll===1?'y':'ies'} still to roll below.</p>`:`<p class="pb-note">No casualties left to roll.</p>`}
-      <p>${link(PB_CAMP,'Serious Injuries chart')}</p>`;
+      <p>${link(PB_LINK.injuries,'Serious Injuries chart')}</p>`;
   }
   if(key==='experience'){
     const pend=(typeof unappliedXp==='function')?unappliedXp(round):0;
     return `<p>Award experience: <b>+1</b> to each Hero and to each surviving Henchman group, <b>+1</b> to the winning leader, and <b>+1</b> to a Hero for every enemy he put out of action. Some scenarios grant more \u2014 add that too.</p>
       <p>Set it on each warrior in the roster below, or let the tool apply the standard awards: <button class="tiny" onclick="applyBattleResults()">Apply battle results</button>${pend?` <span class="pb-note">${pend} point${pend===1?'':'s'} pending</span>`:''}</p>
       <p class="pb-note">Scenario experience is entered by hand on the roster \u2014 the roster is the one place experience lives.</p>
-      <p>${link(PB_TOOLS,'Experience rules')}</p>`;
+      <p>${link(PB_LINK.experience,'Allocate experience')}</p>`;
   }
   if(key==='exploration'){
     const d=pbExploreDice(round); const who=pbSearchingHeroes(round);
     return `<p>Roll <b>1D6</b> for each Hero <b>not</b> taken out of action${who.length?` (${who.map(n=>String(n).replace(/</g,'&lt;')).join(', ')})`:''}, <b>+1 die</b> if you won, plus any dice from skills or equipment. Keep at most <b>6</b>.</p>
       <p>That is <b>${d.capped}</b> dice from the roster (${d.survivors} searching Hero${d.survivors===1?'':'es'}${d.winDie?' + 1 for the win':''}${d.base>6?', capped at 6':''}) before any from skills.</p>
       <p>Total the dice and read the Exploration chart for the wyrdstone found; any <b>double, triple</b> or better reveals a special location.</p>
-      <p>${link(PB_INCOME,'Exploration chart')}</p>`;
+      <p>${link(PB_LINK.exploration,'Exploration chart (doubles &amp; locations)')}</p>`;
   }
   if(key==='wyrdstone'){
     const st=postbattleState(round); const shards=Number((S.stash||{}).wyrd)||0; const w=st.wyrd;
@@ -1085,29 +1096,29 @@ export function pbStepBody(key, round){
     }
     return `<p>Sell wyrdstone once per sequence. The price is a <b>total for the batch</b>, not a price per shard \u2014 smaller lots fetch more each, and a larger warband earns less. The gold goes straight to the treasury.</p>
       ${calc}
-      <p>${link(PB_INCOME,'Wyrdstone table')}</p>`;
+      <p>${link(PB_LINK.wyrdstone,'Wyrdstone pricing table')}</p>`;
   }
   if(key==='veterans'){
     return `<p>Roll <b>2D6</b>. You may hire new recruits whose <b>combined experience</b> does not exceed that total \u2014 seasoned warriors are only available when the roll is high.</p>
       <p>Hire them in step 8 below.</p>
-      <p>${link(PB_TRADE,'Hiring rules')}</p>`;
+      <p>${link(PB_LINK.veterans,'Check available veterans')}</p>`;
   }
   if(key==='rare'){
     return `<p>A Hero <b>not</b> taken out of action may look for a rare item: roll <b>2D6</b> against the item's Rarity. What you find can be bought and added per warrior in the <b>Rare / Trading Post</b> section.</p>
-      <p>${link(PB_TRADE,'Rarity &amp; rare items')}</p>`;
+      <p>${link(PB_LINK.rare,'Rarity rolls &amp; rare items')}</p>`;
   }
   if(key==='dramatis'){
     return `<p>Look for a Dramatis Personae \u2014 a special character \u2014 if your warband may hire one and can afford it. Add them in the <b>Dramatis Personae</b> panel below.</p>
-      <p>${link(PB_TRADE,'Dramatis Personae')}</p>`;
+      <p>${link(PB_LINK.dramatis,'Look for Dramatis Personae')}</p>`;
   }
   if(key==='recruits'){
     return `<p>Hire new warriors (their combined experience within the veterans roll from step 5) and buy common equipment. New warriors join with their free dagger and may buy from their warband's common list.</p>
       <p>Recruit from the roster below.</p>
-      <p>${link(PB_TRADE,'Hiring &amp; equipment')}</p>`;
+      <p>${link(PB_LINK.recruits,'Hire recruits &amp; buy common items')}</p>`;
   }
   if(key==='equipment'){
     return `<p>Move equipment freely between warriors as you wish. Newly hired warriors may take rare or magic items already held in the stash.</p>
-      <p>${link(PB_TOOLS,'Reallocating equipment')}</p>`;
+      <p>${link(PB_LINK.equipment,'Reallocate equipment')}</p>`;
   }
   return '';
 }
