@@ -15,6 +15,7 @@ import type { Ctx, GameData, Model, WarbandState } from '../../src/index.ts';
 import { loadGameData } from '../../src/node.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures, type Fixture } from '../support/fixtures.ts';
+import { coreExportReport, legacyExportReport } from './exportReport.ts';
 import { rng, type Rng } from '../support/random.ts';
 
 export const data = loadGameData();
@@ -647,6 +648,10 @@ export function runSequence(label: string, start: WalkStart, seed: number, withL
       expect(got, `${label}: after ${done.slice(-6).join(' → ')}`).toEqual(want);
     }
     expect(casualtyReport(core.ctxOf(data, s)), `${label}: rules after ${done.slice(-6).join(' → ')}`).toEqual(legacyCasualtyReport());
+    // the exports, now and then (they read everything, so they are slow)
+    if (i % 25 === 24 || i === STEPS - 1) {
+      expect(coreExportReport(core.ctxOf(data, s), canonOf), `${label}: exports after ${done.slice(-6).join(' → ')}`).toEqual(legacyExportReport(L, data, canonOf));
+    }
   }
 }
 
