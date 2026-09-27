@@ -61,7 +61,14 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   über alle Warbands, Schlacht- und Verlustformular samt Entwürfen. Eigene
   Paritäts-Wanderung über Warband, Kampagnendatei und offene Formulare,
   dazu Szenarien für seltene Zweige.
-- [ ] 1b, weiter: Exporte (Chronik-Text, TTS, Text, PDF), Import und Format.
+- [x] 1b, siebter Teil: Exporte – lesbarer Text mit eingebettetem Stand,
+  Tabletop-Simulator-Karten, Chronik-Text, Kampagnen-Text, Dateinamen, das
+  offizielle Rostersheet als PDF (pdf-lib und Vorlage werden hineingereicht)
+  sowie die englischen Regel- und Ausrüstungstexte. Das PDF wird verglichen,
+  indem beide Seiten denselben aufzeichnenden Ersatz für pdf-lib bekommen;
+  ein Test füllt zusätzlich die echte Vorlage mit dem echten pdf-lib.
+- [ ] 1b, weiter: Import und Format (Laden alter Stände, Schemas,
+  Migrationen).
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [ ] 1c, 1d, 1e, 1f

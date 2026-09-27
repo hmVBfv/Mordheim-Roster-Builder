@@ -67,6 +67,11 @@ Post-Battle-Sequenz, Auswertung), die Kampagnendatei, die Kontrolle über
 Bezirke und die Formulare für Schlachten und Verluste. Die übrigen Module
 folgen in der Reihenfolge aus [roadmap.md](roadmap.md).
 
+In `export/` liegen der lesbare Text, die Tabletop-Simulator-Karten, der
+Chronik-Text und das PDF-Rostersheet. `buildOfficialSheet(ctx, pdfLib,
+template)` bekommt pdf-lib und die Vorlage hineingereicht und gibt Bytes und
+Dateinamen zurück; herunterladen oder teilen ist Sache der Oberfläche.
+
 Die Kampagnendatei und halb ausgefüllte Formulare sind in `core/` Werte wie
 eine Warband: Funktionen nehmen sie und geben neue zurück. Betrifft eine
 Aktion Warband und Kampagnendatei zugleich (eine Schlacht verschiebt
