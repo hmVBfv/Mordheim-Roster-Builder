@@ -66,20 +66,46 @@ export interface HireRecord {
   [key: string]: unknown;
 }
 
+export interface StashItem {
+  name: string;
+  qty: number;
+  [key: string]: unknown;
+}
+
 export interface Stash {
   wyrd?: number;
   /** The treasury; `null`/'' means "starting gold". */
   gold?: number | string | null;
-  items?: unknown[];
+  items?: StashItem[];
   [key: string]: unknown;
 }
 
 export type DistrictHold = 'none' | 'foothold' | 'control';
 
+/** An entry of the campaign chronicle (legacy S.campaign.log). */
+export interface LogEntry {
+  id: number;
+  round: number;
+  type: string;
+  text: string;
+  /** true = recorded by the tool as it happened; false = written by hand. */
+  auto: boolean;
+  data?: Record<string, unknown>;
+  edited?: boolean;
+  [key: string]: unknown;
+}
+
 export interface CampaignState {
   on?: boolean;
   round?: number;
   districts?: Record<string, DistrictHold>;
+  log?: LogEntry[];
+  battles?: { id: number; [key: string]: unknown }[];
+  casualties?: unknown[];
+  xp?: unknown[];
+  snapshots?: Record<string, unknown>;
+  /** Last log id handed out (core only; ids are never reused). */
+  logSeq?: number;
   [key: string]: unknown;
 }
 
@@ -125,5 +151,9 @@ export interface WarbandState {
   campaign?: CampaignState;
   leaderUid?: number | null;
   mark?: string | null;
+  /** Fallen warriors (graveyard); typed in the injuries slice. */
+  fallen?: unknown[];
+  /** Next model uid to hand out (core only; see nextModelUid). */
+  uidSeq?: number;
   [key: string]: unknown;
 }

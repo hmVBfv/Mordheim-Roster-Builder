@@ -1049,3 +1049,36 @@ runs the rules on frozen warbands — any write throws. ESLint forbids `window`,
 
 TypeScript 7 (the native port) was out, but typescript-eslint supports only
 up to 6.0, so the workspace pins TypeScript 6.0.
+
+## September 27, 2026 — actions, and two ids that must never come back
+
+The second slice ports roster building: recruiting, equipment, rare items,
+mutations, gold and stash, subtypes, districts, Hired Swords and Dramatis
+Personae, house rules. In core every action takes a state and returns a new
+one. Immer settles open decision C: inside a recipe the code writes the draft
+exactly as the legacy app wrote its global `S`, so a port stays line for line
+comparable, and the result is immutable anyway.
+
+Parity for actions is a random walk. The same seeded sequence of 80 actions
+runs through the legacy functions (which mutate `S` and re-render) and through
+core, from a fresh roster of every warband type — with and without the
+campaign switched on — and from generated states; after every single step the
+two must agree. Two lessons from making that comparison fair:
+
+* **Legacy normalised its state while drawing it.** Rendering filled in
+  missing house-rule defaults, created the campaign lists, and even rewrote a
+  Dramatis Personae's persona if the chosen one was not allowed for the
+  warband. Whether that had happened depended on what was on screen. Core
+  does it explicitly in `normalizeState`, and the comparison normalises both
+  sides.
+* **A removed warrior's uid came back.** Legacy kept a counter in the running
+  page, so within a session it never reused a uid; core, computing
+  "highest uid + 1", handed out the uid of a warrior just removed. With
+  versions and diffs keyed on `uid`, a reused uid would silently graft one
+  warrior's history onto another. The state now remembers its counters
+  (`uidSeq`, and `campaign.logSeq` for chronicle ids), set on load.
+
+The walk is checked for its own coverage — each action must actually change a
+state at least 15 times — after a planted bug (a repeated rare item counting
+double) slipped through the first version of the walk unnoticed, because the
+walk almost never bought the same rare item twice.

@@ -32,6 +32,8 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `format` | ja | Formatnummer; `core/format` migriert ältere Stände beim Laden |
 | `appVersion` | ja | App-Version (Commit), die den Stand erzeugt hat |
 | `canon` | ja | `{ name_de, name_en }` der Warband (z. B. *Die Silberne Karavane* / *The Ardent Caravan*) |
+| `uidSeq` | ja | nächste freie Krieger-`uid`; verhindert, dass eine `uid` nach Entfernen oder Tod wiederverwendet wird (setzt `normalizeState` beim Laden) |
+| `campaign.logSeq` | ja | zuletzt vergebene Chronik-ID; aus demselben Grund |
 | `story` | ja | `{ prologue, interludes: { [round]: text }, explain: { [changeKey]: text } }` |
 | `models[].profile` | ja | `{ name_de, name_en, title_de, title_en, voice, origin, text }` |
 | `wb`, `subtype`, `name`, `budget`, `models`, `stash`, `fallen`, `hired`, `dp`, `mark`, `house`, `leaderUid`, `goldNow` | nein | wie heute |
