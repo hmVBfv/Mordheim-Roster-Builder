@@ -105,7 +105,7 @@ function enrichSide(c: Ctx, side: CasualtySide): CasualtySide {
   return side;
 }
 
-function addCasualtyOn(d: WarbandDraft, c: Ctx, cas: CasualtyInput): Casualty {
+export function addCasualtyOn(d: WarbandDraft, c: Ctx, cas: CasualtyInput): Casualty {
   const camp = campState(d);
   const rec: Casualty = {
     id: nextLogId(d), round: cas.round == null ? (camp.round ?? 0) : Number(cas.round) || 0,
@@ -126,7 +126,7 @@ function addCasualtyOn(d: WarbandDraft, c: Ctx, cas: CasualtyInput): Casualty {
 }
 
 /** Brings the chronicle entry of a casualty in line with its result. */
-function retype(d: WarbandDraft, c: Ctx, r: Casualty): void {
+export function retypeCasualty(d: WarbandDraft, c: Ctx, r: Casualty): void {
   const ev = (campState(d).log ?? []).find((e) => e.data && e.data.casualtyId === r.id);
   if (ev) { ev.text = casualtyText(c, r); ev.type = casualtyType(r); }
 }
@@ -153,7 +153,7 @@ function noteCasualtyOutcome(d: WarbandDraft, c: Ctx, m: Model, result: string, 
     r.result = result;
     if (detail) r.detail = detail;
     if (who) r.victim.name = who;
-    retype(d, c, r);
+    retypeCasualty(d, c, r);
     return r;
   }
   return addCasualtyOn(d, c, { victim: { uid: m.uid, name, wb: d.wb ?? '' }, result, detail });
@@ -400,7 +400,7 @@ export function resolveCasualtyRoll(ctx: Ctx, id: number, code: string | null | 
     const r = casualtyList(d).find((x) => x.id === Number(id)) as Casualty;
     if (!code) {
       r.result = 'pending'; r.detail = ''; delete r.code; delete r.applied;
-      retype(d, c, r);
+      retypeCasualty(d, c, r);
       return;
     }
     r.code = code;
@@ -414,7 +414,7 @@ export function resolveCasualtyRoll(ctx: Ctx, id: number, code: string | null | 
       r.result = (hero ? code === '11-15' : !!(j as { dead?: boolean }).dead) ? 'dead'
         : (hero && /full recovery/i.test(j.name) ? 'recovered' : (hero ? 'injured' : 'recovered'));
       r.detail = INJEN[code] || j.name;
-      retype(d, c, r);
+      retypeCasualty(d, c, r);
       return;
     }
     const dead = hero ? code === '11-15' : !!(j as { dead?: boolean }).dead;
@@ -427,7 +427,7 @@ export function resolveCasualtyRoll(ctx: Ctx, id: number, code: string | null | 
       r.result = 'dead'; r.applied = true;
       r.fallenId = fe;
       if (fallen[fe]) fallen[fe].casualtyId = r.id;
-      retype(d, c, r);
+      retypeCasualty(d, c, r);
       return;
     }
     const inj = j as { code: string; name: string; text?: string; mod?: unknown; miss?: number | null };
@@ -442,7 +442,7 @@ export function resolveCasualtyRoll(ctx: Ctx, id: number, code: string | null | 
     } else {
       r.result = 'recovered'; r.detail = INJEN[code] ? INJEN[code] : j.name;
     }
-    retype(d, c, r);
+    retypeCasualty(d, c, r);
   });
 }
 
@@ -451,17 +451,21 @@ export function setCasualtyNote(ctx: Ctx, id: number, note: string): WarbandStat
   return update(ctx, (d) => { (casualtyList(d).find((x) => x.id === Number(id)) as Casualty).note = String(note || ''); });
 }
 
+/** Deletes a casualty record and its chronicle entry (draft level). */
+export function removeCasualtyOn(d: WarbandDraft, id: unknown): void {
+  const list = casualtyList(d);
+  const i = list.findIndex((x) => x.id === Number(id));
+  if (i < 0) return;
+  const cid = (list[i] as Casualty).id;
+  list.splice(i, 1);
+  const camp = campState(d);
+  camp.log = (camp.log ?? []).filter((e) => !(e.data && e.data.casualtyId === cid));
+}
+
 /** Deletes a casualty record and its chronicle entry. The interface asks first. */
 export function removeCasualty(ctx: Ctx, id: number): WarbandState {
-  const i = (ctx.s.campaign?.casualties ?? []).findIndex((x) => x.id === Number(id));
-  if (i < 0) return ctx.s;
-  return update(ctx, (d) => {
-    const list = casualtyList(d);
-    const cid = (list[i] as Casualty).id;
-    list.splice(i, 1);
-    const camp = campState(d);
-    camp.log = (camp.log ?? []).filter((e) => !(e.data && e.data.casualtyId === cid));
-  });
+  if (!(ctx.s.campaign?.casualties ?? []).some((x) => x.id === Number(id))) return ctx.s;
+  return update(ctx, (d) => { removeCasualtyOn(d, id); });
 }
 
 /** Everything the battle leaves behind, in one go: deaths rolled this round

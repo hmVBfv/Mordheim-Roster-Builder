@@ -95,3 +95,30 @@ export function removeBattle(ctx: Ctx, id: number): WarbandState {
     camp.log = (camp.log ?? []).filter((e) => !(e.data && e.data.battleId === bid));
   });
 }
+
+/* ---- the campaign layer ---- */
+
+/** Switches the campaign layer on or off (districts, chronicle, post-battle). */
+export function setCampaignOn(ctx: Ctx, on: boolean): WarbandState {
+  return update(ctx, (d) => {
+    if (!d.campaign) d.campaign = { districts: {} };
+    d.campaign.on = !!on;
+  });
+}
+
+/** Takes over campaign data pasted as JSON — a warband's campaign part or a
+    bare `{ districts }` — and switches the layer on. */
+export function importCampaignData(ctx: Ctx, text: unknown): { s: WarbandState; ok: boolean; msg: string } {
+  const str = String(text || '').trim();
+  if (!str) return { s: ctx.s, ok: false, msg: 'Nothing to import.' };
+  let d: Record<string, unknown>;
+  try { d = JSON.parse(str) as Record<string, unknown>; } catch { return { s: ctx.s, ok: false, msg: 'Could not read campaign data (expects JSON).' }; }
+  if (d == null) return { s: ctx.s, ok: false, msg: 'Could not read campaign data (expects JSON).' };
+  const camp = (d && (d.campaign || (d.districts ? d : null))) as Record<string, unknown> | null;
+  if (!camp || typeof camp !== 'object') return { s: ctx.s, ok: false, msg: 'No campaign data found.' };
+  const s = update(ctx, (dr) => {
+    dr.campaign = Object.assign({ on: true, districts: {} }, copy(camp));
+    if (!dr.campaign.districts) dr.campaign.districts = {};
+  });
+  return { s, ok: true, msg: 'Campaign imported.' };
+}
