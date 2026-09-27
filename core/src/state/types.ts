@@ -16,7 +16,8 @@ export interface Injury {
   code?: string;
   name?: string;
   /** Stat changes caused by the injury, e.g. { T: -1 }. */
-  mod?: Partial<Record<StatKey, number>>;
+  mod?: Partial<Record<StatKey, number>> | null;
+  text?: string;
   [key: string]: unknown;
 }
 
@@ -52,6 +53,8 @@ export interface Model {
   magic?: string;
   /** Games to miss (injuries). */
   miss?: number;
+  /** Why he misses them, for the chronicle ("Arm Wound …"). */
+  missWhy?: string;
   promoCats?: string[];
   /** Experience surcharge actually paid when veterans joined this group. */
   xpPaid?: number;
@@ -95,6 +98,72 @@ export interface Stash {
 
 export type DistrictHold = 'none' | 'foothold' | 'control';
 
+/** One death (legacy S.fallen). Heroes keep their whole model; a henchman
+    record holds a snapshot of ONE man of the group. */
+export interface FallenRecord {
+  kind: 'hero' | 'hench';
+  m: Model;
+  uid_def?: string;
+  exp?: number;
+  /** Which member of the group fell, and his own name if he had one. */
+  memberIdx?: number;
+  memberName?: string;
+  /** What was taken out of the treasury for him (given back on undo). */
+  lostValue?: number;
+  /** The casualty record this death belongs to. */
+  casualtyId?: number;
+  /** The casualty record was created by the death itself. */
+  casFromDeath?: boolean;
+  [key: string]: unknown;
+}
+
+/** Victim or attacker of a casualty; `uid` is set when he is in this roster. */
+export interface CasualtySide {
+  uid: number | null;
+  name: string;
+  wb: string;
+  grade: string;
+  value: number | null;
+  memberIdx?: number | null;
+  uid_def?: string;
+  [key: string]: unknown;
+}
+
+export type CasualtyResult = 'pending' | 'recovered' | 'injured' | 'dead';
+
+/** A warrior put out of action in a battle (legacy S.campaign.casualties). */
+export interface Casualty {
+  id: number;
+  round: number;
+  battleId: number | null;
+  victim: CasualtySide;
+  attacker: CasualtySide;
+  result: CasualtyResult | string;
+  detail: string;
+  /** Index into `fallen` once the death has been applied. */
+  fallenId: number | null;
+  note: string;
+  /** The injury roll it was resolved with. */
+  code?: string;
+  /** The result has been written onto the roster. */
+  applied?: boolean;
+  /** The experience entry granted to the attacker. */
+  xpId?: number;
+  [key: string]: unknown;
+}
+
+/** Experience earned and held until applied (legacy S.campaign.xp). */
+export interface XpEntry {
+  id: number;
+  round: number;
+  uid: number;
+  name: string;
+  amount: number;
+  reason: string;
+  applied: boolean;
+  [key: string]: unknown;
+}
+
 /** An entry of the campaign chronicle (legacy S.campaign.log). */
 export interface LogEntry {
   id: number;
@@ -114,8 +183,8 @@ export interface CampaignState {
   districts?: Record<string, DistrictHold>;
   log?: LogEntry[];
   battles?: { id: number; [key: string]: unknown }[];
-  casualties?: unknown[];
-  xp?: unknown[];
+  casualties?: Casualty[];
+  xp?: XpEntry[];
   snapshots?: Record<string, unknown>;
   /** Last log id handed out (core only; ids are never reused). */
   logSeq?: number;
@@ -164,8 +233,8 @@ export interface WarbandState {
   campaign?: CampaignState;
   leaderUid?: number | null;
   mark?: string | null;
-  /** Fallen warriors (graveyard); typed in the injuries slice. */
-  fallen?: unknown[];
+  /** Fallen warriors, in the order they fell. */
+  fallen?: FallenRecord[];
   /** Next model uid to hand out (core only; see nextModelUid). */
   uidSeq?: number;
   [key: string]: unknown;

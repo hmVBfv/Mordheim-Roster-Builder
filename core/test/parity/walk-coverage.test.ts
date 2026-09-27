@@ -64,3 +64,34 @@ describe('roster actions without a legacy counterpart', () => {
   });
 });
 
+
+describe('casualty actions without a legacy counterpart', () => {
+  it('never hands out a casualty or experience id again, even in a save without logSeq', () => {
+    // A legacy save: the casualty's chronicle entry was deleted by hand, so
+    // the highest id left is the casualty's (legacy would reuse it).
+    let s: WarbandState = { ...core.newWarband(data, 'merc'), campaign: { on: true, districts: {} } };
+    const ctx = () => core.ctxOf(data, s);
+    s = core.addUnit(ctx(), 'capt');
+    s = core.addCasualty(ctx(), { victim: { name: 'Clanrat', wb: 'skaven' }, attacker: { uid: s.models[0]!.uid, name: 'Captain' } });
+    const camp = s.campaign!;
+    const taken = [...(camp.casualties ?? []).map((r) => r.id), ...(camp.xp ?? []).map((x) => x.id)];
+    s = { ...s, campaign: { ...camp, log: [], logSeq: undefined } };
+    s = core.addCasualty(ctx(), { victim: { name: 'Clanrat', wb: 'skaven' } });
+    expect((s.campaign?.casualties ?? []).at(-1)!.id).toBeGreaterThan(Math.max(...taken));
+  });
+
+  it('asks nothing: the answers to the chart\'s questions are arguments', () => {
+    let s: WarbandState = core.newWarband(data, 'merc');
+    const ctx = () => core.ctxOf(data, s);
+    s = core.addUnit(ctx(), 'capt');
+    s = core.stashSet(ctx(), 'gold', 300);
+    const uid = s.models[0]!.uid;
+    const ransomed = core.addInjury(ctx(), uid, '61', { captiveReturns: true, ransom: 40 });
+    expect(ransomed.stash?.gold).toBe(260);
+    const lost = core.addInjury(ctx(), uid, '61', { captiveReturns: false });
+    expect(lost.models).toHaveLength(0);
+    expect(lost.fallen?.[0]?.kind).toBe('hero');
+    expect(core.addInjury(ctx(), uid, '35', { deepWoundGames: 3 }).models[0]!.miss).toBe(3);
+    expect(core.addInjury(ctx(), uid, 'no-such-code')).toBe(s);
+  });
+});

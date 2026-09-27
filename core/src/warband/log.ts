@@ -15,13 +15,15 @@ export function campState(d: WarbandDraft): CampaignState {
   return c;
 }
 
-/** Next id for a log entry or battle. Never reuses an id: the campaign
-    remembers the last one handed out (`logSeq`). */
+/** Next id for a log entry, battle, casualty or experience entry — they
+    share one sequence. Never reuses an id: the campaign remembers the last
+    one handed out (`logSeq`). A save without it continues after the highest
+    id in any of the four lists; legacy looked at the log and the battles
+    only, so an old save could hand out a casualty's id a second time. */
 export function nextLogId(d: WarbandDraft): number {
   const c = campState(d);
-  const mx = (c.log ?? []).reduce((m, e) => Math.max(m, Number(e.id) || 0), 0);
-  const bx = (c.battles ?? []).reduce((m, e) => Math.max(m, Number(e.id) || 0), 0);
-  const id = Math.max(Number(c.logSeq) || 0, mx, bx) + 1;
+  const top = (xs: { id?: unknown }[] | undefined) => (xs ?? []).reduce((m, e) => Math.max(m, Number(e.id) || 0), 0);
+  const id = Math.max(Number(c.logSeq) || 0, top(c.log), top(c.battles), top(c.casualties), top(c.xp)) + 1;
   c.logSeq = id;
   return id;
 }
@@ -32,6 +34,17 @@ export function logEvent(d: WarbandDraft, type: string, text: string, data?: Rec
   const c = campState(d);
   if (!c.on) return null;
   const e: LogEntry = { id: nextLogId(d), round: c.round ?? 0, type: String(type), text: String(text), auto: true };
+  if (data) e.data = data;
+  (c.log as LogEntry[]).push(e);
+  return e;
+}
+
+/** Like logEvent, but stamped with a given round (a battle records itself
+    under the round it belongs to, which may be ahead of the current one). */
+export function logEventAt(d: WarbandDraft, round: unknown, type: string, text: string, data?: Record<string, unknown>): LogEntry | null {
+  const c = campState(d);
+  if (!c.on) return null;
+  const e: LogEntry = { id: nextLogId(d), round: Number(round) || 0, type: String(type), text: String(text), auto: true };
   if (data) e.data = data;
   (c.log as LogEntry[]).push(e);
   return e;

@@ -30,7 +30,7 @@ function installStubs(): void {
     style: {}, className: '', textContent: '', value: '', checked: false,
     set innerHTML(_v: string) { /* ignored */ }, get innerHTML() { return ''; },
     appendChild() {}, addEventListener() {}, getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0 }),
-    querySelectorAll: () => [], click() {}, focus() {}, select() {},
+    querySelectorAll: () => [], click() {}, focus() {}, select() {}, remove() {},
   });
   const g = globalThis as Record<string, unknown>;
   g.document = { getElementById: el, createElement: el, addEventListener() {}, body: { appendChild() {} }, querySelectorAll: () => [] };

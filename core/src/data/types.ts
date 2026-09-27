@@ -82,6 +82,18 @@ export interface WarbandDef {
 
 export type CatalogCategory = 'cc' | 'missile' | 'bp' | 'armour' | 'misc';
 
+/** A result of the Heroes' Serious Injuries chart (D66). */
+export interface InjuryDef {
+  code: string;
+  name: string;
+  text: string;
+  /** Lasting characteristic change, e.g. { M: -1 }. */
+  mod?: Partial<Record<StatKey, number>> | null;
+  /** Games he misses (a temporary injury). */
+  miss?: number | null;
+  [key: string]: unknown;
+}
+
 export interface CatalogItem {
   /** German name (the key used in rosters). */
   de: string;
@@ -241,7 +253,7 @@ export interface GameData {
   MUTLABEL: Record<string, string>;
   MUTSETS: Record<string, EquipmentEntry[]>;
   INJEN: Record<string, string>;
-  INJURIES: { code: string; name: string; text: string; [key: string]: unknown }[];
+  INJURIES: InjuryDef[];
   NAMEEN: Record<string, string>;
   NR_CAT: Record<string, string>;
   NR_T: Record<string, string>;
