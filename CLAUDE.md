@@ -74,6 +74,14 @@ changing anything structural.
   generator change cannot silently stop exercising a feature.
 - Core never mutates data or state: `createGameData` deep-freezes the data and
   `core/test/purity.test.ts` runs the rules on frozen states.
+- Actions are checked by a seeded random walk (`core/test/parity/walk.ts`,
+  run from four `walk-*.parity.test.ts` files in parallel). Add every new
+  action to the walk and to `ACTIONS`; `walk-coverage.test.ts` fails if an
+  action does not change a state often enough.
+- Any intended difference from legacy behaviour is recorded in
+  `docs/behaviour-changes.md` with its test, and excluded from parity by a
+  named, specific rule — never a blanket one. A legacy bug found on the way
+  is fixed in both, with a regression test in `test/`.
 
 ## Invariants
 
