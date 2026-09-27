@@ -117,7 +117,7 @@ Diese offenen Punkte des Pi müssen vor Phase 2 erledigt sein:
 
 | | Frage | Vorschlag | Bis |
 | --- | --- | --- | --- |
-| **A** | Optik: zwei Themes aus gemeinsamen Variablen – „Parchment“ (hell, heutiger Builder) und „Chronicle“ (dunkel, Chronik-Seite)? | ja; Standard nach Systemeinstellung | Phase 1e |
+| ~~A~~ | ~~Optik~~ – entschieden: beide Themes wählbar, Standard „Chronicle“ (dunkel), siehe [ui.md](ui.md#4-themes-und-gestaltung) | – | – |
 | **B** | Git im Agenten-Container: Die Agenten-Basis lässt git nur auf dem Host laufen. Für die Entwicklung über `roster-rc` wäre Commit/Push auf Feature-Branches aus dem Container praktisch. | für `roster` erlauben, nur auf Branches ≠ `master`; `master` per GitHub-Regelwerk geschützt. Alternative: Host-Helfer `roster-ship`. | Phase 1a |
 | **C** | Immer für unveränderliche Updates in `core/`? | Entscheidung beim ersten Modul nach Lesbarkeit der Tests | Phase 1b |
 | **D** | Alte App nach der Umstellung: `dist/mordheim-roster.html` noch eine Kampagnenrunde lang als Download behalten? | ja, danach entfernen | Phase 3 |
@@ -144,3 +144,4 @@ Siehe [decisions/](decisions/). Kurzfassung:
 | 0012 | Bug-Tracker in der App; Bearbeitung nur auf Zuruf |
 | 0013 | Oberfläche englisch; Kanon und Epos zweisprachig |
 | 0014 | Leistungsgrenzen werden in der CI geprüft |
+| – | Themes: „Chronicle“ (dunkel, Standard) und „Parchment“ (hell) wählbar; Druck immer hell ([ui.md](ui.md#4-themes-und-gestaltung)) |
