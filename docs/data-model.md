@@ -55,6 +55,15 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   eigenen Kriegern. `fallenId` ist ein Index in `fallen`.
 - **Gehaltene Erfahrung** (`campaign.xp[]`): `{ id, round, uid, name,
   amount, reason, applied }`; `applyPendingXp` schreibt sie auf die Krieger.
+- **Schlachten** (`campaign.battles[]`): `{ id, round, sides: [{ key, name,
+  wb, outcome }], opponents: [{ name, wb }], district, outcome, notes }`;
+  `key: 'me'` ist die eigene Warband, `opponents` bleibt für ältere Leser.
+- **Snapshots** (`campaign.snapshots[round]`): `{ round, at, state, totals }`
+  beim Abschluss einer Stufe; `state` ist die ganze Warband ohne
+  Kampagnenaufzeichnungen und ohne `_`-Schlüssel, `totals` = `{ rating,
+  spent, models, heroes, gold, fallen }` so, wie sie damals standen.
+- **Post-Battle** (`campaign.postbattle[round]`): `{ done: { [step]: true },
+  wyrd: { done, shards, gc, size } | null }`.
 - **`uid` eines Kriegers ist unveränderlich** und die Grundlage für Vergleich,
   Lebenslauf und Erwähnungen.
 - **`campaign`:** In der Quick-Build-Variante und in der Kampagnendatei bleibt

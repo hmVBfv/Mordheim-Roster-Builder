@@ -61,12 +61,15 @@ Rüstungswurf) sind portiert und per Paritätstest abgesichert, ebenso aus
 `warband/` der Rosterbau (Einheiten, Ausrüstung, Rare Items, Mutationen,
 Gold und Truhe, Subtyp, Bezirke, Hired Swords und Dramatis Personae,
 Hausregeln), Aufstiege und Beförderungen sowie Verletzungen, Gefallene,
-Verlusteinträge und gehaltene Erfahrung. Die übrigen Module folgen in der
-Reihenfolge aus [roadmap.md](roadmap.md).
+Verlusteinträge und gehaltene Erfahrung, dazu die Kampagne einer Warband
+(Chronik, Stufen und Snapshots, Schlachten, Footholds, Post-Battle-Sequenz,
+Auswertung). Die übrigen Module folgen in der Reihenfolge aus
+[roadmap.md](roadmap.md).
 
 Wo die alte App im Ablauf nachfragte (Robbed anwenden? Grubenkampf gewonnen?
 Gefangener kommt zurück, Lösegeld? D3 für Deep Wound?), ist die Antwort ein
-Argument der Aktion; die Oberfläche fragt, bevor sie aufruft.
+Argument der Aktion; die Oberfläche fragt, bevor sie aufruft. Ebenso das
+Datum eines Snapshots: `advanceRound(ctx, today)` – `core/` liest keine Uhr.
 
 **Aktionen** (`warband/`) nehmen einen Zustand und geben einen neuen zurück
 (Immer); der Eingang bleibt unverändert, eine abgelehnte Aktion gibt genau

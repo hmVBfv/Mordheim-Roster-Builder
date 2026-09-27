@@ -46,6 +46,7 @@ Portieren.
 | Offene/zugeklappte Bereiche (`_…Open`) | im Speicherstand | nicht Teil des Stands | Bildschirmzustand gehört nicht in die Historie |
 | Ungültige Eingabe (unbekannte Warband/Einheit) | Fehler (Absturz) | neutraler Wert (0, leere Liste) | robust gegen alte oder beschädigte Stände |
 | Abgelehnte Aktion (z. B. Heldenlimit erreicht) | Hinweisfenster | derselbe Stand zurück; die Oberfläche erklärt | keine Dialoge in der Logik |
+| Datum eines Stufen-Snapshots | Uhr des Browsers | Argument `today` von `advanceRound`/`snapshotStage` | `core/` liest keine Uhr (Invariante) |
 | Rückfragen im Ablauf (Robbed anwenden? Grubenkampf gewonnen? Gefangener kommt zurück, Lösegeld? D3 für Deep Wound? Löschen bestätigen?) | Dialog mitten in der Aktion | Antwort ist ein Argument (`InjuryChoices`); die Oberfläche fragt vorher | wie oben; Vorgaben = was die alte App ohne Dialog tat |
 
 ## Geplant

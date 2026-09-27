@@ -51,8 +51,13 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Ergebnis der Tabelle mit jeder Antwort an vorbereiteten Warbands. Ein
   weiterer Fehler der alten App behoben, zwei Ungereimtheiten als Vorschlag
   notiert (siehe [behaviour-changes.md](behaviour-changes.md)).
-- [ ] 1b, weiter: Kampagne (Schlachten, Runden, Post-Battle, Snapshots,
-  Bezirke), Exporte, Format.
+- [x] 1b, fünfter Teil: die Kampagne einer Warband – Chronik, Stufen mit
+  Snapshots und ausgesessenen Spielen, Schlachten, Footholds, die
+  Post-Battle-Sequenz mit Wyrdstone-Verkauf, Stufenvergleich und Auswertung
+  je Krieger. Die Wanderung (110 Schritte, 100 Aktionen) vergleicht auch diese
+  Auswertungen nach jedem Schritt.
+- [ ] 1b, weiter: Kampagnendatei (mehrere Warbands, Schlachtformular,
+  Kontrolle über Bezirke), Exporte (Chronik-Text, TTS, Text, PDF), Format.
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [ ] 1c, 1d, 1e, 1f
