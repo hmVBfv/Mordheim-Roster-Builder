@@ -1238,3 +1238,26 @@ comes back from a save as that amount in coins, because loading adopts the
 gold in hand the file states. The legacy app does the same, and the value
 does not change — only a later change to the starting-gold house rule would
 no longer move it, which is arguably right for a warband already in play.
+
+## September 27, 2026 — what changed, and why
+
+With the port done, phase 1c adds the first logic the legacy app never had:
+comparing two marked states of a warband, and matching every change with its
+cause. The comparison works on the warriors' fixed ids and finds everything
+— recruits, deaths, promotions, experience, characteristics, skills, spells,
+injuries, gear, hires, districts, house rules, totals — however it came
+about. The matching then looks for the event or battle record behind each
+change. A characteristic that rose by two needs two advances; a group that
+shrank is explained by its dead and its promoted; buying gear or hiring a
+sword needs no cause at all, because it is the player's free choice. What
+has no cause is marked for everyone to see and blocks nothing.
+
+Each change gets a key made from its content, never its position, so a
+player's explanation stays on the right change when a marked state is
+corrected later. The briefing for a battle is built from all of it: who
+fought, the protocol and notes, the aftermath and advances per warband with
+the players' explanations and what each warrior did in that very battle,
+interludes, open threads, the canon in both languages, and how many
+explanations are still missing. Two choices here are open to Rob: which
+changes ask for an explanation, and that experience became a change kind of
+its own (it was missing from the list in the data model).
