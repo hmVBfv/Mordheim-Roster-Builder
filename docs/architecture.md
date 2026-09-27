@@ -54,6 +54,18 @@ Reine Logik, lauffähig in Browser und Node.
 | `format/` | Zod-Schemas, Formatnummer, Migrationen alter Speicherstände | neu |
 | `export/` | TTS-Texte, Text-Export mit `MORDHEIM-DATA`, PDF-Sheet (Vorlage und `pdf-lib` werden hineingereicht) | `js/tts.js`, `js/pdf.js` |
 
+**Stand (Phase 1b):** `data/` (Laden, Typen), `state/` (Speicherformat,
+Hausregeln) und `rules/` (Nachschlagen, Bezirkseffekte, Preise, Hired Swords
+und Dramatis Personae, Ausrüstung und Rare Items, Kosten und Rating, Worth,
+Rüstungswurf) sind portiert und per Paritätstest abgesichert. Die übrigen
+Module folgen in der Reihenfolge aus [roadmap.md](roadmap.md).
+
+**Wie portiert wird:** Die alte App wird *nicht* auf `core/` umgebaut; sie
+bleibt unverändert live, bis der neue Builder sie ersetzt. `core/` wird gegen
+sie per Differenztest geprüft (`core/test/parity/`): Für erzeugte Warbands
+aller 49 Typen, aller Subtypen und dreier Hausregel-Varianten rechnen alte App
+und `core/` jeden Wert aus, und beide Ergebnisse müssen identisch sein.
+
 Regeln für `core/`:
 
 - Keine DOM-Zugriffe, keine globalen Variablen, kein verstecktes `Date.now()`

@@ -1014,3 +1014,38 @@ Turns worth remembering:
 
 Next is phase 1: pulling the logic out of `js/app.js` into a shared `core/`,
 guarded by the existing tests and a parity check across all 49 warbands.
+
+## September 27, 2026 — phase 1 begins: every rule, computed twice
+
+The first code of the new platform is not new behaviour but old behaviour,
+moved. `core/` is a TypeScript workspace with no DOM, no Node APIs and no
+globals; its first slice is everything `engine.js` computes — costs, gold,
+rating, Worth, armour saves — plus what it reached back into `app.js` for:
+Hired Swords and Dramatis Personae, district price effects, the catalogue
+rule.
+
+The decision that shaped the work: **the legacy app is not rewired onto
+core.** It stays exactly as it is, live, until the new builder replaces it.
+Core is proven against it instead. A generator builds warbands for all 49
+warband types, every subtype and three house-rule presets — random but
+seeded equipment, mutations, rare items (eligible or not), injuries,
+promotions, hired swords with options and personas, campaign footholds — 348
+of them. For each, the legacy functions (loaded in Node with DOM stubs) and
+the core functions answer the same questions, and the answers must be
+identical, down to the unrounded halves of Worth.
+
+They were, on the first run, except for a test bug: two units (the Plague
+Cart and the Trade Wagon) have `profile: null`, which the test had assumed
+away. Passing on the first try is exactly when a test deserves suspicion, so
+three bugs were planted in core by hand — a henchman surcharge of 3 instead
+of 2, an off-by-one in the shield slot, a Hired Sword rule that ignores
+alignment. The suite caught all three (288, 290 and 54 failing warbands).
+A coverage test now fixes minimums for every priced feature the fixtures
+exercise, so a future generator change cannot make parity vacuous.
+
+Two smaller guards: `createGameData` deep-freezes the data, and a purity test
+runs the rules on frozen warbands — any write throws. ESLint forbids `window`,
+`document`, Node imports, `Math.random` and `Date.now` in `core/src`.
+
+TypeScript 7 (the native port) was out, but typescript-eslint supports only
+up to 6.0, so the workspace pins TypeScript 6.0.

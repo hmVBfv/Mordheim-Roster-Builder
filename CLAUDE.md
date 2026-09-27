@@ -37,10 +37,14 @@ changing anything structural.
 
 ## Commands
 
-- Legacy: `node test/run.mjs` (rebuilds `dist/`, runs every test incl.
-  parity), `node build.js`.
-- New workspaces: to be defined in phase 1a. **Update this section when they
-  exist.**
+- `npm ci` once (root; npm workspaces).
+- `npm run check` — typecheck, lint, legacy tests and core tests; run it
+  before every push.
+- `npm run typecheck`, `npm run lint`, `npm run test:legacy`,
+  `npm run test:core` (or `npm test -w core -- --watch` while working).
+- Legacy only: `node test/run.mjs` (rebuilds `dist/`, runs every legacy test
+  incl. its bundle parity), `node build.js`.
+- CI (`.github/workflows/ci.yml`) runs the same on every push.
 
 ## Rules authority (never violate)
 
@@ -54,6 +58,22 @@ changing anything structural.
   edits to rules data.
 - Rules questions are Rob's call. Propose with a cited source; do not change
   rules data without his OK.
+
+## Porting legacy logic into `core/`
+
+- The legacy app is **not** rewired onto `core/`. It stays as it is until the
+  new builder replaces it; `core/` is verified against it by differential
+  tests in `core/test/parity/`.
+- Port a function 1:1 (same order of operations, same quirks), replacing the
+  global `S` with a `Ctx`, and add it to a parity report. Where legacy would
+  throw on broken input (unknown warband or unit), core returns a neutral
+  value (0, empty list, `undefined`) — never a different answer for valid
+  input.
+- The fixtures (`core/test/support/fixtures.ts`) cover every warband,
+  subtype and three house-rule presets; the coverage test sets minimums so a
+  generator change cannot silently stop exercising a feature.
+- Core never mutates data or state: `createGameData` deep-freezes the data and
+  `core/test/purity.test.ts` runs the rules on frozen states.
 
 ## Invariants
 

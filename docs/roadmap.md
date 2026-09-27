@@ -22,6 +22,20 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
 | 1e App-Grundgerüst | Vite + React als PWA, beide Varianten, Design-Variablen mit beiden Themes, Navigation, Dexie, Update-Banner; Roster zunächst nur lesend. |
 | 1f Mockups | Die Bildschirme aus [ui.md](ui.md#3-bildschirme-die-zuerst-als-mockup-entstehen) als statische Seiten unter `docs/mockups/`. |
 
+**Stand:**
+
+- [x] 1a Werkzeuge: npm-Workspaces (`core`), TypeScript 6.0 `strict`,
+  Vitest, ESLint mit Regeln gegen DOM, Node-APIs, `Math.random` und
+  `Date.now` in `core/src`, CI-Workflow `ci.yml`. (TypeScript 7 wird noch
+  nicht von typescript-eslint unterstützt.)
+- [x] 1b, erster Teil: Spieldaten, Speicherformat, Hausregeln und die
+  komplette Regel-/Kostenrechnung aus `engine.js` samt Hired Swords,
+  Dramatis Personae, Bezirkseffekten, Worth und Rüstungswurf – Parität über
+  348 erzeugte Warbands, Reinheitstest auf eingefrorenen Ständen.
+- [ ] 1b, weiter: Warband-Operationen (anwerben, ausrüsten, Erfahrung,
+  Aufstiege, Verletzungen, Beförderungen), Kampagne, Exporte, Format.
+- [ ] 1c, 1d, 1e, 1f
+
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in
 der CI; Mockups auf dem Handy geprüft und freigegeben.
