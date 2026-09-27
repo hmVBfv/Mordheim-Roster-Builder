@@ -1,0 +1,4 @@
+{
+  "//": "The legacy app is ES modules; this keeps Node from guessing (the root package.json has no type, so build.js stays CommonJS).",
+  "type": "module"
+}
