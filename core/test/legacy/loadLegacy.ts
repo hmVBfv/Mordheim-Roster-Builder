@@ -18,6 +18,8 @@ export interface Legacy {
   engine: LegacyModule;
   state: LegacyModule;
   info: LegacyModule;
+  tts: LegacyModule;
+  pdf: LegacyModule;
   /** Replace the legacy global state with a deep copy of `s`. */
   load(s: unknown): any;
 }
@@ -60,9 +62,11 @@ export async function loadLegacy(): Promise<Legacy> {
   const engine = await imp('js/engine.js');
   const state = await imp('js/state.js');
   const info = await imp('js/info.js');
+  const tts = await imp('js/tts.js');
+  const pdf = await imp('js/pdf.js');
   const replaceState = state.replaceState as (s: unknown) => void;
   return {
-    app, engine, state, info,
+    app, engine, state, info, tts, pdf,
     load(s: unknown) {
       replaceState(structuredClone(s));
       return state.S;
