@@ -76,7 +76,12 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Vorschläge V1/V2 entscheiden.
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
-- [ ] 1c, 1d, 1e, 1f
+- [x] 1c Neue Logik: `core/changes` (Vergleich zweier Stände mit stabilen
+  Änderungsschlüsseln, Abgleich mit Ereignissen und Schlachtprotokoll,
+  fehlende Erklärungen) und `core/narrative` (Briefing je Schlacht als
+  Markdown). Die Eingaben, die erst der Server liefert (Notizen, Protokoll
+  über alle Warbands), sind als Datenstruktur festgelegt.
+- [ ] 1d, 1e, 1f
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in

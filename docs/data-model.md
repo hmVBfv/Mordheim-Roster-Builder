@@ -174,14 +174,26 @@ Ständen:
 ```
 
 - **`kind`:** `recruited`, `died`, `injury`, `stat`, `skill`, `spell`,
-  `promoted`, `gear_added`, `gear_removed`, `rare_added`, `rare_removed`,
-  `group_size`, `hired`, `released`, `renamed`, `gold`, `rating`, `worth`,
-  `district`, `house_rules`.
+  `promoted`, `experience`, `gear_added`, `gear_removed`, `rare_added`,
+  `rare_removed`, `group_size`, `hired`, `released`, `renamed`, `gold`,
+  `rating`, `worth`, `district`, `house_rules`.
 - **`change_key`:** `<round>:<uid|wb>:<kind>:<detail>` – stabil, damit die
   Erklärung des Spielers (`story.explain[changeKey]`) auch nach einer
-  Korrektur des Tags an der richtigen Änderung hängt.
-- **`event_ref`:** zugehöriges Ereignis oder Protokolleintrag; fehlt er, ist
-  `unexplained = true`.
+  Korrektur des Tags an der richtigen Änderung hängt. Der Schlüssel entsteht
+  aus dem Inhalt, nie aus Positionen: `detail` ist der Wert, die Fertigkeit,
+  das Ding oder die Verletzung; Wiederholungen tragen `#2`, `#3`, Wegfälle ein
+  vorangestelltes `-`; der n-te Tod eines Kriegers bzw. einer Gruppe ist `n`.
+  Bei Hired Swords steht statt der Krieger-`uid` die `uid` des Eintrags.
+- **`event_ref`:** zugehöriges Ereignis (`evt:<id>`) oder Protokolleintrag
+  (`cas:<id>`); jeder Beleg erklärt höchstens eine Änderung, ein Wert +2
+  braucht zwei Aufstiege. Fehlt er, ist `unexplained = true`. Nie ohne
+  Anlass sind freie Entscheidungen und Summen: Umbenennen, Ausrüstung,
+  verkaufte Rare Items, Anheuern und Entlassen, Gold, Rating, Worth. Eine
+  kleinere Gruppe ist durch ihre Toten und Beförderten erklärt.
+- **Erklärungen:** Das Briefing zählt fehlende Erklärungen für die Arten, aus
+  denen eine Geschichte besteht (`STORY_KINDS`: neu, gefallen, gegangen,
+  befördert, Werte, Fertigkeiten, Zauber, Verletzungen, erworbene Rare Items,
+  Anheuern, Bezirke) – nicht für Erfahrung, Einkäufe oder Summen.
 - Die Datensätze werden beim Markieren eingefroren. Die Rohversionen bleiben
   erhalten, sodass sich ein Vergleich jederzeit nachrechnen und mit dem
   eingefrorenen Stand abgleichen lässt.

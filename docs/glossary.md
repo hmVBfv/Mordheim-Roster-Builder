@@ -32,6 +32,8 @@ Begriff einführt, trägt ihn hier ein.
 | Vergleich | Diff | `core/changes` |
 | Abgleich | Reconciliation | `event_ref`, `unexplained` |
 | Anlass | Cause | `event_ref` |
+| ohne Anlass | Unexplained (no recorded cause) | `unexplained` |
+| Beleg | Evidence | `evt:<id>`, `cas:<id>` |
 | Ereignis | Event | `events` |
 | Änderungsschlüssel | Change key | `change_key` |
 | Kanon | Canon | `canon`, `profile.name_de/_en` |
@@ -70,6 +72,7 @@ Begriff einführt, trägt ihn hier ein.
 | Prolog | Prologue | `story.prologue` |
 | Zwischenspiel | Interlude | `story.interludes`, Segment `i<n>` |
 | Erklärung (einer Änderung) | Explanation | `story.explain` |
+| fehlende Erklärung | Missing explanation | `missingExplanations`, `STORY_KINDS` |
 | Frage an Spieler | Question | `questions` |
 | Zeitleiste | Timeline | `timeline_positions` |
 | Abschnitt | Segment | `segment` |
