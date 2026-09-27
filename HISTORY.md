@@ -1190,3 +1190,26 @@ under a differently cased name, a battle both sides wrote down with the
 sides in another order, a casualty naming the third side when the first is
 removed). Seven short scenarios now cover those; afterwards every planted
 bug was caught except one that, on inspection, cannot change any result.
+
+## September 27, 2026 — the exports, and a PDF drawn twice
+
+The seventh slice ports everything that leaves the builder as text or
+paper: the readable roster that ends in its own save, the Tabletop Simulator
+cards, the chronicle written out for the campaign story, the district
+report, file names, the English rule and equipment texts behind all of them,
+and the official roster sheet.
+
+The sheet was the interesting one to test. It is drawn onto the
+freebooters.org template with pdf-lib, and two PDFs are never byte-for-byte
+equal (they carry the time they were made). So both implementations are
+handed the same stand-in for pdf-lib that writes down every text and box it
+is asked to draw, with its page, position, size and font, and the two lists
+must match. One more test fills the real template with the real library, to
+know core works with what it will be given. Core itself imports neither: the
+library and the template are passed in, as the architecture document said
+they would be.
+
+The planted bugs were all caught once the sheet test also printed warbands
+hired in reverse order — the sheet sorts warriors by the warband's own list
+(a Chieftain before a Seer hired earlier), and generated warbands happen to
+be built in that order already.

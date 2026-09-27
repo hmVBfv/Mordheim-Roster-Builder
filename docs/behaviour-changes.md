@@ -46,7 +46,8 @@ Portieren.
 | Offene/zugeklappte Bereiche (`_…Open`) | im Speicherstand | nicht Teil des Stands | Bildschirmzustand gehört nicht in die Historie |
 | Ungültige Eingabe (unbekannte Warband/Einheit) | Fehler (Absturz) | neutraler Wert (0, leere Liste) | robust gegen alte oder beschädigte Stände |
 | Abgelehnte Aktion (z. B. Heldenlimit erreicht) | Hinweisfenster | derselbe Stand zurück; die Oberfläche erklärt | keine Dialoge in der Logik |
-| Datum eines Stufen-Snapshots und eines Imports in die Kampagnendatei | Uhr des Browsers | Argument `today` | `core/` liest keine Uhr (Invariante) |
+| Datum eines Stufen-Snapshots, eines Imports in die Kampagnendatei und im Dateinamen eines Exports | Uhr des Browsers | Argument `today` | `core/` liest keine Uhr (Invariante) |
+| Exporte (Text, PDF) | Datei wird direkt heruntergeladen; Name aus dem Eingabefeld „Speichern unter“ | Funktionen geben Text bzw. Bytes und Dateinamen zurück; der Name kommt als Argument | keine Dateien und kein DOM in der Logik |
 | Offene Kampagnendatei | Modulvariable im Browser | ein Wert, den die Oberfläche hält und an die Funktionen übergibt | keine globalen Zustände |
 | Halb ausgefüllte Formulare (Schlacht, Verlust, Notiz) | im Speicherstand (`campaign._draft`, `_cas`, `_note`); ein Import von Kampagnendaten verwarf sie nebenbei | eigene Werte der Oberfläche, nicht Teil des Stands | Bildschirmzustand gehört nicht in die Historie |
 | Rückfragen im Ablauf (Robbed anwenden? Grubenkampf gewonnen? Gefangener kommt zurück, Lösegeld? D3 für Deep Wound? Löschen bestätigen?) | Dialog mitten in der Aktion | Antwort ist ein Argument (`InjuryChoices`); die Oberfläche fragt vorher | wie oben; Vorgaben = was die alte App ohne Dialog tat |
