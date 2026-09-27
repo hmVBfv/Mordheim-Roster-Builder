@@ -192,21 +192,34 @@ bis dahin die alte App wie heute) und Tag `:<version>`.
 starten → Health → bei Fehler Rollback). Watchtower fasst die App nicht an.
 Details: [operations.md](operations.md).
 
-## 8. Einbettung in die Agenten-Basis des Pi
+## 8. Wo entwickelt und wo betrieben wird
 
-Die Entwicklung nutzt die bestehende Agenten-Umgebung (Image
-`mordheim-agent`, gemeinsames `home`, Deploy Keys) als eigenes Projekt der
-Ebene 3 mit dem Namen `roster`:
+Grundlage: ADR 0015.
 
-- Arbeitsklon `/mnt/ssd/agent/repos/roster` (liegt bereit), Bearbeitungsklon
-  `repos/roster-config`.
-- Remote-Control-Sitzung `roster-rc` (systemd), sieht nur das eigene Repo.
-- Unit-Tests laufen im Container; Playwright läuft nur in der CI.
-- Läufe nie parallel zu Chronik-Läufen (RAM).
-- Kein Agenten-Container bindet je die Produktionsdaten oder die `.env` ein.
-- Bug-Meldungen liest der Agent über die API mit einem Token, das nur für den
-  Tracker gilt.
+**Entwickelt wird in Cloud-Sitzungen von Claude Code** (Code-Tab der
+Claude-App oder claude.ai/code), mit diesem Repo als Quelle:
 
-Produktion (`~/server/roster/`) und Agenten-Umgebung (`/mnt/ssd/agent/`)
-bleiben getrennt. Die einzige Brücke ist das Ablegen des KI-Pakets in
-`/mnt/ssd/agent/eingang/chronik/`.
+- Die Sitzung klont das Repo, arbeitet auf einem Feature-Branch, lässt die
+  Tests laufen (auch Playwright, Chromium ist dort vorhanden) und pusht den
+  Branch. Rob prüft den Diff und merged per Pull Request.
+- Die Cloud-Sitzung hat keinerlei Zugang zu den Produktionsdaten auf dem Pi.
+- Für `/bugs` bekommt die Cloud-Umgebung die Domain des Servers als erlaubte
+  Domain und das Bug-Token als Umgebungsvariable. Das Token erlaubt nur
+  `GET/PATCH /bugs`.
+
+**Betrieben wird auf dem Pi:**
+
+- Die Pi-Konfiguration liegt als Dateien im Repo unter `ops/`: `compose.yaml`,
+  `Caddyfile`, systemd-Units und -Timer, `roster-deploy`, Backup- und
+  Test-Skripte, Fail2Ban-Regel, `install.sh`. Echte Hostnamen und IPs stehen
+  nicht darin, sondern in `~/server/roster/site.env` auf dem Pi.
+- Rob spielt Änderungen per SSH ein: im vorhandenen Klon
+  `/mnt/ssd/agent/repos/roster` `git pull`, dann `sudo ops/install.sh`;
+  neue App-Versionen mit `roster-deploy <tag>`.
+- Kein Agent arbeitet auf dem Pi am Roster-Projekt. Die Agenten-Basis
+  (`mordheim-agent`, `chronik N`, Remote Control „Chronik“) bleibt
+  unverändert und für die Chronik zuständig.
+
+Produktion (`~/server/roster/`, `/mnt/ssd/roster/`) und Agenten-Umgebung
+(`/mnt/ssd/agent/`) bleiben getrennt. Die einzige Brücke ist das Ablegen des
+KI-Pakets in `/mnt/ssd/agent/eingang/chronik/`.

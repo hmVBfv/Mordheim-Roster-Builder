@@ -33,3 +33,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0012](0012-in-app-bug-tracker.md) | Bug-Tracker in der App, Bearbeitung auf Zuruf |
 | [0013](0013-english-ui-bilingual-canon.md) | Englische Oberfläche, zweisprachiger Kanon |
 | [0014](0014-performance-budgets-in-ci.md) | Leistungsgrenzen in der CI |
+| [0015](0015-develop-in-cloud-operate-on-pi.md) | Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi |

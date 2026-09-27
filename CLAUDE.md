@@ -32,6 +32,7 @@ changing anything structural.
 | `core/` | shared logic, TypeScript, no DOM | phase 1 |
 | `app/` | React 19 PWA, flavours `campaign` and `quickbuild` | phase 1 |
 | `server/` | Fastify + SQLite API | phase 2 |
+| `ops/` | Pi configuration: compose, Caddyfile, systemd, scripts, `install.sh` | phase 2 |
 | `docs/` | concept, architecture, data model, security, operations, UI | now |
 
 ## Commands
@@ -108,18 +109,20 @@ changing anything structural.
 - [ ] both themes checked
 - [ ] Playwright screenshot updated and looked at
 
-## Raspberry Pi constraints
+## Where work happens (ADR 0015)
 
-- 4 GB RAM shared with Jellyfin, TeamSpeak and agent runs. On the Pi run unit
-  tests only; Playwright and image builds run in CI.
-- Never run in parallel with a chronicle run (`chronik N`).
-- Server container limit 256 MB; performance budgets in `docs/ui.md` are
-  enforced by CI.
-
-## Git in the agent container
-
-Open decision B in `docs/roadmap.md`. Until it is decided, follow the agent
-base rule: commits and pushes happen on the host, not in the container.
+- **Development happens in Claude Code cloud sessions.** Work on a feature
+  branch, run the tests (Playwright included), push the branch. Rob reviews
+  and merges via pull request. Never push to `master`.
+- **The Pi only runs the service.** No agent works on this project on the Pi.
+  Everything the Pi needs (compose file, Caddyfile, systemd units and timers,
+  `roster-deploy`, backup scripts, Fail2Ban rule) lives in `ops/` and is
+  applied by Rob over SSH with `sudo ops/install.sh`. Real hostnames and IPs
+  live only in `~/server/roster/site.env` on the Pi — use placeholders in
+  `ops/`.
+- Design for the Pi's limits: 4 GB RAM shared with Jellyfin, TeamSpeak and
+  the chronicle agents; server container limit 256 MB; performance budgets in
+  `docs/ui.md` are enforced by CI.
 
 ## Bugs (from phase 4c)
 

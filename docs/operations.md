@@ -50,9 +50,10 @@ Reihenfolge einhalten; jeder Punkt wird abgehakt, bevor der nächste beginnt.
   `/mnt/ssd/roster/secrets/healthchecks.env`.
 - [ ] **`app.env`** anlegen (siehe Abschnitt 4).
 - [ ] **Fail2Ban-Regel** einrichten (Abschnitt 4).
-- [ ] **Agenten-Projekt `roster`** nach der Checkliste „Neues Projekt
-  aufsetzen“ der Agenten-Basis: Bearbeitungsklon `repos/roster-config`,
-  `roster-rc`-Dienst, Aliase `roster-edit`, `roster-repo`.
+- [ ] **Betriebsdateien holen:** im vorhandenen Klon
+  `/mnt/ssd/agent/repos/roster` `git pull`; `~/server/roster/site.env` mit
+  Hostname und LAN-IP anlegen; `sudo ops/install.sh` (legt Compose,
+  Caddyfile, systemd-Units, `roster-deploy` und die Fail2Ban-Regel an).
 - [ ] **GitHub:** Regelwerk für `master` (nur per Pull Request mit grüner CI).
 - [ ] **Desktop-Kopie:** den bestehenden `rsync`-Job für
   `/mnt/ssd/agent/home` um `/mnt/ssd/roster/backups/restic` erweitern.
@@ -62,8 +63,10 @@ Reihenfolge einhalten; jeder Punkt wird abgehakt, bevor der nächste beginnt.
 ## 3. Verzeichnisse
 
 ```
+/mnt/ssd/agent/repos/roster/ops/   Quelle der Betriebsdateien (aus dem Repo)
 ~/server/roster/
-  compose.yaml        Produktion + Testinstanz
+  site.env            Hostname, LAN-IP (nur auf dem Pi, nie im Repo)
+  compose.yaml        Produktion + Testinstanz (von install.sh erzeugt)
   Caddyfile
   .env                ROSTER_TAG, PREVIOUS_TAG, STAGING_TAG
 /mnt/ssd/roster/
