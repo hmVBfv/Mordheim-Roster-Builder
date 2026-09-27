@@ -14,7 +14,8 @@ import { isHeroModel, totalLarge, totalModels, totalRating } from '../rules/cost
 import { eqListFor, spellLabel, unitDef } from '../rules/lookup.ts';
 import { aDisp, effProfile, isLeaderModel, maxInfo } from '../rules/profile.ts';
 import { svLabel, svOfEntry, svOfModel } from '../rules/saves.ts';
-import { enItem, enRules, eqDisplayParts, houseDeviations, leaderRuleText, markRulesFor, skillText } from './rulesText.ts';
+import { enItem, enRules, eqDisplayParts, houseDeviations, markRulesFor, skillText } from './rulesText.ts';
+import { leaderRuleText } from '../rules/abilities.ts';
 import { safeName } from './text.ts';
 
 /* ---- the part of pdf-lib this uses ---- */

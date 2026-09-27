@@ -16,6 +16,7 @@ import { loadGameData } from '../../src/node.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures, type Fixture } from '../support/fixtures.ts';
 import { coreExportReport, legacyExportReport } from './exportReport.ts';
+import { coreScreens, legacyScreens } from './screens.ts';
 import { rng, type Rng } from '../support/random.ts';
 
 export const data = loadGameData();
@@ -261,7 +262,7 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
       return [`setHouseNum ${key}=${v}`, () => st.setHouseNum(key, v), (c) => core.setHouseNum(c, key, v)];
     }
     case 35: {
-      const key = r.pick(['armourBodyOnly', 'freeDagger', 'miscHench', 'freeMarket', 'allSkills', 'hsEquip', 'hireNewLeader', 'eqLimitOn'] as const);
+      const key = r.pick(['armourBodyOnly', 'freeDagger', 'miscHench', 'freeMarket', 'allSkills', 'hsEquip', 'hireNewLeader', 'eqLimitOn', 'rangedCapOn', 'rerollOne'] as const);
       const v = r.pick([true, false, 1, 0, 'yes']);
       return [`setHouseBool ${key}=${v}`, () => st.setHouseBool(key, v), (c) => core.setHouseBool(c, key, v)];
     }
@@ -648,6 +649,10 @@ export function runSequence(label: string, start: WalkStart, seed: number, withL
       expect(got, `${label}: after ${done.slice(-6).join(' → ')}`).toEqual(want);
     }
     expect(casualtyReport(core.ctxOf(data, s)), `${label}: rules after ${done.slice(-6).join(' → ')}`).toEqual(legacyCasualtyReport());
+    // what the screens show (warnings, unit list, recruit menu, abilities)
+    if (i % 5 === 4) {
+      expect(coreScreens(core.ctxOf(data, s)), `${label}: screens after ${done.slice(-6).join(' → ')}`).toEqual(legacyScreens(L));
+    }
     // the exports, now and then (they read everything, so they are slow)
     if (i % 25 === 24 || i === STEPS - 1) {
       expect(coreExportReport(core.ctxOf(data, s), canonOf), `${label}: exports after ${done.slice(-6).join(' → ')}`).toEqual(legacyExportReport(L, data, canonOf));
