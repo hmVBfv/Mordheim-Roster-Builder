@@ -45,6 +45,19 @@ export interface UnitDef {
   gear?: string[];
   /** A fixed armour save, if the unit has one. */
   sv?: number;
+  /** Gains no experience (animals, vehicles). */
+  noxp?: boolean;
+  /** Skill lists by subtype, instead of `sk`. */
+  skSub?: Record<string, string[]>;
+  /** Profile changes by subtype, e.g. { midd: { S: 1 } }. */
+  profSub?: Record<string, Partial<Record<StatKey, number>>>;
+  /** Skill lists a promoted henchman of this type always gets. */
+  promoCatsFixed?: string[];
+  /** Warband skill set not available to this unit. */
+  noWbSkills?: boolean;
+  /** Extra attack shown as "1+1" (e.g. Saurus bite). */
+  bite?: number | string;
+  magic?: string;
   [key: string]: unknown;
 }
 
@@ -140,6 +153,12 @@ export interface HireEntry {
   opts?: { label: string; choices: string[] };
   personas?: Persona[];
   sk?: string[];
+  /** Race key into MAXPROF (racial maxima). */
+  race?: string;
+  /** Spell list key into SPELLS, for casters. */
+  magic?: string;
+  /** Skills only this character can learn: [name, text]. */
+  hsSpecial?: [string, string][];
   [key: string]: unknown;
 }
 

@@ -56,10 +56,14 @@ function makeModel(r: Rng, data: GameData, s: WarbandState, uid: number, unitId:
     if (L && r.chance(0.3)) m.skills?.push(r.pick(L.skills)[0]);
   }
   if (r.chance(0.15)) m.skills?.push(r.pick(SV_SKILLS));
-  if (r.chance(0.2)) m.spells = ['Spell A (7)', ...(r.chance(0.5) ? ['Spell B (auto)'] : [])];
+  if (r.chance(0.2)) m.spells = [{ name: 'Spell A (7)', red: r.int(0, 1) }, ...(r.chance(0.5) ? [{ name: 'Spell B (auto)' }] : [])];
   if (r.chance(0.3)) m.adv = { WS: 1, ...(r.chance(0.5) ? { S: 1 } : {}), ...(r.chance(0.2) ? { Ld: '1' } : {}) };
   if (r.chance(0.15)) m.inj = [{ name: 'Old Battle Wound' }, ...(r.chance(0.5) ? [{ name: 'Chest Wound', mod: { T: -1 } }] : [])];
   if (def.t === 'hen' && r.chance(0.15)) m.promoted = true;
+  if (m.promoted && r.chance(0.6)) m.promoCats = r.sample(data.STD_CATS, r.int(1, 2));
+  if (def.t === 'hen' && (m.qty ?? 1) > 1 && r.chance(0.4)) m.names = Array.from({ length: m.qty ?? 1 }, (_, i) => (r.chance(0.5) ? `Member ${i}` : ''));
+  if (def.t === 'hero' && r.chance(0.2)) { m.caster = true; if (r.chance(0.5)) m.lore = r.pick(Object.keys(data.SPELLS)); }
+  if (def.t === 'hero' && r.chance(0.1)) m.magic = r.pick(Object.keys(data.SPELLS));
   if (def.t === 'hen' && r.chance(0.25)) m.xpPaid = r.int(1, 12) * 2;
   // Rare items, eligible or not, with the price paid; upgrades sit on a weapon.
   const rareCount = r.chance(0.35) ? r.int(1, 3) : 0;
@@ -92,6 +96,9 @@ function makeState(r: Rng, data: GameData, wb: string, subtype: string | null, h
     const copies = u.t === 'hero' ? 1 : r.chance(0.3) ? 2 : 1;
     for (let i = 0; i < copies; i++) if (r.chance(0.85)) s.models.push(makeModel(r, data, s, uid++, u.id));
   }
+  if (wb === 'maraudersofchaos') s.mark = r.pick(['', ...data.MARAUDER_MARKS.map((x) => x[0])]);
+  const heroes = s.models.filter((m) => data.WARBANDS[wb]?.units.find((u) => u.id === m.uid_def)?.t === 'hero');
+  if (heroes.length && r.chance(0.3)) s.leaderUid = r.pick(heroes).uid;
   const ctx = ctxOf(data, s);
   const heroList = heroEqList(ctx);
   const heroItems = heroList ? Object.values(heroList).flat().map((e) => e[0]) : [];
@@ -108,7 +115,8 @@ function makeState(r: Rng, data: GameData, wb: string, subtype: string | null, h
     s.hired?.push({
       key: a.key, uid: `hs${uid++}`, exp: r.int(0, 20), skills: r.chance(0.3) ? ['Step Aside'] : [],
       ...(opt != null ? { opt } : {}), ...(r.chance(0.6) ? { eq } : {}),
-      ...(r.chance(0.2) ? { adv: { A: 1 } } : {}),
+      ...(r.chance(0.2) ? { adv: { A: 1, ...(r.chance(0.5) ? { WS: 2 } : {}) } } : {}),
+      ...(r.chance(0.2) ? { spells: [{ name: 'Spell (8)', red: r.int(0, 2) }] } : {}),
     });
   }
   const dps = dpEligibility(ctx).allowed;

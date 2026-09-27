@@ -37,6 +37,17 @@ interface Calc {
   inlineUpgradeActive(de: string): boolean;
   totals(): Record<string, unknown>;
   hireRec(r: HireRecord): Record<string, unknown>;
+  modelProfile(m: Model): Record<string, unknown>;
+  warbandProfile(): Record<string, unknown>;
+}
+
+const STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
+
+/* Legacy renders the experience track as HTML; read the numbers back out. */
+function parseXpBar(html: string): Record<string, unknown> {
+  if (/Gains no experience/.test(html)) return { noxp: true };
+  const next = /next at <b>(\d+)<\/b>/.exec(html)?.[1];
+  return { noxp: false, earned: Number(/Advances earned: <b>(\d+)<\/b>/.exec(html)?.[1]), due: html.includes('Advance due!'), next: next ? Number(next) : null };
 }
 
 function legacyCalc(s: WarbandState): Calc {
@@ -78,8 +89,26 @@ function legacyCalc(s: WarbandState): Calc {
         upkeep: a.hsUpkeepFor(r.key), exp: a.hsExp(r), advDue: a.hsAdvancesDue(r), eqCost: a.hsEqCost(r), eqParts: a.hsEqParts(r),
         persona: a.hsPersona(r, ent)?.name ?? null, chosenEq: a.hsChosenEq(r, ent), sv: e.svOfEntry(ent, r),
         personas: ent ? a.hsPersonasAllowed(ent).map((p: { name: string }) => p.name) : [], worthAdv: a.worthAdvOf(r),
+        effProfile: a.hsEffProfile(r, ent), canAdv: STATS.map((k) => a.hsCanAdv(r, ent, k)),
+        skillCats: ent ? a.hsSkillCats(r, ent) : [], raceMax: a.hsRaceMax(ent), special: a.hsSpecialSkills(ent),
       };
     },
+    modelProfile: (m) => {
+      const d = def(m.uid_def);
+      const p = a.effProfile(m);
+      return {
+        effProfile: p, dispMod: a.dispMod(m), aDisp: p ? a.aDisp(m, p) : null, maxInfo: a.maxInfo(m),
+        canAdv: STATS.map((k) => a.canAdv(m, k)), xp: parseXpBar(a.xpBar(m)), injMods: a.injMods(m), netMod: a.netMod(m),
+        skillLists: a.skillListsFor(d), promoted: a.promotedSkillLists(m), members: a.memberNames(m),
+        canBeLeader: a.canBeLeader(m), isLeader: a.isLeaderModel(m), casterLore: a.casterLore(m), magic: a.magicOfModel(m),
+        marauderStart: a.marauderStartSpells(m), spellStart: a.spellStartCount(d, m), casterMagic: a.casterMagic(d),
+        seer: a.isMarauderSeer(d), chief: a.isMarauderChief(d),
+      };
+    },
+    warbandProfile: () => ({
+      defaultLeader: a.defaultLeaderUid(), leader: a.leaderUid(), heroCats: a.availHeroCats(), markLore: a.markLore(),
+      markNames: data.MARAUDER_MARKS.map((x) => a.markName(x[0])),
+    }),
   };
 }
 
@@ -121,8 +150,29 @@ function coreCalc(s: WarbandState): Calc {
         upkeep: core.hsUpkeepFor(ctx, r.key), exp: core.hsExp(r), advDue: core.hsAdvancesDue(r), eqCost: core.hsEqCost(ctx, r), eqParts: core.hsEqParts(ctx, r),
         persona: core.hsPersona(ctx, r, ent)?.name ?? null, chosenEq: core.hsChosenEq(ctx, r, ent), sv: core.svOfEntry(ctx, ent, r),
         personas: ent ? core.hsPersonasAllowed(ctx, ent).map((p) => p.name) : [], worthAdv: core.worthAdvOf(r),
+        effProfile: core.hsEffProfile(r, ent), canAdv: STATS.map((k) => core.hsCanAdv(ctx, r, ent, k)),
+        skillCats: ent ? core.hsSkillCats(ctx, r, ent) : [], raceMax: core.hsRaceMax(ctx, ent), special: core.hsSpecialSkills(ent),
       };
     },
+    modelProfile: (m) => {
+      const d = def(m.uid_def);
+      const p = core.effProfile(ctx, m);
+      const st = core.advanceStatus(ctx, m);
+      return {
+        effProfile: p, dispMod: core.dispMod(ctx, m), aDisp: p ? core.aDisp(ctx, m, p) : null, maxInfo: core.maxInfo(ctx, m),
+        canAdv: STATS.map((k) => core.canAdv(ctx, m, k)),
+        xp: st?.noxp ? { noxp: true } : { noxp: false, earned: st?.earned, due: st?.due, next: st?.next },
+        injMods: core.injMods(m), netMod: core.netMod(m),
+        skillLists: d ? core.skillListsFor(ctx, d) : [], promoted: core.promotedSkillLists(ctx, m), members: core.memberNames(ctx, m),
+        canBeLeader: core.canBeLeader(ctx, m), isLeader: core.isLeaderModel(ctx, m), casterLore: core.casterLore(ctx, m), magic: core.magicOfModel(ctx, m),
+        marauderStart: core.marauderStartSpells(ctx, m), spellStart: core.spellStartCount(ctx, d, m), casterMagic: d ? core.casterMagic(ctx, d) : null,
+        seer: core.isMarauderSeer(ctx, d), chief: core.isMarauderChief(ctx, d),
+      };
+    },
+    warbandProfile: () => ({
+      defaultLeader: core.defaultLeaderUid(ctx), leader: core.leaderUid(ctx), heroCats: core.availHeroCats(ctx), markLore: core.markLore(ctx),
+      markNames: data.MARAUDER_MARKS.map((x) => core.markName(ctx, x[0])),
+    }),
   };
 }
 
@@ -146,11 +196,13 @@ function report(c: Calc): Record<string, unknown> {
       dagger: c.daggerNameFor(m.uid_def), freeDaggerEq: c.freeDaggerEq(m),
       isHero: c.isHeroModel(m), rating: c.modelRating(m), unitMax: c.unitMax(m.uid_def),
       countOf: c.countOf(m.uid_def), modelsOf: c.modelsOf(m.uid_def),
+      profile: c.modelProfile(m),
     };
   });
   return {
     models,
     totals: c.totals(),
+    warbandProfile: c.warbandProfile(),
     inlineUpgrades: upgradeKeys.map((de) => c.inlineUpgradeActive(de)),
     hired: c.hired.map((r) => c.hireRec(r)),
     dp: c.dp.map((r) => c.hireRec(r)),
