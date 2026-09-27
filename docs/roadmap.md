@@ -1,0 +1,146 @@
+# Fahrplan
+
+Stand: 27. September 2026
+
+Jede Phase endet mit einer Abnahme durch Rob. Eine Phase beginnt erst, wenn die
+vorige abgenommen ist; Ausnahmen werden hier vermerkt.
+
+## Phase 0 – Doku und Entscheidungen
+
+- Dieses Doku-Paket, ADRs, `CLAUDE.md`.
+- **Abnahme:** Rob hat gelesen und korrigiert; die offenen Entscheidungen A
+  und B (unten) sind getroffen.
+
+## Phase 1 – `core/` und Grundgerüst der App
+
+| Schritt | Inhalt |
+| --- | --- |
+| 1a Werkzeuge | npm-Workspaces `core`, `app`, `server`; TypeScript `strict`; Vitest; ESLint. Die CI führt Legacy-Tests und neue Tests nebeneinander aus. |
+| 1b Logik herauslösen | In dieser Reihenfolge nach `core/`: Regeln (`engine.js`) → Warband-Operationen (Kosten, Ausrüstung, Gold und Gefallene, Erfahrung und Aufstiege, Verletzungen, Beförderungen, Hired Swords, Dramatis Personae) → Kampagne (Post-Battle, Einkommen, Wyrdstone, Unterhalt, Bezirke, Snapshots) → Exporte (TTS, Text, PDF) → Format (Schemas, Migration aller bisherigen Speicherstände). |
+| 1c Neue Logik | `core/changes` (Vergleich, Abgleich, Änderungsschlüssel), `core/narrative` (Briefing). |
+| 1d Parität | Die 32 Legacy-Testdateien laufen gegen `core/`. Ein Paritätstest vergleicht alte und neue Logik über alle 49 Warbands und bereinigte Speicherstände der laufenden Kampagne. |
+| 1e App-Grundgerüst | Vite + React als PWA, beide Varianten, Design-Variablen mit beiden Themes, Navigation, Dexie, Update-Banner; Roster zunächst nur lesend. |
+| 1f Mockups | Die Bildschirme aus [ui.md](ui.md#3-bildschirme-die-zuerst-als-mockup-entstehen) als statische Seiten unter `docs/mockups/`. |
+
+**Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
+App lässt sich auf Android installieren und startet offline; `size-limit` in
+der CI; Mockups auf dem Handy geprüft und freigegeben.
+
+Die alte App bleibt in dieser Phase unverändert live.
+
+## Phase 2 – Infrastruktur auf dem Pi
+
+- Einmalige Einrichtung nach [operations.md](operations.md#2-einmalige-einrichtung).
+- `Dockerfile` (arm64 + amd64), CI schiebt Images nach `ghcr.io`.
+- `server/`-Grundgerüst: Health, Migrationsrahmen, `roster-cli backup`,
+  Epoche, Markerdatei-Prüfung.
+- `compose.yaml`, `Caddyfile`, `roster-deploy`, Backup- und
+  Wiederherstellungstest-Timer, healthchecks.io, Fail2Ban-Regel.
+- Agenten-Projekt `roster` mit `roster-rc`.
+
+**Abnahme:**
+- Die App ist unter dem Hostnamen mit gültigem Zertifikat erreichbar.
+- Deploy und **Rollback-Übung** (absichtlich kaputtes Image) funktionieren.
+- **SSD-Übung:** Ohne Markerdatei startet die App nicht.
+- Der Wiederherstellungstest ist drei Nächte in Folge grün.
+- `roster-alive` pingt.
+
+## Phase 3 – Nutzer, Warbands, neuer Builder
+
+- Anmeldung: Einladung, Login, Sitzungen, TOTP für Admin und Leiter,
+  Reset-Links, Bremse, CSRF-Schutz.
+- Warbands, Versionen, Autosave, Sync mit Outbox und Epoche.
+- **Neuer Builder mit vollem Funktionsumfang** der alten App: Warband anlegen,
+  Ausrüstung, Rare Items, Hired Swords, Dramatis Personae, Hausregeln,
+  Exporte (TTS, PDF, Text). Eine Paritäts-Checkliste listet jede Funktion.
+- Quick-Build-Variante; Pages wird auf sie umgestellt, sobald die
+  Checkliste vollständig ist.
+- „Send to campaign server“ (Fragment-Link), Datei- und Text-Import.
+- Leak-Test-Grundgerüst; Test „jede Tabelle steht in `data-model.md`“.
+
+**Abnahme:** Die Mitspieler melden sich an und übernehmen ihre Warbands;
+Paritäts-Checkliste 100 %; Pages zeigt den Quick Build.
+
+## Phase 4a – Kampagne im Kern
+
+- Kampagnen, Mitglieder, Einschreibungen, Übersicht mit Status.
+- Schlachten, Schlachtprotokoll, Korrekturvorschläge, **Spielabend-Modus**.
+- Notizen (auch versiegelt), Anhänge, Zeitleiste mit Verschieben.
+- Post-Battle-Sequenz in der neuen Oberfläche; Markieren mit eingefrorenen
+  Änderungen; Öffnen versiegelter Notizen; Sofort-Backup.
+- **Übernahme der laufenden Kampagne:** Speicherstände importieren, Tags aus
+  vorhandenen Snapshots rekonstruieren, veröffentlichte Kapitel als
+  Abschnitte der Zeitleiste, Ereignisse übernehmen.
+
+**Abnahme:** Der nächste echte Spielabend läuft vollständig im neuen System.
+
+## Phase 4b – Erzählung und Leitung
+
+- Erzählung der Warband (Prolog, Zwischenspiele, Erklärungen), Profile mit
+  zweisprachigem Kanon, Lebenslauf, Fragen an Spieler, „Offen für dich“.
+- Hintergrund mit Enthüllungsstufen, „Als Spieler ansehen“.
+- Welt: Fraktionen, NPCs, Ruf, Bezirke, Szenarien.
+- Briefing, KI-Paket, Ablage in `eingang/chronik/`, Kanon-Export für den
+  Chronik-Linter.
+
+**Abnahme:** Das Kapitel zur nächsten Schlacht entsteht mit `chronik N` aus
+dem KI-Paket.
+
+## Phase 4c – Bug-Tracker
+
+- „Report a problem“ mit Kontext; Status für den Meldenden.
+- `roster-cli`/API-Zugang mit Bug-Token; Bereiniger für Testvorlagen.
+- `.claude/commands/bugs.md` (Ablauf `/bugs`) und
+  `.claude/agents/reviewer.md`.
+
+**Abnahme:** Ein echter Bug ist von der Meldung bis „fixed in <version>“
+durchgelaufen.
+
+## Phase 5 – Extras
+
+- Volltextsuche (SQLite FTS5) über Notizen, Zeitleiste, Lebensläufe.
+- Push-Hinweise (Web Push).
+- TTS-Skript, das Beschreibungskarten vom Pi abruft.
+- Connector (MCP) für Claude; Commit freigegebener Kapitel ins Chronik-Repo.
+- Kampagnenvorlagen.
+
+## Voraussetzungen aus der Agenten-Basis
+
+Diese offenen Punkte des Pi müssen vor Phase 2 erledigt sein:
+
+- cgroup-Speicher aktivieren (sonst greifen keine Container-Limits).
+- Chronik-Eingang nach `eingang/chronik/` umziehen.
+- WireGuard: prüfen, aus welchem Netz VPN-Geräte kommen (betrifft den
+  Zugriff auf die Testinstanz von unterwegs).
+
+## Offene Entscheidungen
+
+| | Frage | Vorschlag | Bis |
+| --- | --- | --- | --- |
+| **A** | Optik: zwei Themes aus gemeinsamen Variablen – „Parchment“ (hell, heutiger Builder) und „Chronicle“ (dunkel, Chronik-Seite)? | ja; Standard nach Systemeinstellung | Phase 1e |
+| **B** | Git im Agenten-Container: Die Agenten-Basis lässt git nur auf dem Host laufen. Für die Entwicklung über `roster-rc` wäre Commit/Push auf Feature-Branches aus dem Container praktisch. | für `roster` erlauben, nur auf Branches ≠ `master`; `master` per GitHub-Regelwerk geschützt. Alternative: Host-Helfer `roster-ship`. | Phase 1a |
+| **C** | Immer für unveränderliche Updates in `core/`? | Entscheidung beim ersten Modul nach Lesbarkeit der Tests | Phase 1b |
+| **D** | Alte App nach der Umstellung: `dist/mordheim-roster.html` noch eine Kampagnenrunde lang als Download behalten? | ja, danach entfernen | Phase 3 |
+| **E** | Für welche der bisherigen Schlachten gibt es Snapshots? Wo keine sind, beginnt der Vergleich erst ab dem ersten Snapshot. | beim Import prüfen und festhalten | Phase 4a |
+| **F** | Push-Hinweise | später entscheiden | Phase 5 |
+
+## Getroffene Entscheidungen
+
+Siehe [decisions/](decisions/). Kurzfassung:
+
+| ADR | Entscheidung |
+| --- | --- |
+| 0001 | Pi liefert App und API unter einer eigenen Hostname; Pages bleibt als Quick Build |
+| 0002 | Mechanik offen, Erzählung darf verborgen sein |
+| 0003 | Versionen statt Überschreiben; markierte Stände; eingefrorene Kennzahlen |
+| 0004 | KI ohne API; Anbindung an die Chronik-Pipeline über `eingang/chronik/` |
+| 0005 | React 19 + TypeScript als PWA, kein Rendern auf dem Server; Client rechnet, Server verwahrt |
+| 0006 | Gemeinsamer Kern `core/`, herausgelöst mit Paritätstests |
+| 0007 | SQLite auf der SSD; Backups auf dem Pi, Kopie auf dem Desktop, nichts außer Haus |
+| 0008 | Anmeldung nur auf Einladung; TOTP für Admin und Leiter |
+| 0009 | Deploy bewusst per Skript; Images aus der CI für arm64 und amd64 |
+| 0010 | Schlachtprotokoll hat einen Schreiber; Notizen sind Einträge je Autor; Versiegeltes auch für Leiter gesperrt |
+| 0011 | Verborgenes verlässt nie den Server Richtung Spieler und landet nie in einem Repo |
+| 0012 | Bug-Tracker in der App; Bearbeitung nur auf Zuruf |
+| 0013 | Oberfläche englisch; Kanon und Epos zweisprachig |
+| 0014 | Leistungsgrenzen werden in der CI geprüft |
