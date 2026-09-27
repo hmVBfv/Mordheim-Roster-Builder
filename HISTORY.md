@@ -1213,3 +1213,28 @@ The planted bugs were all caught once the sheet test also printed warbands
 hired in reverse order — the sheet sorts warriors by the warband's own list
 (a Chieftain before a Seer hired earlier), and generated warbands happen to
 be built in that order already.
+
+## September 27, 2026 — every old file still loads, and phase 1b's port is complete
+
+The eighth slice ports loading and writing saves, which finishes moving the
+legacy app's logic into core. The legacy loader is a list of defaults — an
+empty Fallen list for files from before it existed, house rules filled in
+from the defaults, the gold in hand adopted exactly as the file states it —
+and core's loader is the same list, checked against the legacy app on every
+generated warband, on its exports, on the frozen old save that
+test/compat.mjs pins, and on copies with keys torn out at random.
+
+Saves now carry a format number (a file without one is format 0, written
+by the legacy app) and the version of the app that wrote them. The Zod
+schemas the architecture called for describe the format, but loading does
+not refuse a file that departs from them: saves are the players' data, the
+legacy app never refused one, and a schema written today cannot know every
+file written in July. Departures come back as notes; only a file that
+cannot be a warband of a known type is turned away. The server will hold
+what it stores to the same schemas.
+
+One thing surfaced in the round trip: a treasury still at "starting gold"
+comes back from a save as that amount in coins, because loading adopts the
+gold in hand the file states. The legacy app does the same, and the value
+does not change — only a later change to the starting-gold house rule would
+no longer move it, which is arguably right for a warband already in play.

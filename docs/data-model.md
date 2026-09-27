@@ -29,7 +29,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 | Feld | Neu | Bedeutung |
 | --- | --- | --- |
-| `format` | ja | Formatnummer; `core/format` migriert ältere Stände beim Laden |
+| `format` | ja | Formatnummer: fehlt = 0 (alte App), 1 = `core/` (Stand jetzt); `core/format` migriert ältere Stände beim Laden |
 | `appVersion` | ja | App-Version (Commit), die den Stand erzeugt hat |
 | `canon` | ja | `{ name_de, name_en }` der Warband (z. B. *Die Silberne Karavane* / *The Ardent Caravan*) |
 | `uidSeq` | ja | nächste freie Krieger-`uid`; verhindert, dass eine `uid` nach Entfernen oder Tod wiederverwendet wird (setzt `normalizeState` beim Laden) |
@@ -42,6 +42,12 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 - Schlüssel mit `_` am Anfang sind Bedienzustand und werden vor dem Speichern
   entfernt (bestehende Konvention `_stripTransient`).
+- **Regeln für Formatänderungen** (wie `test/compat.mjs`): nur Schlüssel
+  hinzufügen, nie umbenennen oder entfernen; jeder neue Schlüssel bekommt
+  einen Vorgabewert in `core/src/format/save.ts` und steht im Schema
+  (`core/src/format/schema.ts`). Die Formatnummer steigt nur mit einer
+  Migration. Die alte App verwirft beim Laden unbekannte Schlüssel oben im
+  Stand (`uidSeq`, `canon`, `story`); `core/` behält sie.
 - **Gefallene** (`fallen[]`, in der Reihenfolge ihres Todes):
   `{ kind: 'hero'|'hench', m, uid_def, exp, memberIdx, memberName, lostValue,
   casualtyId, casFromDeath }`. `m` ist der Krieger, wie er fiel (bei

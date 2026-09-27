@@ -110,8 +110,11 @@ changing anything structural.
 - Work on branches. Never push to `master`; `master` changes only via pull
   request with green CI. Rob merges and deploys.
 - Schema, endpoint or save-format change → update `docs/data-model.md` in the
-  same commit. Principle change → new ADR. Notable change → `HISTORY.md` entry
-  (why, including wrong turns).
+  same commit. A new save key gets a default in `core/src/format/save.ts` and
+  a place in `core/src/format/schema.ts`; `FORMAT` rises only with a
+  migration. Never rename or remove a key (`test/compat.mjs`).
+  Principle change → new ADR. Notable change → `HISTORY.md` entry (why,
+  including wrong turns).
 - Keep the legacy app working until the switch:
   - every function used from an inline handler must be listed in the
     `Object.assign(window, {…})` block;

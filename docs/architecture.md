@@ -67,6 +67,14 @@ Post-Battle-Sequenz, Auswertung), die Kampagnendatei, die Kontrolle über
 Bezirke und die Formulare für Schlachten und Verluste. Die übrigen Module
 folgen in der Reihenfolge aus [roadmap.md](roadmap.md).
 
+`format/` lädt und schreibt Speicherstände: `loadSave` füllt fehlende
+Schlüssel so auf wie die alte App und bringt den Stand in die kanonische
+Form, `readSaveText` liest eingefügten Text, `writeSave` schreibt Stand,
+`goldNow`, Formatnummer und App-Version. Die Zod-Schemas sind bewusst
+tolerant (unbekannte Schlüssel bleiben, als Text gespeicherte Zahlen gelten);
+beim Laden werden Abweichungen als Hinweise gemeldet statt abgelehnt.
+Abgelehnt wird nur, was keine Warband eines bekannten Typs sein kann.
+
 In `export/` liegen der lesbare Text, die Tabletop-Simulator-Karten, der
 Chronik-Text und das PDF-Rostersheet. `buildOfficialSheet(ctx, pdfLib,
 template)` bekommt pdf-lib und die Vorlage hineingereicht und gibt Bytes und
