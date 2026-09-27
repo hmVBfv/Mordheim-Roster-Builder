@@ -21,7 +21,12 @@ Agenten-Basis unter `/mnt/ssd/agent`.
 
 ## 2. Einmalige Einrichtung
 
-Reihenfolge einhalten; jeder Punkt wird abgehakt, bevor der nächste beginnt.
+Phase 1 findet komplett in der Cloud und in der CI statt; der Pi wird dafür
+nicht angefasst. Eingerichtet wird er in Phase 2, in drei Stufen. Von außen
+erreichbar wird er erst in Stufe 2 – zu einem Zeitpunkt, an dem der Server
+nur `GET /api/v1/health` beantwortet und es noch keine Konten gibt.
+
+### Stufe 1 – Vorbereitung, ohne Änderung nach außen
 
 - [ ] **cgroup-Speicher aktivieren** (offener Punkt der Agenten-Basis): in
   `/boot/firmware/cmdline.txt` `cgroup_enable=memory cgroup_memory=1`
@@ -30,15 +35,13 @@ Reihenfolge einhalten; jeder Punkt wird abgehakt, bevor der nächste beginnt.
 - [ ] **Docker wartet auf die SSD:** Drop-in
   `/etc/systemd/system/docker.service.d/ssd.conf` mit
   `[Unit]` / `RequiresMountsFor=/mnt/ssd`, dann `systemctl daemon-reload`.
+- [ ] **Ports frei?** `sudo ss -tlnp | grep -E ':(80|443|3000|8081) '` darf
+  nichts liefern.
 - [ ] **Verzeichnisse** anlegen (Besitzer `robin`, UID 1000):
   `/mnt/ssd/roster/{data,uploads,backups,secrets,caddy/data,caddy/config,staging/data,staging/uploads}`
   und `~/server/roster/`.
 - [ ] **Markerdatei:** `touch /mnt/ssd/roster/data/.roster-volume`. Die App
   startet nur, wenn sie existiert – so startet sie nie leer auf der SD-Karte.
-- [ ] **Hostname prüfen:** `nslookup mordheim.<name>.duckdns.org` muss die
-  öffentliche IP liefern.
-- [ ] **Fritzbox:** Portfreigabe TCP 443 → Pi.
-- [ ] **UFW:** `sudo ufw allow 443/tcp`.
 - [ ] **Chronik-Eingang angleichen:** `eingang/chronik/` anlegen (Plan der
   Agenten-Basis „Chronik-Eingang angleichen“); Samba-Share und
   `chronik-run.sh` darauf umstellen.
@@ -49,16 +52,67 @@ Reihenfolge einhalten; jeder Punkt wird abgehakt, bevor der nächste beginnt.
   `roster-backup`, `roster-restore-test`); Ping-URLs nach
   `/mnt/ssd/roster/secrets/healthchecks.env`.
 - [ ] **`app.env`** anlegen (siehe Abschnitt 4).
-- [ ] **Fail2Ban-Regel** einrichten (Abschnitt 4).
 - [ ] **Betriebsdateien holen:** im vorhandenen Klon
   `/mnt/ssd/agent/repos/roster` `git pull`; `~/server/roster/site.env` mit
   Hostname und LAN-IP anlegen; `sudo ops/install.sh` (legt Compose,
   Caddyfile, systemd-Units, `roster-deploy` und die Fail2Ban-Regel an).
+- [ ] **Erster Start:** `roster-deploy <tag>`; lokal prüfen mit
+  `curl -s http://127.0.0.1:3000/api/v1/health`. Caddy läuft, bekommt aber
+  noch kein Zertifikat – das ist in dieser Stufe erwartet.
 - [ ] **GitHub:** Regelwerk für `master` (nur per Pull Request mit grüner CI).
 - [ ] **Desktop-Kopie:** den bestehenden `rsync`-Job für
   `/mnt/ssd/agent/home` um `/mnt/ssd/roster/backups/restic` erweitern.
 - [ ] **SD-Klon:** zweite SD-Karte als Klon des Systems anlegen (z. B. mit
   `rpi-clone`), beschriften, beim Pi aufbewahren.
+
+### Stufe 2 – Freischalten
+
+- [ ] **Fritzbox-Fernzugang prüfen:** Der HTTPS-Zugang der Fritzbox selbst
+  (Internetzugriff auf die FRITZ!Box) darf nicht auf Port 443 liegen, sonst
+  kollidiert er mit der Freigabe.
+- [ ] **Hostname prüfen:** `nslookup mordheim.<name>.duckdns.org` muss
+  dieselbe öffentliche IP liefern wie der bisherige DuckDNS-Name. Der
+  DuckDNS-Container bleibt, wie er ist.
+- [ ] **Fritzbox:** Portfreigabe für das Gerät `piServer`: TCP 443 → 443
+  (IPv4). Die bestehenden Freigaben für TeamSpeak bleiben unverändert.
+- [ ] **UFW:** `sudo ufw allow 443/tcp`.
+- [ ] **Zertifikat:** Caddy holt es innerhalb weniger Minuten selbst;
+  prüfen mit `docker logs roster-caddy`.
+- [ ] **Von außen testen:** am Handy im Mobilfunknetz (nicht im WLAN)
+  `https://mordheim.<name>.duckdns.org/api/v1/health` öffnen.
+- [ ] **Überwachung an:** `roster-alive`-Timer aktivieren, Fail2Ban-Regel
+  aktiv (`sudo fail2ban-client status roster-auth`).
+
+### Stufe 3 – Übungen (Abnahme Phase 2)
+
+- [ ] Rollback-Übung mit absichtlich kaputtem Image.
+- [ ] SSD-Übung: ohne Markerdatei startet die App nicht.
+- [ ] Wiederherstellungstest drei Nächte in Folge grün.
+
+Mitspieler werden erst eingeladen, wenn Phase 3 abgenommen ist.
+
+### Nebeneinander mit den bestehenden Diensten
+
+| Dienst | Port | Von außen | Weg |
+| --- | --- | --- | --- |
+| TeamSpeak Sprache | 9987/UDP | ja (bestehend) | Fritzbox → TS3-Container |
+| TeamSpeak Dateien | 30033/TCP | ja (bestehend) | Fritzbox → TS3-Container |
+| **Mordheim** | **443/TCP** | **ja (neu)** | Fritzbox → Caddy (Host-Netz) → App auf `127.0.0.1:3000` |
+| Jellyfin | 8096/TCP | nein | Heimnetz |
+| Mordheim-Testinstanz | 8081/TCP | nein | Heimnetz, WireGuard |
+| SSH | 22/TCP | nur über WireGuard | Fritzbox-VPN |
+
+- Die Fritzbox verteilt nach Port und Protokoll; TeamSpeak und Mordheim teilen
+  sich die öffentliche IP und den DuckDNS-Namen, ohne sich zu berühren.
+- **Last:** Die App synchronisiert nur, solange sie offen ist, und schickt
+  dabei wenige Kilobyte. Neben Sprache in TeamSpeak ist das nicht spürbar,
+  auch nicht am Spielabend. TTS läuft auf den Rechnern der Spieler, nicht auf
+  dem Pi.
+- **Im Heimnetz** funktioniert dieselbe Adresse; die Fritzbox leitet Anfragen
+  an die eigene öffentliche IP intern weiter.
+- **Aufrufen:** Mitspieler öffnen den Einladungslink im Browser, legen ihr
+  Konto an und installieren die App über „App installieren“ bzw. „Zum
+  Home-Bildschirm“. Danach starten sie sie über das Icon.
 
 ## 3. Verzeichnisse
 
