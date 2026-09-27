@@ -71,7 +71,13 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   der alten App lädt wie dort (Parität auch mit zufällig fehlenden
   Schlüsseln und dem eingefrorenen Altstand aus `test/compat.mjs`), der
   eingefügte Text-Export ebenso; Formatnummer 1, Zod-Schemas für Warband und
-  Kampagnendatei. Damit ist die Logik der alten App vollständig in `core/`.
+  Kampagnendatei.
+- [x] 1b, neunter Teil: Regeln, die die alte App nur beim Zeichnen
+  berechnete – Warnungen der Seitenleiste (Legalität der Warband), Liste der
+  Einheiten, Grenzen im Anwerbe-Menü, Fähigkeiten eines Kriegers, Filter der
+  Hired-Sword-Listen, Reihenfolge der Warband-Auswahl. Verglichen, indem das
+  HTML der alten App zurückgelesen wird; die Wanderung prüft sie alle fünf
+  Schritte. Erst damit ist die Logik der alten App vollständig in `core/`.
 - [ ] 1b, Abschluss: Robs gewünschte Änderungen (siehe unten) und die offenen
   Vorschläge V1/V2 entscheiden.
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
