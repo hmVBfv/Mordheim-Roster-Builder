@@ -1147,3 +1147,25 @@ rolling an injury from the casualty list skips what five results do on the
 unit card (Deep Wound, Robbed, Captured, the pits, Survives Against the
 Odds), and casualty records point at the Fallen by position, which breaks
 when one is deleted.
+
+## September 27, 2026 — a warband's campaign, and what "looking" used to write
+
+The fifth slice ports a warband's own side of the campaign: the chronicle,
+closing a stage (sit-outs served, the warband snapshotted, the round moved
+on), battles, footholds, the post-battle checklist with its wyrdstone sale,
+the comparison of two stages and the per-warrior analysis the chronicle text
+is written from. The shared campaign file — several warbands, the battle
+form that records a fight between them, control of districts — comes next,
+because it is a second document with its own state, not part of a warband.
+
+Two things the legacy app did in passing had to be named. Its panels create
+an empty post-battle entry for the current round, and an empty snapshot
+list, simply by being looked at; core does not, and the parity comparison
+treats an untouched entry as absent. And a snapshot is stamped with the
+date: legacy read the clock, core takes the date as an argument, since core
+never reads a clock. The walk compares snapshots as whole earlier states,
+in the same canonical form as the live one.
+
+For once the port found nothing wrong. Every planted bug in the new code
+was caught by the walk — the one that was not turned out to change nothing
+at all.
