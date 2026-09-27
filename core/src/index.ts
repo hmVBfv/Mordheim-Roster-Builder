@@ -20,3 +20,5 @@ export * from './warband/normalize.ts';
 export * from './warband/roster.ts';
 export * from './warband/hiring.ts';
 export * from './warband/house.ts';
+export * from './rules/profile.ts';
+export * from './warband/advance.ts';

@@ -1,4 +1,6 @@
-/* Parity for roster-building actions: the same random sequence of actions is
+/* The random walk behind the action parity suites (walk-*.parity.test.ts).
+ *
+ * Parity for warband actions: the same random sequence of actions is
  * applied to the legacy app (through its exported action functions, which
  * mutate its global S and re-render) and to core (pure functions returning a
  * new state). After every step both states must be identical, up to:
@@ -7,17 +9,22 @@
  *     Sword/Dramatis record uids, chronicle ids), compared by position,
  *   - the canonical form legacy reached as a side effect of rendering, which
  *     core produces with normalizeState(). */
-import { beforeAll, describe, expect, it } from 'vitest';
+import { expect } from 'vitest';
 import * as core from '../../src/index.ts';
 import type { Ctx, GameData, Model, WarbandState } from '../../src/index.ts';
 import { loadGameData } from '../../src/node.ts';
-import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
-import { generateFixtures } from '../support/fixtures.ts';
+import type { Legacy } from '../legacy/loadLegacy.ts';
+import { generateFixtures, type Fixture } from '../support/fixtures.ts';
 import { rng, type Rng } from '../support/random.ts';
 
-const data = loadGameData();
-let L: Legacy;
-beforeAll(async () => { L = await loadLegacy(); });
+export const data = loadGameData();
+
+/* Parity mode drives the legacy app alongside core; coverage mode replays the
+   same walks with core alone (the steps depend only on the core state, so the
+   sequence is identical) and is fast. */
+const NO_LEGACY = { app: {}, state: { S: {} } } as unknown as Legacy;
+let L: Legacy = NO_LEGACY;
+export function useLegacy(l: Legacy | null): void { L = l ?? NO_LEGACY; }
 
 const STEPS = 80;
 
@@ -32,6 +39,11 @@ function canon(s: unknown): unknown {
   }
   (c.hired ?? []).forEach((h, i) => { h.uid = `H${i}`; });
   (c.dp ?? []).forEach((h, i) => { h.uid = `D${i}`; });
+  // Open/closed panels are screen state that legacy kept in the save; core
+  // does not model them.
+  for (const x of [...((c.models as Record<string, unknown>[] | undefined) ?? []), ...(c.hired ?? []), ...(c.dp ?? [])] as Record<string, unknown>[]) {
+    for (const k of Object.keys(x)) if (/^_.*Open$/.test(k)) delete x[k];
+  }
   return c;
 }
 /* Both sides go through normalizeState: when legacy reached the canonical
@@ -56,7 +68,7 @@ function pickModel(r: Rng, s: WarbandState): Model | undefined {
   return s.models.length ? r.pick(s.models) : undefined;
 }
 
-function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
+export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
   const a = L.app, st = L.state;
   const ctx = core.ctxOf(d, s);
   const wb = d.WARBANDS[s.wb as string];
@@ -65,7 +77,10 @@ function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
   const list = m ? core.eqListFor(ctx, core.unitDef(ctx, m.uid_def)) : undefined;
   const items = list ? Object.values(list).flat().map((e) => e[0]) : [];
   const hired = s.hired ?? [], dps = s.dp ?? [];
-  const kind = r.int(0, 36);
+  const roll = r.int(0, 38 + ADV_KINDS);
+  if (roll > 38) return advanceStep(r, d, s, m);
+  // two extra slots for the Hired Sword operations, which have many variants
+  const kind = roll > 36 ? 31 : roll;
   switch (kind) {
     case 0: case 1: case 2: { const u = r.pick(wb.units); return [`addUnit ${u.id}`, () => a.addUnit(u.id), (c) => core.addUnit(c, u.id)]; }
     case 3: if (!m) return null; return [`removeUnit ${m.uid}`, () => a.removeUnit(m.uid), (c) => core.removeUnit(c, m.uid)];
@@ -126,7 +141,8 @@ function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
     case 28: { const di = r.pick(d.DISTRICTS).id, h = r.pick(['none', 'foothold', 'control'] as const); return [`setDistrict ${di} ${h}`, () => a.setDistrict(di, h), (c) => core.setDistrict(c, di, h)]; }
     case 29: case 30: {
       const allowed = core.hireEligibility(ctx).allowed;
-      const key = r.chance(0.9) && allowed.length ? r.pick(allowed).key : r.pick(Object.keys(d.HIREDSWORDS));
+      const casters = allowed.filter((x) => d.HIREDSWORDS[x.key]?.magic);
+      const key = casters.length && r.chance(0.35) ? r.pick(casters).key : r.chance(0.9) && allowed.length ? r.pick(allowed).key : r.pick(Object.keys(d.HIREDSWORDS));
       return [`hireHS ${key}`, () => a.hireHS(key), (c) => core.hireHS(c, key)];
     }
     case 31: {
@@ -190,14 +206,117 @@ function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
 }
 
 /* How often each action actually changed the state, over all sequences. */
-const effective = new Map<string, number>();
+/* How often each action actually changed the state. */
+export const effective = new Map<string, number>();
 
-function runSequence(label: string, start: { legacy: () => void; core: WarbandState }, seed: number): void {
-  start.legacy();
-  L.state.resyncUid();
-  L.app.render();
+const ADV_KINDS = 24;
+const STAT_KEYS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
+
+/* Experience and advancement steps. */
+function advanceStep(r: Rng, d: GameData, s: WarbandState, m: Model | undefined): Step | null {
+  const a = L.app;
+  const ctx = core.ctxOf(d, s);
+  const hired = s.hired ?? [];
+  const op = r.int(0, 19);
+  if (op >= 14) {
+    // Hired Swords and Dramatis Personae
+    const recs = [...hired.map((h, i) => ({ list: 'hired' as const, i, key: h.key })), ...(s.dp ?? []).map((h, i) => ({ list: 'dp' as const, i, key: h.key }))];
+    if (!recs.length) return null;
+    const sub = r.int(0, 5);
+    const entryOf = (key: string) => d.HIREDSWORDS[key] ?? d.DRAMATIS[key];
+    const recOf = (x: { list: 'hired' | 'dp'; i: number }) => (s[x.list] ?? [])[x.i];
+    // aim each operation at a record it can act on, most of the time
+    const fitting = recs.filter((x) =>
+      sub === 2 ? (recOf(x)?.skills ?? []).length > 0
+        : sub === 3 ? !!entryOf(x.key)?.magic
+          : sub >= 4 ? (recOf(x)?.spells ?? []).length > 0 : true);
+    const pick = fitting.length && r.chance(0.85) ? r.pick(fitting) : r.pick(recs);
+    const uidC = () => ((s[pick.list] ?? [])[pick.i] as { uid: string }).uid;
+    const uidL = () => ((L.state.S[pick.list] ?? [])[pick.i] as { uid: string }).uid;
+    const e = d.HIREDSWORDS[pick.key] ?? d.DRAMATIS[pick.key];
+    const fromLore = e?.magic && d.SPELLS[e.magic] ? d.SPELLS[e.magic]!.spells.map((x) => x[0]) : [];
+    const spellNames = fromLore.length ? fromLore : ['Nope (5)'];
+    if (sub === 0) { const k = r.pick(STAT_KEYS); return [`addHsAdv ${pick.list}#${pick.i} ${k}`, () => a.addHsAdv(uidL(), k), (c) => core.addHsAdvance(c, uidC(), k)]; }
+    if (sub === 1) { const k = r.pick(STAT_KEYS); return [`remHsAdv ${pick.list}#${pick.i} ${k}`, () => a.remHsAdv(uidL(), k), (c) => core.removeHsAdvance(c, uidC(), k)]; }
+    if (sub === 2) { const i = r.int(0, 2); return [`remHsSkillIdx ${pick.list}#${pick.i} ${i}`, () => a.remHsSkillIdx(uidL(), i), (c) => core.removeHsSkillAt(c, uidC(), i)]; }
+    if (sub === 3) {
+      const nm = r.chance(0.9) ? r.pick(spellNames) : '\u2014';
+      if (r.chance(0.5)) return [`addHsSpell ${pick.list}#${pick.i} ${nm}`, () => withDom({ [`hssp-${uidL()}`]: nm }, () => a.addHsSpell(uidL())), (c) => core.addHsSpell(c, uidC(), nm)];
+      return [`addHsSpellFromAdv ${pick.list}#${pick.i} ${nm}`, () => withDom({ [`hssp2-${uidL()}`]: nm }, () => a.addHsSpellFromAdv(uidL())), (c) => core.addHsSpell(c, uidC(), nm)];
+    }
+    if (sub === 4) { const i = r.int(0, 1); return [`delHsSpell ${pick.list}#${pick.i} ${i}`, () => a.delHsSpell(uidL(), i), (c) => core.removeHsSpell(c, uidC(), i)]; }
+    { const i = r.int(0, 1), dv = r.pick([1, 1, -1, 3]); return [`hsSpellRed ${pick.list}#${pick.i} ${i} ${dv}`, () => a.hsSpellRed(uidL(), i, dv), (c) => core.hsSpellReduce(c, uidC(), i, dv)]; }
+  }
+  if (op === 13) { const v = r.pick(['', ...d.MARAUDER_MARKS.map((x) => x[0])]); return [`setMark ${v}`, () => a.setMark(v), (c) => core.setMark(c, v)]; }
+  if (!m) return null;
+  const def = core.unitDef(ctx, m.uid_def);
+  const lore = core.casterLore(ctx, m) ?? core.magicOfModel(ctx, m) ?? r.pick(Object.keys(d.SPELLS));
+  const fromLore = d.SPELLS[lore] ? d.SPELLS[lore]!.spells.map((x) => x[0]) : [];
+  const spellNames = fromLore.length ? fromLore : ['Nope (5)'];
+  const skillNames = def ? core.skillListsFor(ctx, def).flatMap(([, sk]) => sk.map((x) => x[0])) : [];
+  switch (op) {
+    case 0: { const dv = r.pick([1, 1, 2, -1, -5]); return [`incExp ${m.uid} ${dv}`, () => a.incExp(m.uid, dv), (c) => core.incExp(c, m.uid, dv)]; }
+    case 1: { const v = r.pick([2, 5, 11, 0, '8']); return [`setExpJump ${m.uid}=${v}`, () => a.setExpJump(m.uid, v), (c) => core.setModelExp(c, m.uid, v)]; }
+    case 2: case 3: { const k = r.pick(STAT_KEYS); return [`addAdv ${m.uid} ${k}`, () => a.addAdv(m.uid, k), (c) => core.addAdvance(c, m.uid, k)]; }
+    case 4: {
+      const withAdv = s.models.filter((x) => Object.keys(x.adv ?? {}).length);
+      const mm = withAdv.length && r.chance(0.85) ? r.pick(withAdv) : m;
+      const keys = Object.keys(mm.adv ?? {}) as (typeof STAT_KEYS)[number][];
+      const k = keys.length ? r.pick(keys) : r.pick(STAT_KEYS);
+      return [`remAdv ${mm.uid} ${k}`, () => a.remAdv(mm.uid, k), (c) => core.removeAdvance(c, mm.uid, k)];
+    }
+    case 5: {
+      const v = skillNames.length && r.chance(0.8) ? r.pick(skillNames) : r.pick(['  Custom skill ', '', 'Mutant']);
+      if (r.chance(0.5)) return [`addSkill ${m.uid} ${v}`, () => withDom({ [`sk-${m.uid}`]: v }, () => a.addSkill(m.uid)), (c) => core.addSkill(c, m.uid, v)];
+      return [`addSkillFromSel ${m.uid} ${v}`, () => withDom({ [`sksel-${m.uid}`]: v }, () => a.addSkillFromSel(m.uid)), (c) => core.addSkillFromList(c, m.uid, v)];
+    }
+    case 6: { const i = r.int(0, 2); return [`remSkill ${m.uid} ${i}`, () => a.remSkill(m.uid, i), (c) => core.removeSkill(c, m.uid, i)]; }
+    case 7: { const cat = r.pick(d.STD_CATS); return [`togglePromoCat ${m.uid} ${cat}`, () => a.togglePromoCat(m.uid, cat), (c) => core.togglePromoCat(c, m.uid, cat)]; }
+    case 8: { const i = r.int(0, 4), v = r.pick(['Hans', '', ' Grim ']); return [`setMemberName ${m.uid} ${i}=${v}`, () => a.setMemberName(m.uid, i, v), (c) => core.setMemberName(c, m.uid, i, v)]; }
+    case 9: {
+      const promoted = s.models.filter((x) => x.promoted);
+      if (promoted.length && r.chance(0.3)) { const mm = r.pick(promoted); return [`unpromote ${mm.uid}`, () => a.unpromote(mm.uid), (c) => core.unpromote(c, mm.uid)]; }
+      const i = r.chance(0.5) ? null : r.int(0, 4);
+      return [`promoteHench ${m.uid} ${i}`, () => a.promoteHench(m.uid, i), (c) => core.promoteHench(c, m.uid, i)];
+    }
+    case 10: {
+      const nm = r.chance(0.9) ? r.pick(spellNames) : '\u2014';
+      if (r.chance(0.5)) return [`addSpell ${m.uid} ${nm}`, () => withDom({ [`sp-${m.uid}`]: nm }, () => a.addSpell(m.uid)), (c) => core.addSpell(c, m.uid, nm)];
+      const own = s.models.filter((x) => core.magicOfModel(ctx, x));
+      const mm = own.length && r.chance(0.85) ? r.pick(own) : m;
+      const ownLore = core.magicOfModel(ctx, mm);
+      const nm2 = ownLore && d.SPELLS[ownLore]?.spells.length ? r.pick(d.SPELLS[ownLore]!.spells)[0] : nm;
+      return [`addSpellFromAdv ${mm.uid} ${nm2}`, () => withDom({ [`spadv-${mm.uid}`]: nm2 }, () => a.addSpellFromAdv(mm.uid)), (c) => core.addSpellFromAdvance(c, mm.uid, nm2)];
+    }
+    case 11: {
+      const withSpells = s.models.filter((x) => (x.spells ?? []).length);
+      if (withSpells.length && r.chance(0.85)) {
+        const mm = r.pick(withSpells), i = r.int(0, (mm.spells ?? []).length - 1);
+        if (r.chance(0.5)) return [`remSpell2 ${mm.uid} ${i}`, () => a.remSpell2(mm.uid, i), (c) => core.removeSpell(c, mm.uid, i)];
+        const dv = r.pick([1, 1, -1, 4]);
+        return [`spellRed ${mm.uid} ${i} ${dv}`, () => a.spellRed(mm.uid, i, dv), (c) => core.spellReduce(c, mm.uid, i, dv)];
+      }
+      const i = r.int(0, 2);
+      if (r.chance(0.5)) return [`remSpell2 ${m.uid} ${i}`, () => a.remSpell2(m.uid, i), (c) => core.removeSpell(c, m.uid, i)];
+      const dv = r.pick([1, 1, -1, 4]);
+      return [`spellRed ${m.uid} ${i} ${dv}`, () => a.spellRed(m.uid, i, dv), (c) => core.spellReduce(c, m.uid, i, dv)];
+    }
+    case 12: {
+      const x = r.int(0, 2);
+      if (x === 0) { const on = r.chance(0.6); return [`setCaster ${m.uid} ${on}`, () => a.setCaster(m.uid, on), (c) => core.setCaster(c, m.uid, on)]; }
+      if (x === 1) { const v = r.pick(Object.keys(d.SPELLS)); return [`setLore ${m.uid} ${v}`, () => a.setLore(m.uid, v), (c) => core.setLore(c, m.uid, v)]; }
+      return [`setLeader ${m.uid}`, () => a.setLeader(m.uid), (c) => core.setLeader(c, m.uid)];
+    }
+    default: return null;
+  }
+}
+
+export type WalkStart = { legacy: () => void; core: WarbandState };
+
+export function runSequence(label: string, start: WalkStart, seed: number, withLegacy = true): void {
+  if (withLegacy) { start.legacy(); L.state.resyncUid(); L.app.render(); }
   let s = core.normalizeState(core.ctxOf(data, start.core));
-  expect(coreCanon(core.ctxOf(data, s)), `${label}: start`).toEqual(legacyCanon());
+  if (withLegacy) expect(coreCanon(core.ctxOf(data, s)), `${label}: start`).toEqual(legacyCanon());
   const r = rng(seed);
   const done: string[] = [];
   for (let i = 0; i < STEPS; i++) {
@@ -205,10 +324,11 @@ function runSequence(label: string, start: { legacy: () => void; core: WarbandSt
     if (!step) continue;
     const [what, legacyCall, coreCall] = step;
     done.push(what);
-    legacyCall();
+    if (withLegacy) legacyCall();
     const before = s;
     s = coreCall(core.ctxOf(data, s));
     if (s !== before) { const name = what.split(' ')[0] as string; effective.set(name, (effective.get(name) ?? 0) + 1); }
+    if (!withLegacy) continue;
     const got = coreCanon(core.ctxOf(data, s)), want = legacyCanon();
     if (JSON.stringify(got) !== JSON.stringify(want)) {
       expect(got, `${label}: after ${done.slice(-6).join(' → ')}`).toEqual(want);
@@ -216,85 +336,48 @@ function runSequence(label: string, start: { legacy: () => void; core: WarbandSt
   }
 }
 
-describe('roster action parity: legacy app vs core', () => {
-  it.each(Object.keys(data.WARBANDS).map((wb) => [wb] as const))('fresh %s', (wb) => {
-    for (const on of [false, true]) {
-      const fresh = core.newWarband(data, wb);
-      const start = on ? { ...fresh, campaign: { on: true, districts: {} } } : fresh;
-      runSequence(`${wb} campaign=${on}`, {
+/* ---- the walks ---- */
+
+export interface Walk { label: string; start: WalkStart; seed: number }
+
+/** A fresh roster of every warband type, with and without the campaign on. */
+export function freshWalks(): Walk[] {
+  const out: Walk[] = [];
+  for (const wb of Object.keys(data.WARBANDS)) for (const on of [false, true]) {
+    const fresh = core.newWarband(data, wb);
+    out.push({
+      label: `${wb} campaign=${on}`, seed: hash(`${wb}|${on}`),
+      start: {
         legacy: () => { L.app.chooseWb(wb); if (on) L.state.S.campaign.on = true; },
-        core: start,
-      }, hash(`${wb}|${on}`));
-    }
-  });
+        core: on ? { ...fresh, campaign: { on: true, districts: {} } } : fresh,
+      },
+    });
+  }
+  return out;
+}
 
-  const fixtures = generateFixtures(data, [3]).filter((_, i) => i % 3 === 0);
-  it.each(fixtures.map((f) => [f.label, f] as const))('from %s', (label, f) => {
-    runSequence(label, { legacy: () => { L.load(f.state); }, core: structuredClone(f.state) }, hash(label));
-  });
-});
+/** Every third generated state (seed 3). */
+export function fixtureWalks(): Walk[] {
+  return generateFixtures(data, [3]).filter((_, i) => i % 3 === 0).map((f: Fixture) => ({
+    label: f.label, seed: hash(f.label),
+    start: { legacy: () => { L.load(f.state); }, core: structuredClone(f.state) },
+  }));
+}
 
-describe('action coverage', () => {
-  /* Parity only means something if the sequences exercise the actions: each
-     must have changed a state a minimum number of times. */
-  it('every action changed a state often enough', () => {
-    const minimum = 15;
-    const actions = ['addUnit', 'removeUnit', 'setName', 'setExp', 'setQty', 'toggleEq', 'setEqQty', 'addRare', 'addRare(again)',
-      'setRareTarget', 'setRareQty', 'setRarePaid', 'removeRare', 'toggleMut', 'setHeirloom', 'toggleWeaponUpgrade',
-      'setGoldCurrent', 'adjGoldCurrent', 'stashAdj', 'stashSet', 'stashAddItem', 'stashRemItem', 'stashItemQty', 'pickSub',
-      'setDistrict', 'hireHS', 'unhireHS', 'setHsExp', 'addHsSkill', 'delHsSkill', 'hsOptSet', 'setHsEq', 'hsSetName',
-      'hireDP', 'unhireDP', 'dpSetName', 'setHsGrade', 'setDpGrade', 'setHouseNum', 'setHouseBool', 'setHouseNotes', 'resetHouse'];
-    const low = actions.filter((a) => (effective.get(a) ?? 0) < minimum).map((a) => `${a}: ${effective.get(a) ?? 0}`);
-    expect(low).toEqual([]);
-  });
-});
+/** Half of a list, for splitting a suite over parallel files. */
+export const half = <T>(xs: T[], which: 0 | 1): T[] => xs.filter((_, i) => i % 2 === which);
 
-describe('roster actions without a legacy counterpart', () => {
-  it('setWarbandName renames the warband', () => {
-    const s = core.newWarband(data, 'merc');
-    expect(core.setWarbandName(core.ctxOf(data, s), 'Die Silberne Karavane').name).toBe('Die Silberne Karavane');
-  });
+/** Every action the walk can take, as labelled in steps. */
+export const ACTIONS = ['addUnit', 'removeUnit', 'setName', 'setExp', 'setQty', 'toggleEq', 'setEqQty', 'addRare', 'addRare(again)',
+  'setRareTarget', 'setRareQty', 'setRarePaid', 'removeRare', 'toggleMut', 'setHeirloom', 'toggleWeaponUpgrade',
+  'setGoldCurrent', 'adjGoldCurrent', 'stashAdj', 'stashSet', 'stashAddItem', 'stashRemItem', 'stashItemQty', 'pickSub',
+  'setDistrict', 'hireHS', 'unhireHS', 'setHsExp', 'addHsSkill', 'delHsSkill', 'hsOptSet', 'setHsEq', 'hsSetName',
+  'hireDP', 'unhireDP', 'dpSetName', 'setHsGrade', 'setDpGrade', 'setHouseNum', 'setHouseBool', 'setHouseNotes', 'resetHouse',
+  'incExp', 'setExpJump', 'addAdv', 'remAdv', 'addSkill', 'addSkillFromSel', 'remSkill', 'togglePromoCat', 'setMemberName',
+  'promoteHench', 'unpromote', 'addSpell', 'addSpellFromAdv', 'remSpell2', 'spellRed', 'setCaster', 'setLore', 'setLeader', 'setMark',
+  'addHsAdv', 'remHsAdv', 'remHsSkillIdx', 'addHsSpell', 'addHsSpellFromAdv', 'delHsSpell', 'hsSpellRed'];
 
-  it('never reuses a model uid after a removal', () => {
-    let s = core.newWarband(data, 'merc');
-    const ctx = () => core.ctxOf(data, s);
-    s = core.addUnit(ctx(), 'capt');
-    s = core.addUnit(ctx(), 'champ');
-    const second = s.models[1]?.uid as number;
-    s = core.removeUnit(ctx(), second);
-    s = core.addUnit(ctx(), 'champ');
-    expect(s.models.map((m) => m.uid)).not.toContain(undefined);
-    expect(s.models[1]?.uid).toBeGreaterThan(second);
-  });
-
-  it('never reuses a chronicle id after a deletion', () => {
-    let s: WarbandState = { ...core.newWarband(data, 'merc'), campaign: { on: true, districts: {} } };
-    const ctx = () => core.ctxOf(data, s);
-    s = core.addUnit(ctx(), 'capt');
-    s = core.addUnit(ctx(), 'champ');
-    const ids = (s.campaign?.log ?? []).map((e) => e.id);
-    s = { ...s, campaign: { ...s.campaign, log: (s.campaign?.log ?? []).slice(0, 1) } };
-    s = core.addUnit(ctx(), 'champ');
-    const last = (s.campaign?.log ?? []).at(-1)?.id as number;
-    expect(last).toBeGreaterThan(Math.max(...ids));
-  });
-
-  it('actions return new states and leave the input untouched', () => {
-    const s = Object.freeze(core.newWarband(data, 'merc')) as WarbandState;
-    const next = core.addUnit(core.ctxOf(data, s), 'capt');
-    expect(next).not.toBe(s);
-    expect(s.models).toHaveLength(0);
-    expect(next.models).toHaveLength(1);
-  });
-
-  it('a refused action returns the very same state', () => {
-    const s = core.newWarband(data, 'merc');
-    expect(core.addUnit(core.ctxOf(data, s), 'no-such-unit')).toBe(s);
-    expect(core.hireHS(core.ctxOf(data, s), 'no-such-hs')).toBe(s);
-  });
-});
-
-function hash(s: string): number {
+export function hash(s: string): number {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
   return h >>> 0;

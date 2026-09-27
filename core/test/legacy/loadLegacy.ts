@@ -42,6 +42,7 @@ function installStubs(): void {
   g.Blob = function Blob() {};
   (globalThis.URL as unknown as Record<string, unknown>).createObjectURL = () => '';
   g.confirm = () => true;
+  g.alert = () => {};
   g.fetch = async (u: string | URL) => {
     const p = fileURLToPath(new URL(String(u)));
     return {

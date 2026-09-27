@@ -9,6 +9,7 @@ import { withFreeDagger, upgradePaid, upgradeTargets } from '../rules/equipment.
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
 import { catalogDefaultPaid } from '../rules/pricing.ts';
 import { logEvent } from './log.ts';
+import { fixPersonas } from './normalize.ts';
 import { findModel, nextModelUid, rememberUids, update } from './update.ts';
 
 /** Has the warband's leader type (the unit marked `req`) already died? */
@@ -38,6 +39,8 @@ export function pickSubtype(ctx: Ctx, key: string): WarbandState {
       for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) valid.add(nm);
       for (const nm of Object.keys(m.eq ?? {})) if (!valid.has(nm)) delete (m.eq as Record<string, unknown>)[nm];
     }
+    // personas allowed may depend on the subtype
+    fixPersonas(d, c);
   });
 }
 

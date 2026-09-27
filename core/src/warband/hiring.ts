@@ -4,6 +4,7 @@ import type { HireRecord, WarbandState } from '../state/types.ts';
 import { houseDefaults, houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
 import { dpCount, dpEligibility, dpGradeAllowed, hireEligibility, hsCount, hsGradeAllowed, hsPersonasAllowed, HS_XP_MAX } from '../rules/hire.ts';
+import { fixPersonas } from './normalize.ts';
 import { update, type WarbandDraft } from './update.ts';
 
 /** A record id for a hire: `hs1`, `hs2`, … (`dp…` for Dramatis Personae),
@@ -88,7 +89,7 @@ export function removeHsSkill(ctx: Ctx, uid: string, skill: string): WarbandStat
 
 /** The chosen option or persona. */
 export function setHsOption(ctx: Ctx, uid: string, v: string): WarbandState {
-  return update(ctx, (d) => { const r = inAny(d, uid); if (r) r.opt = v; });
+  return update(ctx, (d, c) => { const r = inAny(d, uid); if (!r) return; r.opt = v; fixPersonas(d, c); });
 }
 
 /** House rule "hsEquip": extra equipment from the Hero list, 0–9 each. */

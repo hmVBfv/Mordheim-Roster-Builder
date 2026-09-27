@@ -20,6 +20,13 @@ export interface Injury {
   [key: string]: unknown;
 }
 
+/** A spell or prayer a caster knows; `red` lowers its difficulty. */
+export interface SpellPick {
+  name: string;
+  red?: number;
+  [key: string]: unknown;
+}
+
 export interface Model {
   /** Stable id of this roster entry. Never changes. */
   uid: number;
@@ -36,9 +43,15 @@ export interface Model {
   mut?: string[];
   adv?: Partial<Record<StatKey, number | string>>;
   skills?: string[];
-  spells?: string[];
+  spells?: SpellPick[];
   inj?: Injury[];
   promoted?: boolean;
+  /** A hero who learned to cast (house rule / campaign), and his lore. */
+  caster?: boolean;
+  lore?: string;
+  magic?: string;
+  /** Games to miss (injuries). */
+  miss?: number;
   promoCats?: string[];
   /** Experience surcharge actually paid when veterans joined this group. */
   xpPaid?: number;
@@ -56,7 +69,7 @@ export interface HireRecord {
   name?: string;
   exp?: number | string;
   skills?: string[];
-  spells?: string[];
+  spells?: SpellPick[];
   adv?: Partial<Record<StatKey, number | string>>;
   inj?: Injury[];
   /** Chosen option or persona. */
