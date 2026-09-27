@@ -33,7 +33,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `appVersion` | ja | App-Version (Commit), die den Stand erzeugt hat |
 | `canon` | ja | `{ name_de, name_en }` der Warband (z. B. *Die Silberne Karavane* / *The Ardent Caravan*) |
 | `uidSeq` | ja | nächste freie Krieger-`uid`; verhindert, dass eine `uid` nach Entfernen oder Tod wiederverwendet wird (setzt `normalizeState` beim Laden) |
-| `campaign.logSeq` | ja | zuletzt vergebene Chronik-ID; aus demselben Grund |
+| `campaign.logSeq` | ja | zuletzt vergebene ID der Chronik; Log, Schlachten, Verluste und Erfahrungseinträge teilen sich diese Folge |
 | `story` | ja | `{ prologue, interludes: { [round]: text }, explain: { [changeKey]: text } }` |
 | `models[].profile` | ja | `{ name_de, name_en, title_de, title_en, voice, origin, text }` |
 | `wb`, `subtype`, `name`, `budget`, `models`, `stash`, `fallen`, `hired`, `dp`, `mark`, `house`, `leaderUid`, `goldNow` | nein | wie heute |
@@ -42,6 +42,19 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 - Schlüssel mit `_` am Anfang sind Bedienzustand und werden vor dem Speichern
   entfernt (bestehende Konvention `_stripTransient`).
+- **Gefallene** (`fallen[]`, in der Reihenfolge ihres Todes):
+  `{ kind: 'hero'|'hench', m, uid_def, exp, memberIdx, memberName, lostValue,
+  casualtyId, casFromDeath }`. `m` ist der Krieger, wie er fiel (bei
+  Henchmen genau ein Mann der Gruppe, mit der `uid` der Gruppe);
+  `lostValue` ist das Gold, das dafür aus der Kasse ging und bei Rücknahme
+  zurückkommt.
+- **Verluste** (`campaign.casualties[]`): `{ id, round, battleId, victim,
+  attacker, result: 'pending'|'recovered'|'injured'|'dead', detail,
+  fallenId, note, code, applied, xpId }`; `victim`/`attacker` =
+  `{ uid, name, wb, grade, value, memberIdx, uid_def }`, `uid` nur bei
+  eigenen Kriegern. `fallenId` ist ein Index in `fallen`.
+- **Gehaltene Erfahrung** (`campaign.xp[]`): `{ id, round, uid, name,
+  amount, reason, applied }`; `applyPendingXp` schreibt sie auf die Krieger.
 - **`uid` eines Kriegers ist unveränderlich** und die Grundlage für Vergleich,
   Lebenslauf und Erwähnungen.
 - **`campaign`:** In der Quick-Build-Variante und in der Kampagnendatei bleibt
