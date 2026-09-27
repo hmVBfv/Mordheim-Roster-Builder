@@ -51,13 +51,43 @@ function idRefs(c: Rec): IdRef[] {
 
 function canon(s: unknown): unknown {
   const c = JSON.parse(JSON.stringify(s)) as Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: { uid: string }[] };
-  delete c.uidSeq;
-  if (c.campaign) delete c.campaign.logSeq;
+  const camp = c.campaign;
+  // Stage snapshots hold a whole earlier state: brought to the same canonical
+  // form, and stamped with a date legacy took from the clock.
+  const snaps = (camp?.snapshots ?? {}) as Record<string, Rec>;
+  for (const k of Object.keys(snaps)) {
+    const sn = snaps[k] as Rec;
+    if (sn && typeof sn === 'object' && !Array.isArray(sn)) {
+      sn.at = 'DATE';
+      if (sn.state) sn.state = canonCommon(JSON.parse(JSON.stringify(core.normalizeState(core.ctxOf(data, sn.state as WarbandState)))) as Rec);
+    }
+  }
   // Chronicle ids by rank: legacy draws them from a module-wide counter,
   // core from the state; both hand them out in the same order.
-  const refs = idRefs(c);
+  const refs = [...idRefs(c), ...Object.values(snaps).flatMap((sn) => (sn && typeof sn === 'object' && sn.state ? idRefs(sn.state as Rec) : []))];
   const rank = new Map([...new Set(refs.map(([h, k]) => h[k] as number))].sort((x, y) => x - y).map((id, i) => [id, i + 1]));
   for (const [h, k] of refs) h[k] = rank.get(h[k] as number);
+  return canonCommon(c);
+}
+
+/* Everything but the chronicle ids. */
+function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: { uid: string }[] }): Rec {
+  delete c.uidSeq;
+  const camp = c.campaign;
+  if (camp) {
+    delete camp.logSeq;
+    // A post-battle round nobody has touched, and an empty snapshot list, are
+    // what legacy's panels leave behind when they merely look.
+    const pb = camp.postbattle as Record<string, Rec> | undefined;
+    if (pb) {
+      for (const k of Object.keys(pb)) {
+        const st = pb[k] as Rec;
+        if (st && Object.keys(st).every((x) => x === 'done' || x === 'wyrd') && !Object.keys((st.done as Rec) ?? {}).length && st.wyrd == null) delete pb[k];
+      }
+      if (!Object.keys(pb).length) delete camp.postbattle;
+    }
+    if (camp.snapshots && typeof camp.snapshots === 'object' && !Object.keys(camp.snapshots).length) delete camp.snapshots;
+  }
   (c.hired ?? []).forEach((h, i) => { h.uid = `H${i}`; });
   (c.dp ?? []).forEach((h, i) => { h.uid = `D${i}`; });
   // Open/closed panels are screen state that legacy kept in the save; core
@@ -110,7 +140,8 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
   const list = m ? core.eqListFor(ctx, core.unitDef(ctx, m.uid_def)) : undefined;
   const items = list ? Object.values(list).flat().map((e) => e[0]) : [];
   const hired = s.hired ?? [], dps = s.dp ?? [];
-  const roll = r.int(0, 38 + ADV_KINDS + INJ_KINDS);
+  const roll = r.int(0, 38 + ADV_KINDS + INJ_KINDS + CAMP_KINDS);
+  if (roll > 38 + ADV_KINDS + INJ_KINDS) return campaignStep(r, d, s);
   if (roll > 38 + ADV_KINDS) return injuryStep(r, d, s, m);
   if (roll > 38) return advanceStep(r, d, s, m);
   // two extra slots for the Hired Sword operations, which have many variants
@@ -492,6 +523,10 @@ function casualtyReport(ctx: Ctx): unknown {
       cas.indexOf(core.pendingCasualtyFor(ctx, m.uid) as core.Casualty)]),
     outstanding: core.outstandingCasualties(ctx).length, unrolled: core.unrolledCasualties(ctx).length,
     round: core.roundLabel(s.campaign?.round), wb: core.wbName(ctx, s.wb),
+    pb: [core.pbRound(ctx), core.pbActiveStep(ctx), core.pbExploreDice(ctx), core.pbSearchingHeroes(ctx), core.pbWonThisRound(ctx, 1),
+      core.warbandSize(ctx), [1, 3, 9].map((n) => core.wyrdPrice(ctx, n))],
+    stages: [core.diffStages(ctx, 0, 1), core.diffStages(ctx, 1, 2), core.foundingMembers(ctx), core.districtsAt(ctx, 1), core.totalsAt(ctx, 1)],
+    analysis: core.campaignAnalysis(ctx),
   };
 }
 
@@ -508,7 +543,83 @@ function legacyCasualtyReport(): unknown {
     models: S.models.map((m) => [a.modelLabel(m), a.canEarnXp(m), a.pendingXpFor(m.uid), cas.indexOf(a.pendingCasualtyFor(m.uid))]),
     outstanding: a.outstandingCasualties().length, unrolled: a.unrolledCasualties().length,
     round: a.roundLabel(S.campaign?.round), wb: a.wbName(S.wb),
+    pb: [a.pbRound(), a.pbActiveStep(), a.pbExploreDice(), a.pbSearchingHeroes(), a.pbWonThisRound(1),
+      a.warbandSize(), [1, 3, 9].map((n) => a.wyrdPrice(n))],
+    stages: [a.diffStages(0, 1), a.diffStages(1, 2), a.foundingMembers(), a.districtsAt(1), a.totalsAt(1)],
+    analysis: a.campaignAnalysis(),
   };
+}
+
+const CAMP_KINDS = 12;
+const OUTCOMES = ['Victory', 'Defeat', 'Draw', 'Routed', ''];
+
+/* The chronicle, stages, battles, footholds and the post-battle sequence. */
+function campaignStep(r: Rng, d: GameData, s: WarbandState): Step | null {
+  const a = L.app;
+  const camp = s.campaign ?? {};
+  const log = camp.log ?? [], battles = camp.battles ?? [];
+  const byIndex = (list: 'log' | 'battles', i: number) => ({
+    idC: () => ((s.campaign?.[list] ?? []) as { id: number }[])[i]?.id as number,
+    idL: () => (((L.state.S.campaign ?? {})[list] ?? []) as { id: number }[])[i]?.id as number,
+  });
+  const op = r.int(0, 14);
+  switch (op) {
+    case 0: { const t = r.pick(['The rain came.', '', '  ']), round = r.chance(0.3) ? r.int(0, 3) : undefined; return [`addLogNote ${round}`, () => a.addLogNote(t, round), (c) => core.addLogNote(c, t, round)]; }
+    case 1: {
+      if (!log.length) return null;
+      const i = r.int(0, log.length - 1), { idC, idL } = byIndex('log', i);
+      if (r.chance(0.5)) { const t = r.pick(['Corrected.', '']); return [`editLogText #${i}`, () => a.editLogText(idL(), t), (c) => core.editLogText(c, idC(), t)]; }
+      return [`removeLogAt #${i}`, () => withDialogs([true], [], () => a.removeLogAt(idL())), (c) => core.removeLogEntry(c, idC())];
+    }
+    case 2: { const v = r.pick([0, 1, 2, 3, '2', -1, 'x']); return [`setRound ${v}`, () => a.setRound(v), (c) => core.setRound(c, v)]; }
+    case 3: case 4: return ['advanceRound', () => a.advanceRound(), (c) => core.advanceRound(c, '2026-09-27')];
+    case 5: case 6: {
+      const foes = Array.from({ length: r.int(0, 2) }, (_, i) => ({ key: '', name: r.chance(0.8) ? `Foe ${i + 1}` : '', wb: r.chance(0.7) ? r.pick(Object.keys(d.WARBANDS)) : '', outcome: r.pick(OUTCOMES) }));
+      const me = { key: 'me', name: s.name || '', wb: s.wb as string, outcome: r.pick(OUTCOMES) };
+      const b: core.BattleInput = {
+        sides: [me, ...foes], opponents: foes.map((f) => ({ name: f.name, wb: f.wb })),
+        district: r.chance(0.6) ? r.pick(d.DISTRICTS).id : '', outcome: me.outcome, notes: r.pick(['', 'Ambushed at the well.']),
+      };
+      if (r.chance(0.3)) b.round = r.int(0, 3);
+      return [`addBattle`, () => a.addBattle(structuredClone(b)), (c) => core.addBattle(c, structuredClone(b))];
+    }
+    case 7: {
+      if (!battles.length) return null;
+      const i = r.int(0, battles.length - 1), { idC, idL } = byIndex('battles', i);
+      if (r.chance(0.5)) {
+        const patch: Record<string, unknown> = r.pick([{ outcome: 'Victory' }, { notes: 'Rewritten.' }, { round: 2, district: '' }, { outcome: undefined }]);
+        return [`editBattle #${i}`, () => a.editBattle(idL(), { ...patch }), (c) => core.editBattle(c, idC(), { ...patch })];
+      }
+      return [`removeBattle #${i}`, () => withDialogs([true], [], () => a.removeBattle(idL())), (c) => core.removeBattle(c, idC())];
+    }
+    case 8: {
+      const held = Object.keys(camp.districts ?? {}).filter((k) => camp.districts?.[k] && camp.districts[k] !== 'none');
+      if (r.chance(0.5)) { const id = r.pick(d.DISTRICTS).id; return [`claimFoothold ${id}`, () => a.claimFoothold(id), (c) => core.claimFoothold(c, id)]; }
+      const id = held.length && r.chance(0.8) ? r.pick(held) : r.pick(d.DISTRICTS).id;
+      return [`loseFoothold ${id}`, () => a.loseFoothold(id), (c) => core.loseFoothold(c, id)];
+    }
+    case 9: case 10: {
+      // mostly the next step in order, sometimes one out of order
+      const round = r.chance(0.2) ? r.int(0, 3) : undefined;
+      const ctx = core.ctxOf(d, s);
+      const active = core.pbActiveStep(ctx, round);
+      const on = r.chance(0.75);
+      const idx = r.chance(0.7) ? (on ? active : active - 1) : r.int(0, core.PB_ORDER.length);
+      const step = core.PB_ORDER[idx] ?? 'nonsense';
+      return [`pbSetStepDone ${step} ${on}`, () => a.pbSetStepDone(step, on, round), (c) => core.setPostBattleStep(c, step, on, round)];
+    }
+    case 11: case 12: {
+      const round = r.chance(0.2) ? r.int(0, 3) : undefined;
+      const n = r.pick([1, 2, 3, 8, 12, '2', 0, 'x']);
+      return [`pbSellWyrd ${n}`, () => a.pbSellWyrd(round, n), (c) => core.sellWyrdstone(c, round, n)];
+    }
+    default: {
+      // mostly a round with a sale to take back
+      const sold = Object.entries((camp.postbattle ?? {}) as Record<string, { wyrd?: { done?: boolean } }>).filter(([, v]) => v?.wyrd?.done).map(([k]) => Number(k));
+      const round = sold.length && r.chance(0.8) ? r.pick(sold) : r.chance(0.2) ? r.int(0, 3) : undefined;
+      return ['pbClearWyrd', () => a.pbClearWyrd(round), (c) => core.undoWyrdstoneSale(c, round)];
+    }
+  }
 }
 
 export type WalkStart = { legacy: () => void; core: WarbandState };
@@ -579,7 +690,9 @@ export const ACTIONS = ['addUnit', 'removeUnit', 'setName', 'setExp', 'setQty', 
   'addHsAdv', 'remHsAdv', 'remHsSkillIdx', 'addHsSpell', 'addHsSpellFromAdv', 'delHsSpell', 'hsSpellRed',
   'addInj', 'remInj', 'missAdj', 'killHero', 'killHench', 'killHenchMember', 'undoFallen', 'removeFallenAt',
   'addCasualty', 'addCasualty(byHero)', 'resolveCasualtyRoll', 'setCasNote', 'resolveCasualty', 'removeCasualty',
-  'grantXp', 'applyPendingXp', 'applyBattleResults', 'clearPendingXp', 'awardBattleXp'];
+  'grantXp', 'applyPendingXp', 'applyBattleResults', 'clearPendingXp', 'awardBattleXp',
+  'addLogNote', 'editLogText', 'removeLogAt', 'setRound', 'advanceRound', 'addBattle', 'editBattle', 'removeBattle',
+  'claimFoothold', 'loseFoothold', 'pbSetStepDone', 'pbSellWyrd', 'pbClearWyrd'];
 
 export function hash(s: string): number {
   let h = 2166136261;

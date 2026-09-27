@@ -95,3 +95,21 @@ describe('casualty actions without a legacy counterpart', () => {
     expect(core.addInjury(ctx(), uid, 'no-such-code')).toBe(s);
   });
 });
+
+describe('campaign actions without a legacy counterpart', () => {
+  it('stamps a stage snapshot with the date it is given, not a clock', () => {
+    let s: WarbandState = { ...core.newWarband(data, 'merc'), campaign: { on: true, districts: {} } };
+    s = core.addUnit(core.ctxOf(data, s), 'capt');
+    s = core.advanceRound(core.ctxOf(data, s), '2026-10-03');
+    expect(core.stageSnapshots(core.ctxOf(data, s))['0']?.at).toBe('2026-10-03');
+    expect(s.campaign?.round).toBe(1);
+  });
+
+  it('keeps a battle apart from the objects it was given', () => {
+    const sides = [{ key: 'me', name: 'Us', wb: 'merc', outcome: 'Victory' }];
+    const s = core.addBattle(core.ctxOf(data, { ...core.newWarband(data, 'merc'), campaign: { on: true, districts: {} } }), { sides });
+    sides[0]!.outcome = 'Defeat';
+    expect((s.campaign?.battles?.[0]?.sides as { outcome: string }[])[0]?.outcome).toBe('Victory');
+    expect(Object.isFrozen(sides[0])).toBe(false);
+  });
+});
