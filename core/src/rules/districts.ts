@@ -41,3 +41,9 @@ export function itemHalfActive(ctx: Ctx, en: string | undefined | null): boolean
   }
   return false;
 }
+
+/** Is this Hired Sword or Dramatis Persona at half price here? */
+export function hireDiscounted(ctx: Ctx, key: string): boolean {
+  const anyTab = ctx.data.HIREDSWORDS[key] || ctx.data.DRAMATIS[key];
+  return !!anyTab && priceMod(ctx, 'hire', key) < 1;
+}

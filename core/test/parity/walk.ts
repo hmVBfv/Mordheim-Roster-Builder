@@ -76,6 +76,8 @@ function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: 
   const camp = c.campaign;
   if (camp) {
     delete camp.logSeq;
+    // half-filled forms and open panels (legacy kept them in the save)
+    for (const k of Object.keys(camp)) if (k.startsWith('_')) delete camp[k];
     // A post-battle round nobody has touched, and an empty snapshot list, are
     // what legacy's panels leave behind when they merely look.
     const pb = camp.postbattle as Record<string, Rec> | undefined;
@@ -101,7 +103,7 @@ function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: 
 /* Both sides go through normalizeState: when legacy reached the canonical
    form depended on what it happened to render (e.g. the campaign lists only
    appear once the campaign section or a log entry touched them). */
-const canonOf = (s: unknown) => canon(core.normalizeState(core.ctxOf(data, JSON.parse(JSON.stringify(s)) as WarbandState)));
+export const canonOf = (s: unknown) => canon(core.normalizeState(core.ctxOf(data, JSON.parse(JSON.stringify(s)) as WarbandState)));
 export const coreCanon = (ctx: Ctx) => canonOf(ctx.s);
 export const legacyCanon = () => canonOf(L.state.S);
 
