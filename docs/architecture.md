@@ -57,8 +57,19 @@ Reine Logik, lauffähig in Browser und Node.
 **Stand (Phase 1b):** `data/` (Laden, Typen), `state/` (Speicherformat,
 Hausregeln) und `rules/` (Nachschlagen, Bezirkseffekte, Preise, Hired Swords
 und Dramatis Personae, Ausrüstung und Rare Items, Kosten und Rating, Worth,
-Rüstungswurf) sind portiert und per Paritätstest abgesichert. Die übrigen
-Module folgen in der Reihenfolge aus [roadmap.md](roadmap.md).
+Rüstungswurf) sind portiert und per Paritätstest abgesichert, ebenso aus
+`warband/` der Rosterbau (Einheiten, Ausrüstung, Rare Items, Mutationen,
+Gold und Truhe, Subtyp, Bezirke, Hired Swords und Dramatis Personae,
+Hausregeln). Die übrigen Module folgen in der Reihenfolge aus
+[roadmap.md](roadmap.md).
+
+**Aktionen** (`warband/`) nehmen einen Zustand und geben einen neuen zurück
+(Immer); der Eingang bleibt unverändert, eine abgelehnte Aktion gibt genau
+denselben Zustand zurück. Innerhalb einer Aktion darf der Code den Entwurf so
+schreiben wie die alte App ihr globales `S` – das hält die Portierung 1:1.
+`normalizeState` bringt einen geladenen Stand in die kanonische Form, die die
+alte App nebenbei beim Zeichnen herstellte (Kampagnenlisten, Hausregel-
+Vorgaben, gültige Persona) und merkt sich die Zähler `uidSeq`/`logSeq`.
 
 **Wie portiert wird:** Die alte App wird *nicht* auf `core/` umgebaut; sie
 bleibt unverändert live, bis der neue Builder sie ersetzt. `core/` wird gegen

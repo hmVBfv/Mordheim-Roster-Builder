@@ -32,8 +32,14 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   komplette Regel-/Kostenrechnung aus `engine.js` samt Hired Swords,
   Dramatis Personae, Bezirkseffekten, Worth und Rüstungswurf – Parität über
   348 erzeugte Warbands, Reinheitstest auf eingefrorenen Ständen.
-- [ ] 1b, weiter: Warband-Operationen (anwerben, ausrüsten, Erfahrung,
-  Aufstiege, Verletzungen, Beförderungen), Kampagne, Exporte, Format.
+- [x] 1b, zweiter Teil: Rosterbau als reine Aktionen (Einheiten, Ausrüstung,
+  Rare Items, Mutationen, Gold und Truhe, Subtyp, Bezirke, Hired Swords und
+  Dramatis Personae, Hausregeln) – Parität über zufällige Aktionsfolgen
+  (je 80 Schritte, alle 49 Warbands frisch mit und ohne Kampagne, dazu
+  erzeugte Stände); jede Aktion muss dabei mindestens 15-mal gegriffen haben.
+- [ ] 1b, weiter: Erfahrung und Aufstiege, Fertigkeiten und Zauber,
+  Beförderungen, Anführer, Verletzungen und Gefallene, Kampagne, Exporte,
+  Format.
 - [ ] 1c, 1d, 1e, 1f
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
@@ -133,7 +139,7 @@ Diese offenen Punkte des Pi müssen vor Phase 2 erledigt sein:
 | --- | --- | --- | --- |
 | ~~A~~ | ~~Optik~~ – entschieden: beide Themes wählbar, Standard „Chronicle“ (dunkel), siehe [ui.md](ui.md#4-themes-und-gestaltung) | – | – |
 | ~~B~~ | ~~Git im Agenten-Container~~ – entschieden: Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi (ADR 0015); kein Agent auf dem Pi für dieses Projekt | – | – |
-| **C** | Immer für unveränderliche Updates in `core/`? | Entscheidung beim ersten Modul nach Lesbarkeit der Tests | Phase 1b |
+| ~~C~~ | ~~Immer~~ – entschieden: ja, für alle Aktionen in `core/warband` (die Portierung bleibt 1:1 lesbar, Ergebnisse sind unveränderlich) | – | – |
 | **D** | Alte App nach der Umstellung: `dist/mordheim-roster.html` noch eine Kampagnenrunde lang als Download behalten? | ja, danach entfernen | Phase 3 |
 | **E** | Für welche der bisherigen Schlachten gibt es Snapshots? Wo keine sind, beginnt der Vergleich erst ab dem ersten Snapshot. | beim Import prüfen und festhalten | Phase 4a |
 | **F** | Push-Hinweise | später entscheiden | Phase 5 |
