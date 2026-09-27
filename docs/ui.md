@@ -69,8 +69,8 @@ Handy geprüft, bevor die Umsetzung beginnt.
 
 ## 4. Themes und Gestaltung
 
-**Vorschlag (offen, siehe [roadmap.md](roadmap.md#offene-entscheidungen)):**
-ein gemeinsamer Satz Design-Variablen mit zwei Themes.
+**Entschieden (27.09.2026):** ein gemeinsamer Satz Design-Variablen mit zwei
+Themes, beide wählbar. **Standard ist „Chronicle“ (dunkel).**
 
 | | Hell: „Parchment“ | Dunkel: „Chronicle“ |
 | --- | --- | --- |
@@ -79,7 +79,9 @@ ein gemeinsamer Satz Design-Variablen mit zwei Themes.
 | Schriften | Pirata One (Titel), EB Garamond | Cinzel (Titel), EB Garamond |
 | Gut für | Druck, Tageslicht | Spielabend, Handy, dunkle Räume |
 
-- Standard folgt der Systemeinstellung; umschaltbar im Profil.
+- Standard ist „Chronicle“; im Profil wählbar: Chronicle, Parchment oder
+  „wie System“.
+- Druck und PDF-Export verwenden immer „Parchment“.
 - Schriften werden selbst ausgeliefert (strenge CSP, offline).
 - Zierschriften nur für Titel; Fließtext und Werte in einer gut lesbaren
   Schrift, Zahlen tabellarisch ausgerichtet.
