@@ -8,14 +8,14 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
 ## Phase 0 – Doku und Entscheidungen
 
 - Dieses Doku-Paket, ADRs, `CLAUDE.md`.
-- **Abnahme:** Rob hat gelesen und korrigiert; die offenen Entscheidungen A
-  und B (unten) sind getroffen.
+- **Abnahme:** Rob hat gelesen und korrigiert; die Entscheidungen A und B
+  sind getroffen (27.09.2026).
 
 ## Phase 1 – `core/` und Grundgerüst der App
 
 | Schritt | Inhalt |
 | --- | --- |
-| 1a Werkzeuge | npm-Workspaces `core`, `app`, `server`; TypeScript `strict`; Vitest; ESLint. Die CI führt Legacy-Tests und neue Tests nebeneinander aus. |
+| 1a Werkzeuge | Cloud-Umgebung für Claude Code (Setup-Skript `npm ci`); npm-Workspaces `core`, `app`, `server`; TypeScript `strict`; Vitest; ESLint. Die CI führt Legacy-Tests und neue Tests nebeneinander aus. |
 | 1b Logik herauslösen | In dieser Reihenfolge nach `core/`: Regeln (`engine.js`) → Warband-Operationen (Kosten, Ausrüstung, Gold und Gefallene, Erfahrung und Aufstiege, Verletzungen, Beförderungen, Hired Swords, Dramatis Personae) → Kampagne (Post-Battle, Einkommen, Wyrdstone, Unterhalt, Bezirke, Snapshots) → Exporte (TTS, Text, PDF) → Format (Schemas, Migration aller bisherigen Speicherstände). |
 | 1c Neue Logik | `core/changes` (Vergleich, Abgleich, Änderungsschlüssel), `core/narrative` (Briefing). |
 | 1d Parität | Die 32 Legacy-Testdateien laufen gegen `core/`. Ein Paritätstest vergleicht alte und neue Logik über alle 49 Warbands und bereinigte Speicherstände der laufenden Kampagne. |
@@ -36,7 +36,7 @@ Die alte App bleibt in dieser Phase unverändert live.
   Epoche, Markerdatei-Prüfung.
 - `compose.yaml`, `Caddyfile`, `roster-deploy`, Backup- und
   Wiederherstellungstest-Timer, healthchecks.io, Fail2Ban-Regel.
-- Agenten-Projekt `roster` mit `roster-rc`.
+- Alle Betriebsdateien unter `ops/` im Repo, eingespielt mit `sudo ops/install.sh`.
 
 **Abnahme:**
 - Die App ist unter dem Hostnamen mit gültigem Zertifikat erreichbar.
@@ -118,7 +118,7 @@ Diese offenen Punkte des Pi müssen vor Phase 2 erledigt sein:
 | | Frage | Vorschlag | Bis |
 | --- | --- | --- | --- |
 | ~~A~~ | ~~Optik~~ – entschieden: beide Themes wählbar, Standard „Chronicle“ (dunkel), siehe [ui.md](ui.md#4-themes-und-gestaltung) | – | – |
-| **B** | Git im Agenten-Container: Die Agenten-Basis lässt git nur auf dem Host laufen. Für die Entwicklung über `roster-rc` wäre Commit/Push auf Feature-Branches aus dem Container praktisch. | für `roster` erlauben, nur auf Branches ≠ `master`; `master` per GitHub-Regelwerk geschützt. Alternative: Host-Helfer `roster-ship`. | Phase 1a |
+| ~~B~~ | ~~Git im Agenten-Container~~ – entschieden: Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi (ADR 0015); kein Agent auf dem Pi für dieses Projekt | – | – |
 | **C** | Immer für unveränderliche Updates in `core/`? | Entscheidung beim ersten Modul nach Lesbarkeit der Tests | Phase 1b |
 | **D** | Alte App nach der Umstellung: `dist/mordheim-roster.html` noch eine Kampagnenrunde lang als Download behalten? | ja, danach entfernen | Phase 3 |
 | **E** | Für welche der bisherigen Schlachten gibt es Snapshots? Wo keine sind, beginnt der Vergleich erst ab dem ersten Snapshot. | beim Import prüfen und festhalten | Phase 4a |
@@ -144,4 +144,5 @@ Siehe [decisions/](decisions/). Kurzfassung:
 | 0012 | Bug-Tracker in der App; Bearbeitung nur auf Zuruf |
 | 0013 | Oberfläche englisch; Kanon und Epos zweisprachig |
 | 0014 | Leistungsgrenzen werden in der CI geprüft |
+| 0015 | Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi; Pi-Konfiguration als `ops/` im Repo |
 | – | Themes: „Chronicle“ (dunkel, Standard) und „Parchment“ (hell) wählbar; Druck immer hell ([ui.md](ui.md#4-themes-und-gestaltung)) |

@@ -115,3 +115,6 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Regelfehler | Rules issue | `bugs.kind: 'rules'` |
 | Wunsch | Wish | `bugs.kind: 'wish'` |
 | Prüf-Agent | Reviewer agent | `.claude/agents/reviewer.md` |
+| Cloud-Sitzung | Cloud session | Claude Code im Code-Tab bzw. claude.ai/code |
+| Betriebsdateien | Ops files | `ops/`, eingespielt mit `ops/install.sh` |
+| Standortdatei | Site config | `~/server/roster/site.env` (nur auf dem Pi) |
