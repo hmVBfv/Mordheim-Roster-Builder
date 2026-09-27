@@ -17,6 +17,7 @@ export const HOUSE_MODIFIED: Partial<HouseRules> = {
   startGold: 650, max: '', priceAll: 120, priceArmour: 80, priceBP: 150, priceMissile: 90,
   clubSurcharge: 1, slingSurcharge: 2, armourBodyOnly: true, freeDagger: true,
   miscHench: true, freeMarket: false, hsEquip: true,
+  rangedCapOn: true, rangedCap: 25, rerollOne: true,
   hsGrades: { '1a': true, '1b': false, '1c': true, '2a': true },
   dpGrades: { core: true, '1a': false, '1b': true, '1c': true, '2a': true },
 };

@@ -143,9 +143,6 @@ export function markRulesFor(ctx: Ctx, m: Model | null | undefined): [string, st
   return [];
 }
 
-export function leaderRuleText(): string {
-  return 'Friendly models within 6 inches may use the leader’s (usually better) Leadership value for their Leadership tests.';
-}
 
 /* ---- house rules as declared on exports ---- */
 
