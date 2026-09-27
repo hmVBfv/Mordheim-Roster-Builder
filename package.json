@@ -1,0 +1,26 @@
+{
+  "name": "mordheim-campaign",
+  "private": true,
+  "description": "Mordheim Roster Builder and campaign companion (legacy app at the repo root, new workspaces in core/, app/, server/).",
+  "workspaces": [
+    "core"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "test": "npm run test:legacy && npm run test:core",
+    "test:legacy": "node test/run.mjs",
+    "test:core": "npm test -w core",
+    "typecheck": "npm run typecheck -w core",
+    "lint": "eslint .",
+    "check": "npm run typecheck && npm run lint && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.1"
+  }
+}

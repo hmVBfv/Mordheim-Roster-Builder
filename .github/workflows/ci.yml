@@ -1,0 +1,45 @@
+name: CI
+
+# Checks for every branch and every pull request into master. Deployment to
+# GitHub Pages stays in pages.yml (master only).
+#
+#   legacy  the existing app: rebuilds dist/ and runs test/*.mjs
+#   core    the new TypeScript workspace: typecheck, lint, unit and parity
+#           tests (core must compute exactly what the legacy app computes)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  legacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Legacy tests (rebuilds single-file + parity check)
+        run: node test/run.mjs
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Core tests (unit, purity, parity with the legacy app)
+        run: npm run test:core
