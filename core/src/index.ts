@@ -22,3 +22,6 @@ export * from './warband/hiring.ts';
 export * from './warband/house.ts';
 export * from './rules/profile.ts';
 export * from './warband/advance.ts';
+export * from './rules/casualties.ts';
+export * from './warband/xp.ts';
+export * from './warband/casualties.ts';

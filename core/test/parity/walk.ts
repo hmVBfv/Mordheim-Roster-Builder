@@ -26,22 +26,44 @@ const NO_LEGACY = { app: {}, state: { S: {} } } as unknown as Legacy;
 let L: Legacy = NO_LEGACY;
 export function useLegacy(l: Legacy | null): void { L = l ?? NO_LEGACY; }
 
-const STEPS = 80;
+const STEPS = 110;
 
 /* ---- canonical form for comparison ---- */
-function canon(s: unknown): unknown {
-  const c = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & { campaign?: Record<string, unknown>; hired?: { uid: string }[]; dp?: { uid: string }[] };
-  delete c.uidSeq;
-  if (c.campaign) {
-    delete c.campaign.logSeq;
-    const log = c.campaign.log as { id: number }[] | undefined;
-    if (Array.isArray(log)) log.forEach((e, i) => { e.id = i + 1; });
+type Rec = Record<string, unknown>;
+type IdRef = [holder: Rec, key: string];
+
+/* Every place a chronicle id (log entry, battle, casualty, experience entry
+   — one shared sequence) is stored or referenced. */
+function idRefs(c: Rec): IdRef[] {
+  const out: IdRef[] = [];
+  const camp = c.campaign as Rec | undefined;
+  const list = (x: unknown) => (Array.isArray(x) ? x as Rec[] : []);
+  const add = (h: unknown, k: string) => { if (h && typeof h === 'object' && typeof (h as Rec)[k] === 'number') out.push([h as Rec, k]); };
+  if (camp) {
+    for (const e of list(camp.log)) { add(e, 'id'); add(e.data, 'casualtyId'); add(e.data, 'battleId'); }
+    for (const b of list(camp.battles)) add(b, 'id');
+    for (const r of list(camp.casualties)) { add(r, 'id'); add(r, 'xpId'); add(r, 'battleId'); }
+    for (const x of list(camp.xp)) add(x, 'id');
   }
+  for (const f of list(c.fallen)) add(f, 'casualtyId');
+  return out;
+}
+
+function canon(s: unknown): unknown {
+  const c = JSON.parse(JSON.stringify(s)) as Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: { uid: string }[] };
+  delete c.uidSeq;
+  if (c.campaign) delete c.campaign.logSeq;
+  // Chronicle ids by rank: legacy draws them from a module-wide counter,
+  // core from the state; both hand them out in the same order.
+  const refs = idRefs(c);
+  const rank = new Map([...new Set(refs.map(([h, k]) => h[k] as number))].sort((x, y) => x - y).map((id, i) => [id, i + 1]));
+  for (const [h, k] of refs) h[k] = rank.get(h[k] as number);
   (c.hired ?? []).forEach((h, i) => { h.uid = `H${i}`; });
   (c.dp ?? []).forEach((h, i) => { h.uid = `D${i}`; });
   // Open/closed panels are screen state that legacy kept in the save; core
   // does not model them.
-  for (const x of [...((c.models as Record<string, unknown>[] | undefined) ?? []), ...(c.hired ?? []), ...(c.dp ?? [])] as Record<string, unknown>[]) {
+  const fallenModels = ((c.fallen as { m?: Rec }[] | undefined) ?? []).map((f) => f.m).filter(Boolean) as Rec[];
+  for (const x of [...((c.models as Rec[] | undefined) ?? []), ...(c.hired ?? []), ...(c.dp ?? []), ...fallenModels] as Rec[]) {
     for (const k of Object.keys(x)) if (/^_.*Open$/.test(k)) delete x[k];
   }
   return c;
@@ -50,11 +72,22 @@ function canon(s: unknown): unknown {
    form depended on what it happened to render (e.g. the campaign lists only
    appear once the campaign section or a log entry touched them). */
 const canonOf = (s: unknown) => canon(core.normalizeState(core.ctxOf(data, JSON.parse(JSON.stringify(s)) as WarbandState)));
-const coreCanon = (ctx: Ctx) => canonOf(ctx.s);
-const legacyCanon = () => canonOf(L.state.S);
+export const coreCanon = (ctx: Ctx) => canonOf(ctx.s);
+export const legacyCanon = () => canonOf(L.state.S);
+
+/* Legacy dialogs answered in order (confirm: default yes; prompt: default
+   cancelled). Without a prompt function legacy uses its defaults. */
+export function withDialogs<T>(confirms: boolean[], prompts: (string | null)[], fn: () => T): T {
+  const g = globalThis as Record<string, unknown>;
+  const oc = g.confirm, op = g.prompt;
+  const cq = [...confirms], pq = [...prompts];
+  g.confirm = () => (cq.length ? cq.shift() : true);
+  g.prompt = () => (pq.length ? pq.shift() : null);
+  try { return fn(); } finally { g.confirm = oc; g.prompt = op; }
+}
 
 /* Legacy functions that read their input from the DOM get it from here. */
-function withDom<T>(values: Record<string, string>, fn: () => T): T {
+export function withDom<T>(values: Record<string, string>, fn: () => T): T {
   const doc = (globalThis as unknown as { document: { getElementById: (id: string) => unknown } }).document;
   const orig = doc.getElementById;
   doc.getElementById = (id: string) => (id in values ? { value: values[id], style: {} } : orig(id));
@@ -77,7 +110,8 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
   const list = m ? core.eqListFor(ctx, core.unitDef(ctx, m.uid_def)) : undefined;
   const items = list ? Object.values(list).flat().map((e) => e[0]) : [];
   const hired = s.hired ?? [], dps = s.dp ?? [];
-  const roll = r.int(0, 38 + ADV_KINDS);
+  const roll = r.int(0, 38 + ADV_KINDS + INJ_KINDS);
+  if (roll > 38 + ADV_KINDS) return injuryStep(r, d, s, m);
   if (roll > 38) return advanceStep(r, d, s, m);
   // two extra slots for the Hired Sword operations, which have many variants
   const kind = roll > 36 ? 31 : roll;
@@ -281,11 +315,14 @@ function advanceStep(r: Rng, d: GameData, s: WarbandState, m: Model | undefined)
     }
     case 10: {
       const nm = r.chance(0.9) ? r.pick(spellNames) : '\u2014';
-      if (r.chance(0.5)) return [`addSpell ${m.uid} ${nm}`, () => withDom({ [`sp-${m.uid}`]: nm }, () => a.addSpell(m.uid)), (c) => core.addSpell(c, m.uid, nm)];
       const own = s.models.filter((x) => core.magicOfModel(ctx, x));
+      if (r.chance(own.length ? 0.35 : 0.5)) return [`addSpell ${m.uid} ${nm}`, () => withDom({ [`sp-${m.uid}`]: nm }, () => a.addSpell(m.uid)), (c) => core.addSpell(c, m.uid, nm)];
       const mm = own.length && r.chance(0.85) ? r.pick(own) : m;
       const ownLore = core.magicOfModel(ctx, mm);
-      const nm2 = ownLore && d.SPELLS[ownLore]?.spells.length ? r.pick(d.SPELLS[ownLore]!.spells)[0] : nm;
+      // mostly a spell he does not know yet
+      const lore2 = ownLore ? (d.SPELLS[ownLore]?.spells ?? []).map((x) => x[0]) : [];
+      const unknown = lore2.filter((x) => !(mm.spells ?? []).some((sp) => sp.name === x));
+      const nm2 = unknown.length && r.chance(0.85) ? r.pick(unknown) : lore2.length ? r.pick(lore2) : nm;
       return [`addSpellFromAdv ${mm.uid} ${nm2}`, () => withDom({ [`spadv-${mm.uid}`]: nm2 }, () => a.addSpellFromAdv(mm.uid)), (c) => core.addSpellFromAdvance(c, mm.uid, nm2)];
     }
     case 11: {
@@ -311,6 +348,169 @@ function advanceStep(r: Rng, d: GameData, s: WarbandState, m: Model | undefined)
   }
 }
 
+const INJ_KINDS = 16;
+
+/* Injuries, deaths, the Fallen, casualty records and held experience. */
+function injuryStep(r: Rng, d: GameData, s: WarbandState, m: Model | undefined): Step | null {
+  const a = L.app;
+  const ctx = core.ctxOf(d, s);
+  const heroes = s.models.filter((x) => core.isHeroModel(ctx, x));
+  const hench = s.models.filter((x) => !core.isHeroModel(ctx, x));
+  const cas = s.campaign?.casualties ?? [];
+  const pickCas = () => {
+    const i = r.int(0, cas.length - 1);
+    return { i, idC: () => (s.campaign?.casualties ?? [])[i]?.id as number, idL: () => ((L.state.S.campaign?.casualties ?? []) as { id: number }[])[i]?.id as number };
+  };
+  const op = r.int(0, 22);
+  switch (op) {
+    case 0: case 1: case 2: case 3: {
+      const mm = heroes.length && r.chance(0.8) ? r.pick(heroes) : m;
+      if (!mm) return null;
+      const code = r.pick(d.INJURIES).code;
+      const confirms: boolean[] = [], prompts: (string | null)[] = [];
+      const choices: core.InjuryChoices = {};
+      let declined = false;
+      if (code === '36') { const yes = r.chance(0.85); confirms.push(yes); declined = !yes; }
+      if (code === '65') { const won = r.chance(0.5); confirms.push(won); choices.pitWon = won; }
+      if (code === '61') {
+        const back = r.chance(0.6); confirms.push(back); choices.captiveReturns = back;
+        if (back) { const v = r.pick(['0', '35', '200', null, 'x', '-5']); prompts.push(v); choices.ransom = v; }
+      }
+      if (code === '35') { const v = r.pick(['1', '2', '3', '7', null, '0']); prompts.push(v); choices.deepWoundGames = v; }
+      return [`addInj ${mm.uid} ${code}`,
+        () => withDom({ [`inj-${mm.uid}`]: code }, () => withDialogs(confirms, prompts, () => a.addInj(mm.uid))),
+        (c) => (declined ? c.s : core.addInjury(c, mm.uid, code, choices))];
+    }
+    case 4: {
+      const withInj = s.models.filter((x) => (x.inj ?? []).length);
+      const mm = withInj.length && r.chance(0.85) ? r.pick(withInj) : m;
+      if (!mm) return null;
+      const i = r.int(0, 2);
+      return [`remInj ${mm.uid} ${i}`, () => a.remInj(mm.uid, i), (c) => core.removeInjury(c, mm.uid, i)];
+    }
+    case 5: { if (!m) return null; const dv = r.pick([1, 1, -1, 2, -3]); return [`missAdj ${m.uid} ${dv}`, () => a.missAdj(m.uid, dv), (c) => core.adjustMiss(c, m.uid, dv)]; }
+    case 6: {
+      const mm = heroes.length && r.chance(0.85) ? r.pick(heroes) : m;
+      if (!mm) return null;
+      const msg = r.chance(0.2) ? 'He fell from the rooftops.' : undefined;
+      return [`killHero ${mm.uid}`, () => a.killHero(mm.uid, msg), (c) => core.killHero(c, mm.uid, msg)];
+    }
+    case 7: case 8: {
+      const mm = hench.length && r.chance(0.9) ? r.pick(hench) : m;
+      if (!mm) return null;
+      if (r.chance(0.5)) { const i = r.chance(0.5) ? null : r.int(0, 4); return [`killHench ${mm.uid} ${i}`, () => a.killHench(mm.uid, i ?? undefined), (c) => core.killHench(c, mm.uid, i)]; }
+      const i = r.int(0, Math.max(0, core.memberCount(mm) - 1));
+      return [`killHenchMember ${mm.uid} ${i}`, () => a.killHenchMember(mm.uid, i), (c) => core.killHenchMember(c, mm.uid, i)];
+    }
+    case 9: case 10: return ['undoFallen', () => a.undoFallen(), (c) => core.undoFallen(c)];
+    case 11: {
+      const n = s.fallen?.length ?? 0;
+      if (!n) return null;
+      const i = r.int(0, n - 1);
+      return [`removeFallenAt ${i}`, () => withDialogs([true], [], () => a.removeFallenAt(i)), (c) => core.removeFallenAt(c, i)];
+    }
+    case 12: case 13: case 14: {
+      // a casualty: ours or an enemy's, by our Hero, an enemy or nobody
+      const victim: Partial<core.CasualtySide> = {};
+      const ours = m && r.chance(0.7) ? m : undefined;
+      if (ours) {
+        const i = r.int(0, core.memberCount(ours) - 1);
+        victim.uid = ours.uid; victim.name = core.isHeroModel(ctx, ours) ? (ours.name || core.unitDef(ctx, ours.uid_def)?.name || '') : core.memberName(ctx, ours, i);
+        victim.wb = s.wb as string;
+        if (r.chance(0.5)) victim.memberIdx = i;
+      } else { victim.name = `Foe ${r.int(1, 5)}`; victim.wb = r.pick(Object.keys(d.WARBANDS)); if (r.chance(0.3)) victim.value = r.pick([35, '20', 0]) as number; }
+      const attacker: Partial<core.CasualtySide> = {};
+      const hero = heroes.length && r.chance(0.6) ? r.pick(heroes) : undefined;
+      if (hero && !ours) { attacker.uid = hero.uid; attacker.name = hero.name || core.unitDef(ctx, hero.uid_def)?.name || ''; }
+      else if (r.chance(0.5)) { attacker.name = `Foe ${r.int(1, 5)}`; attacker.wb = r.pick(Object.keys(d.WARBANDS)); }
+      const input: core.CasualtyInput = { victim, attacker, result: r.chance(0.8) ? 'pending' : r.pick(['dead', 'injured', 'recovered']), noXp: r.chance(0.15) };
+      if (r.chance(0.2)) input.round = r.int(0, 2);
+      if (r.chance(0.2)) input.note = 'ambush';
+      return [`addCasualty ${victim.uid ?? victim.name}`, () => a.addCasualty(structuredClone(input)), (c) => core.addCasualty(c, structuredClone(input))];
+    }
+    case 15: case 16: {
+      if (!cas.length) return null;
+      const { i, idC, idL } = pickCas();
+      const rec = cas[i] as core.Casualty;
+      const hero = core.casualtyIsHero(ctx, rec);
+      const codes = hero ? d.INJURIES.map((x) => x.code) : core.HENCH_INJ.map((x) => x.code);
+      const code = r.chance(0.1) ? r.pick(['', 'zz']) : r.pick(codes);
+      return [`resolveCasualtyRoll #${i} ${code}`, () => a.resolveCasualtyRoll(idL(), code), (c) => core.resolveCasualtyRoll(c, idC(), code)];
+    }
+    case 17: {
+      if (!cas.length) return null;
+      const { i, idC, idL } = pickCas();
+      if (r.chance(0.5)) { const v = r.pick(['bled out', '', 'x']); return [`setCasNote #${i}`, () => a.setCasNote(idL(), v), (c) => core.setCasualtyNote(c, idC(), v)]; }
+      const res = r.pick(['dead', 'injured', 'recovered', 'pending', '']), det = r.pick([null, '', 'by hand']);
+      return [`resolveCasualty #${i} ${res}`, () => a.resolveCasualty(idL(), res, det), (c) => core.resolveCasualty(c, idC(), res, det)];
+    }
+    case 18: {
+      if (!cas.length) return null;
+      const { i, idC, idL } = pickCas();
+      const silent = r.chance(0.5);
+      return [`removeCasualty #${i}`, () => withDialogs([true], [], () => a.removeCasualty(idL(), silent)), (c) => core.removeCasualty(c, idC())];
+    }
+    case 19: {
+      if (!m) return null;
+      const amt = r.pick([1, 1, 2, 0, '3']) as number, round = r.chance(0.3) ? r.int(0, 3) : undefined;
+      return [`grantXp ${m.uid} ${amt}`, () => a.grantXp(m.uid, amt, 'survived', round), (c) => core.grantXp(c, m.uid, amt, 'survived', round)];
+    }
+    case 20: case 21: {
+      const x = r.int(0, 3);
+      if (x === 0) return ['applyPendingXp', () => a.applyPendingXp(), (c) => core.applyPendingXp(c)];
+      if (x === 1) return ['applyBattleResults', () => withDialogs([true], [], () => a.applyBattleResults()), (c) => core.applyBattleResults(c)];
+      if (x === 2) return ['clearPendingXp', () => withDialogs([true], [], () => a.clearPendingXp()), (c) => core.clearPendingXp(c)];
+      const opts = { survives: r.pick([1, 1, 5]), won: r.pick([true, false, null]) };
+      return ['awardBattleXp', () => a.awardBattleXp(null, { ...opts }), (c) => core.awardBattleXp(c, null, { ...opts })];
+    }
+    default: {
+      // Heroes put enemies out of action and apply their battle: the
+      // sequence the post-battle screen runs.
+      if (!heroes.length) return null;
+      const h = r.pick(heroes);
+      const input: core.CasualtyInput = { victim: { name: `Foe ${r.int(1, 5)}`, wb: r.pick(Object.keys(d.WARBANDS)) }, attacker: { uid: h.uid, name: h.name || '' }, result: 'recovered' };
+      return [`addCasualty(byHero) ${h.uid}`, () => a.addCasualty(structuredClone(input)), (c) => core.addCasualty(c, structuredClone(input))];
+    }
+  }
+}
+
+/* What the read-only rules say about the Fallen, casualties and held
+   experience — compared after every step, since the generated fixtures hold
+   none of these and only the walk produces them. Ids are left out (they are
+   compared by rank in the state). */
+function casualtyReport(ctx: Ctx): unknown {
+  const s = ctx.s;
+  const cas = s.campaign?.casualties ?? [];
+  return {
+    goldLost: core.fallenGoldLost(ctx), expLost: core.fallenExpLost(ctx),
+    fallen: (s.fallen ?? []).map((e) => [core.fallenGoldOf(ctx, e), core.fallenExpEarned(ctx, e), core.fallenEqSig(e.m)]),
+    stats: core.casualtyStats(ctx),
+    cas: cas.map((r) => [core.casualtyText(ctx, r), core.casualtyType(r), core.casualtyIsOurs(r), core.casualtyIsHero(ctx, r),
+      core.casualtyRollOptions(ctx, r).map((o) => o.label).join('|'), core.casualtyModel(ctx, r)?.uid ?? null]),
+    xp: core.pendingXpTotal(ctx),
+    models: s.models.map((m) => [core.modelLabel(ctx, m), core.canEarnXp(ctx, m), core.pendingXpFor(ctx, m.uid),
+      cas.indexOf(core.pendingCasualtyFor(ctx, m.uid) as core.Casualty)]),
+    outstanding: core.outstandingCasualties(ctx).length, unrolled: core.unrolledCasualties(ctx).length,
+    round: core.roundLabel(s.campaign?.round), wb: core.wbName(ctx, s.wb),
+  };
+}
+
+function legacyCasualtyReport(): unknown {
+  const a = L.app, S = L.state.S as WarbandState;
+  const cas = (S.campaign?.casualties ?? []) as core.Casualty[];
+  return {
+    goldLost: a.fallenGoldLost(), expLost: a.fallenExpLost(),
+    fallen: (S.fallen ?? []).map((e) => [a.fallenGoldOf(e), a.fallenExpEarned(e), a.fallenEqSig(e.m)]),
+    stats: a.casualtyStats(),
+    cas: cas.map((r) => [a.casualtyText(r), a.casualtyType(r), a.casualtyIsOurs(r), a.casualtyIsHero(r),
+      (a.casualtyRollOptions(r) as { label: string }[]).map((o) => o.label).join('|'), a.casualtyModel(r)?.uid ?? null]),
+    xp: a.pendingXpTotal(),
+    models: S.models.map((m) => [a.modelLabel(m), a.canEarnXp(m), a.pendingXpFor(m.uid), cas.indexOf(a.pendingCasualtyFor(m.uid))]),
+    outstanding: a.outstandingCasualties().length, unrolled: a.unrolledCasualties().length,
+    round: a.roundLabel(S.campaign?.round), wb: a.wbName(S.wb),
+  };
+}
+
 export type WalkStart = { legacy: () => void; core: WarbandState };
 
 export function runSequence(label: string, start: WalkStart, seed: number, withLegacy = true): void {
@@ -333,6 +533,7 @@ export function runSequence(label: string, start: WalkStart, seed: number, withL
     if (JSON.stringify(got) !== JSON.stringify(want)) {
       expect(got, `${label}: after ${done.slice(-6).join(' → ')}`).toEqual(want);
     }
+    expect(casualtyReport(core.ctxOf(data, s)), `${label}: rules after ${done.slice(-6).join(' → ')}`).toEqual(legacyCasualtyReport());
   }
 }
 
@@ -375,7 +576,10 @@ export const ACTIONS = ['addUnit', 'removeUnit', 'setName', 'setExp', 'setQty', 
   'hireDP', 'unhireDP', 'dpSetName', 'setHsGrade', 'setDpGrade', 'setHouseNum', 'setHouseBool', 'setHouseNotes', 'resetHouse',
   'incExp', 'setExpJump', 'addAdv', 'remAdv', 'addSkill', 'addSkillFromSel', 'remSkill', 'togglePromoCat', 'setMemberName',
   'promoteHench', 'unpromote', 'addSpell', 'addSpellFromAdv', 'remSpell2', 'spellRed', 'setCaster', 'setLore', 'setLeader', 'setMark',
-  'addHsAdv', 'remHsAdv', 'remHsSkillIdx', 'addHsSpell', 'addHsSpellFromAdv', 'delHsSpell', 'hsSpellRed'];
+  'addHsAdv', 'remHsAdv', 'remHsSkillIdx', 'addHsSpell', 'addHsSpellFromAdv', 'delHsSpell', 'hsSpellRed',
+  'addInj', 'remInj', 'missAdj', 'killHero', 'killHench', 'killHenchMember', 'undoFallen', 'removeFallenAt',
+  'addCasualty', 'addCasualty(byHero)', 'resolveCasualtyRoll', 'setCasNote', 'resolveCasualty', 'removeCasualty',
+  'grantXp', 'applyPendingXp', 'applyBattleResults', 'clearPendingXp', 'awardBattleXp'];
 
 export function hash(s: string): number {
   let h = 2166136261;
