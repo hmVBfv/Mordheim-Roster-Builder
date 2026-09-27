@@ -64,6 +64,12 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   spent, models, heroes, gold, fallen }` so, wie sie damals standen.
 - **Post-Battle** (`campaign.postbattle[round]`): `{ done: { [step]: true },
   wyrd: { done, shards, gc, size } | null }`.
+- **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
+  'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
+  name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
+  der Export der Warband zum Zeitpunkt des Imports; `battles` enthält nur
+  Schlachten, an denen die eigene Warband nicht beteiligt war, oder die aus
+  Dateien anderer zusammengeführt wurden.
 - **`uid` eines Kriegers ist unveränderlich** und die Grundlage für Vergleich,
   Lebenslauf und Erwähnungen.
 - **`campaign`:** In der Quick-Build-Variante und in der Kampagnendatei bleibt

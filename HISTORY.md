@@ -1169,3 +1169,24 @@ in the same canonical form as the live one.
 For once the port found nothing wrong. Every planted bug in the new code
 was caught by the walk — the one that was not turned out to change nothing
 at all.
+
+## September 27, 2026 — the campaign file becomes a value
+
+The sixth slice ports the campaign file — the document one player collects
+everybody's warbands into and passes on after a game night — together with
+control of districts across all warbands and the forms that record a battle
+or a casualty. In the legacy app the open file sat in a module variable and
+the half-filled forms lived inside the save, so importing campaign data
+quietly threw away a form in progress. In core both are values the interface
+holds and hands in; an action that touches a warband and the file at once (a
+battle moves footholds for every side) returns both.
+
+These got a walk of their own over three things at once — the warband, the
+file and the open forms — with ordinary roster actions mixed in, comparing
+all three and what the territory, statistics and merged history say after
+every step. The first round of planted bugs showed its limits: half of them
+sat in branches a random walk hardly ever reaches (a warband re-imported
+under a differently cased name, a battle both sides wrote down with the
+sides in another order, a casualty naming the third side when the first is
+removed). Seven short scenarios now cover those; afterwards every planted
+bug was caught except one that, on inspection, cannot change any result.
