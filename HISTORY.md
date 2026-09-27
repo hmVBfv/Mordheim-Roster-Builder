@@ -960,3 +960,57 @@ nothing. Six genuinely poison-immune characters kept their chip.
 
 Tests pin all of it, including the two cases where the fix could have gone
 wrong: the but-clause pair and the dash clause. Suite 20/20.
+
+## September 27, 2026 — a server, a concept, and not a line of code
+
+The trigger was a small discovery. "Save" and the welcome screen's
+"Continue" call `window.storage` — an interface that only exists inside
+claude.ai artifacts. On GitHub Pages it is simply absent, so saving has
+quietly failed there all along ("Could not save – use Export instead"), and
+the Continue block never appears. The campaign file carried a comment saying
+a shared live session was impossible because Pages only serves static files.
+Both limits disappear with a server, and the Raspberry Pi in the cupboard
+already runs Jellyfin, TeamSpeak and the chronicle agents.
+
+What started as "save warbands on the Pi" grew, over one long conversation,
+into a plan for a shared campaign companion whose real purpose is to collect
+material for the bilingual campaign epic: a tagged state of every warband
+after every battle, an automatic diff between those states reconciled against
+the event log, notes from every player (sealable before a battle), the
+player's own explanation for each change, a timeline that can be reordered by
+story time, and a hidden background layer for the campaign leader — hidden
+narrative only, never hidden mechanics, because the leader is also a player.
+
+This entry records a phase with no code on purpose. The plan is written down
+in `docs/` — concept, architecture, data model, security, operations, UI,
+glossary, roadmap and fourteen ADRs — because development will increasingly
+run through Claude Code on the Pi, and an agent that doesn't know *why*
+something is built a certain way will eventually "fix" it.
+
+Turns worth remembering:
+
+* **Svelte, then React.** Svelte looked right: smallest runtime, closest to
+  plain HTML. It lost on the criterion that matters most here — fewest
+  mistakes in agent-written code. Svelte 5 changed its syntax fundamentally;
+  React's patterns have been stable for years and come with lint rules that
+  catch its typical errors. The performance difference is invisible for a
+  roster of a few hundred elements, and a PWA caches the runtime anyway.
+* **Watchtower is not a deploy tool for this.** It runs weekly and ignores
+  locally built images; more importantly, a stateful app with migrations
+  should never update unattended. Deploys are a script: backup, pull,
+  health check, automatic rollback.
+* **"Roter Faden" had to be renamed.** The chronicle repo already has a public
+  `notes/roter-faden.md`. Checking also confirmed that both repositories are
+  public — which turned "hidden data never leaves the server" from a nice
+  principle into a hard rule with a CI leak test.
+* **The escaping problem mostly dissolved.** The legacy app builds HTML from
+  strings and would have needed an audit before sharing data between users.
+  The React rewrite escapes by default and has no inline handlers, so a
+  strict Content Security Policy is possible from day one.
+* **Redundancy became fault tolerance.** No second server; instead an app
+  that works offline, a server "epoch" that makes devices re-offer anything
+  written after the last backup, an amd64 image so the desktop can stand in,
+  and a cloned SD card.
+
+Next is phase 1: pulling the logic out of `js/app.js` into a shared `core/`,
+guarded by the existing tests and a parity check across all 49 warbands.
