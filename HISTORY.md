@@ -1109,3 +1109,41 @@ The walk had become slow — nearly all of its time is the legacy app
 re-rendering its whole page after every action. It now runs from four files
 in parallel, and its coverage is checked by replaying the same walks with
 core alone, which takes two seconds.
+
+## September 27, 2026 — the dead, and the questions the app used to ask
+
+The fourth slice ports what happens to warriors after a fight: the whole
+Serious Injuries chart, deaths and the Fallen list with its undo, the
+casualty records a battle leaves behind and the dice rolled for them, and
+experience held until it is applied. These are one knot rather than three
+features: a death moves the warrior into the Fallen *and* settles the
+casualty record of the battle he fell in, and resolving a casualty's roll
+applies it to the roster exactly as the unit card would. So they were ported
+together.
+
+The legacy app asked questions in the middle of these actions — was he
+robbed, did he win the pit fight, is the captive coming back and for how
+much, what did the D3 say. Core cannot open a dialog, so the answers became
+arguments, with defaults that match what the legacy app did when it could not
+ask. The parity walk answers them at random on the legacy side and passes the
+same answers to core.
+
+Random walks are good at reaching common paths and poor at the ones that need
+a particular roster: a Kislev heirloom lost in a pit fight only shows if the
+captain carries one. A second suite now applies every result of the chart,
+with every answer, to prepared warbands (heirloom, Gromril weapon, Dark Elf
+venom, a named man in the middle of his group), and every casualty roll on
+either table. Planted bugs in the gear-stripping rules went unnoticed by the
+walk and were caught there. The walk also compares what the read-only rules
+say about the Fallen and the casualties after every step, since the generated
+fixtures hold none of them.
+
+Porting turned up one more bug in the live app: after loading a save, a new
+recruit could get the uid of a fallen warrior, and undoing that death then
+put two models with the same uid on the roster. The loader now counts the
+Fallen too, with a regression test. Two further inconsistencies are only
+written down as proposals, because what to do about them is Rob's call:
+rolling an injury from the casualty list skips what five results do on the
+unit card (Deep Wound, Robbed, Captured, the pits, Survives Against the
+Odds), and casualty records point at the Fallen by position, which breaks
+when one is deleted.

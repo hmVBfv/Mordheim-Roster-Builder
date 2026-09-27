@@ -77,7 +77,12 @@ changing anything structural.
 - Actions are checked by a seeded random walk (`core/test/parity/walk.ts`,
   run from four `walk-*.parity.test.ts` files in parallel). Add every new
   action to the walk and to `ACTIONS`; `walk-coverage.test.ts` fails if an
-  action does not change a state often enough.
+  action does not change a state often enough. Branches that need a
+  particular roster to matter get a scenario suite as well
+  (`injuries.parity.test.ts` runs every injury result on prepared warbands).
+- Where legacy asks mid-action (`confirm`, `prompt`), the answer becomes an
+  argument of the core action, defaulting to what legacy does without a
+  dialog; the interface asks before calling.
 - Any intended difference from legacy behaviour is recorded in
   `docs/behaviour-changes.md` with its test, and excluded from parity by a
   named, specific rule — never a blanket one. A legacy bug found on the way

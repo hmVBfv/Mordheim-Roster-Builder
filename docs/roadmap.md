@@ -43,8 +43,16 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   läuft jetzt auf vier Dateien parallel; ihre Abdeckung prüft ein schneller
   Nachlauf nur mit `core/`. Zwei Fehler der alten App gefunden und in beiden
   behoben (siehe [behaviour-changes.md](behaviour-changes.md)).
-- [ ] 1b, weiter: Verletzungen und Gefallene, Kampagne (Schlachten,
-  Verluste, Post-Battle, Snapshots), Exporte, Format.
+- [x] 1b, vierter Teil: Verletzungen (die ganze D66-Tabelle samt Robbed,
+  Sold to the Pits, Captured, Deep Wound), Tod und Gefallene mit Rücknahme,
+  Verlusteinträge und ihre Würfe, gehaltene Erfahrung und das Anwenden der
+  Schlachtergebnisse. Neben der Wanderung (jetzt 100 Schritte, 87 Aktionen,
+  Regelvergleich nach jedem Schritt) prüft `injuries.parity.test.ts` jedes
+  Ergebnis der Tabelle mit jeder Antwort an vorbereiteten Warbands. Ein
+  weiterer Fehler der alten App behoben, zwei Ungereimtheiten als Vorschlag
+  notiert (siehe [behaviour-changes.md](behaviour-changes.md)).
+- [ ] 1b, weiter: Kampagne (Schlachten, Runden, Post-Battle, Snapshots,
+  Bezirke), Exporte, Format.
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [ ] 1c, 1d, 1e, 1f

@@ -60,8 +60,13 @@ und Dramatis Personae, Ausrüstung und Rare Items, Kosten und Rating, Worth,
 Rüstungswurf) sind portiert und per Paritätstest abgesichert, ebenso aus
 `warband/` der Rosterbau (Einheiten, Ausrüstung, Rare Items, Mutationen,
 Gold und Truhe, Subtyp, Bezirke, Hired Swords und Dramatis Personae,
-Hausregeln). Die übrigen Module folgen in der Reihenfolge aus
-[roadmap.md](roadmap.md).
+Hausregeln), Aufstiege und Beförderungen sowie Verletzungen, Gefallene,
+Verlusteinträge und gehaltene Erfahrung. Die übrigen Module folgen in der
+Reihenfolge aus [roadmap.md](roadmap.md).
+
+Wo die alte App im Ablauf nachfragte (Robbed anwenden? Grubenkampf gewonnen?
+Gefangener kommt zurück, Lösegeld? D3 für Deep Wound?), ist die Antwort ein
+Argument der Aktion; die Oberfläche fragt, bevor sie aufruft.
 
 **Aktionen** (`warband/`) nehmen einen Zustand und geben einen neuen zurück
 (Immer); der Eingang bleibt unverändert, eine abgelehnte Aktion gibt genau
