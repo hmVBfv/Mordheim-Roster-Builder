@@ -61,7 +61,9 @@ Rüstungswurf) sind portiert und per Paritätstest abgesichert, ebenso aus
 `warband/` der Rosterbau (Einheiten, Ausrüstung, Rare Items, Mutationen,
 Gold und Truhe, Subtyp, Bezirke, Hired Swords und Dramatis Personae,
 Hausregeln), Aufstiege und Beförderungen sowie Verletzungen, Gefallene,
-Verlusteinträge und gehaltene Erfahrung, in `changes/` der Vergleich zweier
+Verlusteinträge und gehaltene Erfahrung, in `rules/validation.ts`,
+`abilities.ts` und `summary.ts` die Regeln hinter den Bildschirmen
+(Warnungen, Anwerbe-Grenzen, Fähigkeiten, Übersichten), in `changes/` der Vergleich zweier
 Stände und der Abgleich, in `narrative/` das Briefing, dazu in `campaign/` die Kampagne
 einer Warband (Chronik, Stufen und Snapshots, Schlachten, Footholds,
 Post-Battle-Sequenz, Auswertung), die Kampagnendatei, die Kontrolle über

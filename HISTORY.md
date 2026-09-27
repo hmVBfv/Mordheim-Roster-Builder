@@ -1261,3 +1261,23 @@ interludes, open threads, the canon in both languages, and how many
 explanations are still missing. Two choices here are open to Rob: which
 changes ask for an explanation, and that experience became a change kind of
 its own (it was missing from the list in the data model).
+
+## September 27, 2026 — the rules that hid in the drawing code
+
+The eighth slice closed with the claim that all of the legacy app's logic
+now lived in core. Planning phase 1d proved that wrong. To run the legacy
+test files against core, every function they call needed a counterpart, and
+several of them turned out to be drawing functions with rules inside: the
+sidebar decided whether a warband is legal (too few models, a missing
+leader, a Seer without a Mark, one Swivel Gun per Pirate crew, bow duty for
+Outlaws, the Bretonnian horse order, the house-rule caps) and wrote the
+verdict straight into HTML; the recruit menu decided what may still be
+hired; the abilities panel decided which keywords a warrior's rules grant,
+with its careful reading of "is NOT a Large Target".
+
+These are now rules in core — warbandWarnings, recruitStatus,
+modelAbilities, unitSummary and the list filters — and the parity test reads
+the legacy app's own HTML back to compare. The generated warbands never
+switched on the ranged-weapon cap or the one-re-roll-item rule, so planted
+bugs in those warnings went unnoticed until the modified house-rule preset
+turned both on.
