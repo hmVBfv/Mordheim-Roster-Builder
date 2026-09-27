@@ -47,6 +47,8 @@ Portieren.
 | Ungültige Eingabe (unbekannte Warband/Einheit) | Fehler (Absturz) | neutraler Wert (0, leere Liste) | robust gegen alte oder beschädigte Stände |
 | Abgelehnte Aktion (z. B. Heldenlimit erreicht) | Hinweisfenster | derselbe Stand zurück; die Oberfläche erklärt | keine Dialoge in der Logik |
 | Datum eines Stufen-Snapshots, eines Imports in die Kampagnendatei und im Dateinamen eines Exports | Uhr des Browsers | Argument `today` | `core/` liest keine Uhr (Invariante) |
+| Laden eines Stands | übernimmt nur die bekannten Schlüssel oben im Stand | behält zusätzlich `uidSeq`, `canon`, `story`; meldet Abweichungen vom Schema als Hinweise | Zähler und Erzählung dürfen beim Laden nicht verloren gehen |
+| Schreiben eines Stands | Stand und `goldNow` | zusätzlich `format` (1) und `appVersion` | Migrationen brauchen die Formatnummer |
 | Exporte (Text, PDF) | Datei wird direkt heruntergeladen; Name aus dem Eingabefeld „Speichern unter“ | Funktionen geben Text bzw. Bytes und Dateinamen zurück; der Name kommt als Argument | keine Dateien und kein DOM in der Logik |
 | Offene Kampagnendatei | Modulvariable im Browser | ein Wert, den die Oberfläche hält und an die Funktionen übergibt | keine globalen Zustände |
 | Halb ausgefüllte Formulare (Schlacht, Verlust, Notiz) | im Speicherstand (`campaign._draft`, `_cas`, `_note`); ein Import von Kampagnendaten verwarf sie nebenbei | eigene Werte der Oberfläche, nicht Teil des Stands | Bildschirmzustand gehört nicht in die Historie |

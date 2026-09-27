@@ -67,8 +67,13 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   sowie die englischen Regel- und Ausrüstungstexte. Das PDF wird verglichen,
   indem beide Seiten denselben aufzeichnenden Ersatz für pdf-lib bekommen;
   ein Test füllt zusätzlich die echte Vorlage mit dem echten pdf-lib.
-- [ ] 1b, weiter: Import und Format (Laden alter Stände, Schemas,
-  Migrationen).
+- [x] 1b, achter Teil: Laden und Schreiben von Speicherständen – jede Datei
+  der alten App lädt wie dort (Parität auch mit zufällig fehlenden
+  Schlüsseln und dem eingefrorenen Altstand aus `test/compat.mjs`), der
+  eingefügte Text-Export ebenso; Formatnummer 1, Zod-Schemas für Warband und
+  Kampagnendatei. Damit ist die Logik der alten App vollständig in `core/`.
+- [ ] 1b, Abschluss: Robs gewünschte Änderungen (siehe unten) und die offenen
+  Vorschläge V1/V2 entscheiden.
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [ ] 1c, 1d, 1e, 1f
