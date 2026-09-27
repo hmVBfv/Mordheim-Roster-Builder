@@ -37,9 +37,16 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Dramatis Personae, Hausregeln) – Parität über zufällige Aktionsfolgen
   (je 80 Schritte, alle 49 Warbands frisch mit und ohne Kampagne, dazu
   erzeugte Stände); jede Aktion muss dabei mindestens 15-mal gegriffen haben.
-- [ ] 1b, weiter: Erfahrung und Aufstiege, Fertigkeiten und Zauber,
-  Beförderungen, Anführer, Verletzungen und Gefallene, Kampagne, Exporte,
-  Format.
+- [x] 1b, dritter Teil: Profile und Rassenmaxima, Erfahrung und Aufstiege,
+  Fertigkeiten und Zauber, Male der Marauder, Beförderungen, Namen einzelner
+  Henchmen, Anführer, Aufstiege von Hired Swords. Die Paritäts-Wanderung
+  läuft jetzt auf vier Dateien parallel; ihre Abdeckung prüft ein schneller
+  Nachlauf nur mit `core/`. Zwei Fehler der alten App gefunden und in beiden
+  behoben (siehe [behaviour-changes.md](behaviour-changes.md)).
+- [ ] 1b, weiter: Verletzungen und Gefallene, Kampagne (Schlachten,
+  Verluste, Post-Battle, Snapshots), Exporte, Format.
+- [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
+  mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [ ] 1c, 1d, 1e, 1f
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;

@@ -1082,3 +1082,30 @@ The walk is checked for its own coverage — each action must actually change a
 state at least 15 times — after a planted bug (a repeated rare item counting
 double) slipped through the first version of the walk unnoticed, because the
 walk almost never bought the same rare item twice.
+
+## September 27, 2026 — the walk finds two bugs in the live app
+
+The third slice ports advancement: profiles and racial maxima, experience,
+stat advances, skills and spells, the Marauder marks, promotions, individual
+henchman names, the leader, and the same for Hired Swords. The walk grew to
+seventy actions, and two of its findings were not porting mistakes but bugs
+in the app the group is using today:
+
+* **The promotion entry could name the wrong warrior.** Its uid was read off
+  whichever model was last in the roster — right in the common cases, wrong
+  when a lone henchman further up was promoted in place while another
+  promoted Hero stood at the end.
+* **A promoted Hero shared objects with the group he left.** Injuries and
+  spells were copied shallowly, so lowering the Hero's spell difficulty
+  lowered the group's too, until the next reload.
+
+Both are fixed in the legacy app as well, each with a regression test that
+fails on the old code. `docs/behaviour-changes.md` now registers every
+difference between core and the legacy app, and is where Rob's wishes for the
+new builder go — to be built one at a time once the port is complete, so the
+parity net stays clean until then.
+
+The walk had become slow — nearly all of its time is the legacy app
+re-rendering its whole page after every action. It now runs from four files
+in parallel, and its coverage is checked by replaying the same walks with
+core alone, which takes two seconds.

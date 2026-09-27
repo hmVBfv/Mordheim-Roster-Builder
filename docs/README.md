@@ -22,6 +22,7 @@ sind Platzhalter (`<name>`, `<pi-lan-ip>`).
 | [ui.md](ui.md) | UI-Grundsätze, Navigation, Bildschirme, Themes, Leistungsgrenzen | Entwicklung |
 | [glossary.md](glossary.md) | Deutsch ↔ Englisch ↔ Code | alle |
 | [roadmap.md](roadmap.md) | Phasen, Abnahmekriterien, offene Entscheidungen | Planung |
+| [behaviour-changes.md](behaviour-changes.md) | Register: wo `core/` bewusst von der alten App abweicht, und geplante Änderungen am Roster Builder | Rob, Entwicklung |
 | [decisions/](decisions/) | Entscheidungsnotizen (ADRs): was entschieden wurde und warum | alle, vor Änderungen an Grundsätzen |
 
 Die bestehende App (`index.html`, `js/`, `data/`, `test/`) ist in der
