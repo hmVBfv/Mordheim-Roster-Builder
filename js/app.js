@@ -3001,23 +3001,33 @@ export function promoteHench(u,i){
   const idx=(i==null? memberCount(m)-1 : Number(i)||0);
   const who=memberName(m,idx);
   const named=memberNamed(m,idx);
+  // The uid the new Hero has - the new model's, or the same model's when the
+  // last man of a group is promoted in place.
+  let heroUid=m.uid;
   if(memberCount(m)>1){
     m.qty=memberCount(m)-1;
     _dropMemberName(m,idx);
-    S.models.push({uid:nextUid(), uid_def:m.uid_def,
+    heroUid=nextUid();
+    S.models.push({uid:heroUid, uid_def:m.uid_def,
       // a man who had a name of his own keeps it; otherwise fall back to the
       // group's name, as before
       name: named? who : (m.name?m.name+' (Hero)':def.name+' (Hero)'),
       exp:Number(m.exp)||0, qty:1,
+      // Deep copies: the Hero and the men he leaves behind are separate from
+      // here on. Shallow copies shared the injury and spell objects, so
+      // lowering the Hero's spell difficulty changed the group's as well.
       eq:JSON.parse(JSON.stringify(m.eq||{})), mut:[...(m.mut||[])], adv:Object.assign({},m.adv||{}),
-      skills:[...(m.skills||[])], inj:[...(m.inj||[])], spells:[...(m.spells||[])], miss:Number(m.miss)||0, promoted:true, promoCats:(def.promoCatsFixed?[...def.promoCatsFixed]:[]), _advOpen:true});
+      skills:[...(m.skills||[])], inj:JSON.parse(JSON.stringify(m.inj||[])), spells:JSON.parse(JSON.stringify(m.spells||[])), miss:Number(m.miss)||0, promoted:true, promoCats:(def.promoCatsFixed?[...def.promoCatsFixed]:[]), _advOpen:true});
   } else {
     m.promoted=true; m.promoCats=(def.promoCatsFixed?[...def.promoCatsFixed]:(m.promoCats||[])); m._advOpen=true;
     if(named && !m.name){ m.name=who; delete m.names; }
   }
-  const promoted=S.models[S.models.length-1];
+  /* Recorded against the Hero who was made. This used to read the uid off
+     whichever model happened to be last in the roster, which named the wrong
+     warrior when a lone man was promoted in place and another promoted Hero
+     stood at the end of the list. */
   logEvent('promote',`${who} was promoted to Hero (The Lad's Got Talent).`,
-    {uid:(memberCount(m)>0&&promoted&&promoted.promoted)?promoted.uid:m.uid,name:who,uid_def:m.uid_def,exp:Number(m.exp)||0});
+    {uid:heroUid,name:who,uid_def:m.uid_def,exp:Number(m.exp)||0});
   render();
 }
 export function unpromote(u){ const m=S.models.find(x=>x.uid===u); if(m){ delete m.promoted; render(); } }
