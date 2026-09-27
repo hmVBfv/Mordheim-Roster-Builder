@@ -56,8 +56,12 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Post-Battle-Sequenz mit Wyrdstone-Verkauf, Stufenvergleich und Auswertung
   je Krieger. Die Wanderung (110 Schritte, 100 Aktionen) vergleicht auch diese
   Auswertungen nach jedem Schritt.
-- [ ] 1b, weiter: Kampagnendatei (mehrere Warbands, Schlachtformular,
-  Kontrolle über Bezirke), Exporte (Chronik-Text, TTS, Text, PDF), Format.
+- [x] 1b, sechster Teil: Kampagnendatei (Warbands importieren und
+  zusammenführen, Schlachten anderer, Statistik), Kontrolle über Bezirke
+  über alle Warbands, Schlacht- und Verlustformular samt Entwürfen. Eigene
+  Paritäts-Wanderung über Warband, Kampagnendatei und offene Formulare,
+  dazu Szenarien für seltene Zweige.
+- [ ] 1b, weiter: Exporte (Chronik-Text, TTS, Text, PDF), Import und Format.
 - [ ] Danach: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [ ] 1c, 1d, 1e, 1f

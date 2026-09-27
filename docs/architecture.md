@@ -61,10 +61,16 @@ Rüstungswurf) sind portiert und per Paritätstest abgesichert, ebenso aus
 `warband/` der Rosterbau (Einheiten, Ausrüstung, Rare Items, Mutationen,
 Gold und Truhe, Subtyp, Bezirke, Hired Swords und Dramatis Personae,
 Hausregeln), Aufstiege und Beförderungen sowie Verletzungen, Gefallene,
-Verlusteinträge und gehaltene Erfahrung, dazu die Kampagne einer Warband
-(Chronik, Stufen und Snapshots, Schlachten, Footholds, Post-Battle-Sequenz,
-Auswertung). Die übrigen Module folgen in der Reihenfolge aus
-[roadmap.md](roadmap.md).
+Verlusteinträge und gehaltene Erfahrung, dazu in `campaign/` die Kampagne
+einer Warband (Chronik, Stufen und Snapshots, Schlachten, Footholds,
+Post-Battle-Sequenz, Auswertung), die Kampagnendatei, die Kontrolle über
+Bezirke und die Formulare für Schlachten und Verluste. Die übrigen Module
+folgen in der Reihenfolge aus [roadmap.md](roadmap.md).
+
+Die Kampagnendatei und halb ausgefüllte Formulare sind in `core/` Werte wie
+eine Warband: Funktionen nehmen sie und geben neue zurück. Betrifft eine
+Aktion Warband und Kampagnendatei zugleich (eine Schlacht verschiebt
+Footholds bei allen Beteiligten), gibt sie beide zurück (`{ s, cf }`).
 
 Wo die alte App im Ablauf nachfragte (Robbed anwenden? Grubenkampf gewonnen?
 Gefangener kommt zurück, Lösegeld? D3 für Deep Wound?), ist die Antwort ein
