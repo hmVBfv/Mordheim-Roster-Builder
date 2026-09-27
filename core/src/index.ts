@@ -25,3 +25,5 @@ export * from './warband/advance.ts';
 export * from './rules/casualties.ts';
 export * from './warband/xp.ts';
 export * from './warband/casualties.ts';
+export * from './rules/campaign.ts';
+export * from './warband/campaign.ts';
