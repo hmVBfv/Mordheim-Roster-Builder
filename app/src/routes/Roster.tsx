@@ -90,11 +90,11 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         </ul>
       )}
       {v.heroes.length > 0 && <h2>Heroes</h2>}
-      {v.heroes.map((w) => <Warrior key={w.key} w={w} />)}
+      <div className={styles.cards}>{v.heroes.map((w) => <Warrior key={w.key} w={w} />)}</div>
       {v.henchmen.length > 0 && <h2>Henchmen</h2>}
-      {v.henchmen.map((w) => <Warrior key={w.key} w={w} />)}
+      <div className={styles.cards}>{v.henchmen.map((w) => <Warrior key={w.key} w={w} />)}</div>
       {v.hires.length > 0 && <h2>Hired Swords &amp; Dramatis Personae</h2>}
-      {v.hires.map((h) => <Hire key={h.key} h={h} />)}
+      <div className={styles.cards}>{v.hires.map((h) => <Hire key={h.key} h={h} />)}</div>
       {v.fallen.length > 0 && (
         <details className={ui.card}>
           <summary className={styles.summaryToggle}>Fallen ({v.fallen.length})</summary>
