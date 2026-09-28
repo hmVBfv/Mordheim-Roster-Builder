@@ -38,6 +38,7 @@ export * from './export/tts.ts';
 export * from './export/sheet.ts';
 export * from './format/schema.ts';
 export * from './format/save.ts';
+export * from './format/sanitize.ts';
 export * from './changes/diff.ts';
 export * from './changes/reconcile.ts';
 export * from './narrative/briefing.ts';

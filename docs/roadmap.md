@@ -96,8 +96,13 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Logik; zwei Lücken geschlossen (die Reihenfolge der Tooltip-Suche lag noch
   in `info.js`; ein Zähler-Stand der alten App, den `core/` nicht darstellen
   konnte).
-- [ ] 1d, Rest: Parität mit bereinigten Speicherständen der laufenden Kampagne
-  (die Dateien fehlen noch).
+- [ ] 1d, Rest: Parität mit bereinigten Speicherständen der laufenden
+  Kampagne. Werkzeug und Testlauf stehen: `npm run sanitize-save` bereinigt
+  einen Stand (Warband, Kampagnendatei oder Text-Export) nach
+  [security.md](security.md#6-öffentliche-repos), legt ihn unter
+  `core/test/saves/` ab, und `saves.parity.test.ts` lädt ihn in beiden Apps
+  und wandert von dort weiter; zwei erfundene Beispiele halten den Lauf bis
+  dahin in Gang. **Es fehlen die echten Dateien.**
 - [x] 1e App-Grundgerüst: Workspace `app/` (Vite 8, React 19 mit React
   Compiler, React Router, Dexie), beide Varianten aus einem Code
   (`campaign` mit fünf Navigationszielen, `quickbuild` mit drei; der Quick

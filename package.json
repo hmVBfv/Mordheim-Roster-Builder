@@ -16,7 +16,8 @@
     "typecheck": "npm run typecheck -w core && npm run typecheck -w app",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run lint && npm test",
-    "test:app": "npm test -w app"
+    "test:app": "npm test -w app",
+    "sanitize-save": "node core/scripts/sanitize-save.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

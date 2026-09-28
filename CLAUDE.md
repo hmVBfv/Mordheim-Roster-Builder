@@ -51,6 +51,8 @@ changing anything structural.
   `npm run icons -w app` redraws the PNG icons from `app/public/icon.svg`.
 - Legacy only: `node test/run.mjs` (rebuilds `dist/`, runs every legacy test
   incl. its bundle parity), `node build.js`.
+- `npm run sanitize-save -- <save.json | export.txt>` cleans a real save into
+  `core/test/saves/`, where the parity suite picks it up.
 - CI (`.github/workflows/ci.yml`) runs the same on every push.
 
 ## Rules authority (never violate)
@@ -148,7 +150,8 @@ changing anything structural.
   `/mnt/ssd/roster/secrets/`. Work with fixtures.
 - **Both repos are public.** Never commit hidden campaign content, sealed
   notes, GM notes, hostnames, tokens or passwords. Sanitize fixtures built from
-  real saves: drop `story`, `models[].profile.text` and notes.
+  real saves with `npm run sanitize-save` (drops `story`,
+  `models[].profile.text`, notes and player names).
 - New UI code: no `dangerouslySetInnerHTML`, no inline event handlers.
 
 ## UI checklist (new app)

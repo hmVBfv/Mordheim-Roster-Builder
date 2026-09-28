@@ -110,7 +110,10 @@ Aktionen prüfen zufällige Aktionsfolgen (Paritäts-Wanderung). Dazu laufen die
 Legacy-Tests aus `test/` unverändert gegen die alte App, und jeder Aufruf, den
 sie dabei machen, wird in `core/` wiederholt – vom selben Stand aus, mit
 denselben Antworten auf Rückfragen (der Spiegel, `core/test/mirror/`). Was ein
-Legacy-Test über einen Aufruf behauptet, gilt damit auch für `core/`.
+Legacy-Test über einen Aufruf behauptet, gilt damit auch für `core/`. Zuletzt
+kommen echte Speicherstände der laufenden Kampagne dazu (`core/test/saves/`,
+vorher mit `npm run sanitize-save` bereinigt): Beide laden sie gleich, und von
+jedem aus läuft die Wanderung weiter.
 
 Regeln für `core/`:
 
