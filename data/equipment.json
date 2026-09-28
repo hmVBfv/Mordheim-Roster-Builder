@@ -6683,7 +6683,7 @@
   "cppWretch": {
    "Nahkampf": [
     [
-     "Dolch (1. gratis)",
+     "Dolch",
      2
     ],
     [
@@ -10521,7 +10521,7 @@
    ],
    "Rüstung": [
     [
-     "Helm",
+     "Knochenhelm",
      10
     ],
     [
@@ -10870,7 +10870,7 @@
     ],
     [
      "Zweihandwaffe",
-     30
+     15
     ]
    ],
    "Fernkampf": [
@@ -11355,10 +11355,6 @@
     [
      "Axt",
      5
-    ],
-    [
-     "Zwergenaxt",
-     15
     ],
     [
      "Schwert",
@@ -12115,6 +12111,152 @@
     [
      "Elfenumhang",
      75
+    ]
+   ]
+  },
+  "outlawMark": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     30
+    ]
+   ]
+  },
+  "outlawHen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "pfSlayer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Zwergenaxt",
+     15
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Stachelhandschuh",
+     15
     ]
    ]
   }

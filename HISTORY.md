@@ -1409,3 +1409,27 @@ treated only "not" as a denial, as the old comment in app.js insisted
 is exactly what misled players, so "immune to", "never has to" and "no …
 test" deny as well. Before and after over every unit of every warband: 22
 chips disappear, all of them false, and none are gained.
+
+## September 28, 2026 — thirty corrections, six false alarms
+
+The same comparison with mordheimer.net listed some forty errors in the
+rules data itself. Before changing anything, each was read again on its
+page, asking for the exact wording — and six did not hold: Black Dwarfs'
+Tyrant, Dark Elves' Infiltration, the Cavalcade's silk armour, the Norse
+Berserker's armour, the Night Goblin Troll's injury rolls and the
+Outriders' cavalry skills were all right already. The summaries a fetch
+returns are a lead, not a source.
+
+Thirty values were corrected, among them some that change games: a
+Middenheim warband's Captain and Champions had been fighting at Strength 3
+because the city rule was only a note; Reikland's Marksmen lacked their +1
+BS; Ostlander Ruffians, blind drunk and therefore Ld 10, had Ld 7; the
+Cursed Cavalcade could learn the Dark Elves' skills instead of its own; an
+Outlaw's double-handed weapon cost 30 gc instead of 15. Ten further points
+need more than a line of data (a Wolfcloak only for Middenheim, markings
+bought at recruitment for Lizardmen) and are listed as open.
+
+One test went red for an unrelated reason: the campaign-file walk takes
+random steps over the data, and with the new lists it re-added its own
+side to a battle only four times, one short of the minimum. The walk now
+tries that step when it can matter, and walks the group's own warbands too.

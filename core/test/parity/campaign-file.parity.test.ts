@@ -130,7 +130,8 @@ function randomOp(r: Rng, w: World): Op | null {
     case 13: case 14: case 15: case 16: case 17: case 18: {
       if (!w.bd) return null;
       const bd = w.bd;
-      const k = r.int(0, 8);
+      // adding our own side only does something once it was removed, so try it then
+      const k = !core.draftIncludesUs(bd) && r.chance(0.3) ? 0 : r.int(0, 8);
       if (k === 0) return ['addDraftSideMe', () => a.addDraftSideMe(), (x) => ({ ...x, bd: x.bd && core.draftAddSideMe(ctx(x.s), x.bd) })];
       if (k === 1) {
         const keys = core.battleSides(c, w.cf).map((x) => x.key);
@@ -223,7 +224,8 @@ function run(label: string, start: WarbandState, seed: number): void {
 
 function starts(): { label: string; state: WarbandState }[] {
   const out = generateFixtures(data, [3]).filter((_, i) => i % 11 === 0).map((f) => ({ label: f.label, state: f.state }));
-  for (const wb of ['merc', 'skaven', 'possessed', 'orcmob', 'kislev', 'darkelves', 'undead', 'wh']) {
+  // the group's own warbands among them (Merchant Caravans, Marauders of Chaos)
+  for (const wb of ['merc', 'skaven', 'possessed', 'orcmob', 'kislev', 'darkelves', 'undead', 'wh', 'caravans', 'maraudersofchaos']) {
     let s: WarbandState = { ...core.newWarband(data, wb), campaign: { on: true, districts: {} } };
     for (const u of data.WARBANDS[wb]!.units.slice(0, 4)) s = core.addUnit(ctx(s), u.id);
     out.push({ label: `${wb} fresh`, state: s });
