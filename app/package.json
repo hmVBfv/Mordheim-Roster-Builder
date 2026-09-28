@@ -1,0 +1,73 @@
+{
+  "name": "@mordheim/app",
+  "private": true,
+  "type": "module",
+  "description": "The Mordheim Campaign PWA in two flavours: campaign (served by the Pi) and quickbuild (GitHub Pages).",
+  "scripts": {
+    "dev": "vite --mode campaign",
+    "dev:quickbuild": "vite --mode quickbuild",
+    "build": "npm run build:campaign && npm run build:quickbuild",
+    "build:campaign": "vite build --mode campaign",
+    "build:quickbuild": "vite build --mode quickbuild",
+    "preview": "vite preview --mode campaign",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "size": "size-limit",
+    "e2e": "playwright test",
+    "icons": "node scripts/icons.mjs"
+  },
+  "dependencies": {
+    "@fontsource/cinzel": "^5.3.0",
+    "@fontsource/eb-garamond": "^5.3.0",
+    "@fontsource/pirata-one": "^5.3.0",
+    "@mordheim/core": "*",
+    "dexie": "^4.4.6",
+    "dexie-react-hooks": "^4.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router": "^8.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@playwright/test": "^1.63.0",
+    "@rolldown/plugin-babel": "^0.2.4",
+    "@size-limit/file": "^14.1.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/babel__core": "^7.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "fake-indexeddb": "^6.2.5",
+    "jsdom": "^30.1.1",
+    "size-limit": "^14.1.0",
+    "vite": "^8.3.1",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^5.0.2",
+    "workbox-window": "^7.4.1"
+  },
+  "size-limit": [
+    {
+      "name": "campaign: JavaScript on first load",
+      "path": [
+        "dist/campaign/assets/index-*.js",
+        "dist/campaign/assets/workbox-window*.js"
+      ],
+      "limit": "200 KB",
+      "gzip": true
+    },
+    {
+      "name": "quickbuild: JavaScript on first load",
+      "path": [
+        "dist/quickbuild/assets/index-*.js",
+        "dist/quickbuild/assets/workbox-window*.js"
+      ],
+      "limit": "200 KB",
+      "gzip": true
+    }
+  ]
+}

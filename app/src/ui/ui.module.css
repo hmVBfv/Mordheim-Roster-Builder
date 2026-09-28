@@ -1,0 +1,140 @@
+/* Shared pieces of the screens. */
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.button,
+.buttonQuiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttonQuiet {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.listLink {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.listLink small {
+  color: var(--text-muted);
+}
+
+/* A panel that opens from the bottom (native <dialog>, docs/ui.md §2). */
+.sheet {
+  border: 1px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+  color: var(--text);
+  padding: var(--space-4);
+  width: 100%;
+  max-width: 640px;
+  margin: auto auto 0;
+  max-height: 85dvh;
+}
+
+.sheet::backdrop {
+  background: var(--shadow);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 8rem;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.message {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.error {
+  color: var(--danger);
+}
+
+.toast {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-3));
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+@media (min-width: 900px) {
+  .toast {
+    left: auto;
+    bottom: var(--space-4);
+    width: 420px;
+  }
+}

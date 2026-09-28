@@ -1,0 +1,68 @@
+/* Design tokens: one set of variables, two themes (docs/ui.md §4).
+   "Chronicle" (dark) is the default; "Parchment" (light) follows the old
+   Roster Builder and is always used for printing. contrast.test.ts checks
+   every text/background pair against WCAG AA in both themes. */
+
+:root,
+:root[data-theme='chronicle'] {
+  --bg: #16181a;
+  --surface: #1f2225;
+  --surface-2: #2a2e32;
+  --border: #3d4349;
+  --text: #ece6d8;
+  --text-muted: #aaa393;
+  --accent: #7fd88b;
+  --accent-ink: #0f1a11;
+  --danger: #f08a7a;
+  --gold: #d6b46a;
+  --hidden-bg: #26221a;
+  --focus: #7fd88b;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --font-title: 'Cinzel', 'EB Garamond', Georgia, serif;
+  color-scheme: dark;
+}
+
+:root[data-theme='parchment'] {
+  --bg: #e9dcc0;
+  --surface: #f4ead3;
+  --surface-2: #ddcca6;
+  --border: #b9a473;
+  --text: #1d1916;
+  --text-muted: #5a4a38;
+  --accent: #7a1410;
+  --accent-ink: #fbf5e6;
+  --danger: #8e1a14;
+  --gold: #6e5520;
+  --hidden-bg: #d8c9a3;
+  --focus: #7a1410;
+  --shadow: rgba(0, 0, 0, 0.25);
+  --font-title: 'Pirata One', 'EB Garamond', Georgia, serif;
+  color-scheme: light;
+}
+
+:root {
+  --font-body: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --radius: 6px;
+  /* touch targets (docs/ui.md §5) */
+  --tap: 44px;
+  --nav-height: 60px;
+  --sidebar-width: 220px;
+}
+
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f4ead3;
+    --border: #b9a473;
+    --text: #000000;
+    --text-muted: #3c3226;
+    --accent: #7a1410;
+    --font-title: 'Pirata One', 'EB Garamond', Georgia, serif;
+  }
+}

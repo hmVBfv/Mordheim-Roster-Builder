@@ -97,7 +97,20 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   konnte).
 - [ ] 1d, Rest: Parität mit bereinigten Speicherständen der laufenden Kampagne
   (die Dateien fehlen noch).
-- [ ] 1e, 1f
+- [x] 1e App-Grundgerüst: Workspace `app/` (Vite 8, React 19 mit React
+  Compiler, React Router, Dexie), beide Varianten aus einem Code
+  (`campaign` mit fünf Navigationszielen, `quickbuild` mit drei; der Quick
+  Build führt die Route nach „#“, weil Pages keine Tiefen-Links kennt),
+  Themes Chronicle und Parchment samt „wie System“ mit selbst ausgelieferten
+  Schriften (Kontrast WCAG AA per Test), PWA mit Manifest, Icons, Service
+  Worker, Update-Banner und strenger CSP, Import von Speicherständen und
+  Text-Export in den Gerätespeicher, Roster nur lesend. Die Regeldaten
+  kommen erst beim ersten Öffnen eines Rosters (JavaScript beim Start
+  119 KB komprimiert). Playwright prüft bei 360 px beide Varianten und
+  Themes, 44-px-Tippflächen, Offline-Start und die Startzeit-Grenzen.
+  Die Roster-Ansicht ist nur die technische Grundlage; ihr Aussehen kommt
+  aus dem Mockup (1f).
+- [ ] 1f Mockups
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in

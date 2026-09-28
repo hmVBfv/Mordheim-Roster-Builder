@@ -1,0 +1,303 @@
+{
+ "wb": "merc",
+ "subtype": "reik",
+ "name": "The Silver Caravan",
+ "budget": 500,
+ "models": [
+  {
+   "uid": 2,
+   "uid_def": "capt",
+   "name": "Ulrich the Grey",
+   "exp": 26,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Schwert": 1,
+    "Schild": 1,
+    "Leichte Rüstung": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "WS": 1
+   },
+   "skills": [
+    "Strike to Injure"
+   ],
+   "inj": [],
+   "spells": []
+  },
+  {
+   "uid": 3,
+   "uid_def": "champ",
+   "name": "Magda",
+   "exp": 8,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [
+    {
+     "code": "22",
+     "name": "Leg Wound",
+     "text": "Movement permanently −1.",
+     "mod": {
+      "M": -1
+     }
+    }
+   ],
+   "spells": []
+  },
+  {
+   "uid": 4,
+   "uid_def": "champ",
+   "name": "Champion",
+   "exp": 8,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": []
+  },
+  {
+   "uid": 5,
+   "uid_def": "young",
+   "name": "Youngblood",
+   "exp": 0,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": []
+  },
+  {
+   "uid": 6,
+   "uid_def": "warr",
+   "name": "Warrior",
+   "exp": 0,
+   "qty": 3,
+   "eq": {
+    "Dolch (1. gratis)": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": [],
+   "xpPaid": 0,
+   "names": [
+    "Otto",
+    "Fritz",
+    ""
+   ]
+  },
+  {
+   "uid": 7,
+   "uid_def": "mark",
+   "name": "Marksman",
+   "exp": 0,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Armbrust": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": []
+  }
+ ],
+ "hired": [
+  {
+   "key": "ogre",
+   "uid": "hs1",
+   "exp": 0,
+   "skills": []
+  }
+ ],
+ "dp": [],
+ "leaderUid": null,
+ "campaign": {
+  "on": true,
+  "districts": {},
+  "round": 0,
+  "log": [
+   {
+    "id": 1,
+    "round": 0,
+    "type": "recruit",
+    "text": "Recruited Mercenary Captain (60 gc).",
+    "auto": true,
+    "data": {
+     "uid": 2,
+     "name": "Mercenary Captain",
+     "uid_def": "capt",
+     "cost": 60,
+     "grade": "hero"
+    }
+   },
+   {
+    "id": 2,
+    "round": 0,
+    "type": "recruit",
+    "text": "Recruited Champion (35 gc).",
+    "auto": true,
+    "data": {
+     "uid": 3,
+     "name": "Champion",
+     "uid_def": "champ",
+     "cost": 35,
+     "grade": "hero"
+    }
+   },
+   {
+    "id": 3,
+    "round": 0,
+    "type": "recruit",
+    "text": "Recruited Champion (35 gc).",
+    "auto": true,
+    "data": {
+     "uid": 4,
+     "name": "Champion",
+     "uid_def": "champ",
+     "cost": 35,
+     "grade": "hero"
+    }
+   },
+   {
+    "id": 4,
+    "round": 0,
+    "type": "recruit",
+    "text": "Recruited Youngblood (15 gc).",
+    "auto": true,
+    "data": {
+     "uid": 5,
+     "name": "Youngblood",
+     "uid_def": "young",
+     "cost": 15,
+     "grade": "hero"
+    }
+   },
+   {
+    "id": 5,
+    "round": 0,
+    "type": "recruit",
+    "text": "Recruited Warrior (25 gc).",
+    "auto": true,
+    "data": {
+     "uid": 6,
+     "name": "Warrior",
+     "uid_def": "warr",
+     "cost": 25,
+     "grade": "hench"
+    }
+   },
+   {
+    "id": 6,
+    "round": 0,
+    "type": "recruit",
+    "text": "Recruited Marksman (25 gc).",
+    "auto": true,
+    "data": {
+     "uid": 7,
+     "name": "Marksman",
+     "uid_def": "mark",
+     "cost": 25,
+     "grade": "hench"
+    }
+   },
+   {
+    "id": 7,
+    "round": 0,
+    "type": "advance",
+    "text": "Ulrich the Grey advanced +1 WS.",
+    "auto": true,
+    "data": {
+     "uid": 2,
+     "name": "Ulrich the Grey",
+     "uid_def": "capt",
+     "stat": "WS",
+     "exp": 26
+    }
+   },
+   {
+    "id": 9,
+    "round": 0,
+    "type": "injury",
+    "text": "Magda was wounded by an unknown hand — Leg Wound.",
+    "auto": true,
+    "data": {
+     "casualtyId": 8
+    }
+   },
+   {
+    "id": 10,
+    "round": 0,
+    "type": "advance",
+    "text": "Ulrich the Grey learned Strike to Injure.",
+    "auto": true,
+    "data": {
+     "uid": 2,
+     "name": "Ulrich the Grey",
+     "uid_def": "capt",
+     "skill": "Strike to Injure",
+     "exp": 26
+    }
+   }
+  ],
+  "battles": [],
+  "casualties": [
+   {
+    "id": 8,
+    "round": 0,
+    "battleId": null,
+    "victim": {
+     "uid": 3,
+     "name": "Magda",
+     "wb": "merc",
+     "grade": "hero",
+     "value": 35,
+     "memberIdx": null,
+     "uid_def": "champ"
+    },
+    "attacker": {
+     "uid": null,
+     "name": "",
+     "wb": "",
+     "grade": "",
+     "value": null
+    },
+    "result": "injured",
+    "detail": "Leg Wound",
+    "fallenId": null,
+    "note": ""
+   }
+  ],
+  "logSeq": 10
+ },
+ "stash": {
+  "wyrd": 0,
+  "gold": 420,
+  "items": []
+ },
+ "fallen": [],
+ "uidSeq": 8,
+ "goldNow": 35
+}

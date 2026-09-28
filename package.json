@@ -3,18 +3,20 @@
   "private": true,
   "description": "Mordheim Roster Builder and campaign companion (legacy app at the repo root, new workspaces in core/, app/, server/).",
   "workspaces": [
-    "core"
+    "core",
+    "app"
   ],
   "engines": {
     "node": ">=22.12"
   },
   "scripts": {
-    "test": "npm run test:legacy && npm run test:core",
+    "test": "npm run test:legacy && npm run test:core && npm run test:app",
     "test:legacy": "node test/run.mjs",
     "test:core": "npm test -w core",
-    "typecheck": "npm run typecheck -w core",
+    "typecheck": "npm run typecheck -w core && npm run typecheck -w app",
     "lint": "eslint .",
-    "check": "npm run typecheck && npm run lint && npm test"
+    "check": "npm run typecheck && npm run lint && npm test",
+    "test:app": "npm test -w app"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -151,6 +151,15 @@ Regeln für `core/`:
 | Speichern | Dexie + Server | Dexie + Datei |
 | Austausch | Import aus Fragment-Link, Datei, Text | „An Kampagnenserver senden“, Datei, Text |
 
+**Umgesetzt (Phase 1e):** Router im deklarativen Modus; `campaign` nutzt
+Browser-Pfade (der Pi beantwortet jeden Pfad mit der App), `quickbuild` einen
+Hash-Router (Pages kann das nicht). Die Regeldaten (`data/*.json`, etwa
+140 KB komprimiert) sind ein eigener Teil, der erst mit dem ersten Roster
+geladen und vom Service Worker für offline behalten wird; die App-Hülle
+kommt ohne `core/` aus. Die CSP steht im gebauten `index.html` als
+`<meta>` (ohne Inline-Skripte; das Theme setzt `public/theme-boot.js` vor dem
+ersten Zeichnen). Update-Banner mit `registerType: 'prompt'`.
+
 **Zustand:** Persistente Daten liegen in Dexie und sind die Quelle der
 Oberfläche. Reiner UI-Zustand (offene Bereiche, Formulareingaben) bleibt in
 React-State. Kein globaler Store.
