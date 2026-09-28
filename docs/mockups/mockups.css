@@ -331,6 +331,14 @@ dialog.sheet::backdrop { background: var(--shadow); }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 6px 20px var(--shadow);
+  pointer-events: none;
+}
+.toast > span { flex: 1; min-width: 0; }
+.toast button { pointer-events: auto; }
+.toast-x {
+  min-width: var(--tap, 44px); min-height: var(--tap, 44px);
+  border: 0; border-radius: var(--radius); background: transparent;
+  color: var(--text-muted); font-size: 1rem; cursor: pointer;
 }
 
 .note-kind { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold); }
