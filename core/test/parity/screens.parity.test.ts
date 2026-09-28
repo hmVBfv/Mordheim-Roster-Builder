@@ -7,7 +7,7 @@ import type { HireEntry, WarbandState } from '../../src/index.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng } from '../support/random.ts';
-import { coreScreens, legacyScreens } from './screens.ts';
+import { coreScreens, coreTip, coreWarbandOptions, legacyScreens, parseTip, parseWarbandOptions } from './screens.ts';
 import { data, useLegacy } from './walk.ts';
 
 let L: Legacy;
@@ -45,10 +45,17 @@ describe('list helpers', () => {
   });
 
   it('the warband picker groups and orders alike', () => {
-    const html = L.app.warbandOptions('') as string;
-    const legacy = [...html.matchAll(/<optgroup label="([^"]+)">([\s\S]*?)<\/optgroup>/g)]
-      .map((g) => ({ label: g[1], warbands: [...(g[2] as string).matchAll(/<option value="([^"]+)">([^<]*)<\/option>/g)].map((o) => ({ key: o[1], name: (o[2] as string).replace(/&lt;/g, '<') })) }));
-    expect(core.warbandPickerGroups(data).map((g) => ({ label: g.label, warbands: g.warbands }))).toEqual(legacy);
+    expect(coreWarbandOptions(data)).toEqual(parseWarbandOptions(L.app.warbandOptions('') as string));
+  });
+
+  it('a tooltip shows the same entry for every name the app can show one for', () => {
+    const names = new Set<string>(['', 'Nimble', 'Skink Hunter', 'Wyrdstone Hunter', 'Fear', '___no_such_thing___']);
+    for (const it of data.CATALOG) { names.add(it.de); if (it.en) names.add(it.en); }
+    for (const nm of core.skillNameList(data)) names.add(nm);
+    for (const set of Object.values(data.SKILLSETS)) for (const [nm] of set.skills ?? []) names.add(nm);
+    for (const lore of Object.values(data.SPELLS)) for (const [nm] of lore.spells) names.add(nm);
+    for (const [, info] of data.ABILITYINFO) names.add(info.name);
+    for (const nm of names) expect(coreTip(data, nm), nm).toEqual(parseTip(L.info.itipBuild(nm)));
   });
 
   it('the Hired Sword filters agree on random filters', () => {

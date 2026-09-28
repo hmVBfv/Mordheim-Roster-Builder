@@ -9,7 +9,7 @@ import type { Injury, Model } from '../state/types.ts';
 import { houseDefaults, houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
 import { daggerNameFor, inlineUpgradeActive } from '../rules/equipment.ts';
-import { eqListFor, spellLabel, unitDef } from '../rules/lookup.ts';
+import { eqListFor, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
 import { hsSpecialSkills, isMarauderChief, isMarauderSeer } from '../rules/profile.ts';
 
 /** English name of an item (German key, with or without the free-dagger mark). */
@@ -96,6 +96,15 @@ export function spellInfo(data: GameData, nm: string): ItemInfo | null {
     }
   }
   return null;
+}
+
+/** What the tooltip for a name shows (legacy info.js itipBuild): an item,
+    then a skill from the curated lists, then the ability patterns, then a
+    spell. The skill comes before the patterns because they match loosely:
+    the Shooting skill "Nimble" showed the Barbary Monkey's rule, and "Skink
+    Hunter" or "Wyrdstone Hunter" showed the Hunter skill. */
+export function tooltipInfo(data: GameData, nm: string): ItemInfo | null {
+  return itemInfo(data, nm) || skillInfo(data, nm) || abilityInfo(data, nm) || spellInfo(data, nm);
 }
 
 export function ruleNameEN(data: GameData, name: string): string {

@@ -3,7 +3,7 @@
    read back out of the HTML it drew, and the same from core. Used by
    screens.parity.test.ts on the fixtures and by the walk on its states. */
 import * as core from '../../src/index.ts';
-import type { Ctx, WarbandState } from '../../src/index.ts';
+import type { Ctx, GameData, WarbandState } from '../../src/index.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 
 type El = { style: Record<string, unknown>; innerHTML: string; textContent: string; value: string; className: string; [k: string]: unknown };
@@ -65,17 +65,26 @@ function coreAddMenu(ctx: Ctx): unknown[] {
 }
 
 /* The abilities panel: the chips and the special skill lists. */
-function parseAbilities(html: string): unknown {
+export function parseAbilities(html: string): unknown {
   const kw = html.match(/<div class="abil-kw no-print">([\s\S]*?)<\/div>/);
   const chips = kw && !/kwlbl/.test(kw[1] as string) ? [...(kw[1] as string).matchAll(/toggleItip\(event,this,'((?:[^'\\]|\\.)*)'\)">/g)].map((m) => (m[1] as string).replace(/\\'/g, "'")) : [];
   const sets = html.match(/<b>Special skill lists?:<\/b> ([^<]*)\./);
   return { chips, sets: sets ? (sets[1] as string).split(', ') : [] };
 }
 
-function coreAbilities(ctx: Ctx, m: WarbandState['models'][number]): unknown {
-  const def = core.unitDef(ctx, m.uid_def)!;
+export function coreAbilities(ctx: Ctx, m: WarbandState['models'][number] | null, def = core.unitDef(ctx, m?.uid_def ?? '')!): unknown {
   const a = core.modelAbilities(ctx, def, m);
   return { chips: a.abilities.map((x) => x.name), sets: a.isHero ? a.skillSets.map((x) => x.name) : [] };
+}
+
+/* The warband picker (legacy warbandOptions): its groups and entries. */
+export function parseWarbandOptions(html: string): unknown {
+  return [...html.matchAll(/<optgroup label="([^"]+)">([\s\S]*?)<\/optgroup>/g)]
+    .map((g) => ({ label: g[1], warbands: [...(g[2] as string).matchAll(/<option value="([^"]+)">([^<]*)<\/option>/g)].map((o) => ({ key: o[1], name: (o[2] as string).replace(/&lt;/g, '<') })) }));
+}
+
+export function coreWarbandOptions(data: GameData): unknown {
+  return core.warbandPickerGroups(data).map((g) => ({ label: g.label, warbands: g.warbands }));
 }
 
 export function coreScreens(ctx: Ctx): unknown {
@@ -97,4 +106,16 @@ export function legacyScreens(L: Legacy): unknown {
     menu: parseAddMenu(store.addmenu?.innerHTML ?? ''),
     abilities: S.models.map((m) => parseAbilities(a.abilitySection(L.engine.unitDef(m.uid_def), m))),
   };
+}
+
+/* A tooltip (legacy info.js itipBuild) as its parts, and the same from core. */
+export function parseTip(html: unknown): unknown {
+  if (html == null) return null;
+  const m = String(html).match(/^<div class="itip-h">([\s\S]*?)<\/div>(?:<div class="itip-l">([\s\S]*?)<\/div>)?<div class="itip-b">([\s\S]*)<\/div>$/);
+  return m ? { name: m[1], line: m[2] ?? null, text: m[3] } : { unparsed: html };
+}
+
+export function coreTip(data: GameData, nm: string): unknown {
+  const i = core.tooltipInfo(data, nm);
+  return i && { name: i.name || nm, line: i.line || null, text: i.text };
 }
