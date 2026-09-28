@@ -32,7 +32,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['core/test/**/*.ts', 'core/src/node.ts', 'core/vitest.config.ts'],
+    files: ['core/test/**/*.ts', 'core/test/**/*.mjs', 'core/src/node.ts', 'core/vitest.config.ts'],
     languageOptions: { globals: { ...globals.node } },
   },
 );

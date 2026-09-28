@@ -88,7 +88,16 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   fehlende Erklärungen) und `core/narrative` (Briefing je Schlacht als
   Markdown). Die Eingaben, die erst der Server liefert (Notizen, Protokoll
   über alle Warbands), sind als Datenstruktur festgelegt.
-- [ ] 1d, 1e, 1f
+- [x] 1d, erster Teil: Alle 35 Legacy-Testdateien laufen gegen `core/`. Sie
+  laufen unverändert gegen die alte App; jeder ihrer rund 1500 Aufrufe (davon
+  gut 400 Aktionen) wird in `core/` vom selben Stand aus wiederholt und muss
+  dasselbe ergeben (`core/test/mirror/`). Ergebnis: keine Abweichung in der
+  Logik; zwei Lücken geschlossen (die Reihenfolge der Tooltip-Suche lag noch
+  in `info.js`; ein Zähler-Stand der alten App, den `core/` nicht darstellen
+  konnte).
+- [ ] 1d, Rest: Parität mit bereinigten Speicherständen der laufenden Kampagne
+  (die Dateien fehlen noch).
+- [ ] 1e, 1f
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in
@@ -123,6 +132,8 @@ Die alte App bleibt in dieser Phase unverändert live.
   Exporte (TTS, PDF, Text). Eine Paritäts-Checkliste listet jede Funktion.
 - Quick-Build-Variante; Pages wird auf sie umgestellt, sobald die
   Checkliste vollständig ist.
+- Vor dem Abschalten der alten App: die Szenarien der Legacy-Tests als eigene
+  `core/`-Tests übernehmen (Spiegel und Paritätstests fallen mit ihr weg).
 - „Send to campaign server“ (Fragment-Link), Datei- und Text-Import.
 - Leak-Test-Grundgerüst; Test „jede Tabelle steht in `data-model.md`“.
 

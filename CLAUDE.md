@@ -80,6 +80,11 @@ changing anything structural.
   action does not change a state often enough. Branches that need a
   particular roster to matter get a scenario suite as well
   (`injuries.parity.test.ts` runs every injury result on prepared warbands).
+- The legacy tests run unchanged against core through the mirror
+  (`core/test/mirror/`): every call they make into the legacy app is repeated
+  in core from the same state and must come out the same. A legacy function a
+  test starts calling needs its entry in `core/test/mirror/table.ts` (action,
+  query, or drawing with a check of the rule it shows).
 - Where legacy asks mid-action (`confirm`, `prompt`), the answer becomes an
   argument of the core action, defaulting to what legacy does without a
   dialog; the interface asks before calling.

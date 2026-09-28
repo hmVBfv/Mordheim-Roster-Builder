@@ -106,6 +106,11 @@ bleibt unverändert live, bis der neue Builder sie ersetzt. `core/` wird gegen
 sie per Differenztest geprüft (`core/test/parity/`): Für erzeugte Warbands
 aller 49 Typen, aller Subtypen und dreier Hausregel-Varianten rechnen alte App
 und `core/` jeden Wert aus, und beide Ergebnisse müssen identisch sein.
+Aktionen prüfen zufällige Aktionsfolgen (Paritäts-Wanderung). Dazu laufen die
+Legacy-Tests aus `test/` unverändert gegen die alte App, und jeder Aufruf, den
+sie dabei machen, wird in `core/` wiederholt – vom selben Stand aus, mit
+denselben Antworten auf Rückfragen (der Spiegel, `core/test/mirror/`). Was ein
+Legacy-Test über einen Aufruf behauptet, gilt damit auch für `core/`.
 
 Regeln für `core/`:
 
@@ -115,9 +120,11 @@ Regeln für `core/`:
   (unveränderlich; ob mit Immer, wird in Phase 1 entschieden).
 - Alles, was eingefroren wird (Kennzahlen beim Markieren), berechnet `core/`
   genau einmal; gespeichert wird das Ergebnis, nie neu berechnet.
-- Jede Funktion hat Tests (Vitest). Die 32 bestehenden Testdateien werden auf
-  `core/` portiert; ein Paritätstest vergleicht alte und neue Logik über alle
-  Warbands.
+- Jede Funktion hat Tests (Vitest). Die bestehenden Legacy-Testdateien laufen
+  über den Spiegel gegen `core/`; Paritätstests vergleichen alte und neue
+  Logik über alle Warbands. Bevor die alte App wegfällt (Phase 3), werden die
+  Szenarien der Legacy-Tests als eigene `core/`-Tests übernommen, denn Spiegel
+  und Parität fallen mit ihr weg.
 
 ## 4. `app/`
 
