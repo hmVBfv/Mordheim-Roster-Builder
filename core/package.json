@@ -2,6 +2,7 @@
   "name": "@mordheim/core",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "description": "Shared rules and campaign logic: no DOM, no globals. Used by the app (browser) and the server (Node).",
   "exports": {
     ".": "./src/index.ts",
