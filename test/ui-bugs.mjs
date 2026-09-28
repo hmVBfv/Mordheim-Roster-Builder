@@ -68,4 +68,14 @@ assert.ok(sidebarHtml, 'sidebar summary rendered with both units');
 assert.ok(sidebarHtml.indexOf('Chieftain') < sidebarHtml.indexOf('Seer'),
   'sidebar lists the Chieftain before the Seer regardless of recruitment order');
 
-console.log('UI bugs: OK (no duplicate skill lists; render survives skill add; PDF export runs; sidebar roster order follows warband list)');
+// --- Bug: a notice swallowed taps (Rob, 28.09.2026) ---
+// flash() put a box over the bottom middle of the screen for 2.6 s that
+// caught every tap meant for the buttons under it. It must let taps through.
+const shown=[]; const bodyAppend=document.body.appendChild;
+document.body.appendChild=(e)=>{ shown.push(e); };
+app.flash('Saved.');
+document.body.appendChild=bodyAppend;
+assert.equal(shown.length, 1, 'flash shows one notice');
+assert.match(shown[0].style.cssText, /pointer-events:\s*none/, 'the notice lets taps through');
+
+console.log('UI bugs: OK (no duplicate skill lists; render survives skill add; PDF export runs; sidebar roster order follows warband list; notices let taps through)');

@@ -4167,7 +4167,8 @@ export function importJSON(ev){
 }
 export function flash(msg){
   const d=document.createElement('div'); d.textContent=msg;
-  d.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--iron);color:var(--parch);padding:10px 18px;border:1px solid var(--gold);border-radius:4px;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.5)';
+  // pointer-events:none — a notice must never swallow the tap meant for what lies under it
+  d.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--iron);color:var(--parch);padding:10px 18px;border:1px solid var(--gold);border-radius:4px;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.5);pointer-events:none';
   document.body.appendChild(d); setTimeout(()=>d.remove(),2600);
 }
 

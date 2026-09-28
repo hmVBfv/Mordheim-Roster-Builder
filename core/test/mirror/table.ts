@@ -281,6 +281,7 @@ export const TABLE: Record<string, Spec> = {
   'app.renderCampaign': ui('draws the campaign panel; its lists come from the queries above'),
   'app.renderHouse': ui('draws the house-rules panel'),
   'app.welcomeNew': ui('switches from the welcome screen to the warband picker'),
+  'app.flash': ui('shows a short notice; the new app has its own (UndoToast)'),
   'app.renderSidebar': ui('draws the sidebar', (c) => [coreScreens(ctx(c.w)), legacyScreens(c.L)]),
   'app.abilitySection': ui('draws the abilities panel', (c) => [coreAbilities(ctx(c.w), c.args[1] ?? null, c.args[0]), parseAbilities(String(c.ret))]),
   'app.warbandOptions': ui('draws the warband picker', (c) => [coreWarbandOptions(data), parseWarbandOptions(String(c.ret))]),
