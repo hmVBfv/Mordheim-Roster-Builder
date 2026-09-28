@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What Changed Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+  .summary div { display: grid; padding: var(--s2) var(--s3); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .summary b { font-size: 1.3rem; }
+  .summary span { font-size: 0.8rem; color: var(--text-muted); line-height: 1.2; }
+  .who { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
+  .change { display: grid; gap: var(--s1); padding-top: var(--s2); border-top: 1px solid var(--border); }
+  .change:first-of-type { border-top: 0; padding-top: 0; }
+  .what { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--s2); }
+  .what .from { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .what .arrow { color: var(--text-muted); }
+  .what .to { font-weight: 600; }
+  .why { font-size: 0.86rem; color: var(--text-muted); }
+  .why.cause-none { color: var(--warn); }
+  .change.alert { background: color-mix(in srgb, var(--warn) 9%, transparent); margin-inline: calc(-1 * var(--s2)); padding: var(--s2); border-radius: var(--radius); border-top: 0; }
+  .explain { display: grid; gap: var(--s1); }
+  .explain textarea { min-height: 3.2rem; }
+  .explain .foot { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); font-size: 0.8rem; }
+  .explain.missing textarea { border-color: var(--warn); }
+  .free { font-size: 0.8rem; color: var(--text-muted); }
+  .mark { position: sticky; bottom: calc(var(--nav) + env(safe-area-inset-bottom, 0px)); display: grid; gap: var(--s2); padding: var(--s3) var(--s4); background: var(--surface); border-top: 1px solid var(--border); }
+  .new-badge { font-size: 0.8rem; color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>What changed</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <a class="back" href="roster.html" aria-label="Back to the roster">←</a>
+    <span class="title">What changed</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+
+  <div class="content">
+    <div class="stack">
+      <h1>The Silver Caravan</h1>
+      <p class="muted">Since “After battle 4” · this is a preview; nothing is marked yet</p>
+    </div>
+    <div class="summary" role="list">
+      <div role="listitem"><b>12</b><span>changes</span></div>
+      <div role="listitem"><b>1</b><span>without a cause</span></div>
+      <div role="listitem"><b id="missing-n">4</b><span>explanations missing</span></div>
+    </div>
+    <div class="seg" role="group" aria-label="Show" id="filter">
+      <button type="button" aria-pressed="true" data-value="all">All changes</button>
+      <button type="button" aria-pressed="false" data-value="todo">Needs a word</button>
+    </div>
+
+    <article class="card" data-todo>
+      <div class="who"><h2>Ulrich the Grey</h2><span class="muted small">Captain</span></div>
+      <div class="change">
+        <div class="what"><span>Experience</span><span class="from">26</span><span class="arrow">→</span><span class="to">29</span></div>
+        <p class="why">✓ Battle 5: survived +1, won as leader +1, took Tik out of action +1</p>
+        <p class="free">Experience needs no explanation.</p>
+      </div>
+      <div class="change">
+        <div class="what"><span>WS</span><span class="from">4</span><span class="arrow">→</span><span class="to">5</span></div>
+        <p class="why">✓ Advance at 28 experience, rolled after battle 5</p>
+        <label class="explain"><span class="small">What happened?</span>
+          <textarea class="textarea" placeholder="A sentence is enough.">He learned it the hard way, on the gangway of the mill.</textarea>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+      </div>
+      <div class="change">
+        <div class="what"><span>New skill</span><span class="to">Strike to Injure</span></div>
+        <p class="why">✓ Advance at 24 experience, due since battle 4 and taken now</p>
+        <label class="explain"><span class="small">What happened?</span>
+          <textarea class="textarea" placeholder="A sentence is enough."></textarea>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+      </div>
+    </article>
+
+    <article class="card" data-todo>
+      <div class="who"><h2>Magda</h2><span class="muted small">Champion</span></div>
+      <div class="change">
+        <div class="what"><span>Injury</span><span class="to">Leg Wound</span><span class="muted">M 4 → 3</span></div>
+        <p class="why">✓ Out of action by Skritch (Clan Skrittle), turn 4 · rolled 22</p>
+        <label class="explain"><span class="small">What happened?</span>
+          <textarea class="textarea" placeholder="How did she take it? Who carried her home?"></textarea>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+      </div>
+      <div class="change">
+        <div class="what"><span>Experience</span><span class="from">12</span><span class="arrow">→</span><span class="to">13</span></div>
+        <p class="why">✓ Battle 5: survived +1</p>
+      </div>
+    </article>
+
+    <article class="card" data-todo>
+      <div class="who"><h2>Jorg</h2><span class="muted small">Champion</span></div>
+      <div class="change alert">
+        <div class="what"><span>BS</span><span class="from">3</span><span class="arrow">→</span><span class="to">4</span><span class="chip warn">⚠ no cause found</span></div>
+        <p class="why cause-none">No advance was due: 9 experience is below the next step at 11. Everyone in the campaign sees this mark; it blocks nothing.</p>
+        <label class="explain"><span class="small">Explain it, or correct the roster</span>
+          <textarea class="textarea" placeholder="e.g. house rule, a scenario reward, a mistake last time"></textarea>
+          <span class="foot"><span class="vis public">👁 Everyone</span><a class="btn-quiet" href="roster.html">Correct</a></span></label>
+      </div>
+      <div class="change">
+        <div class="what"><span>Experience</span><span class="from">8</span><span class="arrow">→</span><span class="to">9</span></div>
+        <p class="why">✓ Battle 5: survived +1</p>
+      </div>
+    </article>
+
+    <article class="card" data-todo>
+      <div class="who"><h2>Warriors</h2><span class="muted small">group, 3 → 2 men</span></div>
+      <div class="change">
+        <div class="what"><span>Hans</span><span class="to">fell</span></div>
+        <p class="why">✓ Out of action by Nibble (Clan Skrittle), turn 5 · rolled 2 · his dagger and axe are lost</p>
+        <label class="explain"><span class="small">What happened?</span>
+          <textarea class="textarea" placeholder="A last word, a grave, a debt left behind…"></textarea>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="who"><h2>Wilhelm</h2><span class="new-badge">new · Youngblood</span></div>
+      <div class="change">
+        <div class="what"><span>Recruited</span><span class="to">15 gc</span></div>
+        <p class="why">✓ Hired after battle 5</p>
+        <label class="explain"><span class="small">Who is he?</span>
+          <textarea class="textarea">A ferry boy who knows the Hel Fenn shoals and asks for boots instead of wages.</textarea>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="who"><h2>The warband</h2></div>
+      <div class="change"><div class="what"><span>Gold</span><span class="from">35 gc</span><span class="arrow">→</span><span class="to">55 gc</span></div><p class="why">✓ Wyrdstone sold (3 shards, 90 gc) · Wilhelm hired (15 gc) · upkeep of Big Gunnar (30 gc) · a crossbow bought (25 gc)</p></div>
+      <div class="change"><div class="what"><span>Old Mill</span><span class="to">foothold</span></div><p class="why">✓ Won battle 5 there</p></div>
+      <div class="change"><div class="what"><span>Rating</span><span class="from">107</span><span class="arrow">→</span><span class="to">118</span></div><p class="free">Totals need no explanation.</p></div>
+    </article>
+  </div>
+
+  <div class="mark">
+    <button type="button" class="btn btn-block" id="mark">Looks right — mark “After battle 5”</button>
+    <p class="small muted">Freezes rating, worth, gold and models as they are now. Explanations can still be written afterwards; changes then go into the next battle.</p>
+  </div>
+  <nav class="nav" data-current="Warbands"></nav>
+</div>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  function count() {
+    var n = 0;
+    document.querySelectorAll('.explain').forEach(function (l) {
+      var empty = !l.querySelector('textarea').value.trim();
+      l.classList.toggle('missing', empty);
+      if (empty) n++;
+    });
+    document.getElementById('missing-n').textContent = n;
+    document.querySelectorAll('article[data-todo]').forEach(function (a) {
+      a.dataset.todo = a.querySelector('.explain.missing, .change.alert') ? '1' : '';
+    });
+  }
+  document.addEventListener('input', count);
+  count();
+  document.getElementById('filter').addEventListener('choose', function (e) {
+    document.querySelectorAll('article.card').forEach(function (a) { a.hidden = e.detail === 'todo' && !a.dataset.todo; });
+  });
+  document.getElementById('mark').onclick = function () {
+    window.mockToast('Marked “After battle 5”. The numbers are frozen.');
+  };
+})();
+</script>
+</body>
+</html>

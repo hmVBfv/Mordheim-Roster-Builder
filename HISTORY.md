@@ -1337,3 +1337,20 @@ wider, the header pushed the page six pixels past the edge of the screen —
 enough for a phone to scroll sideways and for taps to land in the wrong
 place. The grid now never grows wider than the screen, and on a narrow one
 the sync state says "Saved" instead of "Saved on this device".
+
+## September 28, 2026 — six screens drawn before they are built
+
+Phase 1f drew the six screens that decide the most: game night, the
+timeline, the change view, visibility, the leader's background and the new
+roster. They are plain clickable pages in `docs/mockups/`, on the app's own
+design tokens, with an invented campaign in them, meant to be held in the
+hand before a line of the real screens is written.
+
+Two things only came out of trying them. The timeline's three move buttons
+first sat beside each block and squeezed the text into a narrow column
+that made every note twice as tall; they now share the line of the block's
+details. And dragging on a phone needs a long press before anything moves —
+a quick swipe must still scroll the page — which a simulated finger in
+Chromium confirmed both ways. The roster mockup also carries the injury
+flow agreed for the new builder: the result as rolled, then exactly the
+follow-up the chart asks for.

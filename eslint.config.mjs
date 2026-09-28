@@ -54,4 +54,9 @@ export default tseslint.config(
     files: ['app/*.ts', 'app/e2e/**/*.ts', 'app/scripts/**/*.mjs'],
     languageOptions: { globals: { ...globals.node } },
   },
+  {
+    // the static mockups: a plain script loaded by the pages, no modules
+    files: ['docs/mockups/**/*.js'],
+    languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
+  },
 );

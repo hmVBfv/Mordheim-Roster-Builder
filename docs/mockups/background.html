@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Background Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .secret { padding: var(--s2) var(--s4); font-size: 0.9rem; border-bottom: 1px dashed var(--warn); color: var(--warn); }
+  .secret.is-hidden { border-top: 0; border-inline: 0; }
+  .kinds { display: flex; gap: var(--s1); overflow-x: auto; padding-bottom: 2px; }
+  .kinds button { min-height: var(--tap); padding: 0 var(--s3); border: 1px solid var(--border); border-radius: 999px; background: transparent; white-space: nowrap; cursor: pointer; }
+  .kinds button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+  .thread { gap: var(--s3); }
+  .thread-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); }
+  .level { display: grid; grid-template-columns: auto 1fr; gap: 2px var(--s2); align-items: center; }
+  .dots { display: inline-flex; gap: 3px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: inline-block; }
+  .dots i.on { background: var(--accent); border-color: var(--accent); }
+  .level b { font-weight: 600; }
+  .level small { grid-column: 2; color: var(--text-muted); }
+  .part { display: grid; gap: 2px; }
+  .part .label { display: flex; gap: var(--s2); align-items: center; }
+  .truth { padding: var(--s2) var(--s3); border: 1px dashed var(--warn); border-radius: var(--radius); }
+  .refs { display: flex; flex-wrap: wrap; gap: var(--s1); }
+  details summary { min-height: var(--tap); display: flex; align-items: center; gap: var(--s2); cursor: pointer; color: var(--text-muted); list-style: none; }
+  details summary::before { content: '▸'; }
+  details[open] summary::before { content: '▾'; }
+  .legend { display: grid; gap: var(--s1); font-size: 0.88rem; }
+  .log { font-size: 0.82rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Background</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <a class="back" href="timeline.html" aria-label="Back to the campaign">←</a>
+    <span class="title">Background</span>
+    <span class="vis leader">⚑ Leaders only</span>
+  </header>
+  <p class="secret is-hidden">⚑ Only campaign leaders see this area. It is never sent to players, never in an export, never in a repository.</p>
+
+  <div class="content">
+    <div class="kinds" role="group" aria-label="Show">
+      <button type="button" aria-pressed="true">Threads 3</button>
+      <button type="button" aria-pressed="false">People 4</button>
+      <button type="button" aria-pressed="false">Places 2</button>
+      <button type="button" aria-pressed="false">Scenarios 1</button>
+      <button type="button" aria-pressed="false">GM notes 6</button>
+    </div>
+
+    <details class="card legend">
+      <summary>How much may the story show?</summary>
+      <div class="level"><span class="dots"><i></i><i></i><i></i></span><span><b>Hidden</b> — nothing, not even a hint.</span></div>
+      <div class="level"><span class="dots"><i class="on"></i><i></i><i></i></span><span><b>Hint</b> — traces are allowed, within the limit written down.</span></div>
+      <div class="level"><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span><b>Revealed</b> — public from a battle on; the chronicle may tell it.</span></div>
+      <p class="small muted">The AI package carries these as hard rules; a check marks words from hidden truths in chapter drafts.</p>
+    </details>
+
+    <article class="card thread" id="t1">
+      <div class="thread-head"><h2>Who pays the ferryman?</h2><span class="chip good">active</span></div>
+      <div class="level" id="t1-level"><span class="dots"><i class="on"></i><i></i><i></i></span><span><b>Hint</b></span><small>Limit: “Traces yes — the Countess’s name never.”</small></div>
+      <div class="part"><span class="label">Truth <span class="vis leader">⚑</span></span>
+        <p class="truth is-hidden">Countess Adelheid von Rauch pays the ferrymen’s guild to row warbands into ambushes. She wants the Hel Fenn wyrdstone for her own alchemists, and the rats do the killing for her.</p></div>
+      <div class="part"><span class="label">What the players know</span>
+        <p>Skritch was paid in advance. The coin carries the eel of the ferrymen’s guild. <span class="muted small">(revealed after battle 5)</span></p></div>
+      <div class="refs"><span class="chip">Battle 5</span><span class="chip">Battle 6</span><span class="chip">Skritch</span><span class="chip">The ferryman</span><span class="chip">Note: the coin with the eel</span></div>
+      <div class="row"><button type="button" class="btn" data-open="sheet-reveal">Reveal…</button><button type="button" class="btn-quiet">Edit</button></div>
+      <p class="log">Last: Rob revealed “the coin with the eel” after battle 5 · Mon 22 Sep</p>
+    </article>
+
+    <article class="card thread">
+      <div class="thread-head"><h2>The bell of St. Voss</h2><span class="chip">planned</span></div>
+      <div class="level"><span class="dots"><i></i><i></i><i></i></span><span><b>Hidden</b></span><small>Nothing may be hinted yet.</small></div>
+      <details><summary>Truth, knowledge and references</summary>
+        <p class="truth is-hidden">The bell tolls for whoever carries the reliquary. The Grey Penitents carry it without knowing.</p>
+        <p class="muted small">Players know nothing yet.</p></details>
+      <div class="row"><button type="button" class="btn-quiet">Edit</button></div>
+    </article>
+
+    <article class="card thread">
+      <div class="thread-head"><h2>Skritch’s debt</h2><span class="chip">resolved</span></div>
+      <div class="level"><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span><b>Revealed</b></span><small>Public since battle 3.</small></div>
+      <details><summary>Truth, knowledge and references</summary><p>Skritch owed the clan a warlock engineer; he paid with Nibble’s tail.</p></details>
+    </article>
+  </div>
+  <nav class="nav" data-current="Campaign"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-reveal" aria-labelledby="reveal-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-reveal">
+    <h2 id="reveal-title">Reveal to everyone</h2>
+    <p class="small muted">From “Who pays the ferryman?”. Only what you write here becomes public — the truth above stays hidden.</p>
+    <label class="field"><span class="small">Public note</span>
+      <textarea class="textarea" id="reveal-text">The ferryman did not come back for the Caravan. Someone had paid him not to.</textarea></label>
+    <label class="field"><span class="small">Place in the timeline</span>
+      <select class="select"><option>Battle 6 · aftermath</option><option>Interlude 6</option><option>Battle 6 · course</option></select></label>
+    <label class="field"><span class="small">Reveal level afterwards</span>
+      <select class="select" id="reveal-level"><option value="hint">Hint — keep the limit</option><option value="revealed">Revealed from battle 6</option></select></label>
+    <p class="banner-note small" style="color: var(--warn)">⚑ This is logged: “Rob revealed … from ‘Who pays the ferryman?’”. It can be corrected, not taken back from those who read it.</p>
+    <div class="row"><button class="btn" value="reveal">Reveal to everyone</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  document.getElementById('form-reveal').addEventListener('submit', function () {
+    var full = document.getElementById('reveal-level').value === 'revealed';
+    var lvl = document.getElementById('t1-level');
+    if (full) lvl.innerHTML = '<span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span><b>Revealed</b></span><small>Public from battle 6.</small>';
+    document.querySelector('#t1 .log').textContent = 'Last: Rob revealed a note in Battle 6 · aftermath · just now';
+    window.mockToast('Revealed as a public note in Battle 6 · aftermath.');
+  });
+})();
+</script>
+</body>
+</html>
