@@ -45,8 +45,9 @@ changing anything structural.
   while working).
 - App: `npm run dev -w app` (campaign) or `npm run dev:quickbuild -w app`;
   `npm run build -w app` (both flavours into `app/dist/`), then
-  `npm run size -w app` and `npm run e2e -w app` (Playwright at 360 px; in a
-  cloud session set `CHROMIUM_PATH=/opt/pw-browsers/chromium`). Screenshots
+  `npm run size -w app` and `npm run e2e -w app` (Playwright at 360 px, also
+  the legacy app with the real saves; in a cloud session set
+  `CHROMIUM_PATH=/opt/pw-browsers/chromium`). Screenshots
   land in `app/test-results/screens/` — look at them.
   `npm run icons -w app` redraws the PNG icons from `app/public/icon.svg`.
 - Legacy only: `node test/run.mjs` (rebuilds `dist/`, runs every legacy test

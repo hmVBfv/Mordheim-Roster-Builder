@@ -68,7 +68,8 @@
     background:radial-gradient(var(--blood-br),var(--blood));opacity:.14}
   /* Layout */
   .builder{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
-  @media(max-width:900px){.builder{grid-template-columns:1fr}}
+  .builder>*{min-width:0}
+  @media(max-width:900px){.builder{grid-template-columns:minmax(0,1fr)}}
   .panel{background:var(--parch);border:1px solid var(--parch-edge);border-radius:4px;
     box-shadow:0 6px 16px var(--shadow), inset 0 0 40px rgba(120,90,40,.12);padding:18px 20px}
   .sidebar{position:sticky;top:14px}
@@ -619,6 +620,20 @@
 
   .ulg{color:#7a6a4a;font-size:11.5px;font-variant-numeric:tabular-nums;flex-shrink:0;margin-left:auto;margin-right:8px}
   .ulrow.ultot{border-top:2px solid var(--parch-edge);margin-top:4px;padding-top:4px;border-left-color:transparent}
+  /* Phones: nothing may be wider than the screen (last in the sheet, so it
+     wins over the rules above). At 360 px the page scrolled sideways by
+     180 px: a 1fr column grows to its widest content, and the
+     recruit rows, stat tables, the Fallen and the spell lore were wider. */
+  @media(max-width:560px){
+    .addrow{grid-template-columns:auto auto minmax(0,1fr) minmax(96px,auto)}
+    .addrow .nm{grid-column:1/-1}
+    table.stats{table-layout:fixed}
+    table.stats th,table.stats td{padding:3px 1px;font-size:13px}
+    .fallen-tbl th,.fallen-tbl td{padding:3px 4px;overflow-wrap:anywhere}
+    .lore-tbl{table-layout:fixed}
+    .lore-tbl td{overflow-wrap:anywhere}
+    .lore-tbl td.lore-n{white-space:normal}
+  }
 </style>
 </head>
 <body>
