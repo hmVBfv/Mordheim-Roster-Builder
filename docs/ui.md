@@ -30,6 +30,10 @@ unverändert auf Pages.
    und die Texte, die Spieler selbst schreiben.
 8. **Nie neu laden ohne Zustimmung.** Updates kommen als Banner
    („New version – reload“), nie automatisch, erst recht nicht am Spielabend.
+9. **Zurück schließt, was zuletzt aufging.** Die Zurück-Taste (Handy-Taste,
+   Geste, Browser) schließt einen offenen Bereich, statt den Bildschirm oder
+   die App zu verlassen; wer einen Bereich anders schließt, hinterlässt keinen
+   Schritt im Verlauf (`app/src/ui/useSheet.ts`).
 
 ## 2. Navigation
 
@@ -134,4 +138,5 @@ Diese Liste steht auch in `CLAUDE.md`.
 - [ ] Synchronisationsstand sichtbar, Offline-Fall bedacht
 - [ ] Beide Themes geprüft
 - [ ] Kein `dangerouslySetInnerHTML`, keine Inline-Handler im HTML
+- [ ] Zurück schließt offene Bereiche, ohne die App zu verlassen
 - [ ] Playwright-Screenshot des Bildschirms aktualisiert und angesehen

@@ -160,6 +160,7 @@ changing anything structural.
 - [ ] touch targets ≥ 44 px
 - [ ] visibility shown wherever content might not be public
 - [ ] sync state visible; offline case handled
+- [ ] Back closes an open sheet and never leaves the app (`useSheet`)
 - [ ] both themes checked
 - [ ] Playwright screenshot updated and looked at
 

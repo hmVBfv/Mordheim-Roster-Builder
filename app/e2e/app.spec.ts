@@ -72,6 +72,37 @@ for (const theme of THEMES) {
   });
 }
 
+/* Back closes a sheet instead of leaving the app (Rob, 28.09.2026). */
+test('Back closes the import sheet and stays on the screen', async ({ page }) => {
+  await page.goto('./');
+  const home = page.url();
+  await page.getByRole('link', { name: 'Warbands' }).click();
+  const here = page.url();
+  await page.getByRole('button', { name: 'Import a warband' }).first().click();
+  await expect(page.locator('dialog[open]')).toHaveCount(1);
+  await page.goBack();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  expect(page.url()).toBe(here);
+  // Cancel leaves no step behind: one Back returns to Home
+  await page.getByRole('button', { name: 'Import a warband' }).first().click();
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  await page.waitForFunction(() => !(history.state as { mordheimSheet?: boolean } | null)?.mordheimSheet);
+  await page.goBack();
+  await expect(page).toHaveURL(home);
+  await expect(page.getByRole('heading', { name: 'Your warbands' })).toBeVisible();
+});
+
+test('after an import, Back returns to where the import began, not to the sheet', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Warbands' }).click();
+  const list = page.url();
+  await importSample(page);
+  await page.goBack();
+  expect(page.url()).toBe(list);
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+});
+
 test('the navigation fits the flavour', async ({ page }) => {
   await page.goto('./');
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();
