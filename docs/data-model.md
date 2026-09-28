@@ -193,7 +193,9 @@ Ständen:
 - **Erklärungen:** Das Briefing zählt fehlende Erklärungen für die Arten, aus
   denen eine Geschichte besteht (`STORY_KINDS`: neu, gefallen, gegangen,
   befördert, Werte, Fertigkeiten, Zauber, Verletzungen, erworbene Rare Items,
-  Anheuern, Bezirke) – nicht für Erfahrung, Einkäufe oder Summen.
+  Anheuern, Bezirke) – nicht für Erfahrung, Einkäufe oder Summen. Dass
+  Erfahrung keine Erklärung braucht, hat Rob am 28.09.2026 bestätigt: In
+  vielen Szenarien gibt schon das Ausschalten eines Gegners einen Punkt.
 - Die Datensätze werden beim Markieren eingefroren. Die Rohversionen bleiben
   erhalten, sodass sich ein Vergleich jederzeit nachrechnen und mit dem
   eingefrorenen Stand abgleichen lässt.

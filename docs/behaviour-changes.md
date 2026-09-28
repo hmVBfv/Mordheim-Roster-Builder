@@ -1,6 +1,6 @@
 # Verhaltensänderungen gegenüber der alten App
 
-Stand: 27. September 2026
+Stand: 28. September 2026
 
 `core/` bildet die alte App zunächst 1:1 nach; die Paritätstests beweisen das.
 Dieses Dokument ist das Register für alles, was davon **bewusst abweicht** –
@@ -62,5 +62,132 @@ geplant.
 
 | Nr. | Was | Warum / Quelle | Entscheidung | Status |
 | --- | --- | --- | --- | --- |
-| V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | offen – Rob; auch, ob es schon in der alten App behoben werden soll | Vorschlag |
-| V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | offen – Rob | Vorschlag |
+| V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | geplant, Spezifikation [unten](#v1--ablauf-einer-verletzung) |
+| V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | geplant, Spezifikation [unten](#v2--feste-ids-für-gefallene) |
+| V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. | offen – Rob: RAW (Vorgabe) oder RAI als Hausregel? | Frage |
+
+Zur Erklärungspflicht: Erfahrung braucht keine Erklärung (Rob, 28.09.2026) –
+in vielen Szenarien bekommt ein Held schon fürs Ausschalten eines Gegners einen
+Punkt. `experience` steht deshalb bewusst nicht in `STORY_KINDS`.
+
+### Reihenfolge
+
+V1 und V2 kommen nach Schritt 1d: Solange die Legacy-Tests gegen `core/` laufen
+sollen, muss `core/` sich noch wie die alte App verhalten. Danach wird jede
+Änderung einzeln eingebaut – Test zuerst, dann `core/`, dazu eine benannte
+Ausnahme in den Paritätstests (`walk.ts`, `injuries.parity.test.ts`) und in der
+Liste der Legacy-Tests, die bewusst anders ausgehen.
+
+## V1 – Ablauf einer Verletzung
+
+Quellen, in der Rangfolge aus `CLAUDE.md`: Ultimate FAQ (UFAQ) 10.2, 10.3,
+11.1, 19 und die Errata zu Empire in Flames; FAQ von Tuomas („Augur Blind in
+one Eye“); mordheimer.net, *Campaigns – Serious Injuries*; Regelbuch S. 80–81
+(Tabelle) und S. 107 (Hired Swords); Bezirkseffekte aus der Kampagnenkarte
+(`data/campaign.json`). Die Wirkungen der Ergebnisse selbst stehen schon so in
+`data/injuries.json`; neu ist, dass beide Eingänge denselben Ablauf nehmen und
+die Folgeentscheidungen ausdrücklich abgefragt werden.
+
+### Grundsätze
+
+1. **Ein Ablauf, zwei Eingänge.** Der Wurf in der Verlustliste und „+ Injury“
+   an der Einheitenkarte rufen dieselbe Aktion in `core/` auf. Gibt es für den
+   Krieger einen offenen Verlusteintrag, schließt jeder Eingang ihn ab;
+   „+ Injury“ ohne Verlusteintrag bleibt möglich (Nachtrag von Hand).
+2. **Folgeentscheidungen sind Argumente.** Jeder Nachwurf und jede Wahl steht
+   in der Tabelle unten; die Oberfläche fragt sie ab, bevor sie die Aktion
+   ruft, und bietet wahlweise „würfeln“ (Zufall aus der Oberfläche, `core/`
+   würfelt nie) oder „Ergebnis eintragen“.
+3. **Alles landet im Verlusteintrag.** Ergebnis, Nachwürfe und Teilergebnisse
+   (Multiple Injuries, Grubenkampf) stehen im Eintrag, damit Chronik, Briefing
+   und Änderungsabgleich sie als Beleg finden.
+4. **Bleibendes und Vorübergehendes getrennt.** Bleibende Folgen kommen in
+   `inj` (Profil, Fähigkeiten, Karte, Exporte); verpasste Spiele in `miss`
+   mit Grund; Einmaliges (Gold, Erfahrung, verlorene Ausrüstung) als Ereignis
+   in der Chronik.
+5. **Wer würfelt:** Nur wer am Ende der Schlacht außer Gefecht ist. Geflohene
+   würfeln nicht (UFAQ 10.2). Henchmen, Hired Swords (S. 107) und der
+   Leibwächter des Merchant (UFAQ 19) würfeln W6: 1–2 tot, 3–6 in Ordnung.
+6. **Erfahrung fürs Überleben** bekommt auch, wer verwundet überlebt
+   (UFAQ 11.1, 10.3); das regelt weiter `awardBattleXp`, der
+   Verletzungsablauf ändert daran nichts.
+7. **Bezirke** wirken nur, wenn die Warband des Verwundeten den Bezirk in der
+   verlangten Stufe hält (Foothold oder Kontrolle, wie in den Daten).
+
+### Heroes' Serious Injuries (D66)
+
+| Ergebnis | Folgeentscheidung | Wirkung | Heute abweichend |
+| --- | --- | --- | --- |
+| 11–15 Dead | Temple of Morr (Foothold): W6, bei 5+ stattdessen 41–55 | Krieger fällt, alle Ausrüstung verloren (UFAQ 10.2) | Bezirk wird nicht angeboten |
+| 16–21 Multiple Injuries | W6 = Anzahl weiterer Ergebnisse; jedes davon mit eigenem Ablauf; Dead, Captured und Multiple Injuries werden neu gewürfelt, sind also nicht wählbar | Summe der Teilergebnisse; der Eintrag listet sie | heute nur Hinweistext |
+| 22 Leg Wound | Temple of Sigmar (Foothold, gilt für 22–35): W6, bei 5+ 41–55. Pirat mit Peg Leg: W6, bei 4+ ignoriert | M −1 | Bezirk, Peg Leg fehlen |
+| 23 Arm Wound | W6: 1 = Arm amputiert, 2–6 = verpasst das nächste Spiel | 1: bleibend „nur eine einhändige Waffe“; 2–6: `miss` +1 | heute zwei getrennte Einträge 23a/23b statt Nachwurf |
+| 24 Madness | W6: 1–3 Stupidity, 4–6 Frenzy | bleibend, als Fähigkeit sichtbar | wie 23 |
+| 25 Smashed Leg | W6: 1 = kann nicht mehr rennen (aber angreifen), 2–6 = verpasst das nächste Spiel; Peg Leg wie bei 22 | wie 23 | wie 23 |
+| 26 Chest Wound | – | T −1 | – |
+| 31 Blinded in one eye | Hat er schon 31: muss die Warband verlassen (siehe Vorschläge) | BS −1 | zweites Auge nicht erkannt |
+| 32 Old Battle Wound | – | bleibend; vor jeder Schlacht W6, bei 1 kämpft er nicht (Erinnerung im Spielabend-Modus) | – |
+| 33 Nervous Condition | – | I −1 | – |
+| 34 Hand Injury | – | WS −1 | – |
+| 35 Deep Wound | W3 | verpasst so viele Spiele (`miss`), kein bleibender Eintrag | über die Verlustliste heute bleibend und ohne `miss` |
+| 36 Robbed | – | alle Waffen, Rüstung und Ausrüstung verloren, ohne Erstattung | über die Verlustliste heute ohne Verlust; über „+ Injury“ nur nach Rückfrage |
+| 41–55 Full Recovery | – | nichts | – |
+| 56 Bitter Enmity | W6: 1–3 der Verursacher (war es ein Henchman: dessen Anführer), 4 Anführer seiner Warband, 5 seine ganze Warband, 6 alle Warbands dieser Art | bleibend „Hatred“ mit Ziel; das Ziel kommt aus dem Verlusteintrag (Angreifer) | Ziel wird nicht festgehalten |
+| 61 Captured | The Gaol (Kontrolle): wird 41–55. Sonst: ausgetauscht / freigekauft (Preis) / an Sklavenhändler verkauft / von Untoten getötet (wird Zombie) / von Besessenen geopfert | Austausch oder Lösegeld: kommt mit aller Ausrüstung zurück, Lösegeld aus der Truhe. Sonst verloren, Ausrüstung bleibt beim Fänger | über die Verlustliste heute ohne Rückfrage; Bezirk fehlt |
+| 62–63 Hardened | – | bleibend: immun gegen Angst | – |
+| 64 Horrible Scars | – | bleibend: verursacht Angst | – |
+| 65 Sold to the Pits | Amphitheatre (Foothold): gewonnen. Sonst: gewonnen oder verloren; verloren → D66 nur 11–35, mit eigenem Ablauf | gewonnen: +50 gc, +2 Erfahrung, behält alles. Verloren und nicht tot: verliert Waffen und Rüstung | über die Verlustliste heute ohne Rückfrage; Nachwurf nur als Hinweis |
+| 66 Survives Against the Odds | – | +1 Erfahrung | über die Verlustliste heute ohne Erfahrung |
+
+Neue Erfahrung aus 65 und 66 erscheint im Änderungsabgleich als `experience`
+mit dem Verlusteintrag als Beleg.
+
+### Die Gegenseite: wenn wir einen Helden gefangen nehmen
+
+Ist das Opfer eines Verlusteintrags nicht unser Krieger und lautet das
+Ergebnis 61, fragt der Ablauf, was unsere Warband mit dem Gefangenen tut
+(Regeltext 61, UFAQ-Errata Empire in Flames „Tainted“):
+
+| Wahl | Wirkung bei uns |
+| --- | --- |
+| an Sklavenhändler verkaufen | +W6×5 gc in die Truhe; seine Ausrüstung kommt in die Truhe |
+| Lösegeld | vereinbarter Betrag in die Truhe |
+| Austausch | gegen einen unserer Gefangenen (schließt dessen Eintrag) |
+| töten, neuer Zombie (nur Untote) | ein Zombie mehr im Roster; Ausrüstung in die Truhe |
+| opfern (nur Possessed und Carnival of Chaos) | unser Anführer +1 Erfahrung; Ausrüstung in die Truhe |
+
+Der Gefangene zählt nicht als unser Krieger: Er erhöht weder Rating noch
+Warbandgröße.
+
+### Vorschläge, die über den Regeltext hinausgehen – Rob entscheidet
+
+- **Gefangen als Zustand.** Die Regel kennt Gefangene, die gehalten und später
+  getauscht werden. Vorschlag: Ein Gefangener bleibt im Roster, markiert als
+  „gefangen von …“, kämpft nicht und zählt wie ein Krieger, der ein Spiel
+  aussetzt (UFAQ 19: zählt fürs Rating, nicht für den Rout-Test), bis Austausch,
+  Lösegeld oder Verlust eingetragen sind. Die alte App kennt nur „kommt zurück“
+  oder „verloren“.
+- **Zweites Auge.** „Must retire from the warband“ sagt nichts über die
+  Ausrüstung. Vorschlag nach Tuomas (Entlassen im Post-Battle: vorher darf
+  die Ausrüstung in die Truhe): Er verlässt die Warband, seine Ausrüstung geht
+  in die Truhe; in `fallen` als „ausgeschieden“, nicht als „gefallen“.
+- **Robbed nicht als bleibende Verletzung.** Die alte App führt Robbed in
+  `inj`; es hat aber keine dauerhafte Wirkung. Vorschlag: nur Ereignis in der
+  Chronik.
+- **Man-catcher** (Border Town Burning, 1c): Wer damit außer Gefecht geht,
+  würfelt nicht, sondern ist gefangen, sofern der Gegner eine Engine of Chaos
+  hat. Vorschlag: als Wahl „gefangen durch Man-catcher“ im Verlustformular,
+  sobald jemand diese Warband spielt.
+
+## V2 – Feste IDs für Gefallene
+
+- Jeder Eintrag in `fallen` bekommt eine `id` aus derselben Folge wie Chronik,
+  Schlachten, Verluste und Erfahrung (`campaign.logSeq`).
+- Ein Verlusteintrag verweist mit einem neuen Schlüssel `fallenRef` auf diese
+  `id`. `fallenId` (Position) bleibt erhalten und wird beim Schreiben aus
+  `fallenRef` berechnet, damit die alte App solche Stände weiter richtig liest
+  (kein Schlüssel wird umbenannt oder entfernt, `test/compat.mjs`).
+- Migration auf `FORMAT` 2: vorhandene Gefallene bekommen IDs in ihrer
+  Reihenfolge, Verlusteinträge ihr `fallenRef` aus der bisherigen Position.
+- Test zuerst: Gefallenen-Eintrag löschen, danach zeigt ein späterer
+  Verlusteintrag weiter auf den richtigen Krieger.
