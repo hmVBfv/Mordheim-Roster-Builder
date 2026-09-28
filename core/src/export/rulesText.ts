@@ -11,6 +11,7 @@ import type { Ctx } from '../rules/context.ts';
 import { daggerNameFor, inlineUpgradeActive } from '../rules/equipment.ts';
 import { eqListFor, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
 import { hsSpecialSkills, isMarauderChief, isMarauderSeer } from '../rules/profile.ts';
+import { keyedInfo, skillKey } from '../rules/abilities.ts';
 
 /** English name of an item (German key, with or without the free-dagger mark). */
 export function enItem(data: GameData, name: string): string {
@@ -102,9 +103,10 @@ export function spellInfo(data: GameData, nm: string): ItemInfo | null {
     then a skill from the curated lists, then the ability patterns, then a
     spell. The skill comes before the patterns because they match loosely:
     the Shooting skill "Nimble" showed the Barbary Monkey's rule, and "Skink
-    Hunter" or "Wyrdstone Hunter" showed the Hunter skill. */
+    Hunter" or "Wyrdstone Hunter" showed the Hunter skill. A chip's key
+    ("abil|…", "skill|…") says exactly whose rule it is and comes first. */
 export function tooltipInfo(data: GameData, nm: string): ItemInfo | null {
-  return itemInfo(data, nm) || skillInfo(data, nm) || abilityInfo(data, nm) || spellInfo(data, nm);
+  return keyedInfo(data, nm) || itemInfo(data, nm) || skillInfo(data, nm) || abilityInfo(data, nm) || spellInfo(data, nm);
 }
 
 export function ruleNameEN(data: GameData, name: string): string {
@@ -130,6 +132,12 @@ export function enRules(data: GameData, sp: string | null | undefined): string[]
 export function hsSpecialText(e: HireEntry | null | undefined, nm: string): string {
   const f = hsSpecialSkills(e).find((x) => x[0] === nm);
   return f ? f[1] : '';
+}
+
+/** The text of a skill a warrior has, from his own lists first. */
+export function skillTextFor(ctx: Ctx, m: Model, nm: string): string {
+  const i = keyedInfo(ctx.data, skillKey(ctx.data, ctx.s.wb, unitDef(ctx, m.uid_def), nm));
+  return i ? i.text : skillText(ctx.data, nm);
 }
 
 /** The text of a skill (a Hired Sword's own version first). */

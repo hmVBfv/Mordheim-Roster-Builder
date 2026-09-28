@@ -8,7 +8,7 @@ import { hsChosenEq, hsEqParts, hsEquipOn, hsPersona } from '../rules/hire.ts';
 import { spellLabel, unitDef } from '../rules/lookup.ts';
 import { aDisp, casterLore, effProfile, hsEffProfile, spellEffDiff, spellEffect } from '../rules/profile.ts';
 import { svOfEntry, svOfModel } from '../rules/saves.ts';
-import { attachedBlocks, enRules, eqDisplayParts, markRulesFor, rareDisplayParts, skillInfo } from './rulesText.ts';
+import { attachedBlocks, enRules, eqDisplayParts, markRulesFor, rareDisplayParts, skillTextFor } from './rulesText.ts';
 
 const STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
 /** Heroes (and hired characters) in a darker gold than the rank and file. */
@@ -54,7 +54,7 @@ export function ttsText(ctx: Ctx, m: Model): string {
     + '   Sv ' + ttsSv(svOfModel(ctx, m))) : '';
   const rules = enRules(ctx.data, def?.sp);
   markRulesFor(ctx, m).forEach((x) => rules.push(x[0] + ': ' + x[1]));
-  (m.skills || []).forEach((sk) => { const d = skillInfo(ctx.data, sk); const t = d && d.text; rules.push(t ? `${sk}: ${t}` : sk); });
+  (m.skills || []).forEach((sk) => { const t = skillTextFor(ctx, m, sk); rules.push(t ? `${sk}: ${t}` : sk); });
   (m.inj || []).forEach((j) => rules.push((ctx.data.INJEN[j.code as string] || j.name) as string));
   const rulesTxt = rules.length ? rules.map((r) => '• ' + r).join('\n') : 'None';
   const eq = eqDisplayParts(ctx, m).concat(rareDisplayParts(ctx, m));

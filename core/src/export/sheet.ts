@@ -14,7 +14,7 @@ import { isHeroModel, totalLarge, totalModels, totalRating } from '../rules/cost
 import { eqListFor, spellLabel, unitDef } from '../rules/lookup.ts';
 import { aDisp, effProfile, isLeaderModel, maxInfo } from '../rules/profile.ts';
 import { svLabel, svOfEntry, svOfModel } from '../rules/saves.ts';
-import { enItem, enRules, eqDisplayParts, houseDeviations, markRulesFor, skillText } from './rulesText.ts';
+import { enItem, enRules, eqDisplayParts, houseDeviations, markRulesFor, skillText, skillTextFor } from './rulesText.ts';
 import { leaderRuleText } from '../rules/abilities.ts';
 import { safeName } from './text.ts';
 
@@ -197,7 +197,7 @@ export async function buildOfficialSheet(ctx: Ctx, PDFLib: PdfLib, template: Uin
       const mk = markRulesFor(ctx, m);
       mk.forEach((x) => NOTES.set(x[0], x[1]));
       const sp = [...(isLeader ? ['Leader'] : []), ...mk.map((x) => x[0]), ...(m.skills || []), ...((m.spells || []).map((x) => spellLabel(x.name)))];
-      sp.forEach((nm) => { const t = skillText(ctx.data, nm); if (t) NOTES.set(nm, t); });
+      sp.forEach((nm) => { const t = skillTextFor(ctx, m, nm); if (t) NOTES.set(nm, t); });
       if (isLeader) NOTES.set('Leader', leaderRuleText());
       wrap(pg, f, sp.join(', '), 400, T + 16, 172, 6, 7, 5);
       txt(pg, fb, m.exp || 0, 546, T + 90, 10, { center: true });
@@ -252,7 +252,7 @@ export async function buildOfficialSheet(ctx: Ctx, PDFLib: PdfLib, template: Uin
       if (mi && mi.prof && !def?.vehicle) stats(pg, f, mi.prof as Record<string, unknown>, T + 60, 6.5);
       wrap(pg, f, eqPerModel(m).join(', '), 222, T + 15, 170, 5.5, 6.5, 4);
       const rules = enRules(ctx.data, def?.sp).map((r) => r.split(':')[0]);
-      (m.skills || []).forEach((nm) => { const t = skillText(ctx.data, nm); if (t) NOTES.set(nm, t); });
+      (m.skills || []).forEach((nm) => { const t = skillTextFor(ctx, m, nm); if (t) NOTES.set(nm, t); });
       wrap(pg, f, [...(m.skills || []), ...rules].filter(Boolean).join(', '), 400, T + 15, 172, 6, 7, 6);
       txt(pg, fb, m.exp || 0, 487, T + 62, 9);
       xpBoxes(pg, m.exp || 0, T, SHEET.henXP, [SHEET.henXP.top]);

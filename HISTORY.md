@@ -1386,3 +1386,26 @@ idempotent, so the suite's first check is simply that cleaning a committed
 file changes nothing — a file that slipped in raw fails the build. Two
 invented saves, built with core and written by the legacy app, keep the
 suite honest until the real ones arrive.
+
+## September 28, 2026 — the rule this warrior has
+
+Rob asked whether the units' abilities were right, adding that the tool
+often showed different abilities under the same name. A comparison of all
+49 warbands with mordheimer.net found the units themselves mostly correct,
+and the fault in the tool: every tooltip was looked up by its bare name, and
+the first entry of that name won. A Skaven's Infiltration showed the Cursed
+Cavalcade's text, a Beastman Chief's Bellowing Roar the Ogre version,
+"Swashbuckler" the Buckler, because items were searched before skills. The
+ability chips came from patterns run over a unit's rules text, so a Cleric
+got the Hunter skill from the words "Witch-Hunter's", and Bretonnian Knights
+were shown the All Alone test they are exempt from.
+
+A chip now carries a key that says whose rule it is. Its tooltip takes the
+unit's or warband's own definition first, then a skill of that name from the
+unit's own lists, then the general entry; rules that belong to one unit only
+appear where they are defined or explicitly allowed. The first attempt
+treated only "not" as a denial, as the old comment in app.js insisted
+("immune to X is a rule ABOUT X worth showing"); the audit showed that this
+is exactly what misled players, so "immune to", "never has to" and "no …
+test" deny as well. Before and after over every unit of every warband: 22
+chips disappear, all of them false, and none are gained.

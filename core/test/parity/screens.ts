@@ -64,17 +64,20 @@ function coreAddMenu(ctx: Ctx): unknown[] {
   return out;
 }
 
-/* The abilities panel: the chips and the special skill lists. */
+/* The abilities panel: the chips (by the key their tooltip is looked up
+   by), the chips of learned skills, and the special skill lists. */
 export function parseAbilities(html: string): unknown {
+  const keys = (s: string) => [...s.matchAll(/toggleItip\(event,this,'((?:[^'\\]|\\.)*)'\)">/g)].map((m) => (m[1] as string).replace(/\\'/g, "'"));
   const kw = html.match(/<div class="abil-kw no-print">([\s\S]*?)<\/div>/);
-  const chips = kw && !/kwlbl/.test(kw[1] as string) ? [...(kw[1] as string).matchAll(/toggleItip\(event,this,'((?:[^'\\]|\\.)*)'\)">/g)].map((m) => (m[1] as string).replace(/\\'/g, "'")) : [];
+  const chips = kw && !/kwlbl/.test(kw[1] as string) ? keys(kw[1] as string) : [];
+  const sk = html.match(/<div class="abil-kw no-print"><span class="kwlbl">Skills:<\/span>([\s\S]*?)<\/div>/);
   const sets = html.match(/<b>Special skill lists?:<\/b> ([^<]*)\./);
-  return { chips, sets: sets ? (sets[1] as string).split(', ') : [] };
+  return { chips, skills: sk ? keys(sk[1] as string) : [], sets: sets ? (sets[1] as string).split(', ') : [] };
 }
 
 export function coreAbilities(ctx: Ctx, m: WarbandState['models'][number] | null, def = core.unitDef(ctx, m?.uid_def ?? '')!): unknown {
   const a = core.modelAbilities(ctx, def, m);
-  return { chips: a.abilities.map((x) => x.name), sets: a.isHero ? a.skillSets.map((x) => x.name) : [] };
+  return { chips: a.abilities.map((x) => x.key), skills: a.skillKeys, sets: a.isHero ? a.skillSets.map((x) => x.name) : [] };
 }
 
 /* The warband picker (legacy warbandOptions): its groups and entries. */

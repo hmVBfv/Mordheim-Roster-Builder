@@ -58,6 +58,22 @@ describe('list helpers', () => {
     for (const nm of names) expect(coreTip(data, nm), nm).toEqual(parseTip(L.info.itipBuild(nm)));
   });
 
+  it('a chip\'s tooltip shows the same rule for every unit and every skill it can learn', () => {
+    const keys = new Set<string>(['abil|nope|x|0', 'abil|merc|capt|99999', 'skill|nope|Sprint', 'abil|hs|nope||0']);
+    for (const [wb, W] of Object.entries(data.WARBANDS)) {
+      const ctx = core.ctxOf(data, core.newWarband(data, wb));
+      for (const def of W.units) {
+        const a = core.modelAbilities(ctx, def, null);
+        for (const c of a.abilities) keys.add(c.key);
+        data.ABILITYINFO.forEach((_e, i) => keys.add(`abil|${wb}|${def.id}|${i}`));
+        for (const l of core.unitSkillLists(data, wb, def)) for (const [nm] of (data.SKILLSETS[l] || data.SKILLLISTS[l])!.skills) keys.add(core.skillKey(data, wb, def, nm));
+      }
+    }
+    for (const k of Object.keys(data.HIREDSWORDS)) data.ABILITYINFO.forEach((_e, i) => keys.add(`abil|hs|${k}||${i}`));
+    for (const k of Object.keys(data.DRAMATIS)) data.ABILITYINFO.forEach((_e, i) => keys.add(`abil|dp|${k}||${i}`));
+    for (const k of keys) expect(coreTip(data, k), k).toEqual(parseTip(L.info.itipBuild(k)));
+  });
+
   it('the Hired Sword filters agree on random filters', () => {
     const r = rng(11);
     const entries: HireEntry[] = [...Object.values(data.HIREDSWORDS), ...Object.values(data.DRAMATIS)];
