@@ -32,7 +32,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `format` | ja | Formatnummer: fehlt = 0 (alte App), 1 = `core/` (Stand jetzt); `core/format` migriert ältere Stände beim Laden |
 | `appVersion` | ja | App-Version (Commit), die den Stand erzeugt hat |
 | `canon` | ja | `{ name_de, name_en }` der Warband (z. B. *Die Silberne Karavane* / *The Ardent Caravan*) |
-| `uidSeq` | ja | nächste freie Krieger-`uid`; verhindert, dass eine `uid` nach Entfernen oder Tod wiederverwendet wird (setzt `normalizeState` beim Laden) |
+| `uidSeq` | ja | nächste freie Krieger-`uid`; verhindert, dass eine `uid` nach Entfernen oder Tod wiederverwendet wird. Fehlt er oder läge er nicht hinter jeder vergebenen `uid` (Gefallene eingeschlossen), setzt `normalizeState` ihn hinter die höchste |
 | `campaign.logSeq` | ja | zuletzt vergebene ID der Chronik; Log, Schlachten, Verluste und Erfahrungseinträge teilen sich diese Folge |
 | `story` | ja | `{ prologue, interludes: { [round]: text }, explain: { [changeKey]: text } }` |
 | `models[].profile` | ja | `{ name_de, name_en, title_de, title_en, voice, origin, text }` |

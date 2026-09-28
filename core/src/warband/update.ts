@@ -31,11 +31,13 @@ function knownUids(d: WarbandDraft | WarbandState): number[] {
 }
 
 /** Makes the state remember its uid counter, so a uid freed by a removal is
-    never handed out again. A save without it continues after the highest uid
-    in use, as legacy resyncUid() did on load. */
+    never handed out again. A counter is kept as long as it is past every uid
+    in use (a fresh legacy session started at 1); a save without one, or with
+    one that would collide, continues after the highest uid in use, as legacy
+    resyncUid() did on load. */
 export function rememberUids(d: WarbandDraft): void {
-  const floor = Math.max(1, ...knownUids(d)) + 1;
-  if (!(Number(d.uidSeq) >= floor)) d.uidSeq = floor;
+  const top = Math.max(0, ...knownUids(d));
+  if (!(Number(d.uidSeq) > top)) d.uidSeq = Math.max(1, top) + 1;
 }
 
 /** Next model uid; never reuses one. */
