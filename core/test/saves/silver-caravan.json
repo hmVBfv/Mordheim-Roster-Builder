@@ -1,0 +1,429 @@
+{
+ "wb": "caravans",
+ "subtype": null,
+ "name": "Die Silberne Karavane",
+ "budget": 600,
+ "models": [
+  {
+   "uid": 3,
+   "uid_def": "merchant",
+   "name": "Robba van Dorp",
+   "exp": 28,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Pistole": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "T": 1
+   },
+   "skills": [
+    "Dubious Income"
+   ],
+   "inj": [
+    {
+     "code": "36",
+     "name": "Robbed",
+     "text": "All weapons, armour and equipment lost.",
+     "mod": null
+    }
+   ],
+   "spells": [],
+   "miss": 0,
+   "_injOpen": false,
+   "_advOpen": true
+  },
+  {
+   "uid": 4,
+   "uid_def": "apprentice",
+   "name": "Ottilie Reinhardt",
+   "exp": 10,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 2
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "Ld": 1
+   },
+   "skills": [
+    "Haggle",
+    "Wyrdstone Hunter"
+   ],
+   "inj": [],
+   "spells": [],
+   "_advOpen": true,
+   "_injOpen": true,
+   "_rareOpen": false,
+   "_noDagger": false
+  },
+  {
+   "uid": 7,
+   "uid_def": "magician",
+   "name": "Magister Julius Broun",
+   "exp": 15,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 2
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "A": 2
+   },
+   "skills": [],
+   "inj": [
+    {
+     "code": "34",
+     "name": "Hand Injury",
+     "text": "Weapon Skill permanently −1.",
+     "mod": {
+      "WS": -1
+     }
+    }
+   ],
+   "spells": [
+    {
+     "name": "Silver Arrows of Arha (7)",
+     "red": 0
+    }
+   ],
+   "_spOpen": true,
+   "_advOpen": true,
+   "_noDagger": false,
+   "_injOpen": true
+  },
+  {
+   "uid": 8,
+   "uid_def": "wagon",
+   "name": "Trade Wagon",
+   "exp": 0,
+   "qty": 1,
+   "eq": {},
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": []
+  },
+  {
+   "uid": 13,
+   "uid_def": "sellsword",
+   "name": "Sell-sword",
+   "exp": 5,
+   "qty": 3,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Hammer": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "I": 1,
+    "A": 1
+   },
+   "skills": [],
+   "inj": [],
+   "spells": [],
+   "_advOpen": true,
+   "xpPaid": 8
+  },
+  {
+   "uid": 15,
+   "uid_def": "knight",
+   "name": "Sir Olvir von der Krunkmark",
+   "exp": 10,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Rapier": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": [],
+   "_injOpen": true,
+   "miss": 0
+  },
+  {
+   "uid": 16,
+   "uid_def": "blackguard",
+   "name": "Blackguard",
+   "exp": 2,
+   "qty": 3,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Zweihandwaffe": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "I": 1
+   },
+   "skills": [],
+   "inj": [],
+   "spells": [],
+   "_advOpen": true
+  },
+  {
+   "uid": 6,
+   "uid_def": "knight",
+   "name": "Sir Honnung von Hoiser",
+   "exp": 14,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Rapier": 1,
+    "Helm": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [
+    "Resilient",
+    "Mighty Blow"
+   ],
+   "inj": [
+    {
+     "code": "62-63",
+     "name": "Hardened",
+     "text": "Immune to fear from now on.",
+     "mod": null
+    }
+   ],
+   "spells": [],
+   "_injOpen": false,
+   "_advOpen": true,
+   "miss": 0
+  },
+  {
+   "uid": 17,
+   "uid_def": "marksman",
+   "name": "Marksman",
+   "exp": 0,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Armbrust": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": []
+  }
+ ],
+ "hired": [],
+ "dp": [],
+ "leaderUid": null,
+ "campaign": {
+  "on": false,
+  "districts": {},
+  "round": 0,
+  "log": [],
+  "battles": []
+ },
+ "stash": {
+  "wyrd": 0,
+  "gold": 736,
+  "items": [
+   {
+    "name": "Banner",
+    "qty": 1
+   },
+   {
+    "name": "Lock Picks",
+    "qty": 1
+   },
+   {
+    "name": "Magic Gourt",
+    "qty": 1
+   },
+   {
+    "name": "Dagger",
+    "qty": 4
+   },
+   {
+    "name": "Halfling Cookbook",
+    "qty": 1
+   }
+  ]
+ },
+ "fallen": [
+  {
+   "kind": "hero",
+   "m": {
+    "uid": 5,
+    "uid_def": "knight",
+    "name": "Sir Dieter von Wurtzen",
+    "exp": 8,
+    "qty": 1,
+    "eq": {
+     "Dolch (1. gratis)": 1,
+     "Rapier": 1
+    },
+    "rare": {},
+    "mut": [],
+    "adv": {},
+    "skills": [],
+    "inj": [],
+    "spells": []
+   }
+  },
+  {
+   "kind": "hench",
+   "uid_def": "sellsword",
+   "exp": 2,
+   "m": {
+    "uid": 14,
+    "uid_def": "sellsword",
+    "name": "Sell-sword",
+    "exp": 2,
+    "qty": 1,
+    "eq": {
+     "Dolch (1. gratis)": 2
+    },
+    "rare": {},
+    "mut": [],
+    "adv": {
+     "A": 1
+    },
+    "skills": [],
+    "inj": [],
+    "spells": [],
+    "_advOpen": true
+   },
+   "lostValue": 31
+  },
+  {
+   "kind": "hench",
+   "uid_def": "sellsword",
+   "exp": 2,
+   "m": {
+    "uid": 14,
+    "uid_def": "sellsword",
+    "name": "Sell-sword",
+    "exp": 2,
+    "qty": 1,
+    "eq": {
+     "Dolch (1. gratis)": 2
+    },
+    "rare": {},
+    "mut": [],
+    "adv": {
+     "A": 1
+    },
+    "skills": [],
+    "inj": [],
+    "spells": [],
+    "_advOpen": true
+   },
+   "lostValue": 31
+  },
+  {
+   "kind": "hero",
+   "m": {
+    "uid": 10,
+    "uid_def": "marksman",
+    "name": "Schütze Markus",
+    "exp": 4,
+    "qty": 1,
+    "eq": {
+     "Armbrust": 1,
+     "Dolch (1. gratis)": 1
+    },
+    "rare": {},
+    "mut": [],
+    "adv": {
+     "I": 1
+    },
+    "skills": [
+     "Nimble"
+    ],
+    "inj": [],
+    "spells": [],
+    "_advOpen": true,
+    "promoted": true,
+    "promoCats": [
+     "shooting",
+     "speed"
+    ]
+   },
+   "lostValue": 55
+  },
+  {
+   "kind": "hench",
+   "uid_def": "sellsword",
+   "exp": 4,
+   "m": {
+    "uid": 13,
+    "uid_def": "sellsword",
+    "name": "Sell-sword",
+    "exp": 4,
+    "qty": 1,
+    "eq": {
+     "Dolch (1. gratis)": 1,
+     "Hammer": 1
+    },
+    "rare": {},
+    "mut": [],
+    "adv": {
+     "I": 1
+    },
+    "skills": [],
+    "inj": [],
+    "spells": [],
+    "_advOpen": true,
+    "xpPaid": 0
+   },
+   "lostValue": 28
+  }
+ ],
+ "house": {
+  "startGold": "",
+  "min": "",
+  "max": "",
+  "heroes": 6,
+  "priceAll": 100,
+  "priceArmour": 50,
+  "priceBP": 100,
+  "priceMissile": 100,
+  "clubSurcharge": 0,
+  "slingSurcharge": 0,
+  "armourBodyOnly": true,
+  "freeDagger": false,
+  "miscHench": false,
+  "freeMarket": false,
+  "allSkills": false,
+  "showRarity": false,
+  "rangedCapOn": false,
+  "rangedCap": 0,
+  "rerollOne": false,
+  "eqLimitOn": true,
+  "hireNewLeader": false,
+  "hsGrades": {
+   "1a": true,
+   "1b": true,
+   "1c": true,
+   "2a": true
+  },
+  "dpGrades": {
+   "core": true,
+   "1a": true,
+   "1b": true,
+   "1c": true,
+   "2a": true
+  },
+  "hsEquip": false,
+  "notes": "Notes."
+ },
+ "mark": "",
+ "goldNow": 5
+}

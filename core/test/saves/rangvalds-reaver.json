@@ -1,0 +1,330 @@
+{
+ "wb": "maraudersofchaos",
+ "subtype": "norse",
+ "name": "Rangvalds Reaver",
+ "budget": 500,
+ "models": [
+  {
+   "uid": 1,
+   "uid_def": "chieftain",
+   "name": "Rangvald the Ripper",
+   "exp": 33,
+   "qty": 1,
+   "eq": {
+    "Hammer": 1,
+    "Dolch (1. gratis)": 1,
+    "Helm": 1,
+    "Schwere Rüstung": 1
+   },
+   "rare": {
+    "Schwertbrecher": {
+     "q": 1,
+     "paid": 30
+    }
+   },
+   "mut": [],
+   "adv": {
+    "WS": 1
+   },
+   "skills": [
+    "Resilient",
+    "Step Aside"
+   ],
+   "inj": [],
+   "spells": [],
+   "_advOpen": false,
+   "_noDagger": false,
+   "_injOpen": false,
+   "_rareOpen": false
+  },
+  {
+   "uid": 2,
+   "uid_def": "seer",
+   "name": "Packmaster Styrkarr Skysplitter",
+   "exp": 17,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Barbed Whip": 1,
+    "Schwert": 1
+   },
+   "rare": {
+    "Glücksbringer": {
+     "q": 1,
+     "paid": 10
+    }
+   },
+   "mut": [],
+   "adv": {
+    "S": 1,
+    "Ld": 1
+   },
+   "skills": [
+    "Sorcery"
+   ],
+   "inj": [],
+   "spells": [
+    {
+     "name": "Dispel Magic (7)",
+     "red": 0
+    },
+    {
+     "name": "Wrath of the Great Eagle (9)",
+     "red": 0
+    }
+   ],
+   "_advOpen": false,
+   "_spOpen": false,
+   "miss": 0,
+   "_rareOpen": false,
+   "_injOpen": false
+  },
+  {
+   "uid": 3,
+   "uid_def": "champion",
+   "name": "Ulfrik the Impaler",
+   "exp": 17,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Hellebarde": 1,
+    "Barbed Whip": 1,
+    "Helm": 1,
+    "Schwere Rüstung": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [
+    "Resilient",
+    "Step Aside",
+    "Combat Master"
+   ],
+   "inj": [],
+   "spells": [],
+   "_advOpen": true
+  },
+  {
+   "uid": 4,
+   "uid_def": "champion",
+   "name": "Wulfrik Shiptaker",
+   "exp": 17,
+   "qty": 1,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Hammer": 1,
+    "Schwert": 1,
+    "Helm": 1,
+    "Schwere Rüstung": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [
+    "Resilient",
+    "Step Aside",
+    "Combat Master"
+   ],
+   "inj": [],
+   "spells": [],
+   "_advOpen": true
+  },
+  {
+   "uid": 5,
+   "uid_def": "marauder",
+   "name": "Defilers",
+   "exp": 5,
+   "qty": 4,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Schwert": 1,
+    "Hammer": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "WS": 1,
+    "A": 1
+   },
+   "skills": [],
+   "inj": [],
+   "spells": [],
+   "_advOpen": false
+  },
+  {
+   "uid": 6,
+   "uid_def": "marauder",
+   "name": "Skullsmashers",
+   "exp": 5,
+   "qty": 2,
+   "eq": {
+    "Dolch (1. gratis)": 1,
+    "Schwert": 1,
+    "Hammer": 1
+   },
+   "rare": {},
+   "mut": [],
+   "adv": {
+    "I": 1,
+    "WS": 1
+   },
+   "skills": [],
+   "inj": [],
+   "spells": [],
+   "_advOpen": false
+  },
+  {
+   "uid": 7,
+   "uid_def": "warhound",
+   "name": "Pack of the Grey Maw",
+   "exp": 0,
+   "qty": 5,
+   "eq": {},
+   "rare": {},
+   "mut": [],
+   "adv": {},
+   "skills": [],
+   "inj": [],
+   "spells": []
+  }
+ ],
+ "hired": [],
+ "dp": [],
+ "leaderUid": 1,
+ "campaign": {
+  "on": false,
+  "districts": {},
+  "round": 0,
+  "log": [],
+  "battles": []
+ },
+ "stash": {
+  "wyrd": 1,
+  "gold": 858,
+  "items": [
+   {
+    "name": "Heavy armour",
+    "qty": 1
+   }
+  ]
+ },
+ "fallen": [
+  {
+   "kind": "hench",
+   "uid_def": "warhound",
+   "exp": 0,
+   "m": {
+    "uid": 7,
+    "uid_def": "warhound",
+    "name": "Pack of the Grey Maw",
+    "exp": 0,
+    "qty": 1,
+    "eq": {},
+    "rare": {},
+    "mut": [],
+    "adv": {},
+    "skills": [],
+    "inj": [],
+    "spells": []
+   }
+  },
+  {
+   "kind": "hench",
+   "uid_def": "warhound",
+   "exp": 0,
+   "m": {
+    "uid": 7,
+    "uid_def": "warhound",
+    "name": "Pack of the Grey Maw",
+    "exp": 0,
+    "qty": 1,
+    "eq": {},
+    "rare": {},
+    "mut": [],
+    "adv": {},
+    "skills": [],
+    "inj": [],
+    "spells": []
+   }
+  },
+  {
+   "kind": "hench",
+   "uid_def": "warhound",
+   "exp": 0,
+   "m": {
+    "uid": 7,
+    "uid_def": "warhound",
+    "name": "Pack of the Grey Maw",
+    "exp": 0,
+    "qty": 1,
+    "eq": {},
+    "rare": {},
+    "mut": [],
+    "adv": {},
+    "skills": [],
+    "inj": [],
+    "spells": []
+   }
+  },
+  {
+   "kind": "hench",
+   "uid_def": "warhound",
+   "exp": 0,
+   "m": {
+    "uid": 7,
+    "uid_def": "warhound",
+    "name": "Pack of the Grey Maw",
+    "exp": 0,
+    "qty": 1,
+    "eq": {},
+    "rare": {},
+    "mut": [],
+    "adv": {},
+    "skills": [],
+    "inj": [],
+    "spells": []
+   },
+   "lostValue": 15
+  }
+ ],
+ "house": {
+  "startGold": "",
+  "min": "",
+  "max": "",
+  "heroes": 6,
+  "priceAll": 100,
+  "priceArmour": 50,
+  "priceBP": 100,
+  "priceMissile": 100,
+  "clubSurcharge": 0,
+  "slingSurcharge": 0,
+  "armourBodyOnly": true,
+  "freeDagger": false,
+  "miscHench": false,
+  "freeMarket": false,
+  "allSkills": false,
+  "showRarity": false,
+  "rangedCapOn": false,
+  "rangedCap": 0,
+  "rerollOne": false,
+  "eqLimitOn": true,
+  "hireNewLeader": false,
+  "hsGrades": {
+   "1a": true,
+   "1b": true,
+   "1c": true,
+   "2a": true
+  },
+  "dpGrades": {
+   "core": true,
+   "1a": true,
+   "1b": true,
+   "1c": true,
+   "2a": true
+  },
+  "hsEquip": false,
+  "notes": "Notes."
+ },
+ "mark": "eagle",
+ "goldNow": 54
+}
