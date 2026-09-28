@@ -25,7 +25,7 @@
     var open = e.target.closest('[data-open]');
     if (open) {
       var d = document.getElementById(open.dataset.open);
-      if (d && typeof d.showModal === 'function') d.showModal();
+      if (d && typeof d.showModal === 'function') openSheet(d);
       return;
     }
     var close = e.target.closest('[data-close]');
@@ -41,6 +41,28 @@
   // a tap on the dimmed area closes a sheet
   document.addEventListener('click', function (e) {
     if (e.target.tagName === 'DIALOG') e.target.close();
+  });
+
+  // Back closes a sheet instead of leaving the page (as in the app,
+  // app/src/ui/useSheet.ts): opening adds a history entry, closing any other
+  // way takes it away again
+  var leaving = false;
+  function openSheet(d) {
+    if (d.open) return;
+    history.pushState({ sheet: true }, '');
+    d.showModal();
+    if (!d.dataset.watched) {
+      d.dataset.watched = '1';
+      d.addEventListener('close', function () {
+        if (d.dataset.byBack) { delete d.dataset.byBack; return; }
+        if (history.state && history.state.sheet) { leaving = true; history.back(); }
+      });
+    }
+  }
+  window.addEventListener('popstate', function () {
+    if (leaving) { leaving = false; return; }
+    var d = document.querySelector('dialog[open]');
+    if (d) { d.dataset.byBack = '1'; d.close(); }
   });
 
   // the bottom navigation of the campaign app (docs/ui.md §2)
@@ -60,6 +82,8 @@
     });
   });
 
+  // the notice goes after five seconds, can be dismissed, and only its
+  // buttons catch taps (Rob, 28.09.2026: undo notices must not stand in the way)
   var timer = null;
   window.mockToast = function (text, undo) {
     var el = document.getElementById('toast');
@@ -68,8 +92,15 @@
     var b = el.querySelector('button');
     b.hidden = !undo;
     b.onclick = function () { el.hidden = true; if (undo) undo(); };
+    var x = el.querySelector('.toast-x');
+    if (!x) {
+      x = document.createElement('button');
+      x.type = 'button'; x.className = 'toast-x'; x.setAttribute('aria-label', 'Dismiss'); x.textContent = '\u2715';
+      el.appendChild(x);
+    }
+    x.onclick = function () { el.hidden = true; clearTimeout(timer); };
     el.hidden = false;
     clearTimeout(timer);
-    timer = setTimeout(function () { el.hidden = true; }, 6000);
+    timer = setTimeout(function () { el.hidden = true; }, 5000);
   };
 })();
