@@ -79,8 +79,9 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   HTML der alten App zurückgelesen wird; die Wanderung prüft sie alle fünf
   Schritte. Erst damit ist die Logik der alten App vollständig in `core/`.
 - [x] 1b, Abschluss: V1 und V2 entschieden (28.09.2026) – beide im neuen
-  Builder; V1 als Ablauf mit allen Folgeentscheidungen spezifiziert. Offen:
-  V3 (Augur) und Robs weitere Wünsche.
+  Builder; V1 als Ablauf mit allen Folgeentscheidungen spezifiziert. V3
+  (Augur) entschieden: RAW, weil mordheimer.net keine RAI-Ausnahme nennt.
+  Offen: Robs weitere Wünsche.
 - [ ] Nach 1d: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [x] 1c Neue Logik: `core/changes` (Vergleich zweier Stände mit stabilen

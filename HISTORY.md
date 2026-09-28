@@ -1354,3 +1354,15 @@ a quick swipe must still scroll the page — which a simulated finger in
 Chromium confirmed both ways. The roster mockup also carries the injury
 flow agreed for the new builder: the result as rolled, then exactly the
 follow-up the chart asks for.
+
+## September 28, 2026 — rules as written, unless mordheimer.net says otherwise
+
+The Augur of the Sisters of Sigmar is blind, yet the Serious Injuries chart
+can still cost her an eye. Tuomas' FAQ says that as written the result
+applies to her and that it was probably meant not to. The question was left
+open until Rob settled it with a rule for all such cases: a ruling by
+intent is adopted only where mordheimer.net makes it. For the Augur it
+does not — neither her entry nor result 31 mentions an exception — so she
+loses a point of Ballistic Skill like anyone else. Legacy and core already
+counted it that way; a test now holds the ruling so that no later cleanup
+"fixes" it quietly.
