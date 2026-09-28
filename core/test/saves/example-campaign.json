@@ -1,0 +1,1358 @@
+{
+ "type": "mordheim-campaign-file",
+ "version": 1,
+ "name": "Autumn at the Hel Fenn",
+ "round": 3,
+ "warbands": [
+  {
+   "id": 1,
+   "player": "Player 1",
+   "name": "The Silver Caravan",
+   "wb": "merc",
+   "updated": "2026-09-20",
+   "roster": {
+    "wb": "merc",
+    "subtype": "reik",
+    "name": "The Silver Caravan",
+    "budget": 500,
+    "models": [
+     {
+      "uid": 2,
+      "uid_def": "capt",
+      "name": "Captain Ruprecht",
+      "exp": 20,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1,
+       "Streitkolben": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": []
+     },
+     {
+      "uid": 3,
+      "uid_def": "champ",
+      "name": "Old Gerd",
+      "exp": 8,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": []
+     },
+     {
+      "uid": 4,
+      "uid_def": "warr",
+      "name": "Caravan Guards",
+      "exp": 0,
+      "qty": 4,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": [],
+      "xpPaid": 0
+     }
+    ],
+    "hired": [],
+    "dp": [],
+    "leaderUid": null,
+    "campaign": {
+     "on": true,
+     "districts": {},
+     "round": 0,
+     "log": [
+      {
+       "id": 2,
+       "round": 2,
+       "type": "battle",
+       "text": "Battle 2: fought The Grey Penitents — Victory.",
+       "auto": true,
+       "data": {
+        "battleId": 1
+       }
+      }
+     ],
+     "battles": [
+      {
+       "id": 1,
+       "round": 2,
+       "sides": [
+        {
+         "key": "me",
+         "name": "The Silver Caravan",
+         "wb": "merc",
+         "outcome": "Victory"
+        },
+        {
+         "key": "",
+         "name": "The Grey Penitents",
+         "wb": "sos",
+         "outcome": "Defeat"
+        }
+       ],
+       "opponents": [
+        {
+         "name": "The Grey Penitents",
+         "wb": "sos"
+        }
+       ],
+       "district": "",
+       "outcome": "Victory",
+       "notes": "Notes."
+      }
+     ],
+     "casualties": [],
+     "xp": [],
+     "postbattle": {
+      "2": {
+       "done": {},
+       "wyrd": null
+      }
+     }
+    },
+    "stash": {
+     "wyrd": 0,
+     "gold": null,
+     "items": []
+    },
+    "fallen": [],
+    "house": {
+     "startGold": "",
+     "min": "",
+     "max": "",
+     "heroes": 6,
+     "priceAll": 100,
+     "priceArmour": 100,
+     "priceBP": 100,
+     "priceMissile": 100,
+     "clubSurcharge": 0,
+     "slingSurcharge": 0,
+     "armourBodyOnly": false,
+     "freeDagger": false,
+     "miscHench": false,
+     "freeMarket": false,
+     "allSkills": false,
+     "showRarity": false,
+     "rangedCapOn": false,
+     "rangedCap": 0,
+     "rerollOne": false,
+     "eqLimitOn": true,
+     "hireNewLeader": false,
+     "hsGrades": {
+      "1a": true,
+      "1b": true,
+      "1c": true,
+      "2a": true
+     },
+     "dpGrades": {
+      "core": true,
+      "1a": true,
+      "1b": true,
+      "1c": true,
+      "2a": true
+     },
+     "hsEquip": false,
+     "notes": ""
+    },
+    "goldNow": 302
+   }
+  },
+  {
+   "id": 2,
+   "player": "Player 2",
+   "name": "The Grey Penitents",
+   "wb": "sos",
+   "updated": "2026-09-20",
+   "roster": {
+    "wb": "sos",
+    "subtype": null,
+    "name": "The Grey Penitents",
+    "budget": 500,
+    "models": [
+     {
+      "uid": 2,
+      "uid_def": "matri",
+      "name": "Mother Hildegard",
+      "exp": 24,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1,
+       "Streitkolben": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": []
+     },
+     {
+      "uid": 4,
+      "uid_def": "super",
+      "name": "Sister Brunhild",
+      "exp": 8,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [
+       {
+        "code": "31",
+        "name": "Blinded in one eye",
+        "text": "Ballistic Skill permanently −1. Blinded again → must retire.",
+        "mod": {
+         "BS": -1
+        }
+       }
+      ],
+      "spells": []
+     },
+     {
+      "uid": 5,
+      "uid_def": "augur",
+      "name": "Ottilie the Seer",
+      "exp": 0,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": [],
+      "miss": 1
+     },
+     {
+      "uid": 6,
+      "uid_def": "sister",
+      "name": "Sisters of the Rock",
+      "exp": 0,
+      "qty": 3,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": [],
+      "xpPaid": 0
+     },
+     {
+      "uid": 7,
+      "uid_def": "novice",
+      "name": "Novices",
+      "exp": 0,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": [],
+      "xpPaid": 0
+     }
+    ],
+    "hired": [],
+    "dp": [],
+    "leaderUid": null,
+    "campaign": {
+     "on": true,
+     "districts": {
+      "artisanquarter": "foothold"
+     },
+     "round": 3,
+     "log": [
+      {
+       "id": 1,
+       "round": 1,
+       "type": "round",
+       "text": "Campaign moved to “After battle 1”.",
+       "auto": true
+      },
+      {
+       "id": 3,
+       "round": 1,
+       "type": "battle",
+       "text": "Battle 1: fought Clan Skrittle at Count Steinhardt's Palace — Victory.",
+       "auto": true,
+       "data": {
+        "battleId": 2
+       }
+      },
+      {
+       "id": 5,
+       "round": 1,
+       "type": "injury",
+       "text": "Sister Brunhild was wounded by Sniv (Skaven) — Blinded in one eye.",
+       "auto": true,
+       "data": {
+        "casualtyId": 4
+       }
+      },
+      {
+       "id": 7,
+       "round": 1,
+       "type": "casualty",
+       "text": "Sniv (Skaven) was put out of action by Sister Agna (Sisters of Sigmar).",
+       "auto": true,
+       "data": {
+        "casualtyId": 6
+       }
+      },
+      {
+       "id": 16,
+       "round": 1,
+       "type": "note",
+       "text": "Note.",
+       "auto": false
+      },
+      {
+       "id": 17,
+       "round": 2,
+       "type": "round",
+       "text": "Campaign moved to “After battle 2”.",
+       "auto": true
+      },
+      {
+       "id": 19,
+       "round": 2,
+       "type": "battle",
+       "text": "Battle 2: fought The Silver Caravan — Defeat.",
+       "auto": true,
+       "data": {
+        "battleId": 18
+       }
+      },
+      {
+       "id": 21,
+       "round": 2,
+       "type": "death",
+       "text": "Novice 1 was slain by an unknown hand.",
+       "auto": true,
+       "data": {
+        "casualtyId": 20
+       }
+      },
+      {
+       "id": 23,
+       "round": 2,
+       "type": "missed",
+       "text": "Ottilie the Seer sat out the battle.",
+       "auto": true,
+       "data": {
+        "uid": 5,
+        "name": "Ottilie the Seer",
+        "uid_def": "augur",
+        "remaining": 1
+       }
+      },
+      {
+       "id": 24,
+       "round": 3,
+       "type": "round",
+       "text": "Campaign moved to “After battle 3”.",
+       "auto": true
+      },
+      {
+       "id": 26,
+       "round": 3,
+       "type": "battle",
+       "text": "Battle 3: fought Clan Skrittle at Dwarven District — Draw.",
+       "auto": true,
+       "data": {
+        "battleId": 25
+       }
+      },
+      {
+       "id": 28,
+       "round": 3,
+       "type": "death",
+       "text": "Sister Agna was slain by an unknown hand.",
+       "auto": true,
+       "data": {
+        "casualtyId": 27
+       }
+      }
+     ],
+     "battles": [
+      {
+       "id": 2,
+       "round": 1,
+       "sides": [
+        {
+         "key": "me",
+         "name": "The Grey Penitents",
+         "wb": "sos",
+         "outcome": "Victory"
+        },
+        {
+         "key": "",
+         "name": "Clan Skrittle",
+         "wb": "skaven",
+         "outcome": "Routed"
+        }
+       ],
+       "opponents": [
+        {
+         "name": "Clan Skrittle",
+         "wb": "skaven"
+        }
+       ],
+       "district": "steinhardt",
+       "outcome": "Victory",
+       "notes": "Notes."
+      },
+      {
+       "id": 18,
+       "round": 2,
+       "sides": [
+        {
+         "key": "me",
+         "name": "The Grey Penitents",
+         "wb": "sos",
+         "outcome": "Defeat"
+        },
+        {
+         "key": "",
+         "name": "The Silver Caravan",
+         "wb": "merc",
+         "outcome": "Victory"
+        }
+       ],
+       "opponents": [
+        {
+         "name": "The Silver Caravan",
+         "wb": "merc"
+        }
+       ],
+       "district": "",
+       "outcome": "Defeat",
+       "notes": ""
+      },
+      {
+       "id": 25,
+       "round": 3,
+       "sides": [
+        {
+         "key": "me",
+         "name": "The Grey Penitents",
+         "wb": "sos",
+         "outcome": "Draw"
+        }
+       ],
+       "opponents": [
+        {
+         "name": "Clan Skrittle",
+         "wb": "skaven"
+        }
+       ],
+       "district": "dwarvendistrict",
+       "outcome": "Draw",
+       "notes": "Notes."
+      }
+     ],
+     "casualties": [
+      {
+       "id": 4,
+       "round": 1,
+       "battleId": 2,
+       "victim": {
+        "uid": 4,
+        "name": "Sister Brunhild",
+        "wb": "sos",
+        "grade": "hero",
+        "value": 35,
+        "memberIdx": null,
+        "uid_def": "super"
+       },
+       "attacker": {
+        "uid": null,
+        "name": "Sniv",
+        "wb": "skaven",
+        "grade": "",
+        "value": null
+       },
+       "result": "injured",
+       "detail": "Blinded in one eye",
+       "fallenId": null,
+       "note": "Note.",
+       "code": "31",
+       "applied": true
+      },
+      {
+       "id": 6,
+       "round": 1,
+       "battleId": 2,
+       "victim": {
+        "uid": null,
+        "name": "Sniv",
+        "wb": "skaven",
+        "grade": "",
+        "value": null,
+        "memberIdx": null
+       },
+       "attacker": {
+        "uid": 3,
+        "name": "Sister Agna",
+        "wb": "sos",
+        "grade": "hero",
+        "value": 38,
+        "uid_def": "super"
+       },
+       "result": "pending",
+       "detail": "",
+       "fallenId": null,
+       "note": "",
+       "xpId": 8
+      },
+      {
+       "id": 20,
+       "round": 2,
+       "battleId": null,
+       "victim": {
+        "uid": 7,
+        "name": "Novice 1",
+        "wb": "sos",
+        "grade": "hench",
+        "value": 15,
+        "memberIdx": null,
+        "uid_def": "novice"
+       },
+       "attacker": {
+        "uid": null,
+        "name": "",
+        "wb": "",
+        "grade": "",
+        "value": null
+       },
+       "result": "dead",
+       "detail": "",
+       "fallenId": 0,
+       "note": ""
+      },
+      {
+       "id": 27,
+       "round": 3,
+       "battleId": null,
+       "victim": {
+        "uid": 3,
+        "name": "Sister Agna",
+        "wb": "sos",
+        "grade": "hero",
+        "value": 38,
+        "memberIdx": null,
+        "uid_def": "super"
+       },
+       "attacker": {
+        "uid": null,
+        "name": "",
+        "wb": "",
+        "grade": "",
+        "value": null
+       },
+       "result": "dead",
+       "detail": "",
+       "fallenId": 1,
+       "note": ""
+      }
+     ],
+     "snapshots": {
+      "0": {
+       "round": 0,
+       "at": "2026-08-30",
+       "state": {
+        "wb": "sos",
+        "subtype": null,
+        "name": "The Grey Penitents",
+        "budget": 500,
+        "models": [
+         {
+          "uid": 2,
+          "uid_def": "matri",
+          "name": "Mother Hildegard",
+          "exp": 20,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1,
+           "Streitkolben": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 3,
+          "uid_def": "super",
+          "name": "Sister Agna",
+          "exp": 8,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1,
+           "Streitkolben": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 4,
+          "uid_def": "super",
+          "name": "Sister Brunhild",
+          "exp": 8,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 5,
+          "uid_def": "augur",
+          "name": "Ottilie the Seer",
+          "exp": 0,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 6,
+          "uid_def": "sister",
+          "name": "Sisters of the Rock",
+          "exp": 0,
+          "qty": 3,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "xpPaid": 0
+         },
+         {
+          "uid": 7,
+          "uid_def": "novice",
+          "name": "Novices",
+          "exp": 0,
+          "qty": 2,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "xpPaid": 0
+         }
+        ],
+        "hired": [],
+        "dp": [],
+        "leaderUid": null,
+        "campaign": {
+         "on": true,
+         "round": 0,
+         "districts": {
+          "artisanquarter": "foothold"
+         }
+        },
+        "stash": {
+         "wyrd": 0,
+         "gold": null,
+         "items": []
+        },
+        "fallen": [],
+        "uidSeq": 8
+       },
+       "totals": {
+        "rating": 81,
+        "spent": 276,
+        "models": 9,
+        "heroes": 4,
+        "gold": 224,
+        "fallen": 0
+       }
+      },
+      "1": {
+       "round": 1,
+       "at": "2026-09-06",
+       "state": {
+        "wb": "sos",
+        "subtype": null,
+        "name": "The Grey Penitents",
+        "budget": 500,
+        "models": [
+         {
+          "uid": 2,
+          "uid_def": "matri",
+          "name": "Mother Hildegard",
+          "exp": 20,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1,
+           "Streitkolben": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 3,
+          "uid_def": "super",
+          "name": "Sister Agna",
+          "exp": 8,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1,
+           "Streitkolben": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 4,
+          "uid_def": "super",
+          "name": "Sister Brunhild",
+          "exp": 8,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [
+           {
+            "code": "31",
+            "name": "Blinded in one eye",
+            "text": "Ballistic Skill permanently −1. Blinded again → must retire.",
+            "mod": {
+             "BS": -1
+            }
+           }
+          ],
+          "spells": []
+         },
+         {
+          "uid": 5,
+          "uid_def": "augur",
+          "name": "Ottilie the Seer",
+          "exp": 0,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 6,
+          "uid_def": "sister",
+          "name": "Sisters of the Rock",
+          "exp": 0,
+          "qty": 3,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "xpPaid": 0
+         },
+         {
+          "uid": 7,
+          "uid_def": "novice",
+          "name": "Novices",
+          "exp": 0,
+          "qty": 2,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "xpPaid": 0
+         }
+        ],
+        "hired": [],
+        "dp": [],
+        "leaderUid": null,
+        "campaign": {
+         "on": true,
+         "round": 1,
+         "districts": {
+          "artisanquarter": "foothold"
+         }
+        },
+        "stash": {
+         "wyrd": 0,
+         "gold": null,
+         "items": []
+        },
+        "fallen": [],
+        "uidSeq": 8
+       },
+       "totals": {
+        "rating": 81,
+        "spent": 276,
+        "models": 9,
+        "heroes": 4,
+        "gold": 224,
+        "fallen": 0
+       }
+      },
+      "2": {
+       "round": 2,
+       "at": "2026-09-13",
+       "state": {
+        "wb": "sos",
+        "subtype": null,
+        "name": "The Grey Penitents",
+        "budget": 500,
+        "models": [
+         {
+          "uid": 2,
+          "uid_def": "matri",
+          "name": "Mother Hildegard",
+          "exp": 20,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1,
+           "Streitkolben": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 3,
+          "uid_def": "super",
+          "name": "Sister Agna",
+          "exp": 8,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1,
+           "Streitkolben": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": []
+         },
+         {
+          "uid": 4,
+          "uid_def": "super",
+          "name": "Sister Brunhild",
+          "exp": 8,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [
+           {
+            "code": "31",
+            "name": "Blinded in one eye",
+            "text": "Ballistic Skill permanently −1. Blinded again → must retire.",
+            "mod": {
+             "BS": -1
+            }
+           }
+          ],
+          "spells": []
+         },
+         {
+          "uid": 5,
+          "uid_def": "augur",
+          "name": "Ottilie the Seer",
+          "exp": 0,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "miss": 1
+         },
+         {
+          "uid": 6,
+          "uid_def": "sister",
+          "name": "Sisters of the Rock",
+          "exp": 0,
+          "qty": 3,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "xpPaid": 0
+         },
+         {
+          "uid": 7,
+          "uid_def": "novice",
+          "name": "Novices",
+          "exp": 0,
+          "qty": 1,
+          "eq": {
+           "Dolch (1. gratis)": 1
+          },
+          "rare": {},
+          "mut": [],
+          "adv": {},
+          "skills": [],
+          "inj": [],
+          "spells": [],
+          "xpPaid": 0
+         }
+        ],
+        "hired": [],
+        "dp": [],
+        "leaderUid": null,
+        "campaign": {
+         "on": true,
+         "round": 2,
+         "districts": {
+          "artisanquarter": "foothold"
+         }
+        },
+        "stash": {
+         "wyrd": 0,
+         "gold": 485,
+         "items": []
+        },
+        "fallen": [
+         {
+          "kind": "hench",
+          "uid_def": "novice",
+          "exp": 0,
+          "m": {
+           "uid": 7,
+           "uid_def": "novice",
+           "name": "Novices",
+           "exp": 0,
+           "qty": 1,
+           "eq": {
+            "Dolch (1. gratis)": 1
+           },
+           "rare": {},
+           "mut": [],
+           "adv": {},
+           "skills": [],
+           "inj": [],
+           "spells": [],
+           "xpPaid": 0
+          },
+          "memberIdx": 0,
+          "lostValue": 15,
+          "casualtyId": 20,
+          "casFromDeath": true
+         }
+        ],
+        "uidSeq": 8
+       },
+       "totals": {
+        "rating": 76,
+        "spent": 261,
+        "models": 8,
+        "heroes": 4,
+        "gold": 224,
+        "fallen": 1
+       }
+      }
+     },
+     "xp": [
+      {
+       "id": 8,
+       "round": 1,
+       "uid": 3,
+       "name": "Sister Agna",
+       "amount": 1,
+       "reason": "put Sniv out of action",
+       "applied": false
+      },
+      {
+       "id": 9,
+       "round": 1,
+       "uid": 2,
+       "name": "Mother Hildegard",
+       "amount": 1,
+       "reason": "survived the battle",
+       "applied": false
+      },
+      {
+       "id": 10,
+       "round": 1,
+       "uid": 3,
+       "name": "Sister Agna",
+       "amount": 1,
+       "reason": "survived the battle",
+       "applied": false
+      },
+      {
+       "id": 11,
+       "round": 1,
+       "uid": 4,
+       "name": "Sister Brunhild",
+       "amount": 1,
+       "reason": "survived the battle",
+       "applied": false
+      },
+      {
+       "id": 12,
+       "round": 1,
+       "uid": 5,
+       "name": "Ottilie the Seer",
+       "amount": 1,
+       "reason": "survived the battle",
+       "applied": false
+      },
+      {
+       "id": 13,
+       "round": 1,
+       "uid": 6,
+       "name": "Sisters of the Rock (group of 3)",
+       "amount": 1,
+       "reason": "survived the battle",
+       "applied": false
+      },
+      {
+       "id": 14,
+       "round": 1,
+       "uid": 7,
+       "name": "Novices (group of 2)",
+       "amount": 1,
+       "reason": "survived the battle",
+       "applied": false
+      },
+      {
+       "id": 15,
+       "round": 1,
+       "uid": 2,
+       "name": "Mother Hildegard",
+       "amount": 1,
+       "reason": "led the winning warband",
+       "applied": false
+      },
+      {
+       "id": 22,
+       "round": 2,
+       "uid": 2,
+       "name": "Mother Hildegard",
+       "amount": 1,
+       "reason": "Survived",
+       "applied": false
+      }
+     ],
+     "postbattle": {
+      "3": {
+       "done": {},
+       "wyrd": null
+      }
+     }
+    },
+    "stash": {
+     "wyrd": 0,
+     "gold": 447,
+     "items": [
+      {
+       "name": "Seil & Haken",
+       "qty": 1
+      }
+     ]
+    },
+    "fallen": [
+     {
+      "kind": "hench",
+      "uid_def": "novice",
+      "exp": 0,
+      "m": {
+       "uid": 7,
+       "uid_def": "novice",
+       "name": "Novices",
+       "exp": 0,
+       "qty": 1,
+       "eq": {
+        "Dolch (1. gratis)": 1
+       },
+       "rare": {},
+       "mut": [],
+       "adv": {},
+       "skills": [],
+       "inj": [],
+       "spells": [],
+       "xpPaid": 0
+      },
+      "memberIdx": 0,
+      "lostValue": 15,
+      "casualtyId": 20,
+      "casFromDeath": true
+     },
+     {
+      "kind": "hero",
+      "m": {
+       "uid": 3,
+       "uid_def": "super",
+       "name": "Sister Agna",
+       "exp": 8,
+       "qty": 1,
+       "eq": {
+        "Dolch (1. gratis)": 1,
+        "Streitkolben": 1
+       },
+       "rare": {},
+       "mut": [],
+       "adv": {},
+       "skills": [],
+       "inj": [],
+       "spells": []
+      },
+      "lostValue": 38
+     }
+    ],
+    "house": {
+     "startGold": "",
+     "min": "",
+     "max": "",
+     "heroes": 6,
+     "priceAll": 100,
+     "priceArmour": 100,
+     "priceBP": 100,
+     "priceMissile": 100,
+     "clubSurcharge": 0,
+     "slingSurcharge": 0,
+     "armourBodyOnly": false,
+     "freeDagger": false,
+     "miscHench": false,
+     "freeMarket": false,
+     "allSkills": false,
+     "showRarity": false,
+     "rangedCapOn": false,
+     "rangedCap": 0,
+     "rerollOne": false,
+     "eqLimitOn": true,
+     "hireNewLeader": false,
+     "hsGrades": {
+      "1a": true,
+      "1b": true,
+      "1c": true,
+      "2a": true
+     },
+     "dpGrades": {
+      "core": true,
+      "1a": true,
+      "1b": true,
+      "1c": true,
+      "2a": true
+     },
+     "hsEquip": false,
+     "notes": ""
+    },
+    "goldNow": 224
+   }
+  },
+  {
+   "id": 3,
+   "player": "Player 3",
+   "name": "Clan Skrittle",
+   "wb": "skaven",
+   "updated": "2026-09-20",
+   "roster": {
+    "wb": "skaven",
+    "subtype": null,
+    "name": "Clan Skrittle",
+    "budget": 500,
+    "models": [
+     {
+      "uid": 2,
+      "uid_def": "adept",
+      "name": "Skrittle",
+      "exp": 20,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1,
+       "Schwert": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": []
+     },
+     {
+      "uid": 3,
+      "uid_def": "black",
+      "name": "Sniv",
+      "exp": 8,
+      "qty": 1,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": []
+     },
+     {
+      "uid": 4,
+      "uid_def": "vermin",
+      "name": "Verminkin",
+      "exp": 0,
+      "qty": 5,
+      "eq": {
+       "Dolch (1. gratis)": 1
+      },
+      "rare": {},
+      "mut": [],
+      "adv": {},
+      "skills": [],
+      "inj": [],
+      "spells": [],
+      "xpPaid": 0
+     }
+    ],
+    "hired": [],
+    "dp": [],
+    "leaderUid": null,
+    "campaign": {
+     "on": true,
+     "districts": {},
+     "round": 0,
+     "log": [],
+     "battles": [],
+     "casualties": [],
+     "xp": []
+    },
+    "stash": {
+     "wyrd": 0,
+     "gold": null,
+     "items": []
+    },
+    "fallen": [],
+    "house": {
+     "startGold": "",
+     "min": "",
+     "max": "",
+     "heroes": 6,
+     "priceAll": 100,
+     "priceArmour": 100,
+     "priceBP": 100,
+     "priceMissile": 100,
+     "clubSurcharge": 0,
+     "slingSurcharge": 0,
+     "armourBodyOnly": false,
+     "freeDagger": false,
+     "miscHench": false,
+     "freeMarket": false,
+     "allSkills": false,
+     "showRarity": false,
+     "rangedCapOn": false,
+     "rangedCap": 0,
+     "rerollOne": false,
+     "eqLimitOn": true,
+     "hireNewLeader": false,
+     "hsGrades": {
+      "1a": true,
+      "1b": true,
+      "1c": true,
+      "2a": true
+     },
+     "dpGrades": {
+      "core": true,
+      "1a": true,
+      "1b": true,
+      "1c": true,
+      "2a": true
+     },
+     "hsEquip": false,
+     "notes": ""
+    },
+    "goldNow": 290
+   }
+  }
+ ],
+ "battles": [],
+ "log": []
+}

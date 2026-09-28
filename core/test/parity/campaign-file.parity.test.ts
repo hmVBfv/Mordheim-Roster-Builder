@@ -14,6 +14,7 @@ import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng, type Rng } from '../support/random.ts';
 import { cfCanon, draftCanon } from '../support/canon.ts';
+import { coreCfReport, legacyCfReport } from './cfReport.ts';
 import { coreCanon, data, hash, legacyCanon, randomStep, useLegacy, withDialogs } from './walk.ts';
 
 let L: Legacy;
@@ -31,56 +32,13 @@ const OTHERS: WarbandState[] = generateFixtures(data, [5]).filter((_, i) => i % 
 interface World { s: WarbandState; cf: core.CampaignFile | null; bd: core.BattleDraft | null; cd: core.CasualtyDraft | null }
 type Op = [label: string, legacy: () => unknown, next: (w: World) => World];
 
-/* ---- canonical forms ---- */
-
-/* A list compared as a multiset, without chronicle ids. */
-function bag(xs: Rec[]): string[] {
-  return xs.map((x) => {
-    const rest = { ...x };
-    delete rest.id;
-    delete rest.data;
-    return JSON.stringify(rest);
-  }).sort();
-}
-
-const HIRE_KEYS = ['ogre', 'elfranger', 'warlock', 'halflingscout'];
-
-/* Experience overview without the entries' chronicle ids. */
-const xpRows = (xs: { rows: Rec[] }[]) => xs.map((o) => ({ ...o, rows: o.rows.map((x) => { const y = { ...x }; delete y.id; return y; }) }));
-
-function coreReport(w: World): unknown {
-  const c = ctx(w.s), cf = w.cf;
-  const sides = core.battleSides(c, cf);
-  const terr = core.cfTerritory(c, cf);
-  return {
-    sides, models: sides.map((x) => core.sideModels(c, cf, x.key)),
-    terr, status: terr.map((t) => core.districtStatus(c, cf, t.id)),
-    stats: core.cfStats(cf), xp: xpRows(core.cfXpOverview(cf, w.s.campaign?.round ?? 0) as unknown as { rows: Rec[] }[]),
-    log: bag(core.cfMergedLog(cf) as unknown as Rec[]), battles: bag(core.cfAllBattles(cf)), merged: bag(core.cfAllBattlesMerged(c, cf)),
-    disc: HIRE_KEYS.map((k) => core.hireDiscounted(c, k)),
-  };
-}
-
-function legacyReport(): unknown {
-  const a = L.app, S = L.state.S as WarbandState;
-  const sides = a.battleSides() as { key: string }[];
-  const terr = a.cfTerritory() as { id: string }[];
-  return {
-    sides, models: sides.map((x) => a.sideModels(x.key)),
-    terr, status: terr.map((t) => a.districtStatus(t.id)),
-    stats: a.cfStats(), xp: xpRows(a.cfXpOverview(S.campaign?.round ?? 0)),
-    log: bag(a.cfMergedLog()), battles: bag(a.cfAllBattles()), merged: bag(a.cfAllBattlesMerged()),
-    disc: HIRE_KEYS.map((k) => !!a.hireDiscounted(k)),
-  };
-}
-
 function compare(label: string, w: World): void {
   expect(coreCanon(ctx(w.s)), `${label}: warband`).toEqual(legacyCanon());
   expect(cfCanon(w.cf), `${label}: campaign file`).toEqual(cfCanon(L.app.cfGet()));
   const camp = (L.state.S.campaign ?? {}) as Rec;
   expect(draftCanon(w.bd, w.s), `${label}: battle form`).toEqual(draftCanon(camp._draft, L.state.S as WarbandState));
   expect(w.cd ?? null, `${label}: casualty form`).toEqual(camp._cas ?? null);
-  expect(coreReport(w), `${label}: reports`).toEqual(legacyReport());
+  expect(coreCfReport(ctx(w.s), w.cf), `${label}: reports`).toEqual(legacyCfReport(L));
 }
 
 /* ---- random operations ---- */

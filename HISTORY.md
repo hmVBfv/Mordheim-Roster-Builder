@@ -1366,3 +1366,23 @@ does not — neither her entry nor result 31 mentions an exception — so she
 loses a point of Ballistic Skill like anyone else. Legacy and core already
 counted it that way; a test now holds the ruling so that no later cleanup
 "fixes" it quietly.
+
+## September 28, 2026 — ready for the real saves
+
+The last part of phase 1d compares the two apps on the saves the group
+actually plays with, because generated warbands only come in the shapes the
+generator knows. Those files are not here yet, so the way in was built
+first. `npm run sanitize-save` takes a warband save, the leader's campaign
+file or the readable text export and cleans it for a public repository: the
+story, backgrounds, chronicle notes, battle accounts, casualty remarks,
+house-rule notes and the players' names go; warband and warrior names stay,
+since the chronicle already prints them. Text that was there stays non-empty
+as a placeholder, so a cleaned save still takes the same branches.
+
+Trying it on a doctored copy turned up the first gap at once: a player can
+correct the text of a chronicle entry the app wrote, and the cleaner only
+looked at notes. Corrected entries are cleaned too now. Cleaning is
+idempotent, so the suite's first check is simply that cleaning a committed
+file changes nothing — a file that slipped in raw fails the build. Two
+invented saves, built with core and written by the legacy app, keep the
+suite honest until the real ones arrive.

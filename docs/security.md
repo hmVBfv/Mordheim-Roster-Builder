@@ -133,8 +133,12 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
   bekommt den Hintergrund nur über `eingang/` (lokal, nicht versioniert).
 - Keine Hostnamen, Zugangsdaten oder Tokens im Repo; in der Doku stehen
   Platzhalter.
-- **Testvorlagen aus Bug-Meldungen** (Warband-Versionen) werden vor dem
-  Commit bereinigt: `story`, `models[].profile.text` und Notizen raus.
+- **Testvorlagen aus echten Speicherständen** (Bug-Meldungen, Stände der
+  laufenden Kampagne) werden vor dem Commit bereinigt: `story`,
+  `models[].profile.text`, Notizen, Schlachtberichte, von Hand korrigierte
+  Chronik-Einträge und die Namen der Spieler raus. Das erledigt
+  `npm run sanitize-save` (`core/src/format/sanitize.ts`); der Test über
+  `core/test/saves/` schlägt bei jeder Datei fehl, die nicht bereinigt ist.
 - Beispiele in Doku und Tests verwenden nur Inhalte, die in der Chronik
   bereits veröffentlicht sind, oder erfundene.
 
