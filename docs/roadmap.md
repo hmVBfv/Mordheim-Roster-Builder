@@ -110,7 +110,15 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Themes, 44-px-Tippflächen, Offline-Start und die Startzeit-Grenzen.
   Die Roster-Ansicht ist nur die technische Grundlage; ihr Aussehen kommt
   aus dem Mockup (1f).
-- [ ] 1f Mockups
+- [x] 1f Mockups: die sechs Bildschirme aus [ui.md](ui.md#3-bildschirme-die-zuerst-als-mockup-entstehen)
+  als klickbare statische Seiten unter [`docs/mockups/`](mockups/) –
+  Spielabend (Offline-Warteschlange, drei Tipps für einen Verlust),
+  Zeitleiste (langes Drücken und Ziehen, ↑/↓, „Move to…“, Leiter-Ebene),
+  Änderungsansicht (vorher → nachher, Anlass, ⚠ ohne Anlass,
+  Erklärungsfelder), Sichtbarkeit (öffentlich, versiegelt, nur Leiter, „View
+  as player“), Hintergrund (Stränge mit Enthüllungsstufe) und das neue
+  Roster (mit dem Verletzungsablauf aus V1). Geprüft bei 360 px in beiden
+  Themes; **offen: Robs Prüfung auf dem Handy.**
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in

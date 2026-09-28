@@ -1,0 +1,337 @@
+/* Mockups of the new app (docs/ui.md §3). Same design tokens as
+   app/src/theme/tokens.css; the themes are switched with the strip at the
+   top. Static pages: nothing is saved, nothing is sent. */
+
+:root,
+:root[data-theme='chronicle'] {
+  --bg: #16181a;
+  --surface: #1f2225;
+  --surface-2: #2a2e32;
+  --border: #3d4349;
+  --text: #ece6d8;
+  --text-muted: #aaa393;
+  --accent: #7fd88b;
+  --accent-ink: #0f1a11;
+  --danger: #f08a7a;
+  --warn: #e8c46a;
+  --gold: #d6b46a;
+  --hidden-bg: #26221a;
+  --hidden-stripe: #2f2a1f;
+  --sealed: #c9a6e8;
+  --focus: #7fd88b;
+  --shadow: rgba(0, 0, 0, 0.55);
+  --font-title: 'Cinzel', 'EB Garamond', Georgia, serif;
+  color-scheme: dark;
+}
+
+:root[data-theme='parchment'] {
+  --bg: #e9dcc0;
+  --surface: #f4ead3;
+  --surface-2: #ddcca6;
+  --border: #b9a473;
+  --text: #1d1916;
+  --text-muted: #5a4a38;
+  --accent: #7a1410;
+  --accent-ink: #fbf5e6;
+  --danger: #8e1a14;
+  --warn: #7a5a10;
+  --gold: #6e5520;
+  --hidden-bg: #d8c9a3;
+  --hidden-stripe: #cfbe93;
+  --sealed: #5b2d7a;
+  --focus: #7a1410;
+  --shadow: rgba(0, 0, 0, 0.25);
+  --font-title: 'Pirata One', 'EB Garamond', Georgia, serif;
+  color-scheme: light;
+}
+
+:root {
+  --font-body: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --radius: 6px;
+  --tap: 44px;
+  --nav: 60px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.4;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1.02rem; }
+
+p { margin: 0; }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- the mockup strip (not part of the app) ---------- */
+
+.mock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  padding: var(--s2) var(--s4);
+  padding-top: calc(var(--s2) + env(safe-area-inset-top, 0px));
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  color: #f5f1e6;
+  background: repeating-linear-gradient(135deg, #3b3322 0 10px, #2e281b 10px 20px);
+  border-bottom: 1px solid #5b5036;
+}
+.mock a { color: #f5f1e6; }
+.mock strong { letter-spacing: 0.06em; text-transform: uppercase; font-size: 11px; }
+.mock .spacer { flex: 1; }
+.mock .themes { display: inline-flex; border: 1px solid #8a7a52; border-radius: 999px; overflow: hidden; }
+.mock .themes button {
+  min-height: 32px;
+  padding: 0 var(--s3);
+  border: 0;
+  background: transparent;
+  color: #f5f1e6;
+  font: inherit;
+  cursor: pointer;
+}
+.mock .themes button[aria-pressed='true'] { background: #f5f1e6; color: #2e281b; }
+
+/* ---------- the app frame: phone first ---------- */
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--bg);
+  border-inline: 1px solid var(--border);
+  padding-bottom: calc(var(--nav) + env(safe-area-inset-bottom, 0px));
+  position: relative;
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 52px;
+  padding: var(--s2) var(--s4);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.bar .title { flex: 1; min-width: 0; font-family: var(--font-title); font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .back { font-size: 1.4rem; text-decoration: none; color: var(--text); min-width: var(--tap); min-height: var(--tap); display: grid; place-items: center; margin-left: calc(-1 * var(--s3)); }
+
+.sync { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
+.sync .pending { color: var(--warn); }
+.sync .conflict { color: var(--danger); }
+
+.content { display: grid; gap: var(--s4); padding: var(--s4); }
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(480px, 100%);
+  z-index: 6;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav a {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  min-height: var(--nav);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+.nav a[aria-current='page'] { color: var(--accent); }
+.nav svg { width: 24px; height: 24px; }
+
+/* ---------- pieces ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--s3) var(--s4);
+  display: grid;
+  gap: var(--s2);
+}
+
+.muted { color: var(--text-muted); }
+.small { font-size: 0.88rem; }
+.row { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.between { justify-content: space-between; }
+.stack { display: grid; gap: var(--s2); }
+.label { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+
+.btn, .btn-quiet, .btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 var(--s4);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-quiet { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+.btn-block { width: 100%; }
+.icon-btn {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.chip.good { border-color: var(--accent); color: var(--accent); }
+.chip.warn { border-color: var(--warn); color: var(--warn); }
+.chip.bad { border-color: var(--danger); color: var(--danger); }
+
+/* visibility (docs/ui.md §1.3): never by colour alone — a symbol and words */
+.vis { display: inline-flex; align-items: center; gap: 4px; font-size: 0.82rem; white-space: nowrap; }
+.vis.public { color: var(--text-muted); }
+.vis.sealed { color: var(--sealed); }
+.vis.leader { color: var(--warn); }
+.is-hidden {
+  background: repeating-linear-gradient(135deg, var(--hidden-bg) 0 12px, var(--hidden-stripe) 12px 24px);
+  border-style: dashed;
+}
+.is-sealed { border-left: 4px solid var(--sealed); }
+
+.field { display: grid; gap: var(--s1); }
+.input, .textarea, .select {
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.textarea { min-height: 5.5rem; resize: vertical; }
+
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.seg button {
+  min-height: var(--tap);
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  padding: 0 var(--s2);
+  line-height: 1.1;
+}
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed='true'] { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+
+.stats { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; font-size: 0.95rem; }
+.stats th { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); padding: var(--s1) 0; border-bottom: 1px solid var(--border); }
+.stats td { padding: var(--s1) 0; }
+.stats .up { color: var(--accent); font-weight: 600; }
+.stats .down { color: var(--danger); font-weight: 600; }
+
+/* a panel that opens from the bottom (native <dialog>) */
+dialog.sheet {
+  width: 100%;
+  max-width: 480px;
+  margin: auto auto 0;
+  max-height: 88dvh;
+  padding: var(--s4);
+  padding-bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px));
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--surface);
+  color: var(--text);
+}
+dialog.sheet::backdrop { background: var(--shadow); }
+.sheet-grip { width: 44px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto var(--s3); }
+.sheet form { display: grid; gap: var(--s3); }
+
+.pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: var(--s2); }
+.pick button {
+  min-height: 48px;
+  padding: var(--s1) var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.15;
+}
+.pick button small { display: block; color: var(--text-muted); font-size: 0.78rem; }
+.pick button[aria-pressed='true'] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--nav) + env(safe-area-inset-bottom, 0px) + var(--s3));
+  width: min(448px, calc(100% - 32px));
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s2) var(--s2) var(--s2) var(--s4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+
+.note-kind { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold); }
+blockquote { margin: 0; padding-left: var(--s3); border-left: 3px solid var(--gold); font-style: italic; }

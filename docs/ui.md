@@ -65,7 +65,18 @@ Report a problem   überall erreichbar
 | Roster (neu) | meistgenutzter Bildschirm, heute nicht handytauglich |
 
 Mockups liegen als statische Seiten unter `docs/mockups/` und werden auf dem
-Handy geprüft, bevor die Umsetzung beginnt.
+Handy geprüft, bevor die Umsetzung beginnt. Sie nutzen dieselben
+Design-Variablen wie die App; ein Streifen oben schaltet zwischen beiden
+Themes um und gehört nicht zur App. Die Kampagne darin ist erfunden.
+
+| Seite | Was sie zeigt |
+| --- | --- |
+| `game-night.html` | Vollbild ohne Navigation, Spielzug-Zähler, vier große Knöpfe im unteren Drittel, „letzten Eintrag rückgängig“, Offline-Hinweis mit Zahl der wartenden Einträge |
+| `timeline.html` | feste Anker je Schlacht, Verschieben per langem Drücken, ↑/↓ und „Move to…“, Erfassungszeit bleibt sichtbar, Leiter-Ebene schaltbar |
+| `changes.html` | je Krieger vorher → nachher mit gefundenem Anlass, ⚠ ohne Anlass, Erklärungsfelder mit Zähler, Markieren „After battle N“ |
+| `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
+| `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt |
+| `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen, Ausrüstung und den häufigen Aktionen; Verletzung mit Folgeentscheidung (V1) |
 
 ## 4. Themes und Gestaltung
 
