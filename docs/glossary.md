@@ -108,6 +108,12 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | --- | --- | --- |
 | Kampagnenserver | Campaign app | Variante `campaign`, `server/` |
 | Schnellbau | Quick Build | Variante `quickbuild`, GitHub Pages |
+| Variante (der App) | Flavour | Build-Modus `campaign` / `quickbuild`, `app/src/flavour.ts` |
+| Offen für dich | Open for you | Startseite, `app/src/routes/Home.tsx` |
+| Auf diesem Gerät gespeichert | Saved on this device | `app/src/app/SyncState.tsx` |
+| Neue Version – neu laden | New version available · Reload | `app/src/app/UpdateBanner.tsx` |
+| Gerätespeicher | Device store | Dexie-Datenbank `mordheim`, `app/src/db/db.ts` |
+| Spiegel (Legacy-Tests gegen `core/`) | Mirror | `core/test/mirror/` |
 | Warteschlange | Outbox | Dexie-Tabelle `outbox` |
 | Synchronisation | Sync | `GET /api/v1/sync` |
 | Epoche | Epoch | Server-Epoche nach Wiederherstellung |

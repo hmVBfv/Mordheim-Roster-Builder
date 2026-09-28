@@ -1318,3 +1318,22 @@ fixed it. Planting bugs in core showed the mirror's reach and its limit: it
 caught five of six, and missed a name that was no longer trimmed, because
 no legacy test types a name with spaces around it. The mirror adds the
 scenarios the tests describe; the random walks stay for everything else.
+
+## September 28, 2026 — an app that starts without the rules
+
+Phase 1e put the new app on its feet: React with the compiler, both
+flavours from one code base, the two themes, a device store, and a
+read-only roster that everything shown on it takes from core. Two decisions
+came out of measuring rather than planning. The rules data is about 140 KB
+compressed — more than half the budget for the whole first load — so the
+app shell starts without it and fetches it when a roster is first opened;
+the service worker keeps it for the evening the Wi-Fi is gone. And the
+Quick Build keeps its routes after a "#", because GitHub Pages cannot
+answer a deep link with the app.
+
+Playwright looks at every screen at 360 px in both themes, and it found
+the first bug before anyone else could: in Chronicle, whose title font runs
+wider, the header pushed the page six pixels past the edge of the screen —
+enough for a phone to scroll sideways and for taps to land in the wrong
+place. The grid now never grows wider than the screen, and on a narrow one
+the sync state says "Saved" instead of "Saved on this device".

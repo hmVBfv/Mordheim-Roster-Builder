@@ -38,10 +38,17 @@ changing anything structural.
 ## Commands
 
 - `npm ci` once (root; npm workspaces).
-- `npm run check` — typecheck, lint, legacy tests and core tests; run it
-  before every push.
+- `npm run check` — typecheck, lint, legacy, core and app tests; run it
+  before every push (plus the app build, size and e2e when the app changed).
 - `npm run typecheck`, `npm run lint`, `npm run test:legacy`,
-  `npm run test:core` (or `npm test -w core -- --watch` while working).
+  `npm run test:core`, `npm run test:app` (or `npm test -w core -- --watch`
+  while working).
+- App: `npm run dev -w app` (campaign) or `npm run dev:quickbuild -w app`;
+  `npm run build -w app` (both flavours into `app/dist/`), then
+  `npm run size -w app` and `npm run e2e -w app` (Playwright at 360 px; in a
+  cloud session set `CHROMIUM_PATH=/opt/pw-browsers/chromium`). Screenshots
+  land in `app/test-results/screens/` — look at them.
+  `npm run icons -w app` redraws the PNG icons from `app/public/icon.svg`.
 - Legacy only: `node test/run.mjs` (rebuilds `dist/`, runs every legacy test
   incl. its bundle parity), `node build.js`.
 - CI (`.github/workflows/ci.yml`) runs the same on every push.
