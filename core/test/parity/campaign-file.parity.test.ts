@@ -13,7 +13,8 @@ import type { WarbandState } from '../../src/index.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng, type Rng } from '../support/random.ts';
-import { canonOf, coreCanon, data, hash, legacyCanon, randomStep, useLegacy, withDialogs } from './walk.ts';
+import { cfCanon, draftCanon } from '../support/canon.ts';
+import { coreCanon, data, hash, legacyCanon, randomStep, useLegacy, withDialogs } from './walk.ts';
 
 let L: Legacy;
 beforeAll(async () => { L = await loadLegacy(); useLegacy(L); });
@@ -31,27 +32,6 @@ interface World { s: WarbandState; cf: core.CampaignFile | null; bd: core.Battle
 type Op = [label: string, legacy: () => unknown, next: (w: World) => World];
 
 /* ---- canonical forms ---- */
-
-function cfCanon(cf: unknown): unknown {
-  if (!cf) return null;
-  const c = JSON.parse(JSON.stringify(cf)) as { warbands?: Rec[] };
-  for (const w of c.warbands ?? []) {
-    w.updated = 'DATE';
-    const r = w.roster as WarbandState | undefined;
-    if (r && r.wb && data.WARBANDS[r.wb]) w.roster = canonOf(r);
-  }
-  return c;
-}
-
-/* Draft references to battles and casualties by position (their ids come
-   from different counters). */
-function draftCanon(dr: unknown, s: WarbandState): unknown {
-  if (!dr) return null;
-  const d = JSON.parse(JSON.stringify(dr)) as Rec & { cas?: Rec[] };
-  if (d.editId != null) d.editId = (s.campaign?.battles ?? []).findIndex((b) => b.id === d.editId);
-  for (const c of d.cas ?? []) if (c.id != null) c.id = (s.campaign?.casualties ?? []).findIndex((x) => x.id === c.id);
-  return d;
-}
 
 /* A list compared as a multiset, without chronicle ids. */
 function bag(xs: Rec[]): string[] {

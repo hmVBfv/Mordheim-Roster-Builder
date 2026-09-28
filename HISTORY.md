@@ -1281,3 +1281,40 @@ the legacy app's own HTML back to compare. The generated warbands never
 switched on the ranged-weapon cap or the one-re-roll-item rule, so planted
 bugs in those warnings went unnoticed until the modified house-rule preset
 turned both on.
+
+## September 28, 2026 — the legacy tests, run against core
+
+Phase 1d asked for the 35 legacy test files to run against core. The plan
+was a facade: a stand-in for the legacy modules that answers every call
+from core. It did not survive a count. About fifteen of the files read the
+HTML the legacy app draws — the sidebar, the casualty form, the tooltips —
+so a facade would have had to draw them again; and the tests hold on to
+legacy objects and watch them change in place, which core, handing out new
+values, never does.
+
+What runs instead is a mirror. The legacy tests run unchanged against the
+legacy app; a module hook wraps every function the app exports, and each
+call a test makes is repeated in core from the state legacy had just before
+it, with the same answers to its dialogs and the same values in its input
+fields. The warband, the campaign file and the form drafts must come out
+the same; a query must answer the same; a drawing must show what core's
+rule says. Whatever a test asserts about a call therefore holds for core as
+well — about 1500 calls, 400 of them actions, and no difference in the
+logic.
+
+Two gaps came out of it. The tooltip decided which entry to show — an
+item, then a skill from the curated lists, then the ability patterns, then a
+spell — and that order, which once fixed "Nimble" showing a monkey's rule,
+still lived only in the legacy tooltip code; it is now `tooltipInfo` in
+core, checked against every name the app can show a tooltip for. And a fresh
+legacy session hands out uid 1 first, which core refused: it pushed any
+counter up to the old resync floor. Core now keeps a counter as long as it
+collides with nothing.
+
+A wrong turn on the way: the first wrappers were constants, and the legacy
+modules, which import each other in a circle, touched them before they
+existed. Wrapping with hoisted function declarations, as the originals are,
+fixed it. Planting bugs in core showed the mirror's reach and its limit: it
+caught five of six, and missed a name that was no longer trimmed, because
+no legacy test types a name with spaces around it. The mirror adds the
+scenarios the tests describe; the random walks stay for everything else.

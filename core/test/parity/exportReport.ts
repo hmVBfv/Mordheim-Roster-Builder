@@ -12,7 +12,7 @@ const TODAY = '2026-09-27';
 
 /* The embedded save is compared through `canon`; the date legacy stamps from
    the clock is replaced. */
-function splitText(t: string, canon: (s: unknown) => unknown): { lines: string[]; save: unknown } {
+export function splitText(t: string, canon: (s: unknown) => unknown): { lines: string[]; save: unknown } {
   const lines = t.split('\n');
   const last = lines.pop() as string;
   const json = last.replace(/^MORDHEIM-DATA: /, '');
