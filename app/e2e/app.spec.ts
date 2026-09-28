@@ -129,6 +129,17 @@ test('the undo notice goes quickly, can be dismissed and lets taps through', asy
   await expect(toast).toBeHidden({ timeout: 500 });
 });
 
+/* On a desktop screen the cards stand side by side. */
+test('the roster uses the width of a desktop screen', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  await importSample(page);
+  const tops = await page.getByRole('article').evaluateAll((els) => els.slice(0, 2).map((e) => Math.round(e.getBoundingClientRect().top)));
+  expect(tops[0], 'the first two warriors share a row').toBe(tops[1]);
+  await noSideScroll(page);
+  await shot(page, 'desktop-roster');
+});
+
 test('the navigation fits the flavour', async ({ page }) => {
   await page.goto('./');
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();

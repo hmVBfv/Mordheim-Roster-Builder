@@ -162,6 +162,7 @@ changing anything structural.
 - [ ] sync state visible; offline case handled
 - [ ] Back closes an open sheet and never leaves the app (`useSheet`)
 - [ ] notices never block: short, dismissable, taps pass through
+- [ ] the desktop width is used (cards side by side)
 - [ ] both themes checked
 - [ ] Playwright screenshot updated and looked at
 

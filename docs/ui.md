@@ -56,7 +56,9 @@ Report a problem   überall erreichbar
   Formulare und Auswahl als Bereich, der von unten aufklappt (native
   `<dialog>`), statt Pop-up-Fenstern.
 - **Desktop:** Seitenleiste links, Inhalt mit Liste und Detail
-  nebeneinander (z. B. Roster links, gewählter Krieger rechts).
+  nebeneinander (z. B. Roster links, gewählter Krieger rechts). Karten
+  stehen nebeneinander, so viele die Breite fasst (Roster: ab 1440 px drei
+  Spalten); der Inhalt ist bis 1320 px breit.
 - **Quick Build (Pages):** nur Home (lokale Warbands), Warband (Roster),
   Import/Export und „Send to campaign server“.
 
@@ -143,4 +145,5 @@ Diese Liste steht auch in `CLAUDE.md`.
 - [ ] Kein `dangerouslySetInnerHTML`, keine Inline-Handler im HTML
 - [ ] Zurück schließt offene Bereiche, ohne die App zu verlassen
 - [ ] Hinweise versperren nichts (kurz, wegtippbar, Tipps gehen durch)
+- [ ] Am Desktop wird die Breite genutzt
 - [ ] Playwright-Screenshot des Bildschirms aktualisiert und angesehen
