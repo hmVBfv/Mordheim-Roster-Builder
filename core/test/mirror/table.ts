@@ -315,6 +315,7 @@ export const TABLE: Record<string, Spec> = {
   'info.itipBuild': ui('composes a tooltip', (c) => {
     return [coreTip(data, c.args[0]), parseTip(c.ret)];
   }),
+  'tts.ttsText': q((c) => { const m = model(c, (c.args[0] as { uid?: number } | null)?.uid ?? -1); return m ? core.ttsText(ctx(c.w), m) : null; }),
   'tts.ttsOpen': ui('opens the Tabletop Simulator card of a warrior', (c) => {
     const m = model(c, c.args[0]);
     const lm = (c.L.state.S as WarbandState).models.find((x) => x.uid === c.args[0]);

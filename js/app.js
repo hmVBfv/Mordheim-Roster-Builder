@@ -10,8 +10,8 @@ import { ttsOpen, ttsOpenMember, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from
 import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelMarketValue, marketRarePrice, eqMarketValue, isTwoHanded, _loadoutValue, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
 export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
 /* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
-import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild } from './info.js';
-export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild };
+import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild, abilityFor, keyedInfo, ruleDefs, ruleKey, skillKey, unitSkillLists } from './info.js';
+export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild, abilityFor, keyedInfo, ruleDefs, ruleKey, skillKey, unitSkillLists };
 
 /* ===================== DATA ===================== */
 // equipment item: [name, cost]  (cost in gc)
@@ -291,6 +291,8 @@ export function hsRuleLines(sp){ if(!sp) return '';
   const parts=String(sp).replace(/<br\s*\/?>/gi,'\u0001').replace(/\s*<b>/g,'\u0001<b>').split('\u0001').map(x=>x.trim()).filter(Boolean);
   return parts.map(p=> /^<b>/.test(p)?`<div class="srule">${p}</div>`:`<div class="srule-intro">${p}</div>`).join(''); }
 export let _SKNAMES=null;
+/* The text of a skill a warrior has, from his own lists first (core skillTextFor). */
+export function skillTextFor(m,nm){ const i=keyedInfo(skillKey(S.wb,unitDef(m.uid_def),nm)); return i?i.text:skillText(nm); }
 export function skillText(nm,e){ if(e&&typeof hsSpecialText==='function'){ const t=hsSpecialText(e,nm); if(t) return t; }
   const si=skillInfo(nm); if(!si) return '';
   return (typeof si==='object')?(si.text||si.name||''):String(si); }
@@ -329,28 +331,34 @@ export function skillChipRow(names,label,e){ if(!names||!names.length) return ''
    Clause boundaries are sentence enders, dashes and contrast conjunctions —
    the dash matters: "Not truly alive - immune to psychology" would otherwise
    let the first half suppress a rule the model genuinely has.
-   Only "not"/"n't" count as negation, deliberately: "never gains experience
-   (animal)" still makes it an Animal, and "immune to X" is a rule ABOUT X
-   worth showing, not a denial that X applies. */
+   Negation is "not"/"n't", "immune to", "exempt from", "never has to" and
+   "no … test": a unit immune to All Alone tests is not shown the All Alone
+   rule as if it had to take them (docs/rules-audit.md). "never gains
+   experience (animal)" still makes it an Animal. */
 export function abilityMentioned(re, text){
   const cl=String(text||'').replace(/<[^>]*>/g,' ')
     .replace(/([.;:!?])\s+/g,'$1\u0001').replace(/\s+[-\u2013\u2014]\s+/g,'\u0001')
     .replace(/\s+(?:but|however|although|though|whereas|while|except)\s+/gi,'\u0001')
     .split('\u0001');
   for(const c of cl){ const i=c.search(re); if(i<0) continue;
-    if(!/\b(?:not|n't)\b/i.test(c.slice(0,i))) return true; }
+    if(!/\b(?:not|n't|immune to|exempt from|never (?:has|have|needs?) to)\b|\bno\b[^,;()]*\btests?\b/i.test(c.slice(0,i))) return true; }
   return false;   // absent, or mentioned only where it is denied
 }
+/* The abilities a rules text grants its owner, as chips: each with the key
+   its tooltip is looked up by (core abilityChips). */
+export function abilityChips(o,scan){ let found=[]; const seen=new Set();
+  ABILITYINFO.forEach(([re,info],i)=>{ if(seen.has(info.name)||!abilityMentioned(re,scan)) return;
+    const c=abilityFor(o,i); if(!c) return; seen.add(info.name); found.push(c); });
+  if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
+  if(/immune to fear/i.test(scan) && !/causes? fear|fearsome/i.test(scan)) found=found.filter(f=>f.name!=='Fear');
+  return found; }
 export function hsAbilitySection(hs,rec){
   const pers=(rec&&hs.personas&&typeof hsPersona==='function')?hsPersona(rec,hs):null;
   const sp=[(pers&&pers.sp)||'',hs.sp||''].filter(Boolean).join(' ');
-  let found=[]; const seen=new Set();
-  for(const [re,info] of ABILITYINFO){ if(abilityMentioned(re,sp) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
-  if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
-  // "not a wizard" is handled by abilityMentioned now. This one stays: being
-  // immune to Fear is not a denial that the word appears, it is a different
-  // rule — and a model that only RESISTS fear does not CAUSE it.
-  if(/immune to fear/i.test(sp) && !/causes? fear|fearsome/i.test(sp)) found=found.filter(f=>f.name!=='Fear');
+  const hsKey=Object.keys(HIREDSWORDS).find(k=>HIREDSWORDS[k]===hs);
+  const owner=hsKey?{kind:'hs',key:hsKey,persona:(pers&&pers.name)||''}:{kind:'dp',key:Object.keys(DRAMATIS).find(k=>DRAMATIS[k]===hs)||'',persona:(pers&&pers.name)||''};
+  // a model that only RESISTS fear does not CAUSE it (abilityChips)
+  const found=abilityChips(owner,sp); const seen=new Set(found.map(f=>f.name));
   const skFound=skillChipsIn(sp).filter(n=>!seen.has(n));
   const chip=(label,lookup)=>{ const esc=String(lookup).replace(/'/g,"\\'"); return `<span class="kwchip" tabindex="0" onmouseenter="showItip(this,'${esc}')" onmouseleave="hideItip()" onfocus="showItip(this,'${esc}')" onblur="hideItip()" onclick="toggleItip(event,this,'${esc}')">${label} \u24d8</span>`; };
   const skChip=(nm)=>{ const t=skillText(nm).replace(/"/g,'&quot;').replace(/'/g,"\\'");
@@ -363,7 +371,7 @@ export function hsAbilitySection(hs,rec){
   if(spc.length) html+=skillChipRow(spc,'Special skills (gained through experience)',hs);
   if(hs.skills2) html+=skillChipRow(hs.skills2, hs.profile2?hs.profile2.name:'Skills (2)');
   if(sp) html+=`<div class="abil-sp">${ruleSplitBold(sp).join('<br>')}</div>`;
-  if(found.length||skFound.length) html+=`<div class="abil-kw no-print">`+found.map(info=>chip(info.name,info.name)).join('')+skFound.map(skChip).join('')+`</div>`;
+  if(found.length||skFound.length) html+=`<div class="abil-kw no-print">`+found.map(info=>chip(info.name,info.key)).join('')+skFound.map(skChip).join('')+`</div>`;
   return html+`</div>`;
 }
 /* HIRED SWORDS: Erfahrung. RAW (Rulebook S.147): "Hired Swords gain experience in
@@ -2804,10 +2812,7 @@ export function abilitySection(def, m){
   }
   const acquired=(m&&m.skills)||[]; const muts=(m&&m.mut)||[];
   const scan = sp+' '+muts.map(mutEN).join(' ');   // innate special rules + mutations/blessings (translated to EN so ABILITYINFO matches; acquired skills are shown separately)
-  let found=[]; const seen=new Set();
-  for(const [re,info] of ABILITYINFO){ if(abilityMentioned(re,scan) && !seen.has(info.name)){ seen.add(info.name); found.push(info); } }
-  if(found.some(f=>f.name==='Fearless')) found=found.filter(f=>f.name!=='Fear'&&f.name!=='Terror');
-  if(/immune to fear/i.test(scan) && !/causes? fear|fearsome/i.test(scan)) found=found.filter(f=>f.name!=='Fear');
+  const found=abilityChips({kind:'unit',wb:S.wb||'',id:def.id},scan);
   // which special skill list(s) this unit can draw from
   const stdCats=['combat','shooting','academic','strength','speed']; const sets=[]; const setseen=new Set();
   (def.sk||[]).forEach(c=>{ if(!stdCats.includes(c)&&SKILLSETS[c]&&!setseen.has(c)){ setseen.add(c); sets.push(SKILLSETS[c]); } });
@@ -2823,7 +2828,7 @@ export function abilitySection(def, m){
   if(_mk.length) html+=`<div class="abil-sk"><b>Mark rules:</b> `+_mk.map(function(x){
     const nm=x[0], t=String(x[1]).replace(/"/g,'&quot;').replace(/'/g,"\\'");
     return '<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,\'<b>'+nm+'</b><br>'+t+'\',false,340)" onmouseleave="hideItip()">'+nm+' \u24d8</span>'; }).join('')+`</div>`;
-html+=`<div class="abil-kw no-print">`+found.map(info=>chip(info.name,info.name)).join('')+`</div>`; }
+html+=`<div class="abil-kw no-print">`+found.map(info=>chip(info.name,info.key)).join('')+`</div>`; }
   if(_mlore && _msp.length){
     const txt=_msp.map(s=>{const d=spellEffDiff(s);return spellLabel(s.name)+(d!=null?` (${d})`:'');}).join(', ');
     html+=`<div class="abil-sp print-only" style="margin-top:4px"><b>Spells (${SPELLS[_mlore].name}):</b> ${txt}.</div>`;
@@ -2831,7 +2836,7 @@ html+=`<div class="abil-kw no-print">`+found.map(info=>chip(info.name,info.name)
   }
   if(acquired.length){
     html+=`<div class="abil-sp print-only" style="margin-top:4px"><b>Skills:</b> ${acquired.join(', ')}.</div>`;
-    html+=`<div class="abil-kw no-print"><span class="kwlbl">Skills:</span>`+acquired.map(sk=>chip(sk,sk)).join('')+`</div>`;
+    html+=`<div class="abil-kw no-print"><span class="kwlbl">Skills:</span>`+acquired.map(sk=>chip(sk,skillKey(S.wb,def,sk))).join('')+`</div>`;
   }
   return html+`</div>`;
 }

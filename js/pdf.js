@@ -1,6 +1,6 @@
 /* PDF-Export: befüllt das offizielle freebooters.org-Rostersheet. */
 import { DRAMATIS, HIREDSWORDS, MAXPROF, SHEET, WARBANDS } from '../data/index.js';
-import { HR, S, aDisp, dl, dpRatingTotal, effProfile, enItem, enRules, eqDisplayParts, eqListFor, houseDeviations, hsChosenEq, hsEqParts, hsEquipOn, hsExp, hsRatingTotal, isHeroModel, isLeaderModel, leaderRuleText, markRulesFor, maxInfo, raceEN, safeName, skillText, spellLabel, svLabel, svOfEntry, svOfModel, totalLarge, totalModels, totalRating, unitDef } from './app.js';
+import { HR, S, aDisp, dl, dpRatingTotal, effProfile, enItem, enRules, eqDisplayParts, eqListFor, houseDeviations, hsChosenEq, hsEqParts, hsEquipOn, hsExp, hsRatingTotal, isHeroModel, isLeaderModel, leaderRuleText, markRulesFor, maxInfo, raceEN, safeName, skillText, skillTextFor, spellLabel, svLabel, svOfEntry, svOfModel, totalLarge, totalModels, totalRating, unitDef } from './app.js';
 
 /* Cache for the roster-sheet PDF template bytes. Local to this module because
    loadSheetTemplate() assigns to it — an imported binding would be read-only. */
@@ -138,7 +138,7 @@ async function exportOfficialSheet(){
       const _mk=(typeof markRulesFor==='function')?markRulesFor(m):[];
       _mk.forEach(x=>NOTES.set(x[0],x[1]));
       const sp=[...(_isLeader?['Leader']:[]),..._mk.map(x=>x[0]),...(m.skills||[]),...((m.spells||[]).map(x=>spellLabel(x.name)))];
-      sp.forEach(nm=>{ const t=(typeof skillText==='function')?skillText(nm):''; if(t) NOTES.set(nm,t); });
+      sp.forEach(nm=>{ const t=(typeof skillTextFor==='function')?skillTextFor(m,nm):''; if(t) NOTES.set(nm,t); });
       if(_isLeader && typeof leaderRuleText==='function') NOTES.set('Leader',leaderRuleText());
       _sheetWrap(pg,f,sp.join(', '),400,T+16,172,6,7,5);
       _sheetTxt(pg,fb,m.exp||0,546,T+90,10,{center:true});
@@ -191,7 +191,7 @@ async function exportOfficialSheet(){
       const mi=maxInfo(m); if(mi&&mi.prof&&!def.vehicle) _sheetStats(pg,f,mi.prof,T+60,6.5);
       _sheetWrap(pg,f,_sheetEqPerModel(m).join(', '),222,T+15,170,5.5,6.5,4);
       const rules=enRules(def.sp).map(r=>r.split(':')[0]);
-      (m.skills||[]).forEach(nm=>{ const t=(typeof skillText==='function')?skillText(nm):''; if(t) NOTES.set(nm,t); });
+      (m.skills||[]).forEach(nm=>{ const t=(typeof skillTextFor==='function')?skillTextFor(m,nm):''; if(t) NOTES.set(nm,t); });
       _sheetWrap(pg,f,[...(m.skills||[]),...rules].filter(Boolean).join(', '),400,T+15,172,6,7,6);
       _sheetTxt(pg,fb,m.exp||0,487,T+62,9);
       _sheetXPboxes(pg,f,m.exp||0,T,SHEET.henXP,[SHEET.henXP.top]);

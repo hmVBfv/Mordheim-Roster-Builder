@@ -1,6 +1,6 @@
 /* Tabletop-Simulator-Export: Beschreibungstexte für Modell-Karten. */
 import { DRAMATIS, HIREDSWORDS, INJEN } from '../data/index.js';
-import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, isHeroModel, markRulesFor, memberName, noteLines, skillInfo, spellEffDiff, spellEffect, spellLabel, svOfModel, svOfEntry, uid, unitDef } from './app.js';
+import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, isHeroModel, markRulesFor, memberName, noteLines, skillTextFor, spellEffDiff, spellEffect, spellLabel, svOfModel, svOfEntry, uid, unitDef } from './app.js';
 
 /* The model's name as its own field, so it can be pasted into the TTS Name box
    separately from the description. Heroes get a darker gold than the rank and
@@ -38,7 +38,7 @@ function ttsText(m){
     +'   Sv '+ttsSv((typeof svOfModel==='function')?svOfModel(m):null)):'';
   const rules=enRules(def.sp);
   if(typeof markRulesFor==='function'){ markRulesFor(m).forEach(x=>rules.push(x[0]+': '+x[1])); }
-  (m.skills||[]).forEach(s=>{ const d=skillInfo(s); const t=d&&(typeof d==='object'?d.text:d); rules.push(t?`${s}: ${t}`:s); });
+  (m.skills||[]).forEach(s=>{ const t=skillTextFor(m,s); rules.push(t?`${s}: ${t}`:s); });
   (m.inj||[]).forEach(j=>rules.push(INJEN[j.code]||j.name));
   const rulesTxt=rules.length?rules.map(r=>'• '+r).join('\n'):'None';
   const eq=eqDisplayParts(m).concat((typeof rareDisplayParts==='function'?rareDisplayParts(m):[])); const eqTxt=eq.length?eq.join(', '):'None';
