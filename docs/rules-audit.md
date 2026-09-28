@@ -117,55 +117,68 @@ Chips entfallen (genau die aus A3), und die Chips aus A4 zeigen den Text der
 Einheit. Tests: `core/test/abilities.test.ts`, `test/ability-context.mjs`, dazu
 ein Paritätstest über jeden Chip jeder Einheit.
 
-## B. Datenfehler (eindeutig nach mordheimer.net)
+## B. Datenfehler (nach mordheimer.net)
 
-| Warband | Einheit | Was | Werkzeug | mordheimer.net |
-| --- | --- | --- | --- | --- |
-| Mercenaries (Reikland) | Captain, Marksmen | Stadtregel fehlt | – | Leadership im Umkreis von 12″; Marksmen +1 BS |
-| Mercenaries (Middenheim) | Captain, Champions | Stärke | S3 (die Stadtregel wird nicht angewendet) | S4 |
-| Mercenaries (Middenheim) | Helden | Wolfcloak fehlt in der Liste | – | 10 gc, nur Helden aus Middenheim |
-| Mercenaries, Ostermarkers | Swordsmen | Expert Swordsman | immer | nur beim Angriff |
-| Witch Hunters | Warrior Priest | Regeltext | „Burn the Witch!“ | nur Prayers of Sigmar |
-| Ostlanders | Ruffian, Ogre | Ld | 7 | 10 |
-| Carnival of Chaos | Plague Bearer, Nurgling | Regeln fehlen | – | Daemonic Instability; Nurgling: Cloud of Flies |
-| Carnival of Chaos | Plague Cart | Profil, Regeln | kein Profil | Karren T8 W4, Räder T6 W1, Pferd, Wächter; Boni für Plague Bearer/Nurglings; Nurgle's Rot beim Wächter |
-| Averlanders | Bergjaeger | Set Traps | Treffer S4 | ganze Runde, Wurf 3+ |
-| Orc Mob, Black Orcs | Orc-Skill | 'Ere We Go! | Fear und Terror | nur Fear |
-| Orc Mob | Troll | Always Hungry | nur 15 gc | oder zwei Goblins/Squigs opfern |
-| Beastmen | Beastmen-Skill | Fearless | Fear, Terror, All Alone | Fear, All Alone |
-| Marauders (Hung) | Helden | Warhorse 40 gc, Ride Warhorse | fehlt | für alle Helden |
-| Amazons (Mordheim) | Helden | Spezialfertigkeiten | Lustria-Liste | keine Spezialliste |
-| Bretonnians | Knights | Bretonnian Barding | fehlt | 30 gc |
-| Dark Elves | Cold One Beasthound | Regeln fehlen | – | Stupidity mit Ld des Beastmasters; flieht, wenn er stirbt |
-| Dark Elves | Dark-Elf-Skills | Fury of Khaine, Infiltration | Zusätze; „wie Skaven“ | nur 4″ Nachrücken; aufstellen außer Sicht, ohne 12″ |
-| Dwarf Rangers | Skill | Master of Blades | Wiederholung mit zwei Äxten | pariert bei Gleichstand; zwei Parierwaffen = zwei Paraden |
-| Dwarf Rangers | Apprentice Runesmith | Ausrüstung | Waffen und Rüstung | nur Waffen |
-| Forest Goblins | Gigantic Spider | Regel fehlt | – | geritten keine Stupidity |
-| Gunnery School | Senior Gunnery Officer, Marksman | Hunter | jede Schwarzpulverwaffe | Hunter aus dem Regelbuch (Handgun, Long Rifle) |
-| Imperial Outriders | Warband | Warhorse-Aufwertung, Pferderegeln | alle | nur Knight, Outriders, Hussars; weitere Regeln fehlen |
-| Imperial Outriders | Knight, Outrider, Scout | Cavalry-Skills | nicht in der Liste | angekreuzt |
-| Imperial Outriders | Cavalry-Skills | Athletic Mount; Ride | 2″; fehlt | halbe Bewegung; Ride gehört dazu |
-| Lizardmen | Kroxigor | „zählt als 2 Modelle“ | ja | steht nicht dort |
-| Lizardmen | Saurus | Helm | Helmet | Bone Helmet |
-| Lizardmen | Helden, Skinks | Sacred Markings, Gifte | fehlen | Oversized Jaws, Poison Glands, Mark of the Old Ones; Gifte je Einheit |
-| Norse | Berserker | Rüstung | erlaubt | nie Rüstung |
-| Outlaws | alle | Zweihandwaffe | 30 gc | 15 gc |
-| Outlaws | Outlaw, Marksman | Jagdpfeile, Waldumhang | erlaubt | Pfeile nur Helden und Marksmen, Umhang nur Helden |
-| Outlaws | Helden | Spezialfertigkeiten | Bandit-Liste | keine |
-| Outlaws | Cleric | Fertigkeiten | Combat, Academic, Strength | nur Academic |
-| Pirates | Swabbies | Regeln fehlen | – | zählen nicht für Rout; verschwinden, wenn die Warband routet |
-| Pit Fighters | Troll Slayer, Ogre | Ausrüstung | Rüstung beim Slayer, Zwergenaxt beim Ogre | umgekehrt; Gromril-Waffe für den Slayer |
-| Pit Fighters | Warband | In the Pit! | gekürzt | verliert keine Ausrüstung; ignoriert Robbed, Captured, Hardened, Sold to the Pits, Survives |
-| Amazons (Lustria) | Piranha Warrior | Conch Shell Horn | angeborene Regel | Ausrüstung (Rare 8, 25 gc) |
-| Shadow Warriors | Warband | Distaste for Poison | Gifte und Drogen | nur Gifte |
-| Black Dwarfs | Skill | Tyrant | Zusatz „Rout-Test, wenn der Anführer fällt“ | Rout-Test wiederholen, solange er nicht liegt |
-| Black Dwarfs | Bull Centaur, Gaoler, Krieger | Engine of Chaos | in der Liste | nur Sorcerer |
-| Cursed Cavalcade | Helden | Spezialfertigkeiten | Dark-Elf-Liste | Noblesse Oblige, Torturer, Duelist |
-| Cursed Cavalcade | Helden | Cathayan Quilted Silk Armour | nur Aristocrat | alle Helden, 15 gc |
-| Cursed Cavalcade | Warband | Capture! | fehlt | „61 Captured“ neu würfeln ab 2 Gefangenen oder 5 Thralls |
-| Court of the Profane Pleasures | Wretch | Dolch | erster frei | 2 gc, keiner frei |
-| Lustrian Reavers | Hunting Hawk | Profil | W1, Ld5 | W und Ld „–“ |
-| Night Goblins | Troll | Dumb Monster | „würfelt nie auf Verletzungen“ | nur: lernt nichts, keine Erfahrung |
+Jeder Befund wurde vor der Korrektur noch einmal gezielt auf der Seite
+nachgelesen. Sechs Meldungen hielten dem nicht stand (unten „kein Fehler“) –
+die Zusammenfassungen von WebFetch sind also kein Beleg für sich.
+Test für alle Korrekturen: `core/test/data-audit.test.ts`.
+
+**Korrigiert (28.09.2026):**
+
+| Warband | Was | Vorher | Jetzt (mordheimer.net) |
+| --- | --- | --- | --- |
+| Mercenaries (Reikland) | Stadtregel | fehlte | Leadership des Captains im Umkreis von 12″; Marksmen +1 BS |
+| Mercenaries (Middenheim) | Captain, Champions | S3 (Stadtregel nicht angewendet) | S4 |
+| Mercenaries | Expert Swordsmen | immer | nur beim Angriff, nur mit normalem Schwert |
+| Witch Hunters | Warrior Priest | „Burn the Witch!“ | nur Prayers of Sigmar |
+| Ostlanders | Ruffian, Ogre | Ld 7 | Ld 10 |
+| Averlanders | Set Traps | Treffer S4 | eine Runde; Auslösen bei 3+ in 2″; Marker verschwindet |
+| Orc Mob, Black Orcs | 'Ere We Go! | Fear und Terror | nur Fear |
+| Orc Mob | Troll, Always Hungry | nur 15 gc | oder zwei Goblins/Squigs opfern |
+| Beastmen | Fearless | Fear, Terror, All Alone | Fear, All Alone |
+| Dark Elves | Cold One Beasthound | – | Stupidity mit Ld des Beastmasters; fliehen, wenn er stirbt |
+| Dark Elves | Fury of Khaine | Zusätze | nur 4″ Nachrücken |
+| Dwarf Rangers | Apprentice Runesmith | Waffen und Rüstung | nur Waffen |
+| Forest Goblins | Gigantic Spider | – | geritten keine Stupidity |
+| Gunnery School | SGO, Marksmen: Hunter | jede Schwarzpulverwaffe | Hunter aus dem Regelbuch |
+| Imperial Outriders | Warhorse; Pferderegeln | alle; fehlten | Knight, Outriders, Hussars; ohne Pferd kein Einsatz, tote Pferde zuerst ersetzen, gerittene Pferde kein Ziel, Reiter immer Ziel ohne +1 |
+| Lizardmen | Kroxigor; Saurus-Helm | „zählt als 2“; Helmet | entfällt; Bone Helmet |
+| Outlaws | Zweihandwaffe | 30 gc | 15 gc |
+| Outlaws | Listen der Henchmen | wie Helden | Outlaws ohne Langbogen, leichte Rüstung, Jagdpfeile, Waldumhang; Marksmen ohne Waldumhang |
+| Outlaws | Fertigkeiten | Bandit-Liste; Cleric Combat/Academic/Strength | keine Spezialliste; Cleric nur Academic |
+| Pirates | Swabbies | – | zählen nicht für Rout; verschwinden, wenn die Warband routet |
+| Pit Fighters | Listen; In the Pit! | Zwergenaxt beim Ogre; gekürzt | Zwergenaxt nur Slayer, Rüstung nur Ogre; volle Regel |
+| Amazons (Mordheim) | Spezialfertigkeiten | Lustria-Liste | keine |
+| Amazons (Lustria) | Conch Shell Horn | angeborene Regel | Ausrüstung (Rare 8, 25 gc) |
+| Shadow Warriors | Distaste for Poison | Gifte und Drogen | Gifte |
+| Arabian Tomb Raiders | Bedouin | „nicht kumulativ mit anderen Boni“ | nur +1, auch mit zwei Bedouins |
+| Cursed Cavalcade | Spezialfertigkeiten | Dark-Elf-Liste | Noblesse Oblige, Torturer, Duelist |
+| Court of the Profane Pleasures | Wretches | erster Dolch frei | jeder Dolch 2 gc |
+| Carnival of Chaos | Plague Bearer, Nurgling | – | Daemonic Instability; Nurglings: Cloud of Flies, kein Fear |
+| Carnival of Chaos | Plague Cart | kein Profil | Karren, Rad, Pferd, Wächter; Boni gegen Instability; Nurgle's Rot |
+
+**Kein Fehler (Meldung widerlegt):** Black Dwarfs „Tyrant“ (unser Text steht
+so auf der Seite); Dark Elves „Infiltration“ (mit 12″, wie Skaven); Cursed
+Cavalcade Quilted Silk Armour (nur Aristocrat); Norse Berserker (Rüstung ist
+schon gesperrt); Night-Goblin-Troll würfelt nicht auf Verletzungen (steht in
+der Regeneration der Trolle); Imperial Outriders Cavalry-Skills (die Liste
+hängt schon an allen drei Helden).
+
+**Offen – braucht mehr als eine Datenzeile:**
+
+| Warband | Was | Warum noch offen |
+| --- | --- | --- |
+| Mercenaries (Middenheim) | Wolfcloak 10 gc für Helden | Listen kennen noch keine Einträge je Stadt |
+| Marauders (Hung) | Warhorse 40 gc, alle Helden mit Ride Warhorse | dito, je Stamm |
+| Lizardmen | Sacred Markings (Oversized Jaws, Poison Glands, Mark of the Old Ones), Gifte je Einheit | Aufwertungen beim Anwerben gibt es noch nicht |
+| Dwarf Rangers u. a. | Zwerge nie Arcane Lore | Sperre einzelner Skills fehlt im Skill-Menü |
+| Pit Fighters | Gromril-Waffe für den Slayer | Gromril ist ein Aufschlag, keine Listenzeile |
+| Lustrian Reavers | Hunting Hawk W und Ld „–“ | Profile rechnen mit Zahlen |
+| Black Dwarfs | Engine of Chaos nur für den Sorcerer? | Liste und Gegenstand widersprechen sich (siehe C) |
+| Cursed Cavalcade | „61 Captured“ neu würfeln | Wortlaut nicht bestätigt |
+| Imperial Outriders | Athletic Mount, Ride | Text steht nur in Blazing Saddles, nicht auf der Seite |
+| Dwarf Rangers | Master of Blades | steht nicht auf der Seite der Dwarf Rangers |
 
 ## C. Fragen an Rob
 
@@ -180,6 +193,7 @@ ein Paritätstest über jeden Chip jeder Einheit.
 | C7 | Wood Elves, Shadow Warriors: Ithilmar-Waffen zum Sonderpreis (2×) nur beim Aufstellen? | Fußnote: danach normaler Preis und Seltenheitswurf |
 | C8 | Black Dwarfs, Sorcerer: Rüstung erlaubt? | Eintrag nennt nur Waffen, der Mechanical Suit ist aber „Sorcerer only“ |
 | C9 | Bretonnians: Men-at-Arms höchstens 8 oder beliebig viele? | Überschrift 0–8, Warband-Auswahl „any number“ |
+| C10 | Black Dwarfs: Engine of Chaos nur für den Sorcerer oder für alle Chaos Dwarfs? | Fußnote der Liste nach einem Abruf „Sorcerer only“, der Gegenstand selbst „Chaos Dwarfs only“ |
 
 ## D. Merchant Caravans (Robs Warband)
 

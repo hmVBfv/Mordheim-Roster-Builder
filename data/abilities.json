@@ -937,7 +937,7 @@
    {
     "name": "Daemon",
     "line": "Special (Carnival)",
-    "text": "A daemonic creature: causes fear, is immune to psychology and to poison, and gains no experience."
+    "text": "A daemonic creature: immune to psychology and to poison, and gains no experience (whether it causes fear is in its own rules)."
    }
   ],
   [
