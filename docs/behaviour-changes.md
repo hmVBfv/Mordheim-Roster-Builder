@@ -64,7 +64,13 @@ geplant.
 | --- | --- | --- | --- | --- |
 | V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | geplant, Spezifikation [unten](#v1--ablauf-einer-verletzung) |
 | V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | geplant, Spezifikation [unten](#v2--feste-ids-für-gefallene) |
-| V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. | offen – Rob: RAW (Vorgabe) oder RAI als Hausregel? | Frage |
+| V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. mordheimer.net nennt keine solche Ausnahme – weder beim Augur (*Sisters of Sigmar*) noch bei Ergebnis 31 (*Campaigns – Serious Injuries*). | Rob, 28.09.2026: Eine Auslegung nach Absicht gilt nur, wenn mordheimer.net sie übernimmt. Hier nicht, also **RAW**: Der Augur verliert 1 BS wie jeder andere. | entschieden; alte App und `core/` rechnen schon so, Test `core/test/rulings.test.ts` |
+
+**Grundsatz (Rob, 28.09.2026):** Ändert mordheimer.net eine Regel nach ihrer
+Absicht (RAI) statt nach dem Wortlaut (RAW), übernehmen wir das – aber nur,
+wenn es dort ausdrücklich steht. Eine RAI-Auslegung, die nur in einem FAQ oder
+Forum steht, bleibt draußen; wer sie spielen will, bekommt sie höchstens als
+Hausregel.
 
 Zur Erklärungspflicht: Erfahrung braucht keine Erklärung (Rob, 28.09.2026) –
 in vielen Szenarien bekommt ein Held schon fürs Ausschalten eines Gegners einen
@@ -82,7 +88,7 @@ Liste der Legacy-Tests, die bewusst anders ausgehen.
 
 Quellen, in der Rangfolge aus `CLAUDE.md`: Ultimate FAQ (UFAQ) 10.2, 10.3,
 11.1, 19 und die Errata zu Empire in Flames; FAQ von Tuomas („Augur Blind in
-one Eye“); mordheimer.net, *Campaigns – Serious Injuries*; Regelbuch S. 80–81
+one Eye“, nach V3 ohne Ausnahme für den Augur); mordheimer.net, *Campaigns – Serious Injuries*; Regelbuch S. 80–81
 (Tabelle) und S. 107 (Hired Swords); Bezirkseffekte aus der Kampagnenkarte
 (`data/campaign.json`). Die Wirkungen der Ergebnisse selbst stehen schon so in
 `data/injuries.json`; neu ist, dass beide Eingänge denselben Ablauf nehmen und

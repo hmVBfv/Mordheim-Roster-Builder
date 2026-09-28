@@ -58,6 +58,9 @@ changing anything structural.
 - The **Ultimate FAQ** and the **FAQ from Toumas** override everything, then
   **mordheimer.net**, then the original rulebook. Mordheimer table values
   (with annotations) override prose.
+- Rules as written (RAW) by default. A ruling by intent (RAI) applies only
+  where mordheimer.net states it; one found only in a FAQ or forum is at most
+  a house rule.
 - Content on mordheimer.net not labelled RAW or House Rule never becomes a
   playable warband. broheim.net Fanatics content is NPC flavour only.
 - Source grades: more official is better (Core > 1a > 1b > 1c), not newer.
