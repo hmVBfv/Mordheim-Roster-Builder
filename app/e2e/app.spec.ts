@@ -103,6 +103,32 @@ test('after an import, Back returns to where the import began, not to the sheet'
   await expect(page.locator('dialog[open]')).toHaveCount(0);
 });
 
+/* The undo notice must not stand in the way (Rob, 28.09.2026). */
+test('the undo notice goes quickly, can be dismissed and lets taps through', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  await page.getByRole('button', { name: 'Remove from this device' }).click();
+  const toast = page.locator('[role=status]', { hasText: 'removed.' });
+  await expect(toast).toBeVisible();
+  await shot(page, 'undo-toast');
+  const through = await toast.evaluate((el) => {
+    const r = el.querySelector('span')!.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !el.contains(hit);
+  });
+  expect(through, 'a tap on the text reaches what lies under it').toBe(true);
+  await expect(toast).toBeHidden({ timeout: 6000 });
+  // Undo brings the warband back; the next notice is dismissed at once
+  await importSample(page);
+  await page.getByRole('button', { name: 'Remove from this device' }).click();
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByRole('link', { name: /The Silver Caravan/ })).toBeVisible();
+  await page.getByRole('link', { name: /The Silver Caravan/ }).click();
+  await page.getByRole('button', { name: 'Remove from this device' }).click();
+  await page.getByRole('button', { name: 'Dismiss' }).click();
+  await expect(toast).toBeHidden({ timeout: 500 });
+});
+
 test('the navigation fits the flavour', async ({ page }) => {
   await page.goto('./');
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();

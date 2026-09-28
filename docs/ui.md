@@ -24,7 +24,10 @@ unverändert auf Pages.
    ausstehend · ⚠ Konflikt · Offline-Hinweis.
 5. **Aufgaben statt Suchen.** Der Start zeigt „Offen für dich“.
 6. **Rückgängig statt Nachfragen,** wo Versionen das erlauben. Bestätigung nur
-   bei Unumkehrbarem (z. B. Schlacht abschließen).
+   bei Unumkehrbarem (z. B. Schlacht abschließen). Der Hinweis mit „Undo“
+   steht nicht im Weg (Rob, 28.09.2026): Er verschwindet nach 5 Sekunden, lässt
+   sich sofort wegtippen (✕), und nur seine Knöpfe fangen Tipps ab – was unter
+   dem Text liegt, bleibt bedienbar.
 7. **Englische Oberfläche.** Spielbegriffe wie in den Regeln (Warband, Out of
    Action, Hired Sword). Zweisprachig sind nur Kanon-Felder (Namen, Titel)
    und die Texte, die Spieler selbst schreiben.
@@ -139,4 +142,5 @@ Diese Liste steht auch in `CLAUDE.md`.
 - [ ] Beide Themes geprüft
 - [ ] Kein `dangerouslySetInnerHTML`, keine Inline-Handler im HTML
 - [ ] Zurück schließt offene Bereiche, ohne die App zu verlassen
+- [ ] Hinweise versperren nichts (kurz, wegtippbar, Tipps gehen durch)
 - [ ] Playwright-Screenshot des Bildschirms aktualisiert und angesehen

@@ -161,6 +161,7 @@ changing anything structural.
 - [ ] visibility shown wherever content might not be public
 - [ ] sync state visible; offline case handled
 - [ ] Back closes an open sheet and never leaves the app (`useSheet`)
+- [ ] notices never block: short, dismissable, taps pass through
 - [ ] both themes checked
 - [ ] Playwright screenshot updated and looked at
 
