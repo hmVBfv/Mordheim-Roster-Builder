@@ -1433,3 +1433,27 @@ One test went red for an unrelated reason: the campaign-file walk takes
 random steps over the data, and with the new lists it re-added its own
 side to a battle only four times, one short of the minimum. The walk now
 tries that step when it can matter, and walks the group's own warbands too.
+
+## September 28, 2026 — pressing every button
+
+Rob asked for every button to be tried the way a player would: Back on a
+phone, notices that sit in the way, things that overlap, and a desktop
+screen that should use its room. In the new app, Back with the import
+sheet open left the screen — on the first screen, the app itself. A sheet
+now adds a history entry, so Back closes it, and Cancel takes the entry
+away again. Moving on to an imported warband waits until that entry is
+gone; otherwise the next Back would land on a closed sheet. The undo notice stayed eight seconds, could not be
+closed and swallowed every tap on its strip — right above the bottom
+navigation. It now goes after five, has a dismiss button, and passes taps
+through except on its buttons. On a desktop the roster was a phone-wide
+column; the warrior cards now stand side by side.
+
+The legacy app, which the group plays with until the switch, was tried
+with the real warbands at 360 px: the page scrolled sideways by 180 px.
+The cause took three attempts. The emulated phone zoomed out to fit the
+wide page, so the first measurement looked fine; a grid column sized
+`1fr` grows to its widest content unless told it may shrink; and the
+first phone rules were silently overridden by an `.addrow` rule further
+down the stylesheet. Its "Saved." notices swallowed taps in the same way
+as the new app's. Both are fixed and covered by a Playwright project that
+loads the group's saves into the legacy app.
