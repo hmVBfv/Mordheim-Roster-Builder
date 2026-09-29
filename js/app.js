@@ -1264,10 +1264,22 @@ export function postBattleHelp(openKey){ const k=openKey||pbHelpOpenStep;
     +`<p class="pb-note pbh-src">${pbEsc(PB_SOURCE)}</p>`; }
 export function setPbHelpOpen(key,open){ if(open) pbHelpOpenStep=key; }
 export function openPostBattle(key){ if(key) pbHelpOpenStep=key; const box=document.getElementById('pbhelp'); if(box) box.innerHTML=postBattleHelp(key);
-  document.getElementById('pbmodal').style.display='flex';
+  showModal('pbmodal');
   if(key){ const el=document.getElementById('pbh-'+key); if(el&&el.scrollIntoView) el.scrollIntoView({block:'start'}); } }
-export function closePostBattle(){ document.getElementById('pbmodal').style.display='none'; }
+export function closePostBattle(){ hideModal('pbmodal'); }
 
+/* Legacy modals and Back (Rob, 28.09.2026): opening one adds a history entry,
+   so the phone's Back closes it instead of leaving the page; closing it any
+   other way takes the entry away again, leaving no dead step. */
+const MODALS=['exportmodal','ttsmodal','importmodal','campmodal','pbmodal'];
+let modalLeaving=false;
+export function showModal(id){ const el=document.getElementById(id); if(!el) return; el.style.display='flex';
+  if(typeof history!=='undefined' && history.pushState && !(history.state&&history.state.mhModal)) history.pushState({mhModal:id},''); }
+export function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none';
+  if(typeof history!=='undefined' && history.state && history.state.mhModal){ modalLeaving=true; history.back(); } }
+if(typeof window!=='undefined' && window.addEventListener) window.addEventListener('popstate',()=>{
+  if(modalLeaving){ modalLeaving=false; return; }
+  MODALS.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; }); });
 export function postbattleBlock(){
   const c=campState(); const round=pbRound();
   if(round<1 && !(c.battles||[]).length) return '';
@@ -2454,8 +2466,8 @@ export function campaignTextReport(){ const cd=(S.campaign&&S.campaign.districts
   const act=activeDistrictEffects();
   if(act.length){ lines.push('ACTIVE EFFECTS'); act.forEach(e=>lines.push('  \u2022 '+e.district+': '+e.label)); }
   return lines.join('\n'); }
-export function openCampaignIO(){ const ta=document.getElementById('campexport'); if(ta) ta.value=campaignJSON(); const pb=document.getElementById('camppaste'); if(pb) pb.value=''; document.getElementById('campmodal').style.display='flex'; }
-export function closeCampaignIO(){ document.getElementById('campmodal').style.display='none'; }
+export function openCampaignIO(){ const ta=document.getElementById('campexport'); if(ta) ta.value=campaignJSON(); const pb=document.getElementById('camppaste'); if(pb) pb.value=''; showModal('campmodal'); }
+export function closeCampaignIO(){ hideModal('campmodal'); }
 export function campShowJSON(){ document.getElementById('campexport').value=campaignJSON(); }
 export function campShowText(){ document.getElementById('campexport').value=campaignTextReport(); }
 export function copyCampaign(){ const ta=document.getElementById('campexport'); ta.select(); ta.setSelectionRange(0,99999); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>{ if(typeof flash==='function') flash('Campaign copied.'); },()=>{}); } else { try{ document.execCommand('copy'); if(typeof flash==='function') flash('Campaign copied.'); }catch(e){} } }
@@ -4272,7 +4284,7 @@ export function enRules(sp){
 
 
 
-export function closeTts(){ document.getElementById('ttsmodal').style.display='none'; }
+export function closeTts(){ hideModal('ttsmodal'); }
 export function copyTts(){ const ta=document.getElementById('ttstext'); const txt=ta.value;
   const ok=()=>flash('TTS description copied.');
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,()=>{try{ta.select();document.execCommand('copy');ok();}catch(e){}}); }
@@ -4290,8 +4302,8 @@ export function copyTtsBoth(){ const n=document.getElementById('ttsname'), t=doc
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok,ok); else ok(); }
 export function openExport(){ if(!S.models.length){ flash('No warriors in the warband yet.'); return; }
   document.getElementById('extextwrap').style.display='none';
-  document.getElementById('exportmodal').style.display='flex'; }
-export function closeExport(){ document.getElementById('exportmodal').style.display='none'; }
+  showModal('exportmodal'); }
+export function closeExport(){ hideModal('exportmodal'); }
 export function exportTool(){ dl(JSON.stringify(exportState(),null,2),safeName()+'.json','application/json'); closeExport(); }
 export function exportText(){ const t=buildText(); document.getElementById('extext').value=t; document.getElementById('extextwrap').style.display='block'; }
 export function downloadText(){ dl(buildText(),stampedName()+'.txt','text/plain;charset=utf-8'); }
@@ -4299,8 +4311,8 @@ export function copyExport(){ const ta=document.getElementById('extext'); ta.sel
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>flash('Text copied.'),()=>flash('Selected — please copy manually.')); }
   else { try{ document.execCommand('copy'); flash('Text copied.'); }catch(e){ flash('Selected — please copy manually.'); } } }
 
-export function openImport(){ const ta=document.getElementById('pastebox'); if(ta) ta.value=''; document.getElementById('importmodal').style.display='flex'; }
-export function closeImport(){ document.getElementById('importmodal').style.display='none'; }
+export function openImport(){ const ta=document.getElementById('pastebox'); if(ta) ta.value=''; showModal('importmodal'); }
+export function closeImport(){ hideModal('importmodal'); }
 export function importText(str){
   str=String(str||'').trim();
   if(!str){ flash('Nothing to import — paste a Tool-file JSON or the readable-text export.'); return; }

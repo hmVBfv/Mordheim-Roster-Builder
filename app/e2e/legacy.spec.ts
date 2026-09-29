@@ -96,8 +96,9 @@ test('the extra-equipment panel of a Hired Sword opens without an error and stay
 });
 
 /* The post-battle helper (Rob, 29.09.2026). */
-test('the post-battle helper opens from the top bar and fits a phone', async ({ page }) => {
+test('the post-battle helper opens from the top bar, fits a phone and Back closes it', async ({ page }) => {
   await load(page, 'rangvalds-reaver');
+  const url = page.url();
   await page.getByRole('button', { name: '⚔ Post-battle' }).click();
   const modal = page.locator('#pbmodal');
   await expect(modal).toBeVisible();
@@ -109,8 +110,20 @@ test('the post-battle helper opens from the top bar and fits a phone', async ({ 
   await page.screenshot({ path: 'test-results/screens/legacy-post-battle.png' });
   await page.locator('#pbh-exploration').scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'test-results/screens/legacy-post-battle-exploration.png' });
-  await page.locator('#pbmodal').getByRole('button', { name: '✕ close' }).click();
+  await page.goBack();
   await expect(modal).toBeHidden();
+  expect(page.url()).toBe(url);
+  await expect(page.locator('#builder-view')).toBeVisible();
+});
+
+test('closing a dialog by its button leaves no dead step for Back', async ({ page }) => {
+  await load(page, 'rangvalds-reaver');
+  await page.getByRole('button', { name: 'Export ▾' }).click();
+  await expect(page.locator('#exportmodal')).toBeVisible();
+  await page.locator('#exportmodal').getByRole('button', { name: '✕ close' }).click();
+  await expect(page.locator('#exportmodal')).toBeHidden();
+  // the dialog's history entry is gone again
+  await page.waitForFunction(() => !(history.state as { mhModal?: string } | null)?.mhModal);
 });
 
 test('a notice lets taps through', async ({ page }) => {
