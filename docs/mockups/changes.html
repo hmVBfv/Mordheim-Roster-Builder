@@ -70,14 +70,14 @@
         <p class="why">✓ Advance at 28 experience, rolled after battle 5</p>
         <label class="explain"><span class="small">What happened?</span>
           <textarea class="textarea" placeholder="A sentence is enough.">He learned it the hard way, on the gangway of the mill.</textarea>
-          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet" data-vis>Visible to…</button></span></label>
       </div>
       <div class="change">
         <div class="what"><span>New skill</span><span class="to">Strike to Injure</span></div>
         <p class="why">✓ Advance at 24 experience, due since battle 4 and taken now</p>
         <label class="explain"><span class="small">What happened?</span>
           <textarea class="textarea" placeholder="A sentence is enough."></textarea>
-          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet" data-vis>Visible to…</button></span></label>
       </div>
     </article>
 
@@ -88,7 +88,7 @@
         <p class="why">✓ Out of action by Skritch (Clan Skrittle), turn 4 · rolled 22</p>
         <label class="explain"><span class="small">What happened?</span>
           <textarea class="textarea" placeholder="How did she take it? Who carried her home?"></textarea>
-          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet" data-vis>Visible to…</button></span></label>
       </div>
       <div class="change">
         <div class="what"><span>Experience</span><span class="from">12</span><span class="arrow">→</span><span class="to">13</span></div>
@@ -118,7 +118,7 @@
         <p class="why">✓ Out of action by Nibble (Clan Skrittle), turn 5 · rolled 2 · his dagger and axe are lost</p>
         <label class="explain"><span class="small">What happened?</span>
           <textarea class="textarea" placeholder="A last word, a grave, a debt left behind…"></textarea>
-          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet" data-vis>Visible to…</button></span></label>
       </div>
     </article>
 
@@ -129,7 +129,7 @@
         <p class="why">✓ Hired after battle 5</p>
         <label class="explain"><span class="small">Who is he?</span>
           <textarea class="textarea">A ferry boy who knows the Hel Fenn shoals and asks for boots instead of wages.</textarea>
-          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet">Visible to…</button></span></label>
+          <span class="foot"><span class="vis public">👁 Everyone</span><button type="button" class="btn-quiet" data-vis>Visible to…</button></span></label>
       </div>
     </article>
 
@@ -147,6 +147,19 @@
   </div>
   <nav class="nav" data-current="Warbands"></nav>
 </div>
+
+<dialog class="sheet" id="sheet-vis" aria-labelledby="vis-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-vis">
+    <h2 id="vis-title">Who may read this?</h2>
+    <div class="pick" id="vis-pick">
+      <button type="button" aria-pressed="true" data-value="public">👁 Everyone<small>the whole campaign</small></button>
+      <button type="button" aria-pressed="false" data-value="sealed">✉ Sealed<small>until battle 6 is closed</small></button>
+      <button type="button" aria-pressed="false" data-value="leader">⚑ Leaders only<small>and you</small></button>
+    </div>
+    <div class="row"><button class="btn" value="ok">Done</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
 
 <div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
 
@@ -168,6 +181,17 @@
   count();
   document.getElementById('filter').addEventListener('choose', function (e) {
     document.querySelectorAll('article.card').forEach(function (a) { a.hidden = e.detail === 'todo' && !a.dataset.todo; });
+  });
+  var visFor = null;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-vis]'); if (!b) return;
+    visFor = b.parentElement.querySelector('.vis');
+    window.mockOpen('sheet-vis');
+  });
+  document.getElementById('form-vis').addEventListener('submit', function () {
+    var p = document.querySelector('#vis-pick [aria-pressed=true]');
+    var label = { public: '👁 Everyone', sealed: '✉ Sealed until battle 6', leader: '⚑ Leaders only' }[p.dataset.value];
+    if (visFor) { visFor.textContent = label; visFor.className = 'vis ' + p.dataset.value; }
   });
   document.getElementById('mark').onclick = function () {
     window.mockToast('Marked “After battle 5”. The numbers are frozen.');
