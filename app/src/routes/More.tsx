@@ -1,6 +1,7 @@
 /* Settings of this device. */
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { setChoice, THEME_CHOICES, useThemeChoice } from '../theme/theme.ts';
+import { shownVersion } from '../version.ts';
 import ui from '../ui/ui.module.css';
 import styles from './More.module.css';
 
@@ -18,8 +19,8 @@ export function More() {
           </label>
         ))}
       </fieldset>
-      <p className={ui.muted}>
-        {APP_NAME} · version {__APP_VERSION__}
+      <p className={`${ui.muted} ${styles.version}`}>
+        {APP_NAME} · version <span title={__APP_VERSION__}>{shownVersion(__APP_VERSION__)}</span>
         {FLAVOUR === 'quickbuild' && ' · warbands stay on this device'}
       </p>
     </section>
