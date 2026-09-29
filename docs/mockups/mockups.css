@@ -366,3 +366,21 @@ dialog.sheet::backdrop { background: var(--shadow); }
 
 .note-kind { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold); }
 blockquote { margin: 0; padding-left: var(--s3); border-left: 3px solid var(--gold); font-style: italic; }
+
+/* warband portraits (warband-art.js): three frames, each warband on its own
+   beat so they do not blink together; still under reduced motion */
+.art { display: block; flex: none; width: 48px; height: 48px; border: 1px solid var(--border); border-radius: var(--radius); background: #111; image-rendering: pixelated; }
+.art.small { width: 40px; height: 40px; }
+.art.big { width: 64px; height: 64px; }
+.art .fB, .art .fC { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .art .fA { animation: artA 7s steps(1, end) infinite; }
+  .art .fB { animation: artB 7s steps(1, end) infinite; }
+  .art .fC { animation: artC 7s steps(1, end) infinite; }
+  .art[data-art='penitents'] g { animation-duration: 5.3s; }
+  .art[data-art='skrittle'] g { animation-duration: 6.1s; animation-delay: -2s; }
+}
+@keyframes artA { 0% { opacity: 1; } 58% { opacity: 0; } 64% { opacity: 1; } 80% { opacity: 0; } 90% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes artB { 0% { opacity: 0; } 58% { opacity: 1; } 64% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes artC { 0% { opacity: 0; } 80% { opacity: 1; } 90% { opacity: 0; } 100% { opacity: 0; } }
+.with-art { display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s3); align-items: center; }
