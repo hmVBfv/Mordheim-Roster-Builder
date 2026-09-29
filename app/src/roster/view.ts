@@ -7,6 +7,13 @@ export const STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
 
 export interface StatCell { key: string; value: string; changed: boolean }
 
+/** One step of the experience track: below the starting experience, reached,
+    the next one, or still open. */
+export interface XpStep { at: number; state: 'base' | 'on' | 'next' | 'open' }
+/** The experience track as the Roster Builder draws it (legacy xpBar); null
+    for those who gain no experience. */
+export interface XpView { value: number; steps: XpStep[]; next: number | null }
+
 export interface WarriorView {
   key: string;
   name: string;
@@ -17,6 +24,7 @@ export interface WarriorView {
   promoted: boolean;
   leader: boolean;
   exp: number;
+  xp: XpView | null;
   advanceDue: boolean;
   missGames: number;
   stats: StatCell[];
@@ -30,7 +38,10 @@ export interface WarriorView {
   members: string[];
 }
 
-export interface HireView { key: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae'; exp: number; stats: StatCell[] }
+export interface HireView {
+  key: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
+  exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[];
+}
 
 export interface RosterView {
   name: string;
@@ -56,6 +67,14 @@ function statCells(p: Profile | null, base: Profile | null | undefined, attacks?
   });
 }
 
+function track(thresholds: readonly number[], start: number, value: number): XpView {
+  const next = thresholds.find((t) => t > value) ?? null;
+  return {
+    value, next,
+    steps: thresholds.map((at) => ({ at, state: at <= start ? 'base' : at <= value ? 'on' : at === next ? 'next' : 'open' })),
+  };
+}
+
 function warrior(ctx: core.Ctx, m: Model): WarriorView {
   const def = core.unitDef(ctx, m.uid_def);
   const hero = core.isHeroModel(ctx, m);
@@ -70,6 +89,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     promoted: !!m.promoted,
     leader: core.isLeaderModel(ctx, m),
     exp: Number(m.exp) || 0,
+    xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp) : null,
     advanceDue: !!adv?.due,
     missGames: Number(m.miss) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
@@ -86,9 +106,14 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
 function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView | null {
   const e = kind === 'Hired Sword' ? ctx.data.HIREDSWORDS[rec.key] : ctx.data.DRAMATIS[rec.key];
   if (!e) return null;
+  // Hired Swords gain experience on the Henchmen's steps; Dramatis Personae gain none
+  const hs = kind === 'Hired Sword';
   return {
     key: `${kind}:${rec.uid}`, name: rec.name || e.name, type: e.name, kind,
-    exp: Number(rec.exp) || 0, stats: statCells(core.hsEffProfile(rec, e), e.profile),
+    exp: Number(rec.exp) || 0,
+    xp: hs ? track(core.HS_ADV, 0, core.hsExp(rec)) : null,
+    advanceDue: hs && core.hsAdvanceStatus(ctx, rec, e).due,
+    stats: statCells(core.hsEffProfile(rec, e), e.profile),
   };
 }
 

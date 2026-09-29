@@ -4,7 +4,7 @@ import { Suspense, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
-import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
+import { rosterView, type HireView, type WarriorView, type XpView } from '../roster/view.ts';
 import ui from '../ui/ui.module.css';
 import styles from './Roster.module.css';
 
@@ -21,6 +21,29 @@ function Stats({ cells, save }: { cells: { key: string; value: string; changed: 
         </tr>
       </tbody>
     </table>
+  );
+}
+
+const STEP_WORD = { base: 'before his start', on: 'reached', next: 'next', open: '' } as const;
+
+/* Every step of the experience track framed, those below the starting
+   experience dashed, those reached filled, the next one marked – as the
+   Roster Builder draws it. The state is also in words for screen readers. */
+function XpTrack({ xp }: { xp: XpView }) {
+  return (
+    <div className={styles.xp}>
+      <ol className={styles.steps} aria-label="Experience steps">
+        {xp.steps.map((s) => (
+          <li key={s.at} className={styles[s.state]}>
+            {s.at}{STEP_WORD[s.state] && <span className="visually-hidden"> {STEP_WORD[s.state]}</span>}
+          </li>
+        ))}
+      </ol>
+      <p className={styles.xpLine}>
+        <span>Exp <b>{xp.value}</b></span>
+        <span>{xp.next != null ? `next advance at ${xp.next}` : 'all steps reached'}</span>
+      </p>
+    </div>
   );
 }
 
@@ -43,8 +66,8 @@ function Warrior({ w }: { w: WarriorView }) {
         </p>
       </header>
       <Stats cells={w.stats} save={w.save} />
+      {w.xp ? <XpTrack xp={w.xp} /> : <p className={`${ui.muted} ${styles.xpLine}`}>Gains no experience.</p>}
       <dl className={styles.facts}>
-        <dt>Experience</dt><dd>{w.exp}</dd>
         <Line label="Equipment" items={w.equipment} />
         <Line label="Skills" items={w.skills} />
         <Line label="Spells" items={w.spells} />
@@ -62,9 +85,10 @@ function Hire({ h }: { h: HireView }) {
       <header className={styles.head}>
         <h3>{h.name}</h3>
         <p className={ui.muted}>{h.kind}{h.name !== h.type ? ` · ${h.type}` : ''}</p>
+        {h.advanceDue && <p className={styles.badges}><span className={`${styles.badge} ${styles.due}`}>Advance due</span></p>}
       </header>
       <Stats cells={h.stats} />
-      <dl className={styles.facts}><dt>Experience</dt><dd>{h.exp}</dd></dl>
+      {h.xp && <XpTrack xp={h.xp} />}
     </article>
   );
 }
