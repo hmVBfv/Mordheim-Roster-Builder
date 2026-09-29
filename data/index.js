@@ -12,7 +12,7 @@
  * Regex-Felder sind als {"__re": "muster", "__f": "flags"} kodiert (JSON kennt
  * keine Regex) und werden hier zurückverwandelt.
  */
-const FILES = ["races", "equipment", "skills", "spells", "abilities", "mutations", "injuries", "i18n", "houserules", "marks", "sheet", "campaign", "warbands", "hiredswords", "dramatis"];
+const FILES = ["races", "equipment", "skills", "spells", "abilities", "mutations", "injuries", "i18n", "houserules", "marks", "sheet", "campaign", "warbands", "hiredswords", "dramatis", "postbattle"];
 
 function revive(v) {
   if (Array.isArray(v)) return v.map(revive);
@@ -55,5 +55,6 @@ export const {
   TERMEN, HR_LABELS, MARAUDER_MARKS, MARK_RULES, SHEET,
   DISTRICTS, PENDING_1A, UNITRACE, WARBANDS, WBEXTRA,
   WBRACE, HIREDSWORDS, HS_GRADE_ORDER, WBHIRE, DP_GRADE_ORDER,
-  DRAMATIS
+  DRAMATIS, PB_SOURCE, PB_HENCH_INJURY, PB_XP_AWARDS, PB_HERO_ADVANCE,
+  PB_HENCH_ADVANCE, PB_ADVANCE_NOTES, PB_EXPLORE_SHARDS, PB_LOCATIONS
 } = D;

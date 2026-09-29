@@ -287,6 +287,15 @@ export const TABLE: Record<string, Spec> = {
   'app.renderHouse': ui('draws the house-rules panel'),
   'app.welcomeNew': ui('switches from the welcome screen to the warband picker'),
   'app.flash': ui('shows a short notice; the new app has its own (UndoToast)'),
+  'app.postBattleHelp': ui('draws the post-battle helper, all ten steps'),
+  // the numbers a step reads from the roster are core's
+  'app.pbHelpStep': ui('draws one step of the post-battle helper', (c) => {
+    const html = String(c.ret);
+    const num = (re: RegExp) => { const m = html.match(re); return m ? Number(m[1]) : null; };
+    if (c.args[0] === 'rating') return [core.totalRating(ctx(c.w)), num(/<b>Rating<\/b><\/td><td><\/td><td><b>(\d+)<\/b>/)];
+    if (c.args[0] === 'exploration') return [core.pbExploreDice(ctx(c.w)).capped, num(/From the roster: <b>(\d+)<\/b>/)];
+    return [null, null];
+  }),
   'app.renderSidebar': ui('draws the sidebar', (c) => [coreScreens(ctx(c.w)), legacyScreens(c.L)]),
   'app.abilitySection': ui('draws the abilities panel', (c) => [coreAbilities(ctx(c.w), c.args[1] ?? null, c.args[0]), parseAbilities(String(c.ret))]),
   'app.warbandOptions': ui('draws the warband picker', (c) => [coreWarbandOptions(data), parseWarbandOptions(String(c.ret))]),

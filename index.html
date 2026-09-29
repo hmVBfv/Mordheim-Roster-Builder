@@ -153,6 +153,24 @@
   .pb-link{color:#7a5a1a;text-decoration:none;border-bottom:1px dotted #7a5a1a;white-space:nowrap}
   .pb-link:hover{color:#b4965a}
   .pb-sell{font-family:inherit}
+  .pbbox{max-width:860px}
+  .pbh-intro{font-size:13px;color:#5a4f3c;margin:0 0 8px}
+  .pbh-step{border-top:1px solid var(--parch-edge)}
+  .pbh-step>summary{cursor:pointer;padding:9px 2px;font-family:'Pirata One',serif;font-size:18px;color:var(--iron);display:flex;align-items:center;gap:8px;min-height:30px}
+  .pbh-body{padding:0 2px 12px;font-size:13px;line-height:1.45}
+  .pbh-body h4{margin:12px 0 4px;font-size:13px;color:var(--blood)}
+  .pbh-body p{margin:6px 0}
+  .pbt{border-collapse:collapse;width:100%;font-size:12.5px;margin:4px 0 6px}
+  .pbt th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--iron);border-bottom:2px solid var(--parch-edge);padding:3px 5px}
+  .pbt td{border-bottom:1px solid var(--parch-edge);padding:4px 5px;vertical-align:top}
+  .pbt td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .pbt-num td,.pbt-num th{text-align:center}
+  .pbhere{background:rgba(180,150,90,.35);border-radius:3px;padding:0 4px;font-weight:700}
+  .pbdice{letter-spacing:1px;font-weight:700}
+  .pbt-wide td:last-child{width:62%}
+  .pbnotes{background:rgba(180,150,90,.12);border-left:3px solid #b4965a;padding:5px 8px;margin:6px 0}
+  .pbnotes ul,.pbnotes-plain{margin:4px 0;padding-left:18px}
+  .pbh-src{margin-top:10px}
   .pb-complete{padding:8px 12px;border-top:1px solid var(--parch-edge);color:#3f6a2a;font-weight:600;font-size:13px}
   .chr-wrap{border:1px solid var(--parch-edge);border-radius:4px;margin:8px 0;background:rgba(60,50,45,.04)}
   .chr-sum{cursor:pointer;padding:7px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--iron);list-style:none}
@@ -322,7 +340,7 @@
   #itip .itip-h{font-weight:700;color:var(--blood);font-size:14px;margin-bottom:1px}
   #itip .itip-l{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:#8a6b2a;margin-bottom:4px}
   #itip .itip-b{color:#33301f}
-  #exportmodal,#ttsmodal,#importmodal,#campmodal{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,15,8,.6);align-items:flex-start;justify-content:center;padding:40px 14px}
+  #exportmodal,#ttsmodal,#importmodal,#campmodal,#pbmodal{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,15,8,.6);align-items:flex-start;justify-content:center;padding:40px 14px}
   .exbox{background:var(--parch);border:1px solid var(--gold);border-radius:8px;max-width:680px;width:100%;padding:16px 18px;box-shadow:0 14px 40px rgba(0,0,0,.5);max-height:86vh;overflow:auto}
   .exhead{display:flex;align-items:center;justify-content:space-between;font-family:'Pirata One',serif;font-size:24px;color:var(--blood);margin-bottom:10px}
   .exrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
@@ -641,6 +659,9 @@
     .mem-row .mem-idx{flex:0 0 18px}
     .mem-row .mem-in{flex:1 1 calc(100% - 30px)}
     .mem-row .mem-in + button{margin-left:24px}
+    .pbdice{letter-spacing:0}
+    .pbt{font-size:12px}
+    .pbt td,.pbt th{padding:3px 3px}
   }
   /* Desktop: the sidebar stays in view but must not outgrow the window, or
      its lower panels (the Stash) are only reachable at the page's end. */
@@ -700,6 +721,7 @@
       <button onclick="openLoad()">Load</button>
       <button onclick="openExport()">Export ▾</button>
       <button onclick="openImport()">Import</button>
+      <button onclick="openPostBattle()" title="The ten steps after a battle, with every table you need at the table">⚔ Post-battle</button>
       <input type="file" id="importfile" accept=".json,.txt" style="display:none" onchange="importJSON(event)">
       <button class="blood" onclick="window.print()">Print</button> <button onclick="exportOfficialSheet()" title="Fill the official Mordheim roster sheet (PDF) with your warband">⬇ Official sheet (PDF)</button>
     </div>
@@ -748,6 +770,13 @@
 </div>
 
 
+
+<div id="pbmodal" class="no-print" onclick="if(event.target===this)closePostBattle()">
+  <div class="exbox pbbox">
+    <div class="exhead"><span>After the battle</span><button class="tiny ghost" onclick="closePostBattle()">✕ close</button></div>
+    <div id="pbhelp"></div>
+  </div>
+</div>
 
 <div id="exportmodal" class="no-print" onclick="if(event.target===this)closeExport()">
   <div class="exbox">

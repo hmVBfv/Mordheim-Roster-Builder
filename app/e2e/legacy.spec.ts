@@ -95,6 +95,24 @@ test('the extra-equipment panel of a Hired Sword opens without an error and stay
   expect(errors).toEqual([]);
 });
 
+/* The post-battle helper (Rob, 29.09.2026). */
+test('the post-battle helper opens from the top bar and fits a phone', async ({ page }) => {
+  await load(page, 'rangvalds-reaver');
+  await page.getByRole('button', { name: '⚔ Post-battle' }).click();
+  const modal = page.locator('#pbmodal');
+  await expect(modal).toBeVisible();
+  await page.evaluate(() => document.querySelectorAll('#pbmodal details').forEach((d) => { (d as HTMLDetailsElement).open = true; }));
+  expect(await modal.locator('details.pbh-step').count()).toBe(10);
+  const wide = await modal.evaluate((m) => [...m.querySelectorAll('table')].filter((tb) => tb.getBoundingClientRect().right > window.innerWidth + 1).length);
+  expect(wide, 'tables wider than the screen').toBe(0);
+  expect(await sideScroll(page)).toBeLessThanOrEqual(0);
+  await page.screenshot({ path: 'test-results/screens/legacy-post-battle.png' });
+  await page.locator('#pbh-exploration').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'test-results/screens/legacy-post-battle-exploration.png' });
+  await page.locator('#pbmodal').getByRole('button', { name: '✕ close' }).click();
+  await expect(modal).toBeHidden();
+});
+
 test('a notice lets taps through', async ({ page }) => {
   await page.goto('index.html');
   await page.waitForFunction(() => typeof (window as unknown as { flash?: unknown }).flash === 'function');
