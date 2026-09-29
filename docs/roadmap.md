@@ -82,10 +82,12 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Builder; V1 als Ablauf mit allen Folgeentscheidungen spezifiziert. V3
   (Augur) entschieden: RAW, weil mordheimer.net keine RAI-Ausnahme nennt.
   V4–V7 (Umverteilen, Sperre nach dem ersten Kampf mit Trading Post,
-  Kaufansicht, Gold als Kassenbuch) spezifiziert; Robs Entscheidungen offen.
+  Kaufansicht, Gold als Kassenbuch) spezifiziert und am 29.09.2026
+  entschieden; die Gründungspreise laufen schon in beiden Apps.
 - [x] Abgleich aller 49 Warbands mit mordheimer.net
   ([rules-audit.md](rules-audit.md)): Tooltips suchen im Zusammenhang
-  (beide Apps), 30 Datenfehler korrigiert, 10 offen, Fragen C1–C10 an Rob.
+  (beide Apps), 30 Datenfehler korrigiert, 10 offen, Fragen C1–C10 an Rob
+  – am 29.09.2026 entschieden und umgesetzt.
 - [ ] Nach 1d: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [x] 1c Neue Logik: `core/changes` (Vergleich zweier Stände mit stabilen

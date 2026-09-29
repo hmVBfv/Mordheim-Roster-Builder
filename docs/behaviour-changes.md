@@ -70,10 +70,10 @@ geplant.
 | V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | geplant, Spezifikation [unten](#v1--ablauf-einer-verletzung) |
 | V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | geplant, Spezifikation [unten](#v2--feste-ids-für-gefallene) |
 | V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. mordheimer.net nennt keine solche Ausnahme – weder beim Augur (*Sisters of Sigmar*) noch bei Ergebnis 31 (*Campaigns – Serious Injuries*). | Rob, 28.09.2026: Eine Auslegung nach Absicht gilt nur, wenn mordheimer.net sie übernimmt. Hier nicht, also **RAW**: Der Augur verliert 1 BS wie jeder andere. | entschieden; alte App und `core/` rechnen schon so, Test `core/test/rulings.test.ts` |
-| V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | Spezifikation [unten](#v4-bis-v7--handel-lager-und-gold); Entscheidungen offen |
-| V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28.09.2026: gewünscht | dito |
-| V6 | Kaufansicht übersichtlich, Tooltips und Erklärungen überall, wo es ohne Zusammenhang unklar ist | Rob, 28.09.2026 | gewünscht | dito; Mockup folgt |
-| V7 | Gold als Kassenbuch statt „Schatz minus Wert“ | Heute ist Gold in der Hand = gespeicherter Schatz − heutiger Wert aller Krieger. Daraus folgen die Fehler aus V4/V5 (Abwählen erstattet, Lager kostet nichts und beim Ausrüsten noch einmal) und Sprünge, wenn sich Preise oder Hausregeln ändern. | Vorschlag | Rob entscheidet |
+| V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | entschieden, [unten](#entscheidungen-rob-29092026) |
+| V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28./29.09.2026: gewünscht; Sperre für die ganze Warband | entschieden; Gründungspreise schon in beiden Apps (oben, „Erledigt“), der Rest im neuen Builder |
+| V6 | Kaufansicht übersichtlich, Tooltips und Erklärungen überall, wo es ohne Zusammenhang unklar ist | Rob, 28.09.2026 | gewünscht; Händler in Pixelart als Idee (Rob, 29.09.2026) | Mockup folgt |
+| V7 | Gold als Kassenbuch statt „Schatz minus Wert“ | Heute ist Gold in der Hand = gespeicherter Schatz − heutiger Wert aller Krieger. Daraus folgen die Fehler aus V4/V5 (Abwählen erstattet, Lager kostet nichts und beim Ausrüsten noch einmal) und Sprünge, wenn sich Preise oder Hausregeln ändern. | Rob, 29.09.2026: ja, so ausführlich wie möglich und nötig | entschieden |
 
 **Grundsatz (Rob, 28.09.2026):** Ändert mordheimer.net eine Regel nach ihrer
 Absicht (RAI) statt nach dem Wortlaut (RAW), übernehmen wir das – aber nur,
@@ -268,15 +268,29 @@ Ultimate FAQ 10.1 (Stufen 6, 8 und 9) und mordheimer.net *Campaigns* und
   Speicherformat als `FORMAT` 3: `goldNow` bleibt, neu ist ein Kassenbuch
   und das Lager mit Wert; Migration aus dem heutigen Stand.
 
-### Fragen an Rob
+### Entscheidungen (Rob, 29.09.2026)
 
-1. „Gesperrt nach dem ersten Kampf“: je Krieger (ein nach der dritten
-   Schlacht angeworbener Held darf bis zu seinem ersten Kampf noch frei
-   ausgerüstet werden – aber nach RAW nur mit Gewöhnlichem) oder für die
-   ganze Warband ab ihrem ersten Kampf? Vorschlag nach RAW: für die ganze
-   Warband; Neue bekommen Gewöhnliches beim Anwerben.
-2. Laufende Kampagne: Gelten alle heutigen Krieger als „hat gekämpft“, sobald
-   die Kampagne mindestens eine Schlacht hat? Vorschlag: ja.
-3. Verkaufspreis: halber Preis als Vorschlag, aber änderbar – oder fest?
-4. V7 (Kassenbuch) so umsetzen?
+1. **Sperre für die ganze Warband** ab ihrer ersten Schlacht. Nach RAW gilt
+   sie je Krieger nach seinem ersten Kampf; für die ganze Warband ist es
+   einfacher bei gleichem Ergebnis. Neue Krieger bekommen danach nur
+   Gewöhnliches aus ihrer Liste, zu den Preisen des Trading Post.
+2. **Laufende Kampagne:** Alle heutigen Krieger gelten als „hat gekämpft“,
+   außer sie sind als aussetzend markiert. Gelesen als: Wer bisher nur
+   ausgesetzt hat und nie gekämpft hat, zählt als neu. Die echten Stände der
+   Gruppe haben den Kampagnenmodus aus und stehen auf „Setup“ – beim Import
+   einer laufenden Kampagne fragt der neue Builder deshalb, ab welcher Stufe
+   sie steht, statt es aus den Schlachten abzuleiten.
+3. **Verkauf zum halben Preis,** gerechnet vom Preis, der gerade gilt – also
+   auch die Hälfte eines Preises, den eine Hausregel ändert; bei Seltenem mit
+   Zufallspreis die Hälfte des Grundpreises. Regeln, die den Verkauf ändern
+   (Haggle, „Trade“ der Merchant Caravans), rechnet der Builder eigens.
+4. **Kassenbuch (V7):** ja, so ausführlich wie möglich und nötig – jede
+   Buchung mit Anlass, Betrag, Krieger und Gegenstand, damit die
+   Änderungsansicht und die Chronik daraus lesen können.
+
+**Schon umgesetzt, in beiden Apps:** die Gründungspreise (Tabelle
+„Erledigt“ oben). Die Stufe der Kampagne entscheidet: bis „Setup“ gilt der
+Gründungspreis, ab „After battle 1“ ist die Zeile gesperrt und der
+Gegenstand am Trading Post zu finden. Außerhalb des Kampagnenmodus bleibt
+alles beim Gründungspreis.
 

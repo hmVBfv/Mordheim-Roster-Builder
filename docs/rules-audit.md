@@ -175,25 +175,34 @@ hängt schon an allen drei Helden).
 | Dwarf Rangers u. a. | Zwerge nie Arcane Lore | Sperre einzelner Skills fehlt im Skill-Menü |
 | Pit Fighters | Gromril-Waffe für den Slayer | Gromril ist ein Aufschlag, keine Listenzeile |
 | Lustrian Reavers | Hunting Hawk W und Ld „–“ | Profile rechnen mit Zahlen |
-| Black Dwarfs | Engine of Chaos nur für den Sorcerer? | Liste und Gegenstand widersprechen sich (siehe C) |
 | Cursed Cavalcade | „61 Captured“ neu würfeln | Wortlaut nicht bestätigt |
 | Imperial Outriders | Athletic Mount, Ride | Text steht nur in Blazing Saddles, nicht auf der Seite |
 | Dwarf Rangers | Master of Blades | steht nicht auf der Seite der Dwarf Rangers |
 
-## C. Fragen an Rob
+## C. Robs Entscheidungen (29.09.2026)
 
-| Nr. | Frage | Warum offen |
-| --- | --- | --- |
-| C1 | Trantio: Startgold 600 im normalen Kampagnenspiel? | Seite: +100 gc im Einzelspiel, +20 % nur in einer Lustria-Kampagne |
-| C2 | Cursed Cavalcade, Nightmare: 30 oder 95 gc? | Tabelle 30, Beschreibung 95 (Tabelle geht nach unserer Regel vor) |
-| C3 | Sons of Hashut, Obsidianwaffe: 30 gc (Liste) oder 60 gc (Sonderausrüstung), welche Version? | Seite widerspricht sich; Redaktion: nur eine Version verwenden |
-| C4 | Tomb Lord: Zugang zu „Drive Chariot“? | Academic-Skill, den er laut Tabelle nicht hat; Seite nennt es selbst Widerspruch |
-| C5 | Scarecrow „Flammable“: doppelter Schaden durch Feuer? | RAW nur „fängt bei 3+ Feuer“; doppelter Schaden ist ein Konsens-Hinweis, kein RAW |
-| C6 | Ostermarkers, Champion und Youngblood: Fertigkeiten einer Stadt wählen statt Vereinigung aller? | Seite: Satz einer anderen Mercenary-Option wählen |
-| C7 | Wood Elves, Shadow Warriors: Ithilmar-Waffen zum Sonderpreis (2×) nur beim Aufstellen? | Fußnote: danach normaler Preis und Seltenheitswurf |
-| C8 | Black Dwarfs, Sorcerer: Rüstung erlaubt? | Eintrag nennt nur Waffen, der Mechanical Suit ist aber „Sorcerer only“ |
-| C9 | Bretonnians: Men-at-Arms höchstens 8 oder beliebig viele? | Überschrift 0–8, Warband-Auswahl „any number“ |
-| C10 | Black Dwarfs: Engine of Chaos nur für den Sorcerer oder für alle Chaos Dwarfs? | Fußnote der Liste nach einem Abruf „Sorcerer only“, der Gegenstand selbst „Chaos Dwarfs only“ |
+| Nr. | Frage | Entscheidung | Umsetzung |
+| --- | --- | --- | --- |
+| C1 | Trantio: Startgold 600 im normalen Kampagnenspiel? | Unsere Kampagne zählt für solche Zwecke als „Lustrian campaign“ (+20 %) | 600 gc wie bisher |
+| C2 | Cursed Cavalcade, Nightmare: 30 oder 95 gc? | 30 gc bei der Gründung, 95 gc bei der Suche nach einer Schlacht | Liste 30 gc als Gründungspreis, Trading Post 95 gc (Rare 11) |
+| C3 | Sons of Hashut, Obsidianwaffe: 30 oder 60 gc? | 30 gc bei der Gründung, 60 gc später; umbenennen wegen Border Town Burning | „Zharr obsidian weapon“ – nach Zharr-Naggrund, der Stadt der Chaos-Zwerge; Liste 30 gc als Gründungspreis, Trading Post 60 gc (Rare 10) |
+| C4 | Tomb Lord und „Drive Chariot“ | Die impliziten Korrekturen der Liste „Inconsistencies“ gelten (RAI, weil mordheimer.net sie nennt) | Tomb Lord darf Drive Chariot lernen; Home Ground in jedem Kampagnen-Setting; Nehekharan Javelins sind Wurfwaffen; Asp Arrows sind Sonstige Ausrüstung; Tomb Guardians sammeln Erfahrung (war schon so); „Mummy“ = Tomb Lord (war schon so). Offen bleibt nur, wie der Skeleton Chariot aufgestellt wird – dafür nennt die Seite keine Lösung |
+| C5 | Scarecrow „Flammable“ | Doppelter Schaden durch Feuer, auch RAW: „Flammable“ ist das Stichwort der Tomb Guardians | stand schon so im Text |
+| C6 | Ostermarkers: Fertigkeiten | Die Warband gehört fest zu ihrer Region, alle Champions und Youngbloods lernen aus derselben Tabelle | Ostermark hat keine eigene Tabelle; nach der späteren Klarstellung nimmt man die einer anderen Mercenary-Option. Sie wird jetzt einmal bei der Gründung gewählt (wie die Stadt der Mercenaries): Reikland, Middenheim oder Marienburg – nur die Tabelle, nicht die Stadtregeln |
+| C7 | Wood Elves, Shadow Warriors: Ithilmar zum Sonderpreis nur bei der Gründung? | Ja | Gründungspreis; die Shadow Warriors haben wie die Wood Elves je eine Zeile für Schwert, Speer und Zweihandwaffe (2× Preis) statt einer Zeile zu 20 gc |
+| C8 | Black Dwarfs, Sorcerer: Rüstung? | Ja, aber keine Rituale in Rüstung – außer im Mechanical Suit | Regeltext ergänzt; Chaos armour hindert laut ihrer eigenen Regel ebenfalls nicht |
+| C9 | Bretonnians: Men-at-Arms | 0–8 | stand schon so |
+| C10 | Black Dwarfs: Engine of Chaos | Für alle Chaos Dwarfs; die Seite beschränkt Fahrer und Passagiere nicht | stand schon so; 125 gc bei der Gründung, 195 gc später (Rare 10) |
+
+Test: `core/test/data-audit.test.ts` („Rob, C2“ …) und
+`core/test/start-prices.test.ts`, in der alten App `test/start-prices.mjs`.
+
+Beim Nachlesen fiel dasselbe Muster an weiteren Stellen auf und ist gleich
+mit behoben: Mechanical Suit (175 gc bei der Gründung, 225 gc später),
+Gromril-Rüstung der Zwerge (75 gc, später 150 gc), Gromril-Waffen der Zwerge
+(3× bei der Gründung, später 4×), Dark Elf Blade (+15 gc, später +20 gc) und
+die Nagarythe-Gegenstände der Shadow Warriors. Das „Banner von Nagarythe“ im
+Katalog heißt jetzt wie in der Liste „Standarte“; das Kriegshorn fehlte dort.
 
 ## D. Merchant Caravans (Robs Warband)
 
