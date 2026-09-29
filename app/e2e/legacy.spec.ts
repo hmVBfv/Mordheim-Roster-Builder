@@ -130,6 +130,44 @@ test('closing a dialog by its button leaves no dead step for Back', async ({ pag
   await page.waitForFunction(() => !(history.state as { mhModal?: string } | null)?.mhModal);
 });
 
+/* The order of the page (Rob, 29.09.2026): the figures first and always in
+   view, the warband before the recruiting, rarely used panels last. */
+const tops = (page: import('@playwright/test').Page, sel: string[]) => page.evaluate((s) => s.map((q) => {
+  const el = document.querySelector(q); return el ? Math.round(el.getBoundingClientRect().top + scrollY) : null;
+}), sel);
+
+test('on a phone the gold stays in view and the warband comes before the recruiting', async ({ page }) => {
+  await load(page, 'silver-caravan');
+  const order = ['#statspanel', '#wbname', '#overviewpanel', '#roster', '#recruitbox', '#stashwrap', '#campaignpanel', '#houserules'];
+  const y = await tops(page, order);
+  for (let i = 1; i < order.length; i++) expect(y[i]!, `${order[i]} below ${order[i - 1]}`).toBeGreaterThan(y[i - 1]!);
+  // recruiting is folded away once the warband has warriors
+  expect(await page.locator('#recruitbox').evaluate((d) => (d as HTMLDetailsElement).open)).toBe(false);
+  // deep in the roster the figures are still on screen
+  await page.locator('#roster').evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + scrollY + 3000));
+  await expect(page.locator('#goldnow')).toBeInViewport();
+  expect(await sideScroll(page)).toBeLessThanOrEqual(0);
+  await page.screenshot({ path: 'test-results/screens/legacy-order-phone.png' });
+});
+
+test('a new warband opens with the recruiting', async ({ page }) => {
+  await page.goto('index.html');
+  await page.waitForFunction(() => typeof (window as unknown as { chooseWb?: unknown }).chooseWb === 'function');
+  await page.evaluate(() => (window as unknown as { chooseWb: (k: string) => void }).chooseWb('merc'));
+  await expect(page.locator('#recruitbox')).toHaveAttribute('open', '');
+});
+
+test('on a desktop the figures are compact and nothing empty stands in the way', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await load(page, 'silver-caravan');
+  const h = await page.locator('#statspanel').evaluate((el) => el.getBoundingClientRect().height);
+  expect(h, 'five figures and the legal check in a compact block (was 374 px)').toBeLessThan(240);
+  await expect(page.locator('#loadlist')).toBeHidden();
+  const [stats, overview] = await tops(page, ['#statspanel', '#overviewpanel']);
+  expect(overview! - stats!).toBeLessThan(260);
+  await page.screenshot({ path: 'test-results/screens/legacy-order-desktop.png' });
+});
+
 test('a notice lets taps through', async ({ page }) => {
   await page.goto('index.html');
   await page.waitForFunction(() => typeof (window as unknown as { flash?: unknown }).flash === 'function');
