@@ -1,19 +1,23 @@
 /* The mockups in docs/mockups/ (served from the repository root, like the
-   legacy app): at 360 px nothing scrolls sideways, and every control does
-   something. Rob tried them on his phone and found buttons that did nothing
-   (29.09.2026) – a mockup that looks finished but does not react hides what
-   is still missing. So every control is clicked from a fresh page, and every
-   control inside every sheet one of them opens; a click must change the page
-   (text, classes, pressed/hidden/open/disabled state, URL, history or an open
-   sheet). A control the mockup does not draw says so with a notice
-   (`data-soon`). Controls that are already chosen (aria-pressed="true",
-   aria-current="page") or disabled are skipped, as is the strip at the top
-   that only belongs to the mockups. */
+   legacy app): at 360 px nothing scrolls sideways, every control does
+   something, and every screen can be left. Rob tried them on his phone and
+   found buttons that did nothing, tabs that led nowhere and a menu without a
+   way back (29.09.2026) – a mockup that looks finished but does not react
+   hides what is still missing.
+
+   So every control is clicked from a fresh page, every control inside every
+   sheet one of them opens, and every control inside a sheet opened from a
+   sheet. A click must change the page (text, classes, pressed/hidden/open/
+   disabled state, URL, history or an open sheet); a link must not point to
+   "#" and must lead to a page that exists. Controls that are already chosen
+   (aria-pressed="true", aria-current="page") or disabled are skipped, as is
+   the strip at the top that only belongs to the mockups. */
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
-const PAGES = ['index', 'roster', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give',
-  'game-night', 'timeline', 'changes', 'visibility', 'background'];
+const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give',
+  'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more'];
+const PAGES = ['index', ...SCREENS];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
 const IN_SHEET = 'button:visible, a:visible, input[type=checkbox]:visible';
 
@@ -28,6 +32,7 @@ const go = (page: Page, name: string) => {
   const [file, tab] = name.split('#');
   return page.goto(`${file}.html?fresh=${fresh++}${tab ? `#${tab}` : ''}`);
 };
+const pathOf = (url: string) => new URL(url).pathname;
 
 /* A fingerprint of everything a click could change. */
 const state = (page: Page) =>
@@ -54,21 +59,39 @@ const skipped = (el: Locator) =>
 const labelOf = async (el: Locator) =>
   ((await el.getAttribute('aria-label')) || (await el.innerText().catch(() => '')) || '').trim().replace(/\s+/g, ' ').slice(0, 40);
 
-/* Clicks the control and says whether anything changed. */
-async function reacts(page: Page, el: Locator) {
-  const before = await state(page);
+/* Clicks the control; '' if it did something, else what is wrong. */
+async function verdict(page: Page, el: Locator): Promise<string> {
+  const href = await el.evaluate((e) => (e.tagName === 'A' ? e.getAttribute('href') ?? '' : null));
+  if (href !== null && (href === '' || href === '#')) return 'is a link to nowhere';
+  const before = await state(page), path = pathOf(page.url());
   try {
     await el.click({ timeout: 2000 });
   } catch {
-    return false;
+    return 'cannot be clicked';
   }
-  await page.waitForTimeout(100);
-  return before !== (await state(page));
+  await page.waitForTimeout(200);
+  if (pathOf(page.url()) !== path) {
+    await page.waitForLoadState('load');
+    return (await page.locator('.mock').count()) ? '' : `leads to a missing page (${pathOf(page.url())})`;
+  }
+  return before !== (await state(page)) ? '' : 'does nothing';
 }
+
+/* The way to a control: on the page, then inside the sheets it opened. */
+type Step = { sheet: string | null; i: number };
+const scope = (page: Page, sheet: string | null) => (sheet ? page.locator(`#${sheet}`).locator(IN_SHEET) : page.locator(CONTROLS));
+async function replay(page: Page, name: string, path: Step[]) {
+  await go(page, name);
+  for (const s of path) await scope(page, s.sheet).nth(s.i).click();
+}
+const openSheet = (page: Page) => page.evaluate(() => document.querySelector('dialog[open]')?.id ?? null);
+/* A sheet's controls, by label: the same sheet can hold different controls (a Hero's menu, a group's). */
+const sheetKey = (page: Page, sheet: string) =>
+  page.locator(`#${sheet}`).locator(IN_SHEET).evaluateAll((els) => els.map((e) => (e.getAttribute('data-value') ? '·' : (e.textContent ?? '').trim().slice(0, 24))).join('|'));
 
 for (const name of PAGES) {
   test(`mockup ${name}: fits 360 px, every control reacts`, async ({ page }) => {
-    test.setTimeout(240_000);
+    test.setTimeout(600_000);
     await go(page, name);
     for (const theme of ['chronicle', 'parchment']) {
       await page.locator(`.mock [data-theme="${theme}"]`).click();
@@ -79,30 +102,68 @@ for (const name of PAGES) {
     await page.locator('.mock [data-theme="chronicle"]').click();
 
     const dead: string[] = [];
-    const openers = new Map<string, number>();
-    const count = await page.locator(CONTROLS).count();
-    for (let i = 0; i < count; i++) {
-      await go(page, name);
-      const el = page.locator(CONTROLS).nth(i);
-      if (await skipped(el)) continue;
-      const label = await labelOf(el);
-      if (!(await reacts(page, el))) dead.push(label);
-      const sheet = await page.evaluate(() => document.querySelector('dialog[open]')?.id ?? null);
-      if (sheet && page.url().includes(`${name.split('#')[0]}.html`) && !openers.has(sheet)) openers.set(sheet, i);
-    }
-    for (const [sheet, i] of openers) {
-      await go(page, name);
-      await page.locator(CONTROLS).nth(i).click();
-      const inside = await page.locator(`#${sheet}`).locator(IN_SHEET).count();
-      for (let j = 0; j < inside; j++) {
-        await go(page, name);
-        await page.locator(CONTROLS).nth(i).click();
-        const el = page.locator(`#${sheet}`).locator(IN_SHEET).nth(j);
+    const seen = new Set<string>();
+    const queue: Step[][] = [[]];
+    while (queue.length) {
+      const path = queue.shift()!;
+      await replay(page, name, path);
+      const here = path.length ? await openSheet(page) : null;
+      if (path.length && !here) { dead.push(`a sheet did not open again (${JSON.stringify(path)})`); continue; }
+      const count = await scope(page, here).count();
+      for (let i = 0; i < count; i++) {
+        await replay(page, name, path);
+        const el = scope(page, here).nth(i);
         if (await skipped(el)) continue;
         const label = await labelOf(el);
-        if (!(await reacts(page, el))) dead.push(`[${sheet}] ${label}`);
+        const wrong = await verdict(page, el);
+        if (wrong) dead.push(`${here ? `[${here}] ` : ''}${label} ${wrong}`);
+        // a sheet it opened (on the same page): its controls are next, up to two sheets deep
+        const opened = pathOf(page.url()).endsWith(`/${name.split('#')[0]}.html`) ? await openSheet(page) : null;
+        if (opened && opened !== here && path.length < 2) {
+          const key = `${opened}|${await sheetKey(page, opened)}`;
+          if (!seen.has(key)) { seen.add(key); queue.push([...path, { sheet: here, i }]); }
+        }
       }
     }
     expect(dead, `controls on ${name} that do nothing`).toEqual([]);
   });
 }
+
+/* Every screen can be left: the bar at the bottom, or ← (game night). */
+for (const name of SCREENS) {
+  test(`mockup ${name}: there is a way on`, async ({ page }) => {
+    await go(page, name);
+    const nav = await page.locator('nav.nav a').count();
+    const back = await page.locator('a.back[href]:not([href="#"])').count();
+    expect(nav === 5 || back > 0, `${name} has neither the bottom bar nor ←`).toBe(true);
+  });
+}
+
+/* Rob, 29.09.2026: "The ← sometimes does nothing, or only late." Closing a
+   sheet steps back in the history; a link followed at that moment used to be
+   cancelled by that step. */
+test('mockups: ← works right after a sheet was closed', async ({ page }) => {
+  await go(page, 'roster');
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await expect(page.locator('#sheet-recruit')).toBeVisible();
+  // a fast thumb: Close and ← within the same moment
+  await page.evaluate(() => {
+    document.querySelector<HTMLButtonElement>('#sheet-recruit [data-close]')!.click();
+    document.querySelector<HTMLAnchorElement>('a.back')!.click();
+  });
+  await expect(page).toHaveURL(/warbands\.html/);
+  await page.waitForTimeout(500);
+  await expect(page).toHaveURL(/warbands\.html/);
+});
+
+test('mockups: a link inside a sheet leaves, and Back returns without the sheet', async ({ page }) => {
+  await go(page, 'roster');
+  await page.getByRole('button', { name: 'Stash · 2 shards' }).click();
+  await page.locator('#sheet-stash').getByRole('link', { name: /Give an item/ }).click();
+  await expect(page).toHaveURL(/trading-post\.html#give/);
+  await page.goBack();
+  await expect(page).toHaveURL(/roster\.html/);
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  await page.getByRole('link', { name: 'All warbands' }).click();
+  await expect(page).toHaveURL(/warbands\.html/);
+});

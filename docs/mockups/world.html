@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>World Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .rows button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); align-items: center; min-height: 52px; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-align: left; cursor: pointer; }
+  .rows small { grid-column: 1; color: var(--text-muted); }
+  .rows .chip { grid-row: 1 / span 2; grid-column: 2; }
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); margin: 0; font-size: 0.93rem; }
+  .facts dt { color: var(--text-muted); }
+  .facts dd { margin: 0; }
+  .effects { margin: 0; padding-left: 1.1em; display: grid; gap: 2px; font-size: 0.93rem; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>World</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">The Hel Fenn Campaign</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+  <nav class="tabs" aria-label="Campaign" data-tabs="campaign" data-current="World"></nav>
+
+  <div class="content">
+    <p class="small muted">What everyone in the campaign knows about the world. What the leader keeps back lives in Background ⚑.</p>
+    <div class="seg" id="kinds" role="group" aria-label="Show">
+      <button type="button" data-value="districts" aria-pressed="true">Districts</button><button type="button" data-value="factions">Factions</button><button type="button" data-value="people">People</button><button type="button" data-value="places">Places</button>
+    </div>
+    <ul class="rows" id="rows"></ul>
+  </div>
+  <nav class="nav" data-current="Campaign"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-entry" aria-labelledby="entry-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="entry-title">Entry</h2>
+    <p class="small muted" id="entry-line"></p>
+    <p id="entry-text"></p>
+    <dl class="facts" id="entry-facts"></dl>
+    <ul class="effects" id="entry-effects"></ul>
+    <div class="row" id="entry-acts"><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-hold" aria-labelledby="hold-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-hold">
+    <h2 id="hold-title">Who holds it?</h2>
+    <p class="small muted">A foothold comes from a battle won there; control from holding it longer (campaign rules, Districts). Leaders correct it here; every change is logged.</p>
+    <div class="pick list" id="hold-pick"></div>
+    <div class="row"><button class="btn" value="save">Save</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  /* Districts and their effects as in data/campaign.json; the holders are invented. */
+  var ENTRIES = {
+    districts: [
+      { id: 'cityhall', name: 'City Hall', line: 'The East', hold: 'Silver Caravan · foothold', effects: ['Foothold: during the Exploration Procedure, you may change one die by +1 or −1'] },
+      { id: 'westgate', name: 'West Gate', line: 'The Gates', hold: 'Silver Caravan · foothold', effects: ['Foothold: ½ price to hire Luthor Wolfenbaum; a Hero sent to look for him finds him', 'Foothold: without a foothold at a gate, a warband pays 5 gc to fight in a district'] },
+      { id: 'therock', name: 'The Rock', line: 'The River · ☄ abundance of wyrdstone', hold: 'Grey Penitents · foothold', effects: ['Foothold: Sisters of Sigmar gain 20% more gold for wyrdstone (rounded down)', 'Foothold: the winner of a battle here gains +1D3 shards'] },
+      { id: 'templesigmar', name: 'Temple of Sigmar', line: 'The East', hold: 'Grey Penitents · foothold', effects: ['Foothold: an injury of 22–35 becomes Full Recovery on a 5+ on a D6'] },
+      { id: 'fencealley', name: 'Fence Alley', line: 'The East · hard fought', hold: 'Clan Skrittle · control', effects: ['Control: ½ price Poisons and Drugs'] },
+      { id: 'marketsquare', name: 'Market Square', line: 'The East · hard fought · ☄', hold: '', effects: ['Control: +2 on the rare items roll', 'Foothold: the winner of a battle here gains +1D3 shards'] }
+    ],
+    factions: [
+      { id: 'ferrymen', name: 'The Ferrymen’s Guild', line: 'Boatmen of the Hel Fenn', text: 'They row anyone across for coin and ask nothing. Lately they ask for more coin.', facts: [['Silver Caravan', 'wary — a boat left without them'], ['Grey Penitents', 'friendly'], ['Clan Skrittle', 'unknown']] },
+      { id: 'temple', name: 'The Temple of Sigmar', line: 'The Rock', text: 'Buys wyrdstone to lock it away; blesses those who bring it.', facts: [['Grey Penitents', 'sworn'], ['Silver Caravan', 'tolerated']] }
+    ],
+    people: [
+      { id: 'ferryman', name: 'The ferryman', line: 'NPC · met in battle 5', text: 'Grey beard, one earring, never looks at the water. The coin in his hand carried an eel.', facts: [['Seen by', 'Wilhelm, Brother Anselm'], ['Last', 'battle 5, at the Old Mill']] },
+      { id: 'kaspar', name: 'Old Kaspar', line: 'NPC · the Blind Cat', text: 'A priest who buys shards and asks too few questions.', facts: [['Deals with', 'the Silver Caravan']] }
+    ],
+    places: [
+      { id: 'ferry', name: 'Hel Fenn ferry', line: 'Where battle 6 is fought', text: 'A flat barge on a rope across black water; the far bank is fog.', facts: [['Battles', '6']] },
+      { id: 'blindcat', name: 'The Blind Cat', line: 'Tavern outside the walls', text: 'Where the Silver Caravan sleeps between battles. Two quiet days after battle 5.', facts: [['In the story', 'Interlude 5']] }
+    ]
+  };
+  var kind = ENTRIES[location.hash.slice(1)] ? location.hash.slice(1) : 'districts', cur = null;
+  document.querySelectorAll('#kinds button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === kind)); });
+  function draw() {
+    document.getElementById('rows').innerHTML = ENTRIES[kind].map(function (e) {
+      var chip = kind === 'districts' ? '<span class="chip' + (e.hold ? ' good' : '') + '">' + esc(e.hold ? e.hold.split(' · ')[1] : 'nobody') + '</span>' : '';
+      return '<li><button type="button" data-entry="' + e.id + '"><span><b>' + esc(e.name) + '</b></span><small>' + esc(kind === 'districts' ? (e.hold ? e.hold.split(' · ')[0] + ' · ' : '') + e.line : e.line) + '</small>' + chip + '</button></li>';
+    }).join('');
+  }
+  document.getElementById('kinds').addEventListener('choose', function (e) { kind = e.detail; draw(); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-entry]'); if (!b) return;
+    cur = ENTRIES[kind].filter(function (x) { return x.id === b.dataset.entry; })[0];
+    document.getElementById('entry-title').textContent = cur.name;
+    document.getElementById('entry-line').textContent = cur.line;
+    document.getElementById('entry-text').textContent = cur.text || '';
+    document.getElementById('entry-facts').innerHTML = (cur.facts || (kind === 'districts' ? [['Held by', cur.hold || 'nobody']] : [])).map(function (f) { return '<dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('');
+    document.getElementById('entry-effects').innerHTML = (cur.effects || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
+    document.getElementById('entry-acts').innerHTML = (kind === 'districts' ? '<button type="button" class="btn-quiet" id="hold-open">Change who holds it ⚑</button>' : '') + '<button type="button" class="btn-quiet" data-close>Close</button>';
+    window.mockOpen('sheet-entry');
+  });
+  var HOLDERS = ['nobody', 'Silver Caravan · foothold', 'Silver Caravan · control', 'Grey Penitents · foothold', 'Grey Penitents · control', 'Clan Skrittle · foothold', 'Clan Skrittle · control'];
+  document.getElementById('entry-acts').addEventListener('click', function (e) {
+    if (!e.target.closest('#hold-open')) return;
+    document.getElementById('hold-title').textContent = 'Who holds ' + cur.name + '?';
+    document.getElementById('hold-pick').innerHTML = HOLDERS.map(function (h) { return '<button type="button" data-value="' + h + '" aria-pressed="' + ((cur.hold || 'nobody') === h) + '">' + esc(h) + '</button>'; }).join('');
+    window.mockOpen('sheet-hold');
+  });
+  document.getElementById('form-hold').addEventListener('submit', function () {
+    var p = document.querySelector('#hold-pick [aria-pressed=true]'); if (!p) return;
+    var e = cur, old = e.hold, v = p.dataset.value === 'nobody' ? '' : p.dataset.value;
+    e.hold = v; draw();
+    window.mockToast(e.name + ': ' + (v || 'nobody') + '. Logged.', function () { e.hold = old; draw(); });
+  });
+  draw();
+})();
+</script>
+</body>
+</html>

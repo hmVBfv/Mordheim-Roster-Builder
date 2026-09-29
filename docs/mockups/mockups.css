@@ -181,6 +181,29 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nav a[aria-current='page'] { color: var(--accent); }
 .nav svg { width: 24px; height: 24px; }
 
+/* the tabs of a section (Warband: Roster · Story · Versions; Campaign: …) */
+.tabs {
+  display: flex;
+  gap: var(--s1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: var(--s2) var(--s4) 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.tabs a {
+  flex: none;
+  min-height: var(--tap);
+  display: grid;
+  place-items: center;
+  padding: 0 var(--s3);
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+.tabs a[aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
+
 /* ---------- pieces ---------- */
 
 .card {

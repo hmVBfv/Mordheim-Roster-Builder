@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>More Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .menu { display: grid; gap: var(--s1); }
+  .menu button, .menu a { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: var(--s2); padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; cursor: pointer; text-align: left; }
+  .menu small { color: var(--text-muted); }
+  .devices { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s1); }
+  .devices li { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); align-items: center; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .devices small { color: var(--text-muted); }
+  .radios { display: grid; gap: var(--s1); }
+  .radio { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap); padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+  .radio input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .codes { font-family: ui-monospace, monospace; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s1); padding: var(--s2); border: 1px dashed var(--border); border-radius: var(--radius); }
+  .reports { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s1); font-size: 0.93rem; }
+  .reports li { display: flex; justify-content: space-between; gap: var(--s2); border-bottom: 1px solid var(--border); padding: 2px 0; }
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); margin: 0; font-size: 0.93rem; }
+  .facts dt { color: var(--text-muted); }
+  .facts dd { margin: 0; }
+  .check { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap); cursor: pointer; }
+  .check input { width: 22px; height: 22px; accent-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>More</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">More</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+
+  <div class="content">
+    <section class="stack" aria-labelledby="me-h">
+      <h2 id="me-h">Rob</h2>
+      <p class="small muted">Player · leader of the Hel Fenn Campaign · admin</p>
+      <div class="menu">
+        <button type="button" data-open="sheet-auth">Authenticator <small>on</small></button>
+        <button type="button" data-open="sheet-pass">Password <small>changed in August</small></button>
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="dev-h">
+      <h2 id="dev-h">Devices</h2>
+      <ul class="devices" id="devices">
+        <li><span>This phone<br><small>Android · now</small></span><span class="chip good">this one</span></li>
+        <li><span>Laptop<br><small>Firefox · Sunday</small></span><button type="button" class="btn-quiet" data-signout>Sign out</button></li>
+        <li><span>Tablet<br><small>Chrome · 3 weeks ago</small></span><button type="button" class="btn-quiet" data-signout>Sign out</button></li>
+      </ul>
+    </section>
+
+    <section class="stack" aria-labelledby="look-h">
+      <h2 id="look-h">Appearance</h2>
+      <div class="radios" role="radiogroup" aria-label="Theme">
+        <label class="radio"><input type="radio" name="theme" data-set-theme="chronicle"> Chronicle — dark</label>
+        <label class="radio"><input type="radio" name="theme" data-set-theme="parchment"> Parchment — light</label>
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="bug-h">
+      <h2 id="bug-h">Something wrong?</h2>
+      <button type="button" class="btn-quiet" data-open="sheet-report">Report a problem</button>
+      <ul class="reports" id="reports"><li><span>Gold after selling was 5 gc too low</span><span class="chip good">fixed in 9ab86ae</span></li></ul>
+    </section>
+
+    <section class="stack" aria-labelledby="adm-h">
+      <h2 id="adm-h">Admin <span class="vis leader">⚑</span></h2>
+      <div class="menu">
+        <button type="button" data-admin="users">Users <small>3</small></button>
+        <button type="button" data-admin="invites">Invites <small>1 open</small></button>
+        <button type="button" data-admin="bugs">Bugs <small>2 open</small></button>
+        <button type="button" data-admin="backups">Backups <small id="backup-when">last night ✓</small></button>
+      </div>
+    </section>
+
+    <p class="small muted">Mordheim Campaign · version 492d9ba</p>
+  </div>
+  <nav class="nav" data-current="More"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-auth" aria-labelledby="auth-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="auth-title">Authenticator</h2>
+    <p class="small muted">Leaders and admins sign in with a code from an authenticator app. If the phone is lost, a recovery code gets you in once.</p>
+    <div class="codes" id="codes" hidden><span>4KQ7-2M9X</span><span>8TZC-5HPL</span><span>3WRN-7F2D</span><span>6YBE-9KQA</span></div>
+    <div class="row"><button type="button" class="btn-quiet" id="codes-show">Show recovery codes</button><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-pass" aria-labelledby="pass-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-pass">
+    <h2 id="pass-title">Password</h2>
+    <label class="field"><span class="small">Current password</span><input class="input" type="password" autocomplete="current-password"></label>
+    <label class="field"><span class="small">New password</span><input class="input" type="password" autocomplete="new-password"></label>
+    <div class="row"><button class="btn" value="save">Change</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-report" aria-labelledby="rep-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-report">
+    <h2 id="rep-title">Report a problem</h2>
+    <label class="field"><span class="small">What happened, and what did you expect?</span><textarea class="textarea" id="rep-text">The ← on the roster did nothing after I closed a sheet.</textarea></label>
+    <label class="check"><input type="checkbox" checked> Send the screen I came from and the app version</label>
+    <div class="row"><button class="btn" value="send">Send</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-admin" aria-labelledby="adm-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="adm-title">Users</h2>
+    <dl class="facts" id="adm-facts"></dl>
+    <div class="row" id="adm-acts"><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  document.getElementById('devices').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-signout]'); if (!b) return;
+    var li = b.closest('li'), next = li.nextSibling, list = li.parentNode;
+    li.remove();
+    window.mockToast('Signed out there.', function () { list.insertBefore(li, next); });
+  });
+  document.getElementById('codes-show').onclick = function () {
+    var c = document.getElementById('codes'); c.hidden = !c.hidden;
+    this.textContent = c.hidden ? 'Show recovery codes' : 'Hide recovery codes';
+  };
+  document.getElementById('form-pass').addEventListener('submit', function () { window.mockToast('Password changed; other devices are signed out.'); });
+  document.getElementById('form-report').addEventListener('submit', function () {
+    var li = document.createElement('li');
+    li.innerHTML = '<span></span><span class="chip">new</span>';
+    li.firstChild.textContent = document.getElementById('rep-text').value.slice(0, 60);
+    document.getElementById('reports').prepend(li);
+    window.mockToast('Sent. Its status shows here.', function () { li.remove(); });
+  });
+  var ADMIN = {
+    users: ['Users', [['Rob', 'admin · leader'], ['Anna', 'player'], ['Ben', 'player']], ''],
+    invites: ['Invites', [['Chris', 'invited by Rob · 3 days left']], '<button type="button" class="btn-quiet" data-act="revoke">Revoke</button>'],
+    bugs: ['Bugs', [['S3', 'Timeline: ↑ on the first block'], ['S4', 'Parchment: faint chip on hover']], ''],
+    backups: ['Backups', [['Last', 'last night 03:10 · checked by restoring'], ['Kept', '14 nightly, 8 weekly']], '<button type="button" class="btn" data-act="backup">Back up now</button>']
+  };
+  var which = null;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-admin]');
+    if (b) {
+      which = b.dataset.admin; var a = ADMIN[which];
+      document.getElementById('adm-title').textContent = a[0];
+      document.getElementById('adm-facts').innerHTML = a[1].map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('');
+      document.getElementById('adm-acts').innerHTML = a[2] + '<button type="button" class="btn-quiet" data-close>Close</button>';
+      window.mockOpen('sheet-admin');
+      return;
+    }
+    var act = e.target.closest('[data-act]');
+    if (act && act.dataset.act === 'backup') {
+      document.getElementById('backup-when').textContent = 'just now ✓';
+      ADMIN.backups[1][0][1] = 'just now · checked by restoring';
+      document.getElementById('adm-facts').firstElementChild.nextElementSibling.textContent = 'just now · checked by restoring';
+      window.mockToast('Backup written and checked.');
+    } else if (act && act.dataset.act === 'revoke') {
+      ADMIN.invites[1] = [['—', 'no open invites']]; ADMIN.invites[2] = '';
+      document.getElementById('adm-facts').innerHTML = '<dt>—</dt><dd>no open invites</dd>';
+      act.remove();
+      document.querySelector('[data-admin=invites] small').textContent = 'none open';
+      window.mockToast('Invite revoked.');
+    }
+  });
+})();
+</script>
+</body>
+</html>

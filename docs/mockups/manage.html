@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Manage Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .members { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .members li { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); align-items: center; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .members small { color: var(--text-muted); }
+  .members .select { width: auto; }
+  .toggles { display: grid; gap: var(--s1); }
+  .toggle { display: grid; grid-template-columns: auto 1fr; gap: 0 var(--s2); align-items: center; min-height: var(--tap); padding: var(--s1) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+  .toggle input { width: 22px; height: 22px; accent-color: var(--accent); }
+  .toggle small { grid-column: 2; color: var(--text-muted); }
+  .danger-zone { display: grid; gap: var(--s2); padding: var(--s3); border: 1px solid var(--danger); border-radius: var(--radius); }
+  .invite { font-family: ui-monospace, monospace; font-size: 0.85rem; word-break: break-all; padding: var(--s2); border: 1px dashed var(--border); border-radius: var(--radius); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Manage</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">The Hel Fenn Campaign</span>
+    <span class="vis leader">⚑ Leaders only</span>
+  </header>
+  <nav class="tabs" aria-label="Campaign" data-tabs="campaign" data-current="Manage"></nav>
+
+  <div class="content">
+    <section class="stack" aria-labelledby="mem-h">
+      <h2 id="mem-h">Members</h2>
+      <ul class="members" id="members">
+        <li><span><b>Rob</b><br><small>The Silver Caravan</small></span><select class="select" aria-label="Rob's role" data-member="Rob"><option selected>Leader</option><option>Player</option><option>Viewer</option></select></li>
+        <li><span><b>Anna</b><br><small>The Grey Penitents</small></span><select class="select" aria-label="Anna's role" data-member="Anna"><option>Leader</option><option selected>Player</option><option>Viewer</option></select></li>
+        <li><span><b>Ben</b><br><small>Clan Skrittle</small></span><select class="select" aria-label="Ben's role" data-member="Ben"><option>Leader</option><option selected>Player</option><option>Viewer</option></select></li>
+      </ul>
+      <button type="button" class="btn-quiet" data-open="sheet-invite">Invite someone</button>
+    </section>
+
+    <section class="stack" aria-labelledby="hr-h">
+      <h2 id="hr-h">House rules</h2>
+      <p class="small muted">Off by default, the same for every warband of the campaign, and named on every export (<span id="hr-n">1</span> on).</p>
+      <div class="toggles" id="hr">
+        <label class="toggle"><input type="checkbox" checked> All daggers free<small>Instead of the first one only.</small></label>
+        <label class="toggle"><input type="checkbox"> Henchmen may take misc. equipment<small>Normally for Heroes only.</small></label>
+        <label class="toggle"><input type="checkbox"> Re-roll a single die<small>Once per battle, for each warband.</small></label>
+        <label class="toggle"><input type="checkbox"> Allow hiring a replacement leader<small>When the leader dies and nobody can take over.</small></label>
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="stage-h">
+      <h2 id="stage-h">Battle 6</h2>
+      <p class="muted" id="stage-text">Being played. Sealed notes open when it is closed; every warband is then asked to mark “After battle 6”.</p>
+      <div class="danger-zone">
+        <p class="small">Closing cannot be undone: sealed notes open for everyone, and the battle's protocol is fixed.</p>
+        <button type="button" class="btn-danger" id="close-open" data-open="sheet-close">Close battle 6…</button>
+      </div>
+    </section>
+
+    <section class="stack" aria-labelledby="more-h">
+      <h2 id="more-h">Elsewhere</h2>
+      <div class="row"><a class="btn-quiet" href="world.html#districts">Districts</a><a class="btn-quiet" href="background.html">Background ⚑</a></div>
+    </section>
+  </div>
+  <nav class="nav" data-current="Campaign"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-invite" aria-labelledby="inv-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="inv-title">Invite someone</h2>
+    <p class="small muted">A link for one person, valid for 7 days. Send it however you like; it opens the sign-up.</p>
+    <p class="invite">https://&lt;campaign-host&gt;/invite/7Q2M-X9KD</p>
+    <div class="row"><button type="button" class="btn" id="inv-copy">Copy link</button><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-close" aria-labelledby="close-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-close">
+    <h2 id="close-title">Close battle 6?</h2>
+    <p>Two sealed notes open for everyone. The protocol (casualties, turn by turn) is fixed; corrections become proposals.</p>
+    <label class="field"><span class="small">Winner</span><select class="select" id="winner"><option>The Silver Caravan</option><option>Clan Skrittle</option><option>No winner</option></select></label>
+    <div class="row"><button class="btn-danger" value="close">Close battle 6</button><button type="button" class="btn-quiet" data-close>Not yet</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  document.getElementById('members').addEventListener('change', function (e) {
+    var s = e.target.closest('[data-member]'); if (!s) return;
+    window.mockToast(s.dataset.member + ' is ' + s.value.toLowerCase() + ' now.');
+  });
+  function count() { document.getElementById('hr-n').textContent = document.querySelectorAll('#hr input:checked').length; }
+  document.getElementById('hr').addEventListener('change', function (e) {
+    count();
+    var l = e.target.closest('label');
+    window.mockToast((e.target.checked ? 'On: ' : 'Off: ') + l.firstChild.nextSibling.textContent.trim() + '. Every warband is recalculated.');
+  });
+  document.getElementById('inv-copy').onclick = function () { window.mockToast('Invite link copied.'); };
+  // irreversible: no undo, and the button goes
+  document.getElementById('form-close').addEventListener('submit', function () {
+    var w = document.getElementById('winner').value;
+    document.getElementById('stage-h').textContent = 'Battle 6 · closed';
+    document.getElementById('stage-text').textContent = 'Closed. Winner: ' + w + '. Two sealed notes are open; the warbands are asked to mark “After battle 6”.';
+    document.querySelector('.danger-zone').remove();
+    window.mockToast('Battle 6 is closed.');
+  });
+})();
+</script>
+</body>
+</html>

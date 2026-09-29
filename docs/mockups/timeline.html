@@ -10,9 +10,6 @@
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
 <style>
-  .tabs { display: flex; gap: var(--s1); overflow-x: auto; padding: var(--s2) var(--s4) 0; border-bottom: 1px solid var(--border); background: var(--surface); }
-  .tabs a { min-height: var(--tap); display: grid; place-items: center; padding: 0 var(--s3); color: var(--text-muted); text-decoration: none; white-space: nowrap; border-bottom: 3px solid transparent; }
-  .tabs a[aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
   .switch { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap); font-size: 0.9rem; cursor: pointer; }
   .switch input { width: 22px; height: 22px; accent-color: var(--accent); }
   .help { font-size: 0.9rem; }
@@ -46,7 +43,7 @@
     <span class="title">The Hel Fenn Campaign</span>
     <span class="sync">✓ Saved</span>
   </header>
-  <nav class="tabs" aria-label="Campaign"><a href="#">Overview</a><a href="#">Notes</a><a href="#" aria-current="page">Timeline</a><a href="#">World</a><a href="background.html">Background</a></nav>
+  <nav class="tabs" aria-label="Campaign" data-tabs="campaign" data-current="Timeline"></nav>
 
   <div class="content">
     <div class="row between">
@@ -172,7 +169,7 @@
         };
         box.appendChild(b);
       });
-      document.getElementById('sheet-move').showModal();
+      window.mockOpen('sheet-move');
     }
   });
 

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Story Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .chapter { display: grid; gap: var(--s2); }
+  .chapter .meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s2); font-size: 0.85rem; color: var(--text-muted); }
+  .lives { display: flex; flex-wrap: wrap; gap: var(--s2); }
+  .lives button { min-height: var(--tap); padding: 0 var(--s3); border: 1px solid var(--border); border-radius: 999px; background: var(--surface); cursor: pointer; }
+  .life { list-style: none; margin: 0; padding: 0 0 0 var(--s3); border-left: 2px solid var(--border); display: grid; gap: var(--s2); }
+  .life li { display: grid; gap: 2px; }
+  .life small { color: var(--text-muted); }
+  .choice { display: grid; grid-template-columns: auto 1fr; gap: 0 var(--s2); align-items: start; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+  .choice input { margin-top: 5px; accent-color: var(--accent); width: 20px; height: 20px; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Story</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <a class="back" href="warbands.html" aria-label="All warbands">←</a>
+    <span class="title">The Silver Caravan</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+  <nav class="tabs" aria-label="Warband" data-tabs="warband" data-current="Story"></nav>
+
+  <div class="content">
+    <section class="stack" aria-labelledby="lives-h">
+      <h2 id="lives-h">Their lives</h2>
+      <p class="small muted">Battles, wounds, advances and what was written about each of them, in order.</p>
+      <div class="lives" id="lives"></div>
+    </section>
+
+    <section class="stack" aria-labelledby="ch-h">
+      <div class="row between"><h2 id="ch-h">Chapters</h2><button type="button" class="btn-quiet" data-open="sheet-write">Write an interlude</button></div>
+      <div class="stack" id="chapters">
+        <article class="card chapter"><div class="meta"><span>Interlude 5 · Rob</span><span class="vis public">👁 Everyone</span></div>
+          <p>Two quiet days at the Blind Cat. Ulrich sells the shards to a priest who asks too few questions, and hires a boy called Wilhelm who will not stop talking about a coin with an eel on it.</p></article>
+        <article class="card chapter"><div class="meta"><span>Prologue · Rob</span><span class="vis public">👁 Everyone</span></div>
+          <p>The Caravan came up the Reik with salt and powder and went home with neither. What is left of it stays in Mordheim because a debt stays with Ulrich.</p></article>
+      </div>
+      <a class="btn-quiet" href="timeline.html">The whole campaign’s timeline</a>
+    </section>
+  </div>
+  <nav class="nav" data-current="Warbands"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-life" aria-labelledby="life-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="life-title">Ulrich the Grey</h2>
+    <ul class="life" id="life-list"></ul>
+    <div class="row"><a class="btn-quiet" href="roster.html">His card in the roster</a><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-write" aria-labelledby="write-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-write">
+    <h2 id="write-title">Interlude 5</h2>
+    <label class="field"><span class="small">What happened between the battles</span><textarea class="textarea" id="write-text">Otto has started to carve eels into the Blind Cat's tables. Nobody has asked him why.</textarea></label>
+    <fieldset style="border:0; padding:0; margin:0" class="stack">
+      <legend class="small">Who can read it?</legend>
+      <label class="choice"><input type="radio" name="w-vis" value="public" checked><span>👁 Everyone in the campaign</span></label>
+      <label class="choice"><input type="radio" name="w-vis" value="sealed"><span>🔒 Sealed until battle 6 is closed</span></label>
+    </fieldset>
+    <div class="row"><button class="btn" value="save">Save</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  var LIVES = {
+    ulrich: ['Ulrich the Grey', [['Founding', 'Mercenary Captain, 20 experience'], ['Battle 1', 'Won at City Hall; +1 WS'], ['Battle 3', 'Learned Strike to Injure'], ['Battle 5', 'Held the gangway; 32 experience, an advance to roll'], ['Interlude 5', '“Bolt the doors. Whatever knocks tonight is not a customer.”']]],
+    magda: ['Magda', [['Founding', 'Champion, 8 experience'], ['Battle 2', 'Out of action, full recovery'], ['Battle 5', 'Out of action by Skritch: Leg Wound (−1 M), misses battle 6']]],
+    jorg: ['Jorg', [['Founding', 'Champion, 8 experience'], ['Battle 2', 'Out of action, full recovery'], ['Battle 4', 'BS 4 — no advance recorded for it yet (⚠ in Versions)']]],
+    wilhelm: ['Wilhelm', [['Interlude 5', 'Hired at the Blind Cat as a Youngblood'], ['Interlude 5', 'Saw the coin with the eel']]],
+    warriors: ['The Warriors', [['Founding', 'Otto, Fritz and Hans'], ['Battle 1', 'Otto out of action, back on a 5'], ['Battle 4', 'Hans out of action — dead on a 1']]],
+    marksmen: ['The Marksmen', [['Founding', 'Lukas'], ['Battle 5', 'One Verminkin shot down; +1 experience']]],
+    gunnar: ['Big Gunnar', [['Battle 3', 'Hired: Ogre Bodyguard, 80 gc, upkeep 30 gc'], ['Battle 4', 'Learned Resilient']]]
+  };
+  document.getElementById('lives').innerHTML = Object.keys(LIVES).map(function (k) { return '<button type="button" data-life="' + k + '">' + esc(LIVES[k][0]) + '</button>'; }).join('');
+  function openLife(k) {
+    var l = LIVES[k]; if (!l) return;
+    document.getElementById('life-title').textContent = l[0];
+    document.getElementById('life-list').innerHTML = l[1].map(function (r) { return '<li><small>' + esc(r[0]) + '</small><span>' + esc(r[1]) + '</span></li>'; }).join('');
+    window.mockOpen('sheet-life');
+  }
+  document.getElementById('lives').addEventListener('click', function (e) { var b = e.target.closest('[data-life]'); if (b) openLife(b.dataset.life); });
+  document.getElementById('form-write').addEventListener('submit', function () {
+    var sealed = document.querySelector('[name=w-vis]:checked').value === 'sealed';
+    var a = document.createElement('article');
+    a.className = 'card chapter' + (sealed ? ' is-sealed' : '');
+    a.innerHTML = '<div class="meta"><span>Interlude 5 · Rob · just now</span>' + (sealed ? '<span class="vis sealed">🔒 Sealed until battle 6 is closed</span>' : '<span class="vis public">👁 Everyone</span>') + '</div><p></p>';
+    a.querySelector('p').textContent = document.getElementById('write-text').value;
+    var list = document.getElementById('chapters');
+    list.prepend(a);
+    window.mockToast('Saved' + (sealed ? ', sealed.' : '.'), function () { a.remove(); });
+  });
+  // from the roster: "His story so far"
+  var who = new URLSearchParams(location.search).get('who');
+  if (who && LIVES[who]) openLife(who);
+})();
+</script>
+</body>
+</html>
