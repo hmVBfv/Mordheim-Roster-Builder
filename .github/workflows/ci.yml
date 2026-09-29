@@ -10,6 +10,10 @@ name: CI
 #           app computes) and the legacy tests mirrored onto core
 #   app     the PWA: unit tests, both builds, the size budget, and Playwright
 #           at 360 px (screenshots uploaded as an artifact — look at them)
+#
+# The runner is pinned to ubuntu-24.04: ubuntu-latest moves to Ubuntu 26 from
+# 19.10.2026, and the move should be a deliberate change with a green run
+# (Playwright's browser dependencies), not a surprise on some Tuesday.
 
 on:
   push:
@@ -26,20 +30,20 @@ concurrency:
 
 jobs:
   legacy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: Legacy tests (rebuilds single-file + parity check)
         run: node test/run.mjs
 
   core:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: Typecheck
@@ -50,10 +54,10 @@ jobs:
         run: npm run test:core
 
   app:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: App tests (unit and components)
@@ -70,5 +74,5 @@ jobs:
         run: npm run e2e -w app
       - name: Screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with: { name: app-screens, path: app/test-results/, if-no-files-found: ignore }
