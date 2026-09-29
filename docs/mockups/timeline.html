@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timeline Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .tabs { display: flex; gap: var(--s1); overflow-x: auto; padding: var(--s2) var(--s4) 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .tabs a { min-height: var(--tap); display: grid; place-items: center; padding: 0 var(--s3); color: var(--text-muted); text-decoration: none; white-space: nowrap; border-bottom: 3px solid transparent; }
+  .tabs a[aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
+  .switch { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap); font-size: 0.9rem; cursor: pointer; }
+  .switch input { width: 22px; height: 22px; accent-color: var(--accent); }
+  .help { font-size: 0.9rem; }
+  ol.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .anchor { display: flex; align-items: baseline; gap: var(--s2); padding: var(--s3) 0 var(--s1); border-bottom: 1px solid var(--border); }
+  .anchor h2 { font-size: 1rem; }
+  .anchor .fixed { font-size: 0.78rem; color: var(--text-muted); }
+  .block { display: grid; gap: 2px; padding: var(--s1) var(--s2) var(--s2) var(--s3); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: pan-y; }
+  .block .meta { display: flex; flex-wrap: wrap; gap: 0 var(--s2); font-size: 0.8rem; color: var(--text-muted); }
+  .block .body { display: grid; gap: 2px; min-width: 0; }
+  .block .head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: var(--tap); }
+  .block .tools { display: grid; grid-template-columns: repeat(3, var(--tap)); gap: 2px; flex: none; margin-right: calc(-1 * var(--s1)); }
+  .block .tools button { width: var(--tap); height: var(--tap); border: 0; background: transparent; border-radius: var(--radius); cursor: pointer; font-size: 1.1rem; }
+  .block .tools button:hover { background: var(--surface-2); }
+  .block.fixed-block { border-style: solid; background: var(--surface-2); padding-top: var(--s2); }
+  .block.dragging { outline: 2px solid var(--accent); box-shadow: 0 10px 28px var(--shadow); transform: scale(1.02); position: relative; z-index: 3; }
+  .block.pressing { background: var(--surface-2); }
+  body.is-dragging { overscroll-behavior: none; }
+  .changes-list { margin: 0; padding-left: 1.1em; font-size: 0.92rem; }
+  .moveto { display: grid; gap: var(--s1); }
+  .moveto button { min-height: var(--tap); text-align: left; padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
+  .moveto button[aria-current='true'] { border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Timeline</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">The Hel Fenn Campaign</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+  <nav class="tabs" aria-label="Campaign"><a href="#">Overview</a><a href="#">Notes</a><a href="#" aria-current="page">Timeline</a><a href="#">World</a><a href="background.html">Background</a></nav>
+
+  <div class="content">
+    <div class="row between">
+      <label class="switch"><input type="checkbox" id="layer" checked> Leader layer</label>
+      <span class="vis leader" id="layer-state">⚑ hidden blocks shown</span>
+    </div>
+    <p class="help muted">Long-press a block and drag it to where it happens in the story, or use ↑ ↓ and ⋯. Battles, headings and tagged states stay where they are. Moving changes only the place in the story, never when something was recorded.</p>
+
+    <ol class="tl" id="tl">
+      <li class="anchor" data-segment="Battle 5 · before"><h2>Battle 5 · before</h2><span class="fixed">fixed</span></li>
+      <li class="block is-sealed" data-id="b1"><div class="body"><div class="meta"><span>Intention, written before</span><span class="vis sealed">🔓 opened after battle 5</span></div><p>“Skritch goes for the captain. Whatever it costs.”</p><p class="small muted">Ben · Clan Skrittle</p></div><div class="tools"></div></li>
+
+      <li class="anchor" data-segment="Battle 5 · course"><h2>Battle 5 · course</h2><span class="fixed">fixed</span></li>
+      <li class="block fixed-block"><div class="body"><div class="meta"><span>Battle report</span><span>fixed</span></div><p><b>The Old Mill</b> — The Silver Caravan beat Clan Skrittle; the Grey Penitents routed.</p></div></li>
+      <li class="block" data-id="b2"><div class="body"><div class="meta"><span>Turn 2</span><span>Scene · Anna</span></div><p>Brother Anselm sets the mill wheel on fire to smoke the rats out of the cellar.</p></div><div class="tools"></div></li>
+      <li class="block" data-id="b3"><div class="body"><div class="meta"><span>Turn 3</span><span>Quote · Rob</span></div><blockquote>“Bolt the doors. Whatever knocks tonight is not a customer.”</blockquote><p class="small muted">— Ulrich the Grey</p></div><div class="tools"></div></li>
+      <li class="block" data-id="b4"><div class="body"><div class="meta"><span>Turn 4</span><span>Protocol</span></div><p>Magda is out of action — by Skritch.</p></div><div class="tools"></div></li>
+      <li class="block is-hidden" data-id="h1" data-hidden><div class="body"><div class="meta"><span class="vis leader">⚑ Leader only</span><span>GM note · Rob</span></div><p>Skritch was paid in advance. The coin carries the eel of the ferrymen’s guild.</p></div><div class="tools"></div></li>
+
+      <li class="anchor" data-segment="Battle 5 · aftermath"><h2>Battle 5 · aftermath</h2><span class="fixed">fixed</span></li>
+      <li class="block fixed-block"><div class="body"><div class="meta"><span>Tagged state</span><span>fixed</span></div><p>After battle 5 · The Silver Caravan <span class="chip good">✓ marked</span></p></div></li>
+      <li class="block" data-id="b5"><div class="body"><div class="meta"><span>Changes · The Silver Caravan</span><span class="chip warn">2 explanations missing</span></div>
+        <ul class="changes-list"><li>Magda — Leg Wound, M 4 → 3</li><li>Ulrich the Grey — WS 4 → 5 <span class="muted">“He learned it the hard way.”</span></li><li>Hans — fell</li></ul></div><div class="tools"></div></li>
+      <li class="block" data-id="b6"><div class="body"><div class="meta"><span>Scene · Ben</span></div><p>The rats drag Grot home on a door. He will not walk again this season.</p></div><div class="tools"></div></li>
+
+      <li class="anchor" data-segment="Interlude 5"><h2>Interlude 5</h2><span class="fixed">fixed</span></li>
+      <li class="block" data-id="b7"><div class="body"><div class="meta"><span>Interlude · The Silver Caravan</span></div><p>Two quiet days at the Blind Cat. Ulrich sells the shards to a priest who asks too few questions and hires a boy called Wilhelm.</p></div><div class="tools"></div></li>
+
+      <li class="anchor" data-segment="Battle 6 · before"><h2>Battle 6 · before</h2><span class="fixed">fixed</span></li>
+      <li class="block is-sealed" data-id="b8"><div class="body"><div class="meta"><span class="vis sealed">🔒 Sealed · Ben</span></div><p class="muted">Opens when battle 6 is closed.</p></div><div class="tools"></div></li>
+    </ol>
+  </div>
+  <nav class="nav" data-current="Campaign"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-move" aria-labelledby="move-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="move-title">Move to…</h2>
+    <p class="small muted" id="move-times"></p>
+    <div class="moveto" id="moveto"></div>
+    <button type="button" class="btn-quiet" data-close>Cancel</button>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  var tl = document.getElementById('tl');
+  var TIMES = { b1: 'Sat 20 Sep, 19:40', b2: 'Sat 20 Sep, 20:12', b3: 'Sat 20 Sep, 20:31', b4: 'Sat 20 Sep, 20:44', h1: 'Sun 21 Sep, 10:05', b5: 'Mon 22 Sep, 18:20', b6: 'Mon 22 Sep, 21:02', b7: 'Wed 24 Sep, 22:15', b8: 'Sat 27 Sep, 19:58' };
+
+  // the tools of every movable block
+  tl.querySelectorAll('.block[data-id]').forEach(function (b) {
+    // the tools sit on the line of the block's details, so the text keeps the full width
+    var tools = b.querySelector('.tools'), meta = b.querySelector('.meta');
+    var head = document.createElement('div');
+    head.className = 'head';
+    meta.replaceWith(head);
+    head.append(meta, tools);
+    tools.innerHTML =
+      '<button type="button" data-act="up" aria-label="Move up">↑</button>' +
+      '<button type="button" data-act="down" aria-label="Move down">↓</button>' +
+      '<button type="button" data-act="more" aria-label="Move to…">⋯</button>';
+    b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  });
+
+  function segmentOf(li) {
+    for (var x = li.previousElementSibling; x; x = x.previousElementSibling) if (x.classList.contains('anchor')) return x.dataset.segment;
+    return '';
+  }
+  function remember(li) { var next = li.nextElementSibling; return function () { tl.insertBefore(li, next); }; }
+  function moved(li, undo) { window.mockToast('Moved to ' + segmentOf(li) + '.', undo); }
+
+  function step(li, dir) {
+    var undo = remember(li);
+    if (dir < 0) {
+      var prev = li.previousElementSibling;
+      if (!prev || (prev.classList.contains('anchor') && !prev.previousElementSibling)) return;
+      tl.insertBefore(li, prev);
+    } else {
+      var next = li.nextElementSibling;
+      if (!next) return;
+      tl.insertBefore(next, li);
+    }
+    li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    moved(li, undo);
+  }
+
+  var target = null;
+  tl.addEventListener('click', function (e) {
+    var btn = e.target.closest('.tools button');
+    if (!btn) return;
+    var li = btn.closest('.block');
+    if (btn.dataset.act === 'up') step(li, -1);
+    else if (btn.dataset.act === 'down') step(li, 1);
+    else {
+      target = li;
+      document.getElementById('move-times').textContent = 'Recorded ' + TIMES[li.dataset.id] + ' — that never changes. Now in: ' + segmentOf(li) + '.';
+      var box = document.getElementById('moveto');
+      box.innerHTML = '';
+      tl.querySelectorAll('.anchor').forEach(function (a) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = a.dataset.segment;
+        if (a.dataset.segment === segmentOf(li)) b.setAttribute('aria-current', 'true');
+        b.onclick = function () {
+          var undo = remember(target);
+          var n = a.nextElementSibling;
+          while (n && !n.classList.contains('anchor')) n = n.nextElementSibling;
+          tl.insertBefore(target, n);
+          document.getElementById('sheet-move').close();
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          moved(target, undo);
+        };
+        box.appendChild(b);
+      });
+      document.getElementById('sheet-move').showModal();
+    }
+  });
+
+  /* Long press, then drag: a short touch stays a scroll or a tap. */
+  var drag = null;
+  tl.addEventListener('pointerdown', function (e) {
+    var li = e.target.closest('.block[data-id]');
+    if (!li || e.target.closest('button')) return;
+    var x0 = e.clientX, y0 = e.clientY;
+    li.classList.add('pressing');
+    var timer = setTimeout(function () {
+      li.classList.remove('pressing');
+      drag = { li: li, undo: remember(li) };
+      li.classList.add('dragging');
+      document.body.classList.add('is-dragging');
+      try { li.setPointerCapture(e.pointerId); } catch { /* already released */ }
+      if (navigator.vibrate) navigator.vibrate(15);
+    }, 400);
+    function early(ev) { if (!drag && Math.hypot(ev.clientX - x0, ev.clientY - y0) > 8) stop(); }
+    function stop() { clearTimeout(timer); li.classList.remove('pressing'); tl.removeEventListener('pointermove', early); window.removeEventListener('pointerup', stop); window.removeEventListener('pointercancel', stop); }
+    tl.addEventListener('pointermove', early);
+    window.addEventListener('pointerup', stop);
+    window.addEventListener('pointercancel', stop);
+  });
+  // once dragging, the page must not scroll under the finger
+  tl.addEventListener('touchmove', function (e) { if (drag) e.preventDefault(); }, { passive: false });
+  window.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var y = e.clientY;
+    if (y < 90) window.scrollBy(0, -10); else if (y > window.innerHeight - 90) window.scrollBy(0, 10);
+    var items = Array.prototype.filter.call(tl.children, function (x) { return x !== drag.li; });
+    var before = null;
+    for (var i = 0; i < items.length; i++) {
+      var r = items[i].getBoundingClientRect();
+      if (y < r.top + r.height / 2) { before = items[i]; break; }
+    }
+    if (before === tl.firstElementChild) before = tl.firstElementChild.nextElementSibling;
+    if (before !== drag.li.nextElementSibling) tl.insertBefore(drag.li, before);
+  });
+  window.addEventListener('pointerup', function () {
+    if (!drag) return;
+    var d = drag; drag = null;
+    d.li.classList.remove('dragging');
+    document.body.classList.remove('is-dragging');
+    moved(d.li, d.undo);
+  });
+
+  document.getElementById('layer').addEventListener('change', function (e) {
+    var on = e.target.checked;
+    tl.querySelectorAll('[data-hidden]').forEach(function (x) { x.hidden = !on; });
+    document.getElementById('layer-state').textContent = on ? '⚑ hidden blocks shown' : '👁 as players see it';
+    document.getElementById('layer-state').className = on ? 'vis leader' : 'vis public';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+.themes {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.themes legend {
+  font-family: var(--font-title);
+  padding: 0 var(--space-1);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.option input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+/* whatever the build calls itself, it must not widen the page */
+.version {
+  overflow-wrap: anywhere;
+}

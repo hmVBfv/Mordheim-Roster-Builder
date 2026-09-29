@@ -23,8 +23,13 @@ export let uid = 1;
 /** Hand out the next model id and advance the counter. */
 export function nextUid() { return uid++; }
 
-/** Re-sync the counter after loading a roster whose models already have ids. */
-export function resyncUid() { uid = Math.max(1, ...S.models.map(m => m.uid)) + 1; }
+/** Re-sync the counter after loading a roster whose models already have ids.
+ *  The Fallen count too: a warrior keeps his uid in the Fallen list and gets
+ *  it back if his death is undone, so a new recruit must never be given it. */
+export function resyncUid() {
+  const fallen = (S.fallen || []).map(e => Number(e && e.m && e.m.uid)).filter(Number.isFinite);
+  uid = Math.max(1, ...S.models.map(m => m.uid), ...fallen) + 1;
+}
 
 /** Replace the *contents* of S with a new state object, keeping the same
  *  reference alive for every module that imported S. Do NOT do `S = x`

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visibility Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .switch { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap); font-size: 0.9rem; cursor: pointer; white-space: nowrap; }
+  .switch input { width: 22px; height: 22px; accent-color: var(--accent); }
+  .viewing { padding: var(--s2) var(--s4); background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .compose { transition: background-color 0.2s; }
+  .choices { display: grid; gap: var(--s2); }
+  .choice { display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s3); align-items: start; padding: var(--s2) var(--s3); min-height: var(--tap); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+  .choice input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); }
+  .choice b { display: block; }
+  .choice small { grid-column: 2; color: var(--text-muted); line-height: 1.25; }
+  .choice:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .banner { display: flex; gap: var(--s2); align-items: flex-start; padding: var(--s2) var(--s3); border-radius: var(--radius); font-size: 0.92rem; }
+  .banner.sealed { border: 1px solid var(--sealed); color: var(--sealed); }
+  .banner.leader { border: 1px dashed var(--warn); color: var(--warn); }
+  .note { display: grid; gap: var(--s1); }
+  .note .meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--s2); font-size: 0.82rem; color: var(--text-muted); }
+  .placeholder { font-style: italic; color: var(--text-muted); }
+  .rule { font-size: 0.86rem; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Who can see this</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">Notes</span>
+    <label class="switch"><input type="checkbox" id="as-player"> View as player</label>
+  </header>
+  <p class="viewing" id="viewing" hidden>👁 You see the notes as a player sees them. Leader-only notes are gone; sealed ones stay closed.</p>
+
+  <div class="content">
+    <form class="card compose" id="compose">
+      <h2>New note</h2>
+      <label class="field"><span class="small muted">Battle 6 · Hel Fenn ferry</span>
+        <textarea class="textarea" id="text">Ulrich means to cut the ferry rope once the rats are aboard, and let the river have them.</textarea></label>
+
+      <fieldset class="choices" style="border:0; padding:0; margin:0">
+        <legend class="small" style="margin-bottom: var(--s2)">Who can read this?</legend>
+        <label class="choice"><input type="radio" name="vis" value="public" checked><span><b>👁 Everyone in the campaign</b></span><small>Players, leaders and viewers, from now on.</small></label>
+        <label class="choice"><input type="radio" name="vis" value="sealed"><span><b>🔒 Sealed until battle 6 is closed</b></span><small>Nobody can read it before — not the leader, not the admin. Then it opens for everyone and stands next to how it turned out.</small></label>
+        <label class="choice" id="leader-choice"><input type="radio" name="vis" value="leader"><span><b>⚑ Leaders only</b></span><small>For campaign leaders. It never reaches a player’s phone.</small></label>
+      </fieldset>
+
+      <div class="banner sealed" id="b-sealed" hidden><span aria-hidden="true">🔒</span><span>Sealed. Until battle 6 is closed you can only see that it exists — like everyone else. You cannot unseal it early.</span></div>
+      <div class="banner leader" id="b-leader" hidden><span aria-hidden="true">⚑</span><span>Leaders only. Players never receive it; you can reveal it later as a public note.</span></div>
+
+      <div class="row between"><span class="vis public" id="vis-now">👁 Everyone</span><button type="button" class="btn" id="save">Save note</button></div>
+    </form>
+
+    <h2 id="battle6">Battle 6</h2>
+
+    <article class="card note is-sealed">
+      <div class="meta"><span>Ben · before the battle</span><span class="vis sealed">🔒 Sealed until battle 6 is closed</span></div>
+      <p class="placeholder">This note is sealed. It opens for everyone when battle 6 is closed.</p>
+    </article>
+
+    <article class="card note is-hidden" data-leader>
+      <div class="meta"><span>Rob · GM note</span><span class="vis leader">⚑ Leaders only</span></div>
+      <p>The ferryman is in the Countess’s pay. If the Caravan cuts the rope, he will not come back for them.</p>
+    </article>
+
+    <article class="card note">
+      <div class="meta"><span>Anna · turn 3</span><span class="vis public">👁 Everyone</span></div>
+      <p><span class="note-kind">Dice moment</span> Brother Anselm passes his fear test on a double one.</p>
+    </article>
+
+    <article class="card note">
+      <div class="meta"><span>Rob · turn 3</span><span class="vis public">👁 Everyone</span></div>
+      <blockquote>“Bolt the doors. Whatever knocks tonight is not a customer.”</blockquote>
+      <p class="small muted">— Ulrich the Grey</p>
+    </article>
+
+    <p class="rule muted">What is hidden is filtered on the server: a player’s phone never receives a leader-only note or the text of a sealed one. Mechanics — rosters, rolls, gold, reputation — are never hidden.</p>
+  </div>
+  <nav class="nav" data-current="Notes"></nav>
+</div>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  var compose = document.getElementById('compose');
+  var labels = { public: ['👁 Everyone', 'vis public'], sealed: ['🔒 Sealed until battle 6 is closed', 'vis sealed'], leader: ['⚑ Leaders only', 'vis leader'] };
+  function mode() { return compose.querySelector('input[name=vis]:checked').value; }
+  function update() {
+    var m = mode();
+    compose.classList.toggle('is-sealed', m === 'sealed');
+    compose.classList.toggle('is-hidden', m === 'leader');
+    document.getElementById('b-sealed').hidden = m !== 'sealed';
+    document.getElementById('b-leader').hidden = m !== 'leader';
+    var v = document.getElementById('vis-now');
+    v.textContent = labels[m][0]; v.className = labels[m][1];
+  }
+  compose.addEventListener('change', update);
+  compose.addEventListener('submit', function (e) { e.preventDefault(); });
+  update();
+
+  document.getElementById('save').onclick = function () {
+    var m = mode();
+    var a = document.createElement('article');
+    a.className = 'card note' + (m === 'sealed' ? ' is-sealed' : m === 'leader' ? ' is-hidden' : '');
+    if (m === 'leader') a.dataset.leader = '';
+    var meta = '<div class="meta"><span>Rob · now</span><span class="' + labels[m][1] + '">' + labels[m][0] + '</span></div>';
+    var body = m === 'sealed' ? '<p class="placeholder">Sealed — you wrote it, and you cannot read it either until battle 6 is closed.</p>'
+      : '<p>' + document.getElementById('text').value.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }) + '</p>';
+    a.innerHTML = meta + body;
+    document.getElementById('battle6').insertAdjacentElement('afterend', a);
+    applyView();
+    window.mockToast(m === 'sealed' ? 'Sealed until battle 6 is closed.' : 'Note saved.', function () { a.remove(); });
+  };
+
+  function applyView() {
+    var asPlayer = document.getElementById('as-player').checked;
+    document.querySelectorAll('[data-leader]').forEach(function (x) { x.hidden = asPlayer; });
+    document.getElementById('leader-choice').hidden = asPlayer;
+    document.getElementById('viewing').hidden = !asPlayer;
+    if (asPlayer && mode() === 'leader') { compose.querySelector('input[value=public]').checked = true; update(); }
+  }
+  document.getElementById('as-player').addEventListener('change', applyView);
+})();
+</script>
+</body>
+</html>

@@ -509,6 +509,161 @@ The alternative would be an external backend, which costs exactly that.
 
 `test/campaign-file.mjs` added; suite 18/18.
 
+## July 17, 2026 — casualties: who took out whom, and what became of them
+
+Decided where a campaign phase is cut: **a phase is one battle together with
+its post-battle sequence**, because purchases, hires and advances belong to the
+aftermath of the game just played, not to the next one. So the cut falls at the
+start of the next battle, which is also the natural point to sync rosters into
+the campaign file — the roster is stable then rather than half-updated.
+
+That has a direct consequence for recording kills. During a battle only two
+things are known: who went out of action, and who put them there. Whether that
+means death, a lasting injury or a full recovery is decided by the injury roll
+afterwards. Casualty records therefore have two stages: they are written as
+`pending` during the game and resolved later.
+
+Applying the injury roll to one of our own warriors resolves the existing
+record instead of creating a second one, retypes its chronicle entry (an
+out-of-action becomes a death or a wound, and reads accordingly), and a death
+is tied to its entry in the Fallen section — so casualty, roster and Fallen can
+be cross-referenced. Either side of a casualty may be one of our own models,
+picked from the roster (which is what makes the link possible), or a named
+enemy with their warband. Tallies count what each warrior dealt out (out of
+actions, kills) and suffered (out of actions, injuries, deaths).
+
+`test/casualties.mjs` added; suite 19/19.
+
+## July 17, 2026 — making the record answer the two questions asked of it
+
+Checked what the chronicle could actually deliver against the two goals — a
+written account good enough to be turned into a story, and real per-character
+analysis — and found the record too thin for the second. Three gaps, now closed.
+
+**No stable identity on events.** Every event carried only the unit *type*, so
+two Black Skaven were indistinguishable and a renamed warrior could not be
+followed. Recruitment, advances, skills, promotions, items and deaths now carry
+the model id and name.
+
+**No rank or worth on casualties.** "How many heroes did he kill" and "how much
+enemy gold did he destroy" were unanswerable. Both sides of a casualty now carry
+grade and gold worth — filled in from the roster for our own models, entered by
+hand for enemies.
+
+**No experience history.** Only the current value existed, so no progression
+could be shown. Each stage is now snapshotted as it closes (experience,
+advances, skills, worth per warrior), which gives curves cheaply without
+logging every single point.
+
+On top of that: `characterTimeline()` gives one warrior's whole story (joined,
+fate, kills split by grade, gold destroyed, injuries, experience curve, every
+event in order), `campaignAnalysis()` the campaign-wide figures, and
+`narrativeReport()` a stage-by-stage written account — the battles with the
+player's own words, casualties naming both sides, advances, and a closing roll
+of the warriors with their fates. Both are exportable, the account as markdown
+and the figures as JSON.
+
+Two bugs surfaced while testing it end to end: battles were filed one stage late
+(a leftover from when a stage meant "after battle N" — a phase is the battle
+plus its aftermath, so the battle belongs to the current stage), and a warrior
+killed through a resolved casualty had no recorded moment of death, because that
+entry is keyed by casualty rather than by warrior.
+
+`test/analysis.mjs` added; suite 20/20.
+
+## July 17, 2026 — experience earned from casualties, and snapshot diffing
+
+Reworked the analysis around a better idea: the difference between two stage
+snapshots *is* the analysis. Trying to log every meaning separately as it
+happened was the wrong approach — a warrior present at one stage and dead at
+the next fell in that battle; whose characteristic is higher gained it then.
+
+Snapshots are therefore comprehensive now: per warrior the experience, each
+characteristic advance, skills, spells, injuries, equipment, rare items, count
+and worth — and the fallen are kept in the snapshot too, marked dead, so a
+warrior who is gone can be told apart from one who was never there.
+`diffStages(a,b)` derives who joined, who fell, who left, and per warrior what
+changed (experience gained, which characteristic went up, which skill or spell
+was learned, what was bought). `foundingMembers()` answers who was there from
+the outset.
+
+Experience is now earned rather than typed in. Per the rules (checked against
+mordheimer.net): a Hero earns +1 for each enemy put out of action, every Hero
+and Henchman group earns +1 for surviving, and the leader of the winning
+warband earns +1. Only Heroes earn the per-enemy point — henchmen earn as a
+group by surviving. Scenarios vary the amounts (Mordheim's Burning grants +5 for
+surviving), so they are arguments rather than constants. NPCs count as enemies
+where the scenario treats them so, which the Necromancer's Tower does
+explicitly for its Zombies.
+
+Attributing a casualty to one of our Heroes therefore feeds an experience
+ledger, which holds the points rather than writing them straight onto the
+roster: the whole battle can be tallied and then applied with one button, and
+the reason each point was earned is kept. That also keeps the casualty record
+doing what it is for — attribution of who inflicted what on whom — while the
+consequences are derived from it.
+
+`test/experience.mjs` added; suite 21/21.
+
+## July 17, 2026 — the snapshot is the whole warband state
+
+Adopted a better idea than the hand-picked field list: the warband export
+already contains everything there is, so that is what a stage snapshot should
+be. No guessing in advance which fields an analysis might later want.
+
+One cut is necessary, and it is not obvious. The export contains `S.campaign`,
+which contains the snapshots — so a naive full copy nests every earlier snapshot
+inside each new one. Measured before building it: exactly 2x per stage, turning
+a 2.8 KB warband into 710 KB by stage 8 and roughly 90 MB by stage 15. The
+campaign RECORDS (chronicle, battles, casualties, experience ledger, snapshots)
+are therefore left out — they live centrally and only once. Growth is now linear:
+31.5 KB after fifteen stages.
+
+The districts stay in, so who held what at which stage is answerable
+(`districtsAt`). Computed totals — rating, gold, warband size, fallen — are
+stored as they stood rather than recomputed later: if the data files change
+(an FAQ re-costs a unit), recomputing would silently rewrite history
+(`totalsAt`). Transient interface state (open panels, half-filled forms) is
+stripped out.
+
+`snapRows()` reads both the new full-state snapshots and the earlier flat ones,
+so campaign files written before this keep working. Everything else —
+`diffStages`, character timelines, the narrative — reads through it.
+
+`test/snapshots.mjs` added; suite 22/22.
+
+## July 18, 2026 — defaults, the campaign table, export names, and the TTS fields
+
+A batch of small things, each of which was a papercut in play.
+
+**Names default instead of staying blank.** A new warband is named after its
+type (so an export reads "Arabian Tomb Raiders", not "warband"), and a player
+imported into a campaign file without a name is numbered rather than left as an
+indistinguishable blank cell.
+
+**The campaign table shows the warband rating**, taken from the latest stored
+snapshot totals rather than recomputed — recomputing would need that warband's
+full state loaded and would drift if the data files change later.
+
+**Export file names carry the campaign stage and the date**
+(`Klaue_Skaven_battle1_2026-07-18`), so a folder of exports from several game
+nights can be told apart at a glance. Applies to the roster, the readable text,
+the New Recruit file, the campaign export, the chronicle and the analysis.
+
+**The TTS export gained a name field**, separate from the description, since
+the two go into different boxes in TTS. Heroes (and Hired Swords and Dramatis
+Personae) get a darker gold than the rank and file, so the notable models stand
+out on the tabletop. The dialog now shows both fields labelled with what they
+are for, each with its own copy button, plus a copy-both.
+
+**The stat line gained Sv.** The value was already there for the PDF sheet
+(`svOfModel` in engine.js): the permanent save from armour and skills,
+deliberately excluding shields and bucklers, which depend on what is being
+carried at the time. Heavy armour with helmet and shield therefore reads Sv 5+,
+not 4+.
+
+`test/naming-and-tts.mjs` added; suite 23/23.
+
 ## July 18, 2026 — gold that drifts: the henchman experience surcharge
 
 The first bug found by *playing* rather than by testing: a warband's gold in
@@ -805,3 +960,535 @@ nothing. Six genuinely poison-immune characters kept their chip.
 
 Tests pin all of it, including the two cases where the fix could have gone
 wrong: the but-clause pair and the dash clause. Suite 20/20.
+
+## September 27, 2026 — a server, a concept, and not a line of code
+
+The trigger was a small discovery. "Save" and the welcome screen's
+"Continue" call `window.storage` — an interface that only exists inside
+claude.ai artifacts. On GitHub Pages it is simply absent, so saving has
+quietly failed there all along ("Could not save – use Export instead"), and
+the Continue block never appears. The campaign file carried a comment saying
+a shared live session was impossible because Pages only serves static files.
+Both limits disappear with a server, and the Raspberry Pi in the cupboard
+already runs Jellyfin, TeamSpeak and the chronicle agents.
+
+What started as "save warbands on the Pi" grew, over one long conversation,
+into a plan for a shared campaign companion whose real purpose is to collect
+material for the bilingual campaign epic: a tagged state of every warband
+after every battle, an automatic diff between those states reconciled against
+the event log, notes from every player (sealable before a battle), the
+player's own explanation for each change, a timeline that can be reordered by
+story time, and a hidden background layer for the campaign leader — hidden
+narrative only, never hidden mechanics, because the leader is also a player.
+
+This entry records a phase with no code on purpose. The plan is written down
+in `docs/` — concept, architecture, data model, security, operations, UI,
+glossary, roadmap and fourteen ADRs — because development will increasingly
+run through Claude Code on the Pi, and an agent that doesn't know *why*
+something is built a certain way will eventually "fix" it.
+
+Turns worth remembering:
+
+* **Svelte, then React.** Svelte looked right: smallest runtime, closest to
+  plain HTML. It lost on the criterion that matters most here — fewest
+  mistakes in agent-written code. Svelte 5 changed its syntax fundamentally;
+  React's patterns have been stable for years and come with lint rules that
+  catch its typical errors. The performance difference is invisible for a
+  roster of a few hundred elements, and a PWA caches the runtime anyway.
+* **Watchtower is not a deploy tool for this.** It runs weekly and ignores
+  locally built images; more importantly, a stateful app with migrations
+  should never update unattended. Deploys are a script: backup, pull,
+  health check, automatic rollback.
+* **"Roter Faden" had to be renamed.** The chronicle repo already has a public
+  `notes/roter-faden.md`. Checking also confirmed that both repositories are
+  public — which turned "hidden data never leaves the server" from a nice
+  principle into a hard rule with a CI leak test.
+* **The escaping problem mostly dissolved.** The legacy app builds HTML from
+  strings and would have needed an audit before sharing data between users.
+  The React rewrite escapes by default and has no inline handlers, so a
+  strict Content Security Policy is possible from day one.
+* **Redundancy became fault tolerance.** No second server; instead an app
+  that works offline, a server "epoch" that makes devices re-offer anything
+  written after the last backup, an amd64 image so the desktop can stand in,
+  and a cloned SD card.
+
+Next is phase 1: pulling the logic out of `js/app.js` into a shared `core/`,
+guarded by the existing tests and a parity check across all 49 warbands.
+
+## September 27, 2026 — phase 1 begins: every rule, computed twice
+
+The first code of the new platform is not new behaviour but old behaviour,
+moved. `core/` is a TypeScript workspace with no DOM, no Node APIs and no
+globals; its first slice is everything `engine.js` computes — costs, gold,
+rating, Worth, armour saves — plus what it reached back into `app.js` for:
+Hired Swords and Dramatis Personae, district price effects, the catalogue
+rule.
+
+The decision that shaped the work: **the legacy app is not rewired onto
+core.** It stays exactly as it is, live, until the new builder replaces it.
+Core is proven against it instead. A generator builds warbands for all 49
+warband types, every subtype and three house-rule presets — random but
+seeded equipment, mutations, rare items (eligible or not), injuries,
+promotions, hired swords with options and personas, campaign footholds — 348
+of them. For each, the legacy functions (loaded in Node with DOM stubs) and
+the core functions answer the same questions, and the answers must be
+identical, down to the unrounded halves of Worth.
+
+They were, on the first run, except for a test bug: two units (the Plague
+Cart and the Trade Wagon) have `profile: null`, which the test had assumed
+away. Passing on the first try is exactly when a test deserves suspicion, so
+three bugs were planted in core by hand — a henchman surcharge of 3 instead
+of 2, an off-by-one in the shield slot, a Hired Sword rule that ignores
+alignment. The suite caught all three (288, 290 and 54 failing warbands).
+A coverage test now fixes minimums for every priced feature the fixtures
+exercise, so a future generator change cannot make parity vacuous.
+
+Two smaller guards: `createGameData` deep-freezes the data, and a purity test
+runs the rules on frozen warbands — any write throws. ESLint forbids `window`,
+`document`, Node imports, `Math.random` and `Date.now` in `core/src`.
+
+TypeScript 7 (the native port) was out, but typescript-eslint supports only
+up to 6.0, so the workspace pins TypeScript 6.0.
+
+## September 27, 2026 — actions, and two ids that must never come back
+
+The second slice ports roster building: recruiting, equipment, rare items,
+mutations, gold and stash, subtypes, districts, Hired Swords and Dramatis
+Personae, house rules. In core every action takes a state and returns a new
+one. Immer settles open decision C: inside a recipe the code writes the draft
+exactly as the legacy app wrote its global `S`, so a port stays line for line
+comparable, and the result is immutable anyway.
+
+Parity for actions is a random walk. The same seeded sequence of 80 actions
+runs through the legacy functions (which mutate `S` and re-render) and through
+core, from a fresh roster of every warband type — with and without the
+campaign switched on — and from generated states; after every single step the
+two must agree. Two lessons from making that comparison fair:
+
+* **Legacy normalised its state while drawing it.** Rendering filled in
+  missing house-rule defaults, created the campaign lists, and even rewrote a
+  Dramatis Personae's persona if the chosen one was not allowed for the
+  warband. Whether that had happened depended on what was on screen. Core
+  does it explicitly in `normalizeState`, and the comparison normalises both
+  sides.
+* **A removed warrior's uid came back.** Legacy kept a counter in the running
+  page, so within a session it never reused a uid; core, computing
+  "highest uid + 1", handed out the uid of a warrior just removed. With
+  versions and diffs keyed on `uid`, a reused uid would silently graft one
+  warrior's history onto another. The state now remembers its counters
+  (`uidSeq`, and `campaign.logSeq` for chronicle ids), set on load.
+
+The walk is checked for its own coverage — each action must actually change a
+state at least 15 times — after a planted bug (a repeated rare item counting
+double) slipped through the first version of the walk unnoticed, because the
+walk almost never bought the same rare item twice.
+
+## September 27, 2026 — the walk finds two bugs in the live app
+
+The third slice ports advancement: profiles and racial maxima, experience,
+stat advances, skills and spells, the Marauder marks, promotions, individual
+henchman names, the leader, and the same for Hired Swords. The walk grew to
+seventy actions, and two of its findings were not porting mistakes but bugs
+in the app the group is using today:
+
+* **The promotion entry could name the wrong warrior.** Its uid was read off
+  whichever model was last in the roster — right in the common cases, wrong
+  when a lone henchman further up was promoted in place while another
+  promoted Hero stood at the end.
+* **A promoted Hero shared objects with the group he left.** Injuries and
+  spells were copied shallowly, so lowering the Hero's spell difficulty
+  lowered the group's too, until the next reload.
+
+Both are fixed in the legacy app as well, each with a regression test that
+fails on the old code. `docs/behaviour-changes.md` now registers every
+difference between core and the legacy app, and is where Rob's wishes for the
+new builder go — to be built one at a time once the port is complete, so the
+parity net stays clean until then.
+
+The walk had become slow — nearly all of its time is the legacy app
+re-rendering its whole page after every action. It now runs from four files
+in parallel, and its coverage is checked by replaying the same walks with
+core alone, which takes two seconds.
+
+## September 27, 2026 — the dead, and the questions the app used to ask
+
+The fourth slice ports what happens to warriors after a fight: the whole
+Serious Injuries chart, deaths and the Fallen list with its undo, the
+casualty records a battle leaves behind and the dice rolled for them, and
+experience held until it is applied. These are one knot rather than three
+features: a death moves the warrior into the Fallen *and* settles the
+casualty record of the battle he fell in, and resolving a casualty's roll
+applies it to the roster exactly as the unit card would. So they were ported
+together.
+
+The legacy app asked questions in the middle of these actions — was he
+robbed, did he win the pit fight, is the captive coming back and for how
+much, what did the D3 say. Core cannot open a dialog, so the answers became
+arguments, with defaults that match what the legacy app did when it could not
+ask. The parity walk answers them at random on the legacy side and passes the
+same answers to core.
+
+Random walks are good at reaching common paths and poor at the ones that need
+a particular roster: a Kislev heirloom lost in a pit fight only shows if the
+captain carries one. A second suite now applies every result of the chart,
+with every answer, to prepared warbands (heirloom, Gromril weapon, Dark Elf
+venom, a named man in the middle of his group), and every casualty roll on
+either table. Planted bugs in the gear-stripping rules went unnoticed by the
+walk and were caught there. The walk also compares what the read-only rules
+say about the Fallen and the casualties after every step, since the generated
+fixtures hold none of them.
+
+Porting turned up one more bug in the live app: after loading a save, a new
+recruit could get the uid of a fallen warrior, and undoing that death then
+put two models with the same uid on the roster. The loader now counts the
+Fallen too, with a regression test. Two further inconsistencies are only
+written down as proposals, because what to do about them is Rob's call:
+rolling an injury from the casualty list skips what five results do on the
+unit card (Deep Wound, Robbed, Captured, the pits, Survives Against the
+Odds), and casualty records point at the Fallen by position, which breaks
+when one is deleted.
+
+## September 27, 2026 — a warband's campaign, and what "looking" used to write
+
+The fifth slice ports a warband's own side of the campaign: the chronicle,
+closing a stage (sit-outs served, the warband snapshotted, the round moved
+on), battles, footholds, the post-battle checklist with its wyrdstone sale,
+the comparison of two stages and the per-warrior analysis the chronicle text
+is written from. The shared campaign file — several warbands, the battle
+form that records a fight between them, control of districts — comes next,
+because it is a second document with its own state, not part of a warband.
+
+Two things the legacy app did in passing had to be named. Its panels create
+an empty post-battle entry for the current round, and an empty snapshot
+list, simply by being looked at; core does not, and the parity comparison
+treats an untouched entry as absent. And a snapshot is stamped with the
+date: legacy read the clock, core takes the date as an argument, since core
+never reads a clock. The walk compares snapshots as whole earlier states,
+in the same canonical form as the live one.
+
+For once the port found nothing wrong. Every planted bug in the new code
+was caught by the walk — the one that was not turned out to change nothing
+at all.
+
+## September 27, 2026 — the campaign file becomes a value
+
+The sixth slice ports the campaign file — the document one player collects
+everybody's warbands into and passes on after a game night — together with
+control of districts across all warbands and the forms that record a battle
+or a casualty. In the legacy app the open file sat in a module variable and
+the half-filled forms lived inside the save, so importing campaign data
+quietly threw away a form in progress. In core both are values the interface
+holds and hands in; an action that touches a warband and the file at once (a
+battle moves footholds for every side) returns both.
+
+These got a walk of their own over three things at once — the warband, the
+file and the open forms — with ordinary roster actions mixed in, comparing
+all three and what the territory, statistics and merged history say after
+every step. The first round of planted bugs showed its limits: half of them
+sat in branches a random walk hardly ever reaches (a warband re-imported
+under a differently cased name, a battle both sides wrote down with the
+sides in another order, a casualty naming the third side when the first is
+removed). Seven short scenarios now cover those; afterwards every planted
+bug was caught except one that, on inspection, cannot change any result.
+
+## September 27, 2026 — the exports, and a PDF drawn twice
+
+The seventh slice ports everything that leaves the builder as text or
+paper: the readable roster that ends in its own save, the Tabletop Simulator
+cards, the chronicle written out for the campaign story, the district
+report, file names, the English rule and equipment texts behind all of them,
+and the official roster sheet.
+
+The sheet was the interesting one to test. It is drawn onto the
+freebooters.org template with pdf-lib, and two PDFs are never byte-for-byte
+equal (they carry the time they were made). So both implementations are
+handed the same stand-in for pdf-lib that writes down every text and box it
+is asked to draw, with its page, position, size and font, and the two lists
+must match. One more test fills the real template with the real library, to
+know core works with what it will be given. Core itself imports neither: the
+library and the template are passed in, as the architecture document said
+they would be.
+
+The planted bugs were all caught once the sheet test also printed warbands
+hired in reverse order — the sheet sorts warriors by the warband's own list
+(a Chieftain before a Seer hired earlier), and generated warbands happen to
+be built in that order already.
+
+## September 27, 2026 — every old file still loads, and phase 1b's port is complete
+
+The eighth slice ports loading and writing saves, which finishes moving the
+legacy app's logic into core. The legacy loader is a list of defaults — an
+empty Fallen list for files from before it existed, house rules filled in
+from the defaults, the gold in hand adopted exactly as the file states it —
+and core's loader is the same list, checked against the legacy app on every
+generated warband, on its exports, on the frozen old save that
+test/compat.mjs pins, and on copies with keys torn out at random.
+
+Saves now carry a format number (a file without one is format 0, written
+by the legacy app) and the version of the app that wrote them. The Zod
+schemas the architecture called for describe the format, but loading does
+not refuse a file that departs from them: saves are the players' data, the
+legacy app never refused one, and a schema written today cannot know every
+file written in July. Departures come back as notes; only a file that
+cannot be a warband of a known type is turned away. The server will hold
+what it stores to the same schemas.
+
+One thing surfaced in the round trip: a treasury still at "starting gold"
+comes back from a save as that amount in coins, because loading adopts the
+gold in hand the file states. The legacy app does the same, and the value
+does not change — only a later change to the starting-gold house rule would
+no longer move it, which is arguably right for a warband already in play.
+
+## September 27, 2026 — what changed, and why
+
+With the port done, phase 1c adds the first logic the legacy app never had:
+comparing two marked states of a warband, and matching every change with its
+cause. The comparison works on the warriors' fixed ids and finds everything
+— recruits, deaths, promotions, experience, characteristics, skills, spells,
+injuries, gear, hires, districts, house rules, totals — however it came
+about. The matching then looks for the event or battle record behind each
+change. A characteristic that rose by two needs two advances; a group that
+shrank is explained by its dead and its promoted; buying gear or hiring a
+sword needs no cause at all, because it is the player's free choice. What
+has no cause is marked for everyone to see and blocks nothing.
+
+Each change gets a key made from its content, never its position, so a
+player's explanation stays on the right change when a marked state is
+corrected later. The briefing for a battle is built from all of it: who
+fought, the protocol and notes, the aftermath and advances per warband with
+the players' explanations and what each warrior did in that very battle,
+interludes, open threads, the canon in both languages, and how many
+explanations are still missing. Two choices here are open to Rob: which
+changes ask for an explanation, and that experience became a change kind of
+its own (it was missing from the list in the data model).
+
+## September 27, 2026 — the rules that hid in the drawing code
+
+The eighth slice closed with the claim that all of the legacy app's logic
+now lived in core. Planning phase 1d proved that wrong. To run the legacy
+test files against core, every function they call needed a counterpart, and
+several of them turned out to be drawing functions with rules inside: the
+sidebar decided whether a warband is legal (too few models, a missing
+leader, a Seer without a Mark, one Swivel Gun per Pirate crew, bow duty for
+Outlaws, the Bretonnian horse order, the house-rule caps) and wrote the
+verdict straight into HTML; the recruit menu decided what may still be
+hired; the abilities panel decided which keywords a warrior's rules grant,
+with its careful reading of "is NOT a Large Target".
+
+These are now rules in core — warbandWarnings, recruitStatus,
+modelAbilities, unitSummary and the list filters — and the parity test reads
+the legacy app's own HTML back to compare. The generated warbands never
+switched on the ranged-weapon cap or the one-re-roll-item rule, so planted
+bugs in those warnings went unnoticed until the modified house-rule preset
+turned both on.
+
+## September 28, 2026 — the legacy tests, run against core
+
+Phase 1d asked for the 35 legacy test files to run against core. The plan
+was a facade: a stand-in for the legacy modules that answers every call
+from core. It did not survive a count. About fifteen of the files read the
+HTML the legacy app draws — the sidebar, the casualty form, the tooltips —
+so a facade would have had to draw them again; and the tests hold on to
+legacy objects and watch them change in place, which core, handing out new
+values, never does.
+
+What runs instead is a mirror. The legacy tests run unchanged against the
+legacy app; a module hook wraps every function the app exports, and each
+call a test makes is repeated in core from the state legacy had just before
+it, with the same answers to its dialogs and the same values in its input
+fields. The warband, the campaign file and the form drafts must come out
+the same; a query must answer the same; a drawing must show what core's
+rule says. Whatever a test asserts about a call therefore holds for core as
+well — about 1500 calls, 400 of them actions, and no difference in the
+logic.
+
+Two gaps came out of it. The tooltip decided which entry to show — an
+item, then a skill from the curated lists, then the ability patterns, then a
+spell — and that order, which once fixed "Nimble" showing a monkey's rule,
+still lived only in the legacy tooltip code; it is now `tooltipInfo` in
+core, checked against every name the app can show a tooltip for. And a fresh
+legacy session hands out uid 1 first, which core refused: it pushed any
+counter up to the old resync floor. Core now keeps a counter as long as it
+collides with nothing.
+
+A wrong turn on the way: the first wrappers were constants, and the legacy
+modules, which import each other in a circle, touched them before they
+existed. Wrapping with hoisted function declarations, as the originals are,
+fixed it. Planting bugs in core showed the mirror's reach and its limit: it
+caught five of six, and missed a name that was no longer trimmed, because
+no legacy test types a name with spaces around it. The mirror adds the
+scenarios the tests describe; the random walks stay for everything else.
+
+## September 28, 2026 — an app that starts without the rules
+
+Phase 1e put the new app on its feet: React with the compiler, both
+flavours from one code base, the two themes, a device store, and a
+read-only roster that everything shown on it takes from core. Two decisions
+came out of measuring rather than planning. The rules data is about 140 KB
+compressed — more than half the budget for the whole first load — so the
+app shell starts without it and fetches it when a roster is first opened;
+the service worker keeps it for the evening the Wi-Fi is gone. And the
+Quick Build keeps its routes after a "#", because GitHub Pages cannot
+answer a deep link with the app.
+
+Playwright looks at every screen at 360 px in both themes, and it found
+the first bug before anyone else could: in Chronicle, whose title font runs
+wider, the header pushed the page six pixels past the edge of the screen —
+enough for a phone to scroll sideways and for taps to land in the wrong
+place. The grid now never grows wider than the screen, and on a narrow one
+the sync state says "Saved" instead of "Saved on this device".
+
+## September 28, 2026 — six screens drawn before they are built
+
+Phase 1f drew the six screens that decide the most: game night, the
+timeline, the change view, visibility, the leader's background and the new
+roster. They are plain clickable pages in `docs/mockups/`, on the app's own
+design tokens, with an invented campaign in them, meant to be held in the
+hand before a line of the real screens is written.
+
+Two things only came out of trying them. The timeline's three move buttons
+first sat beside each block and squeezed the text into a narrow column
+that made every note twice as tall; they now share the line of the block's
+details. And dragging on a phone needs a long press before anything moves —
+a quick swipe must still scroll the page — which a simulated finger in
+Chromium confirmed both ways. The roster mockup also carries the injury
+flow agreed for the new builder: the result as rolled, then exactly the
+follow-up the chart asks for.
+
+## September 28, 2026 — rules as written, unless mordheimer.net says otherwise
+
+The Augur of the Sisters of Sigmar is blind, yet the Serious Injuries chart
+can still cost her an eye. Tuomas' FAQ says that as written the result
+applies to her and that it was probably meant not to. The question was left
+open until Rob settled it with a rule for all such cases: a ruling by
+intent is adopted only where mordheimer.net makes it. For the Augur it
+does not — neither her entry nor result 31 mentions an exception — so she
+loses a point of Ballistic Skill like anyone else. Legacy and core already
+counted it that way; a test now holds the ruling so that no later cleanup
+"fixes" it quietly.
+
+## September 28, 2026 — ready for the real saves
+
+The last part of phase 1d compares the two apps on the saves the group
+actually plays with, because generated warbands only come in the shapes the
+generator knows. Those files are not here yet, so the way in was built
+first. `npm run sanitize-save` takes a warband save, the leader's campaign
+file or the readable text export and cleans it for a public repository: the
+story, backgrounds, chronicle notes, battle accounts, casualty remarks,
+house-rule notes and the players' names go; warband and warrior names stay,
+since the chronicle already prints them. Text that was there stays non-empty
+as a placeholder, so a cleaned save still takes the same branches.
+
+Trying it on a doctored copy turned up the first gap at once: a player can
+correct the text of a chronicle entry the app wrote, and the cleaner only
+looked at notes. Corrected entries are cleaned too now. Cleaning is
+idempotent, so the suite's first check is simply that cleaning a committed
+file changes nothing — a file that slipped in raw fails the build. Two
+invented saves, built with core and written by the legacy app, keep the
+suite honest until the real ones arrive.
+
+## September 28, 2026 — the rule this warrior has
+
+Rob asked whether the units' abilities were right, adding that the tool
+often showed different abilities under the same name. A comparison of all
+49 warbands with mordheimer.net found the units themselves mostly correct,
+and the fault in the tool: every tooltip was looked up by its bare name, and
+the first entry of that name won. A Skaven's Infiltration showed the Cursed
+Cavalcade's text, a Beastman Chief's Bellowing Roar the Ogre version,
+"Swashbuckler" the Buckler, because items were searched before skills. The
+ability chips came from patterns run over a unit's rules text, so a Cleric
+got the Hunter skill from the words "Witch-Hunter's", and Bretonnian Knights
+were shown the All Alone test they are exempt from.
+
+A chip now carries a key that says whose rule it is. Its tooltip takes the
+unit's or warband's own definition first, then a skill of that name from the
+unit's own lists, then the general entry; rules that belong to one unit only
+appear where they are defined or explicitly allowed. The first attempt
+treated only "not" as a denial, as the old comment in app.js insisted
+("immune to X is a rule ABOUT X worth showing"); the audit showed that this
+is exactly what misled players, so "immune to", "never has to" and "no …
+test" deny as well. Before and after over every unit of every warband: 22
+chips disappear, all of them false, and none are gained.
+
+## September 28, 2026 — thirty corrections, six false alarms
+
+The same comparison with mordheimer.net listed some forty errors in the
+rules data itself. Before changing anything, each was read again on its
+page, asking for the exact wording — and six did not hold: Black Dwarfs'
+Tyrant, Dark Elves' Infiltration, the Cavalcade's silk armour, the Norse
+Berserker's armour, the Night Goblin Troll's injury rolls and the
+Outriders' cavalry skills were all right already. The summaries a fetch
+returns are a lead, not a source.
+
+Thirty values were corrected, among them some that change games: a
+Middenheim warband's Captain and Champions had been fighting at Strength 3
+because the city rule was only a note; Reikland's Marksmen lacked their +1
+BS; Ostlander Ruffians, blind drunk and therefore Ld 10, had Ld 7; the
+Cursed Cavalcade could learn the Dark Elves' skills instead of its own; an
+Outlaw's double-handed weapon cost 30 gc instead of 15. Ten further points
+need more than a line of data (a Wolfcloak only for Middenheim, markings
+bought at recruitment for Lizardmen) and are listed as open.
+
+One test went red for an unrelated reason: the campaign-file walk takes
+random steps over the data, and with the new lists it re-added its own
+side to a battle only four times, one short of the minimum. The walk now
+tries that step when it can matter, and walks the group's own warbands too.
+
+## September 28, 2026 — pressing every button
+
+Rob asked for every button to be tried the way a player would: Back on a
+phone, notices that sit in the way, things that overlap, and a desktop
+screen that should use its room. In the new app, Back with the import
+sheet open left the screen — on the first screen, the app itself. A sheet
+now adds a history entry, so Back closes it, and Cancel takes the entry
+away again. Moving on to an imported warband waits until that entry is
+gone; otherwise the next Back would land on a closed sheet. The undo notice stayed eight seconds, could not be
+closed and swallowed every tap on its strip — right above the bottom
+navigation. It now goes after five, has a dismiss button, and passes taps
+through except on its buttons. On a desktop the roster was a phone-wide
+column; the warrior cards now stand side by side.
+
+The legacy app, which the group plays with until the switch, was tried
+with the real warbands at 360 px: the page scrolled sideways by 180 px.
+The cause took three attempts. The emulated phone zoomed out to fit the
+wide page, so the first measurement looked fine; a grid column sized
+`1fr` grows to its widest content unless told it may shrink; and the
+first phone rules were silently overridden by an `.addrow` rule further
+down the stylesheet. Its "Saved." notices swallowed taps in the same way
+as the new app's. Both are fixed and covered by a Playwright project that
+loads the group's saves into the legacy app.
+
+## September 29, 2026 — founding prices, a helper for after the battle
+
+Rob answered the ten rules questions, and most answers came down to one
+distinction the tool did not make: a price in a warband list can be a
+*founding* price. The Nightmare costs the Cursed Cavalcade 30 gc when the
+warband is founded and 95 gc when a Hero finds one later; the same pattern
+turned up, once looked for, in the Mechanical Suit, the Engine of Chaos,
+the Dwarfs' gromril and the Shadow Warriors' Ithilmar. The tool had the
+Nightmare at 95 in the list, and whatever stood in a list never appeared
+at the Trading Post. List rows can now say "founding only"; the campaign
+stage decides which price applies. The obvious measure of "has fought" —
+recorded battles — would have missed the whole group: their saves have
+the campaign mode off and stand at "Setup". So outside the campaign mode
+nothing changes, and the new builder will ask for the stage on import.
+
+The Sons of Hashut's obsidian weapon became the Zharr obsidian weapon,
+after the Chaos Dwarfs' city, because it shared a name — and with it the
+tooltip — with the obsidian upgrade of Border Town Burning. Old saves are
+renamed on loading, in both apps.
+
+A subagent pressed every control of the legacy app, 4,801 of them in ten
+states at two widths. One was broken outright (a house-rule panel whose
+handler referred to a variable it could not reach); a static test now
+checks every name in every inline handler. The rest were layout: a
+campaign file that widened the phone page by 296 px, name fields 23 px
+wide, a sidebar taller than the window that hid the Stash.
+
+Rob asked for a post-battle helper like mordheimer.net's, with tables and
+no dice. The campaign checklist existed but only linked out, and only in
+the campaign mode the group does not use; the helper now opens from the
+top bar, with every table in our own short words. A WebFetch will not
+quote the exploration chart at length, so each location was read twice
+in different ways and the few disagreements settled by a narrow third
+question. The first test counted 36 special locations; there are 30.

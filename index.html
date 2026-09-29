@@ -68,7 +68,8 @@
     background:radial-gradient(var(--blood-br),var(--blood));opacity:.14}
   /* Layout */
   .builder{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
-  @media(max-width:900px){.builder{grid-template-columns:1fr}}
+  .builder>*{min-width:0}
+  @media(max-width:900px){.builder{grid-template-columns:minmax(0,1fr)}}
   .panel{background:var(--parch);border:1px solid var(--parch-edge);border-radius:4px;
     box-shadow:0 6px 16px var(--shadow), inset 0 0 40px rgba(120,90,40,.12);padding:18px 20px}
   .sidebar{position:sticky;top:14px}
@@ -123,6 +124,54 @@
   .death-btn{color:var(--blood)!important}
   .eq-rare-summary{margin:4px 0 2px;font-size:13px;padding:4px 8px;background:rgba(120,90,40,.08);border-left:2px solid var(--gold);border-radius:2px}
   /* Campaign chronicle */
+  .pb-wrap{border:1px solid var(--parch-edge);border-radius:4px;margin:8px 0;background:rgba(60,50,45,.04)}
+  .pb-sum{cursor:pointer;padding:8px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--iron);list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .pb-sum::-webkit-details-marker{display:none}
+  .pb-sum-t::before{content:'▸ '}
+  .pb-wrap[open] .pb-sum-t::before{content:'▾ '}
+  .pb-prog{display:flex;align-items:center;gap:6px;font-family:system-ui,sans-serif;font-size:11px;color:#6a5f55;font-weight:600}
+  .pb-bar{width:80px;height:6px;border-radius:3px;background:rgba(60,50,45,.15);overflow:hidden}
+  .pb-bar-fill{display:block;height:100%;background:#5a7a46;transition:width .2s}
+  .pb-intro{padding:2px 12px 8px;font-size:12px;color:#6a5f55}
+  .pb-step{border-top:1px solid var(--parch-edge);padding:7px 12px}
+  .pb-step.pb-done{background:rgba(90,120,70,.08)}
+  .pb-step.pb-active{background:rgba(180,150,90,.10)}
+  .pb-step.pb-locked{opacity:.5}
+  .pb-check{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}
+  .pb-locked .pb-check{cursor:default}
+  .pb-num{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;border-radius:50%;background:var(--iron);color:var(--parch);font-size:11px;font-weight:700}
+  .pb-done .pb-num{background:#5a7a46}
+  .pb-active .pb-num{background:#b4965a}
+  .pb-lock{display:inline-flex;align-items:center;justify-content:center;width:16px;color:#6a5f55}
+  .pb-tick{font-size:11px;color:#3f6a2a;font-weight:600;margin-left:auto}
+  .pb-locknote{margin-left:auto;font-style:italic}
+  .pb-body{margin:6px 0 2px 27px;font-size:13px;line-height:1.5}
+  .pb-body p{margin:5px 0}
+  .pb-note{color:#6a5f55;font-size:12px}
+  .pb-warn{color:#7a1410;font-weight:600}
+  .pb-ok{color:#3f6a2a;font-weight:600}
+  .pb-link{color:#7a5a1a;text-decoration:none;border-bottom:1px dotted #7a5a1a;white-space:nowrap}
+  .pb-link:hover{color:#b4965a}
+  .pb-sell{font-family:inherit}
+  .pbbox{max-width:860px}
+  .pbh-intro{font-size:13px;color:#5a4f3c;margin:0 0 8px}
+  .pbh-step{border-top:1px solid var(--parch-edge)}
+  .pbh-step>summary{cursor:pointer;padding:9px 2px;font-family:'Pirata One',serif;font-size:18px;color:var(--iron);display:flex;align-items:center;gap:8px;min-height:30px}
+  .pbh-body{padding:0 2px 12px;font-size:13px;line-height:1.45}
+  .pbh-body h4{margin:12px 0 4px;font-size:13px;color:var(--blood)}
+  .pbh-body p{margin:6px 0}
+  .pbt{border-collapse:collapse;width:100%;font-size:12.5px;margin:4px 0 6px}
+  .pbt th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--iron);border-bottom:2px solid var(--parch-edge);padding:3px 5px}
+  .pbt td{border-bottom:1px solid var(--parch-edge);padding:4px 5px;vertical-align:top}
+  .pbt td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .pbt-num td,.pbt-num th{text-align:center}
+  .pbhere{background:rgba(180,150,90,.35);border-radius:3px;padding:0 4px;font-weight:700}
+  .pbdice{letter-spacing:1px;font-weight:700}
+  .pbt-wide td:last-child{width:62%}
+  .pbnotes{background:rgba(180,150,90,.12);border-left:3px solid #b4965a;padding:5px 8px;margin:6px 0}
+  .pbnotes ul,.pbnotes-plain{margin:4px 0;padding-left:18px}
+  .pbh-src{margin-top:10px}
+  .pb-complete{padding:8px 12px;border-top:1px solid var(--parch-edge);color:#3f6a2a;font-weight:600;font-size:13px}
   .chr-wrap{border:1px solid var(--parch-edge);border-radius:4px;margin:8px 0;background:rgba(60,50,45,.04)}
   .chr-sum{cursor:pointer;padding:7px 10px;font-family:'Pirata One',serif;font-size:16px;color:var(--iron);list-style:none}
   .chr-sum::-webkit-details-marker{display:none}
@@ -132,10 +181,26 @@
   .chr-round{border-top:1px solid var(--parch-edge);padding:6px 10px}
   .chr-rhead{font-weight:700;color:var(--blood);font-size:13px;margin-bottom:3px}
   .chr-now{background:var(--blood);color:#fff;border-radius:3px;padding:0 6px;font-size:11px;font-weight:400}
-  .chr-bat{margin:4px 0;padding:5px 8px;background:rgba(120,90,40,.09);border-left:2px solid var(--gold);border-radius:2px;font-size:13px}
+  .chr-bat{margin:4px 0;padding:6px 8px;background:rgba(120,90,40,.09);border-left:2px solid var(--gold);border-radius:2px;font-size:13px}
+  /* The account on the left, the controls hard right, vertically centred. */
+  .chr-batline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .chr-battext{min-width:0;overflow-wrap:anywhere}
+  .chr-batbtns{display:flex;gap:5px;align-items:center;flex:0 0 auto;margin-left:auto}
+  .cas-res{font-size:11px;border:1px solid var(--parch-edge);border-radius:3px;padding:0 5px;margin-left:5px}
+  .cas-dead{background:rgba(140,30,30,.14);color:var(--blood);font-weight:700}
+  .cas-injured{background:rgba(150,110,30,.14)}
+  .cas-recovered{background:rgba(60,120,60,.12)}
+  .terr-h{display:inline-flex;align-items:center;gap:3px;margin-right:8px;white-space:nowrap}
+  .terr-add{font-size:12px;padding:1px 3px;max-width:150px}
+  .xp-others{margin-top:10px;border-top:1px solid var(--parch-edge);padding-top:8px}
+  .xp-oth{margin-top:6px}
   .chr-notes{font-size:12px;color:#5d5344;margin-top:3px;font-style:italic}
   .chr-list{list-style:none;margin:3px 0 0;padding:0}
-  .chr-ev{display:grid;grid-template-columns:16px 1fr auto auto;gap:6px;align-items:baseline;font-size:13px;padding:1px 0}
+  /* Four fixed slots, and the tag cell is always present even when empty, so the
+     delete button of every row lands in the same place. Without it a row with no
+     tag put its button in the tag column and sat out of line with the rest. */
+  .chr-ev{display:grid;grid-template-columns:16px minmax(0,1fr) auto 20px;gap:6px;align-items:baseline;font-size:13px;padding:1px 0}
+  .chr-tags{display:flex;gap:4px;align-items:baseline}
   .chr-ic{text-align:center;color:var(--iron)}
   .chr-tx{min-width:0;overflow-wrap:anywhere}
   .chr-tx:focus{outline:1px dashed var(--gold);background:#fff7e6}
@@ -146,6 +211,12 @@
   .bat-form{margin:6px 10px 10px;padding:8px 10px;border:1px solid var(--gold);border-radius:4px;background:#fffaf0}
   .bat-fhead{font-family:'Pirata One',serif;font-size:16px;color:var(--blood);margin-bottom:6px}
   .bat-oppgrid{display:grid;grid-template-columns:1fr 1.4fr auto;gap:5px;align-items:center;margin-bottom:6px}
+  .bat-sec{margin:10px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--blood);font-weight:700;border-bottom:1px solid var(--parch-edge);padding-bottom:2px}
+  .bat-sec .hs-foot{display:block;text-transform:none;letter-spacing:0;font-weight:400}
+  .bat-sidegrid{display:grid;grid-template-columns:1.2fr 1.2fr .9fr auto;gap:5px;align-items:center;margin-bottom:6px}
+  .bat-sidename,.bat-sidewb{font-size:13px;min-width:0;overflow-wrap:anywhere}
+  .bat-sidewb{color:#6b6050;font-style:italic}
+  .bat-casgrid{display:grid;grid-template-columns:1fr 1.2fr 1fr 1.2fr auto;gap:5px;align-items:center;margin-bottom:6px}
   .bat-oh{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#7a6e54}
   .bat-in{font-family:inherit;font-size:13px;padding:3px 5px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px;min-width:0;width:100%}
   .bat-row{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0;font-size:13px}
@@ -173,6 +244,18 @@
   .cf-tbl th,.cf-tbl td{text-align:left;padding:3px 7px;border-bottom:1px solid var(--parch-edge)}
   .cf-tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--iron)}
   .cf-hist{margin-top:10px;font-size:13px}
+  .cf-terr{margin-top:10px;font-size:13px}
+  .cf-bats{margin-top:10px;font-size:13px}
+  .cf-merge{margin-top:10px}
+  .cf-merge .btnsm{display:inline-block;cursor:pointer}
+  .cas-grid2{display:grid;grid-template-columns:auto 1fr 1.3fr;gap:5px;align-items:center;margin:6px 0}
+  .cas-grid{display:grid;grid-template-columns:auto 1fr 1fr 1.2fr;gap:5px;align-items:center;margin-bottom:6px}
+  .cas-list{margin:6px 0}
+  .xp-pend{margin:6px 10px;padding:8px 10px;border:1px solid var(--gold);border-radius:4px;background:#fffaf0}
+  .xp-head{font-family:'Pirata One',serif;font-size:16px;color:var(--blood);margin-bottom:4px}
+  .xp-list{margin:0;padding-left:18px;font-size:13px}
+  .xp-list li{margin:2px 0}
+  .cas-list .fallen-tbl select{font-size:12px;padding:1px 3px}
   .srule-intro{margin:0 0 6px}
   .srule{margin:3px 0;padding:3px 8px 3px 10px;border-left:3px solid var(--gold);background:rgba(154,123,50,.07);border-radius:0 4px 4px 0}
   .srule b{color:var(--blood)}
@@ -242,6 +325,7 @@
   .eqchosen{margin-top:6px;font-size:13.5px;color:#3a3327;background:rgba(255,255,255,.4);border:1px solid var(--parch-edge);border-radius:4px;padding:4px 8px}
   .eqchosen b{color:var(--blood)}
   .brchint{font-size:10px;color:#7a6a4a;border:1px solid var(--parch-edge);border-radius:7px;padding:0 5px;margin-left:3px;vertical-align:middle}
+  .starttag{font-size:10px;color:#6b4d12;border:1px dashed #b08a3a;border-radius:7px;padding:0 5px;margin-left:4px;vertical-align:middle;cursor:help;white-space:nowrap}
   .eqitem.qty.wupg-host{display:grid;grid-column:1/-1;grid-template-columns:160px auto 56px minmax(0,1fr);align-items:center;gap:4px 10px}
   .wupg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:3px 10px;padding-left:10px;border-left:2px solid var(--gold)}
   .wupgchk{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:#6a5a3a;cursor:pointer}
@@ -256,7 +340,7 @@
   #itip .itip-h{font-weight:700;color:var(--blood);font-size:14px;margin-bottom:1px}
   #itip .itip-l{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:#8a6b2a;margin-bottom:4px}
   #itip .itip-b{color:#33301f}
-  #exportmodal,#ttsmodal,#importmodal,#campmodal{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,15,8,.6);align-items:flex-start;justify-content:center;padding:40px 14px}
+  #exportmodal,#ttsmodal,#importmodal,#campmodal,#pbmodal{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,15,8,.6);align-items:flex-start;justify-content:center;padding:40px 14px}
   .exbox{background:var(--parch);border:1px solid var(--gold);border-radius:8px;max-width:680px;width:100%;padding:16px 18px;box-shadow:0 14px 40px rgba(0,0,0,.5);max-height:86vh;overflow:auto}
   .exhead{display:flex;align-items:center;justify-content:space-between;font-family:'Pirata One',serif;font-size:24px;color:var(--blood);margin-bottom:10px}
   .exrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
@@ -265,6 +349,21 @@
   .exnote b{color:#3a3327}
   #extext,#ttstext{width:100%;min-height:320px;margin-top:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;border:1px solid var(--parch-edge);border-radius:6px;padding:10px;background:#fffdf6;color:#2a2118;white-space:pre;resize:vertical}
   #ttstext{min-height:160px}
+  .unit-desc{font-size:12px;font-style:italic;color:#6b6050;margin:4px 0;line-height:1.3}
+  .mem-wrap{margin:6px 0;border:1px solid var(--parch-edge);border-radius:4px;background:rgba(60,50,45,.03)}
+  .mem-sum{cursor:pointer;padding:5px 8px;font-size:12px;color:var(--iron);list-style:none;font-weight:700}
+  .mem-sum::-webkit-details-marker{display:none}
+  .mem-sum::before{content:'\25b8 '}
+  .mem-wrap[open] .mem-sum::before{content:'\25be '}
+  .mem-body{padding:2px 8px 8px}
+  .mem-note{font-size:11px;color:#7a6e54;margin-bottom:5px;line-height:1.25}
+  .mem-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto auto auto;gap:6px;align-items:center;margin:3px 0}
+  .mem-idx{font-size:11px;color:#7a6e54;text-align:right}
+  .mem-in{font-family:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--parch-edge);background:#fff;border-radius:3px;min-width:0;width:100%}
+  .tts-field{margin-top:10px}
+  .tts-lbl{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--iron);font-weight:700}
+  .tts-hint{text-transform:none;letter-spacing:0;font-weight:400;color:#7a6e54}
+  #ttsname{width:100%;min-height:0;margin-top:4px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.4;border:1px solid var(--parch-edge);border-radius:6px;padding:7px 10px;background:#fffdf6;color:#2a2118;white-space:pre;resize:none;overflow:hidden}
   .subnote{margin-top:7px;font-size:13px;color:#5a4f3c;line-height:1.55;background:rgba(255,250,235,.6);border:1px solid var(--parch-edge);border-radius:5px;padding:7px 10px}
   .subnote b{color:var(--blood)}
   .abil{margin-top:10px;border-top:1px dashed var(--parch-edge);padding-top:8px}
@@ -540,6 +639,35 @@
 
   .ulg{color:#7a6a4a;font-size:11.5px;font-variant-numeric:tabular-nums;flex-shrink:0;margin-left:auto;margin-right:8px}
   .ulrow.ultot{border-top:2px solid var(--parch-edge);margin-top:4px;padding-top:4px;border-left-color:transparent}
+  /* Phones: nothing may be wider than the screen (last in the sheet, so it
+     wins over the rules above). At 360 px the page scrolled sideways by
+     180 px: a 1fr column grows to its widest content, and the
+     recruit rows, stat tables, the Fallen and the spell lore were wider. */
+  @media(max-width:560px){
+    .addrow{grid-template-columns:auto auto minmax(0,1fr) minmax(96px,auto)}
+    .addrow .nm{grid-column:1/-1}
+    table.stats{table-layout:fixed}
+    table.stats th,table.stats td{padding:3px 1px;font-size:13px}
+    .fallen-tbl th,.fallen-tbl td{padding:3px 4px;overflow-wrap:anywhere}
+    .lore-tbl{table-layout:fixed}
+    .lore-tbl td{overflow-wrap:anywhere}
+    .lore-tbl td.lore-n{white-space:normal}
+    /* the campaign-file tables (nine columns) scroll inside themselves */
+    .cf-tbl{display:block;overflow-x:auto;white-space:nowrap}
+    /* a henchman's name gets the whole row, his buttons the next one */
+    .mem-row{display:flex;flex-wrap:wrap;gap:6px}
+    .mem-row .mem-idx{flex:0 0 18px}
+    .mem-row .mem-in{flex:1 1 calc(100% - 30px)}
+    .mem-row .mem-in + button{margin-left:24px}
+    .pbdice{letter-spacing:0}
+    .pbt{font-size:12px}
+    .pbt td,.pbt th{padding:3px 3px}
+  }
+  /* Desktop: the sidebar stays in view but must not outgrow the window, or
+     its lower panels (the Stash) are only reachable at the page's end. */
+  @media(min-width:901px){
+    .sidebar{max-height:calc(100vh - 28px);overflow-y:auto;overscroll-behavior:contain}
+  }
 </style>
 </head>
 <body>
@@ -593,6 +721,7 @@
       <button onclick="openLoad()">Load</button>
       <button onclick="openExport()">Export ▾</button>
       <button onclick="openImport()">Import</button>
+      <button onclick="openPostBattle()" title="The ten steps after a battle, with every table you need at the table">⚔ Post-battle</button>
       <input type="file" id="importfile" accept=".json,.txt" style="display:none" onchange="importJSON(event)">
       <button class="blood" onclick="window.print()">Print</button> <button onclick="exportOfficialSheet()" title="Fill the official Mordheim roster sheet (PDF) with your warband">⬇ Official sheet (PDF)</button>
     </div>
@@ -625,7 +754,7 @@
       </main>
 
       <aside class="sidebar" style="margin-top:18px">
-        <div class="panel"><details class="sec-details" open ontoggle="wbOpen=this.open"><summary class="sec-sum">Warband</summary><div class="sec-body">
+        <div class="panel"><details class="sec-details" open><summary class="sec-sum">Warband</summary><div class="sec-body">
           <div class="stat-big"><span>Gold</span><span class="v" id="goldnow">0</span></div>
           <div class="stat-big"><span>Models</span><span class="v" id="models">0</span></div>
           <div class="stat-big"><span>Heroes</span><span class="v" id="heroes">0</span></div>
@@ -633,14 +762,21 @@
           <div class="stat-big" title="Unitless points measuring the fielded fighting power — the fairest balance comparison between warbands. Warriors with their gear at LIST prices (found or discounted items count full; dice prices at expected value). Only the active loadout counts fully: two one-handed melee weapons or one two-handed, plus one missile weapon — further weapons count half (real options, not wielded at once). Shields and bucklers are melee-hand items with the lowest carry priority: weapons claim the hand slots first; a shield counts full only when a hand remains free (dagger + shield: full; dagger + sword + shield: half). Armour, misc, mounts and vehicles count in full — their abilities are priced into the listing. Advancement counts by what landed on the profile: each applied stat advance +5, each skill or spell +10, each stat point lost to injury −5. Raw experience is progress, not power, and is not counted. Everything sums unrounded and is rounded once at the end. Gold in hand is excluded: coins don't fight."><span>Warband&nbsp;Worth</span><span class="v" id="worth">0</span></div>
           <div class="warns" id="warns"></div>
         </div></details></div>
-        <div id="overviewpanel" class="panel" style="margin-top:16px"><details class="sec-details" open ontoggle="ovOpen=this.open"><summary class="sec-sum">Roster</summary><div class="sec-body"><div id="unitlist" class="unitlist"></div></div></details></div>
-        <div id="stashwrap" class="panel" style="margin-top:16px"><details class="sec-details" open ontoggle="stashOpen=this.open"><summary class="sec-sum">Stash / Store</summary><div class="sec-body"><div id="stash" class="stashpanel"></div></div></details></div>
+        <div id="overviewpanel" class="panel" style="margin-top:16px"><details class="sec-details" open><summary class="sec-sum">Roster</summary><div class="sec-body"><div id="unitlist" class="unitlist"></div></div></details></div>
+        <div id="stashwrap" class="panel" style="margin-top:16px"><details class="sec-details" open><summary class="sec-sum">Stash / Store</summary><div class="sec-body"><div id="stash" class="stashpanel"></div></div></details></div>
       </aside>
     </div>
   </section>
 </div>
 
 
+
+<div id="pbmodal" class="no-print" onclick="if(event.target===this)closePostBattle()">
+  <div class="exbox pbbox">
+    <div class="exhead"><span>After the battle</span><button class="tiny ghost" onclick="closePostBattle()">✕ close</button></div>
+    <div id="pbhelp"></div>
+  </div>
+</div>
 
 <div id="exportmodal" class="no-print" onclick="if(event.target===this)closeExport()">
   <div class="exbox">
@@ -685,9 +821,18 @@
 <div id="ttsmodal" class="no-print" onclick="if(event.target===this)closeTts()">
   <div class="exbox">
     <div class="exhead"><span>Tabletop Simulator description</span><button class="tiny ghost" onclick="closeTts()">✕ close</button></div>
-    <div class="exnote">Paste into the model's <b>Description</b> Field in TTS. Colour codes (e.g. [7AD1A4]) show as colours in TTS. Values include advances &amp; injuries; equipment = currently selected items.</div>
-    <textarea id="ttstext" readonly spellcheck="false"></textarea>
-    <div class="exrow"><button class="blood" onclick="copyTts()">Copy</button></div>
+    <div class="exnote">Two fields, each copied separately. Colour codes (e.g. [7AD1A4]) show as colours in TTS. Values include advances &amp; injuries; equipment = currently selected items.</div>
+    <div class="tts-field">
+      <div class="tts-lbl"><span>Name <span class="tts-hint">&rarr; the model's <b>Name</b> field</span></span>
+        <button class="tiny" onclick="copyTtsName()">Copy name</button></div>
+      <textarea id="ttsname" class="tts-one" readonly spellcheck="false" rows="1"></textarea>
+    </div>
+    <div class="tts-field">
+      <div class="tts-lbl"><span>Description <span class="tts-hint">&rarr; the model's <b>Description</b> field</span></span>
+        <button class="tiny" onclick="copyTts()">Copy description</button></div>
+      <textarea id="ttstext" readonly spellcheck="false"></textarea>
+    </div>
+    <div class="exrow"><button class="blood" onclick="copyTtsBoth()">Copy both</button><button class="tiny ghost" onclick="closeTts()">close</button></div>
   </div>
 </div>
 <div id="itip" class="no-print"></div>

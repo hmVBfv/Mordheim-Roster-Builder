@@ -292,6 +292,14 @@
    "wb": "Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival only"
   },
   {
+   "de": "Zharr-Obsidianwaffe",
+   "en": "Zharr obsidian weapon",
+   "cat": "cc",
+   "cost": 60,
+   "rare": "Rare 10",
+   "wb": "Sons of Hashut (Chaos Dwarfs) only; a sword, axe or hammer"
+  },
+  {
    "de": "Pike",
    "en": "Pike",
    "cat": "cc",
@@ -1692,12 +1700,20 @@
    "wb": "Shadow Warriors only"
   },
   {
-   "de": "Banner von Nagarythe",
+   "de": "Standarte von Nagarythe",
    "en": "Standard of Nagarythe",
    "cat": "misc",
    "cost": "75+3D6",
    "rare": "Rare 9",
-   "wb": "Shadow Warriors only (only at warband creation)"
+   "wb": "Shadow Warriors only"
+  },
+  {
+   "de": "Kriegshorn von Nagarythe",
+   "en": "War Horn of Nagarythe",
+   "cat": "misc",
+   "cost": "25+1D6",
+   "rare": "Rare 6",
+   "wb": "Shadow Warriors only"
   },
   {
    "de": "Seedrachen-Umhang",
@@ -2140,7 +2156,14 @@
   "Orc-Stil (Helm/Dolch/Axt/Schild)": "Orc kit (helmet/dagger/axe/shield)",
   "Skink-Stil (Helm/Dolch/Dreizack o. Javelins/Netz o. Buckler)": "Skink kit (helmet/dagger/trident or javelins/net or buckler)",
   "Untoten-Stil (Helm/Dolch/Stachelh./Schwert)": "Undead kit (helmet/dagger/spiked gauntlet/sword)",
-  "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)": "Witch Elf kit (helmet/dagger/2 swords or spear & net)"
+  "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)": "Witch Elf kit (helmet/dagger/2 swords or spear & net)",
+  "Zharr-Obsidianwaffe": "Zharr obsidian weapon",
+  "Giftdrüsen": "Poison Glands",
+  "Mal der Alten": "Mark of the Old Ones",
+  "Übergroße Kiefer": "Oversized Jaws",
+  "Dunkles Gift für Geschosse": "Dark venom (missiles)",
+  "Schwarzer Lotus für Geschosse": "Black lotus (missiles)",
+  "Reptiliengift": "Reptile venom"
  },
  "GSN_BRACE": {
   "Doppelläufige Pistole": 35,
@@ -2354,7 +2377,7 @@
    {
     "name": "Nehekharan Javelin",
     "line": "Missile · Strength: as user · 10 gc · Common",
-    "text": "Range 8\", Strength as user. +1 to hit when thrown (the becket string spins the javelin like a bullet). Mordheimer note: the original only listed the +1 to hit; it is suggested to also apply the normal thrown-weapon rules (no penalty for range or moving). Tomb Lords only."
+    "text": "Range 8\", Strength as user, +1 to hit. Thrown weapon: no penalty for range or for moving and shooting (Mordheimer inconsistency, played by intent: the original listed only the +1 to hit)."
    }
   ],
   [
@@ -3002,7 +3025,7 @@
    },
    {
     "name": "Nightmare",
-    "line": "Mount · Rare 11 · Aristocrat only",
+    "line": "Mount · 30 gc when the warband is founded · later 95 gc, Rare 11 · Aristocrat only",
     "text": "Undead destrier (M8 WS2 BS0 S3 T3 W1 I2 A1 Ld5). May Not Run (but may charge). Immune to Poison and Psychology — never tests Ld and stands still if leaderless; if the rider is wounded, roll on the Whoa Boy! table."
    }
   ],
@@ -3134,7 +3157,7 @@
    },
    {
     "name": "Mechanical Suit",
-    "line": "Armour · Rare 14 · Sorcerer only",
+    "line": "Armour · 175 gc when the warband is founded · later 225 gc, Rare 14 · Sorcerer only",
     "text": "A walking engine that carries a Sorcerer afflicted by the Curse of Stone: +3 Movement. Does not hinder spellcasting; no movement penalty when combined with a shield (but not with a shield/buckler without the right skill)."
    }
   ],
@@ -3145,7 +3168,7 @@
    },
    {
     "name": "Engine of Chaos",
-    "line": "Vehicle · Rare 10 · Chaos Dwarfs only",
+    "line": "Vehicle · 125 gc when the warband is founded · later 195 gc, Rare 10 · Chaos Dwarfs only",
     "text": "A daemon-powered prison wagon (follows the Wagon rules). Holds up to six captives (large creatures count as two). Required to cast the Sacrificial Ritual. Models captured via the Captured injury result or a Man-catcher are locked inside; their gear is lost to the warband. Starting price 125 gc (195 gc / Rare 10 afterwards)."
    }
   ],
@@ -3613,6 +3636,28 @@
   ],
   [
    {
+    "__re": "zharr",
+    "__f": "i"
+   },
+   {
+    "name": "Zharr obsidian weapon",
+    "line": "Close combat · Strength as user +1 · 30 gc when the warband is founded · later 60 gc, Rare 10 · Sons of Hashut",
+    "text": "A sword, axe or hammer of obsidian, forged by the Chaos Dwarfs of Zharr-Naggrund — slow work, since the stone must not crack. It keeps the rules of its weapon type and strikes at +1 Strength. Heavy: −1 Initiative in close combat. (The Sons of Hashut page calls it “Obsidian weapon”; renamed so it is not confused with the Obsidian weapon of Border Town Burning, as the page recommends.)"
+   }
+  ],
+  [
+   {
+    "__re": "wolfsumhang|wolfcloak",
+    "__f": "i"
+   },
+   {
+    "name": "Wolfcloak",
+    "line": "Miscellaneous · 10 gc · Middenheim Heroes (also Norse Explorers and Marauders)",
+    "text": "The Hero must slay a wolf himself: pay 10 gc and roll a D6 — equal to or under his Strength, he wears its pelt and gets +1 to his armour saves against shooting."
+   }
+  ],
+  [
+   {
     "__re": "gromril.?(waffe|weapon)",
     "__f": "i"
    },
@@ -3728,7 +3773,7 @@
    },
    {
     "name": "Asp arrows",
-    "line": "Ammunition (bow)",
+    "line": "Miscellaneous · arrows for a bow · Tomb Lord",
     "text": "Made of mummified venomous snakes, magically guided: +1 to hit. (Tomb Guardians)"
    }
   ],
@@ -4064,6 +4109,72 @@
   ],
   [
    {
+    "__re": "giftdrüsen|poison glands",
+    "__f": "i"
+   },
+   {
+    "name": "Poison Glands",
+    "line": "Sacred marking · 40 gc · Skink Heroes · at recruitment, one marking per Hero",
+    "text": "He may make any of his attacks with his teeth instead of his weapons, as a Saurus bite. These bites have a save modifier of 1 whatever his Strength, and add +1 to the roll on the Injury table."
+   }
+  ],
+  [
+   {
+    "__re": "mal der alten|mark of the old ones",
+    "__f": "i"
+   },
+   {
+    "name": "Mark of the Old Ones",
+    "line": "Sacred marking · 50 gc · any Lizardman Hero · at recruitment, one marking per Hero",
+    "text": "Once per battle the Hero may turn one of his failed dice rolls into a success."
+   }
+  ],
+  [
+   {
+    "__re": "übergroße kiefer|oversized jaws",
+    "__f": "i"
+   },
+   {
+    "name": "Oversized Jaws",
+    "line": "Sacred marking · 40 gc · Saurus Heroes · at recruitment, one marking per Hero",
+    "text": "His bite attack is made at +1 Strength."
+   }
+  ],
+  [
+   {
+    "__re": "gift für geschosse|venom \\(missiles\\)",
+    "__f": "i"
+   },
+   {
+    "name": "Dark venom (missiles)",
+    "line": "Poison · 20 gc, a common item · Skink Heroes",
+    "text": "As Dark venom, but only on a missile weapon: hits count as +1 Strength (also for save modifiers). One battle."
+   }
+  ],
+  [
+   {
+    "__re": "lotus für geschosse|lotus \\(missiles\\)",
+    "__f": "i"
+   },
+   {
+    "name": "Black lotus (missiles)",
+    "line": "Poison · 10 gc, a common item · Skink Heroes",
+    "text": "As Black lotus, but only on a missile weapon: a 6 to hit wounds automatically. One battle."
+   }
+  ],
+  [
+   {
+    "__re": "reptiliengift|reptile venom",
+    "__f": "i"
+   },
+   {
+    "name": "Reptile venom",
+    "line": "Poison · 5 gc per weapon · Skink Braves",
+    "text": "+1 Strength for the weapon, without the −1 save modifier that extra Strength would bring. One battle; every member of the group must be armed alike."
+   }
+  ],
+  [
+   {
     "__re": "dunkles gift|dark venom",
     "__f": "i"
    },
@@ -4314,6 +4425,18 @@
     [
      "Helm",
      10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Wolfsumhang",
+     10,
+     {
+      "heroes": true,
+      "sub": [
+       "midd"
+      ]
+     }
     ]
    ]
   },
@@ -4905,15 +5028,27 @@
     ],
     [
      "Ithilmar-Schwert",
-     20
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ],
     [
      "Ithilmar-Speer",
-     20
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ],
     [
      "Ithilmar-Zweihandwaffe",
-     30
+     30,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ]
    ],
    "Fernkampf": [
@@ -4941,7 +5076,10 @@
     ],
     [
      "Ithilmar-Rüstung",
-     60
+     60,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
@@ -5357,7 +5495,10 @@
     ],
     [
      "Gromril-Rüstung",
-     75
+     75,
+     {
+      "start": true
+     }
     ],
     [
      "Schild",
@@ -5456,8 +5597,11 @@
      15
     ],
     [
-     "Obsidianwaffe",
-     30
+     "Zharr-Obsidianwaffe",
+     30,
+     {
+      "start": true
+     }
     ]
    ],
    "Fernkampf": [
@@ -5643,7 +5787,10 @@
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -5711,13 +5858,19 @@
     ],
     [
      "Mechanischer Anzug",
-     175
+     175,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -5795,7 +5948,10 @@
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -5847,7 +6003,10 @@
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -6683,7 +6842,7 @@
   "cppWretch": {
    "Nahkampf": [
     [
-     "Dolch (1. gratis)",
+     "Dolch",
      2
     ],
     [
@@ -6802,7 +6961,10 @@
     ],
     [
      "Nightmare",
-     95
+     30,
+     {
+      "start": true
+     }
     ],
     [
      "Raubvogel",
@@ -8360,6 +8522,17 @@
      "Helm",
      10
     ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse",
+     40,
+     {
+      "sub": [
+       "hung"
+      ]
+     }
+    ]
    ]
   },
   "marChaosHench": {
@@ -9432,7 +9605,10 @@
    "Rüstung": [
     [
      "Gromril-Rüstung",
-     75
+     75,
+     {
+      "start": true
+     }
     ],
     [
      "Leichte Rüstung",
@@ -10521,7 +10697,7 @@
    ],
    "Rüstung": [
     [
-     "Helm",
+     "Knochenhelm",
      10
     ],
     [
@@ -10531,6 +10707,22 @@
     [
      "Schild",
      5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Übergroße Kiefer",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
     ]
    ]
   },
@@ -10592,6 +10784,36 @@
      "Knochenhelm",
      10
     ]
+   ],
+   "Besonderes": [
+    [
+     "Giftdrüsen",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Dunkles Gift für Geschosse",
+     20,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Schwarzer Lotus für Geschosse",
+     10,
+     {
+      "heroes": true
+     }
+    ]
    ]
   },
   "lizSkink": {
@@ -10648,6 +10870,36 @@
      "Buckler",
      5
     ]
+   ],
+   "Besonderes": [
+    [
+     "Giftdrüsen",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Dunkles Gift für Geschosse",
+     20,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Schwarzer Lotus für Geschosse",
+     10,
+     {
+      "heroes": true
+     }
+    ]
    ]
   },
   "lizSkinkHen": {
@@ -10698,6 +10950,12 @@
     ],
     [
      "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Reptiliengift",
      5
     ]
    ]
@@ -10870,7 +11128,7 @@
     ],
     [
      "Zweihandwaffe",
-     30
+     15
     ]
    ],
    "Fernkampf": [
@@ -11357,10 +11615,6 @@
      5
     ],
     [
-     "Zwergenaxt",
-     15
-    ],
-    [
      "Schwert",
      10
     ],
@@ -11741,10 +11995,6 @@
      10
     ],
     [
-     "Asp-Pfeile",
-     10
-    ],
-    [
      "Nehekharan-Javelin",
      10
     ]
@@ -11757,6 +12007,12 @@
     [
      "Leichte Rüstung",
      20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Asp-Pfeile",
+     10
     ]
    ]
   },
@@ -12005,8 +12261,28 @@
      10
     ],
     [
-     "Ithilmar-Waffe",
-     20
+     "Ithilmar-Schwert",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Speer",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Zweihandwaffe",
+     30,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ]
    ],
    "Fernkampf": [
@@ -12038,17 +12314,26 @@
     ],
     [
      "Ithilmar-Rüstung",
-     60
+     60,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
     [
      "Standarte von Nagarythe",
-     75
+     75,
+     {
+      "start": true
+     }
     ],
     [
      "Kriegshorn von Nagarythe",
-     25
+     25,
+     {
+      "start": true
+     }
     ],
     [
      "Elfenumhang",
@@ -12056,11 +12341,17 @@
     ],
     [
      "Elfenwein",
-     50
+     50,
+     {
+      "start": true
+     }
     ],
     [
      "Elfenrunensteine",
-     50
+     50,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -12115,6 +12406,152 @@
     [
      "Elfenumhang",
      75
+    ]
+   ]
+  },
+  "outlawMark": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     30
+    ]
+   ]
+  },
+  "outlawHen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "pfSlayer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Zwergenaxt",
+     15
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Stachelhandschuh",
+     15
     ]
    ]
   }
@@ -12236,8 +12673,14 @@
     "darkelves"
    ],
    "mult": 0,
-   "base": 15,
-   "note": "+15 bei Rekrutierung / +20 später"
+   "base": 20,
+   "note": "+15 bei Gründung der Warband / +20 später",
+   "start": {
+    "base": 15,
+    "wb": [
+     "darkelves"
+    ]
+   }
   },
   "Dunkles Gift": {
    "en": "Dark venom",
@@ -12280,7 +12723,23 @@
    "heroesOnly": false,
    "mult": 4,
    "base": 0,
-   "note": "4× Waffenpreis (Zwerge bei Erstellung: 3×)"
+   "note": "4× Waffenpreis; Zwerge bei Gründung der Warband 3×; Troll Slayer der Pit Fighters immer 3×",
+   "start": {
+    "mult": 3,
+    "wb": [
+     "dwarftreasure",
+     "dwarfrangers"
+    ]
+   },
+   "always": {
+    "mult": 3,
+    "wb": [
+     "pitfighters"
+    ],
+    "units": [
+     "trollslayer"
+    ]
+   }
   },
   "Ithilmar-Waffe": {
    "en": "Ithilmar weapon",
@@ -12574,5 +13033,20 @@
    },
    "barding"
   ]
- ]
+ ],
+ "RENAMED": {
+  "sonsofhashut": {
+   "eq": {
+    "Obsidianwaffe": "Zharr-Obsidianwaffe"
+   }
+  },
+  "shadowwarriors": {
+   "eq": {
+    "Ithilmar-Waffe": "Ithilmar-Schwert"
+   },
+   "rare": {
+    "Banner von Nagarythe": "Standarte von Nagarythe"
+   }
+  }
+ }
 }
