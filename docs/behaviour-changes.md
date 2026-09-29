@@ -294,16 +294,13 @@ Ultimate FAQ 10.1 (Stufen 6, 8 und 9) und mordheimer.net *Campaigns* und
    auch die Hälfte eines Preises, den eine Hausregel ändert; bei Seltenem mit
    Zufallspreis die Hälfte des Grundpreises. Regeln, die den Verkauf ändern
    (Haggle, „Trade“ der Merchant Caravans), rechnet der Builder eigens.
+   **Rundung:** abrunden, aber jeder Verkauf bringt mindestens 1 gc (Rob,
+   29.09.2026; Regelbuch S. 105, mordheimer.net *Trading* und die Ultimate
+   FAQ nennen keine). Eine Gruppe verkauft ihre Stücke zusammen – die
+   Hälfte und die Rundung gelten für den ganzen Verkauf, nicht je Stück.
 4. **Kassenbuch (V7):** ja, so ausführlich wie möglich und nötig – jede
    Buchung mit Anlass, Betrag, Krieger und Gegenstand, damit die
    Änderungsansicht und die Chronik daraus lesen können.
-
-### Offen (für Rob)
-
-- **Rundung beim Verkauf.** Der halbe Preis von 3, 5 oder 15 gc ist keine
-  ganze Zahl. Regelbuch S. 105, mordheimer.net *Trading* und die Ultimate
-  FAQ nennen keine Rundung. Vorschlag: abrunden (die Händler feilschen
-  besser, sagt die Regel selbst) – das Mockup zeigt es so, mit Hinweis.
 
 **Mockup:** [`trading-post.html`](mockups/trading-post.html) zeigt V4–V7 in
 einer Ansicht (Kaufen, Suchen, Verkaufen, Geben, Kassenbuch).
