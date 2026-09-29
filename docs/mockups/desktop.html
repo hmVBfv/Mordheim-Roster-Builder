@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Desktop Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<script src="warband-art.js"></script>
+<style>
+  /* The desktop is a workspace of panels: the phone's screens, several at a
+     time, side by side. They tile – nothing overlaps, nothing floats – so the
+     overview stays calm. A panel is dragged by its title bar to another
+     place; its ⋯ menu does the same without a mouse (move, wider, maximise,
+     minimise, close). Views are saved arrangements for a task. */
+  body { font-size: 16px; }
+  .shell { display: grid; grid-template-columns: 248px 1fr; min-height: calc(100dvh - 44px); background: linear-gradient(90deg, var(--surface) 0 247px, var(--border) 247px 248px, var(--bg) 248px); }
+  .side { position: sticky; top: 0; align-self: start; height: 100dvh; overflow-y: auto; display: grid; align-content: start; gap: var(--s4); padding: var(--s4); background: var(--surface); border-right: 1px solid var(--border); }
+  @media (max-width: 1023px) { .shell { background: var(--bg); } }
+  .side-wb { display: grid; grid-template-columns: auto 1fr; gap: var(--s3); align-items: center; }
+  .side-wb b { font-family: var(--font-title); display: block; line-height: 1.15; }
+  .side-wb small { color: var(--text-muted); }
+  .side-nav { display: grid; gap: 2px; }
+  .side-nav a { display: grid; grid-template-columns: 24px 1fr; gap: var(--s3); align-items: center; min-height: var(--tap); padding: 0 var(--s3); border-radius: var(--radius); color: var(--text-muted); text-decoration: none; }
+  .side-nav a[aria-current='page'] { background: var(--surface-2); color: var(--text); }
+  .side-nav svg { width: 22px; height: 22px; }
+  .side-links { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .side-links a { display: flex; align-items: center; min-height: 36px; padding: 0 var(--s3); color: var(--text); text-decoration: none; border-radius: var(--radius); }
+  .side-links a:hover, .side-nav a:hover { background: var(--surface-2); }
+
+  .work { min-width: 0; display: grid; grid-template-rows: auto 1fr auto; }
+  .work-bar { position: sticky; top: 0; z-index: 4; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); padding: var(--s2) var(--s4); background: var(--bg); border-bottom: 1px solid var(--border); }
+  .crumbs { flex: 1; min-width: 12em; font-family: var(--font-title); }
+  .crumbs a { color: var(--text-muted); text-decoration: none; }
+  .views { display: flex; flex-wrap: wrap; gap: var(--s1); align-items: center; }
+  .views button { min-height: 36px; padding: 0 var(--s3); border: 1px solid var(--border); border-radius: 999px; background: transparent; cursor: pointer; }
+  .views button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--surface-2); }
+  .views .save { border-style: dashed; color: var(--warn); border-color: var(--warn); }
+
+  /* panels stand in columns (as many as the width holds, up to three), plus
+     a row across the top for a panel that needs the full width */
+  .grid { display: grid; gap: var(--s4); padding: var(--s4); align-content: start; }
+  .top { display: grid; gap: var(--s4); }
+  .top:empty { display: none; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); align-items: start; }
+  .cols.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .col { display: grid; gap: var(--s4); align-content: start; min-height: 96px; border-radius: var(--radius); }
+  .col:empty { border: 2px dashed var(--border); }
+  .col:empty::before { content: 'An empty column: drag a panel here'; padding: var(--s3); color: var(--text-muted); }
+  .col.drop-end, .top.drop-end { outline: 2px dashed var(--accent); outline-offset: 4px; }
+  .panel { min-width: 0; display: grid; grid-template-rows: auto 1fr; max-height: calc(100dvh - 150px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 0 var(--shadow); }
+  .top .panel, .grid.maxed .panel { max-height: none; }
+  .panel.drop-before { box-shadow: 0 -5px 0 var(--accent); }
+  .panel.dragging { opacity: 0.45; }
+  .panel.flash { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .ph { display: flex; align-items: center; gap: var(--s2); min-height: 48px; padding: 0 var(--s1) 0 var(--s2); border-bottom: 1px solid var(--border); cursor: grab; user-select: none; }
+  .ph h2 { flex: 1; min-width: 0; font-size: 1.02rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ph .grip { color: var(--text-muted); font-size: 1.1rem; width: 1.2em; text-align: center; }
+  .ph .meta { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
+  .ph button { min-width: var(--tap); min-height: var(--tap); border: 0; border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 1.05rem; }
+  .ph button:hover { background: var(--surface-2); color: var(--text); }
+  .pb { overflow-y: auto; padding: var(--s3) var(--s4) var(--s4); display: grid; gap: var(--s3); align-content: start; }
+
+  .dock { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; padding: var(--s2) var(--s4); background: var(--surface); border-top: 1px solid var(--border); }
+  .dock:empty { display: none; }
+  .dock button { min-height: 36px; padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
+  .maxbar { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: var(--s2) var(--s4) 0; color: var(--text-muted); }
+
+  /* the panels' content */
+  .wlist { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .wlist button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 0 var(--s2); align-items: center; min-height: var(--tap); padding: var(--s1) var(--s3); border: 1px solid transparent; border-radius: var(--radius); background: transparent; text-align: left; cursor: pointer; }
+  .wlist button:hover { background: var(--surface-2); }
+  .wlist button[aria-pressed='true'] { border-color: var(--accent); background: var(--surface-2); }
+  .wlist small { grid-column: 1; color: var(--text-muted); }
+  .wlist .chips { grid-row: 1 / span 2; grid-column: 2; display: flex; gap: 4px; flex-wrap: wrap; justify-content: end; }
+  .wsec { margin-top: var(--s2); }
+  .figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2); margin: 0; }
+  .figs div { display: grid; }
+  .figs dt { font-size: 0.78rem; color: var(--text-muted); }
+  .figs dd { margin: 0; font-size: 1.15rem; font-weight: 600; }
+  .pips { display: flex; flex-wrap: wrap; gap: 3px; }
+  .pip { min-width: 2.2em; padding: 0 4px; text-align: center; font-size: 0.8rem; border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); }
+  .pip.base { border-style: dashed; }
+  .pip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .pip.next { border-color: var(--accent); color: var(--accent); }
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); margin: 0; }
+  .facts dt { color: var(--text-muted); }
+  .facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .items { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .items li { display: grid; grid-template-columns: 1fr auto; gap: 0 var(--s2); align-items: center; padding: var(--s1) 0; border-bottom: 1px solid var(--border); }
+  .items small { color: var(--text-muted); }
+  .items .btn-quiet { min-height: 36px; padding: 0 var(--s3); }
+  .ledger { list-style: none; margin: 0; padding: 0; display: grid; }
+  .ledger li { display: grid; grid-template-columns: 4em 1fr; gap: var(--s2); padding: var(--s1) 0; border-bottom: 1px solid var(--border); }
+  .ledger .amt { text-align: right; font-weight: 600; }
+  .ledger .plus { color: var(--accent); }
+  .ledger .minus { color: var(--danger); }
+  .ledger .new { background: var(--surface-2); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: s; }
+  .steps li { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s2); align-items: center; min-height: var(--tap); padding: 0 var(--s2); border-radius: var(--radius); }
+  .steps li.now { background: var(--surface-2); }
+  .steps input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .steps label { display: contents; cursor: pointer; }
+  .steps .done span { color: var(--text-muted); text-decoration: line-through; }
+  .steps .btn-quiet { min-height: 36px; padding: 0 var(--s3); }
+  .tl { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .tl li { padding-left: var(--s3); border-left: 3px solid var(--border); }
+  .tl li.sealed { border-left-color: var(--sealed); }
+  .note { font-size: 0.88rem; color: var(--text-muted); }
+  .stepper { display: inline-grid; grid-template-columns: var(--tap) 3em var(--tap); align-items: center; text-align: center; border: 1px solid var(--border); border-radius: var(--radius); }
+  .stepper button { min-height: var(--tap); border: 0; background: transparent; cursor: pointer; font-size: 1.2rem; }
+  .stepper output { font-weight: 600; }
+
+  /* the narrow case: the panels stack, the bar at the bottom comes back */
+  .nav { display: none; }
+  .narrow-note { display: none; }
+  @media (max-width: 1023px) {
+    .shell { grid-template-columns: 1fr; }
+    .side { display: none; }
+    .nav { display: grid; }
+    .work { padding-bottom: calc(var(--nav) + env(safe-area-inset-bottom, 0px)); }
+    .dock { bottom: calc(var(--nav) + env(safe-area-inset-bottom, 0px)); }
+    .panel { max-height: none; }
+    .ph { cursor: default; }
+    .ph .grip { display: none; }
+    .narrow-note { display: block; padding: var(--s3) var(--s4) 0; }
+    .crumbs { min-width: 0; }
+  }
+  /* sheets sit in the middle of a wide screen, not at its foot */
+  @media (min-width: 1024px) {
+    dialog.sheet { margin: auto; max-width: 460px; border-bottom: 1px solid var(--border); border-radius: 12px; }
+    dialog.sheet .sheet-grip { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Desktop</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="shell">
+  <aside class="side" aria-label="Main">
+    <div class="side-wb"><svg class="art big" data-art="caravan" aria-hidden="true" focusable="false"></svg><div><b>The Silver Caravan</b><small>Mercenaries – Reikland</small><br><span class="chip good">✓ After battle 5</span></div></div>
+    <nav class="side-nav" data-current="Warbands" aria-label="Places"></nav>
+    <section class="stack" aria-labelledby="also-h">
+      <p class="label" id="also-h">This warband</p>
+      <ul class="side-links">
+        <li><a href="story.html">Story</a></li>
+        <li><a href="changes.html">Versions</a></li>
+        <li><a href="trading-post.html">Trading Post, full page</a></li>
+        <li><a href="roster.html">Roster as on the phone</a></li>
+      </ul>
+    </section>
+    <p class="small muted">Arrangement and views are kept on this device.</p>
+  </aside>
+
+  <main class="work">
+    <div>
+      <div class="work-bar">
+        <span class="crumbs"><a href="campaign.html">Hel Fenn</a> › The Silver Caravan <span class="sync">✓ Saved</span></span>
+        <div class="views" id="views" role="group" aria-label="Views"></div>
+        <button type="button" class="btn-quiet" data-open="sheet-add">+ Panel</button>
+      </div>
+      <p class="narrow-note small muted">This is the desktop view. On a narrow screen its panels stack; on a phone the app shows one screen at a time.</p>
+      <div class="maxbar" id="maxbar" hidden><span id="max-text"></span><button type="button" class="btn-quiet" data-unmax>Back to all panels</button></div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="dock" id="dock" aria-label="Minimised panels"></div>
+  </main>
+</div>
+<nav class="nav" data-current="Warbands"></nav>
+
+<dialog class="sheet" id="sheet-panel" aria-labelledby="pm-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="pm-title">Roster</h2>
+    <p class="small muted">Dragging the title bar does the same with a mouse.</p>
+    <div class="row">
+      <button type="button" class="btn-quiet" data-pm="left">← Column left</button>
+      <button type="button" class="btn-quiet" data-pm="right">Column right →</button>
+      <button type="button" class="btn-quiet" data-pm="up">↑ Up</button>
+      <button type="button" class="btn-quiet" data-pm="down">↓ Down</button>
+    </div>
+    <div class="row">
+      <button type="button" class="btn-quiet" data-pm="top" id="pm-top">Across the full width</button>
+      <button type="button" class="btn-quiet" data-pm="max" id="pm-max">Fill the workspace</button>
+    </div>
+    <div class="row">
+      <button type="button" class="btn-quiet" data-pm="min">Minimise to the dock</button>
+      <button type="button" class="btn-danger" data-pm="shut">Close panel</button>
+      <button type="button" class="btn-quiet" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-adv" aria-labelledby="adv-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-adv">
+    <h2 id="adv-title">Advance</h2>
+    <p class="small muted" id="adv-help"></p>
+    <div class="row"><span class="small">2D6 as rolled</span>
+      <span class="stepper"><button type="button" data-roll="-1" aria-label="One less">−</button><output id="adv-roll">7</output><button type="button" data-roll="1" aria-label="One more">+</button></span></div>
+    <div class="stack" id="adv-result" aria-live="polite"></div>
+    <div class="row" id="adv-acts"><button class="btn" value="apply" id="adv-apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-add" aria-labelledby="add-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="add-title">Add a panel</h2>
+    <div class="stack" id="add-list"></div>
+    <div class="row"><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+
+  /* ---------- the warband (as in roster.html and trading-post.html) ---------- */
+  var HERO = [2, 4, 6, 8, 11, 14, 17, 20, 24, 28, 32, 36, 41, 46, 51, 57, 63, 69, 76, 83, 90];
+  var HENCH = [2, 5, 9, 14];
+  var KEYS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'Sv'];
+  var st = {
+    gold: 55, wyrd: 2, sel: 'ulrich', searched: {}, fresh: 0,
+    stash: ['Lucky charm', 'Rope'],
+    ledger: [[31, 'Gold after battle 4'], [50, 'Sold 2 wyrdstone shards (warband of 7–9)'], [4, 'Exploration: Ruined Hovels (6 6), D6 gc'], [-30, 'Upkeep: Big Gunnar, Ogre Bodyguard']],
+    steps: [['Injuries', 1], ['Experience', 1], ['Exploration', 1], ['Sell wyrdstone', 1], ['Available veterans', 0], ['Rare items', 0, 'trading'], ['Dramatis Personae', 0], ['Recruits & common items', 0, 'roster'], ['Reallocate equipment', 0, 'stash'], ['Warband rating', 0, 'ledger']],
+    w: [
+      { id: 'ulrich', kind: 'hero', name: 'Ulrich the Grey', type: 'Mercenary Captain', p: [4, 5, 4, 3, 3, 1, 4, 1, 8, '5+'], up: ['WS'], start: 20, xp: 32, taken: 2, gear: ['Sword', 'Shield', 'Light armour', 'Dagger'], skills: ['Strike to Injure'], badges: [['Leader', '']] },
+      { id: 'magda', kind: 'hero', name: 'Magda', type: 'Champion', p: [3, 4, 3, 3, 3, 1, 3, 1, 7, '—'], down: ['M'], start: 8, xp: 10, taken: 0, gear: ['Double-handed weapon', 'Dagger'], injuries: ['Leg Wound (−1 M)'], out: 'taken out of action in battle 5', badges: [['Misses 1 game', 'bad']] },
+      { id: 'jorg', kind: 'hero', name: 'Jorg', type: 'Champion', p: [4, 4, 4, 3, 3, 1, 3, 1, 7, '6+'], up: ['BS'], start: 8, xp: 9, taken: 0, gear: ['Mace', 'Sword', 'Light armour', 'Dagger'], badges: [['⚠ BS 4 without a cause', 'warn']] },
+      { id: 'wilhelm', kind: 'hero', name: 'Wilhelm', type: 'Youngblood · new', p: [4, 2, 2, 3, 3, 1, 3, 1, 6, '—'], start: 0, xp: 0, taken: 0, gear: ['Mace', 'Dagger'] },
+      { id: 'warriors', kind: 'hench', name: 'Warriors', type: 'Henchmen · Otto, Fritz', men: 2, p: [4, 3, 3, 3, 3, 1, 3, 1, 7, '—'], start: 0, xp: 4, taken: 0, gear: ['Axe', 'Buckler', 'Dagger'] },
+      { id: 'marksmen', kind: 'hench', name: 'Marksmen', type: 'Henchmen · Lukas', men: 1, p: [4, 3, 4, 3, 3, 1, 3, 1, 7, '—'], start: 0, xp: 1, taken: 0, gear: ['Crossbow', 'Dagger'] },
+      { id: 'gunnar', kind: 'hired', name: 'Big Gunnar', type: 'Ogre Bodyguard · Hired Sword', p: [6, 3, 2, 4, 4, 3, 3, 2, 7, '6+'], start: 0, xp: 3, taken: 1, gear: ['Club', 'Light armour'], skills: ['Resilient'] }
+    ]
+  };
+  // fixed prices only; the full list with dice prices is on the Trading Post page
+  var RARE = [['Rapier', 5, 15], ['Lucky charm', 6, 10], ['Lock picks', 8, 15], ['Sword breaker', 8, 30], ['Crossbow pistol', 9, 35], ['Duelling pistol', 10, 30]];
+  function byId(id) { return st.w.filter(function (w) { return w.id === id; })[0]; }
+  function track(w) { return w.kind === 'hero' ? HERO : HENCH; }
+  function earned(w) { return track(w).filter(function (t) { return t > w.start && t <= w.xp; }).length; }
+  function due(w) { return earned(w) > w.taken; }
+  function chance(n) { var c = 0; for (var a = 1; a <= 6; a++) for (var b = 1; b <= 6; b++) if (a + b >= n) c++; return Math.round(c * 100 / 36); }
+  function models() { return st.w.reduce(function (n, w) { return n + (w.kind === 'hench' ? w.men : w.kind === 'hero' ? 1 : 0); }, 0); }
+  function rating() { return st.w.reduce(function (n, w) { var each = (w.kind === 'hired' ? 20 : 5) + w.xp; return n + (w.kind === 'hench' ? each * w.men : each); }, 0); }
+  function book(amount, text) { st.gold += amount; st.ledger.push([amount, text]); st.fresh++; }
+
+  /* ---------- panels ---------- */
+  var PANELS = {
+    roster: { title: 'Roster', meta: function () { return rating() + ' · ' + models() + ' / 15'; }, draw: drawRoster },
+    warrior: { title: 'Warrior', meta: function () { return byId(st.sel).name; }, draw: drawWarrior },
+    trading: { title: 'Trading Post', meta: function () { return st.gold + ' gc'; }, draw: drawTrading },
+    ledger: { title: 'Gold', meta: function () { return st.gold + ' gc'; }, draw: drawLedger },
+    stash: { title: 'Stash', meta: function () { return st.stash.length + ' items · ' + st.wyrd + ' shards'; }, draw: drawStash },
+    steps: { title: 'After battle 5', meta: function () { return st.steps.filter(function (s) { return s[1]; }).length + ' of ' + st.steps.length; }, draw: drawSteps },
+    timeline: { title: 'Timeline', meta: function () { return 'Hel Fenn'; }, draw: drawTimeline },
+    campaign: { title: 'Campaign', meta: function () { return 'battle 6 now'; }, draw: drawCampaign }
+  };
+  // a view: panels across the top, then up to three columns
+  var VIEWS = [
+    { key: 'roster', name: 'Roster', top: [], cols: [['roster'], ['warrior'], ['stash', 'ledger']] },
+    { key: 'after', name: 'After battle', top: [], cols: [['steps', 'ledger'], ['warrior', 'trading'], ['roster']] },
+    { key: 'trading', name: 'Trading', top: [], cols: [['trading'], ['roster'], ['stash', 'ledger']] },
+    { key: 'campaign', name: 'Campaign', top: ['campaign'], cols: [['timeline'], ['roster'], ['ledger']] }
+  ];
+  var lay, current = null;   // current: the panel whose ⋯ menu is open
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+
+  function useView(key) {
+    var v = VIEWS.filter(function (x) { return x.key === key; })[0];
+    lay = { view: key, top: v.top.slice(), cols: clone(v.cols), min: [], max: null };
+  }
+  function changed() { lay.view = null; }
+
+  // as many columns as the width holds (a panel wants 340 px), one on a phone
+  function colCount() {
+    var w = window.innerWidth;
+    return w < 1024 ? 1 : Math.max(1, Math.min(3, Math.floor((w - 248 - 32 + 16) / (340 + 16))));
+  }
+  function vis(ids) { return ids.filter(function (id) { return lay.min.indexOf(id) < 0; }); }
+  // what is on screen: columns beyond the width join the last one
+  function display() {
+    var n = colCount(), top = vis(lay.top), cols = lay.cols.map(vis);
+    if (n === 1) return { top: [], cols: [top.concat.apply(top, cols)] };
+    while (cols.length > n) { var last = cols.pop(); cols[cols.length - 1] = cols[cols.length - 1].concat(last); }
+    return { top: top, cols: cols };
+  }
+  function where(id) {
+    var d = display(), t = d.top.indexOf(id);
+    if (t >= 0) return { top: true, c: -1, i: t, d: d };
+    for (var c = 0; c < d.cols.length; c++) { var i = d.cols[c].indexOf(id); if (i >= 0) return { top: false, c: c, i: i, d: d }; }
+    return null;
+  }
+  function inLayout(id) { return lay.top.indexOf(id) >= 0 || lay.cols.some(function (c) { return c.indexOf(id) >= 0; }); }
+  function takeOut(id) {
+    lay.top = lay.top.filter(function (x) { return x !== id; });
+    lay.cols = lay.cols.map(function (c) { return c.filter(function (x) { return x !== id; }); });
+  }
+  function placeBefore(id, target) {
+    if (id === target) return;
+    takeOut(id);
+    var t = lay.top.indexOf(target);
+    if (t >= 0) { lay.top.splice(t, 0, id); return; }
+    lay.cols.forEach(function (c) { var i = c.indexOf(target); if (i >= 0) c.splice(i, 0, id); });
+  }
+  function placeEnd(id, c) { takeOut(id); lay.cols[Math.min(c, lay.cols.length - 1)].push(id); }
+  function placeTop(id) { takeOut(id); lay.top.push(id); }
+  function placeInCol(id, c, row) { var col = display().cols[c] || []; var target = col[row]; if (target && target !== id) placeBefore(id, target); else placeEnd(id, c); }
+
+  function drawViews() {
+    $('views').innerHTML = VIEWS.map(function (v) {
+      return '<button type="button" data-view="' + v.key + '" aria-pressed="' + (lay.view === v.key) + '">' + esc(v.name) + '</button>';
+    }).join('') + (lay.view ? '' : '<button type="button" class="save" data-save>Save as a view</button>');
+  }
+  function panelHtml(id) {
+    var P = PANELS[id];
+    return '<section class="panel" id="p-' + id + '" data-panel="' + id + '" aria-labelledby="ph-' + id + '">' +
+      '<header class="ph" draggable="true"><span class="grip" aria-hidden="true">⠿</span><h2 id="ph-' + id + '">' + esc(P.title) + '</h2><span class="meta">' + esc(P.meta()) + '</span>' +
+      '<button type="button" data-min="' + id + '" aria-label="Minimise ' + esc(P.title) + '">–</button>' +
+      '<button type="button" data-menu="' + id + '" aria-label="' + esc(P.title) + ': move, size, close">⋯</button></header>' +
+      '<div class="pb">' + P.draw() + '</div></section>';
+  }
+  function draw() {
+    drawViews();
+    var g = $('grid');
+    g.className = 'grid' + (lay.max ? ' maxed' : '');
+    if (lay.max) g.innerHTML = panelHtml(lay.max);
+    else {
+      var d = display();
+      g.innerHTML = '<div class="top" data-top>' + d.top.map(panelHtml).join('') + '</div>' +
+        '<div class="cols n' + d.cols.length + '">' + d.cols.map(function (c, k) { return '<div class="col" data-col="' + k + '">' + c.map(panelHtml).join('') + '</div>'; }).join('') + '</div>';
+    }
+    $('dock').innerHTML = lay.min.map(function (id) { return '<button type="button" data-restore="' + id + '">▣ ' + esc(PANELS[id].title) + '</button>'; }).join('');
+    $('maxbar').hidden = !lay.max;
+    if (lay.max) $('max-text').textContent = PANELS[lay.max].title + ' fills the workspace; the other panels wait.';
+  }
+  var drawnCols = colCount();
+  window.addEventListener('resize', function () { if (colCount() !== drawnCols) { drawnCols = colCount(); redraw(); } });
+
+  /* ---------- what the panels show ---------- */
+  function chips(w) {
+    var c = (w.badges || []).map(function (b) { return '<span class="chip ' + b[1] + '">' + esc(b[0]) + '</span>'; });
+    if (due(w)) c.unshift('<span class="chip good">Advance due</span>');
+    return c.join('');
+  }
+  function drawRoster() {
+    var groups = [['Heroes', 'hero'], ['Henchmen', 'hench'], ['Hired Swords', 'hired']];
+    return '<dl class="figs"><div><dt>Rating</dt><dd>' + rating() + '</dd></div><div><dt>Gold</dt><dd>' + st.gold + '</dd></div><div><dt>Models</dt><dd>' + models() + '/15</dd></div><div><dt>Heroes</dt><dd>4/6</dd></div></dl>' +
+      groups.map(function (g) {
+        return '<p class="label wsec">' + g[0] + '</p><ul class="wlist">' + st.w.filter(function (w) { return w.kind === g[1]; }).map(function (w) {
+          return '<li><button type="button" data-sel="' + w.id + '" aria-pressed="' + (st.sel === w.id) + '"><span>' + esc(w.name) + (w.men ? ' ×' + w.men : '') + '</span><span class="chips">' + chips(w) + '</span><small>' + esc(w.type) + ' · Exp ' + w.xp + '</small></button></li>';
+        }).join('') + '</ul>';
+      }).join('') +
+      '<div class="row"><a class="btn-quiet" href="roster.html">+ Recruit</a></div>';
+  }
+  function drawWarrior() {
+    var w = byId(st.sel), th = track(w), next = th.filter(function (t) { return t > w.xp; })[0];
+    var table = '<table class="stats"><thead><tr>' + KEYS.map(function (k) { return '<th>' + k + '</th>'; }).join('') + '</tr></thead><tbody><tr>' +
+      w.p.map(function (v, i) { var k = KEYS[i], c = (w.up || []).indexOf(k) >= 0 ? ' class="up"' : (w.down || []).indexOf(k) >= 0 ? ' class="down"' : ''; return '<td' + c + '>' + v + '</td>'; }).join('') + '</tr></tbody></table>';
+    var pips = th.map(function (t) { return '<span class="pip ' + (t <= w.start ? 'base' : t <= w.xp ? 'on' : t === next ? 'next' : '') + '">' + t + '</span>'; }).join('');
+    var facts = [['Equipment', w.gear.join(', ')]];
+    if (w.skills) facts.push(['Skills', w.skills.join(', ')]);
+    if (w.injuries) facts.push(['Injuries', w.injuries.join(', ')]);
+    return '<div><h3>' + esc(w.name) + '</h3><p class="small muted">' + esc(w.type) + '</p></div>' + (chips(w) ? '<div class="row">' + chips(w) + '</div>' : '') + table +
+      '<div class="pips" aria-label="Advances at ' + th.join(', ') + '">' + pips + '</div>' +
+      '<div class="row between"><span class="small muted">Exp ' + w.xp + (next != null ? ' · next advance at ' + next : '') + '</span><button type="button" class="btn-quiet" data-xp aria-label="One experience more">+1 Exp</button></div>' +
+      '<dl class="facts">' + facts.map(function (f) { return '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('') + '</dl>' +
+      '<div class="row">' + (due(w) ? '<button type="button" class="btn" data-adv>Advance</button>' : '') +
+      '<a class="btn-quiet" href="story.html?who=' + w.id + '">His story</a><a class="btn-quiet" href="roster.html">Injuries on the Roster</a></div>';
+  }
+  function drawTrading() {
+    var w = byId(st.sel), head = '<p class="small muted">Each Hero may look for one rare item after a battle: 2D6, at least its rarity. Pick a Hero in the Roster.</p>';
+    if (w.kind !== 'hero') return head + '<p><b>' + esc(w.name) + '</b> cannot look: only Heroes search for rare items.</p>' + '<a class="btn-quiet" href="trading-post.html">Common items at the Trading Post</a>';
+    if (w.out) return head + '<p><b>' + esc(w.name) + '</b> stays home: ' + esc(w.out) + '.</p>';
+    var done = st.searched[w.id];
+    return head + '<p><b>' + esc(w.name) + '</b> ' + (done ? 'has looked this time: ' + esc(done) + '.' : 'looks for one of these:') + '</p>' +
+      '<ul class="items">' + RARE.map(function (r) {
+        var can = !done && st.gold >= r[2];
+        return '<li><span>' + esc(r[0]) + '<br><small>Rare ' + r[1] + ' · found on ' + r[1] + '+ (' + chance(r[1]) + ' %) · ' + r[2] + ' gc</small></span><button type="button" class="btn-quiet" data-buy="' + esc(r[0]) + '"' + (can ? '' : ' disabled') + '>Found · buy</button></li>';
+      }).join('') + '</ul>' +
+      '<div class="row"><button type="button" class="btn-quiet" data-nothing' + (done ? ' disabled' : '') + '>Found nothing</button><a class="btn-quiet" href="trading-post.html#search">All 70 rare items</a></div>';
+  }
+  function drawLedger() {
+    return '<ol class="ledger">' + st.ledger.map(function (l, i) {
+      var cls = l[0] > 0 ? 'plus' : l[0] < 0 ? 'minus' : '', amt = (l[0] > 0 && i ? '+' : '') + l[0];
+      return '<li' + (i >= st.ledger.length - st.fresh ? ' class="new"' : '') + '><span class="amt ' + cls + '">' + amt + '</span><span>' + esc(l[1]) + '</span></li>';
+    }).join('') + '</ol><p><b>Now: ' + st.gold + ' gc</b></p>';
+  }
+  function drawStash() {
+    var w = byId(st.sel), to = w.kind === 'hero' ? w.name : null;
+    return '<ul class="items">' + st.stash.map(function (it, i) {
+      return '<li><span>' + esc(it) + '</span><button type="button" class="btn-quiet" data-give="' + i + '"' + (to ? '' : ' disabled') + '>' + (to ? 'Give to ' + esc(to.split(' ')[0]) : 'Pick a Hero') + '</button></li>';
+    }).join('') + (st.wyrd ? '<li><span>Wyrdstone ×' + st.wyrd + '<br><small>sold together, by the table for a warband of 7–9</small></span><button type="button" class="btn-quiet" data-sellwyrd>Sell · 50 gc</button></li>' : '') + '</ul>' +
+      (st.stash.length || st.wyrd ? '' : '<p class="muted">The stash is empty.</p>') +
+      '<p class="note">A group needs one piece per man; give to a group on the Trading Post page.</p>';
+  }
+  function drawSteps() {
+    var firstOpen = st.steps.map(function (s) { return s[1]; }).indexOf(0);
+    return '<ol class="steps">' + st.steps.map(function (s, i) {
+      return '<li class="' + (s[1] ? 'done' : '') + (i === firstOpen ? ' now' : '') + '"><label><input type="checkbox" data-step="' + i + '"' + (s[1] ? ' checked' : '') + '><span>' + (i + 1) + '. ' + esc(s[0]) + '</span></label>' +
+        (s[2] && !s[1] ? '<button type="button" class="btn-quiet" data-show="' + s[2] + '">Show ' + esc(PANELS[s[2]].title) + '</button>' : '<span></span>') + '</li>';
+    }).join('') + '</ol>';
+  }
+  function drawTimeline() {
+    return '<ul class="tl">' +
+      '<li><b>Battle 5 · The Old Mill</b><br><span class="small muted">The Silver Caravan beat Clan Skrittle; the Grey Penitents routed.</span></li>' +
+      '<li class="sealed"><span class="vis sealed">🔓 opened after battle 5</span><br><span class="small">“Skritch goes for the captain. Whatever it costs.”</span></li>' +
+      '<li><b>Interlude</b><br><span class="small muted">Two quiet days at the Blind Cat. Ulrich sells the shards to a priest who asks too few questions.</span></li>' +
+      '<li><b>Battle 6 · Hel Fenn ferry</b><br><span class="small muted">being played · 3 entries wait on a phone</span></li>' +
+      '</ul><div class="row"><a class="btn-quiet" href="timeline.html">Whole timeline</a><a class="btn-quiet" href="visibility.html">Write a note</a></div>';
+  }
+  function drawCampaign() {
+    return '<dl class="facts"><dt>Now</dt><dd>Battle 6 · Hel Fenn ferry · turn 4</dd><dt>Warbands</dt><dd>Silver Caravan 118 · Grey Penitents 131 · Clan Skrittle 124</dd><dt>Districts</dt><dd>City Hall, West Gate (footholds) · the Rock and the Temple to the Penitents · Fence Alley to Clan Skrittle</dd></dl>' +
+      '<div class="row"><svg class="art small" data-art="caravan" aria-hidden="true" focusable="false"></svg><svg class="art small" data-art="penitents" aria-hidden="true" focusable="false"></svg><svg class="art small" data-art="skrittle" aria-hidden="true" focusable="false"></svg></div>' +
+      '<div class="row"><a class="btn" href="game-night.html">Open game night</a><a class="btn-quiet" href="campaign.html">Campaign overview</a><a class="btn-quiet" href="world.html">World</a></div>';
+  }
+  function redraw() {
+    draw();
+    document.querySelectorAll('#grid svg.art[data-art]').forEach(window.mockArt);
+  }
+
+  /* ---------- advance (the tables of roster.html) ---------- */
+  var SKILLS = ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient', 'Shooting: Quick Shot'];
+  var HERO_ADV = [[2, 5, 'New skill', 'Choose one from his skill lists:', 'skill'],
+    [6, 6, '+1 S or +1 A', 'Roll a D6:', ['1–3 · +1 Strength', '4–6 · +1 Attack']], [7, 7, '+1 WS or +1 BS', 'Choose one:', ['+1 Weapon Skill', '+1 Ballistic Skill']],
+    [8, 8, '+1 I or +1 Ld', 'Roll a D6:', ['1–3 · +1 Initiative', '4–6 · +1 Leadership']], [9, 9, '+1 W or +1 T', 'Roll a D6:', ['1–3 · +1 Wound', '4–6 · +1 Toughness']],
+    [10, 12, 'New skill', 'Choose one from his skill lists:', 'skill']];
+  var HENCH_ADV = [[2, 4, '+1 Initiative', '', null], [5, 5, '+1 Strength', '', null], [6, 7, '+1 BS or +1 WS', 'Choose one:', ['+1 Ballistic Skill', '+1 Weapon Skill']],
+    [8, 8, '+1 Attack', '', null], [9, 9, '+1 Leadership', '', null], [10, 12, "The lad's got talent", '', 'talent']];
+  var STAT = { 'Weapon Skill': 'WS', 'Ballistic Skill': 'BS', Strength: 'S', Toughness: 'T', Wound: 'W', Initiative: 'I', Attack: 'A', Leadership: 'Ld' };
+  var roll = 7;
+  function advRow() { var w = byId(st.sel); return (w.kind === 'hench' ? HENCH_ADV : HERO_ADV).filter(function (r) { return roll >= r[0] && roll <= r[1]; })[0]; }
+  function showAdv() {
+    var w = byId(st.sel), row = advRow(), opts = row[4] === 'skill' ? SKILLS.filter(function (k) { return (w.skills || []).indexOf(k.split(': ')[1]) < 0; }) : row[4];
+    $('adv-roll').textContent = roll;
+    document.querySelector('[data-roll="-1"]').disabled = roll <= 2;
+    document.querySelector('[data-roll="1"]').disabled = roll >= 12;
+    var html = '<h3>' + roll + ' · ' + esc(row[2]) + '</h3>' + (row[3] ? '<p>' + esc(row[3]) + '</p>' : '');
+    if (row[4] === 'talent') html += '<p>One man becomes a Hero, with two skill lists – that is done on the Roster.</p><a class="btn-quiet" href="roster.html">Promote him on the Roster</a>';
+    else if (opts) html += '<div class="pick" id="adv-pick">' + opts.map(function (o, i) { return '<button type="button" data-value="' + esc(o) + '" aria-pressed="' + (i === 0) + '">' + esc(o) + '</button>'; }).join('') + '</div>';
+    $('adv-result').innerHTML = html;
+    $('adv-apply').hidden = row[4] === 'talent';
+  }
+  function openAdvance() {
+    var w = byId(st.sel); roll = 7;
+    $('adv-title').textContent = 'Advance · ' + w.name;
+    $('adv-help').textContent = w.kind === 'hench' ? 'The group rolls 2D6 once, on the Henchmen table; every man gets the advance.'
+      : w.kind === 'hired' ? 'Hired Swords gain experience like Henchmen but roll on the Heroes table.' : 'Heroes roll 2D6 on the Heroes table.';
+    showAdv(); window.mockOpen('sheet-adv');
+  }
+  $('form-adv').addEventListener('submit', function () {
+    var w = byId(st.sel), row = advRow(), pick = document.querySelector('#adv-pick [aria-pressed=true]');
+    var choice = pick ? pick.dataset.value : row[2], got = choice.replace(/^.*· /, '');
+    var stat = Object.keys(STAT).filter(function (k) { return got.indexOf(k) >= 0; })[0];
+    if (row[4] === 'skill') { w.skills = (w.skills || []).concat(choice.split(': ')[1]); got = choice.split(': ')[1]; }
+    else if (stat) {
+      var i = KEYS.indexOf(STAT[stat]); w.p[i] = w.p[i] + 1;
+      w.up = (w.up || []).concat(STAT[stat]); w.down = (w.down || []).filter(function (k) { return k !== STAT[stat]; });
+    }
+    w.taken++;
+    redraw(); window.mockToast(w.name + ': ' + got + '.');
+  });
+
+  /* ---------- moving panels ---------- */
+  function shut(id) {
+    var before = clone(lay);
+    takeOut(id);
+    lay.min = lay.min.filter(function (x) { return x !== id; });
+    if (lay.max === id) lay.max = null;
+    changed(); redraw();
+    window.mockToast(PANELS[id].title + ' closed. “+ Panel” brings it back.', function () { lay = before; redraw(); });
+  }
+  function minimise(id) { if (lay.min.indexOf(id) < 0) lay.min.push(id); if (lay.max === id) lay.max = null; changed(); redraw(); }
+  function openMenu(id) {
+    current = id;
+    var at = where(id), n = colCount(), col = at && !at.top ? at.d.cols[at.c] : at ? at.d.top : [];
+    $('pm-title').textContent = PANELS[id].title;
+    var off = !!lay.max || !at;
+    document.querySelector('[data-pm=left]').disabled = off || at.top || at.c <= 0;
+    document.querySelector('[data-pm=right]').disabled = off || at.top || at.c >= n - 1;
+    document.querySelector('[data-pm=up]').disabled = off || at.i <= 0;
+    document.querySelector('[data-pm=down]').disabled = off || at.i >= col.length - 1;
+    $('pm-top').textContent = at && at.top ? 'Back into a column' : 'Across the full width';
+    $('pm-top').disabled = off || n === 1;
+    $('pm-max').textContent = lay.max === id ? 'Back to all panels' : 'Fill the workspace';
+    window.mockOpen('sheet-panel');
+  }
+  function menuAction(what, id) {
+    var at = where(id);
+    if (what === 'left' || what === 'right') placeInCol(id, at.c + (what === 'left' ? -1 : 1), at.i);
+    if (what === 'up') { var list = at.top ? at.d.top : at.d.cols[at.c]; placeBefore(id, list[at.i - 1]); }
+    if (what === 'down') { var l2 = at.top ? at.d.top : at.d.cols[at.c]; placeBefore(l2[at.i + 1], id); }
+    if (what === 'top') { if (at.top) { takeOut(id); lay.cols[0].unshift(id); } else placeTop(id); }
+    if (what === 'max') { lay.max = lay.max === id ? null : id; redraw(); flash(id); return; }
+    if (what === 'min') { minimise(id); return; }
+    if (what === 'shut') { shut(id); return; }
+    changed(); redraw(); flash(id);
+  }
+  function drawAdd() {
+    var out = Object.keys(PANELS).filter(function (id) { return !inLayout(id) || lay.min.indexOf(id) >= 0; });
+    $('add-list').innerHTML = out.length ? out.map(function (id) {
+      var minned = lay.min.indexOf(id) >= 0;
+      return '<button type="button" class="btn-quiet btn-block" data-add="' + id + '">' + (minned ? 'Restore ' : 'Add ') + esc(PANELS[id].title) + (minned ? ' from the dock' : '') + '</button>';
+    }).join('') : '<p class="muted">Every panel is open.</p>';
+  }
+  function add(id) {
+    lay.min = lay.min.filter(function (x) { return x !== id; });
+    if (!inLayout(id)) { var d = display(); var shortest = 0; d.cols.forEach(function (c, k) { if (c.length < d.cols[shortest].length) shortest = k; }); placeEnd(id, shortest); }
+    lay.max = null; changed(); redraw(); flash(id);
+  }
+  function flash(id) {
+    var p = $('p-' + id); if (!p) return;
+    p.classList.add('flash'); p.scrollIntoView({ block: 'nearest' });
+    setTimeout(function () { p.classList.remove('flash'); }, 1200);
+  }
+
+  // drag a panel by its title bar: dropped on a panel it goes above it,
+  // dropped on a column's free space to that column's end; the row across
+  // the top takes drops once it holds a panel (the ⋯ menu puts one there)
+  var dragging = null;
+  function clearMarks() { document.querySelectorAll('.drop-before, .drop-end').forEach(function (x) { x.classList.remove('drop-before', 'drop-end'); }); }
+  function dropTarget(e) {
+    var el = e.target.closest && e.target.closest('.panel, .col, .top');
+    if (!el || (el.dataset.panel && el.dataset.panel === dragging)) return null;
+    return el;
+  }
+  document.addEventListener('dragstart', function (e) {
+    var ph = e.target.closest && e.target.closest('.ph'); if (!ph) return;
+    dragging = ph.parentElement.dataset.panel;
+    // changing the layout inside dragstart makes the browser drop the drag
+    setTimeout(function () { ph.parentElement.classList.add('dragging'); }, 0);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', dragging);
+  });
+  document.addEventListener('dragover', function (e) {
+    if (!dragging) return;
+    var t = dropTarget(e); if (!t) return;
+    e.preventDefault();
+    clearMarks();
+    t.classList.add(t.dataset.panel ? 'drop-before' : 'drop-end');
+  });
+  document.addEventListener('drop', function (e) {
+    if (!dragging) return;
+    var t = dropTarget(e), id = dragging;
+    dragging = null;
+    if (!t) return;
+    e.preventDefault();
+    if (t.dataset.panel) placeBefore(id, t.dataset.panel);
+    else if ('top' in t.dataset) placeTop(id);
+    else placeEnd(id, +t.dataset.col);
+    changed(); redraw(); flash(id);
+  });
+  document.addEventListener('dragend', function () {
+    dragging = null; clearMarks();
+    document.querySelectorAll('.dragging').forEach(function (x) { x.classList.remove('dragging'); });
+  });
+
+  /* ---------- clicks ---------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button'); if (!t) return;
+    var d = t.dataset;
+    if (d.view) { useView(d.view); redraw(); return; }
+    if ('save' in d) {
+      var key = 'mine' + VIEWS.length;
+      VIEWS.push({ key: key, name: VIEWS.length > 4 ? 'My view ' + (VIEWS.length - 3) : 'My view', top: lay.top.slice(), cols: clone(lay.cols) });
+      lay.view = key; redraw(); window.mockToast('Saved as a view on this device.'); return;
+    }
+    if (d.menu) { openMenu(d.menu); return; }
+    if (d.min) { minimise(d.min); return; }
+    if (d.restore) { add(d.restore); return; }
+    if ('unmax' in d) { lay.max = null; redraw(); return; }
+    if (d.pm) { $('sheet-panel').close(); menuAction(d.pm, current); return; }
+    if (d.add) { $('sheet-add').close(); add(d.add); return; }
+    if (d.sel) { st.sel = d.sel; redraw(); return; }
+    if ('xp' in d) { byId(st.sel).xp++; redraw(); return; }
+    if ('adv' in d) { openAdvance(); return; }
+    if (d.roll) { roll = Math.max(2, Math.min(12, roll + +d.roll)); showAdv(); return; }
+    if (d.buy) {
+      var w = byId(st.sel), r = RARE.filter(function (x) { return x[0] === d.buy; })[0];
+      w.gear.push(r[0]); st.searched[w.id] = r[0] + ' found';
+      book(-r[2], 'Bought ' + r[0] + ' for ' + w.name + ' (found on ' + r[1] + '+)');
+      redraw(); window.mockToast(w.name + ' found ' + r[0] + '. −' + r[2] + ' gc'); return;
+    }
+    if ('nothing' in d) { st.searched[st.sel] = 'nothing found'; redraw(); return; }
+    if (d.give) {
+      var h = byId(st.sel), item = st.stash.splice(+d.give, 1)[0];
+      h.gear.push(item); redraw(); window.mockToast(item + ' goes to ' + h.name + '.'); return;
+    }
+    if ('sellwyrd' in d) { book(50, 'Sold ' + st.wyrd + ' wyrdstone shards (warband of 7–9)'); st.wyrd = 0; redraw(); return; }
+    if (d.show) { add(d.show); return; }
+  });
+  document.addEventListener('change', function (e) {
+    var c = e.target.closest('[data-step]'); if (!c) return;
+    st.steps[+c.dataset.step][1] = c.checked ? 1 : 0; redraw();
+  });
+  $('sheet-add').addEventListener('close', function () { /* the list is drawn when it opens */ });
+  document.querySelector('[data-open="sheet-add"]').addEventListener('click', drawAdd, true);
+
+  var v = new URLSearchParams(location.search).get('view');
+  useView(VIEWS.some(function (x) { return x.key === v; }) ? v : 'roster');
+  draw();
+  document.addEventListener('DOMContentLoaded', redraw);
+})();
+</script>
+</body>
+</html>

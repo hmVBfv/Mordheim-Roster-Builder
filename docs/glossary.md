@@ -140,3 +140,14 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Cloud-Sitzung | Cloud session | Claude Code im Code-Tab bzw. claude.ai/code |
 | Betriebsdateien | Ops files | `ops/`, eingespielt mit `ops/install.sh` |
 | Standortdatei | Site config | `~/server/roster/site.env` (nur auf dem Pi) |
+
+## Oberfläche
+
+| Deutsch | Englisch (UI) | Code |
+| --- | --- | --- |
+| Arbeitsfläche (Desktop) | Workspace | Vorschlag: `docs/mockups/desktop.html` |
+| Panel | Panel | ein Bildschirm des Handys als Kachel der Arbeitsfläche |
+| Ansicht (gespeicherte Anordnung) | View | `VIEWS` im Mockup; nur auf dem Gerät |
+| Dock | Dock (Minimised panels) | Leiste der minimierten Panels |
+| Bereich von unten | Sheet | `<dialog class="sheet">`, `app/src/ui/useSheet.ts` |
+| Porträt der Warband | – | `docs/mockups/warband-art.js` (`data-art`) |
