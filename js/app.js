@@ -2854,12 +2854,13 @@ export function eqSection(m){
       const cat=_g.cat;
       const isWeapon = (cat==='Nahkampf' || cat==='Fernkampf');
       html+=`<div class="eqcat">${_g.label}</div><div class="eqgrid">`;
-      _g.items.forEach(([nm,pr])=>{
+      _g.items.forEach(([nm,pr,fl])=>{
         if(BRACE_HIDE[nm]) return; // a brace is selected by buying a 2nd single pistol (qty 2)
         const armourBlocked = def.noArmour && cat==='Rüstung';
         const missileBlocked = def.noMissile && cat==='Fernkampf';
         const heavyBlocked = def.noHeavy && nm==='Schwere Rüstung';
-        const heroBlock = (def.t!=='hero') && (cat.includes('Heldinnen'));
+        // rows for Heroes only: a list category so named, or a row marked {heroes:true}
+        const heroBlock = (def.t!=='hero') && !m.promoted && (cat.includes('Heldinnen') || !!(fl&&fl.heroes));
         const blocked = armourBlocked||missileBlocked||heavyBlocked||heroBlock;
         const free = nm.startsWith('Dolch');
         const esc = nm.replace(/'/g,"\\'");
@@ -3074,7 +3075,9 @@ export function skillListsFor(def){ const out=[];
   if(HR().allSkills) cats=['combat','shooting','academic','strength','speed'];
   cats.forEach(c=>{ if(SKILLLISTS[c]) out.push(['['+SKILLLISTS[c].name+']',SKILLLISTS[c].skills]); else if(SKILLSETS[c]) out.push(['['+SKILLSETS[c].name+']',SKILLSETS[c].skills]); });
   const ex=WBEXTRA[S.wb]; if(ex&&ex.skills&&SKILLSETS[ex.skills]&&!def.noWbSkills&&!cats.includes(ex.skills)) out.push(['['+SKILLSETS[ex.skills].name+']',SKILLSETS[ex.skills].skills]);
-  return out; }
+  // skills the warband may never learn (Dwarf Rangers: Arcane Lore)
+  const no=(WARBANDS[S.wb]&&WARBANDS[S.wb].noSkills)||[];
+  return no.length?out.map(([lab,sk])=>[lab,sk.filter(s=>!no.includes(s[0]))]):out; }
 export function skillOptions(def){ return skillListsFor(def).map(([lab,sk])=>sk.map(s=>`<option value="${s[0].replace(/"/g,'&quot;')}">${lab} ${s[1].slice(0,60)}</option>`).join('')).join(''); }
 export function skillOptionsFor(lists){ return lists.map(([lab,sk])=>sk.map(s=>`<option value="${s[0].replace(/"/g,'&quot;')}">${lab} ${s[1].slice(0,60)}</option>`).join('')).join(''); }
 

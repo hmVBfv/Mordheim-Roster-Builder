@@ -3673,6 +3673,9 @@
      },
      "eq": "dwarfRanger"
     }
+   ],
+   "noSkills": [
+    "Arcane Lore"
    ]
   },
   "forestgoblins": {
@@ -7406,7 +7409,7 @@
    "min": 3,
    "max": 13,
    "gold": 500,
-   "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). May hire no Hired Swords or Dramatis Personae except the Crow Master (and any that specifically allow it). <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\"; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
+   "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). May hire no Hired Swords or Dramatis Personae except the Crow Master (and any that specifically allow it). <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\", which is re-rolled once you have captured two Henchmen or hold five Captured Thralls; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
    "units": [
     {
      "id": "aristocrat",

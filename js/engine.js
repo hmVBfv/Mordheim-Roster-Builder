@@ -58,7 +58,11 @@ export function eqListFor(def){ let list=LISTS[def.eq]; if(!list) return list;
   if(S.wb==='maraudersofchaos'&&S.subtype==='kurgan'&&(def.eq==='marChaosHero'||def.eq==='marChaosHench')){
     list=JSON.parse(JSON.stringify(list)); list.Fernkampf=list.Fernkampf||[];
     if(!list.Fernkampf.some(x=>x[0]==='Bogen')) list.Fernkampf.push(['Bogen',10]);
-  } return list; }
+  }
+  // rows for one variant only (Middenheim's Wolfcloak, the Hung's warhorses)
+  const other=r=>!!(r[2]&&r[2].sub&&r[2].sub.indexOf(S.subtype)<0);
+  if(Object.keys(list).some(c=>list[c].some(other))){ const o={}; for(const c in list){ const rs=list[c].filter(r=>!other(r)); if(rs.length) o[c]=rs; } list=o; }
+  return list; }
 
 export function eqWeaponLimit(m){ const def=unitDef(m.uid_def); const list=def?eqListFor(def):null; if(!list) return {cc:0,missile:0};
   let cc=0,missile=0;
@@ -270,6 +274,10 @@ export function upgradeStart(de){ const u=UPGRADES[de]; const st=u&&u.start;
   if(!st||warbandHasFought()) return null;
   if(st.wb&&st.wb.indexOf(S.wb)<0) return null;
   return st; }
+/* A price that holds for some units at any time (the Pit Fighters' Troll
+   Slayer buys gromril weapons at three times the price). */
+export function upgradeAlways(de,m){ const al=UPGRADES[de]&&UPGRADES[de].always; if(!al) return null;
+  if(al.wb&&al.wb.indexOf(S.wb)<0) return null; if(al.units&&(!m||al.units.indexOf(m.uid_def)<0)) return null; return al; }
 /* The price of a flat upgrade (Dark Elf blade: +15 at the founding, +20 later). */
 export function upgradeBase(de){ const u=UPGRADES[de]; if(!u) return 0; const st=upgradeStart(de);
   return (st&&st.base!=null)?st.base:(u.base||0); }
@@ -282,7 +290,7 @@ export function startOnlyRow(def,nm){ const list=def&&def.eq?eqListFor(def):null
 
 export function upgradePaid(m,de,targetNm){ const u=UPGRADES[de]; if(!u) return 0;
   let paid;
-  if(u.mult){ const w=eqWeaponsOf(m).find(x=>x.nm===targetNm); const st=upgradeStart(de); const mu=(st&&st.mult)||u.mult; paid=w?mu*w.price:0; }
+  if(u.mult){ const w=eqWeaponsOf(m).find(x=>x.nm===targetNm); const st=upgradeStart(de); const al=upgradeAlways(de,m); const mu=(st&&st.mult)||(al&&al.mult)||u.mult; paid=w?mu*w.price:0; }
   else paid=upgradeBase(de);
   if(paid>0 && typeof itemHalfActive==='function' && itemHalfActive(de)) paid=Math.floor(paid*0.5);
   return paid; }

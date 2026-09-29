@@ -86,8 +86,9 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   entschieden; die Gründungspreise laufen schon in beiden Apps.
 - [x] Abgleich aller 49 Warbands mit mordheimer.net
   ([rules-audit.md](rules-audit.md)): Tooltips suchen im Zusammenhang
-  (beide Apps), 30 Datenfehler korrigiert, 10 offen, Fragen C1–C10 an Rob
-  – am 29.09.2026 entschieden und umgesetzt.
+  (beide Apps), 30 Datenfehler korrigiert, Fragen C1–C10 an Rob – am
+  29.09.2026 entschieden und umgesetzt; von den 10 offenen Punkten 7
+  nachgezogen, 3 bleiben offen.
 - [ ] Nach 1d: gewünschte Änderungen am Roster Builder einbauen, einzeln und
   mit Tests, gesammelt in [behaviour-changes.md](behaviour-changes.md).
 - [x] 1c Neue Logik: `core/changes` (Vergleich zweier Stände mit stabilen

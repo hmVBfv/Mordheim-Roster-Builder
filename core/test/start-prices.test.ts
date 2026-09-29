@@ -43,6 +43,11 @@ describe('upgrades with a founding price', () => {
       expect(core.upgradePaid(ctx(s), last(s), 'Gromril-Waffe', 'Axt'), `stage ${stage}`).toBe(5 * mult);
     }
   });
+  it('the Pit Fighters\' Troll Slayer pays three times the price at any time', () => {
+    let s = band('pitfighters', 'trollslayer', 1);
+    s = core.setEqQty(ctx(s), last(s).uid, 'Axt', 1);
+    expect(core.upgradePaid(ctx(s), last(s), 'Gromril-Waffe', 'Axt')).toBe(15);
+  });
   it('other warbands pay four times the price at any time', () => {
     let s = band('merc', 'capt', 0);
     s = core.setEqQty(ctx(s), last(s).uid, 'Axt', 1);

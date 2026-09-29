@@ -165,19 +165,30 @@ schon gesperrt); Night-Goblin-Troll würfelt nicht auf Verletzungen (steht in
 der Regeneration der Trolle); Imperial Outriders Cavalry-Skills (die Liste
 hängt schon an allen drei Helden).
 
-**Offen – braucht mehr als eine Datenzeile:**
+**Nachgezogen (29.09.2026)** – was eine Datenzeile nicht konnte, kann sie
+jetzt: Listenzeilen lassen sich auf Helden (`heroes`) oder auf eine Variante
+der Warband (`sub`) beschränken, eine Warband kann einzelne Skills sperren
+(`noSkills`), eine Aufwertung einen festen Preis für bestimmte Einheiten
+haben (`always`). Tests in `core/test/data-audit.test.ts`,
+`core/test/start-prices.test.ts` und `test/unit-limits.mjs`.
 
-| Warband | Was | Warum noch offen |
+| Warband | Was | Jetzt |
 | --- | --- | --- |
-| Mercenaries (Middenheim) | Wolfcloak 10 gc für Helden | Listen kennen noch keine Einträge je Stadt |
-| Marauders (Hung) | Warhorse 40 gc, alle Helden mit Ride Warhorse | dito, je Stamm |
-| Lizardmen | Sacred Markings (Oversized Jaws, Poison Glands, Mark of the Old Ones), Gifte je Einheit | Aufwertungen beim Anwerben gibt es noch nicht |
-| Dwarf Rangers u. a. | Zwerge nie Arcane Lore | Sperre einzelner Skills fehlt im Skill-Menü |
-| Pit Fighters | Gromril-Waffe für den Slayer | Gromril ist ein Aufschlag, keine Listenzeile |
-| Lustrian Reavers | Hunting Hawk W und Ld „–“ | Profile rechnen mit Zahlen |
-| Cursed Cavalcade | „61 Captured“ neu würfeln | Wortlaut nicht bestätigt |
+| Mercenaries (Middenheim) | Wolfcloak | in der Liste der Middenheimer Helden, 10 gc; Tooltip mit der Wolfsjagd (W6 ≤ Stärke) |
+| Marauders (Hung) | Warhorse | in der Heldenliste der Hung, immer 40 gc; „Ride Warhorse“ für alle Helden steht im Stammestext |
+| Lizardmen | Sacred Markings, Gifte | Oversized Jaws (Saurus-Helden, 40 gc), Poison Glands (Skink-Helden, 40 gc), Mark of the Old Ones (50 gc) – nur Helden, ein Zeichen je Held, beim Anwerben; Dark Venom (20 gc) und Black Lotus (10 gc) für Geschosse der Skink-Helden; Reptile Venom (5 gc) für Skink Braves |
+| Dwarf Rangers | nie Arcane Lore | aus dem Skill-Menü genommen (die Seite sagt es ausdrücklich); den Dwarf Treasure Hunters verbietet ihre Seite es nicht |
+| Pit Fighters | Gromril-Waffe für den Troll Slayer | 3× Preis, jederzeit (nicht nur bei der Gründung) |
+| Cursed Cavalcade | „61 Captured!“ neu würfeln | bestätigt und in die Regel „Capture!“ aufgenommen: neu gewürfelt, sobald zwei Henchmen gefangen oder fünf Captured Thralls in der Warband sind |
+| Dwarf Rangers | Master of Blades | kein Fehler: dieselbe Fertigkeit heißt dort „Combat Master“ – unser Eintrag trägt beide Namen |
+
+**Weiter offen:**
+
+| Warband | Was | Warum |
+| --- | --- | --- |
+| Lustrian Reavers | Hunting Hawk W und Ld „–“ | Profile rechnen mit Zahlen; ein Strich braucht eigene Behandlung beim Rechnen |
 | Imperial Outriders | Athletic Mount, Ride | Text steht nur in Blazing Saddles, nicht auf der Seite |
-| Dwarf Rangers | Master of Blades | steht nicht auf der Seite der Dwarf Rangers |
+| Tomb Guardians | Skeleton Chariot aufstellen | die Seite nennt es selbst unklar und gibt keine Lösung |
 
 ## C. Robs Entscheidungen (29.09.2026)
 

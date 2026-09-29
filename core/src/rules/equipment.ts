@@ -136,6 +136,16 @@ export function upgradeStart(ctx: Ctx, de: string): UpgradeDef['start'] | null {
   return st;
 }
 
+/** A price that holds for some units at any time (the Pit Fighters' Troll
+    Slayer buys gromril weapons at three times the price). */
+export function upgradeAlways(ctx: Ctx, de: string, m: Model | undefined): UpgradeDef['always'] | null {
+  const al = ctx.data.UPGRADES[de]?.always;
+  if (!al) return null;
+  if (al.wb && al.wb.indexOf(ctx.s.wb ?? '') < 0) return null;
+  if (al.units && (!m || al.units.indexOf(m.uid_def) < 0)) return null;
+  return al;
+}
+
 /** The price of a flat upgrade (Dark Elf blade: +15 at the founding, +20 later). */
 export function upgradeBase(ctx: Ctx, de: string): number {
   const u = ctx.data.UPGRADES[de];
@@ -168,7 +178,7 @@ export function upgradePaid(ctx: Ctx, m: Model, de: string, targetNm: string): n
   let paid: number;
   if (u.mult) {
     const w = eqWeaponsOf(ctx, m).find((x) => x.nm === targetNm);
-    const mu = upgradeStart(ctx, de)?.mult ?? u.mult;
+    const mu = upgradeStart(ctx, de)?.mult ?? upgradeAlways(ctx, de, m)?.mult ?? u.mult;
     paid = w ? mu * w.price : 0;
   } else paid = upgradeBase(ctx, de);
   if (paid > 0 && itemHalfActive(ctx, de)) paid = Math.floor(paid * 0.5);

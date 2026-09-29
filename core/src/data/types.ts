@@ -12,8 +12,10 @@ export type Profile = Partial<Record<StatKey, number | string>>;
 
 /** Marks on a list row. `start`: the price holds only while the warband is
     founded; afterwards the item is found at the Trading Post under `later`
-    (the catalogue item, by default the row's own name). */
-export interface EntryFlags { start?: boolean; later?: string }
+    (the catalogue item, by default the row's own name). `heroes`: only
+    Heroes may take it, though the list is shared with Henchmen. `sub`: only
+    for these variants of the warband (Middenheim, Hung …). */
+export interface EntryFlags { start?: boolean; later?: string; heroes?: boolean; sub?: string[] }
 /** One entry of an equipment list: [German item name, price in gc, marks]. */
 export type EquipmentEntry = [name: string, price: number, flags?: EntryFlags];
 /** An equipment list by category: "Nahkampf", "Fernkampf", "Rüstung", "Besonderes", … */
@@ -81,6 +83,8 @@ export interface WarbandDef {
   subtypeLabel?: string;
   subtypes?: WarbandSubtype[];
   rules?: string;
+  /** Skills its warriors may never learn (Dwarf Rangers: Arcane Lore). */
+  noSkills?: string[];
   units: UnitDef[];
 }
 
@@ -121,6 +125,8 @@ export interface UpgradeDef {
   base?: number;
   /** The price while the warband is founded, for the warbands listed. */
   start?: { mult?: number; base?: number; wb?: string[] };
+  /** A price that holds at any time for the warbands and units listed. */
+  always?: { mult?: number; base?: number; wb?: string[]; units?: string[] };
   note?: string;
 }
 
