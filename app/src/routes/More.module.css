@@ -22,3 +22,8 @@
   height: 22px;
   accent-color: var(--accent);
 }
+
+/* whatever the build calls itself, it must not widen the page */
+.version {
+  overflow-wrap: anywhere;
+}
