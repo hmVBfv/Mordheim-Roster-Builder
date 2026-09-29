@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trading Post Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  /* the merchant at his stall: original pixel art, three frames */
+  /* the stall stands at night in both themes, so the pixel colours read the same */
+  .scene { display: grid; grid-template-columns: 128px 1fr; gap: var(--s3); align-items: end; padding: var(--s2) var(--s3) 0; background: #2b2724; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .merchant { display: block; width: 128px; height: 96px; image-rendering: pixelated; }
+  .merchant .fB, .merchant .fC { opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .merchant .fA { animation: frA 6s steps(1, end) infinite; }
+    .merchant .fB { animation: frB 6s steps(1, end) infinite; }
+    .merchant .fC { animation: frC 6s steps(1, end) infinite; }
+  }
+  @keyframes frA { 0% { opacity: 1; } 60% { opacity: 0; } 64% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes frB { 0% { opacity: 0; } 60% { opacity: 1; } 64% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes frC { 0% { opacity: 0; } 80% { opacity: 1; } 100% { opacity: 1; } }
+  .say { position: relative; align-self: center; margin-bottom: var(--s2); padding: var(--s2) var(--s3); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); font-style: italic; font-size: 0.95rem; }
+  .say::before { content: ''; position: absolute; left: -7px; bottom: 14px; width: 12px; height: 12px; background: var(--surface); border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg); }
+  .figures { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); margin: 0; }
+  .figures div { display: grid; }
+  .figures dt { font-size: 0.78rem; color: var(--text-muted); }
+  .figures dd { margin: 0; font-size: 1.2rem; font-weight: 600; }
+  .tabs-seg button { font-size: 0.95rem; }
+  .shop { display: grid; gap: var(--s1); list-style: none; margin: 0; padding: 0; }
+  .shop button { width: 100%; min-height: 52px; display: grid; grid-template-columns: 1fr auto; gap: 0 var(--s2); align-items: center; padding: var(--s1) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); text-align: left; cursor: pointer; }
+  .shop .nm { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+  .shop .who { font-size: 0.82rem; color: var(--text-muted); }
+  .shop .gc { grid-row: 1 / span 2; grid-column: 2; color: var(--gold); font-weight: 600; white-space: nowrap; }
+  .shop .nobody .who { color: var(--warn); }
+  .pick.list { grid-template-columns: 1fr; }
+  .pick button:disabled { opacity: 0.6; cursor: default; }
+  .pick button small.no { color: var(--warn); }
+  .heroes { display: grid; gap: var(--s2); }
+  .hero-row { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); align-items: center; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .hero-row .st { grid-column: 1; font-size: 0.85rem; color: var(--text-muted); }
+  .hero-row .st.ok { color: var(--accent); }
+  .hero-row .st.no { color: var(--warn); }
+  .hero-row .btn-quiet { grid-row: 1 / span 2; grid-column: 2; }
+  .hero-row .btn-quiet:disabled { opacity: 0.45; cursor: default; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .tbl th { text-align: left; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); padding: var(--s1) var(--s2) var(--s1) 0; }
+  .tbl td { padding: var(--s1) var(--s2) var(--s1) 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .tbl td:last-child, .tbl th:last-child { padding-right: 0; }
+  .mods { margin: 0; padding-left: 1.1em; display: grid; gap: 2px; }
+  .mods .off { color: var(--text-muted); }
+  details.why summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; color: var(--accent); }
+  .result { display: grid; gap: var(--s1); padding: var(--s3); border: 1px solid var(--border); border-radius: var(--radius); }
+  .verdict.found { color: var(--accent); font-weight: 600; }
+  .verdict.missed { color: var(--warn); font-weight: 600; }
+  .ledger { list-style: none; margin: 0; padding: 0; display: grid; }
+  .ledger li { display: grid; grid-template-columns: 4.2em 1fr; gap: var(--s2); padding: var(--s1) 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .ledger .amt { text-align: right; font-weight: 600; }
+  .ledger .plus { color: var(--accent); }
+  .ledger .minus { color: var(--danger); }
+  .ledger .zero { color: var(--text-muted); }
+  .ledger .new { background: var(--surface-2); }
+  .sheet .scroll { max-height: 46dvh; overflow-y: auto; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Trading Post (V6)</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <a class="back" href="roster.html" aria-label="Back to the roster">←</a>
+    <span class="title">Trading Post</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+
+  <div class="content">
+    <div class="scene">
+      <svg class="merchant" id="merchant" viewBox="0 0 32 24" width="128" height="96" shape-rendering="crispEdges" aria-hidden="true" focusable="false"></svg>
+      <p class="say" id="say">Common wares at fixed prices. Swords, rope, lanterns — all fair.</p>
+    </div>
+
+    <div class="stack">
+      <p class="muted small">The Silver Caravan · <span class="chip good">✓ After battle 5</span></p>
+      <dl class="figures">
+        <div><dt>Gold in hand</dt><dd id="gold">55 gc</dd></div>
+        <div><dt>Stash</dt><dd id="stash-n">2 items</dd></div>
+      </dl>
+    </div>
+
+    <div class="seg tabs-seg" id="tabs" role="group" aria-label="What to do">
+      <button type="button" data-value="buy" aria-pressed="true">Buy</button><button type="button" data-value="search">Search rare</button><button type="button" data-value="sell">Sell</button><button type="button" data-value="give">Give</button>
+    </div>
+
+    <!-- Buy: common items, any time, fixed price -->
+    <section class="stack" id="p-buy" aria-label="Buy common items">
+      <p class="small muted">Common items, as many as you like, at the price chart's price. The founding prices ended with the first battle; a recruit is equipped from here too.</p>
+      <div class="seg" id="cats" role="group" aria-label="Kind">
+        <button type="button" data-value="all" aria-pressed="true">All</button><button type="button" data-value="cc">Close</button><button type="button" data-value="missile">Missile</button><button type="button" data-value="armour">Armour</button><button type="button" data-value="misc">Other</button>
+      </div>
+      <ul class="shop" id="buy-list"></ul>
+      <details class="why small"><summary>Before the first battle?</summary>
+        <p class="muted">Until the warband's first battle every warrior buys from his own list, rare items of the list included, at the list price — and founding prices apply (a Nightmare 30 gc instead of 95). From battle 1 on: common items here, rare items only when a Hero finds them (rulebook p. 46 and 104; Rob, 29.09.2026).</p>
+      </details>
+    </section>
+
+    <!-- Search: one roll per Hero for a rare item -->
+    <section class="stack" id="p-search" aria-label="Search for rare items" hidden>
+      <p class="small muted">Each Hero may look for one rare item: 2D6 equal to or above its rarity. Heroes taken out of action in the last battle stay home.</p>
+      <div class="heroes" id="searchers"></div>
+      <h2>Rare items for this warband</h2>
+      <table class="tbl"><thead><tr><th>Item</th><th>Rare</th><th>Price</th><th>Who</th></tr></thead><tbody id="rare-tbl"></tbody></table>
+      <p class="small muted">Rare items nobody here can use may still be bought and kept in the stash (rulebook p. 104).</p>
+    </section>
+
+    <!-- Sell: half the price that applies now -->
+    <section class="stack" id="p-sell" aria-label="Sell items" hidden>
+      <p class="small muted">Items sell for half the price that applies now (house rules included); variable prices count only their fixed part. A group sells all its pieces of an item together.</p>
+      <ul class="shop" id="sell-list"></ul>
+    </section>
+
+    <!-- Give: move items between warriors and the stash, no gold -->
+    <section class="stack" id="p-give" aria-label="Give items" hidden>
+      <p class="small muted">Move an item between warriors and the stash. No gold changes hands; the price paid moves with it. Only those who may use the item can take it.</p>
+      <ul class="shop" id="give-list"></ul>
+    </section>
+
+    <section class="stack" aria-labelledby="ledger-h">
+      <h2 id="ledger-h">Gold · after battle 5</h2>
+      <ol class="ledger" id="ledger"></ol>
+      <p class="small muted">Every change of gold has a reason (V7); the Versions view and the chronicle read from this list.</p>
+    </section>
+  </div>
+  <nav class="nav" data-current="Warbands"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-buy" aria-labelledby="buy-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="buy-title">Sword</h2>
+    <p class="small muted" id="buy-line"></p>
+    <p class="small" id="buy-text"></p>
+    <span class="small">For whom</span>
+    <div class="scroll"><div class="pick list" id="buy-to"></div></div>
+    <div class="row"><button type="button" class="btn" id="buy-ok">Buy</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-search" aria-labelledby="s-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="s-title">Ulrich searches</h2>
+    <div class="scroll"><div class="pick list" id="s-items"></div></div>
+    <div class="result"><p id="s-need"></p><p class="small muted" id="s-mods"></p></div>
+    <details class="why small"><summary>What changes the roll</summary>
+      <ul class="mods">
+        <li class="off">Streetwise (Academic skill): +2 — none of your Heroes has it</li>
+        <li class="off">Marienburg Mercenaries: +1 — your warband is from Reikland</li>
+        <li class="off">Market Square, controlled: +2 — not held</li>
+      </ul>
+    </details>
+    <label class="field"><span class="small">2D6 as rolled</span><input class="input" id="s-roll" inputmode="numeric" maxlength="2" autocomplete="off"></label>
+    <p class="verdict" id="s-verdict" aria-live="polite"></p>
+    <label class="field" id="s-price-f" hidden><span class="small" id="s-price-l">Price as asked</span><input class="input" id="s-price" inputmode="numeric" maxlength="3" autocomplete="off"></label>
+    <label class="field"><span class="small">Goes to</span><select class="select" id="s-to"></select></label>
+    <div class="row"><button type="button" class="btn" id="s-buy" disabled>Buy</button><button type="button" class="btn-quiet" id="s-miss">Not found</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-sell" aria-labelledby="sell-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="sell-title">Sell</h2>
+    <p class="small muted" id="sell-from"></p>
+    <div class="result"><p id="sell-calc"></p><p class="small muted" id="sell-round"></p></div>
+    <details class="why small"><summary>What changes the price</summary>
+      <ul class="mods">
+        <li class="off">Raven Barracks, foothold: weapons and armour sell for the price paid — not held</li>
+        <li class="off">Arabian Merchant (Hired Sword), Pawnbroker: +2D6 gc per item sold — not hired</li>
+        <li class="off">Trade (Merchant Caravans only) — not this warband</li>
+      </ul>
+    </details>
+    <label class="field"><span class="small">Gold received</span><input class="input" id="sell-gc" inputmode="numeric" maxlength="3" autocomplete="off"></label>
+    <div class="row"><button type="button" class="btn" id="sell-ok">Sell</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-give" aria-labelledby="give-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="give-title">Give</h2>
+    <p class="small muted" id="give-from"></p>
+    <span class="small">To</span>
+    <div class="scroll"><div class="pick list" id="give-to"></div></div>
+    <div class="row"><button type="button" class="btn" id="give-ok">Give</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  /* ---------- the merchant: 32 × 24 pixels, three frames ---------- */
+  var PAL = { a: '#8e2a22', A: '#e2d3a8', w: '#4a3222', W: '#7a5536', h: '#34503c', H: '#4f7458', s: '#e0ad7e', S: '#b67f55',
+    e: '#1b1410', b: '#b8b0a2', B: '#8a8276', g: '#e8c04a', G: '#a8801e', r: '#b8322a', p: '#a9d6de', k: '#2a221c', L: '#ffd66b' };
+  var BASE = [
+    'aaaaAAAAaaaaAAAAaaaaAAAAaaaaAAAA',
+    'aaaaAAAAaaaaAAAAaaaaAAAAaaaaAAAA',
+    'aaaaAAAAaaaaAAAAaaaaAAAAaaaaAAAA',
+    '.aa..AA..aa..AA..aa..AA..aa..AA.',
+    '.ww..k.......................ww.',
+    '.ww.kkk......................ww.',
+    '.ww.kLk......hhhhhh..........ww.',
+    '.ww.kLk.....hhHHHHhh.........ww.',
+    '.ww.kkk....hhHSSSSHhh........ww.',
+    '.ww........hhSssssShh........ww.',
+    '.ww........hhSesseShh........ww.',
+    '.ww........hhSsSSsShh........ww.',
+    '.ww........hhbBBBBbhh........ww.',
+    '.ww........hhbbbbbbhh........ww.',
+    '.ww..W...hhhhhbbbbhhhhh......ww.',
+    '.ww..p..hhhhhhHbbHhhhhhh..gg.ww.',
+    '.ww.rrr.hhHhhhhHHhhhhHhh.gGgGww.',
+    '.ww.rrrhsshhhhhhhhhhhhsshggggww.',
+    '.WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.',
+    '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.',
+    '.wWWWWWWWWWWWWWWWWWWWWWWWWWWWWw.',
+    '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.',
+    '.wWWWWWWWWWWWWWWWWWWWWWWWWWWWWw.',
+    '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.'
+  ];
+  function frame(over) { return BASE.map(function (r, y) { return over[y] || r; }); }
+  var FRAMES = {
+    fA: BASE,
+    // a blink
+    fB: frame({ 10: '.ww........hhSSssSShh........ww.' }),
+    // he holds up a coin, and the lantern flares
+    fC: frame({ 6: '.ww.kgk......hhhhhh..........ww.', 7: '.ww.kgk.....hhHHHHhh.........ww.',
+      12: '.ww........hhbBBBBbhh....g...ww.', 13: '.ww........hhbbbbbbhh...ss...ww.',
+      14: '.ww..W...hhhhhbbbbhhhhhhH....ww.', 15: '.ww..p..hhhhhhHbbHhhhhhhh.gg.ww.', 17: '.ww.rrrhsshhhhhhhhhhhhhhhggggww.' })
+  };
+  var svg = '';
+  Object.keys(FRAMES).forEach(function (k) {
+    svg += '<g class="' + k + '">';
+    FRAMES[k].forEach(function (row, y) {
+      row = (row + '................................').slice(0, 32);
+      for (var x = 0; x < 32;) {
+        var c = row[x], n = 1;
+        while (x + n < 32 && row[x + n] === c) n++;
+        if (c !== '.') svg += '<rect x="' + x + '" y="' + y + '" width="' + n + '" height="1" fill="' + PAL[c] + '"/>';
+        x += n;
+      }
+    });
+    svg += '</g>';
+  });
+  document.getElementById('merchant').innerHTML = svg;
+
+  /* ---------- the warband and the price chart (data/equipment.json) ---------- */
+  var LISTNAME = { merc: 'Mercenary', marksman: 'Marksman' };
+  var CAT = { cc: 'Close combat', missile: 'Missile', armour: 'Armour', misc: 'Miscellaneous' };
+  var ITEMS = {
+    dagger: { name: 'Dagger', cat: 'cc', price: 2, lists: ['merc', 'marksman'], text: '+1 to the armour save of the model hit (6+ if it has none). The first dagger is free.' },
+    mace: { name: 'Mace', cat: 'cc', price: 3, lists: ['merc', 'marksman'], text: 'Concussion: on the injury roll a 2–4 counts as stunned.' },
+    axe: { name: 'Axe', cat: 'cc', price: 5, lists: ['merc', 'marksman'], text: 'Cutting edge: an extra −1 to the armour save.' },
+    sword: { name: 'Sword', cat: 'cc', price: 10, lists: ['merc', 'marksman'], text: 'Parry: when hit, roll a D6; higher than the highest to-hit roll parries the blow (once per phase).' },
+    spear: { name: 'Spear', cat: 'cc', price: 10, lists: ['merc'], text: 'Strike first in the first round of close combat. Unwieldy: only a shield or buckler in the other hand.' },
+    halberd: { name: 'Halberd', cat: 'cc', price: 10, lists: ['merc'], text: '+1 Strength. Two-handed: no shield, buckler or second weapon.' },
+    mstar: { name: 'Morning star', cat: 'cc', price: 15, lists: ['merc'], text: 'Heavy: +1 Strength in the first round of close combat. No second weapon or buckler.' },
+    dhw: { name: 'Double-handed weapon', cat: 'cc', price: 15, lists: ['merc'], text: '+2 Strength. Two-handed; always strikes last.' },
+    flail: { name: 'Flail', cat: 'cc', price: 15, lists: [], text: 'Heavy: +2 Strength in the first round of close combat. Two-handed.' },
+    bow: { name: 'Bow', cat: 'missile', price: 10, lists: ['merc', 'marksman'], text: 'Range 24", Strength 3.' },
+    longbow: { name: 'Long bow', cat: 'missile', price: 15, lists: ['marksman'], text: 'Range 30", Strength 3.' },
+    crossbow: { name: 'Crossbow', cat: 'missile', price: 25, lists: ['merc', 'marksman'], text: 'Range 30", Strength 4. Move or fire.' },
+    light: { name: 'Light armour', cat: 'armour', price: 20, lists: ['merc', 'marksman'], text: 'Armour save 6+.' },
+    heavy: { name: 'Heavy armour', cat: 'armour', price: 50, lists: ['merc'], text: 'Armour save 5+; −1 Movement.' },
+    shield: { name: 'Shield', cat: 'armour', price: 5, lists: ['merc', 'marksman'], text: '+1 to the armour save (6+ on its own).' },
+    buckler: { name: 'Buckler', cat: 'armour', price: 5, lists: ['merc'], text: 'Parries like a sword; no save bonus.' },
+    helmet: { name: 'Helmet', cat: 'armour', price: 10, lists: ['merc', 'marksman'], text: '4+ save against being stunned: the model is only knocked down.' },
+    lantern: { name: 'Lantern', cat: 'misc', price: 10, text: '+4" to the distance at which the bearer spots hidden enemies.' },
+    rope: { name: 'Rope & hook', cat: 'misc', price: 5, one: true, text: 'Re-roll a failed Initiative test when climbing. Only one per model.' },
+    net: { name: 'Net', cat: 'misc', price: 5, text: 'Thrown once per game, range 8": a model hit that fails to roll under its Strength may not move, shoot or cast next turn.' },
+    garlic: { name: 'Garlic', cat: 'misc', price: 1, text: 'A Vampire must pass a Leadership test to charge the bearer. Lasts one battle.' },
+    // rare
+    pistol: { name: 'Pistol', cat: 'missile', price: 15, rare: 8, lists: ['merc', 'marksman'], text: 'Range 6", Strength 4, −2 save. Fires every other turn; +1 attack in close combat.' },
+    handgun: { name: 'Handgun', cat: 'missile', price: 35, rare: 8, lists: ['marksman'], text: 'Range 24", Strength 4, −2 save. Move or fire; fires every other turn.' },
+    blunder: { name: 'Blunderbuss', cat: 'missile', price: 30, rare: 9, lists: ['marksman'], text: 'Once per battle: a line 16" long, every model in it hit at Strength 3.' },
+    charm: { name: 'Lucky charm', cat: 'misc', price: 10, rare: 6, text: 'The first hit in a battle is discarded on a 4+.' },
+    herbs: { name: 'Healing herbs', cat: 'misc', price: 20, dice: '2D6', rare: 8, text: 'Once per battle, at the start of the recovery phase: all lost wounds restored.' },
+    knives: { name: 'Throwing knives', cat: 'missile', price: 15, rare: 5, lists: [], text: 'Range 6", Strength as user; no penalty for range or moving.' }
+  };
+  var COMMON = ['dagger', 'mace', 'axe', 'sword', 'spear', 'halberd', 'mstar', 'dhw', 'flail', 'bow', 'longbow', 'crossbow', 'light', 'heavy', 'shield', 'buckler', 'helmet', 'lantern', 'rope', 'net', 'garlic'];
+  var RARE = ['pistol', 'handgun', 'blunder', 'charm', 'herbs', 'knives'];
+
+  function piece(id, paid) { return { id: id, paid: paid == null ? ITEMS[id].price : paid }; }
+  var st = {
+    gold: 55,
+    warriors: [
+      { id: 'ulrich', name: 'Ulrich the Grey', kind: 'hero', list: 'merc', gear: [piece('sword'), piece('shield'), piece('light'), piece('dagger', 0)] },
+      { id: 'magda', name: 'Magda', kind: 'hero', list: 'merc', out: 'taken out of action in battle 5', gear: [piece('dhw'), piece('dagger', 0)] },
+      { id: 'jorg', name: 'Jorg', kind: 'hero', list: 'merc', gear: [piece('mace'), piece('sword'), piece('light'), piece('dagger', 0)] },
+      { id: 'wilhelm', name: 'Wilhelm', kind: 'hero', list: 'merc', gear: [piece('mace'), piece('dagger', 0)] },
+      { id: 'warriors', name: 'Warriors', kind: 'group', men: 2, list: 'merc', gear: [piece('axe'), piece('buckler'), piece('dagger', 0)] },
+      { id: 'lukas', name: 'Lukas', kind: 'hench', list: 'marksman', gear: [piece('crossbow'), piece('dagger', 0)] },
+      { id: 'gunnar', name: 'Big Gunnar', kind: 'hired', gear: [] }
+    ],
+    stash: [piece('charm', 10), piece('rope', 5)],
+    searched: {},
+    ledger: [
+      [31, 'Gold after battle 4', 'start'],
+      [50, 'Sold 2 wyrdstone shards (warband of 7–9)'],
+      [4, 'Exploration: Ruined Hovels (6 6), D6 gc'],
+      [-30, 'Upkeep: Big Gunnar, Ogre Bodyguard']
+    ]
+  };
+  var byId = {}; st.warriors.forEach(function (w) { byId[w.id] = w; });
+  function men(w) { return w.men || 1; }
+  function count(w, cat) { return w.gear.filter(function (p) { return ITEMS[p.id].cat === cat && p.id !== 'dagger'; }).length; }
+
+  /* Why this warrior may not take the item ('' = he may). */
+  function refusal(it, w, id) {
+    if (w.kind === 'hired') return 'Hired Swords keep the gear they came with';
+    if (it.cat === 'misc') {
+      if (w.kind !== 'hero') return 'miscellaneous items are for Heroes only';
+      if (it.one && w.gear.some(function (p) { return p.id === id; })) return 'carries one already';
+      return '';
+    }
+    if ((it.lists || []).indexOf(w.list) < 0) return 'not in the ' + LISTNAME[w.list] + ' list';
+    if (it.cat === 'cc' && id !== 'dagger' && count(w, 'cc') >= 2) return 'two close combat weapons already, besides the dagger';
+    if (it.cat === 'missile' && count(w, 'missile') >= 2) return 'two missile weapons already';
+    return '';
+  }
+  /* Who could use it at all, from the lists alone (the line under each item). */
+  function whoLine(id) {
+    var it = ITEMS[id];
+    if (it.cat === 'misc') return 'Heroes only';
+    var ok = st.warriors.filter(function (w) { return w.kind !== 'hired' && (it.lists || []).indexOf(w.list) >= 0; });
+    if (!ok.length) return 'nobody here can use it · stash only';
+    var heroes = st.warriors.filter(function (w) { return w.kind === 'hero'; });
+    var names = [], allHeroes = heroes.every(function (h) { return ok.indexOf(h) >= 0; });
+    if (allHeroes) names.push('Heroes');
+    ok.forEach(function (w) { if (!(allHeroes && w.kind === 'hero')) names.push(w.name); });
+    return names.join(', ');
+  }
+  function need(id) { return ITEMS[id].rare; }
+  function chance(n) { var c = 0; for (var a = 1; a <= 6; a++) for (var b = 1; b <= 6; b++) if (a + b >= n) c++; return Math.round(c * 100 / 36); }
+  function priceText(it) { return it.dice ? it.price + '+' + it.dice + ' gc' : it.price + ' gc'; }
+
+  /* ---------- drawing ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  var cat = 'all';
+  function drawBuy() {
+    $('buy-list').innerHTML = COMMON.filter(function (id) { return cat === 'all' || ITEMS[id].cat === cat; }).map(function (id) {
+      var it = ITEMS[id], who = whoLine(id);
+      return '<li><button type="button" data-buy="' + id + '"' + (/nobody/.test(who) ? ' class="nobody"' : '') + '><span class="nm">' + esc(it.name) + '</span><span class="gc">' + priceText(it) + '</span><span class="who">' + esc(who) + '</span></button></li>';
+    }).join('');
+  }
+  function drawSearch() {
+    $('searchers').innerHTML = st.warriors.filter(function (w) { return w.kind === 'hero'; }).map(function (w) {
+      var done = st.searched[w.id], s;
+      if (w.out) s = '<span class="st no">Stays home: ' + esc(w.out) + '</span><button type="button" class="btn-quiet" disabled>Search</button>';
+      else if (done) s = '<span class="st ' + (done.found ? 'ok' : 'no') + '">' + (done.found ? '✓ found ' : '✗ no luck with ') + esc(ITEMS[done.item].name) + '</span><button type="button" class="btn-quiet" disabled>Searched</button>';
+      else s = '<span class="st">May look for one rare item</span><button type="button" class="btn-quiet" data-search="' + w.id + '">Search</button>';
+      return '<div class="hero-row"><b>' + esc(w.name) + '</b>' + s + '</div>';
+    }).join('');
+    $('rare-tbl').innerHTML = RARE.map(function (id) {
+      var it = ITEMS[id];
+      return '<tr><td>' + esc(it.name) + '</td><td>' + it.rare + '</td><td>' + priceText(it) + '</td><td class="small">' + esc(whoLine(id).replace(' · stash only', '')) + '</td></tr>';
+    }).join('');
+  }
+  /* Every piece the warband owns, by owner: stash first. */
+  function owned() {
+    var out = [];
+    st.stash.forEach(function (p, i) { out.push({ owner: 'stash', i: i, p: p }); });
+    st.warriors.forEach(function (w) { w.gear.forEach(function (p, i) { if (p.id !== 'dagger') out.push({ owner: w.id, i: i, p: p }); }); });
+    return out;
+  }
+  function ownerName(o) { return o === 'stash' ? 'Stash' : byId[o].name; }
+  function salePrice(p, owner) { var it = ITEMS[p.id], q = owner === 'stash' ? 1 : men(byId[owner]); return { half: it.price * q / 2, gc: Math.floor(it.price * q / 2), q: q }; }
+  function drawSell() {
+    $('sell-list').innerHTML = owned().map(function (o) {
+      var sp = salePrice(o.p, o.owner), it = ITEMS[o.p.id];
+      return '<li><button type="button" data-sell="' + o.owner + ':' + o.i + '"><span class="nm">' + esc(it.name) + (sp.q > 1 ? ' ×' + sp.q : '') + '</span><span class="gc">' + sp.gc + ' gc</span><span class="who">' + esc(ownerName(o.owner)) + '</span></button></li>';
+    }).join('');
+  }
+  function drawGive() {
+    $('give-list').innerHTML = owned().map(function (o) {
+      var it = ITEMS[o.p.id], q = o.owner === 'stash' ? 1 : men(byId[o.owner]);
+      return '<li><button type="button" data-give="' + o.owner + ':' + o.i + '"><span class="nm">' + esc(it.name) + (q > 1 ? ' ×' + q : '') + '</span><span class="gc">›</span><span class="who">' + esc(ownerName(o.owner)) + ' · paid ' + o.p.paid * q + ' gc</span></button></li>';
+    }).join('');
+  }
+  var fresh = 0;
+  function drawLedger() {
+    var total = 0;
+    $('ledger').innerHTML = st.ledger.map(function (l, i) {
+      total += l[0];
+      var cls = l[2] === 'start' ? 'zero' : l[0] > 0 ? 'plus' : l[0] < 0 ? 'minus' : 'zero';
+      var amt = l[2] === 'start' ? l[0] + ' gc' : (l[0] > 0 ? '+' : l[0] < 0 ? '−' : '±') + Math.abs(l[0]);
+      return '<li' + (i >= st.ledger.length - fresh ? ' class="new"' : '') + '><span class="amt ' + cls + '">' + amt + '</span><span>' + esc(l[1]) + '</span></li>';
+    }).join('') + '<li><span class="amt">' + total + ' gc</span><b>In hand</b></li>';
+  }
+  function drawAll() {
+    $('gold').textContent = st.gold + ' gc';
+    $('stash-n').textContent = st.stash.length + (st.stash.length === 1 ? ' item' : ' items');
+    drawBuy(); drawSearch(); drawSell(); drawGive(); drawLedger();
+  }
+
+  /* ---------- tabs; the roster links here with #give and #sell ---------- */
+  var SAY = {
+    buy: 'Common wares at fixed prices. Swords, rope, lanterns — all fair.',
+    search: 'Rare things? I know a man who knows a man. Send your Heroes.',
+    sell: 'Half of what it’s worth. Blood and dents cost extra.',
+    give: 'Swap among yourselves if you must. Mind my counter.'
+  };
+  function showTab(t) {
+    if (!SAY[t]) t = 'buy';
+    ['buy', 'search', 'sell', 'give'].forEach(function (k) { $('p-' + k).hidden = k !== t; });
+    $('tabs').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === t)); });
+    $('say').textContent = SAY[t];
+  }
+  $('tabs').addEventListener('choose', function (e) { showTab(e.detail); history.replaceState(history.state, '', '#' + e.detail); });
+  $('cats').addEventListener('choose', function (e) { cat = e.detail; drawBuy(); });
+
+  /* every change can be undone once, from the notice */
+  function commit(text, amount, change) {
+    var before = JSON.stringify(st);
+    change();
+    st.ledger.push([amount, text]);
+    fresh = 1;
+    drawAll();
+    window.mockToast(text + (amount ? ' · ' + (amount > 0 ? '+' : '−') + Math.abs(amount) + ' gc' : ''), function () {
+      var back = JSON.parse(before);
+      Object.keys(back).forEach(function (k) { st[k] = back[k]; });
+      st.warriors.forEach(function (w) { byId[w.id] = w; });
+      fresh = 0; drawAll();
+    });
+  }
+  function takeFrom(owner, i) { return owner === 'stash' ? st.stash.splice(i, 1)[0] : byId[owner].gear.splice(i, 1)[0]; }
+  function pieceAt(key) { var k = key.split(':'), owner = k[0], i = Number(k[1]); return { owner: owner, i: i, p: owner === 'stash' ? st.stash[i] : byId[owner].gear[i] }; }
+
+  /* ---------- buy ---------- */
+  var buyId = null, buyTo = 'stash';
+  function recipients(el, id, qtyFrom, exclude) {
+    var it = ITEMS[id];
+    var html = '<button type="button" data-value="stash"' + (exclude === 'stash' ? ' disabled' : '') + '>Stash<small>' + (exclude === 'stash' ? 'is already there' : 'keep it for later') + '</small></button>';
+    st.warriors.forEach(function (w) {
+      if (w.id === exclude) return;
+      var why = refusal(it, w, id);
+      if (!why && qtyFrom != null && men(w) > qtyFrom) why = 'the group needs ' + men(w) + ' — only ' + qtyFrom + ' here';
+      var note = why || (qtyFrom == null ? (men(w) > 1 ? men(w) + ' men: ' + it.price * men(w) + ' gc' : it.price + ' gc') : (men(w) > 1 ? 'one for each of the ' + men(w) + ' men' : 'may use it'));
+      html += '<button type="button" data-value="' + w.id + '"' + (why ? ' disabled' : '') + '>' + esc(w.name) + '<small' + (why ? ' class="no"' : '') + '>' + esc(note) + '</small></button>';
+    });
+    el.innerHTML = html;
+  }
+  function pressFirst(el, value) {
+    el.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === value)); });
+  }
+  function buyCost() { return ITEMS[buyId].price * (buyTo === 'stash' ? 1 : men(byId[buyTo])); }
+  function updateBuy() {
+    var c = buyCost(), b = $('buy-ok');
+    b.disabled = c > st.gold;
+    b.textContent = c > st.gold ? 'Not enough gold (' + c + ' gc)' : 'Buy · ' + c + ' gc';
+  }
+  $('buy-to').addEventListener('choose', function (e) { buyTo = e.detail; updateBuy(); });
+  $('buy-ok').addEventListener('click', function () {
+    var it = ITEMS[buyId], c = buyCost(), to = buyTo;
+    $('sheet-buy').close();
+    commit('Bought ' + it.name + (to === 'stash' ? ' for the stash' : ' for ' + byId[to].name), -c, function () {
+      st.gold -= c;
+      if (to === 'stash') st.stash.push(piece(buyId)); else byId[to].gear.push(piece(buyId));
+    });
+  });
+
+  /* ---------- search ---------- */
+  var seeker = null, sItem = 'pistol';
+  function sItems() {
+    $('s-items').innerHTML = RARE.map(function (id) {
+      var it = ITEMS[id];
+      return '<button type="button" data-value="' + id + '">' + esc(it.name) + '<small>Rare ' + it.rare + ' · ' + priceText(it) + ' · ' + chance(need(id)) + ' %</small></button>';
+    }).join('');
+    pressFirst($('s-items'), sItem);
+  }
+  function sUpdate() {
+    var it = ITEMS[sItem], n = need(sItem), roll = Number($('s-roll').value), v = $('s-verdict');
+    $('s-need').innerHTML = '<b>' + esc(it.name) + '</b> — needs <b>' + n + '+</b> on 2D6 (' + chance(n) + ' %)';
+    $('s-mods').textContent = 'Rare ' + n + '; nothing changes the roll for ' + byId[seeker].name + '.';
+    $('s-price-f').hidden = !it.dice;
+    $('s-price-l').textContent = 'Price as asked: ' + it.price + '+' + it.dice + ' = ' + (it.price + 2) + ' to ' + (it.price + 12) + ' gc';
+    var found = roll >= 2 && roll <= 12 && roll >= n;
+    v.className = 'verdict' + (roll >= 2 && roll <= 12 ? (found ? ' found' : ' missed') : '');
+    v.textContent = !(roll >= 2 && roll <= 12) ? 'Enter the roll (2 to 12).' : found ? roll + ' — found. The merchant has one.' : roll + ' — not found this time.';
+    var price = it.dice ? Number($('s-price').value) : it.price;
+    var priceOk = !it.dice || (price >= it.price + 2 && price <= it.price + 12);
+    var b = $('s-buy');
+    b.disabled = !found || !priceOk || price > st.gold;
+    b.textContent = found && priceOk ? (price > st.gold ? 'Not enough gold' : 'Buy · ' + price + ' gc') : 'Buy';
+    var to = $('s-to'), keep = to.value;
+    to.innerHTML = '<option value="stash">Stash</option>' + st.warriors.map(function (w) {
+      var why = refusal(it, w, sItem) || (men(w) > 1 ? 'the group needs ' + men(w) : '');
+      return '<option value="' + w.id + '"' + (why ? ' disabled' : '') + '>' + esc(w.name) + (why ? ' — ' + why : '') + '</option>';
+    }).join('');
+    to.value = keep && to.querySelector('option[value="' + keep + '"]:not([disabled])') ? keep : 'stash';
+  }
+  $('s-items').addEventListener('choose', function (e) { sItem = e.detail; sUpdate(); });
+  $('s-roll').addEventListener('input', sUpdate);
+  $('s-price').addEventListener('input', sUpdate);
+  $('s-buy').addEventListener('click', function () {
+    var it = ITEMS[sItem], price = it.dice ? Number($('s-price').value) : it.price, to = $('s-to').value, who = seeker, id = sItem;
+    $('sheet-search').close();
+    commit(byId[who].name + ' found ' + it.name + (to === 'stash' ? ' (stash)' : ' for ' + byId[to].name), -price, function () {
+      st.gold -= price; st.searched[who] = { item: id, found: true };
+      var p = piece(id, price);
+      if (to === 'stash') st.stash.push(p); else byId[to].gear.push(p);
+    });
+  });
+  $('s-miss').addEventListener('click', function () {
+    var who = seeker, id = sItem;
+    $('sheet-search').close();
+    commit(byId[who].name + ' looked for ' + ITEMS[id].name + ' — not found', 0, function () { st.searched[who] = { item: id, found: false }; });
+  });
+
+  /* ---------- sell ---------- */
+  var selling = null;
+  $('sell-gc').addEventListener('input', function () {
+    var n = Number($('sell-gc').value), b = $('sell-ok');
+    b.disabled = !(n >= 0) || $('sell-gc').value === '';
+    b.textContent = 'Sell · ' + (n >= 0 ? n : '?') + ' gc';
+  });
+  $('sell-ok').addEventListener('click', function () {
+    var o = selling, gc = Number($('sell-gc').value), it = ITEMS[o.p.id];
+    $('sheet-sell').close();
+    commit('Sold ' + it.name + (o.owner === 'stash' ? ' from the stash' : ' of ' + byId[o.owner].name), gc, function () {
+      st.gold += gc; takeFrom(o.owner, o.i);
+    });
+  });
+
+  /* ---------- give ---------- */
+  var giving = null, giveTo = null;
+  $('give-to').addEventListener('choose', function (e) { giveTo = e.detail; $('give-ok').disabled = false; });
+  $('give-ok').addEventListener('click', function () {
+    var o = giving, to = giveTo, it = ITEMS[o.p.id];
+    var from = o.owner === 'stash' ? 1 : men(byId[o.owner]);
+    var toMen = to === 'stash' ? 1 : men(byId[to]);
+    $('sheet-give').close();
+    var extra = from - toMen;
+    commit(it.name + ': ' + ownerName(o.owner) + ' → ' + ownerName(to) + (extra > 0 ? ' (' + extra + ' more into the stash)' : '') + ', paid ' + o.p.paid + ' gc moves along', 0, function () {
+      var p = takeFrom(o.owner, o.i);
+      if (to === 'stash') { for (var k = 0; k < from; k++) st.stash.push(piece(p.id, p.paid)); return; }
+      if (toMen > 1) { // a group takes one piece per man from the stash
+        var left = toMen - 1;
+        st.stash = st.stash.filter(function (q) { if (left && q.id === p.id) { left--; return false; } return true; });
+      }
+      byId[to].gear.push(p);
+      for (var j = 0; j < extra; j++) st.stash.push(piece(p.id, p.paid));
+    });
+  });
+
+  /* ---------- the list rows open their sheets ---------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-buy]');
+    if (b) {
+      buyId = b.dataset.buy; buyTo = 'stash';
+      var it = ITEMS[buyId];
+      $('buy-title').textContent = it.name;
+      $('buy-line').textContent = CAT[it.cat] + ' · Common · ' + it.price + ' gc';
+      $('buy-text').textContent = it.text;
+      recipients($('buy-to'), buyId, null, null);
+      pressFirst($('buy-to'), 'stash'); updateBuy();
+      window.mockOpen('sheet-buy');
+      return;
+    }
+    var s = e.target.closest('[data-search]');
+    if (s) {
+      seeker = s.dataset.search; sItem = 'pistol';
+      $('s-title').textContent = byId[seeker].name + ' searches';
+      $('s-roll').value = ''; $('s-price').value = '';
+      sItems(); sUpdate();
+      window.mockOpen('sheet-search');
+      return;
+    }
+    var l = e.target.closest('[data-sell]');
+    if (l) {
+      selling = pieceAt(l.dataset.sell);
+      var sp = salePrice(selling.p, selling.owner), itm = ITEMS[selling.p.id];
+      $('sell-title').textContent = 'Sell ' + itm.name + (sp.q > 1 ? ' ×' + sp.q : '');
+      $('sell-from').textContent = selling.owner === 'stash' ? 'From the stash.' : 'From ' + byId[selling.owner].name + (sp.q > 1 ? ': all ' + sp.q + ' pieces — a group is always equipped alike.' : '.');
+      $('sell-calc').innerHTML = 'Half of ' + itm.price * sp.q + ' gc' + (itm.dice ? ' (the fixed part of ' + priceText(itm) + ')' : '') + ': <b>' + sp.gc + ' gc</b>';
+      $('sell-round').textContent = sp.half !== sp.gc ? sp.half + ' rounded down — the rules do not say; a question for Rob.' : 'Change the amount if a rule or a deal says otherwise.';
+      $('sell-gc').value = sp.gc;
+      $('sell-ok').disabled = false; $('sell-ok').textContent = 'Sell · ' + sp.gc + ' gc';
+      window.mockOpen('sheet-sell');
+      return;
+    }
+    var g = e.target.closest('[data-give]');
+    if (g) {
+      giving = pieceAt(g.dataset.give); giveTo = null;
+      var gi = ITEMS[giving.p.id], have = giving.owner === 'stash' ? st.stash.filter(function (q) { return q.id === giving.p.id; }).length : 1;
+      $('give-title').textContent = 'Give ' + gi.name;
+      $('give-from').textContent = (giving.owner === 'stash' ? 'From the stash' : 'From ' + byId[giving.owner].name) + ' · paid ' + giving.p.paid + ' gc · ' + gi.text;
+      recipients($('give-to'), giving.p.id, have, giving.owner);
+      $('give-ok').disabled = true;
+      window.mockOpen('sheet-give');
+    }
+  });
+
+  drawAll();
+  showTab(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
