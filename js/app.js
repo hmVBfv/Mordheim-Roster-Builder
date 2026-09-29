@@ -163,6 +163,9 @@ export function unhireHS(uid){ S.hired=hsList().filter(h=>h.uid!==uid); render()
 /* Anzeige-Panel: Grade-Filter · anheuerbare HS (mit Hire-Button) · angeheuerte HS
    (mit Profil, Upkeep, Remove). Rekrutierung schreibt in S.hired. */
 export let hsEqOpen={};
+/* Remembers an open "Extra equipment" panel across renders (inline handlers
+   reach only what is on window, so the handler calls this). */
+export function setHsEqOpen(k,open){ hsEqOpen[k]=!!open; }
 /* HAUSREGEL: HS/DP zusätzlich ausrüsten. RAW ist die Ausrüstung eines Hired Sword
    fix (die "Equipment:"-Zeile seines Eintrags); es gibt keine Kaufliste für ihn.
    Daher standardmäßig AUS. Ist sie an, darf er aus der Helden-Ausrüstungsliste
@@ -194,7 +197,7 @@ export function hsEqSection(rec){
     return `<div class="eqcat">${cat}</div>${items}`;
   }).join('');
   const c=hsEqCost(rec);
-  return `<details class="sec-details eq-det" ${open?'open':''} ontoggle="hsEqOpen['${rec.uid}']=this.open">
+  return `<details class="sec-details eq-det" ${open?'open':''} ontoggle="setHsEqOpen('${rec.uid}',this.open)">
       <summary class="sec-sum">Extra equipment (house rule)${c?` <span class="hr-on">${c} gc</span>`:''}</summary>
       <div class="sec-body"><div class="eqnote">RAW: a Hired Sword's equipment is fixed. This optional list lets him buy from the warband's Hero equipment chart.</div>${rows}</div>
     </details>`;
@@ -314,11 +317,11 @@ export function spellChipRow(rec,e){ if(!e||!e.magic||!SPELLS[e.magic]) return '
   const chips=sel.map(sp=>{ const d=(typeof spellEffDiff==='function')?spellEffDiff(sp):null;
     const t=String(spellEffect(sp.name,lore)||'').replace(/"/g,'&quot;').replace(/'/g,"\\'");
     const nm=spellLabel(sp.name);
-    return `<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${String(nm).replace(/'/g,"\\'")}${d!=null?' ('+d+')':''}</b><br>${t}',false,320)" onmouseleave="hideItip()">${nm}${d!=null?` <b>(${d})</b>`:''} \u24d8</span>`; }).join('');
+    return `<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${String(nm).replace(/'/g,"\\'")}${d!=null?' ('+d+')':''}</b><br>${t}',false,320)" onmouseleave="hideItip()" onclick="toggleItipFrom(event,this)">${nm}${d!=null?` <b>(${d})</b>`:''} \u24d8</span>`; }).join('');
   return `<div class="abil-sk"><b>Spells (${SPELLS[lore].name}):</b> ${chips}</div>`; }
 export function skillChipRow(names,label,e){ if(!names||!names.length) return '';
   const chip=(nm)=>{ const t=skillText(nm,e).replace(/"/g,'&quot;').replace(/'/g,"\\'");
-    return t?`<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${nm.replace(/'/g,"\\'")}</b><br>${t}',false,300)" onmouseleave="hideItip()">${nm} \u24d8</span>`
+    return t?`<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${nm.replace(/'/g,"\\'")}</b><br>${t}',false,300)" onmouseleave="hideItip()" onclick="toggleItipFrom(event,this)">${nm} \u24d8</span>`
             :`<span class="kwchip kw-plain">${nm}</span>`; };
   return `<div class="abil-sk"><b>${label||'Skills'}:</b> ${names.map(chip).join('')}</div>`; }
 /* ---- keyword scanning must respect negation ----
@@ -362,7 +365,7 @@ export function hsAbilitySection(hs,rec){
   const skFound=skillChipsIn(sp).filter(n=>!seen.has(n));
   const chip=(label,lookup)=>{ const esc=String(lookup).replace(/'/g,"\\'"); return `<span class="kwchip" tabindex="0" onmouseenter="showItip(this,'${esc}')" onmouseleave="hideItip()" onfocus="showItip(this,'${esc}')" onblur="hideItip()" onclick="toggleItip(event,this,'${esc}')">${label} \u24d8</span>`; };
   const skChip=(nm)=>{ const t=skillText(nm).replace(/"/g,'&quot;').replace(/'/g,"\\'");
-    return `<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${nm.replace(/'/g,"\\'")}</b><br>${t}',false,300)" onmouseleave="hideItip()">${nm} \u24d8</span>`; };
+    return `<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,'<b>${nm.replace(/'/g,"\\'")}</b><br>${t}',false,300)" onmouseleave="hideItip()" onclick="toggleItipFrom(event,this)">${nm} \u24d8</span>`; };
   let html=`<div class="abil"><div class="abil-h">Abilities &amp; Special Rules</div>`;
   const gained=(rec&&rec.skills)?rec.skills:[];
   html+=skillChipRow([...fixedSkills(hs,rec),...gained],'Skills',hs);
@@ -2837,7 +2840,7 @@ export function abilitySection(def, m){
   if(found.length){   const _mk=(typeof markRulesFor==='function')?markRulesFor(m):[];
   if(_mk.length) html+=`<div class="abil-sk"><b>Mark rules:</b> `+_mk.map(function(x){
     const nm=x[0], t=String(x[1]).replace(/"/g,'&quot;').replace(/'/g,"\\'");
-    return '<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,\'<b>'+nm+'</b><br>'+t+'\',false,340)" onmouseleave="hideItip()">'+nm+' \u24d8</span>'; }).join('')+`</div>`;
+    return '<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,\'<b>'+nm+'</b><br>'+t+'\',false,340)" onmouseleave="hideItip()" onclick="toggleItipFrom(event,this)">'+nm+' \u24d8</span>'; }).join('')+`</div>`;
 html+=`<div class="abil-kw no-print">`+found.map(info=>chip(info.name,info.key)).join('')+`</div>`; }
   if(_mlore && _msp.length){
     const txt=_msp.map(s=>{const d=spellEffDiff(s);return spellLabel(s.name)+(d!=null?` (${d})`:'');}).join(', ');
@@ -3479,7 +3482,7 @@ export function marauderMarkSection(m, isSeer){
   const lore=markLore(), hasMark=!!S.mark;
   const chips=markRulesFor(m).map(function(x){
     const nm=x[0], t=String(x[1]).replace(/"/g,'&quot;').replace(/'/g,"\\'");
-    return '<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,\'<b>'+nm+'</b><br>'+t+'\',false,340)" onmouseleave="hideItip()">'+nm+' \u24d8</span>';
+    return '<span class="kwchip" tabindex="0" onmouseenter="showItipHTML(this,\'<b>'+nm+'</b><br>'+t+'\',false,340)" onmouseleave="hideItip()" onclick="toggleItipFrom(event,this)">'+nm+' \u24d8</span>';
   }).join('');
   if(isSeer){
     const sel='<select class="advsel no-print" onchange="setMark(this.value)"><option value="">\u2014 choose the Mark \u2014</option>'
@@ -3797,7 +3800,7 @@ export function renderSidebar(){
 }
 
 /* ===================== HAUSREGEL-PANEL ===================== */
-export let hrOpen=false, campOpen=false, hsOpen=false, dpOpen=false, ovOpen=true, stashOpen=true, wbOpen=true;
+export let hrOpen=false, campOpen=false, hsOpen=false, dpOpen=false;
 export function setSecOpen(which,v){ v=!!v;
   if(which==='hr')hrOpen=v; else if(which==='hs')hsOpen=v; else if(which==='dp')dpOpen=v; else if(which==='camp')campOpen=v; }
 /* House Rules: Eine Regel gilt als AKTIV, sobald sie vom Standard abweicht.
@@ -4222,6 +4225,16 @@ export function showPreview(el,key,pin){ const e=HIREDSWORDS[key]||DRAMATIS[key]
 export function toggleItipPreview(ev,el,key){ ev.stopPropagation(); ev.preventDefault(); const t=document.getElementById('itip');
   if(itipPinned && t && t.style.display==='block'){ itipPinned=false; hideItip(true); } else { showPreview(el,key,true); } }
 export function hideItip(force){ if(itipPinned && !force) return; const t=document.getElementById('itip'); if(t) t.style.display='none'; }
+/* A tap on a chip whose tooltip is built in its onmouseenter: shows it pinned,
+   or hides it when it is already shown. Without this, a tooltip hidden by
+   scrolling could not be brought back by tapping the same chip again - a
+   phone fires no second mouseenter. */
+export function toggleItipFrom(ev,el){
+  ev.stopPropagation(); ev.preventDefault();
+  const t=document.getElementById('itip');
+  if(itipPinned && t && t.style.display==='block'){ itipPinned=false; hideItip(true); }
+  else if(el && typeof el.onmouseenter==='function'){ el.onmouseenter(); itipPinned=true; }
+}
 export function toggleItip(ev,el,nm){
   ev.stopPropagation(); ev.preventDefault();
   const t=document.getElementById('itip');
@@ -4336,7 +4349,7 @@ Object.assign(window, {
   loseFoothold, cfSetFoothold, applyBattleTerritory,
   battleSides, sideModels, sideName, sideWb,
   setEqQty, setExp, setExpJump, setGoldCurrent, setHeirloom, setHouseActive, setSecOpen,
-  setHouseBool, setHouseNotes, setHouseNum, setHouseStr, setHsAdvOpen, setHsEq,
+  setHouseBool, setHouseNotes, setHouseNum, setHouseStr, setHsAdvOpen, setHsEq, setHsEqOpen,
   setHsExp, setHsFilter, setHsGrade, setHsSpOpen, setInjOpen, setLeader,
   setLore, setMark, setName, setQty, setRarePaid, setRareQty,
   setRareTarget, setSpellOpen, setupBuilder, showItip, showItipHTML, showPreview,
@@ -4346,7 +4359,7 @@ Object.assign(window, {
   spellStartCount, startGold, stashAddItem, stashAdj, stashItemQty, stashRemItem,
   stashSet, statBarHS, statFilterBar, statNum, statTable, statTableHS,
   statTableM, svFromText, svLabel, svOfEntry, svOfModel, toggleEq,
-  toggleItip, toggleItipPreview, toggleMut, togglePromoCat, toggleWeaponUpgrade, totalHeroes,
+  toggleItip, toggleItipFrom, toggleItipPreview, toggleMut, togglePromoCat, toggleWeaponUpgrade, totalHeroes,
   totalModels, totalRating, totalSpent, translateTerms, ttsOpen, ttsOpenMember, ttsOpenDP,
   ttsOpenHS, ttsText, ttsTextHS, unhireDP, unhireHS, unitBaseCost,
   unitDef, unitFamilies, unitMax, unpromote, upgradePaid, upgradeTargets,
