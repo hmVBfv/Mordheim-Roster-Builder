@@ -104,7 +104,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       <div className={ui.row}>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <button type="button" className={ui.buttonQuiet}
-          onClick={() => { void db.warbands.delete(rec.id).then(() => navigate('/warbands', { state: { removed: rec } })); }}>
+          onClick={() => { void db.warbands.delete(rec.id).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
           Remove from this device
         </button>
       </div>

@@ -92,6 +92,11 @@
   gap: var(--space-1);
 }
 
+/* the file picker is a touch target like any button (docs/ui.md §5) */
+.field input[type='file'] {
+  min-height: 44px;
+}
+
 .textarea {
   width: 100%;
   min-height: 8rem;
