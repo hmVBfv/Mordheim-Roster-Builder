@@ -102,6 +102,19 @@ export interface InjuryDef {
   [key: string]: unknown;
 }
 
+/** Who may have a catalogue item (its restriction text `wb` as data). */
+export interface CatalogOnly {
+  /** Warbands that may: 'key', 'key:variant', 'key/unit,unit'. */
+  wb?: string[];
+  /** Warbands that may not. */
+  notWb?: string[];
+  heroes?: boolean;
+  /** Only warbands of men (WBHIRE[…].human). */
+  human?: boolean;
+  /** Only spellcasters. */
+  casters?: boolean;
+}
+
 export interface CatalogItem {
   /** German name (the key used in rosters). */
   de: string;
@@ -110,7 +123,9 @@ export interface CatalogItem {
   /** A number, or a string for variable prices ("25+2D6", "+20", "4× Preis"). */
   cost: number | string;
   rare: string;
+  /** The restriction as written ("Dwarfs only"); a note when `only` is absent. */
   wb: string;
+  only?: CatalogOnly;
 }
 
 export interface UpgradeDef {

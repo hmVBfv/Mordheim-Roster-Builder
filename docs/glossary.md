@@ -44,6 +44,7 @@ Begriff einführt, trägt ihn hier ein.
 | Gründungspreis | Founding price | Listenzeile `[name, preis, {start: true}]`, `startOnlyRow()`, `UPGRADES[…].start` |
 | Trading Post | Trading Post | `rareEligibleItems()`, `CATALOG` |
 | nur für Helden (Listenzeile) | Heroes only | `{heroes: true}` |
+| einer Warband vorbehalten (Katalog) | – | `CATALOG[…].only`, `catalogAllowed()` |
 | nur für eine Variante (Stadt, Stamm) | – | `{sub: ['midd']}` |
 | gesperrter Skill einer Warband | – | `WARBANDS[…].noSkills` |
 | Post-Battle-Hilfe | Post-battle | `postBattleHelp()`, `data/postbattle.json` |

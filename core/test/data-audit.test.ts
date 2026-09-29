@@ -152,3 +152,52 @@ describe('other warbands', () => {
     expect((unit('carnival', 'cart').attached as { label: string }[]).map((x) => x.label)).toEqual(['Cart', 'Wheel', 'Horse', 'Guardian']);
   });
 });
+
+/* docs/rules-audit.md, E: the catalogue's restrictions ("Dwarfs only") were
+   text only, and the Trading Post offered such items to anyone. */
+describe('catalogue restrictions', () => {
+  // texts that are notes about price or rarity, or restrictions the warband
+  // cannot express (the mount, the Khemri setting), not a list of who may buy
+  const NOTES = ['1st free', '(Arabian/Khemri)', 'Common for Amazons (Lustria)', 'Common if warband includes Goblins',
+    'Rare 6 for Warrior-Priests/Sisters', 'Warhorses only', 'cavalry only'];
+  it('every restriction text has its data, or is a note', () => {
+    const open = data.CATALOG.filter((x) => x.wb && !x.only && !NOTES.includes(x.wb)).map((x) => `${x.en}: ${x.wb}`);
+    expect(open).toEqual([]);
+    expect(data.CATALOG.filter((x) => x.only && NOTES.includes(x.wb)).map((x) => x.en)).toEqual([]);
+  });
+  it('names only warbands, variants and units that exist', () => {
+    const bad: string[] = [];
+    for (const x of data.CATALOG) {
+      for (const e of [...(x.only?.wb ?? []), ...(x.only?.notWb ?? [])]) {
+        const [w = '', units] = e.split('/');
+        const [k = '', sub] = w.split(':');
+        const wb = data.WARBANDS[k];
+        if (!wb) { bad.push(`${x.en}: ${k}`); continue; }
+        if (sub && !(wb.subtypes ?? []).some((s) => s.key === sub)) bad.push(`${x.en}: ${k}:${sub}`);
+        for (const u of units ? units.split(',') : []) if (!wb.units.some((y) => y.id === u)) bad.push(`${x.en}: ${k}/${u}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+  it('the Trading Post keeps to them', () => {
+    const offered = (wb: string, sub: string | null, id: string, eq: string[] = []) => {
+      let s = { ...core.newWarband(data, wb), subtype: sub } as WarbandState;
+      s = core.addUnit(core.ctxOf(data, s), id);
+      const uid = s.models[s.models.length - 1]!.uid;
+      for (const e of eq) s = core.setEqQty(core.ctxOf(data, s), uid, e, 1);
+      const m = s.models.find((x) => x.uid === uid)!;
+      return core.rareEligibleItems(core.ctxOf(data, s), m).map((x) => x.en);
+    };
+    const merc = offered('merc', 'reik', 'capt', ['Schwert']);
+    for (const x of ['Dwarf axe', 'Censer', 'Starblade', 'Trident', 'Pike']) expect(merc, x).not.toContain(x);
+    expect(merc).toContain('Rapier');
+    expect(offered('merc', 'midd', 'capt', ['Schwert'])).not.toContain('Rapier');
+    expect(offered('hochland', null, 'prince')).toContain('Main gauche');
+    expect(offered('skaven', null, 'runner')).toContain('Weeping blades');
+    // who has the item in his own list keeps it, whatever the text says
+    expect(cat('Zwergenaxt')?.only?.wb).toContain('pitfighters/trollslayer');
+    expect(offered('kislev', null, 'capt')).toContain('Vodka');
+    expect(offered('kislev', null, 'warrior')).not.toContain('Vodka');
+    expect(offered('undead', null, 'vamp', ['Schwert'])).not.toContain('Garlic');
+  });
+});
