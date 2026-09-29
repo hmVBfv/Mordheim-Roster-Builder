@@ -251,15 +251,21 @@ Waffenart). Test: `test/rare-restrictions.mjs`, `core/test/data-audit.test.ts`
 bloßen Hinweise); die Paritätstests vergleichen beide Apps über alle
 Warbands.
 
-**Bitte prüfen (Robs Entscheidung),** wo der Text mehr als eine Lesart
-zulässt – umgesetzt ist jeweils die erste:
+**Entschieden (Rob, 29.09.2026):**
+
+| Text | Gilt für |
+| --- | --- |
+| Dwarfs only (Dwarf axe) | Dwarf Treasure Hunters, Dwarf Rangers, der Troll Slayer der Pit Fighters (steht in seiner Liste) **und Zwerge als Hired Swords** (`only.hires: ["dwarf"]`: Troll Slayer, Pathfinder, Treasure Hunter, Runesmith Journeyman, Slayer Pirate). Heute bekommt ein Hired Sword in keiner App etwas aus dem Katalog (seine Ausrüstung ist RAW fest; die Hausregel „Hired Swords may buy extra equipment“ kauft aus der Heldenliste der Warband) – die Angabe greift, sobald das Umverteilen (V4) Gegenstände an Hired Swords geben kann. Test: `core/test/data-audit.test.ts` |
+| Skaven only (Fighting claws, Weeping blades, Warplock pistol) | beide Skaven-Warbands (Eshin, Pestilens) |
+| Undead („not Undead“ u. a.) | Undead, Restless Dead und Tomb Guardians |
+| „(Arabian/Khemri)“ | keine Beschränkung: Gegenstände des Khemri-Settings für jede Warband dort, außer eine Quelle sagt ausdrücklich etwas anderes |
+
+**Umgesetzt nach der naheliegenden Lesart, ohne Rückmeldung** – bei Bedarf
+sagen:
 
 | Text | Umgesetzt | Andere Lesart |
 | --- | --- | --- |
-| Dwarfs only (Dwarf axe) | Dwarf Treasure Hunters, Dwarf Rangers, der Troll Slayer (steht in seiner Liste) | auch Zwerge als Hired Swords |
-| Skaven only (Fighting claws, Weeping blades, Warplock pistol) | beide Skaven-Warbands (Eshin, Pestilens) | nur Clan Eshin |
 | Goblins only (Ball and chain, Squig prodder) | Night Goblins, Forest Goblins, die Goblins der Orc Mob | nur Night Goblins |
-| Undead („not Undead“ u. a.) | Undead, Restless Dead, Tomb Guardians | nur die Warband „Undead“ |
 | Elves („not Elves“) | Wood Elves, Dark Elves, Shadow Warriors | – |
 | Cathay / Emissary (Cathayan Longsword) | Battle Monks of Cathay | auch jede Warband mit dem Swordsmith als Hired Sword |
 | Marauders of Chaos (Chosen of Chaos) (Great axe) | Chieftain, Seer und Champion der Marauders (alle drei haben sie in ihrer Liste) | nur ein bestimmter Held |
@@ -268,8 +274,7 @@ zulässt – umgesetzt ist jeweils die erste:
 | Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival (Obsidian weapon, Chaos armour) | Marauders, Norse, Beastmen, Sons of Hashut, Black Dwarfs, Possessed, Carnival | auch der Court of the Profane Pleasures |
 | Vampires and Necromancers (Book of the Dead) | Vampire und Necromancer der Undead, Necromancer der Restless Dead | – |
 
-**Bewusst ohne Beschränkung** (Text bleibt Hinweis): „(Arabian/Khemri)“ –
-eher Gegenstände des Khemri-Settings für jede Warband dort, bitte bestätigen;
-„cavalry only“ (Lance) und „Warhorses only“ (Barding) – hängen am Reittier,
-nicht an der Warband; „1st free“, „Common for …“, „Rare 6 for …“ – Preis oder
-Seltenheit, keine Beschränkung.
+**Bewusst ohne Beschränkung** (Text bleibt Hinweis): „(Arabian/Khemri)“
+(siehe oben); „cavalry only“ (Lance) und „Warhorses only“ (Barding) – hängen
+am Reittier, nicht an der Warband; „1st free“, „Common for …“, „Rare 6 for …“
+– Preis oder Seltenheit, keine Beschränkung.

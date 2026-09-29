@@ -233,6 +233,9 @@
      "dwarftreasure",
      "dwarfrangers",
      "pitfighters/trollslayer"
+    ],
+    "hires": [
+     "dwarf"
     ]
    }
   },
