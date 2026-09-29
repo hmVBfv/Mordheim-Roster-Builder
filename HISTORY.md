@@ -1457,3 +1457,38 @@ first phone rules were silently overridden by an `.addrow` rule further
 down the stylesheet. Its "Saved." notices swallowed taps in the same way
 as the new app's. Both are fixed and covered by a Playwright project that
 loads the group's saves into the legacy app.
+
+## September 29, 2026 — founding prices, a helper for after the battle
+
+Rob answered the ten rules questions, and most answers came down to one
+distinction the tool did not make: a price in a warband list can be a
+*founding* price. The Nightmare costs the Cursed Cavalcade 30 gc when the
+warband is founded and 95 gc when a Hero finds one later; the same pattern
+turned up, once looked for, in the Mechanical Suit, the Engine of Chaos,
+the Dwarfs' gromril and the Shadow Warriors' Ithilmar. The tool had the
+Nightmare at 95 in the list, and whatever stood in a list never appeared
+at the Trading Post. List rows can now say "founding only"; the campaign
+stage decides which price applies. The obvious measure of "has fought" —
+recorded battles — would have missed the whole group: their saves have
+the campaign mode off and stand at "Setup". So outside the campaign mode
+nothing changes, and the new builder will ask for the stage on import.
+
+The Sons of Hashut's obsidian weapon became the Zharr obsidian weapon,
+after the Chaos Dwarfs' city, because it shared a name — and with it the
+tooltip — with the obsidian upgrade of Border Town Burning. Old saves are
+renamed on loading, in both apps.
+
+A subagent pressed every control of the legacy app, 4,801 of them in ten
+states at two widths. One was broken outright (a house-rule panel whose
+handler referred to a variable it could not reach); a static test now
+checks every name in every inline handler. The rest were layout: a
+campaign file that widened the phone page by 296 px, name fields 23 px
+wide, a sidebar taller than the window that hid the Stash.
+
+Rob asked for a post-battle helper like mordheimer.net's, with tables and
+no dice. The campaign checklist existed but only linked out, and only in
+the campaign mode the group does not use; the helper now opens from the
+top bar, with every table in our own short words. A WebFetch will not
+quote the exploration chart at length, so each location was read twice
+in different ways and the few disagreements settled by a narrow third
+question. The first test counted 36 special locations; there are 30.
