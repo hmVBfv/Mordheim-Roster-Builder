@@ -37,4 +37,11 @@ describe('importing warbands', () => {
     expect(unknown.ok).toBe(false);
     expect(await db.warbands.count()).toBe(0);
   });
+
+  it('says so when it is handed a campaign file (button audit, 29.09.2026)', async () => {
+    const cf = JSON.stringify({ type: 'mordheim-campaign-file', version: 1, name: 'Spring', warbands: [], battles: [] });
+    for (const r of [await importText(data, cf, NOW, id), await importFile(data, new Blob([cf]), NOW, id)]) {
+      expect(r).toEqual({ ok: false, msg: expect.stringMatching(/campaign file/) });
+    }
+  });
 });

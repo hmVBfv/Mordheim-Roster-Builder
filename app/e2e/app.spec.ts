@@ -80,6 +80,7 @@ test('Back closes the import sheet and stays on the screen', async ({ page }) =>
   const here = page.url();
   await page.getByRole('button', { name: 'Import a warband' }).first().click();
   await expect(page.locator('dialog[open]')).toHaveCount(1);
+  await tapTargets(page); // the file picker too (button audit, 29.09.2026)
   await page.goBack();
   await expect(page.locator('dialog[open]')).toHaveCount(0);
   expect(page.url()).toBe(here);
@@ -101,6 +102,18 @@ test('after an import, Back returns to where the import began, not to the sheet'
   await page.goBack();
   expect(page.url()).toBe(list);
   await expect(page.locator('dialog[open]')).toHaveCount(0);
+});
+
+/* Removing a warband leaves no step back to it (button audit, 29.09.2026). */
+test('after removing a warband, Back does not lead to it', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Warbands' }).click();
+  await importSample(page);
+  await page.getByRole('button', { name: 'Remove from this device' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Warbands' })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByText('Not on this device')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1, name: 'Warbands' })).toBeVisible();
 });
 
 /* The undo notice must not stand in the way (Rob, 28.09.2026). */
