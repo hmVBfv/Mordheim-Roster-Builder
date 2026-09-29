@@ -72,6 +72,7 @@ Report a problem   überall erreichbar
 | Auswahl der Sichtbarkeit | Schutz vor versehentlichem Verraten |
 | Background | viel Struktur (Stränge, Enthüllungsstufen) auf wenig Platz |
 | Roster (neu) | meistgenutzter Bildschirm, heute nicht handytauglich |
+| Trading Post (V6) | Kaufen, Suchen, Verkaufen und Umverteilen nach dem ersten Kampf; viele Regeln auf einmal |
 
 Mockups liegen als statische Seiten unter `docs/mockups/` und werden auf dem
 Handy geprüft, bevor die Umsetzung beginnt. Sie nutzen dieselben
@@ -90,6 +91,7 @@ reaktive Knöpfe“).
 | `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
 | `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt |
 | `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1) |
+| `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, Rundung als offene Frage), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter |
 
 ## 4. Themes und Gestaltung
 

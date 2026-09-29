@@ -12,7 +12,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
-const PAGES = ['index', 'roster', 'game-night', 'timeline', 'changes', 'visibility', 'background'];
+const PAGES = ['index', 'roster', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give',
+  'game-night', 'timeline', 'changes', 'visibility', 'background'];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
 const IN_SHEET = 'button:visible, a:visible, input[type=checkbox]:visible';
 
