@@ -9,16 +9,34 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
+<script src="warband-art.js"></script>
 <style>
-  /* Mordheim at night: original pixel art, three frames (the comet's tails
-     shimmer, windows flicker, the wyrdstone pulses); still under reduced motion */
-  .sky { display: block; width: 100%; height: auto; aspect-ratio: 64 / 20; border: 1px solid var(--border); border-radius: var(--radius); background: #0b0d12; image-rendering: pixelated; }
-  .sky .fB, .sky .fC { opacity: 0; }
+  /* Mordheim at night: original pixel art in layers over a base picture.
+     Usually the twin-tailed comet hangs over the city (its tails shimmer,
+     windows flicker, the wyrdstone in the rubble flares). On some visits it
+     comes down: seven frames once, a flash, fire, smoke, then the crater
+     smoulders and the wyrdstone burns bright. ?impact=1 or 0 decides it for
+     a test. Still under reduced motion, and never the flash. */
+  .sky { display: block; width: 100%; height: auto; aspect-ratio: 80 / 25; border: 1px solid var(--border); border-radius: var(--radius); background: #0b0d12; image-rendering: pixelated; }
+  .sky g { opacity: 0; }
+  .sky .base, .sky:not(.impact) .pA { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .sky.impact .aA { opacity: 1; } }
   @media (prefers-reduced-motion: no-preference) {
-    .sky .fA { animation: skA 8s steps(1, end) infinite; }
-    .sky .fB { animation: skB 8s steps(1, end) infinite; }
-    .sky .fC { animation: skC 8s steps(1, end) infinite; }
+    .sky:not(.impact) .pA { animation: skA 8s steps(1, end) infinite; }
+    .sky:not(.impact) .pB { animation: skB 8s steps(1, end) infinite; }
+    .sky:not(.impact) .pC { animation: skC 8s steps(1, end) infinite; }
+    .sky.impact .i1 { animation: skOn 0.45s 0.4s steps(1, end); }
+    .sky.impact .i2 { animation: skOn 0.4s 0.85s steps(1, end); }
+    .sky.impact .i3 { animation: skOn 0.25s 1.25s steps(1, end); }
+    .sky.impact .i4 { animation: skOn 0.15s 1.5s steps(1, end); }
+    .sky.impact .i5 { animation: skOn 0.5s 1.65s steps(1, end); }
+    .sky.impact .i6 { animation: skOn 0.9s 2.15s steps(1, end); }
+    .sky.impact .i7 { animation: skOn 0.9s 3.05s steps(1, end); }
+    .sky.impact .aA { animation: skA 8s 3.95s steps(1, end) infinite; }
+    .sky.impact .aB { animation: skB 8s 3.95s steps(1, end) infinite; }
+    .sky.impact .aC { animation: skC 8s 3.95s steps(1, end) infinite; }
   }
+  @keyframes skOn { 0%, 100% { opacity: 1; } }
   @keyframes skA { 0% { opacity: 1; } 40% { opacity: 0; } 46% { opacity: 1; } 70% { opacity: 0; } 84% { opacity: 1; } 100% { opacity: 1; } }
   @keyframes skB { 0% { opacity: 0; } 40% { opacity: 1; } 46% { opacity: 0; } 100% { opacity: 0; } }
   @keyframes skC { 0% { opacity: 0; } 70% { opacity: 1; } 84% { opacity: 0; } 100% { opacity: 0; } }
@@ -30,6 +48,8 @@
   .tasks .go { color: var(--text-muted); }
   .tasks .urgent { border-color: var(--accent); }
   .tile { display: grid; gap: 2px; padding: var(--s3) var(--s4); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; }
+  .tile:has(.art) { grid-template-columns: 48px 1fr; column-gap: var(--s3); align-items: center; }
+  .tile .art { grid-row: 1 / span 3; }
   .tile h3 { font-size: 1.08rem; }
   .tile .muted { font-size: 0.9rem; }
   .choice { display: grid; grid-template-columns: auto 1fr; gap: 0 var(--s2); align-items: start; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
@@ -47,7 +67,7 @@
   </header>
 
   <div class="content">
-    <svg class="sky" id="sky" viewBox="0 0 64 20" shape-rendering="crispEdges" aria-hidden="true" focusable="false"></svg>
+    <svg class="sky" id="sky" viewBox="0 0 80 25" shape-rendering="crispEdges" aria-hidden="true" focusable="false"></svg>
     <div class="greet">
       <h1>Evening, Rob.</h1>
       <p class="muted">Battle 6 at the Hel Fenn ferry is being played. Three entries wait on this phone until the server is in reach.</p>
@@ -66,7 +86,7 @@
 
     <section class="stack" aria-labelledby="wb-h">
       <h2 id="wb-h">Your warbands</h2>
-      <a class="tile" href="roster.html"><h3>The Silver Caravan</h3><span class="muted">Mercenaries – Reikland · Rating 118 · 55 gc</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></a>
+      <a class="tile" href="roster.html"><svg class="art" data-art="caravan" aria-hidden="true" focusable="false"></svg><h3>The Silver Caravan</h3><span class="muted">Mercenaries – Reikland · Rating 118 · 55 gc</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></a>
       <a class="btn-quiet" href="warbands.html">All warbands and import</a>
     </section>
 
@@ -98,74 +118,391 @@
 
 <script>
 (function () {
-  window.mockPixel(document.getElementById('sky'), {"K":"#0b0d12","k":"#11141b","s":"#6f7480","c":"#e9f5d9","C":"#8fd88f","t":"#3c6b46","b":"#25222b","B":"#35313c","r":"#2a242a","g":"#6fe07a","G":"#2d6b36","w":"#e0a642","W":"#6e4f1f"}, {
-    fA: [
-      'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
-      'KKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKCKKKKKKKKKK',
-      'KKKKKKKKKKKKKKKKKsKKbKKKKKKKKKKKKKKKKKKKKKKKKKKKKKCCccKKKKsKKKKK',
-      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKsKKKKKKKKCCCKCcKKKKKKKKKKK',
-      'KKKKKKKKKsKKKKKKKKKbbKKKKKKKKKKKKKKKKKKKKKKKtttKKbbKKKKKKKKKKKKK',
-      'KKKKKKKKKKKKKKKKKKKbbbKKsKKKKKKKKKKKKKKKKtttKKKKCbbKKKKKKKKKKsKK',
-      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKKttKKKsKKtKbbbKKKKKKKKKKKK',
-      'kkkkkkkkkkkkbskkkkkbbkkkkkkkkkkkkkkkkkkkkkkkkttkBbbbkkkkkkkkkkkk',
-      'kkkkkkkkkkkbbbkkkkBbbkkkkkkskkkkkkkkkkkkkkbbbkkkBbbbbkkkkkbkkkkk',
-      'kkkkkkbkkkBbbbkkkkBbbbkkkkkkkkkkkkkkkkkkkBbbbkkkBbbbbkkkkbbbkkkk',
-      'kkbkkBbbkkBbbbbkkkBbbbkbkkkkkkkkkkkkkkkkkBbbbbkkBbwbbkkkBbbbkkkk',
-      'kbbbkBbbbkBbwbbkbkBwbbBbbkkkkkkkkkkkkkbbtBbbbbBbBbbbbkbkBbbbbkbk',
-      'BbbbkBbbbkBbbbbBbbBbbbBbbbkbkkkkkkkkkBbbkBbwbbBbBbbbbBbkBbbbbBbb',
-      'BbbbbBbWbBBbbbbBbbBbbbBbbbBbbkkkGkkkkBbbbBbbbbBbBbbbbBbbBbwbbBbb',
-      'BbwbbBbbbBBbbbbBbbBbbbBbwbBbbGkkkkkkGBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbkGGGGGGkBbWbBbbbbBbBbbbbBbbBbbbbBWb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrggggrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrggrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb'
+  var sky = document.getElementById('sky');
+  var ask = new URLSearchParams(location.search).get('impact');
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // one visit in three, never while a test drives the browser unless it asks
+  if (ask === '1' || (ask !== '0' && !calm && !navigator.webdriver && Math.random() < 1 / 3)) sky.classList.add('impact');
+  window.mockPixel(sky, {"K": "#0b0d12", "k": "#11141b", "j": "#151a1d", "s": "#6f7480", "h": "#1f3a28", "c": "#f2fbe6", "C": "#9be39b", "t": "#3c6b46", "b": "#25222b", "B": "#3a3441", "r": "#2a242a", "R": "#1c181d", "d": "#19161a", "e": "#2b262c", "g": "#6fe07a", "G": "#2d6b36", "l": "#d2ffb8", "w": "#e0a642", "W": "#6e4f1f", "F": "#e6f7d4", "f": "#bfe3a8", "x": "#0a0a0c", "o": "#f0a030", "O": "#b0461e", "m": "#34343b", "M": "#44444c", "n": "#1b3322", "y": "#ffe08a"}, {
+    base: [
+      'KKKKKKKKKKKKsKKKKbKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKK',
+      'KKsKKKKKKKKKKKKKKbKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKbbbKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKsK',
+      'KKKKKKKKKKKKKKKKbbbsKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKK',
+      'KKKKKKKsKKKKKKKKbbbKKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
+      'kKKKkKKKkKKKkKKKbbbbkKKKkKKKkKKskKKKkKKKkKKKkKKKkKKKkKKKkKKbbKKKkKKKkKKKkKKskKKK',
+      'kKkKkKkKkKkKkKkKbbbKbKkKkKkKkKkKkKkKkKkKkKkKkKkKkKkKkKkKkKkbbbkKkKkKkKkKkKkKkKkK',
+      'kkkkkkkkkkkkkkkkbbbkkkkskbkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkbbbkkkkskkkkkkkkkkkkk',
+      'kkkkkkkkkbkkkkbbbbbbbkkkbbbbkkkkkkkkkkkkskkkkkkkkkkkkkkkkkbbbkkkbkkkkkkkkkkkkkkk',
+      'kkkkkkkkbbbbkkbbbbbbbkkkbbbbkkkbkkkkkkkkkkkkkkkkkkkkkkkkkkbbbkkbbbbkkkbkkkkkkkkk',
+      'kkkkkbkkbbbbkkbbbrbbbkkkbbbBkkbbbbkkkkkkkkkkkkkkkkkkkkkkkkbbbkkbbbbkkbbbbkkkkkkk',
+      'kbkkbbkkbbbBbbbbrbrbbbbkbbbBkkbbbbkkkkkkkkkkkkkkkkkkkkkkkbbbkkkBbbbkkbbbbkkkkkbk',
+      'bbbbbbBkbbbBbjbbbrbbbBbkbwbBkjbbbBkkkjkkkjkkkjkkkjkkkjkkkbbbkjkBbbbkbBbbbjkkbbbk',
+      'bbjbbbBkbwbBbBbbbbbbbBbBbbbBbkbbbBjkbkjkjkjkjkjkhkhkhkjkjbbbjkbBwbbbbBbWbkjbBbbb',
+      'bbbBbWBbbbbBbBbbbbbbbBbBbbbBbBbwbBbbbjjbjjjhjhjhjhjhjhjhjbbbbjbBbbbBbBbbbbjbBbbb',
+      'bbbBbbBBbbbBbBbbbbbbbBWBbbbBbBbbbBbbBjbbhjhjhjhhhhhhhhhjhbbbBbbBbbbBbBwbbBbbBbbb',
+      'bbwBbbBBbbbBbBbbbbbbbBbBbbwBbBbbbBbbBhbbbhhhhhhhhhhhhhhhhbbbBbbBbbbBbBbbbBbbBwbb',
+      'bbbBbbBBbbwBbBbbbbbbbBbBbbbBbBbbbBbWBjbbbhhhhhhhhhlhhhhhhbbbBWbBbwbBbBbbbBbbBbbb',
+      'bbbBbbBBbbbBbBbbbbbbbBbBbbbBbBbbbBbbBhbbbhhhhhhhhlghlhhhhbbbBbbBbbbBbBbbbBbbBbbb',
+      'bbbBbbeBbebBbBbbebbbbBbBbbbBbBbbbebbBebbbeehhhhgegGgghhhebeeBbbebebBeBbbbebbBebb',
+      'ededdlddeddedeeddddddgdeeeleedddededdeeegedrRhghghGhGhghRrdeddeddegdddddeededddd',
+      'dddddggdddddddddddddnGnnddggdddddddldddnGnndrRGGGGGGGGGRrdddlddddnGnnddddlddddgd',
+      'eddeGGGndeddddddgdddddddeGGGndeedddggddddddddrRRRRRRRRRrddddggdeddedededdggddnGn',
+      'dddddddddddgdddnGnndddddddddddddddGGGnddddddddrRRRRRRRrddddGGGndddddddddGGGndddd',
+      'ddddddddddnGnndddddddddddddddddddddddddddddddddrRRRRRrdddddddddddddddddddddddddd'
     ],
-    fB: [
-      'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
-      'KKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKCKKKKKKKKKK',
-      'KKKKKKKKKKKKKKKKKsKKbKKKKKKKKKKKKKKKKKKKKKKKKKKKKKCCccKKKKsKKKKK',
-      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKsKKKKKKKKCCKKCcKKKKKKKKKKK',
-      'KKKKKKKKKsKKKKKKKKKbbKKKKKKKKKKKKKKKKKKKKKKKttKKKbbKKKKKKKKKKKKK',
-      'KKKKKKKKKKKKKKKKKKKbbbKKsKKKKKKKKKKKKKKKKttKKKKKCbbKKKKKKKKKKsKK',
-      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKKtKKKKsKKtKbbbKKKKKKKKKKKK',
-      'kkkkkkkkkkkkbskkkkkbbkkkkkkkkkkkkkkkkkkkkkkkkttkBbbbkkkkkkkkkkkk',
-      'kkkkkkkkkkkbbbkkkkBbbkkkkkkskkkkkkkkkkkkkkbbbkkkBbbbbkkkkkbkkkkk',
-      'kkkkkkbkkkBbbbkkkkBbbbkkkkkkkkkkkkkkkkkkkBbbbkkkBbbbbkkkkbbbkkkk',
-      'kkbkkBbbkkBbbbbkkkBbbbkbkkkkkkkkkkkkkkkkkBbbbbkkBbwbbkkkBbbbkkkk',
-      'kbbbkBbbbkBbWbbkbkBwbbBbbkkkkkkkkkkkkkbbtBbbbbBbBbbbbkbkBbbbbkbk',
-      'BbbbkBbbbkBbbbbBbbBbbbBbbbkbkkkkkkkkkBbbkBbwbbBbBbbbbBbkBbbbbBbb',
-      'BbbbbBbwbBBbbbbBbbBbbbBbbbBbbkkkkkkkkBbbbBbbbbBbBbbbbBbbBbwbbBbb',
-      'BbwbbBbbbBBbbbbBbbBbbbBbwbBbbGkkkkkkGBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbkGGGGGGkBbWbBbbbbBbBbbbbBbbBbbbbBWb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrggggrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrggrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb'
+    pA: [
+      '.......................................................................ttt......',
+      '......................................................................tt........',
+      '....................................................................ttC.........',
+      '...................................................................tCC......tt..',
+      '................................................................C.tC....tttt....',
+      '...............................................................Cccc.CCCt........',
+      '..............................................................CCcccCtttt........',
+      '................................................................CCtt............',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................'
     ],
-    fC: [
-      'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
-      'KKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKCKKKKKKKKKK',
-      'KKKKKKKKKKKKKKKKKsKKbKKKKKKKKKKKKKKKKKKKKKKKKKKKKKCCccKKKKsKKKKK',
-      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKsKKKKKKKKCCCKCcKKKKKKKKKKK',
-      'KKKKKKKKKsKKKKKKKKKbbKKKKKKKKKKKKKKKKKKKKKKKtttKKbbKKKKKKKKKKKKK',
-      'KKKKKKKKKKKKKKKKKKKbbbKKsKKKKKKKKKKKKKKKKtttKKKKCbbKKKKKKKKKKsKK',
-      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKKttKKKsKKtKbbbKKKKKKKKKKKK',
-      'kkkkkkkkkkkkbskkkkkbbkkkkkkkkkkkkkkkkkkkkkkkkttkBbbbkkkkkkkkkkkk',
-      'kkkkkkkkkkkbbbkkkkBbbkkkkkkskkkkkkkkkkkkkkbbbkkkBbbbbkkkkkbkkkkk',
-      'kkkkkkbkkkBbbbkkkkBbbbkkkkkkkkkkkkkkkkkkkBbbbkkkBbbbbkkkkbbbkkkk',
-      'kkbkkBbbkkBbbbbkkkBbbbkbkkkkkkkkkkkkkkkkkBbbbbkkBbwbbkkkBbbbkkkk',
-      'kbbbkBbbbkBbwbbkbkBwbbBbbkkkkkkkkkkkkkbbtBbbbbBbBbbbbkbkBbbbbkbk',
-      'BbbbkBbbbkBbbbbBbbBbbbBbbbkbkkkGkGkkkBbbkBbwbbBbBbbbbBbkBbbbbBbb',
-      'BbbbbBbWbBBbbbbBbbBbbbBbbbBbbkkkgkkkkBbbbBbbbbBbBbbbbBbbBbWbbBbb',
-      'BbwbbBbbbBBbbbbBbbBbbbBbwbBbbGkkkkkkGBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbGggggggGBbwbBbbbbBbBbbbbBbbBbbbbBWb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrggggrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrggrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
-      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb'
+    pB: [
+      '.......................................................................ttt......',
+      '......................................................................tt........',
+      '....................................................................ttC.........',
+      '...................................................................ttC......t...',
+      '................................................................C.tC....tt.t....',
+      '...............................................................Cccc.tCCt........',
+      '..............................................................CCcccCtttt........',
+      '................................................................CCtt............',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '.........W......................................................................',
+      '.....w..........................................................................',
+      '................................................................................',
+      '................................................................................',
+      '.................................................................W..............',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................'
+    ],
+    pC: [
+      '.......................................................................ttt......',
+      '......................................................................tt........',
+      '....................................................................ttC.........',
+      '...................................................................tCC......tt..',
+      '................................................................C.tC....tttt....',
+      '...............................................................Cccc.CCCt........',
+      '..............................................................CCcccCtttt........',
+      '................................................................CCtt............',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '.......................................................................w........',
+      '................................................................................',
+      '................................................................................',
+      '..........................W.....................................................',
+      '................................................................................',
+      '................................................................................',
+      '.....g...............g....g.............g.........................g.............',
+      '.....................l.............g....l.........l.........g.....l......g....g.',
+      '.....l..........g.........l........................l..........................l.',
+      '...........g....l..................l........................l............l......',
+      '...........l....................................................................',
+      '................................................................................'
+    ],
+    i1: [
+      '..........................................................................ttt...',
+      '.........................................................................tC.....',
+      '.......................................................................ccc.tttt.',
+      '.......................................................................cccCt....',
+      '........................................................................ttt.....',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................'
+    ],
+    i2: [
+      '..........................................................................tt....',
+      '.........................................................................t......',
+      '......................................................................t.t.......',
+      '.....................................................................ttt........',
+      '....................................................................tt..........',
+      '..................................................................ttC...........',
+      '.................................................................tCC......ttt...',
+      '..............................................................C.tC....tttt......',
+      '.............................................................Cccc.CCCtt.........',
+      '............................................................CCcccCtttt..........',
+      '..............................................................CCtt..............',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................'
+    ],
+    i3: [
+      '.........................................................................t......',
+      '........................................................................t.......',
+      '.......................................................................t........',
+      '.....................................................................tt.........',
+      '....................................................................t...........',
+      '...................................................................t............',
+      '................................................................ttt.............',
+      '...............................................................tt...............',
+      '.............................................................ttt................',
+      '............................................................tCC.................',
+      '...........................................................tC............t......',
+      '.........................................................ttC.........tttt.......',
+      '........................................................tCC......tttt...........',
+      '.....................................................C.tC....CCtt...............',
+      '....................................................Cccc.CCCCtttt...............',
+      '...................................................CCcccCtttt...................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................'
+    ],
+    i4: [
+      'FFFFFFFFFFFFFFFFFxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFFxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFxxxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFxxxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFxxxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFxxxxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFxxFFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFxxxFxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFxxxFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFFFFFFFFxxxFFFFFFxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFxxxFFFFFFFFFFFFFFFFFF',
+      'FFFFFFFFFxFFFFxxxxxxxFFFxxxxFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFxxxFFFxFFFFFFFFFFFFFFF',
+      'FFFFFFFFxxxxFFxxxxxxxFFFxxxxFFFxFFFFFFFFFFFFFFFFFFFFFFFFFFxxxFFxxxxFFFxFFFFFFFFF',
+      'FFFFFxFFxxxxFFxxxxxxxFFFxxxxFFxxxxFFFFFFFFFFFFFFFFFFFFFFFFxxxFFxxxxFFxxxxFFFFFFF',
+      'FxFFxxFFxxxxxxxxxxxxxxxFxxxxFFxxxxFFFFFFFFFFFFFFFFFFFFFFFxxxFFFxxxxFFxxxxFFFFFxF',
+      'xxxxxxxFxxxxxFxxxxxxxxxFxFxxFFxxxxFFFFFFFFFFFFFFFFFFFFFFFxxxFFFxxxxFxxxxxFFFxxxF',
+      'xxFxxxxFxFxxxxxxxxxxxxxxxxxxxFxxxxFFxFFFFFFFFFFFFFFFFFFFFxxxFFxxFxxxxxxFxFFxxxxx',
+      'xxxxxFxxxxxxxxxxxxxxxxxxxxxxxxxFxxxxxFFxFFFFFFFFFFFFFFFFFxxxxFxxxxxxxxxxxxFxxxxx',
+      'xxxxxxxxxxxxxxxxxxxxxxFxxxxxxxxxxxxxxFxxFFFFFFFFFFFFFFFFFxxxxxxxxxxxxxFxxxxxxxxx',
+      'xxFxxxxxxxxxxxxxxxxxxxxxxxFxxxxxxxxxxFxxxFFFFFFFFFFFFFFFFxxxxxxxxxxxxxxxxxxxxFxx',
+      'xxxxxxxxxxFxxxxxxxxxxxxxxxxxxxxxxxxFxFxxxFFFFFFFFFFFFFFFFxxxxFxxxFxxxxxxxxxxxxxx',
+      'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxFxxxFFFFFFFFFFFFFFFFxxxxxxxxxxxxxxxxxxxxxxx',
+      'xxxxxxFxxFxxxxxxFxxxxxxxxxxxxxxxxFxxxFxxxFFFFFFFFFFFFFFFFxFFxxxFxFxxFxxxxFxxxFxx',
+      'fffffffffffffffffffffffffffffffffffffffffffxfffffffffffffxffffffffffffffffffffff',
+      'ffffffffffffffffffffffffffffffffffffffffffffxfffffffffffxfffffffffffffffffffffff',
+      'fffffffffffffffffffffffffffffffffffffffffffffxfffffffffxffffffffffffffffffffffff',
+      'ffffffffffffffffffffffffffffffffffffffffffffffxfffffffxfffffffffffffffffffffffff',
+      'fffffffffffffffffffffffffffffffffffffffffffffffxfffffxffffffffffffffffffffffffff'
+    ],
+    i5: [
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '......................................................g.........................',
+      '.............................................g..................................',
+      '................................................................................',
+      '...........................................................g....................',
+      '........................................g.......................................',
+      '................................................................................',
+      '.........................o......................................g...............',
+      '.........o.........................g............................o......o........',
+      '.....o.........................o................................................',
+      '......................o........................OOOOOOO................o.........',
+      '..o.......................o..................OOOOoooOOOO.....................o..',
+      '..........o........................o.......OOOoooooooooOOO...o...o..............',
+      '...........................................OOoooocccooooOO......................',
+      '...............................oooooo.....OOooocccccccoooOO.....oooooo..........',
+      '..........................................OOoocccccccccooOO.....................',
+      '..........................................OOoocccccccccooOO.....................',
+      '..........................................OOoocccccccccooOO.....................',
+      '..........................................OOooocccccccoooOO.....................',
+      '...........................................OOoooocccooooOO......................'
+    ],
+    i6: [
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '..............................................mmm.m.MmmmM.......................',
+      '............................................mmm..mmmMMmmm.......................',
+      '.............................................M.mm.MMMmmm........................',
+      '................................................mmmMMmmm........................',
+      '.............................................m..mMmmmm.m........................',
+      '........O.................O..................MMMmm.mmMmM........................',
+      '........O.....................................mMmmm.mMm..........O.....O........',
+      '..............................................M..m.m.mM...............O.........',
+      '..............................................mMmmmm.mM.........................',
+      '.........................o.....................mMmmMmmM......g..................',
+      '.........o............................g........mM.Mm.M..........o...............',
+      '...............................o...............mMM.mMm..........................',
+      '...............................................MmmmmmM................o.........',
+      '...............................................mM.ymM..............g............',
+      '................................g...............y.o.............................',
+      '..........................................g...y.o.o.y...........................',
+      '..............................................o.o.o.o.y...g.....................',
+      '............................................OOOOOOOOOOOOO.......................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................'
+    ],
+    i7: [
+      '................................................................................',
+      '.....................................mm.mmmmm.mm..mmm..mm.mm.m..................',
+      '.......................................mm.mmm.mmm.m.mmm..mmm....................',
+      '.........................................mm....m..mm.m....m..m..................',
+      '........................................m.......mmmmmmm.m...m...................',
+      '.........................................mmm.m..m..m..m.m.mm....................',
+      '...............................................mmmm.m..mm.......................',
+      '...........................................mmm..mmm..m.mm.......................',
+      '............................................mmmmmmmm.mmmm.......................',
+      '........O....................................mm.m..mm.mm.........O..............',
+      '...............................................mm..mm...........................',
+      '.................................................m...m..........................',
+      '................................................mm.mm...........................',
+      '.................................................mmm.m..........................',
+      '...............................................mmmmmmm..........................',
+      '...............................................mmmmm............................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '..................................................l.............................',
+      '.....................l..................l........ll...............l.............',
+      '.....l....................l........................l..........................l.',
+      '................l..................l........................l............l......',
+      '...........l....................................................................',
+      '................................................................................'
+    ],
+    aA: [
+      '................................................................................',
+      '................................................................................',
+      '........................................m..m....mm...m..m..mm...................',
+      '............................................m.mm..mmm.mm...m....................',
+      '............................................mm......m.....m.....................',
+      '...........................................m..m..........m......................',
+      '............................................m....m.....m........................',
+      '................................................m..m............................',
+      '..................................................m..m..........................',
+      '........o.........................................mm............................',
+      '..................................................mmm...........................',
+      '................................................................................',
+      '................................................m..mm...........................',
+      '.................................................m.mm...........................',
+      '................................................mmm.m...........................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '....................................................g...........................',
+      '............................................n...h....n..n.......................',
+      '.................................................gg.............................',
+      '.....l....................l........................g............................',
+      '...................................l........................l............l......',
+      '................................................................................',
+      '................................................................................'
+    ],
+    aB: [
+      '................................................................................',
+      '................................................................................',
+      '..........................................mm...m...m.......mm...................',
+      '.........................................m.m....mmmm...m........................',
+      '...............................................m................................',
+      '................................................mm.m.m.m........................',
+      '................................................mm...m..........................',
+      '.............................................m.m.mm.m..m........................',
+      '..............................................m...m.m.m.........................',
+      '........O.........................................m.mm..........................',
+      '.................................................mm.m...........................',
+      '.................................................m.mmm..........................',
+      '..................................................mmm...........................',
+      '.................................................m..............................',
+      '...................................................m............................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '..............................................nlh..l...nh.......................',
+      '.....................l..................l........ll...............l.............',
+      '.....l....................l........................l..........................l.',
+      '................l..................l........................l............l......',
+      '...........l....................................................................',
+      '................................................................................'
+    ],
+    aC: [
+      '................................................................................',
+      '................................................................................',
+      '........................................m....mm.mm.....m........................',
+      '.........................................m..mm...........mmm....................',
+      '.............................................m...........m......................',
+      '...............................................m..mm..m..m......................',
+      '............................................m..m.m.m....m.......................',
+      '.............................................m.mm..mm.m.........................',
+      '................................................................................',
+      '........o.........................................m.mm..........................',
+      '...................................................mm...........................',
+      '..................................................m..m..........................',
+      '...................................................m............................',
+      '..................................................mm............................',
+      '................................................m..mm...........................',
+      '................................................................................',
+      '................................................................................',
+      '................................................................................',
+      '....................................................g...........................',
+      '.............................................n..n.....n.h.......................',
+      '.................................................gg.............................',
+      '.....l....................l........................g............................',
+      '...................................l........................l............l......',
+      '................................................................................',
+      '................................................................................'
     ]
-  }, 64);
+  }, 80);
   document.getElementById('form-answer').addEventListener('submit', function () {
     var li = document.getElementById('q-task'), next = li.nextSibling, list = li.parentNode;
     li.remove();
