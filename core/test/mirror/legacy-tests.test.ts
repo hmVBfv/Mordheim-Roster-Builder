@@ -21,9 +21,10 @@ const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const REGISTER = fileURLToPath(new URL('./register.mjs', import.meta.url));
 const FILES = readdirSync(path.join(ROOT, 'test')).filter((f) => f.endsWith('.mjs') && f !== 'run.mjs').sort();
 
-/* Tests of the rules data alone. Core reads the same files, so there is no
+/* Tests of the rules data alone (core reads the same files) or of the legacy
+   source itself (inline handlers, which core does not have): there is no
    call into the app to mirror. */
-const DATA_ONLY = ['blessings.mjs', 'catalogue-complete.mjs', 'data-integrity.mjs'];
+const DATA_ONLY = ['blessings.mjs', 'catalogue-complete.mjs', 'data-integrity.mjs', 'inline-handlers.mjs'];
 
 interface Run { code: number | null; out: string; report: MirrorReport | null }
 const runs = new Map<string, Run>();

@@ -634,6 +634,18 @@
     .lore-tbl{table-layout:fixed}
     .lore-tbl td{overflow-wrap:anywhere}
     .lore-tbl td.lore-n{white-space:normal}
+    /* the campaign-file tables (nine columns) scroll inside themselves */
+    .cf-tbl{display:block;overflow-x:auto;white-space:nowrap}
+    /* a henchman's name gets the whole row, his buttons the next one */
+    .mem-row{display:flex;flex-wrap:wrap;gap:6px}
+    .mem-row .mem-idx{flex:0 0 18px}
+    .mem-row .mem-in{flex:1 1 calc(100% - 30px)}
+    .mem-row .mem-in + button{margin-left:24px}
+  }
+  /* Desktop: the sidebar stays in view but must not outgrow the window, or
+     its lower panels (the Stash) are only reachable at the page's end. */
+  @media(min-width:901px){
+    .sidebar{max-height:calc(100vh - 28px);overflow-y:auto;overscroll-behavior:contain}
   }
 </style>
 </head>
@@ -720,7 +732,7 @@
       </main>
 
       <aside class="sidebar" style="margin-top:18px">
-        <div class="panel"><details class="sec-details" open ontoggle="wbOpen=this.open"><summary class="sec-sum">Warband</summary><div class="sec-body">
+        <div class="panel"><details class="sec-details" open><summary class="sec-sum">Warband</summary><div class="sec-body">
           <div class="stat-big"><span>Gold</span><span class="v" id="goldnow">0</span></div>
           <div class="stat-big"><span>Models</span><span class="v" id="models">0</span></div>
           <div class="stat-big"><span>Heroes</span><span class="v" id="heroes">0</span></div>
@@ -728,8 +740,8 @@
           <div class="stat-big" title="Unitless points measuring the fielded fighting power — the fairest balance comparison between warbands. Warriors with their gear at LIST prices (found or discounted items count full; dice prices at expected value). Only the active loadout counts fully: two one-handed melee weapons or one two-handed, plus one missile weapon — further weapons count half (real options, not wielded at once). Shields and bucklers are melee-hand items with the lowest carry priority: weapons claim the hand slots first; a shield counts full only when a hand remains free (dagger + shield: full; dagger + sword + shield: half). Armour, misc, mounts and vehicles count in full — their abilities are priced into the listing. Advancement counts by what landed on the profile: each applied stat advance +5, each skill or spell +10, each stat point lost to injury −5. Raw experience is progress, not power, and is not counted. Everything sums unrounded and is rounded once at the end. Gold in hand is excluded: coins don't fight."><span>Warband&nbsp;Worth</span><span class="v" id="worth">0</span></div>
           <div class="warns" id="warns"></div>
         </div></details></div>
-        <div id="overviewpanel" class="panel" style="margin-top:16px"><details class="sec-details" open ontoggle="ovOpen=this.open"><summary class="sec-sum">Roster</summary><div class="sec-body"><div id="unitlist" class="unitlist"></div></div></details></div>
-        <div id="stashwrap" class="panel" style="margin-top:16px"><details class="sec-details" open ontoggle="stashOpen=this.open"><summary class="sec-sum">Stash / Store</summary><div class="sec-body"><div id="stash" class="stashpanel"></div></div></details></div>
+        <div id="overviewpanel" class="panel" style="margin-top:16px"><details class="sec-details" open><summary class="sec-sum">Roster</summary><div class="sec-body"><div id="unitlist" class="unitlist"></div></div></details></div>
+        <div id="stashwrap" class="panel" style="margin-top:16px"><details class="sec-details" open><summary class="sec-sum">Stash / Store</summary><div class="sec-body"><div id="stash" class="stashpanel"></div></div></details></div>
       </aside>
     </div>
   </section>
