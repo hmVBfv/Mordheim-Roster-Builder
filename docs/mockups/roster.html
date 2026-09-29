@@ -10,20 +10,20 @@
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
 <style>
-  .tabs { display: flex; gap: var(--s1); padding: var(--s2) var(--s4) 0; border-bottom: 1px solid var(--border); background: var(--surface); }
-  .tabs a { min-height: var(--tap); display: grid; place-items: center; padding: 0 var(--s3); color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; }
-  .tabs a[aria-current='page'] { color: var(--text); border-bottom-color: var(--accent); }
-  .figures { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); }
+  .figures { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); margin: 0; }
   .figures div { display: grid; }
   .figures dt { font-size: 0.78rem; color: var(--text-muted); }
   .figures dd { margin: 0; font-size: 1.2rem; font-weight: 600; }
   .todo { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); padding: var(--s2) var(--s3); border: 1px solid var(--warn); border-radius: var(--radius); color: var(--text); text-decoration: none; min-height: var(--tap); }
   .todo span { color: var(--warn); }
+  .cards { display: grid; gap: var(--s4); }
+  .cards:empty { display: none; }
   .warrior { gap: var(--s2); }
   .w-head { display: grid; grid-template-columns: 1fr auto; gap: 0 var(--s2); align-items: start; }
   .w-head h3 { font-size: 1.08rem; }
   .w-head .type { color: var(--text-muted); font-size: 0.92rem; }
   .badges { display: flex; flex-wrap: wrap; gap: var(--s1); grid-column: 1 / -1; margin-top: 2px; }
+  .badges a.chip { text-decoration: none; }
   .xp { display: grid; gap: 4px; }
   .pips { display: flex; flex-wrap: wrap; gap: 3px; }
   .pip { min-width: 2.2em; padding: 0 4px; text-align: center; font-size: 0.8rem; border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); }
@@ -35,17 +35,27 @@
   .facts dt { color: var(--text-muted); }
   .facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
   .acts { display: grid; grid-template-columns: auto auto 1fr auto; gap: var(--s2); align-items: center; }
+  .why { font-size: 0.82rem; color: var(--text-muted); }
   .stepper { display: inline-grid; grid-template-columns: var(--tap) auto var(--tap); align-items: center; border: 1px solid var(--border); border-radius: var(--radius); }
   .stepper button { width: var(--tap); height: var(--tap); border: 0; background: transparent; cursor: pointer; font-size: 1.2rem; }
   .stepper button:disabled { opacity: 0.3; cursor: default; }
   .stepper output { min-width: 3.2em; text-align: center; font-size: 0.9rem; }
+  /* the men of a group: tap a name to change it */
   .men { display: flex; flex-wrap: wrap; gap: var(--s1); }
+  .men button { min-height: var(--tap); padding: 0 var(--s3); border: 1px solid var(--border); border-radius: 999px; background: transparent; cursor: pointer; font-size: 0.9rem; }
+  .men .dead { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 var(--s3); border: 1px dashed var(--border); border-radius: 999px; font-size: 0.9rem; color: var(--text-muted); text-decoration: line-through; }
   .section-head { display: flex; justify-content: space-between; align-items: baseline; }
   .menu { display: grid; gap: var(--s1); }
   .menu button, .menu a { min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); text-decoration: none; cursor: pointer; text-align: left; }
+  .menu button:disabled { opacity: 0.55; cursor: default; }
   .menu .danger { color: var(--danger); }
   .result { display: grid; gap: var(--s2); padding: var(--s3); border: 1px solid var(--border); border-radius: var(--radius); }
   .result h3 { font-size: 1.05rem; }
+  .costs { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s3); margin: 0; font-size: 0.93rem; }
+  .costs dd { margin: 0; text-align: right; }
+  .costs .sum { font-weight: 600; border-top: 1px solid var(--border); padding-top: 2px; }
+  .error { color: var(--danger); font-size: 0.9rem; }
+  .sheet .scroll { max-height: 52dvh; overflow-y: auto; display: grid; gap: var(--s3); }
 </style>
 </head>
 <body>
@@ -53,95 +63,30 @@
 
 <div class="app">
   <header class="bar">
-    <a class="back" href="index.html" aria-label="All warbands">←</a>
+    <a class="back" href="warbands.html" aria-label="All warbands">←</a>
     <span class="title">The Silver Caravan</span>
     <span class="sync">✓ Saved</span>
   </header>
-  <nav class="tabs" aria-label="Warband"><a href="#" aria-current="page">Roster</a><a href="timeline.html">Story</a><a href="changes.html">Versions</a></nav>
+  <nav class="tabs" aria-label="Warband" data-tabs="warband" data-current="Roster"></nav>
 
   <div class="content">
     <div class="stack">
       <p class="muted">Mercenaries – Reikland · Hel Fenn campaign · <span class="chip good">✓ After battle 5</span></p>
       <dl class="figures">
-        <div><dt>Rating</dt><dd>118</dd></div>
+        <div><dt>Rating</dt><dd id="rating">118</dd></div>
         <div><dt>Gold</dt><dd id="gold">55 gc</dd></div>
         <div><dt>Models</dt><dd id="models">7 / 15</dd></div>
-        <div><dt>Worth</dt><dd>612</dd></div>
+        <div><dt>Worth</dt><dd id="worth">612</dd></div>
       </dl>
     </div>
     <a class="todo" href="changes.html"><span>✎ 4 explanations missing · 1 change without a cause</span><b aria-hidden="true">›</b></a>
 
-    <div class="section-head"><h2>Heroes</h2><span class="muted small">4 of 6</span></div>
-
-    <article class="card warrior" data-name="Ulrich the Grey" data-kind="hero" data-start="20" data-xp="32" data-taken="2">
-      <div class="w-head"><div><h3>Ulrich the Grey</h3><p class="type">Mercenary Captain</p></div><button type="button" class="icon-btn" data-more aria-label="More for Ulrich the Grey">⋯</button>
-        <div class="badges"><span class="chip">Leader</span></div></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>4</td><td class="up">5</td><td>4</td><td>3</td><td>3</td><td>1</td><td>4</td><td>1</td><td>8</td><td>5+</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Equipment</dt><dd>Sword, Shield, Light armour, Dagger</dd><dt>Skills</dt><dd>Strike to Injure</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
-
-    <article class="card warrior" data-name="Magda" data-kind="hero" data-start="8" data-xp="10" data-taken="0">
-      <div class="w-head"><div><h3>Magda</h3><p class="type">Champion</p></div><button type="button" class="icon-btn" data-more aria-label="More for Magda">⋯</button>
-        <div class="badges"><span class="chip bad">Misses 1 game</span></div></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td class="down">3</td><td>4</td><td>3</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Equipment</dt><dd>Double-handed weapon, Dagger</dd><dt>Injuries</dt><dd>Leg Wound (−1 M)</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
-
-    <article class="card warrior" data-name="Jorg" data-kind="hero" data-start="8" data-xp="9" data-taken="0">
-      <div class="w-head"><div><h3>Jorg</h3><p class="type">Champion</p></div><button type="button" class="icon-btn" data-more aria-label="More for Jorg">⋯</button>
-        <div class="badges"><a class="chip warn" href="changes.html">⚠ BS 4 without a cause</a></div></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>4</td><td>4</td><td class="up">4</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>6+</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Equipment</dt><dd>Mace, Sword, Light armour, Dagger</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
-
-    <article class="card warrior" data-name="Wilhelm" data-kind="hero" data-start="0" data-xp="0" data-taken="0">
-      <div class="w-head"><div><h3>Wilhelm</h3><p class="type">Youngblood · new</p></div><button type="button" class="icon-btn" data-more aria-label="More for Wilhelm">⋯</button></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>4</td><td>2</td><td>2</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>6</td><td>—</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Equipment</dt><dd>Mace, Dagger</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
-
-    <div class="section-head"><h2>Henchmen</h2><span class="muted small" id="men-count">3 men</span></div>
-
-    <article class="card warrior" data-name="Warriors" data-kind="hench" data-start="0" data-xp="4" data-taken="0" data-cost="25">
-      <div class="w-head"><div><h3>Warriors <span class="muted" id="warriors-n">×2</span></h3><p class="type">Warrior · group</p></div><button type="button" class="icon-btn" data-more aria-label="More for the Warriors">⋯</button></div>
-      <div class="men" id="men"><span class="chip">Otto</span><span class="chip">Fritz</span><span class="chip" style="text-decoration: line-through">Hans ☠</span></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>4</td><td>3</td><td>3</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Equipment</dt><dd>Axe, Buckler, Dagger</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><button type="button" class="btn-quiet" id="add-man">+ Man</button><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
-
-    <article class="card warrior" data-name="Lukas" data-kind="hench" data-start="0" data-xp="1" data-taken="0">
-      <div class="w-head"><div><h3>Lukas</h3><p class="type">Marksman · BS 4 in Reikland</p></div><button type="button" class="icon-btn" data-more aria-label="More for Lukas">⋯</button></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>4</td><td>3</td><td>4</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Equipment</dt><dd>Crossbow, Dagger</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
-
+    <div class="section-head"><h2>Heroes</h2><span class="muted small" id="heroes-n">4 of 6</span></div>
+    <div class="cards" id="heroes"></div>
+    <div class="section-head"><h2>Henchmen</h2><span class="muted small" id="men-n">3 men</span></div>
+    <div class="cards" id="henchmen"></div>
     <div class="section-head"><h2>Hired Swords</h2></div>
-    <article class="card warrior" data-name="Big Gunnar" data-kind="hired" data-start="0" data-xp="3" data-taken="1">
-      <div class="w-head"><div><h3>Big Gunnar</h3><p class="type">Ogre Bodyguard · upkeep 30 gc</p></div><button type="button" class="icon-btn" data-more aria-label="More for Big Gunnar">⋯</button></div>
-      <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>6</td><td>3</td><td>2</td><td>4</td><td>4</td><td>3</td><td>3</td><td>2</td><td>7</td><td>6+</td></tr></tbody></table>
-      <div class="xp"></div>
-      <dl class="facts"><dt>Skills</dt><dd>Resilient</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
-    </article>
+    <div class="cards" id="hired"></div>
 
     <div class="row"><button type="button" class="btn" data-open="sheet-recruit">+ Recruit</button><button type="button" class="btn-quiet" data-open="sheet-stash">Stash · 2 shards</button><a class="btn-quiet" href="trading-post.html">Trading Post</a></div>
   </div>
@@ -152,41 +97,79 @@
   <div class="sheet-grip"></div>
   <form method="dialog">
     <h2 id="more-title">Ulrich the Grey</h2>
-    <div class="menu">
-      <a href="trading-post.html">Equipment &amp; rare items <span aria-hidden="true">›</span></a>
-      <button type="button" data-open="sheet-name">Name, title and voice (DE / EN) <span aria-hidden="true">›</span></button>
-      <a href="timeline.html">His story so far <span aria-hidden="true">›</span></a>
-      <button type="button" data-open="sheet-tts">Tabletop Simulator card <span aria-hidden="true">›</span></button>
-      <button type="button" class="danger" id="gone">Out of action for good… <span aria-hidden="true">›</span></button>
-    </div>
+    <div class="menu" id="more-menu"></div>
     <button type="button" class="btn-quiet" data-close>Close</button>
   </form>
 </dialog>
 
-<!-- The advance as rolled (docs/ui.md; tables as in the post-battle helper). -->
+<!-- The advance as rolled (tables as in the post-battle helper). -->
 <dialog class="sheet" id="sheet-advance" aria-labelledby="adv-title">
   <div class="sheet-grip"></div>
   <form method="dialog" id="form-advance">
     <h2 id="adv-title">Advance · Ulrich the Grey</h2>
     <p class="small muted" id="adv-help">Heroes roll 2D6 on the Heroes' table.</p>
     <label class="field"><span class="small">2D6 as rolled</span>
-      <input class="input" id="adv-roll" inputmode="numeric" maxlength="2" value="7"></label>
-    <div class="result" id="adv-result" aria-live="polite"></div>
-    <div class="row"><button class="btn" value="apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+      <input class="input" id="adv-roll" inputmode="numeric" maxlength="2" value="7" autocomplete="off"></label>
+    <div class="scroll"><div class="result" id="adv-result" aria-live="polite"></div></div>
+    <p class="error" id="adv-error" hidden></p>
+    <div class="row"><button class="btn" value="apply" id="adv-apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
   </form>
 </dialog>
 
-<!-- The injury as rolled, with the follow-up the chart asks for (behaviour-changes.md, V1). -->
+<!-- A Hero's or Hired Sword's injury as rolled, with the follow-up the chart asks for (V1). -->
 <dialog class="sheet" id="sheet-injury" aria-labelledby="inj-title">
   <div class="sheet-grip"></div>
   <form method="dialog" id="form-injury">
     <h2 id="inj-title">Serious injury · Magda</h2>
-    <p class="small muted">Out of action by Skritch (Clan Skrittle), battle 5, turn 4.</p>
+    <p class="small muted" id="inj-sub">Out of action by Skritch (Clan Skrittle), battle 5, turn 4.</p>
     <label class="field"><span class="small">D66 as rolled</span>
-      <input class="input" id="d66" inputmode="numeric" pattern="[1-6][1-6]" maxlength="2" value="23" aria-describedby="d66-help">
+      <input class="input" id="d66" inputmode="numeric" pattern="[1-6][1-6]" maxlength="2" value="23" aria-describedby="d66-help" autocomplete="off">
       <span class="small muted" id="d66-help">Tens die first: a 2 and a 3 is 23.</span></label>
     <div class="result" id="result" aria-live="polite"></div>
     <div class="row"><button class="btn" value="apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<!-- A Henchman out of action: one D6 each (rulebook, Injuries). -->
+<dialog class="sheet" id="sheet-hinj" aria-labelledby="hinj-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-hinj">
+    <h2 id="hinj-title">Out of action · Warriors</h2>
+    <p class="small muted">Each Henchman taken out of action rolls a D6 after the battle: 1–2 he is dead, 3–6 he fights on.</p>
+    <span class="small">Who was taken out of action?</span>
+    <div class="pick" id="hinj-who"></div>
+    <label class="field"><span class="small">D6 as rolled</span><input class="input" id="hinj-roll" inputmode="numeric" maxlength="1" value="2" autocomplete="off"></label>
+    <p id="hinj-verdict" aria-live="polite"></p>
+    <div class="row"><button class="btn" value="apply" id="hinj-apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<!-- More men for a group (rulebook: new recruits and existing Henchmen groups). -->
+<dialog class="sheet" id="sheet-addman" aria-labelledby="add-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-addman">
+    <h2 id="add-title">More men · Warriors</h2>
+    <div class="scroll">
+      <p class="small muted" id="add-help"></p>
+      <div class="row between"><span>How many</span>
+        <span class="stepper"><button type="button" id="add-less" aria-label="One man less">−</button><output id="add-n">1</output><button type="button" id="add-more" aria-label="One man more">+</button></span></div>
+      <label class="field" id="add-roll-f"><span class="small">2D6 as rolled for the veterans on offer (post-battle step 5)</span>
+        <input class="input" id="add-roll" inputmode="numeric" maxlength="2" value="7" autocomplete="off"></label>
+      <dl class="costs" id="add-costs"></dl>
+      <p id="add-verdict" class="small" aria-live="polite"></p>
+      <div id="add-names" class="stack"></div>
+    </div>
+    <div class="row"><button class="btn" value="add" id="add-ok">Recruit</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-man" aria-labelledby="man-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-man">
+    <h2 id="man-title">One of the Warriors</h2>
+    <label class="field"><span class="small">His name</span><input class="input" id="man-name" autocomplete="off"></label>
+    <p class="small muted">The group shares experience, advances and gear; the name is his own. It follows him into the chronicle, and onto his own card if he is ever promoted.</p>
+    <div class="row"><button class="btn" value="save">Save</button><button type="button" class="btn-danger" id="man-dismiss">Dismiss him</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
   </form>
 </dialog>
 
@@ -194,14 +177,8 @@
   <div class="sheet-grip"></div>
   <form method="dialog">
     <h2 id="rec-title">Recruit</h2>
-    <p class="small muted">After the first battle a recruit brings only common items from his list — bought right here, at the Trading Post's prices.</p>
-    <div class="menu" id="recruit-list">
-      <button type="button" data-unit="Warrior" data-gc="25">Warrior <span class="muted">25 gc</span></button>
-      <button type="button" data-unit="Marksman" data-gc="25">Marksman <span class="muted">25 gc · 1 of 7</span></button>
-      <button type="button" data-unit="Swordsman" data-gc="35">Swordsman <span class="muted">35 gc · 0 of 5</span></button>
-      <button type="button" data-unit="Youngblood" data-gc="15">Youngblood <span class="muted">15 gc · 1 of 2</span></button>
-      <button type="button" disabled>Champion <span class="muted">2 of 2</span></button>
-    </div>
+    <p class="small muted">After the first battle a recruit brings only his dagger; common items from his list come from the Trading Post, at its prices. More men for an existing group: “+ Man” on its card.</p>
+    <div class="menu" id="recruit-list"></div>
     <button type="button" class="btn-quiet" data-close>Close</button>
   </form>
 </dialog>
@@ -213,8 +190,7 @@
     <dl class="facts"><dt>Wyrdstone</dt><dd>2 shards</dd><dt>Items</dt><dd>Lucky charm, Rope &amp; hook</dd></dl>
     <div class="menu">
       <a href="trading-post.html#give">Give an item to a warrior <span aria-hidden="true">›</span></a>
-      <a href="trading-post.html#sell">Sell an item — half price <span aria-hidden="true">›</span></a>
-      <a href="game-night.html">Sell wyrdstone after the battle <span aria-hidden="true">›</span></a>
+      <a href="trading-post.html#sell">Sell an item or wyrdstone <span aria-hidden="true">›</span></a>
     </div>
     <button type="button" class="btn-quiet" data-close>Close</button>
   </form>
@@ -224,9 +200,12 @@
   <div class="sheet-grip"></div>
   <form method="dialog" id="form-name">
     <h2 id="name-title">Name, title and voice</h2>
-    <label class="field"><span class="small">Name (German)</span><input class="input" value="Ulrich der Graue"></label>
-    <label class="field"><span class="small">Name (English)</span><input class="input" value="Ulrich the Grey"></label>
-    <label class="field"><span class="small">How he speaks (for the chronicle)</span><textarea class="textarea">Few words, all of them orders.</textarea></label>
+    <div id="name-hero" class="stack">
+      <label class="field"><span class="small">Name (German)</span><input class="input" id="name-de" autocomplete="off"></label>
+      <label class="field"><span class="small">Name (English)</span><input class="input" id="name-en" autocomplete="off"></label>
+      <label class="field"><span class="small">How he speaks (for the chronicle)</span><textarea class="textarea" id="name-voice"></textarea></label>
+    </div>
+    <label class="field" id="name-group"><span class="small">Name of the group</span><input class="input" id="name-grp" autocomplete="off"></label>
     <div class="row"><button class="btn" value="save">Save</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
   </form>
 </dialog>
@@ -235,10 +214,7 @@
   <div class="sheet-grip"></div>
   <form method="dialog">
     <h2 id="tts-title">Tabletop Simulator card</h2>
-    <pre class="card small" style="white-space: pre-wrap; margin: 0">[b]Ulrich the Grey[/b] – Mercenary Captain
-M4 WS5 BS4 S3 T3 W1 I4 A1 Ld8 · Sv 5+
-Sword, Shield, Light armour, Dagger
-Leader · Strike to Injure</pre>
+    <pre class="card small" id="tts-text" style="white-space: pre-wrap; margin: 0"></pre>
     <div class="row"><button type="button" class="btn" id="tts-copy">Copy</button><button type="button" class="btn-quiet" data-close>Close</button></div>
   </form>
 </dialog>
@@ -247,77 +223,266 @@ Leader · Strike to Injure</pre>
 
 <script>
 (function () {
-  /* Experience on every card, as the Roster Builder shows it: every
-     threshold framed, those already reached filled, the next one marked. */
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  var KEYS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'Sv'];
   var HERO = [2, 4, 6, 8, 11, 14, 17, 20, 24, 28, 32, 36, 41, 46, 51, 57, 63, 69, 76, 83, 90];
   var HENCH = [2, 5, 9, 14];
-  function drawXp(card) {
-    var d = card.dataset, xp = Number(d.xp), start = Number(d.start), th = d.kind === 'hero' ? HERO : HENCH; // Hired Swords: the Henchmen's steps
-    var earned = th.filter(function (t) { return t > start && t <= xp; }).length;
-    var next = th.filter(function (t) { return t > xp; })[0];
-    var due = earned > Number(d.taken);
+  var MAX_HEROES = 6, MAX_MODELS = 15, MAX_GROUP = 5, XP_GC = 2;
+  var LISTS = ['Combat', 'Shooting', 'Academic', 'Strength', 'Speed']; // the Mercenary Heroes' skill lists
+
+  /* The warband (an invented one). Groups keep their men by name; the dead
+     stay on the card, struck through, as the Roster Builder shows them. */
+  var st = {
+    gold: 55, worth: 612, seq: 0,
+    w: [
+      { id: 'ulrich', kind: 'hero', name: 'Ulrich the Grey', de: 'Ulrich der Graue', voice: 'Few words, all of them orders.', type: 'Mercenary Captain', badges: [['Leader', '']], p: [4, 5, 4, 3, 3, 1, 4, 1, 8, '5+'], up: ['WS'], start: 20, xp: 32, taken: 2, gear: ['Sword', 'Shield', 'Light armour', 'Dagger'], skills: ['Strike to Injure'] },
+      { id: 'magda', kind: 'hero', name: 'Magda', de: 'Magda', voice: '', type: 'Champion', badges: [['Misses 1 game', 'bad']], p: [3, 4, 3, 3, 3, 1, 3, 1, 7, '—'], down: ['M'], start: 8, xp: 10, taken: 0, gear: ['Double-handed weapon', 'Dagger'], injuries: ['Leg Wound (−1 M)'] },
+      { id: 'jorg', kind: 'hero', name: 'Jorg', de: 'Jörg', voice: '', type: 'Champion', badges: [['⚠ BS 4 without a cause', 'warn', 'changes.html']], p: [4, 4, 4, 3, 3, 1, 3, 1, 7, '6+'], up: ['BS'], start: 8, xp: 9, taken: 0, gear: ['Mace', 'Sword', 'Light armour', 'Dagger'] },
+      { id: 'wilhelm', kind: 'hero', name: 'Wilhelm', de: 'Wilhelm', voice: '', type: 'Youngblood · new', p: [4, 2, 2, 3, 3, 1, 3, 1, 6, '—'], start: 0, xp: 0, taken: 0, gear: ['Mace', 'Dagger'] },
+      { id: 'warriors', kind: 'hench', name: 'Warriors', unit: 'Warrior', cost: 25, gearCost: 10, gearNote: 'Axe 5, Buckler 5, the dagger free', men: [{ name: 'Otto' }, { name: 'Fritz' }, { name: 'Hans', dead: true }], p: [4, 3, 3, 3, 3, 1, 3, 1, 7, '—'], start: 0, xp: 4, taken: 0, gear: ['Axe', 'Buckler', 'Dagger'] },
+      { id: 'marksmen', kind: 'hench', name: 'Marksmen', unit: 'Marksman', note: 'BS 4 in Reikland', unitMax: 7, cost: 25, gearCost: 25, gearNote: 'Crossbow 25, the dagger free', men: [{ name: 'Lukas' }], p: [4, 3, 4, 3, 3, 1, 3, 1, 7, '—'], start: 0, xp: 1, taken: 0, gear: ['Crossbow', 'Dagger'] },
+      { id: 'gunnar', kind: 'hired', name: 'Big Gunnar', de: 'Großer Gunnar', voice: '', type: 'Ogre Bodyguard · upkeep 30 gc', large: true, p: [6, 3, 2, 4, 4, 3, 3, 2, 7, '6+'], start: 0, xp: 3, taken: 1, skills: ['Resilient'] }
+    ]
+  };
+  // what can be recruited after the first battle (Mercenaries, Reikland)
+  var UNITS = [
+    { unit: 'Warrior', kind: 'hench', cost: 25, max: null, p: [4, 3, 3, 3, 3, 1, 3, 1, 7, '—'] },
+    { unit: 'Marksman', kind: 'hench', cost: 25, max: 7, p: [4, 3, 4, 3, 3, 1, 3, 1, 7, '—'], note: 'BS 4 in Reikland' },
+    { unit: 'Swordsman', kind: 'hench', cost: 35, max: 5, p: [4, 4, 3, 3, 3, 1, 3, 1, 7, '—'] },
+    { unit: 'Youngblood', kind: 'hero', cost: 15, max: 2, p: [4, 2, 2, 3, 3, 1, 3, 1, 6, '—'] },
+    { unit: 'Champion', kind: 'hero', cost: 35, max: 2, p: [4, 4, 3, 3, 3, 1, 3, 1, 7, '—'] }
+  ];
+  var UNIT_OF = { ulrich: 'Mercenary Captain', magda: 'Champion', jorg: 'Champion', wilhelm: 'Youngblood' };
+  st.w.forEach(function (w) { if (!w.unit && UNIT_OF[w.id]) w.unit = UNIT_OF[w.id]; });
+
+  function byId(id) { return st.w.filter(function (w) { return w.id === id; })[0]; }
+  function alive(w) { return (w.men || []).filter(function (m) { return !m.dead; }); }
+  function heroes() { return st.w.filter(function (w) { return w.kind === 'hero'; }); }
+  function modelCount() { return st.w.reduce(function (n, w) { return n + (w.kind === 'hero' ? 1 : w.kind === 'hench' ? alive(w).length : 0); }, 0); }
+  function unitCount(unit) { return st.w.reduce(function (n, w) { return n + (w.unit === unit && !w.promoted ? (w.kind === 'hench' ? alive(w).length : 1) : 0); }, 0); }
+  function rating() { return st.w.reduce(function (n, w) { var each = (w.large ? 20 : 5) + w.xp; return n + (w.kind === 'hench' ? each * alive(w).length : each); }, 0); }
+  function steps(w) { return w.kind === 'hero' ? HERO : HENCH; }
+  function earned(w) { return steps(w).filter(function (t) { return t > w.start && t <= w.xp; }).length + (w.bonus || 0); }
+
+  /* Why no more men can join (or '' if they can). */
+  function addBlock(w) {
+    if (alive(w).length >= MAX_GROUP) return 'the group is full with five men';
+    if (w.unitMax && unitCount(w.unit) >= w.unitMax) return 'the warband has its ' + w.unitMax + ' ' + w.unit + 's';
+    if (modelCount() >= MAX_MODELS) return 'the warband has its ' + MAX_MODELS + ' models';
+    return '';
+  }
+
+  /* ---------- drawing ---------- */
+  function statTable(w) {
+    return '<table class="stats"><thead><tr>' + KEYS.map(function (k) { return '<th>' + k + '</th>'; }).join('') + '</tr></thead><tbody><tr>' +
+      w.p.map(function (v, i) { var k = KEYS[i], c = (w.up || []).indexOf(k) >= 0 ? ' class="up"' : (w.down || []).indexOf(k) >= 0 ? ' class="down"' : ''; return '<td' + c + '>' + v + '</td>'; }).join('') + '</tr></tbody></table>';
+  }
+  function xpBlock(w) {
+    var th = steps(w), next = th.filter(function (t) { return t > w.xp; })[0];
     var pips = th.map(function (t) {
-      var cls = t <= start ? 'base' : t <= xp ? 'on' : t === next ? 'next' : '';
+      var cls = t <= w.start ? 'base' : t <= w.xp ? 'on' : t === next ? 'next' : '';
       return '<span class="pip ' + cls + '">' + t + '</span>';
     }).join('');
-    card.querySelector('.xp').innerHTML =
-      '<div class="pips" aria-label="Advances at ' + th.join(', ') + '">' + pips + '</div>' +
-      '<div class="xp-line"><span class="stepper"><button type="button" data-step="-1" aria-label="One experience less"' + (xp > 0 ? '' : ' disabled') + '>−</button><output>Exp ' + xp + (d.kind === 'hench' ? ' (group)' : '') + '</output><button type="button" data-step="1" aria-label="One experience more">+</button></span>' +
-      '<span>' + (next != null ? 'next advance at ' + next : 'maximum reached') + '</span></div>';
-    var badges = card.querySelector('.badges');
-    if (!badges) { badges = document.createElement('div'); badges.className = 'badges'; card.querySelector('.w-head').append(badges); }
-    var chip = badges.querySelector('.due');
-    if (due && !chip) { chip = document.createElement('span'); chip.className = 'chip good due'; badges.append(chip); }
-    if (chip) { if (due) chip.textContent = 'Advance due'; else chip.remove(); }
+    var label = w.kind === 'hench' ? ' (group)' : '';
+    return '<div class="xp"><div class="pips" aria-label="Advances at ' + th.join(', ') + '">' + pips + '</div>' +
+      '<div class="xp-line"><span class="stepper"><button type="button" data-step="-1" aria-label="One experience less"' + (w.xp > w.start ? '' : ' disabled') + '>−</button><output>Exp ' + w.xp + label + '</output><button type="button" data-step="1" aria-label="One experience more">+</button></span>' +
+      '<span>' + (next != null ? 'next advance at ' + next : 'maximum reached') + '</span></div></div>';
   }
-  var cards = document.querySelectorAll('.card.warrior');
-  cards.forEach(drawXp);
-  var current = cards[0];
-  document.addEventListener('click', function (e) {
-    var card = e.target.closest('.card.warrior');
-    if (card) current = card;
-    var b = e.target.closest('[data-step]');
-    if (b && card) { card.dataset.xp = Math.max(0, Number(card.dataset.xp) + Number(b.dataset.step)); drawXp(card); return; }
-    var name = current ? current.dataset.name : '';
-    if (e.target.closest('[data-more]')) { document.getElementById('more-title').textContent = name; open('sheet-more'); }
-    if (e.target.closest('[data-advance]')) { openAdvance(card); }
-    if (e.target.closest('[data-injury]')) { document.getElementById('inj-title').textContent = 'Serious injury · ' + name; open('sheet-injury'); }
-  });
-  function open(id) { window.mockOpen(id); }
+  function card(w) {
+    var due = earned(w) > w.taken, badges = (w.badges || []).map(function (b) {
+      return b[2] ? '<a class="chip ' + b[1] + '" href="' + b[2] + '">' + esc(b[0]) + '</a>' : '<span class="chip ' + b[1] + '">' + esc(b[0]) + '</span>';
+    });
+    if (w.promoted) badges.push('<span class="chip">Promoted</span>');
+    if (w.equip) badges.push('<a class="chip warn" href="trading-post.html">Equip at the Trading Post</a>');
+    if (due) badges.push('<span class="chip good">Advance due</span>');
+    var n = w.kind === 'hench' ? alive(w).length : 0;
+    var title = esc(w.name) + (w.kind === 'hench' ? ' <span class="muted">×' + n + '</span>' : '');
+    var type = w.kind === 'hench' ? w.unit + ' · group' + (w.note ? ' · ' + w.note : '') : w.type;
+    var h = '<article class="card warrior" data-id="' + w.id + '"><div class="w-head"><div><h3>' + title + '</h3><p class="type">' + esc(type) + '</p></div>' +
+      '<button type="button" class="icon-btn" data-more aria-label="More for ' + esc(w.name) + '">⋯</button>' +
+      (badges.length ? '<div class="badges">' + badges.join('') + '</div>' : '') + '</div>';
+    if (w.kind === 'hench') {
+      h += '<div class="men">' + w.men.map(function (m, i) {
+        return m.dead ? '<span class="dead">' + esc(m.name) + ' ☠</span>' : '<button type="button" data-man="' + i + '" aria-label="' + esc(m.name) + ': change the name">' + esc(m.name) + '</button>';
+      }).join('') + '</div>';
+    }
+    h += statTable(w) + xpBlock(w);
+    var facts = '';
+    if (w.gear && w.gear.length) facts += '<dt>Equipment</dt><dd>' + esc(w.gear.join(', ')) + '</dd>';
+    if (w.skills && w.skills.length) facts += '<dt>Skills</dt><dd>' + esc(w.skills.join(', ')) + '</dd>';
+    if (w.lists) facts += '<dt>Skill lists</dt><dd>' + esc(w.lists.join(', ')) + '</dd>';
+    if (w.injuries && w.injuries.length) facts += '<dt>Injuries</dt><dd>' + esc(w.injuries.join(', ')) + '</dd>';
+    if (facts) h += '<dl class="facts">' + facts + '</dl>';
+    var block = w.kind === 'hench' ? addBlock(w) : '';
+    h += '<div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button>' +
+      (w.kind === 'hench' ? '<button type="button" class="btn-quiet" data-addman' + (block ? ' disabled' : '') + '>+ Man</button>' : '<span></span>') +
+      '<span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>';
+    if (block) h += '<p class="why">No more men: ' + esc(block) + '.</p>';
+    return h + '</article>';
+  }
+  function draw() {
+    $('heroes').innerHTML = st.w.filter(function (w) { return w.kind === 'hero'; }).map(card).join('');
+    $('henchmen').innerHTML = st.w.filter(function (w) { return w.kind === 'hench'; }).map(card).join('');
+    $('hired').innerHTML = st.w.filter(function (w) { return w.kind === 'hired'; }).map(card).join('');
+    var men = st.w.reduce(function (n, w) { return n + (w.kind === 'hench' ? alive(w).length : 0); }, 0);
+    $('heroes-n').textContent = heroes().length + ' of ' + MAX_HEROES;
+    $('men-n').textContent = men + (men === 1 ? ' man' : ' men');
+    $('gold').textContent = st.gold + ' gc';
+    $('models').textContent = modelCount() + ' / ' + MAX_MODELS;
+    $('rating').textContent = rating();
+    $('worth').textContent = st.worth;
+    drawRecruit();
+  }
 
-  /* Advance tables (data/postbattle.json). */
+  /* every change can be undone once from its notice */
+  function commit(text, change) {
+    var before = JSON.stringify(st);
+    change(); draw();
+    window.mockToast(text, function () { var b = JSON.parse(before); Object.keys(b).forEach(function (k) { st[k] = b[k]; }); draw(); });
+  }
+
+  /* ---------- the cards ---------- */
+  var current = null;
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('.card.warrior');
+    if (!el) return;
+    var w = byId(el.dataset.id); if (!w) return;
+    current = w;
+    var b = e.target.closest('[data-step]');
+    if (b) { w.xp = Math.max(w.start, w.xp + Number(b.dataset.step)); draw(); return; }
+    if (e.target.closest('[data-more]')) { openMore(w); return; }
+    if (e.target.closest('[data-advance]')) { openAdvance(w); return; }
+    if (e.target.closest('[data-injury]')) { if (w.kind === 'hench') openHinj(w); else openInjury(w, '23'); return; }
+    if (e.target.closest('[data-addman]')) { openAdd(w); return; }
+    var m = e.target.closest('[data-man]');
+    if (m) { openMan(w, Number(m.dataset.man)); }
+  });
+
+  /* ---------- more ---------- */
+  function openMore(w) {
+    $('more-title').textContent = w.name;
+    var items = [];
+    if (w.kind !== 'hired') items.push('<a href="trading-post.html' + (w.kind === 'hench' ? '#give' : '') + '">Equipment &amp; rare items <span aria-hidden="true">›</span></a>');
+    items.push('<button type="button" data-do="name">' + (w.kind === 'hench' ? 'Name of the group' : 'Name, title and voice (DE / EN)') + ' <span aria-hidden="true">›</span></button>');
+    items.push('<a href="story.html?who=' + w.id + '">' + (w.kind === 'hench' ? 'Their story so far' : 'His story so far') + ' <span aria-hidden="true">›</span></a>');
+    items.push('<button type="button" data-do="tts">Tabletop Simulator card' + (w.kind === 'hench' ? 's' : '') + ' <span aria-hidden="true">›</span></button>');
+    if (w.kind === 'hired') items.push('<button type="button" class="danger" data-do="dismiss">Dismiss — upkeep ends <span aria-hidden="true">›</span></button>');
+    else if (w.kind === 'hero') items.push('<button type="button" class="danger" data-do="gone">Out of action for good… <span aria-hidden="true">›</span></button>');
+    $('more-menu').innerHTML = items.join('');
+    window.mockOpen('sheet-more');
+  }
+  $('more-menu').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-do]'); if (!b) return;
+    var w = current, what = b.dataset.do;
+    if (what === 'name') openName(w);
+    else if (what === 'tts') openTts(w);
+    else if (what === 'gone') openInjury(w, '11');
+    else if (what === 'dismiss') { $('sheet-more').close(); commit(w.name + ' is dismissed; his upkeep ends.', function () { st.w = st.w.filter(function (x) { return x.id !== w.id; }); }); }
+  });
+
+  /* ---------- names ---------- */
+  function openName(w) {
+    var group = w.kind === 'hench';
+    $('name-title').textContent = group ? 'Name of the group' : 'Name, title and voice';
+    $('name-hero').hidden = group; $('name-group').hidden = !group;
+    $('name-grp').value = w.name; $('name-de').value = w.de || w.name; $('name-en').value = w.name; $('name-voice').value = w.voice || '';
+    window.mockOpen('sheet-name');
+  }
+  $('form-name').addEventListener('submit', function () {
+    var w = byId(current.id), v = (w.kind === 'hench' ? $('name-grp').value : $('name-en').value).trim();
+    commit('Saved.', function () { if (v) w.name = v; if (w.kind !== 'hench') { w.de = $('name-de').value.trim(); w.voice = $('name-voice').value; } });
+  });
+  var manIdx = 0;
+  function openMan(w, i) {
+    manIdx = i;
+    $('man-title').textContent = 'One of the ' + w.name;
+    $('man-name').value = w.men[i].name;
+    $('man-dismiss').disabled = alive(w).length < 2;
+    window.mockOpen('sheet-man');
+  }
+  $('form-man').addEventListener('submit', function () {
+    var w = byId(current.id), v = $('man-name').value.trim(), old = w.men[manIdx].name, i = manIdx;
+    if (v && v !== old) commit(old + ' is now ' + v + '.', function () { byId(w.id).men[i].name = v; });
+  });
+  $('man-dismiss').addEventListener('click', function () {
+    var w = byId(current.id), i = manIdx, name = w.men[i].name;
+    $('sheet-man').close();
+    commit(name + ' leaves the ' + w.name + '; his gear goes to the stash.', function () { w.men.splice(i, 1); });
+  });
+
+  /* ---------- TTS ---------- */
+  function openTts(w) {
+    var line = KEYS.slice(0, 9).map(function (k, i) { return k + w.p[i]; }).join(' ') + ' · Sv ' + w.p[9];
+    var who = w.kind === 'hench' ? alive(w).map(function (m) { return m.name; }) : [w.name];
+    $('tts-text').textContent = who.map(function (n) {
+      return '[b]' + n + '[/b] – ' + (w.kind === 'hench' ? w.unit : w.type.split(' · ')[0]) + '\n' + line + '\n' + (w.gear || []).join(', ') + ((w.skills || []).length ? '\n' + w.skills.join(', ') : '');
+    }).join('\n\n');
+    $('tts-title').textContent = 'Tabletop Simulator card' + (who.length > 1 ? 's' : '');
+    window.mockOpen('sheet-tts');
+  }
+  $('tts-copy').onclick = function () { window.mockToast('Copied — paste it into the model\'s Description in TTS.'); };
+
+  /* ---------- advance, and the lad's got talent ---------- */
   var HERO_ADV = [[2, 5, 'New skill', 'Choose one from his skill lists:', ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient']],
     [6, 6, '+1 S or +1 A', 'Roll a D6:', ['1–3 · +1 Strength', '4–6 · +1 Attack']], [7, 7, '+1 WS or +1 BS', 'Choose one:', ['+1 Weapon Skill', '+1 Ballistic Skill']],
     [8, 8, '+1 I or +1 Ld', 'Roll a D6:', ['1–3 · +1 Initiative', '4–6 · +1 Leadership']], [9, 9, '+1 W or +1 T', 'Roll a D6:', ['1–3 · +1 Wound', '4–6 · +1 Toughness']],
     [10, 12, 'New skill', 'Choose one from his skill lists:', ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient']]];
   var HENCH_ADV = [[2, 4, '+1 Initiative', '', null], [5, 5, '+1 Strength', '', null], [6, 7, '+1 BS or +1 WS', 'Choose one:', ['+1 Ballistic Skill', '+1 Weapon Skill']],
-    [8, 8, '+1 Attack', '', null], [9, 9, '+1 Leadership', '', null], [10, 12, "The lad's got talent", 'One of the group becomes a Hero:', ['Otto', 'Fritz']]];
-  var advCard = null, rollIn = document.getElementById('adv-roll'), advOut = document.getElementById('adv-result');
-  function openAdvance(card) {
-    advCard = card;
-    document.getElementById('adv-title').textContent = 'Advance · ' + card.dataset.name;
-    document.getElementById('adv-help').textContent = card.dataset.kind === 'hench' ? 'The group rolls 2D6 once, on the Henchmen table; every man gets the advance.'
-      : card.dataset.kind === 'hired' ? 'Hired Swords gain experience like Henchmen (2, 5, 9, 14) but roll 2D6 on the Heroes table.' : 'Heroes roll 2D6 on the Heroes table.';
-    showAdv(); open('sheet-advance');
+    [8, 8, '+1 Attack', '', null], [9, 9, '+1 Leadership', '', null], [10, 12, "The lad's got talent", '', null]];
+  var advId = null, rollIn = $('adv-roll'), advOut = $('adv-result');
+  function advW() { return byId(advId); }
+  function openAdvance(w) {
+    advId = w.id;
+    $('adv-title').textContent = 'Advance · ' + w.name;
+    $('adv-help').textContent = w.kind === 'hench' ? 'The group rolls 2D6 once, on the Henchmen table; every man gets the advance.'
+      : w.kind === 'hired' ? 'Hired Swords gain experience like Henchmen (2, 5, 9, 14) but roll 2D6 on the Heroes table.' : 'Heroes roll 2D6 on the Heroes table.';
+    showAdv(); window.mockOpen('sheet-advance');
   }
+  function talent() { var w = advW(), v = Number(rollIn.value); return w && w.kind === 'hench' && v >= 10 && v <= 12; }
   function showAdv() {
-    var v = Number(rollIn.value), table = advCard && advCard.dataset.kind === 'hench' ? HENCH_ADV : HERO_ADV;
+    var w = advW(), v = Number(rollIn.value), table = w && w.kind === 'hench' ? HENCH_ADV : HERO_ADV;
     var row = v >= 2 && v <= 12 && table.filter(function (r) { return v >= r[0] && v <= r[1]; })[0];
+    $('adv-error').hidden = true;
+    $('adv-apply').disabled = !row;
     if (!row) { advOut.innerHTML = '<p class="muted">Enter the total of two dice, 2–12.</p>'; return; }
     var html = '<h3>' + v + ' · ' + row[2] + '</h3>' + (row[3] ? '<p>' + row[3] + '</p>' : '');
-    if (row[4]) html += '<div class="pick">' + row[4].map(function (o, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + o + '</button>'; }).join('') + '</div>';
-    html += '<p class="small muted">At his racial maximum? Take the other option — or roll again if the result raises only one.</p>';
+    if (talent()) {
+      if (heroes().length >= MAX_HEROES) {
+        html += '<p>The warband already has ' + MAX_HEROES + ' Heroes: roll again.</p>';
+        $('adv-apply').disabled = true;
+      } else {
+        html += '<p>One man of the group becomes a Hero. He stays a ' + w.unit + ', keeps his experience, gear and increases, and rolls once on the Heroes table straight away. The rest of the group rolls again, re-rolling 10–12 (rulebook, Advances).</p>' +
+          '<span class="small">Who?</span><div class="pick" id="adv-who">' + alive(w).map(function (m, i) { return '<button type="button" data-value="' + w.men.indexOf(m) + '" aria-pressed="' + (i === 0) + '">' + esc(m.name) + '</button>'; }).join('') + '</div>' +
+          '<span class="small">His two skill lists, from those of the warband’s Heroes</span><div class="pick" id="adv-lists">' + LISTS.map(function (l) { return '<button type="button" data-multi data-value="' + l + '" aria-pressed="false">' + l + '</button>'; }).join('') + '</div>';
+      }
+    } else if (row[4]) {
+      html += '<div class="pick">' + row[4].map(function (o, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + o + '</button>'; }).join('') + '</div>';
+      html += '<p class="small muted">At his racial maximum? Take the other option — or roll again if the result raises only one.</p>';
+    }
     advOut.innerHTML = html;
   }
   rollIn.addEventListener('input', showAdv);
-  document.getElementById('form-advance').addEventListener('submit', function () {
-    var card = advCard, before = card.dataset.taken;
-    card.dataset.taken = Number(before) + 1; drawXp(card);
+  $('form-advance').addEventListener('submit', function (e) {
+    var w = advW();
+    if (talent()) {
+      var lists = Array.prototype.map.call(advOut.querySelectorAll('#adv-lists [aria-pressed=true]'), function (b) { return b.dataset.value; });
+      if (lists.length !== 2) { e.preventDefault(); $('adv-error').textContent = 'Choose exactly two skill lists (' + lists.length + ' chosen).'; $('adv-error').hidden = false; return; }
+      var idx = Number(advOut.querySelector('#adv-who [aria-pressed=true]').dataset.value), name = w.men[idx].name;
+      commit(name + ' is a Hero now — he rolls on the Heroes table (Advance on his card); the ' + w.name + ' roll again.', function () {
+        var g = byId(w.id), man = g.men.splice(idx, 1)[0];
+        var hero = { id: 'p' + (++st.seq), kind: 'hero', name: man.name, de: man.name, voice: '', unit: g.unit, type: g.unit + ' · promoted', promoted: true, lists: lists,
+          p: g.p.slice(), up: (g.up || []).slice(), start: g.xp, xp: g.xp, taken: 0, bonus: 1, gear: (g.gear || []).slice() };
+        st.w.splice(st.w.indexOf(heroes()[heroes().length - 1]) + 1, 0, hero);
+        if (!alive(g).length) st.w = st.w.filter(function (x) { return x.id !== g.id; });
+      });
+      return;
+    }
     var pick = advOut.querySelector('[aria-pressed=true]'), what = pick ? pick.textContent : advOut.querySelector('h3').textContent.split(' · ')[1];
-    window.mockToast(card.dataset.name + ': ' + what + '.', function () { card.dataset.taken = before; drawXp(card); });
+    commit(w.name + ': ' + what + '.', function () { byId(w.id).taken += 1; });
   });
 
-  /* The Heroes' Serious Injuries chart (mordheimer.net) with its follow-ups. */
+  /* ---------- injuries ---------- */
   var CHART = [
     [11, 15, 'Dead', 'Removed from the roster; all equipment is lost.', null],
     [16, 21, 'Multiple Injuries', 'Roll a D6 for how many more results; Dead, Captured and Multiple Injuries are rolled again.', ['1', '2', '3', '4', '5', '6']],
@@ -334,50 +499,129 @@ Leader · Strike to Injure</pre>
     [36, 36, 'Robbed', 'All weapons, armour and equipment are lost.', null],
     [41, 55, 'Full Recovery', 'No lasting harm.', null],
     [56, 56, 'Bitter Enmity', 'Hates, on a D6:', ['1–3 — Skritch', '4 — the leader of Clan Skrittle', '5 — all of Clan Skrittle', '6 — every Skaven warband']],
-    [61, 61, 'Captured', 'What happens to her?', ['Exchanged', 'Ransomed', 'Sold to slavers', 'Kept for now']],
+    [61, 61, 'Captured', 'What happens?', ['Exchanged', 'Ransomed', 'Sold to slavers', 'Kept for now']],
     [62, 63, 'Hardened', 'Immune to fear from now on.', null],
     [64, 64, 'Horrible Scars', 'Causes fear from now on.', null],
-    [65, 65, 'Sold to the Pits', 'She fights a Pit Fighter:', ['Won — +50 gc, +2 experience', 'Lost — loses weapons and armour, then rolls 11–35']],
+    [65, 65, 'Sold to the Pits', 'A fight against a Pit Fighter:', ['Won — +50 gc, +2 experience', 'Lost — loses weapons and armour, then rolls 11–35']],
     [66, 66, 'Survives Against the Odds', '+1 experience.', null]
   ];
-  var input = document.getElementById('d66'), out = document.getElementById('result');
+  var input = $('d66'), out = $('result');
+  function rowOf() { var v = Number(input.value); return /^[1-6][1-6]$/.test(input.value) && CHART.filter(function (r) { return v >= r[0] && v <= r[1]; })[0]; }
   function show() {
-    var v = Number(input.value);
-    var valid = /^[1-6][1-6]$/.test(input.value);
-    var row = valid && CHART.filter(function (r) { return v >= r[0] && v <= r[1]; })[0];
+    var row = rowOf();
     if (!row) { out.innerHTML = '<p class="muted">Enter two dice, each 1–6.</p>'; return; }
     var html = '<h3>' + (row[0] === row[1] ? row[0] : row[0] + '–' + row[1]) + ' · ' + row[2] + '</h3><p>' + row[3] + '</p>';
     if (row[4]) html += '<div class="pick">' + row[4].map(function (o, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + o + '</button>'; }).join('') + '</div>';
     out.innerHTML = html;
   }
   input.addEventListener('input', show);
-  // no dice in the app: the table is read with the roll made at the table (Rob, 29.09.2026)
-  show();
-  document.getElementById('form-injury').addEventListener('submit', function () {
-    window.mockToast('Applied to ' + (current ? current.dataset.name : 'Magda') + '.', function () {});
+  function openInjury(w, roll) {
+    $('inj-title').textContent = (roll === '11' ? 'Out of action for good · ' : 'Serious injury · ') + w.name;
+    $('inj-sub').textContent = roll === '11' ? 'Dead — or enter another result if it was a mistake.' : 'Out of action in battle 5.';
+    input.value = roll; show();
+    window.mockOpen('sheet-injury');
+  }
+  $('form-injury').addEventListener('submit', function () {
+    var w = byId(current.id), row = rowOf(); if (!row) return;
+    if (row[2] === 'Dead') commit(w.name + ' is dead; his gear is lost.', function () { st.w = st.w.filter(function (x) { return x.id !== w.id; }); });
+    else commit(w.name + ': ' + row[2] + '.', function () { var x = byId(w.id); x.injuries = (x.injuries || []).concat(row[2]); });
   });
-  document.getElementById('gone').onclick = function () {
-    document.getElementById('sheet-more').close();
-    input.value = '11'; show();
-    document.getElementById('inj-title').textContent = 'Out of action for good · ' + current.dataset.name;
-    open('sheet-injury');
-  };
 
-  /* One more man for the group: he comes with the group's experience. */
-  document.getElementById('add-man').onclick = function () {
-    var men = document.getElementById('men'), n = men.querySelectorAll('.chip:not([style])').length + 1;
-    var chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = 'Warrior ' + (n + 1);
-    men.append(chip);
-    document.getElementById('warriors-n').textContent = '×' + n;
-    window.mockToast('Warrior ' + (n + 1) + ' joins for 33 gc — 25, and 8 for the group\'s 4 experience.', function () { chip.remove(); document.getElementById('warriors-n').textContent = '×' + (n - 1); });
-  };
-  document.getElementById('recruit-list').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-unit]'); if (!b) return;
-    document.getElementById('sheet-recruit').close();
-    window.mockToast('Recruited a ' + b.dataset.unit + ' for ' + b.dataset.gc + ' gc — now choose his gear.', function () {});
+  // Henchmen: one D6 each
+  function openHinj(w) {
+    $('hinj-title').textContent = 'Out of action · ' + w.name;
+    $('hinj-who').innerHTML = alive(w).map(function (m, i) { return '<button type="button" data-value="' + w.men.indexOf(m) + '" aria-pressed="' + (i === 0) + '">' + esc(m.name) + '</button>'; }).join('');
+    hinjShow(); window.mockOpen('sheet-hinj');
+  }
+  function hinjShow() {
+    var r = Number($('hinj-roll').value), v = $('hinj-verdict');
+    $('hinj-apply').disabled = !(r >= 1 && r <= 6);
+    v.textContent = !(r >= 1 && r <= 6) ? 'Enter one die, 1–6.' : r <= 2 ? r + ' — he is dead.' : r + ' — he fights on.';
+  }
+  $('hinj-roll').addEventListener('input', hinjShow);
+  $('form-hinj').addEventListener('submit', function () {
+    var w = byId(current.id), idx = Number($('hinj-who').querySelector('[aria-pressed=true]').dataset.value), name = w.men[idx].name, r = Number($('hinj-roll').value);
+    if (r <= 2) commit(name + ' is dead; the ' + w.name + ' are ' + (alive(w).length - 1) + ' now.', function () { var g = byId(w.id); g.men[idx].dead = true; if (!alive(g).length) st.w = st.w.filter(function (x) { return x.id !== g.id; }); });
+    else window.mockToast(name + ' fights on.');
   });
-  document.getElementById('form-name').addEventListener('submit', function () { window.mockToast('Name and voice saved.'); });
-  document.getElementById('tts-copy').onclick = function () { window.mockToast('Copied — paste it into the model\'s Description in TTS.'); };
+
+  /* ---------- more men for a group ---------- */
+  var addId = null, addN = 1;
+  function addW() { return byId(addId); }
+  function addMax(w) { var n = MAX_GROUP - alive(w).length; if (w.unitMax) n = Math.min(n, w.unitMax - unitCount(w.unit)); return Math.max(0, Math.min(n, MAX_MODELS - modelCount())); }
+  function openAdd(w) {
+    addId = w.id; addN = 1; $('add-names').innerHTML = '';
+    $('add-title').textContent = 'More men · ' + w.name;
+    $('add-help').textContent = 'A new man joins with the group’s experience and carries the same gear. He costs the ' + w.unit + ', his gear, and ' + XP_GC + ' gc for each point of the group’s experience.';
+    addShow(); window.mockOpen('sheet-addman');
+  }
+  function addShow() {
+    var w = addW(), max = addMax(w), each = w.cost + w.gearCost + XP_GC * w.xp, total = each * addN, roll = Number($('add-roll').value);
+    $('add-n').textContent = addN;
+    $('add-less').disabled = addN <= 1; $('add-more').disabled = addN >= max;
+    $('add-roll-f').hidden = w.xp === 0;
+    $('add-costs').innerHTML = '<dt>' + w.unit + '</dt><dd>' + w.cost + ' gc</dd><dt>Gear: ' + esc(w.gearNote) + '</dt><dd>' + w.gearCost + ' gc</dd>' +
+      '<dt>Experience: ' + w.xp + ' × ' + XP_GC + ' gc</dt><dd>' + XP_GC * w.xp + ' gc</dd>' +
+      '<dt class="sum">' + addN + ' × ' + each + ' gc</dt><dd class="sum">' + total + ' gc</dd>';
+    var bring = w.xp * addN, ok = true, msg;
+    if (w.xp > 0 && !(roll >= 2 && roll <= 12)) { ok = false; msg = 'Enter the veterans roll, 2–12.'; }
+    else if (w.xp > 0 && bring > roll) { ok = false; msg = addN + ' men bring ' + bring + ' experience; the roll of ' + roll + ' allows ' + Math.floor(roll / w.xp) + '.'; }
+    else if (total > st.gold) { ok = false; msg = 'Not enough gold: ' + st.gold + ' gc in hand.'; }
+    else msg = (w.xp > 0 ? addN + ' × ' + w.xp + ' experience ≤ ' + roll + ' · ' : 'Fresh recruits: no roll needed · ') + 'gold left ' + (st.gold - total) + ' gc.';
+    $('add-verdict').textContent = msg;
+    $('add-ok').disabled = !ok;
+    var names = $('add-names');
+    for (var i = names.children.length; i < addN; i++) {
+      var l = document.createElement('label'); l.className = 'field';
+      l.innerHTML = '<span class="small">Name of new man ' + (i + 1) + '</span><input class="input" autocomplete="off" value="' + w.unit + ' ' + (w.men.length + i + 1) + '">';
+      names.append(l);
+    }
+    while (names.children.length > addN) names.lastChild.remove();
+  }
+  $('add-less').onclick = function () { addN = Math.max(1, addN - 1); addShow(); };
+  $('add-more').onclick = function () { addN = Math.min(addMax(addW()), addN + 1); addShow(); };
+  $('add-roll').addEventListener('input', addShow);
+  $('form-addman').addEventListener('submit', function () {
+    var w = addW(), n = addN, each = w.cost + w.gearCost + XP_GC * w.xp;
+    var names = Array.prototype.map.call($('add-names').querySelectorAll('input'), function (i) { return i.value.trim() || w.unit; });
+    commit(names.join(', ') + ' join' + (n === 1 ? 's' : '') + ' the ' + w.name + ' for ' + each * n + ' gc.', function () {
+      var g = byId(w.id);
+      st.gold -= each * n; st.worth += (g.cost + g.gearCost) * n;
+      names.forEach(function (nm) { g.men.push({ name: nm }); });
+    });
+  });
+
+  /* ---------- recruit ---------- */
+  function drawRecruit() {
+    $('recruit-list').innerHTML = UNITS.map(function (u) {
+      var have = unitCount(u.unit), why = '';
+      if (u.max && have >= u.max) why = have + ' of ' + u.max;
+      else if (u.kind === 'hero' && heroes().length >= MAX_HEROES) why = MAX_HEROES + ' Heroes already';
+      else if (modelCount() >= MAX_MODELS) why = 'warband full';
+      else if (u.cost > st.gold) why = u.cost + ' gc — not enough gold';
+      var info = u.cost + ' gc' + (u.max ? ' · ' + have + ' of ' + u.max : '') + (u.kind === 'hench' ? ' · new group' : '');
+      return '<button type="button" data-unit="' + u.unit + '"' + (why ? ' disabled' : '') + '>' + u.unit + ' <span class="muted">' + (why || info) + '</span></button>';
+    }).join('');
+  }
+  $('recruit-list').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-unit]'); if (!b || b.disabled) return;
+    var u = UNITS.filter(function (x) { return x.unit === b.dataset.unit; })[0];
+    $('sheet-recruit').close();
+    commit('A new ' + u.unit + ' for ' + u.cost + ' gc — his gear comes from the Trading Post.', function () {
+      st.gold -= u.cost; st.worth += u.cost;
+      var id = 'r' + (++st.seq);
+      if (u.kind === 'hero') {
+        var hero = { id: id, kind: 'hero', unit: u.unit, name: 'New ' + u.unit, de: '', voice: '', type: u.unit + ' · new', p: u.p.slice(), start: 0, xp: 0, taken: 0, gear: ['Dagger'], equip: true };
+        st.w.splice(st.w.indexOf(heroes()[heroes().length - 1]) + 1, 0, hero);
+      } else {
+        var group = { id: id, kind: 'hench', name: u.unit + 's (new)', unit: u.unit, unitMax: u.max, note: u.note, cost: u.cost, gearCost: 0, gearNote: 'the dagger free', men: [{ name: u.unit + ' 1' }], p: u.p.slice(), start: 0, xp: 0, taken: 0, gear: ['Dagger'], equip: true };
+        var last = st.w.filter(function (w) { return w.kind === 'hench'; }).pop();
+        st.w.splice(last ? st.w.indexOf(last) + 1 : st.w.length, 0, group);
+      }
+    });
+  });
+
+  draw(); show();
 })();
 </script>
 </body>

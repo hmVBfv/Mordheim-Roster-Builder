@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  /* Mordheim at night: original pixel art, three frames (the comet's tails
+     shimmer, windows flicker, the wyrdstone pulses); still under reduced motion */
+  .sky { display: block; width: 100%; height: auto; aspect-ratio: 64 / 20; border: 1px solid var(--border); border-radius: var(--radius); background: #0b0d12; image-rendering: pixelated; }
+  .sky .fB, .sky .fC { opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .sky .fA { animation: skA 8s steps(1, end) infinite; }
+    .sky .fB { animation: skB 8s steps(1, end) infinite; }
+    .sky .fC { animation: skC 8s steps(1, end) infinite; }
+  }
+  @keyframes skA { 0% { opacity: 1; } 40% { opacity: 0; } 46% { opacity: 1; } 70% { opacity: 0; } 84% { opacity: 1; } 100% { opacity: 1; } }
+  @keyframes skB { 0% { opacity: 0; } 40% { opacity: 1; } 46% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes skC { 0% { opacity: 0; } 70% { opacity: 1; } 84% { opacity: 0; } 100% { opacity: 0; } }
+  .greet { display: grid; gap: var(--s1); }
+  .tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .tasks a, .tasks button { width: 100%; display: grid; grid-template-columns: 1.6em 1fr auto; gap: var(--s2); align-items: center; min-height: 52px; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; text-align: left; cursor: pointer; }
+  .tasks .ico { font-size: 1.1rem; text-align: center; }
+  .tasks small { display: block; color: var(--text-muted); }
+  .tasks .go { color: var(--text-muted); }
+  .tasks .urgent { border-color: var(--accent); }
+  .tile { display: grid; gap: 2px; padding: var(--s3) var(--s4); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; }
+  .tile h3 { font-size: 1.08rem; }
+  .tile .muted { font-size: 0.9rem; }
+  .choice { display: grid; grid-template-columns: auto 1fr; gap: 0 var(--s2); align-items: start; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+  .choice input { margin-top: 5px; accent-color: var(--accent); width: 20px; height: 20px; }
+  .choice small { grid-column: 2; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Home</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">Mordheim Campaign</span>
+    <span class="sync"><span class="pending">⏳ 3 waiting</span></span>
+  </header>
+
+  <div class="content">
+    <svg class="sky" id="sky" viewBox="0 0 64 20" shape-rendering="crispEdges" aria-hidden="true" focusable="false"></svg>
+    <div class="greet">
+      <h1>Evening, Rob.</h1>
+      <p class="muted">Battle 6 at the Hel Fenn ferry is being played. Three entries wait on this phone until the server is in reach.</p>
+    </div>
+
+    <section class="stack" aria-labelledby="open-h">
+      <h2 id="open-h">Open for you</h2>
+      <ul class="tasks" id="tasks">
+        <li><a class="urgent" href="game-night.html"><span class="ico" aria-hidden="true">⚔</span><span>Battle 6 is being played<small>Open game night — 3 entries waiting</small></span><span class="go" aria-hidden="true">›</span></a></li>
+        <li><a href="changes.html"><span class="ico" aria-hidden="true">✎</span><span>4 explanations missing<small>The Silver Caravan · after battle 5</small></span><span class="go" aria-hidden="true">›</span></a></li>
+        <li><a href="trading-post.html#search"><span class="ico" aria-hidden="true">⚖</span><span>Rare items: three Heroes may look<small>Post-battle, step 6</small></span><span class="go" aria-hidden="true">›</span></a></li>
+        <li><a href="roster.html"><span class="ico" aria-hidden="true">★</span><span>Advance due: Ulrich the Grey<small>32 experience, one advance to roll</small></span><span class="go" aria-hidden="true">›</span></a></li>
+        <li id="q-task"><button type="button" data-open="sheet-answer"><span class="ico" aria-hidden="true">?</span><span>Anna asks you<small>“Did Wilhelm see the coin with the eel?”</small></span><span class="go" aria-hidden="true">›</span></button></li>
+      </ul>
+    </section>
+
+    <section class="stack" aria-labelledby="wb-h">
+      <h2 id="wb-h">Your warbands</h2>
+      <a class="tile" href="roster.html"><h3>The Silver Caravan</h3><span class="muted">Mercenaries – Reikland · Rating 118 · 55 gc</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></a>
+      <a class="btn-quiet" href="warbands.html">All warbands and import</a>
+    </section>
+
+    <section class="stack" aria-labelledby="camp-h">
+      <h2 id="camp-h">Campaigns</h2>
+      <a class="tile" href="campaign.html"><h3>The Hel Fenn Campaign</h3><span class="muted">3 warbands · you lead · battle 6 running</span></a>
+    </section>
+  </div>
+  <nav class="nav" data-current="Home"></nav>
+</div>
+
+<!-- A question from another player (docs/concept.md: questions to players). -->
+<dialog class="sheet" id="sheet-answer" aria-labelledby="ans-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-answer">
+    <h2 id="ans-title">Anna asks you</h2>
+    <blockquote>Did Wilhelm see the coin with the eel? Brother Anselm wants to know who else is looking for the ferryman.</blockquote>
+    <label class="field"><span class="small">Your answer</span><textarea class="textarea" id="ans-text">He saw it. He has not told Ulrich yet.</textarea></label>
+    <fieldset style="border:0; padding:0; margin:0" class="stack">
+      <legend class="small">Who can read the answer?</legend>
+      <label class="choice"><input type="radio" name="ans-vis" value="anna" checked><span>👁 Anna and the leaders</span><small>A private answer; she may use it in her story.</small></label>
+      <label class="choice"><input type="radio" name="ans-vis" value="all"><span>👁 Everyone in the campaign</span><small>It appears in the notes.</small></label>
+    </fieldset>
+    <div class="row"><button class="btn" value="send">Send</button><button type="button" class="btn-quiet" data-close>Later</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden><span></span><button type="button" class="btn-quiet">Undo</button></div>
+
+<script>
+(function () {
+  window.mockPixel(document.getElementById('sky'), {"K":"#0b0d12","k":"#11141b","s":"#6f7480","c":"#e9f5d9","C":"#8fd88f","t":"#3c6b46","b":"#25222b","B":"#35313c","r":"#2a242a","g":"#6fe07a","G":"#2d6b36","w":"#e0a642","W":"#6e4f1f"}, {
+    fA: [
+      'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
+      'KKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKCKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKKsKKbKKKKKKKKKKKKKKKKKKKKKKKKKKKKKCCccKKKKsKKKKK',
+      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKsKKKKKKKKCCCKCcKKKKKKKKKKK',
+      'KKKKKKKKKsKKKKKKKKKbbKKKKKKKKKKKKKKKKKKKKKKKtttKKbbKKKKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKKKKbbbKKsKKKKKKKKKKKKKKKKtttKKKKCbbKKKKKKKKKKsKK',
+      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKKttKKKsKKtKbbbKKKKKKKKKKKK',
+      'kkkkkkkkkkkkbskkkkkbbkkkkkkkkkkkkkkkkkkkkkkkkttkBbbbkkkkkkkkkkkk',
+      'kkkkkkkkkkkbbbkkkkBbbkkkkkkskkkkkkkkkkkkkkbbbkkkBbbbbkkkkkbkkkkk',
+      'kkkkkkbkkkBbbbkkkkBbbbkkkkkkkkkkkkkkkkkkkBbbbkkkBbbbbkkkkbbbkkkk',
+      'kkbkkBbbkkBbbbbkkkBbbbkbkkkkkkkkkkkkkkkkkBbbbbkkBbwbbkkkBbbbkkkk',
+      'kbbbkBbbbkBbwbbkbkBwbbBbbkkkkkkkkkkkkkbbtBbbbbBbBbbbbkbkBbbbbkbk',
+      'BbbbkBbbbkBbbbbBbbBbbbBbbbkbkkkkkkkkkBbbkBbwbbBbBbbbbBbkBbbbbBbb',
+      'BbbbbBbWbBBbbbbBbbBbbbBbbbBbbkkkGkkkkBbbbBbbbbBbBbbbbBbbBbwbbBbb',
+      'BbwbbBbbbBBbbbbBbbBbbbBbwbBbbGkkkkkkGBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbkGGGGGGkBbWbBbbbbBbBbbbbBbbBbbbbBWb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrggggrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrggrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb'
+    ],
+    fB: [
+      'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
+      'KKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKCKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKKsKKbKKKKKKKKKKKKKKKKKKKKKKKKKKKKKCCccKKKKsKKKKK',
+      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKsKKKKKKKKCCKKCcKKKKKKKKKKK',
+      'KKKKKKKKKsKKKKKKKKKbbKKKKKKKKKKKKKKKKKKKKKKKttKKKbbKKKKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKKKKbbbKKsKKKKKKKKKKKKKKKKttKKKKKCbbKKKKKKKKKKsKK',
+      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKKtKKKKsKKtKbbbKKKKKKKKKKKK',
+      'kkkkkkkkkkkkbskkkkkbbkkkkkkkkkkkkkkkkkkkkkkkkttkBbbbkkkkkkkkkkkk',
+      'kkkkkkkkkkkbbbkkkkBbbkkkkkkskkkkkkkkkkkkkkbbbkkkBbbbbkkkkkbkkkkk',
+      'kkkkkkbkkkBbbbkkkkBbbbkkkkkkkkkkkkkkkkkkkBbbbkkkBbbbbkkkkbbbkkkk',
+      'kkbkkBbbkkBbbbbkkkBbbbkbkkkkkkkkkkkkkkkkkBbbbbkkBbwbbkkkBbbbkkkk',
+      'kbbbkBbbbkBbWbbkbkBwbbBbbkkkkkkkkkkkkkbbtBbbbbBbBbbbbkbkBbbbbkbk',
+      'BbbbkBbbbkBbbbbBbbBbbbBbbbkbkkkkkkkkkBbbkBbwbbBbBbbbbBbkBbbbbBbb',
+      'BbbbbBbwbBBbbbbBbbBbbbBbbbBbbkkkkkkkkBbbbBbbbbBbBbbbbBbbBbwbbBbb',
+      'BbwbbBbbbBBbbbbBbbBbbbBbwbBbbGkkkkkkGBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbkGGGGGGkBbWbBbbbbBbBbbbbBbbBbbbbBWb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrggggrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrggrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb'
+    ],
+    fC: [
+      'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK',
+      'KKKsKKKKKKKKKKKKKKKKKKKKKKKKKKKsKKKKKKKKKKKKKKKKKKKKKCKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKKsKKbKKKKKKKKKKKKKKKKKKKKKKKKKKKKKCCccKKKKsKKKKK',
+      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKsKKKKKKKKCCCKCcKKKKKKKKKKK',
+      'KKKKKKKKKsKKKKKKKKKbbKKKKKKKKKKKKKKKKKKKKKKKtttKKbbKKKKKKKKKKKKK',
+      'KKKKKKKKKKKKKKKKKKKbbbKKsKKKKKKKKKKKKKKKKtttKKKKCbbKKKKKKKKKKsKK',
+      'KKKKKKKKKKKKKKKKKKKbbKKKKKKKKKKKKKKKKKKttKKKsKKtKbbbKKKKKKKKKKKK',
+      'kkkkkkkkkkkkbskkkkkbbkkkkkkkkkkkkkkkkkkkkkkkkttkBbbbkkkkkkkkkkkk',
+      'kkkkkkkkkkkbbbkkkkBbbkkkkkkskkkkkkkkkkkkkkbbbkkkBbbbbkkkkkbkkkkk',
+      'kkkkkkbkkkBbbbkkkkBbbbkkkkkkkkkkkkkkkkkkkBbbbkkkBbbbbkkkkbbbkkkk',
+      'kkbkkBbbkkBbbbbkkkBbbbkbkkkkkkkkkkkkkkkkkBbbbbkkBbwbbkkkBbbbkkkk',
+      'kbbbkBbbbkBbwbbkbkBwbbBbbkkkkkkkkkkkkkbbtBbbbbBbBbbbbkbkBbbbbkbk',
+      'BbbbkBbbbkBbbbbBbbBbbbBbbbkbkkkGkGkkkBbbkBbwbbBbBbbbbBbkBbbbbBbb',
+      'BbbbbBbWbBBbbbbBbbBbbbBbbbBbbkkkgkkkkBbbbBbbbbBbBbbbbBbbBbWbbBbb',
+      'BbwbbBbbbBBbbbbBbbBbbbBbwbBbbGkkkkkkGBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbGggggggGBbwbBbbbbBbBbbbbBbbBbbbbBWb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrggggrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrggrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb',
+      'BbbbbBbbbBBbbbbBbbBbbbBbbbBbbrrrrrrrrBbbbBbbbbBbBbbbbBbbBbbbbBbb'
+    ]
+  }, 64);
+  document.getElementById('form-answer').addEventListener('submit', function () {
+    var li = document.getElementById('q-task'), next = li.nextSibling, list = li.parentNode;
+    li.remove();
+    window.mockToast('Answer sent to Anna.', function () { list.insertBefore(li, next); });
+  });
+})();
+</script>
+</body>
+</html>

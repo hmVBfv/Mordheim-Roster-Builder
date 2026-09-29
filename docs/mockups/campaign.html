@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campaign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .now { display: grid; gap: var(--s2); padding: var(--s3) var(--s4); border: 1px solid var(--accent); border-radius: var(--radius); background: var(--surface); }
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .rows a, .rows button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); align-items: center; min-height: 52px; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; text-align: left; cursor: pointer; }
+  .rows small { grid-column: 1; color: var(--text-muted); }
+  .rows .chip { grid-row: 1 / span 2; grid-column: 2; }
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); margin: 0; font-size: 0.93rem; }
+  .facts dt { color: var(--text-muted); }
+  .facts dd { margin: 0; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Campaign</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">The Hel Fenn Campaign</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+  <nav class="tabs" aria-label="Campaign" data-tabs="campaign" data-current="Overview"></nav>
+
+  <div class="content">
+    <div class="now">
+      <p class="label">Now</p>
+      <h2>Battle 6 · Hel Fenn ferry</h2>
+      <p class="muted">The Silver Caravan against Clan Skrittle; the Grey Penitents sit this one out. Turn 4.</p>
+      <div class="row"><a class="btn" href="game-night.html">Open game night</a><a class="btn-quiet" href="visibility.html">Write a note</a></div>
+    </div>
+
+    <section class="stack" aria-labelledby="wb-h">
+      <h2 id="wb-h">Warbands</h2>
+      <ul class="rows">
+        <li><a href="roster.html"><span><b>The Silver Caravan</b></span><small>Rob · Mercenaries · Rating 118</small><span class="chip good">✓ After battle 5</span></a></li>
+        <li><button type="button" data-wb="penitents"><span><b>The Grey Penitents</b></span><small>Anna · Sisters of Sigmar · Rating 131</small><span class="chip warn">✎ 2 missing</span></button></li>
+        <li><button type="button" data-wb="skrittle"><span><b>Clan Skrittle</b></span><small>Ben · Skaven – Clan Eshin · Rating 124</small><span class="chip good">✓ After battle 5</span></button></li>
+      </ul>
+    </section>
+
+    <section class="stack" aria-labelledby="bat-h">
+      <h2 id="bat-h">Battles</h2>
+      <ul class="rows" id="battles"></ul>
+    </section>
+
+    <section class="stack" aria-labelledby="dis-h">
+      <h2 id="dis-h">Districts</h2>
+      <p class="muted">Silver Caravan: footholds in City Hall and the West Gate. Grey Penitents: The Rock, the Temple of Sigmar. Clan Skrittle controls Fence Alley. The Market Square is held by nobody.</p>
+      <a class="btn-quiet" href="world.html#districts">All districts and what they give</a>
+    </section>
+  </div>
+  <nav class="nav" data-current="Campaign"></nav>
+</div>
+
+<dialog class="sheet" id="sheet-battle" aria-labelledby="bat-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="bat-title">Battle 5</h2>
+    <dl class="facts" id="bat-facts"></dl>
+    <div class="row"><a class="btn-quiet" href="timeline.html">The story of it</a><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-wb" aria-labelledby="wb-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="wb-title">The Grey Penitents</h2>
+    <dl class="facts" id="wb-facts"></dl>
+    <div class="row"><a class="btn-quiet" href="warbands.html">Their roster</a><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function facts(rows) { return rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join(''); }
+  var BATTLES = [
+    [1, 'Street Fight', 'Silver Caravan beat the Grey Penitents', [['Where', 'City Hall'], ['Winner', 'The Silver Caravan'], ['Out of action', 'Sister Hedda, 2 Novices; Otto'], ['Footholds', 'City Hall for the Silver Caravan']]],
+    [2, 'Wyrdstone Hunt', 'Clan Skrittle won', [['Where', 'Fence Alley'], ['Winner', 'Clan Skrittle'], ['Out of action', 'Jorg, a Warrior; 3 Verminkin'], ['Footholds', 'Fence Alley for Clan Skrittle']]],
+    [3, 'Breakthrough', 'Grey Penitents beat Clan Skrittle', [['Where', 'The Rock'], ['Winner', 'The Grey Penitents'], ['Out of action', 'Nibble, 2 giant rats'], ['Footholds', 'The Rock for the Grey Penitents']]],
+    [4, 'Chance Encounter', 'three warbands, the Penitents held', [['Where', 'Temple of Sigmar'], ['Winner', 'The Grey Penitents'], ['Out of action', 'Hans of the Warriors (dead), Brother Anselm'], ['Footholds', 'Temple of Sigmar for the Grey Penitents']]],
+    [5, 'Defend the Find', 'Silver Caravan won; the Penitents routed', [['Where', 'The Old Mill by the West Gate'], ['Winner', 'The Silver Caravan'], ['Out of action', 'Magda (Leg Wound); Grot; Sister Hedda'], ['Footholds', 'West Gate for the Silver Caravan']]]
+  ];
+  document.getElementById('battles').innerHTML = BATTLES.map(function (b) {
+    return '<li><button type="button" data-battle="' + b[0] + '"><span><b>Battle ' + b[0] + ' · ' + esc(b[1]) + '</b></span><small>' + esc(b[2]) + '</small><span class="chip">closed</span></button></li>';
+  }).join('') + '<li><a href="game-night.html"><span><b>Battle 6 · The ferry</b></span><small>being played now</small><span class="chip good">live</span></a></li>';
+  var WB = {
+    penitents: ['The Grey Penitents', [['Player', 'Anna'], ['Warband', 'Sisters of Sigmar · 9 models'], ['Rating', '131'], ['Gold', '38 gc'], ['State', 'After battle 5, 2 explanations missing'], ['Districts', 'The Rock, Temple of Sigmar (footholds)']]],
+    skrittle: ['Clan Skrittle', [['Player', 'Ben'], ['Warband', 'Skaven – Clan Eshin · 12 models'], ['Rating', '124'], ['Gold', '61 gc'], ['State', 'After battle 5, marked'], ['Districts', 'Fence Alley (control)']]]
+  };
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-battle]');
+    if (b) {
+      var x = BATTLES[Number(b.dataset.battle) - 1];
+      document.getElementById('bat-title').textContent = 'Battle ' + x[0] + ' · ' + x[1];
+      document.getElementById('bat-facts').innerHTML = facts(x[3]);
+      window.mockOpen('sheet-battle');
+      return;
+    }
+    var w = e.target.closest('[data-wb]');
+    if (w) {
+      var y = WB[w.dataset.wb];
+      document.getElementById('wb-title').textContent = y[0];
+      document.getElementById('wb-facts').innerHTML = facts(y[1]);
+      window.mockOpen('sheet-wb');
+    }
+  });
+})();
+</script>
+</body>
+</html>

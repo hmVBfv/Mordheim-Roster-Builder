@@ -37,7 +37,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Startgold, Budget, Sonderregeln wie Trantio (+20 %) | ✓ | ✓ | – | – | 3 | |
 | Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | – | roster (Recruit) | 3 | |
 | Anführer bestimmen | ✓ | ✓ | ◐ | – | 3 | App zeigt nur „Leader“ |
-| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ◐ | roster (+ Man) | 3 | App zeigt die Namen |
+| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ◐ | roster (+ Man mit Veteranenwurf und Grenzen, Namen antippen) | 3 | App zeigt die Namen |
 | Warnungen zur Legalität (Seitenleiste) | ✓ | ✓ | ✓ | – | 1e | |
 | Rating, Worth, Gold, Modelle | ✓ | ✓ | ◐ | roster | 3 | App: ohne Worth |
 
@@ -81,7 +81,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
-| Schalter und Vorgaben, Abweichungen sichtbar, im Export erklärt | ✓ | ✓ | – | – | 3 | **Mockup fehlt** |
+| Schalter und Vorgaben, Abweichungen sichtbar, im Export erklärt | ✓ | ✓ | – | manage (Schalter für die Kampagne) | 3 | Mockup für eine Warband ohne Kampagne fehlt |
 
 ## Kampagne
 
@@ -120,8 +120,10 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 ## Was daraus folgt
 
 1. **Mockups, die noch fehlen**, bevor Phase 3 baut: Warband anlegen,
-   Hired Swords und Dramatis Personae anheuern, Hausregeln, Mutationen und
-   Male, Exporte (PDF, Text, TTS für die ganze Warband).
+   Hired Swords und Dramatis Personae anheuern, Hausregeln einer Warband
+   ohne Kampagne, Mutationen und Male, Exporte (PDF, Text, TTS für die ganze
+   Warband). Die Wege zwischen den Bildschirmen (Leiste unten, Reiter) sind
+   seit dem 29.09.2026 vollständig.
 2. **Neue Logik** (in keiner der beiden Apps): Suchwurf, Verkaufen,
    Umverteilen, Kassenbuch (V4–V7) – kommt nach `core/` mit eigenen Tests,
    bevor der Builder sie braucht.
