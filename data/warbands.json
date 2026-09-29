@@ -5043,7 +5043,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 7 Marksmen, max. 5 Swordsmen.<br><b>Hardy:</b> Heroes & henchmen may re-roll one failed Ld test for 'All Alone' and Rout (must accept the second roll). The Captain may take a Wardog.<br><b>Skills:</b> Ostermark was published without a skill table — by official clarification the player picks one of the three Mercenary skill sets (Reikland / Middenheim / Marienburg). Offered here: The union of those sets — Captain all five, Champion/Youngblood Combat/Shooting/Strength/Speed (Academic is in none of the three sets). Strictly, pick one set and stick to it.",
+   "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 7 Marksmen, max. 5 Swordsmen.<br><b>Hardy:</b> Heroes & henchmen may re-roll one failed Ld test for 'All Alone' and Rout (must accept the second roll). The Captain may take a Wardog.<br><b>Skills:</b> Ostermark was published without a skill table; by later clarification the warband uses the skill table of one of the other Mercenary options. Choose it when founding the warband — it holds for all its Champions and Youngbloods.",
    "units": [
     {
      "id": "ocaptain",
@@ -5099,7 +5099,24 @@
       "strength",
       "speed"
      ],
-     "sp": "Hardy."
+     "sp": "Hardy.",
+     "skSub": {
+      "skReik": [
+       "combat",
+       "shooting",
+       "strength"
+      ],
+      "skMidd": [
+       "combat",
+       "strength",
+       "speed"
+      ],
+      "skMari": [
+       "combat",
+       "shooting",
+       "speed"
+      ]
+     }
     },
     {
      "id": "oyoung",
@@ -5126,7 +5143,24 @@
       "strength",
       "speed"
      ],
-     "sp": "Hardy."
+     "sp": "Hardy.",
+     "skSub": {
+      "skReik": [
+       "combat",
+       "shooting",
+       "speed"
+      ],
+      "skMidd": [
+       "combat",
+       "strength",
+       "speed"
+      ],
+      "skMari": [
+       "combat",
+       "shooting",
+       "speed"
+      ]
+     }
     },
     {
      "id": "owarrior",
@@ -5212,6 +5246,27 @@
      "eq": null,
      "noxp": true,
      "sp": "Animal (gains no experience). Only 1, with the Captain."
+    }
+   ],
+   "subtypeLabel": "Skill table as: ",
+   "subtypes": [
+    {
+     "key": "skReik",
+     "name": "Reikland",
+     "gold": 500,
+     "note": "Champions: Combat, Shooting, Strength. Youngbloods: Combat, Shooting, Speed. (Skill table only — the Reikland city rules do not apply.)"
+    },
+    {
+     "key": "skMidd",
+     "name": "Middenheim",
+     "gold": 500,
+     "note": "Champions and Youngbloods: Combat, Strength, Speed. (Skill table only — the Middenheim city rules do not apply.)"
+    },
+    {
+     "key": "skMari",
+     "name": "Marienburg",
+     "gold": 500,
+     "note": "Champions and Youngbloods: Combat, Shooting, Speed. (Skill table only — the Marienburg city rules do not apply.)"
     }
    ]
   },
@@ -6106,7 +6161,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Tomb Lord. Max. 1 Liche Priest, 2 Acolytes; any number of Skeleton Warriors, max. 2 Tomb Guardians, max. 3 Tomb Scorpions.<br><b>Undead:</b> Fear, immune to psychology, No Pain (stunned counts as knocked down), may not run, immune to poison.<br><b>Home Ground:</b> +1 die in the Exploration phase.<br><b>No Brain:</b> Skeletons never gain experience (Tomb Lord, Liche Priest, Acolytes and Tomb Guardians do).<br><b>Do not Drink:</b> Undead need no food or water; living animals with the warband follow the water rules as normal.",
+   "rules": "<b>Choice:</b> Exactly 1 Tomb Lord. Max. 1 Liche Priest, 2 Acolytes; any number of Skeleton Warriors, max. 2 Tomb Guardians, max. 3 Tomb Scorpions.<br><b>Undead:</b> Fear, immune to psychology, No Pain (stunned counts as knocked down), may not run, immune to poison.<br><b>Home Ground:</b> +1 die in the Exploration phase, in every campaign setting (Mordheimer lists the scope as unclear; played by intent — without it the warband is very weak).<br><b>No Brain:</b> Skeletons never gain experience (Tomb Lord, Liche Priest, Acolytes and Tomb Guardians do).<br><b>Do not Drink:</b> Undead need no food or water; living animals with the warband follow the water rules as normal.",
    "units": [
     {
      "id": "tomblord",
@@ -6708,7 +6763,7 @@
       "strength",
       "blackDwarfSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut."
+     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. He may wear armour but cannot perform rituals while wearing armour, except the Mechanical Suit (made for him) and Chaos armour (which never hinders casting). Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut."
     },
     {
      "id": "bull",
