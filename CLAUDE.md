@@ -125,8 +125,11 @@ changing anything structural.
 
 - **Every bug fix starts with a failing regression test.** Tests are
   unconditional — no branch that silently skips an assertion.
-- Work on branches. Never push to `master`; `master` changes only via pull
-  request with green CI. Rob merges and deploys.
+- Work on branches, one topic per branch, started from `master`. Never push
+  to `master`; `master` changes only via pull request with green CI. When a
+  branch is ready, open the pull request yourself (the session's GitHub
+  access allows it; Rob, 29.09.2026) with a summary of what changes for the
+  players; Rob merges and deploys.
 - Schema, endpoint or save-format change → update `docs/data-model.md` in the
   same commit. A new save key gets a default in `core/src/format/save.ts` and
   a place in `core/src/format/schema.ts`; `FORMAT` rises only with a
