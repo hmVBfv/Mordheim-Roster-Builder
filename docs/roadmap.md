@@ -131,7 +131,10 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   Erklärungsfelder), Sichtbarkeit (öffentlich, versiegelt, nur Leiter, „View
   as player“), Hintergrund (Stränge mit Enthüllungsstufe) und das neue
   Roster (mit dem Verletzungsablauf aus V1). Geprüft bei 360 px in beiden
-  Themes; **offen: Robs Prüfung auf dem Handy.**
+  Themes; **offen: Robs Prüfung auf dem Handy.** Nach Robs erstem Blick
+  (29.09.2026: tote Knöpfe, Erfahrung nur als Zahl) reagiert jede Bedienung –
+  Playwright klickt sie alle einzeln an –, jede Karte zeigt die
+  Erfahrungsschwellen, und der Trading Post (V6) ist als siebte Seite dazu.
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in
@@ -163,7 +166,8 @@ Die alte App bleibt in dieser Phase unverändert live.
 - Warbands, Versionen, Autosave, Sync mit Outbox und Epoche.
 - **Neuer Builder mit vollem Funktionsumfang** der alten App: Warband anlegen,
   Ausrüstung, Rare Items, Hired Swords, Dramatis Personae, Hausregeln,
-  Exporte (TTS, PDF, Text). Eine Paritäts-Checkliste listet jede Funktion.
+  Exporte (TTS, PDF, Text). Die [Paritäts-Checkliste](parity-checklist.md)
+  listet jede Funktion.
 - Quick-Build-Variante; Pages wird auf sie umgestellt, sobald die
   Checkliste vollständig ist.
 - Vor dem Abschalten der alten App: die Szenarien der Legacy-Tests als eigene

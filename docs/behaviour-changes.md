@@ -298,6 +298,16 @@ Ultimate FAQ 10.1 (Stufen 6, 8 und 9) und mordheimer.net *Campaigns* und
    Buchung mit Anlass, Betrag, Krieger und Gegenstand, damit die
    Änderungsansicht und die Chronik daraus lesen können.
 
+### Offen (für Rob)
+
+- **Rundung beim Verkauf.** Der halbe Preis von 3, 5 oder 15 gc ist keine
+  ganze Zahl. Regelbuch S. 105, mordheimer.net *Trading* und die Ultimate
+  FAQ nennen keine Rundung. Vorschlag: abrunden (die Händler feilschen
+  besser, sagt die Regel selbst) – das Mockup zeigt es so, mit Hinweis.
+
+**Mockup:** [`trading-post.html`](mockups/trading-post.html) zeigt V4–V7 in
+einer Ansicht (Kaufen, Suchen, Verkaufen, Geben, Kassenbuch).
+
 **Schon umgesetzt, in beiden Apps:** die Gründungspreise (Tabelle
 „Erledigt“ oben). Die Stufe der Kampagne entscheidet: bis „Setup“ gilt der
 Gründungspreis, ab „After battle 1“ ist die Zeile gesperrt und der

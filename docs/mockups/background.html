@@ -46,12 +46,12 @@
   <p class="secret is-hidden">⚑ Only campaign leaders see this area. It is never sent to players, never in an export, never in a repository.</p>
 
   <div class="content">
-    <div class="kinds" role="group" aria-label="Show">
-      <button type="button" aria-pressed="true">Threads 3</button>
-      <button type="button" aria-pressed="false">People 4</button>
-      <button type="button" aria-pressed="false">Places 2</button>
-      <button type="button" aria-pressed="false">Scenarios 1</button>
-      <button type="button" aria-pressed="false">GM notes 6</button>
+    <div class="kinds" role="group" aria-label="Show" id="kinds">
+      <button type="button" aria-pressed="true" data-kind="thread">Threads 3</button>
+      <button type="button" aria-pressed="false" data-kind="person">People 4</button>
+      <button type="button" aria-pressed="false" data-kind="place">Places 2</button>
+      <button type="button" aria-pressed="false" data-kind="scenario">Scenarios 1</button>
+      <button type="button" aria-pressed="false" data-kind="gm">GM notes 6</button>
     </div>
 
     <details class="card legend">
@@ -70,7 +70,7 @@
       <div class="part"><span class="label">What the players know</span>
         <p>Skritch was paid in advance. The coin carries the eel of the ferrymen’s guild. <span class="muted small">(revealed after battle 5)</span></p></div>
       <div class="refs"><span class="chip">Battle 5</span><span class="chip">Battle 6</span><span class="chip">Skritch</span><span class="chip">The ferryman</span><span class="chip">Note: the coin with the eel</span></div>
-      <div class="row"><button type="button" class="btn" data-open="sheet-reveal">Reveal…</button><button type="button" class="btn-quiet">Edit</button></div>
+      <div class="row"><button type="button" class="btn" data-open="sheet-reveal">Reveal…</button><button type="button" class="btn-quiet" data-open="sheet-edit">Edit</button></div>
       <p class="log">Last: Rob revealed “the coin with the eel” after battle 5 · Mon 22 Sep</p>
     </article>
 
@@ -80,7 +80,7 @@
       <details><summary>Truth, knowledge and references</summary>
         <p class="truth is-hidden">The bell tolls for whoever carries the reliquary. The Grey Penitents carry it without knowing.</p>
         <p class="muted small">Players know nothing yet.</p></details>
-      <div class="row"><button type="button" class="btn-quiet">Edit</button></div>
+      <div class="row"><button type="button" class="btn-quiet" data-open="sheet-edit">Edit</button></div>
     </article>
 
     <article class="card thread">
@@ -89,8 +89,30 @@
       <details><summary>Truth, knowledge and references</summary><p>Skritch owed the clan a warlock engineer; he paid with Nibble’s tail.</p></details>
     </article>
   </div>
+    <div id="other-kinds" hidden>
+      <article class="card" data-kind="person"><h2>Countess Adelheid von Rauch</h2><p class="small muted">⚑ Hidden · pays the ferrymen · appears in: Who pays the ferryman?</p></article>
+      <article class="card" data-kind="person"><h2>Skritch</h2><p class="small muted">Revealed · Clan Skrittle · battles 3, 5</p></article>
+      <article class="card" data-kind="person"><h2>The ferryman</h2><p class="small muted">Hint · rows for coin with the eel</p></article>
+      <article class="card" data-kind="person"><h2>Brother Anselm</h2><p class="small muted">Hidden · carries the reliquary</p></article>
+      <article class="card" data-kind="place"><h2>The drowned mill</h2><p class="small muted">Revealed · battle 5</p></article>
+      <article class="card" data-kind="place"><h2>St. Voss</h2><p class="small muted">Hidden · the bell</p></article>
+      <article class="card" data-kind="scenario"><h2>The ferry at dusk</h2><p class="small muted">Planned for battle 7 · uses “Who pays the ferryman?”</p></article>
+      <article class="card" data-kind="gm"><h2>GM notes</h2><p class="small muted">6 notes, newest: “Let the Caravan find the second coin only if they search the mill.”</p></article>
+    </div>
+  </div>
   <nav class="nav" data-current="Campaign"></nav>
 </div>
+
+<dialog class="sheet" id="sheet-edit" aria-labelledby="edit-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-edit">
+    <h2 id="edit-title">Edit the thread</h2>
+    <label class="field"><span class="small">Title</span><input class="input" value="Who pays the ferryman?"></label>
+    <label class="field"><span class="small">Truth <span class="vis leader">⚑</span></span><textarea class="textarea">Countess Adelheid von Rauch pays the ferrymen’s guild …</textarea></label>
+    <label class="field"><span class="small">Limit for hints</span><input class="input" value="Traces yes — the Countess’s name never."></label>
+    <div class="row"><button class="btn" value="save">Save</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
 
 <dialog class="sheet" id="sheet-reveal" aria-labelledby="reveal-title">
   <div class="sheet-grip"></div>
@@ -112,6 +134,15 @@
 
 <script>
 (function () {
+  document.getElementById('kinds').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-kind]'); if (!b) return;
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    var k = b.dataset.kind;
+    document.querySelectorAll('article.thread').forEach(function (a) { a.hidden = k !== 'thread'; });
+    var other = document.getElementById('other-kinds'); other.hidden = k === 'thread';
+    other.querySelectorAll('article').forEach(function (a) { a.hidden = a.dataset.kind !== k; });
+  });
+  document.getElementById('form-edit').addEventListener('submit', function () { window.mockToast('Saved. Only leaders see the truth.'); });
   document.getElementById('form-reveal').addEventListener('submit', function () {
     var full = document.getElementById('reveal-level').value === 'revealed';
     var lvl = document.getElementById('t1-level');

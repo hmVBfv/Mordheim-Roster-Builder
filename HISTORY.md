@@ -1492,3 +1492,33 @@ top bar, with every table in our own short words. A WebFetch will not
 quote the exploration chart at length, so each location was read twice
 in different ways and the few disagreements settled by a narrow third
 question. The first test counted 36 special locations; there are 30.
+
+## September 29, 2026 — buttons that looked finished
+
+Rob opened the mockups on his phone and found buttons that did nothing,
+and experience shown as a bare number on some cards. The first was worse
+than it looked: on the roster page the experience stepper and the cards
+shared an attribute (`data-xp`), so a tap anywhere on a card did not open
+its sheet but doubled the warrior's experience — invisible on a warrior at
+0 exp, which is why a crawler found only Wilhelm dead. The same crawler,
+clicking every control of every page from a fresh load and every control
+inside every sheet one of them opens, is now a Playwright project; it
+also caught a "Roll for me" button that did nothing whenever the dice
+repeated the old value. The dice buttons went, since the app reads tables
+and does not roll.
+
+Looking closely also turned up rule slips in the mockups themselves: the
+Reikland Marksman at BS 3 instead of 4, the Hired Sword on the Heroes'
+experience steps instead of the Henchmen's, a Mercenary Youngblood with a
+club his list does not have. Mockups are read as the rules by the people
+who test them.
+
+The Trading Post (V6) came next: buy, search, sell, give and the ledger
+in one view, and a merchant drawn as 32×24 pixel art in three frames —
+idle, a blink, a coin held up — who stands still when the phone asks for
+less motion. Writing the sell sheet raised a question the rules never
+answer: half of 5 gc.
+
+The parity checklist answers "does the new app do at least what the old
+one does?" honestly: all of the logic, tested; of the screens, only
+import and a read-only roster so far.

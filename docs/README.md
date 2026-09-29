@@ -23,6 +23,7 @@ sind Platzhalter (`<name>`, `<pi-lan-ip>`).
 | [glossary.md](glossary.md) | Deutsch ↔ Englisch ↔ Code | alle |
 | [roadmap.md](roadmap.md) | Phasen, Abnahmekriterien, offene Entscheidungen | Planung |
 | [behaviour-changes.md](behaviour-changes.md) | Register: wo `core/` bewusst von der alten App abweicht, und geplante Änderungen am Roster Builder | Rob, Entwicklung |
+| [parity-checklist.md](parity-checklist.md) | Jede Funktion der alten App: in `core/`, in der neuen App, im Mockup, in welcher Phase | Rob, Planung |
 | [rules-audit.md](rules-audit.md) | Abgleich der Regeldaten mit mordheimer.net: Befunde, Korrekturen, offene Fragen | Rob, Entwicklung |
 | [decisions/](decisions/) | Entscheidungsnotizen (ADRs): was entschieden wurde und warum | alle, vor Änderungen an Grundsätzen |
 

@@ -30,20 +30,20 @@
   .pip.base { border-style: dashed; }
   .pip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .pip.next { border-color: var(--accent); color: var(--accent); }
-  .xp-line { display: flex; justify-content: space-between; gap: var(--s2); font-size: 0.85rem; color: var(--text-muted); }
+  .xp-line { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); font-size: 0.85rem; color: var(--text-muted); }
   .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); margin: 0; font-size: 0.93rem; }
   .facts dt { color: var(--text-muted); }
   .facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
   .acts { display: grid; grid-template-columns: auto auto 1fr auto; gap: var(--s2); align-items: center; }
   .stepper { display: inline-grid; grid-template-columns: var(--tap) auto var(--tap); align-items: center; border: 1px solid var(--border); border-radius: var(--radius); }
   .stepper button { width: var(--tap); height: var(--tap); border: 0; background: transparent; cursor: pointer; font-size: 1.2rem; }
+  .stepper button:disabled { opacity: 0.3; cursor: default; }
   .stepper output { min-width: 3.2em; text-align: center; font-size: 0.9rem; }
   .men { display: flex; flex-wrap: wrap; gap: var(--s1); }
   .section-head { display: flex; justify-content: space-between; align-items: baseline; }
   .menu { display: grid; gap: var(--s1); }
   .menu button, .menu a { min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); text-decoration: none; cursor: pointer; text-align: left; }
   .menu .danger { color: var(--danger); }
-  .d66 { display: grid; grid-template-columns: 1fr auto; gap: var(--s2); }
   .result { display: grid; gap: var(--s2); padding: var(--s3); border: 1px solid var(--border); border-radius: var(--radius); }
   .result h3 { font-size: 1.05rem; }
 </style>
@@ -53,19 +53,19 @@
 
 <div class="app">
   <header class="bar">
-    <a class="back" href="#" aria-label="All warbands">←</a>
+    <a class="back" href="index.html" aria-label="All warbands">←</a>
     <span class="title">The Silver Caravan</span>
     <span class="sync">✓ Saved</span>
   </header>
-  <nav class="tabs" aria-label="Warband"><a href="#" aria-current="page">Roster</a><a href="#">Story</a><a href="#">Versions</a></nav>
+  <nav class="tabs" aria-label="Warband"><a href="#" aria-current="page">Roster</a><a href="timeline.html">Story</a><a href="changes.html">Versions</a></nav>
 
   <div class="content">
     <div class="stack">
       <p class="muted">Mercenaries – Reikland · Hel Fenn campaign · <span class="chip good">✓ After battle 5</span></p>
       <dl class="figures">
         <div><dt>Rating</dt><dd>118</dd></div>
-        <div><dt>Gold</dt><dd>55 gc</dd></div>
-        <div><dt>Models</dt><dd>7 / 15</dd></div>
+        <div><dt>Gold</dt><dd id="gold">55 gc</dd></div>
+        <div><dt>Models</dt><dd id="models">7 / 15</dd></div>
         <div><dt>Worth</dt><dd>612</dd></div>
       </dl>
     </div>
@@ -73,78 +73,77 @@
 
     <div class="section-head"><h2>Heroes</h2><span class="muted small">4 of 6</span></div>
 
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Ulrich the Grey</h3><p class="type">Mercenary Captain</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for Ulrich the Grey">⋯</button>
-        <div class="badges"><span class="chip">Leader</span><span class="chip good">Advance due</span></div></div>
+    <article class="card warrior" data-name="Ulrich the Grey" data-kind="hero" data-start="20" data-xp="32" data-taken="2">
+      <div class="w-head"><div><h3>Ulrich the Grey</h3><p class="type">Mercenary Captain</p></div><button type="button" class="icon-btn" data-more aria-label="More for Ulrich the Grey">⋯</button>
+        <div class="badges"><span class="chip">Leader</span></div></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
         <tbody><tr><td>4</td><td class="up">5</td><td>4</td><td>3</td><td>3</td><td>1</td><td>4</td><td>1</td><td>8</td><td>5+</td></tr></tbody></table>
-      <div class="xp"><div class="pips" aria-label="Advances: start at 20, taken at 24 and 28, next at 32"><span class="pip base">20</span><span class="pip on">24</span><span class="pip on">28</span><span class="pip next">32</span><span class="pip">36</span><span class="pip">41</span></div>
-        <div class="xp-line"><span>Exp <b id="xp-ulrich">29</b></span><span>next advance at 32</span></div></div>
+      <div class="xp"></div>
       <dl class="facts"><dt>Equipment</dt><dd>Sword, Shield, Light armour, Dagger</dd><dt>Skills</dt><dd>Strike to Injure</dd></dl>
-      <div class="acts">
-        <div class="stepper"><button type="button" data-xp="-1" aria-label="One experience less">−</button><output>Exp</output><button type="button" data-xp="1" aria-label="One experience more">+</button></div>
-        <button type="button" class="btn">Advance</button><span></span>
-        <button type="button" class="btn-quiet" data-open="sheet-injury">Injury</button>
-      </div>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Magda</h3><p class="type">Champion</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for Magda">⋯</button>
+    <article class="card warrior" data-name="Magda" data-kind="hero" data-start="8" data-xp="10" data-taken="0">
+      <div class="w-head"><div><h3>Magda</h3><p class="type">Champion</p></div><button type="button" class="icon-btn" data-more aria-label="More for Magda">⋯</button>
         <div class="badges"><span class="chip bad">Misses 1 game</span></div></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
         <tbody><tr><td class="down">3</td><td>4</td><td>3</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
-      <div class="xp-line"><span>Exp 13</span><span>next advance at 14</span></div>
+      <div class="xp"></div>
       <dl class="facts"><dt>Equipment</dt><dd>Double-handed weapon, Dagger</dd><dt>Injuries</dt><dd>Leg Wound (−1 M)</dd></dl>
-      <div class="acts">
-        <div class="stepper"><button type="button" aria-label="One experience less">−</button><output>Exp</output><button type="button" aria-label="One experience more">+</button></div>
-        <button type="button" class="btn-quiet">Advance</button><span></span>
-        <button type="button" class="btn-quiet" data-open="sheet-injury">Injury</button>
-      </div>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Jorg</h3><p class="type">Champion</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for Jorg">⋯</button>
-        <div class="badges"><span class="chip warn">⚠ BS 4 without a cause</span></div></div>
+    <article class="card warrior" data-name="Jorg" data-kind="hero" data-start="8" data-xp="9" data-taken="0">
+      <div class="w-head"><div><h3>Jorg</h3><p class="type">Champion</p></div><button type="button" class="icon-btn" data-more aria-label="More for Jorg">⋯</button>
+        <div class="badges"><a class="chip warn" href="changes.html">⚠ BS 4 without a cause</a></div></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
         <tbody><tr><td>4</td><td>4</td><td class="up">4</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>6+</td></tr></tbody></table>
-      <div class="xp-line"><span>Exp 9</span><span>next advance at 11</span></div>
+      <div class="xp"></div>
       <dl class="facts"><dt>Equipment</dt><dd>Mace, Sword, Light armour, Dagger</dd></dl>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Wilhelm</h3><p class="type">Youngblood · new</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for Wilhelm">⋯</button></div>
+    <article class="card warrior" data-name="Wilhelm" data-kind="hero" data-start="0" data-xp="0" data-taken="0">
+      <div class="w-head"><div><h3>Wilhelm</h3><p class="type">Youngblood · new</p></div><button type="button" class="icon-btn" data-more aria-label="More for Wilhelm">⋯</button></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
         <tbody><tr><td>4</td><td>2</td><td>2</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>6</td><td>—</td></tr></tbody></table>
-      <dl class="facts"><dt>Equipment</dt><dd>Club, Dagger</dd></dl>
+      <div class="xp"></div>
+      <dl class="facts"><dt>Equipment</dt><dd>Mace, Dagger</dd></dl>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
-    <div class="section-head"><h2>Henchmen</h2><span class="muted small">3 men</span></div>
+    <div class="section-head"><h2>Henchmen</h2><span class="muted small" id="men-count">3 men</span></div>
 
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Warriors <span class="muted">×2</span></h3><p class="type">Warrior · group</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for the Warriors">⋯</button></div>
-      <div class="men"><span class="chip">Otto</span><span class="chip">Fritz</span><span class="chip" style="text-decoration: line-through">Hans ☠</span></div>
+    <article class="card warrior" data-name="Warriors" data-kind="hench" data-start="0" data-xp="4" data-taken="0" data-cost="25">
+      <div class="w-head"><div><h3>Warriors <span class="muted" id="warriors-n">×2</span></h3><p class="type">Warrior · group</p></div><button type="button" class="icon-btn" data-more aria-label="More for the Warriors">⋯</button></div>
+      <div class="men" id="men"><span class="chip">Otto</span><span class="chip">Fritz</span><span class="chip" style="text-decoration: line-through">Hans ☠</span></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
         <tbody><tr><td>4</td><td>3</td><td>3</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
-      <div class="xp-line"><span>Exp 4 (group)</span><span>next advance at 5</span></div>
+      <div class="xp"></div>
       <dl class="facts"><dt>Equipment</dt><dd>Axe, Buckler, Dagger</dd></dl>
-      <div class="acts"><button type="button" class="btn-quiet">+ Man</button><span></span><span></span><button type="button" class="btn-quiet" data-open="sheet-injury">Injury</button></div>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><button type="button" class="btn-quiet" id="add-man">+ Man</button><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Lukas</h3><p class="type">Marksman</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for Lukas">⋯</button></div>
+    <article class="card warrior" data-name="Lukas" data-kind="hench" data-start="0" data-xp="1" data-taken="0">
+      <div class="w-head"><div><h3>Lukas</h3><p class="type">Marksman · BS 4 in Reikland</p></div><button type="button" class="icon-btn" data-more aria-label="More for Lukas">⋯</button></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
-        <tbody><tr><td>4</td><td>3</td><td>3</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
+        <tbody><tr><td>4</td><td>3</td><td>4</td><td>3</td><td>3</td><td>1</td><td>3</td><td>1</td><td>7</td><td>—</td></tr></tbody></table>
+      <div class="xp"></div>
       <dl class="facts"><dt>Equipment</dt><dd>Crossbow, Dagger</dd></dl>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
     <div class="section-head"><h2>Hired Swords</h2></div>
-    <article class="card warrior">
-      <div class="w-head"><div><h3>Big Gunnar</h3><p class="type">Ogre Bodyguard · upkeep 30 gc</p></div><button type="button" class="icon-btn" data-open="sheet-more" aria-label="More for Big Gunnar">⋯</button></div>
+    <article class="card warrior" data-name="Big Gunnar" data-kind="hired" data-start="0" data-xp="3" data-taken="1">
+      <div class="w-head"><div><h3>Big Gunnar</h3><p class="type">Ogre Bodyguard · upkeep 30 gc</p></div><button type="button" class="icon-btn" data-more aria-label="More for Big Gunnar">⋯</button></div>
       <table class="stats"><thead><tr><th>M</th><th>WS</th><th>BS</th><th>S</th><th>T</th><th>W</th><th>I</th><th>A</th><th>Ld</th><th>Sv</th></tr></thead>
         <tbody><tr><td>6</td><td>3</td><td>2</td><td>4</td><td>4</td><td>3</td><td>3</td><td>2</td><td>7</td><td>6+</td></tr></tbody></table>
+      <div class="xp"></div>
+      <dl class="facts"><dt>Skills</dt><dd>Resilient</dd></dl>
+      <div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button><span></span><span></span><button type="button" class="btn-quiet" data-injury>Injury</button></div>
     </article>
 
-    <div class="row"><button type="button" class="btn">+ Recruit</button><button type="button" class="btn-quiet">Stash · 2 shards</button></div>
+    <div class="row"><button type="button" class="btn" data-open="sheet-recruit">+ Recruit</button><button type="button" class="btn-quiet" data-open="sheet-stash">Stash · 2 shards</button><a class="btn-quiet" href="trading-post.html">Trading Post</a></div>
   </div>
   <nav class="nav" data-current="Warbands"></nav>
 </div>
@@ -154,13 +153,26 @@
   <form method="dialog">
     <h2 id="more-title">Ulrich the Grey</h2>
     <div class="menu">
-      <button type="button">Equipment &amp; rare items <span aria-hidden="true">›</span></button>
-      <button type="button">Name, title and voice (DE / EN) <span aria-hidden="true">›</span></button>
-      <button type="button">His story so far <span aria-hidden="true">›</span></button>
-      <button type="button">Tabletop Simulator card <span aria-hidden="true">›</span></button>
-      <button type="button" class="danger">Out of action for good… <span aria-hidden="true">›</span></button>
+      <a href="trading-post.html">Equipment &amp; rare items <span aria-hidden="true">›</span></a>
+      <button type="button" data-open="sheet-name">Name, title and voice (DE / EN) <span aria-hidden="true">›</span></button>
+      <a href="timeline.html">His story so far <span aria-hidden="true">›</span></a>
+      <button type="button" data-open="sheet-tts">Tabletop Simulator card <span aria-hidden="true">›</span></button>
+      <button type="button" class="danger" id="gone">Out of action for good… <span aria-hidden="true">›</span></button>
     </div>
     <button type="button" class="btn-quiet" data-close>Close</button>
+  </form>
+</dialog>
+
+<!-- The advance as rolled (docs/ui.md; tables as in the post-battle helper). -->
+<dialog class="sheet" id="sheet-advance" aria-labelledby="adv-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-advance">
+    <h2 id="adv-title">Advance · Ulrich the Grey</h2>
+    <p class="small muted" id="adv-help">Heroes roll 2D6 on the Heroes' table.</p>
+    <label class="field"><span class="small">2D6 as rolled</span>
+      <input class="input" id="adv-roll" inputmode="numeric" maxlength="2" value="7"></label>
+    <div class="result" id="adv-result" aria-live="polite"></div>
+    <div class="row"><button class="btn" value="apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
   </form>
 </dialog>
 
@@ -171,10 +183,63 @@
     <h2 id="inj-title">Serious injury · Magda</h2>
     <p class="small muted">Out of action by Skritch (Clan Skrittle), battle 5, turn 4.</p>
     <label class="field"><span class="small">D66 as rolled</span>
-      <span class="d66"><input class="input" id="d66" inputmode="numeric" pattern="[1-6][1-6]" maxlength="2" value="23" aria-describedby="d66-help"><button type="button" class="btn-quiet" id="roll">Roll for me</button></span>
+      <input class="input" id="d66" inputmode="numeric" pattern="[1-6][1-6]" maxlength="2" value="23" aria-describedby="d66-help">
       <span class="small muted" id="d66-help">Tens die first: a 2 and a 3 is 23.</span></label>
     <div class="result" id="result" aria-live="polite"></div>
     <div class="row"><button class="btn" value="apply">Apply</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-recruit" aria-labelledby="rec-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="rec-title">Recruit</h2>
+    <p class="small muted">After the first battle a recruit brings only common items from his list — bought right here, at the Trading Post's prices.</p>
+    <div class="menu" id="recruit-list">
+      <button type="button" data-unit="Warrior" data-gc="25">Warrior <span class="muted">25 gc</span></button>
+      <button type="button" data-unit="Marksman" data-gc="25">Marksman <span class="muted">25 gc · 1 of 7</span></button>
+      <button type="button" data-unit="Swordsman" data-gc="35">Swordsman <span class="muted">35 gc · 0 of 5</span></button>
+      <button type="button" data-unit="Youngblood" data-gc="15">Youngblood <span class="muted">15 gc · 1 of 2</span></button>
+      <button type="button" disabled>Champion <span class="muted">2 of 2</span></button>
+    </div>
+    <button type="button" class="btn-quiet" data-close>Close</button>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-stash" aria-labelledby="stash-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="stash-title">Stash</h2>
+    <dl class="facts"><dt>Wyrdstone</dt><dd>2 shards</dd><dt>Items</dt><dd>Lucky charm, Rope &amp; hook</dd></dl>
+    <div class="menu">
+      <a href="trading-post.html#give">Give an item to a warrior <span aria-hidden="true">›</span></a>
+      <a href="trading-post.html#sell">Sell an item — half price <span aria-hidden="true">›</span></a>
+      <a href="game-night.html">Sell wyrdstone after the battle <span aria-hidden="true">›</span></a>
+    </div>
+    <button type="button" class="btn-quiet" data-close>Close</button>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-name" aria-labelledby="name-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-name">
+    <h2 id="name-title">Name, title and voice</h2>
+    <label class="field"><span class="small">Name (German)</span><input class="input" value="Ulrich der Graue"></label>
+    <label class="field"><span class="small">Name (English)</span><input class="input" value="Ulrich the Grey"></label>
+    <label class="field"><span class="small">How he speaks (for the chronicle)</span><textarea class="textarea">Few words, all of them orders.</textarea></label>
+    <div class="row"><button class="btn" value="save">Save</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="sheet" id="sheet-tts" aria-labelledby="tts-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog">
+    <h2 id="tts-title">Tabletop Simulator card</h2>
+    <pre class="card small" style="white-space: pre-wrap; margin: 0">[b]Ulrich the Grey[/b] – Mercenary Captain
+M4 WS5 BS4 S3 T3 W1 I4 A1 Ld8 · Sv 5+
+Sword, Shield, Light armour, Dagger
+Leader · Strike to Injure</pre>
+    <div class="row"><button type="button" class="btn" id="tts-copy">Copy</button><button type="button" class="btn-quiet" data-close>Close</button></div>
   </form>
 </dialog>
 
@@ -182,6 +247,76 @@
 
 <script>
 (function () {
+  /* Experience on every card, as the Roster Builder shows it: every
+     threshold framed, those already reached filled, the next one marked. */
+  var HERO = [2, 4, 6, 8, 11, 14, 17, 20, 24, 28, 32, 36, 41, 46, 51, 57, 63, 69, 76, 83, 90];
+  var HENCH = [2, 5, 9, 14];
+  function drawXp(card) {
+    var d = card.dataset, xp = Number(d.xp), start = Number(d.start), th = d.kind === 'hero' ? HERO : HENCH; // Hired Swords: the Henchmen's steps
+    var earned = th.filter(function (t) { return t > start && t <= xp; }).length;
+    var next = th.filter(function (t) { return t > xp; })[0];
+    var due = earned > Number(d.taken);
+    var pips = th.map(function (t) {
+      var cls = t <= start ? 'base' : t <= xp ? 'on' : t === next ? 'next' : '';
+      return '<span class="pip ' + cls + '">' + t + '</span>';
+    }).join('');
+    card.querySelector('.xp').innerHTML =
+      '<div class="pips" aria-label="Advances at ' + th.join(', ') + '">' + pips + '</div>' +
+      '<div class="xp-line"><span class="stepper"><button type="button" data-step="-1" aria-label="One experience less"' + (xp > 0 ? '' : ' disabled') + '>−</button><output>Exp ' + xp + (d.kind === 'hench' ? ' (group)' : '') + '</output><button type="button" data-step="1" aria-label="One experience more">+</button></span>' +
+      '<span>' + (next != null ? 'next advance at ' + next : 'maximum reached') + '</span></div>';
+    var badges = card.querySelector('.badges');
+    if (!badges) { badges = document.createElement('div'); badges.className = 'badges'; card.querySelector('.w-head').append(badges); }
+    var chip = badges.querySelector('.due');
+    if (due && !chip) { chip = document.createElement('span'); chip.className = 'chip good due'; badges.append(chip); }
+    if (chip) { if (due) chip.textContent = 'Advance due'; else chip.remove(); }
+  }
+  var cards = document.querySelectorAll('.card.warrior');
+  cards.forEach(drawXp);
+  var current = cards[0];
+  document.addEventListener('click', function (e) {
+    var card = e.target.closest('.card.warrior');
+    if (card) current = card;
+    var b = e.target.closest('[data-step]');
+    if (b && card) { card.dataset.xp = Math.max(0, Number(card.dataset.xp) + Number(b.dataset.step)); drawXp(card); return; }
+    var name = current ? current.dataset.name : '';
+    if (e.target.closest('[data-more]')) { document.getElementById('more-title').textContent = name; open('sheet-more'); }
+    if (e.target.closest('[data-advance]')) { openAdvance(card); }
+    if (e.target.closest('[data-injury]')) { document.getElementById('inj-title').textContent = 'Serious injury · ' + name; open('sheet-injury'); }
+  });
+  function open(id) { window.mockOpen(id); }
+
+  /* Advance tables (data/postbattle.json). */
+  var HERO_ADV = [[2, 5, 'New skill', 'Choose one from his skill lists:', ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient']],
+    [6, 6, '+1 S or +1 A', 'Roll a D6:', ['1–3 · +1 Strength', '4–6 · +1 Attack']], [7, 7, '+1 WS or +1 BS', 'Choose one:', ['+1 Weapon Skill', '+1 Ballistic Skill']],
+    [8, 8, '+1 I or +1 Ld', 'Roll a D6:', ['1–3 · +1 Initiative', '4–6 · +1 Leadership']], [9, 9, '+1 W or +1 T', 'Roll a D6:', ['1–3 · +1 Wound', '4–6 · +1 Toughness']],
+    [10, 12, 'New skill', 'Choose one from his skill lists:', ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient']]];
+  var HENCH_ADV = [[2, 4, '+1 Initiative', '', null], [5, 5, '+1 Strength', '', null], [6, 7, '+1 BS or +1 WS', 'Choose one:', ['+1 Ballistic Skill', '+1 Weapon Skill']],
+    [8, 8, '+1 Attack', '', null], [9, 9, '+1 Leadership', '', null], [10, 12, "The lad's got talent", 'One of the group becomes a Hero:', ['Otto', 'Fritz']]];
+  var advCard = null, rollIn = document.getElementById('adv-roll'), advOut = document.getElementById('adv-result');
+  function openAdvance(card) {
+    advCard = card;
+    document.getElementById('adv-title').textContent = 'Advance · ' + card.dataset.name;
+    document.getElementById('adv-help').textContent = card.dataset.kind === 'hench' ? 'The group rolls 2D6 once, on the Henchmen table; every man gets the advance.'
+      : card.dataset.kind === 'hired' ? 'Hired Swords gain experience like Henchmen (2, 5, 9, 14) but roll 2D6 on the Heroes table.' : 'Heroes roll 2D6 on the Heroes table.';
+    showAdv(); open('sheet-advance');
+  }
+  function showAdv() {
+    var v = Number(rollIn.value), table = advCard && advCard.dataset.kind === 'hench' ? HENCH_ADV : HERO_ADV;
+    var row = v >= 2 && v <= 12 && table.filter(function (r) { return v >= r[0] && v <= r[1]; })[0];
+    if (!row) { advOut.innerHTML = '<p class="muted">Enter the total of two dice, 2–12.</p>'; return; }
+    var html = '<h3>' + v + ' · ' + row[2] + '</h3>' + (row[3] ? '<p>' + row[3] + '</p>' : '');
+    if (row[4]) html += '<div class="pick">' + row[4].map(function (o, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + o + '</button>'; }).join('') + '</div>';
+    html += '<p class="small muted">At his racial maximum? Take the other option — or roll again if the result raises only one.</p>';
+    advOut.innerHTML = html;
+  }
+  rollIn.addEventListener('input', showAdv);
+  document.getElementById('form-advance').addEventListener('submit', function () {
+    var card = advCard, before = card.dataset.taken;
+    card.dataset.taken = Number(before) + 1; drawXp(card);
+    var pick = advOut.querySelector('[aria-pressed=true]'), what = pick ? pick.textContent : advOut.querySelector('h3').textContent.split(' · ')[1];
+    window.mockToast(card.dataset.name + ': ' + what + '.', function () { card.dataset.taken = before; drawXp(card); });
+  });
+
   /* The Heroes' Serious Injuries chart (mordheimer.net) with its follow-ups. */
   var CHART = [
     [11, 15, 'Dead', 'Removed from the roster; all equipment is lost.', null],
@@ -216,20 +351,33 @@
     out.innerHTML = html;
   }
   input.addEventListener('input', show);
-  document.getElementById('roll').onclick = function () {
-    input.value = String(1 + Math.floor(Math.random() * 6)) + String(1 + Math.floor(Math.random() * 6));
-    show();
-  };
+  // no dice in the app: the table is read with the roll made at the table (Rob, 29.09.2026)
   show();
   document.getElementById('form-injury').addEventListener('submit', function () {
-    window.mockToast('Applied to Magda.', function () {});
+    window.mockToast('Applied to ' + (current ? current.dataset.name : 'Magda') + '.', function () {});
   });
-  document.querySelectorAll('[data-xp]').forEach(function (b) {
-    b.onclick = function () {
-      var el = document.getElementById('xp-ulrich');
-      el.textContent = Math.max(0, Number(el.textContent) + Number(b.dataset.xp));
-    };
+  document.getElementById('gone').onclick = function () {
+    document.getElementById('sheet-more').close();
+    input.value = '11'; show();
+    document.getElementById('inj-title').textContent = 'Out of action for good · ' + current.dataset.name;
+    open('sheet-injury');
+  };
+
+  /* One more man for the group: he comes with the group's experience. */
+  document.getElementById('add-man').onclick = function () {
+    var men = document.getElementById('men'), n = men.querySelectorAll('.chip:not([style])').length + 1;
+    var chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = 'Warrior ' + (n + 1);
+    men.append(chip);
+    document.getElementById('warriors-n').textContent = '×' + n;
+    window.mockToast('Warrior ' + (n + 1) + ' joins for 33 gc — 25, and 8 for the group\'s 4 experience.', function () { chip.remove(); document.getElementById('warriors-n').textContent = '×' + (n - 1); });
+  };
+  document.getElementById('recruit-list').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-unit]'); if (!b) return;
+    document.getElementById('sheet-recruit').close();
+    window.mockToast('Recruited a ' + b.dataset.unit + ' for ' + b.dataset.gc + ' gc — now choose his gear.', function () {});
   });
+  document.getElementById('form-name').addEventListener('submit', function () { window.mockToast('Name and voice saved.'); });
+  document.getElementById('tts-copy').onclick = function () { window.mockToast('Copied — paste it into the model\'s Description in TTS.'); };
 })();
 </script>
 </body>
