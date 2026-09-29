@@ -92,6 +92,57 @@
   font-weight: 600;
 }
 
+/* the experience track (legacy xpBar) */
+.xp {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  min-width: 2.2em;
+  padding: 0 4px;
+  text-align: center;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+
+.steps .base {
+  border-style: dashed;
+}
+
+.steps .on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.steps .next {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.xpLine {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 var(--space-2);
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
 .facts {
   display: grid;
   grid-template-columns: max-content 1fr;

@@ -62,6 +62,8 @@ for (const theme of THEMES) {
     await importSample(page);
     await expect(page.getByRole('article')).toHaveCount(7);
     await expect(page.getByRole('heading', { name: 'Ulrich the Grey' })).toBeVisible();
+    // experience as the framed steps of the track, not a bare number (Rob, 29.09.2026)
+    await expect(page.getByRole('list', { name: 'Experience steps' }).first().getByRole('listitem')).toHaveCount(21);
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-roster`);
 
