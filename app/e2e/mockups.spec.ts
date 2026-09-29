@@ -16,7 +16,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
 const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give',
-  'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more'];
+  'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more', 'desktop'];
 const PAGES = ['index', ...SCREENS];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
 const IN_SHEET = 'button:visible, a:visible, input[type=checkbox]:visible';
@@ -89,45 +89,103 @@ const openSheet = (page: Page) => page.evaluate(() => document.querySelector('di
 const sheetKey = (page: Page, sheet: string) =>
   page.locator(`#${sheet}`).locator(IN_SHEET).evaluateAll((els) => els.map((e) => (e.getAttribute('data-value') ? '·' : (e.textContent ?? '').trim().slice(0, 24))).join('|'));
 
+/* Clicks every control of a page, then every control in every sheet they
+   open, two sheets deep; returns what did nothing. */
+async function crawl(page: Page, name: string) {
+  const dead: string[] = [];
+  const seen = new Set<string>();
+  const queue: Step[][] = [[]];
+  while (queue.length) {
+    const path = queue.shift()!;
+    await replay(page, name, path);
+    const here = path.length ? await openSheet(page) : null;
+    if (path.length && !here) { dead.push(`a sheet did not open again (${JSON.stringify(path)})`); continue; }
+    const count = await scope(page, here).count();
+    for (let i = 0; i < count; i++) {
+      await replay(page, name, path);
+      const el = scope(page, here).nth(i);
+      if (await skipped(el)) continue;
+      const label = await labelOf(el);
+      const wrong = await verdict(page, el);
+      if (wrong) dead.push(`${here ? `[${here}] ` : ''}${label} ${wrong}`);
+      // a sheet it opened (on the same page): its controls are next, up to two sheets deep
+      const opened = pathOf(page.url()).endsWith(`/${name.split('#')[0]}.html`) ? await openSheet(page) : null;
+      if (opened && opened !== here && path.length < 2) {
+        const key = `${opened}|${await sheetKey(page, opened)}`;
+        if (!seen.has(key)) { seen.add(key); queue.push([...path, { sheet: here, i }]); }
+      }
+    }
+  }
+  return dead;
+}
+
+async function themesFit(page: Page, name: string, width: number, shot: string) {
+  for (const theme of ['chronicle', 'parchment']) {
+    await page.locator(`.mock [data-theme="${theme}"]`).click();
+    const wide = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(wide, `${name} in ${theme} scrolls sideways at ${width} px`).toBeLessThanOrEqual(width);
+    await page.screenshot({ path: `test-results/screens/mockup-${shot}-${theme}.png`, fullPage: true });
+  }
+  await page.locator('.mock [data-theme="chronicle"]').click();
+}
+
 for (const name of PAGES) {
   test(`mockup ${name}: fits 360 px, every control reacts`, async ({ page }) => {
     test.setTimeout(600_000);
     await go(page, name);
-    for (const theme of ['chronicle', 'parchment']) {
-      await page.locator(`.mock [data-theme="${theme}"]`).click();
-      const wide = await page.evaluate(() => document.documentElement.scrollWidth);
-      expect(wide, `${name} in ${theme} scrolls sideways`).toBeLessThanOrEqual(360);
-      await page.screenshot({ path: `test-results/screens/mockup-${name.replace('#', '-')}-${theme}.png`, fullPage: true });
-    }
-    await page.locator('.mock [data-theme="chronicle"]').click();
-
-    const dead: string[] = [];
-    const seen = new Set<string>();
-    const queue: Step[][] = [[]];
-    while (queue.length) {
-      const path = queue.shift()!;
-      await replay(page, name, path);
-      const here = path.length ? await openSheet(page) : null;
-      if (path.length && !here) { dead.push(`a sheet did not open again (${JSON.stringify(path)})`); continue; }
-      const count = await scope(page, here).count();
-      for (let i = 0; i < count; i++) {
-        await replay(page, name, path);
-        const el = scope(page, here).nth(i);
-        if (await skipped(el)) continue;
-        const label = await labelOf(el);
-        const wrong = await verdict(page, el);
-        if (wrong) dead.push(`${here ? `[${here}] ` : ''}${label} ${wrong}`);
-        // a sheet it opened (on the same page): its controls are next, up to two sheets deep
-        const opened = pathOf(page.url()).endsWith(`/${name.split('#')[0]}.html`) ? await openSheet(page) : null;
-        if (opened && opened !== here && path.length < 2) {
-          const key = `${opened}|${await sheetKey(page, opened)}`;
-          if (!seen.has(key)) { seen.add(key); queue.push([...path, { sheet: here, i }]); }
-        }
-      }
-    }
-    expect(dead, `controls on ${name} that do nothing`).toEqual([]);
+    await themesFit(page, name, 360, name.replace('#', '-'));
+    expect(await crawl(page, name), `controls on ${name} that do nothing`).toEqual([]);
   });
 }
+
+/* Rob, 29.09.2026: "Can you show me the desktop mockup too? … several,
+   perhaps movable windows … a good overview without clutter." The desktop
+   page at a desktop's width: three columns, every control reacts. */
+test('mockup desktop at 1440 px: every control reacts', async ({ page }) => {
+  test.setTimeout(600_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await go(page, 'desktop');
+  await expect(page.locator('.cols.n3')).toBeVisible();
+  await themesFit(page, 'desktop', 1440, 'desktop-1440');
+  expect(await crawl(page, 'desktop'), 'controls on the desktop that do nothing').toEqual([]);
+});
+
+test('mockup desktop: a panel is moved by dragging, or by its menu', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await go(page, 'desktop');
+  const first = (col: number) => page.locator(`.col[data-col="${col}"] .panel`).first().getAttribute('data-panel');
+  expect(await first(0)).toBe('roster');
+  await page.locator('#p-ledger .ph h2').dragTo(page.locator('#p-roster .pb'));
+  expect(await first(0)).toBe('ledger');
+  await expect(page.locator('.views [data-save]')).toBeVisible();
+  // without a mouse: the ⋯ menu
+  await page.locator('[data-menu="ledger"]').click();
+  await page.locator('#sheet-panel [data-pm="right"]').click();
+  expect(await first(1)).toBe('ledger');
+  // across the full width, then minimised to the dock and back
+  await page.locator('[data-menu="warrior"]').click();
+  await page.locator('#sheet-panel [data-pm="top"]').click();
+  await expect(page.locator('.top #p-warrior')).toBeVisible();
+  await page.locator('[data-min="warrior"]').click();
+  await expect(page.locator('#p-warrior')).toHaveCount(0);
+  await page.locator('.dock [data-restore="warrior"]').click();
+  await expect(page.locator('.top #p-warrior')).toBeVisible();
+  // the arrangement can be kept as a view
+  await page.locator('.views [data-save]').click();
+  await expect(page.locator('.views button[aria-pressed="true"]')).toHaveText('My view');
+  await page.screenshot({ path: 'test-results/screens/mockup-desktop-moved.png' });
+});
+
+/* Rob, 29.09.2026: the twin-tailed comet should strike on some visits. One
+   in three by chance; ?impact decides it, and a test never gets it by chance. */
+test('mockup home: the comet comes down on some visits', async ({ page }) => {
+  await page.goto('home.html?impact=1');
+  await expect(page.locator('#sky')).toHaveClass(/impact/);
+  for (const q of ['?impact=0', '']) {
+    await page.goto(`home.html${q}`);
+    await expect(page.locator('#sky')).not.toHaveClass(/impact/);
+  }
+});
 
 /* Every screen can be left: the bar at the bottom, or ← (game night). */
 for (const name of SCREENS) {
