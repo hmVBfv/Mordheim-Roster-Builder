@@ -59,6 +59,22 @@ Report a problem   überall erreichbar
   nebeneinander (z. B. Roster links, gewählter Krieger rechts). Karten
   stehen nebeneinander, so viele die Breite fasst (Roster: ab 1440 px drei
   Spalten); der Inhalt ist bis 1320 px breit.
+- **Vorschlag (Mockup `desktop.html`, 29.09.2026, noch nicht entschieden):**
+  Auf Robs Wunsch nach „mehreren ggf. verschiebbaren Fenstern … ohne
+  clutter“ wird der Desktop eine Arbeitsfläche aus Panels. Ein Panel ist ein
+  Bildschirm des Handys (Roster, Krieger, Trading Post, Gold, Lager, Schritte
+  nach der Schlacht, Timeline, Kampagne). Die Panels stehen in Spalten (so
+  viele die Breite fasst, höchstens drei, je Panel mindestens 340 px), dazu
+  eine Reihe über die ganze Breite; nichts überlappt, nichts schwebt – so
+  bleibt es ruhig. Verschoben wird an der Titelleiste per Ziehen oder ohne
+  Maus über das Menü ⋯ des Panels (Spalte links/rechts, hoch, runter, über
+  die ganze Breite, Arbeitsfläche füllen, ins Dock, schließen). Die Panels
+  hängen zusammen: Wer im Roster gewählt ist, zeigt das Krieger-Panel, und
+  für ihn sucht der Trading Post. „Views“ sind gespeicherte Anordnungen für
+  eine Aufgabe (Roster, After battle, Trading, Campaign, eigene); sie liegen
+  nur auf dem Gerät. Unter 1024 px stapeln sich die Panels, und die Leiste
+  unten kehrt zurück – am Handy bleibt es bei einem Bildschirm zur Zeit.
+  Sheets erscheinen am Desktop in der Mitte statt am unteren Rand.
 - **Quick Build (Pages):** nur Home (lokale Warbands), Warband (Roster),
   Import/Export und „Send to campaign server“.
 
@@ -74,6 +90,7 @@ Report a problem   überall erreichbar
 | Roster (neu) | meistgenutzter Bildschirm, heute nicht handytauglich |
 | Trading Post (V6) | Kaufen, Suchen, Verkaufen und Umverteilen nach dem ersten Kampf; viele Regeln auf einmal |
 | Home, Warbands, Campaign, World, Manage, Story, More | die Wege dazwischen: jedes Ziel der Leiste unten und jeder Reiter führt auf eine eigene Seite (Rob, 29.09.2026: Reiter ohne Ziel, aus „Notes“ kein Weg zurück) |
+| Desktop-Arbeitsfläche | Rob, 29.09.2026: am Desktop mehrere, verschiebbare Fenster für einen Überblick ohne Unordnung |
 
 Mockups liegen als statische Seiten unter `docs/mockups/` und werden auf dem
 Handy geprüft, bevor die Umsetzung beginnt. Sie nutzen dieselben
@@ -87,7 +104,9 @@ darf nicht auf „#“ zeigen und muss auf eine Seite führen, die es gibt; jede
 Seite hat die Leiste unten oder ←. Ein ← direkt nach dem Schließen eines
 Sheets wartet, bis dessen Schritt im Verlauf zurückgenommen ist – vorher
 brach dieser Schritt den neuen Seitenaufruf ab („der Pfeil macht manchmal
-nichts“).
+nichts“). Die Desktop-Seite wird zusätzlich bei 1440 px durchgeklickt, und
+ein eigener Test zieht ein Panel an einen anderen Platz, verschiebt es über
+⋯, legt es ins Dock und zurück und speichert die Anordnung als View.
 
 Die Leiste unten führt zu Home (`home.html`), Warbands (`warbands.html`),
 Campaign (`campaign.html`), Notes (`visibility.html`, der Reiter „Notes“ der
@@ -102,14 +121,16 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
 | `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt |
 | `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1); Henchmen-Gruppen mit „+ Man“ (Kosten aus Einheit, gleicher Ausrüstung und 2 gc je Erfahrungspunkt, Veteranenwurf, Grenzen: 5 je Gruppe, Einheit, 15 Modelle), Namen der einzelnen Männer, „The lad's got talent“ (Mann wird Held mit zwei Skill-Listen und sofortigem Aufstieg), Tod eines Mannes (W6), Anwerben neuer Gruppen und Helden |
-| `home.html` | „Offen für dich“, eigene Warbands, Kampagnen; Mordheim bei Nacht als Pixelbild (Komet, flackernde Fenster, pulsierender Wyrdstein; still bei „weniger Bewegung“); eine Frage einer Mitspielerin beantworten |
+| `home.html` | „Offen für dich“, eigene Warbands, Kampagnen; Mordheim bei Nacht als Pixelbild (Komet über der Stadt, flackernde Fenster, Wyrdstein, der in den Trümmern aufleuchtet); bei jedem dritten Aufruf schlägt der Zweischweifige Komet ein (Blitz, Feuerball, Rauch, danach glüht der Krater), `?impact=1` bzw. `0` erzwingt es; still und ohne Blitz bei „weniger Bewegung“; eine Frage einer Mitspielerin beantworten |
+| Porträts der Warbands | `warband-art.js`: je Warband ein Pixelbild nach ihrer Beschreibung – Reikland-Söldner mit Federhut, Harnisch und Luntenbüchse (Silver Caravan), Schwester des Sigmar mit Kapuze, Kriegshammer und Kometenzeichen (Grey Penitents), Eshin-Assassine mit Maske, Augen im Dunkeln und tropfender Klinge (Clan Skrittle); auf Home, Warbands, Campaign, Roster und am Desktop |
 | `warbands.html` | eigene Warbands, Import, die Warbands der Mitspieler nur lesend |
 | `campaign.html` | Übersicht: laufende Schlacht mit Weg in den Spielabend, Warbands mit Stand, Schlachten 1–5, Bezirke |
 | `world.html` | Bezirke (Wirkungen aus `data/campaign.json`, wer sie hält, Korrektur durch Leiter), Fraktionen mit Ruf, Personen, Orte |
 | `manage.html` | nur Leiter: Rollen, Einladung, Hausregeln als Schalter, Schlacht schließen (unumkehrbar, daher mit Bestätigung) |
 | `story.html` | Reiter „Story“ der Warband: Kapitel, Zwischenspiel schreiben (mit Sichtbarkeit), Lebenslauf jedes Kriegers (auch aus ⋯ → „His story so far“) |
 | `more.html` | Geräte, Authenticator, Passwort, Theme, „Report a problem“ mit Status, Admin (Nutzer, Einladungen, Bugs, Backups) |
-| `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, Rundung als offene Frage; Wyrdstein nach der Tabelle für die Warband-Größe), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); alle 70 seltenen Gegenstände, die eine Reikland-Warband suchen darf (106 weitere gehören anderen Warbands), mit Filter und „wer darf es benutzen“; `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter |
+| `desktop.html` | die Arbeitsfläche aus Panels (Vorschlag, siehe §2): Views, Ziehen an der Titelleiste, Menü ⋯, Dock, verknüpfte Auswahl; Aufstieg als Sheet in der Mitte; bei 1440 px drei Spalten, unter 1024 px gestapelt |
+| `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, abgerundet, mindestens 1 gc; Wyrdstein nach der Tabelle für die Warband-Größe), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); alle 70 seltenen Gegenstände, die eine Reikland-Warband suchen darf (106 weitere gehören anderen Warbands), mit Filter und „wer darf es benutzen“; `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter |
 
 ## 4. Themes und Gestaltung
 

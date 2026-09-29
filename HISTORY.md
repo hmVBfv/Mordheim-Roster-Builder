@@ -1555,3 +1555,37 @@ generating the full list from the catalogue, the Roster Builder turned out
 to offer Mercenaries items the catalogue reserves for other warbands — the
 Dwarf axe, the Pestilens censer, the Starblade. Its Trading Post checks the
 weapon family, not the restriction text.
+
+## September 29, 2026 (cont.) — the desktop as a workspace
+
+Rob liked the phone mockups better now and asked to see the desktop: "with
+several, perhaps movable windows … a good overview without clutter". Free
+floating windows were the first idea and the first thing dropped: they
+overlap, they get lost, and every session ends with tidying up. What
+`desktop.html` proposes instead is a workspace of panels — the phone's
+screens, several at a time — standing in columns, as many as the width
+holds, plus a row across the top. A panel moves by its title bar or,
+without a mouse, through its ⋯ menu; it can fill the workspace or wait in a
+dock. The panels are linked: pick a Hero in the Roster and the Warrior panel
+shows him and the Trading Post searches for him. Arrangements for a task are
+"views" (Roster, After battle, Trading, Campaign, your own).
+
+The first layout was a plain grid, and a short panel next to a long one left
+a hole under it; columns fixed that. Dragging worked by hand but not under
+Playwright: the page changed the layout inside `dragstart`, and Chromium
+quietly cancels a drag whose source moves in that moment. The styling now
+waits a tick, and the drop zone that appeared above the columns — the
+source of the jump — is gone; the top row takes drops only once it holds a
+panel.
+
+Home got its comet: on one visit in three the twin-tailed comet comes down
+on the city — seven frames once, a flash, fire, smoke, then the crater
+smoulders and the wyrdstone burns. Tests never get it by chance
+(`navigator.webdriver`), and less motion means no flash at all. The three
+warbands of the invented campaign got portraits drawn from their
+descriptions: a Reikland marksman with plume and slow match, a Sister of
+Sigmar with hammer and comet, an Eshin assassin with a dripping blade.
+
+Rob also settled the open questions: selling rounds down but always brings
+at least 1 gc, and the catalogue's "Dwarfs only" includes Dwarf Hired
+Swords.
