@@ -1,6 +1,6 @@
 /* Tabletop-Simulator-Export: Beschreibungstexte für Modell-Karten. */
 import { DRAMATIS, HIREDSWORDS, INJEN } from '../data/index.js';
-import { S, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, isHeroModel, markRulesFor, memberName, noteLines, skillTextFor, spellEffDiff, spellEffect, spellLabel, svOfModel, svOfEntry, uid, unitDef } from './app.js';
+import { S, showModal, aDisp, attachedBlocks, casterLore, dpList, effProfile, enRules, eqDisplayParts, rareDisplayParts, hsChosenEq, hsEffProfile, hsEqParts, hsEquipOn, hsList, hsPersona, isHeroModel, markRulesFor, memberName, noteLines, skillTextFor, spellEffDiff, spellEffect, spellLabel, svOfModel, svOfEntry, uid, unitDef } from './app.js';
 
 /* The model's name as its own field, so it can be pasted into the TTS Name box
    separately from the description. Heroes get a darker gold than the rank and
@@ -71,7 +71,7 @@ function ttsTextHS(hs,disp,rec){ const k=["M","WS","BS","S","T","W","I","A","Ld"
 function _ttsShow(nameField,body){
   const nf=document.getElementById('ttsname'); if(nf) nf.value=nameField;
   const ta=document.getElementById('ttstext'); ta.value=body;
-  document.getElementById('ttsmodal').style.display='flex';
+  showModal('ttsmodal');
   setTimeout(()=>{ try{ta.focus();ta.select();}catch(e){} },30); }
 function ttsOpen(u){ const m=S.models.find(x=>x.uid===u); if(!m) return;
   _ttsShow(ttsName(m), ttsText(m)); }
