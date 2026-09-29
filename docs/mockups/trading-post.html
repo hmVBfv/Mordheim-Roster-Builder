@@ -133,7 +133,7 @@
 
     <!-- Sell: half the price that applies now -->
     <section class="stack" id="p-sell" aria-label="Sell items" hidden>
-      <p class="small muted">Items sell for half the price that applies now (house rules included); variable prices count only their fixed part. A group sells all its pieces of an item together. Wyrdstone sells by the table for the warband's size.</p>
+      <p class="small muted">Items sell for half the price that applies now (house rules included), rounded down but at least 1 gc; variable prices count only their fixed part. A group sells all its pieces of an item together. Wyrdstone sells by the table for the warband's size.</p>
       <ul class="shop" id="sell-list"></ul>
     </section>
 
@@ -548,7 +548,7 @@
     return out;
   }
   function ownerName(o) { return o === 'stash' ? 'Stash' : byId[o].name; }
-  function salePrice(p, owner) { var it = ITEMS[p.id], q = owner === 'stash' ? 1 : men(byId[owner]), base = it.mult ? p.paid : it.price; return { half: base * q / 2, gc: Math.floor(base * q / 2), q: q, base: base * q }; }
+  function salePrice(p, owner) { var it = ITEMS[p.id], q = owner === 'stash' ? 1 : men(byId[owner]), base = it.mult ? p.paid : it.price; return { half: base * q / 2, gc: base > 0 ? Math.max(1, Math.floor(base * q / 2)) : 0, q: q, base: base * q }; }
   function drawSell() {
     var html = st.wyrd ? '<li><button type="button" data-wyrd><span class="nm">Wyrdstone ×' + st.wyrd + '</span><span class="gc">' + WYRD[st.wyrd] + ' gc<small>all at once</small></span><span class="who">Stash · by the table for a warband of ' + WYRD_COL + '</span></button></li>' : '';
     $('sell-list').innerHTML = html + owned().map(function (o) {
@@ -804,7 +804,7 @@
       $('sell-title').textContent = 'Sell ' + itm.name + (sp.q > 1 ? ' ×' + sp.q : '');
       $('sell-from').textContent = selling.owner === 'stash' ? 'From the stash.' : 'From ' + byId[selling.owner].name + (sp.q > 1 ? ': all ' + sp.q + ' pieces — a group is always equipped alike.' : '.');
       $('sell-calc').innerHTML = 'Half of ' + sp.base + ' gc' + (itm.dice ? ' (the fixed part of ' + priceText(itm) + ')' : '') + ': <b>' + sp.gc + ' gc</b>';
-      $('sell-round').textContent = sp.half !== sp.gc ? sp.half + ' rounded down — the rules do not say; a question for Rob.' : 'Change the amount if a rule or a deal says otherwise.';
+      $('sell-round').textContent = sp.half !== sp.gc ? (sp.half < 1 ? sp.half + ' gc — a sale brings at least 1 gc.' : sp.half + ' rounded down.') + ' Change the amount if a rule or a deal says otherwise.' : 'Change the amount if a rule or a deal says otherwise.';
       $('sell-gc').value = sp.gc;
       $('sell-ok').disabled = false; $('sell-ok').textContent = 'Sell · ' + sp.gc + ' gc';
       window.mockOpen('sheet-sell');
