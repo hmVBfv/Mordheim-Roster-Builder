@@ -223,3 +223,53 @@ rechnet richtig (Kosten je Krieger, Erfahrungsstufen, Aufstiege, Gold in der
 Hand 5 gc). Betroffen ist die Karavane nur von A: Der Chip „Lightning
 Reflexes“ der Knights Vanguard zeigt den Speed-Skill statt ihrer eigenen
 Regel (gleiche Wirkung, anderer Wortlaut).
+
+## E. Gegenstände anderer Warbands am Trading Post (29.09.2026)
+
+**Fehler in beiden Apps:** Der Trading Post bot jeder Einheit alles an, dessen
+Waffenart in ihrer Startliste vorkommt. Die Beschränkung im Katalog („Dwarfs
+only“) stand nur als Text im Feld `wb` und wurde nie geprüft. Ein
+Mercenary-Captain konnte so die Dwarf axe, den Censer der Pestilens, die
+Starblade der Amazonen, den Trident der Pit Fighters oder die Pike der
+Tileans suchen – für eine Reikland-Warband sind 106 der 176 seltenen
+Gegenstände anderen Warbands vorbehalten.
+
+**Behoben:** Der Text bekommt eine Datenform `only` am Katalogeintrag
+(`data/equipment.json`): welche Warbands (auch nur eine Variante,
+`merc:reik`, oder nur bestimmte Einheiten, `pirates/pcaptain,mate`),
+welche nicht (`notWb`), nur Helden, nur Warbands aus Menschen, nur
+Zauberkundige. Wer den Gegenstand in seiner eigenen Ausrüstungsliste hat,
+darf ihn immer, gleich was der Text sagt – so kamen hinzu: der Troll Slayer
+der Pit Fighters (Dwarf axe), die Merchant Caravans (Pike, Rapier), die Wood
+Elves (Elven wine), Lizardmen und Reavers (Blowpipe, Javelins), der Jäger der
+Ostlanders (Double-barrelled pistol), der Captain der Maneaters (Cathayan
+Longsword) und die Helden der Marauders (Great axe). Beide Apps prüfen das
+in `catalogAllowed()` vor allem anderen;
+auch die Hausregel „Free market“ hebt sie nicht auf (sie öffnet nur die
+Waffenart). Test: `test/rare-restrictions.mjs`, `core/test/data-audit.test.ts`
+(jeder Beschränkungstext hat eine Datenform oder steht in der Liste der
+bloßen Hinweise); die Paritätstests vergleichen beide Apps über alle
+Warbands.
+
+**Bitte prüfen (Robs Entscheidung),** wo der Text mehr als eine Lesart
+zulässt – umgesetzt ist jeweils die erste:
+
+| Text | Umgesetzt | Andere Lesart |
+| --- | --- | --- |
+| Dwarfs only (Dwarf axe) | Dwarf Treasure Hunters, Dwarf Rangers, der Troll Slayer (steht in seiner Liste) | auch Zwerge als Hired Swords |
+| Skaven only (Fighting claws, Weeping blades, Warplock pistol) | beide Skaven-Warbands (Eshin, Pestilens) | nur Clan Eshin |
+| Goblins only (Ball and chain, Squig prodder) | Night Goblins, Forest Goblins, die Goblins der Orc Mob | nur Night Goblins |
+| Undead („not Undead“ u. a.) | Undead, Restless Dead, Tomb Guardians | nur die Warband „Undead“ |
+| Elves („not Elves“) | Wood Elves, Dark Elves, Shadow Warriors | – |
+| Cathay / Emissary (Cathayan Longsword) | Battle Monks of Cathay | auch jede Warband mit dem Swordsmith als Hired Sword |
+| Marauders of Chaos (Chosen of Chaos) (Great axe) | Chieftain, Seer und Champion der Marauders (alle drei haben sie in ihrer Liste) | nur ein bestimmter Held |
+| Middenheimers, Norse Explorers and Marauders (Wolfcloak) | Mercenaries Middenheim, Norse, Marauders – nicht die Ostermarkers mit Middenheim-Tabelle (C6: nur die Tabelle, nicht die Stadtregeln) | – |
+| Reiklanders, Marienburgers, Tileans, Hochland (Rapier) | Mercenaries Reikland und Marienburg, Tileans, Hochland Bandits (und die Merchant Caravans, die es in ihrer Liste haben) – nicht die Ostermarkers (C6) | – |
+| Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival (Obsidian weapon, Chaos armour) | Marauders, Norse, Beastmen, Sons of Hashut, Black Dwarfs, Possessed, Carnival | auch der Court of the Profane Pleasures |
+| Vampires and Necromancers (Book of the Dead) | Vampire und Necromancer der Undead, Necromancer der Restless Dead | – |
+
+**Bewusst ohne Beschränkung** (Text bleibt Hinweis): „(Arabian/Khemri)“ –
+eher Gegenstände des Khemri-Settings für jede Warband dort, bitte bestätigen;
+„cavalry only“ (Lance) und „Warhorses only“ (Barding) – hängen am Reittier,
+nicht an der Warband; „1st free“, „Common for …“, „Rare 6 for …“ – Preis oder
+Seltenheit, keine Beschränkung.

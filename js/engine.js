@@ -12,7 +12,7 @@
  * already used across app.js/pdf.js/tts.js. It is safe because none of those
  * are called at module-evaluation time, only from inside function bodies.
  */
-import { ARMOUR_SV, BRACE_PLURAL, CATALOG, DRAMATIS, GSN_BRACE, HIREDSWORDS, LISTS, MUTATIONS, MUTSETS, SV_SKILL_BASE, SV_SKILL_BONUS, UPGRADES, WARBANDS } from '../data/index.js';
+import { ARMOUR_SV, BRACE_PLURAL, CATALOG, DRAMATIS, GSN_BRACE, HIREDSWORDS, LISTS, MUTATIONS, MUTSETS, SV_SKILL_BASE, SV_SKILL_BONUS, UPGRADES, WARBANDS, WBHIRE } from '../data/index.js';
 import { S, HR } from './state.js';
 import { itemInfo } from './info.js';
 import { activeDistrictEffects, catalogEligible, dpHireTotal, hsChosenEq, hsEqParts, hsEqTotal, hsEquipOn, hsHireTotal, hsSizeBonus, itemFamily, itemHalfActive, priceMod } from './app.js';
@@ -307,12 +307,28 @@ export function weaponUpgradesFor(m,nm){ const def=unitDef(m.uid_def); if(!def) 
     out.push({de,u}); }
   return out; }
 
+/* Items the catalogue keeps for some warbands or warriors (`only`, the text in
+   `wb` as data): warbands (with a variant after ':' and units after '/'),
+   warbands that may not have it, Heroes only, human warbands, spellcasters.
+   Before 29.09.2026 only the text existed and a Mercenary could find the
+   Dwarf axe. */
+export function catalogAllowed(it,m){ const o=it&&it.only; if(!o) return true;
+  const def=unitDef(m.uid_def); const isHero=(def&&def.t==='hero')||!!m.promoted;
+  if(o.notWb && o.notWb.includes(S.wb)) return false;
+  if(o.wb && !o.wb.some(e=>{ const [w,units]=e.split('/'); const [k,sub]=w.split(':');
+    return k===S.wb && (!sub||S.subtype===sub) && (!units||units.split(',').includes(m.uid_def)); })) return false;
+  if(o.heroes && !isHero) return false;
+  if(o.human && !(WBHIRE[S.wb]&&WBHIRE[S.wb].human)) return false;
+  if(o.casters && !((def&&def.magic)||m.magic)) return false;
+  return true; }
+
 export function rareEligibleItems(m){ const def=unitDef(m.uid_def); if(!def||!def.eq) return [];
   const list=eqListFor(def); const have=new Set(); const h=HR();
   // rows with a founding price stay on offer: later the item is found here
   if(list) for(const cat in list) for(const [nm,,fl] of list[cat]){ if(!(fl&&fl.start)) have.add(_stripParen(nm).toLowerCase()); }
   const isHero=def.t==='hero'||m.promoted;
   return CATALOG.filter(it=>{
+    if(!catalogAllowed(it,m)) return false;                              // kept for other warbands or warriors
     if(def.noArmour && it.cat==='armour') return false;
     if(def.noMissile && (it.cat==='missile'||it.cat==='bp')) return false;
     if(def.noHeavy && itemFamily(it.de)==='heavyarmour') return false;
