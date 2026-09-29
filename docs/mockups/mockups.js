@@ -59,6 +59,8 @@
       });
     }
   }
+  // for page scripts that open a sheet themselves
+  window.mockOpen = function (id) { var d = document.getElementById(id); if (d && typeof d.showModal === 'function') openSheet(d); };
   window.addEventListener('popstate', function () {
     if (leaving) { leaving = false; return; }
     var d = document.querySelector('dialog[open]');
@@ -73,13 +75,22 @@
     Notes: '<path d="M20 4c-6 0-11 5-12 12l-2 4"/><path d="M8 16c4 0 8-3 9-8"/>',
     More: '<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>'
   };
+  // where each place leads within the mockups
+  var PLACES = { Home: 'index.html', Warbands: 'roster.html', Campaign: 'timeline.html', Notes: 'game-night.html', More: 'index.html' };
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('nav.nav[data-current]').forEach(function (nav) {
       nav.setAttribute('aria-label', 'Main');
       nav.innerHTML = Object.keys(ICONS).map(function (k) {
-        return '<a href="#"' + (nav.dataset.current === k ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[k] + '</svg>' + k + '</a>';
+        return '<a href="' + PLACES[k] + '"' + (nav.dataset.current === k ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[k] + '</svg>' + k + '</a>';
       }).join('');
     });
+  });
+
+  // a control the mockup does not draw says what it would do in the app,
+  // so nothing on a page is silently dead (Rob, 29.09.2026)
+  document.addEventListener('click', function (e) {
+    var soon = e.target.closest('[data-soon]');
+    if (soon) window.mockToast('In the app: ' + soon.dataset.soon);
   });
 
   // the notice goes after five seconds, can be dismissed, and only its
@@ -87,7 +98,12 @@
   var timer = null;
   window.mockToast = function (text, undo) {
     var el = document.getElementById('toast');
-    if (!el) return;
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'toast'; el.id = 'toast'; el.setAttribute('role', 'status'); el.hidden = true;
+      el.innerHTML = '<span></span><button type="button" class="btn-quiet">Undo</button>';
+      document.body.appendChild(el);
+    }
     el.querySelector('span').textContent = text;
     var b = el.querySelector('button');
     b.hidden = !undo;
