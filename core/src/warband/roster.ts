@@ -5,7 +5,7 @@ import type { Model, StashItem, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
 import { henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
-import { withFreeDagger, upgradePaid, upgradeTargets } from '../rules/equipment.ts';
+import { withFreeDagger, upgradeBase, upgradePaid, upgradeTargets } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
 import { catalogDefaultPaid } from '../rules/pricing.ts';
 import { logEvent } from './log.ts';
@@ -183,7 +183,7 @@ export function toggleWeaponUpgrade(ctx: Ctx, uid: number, de: string, nm: strin
     const m = findModel(d, uid);
     if (!m) return;
     m.rare = m.rare || {};
-    if (on) m.rare[de] = { q: 1, on: nm, paid: c.data.UPGRADES[de]?.base || 0 };
+    if (on) m.rare[de] = { q: 1, on: nm, paid: upgradeBase(c, de) };
     else delete m.rare[de];
   });
 }

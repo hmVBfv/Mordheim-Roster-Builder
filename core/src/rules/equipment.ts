@@ -116,18 +116,61 @@ export function upgradeTargets(ctx: Ctx, m: Model, de: string): WeaponRef[] {
   return eqWeaponsOf(ctx, m).filter((w) => w.fam != null && u.fams.includes(w.fam));
 }
 
+/* ---- founding prices ---- */
+
+/** Whether the warband has fought its first battle: in the campaign, from the
+    stage after battle 1. Until then it is being founded and buys at the
+    founding prices of its list (docs/rules-audit.md, C2/C3/C7). */
+export function warbandHasFought(ctx: Ctx): boolean {
+  const c = ctx.s.campaign;
+  if (!c || !c.on) return false;
+  const rounds = (c.battles ?? []).map((b) => Number(b.round) || 0);
+  return Math.max(Number(c.round) || 0, 0, ...rounds) >= 1;
+}
+
+/** The founding price of an upgrade, while it applies to this warband. */
+export function upgradeStart(ctx: Ctx, de: string): UpgradeDef['start'] | null {
+  const st = ctx.data.UPGRADES[de]?.start;
+  if (!st || warbandHasFought(ctx)) return null;
+  if (st.wb && st.wb.indexOf(ctx.s.wb ?? '') < 0) return null;
+  return st;
+}
+
+/** The price of a flat upgrade (Dark Elf blade: +15 at the founding, +20 later). */
+export function upgradeBase(ctx: Ctx, de: string): number {
+  const u = ctx.data.UPGRADES[de];
+  if (!u) return 0;
+  const st = upgradeStart(ctx, de);
+  return st && st.base != null ? st.base : (u.base ?? 0);
+}
+
+export interface StartRow { start: true; later: CatalogItem | null }
+
+/** A list row whose price holds only at the founding, with the catalogue
+    item it is found as later; null for an ordinary row. */
+export function startOnlyRow(ctx: Ctx, def: UnitDef | undefined, nm: string): StartRow | null {
+  const list = def && def.eq ? eqListFor(ctx, def) : undefined;
+  if (!list) return null;
+  for (const cat of Object.keys(list)) for (const row of list[cat] ?? []) {
+    if (row[0] !== nm || !row[2]?.start) continue;
+    const later = row[2].later ?? nm;
+    return { start: true, later: ctx.data.CATALOG.find((x) => x.de === later) ?? null };
+  }
+  return null;
+}
+
 /** Price of an upgrade on a given weapon: material upgrades multiply the
-    weapon's price (Gromril ×3 for dwarfs), flat ones have a base price. */
+    weapon's price (Gromril ×3 for Dwarfs at the founding), flat ones have a
+    base price. */
 export function upgradePaid(ctx: Ctx, m: Model, de: string, targetNm: string): number {
   const u = ctx.data.UPGRADES[de];
   if (!u) return 0;
   let paid: number;
   if (u.mult) {
     const w = eqWeaponsOf(ctx, m).find((x) => x.nm === targetNm);
-    let mu = u.mult;
-    if (de === 'Gromril-Waffe' && (ctx.s.wb === 'dwarftreasure' || ctx.s.wb === 'dwarfrangers')) mu = 3;
+    const mu = upgradeStart(ctx, de)?.mult ?? u.mult;
     paid = w ? mu * w.price : 0;
-  } else paid = u.base ?? 0;
+  } else paid = upgradeBase(ctx, de);
   if (paid > 0 && itemHalfActive(ctx, de)) paid = Math.floor(paid * 0.5);
   return paid;
 }
@@ -188,7 +231,8 @@ export function rareEligibleItems(ctx: Ctx, m: Model): CatalogItem[] {
   const list = eqListFor(ctx, def);
   const have = new Set<string>();
   const h = houseRules(ctx.s);
-  if (list) for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) have.add(stripParen(nm).toLowerCase());
+  // rows with a founding price stay on offer: later the item is found here
+  if (list) for (const cat of Object.keys(list)) for (const [nm, , fl] of list[cat] ?? []) if (!fl?.start) have.add(stripParen(nm).toLowerCase());
   const isHero = def.t === 'hero' || !!m.promoted;
   return ctx.data.CATALOG.filter((it) => {
     if (def.noArmour && it.cat === 'armour') return false;
