@@ -279,12 +279,16 @@ Ultimate FAQ 10.1 (Stufen 6, 8 und 9) und mordheimer.net *Campaigns* und
    sie je Krieger nach seinem ersten Kampf; für die ganze Warband ist es
    einfacher bei gleichem Ergebnis. Neue Krieger bekommen danach nur
    Gewöhnliches aus ihrer Liste, zu den Preisen des Trading Post.
-2. **Laufende Kampagne:** Alle heutigen Krieger gelten als „hat gekämpft“,
-   außer sie sind als aussetzend markiert. Gelesen als: Wer bisher nur
-   ausgesetzt hat und nie gekämpft hat, zählt als neu. Die echten Stände der
-   Gruppe haben den Kampagnenmodus aus und stehen auf „Setup“ – beim Import
-   einer laufenden Kampagne fragt der neue Builder deshalb, ab welcher Stufe
-   sie steht, statt es aus den Schlachten abzuleiten.
+2. **Laufende Kampagne:** Alle heutigen Krieger gelten als „nicht mehr
+   neu“ – auch wer bisher nur ausgesetzt hat (Rob, 29.09.2026: „Das
+   Startequipment bringt man sozusagen nach Mordheim mit und muss ab dann
+   dort nach neuem Equipment suchen. Ob man an einem Kampf dort teilnimmt,
+   ist unerheblich.“). „Neu“ ist ein Krieger also nur im Augenblick seines
+   Anwerbens: Was er dabei mitbringt, kauft er mit; danach ist seine
+   Ausrüstung gesperrt wie die aller anderen. Die echten Stände der Gruppe
+   haben den Kampagnenmodus aus und stehen auf „Setup“ – beim Import einer
+   laufenden Kampagne fragt der neue Builder deshalb, ab welcher Stufe sie
+   steht, statt es aus den Schlachten abzuleiten.
 3. **Verkauf zum halben Preis,** gerechnet vom Preis, der gerade gilt – also
    auch die Hälfte eines Preises, den eine Hausregel ändert; bei Seltenem mit
    Zufallspreis die Hälfte des Grundpreises. Regeln, die den Verkauf ändern
