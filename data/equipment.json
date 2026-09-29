@@ -292,6 +292,14 @@
    "wb": "Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival only"
   },
   {
+   "de": "Zharr-Obsidianwaffe",
+   "en": "Zharr obsidian weapon",
+   "cat": "cc",
+   "cost": 60,
+   "rare": "Rare 10",
+   "wb": "Sons of Hashut (Chaos Dwarfs) only; a sword, axe or hammer"
+  },
+  {
    "de": "Pike",
    "en": "Pike",
    "cat": "cc",
@@ -1692,12 +1700,20 @@
    "wb": "Shadow Warriors only"
   },
   {
-   "de": "Banner von Nagarythe",
+   "de": "Standarte von Nagarythe",
    "en": "Standard of Nagarythe",
    "cat": "misc",
    "cost": "75+3D6",
    "rare": "Rare 9",
-   "wb": "Shadow Warriors only (only at warband creation)"
+   "wb": "Shadow Warriors only"
+  },
+  {
+   "de": "Kriegshorn von Nagarythe",
+   "en": "War Horn of Nagarythe",
+   "cat": "misc",
+   "cost": "25+1D6",
+   "rare": "Rare 6",
+   "wb": "Shadow Warriors only"
   },
   {
    "de": "Seedrachen-Umhang",
@@ -2140,7 +2156,8 @@
   "Orc-Stil (Helm/Dolch/Axt/Schild)": "Orc kit (helmet/dagger/axe/shield)",
   "Skink-Stil (Helm/Dolch/Dreizack o. Javelins/Netz o. Buckler)": "Skink kit (helmet/dagger/trident or javelins/net or buckler)",
   "Untoten-Stil (Helm/Dolch/Stachelh./Schwert)": "Undead kit (helmet/dagger/spiked gauntlet/sword)",
-  "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)": "Witch Elf kit (helmet/dagger/2 swords or spear & net)"
+  "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)": "Witch Elf kit (helmet/dagger/2 swords or spear & net)",
+  "Zharr-Obsidianwaffe": "Zharr obsidian weapon"
  },
  "GSN_BRACE": {
   "Doppelläufige Pistole": 35,
@@ -3002,7 +3019,7 @@
    },
    {
     "name": "Nightmare",
-    "line": "Mount · Rare 11 · Aristocrat only",
+    "line": "Mount · 30 gc when the warband is founded · later 95 gc, Rare 11 · Aristocrat only",
     "text": "Undead destrier (M8 WS2 BS0 S3 T3 W1 I2 A1 Ld5). May Not Run (but may charge). Immune to Poison and Psychology — never tests Ld and stands still if leaderless; if the rider is wounded, roll on the Whoa Boy! table."
    }
   ],
@@ -3134,7 +3151,7 @@
    },
    {
     "name": "Mechanical Suit",
-    "line": "Armour · Rare 14 · Sorcerer only",
+    "line": "Armour · 175 gc when the warband is founded · later 225 gc, Rare 14 · Sorcerer only",
     "text": "A walking engine that carries a Sorcerer afflicted by the Curse of Stone: +3 Movement. Does not hinder spellcasting; no movement penalty when combined with a shield (but not with a shield/buckler without the right skill)."
    }
   ],
@@ -3145,7 +3162,7 @@
    },
    {
     "name": "Engine of Chaos",
-    "line": "Vehicle · Rare 10 · Chaos Dwarfs only",
+    "line": "Vehicle · 125 gc when the warband is founded · later 195 gc, Rare 10 · Chaos Dwarfs only",
     "text": "A daemon-powered prison wagon (follows the Wagon rules). Holds up to six captives (large creatures count as two). Required to cast the Sacrificial Ritual. Models captured via the Captured injury result or a Man-catcher are locked inside; their gear is lost to the warband. Starting price 125 gc (195 gc / Rare 10 afterwards)."
    }
   ],
@@ -3609,6 +3626,17 @@
     "name": "Ithilmar weapon",
     "line": "Close combat",
     "text": "+1 Initiative in close combat. Costs three times the normal weapon."
+   }
+  ],
+  [
+   {
+    "__re": "zharr",
+    "__f": "i"
+   },
+   {
+    "name": "Zharr obsidian weapon",
+    "line": "Close combat · Strength as user +1 · 30 gc when the warband is founded · later 60 gc, Rare 10 · Sons of Hashut",
+    "text": "A sword, axe or hammer of obsidian, forged by the Chaos Dwarfs of Zharr-Naggrund — slow work, since the stone must not crack. It keeps the rules of its weapon type and strikes at +1 Strength. Heavy: −1 Initiative in close combat. (The Sons of Hashut page calls it “Obsidian weapon”; renamed so it is not confused with the Obsidian weapon of Border Town Burning, as the page recommends.)"
    }
   ],
   [
@@ -4905,15 +4933,27 @@
     ],
     [
      "Ithilmar-Schwert",
-     20
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ],
     [
      "Ithilmar-Speer",
-     20
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ],
     [
      "Ithilmar-Zweihandwaffe",
-     30
+     30,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ]
    ],
    "Fernkampf": [
@@ -4941,7 +4981,10 @@
     ],
     [
      "Ithilmar-Rüstung",
-     60
+     60,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
@@ -5357,7 +5400,10 @@
     ],
     [
      "Gromril-Rüstung",
-     75
+     75,
+     {
+      "start": true
+     }
     ],
     [
      "Schild",
@@ -5456,8 +5502,11 @@
      15
     ],
     [
-     "Obsidianwaffe",
-     30
+     "Zharr-Obsidianwaffe",
+     30,
+     {
+      "start": true
+     }
     ]
    ],
    "Fernkampf": [
@@ -5643,7 +5692,10 @@
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -5711,13 +5763,19 @@
     ],
     [
      "Mechanischer Anzug",
-     175
+     175,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -5795,7 +5853,10 @@
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -5847,7 +5908,10 @@
    "Besonderes": [
     [
      "Engine of Chaos",
-     125
+     125,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -6802,7 +6866,10 @@
     ],
     [
      "Nightmare",
-     95
+     30,
+     {
+      "start": true
+     }
     ],
     [
      "Raubvogel",
@@ -9432,7 +9499,10 @@
    "Rüstung": [
     [
      "Gromril-Rüstung",
-     75
+     75,
+     {
+      "start": true
+     }
     ],
     [
      "Leichte Rüstung",
@@ -12003,8 +12073,28 @@
      10
     ],
     [
-     "Ithilmar-Waffe",
-     20
+     "Ithilmar-Schwert",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Speer",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Zweihandwaffe",
+     30,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
     ]
    ],
    "Fernkampf": [
@@ -12036,17 +12126,26 @@
     ],
     [
      "Ithilmar-Rüstung",
-     60
+     60,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
     [
      "Standarte von Nagarythe",
-     75
+     75,
+     {
+      "start": true
+     }
     ],
     [
      "Kriegshorn von Nagarythe",
-     25
+     25,
+     {
+      "start": true
+     }
     ],
     [
      "Elfenumhang",
@@ -12054,11 +12153,17 @@
     ],
     [
      "Elfenwein",
-     50
+     50,
+     {
+      "start": true
+     }
     ],
     [
      "Elfenrunensteine",
-     50
+     50,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -12380,8 +12485,14 @@
     "darkelves"
    ],
    "mult": 0,
-   "base": 15,
-   "note": "+15 bei Rekrutierung / +20 später"
+   "base": 20,
+   "note": "+15 bei Gründung der Warband / +20 später",
+   "start": {
+    "base": 15,
+    "wb": [
+     "darkelves"
+    ]
+   }
   },
   "Dunkles Gift": {
    "en": "Dark venom",
@@ -12424,7 +12535,14 @@
    "heroesOnly": false,
    "mult": 4,
    "base": 0,
-   "note": "4× Waffenpreis (Zwerge bei Erstellung: 3×)"
+   "note": "4× Waffenpreis; Zwerge bei Gründung der Warband 3×",
+   "start": {
+    "mult": 3,
+    "wb": [
+     "dwarftreasure",
+     "dwarfrangers"
+    ]
+   }
   },
   "Ithilmar-Waffe": {
    "en": "Ithilmar weapon",
@@ -12718,5 +12836,20 @@
    },
    "barding"
   ]
- ]
+ ],
+ "RENAMED": {
+  "sonsofhashut": {
+   "eq": {
+    "Obsidianwaffe": "Zharr-Obsidianwaffe"
+   }
+  },
+  "shadowwarriors": {
+   "eq": {
+    "Ithilmar-Waffe": "Ithilmar-Schwert"
+   },
+   "rare": {
+    "Banner von Nagarythe": "Standarte von Nagarythe"
+   }
+  }
+ }
 }

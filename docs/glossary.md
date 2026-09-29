@@ -40,6 +40,11 @@ Begriff einführt, trägt ihn hier ein.
 | Profil (eines Kriegers) | Profile | `models[].profile` |
 | Lebenslauf | Service record | abgeleitet in `core/narrative` |
 | Formatnummer | Format version | `format` |
+| Gründung (bis zur ersten Schlacht) | Founding | `warbandHasFought()` ist falsch |
+| Gründungspreis | Founding price | Listenzeile `[name, preis, {start: true}]`, `startOnlyRow()`, `UPGRADES[…].start` |
+| Trading Post | Trading Post | `rareEligibleItems()`, `CATALOG` |
+| umbenannter Gegenstand | – | `RENAMED` in `data/equipment.json` |
+| Kassenbuch (geplant, V7) | Ledger | – |
 
 ## Kampagne und Schlacht
 

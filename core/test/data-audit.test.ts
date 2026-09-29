@@ -11,6 +11,7 @@ const unit = (wb: string, id: string) => data.WARBANDS[wb]!.units.find((u) => u.
 const list = (key: string) => Object.values(data.LISTS[key]!).flat().map(([n, p]) => `${data.EQEN[n.replace(' (1. gratis)', '')] ?? n} ${p}`);
 const skill = (set: string, name: string) => data.SKILLSETS[set]!.skills.find((x) => x[0] === name)?.[1];
 const row = (key: string, nm: string) => Object.values(data.LISTS[key]!).flat().find((x) => x[0] === nm);
+const cat = (de: string) => data.CATALOG.find((x) => x.de === de);
 
 function profileIn(wb: string, subtype: string, id: string) {
   const s = { ...core.newWarband(data, wb), subtype } as WarbandState;
@@ -71,6 +72,16 @@ describe('other warbands', () => {
     expect(data.SKILLSETS.cavalcadeSkills!.skills.map((x) => x[0])).toEqual(['Noblesse Oblige', 'Torturer', 'Duelist']);
   });
   it('Court of the Profane Pleasures: Wretches pay for every dagger', () => expect(Object.values(data.LISTS.cppWretch!).flat().map((x) => x[0])).not.toContain('Dolch (1. gratis)'));
+  it('Cursed Cavalcade: the Nightmare costs 30 gc at the founding, 95 gc at the Trading Post (Rob, C2)', () => {
+    expect(row('ccArist', 'Nightmare')).toEqual(['Nightmare', 30, { start: true }]);
+    expect(cat('Nightmare')).toMatchObject({ cost: 95, rare: 'Rare 11' });
+  });
+  it('Sons of Hashut: their obsidian weapon is renamed, 30 gc at the founding, 60 gc later (Rob, C3)', () => {
+    expect(row('cdHero', 'Obsidianwaffe')).toBeUndefined();
+    expect(row('cdHero', 'Zharr-Obsidianwaffe')).toEqual(['Zharr-Obsidianwaffe', 30, { start: true }]);
+    expect(cat('Zharr-Obsidianwaffe')).toMatchObject({ cat: 'cc', cost: 60, rare: 'Rare 10' });
+    expect(data.EQEN['Zharr-Obsidianwaffe']).toBe('Zharr obsidian weapon');
+  });
   it('Tomb Guardians: the fixes the page implies (Rob, C4)', () => {
     expect(skill('tgSkills', 'Drive Chariot (Academic)')).toMatch(/Tomb Lord may learn it/);
     expect(data.WARBANDS.tombguardians!.rules).toMatch(/Home Ground:<\/b> \+1 die in the Exploration phase, in every campaign setting/);
@@ -88,8 +99,26 @@ describe('other warbands', () => {
       expect(skSub(W, 'oyoung')[keys[i]!]).toEqual(skSub(merc, 'young')[city]);
     });
   });
+  it('Shadow Warriors and Wood Elves: Ithilmar and the Nagarythe items at founding prices only (Rob, C7)', () => {
+    for (const nm of ['Ithilmar-Schwert', 'Ithilmar-Speer', 'Ithilmar-Zweihandwaffe', 'Ithilmar-Rüstung', 'Standarte von Nagarythe', 'Kriegshorn von Nagarythe', 'Elfenwein', 'Elfenrunensteine']) expect(row('swHero', nm)?.[2], nm).toMatchObject({ start: true });
+    expect(row('swHero', 'Ithilmar-Waffe')).toBeUndefined();
+    expect(row('swHero', 'Ithilmar-Zweihandwaffe')?.[1]).toBe(30);
+    for (const nm of ['Ithilmar-Schwert', 'Ithilmar-Speer', 'Ithilmar-Zweihandwaffe', 'Ithilmar-Rüstung']) expect(row('weHero', nm)?.[2], nm).toMatchObject({ start: true });
+    expect(row('weHero', 'Elfenwein')?.[2]).toBeUndefined();
+    expect(cat('Standarte von Nagarythe')).toMatchObject({ cost: '75+3D6', rare: 'Rare 9' });
+    expect(cat('Kriegshorn von Nagarythe')).toMatchObject({ cost: '25+1D6', rare: 'Rare 6' });
+  });
   it('Black Dwarfs: the Sorcerer may wear armour but performs no rituals in it, except in the Mechanical Suit (Rob, C8)', () => {
     expect(unit('blackdwarfs', 'sorcerer').sp).toMatch(/cannot perform rituals while wearing armour, except the Mechanical Suit/);
+  });
+  it('Black Dwarfs: the Mechanical Suit and the Engine of Chaos at founding prices', () => {
+    expect(row('bdSorc', 'Mechanischer Anzug')).toEqual(['Mechanischer Anzug', 175, { start: true }]);
+    for (const l of ['bdSorc', 'bdHero', 'bdGaoler', 'bdBull']) expect(row(l, 'Engine of Chaos')).toEqual(['Engine of Chaos', 125, { start: true }]);
+  });
+  it('Dwarfs: gromril armour at 75 gc and gromril weapons at three times the price only when founding', () => {
+    for (const l of ['dwarfWarrior', 'dwarfRanger']) expect(row(l, 'Gromril-Rüstung')).toEqual(['Gromril-Rüstung', 75, { start: true }]);
+    expect(data.UPGRADES['Gromril-Waffe']).toMatchObject({ mult: 4, start: { mult: 3, wb: ['dwarftreasure', 'dwarfrangers'] } });
+    expect(data.UPGRADES['Dark-Elf-Klinge']).toMatchObject({ base: 20, start: { base: 15, wb: ['darkelves'] } });
   });
   it('Carnival of Chaos: daemonic instability, the Nurglings’ flies, the Plague Cart profiles', () => {
     expect(unit('carnival', 'plaguebearer').sp).toMatch(/Daemonic Instability/);

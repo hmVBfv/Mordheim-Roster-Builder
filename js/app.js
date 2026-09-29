@@ -1,14 +1,14 @@
 /* Mordheim Roster Builder — Anwendungslogik.
    Daten liegen in ../data/*.js. build.js fügt alles wieder zu EINER HTML
    zusammen (Offline-/Single-File-Variante). */
-import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
+import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, RENAMED, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
 import { exportOfficialSheet, defaultWarbandName } from './pdf.js';
 import { ttsOpen, ttsOpenMember, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
    render/action code below can call it, and re-exported so the window bindings
    at the bottom still expose these to inline onclick handlers. */
-import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelMarketValue, marketRarePrice, eqMarketValue, isTwoHanded, _loadoutValue, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
-export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, upgradePaid, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
+import { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelMarketValue, marketRarePrice, eqMarketValue, isTwoHanded, _loadoutValue, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, startOnlyRow, upgradeBase, upgradeStart, upgradePaid, warbandHasFought, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen } from './engine.js';
+export { adjPrice, applyFreeDaggers, catalogDefaultPaid, countOf, daggerNameFor, dpHireCost, ensureFreeDagger, eqCost, eqListFor, eqWeaponLimit, eqWeaponsOf, goldAvailable, goldCurrent, goldTreasury, heirloomDiscount, hireCostOf, hsHireCost, inlineUpgradeActive, isHeroModel, isUpgrade, henchRecruitCost, henchRecruitSurcharge, lossValueOf, modelRating, modelTotalCost, modelUnitCost, modelsOf, mutCost, mutKindFor, rareCost, rareEligibleItems, startGold, totalHeroes, totalLarge, totalModels, totalSpent, unitBaseCost, unitDef, unitMax, startOnlyRow, upgradeBase, upgradeStart, upgradePaid, warbandHasFought, upgradeTargets, warbandMax, weaponUpgradesFor, statNum, svFromText, _svCombine, svOfModel, svOfEntry, svLabel, _stripParen };
 /* Info/tooltip lookups (name -> tooltip content + HTML — see js/info.js). */
 import { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild, abilityFor, keyedInfo, ruleDefs, ruleKey, skillKey, unitSkillLists } from './info.js';
 export { itemInfo, abilityInfo, spellInfo, skillInfo, itipBuild, abilityFor, keyedInfo, ruleDefs, ruleKey, skillKey, unitSkillLists };
@@ -2527,7 +2527,7 @@ export function setHeirloom(u,v){ const m=S.models.find(x=>x.uid===u); m.heirloo
 // Flat upgrades (mult 0, e.g. Dark Elf Blade / Dark Venom) are shown INLINE next to the weapon,
 // not in the Rare/Trading-Post section. inlineUpgradeActive = flat + warband matches current warband.
 export function toggleWeaponUpgrade(uid,de,nm,on){ const m=S.models.find(x=>x.uid===uid); if(!m) return; m.rare=m.rare||{};
-  if(on) m.rare[de]={q:1,on:nm,paid:(UPGRADES[de]&&UPGRADES[de].base)||0}; else delete m.rare[de];
+  if(on) m.rare[de]={q:1,on:nm,paid:upgradeBase(de)}; else delete m.rare[de];
   render(); }
 /* Startgold der Warband (House-Rule-überschreibbar) */
 export function setGoldCurrent(v){ S.stash=S.stash||{wyrd:0,gold:null,items:[]};
@@ -2672,6 +2672,11 @@ if(typeof window!=='undefined'){ window.catalogEligible=catalogEligible; window.
 export function catLabel(cat){ const M={Nahkampf:'Melee',Fernkampf:'Missile',Rüstung:'Armour',Besonderes:'Special'};
   if(M[cat]) return M[cat];
   return cat.replace('Besonderes','Special').replace('nur Heldinnen','Heroines only').replace('nur Helden','Heroes only'); }
+/* The tooltip of a founding price: what the item costs later, and where. */
+export function startTagTitle(st,closed){ const it=st&&st.later;
+  const later=it?`${it.en}: ${typeof it.cost==='number'?it.cost+' gc':String(it.cost).replace(/Preis/,'price')}${it.rare&&it.rare!=='Common'?', '+it.rare:''}`:'at its normal price';
+  return (closed?'This price held only while the warband was founded. ':'Price while the warband is being founded. ')
+    +'After its first battle the item is found at the Trading Post (Rare / Trading Post below) \u2014 '+later+'.'; }
 export function eqSection(m){
   const def=unitDef(m.uid_def);
   const mutKind=mutKindFor(m);
@@ -2714,26 +2719,31 @@ export function eqSection(m){
           ? (HR().freeDagger ? 'free' : (qty>=1 ? '+'+ap+' gc' : '1st free'))
           : ap+' gc';
         const ii = itemInfo(nm) ? `<span class="iinfo no-print" tabindex="0" onmouseenter="showItip(this,'${esc}')" onmouseleave="hideItip()" onfocus="showItip(this,'${esc}')" onblur="hideItip()" onclick="toggleItip(event,this,'${esc}')">ⓘ</span>` : '';
+        // a founding price: marked, and once the warband has fought no more at it
+        const st = startOnlyRow(def,nm);
+        const stClosed = !!st && warbandHasFought();
+        const stTag = st ? `<span class="starttag" title="${startTagTitle(st,stClosed)}">${stClosed?'founding only':'founding price'}</span>` : '';
         if(isWeapon && !blocked){
           const _ups = qty>0 ? weaponUpgradesFor(m,nm) : [];
           const _upHtml = _ups.length ? `<span class="wupg no-print">`+_ups.map(({de,u})=>{ const _on=!!(m.rare&&m.rare[de]&&m.rare[de].on===nm); const _escd=de.replace(/'/g,"\\'");
               const _iiu=itemInfo(de)?`<span class="iinfo" tabindex="0" onmouseenter="showItip(this,'${_escd}')" onmouseleave="hideItip()" onfocus="showItip(this,'${_escd}')" onblur="hideItip()" onclick="toggleItip(event,this,'${_escd}')">ⓘ</span>`:'';
-              return `<label class="wupgchk"><input type="checkbox" ${_on?'checked':''} onchange="toggleWeaponUpgrade(${m.uid},'${_escd}','${esc}',this.checked)"> ⤴ ${enItem(de)}${u.base?` <span class="upr">+${u.base} gc</span>`:''}</label>${_iiu}`;
+              return `<label class="wupgchk"><input type="checkbox" ${_on?'checked':''} onchange="toggleWeaponUpgrade(${m.uid},'${_escd}','${esc}',this.checked)"> ⤴ ${enItem(de)}${upgradeBase(de)?` <span class="upr"${upgradeStart(de)?` title="Founding price. After the warband's first battle: +${u.base} gc"`:''}>+${upgradeBase(de)} gc</span>`:''}</label>${_iiu}`;
             }).join('')+`</span>` : '';
           html+=`<div class="eqitem qty${_ups.length?' wupg-host':''}">
-            <span class="eqnm">${enItem(nm)}${BRACE_PLURAL[nm]?` <span class="brchint">2 = Brace</span>`:''}${ii}</span>
+            <span class="eqnm">${enItem(nm)}${BRACE_PLURAL[nm]?` <span class="brchint">2 = Brace</span>`:''}${stTag}${ii}</span>
             <span class="qtyctl">
               <button class="qbtn no-print" ${qty<=0?'disabled':''} onclick="setEqQty(${m.uid},'${esc}',${qty-1})">−</button>
               <span class="qn">${qty}</span>
-              <button class="qbtn no-print" ${(BRACE_PLURAL[nm]&&qty>=2)?'disabled':''} onclick="setEqQty(${m.uid},'${esc}',${qty+1})">+</button>
+              <button class="qbtn no-print" ${((BRACE_PLURAL[nm]&&qty>=2)||stClosed)?'disabled':''} onclick="setEqQty(${m.uid},'${esc}',${qty+1})">+</button>
             </span>
             <span class="pr">${prLabel}</span>${_upHtml}</div>`;
         } else {
           const checked = qty?'checked':'';
-          html+=`<label class="eqitem ${blocked?'muted':''}">
-            <input type="checkbox" ${checked} ${blocked?'disabled':''}
+          const off = blocked || (stClosed && !qty);
+          html+=`<label class="eqitem ${off?'muted':''}">
+            <input type="checkbox" ${checked} ${off?'disabled':''}
               onchange="toggleEq(${m.uid},'${esc}',this.checked)">
-            <span>${enItem(nm)}</span>${ii}<span class="pr">${prLabel}</span></label>`;
+            <span>${enItem(nm)}</span>${stTag}${ii}<span class="pr">${prLabel}</span></label>`;
         }
       });
       html+=`</div>`;
@@ -3949,6 +3959,13 @@ export async function loadRoster(nm){
   catch(e){ flash('Could not load.'); }
 }
 export async function delRoster(nm){ try{ await window.storage.delete('mh:'+nm,false); openLoad(); openLoad(); }catch(e){} }
+/* An object with some keys renamed, in their order. A new name that is
+   already there keeps the entry there; list quantities add up. */
+export function renameKeys(o,map){ if(!map||!Object.keys(o).some(k=>map[k])) return o; const out={};
+  for(const k of Object.keys(o)){ const v=o[k]; const nk=map[k]||k;
+    if(nk in out){ if(typeof v==='number'&&typeof out[nk]==='number') out[nk]+=v; continue; }
+    out[nk]=v; }
+  return out; }
 export function applyState(data){
   hideWelcome();
   replaceState({wb:data.wb,subtype:data.subtype,name:data.name||'',budget:data.budget||WARBANDS[data.wb].gold,models:data.models||[],hired:data.hired||[],dp:data.dp||[],leaderUid:data.leaderUid||null,campaign:data.campaign||{on:false,districts:{}},stash:data.stash||{wyrd:0,gold:null,items:[]},fallen:data.fallen||[]});
@@ -3959,6 +3976,10 @@ export function applyState(data){
   if(!S.fallen) S.fallen=[];
   campState();   // fills in round/log/battles for saves written before the chronicle
   S.models.forEach(m=>{ if(!m.eq)m.eq={}; if(!m.mut)m.mut=[]; if(!m.adv)m.adv={}; if(!m.skills)m.skills=[]; if(!m.inj)m.inj=[]; if(!m.spells)m.spells=[]; });
+  // items that changed their name (data RENAMED), e.g. the Sons of Hashut's
+  // obsidian weapon, now the Zharr obsidian weapon
+  const _ren=RENAMED[S.wb];
+  if(_ren) S.models.forEach(m=>{ m.eq=renameKeys(m.eq,_ren.eq); if(m.rare) m.rare=renameKeys(m.rare,_ren.rare); });
   // Saved gold is adopted verbatim: display = goldNow, whatever the imported
   // models would re-price to. (Older saves without goldNow keep the treasury.)
   if(data.goldNow!=null && isFinite(Number(data.goldNow))) S.stash.gold=Number(data.goldNow)+totalSpent();

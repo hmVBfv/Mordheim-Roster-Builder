@@ -27,6 +27,20 @@ export type LoadResult =
    counter and the narrative fields of the new builder (data-model.md). */
 const KEPT = ['uidSeq', 'canon', 'story'] as const;
 
+/** An object with some keys renamed, in their order (data RENAMED: items
+    that changed their name). A new name that is already there keeps the
+    entry there; list quantities add up. */
+function renameKeys<T>(o: Record<string, T>, map: Record<string, string> | undefined): Record<string, T> {
+  if (!map || !Object.keys(o).some((k) => map[k])) return o;
+  const out: Record<string, T> = {};
+  for (const [k, v] of Object.entries(o)) {
+    const nk = map[k] ?? k;
+    if (nk in out) { if (typeof v === 'number' && typeof out[nk] === 'number') out[nk] = ((out[nk] as number) + v) as T; continue; }
+    out[nk] = v;
+  }
+  return out;
+}
+
 /** Loads a parsed save. Refuses only what cannot be a warband of a known
     type; everything else loads, with defaults filled in, and departures from
     the schema are reported as notes. */
@@ -50,6 +64,7 @@ export function loadSave(data: GameData, raw: unknown): LoadResult {
   if (!Array.isArray(s.stash.items)) s.stash.items = [];
   if (!s.fallen) s.fallen = [];
   campState(s);
+  const renamed = data.RENAMED[s.wb as string];
   for (const m of s.models as Model[]) {
     if (!m.eq) m.eq = {};
     if (!m.mut) m.mut = [];
@@ -57,6 +72,7 @@ export function loadSave(data: GameData, raw: unknown): LoadResult {
     if (!m.skills) m.skills = [];
     if (!m.inj) m.inj = [];
     if (!m.spells) m.spells = [];
+    if (renamed) { m.eq = renameKeys(m.eq, renamed.eq); if (m.rare) m.rare = renameKeys(m.rare, renamed.rare); }
   }
   // Saved gold is adopted verbatim: gold in hand = goldNow, whatever the
   // models would re-price to now. Older saves without it keep the treasury.

@@ -10,8 +10,12 @@ export type StatKey = 'M' | 'WS' | 'BS' | 'S' | 'T' | 'W' | 'I' | 'A' | 'Ld';
 /** Profile values can be numbers or strings such as "3(4)", "D6" or "—". */
 export type Profile = Partial<Record<StatKey, number | string>>;
 
-/** One entry of an equipment list: [German item name, price in gc]. */
-export type EquipmentEntry = [name: string, price: number];
+/** Marks on a list row. `start`: the price holds only while the warband is
+    founded; afterwards the item is found at the Trading Post under `later`
+    (the catalogue item, by default the row's own name). */
+export interface EntryFlags { start?: boolean; later?: string }
+/** One entry of an equipment list: [German item name, price in gc, marks]. */
+export type EquipmentEntry = [name: string, price: number, flags?: EntryFlags];
 /** An equipment list by category: "Nahkampf", "Fernkampf", "Rüstung", "Besonderes", … */
 export type EquipmentList = Record<string, EquipmentEntry[]>;
 
@@ -115,6 +119,8 @@ export interface UpgradeDef {
   /** Price multiplier of the host weapon (material upgrades); 0/absent = flat price. */
   mult?: number;
   base?: number;
+  /** The price while the warband is founded, for the warbands listed. */
+  start?: { mult?: number; base?: number; wb?: string[] };
   note?: string;
 }
 
@@ -235,6 +241,9 @@ export interface GameData {
   MOUNTS: Record<string, unknown>;
   STD_CATS: string[];
   UPGRADES: Record<string, UpgradeDef>;
+  /** Items that changed their name, per warband: old → new, in the equipment
+      bought from the list (`eq`) and at the Trading Post (`rare`). */
+  RENAMED: Record<string, { eq?: Record<string, string>; rare?: Record<string, string> }>;
   _ALLCC: string[];
   _CCFAM: string[];
   /** Item-name patterns → weapon/armour family (null = no family). */

@@ -259,10 +259,31 @@ export function eqWeaponsOf(m){ const def=unitDef(m.uid_def); if(!def||!def.eq) 
 
 export function upgradeTargets(m,de){ const u=UPGRADES[de]; if(!u) return []; return eqWeaponsOf(m).filter(w=>u.fams.includes(w.fam)); }
 
+/* Founding prices (Rob, 29.09.2026, C2/C3/C7): some list rows and upgrades
+   have a special price that holds only while the warband is being founded.
+   After its first battle - in the campaign, from the stage after battle 1 -
+   the item is found at the Trading Post at the price there. */
+export function warbandHasFought(){ const c=S.campaign; if(!c||!c.on) return false;
+  const rs=(c.battles||[]).map(b=>Number(b.round)||0);
+  return Math.max(Number(c.round)||0,0,...rs)>=1; }
+export function upgradeStart(de){ const u=UPGRADES[de]; const st=u&&u.start;
+  if(!st||warbandHasFought()) return null;
+  if(st.wb&&st.wb.indexOf(S.wb)<0) return null;
+  return st; }
+/* The price of a flat upgrade (Dark Elf blade: +15 at the founding, +20 later). */
+export function upgradeBase(de){ const u=UPGRADES[de]; if(!u) return 0; const st=upgradeStart(de);
+  return (st&&st.base!=null)?st.base:(u.base||0); }
+/* A list row priced for the founding only, with the catalogue item it is
+   found as later; null for an ordinary row. */
+export function startOnlyRow(def,nm){ const list=def&&def.eq?eqListFor(def):null; if(!list) return null;
+  for(const cat in list) for(const row of list[cat]){ if(row[0]!==nm||!(row[2]&&row[2].start)) continue;
+    const later=row[2].later||nm; return {start:true, later:CATALOG.find(x=>x.de===later)||null}; }
+  return null; }
+
 export function upgradePaid(m,de,targetNm){ const u=UPGRADES[de]; if(!u) return 0;
   let paid;
-  if(u.mult){ const w=eqWeaponsOf(m).find(x=>x.nm===targetNm); let mu=u.mult; if(de==="Gromril-Waffe"&&(S.wb==="dwarftreasure"||S.wb==="dwarfrangers")) mu=3; paid=w?mu*w.price:0; }
-  else paid=u.base;
+  if(u.mult){ const w=eqWeaponsOf(m).find(x=>x.nm===targetNm); const st=upgradeStart(de); const mu=(st&&st.mult)||u.mult; paid=w?mu*w.price:0; }
+  else paid=upgradeBase(de);
   if(paid>0 && typeof itemHalfActive==='function' && itemHalfActive(de)) paid=Math.floor(paid*0.5);
   return paid; }
 
@@ -280,7 +301,8 @@ export function weaponUpgradesFor(m,nm){ const def=unitDef(m.uid_def); if(!def) 
 
 export function rareEligibleItems(m){ const def=unitDef(m.uid_def); if(!def||!def.eq) return [];
   const list=eqListFor(def); const have=new Set(); const h=HR();
-  if(list) for(const cat in list) for(const [nm] of list[cat]) have.add(_stripParen(nm).toLowerCase());
+  // rows with a founding price stay on offer: later the item is found here
+  if(list) for(const cat in list) for(const [nm,,fl] of list[cat]){ if(!(fl&&fl.start)) have.add(_stripParen(nm).toLowerCase()); }
   const isHero=def.t==='hero'||m.promoted;
   return CATALOG.filter(it=>{
     if(def.noArmour && it.cat==='armour') return false;
