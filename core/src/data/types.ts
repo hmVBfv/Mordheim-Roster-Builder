@@ -113,6 +113,10 @@ export interface CatalogOnly {
   human?: boolean;
   /** Only spellcasters. */
   casters?: boolean;
+  /** Hired Swords and Dramatis Personae of these races may carry it too
+      (race of their entry, e.g. 'dwarf'; Rob, 29.09.2026). Neither app lets
+      a Hired Sword take a catalogue item yet; this is for when one can. */
+  hires?: string[];
 }
 
 export interface CatalogItem {

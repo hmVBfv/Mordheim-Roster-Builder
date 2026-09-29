@@ -179,6 +179,13 @@ describe('catalogue restrictions', () => {
     }
     expect(bad).toEqual([]);
   });
+  it('Hired Swords of a race named in "hires" exist; Dwarfs only includes Dwarf Hired Swords', () => {
+    const races = new Set([...Object.values(data.HIREDSWORDS), ...Object.values(data.DRAMATIS)].map((e) => e.race));
+    const bad = data.CATALOG.flatMap((x) => (x.only?.hires ?? []).filter((r) => !races.has(r)).map((r) => `${x.en}: ${r}`));
+    expect(bad).toEqual([]);
+    // Rob, 29.09.2026: "Dwarfs only" holds for Dwarfs as Hired Swords too
+    expect(data.CATALOG.filter((x) => x.wb === 'Dwarfs only').map((x) => x.only?.hires)).toEqual([['dwarf']]);
+  });
   it('the Trading Post keeps to them', () => {
     const offered = (wb: string, sub: string | null, id: string, eq: string[] = []) => {
       let s = { ...core.newWarband(data, wb), subtype: sub } as WarbandState;
