@@ -77,6 +77,10 @@ Mockups liegen als statische Seiten unter `docs/mockups/` und werden auf dem
 Handy geprüft, bevor die Umsetzung beginnt. Sie nutzen dieselben
 Design-Variablen wie die App; ein Streifen oben schaltet zwischen beiden
 Themes um und gehört nicht zur App. Die Kampagne darin ist erfunden.
+Jeder Knopf tut etwas – was ein Mockup nicht zeichnet, sagt ein kurzer
+Hinweis; Playwright klickt jede Bedienung jeder Seite und jedes Sheets
+einzeln an (`app/e2e/mockups.spec.ts`, Rob, 29.09.2026: „viele nicht
+reaktive Knöpfe“).
 
 | Seite | Was sie zeigt |
 | --- | --- |
@@ -85,7 +89,7 @@ Themes um und gehört nicht zur App. Die Kampagne darin ist erfunden.
 | `changes.html` | je Krieger vorher → nachher mit gefundenem Anlass, ⚠ ohne Anlass, Erklärungsfelder mit Zähler, Markieren „After battle N“ |
 | `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
 | `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt |
-| `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen, Ausrüstung und den häufigen Aktionen; Verletzung mit Folgeentscheidung (V1) |
+| `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1) |
 
 ## 4. Themes und Gestaltung
 
