@@ -10,6 +10,7 @@ const data = loadGameData();
 const unit = (wb: string, id: string) => data.WARBANDS[wb]!.units.find((u) => u.id === id)!;
 const list = (key: string) => Object.values(data.LISTS[key]!).flat().map(([n, p]) => `${data.EQEN[n.replace(' (1. gratis)', '')] ?? n} ${p}`);
 const skill = (set: string, name: string) => data.SKILLSETS[set]!.skills.find((x) => x[0] === name)?.[1];
+const row = (key: string, nm: string) => Object.values(data.LISTS[key]!).flat().find((x) => x[0] === nm);
 
 function profileIn(wb: string, subtype: string, id: string) {
   const s = { ...core.newWarband(data, wb), subtype } as WarbandState;
@@ -70,6 +71,26 @@ describe('other warbands', () => {
     expect(data.SKILLSETS.cavalcadeSkills!.skills.map((x) => x[0])).toEqual(['Noblesse Oblige', 'Torturer', 'Duelist']);
   });
   it('Court of the Profane Pleasures: Wretches pay for every dagger', () => expect(Object.values(data.LISTS.cppWretch!).flat().map((x) => x[0])).not.toContain('Dolch (1. gratis)'));
+  it('Tomb Guardians: the fixes the page implies (Rob, C4)', () => {
+    expect(skill('tgSkills', 'Drive Chariot (Academic)')).toMatch(/Tomb Lord may learn it/);
+    expect(data.WARBANDS.tombguardians!.rules).toMatch(/Home Ground:<\/b> \+1 die in the Exploration phase, in every campaign setting/);
+    expect((data.LISTS.tgLord!.Fernkampf ?? []).map((x) => x[0])).not.toContain('Asp-Pfeile');
+    expect((data.LISTS.tgLord!.Besonderes ?? []).map((x) => x[0])).toContain('Asp-Pfeile');
+  });
+  it('Ostermarkers: one Mercenary skill table for the whole warband, chosen at the founding (Rob, C6)', () => {
+    const W = data.WARBANDS.ostermark!;
+    expect(W.subtypes!.map((x) => x.name)).toEqual(['Reikland', 'Middenheim', 'Marienburg']);
+    const merc = data.WARBANDS.merc!;
+    const skSub = (w: typeof W, id: string) => w.units.find((u) => u.id === id)!.skSub as Record<string, string[]>;
+    const keys = W.subtypes!.map((x) => x.key);
+    ['reik', 'midd', 'mari'].forEach((city, i) => {
+      expect(skSub(W, 'ochamp')[keys[i]!]).toEqual(skSub(merc, 'champ')[city]);
+      expect(skSub(W, 'oyoung')[keys[i]!]).toEqual(skSub(merc, 'young')[city]);
+    });
+  });
+  it('Black Dwarfs: the Sorcerer may wear armour but performs no rituals in it, except in the Mechanical Suit (Rob, C8)', () => {
+    expect(unit('blackdwarfs', 'sorcerer').sp).toMatch(/cannot perform rituals while wearing armour, except the Mechanical Suit/);
+  });
   it('Carnival of Chaos: daemonic instability, the Nurglings’ flies, the Plague Cart profiles', () => {
     expect(unit('carnival', 'plaguebearer').sp).toMatch(/Daemonic Instability/);
     expect(unit('carnival', 'nurgling').sp).toMatch(/Cloud of Flies/);

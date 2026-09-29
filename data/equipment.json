@@ -2354,7 +2354,7 @@
    {
     "name": "Nehekharan Javelin",
     "line": "Missile · Strength: as user · 10 gc · Common",
-    "text": "Range 8\", Strength as user. +1 to hit when thrown (the becket string spins the javelin like a bullet). Mordheimer note: the original only listed the +1 to hit; it is suggested to also apply the normal thrown-weapon rules (no penalty for range or moving). Tomb Lords only."
+    "text": "Range 8\", Strength as user, +1 to hit. Thrown weapon: no penalty for range or for moving and shooting (Mordheimer inconsistency, played by intent: the original listed only the +1 to hit)."
    }
   ],
   [
@@ -3728,7 +3728,7 @@
    },
    {
     "name": "Asp arrows",
-    "line": "Ammunition (bow)",
+    "line": "Miscellaneous · arrows for a bow · Tomb Lord",
     "text": "Made of mummified venomous snakes, magically guided: +1 to hit. (Tomb Guardians)"
    }
   ],
@@ -11737,10 +11737,6 @@
      10
     ],
     [
-     "Asp-Pfeile",
-     10
-    ],
-    [
      "Nehekharan-Javelin",
      10
     ]
@@ -11753,6 +11749,12 @@
     [
      "Leichte Rüstung",
      20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Asp-Pfeile",
+     10
     ]
    ]
   },
