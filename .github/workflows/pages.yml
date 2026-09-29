@@ -22,17 +22,19 @@ permissions:
   pages: write
   id-token: write
 
-# One deployment at a time; a newer push cancels an in-progress run.
+# One run per branch or pull request; a newer push cancels an in-progress
+# run of the same ref. Master has a single group, so there is still only one
+# deployment at a time, and one pull request no longer cancels another's build.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '22', cache: npm }
 
       # A few legacy tests read the app's source with a dev dependency (acorn).
@@ -55,7 +57,7 @@ jobs:
         run: touch .nojekyll
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # Publish the repo root: index.html, js/, data/, vendor/, assets/,
           # and the freshly built dist/. All in-app paths are relative
@@ -67,11 +69,11 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
