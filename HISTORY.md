@@ -1522,3 +1522,36 @@ answer: half of 5 gc.
 The parity checklist answers "does the new app do at least what the old
 one does?" honestly: all of the logic, tested; of the screens, only
 import and a read-only roster so far.
+
+## September 29, 2026 — every tab a place
+
+Rob's second look at the mockups on his phone: the ← sometimes did nothing
+or came late, "Notes" in the bottom bar led into game night — a full-screen
+mode without a bar, so there was no way back — and the campaign's tabs
+pointed at "#". The crawler had counted a click on "#" as a reaction,
+because the address changed; it now calls such a link what it is, checks
+that every link leads to a page that exists, and follows sheets opened from
+sheets.
+
+The late ← was a race, and only a fast thumb shows it: closing a sheet
+takes its entry out of the history with a step back, and the dialog's close
+event — which triggers that step — arrives a moment after the tap. A link
+followed in that moment started loading, and then the step back cancelled
+it. Playwright's own clicks are too polite to hit this; the regression test
+closes the sheet and follows the link in the same instant. Links now wait
+for the step back to finish.
+
+Seven pages were missing for the bar and the tabs to lead anywhere: Home,
+Warbands, Campaign, World, Manage, Story, More. The roster gained what Rob
+asked for from the Henchmen: "+ Man" with the price the rules give (the
+unit, the same gear, 2 gc per experience point, the veterans roll, five to
+a group), names for each man, and "The lad's got talent" turning one of
+them into a Hero with his own card. The merchant got grimmer, and Home a
+skyline of Mordheim under the comet.
+
+Rob also asked whether the example warband could really look for only six
+rare items. It could look for seventy; the mockup had shown a sample. While
+generating the full list from the catalogue, the Roster Builder turned out
+to offer Mercenaries items the catalogue reserves for other warbands — the
+Dwarf axe, the Pestilens censer, the Starblade. Its Trading Post checks the
+weapon family, not the restriction text.
