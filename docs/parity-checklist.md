@@ -61,7 +61,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
 | Profil mit allen Änderungen, Rassenmaxima, Rüstungswurf | ✓ | ✓ | ✓ | roster | 1e | geänderte Werte markiert |
-| Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ◐ | roster | 1e | App: Zahl und „Advance due“; Schwellen kommen mit dem nächsten Pull Request |
+| Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ✓ | roster | 1e | App: mit Pull Request #4 |
 | Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | – | roster | 3 | |
 | Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ◐ | roster (Advance) | 3 | App zeigt Fertigkeiten und Zauber |
 | Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ◐ | – | 3 | **Mockup fehlt**; App zeigt Mutationen |
