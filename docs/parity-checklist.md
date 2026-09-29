@@ -1,0 +1,129 @@
+# Paritäts-Checkliste – alte App ↔ neue App
+
+Rob, 29.09.2026: „Checke allg., ob die Funktionalität mindestens der der
+Legacy-Version entspricht.“ Diese Liste ist die Antwort und zugleich die
+Checkliste, die Phase 3 verlangt ([roadmap.md](roadmap.md#phase-3--nutzer-warbands-neuer-builder)):
+Pages wird erst auf den Quick Build umgestellt, wenn jede Zeile in der Spalte
+„neue App“ ein ✓ hat.
+
+## Stand in einem Satz
+
+**Die Logik ist vollständig und geprüft, die Oberfläche noch nicht.** Jede
+Rechnung der alten App steckt in `core/` und kommt dort nachweislich zum
+selben Ergebnis (alle Legacy-Tests laufen über den Spiegel auch gegen
+`core/`, dazu Zufallswanderungen über alle 49 Warbands und Szenarien für
+seltene Zweige). Die neue App kann heute aber nur **importieren und
+anzeigen**; bearbeiten geht erst mit dem neuen Builder (Phase 3) und der
+Kampagne (Phase 4a). Bis dahin bleibt die alte App die, mit der gespielt wird.
+
+## Legende
+
+| Zeichen | Bedeutung |
+| --- | --- |
+| ✓ | vorhanden |
+| ◐ | teilweise (steht in der Anmerkung) |
+| – | fehlt noch |
+| n/a | gibt es dort nicht und braucht es nicht |
+
+Spalten: **alt** = heutiger Roster Builder, **core** = Logik in `core/` mit
+Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
+[`docs/mockups/`](mockups/), **Phase** = wann die App es bekommt.
+
+## Warband und Aufstellung
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Warband wählen (49, Reihenfolge nach Grad), Stadt/Variante, Name | ✓ | ✓ | – | – | 3 | **Mockup fehlt** („Warband anlegen“) |
+| Startgold, Budget, Sonderregeln wie Trantio (+20 %) | ✓ | ✓ | – | – | 3 | |
+| Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | – | roster (Recruit) | 3 | |
+| Anführer bestimmen | ✓ | ✓ | ◐ | – | 3 | App zeigt nur „Leader“ |
+| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ◐ | roster (+ Man) | 3 | App zeigt die Namen |
+| Warnungen zur Legalität (Seitenleiste) | ✓ | ✓ | ✓ | – | 1e | |
+| Rating, Worth, Gold, Modelle | ✓ | ✓ | ◐ | roster | 3 | App: ohne Worth |
+
+## Ausrüstung und Handel
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Ausrüstungslisten je Einheit, erster Dolch frei, Waffengrenzen | ✓ | ✓ | ◐ | trading-post | 3 | App zeigt die Ausrüstung |
+| Preise nach Hausregeln und Bezirken (halber Preis) | ✓ | ✓ | – | trading-post | 3 | |
+| Gründungspreise und Trading Post (C2, C3, C7) | ✓ | ✓ | – | trading-post | 3 | |
+| Seltenes: Katalog, bezahlter Preis, Material-Upgrades (Gromril, Ithilmar …) | ✓ | ✓ | ◐ | trading-post | 3 | App zeigt sie an |
+| Suchwurf je Held mit Modifikatoren, Chance | – | – | – | trading-post | 3 | neu (V5/V6) |
+| Verkaufen zum halben Preis | – | – | – | trading-post | 3 | neu (V6); Rundung offen |
+| Umverteilen zwischen Kriegern und Lager | – | – | – | trading-post | 3 | neu (V4) |
+| Lager (Truhe): Gegenstände, Wyrdstone, Gold | ✓ | ✓ | – | roster, trading-post | 3 | |
+| Kassenbuch mit Anlass je Buchung | – | – | – | trading-post | 3 | neu (V7, `FORMAT` 3) |
+| Regeltexte als Tooltip (Gegenstände, Fertigkeiten, Zauber, Fähigkeiten) | ✓ | ✓ | – | trading-post | 3 | |
+
+## Profile und Entwicklung
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Profil mit allen Änderungen, Rassenmaxima, Rüstungswurf | ✓ | ✓ | ✓ | roster | 1e | geänderte Werte markiert |
+| Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ◐ | roster | 1e | App: Zahl und „Advance due“; Schwellen kommen mit dem nächsten Pull Request |
+| Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | – | roster | 3 | |
+| Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ◐ | roster (Advance) | 3 | App zeigt Fertigkeiten und Zauber |
+| Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ◐ | – | 3 | **Mockup fehlt**; App zeigt Mutationen |
+| Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3 | App zeigt „Promoted“ |
+| Schwere Verletzungen (D66) mit Folgeentscheidungen, ausgesetzte Spiele | ✓ | ✓ | ◐ | roster (Injury, V1) | 3 | App zeigt Verletzungen und „Misses“ |
+| Tod, Gefallene, Rücknahme, verlorener Wert | ✓ | ✓ | ◐ | roster („Out of action for good“) | 3 | App listet Gefallene |
+
+## Hired Swords und Dramatis Personae
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Listen mit Filtern (Grad, Werte, Name), wer anheuern darf und warum nicht | ✓ | ✓ | – | – | 3 | **Mockup fehlt** |
+| Anheuern, Kosten, Unterhalt, Personas, Optionen | ✓ | ✓ | – | – | 3 | |
+| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ◐ | roster (Big Gunnar) | 3 | App zeigt Profil und Erfahrung |
+
+## Hausregeln
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Schalter und Vorgaben, Abweichungen sichtbar, im Export erklärt | ✓ | ✓ | – | – | 3 | **Mockup fehlt** |
+
+## Kampagne
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Kampagnenmodus, Stufen („Setup“, „After battle N“), Snapshots, Stufenvergleich | ✓ | ✓ | – | changes | 4a | |
+| Chronik: Ereignisse, Notizen | ✓ | ✓ | – | timeline | 4a | |
+| Schlachtformular mit Seiten und Verlusten | ✓ | ✓ | – | game-night | 4a | |
+| Bezirke, Footholds, Kontrolle, Effekte | ✓ | ✓ | – | – | 4a | |
+| Post-Battle-Sequenz: Schritte, Wyrdstone-Verkauf, Erkundungswürfel | ✓ | ✓ | – | trading-post (Schritte 6, 8, 9) | 4a | |
+| Nachschlagetabellen nach der Schlacht (Helfer) | ✓ | Daten ✓ | – | roster (Advance, Injury) | 4a | |
+| Ausstehende Erfahrung, Schlachtergebnisse anwenden | ✓ | ✓ | – | changes | 4a | |
+| Kampagnendatei: mehrere Warbands, Zusammenführen, Statistik | ✓ | ✓ | – | – | 4a | übernimmt dann der Server |
+| Auswertung je Krieger, Lebenslauf, Erzähl-Export | ✓ | ✓ | – | timeline, background | 4b | |
+
+## Speichern und Exporte
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Speichern und Laden auf dem Gerät, Liste, Löschen | ✓ | ✓ | ✓ | index | 1e | App: Import, Liste, „Remove from this device“ |
+| Import: Datei, eingefügte Datei, Text-Export | ✓ | ✓ | ✓ | – | 1e | Kampagnendatei noch nicht |
+| Export: Text mit eingebettetem Stand, Datei | ✓ | ✓ | – | – | 3 | |
+| Tabletop-Simulator-Karten (Krieger, Männer, Hired Swords, DP) | ✓ | ✓ | – | roster (TTS) | 3 | |
+| Offizielles Rostersheet als PDF | ✓ | ✓ | – | – | 3 | |
+| Drucken | ✓ | n/a | – | – | 3 | |
+
+## Oberfläche
+
+| Funktion | alt | core | App | Mockup | Phase | Anmerkung |
+| --- | --- | --- | --- | --- | --- | --- |
+| Am Handy bedienbar (360 px, 44-px-Tippflächen) | ◐ | n/a | ✓ | ✓ | 1e | alt: seit dem Umbau der Reihenfolge brauchbar |
+| Zwei Themes | – | n/a | ✓ | ✓ | 1e | |
+| Offline | ◐ | n/a | ✓ | n/a | 1e | alt: als heruntergeladene Datei |
+| Jeder Knopf reagiert | ✓ | n/a | ✓ | ✓ | – | Mockups: Playwright klickt jede Bedienung (`app/e2e/mockups.spec.ts`) |
+
+## Was daraus folgt
+
+1. **Mockups, die noch fehlen**, bevor Phase 3 baut: Warband anlegen,
+   Hired Swords und Dramatis Personae anheuern, Hausregeln, Mutationen und
+   Male, Exporte (PDF, Text, TTS für die ganze Warband).
+2. **Neue Logik** (in keiner der beiden Apps): Suchwurf, Verkaufen,
+   Umverteilen, Kassenbuch (V4–V7) – kommt nach `core/` mit eigenen Tests,
+   bevor der Builder sie braucht.
+3. **Bis zur Umstellung** wird mit der alten App gespielt; sie bleibt live
+   und bekommt nur noch Fehlerbehebungen und die entschiedenen Regeländerungen.
