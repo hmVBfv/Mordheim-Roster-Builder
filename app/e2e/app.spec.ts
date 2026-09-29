@@ -226,6 +226,8 @@ test.describe('start-up budgets', () => {
     }
     expect(median(starts), `starts from the cache: ${starts.join(', ')} ms`).toBeLessThan(1000);
     await page.getByRole('link', { name: 'More' }).click();
+    // the screen must be there before its reaction is timed
+    await expect(page.locator('input[value=parchment]')).toBeAttached();
     const reactions: number[] = [];
     for (const theme of ['parchment', 'chronicle', 'parchment']) {
       reactions.push(await page.evaluate(async (v) => {

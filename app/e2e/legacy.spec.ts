@@ -88,7 +88,11 @@ test('the extra-equipment panel of a Hired Sword opens without an error and stay
     document.querySelectorAll('details').forEach((d) => { if (!d.classList.contains('eq-det')) d.open = true; });
   });
   const panel = page.locator('details.eq-det').first();
+  // the toggle event comes a moment after the click; its inline handler runs
+  // before any listener added here, so waiting for the event waits for it
+  const toggled = panel.evaluate((el) => new Promise((r) => el.addEventListener('toggle', () => r(null), { once: true })));
   await panel.locator('summary').click();
+  await toggled;
   await expect(panel).toHaveAttribute('open', '');
   await page.evaluate(() => (window as unknown as W).render());
   await expect(page.locator('details.eq-det').first()).toHaveAttribute('open', '');
