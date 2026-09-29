@@ -49,6 +49,10 @@ Begriff einführt, trägt ihn hier ein.
 | Post-Battle-Hilfe | Post-battle | `postBattleHelp()`, `data/postbattle.json` |
 | umbenannter Gegenstand | – | `RENAMED` in `data/equipment.json` |
 | Kassenbuch (geplant, V7) | Ledger | – |
+| Suchwurf nach Seltenem | Search (rare) | – (Mockup `trading-post.html#search`) |
+| Veteranenwurf (Männer mit Erfahrung anwerben) | Veterans roll | `henchRecruitSurcharge()`, `m.xpPaid` |
+| Mann (einer Henchmen-Gruppe) | Man | `m.names[]`, `memberName()` |
+| Beförderung | The lad's got talent · Promoted | `promoteHench()`, `m.promoted`, `m.promoCats` |
 
 ## Kampagne und Schlacht
 

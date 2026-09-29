@@ -135,6 +135,11 @@ vorige abgenommen ist; Ausnahmen werden hier vermerkt.
   (29.09.2026: tote Knöpfe, Erfahrung nur als Zahl) reagiert jede Bedienung –
   Playwright klickt sie alle einzeln an –, jede Karte zeigt die
   Erfahrungsschwellen, und der Trading Post (V6) ist als siebte Seite dazu.
+  Nach dem zweiten Blick (29.09.2026: ← träge, aus „Notes“ kein Weg zurück,
+  Reiter ohne Ziel, Henchmen ohne „+ Man“ und Namen) führt jedes Ziel der
+  Leiste und jeder Reiter auf eine eigene Seite (Home, Warbands, Campaign,
+  World, Manage, Story, More), und die Henchmen-Gruppen können wachsen, ihre
+  Männer heißen und einen Helden hervorbringen.
 
 **Abnahme:** Legacy-Tests grün; `core/`-Tests grün, Parität für alle Warbands;
 App lässt sich auf Android installieren und startet offline; `size-limit` in
