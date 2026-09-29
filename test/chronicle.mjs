@@ -98,18 +98,19 @@ const coreNames=[...opts.split('<optgroup')[1].matchAll(/>([^<]+)<\/option>/g)].
 assert.deepStrictEqual(coreNames.slice().sort((a,b)=>a.localeCompare(b)), coreNames,
   'warbands are alphabetical within their grade');
 
-// --- the battle form collects opponents, location, outcome and account ---
+// --- the battle form collects participants, location, outcome and account ---
 fresh(true);
 app.openBattleForm();
 assert.ok(app.battleDraft(), 'a draft battle is opened');
-app.setDraftOpp(0,'name','Klaus'); app.setDraftOpp(0,'wb','reikland');
-app.addDraftOpp();
-app.setDraftOpp(1,'name','Ulf'); app.setDraftOpp(1,'wb','middenheim');
-app.setDraftField('outcome','Victory');
+assert.strictEqual(app.battleDraft().sides.length, 1, 'our own warband is always a participant');
+app.addDraftSide(''); app.setDraftSide(1,'name','Klaus'); app.setDraftSide(1,'wb','merc');
+app.addDraftSide(''); app.setDraftSide(2,'name','Ulf'); app.setDraftSide(2,'wb','middenheim');
+app.setDraftSide(0,'outcome','Victory');
 app.setDraftField('notes','Ambush at the bridge.');
 app.saveBattleForm();
 const saved=app.campState().battles[0];
-assert.strictEqual(saved.opponents.length, 2, 'both opponents are saved');
+assert.strictEqual(saved.sides.length, 3, 'every participant is saved');
+assert.strictEqual(saved.opponents.length, 2, 'the older opponent shape is still filled in');
 assert.strictEqual(saved.opponents[1].wb, 'middenheim', 'the chosen warband is stored by key');
 assert.strictEqual(saved.notes, 'Ambush at the bridge.', 'the account is stored');
 assert.strictEqual(app.battleDraft(), null, 'the draft is cleared after saving');
@@ -119,5 +120,28 @@ app.renderCampaign();
 const camp=store['campaignpanel'].innerHTML;
 assert.ok(/<details class="loc-wrap"><summary/.test(camp), 'districts sit in a collapsible Locations section');
 assert.ok(!/loc-wrap" open/.test(camp), 'Locations start collapsed');
+
+// --- every entry row has the same cells, so the delete buttons line up ---
+// A row without a tag used to put its button in the tag column, leaving it out
+// of line with rows marked "manual" or "edited".
+fresh(true);
+app.addUnit('adept');
+const noteRow=app.addLogNote('Handwritten entry.');
+app.editLogText(noteRow.id,'Handwritten entry, corrected.');
+app.renderCampaign();
+const chron=store['campaignpanel'].innerHTML;
+const rows=chron.match(/<li class="chr-ev[\s\S]*?<\/li>/g)||[];
+assert.ok(rows.length>=2, 'there are rows with and without tags');
+const shape=r=>{ const out=[]; const re=/<(?:span|button)[^>]*class="(chr-ic|chr-tx|chr-tags|tiny ghost no-print)"/g;
+  let m; while((m=re.exec(r))) out.push(m[1]); return out.join('|'); };
+const shapes=new Set(rows.map(shape));
+assert.strictEqual(shapes.size, 1, 'every row has the same grid cells in the same order');
+assert.strictEqual([...shapes][0], 'chr-ic|chr-tx|chr-tags|tiny ghost no-print');
+
+// --- no broken characters in the interface ---
+// \u1f4dc and friends are five hex digits, but a \u escape takes only four, so
+// they used to render as a stray Greek letter followed by a loose digit.
+const panel=store['campaignpanel'].innerHTML;
+assert.ok(!/[\u1f00-\u1fff]/.test(panel), 'no half-parsed escape leaks into the panel: '+(panel.match(/[\u1f00-\u1fff]./)||[''])[0]);
 
 console.log('Campaign chronicle: OK (stages, automatic events, battles with several opponents, manual entries, battle form, old saves)');

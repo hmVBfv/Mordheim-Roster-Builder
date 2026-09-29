@@ -156,7 +156,7 @@
    {
     "name": "May Not Run",
     "line": "Movement",
-    "text": "Can never run; moves at most its normal movement distance."
+    "text": "May not run, but may charge normally."
    }
   ],
   [
@@ -211,7 +211,8 @@
    {
     "name": "Charge",
     "line": "Close combat",
-    "text": "Gains extra attack(s) in the turn it charges — details in the unit text."
+    "text": "Gains extra attack(s) in the turn it charges — details in the unit text.",
+    "own": true
    }
   ],
   [
@@ -266,7 +267,7 @@
    {
     "name": "Regeneration",
     "line": "Special rule",
-    "text": "May recover lost wounds in the recovery phase (roll depends on the unit)."
+    "text": "Whenever an enemy inflicts a wound, roll a D6: on a 4+ the wound is ignored. Wounds caused by fire or fire-based magic cannot be regenerated."
    }
   ],
   [
@@ -343,7 +344,7 @@
    {
     "name": "Natural Stealth",
     "line": "Movement / hiding",
-    "text": "A master of moving unseen: while the model is Hidden, enemies trying to detect it halve their Initiative (i.e. it is far harder to spot). (Dark Elf Shade)"
+    "text": "Enemy models suffer −1 to their Initiative when trying to detect him while he is Hidden. (Dark Elf Shade)"
    }
   ],
   [
@@ -365,7 +366,12 @@
    {
     "name": "Animosity",
     "line": "Psychology (Orcs & Goblins)",
-    "text": "At the start of your turn roll a D6 for each Orc/Goblin Henchman not already in close combat. On a 1, roll again: 1 = “I ’erd dat!” charges/shoots the nearest friendly Orc or Goblin; 2–5 = “Wud yoo say?” hurls insults and does nothing else; 6 = “I’ll show yer!” makes an extra move toward the nearest enemy, charging if able."
+    "text": "At the start of your turn roll a D6 for each Orc/Goblin Henchman not already in close combat. On a 1, roll again: 1 = “I ’erd dat!” charges/shoots the nearest friendly Orc or Goblin; 2–5 = “Wud yoo say?” hurls insults and does nothing else; 6 = “I’ll show yer!” makes an extra move toward the nearest enemy, charging if able.",
+    "own": true,
+    "wb": [
+     "orcmob",
+     "blackorcs"
+    ]
    }
   ],
   [
@@ -376,7 +382,7 @@
    {
     "name": "Hatred",
     "line": "Psychology",
-    "text": "Hatred: in the first turn of any close combat against a hated enemy, may re-roll all missed to-hit rolls. (Cannot leave combat with a hated foe while able to fight.)"
+    "text": "Hatred: in the first turn of any close combat against a hated enemy, may re-roll all missed to-hit rolls."
    }
   ],
   [
@@ -442,7 +448,8 @@
    {
     "name": "Hang the Bandit",
     "line": "Psychology (hatred)",
-    "text": "Hates Bandits and Outlaws: re-roll missed to-hit rolls in the first round of any close combat against them."
+    "text": "Hates Bandits and Outlaws: re-roll missed to-hit rolls in the first round of any close combat against them.",
+    "own": true
    }
   ],
   [
@@ -453,7 +460,8 @@
    {
     "name": "Keen Eyesight",
     "line": "Perception",
-    "text": "Spots Hidden enemies at up to twice the model's Initiative in inches."
+    "text": "Spots Hidden enemies at up to twice the model's Initiative in inches.",
+    "own": true
    }
   ],
   [
@@ -464,7 +472,8 @@
    {
     "name": "Inspired Cooking",
     "line": "Special (Mootlanders)",
-    "text": "Friendly Halflings within 6\" of the Master Chef may re-roll failed to-hit rolls in close combat (once per turn)."
+    "text": "Friendly Halflings within 6\" of the Master Chef may re-roll failed to-hit rolls in close combat (once per turn).",
+    "own": true
    }
   ],
   [
@@ -486,7 +495,11 @@
    {
     "name": "Evade",
     "line": "Reaction (Pit Fighter Pursuer)",
-    "text": "Agile dodger: when an enemy charges this model it may try to evade — take an Initiative test; if passed, it counts as a failed charge."
+    "text": "Agile dodger: when an enemy charges this model it may try to evade — take an Initiative test; if passed, it counts as a failed charge.",
+    "own": true,
+    "wb": [
+     "pitfighters"
+    ]
    }
   ],
   [
@@ -497,7 +510,8 @@
    {
     "name": "Grudgebearers",
     "line": "Special (Dwarfs)",
-    "text": "Dwarfs bear an ancient grudge against Elves: if the warband ever hires any Elven Hired Sword, this Dwarf leaves the warband immediately."
+    "text": "Dwarfs bear an ancient grudge against Elves: if the warband ever hires any Elven Hired Sword, this Dwarf leaves the warband immediately.",
+    "own": true
    }
   ],
   [
@@ -508,7 +522,13 @@
    {
     "name": "Hard Head",
     "line": "Special (Dwarfs)",
-    "text": "Ignores the special rules of maces, clubs and similar concussion weapons — not easily knocked out."
+    "text": "Ignores the special rules of maces, clubs and similar concussion weapons — not easily knocked out.",
+    "own": true,
+    "wb": [
+     "pitfighters",
+     "sonsofhashut",
+     "blackdwarfs"
+    ]
    }
   ],
   [
@@ -519,7 +539,13 @@
    {
     "name": "Hard to Kill",
     "line": "Special (Dwarfs)",
-    "text": "Tough and resilient: only taken Out of Action on a 6 (instead of 5–6); treat 1–2 as knocked down and 3–5 as stunned."
+    "text": "Tough and resilient: only taken Out of Action on a 6 (instead of 5–6); treat 1–2 as knocked down and 3–5 as stunned.",
+    "own": true,
+    "wb": [
+     "pitfighters",
+     "sonsofhashut",
+     "blackdwarfs"
+    ]
    }
   ],
   [
@@ -530,7 +556,8 @@
    {
     "name": "Skinny",
     "line": "Special (Hobgoblin)",
-    "text": "Cowardly and frail: on a Serious Injury roll of 1-3 the Hobgoblin abandons the warband."
+    "text": "Cowardly and frail: on a Serious Injury roll of 1-3 the Hobgoblin abandons the warband.",
+    "own": true
    }
   ],
   [
@@ -541,7 +568,11 @@
    {
     "name": "Nobody cares about them",
     "line": "Special (Hobgoblin)",
-    "text": "Hobgoblins count as only half a model when working out how many are down for a Rout test. Hobgoblins can never be promoted to Hero (re-roll \"The Lad's Got Talent\")."
+    "text": "Hobgoblins count as only half a model when working out how many are down for a Rout test. Hobgoblins can never be promoted to Hero (re-roll \"The Lad's Got Talent\").",
+    "own": true,
+    "wb": [
+     "sonsofhashut"
+    ]
    }
   ],
   [
@@ -552,7 +583,8 @@
    {
     "name": "Nasty Reputation",
     "line": "Special (Gaoler)",
-    "text": "Gaolers are notorious for their brutality — the dread of being captured by them causes fear in Humans."
+    "text": "Gaolers are notorious for their brutality — the dread of being captured by them causes fear in Humans.",
+    "own": true
    }
   ],
   [
@@ -563,7 +595,8 @@
    {
     "name": "Drudgery",
     "line": "Special (Informer)",
-    "text": "Their will is broken: Informers may never become Heroes. Re-roll any \"The Lad's Got Talent\" result for them."
+    "text": "Their will is broken: Informers may never become Heroes. Re-roll any \"The Lad's Got Talent\" result for them.",
+    "own": true
    }
   ],
   [
@@ -574,7 +607,8 @@
    {
     "name": "Art of Silent Death",
     "line": "Special (Dragon Monk)",
-    "text": "Master of open-hand fighting: when fighting unarmed, scores a critical hit on a to-wound roll of 5-6 instead of 6. With a quarter staff, only the unarmed attacks crit on 5+."
+    "text": "Master of open-hand fighting: when fighting unarmed, scores a critical hit on a to-wound roll of 5-6 instead of 6. With a quarter staff, only the unarmed attacks crit on 5+.",
+    "own": true
    }
   ],
   [
@@ -596,7 +630,8 @@
    {
     "name": "Decree",
     "line": "Special (Emissary)",
-    "text": "If the Emissary dies, a new one must be hired before any other warrior or equipment is bought; he then reclaims leadership of the warband."
+    "text": "If the Emissary dies, a new one must be hired before any other warrior or equipment is bought; he then reclaims leadership of the warband.",
+    "own": true
    }
   ],
   [
@@ -607,7 +642,8 @@
    {
     "name": "Mob",
     "line": "Special (Raging Peasant)",
-    "text": "+1 Leadership for each other friendly Peasant within 3\". Due to their rage, Peasants do not benefit from the Leader rule."
+    "text": "+1 Leadership for each other friendly Peasant within 3\". Due to their rage, Peasants do not benefit from the Leader rule.",
+    "own": true
    }
   ],
   [
@@ -618,7 +654,8 @@
    {
     "name": "Ignored",
     "line": "Special (Raging Peasant)",
-    "text": "Peasants taken out of action are not counted toward the number of down models for Rout tests."
+    "text": "Peasants taken out of action are not counted toward the number of down models for Rout tests.",
+    "own": true
    }
   ],
   [
@@ -629,7 +666,8 @@
    {
     "name": "Downtrodden",
     "line": "Special (Raging Peasant)",
-    "text": "When a Peasant is wounded, do not roll for injury — the model is immediately taken out of action."
+    "text": "When a Peasant is wounded, do not roll for injury — the model is immediately taken out of action.",
+    "own": true
    }
   ],
   [
@@ -640,7 +678,8 @@
    {
     "name": "Simple folk",
     "line": "Special (Raging Peasant)",
-    "text": "Peasants never gain Experience."
+    "text": "Peasants never gain Experience.",
+    "own": true
    }
   ],
   [
@@ -651,7 +690,11 @@
    {
     "name": "Death Wish",
     "line": "Psychology (Troll Slayer)",
-    "text": "Seeks an honourable death in combat: completely immune to all psychology."
+    "text": "Seeks an honourable death in combat: completely immune to all psychology.",
+    "own": true,
+    "wb": [
+     "pitfighters"
+    ]
    }
   ],
   [
@@ -662,7 +705,8 @@
    {
     "name": "Slow Witted",
     "line": "Special (Ogre)",
-    "text": "Not the brightest: gains advances at half the normal rate (needs twice the usual experience for each advance)."
+    "text": "Not the brightest: gains advances at half the normal rate (needs twice the usual experience for each advance).",
+    "own": true
    }
   ],
   [
@@ -673,7 +717,8 @@
    {
     "name": "Inconsistency",
     "line": "Special (Chaos Spawn-to-be)",
-    "text": "The Condemned's body mutates constantly: its variable characteristics (WS, S, T and A) are re-rolled anew each turn until the player chooses to 'set' a value on an advance."
+    "text": "The Condemned's body mutates constantly: its variable characteristics (WS, S, T and A) are re-rolled anew each turn until the player chooses to 'set' a value on an advance.",
+    "own": true
    }
   ],
   [
@@ -684,7 +729,8 @@
    {
     "name": "Fate",
     "line": "Special (Marauders)",
-    "text": "While any characteristic is still variable the Condemned carries no equipment but fights without penalty. Once all are set he equips normally — but if he reaches 90 Experience with a value still variable, he is lost and becomes a Chaos Spawn."
+    "text": "While any characteristic is still variable the Condemned carries no equipment but fights without penalty. Once all are set he equips normally — but if he reaches 90 Experience with a value still variable, he is lost and becomes a Chaos Spawn.",
+    "own": true
    }
   ],
   [
@@ -695,7 +741,8 @@
    {
     "name": "Bear Handler",
     "line": "Special (Kislev Bear Tamer)",
-    "text": "A warband with a Bear Tamer may recruit a Trained Bear. The bear automatically passes Stupidity tests while within 6\" of the Tamer (even if the Tamer is Knocked Down or Stunned) and may not be fielded in a game the Tamer sits out."
+    "text": "A warband with a Bear Tamer may recruit a Trained Bear. The bear automatically passes Stupidity tests while within 6\" of the Tamer (even if the Tamer is Knocked Down or Stunned) and may not be fielded in a game the Tamer sits out.",
+    "own": true
    }
   ],
   [
@@ -706,7 +753,8 @@
    {
     "name": "Fiercely Loyal",
     "line": "Special (Kislev Trained Bear)",
-    "text": "The bear's devotion is absolute: it automatically passes Stupidity tests while within 6\" of its Bear Tamer — even if the Tamer has been Knocked Down or Stunned."
+    "text": "As long as his bear is not taken out of action, the Bear Tamer ignores Robbed, Sold to the Pits and Captured results on the Serious Injury chart and treats them as Full Recovery.",
+    "own": true
    }
   ],
   [
@@ -717,7 +765,11 @@
    {
     "name": "Bear Hug",
     "line": "Close combat (Kislev Trained Bear)",
-    "text": "If the bear hits the same enemy with both attacks in a round, it may make a single Bear Hug instead: both roll D6 + Strength; if the bear's total is equal or higher the enemy suffers one automatic wound with no armour save; if lower, the enemy breaks free unharmed."
+    "text": "If the bear hits the same enemy with both attacks in a round, it may make a single Bear Hug instead: both roll D6 + Strength; if the bear's total is equal or higher the enemy suffers one automatic wound with no armour save; if lower, the enemy breaks free unharmed.",
+    "own": true,
+    "wb": [
+     "kislev"
+    ]
    }
   ],
   [
@@ -728,7 +780,8 @@
    {
     "name": "Heirloom (Inheritance)",
     "line": "Special (Kislev Druzhina)",
-    "text": "At warband creation the Captain buys one item from the Kislevite Warrior list at half price — a family heirloom. If it is ever lost (e.g. Robbed), he must rebuy the same item at 150% price; until replaced he suffers −1 to all tests and to-hit rolls."
+    "text": "At warband creation the Captain buys one item from the Kislevite Warrior list at half price — a family heirloom. If it is ever lost (e.g. Robbed), he must rebuy the same item at 150% price; until replaced he suffers −1 to all tests and to-hit rolls.",
+    "own": true
    }
   ],
   [
@@ -739,7 +792,8 @@
    {
     "name": "Gun-Rest",
     "line": "Shooting (Kislev Streltsi)",
-    "text": "A Streltsi armed with both a berdiche (halberd) and a handgun may brace the handgun on the halberd as a gun-rest, steadying the shot."
+    "text": "A Streltsi armed with both a berdiche (halberd) and a handgun may brace the handgun on the halberd as a gun-rest, steadying the shot.",
+    "own": true
    }
   ],
   [
@@ -750,7 +804,8 @@
    {
     "name": "Crack Shot",
     "line": "Shooting (Gunnery School)",
-    "text": "An expert pistol shot at close quarters: may turn a miss into a hit — re-roll a missed to-hit roll when shooting with a pistol."
+    "text": "An expert pistol shot at close quarters: may turn a miss into a hit — re-roll a missed to-hit roll when shooting with a pistol.",
+    "own": true
    }
   ],
   [
@@ -761,7 +816,8 @@
    {
     "name": "Quick Reload",
     "line": "Shooting (Gunnery School)",
-    "text": "Drilled to reload black-powder weapons at great speed under pressure — effectively may shoot every turn (no separate reload turn)."
+    "text": "Drilled to reload black-powder weapons at great speed under pressure — effectively may shoot every turn (no separate reload turn).",
+    "own": true
    }
   ],
   [
@@ -772,7 +828,8 @@
    {
     "name": "Expert Weaponsmith",
     "line": "Special (Gunnery School Instructor)",
-    "text": "While an Instructor is in the warband, all pistols gain +3\" range and all other black-powder weapons gain +6\" range."
+    "text": "While an Instructor is in the warband, all pistols gain +3\" range and all other black-powder weapons gain +6\" range.",
+    "own": true
    }
   ],
   [
@@ -783,7 +840,8 @@
    {
     "name": "Burn the Witch!",
     "line": "Psychology (Witch Hunters)",
-    "text": "The Witch Hunter Captain hates all models that can cast spells (wizards) — apply the rules for Hatred against them."
+    "text": "The Witch Hunter Captain hates all models that can cast spells (wizards) — apply the rules for Hatred against them.",
+    "own": true
    }
   ],
   [
@@ -794,7 +852,8 @@
    {
     "name": "Fanatical",
     "line": "Psychology (Flagellant)",
-    "text": "Convinced the end of the world is nigh: automatically passes every Leadership-based test it is required to take. A Flagellant may never become the warband leader."
+    "text": "Convinced the end of the world is nigh: automatically passes every Leadership-based test it is required to take. A Flagellant may never become the warband leader.",
+    "own": true
    }
   ],
   [
@@ -805,7 +864,7 @@
    {
     "name": "Expert Swordsman",
     "line": "Combat skill",
-    "text": "May re-roll missed to-hit rolls in close combat while armed with a sword (FAQ: only normal swords or weeping blades — not double-handed swords or any other weapon)."
+    "text": "When armed with a sword, may re-roll all missed attacks in the hand-to-hand phase of the turn he charges (FAQ: only normal swords or weeping blades — not double-handed swords or any other weapon)."
    }
   ],
   [
@@ -816,7 +875,11 @@
    {
     "name": "Crazed",
     "line": "Psychology (Darksoul)",
-    "text": "Driven mad: automatically passes all Leadership-based tests it is required to take."
+    "text": "Driven mad: automatically passes all Leadership-based tests it is required to take.",
+    "own": true,
+    "wb": [
+     "hs:pyromaniac"
+    ]
    }
   ],
   [
@@ -827,7 +890,8 @@
    {
     "name": "Perfect Killer",
     "line": "Special (Skaven Assassin)",
-    "text": "Strikes with deadly precision: enemies suffer an additional −1 to their armour save against this model's attacks (shooting and close combat)."
+    "text": "Strikes with deadly precision: enemies suffer an additional −1 to their armour save against this model's attacks (shooting and close combat).",
+    "own": true
    }
   ],
   [
@@ -838,7 +902,8 @@
    {
     "name": "Blessed Sight",
     "line": "Special (Sisters of Sigmar Augur)",
-    "text": "The blind Augur has second sight: she may re-roll any failed characteristic test and any to-hit roll (close combat or shooting), but must accept the second result. If she is not taken Out of Action, in the exploration phase you may roll two dice for her and keep either."
+    "text": "The blind Augur has second sight: she may re-roll any failed characteristic test and any to-hit roll (close combat or shooting), but must accept the second result. If she is not taken Out of Action, in the exploration phase you may roll two dice for her and keep either.",
+    "own": true
    }
   ],
   [
@@ -849,7 +914,8 @@
    {
     "name": "Drunk",
     "line": "Psychology",
-    "text": "Meaning depends on the warrior: Ostlander Ruffians (and similar drunken zealots) automatically pass all Leadership-based tests, may never be the leader and carry no missile weapons. A Beastman Centigor instead must test each turn — on its own roll it is subject to Stupidity or Frenzy."
+    "text": "Meaning depends on the warrior: Ostlander Ruffians (and similar drunken zealots) automatically pass all Leadership-based tests, may never be the leader and carry no missile weapons. A Beastman Centigor instead must test each turn — on its own roll it is subject to Stupidity or Frenzy.",
+    "own": true
    }
   ],
   [
@@ -860,7 +926,7 @@
    {
     "name": "Daemonic Aura 5+",
     "line": "Special save (Daemon)",
-    "text": "A protective daemonic field grants a 5+ special save against any wound (not modified by the attack's Strength)."
+    "text": "A 5+ special save against any wound. It is modified by the Strength of the attack as normal and completely negated by magic weapons and spells. The daemon’s own attacks count as magical."
    }
   ],
   [
@@ -871,7 +937,7 @@
    {
     "name": "Daemon",
     "line": "Special (Carnival)",
-    "text": "A daemonic creature: causes fear, is immune to psychology and to poison, and gains no experience."
+    "text": "A daemonic creature: immune to psychology and to poison, and gains no experience (whether it causes fear is in its own rules)."
    }
   ],
   [
@@ -882,7 +948,8 @@
    {
     "name": "Master Weaponsmith",
     "line": "Special (Dwarf Engineer)",
-    "text": "While the Engineer is in the warband, the range of the warband's basic missile/black-powder weapons is increased (+3\" / +6\")."
+    "text": "While the Engineer is in the warband, the range of the warband's basic missile/black-powder weapons is increased (+3\" / +6\").",
+    "own": true
    }
   ],
   [
@@ -893,7 +960,8 @@
    {
     "name": "Set Traps",
     "line": "Special (Mountain Hunter)",
-    "text": "May lay a hidden trap; a model that triggers it suffers a Strength 4 hit."
+    "text": "May lay a hidden trap; a model that triggers it suffers a Strength 4 hit.",
+    "own": true
    }
   ],
   [
@@ -904,7 +972,8 @@
    {
     "name": "Weak",
     "line": "Special (Halfling)",
-    "text": "Too slight for heavy exertion: may not choose advances from the Strength skill list."
+    "text": "Too slight for heavy exertion: may not choose advances from the Strength skill list.",
+    "own": true
    }
   ],
   [
@@ -915,7 +984,11 @@
    {
     "name": "Vomit Attack",
     "line": "Close combat (Troll)",
-    "text": "Instead of attacking normally, the Troll may vomit over one enemy in base contact: a Strength 5 hit with no armour save allowed."
+    "text": "Instead of attacking normally, the Troll may vomit over one enemy in base contact: a Strength 5 hit with no armour save allowed.",
+    "own": true,
+    "wb": [
+     "orcmob"
+    ]
    }
   ],
   [
@@ -926,7 +999,8 @@
    {
     "name": "Always Hungry",
     "line": "Upkeep (Troll)",
-    "text": "The ever-ravenous Troll must be fed: pay 15 gc upkeep after each game or it wanders off in search of food."
+    "text": "The ever-ravenous Troll must be fed: pay 15 gc upkeep after each game or it wanders off in search of food.",
+    "own": true
    }
   ],
   [
@@ -937,7 +1011,11 @@
    {
     "name": "Woodland-dweller",
     "line": "Movement (Beastmen)",
-    "text": "At home among the trees: ignores movement penalties for woods and rough terrain."
+    "text": "Suffers no movement penalties for moving through wooded areas.",
+    "own": true,
+    "wb": [
+     "beastmen"
+    ]
    }
   ],
   [
@@ -948,7 +1026,8 @@
    {
     "name": "Trample",
     "line": "Close combat (Centigor)",
-    "text": "+1 Attack in close combat; this additional attack gains no weapon bonuses."
+    "text": "+1 Attack in close combat; this additional attack gains no weapon bonuses.",
+    "own": true
    }
   ],
   [
@@ -959,13 +1038,14 @@
    {
     "name": "Lowest of the low",
     "line": "Special (Ungor)",
-    "text": "Downtrodden brutes: can never become a Hero (never benefits from \"The Lad's Got Talent\")."
+    "text": "Downtrodden brutes: can never become a Hero (never benefits from \"The Lad's Got Talent\").",
+    "own": true
    }
   ],
   [
    {
-    "__re": "\\bhunter\\b",
-    "__f": "i"
+    "__re": "(?<![A-Z][A-Za-z]*[\\s-])\\bHunter\\b",
+    "__f": ""
    },
    {
     "name": "Hunter",
@@ -981,7 +1061,8 @@
    {
     "name": "Undead",
     "line": "Psychology",
-    "text": "Undead: immune to all psychology, never runs, feels no pain, and gains no experience."
+    "text": "Undead: immune to all psychology, never runs, feels no pain, and gains no experience.",
+    "own": true
    }
   ],
   [
@@ -992,7 +1073,8 @@
    {
     "name": "Sneaky",
     "line": "Shooting (Halfling Thief)",
-    "text": "Small and furtive: −1 to hit when shot at (cumulative with other to-hit modifiers)."
+    "text": "Small and furtive: −1 to hit when shot at (cumulative with other to-hit modifiers).",
+    "own": true
    }
   ],
   [
@@ -1003,7 +1085,8 @@
    {
     "name": "Stealthy",
     "line": "Deployment (Amazon Scout)",
-    "text": "Deploys at double the normal scouting distance and begins the game already Hidden."
+    "text": "Deploys at double the normal scouting distance and begins the game already Hidden.",
+    "own": true
    }
   ],
   [
@@ -1014,7 +1097,8 @@
    {
     "name": "One with the Jungle",
     "line": "Movement (Amazons of Lustria)",
-    "text": "Suffers no movement penalty for moving through jungle or forest terrain."
+    "text": "Suffers no movement penalty for moving through jungle or forest terrain.",
+    "own": true
    }
   ],
   [
@@ -1036,7 +1120,8 @@
    {
     "name": "Knight's Virtue",
     "line": "Psychology (Bretonnian)",
-    "text": "Chivalrous resolve: never panics or breaks from close combat, and never takes a Leadership test for being All Alone."
+    "text": "Chivalrous resolve: never panics or breaks from close combat, and never takes a Leadership test for being All Alone.",
+    "own": true
    }
   ],
   [
@@ -1047,7 +1132,8 @@
    {
     "name": "Life of Slavery",
     "line": "Special (Arabian Slave)",
-    "text": "A slave may gain experience, but if he rolls \"The Lad's Got Talent\" the Sheikh executes him (remove from roster) and the henchman group re-rolls the advance."
+    "text": "A slave may gain experience, but if he rolls \"The Lad's Got Talent\" the Sheikh executes him (remove from roster) and the henchman group re-rolls the advance.",
+    "own": true
    }
   ],
   [
@@ -1058,7 +1144,8 @@
    {
     "name": "Crazy & Savage",
     "line": "Close combat (Orc Nuttaz)",
-    "text": "Wild, unstable berserkers: +1 Attack in close combat."
+    "text": "Wild, unstable berserkers: +1 Attack in close combat.",
+    "own": true
    }
   ],
   [
@@ -1069,7 +1156,8 @@
    {
     "name": "Rides Spiders",
     "line": "Mount (Forest Goblin)",
-    "text": "Mounted on a Giant or Gigantic Spider, gaining the spider's movement and special rules."
+    "text": "Mounted on a Giant or Gigantic Spider, gaining the spider's movement and special rules.",
+    "own": true
    }
   ],
   [
@@ -1080,7 +1168,8 @@
    {
     "name": "Inscribe Runes",
     "line": "Special (Dwarf Runesmith)",
-    "text": "The Runesmith may inscribe magic runes onto the warband's weapons and armour (starts able to inscribe one minor rune); see the rune rules."
+    "text": "The Runesmith may inscribe magic runes onto the warband's weapons and armour (starts able to inscribe one minor rune); see the rune rules.",
+    "own": true
    }
   ],
   [
@@ -1091,7 +1180,8 @@
    {
     "name": "Three Throws",
     "line": "Shooting (Forest Goblin Slugga)",
-    "text": "May make up to three thrown attacks in a single Shooting phase."
+    "text": "May make up to three thrown attacks in a single Shooting phase.",
+    "own": true
    }
   ],
   [
@@ -1102,7 +1192,8 @@
    {
     "name": "Concealment",
     "line": "Special (Hochland Footpad)",
-    "text": "Hard to spot: an enemy that wishes to charge a Footpad he cannot see (and who is not Hidden) must subtract 1 from his Initiative before taking the test to detect him."
+    "text": "Hard to spot: an enemy that wishes to charge a Footpad he cannot see (and who is not Hidden) must subtract 1 from his Initiative before taking the test to detect him.",
+    "own": true
    }
   ],
   [
@@ -1113,7 +1204,8 @@
    {
     "name": "Convincing Manner",
     "line": "Special (Hochland Huckster)",
-    "text": "When an enemy tries to charge any member of the Huckster's warband within 12\" of the Huckster, that enemy must first pass a Leadership test; on a failure it may not charge (treat as a failed charge). Creatures subject to Stupidity and animals are immune."
+    "text": "When an enemy tries to charge any member of the Huckster's warband within 12\" of the Huckster, that enemy must first pass a Leadership test; on a failure it may not charge (treat as a failed charge). Creatures subject to Stupidity and animals are immune.",
+    "own": true
    }
   ],
   [
@@ -1124,7 +1216,8 @@
    {
     "name": "Slick Operator",
     "line": "Post-battle (Hochland Huckster)",
-    "text": "Between games the Huckster may run a con: roll a D6 — on 2–6 the warband gains 2D6 gold crowns; on a 1 the con backfires (the Huckster misses the next game and no gold is earned)."
+    "text": "Between games the Huckster may run a con: roll a D6 — on 2–6 the warband gains 2D6 gold crowns; on a 1 the con backfires (the Huckster misses the next game and no gold is earned).",
+    "own": true
    }
   ],
   [
@@ -1135,7 +1228,8 @@
    {
     "name": "Looting the Dead",
     "line": "Post-battle (Hochland Looter)",
-    "text": "For each enemy taken Out of Action, the Looter may roll a D6; on a 4+ he strips all that warrior's equipment, which the warband keeps."
+    "text": "For each enemy taken Out of Action, the Looter may roll a D6; on a 4+ he strips all that warrior's equipment, which the warband keeps.",
+    "own": true
    }
   ],
   [
@@ -1146,7 +1240,8 @@
    {
     "name": "Trailblazers",
     "line": "Exploration (Hochland Poacher)",
-    "text": "Poachers know where to find game and safe camps: in the exploration phase the warband may re-roll one exploration die for each Poacher who took part."
+    "text": "Poachers know where to find game and safe camps: in the exploration phase the warband may re-roll one exploration die for each Poacher who took part.",
+    "own": true
    }
   ],
   [
@@ -1157,7 +1252,11 @@
    {
     "name": "Utterly Inept",
     "line": "Special (Hochland Gutterscum)",
-    "text": "Hopeless rabble: gains no experience and never improves."
+    "text": "Hopeless rabble: gains no experience and never improves.",
+    "own": true,
+    "wb": [
+     "hochland"
+    ]
    }
   ],
   [
@@ -1168,7 +1267,11 @@
    {
     "name": "Hardened",
     "line": "Psychology (Hochland Blackheart)",
-    "text": "Cold-blooded and pitiless: immune to fear and never takes a Leadership test for being All Alone."
+    "text": "Cold-blooded and pitiless: immune to fear and never takes a Leadership test for being All Alone.",
+    "own": true,
+    "wb": [
+     "hochland"
+    ]
    }
   ],
   [
@@ -1179,7 +1282,8 @@
    {
     "name": "Swordmaster",
     "line": "Close combat (Hochland Duelist)",
-    "text": "A master parrier: the Duelist parries when his parry roll equals OR beats the enemy's to-hit roll (not only when it beats it). He must be armed with a weapon that allows a Parry (e.g. a sword or buckler)."
+    "text": "A master parrier: the Duelist parries when his parry roll equals OR beats the enemy's to-hit roll (not only when it beats it). He must be armed with a weapon that allows a Parry (e.g. a sword or buckler).",
+    "own": true
    }
   ],
   [
@@ -1190,7 +1294,8 @@
    {
     "name": "Weapon Knowledge",
     "line": "Equipment (Hochland Duelist)",
-    "text": "Versed in every weapon: the Duelist may use any close combat or missile weapon — his starting equipment list merely shows what he begins with."
+    "text": "Versed in every weapon: the Duelist may use any close combat or missile weapon — his starting equipment list merely shows what he begins with.",
+    "own": true
    }
   ],
   [
@@ -1201,7 +1306,8 @@
    {
     "name": "Conch Shell Horn",
     "line": "Wargear · Rare 8 · 25 gc (Piranha Warrior only)",
-    "text": "At the start of the game a Piranha Warrior with the horn may re-roll the roll that decides who deploys first and who takes the first turn. Multiple horns cannot force a second re-roll."
+    "text": "At the start of the game a Piranha Warrior with the horn may re-roll the roll that decides who deploys first and who takes the first turn. Multiple horns cannot force a second re-roll.",
+    "own": true
    }
   ],
   [
@@ -1212,7 +1318,11 @@
    {
     "name": "Combat Riding",
     "line": "Mounted skill (Outriders)",
-    "text": "Trained to fight from horseback: the rider keeps his mount's advantages in close combat (per the Blazing Saddles mounted-combat rules)."
+    "text": "When charging an unmounted opponent, the rider makes a single additional Strength 4 attack (Blazing Saddles).",
+    "own": true,
+    "wb": [
+     "outriders"
+    ]
    }
   ],
   [
@@ -1223,7 +1333,11 @@
    {
     "name": "Horse Handling",
     "line": "Mounted skill (Outriders)",
-    "text": "The Groom has the Animal Handling skill — he keeps his steed under control (e.g. stopping it from bolting), per the Blazing Saddles rules."
+    "text": "The Groom has Animal Handling: riding animals within 6\" may use his Leadership, and stubborn animals with him in base contact ignore their stubbornness.",
+    "own": true,
+    "wb": [
+     "outriders"
+    ]
    }
   ],
   [
@@ -1234,7 +1348,11 @@
    {
     "name": "Ride",
     "line": "Mounted skill (Outriders)",
-    "text": "Allows the warrior to ride a Riding Horse or Warhorse and gain the benefits of a mounted warrior (Blazing Saddles / Mordheim mounted rules). A mounted warrior may not fight with two weapons, though a shield or buckler may still be used."
+    "text": "Allows the warrior to ride a Riding Horse or Warhorse and gain the benefits of a mounted warrior (Blazing Saddles / Mordheim mounted rules). A mounted warrior may not fight with two weapons, though a shield or buckler may still be used.",
+    "own": true,
+    "wb": [
+     "outriders"
+    ]
    }
   ],
   [
@@ -1245,7 +1363,11 @@
    {
     "name": "Hardy",
     "line": "Special (Ostermarkers)",
-    "text": "Self-reliant and used to harsh odds: Heroes and Henchmen may re-roll a failed Leadership test for being All Alone or for Routing — but must accept the second result."
+    "text": "Self-reliant and used to harsh odds: Heroes and Henchmen may re-roll a failed Leadership test for being All Alone or for Routing — but must accept the second result.",
+    "own": true,
+    "wb": [
+     "ostermark"
+    ]
    }
   ],
   [
@@ -1256,7 +1378,8 @@
    {
     "name": "Stubborn",
     "line": "Special (Dwarf Longbeard)",
-    "text": "Set in their ways and impossible to drive off: a Dwarf Longbeard may re-roll any failed Leadership test he is required to take (the second result always stands)."
+    "text": "Set in their ways and impossible to drive off: a Dwarf Longbeard may re-roll any failed Leadership test he is required to take (the second result always stands).",
+    "own": true
    }
   ],
   [
@@ -1267,7 +1390,11 @@
    {
     "name": "Chivalry",
     "line": "Special (Bretonnian Knight)",
-    "text": "Knights may never use any missile weapon (except Holy Water), nor any drug or poison, and may never learn spells (prayers are allowed)."
+    "text": "Knights may never use any missile weapon (except Holy Water), nor any drug or poison, and may never learn spells (prayers are allowed).",
+    "own": true,
+    "wb": [
+     "bretchapel"
+    ]
    }
   ],
   [
@@ -1278,7 +1405,11 @@
    {
     "name": "Lord's Boon",
     "line": "Special (Bretonnian Knight)",
-    "text": "On purchase a Knight may start with ONE of a Warhorse, Light Armour or Heavy Armour at half cost. It may never be traded, given away or sold; if the Knight dies it is removed from the warband."
+    "text": "On purchase a Knight may start with ONE of a Warhorse, Light Armour or Heavy Armour at half cost. It may never be traded, given away or sold; if the Knight dies it is removed from the warband.",
+    "own": true,
+    "wb": [
+     "bretchapel"
+    ]
    }
   ],
   [
@@ -1289,7 +1420,8 @@
    {
     "name": "Vain",
     "line": "Special (Knight Errant)",
-    "text": "Too proud to hide his face from the ladies: may never wear a helmet."
+    "text": "Too proud to hide his face from the ladies: may never wear a helmet.",
+    "own": true
    }
   ],
   [
@@ -1300,7 +1432,8 @@
    {
     "name": "Impetuous",
     "line": "Special (Knight Errant)",
-    "text": "If not in combat and it did not charge this turn, the Knight Errant must charge a viable standing enemy within range (auto-passing fear/psychology for that charge). You may instead pass a Leadership test to let it act normally."
+    "text": "If not in combat and it did not charge this turn, the Knight Errant must charge a viable standing enemy within range (auto-passing fear/psychology for that charge). You may instead pass a Leadership test to let it act normally.",
+    "own": true
    }
   ],
   [
@@ -1311,7 +1444,8 @@
    {
     "name": "Knighthood",
     "line": "Special (Squire)",
-    "text": "On \"The Lad's Got Talent\" you may keep him a Squire (pick two of Combat/Academic/Strength/Speed) or promote him to a Knight Errant (gains Knight/Vain/Impetuous and the Knight equipment list; may exceed the Knight-Errant limit)."
+    "text": "On \"The Lad's Got Talent\" you may keep him a Squire (pick two of Combat/Academic/Strength/Speed) or promote him to a Knight Errant (gains Knight/Vain/Impetuous and the Knight equipment list; may exceed the Knight-Errant limit).",
+    "own": true
    }
   ],
   [
@@ -1322,7 +1456,8 @@
    {
     "name": "Low Caste",
     "line": "Special (Bretonnian peasant)",
-    "text": "Gains Experience and advances normally, but re-rolls any \"The Lad's Got Talent\" result and may never become a Hero."
+    "text": "Gains Experience and advances normally, but re-rolls any \"The Lad's Got Talent\" result and may never become a Hero.",
+    "own": true
    }
   ],
   [
@@ -1333,7 +1468,8 @@
    {
     "name": "Agony and Ecstasy",
     "line": "Special (Whipmaster)",
-    "text": "May spend one Hedonist Whip attack to scourge a friendly model within 3\" (auto-hit, +1 to wound); in reward he doubles his Toughness until he fails an Ld test at the start of one of his turns."
+    "text": "May spend one Hedonist Whip attack to scourge a friendly model within 3\" (auto-hit, +1 to wound); in reward he doubles his Toughness until he fails an Ld test at the start of one of his turns.",
+    "own": true
    }
   ],
   [
@@ -1344,7 +1480,8 @@
    {
     "name": "Pain and Pleasure",
     "line": "Special (Whipmaster)",
-    "text": "Whenever the Whipmaster suffers an unsaved wound he is subject to Frenzy until the end of his next turn — not negated by being knocked down or stunned."
+    "text": "Whenever the Whipmaster suffers an unsaved wound he is subject to Frenzy until the end of his next turn — not negated by being knocked down or stunned.",
+    "own": true
    }
   ],
   [
@@ -1355,7 +1492,8 @@
    {
     "name": "Strange Allure",
     "line": "Special (Danseuse)",
-    "text": "An enemy wishing to attack her in melee or with a missile must first pass a Leadership test; on a failure it must re-roll any successful hits against her."
+    "text": "An enemy wishing to attack her in melee or with a missile must first pass a Leadership test; on a failure it must re-roll any successful hits against her.",
+    "own": true
    }
   ],
   [
@@ -1366,7 +1504,8 @@
    {
     "name": "Pound of Flesh",
     "line": "Special (Flesh Merchant)",
-    "text": "A Wretch may be carried as a \"meat shield\": when the Merchant would take a wound, the Wretch is taken out of action instead. The Wretch still attacks in melee, has no base and cannot be targeted; it is lost if the Merchant dies."
+    "text": "A Wretch may be carried as a \"meat shield\": when the Merchant would take a wound, the Wretch is taken out of action instead. The Wretch still attacks in melee, has no base and cannot be targeted; it is lost if the Merchant dies.",
+    "own": true
    }
   ],
   [
@@ -1377,7 +1516,8 @@
    {
     "name": "Cruel Fate",
     "line": "Special (Flesh Merchant)",
-    "text": "Any captives the warband gains may be turned into Wretches at no cost (via lobotomy and torture)."
+    "text": "Any captives the warband gains may be turned into Wretches at no cost (via lobotomy and torture).",
+    "own": true
    }
   ],
   [
@@ -1388,7 +1528,8 @@
    {
     "name": "Flesh Reserve",
     "line": "Special (Priest of Obscene)",
-    "text": "A Wretch may be carried as a \"sacrificial pawn\": when the Priest fails to cast a spell he may sacrifice it to re-roll the casting. The Wretch still attacks in melee, has no base and cannot be targeted; it is lost if the Priest dies."
+    "text": "A Wretch may be carried as a \"sacrificial pawn\": when the Priest fails to cast a spell he may sacrifice it to re-roll the casting. The Wretch still attacks in melee, has no base and cannot be targeted; it is lost if the Priest dies.",
+    "own": true
    }
   ],
   [
@@ -1399,7 +1540,8 @@
    {
     "name": "Fluctuating Form",
     "line": "Special (Devout)",
-    "text": "At the start of the battle and each Recovery phase (if not in combat) choose Male (+1 WS, S, T, A) or Female (+1 BS, +2 I, +2 Ld, +2 M)."
+    "text": "At the start of the battle and each Recovery phase (if not in combat) choose Male (+1 WS, S, T, A) or Female (+1 BS, +2 I, +2 Ld, +2 M).",
+    "own": true
    }
   ],
   [
@@ -1410,7 +1552,8 @@
    {
     "name": "Slaves to Darkness",
     "line": "Special (Wretch)",
-    "text": "Immune to all psychology and All Alone tests while within 6\" of a friendly Hero. Wretches can never become Heroes; a repeated \"The Lad's Got Talent\" instead gives an immediate Serious Injury (as a Hero)."
+    "text": "Immune to all psychology and All Alone tests while within 6\" of a friendly Hero. Wretches can never become Heroes; a repeated \"The Lad's Got Talent\" instead gives an immediate Serious Injury (as a Hero).",
+    "own": true
    }
   ],
   [
@@ -1421,7 +1564,8 @@
    {
     "name": "Danse Macabre",
     "line": "Special (Cursed Piper)",
-    "text": "In the shooting phase target one enemy within 6\" who must pass an Ld test or be controlled — moved anywhere (even out of combat or off a height). It tests Ld each recovery phase to break free and meanwhile cannot shoot, charge, cast or attack. Only one victim at a time."
+    "text": "In the shooting phase target one enemy within 6\" who must pass an Ld test or be controlled — moved anywhere (even out of combat or off a height). It tests Ld each recovery phase to break free and meanwhile cannot shoot, charge, cast or attack. Only one victim at a time.",
+    "own": true
    }
   ],
   [
@@ -1432,7 +1576,8 @@
    {
     "name": "Expert Horseman",
     "line": "Special (Aristocrat)",
-    "text": "The Aristocrat has the Ride (Nightmare) skill and may ride a Nightmare."
+    "text": "The Aristocrat has the Ride (Nightmare) skill and may ride a Nightmare.",
+    "own": true
    }
   ],
   [
@@ -1443,7 +1588,8 @@
    {
     "name": "Magical Adept",
     "line": "Special (Twisted Scholar)",
-    "text": "When hired you may pay +10 gc to make the Scholar a Wizard; he then uses Lesser Magic and starts with one randomly generated spell."
+    "text": "When hired you may pay +10 gc to make the Scholar a Wizard; he then uses Lesser Magic and starts with one randomly generated spell.",
+    "own": true
    }
   ],
   [
@@ -1454,7 +1600,8 @@
    {
     "name": "Story Teller",
     "line": "Special (Twisted Scholar)",
-    "text": "If not upgraded to a Wizard, you may pay +10 gc to make the Scholar a Chronicler: re-roll one extra Exploration die and choose which two of the dice to keep."
+    "text": "If not upgraded to a Wizard, you may pay +10 gc to make the Scholar a Chronicler: re-roll one extra Exploration die and choose which two of the dice to keep.",
+    "own": true
    }
   ],
   [
@@ -1465,7 +1612,8 @@
    {
     "name": "Maddened With Pain",
     "line": "Special (Great Bear)",
-    "text": "As soon as the Great Bear suffers a single wound it gains one additional Attack."
+    "text": "As soon as the Great Bear suffers a single wound it gains one additional Attack.",
+    "own": true
    }
   ],
   [
@@ -1476,7 +1624,8 @@
    {
     "name": "Survivor",
     "line": "Special (Conqueror)",
-    "text": "Cannot be taken Out of Action unless already Knocked Down or Stunned (if standing, treat the result as Stunned instead). The first \"Dead\" rolled on the Serious Injury chart is treated as Multiple Injuries instead — once only."
+    "text": "Cannot be taken Out of Action unless already Knocked Down or Stunned (if standing, treat the result as Stunned instead). The first \"Dead\" rolled on the Serious Injury chart is treated as Multiple Injuries instead — once only.",
+    "own": true
    }
   ],
   [
@@ -1487,7 +1636,8 @@
    {
     "name": "Ranger",
     "line": "Special (Mountain Guide)",
-    "text": "If the Guide is not put out of action, roll two dice for Exploration and pick one as the result (this is not a re-roll)."
+    "text": "If the Guide is not put out of action, roll two dice for Exploration and pick one as the result (this is not a re-roll).",
+    "own": true
    }
   ],
   [
@@ -1498,7 +1648,8 @@
    {
     "name": "Loner",
     "line": "Special (Mountain Guide)",
-    "text": "Immune to all All Alone tests, never claims or keeps a Gnoblar, and may never become the warband Leader."
+    "text": "Immune to all All Alone tests, never claims or keeps a Gnoblar, and may never become the warband Leader.",
+    "own": true
    }
   ],
   [
@@ -1509,7 +1660,8 @@
    {
     "name": "Feral Instinct",
     "line": "Special (Sabretusk)",
-    "text": "At the start of your turn the Sabretusk must pass a Leadership test (use the Guide's Ld within 6\"). If it fails, the opponent moves it this turn — it may even charge models from its own warband."
+    "text": "At the start of your turn the Sabretusk must pass a Leadership test (use the Guide's Ld within 6\"). If it fails, the opponent moves it this turn — it may even charge models from its own warband.",
+    "own": true
    }
   ],
   [
@@ -1520,7 +1672,8 @@
    {
     "name": "Trained",
     "line": "Special (Sabretusk)",
-    "text": "May use the Mountain Guide's Leadership within 6\". With no Guide in the warband (death/injury) the Sabretusks must be caged at camp and cannot be used until a Guide is hired again."
+    "text": "May use the Mountain Guide's Leadership within 6\". With no Guide in the warband (death/injury) the Sabretusks must be caged at camp and cannot be used until a Guide is hired again.",
+    "own": true
    }
   ],
   [
@@ -1531,7 +1684,8 @@
    {
     "name": "Gluttony",
     "line": "Special (Ogre warband)",
-    "text": "Each Ogre counts as two models when selling wyrdstone or treasure. A captive (or any own member, animal or mount) may be devoured: reduce the warband's model count by 1 (2 for a Large captive) and an Ogre Hero gains XP equal to models eaten. Each Ogre always counts as at least one model."
+    "text": "Each Ogre counts as two models when selling wyrdstone or treasure. A captive (or any own member, animal or mount) may be devoured: reduce the warband's model count by 1 (2 for a Large captive) and an Ogre Hero gains XP equal to models eaten. Each Ogre always counts as at least one model.",
+    "own": true
    }
   ],
   [
@@ -1542,7 +1696,8 @@
    {
     "name": "Lightning Reflexes",
     "line": "Special (Knights Vanguard)",
-    "text": "When charged, the model strikes first; since chargers also strike first, resolve the order by comparing Initiative."
+    "text": "When charged, the model strikes first; since chargers also strike first, resolve the order by comparing Initiative.",
+    "own": true
    }
   ],
   [
@@ -1553,7 +1708,8 @@
    {
     "name": "Hireling",
     "line": "Special (Caravan retinue)",
-    "text": "Paid by the Merchant — this warrior may never become the warband Leader."
+    "text": "Paid by the Merchant — this warrior may never become the warband Leader.",
+    "own": true
    }
   ],
   [
@@ -1564,7 +1720,8 @@
    {
     "name": "Unreliable Hirelings",
     "line": "Special (Blackguard)",
-    "text": "May never become Heroes — re-roll any \"The Lad's Got Talent\" result."
+    "text": "May never become Heroes — re-roll any \"The Lad's Got Talent\" result.",
+    "own": true
    }
   ],
   [
@@ -1586,7 +1743,11 @@
    {
     "name": "Wagon",
     "line": "Special (Trade Wagon)",
-    "text": "Follows the Wagon rules (Empire in Flames). One warband model must drive it. If destroyed, all stored equipment and treasures are lost; if abandoned after a failed Rout test with no driver, it falls to the enemy."
+    "text": "Follows the Wagon rules (Empire in Flames). One warband model must drive it. If destroyed, all stored equipment and treasures are lost; if abandoned after a failed Rout test with no driver, it falls to the enemy.",
+    "own": true,
+    "wb": [
+     "hs:coachman"
+    ]
    }
   ],
   [
@@ -1597,7 +1758,12 @@
    {
     "name": "Animosity",
     "line": "Special (Greenskins)",
-    "text": "At the start of each turn roll a D6 — on a 1 the warband squabbles and does nothing else that turn. Only Goblins are affected (not Trolls, Squigs, Snotlings or Fanatics)."
+    "text": "At the start of each turn roll a D6 — on a 1 the warband squabbles and does nothing else that turn. Only Goblins are affected (not Trolls, Squigs, Snotlings or Fanatics).",
+    "own": true,
+    "wb": [
+     "nightgoblins",
+     "forestgoblins"
+    ]
    }
   ],
   [
@@ -1608,7 +1774,11 @@
    {
     "name": "Hate Stunties",
     "line": "Special (Night Goblin)",
-    "text": "Night Goblins are subject to Hatred towards Dwarfs. Fanatics are too far gone to be affected."
+    "text": "Night Goblins are subject to Hatred towards Dwarfs. Fanatics are too far gone to be affected.",
+    "own": true,
+    "wb": [
+     "nightgoblins"
+    ]
    }
   ],
   [
@@ -1619,7 +1789,8 @@
    {
     "name": "Addict",
     "line": "Special (Fanatic)",
-    "text": "Must buy Mad Cap Mushrooms before each game; if none are available he stays in his cave and does not take part."
+    "text": "Must buy Mad Cap Mushrooms before each game; if none are available he stays in his cave and does not take part.",
+    "own": true
    }
   ],
   [
@@ -1630,7 +1801,8 @@
    {
     "name": "Mushroom Brain",
     "line": "Special (Fanatic)",
-    "text": "Prolonged Mad Cap use has fried his brain — he cannot gain Experience."
+    "text": "Prolonged Mad Cap use has fried his brain — he cannot gain Experience.",
+    "own": true
    }
   ],
   [
@@ -1641,7 +1813,8 @@
    {
     "name": "Looney",
     "line": "Special (Fanatic)",
-    "text": "Subject to Frenzy, and must test for permanent damage after the battle (as for the Ball and Chain)."
+    "text": "Subject to Frenzy, and must test for permanent damage after the battle (as for the Ball and Chain).",
+    "own": true
    }
   ],
   [
@@ -1652,7 +1825,8 @@
    {
     "name": "Frantic",
     "line": "Special (Fanatic)",
-    "text": "Hyperactive — always strikes first in combat, ignoring weapon and Initiative modifiers."
+    "text": "Hyperactive — always strikes first in combat, ignoring weapon and Initiative modifiers.",
+    "own": true
    }
   ],
   [
@@ -1663,7 +1837,8 @@
    {
     "name": "Minderz",
     "line": "Special (Cave Squig)",
-    "text": "Must stay within 6\" of a Goblin or it goes wild: from then on it moves 2D6\" in a random direction each Movement phase, out of the player's control until the end of the game."
+    "text": "Must stay within 6\" of a Goblin or it goes wild: from then on it moves 2D6\" in a random direction each Movement phase, out of the player's control until the end of the game.",
+    "own": true
    }
   ],
   [
@@ -1674,7 +1849,8 @@
    {
     "name": "Weedy",
     "line": "Special (Snotling)",
-    "text": "Fragile — when wounded, knocked down on a 1, stunned on 2-3, out of action on 4-6."
+    "text": "Fragile — when wounded, knocked down on a 1, stunned on 2-3, out of action on 4-6.",
+    "own": true
    }
   ],
   [
@@ -1685,7 +1861,8 @@
    {
     "name": "Dodgy",
     "line": "Special (Snotling)",
-    "text": "Constantly ducking and diving — a 6+ dodge save against shooting."
+    "text": "Constantly ducking and diving — a 6+ dodge save against shooting.",
+    "own": true
    }
   ],
   [
@@ -1696,7 +1873,8 @@
    {
     "name": "Insignificant",
     "line": "Special (Snotling)",
-    "text": "The whole mob counts as a single model for Rout tests, maximum warband size and income. An enemy only gains Experience for taking the last Snotling out of action."
+    "text": "The whole mob counts as a single model for Rout tests, maximum warband size and income. An enemy only gains Experience for taking the last Snotling out of action.",
+    "own": true
    }
   ],
   [
@@ -1707,7 +1885,8 @@
    {
     "name": "Duellist",
     "line": "Special (Saurus Slayer)",
-    "text": "When fighting a single opponent in melee, the Saurus Slayer may re-roll missed hits on the first turn of that combat, whether he charged or was charged."
+    "text": "When fighting a single opponent in melee, the Saurus Slayer may re-roll missed hits on the first turn of that combat, whether he charged or was charged.",
+    "own": true
    }
   ],
   [
@@ -1718,7 +1897,8 @@
    {
     "name": "Silent Hunter",
     "line": "Special (Jungle Shadow)",
-    "text": "Always counts as Hidden while touching any terrain ≥1\" high. Shooting does not reveal his position (casting a spell does)."
+    "text": "Always counts as Hidden while touching any terrain ≥1\" high. Shooting does not reveal his position (casting a spell does).",
+    "own": true
    }
   ],
   [
@@ -1729,7 +1909,8 @@
    {
     "name": "Surprise Attack",
     "line": "Special (Jungle Shadow)",
-    "text": "May re-roll missed to-hit rolls against an enemy attacked from its rear (a 180° arc behind its facing)."
+    "text": "May re-roll missed to-hit rolls against an enemy attacked from its rear (a 180° arc behind its facing).",
+    "own": true
    }
   ],
   [
@@ -1740,7 +1921,8 @@
    {
     "name": "Canopy Walker",
     "line": "Special (Jungle Shadow)",
-    "text": "Automatically passes all climbing, jumping and falling-off-ledges tests."
+    "text": "Automatically passes all climbing, jumping and falling-off-ledges tests.",
+    "own": true
    }
   ],
   [
@@ -1751,7 +1933,8 @@
    {
     "name": "Deadeye",
     "line": "Special (Trapmaster)",
-    "text": "Suffers no to-hit penalty for shooting at long range."
+    "text": "Suffers no to-hit penalty for shooting at long range.",
+    "own": true
    }
   ],
   [
@@ -1762,7 +1945,8 @@
    {
     "name": "Traps",
     "line": "Special (Trapmaster)",
-    "text": "Starts with 1 Trap; may buy up to 5 more at 5 gc each (one use only). Used in the shooting phase: place a real and a false 1\" counter within 3\" of the Trapmaster (≥3\" from other models). A model moving within 2\" flips one — a real trap deals D3 Strength 5 hits (no criticals)."
+    "text": "Starts with 1 Trap; may buy up to 5 more at 5 gc each (one use only). Used in the shooting phase: place a real and a false 1\" counter within 3\" of the Trapmaster (≥3\" from other models). A model moving within 2\" flips one — a real trap deals D3 Strength 5 hits (no criticals).",
+    "own": true
    }
   ],
   [
@@ -1773,7 +1957,8 @@
    {
     "name": "War Beasts",
     "line": "Special (Beastmaster)",
-    "text": "With a Beastmaster you may include up to 2 War Beasts (Warhound, Barbary Monkey, Hunting Hawk). They count toward the maximum warband size, must be bought at creation, and may use the Beastmaster's Leadership within 6\"."
+    "text": "With a Beastmaster you may include up to 2 War Beasts (Warhound, Barbary Monkey, Hunting Hawk). They count toward the maximum warband size, must be bought at creation, and may use the Beastmaster's Leadership within 6\".",
+    "own": true
    }
   ],
   [
@@ -1784,7 +1969,8 @@
    {
     "name": "Promotion Only",
     "line": "Special (Prospect)",
-    "text": "Re-roll any \"The Lad's Got Talent\" result. A Prospect can only become a Hero via the Promotions rule (replacing a lost Hero); you may then hire a new Prospect."
+    "text": "Re-roll any \"The Lad's Got Talent\" result. A Prospect can only become a Hero via the Promotions rule (replacing a lost Hero); you may then hire a new Prospect.",
+    "own": true
    }
   ],
   [
@@ -1795,7 +1981,8 @@
    {
     "name": "Nimble",
     "line": "Special (Barbary Monkey)",
-    "text": "Climbs any sheer surface without Initiative tests, re-rolls failed Diving Charge tests, and may enter buildings. Has a 5+ ward save against any wound (melee, shooting, magic or falling)."
+    "text": "Climbs any sheer surface without Initiative tests, re-rolls failed Diving Charge tests, and may enter buildings. Has a 5+ ward save against any wound (melee, shooting, magic or falling).",
+    "own": true
    }
   ],
   [
@@ -1806,7 +1993,11 @@
    {
     "name": "Expert Riggers",
     "line": "Movement (Pirates)",
-    "text": "Boatswains move through rigging, masts and ropes without movement penalties and ignore climbing penalties."
+    "text": "May re-roll failed Initiative tests for Leaping over Gaps, Jumping Down and Diving Charges, and the test for climbing up or down that a rope allows.",
+    "own": true,
+    "wb": [
+     "pirates"
+    ]
    }
   ],
   [
@@ -1817,7 +2008,11 @@
    {
     "name": "Rabble",
     "line": "Special (Pirates)",
-    "text": "Lowly Swabbies: gain no experience and never count toward the minimum size of the warband."
+    "text": "Each Swabbie may be equipped differently, but only with items from the Swabbie equipment list. Swabbies can never use magic or cast spells of any sort.",
+    "own": true,
+    "wb": [
+     "pirates"
+    ]
    }
   ],
   [

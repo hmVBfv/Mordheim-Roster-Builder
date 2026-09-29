@@ -268,28 +268,20 @@
    ]
   },
   "cavalcadeSkills": {
-   "name": "Dark Elf Special Skills (Fury of Khaine)",
-   "note": "Dark Elf Heroes may use these skills instead of any of the standard skill tables available to them.",
+   "name": "Cursed Cavalcade Special Skills",
+   "note": "Cursed Cavalcade Heroes may use these skills instead of any of the standard skill tables available to them.",
    "skills": [
     [
-     "Fury of Khaine",
-     "A whirlwind in hand-to-hand: If he takes ALL of his current opponents Out Of Action he may make a 4\" follow-up move. If this brings him into contact with a new enemy a new combat starts next turn, counting as a charge. May not follow up in the opponent's turn."
+     "Noblesse Oblige",
+     "Immune to fear, and stomps knocked-down opponents with his iron-shod boots: one additional attack at his own Strength against knocked-down opponents."
     ],
     [
-     "Powerful Build",
-     "Strongly built for an Elf — the warrior may also choose skills from the Strength table. The Sorceress may never take this skill, and no more than two warriors in the warband may have it at any one time."
+     "Torturer",
+     "Any model wounded (and not saved) in close combat by this Hero loses 1 point of Strength permanently for the rest of the battle."
     ],
     [
-     "Fey Quickness",
-     "Inhuman agility: May avoid a melee or missile attack on a D6 roll of 6. Combined with Step Aside or Dodge this improves to 4+ in the relevant area (e.g. Fey Quickness + Step Aside = avoid melee on 4+)."
-    ],
-    [
-     "Infiltration",
-     "Set up after the opposing warband, anywhere on the table that is out of sight of the enemy and more than 12\" from any enemy model. If both players have infiltrators, roll a D6 each — lowest sets up first."
-    ],
-    [
-     "Master of Poisons",
-     "If the Hero does not search for rare items after a battle, he may instead brew D3-1 doses of Dark Venom (may yield none). The poison must be used in the next battle and can never be sold or traded to other warbands."
+     "Duelist",
+     "At the end of each close combat phase, the Duelist may force a non-large opponent he fights one-on-one to pass a Strength test or be pushed 2\" in a direction of the Duelist’s choice."
     ]
    ]
   },
@@ -429,7 +421,7 @@
    "skills": [
     [
      "Drive Chariot (Academic)",
-     "Chariots are very difficult to control and a warrior must have this skill to drive a chariot effectively in combat. A charioteer without this skill cannot charge. (Mordheimer inconsistency note: The skill is classified Academic, which the Tomb Lord cannot normally access.)"
+     "Chariots are very difficult to control and a warrior must have this skill to drive a chariot effectively in combat. A charioteer without this skill cannot charge. The Tomb Lord may learn it although it is Academic (Mordheimer inconsistency, played by intent: he is the obvious charioteer)."
     ]
    ]
   },
@@ -601,7 +593,7 @@
    "skills": [
     [
      "Fury of Khaine",
-     "May make a 4\" follow-up move if he takes all of his opponents out of action; contact with another enemy starts a new combat next turn (counts as charging). May not follow up in the opponent's turn."
+     "May make a 4\" follow-up move if he takes all of his opponents out of action."
     ],
     [
      "Powerful Build",
@@ -869,7 +861,7 @@
     ],
     [
      "Fearless",
-     "Immune to fear, terror and All Alone tests."
+     "Immune to fear and All Alone tests."
     ],
     [
      "Horned One",
@@ -899,7 +891,7 @@
     ],
     [
      "'Ere We Go!",
-     "May ignore Fear and Terror tests when charging."
+     "May ignore Fear tests when charging."
     ],
     [
      "Da Cunnin' Plan",
@@ -933,7 +925,7 @@
     ],
     [
      "'Ere We Go!",
-     "May ignore Fear and Terror tests when charging."
+     "May ignore Fear tests when charging."
     ],
     [
      "Da Cunnin' Plan",

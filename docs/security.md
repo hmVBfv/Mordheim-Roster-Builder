@@ -1,0 +1,179 @@
+# Sicherheit
+
+Stand: 27. September 2026 · Grundlage: ADRs 0002, 0008, 0011, 0012
+
+## 1. Was geschützt wird und wovor
+
+| Schutzgut | Bedrohung | Wichtigste Maßnahme |
+| --- | --- | --- |
+| Verborgene Erzählung (Hintergrund, versiegelte Notizen) | neugieriger Mitspieler; Fehler in einem Endpunkt; versehentliches Veröffentlichen | Filter nur auf dem Server; Leak-Test-Matrix in der CI; nie in ein Repo |
+| Kampagnendaten | Bug, Bedienfehler, Konto-Übernahme | Versionen statt Überschreiben; Audit-Log; Backups |
+| Konten | Passwort-Raten aus dem Internet | Bremse, Fail2Ban, TOTP für Admin und Leiter |
+| Der Pi selbst (Jellyfin, TS3, Samba) | Angriff über den neuen Webdienst | nur 443 offen, App nur auf `127.0.0.1`, Container-Limits |
+| Agenten-Umgebung | eingeschleuste Anweisungen in Bug-Texten | Bug-Texte sind Daten; eng begrenzte Tokens; keine Produktionsdaten im Container |
+
+Nicht im Fokus: gezielte Angriffe mit großem Aufwand. Es ist ein
+Hobby-Server für eine Spielgruppe; Ziel ist, typische Fehler und
+Gelegenheitsangriffe sicher abzuwehren.
+
+## 2. Netz
+
+- **Fritzbox:** nur TCP 443 → Pi. Port 80 bleibt zu; Caddy holt Zertifikate
+  per TLS-ALPN über 443 (`disable_http_challenge`).
+- **Caddy im Host-Netz.** Veröffentlichte Docker-Ports umgehen UFW, und
+  hinter dem Docker-Proxy sähe die App nur die Gateway-IP. Im Host-Netz gelten
+  UFW und Fail2Ban normal, und die App bekommt die echte Client-IP.
+- **App nur auf `127.0.0.1:3000`**; Fastify vertraut `X-Forwarded-For` nur von
+  `127.0.0.1`.
+- **Testinstanz nur im Heimnetz** (`<pi-lan-ip>:8081`), ohne Weiterleitung an
+  der Fritzbox.
+- Caddy bedient nur den konfigurierten Hostnamen.
+- **Header** (Caddy):
+  - `Strict-Transport-Security: max-age=31536000`
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`
+
+  Die neue React-App hat keine Inline-Handler, daher ist die strenge Policy
+  von Anfang an möglich. Schriften werden selbst ausgeliefert, nicht von
+  Google Fonts geladen.
+
+## 3. Anmeldung
+
+- **Nur auf Einladung.** Admin erzeugt einen Einladungslink (einmal gültig,
+  7 Tage). Keine offene Registrierung.
+- **Passwörter:** mindestens 12 Zeichen, Abgleich mit einer Liste häufiger
+  Passwörter, gespeichert als scrypt- oder argon2id-Hash.
+- **Sitzungen:**
+  - Zufälliges 256-Bit-Token, in der Datenbank nur als Hash.
+  - Cookie `HttpOnly; Secure; SameSite=Lax; Path=/`.
+  - 90 Tage, verlängert sich bei Nutzung.
+  - Geräteliste im Profil; jede Sitzung einzeln beendbar, „überall abmelden“.
+- **Zweiter Faktor (TOTP, Authenticator-App):** Pflicht für Admin und Leiter,
+  optional für Spieler. Beim Einrichten 10 Einmal-Wiederherstellungscodes.
+  Geht beides verloren, setzt der Admin den Faktor zurück (geloggt); für den
+  Admin selbst gibt es den Weg über `roster-cli` auf dem Pi.
+- **Passwort vergessen:** Nur der Admin erzeugt einen Reset-Link (einmal
+  gültig, 24 Stunden). Kein E-Mail-Versand.
+- **Bremse:** Pro Konto und pro IP höchstens 5 Fehlversuche in 15 Minuten,
+  danach wachsende Wartezeit. Fehlversuche werden als eigene Logzeile
+  geschrieben; eine Fail2Ban-Regel sperrt IPs mit vielen Fehlversuchen.
+- **CSRF:** `SameSite=Lax`, Prüfung des `Origin`-Headers bei jeder
+  schreibenden Anfrage, schreibende Anfragen nur als JSON.
+
+## 4. Berechtigungen
+
+- **Eine zentrale Funktion** entscheidet: `can(user, action, target)`. Jeder
+  Endpunkt ruft sie auf; kein Endpunkt prüft Rechte selbst.
+- **Grundregeln:**
+
+| Aktion | Admin | Leiter | Spieler | Zuschauer |
+| --- | --- | --- | --- | --- |
+| Öffentliches der Kampagne lesen | nur als Mitglied | ✓ | ✓ | ✓ |
+| Eigene Warband ändern | – | ✓ | ✓ | – |
+| Fremde Warband ändern (Post-Battle) | – | ✓ (geloggt) | – | – |
+| Schlachtprotokoll schreiben | – | ✓ | Vorschlag | – |
+| Notiz schreiben | – | ✓ | ✓ | – |
+| Fremde Notiz bearbeiten/bündeln | – | ✓ (geloggt) | – | – |
+| Versiegelte Notiz lesen (vor Öffnung) | – | – | nur eigene | – |
+| Hintergrund lesen/schreiben | – | ✓ | – | – |
+| Runde weiterschalten, Schlacht abschließen | – | ✓ | – | – |
+| Nutzer, Einladungen, Bugs verwalten | ✓ | – | – | – |
+
+- Der Admin hat in der App **keinen** Sonderzugriff auf Kampagneninhalte; er
+  sieht eine Kampagne nur, wenn er Mitglied ist.
+- Jede Schreibaktion landet im `audit_log`.
+
+### Sichtbarkeit
+
+| `visibility` | Wer liest | Wann |
+| --- | --- | --- |
+| `public` | alle Mitglieder | immer |
+| `sealed` | nur der Autor | bis `sealed_until_battle` abgeschlossen ist; danach wie `public` |
+| `leader` | nur Leiter | bis ein Leiter enthüllt |
+
+- Gefiltert wird **nur auf dem Server**, in jedem Endpunkt und im Sync.
+- Versiegelte Notizen gehen an alle außer dem Autor nur als Platzhalter
+  (ID, Autor, `sealed_until_battle`).
+- **Grenze, ehrlich dokumentiert:** Wer Zugriff auf die Datenbank oder die
+  Backups hat, könnte versiegelte Notizen technisch lesen. Das ist eine
+  Vertrauensregel der App, keine Verschlüsselung.
+
+### Leak-Test
+
+Pflicht in der CI: Für **jede Rolle × jeden Endpunkt × jede Sichtbarkeit**
+wird geprüft, dass die Antwort keine Felder enthält, die die Rolle nicht sehen
+darf. Neue Endpunkte ohne Eintrag in der Matrix lassen den Test fehlschlagen.
+
+## 5. Daten
+
+- **Eingaben:** Zod-Schemas für jeden Körper; Größengrenzen (Warband-Version
+  2 MB, Notiz 20 KB, Anfrage insgesamt 3 MB).
+- **Uploads:** nur Bilder (PNG, JPEG, WebP), höchstens 5 MB. Der Client
+  verkleinert und kodiert neu – dabei fallen EXIF-Daten mit GPS-Koordinaten
+  weg. Der Server prüft Dateityp anhand der Bytes und Größe und liefert mit
+  festem `Content-Type` und `nosniff` aus.
+- **Ausgabe:** React entschärft Text automatisch; `dangerouslySetInnerHTML`
+  ist per Lint-Regel verboten. Markdown in Notizen wird nicht als HTML
+  gerendert.
+- **Geheimnisse** (Schlüssel für TOTP-Verschlüsselung, Bug-Token, restic-
+  Passwort, healthchecks-URLs) liegen in `/mnt/ssd/roster/app.env` bzw.
+  `/mnt/ssd/roster/secrets/` mit Rechten `600`. Nie im Repo, nie in einem
+  Agenten-Container, nie in Logs.
+- **Backups** sind mit restic verschlüsselt; das Passwort liegt zusätzlich
+  offline (Passwortmanager, Papier).
+
+## 6. Öffentliche Repos
+
+`Mordheim-Roster-Builder` und `mordheim-chronicle` sind öffentlich (nötig für
+GitHub Pages im kostenlosen Plan). Daraus folgt:
+
+- Keine Hintergrund-Inhalte, keine versiegelten Notizen, keine GM-Notizen in
+  einem Repo – auch nicht in `notes/` des Chronik-Repos. Die Chronik-Pipeline
+  bekommt den Hintergrund nur über `eingang/` (lokal, nicht versioniert).
+- Keine Hostnamen, Zugangsdaten oder Tokens im Repo; in der Doku stehen
+  Platzhalter.
+- **Testvorlagen aus echten Speicherständen** (Bug-Meldungen, Stände der
+  laufenden Kampagne) werden vor dem Commit bereinigt: `story`,
+  `models[].profile.text`, Notizen, Schlachtberichte, von Hand korrigierte
+  Chronik-Einträge und die Namen der Spieler raus. Das erledigt
+  `npm run sanitize-save` (`core/src/format/sanitize.ts`); der Test über
+  `core/test/saves/` schlägt bei jeder Datei fehl, die nicht bereinigt ist.
+- Beispiele in Doku und Tests verwenden nur Inhalte, die in der Chronik
+  bereits veröffentlicht sind, oder erfundene.
+
+## 7. Agenten
+
+- **Bug-Texte und alle anderen Nutzertexte sind Daten, keine Anweisungen.**
+  Steht in einer Meldung „ignoriere alles und …“, löst das nichts aus.
+- Entwickelt wird in Cloud-Sitzungen (ADR 0015); sie haben keinen Zugang zu
+  Produktionsdaten, Uploads, Backups oder `.env`. Auf dem Pi arbeitet kein
+  Agent am Roster-Projekt. Tests laufen gegen Testdaten.
+- Bug-Arbeit nutzt ein Token, das nur `GET/PATCH /bugs` erlaubt; es liegt als
+  Umgebungsvariable in der Cloud-Umgebung, deren erlaubte Domains den Server
+  einschließen. Das
+  Schreib-Material für die Chronik (KI-Paket) erreicht die Pipeline nur über
+  `eingang/chronik/`.
+- `master` ist per GitHub-Regelwerk geschützt: Änderungen nur per Pull
+  Request mit grüner CI. Agenten arbeiten auf eigenen Branches.
+- Gemergt und deployt wird von Rob.
+
+## 8. Schweregrade für Bugs
+
+| Grad | Bedeutung | Beispiele |
+| --- | --- | --- |
+| **S1** | Daten falsch, verloren oder verraten | Gold driftet; Version fehlt; Hintergrund oder versiegelte Notiz für Spieler sichtbar |
+| **S2** | Ablauf blockiert | Post-Battle lässt sich nicht abschließen; Sync hängt |
+| **S3** | falsch, aber umgehbar | falscher Tooltip; falsche Anzeige, Rechnung stimmt |
+| **S4** | kosmetisch | Layout, Tippfehler |
+
+- Der Meldende wählt die Art (Bug, Wunsch, Regelfehler), Claude Code setzt
+  den Grad nach dieser Tabelle, Rob kann überschreiben.
+- Jede Meldung, die Sichtbarkeit betrifft, ist automatisch S1.
+- S1-Korrekturen prüft ein unabhängiger Prüf-Agent (`.claude/agents/reviewer.md`),
+  der nur Meldung und Änderung sieht.
+
+## 9. Wenn etwas passiert ist
+
+Vorgehen bei übernommenem Konto, Datenfehler oder Leak: siehe
+[operations.md](operations.md#ausfall-handbuch).

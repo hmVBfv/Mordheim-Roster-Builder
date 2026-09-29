@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mordheim Campaign Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .intro { display: grid; gap: var(--s3); }
+  .screens { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); }
+  .screens a { display: grid; gap: var(--s1); padding: var(--s3) var(--s4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); text-decoration: none; }
+  .screens a:hover { border-color: var(--accent); }
+  .screens h2 { color: var(--accent); }
+  .screens ul { margin: var(--s1) 0 0; padding-left: 1.1em; color: var(--text-muted); font-size: 0.92rem; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockups</strong><span>Mordheim Campaign</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span></div>
+<div class="app" style="padding-bottom: var(--s5)">
+  <div class="content">
+    <div class="intro">
+      <h1>Screens to try on the phone</h1>
+      <p>The six screens that are drawn before they are built (docs/ui.md §3). They are clickable, but nothing is stored or sent. Open them on your phone, switch between both themes at the top, and note what feels wrong in the hand: sizes, order, words, what is missing.</p>
+      <p class="muted small">The campaign is invented: Rob leads and plays The Silver Caravan, Anna the Grey Penitents, Ben Clan Skrittle. Battle 6 at the Hel Fenn ferry is being played.</p>
+    </div>
+    <ul class="screens">
+      <li><a href="game-night.html"><h2>Game night</h2><span>One hand, under time pressure, offline.</span>
+        <ul><li>Are the four big buttons in reach of the thumb?</li><li>Is a casualty entered in three taps?</li><li>Is it clear what is still waiting on the phone?</li></ul></a></li>
+      <li><a href="timeline.html"><h2>Timeline</h2><span>Ordering the story after the battle.</span>
+        <ul><li>Long-press a block and drag it; or use ↑ ↓ and “Move to…”.</li><li>Which blocks may move, which are anchors?</li><li>Are leader-only blocks unmistakable?</li></ul></a></li>
+      <li><a href="changes.html"><h2>What changed</h2><span>Before and after, per warrior, with the reason found for each change.</span>
+        <ul><li>Does a change without a cause stand out without shouting?</li><li>Is writing the explanations inviting?</li></ul></a></li>
+      <li><a href="visibility.html"><h2>Who can see this</h2><span>Public, sealed until the battle ends, leader only.</span>
+        <ul><li>Can anything be revealed by accident?</li><li>Do the three states differ by more than colour?</li><li>Try “View as player”.</li></ul></a></li>
+      <li><a href="background.html"><h2>Background</h2><span>The leader’s hidden threads and how much may be hinted.</span>
+        <ul><li>Is the reveal level readable at a glance?</li><li>Is revealing deliberate enough?</li></ul></a></li>
+      <li><a href="roster.html"><h2>Roster</h2><span>The most used screen, rebuilt for the phone.</span>
+        <ul><li>Is everything for one warrior on one card?</li><li>Are the common actions one tap away?</li></ul></a></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

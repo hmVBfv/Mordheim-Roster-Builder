@@ -87,7 +87,7 @@
      "key": "reik",
      "name": "Reikland",
      "gold": 500,
-     "note": "No special bonuses — the balanced standard."
+     "note": "Fighters may use the Captain’s Leadership within 12\" instead of 6\"; all Marksmen +1 BS."
     },
     {
      "key": "midd",
@@ -132,7 +132,12 @@
       "strength",
       "speed"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership."
+     "sp": "Leader: Friendly models within 6\" (12\" in a Reikland warband) may use his Leadership.",
+     "profSub": {
+      "midd": {
+       "S": 1
+      }
+     }
     },
     {
      "id": "champ",
@@ -169,6 +174,11 @@
        "shooting",
        "speed"
       ]
+     },
+     "profSub": {
+      "midd": {
+       "S": 1
+      }
      }
     },
     {
@@ -246,7 +256,12 @@
       "A": 1,
       "Ld": 7
      },
-     "eq": "marksman"
+     "eq": "marksman",
+     "profSub": {
+      "reik": {
+       "BS": 1
+      }
+     }
     },
     {
      "id": "sword",
@@ -267,7 +282,7 @@
       "Ld": 7
      },
      "eq": "merc",
-     "sp": "Expert Swordsmen: May re-roll missed to-hit rolls in close combat while armed with a sword."
+     "sp": "Expert Swordsmen: May re-roll any failed hits when charging, but only when armed with normal swords (not double-handed swords or other weapons)."
     }
    ]
   },
@@ -484,7 +499,7 @@
       "academic",
       "strength"
      ],
-     "sp": "Prayers of Sigmar. Burn the Witch!"
+     "sp": "Prayers of Sigmar."
     },
     {
      "id": "hunter",
@@ -1327,7 +1342,7 @@
       "W": 1,
       "I": 2,
       "A": 1,
-      "Ld": 7
+      "Ld": 10
      },
      "eq": "ostRuffian",
      "sp": "Drunk: Automatically passes all Leadership tests; never the leader; no missile weapons."
@@ -1348,7 +1363,7 @@
       "W": 3,
       "I": 3,
       "A": 2,
-      "Ld": 7
+      "Ld": 10
      },
      "eq": "ostOgre",
      "large": true,
@@ -1470,7 +1485,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Daemon: Gains no experience. Fear. Immune to psychology/poison. Cloud of Flies, Stream of Corruption, Daemonic Aura 5+."
+     "sp": "Daemon: Gains no experience. Fear. Immune to psychology/poison. Cloud of Flies, Stream of Corruption, Daemonic Aura 5+. Daemonic Instability: If taken out of action, banished on a D6 roll of 1-3 (do not roll for injury); if the warband routs, each Plague Bearer must pass a Leadership test or count as destroyed."
     },
     {
      "id": "nurgling",
@@ -1492,7 +1507,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Daemon (swarm, any number). Gains no experience. Immune to psychology/poison. Daemonic Aura 5+."
+     "sp": "Daemon (swarm, any number). Gains no experience. Immune to psychology/poison. Cloud of Flies: Close combat opponents suffer −1 to hit. Daemonic Aura 5+. Daemonic Instability: If taken out of action, banished on a D6 roll of 1-3 (do not roll for injury); if the warband routs, each Nurgling must pass a Leadership test or count as destroyed."
     },
     {
      "id": "cbreth",
@@ -1524,7 +1539,69 @@
      "profile": null,
      "eq": null,
      "noxp": true,
-     "sp": "Cart (see cart rules). Increases the maximum number of warriors by +2. Daemonic."
+     "sp": "Plague Cart: Increases the maximum number of warriors by +2. Plague Bearers and Nurglings may re-roll Leadership tests for Instability and add +1 to their Injury tests if taken out of action. Guardian: Part of the cart; never dismounts, cannot be injured unless the cart is destroyed, never gains experience; his attacks cause Nurgle’s Rot. Immune to Psychology: The Plague Cart and Guardian are Daemonic.",
+     "attached": [
+      {
+       "label": "Cart",
+       "profile": {
+        "M": "—",
+        "WS": "—",
+        "BS": "—",
+        "S": "—",
+        "T": 8,
+        "W": 4,
+        "I": "—",
+        "A": "—",
+        "Ld": "—"
+       },
+       "note": "The cart body — Toughness 8, 4 Wounds."
+      },
+      {
+       "label": "Wheel",
+       "profile": {
+        "M": "—",
+        "WS": "—",
+        "BS": "—",
+        "S": "—",
+        "T": 6,
+        "W": 1,
+        "I": "—",
+        "A": "—",
+        "Ld": "—"
+       },
+       "note": "Each wheel Toughness 6, 1 Wound."
+      },
+      {
+       "label": "Horse",
+       "profile": {
+        "M": 8,
+        "WS": "—",
+        "BS": "—",
+        "S": 3,
+        "T": 3,
+        "W": 1,
+        "I": 3,
+        "A": "—",
+        "Ld": "—"
+       },
+       "note": "The horse that pulls the cart."
+      },
+      {
+       "label": "Guardian",
+       "profile": {
+        "M": "—",
+        "WS": 3,
+        "BS": "—",
+        "S": 3,
+        "T": 3,
+        "W": "—",
+        "I": 3,
+        "A": 1,
+        "Ld": "—"
+       },
+       "note": "Bonded to the cart; his attacks cause Nurgle’s Rot."
+      }
+     ]
     }
    ]
   },
@@ -1766,7 +1843,7 @@
       "shooting",
       "speed"
      ],
-     "sp": "Set Traps: May lay a trap (S4 hit)."
+     "sp": "Set Traps: Instead of doing anything else in a turn, may set a trap (a marker). A model moving within 2\" of it rolls a D6: on a 3+ the trap is triggered and it suffers a Strength 4 hit. The marker is removed either way."
     },
     {
      "id": "young",
@@ -2030,7 +2107,7 @@
      "eq": null,
      "noxp": true,
      "large": true,
-     "sp": "Fear. Stupidity. Large Target. Regeneration (4+). Vomit Attack (S5). Always Hungry: 15 gc upkeep after each game. Gains no experience."
+     "sp": "Fear. Stupidity. Large Target. Regeneration (4+). Vomit Attack (S5). Always Hungry: 15 gc upkeep after each game, or the Boss sacrifices two Goblin Warriors or Cave Squigs; otherwise it wanders off. Gains no experience."
     }
    ]
   },
@@ -2675,8 +2752,7 @@
       "shooting",
       "academic",
       "strength",
-      "speed",
-      "amazonSkills"
+      "speed"
      ],
      "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Amazon Rituals (starts with one ritual chosen at random)."
     },
@@ -2702,8 +2778,7 @@
      "sk": [
       "combat",
       "shooting",
-      "speed",
-      "amazonSkills"
+      "speed"
      ]
     },
     {
@@ -2728,8 +2803,7 @@
      "sk": [
       "combat",
       "strength",
-      "speed",
-      "amazonSkills"
+      "speed"
      ],
      "sp": "Frenzy."
     },
@@ -2886,7 +2960,7 @@
       "Ld": 7
      },
      "eq": "arabWarrior",
-     "sp": "Desert Trader: +1 modifier when the warband rolls to find Rare equipment (does not stack with other such bonuses)."
+     "sp": "Desert Trader: +1 when the warband rolls to find Rare equipment; only +1 even with two Bedouins."
     },
     {
      "id": "nomad",
@@ -3420,7 +3494,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Fear. Scaly skin 6+. Animal (gains no experience). Only with a Beastmaster."
+     "sp": "Fear. Scaly skin 6+. Animal (gains no experience). Only with a Beastmaster. Stupidity: May use the basic Leadership of the Beastmaster if within 6\" of him, never the leader’s. If the Beastmaster dies, the beasts escape and are removed from the roster."
     }
    ]
   },
@@ -3486,7 +3560,8 @@
       "strength",
       "dthSkills"
      ],
-     "sp": "Extra Set of Hands: While in the warband, the Runesmith may inscribe runes on two items before each game instead of one."
+     "sp": "Extra Set of Hands: While in the warband, the Runesmith may inscribe runes on two items before each game instead of one.",
+     "noArmour": true
     },
     {
      "id": "rslayer",
@@ -3598,6 +3673,9 @@
      },
      "eq": "dwarfRanger"
     }
+   ],
+   "noSkills": [
+    "Arcane Lore"
    ]
   },
   "forestgoblins": {
@@ -3771,7 +3849,7 @@
      "eq": null,
      "noxp": true,
      "large": true,
-     "sp": "Fear. Large Target: May always be shot at even if not the closest target. Poisonous: When it wounds, roll injuries with 1 = knocked down, 2-4 = stunned, 5-6 = out of action. Nonsentient: Subject to Stupidity; never gains experience (animal); may climb as normal. Native: Moves through woods without penalty. Uses no weapons or armour. May be ridden by the Chieftain."
+     "sp": "Fear. Large Target: May always be shot at even if not the closest target. Poisonous: When it wounds, roll injuries with 1 = knocked down, 2-4 = stunned, 5-6 = out of action. Nonsentient: Subject to Stupidity (not while ridden by the Chieftain, who directs it); never gains experience (animal); may climb as normal. Native: Moves through woods without penalty. Uses no weapons or armour. May be ridden by the Chieftain."
     }
    ]
   },
@@ -3810,7 +3888,7 @@
       "strength",
       "speed"
      ],
-     "sp": "Leader (12\"): friendly models within 12\" may use his Leadership for Ld tests. Hunter: As the Shooting skill — may fire a black powder weapon every turn instead of every other turn."
+     "sp": "Leader (12\"): friendly models within 12\" may use his Leadership for Ld tests. Hunter: Has the Hunter skill (see the Shooting skills)."
     },
     {
      "id": "instructor",
@@ -3928,7 +4006,7 @@
       "Ld": 7
      },
      "eq": "gsnMarks",
-     "sp": "Quick Reload: Has the Hunter skill (fire black powder weapons every turn); no additional effect from taking Hunter again if promoted."
+     "sp": "Quick Reload: Has the Hunter skill (see the Shooting skills); no additional effect from taking Hunter again if promoted."
     },
     {
      "id": "pistolier",
@@ -4345,7 +4423,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Knight. Max. 2 Outriders, 2 Scouts; max. 5 Chasseurs, 5 Hussars, 2 Grooms.<br><b>Mounted warband:</b> Every warrior comes with a Riding Horse (included in the cost); any may upgrade it to a Warhorse for +40 gc. All use the Blazing Saddles cavalry rules (Ride / Combat Riding / Horse Handling).<br><b>Mounted combat:</b> A mounted warrior may not fight with two close combat weapons (he needs one hand for the reins) and may never use two-handed weapons; a shield or buckler is fine, and a pistol may be fired in the first round of close combat in place of a weapon.<br><b>Dense terrain:</b> Imperial Outriders ignore the normal two-mount warband limit in areas of dense terrain.<br><b>Hired Swords:</b> Only mounted Hired Swords may join — the Freelance Knight (Rulebook) and the Roadwarden (Empire in Flames); the Highwayman keeps his distance and may never be hired.",
+   "rules": "<b>Choice:</b> Exactly 1 Knight. Max. 2 Outriders, 2 Scouts; max. 5 Chasseurs, 5 Hussars, 2 Grooms.<br><b>Mounted warband:</b> Every warrior comes with a Riding Horse (included in the cost); the Knight, Outriders and Hussars may upgrade it to a Warhorse for +40 gc. All use the Blazing Saddles cavalry rules (Ride / Combat Riding / Horse Handling).<br><b>Horses:</b> A model without a mount may not take part in the battle. Dead horses must be replaced before any other income is spent (treasures are sold to fund this). Enemies may not target a ridden horse, by missiles or in close combat. Any mounted warrior may always be chosen as a target by a shooter even if others are closer, but the shooter gains no +1 to hit.<br><b>Mounted combat:</b> A mounted warrior may not fight with two close combat weapons (he needs one hand for the reins) and may never use two-handed weapons; a shield or buckler is fine, and a pistol may be fired in the first round of close combat in place of a weapon.<br><b>Dense terrain:</b> Imperial Outriders ignore the normal two-mount warband limit in areas of dense terrain.<br><b>Hired Swords:</b> Only mounted Hired Swords may join — the Freelance Knight (Rulebook) and the Roadwarden (Empire in Flames); the Highwayman keeps his distance and may never be hired.",
    "units": [
     {
      "id": "ioknight",
@@ -4646,7 +4724,7 @@
      ],
      "noxp": true,
      "large": true,
-     "sp": "Halberd only. Scaly 4+, Aquatic, Fear, Large Target, Animal (gains no experience), counts as 2 models."
+     "sp": "Halberd only. Scaly 4+, Aquatic, Fear, Large Target, Animal (gains no experience)."
     }
    ]
   },
@@ -4968,7 +5046,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 7 Marksmen, max. 5 Swordsmen.<br><b>Hardy:</b> Heroes & henchmen may re-roll one failed Ld test for 'All Alone' and Rout (must accept the second roll). The Captain may take a Wardog.<br><b>Skills:</b> Ostermark was published without a skill table — by official clarification the player picks one of the three Mercenary skill sets (Reikland / Middenheim / Marienburg). Offered here: The union of those sets — Captain all five, Champion/Youngblood Combat/Shooting/Strength/Speed (Academic is in none of the three sets). Strictly, pick one set and stick to it.",
+   "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 7 Marksmen, max. 5 Swordsmen.<br><b>Hardy:</b> Heroes & henchmen may re-roll one failed Ld test for 'All Alone' and Rout (must accept the second roll). The Captain may take a Wardog.<br><b>Skills:</b> Ostermark was published without a skill table; by later clarification the warband uses the skill table of one of the other Mercenary options. Choose it when founding the warband — it holds for all its Champions and Youngbloods.",
    "units": [
     {
      "id": "ocaptain",
@@ -5024,7 +5102,24 @@
       "strength",
       "speed"
      ],
-     "sp": "Hardy."
+     "sp": "Hardy.",
+     "skSub": {
+      "skReik": [
+       "combat",
+       "shooting",
+       "strength"
+      ],
+      "skMidd": [
+       "combat",
+       "strength",
+       "speed"
+      ],
+      "skMari": [
+       "combat",
+       "shooting",
+       "speed"
+      ]
+     }
     },
     {
      "id": "oyoung",
@@ -5051,7 +5146,24 @@
       "strength",
       "speed"
      ],
-     "sp": "Hardy."
+     "sp": "Hardy.",
+     "skSub": {
+      "skReik": [
+       "combat",
+       "shooting",
+       "speed"
+      ],
+      "skMidd": [
+       "combat",
+       "strength",
+       "speed"
+      ],
+      "skMari": [
+       "combat",
+       "shooting",
+       "speed"
+      ]
+     }
     },
     {
      "id": "owarrior",
@@ -5138,6 +5250,27 @@
      "noxp": true,
      "sp": "Animal (gains no experience). Only 1, with the Captain."
     }
+   ],
+   "subtypeLabel": "Skill table as: ",
+   "subtypes": [
+    {
+     "key": "skReik",
+     "name": "Reikland",
+     "gold": 500,
+     "note": "Champions: Combat, Shooting, Strength. Youngbloods: Combat, Shooting, Speed. (Skill table only — the Reikland city rules do not apply.)"
+    },
+    {
+     "key": "skMidd",
+     "name": "Middenheim",
+     "gold": 500,
+     "note": "Champions and Youngbloods: Combat, Strength, Speed. (Skill table only — the Middenheim city rules do not apply.)"
+    },
+    {
+     "key": "skMari",
+     "name": "Marienburg",
+     "gold": 500,
+     "note": "Champions and Youngbloods: Combat, Shooting, Speed. (Skill table only — the Marienburg city rules do not apply.)"
+    }
    ]
   },
   "outlaws": {
@@ -5173,8 +5306,7 @@
       "shooting",
       "academic",
       "strength",
-      "speed",
-      "banditSkills"
+      "speed"
      ],
      "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
     },
@@ -5200,8 +5332,7 @@
      "sk": [
       "combat",
       "shooting",
-      "strength",
-      "banditSkills"
+      "strength"
      ]
     },
     {
@@ -5224,10 +5355,7 @@
      },
      "eq": "outlawEq",
      "sk": [
-      "combat",
-      "academic",
-      "strength",
-      "banditSkills"
+      "academic"
      ],
      "sp": "Disciple of Sigmar: Starts a campaign knowing one of the Prayers of Sigmar (toggle him as a caster to pick it). As with a Witch-Hunter's Warrior-Priest he may learn neither Sorcery nor Arcane Lore. May wear armour, since Prayers are not Spells. Exempt from Bow Duty: He may carry a bow but need not."
     },
@@ -5253,8 +5381,7 @@
      "sk": [
       "combat",
       "shooting",
-      "speed",
-      "banditSkills"
+      "speed"
      ]
     },
     {
@@ -5275,7 +5402,7 @@
       "A": 1,
       "Ld": 7
      },
-     "eq": "outlawEq"
+     "eq": "outlawMark"
     },
     {
      "id": "outlaw",
@@ -5295,7 +5422,7 @@
       "A": 1,
       "Ld": 7
      },
-     "eq": "outlawEq"
+     "eq": "outlawHen"
     }
    ]
   },
@@ -5471,7 +5598,7 @@
      },
      "eq": "pirateSwab",
      "noxp": true,
-     "sp": "Special recruitment; gains no experience; Rabble."
+     "sp": "Special recruitment; gains no experience; Rabble. They ain’t true pirates: Swabbies who are running away or out of action do not count towards the need to take a Rout test. Blimey, they got away: If the warband routs, Swabbies who have already left the table are never seen again."
     }
    ]
   },
@@ -5481,7 +5608,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits (win: that fighter +2 Exp and the warband gets the captive's gear +50 gc; lose: roll for the fighter's injury).<br><b>Hired Swords:</b> Pit Fighters may hire any Hired Sword except the Elf Ranger.",
+   "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits. Win: that fighter gains +2 Experience and the warband gets all the captive's armour and weapons +50 gc. Lose: roll for the fighter's injury as normal, ignoring Robbed, Captured, Hardened, Sold to the Pits and Survives against the Odds.<br><b>Hired Swords:</b> Pit Fighters may hire any Hired Sword except the Elf Ranger.",
    "units": [
     {
      "id": "pitking",
@@ -5529,7 +5656,7 @@
       "A": 1,
       "Ld": 9
      },
-     "eq": "pfOgre",
+     "eq": "pfSlayer",
      "noArmour": true,
      "noMissile": true,
      "sk": [
@@ -6037,7 +6164,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Tomb Lord. Max. 1 Liche Priest, 2 Acolytes; any number of Skeleton Warriors, max. 2 Tomb Guardians, max. 3 Tomb Scorpions.<br><b>Undead:</b> Fear, immune to psychology, No Pain (stunned counts as knocked down), may not run, immune to poison.<br><b>Home Ground:</b> +1 die in the Exploration phase.<br><b>No Brain:</b> Skeletons never gain experience (Tomb Lord, Liche Priest, Acolytes and Tomb Guardians do).<br><b>Do not Drink:</b> Undead need no food or water; living animals with the warband follow the water rules as normal.",
+   "rules": "<b>Choice:</b> Exactly 1 Tomb Lord. Max. 1 Liche Priest, 2 Acolytes; any number of Skeleton Warriors, max. 2 Tomb Guardians, max. 3 Tomb Scorpions.<br><b>Undead:</b> Fear, immune to psychology, No Pain (stunned counts as knocked down), may not run, immune to poison.<br><b>Home Ground:</b> +1 die in the Exploration phase, in every campaign setting (Mordheimer lists the scope as unclear; played by intent — without it the warband is very weak).<br><b>No Brain:</b> Skeletons never gain experience (Tomb Lord, Liche Priest, Acolytes and Tomb Guardians do).<br><b>Do not Drink:</b> Undead need no food or water; living animals with the warband follow the water rules as normal.",
    "units": [
     {
      "id": "tomblord",
@@ -6273,7 +6400,7 @@
       "speed",
       "amazonSkills"
      ],
-     "sp": "Conch Shell Horn: At the start of the game the warband may re-roll the roll for who deploys first / goes first (multiple horns give no extra re-roll)."
+     "sp": ""
     },
     {
      "id": "amazonwarrior",
@@ -6324,7 +6451,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Shadow Master. Max. 3 Shadow Walkers, 1 Shadow Weaver; any number of Shadow Warriors, any number of Shadow Novices.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Distaste for Poison:</b> warriors may not use poisons or drugs of any type.<br><b>Unforgiving:</b> In multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> may hire any Hired Sword that is not Chaotic or evil (no Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.) and no poison-users (no Assassins).",
+   "rules": "<b>Choice:</b> Exactly 1 Shadow Master. Max. 3 Shadow Walkers, 1 Shadow Weaver; any number of Shadow Warriors, any number of Shadow Novices.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Distaste for Poison:</b> warriors may not use poisons of any type.<br><b>Unforgiving:</b> In multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> may hire any Hired Sword that is not Chaotic or evil (no Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.) and no poison-users (no Assassins).",
    "units": [
     {
      "id": "shadowmaster",
@@ -6639,7 +6766,7 @@
       "strength",
       "blackDwarfSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut."
+     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. He may wear armour but cannot perform rituals while wearing armour, except the Mechanical Suit (made for him) and Chaos armour (which never hinders casting). Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut."
     },
     {
      "id": "bull",
@@ -6799,7 +6926,8 @@
       "strength",
       "speed"
      ],
-     "sp": "A decorated soldier and custodian of Imperial law. (Equipped with weapons from the Soldier list — no armour.)"
+     "sp": "Equipped with weapons from the Soldier list; no armour.",
+     "desc": "A decorated soldier and custodian of Imperial law."
     },
     {
      "id": "dragon",
@@ -7229,7 +7357,7 @@
       "Ld": 6
      },
      "eq": "cppHen",
-     "sp": "A Beastman of Slaanesh — more agile and humanlike than common Gors."
+     "desc": "A Beastman of Slaanesh — more agile and humanlike than common Gors."
     },
     {
      "id": "cultist",
@@ -7281,7 +7409,7 @@
    "min": 3,
    "max": 13,
    "gold": 500,
-   "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). May hire no Hired Swords or Dramatis Personae except the Crow Master (and any that specifically allow it). <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\"; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
+   "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). May hire no Hired Swords or Dramatis Personae except the Crow Master (and any that specifically allow it). <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\", which is re-rolled once you have captured two Henchmen or hold five Captured Thralls; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
    "units": [
     {
      "id": "aristocrat",
@@ -8016,7 +8144,7 @@
       "Ld": 7
      },
      "eq": "mcHench",
-     "sp": "Caravan bodyguard — roguish escort hired to protect the goods and their paymaster."
+     "desc": "Caravan bodyguard — roguish escort hired to protect the goods and their paymaster."
     },
     {
      "id": "marksman",

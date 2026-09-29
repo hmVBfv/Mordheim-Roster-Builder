@@ -33,12 +33,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22' }
+        with: { node-version: '22', cache: npm }
+
+      # A few legacy tests read the app's source with a dev dependency (acorn).
+      - run: npm ci
 
       # Rebuilds dist/ and runs every test, including the modular<->single-file
       # parity check.
       - name: Test (rebuilds single-file + parity check)
         run: node test/run.mjs
+
+      # The installed packages are not part of the site.
+      - name: Drop the installed packages
+        run: rm -rf node_modules */node_modules
 
       # .nojekyll disables Jekyll on Pages. Without it Jekyll drops every path
       # starting with an underscore — including data/_util.js — and the modular

@@ -132,7 +132,9 @@ Rule authority, highest first:
    covered by the above.
 
 Where mordheimer.net's unit table and its prose text disagree, the table
-(plus any annotation) wins. Thanks to the maintainers of mordheimer.net and
+(plus any annotation) wins. Rules are read as written (RAW); a ruling by
+intent (RAI) is followed only where mordheimer.net adopts it, anything else is
+at most a house rule. Thanks to the maintainers of mordheimer.net and
 Broheim.net for keeping these rules alive and accessible.
 
 ## Project history

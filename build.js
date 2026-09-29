@@ -30,7 +30,7 @@ const OUT = outArg > -1 ? process.argv[outArg + 1]
 const DATA_JSON = [
   'races', 'equipment', 'skills', 'spells', 'abilities', 'mutations',
   'injuries', 'i18n', 'houserules', 'marks', 'sheet', 'campaign',
-  'warbands', 'hiredswords', 'dramatis',
+  'warbands', 'hiredswords', 'dramatis', 'postbattle',
 ];
 
 /** Modul-Syntax entfernen: aus `export const X` wird `const X`, imports fliegen raus. */

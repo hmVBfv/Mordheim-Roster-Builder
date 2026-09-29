@@ -1,0 +1,74 @@
+name: CI
+
+# Checks for every branch and every pull request into master. Deployment to
+# GitHub Pages stays in pages.yml (master only).
+#
+#   legacy  the existing app: rebuilds dist/ and runs test/*.mjs (a few of
+#           them read the app's source with the dev dependencies, so npm ci)
+#   core    the TypeScript workspaces: typecheck and lint (core and app), core's
+#           unit and parity tests (core must compute exactly what the legacy
+#           app computes) and the legacy tests mirrored onto core
+#   app     the PWA: unit tests, both builds, the size budget, and Playwright
+#           at 360 px (screenshots uploaded as an artifact — look at them)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  legacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - name: Legacy tests (rebuilds single-file + parity check)
+        run: node test/run.mjs
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Core tests (unit, purity, parity with the legacy app)
+        run: npm run test:core
+
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - name: App tests (unit and components)
+        run: npm run test:app
+      - name: Build both flavours
+        run: npm run build -w app
+        env: { APP_VERSION: '${{ github.sha }}' }
+      - name: Size budget (docs/ui.md)
+        run: npm run size -w app
+      - name: Browser for Playwright
+        run: npx playwright install --with-deps chromium
+        working-directory: app
+      - name: End-to-end at 360 px (both flavours and themes, offline, start-up budgets)
+        run: npm run e2e -w app
+      - name: Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: app-screens, path: app/test-results/, if-no-files-found: ignore }
