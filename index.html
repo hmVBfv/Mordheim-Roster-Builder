@@ -668,6 +668,46 @@
   @media(min-width:901px){
     .sidebar{max-height:calc(100vh - 28px);overflow-y:auto;overscroll-behavior:contain}
   }
+  /* The order of the page (Rob, 29.09.2026). The figures are a compact block
+     of five; recruiting folds away once the warband has warriors; an empty
+     load list takes no room. */
+  #loadlist:empty{display:none}
+  #statspanel .sec-body{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 12px}
+  #statspanel .stat-big{flex-direction:column;align-items:flex-start;gap:0;padding:3px 0;border-bottom:0}
+  #statspanel .stat-big>span:first-child{font-size:12px;color:#6a5d46}
+  #statspanel .stat-big .v{font-size:24px;line-height:1.1}
+  #statspanel .rating-row{border-top:0;margin-top:0;padding-top:3px}
+  #statspanel .warns{grid-column:1/-1;margin-top:4px}
+  #recruitbox>summary{list-style:none;cursor:pointer}
+  #recruitbox>summary::-webkit-details-marker{display:none}
+  #recruitbox>summary h2{display:flex;align-items:center;gap:8px;margin:0}
+  #recruitbox>summary h2::before{content:"\25B6";font-size:.5em;color:var(--gold);transition:transform .15s}
+  #recruitbox[open]>summary h2::before{transform:rotate(90deg)}
+  #recruitbox[open]>summary h2{margin-bottom:8px}
+  /* Phone and narrow windows: one column in the order the warband is used -
+     the figures (they stay at the top of the screen), the warband, its
+     overview, the warriors, recruiting, hired help, the stash. */
+  @media(max-width:900px){
+    .builder{display:grid;gap:12px}
+    .builder>main,.builder>.sidebar{display:contents}
+    .builder>main>*,.builder>.sidebar>*{margin-top:0!important}
+    #statspanel{order:1;position:sticky;top:0;z-index:30;padding:6px 10px}
+    .builder>main>.panel:first-child{order:2}
+    #overviewpanel{order:3}
+    #roster{order:4}
+    #recruitbox{order:5}
+    #dppanel{order:6}
+    #hspanel{order:7}
+    #stashwrap{order:8}
+    #statspanel .sec-details{margin:0;border:0;background:none}
+    #statspanel .sec-details>summary{display:none}
+    #statspanel .sec-body{grid-template-columns:repeat(5,1fr);padding:0;gap:0 6px}
+    #statspanel .stat-big>span:first-child{font-size:11px}
+    #statspanel .stat-big .v{font-size:20px}
+    #statspanel .warns .ok{display:none}
+    #statspanel .warns{margin-top:2px}
+    #statspanel .warn{margin:2px 0;padding:2px 6px;font-size:12px}
+  }
 </style>
 </head>
 <body>
@@ -727,8 +767,6 @@
     </div>
     <div id="loadlist" class="panel no-print" style="margin-bottom:16px"></div>
 
-    <div id="houserules" class="panel no-print"></div>
-    <div id="campaignpanel" class="panel no-print" style="margin-top:16px"></div>
 
     <div class="builder">
       <main>
@@ -742,30 +780,35 @@
           <div id="notesprint" class="srules" style="display:none;margin-top:6px;font-style:italic"></div>
         </div>
 
-        <div class="panel addgroup no-print" style="margin-top:18px">
-          <h2 style="margin-top:0">Recruit Warriors</h2>
+        <div id="roster" class="panel" style="margin-top:18px"></div>
+
+        <!-- folded away once the warband has warriors (setupBuilder) -->
+        <details id="recruitbox" class="panel addgroup no-print" style="margin-top:18px" open>
+          <summary><h2>Recruit Warriors</h2></summary>
           <div id="addmenu"></div>
-        </div>
+        </details>
 
         <div id="dppanel" class="panel hspanel no-print" style="margin-top:18px"></div>
         <div id="hspanel" class="panel hspanel no-print" style="margin-top:18px"></div>
-
-        <div id="roster" class="panel" style="margin-top:18px"></div>
       </main>
 
       <aside class="sidebar" style="margin-top:18px">
-        <div class="panel"><details class="sec-details" open><summary class="sec-sum">Warband</summary><div class="sec-body">
+        <div id="statspanel" class="panel"><details class="sec-details" open><summary class="sec-sum">Warband</summary><div class="sec-body">
           <div class="stat-big"><span>Gold</span><span class="v" id="goldnow">0</span></div>
           <div class="stat-big"><span>Models</span><span class="v" id="models">0</span></div>
           <div class="stat-big"><span>Heroes</span><span class="v" id="heroes">0</span></div>
-          <div class="stat-big rating-row"><span>Warband&nbsp;Rating</span><span class="v" id="rating">0</span></div>
-          <div class="stat-big" title="Unitless points measuring the fielded fighting power — the fairest balance comparison between warbands. Warriors with their gear at LIST prices (found or discounted items count full; dice prices at expected value). Only the active loadout counts fully: two one-handed melee weapons or one two-handed, plus one missile weapon — further weapons count half (real options, not wielded at once). Shields and bucklers are melee-hand items with the lowest carry priority: weapons claim the hand slots first; a shield counts full only when a hand remains free (dagger + shield: full; dagger + sword + shield: half). Armour, misc, mounts and vehicles count in full — their abilities are priced into the listing. Advancement counts by what landed on the profile: each applied stat advance +5, each skill or spell +10, each stat point lost to injury −5. Raw experience is progress, not power, and is not counted. Everything sums unrounded and is rounded once at the end. Gold in hand is excluded: coins don't fight."><span>Warband&nbsp;Worth</span><span class="v" id="worth">0</span></div>
+          <div class="stat-big rating-row"><span>Rating</span><span class="v" id="rating">0</span></div>
+          <div class="stat-big" title="Unitless points measuring the fielded fighting power — the fairest balance comparison between warbands. Warriors with their gear at LIST prices (found or discounted items count full; dice prices at expected value). Only the active loadout counts fully: two one-handed melee weapons or one two-handed, plus one missile weapon — further weapons count half (real options, not wielded at once). Shields and bucklers are melee-hand items with the lowest carry priority: weapons claim the hand slots first; a shield counts full only when a hand remains free (dagger + shield: full; dagger + sword + shield: half). Armour, misc, mounts and vehicles count in full — their abilities are priced into the listing. Advancement counts by what landed on the profile: each applied stat advance +5, each skill or spell +10, each stat point lost to injury −5. Raw experience is progress, not power, and is not counted. Everything sums unrounded and is rounded once at the end. Gold in hand is excluded: coins don't fight."><span>Worth</span><span class="v" id="worth">0</span></div>
           <div class="warns" id="warns"></div>
         </div></details></div>
         <div id="overviewpanel" class="panel" style="margin-top:16px"><details class="sec-details" open><summary class="sec-sum">Roster</summary><div class="sec-body"><div id="unitlist" class="unitlist"></div></div></details></div>
         <div id="stashwrap" class="panel" style="margin-top:16px"><details class="sec-details" open><summary class="sec-sum">Stash / Store</summary><div class="sec-body"><div id="stash" class="stashpanel"></div></div></details></div>
       </aside>
     </div>
+
+    <!-- rarely changed: after the warband (Rob, 29.09.2026) -->
+    <div id="campaignpanel" class="panel no-print" style="margin-top:16px"></div>
+    <div id="houserules" class="panel no-print" style="margin-top:16px"></div>
   </section>
 </div>
 

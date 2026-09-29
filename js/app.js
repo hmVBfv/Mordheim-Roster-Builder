@@ -2600,6 +2600,8 @@ export function vehRulesBlock(def){
 }
 export function setupBuilder(){
   const wb=WARBANDS[S.wb];
+  // recruiting is open for a new warband and folded away for one with warriors
+  const rb=document.getElementById('recruitbox'); if(rb) rb.open=!(S.models||[]).length;
   document.getElementById('wbtype').textContent=wb.name;
   document.getElementById('srules').innerHTML=formatRules(wb.rules);
   renderExtra();
