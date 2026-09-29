@@ -120,6 +120,32 @@ describe('other warbands', () => {
     expect(data.UPGRADES['Gromril-Waffe']).toMatchObject({ mult: 4, start: { mult: 3, wb: ['dwarftreasure', 'dwarfrangers'] } });
     expect(data.UPGRADES['Dark-Elf-Klinge']).toMatchObject({ base: 20, start: { base: 15, wb: ['darkelves'] } });
   });
+  it('Mercenaries: the Wolfcloak in the list of Middenheim Heroes only; Hung: warhorses at 40 gc', () => {
+    const names = (wb: string, sub: string, id: string) => {
+      const s = { ...core.newWarband(data, wb), subtype: sub } as WarbandState;
+      return Object.values(core.eqListFor(core.ctxOf(data, s), unit(wb, id)) ?? {}).flat();
+    };
+    expect(names('merc', 'midd', 'capt').find((x) => x[0] === 'Wolfsumhang')).toEqual(['Wolfsumhang', 10, { heroes: true, sub: ['midd'] }]);
+    expect(names('merc', 'reik', 'capt').map((x) => x[0])).not.toContain('Wolfsumhang');
+    expect(names('ostermark', 'skMidd', 'ocaptain').map((x) => x[0])).not.toContain('Wolfsumhang');
+    expect(names('maraudersofchaos', 'hung', 'chieftain').find((x) => x[0] === 'Warhorse')?.[1]).toBe(40);
+    expect(names('maraudersofchaos', 'norse', 'chieftain').map((x) => x[0])).not.toContain('Warhorse');
+  });
+  it('Dwarf Rangers never learn Arcane Lore (the page says so)', () => {
+    const s = core.newWarband(data, 'dwarfrangers');
+    const skills = core.skillListsFor(core.ctxOf(data, s), unit('dwarfrangers', 'runesmith')).flatMap(([, sk]) => sk.map((x) => x[0]));
+    expect(skills).toContain('Battle Tongue');
+    expect(skills).not.toContain('Arcane Lore');
+  });
+  it('Cursed Cavalcade: "61 Captured!" for an enemy Hero is re-rolled once they hold two Henchmen or five Thralls', () => {
+    expect(data.WARBANDS.cavalcade!.rules).toMatch(/re-rolled once you have captured two Henchmen or hold five Captured Thralls/);
+  });
+  it('Lizardmen: sacred markings for Heroes, poisons for Skinks', () => {
+    for (const [l, nm, pr] of [['lizSaurus', 'Übergroße Kiefer', 40], ['lizSaurus', 'Mal der Alten', 50], ['lizSkink', 'Giftdrüsen', 40], ['lizSkinkPr', 'Giftdrüsen', 40],
+      ['lizSkink', 'Dunkles Gift für Geschosse', 20], ['lizSkinkPr', 'Schwarzer Lotus für Geschosse', 10]] as const) expect(row(l, nm), nm).toEqual([nm, pr, { heroes: true }]);
+    expect(row('lizSkinkHen', 'Reptiliengift')).toEqual(['Reptiliengift', 5]);
+    expect(row('lizSaurus', 'Giftdrüsen')).toBeUndefined();
+  });
   it('Carnival of Chaos: daemonic instability, the Nurglings’ flies, the Plague Cart profiles', () => {
     expect(unit('carnival', 'plaguebearer').sp).toMatch(/Daemonic Instability/);
     expect(unit('carnival', 'nurgling').sp).toMatch(/Cloud of Flies/);

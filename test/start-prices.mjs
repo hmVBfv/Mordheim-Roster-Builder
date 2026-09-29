@@ -41,6 +41,8 @@ for(const [stage,mult] of [[0,3],[1,4]]){
 }
 { const m=band('merc','capt',0); app.setEqQty(m.uid,'Axt',1);
   assert.strictEqual(app.upgradePaid(m,'Gromril-Waffe','Axt'), 20, 'a Mercenary pays 4x at any time'); }
+{ const m=band('pitfighters','trollslayer',1); app.setEqQty(m.uid,'Axt',1);
+  assert.strictEqual(app.upgradePaid(m,'Gromril-Waffe','Axt'), 15, 'the Pit Fighters\' Troll Slayer pays 3x at any time'); }
 
 // --- Dark Elf blade: +15 at the founding, +20 later ---
 for(const [stage,price] of [[0,15],[1,20]]){

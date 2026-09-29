@@ -1,6 +1,6 @@
 /* Name and definition lookups (legacy: engine.js unitDef/eqListFor,
    app.js itemFamily/unitFamilies/spellLabel, info.js itemInfo). */
-import type { EquipmentList, GameData, ItemInfo, UnitDef, WarbandDef } from '../data/types.ts';
+import type { EquipmentEntry, EquipmentList, GameData, ItemInfo, UnitDef, WarbandDef } from '../data/types.ts';
 import type { Ctx } from './context.ts';
 
 export function warbandDef(ctx: Ctx): WarbandDef | undefined {
@@ -11,17 +11,26 @@ export function unitDef(ctx: Ctx, id: string): UnitDef | undefined {
   return warbandDef(ctx)?.units.find((u) => u.id === id);
 }
 
-/** The equipment list a unit buys from. Kurgan marauders may also take a bow. */
+/** The equipment list a unit buys from. Kurgan marauders may also take a
+    bow; rows marked for other variants (`sub`) are left out. */
 export function eqListFor(ctx: Ctx, def: UnitDef | undefined): EquipmentList | undefined {
   if (!def || def.eq == null) return undefined;
-  const list = ctx.data.LISTS[def.eq];
+  let list = ctx.data.LISTS[def.eq];
   if (!list) return list;
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && (def.eq === 'marChaosHero' || def.eq === 'marChaosHench')) {
     const copy: EquipmentList = {};
-    for (const cat of Object.keys(list)) copy[cat] = (list[cat] ?? []).map((e) => [e[0], e[1]]);
+    for (const cat of Object.keys(list)) copy[cat] = (list[cat] ?? []).map((e): EquipmentEntry => [...e]);
     copy.Fernkampf = copy.Fernkampf ?? [];
     if (!copy.Fernkampf.some((x) => x[0] === 'Bogen')) copy.Fernkampf.push(['Bogen', 10]);
-    return copy;
+    list = copy;
+  }
+  // rows for one variant only (Middenheim's Wolfcloak, the Hung's warhorses)
+  const other = (r: EquipmentEntry): boolean => !!r[2]?.sub && r[2].sub.indexOf(ctx.s.subtype ?? '') < 0;
+  const src = list;
+  if (Object.keys(src).some((c) => (src[c] ?? []).some(other))) {
+    const out: EquipmentList = {};
+    for (const c of Object.keys(src)) { const rs = (src[c] ?? []).filter((r) => !other(r)); if (rs.length) out[c] = rs; }
+    list = out;
   }
   return list;
 }

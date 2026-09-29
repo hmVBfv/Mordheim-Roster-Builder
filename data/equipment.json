@@ -2157,7 +2157,13 @@
   "Skink-Stil (Helm/Dolch/Dreizack o. Javelins/Netz o. Buckler)": "Skink kit (helmet/dagger/trident or javelins/net or buckler)",
   "Untoten-Stil (Helm/Dolch/Stachelh./Schwert)": "Undead kit (helmet/dagger/spiked gauntlet/sword)",
   "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)": "Witch Elf kit (helmet/dagger/2 swords or spear & net)",
-  "Zharr-Obsidianwaffe": "Zharr obsidian weapon"
+  "Zharr-Obsidianwaffe": "Zharr obsidian weapon",
+  "Giftdrüsen": "Poison Glands",
+  "Mal der Alten": "Mark of the Old Ones",
+  "Übergroße Kiefer": "Oversized Jaws",
+  "Dunkles Gift für Geschosse": "Dark venom (missiles)",
+  "Schwarzer Lotus für Geschosse": "Black lotus (missiles)",
+  "Reptiliengift": "Reptile venom"
  },
  "GSN_BRACE": {
   "Doppelläufige Pistole": 35,
@@ -3641,6 +3647,17 @@
   ],
   [
    {
+    "__re": "wolfsumhang|wolfcloak",
+    "__f": "i"
+   },
+   {
+    "name": "Wolfcloak",
+    "line": "Miscellaneous · 10 gc · Middenheim Heroes (also Norse Explorers and Marauders)",
+    "text": "The Hero must slay a wolf himself: pay 10 gc and roll a D6 — equal to or under his Strength, he wears its pelt and gets +1 to his armour saves against shooting."
+   }
+  ],
+  [
+   {
     "__re": "gromril.?(waffe|weapon)",
     "__f": "i"
    },
@@ -4092,6 +4109,72 @@
   ],
   [
    {
+    "__re": "giftdrüsen|poison glands",
+    "__f": "i"
+   },
+   {
+    "name": "Poison Glands",
+    "line": "Sacred marking · 40 gc · Skink Heroes · at recruitment, one marking per Hero",
+    "text": "He may make any of his attacks with his teeth instead of his weapons, as a Saurus bite. These bites have a save modifier of 1 whatever his Strength, and add +1 to the roll on the Injury table."
+   }
+  ],
+  [
+   {
+    "__re": "mal der alten|mark of the old ones",
+    "__f": "i"
+   },
+   {
+    "name": "Mark of the Old Ones",
+    "line": "Sacred marking · 50 gc · any Lizardman Hero · at recruitment, one marking per Hero",
+    "text": "Once per battle the Hero may turn one of his failed dice rolls into a success."
+   }
+  ],
+  [
+   {
+    "__re": "übergroße kiefer|oversized jaws",
+    "__f": "i"
+   },
+   {
+    "name": "Oversized Jaws",
+    "line": "Sacred marking · 40 gc · Saurus Heroes · at recruitment, one marking per Hero",
+    "text": "His bite attack is made at +1 Strength."
+   }
+  ],
+  [
+   {
+    "__re": "gift für geschosse|venom \\(missiles\\)",
+    "__f": "i"
+   },
+   {
+    "name": "Dark venom (missiles)",
+    "line": "Poison · 20 gc, a common item · Skink Heroes",
+    "text": "As Dark venom, but only on a missile weapon: hits count as +1 Strength (also for save modifiers). One battle."
+   }
+  ],
+  [
+   {
+    "__re": "lotus für geschosse|lotus \\(missiles\\)",
+    "__f": "i"
+   },
+   {
+    "name": "Black lotus (missiles)",
+    "line": "Poison · 10 gc, a common item · Skink Heroes",
+    "text": "As Black lotus, but only on a missile weapon: a 6 to hit wounds automatically. One battle."
+   }
+  ],
+  [
+   {
+    "__re": "reptiliengift|reptile venom",
+    "__f": "i"
+   },
+   {
+    "name": "Reptile venom",
+    "line": "Poison · 5 gc per weapon · Skink Braves",
+    "text": "+1 Strength for the weapon, without the −1 save modifier that extra Strength would bring. One battle; every member of the group must be armed alike."
+   }
+  ],
+  [
+   {
     "__re": "dunkles gift|dark venom",
     "__f": "i"
    },
@@ -4342,6 +4425,18 @@
     [
      "Helm",
      10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Wolfsumhang",
+     10,
+     {
+      "heroes": true,
+      "sub": [
+       "midd"
+      ]
+     }
     ]
    ]
   },
@@ -8427,6 +8522,17 @@
      "Helm",
      10
     ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse",
+     40,
+     {
+      "sub": [
+       "hung"
+      ]
+     }
+    ]
    ]
   },
   "marChaosHench": {
@@ -10602,6 +10708,22 @@
      "Schild",
      5
     ]
+   ],
+   "Besonderes": [
+    [
+     "Übergroße Kiefer",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ]
    ]
   },
   "lizSkinkPr": {
@@ -10662,6 +10784,36 @@
      "Knochenhelm",
      10
     ]
+   ],
+   "Besonderes": [
+    [
+     "Giftdrüsen",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Dunkles Gift für Geschosse",
+     20,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Schwarzer Lotus für Geschosse",
+     10,
+     {
+      "heroes": true
+     }
+    ]
    ]
   },
   "lizSkink": {
@@ -10718,6 +10870,36 @@
      "Buckler",
      5
     ]
+   ],
+   "Besonderes": [
+    [
+     "Giftdrüsen",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Dunkles Gift für Geschosse",
+     20,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Schwarzer Lotus für Geschosse",
+     10,
+     {
+      "heroes": true
+     }
+    ]
    ]
   },
   "lizSkinkHen": {
@@ -10768,6 +10950,12 @@
     ],
     [
      "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Reptiliengift",
      5
     ]
    ]
@@ -12535,12 +12723,21 @@
    "heroesOnly": false,
    "mult": 4,
    "base": 0,
-   "note": "4× Waffenpreis; Zwerge bei Gründung der Warband 3×",
+   "note": "4× Waffenpreis; Zwerge bei Gründung der Warband 3×; Troll Slayer der Pit Fighters immer 3×",
    "start": {
     "mult": 3,
     "wb": [
      "dwarftreasure",
      "dwarfrangers"
+    ]
+   },
+   "always": {
+    "mult": 3,
+    "wb": [
+     "pitfighters"
+    ],
+    "units": [
+     "trollslayer"
     ]
    }
   },

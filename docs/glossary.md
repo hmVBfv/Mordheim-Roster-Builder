@@ -43,6 +43,10 @@ Begriff einführt, trägt ihn hier ein.
 | Gründung (bis zur ersten Schlacht) | Founding | `warbandHasFought()` ist falsch |
 | Gründungspreis | Founding price | Listenzeile `[name, preis, {start: true}]`, `startOnlyRow()`, `UPGRADES[…].start` |
 | Trading Post | Trading Post | `rareEligibleItems()`, `CATALOG` |
+| nur für Helden (Listenzeile) | Heroes only | `{heroes: true}` |
+| nur für eine Variante (Stadt, Stamm) | – | `{sub: ['midd']}` |
+| gesperrter Skill einer Warband | – | `WARBANDS[…].noSkills` |
+| Post-Battle-Hilfe | Post-battle | `postBattleHelp()`, `data/postbattle.json` |
 | umbenannter Gegenstand | – | `RENAMED` in `data/equipment.json` |
 | Kassenbuch (geplant, V7) | Ledger | – |
 

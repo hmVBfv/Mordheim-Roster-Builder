@@ -234,7 +234,9 @@ export function skillListsFor(ctx: Ctx, def: UnitDef): SkillGroup[] {
   const ex = ctx.data.WBEXTRA[ctx.s.wb ?? ''] as { skills?: string } | undefined;
   const set = ex?.skills ? ctx.data.SKILLSETS[ex.skills] : undefined;
   if (ex && ex.skills && set && !def.noWbSkills && !cats.includes(ex.skills)) out.push(['[' + set.name + ']', set.skills]);
-  return out;
+  // skills the warband may never learn (Dwarf Rangers: Arcane Lore)
+  const no = warbandDef(ctx)?.noSkills ?? [];
+  return no.length ? out.map(([lab, sk]): SkillGroup => [lab, sk.filter((s) => !no.includes(s[0]))]) : out;
 }
 
 /** Standard skill lists any Hero of this warband uses — what a promoted
