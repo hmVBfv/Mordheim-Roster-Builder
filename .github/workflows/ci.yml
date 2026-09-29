@@ -3,7 +3,8 @@ name: CI
 # Checks for every branch and every pull request into master. Deployment to
 # GitHub Pages stays in pages.yml (master only).
 #
-#   legacy  the existing app: rebuilds dist/ and runs test/*.mjs
+#   legacy  the existing app: rebuilds dist/ and runs test/*.mjs (a few of
+#           them read the app's source with the dev dependencies, so npm ci)
 #   core    the TypeScript workspaces: typecheck and lint (core and app), core's
 #           unit and parity tests (core must compute exactly what the legacy
 #           app computes) and the legacy tests mirrored onto core
@@ -29,7 +30,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22' }
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
       - name: Legacy tests (rebuilds single-file + parity check)
         run: node test/run.mjs
 
