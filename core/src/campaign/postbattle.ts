@@ -24,6 +24,7 @@ export const PB_LINK = {
   dramatis: 'https://mordheimer.net/docs/tools#7-look-for-dramatis-personae',
   recruits: 'https://mordheimer.net/docs/tools#8-hire-new-recruits--buy-common-items',
   equipment: 'https://mordheimer.net/docs/tools#9-reallocate-equipment',
+  rating: 'https://mordheimer.net/docs/tools',
 } as const;
 
 /** The rulebook's steps in their fixed order: [key, title, link]. */
@@ -37,6 +38,7 @@ export const PB_STEPS: readonly (readonly [string, string, string])[] = [
   ['dramatis', 'Dramatis Personae', PB_LINK.dramatis],
   ['recruits', 'Recruits & common items', PB_LINK.recruits],
   ['equipment', 'Reallocate equipment', PB_LINK.equipment],
+  ['rating', 'Warband rating', PB_LINK.rating],
 ];
 export const PB_ORDER: readonly string[] = PB_STEPS.map((s) => s[0]);
 

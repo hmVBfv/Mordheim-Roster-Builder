@@ -282,12 +282,22 @@ export interface GameData {
   WBHIRE: Record<string, WarbandHireInfo>;
   DP_GRADE_ORDER: string[];
   DRAMATIS: Record<string, HireEntry>;
+  /* The reference tables of the post-battle sequence (data/postbattle.json):
+     rows of [roll, result, text]; the shards table [dice total, shards]. */
+  PB_SOURCE: string;
+  PB_HENCH_INJURY: [roll: string, result: string, text: string][];
+  PB_XP_AWARDS: [what: string, exp: string, who: string][];
+  PB_HERO_ADVANCE: [roll: string, result: string, text: string][];
+  PB_HENCH_ADVANCE: [roll: string, result: string, text: string][];
+  PB_ADVANCE_NOTES: string[];
+  PB_EXPLORE_SHARDS: [total: string, shards: number][];
+  PB_LOCATIONS: [dice: string, name: string, text: string][];
 }
 
 /** The data files, in the order legacy data/index.js loads them. */
 export const DATA_FILES = [
   'races', 'equipment', 'skills', 'spells', 'abilities', 'mutations', 'injuries', 'i18n',
-  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis',
+  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle',
 ] as const;
 export type DataFile = (typeof DATA_FILES)[number];
 

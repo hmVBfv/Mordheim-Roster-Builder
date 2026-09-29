@@ -1,7 +1,7 @@
 /* Mordheim Roster Builder — Anwendungslogik.
    Daten liegen in ../data/*.js. build.js fügt alles wieder zu EINER HTML
    zusammen (Offline-/Single-File-Variante). */
-import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, RENAMED, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
+import { ABILEN, ABILITYINFO, ARMOUR_SV, BLESSINGS, BRACE_HIDE, BRACE_PLURAL, CATALOG, PB_ADVANCE_NOTES, PB_EXPLORE_SHARDS, PB_HENCH_ADVANCE, PB_HENCH_INJURY, PB_HERO_ADVANCE, PB_LOCATIONS, PB_SOURCE, PB_XP_AWARDS, RENAMED, DISTRICTS, DP_GRADE_ORDER, DRAMATIS, EQEN, GSN_BRACE, HIREDSWORDS, HR_LABELS, HS_GRADE_ORDER, INJEN, INJURIES, ITEMINFO, LISTS, MARAUDER_MARKS, MARK_RULES, MAXPROF, MOUNTS, MUTATIONS, MUTEN, MUTLABEL, MUTSETS, NAMEEN, PENDING_1A, RACELABEL, RACE_EN, SHEET, SKILLLISTS, SKILLSETS, SPELLS, STATKEYS, STD_CATS, SV_SKILL_BASE, SV_SKILL_BONUS, TERMEN, UNITRACE, UPGRADES, WARBANDS, WBEXTRA, WBHIRE, WBRACE, _ALLCC, _CCFAM, _FAM } from '../data/index.js';
 import { exportOfficialSheet, defaultWarbandName } from './pdf.js';
 import { ttsOpen, ttsOpenMember, ttsOpenHS, ttsOpenDP, ttsText, ttsTextHS } from './tts.js';
 /* Engine (pure rules & cost calc — see js/engine.js). Imported here so the
@@ -964,6 +964,7 @@ export const PB_LINK={
   dramatis:'https://mordheimer.net/docs/tools#7-look-for-dramatis-personae',
   recruits:'https://mordheimer.net/docs/tools#8-hire-new-recruits--buy-common-items',
   equipment:'https://mordheimer.net/docs/tools#9-reallocate-equipment',
+  rating:'https://mordheimer.net/docs/tools',
 };
 /* [key, title, url]. The body is built in the panel so it can weave in live
    numbers (who searches, how many dice, what is in the stash). */
@@ -977,6 +978,7 @@ export const PB_STEPS=[
   ['dramatis','Dramatis Personae',PB_LINK.dramatis],
   ['recruits','Recruits & common items',PB_LINK.recruits],
   ['equipment','Reallocate equipment',PB_LINK.equipment],
+  ['rating','Warband rating',PB_LINK.rating],
 ];
 export const PB_ORDER=PB_STEPS.map(s=>s[0]);
 /* The round the sequence belongs to: the latest battle's round, else the
@@ -1131,8 +1133,141 @@ export function pbStepBody(key, round){
     return `<p>Move equipment freely between warriors as you wish. Newly hired warriors may take rare or magic items already held in the stash.</p>
       <p>${link(PB_LINK.equipment,'Reallocate equipment')}</p>`;
   }
+  if(key==='rating'){
+    return `<p>Update the warband rating for the next battle: <b>${totalRating()}</b> now (5 per warrior, 20 per large creature, plus all experience; Hired Swords and Dramatis Personae bring their own).</p>`;
+  }
   return '';
 }
+/* ===================== POST-BATTLE HELPER =====================
+   The ten steps after a battle, each with the tables needed at the table
+   (Rob, 29.09.2026: like mordheimer.net's tools page, but no dice). It works
+   without the campaign mode - the group plays with it off - and reads what
+   the roster knows: who searches, how many dice, whose advance is due, the
+   warband's own rules and skills that change a step. Opened from the top bar
+   or from a step of the campaign checklist. */
+export function pbEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pbTable(head,rows,cls){ return `<table class="pbt${cls?' '+cls:''}"><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table>`; }
+/* Earned and applied advances of a warrior (the count xpBar shows). */
+export function advanceCount(m){ const def=unitDef(m.uid_def); if(!def) return {earned:0,applied:0,next:null};
+  const hero=isHeroModel(m); const th=xpThresholds(hero); const xp=Number(m.exp)||0; const start=Number(def.exp)||0;
+  const earned=th.filter(t=>t>start && t<=xp).length; const next=th.find(t=>t>xp);
+  const adv=m.adv||{}, skills=m.skills||[];
+  const spellStart=spellStartCount(def,m); const spellsSel=(m.spells||[]);
+  const spellAdv=Math.max(0,spellsSel.length-spellStart)+spellsSel.reduce((a,sp)=>a+(Number(sp.red)||0),0);
+  const applied=Object.values(adv).reduce((s,v)=>s+(Number(v)||0),0)+skills.length+spellAdv;
+  return {earned,applied,next:next==null?null:next}; }
+/* Rules of this warband that touch a step: the warband's rules, its variant,
+   the skills its Heroes have learnt and the items it carries. */
+export function pbRuleNotes(re){ const out=[]; const seen=new Set();
+  const add=(what,text)=>{ const k=what+'|'+text; if(seen.has(k)) return; seen.add(k); out.push({what,text}); };
+  const wb=WARBANDS[S.wb]; const strip=s=>String(s).replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').trim();
+  if(wb&&wb.rules) String(wb.rules).split(/<br\s*\/?>|(?=<b>)/).forEach(seg=>{ const m=seg.match(/^\s*<b>([^<]*)<\/b>\s*(.*)$/s); const txt=strip(m?m[2]:seg); if(re.test(txt)) add(m?strip(m[1]).replace(/:$/,''):wb.name,txt); });
+  const sub=(S.subtype&&wb&&wb.subtypes)?wb.subtypes.find(x=>x.key===S.subtype):null;
+  if(sub&&sub.note&&re.test(strip(sub.note))) add(sub.name,strip(sub.note));
+  (S.models||[]).forEach(m=>{ const who=m.name||unitDef(m.uid_def).name;
+    (m.skills||[]).forEach(sk=>{ const t=skillTextFor(m,sk); if(t&&re.test(t)) add(`${sk} (${who})`,strip(t)); });
+    const items=[...Object.keys(m.eq||{}).filter(k=>m.eq[k]>0),...Object.keys(m.rare||{})];
+    items.forEach(nm=>{ const i=itemInfo(nm); if(i&&re.test(i.text||'')) add(`${enItem(nm)} (${who})`,strip(i.text)); }); });
+  return out; }
+function pbNotesHtml(re,label){ const n=pbRuleNotes(re); if(!n.length) return '';
+  return `<div class="pbnotes"><b>${label}</b><ul>${n.map(x=>`<li><b>${pbEsc(x.what)}:</b> ${pbEsc(x.text)}</li>`).join('')}</ul></div>`; }
+function pbCamp(){ return !!(S.campaign&&S.campaign.on); }
+export function pbHelpStep(key){
+  const link=(url,label)=>`<a class="pb-link" href="${url}" target="_blank" rel="noopener">${label} \u2197</a>`;
+  const heroes=S.models.filter(m=>isHeroModel(m)); const name=m=>pbEsc(m.name||unitDef(m.uid_def).name);
+  if(key==='injuries'){
+    const d66=INJURIES.map(j=>[pbEsc(j.code),`<b>${pbEsc(j.name)}</b>`,pbEsc(j.text)]);
+    return `<p>Everyone taken out of action rolls here. Henchmen roll a D6; Heroes roll a D66 (first die tens, second ones).</p>
+      <h4>Henchmen (D6)</h4>${pbTable(['D6','Result',''],PB_HENCH_INJURY.map(r=>[r[0],`<b>${r[1]}</b>`,r[2]]))}
+      <h4>Heroes: Serious Injuries (D66)</h4>${pbTable(['D66','Result','Effect'],d66,'pbt-wide')}
+      <p class="pb-note">Enter a result with <b>+ Injury</b> on the warrior's card${pbCamp()?' or in the Casualties list of the campaign':''}.</p>
+      <p>${link(PB_LINK.injuries,'Serious Injuries on mordheimer.net')}</p>`;
+  }
+  if(key==='experience'){
+    const due=S.models.filter(m=>{ const a=advanceCount(m); return a.earned>a.applied; });
+    const th=h=>xpThresholds(h).join(', ');
+    return `<h4>Experience for this battle</h4>${pbTable(['For','Exp','Who'],PB_XP_AWARDS.map(r=>[`<b>${r[0]}</b>`,r[1],r[2]]))}
+      <p>An advance is due when experience reaches a threshold. Heroes: ${th(true)}. Henchman groups: ${th(false)}.</p>
+      ${due.length?`<p class="pb-warn">Advance due: ${due.map(name).join(', ')}.</p>`:'<p class="pb-note">No advance due on the roster.</p>'}
+      <h4>Heroes: advance (2D6)</h4>${pbTable(['2D6','Advance',''],PB_HERO_ADVANCE.map(r=>[r[0],`<b>${r[1]}</b>`,r[2]]))}
+      <h4>Henchmen: advance (2D6)</h4>${pbTable(['2D6','Advance',''],PB_HENCH_ADVANCE.map(r=>[r[0],`<b>${r[1]}</b>`,r[2]]))}
+      <ul class="pbnotes-plain">${PB_ADVANCE_NOTES.map(n=>`<li>${pbEsc(n)}</li>`).join('')}</ul>
+      <p>${link(PB_LINK.experience,'Allocate experience on mordheimer.net')}</p>`;
+  }
+  if(key==='exploration'){
+    const round=pbRound(); const d=pbExploreDice(round); const ooa=pbCamp()?pbHeroesOOA(round):new Set();
+    const who=heroes.filter(m=>!ooa.has(m.uid)).map(name);
+    return `<p>Roll <b>one D6 per Hero</b> who was not taken out of action, <b>+1 die</b> if you won, and any dice from rules and items. Keep at most <b>six</b>. Add them up for the shards; any double, triple or more is a special location — read the most numerous.</p>
+      <p>From the roster: <b>${d.capped}</b> ${d.capped===1?'die':'dice'} — ${who.length?who.join(', '):'no Hero'}${d.winDie?' + 1 for the win':''}${pbCamp()?'':' (leave out anyone taken out of action; +1 if you won)'}.</p>
+      ${pbNotesHtml(/explor/i,'In your warband:')}
+      <h4>Wyrdstone found</h4>${pbTable(['Dice total','Shards'],PB_EXPLORE_SHARDS.map(r=>[r[0],`<b>${r[1]}</b>`]))}
+      <h4>Special locations</h4>${pbTable(['Dice','Location','What you find'],PB_LOCATIONS.map(r=>[`<span class="pbdice">${r[0]}</span>`,`<b>${pbEsc(r[1])}</b>`,pbEsc(r[2])]),'pbt-wide')}
+      <p>${link(PB_LINK.exploration,'The full exploration chart')}</p>`;
+  }
+  if(key==='wyrdstone'){
+    const size=warbandSize(); const band=wyrdSizeBand(size);
+    const head=['Shards',...WYRD_BANDS.map((b,i)=>i===band?`<span class="pbhere">${b[1]}</span>`:b[1])];
+    const rows=WYRD_PRICE.map((r,i)=>[`<b>${i===WYRD_PRICE.length-1?(i+1)+'+':i+1}</b>`,...r.map((v,j)=>j===band?`<span class="pbhere">${v}</span>`:String(v))]);
+    return `<p>Sell once per sequence. The table gives the <b>total</b> for the shards sold together; a larger warband earns less. Yours counts <b>${size}</b> (column ${WYRD_BANDS[band][1]}, marked).</p>
+      ${pbTable(head,rows,'pbt-num')}
+      <p class="pb-note">In the campaign mode the checklist's sale step sells from the stash.</p>
+      <p>${link(PB_LINK.wyrdstone,'Selling wyrdstone on mordheimer.net')}</p>`;
+  }
+  if(key==='veterans'){
+    const groups=S.models.filter(m=>{ const def=unitDef(m.uid_def); return def&&def.t==='hen'&&!isHeroModel(m)&&!def.vehicle; });
+    return `<p>Roll <b>2D6</b>: that is the experience of the veterans available for hire now — the recruits of step 8 may together bring at most that much.</p>
+      <p>A new warrior who joins an existing Henchman group arrives with the group's experience and costs <b>2 gc more for each point</b>.</p>
+      ${groups.length?pbTable(['Group','Exp','One more costs'],groups.map(m=>[name(m),String(Number(m.exp)||0),`<b>${henchRecruitCost(m)} gc</b>${henchRecruitSurcharge(m)?` <span class="pb-note">(+${henchRecruitSurcharge(m)} for experience)</span>`:''}`])):''}
+      <p>${link(PB_LINK.veterans,'Available veterans on mordheimer.net')}</p>`;
+  }
+  if(key==='rare'){
+    const round=pbRound(); const ooa=pbCamp()?pbHeroesOOA(round):new Set();
+    const who=heroes.filter(m=>!ooa.has(m.uid)).map(name);
+    return `<p>Each Hero who was not taken out of action may look for <b>one</b> rare item: name it, roll <b>2D6</b> — equal to or above its Rarity, he finds it. One item per successful roll.</p>
+      <p>Searching: ${who.length?who.join(', '):'no Hero'}${pbCamp()?'':' (leave out anyone taken out of action)'}.</p>
+      ${pbNotesHtml(/rare item|rarity|rare roll|finding rare/i,'In your warband:')}
+      <ul class="pbnotes-plain"><li>A price with dice (e.g. 25+D6 gc) is rolled when you buy.</li>
+      <li>What you buy goes to the stash, or straight to a warrior who may use it (step 9).</li>
+      <li>Selling brings <b>half</b> the price that applies now; for items with a dice price, half the fixed part.</li>
+      ${warbandHasFought()?'<li>List prices marked <i>founding</i> no longer apply: those items are found here, at the Trading Post price.</li>':''}</ul>
+      <p class="pb-note">Buy in the warrior's <b>Rare Items / Trading Post</b> section.</p>
+      <p>${link(PB_LINK.rare,'Rarity rolls on mordheimer.net')}</p>`;
+  }
+  if(key==='dramatis'){
+    return `<p>If your warband may hire a Dramatis Persona and can afford one, look for one now. Each has its own rules for how he is found and what he costs — see the <b>Dramatis Personae</b> panel.</p>
+      <p>${link(PB_LINK.dramatis,'Dramatis Personae on mordheimer.net')}</p>`;
+  }
+  if(key==='recruits'){
+    return `<p>Hire new warriors — together no more experience than the veterans roll of step 5. Each comes with a free dagger and may buy <b>common</b> items from his list; rare items come only from the stash (step 9).</p>
+      <p>Common items can be bought for anyone at any time at their list price.</p>
+      <p>${link(PB_LINK.recruits,'New recruits on mordheimer.net')}</p>`;
+  }
+  if(key==='equipment'){
+    return `<ul class="pbnotes-plain"><li>Move items between warriors and the stash as you like — only to someone who may use them (his equipment list; miscellaneous items to Heroes unless the item allows Henchmen).</li>
+      <li>A Henchman group always carries the same equipment: an item for the group needs one for every member.</li>
+      <li>Hired Swords take no equipment and give none.</li>
+      <li>The equipment of a warrior who died is lost.</li></ul>
+      <p>${link(PB_LINK.equipment,'Reallocate equipment on mordheimer.net')}</p>`;
+  }
+  if(key==='rating'){
+    let war=0, large=0, xp=0; S.models.forEach(m=>{ const def=unitDef(m.uid_def); if(!def||def.vehicle) return; const q=def.t==='hen'?(Number(m.qty)||1):1; if(def.large) large+=q; else war+=q; xp+=(Number(m.exp)||0)*q; });
+    const hs=(typeof hsRatingTotal==='function'?hsRatingTotal():0)+(typeof dpRatingTotal==='function'?dpRatingTotal():0);
+    return `<p>The rating decides the underdog bonus and some scenarios. Update it once the roster is final.</p>
+      ${pbTable(['','','Points'],[['Warriors',`${war} × 5`,String(war*5)],['Large creatures',`${large} × 20`,String(large*20)],['Experience','all',String(xp)],['Hired Swords, Dramatis Personae','their own',String(hs)],['<b>Rating</b>','',`<b>${totalRating()}</b>`]])}`;
+  }
+  return '';
+}
+let pbHelpOpenStep='injuries';
+export function postBattleHelp(openKey){ const k=openKey||pbHelpOpenStep;
+  return `<div class="pbh-intro">Work from top to bottom. Roll your dice at the table — this shows who rolls, how many dice and what each result means. The short forms are ours; ${'\u2197'} links lead to the full rules on mordheimer.net.</div>`
+    +PB_STEPS.map(([key,title],i)=>`<details class="pbh-step" id="pbh-${key}" ${key===k?'open':''} ontoggle="setPbHelpOpen('${key}',this.open)"><summary><span class="pb-num">${i+1}</span> ${title}</summary><div class="pbh-body">${pbHelpStep(key)}</div></details>`).join('')
+    +`<p class="pb-note pbh-src">${pbEsc(PB_SOURCE)}</p>`; }
+export function setPbHelpOpen(key,open){ if(open) pbHelpOpenStep=key; }
+export function openPostBattle(key){ if(key) pbHelpOpenStep=key; const box=document.getElementById('pbhelp'); if(box) box.innerHTML=postBattleHelp(key);
+  document.getElementById('pbmodal').style.display='flex';
+  if(key){ const el=document.getElementById('pbh-'+key); if(el&&el.scrollIntoView) el.scrollIntoView({block:'start'}); } }
+export function closePostBattle(){ document.getElementById('pbmodal').style.display='none'; }
+
 export function postbattleBlock(){
   const c=campState(); const round=pbRound();
   if(round<1 && !(c.battles||[]).length) return '';
@@ -1150,7 +1285,7 @@ export function postbattleBlock(){
       ? `<span class="pb-lock" title="Finish the step before this one first">\u2013</span>`
       : `<input type="checkbox" ${done?'checked':''} onchange="pbSetStepDone('${key}',this.checked,${round})">`;
     const head=`<label class="pb-check">${box}<span class="pb-num">${i+1}</span><b>${title}</b>${done?'<span class="pb-tick">done</span>':(locked?'<span class="pb-note pb-locknote">locked</span>':'')}</label>`;
-    const body=(isActive)?`<div class="pb-body">${pbStepBody(key,round)}</div>`:'';
+    const body=(isActive)?`<div class="pb-body">${pbStepBody(key,round)}<p><button class="tiny ghost" onclick="openPostBattle('${key}')">Tables for this step</button></p></div>`:'';
     return `<div class="${cls}">${head}${body}</div>`;
   }).join('');
   const pct=Math.round(active/total*100);
@@ -2860,16 +2995,12 @@ export function xpBar(m){
   const def=unitDef(m.uid_def);
   if(def.noxp) return `<div class="xpinfo">Gains no experience.</div>`;
   const hero=isHeroModel(m); const th=xpThresholds(hero); const xp=Number(m.exp)||0; const start=Number(def.exp)||0;
-  const earned=th.filter(t=>t>start && t<=xp).length;
+  const {earned,applied}=advanceCount(m);
   const next=th.find(t=>t>xp);
   const pips=th.map(t=>{
     const cls = t<=start ? 'base' : (t<=xp ? 'on' : (t===next?'next':''));
     return `<span class="xppip ${cls}" title="Advance at ${t} exp – click to set" onclick="setExpJump(${m.uid},${t})">${t}</span>`;
   }).join('');
-  const adv=m.adv||{}, skills=m.skills||[];
-  const spellStart=spellStartCount(def,m); const spellsSel=(m.spells||[]);
-  const spellAdv=Math.max(0,spellsSel.length-spellStart)+spellsSel.reduce((a,sp)=>a+(Number(sp.red)||0),0);
-  const applied=Object.values(adv).reduce((s,v)=>s+(Number(v)||0),0)+skills.length+spellAdv;
   const due = earned>applied;
   const info = next!=null
     ? `Advances earned: <b>${earned}</b> · next at <b>${next}</b> Exp (${next-xp} to go)`
@@ -4359,7 +4490,7 @@ Object.assign(window, {
   spellStartCount, startGold, stashAddItem, stashAdj, stashItemQty, stashRemItem,
   stashSet, statBarHS, statFilterBar, statNum, statTable, statTableHS,
   statTableM, svFromText, svLabel, svOfEntry, svOfModel, toggleEq,
-  toggleItip, toggleItipFrom, toggleItipPreview, toggleMut, togglePromoCat, toggleWeaponUpgrade, totalHeroes,
+  toggleItip, toggleItipFrom, toggleItipPreview, toggleMut, openPostBattle, closePostBattle, setPbHelpOpen, togglePromoCat, toggleWeaponUpgrade, totalHeroes,
   totalModels, totalRating, totalSpent, translateTerms, ttsOpen, ttsOpenMember, ttsOpenDP,
   ttsOpenHS, ttsText, ttsTextHS, unhireDP, unhireHS, unitBaseCost,
   unitDef, unitFamilies, unitMax, unpromote, upgradePaid, upgradeTargets,

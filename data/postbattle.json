@@ -1,0 +1,68 @@
+{
+ "PB_SOURCE": "Short forms in our own words; numbers checked against mordheimer.net (Campaigns: Experience, Income, Trading; Tools: post-battle sequence), 29.09.2026. The full wording is on the linked pages.",
+ "PB_HENCH_INJURY": [
+  ["1–2", "Dead", "Remove him from the group. His equipment is lost."],
+  ["3–6", "Recovers", "He fights in the next battle as normal."]
+ ],
+ "PB_XP_AWARDS": [
+  ["Survives", "+1", "Every Hero and every Henchman group that fought, even if taken out of action — unless killed."],
+  ["Winning leader", "+1", "The leader of the winning warband."],
+  ["Enemy out of action", "+1 each", "A Hero, for every enemy he puts out of action."],
+  ["Scenario", "varies", "Many scenarios give more (objectives, wyrdstone carried off …) — see the scenario."]
+ ],
+ "PB_HERO_ADVANCE": [
+  ["2–5", "New skill", "Choose a skill from one of the Hero's skill lists."],
+  ["6", "+1 S or +1 A", "Roll a D6: 1–3 +1 Strength, 4–6 +1 Attack."],
+  ["7", "+1 WS or +1 BS", "Choose one."],
+  ["8", "+1 I or +1 Ld", "Roll a D6: 1–3 +1 Initiative, 4–6 +1 Leadership."],
+  ["9", "+1 W or +1 T", "Roll a D6: 1–3 +1 Wound, 4–6 +1 Toughness."],
+  ["10–12", "New skill", "Choose a skill from one of the Hero's skill lists."]
+ ],
+ "PB_HENCH_ADVANCE": [
+  ["2–4", "+1 Initiative", ""],
+  ["5", "+1 Strength", ""],
+  ["6–7", "+1 BS or +1 WS", "Choose one."],
+  ["8", "+1 Attack", ""],
+  ["9", "+1 Leadership", ""],
+  ["10–12", "The lad's got talent", "One model of the group becomes a Hero."]
+ ],
+ "PB_ADVANCE_NOTES": [
+  "Racial maximum: if the characteristic is already at its maximum, take the other option — or roll again if the result raises only one characteristic.",
+  "Henchmen gain experience as a group: every model in it gets the same advance."
+ ],
+ "PB_EXPLORE_SHARDS": [
+  ["1–5", 1], ["6–11", 2], ["12–17", 3], ["18–24", 4], ["25–30", 5], ["31–35", 6], ["36+", 7]
+ ],
+ "PB_LOCATIONS": [
+  ["1 1", "Well", "A Hero rolls a D6: equal to or under his Toughness, he finds 1 wyrdstone shard; above it, he drinks tainted water and misses the next game."],
+  ["2 2", "Shop", "Loot worth D6 gc; on a 1 also a Lucky Charm."],
+  ["3 3", "Corpse", "D6: 1–2 D6 gc · 3 dagger · 4 axe · 5 sword · 6 light armour."],
+  ["4 4", "Straggler", "Skaven sell him for 2D6 gc. Possessed sacrifice him: +1 Experience for the leader. Undead: a free Zombie. Anyone else: next exploration, roll one extra die and discard one."],
+  ["5 5", "Overturned cart", "D6: 1–2 a Mordheim map · 3–4 a purse of 2D6 gc · 5–6 a jewelled sword and dagger, 10 gc each when sold."],
+  ["6 6", "Ruined hovels", "Loot worth D6 gc."],
+  ["1 1 1", "Tavern", "The leader takes a Leadership test: passed, drink worth 4D6 gc; failed, D6 gc. Undead, Witch Hunters and Sisters of Sigmar pass automatically."],
+  ["2 2 2", "Smithy", "D6: 1 sword · 2 double-handed weapon · 3 flail · 4 D3 halberds · 5 lance · 6 metal worth 2D6 gc."],
+  ["3 3 3", "Prisoners", "Possessed: sacrifice them, D3 Experience. Undead: D3 Zombies. Skaven: sell them for 3D6 gc. Anyone else: escort them home for 2D6 gc, and one may join as a Henchman."],
+  ["4 4 4", "Fletcher", "D6: 1–2 D3 short bows · 3 D3 bows · 4 D3 long bows · 5 a quiver of hunting arrows · 6 D3 crossbows."],
+  ["5 5 5", "Market hall", "Goods worth 2D6 gc."],
+  ["6 6 6", "Returning a favour", "Any one Hired Sword fights for you in the next battle free of charge."],
+  ["1 1 1 1", "Gunsmith", "D6: 1 blunderbuss · 2 brace of pistols · 3 brace of duelling pistols · 4 D3 handguns · 5 D3 flasks of superior blackpowder · 6 Hochland long rifle."],
+  ["2 2 2 2", "Shrine", "Loot worth 3D6 gc. Sisters of Sigmar and Witch Hunters also bless one weapon: it wounds Undead and Possessed on 2+."],
+  ["3 3 3 3", "Townhouse", "Loot worth 3D6 gc."],
+  ["4 4 4 4", "Armourer", "D6: 1–2 D3 shields or bucklers · 3 D3 helmets · 4 D3 light armour · 5 D3 heavy armour · 6 ithilmar armour."],
+  ["5 5 5 5", "Graveyard", "Plunder it for D6×10 gc — Witch Hunters and Sisters of Sigmar you meet next hate you. Witch Hunters and Sisters seal the graves instead: D6 Experience."],
+  ["6 6 6 6", "Catacombs", "Next battle, up to three of your fighters may come through the tunnels: set them up at ground level in your first turn, more than 8\" from any enemy."],
+  ["1 1 1 1 1", "Moneylender's house", "D6×10 gc."],
+  ["2 2 2 2 2", "Alchemist's laboratory", "3D6 gc, and a notebook: one Hero may choose Academic skills from now on."],
+  ["3 3 3 3 3", "Jewelsmith", "D6: 1–2 quartz, D6×5 gc · 3–4 an amethyst, 20 gc · 5 a necklace, 50 gc · 6 a ruby, D6×15 gc. While you keep the gem, +1 to find rare items."],
+  ["4 4 4 4 4", "Merchant's house", "Goods worth 2D6×5 gc; on a double, also a Freetrader's symbol — its bearer gains the Haggle skill."],
+  ["5 5 5 5 5", "Shattered building", "D3 wyrdstone shards; pass a Leadership test and a stray wardog joins you."],
+  ["6 6 6 6 6", "Entrance to the catacombs", "From now on you may re-roll one exploration die each time."],
+  ["1 1 1 1 1 1", "The pit", "You may send one Hero down: D6, on a 1 he is never seen again; on 2+ he returns with D6+1 wyrdstone shards."],
+  ["2 2 2 2 2 2", "Hidden treasure", "5D6×5 gc, and roll for each: D3 wyrdstone 4+ · holy relic 5+ · heavy armour 5+ · D3 gems of 10 gc 4+ · elven cloak 5+ · holy tome 5+ · magical artefact 5+."],
+  ["3 3 3 3 3 3", "Dwarf smithy", "D6: 1 D3 double-handed axes · 2 D3 heavy armour · 3 gromril axe · 4 gromril hammer · 5 double-handed gromril axe · 6 gromril armour."],
+  ["4 4 4 4 4 4", "Slaughtered warband", "3D6×5 gc and D6 daggers, and roll for each: D3 light armour 4+ · heavy armour 5+ · Mordheim map 4+ · D3 halberds 5+ · D3 swords 3+ · D3 shields 2+ · D3 bows 4+ · D3 helmets 2+."],
+  ["5 5 5 5 5 5", "Fighting arena", "A training manual: sell it for 100 gc, or a Hero studies it — Combat skills from now on, and his WS may rise one point above its racial maximum."],
+  ["6 6 6 6 6 6", "Noble's villa", "D6: 1–2 D6×10 gc · 3–4 D6 vials of Crimson Shade · 5–6 a magical artefact."]
+ ]
+}
