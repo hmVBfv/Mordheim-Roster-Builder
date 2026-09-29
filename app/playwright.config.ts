@@ -16,7 +16,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list']],
+  // in the CI a failing test also becomes an annotation of the run, readable
+  // on its summary page without opening the log
+  reporter: process.env.CI ? [['list'], ['github']] : [['list']],
   use: { viewport: { width: 360, height: 740 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true, launchOptions },
   projects: [
     { name: 'campaign', testIgnore: /legacy/, use: { baseURL: 'http://localhost:4173/' } },

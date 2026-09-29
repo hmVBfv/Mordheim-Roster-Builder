@@ -183,6 +183,9 @@ test('starts offline once it has been opened', async ({ page, context }) => {
 });
 
 /* docs/ui.md "Leistungsgrenzen", on a throttled phone. */
+/* The budgets of docs/ui.md. Each time is the median of three runs: a
+   shared CI runner has slow moments that say nothing about the app, and a
+   real regression still shows in the median. */
 test.describe('start-up budgets', () => {
   async function throttle(page: Page) {
     const cdp = await page.context().newCDPSession(page);
@@ -192,13 +195,21 @@ test.describe('start-up budgets', () => {
     await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   }
   const ready = (page: Page) => expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+  const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]!;
 
-  test('first start online in under 3 s', async ({ page }) => {
-    await throttle(page);
-    const t0 = Date.now();
-    await page.goto('./');
-    await ready(page);
-    expect(Date.now() - t0).toBeLessThan(3000);
+  test('first start online in under 3 s', async ({ browser, baseURL }) => {
+    const times: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      const ctx = await browser.newContext({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+      const page = await ctx.newPage();
+      await throttle(page);
+      const t0 = Date.now();
+      await page.goto(baseURL!);
+      await ready(page);
+      times.push(Date.now() - t0);
+      await ctx.close();
+    }
+    expect(median(times), `first starts: ${times.join(', ')} ms`).toBeLessThan(3000);
   });
 
   test('start from the cache in under 1 s, a reaction in under 100 ms', async ({ page }) => {
@@ -206,18 +217,25 @@ test.describe('start-up budgets', () => {
     await page.evaluate(async () => { await navigator.serviceWorker.ready; });
     await page.reload();
     await throttle(page);
-    const t0 = Date.now();
-    await page.reload();
-    await ready(page);
-    expect(Date.now() - t0).toBeLessThan(1000);
+    const starts: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      const t0 = Date.now();
+      await page.reload();
+      await ready(page);
+      starts.push(Date.now() - t0);
+    }
+    expect(median(starts), `starts from the cache: ${starts.join(', ')} ms`).toBeLessThan(1000);
     await page.getByRole('link', { name: 'More' }).click();
-    const ms = await page.evaluate(async () => {
-      const radio = document.querySelector<HTMLInputElement>('input[value=parchment]')!;
-      const t = performance.now();
-      radio.click();
-      await new Promise((r) => requestAnimationFrame(() => r(null)));
-      return performance.now() - t;
-    });
-    expect(ms).toBeLessThan(100);
+    const reactions: number[] = [];
+    for (const theme of ['parchment', 'chronicle', 'parchment']) {
+      reactions.push(await page.evaluate(async (v) => {
+        const radio = document.querySelector<HTMLInputElement>(`input[value=${v}]`)!;
+        const t = performance.now();
+        radio.click();
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        return performance.now() - t;
+      }, theme));
+    }
+    expect(median(reactions), `reactions: ${reactions.map(Math.round).join(', ')} ms`).toBeLessThan(100);
   });
 });
