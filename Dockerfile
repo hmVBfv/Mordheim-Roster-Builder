@@ -66,7 +66,7 @@ ENV ROSTER_VERSION=${ROSTER_VERSION}
 LABEL org.opencontainers.image.source="https://github.com/hmVBfv/Mordheim-Roster-Builder" \
       org.opencontainers.image.description="Mordheim Campaign server" \
       org.opencontainers.image.revision="${ROSTER_VERSION}"
-# the official image's user "node" is 1000:1000, like robin on the Pi
+# the official image's user "node" is 1000:1000, like the first user on the Pi
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

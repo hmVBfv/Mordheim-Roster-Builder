@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # roster-restore – put a backup back into production (docs/operations.md,
-# Wiederherstellung). Run as robin over SSH:
+# Wiederherstellung). Run as your own
+# user (not root) over SSH:
 #
 #   roster-restore                  the latest backup from restic
 #   roster-restore --restic <id>    a particular restic snapshot (restic snapshots)
@@ -15,7 +16,7 @@ set -euo pipefail
 . "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
 
 usage() {
-  sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//' >&2
+  sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//' >&2
   exit 64
 }
 

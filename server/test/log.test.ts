@@ -18,9 +18,9 @@ function failregex(): RegExp {
 describe('Fail2Ban', () => {
   it('reads the IP of a failed login', () => {
     const log = captureLog();
-    loginFailed(log.logger, '203.0.113.9', 'robin');
+    loginFailed(log.logger, '203.0.113.9', 'player');
     expect(failregex().exec(log.lines[0]!)?.groups?.host).toBe('203.0.113.9');
-    loginFailed(log.logger.child({ reqId: 'req-7' }), '2001:db8::1', 'robin');
+    loginFailed(log.logger.child({ reqId: 'req-7' }), '2001:db8::1', 'player');
     expect(failregex().exec(log.lines[1]!)?.groups?.host).toBe('2001:db8::1');
   });
 
