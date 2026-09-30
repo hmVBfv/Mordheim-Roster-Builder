@@ -11,7 +11,13 @@ if [ ! -r "$ROSTER_CONF" ]; then
 fi
 # shellcheck source=/dev/null
 . "$ROSTER_CONF"
-: "${ROSTER_DIR:?} ${ROSTER_DATA:?} ${ROSTER_IMAGE:?}"
+: "${ROSTER_DIR:?} ${ROSTER_DATA:?} ${ROSTER_IMAGE:?} ${ROSTER_USER:?}"
+# as the service's own user, never as root: files it writes (a restored
+# database, .env) must stay the container's to write
+if [ "$(id -un)" != "$ROSTER_USER" ]; then
+  echo "$(basename "$0"): run this as $ROSTER_USER (without sudo)" >&2
+  exit 1
+fi
 
 ROSTER_ENV="$ROSTER_DIR/.env"
 ROSTER_LOG="$ROSTER_DIR/ops.log"

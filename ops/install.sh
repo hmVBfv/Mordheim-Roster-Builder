@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # ops/install.sh – puts the Pi's configuration from the repository in place
-# (ADR 0015, docs/operations.md). On the Pi, in the clone:
+# (ADR 0015, docs/operations.md). On the Pi, in your own clone – never in one
+# an agent container can write to, because this script runs as root:
 #
-#   cd /mnt/ssd/agent/repos/roster && git pull && sudo ops/install.sh
+#   cd ~/src/Mordheim-Roster-Builder && git pull --ff-only && sudo ops/install.sh
 #
 # Reads ~/server/roster/site.env (hostname, LAN IP; see ops/site.env.example)
 # and writes:
@@ -41,14 +42,26 @@ if [ -n "$render_only" ]; then
   ROSTER_USER=${ROSTER_USER:-$(id -un)}
 else
   [ "$(id -u)" -eq 0 ] || die "run with sudo (or use --render <dir>)"
-  ROSTER_USER=${SUDO_USER:-robin}
+  if [ -z "${SUDO_USER:-}" ] || [ "$SUDO_USER" = root ]; then die "run it with sudo from your own account, not as root"; fi
+  ROSTER_USER=$SUDO_USER
 fi
 home=$(getent passwd "$ROSTER_USER" | cut -d: -f6) || die "no user $ROSTER_USER"
 site=${site:-$home/server/roster/site.env}
 [ -r "$site" ] || die "$site is missing – copy ops/site.env.example there and fill it in"
-# shellcheck source=/dev/null
-. "$site"
-ROSTER_USER=${ROSTER_USER:-robin}
+
+# site.env is read, not run: only these keys, one KEY=value per line
+while IFS= read -r line || [ -n "$line" ]; do
+  line=${line%$'\r'}
+  case "$line" in '' | '#'*) continue ;; esac
+  key=${line%%=*} value=${line#*=}
+  [ "$key" != "$line" ] || die "site.env: not KEY=value: $line"
+  value=${value#\"} value=${value%\"}
+  case "$key" in
+    ROSTER_HOST | ROSTER_LAN_IP | ROSTER_USER | ROSTER_MOUNT | ROSTER_DATA | ROSTER_IMAGE) printf -v "$key" '%s' "$value" ;;
+    *) die "site.env: unknown key $key" ;;
+  esac
+done <"$site"
+[[ "$ROSTER_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || die "ROSTER_USER is not a user name: $ROSTER_USER"
 home=$(getent passwd "$ROSTER_USER" | cut -d: -f6) || die "no user $ROSTER_USER (site.env)"
 ROSTER_MOUNT=${ROSTER_MOUNT:-/mnt/ssd}
 ROSTER_DATA=${ROSTER_DATA:-$ROSTER_MOUNT/roster}
@@ -95,6 +108,12 @@ if [ -n "$render_only" ]; then
   say "rendered into $render_only"
   exit 0
 fi
+
+# 0. this script runs as root: its files must not be writable by anyone else,
+#    in particular not by an agent container (/mnt/ssd/agent is mounted there)
+case "$ops/" in "${ROSTER_AGENT_DIR:-/mnt/ssd/agent}"/*) die "$ops is inside the agent directory; clone the repository into your home (docs/operations.md, Stufe 1)" ;; esac
+unsafe=$(find "$ops" \( -perm /022 -o \( ! -user root ! -user "$ROSTER_USER" \) \) -print -quit)
+[ -z "$unsafe" ] || die "$unsafe is writable by others or owned by someone else; not running files from there as root"
 
 # 1. what must be there
 for cmd in docker restic curl openssl flock systemctl sed; do
