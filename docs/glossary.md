@@ -150,4 +150,4 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Ansicht (gespeicherte Anordnung) | View | `VIEWS` im Mockup; nur auf dem Gerät |
 | Dock | Dock (Minimised panels) | Leiste der minimierten Panels |
 | Bereich von unten | Sheet | `<dialog class="sheet">`, `app/src/ui/useSheet.ts` |
-| Porträt der Warband | – | `docs/mockups/warband-art.js` (`data-art`) |
+| Wappen der Warband | – | `docs/mockups/warband-art.js` (`data-art`) |
