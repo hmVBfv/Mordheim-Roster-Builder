@@ -1,6 +1,6 @@
 # Fahrplan
 
-Stand: 28. September 2026
+Stand: 30. September 2026
 
 Jede Phase endet mit einer Abnahme durch Rob. Eine Phase beginnt erst, wenn die
 vorige abgenommen ist; Ausnahmen werden hier vermerkt.
@@ -157,6 +157,31 @@ Die alte App bleibt in dieser Phase unverändert live.
   Wiederherstellungstest-Timer, healthchecks.io, Fail2Ban-Regel.
 - Alle Betriebsdateien unter `ops/` im Repo, eingespielt mit `sudo ops/install.sh`.
 
+**Ausnahme:** Phase 2 beginnt, bevor Phase 1 abgenommen ist (Rob,
+30.09.2026). Offen sind dort die echten Speicherstände (1d), Robs Prüfung der
+Mockups auf dem Handy und die Installation der App auf Android – die lässt
+sich mit Phase 2 am echten Hostnamen prüfen, weil der Server die App schon
+ausliefert.
+
+**Stand:**
+
+- [x] `server/`: Fastify und SQLite, Markerdatei, Migrationsrahmen (Snapshot
+  vor jeder Migration), Epoche (wechselt bei jedem Start auf einer
+  Snapshot-Kopie), `GET /api/v1/health`, `roster-cli` (`backup`,
+  `schema-version`, `info`, `epoch renew`), die App als statische Dateien,
+  `can()` für jede Route und der Anfang der Leak-Matrix, Logs mit fester Form
+  für Fail2Ban. 51 Tests.
+- [x] `Dockerfile` (Node 24, gebaut ohne Emulation für arm64 und amd64) und
+  CI: Rauchtest des Images, Ende-zu-Ende-Test von `ops/` auf dem Runner
+  (`install.sh`, Deploy, Rollback mit und ohne Rücksicherung, Backup und
+  Wiederherstellungstest mit restic, `roster-restore`, SSD-Übung, Fail2Ban),
+  dann Push nach `ghcr.io`.
+- [x] `ops/`: `compose.yaml`, `Caddyfile`, `roster-deploy`, `roster-restore`,
+  Timer für Backup, Wiederherstellungstest und `roster-alive`, Fail2Ban,
+  `install.sh`.
+- [ ] Einrichtung auf dem Pi – Stufen 1 bis 3 in
+  [operations.md](operations.md#2-einmalige-einrichtung) (Rob).
+
 **Abnahme:**
 - Die App ist unter dem Hostnamen mit gültigem Zertifikat erreichbar.
 - Deploy und **Rollback-Übung** (absichtlich kaputtes Image) funktionieren.
@@ -231,7 +256,8 @@ durchgelaufen.
 Diese offenen Punkte des Pi müssen vor Phase 2 erledigt sein:
 
 - cgroup-Speicher aktivieren (sonst greifen keine Container-Limits).
-- Chronik-Eingang nach `eingang/chronik/` umziehen.
+- Chronik-Eingang nach `eingang/chronik/` umziehen (gebraucht erst ab
+  Phase 4b; bis dahin bindet die App ihn nicht ein).
 - WireGuard: prüfen, aus welchem Netz VPN-Geräte kommen (betrifft den
   Zugriff auf die Testinstanz von unterwegs).
 
