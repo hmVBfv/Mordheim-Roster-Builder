@@ -7,7 +7,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default tseslint.config(
   {
-    ignores: ['js/**', 'data/**', 'test/**', 'build.js', 'dist/**', 'vendor/**', 'assets/**', '**/node_modules/**', 'app/dist/**', 'app/public/**', 'app/test-results/**', 'app/playwright-report/**'],
+    ignores: ['js/**', 'data/**', 'test/**', 'build.js', 'dist/**', 'vendor/**', 'assets/**', '**/node_modules/**', 'app/dist/**', 'app/public/**', 'server/dist/**', 'app/test-results/**', 'app/playwright-report/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -53,6 +53,15 @@ export default tseslint.config(
   {
     files: ['app/*.ts', 'app/e2e/**/*.ts', 'app/scripts/**/*.mjs'],
     languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // the server: Node, same strictness as core
+    files: ['server/**/*.{ts,mjs}'],
+    languageOptions: { globals: { ...globals.node } },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
+      'eqeqeq': ['error', 'always', { null: 'ignore' }],
+    },
   },
   {
     // the static mockups: a plain script loaded by the pages, no modules

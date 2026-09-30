@@ -10,6 +10,18 @@ name: CI
 #           app computes) and the legacy tests mirrored onto core
 #   app     the PWA: unit tests, both builds, the size budget, and Playwright
 #           at 360 px (screenshots uploaded as an artifact — look at them)
+#   server  the server's tests (health, migrations, snapshots, epoch, can(),
+#           the leak-test matrix, the log's contract with Fail2Ban)
+#   image   builds the image (amd64) and tests it and ops/ on this runner:
+#           the smoke test (SSD drill, health, roster-cli, client address,
+#           epoch, memory), shellcheck, the Caddyfile, and ops/test/e2e.sh –
+#           install.sh, roster-deploy with both rollbacks, backup and restore
+#           test with restic, roster-restore, Fail2Ban
+#   publish when all of the above are green on a push: the image for
+#           linux/arm64 (the Pi) and linux/amd64 to ghcr.io/hmvbfv/mordheim-roster
+#           as :<first 7 of the commit>; on master also :master and
+#           :drill-broken (for the rollback drill). Monthly on master, a
+#           fresh build for the base image's security updates (ADR 0009).
 #
 # The runner is pinned to ubuntu-24.04: ubuntu-latest moves to Ubuntu 26 from
 # 19.10.2026, and the move should be a deliberate change with a green run
@@ -20,6 +32,8 @@ on:
     branches: ['**']
   pull_request:
     branches: [master]
+  schedule:
+    - cron: '17 4 3 * *'
 
 permissions:
   contents: read
@@ -76,3 +90,93 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with: { name: app-screens, path: app/test-results/, if-no-files-found: ignore }
+
+  server:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - name: Server tests
+        run: npm run test:server
+
+  image:
+    runs-on: ubuntu-24.04
+    env:
+      IMAGE: localtest/mordheim-roster
+    steps:
+      - uses: actions/checkout@v7
+      - name: Tag
+        run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+      - name: Build the image (amd64) and the two drill images
+        run: |
+          docker build --build-arg ROSTER_VERSION="$GITHUB_SHA" -t "$IMAGE:$TAG" .
+          docker build --build-arg ROSTER_VERSION="$GITHUB_SHA" --target drill-broken -t "$IMAGE:drill-broken" .
+          docker build -f ops/test/Dockerfile.drill --build-arg BASE="$IMAGE:$TAG" -t "$IMAGE:drill-migration" ops/test
+          docker image ls "$IMAGE"
+      - name: Smoke test (SSD drill, health, roster-cli, client address, epoch, memory)
+        run: ops/test/smoke.sh "$IMAGE:$TAG" "$GITHUB_SHA"
+      - name: Shell scripts
+        run: shellcheck -x -P ops/lib ops/install.sh ops/bin/* ops/lib/* ops/test/*.sh ops/image/roster-cli
+      - name: Caddyfile and compose file
+        run: |
+          printf 'ROSTER_HOST=mordheim.example.duckdns.org\nROSTER_LAN_IP=192.168.178.20\n' > "$RUNNER_TEMP/site.env"
+          ops/install.sh --render "$RUNNER_TEMP/rendered" --site "$RUNNER_TEMP/site.env"
+          docker run --rm -v "$RUNNER_TEMP/rendered/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2 caddy validate --adapter caddyfile --config /etc/caddy/Caddyfile
+          sed -i 's#/mnt/ssd/roster#'"$RUNNER_TEMP"'/data#g' "$RUNNER_TEMP/rendered/compose.yaml"
+          mkdir -p "$RUNNER_TEMP/data" && touch "$RUNNER_TEMP/data/app.env" "$RUNNER_TEMP/data/staging.env"
+          ROSTER_TAG=test docker compose -f "$RUNNER_TEMP/rendered/compose.yaml" config -q
+      - name: Tools for the ops test
+        run: sudo apt-get update -q && sudo apt-get install -y -q restic fail2ban
+      - name: ops end to end (install.sh, deploy, rollbacks, backup, restore test, restore, SSD drill, Fail2Ban)
+        run: sudo GITHUB_ACTIONS="$GITHUB_ACTIONS" IMAGE="$IMAGE" ops/test/e2e.sh "$TAG" drill-broken drill-migration
+
+  publish:
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    needs: [legacy, core, app, server, image]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    env:
+      REPO: ghcr.io/hmvbfv/mordheim-roster
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tags
+        run: |
+          short=${GITHUB_SHA::7}
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then
+            tags="-t $REPO:master-$(date -u +%Y%m%d) -t $REPO:master"
+          elif [ "$GITHUB_REF" = refs/heads/master ]; then
+            tags="-t $REPO:$short -t $REPO:master"
+          else
+            tags="-t $REPO:$short"
+          fi
+          echo "TAGS=$tags" >> "$GITHUB_ENV"
+      - name: Build and push (linux/arm64, linux/amd64)
+        run: |
+          # shellcheck disable=SC2086
+          docker buildx build --push --platform linux/arm64,linux/amd64 \
+            --build-arg ROSTER_VERSION="$GITHUB_SHA" $TAGS .
+      - name: The broken image for the rollback drill (master)
+        if: github.ref == 'refs/heads/master'
+        run: |
+          docker buildx build --push --platform linux/arm64,linux/amd64 \
+            --build-arg ROSTER_VERSION="$GITHUB_SHA" --target drill-broken -t "$REPO:drill-broken" .
+      - name: Summary
+        run: |
+          {
+            echo "### Image"
+            echo
+            echo "Pushed: \`${TAGS//-t /}\`"
+            echo
+            echo "On the Pi: \`roster-deploy --staging ${GITHUB_SHA::7}\`, then \`roster-deploy ${GITHUB_SHA::7}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

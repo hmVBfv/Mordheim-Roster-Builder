@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Nightly backup (roster-backup.timer, 02:30; docs/operations.md section 6):
+# a snapshot of the running database, then restic over all snapshots
+# (including those taken before deploys) and the uploads, then restic's
+# retention. Pings healthchecks.io: start, success or fail.
+set -euo pipefail
+# shellcheck source=common.sh
+. "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
+
+fail() {
+  hc_ping BACKUP fail "$*"
+  die "$*"
+}
+
+require_marker
+hc_ping BACKUP start
+running roster-app || fail "roster-app is not running"
+snap=$(docker exec roster-app roster-cli backup --label nightly) || fail "roster-cli backup failed"
+log "snapshot $snap"
+restic_cmd backup --quiet --host roster --tag nightly "$ROSTER_DATA/data/snapshots" "$ROSTER_DATA/uploads" ||
+  fail "restic backup failed"
+restic_cmd forget --quiet --host roster --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune ||
+  fail "restic forget failed"
+log "backup done"
+hc_ping BACKUP "" "snapshot $snap"

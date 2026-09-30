@@ -154,7 +154,13 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `bugs` | `id`, `reporter_id`, `kind` (`bug` · `wish` · `rules`), `title`, `text`, `source_ref`, `severity` (`S1`–`S4`), `area`, `status` (`new` · `confirmed` · `in_progress` · `fixed` · `closed` · `duplicate`), `app_version`, `device`, `view`, `js_errors` (JSON), `warband_id`, `rev`, `consent_attach`, `fixed_in`, `created_at` | |
 | `bug_comments` | `id`, `bug_id`, `author_id`, `text`, `created_at` | Rückfragen |
 | `audit_log` | `seq`, `at`, `actor_id`, `action`, `target_type`, `target_id`, `campaign_id`, `visibility`, `payload` (JSON) | jede Schreibaktion; Quelle für `seq` |
-| `schema_migrations` | `version`, `applied_at` | |
+| `schema_migrations` | `version`, `name`, `applied_at` | legt der Migrationsrahmen selbst an (`server/src/migrations.ts`); eine Zeile je Datei `server/migrations/NNNN_name.sql` |
+| `meta` | `key`, `value` | seit Migration 1; was der Server über sich selbst weiß: `epoch` (wechselt bei jeder Wiederherstellung, siehe [architecture.md](architecture.md#6-synchronisation)), `created_at` (Anlage der Datenbank), `restored_from` (nur in Snapshot-Kopien: Label und Zeit; ein Server, der auf der Kopie startet, nimmt eine neue Epoche und löscht den Eintrag) |
+
+**Snapshots** (`data/snapshots/<zeit>-<label>.sqlite`, die letzten 5) sind
+vollständige Kopien der Datenbank (`VACUUM INTO`) mit `restored_from` in
+`meta`; Labels: `nightly`, `pre-deploy-<commit>`, `pre-migrate-v<alt>-v<neu>`,
+`manual`, ab Phase 4a nach jeder Schlacht.
 
 ## 4. Änderungsdatensätze
 

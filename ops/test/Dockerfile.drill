@@ -1,0 +1,5 @@
+# CI only: an image whose migrations change the schema and then fail
+# (ops/test/e2e.sh, the rollback with restore).
+ARG BASE
+FROM ${BASE}
+COPY drill-migrations/ /app/server/migrations/
