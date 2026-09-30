@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
 <script src="warband-art.js"></script>
+<script src="rules-data.js"></script>
 <style>
   .figures { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); margin: 0; }
   .figures div { display: grid; }
@@ -425,10 +426,10 @@
   $('tts-copy').onclick = function () { window.mockToast('Copied — paste it into the model\'s Description in TTS.'); };
 
   /* ---------- advance, and the lad's got talent ---------- */
-  var HERO_ADV = [[2, 5, 'New skill', 'Choose one from his skill lists:', ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient']],
+  var HERO_ADV = [[2, 5, 'New skill', 'Choose one from his skill lists:', 'skill'],
     [6, 6, '+1 S or +1 A', 'Roll a D6:', ['1–3 · +1 Strength', '4–6 · +1 Attack']], [7, 7, '+1 WS or +1 BS', 'Choose one:', ['+1 Weapon Skill', '+1 Ballistic Skill']],
     [8, 8, '+1 I or +1 Ld', 'Roll a D6:', ['1–3 · +1 Initiative', '4–6 · +1 Leadership']], [9, 9, '+1 W or +1 T', 'Roll a D6:', ['1–3 · +1 Wound', '4–6 · +1 Toughness']],
-    [10, 12, 'New skill', 'Choose one from his skill lists:', ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient']]];
+    [10, 12, 'New skill', 'Choose one from his skill lists:', 'skill']];
   var HENCH_ADV = [[2, 4, '+1 Initiative', '', null], [5, 5, '+1 Strength', '', null], [6, 7, '+1 BS or +1 WS', 'Choose one:', ['+1 Ballistic Skill', '+1 Weapon Skill']],
     [8, 8, '+1 Attack', '', null], [9, 9, '+1 Leadership', '', null], [10, 12, "The lad's got talent", '', null]];
   var advId = null, rollIn = $('adv-roll'), advOut = $('adv-result');
@@ -457,13 +458,32 @@
           '<span class="small">Who?</span><div class="pick" id="adv-who">' + alive(w).map(function (m, i) { return '<button type="button" data-value="' + w.men.indexOf(m) + '" aria-pressed="' + (i === 0) + '">' + esc(m.name) + '</button>'; }).join('') + '</div>' +
           '<span class="small">His two skill lists, from those of the warband’s Heroes</span><div class="pick" id="adv-lists">' + LISTS.map(function (l) { return '<button type="button" data-multi data-value="' + l + '" aria-pressed="false">' + l + '</button>'; }).join('') + '</div>';
       }
+    } else if (row[4] === 'skill') {
+      html += window.mockSkillPicker(skillLists(w), w.skills) + '<p class="skill-text" id="adv-skilltext"></p>';
     } else if (row[4]) {
       html += '<div class="pick">' + row[4].map(function (o, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + o + '</button>'; }).join('') + '</div>';
       html += '<p class="small muted">At his racial maximum? Take the other option — or roll again if the result raises only one.</p>';
     }
     advOut.innerHTML = html;
+    skillText();
   }
   rollIn.addEventListener('input', showAdv);
+  /* The skill lists of a warrior (Mercenaries, Reikland): the Captain has all
+     five, Champions Combat, Shooting and Strength, Youngbloods Combat,
+     Shooting and Speed, a promoted man the two he was given, the Ogre
+     Combat and Strength. */
+  var SKILL_LISTS = { 'Mercenary Captain': ['combat', 'shooting', 'academic', 'strength', 'speed'], Champion: ['combat', 'shooting', 'strength'], Youngblood: ['combat', 'shooting', 'speed'] };
+  function skillLists(w) {
+    if (w.lists) return w.lists.map(function (l) { return l.toLowerCase(); });
+    if (w.kind === 'hired') return ['combat', 'strength'];
+    return SKILL_LISTS[w.unit] || [];
+  }
+  // what the chosen skill does
+  function skillText() {
+    var t = $('adv-skilltext'), b = advOut.querySelector('.pick.skills [aria-pressed=true]');
+    if (t) t.textContent = b ? b.dataset.value + ': ' + window.mockSkillText(b.dataset.value) : '';
+  }
+  advOut.addEventListener('choose', skillText);
   $('form-advance').addEventListener('submit', function (e) {
     var w = advW();
     if (talent()) {
@@ -480,7 +500,8 @@
       return;
     }
     var pick = advOut.querySelector('[aria-pressed=true]'), what = pick ? pick.textContent : advOut.querySelector('h3').textContent.split(' · ')[1];
-    commit(w.name + ': ' + what + '.', function () { byId(w.id).taken += 1; });
+    var skill = advOut.querySelector('.pick.skills [aria-pressed=true]');
+    commit(w.name + ': ' + what + '.', function () { var x = byId(w.id); x.taken += 1; if (skill) x.skills = (x.skills || []).concat(skill.dataset.value); });
   });
 
   /* ---------- injuries ---------- */
