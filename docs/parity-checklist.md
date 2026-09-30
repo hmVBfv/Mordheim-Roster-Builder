@@ -50,7 +50,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Gründungspreise und Trading Post (C2, C3, C7) | ✓ | ✓ | – | trading-post | 3 | |
 | Seltenes: Katalog, bezahlter Preis, Material-Upgrades (Gromril, Ithilmar …) | ✓ | ✓ | ◐ | trading-post | 3 | App zeigt sie an |
 | Suchwurf je Held mit Modifikatoren, Chance | – | – | – | trading-post | 3 | neu (V5/V6) |
-| Verkaufen zum halben Preis | – | – | – | trading-post | 3 | neu (V6); Rundung offen |
+| Verkaufen zum halben Preis | – | – | – | trading-post | 3 | neu (V6); abrunden, mindestens 1 gc |
 | Umverteilen zwischen Kriegern und Lager | – | – | – | trading-post | 3 | neu (V4) |
 | Lager (Truhe): Gegenstände, Wyrdstone, Gold | ✓ | ✓ | – | roster, trading-post | 3 | |
 | Kassenbuch mit Anlass je Buchung | – | – | – | trading-post | 3 | neu (V7, `FORMAT` 3) |

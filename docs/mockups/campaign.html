@@ -9,12 +9,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
+<script src="warband-art.js"></script>
 <style>
   .now { display: grid; gap: var(--s2); padding: var(--s3) var(--s4); border: 1px solid var(--accent); border-radius: var(--radius); background: var(--surface); }
   .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
   .rows a, .rows button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); align-items: center; min-height: 52px; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; text-align: left; cursor: pointer; }
   .rows small { grid-column: 1; color: var(--text-muted); }
   .rows .chip { grid-row: 1 / span 2; grid-column: 2; }
+  .rows.wbs a, .rows.wbs button { grid-template-columns: 40px 1fr auto; }
+  .rows.wbs .art { grid-row: 1 / span 2; }
+  .rows.wbs small { grid-column: 2; }
+  .rows.wbs .chip { grid-column: 3; }
   .facts { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--s3); margin: 0; font-size: 0.93rem; }
   .facts dt { color: var(--text-muted); }
   .facts dd { margin: 0; }
@@ -40,10 +45,10 @@
 
     <section class="stack" aria-labelledby="wb-h">
       <h2 id="wb-h">Warbands</h2>
-      <ul class="rows">
-        <li><a href="roster.html"><span><b>The Silver Caravan</b></span><small>Rob · Mercenaries · Rating 118</small><span class="chip good">✓ After battle 5</span></a></li>
-        <li><button type="button" data-wb="penitents"><span><b>The Grey Penitents</b></span><small>Anna · Sisters of Sigmar · Rating 131</small><span class="chip warn">✎ 2 missing</span></button></li>
-        <li><button type="button" data-wb="skrittle"><span><b>Clan Skrittle</b></span><small>Ben · Skaven – Clan Eshin · Rating 124</small><span class="chip good">✓ After battle 5</span></button></li>
+      <ul class="rows wbs">
+        <li><a href="roster.html"><svg class="art small" data-art="caravan" aria-hidden="true" focusable="false"></svg><span><b>The Silver Caravan</b></span><small>Rob · Mercenaries · Rating 118</small><span class="chip good">✓ After battle 5</span></a></li>
+        <li><button type="button" data-wb="penitents"><svg class="art small" data-art="penitents" aria-hidden="true" focusable="false"></svg><span><b>The Grey Penitents</b></span><small>Anna · Sisters of Sigmar · Rating 131</small><span class="chip warn">✎ 2 missing</span></button></li>
+        <li><button type="button" data-wb="skrittle"><svg class="art small" data-art="skrittle" aria-hidden="true" focusable="false"></svg><span><b>Clan Skrittle</b></span><small>Ben · Skaven – Clan Eshin · Rating 124</small><span class="chip good">✓ After battle 5</span></button></li>
       </ul>
     </section>
 
@@ -73,7 +78,7 @@
 <dialog class="sheet" id="sheet-wb" aria-labelledby="wb-title">
   <div class="sheet-grip"></div>
   <form method="dialog">
-    <h2 id="wb-title">The Grey Penitents</h2>
+    <div class="with-art"><svg class="art big" id="wb-art" data-art="penitents" aria-hidden="true" focusable="false"></svg><h2 id="wb-title">The Grey Penitents</h2></div>
     <dl class="facts" id="wb-facts"></dl>
     <div class="row"><a class="btn-quiet" href="warbands.html">Their roster</a><button type="button" class="btn-quiet" data-close>Close</button></div>
   </form>
@@ -110,6 +115,7 @@
     if (w) {
       var y = WB[w.dataset.wb];
       document.getElementById('wb-title').textContent = y[0];
+      var art = document.getElementById('wb-art'); art.dataset.art = w.dataset.wb; window.mockArt(art);
       document.getElementById('wb-facts').innerHTML = facts(y[1]);
       window.mockOpen('sheet-wb');
     }

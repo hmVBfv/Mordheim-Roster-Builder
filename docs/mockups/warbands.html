@@ -9,10 +9,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
+<script src="warband-art.js"></script>
 <style>
   .tile { display: grid; gap: 2px; padding: var(--s3) var(--s4); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; text-align: left; cursor: pointer; width: 100%; }
   .tile h3 { font-size: 1.08rem; }
   .tile .muted { font-size: 0.9rem; }
+  .tile:has(.art) { grid-template-columns: 48px 1fr; column-gap: var(--s3); align-items: center; }
+  .tile .art { grid-row: 1 / span 3; }
   .list { display: grid; gap: var(--s2); }
   .roster-lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 0.93rem; }
   .roster-lines li { display: flex; justify-content: space-between; gap: var(--s2); border-bottom: 1px solid var(--border); padding: 2px 0; }
@@ -32,7 +35,7 @@
     <section class="stack" aria-labelledby="mine-h">
       <h2 id="mine-h">Yours</h2>
       <div class="list" id="mine">
-        <a class="tile" href="roster.html"><h3>The Silver Caravan</h3><span class="muted">Mercenaries – Reikland · Hel Fenn campaign · Rating 118 · 55 gc</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></a>
+        <a class="tile" href="roster.html"><svg class="art" data-art="caravan" aria-hidden="true" focusable="false"></svg><h3>The Silver Caravan</h3><span class="muted">Mercenaries – Reikland · Hel Fenn campaign · Rating 118 · 55 gc</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></a>
       </div>
       <button type="button" class="btn-quiet" data-open="sheet-import">Import a warband</button>
     </section>
@@ -41,8 +44,8 @@
       <h2 id="others-h">In your campaigns</h2>
       <p class="small muted">Rosters are open to everyone in the campaign; only stories can be hidden.</p>
       <div class="list">
-        <button type="button" class="tile" data-wb="penitents"><h3>The Grey Penitents</h3><span class="muted">Sisters of Sigmar · Anna · Rating 131</span><span class="chip warn" style="justify-self: start">✎ 2 explanations missing</span></button>
-        <button type="button" class="tile" data-wb="skrittle"><h3>Clan Skrittle</h3><span class="muted">Skaven – Clan Eshin · Ben · Rating 124</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></button>
+        <button type="button" class="tile" data-wb="penitents"><svg class="art" data-art="penitents" aria-hidden="true" focusable="false"></svg><h3>The Grey Penitents</h3><span class="muted">Sisters of Sigmar · Anna · Rating 131</span><span class="chip warn" style="justify-self: start">✎ 2 explanations missing</span></button>
+        <button type="button" class="tile" data-wb="skrittle"><svg class="art" data-art="skrittle" aria-hidden="true" focusable="false"></svg><h3>Clan Skrittle</h3><span class="muted">Skaven – Clan Eshin · Ben · Rating 124</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></button>
       </div>
     </section>
   </div>
@@ -52,8 +55,8 @@
 <dialog class="sheet" id="sheet-wb" aria-labelledby="wb-title">
   <div class="sheet-grip"></div>
   <form method="dialog">
-    <h2 id="wb-title">The Grey Penitents</h2>
-    <p class="small muted" id="wb-line"></p>
+    <div class="with-art"><svg class="art big" id="wb-art" data-art="penitents" aria-hidden="true" focusable="false"></svg><div><h2 id="wb-title">The Grey Penitents</h2>
+    <p class="small muted" id="wb-line"></p></div></div>
     <ul class="roster-lines" id="wb-lines"></ul>
     <p class="small muted">Read only: only Anna changes her warband. Her notes and story follow her visibility choices.</p>
     <div class="row"><a class="btn-quiet" href="timeline.html">Their story in the timeline</a><button type="button" class="btn-quiet" data-close>Close</button></div>
@@ -86,6 +89,7 @@ Ulrich the Grey, Mercenary Captain …</textarea></label>
     var w = WB[b.dataset.wb];
     document.getElementById('wb-title').textContent = w.name;
     document.getElementById('wb-line').textContent = w.line;
+    var art = document.getElementById('wb-art'); art.dataset.art = b.dataset.wb; window.mockArt(art);
     document.getElementById('wb-lines').innerHTML = w.rows.map(function (r) { return '<li><span>' + esc(r[0]) + '</span><span>' + esc(r[1]) + '</span></li>'; }).join('');
     window.mockOpen('sheet-wb');
   });

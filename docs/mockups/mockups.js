@@ -128,8 +128,9 @@
     campaign: [['Overview', 'campaign.html'], ['Notes', 'visibility.html'], ['Timeline', 'timeline.html'], ['World', 'world.html'], ['Background ⚑', 'background.html'], ['Manage ⚑', 'manage.html']]
   };
   document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('nav.nav[data-current]').forEach(function (nav) {
-      nav.setAttribute('aria-label', 'Main');
+    // the bar at the bottom, and the same places in the desktop's sidebar
+    document.querySelectorAll('nav.nav[data-current], nav.side-nav[data-current]').forEach(function (nav) {
+      if (!nav.hasAttribute('aria-label')) nav.setAttribute('aria-label', 'Main');
       nav.innerHTML = Object.keys(ICONS).map(function (k) {
         return '<a href="' + PLACES[k] + '"' + (nav.dataset.current === k ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[k] + '</svg>' + k + '</a>';
       }).join('');
