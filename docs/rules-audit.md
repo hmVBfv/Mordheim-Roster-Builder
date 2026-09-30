@@ -312,3 +312,17 @@ jeder Katalogeintrag hat einen Text, ähnliche Namen bekommen ihren eigenen
 (Banner und Clan-Pestilens-Banner, Familiar und Schriftrolle, Obsidian- und
 Zharr-Obsidianwaffe, kleine und große Leiter), die Brazier Iron ist
 zweihändig.
+
+**Dazu: neun Waffen mit dem Text einer anderen.** Die Suche nimmt den
+ersten passenden Eintrag, und ein allgemeines Muster stand vor dem
+besonderen: Der Schwertbrecher zeigte den Text des Schwerts (ohne seine
+Klingenfalle), die Zwergenaxt den der Axt (ohne Parieren), der Seuchendolch
+den des Dolchs, der Sigmaritische Kriegshammer, der Reiterhammer und sogar
+der Hexenhammer – ein Buch – den von Keule/Hammer, die Harpunenarmbrust den
+der Armbrust, die doppelläufigen Waffen der Ostländer die der einfachen.
+Die besonderen Einträge stehen jetzt vorn; wo sie fehlten, sind sie neu.
+Ein Skript hat für jeden Namen aus Katalog und Listen verglichen: Genau
+diese 18 Namen (deutsch und englisch) haben einen anderen Text bekommen,
+sonst keiner. Nebenwirkung: Der Reiterhammer ist zweihändig, wie seine
+Regel sagt, und zählt so auch beim Wert. Test: „a special weapon is not
+mistaken for the plain one“.

@@ -2944,6 +2944,105 @@
  "ITEMINFO": [
   [
    {
+    "__re": "schwertbrecher|sword ?breaker",
+    "__f": "i"
+   },
+   {
+    "name": "Sword breaker",
+    "line": "Close combat · 30 gc · Rare 8",
+    "text": "Parry: when hit, roll a D6; if it beats the opponent's highest to-hit roll, the blow is parried (attacks of twice the user's Strength or more cannot be). Trap blade: after each successful parry roll a D6 — on 4+ the attacker's weapon breaks and is useless for the rest of the battle; he fights on with another weapon or his fists."
+   }
+  ],
+  [
+   {
+    "__re": "disease dagger|seuchendolch",
+    "__f": "i"
+   },
+   {
+    "name": "Disease dagger",
+    "line": "Close combat · 15 gc · Rare 8 · Skaven of Clan Pestilens only",
+    "text": "A dagger (the enemy gets +1 to his armour save, 6+ if he has none). Infecting: on a to-hit roll of 6 the target rolls a D6 — if higher than his Toughness he takes an extra automatic wound. Undead and Possessed are immune. Two of them give the usual extra attack, nothing more."
+   }
+  ],
+  [
+   {
+    "__re": "zwergenaxt|dwarf axe",
+    "__f": "i"
+   },
+   {
+    "name": "Dwarf axe",
+    "line": "Close combat · 15 gc · Rare 8 · Dwarfs only",
+    "text": "Cutting edge: an extra −1 to the enemy's armour save. Parry like a sword (one parry per close-combat phase; with a second Dwarf axe or a sword, re-roll a failed parry instead)."
+   }
+  ],
+  [
+   {
+    "__re": "hexenhammer|hammer of witches",
+    "__f": "i"
+   },
+   {
+    "name": "Hammer of witches",
+    "line": "Miscellaneous · 100 gc · Rare 10 · Witch Hunters only",
+    "text": "A book, not a weapon: a Hero who has it hates all Possessed, Skaven, Beastmen, followers of Chaos, Daemons, Dark Elves, Orcs & Goblins and Sisters of Sigmar."
+   }
+  ],
+  [
+   {
+    "__re": "reiterhammer|horseman'?s hammer",
+    "__f": "i"
+   },
+   {
+    "name": "Horseman's hammer",
+    "line": "Close combat · 12 gc · Rare 10",
+    "text": "Strength +1. Two-handed: no shield, buckler or second weapon in close combat (a shield still counts against shooting). Cavalry charge: mounted, he gets a further +1 Strength in the turn he charges."
+   }
+  ],
+  [
+   {
+    "__re": "sigmarite warhammer|sigmaritenhammer|sigmaritischer kriegshammer",
+    "__f": "i"
+   },
+   {
+    "name": "Sigmarite warhammer",
+    "line": "Close combat · Strength: +1",
+    "text": "Concussion: injury roll 2–4 = stunned. Holy: +1 on wound rolls against Possessed/Undead. Sisters of Sigmar only."
+   }
+  ],
+  [
+   {
+    "__re": "harpunenarmbrust|harpoon crossbow",
+    "__f": "i"
+   },
+   {
+    "name": "Harpoon Crossbow",
+    "line": "Missile · 30\" · Strength 5 · Rare 10",
+    "text": "Move or fire: may not move and shoot in the same turn. Prepare shot: needs a full turn to prepare before it can fire."
+   }
+  ],
+  [
+   {
+    "__re": "dl-jagdbüchse|double-barrell?ed hunting rifle",
+    "__f": "i"
+   },
+   {
+    "name": "Ostlander double-barrelled hunting rifle",
+    "line": "Black powder · 48\" · Strength 4 · 300 gc · Rare 12 · Ostlanders only",
+    "text": "A Hochland long rifle with two barrels: each hit is two Strength 4 hits. Each barrel takes a full turn to reload; with one barrel loaded it fires like a single rifle. Otherwise as the long rifle: move or fire, pick any target in sight, −2 to the enemy's armour save."
+   }
+  ],
+  [
+   {
+    "__re": "ostländer dl-pistole|ostlander double-barrell?ed pistol",
+    "__f": "i"
+   },
+   {
+    "name": "Ostlander double-barrelled pistol",
+    "line": "Black powder · 6\" · Strength 4 · 30 gc (60 gc a brace) · Rare 10 · Ostlanders only",
+    "text": "A pistol with two barrels: each hit is two Strength 4 hits. Each barrel takes a full turn to reload; with one barrel loaded it fires like a single pistol. A brace fires every other round, not every round. Otherwise as a pistol (−2 to the armour save, usable in close combat)."
+   }
+  ],
+  [
+   {
     "__re": "kompass|\\bcompass\\b",
     "__f": "i"
    },
@@ -3633,17 +3732,6 @@
     "name": "Iron Fist",
     "line": "Close combat · Str. as user · Common",
     "text": "Parry: may parry like a buckler. Gloved: nothing else may be held in that hand (no double-handed weapon); two iron fists mean no other close-combat weapons. Dual-role: works as buckler and blade together — re-roll failed parries if paired with a sword or a second iron fist."
-   }
-  ],
-  [
-   {
-    "__re": "harpunenarmbrust|harpoon crossbow",
-    "__f": "i"
-   },
-   {
-    "name": "Harpoon Crossbow",
-    "line": "Missile · 30\" · Strength 5 · Rare 10",
-    "text": "Move or fire: may not move and shoot in the same turn. Prepare shot: needs a full turn to prepare before it can fire."
    }
   ],
   [
@@ -4799,17 +4887,6 @@
     "name": "Steel whip",
     "line": "Close combat · Strength: as user",
     "text": "Cannot be parried: no parries (sword/buckler) are possible against the steel whip. Whipcrack: +1 attack when charging or against a charger (then \"strike first\"). Sisters of Sigmar only."
-   }
-  ],
-  [
-   {
-    "__re": "sigmarite warhammer|sigmaritenhammer",
-    "__f": "i"
-   },
-   {
-    "name": "Sigmarite warhammer",
-    "line": "Close combat · Strength: +1",
-    "text": "Concussion: injury roll 2–4 = stunned. Holy: +1 on wound rolls against Possessed/Undead. Sisters of Sigmar only."
    }
   ],
   [
