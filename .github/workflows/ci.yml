@@ -103,6 +103,8 @@ jobs:
 
   image:
     runs-on: ubuntu-24.04
+    # a hung package install once kept this job waiting for over an hour
+    timeout-minutes: 30
     env:
       IMAGE: localtest/mordheim-roster
     steps:
@@ -128,7 +130,10 @@ jobs:
           mkdir -p "$RUNNER_TEMP/data" && touch "$RUNNER_TEMP/data/app.env" "$RUNNER_TEMP/data/staging.env"
           ROSTER_TAG=test docker compose -f "$RUNNER_TEMP/rendered/compose.yaml" config -q
       - name: Tools for the ops test
-        run: sudo apt-get update -q && sudo apt-get install -y -q restic fail2ban
+        timeout-minutes: 8
+        run: |
+          sudo apt-get -o DPkg::Lock::Timeout=120 update -q
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y -q --no-install-recommends restic fail2ban
       - name: ops end to end (install.sh, deploy, rollbacks, backup, restore test, restore, SSD drill, Fail2Ban)
         run: sudo GITHUB_ACTIONS="$GITHUB_ACTIONS" IMAGE="$IMAGE" ops/test/e2e.sh "$TAG" drill-broken drill-migration
 
@@ -136,6 +141,7 @@ jobs:
     if: github.event_name == 'push' || github.event_name == 'schedule'
     needs: [legacy, core, app, server, image]
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write
