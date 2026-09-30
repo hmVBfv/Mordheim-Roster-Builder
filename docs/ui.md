@@ -75,6 +75,15 @@ Report a problem   überall erreichbar
   nur auf dem Gerät. Unter 1024 px stapeln sich die Panels, und die Leiste
   unten kehrt zurück – am Handy bleibt es bei einem Bildschirm zur Zeit.
   Sheets erscheinen am Desktop in der Mitte statt am unteren Rand.
+  Jedes Ziel der Leiste ist am Desktop eine eigene Arbeitsfläche mit ihren
+  Panels und Views (30.09.2026): Home (Stadt, Offen für dich, Warbands,
+  Kampagnen, Fragen), Warbands (die eigene, die der Mitspieler nur lesend),
+  die Warband (Roster, Krieger, Trading Post, Gold, Lager, Schritte nach der
+  Schlacht, Story, Was sich geändert hat), Campaign (Jetzt, Warbands,
+  Schlachten, Bezirke, Timeline, Notizen, Leitung ⚑), Notes (schreiben mit
+  Sichtbarkeit, Notizen, Timeline), More (Konto, Geräte, Problem melden).
+  Jede Fläche behält ihre Anordnung, wenn man zwischen ihnen wechselt; die
+  Reiter des Handys werden zu Panels und Views.
 - **Quick Build (Pages):** nur Home (lokale Warbands), Warband (Roster),
   Import/Export und „Send to campaign server“.
 
@@ -120,17 +129,17 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | `changes.html` | je Krieger vorher → nachher mit gefundenem Anlass, ⚠ ohne Anlass, Erklärungsfelder mit Zähler, Markieren „After battle N“ |
 | `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
 | `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt |
-| `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1); Henchmen-Gruppen mit „+ Man“ (Kosten aus Einheit, gleicher Ausrüstung und 2 gc je Erfahrungspunkt, Veteranenwurf, Grenzen: 5 je Gruppe, Einheit, 15 Modelle), Namen der einzelnen Männer, „The lad's got talent“ (Mann wird Held mit zwei Skill-Listen und sofortigem Aufstieg), Tod eines Mannes (W6), Anwerben neuer Gruppen und Helden |
-| `home.html` | „Offen für dich“, eigene Warbands, Kampagnen; Mordheim bei Nacht als Pixelbild (Komet über der Stadt, flackernde Fenster, Wyrdstein, der in den Trümmern aufleuchtet); bei jedem dritten Aufruf schlägt der Zweischweifige Komet ein (Blitz, Feuerball, Rauch, danach glüht der Krater), `?impact=1` bzw. `0` erzwingt es; still und ohne Blitz bei „weniger Bewegung“; eine Frage einer Mitspielerin beantworten |
-| Porträts der Warbands | `warband-art.js`: je Warband ein Pixelbild nach ihrer Beschreibung – Reikland-Söldner mit Federhut, Harnisch und Luntenbüchse (Silver Caravan), Schwester des Sigmar mit Kapuze, Kriegshammer und Kometenzeichen (Grey Penitents), Eshin-Assassine mit Maske, Augen im Dunkeln und tropfender Klinge (Clan Skrittle); auf Home, Warbands, Campaign, Roster und am Desktop |
+| `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1); Henchmen-Gruppen mit „+ Man“ (Kosten aus Einheit, gleicher Ausrüstung und 2 gc je Erfahrungspunkt, Veteranenwurf, Grenzen: 5 je Gruppe, Einheit, 15 Modelle), Namen der einzelnen Männer, „The lad's got talent“ (Mann wird Held mit zwei Skill-Listen und sofortigem Aufstieg), Tod eines Mannes (W6), Anwerben neuer Gruppen und Helden; beim Aufstieg alle Fertigkeiten der Listen des Kriegers (Captain alle fünf, Champion Combat/Shooting/Strength, Youngblood Combat/Shooting/Speed, Beförderter seine zwei, Ogre Combat/Strength) mit ihrem Regeltext aus `data/skills.json` (`rules-data.js`) |
+| `home.html` | „Offen für dich“, eigene Warbands, Kampagnen; Mordheim bei Nacht als Pixelbild (Komet über der Stadt, flackernde Fenster, Wyrdstein, der in den Trümmern aufleuchtet); bei jedem dritten Aufruf schlägt der Zweischweifige Komet ein (Blitz, Feuerball, Rauch, danach glüht der Krater), `?impact=1` bzw. `0` erzwingt es; still und ohne Blitz bei „weniger Bewegung“ (`city-art.js`, auch am Desktop); eine Frage einer Mitspielerin beantworten |
+| Wappen der Warbands | `warband-art.js`: je Warband ein eigenes Wappen aus schlichten heraldischen Elementen, passend zu Volk und Fraktion (Rob, 30.09.2026: lieber Wappen als Figuren) – silberner Schild mit blauem Bord und schwarzem Adler (Silver Caravan, Söldner des Imperiums), grauer Schild mit rotem Haupt, Zweischweifigem Kometen und goldenem Kriegshammer (Grey Penitents, Schwestern des Sigmar), schwarzer Lumpen an einer Stange mit Rattenschädel über gekreuzten Klingen (Clan Skrittle, Eshin); keine Symbole aus Games-Workshop-Material; auf Home, Warbands, Campaign, Roster und am Desktop |
 | `warbands.html` | eigene Warbands, Import, die Warbands der Mitspieler nur lesend |
 | `campaign.html` | Übersicht: laufende Schlacht mit Weg in den Spielabend, Warbands mit Stand, Schlachten 1–5, Bezirke |
 | `world.html` | Bezirke (Wirkungen aus `data/campaign.json`, wer sie hält, Korrektur durch Leiter), Fraktionen mit Ruf, Personen, Orte |
 | `manage.html` | nur Leiter: Rollen, Einladung, Hausregeln als Schalter, Schlacht schließen (unumkehrbar, daher mit Bestätigung) |
 | `story.html` | Reiter „Story“ der Warband: Kapitel, Zwischenspiel schreiben (mit Sichtbarkeit), Lebenslauf jedes Kriegers (auch aus ⋯ → „His story so far“) |
 | `more.html` | Geräte, Authenticator, Passwort, Theme, „Report a problem“ mit Status, Admin (Nutzer, Einladungen, Bugs, Backups) |
-| `desktop.html` | die Arbeitsfläche aus Panels (Vorschlag, siehe §2): Views, Ziehen an der Titelleiste, Menü ⋯, Dock, verknüpfte Auswahl; Aufstieg als Sheet in der Mitte; bei 1440 px drei Spalten, unter 1024 px gestapelt |
-| `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, abgerundet, mindestens 1 gc; Wyrdstein nach der Tabelle für die Warband-Größe), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); alle 70 seltenen Gegenstände, die eine Reikland-Warband suchen darf (106 weitere gehören anderen Warbands), mit Filter und „wer darf es benutzen“; `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter |
+| `desktop.html` | die Arbeitsfläche aus Panels (Vorschlag, siehe §2), für jedes Ziel der Leiste eine eigene (`#home`, `#warbands`, `#campaign`, `#notes`, `#more`; ohne Anker die Warband): Views, Ziehen an der Titelleiste, Menü ⋯, Dock, verknüpfte Auswahl; Aufstieg als Sheet in der Mitte mit allen Fertigkeiten seiner Listen und ihrem Text; beim Trading Post zeigt ein Tipp auf den Namen, was der Gegenstand tut; bei 1440 px drei Spalten, unter 1024 px gestapelt |
+| `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, abgerundet, mindestens 1 gc; Wyrdstein nach der Tabelle für die Warband-Größe), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); alle 70 seltenen Gegenstände, die eine Reikland-Warband suchen darf (106 weitere gehören anderen Warbands), mit Filter und „wer darf es benutzen“; `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter; jeder Gegenstand mit Regeltext, auch beim Suchen für den gewählten Gegenstand (Rob, 30.09.2026) |
 
 ## 4. Themes und Gestaltung
 
