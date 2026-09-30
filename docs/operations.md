@@ -127,15 +127,20 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
     Der Pi kommt nicht an den Desktop: ein kompromittierter Pi kann die
     Kopie nicht löschen. Prüfen: `restic -r ~/backup/roster-restic snapshots`
     mit dem Passwort aus der Offline-Ablage.
-14. **SD-Klon:** zweite SD-Karte als Klon des Systems mit `rpi-clone`
-    (die gepflegte Fassung github.com/geerlingguy/rpi-clone, erst ansehen,
-    dann nach `/usr/local/sbin/`). Ziel vorher mit
-    `lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS` bestimmen – die SSD ist meist
-    `sda`, der Kartenleser `sdb`; das falsche Ziel wird überschrieben.
-    `sudo rpi-clone sdb`; die SSD wird nicht mitkopiert. Einmal von der
-    Kopie booten und `docker ps`, `roster-deploy --status` prüfen.
-    Beschriften, zu Hause aufbewahren (auf ihr liegen `site.env`,
-    `app.env` und die SSH-Schlüssel, nicht das restic-Passwort).
+14. **SD-Klon:** auf dem Desktop, bei ausgeschaltetem Pi (etwa 20 Minuten
+    Pause für alle Dienste). `rpi-clone` läuft unter Trixie nicht
+    verlässlich, darum `dd`: Karte in den Leser am Desktop, Gerät mit
+    `lsblk -o NAME,SIZE,MODEL,TRAN,MOUNTPOINTS` bestimmen (Größe der Karte,
+    `TRAN` = `usb`; das falsche Gerät wird überschrieben), eingehängte
+    Partitionen aushängen, dann
+    `sudo dd if=/dev/sdX bs=4M status=progress | zstd -T0 > ~/backup/piServer-<Datum>.img.zst`
+    und auf die Reservekarte (mindestens so groß wie die Originalkarte)
+    `zstdcat … | sudo dd of=/dev/sdY bs=4M status=progress conv=fsync`.
+    Die Reservekarte in den Pi, booten, `docker ps`, `roster-deploy --status`
+    prüfen; die alte Karte wird die Reserve. Nie beide Karten zugleich im
+    Pi (gleiche Partitions-IDs). Beschriften, zu Hause aufbewahren (auf
+    Karte und Abbild liegen `site.env`, `app.env` und die SSH-Schlüssel,
+    nicht das restic-Passwort).
 
 Der Chronik-Eingang (`eingang/chronik/`) wird erst in Phase 4b gebraucht.
 
@@ -441,7 +446,7 @@ Keine Agenten-Läufe während eines Spielabends.
 | --- | --- |
 | monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:master-<datum>`; Testinstanz, dann produktiv deployen |
 | monatlich | Blick auf healthchecks.io und `docker image prune -f`; alte `roster.sqlite.failed-*` und `…before-restore-*` in `data/` löschen, wenn nicht mehr gebraucht |
-| vierteljährlich | SD-Klon auffrischen |
+| vierteljährlich | SD-Klon auffrischen (wie Schritt 14; alte Abbilder bis auf das letzte löschen) |
 | jährlich | restic-Passwort aus der Offline-Ablage testweise verwenden |
 
 ## Ausfall-Handbuch
