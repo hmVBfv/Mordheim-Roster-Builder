@@ -2944,6 +2944,105 @@
  "ITEMINFO": [
   [
    {
+    "__re": "schwertbrecher|sword ?breaker",
+    "__f": "i"
+   },
+   {
+    "name": "Sword breaker",
+    "line": "Close combat · 30 gc · Rare 8",
+    "text": "Parry: when hit, roll a D6; if it beats the opponent's highest to-hit roll, the blow is parried (attacks of twice the user's Strength or more cannot be). Trap blade: after each successful parry roll a D6 — on 4+ the attacker's weapon breaks and is useless for the rest of the battle; he fights on with another weapon or his fists."
+   }
+  ],
+  [
+   {
+    "__re": "disease dagger|seuchendolch",
+    "__f": "i"
+   },
+   {
+    "name": "Disease dagger",
+    "line": "Close combat · 15 gc · Rare 8 · Skaven of Clan Pestilens only",
+    "text": "A dagger (the enemy gets +1 to his armour save, 6+ if he has none). Infecting: on a to-hit roll of 6 the target rolls a D6 — if higher than his Toughness he takes an extra automatic wound. Undead and Possessed are immune. Two of them give the usual extra attack, nothing more."
+   }
+  ],
+  [
+   {
+    "__re": "zwergenaxt|dwarf axe",
+    "__f": "i"
+   },
+   {
+    "name": "Dwarf axe",
+    "line": "Close combat · 15 gc · Rare 8 · Dwarfs only",
+    "text": "Cutting edge: an extra −1 to the enemy's armour save. Parry like a sword (one parry per close-combat phase; with a second Dwarf axe or a sword, re-roll a failed parry instead)."
+   }
+  ],
+  [
+   {
+    "__re": "hexenhammer|hammer of witches",
+    "__f": "i"
+   },
+   {
+    "name": "Hammer of witches",
+    "line": "Miscellaneous · 100 gc · Rare 10 · Witch Hunters only",
+    "text": "A book, not a weapon: a Hero who has it hates all Possessed, Skaven, Beastmen, followers of Chaos, Daemons, Dark Elves, Orcs & Goblins and Sisters of Sigmar."
+   }
+  ],
+  [
+   {
+    "__re": "reiterhammer|horseman'?s hammer",
+    "__f": "i"
+   },
+   {
+    "name": "Horseman's hammer",
+    "line": "Close combat · 12 gc · Rare 10",
+    "text": "Strength +1. Two-handed: no shield, buckler or second weapon in close combat (a shield still counts against shooting). Cavalry charge: mounted, he gets a further +1 Strength in the turn he charges."
+   }
+  ],
+  [
+   {
+    "__re": "sigmarite warhammer|sigmaritenhammer|sigmaritischer kriegshammer",
+    "__f": "i"
+   },
+   {
+    "name": "Sigmarite warhammer",
+    "line": "Close combat · Strength: +1",
+    "text": "Concussion: injury roll 2–4 = stunned. Holy: +1 on wound rolls against Possessed/Undead. Sisters of Sigmar only."
+   }
+  ],
+  [
+   {
+    "__re": "harpunenarmbrust|harpoon crossbow",
+    "__f": "i"
+   },
+   {
+    "name": "Harpoon Crossbow",
+    "line": "Missile · 30\" · Strength 5 · Rare 10",
+    "text": "Move or fire: may not move and shoot in the same turn. Prepare shot: needs a full turn to prepare before it can fire."
+   }
+  ],
+  [
+   {
+    "__re": "dl-jagdbüchse|double-barrell?ed hunting rifle",
+    "__f": "i"
+   },
+   {
+    "name": "Ostlander double-barrelled hunting rifle",
+    "line": "Black powder · 48\" · Strength 4 · 300 gc · Rare 12 · Ostlanders only",
+    "text": "A Hochland long rifle with two barrels: each hit is two Strength 4 hits. Each barrel takes a full turn to reload; with one barrel loaded it fires like a single rifle. Otherwise as the long rifle: move or fire, pick any target in sight, −2 to the enemy's armour save."
+   }
+  ],
+  [
+   {
+    "__re": "ostländer dl-pistole|ostlander double-barrell?ed pistol",
+    "__f": "i"
+   },
+   {
+    "name": "Ostlander double-barrelled pistol",
+    "line": "Black powder · 6\" · Strength 4 · 30 gc (60 gc a brace) · Rare 10 · Ostlanders only",
+    "text": "A pistol with two barrels: each hit is two Strength 4 hits. Each barrel takes a full turn to reload; with one barrel loaded it fires like a single pistol. A brace fires every other round, not every round. Otherwise as a pistol (−2 to the armour save, usable in close combat)."
+   }
+  ],
+  [
+   {
     "__re": "kompass|\\bcompass\\b",
     "__f": "i"
    },
@@ -3633,17 +3732,6 @@
     "name": "Iron Fist",
     "line": "Close combat · Str. as user · Common",
     "text": "Parry: may parry like a buckler. Gloved: nothing else may be held in that hand (no double-handed weapon); two iron fists mean no other close-combat weapons. Dual-role: works as buckler and blade together — re-roll failed parries if paired with a sword or a second iron fist."
-   }
-  ],
-  [
-   {
-    "__re": "harpunenarmbrust|harpoon crossbow",
-    "__f": "i"
-   },
-   {
-    "name": "Harpoon Crossbow",
-    "line": "Missile · 30\" · Strength 5 · Rare 10",
-    "text": "Move or fire: may not move and shoot in the same turn. Prepare shot: needs a full turn to prepare before it can fire."
    }
   ],
   [
@@ -4803,17 +4891,6 @@
   ],
   [
    {
-    "__re": "sigmarite warhammer|sigmaritenhammer",
-    "__f": "i"
-   },
-   {
-    "name": "Sigmarite warhammer",
-    "line": "Close combat · Strength: +1",
-    "text": "Concussion: injury roll 2–4 = stunned. Holy: +1 on wound rolls against Possessed/Undead. Sisters of Sigmar only."
-   }
-  ],
-  [
-   {
     "__re": "geweihtes wasser|blessed water",
     "__f": "i"
    },
@@ -5107,6 +5184,644 @@
     "name": "Trip wire",
     "line": "Special equipment (trap)",
     "text": "A hero sets a trap (spending a whole turn). A model within 2\" of the marker: D6, on a 3+ it triggers → S4 hit. On no wound/no trigger it may move on, otherwise it is knocked down/stunned 2\" from the marker. (Master Trapper: 4\", triggers on 2+.)"
+   }
+  ],
+  [
+   {
+    "__re": "schlagring|brass knuckles",
+    "__f": "i"
+   },
+   {
+    "name": "Brass knuckles",
+    "line": "Close combat · 20 gc a pair · Rare 6",
+    "text": "Used as a pair: Strength +1 and one extra attack, but nothing else may be held in the hands while fighting with them (they may be swapped for other weapons outside combat). Cumbersome: −2 Initiative in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "brazier",
+    "__f": "i"
+   },
+   {
+    "name": "Brazier iron",
+    "line": "Close combat · 35 gc · Rare 7 · Witch Hunters only",
+    "text": "Strength +1. Two-handed: no shield, buckler or second weapon in close combat (a shield still helps against shooting). Fire: on each hit roll a D6 — on 5+ the target is set on fire; unless he rolls 4+ in his recovery phase he takes a Strength 4 hit each turn and can do nothing but move. Friends in base contact may put him out on 4+."
+   }
+  ],
+  [
+   {
+    "__re": "^obsidianwaffe$|^obsidian weapon$",
+    "__f": "i"
+   },
+   {
+    "name": "Obsidian weapon",
+    "line": "Close combat · 4× the weapon's price · Rare 12",
+    "text": "Strength +1. Heavy: always strikes last, even when charging. Blemished: never used by Dwarfs, Elves, Sisters of Sigmar, Witch Hunters or Priests. (Border Town Burning; the Sons of Hashut have their own obsidian weapons — a campaign uses one version, not both.)"
+   }
+  ],
+  [
+   {
+    "__re": "chaosrüstung|chaos armou?r",
+    "__f": "i"
+   },
+   {
+    "name": "Chaos armour",
+    "line": "Armour · 185 gc · Rare 13",
+    "text": "Save 4+, no movement penalty with a shield, and it does not stop spellcasting (a caster still needs the right skill to add a shield or buckler). +1 to the rarity roll for each enemy the Hero took out of action in the last battle; the price drops by 1 gc per experience point he has. It fuses to its wearer and can never be removed or passed on."
+   }
+  ],
+  [
+   {
+    "__re": "pavise",
+    "__f": "i"
+   },
+   {
+    "name": "Pavise",
+    "line": "Armour · 25 gc · Rare 8",
+    "text": "Save 6+. Against shooting the bearer counts as in cover (−1 to hit); in close combat it counts as a shield (+1 save) only if he was charged from the front. So heavy that the bearer moves at half pace."
+   }
+  ],
+  [
+   {
+    "__re": "laterne|lantern",
+    "__f": "i"
+   },
+   {
+    "name": "Lantern",
+    "line": "Miscellaneous · 10 gc · Common",
+    "text": "+4\" to the distance at which the bearer can spot hidden enemies."
+   }
+  ],
+  [
+   {
+    "__re": "fackel|\\btorch\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Torch",
+    "line": "Miscellaneous · 2 gc · Common",
+    "text": "Works like a lantern (+4\" to spot hidden enemies) for one game only. Causes fear in animals, can be used as a club at −1 to hit, and wounds it causes cannot be regenerated."
+   }
+  ],
+  [
+   {
+    "__re": "relikt|\\brelic\\b",
+    "__f": "i"
+   },
+   {
+    "name": "Holy (unholy) relic",
+    "line": "Miscellaneous · 15+3D6 gc · Rare 8 (Rare 6 for Warrior-Priests and Sisters of Sigmar)",
+    "text": "The bearer automatically passes the first Leadership test he has to take in a game. Carried by the leader, it passes the first Rout test if no Leadership test was taken before. More relics do not help with later tests."
+   }
+  ],
+  [
+   {
+    "__re": "zauberfoliant|tome of magic",
+    "__f": "i"
+   },
+   {
+    "name": "Tome of magic",
+    "line": "Miscellaneous · 200+D6×25 gc · Rare 12 · not Witch Hunters or Sisters of Sigmar",
+    "text": "A wizard of the warband permanently learns one more spell, rolled from his own list or from Lesser Magic; each tome serves only one model. Without a wizard, a warrior with the Arcane Lore skill can learn Lesser Magic from it. Whether a used tome may be passed on is for the group to agree (Ultimate FAQ 7.3)."
+   }
+  ],
+  [
+   {
+    "__re": "bugman",
+    "__f": "i"
+   },
+   {
+    "name": "Bugman's ale",
+    "line": "Miscellaneous · 50+3D6 gc · Rare 9",
+    "text": "Drunk before a battle, it makes the whole warband immune to fear for that battle. Enough for one battle. Elves may not drink it."
+   }
+  ],
+  [
+   {
+    "__re": "seidenkleidung|silk clothes",
+    "__f": "i"
+   },
+   {
+    "name": "Cathayan silk clothes",
+    "line": "Miscellaneous · 50+2D6 gc · Rare 9",
+    "text": "A Mercenary warband whose leader wears them may re-roll its first failed Rout test. After every battle in which the leader was taken out of action, roll a D6: on 1–3 the clothes are ruined."
+   }
+  ],
+  [
+   {
+    "__re": "elfenstiefel|elven boots",
+    "__f": "i"
+   },
+   {
+    "name": "Elven boots",
+    "line": "Miscellaneous · 75+D6×10 gc · Rare 12",
+    "text": "+1 Movement, even above the racial maximum."
+   }
+  ],
+  [
+   {
+    "__re": "knoblauch|garlic",
+    "__f": "i"
+   },
+   {
+    "name": "Garlic",
+    "line": "Miscellaneous · 1 gc · Common · not Undead",
+    "text": "A Vampire must pass a Leadership test to charge the bearer. Lasts for one battle, used or not."
+   }
+  ],
+  [
+   {
+    "__re": "^banner$",
+    "__f": "i"
+   },
+   {
+    "name": "Banner",
+    "line": "Miscellaneous · 10 gc · Rare 5",
+    "text": "Carried in one hand by any Hero. Friendly warriors within 12\" of the bearer may re-roll failed All Alone tests (never a re-roll of a re-roll)."
+   }
+  ],
+  [
+   {
+    "__re": "krähenfüße|caltrops",
+    "__f": "i"
+   },
+   {
+    "name": "Caltrops",
+    "line": "Miscellaneous · 15+2D6 gc · Rare 6",
+    "text": "One use: when an enemy declares a charge, throw them into his path — his charge range drops by D6\"; if he can no longer reach, the charge fails."
+   }
+  ],
+  [
+   {
+    "__re": "feuerpfeile|fire arrows",
+    "__f": "i"
+   },
+   {
+    "name": "Fire arrows",
+    "line": "Miscellaneous · 30+1D6 gc · Rare 9",
+    "text": "Last one battle. On a hit roll a D6: on 4+ the target is set on fire — he must roll 4+ in his recovery phase or take a Strength 4 hit and do nothing but move while burning. Friends in base contact may put him out on 4+."
+   }
+  ],
+  [
+   {
+    "__re": "feuerbombe|fire ?bomb",
+    "__f": "i"
+   },
+   {
+    "name": "Fire bomb",
+    "line": "Miscellaneous · 35+2D6 gc · Rare 9",
+    "text": "Thrown in the shooting phase like blessed water. The warrior hit takes D3 Strength 4 hits with no armour save, and every model within 1\" of him takes a Strength 3 hit. A to-hit roll of 1: it goes off on the thrower instead."
+   }
+  ],
+  [
+   {
+    "__re": "blitzpulver|flash powder",
+    "__f": "i"
+   },
+   {
+    "name": "Flash powder",
+    "line": "Miscellaneous · 25+2D6 gc · Rare 8",
+    "text": "One use, thrown when an enemy charges the bearer: the charger must pass an Initiative test or is blinded, and the charge fails."
+   }
+  ],
+  [
+   {
+    "__re": "eisenbeschlagene stiefel|iron shod boots",
+    "__f": "i"
+   },
+   {
+    "name": "Iron shod boots",
+    "line": "Miscellaneous · 20+3D6 gc · Rare 8",
+    "text": "One extra kick attack in each round of close combat, at −1 to hit."
+   }
+  ],
+  [
+   {
+    "__re": "dietrich|lock ?picks",
+    "__f": "i"
+   },
+   {
+    "name": "Lock picks",
+    "line": "Miscellaneous · 15 gc · Rare 8",
+    "text": "The bearer may open a door with an Initiative test instead of Strength (at the end of his move, without the −1, and the door can still be locked again)."
+   }
+  ],
+  [
+   {
+    "__re": "mordheim-?karte|mordheim map",
+    "__f": "i"
+   },
+   {
+    "name": "Mordheim map",
+    "line": "Miscellaneous · 20+4D6 gc · Rare 9",
+    "text": "Roll a D6 when bought: 1 fake — the opponent chooses the next scenario; 2–3 vague — re-roll one die in the next exploration; 4 catacombs — you choose the next scenario; 5 accurate — re-roll up to three dice in the next exploration; 6 master map — re-roll one exploration die after every battle in which its Hero was not taken out of action."
+   }
+  ],
+  [
+   {
+    "__re": "hasenpfote|rabbit'?s foot",
+    "__f": "i"
+   },
+   {
+    "name": "Rabbit's foot",
+    "line": "Miscellaneous · 10 gc · Rare 5",
+    "text": "The wearer may re-roll one die during the battle; if it was not used, one die in the exploration phase instead, provided the Hero may search the ruins."
+   }
+  ],
+  [
+   {
+    "__re": "tarot",
+    "__f": "i"
+   },
+   {
+    "name": "Tarot cards",
+    "line": "Miscellaneous · 50 gc · Rare 7 · not Witch Hunters or Sisters of Sigmar",
+    "text": "Before each game the Hero takes a Leadership test. Passed: change one exploration die by 1 up or down (even if he goes out of action). Failed by 3 or more: he refuses to fight and misses the next game."
+   }
+  ],
+  [
+   {
+    "__re": "fernrohr|telescope",
+    "__f": "i"
+   },
+   {
+    "name": "Telescope",
+    "line": "Miscellaneous · 75+3D6 gc · Rare 10",
+    "text": "A Hero using it adds D6\" to the range of his missile weapon each turn and spots hidden enemies at three times the usual distance."
+   }
+  ],
+  [
+   {
+    "__re": "kriegshorn|war ?horn",
+    "__f": "i"
+   },
+   {
+    "name": "War horn",
+    "line": "Miscellaneous · 30+2D6 gc · Rare 8",
+    "text": "Once per battle, at the start of any turn (also just before a Rout test): the warband gets +1 Leadership until the start of the next turn."
+   }
+  ],
+  [
+   {
+    "__re": "opulente kutsche|opulent coach",
+    "__f": "i"
+   },
+   {
+    "name": "Opulent coach",
+    "line": "Miscellaneous · 250 gc · Rare 10",
+    "text": "The warband leader gets +3 to his rolls to find rare items."
+   }
+  ],
+  [
+   {
+    "__re": "schwarzer lotus|black lotus",
+    "__f": "i"
+   },
+   {
+    "name": "Black lotus",
+    "line": "Poison · 10+1D6 gc · Rare 9 (Rare 7 for Skaven and Lizardmen) · not Witch Hunters, Warrior-Priests or Sisters of Sigmar",
+    "text": "Coats one weapon for one battle: a to-hit roll of 6 wounds automatically (roll again for a critical — a 6 is one). Armour saves as normal."
+   }
+  ],
+  [
+   {
+    "__re": "alraune|mandrake",
+    "__f": "i"
+   },
+   {
+    "name": "Mandrake root",
+    "line": "Drug · 25+1D6 gc · Rare 8",
+    "text": "For one battle +1 Toughness, and Stunned results count as Knocked Down. No effect on Undead or the Possessed. After the battle roll 2D6: on 2–3 the model loses 1 Toughness for good."
+   }
+  ],
+  [
+   {
+    "__re": "shallaya",
+    "__f": "i"
+   },
+   {
+    "name": "Tears of Shallaya",
+    "line": "Miscellaneous · 10+2D6 gc · Rare 7 · not Undead or Possessed",
+    "text": "Drunk at the start of a battle: immune to all poisons for that battle."
+   }
+  ],
+  [
+   {
+    "__re": "bärenklauen|bear-?claw",
+    "__f": "i"
+   },
+   {
+    "name": "Bear-claw necklace",
+    "line": "Miscellaneous · 75+3D6 gc · Rare 9 · Kislevite Heroes only",
+    "text": "The wearer is subject to Frenzy."
+   }
+  ],
+  [
+   {
+    "__re": "wodka|vodka",
+    "__f": "i"
+   },
+   {
+    "name": "Vodka",
+    "line": "Miscellaneous · 35+2D6 gc · Rare 8 · Kislevite Heroes only",
+    "text": "One use before the game: every warrior of the warband gets +1 Leadership (up to 10) for that game, but each must test against his Toughness — failed: −1 Initiative for the game."
+   }
+  ],
+  [
+   {
+    "__re": "gubbinz",
+    "__f": "i"
+   },
+   {
+    "name": "Magic gubbinz",
+    "line": "Miscellaneous · 50 gc · Rare 9 · Forest Goblins only",
+    "text": "The Shaman may re-roll a failed spell on a D6 roll of 4+."
+   }
+  ],
+  [
+   {
+    "__re": "vergiftete waffe|poisoned weapon",
+    "__f": "i"
+   },
+   {
+    "name": "Poisoned weapon",
+    "line": "Weapon poison · +25 gc · Common · Forest Goblins only",
+    "text": "Poisons one weapon for good: +1 to all its injury rolls. It cannot be traded or sold afterwards."
+   }
+  ],
+  [
+   {
+    "__re": "rote-zahn|red toof",
+    "__f": "i"
+   },
+   {
+    "name": "Red Toof tribal jewellery",
+    "line": "Miscellaneous · 40 gc · Rare 9 · Forest Goblins only",
+    "text": "Cannot be removed; the wearer is subject to Frenzy."
+   }
+  ],
+  [
+   {
+    "__re": "papagei|parrot",
+    "__f": "i"
+   },
+   {
+    "name": "Parrot",
+    "line": "Miscellaneous · 15 gc · Rare 8 · Pirate Captain and Mates only",
+    "text": "Enemies in base contact are at −1 to hit in their first round of combat against the pirate unless they pass a Leadership test."
+   }
+  ],
+  [
+   {
+    "__re": "^vertrauter$|^familiar$",
+    "__f": "i"
+   },
+   {
+    "name": "Familiar",
+    "line": "Miscellaneous · 20+1D6 gc · Rare 8 · spellcasters only",
+    "text": "Only a spellcaster may look for it, and the gold is spent even if the roll fails. Once per turn the wizard may re-roll a failed attempt to cast a spell (not prayers); the re-roll stands."
+   }
+  ],
+  [
+   {
+    "__re": "flussbarke|river barge",
+    "__f": "i"
+   },
+   {
+    "name": "River barge",
+    "line": "Vehicle · 200 gc · Rare 9",
+    "text": "A boat. Its rules are in 'Vehicles of the Empire' (Town Cryer 24, Empire in Flames)."
+   }
+  ],
+  [
+   {
+    "__re": "flussboot|riverboat",
+    "__f": "i"
+   },
+   {
+    "name": "Riverboat",
+    "line": "Vehicle · 100 gc · Rare 8",
+    "text": "A boat. Its rules are in 'Vehicles of the Empire' (Town Cryer 24, Empire in Flames)."
+   }
+  ],
+  [
+   {
+    "__re": "ruderboot|rowboat",
+    "__f": "i"
+   },
+   {
+    "name": "Rowboat",
+    "line": "Vehicle · 40 gc · Rare 7",
+    "text": "A boat. Its rules are in 'Vehicles of the Empire' (Town Cryer 24, Empire in Flames)."
+   }
+  ],
+  [
+   {
+    "__re": "postkutsche|stagecoach",
+    "__f": "i"
+   },
+   {
+    "name": "Wagon / stagecoach",
+    "line": "Vehicle · 100 gc · Rare 7",
+    "text": "Price without draft animals. Its rules are in 'Vehicles of the Empire' (Empire in Flames)."
+   }
+  ],
+  [
+   {
+    "__re": "lamellen|lamellar",
+    "__f": "i"
+   },
+   {
+    "name": "Lamellar armour",
+    "line": "Armour · 120 gc · Rare 9",
+    "text": "Save 4+; −1 Movement when worn together with a shield."
+   }
+  ],
+  [
+   {
+    "__re": "buch der toten|book of the dead",
+    "__f": "i"
+   },
+   {
+    "name": "Book of the Dead",
+    "line": "Miscellaneous · 200+D6×25 gc · Rare 12 · Vampires and Necromancers only",
+    "text": "A Necromancer permanently learns a new spell; a Vampire with the Arcane Lore skill can learn Necromancy from it."
+   }
+  ],
+  [
+   {
+    "__re": "^truhe$|^chest$",
+    "__f": "i"
+   },
+   {
+    "name": "Chest",
+    "line": "Miscellaneous · 5 gc · Common",
+    "text": "Cumbersome: carried by two models, who must stay in base contact with it or drop it, and who may neither shoot nor attack in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "knallfr|firecrackers",
+    "__f": "i"
+   },
+   {
+    "name": "Firecrackers",
+    "line": "Miscellaneous · 20 gc · Rare 9",
+    "text": "Last one game. If an animal or a mounted warrior charges the bearer (not in combat, not down), he may use them on a passed Initiative test: the animal or mount must pass a Leadership test (its own) or the charge fails, and riders roll on the Whoa Boy! table. Or throw them in the shooting phase up to 8\": mounts and animals within 3\" test Leadership — mounts that fail roll on Whoa Boy!, animals flee."
+   }
+  ],
+  [
+   {
+    "__re": "große leiter|large ladder",
+    "__f": "i"
+   },
+   {
+    "name": "Large ladder",
+    "line": "Miscellaneous · 10 gc · Rare 5",
+    "text": "A ladder longer than 3\". Carried by two models or one large model (one model alone at quarter speed); carriers may not run. Setting it up costs half their move. It counts as open ground; a model in contact may try to knock it over with a Strength test, −1 for each model on it after the first."
+   }
+  ],
+  [
+   {
+    "__re": "karte von cathay|map of cathay",
+    "__f": "i"
+   },
+   {
+    "name": "Map of Cathay",
+    "line": "Miscellaneous · 20+4D6 gc · Rare 9",
+    "text": "Roll a D6: 1 fake; 2–3 the first random happening of the next battle is The Old Crone; 4–5 the next time the progress table shows 4+, you count as having the most campaign points; 6 whenever you roll a 1 for random happenings you may choose Belandysh comes! instead."
+   }
+  ],
+  [
+   {
+    "__re": "mantikor|manticore",
+    "__f": "i"
+   },
+   {
+    "name": "Manticore spoor",
+    "line": "Poison · 30+2D6 gc · Rare 9",
+    "text": "A model wounded by the coated weapon rolls a D6 at the start of each of its turns: on 1 it loses a wound, on 6 the poison wears off. Several such wounds still mean one roll per turn."
+   }
+  ],
+  [
+   {
+    "__re": "spinnenspucke|spider spittle",
+    "__f": "i"
+   },
+   {
+    "name": "Spider spittle",
+    "line": "Poison · 30+1D6 gc · Rare 7",
+    "text": "A warrior hit by the coated weapon must pass a Toughness test or is paralysed: he cannot move or fight and is hit automatically in close combat, until he passes a Toughness test in his recovery phase."
+   }
+  ],
+  [
+   {
+    "__re": "pulverfass|powder keg",
+    "__f": "i"
+   },
+   {
+    "name": "Powder keg",
+    "line": "Miscellaneous · 15 gc · Rare 7",
+    "text": "Carried like a chest, but it can explode: hit it with blackpowder, fire arrows, a fire bomb, a torch or a brazier iron and wound it (Toughness 4), then on 4+ — or on a critical hit — it goes off: a Strength 6 hit on every model within D6+3\"."
+   }
+  ],
+  [
+   {
+    "__re": "regenmantel|rain ?coat",
+    "__f": "i"
+   },
+   {
+    "name": "Rain coat",
+    "line": "Miscellaneous · 10 gc · Common",
+    "text": "Keeps the wearer and his equipment dry in wet weather. Unlike other miscellaneous equipment, Henchmen may have one."
+   }
+  ],
+  [
+   {
+    "__re": "rosenkranz|rosary",
+    "__f": "i"
+   },
+   {
+    "name": "Rosary",
+    "line": "Miscellaneous · 10 gc · Rare 6",
+    "text": "A prayer user may re-roll a failed Difficulty test if he did nothing that turn but move (not run) or stand still. Not in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "kleine leiter|small ladder",
+    "__f": "i"
+   },
+   {
+    "name": "Small ladder",
+    "line": "Miscellaneous · 5 gc · Common",
+    "text": "A ladder of up to 3\". Carried by two models or one large model (one model alone at half speed); carriers may not run. Setting it up costs a quarter of their move. It counts as open ground; a model in contact may try to knock it over with a Strength test, −1 for each model on it after the first."
+   }
+  ],
+  [
+   {
+    "__re": "rauchbombe|smoke ?bomb",
+    "__f": "i"
+   },
+   {
+    "name": "Smoke bomb",
+    "line": "Miscellaneous · 30+2D6 gc · Rare 10",
+    "text": "Thrown at the start of the movement phase up to 4\": smoke of 2\" radius until the start of the thrower's next turn. Inside it nobody attacks, shoots, casts or is targeted, and nobody sees through it; models in combat inside are moved 1\" apart. Thrown from close combat, the thrower must pass an Initiative test or take one hit from each enemy. If its carrier is knocked down, stunned or put out of action, it goes off on 4+."
+   }
+  ],
+  [
+   {
+    "__re": "rikscha|rickshaw",
+    "__f": "i"
+   },
+   {
+    "name": "Rickshaw",
+    "line": "Vehicle · 70 gc · Rare 8 · Humans only",
+    "text": "A two-wheeled cart with one seat, pulled by a warband member who may not run or charge while pulling. Shots at it are at +1 to hit; each hit strikes the runner (1–2), the cart (3–4, Toughness 8, 2 Wounds), a wheel (5, Toughness 6, 1 Wound) or the passenger (6). Without a wheel it cannot be pulled; it can be repaired after the battle."
+   }
+  ],
+  [
+   {
+    "__re": "proviant|victuals",
+    "__f": "i"
+   },
+   {
+    "name": "Victuals",
+    "line": "Miscellaneous · 8 gc · Common",
+    "text": "Used after a battle when selling treasures: the warband counts as one size band smaller (never below 1–3 models). Any number may be used."
+   }
+  ],
+  [
+   {
+    "__re": "schubkarre|wheelbarrow",
+    "__f": "i"
+   },
+   {
+    "name": "Wheelbarrow",
+    "line": "Miscellaneous · 5 gc · Rare 5",
+    "text": "Pushed by a Hero or Henchman in base contact (not an animal, not a stupid model) without slowing him, though he may not charge while pushing. Carries one cumbersome item such as a chest or keg, plus any number of small items."
+   }
+  ],
+  [
+   {
+    "__re": "winterpelz|winter furs",
+    "__f": "i"
+   },
+   {
+    "name": "Winter furs",
+    "line": "Miscellaneous · 5 gc · Common · not Beastmen",
+    "text": "Pelts, gloves and snow shoes: immune to Deep Snow and Chilling Cold in bitter cold weather; useless for the rest of the battle once soaked. Henchmen may have them too."
+   }
+  ],
+  [
+   {
+    "__re": "wyrdstein-pendel|wyrdstone pendulum",
+    "__f": "i"
+   },
+   {
+    "name": "Wyrdstone pendulum",
+    "line": "Miscellaneous · 25+3D6 gc · Rare 9",
+    "text": "If the Hero was not taken out of action, he tests Leadership after the battle: passed — re-roll one die in the exploration phase (that die may not be re-rolled again)."
    }
   ]
  ],
