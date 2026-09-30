@@ -130,7 +130,7 @@ jobs:
       - name: Tools for the ops test
         run: sudo apt-get update -q && sudo apt-get install -y -q restic fail2ban
       - name: ops end to end (install.sh, deploy, rollbacks, backup, restore test, restore, SSD drill, Fail2Ban)
-        run: sudo IMAGE="$IMAGE" ops/test/e2e.sh "$TAG" drill-broken drill-migration
+        run: sudo GITHUB_ACTIONS="$GITHUB_ACTIONS" IMAGE="$IMAGE" ops/test/e2e.sh "$TAG" drill-broken drill-migration
 
   publish:
     if: github.event_name == 'push' || github.event_name == 'schedule'
