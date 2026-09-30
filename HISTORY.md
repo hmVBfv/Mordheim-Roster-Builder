@@ -1679,3 +1679,13 @@ built here. The scripts were tested anyway: a base image assembled from the
 session's own Node binary, the runtime stage recreated around it, and then
 deploy, both rollbacks, backup and restore test with a real restic, and the
 restore — before the first push. The real image is built and tested by CI.
+
+CI still had its say. Its shellcheck is older and stricter about an unused
+function argument. The job log could not be read from the session, so the
+end-to-end test now reports its failures as GitHub annotations, which the
+API does return — and they showed the timers' services failing with
+"dependency": they require the SSD's mount, and on the runner a test
+"SSD" under `/mnt` depends on a disk systemd cannot start. The mount point
+is now a setting (`ROSTER_MOUNT`, `/mnt/ssd` by default) that the
+emergency setup on the desktop needed anyway, and the test mounts its SSD
+as a proper mount unit under `/srv`.

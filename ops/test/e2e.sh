@@ -8,7 +8,7 @@
 #   sudo IMAGE=<repo> ops/test/e2e.sh <good tag> <broken tag> <migration-drill tag>
 #
 # The images must exist locally (roster-deploy runs with ROSTER_NO_PULL=1).
-# /mnt/ssd becomes a tmpfs (through systemd) if it is not mounted.
+# The SSD is a tmpfs on /srv/ssd, mounted through systemd.
 set -Eeuo pipefail
 
 good=${1:?good tag} broken=${2:?broken tag} drill=${3:?migration drill tag}
@@ -17,7 +17,12 @@ user=${SUDO_USER:?run with sudo}
 [ "$(id -u)" -eq 0 ] || { echo "run with sudo" >&2; exit 1; }
 home=$(getent passwd "$user" | cut -d: -f6)
 ops=$(cd "$(dirname "$0")/.." && pwd)
-data=/mnt/ssd/roster/data
+# not /mnt/ssd: on the runner /mnt is a disk of its own that systemd cannot
+# start, so a mount below it fails its dependency. The paths come from
+# site.env (ROSTER_MOUNT), as they would on the desktop in an emergency.
+mnt=/srv/ssd
+root=$mnt/roster
+data=$root/data
 failures=0
 
 as() { sudo -u "$user" env HOME="$home" ROSTER_NO_PULL=1 ROSTER_DEPLOY_WAIT=30 ROSTER_RESTORE_WAIT=45 "$@"; }
@@ -49,30 +54,32 @@ env_tag() { sed -n "s/^$1=//p" "$home/server/roster/.env" | tail -n 1; }
 runs_image() { [ "$(docker inspect -f '{{.Image}}' roster-app)" = "$(docker image inspect -f '{{.Id}}' "$IMAGE:$1")" ]; }
 
 echo "# setup"
-mkdir -p /mnt/ssd
-# mounted through systemd, so PID 1 knows it (the units require the mount;
-# a plain mount from the runner's own mount namespace stays invisible to it)
-if ! systemctl is-active --quiet mnt-ssd.mount; then
-  printf '[Mount]\nWhat=tmpfs\nWhere=/mnt/ssd\nType=tmpfs\nOptions=size=1g,mode=755\n' >/run/systemd/system/mnt-ssd.mount
+mkdir -p "$mnt"
+# a mount unit, so systemd knows it: the timers' services require the mount
+unit=$(systemd-escape --path --suffix=mount "$mnt")
+if ! systemctl is-active --quiet "$unit"; then
+  printf '[Mount]\nWhat=tmpfs\nWhere=%s\nType=tmpfs\nOptions=size=1g,mode=755\n' "$mnt" >"/run/systemd/system/$unit"
   systemctl daemon-reload
-  if ! systemctl start mnt-ssd.mount; then
-    annotate error "mount /mnt/ssd" "$(systemctl status mnt-ssd.mount --no-pager 2>&1 | tail -n 15)"
+  if ! systemctl start "$unit"; then
+    annotate error "mount $mnt" "$(systemctl status "$unit" --no-pager 2>&1 | tail -n 15 || true)"
     exit 1
   fi
 fi
-for _ in $(seq 1 10); do mountpoint -q /mnt/ssd && break; sleep 0.5; done
-mountpoint -q /mnt/ssd || { annotate error "mount /mnt/ssd" "systemd mounted it, this process does not see it: $(findmnt /mnt/ssd 2>&1)"; exit 1; }
+for _ in $(seq 1 10); do mountpoint -q "$mnt" && break; sleep 0.5; done
+mountpoint -q "$mnt" || { annotate error "mount $mnt" "systemd mounted it, this process does not see it"; exit 1; }
 install -d -o "$user" -g "$(id -g "$user")" "$home/server" "$home/server/roster"
 cat >"$home/server/roster/site.env" <<EOF
 ROSTER_HOST=roster.test
 ROSTER_LAN_IP=127.0.0.1
 ROSTER_IMAGE=$IMAGE
+ROSTER_MOUNT=$mnt
 EOF
 "$ops/install.sh" --no-caddy
-as sh -c 'umask 077; head -c 32 /dev/urandom | base64 > /mnt/ssd/roster/secrets/restic.pass'
-as restic init -q -r /mnt/ssd/roster/backups/restic --password-file /mnt/ssd/roster/secrets/restic.pass
+as sh -c "umask 077; head -c 32 /dev/urandom | base64 > $root/secrets/restic.pass"
+as restic init -q -r "$root/backups/restic" --password-file "$root/secrets/restic.pass"
 expect "install.sh created the marker file on the (mounted) SSD" test -f "$data/.roster-volume"
-expect "app.env is private" test "$(stat -c %a /mnt/ssd/roster/app.env)" = 600
+expect "app.env is private" test "$(stat -c %a "$root/app.env")" = 600
+expect "Docker and the timers wait for the SSD" grep -q "RequiresMountsFor=$mnt" /etc/systemd/system/docker.service.d/ssd.conf /etc/systemd/system/roster-backup.service
 expect "the timers are enabled" systemctl is-enabled --quiet roster-backup.timer roster-restore-test.timer
 expect "roster-alive waits for Stufe 2" sh -c '! systemctl is-enabled --quiet roster-alive.timer'
 
@@ -85,7 +92,7 @@ probe_set before-backup
 
 echo "# backup and restore test (the timers' services)"
 expect "roster-backup.service" systemctl start roster-backup.service
-expect "restic has a snapshot" sh -c "sudo -u $user restic -q -r /mnt/ssd/roster/backups/restic --password-file /mnt/ssd/roster/secrets/restic.pass snapshots --json | grep -q '\"tags\":\\[\"nightly\"\\]'"
+expect "restic has a snapshot" sh -c "sudo -u $user restic -q -r $root/backups/restic --password-file $root/secrets/restic.pass snapshots --json | grep -q '\"tags\":\\[\"nightly\"\\]'"
 probe_set after-backup
 expect "roster-restore-test.service" systemctl start roster-restore-test.service
 expect "the test instance is healthy" sh -c "curl -fsS -m 5 http://127.0.0.1:8081/api/v1/health | grep -q '\"status\":\"ok\"'"

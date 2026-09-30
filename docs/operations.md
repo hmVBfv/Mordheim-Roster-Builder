@@ -196,7 +196,10 @@ Mitspieler werden erst eingeladen, wenn Phase 3 abgenommen ist.
 | [`test/`](../ops/test/) | – | Rauch- und Ende-zu-Ende-Test der CI |
 
 Platzhalter in den Vorlagen (`{{ROSTER_HOST}}`, `{{ROSTER_LAN_IP}}`,
-`{{ROSTER_DATA}}`, `{{ROSTER_UID}}` …) füllt `install.sh` aus `site.env`.
+`{{ROSTER_DATA}}`, `{{ROSTER_MOUNT}}`, `{{ROSTER_UID}}` …) füllt `install.sh`
+aus `site.env`. `ROSTER_MOUNT` (Standard `/mnt/ssd`) ist der Mount, auf dem
+die Daten liegen: Docker und die Timer warten auf ihn, und `install.sh`
+bricht ab, solange er nicht eingebunden ist.
 
 ### `compose.yaml`
 
@@ -398,7 +401,8 @@ Das Image gibt es auch für amd64. Fällt der Pi länger aus:
 
 1. Auf dem Manjaro-Desktop Docker starten, `compose.yaml` und `Caddyfile`
    mit `ops/install.sh --render <verzeichnis> --site <site.env>` erzeugen
-   (`ROSTER_DATA` in der `site.env` auf den Desktop-Pfad setzen).
+   (`ROSTER_MOUNT` und `ROSTER_DATA` in der `site.env` auf den Desktop
+   setzen, z. B. `/` und `/srv/roster`).
 2. Letzten Stand aus der restic-Kopie auf dem Desktop zurückspielen.
 3. An der Fritzbox die Freigabe TCP 443 auf den Desktop umstellen.
 4. DuckDNS zeigt weiter auf die Heim-IP; nichts zu ändern.
