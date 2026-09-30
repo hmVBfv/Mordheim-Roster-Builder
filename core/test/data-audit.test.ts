@@ -208,3 +208,51 @@ describe('catalogue restrictions', () => {
     expect(offered('undead', null, 'vamp', ['Schwert'])).not.toContain('Garlic');
   });
 });
+
+/* Rob, 30.09.2026: "Bei den Rare Searches moechte ich auch sehen, was die
+   Gegenstaende machen." 58 items of the catalogue had no rules text, so
+   neither app could say what they do (mostly miscellaneous equipment:
+   lantern, banner, tarot cards, the Mordheim map ...). */
+describe('rules texts of the catalogue', () => {
+  it('every item of the catalogue says what it does', () => {
+    const bare = data.CATALOG.filter((x) => !core.itemInfo(data, x.de) && !core.itemInfo(data, x.en)).map((x) => x.en);
+    expect(bare).toEqual([]);
+  });
+  it('an item gets its own text, not a neighbour\'s', () => {
+    const name = (n: string) => core.itemInfo(data, n)?.name;
+    expect(name('Banner')).toBe('Banner');
+    expect(name('Clan Pestilens banner')).toBe('Clan Pestilens Banner');
+    expect(name('Familiar')).toBe('Familiar');
+    expect(name('Scroll of the Rat Familiar')).toBe('Scroll of the Rat Familiar');
+    expect(name('Obsidianwaffe')).toBe('Obsidian weapon');
+    expect(name('Zharr obsidian weapon')).toBe('Zharr obsidian weapon');
+    expect(name('War Horn of Nagarythe')).toBe('War horn of Nagarythe');
+    expect(name('Kleine Leiter')).toBe('Small ladder');
+    expect(name('Große Leiter')).toBe('Large ladder');
+  });
+  // these showed the text of a plainer weapon whose pattern matched first
+  // (the sword breaker the sword's, the Hammer of witches – a book – the mace's)
+  it('a special weapon is not mistaken for the plain one', () => {
+    const name = (n: string) => core.itemInfo(data, n)?.name;
+    expect(name('Schwertbrecher')).toBe('Sword breaker');
+    expect(name('Zwergenaxt')).toBe('Dwarf axe');
+    expect(name('Disease Dagger')).toBe('Disease dagger');
+    expect(name('Hexenhammer')).toBe('Hammer of witches');
+    expect(name('Reiterhammer')).toBe("Horseman's hammer");
+    expect(name('Sigmaritischer Kriegshammer')).toBe('Sigmarite warhammer');
+    expect(name('Harpunenarmbrust')).toBe('Harpoon Crossbow');
+    expect(name('Ostländer DL-Jagdbüchse')).toBe('Ostlander double-barrelled hunting rifle');
+    expect(name('Ostländer DL-Pistole')).toBe('Ostlander double-barrelled pistol');
+    // and the plain ones keep theirs
+    expect(name('Schwert')).toBe('Sword');
+    expect(name('Axt')).toBe('Axe');
+    expect(name('Dolch')).toBe('Dagger');
+    expect(name('Streitkolben')).toBe('Mace / Hammer / Club');
+    expect(name('Armbrust')).toBe('Crossbow');
+    expect(name('Pistole')).toBe('Pistol');
+  });
+  it('the brazier iron counts as two-handed, from its text', () => {
+    const s = core.newWarband(data, 'wh');
+    expect(core.isTwoHanded(core.ctxOf(data, s), 'Brazier Iron')).toBe(true);
+  });
+});
