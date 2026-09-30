@@ -176,21 +176,48 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 
 | Zweck | Wahl |
 | --- | --- |
-| Laufzeit | Node 24 LTS |
-| HTTP | Fastify (`trustProxy` nur für `127.0.0.1`) |
-| Datenbank | SQLite über `better-sqlite3`, WAL-Modus |
-| Migrationen | nummerierte SQL-Dateien, nur vorwärts, Tabelle `schema_migrations` |
-| Validierung | dieselben Zod-Schemas aus `core/format` |
-| Logs | JSON auf stdout (pino); Login-Fehler als eigene Zeilen für Fail2Ban |
+| Laufzeit | Node 24 LTS (Image `node:24-trixie-slim`); die Tests laufen auch unter Node 22 |
+| HTTP | Fastify (`trustProxy`: Loopback und das Gateway des Docker-Netzes, siehe unten) |
+| Datenbank | SQLite über `better-sqlite3`, WAL-Modus, `synchronous = NORMAL` |
+| Migrationen | nummerierte SQL-Dateien in `server/migrations/`, nur vorwärts, Tabelle `schema_migrations` |
+| Validierung | dieselben Zod-Schemas aus `core/format` (ab Phase 3) |
+| Logs | JSON auf stdout (pino); eine Zeile je Anfrage; Login-Fehler als eigene Zeilen für Fail2Ban |
 | Auslieferung | statische Dateien des `campaign`-Builds, API unter `/api/v1` |
-| CLI | `roster-cli`: Backup, Einladung, Reset-Link, Bugs, KI-Paket |
+| CLI | `roster-cli`: Backup, Schemastand, Epoche; später Einladung, Reset-Link, Bugs, KI-Paket |
+| Build | `server/build.mjs` bündelt mit rolldown nach `server/dist/` (Server, CLI, Healthcheck); Pakete bleiben extern |
 
 - **Kein Rendern auf dem Server**, kein Next.js.
-- Ziel-Speicherbedarf 50–80 MB, Grenze 256 MB (Container-Limit).
-- Beim Start: Markerdatei auf der SSD prüfen (`/data/.roster-volume`), sonst
-  Abbruch. Migrationen laufen nur nach einem Backup.
-- `GET /api/v1/health` meldet Version, Datenbank-Zustand und
-  Migrationsstand; `roster-deploy` wartet darauf.
+- Ziel-Speicherbedarf 50–80 MB, Grenze 256 MB (Container-Limit); der
+  Rauchtest der CI misst den Container.
+- **Start** (`server/src/start.ts`): Markerdatei auf der SSD prüfen
+  (`/data/.roster-volume`), sonst Abbruch, ohne etwas anzulegen; Datenbank
+  öffnen, vollständige Integritätsprüfung; stehen Migrationen an und hat die
+  Datenbank schon ein Schema, zuerst ein Snapshot, dann die Migrationen; dann
+  die Epoche (neu bei einer neuen Datenbank und bei einem Start auf einem
+  zurückgespielten Snapshot). Ist die Datenbank beschädigt, nicht lesbar
+  oder neuer als der Code, lauscht der Server trotzdem und beantwortet
+  Health mit 503 – ab Phase 3 bleiben die Daten-Endpunkte dann zu.
+- `GET /api/v1/health` meldet `status`, `version` (der Commit), `startedAt`,
+  `epoch`, `db` (`integrity`: `ok` · `failed` · `unreadable`, geprüft beim
+  Start und danach höchstens alle 15 Minuten) und `migrations`
+  (`current`, `expected`); 200 nur bei `ok`, sonst 503. `roster-deploy`, der
+  Healthcheck des Containers und `roster-alive` fragen es ab.
+- **Rechte:** Jede Route nennt ihre Aktion; ein Hook fragt `can()`
+  (`server/src/policy.ts`), bevor der Handler läuft. Eine Route ohne Aktion
+  lässt sich nicht registrieren, und der Test der Leak-Matrix
+  (`server/test/leak-matrix.ts`) schlägt für jede Aktion ohne Zeile fehl.
+- **Client-Adresse:** Caddy spricht `127.0.0.1:3000` an, Docker reicht das
+  in den Container weiter – dort kommt die Verbindung vom Gateway des
+  Docker-Netzes. Deshalb glaubt der Server `X-Forwarded-For` von Loopback und
+  von diesem Gateway (aus `/proc/net/route`), sonst niemandem; `TRUST_PROXY`
+  überschreibt das. Der Rauchtest prüft es mit dem echten Image.
+- **Statische Dateien:** nur die Dateien, die beim Start im Build liegen
+  (feste Liste, kein Pfad aus der Anfrage erreicht etwas anderes); Assets mit
+  Hash ein Jahr im Cache, alles andere wird neu geprüft; unbekannte Seiten
+  der App bekommen `index.html` (die App routet über Pfade).
+- **Installation ohne Skripte:** `.npmrc` setzt `ignore-scripts=true`.
+  `better-sqlite3` bringt fertige Binärdateien für jede Plattform mit; npm
+  hätte sonst beim `npm ci` versucht, es mit node-gyp neu zu übersetzen.
 
 ### Endpunkte (Grobschnitt)
 
@@ -206,7 +233,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Welt | `…/factions`, `…/npcs`, `…/reputation`, `…/districts`, `…/scenarios` |
 | Sync | `GET /sync?cursor=` |
 | Bugs | `POST /bugs`, `GET /bugs` (Admin, Bug-Token), `PATCH /bugs/:id` |
-| Betrieb | `GET /health` |
+| Betrieb | `GET /health` (Phase 2, öffentlich) |
 
 Details und Felder: [data-model.md](data-model.md). Rechte:
 [security.md](security.md).
@@ -254,14 +281,23 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
    [security.md](security.md).
 3. Build beider App-Varianten; `size-limit` prüft das Budget.
 4. Playwright-Screenshots der Kernbildschirme bei 360 px.
-5. Image `ghcr.io/hmvbfv/mordheim-roster:<sha>` für `linux/arm64` und
-   `linux/amd64` (der Desktop kann im Notfall als Server einspringen).
+5. Image bauen und prüfen: Rauchtest (SSD-Übung, Health, `roster-cli`,
+   Client-Adresse, Epoche, Speicher) und Ende-zu-Ende-Test der
+   Betriebsdateien auf dem Runner (`ops/test/e2e.sh`: `install.sh`, Deploy mit
+   beiden Arten von Rollback, Backup und Wiederherstellungstest mit restic,
+   `roster-restore`, Fail2Ban).
+6. Sind alle Jobs grün: Image `ghcr.io/hmvbfv/mordheim-roster:<commit>` (die
+   ersten sieben Zeichen) für `linux/arm64` und `linux/amd64` (der Desktop
+   kann im Notfall als Server einspringen). Gebaut wird alles auf der
+   Plattform des Runners; für arm64 wird nur kopiert, nichts übersetzt.
 
 **Auf `master`:** zusätzlich Quick Build nach Pages (nach der Umstellung;
-bis dahin die alte App wie heute) und Tag `:<version>`.
+bis dahin die alte App wie heute) und die Tags `:master` und `:drill-broken`
+(für die Rollback-Übung). Monatlich baut die CI `master` neu
+(`:master-<datum>`), für die Sicherheitsupdates des Basis-Images.
 
-**Auf dem Pi:** bewusst per `roster-deploy <tag>` (Backup → Image holen →
-starten → Health → bei Fehler Rollback). Watchtower fasst die App nicht an.
+**Auf dem Pi:** bewusst per `roster-deploy <commit>` (Image holen → Backup →
+starten → Health → bei Fehler Rollback, wenn nötig mit Rücksicherung). Watchtower fasst die App nicht an.
 Details: [operations.md](operations.md).
 
 ## 8. Wo entwickelt und wo betrieben wird

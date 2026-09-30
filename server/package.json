@@ -1,0 +1,24 @@
+{
+  "name": "@mordheim/server",
+  "private": true,
+  "type": "module",
+  "description": "The campaign server on the Pi: Fastify and SQLite, the app's static files, roster-cli. Stores; the client computes (ADR 0005).",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "fastify": "^5.12.5",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^24.0.0",
+    "rolldown": "^1.2.11",
+    "vitest": "^5.0.2"
+  }
+}
