@@ -105,11 +105,37 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
 12. **Backup und Test gleich einmal:** `sudo systemctl start roster-backup.service`,
     dann `sudo systemctl start roster-restore-test.service`; beide melden sich
     bei healthchecks.io, `tail ~/server/roster/ops.log` zeigt den Verlauf.
-13. **Desktop-Kopie:** den bestehenden `rsync`-Job um
-    `/mnt/ssd/roster/backups/restic` erweitern (verschlüsselt, ohne das
-    Passwort unbrauchbar).
-14. **SD-Klon:** zweite SD-Karte als Klon des Systems (z. B. `rpi-clone`),
-    beschriften, beim Pi aufbewahren.
+13. **Desktop-Kopie:** der Desktop holt `/mnt/ssd/roster/backups/restic`
+    selbst ab (verschlüsselt, ohne das Passwort unbrauchbar). Einen
+    `rsync`-Job gab es vorher nicht, nur den Samba-Mount der Medien; der
+    taugt dafür nicht (Schreibrecht, gleiche Platte, wenn das Ziel dort
+    liegt). Stattdessen:
+    - eigener Schlüssel `~/.ssh/roster_backup` ohne Passphrase, auf dem Pi in
+      `~/.ssh/authorized_keys` eingetragen mit
+      `command="/usr/bin/rrsync -ro /mnt/ssd/roster/backups/restic",restrict,from="192.168.178.0/24"`
+      – nur lesen, nur dieses Verzeichnis, keine Shell, nur aus dem Heimnetz;
+      nicht per `ssh-copy-id` (das trägt ihn unbeschränkt ein);
+    - `Host roster-backup` in `~/.ssh/config` des Desktops mit diesem
+      Schlüssel und `IdentitiesOnly yes`;
+    - `~/.local/bin/roster-backup-pull`:
+      `rsync -a --delete --backup --backup-dir=~/backup/roster-restic-removed/<Datum> roster-backup:./ ~/backup/roster-restic/`,
+      danach Ordner in `roster-restic-removed/` älter als 30 Tage löschen
+      (restic ändert keine Datei; was auf dem Pi verschwindet oder sich
+      ändert, bleibt so 30 Tage auf dem Desktop);
+    - ein systemd-User-Timer (`OnStartupSec=10min`, `OnUnitActiveSec=6h`).
+    Das Ziel liegt auf der Platte des Desktops, nie auf dem Samba-Mount.
+    Der Pi kommt nicht an den Desktop: ein kompromittierter Pi kann die
+    Kopie nicht löschen. Prüfen: `restic -r ~/backup/roster-restic snapshots`
+    mit dem Passwort aus der Offline-Ablage.
+14. **SD-Klon:** zweite SD-Karte als Klon des Systems mit `rpi-clone`
+    (die gepflegte Fassung github.com/geerlingguy/rpi-clone, erst ansehen,
+    dann nach `/usr/local/sbin/`). Ziel vorher mit
+    `lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS` bestimmen – die SSD ist meist
+    `sda`, der Kartenleser `sdb`; das falsche Ziel wird überschrieben.
+    `sudo rpi-clone sdb`; die SSD wird nicht mitkopiert. Einmal von der
+    Kopie booten und `docker ps`, `roster-deploy --status` prüfen.
+    Beschriften, zu Hause aufbewahren (auf ihr liegen `site.env`,
+    `app.env` und die SSH-Schlüssel, nicht das restic-Passwort).
 
 Der Chronik-Eingang (`eingang/chronik/`) wird erst in Phase 4b gebraucht.
 
@@ -339,7 +365,7 @@ steht zusätzlich in `~/server/roster/ops.log`.
 | vor jedem Deploy | Snapshot `pre-deploy-<commit>` | `data/snapshots/` + nächstes restic |
 | vor jeder Migration | Snapshot `pre-migrate-v<alt>-v<neu>` (der Server selbst, beim Start) | `data/snapshots/` + nächstes restic |
 | nach jeder abgeschlossenen Schlacht (ab Phase 4a) | Snapshot (löst der Server selbst aus) | `data/snapshots/` + nächstes restic |
-| wenn der Desktop läuft | Kopie des restic-Repos | Desktop (bestehender `rsync`-Job) |
+| wenn der Desktop läuft | Kopie des restic-Repos | Desktop (`roster-backup-pull`, User-Timer, alle 6 h) |
 
 - **Snapshots** schreibt der Server mit `VACUUM INTO`: eine vollständige,
   in sich stimmige Kopie, während die App weiterläuft. Jede Kopie trägt eine
