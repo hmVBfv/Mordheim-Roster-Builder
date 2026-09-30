@@ -74,8 +74,11 @@ ROSTER_LAN_IP=127.0.0.1
 ROSTER_IMAGE=$IMAGE
 ROSTER_MOUNT=$mnt
 EOF
-# install.sh refuses to run files others could have changed
+# install.sh refuses to run files others could have changed, and checks the
+# directories above them too (the runner's primary group is not private)
 chmod -R go-w "$ops"
+d=$(dirname "$ops")
+while [ "$d" != / ] && [ "$d" != /home ]; do chmod go-w "$d"; d=$(dirname "$d"); done
 "$ops/install.sh" --no-caddy
 as sh -c "umask 077; head -c 32 /dev/urandom | base64 > $root/secrets/restic.pass"
 as restic init -q -r "$root/backups/restic" --password-file "$root/secrets/restic.pass"

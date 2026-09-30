@@ -109,11 +109,35 @@ if [ -n "$render_only" ]; then
   exit 0
 fi
 
-# 0. this script runs as root: its files must not be writable by anyone else,
-#    in particular not by an agent container (/mnt/ssd/agent is mounted there)
+# 0. this script runs as root: its files, and the directories above them,
+#    must not be changeable by anyone but root and $ROSTER_USER – in
+#    particular not by an agent container (/mnt/ssd/agent is mounted there)
 case "$ops/" in "${ROSTER_AGENT_DIR:-/mnt/ssd/agent}"/*) die "$ops is inside the agent directory; clone the repository into your home (docs/operations.md, Stufe 1)" ;; esac
-unsafe=$(find "$ops" \( -perm /022 -o \( ! -user root ! -user "$ROSTER_USER" \) \) -print -quit)
-[ -z "$unsafe" ] || die "$unsafe is writable by others or owned by someone else; not running files from there as root"
+# Debian and Raspberry Pi OS give each user a private group of the same name
+# and the umask 002, so a fresh clone is group-writable. Group write counts as
+# safe only for that group: nobody else is a member or has it as primary group.
+gid=$(id -g "$ROSTER_USER")
+private_group=""
+if [ "$(getent group "$gid" | cut -d: -f1)" = "$ROSTER_USER" ] &&
+  [ -z "$(getent group "$gid" | cut -d: -f4 | tr ',' '\n' | grep -vx "$ROSTER_USER" || true)" ] &&
+  [ "$(getent passwd | awk -F: -v g="$gid" '$4 == g' | wc -l)" -eq 1 ]; then
+  private_group=1
+fi
+changeable() { # the files and directories below $1 that someone else could change
+  if [ -n "$private_group" ]; then
+    find "$1" "${@:2}" \( -perm /002 -o \( -perm /020 ! -group "$gid" \) -o \( ! -user root ! -user "$ROSTER_USER" \) \) -print -quit
+  else
+    find "$1" "${@:2}" \( -perm /022 -o \( ! -user root ! -user "$ROSTER_USER" \) \) -print -quit
+  fi
+}
+unsafe=$(changeable "$ops")
+dir=$(dirname "$ops")
+while [ -z "$unsafe" ] && [ "$dir" != / ]; do
+  # a directory above: whoever can write it can swap the clone
+  unsafe=$(changeable "$dir" -maxdepth 0)
+  dir=$(dirname "$dir")
+done
+[ -z "$unsafe" ] || die "$unsafe ($(stat -c '%A %U:%G' "$unsafe")) can be changed by someone else; not running files from there as root"
 
 # 1. what must be there
 for cmd in docker restic curl openssl flock systemctl sed; do

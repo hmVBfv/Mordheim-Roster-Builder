@@ -134,6 +134,8 @@ jobs:
         run: |
           sudo apt-get -o DPkg::Lock::Timeout=120 update -q
           sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y -q --no-install-recommends restic fail2ban
+      - name: install.sh refuses files others could change (and accepts a private group)
+        run: sudo ops/test/install-guard.sh
       - name: ops end to end (install.sh, deploy, rollbacks, backup, restore test, restore, SSD drill, Fail2Ban)
         run: sudo GITHUB_ACTIONS="$GITHUB_ACTIONS" IMAGE="$IMAGE" ops/test/e2e.sh "$TAG" drill-broken drill-migration
 
