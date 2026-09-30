@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="mockups.css">
 <script src="mockups.js"></script>
 <script src="warband-art.js"></script>
+<script src="rules-data.js"></script>
+<script src="city-art.js"></script>
 <style>
   /* The desktop is a workspace of panels: the phone's screens, several at a
      time, side by side. They tile – nothing overlaps, nothing floats – so the
@@ -48,11 +50,12 @@
   .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); align-items: start; }
   .cols.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cols.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .col, .top { grid-template-columns: minmax(0, 1fr); }
   .col { display: grid; gap: var(--s4); align-content: start; min-height: 96px; border-radius: var(--radius); }
   .col:empty { border: 2px dashed var(--border); }
   .col:empty::before { content: 'An empty column: drag a panel here'; padding: var(--s3); color: var(--text-muted); }
   .col.drop-end, .top.drop-end { outline: 2px dashed var(--accent); outline-offset: 4px; }
-  .panel { min-width: 0; display: grid; grid-template-rows: auto 1fr; max-height: calc(100dvh - 150px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 0 var(--shadow); }
+  .panel { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; max-height: calc(100dvh - 150px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 0 var(--shadow); }
   .top .panel, .grid.maxed .panel { max-height: none; }
   .panel.drop-before { box-shadow: 0 -5px 0 var(--accent); }
   .panel.dragging { opacity: 0.45; }
@@ -60,7 +63,7 @@
   .ph { display: flex; align-items: center; gap: var(--s2); min-height: 48px; padding: 0 var(--s1) 0 var(--s2); border-bottom: 1px solid var(--border); cursor: grab; user-select: none; }
   .ph h2 { flex: 1; min-width: 0; font-size: 1.02rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ph .grip { color: var(--text-muted); font-size: 1.1rem; width: 1.2em; text-align: center; }
-  .ph .meta { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
+  .ph .meta { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
   .ph button { min-width: var(--tap); min-height: var(--tap); border: 0; border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 1.05rem; }
   .ph button:hover { background: var(--surface-2); color: var(--text); }
   .pb { overflow-y: auto; padding: var(--s3) var(--s4) var(--s4); display: grid; gap: var(--s3); align-content: start; }
@@ -93,6 +96,9 @@
   .items { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
   .items li { display: grid; grid-template-columns: 1fr auto; gap: 0 var(--s2); align-items: center; padding: var(--s1) 0; border-bottom: 1px solid var(--border); }
   .items small { color: var(--text-muted); }
+  .items details { min-width: 0; }
+  .items summary { cursor: pointer; min-height: var(--tap); padding: 2px 0; }
+  .items details p { margin: var(--s1) 0 var(--s2); padding-left: var(--s3); border-left: 3px solid var(--accent); }
   .items .btn-quiet { min-height: 36px; padding: 0 var(--s3); }
   .ledger { list-style: none; margin: 0; padding: 0; display: grid; }
   .ledger li { display: grid; grid-template-columns: 4em 1fr; gap: var(--s2); padding: var(--s1) 0; border-bottom: 1px solid var(--border); }
@@ -111,6 +117,26 @@
   .tl li { padding-left: var(--s3); border-left: 3px solid var(--border); }
   .tl li.sealed { border-left-color: var(--sealed); }
   .note { font-size: 0.88rem; color: var(--text-muted); }
+  .items li.one { grid-template-columns: 1fr; }
+  .items dl { margin: var(--s1) 0 var(--s2); }
+  .tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .tasks a, .tasks button { width: 100%; display: grid; grid-template-columns: 1.6em 1fr auto; gap: var(--s2); align-items: center; min-height: 52px; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); text-decoration: none; text-align: left; cursor: pointer; }
+  .tasks small, .wtile small, .rows small { display: block; color: var(--text-muted); }
+  .tasks .ico { text-align: center; }
+  .wtile { display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s3); align-items: center; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); text-decoration: none; }
+  .wtile .chip { margin-top: 2px; }
+  .art-row { display: flex; gap: 4px; }
+  .lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .lines li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--s2); padding: 2px 0; border-bottom: 1px solid var(--border); }
+  .lines li span { min-width: 0; overflow-wrap: anywhere; }
+  .lines li span:last-child { color: var(--text-muted); text-align: right; }
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .rows a { display: grid; grid-template-columns: 40px 1fr auto; gap: var(--s3); align-items: center; padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); text-decoration: none; }
+  .check { display: flex; gap: var(--s2); align-items: flex-start; min-height: var(--tap); cursor: pointer; }
+  .check input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); }
+  .now-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3); }
+  .warn-text { color: var(--warn); }
+  .grid .sky { width: min(100%, 900px); margin-inline: auto; }
   .stepper { display: inline-grid; grid-template-columns: var(--tap) 3em var(--tap); align-items: center; text-align: center; border: 1px solid var(--border); border-radius: var(--radius); }
   .stepper button { min-height: var(--tap); border: 0; background: transparent; cursor: pointer; font-size: 1.2rem; }
   .stepper output { font-weight: 600; }
@@ -147,8 +173,8 @@
     <section class="stack" aria-labelledby="also-h">
       <p class="label" id="also-h">This warband</p>
       <ul class="side-links">
-        <li><a href="story.html">Story</a></li>
-        <li><a href="changes.html">Versions</a></li>
+        <li><a href="desktop.html?view=story#roster">Story and what changed</a></li>
+        <li><a href="desktop.html?view=after#roster">After battle 5</a></li>
         <li><a href="trading-post.html">Trading Post, full page</a></li>
         <li><a href="roster.html">Roster as on the phone</a></li>
       </ul>
@@ -159,7 +185,7 @@
   <main class="work">
     <div>
       <div class="work-bar">
-        <span class="crumbs"><a href="campaign.html">Hel Fenn</a> › The Silver Caravan <span class="sync">✓ Saved</span></span>
+        <span class="crumbs"><span id="crumbs"></span> <span class="sync">✓ Saved</span></span>
         <div class="views" id="views" role="group" aria-label="Views"></div>
         <button type="button" class="btn-quiet" data-open="sheet-add">+ Panel</button>
       </div>
@@ -228,7 +254,7 @@
   var HENCH = [2, 5, 9, 14];
   var KEYS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'Sv'];
   var st = {
-    gold: 55, wyrd: 2, sel: 'ulrich', searched: {}, fresh: 0,
+    gold: 55, wyrd: 2, sel: 'ulrich', searched: {}, fresh: 0, info: {},
     stash: ['Lucky charm', 'Rope'],
     ledger: [[31, 'Gold after battle 4'], [50, 'Sold 2 wyrdstone shards (warband of 7–9)'], [4, 'Exploration: Ruined Hovels (6 6), D6 gc'], [-30, 'Upkeep: Big Gunnar, Ogre Bodyguard']],
     steps: [['Injuries', 1], ['Experience', 1], ['Exploration', 1], ['Sell wyrdstone', 1], ['Available veterans', 0], ['Rare items', 0, 'trading'], ['Dramatis Personae', 0], ['Recruits & common items', 0, 'roster'], ['Reallocate equipment', 0, 'stash'], ['Warband rating', 0, 'ledger']],
@@ -243,7 +269,13 @@
     ]
   };
   // fixed prices only; the full list with dice prices is on the Trading Post page
-  var RARE = [['Rapier', 5, 15], ['Lucky charm', 6, 10], ['Lock picks', 8, 15], ['Sword breaker', 8, 30], ['Crossbow pistol', 9, 35], ['Duelling pistol', 10, 30]];
+  var RARE = [
+    ['Rapier', 5, 15, 'Parry: parries like a sword. Barrage: if you hit but fail to wound, you may immediately attack again (each at −1 to hit, until you miss). Enemy +1 to the armour save.'],
+    ['Lucky charm', 6, 10, 'The first time the model is hit in a battle, roll a D6: on 4+ the hit is discarded and no damage is suffered. Carrying two or more charms gives no extra benefit — only the first hit may be discarded. (FAQ)'],
+    ['Lock picks', 8, 15, 'The bearer may open a door with an Initiative test instead of Strength (at the end of his move, without the −1, and the door can still be locked again).'],
+    ['Sword breaker', 8, 30, 'Parry: when hit, roll a D6; if higher than the opponent\'s highest to-hit roll, the blow is parried. Trap blade: after a successful parry roll a D6 — on 4+ the attacker\'s weapon breaks and is useless.'],
+    ['Crossbow pistol', 9, 35, 'May shoot in the first close-combat round (−2 to hit, resolved first) — in addition to the close-combat attacks.'],
+    ['Duelling pistol', 10, 30, 'Accuracy: +1 to hit (also in close combat). Prepare shot: every 2nd turn (brace: every turn). Also usable in close combat.']];
   function byId(id) { return st.w.filter(function (w) { return w.id === id; })[0]; }
   function track(w) { return w.kind === 'hero' ? HERO : HENCH; }
   function earned(w) { return track(w).filter(function (t) { return t > w.start && t <= w.xp; }).length; }
@@ -253,6 +285,34 @@
   function rating() { return st.w.reduce(function (n, w) { var each = (w.kind === 'hired' ? 20 : 5) + w.xp; return n + (w.kind === 'hench' ? each * w.men : each); }, 0); }
   function book(amount, text) { st.gold += amount; st.ledger.push([amount, text]); st.fresh++; }
 
+  /* ---------- the campaign around it (as in the phone's pages) ---------- */
+  var OTHERS = {
+    penitents: { name: 'The Grey Penitents', line: 'Sisters of Sigmar · Anna · Rating 131 · 38 gc · 9 models', rows: [['Mother Ursula', 'Sigmarite Matriarch · Exp 27'], ['Sister Hedda', 'Sister Superior · Exp 11'], ['Sister Agnes', 'Augur · Exp 6'], ['Novices ×3', 'Henchmen · Exp 3'], ['Sigmarite Sisters ×3', 'Henchmen · Exp 5'], ['Brother Anselm', 'Warrior-Priest · Hired Sword · Exp 9']] },
+    skrittle: { name: 'Clan Skrittle', line: 'Skaven – Clan Eshin · Ben · Rating 124 · 61 gc · 12 models', rows: [['Skritch', 'Assassin Adept · Exp 26'], ['Grot', 'Black Skaven · Exp 12 · misses 1 game'], ['Nibble', 'Night Runner · Exp 6'], ['Verminkin ×5', 'Henchmen · Exp 4'], ['Giant rats ×4', 'Henchmen · no experience']] }
+  };
+  var BATTLES = [
+    [1, 'Street Fight', 'City Hall', 'The Silver Caravan beat the Grey Penitents', 'Sister Hedda, 2 Novices; Otto'],
+    [2, 'Wyrdstone Hunt', 'Fence Alley', 'Clan Skrittle won', 'Jorg, a Warrior; 3 Verminkin'],
+    [3, 'Breakthrough', 'The Rock', 'The Grey Penitents beat Clan Skrittle', 'Nibble, 2 giant rats'],
+    [4, 'Chance Encounter', 'Temple of Sigmar', 'Three warbands, the Penitents held', 'Hans of the Warriors (dead), Brother Anselm'],
+    [5, 'Defend the Find', 'The Old Mill by the West Gate', 'The Silver Caravan won; the Penitents routed', 'Magda (Leg Wound); Grot; Sister Hedda']];
+  var DISTRICTS = [
+    ['City Hall', 'Silver Caravan · foothold', 'During the Exploration Procedure you may change one die by +1 or −1.'],
+    ['West Gate', 'Silver Caravan · foothold', 'Half price to hire Luthor Wolfenbaum; a Hero sent to look for him finds him.'],
+    ['The Rock', 'Grey Penitents · foothold', 'Sisters of Sigmar gain 20 % more gold for wyrdstone (rounded down).'],
+    ['Temple of Sigmar', 'Grey Penitents · foothold', 'An injury of 22–35 becomes Full Recovery on a 5+ on a D6.'],
+    ['Fence Alley', 'Clan Skrittle · control', 'Half price for poisons and drugs.'],
+    ['Market Square', 'nobody', 'Control: +2 to find rare items.']];
+  var talk = {
+    notes: [['public', 'Rob', 'The ferry creaks. Ulrich counts the Skaven he can see and doubles it.'], ['sealed', 'Rob', 'If Skritch comes for me, Lukas shoots the lantern first.'], ['leader', 'Anna (leader)', 'The ferryman owes Clan Skrittle money. Reveal after battle 6.']],
+    vis: 'public', answered: false, copies: 0, reports: 0,
+    // what is typed survives a panel being drawn again
+    drafts: { answer: 'He saw it. He said nothing, and kept his hand on his purse.', note: 'Magda watches the ferryman’s hands, not his face.', report: 'The Advance button on Big Gunnar does nothing.' },
+    devices: ['This computer · Firefox', 'Pixel 8 · the app', 'Tablet in the cellar · the app'],
+    hr: { freeMarket: false, allSkills: false, hsEquip: true }
+  };
+  var VIS = { public: ['🌐 public', 'public'], sealed: ['🔒 sealed until battle 6 ends', 'sealed'], leader: ['⚑ leader only', 'leader'] };
+
   /* ---------- panels ---------- */
   var PANELS = {
     roster: { title: 'Roster', meta: function () { return rating() + ' · ' + models() + ' / 15'; }, draw: drawRoster },
@@ -261,24 +321,80 @@
     ledger: { title: 'Gold', meta: function () { return st.gold + ' gc'; }, draw: drawLedger },
     stash: { title: 'Stash', meta: function () { return st.stash.length + ' items · ' + st.wyrd + ' shards'; }, draw: drawStash },
     steps: { title: 'After battle 5', meta: function () { return st.steps.filter(function (s) { return s[1]; }).length + ' of ' + st.steps.length; }, draw: drawSteps },
+    story: { title: 'Story', meta: function () { return '5 chapters'; }, draw: drawStory },
+    versions: { title: 'What changed', meta: function () { return 'after battle 5'; }, draw: drawVersions },
     timeline: { title: 'Timeline', meta: function () { return 'Hel Fenn'; }, draw: drawTimeline },
-    campaign: { title: 'Campaign', meta: function () { return 'battle 6 now'; }, draw: drawCampaign }
+    campaign: { title: 'Campaign', meta: function () { return 'battle 6 now'; }, draw: drawCampaign },
+    city: { title: 'Mordheim', meta: function () { return 'evening'; }, draw: drawCity },
+    open: { title: 'Open for you', meta: function () { return (talk.answered ? 3 : 4) + ' things'; }, draw: drawOpen },
+    mine: { title: 'Your warbands', meta: function () { return (1 + talk.copies) + ''; }, draw: drawMine },
+    campaigns: { title: 'Campaigns', meta: function () { return '1'; }, draw: drawCampaigns },
+    question: { title: 'Anna asks you', meta: function () { return talk.answered ? 'answered' : 'open'; }, draw: drawQuestion },
+    penitents: { title: 'The Grey Penitents', meta: function () { return 'Anna · read only'; }, draw: function () { return drawOther('penitents'); } },
+    skrittle: { title: 'Clan Skrittle', meta: function () { return 'Ben · read only'; }, draw: function () { return drawOther('skrittle'); } },
+    now: { title: 'Now', meta: function () { return 'battle 6'; }, draw: drawNow },
+    standings: { title: 'Warbands', meta: function () { return '3'; }, draw: drawStandings },
+    battles: { title: 'Battles', meta: function () { return '5 fought'; }, draw: drawBattles },
+    districts: { title: 'Districts', meta: function () { return DISTRICTS.length + ''; }, draw: drawDistricts },
+    notes: { title: 'Notes', meta: function () { return talk.notes.length + ''; }, draw: drawNotes },
+    write: { title: 'Write a note', meta: function () { return VIS[talk.vis][1]; }, draw: drawWrite },
+    manage: { title: 'Manage ⚑', meta: function () { return 'leader'; }, draw: drawManage },
+    account: { title: 'Account', meta: function () { return 'Rob'; }, draw: drawAccount },
+    devices: { title: 'Devices', meta: function () { return talk.devices.length + ''; }, draw: drawDevices },
+    report: { title: 'Report a problem', meta: function () { return talk.reports ? talk.reports + ' sent' : ''; }, draw: drawReport }
   };
-  // a view: panels across the top, then up to three columns
-  var VIEWS = [
-    { key: 'roster', name: 'Roster', top: [], cols: [['roster'], ['warrior'], ['stash', 'ledger']] },
-    { key: 'after', name: 'After battle', top: [], cols: [['steps', 'ledger'], ['warrior', 'trading'], ['roster']] },
-    { key: 'trading', name: 'Trading', top: [], cols: [['trading'], ['roster'], ['stash', 'ledger']] },
-    { key: 'campaign', name: 'Campaign', top: ['campaign'], cols: [['timeline'], ['roster'], ['ledger']] }
-  ];
-  var lay, current = null;   // current: the panel whose ⋯ menu is open
+  /* Each place of the bar is a workspace of its own, with the panels that
+     belong there and views for its tasks (Rob, 30.09.2026: the desktop's
+     other pages). A view: panels across the top, then up to three columns. */
+  var PLACES = {
+    home: { nav: 'Home', crumbs: 'Mordheim Campaign', panels: ['city', 'open', 'mine', 'campaigns', 'question'],
+      views: [{ key: 'home', name: 'Home', top: ['city'], cols: [['open'], ['mine', 'campaigns'], ['question']] }] },
+    warbands: { nav: 'Warbands', crumbs: 'Warbands', panels: ['mine', 'penitents', 'skrittle'],
+      views: [{ key: 'all', name: 'All warbands', top: [], cols: [['mine'], ['penitents'], ['skrittle']] }] },
+    roster: { nav: 'Warbands', crumbs: '<a href="#campaign">Hel Fenn</a> › <a href="#warbands">Warbands</a> › The Silver Caravan', panels: ['roster', 'warrior', 'trading', 'ledger', 'stash', 'steps', 'story', 'versions', 'timeline', 'campaign'],
+      views: [
+        { key: 'roster', name: 'Roster', top: [], cols: [['roster'], ['warrior'], ['stash', 'ledger']] },
+        { key: 'after', name: 'After battle', top: [], cols: [['steps', 'ledger'], ['warrior', 'trading'], ['roster', 'versions']] },
+        { key: 'trading', name: 'Trading', top: [], cols: [['trading'], ['roster'], ['stash', 'ledger']] },
+        { key: 'story', name: 'Story', top: [], cols: [['story'], ['versions'], ['timeline']] }] },
+    campaign: { nav: 'Campaign', crumbs: 'The Hel Fenn Campaign', panels: ['now', 'standings', 'battles', 'districts', 'timeline', 'notes', 'manage'],
+      views: [
+        { key: 'overview', name: 'Overview', top: ['now'], cols: [['standings'], ['battles'], ['districts']] },
+        { key: 'story', name: 'Story', top: [], cols: [['timeline'], ['notes'], ['battles']] },
+        { key: 'leader', name: 'Leader ⚑', top: [], cols: [['manage'], ['standings'], ['districts']] }] },
+    notes: { nav: 'Notes', crumbs: '<a href="#campaign">Hel Fenn</a> › Notes', panels: ['write', 'notes', 'timeline'],
+      views: [{ key: 'notes', name: 'Notes', top: [], cols: [['write'], ['notes'], ['timeline']] }] },
+    more: { nav: 'More', crumbs: 'More', panels: ['account', 'devices', 'report'],
+      views: [{ key: 'more', name: 'More', top: [], cols: [['account'], ['devices'], ['report']] }] }
+  };
+  var place = PLACES[location.hash.slice(1)] ? location.hash.slice(1) : 'roster';
+  var lays = {}, lay, current = null;   // current: the panel whose ⋯ menu is open
+  var VIEWS = PLACES[place].views;
   function clone(x) { return JSON.parse(JSON.stringify(x)); }
 
   function useView(key) {
     var v = VIEWS.filter(function (x) { return x.key === key; })[0];
-    lay = { view: key, top: v.top.slice(), cols: clone(v.cols), min: [], max: null };
+    lay = lays[place] = { view: key, top: v.top.slice(), cols: clone(v.cols), min: [], max: null };
   }
   function changed() { lay.view = null; }
+  // going to another place keeps each place's arrangement for when you come back
+  function goPlace(p) {
+    place = PLACES[p] ? p : 'roster';
+    VIEWS = PLACES[place].views;
+    if (lays[place]) lay = lays[place]; else useView(VIEWS[0].key);
+    redraw();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', function () { goPlace(location.hash.slice(1)); });
+  // the places in the sidebar lead to the desktop's own workspaces
+  function placeNav() {
+    document.querySelectorAll('.side-nav a').forEach(function (a) {
+      var k = a.textContent.trim().toLowerCase();
+      a.setAttribute('href', '#' + k);
+      if (PLACES[place].nav.toLowerCase() === k) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    $('crumbs').innerHTML = PLACES[place].crumbs;
+  }
 
   // as many columns as the width holds (a panel wants 340 px), one on a phone
   function colCount() {
@@ -384,7 +500,9 @@
     return head + '<p><b>' + esc(w.name) + '</b> ' + (done ? 'has looked this time: ' + esc(done) + '.' : 'looks for one of these:') + '</p>' +
       '<ul class="items">' + RARE.map(function (r) {
         var can = !done && st.gold >= r[2];
-        return '<li><span>' + esc(r[0]) + '<br><small>Rare ' + r[1] + ' · found on ' + r[1] + '+ (' + chance(r[1]) + ' %) · ' + r[2] + ' gc</small></span><button type="button" class="btn-quiet" data-buy="' + esc(r[0]) + '"' + (can ? '' : ' disabled') + '>Found · buy</button></li>';
+        // tap the name: what the item does (Rob, 30.09.2026)
+        return '<li><details data-info="' + esc(r[0]) + '"' + (st.info[r[0]] ? ' open' : '') + '><summary>' + esc(r[0]) + '<br><small>Rare ' + r[1] + ' · found on ' + r[1] + '+ (' + chance(r[1]) + ' %) · ' + r[2] + ' gc</small></summary><p class="small">' + esc(r[3]) + '</p></details>' +
+          '<button type="button" class="btn-quiet" data-buy="' + esc(r[0]) + '"' + (can ? '' : ' disabled') + '>Found · buy</button></li>';
       }).join('') + '</ul>' +
       '<div class="row"><button type="button" class="btn-quiet" data-nothing' + (done ? ' disabled' : '') + '>Found nothing</button><a class="btn-quiet" href="trading-post.html#search">All 70 rare items</a></div>';
   }
@@ -415,20 +533,144 @@
       '<li class="sealed"><span class="vis sealed">🔓 opened after battle 5</span><br><span class="small">“Skritch goes for the captain. Whatever it costs.”</span></li>' +
       '<li><b>Interlude</b><br><span class="small muted">Two quiet days at the Blind Cat. Ulrich sells the shards to a priest who asks too few questions.</span></li>' +
       '<li><b>Battle 6 · Hel Fenn ferry</b><br><span class="small muted">being played · 3 entries wait on a phone</span></li>' +
-      '</ul><div class="row"><a class="btn-quiet" href="timeline.html">Whole timeline</a><a class="btn-quiet" href="visibility.html">Write a note</a></div>';
+      '</ul><div class="row"><a class="btn-quiet" href="timeline.html">Whole timeline</a>' +
+      (place === 'notes' ? '<button type="button" class="btn-quiet" data-show="write">Write a note</button>' : '<a class="btn-quiet" href="#notes">Write a note</a>') + '</div>';
   }
   function drawCampaign() {
     return '<dl class="facts"><dt>Now</dt><dd>Battle 6 · Hel Fenn ferry · turn 4</dd><dt>Warbands</dt><dd>Silver Caravan 118 · Grey Penitents 131 · Clan Skrittle 124</dd><dt>Districts</dt><dd>City Hall, West Gate (footholds) · the Rock and the Temple to the Penitents · Fence Alley to Clan Skrittle</dd></dl>' +
-      '<div class="row"><svg class="art small" data-art="caravan" aria-hidden="true" focusable="false"></svg><svg class="art small" data-art="penitents" aria-hidden="true" focusable="false"></svg><svg class="art small" data-art="skrittle" aria-hidden="true" focusable="false"></svg></div>' +
-      '<div class="row"><a class="btn" href="game-night.html">Open game night</a><a class="btn-quiet" href="campaign.html">Campaign overview</a><a class="btn-quiet" href="world.html">World</a></div>';
+      '<div class="row">' + art('caravan', 'small') + art('penitents', 'small') + art('skrittle', 'small') + '</div>' +
+      '<div class="row"><a class="btn" href="game-night.html">Open game night</a><a class="btn-quiet" href="#campaign">The campaign</a></div>';
   }
+
+  /* ---------- the other places ---------- */
+  function art(k, size) { return '<svg class="art ' + (size || '') + '" data-art="' + k + '" aria-hidden="true" focusable="false"></svg>'; }
+  function drawCity() {
+    return '<svg class="sky" data-city aria-hidden="true" focusable="false"></svg>' +
+      '<div><h2>Evening, Rob.</h2><p class="muted">Battle 6 at the Hel Fenn ferry is being played. Three entries wait on a phone until the server is in reach.</p></div>';
+  }
+  function drawOpen() {
+    var t = [['⚔', 'Battle 6 is being played', 'Open game night — 3 entries waiting', 'game-night.html'],
+      ['✎', '4 explanations missing', 'The Silver Caravan · after battle 5', 'desktop.html?view=story#roster'],
+      ['⚖', 'Rare items: three Heroes may look', 'Post-battle, step 6', 'desktop.html?view=trading#roster'],
+      ['↑', 'Advance due: Ulrich the Grey', 'and the Warriors', 'desktop.html?view=roster#roster']];
+    var html = t.map(function (x) {
+      return '<li><a href="' + x[3] + '"><span class="ico" aria-hidden="true">' + x[0] + '</span><span>' + esc(x[1]) + '<small>' + esc(x[2]) + '</small></span><span aria-hidden="true">›</span></a></li>';
+    }).join('');
+    // the question has its own panel here: show it rather than leave
+    if (!talk.answered) html += '<li><button type="button" data-show="question"><span class="ico" aria-hidden="true">?</span><span>Anna asks you<small>“Did Wilhelm see the coin with the eel?”</small></span><span aria-hidden="true">›</span></button></li>';
+    return '<ul class="tasks">' + html + '</ul>';
+  }
+  function drawMine() {
+    var copy = '';
+    for (var i = 0; i < talk.copies; i++) copy += '<a class="wtile" href="#roster">' + art('caravan') + '<span><b>The Silver Caravan (copy)</b><small>on this computer only · not in a campaign</small></span></a>';
+    return '<a class="wtile" href="#roster">' + art('caravan') + '<span><b>The Silver Caravan</b><small>Mercenaries – Reikland · Rating ' + rating() + ' · ' + st.gold + ' gc</small><span class="chip good">✓ After battle 5</span></span></a>' + copy +
+      '<button type="button" class="btn-quiet" data-import>Import a warband</button>';
+  }
+  function drawCampaigns() {
+    return '<a class="wtile" href="#campaign"><span class="art-row">' + art('caravan', 'small') + art('penitents', 'small') + art('skrittle', 'small') + '</span><span><b>The Hel Fenn Campaign</b><small>3 warbands · battle 6 being played · you lead</small></span></a>' +
+      '<div class="row"><a class="btn" href="game-night.html">Open game night</a></div>';
+  }
+  function drawQuestion() {
+    if (talk.answered) return '<p class="muted">Answered. Anna sees your answer in her story; it is sealed for the others until battle 6 ends.</p>';
+    return '<p><b>Anna</b> asks, for the chronicle: <i>“Did Wilhelm see the coin with the eel on it?”</i></p>' +
+      '<label class="field"><span class="small">Your answer</span><textarea class="textarea" id="q-answer" data-draft="answer">' + esc(talk.drafts.answer) + '</textarea></label>' +
+      '<p class="small"><span class="vis sealed">🔒 sealed until battle 6 ends</span></p>' +
+      '<div class="row"><button type="button" class="btn" data-answer>Send answer</button></div>';
+  }
+  function drawOther(k) {
+    var o = OTHERS[k];
+    return '<div class="with-art">' + art(k, 'big') + '<p class="small muted">' + esc(o.line) + '</p></div>' +
+      '<ul class="lines">' + o.rows.map(function (r) { return '<li><span>' + esc(r[0]) + '</span><span>' + esc(r[1]) + '</span></li>'; }).join('') + '</ul>' +
+      '<p class="note">Read only: only its player changes it. Notes and story follow her visibility choices.</p>' +
+      '<div class="row"><a class="btn-quiet" href="timeline.html">Their story in the timeline</a></div>';
+  }
+  function drawNow() {
+    return '<div class="now-row"><div><p class="label">Now</p><h2>Battle 6 · Hel Fenn ferry</h2><p class="muted">The Silver Caravan against Clan Skrittle; the Grey Penitents sit this one out. Turn 4.</p></div>' +
+      '<div class="row"><a class="btn" href="game-night.html">Open game night</a><a class="btn-quiet" href="#notes">Write a note</a></div></div>';
+  }
+  function drawStandings() {
+    var rows = [['caravan', 'The Silver Caravan', 'Rob · Mercenaries · Rating ' + rating(), '✓ After battle 5', 'good', '#roster'],
+      ['penitents', 'The Grey Penitents', 'Anna · Sisters of Sigmar · Rating 131', '✎ 2 missing', 'warn', '#warbands'],
+      ['skrittle', 'Clan Skrittle', 'Ben · Skaven – Clan Eshin · Rating 124', '✓ After battle 5', 'good', '#warbands']];
+    return '<ul class="rows">' + rows.map(function (r) {
+      return '<li><a href="' + r[5] + '">' + art(r[0], 'small') + '<span><b>' + esc(r[1]) + '</b><small>' + esc(r[2]) + '</small></span><span class="chip ' + r[4] + '">' + esc(r[3]) + '</span></a></li>';
+    }).join('') + '</ul>';
+  }
+  function drawBattles() {
+    return '<ul class="items">' + BATTLES.map(function (b) {
+      return '<li class="one"><details data-info="battle' + b[0] + '"' + (st.info['battle' + b[0]] ? ' open' : '') + '><summary><b>Battle ' + b[0] + ' · ' + esc(b[1]) + '</b><br><small>' + esc(b[3]) + '</small></summary>' +
+        '<dl class="facts small"><dt>Where</dt><dd>' + esc(b[2]) + '</dd><dt>Out of action</dt><dd>' + esc(b[4]) + '</dd></dl></details></li>';
+    }).join('') + '<li class="one"><span><b>Battle 6 · Hel Fenn ferry</b><br><small>being played</small></span></li></ul>';
+  }
+  function drawDistricts() {
+    return '<ul class="items">' + DISTRICTS.map(function (d, i) {
+      return '<li class="one"><details data-info="district' + i + '"' + (st.info['district' + i] ? ' open' : '') + '><summary><b>' + esc(d[0]) + '</b><br><small>' + esc(d[1]) + '</small></summary><p class="small">' + esc(d[2]) + '</p></details></li>';
+    }).join('') + '</ul><div class="row"><a class="btn-quiet" href="world.html">The world: factions, people, places</a></div>';
+  }
+  function drawNotes() {
+    return '<ul class="tl">' + talk.notes.map(function (n) {
+      var v = VIS[n[0]];
+      return '<li class="' + (n[0] === 'public' ? '' : n[0]) + '"><span class="vis ' + v[1] + '">' + v[0] + '</span> <span class="small muted">· ' + esc(n[1]) + '</span><br><span class="small">' + esc(n[2]) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function drawWrite() {
+    return '<label class="field"><span class="small">A note for battle 6</span><textarea class="textarea" id="note-text" data-draft="note">' + esc(talk.drafts.note) + '</textarea></label>' +
+      '<span class="small">Who can see it</span><div class="seg" id="note-vis">' + Object.keys(VIS).map(function (k) {
+        return '<button type="button" data-value="' + k + '" aria-pressed="' + (talk.vis === k) + '">' + VIS[k][0] + '</button>';
+      }).join('') + '</div>' +
+      '<div class="row"><button type="button" class="btn" data-note>Save note</button><a class="btn-quiet" href="visibility.html">As on the phone</a></div>';
+  }
+  function drawManage() {
+    var HR = [['freeMarket', 'Free market', 'Any kind of weapon may be looked for, not only those of the warband\'s lists.'], ['allSkills', 'All skill lists', 'Every Hero may learn from all five lists.'], ['hsEquip', 'Hired Swords may buy equipment', 'from the warband\'s Hero list.']];
+    return '<p class="small muted">Only leaders. House rules are off unless switched on here, and every export says which are on.</p>' +
+      '<ul class="items">' + HR.map(function (h) {
+        return '<li class="one"><label class="check"><input type="checkbox" data-hr="' + h[0] + '"' + (talk.hr[h[0]] ? ' checked' : '') + '><span><b>' + esc(h[1]) + '</b><br><small>' + esc(h[2]) + '</small></span></label></li>';
+      }).join('') + '</ul>' +
+      '<div class="row"><a class="btn-quiet" href="manage.html">Roles, invites, closing a battle</a></div>';
+  }
+  function drawStory() {
+    var ch = ['Prologue · The road to Mordheim', 'Chapter 1 · City Hall', 'Chapter 2 · What the rats took', 'Chapter 3 · The Rock', 'Chapter 4 · The Old Mill'];
+    return '<ol class="lines">' + ch.map(function (c) { return '<li><span>' + esc(c) + '</span><span>✓</span></li>'; }).join('') + '</ol>' +
+      '<p class="label">Their lives</p><div class="row">' + st.w.filter(function (w) { return w.kind !== 'hench'; }).map(function (w) {
+        return '<a class="btn-quiet" href="story.html?who=' + w.id + '">' + esc(w.name.split(' the ')[0]) + '</a>';
+      }).join('') + '</div><div class="row"><a class="btn" href="story.html">Write an interlude</a></div>';
+  }
+  function drawVersions() {
+    var ch = [['Magda', 'M 4 → 3', 'Leg Wound, battle 5', 'ok'], ['Ulrich the Grey', 'Exp 29 → 32', 'battle 5: +1 survived, +1 leader, +1 Out of Action', 'ok'], ['Jorg', 'BS 3 → 4', 'no cause found', 'warn'], ['Warriors', 'Hans dead', 'Henchman injury, rolled 1', 'ok']];
+    return '<ul class="items">' + ch.map(function (c) {
+      return '<li class="one"><span><b>' + esc(c[0]) + '</b> · ' + esc(c[1]) + '<br><small>' + (c[3] === 'warn' ? '⚠ ' : '✓ ') + esc(c[2]) + '</small></span></li>';
+    }).join('') + '</ul><p class="small warn-text">4 explanations missing · 1 change without a cause</p>' +
+      '<div class="row"><a class="btn" href="changes.html">Explain the changes</a></div>';
+  }
+  function drawAccount() {
+    return '<dl class="facts"><dt>Name</dt><dd>Rob</dd><dt>Authenticator</dt><dd>✓ on (leaders need it)</dd><dt>Password</dt><dd>set · changed 3 weeks ago</dd></dl>' +
+      '<p class="label">Theme</p><div class="row"><label class="check"><input type="radio" name="theme" data-set-theme="chronicle"> Chronicle — dark</label><label class="check"><input type="radio" name="theme" data-set-theme="parchment"> Parchment — light</label></div>' +
+      '<div class="row"><a class="btn-quiet" href="more.html">Password, authenticator, admin</a></div>';
+  }
+  function drawDevices() {
+    return '<ul class="items">' + talk.devices.map(function (d, i) {
+      return '<li><span>' + esc(d) + (i === 0 ? '<br><small>this one</small>' : '') + '</span>' + (i === 0 ? '<span></span>' : '<button type="button" class="btn-quiet" data-signout="' + i + '">Sign out</button>') + '</li>';
+    }).join('') + '</ul>';
+  }
+  function drawReport() {
+    return '<p class="small muted">Say what happened; the page you were on and the time go with it. You will see when it is fixed.</p>' +
+      '<label class="field"><span class="small">What went wrong</span><textarea class="textarea" id="report-text" data-draft="report">' + esc(talk.drafts.report) + '</textarea></label>' +
+      '<div class="row"><button type="button" class="btn" data-report>Send report</button></div>' +
+      (talk.reports ? '<p class="small">✓ ' + talk.reports + ' sent · status: new</p>' : '');
+  }
+  var cityDrawn = false;
   function redraw() {
     draw();
+    placeNav();
     document.querySelectorAll('#grid svg.art[data-art]').forEach(window.mockArt);
+    document.querySelectorAll('#grid svg.sky[data-city]').forEach(function (svg) { window.mockCity(svg, cityDrawn); cityDrawn = true; });
+    document.querySelectorAll('#grid [data-set-theme]').forEach(function (r) { r.checked = document.documentElement.getAttribute('data-theme') === r.dataset.setTheme; });
   }
 
   /* ---------- advance (the tables of roster.html) ---------- */
-  var SKILLS = ['Combat: Strike to Injure', 'Speed: Sprint', 'Strength: Resilient', 'Shooting: Quick Shot'];
+  // the skill lists of each kind of warrior (Mercenaries, Reikland; the Ogre)
+  var SKILL_LISTS = { 'Mercenary Captain': ['combat', 'shooting', 'academic', 'strength', 'speed'], Champion: ['combat', 'shooting', 'strength'], Youngblood: ['combat', 'shooting', 'speed'], 'Ogre Bodyguard': ['combat', 'strength'] };
+  function skillLists(w) { return SKILL_LISTS[w.type.split(' · ')[0]] || []; }
   var HERO_ADV = [[2, 5, 'New skill', 'Choose one from his skill lists:', 'skill'],
     [6, 6, '+1 S or +1 A', 'Roll a D6:', ['1–3 · +1 Strength', '4–6 · +1 Attack']], [7, 7, '+1 WS or +1 BS', 'Choose one:', ['+1 Weapon Skill', '+1 Ballistic Skill']],
     [8, 8, '+1 I or +1 Ld', 'Roll a D6:', ['1–3 · +1 Initiative', '4–6 · +1 Leadership']], [9, 9, '+1 W or +1 T', 'Roll a D6:', ['1–3 · +1 Wound', '4–6 · +1 Toughness']],
@@ -439,16 +681,24 @@
   var roll = 7;
   function advRow() { var w = byId(st.sel); return (w.kind === 'hench' ? HENCH_ADV : HERO_ADV).filter(function (r) { return roll >= r[0] && roll <= r[1]; })[0]; }
   function showAdv() {
-    var w = byId(st.sel), row = advRow(), opts = row[4] === 'skill' ? SKILLS.filter(function (k) { return (w.skills || []).indexOf(k.split(': ')[1]) < 0; }) : row[4];
+    var w = byId(st.sel), row = advRow();
     $('adv-roll').textContent = roll;
     document.querySelector('[data-roll="-1"]').disabled = roll <= 2;
     document.querySelector('[data-roll="1"]').disabled = roll >= 12;
     var html = '<h3>' + roll + ' · ' + esc(row[2]) + '</h3>' + (row[3] ? '<p>' + esc(row[3]) + '</p>' : '');
     if (row[4] === 'talent') html += '<p>One man becomes a Hero, with two skill lists – that is done on the Roster.</p><a class="btn-quiet" href="roster.html">Promote him on the Roster</a>';
-    else if (opts) html += '<div class="pick" id="adv-pick">' + opts.map(function (o, i) { return '<button type="button" data-value="' + esc(o) + '" aria-pressed="' + (i === 0) + '">' + esc(o) + '</button>'; }).join('') + '</div>';
+    else if (row[4] === 'skill') html += window.mockSkillPicker(skillLists(w), w.skills) + '<p class="skill-text" id="adv-skilltext"></p>';
+    else if (row[4]) html += '<div class="pick" id="adv-pick">' + row[4].map(function (o, i) { return '<button type="button" data-value="' + esc(o) + '" aria-pressed="' + (i === 0) + '">' + esc(o) + '</button>'; }).join('') + '</div>';
     $('adv-result').innerHTML = html;
     $('adv-apply').hidden = row[4] === 'talent';
+    skillText();
   }
+  // what the chosen skill does
+  function skillText() {
+    var t = $('adv-skilltext'), b = document.querySelector('#adv-result .pick.skills [aria-pressed=true]');
+    if (t) t.textContent = b ? b.dataset.value + ': ' + window.mockSkillText(b.dataset.value) : '';
+  }
+  $('adv-result').addEventListener('choose', skillText);
   function openAdvance() {
     var w = byId(st.sel); roll = 7;
     $('adv-title').textContent = 'Advance · ' + w.name;
@@ -457,10 +707,10 @@
     showAdv(); window.mockOpen('sheet-adv');
   }
   $('form-adv').addEventListener('submit', function () {
-    var w = byId(st.sel), row = advRow(), pick = document.querySelector('#adv-pick [aria-pressed=true]');
+    var w = byId(st.sel), row = advRow(), pick = document.querySelector('#adv-result .pick [aria-pressed=true]');
     var choice = pick ? pick.dataset.value : row[2], got = choice.replace(/^.*· /, '');
     var stat = Object.keys(STAT).filter(function (k) { return got.indexOf(k) >= 0; })[0];
-    if (row[4] === 'skill') { w.skills = (w.skills || []).concat(choice.split(': ')[1]); got = choice.split(': ')[1]; }
+    if (row[4] === 'skill') { w.skills = (w.skills || []).concat(choice); got = choice; }
     else if (stat) {
       var i = KEYS.indexOf(STAT[stat]); w.p[i] = w.p[i] + 1;
       w.up = (w.up || []).concat(STAT[stat]); w.down = (w.down || []).filter(function (k) { return k !== STAT[stat]; });
@@ -505,7 +755,7 @@
     changed(); redraw(); flash(id);
   }
   function drawAdd() {
-    var out = Object.keys(PANELS).filter(function (id) { return !inLayout(id) || lay.min.indexOf(id) >= 0; });
+    var out = PLACES[place].panels.filter(function (id) { return !inLayout(id) || lay.min.indexOf(id) >= 0; });
     $('add-list').innerHTML = out.length ? out.map(function (id) {
       var minned = lay.min.indexOf(id) >= 0;
       return '<button type="button" class="btn-quiet btn-block" data-add="' + id + '">' + (minned ? 'Restore ' : 'Add ') + esc(PANELS[id].title) + (minned ? ' from the dock' : '') + '</button>';
@@ -596,17 +846,57 @@
     }
     if ('sellwyrd' in d) { book(50, 'Sold ' + st.wyrd + ' wyrdstone shards (warband of 7–9)'); st.wyrd = 0; redraw(); return; }
     if (d.show) { add(d.show); return; }
+    // the other places
+    if ('import' in d) {
+      talk.copies++; redraw();
+      window.mockToast('Imported. It stays on this computer until it joins a campaign.', function () { talk.copies--; redraw(); });
+      return;
+    }
+    if ('answer' in d) {
+      talk.answered = true; redraw();
+      window.mockToast('Answer sent to Anna.', function () { talk.answered = false; redraw(); });
+      return;
+    }
+    if ('note' in d) {
+      var text = talk.drafts.note.trim(); if (!text) { window.mockToast('The note is empty.'); return; }
+      talk.notes.unshift([talk.vis, 'Rob', text]); talk.drafts.note = ''; redraw(); flash('notes');
+      window.mockToast('Note saved · ' + VIS[talk.vis][0] + '.', function () { talk.notes.shift(); talk.drafts.note = text; redraw(); });
+      return;
+    }
+    if (d.signout) {
+      var dev = talk.devices.splice(+d.signout, 1)[0], at = +d.signout; redraw();
+      window.mockToast(dev + ' is signed out.', function () { talk.devices.splice(at, 0, dev); redraw(); });
+      return;
+    }
+    if ('report' in d) { talk.reports++; redraw(); window.mockToast('Report sent. You will see its status here.'); return; }
+  });
+  document.addEventListener('input', function (e) {
+    var t = e.target.closest && e.target.closest('[data-draft]'); if (t) talk.drafts[t.dataset.draft] = t.value;
+  });
+  document.addEventListener('choose', function (e) {
+    if (e.target.id === 'note-vis') { talk.vis = e.detail; redraw(); }
   });
   document.addEventListener('change', function (e) {
+    var h = e.target.closest('[data-hr]');
+    if (h) {
+      talk.hr[h.dataset.hr] = h.checked; redraw();
+      window.mockToast('House rule ' + (h.checked ? 'on' : 'off') + ' for the whole campaign; exports say so.');
+      return;
+    }
     var c = e.target.closest('[data-step]'); if (!c) return;
     st.steps[+c.dataset.step][1] = c.checked ? 1 : 0; redraw();
   });
-  $('sheet-add').addEventListener('close', function () { /* the list is drawn when it opens */ });
+  // an item's text stays open when the panel is drawn again ('toggle' does not bubble)
+  document.addEventListener('toggle', function (e) {
+    var dd = e.target; if (!dd.dataset || !dd.dataset.info) return;
+    if (dd.open) st.info[dd.dataset.info] = 1; else delete st.info[dd.dataset.info];
+  }, true);
   document.querySelector('[data-open="sheet-add"]').addEventListener('click', drawAdd, true);
 
   var v = new URLSearchParams(location.search).get('view');
-  useView(VIEWS.some(function (x) { return x.key === v; }) ? v : 'roster');
+  useView(VIEWS.some(function (x) { return x.key === v; }) ? v : VIEWS[0].key);
   draw();
+  // after mockups.js has drawn the sidebar's places
   document.addEventListener('DOMContentLoaded', redraw);
 })();
 </script>

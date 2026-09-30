@@ -140,15 +140,24 @@ for (const name of PAGES) {
 
 /* Rob, 29.09.2026: "Can you show me the desktop mockup too? … several,
    perhaps movable windows … a good overview without clutter." The desktop
-   page at a desktop's width: three columns, every control reacts. */
-test('mockup desktop at 1440 px: every control reacts', async ({ page }) => {
-  test.setTimeout(600_000);
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await go(page, 'desktop');
-  await expect(page.locator('.cols.n3')).toBeVisible();
-  await themesFit(page, 'desktop', 1440, 'desktop-1440');
-  expect(await crawl(page, 'desktop'), 'controls on the desktop that do nothing').toEqual([]);
-});
+   page at a desktop's width: three columns, every control reacts – in each
+   of its places (30.09.2026: "natuerlich fehlen noch die weiteren
+   Unter-Seiten"), which also fit a phone's width. */
+const DESKTOP = ['desktop', 'desktop#home', 'desktop#warbands', 'desktop#campaign', 'desktop#notes', 'desktop#more'];
+for (const name of DESKTOP) {
+  test(`mockup ${name} at 1440 px: every control reacts`, async ({ page }) => {
+    test.setTimeout(600_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await go(page, name);
+    await expect(page.locator('.cols.n3')).toBeVisible();
+    const shot = name.replace('#', '-');
+    await themesFit(page, name, 1440, `${shot}-1440`);
+    expect(await crawl(page, name), `controls on ${name} that do nothing`).toEqual([]);
+    await page.setViewportSize({ width: 360, height: 740 });
+    await go(page, name);
+    await themesFit(page, name, 360, `${shot}-360`);
+  });
+}
 
 test('mockup desktop: a panel is moved by dragging, or by its menu', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
