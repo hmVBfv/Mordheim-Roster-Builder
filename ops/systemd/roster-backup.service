@@ -1,0 +1,13 @@
+[Unit]
+Description=Mordheim Campaign: nightly backup (snapshot + restic)
+Documentation=https://github.com/hmVBfv/Mordheim-Roster-Builder/blob/master/docs/operations.md
+Requires=docker.service
+After=docker.service
+RequiresMountsFor=/mnt/ssd
+
+[Service]
+Type=oneshot
+User={{ROSTER_USER}}
+ExecStart=/usr/local/lib/roster/roster-backup
+Nice=10
+IOSchedulingClass=idle

@@ -1,0 +1,10 @@
+[Unit]
+Description=Mordheim Campaign: reachable from outside, certificate, disk (healthchecks.io)
+Documentation=https://github.com/hmVBfv/Mordheim-Roster-Builder/blob/master/docs/operations.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User={{ROSTER_USER}}
+ExecStart=/usr/local/lib/roster/roster-alive

@@ -1,0 +1,13 @@
+[Unit]
+Description=Mordheim Campaign: restore the latest backup into the test instance
+Documentation=https://github.com/hmVBfv/Mordheim-Roster-Builder/blob/master/docs/operations.md
+Requires=docker.service
+After=docker.service roster-backup.service
+RequiresMountsFor=/mnt/ssd
+
+[Service]
+Type=oneshot
+User={{ROSTER_USER}}
+ExecStart=/usr/local/lib/roster/roster-restore-test
+Nice=10
+IOSchedulingClass=idle

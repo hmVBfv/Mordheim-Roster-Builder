@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+# roster-deploy – a new version onto the Pi, deliberately (ADR 0009,
+# docs/operations.md section 5). Run as robin over SSH, in tmux:
+#
+#   roster-deploy <tag>             production: backup, pull, switch, health,
+#                                   rollback if the new version is not healthy
+#   roster-deploy --staging <tag>   only the test instance (<pi-lan-ip>:8081)
+#   roster-deploy --status          what runs where
+#
+# <tag> is a commit (the first 7 characters are enough), as CI tags the images.
+# Production, step by step:
+#   1. the marker file on the SSD, else stop
+#   2. pull the image (nothing has changed if that fails)
+#   3. snapshot the database (roster-cli backup --label pre-deploy-<tag>)
+#   4. .env: PREVIOUS_TAG <- the running tag, ROSTER_TAG <- <tag>; start it
+#   5. wait up to 60 s: the container runs the new image and health is ok
+#   6. if not: back to the previous tag; if the schema changed in between,
+#      the snapshot from step 3 goes back first (the failed database is kept
+#      next to it as roster.sqlite.failed-<tag>-<time>)
+# Exit: 0 deployed, 1 not deployed (the previous version runs again),
+#       2 rolled back but the previous version is not healthy either.
+set -euo pipefail
+# shellcheck source=../lib/common.sh
+. "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
+
+WAIT=${ROSTER_DEPLOY_WAIT:-60}
+
+usage() {
+  sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//' >&2
+  exit 64
+}
+
+status() {
+  local c
+  echo "ROSTER_TAG=$(env_get ROSTER_TAG)  PREVIOUS_TAG=$(env_get PREVIOUS_TAG)  STAGING_TAG=$(env_get STAGING_TAG)"
+  for c in roster-app roster-staging roster-caddy; do
+    local st
+    st=$(docker inspect -f '{{.State.Status}} {{.Config.Image}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}-{{end}}' "$c" 2>/dev/null) || st="not created"
+    printf '%-15s %s\n' "$c" "$st"
+  done
+}
+
+deploy_staging() {
+  local tag=$1 image id
+  image="$ROSTER_IMAGE:$tag"
+  log "staging: deploying $tag"
+  pull_image "$image" || die "staging: cannot pull $image"
+  id=$(image_id "$image")
+  env_set STAGING_TAG "$tag"
+  compose up -d --no-deps staging
+  if wait_healthy roster-staging "$id" "$WAIT"; then
+    log "staging: $tag is healthy"
+  else
+    log "staging: $tag is NOT healthy (see: journalctl CONTAINER_NAME=roster-staging -n 50)"
+    exit 1
+  fi
+}
+
+# the database's schema version, read with the image of the given tag
+schema_with() {
+  ROSTER_TAG=$1 compose run --rm --no-deps -T app roster-cli schema-version 2>/dev/null | tr -dc '0-9'
+}
+
+deploy() {
+  local tag=$1 image new_id current snap="" schema_before="" data="$ROSTER_DATA/data"
+  require_marker
+  image="$ROSTER_IMAGE:$tag"
+  current=$(env_get ROSTER_TAG)
+  log "deploying $tag (running: ${current:-nothing})"
+
+  pull_image "$image" || die "cannot pull $image; nothing was changed"
+  new_id=$(image_id "$image")
+  if [ -n "$current" ] && running roster-app && [ "$(docker inspect -f '{{.Image}}' roster-app)" = "$new_id" ]; then
+    log "$tag already runs"
+    return 0
+  fi
+
+  # 3. snapshot
+  if running roster-app; then
+    snap=$(docker exec roster-app roster-cli backup --label "$(snapshot_label "pre-deploy-$tag")") || die "backup failed; nothing was changed"
+    schema_before=$(docker exec roster-app roster-cli schema-version | tr -dc '0-9')
+  elif [ -f "$data/roster.sqlite" ]; then
+    [ -n "$current" ] || die "there is a database but no ROSTER_TAG in $ROSTER_ENV and no running app; back it up by hand first"
+    snap=$(compose run --rm --no-deps -T app roster-cli backup --label "$(snapshot_label "pre-deploy-$tag")") || die "backup failed; nothing was changed"
+    schema_before=$(schema_with "$current")
+  else
+    log "no database yet: first deploy, nothing to back up"
+    schema_before=0
+  fi
+  [ -z "$snap" ] || log "snapshot: $data/snapshots/$snap (schema $schema_before)"
+
+  # 4. switch
+  cp "$ROSTER_ENV" "$ROSTER_ENV.before-deploy"
+  env_set PREVIOUS_TAG "$current"
+  env_set ROSTER_TAG "$tag"
+  compose up -d --no-deps app
+
+  # 5. health
+  if wait_healthy roster-app "$new_id" "$WAIT"; then
+    rm -f "$ROSTER_ENV.before-deploy"
+    log "deployed $tag"
+    return 0
+  fi
+
+  # 6. rollback
+  log "$tag is not healthy within ${WAIT}s (see: journalctl CONTAINER_NAME=roster-app -n 50)"
+  compose stop app >/dev/null 2>&1 || true
+  if [ -z "$current" ]; then
+    mv "$ROSTER_ENV.before-deploy" "$ROSTER_ENV"
+    log "first deploy failed; there is no previous version to go back to"
+    exit 1
+  fi
+  mv "$ROSTER_ENV.before-deploy" "$ROSTER_ENV"
+  local schema_now
+  schema_now=$(schema_with "$current" || true)
+  if [ -n "$snap" ] && [ "$schema_now" != "$schema_before" ]; then
+    local kept
+    kept="roster.sqlite.failed-$(snapshot_label "$tag")-$(date -u +%Y%m%dT%H%M%SZ)"
+    log "schema changed ($schema_before -> ${schema_now:-unreadable}): restoring $snap, keeping the failed database as $kept"
+    mv "$data/roster.sqlite" "$data/$kept"
+    for ext in wal shm; do
+      [ ! -f "$data/roster.sqlite-$ext" ] || mv "$data/roster.sqlite-$ext" "$data/$kept-$ext"
+    done
+    cp "$data/snapshots/$snap" "$data/roster.sqlite.restoring"
+    mv "$data/roster.sqlite.restoring" "$data/roster.sqlite"
+  fi
+  compose up -d --no-deps app
+  if wait_healthy roster-app "$(image_id "$ROSTER_IMAGE:$current")" "$WAIT"; then
+    log "rolled back to $current; $tag was NOT deployed"
+    exit 1
+  fi
+  log "ROLLBACK FAILED: $current is not healthy either. The service is down. See docs/operations.md, Ausfall-Handbuch"
+  exit 2
+}
+
+[ $# -ge 1 ] || usage
+exec 9>"$ROSTER_DIR/.deploy.lock"
+flock -n 9 || die "another roster-deploy is running"
+case "$1" in
+  --status) status ;;
+  --staging)
+    if [ $# -ne 2 ] || ! valid_tag "$2"; then usage; fi
+    deploy_staging "$2" ;;
+  -*) usage ;;
+  *)
+    if [ $# -ne 1 ] || ! valid_tag "$1"; then usage; fi
+    deploy "$1" ;;
+esac

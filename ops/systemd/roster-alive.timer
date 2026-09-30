@@ -1,0 +1,11 @@
+# Enabled by hand in Stufe 2, once the Pi is reachable from outside:
+#   sudo systemctl enable --now roster-alive.timer
+[Unit]
+Description=Mordheim Campaign: dead man's switch every 5 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,3 @@
+#!/bin/sh
+# roster-cli inside the image: docker exec roster-app roster-cli <command>
+exec node /app/server/dist/cli.js "$@"
