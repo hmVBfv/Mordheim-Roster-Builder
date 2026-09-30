@@ -1,6 +1,6 @@
 # Sicherheit
 
-Stand: 27. September 2026 · Grundlage: ADRs 0002, 0008, 0011, 0012
+Stand: 30. September 2026 · Grundlage: ADRs 0002, 0008, 0011, 0012, 0015
 
 ## 1. Was geschützt wird und wovor
 
@@ -9,7 +9,9 @@ Stand: 27. September 2026 · Grundlage: ADRs 0002, 0008, 0011, 0012
 | Verborgene Erzählung (Hintergrund, versiegelte Notizen) | neugieriger Mitspieler; Fehler in einem Endpunkt; versehentliches Veröffentlichen | Filter nur auf dem Server; Leak-Test-Matrix in der CI; nie in ein Repo |
 | Kampagnendaten | Bug, Bedienfehler, Konto-Übernahme | Versionen statt Überschreiben; Audit-Log; Backups |
 | Konten | Passwort-Raten aus dem Internet | Bremse, Fail2Ban, TOTP für Admin und Leiter |
-| Der Pi selbst (Jellyfin, TS3, Samba) | Angriff über den neuen Webdienst | nur 443 offen, App nur auf `127.0.0.1`, Container-Limits |
+| Der Pi selbst (die übrigen Dienste) | Angriff über den neuen Webdienst | nur 443 offen, App nur auf `127.0.0.1`, Container gehärtet und begrenzt |
+| Der Pi als Ganzes | untergeschobene Betriebsdateien (`install.sh` läuft als root); ein fremdes Image | Klon außerhalb der Agenten-Verzeichnisse, `install.sh` prüft das; `master` nur per Pull Request; Zwei-Faktor-Anmeldung bei GitHub; Deploy nur bewusst per Commit-Tag |
+| Rob selbst | Rückschluss vom öffentlichen Repo auf Person und Heimnetz | keine Hostnamen, Adressen, Kontonamen, Klarnamen oder E-Mail-Adressen im Repo und in den Commits |
 | Agenten-Umgebung | eingeschleuste Anweisungen in Bug-Texten | Bug-Texte sind Daten; eng begrenzte Tokens; keine Produktionsdaten im Container |
 
 Nicht im Fokus: gezielte Angriffe mit großem Aufwand. Es ist ein
@@ -172,7 +174,16 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
   `eingang/chronik/`.
 - `master` ist per GitHub-Regelwerk geschützt: Änderungen nur per Pull
   Request mit grüner CI. Agenten arbeiten auf eigenen Branches.
-- Gemergt und deployt wird von Rob.
+- Gemergt und deployt wird von Rob. Vor `sudo ops/install.sh` zeigt
+  `git diff HEAD origin/master -- ops/`, was als root laufen wird
+  ([operations.md](operations.md#aktualisieren)).
+- **Commits** tragen `M. Robin R. <155396440+hmVBfv@users.noreply.github.com>`
+  als Autor, nie einen Klarnamen oder eine echte Adresse; Cloud-Sitzungen
+  setzen das vor dem ersten Commit (`CLAUDE.md`).
+- `install.sh` liest `site.env` Zeile für Zeile (nur bekannte Schlüssel,
+  geprüfte Werte), statt sie als Shell auszuführen, und bricht ab, wenn seine
+  eigenen Dateien für andere beschreibbar sind oder unter `/mnt/ssd/agent/`
+  liegen. Die Skripte laufen als `<user>`, nie als root.
 
 ## 8. Schweregrade für Bugs
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # roster-deploy – a new version onto the Pi, deliberately (ADR 0009,
-# docs/operations.md section 5). Run as robin over SSH, in tmux:
+# docs/operations.md section 5). Run as your own user
+# (not root) over SSH, in tmux:
 #
 #   roster-deploy <tag>             production: backup, pull, switch, health,
 #                                   rollback if the new version is not healthy
@@ -26,7 +27,7 @@ set -euo pipefail
 WAIT=${ROSTER_DEPLOY_WAIT:-60}
 
 usage() {
-  sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//' >&2
+  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2
   exit 64
 }
 

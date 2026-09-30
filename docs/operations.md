@@ -4,10 +4,11 @@ Stand: 30. September 2026 · Status: Phase 2. Die Betriebsdateien liegen unter
 [`ops/`](../ops/) im Repo; dieses Dokument beschreibt sie und die Handgriffe
 auf dem Pi. Die Dateien sind maßgeblich, wo beide voneinander abweichen.
 
-Grundlage ist der bestehende Aufbau des `piServer` (Raspberry Pi 5, 4 GB,
-Raspberry Pi OS Lite 64-bit, Daten auf der SSD unter `/mnt/ssd`, Docker,
-DuckDNS, Watchtower, UFW, Fail2Ban, WireGuard über die Fritzbox) und seine
-Agenten-Basis unter `/mnt/ssd/agent`.
+Grundlage ist der bestehende Aufbau des Pi (Raspberry Pi 5, 4 GB, Raspberry
+Pi OS Lite 64-bit, Daten auf der SSD unter `/mnt/ssd`, Docker, DuckDNS,
+Watchtower, UFW, Fail2Ban, VPN über die Fritzbox) und seine Agenten-Basis
+unter `/mnt/ssd/agent`. `<user>` steht für das eigene Konto auf dem Pi –
+Namen, Adressen und Hostnamen gehören nicht in dieses öffentliche Repo.
 
 ## 1. Ziele
 
@@ -27,103 +28,133 @@ erreichbar wird er erst in Stufe 2 – zu einem Zeitpunkt, an dem der Server
 nur `GET /api/v1/health` und die Dateien der App ausliefert und es noch keine
 Konten gibt.
 
-Was `sudo ops/install.sh` selbst erledigt, ist mit *(install.sh)* markiert;
-der Rest sind Handgriffe von Rob. `install.sh` lässt sich nach jedem
-`git pull` erneut ausführen: Es überschreibt nie `app.env`, `staging.env`,
-`healthchecks.env` oder `.env`.
+Alle Befehle laufen per SSH als `<user>`; `sudo` nur, wo es dasteht. Schritte
+an der Fritzbox sind mit **Fritzbox** markiert. `install.sh` lässt sich nach
+jedem `git pull` erneut ausführen: Es überschreibt nie `site.env`,
+`app.env`, `staging.env`, `healthchecks.env` oder `.env`.
+
+**Wo der Klon liegt:** `install.sh` läuft als root. Deshalb kommt es aus einem
+eigenen Klon im Home-Verzeichnis (`~/src/Mordheim-Roster-Builder`), nie aus
+`/mnt/ssd/agent/…`: Dort können die Agenten-Container schreiben, und was dort
+liegt, würde mit root-Rechten ausgeführt. `install.sh` bricht ab, wenn es aus
+dem Agenten-Verzeichnis gestartet wird oder seine Dateien für andere
+beschreibbar sind.
 
 ### Stufe 1 – Vorbereitung, ohne Änderung nach außen
 
-- [ ] **cgroup-Speicher aktivieren** (offener Punkt der Agenten-Basis): in
-  `/boot/firmware/cmdline.txt` `cgroup_enable=memory cgroup_memory=1`
-  anhängen, neu starten, prüfen, dass `docker info` keine Warnung zu
-  Memory-Limits mehr zeigt. Ohne das greifen die Container-Limits nicht;
-  `install.sh` warnt, solange die Warnung da ist.
-- [ ] **Ports frei?** `sudo ss -tlnp | grep -E ':(80|443|3000|8081) '` darf
-  nichts liefern.
-- [ ] **robin in der Gruppe `docker`** (`id -nG robin`); `roster-deploy` und
-  die Timer laufen als robin, nicht als root.
-- [ ] **restic installieren:** `sudo apt install restic` (`install.sh` setzt es
-  voraus).
-- [ ] **Standortdatei:** `~/server/roster/site.env` aus
-  [`ops/site.env.example`](../ops/site.env.example) anlegen – Hostname und
-  LAN-IP. Sie steht nur auf dem Pi.
-- [ ] **Betriebsdateien holen:** im vorhandenen Klon
-  `/mnt/ssd/agent/repos/roster` `git pull`, dann `sudo ops/install.sh`.
-  - *(install.sh)* prüft, dass `/mnt/ssd` eingebunden ist, sonst Abbruch;
-  - *(install.sh)* **Docker wartet auf die SSD:** Drop-in
-    `/etc/systemd/system/docker.service.d/ssd.conf` mit
-    `RequiresMountsFor=/mnt/ssd`;
-  - *(install.sh)* **Verzeichnisse** unter `/mnt/ssd/roster/` (Besitzer
-    robin) und `~/server/roster/`;
-  - *(install.sh)* **Markerdatei** `/mnt/ssd/roster/data/.roster-volume` –
-    nur, wenn `/mnt/ssd` wirklich eingebunden ist. Die App und alle Skripte
-    arbeiten nur, wenn sie existiert, so startet nie eine leere App auf der
-    SD-Karte;
-  - *(install.sh)* `app.env` und `staging.env` aus den Vorlagen in
-    [`ops/env/`](../ops/env/), Rechte 600;
-  - *(install.sh)* `compose.yaml`, `Caddyfile`, `roster.conf`, Skripte,
-    systemd-Units und -Timer, Fail2Ban-Regel; startet Caddy und die Timer für
-    Backup und Wiederherstellungstest.
-- [ ] **restic-Repo:** als robin das Passwort anlegen
-  (`umask 077; openssl rand -base64 32 > /mnt/ssd/roster/secrets/restic.pass`)
-  und zusätzlich offline ablegen; dann
-  `restic init -r /mnt/ssd/roster/backups/restic --password-file /mnt/ssd/roster/secrets/restic.pass`.
-- [ ] **healthchecks.io:** drei Checks anlegen (`roster-alive` alle 5 Minuten,
-  `roster-backup` und `roster-restore-test` täglich); die Ping-URLs in
-  `/mnt/ssd/roster/secrets/healthchecks.env` eintragen (Vorlage:
-  [`ops/env/healthchecks.env.example`](../ops/env/healthchecks.env.example);
-  die leere Datei legt `install.sh` an).
-- [ ] **Image-Paket öffentlich:** nach dem ersten Lauf der CI auf `master`
-  unter GitHub → Packages → `mordheim-roster` → Package settings die
-  Sichtbarkeit auf *Public* stellen (einmalig; das Repo ist ohnehin
-  öffentlich, im Image steht nichts Geheimes). Sonst braucht der Pi ein
-  `docker login ghcr.io` mit einem Token (`read:packages`).
-- [ ] **Erster Start:** als robin `roster-deploy <commit>` (die ersten sieben
-  Zeichen reichen); prüfen mit `roster-deploy --status` und
-  `curl -s http://127.0.0.1:3000/api/v1/health`. Caddy läuft, bekommt aber
-  noch kein Zertifikat – das ist in dieser Stufe erwartet.
-- [ ] **Testinstanz:** `roster-deploy --staging <commit>`, im Heimnetz
-  `http://<pi-lan-ip>:8081/api/v1/health` öffnen.
-- [ ] **GitHub:** Regelwerk für `master` (nur per Pull Request mit grüner CI).
-- [ ] **Desktop-Kopie:** den bestehenden `rsync`-Job für
-  `/mnt/ssd/agent/home` um `/mnt/ssd/roster/backups/restic` erweitern.
-- [ ] **SD-Klon:** zweite SD-Karte als Klon des Systems anlegen (z. B. mit
-  `rpi-clone`), beschriften, beim Pi aufbewahren.
-- [ ] **Chronik-Eingang angleichen** (Plan der Agenten-Basis): gebraucht erst
-  in Phase 4b; bis dahin bindet die App ihn nicht ein.
+1. **cgroup-Speicher** (damit die Speichergrenzen der Container greifen):
+   `grep -c cgroup_enable=memory /boot/firmware/cmdline.txt` – bei `0`:
+   `sudo cp /boot/firmware/cmdline.txt /boot/firmware/cmdline.txt.bak`,
+   `sudo sed -i '1 s/$/ cgroup_enable=memory cgroup_memory=1/' /boot/firmware/cmdline.txt`,
+   `sudo reboot`; danach zeigt `docker info 2>&1 | grep -i 'memory limit'`
+   nichts mehr.
+2. **Prüfen:** `sudo ss -tlnp | grep -E ':(443|3000|8081) '` liefert nichts;
+   `id -nG` enthält `docker`.
+3. **Fritzbox – feste Adresse für den Pi:** Heimnetz → Netzwerk → beim Pi
+   „Bearbeiten“ → „Diesem Netzwerkgerät immer die gleiche IPv4-Adresse
+   zuweisen“. Die Testinstanz lauscht auf dieser Adresse, und die
+   Portfreigabe hängt am Gerät.
+4. **restic:** `sudo apt update && sudo apt install -y restic`.
+5. **Eigener Klon:**
+   `mkdir -p ~/src && git clone https://github.com/hmVBfv/Mordheim-Roster-Builder.git ~/src/Mordheim-Roster-Builder`.
+   Prüfen, dass kein Container das Home-Verzeichnis sieht:
+   `docker inspect -f '{{.Name}}: {{range .Mounts}}{{.Source}} {{end}}' $(docker ps -q)`
+   darf nirgends `/home/<user>` zeigen.
+6. **Standortdatei:** `mkdir -p ~/server/roster`,
+   `cp ~/src/Mordheim-Roster-Builder/ops/site.env.example ~/server/roster/site.env`,
+   `chmod 600 ~/server/roster/site.env`, `nano ~/server/roster/site.env`:
+   `ROSTER_HOST` (der Hostname unter DuckDNS; jeder Name unterhalb des
+   eigenen DuckDNS-Namens zeigt auf dieselbe IP, bei DuckDNS ist nichts
+   anzulegen) und `ROSTER_LAN_IP` (die feste Adresse aus Schritt 3,
+   `hostname -I`). `install.sh` liest die Datei Zeile für Zeile als
+   `KEY=value`; ausgeführt wird darin nichts.
+7. **Einspielen:** `cd ~/src/Mordheim-Roster-Builder && git log -1 --oneline`
+   (der zuletzt gemergte Pull Request), dann `sudo ops/install.sh`. Legt an:
+   das Drop-in, mit dem Docker auf die SSD wartet; die Verzeichnisse unter
+   `/mnt/ssd/roster/` samt Markerdatei (nur, wenn `/mnt/ssd` eingebunden ist);
+   `app.env`, `staging.env`, `secrets/healthchecks.env` (600);
+   `~/server/roster/compose.yaml`, `Caddyfile`, `.env`;
+   `/etc/roster/roster.conf`, `roster-deploy`, `roster-restore`, die Skripte
+   unter `/usr/local/lib/roster/`, die systemd-Units und -Timer, die
+   Fail2Ban-Regel. Startet Caddy und die Timer für Backup und
+   Wiederherstellungstest; `roster-alive` erst in Stufe 2.
+8. **restic-Repo:**
+   `(umask 077; openssl rand -base64 32 > /mnt/ssd/roster/secrets/restic.pass)`,
+   Inhalt zusätzlich im Passwortmanager ablegen
+   (`cat /mnt/ssd/roster/secrets/restic.pass`), dann
+   `restic init -r /mnt/ssd/roster/backups/restic --password-file /mnt/ssd/roster/secrets/restic.pass`.
+9. **healthchecks.io:** drei Checks (`roster-alive`: alle 5 Minuten, Karenz
+   10 Minuten; `roster-backup`: Cron `30 2 * * *`, `roster-restore-test`: Cron
+   `0 3 * * *`, beide Europe/Berlin, Karenz 1 Stunde), Benachrichtigung
+   einrichten; die drei Ping-URLs mit `nano /mnt/ssd/roster/secrets/healthchecks.env`
+   eintragen. Die URLs sind Geheimnisse: Wer sie kennt, kann „alles in
+   Ordnung“ melden.
+10. **GitHub:** das Paket `mordheim-roster` auf *Public* stellen (Profil →
+    Packages → `mordheim-roster` → Package settings → Change visibility);
+    so braucht der Pi kein Token. Im Image steht nichts Geheimes. Das
+    GitHub-Konto ist damit die Lieferkette für den Pi: Zwei-Faktor-Anmeldung
+    muss an sein, und `master` ändert sich nur per Pull Request.
+11. **Erster Start:** Tag = die ersten sieben Zeichen des Commits, für den die
+    CI auf `master` grün ist (`git -C ~/src/Mordheim-Roster-Builder rev-parse --short=7 HEAD`).
+    `roster-deploy --staging <tag>`, im Heimnetz
+    `curl -s http://<pi-lan-ip>:8081/api/v1/health`; dann `roster-deploy <tag>`,
+    `roster-deploy --status`, `curl -s http://127.0.0.1:3000/api/v1/health`.
+    Nie `master` als Tag: der wandert, und ein Rollback hätte kein Ziel.
+12. **Backup und Test gleich einmal:** `sudo systemctl start roster-backup.service`,
+    dann `sudo systemctl start roster-restore-test.service`; beide melden sich
+    bei healthchecks.io, `tail ~/server/roster/ops.log` zeigt den Verlauf.
+13. **Desktop-Kopie:** den bestehenden `rsync`-Job um
+    `/mnt/ssd/roster/backups/restic` erweitern (verschlüsselt, ohne das
+    Passwort unbrauchbar).
+14. **SD-Klon:** zweite SD-Karte als Klon des Systems (z. B. `rpi-clone`),
+    beschriften, beim Pi aufbewahren.
+
+Der Chronik-Eingang (`eingang/chronik/`) wird erst in Phase 4b gebraucht.
 
 ### Stufe 2 – Freischalten
 
-- [ ] **Fritzbox-Fernzugang prüfen:** Der HTTPS-Zugang der Fritzbox selbst
-  (Internetzugriff auf die FRITZ!Box) darf nicht auf Port 443 liegen, sonst
-  kollidiert er mit der Freigabe.
-- [ ] **Hostname prüfen:** `nslookup mordheim.<name>.duckdns.org` muss
-  dieselbe öffentliche IP liefern wie der bisherige DuckDNS-Name. Der
-  DuckDNS-Container bleibt, wie er ist.
-- [ ] **Fritzbox:** Portfreigabe für das Gerät `piServer`: TCP 443 → 443
-  (IPv4). Die bestehenden Freigaben für TeamSpeak bleiben unverändert.
-- [ ] **UFW:** `sudo ufw allow 443/tcp`.
-- [ ] **Zertifikat:** Caddy holt es innerhalb weniger Minuten selbst;
-  prüfen mit `docker logs roster-caddy`.
-- [ ] **Von außen testen:** am Handy im Mobilfunknetz (nicht im WLAN)
-  `https://mordheim.<name>.duckdns.org/api/v1/health` öffnen.
-- [ ] **Überwachung an:** `sudo systemctl enable --now roster-alive.timer`;
-  Fail2Ban-Regel aktiv (`sudo fail2ban-client status roster-auth`).
+1. **Fritzbox – eigener Fernzugang:** Internet → Freigaben →
+   FRITZ!Box-Dienste. Ist „Internetzugriff auf die FRITZ!Box über HTTPS“ an
+   und liegt auf Port 443, kollidiert er mit der Freigabe. Empfehlung:
+   ausschalten – der Zugang von unterwegs geht über das VPN.
+2. **Hostname:** `nslookup <ROSTER_HOST>` liefert dieselbe öffentliche IP wie
+   `nslookup <name>.duckdns.org`.
+3. **Fritzbox – Portfreigabe:** Internet → Freigaben → Portfreigaben → beim
+   Pi „Bearbeiten“ (sonst „Gerät für Freigaben hinzufügen“) → „Neue Freigabe“
+   → „Portfreigabe“: Anwendung „HTTPS-Server“ (oder „Andere Anwendung“,
+   Name „Mordheim“), Protokoll TCP, Port an Gerät 443 bis 443, Port extern
+   gewünscht 443, **nur IPv4** (kein Haken bei IPv6), „Freigabe aktivieren“.
+   Beim Gerät „Selbstständige Portfreigaben für dieses Gerät erlauben“ aus;
+   kein „Exposed Host“. Die bestehenden Freigaben bleiben unverändert.
+4. **UFW:** `sudo ufw allow 443/tcp comment 'Mordheim (Caddy)'`,
+   `sudo ufw status numbered`.
+5. **Zertifikat:** `docker restart roster-caddy` (Caddy versucht es sofort
+   neu, statt aus der Wartezeit früherer Fehlversuche), nach einer Minute
+   `docker logs --since 5m roster-caddy 2>&1 | grep -iE 'certificate obtained|error'`.
+6. **Von außen testen:** am Handy im Mobilfunknetz (nicht im WLAN)
+   `https://<ROSTER_HOST>/api/v1/health` öffnen.
+7. **Überwachung an:** `sudo systemctl enable --now roster-alive.timer`;
+   `sudo fail2ban-client status roster-auth`.
+
+Mit dem Zertifikat steht der Hostname in den öffentlichen
+Certificate-Transparency-Logs; Scanner klopfen danach an. Erreichbar ist nur
+Port 443, und dahinter liegen in Phase 2 nur Health und die Dateien der App.
 
 ### Stufe 3 – Übungen (Abnahme Phase 2)
 
-- [ ] **Rollback-Übung:** `roster-deploy drill-broken` – ein Image, das sofort
-  abstürzt (die CI legt es bei jedem Lauf auf `master` ab). Erwartet:
-  Abbruch nach 60 Sekunden, Exit 1, „rolled back to …“;
-  `roster-deploy --status` zeigt wieder den vorigen Stand.
-- [ ] **SSD-Übung:** `mv /mnt/ssd/roster/data/.roster-volume ~/marker.away`,
-  dann `docker restart roster-app`: Die App kommt nicht hoch
-  (`journalctl CONTAINER_NAME=roster-app -n 5` zeigt `volume_missing`),
-  `roster-deploy` und das Backup verweigern die Arbeit. Datei
-  zurücklegen, `docker restart roster-app`, Health prüfen.
-- [ ] Der **Wiederherstellungstest** ist drei Nächte in Folge grün
-  (healthchecks.io).
+1. **Rollback-Übung:** `roster-deploy drill-broken; echo "exit=$?"` – ein
+   Image, das sofort abstürzt (die CI legt es auf `master` ab). Erwartet:
+   nach 60 Sekunden „rolled back to …“, `exit=1`; `roster-deploy --status`
+   zeigt den vorigen Stand.
+2. **SSD-Übung:** `mv /mnt/ssd/roster/data/.roster-volume ~/roster-volume.away`,
+   `docker restart roster-app`, nach ein paar Sekunden
+   `curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/api/v1/health`
+   → `000`, `journalctl CONTAINER_NAME=roster-app -n 3 --no-pager` zeigt
+   `volume_missing`, `roster-deploy <tag>` verweigert die Arbeit. Zurück:
+   `mv ~/roster-volume.away /mnt/ssd/roster/data/.roster-volume`,
+   `docker restart roster-app`, Health prüfen.
+3. Der **Wiederherstellungstest** ist drei Nächte in Folge grün
+   (healthchecks.io).
 
 Beide Übungen laufen zusätzlich bei jedem Push in der CI
 ([`ops/test/e2e.sh`](../ops/test/e2e.sh)), dazu ein Rollback mit
@@ -132,21 +163,29 @@ scheitert).
 
 Mitspieler werden erst eingeladen, wenn Phase 3 abgenommen ist.
 
+### Aktualisieren
+
+```bash
+cd ~/src/Mordheim-Roster-Builder
+git fetch && git log --oneline HEAD..origin/master     # was neu ist
+git diff HEAD origin/master -- ops/                     # was als root laufen wird
+git pull --ff-only && sudo ops/install.sh               # nur wenn ops/ sich geändert hat
+roster-deploy --staging <tag> && roster-deploy <tag>
+```
+
 ### Nebeneinander mit den bestehenden Diensten
 
 | Dienst | Port | Von außen | Weg |
 | --- | --- | --- | --- |
-| TeamSpeak Sprache | 9987/UDP | ja (bestehend) | Fritzbox → TS3-Container |
-| TeamSpeak Dateien | 30033/TCP | ja (bestehend) | Fritzbox → TS3-Container |
 | **Mordheim** | **443/TCP** | **ja (neu)** | Fritzbox → Caddy (Host-Netz) → App auf `127.0.0.1:3000` |
-| Jellyfin | 8096/TCP | nein | Heimnetz |
-| Mordheim-Testinstanz | 8081/TCP | nein | Heimnetz, WireGuard |
-| SSH | 22/TCP | nur über WireGuard | Fritzbox-VPN |
+| Mordheim-Testinstanz | 8081/TCP | nein | Heimnetz und VPN |
+| bestehende Dienste | wie bisher | unverändert | die bestehenden Freigaben bleiben, wie sie sind |
 
-- Die Fritzbox verteilt nach Port und Protokoll; TeamSpeak und Mordheim teilen
-  sich die öffentliche IP und den DuckDNS-Namen, ohne sich zu berühren.
+- Die Fritzbox verteilt nach Port und Protokoll; die bestehenden Dienste und
+  Mordheim teilen sich die öffentliche IP und den DuckDNS-Namen, ohne sich zu
+  berühren.
 - **Last:** Die App synchronisiert nur, solange sie offen ist, und schickt
-  dabei wenige Kilobyte. Neben Sprache in TeamSpeak ist das nicht spürbar,
+  dabei wenige Kilobyte. Neben Sprache im Voice-Chat ist das nicht spürbar,
   auch nicht am Spielabend. TTS läuft auf den Rechnern der Spieler, nicht auf
   dem Pi.
 - **Im Heimnetz** funktioniert dieselbe Adresse; die Fritzbox leitet Anfragen
@@ -158,7 +197,7 @@ Mitspieler werden erst eingeladen, wenn Phase 3 abgenommen ist.
 ## 3. Verzeichnisse
 
 ```
-/mnt/ssd/agent/repos/roster/ops/   Quelle der Betriebsdateien (aus dem Repo)
+~/src/Mordheim-Roster-Builder/ops/  Quelle der Betriebsdateien (eigener Klon, nicht unter /mnt/ssd/agent)
 ~/server/roster/
   site.env            Hostname, LAN-IP (nur auf dem Pi, nie im Repo)
   compose.yaml        Produktion, Testinstanz, Caddy (von install.sh erzeugt)
@@ -205,7 +244,7 @@ bricht ab, solange er nicht eingebunden ist.
 
 - **Caddy** im Host-Netz (UFW und Fail2Ban greifen, die App sieht die echte
   Client-IP), 128 MB. Watchtower darf Caddy weiter aktualisieren.
-- **App** (`roster-app`) auf `127.0.0.1:3000`, als robin (1000:1000),
+- **App** (`roster-app`) auf `127.0.0.1:3000`, als `<user>` (1000:1000),
   256 MB, 1,5 Kerne; Logs an journald (für Fail2Ban); Watchtower
   ausgeschlossen. Gehärtet: Dateisystem nur lesbar außer `/data`,
   `/uploads` und `/tmp`, keine Capabilities, `no-new-privileges`, höchstens
@@ -262,7 +301,7 @@ legt es als `ghcr.io/hmvbfv/mordheim-roster:<commit>` ab (die ersten sieben
 Zeichen des Commits) – aber erst, wenn alle Tests grün sind, auch der
 Rauchtest des Images und der Ende-zu-Ende-Test der Betriebsdateien. Auf
 `master` zusätzlich `:master` und `:drill-broken` (Rollback-Übung). Auf den Pi
-kommt ein Image nur bewusst, als robin per SSH in `tmux`:
+kommt ein Image nur bewusst, als `<user>` per SSH in `tmux`:
 
 ```bash
 roster-deploy --staging <commit>   # zuerst die Testinstanz, im Heimnetz prüfen

@@ -135,6 +135,11 @@ changing anything structural.
 
 - **Every bug fix starts with a failing regression test.** Tests are
   unconditional — no branch that silently skips an assertion.
+- Commit as `M. Robin R. <155396440+hmVBfv@users.noreply.github.com>`: before
+  the first commit of a session run
+  `git config user.name "M. Robin R."` and
+  `git config user.email "155396440+hmVBfv@users.noreply.github.com"`.
+  Never commit under a real name or address (both repos are public).
 - Work on branches, one topic per branch, started from `master`. Never push
   to `master`; `master` changes only via pull request with green CI. When a
   branch is ready, open the pull request yourself (the session's GitHub
@@ -188,9 +193,11 @@ changing anything structural.
 - **The Pi only runs the service.** No agent works on this project on the Pi.
   Everything the Pi needs (compose file, Caddyfile, systemd units and timers,
   `roster-deploy`, backup scripts, Fail2Ban rule) lives in `ops/` and is
-  applied by Rob over SSH with `sudo ops/install.sh`. Real hostnames and IPs
-  live only in `~/server/roster/site.env` on the Pi — use placeholders in
-  `ops/`.
+  applied by Rob over SSH with `sudo ops/install.sh` from his own clone
+  (`~/src/Mordheim-Roster-Builder`, never under `/mnt/ssd/agent/`). Real
+  hostnames, IPs and account names live only in `~/server/roster/site.env`
+  on the Pi — use placeholders (`<user>`, `<name>`, `<pi-lan-ip>`) in
+  `ops/` and `docs/`.
 - Design for the Pi's limits: 4 GB RAM shared with Jellyfin, TeamSpeak and
   the chronicle agents; server container limit 256 MB; performance budgets in
   `docs/ui.md` are enforced by CI.

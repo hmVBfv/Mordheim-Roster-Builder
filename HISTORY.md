@@ -1689,3 +1689,27 @@ API does return — and they showed the timers' services failing with
 is now a setting (`ROSTER_MOUNT`, `/mnt/ssd` by default) that the
 emergency setup on the desktop needed anyway, and the test mounts its SSD
 as a proper mount unit under `/srv`.
+
+## September 30, 2026 (cont.) — before the Pi: who can reach what
+
+Rob asked for the commands for the Pi, and for a check that nothing in the
+repository could be used against the Pi or against him. Going through it
+command by command changed three things.
+
+The plan had Rob run `sudo ops/install.sh` in the clone the agent base
+already keeps under `/mnt/ssd/agent/repos/`. That directory is mounted into
+the agent containers, so anything able to steer an agent could have edited a
+script that root runs next. The clone now lives in Rob's home, and
+`install.sh` refuses to run from the agent directory or from files others
+could change. It also stopped *sourcing* `site.env` as root; it reads the
+known keys line by line and checks their values. The scripts refuse to run
+as root, so a restored database cannot end up owned by root.
+
+The repository itself holds no secret, hostname or address: every revision
+was searched. It did hold the Pi's account name, host name and the ports of
+the other services, now placeholders or gone from the current docs. And the
+cloud sessions had committed under Rob's full name and university address,
+while his own commits use a shortened name and GitHub's no-reply address.
+Commits from now on use the latter (`CLAUDE.md` says so). The older commits
+were a question for Rob: rewriting published history can only be partly
+undone, and GitHub keeps the old commits of merged pull requests.

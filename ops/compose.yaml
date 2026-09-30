@@ -2,7 +2,7 @@
 # ops/install.sh renders it into ~/server/roster/compose.yaml with the values
 # from ~/server/roster/site.env – change it here, in the repository.
 #   {{ROSTER_DATA}}    /mnt/ssd/roster
-#   {{ROSTER_UID}}, {{ROSTER_GID}}  robin's user and group (1000:1000)
+#   {{ROSTER_UID}}, {{ROSTER_GID}}  your user and group on the Pi
 #   {{ROSTER_LAN_IP}}  the Pi in the home network (test instance only)
 # The image tags come from ~/server/roster/.env, which roster-deploy keeps.
 name: roster
