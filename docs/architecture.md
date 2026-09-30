@@ -5,7 +5,7 @@ Stand: 27. September 2026 · Grundlage: [concept.md](concept.md), ADRs 0001, 000
 ## 1. Überblick
 
 ```
- Handy / Desktop (PWA)                     Pi 5 (piServer)
+ Handy / Desktop (PWA)                     Pi 5
 ┌──────────────────────────┐   HTTPS   ┌──────────────────────────────┐
 │ app/  React-Oberfläche   │◄─────────►│ caddy   :443, Zertifikat      │
 │  ├ core/  Regeln, Diff   │  Fritzbox │   └► server/ 127.0.0.1:3000   │
@@ -321,9 +321,11 @@ Claude-App oder claude.ai/code), mit diesem Repo als Quelle:
   `Caddyfile`, systemd-Units und -Timer, `roster-deploy`, Backup- und
   Test-Skripte, Fail2Ban-Regel, `install.sh`. Echte Hostnamen und IPs stehen
   nicht darin, sondern in `~/server/roster/site.env` auf dem Pi.
-- Rob spielt Änderungen per SSH ein: im vorhandenen Klon
-  `/mnt/ssd/agent/repos/roster` `git pull`, dann `sudo ops/install.sh`;
-  neue App-Versionen mit `roster-deploy <tag>`.
+- Rob spielt Änderungen per SSH ein: im eigenen Klon
+  `~/src/Mordheim-Roster-Builder` `git pull --ff-only`, dann
+  `sudo ops/install.sh`; neue App-Versionen mit `roster-deploy <tag>`. Der
+  Klon liegt bewusst nicht unter `/mnt/ssd/agent/`: `install.sh` läuft als
+  root, und dort können die Agenten-Container schreiben.
 - Kein Agent arbeitet auf dem Pi am Roster-Projekt. Die Agenten-Basis
   (`mordheim-agent`, `chronik N`, Remote Control „Chronik“) bleibt
   unverändert und für die Chronik zuständig.

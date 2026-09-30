@@ -74,6 +74,8 @@ ROSTER_LAN_IP=127.0.0.1
 ROSTER_IMAGE=$IMAGE
 ROSTER_MOUNT=$mnt
 EOF
+# install.sh refuses to run files others could have changed
+chmod -R go-w "$ops"
 "$ops/install.sh" --no-caddy
 as sh -c "umask 077; head -c 32 /dev/urandom | base64 > $root/secrets/restic.pass"
 as restic init -q -r "$root/backups/restic" --password-file "$root/secrets/restic.pass"
