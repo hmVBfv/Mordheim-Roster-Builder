@@ -32,7 +32,7 @@ expect_exit() { # expect_exit <code> <description> <command…>
   "$@" || got=$?
   if [ "$got" = "$want" ]; then ok "$d (exit $got)"; else bad "$d (exit $got, expected $want)"; fi
 }
-health() { curl -fsS -m 5 "http://127.0.0.1:${1:-3000}/api/v1/health"; }
+health() { curl -fsS -m 5 http://127.0.0.1:3000/api/v1/health; }
 field() { sed -E "s/.*\"$1\":\"?([^\",}]*)\"?.*/\\1/"; }
 probe_set() { docker exec "${2:-roster-app}" node -e "const D=require('/app/node_modules/better-sqlite3');new D('/data/roster.sqlite').prepare(\"INSERT INTO meta (key, value) VALUES ('e2e_probe', ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value\").run(process.argv[1])" "$1"; }
 probe_get() { docker exec "${1:-roster-app}" node -e "const D=require('/app/node_modules/better-sqlite3');const r=new D('/data/roster.sqlite').prepare(\"SELECT value FROM meta WHERE key = 'e2e_probe'\").get();process.stdout.write(r?r.value:'')"; }
