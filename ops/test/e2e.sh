@@ -8,7 +8,7 @@
 #   sudo IMAGE=<repo> ops/test/e2e.sh <good tag> <broken tag> <migration-drill tag>
 #
 # The images must exist locally (roster-deploy runs with ROSTER_NO_PULL=1).
-# /mnt/ssd becomes a tmpfs if it is not a mount point.
+# /mnt/ssd becomes a tmpfs (through systemd) if it is not mounted.
 set -Eeuo pipefail
 
 good=${1:?good tag} broken=${2:?broken tag} drill=${3:?migration drill tag}
@@ -50,7 +50,10 @@ runs_image() { [ "$(docker inspect -f '{{.Image}}' roster-app)" = "$(docker imag
 
 echo "# setup"
 mkdir -p /mnt/ssd
-mountpoint -q /mnt/ssd || mount -t tmpfs -o size=1g tmpfs /mnt/ssd
+# mounted through systemd, so PID 1 knows it (the units require the mount;
+# a plain mount from the runner's own mount namespace stays invisible to it)
+systemctl is-active --quiet mnt-ssd.mount || systemd-mount --type=tmpfs --options=size=1g tmpfs /mnt/ssd
+for _ in $(seq 1 10); do mountpoint -q /mnt/ssd && break; sleep 0.5; done
 install -d -o "$user" -g "$(id -g "$user")" "$home/server" "$home/server/roster"
 cat >"$home/server/roster/site.env" <<EOF
 ROSTER_HOST=roster.test
