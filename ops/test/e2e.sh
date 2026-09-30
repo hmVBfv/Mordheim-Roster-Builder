@@ -149,6 +149,9 @@ if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed"
   annotate notice "ops.log" "$(tail -n 40 "$home/server/roster/ops.log")"
   annotate notice "roster-app journal" "$(journalctl CONTAINER_NAME=roster-app -n 30 --no-pager -o cat 2>&1 | cut -c1-300)"
+  for u in roster-backup roster-restore-test; do
+    annotate notice "$u journal" "$(journalctl -u "$u.service" -n 30 --no-pager 2>&1 | cut -c1-300)"
+  done
   journalctl CONTAINER_NAME=roster-app -n 40 --no-pager || true
   exit 1
 fi
