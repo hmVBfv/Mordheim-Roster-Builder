@@ -185,7 +185,13 @@ if [ -d /etc/fail2ban ]; then
   install -m 644 "$ops/fail2ban/filter.d/roster-auth.conf" /etc/fail2ban/filter.d/roster-auth.conf
   install -m 644 "$ops/fail2ban/jail.d/roster.local" /etc/fail2ban/jail.d/roster.local
   if systemctl is-active --quiet fail2ban; then
-    fail2ban-client reload >/dev/null && say "Fail2Ban reloaded (sudo fail2ban-client status roster-auth)"
+    if fail2ban-client reload >/dev/null; then
+      say "Fail2Ban reloaded (sudo fail2ban-client status roster-auth)"
+    else
+      warn "fail2ban-client reload failed – see: sudo journalctl -u fail2ban -n 30"
+    fi
+  else
+    warn "Fail2Ban is installed but not running (sudo systemctl enable --now fail2ban)"
   fi
 else
   warn "Fail2Ban is not installed; the roster-auth jail is skipped"
