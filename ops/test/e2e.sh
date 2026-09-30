@@ -52,8 +52,16 @@ echo "# setup"
 mkdir -p /mnt/ssd
 # mounted through systemd, so PID 1 knows it (the units require the mount;
 # a plain mount from the runner's own mount namespace stays invisible to it)
-systemctl is-active --quiet mnt-ssd.mount || systemd-mount --type=tmpfs --options=size=1g tmpfs /mnt/ssd
+if ! systemctl is-active --quiet mnt-ssd.mount; then
+  printf '[Mount]\nWhat=tmpfs\nWhere=/mnt/ssd\nType=tmpfs\nOptions=size=1g,mode=755\n' >/run/systemd/system/mnt-ssd.mount
+  systemctl daemon-reload
+  if ! systemctl start mnt-ssd.mount; then
+    annotate error "mount /mnt/ssd" "$(systemctl status mnt-ssd.mount --no-pager 2>&1 | tail -n 15)"
+    exit 1
+  fi
+fi
 for _ in $(seq 1 10); do mountpoint -q /mnt/ssd && break; sleep 0.5; done
+mountpoint -q /mnt/ssd || { annotate error "mount /mnt/ssd" "systemd mounted it, this process does not see it: $(findmnt /mnt/ssd 2>&1)"; exit 1; }
 install -d -o "$user" -g "$(id -g "$user")" "$home/server" "$home/server/roster"
 cat >"$home/server/roster/site.env" <<EOF
 ROSTER_HOST=roster.test
