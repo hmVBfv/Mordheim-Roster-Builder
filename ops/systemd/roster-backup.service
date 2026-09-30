@@ -3,7 +3,7 @@ Description=Mordheim Campaign: nightly backup (snapshot + restic)
 Documentation=https://github.com/hmVBfv/Mordheim-Roster-Builder/blob/master/docs/operations.md
 Requires=docker.service
 After=docker.service
-RequiresMountsFor=/mnt/ssd
+RequiresMountsFor={{ROSTER_MOUNT}}
 
 [Service]
 Type=oneshot

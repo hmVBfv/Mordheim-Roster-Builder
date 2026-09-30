@@ -50,7 +50,8 @@ site=${site:-$home/server/roster/site.env}
 . "$site"
 ROSTER_USER=${ROSTER_USER:-robin}
 home=$(getent passwd "$ROSTER_USER" | cut -d: -f6) || die "no user $ROSTER_USER (site.env)"
-ROSTER_DATA=${ROSTER_DATA:-/mnt/ssd/roster}
+ROSTER_MOUNT=${ROSTER_MOUNT:-/mnt/ssd}
+ROSTER_DATA=${ROSTER_DATA:-$ROSTER_MOUNT/roster}
 ROSTER_IMAGE=${ROSTER_IMAGE:-ghcr.io/hmvbfv/mordheim-roster}
 ROSTER_DIR=$home/server/roster
 ROSTER_UID=$(id -u "$ROSTER_USER")
@@ -58,12 +59,14 @@ ROSTER_GID=$(id -g "$ROSTER_USER")
 : "${ROSTER_HOST:?site.env: ROSTER_HOST is missing}" "${ROSTER_LAN_IP:?site.env: ROSTER_LAN_IP is missing}"
 [[ "$ROSTER_HOST" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]] || die "ROSTER_HOST is not a host name: $ROSTER_HOST"
 [[ "$ROSTER_LAN_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || die "ROSTER_LAN_IP is not an IPv4 address: $ROSTER_LAN_IP"
+[[ "$ROSTER_MOUNT" =~ ^/[A-Za-z0-9/_.-]*$ ]] || die "ROSTER_MOUNT is not a plain absolute path: $ROSTER_MOUNT"
 [[ "$ROSTER_DATA" =~ ^/[A-Za-z0-9/_.-]+$ ]] || die "ROSTER_DATA is not a plain absolute path: $ROSTER_DATA"
+case "$ROSTER_DATA/" in "${ROSTER_MOUNT%/}/"?*) ;; *) die "ROSTER_DATA ($ROSTER_DATA) is not on ROSTER_MOUNT ($ROSTER_MOUNT)" ;; esac
 [[ "$ROSTER_IMAGE" =~ ^[a-z0-9./:_-]+$ ]] || die "ROSTER_IMAGE is not an image name: $ROSTER_IMAGE"
 
 render() {
   sed -e "s|{{ROSTER_HOST}}|$ROSTER_HOST|g" -e "s|{{ROSTER_LAN_IP}}|$ROSTER_LAN_IP|g" \
-    -e "s|{{ROSTER_DATA}}|$ROSTER_DATA|g" -e "s|{{ROSTER_USER}}|$ROSTER_USER|g" \
+    -e "s|{{ROSTER_DATA}}|$ROSTER_DATA|g" -e "s|{{ROSTER_MOUNT}}|$ROSTER_MOUNT|g" -e "s|{{ROSTER_USER}}|$ROSTER_USER|g" \
     -e "s|{{ROSTER_UID}}|$ROSTER_UID|g" -e "s|{{ROSTER_GID}}|$ROSTER_GID|g" "$1"
 }
 
@@ -87,6 +90,7 @@ if [ -n "$render_only" ]; then
   render "$ops/Caddyfile" >"$render_only/Caddyfile"
   conf >"$render_only/roster.conf"
   for u in "${UNITS[@]}"; do render "$ops/systemd/$u" >"$render_only/systemd/$u"; done
+  render "$ops/systemd/docker.service.d/ssd.conf" >"$render_only/systemd/docker-ssd.conf"
   if grep -rn '{{' "$render_only"; then die "placeholders left unrendered"; fi
   say "rendered into $render_only"
   exit 0
@@ -101,10 +105,7 @@ id -nG "$ROSTER_USER" | tr ' ' '\n' | grep -qx docker || die "$ROSTER_USER is no
 if docker info 2>&1 | grep -qi 'no memory limit support\|memory limit.*not supported'; then
   warn "Docker has no memory limits: add 'cgroup_enable=memory cgroup_memory=1' to /boot/firmware/cmdline.txt and reboot (Stufe 1)"
 fi
-ssd=$(echo "$ROSTER_DATA" | cut -d/ -f1-3)
-if [ "$ssd" = /mnt/ssd ]; then
-  mountpoint -q /mnt/ssd || die "/mnt/ssd is not mounted – not installing onto the SD card"
-fi
+mountpoint -q "$ROSTER_MOUNT" || die "$ROSTER_MOUNT is not mounted – not installing onto the SD card"
 
 # 2. directories on the SSD
 as_user() { install -d -o "$ROSTER_USER" -g "$ROSTER_GID" -m "${2:-750}" "$1"; }
@@ -171,7 +172,8 @@ for u in "${UNITS[@]}"; do
   chmod 644 "/etc/systemd/system/$u"
 done
 install -d -m 755 /etc/systemd/system/docker.service.d
-install -m 644 "$ops/systemd/docker.service.d/ssd.conf" /etc/systemd/system/docker.service.d/ssd.conf
+render "$ops/systemd/docker.service.d/ssd.conf" >/etc/systemd/system/docker.service.d/ssd.conf
+chmod 644 /etc/systemd/system/docker.service.d/ssd.conf
 systemctl daemon-reload
 systemctl enable --now roster-backup.timer roster-restore-test.timer >/dev/null
 if systemctl is-enabled --quiet roster-alive.timer; then
