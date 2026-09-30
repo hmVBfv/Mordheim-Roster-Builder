@@ -33,7 +33,14 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": "Goblins only"
+   "wb": "Goblins only",
+   "only": {
+    "wb": [
+     "nightgoblins",
+     "forestgoblins",
+     "orcmob/goblin"
+    ]
+   }
   },
   {
    "de": "Barbed Whip",
@@ -41,7 +48,13 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Rare 9",
-   "wb": "Marauders of Chaos (1 Hero) only"
+   "wb": "Marauders of Chaos (1 Hero) only",
+   "only": {
+    "wb": [
+     "maraudersofchaos"
+    ],
+    "heroes": true
+   }
   },
   {
    "de": "Beastlash",
@@ -49,7 +62,12 @@
    "cat": "cc",
    "cost": "10+1D6",
    "rare": "Rare 8",
-   "wb": "Dark Elf Beastmaster only"
+   "wb": "Dark Elf Beastmaster only",
+   "only": {
+    "wb": [
+     "darkelves/beastmaster"
+    ]
+   }
   },
   {
    "de": "Boat Hook",
@@ -57,7 +75,12 @@
    "cat": "cc",
    "cost": 8,
    "rare": "Common",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Boss Pole",
@@ -65,7 +88,13 @@
    "cat": "cc",
    "cost": 20,
    "rare": "Common",
-   "wb": "Forest & Night Goblins only"
+   "wb": "Forest & Night Goblins only",
+   "only": {
+    "wb": [
+     "forestgoblins",
+     "nightgoblins"
+    ]
+   }
   },
   {
    "de": "Schlagring (Paar)",
@@ -81,7 +110,12 @@
    "cat": "cc",
    "cost": 35,
    "rare": "Rare 7",
-   "wb": "Witch Hunters only"
+   "wb": "Witch Hunters only",
+   "only": {
+    "wb": [
+     "wh"
+    ]
+   }
   },
   {
    "de": "Cat O'Nine Tails",
@@ -89,7 +123,13 @@
    "cat": "cc",
    "cost": 8,
    "rare": "Common",
-   "wb": "Pirate Heroes only"
+   "wb": "Pirate Heroes only",
+   "only": {
+    "wb": [
+     "pirates"
+    ],
+    "heroes": true
+   }
   },
   {
    "de": "Censer",
@@ -97,7 +137,12 @@
    "cat": "cc",
    "cost": 40,
    "rare": "Rare 9",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Klaue der Alten",
@@ -105,7 +150,12 @@
    "cat": "cc",
    "cost": 30,
    "rare": "Rare 12",
-   "wb": "Amazons (Mordheim) only"
+   "wb": "Amazons (Mordheim) only",
+   "only": {
+    "wb": [
+     "amazons"
+    ]
+   }
   },
   {
    "de": "Hackbeil",
@@ -113,7 +163,12 @@
    "cat": "cc",
    "cost": 3,
    "rare": "Common",
-   "wb": "Mootlanders only"
+   "wb": "Mootlanders only",
+   "only": {
+    "wb": [
+     "mootlanders"
+    ]
+   }
   },
   {
    "de": "Knüppel",
@@ -137,7 +192,13 @@
    "cat": "cc",
    "cost": "+15/+20",
    "rare": "Rare 9",
-   "wb": "Dark Elves Heroes only (upgrades sword or dagger; +15 gc at recruitment, +20 gc later)"
+   "wb": "Dark Elves Heroes only (upgrades sword or dagger; +15 gc at recruitment, +20 gc later)",
+   "only": {
+    "wb": [
+     "darkelves"
+    ],
+    "heroes": true
+   }
   },
   {
    "de": "Disease Dagger",
@@ -145,7 +206,12 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Rare 8",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Zweihandwaffe",
@@ -161,7 +227,17 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Rare 8",
-   "wb": "Dwarfs only"
+   "wb": "Dwarfs only",
+   "only": {
+    "wb": [
+     "dwarftreasure",
+     "dwarfrangers",
+     "pitfighters/trollslayer"
+    ],
+    "hires": [
+     "dwarf"
+    ]
+   }
   },
   {
    "de": "Kampfklauen (Paar)",
@@ -169,7 +245,13 @@
    "cat": "cc",
    "cost": 35,
    "rare": "Rare 7",
-   "wb": "Skaven only"
+   "wb": "Skaven only",
+   "only": {
+    "wb": [
+     "skaven",
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Flegel",
@@ -185,7 +267,13 @@
    "cat": "cc",
    "cost": 25,
    "rare": "Rare 8",
-   "wb": "Marauders of Chaos (Chosen of Chaos) only"
+   "wb": "Marauders of Chaos (Chosen of Chaos) only",
+   "only": {
+    "wb": [
+     "maraudersofchaos/chieftain",
+     "maraudersofchaos/seer,champion"
+    ]
+   }
   },
   {
    "de": "Gromril-Waffe",
@@ -241,7 +329,12 @@
    "cat": "cc",
    "cost": 2,
    "rare": "Common",
-   "wb": "Mootlanders only"
+   "wb": "Mootlanders only",
+   "only": {
+    "wb": [
+     "mootlanders"
+    ]
+   }
   },
   {
    "de": "Schöpfkelle",
@@ -249,7 +342,12 @@
    "cat": "cc",
    "cost": 2,
    "rare": "Common",
-   "wb": "Mootlanders only"
+   "wb": "Mootlanders only",
+   "only": {
+    "wb": [
+     "mootlanders"
+    ]
+   }
   },
   {
    "de": "Lanze",
@@ -273,7 +371,12 @@
    "cat": "cc",
    "cost": 7,
    "rare": "Rare 7",
-   "wb": "Hochland Bandits only"
+   "wb": "Hochland Bandits only",
+   "only": {
+    "wb": [
+     "hochland"
+    ]
+   }
   },
   {
    "de": "Morgenstern",
@@ -289,7 +392,18 @@
    "cat": "cc",
    "cost": "4× Preis",
    "rare": "Rare 12",
-   "wb": "Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival only"
+   "wb": "Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival only",
+   "only": {
+    "wb": [
+     "maraudersofchaos",
+     "norse",
+     "beastmen",
+     "sonsofhashut",
+     "blackdwarfs",
+     "possessed",
+     "carnival"
+    ]
+   }
   },
   {
    "de": "Zharr-Obsidianwaffe",
@@ -297,7 +411,12 @@
    "cat": "cc",
    "cost": 60,
    "rare": "Rare 10",
-   "wb": "Sons of Hashut (Chaos Dwarfs) only; a sword, axe or hammer"
+   "wb": "Sons of Hashut (Chaos Dwarfs) only; a sword, axe or hammer",
+   "only": {
+    "wb": [
+     "sonsofhashut"
+    ]
+   }
   },
   {
    "de": "Pike",
@@ -305,7 +424,13 @@
    "cat": "cc",
    "cost": 12,
    "rare": "Rare 7",
-   "wb": "Tileans only"
+   "wb": "Tileans only",
+   "only": {
+    "wb": [
+     "tileans",
+     "caravans/sellsword"
+    ]
+   }
   },
   {
    "de": "Rapier",
@@ -313,7 +438,16 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Rare 5",
-   "wb": "Reiklanders, Marienburgers, Tileans, Hochland only"
+   "wb": "Reiklanders, Marienburgers, Tileans, Hochland only",
+   "only": {
+    "wb": [
+     "merc:reik",
+     "merc:mari",
+     "tileans",
+     "hochland",
+     "caravans/merchant,apprentice,knight,magician"
+    ]
+   }
   },
   {
    "de": "Schlangenstab",
@@ -321,7 +455,12 @@
    "cat": "cc",
    "cost": 30,
    "rare": "Common",
-   "wb": "Tomb Guardians Liche Priest only"
+   "wb": "Tomb Guardians Liche Priest only",
+   "only": {
+    "wb": [
+     "tombguardians/lichepriest"
+    ]
+   }
   },
   {
    "de": "Sigmaritischer Kriegshammer",
@@ -329,7 +468,12 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": "Sisters of Sigmar only"
+   "wb": "Sisters of Sigmar only",
+   "only": {
+    "wb": [
+     "sos"
+    ]
+   }
   },
   {
    "de": "Speer",
@@ -345,7 +489,12 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": "Pit Fighters only"
+   "wb": "Pit Fighters only",
+   "only": {
+    "wb": [
+     "pitfighters"
+    ]
+   }
   },
   {
    "de": "Starblade",
@@ -353,7 +502,12 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Rare 7",
-   "wb": "Amazons (Lustria) only"
+   "wb": "Amazons (Lustria) only",
+   "only": {
+    "wb": [
+     "amazonslustria"
+    ]
+   }
   },
   {
    "de": "Starsword",
@@ -361,7 +515,12 @@
    "cat": "cc",
    "cost": 30,
    "rare": "Rare 10",
-   "wb": "Amazons (Lustria) only"
+   "wb": "Amazons (Lustria) only",
+   "only": {
+    "wb": [
+     "amazonslustria"
+    ]
+   }
   },
   {
    "de": "Stahlpeitsche",
@@ -369,7 +528,14 @@
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
-   "wb": "Sisters of Sigmar & Chaos Dwarfs only"
+   "wb": "Sisters of Sigmar & Chaos Dwarfs only",
+   "only": {
+    "wb": [
+     "sos",
+     "sonsofhashut",
+     "blackdwarfs"
+    ]
+   }
   },
   {
    "de": "Schwert",
@@ -393,7 +559,12 @@
    "cat": "cc",
    "cost": 3,
    "rare": "Common",
-   "wb": "Mootlanders only"
+   "wb": "Mootlanders only",
+   "only": {
+    "wb": [
+     "mootlanders"
+    ]
+   }
   },
   {
    "de": "Dreizack",
@@ -401,7 +572,12 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Rare 7",
-   "wb": "Pit Fighters only"
+   "wb": "Pit Fighters only",
+   "only": {
+    "wb": [
+     "pitfighters"
+    ]
+   }
   },
   {
    "de": "Klageklingen (Paar)",
@@ -409,7 +585,13 @@
    "cat": "cc",
    "cost": 50,
    "rare": "Rare 9",
-   "wb": "Skaven only"
+   "wb": "Skaven only",
+   "only": {
+    "wb": [
+     "skaven",
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Belaying Pin",
@@ -417,7 +599,12 @@
    "cat": "missile",
    "cost": 3,
    "rare": "Common",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Blasrohr",
@@ -425,7 +612,16 @@
    "cat": "missile",
    "cost": 25,
    "rare": "Rare 7",
-   "wb": "Skaven, Lizardmen, Forest Goblins only (Common for Forest Goblins)"
+   "wb": "Skaven, Lizardmen, Forest Goblins only (Common for Forest Goblins)",
+   "only": {
+    "wb": [
+     "skaven",
+     "skavenpest",
+     "lizardmen",
+     "forestgoblins",
+     "reavers/conqueror,slayer,beastmaster,shadow,trapmaster"
+    ]
+   }
   },
   {
    "de": "Bolas",
@@ -433,7 +629,13 @@
    "cat": "missile",
    "cost": 5,
    "rare": "Common",
-   "wb": "Lizardmen, Amazons (Lustria) only"
+   "wb": "Lizardmen, Amazons (Lustria) only",
+   "only": {
+    "wb": [
+     "lizardmen",
+     "amazonslustria"
+    ]
+   }
   },
   {
    "de": "Bogen",
@@ -473,7 +675,16 @@
    "cat": "missile",
    "cost": 5,
    "rare": "Common",
-   "wb": "Amazons (Mordheim), Norse, Pit Fighters only"
+   "wb": "Amazons (Mordheim), Norse, Pit Fighters only",
+   "only": {
+    "wb": [
+     "amazons",
+     "norse",
+     "pitfighters",
+     "lizardmen/skinkpriest,greatcrest,skinkbrave",
+     "reavers/conqueror,slayer,beastmaster,shadow,trapmaster"
+    ]
+   }
   },
   {
    "de": "Langbogen",
@@ -489,7 +700,12 @@
    "cat": "missile",
    "cost": 10,
    "rare": "Common",
-   "wb": "Tomb Guardians Tomb Lord only"
+   "wb": "Tomb Guardians Tomb Lord only",
+   "only": {
+    "wb": [
+     "tombguardians/tomblord"
+    ]
+   }
   },
   {
    "de": "Repetierarmbrust",
@@ -521,7 +737,12 @@
    "cat": "missile",
    "cost": 40,
    "rare": "Rare 12",
-   "wb": "Amazons (Mordheim) only"
+   "wb": "Amazons (Mordheim) only",
+   "only": {
+    "wb": [
+     "amazons"
+    ]
+   }
   },
   {
    "de": "Sonnenstab",
@@ -529,7 +750,12 @@
    "cat": "missile",
    "cost": 50,
    "rare": "Rare 12",
-   "wb": "Amazons (Mordheim) only"
+   "wb": "Amazons (Mordheim) only",
+   "only": {
+    "wb": [
+     "amazons"
+    ]
+   }
   },
   {
    "de": "Sunstaff (Lustria)",
@@ -537,7 +763,12 @@
    "cat": "missile",
    "cost": 35,
    "rare": "Rare 10",
-   "wb": "Amazons (Lustria) only"
+   "wb": "Amazons (Lustria) only",
+   "only": {
+    "wb": [
+     "amazonslustria"
+    ]
+   }
   },
   {
    "de": "Wurfmesser",
@@ -553,7 +784,12 @@
    "cat": "missile",
    "cost": 15,
    "rare": "Rare 10",
-   "wb": "Arabian Tomb Raiders only"
+   "wb": "Arabian Tomb Raiders only",
+   "only": {
+    "wb": [
+     "arabian"
+    ]
+   }
   },
   {
    "de": "Donnerbüchse",
@@ -569,7 +805,12 @@
    "cat": "cc",
    "cost": 25,
    "rare": "Rare 10",
-   "wb": "Black Dwarfs (Gaolers) only"
+   "wb": "Black Dwarfs (Gaolers) only",
+   "only": {
+    "wb": [
+     "blackdwarfs/gaoler"
+    ]
+   }
   },
   {
    "de": "Mechanischer Anzug",
@@ -577,7 +818,12 @@
    "cat": "armour",
    "cost": 225,
    "rare": "Rare 14",
-   "wb": "Black Dwarfs (Sorcerer) only"
+   "wb": "Black Dwarfs (Sorcerer) only",
+   "only": {
+    "wb": [
+     "blackdwarfs/sorcerer"
+    ]
+   }
   },
   {
    "de": "Engine of Chaos",
@@ -585,7 +831,13 @@
    "cat": "misc",
    "cost": 195,
    "rare": "Rare 10",
-   "wb": "Chaos Dwarfs only"
+   "wb": "Chaos Dwarfs only",
+   "only": {
+    "wb": [
+     "sonsofhashut",
+     "blackdwarfs"
+    ]
+   }
   },
   {
    "de": "Drachenschwert",
@@ -601,7 +853,13 @@
    "cat": "cc",
    "cost": 75,
    "rare": "Rare 12",
-   "wb": "Cathay / Emissary"
+   "wb": "Cathay / Emissary",
+   "only": {
+    "wb": [
+     "battlemonks",
+     "maneaters/captain"
+    ]
+   }
   },
   {
    "de": "Kampfstab",
@@ -625,7 +883,12 @@
    "cat": "missile",
    "cost": 10,
    "rare": "Rare 7",
-   "wb": "Battle Monks"
+   "wb": "Battle Monks",
+   "only": {
+    "wb": [
+     "battlemonks"
+    ]
+   }
   },
   {
    "de": "Breitschwert",
@@ -665,7 +928,12 @@
    "cat": "cc",
    "cost": 30,
    "rare": "Rare 10",
-   "wb": "Cavalcade (Aristocrat)"
+   "wb": "Cavalcade (Aristocrat)",
+   "only": {
+    "wb": [
+     "cavalcade/aristocrat"
+    ]
+   }
   },
   {
    "de": "Kathay-Seidenpanzer",
@@ -673,7 +941,12 @@
    "cat": "armour",
    "cost": 15,
    "rare": "Rare 10",
-   "wb": "Cavalcade (Aristocrat)"
+   "wb": "Cavalcade (Aristocrat)",
+   "only": {
+    "wb": [
+     "cavalcade/aristocrat"
+    ]
+   }
   },
   {
    "de": "Raubvogel",
@@ -681,7 +954,12 @@
    "cat": "misc",
    "cost": 30,
    "rare": "Rare 10",
-   "wb": "Cavalcade (Aristocrat)"
+   "wb": "Cavalcade (Aristocrat)",
+   "only": {
+    "wb": [
+     "cavalcade/aristocrat"
+    ]
+   }
   },
   {
    "de": "Nightmare",
@@ -689,7 +967,12 @@
    "cat": "misc",
    "cost": 95,
    "rare": "Rare 11",
-   "wb": "Cavalcade (Aristocrat)"
+   "wb": "Cavalcade (Aristocrat)",
+   "only": {
+    "wb": [
+     "cavalcade/aristocrat"
+    ]
+   }
   },
   {
    "de": "Banner des Adelshauses",
@@ -697,7 +980,12 @@
    "cat": "misc",
    "cost": 25,
    "rare": "Rare 10",
-   "wb": "Cavalcade"
+   "wb": "Cavalcade",
+   "only": {
+    "wb": [
+     "cavalcade"
+    ]
+   }
   },
   {
    "de": "Zimbeln",
@@ -705,7 +993,12 @@
    "cat": "misc",
    "cost": 15,
    "rare": "",
-   "wb": "Cavalcade (Fighting Ape)"
+   "wb": "Cavalcade (Fighting Ape)",
+   "only": {
+    "wb": [
+     "cavalcade/ape"
+    ]
+   }
   },
   {
    "de": "Sonnenkönig-Maske",
@@ -713,7 +1006,12 @@
    "cat": "misc",
    "cost": 70,
    "rare": "",
-   "wb": "Cavalcade (Aristocrat)"
+   "wb": "Cavalcade (Aristocrat)",
+   "only": {
+    "wb": [
+     "cavalcade/aristocrat"
+    ]
+   }
   },
   {
    "de": "Silberne Todesmaske",
@@ -721,7 +1019,12 @@
    "cat": "misc",
    "cost": 50,
    "rare": "",
-   "wb": "Cavalcade"
+   "wb": "Cavalcade",
+   "only": {
+    "wb": [
+     "cavalcade"
+    ]
+   }
   },
   {
    "de": "Fischkopf-Maske",
@@ -729,7 +1032,12 @@
    "cat": "misc",
    "cost": 60,
    "rare": "",
-   "wb": "Cavalcade"
+   "wb": "Cavalcade",
+   "only": {
+    "wb": [
+     "cavalcade"
+    ]
+   }
   },
   {
    "de": "Gesichtslose Maske",
@@ -737,7 +1045,12 @@
    "cat": "misc",
    "cost": 30,
    "rare": "",
-   "wb": "Cavalcade"
+   "wb": "Cavalcade",
+   "only": {
+    "wb": [
+     "cavalcade"
+    ]
+   }
   },
   {
    "de": "Pestdoktor-Maske",
@@ -745,7 +1058,12 @@
    "cat": "misc",
    "cost": 45,
    "rare": "",
-   "wb": "Cavalcade (Twisted Scholar)"
+   "wb": "Cavalcade (Twisted Scholar)",
+   "only": {
+    "wb": [
+     "cavalcade/scholar"
+    ]
+   }
   },
   {
    "de": "Narrenmaske",
@@ -753,7 +1071,12 @@
    "cat": "misc",
    "cost": 70,
    "rare": "",
-   "wb": "Cavalcade"
+   "wb": "Cavalcade",
+   "only": {
+    "wb": [
+     "cavalcade"
+    ]
+   }
   },
   {
    "de": "Bec de Corbin",
@@ -761,7 +1084,12 @@
    "cat": "cc",
    "cost": 30,
    "rare": "Common",
-   "wb": "Reavers (Conqueror start)"
+   "wb": "Reavers (Conqueror start)",
+   "only": {
+    "wb": [
+     "reavers/conqueror"
+    ]
+   }
   },
   {
    "de": "Meisterhafte Schwere Rüstung",
@@ -769,7 +1097,12 @@
    "cat": "armour",
    "cost": 50,
    "rare": "Common",
-   "wb": "Reavers (Conqueror start)"
+   "wb": "Reavers (Conqueror start)",
+   "only": {
+    "wb": [
+     "reavers/conqueror"
+    ]
+   }
   },
   {
    "de": "Feuertöpfe (Miragliano)",
@@ -777,7 +1110,12 @@
    "cat": "missile",
    "cost": 35,
    "rare": "Common",
-   "wb": "Reavers (Trapmaster start)"
+   "wb": "Reavers (Trapmaster start)",
+   "only": {
+    "wb": [
+     "reavers/trapmaster"
+    ]
+   }
   },
   {
    "de": "Echsenhaut-Umhang",
@@ -785,7 +1123,12 @@
    "cat": "misc",
    "cost": 10,
    "rare": "",
-   "wb": "Reavers (Saurus Slayer)"
+   "wb": "Reavers (Saurus Slayer)",
+   "only": {
+    "wb": [
+     "reavers/slayer"
+    ]
+   }
   },
   {
    "de": "Schädelmaske",
@@ -793,7 +1136,12 @@
    "cat": "misc",
    "cost": 15,
    "rare": "",
-   "wb": "Reavers (Saurus Slayer)"
+   "wb": "Reavers (Saurus Slayer)",
+   "only": {
+    "wb": [
+     "reavers/slayer"
+    ]
+   }
   },
   {
    "de": "Echsenschwert",
@@ -801,7 +1149,12 @@
    "cat": "cc",
    "cost": 30,
    "rare": "",
-   "wb": "Reavers (Saurus Slayer)"
+   "wb": "Reavers (Saurus Slayer)",
+   "only": {
+    "wb": [
+     "reavers/slayer"
+    ]
+   }
   },
   {
    "de": "Slann-Kopfschmuck",
@@ -809,7 +1162,12 @@
    "cat": "misc",
    "cost": 35,
    "rare": "",
-   "wb": "Reavers (Saurus Slayer)"
+   "wb": "Reavers (Saurus Slayer)",
+   "only": {
+    "wb": [
+     "reavers/slayer"
+    ]
+   }
   },
   {
    "de": "Ogerkeule",
@@ -817,7 +1175,12 @@
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
-   "wb": "Maneaters"
+   "wb": "Maneaters",
+   "only": {
+    "wb": [
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Eisenfaust",
@@ -825,7 +1188,12 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": "Maneaters"
+   "wb": "Maneaters",
+   "only": {
+    "wb": [
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Harpunenarmbrust",
@@ -833,7 +1201,12 @@
    "cat": "missile",
    "cost": 50,
    "rare": "Rare 10",
-   "wb": "Maneaters (Guide)"
+   "wb": "Maneaters (Guide)",
+   "only": {
+    "wb": [
+     "maneaters/guide"
+    ]
+   }
   },
   {
    "de": "Gnoblar-Kämpfer",
@@ -841,7 +1214,12 @@
    "cat": "misc",
    "cost": 15,
    "rare": "",
-   "wb": "Maneaters"
+   "wb": "Maneaters",
+   "only": {
+    "wb": [
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Lookout-Gnoblar",
@@ -849,7 +1227,12 @@
    "cat": "misc",
    "cost": 20,
    "rare": "Rare 8",
-   "wb": "Maneaters"
+   "wb": "Maneaters",
+   "only": {
+    "wb": [
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Luck-Gnoblar",
@@ -857,7 +1240,12 @@
    "cat": "misc",
    "cost": 25,
    "rare": "Rare 9",
-   "wb": "Maneaters"
+   "wb": "Maneaters",
+   "only": {
+    "wb": [
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Sword-Gnoblar",
@@ -865,7 +1253,12 @@
    "cat": "misc",
    "cost": 30,
    "rare": "Rare 10",
-   "wb": "Maneaters"
+   "wb": "Maneaters",
+   "only": {
+    "wb": [
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Death-Cap-Dolche",
@@ -873,7 +1266,12 @@
    "cat": "cc",
    "cost": 25,
    "rare": "Common",
-   "wb": "Night Goblins (Fanatic)"
+   "wb": "Night Goblins (Fanatic)",
+   "only": {
+    "wb": [
+     "nightgoblins/fanatic"
+    ]
+   }
   },
   {
    "de": "Doppelläufige Pistole",
@@ -881,7 +1279,13 @@
    "cat": "bp",
    "cost": "25+1D6 (Paar 46+2D6)",
    "rare": "Rare 9 (Paar Rare 10)",
-   "wb": "Gunnery School of Nuln only"
+   "wb": "Gunnery School of Nuln only",
+   "only": {
+    "wb": [
+     "gunnery",
+     "ostlander/jaeger"
+    ]
+   }
   },
   {
    "de": "DL-Duellpistole",
@@ -889,7 +1293,12 @@
    "cat": "bp",
    "cost": "45+2D6 (Paar 80+4D6)",
    "rare": "Rare 11 (Paar Rare 12)",
-   "wb": "Gunnery School of Nuln only"
+   "wb": "Gunnery School of Nuln only",
+   "only": {
+    "wb": [
+     "gunnery"
+    ]
+   }
   },
   {
    "de": "DL-Handfeuerwaffe",
@@ -897,7 +1306,12 @@
    "cat": "bp",
    "cost": "60+2D6",
    "rare": "Rare 10",
-   "wb": "Gunnery School of Nuln only"
+   "wb": "Gunnery School of Nuln only",
+   "only": {
+    "wb": [
+     "gunnery"
+    ]
+   }
   },
   {
    "de": "Duellpistole",
@@ -913,7 +1327,13 @@
    "cat": "bp",
    "cost": "80+2D6",
    "rare": "Rare 12",
-   "wb": "Gunnery School of Nuln only (also Maneaters)"
+   "wb": "Gunnery School of Nuln only (also Maneaters)",
+   "only": {
+    "wb": [
+     "gunnery",
+     "maneaters"
+    ]
+   }
   },
   {
    "de": "Handfeuerwaffe",
@@ -929,7 +1349,12 @@
    "cat": "bp",
    "cost": "30+2D6",
    "rare": "Rare 8",
-   "wb": "Gunnery School of Nuln only"
+   "wb": "Gunnery School of Nuln only",
+   "only": {
+    "wb": [
+     "gunnery"
+    ]
+   }
   },
   {
    "de": "Hochland-Langbüchse",
@@ -945,7 +1370,12 @@
    "cat": "bp",
    "cost": 300,
    "rare": "Rare 12",
-   "wb": "Ostlanders only"
+   "wb": "Ostlanders only",
+   "only": {
+    "wb": [
+     "ostlander"
+    ]
+   }
   },
   {
    "de": "Ostländer DL-Pistole",
@@ -953,7 +1383,12 @@
    "cat": "bp",
    "cost": "30 (Paar 60)",
    "rare": "Rare 10",
-   "wb": "Ostlanders only"
+   "wb": "Ostlanders only",
+   "only": {
+    "wb": [
+     "ostlander"
+    ]
+   }
   },
   {
    "de": "Pistole",
@@ -969,7 +1404,12 @@
    "cat": "bp",
    "cost": "60+2D6",
    "rare": "Rare 11",
-   "wb": "Gunnery School of Nuln only"
+   "wb": "Gunnery School of Nuln only",
+   "only": {
+    "wb": [
+     "gunnery"
+    ]
+   }
   },
   {
    "de": "Repetierpistole",
@@ -977,7 +1417,12 @@
    "cat": "bp",
    "cost": "30+2D6",
    "rare": "Rare 9",
-   "wb": "Gunnery School of Nuln only"
+   "wb": "Gunnery School of Nuln only",
+   "only": {
+    "wb": [
+     "gunnery"
+    ]
+   }
   },
   {
    "de": "Swivel Gun",
@@ -985,7 +1430,12 @@
    "cat": "bp",
    "cost": 65,
    "rare": "Rare 8",
-   "wb": "Pirate Gunners only (max 1 per warband)"
+   "wb": "Pirate Gunners only (max 1 per warband)",
+   "only": {
+    "wb": [
+     "pirates/pgunner"
+    ]
+   }
   },
   {
    "de": "Swivel Gun: Kugelschuss",
@@ -993,7 +1443,12 @@
    "cat": "bp",
    "cost": 5,
    "rare": "—",
-   "wb": "Swivel-Gun ammo (per game)"
+   "wb": "Swivel-Gun ammo (per game)",
+   "only": {
+    "wb": [
+     "pirates/pgunner"
+    ]
+   }
   },
   {
    "de": "Swivel Gun: Kettenschuss",
@@ -1001,7 +1456,12 @@
    "cat": "bp",
    "cost": 2,
    "rare": "—",
-   "wb": "Swivel-Gun ammo (per game)"
+   "wb": "Swivel-Gun ammo (per game)",
+   "only": {
+    "wb": [
+     "pirates/pgunner"
+    ]
+   }
   },
   {
    "de": "Swivel Gun: Kartätschenschuss",
@@ -1009,7 +1469,12 @@
    "cat": "bp",
    "cost": 2,
    "rare": "—",
-   "wb": "Swivel-Gun ammo (per game)"
+   "wb": "Swivel-Gun ammo (per game)",
+   "only": {
+    "wb": [
+     "pirates/pgunner"
+    ]
+   }
   },
   {
    "de": "Warplock-Pistole",
@@ -1017,7 +1482,13 @@
    "cat": "bp",
    "cost": "35 (Paar 70)",
    "rare": "Rare 11",
-   "wb": "Skaven only"
+   "wb": "Skaven only",
+   "only": {
+    "wb": [
+     "skaven",
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Leichte Rüstung",
@@ -1073,7 +1544,12 @@
    "cat": "armour",
    "cost": 8,
    "rare": "Common",
-   "wb": "Mootlanders only"
+   "wb": "Mootlanders only",
+   "only": {
+    "wb": [
+     "mootlanders"
+    ]
+   }
   },
   {
    "de": "Ithilmar-Rüstung",
@@ -1097,7 +1573,18 @@
    "cat": "armour",
    "cost": 185,
    "rare": "Rare 13",
-   "wb": "Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival only"
+   "wb": "Marauders, Norse, Beastmen, Chaos Dwarfs, Possessed, Carnival only",
+   "only": {
+    "wb": [
+     "maraudersofchaos",
+     "norse",
+     "beastmen",
+     "sonsofhashut",
+     "blackdwarfs",
+     "possessed",
+     "carnival"
+    ]
+   }
   },
   {
    "de": "Pavise",
@@ -1121,7 +1608,12 @@
    "cat": "armour",
    "cost": 30,
    "rare": "Rare 11",
-   "wb": "Bretonnian Warhorses only"
+   "wb": "Bretonnian Warhorses only",
+   "only": {
+    "wb": [
+     "bretonnian"
+    ]
+   }
   },
   {
    "de": "Seil & Haken",
@@ -1177,7 +1669,14 @@
    "cat": "misc",
    "cost": "10+3D6",
    "rare": "Rare 6",
-   "wb": "not Undead (Common for Warrior-Priests/Sisters)"
+   "wb": "not Undead (Common for Warrior-Priests/Sisters)",
+   "only": {
+    "notWb": [
+     "undead",
+     "restless",
+     "tombguardians"
+    ]
+   }
   },
   {
    "de": "Heiliges/Unheiliges Relikt",
@@ -1193,7 +1692,13 @@
    "cat": "misc",
    "cost": "100+D6×10",
    "rare": "Rare 8",
-   "wb": "Warrior-Priests & Sisters of Sigmar only"
+   "wb": "Warrior-Priests & Sisters of Sigmar only",
+   "only": {
+    "wb": [
+     "sos",
+     "wh/priest"
+    ]
+   }
   },
   {
    "de": "Zauberfoliant",
@@ -1201,7 +1706,13 @@
    "cat": "misc",
    "cost": "200+D6×25",
    "rare": "Rare 12",
-   "wb": "not Witch Hunters/Sisters"
+   "wb": "not Witch Hunters/Sisters",
+   "only": {
+    "notWb": [
+     "wh",
+     "sos"
+    ]
+   }
   },
   {
    "de": "Bugmans Ale",
@@ -1209,7 +1720,14 @@
    "cat": "misc",
    "cost": "50+3D6",
    "rare": "Rare 9",
-   "wb": "not Elves"
+   "wb": "not Elves",
+   "only": {
+    "notWb": [
+     "woodelf",
+     "darkelves",
+     "shadowwarriors"
+    ]
+   }
   },
   {
    "de": "Cathay-Seidenkleidung",
@@ -1241,7 +1759,14 @@
    "cat": "misc",
    "cost": 1,
    "rare": "Common",
-   "wb": "not Undead"
+   "wb": "not Undead",
+   "only": {
+    "notWb": [
+     "undead",
+     "restless",
+     "tombguardians"
+    ]
+   }
   },
   {
    "de": "Halbling-Kochbuch",
@@ -1249,7 +1774,15 @@
    "cat": "misc",
    "cost": "30+3D6",
    "rare": "Rare 7",
-   "wb": "not Undead/Carnival"
+   "wb": "not Undead/Carnival",
+   "only": {
+    "notWb": [
+     "undead",
+     "restless",
+     "tombguardians",
+     "carnival"
+    ]
+   }
   },
   {
    "de": "Banner",
@@ -1329,7 +1862,13 @@
    "cat": "misc",
    "cost": 50,
    "rare": "Rare 7",
-   "wb": "not Witch Hunters/Sisters"
+   "wb": "not Witch Hunters/Sisters",
+   "only": {
+    "notWb": [
+     "wh",
+     "sos"
+    ]
+   }
   },
   {
    "de": "Fernrohr",
@@ -1369,7 +1908,12 @@
    "cat": "misc",
    "cost": 100,
    "rare": "Rare 10",
-   "wb": "Witch Hunters only"
+   "wb": "Witch Hunters only",
+   "only": {
+    "wb": [
+     "wh"
+    ]
+   }
   },
   {
    "de": "Schwarzer Lotus",
@@ -1377,7 +1921,13 @@
    "cat": "misc",
    "cost": "10+1D6",
    "rare": "Rare 9",
-   "wb": "not WH/WP/Sisters (Rare 7 Skaven/Lizardmen)"
+   "wb": "not WH/WP/Sisters (Rare 7 Skaven/Lizardmen)",
+   "only": {
+    "notWb": [
+     "wh",
+     "sos"
+    ]
+   }
   },
   {
    "de": "Purpurschatten",
@@ -1393,7 +1943,13 @@
    "cat": "misc",
    "cost": "30+2D6",
    "rare": "Rare 8",
-   "wb": "not WH/WP/Sisters (Rare 6 Dark Elves/Lizardmen)"
+   "wb": "not WH/WP/Sisters (Rare 6 Dark Elves/Lizardmen)",
+   "only": {
+    "notWb": [
+     "wh",
+     "sos"
+    ]
+   }
   },
   {
    "de": "Heilkräuter",
@@ -1425,7 +1981,15 @@
    "cat": "misc",
    "cost": "10+2D6",
    "rare": "Rare 7",
-   "wb": "not Possessed/Undead"
+   "wb": "not Possessed/Undead",
+   "only": {
+    "notWb": [
+     "possessed",
+     "undead",
+     "restless",
+     "tombguardians"
+    ]
+   }
   },
   {
    "de": "Reptiliengift",
@@ -1433,7 +1997,12 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": "Skink Henchmen only"
+   "wb": "Skink Henchmen only",
+   "only": {
+    "wb": [
+     "lizardmen/skinkbrave"
+    ]
+   }
   },
   {
    "de": "Amulett des Mondes",
@@ -1441,7 +2010,13 @@
    "cat": "misc",
    "cost": 50,
    "rare": "Rare 12",
-   "wb": "Amazons only (Rare 11 for Lustria)"
+   "wb": "Amazons only (Rare 11 for Lustria)",
+   "only": {
+    "wb": [
+     "amazons",
+     "amazonslustria"
+    ]
+   }
   },
   {
    "de": "Asp-Pfeile",
@@ -1449,7 +2024,12 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Common",
-   "wb": "Tomb Guardians Tomb Lord only"
+   "wb": "Tomb Guardians Tomb Lord only",
+   "only": {
+    "wb": [
+     "tombguardians/tomblord"
+    ]
+   }
   },
   {
    "de": "Bärenklauen-Kette",
@@ -1457,7 +2037,13 @@
    "cat": "misc",
    "cost": "75+3D6",
    "rare": "Rare 9",
-   "wb": "Kislevite Heroes only"
+   "wb": "Kislevite Heroes only",
+   "only": {
+    "wb": [
+     "kislev"
+    ],
+    "heroes": true
+   }
   },
   {
    "de": "Wodka",
@@ -1465,7 +2051,13 @@
    "cat": "misc",
    "cost": "35+2D6",
    "rare": "Rare 8",
-   "wb": "Kislevite Heroes only"
+   "wb": "Kislevite Heroes only",
+   "only": {
+    "wb": [
+     "kislev"
+    ],
+    "heroes": true
+   }
   },
   {
    "de": "Gesegnete Hirschhaut",
@@ -1473,7 +2065,12 @@
    "cat": "misc",
    "cost": 40,
    "rare": "Rare 10",
-   "wb": "Horned Hunters only"
+   "wb": "Horned Hunters only",
+   "only": {
+    "wb": [
+     "hornedhunters"
+    ]
+   }
   },
   {
    "de": "Trip Wire",
@@ -1481,7 +2078,12 @@
    "cat": "misc",
    "cost": 15,
    "rare": "Common",
-   "wb": "Horned Hunters only"
+   "wb": "Horned Hunters only",
+   "only": {
+    "wb": [
+     "hornedhunters"
+    ]
+   }
   },
   {
    "de": "Forest Cloak",
@@ -1489,7 +2091,13 @@
    "cat": "misc",
    "cost": 50,
    "rare": "Rare 10",
-   "wb": "Heroes only (Outlaws)"
+   "wb": "Heroes only (Outlaws)",
+   "only": {
+    "wb": [
+     "outlaws"
+    ],
+    "heroes": true
+   }
   },
   {
    "de": "Bota-Schlauch",
@@ -1577,7 +2185,12 @@
    "cat": "misc",
    "cost": 50,
    "rare": "Rare 9",
-   "wb": "Forest Goblins only"
+   "wb": "Forest Goblins only",
+   "only": {
+    "wb": [
+     "forestgoblins"
+    ]
+   }
   },
   {
    "de": "Vergiftete Waffe",
@@ -1585,7 +2198,12 @@
    "cat": "misc",
    "cost": "+25",
    "rare": "Common",
-   "wb": "Forest Goblins only"
+   "wb": "Forest Goblins only",
+   "only": {
+    "wb": [
+     "forestgoblins"
+    ]
+   }
   },
   {
    "de": "Rote-Zahn-Stammesschmuck",
@@ -1593,7 +2211,12 @@
    "cat": "misc",
    "cost": 40,
    "rare": "Rare 9",
-   "wb": "Forest Goblins only"
+   "wb": "Forest Goblins only",
+   "only": {
+    "wb": [
+     "forestgoblins"
+    ]
+   }
   },
   {
    "de": "Squig-Treiber",
@@ -1601,7 +2224,14 @@
    "cat": "misc",
    "cost": 15,
    "rare": "Common",
-   "wb": "Goblins only"
+   "wb": "Goblins only",
+   "only": {
+    "wb": [
+     "nightgoblins",
+     "forestgoblins",
+     "orcmob/goblin"
+    ]
+   }
   },
   {
    "de": "Kompass",
@@ -1609,7 +2239,12 @@
    "cat": "misc",
    "cost": "45+2D6",
    "rare": "Rare 9",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Hartkeks",
@@ -1617,7 +2252,12 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Hakenhand",
@@ -1625,7 +2265,12 @@
    "cat": "misc",
    "cost": 4,
    "rare": "Common",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Jolly Roger",
@@ -1633,7 +2278,12 @@
    "cat": "misc",
    "cost": "40+2D6",
    "rare": "Rare 9",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Papagei",
@@ -1641,7 +2291,12 @@
    "cat": "misc",
    "cost": 15,
    "rare": "Rare 8",
-   "wb": "Pirate Captain & Mates only"
+   "wb": "Pirate Captain & Mates only",
+   "only": {
+    "wb": [
+     "pirates/pcaptain,mate"
+    ]
+   }
   },
   {
    "de": "Holzbein",
@@ -1649,7 +2304,12 @@
    "cat": "misc",
    "cost": 8,
    "rare": "Common",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Fernglas",
@@ -1657,7 +2317,12 @@
    "cat": "misc",
    "cost": 20,
    "rare": "Rare 8",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Schatzkarte",
@@ -1665,7 +2330,12 @@
    "cat": "misc",
    "cost": "75+4D6",
    "rare": "Rare 10",
-   "wb": "Pirates only"
+   "wb": "Pirates only",
+   "only": {
+    "wb": [
+     "pirates"
+    ]
+   }
   },
   {
    "de": "Muschelhorn",
@@ -1673,7 +2343,12 @@
    "cat": "misc",
    "cost": 25,
    "rare": "Rare 8",
-   "wb": "Amazons (Lustria) Piranha Warrior only"
+   "wb": "Amazons (Lustria) Piranha Warrior only",
+   "only": {
+    "wb": [
+     "amazonslustria/piranhawarrior"
+    ]
+   }
   },
   {
    "de": "Verzauberte Häute",
@@ -1681,7 +2356,12 @@
    "cat": "misc",
    "cost": 20,
    "rare": "Rare 6",
-   "wb": "Amazons (Lustria) only"
+   "wb": "Amazons (Lustria) only",
+   "only": {
+    "wb": [
+     "amazonslustria"
+    ]
+   }
   },
   {
    "de": "Elfenrunensteine",
@@ -1689,7 +2369,13 @@
    "cat": "misc",
    "cost": "50+2D6",
    "rare": "Rare 11",
-   "wb": "Shadow Warrior Weavers only"
+   "wb": "Shadow Warrior Weavers only",
+   "only": {
+    "wb": [
+     "shadowwarriors/shadowweaver",
+     "shadowwarriors/shadowmaster,shadowwalker"
+    ]
+   }
   },
   {
    "de": "Elfenwein",
@@ -1697,7 +2383,13 @@
    "cat": "misc",
    "cost": "50+3D6",
    "rare": "Rare 10",
-   "wb": "Shadow Warriors only"
+   "wb": "Shadow Warriors only",
+   "only": {
+    "wb": [
+     "shadowwarriors",
+     "woodelf/hunt,way,mage,scout,glade"
+    ]
+   }
   },
   {
    "de": "Standarte von Nagarythe",
@@ -1705,7 +2397,12 @@
    "cat": "misc",
    "cost": "75+3D6",
    "rare": "Rare 9",
-   "wb": "Shadow Warriors only"
+   "wb": "Shadow Warriors only",
+   "only": {
+    "wb": [
+     "shadowwarriors"
+    ]
+   }
   },
   {
    "de": "Kriegshorn von Nagarythe",
@@ -1713,7 +2410,12 @@
    "cat": "misc",
    "cost": "25+1D6",
    "rare": "Rare 6",
-   "wb": "Shadow Warriors only"
+   "wb": "Shadow Warriors only",
+   "only": {
+    "wb": [
+     "shadowwarriors"
+    ]
+   }
   },
   {
    "de": "Seedrachen-Umhang",
@@ -1721,7 +2423,12 @@
    "cat": "misc",
    "cost": "50+2D6",
    "rare": "Rare 10",
-   "wb": "Dark Elves Heroes & Corsairs only"
+   "wb": "Dark Elves Heroes & Corsairs only",
+   "only": {
+    "wb": [
+     "darkelves/highborn,beastmaster,fellblade,sorceress,corsair"
+    ]
+   }
   },
   {
    "de": "Vertrauter",
@@ -1729,7 +2436,10 @@
    "cat": "misc",
    "cost": "20+1D6",
    "rare": "Rare 8",
-   "wb": "spellcasters only (any warband)"
+   "wb": "spellcasters only (any warband)",
+   "only": {
+    "casters": true
+   }
   },
   {
    "de": "Clan-Pestilens-Banner",
@@ -1737,7 +2447,12 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 5",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Nebel-Warpstein-Splitter",
@@ -1745,7 +2460,12 @@
    "cat": "misc",
    "cost": "100+D6×10",
    "rare": "Rare 9",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Liber Bubonicus",
@@ -1753,7 +2473,12 @@
    "cat": "misc",
    "cost": "200+D6×25",
    "rare": "Rare 12",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Liturgicus Infecticus",
@@ -1761,7 +2486,12 @@
    "cat": "misc",
    "cost": "30+2D6",
    "rare": "Rare 8",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Schriftrolle des Rattenvertrauten",
@@ -1769,7 +2499,12 @@
    "cat": "misc",
    "cost": "25+1D6",
    "rare": "Rare 8",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Warpstein-Amulett",
@@ -1777,7 +2512,12 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 5",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Phiole von Pestilens",
@@ -1785,7 +2525,12 @@
    "cat": "misc",
    "cost": "25+2D6",
    "rare": "Rare 9",
-   "wb": "Skaven of Clan Pestilens only"
+   "wb": "Skaven of Clan Pestilens only",
+   "only": {
+    "wb": [
+     "skavenpest"
+    ]
+   }
   },
   {
    "de": "Skelettstreitwagen",
@@ -1793,7 +2538,12 @@
    "cat": "misc",
    "cost": "200+10D6",
    "rare": "Common",
-   "wb": "Tomb Guardians only"
+   "wb": "Tomb Guardians only",
+   "only": {
+    "wb": [
+     "tombguardians"
+    ]
+   }
   },
   {
    "de": "Flussbarke",
@@ -1841,7 +2591,13 @@
    "cat": "misc",
    "cost": "200+D6×25",
    "rare": "Rare 12",
-   "wb": "Vampires and Necromancers only"
+   "wb": "Vampires and Necromancers only",
+   "only": {
+    "wb": [
+     "undead/vamp,necro",
+     "restless/necromancer"
+    ]
+   }
   },
   {
    "de": "Truhe",
@@ -1937,7 +2693,10 @@
    "cat": "misc",
    "cost": 70,
    "rare": "Rare 8",
-   "wb": "Humans only"
+   "wb": "Humans only",
+   "only": {
+    "human": true
+   }
   },
   {
    "de": "Proviant",
@@ -1961,7 +2720,12 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": "Not for Beastmen"
+   "wb": "Not for Beastmen",
+   "only": {
+    "notWb": [
+     "beastmen"
+    ]
+   }
   },
   {
    "de": "Wolfsumhang",
@@ -1969,7 +2733,14 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Special",
-   "wb": "Middenheimers, Norse Explorers and Marauders only"
+   "wb": "Middenheimers, Norse Explorers and Marauders only",
+   "only": {
+    "wb": [
+     "merc:midd",
+     "norse",
+     "maraudersofchaos"
+    ]
+   }
   },
   {
    "de": "Wyrdstein-Pendel",
