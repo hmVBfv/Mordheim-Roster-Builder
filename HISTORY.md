@@ -1555,3 +1555,61 @@ generating the full list from the catalogue, the Roster Builder turned out
 to offer Mercenaries items the catalogue reserves for other warbands — the
 Dwarf axe, the Pestilens censer, the Starblade. Its Trading Post checks the
 weapon family, not the restriction text.
+
+## September 29, 2026 (cont.) — the desktop as a workspace
+
+Rob liked the phone mockups better now and asked to see the desktop: "with
+several, perhaps movable windows … a good overview without clutter". Free
+floating windows were the first idea and the first thing dropped: they
+overlap, they get lost, and every session ends with tidying up. What
+`desktop.html` proposes instead is a workspace of panels — the phone's
+screens, several at a time — standing in columns, as many as the width
+holds, plus a row across the top. A panel moves by its title bar or,
+without a mouse, through its ⋯ menu; it can fill the workspace or wait in a
+dock. The panels are linked: pick a Hero in the Roster and the Warrior panel
+shows him and the Trading Post searches for him. Arrangements for a task are
+"views" (Roster, After battle, Trading, Campaign, your own).
+
+The first layout was a plain grid, and a short panel next to a long one left
+a hole under it; columns fixed that. Dragging worked by hand but not under
+Playwright: the page changed the layout inside `dragstart`, and Chromium
+quietly cancels a drag whose source moves in that moment. The styling now
+waits a tick, and the drop zone that appeared above the columns — the
+source of the jump — is gone; the top row takes drops only once it holds a
+panel.
+
+Home got its comet: on one visit in three the twin-tailed comet comes down
+on the city — seven frames once, a flash, fire, smoke, then the crater
+smoulders and the wyrdstone burns. Tests never get it by chance
+(`navigator.webdriver`), and less motion means no flash at all. The three
+warbands of the invented campaign got portraits drawn from their
+descriptions: a Reikland marksman with plume and slow match, a Sister of
+Sigmar with hammer and comet, an Eshin assassin with a dripping blade.
+
+Rob also settled the open questions: selling rounds down but always brings
+at least 1 gc, and the catalogue's "Dwarfs only" includes Dwarf Hired
+Swords.
+
+## September 30, 2026 — what things do, and the rest of the desktop
+
+Rob wanted to see what an item does when he looks for it. Following that
+thread showed the data, not the screen, was short: 58 items of the
+catalogue had no rules text at all, in either app — the lantern, the banner,
+the maps and tarot cards, poisons, ladders, vehicles. They got short texts
+from mordheimer.net's equipment pages (a pull request of their own, since
+they are rules data), and the mockups now show them: on the Trading Post a
+tap on the name, while searching the text of the chosen item. On the way the
+sword breaker's text turned out to lack half its rule (the trap blade).
+
+The same question for skills: the example Advance offered three. It now
+offers every skill of the warrior's lists with its text, as the builder
+will — Ulrich, a Captain, has thirty-three to choose from.
+
+The desktop got its other places: Home, Warbands, Campaign, Notes and More
+are workspaces of their own, each keeping its arrangement, and the phone's
+tabs became panels and views. The warbands' pictures became emblems — Rob
+preferred heraldry to figures. They are our own, from plain elements: a
+shield with an eagle for the Empire's mercenaries, the comet and hammer for
+the Sisters, a rag with a rat's skull for Clan Eshin; nothing copied from
+the game's own symbols. The city at night moved into a script of its own so
+Home on the desktop shows it too.

@@ -366,3 +366,56 @@ dialog.sheet::backdrop { background: var(--shadow); }
 
 .note-kind { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold); }
 blockquote { margin: 0; padding-left: var(--s3); border-left: 3px solid var(--gold); font-style: italic; }
+
+/* warband emblems (warband-art.js): three frames, each warband on its own
+   beat so they do not blink together; still under reduced motion */
+.art { display: block; flex: none; width: 48px; height: 48px; border: 1px solid var(--border); border-radius: var(--radius); background: #111; image-rendering: pixelated; }
+.art.small { width: 40px; height: 40px; }
+.art.big { width: 64px; height: 64px; }
+.art .fB, .art .fC { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .art .fA { animation: artA 7s steps(1, end) infinite; }
+  .art .fB { animation: artB 7s steps(1, end) infinite; }
+  .art .fC { animation: artC 7s steps(1, end) infinite; }
+  .art[data-art='penitents'] g { animation-duration: 5.3s; }
+  .art[data-art='skrittle'] g { animation-duration: 6.1s; animation-delay: -2s; }
+}
+@keyframes artA { 0% { opacity: 1; } 58% { opacity: 0; } 64% { opacity: 1; } 80% { opacity: 0; } 90% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes artB { 0% { opacity: 0; } 58% { opacity: 1; } 64% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes artC { 0% { opacity: 0; } 80% { opacity: 1; } 90% { opacity: 0; } 100% { opacity: 0; } }
+.with-art { display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s3); align-items: center; }
+
+/* a skill picker grouped by list (rules-data.js) */
+.pick .pick-h { grid-column: 1 / -1; margin-top: var(--s2); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.pick .pick-h:first-child { margin-top: 0; }
+.skill-text { font-size: 0.9rem; padding: var(--s2) var(--s3); border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 var(--radius) var(--radius) 0; }
+
+/* the city at night (city-art.js): layers over a base picture; .impact plays
+   the comet's fall once, .struck shows the city after it; still under less
+   motion, and never the flash */
+.sky { display: block; width: 100%; height: auto; aspect-ratio: 80 / 25; border: 1px solid var(--border); border-radius: var(--radius); background: #0b0d12; image-rendering: pixelated; }
+.sky g { opacity: 0; }
+.sky .base, .sky:not(.impact):not(.struck) .pA, .sky.struck .aA { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .sky.impact .aA { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .sky:not(.impact):not(.struck) .pA { animation: skA 8s steps(1, end) infinite; }
+  .sky:not(.impact):not(.struck) .pB { animation: skB 8s steps(1, end) infinite; }
+  .sky:not(.impact):not(.struck) .pC { animation: skC 8s steps(1, end) infinite; }
+  .sky.impact .i1 { animation: skOn 0.45s 0.4s steps(1, end); }
+  .sky.impact .i2 { animation: skOn 0.4s 0.85s steps(1, end); }
+  .sky.impact .i3 { animation: skOn 0.25s 1.25s steps(1, end); }
+  .sky.impact .i4 { animation: skOn 0.15s 1.5s steps(1, end); }
+  .sky.impact .i5 { animation: skOn 0.5s 1.65s steps(1, end); }
+  .sky.impact .i6 { animation: skOn 0.9s 2.15s steps(1, end); }
+  .sky.impact .i7 { animation: skOn 0.9s 3.05s steps(1, end); }
+  .sky.impact .aA { animation: skA 8s 3.95s steps(1, end) infinite; }
+  .sky.impact .aB { animation: skB 8s 3.95s steps(1, end) infinite; }
+  .sky.impact .aC { animation: skC 8s 3.95s steps(1, end) infinite; }
+  .sky.struck .aA { animation: skA 8s steps(1, end) infinite; }
+  .sky.struck .aB { animation: skB 8s steps(1, end) infinite; }
+  .sky.struck .aC { animation: skC 8s steps(1, end) infinite; }
+}
+@keyframes skOn { 0%, 100% { opacity: 1; } }
+@keyframes skA { 0% { opacity: 1; } 40% { opacity: 0; } 46% { opacity: 1; } 70% { opacity: 0; } 84% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes skB { 0% { opacity: 0; } 40% { opacity: 1; } 46% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes skC { 0% { opacity: 0; } 70% { opacity: 1; } 84% { opacity: 0; } 100% { opacity: 0; } }
