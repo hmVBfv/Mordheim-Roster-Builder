@@ -9,7 +9,7 @@
 #
 # The images must exist locally (roster-deploy runs with ROSTER_NO_PULL=1).
 # /mnt/ssd becomes a tmpfs if it is not a mount point.
-set -euo pipefail
+set -Eeuo pipefail
 
 good=${1:?good tag} broken=${2:?broken tag} drill=${3:?migration drill tag}
 IMAGE=${IMAGE:-localtest/mordheim-roster}
@@ -20,9 +20,18 @@ ops=$(cd "$(dirname "$0")/.." && pwd)
 data=/mnt/ssd/roster/data
 failures=0
 
-as() { sudo -u "$user" env ROSTER_NO_PULL=1 ROSTER_DEPLOY_WAIT=30 ROSTER_RESTORE_WAIT=45 "$@"; }
+as() { sudo -u "$user" env HOME="$home" ROSTER_NO_PULL=1 ROSTER_DEPLOY_WAIT=30 ROSTER_RESTORE_WAIT=45 "$@"; }
+# In GitHub Actions a failure also becomes an annotation, readable without the log.
+annotate() { # annotate <level> <title> <text…>
+  [ -n "${GITHUB_ACTIONS:-}" ] || return 0
+  local text=${*:3}
+  text=${text//'%'/'%25'}
+  text=${text//$'\n'/'%0A'}
+  echo "::$1 title=$2::$text"
+}
 ok() { echo "ok - $*"; }
-bad() { echo "FAIL - $*"; failures=$((failures + 1)); }
+bad() { echo "FAIL - $*"; annotate error "ops e2e" "$*"; failures=$((failures + 1)); }
+trap 'annotate error "ops e2e aborted" "line $LINENO: $BASH_COMMAND"' ERR
 expect() { # expect <description> <command…>
   local d=$1; shift
   if "$@"; then ok "$d"; else bad "$d"; fi
@@ -138,6 +147,8 @@ cat "$home/server/roster/ops.log"
 echo
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed"
+  annotate notice "ops.log" "$(tail -n 40 "$home/server/roster/ops.log")"
+  annotate notice "roster-app journal" "$(journalctl CONTAINER_NAME=roster-app -n 30 --no-pager -o cat 2>&1 | cut -c1-300)"
   journalctl CONTAINER_NAME=roster-app -n 40 --no-pager || true
   exit 1
 fi
