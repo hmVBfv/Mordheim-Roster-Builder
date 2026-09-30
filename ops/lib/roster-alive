@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Dead man's switch (roster-alive.timer, every 5 minutes; docs/operations.md
+# section 7): the server answers from outside under its hostname, the
+# certificate lasts more than 14 days, the SSD is mounted and below 90 %.
+# Pings healthchecks.io on success, /fail with the reasons otherwise – and if
+# the Pi is down, the missing ping is the alarm.
+set -uo pipefail
+# shellcheck source=common.sh
+. "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
+: "${ROSTER_HOST:?}"
+
+problems=()
+[ -f "$MARKER" ] || problems+=("SSD marker missing")
+if ! body=$(curl -fsS -m 15 "https://$ROSTER_HOST/api/v1/health" 2>&1) || ! grep -q '"status":"ok"' <<<"$body"; then
+  problems+=("health: ${body:0:200}")
+fi
+if ! echo | openssl s_client -servername "$ROSTER_HOST" -connect "$ROSTER_HOST:443" 2>/dev/null |
+  openssl x509 -noout -checkend $((14 * 86400)) >/dev/null 2>&1; then
+  problems+=("certificate expires within 14 days or cannot be read")
+fi
+pct=$(df --output=pcent "$ROSTER_DATA" 2>/dev/null | tail -n 1 | tr -dc '0-9')
+[ -n "$pct" ] && [ "$pct" -lt 90 ] || problems+=("disk ${pct:-?}% full")
+
+if [ ${#problems[@]} -eq 0 ]; then
+  hc_ping ALIVE "" "ok"
+else
+  log "not alive: ${problems[*]}"
+  hc_ping ALIVE fail "${problems[*]}"
+  exit 1
+fi

@@ -1,0 +1,13 @@
+# Bans an IP after 10 failed logins within an hour, for a day. The server's
+# own brake (5 per account and IP in 15 minutes) comes first; this catches
+# someone who keeps trying. Caddy runs in the host network, so the ban (on
+# port 443) takes effect before the request reaches it.
+[roster-auth]
+enabled  = true
+backend  = systemd
+filter   = roster-auth
+port     = 443
+protocol = tcp
+maxretry = 10
+findtime = 1h
+bantime  = 1d

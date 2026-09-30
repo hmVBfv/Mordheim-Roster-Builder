@@ -130,8 +130,14 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Spiegel (Legacy-Tests gegen `core/`) | Mirror | `core/test/mirror/` |
 | Warteschlange | Outbox | Dexie-Tabelle `outbox` |
 | Synchronisation | Sync | `GET /api/v1/sync` |
-| Epoche | Epoch | Server-Epoche nach Wiederherstellung |
-| Testinstanz | Staging | Container `roster-staging` |
+| Epoche | Epoch | `meta.epoch`; neu bei jedem Start auf einer Snapshot-Kopie (`server/src/db.ts`) |
+| Testinstanz | Staging | Container `roster-staging`, `roster-deploy --staging` |
+| Markerdatei | Marker file | `/data/.roster-volume` (`server/src/volume.ts`) |
+| Snapshot (der Datenbank) | Snapshot | `data/snapshots/<zeit>-<label>.sqlite`, `roster-cli backup` |
+| Wiederherstellungstest | Restore test | `roster-restore-test.timer` |
+| Rollback-Übung | Rollback drill | Image `:drill-broken` |
+| SSD-Übung | SSD drill | ohne Markerdatei startet nichts |
+| Aktion (für `can()`) | Action | `server/src/policy.ts` |
 | Totmannschalter | Dead man's switch | healthchecks.io |
 | Leak-Test | Leak test | CI-Matrix Rolle × Endpunkt × Sichtbarkeit |
 | Schweregrad | Severity | `S1`–`S4` |

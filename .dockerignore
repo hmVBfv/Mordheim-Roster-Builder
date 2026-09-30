@@ -1,0 +1,13 @@
+# Only what the Dockerfile copies; everything else stays out of the context.
+**/node_modules
+**/dist
+.git
+app/test-results
+app/playwright-report
+core/test/saves
+docs
+test
+js
+vendor
+assets
+*.md

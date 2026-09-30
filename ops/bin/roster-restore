@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# roster-restore – put a backup back into production (docs/operations.md,
+# Wiederherstellung). Run as robin over SSH:
+#
+#   roster-restore                  the latest backup from restic
+#   roster-restore --restic <id>    a particular restic snapshot (restic snapshots)
+#   roster-restore --file <name>    a snapshot in /mnt/ssd/roster/data/snapshots/
+#
+# The app stops; the current database is kept next to it as
+# roster.sqlite.before-restore-<time>; uploads from the backup are added
+# (nothing newer is deleted). The restored database takes a new epoch on
+# start, so every device syncs anew and offers what it made after the backup.
+set -euo pipefail
+# shellcheck source=../lib/common.sh
+. "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
+
+usage() {
+  sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//' >&2
+  exit 64
+}
+
+yes=${ROSTER_YES:-}
+from="restic" id=latest file=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --restic) [ $# -ge 2 ] || usage; id=$2; shift 2 ;;
+    --file) [ $# -ge 2 ] || usage; from="file"; file=$2; shift 2 ;;
+    --yes) yes=1; shift ;;
+    *) usage ;;
+  esac
+done
+
+require_marker
+data="$ROSTER_DATA/data"
+tmp="$ROSTER_DATA/restore-tmp"
+trap 'rm -rf "$tmp"' EXIT
+
+if [ "$from" = file ]; then
+  [[ "$file" =~ ^[A-Za-z0-9._-]+\.sqlite$ ]] || die "--file takes a file name from $data/snapshots"
+  snap="$data/snapshots/$file"
+  [ -f "$snap" ] || die "$snap does not exist"
+else
+  rm -rf "$tmp"
+  mkdir -p "$tmp"
+  restic_cmd restore "$id" --host roster --target "$tmp" >/dev/null || die "restic restore $id failed"
+  snap=$(find "$tmp$data/snapshots" -maxdepth 1 -name '*.sqlite' 2>/dev/null | sort | tail -n 1)
+  [ -n "$snap" ] || die "no database snapshot in restic snapshot $id"
+fi
+
+echo "This replaces the production database with $(basename "$snap")."
+if [ -z "$yes" ]; then
+  read -r -p "Type RESTORE to go on: " answer
+  [ "$answer" = RESTORE ] || die "not confirmed; nothing was changed"
+fi
+
+log "restoring $(basename "$snap")"
+compose stop app
+kept="roster.sqlite.before-restore-$(date -u +%Y%m%dT%H%M%SZ)"
+if [ -f "$data/roster.sqlite" ]; then
+  mv "$data/roster.sqlite" "$data/$kept"
+  for ext in wal shm; do
+    [ ! -f "$data/roster.sqlite-$ext" ] || mv "$data/roster.sqlite-$ext" "$data/$kept-$ext"
+  done
+  log "the replaced database is kept as $data/$kept"
+fi
+cp "$snap" "$data/roster.sqlite.restoring"
+mv "$data/roster.sqlite.restoring" "$data/roster.sqlite"
+if [ "$from" = restic ] && [ -d "$tmp$ROSTER_DATA/uploads" ]; then
+  # add what the backup has, keep what is newer
+  tar -C "$tmp$ROSTER_DATA/uploads" -cf - . | tar -C "$ROSTER_DATA/uploads" -xf - --skip-old-files
+fi
+compose up -d --no-deps app
+tag=$(env_get ROSTER_TAG)
+if wait_healthy roster-app "$(image_id "$ROSTER_IMAGE:$tag")" 60; then
+  log "restored $(basename "$snap"); the app is healthy on a new epoch"
+else
+  die "the app is not healthy after the restore (journalctl CONTAINER_NAME=roster-app -n 50); the replaced database is $data/$kept"
+fi
