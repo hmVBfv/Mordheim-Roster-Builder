@@ -24,7 +24,14 @@ Gelegenheitsangriffe sicher abzuwehren.
   hinter dem Docker-Proxy sähe die App nur die Gateway-IP. Im Host-Netz gelten
   UFW und Fail2Ban normal, und die App bekommt die echte Client-IP.
 - **App nur auf `127.0.0.1:3000`**; Fastify vertraut `X-Forwarded-For` nur von
-  `127.0.0.1`.
+  Loopback und vom Gateway des Docker-Netzes – über den Docker-Port kommt
+  Caddys Verbindung von dort an, und von außen erreicht niemand diesen Port
+  (siehe [architecture.md](architecture.md#5-server)). Die Testinstanz ist
+  ein Sonderfall: Ihr Port liegt auf der LAN-Adresse, also kann dort jedes
+  Gerät im Heimnetz eine Adresse vorgeben. Sie hat keine echten Konten.
+- **Container gehärtet:** Dateisystem nur lesbar (außer `/data`, `/uploads`,
+  `/tmp`), keine Capabilities, `no-new-privileges`, Prozessgrenze, eigener
+  Nutzer 1000:1000 ([`ops/compose.yaml`](../ops/compose.yaml)).
 - **Testinstanz nur im Heimnetz** (`<pi-lan-ip>:8081`), ohne Weiterleitung an
   der Fritzbox.
 - Caddy bedient nur den konfigurierten Hostnamen.
@@ -122,6 +129,15 @@ darf. Neue Endpunkte ohne Eintrag in der Matrix lassen den Test fehlschlagen.
   Agenten-Container, nie in Logs.
 - **Backups** sind mit restic verschlüsselt; das Passwort liegt zusätzlich
   offline (Passwortmanager, Papier).
+- **Logs:** eine Zeile je Anfrage mit der Route (dem Muster, nie der vollen
+  URL samt Query), Status, Dauer und Adresse; keine Header, keine Körper.
+  Felder namens `password`, `token`, `totp`, `cookie`, `authorization` werden
+  geschwärzt, falls sie je mitgegeben werden. Fehlgeschlagene Logins haben
+  eine feste Form, `"event":"login_failed","ip":"…"` vorn, damit ein
+  Kontoname Fail2Ban keine fremde Adresse unterschieben kann (Test in
+  `server/test/log.test.ts`).
+- **Pakete:** npm führt keine Installationsskripte von Abhängigkeiten aus
+  (`.npmrc`: `ignore-scripts=true`).
 
 ## 6. Öffentliche Repos
 

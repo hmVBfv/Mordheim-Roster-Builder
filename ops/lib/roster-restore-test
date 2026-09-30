@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Nightly restore test (roster-restore-test.timer, 03:00, after the backup;
+# docs/operations.md section 6): the latest backup from restic goes into the
+# test instance, which is started and must be healthy. If this fails, the
+# backup is not usable – healthchecks.io says so.
+set -euo pipefail
+# shellcheck source=common.sh
+. "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
+
+WAIT=${ROSTER_RESTORE_WAIT:-90}
+tmp="$ROSTER_DATA/staging/restore-tmp"
+data="$ROSTER_DATA/staging/data"
+uploads="$ROSTER_DATA/staging/uploads"
+
+fail() {
+  hc_ping RESTORE_TEST fail "$*"
+  die "$*"
+}
+trap 'rm -rf "$tmp"' EXIT
+
+require_marker
+hc_ping RESTORE_TEST start
+rm -rf "$tmp"
+mkdir -p "$tmp" "$data" "$uploads"
+restic_cmd restore latest --host roster --target "$tmp" >/dev/null || fail "restic restore failed"
+snapdir="$tmp$ROSTER_DATA/data/snapshots"
+latest=$(find "$snapdir" -maxdepth 1 -name '*.sqlite' 2>/dev/null | sort | tail -n 1)
+[ -n "$latest" ] || fail "no database snapshot in the latest backup"
+log "restoring $(basename "$latest") into the test instance"
+
+compose stop staging >/dev/null 2>&1 || true
+touch "$data/.roster-volume"
+rm -f "$data/roster.sqlite" "$data/roster.sqlite-wal" "$data/roster.sqlite-shm"
+cp "$latest" "$data/roster.sqlite"
+find "$uploads" -mindepth 1 -delete
+if [ -d "$tmp$ROSTER_DATA/uploads" ]; then
+  cp -a "$tmp$ROSTER_DATA/uploads/." "$uploads/"
+fi
+compose up -d --no-deps staging >/dev/null 2>&1 || fail "the test instance did not start"
+
+url="http://${ROSTER_LAN_IP:-127.0.0.1}:8081/api/v1/health"
+for ((i = 0; i < WAIT; i += 3)); do
+  if body=$(curl -fsS -m 5 "$url" 2>/dev/null) && grep -q '"status":"ok"' <<<"$body"; then
+    log "restore test ok: $(basename "$latest")"
+    hc_ping RESTORE_TEST "" "restored $(basename "$latest")"
+    exit 0
+  fi
+  sleep 3
+done
+fail "the test instance is not healthy on the restored backup ($url)"

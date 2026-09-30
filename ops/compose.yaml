@@ -1,0 +1,65 @@
+# Mordheim Campaign on the Pi (docs/operations.md). This is a template:
+# ops/install.sh renders it into ~/server/roster/compose.yaml with the values
+# from ~/server/roster/site.env – change it here, in the repository.
+#   {{ROSTER_DATA}}    /mnt/ssd/roster
+#   {{ROSTER_UID}}, {{ROSTER_GID}}  robin's user and group (1000:1000)
+#   {{ROSTER_LAN_IP}}  the Pi in the home network (test instance only)
+# The image tags come from ~/server/roster/.env, which roster-deploy keeps.
+name: roster
+
+x-app: &app
+  user: "{{ROSTER_UID}}:{{ROSTER_GID}}"
+  init: true
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  pids_limit: 128
+  stop_grace_period: 20s
+  logging:
+    driver: journald   # journalctl CONTAINER_NAME=roster-app; Fail2Ban reads it
+  labels:
+    # updates only deliberately, with a backup first (ADR 0009)
+    com.centurylinklabs.watchtower.enable: "false"
+
+services:
+  caddy:
+    image: caddy:2
+    container_name: roster-caddy
+    # host network: UFW and Fail2Ban apply, the app sees the real client address
+    network_mode: host
+    restart: unless-stopped
+    mem_limit: 128m
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - {{ROSTER_DATA}}/caddy/data:/data
+      - {{ROSTER_DATA}}/caddy/config:/config
+
+  app:
+    <<: *app
+    image: ${ROSTER_IMAGE:-ghcr.io/hmvbfv/mordheim-roster}:${ROSTER_TAG:-not-deployed-yet}
+    container_name: roster-app
+    # only for Caddy on the same machine
+    ports: ["127.0.0.1:3000:3000"]
+    env_file: {{ROSTER_DATA}}/app.env
+    volumes:
+      - {{ROSTER_DATA}}/data:/data
+      - {{ROSTER_DATA}}/uploads:/uploads
+      # phase 4b adds the chronicle inbox:
+      # - /mnt/ssd/agent/eingang/chronik:/export/chronik
+    mem_limit: 256m
+    cpus: 1.5
+
+  staging:
+    <<: *app
+    image: ${ROSTER_IMAGE:-ghcr.io/hmvbfv/mordheim-roster}:${STAGING_TAG:-${ROSTER_TAG:-not-deployed-yet}}
+    container_name: roster-staging
+    # home network and WireGuard only; the Fritzbox forwards nothing to 8081
+    ports: ["{{ROSTER_LAN_IP}}:8081:3000"]
+    env_file: {{ROSTER_DATA}}/staging.env
+    volumes:
+      - {{ROSTER_DATA}}/staging/data:/data
+      - {{ROSTER_DATA}}/staging/uploads:/uploads
+    mem_limit: 192m
+    cpus: 1
