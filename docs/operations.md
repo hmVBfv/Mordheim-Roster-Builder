@@ -37,8 +37,10 @@ jedem `git pull` erneut ausführen: Es überschreibt nie `site.env`,
 eigenen Klon im Home-Verzeichnis (`~/src/Mordheim-Roster-Builder`), nie aus
 `/mnt/ssd/agent/…`: Dort können die Agenten-Container schreiben, und was dort
 liegt, würde mit root-Rechten ausgeführt. `install.sh` bricht ab, wenn es aus
-dem Agenten-Verzeichnis gestartet wird oder seine Dateien für andere
-beschreibbar sind.
+dem Agenten-Verzeichnis gestartet wird oder seine Dateien oder die
+Verzeichnisse darüber von jemand anderem als root und `<user>` geändert werden
+können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
+002) zählt als eigenes, solange niemand sonst in dieser Gruppe ist.
 
 ### Stufe 1 – Vorbereitung, ohne Änderung nach außen
 

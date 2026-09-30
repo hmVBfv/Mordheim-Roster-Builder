@@ -1713,3 +1713,12 @@ while his own commits use a shortened name and GitHub's no-reply address.
 Commits from now on use the latter (`CLAUDE.md` says so). The older commits
 were a question for Rob: rewriting published history can only be partly
 undone, and GitHub keeps the old commits of merged pull requests.
+
+The check caught its author first. On the Pi, `install.sh` refused Rob's
+fresh clone as "writable by others": Raspberry Pi OS, like Debian, gives each
+user a private group of the same name and the umask 002, so every clone is
+group-writable – by a group only he is in. The check now counts such a group
+as the user's own, and in exchange also looks at the directories above the
+clone, since whoever can write one of them can swap the clone underneath.
+`ops/test/install-guard.sh` creates throwaway users on the CI runner and
+tries each case.
