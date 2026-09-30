@@ -278,3 +278,37 @@ sagen:
 (siehe oben); „cavalry only“ (Lance) und „Warhorses only“ (Barding) – hängen
 am Reittier, nicht an der Warband; „1st free“, „Common for …“, „Rare 6 for …“
 – Preis oder Seltenheit, keine Beschränkung.
+
+## F. Regeltexte für den ganzen Katalog (30.09.2026)
+
+Rob, 30.09.2026: „Bei den Rare Searches möchte ich auch sehen, was die
+Gegenstände machen.“ 58 Gegenstände des Katalogs hatten keinen Regeltext –
+beide Apps zeigten bei ihnen kein ⓘ, und die Hilfen der Post-Battle-Sequenz
+fanden sie nicht (etwa die Mordheim-Karte oder die Tarotkarten bei der
+Erkundung). Betroffen war vor allem die sonstige Ausrüstung: Laterne,
+Fackel, Banner, Krähenfüße, Feuerpfeile und -bomben, Blitzpulver, Dietriche,
+Karten, Hasenpfote, Tarotkarten, Fernrohr, Kriegshorn, Gifte und Drogen,
+Leitern, Truhe, Pulverfass, Fahrzeuge; dazu Schlagring, Brazier Iron,
+Obsidianwaffe, Chaos-, Lamellen- und Pavise-Rüstung.
+
+**Ergänzt** in `ITEMINFO` (`data/equipment.json`), in eigenen Worten und
+knapp, nach mordheimer.net (Equipment: Miscellaneous Equipment, Armour,
+Close-Combat Weapons, gelesen am 30.09.2026). Die Ultimate FAQ sagt nur zum
+Zauberfolianten etwas (7.3: ob ein benutzter Foliant weitergegeben werden
+darf, entscheidet die Gruppe) – das steht im Text. Wo mordheimer.net nur
+Vorschläge macht (die Opulente Kutsche als Wagen), steht nur die Regel.
+Fahrzeuge verweisen auf „Vehicles of the Empire“, weil ihre Regeln dort
+stehen und nicht beim Gegenstand.
+
+**Nebenwirkung, gewollt:** Die Brazier Iron ist jetzt laut ihrem Text
+zweihändig; `isTwoHanded()` liest das aus dem Text, und so zählt sie beim
+Wert eines Witch Hunters wie jede zweihändige Waffe. Keine bisherige
+Zuordnung hat sich geändert: Die neuen Einträge stehen am Ende der Liste,
+und ein Skript hat für jeden Namen aus Katalog und Ausrüstungslisten
+geprüft, dass nur bisher textlose Namen einen Text bekommen.
+
+Test: `core/test/data-audit.test.ts` („rules texts of the catalogue“) –
+jeder Katalogeintrag hat einen Text, ähnliche Namen bekommen ihren eigenen
+(Banner und Clan-Pestilens-Banner, Familiar und Schriftrolle, Obsidian- und
+Zharr-Obsidianwaffe, kleine und große Leiter), die Brazier Iron ist
+zweihändig.
