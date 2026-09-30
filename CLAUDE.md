@@ -31,8 +31,8 @@ changing anything structural.
 | `data/` | audited rules data (JSON) | single source for legacy and new code |
 | `core/` | shared logic, TypeScript, no DOM | phase 1 |
 | `app/` | React 19 PWA, flavours `campaign` and `quickbuild` | phase 1 |
-| `server/` | Fastify + SQLite API | phase 2 |
-| `ops/` | Pi configuration: compose, Caddyfile, systemd, scripts, `install.sh` | phase 2 |
+| `server/` | Fastify + SQLite API, `roster-cli` | phase 2 (skeleton: health, migrations, snapshots, epoch) |
+| `ops/`, `Dockerfile` | Pi configuration: compose, Caddyfile, systemd, scripts, `install.sh`; the image | phase 2 |
 | `docs/` | concept, architecture, data model, security, operations, UI | now |
 
 ## Commands
@@ -41,8 +41,18 @@ changing anything structural.
 - `npm run check` — typecheck, lint, legacy, core and app tests; run it
   before every push (plus the app build, size and e2e when the app changed).
 - `npm run typecheck`, `npm run lint`, `npm run test:legacy`,
-  `npm run test:core`, `npm run test:app` (or `npm test -w core -- --watch`
-  while working).
+  `npm run test:core`, `npm run test:app`, `npm run test:server` (or
+  `npm test -w core -- --watch` while working).
+- `.npmrc` sets `ignore-scripts=true`: no dependency runs install scripts
+  (better-sqlite3 ships prebuilt binaries). Keep it that way.
+- Server: `npm run build -w server` bundles into `server/dist/`; the image:
+  `docker build --build-arg ROSTER_VERSION=$(git rev-parse HEAD) -t roster .`,
+  then `ops/test/smoke.sh roster <version>`. `ops/test/e2e.sh` needs a
+  systemd host with restic and Fail2Ban (the CI runner); read it before
+  running it anywhere else. `ops/install.sh --render <dir> --site <file>`
+  renders the Pi's files without installing anything; shellcheck all of
+  `ops/` after changing a script. In a cloud session Docker Hub may be
+  unreachable – the CI builds and tests the image on every push.
 - App: `npm run dev -w app` (campaign) or `npm run dev:quickbuild -w app`;
   `npm run build -w app` (both flavours into `app/dist/`), then
   `npm run size -w app` and `npm run e2e -w app` (Playwright at 360 px, also

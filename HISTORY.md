@@ -1613,3 +1613,69 @@ shield with an eagle for the Empire's mercenaries, the comet and hammer for
 the Sisters, a rag with a rat's skull for Clan Eshin; nothing copied from
 the game's own symbols. The city at night moved into a script of its own so
 Home on the desktop shows it too.
+
+## September 30, 2026 (cont.) — the Pi's side, before the Pi
+
+Rob chose to go on with phase 2 rather than split phase 3 for an earlier
+offline test. Nobody works on the Pi itself (ADR 0015), so phase 2 in this
+repository means everything the Pi will run, tested somewhere else: the
+`server/` skeleton, the image, and `ops/` — and a CI that does on a GitHub
+runner what Rob will do on the Pi, drills included.
+
+The server does little yet, but what it does is what the rest will stand on.
+It refuses to start without the marker file on the SSD and creates nothing
+then. It checks the database's integrity, takes a snapshot before any
+migration of a database that has a schema, and migrates forward in one
+transaction per file. If the database is damaged, unreadable or newer than
+the code, it still answers health — with 503 — so `roster-deploy` rolls back
+and the dead man's switch complains, instead of a container restarting in a
+loop without saying why. Every route names its action for `can()`, and a
+route without one cannot be registered: the rule "every endpoint goes
+through `can()`" is enforced before there is a single endpoint worth
+guarding. It also serves the app's campaign build, so installing the PWA on
+a phone — still open from phase 1 — can be tried at the real address.
+
+Three things in the plan turned out wrong on contact:
+
+- **The epoch.** The plan said the server's epoch changes on every restore.
+  Kept in the database, it would not: a restored file carries the epoch it
+  had when it was backed up, which is exactly the one the devices already
+  know. Every snapshot copy now carries a mark; a server that starts on a
+  marked file takes a new epoch and removes the mark. The live database never
+  has it, and restoring the same snapshot twice still gives two epochs.
+- **The client address.** The plan had Fastify trust `X-Forwarded-For` only
+  from 127.0.0.1. But Caddy reaches the app through Docker's published port,
+  and inside the container that connection comes from the Docker network's
+  gateway. With the plan's setting every request would have come "from the
+  gateway", and ten failed logins by anyone would have had Fail2Ban ban…
+  the gateway. The server now also trusts its own default gateway, and the
+  smoke test checks it with the real image.
+- **npm and SQLite.** `npm ci` tried to compile better-sqlite3 with node-gyp,
+  although the package ships prebuilt binaries for every platform we need —
+  from a lock file, npm does not see the package's `gypfile: false`. Here
+  that failed outright (no Node headers to download); on CI it would have
+  cost a minute of compiling on every run. `.npmrc` now switches off install
+  scripts for all dependencies, which is also one less way for a compromised
+  package to run code. None of ours needed one.
+
+The Fail2Ban filter got stricter than planned: `"event":"login_failed","ip":`
+must stand side by side, which the logger guarantees, so nothing a user types
+can come between them. A test tries to smuggle another address in through the
+account name; CI then writes real lines into the journal and watches the jail
+ban the address.
+
+`roster-deploy` pulls first (a failed pull changes nothing), then backs up,
+switches, and waits for the container to run exactly the new image *and* to
+report healthy. On failure it goes back, and if the schema moved in between
+it puts the pre-deploy snapshot back and keeps the failed database next to
+it. Both kinds of failure are drills in CI: `:drill-broken` exits at once;
+a second test image migrates one step and then fails the next. `roster-restore`
+replaces the manual restore steps. The image builds everything on the
+runner's own platform and only copies files for arm64, so there is no slow
+emulation.
+
+Docker Hub was not reachable from this session, so the image could not be
+built here. The scripts were tested anyway: a base image assembled from the
+session's own Node binary, the runtime stage recreated around it, and then
+deploy, both rollbacks, backup and restore test with a real restic, and the
+restore — before the first push. The real image is built and tested by CI.
