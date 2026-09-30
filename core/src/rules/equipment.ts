@@ -235,6 +235,28 @@ export function catalogEligible(ctx: Ctx, def: UnitDef | undefined, item: Catalo
 }
 
 /** Catalogue items this model may buy in the Rare / Trading Post section. */
+/** Items the catalogue keeps for some warbands or warriors (`only`, the text
+    in `wb` as data): warbands (with a variant after ':' and units after
+    '/'), warbands that may not have it, Heroes only, human warbands,
+    spellcasters (legacy catalogAllowed). */
+export function catalogAllowed(ctx: Ctx, it: CatalogItem, m: Model): boolean {
+  const o = it.only;
+  if (!o) return true;
+  const def = unitDef(ctx, m.uid_def);
+  const isHero = def?.t === 'hero' || !!m.promoted;
+  const wb = ctx.s.wb ?? '';
+  if (o.notWb && o.notWb.includes(wb)) return false;
+  if (o.wb && !o.wb.some((e) => {
+    const [w = '', units] = e.split('/');
+    const [k, sub] = w.split(':');
+    return k === wb && (!sub || ctx.s.subtype === sub) && (!units || units.split(',').includes(m.uid_def));
+  })) return false;
+  if (o.heroes && !isHero) return false;
+  if (o.human && !ctx.data.WBHIRE[wb]?.human) return false;
+  if (o.casters && !(def?.magic || m.magic)) return false;
+  return true;
+}
+
 export function rareEligibleItems(ctx: Ctx, m: Model): CatalogItem[] {
   const def = unitDef(ctx, m.uid_def);
   if (!def || !def.eq) return [];
@@ -245,6 +267,7 @@ export function rareEligibleItems(ctx: Ctx, m: Model): CatalogItem[] {
   if (list) for (const cat of Object.keys(list)) for (const [nm, , fl] of list[cat] ?? []) if (!fl?.start) have.add(stripParen(nm).toLowerCase());
   const isHero = def.t === 'hero' || !!m.promoted;
   return ctx.data.CATALOG.filter((it) => {
+    if (!catalogAllowed(ctx, it, m)) return false; // kept for other warbands or warriors
     if (def.noArmour && it.cat === 'armour') return false;
     if (def.noMissile && (it.cat === 'missile' || it.cat === 'bp')) return false;
     if (def.noHeavy && itemFamily(ctx.data, it.de) === 'heavyarmour') return false;
