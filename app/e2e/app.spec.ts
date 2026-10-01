@@ -74,6 +74,112 @@ for (const theme of THEMES) {
   });
 }
 
+/* Phase 3a: a warband built from nothing, in both themes. Every sheet is
+   checked open (width, touch targets) and photographed. */
+for (const theme of THEMES) {
+  test(`a new warband, recruited and named, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await page.getByRole('link', { name: 'Warbands' }).click();
+    await page.getByRole('link', { name: 'New warband' }).click();
+    await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+    await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
+    await page.getByRole('textbox', { name: 'Name' }).fill('The Grey Company');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-new-warband`);
+    await page.getByRole('button', { name: 'Start the warband' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'The Grey Company' })).toBeVisible();
+    await expect(page.getByText('No warriors yet')).toBeVisible();
+
+    // recruit: the list, grouped, with prices; the leader only once
+    await page.getByRole('button', { name: '+ Recruit' }).click();
+    const sheet = page.locator('dialog[open]');
+    await expect(sheet.getByRole('heading', { name: 'Recruit' })).toBeVisible();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-recruit`);
+    await sheet.getByRole('button', { name: /^Mercenary Captain/ }).click();
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    await expect(page.getByRole('article', { name: 'Mercenary Captain' })).toBeVisible();
+    await expect(page.getByText('Recruited Mercenary Captain')).toBeVisible();
+    await page.getByRole('button', { name: '+ Recruit' }).click();
+    await expect(sheet.getByRole('button', { name: /^Mercenary Captain/ })).toBeDisabled();
+    await sheet.getByRole('button', { name: /^Warrior/ }).click();
+    const group = page.getByRole('article', { name: 'Warrior' });
+    await group.getByRole('button', { name: /\+ Man/ }).click();
+    await group.getByRole('button', { name: /\+ Man/ }).click();
+    await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(3);
+
+    // name one man, then let another go
+    await group.getByRole('button', { name: 'Warrior 2: name or dismiss' }).click();
+    await page.locator('dialog[open]').getByRole('textbox').fill('Bruno');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-name-a-man`);
+    await page.locator('dialog[open]').getByRole('button', { name: 'Save' }).click();
+    await expect(group.getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
+    await group.getByRole('button', { name: 'Warrior 3: name or dismiss' }).click();
+    await page.locator('dialog[open]').getByRole('button', { name: 'Dismiss him' }).click();
+    await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(2);
+    await expect(group.getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
+
+    // experience one step at a time
+    const captain = page.getByRole('article', { name: 'Mercenary Captain' });
+    await captain.getByRole('button', { name: /One experience more/ }).click();
+    await expect(captain.getByText('Exp 21')).toBeVisible();
+
+    // ⋯: the menu of a warrior, and a name for the Captain
+    await captain.getByRole('button', { name: 'More for Mercenary Captain', exact: true }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-warrior-menu`);
+    await page.locator('dialog[open]').getByRole('button', { name: /^Name/ }).click();
+    await page.locator('dialog[open]').getByRole('textbox').fill('Ulrich the Grey');
+    await page.locator('dialog[open]').getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-roster-edited`);
+
+    // everything is on the device: a reload shows the same
+    await page.reload();
+    await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toContainText('Exp 21');
+    await expect(page.getByRole('article', { name: 'Warrior' }).getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
+  });
+}
+
+/* Removing a warrior is a click and an Undo, not a question. */
+test('a warrior removed from the roster comes back with Undo', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /Remove from the roster/ }).click();
+  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+});
+
+/* Back closes the sheets of the roster too, and a sheet opened from the ⋯
+   menu leaves no step of the menu behind. */
+test('Back closes the sheets of the roster', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  const roster = page.url();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await expect(page.locator('dialog[open]')).toHaveCount(1);
+  await page.goBack();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  expect(page.url()).toBe(roster);
+  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /^Name/ }).click();
+  await expect(page.locator('dialog[open]').getByRole('textbox')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  expect(page.url()).toBe(roster);
+  await page.getByRole('button', { name: 'Rename the warband' }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: 'Cancel' }).click();
+  await page.waitForFunction(() => !(history.state as { mordheimSheet?: boolean } | null)?.mordheimSheet);
+  await page.goBack();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toHaveCount(0);
+});
+
 /* Back closes a sheet instead of leaving the app (Rob, 28.09.2026). */
 test('Back closes the import sheet and stays on the screen', async ({ page }) => {
   await page.goto('./');
@@ -140,7 +246,7 @@ test('the undo notice goes quickly, can be dismissed and lets taps through', asy
   await expect(page.getByRole('link', { name: /The Silver Caravan/ })).toBeVisible();
   await page.getByRole('link', { name: /The Silver Caravan/ }).click();
   await page.getByRole('button', { name: 'Remove from this device' }).click();
-  await page.getByRole('button', { name: 'Dismiss' }).click();
+  await page.getByRole('button', { name: 'Dismiss', exact: true }).click();
   await expect(toast).toBeHidden({ timeout: 500 });
 });
 
@@ -241,5 +347,28 @@ test.describe('start-up budgets', () => {
       }, theme));
     }
     expect(median(reactions), `reactions: ${reactions.map(Math.round).join(', ')} ms`).toBeLessThan(100);
+  });
+
+  /* The most frequent change on the roster: one step of experience. The
+     whole roster is worked out again by core; it must still feel instant. */
+  test('a step of experience shows in under 100 ms', async ({ page }) => {
+    await page.goto('./');
+    await importSample(page);
+    await throttle(page);
+    const button = 'article[aria-label="Ulrich the Grey"] button[aria-label^="One experience more"]';
+    await expect(page.locator(button)).toBeVisible();
+    const reactions: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      reactions.push(await page.evaluate(async (sel) => {
+        const b = document.querySelector<HTMLButtonElement>(sel)!;
+        const out = b.previousElementSibling!;
+        const before = out.textContent;
+        const t = performance.now();
+        b.click();
+        while (out.textContent === before) await new Promise((r) => requestAnimationFrame(() => r(null)));
+        return performance.now() - t;
+      }, button));
+    }
+    expect(median(reactions), `experience steps: ${reactions.map(Math.round).join(', ')} ms`).toBeLessThan(100);
   });
 });

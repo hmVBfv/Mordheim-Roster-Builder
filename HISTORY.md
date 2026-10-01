@@ -1722,3 +1722,34 @@ as the user's own, and in exchange also looks at the directories above the
 clone, since whoever can write one of them can swap the clone underneath.
 `ops/test/install-guard.sh` creates throwaway users on the CI runner and
 tries each case.
+
+## October 2, 2026 — the Pi online, and the first edit
+
+Stages 1 and 2 of the setup went through on the Pi: the app answers under its
+hostname with a certificate, the encrypted backup reaches the desktop, and
+the app installed on Rob's phone from there – the one item phase 1 could not
+check. Two things in the runbook were wrong. There was no rsync job on the
+desktop to extend, only a Samba mount of the media share, which is the wrong
+road for a backup copy: it can write, and a careless target lands on the very
+SSD it should protect. The desktop now pulls the repository with a key that
+`rrsync -ro` confines to reading that one directory. And `rpi-clone` is
+reported not to work on Trixie, so the SD clone became a `dd` image taken on
+the desktop – and then waited, at Rob's choice.
+
+Rob started phase 3 before the drills of stage 3, builder first. Step 3a
+makes the roster editable: a warband is started from the list grouped by
+grade, warriors are recruited from the Roster Builder's own list (with the
+reason when one may not be), named, let go, given experience one step at a
+time, a Hero made leader. Every change is a core action on the state the
+screen shows, saved on the device at once; the notice after it offers Undo
+instead of a question, and a later change takes the notice away, so Undo
+never reverts more than its own change. Only one piece of logic is new:
+dismissing one particular man of a group (`dismissMember`) – the Roster
+Builder could only shrink a group from its end, losing the wrong man's name.
+
+Building it found a fault in the sheets. Choosing "Name" in the ⋯ menu
+closed the menu and opened the name sheet – which shut again at once. The
+menu's step back in the history is one `popstate` event, and every open
+sheet listens for it: the name sheet, opened by the menu's listener, heard
+the same event a moment later and took it for Back. What a closing sheet
+runs afterwards now waits until every listener has seen the event.

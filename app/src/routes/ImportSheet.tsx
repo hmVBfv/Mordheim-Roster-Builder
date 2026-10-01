@@ -7,7 +7,7 @@ import type { ImportOutcome } from '../db/warbands.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 
-export function ImportSheet({ onImported }: { onImported: (id: string) => void }) {
+export function ImportSheet({ onImported, quiet = false }: { onImported: (id: string) => void; quiet?: boolean }) {
   const { ref: sheetRef, open: openSheet, close: closeSheet } = useSheet();
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -29,7 +29,7 @@ export function ImportSheet({ onImported }: { onImported: (id: string) => void }
 
   return (
     <>
-      <button type="button" className={ui.button} onClick={() => { setError(null); openSheet(); }}>Import a warband</button>
+      <button type="button" className={quiet ? ui.buttonQuiet : ui.button} onClick={() => { setError(null); openSheet(); }}>Import a warband</button>
       <dialog ref={sheetRef} className={ui.sheet} aria-labelledby="import-title">
         <form method="dialog" className={ui.page} onSubmit={(e) => { e.preventDefault(); void run((d, w) => w.importText(d, text)); }}>
           <h2 id="import-title">Import a warband</h2>

@@ -1,111 +1,114 @@
-/* One warband, read only for now: the new builder comes in phase 3. */
+/* One warband, to read and to change (phase 3a). Every change is an action
+   of core, saved on this device at once; the notice after it offers "Undo"
+   instead of asking first (docs/ui.md §1.6). */
+import * as core from '@mordheim/core';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
-import { rosterView, type HireView, type WarriorView, type XpView } from '../roster/view.ts';
+import { Hire, Warrior } from '../roster/Cards.tsx';
+import { MenuSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
+import { useEditor } from '../roster/useEditor.ts';
+import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
+import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
-import styles from './Roster.module.css';
-
-function Stats({ cells, save }: { cells: { key: string; value: string; changed: boolean }[]; save?: string }) {
-  return (
-    <table className={styles.stats}>
-      <thead>
-        <tr>{cells.map((c) => <th key={c.key} scope="col">{c.key}</th>)}{save != null && <th scope="col">Sv</th>}</tr>
-      </thead>
-      <tbody>
-        <tr>
-          {cells.map((c) => <td key={c.key} className={c.changed ? styles.changed : undefined}>{c.value}</td>)}
-          {save != null && <td>{save}</td>}
-        </tr>
-      </tbody>
-    </table>
-  );
-}
-
-const STEP_WORD = { base: 'before his start', on: 'reached', next: 'next', open: '' } as const;
-
-/* Every step of the experience track framed, those below the starting
-   experience dashed, those reached filled, the next one marked – as the
-   Roster Builder draws it. The state is also in words for screen readers. */
-function XpTrack({ xp }: { xp: XpView }) {
-  return (
-    <div className={styles.xp}>
-      <ol className={styles.steps} aria-label="Experience steps">
-        {xp.steps.map((s) => (
-          <li key={s.at} className={styles[s.state]}>
-            {s.at}{STEP_WORD[s.state] && <span className="visually-hidden"> {STEP_WORD[s.state]}</span>}
-          </li>
-        ))}
-      </ol>
-      <p className={styles.xpLine}>
-        <span>Exp <b>{xp.value}</b></span>
-        <span>{xp.next != null ? `next advance at ${xp.next}` : 'all steps reached'}</span>
-      </p>
-    </div>
-  );
-}
-
-function Line({ label, items }: { label: string; items: string[] }) {
-  if (!items.length) return null;
-  return (<><dt>{label}</dt><dd>{items.join(', ')}</dd></>);
-}
-
-function Warrior({ w }: { w: WarriorView }) {
-  return (
-    <article className={`${ui.card} ${styles.warrior}`}>
-      <header className={styles.head}>
-        <h3>{w.name}{w.count > 1 && <span className={styles.count}> ×{w.count}</span>}</h3>
-        {w.name !== w.type && <p className={ui.muted}>{w.type}</p>}
-        <p className={styles.badges}>
-          {w.leader && <span className={styles.badge}>Leader</span>}
-          {w.promoted && <span className={styles.badge}>Promoted</span>}
-          {w.advanceDue && <span className={`${styles.badge} ${styles.due}`}>Advance due</span>}
-          {w.missGames > 0 && <span className={`${styles.badge} ${styles.out}`}>Misses {w.missGames} game{w.missGames > 1 ? 's' : ''}</span>}
-        </p>
-      </header>
-      <Stats cells={w.stats} save={w.save} />
-      {w.xp ? <XpTrack xp={w.xp} /> : <p className={`${ui.muted} ${styles.xpLine}`}>Gains no experience.</p>}
-      <dl className={styles.facts}>
-        <Line label="Equipment" items={w.equipment} />
-        <Line label="Skills" items={w.skills} />
-        <Line label="Spells" items={w.spells} />
-        <Line label="Mutations" items={w.mutations} />
-        <Line label="Injuries" items={w.injuries} />
-        <Line label="Men" items={w.members} />
-      </dl>
-    </article>
-  );
-}
-
-function Hire({ h }: { h: HireView }) {
-  return (
-    <article className={`${ui.card} ${styles.warrior}`}>
-      <header className={styles.head}>
-        <h3>{h.name}</h3>
-        <p className={ui.muted}>{h.kind}{h.name !== h.type ? ` · ${h.type}` : ''}</p>
-        {h.advanceDue && <p className={styles.badges}><span className={`${styles.badge} ${styles.due}`}>Advance due</span></p>}
-      </header>
-      <Stats cells={h.stats} />
-      {h.xp && <XpTrack xp={h.xp} />}
-    </article>
-  );
-}
+import { UndoToast } from '../ui/UndoToast.tsx';
+import { useSheet } from '../ui/useSheet.ts';
+import styles from '../roster/Roster.module.css';
 
 function RosterBody({ rec }: { rec: StoredWarband }) {
   const data = useGameData();
-  const v = useMemo(() => rosterView(data, rec.state), [data, rec.state]);
+  const ed = useEditor(data, rec);
+  const v = useMemo(() => rosterView(data, ed.state), [data, ed.state]);
   const navigate = useNavigate();
+
+  const { ref: menuRef, open: openMenuSheet, close: closeMenu } = useSheet();
+  const [menuOf, setMenuOf] = useState<{ title: string; items: MenuItem[] }>({ title: '', items: [] });
+  const { ref: nameRef, open: openNameSheet, close: closeName } = useSheet();
+  const [naming, setNaming] = useState<Naming | null>(null);
+  const { ref: recruitRef, open: openRecruit, close: closeRecruit } = useSheet();
+
+  // a new key each time, so the form starts from the value it is given
+  const askName = (n: Omit<Naming, 'key'>) => { setNaming((prev) => ({ ...n, key: (prev?.key ?? 0) + 1 })); openNameSheet(); };
+  const openMenu = (title: string, items: MenuItem[]) => { setMenuOf({ title, items }); openMenuSheet(); };
+
+  const warriorMenu = (w: WarriorView) => openMenu(w.name, [
+    {
+      label: w.hero ? 'Name' : 'Name of the group',
+      run: () => askName({
+        title: w.hero ? 'Name' : 'Name of the group', label: w.hero ? `Name of this ${w.type}` : 'Name of the group',
+        value: w.name === w.type ? '' : w.name, fallback: w.type,
+        save: (nm) => ed.edit((c) => core.setModelName(c, w.uid, nm || w.type), 'Name saved.'),
+      }),
+    },
+    ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
+    {
+      label: 'Remove from the roster', danger: true,
+      run: () => ed.edit((c) => core.removeUnit(c, w.uid), `${w.name} removed from the roster.`),
+    },
+  ]);
+
+  const hireMenu = (h: HireView) => {
+    const hs = h.kind === 'Hired Sword';
+    openMenu(h.name, [
+      {
+        label: 'Name',
+        run: () => askName({
+          title: 'Name', label: `Name of this ${h.type}`, value: h.name === h.type ? '' : h.name, fallback: h.type,
+          save: (nm) => ed.edit((c) => (hs ? core.setHsName(c, h.uid, nm) : core.setDpName(c, h.uid, nm)), 'Name saved.'),
+        }),
+      },
+      {
+        label: 'Dismiss — upkeep ends', danger: true,
+        run: () => ed.edit((c) => (hs ? core.unhireHS(c, h.uid) : core.unhireDP(c, h.uid)), `${h.name} is dismissed.`),
+      },
+    ]);
+  };
+
+  const manSheet = (w: WarriorView, i: number) => {
+    const m = w.men[i]!;
+    askName({
+      title: m.name, label: `Name of this man of ${w.name}`, value: m.named ? m.name : '', fallback: m.name,
+      save: (nm) => ed.edit((c) => core.setMemberName(c, w.uid, i, nm), 'Name saved.'),
+      extra: w.count > 1
+        ? { label: 'Dismiss him', run: () => ed.edit((c) => core.dismissMember(c, w.uid, i), `${m.name} leaves ${w.name}.`) }
+        : undefined,
+    });
+  };
+
+  const warriorActs = (w: WarriorView) => ({
+    onMore: () => warriorMenu(w),
+    onXp: (d: number) => ed.edit((c) => core.setModelExp(c, w.uid, w.exp + d)),
+    onMan: (i: number) => manSheet(w, i),
+    onAddMan: () => {
+      if (!w.addMan || !('cost' in w.addMan)) return;
+      const cost = w.addMan.cost;
+      ed.edit((c) => core.setQty(c, w.uid, w.count + 1), `A man joins ${w.name} (${cost} gc).`);
+    },
+  });
+  const hireActs = (h: HireView) => ({
+    onMore: () => hireMenu(h),
+    onXp: (d: number) => ed.edit((c) => core.setHsExp(c, h.uid, h.exp + d)),
+  });
+
   return (
     <section className={ui.page}>
       <header>
-        <h1>{v.name}</h1>
+        <div className={styles.title}>
+          <h1>{v.name}</h1>
+          <button type="button" className={ui.iconButton} aria-label="Rename the warband"
+            onClick={() => askName({
+              title: 'Name of the warband', label: 'Name', value: v.name, fallback: v.type,
+              save: (nm) => ed.edit((c) => core.setWarbandName(c, nm), 'Name saved.'),
+            })}><IconEdit /></button>
+        </div>
         <p className={ui.muted}>{v.type}{v.campaign ? ` · ${v.campaign}` : ''}</p>
         <dl className={styles.summary}>
           <div><dt>Rating</dt><dd>{v.rating}</dd></div>
           <div><dt>Gold</dt><dd>{v.gold} gc</dd></div>
           <div><dt>Models</dt><dd>{v.models}/{v.maxModels}</dd></div>
+          <div><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
       </header>
       {v.warnings.length > 0 && (
@@ -113,12 +116,15 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           {v.warnings.map((w) => <li key={w}>{w}</li>)}
         </ul>
       )}
-      {v.heroes.length > 0 && <h2>Heroes</h2>}
-      <div className={styles.cards}>{v.heroes.map((w) => <Warrior key={w.key} w={w} />)}</div>
+      {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
+        <p className={`${ui.card} ${ui.muted}`}>No warriors yet. Recruit your Heroes and Henchmen: {v.gold} gc to spend.</p>
+      )}
+      {v.heroes.length > 0 && <div className={styles.sectionHead}><h2>Heroes</h2><span className={ui.muted}>{v.heroCount} of {v.heroMax}</span></div>}
+      <div className={styles.cards}>{v.heroes.map((w) => <Warrior key={w.key} w={w} act={warriorActs(w)} />)}</div>
       {v.henchmen.length > 0 && <h2>Henchmen</h2>}
-      <div className={styles.cards}>{v.henchmen.map((w) => <Warrior key={w.key} w={w} />)}</div>
+      <div className={styles.cards}>{v.henchmen.map((w) => <Warrior key={w.key} w={w} act={warriorActs(w)} />)}</div>
       {v.hires.length > 0 && <h2>Hired Swords &amp; Dramatis Personae</h2>}
-      <div className={styles.cards}>{v.hires.map((h) => <Hire key={h.key} h={h} />)}</div>
+      <div className={styles.cards}>{v.hires.map((h) => <Hire key={h.key} h={h} act={hireActs(h)} />)}</div>
       {v.fallen.length > 0 && (
         <details className={ui.card}>
           <summary className={styles.summaryToggle}>Fallen ({v.fallen.length})</summary>
@@ -126,12 +132,19 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         </details>
       )}
       <div className={ui.row}>
+        <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <button type="button" className={ui.buttonQuiet}
           onClick={() => { void db.warbands.delete(rec.id).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
           Remove from this device
         </button>
       </div>
+
+      <MenuSheet dialogRef={menuRef} close={closeMenu} title={menuOf.title} items={menuOf.items} />
+      <NameSheet dialogRef={nameRef} close={closeName} naming={naming} />
+      <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
+        onRecruit={(u) => ed.edit((c) => core.addUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />
+      {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}
     </section>
   );
 }
