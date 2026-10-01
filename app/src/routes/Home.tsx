@@ -23,7 +23,8 @@ export function Home() {
         {recent && recent.length > 0 ? <WarbandList warbands={recent} /> : recent && <p className={ui.muted}>None on this device yet.</p>}
       </div>
       <div className={ui.row}>
-        <ImportSheet onImported={(id) => { void navigate(`/warbands/${id}`); }} />
+        <Link to="/warbands/new" className={ui.button}>New warband</Link>
+        <ImportSheet quiet onImported={(id) => { void navigate(`/warbands/${id}`); }} />
         {recent && recent.length > 0 && <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>}
       </div>
     </section>

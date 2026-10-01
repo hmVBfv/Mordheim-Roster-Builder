@@ -53,6 +53,13 @@ Begriff einführt, trägt ihn hier ein.
 | Suchwurf nach Seltenem | Search (rare) | – (Mockup `trading-post.html#search`) |
 | Veteranenwurf (Männer mit Erfahrung anwerben) | Veterans roll | `henchRecruitSurcharge()`, `m.xpPaid` |
 | Mann (einer Henchmen-Gruppe) | Man | `m.names[]`, `memberName()` |
+| einen Mann entlassen | Dismiss him | `dismissMember()` |
+| Mann nachrekrutieren | + Man | `setQty()`, `henchRecruitCost()` |
+| Warband anlegen | New warband · Start the warband | `createWarband()`, `/warbands/new` |
+| Anwerben | Recruit | `addUnit()`, `recruitStatus()`, Sheet `RecruitSheet` |
+| aus dem Roster nehmen | Remove from the roster | `removeUnit()` |
+| Anführer bestimmen | Lead the warband | `setLeader()`, `canBeLeader()` |
+| Hinweis mit Rückgängig | Undo (notice) | `UndoToast`, `useEditor().notice` |
 | Beförderung | The lad's got talent · Promoted | `promoteHench()`, `m.promoted`, `m.promoCats` |
 
 ## Kampagne und Schlacht

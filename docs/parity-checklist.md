@@ -8,13 +8,14 @@ Pages wird erst auf den Quick Build umgestellt, wenn jede Zeile in der Spalte
 
 ## Stand in einem Satz
 
-**Die Logik ist vollständig und geprüft, die Oberfläche noch nicht.** Jede
+**Die Logik ist vollständig und geprüft, die Oberfläche wächst.** Jede
 Rechnung der alten App steckt in `core/` und kommt dort nachweislich zum
 selben Ergebnis (alle Legacy-Tests laufen über den Spiegel auch gegen
 `core/`, dazu Zufallswanderungen über alle 49 Warbands und Szenarien für
-seltene Zweige). Die neue App kann heute aber nur **importieren und
-anzeigen**; bearbeiten geht erst mit dem neuen Builder (Phase 3) und der
-Kampagne (Phase 4a). Bis dahin bleibt die alte App die, mit der gespielt wird.
+seltene Zweige). Seit 3a (02.10.2026) legt die neue App Warbands an, wirbt
+an, benennt und entlässt, setzt Erfahrung und Anführer; Ausrüstung,
+Aufstiege, Verletzungen, Hired Swords und Exporte folgen in 3b–3e. Bis zur
+Umstellung bleibt die alte App die, mit der gespielt wird.
 
 ## Legende
 
@@ -33,13 +34,13 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
-| Warband wählen (49, Reihenfolge nach Grad), Stadt/Variante, Name | ✓ | ✓ | – | – | 3 | **Mockup fehlt** („Warband anlegen“) |
-| Startgold, Budget, Sonderregeln wie Trantio (+20 %) | ✓ | ✓ | – | – | 3 | |
-| Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | – | roster (Recruit) | 3 | |
-| Anführer bestimmen | ✓ | ✓ | ◐ | – | 3 | App zeigt nur „Leader“ |
-| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ◐ | roster (+ Man mit Veteranenwurf und Grenzen, Namen antippen) | 3 | App zeigt die Namen |
+| Warband wählen (49, Reihenfolge nach Grad), Stadt/Variante, Name | ✓ | ✓ | ✓ | – | 3a | „New warband“; ohne Mockup, die App selbst ist es (Liste und Auswahl wie gehabt); umbenennen über ✎ |
+| Startgold, Budget, Sonderregeln wie Trantio (+20 %) | ✓ | ✓ | ✓ | – | 3a | Startgold schon bei der Auswahl |
+| Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | ✓ | roster (Recruit) | 3a | Liste wie im Builder (Helden, Henchmen, Fahrzeuge), mit Grund, wenn nicht; entlassen über ⋯ mit Undo |
+| Anführer bestimmen | ✓ | ✓ | ✓ | – | 3a | ⋯ → „Lead the warband“ bei jedem Helden, der führen darf |
+| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ◐ | roster (+ Man mit Veteranenwurf und Grenzen, Namen antippen) | 3a/3c | „+ Man“ mit Preis samt Aufpreis und Grund, wenn nicht; Namen antippen; einen bestimmten Mann entlassen (neu, `dismissMember`). Der Veteranenwurf kommt mit 3c |
 | Warnungen zur Legalität (Seitenleiste) | ✓ | ✓ | ✓ | – | 1e | |
-| Rating, Worth, Gold, Modelle | ✓ | ✓ | ◐ | roster | 3 | App: ohne Worth |
+| Rating, Worth, Gold, Modelle | ✓ | ✓ | ✓ | roster | 3a | |
 
 ## Ausrüstung und Handel
 
@@ -62,7 +63,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Profil mit allen Änderungen, Rassenmaxima, Rüstungswurf | ✓ | ✓ | ✓ | roster | 1e | geänderte Werte markiert |
 | Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ✓ | roster | 1e | App: mit Pull Request #4 |
-| Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | – | roster | 3 | |
+| Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | ◐ | roster | 3a | Stepper (nicht unter die Starterfahrung, Hired Swords bis 14); Sprung auf eine Schwelle fehlt |
 | Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ◐ | roster (Advance) | 3 | App zeigt Fertigkeiten und Zauber |
 | Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ◐ | – | 3 | **Mockup fehlt**; App zeigt Mutationen |
 | Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3 | App zeigt „Promoted“ |
@@ -75,7 +76,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Listen mit Filtern (Grad, Werte, Name), wer anheuern darf und warum nicht | ✓ | ✓ | – | – | 3 | **Mockup fehlt** |
 | Anheuern, Kosten, Unterhalt, Personas, Optionen | ✓ | ✓ | – | – | 3 | |
-| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ◐ | roster (Big Gunnar) | 3 | App zeigt Profil und Erfahrung |
+| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ◐ | roster (Big Gunnar) | 3 | App: Erfahrung per Stepper, Name, Entlassen; Aufstiege fehlen |
 
 ## Hausregeln
 
