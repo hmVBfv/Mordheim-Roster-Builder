@@ -180,7 +180,12 @@ ausliefert.
   Timer für Backup, Wiederherstellungstest und `roster-alive`, Fail2Ban,
   `install.sh`.
 - [ ] Einrichtung auf dem Pi – Stufen 1 bis 3 in
-  [operations.md](operations.md#2-einmalige-einrichtung) (Rob).
+  [operations.md](operations.md#2-einmalige-einrichtung) (Rob). Stufe 1
+  und 2 erledigt (02.10.2026): die App läuft unter dem Hostnamen mit
+  gültigem Zertifikat, Backup samt Kopie auf dem Desktop, `roster-alive`
+  pingt; der SD-Klon ist zurückgestellt. Die App ließ sich vom Hostnamen aus
+  auf Android installieren (offen aus Phase 1). Offen: Stufe 3 (Rollback-
+  und SSD-Übung, drei grüne Nächte).
 
 **Abnahme:**
 - Die App ist unter dem Hostnamen mit gültigem Zertifikat erreichbar.
