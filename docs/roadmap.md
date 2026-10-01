@@ -1,6 +1,6 @@
 # Fahrplan
 
-Stand: 30. September 2026
+Stand: 2. Oktober 2026
 
 Jede Phase endet mit einer Abnahme durch Rob. Eine Phase beginnt erst, wenn die
 vorige abgenommen ist; Ausnahmen werden hier vermerkt.
@@ -207,6 +207,30 @@ ausliefert.
 
 **Abnahme:** Die Mitspieler melden sich an und übernehmen ihre Warbands;
 Paritäts-Checkliste 100 %; Pages zeigt den Quick Build.
+
+**Ausnahme:** Phase 3 beginnt, bevor Phase 1 und 2 abgenommen sind (Rob,
+02.10.2026). Offen bleiben dort die echten Speicherstände (1d), Robs Prüfung
+der Mockups auf dem Handy und die Übungen der Stufe 3 (Rollback, SSD, drei
+grüne Nächte), die Rob bei Gelegenheit selbst macht.
+
+**Reihenfolge (Rob, 02.10.2026): erst der Builder, dann Anmeldung und Sync.**
+Der Builder rechnet ganz auf dem Gerät und braucht den Server nicht; die
+Anmeldung geht erst live, wenn Daten hinter ihr liegen.
+
+| Schritt | Inhalt |
+| --- | --- |
+| 3a Roster bearbeiten | Grundlage: jede Änderung eine Aktion aus `core/`, sofort auf dem Gerät gespeichert, einmal rückgängig über den Hinweis. Warband anlegen (Auswahl nach Grad, Variante, Name), Namen, Anwerben und Entlassen, Henchmen-Gruppen (+ Man, Namen der Männer, einen Mann entlassen), Erfahrung per Stepper, Anführer, Worth. |
+| 3b Ausrüstung und Handel | erst die neue Logik in `core/` (V4–V7: Suchwurf, Verkaufen, Umverteilen, Kassenbuch), dann der Trading Post nach Mockup: Kaufen, Seltenes, Suchen, Verkaufen, Geben, Lager, Regeltexte. |
+| 3c Entwicklung | Aufstiege mit Fertigkeiten und Zaubern, Beförderung, Verletzungen mit Folgeentscheidungen (V1), Tod und Gefallene, Veteranenwurf bei „+ Man“; Mutationen und Male (Mockup fehlt). |
+| 3d Hired Swords und Dramatis Personae | Listen mit Filtern, Anheuern, Optionen, Aufstiege (Mockup fehlt). |
+| 3e Hausregeln und Exporte | Hausregeln einer Warband (Mockup fehlt), Text und Datei, TTS-Karten, Rostersheet als PDF, Drucken. |
+| 3f Quick Build auf Pages | Checkliste vollständig, Szenarien der Legacy-Tests als eigene `core/`-Tests, Entscheidung D, Umstellung. |
+| 3g Anmeldung | Einladung, Login, Sitzungen, TOTP, Reset-Links, Bremse, CSRF, Leak-Tests. |
+| 3h Warbands auf dem Server | Versionen, Autosave, Sync mit Outbox und Epoche, „Send to campaign server“. |
+
+Wo ein Mockup fehlt, entsteht es vor dem Code. Für kleine Bildschirme, die
+nur bestehende Muster verwenden (Liste, Sheet, Stepper), ist die App selbst
+das Mockup: Rob prüft sie auf der Testinstanz (`roster-deploy --staging`).
 
 ## Phase 4a – Kampagne im Kern
 
