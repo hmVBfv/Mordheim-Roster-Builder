@@ -120,10 +120,12 @@ jobs:
       - name: Smoke test (SSD drill, health, roster-cli, client address, epoch, memory)
         run: ops/test/smoke.sh "$IMAGE:$TAG" "$GITHUB_SHA"
       - name: Shell scripts
-        run: shellcheck -x -P ops/lib ops/install.sh ops/bin/* ops/lib/* ops/test/*.sh ops/image/roster-cli
+        run: shellcheck -x -P ops/lib ops/install.sh ops/bin/* ops/lib/* ops/test/*.sh ops/image/roster-cli ops/ddns/*
+      - name: DynDNS updater against a stand-in for the Porkbun API
+        run: ops/test/ddns.sh
       - name: Caddyfile and compose file
         run: |
-          printf 'ROSTER_HOST=mordheim.example.duckdns.org\nROSTER_LAN_IP=192.168.178.20\n' > "$RUNNER_TEMP/site.env"
+          printf 'ROSTER_HOST=mordheim.example.org\nROSTER_LAN_IP=192.168.178.20\n' > "$RUNNER_TEMP/site.env"
           ops/install.sh --render "$RUNNER_TEMP/rendered" --site "$RUNNER_TEMP/site.env"
           docker run --rm -v "$RUNNER_TEMP/rendered/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2 caddy validate --adapter caddyfile --config /etc/caddy/Caddyfile
           sed -i 's#/mnt/ssd/roster#'"$RUNNER_TEMP"'/data#g' "$RUNNER_TEMP/rendered/compose.yaml"
