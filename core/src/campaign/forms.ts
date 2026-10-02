@@ -15,7 +15,7 @@ import type { Casualty, CasualtySide, FallenRecord, Model, WarbandState } from '
 import type { Ctx } from '../rules/context.ts';
 import { ctxOf } from '../rules/context.ts';
 import { wbName } from '../rules/casualties.ts';
-import { addCasualtyOn, removeCasualtyOn, retypeCasualty } from '../warband/casualties.ts';
+import { addCasualtyOn, linkFallenOn, removeCasualtyOn, retypeCasualty } from '../warband/casualties.ts';
 import { campState } from '../warband/log.ts';
 import { update } from '../warband/update.ts';
 import { addBattle, type BattleSide } from './chronicle.ts';
@@ -300,7 +300,7 @@ export function saveBattleDraft(ctx: Ctx, cf: CampaignFile | null, d: BattleDraf
       });
       const side = d.sides[row.vSide as number];
       if (rec && victim.dead && victim.fallenIdx != null && side && side.key === 'me') {
-        rec.fallenId = victim.fallenIdx;
+        linkFallenOn(dr, rec, victim.fallenIdx);
         const fe = (dr.fallen ?? [])[victim.fallenIdx];
         if (fe) fe.casualtyId = rec.id;
       }
@@ -360,7 +360,7 @@ export function saveCasualtyDraft(ctx: Ctx, cf: CampaignFile | null, d: Casualty
       battleId: lastBat ? lastBat.id : null, noXp: d.aSideKey === 'env',
     });
     if (rec && victim.dead && victim.fallenIdx != null) {
-      rec.fallenId = victim.fallenIdx; rec.applied = true;
+      linkFallenOn(dr, rec, victim.fallenIdx); rec.applied = true;
       const fe = (dr.fallen ?? [])[victim.fallenIdx];
       if (fe) fe.casualtyId = rec.id;
     }

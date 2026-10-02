@@ -18,12 +18,13 @@ export function campState(d: WarbandDraft): CampaignState {
 /** Next id for a log entry, battle, casualty or experience entry — they
     share one sequence. Never reuses an id: the campaign remembers the last
     one handed out (`logSeq`). A save without it continues after the highest
-    id in any of the four lists; legacy looked at the log and the battles
-    only, so an old save could hand out a casualty's id a second time. */
+    id in any of the four lists and the Fallen (V2); legacy looked at the log
+    and the battles only, so an old save could hand out a casualty's id a
+    second time. */
 export function nextLogId(d: WarbandDraft): number {
   const c = campState(d);
   const top = (xs: { id?: unknown }[] | undefined) => (xs ?? []).reduce((m, e) => Math.max(m, Number(e.id) || 0), 0);
-  const id = Math.max(Number(c.logSeq) || 0, top(c.log), top(c.battles), top(c.casualties), top(c.xp)) + 1;
+  const id = Math.max(Number(c.logSeq) || 0, top(c.log), top(c.battles), top(c.casualties), top(c.xp), top(d.fallen as { id?: unknown }[] | undefined)) + 1;
   c.logSeq = id;
   return id;
 }

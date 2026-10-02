@@ -29,7 +29,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 | Feld | Neu | Bedeutung |
 | --- | --- | --- |
-| `format` | ja | Formatnummer: fehlt = 0 (alte App), 1 = `core/` (Stand jetzt); `core/format` migriert ältere Stände beim Laden |
+| `format` | ja | Formatnummer: fehlt = 0 (alte App), 1 = `core/` bis 02.10.2026, 2 = Gefallene mit fester `id` und `fallenRef` (V2, Stand jetzt); `core/format` migriert ältere Stände beim Laden (`normalizeState`) |
 | `appVersion` | ja | App-Version (Commit), die den Stand erzeugt hat |
 | `canon` | ja | `{ name_de, name_en }` der Warband (z. B. *Die Silberne Karavane* / *The Ardent Caravan*) |
 | `uidSeq` | ja | nächste freie Krieger-`uid`; verhindert, dass eine `uid` nach Entfernen oder Tod wiederverwendet wird. Fehlt er oder läge er nicht hinter jeder vergebenen `uid` (Gefallene eingeschlossen), setzt `normalizeState` ihn hinter die höchste |
@@ -51,16 +51,30 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   Migration. Die alte App verwirft beim Laden unbekannte Schlüssel oben im
   Stand (`uidSeq`, `canon`, `story`, `ledger`); `core/` behält sie.
 - **Gefallene** (`fallen[]`, in der Reihenfolge ihres Todes):
-  `{ kind: 'hero'|'hench', m, uid_def, exp, memberIdx, memberName, lostValue,
-  casualtyId, casFromDeath }`. `m` ist der Krieger, wie er fiel (bei
+  `{ id, kind: 'hero'|'hench', m, uid_def, exp, memberIdx, memberName,
+  lostValue, casualtyId, casFromDeath }`. `id` (ab Format 2, V2) kommt aus
+  derselben Folge wie Chronik, Schlachten, Verluste und Erfahrung; Einträge
+  ohne `id` (alte App) bekommen beim Laden eine, in ihrer Reihenfolge. `m` ist der Krieger, wie er fiel (bei
   Henchmen genau ein Mann der Gruppe, mit der `uid` der Gruppe);
   `lostValue` ist das Gold, das dafür aus der Kasse ging und bei Rücknahme
   zurückkommt.
 - **Verluste** (`campaign.casualties[]`): `{ id, round, battleId, victim,
   attacker, result: 'pending'|'recovered'|'injured'|'dead', detail,
-  fallenId, note, code, applied, xpId }`; `victim`/`attacker` =
+  fallenId, note, code, applied, xpId, injury }`; `victim`/`attacker` =
   `{ uid, name, wb, grade, value, memberIdx, uid_def }`, `uid` nur bei
-  eigenen Kriegern. `fallenId` ist ein Index in `fallen`.
+  eigenen Kriegern. `fallenId` ist ein Index in `fallen` – das liest die
+  alte App; `fallenRef` (ab Format 2, V2) verweist über die `id` und hält
+  auch, wenn ein früherer Gefallener gelöscht wird. `core/` hält `fallenId`
+  mit `fallenRef` im Gleichschritt und repariert beim Laden, was die alte
+  App an Positionen verschoben hat. `injury` (neu,
+  V1, optional) hält den Wurf, mit dem `injure` den Eintrag abschloss,
+  samt Folgeentscheidungen: `{ hero: { code, saved?, d6?, games?, hates?,
+  captured?, pit?, more? } }` oder `{ d6, member? }`; die alte App liest
+  darüber hinweg.
+- **Gefangener** (`models[].captive`, neu, optional): `{ by, round,
+  casualtyId }` – nach 61 „vorerst gefangen“ (Rob, 02.10.2026); er bleibt im
+  Roster, bis `releaseCaptive` den Schlüssel entfernt oder ihn zu den
+  Gefallenen legt. Die alte App führt ihn als gewöhnlichen Krieger.
 - **Gehaltene Erfahrung** (`campaign.xp[]`): `{ id, round, uid, name,
   amount, reason, applied }`; `applyPendingXp` schreibt sie auf die Krieger.
 - **Schlachten** (`campaign.battles[]`): `{ id, round, sides: [{ key, name,

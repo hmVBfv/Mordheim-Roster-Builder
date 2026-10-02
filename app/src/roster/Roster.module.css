@@ -410,3 +410,112 @@
   grid-template-columns: 1fr auto;
   gap: var(--space-2);
 }
+
+/* the advance sheet */
+.table summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.table ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.result {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.result h3,
+.result p {
+  margin: 0;
+}
+
+.pickRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.pickRow button {
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pickRow button[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.pickRow button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pickRow small {
+  color: var(--text-muted);
+}
+
+.skillGroup {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.skillGroup > span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.text {
+  font-size: 0.93rem;
+}
+
+/* "Advance" on a card when one is due */
+.dueButton {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* injuries (phase 3c): long answers stacked, dice beside their button,
+   a result the chart rolls again set in */
+.pickCol {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pickCol button {
+  text-align: start;
+  padding: var(--space-2) var(--space-3);
+}
+
+.dice {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.dice input {
+  width: 5.5em;
+  flex: none;
+}
+
+.subRoll {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--border);
+}

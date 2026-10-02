@@ -55,6 +55,10 @@ export interface Model {
   miss?: number;
   /** Why he misses them, for the chronicle ("Arm Wound …"). */
   missWhy?: string;
+  /** Held captive after rolling 61 (Rob, 02.10.2026: captured as a state):
+      he stays on the roster and counts for the rating but does not fight,
+      until he is exchanged, ransomed or lost (core releaseCaptive). */
+  captive?: { by: string; round: number; casualtyId?: number | null };
   promoCats?: string[];
   /** Experience surcharge actually paid when veterans joined this group. */
   xpPaid?: number;
@@ -133,6 +137,9 @@ export type DistrictHold = 'none' | 'foothold' | 'control';
 /** One death (legacy S.fallen). Heroes keep their whole model; a henchman
     record holds a snapshot of ONE man of the group. */
 export interface FallenRecord {
+  /** Fixed id from the chronicle's sequence (V2); entries the old app
+      wrote get one on load. */
+  id?: number;
   kind: 'hero' | 'hench';
   m: Model;
   uid_def?: string;
@@ -172,8 +179,12 @@ export interface Casualty {
   attacker: CasualtySide;
   result: CasualtyResult | string;
   detail: string;
-  /** Index into `fallen` once the death has been applied. */
+  /** Index into `fallen` once the death has been applied – what the old
+      app reads; core keeps it in step with `fallenRef`. */
   fallenId: number | null;
+  /** The Fallen entry by its fixed id (V2): survives deleting an earlier
+      entry. */
+  fallenRef?: number | null;
   note: string;
   /** The injury roll it was resolved with. */
   code?: string;

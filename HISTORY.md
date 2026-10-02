@@ -1774,3 +1774,51 @@ and every edit of the roster goes through the ledger: recruiting a man is
 booked under the notice the player sees, dismissing one sends his gear to
 the stash and refunds nothing. The search sheet takes the roll as the
 table rolled it; the app only says what is needed and what the odds were.
+
+Step 3c opened with advances. The sheet takes the 2D6 as rolled and shows
+the row of the rulebook's table it lands on – a characteristic, offered
+only while below the race's maximum; a skill from the warrior's own lists,
+or for a wizard a spell instead, a known one becoming easier; for a group,
+"The lad's got talent" with the man and his two lists. The app never rolls.
+Mistakes are taken back from the ⋯ menu, each with its Undo.
+
+Injuries (V1) came next, as the second piece of new logic. The Roster
+Builder had two ways to the same chart – the roll in the casualty list and
+"+ Injury" on the card – and five results did different things depending on
+which was used: a Deep Wound became lasting, Robbed took nothing, the pit
+fight and a capture asked nothing, Survives Against the Odds gave no
+experience. Rather than bend those ports and teach the parity tests a
+string of exceptions, `injure` is new: one action for both ways, taking the
+roll with every follow-up already answered – the D6 of an Arm Wound, the D3
+of a Deep Wound, whom he now hates, what became of the captive, the pit
+fight and the roll after losing it, the further results of Multiple
+Injuries. The legacy ports stay exactly as they were, for parity; the new
+app simply never calls them.
+
+The sheet asks those questions in the chart's order and nests where the
+chart rolls again, so a lost pit fight inside Multiple Injuries is three
+inputs deep and still one roll for core. Districts that change an injury ask
+their own D6 or decide by themselves. Unlike the advance sheet, this one
+offers "Roll the dice": the spec asks for both, and a dead Hero should not
+depend on someone finding a D66 in Tabletop Simulator. The dice come from
+the screen, never from core.
+
+Rob answered the open points the same day. The Peg Leg ignores a leg
+wound only on a 4+ – which leg was hit is a coin toss – and the source
+says so too; the data's tooltip had shortened it to "may ignore … and
+never suffers further leg injuries", and is now corrected. Robbed is a loss
+of equipment, not an injury. And a captive is now a state rather than an
+answer the player must give at once: he stays on the roster, counted but
+not fighting, until an exchange, a ransom or his loss is entered.
+
+V2 followed: fixed ids for the Fallen. A casualty record had pointed at its
+dead warrior by position, so deleting one Fallen entry quietly moved every
+later record onto the wrong man. The failing test came first, as the spec
+asked; the fix gives each entry an id from the chronicle's sequence at the
+moment of death and links by it, keeping the old position in step for the
+old app. The format number rose to 2 for the first time, with the migration
+in `normalizeState`, so that a state already in the app's store is mended
+just like a file. Writing the parity exceptions turned up a second case of
+the same fault in the old app: a death taken back left its record on a
+position the next death would fill. Both are now named rules in the parity
+suite rather than silent differences.
