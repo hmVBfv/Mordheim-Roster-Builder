@@ -26,11 +26,12 @@ async function noSideScroll(page: Page) {
   expect(scroll, 'the page scrolls sideways').toBeLessThanOrEqual(client);
 }
 
-/* …and touch targets of at least 44 px. */
+/* …and touch targets of at least 44 px – except a word in running text that
+   opens its rules in a bubble (docs/ui.md §5). */
 async function tapTargets(page: Page) {
   const small = await page.evaluate(() => {
     const out: string[] = [];
-    for (const el of document.querySelectorAll<HTMLElement>('a, button, summary, label:has(input[type=radio]), input[type=file]')) {
+    for (const el of document.querySelectorAll<HTMLElement>('a, button:not([data-tip]), summary, label:has(input[type=radio]), input[type=file]')) {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || getComputedStyle(el).visibility === 'hidden') continue;
       if (r.height < 44 || r.width < 44) out.push(`${el.tagName} "${(el.textContent ?? '').trim().slice(0, 30)}" ${Math.round(r.width)}×${Math.round(r.height)}`);
@@ -752,3 +753,38 @@ test.describe('start-up budgets', () => {
     expect(median(reactions), `experience steps: ${reactions.map(Math.round).join(', ')} ms`).toBeLessThan(100);
   });
 });
+
+/* Rob, 02.10.2026: the Roster Builder's tooltips are "essential and must be
+   in". Every word on a card that names a rule opens a bubble with its text. */
+for (const theme of THEMES) {
+  test(`rule texts on the cards, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+    // his own Leader rule: 12" in a Reikland warband
+    await ulrich.getByRole('button', { name: 'Leader', exact: true }).click();
+    const tip = page.getByRole('tooltip');
+    await expect(tip).toContainText('Reikland');
+    await ulrich.getByRole('button', { name: 'Sword', exact: true }).click();
+    await expect(tip).toHaveCount(1);
+    await expect(tip).toContainText('Parry');
+    const box = (await tip.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(360);
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-rule-tip`);
+    // a tap elsewhere closes it
+    await page.getByRole('heading', { level: 1 }).click();
+    await expect(tip).toHaveCount(0);
+    // an injury, a skill, a Hired Sword's rule
+    await page.getByRole('article', { name: 'Magda' }).getByRole('button', { name: /Leg Wound/ }).click();
+    await expect(tip).toContainText('Movement permanently');
+    await ulrich.getByRole('button', { name: 'Strike to Injure' }).click();
+    await expect(tip).toContainText('Skill');
+    await page.keyboard.press('Escape');
+    await expect(tip).toHaveCount(0);
+    await page.getByRole('article', { name: /Ogre/ }).getByRole('button', { name: 'Fear', exact: true }).click();
+    await expect(tip).toBeVisible();
+  });
+}

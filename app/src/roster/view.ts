@@ -2,6 +2,9 @@
    the React components so it can be tested without drawing anything. */
 import * as core from '@mordheim/core';
 import type { GameData, HireRecord, Model, Profile, UnitDef, WarbandState } from '@mordheim/core';
+import { hireFacts, warriorFacts, type Fact } from './tips.ts';
+
+export type { Fact, Tip } from './tips.ts';
 
 export const STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
 
@@ -46,13 +49,16 @@ export interface WarriorView {
   missGames: number;
   stats: StatCell[];
   save: string;
-  equipment: string[];
-  skills: string[];
-  spells: string[];
-  mutations: string[];
+  /** His special rules (Leader, Fear, Large Target …); each word on the
+      card carries its rule text for the bubble (tips.ts). */
+  rules: Fact[];
+  equipment: Fact[];
+  skills: Fact[];
+  spells: Fact[];
+  mutations: Fact[];
   /** Marauders: what the warband's Mark gives him (the Seer; the Chieftain once he took it). */
-  mark: string[];
-  injuries: string[];
+  mark: Fact[];
+  injuries: Fact[];
   /** Blinded in both eyes: he must retire from the warband (rulebook, 31). */
   retire: boolean;
   /** Held captive (61): by whom, or '' when unknown; null when free. */
@@ -66,7 +72,7 @@ export interface WarriorView {
 export interface HireView {
   key: string; uid: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
   exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[];
-  skills: string[]; spells: string[];
+  rules: Fact[]; skills: Fact[]; spells: Fact[];
 }
 
 /** One line of the recruit list (legacy renderAddMenu). */
@@ -142,6 +148,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
   const count = hero ? 1 : core.memberCount(m);
   const leader = core.isLeaderModel(ctx, m);
   const block = hero ? '' : addManBlock(ctx, m, def);
+  const facts = warriorFacts(ctx, m);
   return {
     key: String(m.uid),
     uid: m.uid,
@@ -158,15 +165,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     missGames: Number(m.miss) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
     save: core.svLabel(core.svOfModel(ctx, m)),
-    equipment: [...core.eqDisplayParts(ctx, m), ...core.rareDisplayParts(ctx, m)],
-    skills: [...(m.skills ?? [])],
-    spells: (m.spells ?? []).map((s) => s.name),
-    mutations: [...new Set(m.mut ?? [])].map((x) => {
-      const n = (m.mut ?? []).filter((y) => y === x).length;
-      return core.mutEN(ctx.data, x) + (n > 1 ? ` ×${n}` : '');
-    }),
-    mark: core.markRulesFor(ctx, m).map(([n]) => n),
-    injuries: (m.inj ?? []).map((j) => j.name + core.injModText(j)),
+    ...facts,
     retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
     captive: m.captive ? m.captive.by : null,
     men: hero ? [] : core.memberNames(ctx, m).map((name, i) => ({ i, name, named: core.memberNamed(m, i) })),
@@ -179,14 +178,14 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
   if (!e) return null;
   // Hired Swords gain experience on the Henchmen's steps; Dramatis Personae gain none
   const hs = kind === 'Hired Sword';
+  const facts = hireFacts(ctx, rec, e, hs ? 'hs' : 'dp', rec.key);
   return {
     key: `${kind}:${rec.uid}`, uid: rec.uid, name: rec.name || e.name, type: e.name, kind,
     exp: Number(rec.exp) || 0,
     xp: hs ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX) : null,
     advanceDue: hs && core.hsAdvanceStatus(ctx, rec, e).due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),
-    skills: [...(rec.skills ?? [])],
-    spells: (rec.spells ?? []).map((sp) => core.spellLabel(sp.name)),
+    ...facts,
   };
 }
 
