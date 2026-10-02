@@ -36,6 +36,8 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `campaign.logSeq` | ja | zuletzt vergebene ID der Chronik; Log, Schlachten, Verluste und Erfahrungseinträge teilen sich diese Folge |
 | `story` | ja | `{ prologue, interludes: { [round]: text }, explain: { [changeKey]: text } }` |
 | `models[].profile` | ja | `{ name_de, name_en, title_de, title_en, voice, origin, text }` |
+| `ledger` | ja | Kassenbuch (V7), ab der ersten Schlacht der Warband: `[{ id, kind: 'open'\|'roster'\|'buy'\|'sell'\|'search'\|'adjust', amount, text, round, uid, item, qty, found }]`. Gold in der Hand = Summe der `amount`. `stash.gold` wird so nachgeführt, dass die Formel der alten App (Schatz − Wert) dasselbe ergibt; die alte App verwirft das Kassenbuch beim Laden und zeigt trotzdem das richtige Gold. Fehlt es, gilt die Rechnung der alten App |
+| `stash.items[]`: `key`, `rare`, `paid` | ja | was der Gegenstand ist (deutscher Listenname oder Katalogschlüssel), ob selten, Preis je Stück; Einträge ohne `key` (alte App, freier Text) bleiben, lassen sich aber keinem Krieger geben |
 | `wb`, `subtype`, `name`, `budget`, `models`, `stash`, `fallen`, `hired`, `dp`, `mark`, `house`, `leaderUid`, `goldNow` | nein | wie heute |
 | `models[]`: `uid`, `uid_def`, `name`, `names`, `qty`, `exp`, `adv`, `skills`, `spells`, `inj`, `eq`, `rare`, `mut`, `promoted`, `promoCats`, `xpPaid`, `heirloom`, `caster`, `lore`, `magic`, `miss`, `missWhy` | nein | wie heute |
 | `campaign` | geändert | siehe unten |
@@ -47,7 +49,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   einen Vorgabewert in `core/src/format/save.ts` und steht im Schema
   (`core/src/format/schema.ts`). Die Formatnummer steigt nur mit einer
   Migration. Die alte App verwirft beim Laden unbekannte Schlüssel oben im
-  Stand (`uidSeq`, `canon`, `story`); `core/` behält sie.
+  Stand (`uidSeq`, `canon`, `story`, `ledger`); `core/` behält sie.
 - **Gefallene** (`fallen[]`, in der Reihenfolge ihres Todes):
   `{ kind: 'hero'|'hench', m, uid_def, exp, memberIdx, memberName, lostValue,
   casualtyId, casFromDeath }`. `m` ist der Krieger, wie er fiel (bei

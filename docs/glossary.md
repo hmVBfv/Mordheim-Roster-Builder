@@ -49,9 +49,14 @@ Begriff einführt, trägt ihn hier ein.
 | gesperrter Skill einer Warband | – | `WARBANDS[…].noSkills` |
 | Post-Battle-Hilfe | Post-battle | `postBattleHelp()`, `data/postbattle.json` |
 | umbenannter Gegenstand | – | `RENAMED` in `data/equipment.json` |
-| Kassenbuch (geplant, V7) | Ledger | – |
-| Suchwurf nach Seltenem | Search (rare) | – (Mockup `trading-post.html#search`) |
+| Kassenbuch (V7) | Ledger | `s.ledger`, `ledgerBalance()`, `settle()`, `keepGold()`, `bookGold()` |
+| Suchwurf nach Seltenem | Search (rare) | `searchOdds()`, `searchBlock()`, `recordSearch()` |
 | Veteranenwurf (Männer mit Erfahrung anwerben) | Veterans roll | `henchRecruitSurcharge()`, `m.xpPaid` |
+| Handel gesperrt (ab der ersten Schlacht) | – | `tradeLocked()` |
+| Kaufen (Trading Post) | Buy | `buyItem()`, `commonPrice()` |
+| Verkaufen | Sell | `sellItem()`, `sellPrice()` |
+| Geben, Umverteilen (V4) | Give | `giveItem()`, `canReceive()` |
+| Lager (Truhe) | Stash | `s.stash.items[]` (`key`, `rare`, `paid`) |
 | Mann (einer Henchmen-Gruppe) | Man | `m.names[]`, `memberName()` |
 | einen Mann entlassen | Dismiss him | `dismissMember()` |
 | Mann nachrekrutieren | + Man | `setQty()`, `henchRecruitCost()` |
