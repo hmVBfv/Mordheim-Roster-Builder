@@ -57,6 +57,7 @@ export interface WarriorView {
 export interface HireView {
   key: string; uid: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
   exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[];
+  skills: string[]; spells: string[];
 }
 
 /** One line of the recruit list (legacy renderAddMenu). */
@@ -168,6 +169,8 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
     xp: hs ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX) : null,
     advanceDue: hs && core.hsAdvanceStatus(ctx, rec, e).due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),
+    skills: [...(rec.skills ?? [])],
+    spells: (rec.spells ?? []).map((sp) => core.spellLabel(sp.name)),
   };
 }
 

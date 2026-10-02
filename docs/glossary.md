@@ -67,6 +67,8 @@ Begriff einführt, trägt ihn hier ein.
 | Anführer bestimmen | Lead the warband | `setLeader()`, `canBeLeader()` |
 | Hinweis mit Rückgängig | Undo (notice) | `UndoToast`, `useEditor().notice` |
 | Beförderung | The lad's got talent · Promoted | `promoteHench()`, `m.promoted`, `m.promoCats` |
+| Aufstieg (Wurf nach der Tabelle) | Advance | `AdvanceSheet`, `HERO_TABLE`, `HENCH_TABLE`, `addAdvance()`, `addSkillFromList()` |
+| Aufstiege korrigieren | Advances taken – correct | `TakenSheet`, `removeAdvance()`, `removeSkill()` |
 
 ## Kampagne und Schlacht
 
