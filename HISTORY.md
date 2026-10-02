@@ -1822,3 +1822,22 @@ just like a file. Writing the parity exceptions turned up a second case of
 the same fault in the old app: a death taken back left its record on a
 position the next death would fill. Both are now named rules in the parity
 suite rather than silent differences.
+
+## October 2, 2026 (cont.) — a name of our own
+
+The service moved from DuckDNS to a domain of its own: DuckDNS sometimes took
+seconds to resolve. The first registrar fell through, the second worked; the
+DynDNS did not. Debian's `ddclient` speaks to `porkbun.com`, while Porkbun's
+API lives at `api.porkbun.com`, and the answer is an HTML 403 that says
+nothing about why. Rob also pasted its debug log into the chat, keys
+included, so the keys were replaced before anything else. A forty-line
+script now does the job: ask Porkbun for the address it sees, compare,
+change a record only when it differs. It runs from a timer as a throwaway
+user, takes its keys on stdin, and `install.sh` puts it in place once the
+key file exists – and refuses while anyone but root could read that file.
+
+The switch itself showed a gap in `install.sh`. It rewrites the Caddyfile
+from `site.env` but rightly never touches `app.env`, so the app kept the old
+origin and would have refused every write from the new one – a fault that
+only shows once there is something to write. It now warns whenever
+`PUBLIC_ORIGIN` and `ROSTER_HOST` disagree, with the line that fixes it.

@@ -24,6 +24,7 @@ mnt=/srv/ssd
 root=$mnt/roster
 data=$root/data
 failures=0
+work_dir=$(mktemp -d)
 
 as() { sudo -u "$user" env HOME="$home" ROSTER_NO_PULL=1 ROSTER_DEPLOY_WAIT=30 ROSTER_RESTORE_WAIT=45 "$@"; }
 # In GitHub Actions a failure also becomes an annotation, readable without the log.
@@ -87,6 +88,31 @@ expect "app.env is private" test "$(stat -c %a "$root/app.env")" = 600
 expect "Docker and the timers wait for the SSD" grep -q "RequiresMountsFor=$mnt" /etc/systemd/system/docker.service.d/ssd.conf /etc/systemd/system/roster-backup.service
 expect "the timers are enabled" systemctl is-enabled --quiet roster-backup.timer roster-restore-test.timer
 expect "roster-alive waits for Stufe 2" sh -c '! systemctl is-enabled --quiet roster-alive.timer'
+expect "no DynDNS updater without its settings" test ! -e /etc/systemd/system/porkbun-ddns.timer
+
+echo "# a new hostname: app.env is kept, and install.sh says what to change"
+sed -i 's/^ROSTER_HOST=.*/ROSTER_HOST=roster2.test/' "$home/server/roster/site.env"
+"$ops/install.sh" --no-caddy 2>"$work_dir/install.err" >/dev/null
+expect "app.env keeps its origin" grep -qx 'PUBLIC_ORIGIN=https://roster.test' "$root/app.env"
+expect "install.sh warns that PUBLIC_ORIGIN is stale" grep -q "PUBLIC_ORIGIN is 'https://roster.test', site.env says https://roster2.test" "$work_dir/install.err"
+expect "roster.conf has the new hostname" grep -qx 'ROSTER_HOST=roster2.test' /etc/roster/roster.conf
+sed -i 's/^ROSTER_HOST=.*/ROSTER_HOST=roster.test/' "$home/server/roster/site.env"
+"$ops/install.sh" --no-caddy 2>"$work_dir/install.err" >/dev/null
+expect "no warning once they agree" sh -c "! grep -q PUBLIC_ORIGIN '$work_dir/install.err'"
+
+echo "# DynDNS updater: installed only with private settings"
+install -m 644 /dev/null /etc/porkbun-ddns.env
+# enabling the timer runs the updater at once: a domain without a dot stops
+# it before it calls Porkbun
+printf 'PORKBUN_API_KEY=pk1_x\nPORKBUN_SECRET_KEY=sk1_x\nDOMAIN=not-a-domain\nHOSTS="mordheim ts"\n' >/etc/porkbun-ddns.env
+expect_exit 1 "install.sh refuses keys others can read" sh -c "'$ops/install.sh' --no-caddy >/dev/null 2>&1"
+chmod 600 /etc/porkbun-ddns.env
+"$ops/install.sh" --no-caddy >/dev/null
+expect "the updater is installed" test -x /usr/local/sbin/porkbun-ddns
+expect "its timer is enabled" systemctl is-enabled --quiet porkbun-ddns.timer
+systemctl disable --now porkbun-ddns.timer >/dev/null 2>&1
+rm -f /etc/porkbun-ddns.env /etc/systemd/system/porkbun-ddns.service /etc/systemd/system/porkbun-ddns.timer /usr/local/sbin/porkbun-ddns
+systemctl daemon-reload
 
 echo "# first deploy"
 expect_exit 0 "roster-deploy $good" as roster-deploy "$good"
