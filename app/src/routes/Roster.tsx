@@ -14,7 +14,8 @@ import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
 import { injuryEnv } from '../roster/injury.ts';
 import { CaptiveSheet, InjuriesSheet, InjurySheet, type InjuryFor } from '../roster/InjurySheet.tsx';
 import { equipmentView } from '../roster/equipment.ts';
-import { MenuSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
+import { MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
+import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
@@ -57,6 +58,9 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   };
   const { ref: injuriesRef, open: openInjuriesSheet, close: closeInjuries } = useSheet();
   const [injuriesOf, setInjuriesOf] = useState<number | null>(null);
+  const { ref: menRef, open: openMenSheet, close: closeMen } = useSheet();
+  const [menFor, setMenFor] = useState<{ key: number; uid: number } | null>(null);
+  const menView = menFor ? moreMenView(ctx, menFor.uid) : null;
   const { ref: captiveRef, open: openCaptiveSheet, close: closeCaptive } = useSheet();
   const [captiveOf, setCaptiveOf] = useState<{ key: number; uid: number; name: string; by: string } | null>(null);
   const openCaptive = (w: WarriorView) => { setCaptiveOf((p) => ({ key: (p?.key ?? 0) + 1, uid: w.uid, name: w.name, by: w.captive ?? '' })); openCaptiveSheet(); };
@@ -165,8 +169,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     onCaptive: () => openCaptive(w),
     onAddMan: () => {
       if (!w.addMan || !('cost' in w.addMan)) return;
-      const cost = w.addMan.cost;
-      ed.edit((c) => core.setQty(c, w.uid, w.count + 1), `A man joins ${w.name} (${cost} gc).`);
+      setMenFor((p) => ({ key: (p?.key ?? 0) + 1, uid: w.uid }));
+      openMenSheet();
     },
   });
   const hireActs = (h: HireView) => ({
@@ -233,6 +237,15 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         onRemove={(c, text) => { if (takenFor) correct(takenFor.id, c, text); }} />
       <InjurySheet dialogRef={injRef} close={closeInj} who={injFor}
         onApply={(r, text) => { if (injFor) { const id = injFor.uid; ed.edit((c) => core.injure(c, id, r), text, { gold: 'keep' }); } }} />
+      <MoreMenSheet dialogRef={menRef} close={closeMen} view={menView && menFor ? { ...menView, key: menFor.key } : null}
+        onAdd={(n, roll, names, text) => {
+          if (!menFor) return;
+          const uid = menFor.uid;
+          ed.edit((c) => {
+            const s1 = roll != null ? core.setVeteransRoll(c, roll) : c.s;
+            return core.addMen(core.ctxOf(data, s1), uid, n, names);
+          }, text);
+        }} />
       <CaptiveSheet dialogRef={captiveRef} close={closeCaptive} who={captiveOf}
         onEnd={(fate, text) => { if (captiveOf) { const uid = captiveOf.uid; ed.edit((c) => core.releaseCaptive(c, uid, fate), text, { gold: 'keep' }); } }} />
       <InjuriesSheet dialogRef={injuriesRef} close={closeInjuries} name={injuriesView?.name ?? ''} injuries={injuriesView?.injuries ?? []} miss={injuriesView?.missGames ?? 0}
