@@ -5,7 +5,7 @@
    (core tooltipInfo, keyedInfo, itemInfo …) – the same texts as in the
    Trading Post. A word core has no text for stays a plain word. */
 import * as core from '@mordheim/core';
-import type { GameData, HireEntry, HireRecord, ItemInfo, Model } from '@mordheim/core';
+import type { GameData, HireEntry, HireRecord, ItemInfo, Model, UnitDef } from '@mordheim/core';
 
 /** What one bubble shows: the rule's name, what kind of rule it is, its text. */
 export interface Tip { name: string; line: string; text: string }
@@ -75,10 +75,29 @@ export interface WarriorFacts {
   mutations: Fact[]; mark: Fact[]; injuries: Fact[];
 }
 
+/* A warrior's special rules depend only on his unit, whether he is a Hero
+   and leads, his mutations and the Mark he bears. Core finds them by
+   testing every known ability against his rules (modelAbilities), about
+   half a millisecond a warrior – on every change to the roster. So they are
+   kept for each data set and those inputs. */
+const RULES = new WeakMap<GameData, Map<string, Fact[]>>();
+
+function warriorRules(ctx: core.Ctx, def: UnitDef, m: Model, skip: readonly string[]): Fact[] {
+  let memo = RULES.get(ctx.data);
+  if (!memo) RULES.set(ctx.data, (memo = new Map()));
+  const key = JSON.stringify([ctx.s.wb, def.id, core.isHeroModel(ctx, m), core.isLeaderModel(ctx, m), [...new Set(m.mut ?? [])].sort(), skip]);
+  let out = memo.get(key);
+  if (!out) {
+    const a = core.modelAbilities(ctx, def, m);
+    out = rules(a.abilities, core.ruleDefs(a.sp, `Special rule · ${def.name}`), skip);
+    memo.set(key, out);
+  }
+  return out;
+}
+
 export function warriorFacts(ctx: core.Ctx, m: Model): WarriorFacts {
   const data = ctx.data;
   const def = core.unitDef(ctx, m.uid_def);
-  const a = def ? core.modelAbilities(ctx, def, m) : null;
   const mutations = [...new Set(m.mut ?? [])].map((x) => {
     const n = (m.mut ?? []).filter((y) => y === x).length;
     const en = core.mutEN(data, x);
@@ -86,11 +105,12 @@ export function warriorFacts(ctx: core.Ctx, m: Model): WarriorFacts {
   });
   const mark = core.markRulesFor(ctx, m).map(([n, t]) => fact(n, tipOf({ name: n, text: t }, n, 'Mark of Chaos')));
   return {
-    rules: a && def ? rules(a.abilities, core.ruleDefs(a.sp, `Special rule · ${def.name}`), [...mutations, ...mark].map((f) => f.label.replace(/ ×\d+$/, ''))) : [],
+    rules: def ? warriorRules(ctx, def, m, [...mutations, ...mark].map((f) => f.label.replace(/ ×\d+$/, ''))) : [],
     equipment: equipment(ctx, m),
-    skills: (m.skills ?? []).map((nm, i) => {
-      const key = a?.skillKeys[i];
-      return fact(nm, tipOf((key ? core.keyedInfo(data, key) : null) ?? core.tooltipInfo(data, nm), nm, 'Skill'));
+    // a skill as his own lists word it (the key modelAbilities gives it)
+    skills: (m.skills ?? []).map((nm) => {
+      const key = core.skillKey(data, ctx.s.wb, def ?? undefined, nm);
+      return fact(nm, tipOf(core.keyedInfo(data, key) ?? core.tooltipInfo(data, nm), nm, 'Skill'));
     }),
     spells: (m.spells ?? []).map((s) => fact(s.name, tipOf(core.spellInfo(data, s.name), core.spellLabel(s.name), 'Spell'))),
     mutations,
