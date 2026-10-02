@@ -52,7 +52,7 @@ function restoreValueOnUndo(d: WarbandDraft, c: Ctx, rec: FallenRecord): number 
 /** Gear lost to an injury (Robbed, a lost pit fight). Removing items would
     normally refund them; stolen gear must not, so the same amount leaves the
     treasury in the same breath. weaponsOnly: weapons and armour only. */
-function stripGearSettled(d: WarbandDraft, c: Ctx, m: Model, weaponsOnly: boolean): number {
+export function stripGearSettled(d: WarbandDraft, c: Ctx, m: Model, weaponsOnly: boolean): number {
   const before = modelUnitCost(c, m);
   const def = unitDef(c, m.uid_def);
   if (weaponsOnly) {
@@ -161,7 +161,7 @@ function noteCasualtyOutcome(d: WarbandDraft, c: Ctx, m: Model, result: string, 
 
 /* ---- deaths (draft level) ---- */
 
-function killHeroOn(d: WarbandDraft, c: Ctx, uid: number, msg: string | null, resolving: Casualty | null): void {
+export function killHeroOn(d: WarbandDraft, c: Ctx, uid: number, msg: string | null, resolving: Casualty | null): void {
   const m = findModel(d, uid);
   if (!m) return;
   const snap = copy(m);
@@ -179,7 +179,7 @@ function killHeroOn(d: WarbandDraft, c: Ctx, uid: number, msg: string | null, re
 /** One man of a group falls, by index, so the right name goes with the
     right death. The group's recruit surcharge stays with the group; only
     the last man takes the remainder with him. */
-function killHenchMemberOn(d: WarbandDraft, c: Ctx, uid: number, index: unknown, resolving: Casualty | null): void {
+export function killHenchMemberOn(d: WarbandDraft, c: Ctx, uid: number, index: unknown, resolving: Casualty | null): void {
   const m = findModel(d, uid);
   if (!m) return;
   const i = Number(index) || 0;
