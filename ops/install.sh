@@ -242,8 +242,9 @@ fi
 # 6b. DynDNS for the domain (optional): only where its settings exist
 ddns_env=/etc/porkbun-ddns.env
 if [ -e "$ddns_env" ]; then
-  [ "$(stat -c '%u' "$ddns_env")" = 0 ] && [ $((0$(stat -c '%a' "$ddns_env") & 077)) -eq 0 ] ||
+  if [ "$(stat -c '%u' "$ddns_env")" != 0 ] || [ $((0$(stat -c '%a' "$ddns_env") & 077)) -ne 0 ]; then
     die "$ddns_env ($(stat -c '%A %U' "$ddns_env")) holds the Porkbun keys: sudo chown root: $ddns_env && sudo chmod 600 $ddns_env"
+  fi
   command -v jq >/dev/null || die "jq is not installed (sudo apt install jq) – the DynDNS updater needs it"
   install -m 755 "$ops/ddns/porkbun-ddns" /usr/local/sbin/porkbun-ddns
   for u in porkbun-ddns.service porkbun-ddns.timer; do install -m 644 "$ops/systemd/$u" "/etc/systemd/system/$u"; done
