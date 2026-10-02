@@ -12,13 +12,14 @@ import styles from './Roster.module.css';
 type Sheet = ReturnType<typeof useSheet>;
 
 export interface EquipmentActions {
-  qty: (key: string, qty: number) => void;
+  qty: (key: string, qty: number, name: string) => void;
   addRare: (de: string) => void;
   rareQty: (de: string, q: number) => void;
   target: (de: string, weapon: string) => void;
 }
 
 function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void }) {
+  // max = value: no more may be taken
   return (
     <span className={styles.stepper}>
       <button type="button" aria-label={`One ${label} less`} disabled={value <= min} onClick={() => onChange(value - 1)}>−</button>
@@ -35,7 +36,9 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
     <div className={ui.page}>
       <div>
         <h2 id={titleId}>Equipment · {v.name}</h2>
-        <p className={ui.muted}>Until the first battle every warrior buys from his own list{v.men > 1 ? ', a group for every man' : ''}; taking an item back returns its price.</p>
+        <p className={ui.muted}>{v.recruit
+          ? 'Hired after the warband\'s first battle: until his own he buys from his list at its prices – common items freely, rare ones only by a search at the Trading Post. Taking an item back returns its price.'
+          : `Until the first battle every warrior buys from his own list${v.men > 1 ? ', a group for every man' : ''}; taking an item back returns its price.`}</p>
       </div>
       {v.groups.map((g) => (
         <section key={g.label} className={styles.eqGroup} aria-label={g.label}>
@@ -45,9 +48,9 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
               <li key={r.key} className={styles.eqRow}>
                 <span className={styles.eqName} title={r.text || undefined}>
                   {r.name}
-                  <small>{r.free ? `first one free, then ${r.price} gc` : `${r.price} gc${per}`}</small>
+                  <small>{r.free ? `first one free, then ${r.price} gc` : `${r.price} gc${per}`}{r.more && r.qty === 0 ? ` · ${r.more}` : ''}</small>
                 </span>
-                <Stepper label={r.name} value={r.qty} onChange={(q) => act.qty(r.key, q)} />
+                <Stepper label={r.name} value={r.qty} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} />
               </li>
             ))}
           </ul>
@@ -85,7 +88,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
             </select>
             <button type="button" className={ui.buttonQuiet} disabled={!pick} onClick={() => { act.addRare(pick); setPick(''); }}>Add</button>
           </div>
-        ) : <p className={ui.muted}>Nothing from the catalogue fits this warrior.</p>}
+        ) : <p className={ui.muted}>{v.recruit ? 'Rare items: search for them at the Trading Post.' : 'Nothing from the catalogue fits this warrior.'}</p>}
       </section>
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => close()}>Done</button></div>
     </div>

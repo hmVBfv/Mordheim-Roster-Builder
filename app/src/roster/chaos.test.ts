@@ -19,12 +19,16 @@ describe('mutations', () => {
     const uid = s.models[0]!.uid;
     const v = mutationView(ctx(s), uid)!;
     expect(v).toMatchObject({ label: 'Mutations', one: 'mutation', required: true, viaSkill: false, cost: 0, locked: false });
-    expect(v.items.find((i) => i.key === 'Große Klaue')).toMatchObject({ name: 'Great Claw', price: 50, on: false });
+    expect(v.items.find((i) => i.key === 'Große Klaue')).toMatchObject({ name: 'Great Claw', price: 50, count: 0, more: '', less: 'none to take back' });
     expect(v.items.every((i) => i.text)).toBe(true);
     expect(core.warbandWarnings(ctx(s)).some((w) => /needs at least 1 mutation/.test(w))).toBe(true);
-    s = core.toggleMutation(ctx(s), uid, 'Große Klaue', true);
-    s = core.toggleMutation(ctx(s), uid, 'Gespaltene Hufe', true);
-    expect(mutationView(ctx(s), uid)!.cost).toBe(50 + 2 * 40);
+    s = core.setMutationCount(ctx(s), uid, 'Große Klaue', 2);
+    s = core.setMutationCount(ctx(s), uid, 'Gespaltene Hufe', 1);
+    const w = mutationView(ctx(s), uid)!;
+    expect(w.cost).toBe(50 + 2 * 50 + 2 * 40);
+    // two claws take both arms: no tentacle without an Extra Arm
+    expect(w.items.find((i) => i.key === 'Tentakel')!.more).toBe('he has no free arm for it');
+    expect(w.items.find((i) => i.key === 'Dämonenseele')!.more).toBe('');
   });
 
   it('a Tainted One takes Blessings of Nurgle', () => {

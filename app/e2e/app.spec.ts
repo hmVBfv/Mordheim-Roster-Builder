@@ -268,9 +268,14 @@ for (const theme of THEMES) {
     await expect(page.getByRole('list', { name: 'Warnings' })).toContainText('Mutant needs at least 1 mutation');
     await page.getByRole('button', { name: 'More for Grell', exact: true }).click();
     await sheet.getByRole('button', { name: 'Mutations' }).click();
-    await sheet.getByRole('button', { name: 'Great Claw, 50 gc' }).click();
-    await sheet.getByRole('button', { name: 'Cloven Hooves, 40 gc' }).click();
+    await sheet.getByRole('button', { name: 'One Great Claw more' }).click();
+    await sheet.getByRole('button', { name: 'One Cloven Hooves more' }).click();
     await expect(sheet).toContainText('Together: 130 gc');
+    // the UFAQ allows the same mutation again: a second claw, and both arms are taken
+    await sheet.getByRole('button', { name: 'One Great Claw more' }).click();
+    await expect(sheet).toContainText('Together: 230 gc');
+    await expect(sheet.getByRole('button', { name: 'One Tentacles more' })).toBeDisabled();
+    await sheet.getByRole('button', { name: 'One Great Claw less' }).click();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-mutations`);
     await sheet.getByRole('button', { name: 'Close' }).click();
@@ -326,6 +331,33 @@ test('more men after the first battle: the veterans roll', async ({ page }) => {
   await group.getByRole('button', { name: /\+ Man/ }).click();
   await expect(roll).toHaveValue('5');
   await expect(sheet).toContainText('1 man brings 3 experience; 2 of the roll are left.');
+});
+
+/* A warrior hired after the first battle buys from his own list until his
+   own first battle (Rob, 02.10.2026, on the Ultimate FAQ); rare items only
+   by searching. */
+test('a recruit after the first battle buys from his list', async ({ page }) => {
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  const sheet = page.locator('dialog[open]');
+  const gold = async () => parseInt((await page.locator('dt:text-is("Gold") + dd').textContent())!, 10);
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await sheet.getByRole('button', { name: /^Youngblood/ }).click();
+  await expect(sheet).toHaveCount(0);
+  const young = page.getByRole('article', { name: 'Youngblood' }).last();
+  await expect(page.getByRole('article', { name: 'Youngblood' })).toHaveCount(2);
+  const before = await gold();
+  await young.getByRole('button', { name: /More for Youngblood/ }).click();
+  await sheet.getByRole('button', { name: 'Equipment & rare items' }).click();
+  await expect(sheet).toContainText('until his own he buys from his list');
+  await sheet.getByRole('button', { name: 'One Sword more' }).click();
+  await expect.poll(gold).toBe(before - 10);
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'recruit-list');
+  await sheet.getByRole('button', { name: 'Done' }).click();
+  // a warrior who has fought goes to the Trading Post
+  await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
+  await expect(sheet.getByRole('button', { name: /Equipment – at the Trading Post/ })).toBeVisible();
 });
 
 /* After the first battle a dismissed warrior refunds nothing; his

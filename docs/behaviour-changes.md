@@ -78,7 +78,7 @@ geplant.
 | V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | umgesetzt in 3c (02.10.2026), `FORMAT` 2; [unten](#v2--feste-ids-für-gefallene) |
 | V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. mordheimer.net nennt keine solche Ausnahme – weder beim Augur (*Sisters of Sigmar*) noch bei Ergebnis 31 (*Campaigns – Serious Injuries*). | Rob, 28.09.2026: Eine Auslegung nach Absicht gilt nur, wenn mordheimer.net sie übernimmt. Hier nicht, also **RAW**: Der Augur verliert 1 BS wie jeder andere. | entschieden; alte App und `core/` rechnen schon so, Test `core/test/rulings.test.ts` |
 | V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | entschieden, [unten](#entscheidungen-rob-29092026); Logik in `core/` (3b), Oberfläche folgt |
-| V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28./29.09.2026: gewünscht; Sperre für die ganze Warband | entschieden; Gründungspreise schon in beiden Apps (oben, „Erledigt“), der Rest im neuen Builder; Logik in `core/` (3b), Oberfläche folgt |
+| V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28./29.09.2026: gewünscht; Sperre für die ganze Warband. **Rob, 02.10.2026 (UFAQ: „You must always equip any newly hired warriors using the equipment list from your warband“):** die Liste gilt für jeden Krieger bis zu *seiner* ersten Schlacht – ein Rekrut kauft daraus zu Listenpreisen, Gewöhnliches frei, Seltenes nur über die Suche (Regelbuch, New recruits) | entschieden; Gründungspreise schon in beiden Apps (oben, „Erledigt“), der Rest im neuen Builder; Logik in `core/` (3b), Oberfläche folgt |
 | V6 | Kaufansicht übersichtlich, Tooltips und Erklärungen überall, wo es ohne Zusammenhang unklar ist | Rob, 28.09.2026 | gewünscht; Händler in Pixelart als Idee (Rob, 29.09.2026) | Mockup folgt |
 | V7 | Gold als Kassenbuch statt „Schatz minus Wert“ | Heute ist Gold in der Hand = gespeicherter Schatz − heutiger Wert aller Krieger. Daraus folgen die Fehler aus V4/V5 (Abwählen erstattet, Lager kostet nichts und beim Ausrüsten noch einmal) und Sprünge, wenn sich Preise oder Hausregeln ändern. | Rob, 29.09.2026: ja, so ausführlich wie möglich und nötig | entschieden; Logik in `core/` (3b), Oberfläche folgt |
 
@@ -100,19 +100,26 @@ sollen, muss `core/` sich noch wie die alte App verhalten. Danach wird jede
 Ausnahme in den Paritätstests (`walk.ts`, `injuries.parity.test.ts`) und in der
 Liste der Legacy-Tests, die bewusst anders ausgehen.
 
-## Zur Entscheidung: Mutationen (Schritt 3c, 02.10.2026)
+## Rekruten und Mutationen (Rob, 02.10.2026)
 
-1. **Mehrfach dieselbe Mutation.** Das UFAQ (Games Workshop FAQ) erlaubt
-   mehrere gleiche Mutationen mit zusammenzählender Wirkung („a Possessed
-   with two Blackbloods costs 180 GC“). Der Roster Builder und `core`
-   erlauben jede Mutation nur einmal (`toggleMutation`). Vorschlag:
-   übernehmen, als Anzahl je Mutation.
-2. **Kauf nur beim Anwerben.** Regelbuch S. 57: Mutationen werden nur beim
-   Anwerben gekauft. Die App weist nach der ersten Schlacht darauf hin,
-   bucht eine Änderung aber weiter ins Kassenbuch, statt sie zu sperren –
-   der Builder weiß nicht, in welcher Runde ein Krieger kam, und die
-   Fertigkeit „Mutant“ (Beastmen) erlaubt später genau eine. Vorschlag: so
-   lassen; sperren erst, wenn die Anwerberunde festgehalten wird.
+1. **Mehrfach dieselbe Mutation** (UFAQ: „You can have multiples of any of
+   the mutations with cumulative effects“), wo es Sinn ergibt: Was einen
+   Arm ersetzt (Great Claw, Tentacle), braucht einen – höchstens zwei,
+   dazu einer je Extra Arm (UFAQ: „you must first buy the Extra Arm
+   mutation as the Tentacle has to have an arm to grow from“); ein Extra
+   Arm, an dem eine Klaue oder ein Tentakel hängt, kann nicht weg. **Nur
+   einmal** (Vorschlag, bitte bestätigen): Daemon Soul und Hideous, deren
+   Wirkung sich nicht addiert, und die Blessings of Nurgle (`ONCE` in
+   `core/src/warband/recruits.ts`). Gespeichert als wiederholter Name in
+   `m.mut`; `mutCost` rechnet schon so.
+2. **Kauf beim Anwerben.** Jeder Krieger, der nach der ersten Schlacht der
+   Warband angeworben wird, trägt die Runde (`m.joined`, `recruitUnit`).
+   Bis zu seiner ersten Schlacht sind seine Liste (Gewöhnliches zu
+   Listenpreisen, Seltenes über die Suche) und seine Mutationen offen,
+   danach nicht mehr – außer der einen Mutation der Fertigkeit „Mutant“.
+   Ein Rekrut, der nicht gekämpft hat, kann zum vollen Preis aus dem Roster
+   genommen werden. Neue Logik (`warriorHasFought`, `setListQty`,
+   `setMutationCount`), Tests `core/test/recruits.test.ts`.
 
 ## V1 – Ablauf einer Verletzung
 

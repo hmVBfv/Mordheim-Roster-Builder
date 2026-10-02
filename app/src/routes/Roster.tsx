@@ -118,7 +118,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const openMenu = (title: string, items: MenuItem[]) => { setMenuOf({ title, items }); openMenuSheet(); };
 
   const warriorMenu = (w: WarriorView) => openMenu(w.name, [
-    locked
+    // his own list until his first battle, then the Trading Post (Rob, 02.10.2026)
+    w.fought
       ? { label: 'Equipment – at the Trading Post', run: () => { void navigate(`${trade}#give`); } }
       : { label: 'Equipment & rare items', run: () => { setEqOf(w.uid); openEqSheet(); } },
     {
@@ -148,9 +149,12 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     ...(w.injuries.length || w.missGames ? [{ label: 'Injuries – correct', run: () => { setInjuriesOf(w.uid); openInjuriesSheet(); } }] : []),
     ...(w.captive != null ? [{ label: 'Captivity – how it ended…', run: () => openCaptive(w) }] : []),
     ...(w.hero && w.captive == null ? [{ label: 'Out of action for good…', danger: true, run: () => injureWarrior(w, '11') }] : []),
-    locked
+    w.fought
       ? { label: 'Dismiss – his equipment goes to the stash', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
-      : { label: 'Remove from the roster', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} removed from the roster.`) },
+      : locked
+        // a recruit who has not fought: his hire is undone, at its price
+        ? { label: 'Remove from the roster – he has not fought', danger: true, run: () => ed.edit((c) => core.removeUnit(c, w.uid), `${w.name} removed from the roster; his price is back.`) }
+        : { label: 'Remove from the roster', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} removed from the roster.`) },
   ]);
 
   const hireMenu = (h: HireView) => {
@@ -260,7 +264,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       <InjurySheet dialogRef={injRef} close={closeInj} who={injFor}
         onApply={(r, text) => { if (injFor) { const id = injFor.uid; ed.edit((c) => core.injure(c, id, r), text, { gold: 'keep' }); } }} />
       <MutationSheet dialogRef={mutRef} close={closeMut} view={mutView}
-        onToggle={(key, on, name) => { if (mutOf != null) { const uid = mutOf; ed.edit((c) => core.toggleMutation(c, uid, key, on), locked ? `${name} ${on ? 'bought' : 'taken back'}.` : undefined); } }} />
+        onSet={(key, n, name) => { if (mutOf != null) { const uid = mutOf; ed.edit((c) => core.setMutationCount(c, uid, key, n), undefined, { book: `${mutView?.name ?? ''}: ${name} ×${n}` }); } }} />
       <MarkSheet dialogRef={markRef} close={closeMark} view={mView ? { ...mView, key: markKey } : null}
         onApply={(mark, text) => ed.edit((c) => core.setMark(c, mark), text)} />
       <MoreMenSheet dialogRef={menRef} close={closeMen} view={menView && menFor ? { ...menView, key: menFor.key } : null}
@@ -278,13 +282,13 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         onRemove={(i, text) => { if (injuriesOf != null) ed.edit((c) => core.removeInjury(c, injuriesOf, i), text); }}
         onMiss={(dl) => { if (injuriesOf != null) ed.edit((c) => core.adjustMiss(c, injuriesOf, dl)); }} />
       <EquipmentSheet dialogRef={eqRef} close={closeEq} view={eqView} act={{
-        qty: (key, q) => ed.edit((c) => core.setEqQty(c, eqOf!, key, q)),
+        qty: (key, q, name) => ed.edit((c) => core.setListQty(c, eqOf!, key, q), undefined, { book: `${eqView?.name ?? ''}: ${name} ×${q} (his list)` }),
         addRare: (de) => ed.edit((c) => core.addRare(c, eqOf!, de)),
         rareQty: (de, q) => ed.edit((c) => core.setRareQty(c, eqOf!, de, q)),
         target: (de, nm) => ed.edit((c) => core.setRareTarget(c, eqOf!, de, nm)),
       }} />
       <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
-        onRecruit={(u) => ed.edit((c) => core.addUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />
+        onRecruit={(u) => ed.edit((c) => core.recruitUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />
       {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}
     </section>
   );
