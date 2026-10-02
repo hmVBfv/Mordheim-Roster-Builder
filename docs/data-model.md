@@ -58,9 +58,13 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   zurückkommt.
 - **Verluste** (`campaign.casualties[]`): `{ id, round, battleId, victim,
   attacker, result: 'pending'|'recovered'|'injured'|'dead', detail,
-  fallenId, note, code, applied, xpId }`; `victim`/`attacker` =
+  fallenId, note, code, applied, xpId, injury }`; `victim`/`attacker` =
   `{ uid, name, wb, grade, value, memberIdx, uid_def }`, `uid` nur bei
-  eigenen Kriegern. `fallenId` ist ein Index in `fallen`.
+  eigenen Kriegern. `fallenId` ist ein Index in `fallen`. `injury` (neu,
+  V1, optional) hält den Wurf, mit dem `injure` den Eintrag abschloss,
+  samt Folgeentscheidungen: `{ hero: { code, saved?, d6?, games?, hates?,
+  captured?, pit?, more? } }` oder `{ d6, member? }`; die alte App liest
+  darüber hinweg.
 - **Gehaltene Erfahrung** (`campaign.xp[]`): `{ id, round, uid, name,
   amount, reason, applied }`; `applyPendingXp` schreibt sie auf die Krieger.
 - **Schlachten** (`campaign.battles[]`): `{ id, round, sides: [{ key, name,
