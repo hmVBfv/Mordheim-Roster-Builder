@@ -5,6 +5,7 @@ import type { WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
 import { entryOf, hsPersona, hsPersonasAllowed } from '../rules/hire.ts';
+import { fixFallenIdsOn } from './casualties.ts';
 import { campState } from './log.ts';
 import { rememberUids, update, type WarbandDraft } from './update.ts';
 
@@ -15,6 +16,8 @@ export function normalizeState(ctx: Ctx): WarbandState {
     if (!Array.isArray(camp.xp)) camp.xp = [];
     d.house = houseRules(d as WarbandState);
     fixPersonas(d, c);
+    // V2: fixed ids for the Fallen, for saves of the old app and its edits
+    fixFallenIdsOn(d);
   });
 }
 

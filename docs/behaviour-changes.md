@@ -75,7 +75,7 @@ geplant.
 | Nr. | Was | Warum / Quelle | Entscheidung | Status |
 | --- | --- | --- | --- | --- |
 | V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | umgesetzt in 3c (02.10.2026): `core` `injure`, Oberfläche „Injury“; Spezifikation und Stand [unten](#v1--ablauf-einer-verletzung) |
-| V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | geplant, Spezifikation [unten](#v2--feste-ids-für-gefallene) |
+| V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | umgesetzt in 3c (02.10.2026), `FORMAT` 2; [unten](#v2--feste-ids-für-gefallene) |
 | V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. mordheimer.net nennt keine solche Ausnahme – weder beim Augur (*Sisters of Sigmar*) noch bei Ergebnis 31 (*Campaigns – Serious Injuries*). | Rob, 28.09.2026: Eine Auslegung nach Absicht gilt nur, wenn mordheimer.net sie übernimmt. Hier nicht, also **RAW**: Der Augur verliert 1 BS wie jeder andere. | entschieden; alte App und `core/` rechnen schon so, Test `core/test/rulings.test.ts` |
 | V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | entschieden, [unten](#entscheidungen-rob-29092026); Logik in `core/` (3b), Oberfläche folgt |
 | V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28./29.09.2026: gewünscht; Sperre für die ganze Warband | entschieden; Gründungspreise schon in beiden Apps (oben, „Erledigt“), der Rest im neuen Builder; Logik in `core/` (3b), Oberfläche folgt |
@@ -266,6 +266,34 @@ Der **Man-catcher** bleibt ungebaut, bis jemand diese Warband spielt.
   Reihenfolge, Verlusteinträge ihr `fallenRef` aus der bisherigen Position.
 - Test zuerst: Gefallenen-Eintrag löschen, danach zeigt ein späterer
   Verlusteintrag weiter auf den richtigen Krieger.
+
+### Umsetzung (Schritt 3c, 02.10.2026)
+
+- `core/test/fallen.test.ts` (zuerst rot): Löschen am Anfang und in der
+  Mitte, Tod über `resolveCasualtyRoll` und über `injure`, eindeutige IDs
+  aus der Folge, Rücknahme eines Todes, Laden eines Stands der alten App und
+  eines Stands, den die alte App nach Format 2 bearbeitet hat.
+- Die IDs vergibt der Tod selbst (`killHeroOn`, `killHenchMemberOn`); jede
+  Stelle, die einen Verlusteintrag mit einem Gefallenen verbindet, setzt
+  `fallenId` und `fallenRef` zusammen (`linkFallenOn`). `removeFallenAt`
+  und `undoFallen` richten danach alle Positionen nach den IDs aus
+  (`relinkFallenOn`); ein Eintrag, dessen Gefallener fort ist, zeigt auf
+  keinen mehr statt auf den falschen.
+- Die Migration steckt in `normalizeState` (`fixFallenIdsOn`) und läuft bei
+  jedem Laden, auch für Stände in der App: Sie gibt Gefallenen ohne ID eine
+  und Verlusteinträgen ohne `fallenRef` den Verweis aus der Position.
+  Bearbeitet die alte App einen Stand im Format 2, behält sie `fallenRef`,
+  und `core/` richtet ihre verschobenen Positionen beim nächsten Laden
+  wieder.
+- `nextLogId` zählt die IDs der Gefallenen mit, damit keine doppelt
+  vergeben wird.
+- **Benannte Ausnahmen in den Paritätstests** (alle mit „V2“ markiert):
+  `canonOf` lässt `fallen[].id` und `casualties[].fallenRef` weg und setzt
+  einen Verweis hinter das Ende der Liste auf „keiner“;
+  `walk.ts` gibt dem Stand der alten App nach `removeFallenAt` und
+  `undoFallen` dieselbe Verschiebung bzw. Entkopplung
+  (`shiftFallenLinks`, `unlinkPastEnd`), damit der Rest weiter verglichen
+  wird; der Spiegel vergleicht `campCasualties` ohne `fallenRef`.
 
 ## V4 bis V7 – Handel, Lager und Gold
 

@@ -16,8 +16,10 @@ import { normalizeState } from '../warband/normalize.ts';
 import { exportState } from '../export/text.ts';
 import { schemaNotes, warbandSaveSchema } from './schema.ts';
 
-/** The format this version writes. */
-export const FORMAT = 1;
+/** The format this version writes. 2: the Fallen have fixed ids and casualty
+    records link to them by `fallenRef` (V2); loading any older file gives
+    them (normalizeState). */
+export const FORMAT = 2;
 
 export type LoadResult =
   | { ok: true; state: WarbandState; format: number; notes: string[] }

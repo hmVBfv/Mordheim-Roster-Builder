@@ -18,7 +18,7 @@ import { unitDef } from '../rules/lookup.ts';
 import { memberCount, memberName } from '../rules/profile.ts';
 import { bookOn, ensureLedger, syncTreasury } from '../trade/ledger.ts';
 import { dismissHire } from '../trade/market.ts';
-import { addCasualtyOn, killHenchMemberOn, killHeroOn, retypeCasualty, stripGearSettled } from './casualties.ts';
+import { addCasualtyOn, killHenchMemberOn, killHeroOn, linkFallenOn, retypeCasualty, stripGearSettled } from './casualties.ts';
 import { campState, logEvent } from './log.ts';
 import { findModel, update, type WarbandDraft } from './update.ts';
 
@@ -278,7 +278,7 @@ function closeCasualty(d: WarbandDraft, c: Ctx, cas: Casualty | null, before: nu
   if (outcome === 'dead') {
     const fallen = d.fallen as FallenRecord[];
     const fe = fallen.length - 1;
-    r.fallenId = fe;
+    linkFallenOn(d, r, fe);
     if (fallen[fe]) fallen[fe].casualtyId = r.id;
   }
   retypeCasualty(d, c, r);

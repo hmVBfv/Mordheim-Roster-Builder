@@ -1,6 +1,11 @@
 /* The canonical form in which a legacy state and a core state are compared
  * (parity suites and the mirror of the legacy tests). Equal up to:
  *   - core-only bookkeeping (uidSeq, campaign.logSeq),
+ *   - the fixed ids of the Fallen and the links to them (fallen[].id,
+ *     casualties[].fallenRef; V2 in docs/behaviour-changes.md): the old app
+ *     has neither, and core draws them from the shared id sequence; a
+ *     record left pointing past the end of the Fallen points nowhere in
+ *     both (core unlinks it, the old app kept the stale position),
  *   - ids that legacy draws from a clock or a module-wide counter (Hired
  *     Sword/Dramatis record uids, chronicle ids), compared by position,
  *   - the canonical form legacy reached as a side effect of rendering, which
@@ -55,9 +60,16 @@ function canon(s: unknown): unknown {
 /* Everything but the chronicle ids. */
 function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: { uid: string }[] }): Rec {
   delete c.uidSeq;
+  // V2: the Fallen's fixed ids are core's own
+  for (const f of (c.fallen as Rec[] | undefined) ?? []) delete f.id;
   const camp = c.campaign;
   if (camp) {
     delete camp.logSeq;
+    const nFallen = ((c.fallen as unknown[] | undefined) ?? []).length;
+    for (const r of (camp.casualties as Rec[] | undefined) ?? []) {
+      delete r.fallenRef;
+      if (typeof r.fallenId === 'number' && r.fallenId >= nFallen) r.fallenId = null;
+    }
     // half-filled forms and open panels (legacy kept them in the save)
     for (const k of Object.keys(camp)) if (k.startsWith('_')) delete camp[k];
     // A post-battle round nobody has touched, and an empty snapshot list, are
