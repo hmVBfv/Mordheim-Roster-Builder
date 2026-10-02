@@ -115,7 +115,10 @@ for (const theme of THEMES) {
     await sheet.getByRole('button', { name: /^Warrior/ }).click();
     const group = page.getByRole('article', { name: 'Warrior' });
     await group.getByRole('button', { name: /\+ Man/ }).click();
-    await group.getByRole('button', { name: /\+ Man/ }).click();
+    await sheet.getByRole('button', { name: 'One man more' }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-more-men`);
+    await sheet.getByRole('button', { name: 'Recruit' }).click();
     await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(3);
 
     // name one man, then let another go
@@ -254,6 +257,37 @@ for (const theme of THEMES) {
     await expect.poll(gold).toBe(start - 25);
   });
 }
+
+/* After the first battle more men for a group with experience draw on the
+   veterans roll (rulebook, new recruits and existing Henchmen groups). */
+test('more men after the first battle: the veterans roll', async ({ page }) => {
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  const sheet = page.locator('dialog[open]');
+  const gold = async () => parseInt((await page.locator('dt:text-is("Gold") + dd').textContent())!, 10);
+  const group = page.getByRole('article', { name: 'Warrior', exact: true });
+  for (let i = 0; i < 3; i++) await group.getByRole('button', { name: 'One experience more for Warrior', exact: true }).click();
+  await expect(group).toContainText('Exp 3');
+  const before = await gold();
+  await group.getByRole('button', { name: /\+ Man/ }).click();
+  const roll = sheet.getByRole('textbox', { name: /2D6 as rolled for the veterans/ });
+  await expect(sheet.getByRole('button', { name: 'Recruit' })).toBeDisabled();
+  await roll.fill('5');
+  await sheet.getByRole('button', { name: 'One man more' }).click();
+  await expect(sheet).toContainText('2 men bring 6 experience; 5 of the roll are left.');
+  await expect(sheet.getByRole('button', { name: 'Recruit' })).toBeDisabled();
+  await sheet.getByRole('button', { name: 'One man less' }).click();
+  await sheet.getByRole('textbox', { name: 'Name of new man 1' }).fill('Kaspar');
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'more-men-veterans');
+  await sheet.getByRole('button', { name: 'Recruit' }).click();
+  await expect(group.getByRole('button', { name: 'Kaspar: name or dismiss' })).toBeVisible();
+  await expect.poll(gold).toBeLessThan(before);
+  // the rest of the roll stays for this round: 2 left, one more man would bring 3
+  await group.getByRole('button', { name: /\+ Man/ }).click();
+  await expect(roll).toHaveValue('5');
+  await expect(sheet).toContainText('1 man brings 3 experience; 2 of the roll are left.');
+});
 
 /* After the first battle a dismissed warrior refunds nothing; his
    equipment goes to the stash. */
