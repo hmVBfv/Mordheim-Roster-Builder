@@ -30,6 +30,22 @@ export function useLegacy(l: Legacy | null): void { L = l ?? NO_LEGACY; }
 
 const STEPS = 110;
 
+/* V2: what core does to the links when a Fallen entry is deleted, applied to
+   the legacy state after its removeFallenAt (records with an id follow it
+   again in canonOf). */
+export function unlinkPastEnd(s: WarbandState): void {
+  const n = s.fallen?.length ?? 0;
+  for (const r of s.campaign?.casualties ?? []) if (r.fallenId != null && r.fallenId >= n) r.fallenId = null;
+}
+
+export function shiftFallenLinks(s: WarbandState, removed: number): void {
+  for (const r of s.campaign?.casualties ?? []) {
+    if (r.fallenId == null) continue;
+    if (r.fallenId === removed) r.fallenId = null;
+    else if (r.fallenId > removed) r.fallenId -= 1;
+  }
+}
+
 export const coreCanon = (ctx: Ctx) => canonOf(ctx.s);
 export const legacyCanon = () => canonOf(L.state.S);
 
@@ -361,12 +377,17 @@ function injuryStep(r: Rng, d: GameData, s: WarbandState, m: Model | undefined):
       const i = r.int(0, Math.max(0, core.memberCount(mm) - 1));
       return [`killHenchMember ${mm.uid} ${i}`, () => a.killHenchMember(mm.uid, i), (c) => core.killHenchMember(c, mm.uid, i)];
     }
-    case 9: case 10: return ['undoFallen', () => a.undoFallen(), (c) => core.undoFallen(c)];
+    // V2: core unlinks a record whose death was taken back; the old app left
+    // it on the position, where the next death would land
+    case 9: case 10: return ['undoFallen', () => { a.undoFallen(); unlinkPastEnd(L.state.S as WarbandState); }, (c) => core.undoFallen(c)];
     case 11: {
       const n = s.fallen?.length ?? 0;
       if (!n) return null;
       const i = r.int(0, n - 1);
-      return [`removeFallenAt ${i}`, () => withDialogs([true], [], () => a.removeFallenAt(i)), (c) => core.removeFallenAt(c, i)];
+      // V2 (docs/behaviour-changes.md): core keeps each casualty record on its
+      // own warrior; the old app left later records pointing one too far.
+      // The legacy side gets the same shift, so the rest still compares.
+      return [`removeFallenAt ${i}`, () => { withDialogs([true], [], () => a.removeFallenAt(i)); shiftFallenLinks(L.state.S as WarbandState, i); }, (c) => core.removeFallenAt(c, i)];
     }
     case 12: case 13: case 14: {
       // a casualty: ours or an enemy's, by our Hero, an enemy or nobody
