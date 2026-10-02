@@ -788,3 +788,57 @@ for (const theme of THEMES) {
     await expect(tip).toBeVisible();
   });
 }
+
+/* Phase 3d: hiring (mockup docs/mockups/hire.html). Rob, 02.10.2026: the
+   Hire button must be in reach without scrolling, and after hiring the list
+   starts at its filters again. */
+for (const theme of THEMES) {
+  test(`hiring a Hired Sword, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    await page.getByRole('link', { name: 'Hire…' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Hire' })).toBeVisible();
+    const list = page.getByRole('list', { name: 'Hired Swords' });
+    // the Ogre is already with the Silver Caravan
+    await expect(list.getByRole('button', { name: /Ogre Bodyguard/ })).toContainText('with the warband');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-hire`);
+
+    // one who wants his weapons chosen first
+    await page.getByRole('searchbox', { name: 'Find by name or race' }).fill('troll');
+    await list.getByRole('button', { name: /Troll Slayer/ }).click();
+    const sheet = page.locator('dialog[open]');
+    const hire = sheet.getByRole('button', { name: 'Hire', exact: true });
+    await expect(hire).toBeDisabled();
+    await expect(sheet).toContainText('choose weapons first');
+    await sheet.getByRole('button', { name: 'Double-Handed Axe' }).click();
+    await expect(hire).toBeEnabled();
+    await expect(hire).toBeInViewport();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-hire-sheet`);
+    await hire.click();
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    await expect(page.getByRole('status').filter({ hasText: 'hired' })).toContainText(/Troll Slayer hired for \d+ gc/);
+    await expect(page.getByRole('searchbox', { name: 'Find by name or race' })).toBeInViewport();
+    await expect(list.getByRole('button', { name: /Troll Slayer/ })).toContainText('with the warband');
+
+    // and he is on the roster
+    await page.getByRole('link', { name: /‹ The Silver Caravan/ }).click();
+    await expect(page.getByRole('article', { name: /Troll Slayer/ })).toBeVisible();
+  });
+}
+
+test('one who may not join says why, and cannot be hired', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  await page.getByRole('link', { name: 'Hire…' }).click();
+  await page.getByRole('checkbox', { name: 'Only those this warband may hire' }).uncheck();
+  await page.getByRole('searchbox', { name: 'Find by name or race' }).fill('Dark Elf Assassin');
+  await page.getByRole('list', { name: 'Hired Swords' }).getByRole('button').first().click();
+  const sheet = page.locator('dialog[open]');
+  await expect(sheet).toContainText('Not now: not available to this warband type');
+  await expect(sheet.getByRole('button', { name: 'Hire', exact: true })).toBeDisabled();
+  await sheet.getByRole('button', { name: 'Close' }).click();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+});

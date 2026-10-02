@@ -6,5 +6,5 @@
 export const SCREENS_MS = 30_000;
 
 export async function loadScreens(): Promise<void> {
-  await Promise.all([import('../routes/Roster.tsx'), import('../routes/NewWarband.tsx'), import('../routes/TradingPost.tsx')]);
+  await Promise.all([import('../routes/Roster.tsx'), import('../routes/NewWarband.tsx'), import('../routes/TradingPost.tsx'), import('../routes/Hire.tsx')]);
 }

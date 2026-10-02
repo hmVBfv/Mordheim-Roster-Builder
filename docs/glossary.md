@@ -38,6 +38,11 @@ Begriff einführt, trägt ihn hier ein.
 | Änderungsschlüssel | Change key | `change_key` |
 | Kanon | Canon | `canon`, `profile.name_de/_en` |
 | Profil (eines Kriegers) | Profile | `models[].profile` |
+| Söldner, Hired Sword | Hired Sword | `hired`, `HIREDSWORDS` |
+| Dramatis Personae (benannte Figur) | Dramatis Personae | `dp`, `DRAMATIS` |
+| Anheuern | Hire | `core` `hire`, `hireProblem`, `hireChoices`; Bildschirm `/warbands/:id/hire` |
+| Anheuergebühr / Unterhalt | Hire fee / Upkeep | `hsHireCost`, `hsUpkeepFor` |
+| Wanderer (bleibt eine Schlacht) | Wanderer | `wanderer` |
 | Lebenslauf | Service record | abgeleitet in `core/narrative` |
 | Formatnummer | Format version | `format` |
 | Gründung (bis zur ersten Schlacht) | Founding | `warbandHasFought()` ist falsch |

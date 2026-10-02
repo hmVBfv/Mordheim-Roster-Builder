@@ -38,6 +38,7 @@
 
 .seg button {
   min-height: var(--tap);
+  min-width: var(--tap);
   padding: 0 var(--space-3);
   border: 1px solid var(--border);
   border-radius: 999px;
