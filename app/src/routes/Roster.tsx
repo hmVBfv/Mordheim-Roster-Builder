@@ -247,6 +247,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       )}
       <div className={ui.row}>
         <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
+        <Link to={`/warbands/${rec.id}/hire`} className={ui.buttonQuiet}>Hire…</Link>
         <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <button type="button" className={ui.buttonQuiet}
