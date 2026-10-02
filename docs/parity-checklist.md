@@ -64,9 +64,9 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Profil mit allen Änderungen, Rassenmaxima, Rüstungswurf | ✓ | ✓ | ✓ | roster | 1e | geänderte Werte markiert |
 | Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ✓ | roster | 1e | App: mit Pull Request #4 |
 | Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | ◐ | roster | 3a | Stepper (nicht unter die Starterfahrung, Hired Swords bis 14); Sprung auf eine Schwelle fehlt |
-| Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ◐ | roster (Advance) | 3 | App zeigt Fertigkeiten und Zauber |
+| Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ✓ | roster (Advance) | 3c | „Advance“ auf jeder Karte: Wurf nach den Tabellen, Werte bis zum Rassenmaximum, Fertigkeit aus seinen Listen oder ein Zauber stattdessen; Korrektur über ⋯ |
 | Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ◐ | – | 3 | **Mockup fehlt**; App zeigt Mutationen |
-| Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3 | App zeigt „Promoted“ |
+| Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3c | 10–12 einer Gruppe: wer, zwei Listen; Rücknahme über Undo, eine spätere Rücknahme fehlt noch |
 | Schwere Verletzungen (D66) mit Folgeentscheidungen, ausgesetzte Spiele | ✓ | ✓ | ◐ | roster (Injury, V1) | 3 | App zeigt Verletzungen und „Misses“ |
 | Tod, Gefallene, Rücknahme, verlorener Wert | ✓ | ✓ | ◐ | roster („Out of action for good“) | 3 | App listet Gefallene |
 
@@ -76,7 +76,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Listen mit Filtern (Grad, Werte, Name), wer anheuern darf und warum nicht | ✓ | ✓ | – | – | 3 | **Mockup fehlt** |
 | Anheuern, Kosten, Unterhalt, Personas, Optionen | ✓ | ✓ | – | – | 3 | |
-| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ◐ | roster (Big Gunnar) | 3 | App: Erfahrung per Stepper, Name, Entlassen; Aufstiege fehlen |
+| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ✓ | roster (Big Gunnar) | 3c | Hired Swords würfeln auf der Heldentabelle mit ihren Listen |
 
 ## Hausregeln
 
