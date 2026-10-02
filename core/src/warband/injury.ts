@@ -58,13 +58,19 @@ export interface HeroRoll {
   games?: number;
   /** 56: whom he hates, by name. */
   hates?: string;
-  /** 61: what became of him. */
-  captured?: { fate: 'exchanged' } | { fate: 'ransomed'; gold: number } | { fate: 'lost' };
+  /** 61: what became of him. `held`: still a captive, on the roster but
+      not fighting, until releaseCaptive says how it ended; `by` names the
+      captors. */
+  captured?: CaptiveFate | { fate: 'held'; by?: string };
   /** 65: the pit fight; lost, he rolls again on 11–35. */
   pit?: { won: true } | { won: false; then: HeroRoll };
   /** 16–21: the further results, as many as the D6. */
   more?: HeroRoll[];
 }
+
+/** How a captivity ends: exchanged or ransomed he comes back with all his
+    equipment; lost, he and it are gone (sold, killed or sacrificed). */
+export type CaptiveFate = { fate: 'exchanged' } | { fate: 'ransomed'; gold: number } | { fate: 'lost' };
 
 /** What a warrior's injury roll was: the D66 chart for a Hero, a D6 for a
     Henchman (one man of the group) or a Hired Sword. */
@@ -168,6 +174,7 @@ export function heroRollText(ctx: Ctx, r: HeroRoll): string {
       if (dist.gaol) return 'Captured, but freed from the Gaol: Full Recovery';
       if (r.captured?.fate === 'exchanged') return 'Captured, then exchanged';
       if (r.captured?.fate === 'ransomed') return `Captured, then ransomed for ${r.captured.gold} gc`;
+      if (r.captured?.fate === 'held') return `Captured, held${r.captured.by ? ` by ${r.captured.by}` : ''}`;
       return 'Captured and never returned';
     case '65':
       if (dist.amphitheatre || r.pit?.won) return `Sold to the Pits: won the fight${dist.amphitheatre ? ' (the Amphitheatre)' : ''}, +50 gc, +2 experience`;
@@ -222,6 +229,7 @@ function applyHero(d: WarbandDraft, c: Ctx, uid: number, r: HeroRoll, cas: Casua
         return 'dead';
       }
       if (r.captured?.fate === 'ransomed' && r.captured.gold > 0) goldOn(d, c, -r.captured.gold, `Ransom for ${nm}`);
+      if (r.captured?.fate === 'held') m.captive = { by: String(r.captured.by ?? '').trim(), round: Number(campState(d).round) || 0 };
       return 'injured';
     case '65':
       if (dist.amphitheatre || r.pit?.won) {
@@ -256,12 +264,12 @@ function casualtyFor(d: WarbandDraft, c: Ctx, uid: number, who: string | null, i
 /** Writes the outcome into the casualty record (creating one after the fact
     in a campaign, as the Roster Builder does) and links a death to its
     Fallen record. */
-function closeCasualty(d: WarbandDraft, c: Ctx, cas: Casualty | null, before: number, victim: { uid: number; name: string }, outcome: Outcome, code: string, detail: string, roll: InjuryRoll): void {
+function closeCasualty(d: WarbandDraft, c: Ctx, cas: Casualty | null, before: number, victim: { uid: number; name: string }, outcome: Outcome, code: string, detail: string, roll: InjuryRoll): Casualty | null {
   const camp = campState(d);
   const list = camp.casualties as Casualty[];
   let r = cas ?? (list.length > before ? list[list.length - 1] as Casualty : null);
   if (!r && camp.on) r = addCasualtyOn(d, c, { victim: { uid: victim.uid, name: victim.name, wb: d.wb ?? '' }, result: outcome, detail });
-  if (!r) return;
+  if (!r) return null;
   r.result = outcome;
   r.detail = detail;
   r.code = code;
@@ -274,6 +282,7 @@ function closeCasualty(d: WarbandDraft, c: Ctx, cas: Casualty | null, before: nu
     if (fallen[fe]) fallen[fe].casualtyId = r.id;
   }
   retypeCasualty(d, c, r);
+  return r;
 }
 
 export interface InjureOptions {
@@ -292,7 +301,7 @@ export function injure(ctx: Ctx, id: number | string, roll: InjuryRoll, opts: In
   const m0 = findModel(ctx.s, id);
   if (!m0) return ctx.s;
   const hero = isHeroModel(ctx, m0);
-  if (hero !== ('hero' in roll)) return ctx.s;
+  if (hero !== ('hero' in roll) || m0.captive) return ctx.s;
   if ('hero' in roll && heroRollProblem(ctx, m0, roll.hero)) return ctx.s;
   if ('d6' in roll && (!isInt(roll.d6, 1, 6) || !isInt(roll.member ?? 0, 0, memberCount(m0) - 1))) return ctx.s;
   const s0 = ensureLedger(ctx);
@@ -303,7 +312,9 @@ export function injure(ctx: Ctx, id: number | string, roll: InjuryRoll, opts: In
       const victim = { uid: m.uid, name: m.name || unitDef(c, m.uid_def)?.name || '' };
       const cas = casualtyFor(d, c, m.uid, null, opts.casualtyId ?? null);
       const outcome = applyHero(d, c, m.uid, roll.hero, cas);
-      closeCasualty(d, c, cas, before, victim, outcome, roll.hero.code, heroRollText(c, roll.hero), roll);
+      const r = closeCasualty(d, c, cas, before, victim, outcome, roll.hero.code, heroRollText(c, roll.hero), roll);
+      const held = findModel(d, id);
+      if (held?.captive) held.captive.casualtyId = r ? r.id : null;
     } else {
       const i = roll.member ?? 0;
       const who = memberName(c, m, i);
@@ -324,4 +335,37 @@ function injureHire(ctx: Ctx, uid: string, roll: InjuryRoll): WarbandState {
   const name = rec.name || ctx.data.HIREDSWORDS[rec.key]?.name || 'The Hired Sword';
   const gone = dismissHire(ctx, uid, 'hs');
   return update(ctxOf(ctx.data, gone), (d) => { logEvent(d, 'death', `${name} (Hired Sword) was slain.`, { name, hire: rec.key }); });
+}
+
+/** Ends a captivity (61 "held"): exchanged or ransomed he returns with all
+    his equipment, the ransom booked; lost, he joins the Fallen with it.
+    The casualty record of his capture says how it ended. */
+export function releaseCaptive(ctx: Ctx, uid: number, fate: CaptiveFate): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  if (!m0?.captive) return ctx.s;
+  if (fate.fate === 'ransomed' && !isInt(fate.gold, 0, 100000)) return ctx.s;
+  if (fate.fate !== 'exchanged' && fate.fate !== 'ransomed' && fate.fate !== 'lost') return ctx.s;
+  const s0 = ensureLedger(ctx);
+  return update(ctxOf(ctx.data, s0), (d, c) => {
+    const m = findModel(d, uid) as Model;
+    const nm = m.name || unitDef(c, m.uid_def)?.name || 'He';
+    const casId = m.captive?.casualtyId;
+    const cas = casId == null ? null : (campState(d).casualties as Casualty[]).find((x) => x.id === casId) ?? null;
+    const roll: HeroRoll = { code: '61', captured: JSON.parse(JSON.stringify(fate)) as CaptiveFate };
+    if (fate.fate === 'lost') {
+      const before = (campState(d).casualties as Casualty[]).length;
+      killHeroOn(d, c, uid, `${nm} was Captured and never returned. He and his equipment are lost.`, cas);
+      closeCasualty(d, c, cas, before, { uid, name: nm }, 'dead', '61', heroRollText(c, roll), { hero: roll });
+    } else {
+      delete m.captive;
+      if (fate.fate === 'ransomed' && fate.gold > 0) goldOn(d, c, -fate.gold, `Ransom for ${nm}`);
+      logEvent(d, 'injury', `${nm} ${fate.fate === 'ransomed' ? `was ransomed for ${fate.gold} gc` : 'was exchanged'} and returns with all his equipment.`, { uid: m.uid, uid_def: m.uid_def });
+      if (cas) {
+        cas.detail = heroRollText(c, roll);
+        cas.injury = { hero: roll };
+        retypeCasualty(d, c, cas);
+      }
+    }
+    syncTreasury(d, c);
+  });
 }

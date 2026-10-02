@@ -73,6 +73,7 @@ Begriff einführt, trägt ihn hier ein.
 | Folgeentscheidung (Nachwurf, Wahl) | follow-up (D6, D3, fate, fight) | `HeroRoll.d6`, `.games`, `.captured`, `.pit`, `.more` |
 | Endgültig außer Gefecht | Out of action for good | `injure()` mit `11-15` |
 | Verletzungen korrigieren | Injuries – correct | `InjuriesSheet`, `removeInjury()`, `adjustMiss()` |
+| Gefangener, Gefangenschaft | Captive · Captivity | `m.captive`, `CaptiveSheet`, `releaseCaptive()` |
 
 ## Kampagne und Schlacht
 

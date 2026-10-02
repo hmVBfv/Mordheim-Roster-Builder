@@ -76,6 +76,7 @@ export interface WarriorActions {
   onAddMan: () => void;
   onAdvance: () => void;
   onInjury: () => void;
+  onCaptive: () => void;
 }
 
 export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
@@ -86,6 +87,7 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
     w.advanceDue && <span key="a" className={`${styles.badge} ${styles.due}`}>Advance due</span>,
     w.missGames > 0 && <span key="m" className={`${styles.badge} ${styles.out}`}>Misses {w.missGames} game{w.missGames > 1 ? 's' : ''}</span>,
     w.retire && <span key="r" className={`${styles.badge} ${styles.out}`}>Blind: must retire</span>,
+    w.captive != null && <span key="c" className={`${styles.badge} ${styles.out}`}>{w.captive ? `Captive of ${w.captive}` : 'Captive'}</span>,
   ].filter(Boolean);
   return (
     <article className={`${ui.card} ${styles.warrior}`} aria-label={w.name}>
@@ -118,7 +120,9 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
               + Man{'cost' in w.addMan ? ` · ${w.addMan.cost} gc` : ''}
             </button>
           )}
-          <button type="button" className={ui.buttonQuiet} aria-label={`Injury for ${w.name}`} onClick={act.onInjury}>Injury</button>
+          {w.captive == null
+            ? <button type="button" className={ui.buttonQuiet} aria-label={`Injury for ${w.name}`} onClick={act.onInjury}>Injury</button>
+            : <button type="button" className={ui.buttonQuiet} aria-label={`Captivity of ${w.name}: how it ended`} onClick={act.onCaptive}>Captivity…</button>}
         </div>
         {w.addMan && 'why' in w.addMan && <p className={styles.why}>No more men: {w.addMan.why}.</p>}
       </div>
