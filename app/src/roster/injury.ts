@@ -91,7 +91,7 @@ export function questionOf(code: HeroCode, env: InjuryEnv): { label: string; opt
         ],
       };
     }
-    case '61': return env.districts.gaol ? null : { label: 'His fate', options: [{ key: 'exchanged', label: 'Exchanged' }, { key: 'ransomed', label: 'Ransomed' }, { key: 'lost', label: 'Never returned (sold, killed or sacrificed)' }] };
+    case '61': return env.districts.gaol ? null : { label: 'His fate', options: [{ key: 'held', label: 'Held for now — he stays on the roster but does not fight' }, { key: 'exchanged', label: 'Exchanged' }, { key: 'ransomed', label: 'Ransomed' }, { key: 'lost', label: 'Never returned (sold, killed or sacrificed)' }] };
     case '65': return env.districts.amphitheatre ? null : { label: 'The fight', options: [{ key: 'won', label: 'Won — +50 gc, +2 experience' }, { key: 'lost', label: 'Lost — loses his weapons and armour, then rolls 11–35' }] };
     case '16-21': return { label: 'D6: how many more', options: ['1', '2', '3', '4', '5', '6'].map((k) => ({ key: k, label: k })) };
     default: return null;
@@ -103,7 +103,7 @@ const SIGMAR: readonly HeroCode[] = ['22', '23', '24', '25', '26', '31', '32', '
 /** A district's or the Peg Leg's question before the row applies. */
 export function saveQuestionOf(code: HeroCode, env: InjuryEnv): { label: string; note: string; options: Option[]; saved: 'morr' | 'sigmar' | 'peg' } | null {
   if (code === '11-15' && env.districts.morr) return { label: 'Temple of Morr', note: 'Your foothold there: roll a D6, on 5+ he recovers fully.', options: [{ key: 'stands', label: '1–4 — dead' }, { key: 'save', label: '5–6 — Full Recovery' }], saved: 'morr' };
-  if ((code === '22' || code === '25') && env.pegLeg) return { label: 'Peg Leg', note: 'His Peg Leg may let him ignore a Leg Wound or a Smashed Leg (the item\'s rule).', options: [{ key: 'save', label: 'Ignored' }, { key: 'stands', label: 'It stands' }], saved: 'peg' };
+  if ((code === '22' || code === '25') && env.pegLeg) return { label: 'Peg Leg', note: 'His Peg Leg: roll a D6, on 4+ the hit struck the peg and is ignored.', options: [{ key: 'stands', label: '1–3 — it stands' }, { key: 'save', label: '4–6 — ignored' }], saved: 'peg' };
   if (SIGMAR.includes(code) && env.districts.sigmar) return { label: 'Temple of Sigmar', note: 'Your foothold there: roll a D6, on 5+ he recovers fully.', options: [{ key: 'stands', label: '1–4 — it stands' }, { key: 'save', label: '5–6 — Full Recovery' }], saved: 'sigmar' };
   return null;
 }
@@ -116,6 +116,12 @@ export function hatesDefault(pick: string | undefined, env: InjuryEnv): string {
   if (pick === '5') return a?.wb ? `the ${a.wb}` : '';
   if (pick === '6') return a?.wb ? `every ${a.wb} warband` : '';
   return '';
+}
+
+/** Who holds a captive, from his casualty record. */
+export function captors(env: InjuryEnv): string {
+  const a = env.attacker;
+  return a?.wb ? `the ${a.wb}` : a?.name ?? '';
 }
 
 const D6_OF: Record<string, number> = { '1': 1, '2-6': 2, '1-3': 1, '4-6': 4, '4': 4, '5': 5, '6': 6 };
@@ -140,6 +146,7 @@ export function rollFromDraft(d: RollDraft, env: InjuryEnv, allowed: readonly He
     case '61':
       if (env.districts.gaol) return { code };
       if (d.pick === 'exchanged' || d.pick === 'lost') return { code, captured: { fate: d.pick } };
+      if (d.pick === 'held') return { code, captured: { fate: 'held', by: captors(env) } };
       if (d.pick === 'ransomed' && /^\d+$/.test((d.gold ?? '').trim())) return { code, captured: { fate: 'ransomed', gold: Number(d.gold) } };
       return null;
     case '65': {

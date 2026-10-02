@@ -376,6 +376,24 @@ for (const theme of THEMES) {
     await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(2);
     await expect(group).not.toContainText('Otto');
 
+    // 61 Captured, held for now (Rob, 02.10.2026): on the roster but not fighting, until ransomed
+    const young = page.getByRole('article', { name: 'Youngblood' });
+    await young.getByRole('button', { name: 'Injury for Youngblood' }).click();
+    await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('61');
+    await sheet.getByRole('button', { name: /^Held for now/ }).click();
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(young).toContainText('Captive');
+    await expect(young.getByRole('button', { name: 'Injury for Youngblood' })).toHaveCount(0);
+    const goldBefore = await page.locator('dl dt', { hasText: 'Gold' }).locator('xpath=following-sibling::dd').textContent();
+    await young.getByRole('button', { name: /Captivity of Youngblood/ }).click();
+    await sheet.getByRole('button', { name: 'Ransomed' }).click();
+    await sheet.getByRole('textbox', { name: 'Ransom paid, in gc' }).fill('20');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-captivity`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(young).not.toContainText('Captive');
+    await expect(page.locator('dl dt', { hasText: 'Gold' }).locator('xpath=following-sibling::dd')).toHaveText(`${parseInt(goldBefore!, 10) - 20} gc`);
+
     // an injury entered by mistake is taken back from ⋯
     await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
     await sheet.getByRole('button', { name: /Injuries – correct/ }).click();

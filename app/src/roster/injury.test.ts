@@ -23,6 +23,7 @@ describe('the roll from the answers', () => {
     expect(rollFromDraft({ dice: '35', pick: '3' }, env())).toEqual({ code: '35', games: 3 });
     expect(rollFromDraft({ dice: '61', pick: 'ransomed' }, env())).toBe(null);
     expect(rollFromDraft({ dice: '61', pick: 'ransomed', gold: '40' }, env())).toEqual({ code: '61', captured: { fate: 'ransomed', gold: 40 } });
+    expect(rollFromDraft({ dice: '61', pick: 'held' }, env())).toEqual({ code: '61', captured: { fate: 'held', by: 'the Orc Mob' } });
   });
 
   it('Bitter Enmity names the attacker from the casualty record, and the player may change it', () => {
@@ -56,7 +57,8 @@ describe('the roll from the answers', () => {
     const gaol = env({ districts: { morr: false, sigmar: false, gaol: true, amphitheatre: false } });
     expect(questionOf('61', gaol)).toBe(null);
     expect(rollFromDraft({ dice: '61' }, gaol)).toEqual({ code: '61' });
-    expect(saveQuestionOf('22', env({ pegLeg: true }))?.saved).toBe('peg');
+    // the Peg Leg (Rob, 02.10.2026): only on 4+ – which leg was hit is a coin toss
+    expect(saveQuestionOf('22', env({ pegLeg: true }))).toMatchObject({ saved: 'peg', options: [{ key: 'stands', label: '1–3 — it stands' }, { key: 'save', label: '4–6 — ignored' }] });
     expect(saveQuestionOf('23', env({ pegLeg: true }))).toBe(null);
   });
 

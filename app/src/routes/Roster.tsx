@@ -12,7 +12,7 @@ import { AdvanceSheet, TakenSheet, type AdvanceChoice, type Correction } from '.
 import { advanceView, takenOf } from '../roster/advance.ts';
 import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
 import { injuryEnv } from '../roster/injury.ts';
-import { InjuriesSheet, InjurySheet, type InjuryFor } from '../roster/InjurySheet.tsx';
+import { CaptiveSheet, InjuriesSheet, InjurySheet, type InjuryFor } from '../roster/InjurySheet.tsx';
 import { equipmentView } from '../roster/equipment.ts';
 import { MenuSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
 import { useEditor } from '../roster/useEditor.ts';
@@ -57,6 +57,9 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   };
   const { ref: injuriesRef, open: openInjuriesSheet, close: closeInjuries } = useSheet();
   const [injuriesOf, setInjuriesOf] = useState<number | null>(null);
+  const { ref: captiveRef, open: openCaptiveSheet, close: closeCaptive } = useSheet();
+  const [captiveOf, setCaptiveOf] = useState<{ key: number; uid: number; name: string; by: string } | null>(null);
+  const openCaptive = (w: WarriorView) => { setCaptiveOf((p) => ({ key: (p?.key ?? 0) + 1, uid: w.uid, name: w.name, by: w.captive ?? '' })); openCaptiveSheet(); };
   const injuriesView = injuriesOf != null ? v.heroes.concat(v.henchmen).find((w) => w.uid === injuriesOf) ?? null : null;
 
   /* An advance as chosen in the sheet: the matching action of core. */
@@ -117,7 +120,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     ...(w.xp ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: w.uid, name: w.name }); openTakenSheet(); } }] : []),
     ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
     ...(w.injuries.length || w.missGames ? [{ label: 'Injuries – correct', run: () => { setInjuriesOf(w.uid); openInjuriesSheet(); } }] : []),
-    ...(w.hero ? [{ label: 'Out of action for good…', danger: true, run: () => injureWarrior(w, '11') }] : []),
+    ...(w.captive != null ? [{ label: 'Captivity – how it ended…', run: () => openCaptive(w) }] : []),
+    ...(w.hero && w.captive == null ? [{ label: 'Out of action for good…', danger: true, run: () => injureWarrior(w, '11') }] : []),
     locked
       ? { label: 'Dismiss – his equipment goes to the stash', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
       : { label: 'Remove from the roster', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} removed from the roster.`) },
@@ -158,6 +162,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     onMan: (i: number) => manSheet(w, i),
     onAdvance: () => openAdvance(w.uid),
     onInjury: () => injureWarrior(w),
+    onCaptive: () => openCaptive(w),
     onAddMan: () => {
       if (!w.addMan || !('cost' in w.addMan)) return;
       const cost = w.addMan.cost;
@@ -228,6 +233,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         onRemove={(c, text) => { if (takenFor) correct(takenFor.id, c, text); }} />
       <InjurySheet dialogRef={injRef} close={closeInj} who={injFor}
         onApply={(r, text) => { if (injFor) { const id = injFor.uid; ed.edit((c) => core.injure(c, id, r), text, { gold: 'keep' }); } }} />
+      <CaptiveSheet dialogRef={captiveRef} close={closeCaptive} who={captiveOf}
+        onEnd={(fate, text) => { if (captiveOf) { const uid = captiveOf.uid; ed.edit((c) => core.releaseCaptive(c, uid, fate), text, { gold: 'keep' }); } }} />
       <InjuriesSheet dialogRef={injuriesRef} close={closeInjuries} name={injuriesView?.name ?? ''} injuries={injuriesView?.injuries ?? []} miss={injuriesView?.missGames ?? 0}
         onRemove={(i, text) => { if (injuriesOf != null) ed.edit((c) => core.removeInjury(c, injuriesOf, i), text); }}
         onMiss={(dl) => { if (injuriesOf != null) ed.edit((c) => core.adjustMiss(c, injuriesOf, dl)); }} />

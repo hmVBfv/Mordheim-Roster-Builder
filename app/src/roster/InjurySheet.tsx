@@ -193,3 +193,49 @@ export function InjuriesSheet({ dialogRef, close, name, injuries, miss, onRemove
     </dialog>
   );
 }
+
+/** How a captivity ended (61 held; Rob, 02.10.2026). */
+export function CaptiveSheet({ dialogRef, close, who, onEnd }: {
+  dialogRef: Sheet['ref']; close: Sheet['close']; who: { key: number; name: string; by: string } | null;
+  onEnd: (fate: core.CaptiveFate, text: string) => void;
+}) {
+  const id = useId();
+  return (
+    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
+      {who && <CaptiveBody key={who.key} who={who} close={close} onEnd={onEnd} titleId={id} />}
+    </dialog>
+  );
+}
+
+function CaptiveBody({ who, close, onEnd, titleId }: { who: { name: string; by: string }; close: Sheet['close']; onEnd: (fate: core.CaptiveFate, text: string) => void; titleId: string }) {
+  const [pick, setPick] = useState<string | undefined>(undefined);
+  const [gold, setGold] = useState('');
+  const goldId = useId();
+  const fate: core.CaptiveFate | null = pick === 'exchanged' || pick === 'lost' ? { fate: pick }
+    : pick === 'ransomed' && /^\d+$/.test(gold) ? { fate: 'ransomed', gold: Number(gold) } : null;
+  const text = !fate ? '' : fate.fate === 'lost' ? `${who.name} never returned; he and his equipment are lost.`
+    : fate.fate === 'ransomed' ? `${who.name} ransomed for ${fate.gold} gc; he is back.` : `${who.name} exchanged; he is back.`;
+  return (
+    <form className={ui.page} onSubmit={(e) => { e.preventDefault(); if (fate) close(() => onEnd(fate, text)); }}>
+      <div>
+        <h2 id={titleId}>Captivity · {who.name}</h2>
+        <p className={ui.muted}>Held {who.by ? `by ${who.by}` : 'by the enemy'}. Exchanged or ransomed, he returns with all his equipment; otherwise he is lost with it.</p>
+      </div>
+      <Pick label="How it ended" value={pick} onPick={setPick} options={[
+        { key: 'exchanged', label: 'Exchanged for a captive of ours' },
+        { key: 'ransomed', label: 'Ransomed' },
+        { key: 'lost', label: 'Never returned (sold, killed or sacrificed)' },
+      ]} />
+      {pick === 'ransomed' && (
+        <div className={ui.field}>
+          <label htmlFor={goldId}>Ransom paid, in gc</label>
+          <input id={goldId} className={ui.input} inputMode="numeric" value={gold} autoComplete="off" onChange={(e) => setGold(e.target.value.replace(/\D/g, ''))} />
+        </div>
+      )}
+      <div className={ui.row}>
+        <button type="submit" className={ui.button} disabled={!fate}>Apply</button>
+        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+      </div>
+    </form>
+  );
+}

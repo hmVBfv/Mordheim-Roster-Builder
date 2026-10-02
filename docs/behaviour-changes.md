@@ -142,7 +142,7 @@ die Folgeentscheidungen ausdrücklich abgefragt werden.
 | --- | --- | --- | --- |
 | 11–15 Dead | Temple of Morr (Foothold): W6, bei 5+ stattdessen 41–55 | Krieger fällt, alle Ausrüstung verloren (UFAQ 10.2) | Bezirk wird nicht angeboten |
 | 16–21 Multiple Injuries | W6 = Anzahl weiterer Ergebnisse; jedes davon mit eigenem Ablauf; Dead, Captured und Multiple Injuries werden neu gewürfelt, sind also nicht wählbar | Summe der Teilergebnisse; der Eintrag listet sie | heute nur Hinweistext |
-| 22 Leg Wound | Temple of Sigmar (Foothold, gilt für 22–35): W6, bei 5+ 41–55. Pirat mit Peg Leg: W6, bei 4+ ignoriert | M −1 | Bezirk, Peg Leg fehlen |
+| 22 Leg Wound | Temple of Sigmar (Foothold, gilt für 22–35): W6, bei 5+ 41–55. Pirat mit Peg Leg: W6, bei 4+ ignoriert (Rob, 02.10.2026: welches Bein getroffen ist, steht 50:50) | M −1 | Bezirk, Peg Leg fehlen |
 | 23 Arm Wound | W6: 1 = Arm amputiert, 2–6 = verpasst das nächste Spiel | 1: bleibend „nur eine einhändige Waffe“; 2–6: `miss` +1 | heute zwei getrennte Einträge 23a/23b statt Nachwurf |
 | 24 Madness | W6: 1–3 Stupidity, 4–6 Frenzy | bleibend, als Fähigkeit sichtbar | wie 23 |
 | 25 Smashed Leg | W6: 1 = kann nicht mehr rennen (aber angreifen), 2–6 = verpasst das nächste Spiel; Peg Leg wie bei 22 | wie 23 | wie 23 |
@@ -155,7 +155,7 @@ die Folgeentscheidungen ausdrücklich abgefragt werden.
 | 36 Robbed | – | alle Waffen, Rüstung und Ausrüstung verloren, ohne Erstattung | über die Verlustliste heute ohne Verlust; über „+ Injury“ nur nach Rückfrage |
 | 41–55 Full Recovery | – | nichts | – |
 | 56 Bitter Enmity | W6: 1–3 der Verursacher (war es ein Henchman: dessen Anführer), 4 Anführer seiner Warband, 5 seine ganze Warband, 6 alle Warbands dieser Art | bleibend „Hatred“ mit Ziel; das Ziel kommt aus dem Verlusteintrag (Angreifer) | Ziel wird nicht festgehalten |
-| 61 Captured | The Gaol (Kontrolle): wird 41–55. Sonst: ausgetauscht / freigekauft (Preis) / an Sklavenhändler verkauft / von Untoten getötet (wird Zombie) / von Besessenen geopfert | Austausch oder Lösegeld: kommt mit aller Ausrüstung zurück, Lösegeld aus der Truhe. Sonst verloren, Ausrüstung bleibt beim Fänger | über die Verlustliste heute ohne Rückfrage; Bezirk fehlt |
+| 61 Captured | The Gaol (Kontrolle): wird 41–55. Sonst: vorerst gefangen (Rob, 02.10.2026) / ausgetauscht / freigekauft (Preis) / an Sklavenhändler verkauft / von Untoten getötet (wird Zombie) / von Besessenen geopfert | Austausch oder Lösegeld: kommt mit aller Ausrüstung zurück, Lösegeld aus der Truhe. Vorerst gefangen: bleibt im Roster, bis eines davon eingetragen ist. Sonst verloren, Ausrüstung bleibt beim Fänger | über die Verlustliste heute ohne Rückfrage; Bezirk fehlt |
 | 62–63 Hardened | – | bleibend: immun gegen Angst | – |
 | 64 Horrible Scars | – | bleibend: verursacht Angst | – |
 | 65 Sold to the Pits | Amphitheatre (Foothold): gewonnen. Sonst: gewonnen oder verloren; verloren → D66 nur 11–35, mit eigenem Ablauf | gewonnen: +50 gc, +2 Erfahrung, behält alles. Verloren und nicht tot: verliert Waffen und Rüstung | über die Verlustliste heute ohne Rückfrage; Nachwurf nur als Hinweis |
@@ -230,24 +230,29 @@ Warbandgröße.
 - **Würfeln:** Jeder Wurf kann eingetragen werden oder per „Roll the dice“
   in der Oberfläche fallen (Grundsatz 2); `core` würfelt nie.
 
-**Zur Entscheidung (Rob):**
+**Entscheidungen (Rob, 02.10.2026):**
 
-1. **Peg Leg.** Die Spezifikation oben sagt „W6, bei 4+ ignoriert“, der
-   Regeltext in den Daten (`data/equipment.json`, *Peg Leg*, Pirates) sagt,
-   der Träger *darf* Leg Wound und Smashed Leg ignorieren. Die App fragt
-   heute nur „Ignored / It stands“ und überlässt den Wurf dem Tisch.
-   Vorschlag: die Quelle auf mordheimer.net prüfen und die Frage danach
-   ausrichten.
-2. **Robbed** kommt nicht mehr in die bleibenden Verletzungen, nur als
-   Ereignis in die Chronik (Grundsatz 4; zugleich der offene Vorschlag
-   „Robbed nicht als bleibende Verletzung“). Bitte bestätigen.
-3. **Zweites Auge:** Die App erkennt es, warnt im Sheet und zeigt auf der
-   Karte „Blind: must retire“; entlassen wird von Hand über ⋯ (die
-   Ausrüstung geht dabei nach V4 in die Truhe). Der Vorschlag, ihn als
-   „ausgeschieden“ unter die Gefallenen zu legen, wartet auf deine
-   Entscheidung.
-4. **Gefangen als Zustand** und **Man-catcher** sind nicht gebaut; ein
-   Gefangener wird heute ausgetauscht, freigekauft oder ist verloren.
+1. **Peg Leg:** nur bei W6 4+ ignoriert – welches Bein getroffen ist, steht
+   50:50. So steht es auch im Regeltext (*Town Cryer* 9, mordheimer.net,
+   `test/fixtures/ref_Misc.txt`); der verkürzte Tooltip in
+   `data/equipment.json` („may ignore … never suffers further leg
+   injuries“) ist danach berichtigt, samt Rettungswurf 6+ und −1
+   Bewegung. Die App fragt „1–3 it stands / 4–6 ignored“.
+2. **Robbed** ist nur der Verlust der Ausrüstung: ein Ereignis in der
+   Chronik, keine bleibende Verletzung.
+3. **Zweites Auge:** so lassen – Warnung im Sheet, „Blind: must retire“ auf
+   der Karte, entlassen von Hand über ⋯.
+4. **Gefangen als Zustand:** ja. 61 bietet „Held for now“: Er bleibt im
+   Roster (`m.captive = { by, round, casualtyId }`), zählt fürs Rating,
+   kämpft nicht und kann nicht erneut verwundet werden; die Karte zeigt
+   „Captive of …“. „Captivity…“ trägt später ein, wie es endete:
+   ausgetauscht oder freigekauft (Lösegeld ins Kassenbuch) kommt er mit
+   aller Ausrüstung zurück, sonst fällt er mit ihr (`releaseCaptive`; der
+   Verlusteintrag der Gefangennahme hält das Ende fest). Offen bis 4a: dass
+   ein Gefangener nach der Schlacht keine Erfahrung fürs Überleben bekommt
+   und auf Karten und Exporten als nicht kämpfend erscheint.
+
+Der **Man-catcher** bleibt ungebaut, bis jemand diese Warband spielt.
 
 ## V2 – Feste IDs für Gefallene
 

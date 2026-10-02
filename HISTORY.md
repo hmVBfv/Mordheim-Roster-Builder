@@ -1802,3 +1802,11 @@ their own D6 or decide by themselves. Unlike the advance sheet, this one
 offers "Roll the dice": the spec asks for both, and a dead Hero should not
 depend on someone finding a D66 in Tabletop Simulator. The dice come from
 the screen, never from core.
+
+Rob answered the open points the same day. The Peg Leg ignores a leg
+wound only on a 4+ – which leg was hit is a coin toss – and the source
+says so too; the data's tooltip had shortened it to "may ignore … and
+never suffers further leg injuries", and is now corrected. Robbed is a loss
+of equipment, not an injury. And a captive is now a state rather than an
+answer the player must give at once: he stays on the roster, counted but
+not fighting, until an exchange, a ransom or his loss is entered.

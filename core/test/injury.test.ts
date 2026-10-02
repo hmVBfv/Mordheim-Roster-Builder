@@ -143,6 +143,40 @@ describe('a Hero', () => {
       expect(cas(n)).toMatchObject({ result: 'dead', detail: 'Captured and never returned' });
     });
 
+    it('held (Rob, 02.10.2026): he stays on the roster, not fighting, until it ends', () => {
+      const { s, champ } = band();
+      const n = core.injure(ctx(s), champ, hero({ code: '61', captured: { fate: 'held', by: 'Gorbag\'s Boyz' } }));
+      expect(model(n, champ).captive).toEqual({ by: 'Gorbag\'s Boyz', round: 1, casualtyId: cas(n).id });
+      expect(model(n, champ).eq).toEqual(model(s, champ).eq);
+      expect(core.totalRating(ctx(n))).toBe(core.totalRating(ctx(s)));
+      expect(cas(n)).toMatchObject({ result: 'injured', detail: 'Captured, held by Gorbag\'s Boyz' });
+      // a captive does not fight, so he cannot be put out of action again
+      expect(core.injure(ctx(n), champ, hero({ code: '22' }))).toBe(n);
+      // it survives saving and loading
+      const back = core.loadSave(data, JSON.parse(JSON.stringify(core.writeSave(ctx(n)))));
+      expect(back.ok).toBe(true);
+      expect(back.ok && model(back.state, champ).captive).toEqual(model(n, champ).captive);
+    });
+
+    it('a captivity ends: exchanged, ransomed (booked) or lost (among the Fallen)', () => {
+      const { s, champ } = band();
+      const n = core.injure(ctx(s), champ, hero({ code: '61', captured: { fate: 'held', by: 'the Orcs' } }));
+      const ex = core.releaseCaptive(ctx(n), champ, { fate: 'exchanged' });
+      expect(model(ex, champ).captive).toBeUndefined();
+      expect(model(ex, champ).eq).toEqual(model(s, champ).eq);
+      expect(cas(ex)).toMatchObject({ detail: 'Captured, then exchanged', injury: { hero: { code: '61', captured: { fate: 'exchanged' } } } });
+      const ra = core.releaseCaptive(ctx(n), champ, { fate: 'ransomed', gold: 45 });
+      expect(gold(ra)).toBe(gold(n) - 45);
+      expect(ra.campaign!.log!.some((e) => /ransomed for 45 gc and returns/.test(e.text))).toBe(true);
+      const lost = core.releaseCaptive(ctx(n), champ, { fate: 'lost' });
+      expect(model(lost, champ)).toBeUndefined();
+      expect(lost.campaign!.casualties).toHaveLength(1);
+      expect(cas(lost)).toMatchObject({ result: 'dead', detail: 'Captured and never returned', fallenId: lost.fallen!.length - 1 });
+      expect(gold(lost)).toBe(gold(n));
+      // nothing to end for a warrior who is free
+      expect(core.releaseCaptive(ctx(s), champ, { fate: 'exchanged' })).toBe(s);
+    });
+
     it('with the Gaol under control it becomes Full Recovery, without asking', () => {
       const { s, champ } = band({ districts: { gaol: 'control' } });
       const n = core.injure(ctx(s), champ, hero({ code: '61' }));
