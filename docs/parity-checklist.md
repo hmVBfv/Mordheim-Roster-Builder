@@ -50,11 +50,11 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Preise nach Hausregeln und Bezirken (halber Preis) | ✓ | ✓ | – | trading-post | 3 | |
 | Gründungspreise und Trading Post (C2, C3, C7) | ✓ | ✓ | – | trading-post | 3 | |
 | Seltenes: Katalog, bezahlter Preis, Material-Upgrades (Gromril, Ithilmar …) | ✓ | ✓ | ◐ | trading-post | 3 | App zeigt sie an |
-| Suchwurf je Held mit Modifikatoren, Chance | – | – | – | trading-post | 3 | neu (V5/V6) |
-| Verkaufen zum halben Preis | – | – | – | trading-post | 3 | neu (V6); abrunden, mindestens 1 gc |
-| Umverteilen zwischen Kriegern und Lager | – | – | – | trading-post | 3 | neu (V4) |
+| Suchwurf je Held mit Modifikatoren, Chance | – | ✓ | – | trading-post | 3b | neu (V5/V6); `searchOdds`, ein Wurf je Held und Stufe |
+| Verkaufen zum halben Preis | – | ✓ | – | trading-post | 3b | neu (V6); abrunden, mindestens 1 gc, eine Gruppe zusammen |
+| Umverteilen zwischen Kriegern und Lager | – | ✓ | – | trading-post | 3b | neu (V4); `giveItem` mit Grund, wenn nicht |
 | Lager (Truhe): Gegenstände, Wyrdstone, Gold | ✓ | ✓ | – | roster, trading-post | 3 | |
-| Kassenbuch mit Anlass je Buchung | – | – | – | trading-post | 3 | neu (V7, `FORMAT` 3) |
+| Kassenbuch mit Anlass je Buchung | – | ✓ | – | trading-post | 3b | neu (V7), ab der ersten Schlacht; ohne neue Formatnummer |
 | Regeltexte als Tooltip (Gegenstände, Fertigkeiten, Zauber, Fähigkeiten) | ✓ | ✓ | – | trading-post | 3 | |
 
 ## Profile und Entwicklung

@@ -83,9 +83,41 @@ export interface HireRecord {
 }
 
 export interface StashItem {
+  /** What the player reads (legacy: the English name or free text). */
   name: string;
   qty: number;
+  /** Phase 3b: the item it is – a German list name (common) or a catalogue
+      key (rare). Items without one (legacy, free text) are kept but cannot
+      be given to a warrior. */
+  key?: string;
+  /** A rare catalogue item (Trading Post search). */
+  rare?: boolean;
+  /** What one piece cost when it was bought, in gc. */
+  paid?: number;
   [key: string]: unknown;
+}
+
+/** What made gold in hand change (V7). */
+export type LedgerKind = 'open' | 'roster' | 'buy' | 'sell' | 'search' | 'adjust';
+
+/** One booking of the gold ledger (V7, docs/behaviour-changes.md): from the
+    warband's first battle on, gold in hand is the sum of its bookings. */
+export interface LedgerEntry {
+  id: number;
+  kind: LedgerKind;
+  /** Change of gold in hand, in whole gc (negative: spent). */
+  amount: number;
+  /** The cause, in words. */
+  text: string;
+  /** Campaign stage when it was booked (0 = Setup). */
+  round?: number;
+  /** The warrior concerned (model uid, or a Hired Sword's uid). */
+  uid?: number | string;
+  /** The item concerned (German list name or catalogue key). */
+  item?: string;
+  qty?: number;
+  /** A search for a rare item: whether it was found. */
+  found?: boolean;
 }
 
 export interface Stash {
@@ -237,5 +269,7 @@ export interface WarbandState {
   fallen?: FallenRecord[];
   /** Next model uid to hand out (core only; see nextModelUid). */
   uidSeq?: number;
+  /** The gold ledger (V7); absent until the warband's first battle. */
+  ledger?: LedgerEntry[];
   [key: string]: unknown;
 }
