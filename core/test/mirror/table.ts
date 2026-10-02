@@ -173,7 +173,8 @@ export const TABLE: Record<string, Spec> = {
   'app.campState': q((c) => c.w.s.campaign, { norm: (v, c) => (canonOf({ ...c.w.s, campaign: v }) as WarbandState).campaign }),
   'app.campRound': q((c) => c.w.s.campaign?.round),
   'app.campDistricts': q((c) => c.w.s.campaign?.districts),
-  'app.campCasualties': q((c) => core.casualties(ctx(c.w))),
+  // V2: core's records also link the Fallen by id (fallenRef)
+  'app.campCasualties': q((c) => core.casualties(ctx(c.w)), { norm: (v) => JSON.parse(JSON.stringify(v ?? null), (k, x) => (k === 'fallenRef' ? undefined : x)) }),
   'app.casualtyText': q((c) => core.casualtyText(ctx(c.w), c.args[0])),
   'app.casualtyRollOptions': q((c) => core.casualtyRollOptions(ctx(c.w), c.args[0])),
   'app.casualtyStats': q((c) => core.casualtyStats(ctx(c.w))),
