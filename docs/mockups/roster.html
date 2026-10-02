@@ -238,13 +238,13 @@
   var st = {
     gold: 55, worth: 612, seq: 0,
     w: [
-      { id: 'ulrich', kind: 'hero', name: 'Ulrich the Grey', de: 'Ulrich der Graue', voice: 'Few words, all of them orders.', type: 'Mercenary Captain', badges: [['Leader', '']], p: [4, 5, 4, 3, 3, 1, 4, 1, 8, '5+'], up: ['WS'], start: 20, xp: 32, taken: 2, gear: ['Sword', 'Shield', 'Light armour', 'Dagger'], skills: ['Strike to Injure'] },
+      { id: 'ulrich', kind: 'hero', name: 'Ulrich the Grey', de: 'Ulrich der Graue', voice: 'Few words, all of them orders.', type: 'Mercenary Captain', rules: ['Leader'], badges: [['Leader', '']], p: [4, 5, 4, 3, 3, 1, 4, 1, 8, '5+'], up: ['WS'], start: 20, xp: 32, taken: 2, gear: ['Sword', 'Shield', 'Light armour', 'Dagger'], skills: ['Strike to Injure'] },
       { id: 'magda', kind: 'hero', name: 'Magda', de: 'Magda', voice: '', type: 'Champion', badges: [['Misses 1 game', 'bad']], p: [3, 4, 3, 3, 3, 1, 3, 1, 7, '—'], down: ['M'], start: 8, xp: 10, taken: 0, gear: ['Double-handed weapon', 'Dagger'], injuries: ['Leg Wound (−1 M)'] },
       { id: 'jorg', kind: 'hero', name: 'Jorg', de: 'Jörg', voice: '', type: 'Champion', badges: [['⚠ BS 4 without a cause', 'warn', 'changes.html']], p: [4, 4, 4, 3, 3, 1, 3, 1, 7, '6+'], up: ['BS'], start: 8, xp: 9, taken: 0, gear: ['Mace', 'Sword', 'Light armour', 'Dagger'] },
       { id: 'wilhelm', kind: 'hero', name: 'Wilhelm', de: 'Wilhelm', voice: '', type: 'Youngblood · new', p: [4, 2, 2, 3, 3, 1, 3, 1, 6, '—'], start: 0, xp: 0, taken: 0, gear: ['Mace', 'Dagger'] },
       { id: 'warriors', kind: 'hench', name: 'Warriors', unit: 'Warrior', cost: 25, gearCost: 10, gearNote: 'Axe 5, Buckler 5, the dagger free', men: [{ name: 'Otto' }, { name: 'Fritz' }, { name: 'Hans', dead: true }], p: [4, 3, 3, 3, 3, 1, 3, 1, 7, '—'], start: 0, xp: 4, taken: 0, gear: ['Axe', 'Buckler', 'Dagger'] },
       { id: 'marksmen', kind: 'hench', name: 'Marksmen', unit: 'Marksman', note: 'BS 4 in Reikland', unitMax: 7, cost: 25, gearCost: 25, gearNote: 'Crossbow 25, the dagger free', men: [{ name: 'Lukas' }], p: [4, 3, 4, 3, 3, 1, 3, 1, 7, '—'], start: 0, xp: 1, taken: 0, gear: ['Crossbow', 'Dagger'] },
-      { id: 'gunnar', kind: 'hired', name: 'Big Gunnar', de: 'Großer Gunnar', voice: '', type: 'Ogre Bodyguard · upkeep 30 gc', large: true, p: [6, 3, 2, 4, 4, 3, 3, 2, 7, '6+'], start: 0, xp: 3, taken: 1, skills: ['Resilient'] }
+      { id: 'gunnar', kind: 'hired', name: 'Big Gunnar', de: 'Großer Gunnar', voice: '', type: 'Ogre Bodyguard · upkeep 30 gc', rules: ['Fear', 'Large Target'], large: true, p: [6, 3, 2, 4, 4, 3, 3, 2, 7, '6+'], start: 0, xp: 3, taken: 1, skills: ['Resilient'] }
     ]
   };
   // what can be recruited after the first battle (Mercenaries, Reikland)
@@ -311,10 +311,12 @@
     }
     h += statTable(w) + xpBlock(w);
     var facts = '';
-    if (w.gear && w.gear.length) facts += '<dt>Equipment</dt><dd>' + esc(w.gear.join(', ')) + '</dd>';
-    if (w.skills && w.skills.length) facts += '<dt>Skills</dt><dd>' + esc(w.skills.join(', ')) + '</dd>';
+    // every word with rules can be tapped (or hovered) for what it does
+    if (w.rules && w.rules.length) facts += '<dt>Rules</dt><dd>' + window.mockTips(w.rules) + '</dd>';
+    if (w.gear && w.gear.length) facts += '<dt>Equipment</dt><dd>' + window.mockTips(w.gear) + '</dd>';
+    if (w.skills && w.skills.length) facts += '<dt>Skills</dt><dd>' + window.mockTips(w.skills) + '</dd>';
     if (w.lists) facts += '<dt>Skill lists</dt><dd>' + esc(w.lists.join(', ')) + '</dd>';
-    if (w.injuries && w.injuries.length) facts += '<dt>Injuries</dt><dd>' + esc(w.injuries.join(', ')) + '</dd>';
+    if (w.injuries && w.injuries.length) facts += '<dt>Injuries</dt><dd>' + window.mockTips(w.injuries) + '</dd>';
     if (facts) h += '<dl class="facts">' + facts + '</dl>';
     var block = w.kind === 'hench' ? addBlock(w) : '';
     h += '<div class="acts"><button type="button" class="btn-quiet" data-advance>Advance</button>' +

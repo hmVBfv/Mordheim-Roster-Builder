@@ -33,6 +33,8 @@
   .moveto { display: grid; gap: var(--s1); }
   .moveto button { min-height: var(--tap); text-align: left; padding: 0 var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
   .moveto button[aria-current='true'] { border-color: var(--accent); }
+  .aibox { display: grid; grid-template-columns: 1fr auto; gap: var(--s2) var(--s3); align-items: center; padding: var(--s3); border: 1px solid var(--accent); border-radius: var(--radius); background: var(--surface); }
+  @media (max-width: 420px) { .aibox { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -49,6 +51,10 @@
     <div class="row between">
       <label class="switch"><input type="checkbox" id="layer" checked> Leader layer</label>
       <span class="vis leader" id="layer-state">⚑ hidden blocks shown</span>
+    </div>
+    <div class="aibox">
+      <div><b>Battle 5 is ready to be written</b><br><span class="small muted">The order below is the order of the story. The AI pack gathers it with everything a writer needs.</span></div>
+      <button type="button" class="btn" data-open="sheet-ai">AI pack…</button>
     </div>
     <p class="help muted">Long-press a block and drag it to where it happens in the story, or use ↑ ↓ and ⋯. Battles, headings and tagged states stay where they are. Moving changes only the place in the story, never when something was recorded.</p>
 
@@ -86,6 +92,34 @@
     <p class="small muted" id="move-times"></p>
     <div class="moveto" id="moveto"></div>
     <button type="button" class="btn-quiet" data-close>Cancel</button>
+  </form>
+</dialog>
+
+<!-- The AI pack (concept 4.10): the battle in story order and all that
+     goes with it, as one Markdown prompt to give Claude; the app itself
+     calls no AI. Leaders only, because hidden background goes in, marked. -->
+<dialog class="sheet" id="sheet-ai" aria-labelledby="ai-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-ai">
+    <h2 id="ai-title">AI pack · battle 5</h2>
+    <p class="small muted">One prompt with everything below, in the order of the timeline. Give it to Claude in a chat; the chapter that comes back is imported under Chronicle.</p>
+    <p class="small"><span class="vis leader">⚑ Leaders only</span> Hidden background goes in, each piece with the rule how much may be hinted.</p>
+    <div class="stack" id="ai-parts">
+      <label class="check"><input type="checkbox" checked disabled> <span><b>The battle in story order</b><br><small>the 8 blocks of battle 5 as arranged here: report, scenes, quotes kept apart, protocol</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="aftermath"> <span><b>Aftermath and advances</b><br><small>deaths, injuries, advances per warband, each with the player's explanation and what the warrior did in this battle</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="canon"> <span><b>Canon</b><br><small>names, titles and voices in German and English, from the warriors' profiles</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="world"> <span><b>World</b><br><small>the districts held, factions, people and places that appear</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="notes"> <span><b>Notes of the round</b><br><small>public notes; sealed ones once opened</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="background"> <span><b>Background ⚑</b><br><small>2 threads, with their reveal level as a hard rule (“hint only”, “never name”)</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="story"> <span><b>The story so far</b><br><small>a summary of chapters 1–4 and the last chapter in full</small></span></label>
+      <label class="check"><input type="checkbox" checked data-part="style"> <span><b>Style</b><br><small>the campaign's style guide: German, past tense, no game terms in the prose</small></span></label>
+    </div>
+    <label class="field"><span class="small">Language of the chapter</span>
+      <span class="seg" role="group" aria-label="Language"><button type="button" data-value="de" aria-pressed="true">Deutsch</button><button type="button" data-value="en">English</button><button type="button" data-value="both">Both</button></span></label>
+    <label class="field"><span class="small">The prompt, as it will be copied</span>
+      <textarea class="textarea" id="ai-text" rows="9" readonly></textarea></label>
+    <p class="small muted" id="ai-size"></p>
+    <div class="row"><button type="button" class="btn" id="ai-copy">Copy prompt</button><button type="button" class="btn-quiet" id="ai-file">Download .md</button><button type="button" class="btn-quiet" data-close>Close</button></div>
   </form>
 </dialog>
 
@@ -223,6 +257,31 @@
     document.getElementById('layer-state').textContent = on ? '⚑ hidden blocks shown' : '👁 as players see it';
     document.getElementById('layer-state').className = on ? 'vis leader' : 'vis public';
   });
+})();
+
+/* the AI pack: its text follows what is ticked */
+(function () {
+  var PARTS = {
+    head: '# Chapter 5 · The Old Mill\n\nWrite chapter 5 of the Hel Fenn chronicle from the material below. Keep to the canon spellings. Never state what the background marks as hidden; hint where it allows.\n',
+    battle: '\n## The battle, in story order\n- Before (sealed, opened): Skritch: “Skritch goes for the captain. Whatever it costs.”\n- Report: The Old Mill — The Silver Caravan beat Clan Skrittle; the Grey Penitents routed.\n- Turn 2 (Anna): Brother Anselm sets the mill wheel on fire to smoke the rats out of the cellar.\n- Turn 3, quote (Ulrich the Grey): “Bolt the doors. Whatever knocks tonight is not a customer.”\n- Turn 4: Magda is out of action — by Skritch.\n',
+    aftermath: '\n## Aftermath\n- Magda: Leg Wound (M 4 → 3). Explanation: missing.\n- Ulrich the Grey: WS 4 → 5 — “He learned it the hard way.” In this battle: held the mill door, put two rats out of action.\n- Hans (Warriors): fell.\n',
+    canon: '\n## Canon\n| EN | DE | Voice |\n| Ulrich the Grey | Ulrich der Graue | Few words, all of them orders. |\n| Magda | Magda | |\n',
+    world: '\n## World\n- The Old Mill (Merchants\' Quarter); City Hall and West Gate held by the Silver Caravan.\n',
+    notes: '\n## Notes\n- Ben: The rats drag Grot home on a door.\n',
+    background: '\n## Background — hard rules\n- The eel coin: HINT ONLY (a coin, an eel, wet money). Never name the ferrymen\'s guild.\n',
+    story: '\n## The story so far\nChapters 1–4 in brief: … Chapter 4 in full follows.\n',
+    style: '\n## Style\nGerman, past tense, close third person; no dice, no game terms.\n'
+  };
+  function build() {
+    var t = PARTS.head + PARTS.battle;
+    document.querySelectorAll('#ai-parts [data-part]').forEach(function (c) { if (c.checked) t += PARTS[c.dataset.part]; });
+    document.getElementById('ai-text').value = t;
+    document.getElementById('ai-size').textContent = t.length + ' characters · about ' + Math.round(t.length / 4) + ' tokens with the full chapter 4 left out of this preview';
+  }
+  document.getElementById('ai-parts').addEventListener('change', build);
+  document.getElementById('ai-copy').addEventListener('click', function () { window.mockToast('Prompt copied. Paste it into a chat with Claude.'); });
+  document.getElementById('ai-file').addEventListener('click', function () { window.mockToast('Saved as hel-fenn-chapter-5.md.'); });
+  build();
 })();
 </script>
 </body>

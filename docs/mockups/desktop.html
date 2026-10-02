@@ -157,8 +157,12 @@
     .crumbs { min-width: 0; }
   }
   /* sheets sit in the middle of a wide screen, not at its foot */
+  dialog.page-panel { max-width: min(1100px, 94vw); width: 94vw; height: 88dvh; display: none; }
+  dialog.page-panel[open] { display: grid; grid-template-rows: auto 1fr; gap: var(--s2); }
+  dialog.page-panel iframe { width: 100%; height: 100%; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
   @media (min-width: 1024px) {
     dialog.sheet { margin: auto; max-width: 460px; border-bottom: 1px solid var(--border); border-radius: 12px; }
+    dialog.sheet.page-panel { max-width: min(1100px, 94vw); }
     dialog.sheet .sheet-grip { display: none; }
   }
 </style>
@@ -176,7 +180,6 @@
         <li><a href="desktop.html?view=story#roster">Story and what changed</a></li>
         <li><a href="desktop.html?view=after#roster">After battle 5</a></li>
         <li><a href="trading-post.html">Trading Post, full page</a></li>
-        <li><a href="roster.html">Roster as on the phone</a></li>
       </ul>
     </section>
     <p class="small muted">Arrangement and views are kept on this device.</p>
@@ -197,6 +200,13 @@
   </main>
 </div>
 <nav class="nav" data-current="Warbands"></nav>
+
+<!-- A screen the desktop has no panel of its own for yet opens here, inside
+     the desktop: never a jump to the phone's layout (Rob, 02.10.2026). -->
+<dialog class="sheet page-panel" id="sheet-page" aria-labelledby="page-title">
+  <div class="row between"><h2 id="page-title">Page</h2><button type="button" class="btn-quiet" data-close>Close</button></div>
+  <iframe id="page-frame" title="Page"></iframe>
+</dialog>
 
 <dialog class="sheet" id="sheet-panel" aria-labelledby="pm-title">
   <div class="sheet-grip"></div>
@@ -482,13 +492,14 @@
     var table = '<table class="stats"><thead><tr>' + KEYS.map(function (k) { return '<th>' + k + '</th>'; }).join('') + '</tr></thead><tbody><tr>' +
       w.p.map(function (v, i) { var k = KEYS[i], c = (w.up || []).indexOf(k) >= 0 ? ' class="up"' : (w.down || []).indexOf(k) >= 0 ? ' class="down"' : ''; return '<td' + c + '>' + v + '</td>'; }).join('') + '</tr></tbody></table>';
     var pips = th.map(function (t) { return '<span class="pip ' + (t <= w.start ? 'base' : t <= w.xp ? 'on' : t === next ? 'next' : '') + '">' + t + '</span>'; }).join('');
-    var facts = [['Equipment', w.gear.join(', ')]];
-    if (w.skills) facts.push(['Skills', w.skills.join(', ')]);
-    if (w.injuries) facts.push(['Injuries', w.injuries.join(', ')]);
+    // words with rules: hover or tap for what they do
+    var facts = [['Equipment', window.mockTips(w.gear)]];
+    if (w.skills) facts.push(['Skills', window.mockTips(w.skills)]);
+    if (w.injuries) facts.push(['Injuries', window.mockTips(w.injuries)]);
     return '<div><h3>' + esc(w.name) + '</h3><p class="small muted">' + esc(w.type) + '</p></div>' + (chips(w) ? '<div class="row">' + chips(w) + '</div>' : '') + table +
       '<div class="pips" aria-label="Advances at ' + th.join(', ') + '">' + pips + '</div>' +
       '<div class="row between"><span class="small muted">Exp ' + w.xp + (next != null ? ' · next advance at ' + next : '') + '</span><button type="button" class="btn-quiet" data-xp aria-label="One experience more">+1 Exp</button></div>' +
-      '<dl class="facts">' + facts.map(function (f) { return '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join('') + '</dl>' +
+      '<dl class="facts">' + facts.map(function (f) { return '<dt>' + f[0] + '</dt><dd>' + f[1] + '</dd>'; }).join('') + '</dl>' +
       '<div class="row">' + (due(w) ? '<button type="button" class="btn" data-adv>Advance</button>' : '') +
       '<a class="btn-quiet" href="story.html?who=' + w.id + '">His story</a><a class="btn-quiet" href="roster.html">Injuries on the Roster</a></div>';
   }
@@ -564,7 +575,7 @@
     var copy = '';
     for (var i = 0; i < talk.copies; i++) copy += '<a class="wtile" href="#roster">' + art('caravan') + '<span><b>The Silver Caravan (copy)</b><small>on this computer only · not in a campaign</small></span></a>';
     return '<a class="wtile" href="#roster">' + art('caravan') + '<span><b>The Silver Caravan</b><small>Mercenaries – Reikland · Rating ' + rating() + ' · ' + st.gold + ' gc</small><span class="chip good">✓ After battle 5</span></span></a>' + copy +
-      '<button type="button" class="btn-quiet" data-import>Import a warband</button>';
+      '<div class="row"><a class="btn" href="warbands.html#new">New warband</a><button type="button" class="btn-quiet" data-import>Import a warband</button></div>';
   }
   function drawCampaigns() {
     return '<a class="wtile" href="#campaign"><span class="art-row">' + art('caravan', 'small') + art('penitents', 'small') + art('skrittle', 'small') + '</span><span><b>The Hel Fenn Campaign</b><small>3 warbands · battle 6 being played · you lead</small></span></a>' +
@@ -645,6 +656,9 @@
   function drawAccount() {
     return '<dl class="facts"><dt>Name</dt><dd>Rob</dd><dt>Authenticator</dt><dd>✓ on (leaders need it)</dd><dt>Password</dt><dd>set · changed 3 weeks ago</dd></dl>' +
       '<p class="label">Theme</p><div class="row"><label class="check"><input type="radio" name="theme" data-set-theme="chronicle"> Chronicle — dark</label><label class="check"><input type="radio" name="theme" data-set-theme="parchment"> Parchment — light</label></div>' +
+      // the layout is chosen here, never by the app on its own (Rob, 02.10.2026)
+      '<p class="label">Layout on this device</p><div class="row"><label class="check"><input type="radio" name="layout" checked> Desktop — panels side by side</label><label class="check"><input type="radio" name="layout" data-layout="phone"> Phone — one screen at a time</label></div>' +
+      '<p class="small muted">Chosen once per device; the app does not switch by itself.</p>' +
       '<div class="row"><a class="btn-quiet" href="more.html">Password, authenticator, admin</a></div>';
   }
   function drawDevices() {
@@ -898,6 +912,27 @@
   draw();
   // after mockups.js has drawn the sidebar's places
   document.addEventListener('DOMContentLoaded', redraw);
+})();
+
+/* The desktop never leaves for the phone's layout (Rob, 02.10.2026): a
+   screen it has no panel of its own for opens inside it; changing the
+   layout is a setting (More → Account). */
+(function () {
+  window.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    var href = a.getAttribute('href') || '';
+    if (!/\.html/.test(href) || /^(desktop|index)\.html/.test(href)) return;
+    e.preventDefault();
+    var hash = href.indexOf('#') >= 0 ? href.slice(href.indexOf('#')) : '';
+    var base = hash ? href.slice(0, href.indexOf('#')) : href;
+    document.getElementById('page-frame').src = base + (base.indexOf('?') >= 0 ? '&' : '?') + 'embed=1' + hash;
+    document.getElementById('page-title').textContent = (a.textContent || '').trim() || base;
+    window.mockOpen('sheet-page');
+  }, true);
+  document.addEventListener('change', function (e) {
+    if (e.target.matches && e.target.matches('[data-layout="phone"]') && e.target.checked) location.href = 'home.html';
+  });
 })();
 </script>
 </body>

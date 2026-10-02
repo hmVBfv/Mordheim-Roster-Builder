@@ -37,7 +37,7 @@
       <div class="list" id="mine">
         <a class="tile" href="roster.html"><svg class="art" data-art="caravan" aria-hidden="true" focusable="false"></svg><h3>The Silver Caravan</h3><span class="muted">Mercenaries – Reikland · Hel Fenn campaign · Rating 118 · 55 gc</span><span class="chip good" style="justify-self: start">✓ After battle 5</span></a>
       </div>
-      <button type="button" class="btn-quiet" data-open="sheet-import">Import a warband</button>
+      <div class="row"><button type="button" class="btn" data-open="sheet-new">New warband</button><button type="button" class="btn-quiet" data-open="sheet-import">Import a warband</button></div>
     </section>
 
     <section class="stack" aria-labelledby="others-h">
@@ -60,6 +60,26 @@
     <ul class="roster-lines" id="wb-lines"></ul>
     <p class="small muted">Read only: only Anna changes her warband. Her notes and story follow her visibility choices.</p>
     <div class="row"><a class="btn-quiet" href="timeline.html">Their story in the timeline</a><button type="button" class="btn-quiet" data-close>Close</button></div>
+  </form>
+</dialog>
+
+<!-- A new warband, as the app starts one (app /warbands/new): the warband
+     from the list, grouped by grade, its variant, a name. -->
+<dialog class="sheet" id="sheet-new" aria-labelledby="new-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-new">
+    <h2 id="new-title">New warband</h2>
+    <label class="field"><span class="small">Warband</span>
+      <select class="select" id="new-wb">
+        <optgroup label="Core (rulebook)"><option value="merc" selected>Mercenaries · 500 gc</option><option value="possessed">Cult of the Possessed · 500 gc</option><option value="sisters">Sisters of Sigmar · 500 gc</option><option value="wh">Witch Hunters · 500 gc</option><option value="undead">Undead · 500 gc</option><option value="skaven">Skaven · 500 gc</option></optgroup>
+        <optgroup label="1a"><option value="orcmob">Orc Mob · 500 gc</option><option value="dwarfs">Dwarf Treasure Hunters · 500 gc</option><option value="kislev">Kislevites · 500 gc</option></optgroup>
+        <optgroup label="1b"><option value="carnival">Carnival of Chaos · 500 gc</option><option value="marauders">Marauders of Chaos · 500 gc</option><option value="pirates">Pirates · 500 gc</option></optgroup>
+      </select></label>
+    <div class="field" id="new-var-f"><span class="small">Variant</span>
+      <div class="seg" id="new-var" role="group" aria-label="Variant"><button type="button" data-value="Reikland" aria-pressed="true">Reikland</button><button type="button" data-value="Middenheim">Middenheim</button><button type="button" data-value="Marienburg">Marienburg</button></div></div>
+    <label class="field"><span class="small">Name</span><input class="input" id="new-name" placeholder="Mercenaries" autocomplete="off"></label>
+    <p class="small muted">It starts on this phone with its gold to spend; the roster opens to recruit the first warriors. Joining a campaign sends it to the server.</p>
+    <div class="row"><button class="btn" value="new">Start the warband</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
   </form>
 </dialog>
 
@@ -92,6 +112,25 @@ Ulrich the Grey, Mercenary Captain …</textarea></label>
     var art = document.getElementById('wb-art'); art.dataset.art = b.dataset.wb; window.mockArt(art);
     document.getElementById('wb-lines').innerHTML = w.rows.map(function (r) { return '<li><span>' + esc(r[0]) + '</span><span>' + esc(r[1]) + '</span></li>'; }).join('');
     window.mockOpen('sheet-wb');
+  });
+  var wbSel = document.getElementById('new-wb');
+  // Home's "New warband" lands here with the sheet open.
+  if (location.hash === '#new') window.mockOpen('sheet-new');
+  wbSel.addEventListener('change', function () {
+    document.getElementById('new-var-f').hidden = wbSel.value !== 'merc';
+    document.getElementById('new-name').placeholder = wbSel.options[wbSel.selectedIndex].text.split(' · ')[0];
+  });
+  document.getElementById('form-new').addEventListener('submit', function () {
+    var label = wbSel.options[wbSel.selectedIndex].text.split(' · ')[0];
+    var v = wbSel.value === 'merc' ? ' – ' + document.querySelector('#new-var [aria-pressed=true]').dataset.value : '';
+    var name = document.getElementById('new-name').value.trim() || label;
+    var a = document.createElement('a');
+    a.className = 'tile'; a.href = 'roster.html';
+    a.innerHTML = '<h3></h3><span class="muted"></span>';
+    a.querySelector('h3').textContent = name;
+    a.querySelector('span').textContent = label + v + ' · 500 gc to spend · on this phone only';
+    document.getElementById('mine').append(a);
+    window.mockToast(name + ' started. In the app its roster opens now.', function () { a.remove(); });
   });
   document.getElementById('form-import').addEventListener('submit', function () {
     var a = document.createElement('a');
