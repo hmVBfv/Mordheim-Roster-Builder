@@ -9,3 +9,4 @@ export const MapIcon = (): ReactElement => <svg {...base}><path d="M3 6l6-2 6 2 
 export const QuillIcon = (): ReactElement => <svg {...base}><path d="M20 4c-6 0-11 5-12 12l-2 4" /><path d="M8 16c4 0 8-3 9-8" /></svg>;
 export const MoreIcon = (): ReactElement => <svg {...base}><circle cx="5" cy="12" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="19" cy="12" r="1.2" /></svg>;
 export const IconClose = (): ReactElement => <svg {...base}><path d="M6 6l12 12M18 6L6 18" /></svg>;
+export const IconEdit = (): ReactElement => <svg {...base}><path d="M4 20h4l11-11-4-4L4 16z" /><path d="M13 7l4 4" /></svg>;

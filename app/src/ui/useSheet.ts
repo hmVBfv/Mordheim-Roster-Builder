@@ -20,7 +20,10 @@ export function useSheet() {
     const onPop = () => {
       if (leaving.current) { // our own step back after closing
         leaving.current = false;
-        const f = after.current; after.current = null; f?.();
+        // run it once every sheet has seen this step back: a sheet opened by
+        // it would otherwise take the same event for Back and close again
+        const f = after.current; after.current = null;
+        if (f) setTimeout(f, 0);
       } else if (d.open) { // Back while the sheet is open
         d.dataset.byBack = '1';
         d.close();

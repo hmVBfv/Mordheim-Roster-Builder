@@ -3,7 +3,7 @@
    stash*, setGoldCurrent). Every action returns a new state. */
 import type { Model, StashItem, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
-import type { Ctx } from '../rules/context.ts';
+import { ctxOf, type Ctx } from '../rules/context.ts';
 import { henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
 import { withFreeDagger, upgradeBase, upgradePaid, upgradeTargets } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
@@ -98,6 +98,24 @@ export function setQty(ctx: Ctx, uid: number, v: unknown): WarbandState {
     else if (q < was) m.xpPaid = Math.max(0, (Number(m.xpPaid) || 0) - (was - q) * henchRecruitSurcharge(c, m));
     m.qty = q;
   });
+}
+
+/** Lets man `i` of a henchman group go (new in the app; the Roster Builder
+    could only shrink a group from its end): his name goes with him, and the
+    group shrinks by one exactly as setQty does, experience surcharge
+    refunded. The last man is not dismissed this way – that is removing the
+    group (removeUnit). */
+export function dismissMember(ctx: Ctx, uid: number, i: number): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  const q = Math.max(1, Number(m0?.qty) || 1);
+  if (!m0 || q <= 1 || !Number.isInteger(i) || i < 0 || i >= q) return ctx.s;
+  const named = update(ctx, (d) => {
+    const m = findModel(d, uid);
+    if (!m || !Array.isArray(m.names)) return;
+    m.names.splice(i, 1);
+    if (!m.names.some((x) => (x || '').trim())) delete m.names;
+  });
+  return setQty(ctxOf(ctx.data, named), uid, q - 1);
 }
 
 export function toggleEq(ctx: Ctx, uid: number, nm: string, on: boolean): WarbandState {
