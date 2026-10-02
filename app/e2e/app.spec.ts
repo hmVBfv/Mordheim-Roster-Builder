@@ -44,11 +44,11 @@ async function useTheme(page: Page, theme: string) {
   await page.addInitScript((t) => { localStorage.setItem('mordheim-theme', t); }, theme);
 }
 
-async function importText(page: Page, text: string) {
+async function importText(page: Page, text: string, heading = 'The Silver Caravan') {
   await page.getByRole('button', { name: 'Import a warband' }).first().click();
   await page.getByRole('textbox').fill(text);
   await page.getByRole('button', { name: 'Import', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
 }
 
 async function importSample(page: Page) {
@@ -255,6 +255,45 @@ for (const theme of THEMES) {
     // after a reload, the same
     await page.reload();
     await expect.poll(gold).toBe(start - 25);
+  });
+}
+
+/* Phase 3c: mutations (and Blessings of Nurgle) and the Mark of Chaos. */
+for (const theme of THEMES) {
+  test(`mutations, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    const sheet = page.locator('dialog[open]');
+    await importText(page, JSON.stringify({ wb: 'possessed', name: 'The Fallen Choir', models: [{ uid: 1, uid_def: 'mag' }, { uid: 2, uid_def: 'mut', name: 'Grell' }] }), 'The Fallen Choir');
+    await expect(page.getByRole('list', { name: 'Warnings' })).toContainText('Mutant needs at least 1 mutation');
+    await page.getByRole('button', { name: 'More for Grell', exact: true }).click();
+    await sheet.getByRole('button', { name: 'Mutations' }).click();
+    await sheet.getByRole('button', { name: 'Great Claw, 50 gc' }).click();
+    await sheet.getByRole('button', { name: 'Cloven Hooves, 40 gc' }).click();
+    await expect(sheet).toContainText('Together: 130 gc');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-mutations`);
+    await sheet.getByRole('button', { name: 'Close' }).click();
+    const grell = page.getByRole('article', { name: 'Grell' });
+    await expect(grell).toContainText('Great Claw, Cloven Hooves');
+    await expect(page.getByRole('list', { name: 'Warnings' })).not.toContainText('Mutant needs');
+  });
+
+  test(`the Mark of Chaos, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    const sheet = page.locator('dialog[open]');
+    await importText(page, JSON.stringify({ wb: 'maraudersofchaos', name: 'Sons of the Crow', models: [{ uid: 1, uid_def: 'chieftain', name: 'Skarr' }, { uid: 2, uid_def: 'seer', name: 'Vala' }] }), 'Sons of the Crow');
+    await page.getByRole('button', { name: 'More for Vala', exact: true }).click();
+    await sheet.getByRole('button', { name: /Mark of Chaos/ }).click();
+    await sheet.getByRole('button', { name: /^Mark of Tchar/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-mark`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('article', { name: 'Vala' })).toContainText('Sorcerer of Tchar');
+    await page.getByRole('button', { name: 'More for Skarr', exact: true }).click();
+    await sheet.getByRole('button', { name: /^Take the Mark of Tchar/ }).click();
+    await expect(page.getByRole('article', { name: 'Skarr' })).toContainText('Touched by Tchar');
   });
 }
 

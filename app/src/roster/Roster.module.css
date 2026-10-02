@@ -539,3 +539,9 @@
   border-top: 1px solid var(--border);
   font-weight: 600;
 }
+
+/* a price on a toggle stays on one line */
+.price {
+  flex: none;
+  white-space: nowrap;
+}

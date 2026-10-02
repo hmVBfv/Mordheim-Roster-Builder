@@ -100,6 +100,20 @@ sollen, muss `core/` sich noch wie die alte App verhalten. Danach wird jede
 Ausnahme in den Paritätstests (`walk.ts`, `injuries.parity.test.ts`) und in der
 Liste der Legacy-Tests, die bewusst anders ausgehen.
 
+## Zur Entscheidung: Mutationen (Schritt 3c, 02.10.2026)
+
+1. **Mehrfach dieselbe Mutation.** Das UFAQ (Games Workshop FAQ) erlaubt
+   mehrere gleiche Mutationen mit zusammenzählender Wirkung („a Possessed
+   with two Blackbloods costs 180 GC“). Der Roster Builder und `core`
+   erlauben jede Mutation nur einmal (`toggleMutation`). Vorschlag:
+   übernehmen, als Anzahl je Mutation.
+2. **Kauf nur beim Anwerben.** Regelbuch S. 57: Mutationen werden nur beim
+   Anwerben gekauft. Die App weist nach der ersten Schlacht darauf hin,
+   bucht eine Änderung aber weiter ins Kassenbuch, statt sie zu sperren –
+   der Builder weiß nicht, in welcher Runde ein Krieger kam, und die
+   Fertigkeit „Mutant“ (Beastmen) erlaubt später genau eine. Vorschlag: so
+   lassen; sperren erst, wenn die Anwerberunde festgehalten wird.
+
 ## V1 – Ablauf einer Verletzung
 
 Quellen, in der Rangfolge aus `CLAUDE.md`: Ultimate FAQ (UFAQ) 10.2, 10.3,

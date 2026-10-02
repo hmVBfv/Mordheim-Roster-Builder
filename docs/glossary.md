@@ -53,6 +53,8 @@ Begriff einführt, trägt ihn hier ein.
 | Kassenbuch (V7) | Ledger | `s.ledger`, `ledgerBalance()`, `settle()`, `keepGold()`, `bookGold()` |
 | Suchwurf nach Seltenem | Search (rare) | `searchOdds()`, `searchBlock()`, `recordSearch()` |
 | Veteranenwurf (Männer mit Erfahrung anwerben) | Veterans roll | `setVeteransRoll()`, `veteransOf()`, `postbattle[round].veterans`, `henchRecruitSurcharge()`, `m.xpPaid` |
+| Mutationen, Segnungen des Nurgle | Mutations · Blessings of Nurgle | `MutationSheet`, `mutationView()`, `toggleMutation()`, `mutCost()` |
+| Mal des Chaos (Marauder) | Mark of Chaos | `MarkSheet`, `markView()`, `setMark()`, `setCaster()` (Häuptling nimmt das Mal) |
 | Mehr Männer für eine Gruppe | More men · + Man | `MoreMenSheet`, `addMen()`, `moreMenMax()` |
 | Handel gesperrt (ab der ersten Schlacht) | – | `tradeLocked()` |
 | Kaufen (Trading Post) | Buy | `buyItem()`, `commonPrice()` |
