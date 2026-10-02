@@ -81,6 +81,7 @@
   max-width: 640px;
   margin: auto auto 0;
   max-height: 85dvh;
+  overflow-y: auto;
 }
 
 .sheet::backdrop {
