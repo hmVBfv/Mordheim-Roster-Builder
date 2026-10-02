@@ -361,6 +361,26 @@ Neue Logik in `core/src/trade/` (`ledger.ts`, `market.ts`), Tests in
    die Regeldaten aufnehmen.
 2. **Außer Gefecht in der letzten Schlacht** schließt vom Suchen aus; das
    prüft der Builder erst, wenn er Schlachten führt (4a).
+3. **Gewöhnlich oder selten?** Nach der ersten Schlacht bietet der Trading
+   Post nur, was die Preistabelle gewöhnlich nennt; Seltenes aus den Listen
+   (Pistole, Handgun, Elfenbogen …) gibt es nur noch über den Suchwurf
+   (`tradeKind`). Listen und Preistabelle benennen manches verschieden; der
+   Builder ordnet zu über den deutschen Schlüssel, den englischen Namen, den
+   Namen in Klammern („Jagdgewehr“ = *Hunting rifle (Hochland long rifle)*),
+   ein Paar über die einzelne Waffe und „A/B“ über beide. Diese Gegenstände
+   kennt die Preistabelle nicht; der Trading Post bietet sie gesondert an
+   („Not in the price chart“), und der Tisch entscheidet: Black lotus und
+   Dark venom für Geschosse, Bone helmet, Mark of the Old Ones, Oversized
+   Jaws, Poison Glands (Lizardmen); Cathayan Silk Cloak; die Ausrüstungen
+   der Pit Fighters (Chaos-, Empire-, Orc-, Skink-, Undead-, Witch-Elf-Kit);
+   Choppa; Cutlass und die Ladungen der Swivel Gun (Pirates);
+   Double-barrelled Hochland long rifle; Gnoblar Fighter; Gral-Reliquie;
+   Hedonist Whip und Slaaneshi Man-Catcher; Lizardman Sword, Lizardmen Skin
+   Cloak, Schädelmaske, Trophy Slann Headdress, Warhound (Lustrian Reavers);
+   Pferd, Warhorse, Warhorse (upgrade); Pigeon bombs; Poisoned Daggers;
+   Staff, Staff/Club; Throwing axes, spears, stars, weapons. Vorschlag: in
+   den Regeldaten je Gegenstand „gewöhnlich“ oder „selten N“ nachtragen,
+   mit Quelle.
 
 
 **Schon umgesetzt, in beiden Apps:** die Gründungspreise (Tabelle

@@ -8,6 +8,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { Hire, Warrior } from '../roster/Cards.tsx';
+import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
+import { equipmentView } from '../roster/equipment.ts';
 import { MenuSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
 import { useEditor } from '../roster/useEditor.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
@@ -21,7 +23,15 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const data = useGameData();
   const ed = useEditor(data, rec);
   const v = useMemo(() => rosterView(data, ed.state), [data, ed.state]);
+  const ctx = useMemo(() => core.ctxOf(data, ed.state), [data, ed.state]);
+  // from the first battle on, equipment changes at the Trading Post and
+  // nothing a warrior leaves behind is refunded (V4–V7)
+  const locked = core.tradeLocked(ctx);
   const navigate = useNavigate();
+  const { ref: eqRef, open: openEqSheet, close: closeEq } = useSheet();
+  const [eqOf, setEqOf] = useState<number | null>(null);
+  const eqView = eqOf != null ? equipmentView(ctx, eqOf) : null;
+  const trade = `/warbands/${rec.id}/trade`;
 
   const { ref: menuRef, open: openMenuSheet, close: closeMenu } = useSheet();
   const [menuOf, setMenuOf] = useState<{ title: string; items: MenuItem[] }>({ title: '', items: [] });
@@ -34,6 +44,9 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const openMenu = (title: string, items: MenuItem[]) => { setMenuOf({ title, items }); openMenuSheet(); };
 
   const warriorMenu = (w: WarriorView) => openMenu(w.name, [
+    locked
+      ? { label: 'Equipment – at the Trading Post', run: () => { void navigate(`${trade}#give`); } }
+      : { label: 'Equipment & rare items', run: () => { setEqOf(w.uid); openEqSheet(); } },
     {
       label: w.hero ? 'Name' : 'Name of the group',
       run: () => askName({
@@ -43,10 +56,9 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       }),
     },
     ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
-    {
-      label: 'Remove from the roster', danger: true,
-      run: () => ed.edit((c) => core.removeUnit(c, w.uid), `${w.name} removed from the roster.`),
-    },
+    locked
+      ? { label: 'Dismiss – his equipment goes to the stash', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
+      : { label: 'Remove from the roster', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} removed from the roster.`) },
   ]);
 
   const hireMenu = (h: HireView) => {
@@ -61,7 +73,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       },
       {
         label: 'Dismiss — upkeep ends', danger: true,
-        run: () => ed.edit((c) => (hs ? core.unhireHS(c, h.uid) : core.unhireDP(c, h.uid)), `${h.name} is dismissed.`),
+        run: () => ed.edit((c) => core.dismissHire(c, h.uid, hs ? 'hs' : 'dp'), `${h.name} is dismissed.`, { gold: locked ? 'keep' : 'settle' }),
       },
     ]);
   };
@@ -72,7 +84,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       title: m.name, label: `Name of this man of ${w.name}`, value: m.named ? m.name : '', fallback: m.name,
       save: (nm) => ed.edit((c) => core.setMemberName(c, w.uid, i, nm), 'Name saved.'),
       extra: w.count > 1
-        ? { label: 'Dismiss him', run: () => ed.edit((c) => core.dismissMember(c, w.uid, i), `${m.name} leaves ${w.name}.`) }
+        ? { label: 'Dismiss him', run: () => ed.edit((c) => core.dismissMan(c, w.uid, i), `${m.name} leaves ${w.name}.`, { gold: locked ? 'keep' : 'settle' }) }
         : undefined,
     });
   };
@@ -133,6 +145,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       )}
       <div className={ui.row}>
         <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
+        <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <button type="button" className={ui.buttonQuiet}
           onClick={() => { void db.warbands.delete(rec.id).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
@@ -142,6 +155,12 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
 
       <MenuSheet dialogRef={menuRef} close={closeMenu} title={menuOf.title} items={menuOf.items} />
       <NameSheet dialogRef={nameRef} close={closeName} naming={naming} />
+      <EquipmentSheet dialogRef={eqRef} close={closeEq} view={eqView} act={{
+        qty: (key, q) => ed.edit((c) => core.setEqQty(c, eqOf!, key, q)),
+        addRare: (de) => ed.edit((c) => core.addRare(c, eqOf!, de)),
+        rareQty: (de, q) => ed.edit((c) => core.setRareQty(c, eqOf!, de, q)),
+        target: (de, nm) => ed.edit((c) => core.setRareTarget(c, eqOf!, de, nm)),
+      }} />
       <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
         onRecruit={(u) => ed.edit((c) => core.addUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />
       {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}

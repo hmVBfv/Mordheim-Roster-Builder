@@ -1765,3 +1765,12 @@ price, giving between warriors and the stash, searching for rare items and
 dismissing after the first battle all keep gold in hand and the ledger in
 step. The search modifiers are only those the audited data states; the rest
 is a number the player enters, until Rob decides otherwise.
+
+The Trading Post followed on the same day. Before the first battle a
+warrior's ⋯ menu opens his list – a stepper per item, the free dagger
+first, rare items from the catalogue – exactly the Roster Builder's
+choices. From the first battle on the same menu leads to the Trading Post,
+and every edit of the roster goes through the ledger: recruiting a man is
+booked under the notice the player sees, dismissing one sends his gear to
+the stash and refunds nothing. The search sheet takes the roll as the
+table rolled it; the app only says what is needed and what the odds were.
