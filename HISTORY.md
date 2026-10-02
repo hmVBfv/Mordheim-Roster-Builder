@@ -1852,3 +1852,14 @@ group with experience, the roll of the round: entered once, kept with the
 round's post-battle state, and spent down as men join, so a second group
 sees what the first left over. The editor tests had to learn to open a
 sheet for this, with a few lines of <dialog> that jsdom lacks.
+
+The last pieces of 3c were the Chaos ones: Mutations and the Blessings of
+Nurgle on a warrior's ⋯ menu, each with its price and rule text and the
+sum the rulebook asks for (the dearest at its price, every further one
+double), and for the Marauders of Chaos the Mark the Seer must bear and the
+Chieftain may take. Both are a list and a pick from patterns the app
+already has, so, as the roadmap allows, the app itself is their mockup.
+Writing them turned up two questions for Rob: the FAQ allows the same
+mutation more than once, which neither builder does, and the rule that
+mutations are bought only on recruitment cannot be enforced while nobody
+records when a warrior was recruited.

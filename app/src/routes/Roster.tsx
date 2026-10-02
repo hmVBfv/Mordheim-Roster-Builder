@@ -13,6 +13,8 @@ import { advanceView, takenOf } from '../roster/advance.ts';
 import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
 import { injuryEnv } from '../roster/injury.ts';
 import { CaptiveSheet, InjuriesSheet, InjurySheet, type InjuryFor } from '../roster/InjurySheet.tsx';
+import { markRole, markView, mutationView } from '../roster/chaos.ts';
+import { MarkSheet, MutationSheet } from '../roster/ChaosSheets.tsx';
 import { equipmentView } from '../roster/equipment.ts';
 import { MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
 import { moreMenView } from '../roster/men.ts';
@@ -58,6 +60,12 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   };
   const { ref: injuriesRef, open: openInjuriesSheet, close: closeInjuries } = useSheet();
   const [injuriesOf, setInjuriesOf] = useState<number | null>(null);
+  const { ref: mutRef, open: openMutSheet, close: closeMut } = useSheet();
+  const [mutOf, setMutOf] = useState<number | null>(null);
+  const mutView = mutOf != null ? mutationView(ctx, mutOf) : null;
+  const { ref: markRef, open: openMarkSheet, close: closeMark } = useSheet();
+  const [markKey, setMarkKey] = useState(0);
+  const mView = markView(ctx);
   const { ref: menRef, open: openMenSheet, close: closeMen } = useSheet();
   const [menFor, setMenFor] = useState<{ key: number; uid: number } | null>(null);
   const menView = menFor ? moreMenView(ctx, menFor.uid) : null;
@@ -122,6 +130,20 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       }),
     },
     ...(w.xp ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: w.uid, name: w.name }); openTakenSheet(); } }] : []),
+    ...(() => {
+      const mv = mutationView(ctx, w.uid);
+      return mv ? [{ label: mv.label, run: () => { setMutOf(w.uid); openMutSheet(); } }] : [];
+    })(),
+    ...(() => {
+      const role = markRole(ctx, w.uid);
+      if (role === 'seer') return [{ label: 'Mark of Chaos…', run: () => { setMarkKey((k) => k + 1); openMarkSheet(); } }];
+      const mk = ctx.s.mark ? core.markName(ctx, ctx.s.mark) : '';
+      const on = !!ctx.s.models.find((m) => m.uid === w.uid)?.caster;
+      if (role === 'chief' && mk) {
+        return [{ label: on ? 'Give up the Mark' : `Take the ${mk.split(' — ')[0]}`, run: () => ed.edit((c) => core.setCaster(c, w.uid, !on), on ? `${w.name} no longer bears the Mark.` : `${w.name} takes the Mark.`) }];
+      }
+      return [];
+    })(),
     ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
     ...(w.injuries.length || w.missGames ? [{ label: 'Injuries – correct', run: () => { setInjuriesOf(w.uid); openInjuriesSheet(); } }] : []),
     ...(w.captive != null ? [{ label: 'Captivity – how it ended…', run: () => openCaptive(w) }] : []),
@@ -237,6 +259,10 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         onRemove={(c, text) => { if (takenFor) correct(takenFor.id, c, text); }} />
       <InjurySheet dialogRef={injRef} close={closeInj} who={injFor}
         onApply={(r, text) => { if (injFor) { const id = injFor.uid; ed.edit((c) => core.injure(c, id, r), text, { gold: 'keep' }); } }} />
+      <MutationSheet dialogRef={mutRef} close={closeMut} view={mutView}
+        onToggle={(key, on, name) => { if (mutOf != null) { const uid = mutOf; ed.edit((c) => core.toggleMutation(c, uid, key, on), locked ? `${name} ${on ? 'bought' : 'taken back'}.` : undefined); } }} />
+      <MarkSheet dialogRef={markRef} close={closeMark} view={mView ? { ...mView, key: markKey } : null}
+        onApply={(mark, text) => ed.edit((c) => core.setMark(c, mark), text)} />
       <MoreMenSheet dialogRef={menRef} close={closeMen} view={menView && menFor ? { ...menView, key: menFor.key } : null}
         onAdd={(n, roll, names, text) => {
           if (!menFor) return;
