@@ -15,7 +15,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
-const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give', 'hire', 'chronicle',
+const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give', 'hire', 'chronicle', 'house-rules', 'house-rules#campaign', 'house-rules#leader',
   'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more', 'desktop'];
 const PAGES = ['index', ...SCREENS];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
@@ -318,4 +318,34 @@ test('mockup warbands: a new warband is started from the list, or from Home', as
   await page.getByRole('button', { name: 'Start the warband' }).click();
   await expect(page.locator('#mine')).toContainText('Clan Gnaw');
   await expect(page.locator('#mine')).toContainText('Skaven');
+});
+
+/* Phase 3e: a warband's house rules, before the code (roadmap: the mockup
+   comes first). */
+test('mockup house-rules: a rule switched on shows its value, its effect and its declaration', async ({ page }) => {
+  await go(page, 'house-rules');
+  await page.getByRole('checkbox', { name: 'Armour', exact: true }).check();
+  await page.getByRole('button', { name: 'More: Armour' }).click();
+  await expect(page.locator('#declared')).toContainText('Armour: 85 %');
+  await expect(page.locator('#effect')).toContainText('as written: 415 of 500');
+  await page.getByRole('checkbox', { name: 'Body armour only, not helmets, shields and bucklers' }).check();
+  await expect(page.locator('#declared')).toContainText('body armour only');
+  await page.getByRole('group', { name: 'Hired Sword grades played' }).getByRole('button', { name: '2a' }).click();
+  await expect(page.locator('#count')).toHaveText('2');
+  await page.screenshot({ path: 'test-results/screens/mockup-house-rules-on.png', fullPage: true });
+  await page.getByRole('button', { name: 'All back to the rules as written' }).click();
+  await expect(page.locator('#count')).toHaveText('0');
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.locator('#count')).toHaveText('2');
+});
+
+test('mockup house-rules#campaign: the campaign’s rules count, and a warband built otherwise is flagged', async ({ page }) => {
+  await go(page, 'house-rules#campaign');
+  await expect(page.locator('#flag')).toBeVisible();
+  await expect(page.locator('#flag-text')).toContainText('Armour: 80 % in its file, as written in Hel Fenn');
+  // a player sees what is on, without switches
+  await expect(page.locator('#groups')).toContainText('All daggers free');
+  await expect(page.getByRole('checkbox', { name: 'All daggers free' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Take Hel Fenn’s rules' }).click();
+  await expect(page.locator('#flag')).toBeHidden();
 });

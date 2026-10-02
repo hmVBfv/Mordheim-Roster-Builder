@@ -82,7 +82,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
-| Schalter und Vorgaben, Abweichungen sichtbar, im Export erklärt | ✓ | ✓ | – | manage (Schalter für die Kampagne) | 3 | Mockup für eine Warband ohne Kampagne fehlt |
+| Schalter und Vorgaben, Abweichungen sichtbar, im Export erklärt | ✓ | ✓ | – | house-rules (Warband allein, in einer Kampagne, als Leiter), manage | 3e | Mockup 03.10.2026: alle Hausregeln des Roster Builders in seinen Gruppen, aus = wie geschrieben („Enforce equipment list“ daher umgekehrt als „Equipment beyond the lists“), je Regel was das Regelwerk sagt, Wert nur wenn an, Wirkung auf das Gold einer Gründung, Erklärung für den Export; in einer Kampagne gelten deren Regeln, eine abweichende Datei der Warband wird markiert. „Show rarity“ ist eine Anzeige, keine Regel: Vorschlag, sie unter More zu führen und nicht im Export zu nennen |
 
 ## Kampagne
 
