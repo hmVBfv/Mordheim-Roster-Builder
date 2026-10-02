@@ -71,6 +71,10 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   samt Folgeentscheidungen: `{ hero: { code, saved?, d6?, games?, hates?,
   captured?, pit?, more? } }` oder `{ d6, member? }`; die alte App liest
   darüber hinweg.
+- **Angeworben in Runde** (`models[].joined`, neu, optional): die
+  Kampagnenrunde, in der ein Krieger nach der ersten Schlacht der Warband
+  kam (`recruitUnit`); fehlt er, kam der Krieger mit der Warband. Bis zu
+  seiner ersten Schlacht kauft er von seiner Liste (Rob, 02.10.2026).
 - **Gefangener** (`models[].captive`, neu, optional): `{ by, round,
   casualtyId }` – nach 61 „vorerst gefangen“ (Rob, 02.10.2026); er bleibt im
   Roster, bis `releaseCaptive` den Schlüssel entfernt oder ihn zu den

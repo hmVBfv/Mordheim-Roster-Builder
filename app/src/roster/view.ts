@@ -37,6 +37,9 @@ export interface WarriorView {
   leader: boolean;
   /** A Hero who may lead and does not yet. */
   canLead: boolean;
+  /** He has fought his first battle: equipment at the Trading Post, no more
+      mutations. Until then his own list is open (Rob, 02.10.2026). */
+  fought: boolean;
   exp: number;
   xp: XpView | null;
   advanceDue: boolean;
@@ -148,6 +151,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     promoted: !!m.promoted,
     leader,
     canLead: !leader && core.canBeLeader(ctx, m),
+    fought: core.warriorHasFought(ctx, m),
     exp: Number(m.exp) || 0,
     xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp) : null,
     advanceDue: !!adv?.due,
@@ -157,7 +161,10 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     equipment: [...core.eqDisplayParts(ctx, m), ...core.rareDisplayParts(ctx, m)],
     skills: [...(m.skills ?? [])],
     spells: (m.spells ?? []).map((s) => s.name),
-    mutations: (m.mut ?? []).map((x) => core.mutEN(ctx.data, x)),
+    mutations: [...new Set(m.mut ?? [])].map((x) => {
+      const n = (m.mut ?? []).filter((y) => y === x).length;
+      return core.mutEN(ctx.data, x) + (n > 1 ? ` ×${n}` : '');
+    }),
     mark: core.markRulesFor(ctx, m).map(([n]) => n),
     injuries: (m.inj ?? []).map((j) => j.name + core.injModText(j)),
     retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,

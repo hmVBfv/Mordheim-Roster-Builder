@@ -1863,3 +1863,15 @@ Writing them turned up two questions for Rob: the FAQ allows the same
 mutation more than once, which neither builder does, and the rule that
 mutations are bought only on recruitment cannot be enforced while nobody
 records when a warrior was recruited.
+
+Rob's answers on mutations changed more than mutations. Citing the
+Ultimate FAQ – newly hired warriors are always equipped from the
+warband's list – he moved the line drawn on 29 September: the list is not
+closed for the whole warband after its first battle, but for each warrior
+after his own. So a warrior hired mid-campaign now carries the round he
+joined in, buys from his list at its prices until he has fought (common
+items freely, rare ones only by searching, as the rulebook adds), and buys
+his mutations as he is hired; a recruit who never fought can be taken off
+the roster at his price. The same mutation may now be taken more than once
+where the effects add up, as the FAQ allows, with one constraint Rob gave:
+a claw or tentacle needs an arm to grow from.
