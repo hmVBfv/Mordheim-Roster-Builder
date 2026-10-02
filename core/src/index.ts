@@ -28,6 +28,7 @@ export * from './warband/casualties.ts';
 export * from './warband/injury.ts';
 export * from './warband/veterans.ts';
 export * from './warband/recruits.ts';
+export * from './warband/hires.ts';
 export * from './campaign/territory.ts';
 export * from './campaign/chronicle.ts';
 export * from './campaign/stages.ts';

@@ -85,7 +85,7 @@ const ARM = ['Große Klaue', 'Tentakel'];
 const EXTRA_ARM = 'Zusätzlicher Arm';
 /** No effect that adds up: a second Daemon Soul saves nothing more, a
     second Hideous frightens no more; the Blessings of Nurgle are gifts of
-    one kind each. */
+    one kind each. Confirmed by Rob, 02.10.2026. */
 export const ONCE = ['Dämonenseele', 'Scheußlich', 'Strom der Verderbnis', 'Nurgles Fäule', 'Fliegenschwarm', 'Aufgeblähte Fäulnis', 'Mal des Nurgle'];
 
 const countOf = (mut: readonly string[], nm: string) => mut.filter((x) => x === nm).length;
