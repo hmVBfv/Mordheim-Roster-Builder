@@ -77,10 +77,10 @@ geplant.
 | V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | geplant, Spezifikation [unten](#v1--ablauf-einer-verletzung) |
 | V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | geplant, Spezifikation [unten](#v2--feste-ids-für-gefallene) |
 | V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. mordheimer.net nennt keine solche Ausnahme – weder beim Augur (*Sisters of Sigmar*) noch bei Ergebnis 31 (*Campaigns – Serious Injuries*). | Rob, 28.09.2026: Eine Auslegung nach Absicht gilt nur, wenn mordheimer.net sie übernimmt. Hier nicht, also **RAW**: Der Augur verliert 1 BS wie jeder andere. | entschieden; alte App und `core/` rechnen schon so, Test `core/test/rulings.test.ts` |
-| V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | entschieden, [unten](#entscheidungen-rob-29092026) |
-| V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28./29.09.2026: gewünscht; Sperre für die ganze Warband | entschieden; Gründungspreise schon in beiden Apps (oben, „Erledigt“), der Rest im neuen Builder |
+| V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | entschieden, [unten](#entscheidungen-rob-29092026); Logik in `core/` (3b), Oberfläche folgt |
+| V5 | Startausrüstung nach dem ersten Kampf sperren; danach nur über den Trading Post | Heute lässt die Liste der Einheit jederzeit jeden Gegenstand zum Listenpreis an- und abwählen, auch seltene. RAW (Regelbuch S. 46, 79, 104–105; mordheimer.net *Trading*): nach dem ersten Spiel Seltenes nur mit Suchwurf eines Helden, neue Rekruten nur Gewöhnliches, Verkauf zum halben Preis. | Rob, 28./29.09.2026: gewünscht; Sperre für die ganze Warband | entschieden; Gründungspreise schon in beiden Apps (oben, „Erledigt“), der Rest im neuen Builder; Logik in `core/` (3b), Oberfläche folgt |
 | V6 | Kaufansicht übersichtlich, Tooltips und Erklärungen überall, wo es ohne Zusammenhang unklar ist | Rob, 28.09.2026 | gewünscht; Händler in Pixelart als Idee (Rob, 29.09.2026) | Mockup folgt |
-| V7 | Gold als Kassenbuch statt „Schatz minus Wert“ | Heute ist Gold in der Hand = gespeicherter Schatz − heutiger Wert aller Krieger. Daraus folgen die Fehler aus V4/V5 (Abwählen erstattet, Lager kostet nichts und beim Ausrüsten noch einmal) und Sprünge, wenn sich Preise oder Hausregeln ändern. | Rob, 29.09.2026: ja, so ausführlich wie möglich und nötig | entschieden |
+| V7 | Gold als Kassenbuch statt „Schatz minus Wert“ | Heute ist Gold in der Hand = gespeicherter Schatz − heutiger Wert aller Krieger. Daraus folgen die Fehler aus V4/V5 (Abwählen erstattet, Lager kostet nichts und beim Ausrüsten noch einmal) und Sprünge, wenn sich Preise oder Hausregeln ändern. | Rob, 29.09.2026: ja, so ausführlich wie möglich und nötig | entschieden; Logik in `core/` (3b), Oberfläche folgt |
 
 **Grundsatz (Rob, 28.09.2026):** Ändert mordheimer.net eine Regel nach ihrer
 Absicht (RAI) statt nach dem Wortlaut (RAW), übernehmen wir das – aber nur,
@@ -305,6 +305,63 @@ Ultimate FAQ 10.1 (Stufen 6, 8 und 9) und mordheimer.net *Campaigns* und
 
 **Mockup:** [`trading-post.html`](mockups/trading-post.html) zeigt V4–V7 in
 einer Ansicht (Kaufen, Suchen, Verkaufen, Geben, Kassenbuch).
+
+### Umsetzung in `core/` (Schritt 3b, 02.10.2026)
+
+Neue Logik in `core/src/trade/` (`ledger.ts`, `market.ts`), Tests in
+`core/test/trade.test.ts`. Die Aktionen der alten App bleiben unverändert
+(Parität); was sie am Gold ändern, bucht `settle` ins Kassenbuch.
+
+- **Kassenbuch erst ab der ersten Schlacht** (`tradeLocked` =
+  `warbandHasFought`). Davor rechnet das Gold wie in der alten App; beim
+  ersten Handel danach eröffnet `ensureLedger` mit dem Gold in der Hand.
+  Jede Buchung: `id, kind, amount, text, round, uid, item, qty, found`.
+- **Keine neue Formatnummer.** Abweichend vom Plan („`FORMAT` 3“) ist das
+  Kassenbuch ein zusätzlicher, optionaler Schlüssel: Ein Stand ohne ihn ist
+  weiter gültig, eine Migration braucht es nicht. `stash.gold` wird so
+  nachgeführt, dass die Formel der alten App dasselbe Gold zeigt – die alte
+  App liest einen neuen Stand also richtig, nur ohne Kassenbuch.
+- **Preisänderungen** (Hausregel, Bezirk) bewegen das Gold nicht mehr
+  (`keepGold`).
+- **Kaufen** (`buyItem`): Gewöhnliches aus der Liste des Kriegers zum
+  heutigen Listenpreis, für eine Gruppe ein Stück je Mann; oder Stücke ins
+  Lager. Vor der ersten Schlacht abgelehnt – dann kauft die Warband aus
+  ihren Listen.
+- **Verkaufen** (`sellItem`, `sellPrice`): Hälfte des heute gültigen
+  Preises, bei Seltenem mit Würfelpreis die Hälfte des Grundpreises, für den
+  ganzen Verkauf, abgerundet, mindestens 1 gc; der Preis lässt sich
+  überschreiben (Haggle, Trade). Eine Gruppe verkauft alle Stücke zusammen.
+- **Geben** (`giveItem`): zwischen Kriegern und Lager ohne Gold; Seltenes
+  behält seinen bezahlten Preis. Eine Gruppe gibt einen Gegenstand für alle
+  Männer ab – was der Empfänger nicht braucht, geht ins Lager – und nimmt
+  einen nur, wenn es eines je Mann gibt. Wer ihn nicht tragen darf, bekommt
+  ihn nicht, mit Grund (`canReceive`). Die Waffengrenzen bleiben eine
+  Warnung des Rosters wie in der alten App.
+- **Der erste Dolch** ist der freie und bleibt beim Krieger.
+- **Suchen** (`searchOdds`, `searchBlock`, `recordSearch`): 2W6 ≥ Seltenheit
+  minus Modifikatoren; ein Wurf je Held und Stufe; ein Fund wird bezahlt und
+  geht ins Lager oder direkt an einen Helden, der ihn tragen darf; auch ein
+  Fehlwurf steht im Kassenbuch (0 gc), damit der Held für diese Stufe als
+  „hat gesucht“ gilt.
+- **Entlassen nach der ersten Schlacht** (`dismissWarrior`, `dismissMan`,
+  `dismissHire`): kein Gold zurück; die Ausrüstung geht vorher ins Lager
+  (Tuomas, „Dismiss Hero Equipment“), bei einem Mann seiner Gruppe sein
+  Anteil.
+
+**Zur Entscheidung (Rob):**
+
+1. **Modifikatoren des Suchwurfs.** Der Builder rechnet nur, was die
+   geprüften Regeldaten ausdrücklich sagen: *Streetwise* +2
+   (`data/skills.json`), Marienburg +1, Norse „Reavers“ +1, Kurgan
+   „Difficult Customers“ −1 außer Great Axe und Barbed Whip
+   (`data/warbands.json`). Alles andere – Ruf des Handelswagens der Merchant
+   Caravans, Ogre-Helden der Maneaters, „Gofer“ (3W6, zwei höchste), Einheiten,
+   die nicht suchen dürfen – gibt der Spieler als Zusatz von Hand ein.
+   Vorschlag: so lassen und die übrigen später als strukturierte Felder in
+   die Regeldaten aufnehmen.
+2. **Außer Gefecht in der letzten Schlacht** schließt vom Suchen aus; das
+   prüft der Builder erst, wenn er Schlachten führt (4a).
+
 
 **Schon umgesetzt, in beiden Apps:** die Gründungspreise (Tabelle
 „Erledigt“ oben). Die Stufe der Kampagne entscheidet: bis „Setup“ gilt der

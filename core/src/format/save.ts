@@ -24,8 +24,10 @@ export type LoadResult =
   | { ok: false; msg: string };
 
 /* Keys a save carries at the top level beyond the legacy set: core's uid
-   counter and the narrative fields of the new builder (data-model.md). */
-const KEPT = ['uidSeq', 'canon', 'story'] as const;
+   counter, the narrative fields of the new builder and the gold ledger
+   (data-model.md). None needs a default: a save without them is read as the
+   Roster Builder reads it. */
+const KEPT = ['uidSeq', 'canon', 'story', 'ledger'] as const;
 
 /** An object with some keys renamed, in their order (data RENAMED: items
     that changed their name). A new name that is already there keeps the

@@ -1753,3 +1753,15 @@ menu's step back in the history is one `popstate` event, and every open
 sheet listens for it: the name sheet, opened by the menu's listener, heard
 the same event a moment later and took it for Back. What a closing sheet
 runs afterwards now waits until every listener has seen the event.
+
+Step 3b began in `core/`, before any screen: trading after the first
+battle (V4–V7). The ledger turned out simpler than planned. Instead of a new
+save format, the actions of the Roster Builder run as they are and a booking
+records what they did to gold in hand; the treasury is then set so that the
+old formula – treasury less what the warband owns – shows the same figure. A
+save with a ledger still reads correctly in the old app, and a price change
+no longer moves the gold, which was the point of V7. Buying, selling at half
+price, giving between warriors and the stash, searching for rare items and
+dismissing after the first battle all keep gold in hand and the ledger in
+step. The search modifiers are only those the audited data states; the rest
+is a number the player enters, until Rob decides otherwise.
