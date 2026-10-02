@@ -1774,3 +1774,10 @@ and every edit of the roster goes through the ledger: recruiting a man is
 booked under the notice the player sees, dismissing one sends his gear to
 the stash and refunds nothing. The search sheet takes the roll as the
 table rolled it; the app only says what is needed and what the odds were.
+
+Step 3c opened with advances. The sheet takes the 2D6 as rolled and shows
+the row of the rulebook's table it lands on – a characteristic, offered
+only while below the race's maximum; a skill from the warrior's own lists,
+or for a wizard a spell instead, a known one becoming easier; for a group,
+"The lad's got talent" with the man and his two lists. The app never rolls.
+Mistakes are taken back from the ⋯ menu, each with its Undo.

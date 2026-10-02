@@ -8,6 +8,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { Hire, Warrior } from '../roster/Cards.tsx';
+import { AdvanceSheet, TakenSheet, type AdvanceChoice, type Correction } from '../roster/AdvanceSheet.tsx';
+import { advanceView, takenOf } from '../roster/advance.ts';
 import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
 import { equipmentView } from '../roster/equipment.ts';
 import { MenuSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
@@ -32,6 +34,45 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const [eqOf, setEqOf] = useState<number | null>(null);
   const eqView = eqOf != null ? equipmentView(ctx, eqOf) : null;
   const trade = `/warbands/${rec.id}/trade`;
+  const { ref: advRef, open: openAdvSheet, close: closeAdv } = useSheet();
+  const [advOf, setAdvOf] = useState<{ key: number; id: number | string } | null>(null);
+  const advView = advOf ? advanceView(ctx, advOf.id) : null;
+  const { ref: takenRef, open: openTakenSheet, close: closeTaken } = useSheet();
+  const [takenFor, setTakenFor] = useState<{ id: number | string; name: string } | null>(null);
+  const openAdvance = (id: number | string) => { setAdvOf((p) => ({ key: (p?.key ?? 0) + 1, id })); openAdvSheet(); };
+
+  /* An advance as chosen in the sheet: the matching action of core. */
+  const applyAdvance = (id: number | string, c: AdvanceChoice, text: string) => ed.edit((x) => {
+    if (typeof id === 'string') {
+      if (c.kind === 'stat') return core.addHsAdvance(x, id, c.stat);
+      if (c.kind === 'skill') return core.addHsSkill(x, id, c.skill);
+      if (c.kind === 'spell') return core.addHsSpell(x, id, c.spell);
+      if (c.kind === 'reduce') return core.hsSpellReduce(x, id, (x.s.hired ?? []).find((h) => h.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
+      return x.s;
+    }
+    if (c.kind === 'stat') return core.addAdvance(x, id, c.stat);
+    if (c.kind === 'skill') return core.addSkillFromList(x, id, c.skill);
+    if (c.kind === 'spell') return c.own ? core.addSpellFromAdvance(x, id, c.spell) : core.addSpell(x, id, c.spell);
+    if (c.kind === 'reduce') return core.spellReduce(x, id, x.s.models.find((m) => m.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
+    // The lad's got talent: the man becomes a Hero of his own, with his two lists
+    let s1 = core.promoteHench(x, id, c.man);
+    const hero = s1.models.find((m) => m.promoted && !x.s.models.some((o) => o.uid === m.uid))?.uid ?? id;
+    for (const l of c.lists) s1 = core.togglePromoCat(core.ctxOf(data, s1), hero, l);
+    return s1;
+  }, text);
+
+  const correct = (id: number | string, c: Correction, text: string) => ed.edit((x) => {
+    if (typeof id === 'string') {
+      if (c.kind === 'stat') return core.removeHsAdvance(x, id, c.stat);
+      if (c.kind === 'skill') return core.removeHsSkillAt(x, id, c.index);
+      if (c.kind === 'spell') return core.removeHsSpell(x, id, c.index);
+      return core.hsSpellReduce(x, id, c.index, -1);
+    }
+    if (c.kind === 'stat') return core.removeAdvance(x, id, c.stat);
+    if (c.kind === 'skill') return core.removeSkill(x, id, c.index);
+    if (c.kind === 'spell') return core.removeSpell(x, id, c.index);
+    return core.spellReduce(x, id, c.index, -1);
+  }, text);
 
   const { ref: menuRef, open: openMenuSheet, close: closeMenu } = useSheet();
   const [menuOf, setMenuOf] = useState<{ title: string; items: MenuItem[] }>({ title: '', items: [] });
@@ -55,6 +96,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         save: (nm) => ed.edit((c) => core.setModelName(c, w.uid, nm || w.type), 'Name saved.'),
       }),
     },
+    ...(w.xp ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: w.uid, name: w.name }); openTakenSheet(); } }] : []),
     ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
     locked
       ? { label: 'Dismiss – his equipment goes to the stash', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
@@ -71,6 +113,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           save: (nm) => ed.edit((c) => (hs ? core.setHsName(c, h.uid, nm) : core.setDpName(c, h.uid, nm)), 'Name saved.'),
         }),
       },
+      ...(hs ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: h.uid, name: h.name }); openTakenSheet(); } }] : []),
       {
         label: 'Dismiss — upkeep ends', danger: true,
         run: () => ed.edit((c) => core.dismissHire(c, h.uid, hs ? 'hs' : 'dp'), `${h.name} is dismissed.`, { gold: locked ? 'keep' : 'settle' }),
@@ -93,6 +136,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     onMore: () => warriorMenu(w),
     onXp: (d: number) => ed.edit((c) => core.setModelExp(c, w.uid, w.exp + d)),
     onMan: (i: number) => manSheet(w, i),
+    onAdvance: () => openAdvance(w.uid),
     onAddMan: () => {
       if (!w.addMan || !('cost' in w.addMan)) return;
       const cost = w.addMan.cost;
@@ -102,6 +146,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const hireActs = (h: HireView) => ({
     onMore: () => hireMenu(h),
     onXp: (d: number) => ed.edit((c) => core.setHsExp(c, h.uid, h.exp + d)),
+    onAdvance: () => openAdvance(h.uid),
   });
 
   return (
@@ -155,6 +200,10 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
 
       <MenuSheet dialogRef={menuRef} close={closeMenu} title={menuOf.title} items={menuOf.items} />
       <NameSheet dialogRef={nameRef} close={closeName} naming={naming} />
+      <AdvanceSheet dialogRef={advRef} close={closeAdv} view={advView && advOf ? { ...advView, key: advOf.key } : null}
+        onApply={(c, text) => { if (advOf) applyAdvance(advOf.id, c, text); }} />
+      <TakenSheet dialogRef={takenRef} close={closeTaken} name={takenFor?.name ?? ''} taken={takenFor ? takenOf(ctx, takenFor.id) : null}
+        onRemove={(c, text) => { if (takenFor) correct(takenFor.id, c, text); }} />
       <EquipmentSheet dialogRef={eqRef} close={closeEq} view={eqView} act={{
         qty: (key, q) => ed.edit((c) => core.setEqQty(c, eqOf!, key, q)),
         addRare: (de) => ed.edit((c) => core.addRare(c, eqOf!, de)),

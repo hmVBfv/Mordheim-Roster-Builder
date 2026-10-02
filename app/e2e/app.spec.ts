@@ -274,6 +274,61 @@ test('a warrior dismissed after the first battle leaves his equipment', async ({
   await expect(page.getByRole('region', { name: 'Give items' })).toBeVisible();
 });
 
+/* Phase 3c: advances as rolled, and "The lad's got talent". */
+for (const theme of THEMES) {
+  test(`advances as rolled, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    const sheet = page.locator('dialog[open]');
+    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+
+    // 7: +1 WS or +1 BS
+    await ulrich.getByRole('button', { name: 'Advance' }).click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('7');
+    await sheet.getByRole('button', { name: '+1 Weapon Skill' }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advance-stat`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.locator('[role=status]', { hasText: '+1 Weapon Skill' })).toBeVisible();
+
+    // 3: a new skill from his lists
+    await ulrich.getByRole('button', { name: 'Advance' }).click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('3');
+    const combat = sheet.getByRole('group', { name: 'Combat' });
+    const skill = combat.getByRole('button', { disabled: false }).first();
+    const name = (await skill.textContent())!;
+    await skill.click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advance-skill`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(ulrich).toContainText(name);
+
+    // 11 for a group: one man becomes a Hero, with two skill lists
+    const group = page.getByRole('article', { name: 'Warrior', exact: true });
+    await group.getByRole('button', { name: 'Advance' }).click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('11');
+    await sheet.getByRole('group', { name: 'Who' }).getByRole('button', { name: 'Fritz' }).click();
+    await sheet.getByRole('group', { name: 'Skill lists' }).getByRole('button').nth(0).click();
+    await sheet.getByRole('group', { name: 'Skill lists' }).getByRole('button').nth(1).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advance-talent`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('article', { name: 'Fritz' })).toContainText('Promoted');
+    await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(2);
+
+    // a mistake taken back, from ⋯
+    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+    await sheet.getByRole('button', { name: /Advances taken – correct/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advances-taken`);
+    await sheet.getByRole('listitem').filter({ hasText: name }).getByRole('button', { name: 'Remove' }).click();
+    await expect(ulrich).not.toContainText(name);
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(ulrich).toContainText(name);
+  });
+}
+
 /* Removing a warrior is a click and an Undo, not a question. */
 test('a warrior removed from the roster comes back with Undo', async ({ page }) => {
   await page.goto('./');

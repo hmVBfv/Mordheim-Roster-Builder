@@ -74,6 +74,7 @@ export interface WarriorActions {
   onXp: (delta: number) => void;
   onMan: (i: number) => void;
   onAddMan: () => void;
+  onAdvance: () => void;
 }
 
 export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
@@ -107,19 +108,24 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
         <Line label="Mutations" items={w.mutations} />
         <Line label="Injuries" items={w.injuries} />
       </dl>
-      {w.addMan && (
+      {(w.xp || w.addMan) && (
         <div className={styles.acts}>
-          <button type="button" className={ui.buttonQuiet} disabled={'why' in w.addMan} onClick={act.onAddMan}>
-            + Man{'cost' in w.addMan ? ` · ${w.addMan.cost} gc` : ''}
-          </button>
-          {'why' in w.addMan && <p className={styles.why}>No more men: {w.addMan.why}.</p>}
+          <div className={ui.row}>
+            {w.xp && <button type="button" className={`${ui.buttonQuiet} ${w.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>}
+            {w.addMan && (
+              <button type="button" className={ui.buttonQuiet} disabled={'why' in w.addMan} onClick={act.onAddMan}>
+                + Man{'cost' in w.addMan ? ` · ${w.addMan.cost} gc` : ''}
+              </button>
+            )}
+          </div>
+          {w.addMan && 'why' in w.addMan && <p className={styles.why}>No more men: {w.addMan.why}.</p>}
         </div>
       )}
     </article>
   );
 }
 
-export interface HireActions { onMore: () => void; onXp: (delta: number) => void }
+export interface HireActions { onMore: () => void; onXp: (delta: number) => void; onAdvance: () => void }
 
 export function Hire({ h, act }: { h: HireView; act: HireActions }) {
   return (
@@ -129,6 +135,15 @@ export function Hire({ h, act }: { h: HireView; act: HireActions }) {
       </Head>
       <Stats cells={h.stats} />
       {h.xp && <XpTrack xp={h.xp} who={h.name} group={false} onStep={act.onXp} />}
+      <dl className={styles.facts}>
+        <Line label="Skills" items={h.skills} />
+        <Line label="Spells" items={h.spells} />
+      </dl>
+      {h.xp && (
+        <div className={styles.acts}>
+          <button type="button" className={`${ui.buttonQuiet} ${h.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>
+        </div>
+      )}
     </article>
   );
 }
