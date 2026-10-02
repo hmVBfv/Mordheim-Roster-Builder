@@ -28,7 +28,11 @@ export interface Editor {
     books whatever the action cost or brought (recruiting, + Man, hiring);
     `keep` leaves gold as it was (a price house rule). Trade actions book
     themselves, so settling after them books nothing more. */
-export interface EditOptions { gold?: 'settle' | 'keep' }
+export interface EditOptions {
+  gold?: 'settle' | 'keep';
+  /** The ledger's words for a change made without a notice (a stepper). */
+  book?: string;
+}
 
 /** One change, as the editor makes it: before the first battle the action
     alone, as in the Roster Builder; afterwards with the ledger opened if
@@ -39,7 +43,7 @@ export function applyEdit(data: GameData, before: WarbandState, action: (ctx: co
   const c0 = core.ctxOf(data, s0);
   const next = action(c0);
   if (next === s0) return before;
-  return opts.gold === 'keep' ? core.keepGold(c0, next) : core.settle(c0, next, { text: text ?? 'Changed by hand' });
+  return opts.gold === 'keep' ? core.keepGold(c0, next) : core.settle(c0, next, { text: text ?? opts.book ?? 'Changed by hand' });
 }
 
 /** A save stamp later than `prev` (two edits may fall in one millisecond). */

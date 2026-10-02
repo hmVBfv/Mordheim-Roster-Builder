@@ -59,6 +59,10 @@ export interface Model {
       he stays on the roster and counts for the rating but does not fight,
       until he is exchanged, ransomed or lost (core releaseCaptive). */
   captive?: { by: string; round: number; casualtyId?: number | null };
+  /** The campaign round he was hired in, after the warband's first battle
+      (core recruitUnit); absent: with the warband. His list stays open
+      until his own first battle (Rob, 02.10.2026). */
+  joined?: number;
   promoCats?: string[];
   /** Experience surcharge actually paid when veterans joined this group. */
   xpPaid?: number;

@@ -42,6 +42,7 @@ export const modelSchema = z.looseObject({
   magic: z.string().optional(),
   miss: num.optional(),
   missWhy: z.string().optional(),
+  joined: num.optional(),
   captive: z.looseObject({ by: z.string(), round: z.number(), casualtyId: z.number().nullable().optional() }).optional(),
   xpPaid: num.optional(),
   heirloom: z.string().nullable().optional(),

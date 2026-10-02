@@ -10,9 +10,9 @@ import styles from './Roster.module.css';
 
 type Sheet = ReturnType<typeof useSheet>;
 
-export function MutationSheet({ dialogRef, close, view, onToggle }: {
+export function MutationSheet({ dialogRef, close, view, onSet }: {
   dialogRef: Sheet['ref']; close: Sheet['close']; view: MutationView | null;
-  onToggle: (key: string, on: boolean, name: string) => void;
+  onSet: (key: string, n: number, name: string) => void;
 }) {
   const id = useId();
   return (
@@ -23,19 +23,21 @@ export function MutationSheet({ dialogRef, close, view, onToggle }: {
             <h2 id={id}>{view.label} · {view.name}</h2>
             <p className={ui.muted}>
               The dearest {view.one} at its price, every further one costs double.
+              {view.one === 'mutation' && !view.viaSkill ? ' The same one may be taken again where its effects add up; a claw or tentacle needs an arm.' : ''}
               {view.required ? ` He must have at least one ${view.one}.` : ''}
-              {view.viaSkill ? ' Open to him through the Mutant skill.' : ''}
+              {view.viaSkill ? ' The Mutant skill gives him one.' : ''}
             </p>
-            {view.locked && <p className={ui.muted}>After the first battle {view.label.toLowerCase()} are bought only when a warrior is recruited (rulebook); a change now is booked in the ledger.</p>}
+            {view.locked && <p className={ui.muted}>He has fought his first battle: {view.label.toLowerCase()} are bought only as a warrior is hired.</p>}
           </div>
           <ul className={styles.eqList} aria-label={view.label}>
             {view.items.map((it) => (
               <li key={it.key} className={styles.eqRow}>
-                <span className={styles.eqName}>{it.name}<small>{it.text}</small></span>
-                <button type="button" className={`${ui.buttonQuiet} ${styles.price}`} aria-pressed={it.on} aria-label={`${it.name}, ${it.price} gc`}
-                  onClick={() => onToggle(it.key, !it.on, it.name)}>
-                  {it.on ? '✓ ' : ''}{it.price} gc
-                </button>
+                <span className={styles.eqName}>{it.name} · {it.price} gc<small>{it.text}{it.more && it.count === 0 && !view.locked ? ` (${it.more})` : ''}</small></span>
+                <span className={styles.stepper}>
+                  <button type="button" aria-label={`One ${it.name} less`} disabled={!!it.less} onClick={() => onSet(it.key, it.count - 1, it.name)}>−</button>
+                  <span aria-live="polite">{it.count}</span>
+                  <button type="button" aria-label={`One ${it.name} more`} disabled={!!it.more} onClick={() => onSet(it.key, it.count + 1, it.name)}>+</button>
+                </span>
               </li>
             ))}
           </ul>

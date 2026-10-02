@@ -18,7 +18,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 /* ---- a warrior's list, while the warband is founded ---- */
 
-export interface ListRow { key: string; name: string; price: number; qty: number; free: boolean; text: string }
+export interface ListRow { key: string; name: string; price: number; qty: number; free: boolean; text: string; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
 export interface RareRow { de: string; name: string; q: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
 export interface RareOffer { de: string; name: string; price: string; rarity: string }
@@ -32,6 +32,9 @@ export interface EquipmentView {
   offer: RareOffer[];
   /** One price per man: a henchman group pays for every man. */
   men: number;
+  /** Hired after the warband's first battle, before his own: common items
+      from his list, rare ones only by searching. */
+  recruit: boolean;
 }
 
 const menOf = (ctx: core.Ctx, m: Model) => (core.unitDef(ctx, m.uid_def)?.t === 'hen' ? core.memberCount(m) : 1);
@@ -47,7 +50,10 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
     rows: (list[cat] ?? [])
       .filter(([, , fl]) => hero || !fl?.heroes)
       .filter(([nm]) => !ctx.data.BRACE_HIDE[nm])
-      .map(([nm, pr]) => ({ key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), qty: Number(m.eq?.[nm]) || 0, free: nm.includes(FREE), text: itemText(ctx.data, nm) })),
+      .map(([nm, pr]) => {
+        const qty = Number(m.eq?.[nm]) || 0;
+        return { key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), qty, free: nm.includes(FREE), text: itemText(ctx.data, nm), more: core.listProblem(ctx, uid, nm, qty + 1) };
+      }),
   })).filter((g) => g.rows.length);
   const rare: RareRow[] = Object.entries(m.rare ?? {}).map(([de, r]) => {
     const it = ctx.data.CATALOG.find((x) => x.de === de);
@@ -58,12 +64,14 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
       text: itemText(ctx.data, it?.en ?? de),
     };
   });
+  const recruit = core.isNewRecruit(ctx, m);
   const held = new Set(Object.keys(m.rare ?? {}));
-  const offer = core.rareEligibleItems(ctx, m)
+  // the catalogue's rare items belong to founding; a recruit searches
+  const offer = recruit ? [] : core.rareEligibleItems(ctx, m)
     .filter((it) => !(held.has(it.de) && core.isUpgrade(ctx.data, it.de)))
     .map((it) => ({ de: it.de, name: it.en, price: typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost), rarity: it.rare || '' }))
     .sort((a, b) => a.name.localeCompare(b.name));
-  return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, men: menOf(ctx, m) };
+  return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, men: menOf(ctx, m), recruit };
 }
 
 /* ---- the Trading Post, after the first battle ---- */
