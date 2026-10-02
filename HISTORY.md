@@ -1903,3 +1903,23 @@ leader publishes it. Making the import's sample text consistent showed the
 mockups' own campaign had drifted – chapter 4 sat at the Old Mill, which is
 battle 5 – and a new check found a sheet wider than the phone, which the
 page-width test could not see.
+## October 2, 2026 (cont.) — the bubbles come back
+
+The Roster Builder put a small ⓘ next to every item and every special rule,
+and hovering it showed what the thing does. The new roster had dropped them
+on the cards – only the Trading Post kept its texts, and only as a `title`,
+which a phone never shows. Rob: "essential and must be in". So every word
+on a card that names a rule is now a word you can tap: the bubble shows the
+rule's name, what kind of rule it is and its text, and a mouse resting on
+the word opens it too. The lookups are the Roster Builder's own, already
+ported to core, so the Captain's Leader rule reads 12" in Reikland rather
+than the general 6", and a skill is the one from the warrior's own lists.
+What core had no way to give was the item behind "Brace of Pistols" or
+"Sword [Dark Elf blade]": the card's labels were strings, so core now
+returns each entry with the items it stands for, and the old functions
+are those labels (the parity suite holds them to the Roster Builder's).
+The cards gained a "Rules" line on the way – special rules had no place on
+them – and a Hired Sword's card lists the skills he comes with, as the old
+roster did. The bubble lets taps through like the Undo notice, and the
+words are the one exception to the 44-pixel rule: a word in a sentence
+cannot be a finger high.

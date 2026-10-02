@@ -278,7 +278,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         }} />
       <CaptiveSheet dialogRef={captiveRef} close={closeCaptive} who={captiveOf}
         onEnd={(fate, text) => { if (captiveOf) { const uid = captiveOf.uid; ed.edit((c) => core.releaseCaptive(c, uid, fate), text, { gold: 'keep' }); } }} />
-      <InjuriesSheet dialogRef={injuriesRef} close={closeInjuries} name={injuriesView?.name ?? ''} injuries={injuriesView?.injuries ?? []} miss={injuriesView?.missGames ?? 0}
+      <InjuriesSheet dialogRef={injuriesRef} close={closeInjuries} name={injuriesView?.name ?? ''} injuries={injuriesView?.injuries.map((f) => f.label) ?? []} miss={injuriesView?.missGames ?? 0}
         onRemove={(i, text) => { if (injuriesOf != null) ed.edit((c) => core.removeInjury(c, injuriesOf, i), text); }}
         onMiss={(dl) => { if (injuriesOf != null) ed.edit((c) => core.adjustMiss(c, injuriesOf, dl)); }} />
       <EquipmentSheet dialogRef={eqRef} close={closeEq} view={eqView} act={{
