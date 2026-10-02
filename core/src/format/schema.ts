@@ -42,6 +42,7 @@ export const modelSchema = z.looseObject({
   magic: z.string().optional(),
   miss: num.optional(),
   missWhy: z.string().optional(),
+  captive: z.looseObject({ by: z.string(), round: z.number(), casualtyId: z.number().nullable().optional() }).optional(),
   xpPaid: num.optional(),
   heirloom: z.string().nullable().optional(),
 });
@@ -73,6 +74,8 @@ export const casualtySchema = z.looseObject({
   id: z.number(), round: z.number(), battleId: z.number().nullable().optional(),
   victim: side, attacker: side, result: z.string(), detail: z.string().optional(),
   fallenId: z.number().nullable().optional(), note: z.string().optional(),
+  /** The roll it was resolved with and its follow-ups (V1, core injure). */
+  injury: z.union([z.looseObject({ hero: z.looseObject({ code: z.string() }) }), z.looseObject({ d6: z.number() })]).optional(),
 });
 
 export const campaignSchema = z.looseObject({

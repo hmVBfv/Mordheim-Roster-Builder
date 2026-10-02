@@ -55,6 +55,10 @@ export interface Model {
   miss?: number;
   /** Why he misses them, for the chronicle ("Arm Wound …"). */
   missWhy?: string;
+  /** Held captive after rolling 61 (Rob, 02.10.2026: captured as a state):
+      he stays on the roster and counts for the rating but does not fight,
+      until he is exchanged, ransomed or lost (core releaseCaptive). */
+  captive?: { by: string; round: number; casualtyId?: number | null };
   promoCats?: string[];
   /** Experience surcharge actually paid when veterans joined this group. */
   xpPaid?: number;

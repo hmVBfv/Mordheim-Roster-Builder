@@ -48,6 +48,10 @@ export interface WarriorView {
   spells: string[];
   mutations: string[];
   injuries: string[];
+  /** Blinded in both eyes: he must retire from the warband (rulebook, 31). */
+  retire: boolean;
+  /** Held captive (61): by whom, or '' when unknown; null when free. */
+  captive: string | null;
   /** The men of a group, each by his name or the fallback ("Warriors 2"). */
   men: ManView[];
   /** For a group: another man, at what price or why not; null for a Hero. */
@@ -153,6 +157,8 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     spells: (m.spells ?? []).map((s) => s.name),
     mutations: (m.mut ?? []).map((x) => core.mutEN(ctx.data, x)),
     injuries: (m.inj ?? []).map((j) => j.name + core.injModText(j)),
+    retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
+    captive: m.captive ? m.captive.by : null,
     men: hero ? [] : core.memberNames(ctx, m).map((name, i) => ({ i, name, named: core.memberNamed(m, i) })),
     addMan: hero ? null : block ? { why: block } : { cost: core.henchRecruitCost(ctx, m) },
   };
