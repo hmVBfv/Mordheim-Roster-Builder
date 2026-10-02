@@ -15,7 +15,7 @@ import type { CatalogItem, EquipmentEntry, UnitDef } from '../data/types.ts';
 import type { Model, RareHolding, StashItem, WarbandState } from '../state/types.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { catalogAllowed, rareEligibleItems } from '../rules/equipment.ts';
-import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
+import { eqListFor, isUpgrade, stripParen, unitDef, warbandDef } from '../rules/lookup.ts';
 import { adjPrice, catalogDefaultPaid } from '../rules/pricing.ts';
 import { memberCount } from '../rules/profile.ts';
 import { enItem } from '../export/rulesText.ts';
@@ -35,6 +35,53 @@ export interface Verdict { ok: boolean; reason: string }
 const FREE_DAGGER = '(1. gratis)';
 
 const catalogItem = (ctx: Ctx, de: string): CatalogItem | undefined => ctx.data.CATALOG.find((it) => it.de === de);
+
+/** How an item of an equipment list is traded after the first battle (V5):
+    common items are bought at any time, rare ones only found by a Hero's
+    search. The lists and the price chart name some items differently
+    ("Jagdgewehr" is the chart's Hochland long rifle), so a list item is
+    matched by its German key, its English name, the part of the chart's
+    name in brackets, a brace by its single weapon, and "A/B" by both.
+    Whatever matches nothing is `unknown`: the price chart does not list it
+    (mounts, kits, warband specials), and the table decides. */
+export type TradeKind = { kind: 'common' } | { kind: 'rare'; rarity: number; de: string } | { kind: 'unknown' };
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9äöüß]/g, '');
+
+function chartEntry(ctx: Ctx, nm: string): CatalogItem | undefined {
+  const byDe = ctx.data.CATALOG.find((x) => x.de === nm) ?? ctx.data.CATALOG.find((x) => x.de === stripParen(nm));
+  if (byDe) return byDe;
+  const en = norm(enItem(ctx.data, nm));
+  if (!en) return undefined;
+  return ctx.data.CATALOG.find((x) => {
+    const paren = /\(([^)]+)\)\s*$/.exec(x.en)?.[1] ?? '';
+    return norm(x.en) === en || norm(stripParen(x.en)) === en || (paren && norm(paren) === en);
+  });
+}
+
+export function tradeKind(ctx: Ctx, nm: string): TradeKind {
+  const of = (it: CatalogItem | undefined): TradeKind | null => {
+    if (!it) return null;
+    const r = /Rare\s+(\d+)/.exec(it.rare ?? '');
+    return r ? { kind: 'rare', rarity: Number(r[1]), de: it.de } : /Common/i.test(it.rare ?? '') ? { kind: 'common' } : null;
+  };
+  const direct = of(chartEntry(ctx, nm));
+  if (direct) return direct;
+  const en = enItem(ctx.data, nm);
+  const brace = /^brace of (.+?)s$/i.exec(en);
+  if (brace) {
+    const single = ctx.data.CATALOG.find((x) => norm(x.en) === norm(brace[1]!));
+    const k = of(single);
+    if (k) return k;
+  }
+  if (nm.includes('/')) {
+    const parts = nm.split('/').map((p) => of(chartEntry(ctx, p.trim())));
+    if (parts.every((k) => k?.kind === 'common')) return { kind: 'common' };
+    const rare = parts.find((k) => k?.kind === 'rare');
+    if (rare) return rare;
+  }
+  return { kind: 'unknown' };
+}
 
 /** The English name of an item, as the screens show it. */
 export function goodsName(ctx: Ctx, g: Goods): string {
@@ -206,6 +253,7 @@ export function buyItem(ctx: Ctx, to: Holder, key: string, opts: { qty?: number;
   const why = closed(ctx);
   if (why) return refuse(ctx, why);
   const g: Goods = { key, rare: false };
+  if (tradeKind(ctx, key).kind === 'rare') return refuse(ctx, 'a rare item: only a Hero\'s search finds it');
   const v = canReceive(ctx, to, g);
   if (!v.ok) return refuse(ctx, v.reason);
   const each = opts.price ?? commonPrice(ctx, key);
