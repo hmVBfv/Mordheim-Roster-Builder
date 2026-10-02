@@ -74,8 +74,8 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
-| Listen mit Filtern (Grad, Werte, Name), wer anheuern darf und warum nicht | ✓ | ✓ | – | hire | 3d | Mockup mit den echten Regeldaten (72 Hired Swords, 30 DP); Robs Prüfung offen |
-| Anheuern, Kosten, Unterhalt, Personas, Optionen | ✓ | ✓ | – | hire (Sheet) | 3d | |
+| Listen mit Filtern (Grad, Werte, Name), wer anheuern darf und warum nicht | ✓ | ✓ | ✓ | hire | 3d | Bildschirm „Hire“ (Roster → Hire…): Suche nach Name oder Volk, Grade, Kennwert mit Vergleich (wie im Roster Builder), „Only those this warband may hire“, Sortierung; jeder, der nicht darf, mit Grund (neu, `hireProblem`) |
+| Anheuern, Kosten, Unterhalt, Personas, Optionen | ✓ | ✓ | ✓ | hire (Sheet) | 3d | Sheet mit Werten (bei Paaren beiden), Ausrüstung, Regeln und Fertigkeiten mit Regeltext, Erfahrung, Hinweis (Wanderer); Waffen oder Persona vor dem Anheuern (neu, `hire`); Gebühr mit halbem Preis durch einen Bezirk, Unterhalt, Rating, Gold danach; nach der ersten Schlacht ins Kassenbuch. Hired Swords zählen nicht zu Kriegern und Helden (Errata S. 147); wer einen Heldenplatz besetzt, braucht einen freien |
 | Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ✓ | roster (Big Gunnar) | 3c | Hired Swords würfeln auf der Heldentabelle mit ihren Listen |
 
 ## Hausregeln

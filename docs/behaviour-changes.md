@@ -64,6 +64,7 @@ Portieren.
 | Exporte (Text, PDF) | Datei wird direkt heruntergeladen; Name aus dem Eingabefeld „Speichern unter“ | Funktionen geben Text bzw. Bytes und Dateinamen zurück; der Name kommt als Argument | keine Dateien und kein DOM in der Logik |
 | Offene Kampagnendatei | Modulvariable im Browser | ein Wert, den die Oberfläche hält und an die Funktionen übergibt | keine globalen Zustände |
 | Halb ausgefüllte Formulare (Schlacht, Verlust, Notiz) | im Speicherstand (`campaign._draft`, `_cas`, `_note`); ein Import von Kampagnendaten verwarf sie nebenbei | eigene Werte der Oberfläche, nicht Teil des Stands | Bildschirmzustand gehört nicht in die Historie |
+| Anheuern aus dem Hire-Bildschirm (3d) | Menü nur mit denen, die anheuern dürfen; Option oder Persona danach; ein Hired Sword, der einen Heldenplatz besetzt (Priest of Morr, Wolf Priest), auch bei vollen Helden – dann nur eine Warnung | `hire` mit Option oder Persona vorab; `hireProblem` nennt den Grund für jeden, der nicht darf (Regeln der Warband, Grad als Hausregel, schon dabei, besetzter Heldenplatz); Gold ist wie bei Rekruten kein Grund, die Warnung bleibt | sein eigener Regeltext: „He replaces one of a Mercenary warband's Heroes“ (Town Cryer 12); Hired Swords zählen sonst nicht zu Kriegern und Helden (Regelbuch S. 147, offizielle Errata im Ultimate FAQ); Test `core/test/hires.test.ts` |
 | Rückfragen im Ablauf (Robbed anwenden? Grubenkampf gewonnen? Gefangener kommt zurück, Lösegeld? D3 für Deep Wound? Löschen bestätigen?) | Dialog mitten in der Aktion | Antwort ist ein Argument (`InjuryChoices`); die Oberfläche fragt vorher | wie oben; Vorgaben = was die alte App ohne Dialog tat |
 
 ## Geplant
@@ -108,7 +109,7 @@ Liste der Legacy-Tests, die bewusst anders ausgehen.
    dazu einer je Extra Arm (UFAQ: „you must first buy the Extra Arm
    mutation as the Tentacle has to have an arm to grow from“); ein Extra
    Arm, an dem eine Klaue oder ein Tentakel hängt, kann nicht weg. **Nur
-   einmal** (Vorschlag, bitte bestätigen): Daemon Soul und Hideous, deren
+   einmal** (bestätigt von Rob, 02.10.2026): Daemon Soul und Hideous, deren
    Wirkung sich nicht addiert, und die Blessings of Nurgle (`ONCE` in
    `core/src/warband/recruits.ts`). Gespeichert als wiederholter Name in
    `m.mut`; `mutCost` rechnet schon so.

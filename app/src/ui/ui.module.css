@@ -242,3 +242,16 @@
 .tipBubble p:last-child {
   margin-bottom: 0;
 }
+
+/* The buttons of a sheet stay at its bottom edge while its content scrolls
+   (Rob, 02.10.2026: "Hire" lay under a long profile). The bar reaches the
+   sheet's edges, over the padding. */
+.sheetActions {
+  position: sticky;
+  bottom: calc(-1 * var(--space-4));
+  z-index: 1;
+  margin: 0 calc(-1 * var(--space-4)) calc(-1 * var(--space-4));
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}

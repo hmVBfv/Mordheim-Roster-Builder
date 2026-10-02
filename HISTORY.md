@@ -1923,3 +1923,23 @@ them – and a Hired Sword's card lists the skills he comes with, as the old
 roster did. The bubble lets taps through like the Undo notice, and the
 words are the one exception to the 44-pixel rule: a word in a sentence
 cannot be a finger high.
+
+## October 2, 2026 (cont.) — hiring
+
+Step 3d turned the Hire mockup into the app's own screen. Core already had
+the Roster Builder's hiring – who may join, the fees, a district halving
+one, the grudges that raise an upkeep – but only as a menu of those who
+may, with weapons and personas chosen after the fact. The new screen lists
+everyone, says in words why someone may not join, and asks for the Ogre's
+weapons or the Emissary's Mark before he is hired; core got `hireProblem`
+and `hire` for that, around the old actions.
+
+Looking the rules up for the screen turned up a mistake of my own: the
+mockup said Hired Swords count towards the warband's models, and refused a
+hire when the warband had fifteen. The rulebook, as corrected by the
+official errata, says the opposite – they count towards neither warriors
+nor Heroes – and the Roster Builder had it right. The one exception comes
+from a Hired Sword's own text: a Priest of Morr "replaces one of a
+Mercenary warband's Heroes", so he needs a free place. Gold, as with
+recruits, is not a reason to refuse; the roster warns when the warband
+spends more than it has.
