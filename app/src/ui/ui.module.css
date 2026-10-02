@@ -97,6 +97,18 @@
   min-height: 44px;
 }
 
+.input,
+.select {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
 .textarea {
   width: 100%;
   min-height: 8rem;

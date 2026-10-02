@@ -12,6 +12,7 @@ import { Shell } from './Shell.tsx';
 
 // the roster needs the rules: loaded when first opened
 const Roster = lazy(() => import('../routes/Roster.tsx').then((m) => ({ default: m.Roster })));
+const NewWarband = lazy(() => import('../routes/NewWarband.tsx').then((m) => ({ default: m.NewWarband })));
 
 export function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export function AppRoutes() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/warbands" element={<Warbands />} />
+          <Route path="/warbands/new" element={<NewWarband />} />
           <Route path="/warbands/:id" element={<Roster />} />
           {FLAVOUR === 'campaign' && <Route path="/campaign" element={<Placeholder title="Campaign" text="Campaigns, battles and the map arrive with the campaign server." />} />}
           {FLAVOUR === 'campaign' && <Route path="/notes" element={<Placeholder title="Notes" text="Notes, quotes and the timeline arrive with the campaign server." />} />}

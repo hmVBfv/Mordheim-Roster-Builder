@@ -1,0 +1,364 @@
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-2) 0 0;
+}
+
+.summary div {
+  display: grid;
+}
+
+.summary dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.summary dd {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.warnings {
+  margin: 0;
+  padding-left: calc(var(--space-4) + 1em);
+  color: var(--danger);
+}
+
+.warrior {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* name and type on the left, ⋯ on the right, the badges below */
+.head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 0 var(--space-2);
+}
+
+.head > .badges {
+  grid-column: 1 / -1;
+}
+
+.head h3 {
+  margin: 0;
+}
+
+.head p {
+  margin: 0;
+}
+
+.count {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.badge {
+  font-size: 0.8rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.due {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.out {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.stats {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.stats th {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats td {
+  padding: var(--space-1) 0;
+}
+
+.changed {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* the experience track (legacy xpBar) */
+.xp {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  min-width: 2.2em;
+  padding: 0 4px;
+  text-align: center;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+
+.steps .base {
+  border-style: dashed;
+}
+
+.steps .on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.steps .next {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.xpLine {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 var(--space-2);
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.facts dt {
+  color: var(--text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.summaryToggle {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* one card per warrior; side by side where the screen has room (desktop) */
+.cards {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  align-items: start;
+}
+
+.cards:empty {
+  display: none;
+}
+
+/* the warband's name with its rename button */
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.title h1 {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sectionHead h2 {
+  margin: 0;
+}
+
+/* − Exp n + : the experience, one point at a time */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepper button {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.stepper span {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* the men of a group, each a button to name or dismiss him */
+.men {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.men button {
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.men .unnamed {
+  background: transparent;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.acts {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.acts button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.why {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* the ⋯ menu: one row per choice */
+.menu {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.menu button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.danger,
+.menu .danger {
+  color: var(--danger);
+}
+
+/* the recruit list */
+.recruitGroup {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.recruitGroup h3 {
+  margin: 0;
+}
+
+.unit {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.unit:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.unit small {
+  color: var(--text-muted);
+}
+
+.unitName {
+  font-weight: 600;
+}
+
+/* a unit's special rules: two lines, the rest on the warrior */
+.note {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
