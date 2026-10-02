@@ -227,7 +227,7 @@ Anmeldung geht erst live, wenn Daten hinter ihr liegen.
 | 3a Roster bearbeiten | Grundlage: jede Änderung eine Aktion aus `core/`, sofort auf dem Gerät gespeichert, einmal rückgängig über den Hinweis. Warband anlegen (Auswahl nach Grad, Variante, Name), Namen, Anwerben und Entlassen, Henchmen-Gruppen (+ Man, Namen der Männer, einen Mann entlassen), Erfahrung per Stepper, Anführer, Worth. |
 | 3b Ausrüstung und Handel | erst die neue Logik in `core/` (V4–V7: Suchwurf, Verkaufen, Umverteilen, Kassenbuch), dann der Trading Post nach Mockup: Kaufen, Seltenes, Suchen, Verkaufen, Geben, Lager, Regeltexte. **Stand 02.10.2026:** Logik (PR #16) und Oberfläche umgesetzt; offen: bezahlten Preis von Hand ändern, Wyrdstone verkaufen (mit 4a). |
 | 3c Entwicklung | Aufstiege mit Fertigkeiten und Zaubern, Beförderung, Verletzungen mit Folgeentscheidungen (V1), Tod und Gefallene, Veteranenwurf bei „+ Man“; Mutationen und Male (Mockup fehlt). **Stand 02.10.2026:** Aufstiege, Beförderung, Verletzungen (V1) mit Gefangenschaft und feste IDs für Gefallene (V2, Format 2) umgesetzt; Veteranenwurf bei „+ Man“, Mutationen, Segnungen des Nurgle und Male der Marauder umgesetzt (die App ist hier das Mockup: Liste und Auswahl aus bestehenden Mustern; Robs Prüfung auf der Testinstanz). 3c ist damit vollständig. |
-| 3d Hired Swords und Dramatis Personae | Listen mit Filtern, Anheuern, Optionen, Aufstiege. **Stand 02.10.2026:** Mockup `docs/mockups/hire.html` mit den echten Regeldaten; wartet auf Robs Prüfung. |
+| 3d Hired Swords und Dramatis Personae | Listen mit Filtern, Anheuern, Optionen, Aufstiege. **Stand 02.10.2026:** Mockup `docs/mockups/hire.html` mit den echten Regeldaten (#26); Robs erste Durchsicht umgesetzt (Hire ohne Scrollen, Liste danach wieder oben, Regeltexte als Blase, Layout am Desktop nur von Hand, „New warband“, KI-Paket und Chronicle). |
 | 3e Hausregeln und Exporte | Hausregeln einer Warband (Mockup fehlt), Text und Datei, TTS-Karten, Rostersheet als PDF, Drucken. |
 | 3f Quick Build auf Pages | Checkliste vollständig, Szenarien der Legacy-Tests als eigene `core/`-Tests, Entscheidung D, Umstellung. |
 | 3g Anmeldung | Einladung, Login, Sitzungen, TOTP, Reset-Links, Bremse, CSRF, Leak-Tests. |
@@ -256,8 +256,10 @@ das Mockup: Rob prüft sie auf der Testinstanz (`roster-deploy --staging`).
   zweisprachigem Kanon, Lebenslauf, Fragen an Spieler, „Offen für dich“.
 - Hintergrund mit Enthüllungsstufen, „Als Spieler ansehen“.
 - Welt: Fraktionen, NPCs, Ruf, Bezirke, Szenarien.
-- Briefing, KI-Paket, Ablage in `eingang/chronik/`, Kanon-Export für den
-  Chronik-Linter.
+- Briefing, KI-Paket (auch als Prompt zum Kopieren aus der Timeline),
+  Ablage in `eingang/chronik/`, Kanon-Export für den Chronik-Linter.
+- Reiter „Chronicle“: die ganze Geschichte, Textimport von Kapiteln als
+  Entwurf mit Prüfung, Download (Mockup `chronicle.html`, 02.10.2026).
 
 **Abnahme:** Das Kapitel zur nächsten Schlacht entsteht mit `chronik N` aus
 dem KI-Paket.

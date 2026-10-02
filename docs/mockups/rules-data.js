@@ -74,3 +74,86 @@
     return html ? '<div class="pick skills">' + html + '</div>' : '<p class="muted">He knows every skill of his lists.</p>';
   };
 })();
+
+/* What equipment, injuries and special rules do, for the tap-and-hover
+   bubbles on the cards (Rob, 02.10.2026: "essential"). Copied from the
+   rules data through core (itemInfo, abilityInfo, INJURIES); refresh it
+   from there rather than editing it here. */
+window.MOCK_TIPS = {
+ "Sword": {
+  "line": "Close combat · Strength: as user",
+  "text": "Parry: when hit, roll a D6; if higher than the opponent's highest to-hit roll, the blow is parried (one parry per close-combat phase). Attacks with ≥ 2× the user's own Strength cannot be parried."
+ },
+ "Shield": {
+  "line": "Armour",
+  "text": "+1 to the armour save (6+ on its own), combines with armour."
+ },
+ "Light armour": {
+  "line": "Armour",
+  "text": "Armour save 6+. No movement penalty."
+ },
+ "Dagger": {
+  "line": "Close combat · Strength: as user",
+  "text": "+1 to the armour save of the model hit (6+ if it otherwise has none). The first dagger is free; two weapons give +1 attack."
+ },
+ "Double-handed weapon": {
+  "line": "Close combat · Strength: +2",
+  "text": "Two-handed: no shield/buckler/second weapon (a shield still counts +1 vs shooting). Strike last: always strikes last, even when charging."
+ },
+ "Mace": {
+  "line": "Close combat · Strength: as user",
+  "text": "Concussion: on the injury roll a result of 2–4 is treated as \"stunned\" — good for knocking opponents out."
+ },
+ "Axe": {
+  "line": "Close combat · Strength: as user",
+  "text": "Cutting edge: additional save modifier −1 (e.g. S4 with an axe = −2 to the armour save)."
+ },
+ "Buckler": {
+  "line": "Armour",
+  "text": "Parry like a sword (D6 over the to-hit roll, one per phase); no save bonus. With a sword: re-roll one failed parry."
+ },
+ "Crossbow": {
+  "line": "Range 30\" · Strength 4",
+  "text": "Move or fire: may not move and fire in the same turn (turning/standing up allowed)."
+ },
+ "Club": {
+  "line": "Close combat · Strength: as user",
+  "text": "Concussion: on the injury roll a result of 2–4 is treated as \"stunned\" — good for knocking opponents out."
+ },
+ "Helmet": {
+  "line": "Armour",
+  "text": "4+ save against \"stunned\": a stunned result then becomes only \"knocked down\"."
+ },
+ "Spear": {
+  "line": "Close combat · Strength: as user",
+  "text": "Strike first: strikes first in the first close-combat round. Unwieldy: only a shield/buckler in the other hand. Mounted: +1 Strength on the charge."
+ },
+ "Halberd": {
+  "line": "Close combat · Strength: +1",
+  "text": "Two-handed: no shield/buckler/second weapon (a shield still counts +1 vs shooting)."
+ },
+ "Bow": {
+  "line": "Range 24\" · Strength 3",
+  "text": "The standard missile weapon of the Old World."
+ },
+ "Pistol": {
+  "line": "Range 6\" · Strength 4 · Save −2",
+  "text": "Prepare shot: every 2nd turn (brace: every turn). Close combat: +1 attack at S4 / Save −2, once per combat (brace: 2 attacks in the first round)."
+ },
+ "Leader": {
+  "line": "Special rule",
+  "text": "Friendly models within 6\" may use the leader's (usually better) Leadership value for their Leadership tests."
+ },
+ "Fear": {
+  "line": "Psychology",
+  "text": "Causes fear. A model that wants to charge a fear-causing model must first pass a Leadership test; in close combat against one it only hits if a Leadership test is passed (otherwise only on a 6). Fear-causers are themselves immune to fear."
+ },
+ "Large Target": {
+  "line": "Shooting",
+  "text": "May always be chosen as a shooting target, even if it is not the nearest. In addition, all shots against it gain +1 to hit."
+ },
+ "Leg Wound": {
+  "line": "Serious injury · 22",
+  "text": "Movement permanently −1."
+ }
+};

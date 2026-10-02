@@ -119,6 +119,8 @@ Begriff einführt, trägt ihn hier ein.
 | Briefing | Briefing | `core/narrative` |
 | KI-Paket | AI pack | `ai-pack` |
 | Kapitelentwurf | Chapter draft | `chapter_drafts` |
+| Chronik (Reiter der Kampagne: die ganze Geschichte) | Chronicle | `chapters` |
+| Kapitel importieren | Import a chapter | Entwurf aus Text oder .md/.txt |
 
 ## Verborgene Ebene und Welt
 
@@ -182,3 +184,6 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Dock | Dock (Minimised panels) | Leiste der minimierten Panels |
 | Bereich von unten | Sheet | `<dialog class="sheet">`, `app/src/ui/useSheet.ts` |
 | Wappen der Warband | – | `docs/mockups/warband-art.js` (`data-art`) |
+| Layout auf diesem Gerät | Layout on this device (Phone / Desktop) | von Hand gewählt, nur auf dem Gerät; die App wechselt nie von selbst |
+| Regeltext-Blase | – (Antippen eines unterstrichenen Worts) | `.tip`, `window.mockTips` im Mockup |
+| Neue Warband | New warband | App: `/warbands/new` |

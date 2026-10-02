@@ -184,6 +184,8 @@
     var e = cur;
     st.gold -= e.hire; st.upkeep += e.upkeep || 0; st.models += 1; st.hired[e.key] = 1;
     figures(); draw();
+    // back up to the search and filters, not somewhere in the middle of the list (Rob, 02.10.2026)
+    setTimeout(function () { document.querySelector('.figures').scrollIntoView({ block: 'start' }); }, 60);
     window.mockToast(e.name + ' hired for ' + e.hire + ' gc.', function () { st.gold += e.hire; st.upkeep -= e.upkeep || 0; st.models -= 1; delete st.hired[e.key]; figures(); draw(); });
   });
 

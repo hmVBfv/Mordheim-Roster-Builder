@@ -43,7 +43,7 @@ unverändert auf Pages.
 ```
 Home         Open for you · Warbands · Campaigns
 Warband      Roster · Story · Versions
-Campaign     Overview · Notes · Timeline · World
+Campaign     Overview · Notes · Timeline · Chronicle · World
              · Background* · Manage*
 Game night   Vollbild, aus einer Schlacht heraus
 Profile      Devices · Authenticator · Password
@@ -84,6 +84,13 @@ Report a problem   überall erreichbar
   Sichtbarkeit, Notizen, Timeline), More (Konto, Geräte, Problem melden).
   Jede Fläche behält ihre Anordnung, wenn man zwischen ihnen wechselt; die
   Reiter des Handys werden zu Panels und Views.
+- **Layout von Hand, je Gerät (Rob, 02.10.2026):** Die App wechselt nie von
+  selbst zwischen Handy und Desktop – im Mockup sprang die Arbeitsfläche bei
+  manchen Klicks auf eine Handy-Seite, ohne Weg zurück. Gewählt wird unter
+  More → „Layout on this device“ (Phone / Desktop), gespeichert auf dem
+  Gerät; auf einem breiten Bildschirm fragt die App beim ersten Start einmal.
+  Was am Desktop noch kein eigenes Panel hat, öffnet sich dort in einem
+  großen Panel in der Mitte, nie als Handy-Seite.
 - **Quick Build (Pages):** nur Home (lokale Warbands), Warband (Roster),
   Import/Export und „Send to campaign server“.
 
@@ -125,20 +132,22 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | Seite | Was sie zeigt |
 | --- | --- |
 | `game-night.html` | Vollbild ohne Navigation, Spielzug-Zähler, vier große Knöpfe im unteren Drittel, „letzten Eintrag rückgängig“, Offline-Hinweis mit Zahl der wartenden Einträge |
-| `timeline.html` | feste Anker je Schlacht, Verschieben per langem Drücken, ↑/↓ und „Move to…“, Erfassungszeit bleibt sichtbar, Leiter-Ebene schaltbar |
+| `timeline.html` | feste Anker je Schlacht, Verschieben per langem Drücken, ↑/↓ und „Move to…“, Erfassungszeit bleibt sichtbar, Leiter-Ebene schaltbar; **„AI pack…“** (nur Leiter): ein Prompt aus der Schlacht in Story-Reihenfolge, Aftermath und Aufstiegen, Kanon, Welt, Notizen, Hintergrund ⚑ mit Enthüllungsregeln, bisheriger Geschichte und Stil – Teile abwählbar, Sprache, kopieren oder als .md |
 | `changes.html` | je Krieger vorher → nachher mit gefundenem Anlass, ⚠ ohne Anlass, Erklärungsfelder mit Zähler, Markieren „After battle N“ |
 | `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
 | `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt |
 | `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1); Henchmen-Gruppen mit „+ Man“ (Kosten aus Einheit, gleicher Ausrüstung und 2 gc je Erfahrungspunkt, Veteranenwurf, Grenzen: 5 je Gruppe, Einheit, 15 Modelle), Namen der einzelnen Männer, „The lad's got talent“ (Mann wird Held mit zwei Skill-Listen und sofortigem Aufstieg), Tod eines Mannes (W6), Anwerben neuer Gruppen und Helden; beim Aufstieg alle Fertigkeiten der Listen des Kriegers (Captain alle fünf, Champion Combat/Shooting/Strength, Youngblood Combat/Shooting/Speed, Beförderter seine zwei, Ogre Combat/Strength) mit ihrem Regeltext aus `data/skills.json` (`rules-data.js`) |
 | `home.html` | „Offen für dich“, eigene Warbands, Kampagnen; Mordheim bei Nacht als Pixelbild (Komet über der Stadt, flackernde Fenster, Wyrdstein, der in den Trümmern aufleuchtet); bei jedem dritten Aufruf schlägt der Zweischweifige Komet ein (Blitz, Feuerball, Rauch, danach glüht der Krater), `?impact=1` bzw. `0` erzwingt es; still und ohne Blitz bei „weniger Bewegung“ (`city-art.js`, auch am Desktop); eine Frage einer Mitspielerin beantworten |
 | Wappen der Warbands | `warband-art.js`: je Warband ein eigenes Wappen aus schlichten heraldischen Elementen, passend zu Volk und Fraktion (Rob, 30.09.2026: lieber Wappen als Figuren) – silberner Schild mit blauem Bord und schwarzem Adler (Silver Caravan, Söldner des Imperiums), grauer Schild mit rotem Haupt, Zweischweifigem Kometen und goldenem Kriegshammer (Grey Penitents, Schwestern des Sigmar), schwarzer Lumpen an einer Stange mit Rattenschädel über gekreuzten Klingen (Clan Skrittle, Eshin); keine Symbole aus Games-Workshop-Material; auf Home, Warbands, Campaign, Roster und am Desktop |
-| `warbands.html` | eigene Warbands, Import, die Warbands der Mitspieler nur lesend |
+| `warbands.html` | eigene Warbands, **„New warband“** (Warband nach Stufe gruppiert, Variante, Name; auch von Home aus, Rob, 02.10.2026: „zu gut versteckt“), Import, die Warbands der Mitspieler nur lesend |
+| `hire.html` | Hired Swords und Dramatis Personae mit den echten Regeldaten: Suche, Stufen, „nur wen diese Warband anheuern darf“, Sortierung; Sheet mit Werten, Regeln, Optionen, Kosten und Grund, wenn nicht |
+| `chronicle.html` | Reiter „Chronicle“ der Kampagne: die ganze geschriebene Geschichte, Kapitel für Kapitel (Prolog zweisprachig); **„Import a chapter“** als Text (eingefügt oder .md/.txt) mit Titel, Schlacht und Sprache, Prüfung auf Begriffe aus verborgenem Hintergrund und erlaubte Andeutungen, landet als Entwurf; „Download all (.md)“ |
 | `campaign.html` | Übersicht: laufende Schlacht mit Weg in den Spielabend, Warbands mit Stand, Schlachten 1–5, Bezirke |
 | `world.html` | Bezirke (Wirkungen aus `data/campaign.json`, wer sie hält, Korrektur durch Leiter), Fraktionen mit Ruf, Personen, Orte |
 | `manage.html` | nur Leiter: Rollen, Einladung, Hausregeln als Schalter, Schlacht schließen (unumkehrbar, daher mit Bestätigung) |
 | `story.html` | Reiter „Story“ der Warband: Kapitel, Zwischenspiel schreiben (mit Sichtbarkeit), Lebenslauf jedes Kriegers (auch aus ⋯ → „His story so far“) |
-| `more.html` | Geräte, Authenticator, Passwort, Theme, „Report a problem“ mit Status, Admin (Nutzer, Einladungen, Bugs, Backups) |
-| `desktop.html` | die Arbeitsfläche aus Panels (Vorschlag, siehe §2), für jedes Ziel der Leiste eine eigene (`#home`, `#warbands`, `#campaign`, `#notes`, `#more`; ohne Anker die Warband): Views, Ziehen an der Titelleiste, Menü ⋯, Dock, verknüpfte Auswahl; Aufstieg als Sheet in der Mitte mit allen Fertigkeiten seiner Listen und ihrem Text; beim Trading Post zeigt ein Tipp auf den Namen, was der Gegenstand tut; bei 1440 px drei Spalten, unter 1024 px gestapelt |
+| `more.html` | Geräte, Authenticator, Passwort, Theme, Layout auf diesem Gerät, „Report a problem“ mit Status, Admin (Nutzer, Einladungen, Bugs, Backups) |
+| `desktop.html` | die Arbeitsfläche aus Panels (Vorschlag, siehe §2), für jedes Ziel der Leiste eine eigene (`#home`, `#warbands`, `#campaign`, `#notes`, `#more`; ohne Anker die Warband): Views, Ziehen an der Titelleiste, Menü ⋯, Dock, verknüpfte Auswahl; Aufstieg als Sheet in der Mitte mit allen Fertigkeiten seiner Listen und ihrem Text; beim Trading Post zeigt ein Tipp auf den Namen, was der Gegenstand tut; bei 1440 px drei Spalten, unter 1024 px gestapelt; Seiten ohne eigenes Panel öffnen sich in einem großen Panel (`?embed=1` blendet Leiste und Mockup-Streifen aus), die Arbeitsfläche wird nie verlassen; Layout unter More |
 | `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, abgerundet, mindestens 1 gc; Wyrdstein nach der Tabelle für die Warband-Größe), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); alle 70 seltenen Gegenstände, die eine Reikland-Warband suchen darf (106 weitere gehören anderen Warbands), mit Filter und „wer darf es benutzen“; `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter; jeder Gegenstand mit Regeltext, auch beim Suchen für den gewählten Gegenstand (Rob, 30.09.2026) |
 
 ## 4. Themes und Gestaltung
@@ -163,7 +172,21 @@ Themes, beide wählbar. **Standard ist „Chronicle“ (dunkel).**
 
 ## 5. Bedienung
 
-- **Tippflächen** mindestens 44 × 44 px.
+- **Tippflächen** mindestens 44 × 44 px. Ausnahme: ein Regelwort im
+  Fließtext einer Karte (siehe Regeltexte); seine Trefferfläche ist etwas
+  größer als das Wort, ohne das Wort der nächsten Zeile zu überdecken.
+- **Regeltexte auf jeder Karte (Rob, 02.10.2026: „essentiell und muss drin
+  sein“):** Ausrüstung, seltene Gegenstände, Fertigkeiten, Zauber,
+  Verletzungen, Mutationen und Sonderregeln sind gepunktet unterstrichen.
+  Antippen zeigt eine Blase mit Werten und Regeltext (am Desktop auch beim
+  Darüberfahren); erneutes Antippen, ein Tipp daneben oder Esc schließt sie.
+  Die Blase verdeckt keine Knöpfe dauerhaft und hält nichts auf. Die Texte
+  kommen aus `core` (`itemInfo`, `skillInfo`, `abilityInfo`, Zaubertexte,
+  Verletzungstabelle) – dieselben wie im Trading Post.
+- **Sheets:** Die Knöpfe eines Sheets (Hire, Save, Start …) stehen am unteren
+  Rand fest und sind ohne Scrollen erreichbar (Rob, 02.10.2026: „Hire“ lag
+  unter langen Werten). Nach dem Anheuern steht die Liste wieder oben bei den
+  Filtern.
 - **Statuswerte** (M WS BS S T W I A Ld Sv) als feste Tabelle mit
   gleichbreiten Ziffern; auf 360 px ohne horizontales Scrollen.
 - **Game night:** große Knöpfe im unteren Drittel (+ Casualty, + Note,

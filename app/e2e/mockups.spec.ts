@@ -15,7 +15,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
-const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give', 'hire',
+const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give', 'hire', 'chronicle',
   'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more', 'desktop'];
 const PAGES = ['index', ...SCREENS];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
@@ -108,8 +108,15 @@ async function crawl(page: Page, name: string) {
       const label = await labelOf(el);
       const wrong = await verdict(page, el);
       if (wrong) dead.push(`${here ? `[${here}] ` : ''}${label} ${wrong}`);
+      // the desktop never jumps to the phone's pages: they open in a panel
+      else if (name.startsWith('desktop') && !pathOf(page.url()).endsWith('/desktop.html')) dead.push(`${label} leaves the desktop for ${pathOf(page.url())}`);
       // a sheet it opened (on the same page): its controls are next, up to two sheets deep
       const opened = pathOf(page.url()).endsWith(`/${name.split('#')[0]}.html`) ? await openSheet(page) : null;
+      // a sheet is as narrow as the phone, too (the page's own width does not show it)
+      if (opened && opened !== here) {
+        const over = await page.evaluate((id) => { const d = document.getElementById(id)!; return d.scrollWidth - d.clientWidth; }, opened);
+        if (over > 0) dead.push(`[${opened}] scrolls sideways by ${over} px`);
+      }
       if (opened && opened !== here && path.length < 2) {
         const key = `${opened}|${await sheetKey(page, opened)}`;
         if (!seen.has(key)) { seen.add(key); queue.push([...path, { sheet: here, i }]); }
@@ -233,4 +240,82 @@ test('mockups: a link inside a sheet leaves, and Back returns without the sheet'
   await expect(page.locator('dialog[open]')).toHaveCount(0);
   await page.getByRole('link', { name: 'All warbands' }).click();
   await expect(page).toHaveURL(/warbands\.html/);
+});
+
+/* Rob's review of the hire and desktop mockups (02.10.2026). */
+test('mockup hire: Hire is in reach, and after hiring the list starts at the top', async ({ page }) => {
+  await go(page, 'hire');
+  await page.locator('#list button').nth(20).click();
+  const ok = page.locator('#h-ok');
+  await expect(ok).toBeInViewport();
+  await ok.click();
+  await expect(page.locator('#sheet-hire')).toHaveCount(1);
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  await expect(page.locator('#q')).toBeInViewport();
+});
+
+test('mockup desktop: no click leads to the phone\'s pages', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await go(page, 'desktop#campaign');
+  await page.getByRole('link', { name: 'Open game night' }).click();
+  await expect(page).toHaveURL(/desktop\.html/);
+  await expect(page.locator('#sheet-page')).toBeVisible();
+  await expect(page.locator('#page-frame')).toHaveAttribute('src', /game-night\.html\?embed=1/);
+  const frame = page.frameLocator('#page-frame');
+  await expect(frame.locator('.mock')).toBeHidden();
+  await expect(frame.locator('nav.nav')).toBeHidden();
+});
+
+test('mockup desktop: the layout is chosen by hand, on this device', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await go(page, 'desktop#more');
+  await expect(page.getByRole('radio', { name: /Desktop/ })).toBeChecked();
+  // it leaves the page at once, so a click: check() would wait to see it checked
+  await page.getByRole('radio', { name: /Phone/ }).click();
+  await expect(page).toHaveURL(/home\.html/);
+});
+
+test('mockup roster: equipment, skills, rules and injuries explain themselves', async ({ page }) => {
+  await go(page, 'roster');
+  const tips = page.locator('.tip:visible');
+  expect(await tips.count()).toBeGreaterThan(5);
+  await tips.first().click();
+  const box = page.locator('#mock-tip');
+  await expect(box).toBeVisible();
+  expect((await box.innerText()).length).toBeGreaterThan(10);
+  await page.screenshot({ path: 'test-results/screens/mockup-roster-tip.png' });
+  await page.keyboard.press('Escape');
+  await expect(box).toBeHidden();
+});
+
+test('mockup timeline: the AI pack holds the battle with what surrounds it', async ({ page }) => {
+  await go(page, 'timeline');
+  await page.getByRole('button', { name: 'AI pack…' }).click();
+  const text = page.locator('#ai-text');
+  for (const part of ['Aftermath', 'Canon', 'World', 'Background', 'Style']) await expect(text).toHaveValue(new RegExp(part));
+  await page.locator('#sheet-ai [data-part="background"]').uncheck();
+  await expect(text).not.toHaveValue(/Background/);
+  await page.screenshot({ path: 'test-results/screens/mockup-timeline-ai.png' });
+});
+
+test('mockup chronicle: a chapter is imported as a draft, hidden names are flagged', async ({ page }) => {
+  await go(page, 'chronicle');
+  const before = await page.locator('#chapters > li').count();
+  await page.getByRole('button', { name: 'Import a chapter' }).click();
+  await page.locator('#imp-text').fill('Die Fährleute warteten am Steg.');
+  await expect(page.locator('#imp-checks')).toContainText('Fährleute');
+  await page.getByRole('button', { name: 'Add as draft' }).click();
+  await expect(page.locator('#chapters > li')).toHaveCount(before + 1);
+});
+
+test('mockup warbands: a new warband is started from the list, or from Home', async ({ page }) => {
+  await go(page, 'home');
+  await page.getByRole('link', { name: 'New warband' }).click();
+  await expect(page.locator('#sheet-new')).toBeVisible();
+  await page.locator('#new-wb').selectOption('skaven');
+  await expect(page.locator('#new-var-f')).toBeHidden();
+  await page.locator('#new-name').fill('Clan Gnaw');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await expect(page.locator('#mine')).toContainText('Clan Gnaw');
+  await expect(page.locator('#mine')).toContainText('Skaven');
 });

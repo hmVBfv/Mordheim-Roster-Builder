@@ -272,9 +272,20 @@ aber vollständig und geordnet:
 - **Kanon-Export:** Die Schreibweisen für den Chronik-Linter
   (`notes/agent/spielbegriffe.txt` o. ä.) können aus dem Kanon der App erzeugt
   werden – eine Quelle für richtige Namen.
+- **Von Hand, ohne Pipeline (Rob, 02.10.2026):** In der Timeline baut
+  „AI pack…“ denselben Inhalt als einen Prompt – die Schlacht in der
+  Reihenfolge der Timeline, Aftermath und Aufstiege, Kanon, Welt, Notizen,
+  Hintergrund mit Enthüllungsregeln, die bisherige Geschichte, Stil; Teile
+  lassen sich abwählen, die Sprache wählen; kopieren oder als .md laden und
+  in einem Chat an Claude geben.
+- **Chronicle:** Ein eigener Reiter der Kampagne zeigt die ganze
+  geschriebene Geschichte, Kapitel für Kapitel. Ein Kapitel kommt als Text
+  zurück (eingefügt oder als .md/.txt), einer Schlacht oder einem
+  Zwischenspiel zugeordnet, mit Sprache; alle Kapitel lassen sich als eine
+  .md herunterladen.
 - Jeder KI-Text ist ein Entwurf; der Leiter prüft vor der Veröffentlichung.
   Eine einfache Prüfung markiert Begriffe aus verborgenen Wahrheiten im
-  Entwurf.
+  Entwurf (und zeigt, welche Andeutungen der Hintergrund erlaubt).
 - **Später:** ein Connector (MCP), über den Claude Briefings direkt liest und
   Entwürfe zurücklegt; Claude Code committet freigegebene Kapitel ins
   Chronik-Repo.
