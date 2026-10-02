@@ -4,7 +4,11 @@
    mockup (docs/roadmap.md, phase 3). */
 import * as core from '@mordheim/core';
 
-export interface MutationItem { key: string; name: string; price: number; on: boolean; text: string }
+export interface MutationItem {
+  key: string; name: string; price: number; text: string;
+  /** How many he has, and why not one more or one less ('' = may). */
+  count: number; more: string; less: string;
+}
 
 export interface MutationView {
   uid: number;
@@ -21,7 +25,7 @@ export interface MutationView {
   /** What the chosen ones cost: the dearest at its price, every further
       one double (core mutCost). */
   cost: number;
-  /** After the first battle: bought only when a warrior is recruited. */
+  /** After his first battle: no more mutations (unless by the Mutant skill). */
   locked: boolean;
 }
 
@@ -40,10 +44,15 @@ export function mutationView(ctx: core.Ctx, uid: number): MutationView | null {
     required: !!def.mutReq,
     items: set.map(([key, price]) => {
       const name = core.mutEN(ctx.data, key);
-      return { key, name, price, on: chosen.includes(key), text: core.abilityInfo(ctx.data, name)?.text ?? '' };
+      const count = chosen.filter((x) => x === key).length;
+      return {
+        key, name, price, text: core.abilityInfo(ctx.data, name)?.text ?? '', count,
+        more: core.mutationProblem(ctx, uid, key, count + 1),
+        less: count ? core.mutationProblem(ctx, uid, key, count - 1) : 'none to take back',
+      };
     }),
     cost: core.mutCost(ctx, m),
-    locked: core.tradeLocked(ctx),
+    locked: !!def.mut && core.warriorHasFought(ctx, m),
   };
 }
 
