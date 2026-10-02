@@ -1,0 +1,282 @@
+/* The Trading Post (docs/mockups/trading-post.html). */
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+}
+
+.figures div {
+  display: grid;
+}
+
+.figures dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.figures dd {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* a row of choices, one pressed */
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.seg button {
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* one item of a list: its name, and what it costs or brings */
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.item small {
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* who gets it: a list of choices with a note each */
+.pick {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.pick button {
+  display: grid;
+  gap: 2px;
+  min-height: 52px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pick button[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.pick button:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.pick small {
+  color: var(--text-muted);
+}
+
+.pick .no,
+.no {
+  color: var(--danger);
+}
+
+.scroll {
+  max-height: 36dvh;
+  overflow-y: auto;
+}
+
+.between {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.between h2 {
+  margin: 0;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepper button {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.text {
+  margin: var(--space-1) 0 0;
+  font-size: 0.93rem;
+}
+
+.result {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.result p {
+  margin: 0;
+}
+
+.result p + p {
+  margin-top: var(--space-1);
+}
+
+.verdict {
+  margin: 0;
+  font-weight: 600;
+}
+
+.found {
+  color: var(--accent);
+}
+
+.missed {
+  color: var(--danger);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+}
+
+.check input {
+  width: 22px;
+  height: 22px;
+}
+
+.searcher {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.searcher > span {
+  display: grid;
+}
+
+.searcher small {
+  color: var(--text-muted);
+}
+
+.stash {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stash li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stash small {
+  color: var(--text-muted);
+}
+
+/* the ledger: amount on the left, the cause on the right */
+.ledger {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ledger li {
+  display: grid;
+  grid-template-columns: 4.5em 1fr;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.93rem;
+}
+
+.ledger li > span:first-child {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger small {
+  display: block;
+  color: var(--text-muted);
+}
+
+.plus {
+  color: var(--accent);
+}
+
+.minus {
+  color: var(--danger);
+}
+
+.zero {
+  color: var(--text-muted);
+}

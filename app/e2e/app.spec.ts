@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
+/* the same warband after its first battle: trading has begun (V4–V7) */
+const FOUGHT = JSON.stringify({ ...JSON.parse(SAVE) as Record<string, unknown>, campaign: { ...(JSON.parse(SAVE) as { campaign: object }).campaign, round: 1 } });
 const THEMES = ['chronicle', 'parchment'] as const;
 
 /* No errors in the console, Content Security Policy violations included. */
@@ -40,6 +42,13 @@ async function tapTargets(page: Page) {
 
 async function useTheme(page: Page, theme: string) {
   await page.addInitScript((t) => { localStorage.setItem('mordheim-theme', t); }, theme);
+}
+
+async function importText(page: Page, text: string) {
+  await page.getByRole('button', { name: 'Import a warband' }).first().click();
+  await page.getByRole('textbox').fill(text);
+  await page.getByRole('button', { name: 'Import', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeVisible();
 }
 
 async function importSample(page: Page) {
@@ -144,6 +153,126 @@ for (const theme of THEMES) {
     await expect(page.getByRole('article', { name: 'Warrior' }).getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
   });
 }
+
+/* Phase 3b: equipment while the warband is founded, from the warrior's list. */
+for (const theme of THEMES) {
+  test(`equipment from the list before the first battle, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    const gold = async () => Number((await page.locator('dt:text-is("Gold") + dd').textContent())!.replace(/\D/g, ''));
+    const before = await gold();
+    await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
+    await page.locator('dialog[open]').getByRole('button', { name: /Equipment & rare items/ }).click();
+    const sheet = page.locator('dialog[open]');
+    await expect(sheet.getByRole('heading', { name: 'Equipment · Magda' })).toBeVisible();
+    await sheet.getByRole('button', { name: 'One Sword more' }).click();
+    await expect(sheet.getByRole('button', { name: 'One Sword less' })).toBeEnabled();
+    await sheet.getByRole('combobox', { name: 'Rare item to add' }).selectOption({ index: 1 });
+    await sheet.getByRole('button', { name: 'Add', exact: true }).click();
+    await expect(sheet.getByRole('region', { name: 'Rare and trading-post items' }).getByRole('listitem')).toHaveCount(1);
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-equipment`);
+    await sheet.getByRole('button', { name: 'Done' }).click();
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    await expect(page.getByRole('article', { name: 'Magda' })).toContainText('Sword');
+    await expect.poll(gold).toBeLessThan(before - 9);
+    // the Trading Post says what applies before the first battle
+    await page.getByRole('link', { name: /^Trading Post/ }).click();
+    await expect(page.getByText('Until its first battle the warband buys from its lists')).toBeVisible();
+  });
+}
+
+/* Phase 3b: the Trading Post after the first battle, every tab and sheet. */
+for (const theme of THEMES) {
+  test(`the Trading Post after the first battle, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importText(page, FOUGHT);
+    await page.getByRole('link', { name: /^Trading Post/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Trading Post' })).toBeVisible();
+    const gold = async () => Number((await page.locator('dt:text-is("Gold in hand") + dd').textContent())!.replace(/\D/g, ''));
+    const start = await gold();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-trade-buy`);
+
+    // buy a helmet for Magda
+    await page.getByRole('button', { name: /^Helmet/ }).click();
+    const sheet = page.locator('dialog[open]');
+    await sheet.getByRole('button', { name: /^Magda/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-trade-buy-sheet`);
+    await sheet.getByRole('button', { name: /^Buy · 10 gc/ }).click();
+    await expect(page.locator('[role=status]', { hasText: 'Bought Helmet' })).toBeVisible();
+    await expect.poll(gold).toBe(start - 10);
+
+    // give Ulrich's sword to the stash: no gold moves
+    await page.getByRole('button', { name: 'Give', exact: true }).click();
+    await page.getByRole('button', { name: 'Give Sword of Ulrich the Grey' }).click();
+    await sheet.getByRole('button', { name: /^Stash/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-trade-give`);
+    await sheet.getByRole('button', { name: 'Give', exact: true }).click();
+    await expect(page.getByRole('region', { name: 'Stash' }).getByText('Sword')).toBeVisible();
+    await expect.poll(gold).toBe(start - 10);
+
+    // sell it from the stash at half price
+    await page.getByRole('button', { name: 'Sell', exact: true }).click();
+    await page.getByRole('button', { name: 'Sell Sword of Stash' }).click();
+    await expect(sheet.getByRole('textbox', { name: 'Gold received' })).toHaveValue('5');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-trade-sell`);
+    await sheet.getByRole('button', { name: 'Sell · 5 gc' }).click();
+    await expect.poll(gold).toBe(start - 5);
+
+    // Ulrich searches; a 12 finds anything
+    await page.getByRole('button', { name: 'Search rare' }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-trade-search`);
+    await page.getByRole('listitem').filter({ hasText: 'Ulrich the Grey' }).getByRole('button', { name: 'Search' }).click();
+    await sheet.getByRole('group', { name: 'Rare items' }).getByRole('button').first().click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('12');
+    await expect(sheet.getByText('12 — found.')).toBeVisible();
+    await sheet.getByRole('textbox', { name: /^Price/ }).fill('20');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-trade-search-sheet`);
+    await sheet.getByRole('button', { name: 'Buy · 20 gc' }).click();
+    await expect(page.locator('[role=status]', { hasText: /^Found / })).toBeVisible();
+    await expect.poll(gold).toBe(start - 25);
+    await expect(page.getByRole('listitem').filter({ hasText: 'Ulrich the Grey' }).getByRole('button', { name: 'Search' })).toBeDisabled();
+
+    // the ledger says why, each time
+    const ledger = page.getByRole('list', { name: 'Ledger' });
+    await expect(ledger.getByRole('listitem')).toHaveCount(4);
+    await expect(ledger).toContainText('Bought Helmet');
+    await expect(ledger).toContainText('Sold Sword');
+    await expect(ledger).toContainText('Ulrich the Grey found');
+    await shot(page, `${theme}-trade-ledger`);
+
+    // after a reload, the same
+    await page.reload();
+    await expect.poll(gold).toBe(start - 25);
+  });
+}
+
+/* After the first battle a dismissed warrior refunds nothing; his
+   equipment goes to the stash. */
+test('a warrior dismissed after the first battle leaves his equipment', async ({ page }) => {
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  const gold = async () => (await page.locator('dt:text-is("Gold") + dd').textContent())!;
+  const before = await gold();
+  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /Dismiss – his equipment goes to the stash/ }).click();
+  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toHaveCount(0);
+  await expect.poll(gold).toBe(before);
+  await expect(page.getByRole('link', { name: /Trading Post · stash/ })).toBeVisible();
+  // ⋯ → Equipment leads to the Trading Post
+  await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /Equipment – at the Trading Post/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Trading Post' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Give items' })).toBeVisible();
+});
 
 /* Removing a warrior is a click and an Undo, not a question. */
 test('a warrior removed from the roster comes back with Undo', async ({ page }) => {

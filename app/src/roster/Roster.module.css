@@ -362,3 +362,51 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* a warrior's equipment while the warband is founded */
+.eqGroup {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.eqGroup h3 {
+  margin: 0;
+}
+
+.eqList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.eqRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.eqName {
+  display: grid;
+  min-width: 0;
+}
+
+.eqName small {
+  color: var(--text-muted);
+}
+
+.eqUpgrade {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: end;
+}
+
+.eqAdd {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+}

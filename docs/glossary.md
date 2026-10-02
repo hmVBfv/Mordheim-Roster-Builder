@@ -42,7 +42,8 @@ Begriff einführt, trägt ihn hier ein.
 | Formatnummer | Format version | `format` |
 | Gründung (bis zur ersten Schlacht) | Founding | `warbandHasFought()` ist falsch |
 | Gründungspreis | Founding price | Listenzeile `[name, preis, {start: true}]`, `startOnlyRow()`, `UPGRADES[…].start` |
-| Trading Post | Trading Post | `rareEligibleItems()`, `CATALOG` |
+| Trading Post | Trading Post | `/warbands/:id/trade`, `rareEligibleItems()`, `CATALOG` |
+| Ausrüstung aus der Liste (bis zur ersten Schlacht) | Equipment & rare items | `EquipmentSheet`, `setEqQty()`, `addRare()` |
 | nur für Helden (Listenzeile) | Heroes only | `{heroes: true}` |
 | einer Warband vorbehalten (Katalog) | – | `CATALOG[…].only`, `catalogAllowed()` |
 | nur für eine Variante (Stadt, Stamm) | – | `{sub: ['midd']}` |
