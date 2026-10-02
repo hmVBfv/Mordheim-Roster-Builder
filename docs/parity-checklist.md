@@ -55,7 +55,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Umverteilen zwischen Kriegern und Lager | – | ✓ | ✓ | trading-post | 3b | neu (V4); `giveItem` mit Grund, wenn nicht |
 | Lager (Truhe): Gegenstände, Wyrdstone, Gold | ✓ | ✓ | ◐ | roster, trading-post | 3b | Gegenstände und Gold im Trading Post; Wyrdstone und Gold von Hand fehlen (kommt mit der Post-Battle-Sequenz, 4a) |
 | Kassenbuch mit Anlass je Buchung | – | ✓ | ✓ | trading-post | 3b | neu (V7), ab der ersten Schlacht; ohne neue Formatnummer |
-| Regeltexte als Tooltip (Gegenstände, Fertigkeiten, Zauber, Fähigkeiten) | ✓ | ✓ | ◐ | trading-post | 3b | Gegenstände: Regeltext im Trading Post und als Tooltip; Fertigkeiten, Zauber, Fähigkeiten folgen mit 3c |
+| Regeltexte als Tooltip (Gegenstände, Fertigkeiten, Zauber, Fähigkeiten) | ✓ | ✓ | ◐ | trading-post, roster | 3b/3d | Gegenstände: Regeltext im Trading Post und als Tooltip. Rob, 02.10.2026: „essentiell und muss drin sein“ – auf jeder Karte als Blase (Antippen, am Desktop Darüberfahren) für Ausrüstung, seltene Gegenstände, Fertigkeiten, Zauber, Verletzungen, Mutationen und Sonderregeln; im Mockup roster, in der App als Nächstes |
 
 ## Profile und Entwicklung
 

@@ -63,6 +63,12 @@
         <label class="radio"><input type="radio" name="theme" data-set-theme="chronicle"> Chronicle — dark</label>
         <label class="radio"><input type="radio" name="theme" data-set-theme="parchment"> Parchment — light</label>
       </div>
+      <!-- the layout is a setting of the device; the app never switches it by itself (Rob, 02.10.2026) -->
+      <div class="radios" role="radiogroup" aria-label="Layout on this device">
+        <label class="radio"><input type="radio" name="layout" checked> Phone — one screen at a time</label>
+        <label class="radio"><input type="radio" name="layout" id="layout-desktop"> Desktop — panels side by side</label>
+      </div>
+      <p class="small muted">Chosen once per device; on a wide screen the app asks once at the start, then keeps your choice.</p>
     </section>
 
     <section class="stack" aria-labelledby="bug-h">
@@ -180,6 +186,9 @@
     }
   });
 })();
+</script>
+<script>
+  document.getElementById('layout-desktop').addEventListener('change', function (e) { if (e.target.checked) location.href = 'desktop.html'; });
 </script>
 </body>
 </html>

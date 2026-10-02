@@ -1875,3 +1875,31 @@ his mutations as he is hired; a recruit who never fought can be taken off
 the roster at his price. The same mutation may now be taken more than once
 where the effects add up, as the FAQ allows, with one constraint Rob gave:
 a claw or tentacle needs an arm to grow from.
+
+## October 2, 2026 (cont.) — what the mockups were missing
+
+Rob went through the Hire mockup and the desktop and came back with six
+things, none of them about rules. The Hire button sat below a Hired Sword's
+long profile, so every hire began with scrolling, and after it the list
+stayed where it was, half way down; the buttons of a sheet now stay at its
+bottom edge and the list returns to its filters. The desktop jumped to a
+phone page on some clicks and had no way back: it had been linking to the
+phone pages for everything it did not draw itself. Now such a page opens in
+a large panel inside the workspace, and the layout is chosen by hand, per
+device, under More – the app never decides by itself (the crawl now fails
+any click that leaves the desktop). The bubbles with an item's or a skill's
+rules, which the Roster Builder always had and the mockups had only in the
+Trading Post, are now on every card; Rob called them essential. And there
+was no visible way to start a warband at all – the app has one, the
+mockups had forgotten it.
+
+The other two were new ideas. The concept had an "AI pack" for the
+chronicle pipeline; Rob asked how the timeline would actually get a battle
+written, so the timeline now builds that package as one prompt to copy,
+with each part switchable and the hidden background marked with its reveal
+rules. What comes back needed a home: a Chronicle tab with the whole story,
+where a chapter is imported as text and checked for hidden names before a
+leader publishes it. Making the import's sample text consistent showed the
+mockups' own campaign had drifted – chapter 4 sat at the Old Mill, which is
+battle 5 – and a new check found a sheet wider than the phone, which the
+page-width test could not see.

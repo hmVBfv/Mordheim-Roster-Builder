@@ -419,3 +419,18 @@ blockquote { margin: 0; padding-left: var(--s3); border-left: 3px solid var(--go
 @keyframes skA { 0% { opacity: 1; } 40% { opacity: 0; } 46% { opacity: 1; } 70% { opacity: 0; } 84% { opacity: 1; } 100% { opacity: 1; } }
 @keyframes skB { 0% { opacity: 0; } 40% { opacity: 1; } 46% { opacity: 0; } 100% { opacity: 0; } }
 @keyframes skC { 0% { opacity: 0; } 70% { opacity: 1; } 84% { opacity: 0; } 100% { opacity: 0; } }
+
+/* a word with rules on a card, and the bubble that says what it does */
+.tip { display: inline; min-height: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+.tip { position: relative; }
+/* a little more room to tap, without spreading the line or covering the
+   word on the next line (a word in running text cannot be 44 px high) */
+.tip::after { content: ''; position: absolute; inset: -5px -2px; }
+.tip:hover, .tip[aria-describedby] { color: var(--accent); }
+.tipbox { position: absolute; z-index: 50; display: grid; gap: 2px; padding: var(--s2) var(--s3); background: var(--surface-2); color: var(--text); border: 1px solid var(--accent); border-radius: var(--radius); box-shadow: 0 6px 18px var(--shadow); font-size: 0.92rem; line-height: 1.35; }
+.tipbox small { color: var(--text-muted); }
+.tipbox p { margin: 0; }
+/* the buttons of a long sheet stay in reach at its foot */
+.sheet form > .row:last-child { position: sticky; bottom: calc(-1 * var(--s4) - env(safe-area-inset-bottom, 0px)); z-index: 2; margin: 0 calc(-1 * var(--s4)) calc(-1 * var(--s4) - env(safe-area-inset-bottom, 0px)); padding: var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--border); }
+/* a phone page inside a panel of the desktop */
+.embedded .mock, .embedded nav.nav { display: none; }
