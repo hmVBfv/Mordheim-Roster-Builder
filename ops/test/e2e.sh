@@ -102,7 +102,9 @@ expect "no warning once they agree" sh -c "! grep -q PUBLIC_ORIGIN '$work_dir/in
 
 echo "# DynDNS updater: installed only with private settings"
 install -m 644 /dev/null /etc/porkbun-ddns.env
-printf 'PORKBUN_API_KEY=pk1_x\nPORKBUN_SECRET_KEY=sk1_x\nDOMAIN=example.org\nHOSTS="mordheim ts"\n' >/etc/porkbun-ddns.env
+# enabling the timer runs the updater at once: a domain without a dot stops
+# it before it calls Porkbun
+printf 'PORKBUN_API_KEY=pk1_x\nPORKBUN_SECRET_KEY=sk1_x\nDOMAIN=not-a-domain\nHOSTS="mordheim ts"\n' >/etc/porkbun-ddns.env
 expect_exit 1 "install.sh refuses keys others can read" sh -c "'$ops/install.sh' --no-caddy >/dev/null 2>&1"
 chmod 600 /etc/porkbun-ddns.env
 "$ops/install.sh" --no-caddy >/dev/null
