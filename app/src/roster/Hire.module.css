@@ -1,0 +1,84 @@
+/* The Hire screen (docs/mockups/hire.html); lists and choices come from
+   Trade.module.css. */
+.top {
+  scroll-margin-top: var(--space-4);
+}
+
+.filters {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.who {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.who small {
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.fee {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* one who may not join: still opens, to say why */
+.blocked > .who > span:first-child {
+  color: var(--text-muted);
+}
+
+.summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: var(--space-1);
+}
+
+.label {
+  flex-basis: 100%;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.costs {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.costs dd {
+  margin: 0;
+  text-align: right;
+}
+
+.costs small {
+  color: var(--text-muted);
+}
+
+.sum {
+  font-weight: 600;
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-1);
+}
+
+.verdict {
+  margin: 0;
+}
+
+/* the characteristic filter: which, compared how, with what */
+.stat {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr;
+  gap: var(--space-2);
+  align-items: center;
+}
