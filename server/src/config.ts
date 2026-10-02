@@ -11,7 +11,7 @@ export interface Config {
   staticDir: string;
   host: string;
   port: number;
-  /** https://mordheim.<name>.duckdns.org – checked against Origin on writes (phase 3). */
+  /** https://mordheim.<domain> – checked against Origin on writes (phase 3). */
   publicOrigin: string | null;
   logLevel: string;
   /** The commit the image was built from (Docker build argument). */

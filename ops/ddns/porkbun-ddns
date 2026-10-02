@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# porkbun-ddns – keeps A records of a domain at Porkbun on this connection's
+# public IPv4 (docs/operations.md, "Eigene Domain und DynDNS"). Run by
+# porkbun-ddns.timer every 5 minutes; changes a record only when it differs.
+#
+# Settings from the environment (systemd: EnvironmentFile=/etc/porkbun-ddns.env,
+# root-only, see ops/env/porkbun-ddns.env.example):
+#   PORKBUN_API_KEY, PORKBUN_SECRET_KEY   API access, created at Porkbun
+#   DOMAIN                                the domain, opted in to API access
+#   HOSTS                                 names below it, e.g. "mordheim ts"
+#   PORKBUN_API                           only for tests (default: Porkbun)
+#
+# The keys reach curl on stdin, never on a command line (ps would show them).
+# Debian's ddclient 3.11 is no alternative: it calls porkbun.com instead of
+# api.porkbun.com and gets 403.
+set -euo pipefail
+
+api=${PORKBUN_API:-https://api.porkbun.com/api/json/v3}
+: "${PORKBUN_API_KEY:?PORKBUN_API_KEY is missing}" "${PORKBUN_SECRET_KEY:?PORKBUN_SECRET_KEY is missing}"
+: "${DOMAIN:?DOMAIN is missing}" "${HOSTS:?HOSTS is missing}"
+[[ "$DOMAIN" =~ ^[a-z0-9-]+(\.[a-z0-9-]+)+$ ]] || { echo "DOMAIN is not a domain: $DOMAIN" >&2; exit 1; }
+for h in $HOSTS; do
+  [[ "$h" =~ ^[a-z0-9_]([a-z0-9_-]*[a-z0-9])?(\.[a-z0-9_]([a-z0-9_-]*[a-z0-9])?)*$ ]] || { echo "HOSTS: not a name: $h" >&2; exit 1; }
+done
+ttl=600
+
+auth=$(jq -n --arg a "$PORKBUN_API_KEY" --arg s "$PORKBUN_SECRET_KEY" '{apikey: $a, secretapikey: $s}')
+call() { # call <path> <json body>: the answer, or exit with Porkbun's message
+  local out
+  out=$(curl -4 -sS --max-time 30 -H 'Content-Type: application/json' --data-binary @- "$api/$1" <<<"$2") ||
+    { echo "$1: no answer from Porkbun" >&2; exit 1; }
+  if ! jq -e '.status == "SUCCESS"' <<<"$out" >/dev/null 2>&1; then
+    local msg
+    msg=$(jq -r '.message // ("status " + (.status | tostring))' <<<"$out" 2>/dev/null) || msg="not JSON (an HTTP error page?)"
+    echo "$1: $msg" >&2
+    exit 1
+  fi
+  printf '%s' "$out"
+}
+
+ip=$(call ping "$auth" | jq -r '.yourIp // empty')
+[[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || { echo "no public IPv4 from Porkbun: '$ip'" >&2; exit 1; }
+
+for h in $HOSTS; do
+  cur=$(call "dns/retrieveByNameType/$DOMAIN/A/$h" "$auth" | jq -r '.records[0].content // empty')
+  [ "$cur" = "$ip" ] && continue
+  if [ -n "$cur" ]; then
+    call "dns/editByNameType/$DOMAIN/A/$h" "$(jq -n --argjson a "$auth" --arg ip "$ip" --arg t "$ttl" '$a + {content: $ip, ttl: $t}')" >/dev/null
+  else
+    call "dns/create/$DOMAIN" "$(jq -n --argjson a "$auth" --arg ip "$ip" --arg h "$h" --arg t "$ttl" '$a + {name: $h, type: "A", content: $ip, ttl: $t}')" >/dev/null
+  fi
+  echo "$h.$DOMAIN: ${cur:-none} -> $ip"
+done

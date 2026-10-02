@@ -1,11 +1,12 @@
 # Betrieb auf dem Pi
 
-Stand: 30. September 2026 · Status: Phase 2. Die Betriebsdateien liegen unter
+Stand: 2. Oktober 2026 · Status: Phase 2. Die Betriebsdateien liegen unter
 [`ops/`](../ops/) im Repo; dieses Dokument beschreibt sie und die Handgriffe
 auf dem Pi. Die Dateien sind maßgeblich, wo beide voneinander abweichen.
 
 Grundlage ist der bestehende Aufbau des Pi (Raspberry Pi 5, 4 GB, Raspberry
-Pi OS Lite 64-bit, Daten auf der SSD unter `/mnt/ssd`, Docker, DuckDNS,
+Pi OS Lite 64-bit, Daten auf der SSD unter `/mnt/ssd`, Docker, eigene Domain
+mit DynDNS (Abschnitt 11),
 Watchtower, UFW, Fail2Ban, VPN über die Fritzbox) und seine Agenten-Basis
 unter `/mnt/ssd/agent`. `<user>` steht für das eigene Konto auf dem Pi –
 Namen, Adressen und Hostnamen gehören nicht in dieses öffentliche Repo.
@@ -65,9 +66,8 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
 6. **Standortdatei:** `mkdir -p ~/server/roster`,
    `cp ~/src/Mordheim-Roster-Builder/ops/site.env.example ~/server/roster/site.env`,
    `chmod 600 ~/server/roster/site.env`, `nano ~/server/roster/site.env`:
-   `ROSTER_HOST` (der Hostname unter DuckDNS; jeder Name unterhalb des
-   eigenen DuckDNS-Namens zeigt auf dieselbe IP, bei DuckDNS ist nichts
-   anzulegen) und `ROSTER_LAN_IP` (die feste Adresse aus Schritt 3,
+   `ROSTER_HOST` (der öffentliche Hostname, z. B. `mordheim.<domain>`; sein
+   A-Record muss auf die Heim-IP zeigen, Abschnitt 11) und `ROSTER_LAN_IP` (die feste Adresse aus Schritt 3,
    `hostname -I`). `install.sh` liest die Datei Zeile für Zeile als
    `KEY=value`; ausgeführt wird darin nichts.
 7. **Einspielen:** `cd ~/src/Mordheim-Roster-Builder && git log -1 --oneline`
@@ -150,8 +150,8 @@ Der Chronik-Eingang (`eingang/chronik/`) wird erst in Phase 4b gebraucht.
    FRITZ!Box-Dienste. Ist „Internetzugriff auf die FRITZ!Box über HTTPS“ an
    und liegt auf Port 443, kollidiert er mit der Freigabe. Empfehlung:
    ausschalten – der Zugang von unterwegs geht über das VPN.
-2. **Hostname:** `nslookup <ROSTER_HOST>` liefert dieselbe öffentliche IP wie
-   `nslookup <name>.duckdns.org`.
+2. **Hostname:** `dig +short A <ROSTER_HOST>` liefert dieselbe öffentliche
+   IP wie `curl -4 -s https://api.ipify.org`.
 3. **Fritzbox – Portfreigabe:** Internet → Freigaben → Portfreigaben → beim
    Pi „Bearbeiten“ (sonst „Gerät für Freigaben hinzufügen“) → „Neue Freigabe“
    → „Portfreigabe“: Anwendung „HTTPS-Server“ (oder „Andere Anwendung“,
@@ -215,7 +215,7 @@ roster-deploy --staging <tag> && roster-deploy <tag>
 | bestehende Dienste | wie bisher | unverändert | die bestehenden Freigaben bleiben, wie sie sind |
 
 - Die Fritzbox verteilt nach Port und Protokoll; die bestehenden Dienste und
-  Mordheim teilen sich die öffentliche IP und den DuckDNS-Namen, ohne sich zu
+  Mordheim teilen sich die öffentliche IP und die Domain, ohne sich zu
   berühren.
 - **Last:** Die App synchronisiert nur, solange sie offen ist, und schickt
   dabei wenige Kilobyte. Neben Sprache im Voice-Chat ist das nicht spürbar,
@@ -263,9 +263,10 @@ roster-deploy --staging <tag> && roster-deploy <tag>
 | [`lib/`](../ops/lib/) | `/usr/local/lib/roster/` | Backup, Wiederherstellungstest, Totmannschalter |
 | [`systemd/`](../ops/systemd/) | `/etc/systemd/system/` | Timer und Dienste; Docker wartet auf die SSD |
 | [`fail2ban/`](../ops/fail2ban/) | `/etc/fail2ban/` | Filter und Jail `roster-auth` |
+| [`ddns/porkbun-ddns`](../ops/ddns/porkbun-ddns) | `/usr/local/sbin/` | DynDNS der Domain; nur, wenn `/etc/porkbun-ddns.env` existiert (Abschnitt 11) |
 | [`image/roster-cli`](../ops/image/roster-cli) | im Image | `roster-cli` im Container |
 | [`install.sh`](../ops/install.sh) | – | spielt alles ein; `--render <dir>` erzeugt nur die Dateien |
-| [`test/`](../ops/test/) | – | Rauch- und Ende-zu-Ende-Test der CI |
+| [`test/`](../ops/test/) | – | Rauch- und Ende-zu-Ende-Test der CI, DynDNS-Updater gegen einen API-Ersatz |
 
 Platzhalter in den Vorlagen (`{{ROSTER_HOST}}`, `{{ROSTER_LAN_IP}}`,
 `{{ROSTER_DATA}}`, `{{ROSTER_MOUNT}}`, `{{ROSTER_UID}}` …) füllt `install.sh`
@@ -302,7 +303,7 @@ bricht ab, solange er nicht eingebunden ist.
 
 | Schlüssel | Zweck | ab |
 | --- | --- | --- |
-| `PUBLIC_ORIGIN` | `https://mordheim.<name>.duckdns.org` (für die `Origin`-Prüfung) | Phase 2 |
+| `PUBLIC_ORIGIN` | `https://<ROSTER_HOST>` (für die `Origin`-Prüfung); `install.sh` warnt, wenn es nicht zu `site.env` passt | Phase 2 |
 | `LOG_LEVEL` | `info` | Phase 2 |
 | `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse | Phase 3 |
 | `BUGS_TOKEN_HASH` | Hash des Tokens für die Bug-Arbeit des Agenten | Phase 4c |
@@ -417,7 +418,7 @@ das Backup nicht brauchbar – Meldung kommt über healthchecks.io.
 
 - **Totmannschalter (healthchecks.io):**
   - `roster-alive`: alle 5 Minuten ruft ein Timer auf dem Pi
-    `https://mordheim.<name>.duckdns.org/api/v1/health` auf und prüft
+    `https://<ROSTER_HOST>/api/v1/health` auf und prüft
     zusätzlich die Restlaufzeit des Zertifikats (> 14 Tage), die
     Markerdatei und den Platz auf `/mnt/ssd` (< 90 %). Erfolg pingt, ein
     Problem pingt `/fail` mit dem Grund.
@@ -453,7 +454,7 @@ Keine Agenten-Läufe während eines Spielabends.
 
 | Fall | Erkennen | Folge | Vorgehen |
 | --- | --- | --- | --- |
-| Internet, Fritzbox oder DuckDNS weg | `roster-alive` bleibt aus | kein Zugriff von außen | nichts tun; App läuft offline, gleicht später ab |
+| Internet, Fritzbox oder DNS weg | `roster-alive` bleibt aus | kein Zugriff von außen | nichts tun; App läuft offline, gleicht später ab |
 | Pi hängt oder ist aus | `roster-alive` bleibt aus | wie oben | Pi neu starten; Container starten selbst |
 | SSD nach Neustart nicht eingebunden | Docker startet nicht; `roster-alive` bleibt aus | Dienste aus, aber keine leere App auf der SD | SSD-Verbindung prüfen, `mount -a`, `systemctl start docker` |
 | SSD defekt | wie oben, Mount schlägt fehl | Daten auf dem Pi weg | neue SSD, restic-Kopie vom Desktop zurückspielen; bis dahin Notbetrieb (Abschnitt 10) |
@@ -477,18 +478,80 @@ Das Image gibt es auch für amd64. Fällt der Pi länger aus:
    setzen, z. B. `/` und `/srv/roster`).
 2. Letzten Stand aus der restic-Kopie auf dem Desktop zurückspielen.
 3. An der Fritzbox die Freigabe TCP 443 auf den Desktop umstellen.
-4. DuckDNS zeigt weiter auf die Heim-IP; nichts zu ändern.
+4. Der DNS-Eintrag zeigt weiter auf die Heim-IP; nichts zu ändern.
 5. Nach der Rückkehr des Pi: Stand vom Desktop per Backup/Restore
    zurückholen, Freigabe zurückstellen.
 
-## 11. Umzug auf die eigene Domain
+## 11. Eigene Domain und DynDNS
 
-1. DNS-Eintrag `mordheim.<domain>` auf die Heim-IP (oder als CNAME auf den
-   DuckDNS-Namen).
-2. Im `Caddyfile` den Hostnamen ergänzen; den alten Block für einige Wochen
-   als `redir https://mordheim.<domain>{uri} permanent` behalten.
-3. `PUBLIC_ORIGIN` in `app.env` ändern, App neu starten.
-4. Alle melden sich einmal neu an (Cookies hängen am Hostnamen); die App muss
-   neu installiert werden, weil die PWA an die Adresse gebunden ist.
+Seit 02.10.2026 läuft der Dienst unter einer eigenen Domain statt unter
+DuckDNS (dessen Namensauflösung war zeitweise langsam). Die Domain liegt bei
+Porkbun; Porkbun zeigt die Inhaberdaten im WHOIS nicht an. Namen und Schlüssel
+stehen nur auf dem Pi, hier `<domain>`.
+
+### DNS-Einträge
+
+| Typ | Host | Ziel | Zweck |
+| --- | --- | --- | --- |
+| A | `mordheim` | Heim-IP (vom Updater gepflegt) | Roster (`ROSTER_HOST`) |
+| A | `ts` | Heim-IP (vom Updater gepflegt) | bestehender Sprachdienst |
+| SRV (optional) | `_ts3._udp` | `0 5 9987 ts.<domain>` | Sprachdienst auch unter `<domain>` allein |
+
+Kein AAAA-Eintrag: die Freigaben der Fritzbox gelten nur für IPv4. DNSSEC ist
+nicht nötig (die Zertifikatsprüfung schützt den Roster ohnehin) und schadet
+nicht, wenn man es beim Anbieter einschaltet. HTTP gibt es nicht: Port 80
+bleibt zu, Caddy hört dort nicht, und HSTS hält Browser nach dem ersten
+Besuch ein Jahr lang auf HTTPS. HSTS-Preload lohnt nicht (gälte für die ganze
+Domain, braucht die Umleitung auf Port 80 und lässt sich nur über Monate
+zurücknehmen).
+
+### DynDNS-Updater
+
+`ops/ddns/porkbun-ddns` hält die A-Records auf der öffentlichen IPv4: alle
+5 Minuten (`porkbun-ddns.timer`) fragt es Porkbun nach der eigenen IP und
+ändert einen Eintrag nur, wenn er abweicht; fehlt er, legt es ihn an. Es läuft
+als Wegwerf-Benutzer ohne Rechte (`DynamicUser`), die Schlüssel bekommt nur
+dieser eine Prozess, und an `curl` gehen sie über stdin, nicht über die
+Befehlszeile. `ops/test/ddns.sh` prüft es in der CI gegen einen Ersatz der
+Porkbun-API.
+
+Debians `ddclient` (3.11) taugt dafür nicht: Es ruft `porkbun.com` statt
+`api.porkbun.com` auf und bekommt 403.
+
+1. Bei Porkbun: Account → API Access → Schlüssel anlegen; bei der Domain
+   „API Access“ einschalten. Die Schlüssel nirgends hineinkopieren außer in
+   die Datei aus Schritt 2 (geraten sie in einen Chat oder ein Log: löschen
+   und neu anlegen).
+2. `sudo apt install -y jq`,
+   `sudo install -m 600 /dev/null /etc/porkbun-ddns.env`,
+   `sudo nano /etc/porkbun-ddns.env` nach
+   [`ops/env/porkbun-ddns.env.example`](../ops/env/porkbun-ddns.env.example).
+3. `sudo ops/install.sh` installiert Skript und Timer, sobald es die Datei
+   findet (und verweigert, wenn andere sie lesen können).
+4. Prüfen: `sudo systemctl start porkbun-ddns.service`,
+   `journalctl -u porkbun-ddns -n 10 --no-pager` (ohne Ausgabe des Skripts:
+   alles stimmte schon; sonst `mordheim.<domain>: <alt> -> <neu>`),
+   `dig +short A mordheim.<domain> @curitiba.ns.porkbun.com`.
+
+### Umzug des Hostnamens
+
+1. `ROSTER_HOST=mordheim.<domain>` in `~/server/roster/site.env`, dann
+   `sudo ops/install.sh`: schreibt `Caddyfile` und `/etc/roster/roster.conf`
+   neu (damit prüft `roster-alive` die neue Adresse) und startet Caddy neu;
+   Caddy holt das Zertifikat über TLS-ALPN auf 443
+   (`docker logs --since 10m roster-caddy 2>&1 | grep -iE 'obtain|error'`).
+2. `app.env` überschreibt `install.sh` nie; es warnt aber, solange
+   `PUBLIC_ORIGIN` nicht zu `ROSTER_HOST` passt. Ändern
+   (`sudo nano /mnt/ssd/roster/app.env`), dann
+   `cd ~/server/roster && docker compose up -d --force-recreate app` – ein
+   `docker restart` liest die Datei nicht neu.
+3. Die alte Adresse antwortet danach nicht mehr (der `Caddyfile` kennt nur
+   einen Host). Solange niemand angemeldet ist (vor 3g), braucht es keine
+   Umleitung; danach wäre sie ein zweiter Block
+   `<alt> { redir https://<neu>{uri} permanent }`.
+4. Die App auf jedem Gerät unter der neuen Adresse neu installieren (die PWA
+   und ihre lokalen Daten hängen an der Adresse: vorher exportieren); ab 3g
+   melden sich alle einmal neu an (Cookies hängen am Hostnamen).
 5. Serveradresse in der Quick-Build-Einstellung und ggf. im TTS-Skript
-   ändern.
+   ändern; im Sprachdienst `ts.<domain>` eintragen.
+6. Den alten DynDNS-Dienst erst abschalten, wenn alle umgestellt haben.
