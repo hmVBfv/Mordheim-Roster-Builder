@@ -5,7 +5,7 @@ import * as core from '@mordheim/core';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { AppRoutes } from '../app/App.tsx';
 import { db } from '../db/db.ts';
 import { data } from '../test/data.ts';
@@ -13,6 +13,27 @@ import { nextStamp, savedFields } from './useEditor.ts';
 import { createWarband } from './view.ts';
 
 const NOW = '2026-10-02T10:00:00.000Z';
+
+/* jsdom has no showModal(): just enough of a modal <dialog> for a sheet to
+   open and to report its closing, as useSheet expects. */
+beforeAll(() => {
+  const proto = HTMLDialogElement.prototype as HTMLDialogElement & { showModal?: () => void };
+  if (typeof proto.showModal === 'function') return;
+  proto.showModal = function (this: HTMLDialogElement) { this.setAttribute('open', ''); };
+  proto.close = function (this: HTMLDialogElement) {
+    if (!this.hasAttribute('open')) return;
+    this.removeAttribute('open');
+    this.dispatchEvent(new Event('close'));
+  };
+});
+
+/** Adds `n` men through the "More men" sheet. */
+async function moreMen(user: ReturnType<typeof userEvent.setup>, group: HTMLElement, n = 1) {
+  await user.click(within(group).getByRole('button', { name: /\+ Man/ }));
+  const sheet = await screen.findByRole('dialog', { name: /More men/ });
+  for (let i = 1; i < n; i++) await user.click(within(sheet).getByRole('button', { name: 'One man more' }));
+  await user.click(within(sheet).getByRole('button', { name: 'Recruit' }));
+}
 
 async function seed(s: core.WarbandState) {
   await db.warbands.add({ id: 'w1', name: s.name ?? '', wb: s.wb as string, wbName: data.WARBANDS[s.wb as string]!.name, state: s, format: core.FORMAT, createdAt: NOW, updatedAt: NOW });
@@ -58,24 +79,24 @@ describe('the roster', () => {
     await user.click(within(captain).getByRole('button', { name: /One experience more/ }));
     await waitFor(async () => expect((await stored()).state.models[0]!.exp).toBe(22));
     expect(within(captain).getByText('22')).toBeTruthy();
-    expect(screen.queryByText(/A man joins/)).toBeNull();
+    expect(screen.queryByRole('status')).toBeNull();
   });
 
-  it('+ Man adds a man at his price; Undo takes him away again', async () => {
+  it('+ Man adds a man at his price through its sheet; Undo takes him away again', async () => {
     await seed(band());
     at('/warbands/w1');
     const user = userEvent.setup();
     const group = await screen.findByRole('article', { name: 'Warrior' });
     const gold = (await stored()).state;
     const before = core.goldCurrent(core.ctxOf(data, gold));
-    await user.click(within(group).getByRole('button', { name: /\+ Man/ }));
+    await moreMen(user, group);
     await waitFor(async () => expect((await stored()).state.models[1]!.qty).toBe(3));
     expect(core.goldCurrent(core.ctxOf(data, (await stored()).state))).toBeLessThan(before);
     expect(within(within(group).getByRole('list', { name: 'Men of Warrior' })).getAllByRole('listitem')).toHaveLength(3);
-    const notice = screen.getByText(/A man joins Warrior/).closest<HTMLElement>('[role=status]')!;
+    const notice = (await screen.findByText(/Warrior 3 joins Warrior/)).closest<HTMLElement>('[role=status]')!;
     await user.click(within(notice).getByRole('button', { name: 'Undo' }));
     await waitFor(async () => expect((await stored()).state.models[1]!.qty).toBe(2));
-    expect(screen.queryByText(/A man joins/)).toBeNull();
+    expect(screen.queryByText(/joins Warrior/)).toBeNull();
   });
 
   it('a later change takes the notice away, so Undo never reverts more than its own change', async () => {
@@ -83,10 +104,10 @@ describe('the roster', () => {
     at('/warbands/w1');
     const user = userEvent.setup();
     const group = await screen.findByRole('article', { name: 'Warrior' });
-    await user.click(within(group).getByRole('button', { name: /\+ Man/ }));
-    expect(screen.getByText(/A man joins/)).toBeTruthy();
+    await moreMen(user, group);
+    expect(await screen.findByText(/joins Warrior/)).toBeTruthy();
     await user.click(within(group).getByRole('button', { name: /One experience more/ }));
-    expect(screen.queryByText(/A man joins/)).toBeNull();
+    expect(screen.queryByText(/joins Warrior/)).toBeNull();
     await waitFor(async () => expect((await stored()).state.models[1]).toMatchObject({ qty: 3, exp: 1 }));
   });
 

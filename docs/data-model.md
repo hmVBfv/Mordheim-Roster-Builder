@@ -85,7 +85,10 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   Kampagnenaufzeichnungen und ohne `_`-Schlüssel, `totals` = `{ rating,
   spent, models, heroes, gold, fallen }` so, wie sie damals standen.
 - **Post-Battle** (`campaign.postbattle[round]`): `{ done: { [step]: true },
-  wyrd: { done, shards, gc, size } | null }`.
+  wyrd: { done, shards, gc, size } | null, veterans? }`. `veterans` (neu,
+  optional): `{ roll, spent }` – der Veteranenwurf der Runde (2W6) und wie
+  viel Erfahrung neue Männer davon schon mitgebracht haben (`core`
+  `setVeteransRoll`, `addMen`).
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist

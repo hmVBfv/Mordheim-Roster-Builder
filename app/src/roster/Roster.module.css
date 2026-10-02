@@ -519,3 +519,23 @@
   padding-left: var(--space-3);
   border-left: 2px solid var(--border);
 }
+
+/* the price of more men: line by line, the sum set off */
+.costs {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.costs dd {
+  margin: 0;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.costs .sum {
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+}

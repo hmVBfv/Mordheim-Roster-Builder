@@ -7,6 +7,7 @@ import ui from '../ui/ui.module.css';
 import type { useSheet } from '../ui/useSheet.ts';
 import styles from './Roster.module.css';
 import type { RecruitUnit, RosterView } from './view.ts';
+import { moreMenVerdict, type MoreMenView } from './men.ts';
 
 type Sheet = ReturnType<typeof useSheet>;
 /** The dialog's ref and its close(), from useSheet in the screen. */
@@ -106,5 +107,81 @@ export function RecruitSheet({ dialogRef, close, v, onRecruit }: SheetProps & { 
         <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
       </div>
     </dialog>
+  );
+}
+
+/** More men for a group (mockup roster.html "More men"): how many, the
+    veterans roll after the first battle, the price, their names. */
+export function MoreMenSheet({ dialogRef, close, view, onAdd }: SheetProps & {
+  view: (MoreMenView & { key: number }) | null;
+  onAdd: (n: number, roll: number | null, names: string[], text: string) => void;
+}) {
+  const id = useId();
+  return (
+    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
+      {view && <MoreMenBody key={view.key} v={view} close={close} onAdd={onAdd} titleId={id} />}
+    </dialog>
+  );
+}
+
+function MoreMenBody({ v, close, onAdd, titleId }: { v: MoreMenView; close: Sheet['close']; onAdd: (n: number, roll: number | null, names: string[], text: string) => void; titleId: string }) {
+  const [n, setN] = useState(1);
+  const [roll, setRoll] = useState(v.veterans?.roll != null ? String(v.veterans.roll) : '');
+  const [names, setNames] = useState<string[]>([]);
+  const rollId = useId();
+  const r = roll === '' ? null : Number(roll);
+  const verdict = moreMenVerdict(v, n, v.veterans ? r : null);
+  const total = n * v.each;
+  const who = Array.from({ length: n }, (_, i) => (names[i] ?? '').trim() || v.fallbacks[i]!);
+  const text = `${who.join(', ')} join${n === 1 ? 's' : ''} ${v.name} (${total} gc).`;
+  return (
+    <form className={ui.page} onSubmit={(e) => { e.preventDefault(); if (!verdict) close(() => onAdd(n, v.veterans ? r : null, names.slice(0, n), text)); }}>
+      <div>
+        <h2 id={titleId}>More men · {v.name}</h2>
+        <p className={ui.muted}>A new man joins with the group's experience and the same gear. He costs the {v.unit} with that gear{v.exp ? `, and ${v.perExp} gc for each point of the group's experience` : ''}.</p>
+      </div>
+      <div className={ui.row}>
+        <span>How many</span>
+        <span className={styles.stepper}>
+          <button type="button" aria-label="One man less" disabled={n <= 1} onClick={() => setN(n - 1)}>−</button>
+          <span aria-live="polite">{n}</span>
+          <button type="button" aria-label="One man more" disabled={n >= v.max} onClick={() => setN(n + 1)}>+</button>
+        </span>
+      </div>
+      {v.veterans && (
+        <div className={ui.field}>
+          <label htmlFor={rollId}>2D6 as rolled for the veterans on offer (post-battle step 5)</label>
+          <span className={styles.dice}>
+            <input id={rollId} className={ui.input} inputMode="numeric" maxLength={2} value={roll} autoComplete="off" onChange={(e) => setRoll(e.target.value.replace(/\D/g, '').slice(0, 2))} />
+            <button type="button" className={ui.buttonQuiet} onClick={() => setRoll(String(2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)))}>Roll the dice</button>
+          </span>
+          <span className={ui.muted}>{v.veterans.roll != null ? `This round: ${v.veterans.roll}, of which new men brought ${v.veterans.spent}. ` : ''}Together, new men may bring at most that much experience.</span>
+        </div>
+      )}
+      <dl className={styles.costs}>
+        <dt>{v.unit} with his gear</dt><dd>{v.base} gc</dd>
+        {v.surcharge > 0 && <><dt>Experience: {v.exp} × {v.perExp} gc</dt><dd>{v.surcharge} gc</dd></>}
+        <dt className={styles.sum}>{n} × {v.each} gc</dt><dd className={styles.sum}>{total} gc</dd>
+      </dl>
+      <p aria-live="polite" className={verdict ? styles.why : ui.muted}>{verdict || `Gold left: ${v.gold - total} gc.`}</p>
+      {who.map((_, i) => (
+        <NameField key={i} label={`Name of new man ${i + 1}`} value={names[i] ?? ''} placeholder={v.fallbacks[i]!} onChange={(x) => setNames((p) => { const c = [...p]; c[i] = x; return c; })} />
+      ))}
+      <div className={ui.row}>
+        <button type="submit" className={ui.button} disabled={!!verdict}>Recruit</button>
+        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+      </div>
+    </form>
+  );
+}
+
+
+function NameField({ label, value, placeholder, onChange }: { label: string; value: string; placeholder: string; onChange: (v: string) => void }) {
+  const id = useId();
+  return (
+    <div className={ui.field}>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} className={ui.input} value={value} placeholder={placeholder} autoComplete="off" onChange={(e) => onChange(e.target.value)} />
+    </div>
   );
 }
