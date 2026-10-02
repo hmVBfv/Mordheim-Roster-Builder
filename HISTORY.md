@@ -1810,3 +1810,15 @@ never suffers further leg injuries", and is now corrected. Robbed is a loss
 of equipment, not an injury. And a captive is now a state rather than an
 answer the player must give at once: he stays on the roster, counted but
 not fighting, until an exchange, a ransom or his loss is entered.
+
+V2 followed: fixed ids for the Fallen. A casualty record had pointed at its
+dead warrior by position, so deleting one Fallen entry quietly moved every
+later record onto the wrong man. The failing test came first, as the spec
+asked; the fix gives each entry an id from the chronicle's sequence at the
+moment of death and links by it, keeping the old position in step for the
+old app. The format number rose to 2 for the first time, with the migration
+in `normalizeState`, so that a state already in the app's store is mended
+just like a file. Writing the parity exceptions turned up a second case of
+the same fault in the old app: a death taken back left its record on a
+position the next death would fill. Both are now named rules in the parity
+suite rather than silent differences.
