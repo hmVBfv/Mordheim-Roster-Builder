@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>House Rules Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .figures { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); margin: 0; }
+  .figures div { display: grid; }
+  .figures dt { font-size: 0.78rem; color: var(--text-muted); }
+  .figures dd { margin: 0; font-size: 1.2rem; font-weight: 600; }
+  .cases { display: flex; gap: 4px; }
+  .cases a { color: inherit; }
+  .cases a[aria-current='page'] { font-weight: 700; text-decoration: none; }
+  .group { display: grid; gap: var(--s1); }
+  .rule { display: grid; gap: var(--s1); padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .rule.on { border-color: var(--warn); }
+  .rule-head { display: grid; grid-template-columns: 1fr auto; gap: var(--s2); align-items: center; min-height: var(--tap); }
+  .rule-head b { font-weight: 600; }
+  .rule .std { font-size: 0.85rem; color: var(--text-muted); }
+  .rule .hr { font-size: 0.75rem; color: var(--warn); border: 1px solid var(--warn); border-radius: 999px; padding: 0 6px; margin-left: var(--s1); }
+  /* a switch: a real checkbox, big enough for a thumb */
+  .switch { position: relative; display: inline-flex; width: 56px; height: var(--tap); align-items: center; justify-content: center; cursor: pointer; }
+  .switch input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
+  .switch span { width: 44px; height: 24px; border-radius: 12px; background: var(--border); position: relative; transition: background 0.15s; pointer-events: none; }
+  .switch span::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); transition: left 0.15s; }
+  .switch input:checked + span { background: var(--warn); }
+  .switch input:checked + span::after { left: 23px; }
+  .switch input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .switch input:disabled { cursor: default; }
+  .switch input:disabled + span { opacity: 0.6; }
+  .value { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+  .stepper { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius); }
+  .stepper button { min-width: var(--tap); min-height: var(--tap); border: 0; background: transparent; color: var(--text); font-size: 1.2rem; cursor: pointer; }
+  .stepper output { min-width: 4.5em; text-align: center; font-weight: 600; }
+  .grades { display: flex; flex-wrap: wrap; gap: var(--s1); }
+  .grades button { min-height: var(--tap); min-width: var(--tap); padding: 0 var(--s2); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--text); cursor: pointer; }
+  .grades button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .grades button:disabled { cursor: default; opacity: 0.7; }
+  .check { display: flex; align-items: center; gap: var(--s2); min-height: var(--tap); cursor: pointer; font-size: 0.95rem; }
+  .check input { width: 22px; height: 22px; accent-color: var(--accent); }
+  .declared { padding: var(--s2) var(--s3); border: 1px dashed var(--border); border-radius: var(--radius); font-size: 0.9rem; }
+  .declared p { margin: 0; }
+  .flag { display: grid; gap: var(--s2); padding: var(--s3); border: 1px solid var(--warn); border-radius: var(--radius); }
+  .flag p { margin: 0; }
+  .effect { font-size: 0.9rem; }
+  .effect b { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>House rules</span>
+  <span class="cases" aria-label="Case"><a href="house-rules.html" id="case-alone">On its own</a>·<a href="house-rules.html#campaign" id="case-campaign">In a campaign</a>·<a href="house-rules.html#leader" id="case-leader">As leader</a></span>
+  <span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <a class="back" href="roster.html" aria-label="Back to the roster" id="back">←</a>
+    <span class="title">House rules</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+
+  <div class="content">
+    <div class="stack">
+      <p class="muted small" id="who"></p>
+      <p id="intro"></p>
+      <dl class="figures">
+        <div><dt>House rules on</dt><dd id="count">0</dd></div>
+        <div id="gold-fig"><dt>Gold left</dt><dd id="gold">85 gc</dd></div>
+      </dl>
+      <p class="effect muted" id="effect"></p>
+    </div>
+
+    <div class="flag" id="flag" hidden>
+      <p><b>This warband was built with other house rules.</b></p>
+      <p class="small" id="flag-text"></p>
+      <div class="row"><button type="button" class="btn" id="take">Take Hel Fenn’s rules</button></div>
+    </div>
+
+    <div id="groups" class="stack"></div>
+
+    <section class="stack" aria-labelledby="notes-h">
+      <h2 id="notes-h">Notes</h2>
+      <label class="field" id="notes-field"><span class="small muted">Printed with the roster and named on every export</span>
+        <textarea class="textarea" id="notes" rows="3" placeholder="e.g. we play the Hel Fenn scenario rules from the Annual"></textarea></label>
+      <p class="muted" id="notes-ro" hidden>No notes from Hel Fenn’s leaders.</p>
+    </section>
+
+    <section class="stack" aria-labelledby="dec-h">
+      <h2 id="dec-h">On every export</h2>
+      <p class="small muted">Text, file, TTS cards and the PDF sheet name every house rule that is on, so nobody plays against rules he did not know.</p>
+      <div class="declared" id="declared"></div>
+    </section>
+
+    <div class="row" id="reset-row"><button type="button" class="btn-quiet" id="reset">All back to the rules as written</button></div>
+  </div>
+  <nav class="nav" data-current="Warbands"></nav>
+</div>
+
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  /* The Roster Builder's house rules (core houseDefaults), grouped as it
+     groups them, each with what the rules as written say. Off is always
+     the rules as written; "Enforce the equipment list" is shown the other
+     way round for that reason. "Show rarity" is a display setting, not a
+     rule, and moves to More. */
+  var GROUPS = [['comp', 'The warband'], ['lead', 'Leader and advances'], ['cost', 'Prices'], ['access', 'What may be bought and carried'], ['hire', 'Hired Swords and Dramatis Personae']];
+  var RULES = [
+    { k: 'startGold', g: 'comp', label: 'Starting gold', kind: 'gc', std: 'the warband’s own: 500 gc', start: 600, step: 50, min: 0, max: 2000 },
+    { k: 'min', g: 'comp', label: 'Fewest models', kind: 'n', std: 'the warband’s own: 3', start: 5, step: 1, min: 1, max: 20 },
+    { k: 'max', g: 'comp', label: 'Most models', kind: 'n', std: 'the warband’s own: 15', start: 12, step: 1, min: 1, max: 30 },
+    { k: 'heroes', g: 'comp', label: 'Most Heroes', kind: 'n', std: '6', start: 5, step: 1, min: 1, max: 12 },
+    { k: 'rangedCap', g: 'comp', label: 'Limit models with ranged weapons', kind: 'pct', std: 'no limit', start: 50, step: 5, min: 0, max: 100, unit: '% of the models at most', note: '0 % means a warband without ranged weapons.' },
+    { k: 'hireNewLeader', g: 'lead', label: 'A new leader may be hired', kind: 'bool', std: 'when the leader dies, the Hero with the highest Leadership takes over; no new leader can be hired' },
+    { k: 'allSkills', g: 'lead', label: 'Heroes choose from every skill list', kind: 'bool', std: 'only from the lists of their type', on: 'Combat, Shooting, Academic, Strength and Speed for every Hero' },
+    { k: 'priceAll', g: 'cost', label: 'All equipment', kind: 'price', std: '100 %', start: 80 },
+    { k: 'priceArmour', g: 'cost', label: 'Armour', kind: 'price', std: '100 %', start: 80, sub: { k: 'armourBodyOnly', label: 'Body armour only, not helmets, shields and bucklers' } },
+    { k: 'priceBP', g: 'cost', label: 'Blackpowder weapons', kind: 'price', std: '100 %', start: 120 },
+    { k: 'priceMissile', g: 'cost', label: 'Missile weapons', kind: 'price', std: '100 %', start: 120 },
+    { k: 'clubSurcharge', g: 'cost', label: 'Clubs, maces and hammers', kind: 'plus', std: 'the list price', start: 2, step: 1, min: 1, max: 20 },
+    { k: 'slingSurcharge', g: 'cost', label: 'Slings', kind: 'plus', std: 'the list price', start: 2, step: 1, min: 1, max: 20 },
+    { k: 'freeDagger', g: 'cost', label: 'All daggers free', kind: 'bool', std: 'each warrior’s first dagger is free' },
+    { k: 'anyEq', g: 'access', label: 'Equipment beyond the lists', kind: 'bool', std: 'the roster warns when a warrior carries what his list does not offer', on: 'no warning; saved as “Enforce equipment list: off”' },
+    { k: 'freeMarket', g: 'access', label: 'Free market', kind: 'bool', std: 'only rare items the warband’s lists and rules allow are on offer', on: 'every rare and trading-post item is on offer' },
+    { k: 'miscHench', g: 'access', label: 'Henchmen may take miscellaneous equipment', kind: 'bool', std: 'Heroes only' },
+    { k: 'rerollOne', g: 'access', label: 'One re-roll item per warband', kind: 'bool', std: 'no limit', on: 'a second Lucky charm, rabbit’s foot, relic or familiar is warned about' },
+    { k: 'hsGrades', g: 'hire', label: 'Hired Sword grades played', kind: 'grades', grades: ['1a', '1b', '1c', '2a'], std: 'all grades' },
+    { k: 'dpGrades', g: 'hire', label: 'Dramatis Personae grades played', kind: 'grades', grades: ['core', '1a', '1b', '1c', '2a'], std: 'all grades' },
+    { k: 'hsEquip', g: 'hire', label: 'They may buy equipment', kind: 'bool', std: 'their equipment is fixed', on: 'from the warband’s Hero equipment list' }
+  ];
+  var byKey = {}; RULES.forEach(function (r) { byKey[r.k] = r; });
+
+  // the three cases of the mockup: a warband on its own (Quick Build, or
+  // before it joins a campaign); in a campaign, as a player; as its leader
+  var CASE = location.hash === '#campaign' ? 'campaign' : location.hash === '#leader' ? 'leader' : 'alone';
+  ['alone', 'campaign', 'leader'].forEach(function (c) { if (c === CASE) $('case-' + c).setAttribute('aria-current', 'page'); });
+  var CAMPAIGN = { freeDagger: true };
+  var OWN = { priceArmour: 80, freeDagger: true };   // what the Silver Caravan's file was built with
+  var st = CASE === 'alone' ? {} : JSON.parse(JSON.stringify(CAMPAIGN));
+  var editable = CASE !== 'campaign';
+
+  $('who').textContent = CASE === 'alone'
+    ? 'The Grey Company · Mercenaries – Middenheim · being founded, on this phone'
+    : CASE === 'campaign' ? 'The Silver Caravan · Hel Fenn campaign · ✓ After battle 5' : 'Hel Fenn campaign · 3 warbands · you lead';
+  $('intro').textContent = CASE === 'alone'
+    ? 'Everything is played as written unless a house rule is switched on here. It belongs to this warband until it joins a campaign; then the campaign’s rules count.'
+    : CASE === 'campaign' ? 'Hel Fenn’s leaders set these for every warband of the campaign (Manage). Everything else is played as written.'
+      : 'For every warband of Hel Fenn. A change counts from now on and is named on every warband’s exports.';
+  if (CASE === 'leader') { $('back').href = 'manage.html'; $('back').setAttribute('aria-label', 'Back to Manage'); }
+  if (CASE !== 'alone') $('gold-fig').hidden = true;
+  $('notes-field').hidden = !editable;
+  $('notes-ro').hidden = editable;
+  $('reset-row').hidden = !editable;
+
+  function isOn(r) {
+    var v = st[r.k];
+    if (r.kind === 'grades') return !!v && r.grades.some(function (g) { return v[g] === false; });
+    return v !== undefined && v !== false;
+  }
+  function valueText(r) {
+    var v = st[r.k];
+    if (r.kind === 'bool') return 'on';
+    if (r.kind === 'price') return v + ' %' + (r.sub && st[r.sub.k] ? ' (body armour only)' : '');
+    if (r.kind === 'gc') return v + ' gc';
+    if (r.kind === 'plus') return '+' + v + ' gc each';
+    if (r.kind === 'pct') return v + ' %';
+    if (r.kind === 'grades') return 'without ' + r.grades.filter(function (g) { return v[g] === false; }).join(', ');
+    return String(v);
+  }
+  function control(r) {
+    var dis = editable ? '' : ' disabled';
+    if (r.kind === 'bool') return '';
+    if (r.kind === 'grades') {
+      var v = st[r.k] || {};
+      return '<div class="grades" role="group" aria-label="' + esc(r.label) + '">' + r.grades.map(function (g) {
+        return '<button type="button" data-grade="' + r.k + ':' + g + '" aria-pressed="' + (v[g] !== false) + '"' + dis + '>' + g + '</button>';
+      }).join('') + '</div>';
+    }
+    if (!isOn(r)) return '';
+    var step = r.kind === 'price' ? 5 : r.step;
+    var out = '<div class="value"><span class="stepper"><button type="button" data-step="' + r.k + ':-' + step + '" aria-label="Less: ' + esc(r.label) + '"' + dis + '>−</button><output>' + esc(valueText(r).replace(/ \(body armour only\)/, '')) + '</output><button type="button" data-step="' + r.k + ':' + step + '" aria-label="More: ' + esc(r.label) + '"' + dis + '>+</button></span>'
+      + (r.unit ? '<span class="small muted">' + esc(r.unit) + '</span>' : '') + '</div>';
+    if (r.sub) out += '<label class="check"><input type="checkbox" data-sub="' + r.sub.k + '"' + (st[r.sub.k] ? ' checked' : '') + dis + '> ' + esc(r.sub.label) + '</label>';
+    if (r.note) out += '<p class="small muted">' + esc(r.note) + '</p>';
+    return out;
+  }
+  function draw() {
+    var html = '';
+    GROUPS.forEach(function (gr) {
+      var rules = RULES.filter(function (r) { return r.g === gr[0]; });
+      // a player sees what is on; the rest is played as written
+      if (!editable) rules = rules.filter(isOn);
+      if (!rules.length) return;
+      html += '<section class="group" aria-label="' + esc(gr[1]) + '"><h2>' + esc(gr[1]) + '</h2>' + rules.map(function (r) {
+        var on = isOn(r);
+        // a player sees the campaign's rules, not switches he cannot use
+        var sw = r.kind === 'grades' || !editable ? '' : '<label class="switch"><input type="checkbox" data-toggle="' + r.k + '" aria-label="' + esc(r.label) + '"' + (on ? ' checked' : '') + (editable ? '' : ' disabled') + '><span></span></label>';
+        return '<div class="rule' + (on ? ' on' : '') + '"><div class="rule-head"><span><b>' + esc(r.label) + '</b>' + (on ? '<span class="hr">house rule</span>' : '') + '</span>' + sw + '</div>'
+          + '<span class="std">' + (on && r.on ? esc(r.on) + ' · ' : '') + 'As written: ' + esc(r.std) + '</span>' + control(r) + '</div>';
+      }).join('') + '</section>';
+    });
+    if (!editable) html += '<p class="muted small">' + (RULES.some(isOn) ? 'Everything else is played as written.' : 'No house rules: everything is played as written.') + '</p>';
+    $('groups').innerHTML = html;
+    var on = RULES.filter(isOn);
+    $('count').textContent = on.length;
+    var notes = $('notes').value.trim();
+    $('declared').innerHTML = on.length || notes
+      ? '<p><b>House rules:</b> ' + on.map(function (r) { return esc(r.label) + ': ' + esc(valueText(r)); }).join('; ') + (notes ? (on.length ? '; ' : '') + 'Notes: ' + esc(notes) : '') + '</p>'
+      : '<p class="muted">Nothing: the rules as written.</p>';
+    effect();
+    flag();
+  }
+  // a feel for what prices do to a founding warband: 415 gc spent, 140 of it on armour
+  function effect() {
+    if (CASE !== 'alone') {
+      $('effect').textContent = CASE === 'campaign' ? '' : 'Prices count from the next purchase; gold already in a warband’s hands stays as it is (the ledger).';
+      return;
+    }
+    var all = (st.priceAll || 100) / 100, arm = (st.priceArmour || 100) / 100;
+    var spent = Math.round(275 * all + 140 * all * arm) + (st.freeDagger ? -2 * 2 : 0);
+    var start = st.startGold || 500;
+    $('gold').textContent = (start - spent) + ' gc';
+    $('effect').innerHTML = spent === 415 && start === 500 ? 'The warband spent 415 gc of 500.' : 'With these rules the warband spent <b>' + spent + ' gc</b> of ' + start + ' (as written: 415 of 500).';
+  }
+  function flag() {
+    if (CASE !== 'campaign') { $('flag').hidden = true; return; }
+    var diff = RULES.filter(function (r) { return JSON.stringify(OWN[r.k]) !== JSON.stringify(CAMPAIGN[r.k]); });
+    $('flag').hidden = !diff.length;
+    $('flag-text').textContent = diff.map(function (r) {
+      var mine = OWN[r.k] === undefined ? 'as written' : r.kind === 'price' ? OWN[r.k] + ' %' : 'on';
+      var theirs = CAMPAIGN[r.k] === undefined ? 'as written' : r.kind === 'price' ? CAMPAIGN[r.k] + ' %' : 'on';
+      return r.label + ': ' + mine + ' in its file, ' + theirs + ' in Hel Fenn';
+    }).join(' · ') + '. In the campaign Hel Fenn’s rules count; the roster is worked out with them.';
+  }
+
+  function changed(text, undo) { draw(); window.mockToast(text + (CASE === 'leader' ? ' For every warband of Hel Fenn.' : ''), undo); }
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.dataset.toggle) {
+      var r = byKey[t.dataset.toggle], before = JSON.parse(JSON.stringify(st));
+      if (t.checked) st[r.k] = r.kind === 'bool' ? true : r.start; else { delete st[r.k]; if (r.sub) delete st[r.sub.k]; }
+      changed(r.label + (t.checked ? ': house rule on.' : ': as written again.'), function () { st = before; draw(); });
+    } else if (t.dataset.sub) {
+      if (t.checked) st[t.dataset.sub] = true; else delete st[t.dataset.sub];
+      draw();
+    }
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-step], [data-grade]');
+    if (!b) return;
+    if (b.dataset.step) {
+      var p = b.dataset.step.split(':'), r = byKey[p[0]];
+      var min = r.kind === 'price' ? 25 : r.min, max = r.kind === 'price' ? 200 : r.max;
+      st[r.k] = Math.max(min, Math.min(max, st[r.k] + Number(p[1])));
+      draw();
+    } else {
+      var q = b.dataset.grade.split(':'), before = JSON.parse(JSON.stringify(st));
+      var v = st[q[0]] = st[q[0]] || {};
+      if (v[q[1]] === false) delete v[q[1]]; else v[q[1]] = false;
+      if (!Object.keys(v).length) delete st[q[0]];
+      changed('Grade ' + q[1] + (v[q[1]] === false ? ' is not played.' : ' is played again.'), function () { st = before; draw(); });
+    }
+  });
+  $('notes').addEventListener('input', draw);
+  $('reset').addEventListener('click', function () {
+    var before = JSON.parse(JSON.stringify(st)), notes = $('notes').value;
+    st = {}; $('notes').value = '';
+    changed('All house rules off: the rules as written.', function () { st = before; $('notes').value = notes; draw(); });
+  });
+  $('take').addEventListener('click', function () {
+    OWN = JSON.parse(JSON.stringify(CAMPAIGN));
+    draw();
+    window.mockToast('The Silver Caravan now carries Hel Fenn’s house rules in its file too.', function () { OWN = { priceArmour: 80, freeDagger: true }; draw(); });
+  });
+  window.addEventListener('hashchange', function () { location.reload(); });
+  draw();
+})();
+</script>
+</body>
+</html>
