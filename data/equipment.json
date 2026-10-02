@@ -3093,7 +3093,7 @@
    {
     "name": "Peg Leg",
     "line": "Miscellaneous · 8 gc · Common",
-    "text": "A wooden leg. The wearer's Movement is reduced by 1, but he may ignore a Leg Wound / Smashed Leg result (the peg already replaced it) and never suffers further leg injuries."
+    "text": "A wooden leg in place of a ruined one (Pirates only, one per model). Movement and maximum Movement −1. Special save of 6+ whenever any other save against a wounding shooting or close-combat hit fails; not modified, usable even without a normal save. A later Leg Wound or Smashed Leg is ignored on a D6 roll of 4+: the hit struck the peg."
    }
   ],
   [

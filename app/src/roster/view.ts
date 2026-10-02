@@ -48,6 +48,10 @@ export interface WarriorView {
   spells: string[];
   mutations: string[];
   injuries: string[];
+  /** Blinded in both eyes: he must retire from the warband (rulebook, 31). */
+  retire: boolean;
+  /** Held captive (61): by whom, or '' when unknown; null when free. */
+  captive: string | null;
   /** The men of a group, each by his name or the fallback ("Warriors 2"). */
   men: ManView[];
   /** For a group: another man, at what price or why not; null for a Hero. */
@@ -57,6 +61,7 @@ export interface WarriorView {
 export interface HireView {
   key: string; uid: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
   exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[];
+  skills: string[]; spells: string[];
 }
 
 /** One line of the recruit list (legacy renderAddMenu). */
@@ -152,6 +157,8 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     spells: (m.spells ?? []).map((s) => s.name),
     mutations: (m.mut ?? []).map((x) => core.mutEN(ctx.data, x)),
     injuries: (m.inj ?? []).map((j) => j.name + core.injModText(j)),
+    retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
+    captive: m.captive ? m.captive.by : null,
     men: hero ? [] : core.memberNames(ctx, m).map((name, i) => ({ i, name, named: core.memberNamed(m, i) })),
     addMan: hero ? null : block ? { why: block } : { cost: core.henchRecruitCost(ctx, m) },
   };
@@ -168,6 +175,8 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
     xp: hs ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX) : null,
     advanceDue: hs && core.hsAdvanceStatus(ctx, rec, e).due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),
+    skills: [...(rec.skills ?? [])],
+    spells: (rec.spells ?? []).map((sp) => core.spellLabel(sp.name)),
   };
 }
 

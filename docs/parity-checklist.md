@@ -64,11 +64,11 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Profil mit allen Änderungen, Rassenmaxima, Rüstungswurf | ✓ | ✓ | ✓ | roster | 1e | geänderte Werte markiert |
 | Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ✓ | roster | 1e | App: mit Pull Request #4 |
 | Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | ◐ | roster | 3a | Stepper (nicht unter die Starterfahrung, Hired Swords bis 14); Sprung auf eine Schwelle fehlt |
-| Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ◐ | roster (Advance) | 3 | App zeigt Fertigkeiten und Zauber |
+| Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ✓ | roster (Advance) | 3c | „Advance“ auf jeder Karte: Wurf nach den Tabellen, Werte bis zum Rassenmaximum, Fertigkeit aus seinen Listen oder ein Zauber stattdessen; Korrektur über ⋯ |
 | Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ◐ | – | 3 | **Mockup fehlt**; App zeigt Mutationen |
-| Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3 | App zeigt „Promoted“ |
-| Schwere Verletzungen (D66) mit Folgeentscheidungen, ausgesetzte Spiele | ✓ | ✓ | ◐ | roster (Injury, V1) | 3 | App zeigt Verletzungen und „Misses“ |
-| Tod, Gefallene, Rücknahme, verlorener Wert | ✓ | ✓ | ◐ | roster („Out of action for good“) | 3 | App listet Gefallene |
+| Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3c | 10–12 einer Gruppe: wer, zwei Listen; Rücknahme über Undo, eine spätere Rücknahme fehlt noch |
+| Schwere Verletzungen (D66) mit Folgeentscheidungen, ausgesetzte Spiele | ✓ | ✓ | ✓ | roster (Injury, V1) | 3c | „Injury“ auf jeder Karte: D66 wie gewürfelt (oder „Roll the dice“), jede Nachfrage der Tabelle, verschachtelt bei Multiple Injuries und verlorenem Grubenkampf; Bezirke und Peg Leg; Henchmen und Hired Swords W6. Neue Logik `core` `injure` (V1), beide Eingänge gleich. Korrektur und ausgesetzte Spiele über ⋯ |
+| Tod, Gefallene, Rücknahme, verlorener Wert | ✓ | ✓ | ◐ | roster („Out of action for good“) | 3c | Tod über die Verletzung (auch „Out of action for good…“ im ⋯), Rücknahme über Undo; App listet Gefallene. Eine spätere Rücknahme und feste IDs (V2) folgen |
 
 ## Hired Swords und Dramatis Personae
 
@@ -76,7 +76,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Listen mit Filtern (Grad, Werte, Name), wer anheuern darf und warum nicht | ✓ | ✓ | – | – | 3 | **Mockup fehlt** |
 | Anheuern, Kosten, Unterhalt, Personas, Optionen | ✓ | ✓ | – | – | 3 | |
-| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ◐ | roster (Big Gunnar) | 3 | App: Erfahrung per Stepper, Name, Entlassen; Aufstiege fehlen |
+| Erfahrung (Henchmen-Schritte), Aufstiege, Fertigkeiten, Zauber | ✓ | ✓ | ✓ | roster (Big Gunnar) | 3c | Hired Swords würfeln auf der Heldentabelle mit ihren Listen |
 
 ## Hausregeln
 

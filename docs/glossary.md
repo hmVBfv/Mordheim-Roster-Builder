@@ -67,6 +67,13 @@ Begriff einführt, trägt ihn hier ein.
 | Anführer bestimmen | Lead the warband | `setLeader()`, `canBeLeader()` |
 | Hinweis mit Rückgängig | Undo (notice) | `UndoToast`, `useEditor().notice` |
 | Beförderung | The lad's got talent · Promoted | `promoteHench()`, `m.promoted`, `m.promoCats` |
+| Aufstieg (Wurf nach der Tabelle) | Advance | `AdvanceSheet`, `HERO_TABLE`, `HENCH_TABLE`, `addAdvance()`, `addSkillFromList()` |
+| Aufstiege korrigieren | Advances taken – correct | `TakenSheet`, `removeAdvance()`, `removeSkill()` |
+| Schwere Verletzung (Wurf nach der Tabelle) | Injury · Serious injury | `InjurySheet`, `injure()`, `HeroRoll`, `HERO_CODES` |
+| Folgeentscheidung (Nachwurf, Wahl) | follow-up (D6, D3, fate, fight) | `HeroRoll.d6`, `.games`, `.captured`, `.pit`, `.more` |
+| Endgültig außer Gefecht | Out of action for good | `injure()` mit `11-15` |
+| Verletzungen korrigieren | Injuries – correct | `InjuriesSheet`, `removeInjury()`, `adjustMiss()` |
+| Gefangener, Gefangenschaft | Captive · Captivity | `m.captive`, `CaptiveSheet`, `releaseCaptive()` |
 
 ## Kampagne und Schlacht
 

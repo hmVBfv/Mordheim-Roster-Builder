@@ -52,7 +52,7 @@ function restoreValueOnUndo(d: WarbandDraft, c: Ctx, rec: FallenRecord): number 
 /** Gear lost to an injury (Robbed, a lost pit fight). Removing items would
     normally refund them; stolen gear must not, so the same amount leaves the
     treasury in the same breath. weaponsOnly: weapons and armour only. */
-function stripGearSettled(d: WarbandDraft, c: Ctx, m: Model, weaponsOnly: boolean): number {
+export function stripGearSettled(d: WarbandDraft, c: Ctx, m: Model, weaponsOnly: boolean): number {
   const before = modelUnitCost(c, m);
   const def = unitDef(c, m.uid_def);
   if (weaponsOnly) {
@@ -74,6 +74,48 @@ function stripGearSettled(d: WarbandDraft, c: Ctx, m: Model, weaponsOnly: boolea
   const lost = Math.max(0, before - modelUnitCost(c, m));
   if (lost > 0) stashOf(d).gold = Math.max(0, goldTreasury(c) - lost);
   return lost;
+}
+
+/* ---- links between casualty records and the Fallen (V2) ---- */
+
+/** Links a casualty record to the Fallen entry at `index`: by position, as
+    the old app reads it, and by the entry's fixed id, which survives
+    deleting an earlier entry (V2). */
+export function linkFallenOn(d: WarbandDraft, r: Casualty, index: number): void {
+  r.fallenId = index;
+  const f = (d.fallen as FallenRecord[] | undefined)?.[index];
+  if (!f) { delete r.fallenRef; return; }
+  if (typeof f.id !== 'number') f.id = nextLogId(d);
+  r.fallenRef = f.id;
+}
+
+/** Brings every record's position in line with its id after the Fallen
+    list changed; an entry that is gone leaves its record unlinked. A record
+    without an id (written by the old app) keeps its position, shifted past
+    a deleted entry at `removed`. */
+export function relinkFallenOn(d: WarbandDraft, removed: number | null = null): void {
+  const fallen = (d.fallen as FallenRecord[] | undefined) ?? [];
+  for (const r of (d.campaign?.casualties as Casualty[] | undefined) ?? []) {
+    if (r.fallenRef != null) {
+      const i = fallen.findIndex((f) => f.id === r.fallenRef);
+      if (i < 0) { r.fallenId = null; delete r.fallenRef; } else r.fallenId = i;
+    } else if (removed != null && r.fallenId != null) {
+      if (r.fallenId === removed) r.fallenId = null;
+      else if (r.fallenId > removed) r.fallenId -= 1;
+    }
+  }
+}
+
+/** Gives every Fallen entry its fixed id and every linked record its
+    reference, from the positions (on load: saves of the old app, and edits
+    it made to newer saves), then the positions from the references (V2). */
+export function fixFallenIdsOn(d: WarbandDraft): void {
+  const fallen = (d.fallen as FallenRecord[] | undefined) ?? [];
+  for (const f of fallen) if (typeof f.id !== 'number') f.id = nextLogId(d);
+  for (const r of (d.campaign?.casualties as Casualty[] | undefined) ?? []) {
+    if (r.fallenRef == null && r.fallenId != null && fallen[r.fallenId]) r.fallenRef = fallen[r.fallenId]!.id;
+  }
+  relinkFallenOn(d);
 }
 
 /* ---- casualty records (draft level) ---- */
@@ -161,15 +203,15 @@ function noteCasualtyOutcome(d: WarbandDraft, c: Ctx, m: Model, result: string, 
 
 /* ---- deaths (draft level) ---- */
 
-function killHeroOn(d: WarbandDraft, c: Ctx, uid: number, msg: string | null, resolving: Casualty | null): void {
+export function killHeroOn(d: WarbandDraft, c: Ctx, uid: number, msg: string | null, resolving: Casualty | null): void {
   const m = findModel(d, uid);
   if (!m) return;
   const snap = copy(m);
   d.fallen = d.fallen || [];
-  d.fallen.push({ kind: 'hero', m: snap, lostValue: loseValueOnDeath(d, c, snap) });
+  d.fallen.push({ kind: 'hero', m: snap, lostValue: loseValueOnDeath(d, c, snap), id: nextLogId(d) });
   if (m.uid === d.leaderUid) d.leaderUid = null;
   const cas = noteCasualtyOutcome(d, c, m, 'dead', null, null, resolving);
-  if (cas) cas.fallenId = d.fallen.length - 1;
+  if (cas) linkFallenOn(d, cas, d.fallen.length - 1);
   const name = m.name || unitName(c, m);
   if (msg) logEvent(d, 'death', msg, { uid: m.uid, name, uid_def: m.uid_def, exp: Number(m.exp) || 0, hero: true });
   else if (!cas) logEvent(d, 'death', `${name} (${unitName(c, m)}) was slain.`, { uid: m.uid, name, uid_def: m.uid_def, exp: Number(m.exp) || 0, hero: true });
@@ -179,7 +221,7 @@ function killHeroOn(d: WarbandDraft, c: Ctx, uid: number, msg: string | null, re
 /** One man of a group falls, by index, so the right name goes with the
     right death. The group's recruit surcharge stays with the group; only
     the last man takes the remainder with him. */
-function killHenchMemberOn(d: WarbandDraft, c: Ctx, uid: number, index: unknown, resolving: Casualty | null): void {
+export function killHenchMemberOn(d: WarbandDraft, c: Ctx, uid: number, index: unknown, resolving: Casualty | null): void {
   const m = findModel(d, uid);
   if (!m) return;
   const i = Number(index) || 0;
@@ -191,7 +233,7 @@ function killHenchMemberOn(d: WarbandDraft, c: Ctx, uid: number, index: unknown,
   if (memberNamed(m, i)) snap.name = who;
   const last = (memberCount(m) - 1) <= 0;
   snap.xpPaid = last ? (Number(m.xpPaid) || 0) : 0;
-  const rec: FallenRecord = { kind: 'hench', uid_def: m.uid_def, exp: Number(m.exp) || 0, m: snap, memberIdx: i, lostValue: loseValueOnDeath(d, c, snap) };
+  const rec: FallenRecord = { kind: 'hench', uid_def: m.uid_def, exp: Number(m.exp) || 0, m: snap, memberIdx: i, lostValue: loseValueOnDeath(d, c, snap), id: nextLogId(d) };
   if (memberNamed(m, i)) rec.memberName = who;
   d.fallen = d.fallen || [];
   d.fallen.push(rec);
@@ -199,7 +241,7 @@ function killHenchMemberOn(d: WarbandDraft, c: Ctx, uid: number, index: unknown,
   dropMemberName(m, i);
   const wasPending = !!pendingCasualtyFor(c, m.uid, who);
   const cas = noteCasualtyOutcome(d, c, m, 'dead', null, who, resolving);
-  if (cas) { cas.fallenId = d.fallen.length - 1; rec.casualtyId = cas.id; rec.casFromDeath = !wasPending; }
+  if (cas) { linkFallenOn(d, cas, d.fallen.length - 1); rec.casualtyId = cas.id; rec.casFromDeath = !wasPending; }
   else logEvent(d, 'death', `${who} was slain.`, { uid: m.uid, name: who, uid_def: m.uid_def, exp: Number(m.exp) || 0, hero: false });
   if (m.qty <= 0) d.models = d.models.filter((x) => x.uid !== uid);
 }
@@ -276,19 +318,27 @@ export function undoFallen(ctx: Ctx): WarbandState {
         camp.log = (camp.log ?? []).filter((x) => !(x.data && x.data.casualtyId === e.casualtyId));
       } else {
         const rec = (camp.casualties ?? []).find((r) => r.id === e.casualtyId);
-        if (rec) { rec.applied = false; delete (rec as Partial<Casualty>).fallenId; }
+        if (rec) { rec.applied = false; delete (rec as Partial<Casualty>).fallenId; delete rec.fallenRef; }
         resolveCasualtyOn(d, c, e.casualtyId, 'pending', '');
       }
     }
     fallen.pop();
+    // V2: a record of the taken-back death that was not reset above (a
+    // Hero's) no longer points at an entry that is gone
+    relinkFallenOn(d);
   });
 }
 
 /** Deletes a Fallen record for good (no gold changes; undo cannot bring it
-    back). The interface asks first when the record lists equipment. */
+    back). The interface asks first when the record lists equipment. Every
+    casualty record keeps pointing at its own warrior; the old app left the
+    later ones pointing at the wrong one (V2). */
 export function removeFallenAt(ctx: Ctx, index: number): WarbandState {
   if (!ctx.s.fallen || !ctx.s.fallen[index]) return ctx.s;
-  return update(ctx, (d) => { (d.fallen as FallenRecord[]).splice(index, 1); });
+  return update(ctx, (d) => {
+    (d.fallen as FallenRecord[]).splice(index, 1);
+    relinkFallenOn(d, index);
+  });
 }
 
 /* ---- actions: injuries ---- */
@@ -425,7 +475,7 @@ export function resolveCasualtyRoll(ctx: Ctx, id: number, code: string | null | 
       const fallen = d.fallen as FallenRecord[];
       const fe = fallen.length - 1;
       r.result = 'dead'; r.applied = true;
-      r.fallenId = fe;
+      linkFallenOn(d, r, fe);
       if (fallen[fe]) fallen[fe].casualtyId = r.id;
       retypeCasualty(d, c, r);
       return;
@@ -482,7 +532,7 @@ export function applyBattleResults(ctx: Ctx): WarbandState {
       else killHenchMemberOn(d, c, m.uid, casualtyMemberIndex(c, cas, m), cas);
       const fallen = d.fallen as FallenRecord[];
       const fe = fallen.length - 1;
-      cas.fallenId = fe; cas.applied = true;
+      linkFallenOn(d, cas, fe); cas.applied = true;
       if (fallen[fe]) fallen[fe].casualtyId = cas.id;
     }
     applyPendingXpOn(d, c);

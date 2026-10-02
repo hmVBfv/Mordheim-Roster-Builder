@@ -274,6 +274,152 @@ test('a warrior dismissed after the first battle leaves his equipment', async ({
   await expect(page.getByRole('region', { name: 'Give items' })).toBeVisible();
 });
 
+/* Phase 3c: advances as rolled, and "The lad's got talent". */
+for (const theme of THEMES) {
+  test(`advances as rolled, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    const sheet = page.locator('dialog[open]');
+    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+
+    // 7: +1 WS or +1 BS
+    await ulrich.getByRole('button', { name: 'Advance' }).click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('7');
+    await sheet.getByRole('button', { name: '+1 Weapon Skill' }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advance-stat`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.locator('[role=status]', { hasText: '+1 Weapon Skill' })).toBeVisible();
+
+    // 3: a new skill from his lists
+    await ulrich.getByRole('button', { name: 'Advance' }).click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('3');
+    const combat = sheet.getByRole('group', { name: 'Combat' });
+    const skill = combat.getByRole('button', { disabled: false }).first();
+    const name = (await skill.textContent())!;
+    await skill.click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advance-skill`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(ulrich).toContainText(name);
+
+    // 11 for a group: one man becomes a Hero, with two skill lists
+    const group = page.getByRole('article', { name: 'Warrior', exact: true });
+    await group.getByRole('button', { name: 'Advance' }).click();
+    await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('11');
+    await sheet.getByRole('group', { name: 'Who' }).getByRole('button', { name: 'Fritz' }).click();
+    await sheet.getByRole('group', { name: 'Skill lists' }).getByRole('button').nth(0).click();
+    await sheet.getByRole('group', { name: 'Skill lists' }).getByRole('button').nth(1).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advance-talent`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('article', { name: 'Fritz' })).toContainText('Promoted');
+    await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(2);
+
+    // a mistake taken back, from ⋯
+    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+    await sheet.getByRole('button', { name: /Advances taken – correct/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-advances-taken`);
+    await sheet.getByRole('listitem').filter({ hasText: name }).getByRole('button', { name: 'Remove' }).click();
+    await expect(ulrich).not.toContainText(name);
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(ulrich).toContainText(name);
+  });
+}
+
+/* Phase 3c: injuries as rolled, with the follow-ups the chart asks for (V1). */
+for (const theme of THEMES) {
+  test(`injuries as rolled, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    const sheet = page.locator('dialog[open]');
+
+    // 23 Arm Wound asks a D6: 2–6, he misses the next game
+    const magda = page.getByRole('article', { name: 'Magda' });
+    await magda.getByRole('button', { name: 'Injury for Magda' }).click();
+    await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('23');
+    await sheet.getByRole('button', { name: /^2–6 — misses the next game/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-injury-arm`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(magda).toContainText('Misses 1 game');
+
+    // Multiple Injuries: two more, one of them a lost pit fight with its own roll
+    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+    await ulrich.getByRole('button', { name: 'Injury for Ulrich the Grey' }).click();
+    await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('21');
+    await sheet.getByRole('group', { name: 'D6: how many more' }).getByRole('button', { name: '2', exact: true }).click();
+    await sheet.getByRole('textbox', { name: 'Further result 1, D66' }).fill('22');
+    await expect(sheet.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    await sheet.getByRole('textbox', { name: 'Further result 2, D66' }).fill('65');
+    await sheet.getByRole('button', { name: /^Lost — loses his weapons and armour/ }).click();
+    await sheet.getByRole('textbox', { name: 'Then D66, 11–35' }).fill('34');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-injury-multiple`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(ulrich).toContainText('Leg Wound');
+    await expect(ulrich).toContainText('Hand Injury');
+    await expect(ulrich).not.toContainText('Sword');
+
+    // a Henchman rolls a D6 for the man who went down
+    const group = page.getByRole('article', { name: 'Warrior', exact: true });
+    await group.getByRole('button', { name: 'Injury for Warrior' }).click();
+    await sheet.getByRole('group', { name: 'Who' }).getByRole('button', { name: 'Otto' }).click();
+    await sheet.getByRole('textbox', { name: 'D6 as rolled' }).fill('2');
+    await expect(sheet).toContainText('Otto is dead');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-injury-hench`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(2);
+    await expect(group).not.toContainText('Otto');
+
+    // 61 Captured, held for now (Rob, 02.10.2026): on the roster but not fighting, until ransomed
+    const young = page.getByRole('article', { name: 'Youngblood' });
+    await young.getByRole('button', { name: 'Injury for Youngblood' }).click();
+    await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('61');
+    await sheet.getByRole('button', { name: /^Held for now/ }).click();
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(young).toContainText('Captive');
+    await expect(young.getByRole('button', { name: 'Injury for Youngblood' })).toHaveCount(0);
+    const goldBefore = await page.locator('dl dt', { hasText: 'Gold' }).locator('xpath=following-sibling::dd').textContent();
+    await young.getByRole('button', { name: /Captivity of Youngblood/ }).click();
+    await sheet.getByRole('button', { name: 'Ransomed' }).click();
+    await sheet.getByRole('textbox', { name: 'Ransom paid, in gc' }).fill('20');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-captivity`);
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(young).not.toContainText('Captive');
+    await expect(page.locator('dl dt', { hasText: 'Gold' }).locator('xpath=following-sibling::dd')).toHaveText(`${parseInt(goldBefore!, 10) - 20} gc`);
+
+    // an injury entered by mistake is taken back from ⋯
+    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+    await sheet.getByRole('button', { name: /Injuries – correct/ }).click();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-injuries-correct`);
+    await sheet.getByRole('listitem').filter({ hasText: 'Leg Wound' }).getByRole('button', { name: 'Remove' }).click();
+    await expect(ulrich).not.toContainText('Leg Wound');
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(ulrich).toContainText('Leg Wound');
+
+    // out of action for good: the Champion joins the Fallen
+    await page.getByRole('button', { name: 'More for Champion', exact: true }).click();
+    await sheet.getByRole('button', { name: /Out of action for good/ }).click();
+    await expect(sheet.getByRole('textbox', { name: 'D66 as rolled' })).toHaveValue('11');
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('article', { name: 'Champion', exact: true })).toHaveCount(0);
+    await expect(page.getByText(/^Fallen \(\d+\)$/)).toBeVisible();
+
+    // a Hired Sword rolls a D6 too: on a 1 he is gone
+    await page.getByRole('button', { name: 'Injury for Ogre Bodyguard' }).click();
+    await sheet.getByRole('textbox', { name: 'D6 as rolled' }).fill('1');
+    await sheet.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('article', { name: 'Ogre Bodyguard' })).toHaveCount(0);
+  });
+}
+
 /* Removing a warrior is a click and an Undo, not a question. */
 test('a warrior removed from the roster comes back with Undo', async ({ page }) => {
   await page.goto('./');
