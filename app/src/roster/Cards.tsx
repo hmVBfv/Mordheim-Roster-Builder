@@ -110,6 +110,7 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
         <Line label="Skills" items={w.skills} />
         <Line label="Spells" items={w.spells} />
         <Line label="Mutations" items={w.mutations} />
+        <Line label="Mark" items={w.mark} />
         <Line label="Injuries" items={w.injuries} />
       </dl>
       <div className={styles.acts}>

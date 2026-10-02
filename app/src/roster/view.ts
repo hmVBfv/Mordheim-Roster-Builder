@@ -47,6 +47,8 @@ export interface WarriorView {
   skills: string[];
   spells: string[];
   mutations: string[];
+  /** Marauders: what the warband's Mark gives him (the Seer; the Chieftain once he took it). */
+  mark: string[];
   injuries: string[];
   /** Blinded in both eyes: he must retire from the warband (rulebook, 31). */
   retire: boolean;
@@ -156,6 +158,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     skills: [...(m.skills ?? [])],
     spells: (m.spells ?? []).map((s) => s.name),
     mutations: (m.mut ?? []).map((x) => core.mutEN(ctx.data, x)),
+    mark: core.markRulesFor(ctx, m).map(([n]) => n),
     injuries: (m.inj ?? []).map((j) => j.name + core.injModText(j)),
     retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
     captive: m.captive ? m.captive.by : null,
