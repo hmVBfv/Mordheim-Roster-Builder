@@ -1,0 +1,20 @@
+[Unit]
+Description=Keep the Porkbun A records on this connection's public IPv4
+Documentation=https://github.com/hmVBfv/Mordheim-Roster-Builder/blob/master/docs/operations.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# root-only (600); systemd reads it and passes the keys to this one process
+EnvironmentFile=/etc/porkbun-ddns.env
+ExecStart=/usr/local/sbin/porkbun-ddns
+# a throwaway user without rights; the script only talks to Porkbun
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=

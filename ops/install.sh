@@ -14,6 +14,8 @@
 #   /etc/roster/roster.conf, /usr/local/bin/roster-{deploy,restore},
 #     /usr/local/lib/roster/, systemd units and timers, the Docker drop-in
 #     that waits for the SSD, the Fail2Ban filter and jail
+#   /usr/local/sbin/porkbun-ddns and its timer, only if /etc/porkbun-ddns.env
+#     exists (the domain's DynDNS, ops/env/porkbun-ddns.env.example)
 # then starts Caddy and the backup and restore-test timers. roster-alive is
 # enabled by hand in Stufe 2. Safe to run again after every git pull.
 #
@@ -181,6 +183,18 @@ if [ ! -e "$ROSTER_DATA/secrets/healthchecks.env" ]; then
   chmod 600 "$ROSTER_DATA/secrets/healthchecks.env"
   say "created $ROSTER_DATA/secrets/healthchecks.env – put the three ping URLs in"
 fi
+# app.env and staging.env are never overwritten: after a new ROSTER_HOST (or
+# LAN IP) their origin is stale, and the app refuses writes from the new one
+origin_check() { # <file> <expected origin>
+  local have
+  have=$(sed -n 's/^PUBLIC_ORIGIN=//p' "$1" | tail -n 1)
+  have=${have%$'\r'} have=${have#\"} have=${have%\"} have=${have%/}
+  if [ "$have" != "$2" ]; then
+    warn "$1: PUBLIC_ORIGIN is '$have', site.env says $2 – change it there (sudo nano $1), then: cd $ROSTER_DIR && docker compose up -d --force-recreate $3"
+  fi
+}
+origin_check "$ROSTER_DATA/app.env" "https://$ROSTER_HOST" app
+origin_check "$ROSTER_DATA/staging.env" "http://$ROSTER_LAN_IP:8081" staging
 [ -f "$ROSTER_DATA/secrets/restic.pass" ] || warn "$ROSTER_DATA/secrets/restic.pass is missing – backups will fail (Stufe 1: restic)"
 [ -f "$ROSTER_DATA/backups/restic/config" ] || warn "no restic repository in $ROSTER_DATA/backups/restic – run: restic init -r $ROSTER_DATA/backups/restic --password-file $ROSTER_DATA/secrets/restic.pass"
 
@@ -223,6 +237,19 @@ if systemctl is-enabled --quiet roster-alive.timer; then
   say "roster-alive.timer is enabled"
 else
   say "roster-alive.timer is installed, not enabled (Stufe 2: sudo systemctl enable --now roster-alive.timer)"
+fi
+
+# 6b. DynDNS for the domain (optional): only where its settings exist
+ddns_env=/etc/porkbun-ddns.env
+if [ -e "$ddns_env" ]; then
+  [ "$(stat -c '%u' "$ddns_env")" = 0 ] && [ $((0$(stat -c '%a' "$ddns_env") & 077)) -eq 0 ] ||
+    die "$ddns_env ($(stat -c '%A %U' "$ddns_env")) holds the Porkbun keys: sudo chown root: $ddns_env && sudo chmod 600 $ddns_env"
+  command -v jq >/dev/null || die "jq is not installed (sudo apt install jq) – the DynDNS updater needs it"
+  install -m 755 "$ops/ddns/porkbun-ddns" /usr/local/sbin/porkbun-ddns
+  for u in porkbun-ddns.service porkbun-ddns.timer; do install -m 644 "$ops/systemd/$u" "/etc/systemd/system/$u"; done
+  systemctl daemon-reload
+  systemctl enable --now porkbun-ddns.timer >/dev/null
+  say "DynDNS updater enabled (journalctl -u porkbun-ddns)"
 fi
 
 # 7. Fail2Ban
