@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chronicle Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="mockups.css">
+<script src="mockups.js"></script>
+<style>
+  .chapters { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+  .chapters details { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .chapters summary { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s2); min-height: 56px; align-items: center; padding: var(--s2) var(--s3); cursor: pointer; }
+  .chapters summary small { grid-column: 1; color: var(--text-muted); }
+  .chapters summary .chip { grid-row: 1 / span 2; grid-column: 2; }
+  .prose { padding: 0 var(--s3) var(--s3); font-size: 1.05rem; line-height: 1.55; }
+  .prose p { margin: 0 0 var(--s2); }
+  .lang { display: flex; gap: var(--s1); padding: 0 var(--s3) var(--s2); }
+  .flag { background: color-mix(in srgb, var(--warn) 25%, transparent); border-bottom: 2px solid var(--warn); }
+  .checks { margin: 0; padding-left: 1.1em; display: grid; gap: 2px; }
+</style>
+</head>
+<body>
+<div class="mock"><strong>Mockup</strong><span>Chronicle</span><span class="spacer"></span><span class="themes" role="group" aria-label="Theme"><button type="button" data-theme="chronicle">Chronicle</button><button type="button" data-theme="parchment">Parchment</button></span><a href="index.html">All</a></div>
+
+<div class="app">
+  <header class="bar">
+    <span class="title">The Hel Fenn Campaign</span>
+    <span class="sync">✓ Saved</span>
+  </header>
+  <nav class="tabs" aria-label="Campaign" data-tabs="campaign" data-current="Chronicle"></nav>
+
+  <div class="content">
+    <div class="row between">
+      <p class="muted small">The whole story as written, chapter by chapter, for everyone in the campaign.</p>
+    </div>
+    <div class="row"><button type="button" class="btn" data-open="sheet-import">Import a chapter</button><button type="button" class="btn-quiet" id="all-md">Download all (.md)</button></div>
+
+    <ol class="chapters" id="chapters">
+      <li><details><summary><b>Prologue · The road to Mordheim</b><small>before battle 1 · Deutsch, English</small><span class="chip good">published</span></summary>
+        <div class="lang seg" role="group" aria-label="Language"><button type="button" data-value="de" aria-pressed="true">Deutsch</button><button type="button" data-value="en">English</button></div>
+        <div class="prose"><p>Der Regen hatte die Straße nach Mordheim in einen Bach aus Lehm verwandelt, als Ulrich der Graue seine Leute zum letzten Mal zählte.</p><p>Sieben. Mehr waren es nicht, die für Silber in eine Stadt gingen, aus der niemand Silber zurückbrachte.</p></div></details></li>
+      <li><details><summary><b>Chapter 1 · City Hall</b><small>battle 1 · Deutsch</small><span class="chip good">published</span></summary>
+        <div class="prose"><p>Das Rathaus stand noch, wenn man es so nennen wollte …</p></div></details></li>
+      <li><details><summary><b>Chapter 2 · What the rats took</b><small>battle 2 · Deutsch</small><span class="chip good">published</span></summary>
+        <div class="prose"><p>Am Morgen fehlte Hans' Bruder. Am Abend fehlte auch die Kiste mit den Splittern …</p></div></details></li>
+      <li><details><summary><b>Chapter 3 · The Rock</b><small>battle 3 · Deutsch</small><span class="chip good">published</span></summary>
+        <div class="prose"><p>Die Schwestern beteten laut, als sie den Felsen hinaufstiegen …</p></div></details></li>
+      <li><details><summary><b>Chapter 4 · The Temple of Sigmar</b><small>battle 4 · Deutsch</small><span class="chip good">published</span></summary>
+        <div class="prose"><p>Im Tempel brannte keine Kerze mehr, aber drei Warbands suchten darin nach demselben Licht …</p></div></details></li>
+    </ol>
+    <p class="small muted">A chapter comes in as text: pasted, or a .md or .txt file – usually what Claude wrote from the AI pack on the Timeline. It is a draft until a leader publishes it.</p>
+  </div>
+  <nav class="nav" data-current="Campaign"></nav>
+</div>
+
+<!-- Importing a written chapter: paste or a file, which battle, which language. Before it is published, a check marks words of hidden background. -->
+<dialog class="sheet" id="sheet-import" aria-labelledby="imp-title">
+  <div class="sheet-grip"></div>
+  <form method="dialog" id="form-import">
+    <h2 id="imp-title">Import a chapter</h2>
+    <label class="field"><span class="small">Title</span><input class="input" id="imp-name" value="Chapter 5 · The Old Mill" autocomplete="off"></label>
+    <label class="field"><span class="small">For</span>
+      <select class="select" id="imp-battle"><option selected>Battle 5 · The Old Mill</option><option>Battle 6 · Hel Fenn ferry</option><option>Interlude 5</option><option>Prologue / epilogue</option></select></label>
+    <span class="small">Language</span>
+    <div class="seg" id="imp-lang" role="group" aria-label="Language"><button type="button" data-value="Deutsch" aria-pressed="true">Deutsch</button><button type="button" data-value="English">English</button></div>
+    <label class="field"><span class="small">The text (Markdown or plain)</span>
+      <textarea class="textarea" id="imp-text" rows="7">Nebel lag über dem Mühlbach. Skritch wartete, wie bezahlt, im Schilf; die Münze in seiner Pfote trug einen Aal.
+
+Ulrich der Graue sah es nicht. Er sah nur das Wasser.</textarea></label>
+    <div class="row"><label class="btn-quiet" for="imp-file">Choose a file…</label><input type="file" id="imp-file" accept=".md,.txt,text/markdown,text/plain" hidden></div>
+    <div class="stack" aria-live="polite">
+      <p class="small"><b>Check before it is published</b></p>
+      <ul class="checks small" id="imp-checks"></ul>
+    </div>
+    <div class="row"><button class="btn" value="import">Add as draft</button><button type="button" class="btn-quiet" data-close>Cancel</button></div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+  // words of the hidden background (leaders only); a draft that uses them is marked, not refused
+  var HIDDEN = ['ferrymen', 'Fährleute', 'guild', 'Gilde'];
+  var HINTED = ['Aal', 'eel'];
+  function check() {
+    var t = $('imp-text').value, out = [];
+    out.push('<li>' + t.trim().split(/\s+/).filter(Boolean).length + ' words · ' + ((t.match(/\n\s*\n/g) || []).length + 1) + ' paragraphs</li>');
+    HIDDEN.forEach(function (w) { if (t.toLowerCase().indexOf(w.toLowerCase()) >= 0) out.push('<li class="flag">⚑ “' + w + '” is hidden background (never name): change it before publishing</li>'); });
+    HINTED.forEach(function (w) { if (t.indexOf(w) >= 0) out.push('<li>“' + w + '”: a hint the background allows ✓</li>'); });
+    out.push('<li>Canon: Ulrich der Graue ✓ · Skritch ✓</li>');
+    $('imp-checks').innerHTML = out.join('');
+  }
+  $('imp-text').addEventListener('input', check);
+  $('imp-file').addEventListener('change', function () { window.mockToast('In the app the file\'s text lands in the box above.'); });
+  $('form-import').addEventListener('submit', function () {
+    var li = document.createElement('li');
+    li.innerHTML = '<details open><summary><b></b><small></small><span class="chip warn">draft</span></summary><div class="prose"></div></details>';
+    li.querySelector('b').textContent = $('imp-name').value;
+    li.querySelector('small').textContent = $('imp-battle').value + ' · ' + document.querySelector('#imp-lang [aria-pressed=true]').dataset.value;
+    $('imp-text').value.split(/\n\s*\n/).forEach(function (p) { var e = document.createElement('p'); e.textContent = p; li.querySelector('.prose').appendChild(e); });
+    $('chapters').appendChild(li);
+    window.mockToast('Added as a draft. A leader publishes it.', function () { li.remove(); });
+  });
+  $('all-md').addEventListener('click', function () { window.mockToast('Saved as hel-fenn-chronicle.md (5 chapters).'); });
+  check();
+})();
+</script>
+</body>
+</html>

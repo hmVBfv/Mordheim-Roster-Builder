@@ -18,6 +18,10 @@
   var initial = saved === 'parchment' ? 'parchment' : 'chronicle';
   // loaded in <head>: colour the page now, mark the buttons once they exist
   document.documentElement.setAttribute('data-theme', initial);
+  // shown inside a panel of the desktop: the page alone, without the strip
+  // of the mockups and the phone's bar (Rob, 02.10.2026: no jumps between
+  // desktop and phone)
+  if (/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embedded');
   document.addEventListener('DOMContentLoaded', function () { setTheme(initial); });
   window.mockTheme = setTheme;
 
@@ -125,7 +129,7 @@
   // the tabs of a warband and of a campaign (docs/ui.md §2); ⚑ = leaders only
   var TABS = {
     warband: [['Roster', 'roster.html'], ['Story', 'story.html'], ['Versions', 'changes.html']],
-    campaign: [['Overview', 'campaign.html'], ['Notes', 'visibility.html'], ['Timeline', 'timeline.html'], ['World', 'world.html'], ['Background ⚑', 'background.html'], ['Manage ⚑', 'manage.html']]
+    campaign: [['Overview', 'campaign.html'], ['Notes', 'visibility.html'], ['Timeline', 'timeline.html'], ['Chronicle', 'chronicle.html'], ['World', 'world.html'], ['Background ⚑', 'background.html'], ['Manage ⚑', 'manage.html']]
   };
   document.addEventListener('DOMContentLoaded', function () {
     // the bar at the bottom, and the same places in the desktop's sidebar
@@ -145,6 +149,58 @@
       if (here) nav.scrollLeft = prev ? Math.max(0, prev.offsetLeft - nav.offsetLeft - 8) : 0;
     });
   });
+
+  /* ---------- what a thing does: bubbles ---------- */
+
+  // A word on a card that has rules (an item, a skill, an injury, a special
+  // rule) is a button: a tap shows what it does in a bubble beside it, a
+  // second tap or a tap elsewhere hides it; with a mouse, hovering shows it
+  // too (Rob, 02.10.2026: the Roster Builder's tooltips are essential).
+  var tipBox = null, tipFor = null, pinned = false;
+  function tipText(name) {
+    var t = (window.MOCK_TIPS || {})[name];
+    if (t) return t;
+    var s = window.mockSkillText ? window.mockSkillText(name) : '';
+    return s ? { line: 'Skill', text: s } : null;
+  }
+  function showTip(el, pin) {
+    var t = tipText(el.dataset.tip);
+    if (!t) return;
+    if (!tipBox) { tipBox = document.createElement('div'); tipBox.className = 'tipbox'; tipBox.setAttribute('role', 'tooltip'); tipBox.id = 'mock-tip'; document.body.appendChild(tipBox); }
+    tipBox.innerHTML = '<b></b><small></small><p></p>';
+    tipBox.querySelector('b').textContent = el.dataset.tip;
+    tipBox.querySelector('small').textContent = t.line || '';
+    tipBox.querySelector('p').textContent = t.text;
+    tipBox.hidden = false; tipFor = el; pinned = !!pin;
+    el.setAttribute('aria-describedby', 'mock-tip');
+    var r = el.getBoundingClientRect(), w = Math.min(320, window.innerWidth - 16);
+    tipBox.style.width = w + 'px';
+    var left = Math.max(8, Math.min(r.left + window.scrollX, window.scrollX + window.innerWidth - w - 8));
+    tipBox.style.left = left + 'px';
+    var below = r.bottom + window.scrollY + 6, h = tipBox.offsetHeight;
+    tipBox.style.top = (r.bottom + h + 12 > window.innerHeight && r.top > h + 12 ? r.top + window.scrollY - h - 6 : below) + 'px';
+  }
+  function hideTip() { if (tipBox) tipBox.hidden = true; if (tipFor) tipFor.removeAttribute('aria-describedby'); tipFor = null; pinned = false; }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-tip]');
+    if (el) { if (tipFor === el && pinned) hideTip(); else showTip(el, true); return; }
+    if (tipBox && !e.target.closest('.tipbox')) hideTip();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTip(); });
+  if (window.matchMedia && window.matchMedia('(hover: hover)').matches) {
+    document.addEventListener('mouseover', function (e) { var el = e.target.closest('[data-tip]'); if (el && !pinned) showTip(el, false); });
+    document.addEventListener('mouseout', function (e) { var el = e.target.closest('[data-tip]'); if (el && el === tipFor && !pinned) hideTip(); });
+  }
+  window.addEventListener('scroll', function () { if (tipFor && !pinned) hideTip(); }, { passive: true });
+  // a list of names as tappable words
+  window.mockTips = function (names) {
+    return names.map(function (n) {
+      var base = String(n).replace(/\s*\(.*\)$/, '');
+      var known = tipText(base);
+      var e = String(n).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+      return known ? '<button type="button" class="tip" data-tip="' + base.replace(/"/g, '&quot;') + '">' + e + '</button>' : e;
+    }).join(', ');
+  };
 
   /* ---------- notices ---------- */
 
