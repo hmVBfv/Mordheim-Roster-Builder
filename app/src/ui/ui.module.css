@@ -180,3 +180,65 @@
   color: var(--text-muted);
   cursor: pointer;
 }
+
+/* A word on a card that names a rule (Tip.tsx): dotted underline, the
+   bubble on a tap. It stays a word in running text, so it cannot be 44 px
+   high (docs/ui.md §5); the place to tap reaches a little past the word
+   without covering the word on the next line. */
+.tip {
+  position: relative;
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--text-muted);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.tip::after {
+  content: '';
+  position: absolute;
+  inset: -5px -2px;
+}
+
+.tip:hover,
+.tip[aria-expanded='true'] {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+/* over the bar at the bottom too; taps pass through to what lies under it */
+.tipBubble {
+  position: fixed;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 16px));
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px var(--shadow);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.tipBubble small {
+  color: var(--text-muted);
+}
+
+.tipBubble p {
+  margin: 0 0 var(--space-1);
+}
+
+.tipBubble p:last-child {
+  margin-bottom: 0;
+}

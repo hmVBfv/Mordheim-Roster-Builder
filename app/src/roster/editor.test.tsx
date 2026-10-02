@@ -9,10 +9,13 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { AppRoutes } from '../app/App.tsx';
 import { db } from '../db/db.ts';
 import { data } from '../test/data.ts';
+import { loadScreens, SCREENS_MS } from '../test/screens.ts';
 import { nextStamp, savedFields } from './useEditor.ts';
 import { createWarband } from './view.ts';
 
 const NOW = '2026-10-02T10:00:00.000Z';
+
+beforeAll(loadScreens, SCREENS_MS);
 
 /* jsdom has no showModal(): just enough of a modal <dialog> for a sheet to
    open and to report its closing, as useSheet expects. */

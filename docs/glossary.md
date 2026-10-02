@@ -185,5 +185,5 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Bereich von unten | Sheet | `<dialog class="sheet">`, `app/src/ui/useSheet.ts` |
 | Wappen der Warband | – | `docs/mockups/warband-art.js` (`data-art`) |
 | Layout auf diesem Gerät | Layout on this device (Phone / Desktop) | von Hand gewählt, nur auf dem Gerät; die App wechselt nie von selbst |
-| Regeltext-Blase | – (Antippen eines unterstrichenen Worts) | `.tip`, `window.mockTips` im Mockup |
+| Regeltext-Blase | – (Antippen eines unterstrichenen Worts) | App: `TipWord` (`app/src/ui/Tip.tsx`), Texte aus `app/src/roster/tips.ts`; Mockup: `.tip`, `window.mockTips` |
 | Neue Warband | New warband | App: `/warbands/new` |

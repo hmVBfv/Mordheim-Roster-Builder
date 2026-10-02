@@ -1,10 +1,11 @@
 /* One card per warrior, as in the roster mockup (docs/mockups/roster.html):
    name and ⋯ on top, the profile, the experience track with its stepper,
    what he carries and knows, and for a henchman group its men. */
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { MoreIcon } from '../ui/icons.tsx';
+import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
-import type { HireView, StatCell, WarriorView, XpView } from './view.ts';
+import type { Fact, HireView, StatCell, WarriorView, XpView } from './view.ts';
 import styles from './Roster.module.css';
 
 function Stats({ cells, save }: { cells: StatCell[]; save?: string }) {
@@ -51,9 +52,15 @@ function XpTrack({ xp, who, group, onStep }: { xp: XpView; who: string; group: b
   );
 }
 
-function Line({ label, items }: { label: string; items: string[] }) {
+/* A line of the card: each word that names a rule opens its bubble. */
+function Line({ label, items }: { label: string; items: Fact[] }) {
   if (!items.length) return null;
-  return (<><dt>{label}</dt><dd>{items.join(', ')}</dd></>);
+  return (
+    <>
+      <dt>{label}</dt>
+      <dd>{items.map((f, i) => <Fragment key={i}>{i > 0 && ', '}<TipWord label={f.label} tips={f.tips} /></Fragment>)}</dd>
+    </>
+  );
 }
 
 function Head({ name, count, type, onMore, children }: { name: string; count?: number; type: string | null; onMore: () => void; children?: ReactNode }) {
@@ -106,6 +113,7 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
       <Stats cells={w.stats} save={w.save} />
       {w.xp ? <XpTrack xp={w.xp} who={w.name} group={group} onStep={act.onXp} /> : <p className={`${ui.muted} ${styles.xpLine}`}>Gains no experience.</p>}
       <dl className={styles.facts}>
+        <Line label="Rules" items={w.rules} />
         <Line label="Equipment" items={w.equipment} />
         <Line label="Skills" items={w.skills} />
         <Line label="Spells" items={w.spells} />
@@ -142,6 +150,7 @@ export function Hire({ h, act }: { h: HireView; act: HireActions }) {
       <Stats cells={h.stats} />
       {h.xp && <XpTrack xp={h.xp} who={h.name} group={false} onStep={act.onXp} />}
       <dl className={styles.facts}>
+        <Line label="Rules" items={h.rules} />
         <Line label="Skills" items={h.skills} />
         <Line label="Spells" items={h.spells} />
       </dl>

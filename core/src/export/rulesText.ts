@@ -229,13 +229,18 @@ export function eqSummaryParts(ctx: Ctx, m: Model): string[] {
   return out;
 }
 
+/** One entry of a warrior's equipment as the roster shows it, with the
+    items it stands for (data keys: the item, then its inline upgrades), so
+    a tooltip can explain what the words name. */
+export interface EqDisplayItem { label: string; items: string[] }
+
 /** Fixed gear and list equipment in English, braces of pistols as one, and
     inline weapon upgrades on their weapon. */
-export function eqDisplayParts(ctx: Ctx, m: Model): string[] {
+export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
   const def = unitDef(ctx, m.uid_def);
-  const out: string[] = [];
+  const out: EqDisplayItem[] = [];
   if (!def) return out;
-  if (def.gear) def.gear.forEach((g) => out.push(g));
+  if (def.gear) def.gear.forEach((g) => out.push({ label: g, items: [g] }));
   if (def.eq) {
     const list = eqListFor(ctx, def) ?? {};
     for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) {
@@ -247,25 +252,35 @@ export function eqDisplayParts(ctx: Ctx, m: Model): string[] {
       const us = ups.length ? ` [${ups.map((de) => enItem(ctx.data, de)).join(', ')}]` : '';
       const plural = ctx.data.BRACE_PLURAL[base];
       if (plural && qty >= 2) {
-        out.push('Brace of ' + plural);
-        if (qty > 2) out.push((qty - 2) + '× ' + enItem(ctx.data, base));
-      } else out.push((qty > 1 ? qty + '× ' : '') + enItem(ctx.data, base) + us);
+        out.push({ label: 'Brace of ' + plural, items: [base] });
+        if (qty > 2) out.push({ label: (qty - 2) + '× ' + enItem(ctx.data, base), items: [base] });
+      } else out.push({ label: (qty > 1 ? qty + '× ' : '') + enItem(ctx.data, base) + us, items: [base, ...ups] });
     }
   }
   return out;
 }
 
+/** The labels of eqDisplayItems (legacy eqDisplayParts). */
+export function eqDisplayParts(ctx: Ctx, m: Model): string[] {
+  return eqDisplayItems(ctx, m).map((x) => x.label);
+}
+
 /** Rare and magic items carried on their own (inline upgrades show on their weapon). */
-export function rareDisplayParts(ctx: Ctx, m: Model): string[] {
-  const out: string[] = [];
+export function rareDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
+  const out: EqDisplayItem[] = [];
   const r = m.rare || {};
   for (const de of Object.keys(r)) {
     if (inlineUpgradeActive(ctx, de)) continue;
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     const q = Number(r[de]!.q) || 1;
-    out.push((q > 1 ? q + '× ' : '') + (it ? it.en : de));
+    out.push({ label: (q > 1 ? q + '× ' : '') + (it ? it.en : de), items: [de] });
   }
   return out;
+}
+
+/** The labels of rareDisplayItems (legacy rareDisplayParts). */
+export function rareDisplayParts(ctx: Ctx, m: Model): string[] {
+  return rareDisplayItems(ctx, m).map((x) => x.label);
 }
 
 /** Equipment of a set of fallen as "N× Item", the free dagger marked. */

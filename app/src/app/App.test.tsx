@@ -2,9 +2,10 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../db/db.ts';
 import { data, sampleSave } from '../test/data.ts';
+import { loadScreens, SCREENS_MS } from '../test/screens.ts';
 import { AppRoutes } from './App.tsx';
 
 const NOW = '2026-09-28T10:00:00.000Z';
@@ -17,6 +18,7 @@ async function seed() {
 
 const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>);
 
+beforeAll(loadScreens, SCREENS_MS);
 beforeEach(async () => { await db.warbands.clear(); localStorage.clear(); });
 afterEach(() => cleanup());
 
