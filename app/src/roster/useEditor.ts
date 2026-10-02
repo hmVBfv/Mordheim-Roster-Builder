@@ -15,11 +15,31 @@ export interface Editor {
   /** The state the screen shows, tidied as on load. */
   state: WarbandState;
   /** Applies an action of core. With `text` the change gets a notice with
-      "Undo"; without (a step of the experience stepper) it is just made. */
-  edit: (action: (ctx: core.Ctx) => WarbandState, text?: string) => void;
+      "Undo"; without (a step of the experience stepper) it is just made.
+      After the warband's first battle the change also lands in the gold
+      ledger (see applyEdit). */
+  edit: (action: (ctx: core.Ctx) => WarbandState, text?: string, opts?: EditOptions) => void;
   notice: Notice | null;
   undo: () => void;
   dismiss: () => void;
+}
+
+/** What a change does to gold in hand after the first battle: `settle`
+    books whatever the action cost or brought (recruiting, + Man, hiring);
+    `keep` leaves gold as it was (a price house rule). Trade actions book
+    themselves, so settling after them books nothing more. */
+export interface EditOptions { gold?: 'settle' | 'keep' }
+
+/** One change, as the editor makes it: before the first battle the action
+    alone, as in the Roster Builder; afterwards with the ledger opened if
+    need be and what the action did to gold booked under `text`. Returns
+    `before` itself when nothing changed. */
+export function applyEdit(data: GameData, before: WarbandState, action: (ctx: core.Ctx) => WarbandState, text?: string, opts: EditOptions = {}): WarbandState {
+  const s0 = core.ensureLedger(core.ctxOf(data, before));
+  const c0 = core.ctxOf(data, s0);
+  const next = action(c0);
+  if (next === s0) return before;
+  return opts.gold === 'keep' ? core.keepGold(c0, next) : core.settle(c0, next, { text: text ?? 'Changed by hand' });
 }
 
 /** A save stamp later than `prev` (two edits may fall in one millisecond). */
@@ -57,9 +77,9 @@ export function useEditor(data: GameData, rec: StoredWarband, now: () => Date = 
     writes.current = writes.current.then(() => db.warbands.update(rec.id, fields)).catch((e: unknown) => { console.error('saving the warband failed', e); });
   }, [data, rec.id, rec.updatedAt, now]);
 
-  const edit = useCallback((action: (ctx: core.Ctx) => WarbandState, text?: string) => {
+  const edit = useCallback((action: (ctx: core.Ctx) => WarbandState, text?: string, opts?: EditOptions) => {
     const before = latest.current && latest.current.stamp >= rec.updatedAt ? latest.current.s : stored;
-    const next = action(core.ctxOf(data, before));
+    const next = applyEdit(data, before, action, text, opts);
     if (next === before) return;
     commit(next);
     // a notice undoes its own change only: a later change takes it away

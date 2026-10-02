@@ -323,3 +323,24 @@ describe('purity', () => {
     }).not.toThrow();
   });
 });
+
+describe('what is common and what is rare (V5)', () => {
+  const kind = (nm: string) => core.tradeKind(ctx(band().s), nm);
+  it('matches the lists to the price chart, also where they name things differently', () => {
+    expect(kind('Schwert')).toEqual({ kind: 'common' });
+    expect(kind('Pistole')).toMatchObject({ kind: 'rare', rarity: 8 });
+    // "Jagdgewehr" is the chart's Hunting rifle (Hochland long rifle)
+    expect(kind('Jagdgewehr')).toMatchObject({ kind: 'rare', rarity: 11, de: 'Hochland-Langbüchse' });
+    // a brace by its single weapon
+    expect(kind('Pistolenpaar')).toMatchObject({ kind: 'rare', rarity: 8 });
+    // "A/B" by both
+    expect(kind('Streitkolben/Knüppel')).toEqual({ kind: 'common' });
+    // not in the chart at all: the table decides
+    expect(kind('Orc-Stil (Helm/Dolch/Axt/Schild)')).toEqual({ kind: 'unknown' });
+  });
+
+  it('a rare item of the list is not bought after the first battle', () => {
+    const { s, capt } = band();
+    expect(core.buyItem(ctx(s), capt, 'Pistole')).toMatchObject({ ok: false, reason: 'a rare item: only a Hero\'s search finds it' });
+  });
+});
