@@ -15,7 +15,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
-const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give',
+const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give', 'hire',
   'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more', 'desktop'];
 const PAGES = ['index', ...SCREENS];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
