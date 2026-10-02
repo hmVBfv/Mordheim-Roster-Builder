@@ -1841,3 +1841,14 @@ from `site.env` but rightly never touches `app.env`, so the app kept the old
 origin and would have refused every write from the new one – a fault that
 only shows once there is something to write. It now warns whenever
 `PUBLIC_ORIGIN` and `ROSTER_HOST` disagree, with the line that fixes it.
+
+The veterans roll closed the list of 3c's rules. The rulebook lets new men
+join an experienced Henchman group only as far as a 2D6, rolled once
+between battles, covers their combined experience; the Roster Builder
+explained this in its post-battle helper and left the arithmetic to the
+player. Now "+ Man" opens the "More men" sheet of the mockup – how many,
+the price line by line, their names – and from the first battle on, for a
+group with experience, the roll of the round: entered once, kept with the
+round's post-battle state, and spent down as men join, so a second group
+sees what the first left over. The editor tests had to learn to open a
+sheet for this, with a few lines of <dialog> that jsdom lacks.

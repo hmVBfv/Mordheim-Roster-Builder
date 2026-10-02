@@ -48,3 +48,9 @@ describe('more men', () => {
     expect(moreMenVerdict({ ...v, gold: v.each - 1 }, 1, null)).toBe(`Not enough gold: ${v.each - 1} gc in hand.`);
   });
 });
+
+it('names the new men of a lone man\'s group as they will be called', () => {
+  let s = createWarband(data, 'merc', null, '');
+  s = core.addUnit(ctx(s), 'warr');
+  expect(moreMenView(ctx(s), s.models[0]!.uid)!.fallbacks.slice(0, 2)).toEqual(['Warrior 2', 'Warrior 3']);
+});
