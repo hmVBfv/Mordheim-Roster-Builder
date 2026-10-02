@@ -74,7 +74,7 @@ geplant.
 
 | Nr. | Was | Warum / Quelle | Entscheidung | Status |
 | --- | --- | --- | --- | --- |
-| V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | geplant, Spezifikation [unten](#v1--ablauf-einer-verletzung) |
+| V1 | Ein Verlust, der über die Verlustliste gewürfelt wird, soll dieselben Folgen haben wie das Ergebnis über „+ Injury“ an der Einheitenkarte | Heute weichen fünf Ergebnisse ab: **35 Deep Wound** wird als bleibende Verletzung eingetragen, ohne verpasste Spiele; **36 Robbed** ohne Verlust der Ausrüstung; **61 Captured** und **65 Sold to the Pits** ohne Rückfrage (kein Lösegeld, kein Grubenkampf); **66 Survives Against the Odds** ohne +1 Erfahrung. Umgekehrt schließt „+ Injury“ bei diesen fünf Ergebnissen (außer einem Gefangenen, der nicht zurückkommt) einen offenen Verlusteintrag nicht ab. Der Code behauptet, beide Wege seien gleich. | Rob, 28.09.2026: angleichen, **nur im neuen Builder**; Folgeentscheidungen aus der Verletzungstabelle ableiten, Spielinhalte von mordheimer.net | umgesetzt in 3c (02.10.2026): `core` `injure`, Oberfläche „Injury“; Spezifikation und Stand [unten](#v1--ablauf-einer-verletzung) |
 | V2 | Gefallene über eine feste ID statt über ihre Position ansprechen | Ein Verlusteintrag verweist mit `fallenId` auf die Position in `fallen`. Wird ein Gefallenen-Eintrag gelöscht, zeigen spätere Verlusteinträge auf den falschen Krieger. | Rob, 28.09.2026: ja, **im neuen Builder** | geplant, Spezifikation [unten](#v2--feste-ids-für-gefallene) |
 | V3 | Augur und „Blinded in one eye“ | Toumas: nach Regeltext (RAW) wirkt das Ergebnis auch beim Augur; beabsichtigt (RAI) war, dass Augurs Augenverletzungen ignorieren. mordheimer.net nennt keine solche Ausnahme – weder beim Augur (*Sisters of Sigmar*) noch bei Ergebnis 31 (*Campaigns – Serious Injuries*). | Rob, 28.09.2026: Eine Auslegung nach Absicht gilt nur, wenn mordheimer.net sie übernimmt. Hier nicht, also **RAW**: Der Augur verliert 1 BS wie jeder andere. | entschieden; alte App und `core/` rechnen schon so, Test `core/test/rulings.test.ts` |
 | V4 | Ausrüstung zwischen Kriegern verschieben, besonders seltene Gegenstände | Heute nur über Abwählen (voller Preis zurück) und neu Anwählen (voller Preis weg); ein seltener Gegenstand verliert dabei seinen bezahlten Preis. RAW erlaubt es ausdrücklich: Post-Battle-Stufe 9 „Reallocate equipment“ (UFAQ-Errata zu S. 117), Regelbuch S. 79 und mordheimer.net *Trading* („hoarded … or redistributed“). | Rob, 28.09.2026: gewünscht, mindestens für Helden | entschieden, [unten](#entscheidungen-rob-29092026); Logik in `core/` (3b), Oberfläche folgt |
@@ -200,6 +200,54 @@ Warbandgröße.
   würfelt nicht, sondern ist gefangen, sofern der Gegner eine Engine of Chaos
   hat. Vorschlag: als Wahl „gefangen durch Man-catcher“ im Verlustformular,
   sobald jemand diese Warband spielt.
+
+### Umsetzung (Schritt 3c, 02.10.2026)
+
+- **Neue Aktion statt geänderter Ports.** `injure(ctx, wer, wurf, { casualtyId })`
+  in `core/src/warband/injury.ts` ist die eine Aktion für beide Eingänge.
+  `addInjury` und `resolveCasualtyRoll` bleiben 1:1 wie in der alten App und
+  in den Paritätstests; die neue App ruft nur `injure`. Eine Ausnahme in den
+  Paritätstests braucht es deshalb nicht. Tests: `core/test/injury.test.ts`
+  (jede Zeile der Tabelle, Bezirke, Peg Leg, Kassenbuch, beide Eingänge
+  gleich, eingefrorene Eingaben), `app/src/roster/injury.test.ts` (jede
+  beantwortete Zeile ergibt einen Wurf, den `core` annimmt), Playwright
+  „injuries as rolled“.
+- **Der Wurf** ist ein Objekt mit allen Folgeentscheidungen (`HeroRoll`:
+  `d6`, `games`, `hates`, `captured`, `pit`, `more`, `saved`); ein
+  unvollständiger Wurf ändert nichts (`heroRollProblem` nennt, was fehlt).
+  Er steht danach im Verlusteintrag (`injury`), dazu `code`, `detail`,
+  `applied`; ohne offenen Eintrag legt `injure` in einer Kampagne einen an,
+  wie die alte App.
+- **Gold** über das Kassenbuch (V7): Lösegeld und der gewonnene
+  Grubenkampf werden gebucht, Verlorenes (Robbed, verlorener Grubenkampf,
+  Tod) wird nie erstattet.
+- **Bezirke:** Temple of Morr und Temple of Sigmar fragen ihren W6 (5+),
+  Gaol (Kontrolle) und Amphitheatre (Foothold) wirken ohne Frage.
+- **Henchmen** würfeln W6 für den Mann, der ausfiel (nach Namen);
+  **Hired Swords** W6, bei 1–2 sind sie mit ihrer Ausrüstung fort.
+  Dramatis Personae bekommen keine Verletzung angeboten (eigene Regeln je
+  Figur).
+- **Würfeln:** Jeder Wurf kann eingetragen werden oder per „Roll the dice“
+  in der Oberfläche fallen (Grundsatz 2); `core` würfelt nie.
+
+**Zur Entscheidung (Rob):**
+
+1. **Peg Leg.** Die Spezifikation oben sagt „W6, bei 4+ ignoriert“, der
+   Regeltext in den Daten (`data/equipment.json`, *Peg Leg*, Pirates) sagt,
+   der Träger *darf* Leg Wound und Smashed Leg ignorieren. Die App fragt
+   heute nur „Ignored / It stands“ und überlässt den Wurf dem Tisch.
+   Vorschlag: die Quelle auf mordheimer.net prüfen und die Frage danach
+   ausrichten.
+2. **Robbed** kommt nicht mehr in die bleibenden Verletzungen, nur als
+   Ereignis in die Chronik (Grundsatz 4; zugleich der offene Vorschlag
+   „Robbed nicht als bleibende Verletzung“). Bitte bestätigen.
+3. **Zweites Auge:** Die App erkennt es, warnt im Sheet und zeigt auf der
+   Karte „Blind: must retire“; entlassen wird von Hand über ⋯ (die
+   Ausrüstung geht dabei nach V4 in die Truhe). Der Vorschlag, ihn als
+   „ausgeschieden“ unter die Gefallenen zu legen, wartet auf deine
+   Entscheidung.
+4. **Gefangen als Zustand** und **Man-catcher** sind nicht gebaut; ein
+   Gefangener wird heute ausgetauscht, freigekauft oder ist verloren.
 
 ## V2 – Feste IDs für Gefallene
 

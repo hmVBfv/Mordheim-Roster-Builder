@@ -75,6 +75,7 @@ export interface WarriorActions {
   onMan: (i: number) => void;
   onAddMan: () => void;
   onAdvance: () => void;
+  onInjury: () => void;
 }
 
 export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
@@ -84,6 +85,7 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
     w.promoted && <span key="p" className={styles.badge}>Promoted</span>,
     w.advanceDue && <span key="a" className={`${styles.badge} ${styles.due}`}>Advance due</span>,
     w.missGames > 0 && <span key="m" className={`${styles.badge} ${styles.out}`}>Misses {w.missGames} game{w.missGames > 1 ? 's' : ''}</span>,
+    w.retire && <span key="r" className={`${styles.badge} ${styles.out}`}>Blind: must retire</span>,
   ].filter(Boolean);
   return (
     <article className={`${ui.card} ${styles.warrior}`} aria-label={w.name}>
@@ -108,24 +110,23 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
         <Line label="Mutations" items={w.mutations} />
         <Line label="Injuries" items={w.injuries} />
       </dl>
-      {(w.xp || w.addMan) && (
-        <div className={styles.acts}>
-          <div className={ui.row}>
-            {w.xp && <button type="button" className={`${ui.buttonQuiet} ${w.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>}
-            {w.addMan && (
-              <button type="button" className={ui.buttonQuiet} disabled={'why' in w.addMan} onClick={act.onAddMan}>
-                + Man{'cost' in w.addMan ? ` · ${w.addMan.cost} gc` : ''}
-              </button>
-            )}
-          </div>
-          {w.addMan && 'why' in w.addMan && <p className={styles.why}>No more men: {w.addMan.why}.</p>}
+      <div className={styles.acts}>
+        <div className={ui.row}>
+          {w.xp && <button type="button" className={`${ui.buttonQuiet} ${w.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>}
+          {w.addMan && (
+            <button type="button" className={ui.buttonQuiet} disabled={'why' in w.addMan} onClick={act.onAddMan}>
+              + Man{'cost' in w.addMan ? ` · ${w.addMan.cost} gc` : ''}
+            </button>
+          )}
+          <button type="button" className={ui.buttonQuiet} aria-label={`Injury for ${w.name}`} onClick={act.onInjury}>Injury</button>
         </div>
-      )}
+        {w.addMan && 'why' in w.addMan && <p className={styles.why}>No more men: {w.addMan.why}.</p>}
+      </div>
     </article>
   );
 }
 
-export interface HireActions { onMore: () => void; onXp: (delta: number) => void; onAdvance: () => void }
+export interface HireActions { onMore: () => void; onXp: (delta: number) => void; onAdvance: () => void; onInjury: () => void }
 
 export function Hire({ h, act }: { h: HireView; act: HireActions }) {
   return (
@@ -141,7 +142,10 @@ export function Hire({ h, act }: { h: HireView; act: HireActions }) {
       </dl>
       {h.xp && (
         <div className={styles.acts}>
-          <button type="button" className={`${ui.buttonQuiet} ${h.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>
+          <div className={ui.row}>
+            <button type="button" className={`${ui.buttonQuiet} ${h.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>
+            <button type="button" className={ui.buttonQuiet} aria-label={`Injury for ${h.name}`} onClick={act.onInjury}>Injury</button>
+          </div>
         </div>
       )}
     </article>
