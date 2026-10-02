@@ -226,7 +226,7 @@ Anmeldung geht erst live, wenn Daten hinter ihr liegen.
 | --- | --- |
 | 3a Roster bearbeiten | Grundlage: jede Änderung eine Aktion aus `core/`, sofort auf dem Gerät gespeichert, einmal rückgängig über den Hinweis. Warband anlegen (Auswahl nach Grad, Variante, Name), Namen, Anwerben und Entlassen, Henchmen-Gruppen (+ Man, Namen der Männer, einen Mann entlassen), Erfahrung per Stepper, Anführer, Worth. |
 | 3b Ausrüstung und Handel | erst die neue Logik in `core/` (V4–V7: Suchwurf, Verkaufen, Umverteilen, Kassenbuch), dann der Trading Post nach Mockup: Kaufen, Seltenes, Suchen, Verkaufen, Geben, Lager, Regeltexte. **Stand 02.10.2026:** Logik (PR #16) und Oberfläche umgesetzt; offen: bezahlten Preis von Hand ändern, Wyrdstone verkaufen (mit 4a). |
-| 3c Entwicklung | Aufstiege mit Fertigkeiten und Zaubern, Beförderung, Verletzungen mit Folgeentscheidungen (V1), Tod und Gefallene, Veteranenwurf bei „+ Man“; Mutationen und Male (Mockup fehlt). |
+| 3c Entwicklung | Aufstiege mit Fertigkeiten und Zaubern, Beförderung, Verletzungen mit Folgeentscheidungen (V1), Tod und Gefallene, Veteranenwurf bei „+ Man“; Mutationen und Male (Mockup fehlt). **Stand 02.10.2026:** Aufstiege und Beförderung umgesetzt; als Nächstes Verletzungen (V1, V2). |
 | 3d Hired Swords und Dramatis Personae | Listen mit Filtern, Anheuern, Optionen, Aufstiege (Mockup fehlt). |
 | 3e Hausregeln und Exporte | Hausregeln einer Warband (Mockup fehlt), Text und Datei, TTS-Karten, Rostersheet als PDF, Drucken. |
 | 3f Quick Build auf Pages | Checkliste vollständig, Szenarien der Legacy-Tests als eigene `core/`-Tests, Entscheidung D, Umstellung. |
