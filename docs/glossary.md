@@ -52,7 +52,8 @@ Begriff einführt, trägt ihn hier ein.
 | umbenannter Gegenstand | – | `RENAMED` in `data/equipment.json` |
 | Kassenbuch (V7) | Ledger | `s.ledger`, `ledgerBalance()`, `settle()`, `keepGold()`, `bookGold()` |
 | Suchwurf nach Seltenem | Search (rare) | `searchOdds()`, `searchBlock()`, `recordSearch()` |
-| Veteranenwurf (Männer mit Erfahrung anwerben) | Veterans roll | `henchRecruitSurcharge()`, `m.xpPaid` |
+| Veteranenwurf (Männer mit Erfahrung anwerben) | Veterans roll | `setVeteransRoll()`, `veteransOf()`, `postbattle[round].veterans`, `henchRecruitSurcharge()`, `m.xpPaid` |
+| Mehr Männer für eine Gruppe | More men · + Man | `MoreMenSheet`, `addMen()`, `moreMenMax()` |
 | Handel gesperrt (ab der ersten Schlacht) | – | `tradeLocked()` |
 | Kaufen (Trading Post) | Buy | `buyItem()`, `commonPrice()` |
 | Verkaufen | Sell | `sellItem()`, `sellPrice()` |

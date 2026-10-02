@@ -39,7 +39,8 @@ export function moreMenView(ctx: core.Ctx, uid: number): MoreMenView | null {
   return {
     uid, name: m.name || def.name, unit: def.name, max,
     base, exp: core.veteranExp(m), perExp: core.HENCH_XP_GC, surcharge, each: base + surcharge,
-    fallbacks: Array.from({ length: max }, (_, i) => core.memberDefaultName(ctx, m, q + i)),
+    // numbered as in the grown group (a lone man has no number yet)
+    fallbacks: Array.from({ length: max }, (_, i) => core.memberDefaultName(ctx, { ...m, qty: q + max }, q + i)),
     veterans: v === undefined ? null : { roll: v?.roll ?? null, spent: v?.spent ?? 0 },
     gold: core.goldCurrent(ctx),
     goldBinds: core.tradeLocked(ctx),

@@ -38,7 +38,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Startgold, Budget, Sonderregeln wie Trantio (+20 %) | ✓ | ✓ | ✓ | – | 3a | Startgold schon bei der Auswahl |
 | Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | ✓ | roster (Recruit) | 3a | Liste wie im Builder (Helden, Henchmen, Fahrzeuge), mit Grund, wenn nicht; entlassen über ⋯ mit Undo |
 | Anführer bestimmen | ✓ | ✓ | ✓ | – | 3a | ⋯ → „Lead the warband“ bei jedem Helden, der führen darf |
-| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ◐ | roster (+ Man mit Veteranenwurf und Grenzen, Namen antippen) | 3a/3c | „+ Man“ mit Preis samt Aufpreis und Grund, wenn nicht; Namen antippen; einen bestimmten Mann entlassen (neu, `dismissMember`). Der Veteranenwurf kommt mit 3c |
+| Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ✓ | roster (+ Man mit Veteranenwurf und Grenzen, Namen antippen) | 3a/3c | „+ Man“ mit Preis samt Aufpreis und Grund, wenn nicht; Namen antippen; einen bestimmten Mann entlassen (neu, `dismissMember`). Seit 3c öffnet „+ Man“ das Sheet „More men“: wie viele, Preis, Namen; nach der ersten Schlacht bei einer Gruppe mit Erfahrung der Veteranenwurf der Runde (neu, `setVeteransRoll`, `addMen`) |
 | Warnungen zur Legalität (Seitenleiste) | ✓ | ✓ | ✓ | – | 1e | |
 | Rating, Worth, Gold, Modelle | ✓ | ✓ | ✓ | roster | 3a | |
 
