@@ -6,6 +6,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data, fixtures } from '../test/data.ts';
+import { hireFacts, warriorFacts } from './tips.ts';
 import { rosterView, type Fact } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -40,6 +41,18 @@ describe('rule texts on the card', () => {
     expect(byLabel(w.injuries, 'Lost his hat')!.tips).toEqual([]);
   });
 
+  it('the Leader rule goes with the lead', () => {
+    let s = core.newWarband(data, 'merc');
+    for (const id of ['capt', 'champ']) s = core.addUnit(ctx(s), id);
+    const champ = s.models[1]!.uid;
+    expect(byLabel(rosterView(data, s).heroes[1]!.rules, 'Leader')).toBeUndefined();
+    // the Captain has fallen: the Champion takes command
+    s = core.setLeader(ctx(core.removeUnit(ctx(s), s.models[0]!.uid)), champ);
+    const now = rosterView(data, s).heroes[0]!;
+    expect(now.leader).toBe(true);
+    expect(byLabel(now.rules, 'Leader')!.tips[0]!.text).not.toBe('');
+  });
+
   it('a Rat Ogre: Fear, Large Target, Stupidity', () => {
     let s = core.newWarband(data, 'skaven');
     s = core.addUnit(ctx(s), 'ogre');
@@ -68,25 +81,34 @@ describe('rule texts on the card', () => {
   });
 
   /* Every warband of the fixtures: the texts are plain, and nearly every
-     word that names something has one. */
-  it('for every kind of warband', () => {
+     word that names something has one. A sweep over every fixture, close
+     to two seconds here: CI runners are slower than the five-second default. */
+  it('for every kind of warband', { timeout: 30_000 }, () => {
     let words = 0, explained = 0;
+    const wrong: string[] = [];
     for (const f of fixtures) {
-      const v = rosterView(data, f.state);
-      const facts = [
-        ...[...v.heroes, ...v.henchmen].flatMap((w) => [...w.rules, ...w.equipment, ...w.skills, ...w.spells, ...w.mutations, ...w.mark, ...w.injuries]),
-        ...v.hires.flatMap((h) => [...h.rules, ...h.skills, ...h.spells]),
-      ];
-      for (const x of facts) {
-        expect(x.label, f.label).not.toBe('');
-        words++;
-        if (x.tips.length) explained++;
-        for (const t of x.tips) {
-          expect(t.text, `${f.label}: ${x.label}`).not.toMatch(/<[a-z/]/i);
-          expect(t.name, `${f.label}: ${x.label}`).not.toBe('');
+      const c = ctx(core.normalizeState(ctx(f.state)));
+      const facts: Fact[] = [];
+      for (const m of c.s.models) {
+        const w = warriorFacts(c, m);
+        facts.push(...w.rules, ...w.equipment, ...w.skills, ...w.spells, ...w.mutations, ...w.mark, ...w.injuries);
+      }
+      for (const [list, kind, book] of [[c.s.hired, 'hs', data.HIREDSWORDS], [c.s.dp, 'dp', data.DRAMATIS]] as const) {
+        for (const rec of list ?? []) {
+          const e = book[rec.key];
+          if (!e) continue;
+          const h = hireFacts(c, rec, e, kind, rec.key);
+          facts.push(...h.rules, ...h.skills, ...h.spells);
         }
       }
+      for (const x of facts) {
+        words++;
+        if (x.tips.length) explained++;
+        if (!x.label) wrong.push(`${f.label}: a word without a label`);
+        for (const t of x.tips) if (/<[a-z/]/i.test(t.text) || !t.name) wrong.push(`${f.label}: ${x.label}`);
+      }
     }
+    expect(wrong).toEqual([]);
     expect(words).toBeGreaterThan(500);
     // what stays a word: the fixtures' made-up spells, a few Hired Swords'
     // skills the data has no text for, a warhound
