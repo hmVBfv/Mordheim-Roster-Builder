@@ -113,10 +113,10 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 | Tabelle | Spalten | Hinweise |
 | --- | --- | --- |
-| `users` | `id`, `username` (eindeutig), `display_name`, `pw_hash`, `is_admin`, `totp_secret_enc`, `totp_enabled_at`, `created_at`, `disabled_at` | TOTP-Geheimnis verschlüsselt mit Schlüssel aus der `.env` |
-| `sessions` | `id`, `user_id`, `token_hash`, `device_label`, `created_at`, `last_seen_at`, `expires_at`, `revoked_at` | nur Hash des Tokens |
-| `invites` | `id`, `token_hash`, `kind` (`register` · `reset`), `created_by`, `for_user_id`, `campaign_id`, `expires_at`, `used_at` | einmal gültig; Register 7 Tage, Reset 24 Stunden |
-| `login_attempts` | `id`, `username`, `ip`, `at`, `ok` | für Bremse und Fail2Ban |
+| `users` | `id`, `username` (eindeutig ohne Groß/klein), `display_name`, `pw_hash`, `is_admin`, `totp_secret_enc`, `totp_pending_enc`, `totp_enabled_at`, `totp_last_step`, `totp_recovery`, `created_at`, `disabled_at` | seit Migration 2. `pw_hash`: `scrypt$N$r$p$salz$hash`. TOTP-Geheimnis mit `TOTP_KEY` aus `app.env` verschlüsselt (AES-256-GCM); ein Geheimnis im Einrichten wartet in `totp_pending_enc`, bis sein erster Code stimmt. `totp_last_step`: Zeitschritt des zuletzt benutzten Codes (jeder Code nur einmal). `totp_recovery`: JSON-Liste der Hashes der Wiederherstellungscodes; ein benutzter fällt heraus |
+| `sessions` | `id`, `user_id`, `token_hash`, `stage` (`totp` · `full`), `device_label`, `ip`, `created_at`, `last_seen_at`, `expires_at`, `revoked_at` | nur Hash des Tokens. `totp`: Passwort stimmte, Code steht aus (5 Minuten); `full`: angemeldet, 90 Tage ab letzter Nutzung (höchstens stündlich nachgeführt, mit Adresse). Mit dem Code bekommt die Sitzung ein neues Token |
+| `invites` | `id`, `token_hash`, `kind` (`register` · `reset`), `created_by`, `for_user_id`, `campaign_id`, `is_admin`, `note`, `created_at`, `expires_at`, `used_at`, `revoked_at` | einmal gültig; Register 7 Tage, Reset 24 Stunden. `created_by` leer: von `roster-cli`; nur von dort `is_admin`. Ein neuer Reset-Link widerruft den älteren. `campaign_id` ab Phase 4a |
+| `login_attempts` | `id`, `username`, `ip`, `at`, `ok`, `reason` (`password` · `unknown` · `disabled` · `code` · `braked` · `registered` · leer) | für Bremse, Fail2Ban und die Admin-Ansicht „wer wann“ (Rob, 03.10.2026); 180 Tage aufbewahrt. Von der Bremse abgewiesene Versuche zählen nicht für sie |
 
 ### Warbands
 
@@ -176,7 +176,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | --- | --- | --- |
 | `bugs` | `id`, `reporter_id`, `kind` (`bug` · `wish` · `rules`), `title`, `text`, `source_ref`, `severity` (`S1`–`S4`), `area`, `status` (`new` · `confirmed` · `in_progress` · `fixed` · `closed` · `duplicate`), `app_version`, `device`, `view`, `js_errors` (JSON), `warband_id`, `rev`, `consent_attach`, `fixed_in`, `created_at` | |
 | `bug_comments` | `id`, `bug_id`, `author_id`, `text`, `created_at` | Rückfragen |
-| `audit_log` | `seq`, `at`, `actor_id`, `action`, `target_type`, `target_id`, `campaign_id`, `visibility`, `payload` (JSON) | jede Schreibaktion; Quelle für `seq` |
+| `audit_log` | `seq`, `at`, `actor_id`, `action`, `target_type`, `target_id`, `campaign_id`, `visibility` (`public` · `sealed` · `leader` · `admin`), `payload` (JSON) | seit Migration 2; jede Schreibaktion; Quelle für `seq`. `actor_id` leer: `roster-cli` (dann `payload.via`). Konto-Aktionen (`user.*`, `invite.*`, `totp.*`, `session.*`, `sessions.*`) haben `admin`; nie Passwörter, Tokens oder Codes im `payload` |
 | `schema_migrations` | `version`, `name`, `applied_at` | legt der Migrationsrahmen selbst an (`server/src/migrations.ts`); eine Zeile je Datei `server/migrations/NNNN_name.sql` |
 | `meta` | `key`, `value` | seit Migration 1; was der Server über sich selbst weiß: `epoch` (wechselt bei jeder Wiederherstellung, siehe [architecture.md](architecture.md#6-synchronisation)), `created_at` (Anlage der Datenbank), `restored_from` (nur in Snapshot-Kopien: Label und Zeit; ein Server, der auf der Kopie startet, nimmt eine neue Epoche und löscht den Eintrag) |
 
