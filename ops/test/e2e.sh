@@ -136,6 +136,7 @@ expect "production is untouched" test "$(probe_get)" = after-backup
 
 echo "# rollback drill: an image that does not start"
 epoch=$(health | field epoch)
+schema=$(docker exec roster-app roster-cli schema-version)
 expect_exit 1 "roster-deploy $broken is refused" as roster-deploy "$broken"
 expect "ROSTER_TAG is back to $good" test "$(env_tag ROSTER_TAG)" = "$good"
 expect "the app runs $good again" runs_image "$good"
@@ -146,7 +147,7 @@ expect "the data is as it was" test "$(probe_get)" = after-backup
 echo "# rollback drill: an image that migrates and fails"
 expect_exit 1 "roster-deploy $drill is refused" as roster-deploy "$drill"
 expect "the app runs $good again" runs_image "$good"
-expect "schema back at 1" test "$(docker exec roster-app roster-cli schema-version)" = 1
+expect "schema back at $schema" test "$(docker exec roster-app roster-cli schema-version)" = "$schema"
 expect "the failed database is kept" sh -c "ls $data | grep -q '^roster.sqlite.failed-'"
 expect "the data is as before the deploy" test "$(probe_get)" = after-backup
 expect "a new epoch: devices sync anew" test "$(health | field epoch)" != "$epoch"
