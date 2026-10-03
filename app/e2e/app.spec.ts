@@ -872,3 +872,41 @@ for (const theme of THEMES) {
     await expect(page.getByText(/House rules: Armour price: 85/)).toBeVisible();
   });
 }
+
+/* Phase 3e: exports – Tabletop Simulator cards, readable text, tool file
+   and the official roster sheet, as the Roster Builder made them. */
+for (const theme of THEMES) {
+  test(`exports, in ${theme}`, async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    // a card's ⋯ menu leads to its Tabletop Simulator entry
+    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
+    await page.locator('dialog[open]').getByRole('button', { name: 'Tabletop Simulator card' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Export' })).toBeVisible();
+    const card = page.locator('details[open]').filter({ hasText: 'Ulrich the Grey' });
+    await expect(card.getByRole('textbox', { name: 'Name' })).toHaveValue('[B8860B]Ulrich the Grey[-]');
+    await expect(card.getByRole('textbox', { name: 'Description' })).toHaveValue(/Special Rules:/);
+    await card.getByRole('button', { name: 'Copy name' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'copied' })).toHaveText('Name copied.');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('[B8860B]Ulrich the Grey[-]');
+    // the men of a group each have a card with their own name
+    await expect(page.locator('summary').filter({ hasText: 'Otto' })).toContainText('of Warrior');
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-export`);
+
+    // the readable text, the tool file and the sheet
+    await page.getByRole('button', { name: 'Show the text' }).click();
+    await expect(page.getByRole('textbox', { name: 'Readable text' })).toHaveValue(/MORDHEIM-DATA:/);
+    const [json] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Save as .json' }).click()]);
+    expect(json.suggestedFilename()).toMatch(/\.json$/);
+    const [txt] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Save as .txt' }).click()]);
+    expect(txt.suggestedFilename()).toMatch(/\d{4}-\d\d-\d\d\.txt$/);
+    const [pdf] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Save as PDF' }).click()]);
+    expect(pdf.suggestedFilename()).toMatch(/official_sheet\.pdf$/);
+    const bytes = readFileSync(await pdf.path());
+    expect(bytes.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(bytes.length).toBeGreaterThan(100_000);
+  });
+}

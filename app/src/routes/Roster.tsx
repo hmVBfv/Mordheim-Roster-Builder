@@ -147,6 +147,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       }
       return [];
     })(),
+    { label: 'Tabletop Simulator card', run: () => { void navigate(`/warbands/${rec.id}/export#tts-${w.uid}`); } },
     ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
     ...(w.injuries.length || w.missGames ? [{ label: 'Injuries – correct', run: () => { setInjuriesOf(w.uid); openInjuriesSheet(); } }] : []),
     ...(w.captive != null ? [{ label: 'Captivity – how it ended…', run: () => openCaptive(w) }] : []),
@@ -170,6 +171,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         }),
       },
       ...(hs ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: h.uid, name: h.name }); openTakenSheet(); } }] : []),
+      { label: 'Tabletop Simulator card', run: () => { void navigate(`/warbands/${rec.id}/export#tts-${h.uid}`); } },
       {
         label: 'Dismiss — upkeep ends', danger: true,
         run: () => ed.edit((c) => core.dismissHire(c, h.uid, hs ? 'hs' : 'dp'), `${h.name} is dismissed.`, { gold: locked ? 'keep' : 'settle' }),
@@ -256,6 +258,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         <Link to={`/warbands/${rec.id}/house`} className={ui.buttonQuiet}>House rules</Link>
         <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
+        <Link to={`/warbands/${rec.id}/export`} className={ui.buttonQuiet}>Export…</Link>
         <button type="button" className={ui.buttonQuiet}
           onClick={() => { void db.warbands.delete(rec.id).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
           Remove from this device
