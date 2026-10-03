@@ -255,3 +255,11 @@
   background: var(--surface);
   border-top: 1px solid var(--border);
 }
+
+/* on paper: no buttons that only do something on the screen */
+@media print {
+  .iconButton,
+  .toast {
+    display: none;
+  }
+}

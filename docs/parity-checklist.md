@@ -49,7 +49,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Ausrüstungslisten je Einheit, erster Dolch frei, Waffengrenzen | ✓ | ✓ | ✓ | trading-post | 3b | bis zur ersten Schlacht ⋯ → „Equipment & rare items“ mit Stepper je Gegenstand; Waffengrenzen als Warnung |
 | Preise nach Hausregeln und Bezirken (halber Preis) | ✓ | ✓ | ✓ | trading-post | 3b | Liste und Trading Post zeigen den Preis, der gerade gilt |
 | Gründungspreise und Trading Post (C2, C3, C7) | ✓ | ✓ | ✓ | trading-post | 3b | Trading Post ab der ersten Schlacht (`/warbands/:id/trade`) |
-| Seltenes: Katalog, bezahlter Preis, Material-Upgrades (Gromril, Ithilmar …) | ✓ | ✓ | ◐ | trading-post | 3b | hinzufügen, Anzahl, Waffe eines Upgrades; den bezahlten Preis von Hand ändern fehlt noch |
+| Seltenes: Katalog, bezahlter Preis, Material-Upgrades (Gromril, Ithilmar …) | ✓ | ✓ | ✓ | trading-post | 3b | hinzufügen, Anzahl, Waffe eines Upgrades; den bezahlten Preis von Hand ändern fehlt noch **3f (03.10.2026):** bezahlter Preis von Hand im Ausrüstungs-Sheet. |
 | Suchwurf je Held mit Modifikatoren, Chance | – | ✓ | ✓ | trading-post | 3b | neu (V5/V6); `searchOdds`, ein Wurf je Held und Stufe |
 | Verkaufen zum halben Preis | – | ✓ | ✓ | trading-post | 3b | neu (V6); abrunden, mindestens 1 gc, eine Gruppe zusammen |
 | Umverteilen zwischen Kriegern und Lager | – | ✓ | ✓ | trading-post | 3b | neu (V4); `giveItem` mit Grund, wenn nicht |
@@ -63,7 +63,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Profil mit allen Änderungen, Rassenmaxima, Rüstungswurf | ✓ | ✓ | ✓ | roster | 1e | geänderte Werte markiert |
 | Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ✓ | roster | 1e | App: mit Pull Request #4 |
-| Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | ◐ | roster | 3a | Stepper (nicht unter die Starterfahrung, Hired Swords bis 14); Sprung auf eine Schwelle fehlt |
+| Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | ✓ | roster | 3a | Stepper (nicht unter die Starterfahrung, Hired Swords bis 14); Sprung auf eine Schwelle fehlt **3f:** „Exp n“ antippen öffnet ein Sheet mit den Schwellen der Leiste und einem Zahlenfeld. |
 | Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ✓ | roster (Advance) | 3c | „Advance“ auf jeder Karte: Wurf nach den Tabellen, Werte bis zum Rassenmaximum, Fertigkeit aus seinen Listen oder ein Zauber stattdessen; Korrektur über ⋯ |
 | Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ✓ | App (Liste, Auswahl) | 3c | ⋯ → „Mutations“ bzw. „Blessings of Nurgle“ (Preis, Regeltext, Summe; auch über die Fertigkeit „Mutant“); Seher ⋯ → „Mark of Chaos…“, Häuptling ⋯ → „Take the Mark“; die Regeln des Mals auf der Karte |
 | Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3c | 10–12 einer Gruppe: wer, zwei Listen; Rücknahme über Undo, eine spätere Rücknahme fehlt noch |
@@ -107,7 +107,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Export: Text mit eingebettetem Stand, Datei | ✓ | ✓ | ✓ | – | 3e | Roster → Export…: Text anzeigen, kopieren, als .txt (Name mit Stufe und Tag); Tool-Datei als .json (`writeSave`, mit Format und Gold in der Hand); beide lassen sich wieder importieren |
 | Tabletop-Simulator-Karten (Krieger, Männer, Hired Swords, DP) | ✓ | ✓ | ✓ | roster (TTS) | 3e | je Held, Gruppe, Mann einer Gruppe (eigener Name) und Angeheuertem Name und Beschreibung zum Kopieren; vom ⋯-Menü einer Karte direkt dorthin |
 | Offizielles Rostersheet als PDF | ✓ | ✓ | ✓ | – | 3e | pdf-lib 1.17.1 (wie `vendor/`) und die Vorlage `assets/sheet.pdf` werden erst beim Erstellen geladen; beide auch offline im Service Worker |
-| Drucken | ✓ | n/a | – | – | 3 | vorerst über das PDF; eine Druckansicht des Rosters folgt |
+| Drucken | ✓ | n/a | ✓ | – | 3f | Export → „Print the roster“: das Roster ohne Navigation und Knöpfe, immer hell; oder das offizielle Rostersheet als PDF |
 
 ## Oberfläche
 
