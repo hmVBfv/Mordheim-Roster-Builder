@@ -49,26 +49,66 @@ Gelegenheitsangriffe sicher abzuwehren.
 
 ## 3. Anmeldung
 
+Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
+`passwords.ts`, `totp.ts`; Tests `server/test/accounts.test.ts`,
+`credentials.test.ts`, `leak-matrix.test.ts`).
+
 - **Nur auf Einladung.** Admin erzeugt einen Einladungslink (einmal gültig,
-  7 Tage). Keine offene Registrierung.
-- **Passwörter:** mindestens 12 Zeichen, Abgleich mit einer Liste häufiger
-  Passwörter, gespeichert als scrypt- oder argon2id-Hash.
+  7 Tage). Keine offene Registrierung. Der erste Admin entsteht über
+  `roster-cli invite --admin` auf dem Pi; Admin-Einladungen gibt es nur dort.
+  Das Token steht im Fragment des Links (`/invite#…`, `/reset#…`), das der
+  Browser nie an einen Server schickt, und geht im Körper an die API – nie
+  in einer URL, die irgendwo im Log landen könnte.
+- **Nutzernamen:** 3–32 Zeichen aus Buchstaben, Ziffern, `.`, `-`, `_`;
+  eindeutig ohne Rücksicht auf Groß- und Kleinschreibung.
+- **Passwörter:** mindestens 12 Zeichen (gezählt in Zeichen, nicht in
+  UTF-16-Einheiten), höchstens 200, nicht auf der Liste häufiger Passwörter
+  (`server/src/common-passwords.ts`: die Einträge ab 12 Zeichen aus SecLists
+  „100k most used passwords (NCSC)“, MIT-Lizenz), ohne den Nutzernamen,
+  mindestens 4 verschiedene Zeichen. Gespeichert als scrypt-Hash
+  (N = 2¹⁵, r = 8, p = 1; 32 MiB für einen Augenblick, höchstens zwei
+  gleichzeitig) mit seinen Parametern, damit ein späterer Aufwand alte Hashes
+  noch prüft. Ein unbekannter Nutzername kostet dieselbe Zeit wie ein
+  falsches Passwort.
 - **Sitzungen:**
   - Zufälliges 256-Bit-Token, in der Datenbank nur als Hash.
-  - Cookie `HttpOnly; Secure; SameSite=Lax; Path=/`.
+  - Cookie `mh_session`, `HttpOnly; Secure; SameSite=Lax; Path=/`
+    (`Secure`, sobald `PUBLIC_ORIGIN` https ist).
   - 90 Tage, verlängert sich bei Nutzung.
-  - Geräteliste im Profil; jede Sitzung einzeln beendbar, „überall abmelden“.
+  - Geräteliste im Profil; jede Sitzung einzeln beendbar, „überall sonst
+    abmelden“. Eine neue Anmeldung beendet die vorige Sitzung desselben
+    Geräts; ein neues Passwort beendet alle anderen, ein Reset alle.
 - **Zweiter Faktor (TOTP, Authenticator-App):** Pflicht für Admin und Leiter,
   optional für Spieler. Beim Einrichten 10 Einmal-Wiederherstellungscodes.
   Geht beides verloren, setzt der Admin den Faktor zurück (geloggt); für den
   Admin selbst gibt es den Weg über `roster-cli` auf dem Pi.
+  - Anmeldung in zwei Schritten: Passwort → Sitzung im Zustand `totp`
+    (5 Minuten, darf nur den Code schicken) → mit dem Code eine volle
+    Sitzung mit neuem Token.
+  - RFC 6238 (HMAC-SHA1, 30 Sekunden, 6 Ziffern), ein Zeitschritt Spiel in
+    jede Richtung, jeder Code nur einmal.
+  - Das Geheimnis liegt mit `TOTP_KEY` (aus `app.env`, nicht im Backup)
+    verschlüsselt in der Datenbank: Eine Kopie der Datenbank allein verrät
+    keine Codes. Ohne `TOTP_KEY` lässt sich kein Faktor einrichten.
+  - Ein Admin ohne eingerichteten Faktor darf nur sein eigenes Konto
+    pflegen (Faktor einrichten, Passwort, Geräte, abmelden); abschalten kann
+    er ihn nicht. Das Zurücksetzen durch den Admin meldet das Konto überall
+    ab (ein verlorenes Handy ist oft noch angemeldet).
 - **Passwort vergessen:** Nur der Admin erzeugt einen Reset-Link (einmal
-  gültig, 24 Stunden). Kein E-Mail-Versand.
+  gültig, 24 Stunden), in der App oder mit `roster-cli reset`. Kein
+  E-Mail-Versand.
 - **Bremse:** Pro Konto und pro IP höchstens 5 Fehlversuche in 15 Minuten,
-  danach wachsende Wartezeit. Fehlversuche werden als eigene Logzeile
+  danach wachsende Wartezeit (30 Sekunden, verdoppelt je weiterem Fehler,
+  höchstens 15 Minuten; `429` mit `Retry-After`). Versuche, die die Bremse
+  abweist, verlängern sie nicht – Abwarten hilft immer. Sie gilt auch für den
+  Code nach dem Passwort. Fehlversuche werden als eigene Logzeile
   geschrieben; eine Fail2Ban-Regel sperrt IPs mit vielen Fehlversuchen.
 - **CSRF:** `SameSite=Lax`, Prüfung des `Origin`-Headers bei jeder
-  schreibenden Anfrage, schreibende Anfragen nur als JSON.
+  schreibenden Anfrage (gleich `PUBLIC_ORIGIN`; ohne ihn der eigene Host),
+  schreibende Anfragen nur als JSON (Formulare und `text/plain` ergeben 415).
+- **Protokolle für den Admin** (Rob, 03.10.2026): jede Anmeldung und jeder
+  Fehlversuch (`login_attempts`, 180 Tage) und jede Schreibaktion
+  (`audit_log`), in der App unter Admin.
 
 ## 4. Berechtigungen
 
@@ -93,6 +133,18 @@ Gelegenheitsangriffe sicher abzuwehren.
   sieht eine Kampagne nur, wenn er Mitglied ist.
 - Jede Schreibaktion landet im `audit_log`.
 
+**Konten (Phase 3g)** – die Aktionen in `server/src/policy.ts`:
+
+| Aktion | Niemand angemeldet | Code steht aus | Angemeldet | Admin (mit Faktor) |
+| --- | --- | --- | --- | --- |
+| Wer bin ich, anmelden, Link prüfen und einlösen | ✓ | ✓ | ✓ | ✓ |
+| Code nach dem Passwort | – | ✓ | – | – |
+| Abmelden, Geräte, Passwort, eigener Faktor | – | – | ✓ | ✓ |
+| Nutzer, Einladungen, Reset-Links, Anmelde- und Audit-Log | – | – | – | ✓ |
+
+Ein Admin ohne Faktor hat nur die Zeile „Angemeldet“, bis er ihn
+eingerichtet hat.
+
 ### Sichtbarkeit
 
 | `visibility` | Wer liest | Wann |
@@ -114,9 +166,19 @@ Pflicht in der CI: Für **jede Rolle × jeden Endpunkt × jede Sichtbarkeit**
 wird geprüft, dass die Antwort keine Felder enthält, die die Rolle nicht sehen
 darf. Neue Endpunkte ohne Eintrag in der Matrix lassen den Test fehlschlagen.
 
+Stand 3g (`server/test/leak-matrix.ts`): Rollen niemand, „Code steht aus“,
+angemeldet, Admin; jede Route hat eine Probe-Anfrage, die jede Rolle schickt.
+Nicht vorgesehene Rollen werden mit 401/403 und nichts als dem Fehler
+abgewiesen, vorgesehene kommen durch, und eine erfolgreiche Antwort trägt nur
+die erlaubten Felder. Keine Antwort enthält irgendwo einen Passwort- oder
+Token-Hash oder ein verschlüsseltes Geheimnis. Kampagnenrollen und
+Sichtbarkeit kommen mit 3h/4a dazu.
+
 ## 5. Daten
 
-- **Eingaben:** Zod-Schemas für jeden Körper; Größengrenzen (Warband-Version
+- **Eingaben:** ein Schema für jeden Körper – Warband- und Notizdaten mit den
+  Zod-Schemas aus `core/format` (ab 3h), die kleinen Körper der Konten mit
+  JSON Schema, das Fastify selbst prüft; Größengrenzen (Warband-Version
   2 MB, Notiz 20 KB, Anfrage insgesamt 3 MB).
 - **Uploads:** nur Bilder (PNG, JPEG, WebP), höchstens 5 MB. Der Client
   verkleinert und kodiert neu – dabei fallen EXIF-Daten mit GPS-Koordinaten

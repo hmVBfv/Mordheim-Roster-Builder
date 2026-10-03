@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { BackupError, KEEP, listSnapshots, snapshot, stamp } from '../src/backup.ts';
 import { getMeta, openDb } from '../src/db.ts';
 import { currentVersion } from '../src/migrations.ts';
-import { clock, startServer } from './helpers.ts';
+import { clock, SCHEMA, startServer } from './helpers.ts';
 
 describe('snapshots', () => {
   it('are named by time and label, and are complete databases', async () => {
@@ -17,7 +17,7 @@ describe('snapshots', () => {
     expect(name).toBe('20260930T120000Z-pre-deploy-9cfc4ab.sqlite');
     const copy = openDb(join(s.data, 'snapshots', name), { mustExist: true });
     expect(copy.pragma('integrity_check', { simple: true })).toBe('ok');
-    expect(currentVersion(copy)).toBe(1);
+    expect(currentVersion(copy)).toBe(SCHEMA);
     expect(getMeta(copy, 'probe')).toBe('written before the snapshot');
     expect(getMeta(copy, 'epoch')).toBe(getMeta(s.db, 'epoch'));
     expect(JSON.parse(getMeta(copy, 'restored_from')!)).toEqual({ label: 'pre-deploy-9cfc4ab', at: '2026-09-30T12:00:00.000Z' });

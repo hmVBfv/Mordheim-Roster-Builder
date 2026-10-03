@@ -1985,3 +1985,50 @@ the theme, but a bare :root lost to the theme's attribute selector, so a
 dark theme printed dark. What still holds the switch back is not the
 builder but the campaign: the group plays its campaign in the Roster
 Builder today, and those rows of the checklist belong to phase 4a.
+
+## October 3, 2026 (cont.) — who is asking
+
+Phase 3g starts on the server, because the app's sign-in screens need
+something to talk to. The accounts follow ADR 0008 to the letter – invite
+only, an authenticator required for the admin – and Rob added one wish on
+the way: he wants to see who signed in when, and what was changed. So every
+attempt to sign in is kept for half a year, and every write lands in the
+audit log; both have their admin endpoint already.
+
+A few choices are worth the record. Node's own scrypt instead of an argon2
+package: no native module to trust beyond better-sqlite3, and the
+parameters travel with each hash so the cost can rise later. At most two
+hashes run at once, because each needs 32 MiB and the Pi shares its memory
+with Jellyfin and TeamSpeak. The authenticator secret is encrypted with a
+key that lives in app.env and not in the backups, so a copy of the
+database alone gives no codes away; install.sh makes that key once and
+never replaces it, since a new key would lock out every account with an
+authenticator. The links carry their token in the fragment – the part of
+a URL a browser never sends – and the API takes it in the body, so no log
+line anywhere can hold a working link. The first draft had the token in
+the path, where Caddy, a proxy or a stray debug line could have kept it.
+
+The brake had a wrong turn too: a try refused by the brake first counted
+as another failure, so a player who kept tapping "Sign in" during the wait
+made the wait longer. Now only real failures count, and waiting always
+works; the attacker still gets the same 429 and Fail2Ban still sees every
+line. The code after the password is braked as well – six digits are quick
+to guess otherwise.
+
+The leak-test matrix grew from a list of fields into the test it was meant
+to be: every route has a probe request, every probe is sent as nobody, as
+someone halfway through signing in, as a player and as the admin, and an
+answer may carry only the fields its row allows – and never a hash or a
+secret, at any depth. A second test now fails when a table or a column the
+migrations create is missing from data-model.md.
+
+## October 3, 2026 (cont.) — the old app stays as it is
+
+With the builder complete, the question was when GitHub Pages switches
+from the Roster Builder to the new app. Rob's answer: not before the
+campaign runs in the new app (phase 4a), because the group plays its
+campaign in the Roster Builder today – and until then the Roster Builder
+stays exactly as it is. No more fixes there; a bug found on the way is
+fixed in core and recorded as a behaviour change. That ends the habit of
+fixing both apps, which had made every legacy quirk twice the work.
+

@@ -7,7 +7,7 @@
    5. listen.
    If 2 or 3 fail the server still listens, and health answers 503 with the
    reason's category, so roster-deploy rolls back and roster-alive reports.
-   From phase 3 on, the data endpoints stay closed in that case. */
+   The data endpoints (accounts and everything after) stay closed then. */
 import pino, { type Logger } from 'pino';
 import type { FastifyInstance } from 'fastify';
 import { buildApp } from './app.ts';
@@ -16,6 +16,7 @@ import { readConfig, type Config } from './config.ts';
 import { dbPath, openDb, settleEpoch, type DB } from './db.ts';
 import { Health } from './health.ts';
 import { loggerOptions } from './log.ts';
+import type { HashCost } from './passwords.ts';
 import { currentVersion, loadMigrations, migrate, pending, MIGRATIONS_DIR } from './migrations.ts';
 import { trustedProxies } from './net.ts';
 import { loadStatic } from './static.ts';
@@ -38,6 +39,8 @@ export interface StartOptions {
   migrationsDir?: string;
   /** Proxy routing table, for tests. */
   readRoutes?: () => string;
+  /** scrypt's cost, for tests. */
+  hashCost?: HashCost;
 }
 
 /** Starts the server; throws (VolumeError, ConfigError) only when it must not run at all. */
@@ -78,7 +81,11 @@ export async function start(opts: StartOptions = {}): Promise<Started> {
 
   const files = loadStatic(config.staticDir);
   if (!files.index) log.warn({ event: 'static_missing', dir: config.staticDir }, 'no app build to serve');
-  const app = buildApp({ config, health, files, trustProxy: trustedProxies(config.trustProxy, opts.readRoutes), logger: log });
+  if (!config.totpKey) log.warn({ event: 'totp_key_missing' }, 'no TOTP_KEY: nobody can set up an authenticator, and an admin can only look after the own account');
+  const app = buildApp({
+    config, health, files, trustProxy: trustedProxies(config.trustProxy, opts.readRoutes), logger: log,
+    db: ready ? db : null, now, totpKey: config.totpKey, hashCost: opts.hashCost,
+  });
   await app.listen({ host: config.host, port: config.port });
   log.info({ event: 'started', version: config.version, ready, files: files.count }, 'server started');
 

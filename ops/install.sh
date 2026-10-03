@@ -195,6 +195,16 @@ origin_check() { # <file> <expected origin>
 }
 origin_check "$ROSTER_DATA/app.env" "https://$ROSTER_HOST" app
 origin_check "$ROSTER_DATA/staging.env" "http://$ROSTER_LAN_IP:8081" staging
+# the key that encrypts the authenticators' secrets (phase 3g): made once,
+# appended if missing, never replaced – a new key makes every authenticator
+# unreadable (then: roster-cli totp-reset <user> for each account)
+totp_key() { # <file> <service>
+  if grep -Eq '^TOTP_KEY=.+' "$1"; then return 0; fi
+  printf 'TOTP_KEY=%s\n' "$(openssl rand -base64 32)" >>"$1"
+  say "added a TOTP_KEY to $1 – keep a copy in your password manager, then: cd $ROSTER_DIR && docker compose up -d --force-recreate $2"
+}
+totp_key "$ROSTER_DATA/app.env" app
+totp_key "$ROSTER_DATA/staging.env" staging
 [ -f "$ROSTER_DATA/secrets/restic.pass" ] || warn "$ROSTER_DATA/secrets/restic.pass is missing – backups will fail (Stufe 1: restic)"
 [ -f "$ROSTER_DATA/backups/restic/config" ] || warn "no restic repository in $ROSTER_DATA/backups/restic – run: restic init -r $ROSTER_DATA/backups/restic --password-file $ROSTER_DATA/secrets/restic.pass"
 
