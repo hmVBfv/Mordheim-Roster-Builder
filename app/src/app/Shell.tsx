@@ -1,8 +1,9 @@
 /* The frame around every screen: title and sync state on top, navigation at
    the bottom on a phone and on the left from tablet width on. */
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { NavLink } from 'react-router';
-import { APP_NAME } from '../flavour.ts';
+import { startSession } from '../account/session.ts';
+import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { navItems } from './nav.ts';
 import styles from './Shell.module.css';
 import { SyncState } from './SyncState.tsx';
@@ -10,6 +11,8 @@ import { UpdateBanner } from './UpdateBanner.tsx';
 
 export function Shell({ children }: { children: ReactNode }) {
   const items = navItems();
+  // who is signed in: asked once, never waited for (the builder works without)
+  useEffect(() => { if (FLAVOUR === 'campaign') startSession(); }, []);
   return (
     <div className={styles.shell}>
       <header className={styles.header}>

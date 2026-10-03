@@ -9,6 +9,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { AppRoutes } from '../app/App.tsx';
 import { db } from '../db/db.ts';
 import { data } from '../test/data.ts';
+import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
 import { nextStamp, savedFields } from './useEditor.ts';
 import { createWarband } from './view.ts';
@@ -17,18 +18,7 @@ const NOW = '2026-10-02T10:00:00.000Z';
 
 beforeAll(loadScreens, SCREENS_MS);
 
-/* jsdom has no showModal(): just enough of a modal <dialog> for a sheet to
-   open and to report its closing, as useSheet expects. */
-beforeAll(() => {
-  const proto = HTMLDialogElement.prototype as HTMLDialogElement & { showModal?: () => void };
-  if (typeof proto.showModal === 'function') return;
-  proto.showModal = function (this: HTMLDialogElement) { this.setAttribute('open', ''); };
-  proto.close = function (this: HTMLDialogElement) {
-    if (!this.hasAttribute('open')) return;
-    this.removeAttribute('open');
-    this.dispatchEvent(new Event('close'));
-  };
-});
+beforeAll(polyfillDialog);
 
 /** Adds `n` men through the "More men" sheet. */
 async function moreMen(user: ReturnType<typeof userEvent.setup>, group: HTMLElement, n = 1) {
