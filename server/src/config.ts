@@ -1,7 +1,8 @@
 /* The server's configuration, from the environment (app.env on the Pi, see
-   docs/operations.md). Only what phase 2 needs; secrets arrive with the
-   features that use them (TOTP_KEY, BUGS_TOKEN_HASH in phase 3). */
+   docs/operations.md). Secrets arrive with the features that use them:
+   TOTP_KEY with the accounts (phase 3g), BUGS_TOKEN_HASH later. */
 import { fileURLToPath } from 'node:url';
+import { parseKey } from './totp.ts';
 
 export interface Config {
   /** The SSD volume: roster.sqlite, snapshots/, and the marker file. */
@@ -18,6 +19,8 @@ export interface Config {
   version: string;
   /** Addresses whose X-Forwarded-For is believed; null: loopback and the container's gateway. */
   trustProxy: string[] | null;
+  /** TOTP_KEY (32 bytes, base64): encrypts the authenticators' secrets. null: none can be set up. */
+  totpKey: Buffer | null;
 }
 
 const LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'];
@@ -43,6 +46,8 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     if (u.origin !== env.PUBLIC_ORIGIN.replace(/\/$/, '')) throw new ConfigError('PUBLIC_ORIGIN must be an origin only (scheme, host, port)');
     publicOrigin = u.origin;
   }
+  const totpKey = parseKey(env.TOTP_KEY);
+  if (env.TOTP_KEY && !totpKey) throw new ConfigError('TOTP_KEY must be 32 bytes in base64 (openssl rand -base64 32)');
   return {
     dataDir: env.DATA_DIR ?? '/data',
     uploadDir: env.UPLOAD_DIR ?? '/uploads',
@@ -53,5 +58,6 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     logLevel,
     version: env.ROSTER_VERSION || 'dev',
     trustProxy: env.TRUST_PROXY ? env.TRUST_PROXY.split(',').map((s) => s.trim()).filter(Boolean) : null,
+    totpKey,
   };
 }

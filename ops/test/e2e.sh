@@ -85,6 +85,9 @@ as sh -c "umask 077; head -c 32 /dev/urandom | base64 > $root/secrets/restic.pas
 as restic init -q -r "$root/backups/restic" --password-file "$root/secrets/restic.pass"
 expect "install.sh created the marker file on the (mounted) SSD" test -f "$data/.roster-volume"
 expect "app.env is private" test "$(stat -c %a "$root/app.env")" = 600
+expect "install.sh gave app.env a TOTP_KEY" grep -Eq '^TOTP_KEY=[A-Za-z0-9+/]{43}=$' "$root/app.env"
+expect "staging has a key of its own" sh -c "test \"\$(grep '^TOTP_KEY=' '$root/staging.env')\" != \"\$(grep '^TOTP_KEY=' '$root/app.env')\""
+totp_key=$(grep '^TOTP_KEY=' "$root/app.env")
 expect "Docker and the timers wait for the SSD" grep -q "RequiresMountsFor=$mnt" /etc/systemd/system/docker.service.d/ssd.conf /etc/systemd/system/roster-backup.service
 expect "the timers are enabled" systemctl is-enabled --quiet roster-backup.timer roster-restore-test.timer
 expect "roster-alive waits for Stufe 2" sh -c '! systemctl is-enabled --quiet roster-alive.timer'
@@ -94,6 +97,7 @@ echo "# a new hostname: app.env is kept, and install.sh says what to change"
 sed -i 's/^ROSTER_HOST=.*/ROSTER_HOST=roster2.test/' "$home/server/roster/site.env"
 "$ops/install.sh" --no-caddy 2>"$work_dir/install.err" >/dev/null
 expect "app.env keeps its origin" grep -qx 'PUBLIC_ORIGIN=https://roster.test' "$root/app.env"
+expect "app.env keeps its TOTP_KEY, once" test "$(grep -c '^TOTP_KEY=' "$root/app.env")" = 1 -a "$(grep '^TOTP_KEY=' "$root/app.env")" = "$totp_key"
 expect "install.sh warns that PUBLIC_ORIGIN is stale" grep -q "PUBLIC_ORIGIN is 'https://roster.test', site.env says https://roster2.test" "$work_dir/install.err"
 expect "roster.conf has the new hostname" grep -qx 'ROSTER_HOST=roster2.test' /etc/roster/roster.conf
 sed -i 's/^ROSTER_HOST=.*/ROSTER_HOST=roster.test/' "$home/server/roster/site.env"
