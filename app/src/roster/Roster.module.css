@@ -539,3 +539,11 @@
   border-top: 1px solid var(--border);
   font-weight: 600;
 }
+
+/* the house rules that are on, beside the warband's type: a link to them */
+.houseLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--gold);
+}
