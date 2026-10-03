@@ -16,6 +16,7 @@ import { CaptiveSheet, InjuriesSheet, InjurySheet, type InjuryFor } from '../ros
 import { markRole, markView, mutationView } from '../roster/chaos.ts';
 import { MarkSheet, MutationSheet } from '../roster/ChaosSheets.tsx';
 import { equipmentView } from '../roster/equipment.ts';
+import { houseView } from '../roster/house.ts';
 import { MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
 import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
@@ -34,6 +35,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   // from the first battle on, equipment changes at the Trading Post and
   // nothing a warrior leaves behind is refunded (V4–V7)
   const locked = core.tradeLocked(ctx);
+  const houseOn = useMemo(() => houseView(data, ed.state).count, [data, ed.state]);
   const navigate = useNavigate();
   const { ref: eqRef, open: openEqSheet, close: closeEq } = useSheet();
   const [eqOf, setEqOf] = useState<number | null>(null);
@@ -217,7 +219,10 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
               save: (nm) => ed.edit((c) => core.setWarbandName(c, nm), 'Name saved.'),
             })}><IconEdit /></button>
         </div>
-        <p className={ui.muted}>{v.type}{v.campaign ? ` · ${v.campaign}` : ''}</p>
+        <p className={ui.muted}>
+          {v.type}{v.campaign ? ` · ${v.campaign}` : ''}
+          {houseOn > 0 && <> · <Link to={`/warbands/${rec.id}/house`} className={styles.houseLink}>⚖ {houseOn} house rule{houseOn > 1 ? 's' : ''}</Link></>}
+        </p>
         <dl className={styles.summary}>
           <div><dt>Rating</dt><dd>{v.rating}</dd></div>
           <div><dt>Gold</dt><dd>{v.gold} gc</dd></div>
@@ -248,6 +253,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       <div className={ui.row}>
         <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
         <Link to={`/warbands/${rec.id}/hire`} className={ui.buttonQuiet}>Hire…</Link>
+        <Link to={`/warbands/${rec.id}/house`} className={ui.buttonQuiet}>House rules</Link>
         <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <button type="button" className={ui.buttonQuiet}
