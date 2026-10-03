@@ -1971,3 +1971,17 @@ official roster sheet needed pdf-lib in the app; it is pinned to the
 version the Roster Builder vendors, and it and the template are loaded
 only when a sheet is made, so the first load stays as small as it was.
 Printing, for now, goes through the PDF.
+
+## October 3, 2026 (cont.) — the builder's last gaps
+
+Phase 3f is the switch of GitHub Pages from the Roster Builder to the new
+app, and its precondition is a complete checklist. Three small gaps of the
+builder remained, each something the old app did in one click: jumping
+the experience to a step of the track (now a tap on "Exp n", with the
+steps as buttons big enough for a thumb), changing what was paid for a
+rare item (a price rolled at the table), and printing the roster. Printing
+found a bug on the way: the print colours were meant to be light whatever
+the theme, but a bare :root lost to the theme's attribute selector, so a
+dark theme printed dark. What still holds the switch back is not the
+builder but the campaign: the group plays its campaign in the Roster
+Builder today, and those rows of the checklist belong to phase 4a.

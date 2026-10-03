@@ -3,8 +3,8 @@
    instead of asking first (docs/ui.md §1.6). */
 import * as core from '@mordheim/core';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Suspense, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { Hire, Warrior } from '../roster/Cards.tsx';
@@ -17,7 +17,7 @@ import { markRole, markView, mutationView } from '../roster/chaos.ts';
 import { MarkSheet, MutationSheet } from '../roster/ChaosSheets.tsx';
 import { equipmentView } from '../roster/equipment.ts';
 import { houseView } from '../roster/house.ts';
-import { MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type MenuItem, type Naming } from '../roster/sheets.tsx';
+import { ExpSheet, MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type ExpSetting, type MenuItem, type Naming } from '../roster/sheets.tsx';
 import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
@@ -37,6 +37,14 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const locked = core.tradeLocked(ctx);
   const houseOn = useMemo(() => houseView(data, ed.state).count, [data, ed.state]);
   const navigate = useNavigate();
+  // "Print the roster" (Export) comes here and prints once
+  const location = useLocation();
+  const printing = !!(location.state as { print?: boolean } | null)?.print;
+  useEffect(() => {
+    if (!printing) return;
+    void navigate('.', { replace: true, state: null });
+    setTimeout(() => window.print(), 100);
+  }, [printing, navigate]);
   const { ref: eqRef, open: openEqSheet, close: closeEq } = useSheet();
   const [eqOf, setEqOf] = useState<number | null>(null);
   const eqView = eqOf != null ? equipmentView(ctx, eqOf) : null;
@@ -113,11 +121,17 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const [menuOf, setMenuOf] = useState<{ title: string; items: MenuItem[] }>({ title: '', items: [] });
   const { ref: nameRef, open: openNameSheet, close: closeName } = useSheet();
   const [naming, setNaming] = useState<Naming | null>(null);
+  const { ref: expRef, open: openExpSheet, close: closeExp } = useSheet();
+  const [expSet, setExpSet] = useState<ExpSetting | null>(null);
   const { ref: recruitRef, open: openRecruit, close: closeRecruit } = useSheet();
 
   // a new key each time, so the form starts from the value it is given
   const askName = (n: Omit<Naming, 'key'>) => { setNaming((prev) => ({ ...n, key: (prev?.key ?? 0) + 1 })); openNameSheet(); };
   const openMenu = (title: string, items: MenuItem[]) => { setMenuOf({ title, items }); openMenuSheet(); };
+  const askExp = (who: string, xp: NonNullable<WarriorView['xp']>, save: (v: number) => void) => {
+    setExpSet((prev) => ({ key: (prev?.key ?? 0) + 1, who, value: xp.value, steps: xp.steps.map((s) => s.at), min: xp.min, max: xp.max, save }));
+    openExpSheet();
+  };
 
   const warriorMenu = (w: WarriorView) => openMenu(w.name, [
     // his own list until his first battle, then the Trading Post (Rob, 02.10.2026)
@@ -193,6 +207,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const warriorActs = (w: WarriorView) => ({
     onMore: () => warriorMenu(w),
     onXp: (d: number) => ed.edit((c) => core.setModelExp(c, w.uid, w.exp + d)),
+    onSetXp: () => { if (w.xp) askExp(w.name, w.xp, (v) => ed.edit((c) => core.setModelExp(c, w.uid, v), `${w.name}: experience ${v}.`)); },
     onMan: (i: number) => manSheet(w, i),
     onAdvance: () => openAdvance(w.uid),
     onInjury: () => injureWarrior(w),
@@ -206,6 +221,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const hireActs = (h: HireView) => ({
     onMore: () => hireMenu(h),
     onXp: (d: number) => ed.edit((c) => core.setHsExp(c, h.uid, h.exp + d)),
+    onSetXp: () => { if (h.xp) askExp(h.name, h.xp, (v) => ed.edit((c) => core.setHsExp(c, h.uid, v), `${h.name}: experience ${v}.`)); },
     onAdvance: () => openAdvance(h.uid),
     onInjury: () => openInjury({ kind: 'hire', uid: h.uid, name: h.name }),
   });
@@ -252,7 +268,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           <ul>{v.fallen.map((f, i) => <li key={i}>{f}</li>)}</ul>
         </details>
       )}
-      <div className={ui.row}>
+      <div className={`${ui.row} ${styles.screenOnly}`}>
         <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
         <Link to={`/warbands/${rec.id}/hire`} className={ui.buttonQuiet}>Hire…</Link>
         <Link to={`/warbands/${rec.id}/house`} className={ui.buttonQuiet}>House rules</Link>
@@ -267,6 +283,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
 
       <MenuSheet dialogRef={menuRef} close={closeMenu} title={menuOf.title} items={menuOf.items} />
       <NameSheet dialogRef={nameRef} close={closeName} naming={naming} />
+      <ExpSheet dialogRef={expRef} close={closeExp} setting={expSet} />
       <AdvanceSheet dialogRef={advRef} close={closeAdv} view={advView && advOf ? { ...advView, key: advOf.key } : null}
         onApply={(c, text) => { if (advOf) applyAdvance(advOf.id, c, text); }} />
       <TakenSheet dialogRef={takenRef} close={closeTaken} name={takenFor?.name ?? ''} taken={takenFor ? takenOf(ctx, takenFor.id) : null}
@@ -296,6 +313,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         addRare: (de) => ed.edit((c) => core.addRare(c, eqOf!, de)),
         rareQty: (de, q) => ed.edit((c) => core.setRareQty(c, eqOf!, de, q)),
         target: (de, nm) => ed.edit((c) => core.setRareTarget(c, eqOf!, de, nm)),
+        paid: (de, gc) => ed.edit((c) => core.setRarePaid(c, eqOf!, de, gc), `Paid set to ${gc} gc.`),
       }} />
       <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
         onRecruit={(u) => ed.edit((c) => core.recruitUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />

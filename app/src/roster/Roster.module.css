@@ -547,3 +547,64 @@
   min-height: var(--tap);
   color: var(--gold);
 }
+
+/* the experience between − and +: tapped, it is set at once (a step of
+   the track, or any number) */
+.stepper .xpValue {
+  padding: 0 var(--space-2);
+  border-style: dashed;
+  font-size: 1rem;
+}
+
+/* what was paid for a rare item, set by hand */
+.paid {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.paid input {
+  width: 5.5em;
+}
+
+.expSteps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.expSteps button {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.expSteps button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+@media print {
+  /* the roster on paper: the cards, without what is only for the screen */
+  .screenOnly,
+  .acts,
+  .men button,
+  .stepper button:not(.xpValue) {
+    display: none;
+  }
+
+  .stepper .xpValue {
+    border: 0;
+  }
+
+  .warrior {
+    break-inside: avoid;
+  }
+}
