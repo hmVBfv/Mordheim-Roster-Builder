@@ -104,10 +104,10 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Speichern und Laden auf dem Gerät, Liste, Löschen | ✓ | ✓ | ✓ | index | 1e | App: Import, Liste, „Remove from this device“ |
 | Import: Datei, eingefügte Datei, Text-Export | ✓ | ✓ | ✓ | – | 1e | Kampagnendatei noch nicht |
-| Export: Text mit eingebettetem Stand, Datei | ✓ | ✓ | – | – | 3 | |
-| Tabletop-Simulator-Karten (Krieger, Männer, Hired Swords, DP) | ✓ | ✓ | – | roster (TTS) | 3 | |
-| Offizielles Rostersheet als PDF | ✓ | ✓ | – | – | 3 | |
-| Drucken | ✓ | n/a | – | – | 3 | |
+| Export: Text mit eingebettetem Stand, Datei | ✓ | ✓ | ✓ | – | 3e | Roster → Export…: Text anzeigen, kopieren, als .txt (Name mit Stufe und Tag); Tool-Datei als .json (`writeSave`, mit Format und Gold in der Hand); beide lassen sich wieder importieren |
+| Tabletop-Simulator-Karten (Krieger, Männer, Hired Swords, DP) | ✓ | ✓ | ✓ | roster (TTS) | 3e | je Held, Gruppe, Mann einer Gruppe (eigener Name) und Angeheuertem Name und Beschreibung zum Kopieren; vom ⋯-Menü einer Karte direkt dorthin |
+| Offizielles Rostersheet als PDF | ✓ | ✓ | ✓ | – | 3e | pdf-lib 1.17.1 (wie `vendor/`) und die Vorlage `assets/sheet.pdf` werden erst beim Erstellen geladen; beide auch offline im Service Worker |
+| Drucken | ✓ | n/a | – | – | 3 | vorerst über das PDF; eine Druckansicht des Rosters folgt |
 
 ## Oberfläche
 
