@@ -842,3 +842,33 @@ test('one who may not join says why, and cannot be hired', async ({ page }) => {
   await sheet.getByRole('button', { name: 'Close' }).click();
   await expect(page.locator('dialog[open]')).toHaveCount(0);
 });
+
+/* Phase 3e: a warband's house rules (mockup docs/mockups/house-rules.html). */
+for (const theme of THEMES) {
+  test(`house rules, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.goto('./');
+    await importSample(page);
+    await page.getByRole('link', { name: 'House rules', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'House rules' })).toBeVisible();
+    await expect(page.getByText('Nothing: the rules as written.')).toBeVisible();
+    // armour at 80 %, then a step up
+    await page.getByRole('checkbox', { name: 'Armour', exact: true }).check();
+    await page.getByRole('button', { name: 'More: Armour' }).click();
+    await expect(page.getByRole('region', { name: 'Prices' })).toContainText('85 %');
+    await expect(page.getByText(/House rules: Armour price: 85/)).toBeVisible();
+    // a grade not played
+    await page.getByRole('group', { name: 'Hired Sword grades played' }).getByRole('button', { name: '2a' }).click();
+    await expect(page.getByText(/excluded: 2a/)).toBeVisible();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-house-rules`);
+    // the roster shows them, and leads back
+    await page.getByRole('link', { name: /‹ The Silver Caravan/ }).click();
+    await page.getByRole('link', { name: '⚖ 2 house rules' }).click();
+    // all back, and undone
+    await page.getByRole('button', { name: 'All back to the rules as written' }).click();
+    await expect(page.getByText('Nothing: the rules as written.')).toBeVisible();
+    await page.getByRole('status').filter({ hasText: 'All house rules off' }).getByRole('button', { name: 'Undo' }).click();
+    await expect(page.getByText(/House rules: Armour price: 85/)).toBeVisible();
+  });
+}
