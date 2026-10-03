@@ -910,3 +910,44 @@ for (const theme of THEMES) {
     expect(bytes.length).toBeGreaterThan(100_000);
   });
 }
+
+/* Phase 3f: the builder's last gaps against the Roster Builder – setting the
+   experience at once, the price paid for a rare item, printing the roster. */
+test('experience set at once, a rare item’s price by hand, the roster printed', async ({ page }) => {
+  await page.addInitScript(() => { (window as unknown as { printed: number }).printed = 0; window.print = () => { (window as unknown as { printed: number }).printed++; }; });
+  await page.goto('./');
+  await importSample(page);
+  const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+  await ulrich.getByRole('button', { name: /Experience of Ulrich the Grey: \d+\. Set it/ }).click();
+  let sheet = page.locator('dialog[open]');
+  await sheet.getByRole('group', { name: 'Steps of the track' }).getByRole('button', { name: '36', exact: true }).click();
+  await expect(sheet.getByRole('spinbutton', { name: 'Experience' })).toHaveValue('36');
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'experience-set');
+  await sheet.getByRole('button', { name: 'Save' }).click();
+  await expect(ulrich.getByRole('button', { name: /Experience of Ulrich the Grey: 36/ })).toBeVisible();
+
+  // the price rolled at the table, entered by hand
+  await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /Equipment & rare items/ }).click();
+  sheet = page.locator('dialog[open]');
+  await sheet.getByRole('combobox', { name: 'Rare item to add' }).selectOption({ index: 1 });
+  await sheet.getByRole('button', { name: 'Add', exact: true }).click();
+  const paid = sheet.getByRole('spinbutton', { name: /^Paid for / });
+  await paid.fill('37');
+  await paid.blur();
+  await expect(page.getByRole('status').filter({ hasText: 'Paid set to 37 gc.' })).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Done' })).toBeInViewport();
+  await sheet.getByRole('button', { name: 'Done' }).click();
+
+  // printing: from Export to the roster, which prints once, without the screen's buttons
+  await page.getByRole('link', { name: 'Export…' }).click();
+  await page.getByRole('button', { name: 'Print the roster' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { printed: number }).printed)).toBe(1);
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
+  await expect(page.getByRole('button', { name: '+ Recruit' })).toBeHidden();
+  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+  await shot(page, 'roster-print');
+});

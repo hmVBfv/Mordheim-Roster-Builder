@@ -16,6 +16,8 @@ export interface EquipmentActions {
   addRare: (de: string) => void;
   rareQty: (de: string, q: number) => void;
   target: (de: string, weapon: string) => void;
+  /** What was paid for a rare item, set by hand (a price rolled at the table). */
+  paid: (de: string, gc: number) => void;
 }
 
 function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void }) {
@@ -64,7 +66,13 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
               <li key={r.de} className={styles.eqRow}>
                 <span className={styles.eqName} title={r.text || undefined}>
                   {r.name}
-                  <small>{r.paid} gc paid{r.upgrade && r.on ? ` · on ${r.targets.find((t) => t.key === r.on)?.name ?? r.on}` : ''}</small>
+                  {r.upgrade && r.on && <small>on {r.targets.find((t) => t.key === r.on)?.name ?? r.on}</small>}
+                  <label className={styles.paid}>
+                    <small>Paid</small>
+                    <input key={r.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={r.paid} aria-label={`Paid for ${r.name}`}
+                      onBlur={(e) => { const n = Math.max(0, Math.round(Number(e.target.value) || 0)); if (n !== r.paid) act.paid(r.de, n); }} />
+                    <small>gc</small>
+                  </label>
                 </span>
                 {r.upgrade ? (
                   <span className={styles.eqUpgrade}>
@@ -90,7 +98,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
           </div>
         ) : <p className={ui.muted}>{v.recruit ? 'Rare items: search for them at the Trading Post.' : 'Nothing from the catalogue fits this warrior.'}</p>}
       </section>
-      <div className={ui.row}><button type="button" className={ui.button} onClick={() => close()}>Done</button></div>
+      <div className={`${ui.row} ${ui.sheetActions}`}><button type="button" className={ui.button} onClick={() => close()}>Done</button></div>
     </div>
   );
 }
