@@ -167,3 +167,16 @@
     max-width: 1320px;
   }
 }
+
+/* on paper: only the page itself */
+@media print {
+  .header,
+  .nav,
+  .banner {
+    display: none;
+  }
+
+  .main {
+    padding-bottom: 0;
+  }
+}

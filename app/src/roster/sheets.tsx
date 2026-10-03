@@ -76,6 +76,52 @@ export function NameSheet({ dialogRef, close, naming }: SheetProps & { naming: N
   );
 }
 
+/** Setting the experience at once (legacy: a click on a step of the track):
+    the steps of his track to jump to, or any number. */
+export interface ExpSetting {
+  key: number;
+  who: string;
+  value: number;
+  steps: number[];
+  min: number;
+  max: number | null;
+  save: (v: number) => void;
+}
+
+function ExpForm({ close, e, titleId }: { close: Sheet['close']; e: ExpSetting; titleId: string }) {
+  const [value, setValue] = useState(String(e.value));
+  const n = Math.round(Number(value));
+  const ok = value.trim() !== '' && Number.isFinite(n) && n >= e.min && (e.max == null || n <= e.max);
+  return (
+    <form method="dialog" className={ui.page} onSubmit={(ev) => { ev.preventDefault(); if (ok) close(() => e.save(n)); }}>
+      <h2 id={titleId}>Experience · {e.who}</h2>
+      <div className={styles.expSteps} role="group" aria-label="Steps of the track">
+        {e.steps.filter((s) => s >= e.min && (e.max == null || s <= e.max)).map((s) => (
+          <button key={s} type="button" aria-pressed={n === s} onClick={() => setValue(String(s))}>{s}</button>
+        ))}
+      </div>
+      <label className={ui.field}>
+        <span>Experience</span>
+        <input className={ui.input} type="number" inputMode="numeric" min={e.min} max={e.max ?? undefined} value={value} onChange={(ev) => setValue(ev.target.value)} />
+      </label>
+      {!ok && <p className={styles.why}>{e.max != null ? `From ${e.min} to ${e.max}.` : `At least ${e.min}.`}</p>}
+      <div className={ui.row}>
+        <button type="submit" className={ui.button} disabled={!ok}>Save</button>
+        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+      </div>
+    </form>
+  );
+}
+
+export function ExpSheet({ dialogRef, close, setting }: SheetProps & { setting: ExpSetting | null }) {
+  const id = useId();
+  return (
+    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
+      {setting && <ExpForm key={setting.key} close={close} e={setting} titleId={id} />}
+    </dialog>
+  );
+}
+
 function UnitButton({ u, onPick }: { u: RecruitUnit; onPick: () => void }) {
   const facts = [u.limit === 'any' ? 'any number' : u.limit.startsWith('=') ? `exactly ${u.limit.slice(1)}` : u.limit, `${u.cost} gc`, u.exp ? `${u.exp} exp` : ''].filter(Boolean).join(' · ');
   return (

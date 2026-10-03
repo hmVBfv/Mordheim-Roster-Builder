@@ -54,8 +54,11 @@
   --sidebar-width: 220px;
 }
 
+/* on paper always light – whichever theme is chosen (the attribute
+   selector outweighs a bare :root, so it is named here too) */
 @media print {
-  :root {
+  :root,
+  :root[data-theme] {
     --bg: #ffffff;
     --surface: #ffffff;
     --surface-2: #f4ead3;
@@ -63,6 +66,10 @@
     --text: #000000;
     --text-muted: #3c3226;
     --accent: #7a1410;
+    --accent-ink: #fbf5e6;
+    --danger: #8e1a14;
+    --gold: #6e5520;
     --font-title: 'Pirata One', 'EB Garamond', Georgia, serif;
+    color-scheme: light;
   }
 }

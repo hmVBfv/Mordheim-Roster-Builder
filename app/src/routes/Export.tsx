@@ -7,7 +7,7 @@
 import * as core from '@mordheim/core';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { exportCtx, readableText, toolFile, ttsCards, type TtsCard } from '../roster/exports.ts';
@@ -52,6 +52,7 @@ function Body({ rec }: { rec: StoredWarband }) {
   const ctx = useMemo(() => exportCtx(data, rec.state), [data, rec.state]);
   const cards = useMemo(() => ttsCards(ctx), [ctx]);
   const { hash } = useLocation();
+  const navigate = useNavigate();
   const [note, setNote] = useState('');
   const [text, setText] = useState<string | null>(null);
   const [pdf, setPdf] = useState<'idle' | 'making' | string>('idle');
@@ -126,6 +127,14 @@ function Body({ rec }: { rec: StoredWarband }) {
           <button type="button" className={ui.buttonQuiet} disabled={pdf === 'making'} onClick={() => { void makePdf(); }}>{pdf === 'making' ? 'Making the sheet…' : 'Save as PDF'}</button>
         </div>
         {pdf !== 'idle' && pdf !== 'making' && <p className={trade.no} role="alert">{pdf}</p>}
+      </section>
+
+      <section className={styles.group} aria-labelledby="ex-print">
+        <h2 id="ex-print">Print</h2>
+        <p className={ui.muted}>The roster as it is on the screen, without the buttons; or the official sheet above, as a PDF.</p>
+        <div className={ui.row}>
+          <button type="button" className={ui.buttonQuiet} onClick={() => { void navigate(`/warbands/${rec.id}`, { state: { print: true } }); }}>Print the roster</button>
+        </div>
       </section>
 
       <p className={styles.note} role="status" aria-live="polite">{note}</p>
