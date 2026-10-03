@@ -61,7 +61,8 @@ export default defineConfig(({ mode, command }) => {
         },
         workbox: {
           // everything the app needs offline; fonts only in the Latin subsets
-          globPatterns: ['**/*.{js,css,html,svg,png}', '**/*-latin-*.woff2'],
+          // the roster sheet's template too, so a sheet can be made offline
+          globPatterns: ['**/*.{js,css,html,svg,png,pdf}', '**/*-latin-*.woff2'],
           navigateFallback: 'index.html',
           cleanupOutdatedCaches: true,
         },

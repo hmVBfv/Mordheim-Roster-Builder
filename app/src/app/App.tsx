@@ -13,6 +13,7 @@ import { Shell } from './Shell.tsx';
 // the roster needs the rules: loaded when first opened
 const Roster = lazy(() => import('../routes/Roster.tsx').then((m) => ({ default: m.Roster })));
 const NewWarband = lazy(() => import('../routes/NewWarband.tsx').then((m) => ({ default: m.NewWarband })));
+const Export = lazy(() => import('../routes/Export.tsx').then((m) => ({ default: m.Export })));
 const TradingPost = lazy(() => import('../routes/TradingPost.tsx').then((m) => ({ default: m.TradingPost })));
 const Hire = lazy(() => import('../routes/Hire.tsx').then((m) => ({ default: m.Hire })));
 const HouseRules = lazy(() => import('../routes/HouseRules.tsx').then((m) => ({ default: m.HouseRules })));
@@ -26,6 +27,7 @@ export function AppRoutes() {
           <Route path="/warbands" element={<Warbands />} />
           <Route path="/warbands/new" element={<NewWarband />} />
           <Route path="/warbands/:id" element={<Roster />} />
+          <Route path="/warbands/:id/export" element={<Export />} />
           <Route path="/warbands/:id/trade" element={<TradingPost />} />
           <Route path="/warbands/:id/hire" element={<Hire />} />
           <Route path="/warbands/:id/house" element={<HouseRules />} />
