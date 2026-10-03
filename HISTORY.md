@@ -1958,3 +1958,16 @@ somewhere sensible and moves in steps. Prices never move gold already
 booked in the ledger; before the first battle they change what the
 warband spent, as in the Roster Builder. The declaration at the bottom is
 the one the exports print, from core.
+
+## October 3, 2026 (cont.) — what leaves the device
+
+The exports were the last part of 3e, and the easiest: core had ported
+every one of them, so the work was the screen and the plumbing. Rob plays
+on Tabletop Simulator, so its cards come first on the export screen – a
+Name and a Description for every model, each man of a group with his own
+name as the Roster Builder does it – and a card's ⋯ menu leads straight to
+its entry. The readable text and the tool file both import back. The
+official roster sheet needed pdf-lib in the app; it is pinned to the
+version the Roster Builder vendors, and it and the template are loaded
+only when a sheet is made, so the first load stays as small as it was.
+Printing, for now, goes through the PDF.
