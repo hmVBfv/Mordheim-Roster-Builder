@@ -15,6 +15,7 @@ const Roster = lazy(() => import('../routes/Roster.tsx').then((m) => ({ default:
 const NewWarband = lazy(() => import('../routes/NewWarband.tsx').then((m) => ({ default: m.NewWarband })));
 const TradingPost = lazy(() => import('../routes/TradingPost.tsx').then((m) => ({ default: m.TradingPost })));
 const Hire = lazy(() => import('../routes/Hire.tsx').then((m) => ({ default: m.Hire })));
+const HouseRules = lazy(() => import('../routes/HouseRules.tsx').then((m) => ({ default: m.HouseRules })));
 
 export function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ export function AppRoutes() {
           <Route path="/warbands/:id" element={<Roster />} />
           <Route path="/warbands/:id/trade" element={<TradingPost />} />
           <Route path="/warbands/:id/hire" element={<Hire />} />
+          <Route path="/warbands/:id/house" element={<HouseRules />} />
           {FLAVOUR === 'campaign' && <Route path="/campaign" element={<Placeholder title="Campaign" text="Campaigns, battles and the map arrive with the campaign server." />} />}
           {FLAVOUR === 'campaign' && <Route path="/notes" element={<Placeholder title="Notes" text="Notes, quotes and the timeline arrive with the campaign server." />} />}
           <Route path="/more" element={<More />} />

@@ -1943,3 +1943,18 @@ from a Hired Sword's own text: a Priest of Morr "replaces one of a
 Mercenary warband's Heroes", so he needs a free place. Gold, as with
 recruits, is not a reason to refuse; the roster warns when the warband
 spends more than it has.
+
+## October 3, 2026 — house rules, a first base
+
+Rob saw the house-rules mockup and asked for it in the app straight away:
+a rough base first, improvements later. The screen is the mockup's first
+case, a warband on its own, because until the campaign server every
+warband keeps its own rules. Core already had every setter; what the
+screen adds is the reading of them: each rule with what the rules as
+written say for this warband (its own starting gold, its own maximum),
+off always meaning as written – so "Enforce equipment list", the one rule
+on by default, appears the other way round – and a value that starts
+somewhere sensible and moves in steps. Prices never move gold already
+booked in the ledger; before the first battle they change what the
+warband spent, as in the Roster Builder. The declaration at the bottom is
+the one the exports print, from core.
