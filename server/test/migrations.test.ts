@@ -1,17 +1,20 @@
 /* The migration frame: numbered SQL files, forward only, one transaction
    each, a snapshot before migrating a database that already has a schema. */
-import { copyFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { openDb } from '../src/db.ts';
 import { currentVersion, loadMigrations, migrate, MigrationError, MIGRATIONS_DIR, pending } from '../src/migrations.ts';
-import { clock, startServer, tmpDir } from './helpers.ts';
+import { clock, SCHEMA, startServer, tmpDir } from './helpers.ts';
 
 function migrationsDir(files: Record<string, string>): string {
   const dir = tmpDir('roster-mig-');
   for (const [f, sql] of Object.entries(files)) writeFileSync(join(dir, f), sql);
   return dir;
 }
+
+/** The file name of the migration after the repository's last one. */
+const NEXT = `${String(SCHEMA + 1).padStart(4, '0')}`;
 
 /** The real migrations, plus more. */
 function withExtra(extra: Record<string, string>): string {
@@ -20,6 +23,27 @@ function withExtra(extra: Record<string, string>): string {
   for (const [f, sql] of Object.entries(extra)) writeFileSync(join(dir, f), sql);
   return dir;
 }
+
+describe('docs/data-model.md', () => {
+  it('names every table and every column the migrations create', () => {
+    const doc = readFileSync(new URL('../../docs/data-model.md', import.meta.url), 'utf8');
+    const db = openDb(':memory:');
+    migrate(db, loadMigrations(), clock().now);
+    const tables = (db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[]).map((t) => t.name);
+    const missing: string[] = [];
+    for (const t of tables) {
+      const row = doc.split('\n').find((l) => l.startsWith(`| \`${t}\` |`));
+      if (!row) {
+        missing.push(t);
+        continue;
+      }
+      const cols = (db.prepare(`PRAGMA table_info(${t})`).all() as { name: string }[]).map((c) => c.name);
+      for (const c of cols) if (!row.includes(`\`${c}\``)) missing.push(`${t}.${c}`);
+    }
+    expect(missing).toEqual([]);
+    expect(tables).toContain('users');
+  });
+});
 
 describe('migration files', () => {
   it('the repository\'s migrations are numbered from 1 without gaps', () => {
@@ -77,41 +101,41 @@ describe('migrating at start', () => {
   it('takes a snapshot before migrating an existing database', async () => {
     const first = await startServer();
     await first.close();
-    const next = withExtra({ '0002_more.sql': 'CREATE TABLE more (x INTEGER) STRICT;' });
+    const next = withExtra({ [`${NEXT}_more.sql`]: 'CREATE TABLE more (x INTEGER) STRICT;' });
     const s = await startServer({ data: first.data, migrationsDir: next });
     expect(s.ready).toBe(true);
     const snaps = readdirSync(join(s.data, 'snapshots'));
     expect(snaps).toHaveLength(1);
-    expect(snaps[0]).toMatch(/-pre-migrate-v1-v2\.sqlite$/);
+    expect(snaps[0]).toMatch(new RegExp(`-pre-migrate-v${SCHEMA}-v${SCHEMA + 1}\\.sqlite$`));
     // the snapshot is the database before the migration
     const before = openDb(join(s.data, 'snapshots', snaps[0]!), { mustExist: true });
-    expect(currentVersion(before)).toBe(1);
+    expect(currentVersion(before)).toBe(SCHEMA);
     before.close();
-    expect(currentVersion(s.db)).toBe(2);
+    expect(currentVersion(s.db)).toBe(SCHEMA + 1);
   });
 
   it('when a migration fails the server answers health with 503 and stays unmigrated', async () => {
     const first = await startServer();
     await first.close();
-    const broken = withExtra({ '0002_broken.sql': 'INSERT INTO nowhere VALUES (1);' });
+    const broken = withExtra({ [`${NEXT}_broken.sql`]: 'INSERT INTO nowhere VALUES (1);' });
     const s = await startServer({ data: first.data, migrationsDir: broken });
     expect(s.ready).toBe(false);
     const res = await fetch(`${s.url}/api/v1/health`);
     expect(res.status).toBe(503);
     const body = await res.json() as { status: string; migrations: { current: number; expected: number } };
     expect(body.status).toBe('error');
-    expect(body.migrations).toEqual({ current: 1, expected: 2 });
+    expect(body.migrations).toEqual({ current: SCHEMA, expected: SCHEMA + 1 });
     expect(s.log.entries().some((e) => e.event === 'migration_failed')).toBe(true);
   });
 
   it('an older version on a newer database does not start the data side (rollback without restore)', async () => {
-    const newer = withExtra({ '0002_more.sql': 'CREATE TABLE more (x INTEGER) STRICT;' });
+    const newer = withExtra({ [`${NEXT}_more.sql`]: 'CREATE TABLE more (x INTEGER) STRICT;' });
     const a = await startServer({ migrationsDir: newer });
     await a.close();
     const old = await startServer({ data: a.data });
     expect(old.ready).toBe(false);
     const res = await fetch(`${old.url}/api/v1/health`);
     expect(res.status).toBe(503);
-    expect(((await res.json()) as { migrations: unknown }).migrations).toEqual({ current: 2, expected: 1 });
+    expect(((await res.json()) as { migrations: unknown }).migrations).toEqual({ current: SCHEMA + 1, expected: SCHEMA });
   });
 });

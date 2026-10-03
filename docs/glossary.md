@@ -15,6 +15,11 @@ Begriff einführt, trägt ihn hier ein.
 | Reset-Link | Reset link | `invites`, `kind: 'reset'` |
 | Sitzung, Gerät | Session, device | `sessions` |
 | Zweiter Faktor, Authenticator | Authenticator (TOTP) | `totp_*` |
+| Wiederherstellungscode | Recovery code | `totp_recovery`, `newRecoveryCodes()` |
+| Anmeldung, Code steht aus | Sign in; code needed | `sessions.stage` (`totp` · `full`), `Actor.pending` |
+| Bremse | (429 „Too many attempts“) | `brakeWait()`, `login_attempts` |
+| Anmelde-Log | Sign-ins | `login_attempts`, `GET /admin/logins` |
+| Audit-Log | Audit log | `audit_log`, `GET /admin/audit` |
 
 ## Warbands
 
