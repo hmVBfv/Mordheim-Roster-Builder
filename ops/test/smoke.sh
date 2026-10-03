@@ -4,9 +4,12 @@
 # 1. the SSD drill: without the marker file the container exits, creates nothing
 # 2. with it: health is ok and reports the expected version
 # 3. roster-cli backup writes a snapshot; the healthcheck script agrees
-# 4. X-Forwarded-For from the Docker gateway is believed (Fail2Ban sees clients)
-# 5. a restart keeps the epoch; a start on a restored snapshot changes it
-# 6. memory stays well inside the Pi's 256 MB limit
+# 4. accounts: roster-cli makes the admin link, the account registers, sets
+#    up the authenticator (TOTP_KEY), a wrong password is turned away and
+#    logged for Fail2Ban, a write from elsewhere is refused
+# 5. X-Forwarded-For from the Docker gateway is believed (Fail2Ban sees clients)
+# 6. a restart keeps the epoch; a start on a restored snapshot changes it
+# 7. memory stays well inside the Pi's 256 MB limit
 set -euo pipefail
 
 image=${1:?usage: smoke.sh <image> <version>}
@@ -15,6 +18,8 @@ port=39123
 work=$(mktemp -d)
 name=roster-smoke-$$
 uid=$(id -u) gid=$(id -g)
+origin=http://127.0.0.1:$port
+totp_key=$(head -c 32 /dev/urandom | base64)
 
 cleanup() {
   docker rm -f "$name" >/dev/null 2>&1 || true
@@ -29,6 +34,7 @@ health() { curl -fsS -m 5 "http://127.0.0.1:$port/api/v1/health"; }
 run() {
   docker run -d --name "$name" --user "$uid:$gid" --read-only --tmpfs /tmp --cap-drop ALL \
     --security-opt no-new-privileges:true -p "127.0.0.1:$port:3000" \
+    -e PUBLIC_ORIGIN="$origin" -e TOTP_KEY="$totp_key" \
     -v "$work/data:/data" -v "$work/uploads:/uploads" "$image" >/dev/null
 }
 
@@ -71,12 +77,28 @@ snap=$(docker exec "$name" roster-cli backup --label smoke)
 [ "$(docker exec "$name" roster-cli schema-version)" -ge 1 ] || fail "schema-version"
 docker exec "$name" node server/dist/healthcheck.js || fail "healthcheck.js says unhealthy"
 
-echo "4. the client address behind the proxy"
+echo "4. accounts"
+api() { curl -sS -m 10 -H 'Content-Type: application/json' -H "Origin: $origin" "$@"; }
+link=$(docker exec "$name" roster-cli invite --admin --note smoke)
+[[ "$link" =~ ^http://127\.0\.0\.1:$port/invite#[A-Za-z0-9_-]{43}$ ]] || fail "unexpected invite link: $link"
+token=${link#*#}
+api -c "$work/cookies" -d "{\"token\":\"$token\",\"username\":\"smoke\",\"password\":\"a long test passphrase\"}" \
+  "$origin/api/v1/invites/accept" | grep -q '"mustSetUpTotp":true' || fail "registering from the admin link"
+api -b "$work/cookies" -d '{}' "$origin/api/v1/account/totp/setup" | grep -q '"uri":"otpauth://totp/' || fail "no authenticator setup (TOTP_KEY)"
+[ "$(api -o /dev/null -w '%{http_code}' -d '{"username":"smoke","password":"wrong password!"}' "$origin/api/v1/auth/login")" = 401 ] ||
+  fail "a wrong password was not turned away"
+sleep 0.5
+docker logs "$name" 2>&1 | grep '"event":"login_failed"' | grep -q '"account":"smoke"' || fail "no login_failed line for Fail2Ban"
+[ "$(curl -sS -o /dev/null -w '%{http_code}' -m 5 -H 'Content-Type: application/json' -H 'Origin: https://evil.example' \
+  -d '{"username":"smoke","password":"x"}' "$origin/api/v1/auth/login")" = 403 ] || fail "a write from another origin was not refused"
+docker exec "$name" roster-cli users | grep -q $'^smoke\tadmin\t' || fail "roster-cli users does not list the admin"
+
+echo "5. the client address behind the proxy"
 curl -s -o /dev/null -m 5 -H 'X-Forwarded-For: 203.0.113.9' "http://127.0.0.1:$port/api/v1/nope"
 sleep 0.5
 docker logs "$name" 2>&1 | grep '"route":"/api/v1/nope"' | grep -q '"ip":"203.0.113.9"' || fail "X-Forwarded-For from the gateway not believed"
 
-echo "5. the epoch"
+echo "6. the epoch"
 docker restart "$name" >/dev/null
 body=$(wait_healthy) || fail "not healthy after restart"
 grep -q "\"epoch\":\"$epoch\"" <<<"$body" || fail "a restart changed the epoch"
@@ -88,7 +110,7 @@ body=$(wait_healthy) || fail "not healthy on the restored snapshot"
 grep -q "\"epoch\":\"$epoch\"" <<<"$body" && fail "a restore kept the epoch"
 docker logs "$name" 2>&1 | grep -q '"event":"restored"' || fail "no restored log line"
 
-echo "6. memory"
+echo "7. memory"
 mem=$(docker stats --no-stream --format '{{.MemUsage}}' "$name" | awk '{print $1}')
 echo "   memory in use: $mem"
 mib=$(awk -v m="$mem" 'BEGIN { v = m + 0; if (m ~ /GiB/) v *= 1024; else if (m ~ /KiB/) v /= 1024; print int(v) }')

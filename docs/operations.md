@@ -173,6 +173,32 @@ Mit dem Zertifikat steht der Hostname in den öffentlichen
 Certificate-Transparency-Logs; Scanner klopfen danach an. Erreichbar ist nur
 Port 443, und dahinter liegen in Phase 2 nur Health und die Dateien der App.
 
+### Konten (ab Phase 3g)
+
+Der erste Admin entsteht auf dem Pi, alle weiteren Konten über
+Einladungslinks aus der App:
+
+1. Nach dem Deploy mit 3g: `grep TOTP_KEY /mnt/ssd/roster/app.env` zeigt den
+   Schlüssel, den `install.sh` angelegt hat – in den Passwortmanager.
+2. `docker exec roster-app roster-cli invite --admin --note Rob` druckt einen
+   Link (`https://<ROSTER_HOST>/invite#…`, 7 Tage, einmal gültig). Öffnen,
+   Nutzernamen und Passwort wählen.
+3. In der App den Authenticator einrichten (Profil); vorher sind die
+   Admin-Werkzeuge gesperrt. Die 10 Wiederherstellungscodes in den
+   Passwortmanager.
+4. Mitspieler bekommen ihren Link aus der App (Admin → Einladungen).
+
+`roster-cli` für Konten (immer `docker exec roster-app roster-cli …`; jeder
+Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
+
+| Befehl | Wirkung |
+| --- | --- |
+| `invite [--admin] [--note <text>]` | Einladungslink, 7 Tage; `--admin` nur hier |
+| `reset <name>` | Link für ein neues Passwort, 24 Stunden; ersetzt einen älteren |
+| `totp-reset <name>` | entfernt den Authenticator und meldet das Konto überall ab – der Weg zurück, wenn ein Admin Handy und Codes verloren hat |
+| `sign-out <name>` | beendet alle Sitzungen des Kontos |
+| `users` | Konten mit Admin, Faktor, gesperrt, Geräten, zuletzt gesehen |
+
 ### Stufe 3 – Übungen (Abnahme Phase 2)
 
 1. **Rollback-Übung:** `roster-deploy drill-broken; echo "exit=$?"` – ein
@@ -305,7 +331,7 @@ bricht ab, solange er nicht eingebunden ist.
 | --- | --- | --- |
 | `PUBLIC_ORIGIN` | `https://<ROSTER_HOST>` (für die `Origin`-Prüfung); `install.sh` warnt, wenn es nicht zu `site.env` passt | Phase 2 |
 | `LOG_LEVEL` | `info` | Phase 2 |
-| `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse | Phase 3 |
+| `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse (32 Byte, base64). `install.sh` hängt ihn an, wenn er fehlt (`openssl rand -base64 32`), und ersetzt ihn nie; die Testinstanz bekommt einen eigenen. **Kopie in den Passwortmanager** – er liegt nicht im Backup. Ein falscher Wert hält den Server an (`ConfigError`); fehlt er, startet der Server, aber niemand kann einen Faktor einrichten | Phase 3g |
 | `BUGS_TOKEN_HASH` | Hash des Tokens für die Bug-Arbeit des Agenten | Phase 4c |
 
 `DATA_DIR` (`/data`), `UPLOAD_DIR` (`/uploads`), `PORT` (3000) und die
@@ -464,7 +490,9 @@ Keine Agenten-Läufe während eines Spielabends.
 | Datenbank beschädigt | Health meldet `integrity: failed` bzw. `unreadable` (503) | App liefert nur Health | `roster-restore` (Abschnitt 6); Geräte bieten Neueres an |
 | Arbeitsspeicher voll | App neu gestartet, Log zeigt OOM | kurze Pause | laufende Agenten-Läufe beenden; Limits prüfen |
 | Zertifikat erneuert nicht | `roster-alive` meldet < 14 Tage | Browserwarnung droht | Caddy-Log prüfen: `docker logs roster-caddy`; Port 443 und DNS prüfen |
-| Konto übernommen | ungewohnte Einträge im Audit-Log | fremde Änderungen | `roster-cli sessions revoke --user <name>`, Reset-Link, Audit-Log durchsehen, Versionen zurückholen |
+| Konto übernommen | ungewohnte Einträge im Audit-Log oder im Anmelde-Log (Admin) | fremde Änderungen | `roster-cli sign-out <name>`, `roster-cli reset <name>` (bei Verdacht auf den Faktor auch `totp-reset`), Audit-Log durchsehen, Versionen zurückholen |
+| Admin hat Authenticator und Codes verloren | – | keine Admin-Werkzeuge | `roster-cli totp-reset <name>`, anmelden, Faktor neu einrichten |
+| `TOTP_KEY` verloren oder ersetzt | Code wird nie angenommen | Konten mit Faktor kommen nicht mehr hinein | alten Schlüssel aus dem Passwortmanager zurück in `app.env`; sonst `roster-cli totp-reset <name>` für jedes Konto mit Faktor (`roster-cli users`) |
 | Verborgenes war sichtbar | Meldung (automatisch S1) | Leak | vorige Version deployen; Umfang über Audit- und Zugriffslog klären; Test ergänzen, der den Fall abdeckt |
 | Neustart um 03:30 | – | kurze Pause | nichts; Container starten selbst |
 

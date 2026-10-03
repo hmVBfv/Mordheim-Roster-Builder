@@ -27,7 +27,7 @@ changing anything structural.
 
 | Path | What | Status |
 | --- | --- | --- |
-| `index.html`, `js/`, `build.js`, `test/` | legacy app (vanilla JS, live on Pages) | keep working until the switch in phase 3 |
+| `index.html`, `js/`, `build.js`, `test/` | legacy app (vanilla JS, live on Pages) | frozen (Rob, 03.10.2026): stays on Pages until the campaign runs in the new app (4a), no more changes |
 | `data/` | audited rules data (JSON) | single source for legacy and new code |
 | `core/` | shared logic, TypeScript, no DOM | phase 1 |
 | `app/` | React 19 PWA, flavours `campaign` and `quickbuild` | phase 1 |
@@ -113,8 +113,10 @@ changing anything structural.
   dialog; the interface asks before calling.
 - Any intended difference from legacy behaviour is recorded in
   `docs/behaviour-changes.md` with its test, and excluded from parity by a
-  named, specific rule — never a blanket one. A legacy bug found on the way
-  is fixed in both, with a regression test in `test/`.
+  named, specific rule — never a blanket one. The legacy app is frozen
+  (Rob, 03.10.2026): a legacy bug found on the way is fixed in core only,
+  recorded there as a behaviour change with its test; legacy itself changes
+  only when Rob asks for it explicitly.
 
 ## Invariants
 
@@ -151,7 +153,8 @@ changing anything structural.
   migration. Never rename or remove a key (`test/compat.mjs`).
   Principle change → new ADR. Notable change → `HISTORY.md` entry (why,
   including wrong turns).
-- Keep the legacy app working until the switch:
+- The legacy app is frozen, but must keep working until the switch; if Rob
+  ever asks for a change there:
   - every function used from an inline handler must be listed in the
     `Object.assign(window, {…})` block;
   - ES module imports are read-only — reassign state via `replaceState()` or

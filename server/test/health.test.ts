@@ -4,7 +4,7 @@ import { writeFileSync, openSync, writeSync, closeSync, statSync } from 'node:fs
 import { describe, expect, it } from 'vitest';
 import { dbPath } from '../src/db.ts';
 import { INTEGRITY_TTL, type HealthReport } from '../src/health.ts';
-import { clock, dataDir, startServer } from './helpers.ts';
+import { clock, dataDir, SCHEMA, startServer } from './helpers.ts';
 
 const get = async (url: string) => {
   const res = await fetch(`${url}/api/v1/health`);
@@ -24,7 +24,7 @@ describe('health', () => {
       startedAt: '2026-09-30T12:00:00.000Z',
       epoch: expect.stringMatching(/^[0-9a-f-]{36}$/),
       db: { integrity: 'ok', checkedAt: '2026-09-30T12:00:00.000Z' },
-      migrations: { current: 1, expected: 1 },
+      migrations: { current: SCHEMA, expected: SCHEMA },
     });
   });
 
