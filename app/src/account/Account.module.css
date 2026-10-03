@@ -1,0 +1,262 @@
+/* Signing in, links, the account in More, the admin (phase 3g). */
+.form {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 480px;
+}
+
+/* the six digits, readable at a glance */
+.code {
+  font-size: 1.4rem;
+  letter-spacing: 0.3em;
+  font-variant-numeric: tabular-nums;
+}
+
+.start {
+  justify-self: start;
+}
+
+/* a row of the account: what it is on the left, its state or action on the right */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.rows > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rows > li > span {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rows small {
+  color: var(--text-muted);
+}
+
+/* "Sign out" stays one word-pair, the text beside it wraps instead */
+.rows > li > button,
+.rows > li > a,
+.entryHead button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.head h2 {
+  margin: 0;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* the grid's gap spaces the parts; their own margins would double it */
+.section p,
+.section h2 {
+  margin: 0;
+}
+
+/* a command for the Pi, at the size of the text around it */
+.cmd {
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+}
+
+/* content only the admin sees (docs/ui.md: visibility shown wherever
+   content might not be public) */
+.adminOnly {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+/* the QR code: dark on light whatever the theme, so every camera reads it */
+.qr {
+  display: block;
+  width: min(240px, 100%);
+  height: auto;
+  margin: 0 auto;
+  padding: var(--space-2);
+  background: #fff;
+  border-radius: var(--radius);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.qrWait {
+  aspect-ratio: 1;
+}
+
+.secret {
+  font-family: ui-monospace, monospace;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.codes {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1) var(--space-4);
+  font-family: ui-monospace, monospace;
+  font-size: 1.05rem;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  user-select: all;
+}
+
+.link {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* the admin's tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.tabs a[aria-current='page'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* lists of the admin: cards side by side on a wide screen */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+.entry {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+
+.entry small {
+  color: var(--text-muted);
+}
+
+.entryHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.flag {
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.8rem;
+}
+
+.failed {
+  color: var(--danger);
+}
+
+/* a log: one line per entry, time first */
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.log li {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+.log time {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.log small {
+  color: var(--text-muted);
+}
+
+@media (min-width: 900px) {
+  .log li {
+    grid-template-columns: 9rem minmax(0, 1fr);
+  }
+}

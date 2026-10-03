@@ -9,6 +9,9 @@ import { vi } from 'vitest';
 // (files that render the routes load them first: test/screens.ts)
 configure({ asyncUtilTimeout: 5000 });
 
+// no campaign server in the tests: nobody is signed in, unless a test answers otherwise
+vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ user: null, pending: false }), { headers: { 'content-type': 'application/json' } })));
+
 vi.mock('virtual:pwa-register/react', () => ({
   useRegisterSW: () => ({ needRefresh: [false, () => {}], offlineReady: [false, () => {}], updateServiceWorker: async () => {} }),
 }));

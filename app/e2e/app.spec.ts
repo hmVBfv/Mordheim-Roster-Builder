@@ -1,6 +1,7 @@
 /* The built app on a phone-sized screen. */
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
 /* the same warband after its first battle: trading has begun (V4–V7) */
@@ -9,41 +10,14 @@ const THEMES = ['chronicle', 'parchment'] as const;
 
 /* No errors in the console, Content Security Policy violations included. */
 let errors: string[] = [];
-test.beforeEach(({ page }) => {
+test.beforeEach(async ({ page }) => {
   errors = [];
   page.on('console', (m) => { if (m.type() === 'error' && !/ERR_INTERNET_DISCONNECTED|net::ERR_/.test(m.text())) errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
+  // the preview has no campaign server: nobody is signed in (account.spec.ts plays the server)
+  await page.route('**/api/v1/**', (r) => r.fulfill({ json: { user: null, pending: false } }));
 });
 test.afterEach(() => { expect(errors, 'console errors').toEqual([]); });
-
-async function shot(page: Page, name: string) {
-  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-${name}.png`, fullPage: true });
-}
-
-/* docs/ui.md checklist: usable at 360 px without horizontal scrolling. */
-async function noSideScroll(page: Page) {
-  const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
-  expect(scroll, 'the page scrolls sideways').toBeLessThanOrEqual(client);
-}
-
-/* …and touch targets of at least 44 px – except a word in running text that
-   opens its rules in a bubble (docs/ui.md §5). */
-async function tapTargets(page: Page) {
-  const small = await page.evaluate(() => {
-    const out: string[] = [];
-    for (const el of document.querySelectorAll<HTMLElement>('a, button:not([data-tip]), summary, label:has(input[type=radio]), input[type=file]')) {
-      const r = el.getBoundingClientRect();
-      if (r.width === 0 || getComputedStyle(el).visibility === 'hidden') continue;
-      if (r.height < 44 || r.width < 44) out.push(`${el.tagName} "${(el.textContent ?? '').trim().slice(0, 30)}" ${Math.round(r.width)}×${Math.round(r.height)}`);
-    }
-    return out;
-  });
-  expect(small, 'touch targets under 44 px').toEqual([]);
-}
-
-async function useTheme(page: Page, theme: string) {
-  await page.addInitScript((t) => { localStorage.setItem('mordheim-theme', t); }, theme);
-}
 
 async function importText(page: Page, text: string, heading = 'The Silver Caravan') {
   await page.getByRole('button', { name: 'Import a warband' }).first().click();
@@ -647,6 +621,15 @@ test('the navigation fits the flavour', async ({ page }) => {
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();
   expect(labels).toEqual(test.info().project.name === 'quickbuild' ? ['Home', 'Warbands', 'More'] : ['Home', 'Warbands', 'Campaign', 'Notes', 'More']);
   await expect(page).toHaveTitle(test.info().project.name === 'quickbuild' ? 'Mordheim Quick Build' : 'Mordheim Campaign');
+});
+
+test('the account is the campaign app’s: More shows it there, the Quick Build has none', async ({ page }) => {
+  const quick = test.info().project.name === 'quickbuild';
+  await page.goto(quick ? '#/more' : 'more');
+  await expect(page.getByRole('heading', { level: 1, name: 'More' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Account' })).toHaveCount(quick ? 0 : 1);
+  await page.goto(quick ? '#/sign-in' : 'sign-in');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(quick ? 'Not found' : 'Sign in');
 });
 
 test('installable: the manifest and its icons', async ({ page, request }) => {

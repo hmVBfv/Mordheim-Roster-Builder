@@ -2032,3 +2032,30 @@ stays exactly as it is. No more fixes there; a bug found on the way is
 fixed in core and recorded as a behaviour change. That ends the habit of
 fixing both apps, which had made every legacy quirk twice the work.
 
+## October 3, 2026 (cont.) — signing in, on the phone
+
+The screens for 3g follow the patterns the app already has – a form, a
+sheet from the bottom, a list – so the app is its own mockup here, as the
+roadmap allows for small screens. Signing in is two steps when an
+authenticator is set up, and the second step offers a recovery code in the
+same place. The invite and reset links take their token out of the address
+bar the moment the page opens, so it is neither in the history nor in a
+bookmark. Setting up the authenticator draws its QR code with a small
+encoder that is loaded only then; on the phone itself the same link opens
+the authenticator app directly. The ten recovery codes can be copied or
+saved as a file, and the sheet does not close until the player says they
+are kept.
+
+The admin's view is what Rob asked for this morning: the users, with what
+can be done for each (a reset link, removing a lost authenticator, signing
+out everywhere, disabling); the open invites; every sign-in and failed try
+with its address; and the audit log in words – "Rob made an invite", "kai
+joined with an invite", "roster-cli on the Pi made an invite · an admin
+account". On a wide screen the users stand side by side.
+
+Nothing of it reaches the Quick Build: the account section in More is a
+separate part loaded only by the campaign app, and the Quick Build has no
+sign-in route at all. The builder never waits for the server either – who
+is signed in is asked once in the background, and the warbands stay on the
+device until 3h.
+
