@@ -124,6 +124,9 @@ test('offline the changes wait on the device and go up when it is back', async (
   await page.goto('warbands');
   await page.getByRole('link', { name: /The Ardent Caravan/ }).click();
   await expect(page.getByTitle('Saved on this device and on the campaign server')).toBeVisible();
+  // the roster's parts are loaded before the line goes down (a fresh browser has no cached copy yet)
+  await expect(page.getByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rename the warband' })).toBeVisible();
   srv.state.down = true;
   await context.setOffline(true);
   await page.getByRole('button', { name: 'Rename the warband' }).click();
