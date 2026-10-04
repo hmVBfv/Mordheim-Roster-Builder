@@ -73,7 +73,8 @@ export default defineConfig(({ mode, command }) => {
       emptyOutDir: true,
       target: 'es2022',
     },
-    server: { fs: { allow: ['..'] } },
+    // the campaign app talks to the server: `npm run dev -w server`-style, on port 3000
+    server: { fs: { allow: ['..'] }, ...(flavour === 'campaign' ? { proxy: { '/api': 'http://127.0.0.1:3000' } } : {}) },
     test: {
       environment: 'jsdom',
       include: ['src/**/*.test.{ts,tsx}'],

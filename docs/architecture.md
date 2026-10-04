@@ -141,6 +141,7 @@ Regeln für `core/`:
 | Verschieben | dnd-kit (Touch und Tastatur) |
 | Stil | CSS-Variablen (Design-Tokens), CSS-Module, natives `<dialog>`; keine UI-Bibliothek |
 | PWA | vite-plugin-pwa: Manifest, Service Worker, Update-Banner |
+| QR-Code | `uqr` (MIT, ohne Abhängigkeiten) für das Einrichten des Authenticators; erst dort geladen |
 | Tests | Vitest + Testing Library; Playwright bei 360 px (nur CI) |
 | Lint | ESLint mit `eslint-plugin-react-hooks`; `dangerouslySetInnerHTML` verboten |
 
@@ -162,6 +163,16 @@ geladen und vom Service Worker für offline behalten wird; die App-Hülle
 kommt ohne `core/` aus. Die CSP steht im gebauten `index.html` als
 `<meta>` (ohne Inline-Skripte; das Theme setzt `public/theme-boot.js` vor dem
 ersten Zeichnen). Update-Banner mit `registerType: 'prompt'`.
+
+**Konten (Phase 3g, nur `campaign`):** `app/src/account/` – `api.ts`
+spricht mit `/api/v1` (gleicher Ursprung, Cookie, Schreiben nur als JSON),
+`session.ts` fragt beim Start einmal, wer angemeldet ist, und wieder, wenn das
+Gerät online kommt; der Builder wartet nie darauf. Auf dem Gerät bleibt nur
+der zuletzt bekannte Nutzer (Name und Flags, kein Token – das Cookie ist
+`HttpOnly`). Bildschirme: `/sign-in`, `/invite#…` und `/reset#…` (das Token
+verlässt sofort die Adresszeile), das Konto in More, `/admin/:tab`
+(Nutzer, Einladungen, Anmelde-Log, Audit-Log). Im Dev-Server leitet Vite
+`/api` an `127.0.0.1:3000` weiter.
 
 **Zustand:** Persistente Daten liegen in Dexie und sind die Quelle der
 Oberfläche. Reiner UI-Zustand (offene Bereiche, Formulareingaben) bleibt in
