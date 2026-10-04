@@ -180,10 +180,10 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | HTTP | Fastify (`trustProxy`: Loopback und das Gateway des Docker-Netzes, siehe unten) |
 | Datenbank | SQLite über `better-sqlite3`, WAL-Modus, `synchronous = NORMAL` |
 | Migrationen | nummerierte SQL-Dateien in `server/migrations/`, nur vorwärts, Tabelle `schema_migrations` |
-| Validierung | dieselben Zod-Schemas aus `core/format` (ab Phase 3) |
+| Validierung | dieselben Zod-Schemas aus `core/format` für Warbands und Notizen (ab 3h); die Körper der Konten mit JSON Schema in Fastify |
 | Logs | JSON auf stdout (pino); eine Zeile je Anfrage; Login-Fehler als eigene Zeilen für Fail2Ban |
 | Auslieferung | statische Dateien des `campaign`-Builds, API unter `/api/v1` |
-| CLI | `roster-cli`: Backup, Schemastand, Epoche; später Einladung, Reset-Link, Bugs, KI-Paket |
+| CLI | `roster-cli`: Backup, Schemastand, Epoche, Einladung (auch für den ersten Admin), Reset-Link, Faktor zurücksetzen, abmelden, Nutzerliste; später Bugs, KI-Paket |
 | Build | `server/build.mjs` bündelt mit rolldown nach `server/dist/` (Server, CLI, Healthcheck); Pakete bleiben extern |
 
 - **Kein Rendern auf dem Server**, kein Next.js.
@@ -196,7 +196,12 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
   die Epoche (neu bei einer neuen Datenbank und bei einem Start auf einem
   zurückgespielten Snapshot). Ist die Datenbank beschädigt, nicht lesbar
   oder neuer als der Code, lauscht der Server trotzdem und beantwortet
-  Health mit 503 – ab Phase 3 bleiben die Daten-Endpunkte dann zu.
+  Health mit 503 – die Daten-Endpunkte (ab 3g die Konten) antworten dann
+  ebenfalls 503.
+- **Wer fragt:** Derselbe Hook liest vor `can()` das Cookie `mh_session`
+  und findet die Sitzung (`req.actor`: niemand, „Code steht aus“ oder ein
+  Nutzer); eine schreibende Anfrage ohne den `Origin` der App weist er mit
+  403 ab. Nur JSON wird gelesen.
 - `GET /api/v1/health` meldet `status`, `version` (der Commit), `startedAt`,
   `epoch`, `db` (`integrity`: `ok` · `failed` · `unreadable`, geprüft beim
   Start und danach höchstens alle 15 Minuten) und `migrations`
@@ -223,8 +228,10 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 
 | Bereich | Pfade |
 | --- | --- |
-| Anmeldung | `POST /auth/login`, `POST /auth/totp`, `POST /auth/logout`, `GET/DELETE /auth/sessions` |
-| Einladungen | `POST /invites` (Admin), `POST /invites/:token/accept` |
+| Anmeldung | `GET /auth/me`, `POST /auth/login`, `POST /auth/totp`, `POST /auth/logout`, `GET /auth/sessions`, `DELETE /auth/sessions/:id` (`others`: alle anderen) – Phase 3g |
+| Einladungen | `POST /invites/check`, `POST /invites/accept` (Token im Körper; Register und Reset) – Phase 3g |
+| Eigenes Konto | `POST /account/password`, `POST /account/totp/setup`, `…/enable`, `…/disable` – Phase 3g |
+| Admin | `GET /admin/users`, `POST /admin/users/:id/:op` (`reset` · `totp-reset` · `disable` · `enable` · `sign-out`), `GET/POST /admin/invites`, `DELETE /admin/invites/:id`, `GET /admin/logins`, `GET /admin/audit` (`?limit=&before=`) – Phase 3g |
 | Warbands | `GET/POST /warbands`, `GET /warbands/:id/versions`, `POST /warbands/:id/versions` (mit `baseRev`), `PUT /warbands/:id/autosave` |
 | Kampagnen | `GET/POST /campaigns`, `…/members`, `…/enrolments`, `…/rounds/advance` |
 | Schlachten | `…/battles`, `…/battles/:id/protocol`, `…/battles/:id/proposals`, `…/battles/:id/close` |

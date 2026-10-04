@@ -5,8 +5,12 @@ import pino, { type Logger } from 'pino';
 import { afterEach } from 'vitest';
 import type { DB } from '../src/db.ts';
 import { loggerOptions } from '../src/log.ts';
+import { loadMigrations } from '../src/migrations.ts';
 import { start, type Started, type StartOptions } from '../src/start.ts';
 import { MARKER } from '../src/volume.ts';
+
+/** The schema version of the repository's migrations. */
+export const SCHEMA = loadMigrations().length;
 
 const cleanup: (() => unknown)[] = [];
 afterEach(async () => {

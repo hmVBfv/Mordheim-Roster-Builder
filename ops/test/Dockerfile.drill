@@ -1,5 +1,16 @@
 # CI only: an image whose migrations change the schema and then fail
-# (ops/test/e2e.sh, the rollback with restore).
+# (ops/test/e2e.sh, the rollback with restore). The drill's two files are
+# numbered after the image's own migrations, however many there are by now:
+# 1_drill.sql becomes NNNN_drill.sql, 2_drill_fails.sql the one after.
 ARG BASE
 FROM ${BASE}
-COPY drill-migrations/ /app/server/migrations/
+USER root
+COPY drill-migrations/ /tmp/drill/
+RUN n=$(ls /app/server/migrations | wc -l) \
+ && for f in /tmp/drill/*.sql; do \
+      n=$((n + 1)); name=${f##*/}; \
+      cp "$f" "/app/server/migrations/$(printf '%04d' "$n")_${name#*_}"; \
+    done \
+ && rm -r /tmp/drill \
+ && ls /app/server/migrations
+USER node
