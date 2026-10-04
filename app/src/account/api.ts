@@ -28,6 +28,8 @@ export class ApiError extends Error {
     readonly problem?: string,
     /** Seconds to wait (the brake). */
     readonly retryAfter?: number,
+    /** The whole answer, for refusals that carry more (a conflict's other state). */
+    readonly body?: Record<string, unknown>,
   ) {
     super(problem ?? code);
   }
@@ -40,7 +42,7 @@ export class ApiError extends Error {
 
 const BASE = `${import.meta.env.BASE_URL}api/v1`;
 
-export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'DELETE'; body?: unknown } = {}): Promise<T> {
+export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown } = {}): Promise<T> {
   const method = init.method ?? (init.body === undefined ? 'GET' : 'POST');
   const write = method !== 'GET';
   let res: Response;
@@ -61,7 +63,7 @@ export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'DE
   const json = parsed as Record<string, unknown>;
   if (!res.ok) {
     const retry = Number(json.retryAfter);
-    throw new ApiError(res.status, String(json.error ?? 'error'), typeof json.problem === 'string' ? json.problem : undefined, Number.isFinite(retry) ? retry : undefined);
+    throw new ApiError(res.status, String(json.error ?? 'error'), typeof json.problem === 'string' ? json.problem : undefined, Number.isFinite(retry) ? retry : undefined, json);
   }
   return json as T;
 }
