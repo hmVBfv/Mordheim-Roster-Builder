@@ -2059,3 +2059,14 @@ sign-in route at all. The builder never waits for the server either – who
 is signed in is asked once in the background, and the warbands stay on the
 device until 3h.
 
+
+## October 4, 2026 — one key for both instances
+
+The first plan gave the test instance a TOTP_KEY of its own. Rob asked
+whether an account made on staging would need making again in production,
+and the answer turned up a flaw: every night the restore test puts a copy of
+production into the test instance, and with a key of its own none of that
+copy's authenticators could be read there – codes would simply never work
+on staging. Separate keys protected nothing, since staging holds the same
+data anyway. install.sh now keeps staging.env's key equal to app.env's,
+replacing a different one it finds (never the other way round).
