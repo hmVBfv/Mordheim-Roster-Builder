@@ -86,12 +86,19 @@ as restic init -q -r "$root/backups/restic" --password-file "$root/secrets/resti
 expect "install.sh created the marker file on the (mounted) SSD" test -f "$data/.roster-volume"
 expect "app.env is private" test "$(stat -c %a "$root/app.env")" = 600
 expect "install.sh gave app.env a TOTP_KEY" grep -Eq '^TOTP_KEY=[A-Za-z0-9+/]{43}=$' "$root/app.env"
-expect "staging has a key of its own" sh -c "test \"\$(grep '^TOTP_KEY=' '$root/staging.env')\" != \"\$(grep '^TOTP_KEY=' '$root/app.env')\""
+expect "staging has production's key, once" sh -c "test \"\$(grep '^TOTP_KEY=' '$root/staging.env')\" = \"\$(grep '^TOTP_KEY=' '$root/app.env')\" -a \"\$(grep -c '^TOTP_KEY=' '$root/staging.env')\" = 1"
 totp_key=$(grep '^TOTP_KEY=' "$root/app.env")
 expect "Docker and the timers wait for the SSD" grep -q "RequiresMountsFor=$mnt" /etc/systemd/system/docker.service.d/ssd.conf /etc/systemd/system/roster-backup.service
 expect "the timers are enabled" systemctl is-enabled --quiet roster-backup.timer roster-restore-test.timer
 expect "roster-alive waits for Stufe 2" sh -c '! systemctl is-enabled --quiet roster-alive.timer'
 expect "no DynDNS updater without its settings" test ! -e /etc/systemd/system/porkbun-ddns.timer
+
+echo "# a test instance with a key of its own (installed before the fix) gets production's"
+sed -i 's/^TOTP_KEY=.*/TOTP_KEY=c3RhZ2luZy1rZXktb2YtaXRzLW93bi0zMi1ieXRlcyE=/' "$root/staging.env"
+"$ops/install.sh" --no-caddy >/dev/null
+expect "staging has production's key again" test "$(grep '^TOTP_KEY=' "$root/staging.env")" = "$totp_key"
+expect "staging.env stays private" test "$(stat -c %a "$root/staging.env")" = 600
+expect "staging keeps its origin" grep -q '^PUBLIC_ORIGIN=' "$root/staging.env"
 
 echo "# a new hostname: app.env is kept, and install.sh says what to change"
 sed -i 's/^ROSTER_HOST=.*/ROSTER_HOST=roster2.test/' "$home/server/roster/site.env"
