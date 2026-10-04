@@ -28,6 +28,8 @@ Begriff einführt, trägt ihn hier ein.
 | Warband | Warband | `warbands` |
 | Version | Version | `warband_versions`, `rev` |
 | aktuelle Version | Latest version | `head_rev` |
+| Entwurf (Autosave) | Draft | `warband_autosaves`, `PUT /warbands/:id/autosave` |
+| freie Warband, Blaupause | Free warband; copy | ohne Kampagne; Kopie: `source: 'copy'`, `copied_from` |
 | Autosave-Platz | Autosave | `warband_autosaves` |
 | markierter Stand | Tagged state | `tags` |
 | Start | Start | `kind: 'start'` |

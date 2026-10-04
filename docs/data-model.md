@@ -122,9 +122,9 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 | Tabelle | Spalten | Hinweise |
 | --- | --- | --- |
-| `warbands` | `id`, `owner_id`, `name`, `wb_type`, `head_rev`, `created_at`, `archived_at` | `head_rev` = aktuelle Version |
-| `warband_versions` | `warband_id`, `rev`, `data` (JSON), `format`, `app_version`, `source` (`save` · `import` · `migration`), `created_by`, `created_at`, `note` | Primärschlüssel (`warband_id`, `rev`); nur anhängen |
-| `warband_autosaves` | `warband_id`, `user_id`, `base_rev`, `data`, `updated_at` | ein Platz je Nutzer und Warband |
+| `warbands` | `id`, `owner_id`, `name`, `wb_type`, `head_rev`, `copied_from`, `copied_rev`, `created_at`, `updated_at`, `archived_at`, `seq` | seit Migration 3. `id` vom Gerät (UUID). `head_rev` = aktuelle Version. Ohne Kampagne „frei“ (Entwurf, Blaupause) und nur für den Besitzer sichtbar; `copied_from`/`copied_rev`: Warband und Version, aus der sie kopiert wurde (Kampagnenstart aus einer Blaupause, concept.md 4.1). `seq`: `audit_log.seq` der letzten Änderung (Sync). `archived_at`: entfernt (Grabstein) |
+| `warband_versions` | `warband_id`, `rev`, `data` (JSON), `format`, `app_version`, `source` (`save` · `import` · `copy` · `restore` · `migration`), `created_by`, `created_at`, `note` | Primärschlüssel (`warband_id`, `rev`); nur anhängen; `data` höchstens 2 MB, geprüft gegen `warbandSaveSchema` aus `core/format`, Schlüssel mit `_` entfernt |
+| `warband_autosaves` | `warband_id`, `user_id`, `base_rev`, `data`, `device`, `updated_at`, `seq` | ein Platz je Nutzer und Warband (Entwurf seit der letzten Version); eine neue Version desselben Nutzers leert ihn. Ein anderes Gerät desselben Nutzers überschreibt ihn nur, wenn es ihn gesehen hat (`afterSeq`) oder ausdrücklich (`force`). Im `audit_log` steht je Entwurf nur der letzte Eintrag (`warband.autosave`); die Admin-Ansicht zeigt Entwürfe nicht |
 | `tags` | `id`, `warband_id`, `rev`, `kind` (`start` · `after_battle` · `sat_out`), `campaign_id`, `battle_id`, `round`, `totals` (JSON, eingefroren), `created_by`, `created_at`, `superseded_by` | Korrektur = neuer Tag, alter bekommt `superseded_by` |
 | `changes` | `id`, `tag_id`, `warband_id`, `battle_id`, `seq_in_tag`, `kind`, `uid`, `change_key`, `payload` (JSON), `event_ref`, `unexplained` | eingefroren beim Markieren, siehe Abschnitt 4 |
 

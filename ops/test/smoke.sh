@@ -6,7 +6,8 @@
 # 3. roster-cli backup writes a snapshot; the healthcheck script agrees
 # 4. accounts: roster-cli makes the admin link, the account registers, sets
 #    up the authenticator (TOTP_KEY), a wrong password is turned away and
-#    logged for Fail2Ban, a write from elsewhere is refused
+#    logged for Fail2Ban, a write from elsewhere is refused; a player's
+#    warband is stored and synced, a broken save refused
 # 5. X-Forwarded-For from the Docker gateway is believed (Fail2Ban sees clients)
 # 6. a restart keeps the epoch; a start on a restored snapshot changes it
 # 7. memory stays well inside the Pi's 256 MB limit
@@ -92,6 +93,16 @@ docker logs "$name" 2>&1 | grep '"event":"login_failed"' | grep -q '"account":"s
 [ "$(curl -sS -o /dev/null -w '%{http_code}' -m 5 -H 'Content-Type: application/json' -H 'Origin: https://evil.example' \
   -d '{"username":"smoke","password":"x"}' "$origin/api/v1/auth/login")" = 403 ] || fail "a write from another origin was not refused"
 docker exec "$name" roster-cli users | grep -q $'^smoke\tadmin\t' || fail "roster-cli users does not list the admin"
+# a player's warband: core's save schema and zod are in the image
+link=$(docker exec "$name" roster-cli invite --note player)
+api -c "$work/player" -d "{\"token\":\"${link#*#}\",\"username\":\"player\",\"password\":\"a long test passphrase\"}" \
+  "$origin/api/v1/invites/accept" >/dev/null || fail "registering a player"
+wid=$(cat /proc/sys/kernel/random/uuid)
+api -b "$work/player" -d "{\"id\":\"$wid\",\"source\":\"save\",\"data\":{\"wb\":\"reikland\",\"name\":\"Smoke\",\"models\":[]}}" \
+  "$origin/api/v1/warbands" | grep -q '"headRev":1' || fail "a warband was not stored"
+api -b "$work/player" "$origin/api/v1/sync?cursor=0" | grep -q "\"id\":\"$wid\"" || fail "sync does not return the warband"
+[ "$(api -b "$work/player" -o /dev/null -w '%{http_code}' -d '{"id":"'"$(cat /proc/sys/kernel/random/uuid)"'","source":"save","data":{"name":"no type"}}' "$origin/api/v1/warbands")" = 400 ] ||
+  fail "a save without a warband type was stored"
 
 echo "5. the client address behind the proxy"
 curl -s -o /dev/null -m 5 -H 'X-Forwarded-For: 203.0.113.9' "http://127.0.0.1:$port/api/v1/nope"
