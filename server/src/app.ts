@@ -1,11 +1,17 @@
 /* The HTTP side: Fastify with the API under /api/v1 and the app's files.
    Every route names an action; a hook asks can() before any handler runs
-   (policy.ts). */
+   (policy.ts). Before that the same hook finds who is asking – the session
+   cookie – and refuses a write that does not come from the app itself
+   (Origin; JSON only), so another site cannot act in a player's name
+   (docs/security.md, CSRF). */
 import Fastify, { LogController, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import type { Logger } from 'pino';
 import type { Config } from './config.ts';
+import type { DB } from './db.ts';
 import type { Health } from './health.ts';
-import { can, isAction, type Action } from './policy.ts';
+import type { HashCost } from './passwords.ts';
+import { can, isAction, type Action, type Actor } from './policy.ts';
+import { readActor, registerAccountRoutes } from './routes-accounts.ts';
 import type { StaticFiles } from './static.ts';
 
 declare module 'fastify' {
@@ -16,6 +22,10 @@ declare module 'fastify' {
     /** Every route as registered, with its action (for the leak-test matrix). */
     registeredRoutes: RegisteredRoute[];
   }
+  interface FastifyRequest {
+    /** Who is asking (the session cookie); null: nobody signed in. */
+    actor: Actor | null;
+  }
 }
 
 export interface RegisteredRoute {
@@ -25,8 +35,15 @@ export interface RegisteredRoute {
 }
 
 export interface AppDeps {
-  config: Pick<Config, 'version'>;
+  config: Pick<Config, 'version'> & Partial<Pick<Config, 'publicOrigin'>>;
   health: Health;
+  /** The database once it is checked and migrated; null keeps every data endpoint closed. */
+  db?: DB | null;
+  now?: () => Date;
+  /** TOTP_KEY: encrypts the authenticators' secrets; null: they cannot be set up. */
+  totpKey?: Buffer | null;
+  /** scrypt's cost (tests pass a small one). */
+  hashCost?: HashCost | undefined;
   files: StaticFiles;
   trustProxy: string[];
   /** false: silent (tests that do not look at the log). */
@@ -52,8 +69,14 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     exposeHeadRoutes: false,
   }) as unknown as FastifyInstance;
 
+  // only JSON is parsed: a form or text/plain from another site cannot carry a write
+  app.removeContentTypeParser('text/plain');
+
   // no route without an action: the check cannot be forgotten
   app.decorate('registeredRoutes', [] as RegisteredRoute[]);
+  app.decorateRequest('actor', null);
+  const now = deps.now ?? (() => new Date());
+  const db = deps.db ?? null;
   app.addHook('onRoute', (route) => {
     const action = route.config?.action;
     if (!isAction(action)) {
@@ -66,7 +89,16 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     const action = req.routeOptions.config.action;
     // unmatched requests end in the not-found handler, which serves nothing
     if (action === undefined) return;
-    if (!can(null, action)) return reply.code(403).send({ error: 'forbidden' });
+    const infra = action === 'health.read' || action === 'app.files';
+    if (!infra) {
+      // the data endpoints stay closed while the database is not ready (start.ts)
+      if (!db) return reply.code(503).send({ error: 'unavailable' });
+      if (req.method !== 'GET' && req.method !== 'HEAD' && !sameOrigin(req, deps.config.publicOrigin ?? null)) {
+        return reply.code(403).send({ error: 'cross_origin' });
+      }
+      req.actor = readActor(db, req, now());
+    }
+    if (!can(req.actor, action)) return reply.code(req.actor ? 403 : 401).send({ error: req.actor ? 'forbidden' : 'sign_in' });
   });
 
   app.addHook('onSend', async (req, reply) => {
@@ -97,6 +129,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     return reply.code(report.status === 'ok' ? 200 : 503).send(report);
   });
 
+  registerAccountRoutes(app, { db, now, config: { publicOrigin: deps.config.publicOrigin ?? null }, totpKey: deps.totpKey ?? null, hashCost: deps.hashCost });
+
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);
     if (path === null || path.startsWith('/api/')) return notFound(reply);
@@ -123,6 +157,20 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
 function notFound(reply: FastifyReply) {
   return reply.code(404).type('application/json; charset=utf-8').send({ error: 'not_found' });
+}
+
+/** A write comes from the app itself: its Origin is the public origin (or,
+    without one configured, the host it was sent to). Browsers always send
+    Origin with a cross-site or any non-GET fetch. */
+function sameOrigin(req: FastifyRequest, publicOrigin: string | null): boolean {
+  const origin = req.headers.origin;
+  if (!origin) return false;
+  if (publicOrigin) return origin === publicOrigin;
+  try {
+    return new URL(origin).host === req.headers.host;
+  } catch {
+    return false;
+  }
 }
 
 function acceptsHtml(req: FastifyRequest) {
