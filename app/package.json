@@ -13,7 +13,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "size": "size-limit",
+    "size": "node scripts/size.mjs",
     "e2e": "playwright test",
     "icons": "node scripts/icons.mjs"
   },
@@ -34,7 +34,6 @@
     "@babel/core": "^7.29.7",
     "@playwright/test": "^1.63.0",
     "@rolldown/plugin-babel": "^0.2.4",
-    "@size-limit/file": "^14.1.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
@@ -46,30 +45,9 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^30.1.1",
-    "size-limit": "^14.1.0",
     "vite": "^8.3.1",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^5.0.2",
     "workbox-window": "^7.4.1"
-  },
-  "size-limit": [
-    {
-      "name": "campaign: JavaScript on first load",
-      "path": [
-        "dist/campaign/assets/index-*.js",
-        "dist/campaign/assets/workbox-window*.js"
-      ],
-      "limit": "200 KB",
-      "gzip": true
-    },
-    {
-      "name": "quickbuild: JavaScript on first load",
-      "path": [
-        "dist/quickbuild/assets/index-*.js",
-        "dist/quickbuild/assets/workbox-window*.js"
-      ],
-      "limit": "200 KB",
-      "gzip": true
-    }
-  ]
+  }
 }
