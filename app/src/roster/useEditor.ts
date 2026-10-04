@@ -1,11 +1,12 @@
 /* Editing a warband: every change is an action of core, taken on the state
    the screen shows and saved on this device at once (docs/ui.md §1.6:
-   "Undo" instead of "Are you sure?"). Until the server joins (phase 3h)
-   the only copy is the one in this device's store. */
+   "Undo" instead of "Are you sure?"). In the campaign app the sync sends
+   the change to the server a moment later (src/sync/, phase 3h). */
 import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { db, type StoredWarband } from '../db/db.ts';
+import { requestSync } from '../sync/runner.ts';
 import { editableState } from './view.ts';
 
 /** A change that can be taken back once, from its notice. */
@@ -78,7 +79,7 @@ export function useEditor(data: GameData, rec: StoredWarband, now: () => Date = 
     latest.current = { s: next, stamp };
     setLocal(latest.current);
     const fields = savedFields(data, next, stamp);
-    writes.current = writes.current.then(() => db.warbands.update(rec.id, fields)).catch((e: unknown) => { console.error('saving the warband failed', e); });
+    writes.current = writes.current.then(() => db.warbands.update(rec.id, fields)).then(() => requestSync()).catch((e: unknown) => { console.error('saving the warband failed', e); });
   }, [data, rec.id, rec.updatedAt, now]);
 
   const edit = useCallback((action: (ctx: core.Ctx) => WarbandState, text?: string, opts?: EditOptions) => {

@@ -1,14 +1,13 @@
 /* The start: what waits for the player, then their warbands (docs/ui.md §1.5). */
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useNavigate } from 'react-router';
-import { db } from '../db/db.ts';
 import { FLAVOUR } from '../flavour.ts';
+import { useWarbands } from '../sync/local.ts';
 import ui from '../ui/ui.module.css';
 import { ImportSheet } from './ImportSheet.tsx';
 import { WarbandList } from './WarbandList.tsx';
 
 export function Home() {
-  const recent = useLiveQuery(() => db.warbands.orderBy('updatedAt').reverse().limit(3).toArray(), []);
+  const recent = useWarbands(3);
   const navigate = useNavigate();
   return (
     <section className={ui.page}>
@@ -20,7 +19,7 @@ export function Home() {
       )}
       <div>
         <h2>Your warbands</h2>
-        {recent && recent.length > 0 ? <WarbandList warbands={recent} /> : recent && <p className={ui.muted}>None on this device yet.</p>}
+        {recent && recent.length > 0 ? <WarbandList warbands={recent} /> : recent && <p className={ui.muted}>None yet.</p>}
       </div>
       <div className={ui.row}>
         <Link to="/warbands/new" className={ui.button}>New warband</Link>

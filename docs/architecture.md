@@ -285,6 +285,36 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
 | Daten | Regel |
 | --- | --- |
 | Warband-Versionen | `baseRev` muss der aktuellen Version entsprechen, sonst 409; die App bietet „neueren Stand laden“ oder „als Kopie speichern“ |
+| Warband-Entwurf | ein Platz je Nutzer und Warband; ein anderes Gerät ersetzt ihn nur, wenn es ihn gesehen hat (`afterSeq`), sonst 409 und die Spielerin entscheidet |
+
+**Umgesetzt für Warbands (Phase 3h, `app/src/sync/`):**
+
+- **Was wartet, steht am Datensatz** statt in einer eigenen Warteschlange:
+  `serverRev` (noch nie gesendet, wenn leer), `syncedAt` gegen `updatedAt`
+  (neuere Änderungen warten), `removedAt` (entfernt, wartet auf das Ende von
+  Undo), `restore` (nach einer Wiederherstellung des Servers). So geht beim
+  Schließen des Tabs oder offline nichts verloren, und der Abgleich ist
+  derselbe, egal wie lange das Gerät weg war.
+- **Eine Runde:** erst holen (`GET /sync?cursor=`), dann senden – neue
+  Warbands per `POST /warbands` (die UUID des Geräts, doppelt gesendet wird
+  sie einmal angelegt), Änderungen als Entwurf (`PUT …/autosave`),
+  Entferntes nach Undo per `DELETE`. Eine Version entsteht nur bewusst (der
+  Versionen-Bildschirm), nie durch den Abgleich.
+- **Beide Seiten geändert:** nichts wird überschrieben. Der Datensatz bekommt
+  einen Konflikt (`draft`: ein anderes Gerät hat entworfen; `behind`: eine
+  neuere Version kam dazwischen; `removed`: anderswo entfernt) und wird nicht
+  mehr gesendet, bis die Spielerin im Roster „Keep this one“ oder „Take the
+  other one“ wählt. Die Kopfzeile zeigt „Check“.
+- **Neue Epoche:** alles neu ab Cursor 0; was der Server nicht kennt, legt das
+  Gerät neu an, und wo der Server auf eine ältere Version zurückgefallen ist,
+  schickt es seinen Stand als neue Version (`source: 'restore'`).
+- **Wessen Warband:** neu angelegte und importierte gehören dem angemeldeten
+  Nutzer; was ohne Anmeldung entstand, bleibt auf dem Gerät, bis die
+  Spielerin es mit „Keep … in my account“ ins Konto nimmt. Listen zeigen
+  keine Warbands eines anderen Kontos (ein geteiltes Gerät).
+- **Kopfzeile:** „Saved and synced“, „n waiting“ (auch offline, auf dem
+  Gerät gezählt), „Check“ bei einem Konflikt, „Not synced“ bei einem Fehler;
+  ohne Anmeldung wie bisher „Saved on this device“.
 | Notizen | gehören ihrem Autor; letzte Fassung gewinnt, frühere bleiben als Revision |
 | Schlachtprotokoll | nur der Leiter schreibt; Spieler schicken Korrekturvorschläge |
 | Zeitleisten-Position | letzte Verschiebung gewinnt, jede wird geloggt |
@@ -297,7 +327,7 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
 1. Legacy-Tests (`node test/run.mjs`) und Vitest für `core`, `app`, `server`.
 2. Leak-Test-Matrix (Rolle × Endpunkt × Sichtbarkeit), siehe
    [security.md](security.md).
-3. Build beider App-Varianten; `size-limit` prüft das Budget.
+3. Build beider App-Varianten; `app/scripts/size.mjs` prüft das Budget (was `index.html` beim Start lädt).
 4. Playwright-Screenshots der Kernbildschirme bei 360 px.
 5. Image bauen und prüfen: Rauchtest (SSD-Übung, Health, `roster-cli`,
    Client-Adresse, Epoche, Speicher) und Ende-zu-Ende-Test der

@@ -2095,3 +2095,35 @@ even their existence shows. The leak-test matrix tries every warband route
 with someone else's warband. Sync hands a device everything of its owner
 that changed since its cursor, removals included, with the epoch that tells
 it when the server was restored and it must start over.
+
+## October 4, 2026 (cont.) — the same warband on every device
+
+The app keeps working on the device's own store, as it always has; the
+sync only carries what changed. The first plan was a queue of operations
+to send – an outbox in the classic sense – but every operation in it would
+have had to be replayed in order and reconciled with whatever the server
+had meanwhile. Marking what waits on the warband itself turned out simpler
+and sturdier: a warband the server has never seen, edits newer than the
+last sent, a removal waiting for its Undo. A round of sync first takes the
+server's changes, then sends what is marked, and it comes out the same
+whether the phone was offline for a minute or a week.
+
+When both sides changed, nothing is overwritten. The warband carries the
+conflict, stops being sent, and the roster asks which one to keep – the
+other device's draft, a newer version saved elsewhere, or a removal
+elsewhere. Warbands made before signing in stay on the device until the
+player takes them into the account; a phone that is shared does not show
+another account's warbands. And after a restore of the server, the devices
+give back what the backup missed.
+
+The header says where things stand. One wrong turn on the way: offline it
+went on saying "Saved and synced" after a change, because the count of what
+waits came from the last successful round; now the device counts it itself.
+
+
+The sync also showed a hole in a check. The first-load budget was measured
+by file name – every `index-*.js` – and the sync, sharing the device store
+with the entry, made the bundler split the store into a chunk of its own.
+The measurement dropped by 16 KB while the page loaded the same. Now a
+small script reads what index.html actually loads and adds it up: 124 KB of
+the 200 allowed.
