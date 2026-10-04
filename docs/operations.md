@@ -188,6 +188,11 @@ Einladungslinks aus der App:
    Passwortmanager.
 4. Mitspieler bekommen ihren Link aus der App (Admin → Einladungen).
 
+Die Testinstanz hat eine eigene Datenbank, aber denselben `TOTP_KEY`. Ein
+Konto, das du dort anlegst, gilt nur dort und ist nach dem nächsten
+nächtlichen Wiederherstellungstest wieder weg; danach meldest du dich dort mit
+deinem Produktions-Konto und dessen Authenticator an.
+
 `roster-cli` für Konten (immer `docker exec roster-app roster-cli …`; jeder
 Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
 
@@ -331,7 +336,7 @@ bricht ab, solange er nicht eingebunden ist.
 | --- | --- | --- |
 | `PUBLIC_ORIGIN` | `https://<ROSTER_HOST>` (für die `Origin`-Prüfung); `install.sh` warnt, wenn es nicht zu `site.env` passt | Phase 2 |
 | `LOG_LEVEL` | `info` | Phase 2 |
-| `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse (32 Byte, base64). `install.sh` hängt ihn an, wenn er fehlt (`openssl rand -base64 32`), und ersetzt ihn nie; die Testinstanz bekommt einen eigenen. **Kopie in den Passwortmanager** – er liegt nicht im Backup. Ein falscher Wert hält den Server an (`ConfigError`); fehlt er, startet der Server, aber niemand kann einen Faktor einrichten | Phase 3g |
+| `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse (32 Byte, base64). `install.sh` hängt ihn an, wenn er fehlt (`openssl rand -base64 32`), und ersetzt ihn nie. Die Testinstanz bekommt **denselben** Schlüssel (`install.sh` gleicht `staging.env` an `app.env` an, nie umgekehrt): Der nächtliche Wiederherstellungstest spielt ihr eine Kopie der Produktion ein, und mit einem eigenen Schlüssel wäre dort kein Authenticator lesbar. **Kopie in den Passwortmanager** – er liegt nicht im Backup. Ein falscher Wert hält den Server an (`ConfigError`); fehlt er, startet der Server, aber niemand kann einen Faktor einrichten | Phase 3g |
 | `BUGS_TOKEN_HASH` | Hash des Tokens für die Bug-Arbeit des Agenten | Phase 4c |
 
 `DATA_DIR` (`/data`), `UPLOAD_DIR` (`/uploads`), `PORT` (3000) und die
