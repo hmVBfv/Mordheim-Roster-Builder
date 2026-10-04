@@ -6,6 +6,7 @@
   "description": "Shared rules and campaign logic: no DOM, no globals. Used by the app (browser) and the server (Node).",
   "exports": {
     ".": "./src/index.ts",
+    "./format": "./src/format/schema.ts",
     "./node": "./src/node.ts"
   },
   "scripts": {

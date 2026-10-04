@@ -9,8 +9,14 @@
    nobody (null), someone between password and authenticator code
    (`pending`), or a signed-in user. An admin – and later a leader – must have
    the authenticator set up (ADR 0008); until then such an account may only
-   look after itself. Campaign roles and targets (a warband, a note) join in
-   phase 3h/4a. */
+   look after itself.
+
+   Phase 3h brings the first target: a warband. An action with `owner`
+   needs a signed-in user at the door (the hook in app.ts) and, once the
+   handler has loaded the warband, `can(actor, action, warband)` again – only
+   its owner gets through; everyone else is told it does not exist (404).
+   Not even the admin sees another's warband (concept.md: no special access
+   to content). Campaign roles join in phase 4a. */
 
 export interface Actor {
   id: string;
@@ -51,7 +57,15 @@ export const ACTIONS = {
   /** Who signed in when, from where (Rob, 03.10.2026: log data next to logins). */
   'admin.logins.read': { who: 'admin' },
   'admin.audit.read': { who: 'admin' },
-} as const satisfies Record<string, { who: Who }>;
+  /** One's own warbands: the list, and what changed since a cursor (GET /sync). */
+  'warbands.list': { who: 'user' },
+  /** A new warband of one's own (made, imported or copied). */
+  'warbands.create': { who: 'user' },
+  /** A warband, its versions and draft – its owner only. */
+  'warband.read': { who: 'user', target: 'owner' },
+  /** A new version, the draft, removing and bringing back – its owner only. */
+  'warband.write': { who: 'user', target: 'owner' },
+} as const satisfies Record<string, { who: Who; target?: 'owner' }>;
 
 export type Action = keyof typeof ACTIONS;
 
@@ -64,9 +78,19 @@ const SELF_CARE: ReadonlySet<Action> = new Set(['auth.me', 'auth.logout', 'auth.
 /** An admin must have the authenticator (ADR 0008). */
 export const mustSetUpTotp = (a: Actor) => a.isAdmin && !a.totp;
 
-/** can(actor, action) – targets join with the campaign data. */
-export function can(actor: Actor | null, action: Action): boolean {
-  const who: Who = ACTIONS[action].who;
+/** What an action may be aimed at (phase 3h: a warband). */
+export interface Target { ownerId: string }
+
+/** can(actor, action[, target]). Without a target an `owner` action only
+    asks who is at the door; the handler asks again with the target. */
+export function can(actor: Actor | null, action: Action, target?: Target): boolean {
+  const def: { who: Who; target?: 'owner' } = ACTIONS[action];
+  if (!canAtDoor(actor, def.who, action)) return false;
+  if (target && def.target === 'owner') return actor!.id === target.ownerId;
+  return true;
+}
+
+function canAtDoor(actor: Actor | null, who: Who, action: Action): boolean {
   if (who === 'public') return true;
   if (!actor) return false;
   if (who === 'pending') return actor.pending;

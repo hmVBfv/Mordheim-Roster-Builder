@@ -6,8 +6,10 @@
    a successful answer may carry only the listed top-level fields. On top,
    no answer anywhere may contain a password hash, a token hash or an
    authenticator secret at rest. A route whose action has no row here, or a
-   route without a probe, fails the test. Campaign roles (leader, member)
-   and visibility join in phase 3h/4a. */
+   route without a probe, fails the test. A warband (phase 3h) belongs to
+   the "user" role; for anyone else it does not exist (404 counts as turned
+   away). Campaign roles (leader, member) and visibility join in phase 4a. */
+import { randomUUID } from 'node:crypto';
 import type { Action } from '../src/policy.ts';
 
 /** anonymous: no cookie; pending: password right, code due; user: signed in;
@@ -30,10 +32,16 @@ export interface ProbeContext {
   /** The user role's username and password. */
   username: string;
   password: string;
+  /** A warband of the user role, its current version, and one to remove and bring back. */
+  warbandId: string;
+  headRev(): number;
+  spareWarbandId: string;
+  /** A warband save the server accepts. */
+  save: Record<string, unknown>;
 }
 
 export interface Probe {
-  method: 'GET' | 'HEAD' | 'POST' | 'DELETE';
+  method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE';
   url: string;
   body?: unknown;
 }
@@ -150,6 +158,40 @@ export const MATRIX: Record<Action, MatrixRow> = {
     allowed: ['admin'],
     routes: { 'GET /api/v1/admin/audit': () => ({ method: 'GET', url: '/api/v1/admin/audit' }) },
     fields: { admin: ['entries'] },
+  },
+  // each signed-in user lists and syncs only their own
+  'warbands.list': {
+    allowed: signedIn,
+    routes: {
+      'GET /api/v1/warbands': () => ({ method: 'GET', url: '/api/v1/warbands' }),
+      'GET /api/v1/sync': () => ({ method: 'GET', url: '/api/v1/sync?cursor=0' }),
+    },
+    fields: same(signedIn, ['warbands', 'epoch', 'cursor']),
+  },
+  'warbands.create': {
+    allowed: signedIn,
+    routes: { 'POST /api/v1/warbands': (c) => ({ method: 'POST', url: '/api/v1/warbands', body: { id: randomUUID(), data: c.save, source: 'save' } }) },
+    fields: same(signedIn, ['warband', 'rev']),
+  },
+  'warband.read': {
+    allowed: ['user'],
+    routes: {
+      'GET /api/v1/warbands/:id': (c) => ({ method: 'GET', url: `/api/v1/warbands/${c.warbandId}` }),
+      'GET /api/v1/warbands/:id/versions': (c) => ({ method: 'GET', url: `/api/v1/warbands/${c.warbandId}/versions` }),
+      'GET /api/v1/warbands/:id/versions/:rev': (c) => ({ method: 'GET', url: `/api/v1/warbands/${c.warbandId}/versions/1` }),
+    },
+    fields: { user: ['warband', 'head', 'draft', 'versions', 'version'] },
+  },
+  'warband.write': {
+    allowed: ['user'],
+    routes: {
+      'POST /api/v1/warbands/:id/versions': (c) => ({ method: 'POST', url: `/api/v1/warbands/${c.warbandId}/versions`, body: { baseRev: c.headRev(), data: c.save } }),
+      'PUT /api/v1/warbands/:id/autosave': (c) => ({ method: 'PUT', url: `/api/v1/warbands/${c.warbandId}/autosave`, body: { baseRev: c.headRev(), data: c.save, force: true } }),
+      'DELETE /api/v1/warbands/:id/autosave': (c) => ({ method: 'DELETE', url: `/api/v1/warbands/${c.warbandId}/autosave` }),
+      'DELETE /api/v1/warbands/:id': (c) => ({ method: 'DELETE', url: `/api/v1/warbands/${c.spareWarbandId}` }),
+      'POST /api/v1/warbands/:id/unarchive': (c) => ({ method: 'POST', url: `/api/v1/warbands/${c.spareWarbandId}/unarchive`, body: {} }),
+    },
+    fields: { user: ['warband', 'rev', 'seq', 'dropped'] },
   },
 };
 
