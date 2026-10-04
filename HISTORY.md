@@ -2021,3 +2021,14 @@ someone halfway through signing in, as a player and as the admin, and an
 answer may carry only the fields its row allows – and never a hash or a
 secret, at any depth. A second test now fails when a table or a column the
 migrations create is missing from data-model.md.
+
+## October 3, 2026 (cont.) — the old app stays as it is
+
+With the builder complete, the question was when GitHub Pages switches
+from the Roster Builder to the new app. Rob's answer: not before the
+campaign runs in the new app (phase 4a), because the group plays its
+campaign in the Roster Builder today – and until then the Roster Builder
+stays exactly as it is. No more fixes there; a bug found on the way is
+fixed in core and recorded as a behaviour change. That ends the habit of
+fixing both apps, which had made every legacy quirk twice the work.
+

@@ -19,9 +19,14 @@ sich stillschweigend: Jede Abweichung steht hier mit Grund und Test.
 3. **Umsetzung:** Test, der das neue Verhalten festhält, dann die Änderung in
    `core/`. Der Paritätstest bekommt eine ausdrücklich benannte Ausnahme für
    genau diesen Fall – nie eine pauschale.
-4. **Alte App:** Nur echte Fehler, die im laufenden Spiel stören, werden auch
-   dort behoben (mit eigenem Test in `test/`). Neue Abläufe kommen nur in den
-   neuen Builder.
+4. **Alte App:** eingefroren (Rob, 03.10.2026: „Der Legacy Roster Builder
+   soll dann so bleiben. Der wird dann nicht weiter mit angepasst.“). Sie
+   bleibt auf Pages, bis die Kampagne in der neuen App läuft (Phase 4a), und
+   bekommt keine Änderungen mehr – auch keine Fehlerbehebungen, außer Rob
+   wünscht es ausdrücklich. Ein Fehler, der auffällt, wird nur in `core/`
+   behoben und hier mit Test und benannter Paritäts-Ausnahme eingetragen.
+   Die Einträge unter „Erledigt … in beiden behoben“ stammen aus der Zeit
+   davor.
 5. **Ab Phase 3** (neuer Builder ersetzt die alte App) entfallen die
    Paritätstests; Änderungen gehen dann direkt mit Tests in `core/`.
 
