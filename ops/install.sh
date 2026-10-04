@@ -198,13 +198,24 @@ origin_check "$ROSTER_DATA/staging.env" "http://$ROSTER_LAN_IP:8081" staging
 # the key that encrypts the authenticators' secrets (phase 3g): made once,
 # appended if missing, never replaced – a new key makes every authenticator
 # unreadable (then: roster-cli totp-reset <user> for each account)
-totp_key() { # <file> <service>
-  if grep -Eq '^TOTP_KEY=.+' "$1"; then return 0; fi
-  printf 'TOTP_KEY=%s\n' "$(openssl rand -base64 32)" >>"$1"
-  say "added a TOTP_KEY to $1 – keep a copy in your password manager, then: cd $ROSTER_DIR && docker compose up -d --force-recreate $2"
-}
-totp_key "$ROSTER_DATA/app.env" app
-totp_key "$ROSTER_DATA/staging.env" staging
+if ! grep -Eq '^TOTP_KEY=.+' "$ROSTER_DATA/app.env"; then
+  printf 'TOTP_KEY=%s\n' "$(openssl rand -base64 32)" >>"$ROSTER_DATA/app.env"
+  say "added a TOTP_KEY to $ROSTER_DATA/app.env – keep a copy in your password manager, then: cd $ROSTER_DIR && docker compose up -d --force-recreate app"
+fi
+# the test instance uses the same key: every night the restore test puts a
+# copy of production into it, and with a key of its own no authenticator of
+# that copy could be read there. staging.env's key is replaced if it differs
+# (only staging.env, never app.env).
+app_key=$(grep -E '^TOTP_KEY=.+' "$ROSTER_DATA/app.env" | tail -n 1)
+if [ "$(grep -E '^TOTP_KEY=' "$ROSTER_DATA/staging.env" || true)" != "$app_key" ]; then
+  staged=$(mktemp "$ROSTER_DATA/staging.env.XXXXXX")
+  { grep -Ev '^TOTP_KEY=' "$ROSTER_DATA/staging.env" || true; printf '%s\n' "$app_key"; } >"$staged"
+  chown "$ROSTER_USER:$ROSTER_GID" "$staged"
+  chmod 600 "$staged"
+  mv "$staged" "$ROSTER_DATA/staging.env"
+  say "staging.env now has production's TOTP_KEY; restart the test instance: cd $ROSTER_DIR && docker compose up -d --force-recreate staging"
+fi
+unset app_key
 [ -f "$ROSTER_DATA/secrets/restic.pass" ] || warn "$ROSTER_DATA/secrets/restic.pass is missing – backups will fail (Stufe 1: restic)"
 [ -f "$ROSTER_DATA/backups/restic/config" ] || warn "no restic repository in $ROSTER_DATA/backups/restic – run: restic init -r $ROSTER_DATA/backups/restic --password-file $ROSTER_DATA/secrets/restic.pass"
 
