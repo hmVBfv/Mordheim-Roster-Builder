@@ -22,6 +22,8 @@ import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import { ConflictBanner } from '../sync/ConflictBanner.tsx';
 import { removeWarband } from '../sync/local.ts';
+import { makeCopy } from '../sync/versions.ts';
+import { FLAVOUR } from '../flavour.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
@@ -278,6 +280,11 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <Link to={`/warbands/${rec.id}/export`} className={ui.buttonQuiet}>Export…</Link>
+        {FLAVOUR === 'campaign' && rec.ownerId && <Link to={`/warbands/${rec.id}/versions`} className={ui.buttonQuiet}>Versions{rec.serverRev ? ` · ${rec.serverRev}` : ''}</Link>}
+        <button type="button" className={ui.buttonQuiet}
+          onClick={() => { void makeCopy(rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }}>
+          Make a copy
+        </button>
         <button type="button" className={ui.buttonQuiet}
           onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
           {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}

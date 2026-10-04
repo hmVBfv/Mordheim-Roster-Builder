@@ -150,7 +150,11 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
       if (w.serverRev === undefined) {
         const sent = w.updatedAt;
         try {
-          await api('/warbands', { body: { id: w.id, data: writeSave(data, w, deps.appVersion), source: w.origin ?? 'save', ...(w.origin === 'copy' && w.copiedFrom ? { copiedFrom: w.copiedFrom } : {}), appVersion: deps.appVersion ?? '' } });
+          // a copy names its source on the server only if that source is there and the account's own
+          const copy = w.origin === 'copy' && w.copiedFrom ? await db.warbands.get(w.copiedFrom.id) : undefined;
+          const asCopy = !!copy && copy.ownerId === deps.userId && copy.serverRev !== undefined;
+          const source = w.origin === 'copy' ? (asCopy ? 'copy' : 'save') : (w.origin ?? 'save');
+          await api('/warbands', { body: { id: w.id, data: writeSave(data, w, deps.appVersion), source, ...(asCopy ? { copiedFrom: w.copiedFrom } : {}), appVersion: deps.appVersion ?? '' } });
           await db.warbands.update(w.id, { serverRev: 1, syncedAt: sent, draftSeq: null });
         } catch (e) {
           if (!(e instanceof ApiError && e.code === 'exists')) throw e;

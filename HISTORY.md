@@ -2127,3 +2127,25 @@ with the entry, made the bundler split the store into a chunk of its own.
 The measurement dropped by 16 KB while the page loaded the same. Now a
 small script reads what index.html actually loads and adds it up: 124 KB of
 the 200 allowed.
+
+## October 4, 2026 (cont.) — versions, copies, and the way from the Quick Build
+
+With the sync in place, versions became what ADR 0003 meant them to be:
+marks made on purpose. Every change is kept as a draft anyway, so a version
+is the state worth keeping – before a battle, after the post-battle
+sequence – with a note. Bringing back an older one does not rewrite
+anything; it becomes the newest as a new version, and the history shows
+what happened.
+
+Rob's blueprint idea is a button on every roster: Make a copy. The copy is
+a warband of its own and, in the account, remembers which warband and
+version it came from, so a campaign started from a blueprint can always
+say where it began. A copy can also start from any older version.
+
+The Quick Build got the way to the server the concept sketched: its address
+once under More, then "Send to campaign server" on the Export screen opens
+the campaign app with the warband compressed into the link's fragment.
+Nothing passes through a server on the way, and the campaign app takes the
+fragment out of the address bar before anything else, shows the warband,
+and adds it as a new one or as the next version of one of the player's own.
+

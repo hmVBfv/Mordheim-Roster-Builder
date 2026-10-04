@@ -7,6 +7,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { AppRoutes } from '../app/App.tsx';
 import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
+import { stopSync } from '../sync/runner.ts';
 import { resetSession } from './session.ts';
 import { ADMIN, fakeServer, ME } from './testServer.ts';
 
@@ -14,7 +15,7 @@ const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><AppRo
 
 beforeAll(loadScreens, SCREENS_MS);
 beforeAll(polyfillDialog);
-afterEach(() => { cleanup(); resetSession(); localStorage.clear(); });
+afterEach(() => { cleanup(); stopSync(); resetSession(); localStorage.clear(); });
 
 describe('signing in', () => {
   it('password, then the authenticator’s code, then the account', async () => {

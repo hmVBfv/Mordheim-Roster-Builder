@@ -21,6 +21,9 @@ const HouseRules = lazy(() => import('../routes/HouseRules.tsx').then((m) => ({ 
 const SignIn = lazy(() => import('../account/SignIn.tsx').then((m) => ({ default: m.SignIn })));
 const LinkAccept = lazy(() => import('../account/LinkAccept.tsx').then((m) => ({ default: m.LinkAccept })));
 const Admin = lazy(() => import('../account/Admin.tsx').then((m) => ({ default: m.Admin })));
+// warbands on the server (phase 3h)
+const Versions = lazy(() => import('../routes/Versions.tsx').then((m) => ({ default: m.Versions })));
+const ImportLink = lazy(() => import('../routes/ImportLink.tsx').then((m) => ({ default: m.ImportLink })));
 
 export function AppRoutes() {
   return (
@@ -42,6 +45,8 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/reset" element={<LinkAccept />} />}
           {FLAVOUR === 'campaign' && <Route path="/admin" element={<Admin />} />}
           {FLAVOUR === 'campaign' && <Route path="/admin/:tab" element={<Admin />} />}
+          {FLAVOUR === 'campaign' && <Route path="/warbands/:id/versions" element={<Versions />} />}
+          {FLAVOUR === 'campaign' && <Route path="/import" element={<ImportLink />} />}
           <Route path="/more" element={<More />} />
           <Route path="*" element={<Placeholder title="Not found" text="There is nothing at this address." />} />
         </Routes>

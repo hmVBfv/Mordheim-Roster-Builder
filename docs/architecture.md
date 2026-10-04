@@ -315,6 +315,21 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
 - **Kopfzeile:** „Saved and synced“, „n waiting“ (auch offline, auf dem
   Gerät gezählt), „Check“ bei einem Konflikt, „Not synced“ bei einem Fehler;
   ohne Anmeldung wie bisher „Saved on this device“.
+- **Versionen** (`/warbands/:id/versions`) entstehen nur bewusst: „Save a
+  version“ mit Notiz; eine ältere wird als neue Version wieder die neueste
+  (`source: 'restore'`), nichts in der Geschichte ändert sich. Wurde
+  inzwischen anderswo gespeichert (409 `stale`): die neuere nehmen oder den
+  eigenen Stand als Kopie behalten.
+- **Kopie** („Make a copy“, auch offline und im Quick Build): eine neue
+  Warband mit eigener UUID; im Konto merkt sie sich Warband und Version, aus
+  der sie kam (`copied_from`), sofern diese dem Konto gehört und auf dem
+  Server liegt.
+- **„Send to campaign server“** (Quick Build, concept.md 4.11): die Adresse
+  steht unter More; Export öffnet `https://<server>/import#v1.<Warband>`
+  (JSON, `deflate-raw`, base64url, `app/src/share/link.ts`). Die
+  Kampagnen-App nimmt das Fragment sofort aus der Adresszeile, zeigt die
+  Warband und legt sie als neue an oder als nächste Version einer eigenen
+  (`source: 'import'`).
 | Notizen | gehören ihrem Autor; letzte Fassung gewinnt, frühere bleiben als Revision |
 | Schlachtprotokoll | nur der Leiter schreibt; Spieler schicken Korrekturvorschläge |
 | Zeitleisten-Position | letzte Verschiebung gewinnt, jede wird geloggt |

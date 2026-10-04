@@ -139,3 +139,37 @@ test('offline the changes wait on the device and go up when it is back', async (
   await page.evaluate(() => window.dispatchEvent(new Event('online')));
   await expect.poll(() => srv.state.warbands.get(id)!.draft?.data as { name?: string } | undefined, { timeout: 15000 }).toMatchObject({ name: 'Renamed offline' });
 });
+
+test('versions: one saved with a note, an older one brought back; a copy as a blueprint', async ({ page }) => {
+  const srv = await playServer(page);
+  const id = serverWarband(srv, 'The Ardent Caravan');
+  await page.goto(`warbands/${id}`);
+  await expect(page.getByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeVisible();
+  await page.getByRole('link', { name: /^Versions/ }).click();
+  await page.getByLabel('A note for this version (optional)').fill('before the battle at the Docks');
+  await page.getByRole('button', { name: 'Save a version' }).click();
+  await expect(page.getByText('Version 2 saved.')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Versions' }).getByText('“before the battle at the Docks”', { exact: false })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'versions');
+  await page.getByRole('button', { name: 'Version 1: what to do' }).click();
+  await shot(page, 'versions-sheet');
+  await page.getByRole('dialog', { name: 'Version 1' }).getByRole('button', { name: 'Make a copy' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Ardent Caravan (copy)' })).toBeVisible();
+  await expect.poll(() => [...srv.state.warbands.values()].find((w) => w.copiedFrom)?.copiedFrom, { timeout: 8000 }).toEqual({ id, rev: 1 });
+});
+
+test('a warband sent from the Quick Build arrives through its link', async ({ page }) => {
+  const srv = await playServer(page);
+  const { encodeSave } = await import('../src/share/link.ts');
+  const fragment = await encodeSave({ ...SAVE, name: 'Planned at lunch' });
+  await page.goto(`import#${fragment}`);
+  await expect(page.getByRole('heading', { level: 2, name: 'Planned at lunch' })).toBeVisible();
+  expect(new URL(page.url()).hash).toBe('');
+  await noSideScroll(page);
+  await shot(page, 'import-link');
+  await page.getByRole('button', { name: 'Add as a new warband' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Planned at lunch' })).toBeVisible();
+  await expect.poll(() => [...srv.state.warbands.values()].map((w) => w.versions[0]!.source), { timeout: 8000 }).toEqual(['import']);
+});
