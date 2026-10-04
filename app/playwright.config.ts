@@ -22,7 +22,8 @@ export default defineConfig({
   use: { viewport: { width: 360, height: 740 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true, launchOptions },
   projects: [
     { name: 'campaign', testIgnore: /legacy|mockups/, use: { baseURL: 'http://localhost:4173/' } },
-    { name: 'quickbuild', testIgnore: /legacy|mockups/, use: { baseURL: 'http://localhost:4174/' } },
+    // accounts are the campaign app's (account.spec.ts); app.spec.ts checks the Quick Build has none
+    { name: 'quickbuild', testIgnore: /legacy|mockups|account/, use: { baseURL: 'http://localhost:4174/' } },
     // the legacy Roster Builder (repo root), still live until phase 3
     { name: 'legacy', testMatch: /legacy\.spec\.ts/, use: { baseURL: 'http://127.0.0.1:4175/' } },
     // the mockups of the new app (docs/mockups/), from the same server
