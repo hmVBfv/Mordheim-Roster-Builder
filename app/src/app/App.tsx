@@ -24,6 +24,10 @@ const Admin = lazy(() => import('../account/Admin.tsx').then((m) => ({ default: 
 // warbands on the server (phase 3h)
 const Versions = lazy(() => import('../routes/Versions.tsx').then((m) => ({ default: m.Versions })));
 const ImportLink = lazy(() => import('../routes/ImportLink.tsx').then((m) => ({ default: m.ImportLink })));
+// campaigns (phase 4a)
+const Campaigns = lazy(() => import('../campaign/Campaigns.tsx').then((m) => ({ default: m.Campaigns })));
+const Campaign = lazy(() => import('../campaign/Campaign.tsx').then((m) => ({ default: m.Campaign })));
+const CampaignWarband = lazy(() => import('../campaign/CampaignWarband.tsx').then((m) => ({ default: m.CampaignWarband })));
 
 export function AppRoutes() {
   return (
@@ -38,7 +42,10 @@ export function AppRoutes() {
           <Route path="/warbands/:id/trade" element={<TradingPost />} />
           <Route path="/warbands/:id/hire" element={<Hire />} />
           <Route path="/warbands/:id/house" element={<HouseRules />} />
-          {FLAVOUR === 'campaign' && <Route path="/campaign" element={<Placeholder title="Campaign" text="Campaigns, battles and the map arrive with the campaign server." />} />}
+          {FLAVOUR === 'campaign' && <Route path="/campaign" element={<Campaigns />} />}
+          {FLAVOUR === 'campaign' && <Route path="/campaign/:id" element={<Campaign />} />}
+          {FLAVOUR === 'campaign' && <Route path="/campaign/:id/warbands/:wid" element={<CampaignWarband />} />}
+          {FLAVOUR === 'campaign' && <Route path="/campaign/:id/:tab" element={<Campaign />} />}
           {FLAVOUR === 'campaign' && <Route path="/notes" element={<Placeholder title="Notes" text="Notes, quotes and the timeline arrive with the campaign server." />} />}
           {FLAVOUR === 'campaign' && <Route path="/sign-in" element={<SignIn />} />}
           {FLAVOUR === 'campaign' && <Route path="/invite" element={<LinkAccept />} />}

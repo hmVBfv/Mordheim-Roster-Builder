@@ -2185,3 +2185,34 @@ told the player to check the time on their phone. Different errors now.
 
 Rob also asked for a dedicated security review before the first real game
 night – from outside and signed in. It is on the roadmap after 4a.
+
+## October 5, 2026 (cont.) — the campaign arrives on the server
+
+Phase 4a is the one the whole project was for: the next real game night
+should run entirely in the new system. It is cut into five steps, each its
+own pull request; the first brings the campaign itself. Someone with the
+authenticator starts one and leads it; a leader adds the other players and
+gives them roles; a player enters a warband. Entering is always a copy –
+Rob's blueprint idea from the day before, now used as the concept meant
+it: the free warband stays as it is, the copy belongs to the campaign. A
+leader confirms it, and its latest version is marked "start".
+
+That mark is the first place where the server computes rules. ADR 0005
+said the client computes and the server keeps – except for the binding
+comparison when a warband is marked, so that a history can never be
+rewritten by a client. The totals frozen in the "start" tag are therefore
+computed on the server with the same core code as in the app, and the
+rules data is bundled into the server so the image needs no data
+directory. The overview shows those frozen numbers; reading a warband
+computes the rest on the device, as before.
+
+Every member reads every warband entered, including the player's changes
+since the last version: the mechanics are open to all (ADR 0002). Someone
+outside the campaign gets a 404 for all of it, the admin included, and the
+leak matrix now has campaign roles – the test user is a player in one
+campaign the admin is not part of, and in one the admin leads.
+
+On the way, the leaving sheet lost its notice in the browser test though
+not in the unit test: freeing the warband re-rendered the roster before
+the sheet had closed, and the sheet that should have shown the notice was
+already gone. It closes first now.

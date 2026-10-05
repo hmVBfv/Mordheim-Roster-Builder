@@ -27,6 +27,7 @@ import { ShareSheet } from '../share/ShareSheet.tsx';
 import { useSession } from '../account/session.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import { FLAVOUR } from '../flavour.ts';
+import { InCampaign } from '../campaign/InCampaign.tsx';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
@@ -291,10 +292,15 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           Make a copy
         </button>
         {FLAVOUR === 'campaign' && session.status === 'in' && <ShareSheet data={data} rec={rec} state={ed.state} onNotice={notify} />}
-        <button type="button" className={ui.buttonQuiet}
-          onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
-          {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}
-        </button>
+        {/* entered in a campaign: it leaves the campaign before it can be removed */}
+        {FLAVOUR === 'campaign' && rec.campaignId
+          ? <InCampaign rec={rec} onNotice={notify} />
+          : (
+            <button type="button" className={ui.buttonQuiet}
+              onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
+              {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}
+            </button>
+          )}
       </div>
 
       <MenuSheet dialogRef={menuRef} close={closeMenu} title={menuOf.title} items={menuOf.items} />

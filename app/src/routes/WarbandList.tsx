@@ -13,6 +13,7 @@ export function WarbandList({ warbands, marks = false }: { warbands: StoredWarba
             <small>
               {w.wbName}
               {marks && !w.ownerId && ' · only on this device'}
+              {w.campaignId && ' · in a campaign'}
               {w.conflict && <strong className={ui.error}> · changed elsewhere too – check</strong>}
             </small>
           </Link>
