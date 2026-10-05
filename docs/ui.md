@@ -46,7 +46,8 @@ Warband      Roster · Story · Versions · Share…
 Campaign     Overview · Notes · Timeline · Chronicle · World
              · Background* · Manage*   (4a1: Overview und Manage;
              mehrere Kampagnen: erst die Liste, eine: gleich sie)
-Game night   Vollbild, aus einer Schlacht heraus
+Game night   Vollbild, aus einer Schlacht heraus (4a2: /campaign/:id/battles/:bid,
+             auf dem Handy ohne die Leiste unten)
 Profile      Devices · Authenticator · Password
 Admin*       Users · Invites · Bugs · Backups
 Report a problem   überall erreichbar
