@@ -44,7 +44,8 @@ unverändert auf Pages.
 Home         Open for you · Warbands · Campaigns
 Warband      Roster · Story · Versions · Share…
 Campaign     Overview · Notes · Timeline · Chronicle · World
-             · Background* · Manage*
+             · Background* · Manage*   (4a1: Overview und Manage;
+             mehrere Kampagnen: erst die Liste, eine: gleich sie)
 Game night   Vollbild, aus einer Schlacht heraus
 Profile      Devices · Authenticator · Password
 Admin*       Users · Invites · Bugs · Backups

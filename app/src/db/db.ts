@@ -37,6 +37,8 @@ export interface StoredWarband {
   restore?: boolean;
   /** Changed on another device as well: the player decides (src/sync/conflict.ts). */
   conflict?: SyncConflict;
+  /** The campaign it is entered in (phase 4a), as the server says; absent or null: free. */
+  campaignId?: string | null;
 }
 
 export type SyncConflict =

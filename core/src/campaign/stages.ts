@@ -19,6 +19,15 @@ const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 export interface StageTotals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
 export interface StageSnapshot { round: number; at: string; state: WarbandState; totals: StageTotals }
 
+/** The totals of a warband as they stand now, as a stage snapshot freezes
+    them – and, on the campaign server, a tag (ADR 0003). */
+export function stageTotals(ctx: Ctx): StageTotals {
+  return {
+    rating: totalRating(ctx), spent: totalSpent(ctx), models: totalModels(ctx),
+    heroes: totalHeroes(ctx), gold: goldCurrent(ctx), fallen: (ctx.s.fallen ?? []).length,
+  };
+}
+
 export function stageSnapshots(ctx: Ctx): Record<string, StageSnapshot> {
   const s = camp(ctx).snapshots;
   return (s && typeof s === 'object' ? s : {}) as Record<string, StageSnapshot>;
@@ -140,10 +149,7 @@ function snapshotStageOn(d: WarbandDraft, c: Ctx, round: unknown, today: string)
     round: Number(round) || 0,
     at: today,
     state: st,
-    totals: {
-      rating: totalRating(c), spent: totalSpent(c), models: totalModels(c),
-      heroes: totalHeroes(c), gold: goldCurrent(c), fallen: (d.fallen ?? []).length,
-    },
+    totals: stageTotals(c),
   };
   (camp.snapshots as Record<string, unknown>)[String(round)] = snap;
   return snap;

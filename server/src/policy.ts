@@ -16,7 +16,17 @@
    handler has loaded the warband, `can(actor, action, warband)` again – only
    its owner gets through; everyone else is told it does not exist (404).
    Not even the admin sees another's warband (concept.md: no special access
-   to content). Campaign roles join in phase 4a. */
+   to content).
+
+   Phase 4a brings campaigns. A campaign action names what the actor must be
+   in it – a member (leader, player or viewer), a player (leader or player),
+   or a leader – and the handler asks `can(actor, action, { role })` with the
+   actor's role there. Someone outside the campaign is told it does not exist
+   (404); a member without the right gets a 403. A leader must have the
+   authenticator set up (ADR 0008), like an admin; so must whoever starts a
+   campaign, as its first leader. */
+
+import type { CampaignRole } from './campaigns.ts';
 
 export interface Actor {
   id: string;
@@ -30,7 +40,9 @@ export interface Actor {
   pending: boolean;
 }
 
-type Who = 'public' | 'pending' | 'user' | 'admin';
+/** totp: signed in with the authenticator set up. */
+type Who = 'public' | 'pending' | 'user' | 'totp' | 'admin';
+type TargetKind = 'owner' | 'member' | 'player' | 'leader';
 
 export const ACTIONS = {
   /** GET /api/v1/health – for roster-deploy, the container healthcheck and roster-alive. */
@@ -75,7 +87,19 @@ export const ACTIONS = {
   'share.answer': { who: 'user', target: 'owner' },
   /** Taking back one's share – its sender only. */
   'share.revoke': { who: 'user', target: 'owner' },
-} as const satisfies Record<string, { who: Who; target?: 'owner' }>;
+  /** One's campaigns. */
+  'campaigns.list': { who: 'user' },
+  /** Starting a campaign, as its first leader – with the authenticator (ADR 0008). */
+  'campaigns.create': { who: 'totp' },
+  /** A campaign: its members, the warbands entered and their state – every member (ADR 0002: mechanics open). */
+  'campaign.read': { who: 'user', target: 'member' },
+  /** A warband entered in the campaign, someone else's included – every member. */
+  'campaign.warband.read': { who: 'user', target: 'member' },
+  /** Entering a warband of one's own, or withdrawing it – leaders and players. */
+  'campaign.enrol': { who: 'user', target: 'player' },
+  /** Name, members and roles, confirming warbands – leaders, with the authenticator. */
+  'campaign.manage': { who: 'user', target: 'leader' },
+} as const satisfies Record<string, { who: Who; target?: TargetKind }>;
 
 export type Action = keyof typeof ACTIONS;
 
@@ -88,16 +112,22 @@ const SELF_CARE: ReadonlySet<Action> = new Set(['auth.me', 'auth.logout', 'auth.
 /** An admin must have the authenticator (ADR 0008). */
 export const mustSetUpTotp = (a: Actor) => a.isAdmin && !a.totp;
 
-/** What an action may be aimed at (phase 3h: a warband). */
-export interface Target { ownerId: string }
+/** What an action may be aimed at: something with an owner (a warband, a
+    share), or a campaign, given as the actor's role in it (null: none). */
+export type Target = { ownerId: string } | { role: CampaignRole | null };
 
-/** can(actor, action[, target]). Without a target an `owner` action only
+/** can(actor, action[, target]). Without a target an action with one only
     asks who is at the door; the handler asks again with the target. */
 export function can(actor: Actor | null, action: Action, target?: Target): boolean {
-  const def: { who: Who; target?: 'owner' } = ACTIONS[action];
+  const def: { who: Who; target?: TargetKind } = ACTIONS[action];
   if (!canAtDoor(actor, def.who, action)) return false;
-  if (target && def.target === 'owner') return actor!.id === target.ownerId;
-  return true;
+  if (!target || !def.target) return true;
+  if (def.target === 'owner') return 'ownerId' in target && actor!.id === target.ownerId;
+  const role = 'role' in target ? target.role : null;
+  if (!role) return false;
+  if (def.target === 'member') return true;
+  if (def.target === 'player') return role === 'leader' || role === 'player';
+  return role === 'leader' && actor!.totp;
 }
 
 function canAtDoor(actor: Actor | null, who: Who, action: Action): boolean {
@@ -107,5 +137,6 @@ function canAtDoor(actor: Actor | null, who: Who, action: Action): boolean {
   if (actor.pending) return false;
   if (mustSetUpTotp(actor) && !SELF_CARE.has(action)) return false;
   if (who === 'user') return true;
+  if (who === 'totp') return actor.totp;
   return actor.isAdmin;
 }
