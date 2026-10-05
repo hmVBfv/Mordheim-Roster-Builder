@@ -5,16 +5,35 @@
    bring it a moment later). */
 import * as core from '@mordheim/core';
 import type { GameData } from '@mordheim/core';
-import { api } from '../account/api.ts';
+import { api, ApiError } from '../account/api.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { readSave } from '../sync/engine.ts';
 import { currentUserId } from '../sync/local.ts';
 import type { CampaignView } from './api.ts';
 
+/** A warband made on this device goes to the account first, so the campaign's copy can name it as its source. */
+async function onServer(data: GameData, rec: StoredWarband): Promise<StoredWarband> {
+  if (rec.serverRev !== undefined || !rec.ownerId) return rec;
+  const sent = rec.updatedAt;
+  try {
+    await api('/warbands', { body: { id: rec.id, data: core.writeSave(core.ctxOf(data, rec.state), __APP_VERSION__), source: rec.origin === 'copy' ? 'save' : (rec.origin ?? 'save'), appVersion: __APP_VERSION__ } });
+  } catch (e) {
+    // the sync sent it a moment ago: the same warband, already there
+    if (!(e instanceof ApiError && e.code === 'exists')) throw e;
+    const there = await api<{ warband: { headRev: number } }>(`/warbands/${rec.id}`).catch(() => null);
+    if (!there) return rec;
+    await db.warbands.update(rec.id, { serverRev: there.warband.headRev });
+    return { ...rec, serverRev: there.warband.headRev };
+  }
+  await db.warbands.update(rec.id, { serverRev: 1, syncedAt: sent, draftSeq: null });
+  return { ...rec, serverRev: 1 };
+}
+
 interface Entered { enrolmentId: string; warband: { id: string; createdAt: string; campaignId: string | null }; head: { rev: number; data: unknown }; campaign: CampaignView }
 
-export async function enterWarband(data: GameData, campaignId: string, rec: StoredWarband): Promise<{ id: string; campaign: CampaignView }> {
+export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband): Promise<{ id: string; campaign: CampaignView }> {
+  const rec = await onServer(data, from);
   const r = await api<Entered>(`/campaigns/${campaignId}/enrolments`, {
     body: {
       warbandId: newId(), data: core.writeSave(core.ctxOf(data, rec.state), __APP_VERSION__), appVersion: __APP_VERSION__,

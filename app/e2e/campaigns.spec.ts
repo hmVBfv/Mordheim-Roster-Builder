@@ -89,6 +89,30 @@ test('entering a warband: a copy goes in and opens; it can leave again', async (
   await expect(page.getByRole('button', { name: 'Remove the warband' })).toBeVisible();
 });
 
+test('a new warband for the campaign: free under Warbands, its copy entered and opened', async ({ page }) => {
+  const srv = await playServer(page);
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: others.slice(0, 1) });
+  await page.goto(`campaign/${c.id}`);
+  await page.getByRole('button', { name: 'Enter a warband' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Enter a warband' });
+  await expect(sheet).toContainText('None of your warbands is free yet');
+  await tapTargets(page);
+  await shot(page, 'campaign-enter-none');
+  await sheet.getByRole('button', { name: 'New warband for this campaign' }).click();
+  await expect(page.getByText('For The Hel Fenn Campaign:', { exact: false })).toBeVisible();
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
+  await page.getByLabel('Name').fill('The Ardent Caravan');
+  await noSideScroll(page);
+  await shot(page, 'campaign-new-warband');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await expect(page.getByRole('link', { name: 'In The Hel Fenn Campaign' })).toBeVisible();
+  await page.goto('warbands');
+  await expect(page.getByRole('link', { name: /The Ardent Caravan/ })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: /in The Hel Fenn Campaign/ })).toHaveCount(1);
+  await shot(page, 'campaign-new-warband-list');
+});
+
 test('starting a campaign, with the authenticator', async ({ page }) => {
   await playServer(page, true, { totp: true });
   await page.goto('campaign');
