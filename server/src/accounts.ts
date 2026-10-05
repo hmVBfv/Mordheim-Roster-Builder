@@ -198,11 +198,11 @@ export function listAttempts(db: DB, limit: number, beforeId?: number): AttemptS
 
 /* ---- audit log ---- */
 
-export interface AuditEntry { actorId: string | null; action: string; targetType?: string; targetId?: string; visibility?: 'public' | 'sealed' | 'leader' | 'admin'; payload?: unknown }
+export interface AuditEntry { actorId: string | null; action: string; targetType?: string; targetId?: string; campaignId?: string; visibility?: 'public' | 'sealed' | 'leader' | 'admin'; payload?: unknown }
 
 export function audit(db: DB, e: AuditEntry, now: Date): number {
-  const r = db.prepare('INSERT INTO audit_log (at, actor_id, action, target_type, target_id, visibility, payload) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .run(iso(now), e.actorId, e.action, e.targetType ?? null, e.targetId ?? null, e.visibility ?? 'admin', e.payload === undefined ? null : JSON.stringify(e.payload));
+  const r = db.prepare('INSERT INTO audit_log (at, actor_id, action, target_type, target_id, campaign_id, visibility, payload) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(iso(now), e.actorId, e.action, e.targetType ?? null, e.targetId ?? null, e.campaignId ?? null, e.visibility ?? 'admin', e.payload === undefined ? null : JSON.stringify(e.payload));
   return Number(r.lastInsertRowid);
 }
 

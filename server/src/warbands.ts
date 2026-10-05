@@ -18,6 +18,8 @@ export interface WarbandRow {
   id: string; owner_id: string; name: string; wb_type: string; head_rev: number;
   copied_from: string | null; copied_rev: number | null;
   created_at: string; updated_at: string; archived_at: string | null; seq: number;
+  /** The campaign it is entered in (pending or confirmed); null: free. */
+  campaign_id: string | null;
 }
 interface VersionRow { warband_id: string; rev: number; data: string; format: number; app_version: string; source: Source; created_by: string; created_at: string; note: string }
 interface AutosaveRow { warband_id: string; user_id: string; base_rev: number; data: string; device: string; updated_at: string; seq: number }
@@ -28,6 +30,7 @@ export interface WarbandMeta {
   id: string; name: string; wbType: string; headRev: number;
   copiedFrom: { id: string; rev: number } | null;
   createdAt: string; updatedAt: string; archivedAt: string | null;
+  campaignId: string | null;
 }
 export interface Version { rev: number; format: number; appVersion: string; source: Source; createdBy: string | null; createdAt: string; note: string; bytes: number }
 export interface Draft { baseRev: number; data: unknown; device: string; updatedAt: string; seq: number }
@@ -35,7 +38,7 @@ export interface Draft { baseRev: number; data: unknown; device: string; updated
 export const metaOf = (w: WarbandRow): WarbandMeta => ({
   id: w.id, name: w.name, wbType: w.wb_type, headRev: w.head_rev,
   copiedFrom: w.copied_from ? { id: w.copied_from, rev: w.copied_rev ?? 1 } : null,
-  createdAt: w.created_at, updatedAt: w.updated_at, archivedAt: w.archived_at,
+  createdAt: w.created_at, updatedAt: w.updated_at, archivedAt: w.archived_at, campaignId: w.campaign_id,
 });
 const draftOf = (a: AutosaveRow): Draft => ({ baseRev: a.base_rev, data: JSON.parse(a.data) as unknown, device: a.device, updatedAt: a.updated_at, seq: a.seq });
 
