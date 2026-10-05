@@ -2225,3 +2225,28 @@ and its copy goes into the campaign straight away – campaigns stay apart
 from the warbands themselves. The free one is sent to the account first,
 so the copy can name it as its source. With two warbands of the same name
 side by side, the list now says which campaign the copy is in.
+
+## October 5, 2026 (cont.) — the game night
+
+The second step of 4a is the evening itself. A leader sets up the battle –
+who fights, where on the map, a title – and the game night opens: full
+screen on the phone, the turn on top, the protocol as it grows, big
+buttons below. Who went out of action is picked from the real rosters of
+the warbands that fought, henchmen man by man and the Fallen too, the same
+list the Roster Builder's battle form offered; the attacker can also be
+the surroundings, or someone outside every roster. Only a leader writes
+the protocol (ADR 0010). Everyone else sees it within a few seconds and
+can suggest a correction, which the leader takes over or not.
+
+Everything entered goes to an outbox on the device first and is sent from
+there – by the game night every few seconds and by every round of the
+sync. Each entry carries the id the server keeps it under, so an entry
+sent twice after a lost answer is there once, and correcting it is
+sending it again under the same id. A table without a connection loses
+nothing; the header counts what waits.
+
+The first version of the screen had a bug the unit tests found at once:
+its sheets never closed with their result. The sheets hook their dialog
+when the screen first renders, and the screen first rendered "Loading the
+battle…" without any dialog. The game night now mounts once the battle is
+there.

@@ -2,6 +2,7 @@
    A campaign is read from the server; the last answer is kept on the device,
    so the overview still shows offline what it showed last. */
 import { api } from '../account/api.ts';
+import type { BattleSummary } from '../battle/api.ts';
 import { db } from '../db/db.ts';
 
 export type CampaignRole = 'leader' | 'player' | 'viewer';
@@ -18,6 +19,8 @@ export interface CampaignView {
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
+  /** Phase 4a2; absent in a view kept from before it. */
+  battles?: BattleSummary[];
 }
 export interface CampaignWarband {
   warband: { id: string; name: string; wbType: string; headRev: number; campaignId: string | null };

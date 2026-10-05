@@ -140,3 +140,86 @@ test('on a desktop the warbands and the members stand side by side', async ({ pa
   expect(b!.x).toBeGreaterThan(a!.x + 200);
   await shot(page, 'campaign-desktop');
 });
+
+/* The game night (phase 4a2). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the game night: a leader writes the protocol, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    await page.goto(`campaign/${c.id}`);
+    await page.getByRole('button', { name: 'New battle' }).click();
+    const setup = page.getByRole('dialog', { name: 'Battle 1' });
+    await setup.getByLabel('Title (optional)').fill('Hel Fenn ferry');
+    await tapTargets(page);
+    await shot(page, `${theme}-battle-new`);
+    await setup.getByRole('button', { name: 'Start the game night' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Battle 1 · Hel Fenn ferry' })).toBeVisible();
+    await page.getByRole('button', { name: 'Next turn' }).click();
+    await page.getByRole('button', { name: '+ Casualty' }).click();
+    const cas = page.getByRole('dialog', { name: 'Out of action · turn 2' });
+    await cas.getByRole('combobox', { name: 'Warband' }).first().selectOption({ label: 'The Grey Penitents' });
+    await cas.getByRole('combobox', { name: 'Who' }).selectOption({ index: 2 });
+    await cas.getByRole('combobox', { name: 'Warband' }).nth(1).selectOption({ label: 'Clan Skrittle' });
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-battle-casualty`);
+    await cas.getByRole('button', { name: 'Add to the protocol' }).click();
+    await page.getByRole('button', { name: '+ Event' }).click();
+    const ev = page.getByRole('dialog', { name: 'Event · turn 2' });
+    await ev.getByLabel('What happened', { exact: true }).fill('The ferry drifts towards the Stir.');
+    await ev.getByRole('button', { name: 'Add to the protocol' }).click();
+    await expect(page.getByRole('list', { name: 'Protocol' }).getByRole('listitem')).toHaveCount(2);
+    await expect.poll(() => [...srv.state.battles.values()][0]!.entries.length, { timeout: 8000 }).toBe(2);
+    await page.getByLabel('Outcome for The Grey Penitents').selectOption('victory');
+    await expect(page.getByText('Outcome saved.')).toBeVisible();
+    // full screen on the phone: no navigation, the buttons for one hand instead
+    await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-game-night`);
+  });
+}
+
+test('the game night without a connection: entered here, sent when back', async ({ page, context }) => {
+  const srv = await playServer(page, true, { totp: true });
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+  await page.goto(`campaign/${c.id}/battles/${b.id}`);
+  await expect(page.getByRole('heading', { level: 1, name: 'Battle 1 · Hel Fenn ferry' })).toBeVisible();
+  srv.state.down = true;
+  await context.setOffline(true);
+  await page.getByRole('button', { name: '+ Event' }).click();
+  const ev = page.getByRole('dialog', { name: 'Event · turn 1' });
+  await ev.getByLabel('What happened', { exact: true }).fill('A building collapses on the quay.');
+  await ev.getByRole('button', { name: 'Add to the protocol' }).click();
+  await expect(page.getByText('No connection.', { exact: false })).toBeVisible();
+  await expect(page.getByText('⏳ 1 waiting')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Protocol' })).toContainText('on this phone');
+  await noSideScroll(page);
+  await shot(page, 'game-night-offline');
+  srv.state.down = false;
+  await context.setOffline(false);
+  await page.evaluate(() => window.dispatchEvent(new Event('online')));
+  await expect.poll(() => b.entries.length, { timeout: 15000 }).toBe(1);
+  await expect(page.getByText('⏳ 1 waiting')).toBeHidden({ timeout: 10000 });
+});
+
+test('a player at the game night sees the protocol and suggests a correction', async ({ page }) => {
+  const srv = await playServer(page);
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others[0]!, role: 'leader' }, { ...others[1]!, pending: false }] });
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+  srv.entryElsewhere(b.id, { id: '11111111-1111-4111-8111-111111111111', turn: 2, kind: 'event', payload: { text: 'Rain over the Stir.' }, author: 'Anna' });
+  await page.goto(`campaign/${c.id}/battles/${b.id}`);
+  await page.getByRole('list', { name: 'Protocol' }).getByRole('button', { name: 'Suggest a correction' }).click();
+  await page.getByLabel('What should it say?').fill('It was snow, not rain.');
+  await page.getByRole('button', { name: 'Send to the leader' }).click();
+  await expect(page.getByRole('list', { name: 'Corrections' })).toContainText('It was snow, not rain.');
+  await expect.poll(() => b.proposals.length, { timeout: 8000 }).toBe(1);
+  // what another leader's device writes appears within seconds
+  srv.entryElsewhere(b.id, { id: '22222222-2222-4222-8222-222222222222', turn: 3, kind: 'event', payload: { text: 'The ferry drifts.' }, author: 'Anna' });
+  await expect(page.getByRole('list', { name: 'Protocol' })).toContainText('The ferry drifts.', { timeout: 10000 });
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'game-night-player');
+});
