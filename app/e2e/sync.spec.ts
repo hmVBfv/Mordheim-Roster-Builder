@@ -2,14 +2,9 @@
    campaign app, against the stand-in server of the Vitest suites
    (src/sync/fakeSync.ts) played by the browser itself. Campaign app only
    (playwright.config.ts). */
-import { readFileSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
-import { createFakeSync } from '../src/sync/fakeSync.ts';
+import { expect, test } from '@playwright/test';
 import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
-
-const SAVE = JSON.parse(readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8')) as Record<string, unknown>;
-const KAI = { id: 'u1', username: 'kai', displayName: 'Kai', isAdmin: false, totp: false, mustSetUpTotp: false };
-const T0 = '2026-10-04T10:00:00.000Z';
+import { playServer, SAVE, serverWarband } from './play.ts';
 
 let errors: string[] = [];
 test.beforeEach(({ page }) => {
@@ -23,35 +18,6 @@ test.beforeEach(({ page }) => {
   page.on('pageerror', (e) => errors.push(String(e)));
 });
 test.afterEach(() => { expect(errors, 'console errors').toEqual([]); });
-
-/** The server: signed in as Kai, the warband endpoints from the stand-in. */
-async function playServer(page: Page, signedIn = true) {
-  const f = createFakeSync();
-  let me = signedIn;
-  await page.route('**/api/v1/**', async (route) => {
-    const req = route.request();
-    const url = new URL(req.url());
-    const path = url.pathname.replace(/^\/api\/v1/, '');
-    if (f.state.down) return route.abort('internetdisconnected');
-    if (path === '/auth/me') return route.fulfill({ json: { user: me ? KAI : null, pending: false } });
-    if (path === '/auth/sessions') return route.fulfill({ json: { sessions: [] } });
-    f.state.calls.push(`${req.method()} ${path}`);
-    const res = f.handle(req.method(), path, url.searchParams, (req.postDataJSON() ?? {}) as Record<string, unknown>);
-    return route.fulfill({ status: res.status, headers: { 'content-type': 'application/json' }, body: await res.text() });
-  });
-  return { ...f, signIn: () => { me = true; } };
-}
-
-function serverWarband(f: ReturnType<typeof createFakeSync>, name: string, draft?: { name: string; device: string }) {
-  const id = crypto.randomUUID();
-  const seq = ++f.state.seq;
-  f.state.warbands.set(id, {
-    id, headRev: 1, versions: [{ rev: 1, data: { ...SAVE, name }, createdAt: T0, source: 'save' }], archivedAt: null, seq,
-    draft: draft ? { baseRev: 1, data: { ...SAVE, name: draft.name }, device: draft.device, updatedAt: T0, seq: ++f.state.seq } : null,
-    copiedFrom: null, createdAt: T0,
-  });
-  return id;
-}
 
 test('the account’s warbands come to a new device; a change here goes up as the draft', async ({ page }) => {
   const srv = await playServer(page);

@@ -152,6 +152,20 @@ prüft das in jedem Endpunkt einer Warband; die Leak-Matrix probiert jeden mit
 einer fremden Warband. Mit der Einschreibung in eine Kampagne (4a) wird die
 eingetragene Kopie für deren Mitglieder lesbar (ADR 0002).
 
+**Kampagnen (Phase 4a1):** Wer nicht Mitglied ist, für den gibt es die
+Kampagne nicht (404) – auch für den Admin. Ein Mitglied ohne das nötige
+Recht bekommt 403. `can()` bekommt die Rolle des Handelnden in der Kampagne:
+`campaign.read` und `campaign.warband.read` jedes Mitglied (auch Zuschauer;
+die Mechanik ist offen, ADR 0002, also auch der Entwurf seit der letzten
+Version), `campaign.enrol` Leiter und Spieler (zurückziehen nur die eigene,
+ein Leiter jede), `campaign.manage` nur Leiter mit Authenticator. Eine
+Kampagne anlegen darf nur, wer den Authenticator eingerichtet hat – er wird
+ihr erster Leiter. Ob ein Mitglied den Authenticator hat, sehen nur Leiter
+(`canLead`). Eine eingetragene Warband bleibt die ihres Besitzers: Über
+`/warbands/:id` liest und ändert sie nur er; die anderen lesen sie über die
+Kampagne. Jede Kampagnen-Aktion steht mit `campaign_id` und Sichtbarkeit
+`public` im `audit_log`.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,
@@ -190,8 +204,12 @@ angemeldet, Admin; jede Route hat eine Probe-Anfrage, die jede Rolle schickt.
 Nicht vorgesehene Rollen werden mit 401/403 und nichts als dem Fehler
 abgewiesen, vorgesehene kommen durch, und eine erfolgreiche Antwort trägt nur
 die erlaubten Felder. Keine Antwort enthält irgendwo einen Passwort- oder
-Token-Hash oder ein verschlüsseltes Geheimnis. Kampagnenrollen und
-Sichtbarkeit kommen mit 3h/4a dazu.
+Token-Hash oder ein verschlüsseltes Geheimnis. Seit 3h gehören Warbands
+der Rolle „angemeldet“ (für alle anderen 404); seit 4a1 ist sie Spielerin in
+einer Kampagne ohne den Admin und in einer, die der Admin leitet – jede
+Kampagnen-Aktion probieren also ein Mitglied, ein Mitglied ohne das Recht
+(403) und ein Außenstehender (404). Die Sichtbarkeit verborgener Inhalte
+kommt mit Notizen und Hintergrund dazu.
 
 ## 5. Daten
 

@@ -30,7 +30,7 @@ const STEP_WORD = { base: 'before his start', on: 'reached', next: 'next', open:
    experience dashed, those reached filled, the next one marked – as the
    Roster Builder draws it. The state is also in words for screen readers.
    The stepper beside it sets the experience one point at a time. */
-function XpTrack({ xp, who, group, onStep, onSet }: { xp: XpView; who: string; group: boolean; onStep: (delta: number) => void; onSet: () => void }) {
+function XpTrack({ xp, who, group, onStep, onSet }: { xp: XpView; who: string; group: boolean; onStep?: (delta: number) => void; onSet?: () => void }) {
   return (
     <div className={styles.xp}>
       <ol className={styles.steps} aria-label="Experience steps">
@@ -41,13 +41,15 @@ function XpTrack({ xp, who, group, onStep, onSet }: { xp: XpView; who: string; g
         ))}
       </ol>
       <div className={styles.xpLine}>
-        <span className={styles.stepper}>
-          <button type="button" aria-label={`One experience less for ${who}`} disabled={xp.value <= xp.min} onClick={() => onStep(-1)}>−</button>
-          <button type="button" className={styles.xpValue} aria-label={`Experience of ${who}: ${xp.value}. Set it`} onClick={onSet}>
-            <span aria-live="polite" aria-atomic="true">Exp <b>{xp.value}</b>{group ? ' (group)' : ''}</span>
-          </button>
-          <button type="button" aria-label={`One experience more for ${who}`} disabled={xp.max != null && xp.value >= xp.max} onClick={() => onStep(1)}>+</button>
-        </span>
+        {onStep && onSet ? (
+          <span className={styles.stepper}>
+            <button type="button" aria-label={`One experience less for ${who}`} disabled={xp.value <= xp.min} onClick={() => onStep(-1)}>−</button>
+            <button type="button" className={styles.xpValue} aria-label={`Experience of ${who}: ${xp.value}. Set it`} onClick={onSet}>
+              <span aria-live="polite" aria-atomic="true">Exp <b>{xp.value}</b>{group ? ' (group)' : ''}</span>
+            </button>
+            <button type="button" aria-label={`One experience more for ${who}`} disabled={xp.max != null && xp.value >= xp.max} onClick={() => onStep(1)}>+</button>
+          </span>
+        ) : <span>Exp <b>{xp.value}</b>{group ? ' (group)' : ''}</span>}
         <span>{xp.next != null ? `next advance at ${xp.next}` : 'all steps reached'}</span>
       </div>
     </div>
@@ -65,14 +67,14 @@ function Line({ label, items }: { label: string; items: Fact[] }) {
   );
 }
 
-function Head({ name, count, type, onMore, children }: { name: string; count?: number; type: string | null; onMore: () => void; children?: ReactNode }) {
+function Head({ name, count, type, onMore, children }: { name: string; count?: number; type: string | null; onMore?: () => void; children?: ReactNode }) {
   return (
     <header className={styles.head}>
       <div>
         <h3>{name}{count != null && <span className={styles.count}> ×{count}</span>}</h3>
         {type && <p className={ui.muted}>{type}</p>}
       </div>
-      <button type="button" className={ui.iconButton} aria-label={`More for ${name}`} onClick={onMore}><MoreIcon /></button>
+      {onMore && <button type="button" className={ui.iconButton} aria-label={`More for ${name}`} onClick={onMore}><MoreIcon /></button>}
       {children}
     </header>
   );
@@ -90,7 +92,8 @@ export interface WarriorActions {
   onCaptive: () => void;
 }
 
-export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
+/** A warrior's card; without `act` only to read (another player's warband, phase 4a). */
+export function Warrior({ w, act }: { w: WarriorView; act?: WarriorActions }) {
   const group = !w.hero;
   const badges = [
     w.leader && <span key="l" className={styles.badge}>Leader</span>,
@@ -102,20 +105,22 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
   ].filter(Boolean);
   return (
     <article className={`${ui.card} ${styles.warrior}`} aria-label={w.name}>
-      <Head name={w.name} count={group ? w.count : undefined} type={group ? (w.name !== w.type ? `${w.type} · group` : 'Henchman group') : w.name !== w.type ? w.type : null} onMore={act.onMore}>
+      <Head name={w.name} count={group ? w.count : undefined} type={group ? (w.name !== w.type ? `${w.type} · group` : 'Henchman group') : w.name !== w.type ? w.type : null} onMore={act?.onMore}>
         {badges.length > 0 && <p className={styles.badges}>{badges}</p>}
       </Head>
       {group && (
         <ul className={styles.men} aria-label={`Men of ${w.name}`}>
           {w.men.map((m) => (
             <li key={m.i}>
-              <button type="button" className={m.named ? undefined : styles.unnamed} aria-label={`${m.name}: name or dismiss`} onClick={() => act.onMan(m.i)}>{m.name}</button>
+              {act
+                ? <button type="button" className={m.named ? undefined : styles.unnamed} aria-label={`${m.name}: name or dismiss`} onClick={() => act.onMan(m.i)}>{m.name}</button>
+                : <span className={m.named ? undefined : styles.unnamed}>{m.name}</span>}
             </li>
           ))}
         </ul>
       )}
       <Stats cells={w.stats} save={w.save} />
-      {w.xp ? <XpTrack xp={w.xp} who={w.name} group={group} onStep={act.onXp} onSet={act.onSetXp} /> : <p className={`${ui.muted} ${styles.xpLine}`}>Gains no experience.</p>}
+      {w.xp ? <XpTrack xp={w.xp} who={w.name} group={group} onStep={act?.onXp} onSet={act?.onSetXp} /> : <p className={`${ui.muted} ${styles.xpLine}`}>Gains no experience.</p>}
       <dl className={styles.facts}>
         <Line label="Rules" items={w.rules} />
         <Line label="Equipment" items={w.equipment} />
@@ -125,7 +130,7 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
         <Line label="Mark" items={w.mark} />
         <Line label="Injuries" items={w.injuries} />
       </dl>
-      <div className={styles.acts}>
+      {act && <div className={styles.acts}>
         <div className={ui.row}>
           {w.xp && <button type="button" className={`${ui.buttonQuiet} ${w.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>}
           {w.addMan && (
@@ -138,27 +143,27 @@ export function Warrior({ w, act }: { w: WarriorView; act: WarriorActions }) {
             : <button type="button" className={ui.buttonQuiet} aria-label={`Captivity of ${w.name}: how it ended`} onClick={act.onCaptive}>Captivity…</button>}
         </div>
         {w.addMan && 'why' in w.addMan && <p className={styles.why}>No more men: {w.addMan.why}.</p>}
-      </div>
+      </div>}
     </article>
   );
 }
 
 export interface HireActions { onMore: () => void; onXp: (delta: number) => void; onSetXp: () => void; onAdvance: () => void; onInjury: () => void }
 
-export function Hire({ h, act }: { h: HireView; act: HireActions }) {
+export function Hire({ h, act }: { h: HireView; act?: HireActions }) {
   return (
     <article className={`${ui.card} ${styles.warrior}`} aria-label={h.name}>
-      <Head name={h.name} type={`${h.kind}${h.name !== h.type ? ` · ${h.type}` : ''}`} onMore={act.onMore}>
+      <Head name={h.name} type={`${h.kind}${h.name !== h.type ? ` · ${h.type}` : ''}`} onMore={act?.onMore}>
         {h.advanceDue && <p className={styles.badges}><span className={`${styles.badge} ${styles.due}`}>Advance due</span></p>}
       </Head>
       <Stats cells={h.stats} />
-      {h.xp && <XpTrack xp={h.xp} who={h.name} group={false} onStep={act.onXp} onSet={act.onSetXp} />}
+      {h.xp && <XpTrack xp={h.xp} who={h.name} group={false} onStep={act?.onXp} onSet={act?.onSetXp} />}
       <dl className={styles.facts}>
         <Line label="Rules" items={h.rules} />
         <Line label="Skills" items={h.skills} />
         <Line label="Spells" items={h.spells} />
       </dl>
-      {h.xp && (
+      {h.xp && act && (
         <div className={styles.acts}>
           <div className={ui.row}>
             <button type="button" className={`${ui.buttonQuiet} ${h.advanceDue ? styles.dueButton : ''}`} onClick={act.onAdvance}>Advance</button>

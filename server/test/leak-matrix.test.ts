@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { ACTIONS, type Action } from '../src/policy.ts';
+import { confirmEnrolment, createCampaign, enrol, setMember } from '../src/campaigns.ts';
 import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
@@ -50,12 +51,25 @@ describe('leak-test matrix', () => {
     const incoming = createShare(s.db, { from: victim.id, to: player.id, warbandId: null, name: 'Sent', wbType: 'reikland', json }, s.clock.now());
     const outgoing = createShare(s.db, { from: player.id, to: victim.id, warbandId: null, name: 'Sent back', wbType: 'reikland', json }, s.clock.now());
     const code = createShare(s.db, { from: victim.id, to: null, warbandId: null, name: 'By code', wbType: 'reikland', json }, s.clock.now());
+    // campaigns: one the victim leads (the player in it, the admin outside), one the admin leads
+    const t0 = s.clock.now();
+    const entry = (c: ReturnType<typeof createCampaign>, playerId: string) => enrol(s.db, { campaign: c, playerId, warbandId: randomUUID(), data: SAVE, json, copiedFrom: null, appVersion: '' }, t0).enrolment;
+    const theirs = createCampaign(s.db, { name: 'The Victim’s Campaign', by: victim.id }, t0);
+    setMember(s.db, theirs.id, player.id, 'player', victim.id, t0);
+    const entered = entry(theirs, victim.id);
+    confirmEnrolment(s.db, theirs, entered, victim.id, t0);
+    const own = entry(theirs, player.id);
+    const led = createCampaign(s.db, { name: 'The Admin’s Campaign', by: admin.id }, t0);
+    setMember(s.db, led.id, player.id, 'player', admin.id, t0);
+    setMember(s.db, led.id, victim.id, 'player', admin.id, t0);
+    const pending: [string, string] = [entry(led, player.id).id, entry(led, player.id).id];
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
       code: () => pendingOne.code(), username: player.username, password: 'correct horse battery',
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
+      campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
@@ -74,8 +88,8 @@ describe('leak-test matrix', () => {
           probes++;
           const where = `${role} ${route} (${action})`;
           const json = (res.headers['content-type'] ?? '').startsWith('application/json') && res.body ? (res.json() as Record<string, unknown>) : null;
-          // someone else's warband does not exist for them: there a 404 is the refusal
-          const owned = (ACTIONS[action] as { target?: string }).target === 'owner';
+          // someone else's warband, or a campaign one is not part of, does not exist for them: there a 404 is the refusal
+          const owned = !!(ACTIONS[action] as { target?: string }).target;
           const denied = ((res.statusCode === 401 || res.statusCode === 403) && DENIED.includes(String(json?.error)))
             || (owned && res.statusCode === 404 && json?.error === 'not_found');
           if (!row.allowed.includes(role)) {

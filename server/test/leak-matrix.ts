@@ -8,7 +8,11 @@
    authenticator secret at rest. A route whose action has no row here, or a
    route without a probe, fails the test. A warband (phase 3h) belongs to
    the "user" role; for anyone else it does not exist (404 counts as turned
-   away). Campaign roles (leader, member) and visibility join in phase 4a. */
+   away). Campaigns (phase 4a): the "user" role is a player in one campaign
+   the "admin" role is not part of, and in one the admin leads – so every
+   campaign action is tried by a member, a member without the right (403)
+   and an outsider (404), the admin included (no special access).
+   Visibility of hidden content joins with notes and the background. */
 import { randomUUID } from 'node:crypto';
 import type { Action } from '../src/policy.ts';
 
@@ -42,10 +46,17 @@ export interface ProbeContext {
   incomingShareId: string;
   outgoingShareId: string;
   shareCode: string;
+  /** A campaign led by the victim, the user role a player in it, the admin outside; the victim's warband entered in it, and the user role's. */
+  campaignId: string;
+  enteredWarbandId: string;
+  ownEnrolmentId: string;
+  /** A campaign the admin leads, the user role a player in it; two of the user role's warbands waiting for the admin. */
+  ledCampaignId: string;
+  pendingEnrolmentIds: [string, string];
 }
 
 export interface Probe {
-  method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   url: string;
   body?: unknown;
 }
@@ -60,6 +71,8 @@ export interface MatrixRow {
 }
 
 const signedIn: Role[] = ['user', 'admin'];
+/** A campaign as its members see it. */
+const VIEW = ['campaign', 'role', 'members', 'enrolments'];
 const same = (roles: Role[], fields: string[]) => Object.fromEntries(roles.map((r) => [r, fields])) as Partial<Record<Role, string[]>>;
 
 export const MATRIX: Record<Action, MatrixRow> = {
@@ -229,6 +242,47 @@ export const MATRIX: Record<Action, MatrixRow> = {
     allowed: ['user'],
     routes: { 'DELETE /api/v1/shares/:id': (c) => ({ method: 'DELETE', url: `/api/v1/shares/${c.outgoingShareId}` }) },
     fields: { user: ['ok'] },
+  },
+  'campaigns.list': {
+    allowed: signedIn,
+    routes: { 'GET /api/v1/campaigns': () => ({ method: 'GET', url: '/api/v1/campaigns' }) },
+    fields: same(signedIn, ['campaigns']),
+  },
+  'campaigns.create': {
+    // the first leader needs the authenticator: the user role has none
+    allowed: ['admin'],
+    routes: { 'POST /api/v1/campaigns': () => ({ method: 'POST', url: '/api/v1/campaigns', body: { name: 'Probing the Hel Fenn' } }) },
+    fields: { admin: VIEW },
+  },
+  'campaign.read': {
+    allowed: ['user'],
+    routes: { 'GET /api/v1/campaigns/:id': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}` }) },
+    fields: { user: VIEW },
+  },
+  'campaign.warband.read': {
+    allowed: ['user'],
+    routes: { 'GET /api/v1/campaigns/:id/warbands/:wid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/warbands/${c.enteredWarbandId}` }) },
+    fields: { user: ['warband', 'player', 'status', 'head', 'draft', 'tags'] },
+  },
+  'campaign.enrol': {
+    allowed: ['user'],
+    routes: {
+      'POST /api/v1/campaigns/:id/enrolments': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.campaignId}/enrolments`, body: { warbandId: randomUUID(), data: c.save } }),
+      'DELETE /api/v1/campaigns/:id/enrolments/:eid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/enrolments/${c.ownEnrolmentId}` }),
+    },
+    fields: { user: [...VIEW, 'enrolmentId', 'warband', 'head'] },
+  },
+  'campaign.manage': {
+    // the user role is a player there (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'PATCH /api/v1/campaigns/:id': (c) => ({ method: 'PATCH', url: `/api/v1/campaigns/${c.ledCampaignId}`, body: { name: 'The Probed Fenn' } }),
+      'PUT /api/v1/campaigns/:id/members/:userId': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/members/${c.victimId}`, body: { role: 'viewer' } }),
+      'DELETE /api/v1/campaigns/:id/members/:userId': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/members/${c.victimId}` }),
+      'POST /api/v1/campaigns/:id/enrolments/:eid/confirm': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[0]}/confirm`, body: {} }),
+      'POST /api/v1/campaigns/:id/enrolments/:eid/decline': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[1]}/decline`, body: {} }),
+    },
+    fields: { admin: [...VIEW, 'left'] },
   },
 };
 

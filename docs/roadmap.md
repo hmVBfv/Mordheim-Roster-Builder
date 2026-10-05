@@ -252,6 +252,17 @@ das Mockup: Rob prüft sie auf der Testinstanz (`roster-deploy --staging`).
 
 **Abnahme:** Der nächste echte Spielabend läuft vollständig im neuen System.
 
+**Schritte (05.10.2026):** jeder ein eigener Pull Request, in dieser
+Reihenfolge, weil jeder auf dem vorigen aufbaut.
+
+| Schritt | Inhalt |
+| --- | --- |
+| 4a1 Kampagnen und Einschreibung | Kampagne anlegen (wer anlegt, leitet; mit Authenticator), Mitglieder und Rollen, Warband eintragen (immer eine Kopie, ein Leiter bestätigt, Tag `start` mit eingefrorenen Kennzahlen, die der Server mit `core` rechnet), Übersicht, fremde Warbands lesen, Verwaltung, eine eingetragene Warband verlässt die Kampagne. **Stand 05.10.2026:** umgesetzt (Migration 5, `server/src/campaigns.ts`, `routes-campaigns.ts`, `app/src/campaign/`). Die Regeldaten stecken im Server-Bundle (`server/src/rules.ts`). Noch nicht: Hausregeln der Kampagne, Einladungslinks mit Kampagne |
+| 4a2 Schlachten und Spielabend | Schlacht anlegen (Runde, Teilnehmer, Szenario, Bezirk), Schlachtprotokoll nur vom Leiter, Korrekturvorschläge, Spielabend-Modus, offline gesammelt und ohne Duplikate gesendet |
+| 4a3 Notizen und Zeitleiste | Notizen mit Art, Erwähnungen und Versiegeln, Bilder, Zeitleiste mit Verschieben; Leak-Matrix mit Sichtbarkeit |
+| 4a4 Nach der Schlacht | Post-Battle-Sequenz in der App, Änderungsvorschau, Tag `after_battle` mit eingefrorenen Änderungen (Server rechnet mit `core`), Schlacht abschließen (versiegelte Notizen öffnen, Sofort-Backup), Runde weiterschalten, Bezirke, Hausregeln der Kampagne |
+| 4a5 Übernahme | die laufende Kampagne aus den Speicherständen: Tags aus den Snapshots (Entscheidung E), Kapitel als Abschnitte der Zeitleiste, Ereignisse; Probelauf auf der Testinstanz |
+
 ## Phase 4b – Erzählung und Leitung
 
 - Erzählung der Warband (Prolog, Zwischenspiele, Erklärungen), Profile mit

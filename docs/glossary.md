@@ -30,6 +30,14 @@ Begriff einführt, trägt ihn hier ein.
 | Version speichern | Save a version | `saveVersion`, `POST /warbands/:id/versions` |
 | ältere Version zurückholen | Bring back (make it the newest) | `restoreVersion`, `source: 'restore'` |
 | Kopie (Blaupause) | Make a copy | `makeCopy`, `origin: 'copy'`, `copiedFrom` |
+| Kampagne anlegen | Start a campaign | `POST /campaigns`, `createCampaign` |
+| Mitglied, Leiter, Spieler, Zuschauer | Member; Leader, Player, Viewer | `members.role` (`leader` · `player` · `viewer`) |
+| Warband eintragen | Enter a warband (Enter a copy) | `POST /campaigns/:id/enrolments`, `enrolments`, `enterWarband` |
+| wartet auf einen Leiter | Waiting for a leader | `enrolments.status = 'pending'` |
+| bestätigen / ablehnen | Confirm / Decline | `confirmEnrolment`, `declineEnrolment` |
+| Kampagne verlassen | Leave the campaign… | `DELETE …/enrolments/:eid`, `withdrawEnrolment`, `status = 'left'` |
+| Verwaltung | Manage | `/campaign/:id/manage`, `campaign.manage` |
+| Gründung (Runde 0) | Setup | `campaigns.round = 0`, `roundName` |
 | Teilen (eine Kopie an andere) | Share… | `ShareSheet`, `warband_shares`, `POST /shares` |
 | Kopie schicken | Send a copy | `sendCopy`, `to_user` |
 | Teilen-Code | Share code | `makeCode`, `code_hash`, `POST /shares/peek`, `POST /shares/redeem` |
