@@ -175,6 +175,17 @@ der Server mit einem Schema (eine Warband darin muss mitgekämpft haben);
 Protokoll und Vorschläge sind öffentlich für die Kampagne und stehen mit
 `campaign_id` im `audit_log`.
 
+**Notizen (Phase 4a3):** Was jemand von einer Notiz bekommt, entscheidet
+`server/src/notes.ts` für den Fragenden: versiegelt – bis die Schlacht
+geschlossen ist – nur der Autor den Text, alle anderen (Leiter und Admin
+eingeschlossen) einen Platzhalter ohne Wörter, Art und Erwähnungen;
+„nur Leiter“ bekommen nur Leiter mit Authenticator, Spieler gar nicht.
+Schreiben Leiter und Spieler (`notes.write`), Zuschauer nicht; eine
+Notiz, die man nicht sehen darf, gibt es beim Löschen nicht (404). Im
+`audit_log` steht nie der Text, und die Einträge tragen die Sichtbarkeit der
+Notiz. Die Leak-Matrix legt eine versiegelte und eine Leiter-Notiz mit
+Merkwörtern an, die in keiner Antwort an irgendeine Rolle vorkommen dürfen.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

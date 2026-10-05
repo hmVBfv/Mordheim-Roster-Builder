@@ -103,6 +103,8 @@ export const ACTIONS = {
   'battle.write': { who: 'user', target: 'leader' },
   /** A correction of the protocol – leaders and players; they see it live and propose (concept.md 4.5). */
   'battle.propose': { who: 'user', target: 'player' },
+  /** Writing one's notes (and a leader correcting another's words) – leaders and players, not viewers. */
+  'notes.write': { who: 'user', target: 'player' },
 } as const satisfies Record<string, { who: Who; target?: TargetKind }>;
 
 export type Action = keyof typeof ACTIONS;

@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { ACTIONS, type Action } from '../src/policy.ts';
 import { createBattle, putEntry, putProposal } from '../src/battles.ts';
 import { confirmEnrolment, createCampaign, enrol, setMember } from '../src/campaigns.ts';
+import { putNote } from '../src/notes.ts';
 import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
@@ -73,6 +74,16 @@ describe('leak-test matrix', () => {
     putEntry(s.db, ledBattle, { id: ledEntryId, turn: 1, kind: 'event', payload: { text: 'Rain.' }, by: admin.id }, t0);
     const ledProposalIds: [string, string] = [randomUUID(), randomUUID()];
     for (const pid of ledProposalIds) putProposal(s.db, ledBattle, { id: pid, entryId: ledEntryId, payload: { text: 'It was snow.' }, by: player.id }, t0);
+    // notes in the victim's campaign: hidden ones the player must never read, and one of the player's own
+    const note = (text: string, visibility: 'public' | 'sealed' | 'leader', by: string, leader: boolean) => {
+      const nid = randomUUID();
+      const r = putNote(s.db, theirs.id, nid, { battleId: battle.id, turn: 1, kind: 'general', text, lang: '', visibility, mentions: [], protocolEntryId: null }, { id: by, leader }, t0);
+      if (!r.ok) throw new Error(r.error);
+      return nid;
+    };
+    note('SEALED-SECRET: the ferryman takes the coin.', 'sealed', victim.id, true);
+    note('LEADER-SECRET: the Countess pays him.', 'leader', victim.id, true);
+    const ownNoteId = note('Rain over the Stir.', 'public', player.id, false);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -80,7 +91,7 @@ describe('leak-test matrix', () => {
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
-      battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id,
+      battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
