@@ -18,6 +18,7 @@ import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { UNDO_MS } from '../ui/UndoToast.tsx';
 import { countPending, isDirty } from './pending.ts';
 
@@ -161,7 +162,7 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
           // the id is taken – by this account (the server knows it already) or by nobody we may see
           const there = await api<{ warband: { headRev: number } }>(`/warbands/${w.id}`).catch(() => null);
           if (there) await db.warbands.update(w.id, { serverRev: there.warband.headRev });
-          else await db.transaction('rw', db.warbands, async () => { await db.warbands.delete(w.id); await db.warbands.add({ ...w, id: crypto.randomUUID() }); });
+          else await db.transaction('rw', db.warbands, async () => { await db.warbands.delete(w.id); await db.warbands.add({ ...w, id: newId() }); });
         }
         pushed++;
         continue;

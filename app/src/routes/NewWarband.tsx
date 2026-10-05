@@ -5,6 +5,7 @@ import { warbandPickerGroups } from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { newOwnership } from '../sync/local.ts';
 import { requestSync } from '../sync/runner.ts';
 import { FORMAT } from '@mordheim/core';
@@ -31,7 +32,7 @@ function Form() {
     const s = createWarband(data, choice.key, subtype?.key ?? null, name);
     const now = new Date().toISOString();
     const rec: StoredWarband = {
-      id: crypto.randomUUID(), name: s.name || choice.name, wb: choice.key, wbName: choice.name,
+      id: newId(), name: s.name || choice.name, wb: choice.key, wbName: choice.name,
       state: s, format: FORMAT, createdAt: now, updatedAt: now, ...newOwnership('save'),
     };
     await db.warbands.add(rec);

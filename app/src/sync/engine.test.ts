@@ -7,6 +7,7 @@
 import { FORMAT, writeSave, ctxOf } from '@mordheim/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { data, sampleSave } from '../test/data.ts';
 import { keepMine, takeTheirs } from './conflict.ts';
 import { isDirty, syncOnce, type SyncDeps } from './engine.ts';
@@ -19,7 +20,7 @@ const T0 = '2026-10-04T10:00:00.000Z';
 
 function record(over: Partial<StoredWarband> = {}): StoredWarband {
   const s = sampleSave();
-  return { id: crypto.randomUUID(), name: s.name!, wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: T0, updatedAt: T0, ownerId: ME, origin: 'save', ...over };
+  return { id: newId(), name: s.name!, wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: T0, updatedAt: T0, ownerId: ME, origin: 'save', ...over };
 }
 /** An edit on this device, as the editor makes it. */
 async function edit(id: string, name: string) {
@@ -53,7 +54,7 @@ describe('sending', () => {
 
   it('only the signed-in user’s warbands; the device’s own and other accounts’ stay', async () => {
     const srv = fakeSyncServer();
-    await db.warbands.bulkAdd([record({ id: crypto.randomUUID(), ownerId: undefined }), record({ id: crypto.randomUUID(), ownerId: 'user-ben' })]);
+    await db.warbands.bulkAdd([record({ id: newId(), ownerId: undefined }), record({ id: newId(), ownerId: 'user-ben' })]);
     await syncOnce(deps());
     expect(srv.state.warbands.size).toBe(0);
   });
@@ -75,7 +76,7 @@ describe('sending', () => {
 describe('taking', () => {
   it('a new device takes the account’s warbands, the draft where there is one', async () => {
     const srv = fakeSyncServer();
-    const id = crypto.randomUUID();
+    const id = newId();
     srv.state.warbands.set(id, { id, headRev: 2, versions: [{ rev: 1, data: saveOf('First'), createdAt: T0, source: 'save' }, { rev: 2, data: saveOf('Second'), createdAt: T0, source: 'save' }], archivedAt: null, seq: 3, draft: { baseRev: 2, data: saveOf('Drafted'), device: 'Laptop', updatedAt: T0, seq: 4 }, copiedFrom: null, createdAt: T0 });
     srv.state.seq = 4;
     expect(await syncOnce(deps())).toMatchObject({ pulled: 1, pushed: 0, waiting: 0 });
@@ -165,8 +166,8 @@ describe('removing', () => {
 
   it('removed on another device: gone here – unless this device has changes, then the player decides', async () => {
     const srv = fakeSyncServer();
-    const a = record({ id: crypto.randomUUID() });
-    const b = record({ id: crypto.randomUUID() });
+    const a = record({ id: newId() });
+    const b = record({ id: newId() });
     await db.warbands.bulkAdd([a, b]);
     await syncOnce(deps());
     for (const w of [a, b]) { const x = srv.state.warbands.get(w.id)!; x.archivedAt = T0; x.seq = ++srv.state.seq; }
@@ -184,8 +185,8 @@ describe('removing', () => {
 describe('after the server was restored from a backup (a new epoch)', () => {
   it('everything anew: what the server lost comes back from this device', async () => {
     const srv = fakeSyncServer();
-    const lost = record({ id: crypto.randomUUID() });
-    const older = record({ id: crypto.randomUUID() });
+    const lost = record({ id: newId() });
+    const older = record({ id: newId() });
     await db.warbands.bulkAdd([lost, older]);
     await syncOnce(deps());
     srv.versionElsewhere(older.id, saveOf('Version 2'));

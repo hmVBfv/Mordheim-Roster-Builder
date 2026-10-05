@@ -7,12 +7,13 @@ import { resetSession, signedIn, signedOut } from '../account/session.ts';
 import { ME as KAI } from '../account/testServer.ts';
 import { syncWords } from '../app/SyncState.tsx';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { sampleSave } from '../test/data.ts';
 import { keepInAccount, newOwnership, removeWarband, restoreWarband, shown } from './local.ts';
 
 const rec = (over: Partial<StoredWarband> = {}): StoredWarband => {
   const s = sampleSave();
-  return { id: crypto.randomUUID(), name: 'W', wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: '2026-10-04T10:00:00Z', updatedAt: '2026-10-04T10:00:00Z', ...over };
+  return { id: newId(), name: 'W', wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: '2026-10-04T10:00:00Z', updatedAt: '2026-10-04T10:00:00Z', ...over };
 };
 
 afterEach(async () => { resetSession(); localStorage.clear(); await db.warbands.clear(); });

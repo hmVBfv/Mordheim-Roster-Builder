@@ -47,7 +47,9 @@ export default tseslint.config(
       'eqeqeq': ['error', 'always', { null: 'ignore' }],
       'no-restricted-syntax': ['error',
         { selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']", message: 'No raw HTML in the app (CLAUDE.md).' },
-        { selector: "MemberExpression[property.name='innerHTML']", message: 'No raw HTML in the app (CLAUDE.md).' }],
+        { selector: "MemberExpression[property.name='innerHTML']", message: 'No raw HTML in the app (CLAUDE.md).' },
+        // only in a secure context; the test instance runs over http (Rob, 05.10.2026)
+        { selector: "CallExpression[callee.object.name='crypto'][callee.property.name='randomUUID']", message: 'Use newId() from src/db/ids.ts: crypto.randomUUID exists only over https.' }],
     },
   },
   {
