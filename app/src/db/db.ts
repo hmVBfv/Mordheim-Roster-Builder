@@ -52,15 +52,35 @@ export type SyncConflict =
 /** Small facts of this device: the sync's cursor, the server's epoch, whose they are. */
 export interface MetaRow { key: string; value: unknown }
 
+/** What waits to be sent to a campaign (phase 4a2): a protocol entry, its
+    removal, a correction – each with the id the server keeps it under, so
+    sending it twice makes it once (ADR 0010). Sent in order of `at`. */
+export interface OutboxItem {
+  /** The record's own id (entry or proposal); a removal waits under `<id>:delete`. */
+  key: string;
+  op: 'entry.put' | 'entry.delete' | 'proposal.put';
+  userId: string;
+  campaignId: string;
+  battleId: string;
+  targetId: string;
+  body: unknown;
+  at: string;
+  /** The server refused it (not just unreachable): kept, shown, not sent again. */
+  refused?: string;
+}
+
 export class MordheimDb extends Dexie {
   warbands!: EntityTable<StoredWarband, 'id'>;
   meta!: EntityTable<MetaRow, 'key'>;
+  outbox!: EntityTable<OutboxItem, 'key'>;
 
   constructor(name = 'mordheim') {
     super(name);
     this.version(1).stores({ warbands: 'id, updatedAt, name' });
     // phase 3h: the sync's own facts; the new fields of a warband need no index
     this.version(2).stores({ warbands: 'id, updatedAt, name', meta: 'key' });
+    // phase 4a2: what the game night gathered and still has to send
+    this.version(3).stores({ warbands: 'id, updatedAt, name', meta: 'key', outbox: 'key, at, battleId' });
   }
 }
 

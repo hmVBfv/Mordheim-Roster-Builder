@@ -17,6 +17,14 @@ export interface FakeWarband {
 }
 
 export type FakeRole = 'leader' | 'player' | 'viewer';
+export interface FakeEntry { id: string; turn: number; kind: 'casualty' | 'event'; payload: unknown; author: string; createdAt: string; updatedAt: string; deleted?: boolean }
+export interface FakeProposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: { text: string }; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
+export interface FakeBattle {
+  id: string; campaignId: string; round: number; title: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
+  participants: { warbandId: string; outcome: string }[];
+  entries: FakeEntry[];
+  proposals: FakeProposal[];
+}
 export interface FakeTotals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
 export interface FakeEnrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
@@ -57,6 +65,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     people: [{ id: 'user-ben', username: 'ben', displayName: 'Ben' }, { id: 'user-rob', username: 'rob', displayName: 'Rob' }] as FakePerson[],
     shares: [] as FakeShare[],
     campaigns: new Map<string, FakeCampaign>(),
+    battles: new Map<string, FakeBattle>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -76,7 +85,118 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
         createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag,
         headRev: s.warbands.get(e.warbandId)?.headRev ?? 1, updatedAt: c.createdAt,
       })),
+      battles: [...s.battles.values()].filter((b) => b.campaignId === c.id).map(battleSummary),
     };
+  };
+
+  /* ---- battles ---- */
+  const nameOf = (warbandId: string) => [...s.campaigns.values()].flatMap((c) => c.enrolments).find((e) => e.warbandId === warbandId);
+  const battleSummary = (b: FakeBattle) => ({ id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: b.participants.map((p) => nameOf(p.warbandId)?.name ?? '').sort(), createdAt: b.createdAt, closedAt: null });
+  const battleView = (b: FakeBattle) => ({
+    battle: { id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: null },
+    seq: b.seq,
+    participants: b.participants.map((p) => {
+      const e = nameOf(p.warbandId)!;
+      return { warbandId: p.warbandId, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, playerId: e.playerId, player: e.player, outcome: p.outcome, revBefore: 1 };
+    }),
+    entries: b.entries.filter((e) => !e.deleted).sort((x, y) => x.turn - y.turn || x.createdAt.localeCompare(y.createdAt)).map((e) => ({ id: e.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt, updatedAt: e.updatedAt })),
+    proposals: b.proposals,
+  });
+  /** A battle in a campaign, of the warbands confirmed there (all of them, unless named). */
+  const addBattle = (campaignId: string, o: { title?: string; warbandIds?: string[]; round?: number } = {}) => {
+    const c = s.campaigns.get(campaignId)!;
+    const b: FakeBattle = {
+      id: `00000000-0000-4000-8000-${String(s.battles.size + 1).padStart(12, '0')}`, campaignId, round: o.round ?? c.round + 1, title: o.title ?? '', district: '', status: 'open', turn: 1, createdAt: at(), seq: next(),
+      participants: (o.warbandIds ?? c.enrolments.filter((e) => e.status === 'active').map((e) => e.warbandId)).map((warbandId) => ({ warbandId, outcome: '' })),
+      entries: [], proposals: [],
+    };
+    s.battles.set(b.id, b);
+    return b;
+  };
+  /** Another leader's device writes an entry. */
+  const entryElsewhere = (bid: string, e: Omit<FakeEntry, 'createdAt' | 'updatedAt'>) => {
+    const b = s.battles.get(bid)!;
+    b.entries.push({ ...e, createdAt: at(), updatedAt: at() });
+    b.seq = next();
+  };
+
+  const battleRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
+    const lead = role === 'leader';
+    if (rest === '/battles') {
+      if (method === 'GET') return json(200, { battles: [...s.battles.values()].filter((b) => b.campaignId === c.id).map(battleSummary) });
+      if (method === 'POST') {
+        if (!lead) return json(403, { error: 'forbidden' });
+        const id = String(body.id);
+        const there = s.battles.get(id);
+        if (there) return json(200, battleView(there));
+        const ws = (body.warbandIds as string[] | undefined) ?? [];
+        if (!ws.length) return json(400, { error: 'invalid', problem: 'a battle needs a warband that fought it' });
+        const b = addBattle(c.id, { title: String(body.title ?? ''), warbandIds: ws });
+        s.battles.delete(b.id);
+        b.id = id;
+        b.district = String(body.district ?? '');
+        s.battles.set(id, b);
+        return json(201, battleView(b));
+      }
+    }
+    const m = rest.match(/^\/battles\/([^/]+)(\/.*)?$/);
+    if (!m) return null;
+    const b = s.battles.get(m[1]!);
+    if (!b || b.campaignId !== c.id) return json(404, { error: 'not_found' });
+    const sub = m[2] ?? '';
+    if (method === 'GET' && sub === '') {
+      const since = query.get('since');
+      return since !== null && Number(since) >= b.seq ? json(200, { unchanged: true, seq: b.seq }) : json(200, battleView(b));
+    }
+    let x: RegExpMatchArray | null;
+    if (method === 'PUT' && (x = sub.match(/^\/proposals\/([^/]+)$/))) {
+      if (role === 'viewer') return json(403, { error: 'forbidden' });
+      const cur = b.proposals.find((p) => p.id === x![1]);
+      if (cur) { if (cur.status !== 'open') return json(409, { error: 'decided' }); cur.payload = { text: String(body.text) }; }
+      else b.proposals.push({ id: x[1]!, targetType: body.entryId ? 'protocol_entry' : 'battle', targetId: String(body.entryId ?? b.id), authorId: me.id, author: me.displayName, payload: { text: String(body.text) }, status: 'open', decidedBy: null, createdAt: at() });
+      b.seq = next();
+      return json(200, { ok: true, seq: b.seq });
+    }
+    if (!lead) return json(403, { error: 'forbidden' });
+    if (b.status === 'closed') return json(409, { error: 'closed' });
+    if (method === 'PATCH' && sub === '') {
+      if (body.turn !== undefined) b.turn = Number(body.turn);
+      if (body.title !== undefined) b.title = String(body.title);
+      for (const [w, o] of Object.entries((body.outcomes as Record<string, string> | undefined) ?? {})) {
+        const p = b.participants.find((q) => q.warbandId === w);
+        if (!p) return json(400, { error: 'invalid', problem: 'an outcome for a warband that did not fight' });
+        p.outcome = o;
+      }
+      b.seq = next();
+      return json(200, battleView(b));
+    }
+    if ((x = sub.match(/^\/protocol\/([^/]+)$/))) {
+      const cur = b.entries.find((e) => e.id === x![1]);
+      if (method === 'PUT') {
+        if (cur?.deleted) return json(409, { error: 'removed' });
+        const e = { turn: Number(body.turn), kind: body.kind as FakeEntry['kind'], payload: body.payload };
+        if (cur) Object.assign(cur, e, { updatedAt: at() });
+        else b.entries.push({ id: x[1]!, ...e, author: me.displayName, createdAt: at(), updatedAt: at() });
+        b.seq = next();
+        return json(200, { entry: battleView(b).entries.find((q) => q.id === x![1]), seq: b.seq });
+      }
+      if (method === 'DELETE') {
+        const removed = !!cur && !cur.deleted;
+        if (cur) cur.deleted = true;
+        b.seq = next();
+        return json(200, { removed, seq: b.seq });
+      }
+    }
+    if (method === 'POST' && (x = sub.match(/^\/proposals\/([^/]+)\/(accept|reject)$/))) {
+      const p = b.proposals.find((q) => q.id === x![1]);
+      if (!p) return json(404, { error: 'not_found' });
+      if (p.status !== 'open') return json(409, { error: 'decided' });
+      p.status = x[2] === 'accept' ? 'accepted' : 'rejected';
+      p.decidedBy = me.displayName;
+      b.seq = next();
+      return json(200, battleView(b));
+    }
+    return json(404, { error: 'not_found' });
   };
   const dataOf = (e: FakeEnrolment) => {
     const w = s.warbands.get(e.warbandId);
@@ -111,7 +231,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     return camp;
   };
 
-  const campaignRoutes = (method: string, path: string, body: Record<string, unknown>): Response | null => {
+  const campaignRoutes = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
     if (path === '/campaigns') {
       if (method === 'GET') {
         return json(200, { campaigns: [...s.campaigns.values()].filter((c) => roleOf(c)).map((c) => ({ id: c.id, name: c.name, round: c.round, role: roleOf(c), members: c.members.length, warbands: c.enrolments.filter((e) => e.status === 'active').length, createdAt: c.createdAt })) });
@@ -130,6 +250,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     const rest = m[2] ?? '';
     const lead = role === 'leader';
     const forbidden = json(403, { error: 'forbidden' });
+    if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
     if (method === 'PATCH' && rest === '') { if (!lead) return forbidden; c.name = String(body.name).trim(); return json(200, view(c)); }
     let x: RegExpMatchArray | null;
@@ -234,7 +355,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
 
   const handle = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown>): Response => {
     let m: RegExpMatchArray | null;
-    if (path.startsWith('/campaigns')) return campaignRoutes(method, path, body) ?? json(404, { error: 'not_found' });
+    if (path.startsWith('/campaigns')) return campaignRoutes(method, path, query, body) ?? json(404, { error: 'not_found' });
     if (method === 'GET' && path === '/people') return json(200, { people: s.people });
     if (method === 'GET' && path === '/shares') {
       return json(200, { incoming: s.shares.filter((x) => x.toId === 'me' && open(x)).map(summary), outgoing: s.shares.filter((x) => x.mine).map(summary) });
@@ -313,5 +434,5 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, entryElsewhere };
 }

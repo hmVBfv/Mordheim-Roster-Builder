@@ -39,6 +39,14 @@ Begriff einführt, trägt ihn hier ein.
 | Kampagne verlassen | Leave the campaign… | `DELETE …/enrolments/:eid`, `withdrawEnrolment`, `status = 'left'` |
 | Verwaltung | Manage | `/campaign/:id/manage`, `campaign.manage` |
 | Gründung (Runde 0) | Setup | `campaigns.round = 0`, `roundName` |
+| Schlacht anlegen | New battle → Start the game night | `POST /campaigns/:id/battles`, `NewBattleSheet` |
+| Spielabend | Game night | `/campaign/:id/battles/:bid`, `Battle.tsx` |
+| Schlachtprotokoll | Protocol | `protocol_entries` |
+| Verlust (aus dem Gefecht) | Casualty, “Out of action” | `kind: 'casualty'` |
+| Ereignis | Event | `kind: 'event'` |
+| Ergebnis | Outcome: Victory, Defeat, Draw, Routed | `battle_participants.outcome` |
+| Korrekturvorschlag | Suggest a correction; Take over / Reject | `proposals` |
+| Postausgang (auf dem Gerät) | “on this phone”, “N waiting” | `db.outbox`, `flushOutbox` |
 | Teilen (eine Kopie an andere) | Share… | `ShareSheet`, `warband_shares`, `POST /shares` |
 | Kopie schicken | Send a copy | `sendCopy`, `to_user` |
 | Teilen-Code | Share code | `makeCode`, `code_hash`, `POST /shares/peek`, `POST /shares/redeem` |
