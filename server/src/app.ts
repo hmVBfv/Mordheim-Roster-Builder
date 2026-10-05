@@ -40,7 +40,7 @@ export interface RegisteredRoute {
 }
 
 export interface AppDeps {
-  config: Pick<Config, 'version'> & Partial<Pick<Config, 'publicOrigin'>>;
+  config: Pick<Config, 'version'> & Partial<Pick<Config, 'publicOrigin' | 'dataDir'>>;
   health: Health;
   /** The database once it is checked and migrated; null keeps every data endpoint closed. */
   db?: DB | null;
@@ -138,7 +138,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerWarbandRoutes(app, { db, now });
   registerShareRoutes(app, { db, now });
   registerCampaignRoutes(app, { db, now });
-  registerBattleRoutes(app, { db, now });
+  registerBattleRoutes(app, { db, now, dataDir: deps.config.dataDir ?? null, log: app.log });
   registerNoteRoutes(app, { db, now });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {

@@ -175,6 +175,12 @@ der Server mit einem Schema (eine Warband darin muss mitgekämpft haben);
 Protokoll und Vorschläge sind öffentlich für die Kampagne und stehen mit
 `campaign_id` im `audit_log`.
 
+**Nach der Schlacht (Phase 4a4):** Schließen und die Runde weiterschalten
+nur Leiter mit Authenticator; seine Warband „after battle N“ markieren nur
+ihr Spieler (`battle.mark`, dazu der Besitz der Warband). Der Server rechnet
+dabei Kennzahlen und Änderungen selbst aus den gespeicherten Versionen –
+was ein Gerät behauptet, zählt nicht (ADR 0005, ADR 0016).
+
 **Notizen (Phase 4a3):** Was jemand von einer Notiz bekommt, entscheidet
 `server/src/notes.ts` für den Fragenden: versiegelt – bis die Schlacht
 geschlossen ist – nur der Autor den Text, alle anderen (Leiter und Admin
