@@ -2250,3 +2250,31 @@ its sheets never closed with their result. The sheets hook their dialog
 when the screen first renders, and the screen first rendered "Loading the
 battle…" without any dialog. The game night now mounts once the battle is
 there.
+
+## October 5, 2026 (cont.) — notes, and what stays sealed
+
+Rob looked at the desktop on the way and found too many buttons and the
+equipment purchase too hidden; on a wide screen there is room for a second
+pane beside the roster. He put it after the campaign setup – the
+workspace from the desktop mockup is the proposal – and the roadmap says so.
+
+The third step brings notes. Everyone writes at the same time, each note
+with one author (ADR 0010); a note is a scene, a quote with its speaker
+picked from the rosters, a dice moment, an open thread, or just a note.
+Who may read it is chosen when writing: everyone, leaders only, or sealed
+until the battle is closed – then its author alone, not the leader, not
+the admin, until it opens for all. The server decides this for the one
+who asks (ADR 0011): a sealed note of someone else's arrives as a
+placeholder without words, kind or names, a leaders' note does not
+arrive at all. The leak matrix now plants a sealed and a leaders' note
+with marker words that no answer to any role may contain.
+
+At the game night the notes stand in the protocol by turn, with "+ Note"
+and "+ Quote" for everybody, and they wait in the same outbox offline.
+
+Two small lessons. The author's own sealed note first said "opened after
+the battle" – the server marked every sealed note as opened for its
+author; only a closed battle opens one now. And the game night briefly
+lost an entry just taken out: an answer asked for before the change came
+back after it and was shown. Every change made on the screen now counts
+up, and an answer asked for before the last one is not shown.

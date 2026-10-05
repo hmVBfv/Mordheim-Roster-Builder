@@ -129,8 +129,9 @@ describe('the protocol', () => {
     await screen.findByRole('heading', { level: 1, name: 'Battle 1' });
     srv.state.down = true;
     await user.click(screen.getByRole('button', { name: '+ Event' }));
-    await user.type(screen.getByLabelText('What happened'), 'A building collapses.');
-    await user.click(screen.getByRole('button', { name: 'Add to the protocol' }));
+    const ev = screen.getByRole('dialog', { name: 'Event · turn 1' });
+    await user.type(within(ev).getByLabelText('What happened'), 'A building collapses.');
+    await user.click(within(ev).getByRole('button', { name: 'Add to the protocol' }));
     const protocol = screen.getByRole('list', { name: 'Protocol' });
     expect(await within(protocol).findByText('A building collapses.')).toBeTruthy();
     expect(within(protocol).getByText(/on this phone/)).toBeTruthy();
