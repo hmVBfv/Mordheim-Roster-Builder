@@ -42,7 +42,7 @@ export class ApiError extends Error {
 
 const BASE = `${import.meta.env.BASE_URL}api/v1`;
 
-export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown } = {}): Promise<T> {
+export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown } = {}): Promise<T> {
   const method = init.method ?? (init.body === undefined ? 'GET' : 'POST');
   const write = method !== 'GET';
   let res: Response;
@@ -78,6 +78,7 @@ export function errorText(e: unknown): string {
     case 'too_many_attempts': return `Too many attempts. Try again in ${waitText(e.retryAfter ?? 30)}.`;
     case 'unknown_share_code': return 'No warband goes with that code. It may have been taken back or have run out (codes last 7 days).';
     case 'gone': return 'That is no longer open: it was taken back, answered or has run out.';
+    case 'not_found': return 'That is not there (any more), or not for you.';
     case 'invalid_link': return 'This link is no longer valid: it was used, revoked or has expired. Ask for a new one.';
     case 'sign_in': return 'Please sign in again.';
     case 'forbidden': return 'Your account may not do that.';

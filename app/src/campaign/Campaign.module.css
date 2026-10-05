@@ -1,0 +1,143 @@
+/* Campaigns (phase 4a1; docs/mockups/campaign.html, manage.html). */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* a warband or a campaign: name and line on the left, its state on the right */
+.entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.entry > span {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.entry small {
+  color: var(--text-muted);
+}
+
+.chip {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ok {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.waiting {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.section > h2,
+.section > h3 {
+  margin: 0;
+}
+
+/* a member: name and role on one line, the role's select beside */
+.member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.member > span {
+  display: grid;
+  min-width: 0;
+}
+
+.member small {
+  color: var(--text-muted);
+}
+
+.member .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.member .controls > * {
+  white-space: nowrap;
+}
+
+.member .controls select {
+  width: auto;
+}
+
+.people {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.choice input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+.choice small {
+  color: var(--text-muted);
+}
+
+/* one column on a phone; the lists side by side on a wide screen */
+.columns {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .columns {
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--space-4) * 2);
+    align-items: start;
+  }
+}

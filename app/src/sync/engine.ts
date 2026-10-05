@@ -27,6 +27,8 @@ export interface ServerDraft { baseRev: number; data: unknown; device: string; u
 export interface ServerWarband {
   id: string; name: string; wbType: string; headRev: number; createdAt: string; updatedAt: string; archivedAt: string | null;
   copiedFrom: { id: string; rev: number } | null;
+  /** The campaign it is entered in (phase 4a); null: free. */
+  campaignId?: string | null;
   head: ServerVersion | null; draft: ServerDraft | null;
 }
 interface SyncAnswer { epoch: string | null; cursor: number; warbands: ServerWarband[] }
@@ -81,6 +83,16 @@ async function applyRemote(deps: SyncDeps, data: GameData, w: ServerWarband, now
   return db.transaction('rw', db.warbands, async () => {
     const local = await db.warbands.get(w.id);
     if (local && local.ownerId !== deps.userId) return false;
+    // entered in a campaign or free again: whatever else this device has
+    const campaign = w.campaignId ?? null;
+    const moved = !!local && !w.archivedAt && (local.campaignId ?? null) !== campaign;
+    if (moved) await db.warbands.update(w.id, { campaignId: campaign });
+    return (await takeRemote(deps, data, w, now, local)) || moved;
+  });
+}
+
+async function takeRemote(deps: SyncDeps, data: GameData, w: ServerWarband, now: Date, local: StoredWarband | undefined): Promise<boolean> {
+  {
     if (w.archivedAt || !w.head) {
       if (!local || local.removedAt) return false;
       // removed elsewhere while this device has changes: the player decides
@@ -100,7 +112,7 @@ async function applyRemote(deps: SyncDeps, data: GameData, w: ServerWarband, now
       await db.warbands.add({
         id: w.id, ...fromServer(data, state, stamp), format: core.FORMAT, createdAt: w.createdAt,
         ownerId: deps.userId, serverRev: head.rev, draftSeq: seq, origin: 'save',
-        ...(w.copiedFrom ? { copiedFrom: w.copiedFrom } : {}),
+        ...(w.copiedFrom ? { copiedFrom: w.copiedFrom } : {}), campaignId: w.campaignId ?? null,
       });
       return true;
     }
@@ -129,7 +141,7 @@ async function applyRemote(deps: SyncDeps, data: GameData, w: ServerWarband, now
     }
     // a newer draft from another device: sending ours will meet it (draft_conflict)
     return false;
-  });
+  }
 }
 
 async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> {
@@ -142,8 +154,14 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
       if (w.removedAt) {
         if (now.getTime() - Date.parse(w.removedAt) < undoMs) continue;
         if (w.serverRev !== undefined) {
-          await api(`/warbands/${w.id}`, { method: 'DELETE' }).catch((e: unknown) => { if (!(e instanceof ApiError && e.status === 404)) throw e; });
+          const kept = await api(`/warbands/${w.id}`, { method: 'DELETE' }).then(() => false, (e: unknown) => {
+            // entered in a campaign: it stays until it has left the campaign
+            if (e instanceof ApiError && e.code === 'enrolled') return true;
+            if (!(e instanceof ApiError && e.status === 404)) throw e;
+            return false;
+          });
           pushed++;
+          if (kept) { await db.warbands.update(w.id, { removedAt: undefined }); continue; }
         }
         await db.warbands.delete(w.id);
         continue;
