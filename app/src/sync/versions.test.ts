@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { resetSession, signedIn } from '../account/session.ts';
 import { ME as KAI } from '../account/testServer.ts';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { cleanServer, decodeSave, encodeSave, importLink } from '../share/link.ts';
 import { data, sampleSave } from '../test/data.ts';
 import { syncOnce } from './engine.ts';
@@ -16,7 +17,7 @@ const T0 = '2026-10-04T10:00:00.000Z';
 const deps = { userId: KAI.id, data: async () => data, undoMs: 0 };
 const record = (over: Partial<StoredWarband> = {}): StoredWarband => {
   const s = sampleSave();
-  return { id: crypto.randomUUID(), name: s.name!, wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: T0, updatedAt: T0, ownerId: KAI.id, origin: 'save', ...over };
+  return { id: newId(), name: s.name!, wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: T0, updatedAt: T0, ownerId: KAI.id, origin: 'save', ...over };
 };
 const named = (name: string) => ({ ...sampleSave(), name });
 

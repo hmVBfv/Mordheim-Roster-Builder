@@ -623,6 +623,22 @@ test('the navigation fits the flavour', async ({ page }) => {
   await expect(page).toHaveTitle(test.info().project.name === 'quickbuild' ? 'Mordheim Quick Build' : 'Mordheim Campaign');
 });
 
+/* Over http in the home network (the test instance) the browser has no
+   crypto.randomUUID (Rob, 05.10.2026: import failed, "Start the warband"
+   did nothing). The same without it here. */
+test('without crypto.randomUUID (plain http) a warband can be started and imported', async ({ page }) => {
+  await page.addInitScript(() => { Object.defineProperty(Crypto.prototype, 'randomUUID', { value: undefined, configurable: true }); });
+  const quick = test.info().project.name === 'quickbuild';
+  await page.goto(quick ? '#/warbands/new' : 'warbands/new');
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
+  await page.getByLabel('Name').fill('Over plain http');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Over plain http' })).toBeVisible();
+  await page.goto(quick ? '#/warbands' : 'warbands');
+  await importSample(page);
+});
+
 test('the account is the campaign app’s: More shows it there, the Quick Build has none', async ({ page }) => {
   const quick = test.info().project.name === 'quickbuild';
   await page.goto(quick ? '#/more' : 'more');

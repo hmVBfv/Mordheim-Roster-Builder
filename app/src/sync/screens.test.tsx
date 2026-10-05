@@ -9,6 +9,7 @@ import { resetSession, signedIn } from '../account/session.ts';
 import { ME as KAI } from '../account/testServer.ts';
 import { AppRoutes } from '../app/App.tsx';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { encodeSave } from '../share/link.ts';
 import { data, sampleSave } from '../test/data.ts';
 import { polyfillDialog } from '../test/dialog.ts';
@@ -21,7 +22,7 @@ const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><AppRo
 const T0 = '2026-10-04T10:00:00.000Z';
 const record = (over: Partial<StoredWarband> = {}): StoredWarband => {
   const s = sampleSave();
-  return { id: crypto.randomUUID(), name: s.name!, wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: T0, updatedAt: T0, ownerId: KAI.id, origin: 'save', ...over };
+  return { id: newId(), name: s.name!, wb: s.wb as string, wbName: 'Mercenaries', state: s, format: FORMAT, createdAt: T0, updatedAt: T0, ownerId: KAI.id, origin: 'save', ...over };
 };
 
 beforeAll(loadScreens, SCREENS_MS);
