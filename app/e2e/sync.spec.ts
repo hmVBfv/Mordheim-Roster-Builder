@@ -173,3 +173,63 @@ test('a warband sent from the Quick Build arrives through its link', async ({ pa
   await expect(page.getByRole('heading', { level: 1, name: 'Planned at lunch' })).toBeVisible();
   await expect.poll(() => [...srv.state.warbands.values()].map((w) => w.versions[0]!.source), { timeout: 8000 }).toEqual(['import']);
 });
+
+/* Sharing (Rob, 05.10.2026): a copy straight to another player, or a short
+   code – always a copy of their own. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`Share…: a copy to a player, or a share code, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const id = serverWarband(srv, 'The Ardent Caravan');
+    await page.goto(`warbands/${id}`);
+    await expect(page.getByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeVisible();
+    await page.getByRole('button', { name: 'Share…' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Share The Ardent Caravan' });
+    await sheet.getByRole('radio', { name: /^Ben/ }).check();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-share-sheet`);
+    await sheet.getByRole('button', { name: 'Send the copy' }).click();
+    await expect(page.getByText('Sent to Ben.', { exact: false })).toBeVisible();
+    expect(srv.state.shares[0]).toMatchObject({ toId: 'user-ben', name: 'The Ardent Caravan' });
+
+    await page.getByRole('button', { name: 'Share…' }).click();
+    await sheet.getByRole('button', { name: 'Make a share code' }).click();
+    await expect(sheet.getByLabel('Share code', { exact: true })).toHaveText('K7M2-Q9XD');
+    await expect(sheet.getByRole('list')).toContainText('code · taken 0×');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-share-code`);
+  });
+}
+
+test('a copy sent to you is taken from Home; a code is entered on Warbands', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.shareFrom('Ben', { ...SAVE, name: 'The Ardent Caravan' });
+  srv.shareFrom('Rob', { ...SAVE, name: 'Rob’s Spare' }, 'H4TR8WNP');
+  await page.goto('');
+  const list = page.getByRole('list', { name: 'Sent to you' });
+  await expect(list).toContainText('Ben sent you The Ardent Caravan');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'share-incoming');
+  await list.getByRole('button', { name: 'Take it' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeVisible();
+
+  await page.goto('warbands');
+  await page.getByRole('button', { name: 'Enter a share code' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Enter a share code' });
+  await sheet.getByLabel('The code another player gave you').fill('h4tr-8wnp');
+  await sheet.getByRole('button', { name: 'Look it up' }).click();
+  await expect(sheet).toContainText('Rob’s Spare');
+  await expect(sheet).toContainText('from Rob');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'share-code-entered');
+  await sheet.getByRole('button', { name: 'Add the copy' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Rob’s Spare' })).toBeVisible();
+  expect([...srv.state.warbands.values()].map((w) => w.versions[0]!.note)).toEqual(['shared by Ben', 'shared by Rob']);
+  // the copies are in step: the sync sends nothing for them
+  await page.waitForTimeout(500);
+  expect(srv.state.calls.filter((c) => c === 'POST /warbands' || c.endsWith('/autosave'))).toEqual([]);
+});

@@ -12,6 +12,7 @@ import type { Health } from './health.ts';
 import type { HashCost } from './passwords.ts';
 import { can, isAction, type Action, type Actor } from './policy.ts';
 import { readActor, registerAccountRoutes } from './routes-accounts.ts';
+import { registerShareRoutes } from './routes-shares.ts';
 import { registerWarbandRoutes } from './routes-warbands.ts';
 import type { StaticFiles } from './static.ts';
 
@@ -132,6 +133,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   registerAccountRoutes(app, { db, now, config: { publicOrigin: deps.config.publicOrigin ?? null }, totpKey: deps.totpKey ?? null, hashCost: deps.hashCost });
   registerWarbandRoutes(app, { db, now });
+  registerShareRoutes(app, { db, now });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);

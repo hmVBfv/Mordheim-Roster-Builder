@@ -23,6 +23,9 @@ import { useEditor } from '../roster/useEditor.ts';
 import { ConflictBanner } from '../sync/ConflictBanner.tsx';
 import { removeWarband } from '../sync/local.ts';
 import { makeCopy } from '../sync/versions.ts';
+import { ShareSheet } from '../share/ShareSheet.tsx';
+import { useSession } from '../account/session.ts';
+import { useNotice } from '../ui/Notice.tsx';
 import { FLAVOUR } from '../flavour.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
@@ -34,6 +37,8 @@ import styles from '../roster/Roster.module.css';
 function RosterBody({ rec }: { rec: StoredWarband }) {
   const data = useGameData();
   const ed = useEditor(data, rec);
+  const session = useSession();
+  const [shareNotice, notify] = useNotice();
   const v = useMemo(() => rosterView(data, ed.state), [data, ed.state]);
   const ctx = useMemo(() => core.ctxOf(data, ed.state), [data, ed.state]);
   // from the first battle on, equipment changes at the Trading Post and
@@ -285,6 +290,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           onClick={() => { void makeCopy(rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }}>
           Make a copy
         </button>
+        {FLAVOUR === 'campaign' && session.status === 'in' && <ShareSheet data={data} rec={rec} state={ed.state} onNotice={notify} />}
         <button type="button" className={ui.buttonQuiet}
           onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
           {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}
@@ -328,6 +334,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
         onRecruit={(u) => ed.edit((c) => core.recruitUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />
       {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}
+      {!ed.notice && shareNotice}
     </section>
   );
 }

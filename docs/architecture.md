@@ -249,6 +249,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Erzählung | `…/notes`, `…/timeline/positions`, `…/questions`, `…/attachments` |
 | Leiter | `…/background`, `…/style`, `…/briefing/:battleId`, `…/ai-pack/:battleId` |
 | Welt | `…/factions`, `…/npcs`, `…/reputation`, `…/districts`, `…/scenarios` |
+| Teilen | `GET /people` (Anzeigename und Nutzername der anderen), `GET/POST /shares`, `POST /shares/peek`, `POST /shares/redeem` (Code), `POST /shares/:id/accept`, `POST /shares/:id/decline`, `DELETE /shares/:id` – Rob, 05.10.2026 |
 | Sync | `GET /sync?cursor=` – Phase 3h: die eigenen Warbands mit neuester Version und Entwurf, Entferntes ohne Version, dazu `epoch` und der nächste `cursor` |
 | Bugs | `POST /bugs`, `GET /bugs` (Admin, Bug-Token), `PATCH /bugs/:id` |
 | Betrieb | `GET /health` (Phase 2, öffentlich) |

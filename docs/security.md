@@ -152,6 +152,18 @@ prüft das in jedem Endpunkt einer Warband; die Leak-Matrix probiert jeden mit
 einer fremden Warband. Mit der Einschreibung in eine Kampagne (4a) wird die
 eingetragene Kopie für deren Mitglieder lesbar (ADR 0002).
 
+**Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
+Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
+nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,
+sonst 404). Als Code: 8 Zeichen ohne verwechselbare (`0/O`, `1/I/L`), nur
+der Hash gespeichert, 7 Tage, mehrfach einlösbar, zurücknehmbar; einlösen
+nur angemeldet, und falsche Codes bremsen nach 10 Versuchen in 15 Minuten
+je Nutzer (429). Kann niemand mehr eine Kopie nehmen (beantwortet, zurückgenommen, abgelaufen), leert der Server die gespeicherte Warband. `GET /people` zeigt angemeldeten Nutzern nur Anzeige- und
+Nutzernamen aktiver Konten.
+
+**Geplant (Rob, 05.10.2026):** eine eigene Sicherheitsprüfung, dass sich
+weder von außen noch angemeldet etwas ausnutzen lässt (roadmap.md).
+
 ### Sichtbarkeit
 
 | `visibility` | Wer liest | Wann |

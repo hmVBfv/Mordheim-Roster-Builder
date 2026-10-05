@@ -30,6 +30,12 @@ Begriff einführt, trägt ihn hier ein.
 | Version speichern | Save a version | `saveVersion`, `POST /warbands/:id/versions` |
 | ältere Version zurückholen | Bring back (make it the newest) | `restoreVersion`, `source: 'restore'` |
 | Kopie (Blaupause) | Make a copy | `makeCopy`, `origin: 'copy'`, `copiedFrom` |
+| Teilen (eine Kopie an andere) | Share… | `ShareSheet`, `warband_shares`, `POST /shares` |
+| Kopie schicken | Send a copy | `sendCopy`, `to_user` |
+| Teilen-Code | Share code | `makeCode`, `code_hash`, `POST /shares/peek`, `POST /shares/redeem` |
+| Teilen-Code eingeben | Enter a share code | `CodeSheet`, `redeemCode` |
+| Kopie annehmen / ablehnen | Take it / Decline | `acceptShare`, `declineShare` |
+| Teilen zurücknehmen | Take back | `revokeShare`, `DELETE /shares/:id` |
 | An Kampagnenserver senden | Send to campaign server | `app/src/share/link.ts`, Route `/import` |
 | aktuelle Version | Latest version | `head_rev` |
 | Entwurf (Autosave) | Draft | `warband_autosaves`, `PUT /warbands/:id/autosave` |
