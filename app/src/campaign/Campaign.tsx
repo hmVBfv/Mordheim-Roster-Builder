@@ -93,7 +93,7 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
         <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void submit(); }}>
           <h2 id="enter-title">Enter a warband</h2>
           <p className={ui.muted}>A copy goes into the campaign; the warband you pick stays as it is, for other games. A leader confirms the copy, and its start is marked.</p>
-          {free.length === 0 && <p className={ui.muted}>None of your warbands is free: make one under Warbands first.</p>}
+          {free.length === 0 && <p className={ui.muted}>None of your warbands is free yet: make a new one for the campaign.</p>}
           {free.length > 0 && (
             <fieldset className={styles.people}>
               <legend className="visually-hidden">Warband</legend>
@@ -107,7 +107,8 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
           )}
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
           <div className={ui.row}>
-            <button type="submit" className={ui.button} disabled={busy || !chosen}>Enter a copy</button>
+            {free.length > 0 && <button type="submit" className={ui.button} disabled={busy || !chosen}>Enter a copy</button>}
+            <button type="button" className={free.length > 0 ? ui.buttonQuiet : ui.button} onClick={() => close(() => void navigate(`/warbands/new?campaign=${id}`))}>New warband for this campaign</button>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
           </div>
         </form>

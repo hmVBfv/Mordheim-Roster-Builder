@@ -2216,3 +2216,12 @@ On the way, the leaving sheet lost its notice in the browser test though
 not in the unit test: freeing the warband re-rendered the roster before
 the sheet had closed, and the sheet that should have shown the notice was
 already gone. It closes first now.
+
+Rob's first look at it found the dead end at once: a player new to the
+group has no warband yet, and "Enter a warband" told them to go and make
+one elsewhere first. Now the sheet offers "New warband for this campaign".
+It is the usual form; the warband is made as always, free under Warbands,
+and its copy goes into the campaign straight away – campaigns stay apart
+from the warbands themselves. The free one is sent to the account first,
+so the copy can name it as its source. With two warbands of the same name
+side by side, the list now says which campaign the copy is in.
