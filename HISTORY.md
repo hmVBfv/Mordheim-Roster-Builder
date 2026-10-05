@@ -2070,3 +2070,28 @@ copy's authenticators could be read there – codes would simply never work
 on staging. Separate keys protected nothing, since staging holds the same
 data anyway. install.sh now keeps staging.env's key equal to app.env's,
 replacing a different one it finds (never the other way round).
+
+## October 4, 2026 (cont.) — warbands that live on the server
+
+Rob asked whether warbands could be kept apart from any campaign and used
+as a blueprint for a campaign start – build one for fun now, play it later.
+The concept already said so: a warband belongs to one user and at most one
+campaign; a free one is a draft, and a campaign starts with a copy of it, so
+the blueprint stays as it was. Phase 3h starts with that on the server.
+
+A warband arrives as the app wrote it and is kept as a version; the server
+checks it against the same tolerant schema the app loads saves with and
+otherwise does not compute (ADR 0005). Every version builds on the one
+before, and a save built on an older one is refused rather than overwriting
+(ADR 0003). Between versions, a draft per user keeps the work of the last
+minutes; a second device of the same user may only replace a draft it has
+seen. Drafts change every few seconds while someone edits, so the audit log
+keeps just the latest line of each – the log is for changes, not
+keystrokes. A copy remembers the warband and version it came from.
+
+Free warbands are their owner's alone: for anyone else, the admin included,
+they do not exist, and the server answers 404 rather than 403 so that not
+even their existence shows. The leak-test matrix tries every warband route
+with someone else's warband. Sync hands a device everything of its owner
+that changed since its cursor, removals included, with the epoch that tells
+it when the server was restored and it must start over.

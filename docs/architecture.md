@@ -243,13 +243,13 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Einladungen | `POST /invites/check`, `POST /invites/accept` (Token im Körper; Register und Reset) – Phase 3g |
 | Eigenes Konto | `POST /account/password`, `POST /account/totp/setup`, `…/enable`, `…/disable` – Phase 3g |
 | Admin | `GET /admin/users`, `POST /admin/users/:id/:op` (`reset` · `totp-reset` · `disable` · `enable` · `sign-out`), `GET/POST /admin/invites`, `DELETE /admin/invites/:id`, `GET /admin/logins`, `GET /admin/audit` (`?limit=&before=`) – Phase 3g |
-| Warbands | `GET/POST /warbands`, `GET /warbands/:id/versions`, `POST /warbands/:id/versions` (mit `baseRev`), `PUT /warbands/:id/autosave` |
+| Warbands | `GET/POST /warbands` (`?archived=1`), `GET/DELETE /warbands/:id`, `POST /warbands/:id/unarchive`, `GET /warbands/:id/versions`, `GET /warbands/:id/versions/:rev`, `POST /warbands/:id/versions` (mit `baseRev`, sonst 409 `stale`), `PUT/DELETE /warbands/:id/autosave` (mit `afterSeq`, sonst 409 `draft_conflict`) – Phase 3h |
 | Kampagnen | `GET/POST /campaigns`, `…/members`, `…/enrolments`, `…/rounds/advance` |
 | Schlachten | `…/battles`, `…/battles/:id/protocol`, `…/battles/:id/proposals`, `…/battles/:id/close` |
 | Erzählung | `…/notes`, `…/timeline/positions`, `…/questions`, `…/attachments` |
 | Leiter | `…/background`, `…/style`, `…/briefing/:battleId`, `…/ai-pack/:battleId` |
 | Welt | `…/factions`, `…/npcs`, `…/reputation`, `…/districts`, `…/scenarios` |
-| Sync | `GET /sync?cursor=` |
+| Sync | `GET /sync?cursor=` – Phase 3h: die eigenen Warbands mit neuester Version und Entwurf, Entferntes ohne Version, dazu `epoch` und der nächste `cursor` |
 | Bugs | `POST /bugs`, `GET /bugs` (Admin, Bug-Token), `PATCH /bugs/:id` |
 | Betrieb | `GET /health` (Phase 2, öffentlich) |
 
