@@ -2149,3 +2149,14 @@ Nothing passes through a server on the way, and the campaign app takes the
 fragment out of the address bar before anything else, shows the warband,
 and adds it as a new one or as the next version of one of the player's own.
 
+
+## October 5, 2026 — the test instance speaks plain http
+
+Rob's first round on the test instance found two failures with one cause:
+importing a warband said "crypto.randomUUID is not a function", and "Start
+the warband" did nothing at all. The browser offers randomUUID only in a
+secure context – https, or localhost, which is where every test ran – and
+the test instance is served over plain http in the home network. New ids
+now come from a small helper that falls back to getRandomValues, which
+every context has, and a lint rule keeps randomUUID out of the app. An
+end-to-end test runs both actions with randomUUID taken away.
