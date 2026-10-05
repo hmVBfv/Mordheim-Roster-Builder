@@ -38,6 +38,10 @@ export interface ProbeContext {
   spareWarbandId: string;
   /** A warband save the server accepts. */
   save: Record<string, unknown>;
+  /** A copy sent to the user role (to take or decline), one the user role sent (to take back), and a code. */
+  incomingShareId: string;
+  outgoingShareId: string;
+  shareCode: string;
 }
 
 export interface Probe {
@@ -192,6 +196,39 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'POST /api/v1/warbands/:id/unarchive': (c) => ({ method: 'POST', url: `/api/v1/warbands/${c.spareWarbandId}/unarchive`, body: {} }),
     },
     fields: { user: ['warband', 'rev', 'seq', 'dropped'] },
+  },
+  // sharing (Rob, 05.10.2026): names of the others, and copies only
+  'people.list': {
+    allowed: signedIn,
+    routes: { 'GET /api/v1/people': () => ({ method: 'GET', url: '/api/v1/people' }) },
+    fields: same(signedIn, ['people']),
+  },
+  'shares.read': {
+    allowed: signedIn,
+    routes: { 'GET /api/v1/shares': () => ({ method: 'GET', url: '/api/v1/shares' }) },
+    fields: same(signedIn, ['incoming', 'outgoing']),
+  },
+  'shares.create': {
+    allowed: signedIn,
+    routes: {
+      'POST /api/v1/shares': (c) => ({ method: 'POST', url: '/api/v1/shares', body: { data: c.save } }),
+      'POST /api/v1/shares/peek': (c) => ({ method: 'POST', url: '/api/v1/shares/peek', body: { code: c.shareCode } }),
+      'POST /api/v1/shares/redeem': (c) => ({ method: 'POST', url: '/api/v1/shares/redeem', body: { code: c.shareCode, warbandId: randomUUID() } }),
+    },
+    fields: same(signedIn, ['id', 'code', 'expiresAt', 'name', 'wbType', 'from', 'warband', 'head']),
+  },
+  'share.answer': {
+    allowed: ['user'],
+    routes: {
+      'POST /api/v1/shares/:id/accept': (c) => ({ method: 'POST', url: `/api/v1/shares/${c.incomingShareId}/accept`, body: { warbandId: randomUUID() } }),
+      'POST /api/v1/shares/:id/decline': (c) => ({ method: 'POST', url: `/api/v1/shares/${c.incomingShareId}/decline`, body: {} }),
+    },
+    fields: { user: ['warband', 'head', 'ok'] },
+  },
+  'share.revoke': {
+    allowed: ['user'],
+    routes: { 'DELETE /api/v1/shares/:id': (c) => ({ method: 'DELETE', url: `/api/v1/shares/${c.outgoingShareId}` }) },
+    fields: { user: ['ok'] },
   },
 };
 

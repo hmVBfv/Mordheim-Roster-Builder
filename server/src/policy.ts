@@ -65,6 +65,16 @@ export const ACTIONS = {
   'warband.read': { who: 'user', target: 'owner' },
   /** A new version, the draft, removing and bringing back – its owner only. */
   'warband.write': { who: 'user', target: 'owner' },
+  /** Who else is signed up – names only – to send a copy to (Rob, 05.10.2026). */
+  'people.list': { who: 'user' },
+  /** One's shares: sent, and waiting to be answered. */
+  'shares.read': { who: 'user' },
+  /** Sharing a copy (to a player or as a code), and looking up or taking a code. */
+  'shares.create': { who: 'user' },
+  /** Taking or declining a copy sent to oneself – its recipient only. */
+  'share.answer': { who: 'user', target: 'owner' },
+  /** Taking back one's share – its sender only. */
+  'share.revoke': { who: 'user', target: 'owner' },
 } as const satisfies Record<string, { who: Who; target?: 'owner' }>;
 
 export type Action = keyof typeof ACTIONS;
