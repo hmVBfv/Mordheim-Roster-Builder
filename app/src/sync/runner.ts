@@ -44,7 +44,11 @@ async function round(): Promise<void> {
   setStatus({ state: 'syncing', ...counts() });
   try {
     const [{ syncOnce }, { loadGameData }] = await Promise.all([import('./engine.ts'), import('../game/gameData.ts')]);
-    const r = await syncOnce({ userId: me, data: loadGameData, appVersion: __APP_VERSION__, device: deviceLabel() });
+    await syncOnce({ userId: me, data: loadGameData, appVersion: __APP_VERSION__, device: deviceLabel() });
+    // what the game night gathered goes after the warbands (phase 4a2)
+    const { flushOutbox } = await import('../battle/outbox.ts');
+    await flushOutbox(me);
+    const r = await countPending(me);
     if (user !== me) return;
     setStatus({ state: 'idle', waiting: r.waiting, conflicts: r.conflicts, at: new Date().toISOString() });
   } catch (e) {

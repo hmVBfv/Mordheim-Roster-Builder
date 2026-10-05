@@ -8,6 +8,17 @@
   padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
 }
 
+/* the game night on a phone: no navigation below, its own buttons instead */
+@media (max-width: 899px) {
+  .bare {
+    padding-bottom: 0;
+  }
+
+  .bare .nav {
+    display: none;
+  }
+}
+
 .header {
   grid-area: header;
   display: flex;

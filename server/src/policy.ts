@@ -99,6 +99,10 @@ export const ACTIONS = {
   'campaign.enrol': { who: 'user', target: 'player' },
   /** Name, members and roles, confirming warbands – leaders, with the authenticator. */
   'campaign.manage': { who: 'user', target: 'leader' },
+  /** Setting up a battle and writing its protocol, deciding corrections – leaders only (ADR 0010). */
+  'battle.write': { who: 'user', target: 'leader' },
+  /** A correction of the protocol – leaders and players; they see it live and propose (concept.md 4.5). */
+  'battle.propose': { who: 'user', target: 'player' },
 } as const satisfies Record<string, { who: Who; target?: TargetKind }>;
 
 export type Action = keyof typeof ACTIONS;

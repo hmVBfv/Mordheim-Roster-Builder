@@ -18,6 +18,8 @@ import {
   type CampaignRole, type CampaignView, type Enrolment,
 } from './api.ts';
 import styles from './Campaign.module.css';
+import { NewBattleSheet } from './NewBattle.tsx';
+import { battleTitle } from '../battle/api.ts';
 
 /** The campaign as last seen on this device, then as the server has it now. */
 function useCampaign(id: string) {
@@ -117,7 +119,7 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
   );
 }
 
-function Overview({ id, view, me, onView }: { id: string; view: CampaignView; me: string; onView: (v: CampaignView) => void }) {
+function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignView; me: string; lead: boolean; onView: (v: CampaignView) => void }) {
   return (
     <div className={styles.columns}>
       <section className={styles.section} aria-labelledby="c-warbands">
@@ -138,7 +140,20 @@ function Overview({ id, view, me, onView }: { id: string; view: CampaignView; me
         </section>
         <section className={styles.section} aria-labelledby="c-battles">
           <h2 id="c-battles">Battles</h2>
-          <p className={ui.muted}>No battles yet.</p>
+          {(view.battles ?? []).length === 0 && <p className={ui.muted}>No battles yet.</p>}
+          {(view.battles ?? []).length > 0 && (
+            <ul className={styles.list} aria-label="Battles">
+              {[...(view.battles ?? [])].reverse().map((b) => (
+                <li key={b.id}>
+                  <Link to={`/campaign/${id}/battles/${b.id}`} className={styles.entry}>
+                    <span>{battleTitle(b)}<small>{b.warbands.join(' · ')}</small></span>
+                    <span className={`${styles.chip} ${b.status === 'open' ? styles.ok : ''}`}>{b.status === 'open' ? 'live' : 'closed'}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          {lead && <div className={ui.row}><NewBattleSheet id={id} view={view} /></div>}
         </section>
       </div>
     </div>
@@ -277,7 +292,7 @@ export function Campaign() {
       )}
       {manage
         ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
-        : <Overview id={id} view={view} me={user.id} onView={setView} />}
+        : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>
