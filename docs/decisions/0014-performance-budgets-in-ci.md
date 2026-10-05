@@ -7,7 +7,8 @@ großer Teil des Codes von einem Agenten geschrieben wird.
 
 ## Entscheidung
 - Grenzen für Bundle-Größe, Reaktionszeit, Startzeit und Bildgröße stehen in
-  `docs/ui.md` und werden in der CI geprüft (`size-limit`, Playwright).
+  `docs/ui.md` und werden in der CI geprüft (`size-limit`, seit 04.10.2026
+  `app/scripts/size.mjs`; Playwright).
 - Der Server-Container hat ein Speicherlimit von 256 MB.
 - Playwright läuft nur in der CI, nicht auf dem Pi.
 

@@ -5,6 +5,8 @@ import { warbandPickerGroups } from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newOwnership } from '../sync/local.ts';
+import { requestSync } from '../sync/runner.ts';
 import { FORMAT } from '@mordheim/core';
 import { useGameData } from '../game/useGameData.ts';
 import { createWarband, newWarbandChoice } from '../roster/view.ts';
@@ -30,9 +32,10 @@ function Form() {
     const now = new Date().toISOString();
     const rec: StoredWarband = {
       id: crypto.randomUUID(), name: s.name || choice.name, wb: choice.key, wbName: choice.name,
-      state: s, format: FORMAT, createdAt: now, updatedAt: now,
+      state: s, format: FORMAT, createdAt: now, updatedAt: now, ...newOwnership('save'),
     };
     await db.warbands.add(rec);
+    requestSync();
     // Back from the new roster leads to where the player came from, not to this form
     void navigate(`/warbands/${rec.id}`, { replace: true });
   };

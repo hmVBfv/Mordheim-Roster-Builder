@@ -2,7 +2,8 @@
    the bottom on a phone and on the left from tablet width on. */
 import { useEffect, type ReactNode } from 'react';
 import { NavLink } from 'react-router';
-import { startSession } from '../account/session.ts';
+import { startSession, subscribeSession, getSession } from '../account/session.ts';
+import { startSync, stopSync } from '../sync/runner.ts';
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { navItems } from './nav.ts';
 import styles from './Shell.module.css';
@@ -13,6 +14,18 @@ export function Shell({ children }: { children: ReactNode }) {
   const items = navItems();
   // who is signed in: asked once, never waited for (the builder works without)
   useEffect(() => { if (FLAVOUR === 'campaign') startSession(); }, []);
+  // the sync runs while someone is signed in (also offline: changes wait on the device)
+  useEffect(() => {
+    if (FLAVOUR !== 'campaign') return;
+    const follow = () => {
+      const s = getSession();
+      const id = s.status === 'in' ? s.user.id : s.status === 'unreachable' ? s.user?.id : undefined;
+      if (id) startSync(id);
+      else if (s.status !== 'loading') stopSync();
+    };
+    follow();
+    return subscribeSession(follow);
+  }, []);
   return (
     <div className={styles.shell}>
       <header className={styles.header}>

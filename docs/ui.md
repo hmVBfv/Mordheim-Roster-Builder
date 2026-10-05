@@ -205,7 +205,7 @@ Von der CI geprüft; ein Überschreiten lässt den Build fehlschlagen.
 
 | Grenze | Wert | Prüfung |
 | --- | --- | --- |
-| JavaScript beim ersten Laden | ≤ 200 KB (komprimiert) | `size-limit` |
+| JavaScript beim ersten Laden | ≤ 200 KB (komprimiert) | `app/scripts/size.mjs`: der Einstieg aus `index.html`, alle Teile, die er vorlädt, und Workbox (bis 04.10.2026 `size-limit` über Dateinamen, das abgespaltene Teile übersah) |
 | Reaktion auf eine Eingabe | < 100 ms auf einem Mittelklasse-Handy | Playwright mit CPU-Drosselung für Kernabläufe |
 | Erster Start online (4G) | < 3 s bis bedienbar | Playwright mit Netzwerkprofil |
 | Start aus Cache | < 1 s | Playwright |
