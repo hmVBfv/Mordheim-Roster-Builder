@@ -8,6 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { StageTotals } from '@mordheim/core';
 import { audit } from './accounts.ts';
+import { listBattles, type BattleSummary } from './battles.ts';
 import type { DB } from './db.ts';
 import { gameData, totalsOf } from './rules.ts';
 import { createWarband, versionOf, warbandById, type WarbandRow } from './warbands.ts';
@@ -45,6 +46,7 @@ export interface CampaignView {
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
+  battles: BattleSummary[];
 }
 
 const tagOf = (t: TagRow & { by: string }): Tag => ({
@@ -100,7 +102,7 @@ export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): Campai
     }));
   return {
     campaign: { id: c.id, name: c.name, round: c.round, houseRules: JSON.parse(c.house_rules) as unknown, createdAt: c.created_at, updatedAt: c.updated_at },
-    role, members, enrolments,
+    role, members, enrolments, battles: listBattles(db, c.id),
   };
 }
 
