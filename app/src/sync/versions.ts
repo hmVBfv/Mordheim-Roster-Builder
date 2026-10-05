@@ -7,6 +7,7 @@ import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';
 import { db, type StoredWarband } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { readSave, writeSave } from './engine.ts';
 import { newOwnership } from './local.ts';
 import { requestSync } from './runner.ts';
@@ -74,7 +75,7 @@ export async function versionState(data: GameData, id: string, rev: number): Pro
 
 /** A new warband from this one (or one of its versions): the blueprint's copy. Works offline and without an account. */
 export async function makeCopy(rec: StoredWarband, state: WarbandState = rec.state, rev?: number, now = new Date()): Promise<string> {
-  const id = crypto.randomUUID();
+  const id = newId();
   const name = `${state.name || rec.name} (copy)`.slice(0, 80);
   const from = rec.serverRev !== undefined ? { id: rec.id, rev: rev ?? rec.serverRev } : undefined;
   const stamp = now.toISOString();

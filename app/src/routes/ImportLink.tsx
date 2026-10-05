@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { db } from '../db/db.ts';
+import { newId } from '../db/ids.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { decodeSave } from '../share/link.ts';
 import { newOwnership, useWarbands } from '../sync/local.ts';
@@ -44,7 +45,7 @@ function Preview({ state }: { state: WarbandState }) {
   const addNew = async () => {
     setBusy(true);
     const now = new Date().toISOString();
-    const id = crypto.randomUUID();
+    const id = newId();
     await db.warbands.add({ id, name: state.name || wb?.name || 'Warband', wb: state.wb as string, wbName: wb?.name ?? String(state.wb), state, format: core.FORMAT, createdAt: now, updatedAt: now, ...newOwnership('import') });
     requestSync();
     taken = '';
