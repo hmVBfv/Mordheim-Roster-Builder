@@ -145,6 +145,13 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
 Ein Admin ohne Faktor hat nur die Zeile „Angemeldet“, bis er ihn
 eingerichtet hat.
 
+**Warbands (Phase 3h):** Eine Warband ohne Kampagne („frei“: Entwurf,
+Blaupause) sieht und ändert nur ihr Besitzer – auch der Admin nicht. Für alle
+anderen gibt es sie nicht (404, nicht 403). `can(actor, action, warband)`
+prüft das in jedem Endpunkt einer Warband; die Leak-Matrix probiert jeden mit
+einer fremden Warband. Mit der Einschreibung in eine Kampagne (4a) wird die
+eingetragene Kopie für deren Mitglieder lesbar (ADR 0002).
+
 ### Sichtbarkeit
 
 | `visibility` | Wer liest | Wann |

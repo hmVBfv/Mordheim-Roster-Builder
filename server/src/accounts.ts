@@ -212,7 +212,7 @@ export function listAudit(db: DB, limit: number, beforeSeq?: number): AuditSumma
   const rows = db.prepare(`SELECT a.*, u.username AS actor_name, t.username AS target_name FROM audit_log a
     LEFT JOIN users u ON u.id = a.actor_id
     LEFT JOIN users t ON a.target_type = 'user' AND t.id = a.target_id
-    WHERE a.seq < ? ORDER BY a.seq DESC LIMIT ?`).all(beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
+    WHERE a.seq < ? AND a.action != 'warband.autosave' ORDER BY a.seq DESC LIMIT ?`).all(beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
     seq: number; at: string; actor_name: string | null; action: string; target_type: string | null; target_id: string | null; target_name: string | null; payload: string | null;
   }[];
   return rows.map((r) => ({

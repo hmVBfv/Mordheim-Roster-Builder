@@ -15,7 +15,7 @@ export const ORIGIN = 'http://mordheim.test';
 export const PASSWORD = 'correct horse battery';
 
 export interface Req {
-  method?: 'GET' | 'HEAD' | 'POST' | 'DELETE';
+  method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE';
   url: string;
   body?: unknown;
   /** The session token, if any. */
