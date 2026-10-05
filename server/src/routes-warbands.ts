@@ -140,6 +140,8 @@ export function registerWarbandRoutes(app: FastifyInstance, deps: WarbandDeps): 
     const w = target(req, reply, 'warband.write');
     if (!w) return reply;
     if (w.archived_at) return { warband: metaOf(w) };
+    // entered in a campaign: it leaves the campaign first (concept.md 4.1)
+    if (w.campaign_id) return reply.code(409).send({ error: 'enrolled' });
     return { warband: metaOf(setArchived(db(), w.id, req.actor!.id, true, now())) };
   });
 
