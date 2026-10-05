@@ -10,6 +10,7 @@ import ui from '../ui/ui.module.css';
 import { useNotice } from '../ui/Notice.tsx';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { ImportSheet } from './ImportSheet.tsx';
+import { CodeSheet } from '../share/CodeSheet.tsx';
 import { WarbandList } from './WarbandList.tsx';
 
 export function Warbands() {
@@ -27,6 +28,7 @@ export function Warbands() {
       <div className={ui.row}>
         <Link to="/warbands/new" className={ui.button}>New warband</Link>
         <ImportSheet quiet onImported={(id) => { void navigate(`/warbands/${id}`); }} />
+        {signedIn && <CodeSheet />}
       </div>
       {deviceOnly.length > 0 && (
         <div className={ui.card}>

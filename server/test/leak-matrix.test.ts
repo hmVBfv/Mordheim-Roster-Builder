@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { ACTIONS, type Action } from '../src/policy.ts';
+import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
 import { MATRIX, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
@@ -45,11 +46,16 @@ describe('leak-test matrix', () => {
     const warbandId = randomUUID();
     const spareWarbandId = randomUUID();
     for (const id of [warbandId, spareWarbandId]) createWarband(s.db, { id, ownerId: player.id, data: SAVE, json: JSON.stringify(SAVE), source: 'save', note: '', appVersion: '', copiedFrom: null }, s.clock.now());
+    const json = JSON.stringify(SAVE);
+    const incoming = createShare(s.db, { from: victim.id, to: player.id, warbandId: null, name: 'Sent', wbType: 'reikland', json }, s.clock.now());
+    const outgoing = createShare(s.db, { from: player.id, to: victim.id, warbandId: null, name: 'Sent back', wbType: 'reikland', json }, s.clock.now());
+    const code = createShare(s.db, { from: victim.id, to: null, warbandId: null, name: 'By code', wbType: 'reikland', json }, s.clock.now());
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
       code: () => pendingOne.code(), username: player.username, password: 'correct horse battery',
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
+      incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {

@@ -2160,3 +2160,28 @@ the test instance is served over plain http in the home network. New ids
 now come from a small helper that falls back to getRandomValues, which
 every context has, and a lint rule keeps randomUUID out of the app. An
 end-to-end test runs both actions with randomUUID taken away.
+
+## October 5, 2026 (cont.) — sharing a warband without a file
+
+Rob asked whether warbands could go from one player to another without
+exporting a file, sending it and pasting it in. Two ways now, both on the
+roster under "Share…": a copy straight to another player, which waits on
+their Home under "Open for you" until they take or decline it; or a short
+code – eight characters like K7M2-Q9XD, without the ones that are easily
+misread – that anyone signed in enters under Warbands. Rob preferred a
+code over a link: easier to say across the table or type from a chat.
+
+Both are always a copy. The recipient gets a warband of their own, with
+"shared by" on its first version; the sender's warband stays private, as
+ADR 0011 wants every warband to be. A code serves several players (a
+whole group can take the same starting list), lasts seven days and can
+be taken back. The server keeps only its hash, and because a short code
+can be guessed, wrong ones are braked: ten in fifteen minutes per account,
+then a wait.
+
+One wrong turn on the way: the server first answered a wrong share code
+with the same error as a wrong authenticator code, and the app would have
+told the player to check the time on their phone. Different errors now.
+
+Rob also asked for a dedicated security review before the first real game
+night – from outside and signed in. It is on the roadmap after 4a.
