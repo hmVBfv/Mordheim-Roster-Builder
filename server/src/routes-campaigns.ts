@@ -13,6 +13,7 @@ import {
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
 import { totalsOf } from './rules.ts';
+import { advanceRound, changesOf } from './aftermath.ts';
 import { checkSave, draftOfUser, metaOf, versionOf, warbandById } from './warbands.ts';
 
 export interface CampaignDeps { db: DB | null; now: () => Date }
@@ -172,7 +173,17 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
       status: e.status,
       head: versionOf(db(), w.id, w.head_rev),
       draft: draft && draft.baseRev === w.head_rev ? { data: draft.data, updatedAt: draft.updatedAt } : null,
-      tags: tagsOf(db(), w.id, t.c.id),
+      // each mark with what changed since the one before, frozen (phase 4a4)
+      tags: tagsOf(db(), w.id, t.c.id).map((g) => ({ ...g, changes: changesOf(db(), g.id) })),
     };
+  });
+
+  /** The campaign moves on to the next round, once its battles are closed; who fought none sat it out. */
+  app.post('/api/v1/campaigns/:id/rounds/advance', { config: { action: 'campaign.manage' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    const r = advanceRound(db(), t.c, req.actor!.id, now());
+    if (!r.ok) return reply.code(r.status).send({ error: r.error, problem: r.problem });
+    return view(t.c, t.role);
   });
 }

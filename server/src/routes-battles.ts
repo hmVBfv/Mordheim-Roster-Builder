@@ -13,8 +13,16 @@ import { campaignById, openEnrolment, roleIn, type CampaignRole, type CampaignRo
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
 import { gameData } from './rules.ts';
+import { changesOf, closeBattle, markAfterBattle, marksOf } from './aftermath.ts';
+import { snapshot } from './backup.ts';
+import { warbandById } from './warbands.ts';
 
-export interface BattleDeps { db: DB | null; now: () => Date }
+export interface BattleDeps {
+  db: DB | null; now: () => Date;
+  /** Where the snapshot after each battle goes (docs/operations.md); null: none (some tests). */
+  dataDir?: string | null;
+  log?: { warn: (o: object, msg: string) => void };
+}
 
 const UUID = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 const id = { type: 'string', pattern: UUID } as const;
@@ -51,6 +59,8 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     return out;
   };
   const districtOk = (d: string | undefined) => !d || gameData().DISTRICTS.some((x) => x.id === d);
+  /** The battle as members see it, with each warband's mark after it (phase 4a4). */
+  const view = (b: BattleRow) => ({ ...battleView(db(), b), marks: marksOf(db(), b.id) });
 
   app.get('/api/v1/campaigns/:id/battles', { config: { action: 'campaign.read' } }, async (req, reply) => {
     const t = target(req, reply, 'campaign.read');
@@ -68,14 +78,14 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const bid = b.id.toLowerCase();
     const there = battleById(db(), bid);
     // the same battle sent twice (an answer lost on the way): it is there
-    if (there) return there.campaign_id === t.c.id ? battleView(db(), there) : reply.code(409).send({ error: 'exists' });
+    if (there) return there.campaign_id === t.c.id ? view(there) : reply.code(409).send({ error: 'exists' });
     const ws = fighters(t.c, b.warbandIds);
     if (typeof ws === 'string') return reply.code(400).send({ error: 'invalid', problem: ws });
     if (!districtOk(b.district)) return reply.code(400).send({ error: 'invalid', problem: 'no such district' });
     const made = createBattle(db(), {
       id: bid, campaignId: t.c.id, round: b.round ?? t.c.round + 1, title: (b.title ?? '').trim(), scenario: (b.scenario ?? '').trim(), district: b.district ?? '', warbandIds: ws, by: req.actor!.id,
     }, now());
-    return reply.code(201).send(battleView(db(), made));
+    return reply.code(201).send(view(made));
   });
 
   app.get('/api/v1/campaigns/:id/battles/:bid', {
@@ -87,7 +97,7 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const since = (req.query as { since?: number }).since;
     // a device that has seen this state learns only that nothing changed
     if (since !== undefined && since >= t.b!.seq) return { unchanged: true, seq: t.b!.seq };
-    return battleView(db(), t.b!);
+    return view(t.b!);
   });
 
   app.patch('/api/v1/campaigns/:id/battles/:bid', {
@@ -116,7 +126,7 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
       ...(warbandIds ? { warbandIds } : {}),
       ...(p.outcomes ? { outcomes: Object.fromEntries(Object.entries(p.outcomes).map(([w, o]) => [w.toLowerCase(), o])) } : {}),
     }, req.actor!.id, now());
-    return battleView(db(), battleById(db(), t.b!.id)!);
+    return view(battleById(db(), t.b!.id)!);
   });
 
   app.put('/api/v1/campaigns/:id/battles/:bid/protocol/:eid', {
@@ -166,6 +176,38 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     return { ok: true, seq: battleById(db(), t.b!.id)!.seq };
   });
 
+  /** Closing: the protocol is fixed, sealed notes open, and the database is snapshotted (data-model.md: after every battle). */
+  app.post('/api/v1/campaigns/:id/battles/:bid/close', { config: { action: 'battle.write' } }, async (req, reply) => {
+    const t = target(req, reply, 'battle.write');
+    if (!t) return reply;
+    if (t.b!.status === 'closed') return view(t.b!);
+    closeBattle(db(), t.b!, req.actor!.id, now());
+    if (deps.dataDir) {
+      try {
+        snapshot(db(), deps.dataDir, `battle-${t.b!.round}`, now);
+      } catch (e) {
+        // the battle is closed either way; the nightly snapshot follows
+        deps.log?.warn({ event: 'snapshot_failed', battle: t.b!.id, err: String(e) }, 'snapshot after the battle failed');
+      }
+    }
+    return view(battleById(db(), t.b!.id)!);
+  });
+
+  /** Marking one's warband "after battle N" (concept.md 4.2): its player, once the battle is closed. */
+  app.post('/api/v1/campaigns/:id/battles/:bid/marks', {
+    config: { action: 'battle.mark' },
+    schema: body({ warbandId: id, rev: { type: 'integer', minimum: 1 } }, ['warbandId', 'rev']),
+  }, async (req, reply) => {
+    const t = target(req, reply, 'battle.mark');
+    if (!t) return reply;
+    const b = req.body as { warbandId: string; rev: number };
+    const w = warbandById(db(), b.warbandId.toLowerCase());
+    if (!w || w.owner_id !== req.actor!.id) return reply.code(403).send({ error: 'forbidden' });
+    const r = markAfterBattle(db(), t.c, t.b!, w.id, b.rev, req.actor!.id, now());
+    if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
+    return { tag: r.tag, changes: r.changes };
+  });
+
   for (const verdict of ['accept', 'reject'] as const) {
     app.post(`/api/v1/campaigns/:id/battles/:bid/proposals/:pid/${verdict}`, { config: { action: 'battle.write' } }, async (req, reply) => {
       const t = target(req, reply, 'battle.write');
@@ -175,7 +217,7 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
       if (t.b!.status === 'closed') return closed(reply);
       const r = decideProposal(db(), t.b!, p, verdict === 'accept', req.actor!.id, now());
       if (!r.ok) return reply.code(r.error === 'decided' ? 409 : 400).send(r.error === 'decided' ? { error: 'decided' } : { error: 'invalid', problem: r.problem });
-      return battleView(db(), battleById(db(), t.b!.id)!);
+      return view(battleById(db(), t.b!.id)!);
     });
   }
 }
