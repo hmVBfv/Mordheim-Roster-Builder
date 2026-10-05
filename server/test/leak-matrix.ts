@@ -53,6 +53,13 @@ export interface ProbeContext {
   /** A campaign the admin leads, the user role a player in it; two of the user role's warbands waiting for the admin. */
   ledCampaignId: string;
   pendingEnrolmentIds: [string, string];
+  /** A battle in the victim's campaign; one in the admin's, with a protocol entry and two open corrections of the user role's. */
+  battleId: string;
+  ledBattleId: string;
+  ledEntryId: string;
+  ledProposalIds: [string, string];
+  /** The user role's warband confirmed in the admin's campaign. */
+  ledWarbandId: string;
 }
 
 export interface Probe {
@@ -72,7 +79,9 @@ export interface MatrixRow {
 
 const signedIn: Role[] = ['user', 'admin'];
 /** A campaign as its members see it. */
-const VIEW = ['campaign', 'role', 'members', 'enrolments'];
+const VIEW = ['campaign', 'role', 'members', 'enrolments', 'battles'];
+/** A battle as its campaign's members see it. */
+const BATTLE = ['battle', 'seq', 'participants', 'entries', 'proposals', 'unchanged'];
 const same = (roles: Role[], fields: string[]) => Object.fromEntries(roles.map((r) => [r, fields])) as Partial<Record<Role, string[]>>;
 
 export const MATRIX: Record<Action, MatrixRow> = {
@@ -256,8 +265,12 @@ export const MATRIX: Record<Action, MatrixRow> = {
   },
   'campaign.read': {
     allowed: ['user'],
-    routes: { 'GET /api/v1/campaigns/:id': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}` }) },
-    fields: { user: VIEW },
+    routes: {
+      'GET /api/v1/campaigns/:id': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}` }),
+      'GET /api/v1/campaigns/:id/battles': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/battles` }),
+      'GET /api/v1/campaigns/:id/battles/:bid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/battles/${c.battleId}` }),
+    },
+    fields: { user: [...VIEW, ...BATTLE] },
   },
   'campaign.warband.read': {
     allowed: ['user'],
@@ -283,6 +296,26 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'POST /api/v1/campaigns/:id/enrolments/:eid/decline': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[1]}/decline`, body: {} }),
     },
     fields: { admin: [...VIEW, 'left'] },
+  },
+  'battle.write': {
+    // the user role is a player there (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'POST /api/v1/campaigns/:id/battles': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles`, body: { id: randomUUID(), title: 'Probing the ferry', warbandIds: [c.ledWarbandId] } }),
+      'PATCH /api/v1/campaigns/:id/battles/:bid': (c) => ({ method: 'PATCH', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}`, body: { turn: 2 } }),
+      'PUT /api/v1/campaigns/:id/battles/:bid/protocol/:eid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/protocol/${randomUUID()}`, body: { turn: 2, kind: 'event', payload: { text: 'The ferry drifts.' } } }),
+      'DELETE /api/v1/campaigns/:id/battles/:bid/protocol/:eid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/protocol/${c.ledEntryId}` }),
+      'POST /api/v1/campaigns/:id/battles/:bid/proposals/:pid/accept': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/proposals/${c.ledProposalIds[0]}/accept`, body: {} }),
+      'POST /api/v1/campaigns/:id/battles/:bid/proposals/:pid/reject': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/proposals/${c.ledProposalIds[1]}/reject`, body: {} }),
+    },
+    fields: { admin: [...BATTLE, 'entry', 'removed'] },
+  },
+  'battle.propose': {
+    allowed: ['user'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/battles/:bid/proposals/:pid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/battles/${c.battleId}/proposals/${randomUUID()}`, body: { text: 'Magda was taken out in turn 3, not 4.' } }),
+    },
+    fields: { user: ['ok', 'seq'] },
   },
 };
 

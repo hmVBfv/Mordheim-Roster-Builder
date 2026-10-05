@@ -166,6 +166,15 @@ ihr erster Leiter. Ob ein Mitglied den Authenticator hat, sehen nur Leiter
 Kampagne. Jede Kampagnen-Aktion steht mit `campaign_id` und Sichtbarkeit
 `public` im `audit_log`.
 
+**Schlachten (Phase 4a2):** lesen jedes Mitglied (`campaign.read`), auch
+Zuschauer; anlegen, ändern, Protokoll schreiben und Vorschläge entscheiden
+nur Leiter mit Authenticator (`battle.write`, ADR 0010); Korrekturen
+vorschlagen Leiter und Spieler (`battle.propose`), umformulieren nur der
+Autor, solange der Vorschlag offen ist. Was ein Eintrag sagen darf, prüft
+der Server mit einem Schema (eine Warband darin muss mitgekämpft haben);
+Protokoll und Vorschläge sind öffentlich für die Kampagne und stehen mit
+`campaign_id` im `audit_log`.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

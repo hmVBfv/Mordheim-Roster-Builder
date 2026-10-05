@@ -245,7 +245,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Admin | `GET /admin/users`, `POST /admin/users/:id/:op` (`reset` · `totp-reset` · `disable` · `enable` · `sign-out`), `GET/POST /admin/invites`, `DELETE /admin/invites/:id`, `GET /admin/logins`, `GET /admin/audit` (`?limit=&before=`) – Phase 3g |
 | Warbands | `GET/POST /warbands` (`?archived=1`), `GET/DELETE /warbands/:id`, `POST /warbands/:id/unarchive`, `GET /warbands/:id/versions`, `GET /warbands/:id/versions/:rev`, `POST /warbands/:id/versions` (mit `baseRev`, sonst 409 `stale`), `PUT/DELETE /warbands/:id/autosave` (mit `afterSeq`, sonst 409 `draft_conflict`) – Phase 3h |
 | Kampagnen | `GET/POST /campaigns` (anlegen nur mit Authenticator), `GET/PATCH /campaigns/:id` (Name), `PUT/DELETE /campaigns/:id/members/:userId` (`role`), `POST /campaigns/:id/enrolments` (Kopie mit der Geräte-ID), `POST …/enrolments/:eid/confirm`, `…/decline`, `DELETE …/enrolments/:eid`, `GET /campaigns/:id/warbands/:wid` (eingetragene Warband für alle Mitglieder) – Phase 4a1; `…/rounds/advance` folgt |
-| Schlachten | `…/battles`, `…/battles/:id/protocol`, `…/battles/:id/proposals`, `…/battles/:id/close` |
+| Schlachten | `GET/POST /campaigns/:id/battles`, `GET/PATCH /campaigns/:id/battles/:bid` (`?since=seq`; Titel, Szenario, Bezirk, Zug, Teilnehmer, Ergebnisse), `PUT/DELETE …/battles/:bid/protocol/:eid` (Geräte-ID), `PUT …/battles/:bid/proposals/:pid`, `POST …/proposals/:pid/accept`, `…/reject` – Phase 4a2; `…/close` folgt mit 4a4 |
 | Erzählung | `…/notes`, `…/timeline/positions`, `…/questions`, `…/attachments` |
 | Leiter | `…/background`, `…/style`, `…/briefing/:battleId`, `…/ai-pack/:battleId` |
 | Welt | `…/factions`, `…/npcs`, `…/reputation`, `…/districts`, `…/scenarios` |

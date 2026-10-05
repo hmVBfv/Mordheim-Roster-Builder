@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { ACTIONS, type Action } from '../src/policy.ts';
+import { createBattle, putEntry, putProposal } from '../src/battles.ts';
 import { confirmEnrolment, createCampaign, enrol, setMember } from '../src/campaigns.ts';
 import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
@@ -63,6 +64,15 @@ describe('leak-test matrix', () => {
     setMember(s.db, led.id, player.id, 'player', admin.id, t0);
     setMember(s.db, led.id, victim.id, 'player', admin.id, t0);
     const pending: [string, string] = [entry(led, player.id).id, entry(led, player.id).id];
+    const ledEntered = entry(led, player.id);
+    confirmEnrolment(s.db, led, ledEntered, admin.id, t0);
+    // battles: one in each campaign; in the admin's an entry and two corrections of the player's
+    const battle = createBattle(s.db, { id: randomUUID(), campaignId: theirs.id, round: 1, title: 'The ferry', scenario: '', district: '', warbandIds: [entered.warband_id], by: victim.id }, t0);
+    const ledBattle = createBattle(s.db, { id: randomUUID(), campaignId: led.id, round: 1, title: 'The bridge', scenario: '', district: '', warbandIds: [ledEntered.warband_id], by: admin.id }, t0);
+    const ledEntryId = randomUUID();
+    putEntry(s.db, ledBattle, { id: ledEntryId, turn: 1, kind: 'event', payload: { text: 'Rain.' }, by: admin.id }, t0);
+    const ledProposalIds: [string, string] = [randomUUID(), randomUUID()];
+    for (const pid of ledProposalIds) putProposal(s.db, ledBattle, { id: pid, entryId: ledEntryId, payload: { text: 'It was snow.' }, by: player.id }, t0);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -70,6 +80,7 @@ describe('leak-test matrix', () => {
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
+      battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
