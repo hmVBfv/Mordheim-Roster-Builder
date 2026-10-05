@@ -140,6 +140,58 @@ describe('the overview', () => {
     expect(await syncOnce({ userId: KAI.id, data: async () => data })).toMatchObject({ pushed: 0, waiting: 0 });
   });
 
+  it('a new warband for the campaign: made free under Warbands, its copy entered at once and opened (Rob, 05.10.2026)', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
+    const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
+    expect(within(sheet).getByText(/None of your warbands is free yet/)).toBeTruthy();
+    expect(within(sheet).queryByRole('button', { name: 'Enter a copy' })).toBeNull();
+    await user.click(within(sheet).getByRole('button', { name: 'New warband for this campaign' }));
+    expect(await screen.findByText(/For The Hel Fenn Campaign: the warband is yours under Warbands/)).toBeTruthy();
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'tileans');
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Sons of Trantio');
+    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
+    expect(await screen.findByRole('link', { name: 'In The Hel Fenn Campaign' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Sons of Trantio' })).toBeTruthy();
+    const all = await db.warbands.toArray();
+    const free = all.find((w) => !w.campaignId)!;
+    const copy = all.find((w) => w.campaignId)!;
+    expect(all).toHaveLength(2);
+    expect(free).toMatchObject({ name: 'Sons of Trantio', ownerId: KAI.id, serverRev: 1 });
+    expect(copy).toMatchObject({ name: 'Sons of Trantio', campaignId: c.id, copiedFrom: { id: free.id, rev: 1 } });
+    expect(srv.state.warbands.get(free.id)!.campaignId ?? null).toBeNull();
+    expect(srv.state.warbands.get(free.id)!.versions.map((v) => v.source)).toEqual(['save']);
+    expect(srv.state.campaigns.get(c.id)!.enrolments.map((e) => [e.name, e.status])).toEqual([['The Grey Penitents', 'active'], ['Sons of Trantio', 'pending']]);
+    // in step with the server: the next sync sends neither of them again
+    expect(await syncOnce({ userId: KAI.id, data: async () => data })).toMatchObject({ pushed: 0, waiting: 0 });
+    cleanup();
+    at('/warbands');
+    await screen.findByRole('link', { name: /in The Hel Fenn Campaign/ });
+    expect(screen.getAllByRole('link', { name: /Sons of Trantio/ }).map((a) => a.textContent)).toEqual(expect.arrayContaining([
+      expect.stringMatching(/· in The Hel Fenn Campaign$/), expect.not.stringMatching(/in The Hel Fenn/),
+    ]));
+  });
+
+  it('a new warband for the campaign without the connection: made, and entered later', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
+    const user = userEvent.setup();
+    at(`/warbands/new?campaign=${c.id}`);
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'tileans');
+    srv.state.down = true;
+    const fetchNow = globalThis.fetch;
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch'); }));
+    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
+    expect((await screen.findByRole('alert')).textContent).toMatch(/Your warband is made and under Warbands, but it could not be entered yet/);
+    expect(await db.warbands.count()).toBe(1);
+    vi.stubGlobal('fetch', fetchNow);
+    await user.click(screen.getByRole('link', { name: 'Open the warband' }));
+    expect(await screen.findByRole('button', { name: 'Remove the warband' })).toBeTruthy();
+  });
+
   it('leaving the campaign from the roster: the warband is free again', async () => {
     const srv = server();
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });

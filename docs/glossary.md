@@ -33,6 +33,7 @@ Begriff einführt, trägt ihn hier ein.
 | Kampagne anlegen | Start a campaign | `POST /campaigns`, `createCampaign` |
 | Mitglied, Leiter, Spieler, Zuschauer | Member; Leader, Player, Viewer | `members.role` (`leader` · `player` · `viewer`) |
 | Warband eintragen | Enter a warband (Enter a copy) | `POST /campaigns/:id/enrolments`, `enrolments`, `enterWarband` |
+| neue Warband für die Kampagne | New warband for this campaign | `/warbands/new?campaign=<id>`: frei unter Warbands, die Kopie sofort eingetragen |
 | wartet auf einen Leiter | Waiting for a leader | `enrolments.status = 'pending'` |
 | bestätigen / ablehnen | Confirm / Decline | `confirmEnrolment`, `declineEnrolment` |
 | Kampagne verlassen | Leave the campaign… | `DELETE …/enrolments/:eid`, `withdrawEnrolment`, `status = 'left'` |

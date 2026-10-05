@@ -1,7 +1,6 @@
 /* On the roster of a warband entered in a campaign (phase 4a1): where it is
    entered, and leaving – the warband is then free again; what the campaign
    marked of it stays in the campaign's history. */
-import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { errorText } from '../account/api.ts';
@@ -10,10 +9,7 @@ import { requestSync } from '../sync/runner.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { getCampaign, withdrawEnrolment, type CampaignView } from './api.ts';
-
-export function useCampaignName(id: string | null | undefined): string | null {
-  return useLiveQuery(async () => (id ? ((await db.meta.get(`campaign:${id}`))?.value as CampaignView | undefined)?.campaign.name ?? null : null), [id]) ?? null;
-}
+import { useCampaignName } from './name.ts';
 
 export function InCampaign({ rec, onNotice }: { rec: StoredWarband; onNotice: (t: string) => void }) {
   const id = rec.campaignId!;
