@@ -20,6 +20,8 @@ import { houseView } from '../roster/house.ts';
 import { ExpSheet, MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type ExpSetting, type MenuItem, type Naming } from '../roster/sheets.tsx';
 import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
+import { ConflictBanner } from '../sync/ConflictBanner.tsx';
+import { removeWarband } from '../sync/local.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
@@ -248,6 +250,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           <div><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
       </header>
+      <ConflictBanner data={data} rec={rec} />
       {v.warnings.length > 0 && (
         <ul className={`${ui.card} ${styles.warnings}`} aria-label="Warnings">
           {v.warnings.map((w) => <li key={w}>{w}</li>)}
@@ -276,8 +279,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <Link to={`/warbands/${rec.id}/export`} className={ui.buttonQuiet}>Export…</Link>
         <button type="button" className={ui.buttonQuiet}
-          onClick={() => { void db.warbands.delete(rec.id).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
-          Remove from this device
+          onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
+          {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}
         </button>
       </div>
 
@@ -326,7 +329,7 @@ export function Roster() {
   const { id = '' } = useParams();
   const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
   if (rec === undefined) return null;
-  if (rec === null) {
+  if (rec === null || rec.removedAt) {
     return (
       <section className={ui.page}>
         <h1>Not on this device</h1>

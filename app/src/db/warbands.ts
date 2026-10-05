@@ -3,6 +3,8 @@
    through core, exactly as the old app loads a file. */
 import { FORMAT, loadSave, readSaveText } from '@mordheim/core';
 import type { GameData, LoadResult } from '@mordheim/core';
+import { newOwnership } from '../sync/local.ts';
+import { requestSync } from '../sync/runner.ts';
 import { db, type StoredWarband } from './db.ts';
 
 export type ImportOutcome = { ok: true; id: string; notes: string[] } | { ok: false; msg: string };
@@ -20,9 +22,9 @@ function store(data: GameData, r: LoadResult, now: string, newId: () => string):
   const wb = data.WARBANDS[s.wb as string];
   const rec: StoredWarband = {
     id: newId(), name: s.name || wb?.name || 'Warband', wb: s.wb as string, wbName: wb?.name ?? String(s.wb),
-    state: s, format: FORMAT, createdAt: now, updatedAt: now,
+    state: s, format: FORMAT, createdAt: now, updatedAt: now, ...newOwnership('import'),
   };
-  return db.warbands.add(rec).then(() => ({ ok: true as const, id: rec.id, notes: r.notes }));
+  return db.warbands.add(rec).then(() => { requestSync(); return { ok: true as const, id: rec.id, notes: r.notes }; });
 }
 
 /** Pasted text: the JSON of a save, or the readable export with its data line. */
@@ -41,6 +43,3 @@ export async function importFile(data: GameData, file: Blob, now = new Date().to
   return store(data, r, now, newId);
 }
 
-export function removeWarband(id: string): Promise<void> {
-  return db.warbands.delete(id);
-}

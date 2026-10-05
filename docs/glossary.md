@@ -30,6 +30,9 @@ Begriff einführt, trägt ihn hier ein.
 | aktuelle Version | Latest version | `head_rev` |
 | Entwurf (Autosave) | Draft | `warband_autosaves`, `PUT /warbands/:id/autosave` |
 | freie Warband, Blaupause | Free warband; copy | ohne Kampagne; Kopie: `source: 'copy'`, `copied_from` |
+| Abgleich, wartet | Sync; n waiting | `app/src/sync/`, `syncOnce`, `countPending` |
+| Konflikt (anderswo auch geändert) | Changed on another device as well; Check | `StoredWarband.conflict` (`draft` · `behind` · `removed`) |
+| nur auf diesem Gerät | Only on this device; Keep in my account | `StoredWarband.ownerId` leer, `keepInAccount` |
 | Autosave-Platz | Autosave | `warband_autosaves` |
 | markierter Stand | Tagged state | `tags` |
 | Start | Start | `kind: 'start'` |
