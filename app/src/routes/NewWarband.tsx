@@ -1,9 +1,16 @@
 /* Starting a new warband (phase 3a), as the Roster Builder starts one: the
    warband from the list grouped by grade, its variant where it has one,
-   and a name. The roster opens empty, with the starting gold to spend. */
+   and a name. The roster opens empty, with the starting gold to spend.
+
+   For a campaign (Rob, 05.10.2026: "Enter a warband" → "New warband for
+   this campaign", ?campaign=<id>): the warband is made as always, free
+   under Warbands, and a copy is entered in the campaign at once; the copy
+   opens. Campaigns stay apart from the warbands themselves. */
 import { warbandPickerGroups } from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
+import { errorText } from '../account/api.ts';
+import { useCampaignName } from '../campaign/name.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { newOwnership } from '../sync/local.ts';
@@ -13,8 +20,9 @@ import { useGameData } from '../game/useGameData.ts';
 import { createWarband, newWarbandChoice } from '../roster/view.ts';
 import ui from '../ui/ui.module.css';
 
-function Form() {
+function Form({ campaignId }: { campaignId: string | null }) {
   const data = useGameData();
+  const [made, setMade] = useState<{ id: string; error: string } | null>(null);
   const groups = useMemo(() => warbandPickerGroups(data), [data]);
   const [key, setKey] = useState('');
   const [sub, setSub] = useState<string | null>(null);
@@ -37,9 +45,33 @@ function Form() {
     };
     await db.warbands.add(rec);
     requestSync();
+    let open = rec.id;
+    if (campaignId) {
+      try {
+        const { enterWarband } = await import('../campaign/enter.ts');
+        open = (await enterWarband(data, campaignId, rec)).id;
+      } catch (e) {
+        // the warband is made; entering it can wait for the connection
+        setMade({ id: rec.id, error: errorText(e) });
+        setBusy(false);
+        return;
+      }
+    }
     // Back from the new roster leads to where the player came from, not to this form
-    void navigate(`/warbands/${rec.id}`, { replace: true });
+    void navigate(`/warbands/${open}`, { replace: true });
   };
+
+  if (made && campaignId) {
+    return (
+      <div className={ui.page}>
+        <p className={`${ui.message} ${ui.error}`} role="alert">Your warband is made and under Warbands, but it could not be entered yet: {made.error} Enter it from the campaign later.</p>
+        <div className={ui.row}>
+          <Link to={`/warbands/${made.id}`} className={ui.button} replace>Open the warband</Link>
+          <Link to={`/campaign/${campaignId}`} className={ui.buttonQuiet} replace>To the campaign</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void create(); }}>
@@ -71,18 +103,26 @@ function Form() {
       {choice && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
       <div className={ui.row}>
         <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>
-        <Link to="/warbands" className={ui.buttonQuiet}>Cancel</Link>
+        <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
       </div>
     </form>
   );
 }
 
 export function NewWarband() {
+  const [params] = useSearchParams();
+  const campaignId = params.get('campaign');
+  const campaign = useCampaignName(campaignId);
   return (
     <section className={ui.page}>
       <h1>New warband</h1>
+      {campaignId && (
+        <p className={`${ui.card} ${ui.muted}`}>
+          For {campaign ?? 'the campaign'}: the warband is yours under Warbands, free for other games; a copy of it is entered in the campaign at once, and that copy opens.
+        </p>
+      )}
       <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}>
-        <Form />
+        <Form campaignId={campaignId} />
       </Suspense>
     </section>
   );
