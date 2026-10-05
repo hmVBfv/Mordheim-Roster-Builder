@@ -1,0 +1,90 @@
+/* Sharing a warband (Rob, 05.10.2026). */
+.people {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.person input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+.person small {
+  color: var(--text-muted);
+}
+
+/* the code, readable across a table */
+.code {
+  margin: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 2rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+  user-select: all;
+}
+
+.codeInput {
+  font-family: ui-monospace, monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.list li > span {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.list small {
+  color: var(--text-muted);
+}
+
+.list button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.section h3 {
+  margin: 0;
+}

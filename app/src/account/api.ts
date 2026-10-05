@@ -76,6 +76,8 @@ export function errorText(e: unknown): string {
     case 'invalid_login': return 'Username or password is not right.';
     case 'invalid_code': return 'That code is not right. Codes change every 30 seconds – check the time on your phone.';
     case 'too_many_attempts': return `Too many attempts. Try again in ${waitText(e.retryAfter ?? 30)}.`;
+    case 'unknown_share_code': return 'No warband goes with that code. It may have been taken back or have run out (codes last 7 days).';
+    case 'gone': return 'That is no longer open: it was taken back, answered or has run out.';
     case 'invalid_link': return 'This link is no longer valid: it was used, revoked or has expired. Ask for a new one.';
     case 'sign_in': return 'Please sign in again.';
     case 'forbidden': return 'Your account may not do that.';

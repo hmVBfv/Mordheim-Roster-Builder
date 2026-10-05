@@ -42,7 +42,7 @@ unverändert auf Pages.
 
 ```
 Home         Open for you · Warbands · Campaigns
-Warband      Roster · Story · Versions
+Warband      Roster · Story · Versions · Share…
 Campaign     Overview · Notes · Timeline · Chronicle · World
              · Background* · Manage*
 Game night   Vollbild, aus einer Schlacht heraus
