@@ -27,6 +27,10 @@ Begriff einführt, trägt ihn hier ein.
 | --- | --- | --- |
 | Warband | Warband | `warbands` |
 | Version | Version | `warband_versions`, `rev` |
+| Version speichern | Save a version | `saveVersion`, `POST /warbands/:id/versions` |
+| ältere Version zurückholen | Bring back (make it the newest) | `restoreVersion`, `source: 'restore'` |
+| Kopie (Blaupause) | Make a copy | `makeCopy`, `origin: 'copy'`, `copiedFrom` |
+| An Kampagnenserver senden | Send to campaign server | `app/src/share/link.ts`, Route `/import` |
 | aktuelle Version | Latest version | `head_rev` |
 | Entwurf (Autosave) | Draft | `warband_autosaves`, `PUT /warbands/:id/autosave` |
 | freie Warband, Blaupause | Free warband; copy | ohne Kampagne; Kopie: `source: 'copy'`, `copied_from` |

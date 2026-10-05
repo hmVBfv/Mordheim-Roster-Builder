@@ -14,6 +14,8 @@ import { exportCtx, readableText, toolFile, ttsCards, type TtsCard } from '../ro
 import { officialSheet } from '../roster/pdf.ts';
 import styles from '../roster/Export.module.css';
 import trade from '../roster/Trade.module.css';
+import { FLAVOUR } from '../flavour.ts';
+import { encodeSave, getServer, importLink } from '../share/link.ts';
 import { copyText, saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
 
@@ -44,6 +46,34 @@ function Card({ c, open, onCopied }: { c: TtsCard; open: boolean; onCopied: (wha
       <CopyField label="Name" value={c.name} rows={1} onCopied={onCopied} />
       <CopyField label="Description" value={c.text} rows={8} onCopied={onCopied} />
     </details>
+  );
+}
+
+/** Quick Build → campaign server (concept.md 4.11): a link that carries the warband in its fragment. */
+function SendToServer({ ctx, onCopied }: { ctx: core.Ctx; onCopied: (what: string) => void }) {
+  const server = getServer();
+  const [link, setLink] = useState<string | null>(null);
+  useEffect(() => {
+    if (!server) return;
+    let live = true;
+    void encodeSave(core.writeSave(ctx, __APP_VERSION__)).then((f) => { if (live) setLink(importLink(server, f)); });
+    return () => { live = false; };
+  }, [server, ctx]);
+  return (
+    <section className={styles.group} aria-labelledby="ex-server">
+      <h2 id="ex-server">Campaign server</h2>
+      {server ? (
+        <>
+          <p className={ui.muted}>Opens the campaign app at {server.replace(/^https?:\/\//, '')} with this warband: there you add it as a new warband or as the next version of one of yours. The warband travels in the link itself, not through any server.</p>
+          <div className={ui.row}>
+            <a className={ui.button} href={link ?? undefined} target="_blank" rel="noopener noreferrer" aria-disabled={!link}>Send to campaign server</a>
+            <button type="button" className={ui.buttonQuiet} disabled={!link} onClick={() => { if (link) void copyText(link).then((ok) => onCopied(ok ? 'Link' : '')); }}>Copy the link</button>
+          </div>
+        </>
+      ) : (
+        <p className={ui.muted}>To send warbands to your group’s campaign server, enter its address under More → Campaign server.</p>
+      )}
+    </section>
   );
 }
 
@@ -128,6 +158,8 @@ function Body({ rec }: { rec: StoredWarband }) {
         </div>
         {pdf !== 'idle' && pdf !== 'making' && <p className={trade.no} role="alert">{pdf}</p>}
       </section>
+
+      {FLAVOUR === 'quickbuild' && <SendToServer ctx={ctx} onCopied={copied} />}
 
       <section className={styles.group} aria-labelledby="ex-print">
         <h2 id="ex-print">Print</h2>

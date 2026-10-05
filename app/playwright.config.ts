@@ -21,7 +21,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['list'], ['github']] : [['list']],
   use: { viewport: { width: 360, height: 740 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true, launchOptions },
   projects: [
-    { name: 'campaign', testIgnore: /legacy|mockups/, use: { baseURL: 'http://localhost:4173/' } },
+    { name: 'campaign', testIgnore: /legacy|mockups|quickbuild\.spec/, use: { baseURL: 'http://localhost:4173/' } },
     // accounts are the campaign app's (account.spec.ts); app.spec.ts checks the Quick Build has none
     { name: 'quickbuild', testIgnore: /legacy|mockups|account|sync/, use: { baseURL: 'http://localhost:4174/' } },
     // the legacy Roster Builder (repo root), still live until phase 3
