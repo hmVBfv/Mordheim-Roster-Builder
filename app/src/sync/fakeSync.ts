@@ -4,7 +4,7 @@
    baseRev, one draft per user with afterSeq, tombstones, sync by seq,
    epoch), in memory, for one signed-in user. Tests can act as "another
    device" by changing the state directly. */
-export interface FakeVersion { rev: number; data: unknown; createdAt: string; source: string }
+export interface FakeVersion { rev: number; data: unknown; createdAt: string; source: string; note?: string }
 export interface FakeWarband {
   id: string; headRev: number; versions: FakeVersion[]; archivedAt: string | null; seq: number;
   draft: { baseRev: number; data: unknown; device: string; updatedAt: string; seq: number } | null;
@@ -62,11 +62,16 @@ export function createFakeSync() {
       if (!w) return json(404, { error: 'not_found' });
       const rest = m[2] ?? '';
       if (method === 'GET' && rest === '') return json(200, { warband: meta(w), head: w.versions.find((v) => v.rev === w.headRev), draft: w.draft });
+      if (method === 'GET' && rest === '/versions') return json(200, { versions: [...w.versions].reverse().map((v) => ({ rev: v.rev, format: 2, appVersion: '', source: v.source, createdBy: 'kai', createdAt: v.createdAt, note: v.note ?? '', bytes: JSON.stringify(v.data).length })) });
+      if (method === 'GET' && rest.startsWith('/versions/')) {
+        const v = w.versions.find((x) => x.rev === Number(rest.slice(10)));
+        return v ? json(200, { version: { ...v, format: 2, createdBy: 'kai', note: v.note ?? '' } }) : json(404, { error: 'not_found' });
+      }
       if (method === 'POST' && rest === '/versions') {
         if (w.archivedAt) return json(409, { error: 'archived' });
         if (body.baseRev !== w.headRev) return json(409, { error: 'stale', headRev: w.headRev });
         w.headRev++;
-        w.versions.push({ rev: w.headRev, data: body.data, createdAt: at(), source: String(body.source ?? 'save') });
+        w.versions.push({ rev: w.headRev, data: body.data, createdAt: at(), source: String(body.source ?? 'save'), note: String(body.note ?? '') });
         w.draft = null;
         w.seq = next();
         return json(201, { warband: meta(w), rev: w.headRev });
