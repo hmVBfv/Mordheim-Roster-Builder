@@ -5,12 +5,12 @@
    what is newer) and players send corrections. Whatever is entered goes to
    the outbox first and is sent when the server answers: a table without a
    connection loses nothing. */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { errorText, type Me } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { useOnline } from '../app/SyncState.tsx';
-import { cachedCampaign, getCampaign, readWarband, type CampaignRole } from '../campaign/api.ts';
+import { cachedCampaign, getCampaign, type CampaignRole } from '../campaign/api.ts';
 import { db, type OutboxItem } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { useNotice } from '../ui/Notice.tsx';
@@ -20,7 +20,12 @@ import {
   battleTitle, cachedBattle, casualtyText, decideProposal, getBattle, OUTCOME_NAMES, patchBattle,
   type BattleView, type CasualtyPayload, type Entry, type EntryBody, type Outcome, type Proposal,
 } from './api.ts';
-import { CasualtySheet, EventSheet, ProposalSheet, usePicks } from './BattleSheets.tsx';
+import { CasualtySheet, EventSheet, ProposalSheet } from './BattleSheets.tsx';
+import type { FullNote, Kind } from '../notes/api.ts';
+import { NoteCard, NoteSheet } from '../notes/NoteParts.tsx';
+import { noteRights, useNoteActions } from '../notes/Notes.tsx';
+import { useNotes } from '../notes/useNotes.ts';
+import { usePicks, useWarbandLoader } from './picks.ts';
 import styles from './Battle.module.css';
 import { enqueue, flushOutbox, useOutbox } from './outbox.ts';
 
@@ -49,16 +54,23 @@ function merge(view: BattleView, outbox: OutboxItem[], me: string): { entries: S
 }
 
 function useBattle(cid: string, bid: string, userId: string | undefined) {
-  const [view, setView] = useState<BattleView | null>(null);
+  const [view, setShown] = useState<BattleView | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // every change made here counts up; an answer asked for before it is stale and not shown
+  const changes = useRef(0);
+  const setView = useCallback((v: BattleView) => { changes.current++; setShown(v); }, []);
   /** Sends what waits, then asks for what is newer than the state seen last (all of it with `full`). */
-  const refresh = useCallback((full = false): Promise<void> => (userId ? flushOutbox(userId) : Promise.resolve(0))
-    .then(() => (full ? null : cachedBattle(bid)))
-    .then((cur) => getBattle(cid, bid, cur?.seq).then((v) => { setView(v ?? cur); setError(null); }))
-    .catch((e: unknown) => setError(errorText(e))), [cid, bid, userId]);
+  const refresh = useCallback((full = false): Promise<void> => {
+    const asked = changes.current;
+    return (userId ? flushOutbox(userId) : Promise.resolve(0))
+      .then(() => (full ? null : cachedBattle(bid)))
+      // nothing newer: what is shown stays (it may already show what was just entered here)
+      .then((cur) => getBattle(cid, bid, cur?.seq).then((v) => { if (v && asked === changes.current) setShown(v); setError(null); }))
+      .catch((e: unknown) => setError(errorText(e)));
+  }, [cid, bid, userId]);
   useEffect(() => {
     let live = true;
-    void cachedBattle(bid).then((v) => { if (live && v) setView((cur) => cur ?? v); });
+    void cachedBattle(bid).then((v) => { if (live && v) setShown((cur) => cur ?? v); });
     void refresh(true);
     const t = setInterval(() => { if (document.visibilityState === 'visible') void refresh(); }, POLL_MS);
     return () => { live = false; clearInterval(t); };
@@ -133,21 +145,26 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<Shown | null>(null);
   const [about, setAbout] = useState<Shown | null>(null);
-  const loadWarband = useCallback(async (wid: string) => {
-    const k = `cw:${cid}:${wid}`;
-    try {
-      const r = await readWarband(cid, wid);
-      const data = r.draft?.data ?? r.head.data;
-      await db.meta.put({ key: k, value: data });
-      return data;
-    } catch {
-      return (await db.meta.get(k))?.value ?? null;
-    }
-  }, [cid]);
+  const loadWarband = useWarbandLoader(cid);
   const [wantPicks, setWantPicks] = useState(false);
-  const { picks, error: picksError } = usePicks(view.participants, loadWarband, lead && wantPicks);
+  const fighters = useMemo(() => view.participants.map((p) => p.warbandId), [view.participants]);
+  const { picks, error: picksError } = usePicks(fighters, loadWarband, wantPicks);
+  // notes of this battle, everybody's (phase 4a3), laid into the protocol by turn
+  const noteState = useNotes(cid, user, POLL_MS);
+  const battleNotes = useMemo(() => (noteState.notes ?? []).filter((n) => n.battleId === bid), [noteState.notes, bid]);
+  const notes = useNoteActions(cid, user, notify, noteState.refresh);
+  const noteSheet = useSheet();
+  const [noteOf, setNoteOf] = useState<{ note: FullNote | null; kind: Kind }>({ note: null, kind: 'general' });
+  const openNote = (note: FullNote | null, kind: Kind) => { setNoteOf({ note, kind }); setFormKey((k) => k + 1); setWantPicks(true); noteSheet.open(); };
 
   const merged = useMemo(() => merge(view, outbox, user.id), [view, outbox, user.id]);
+  const timeline = useMemo(() => {
+    const turnOf = (n: (typeof battleNotes)[number]) => ('turn' in n && n.turn) || 0;
+    return [
+      ...merged.entries.map((e) => ({ turn: e.turn, at: e.createdAt, entry: e, note: null })),
+      ...battleNotes.map((n) => ({ turn: turnOf(n), at: n.createdAt, entry: null, note: n })),
+    ].sort((a, b) => b.turn - a.turn || b.at.localeCompare(a.at));
+  }, [merged.entries, battleNotes]);
   const names = useMemo(() => Object.fromEntries(view.participants.map((p) => [p.warbandId, p.name])), [view]);
 
   const waiting = outbox.filter((i) => !i.refused).length;
@@ -203,14 +220,23 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </div>
           <section aria-labelledby="b-protocol" className={ui.page}>
             <h2 id="b-protocol">Protocol</h2>
-            {merged.entries.length === 0 && <p className={ui.muted}>Nothing yet.{lead ? ' Who goes out of action, you enter below.' : ' A leader writes it; it appears here.'}</p>}
+            {merged.entries.length === 0 && battleNotes.length === 0 && <p className={ui.muted}>Nothing yet.{lead ? ' Who goes out of action, you enter below.' : ' A leader writes the protocol; notes and quotes everybody.'}</p>}
             <ul className={styles.protocol} aria-label="Protocol">
-              {merged.entries.map((e) => (
-                <EntryCard key={e.id} e={e} names={names} lead={lead && !closed} canPropose={canPropose && !closed}
-                  onCorrect={() => { setEditing(e); setFormKey((k) => k + 1); if (e.kind === 'casualty') { setWantPicks(true); cas.open(); } else ev.open(); }}
-                  onRemove={() => void removeEntry(e)}
-                  onPropose={() => { setAbout(e); setFormKey((k) => k + 1); prop.open(); }} />
-              ))}
+              {timeline.map((t) => (t.entry
+                ? (
+                  <EntryCard key={t.entry.id} e={t.entry} names={names} lead={lead && !closed} canPropose={canPropose && !closed}
+                    onCorrect={() => { setEditing(t.entry!); setFormKey((k) => k + 1); if (t.entry!.kind === 'casualty') { setWantPicks(true); cas.open(); } else ev.open(); }}
+                    onRemove={() => void removeEntry(t.entry!)}
+                    onPropose={() => { setAbout(t.entry!); setFormKey((k) => k + 1); prop.open(); }} />
+                )
+                : (() => {
+                  const n = t.note!;
+                  const r = noteRights(n, user, lead, canPropose && !closed);
+                  return (
+                    <NoteCard key={n.id} n={n} battleName={() => `battle ${view.battle.round}`} pending={'pending' in n ? n.pending : false} refused={'refused' in n ? n.refused : undefined}
+                      canEdit={r.edit} canRemove={r.remove} onEdit={() => openNote(n as FullNote, (n as FullNote).kind)} onRemove={() => void notes.remove(n)} />
+                  );
+                })()))}
             </ul>
           </section>
         </div>
@@ -266,7 +292,9 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           {lead && <button type="button" className={ui.button} onClick={() => { setEditing(null); setFormKey((k) => k + 1); setWantPicks(true); cas.open(); }}>+ Casualty</button>}
           {lead && <button type="button" className={ui.button} onClick={() => { setEditing(null); setFormKey((k) => k + 1); ev.open(); }}>+ Event</button>}
           {lead && mine.length > 0 && <button type="button" className={ui.buttonQuiet} onClick={() => void removeEntry(mine.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]!)}>Undo last</button>}
-          {!lead && <button type="button" className={ui.button} onClick={() => { setAbout(null); setFormKey((k) => k + 1); prop.open(); }}>Suggest a correction</button>}
+          <button type="button" className={ui.button} onClick={() => openNote(null, 'general')}>+ Note</button>
+          <button type="button" className={ui.button} onClick={() => openNote(null, 'quote')}>+ Quote</button>
+          {!lead && <button type="button" className={ui.buttonQuiet} onClick={() => { setAbout(null); setFormKey((k) => k + 1); prop.open(); }}>Suggest a correction</button>}
         </div>
       )}
 
@@ -284,6 +312,14 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           setView({ ...view, proposals: [...view.proposals, { id: pid, targetType: entryId ? 'protocol_entry' : 'battle', targetId: entryId ?? bid, authorId: user.id, author: user.displayName, payload: { text }, status: 'open', decidedBy: null, createdAt: new Date().toISOString() }] });
           void enqueue({ key: pid, op: 'proposal.put', userId: user.id, campaignId: cid, battleId: bid, targetId: pid, body: { entryId, text } })
             .then(() => { notify('Sent to the leader.'); void refresh(); });
+        }} />
+      <NoteSheet dialogRef={noteSheet.ref} close={noteSheet.close} formKey={formKey} battles={[{ id: bid, label: `battle ${view.battle.round}`, open: !closed }]}
+        fixed={{ battleId: bid, turn: shownTurn }} kind={noteOf.kind} canLead={lead} warbands={view.participants.map((p) => ({ warbandId: p.warbandId, name: p.name }))} picks={picks}
+        note={noteOf.note} wordsOnly={!!noteOf.note && noteOf.note.authorId !== user.id}
+        onSave={(body) => {
+          const o = noteOf.note;
+          const nid = o?.id ?? newId();
+          void notes.save(nid, o && o.authorId !== user.id ? { ...body, kind: o.kind, visibility: o.visibility, mentions: o.mentions, battleId: o.battleId, turn: o.turn } : body, o ? 'Saved.' : body.kind === 'quote' ? 'Quote saved.' : 'Note saved.');
         }} />
       {notice}
     </section>

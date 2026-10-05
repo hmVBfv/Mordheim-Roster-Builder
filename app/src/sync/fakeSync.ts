@@ -19,6 +19,10 @@ export interface FakeWarband {
 export type FakeRole = 'leader' | 'player' | 'viewer';
 export interface FakeEntry { id: string; turn: number; kind: 'casualty' | 'event'; payload: unknown; author: string; createdAt: string; updatedAt: string; deleted?: boolean }
 export interface FakeProposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: { text: string }; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
+export interface FakeNote {
+  id: string; campaignId: string; battleId: string | null; turn: number | null; authorId: string; author: string; kind: string; text: string;
+  visibility: 'public' | 'sealed' | 'leader'; mentions: unknown[]; createdAt: string; updatedAt: string; seq: number; deleted?: boolean; edited?: boolean;
+}
 export interface FakeBattle {
   id: string; campaignId: string; round: number; title: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
   participants: { warbandId: string; outcome: string }[];
@@ -66,6 +70,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     shares: [] as FakeShare[],
     campaigns: new Map<string, FakeCampaign>(),
     battles: new Map<string, FakeBattle>(),
+    notes: new Map<string, FakeNote>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -118,6 +123,61 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     const b = s.battles.get(bid)!;
     b.entries.push({ ...e, createdAt: at(), updatedAt: at() });
     b.seq = next();
+  };
+
+  /* ---- notes (as server/src/notes.ts filters them) ---- */
+  const noteFor = (n: FakeNote, role: FakeRole) => {
+    if (n.deleted) return null;
+    if (n.visibility === 'leader' && role !== 'leader' && n.authorId !== me.id) return null;
+    const closed = n.battleId ? s.battles.get(n.battleId)?.status === 'closed' : false;
+    if (n.visibility === 'sealed' && !closed && n.authorId !== me.id) {
+      return { id: n.id, battleId: n.battleId, authorId: n.authorId, author: n.author, visibility: 'sealed', sealedUntil: n.battleId, sealed: true, createdAt: n.createdAt };
+    }
+    return {
+      id: n.id, battleId: n.battleId, turn: n.turn, authorId: n.authorId, author: n.author, kind: n.kind, text: n.text, lang: '', visibility: n.visibility,
+      sealedUntil: n.visibility === 'sealed' ? n.battleId : null, opened: n.visibility === 'sealed' && closed, mentions: n.mentions, protocolEntryId: null,
+      createdAt: n.createdAt, updatedAt: n.updatedAt, edited: !!n.edited,
+    };
+  };
+  const notesSeq = (cid: string) => Math.max(0, ...[...s.notes.values()].filter((n) => n.campaignId === cid).map((n) => n.seq));
+  /** Another member writes a note. */
+  const noteFrom = (campaignId: string, n: { author: string; text: string; battleId?: string | null; turn?: number | null; kind?: string; visibility?: FakeNote['visibility']; mentions?: unknown[] }) => {
+    const note: FakeNote = {
+      id: `${String(s.notes.size + 1).padStart(8, '0')}-0000-4000-8000-000000000000`, campaignId, battleId: n.battleId ?? null, turn: n.turn ?? null,
+      authorId: `user-${n.author.toLowerCase()}`, author: n.author, kind: n.kind ?? 'general', text: n.text, visibility: n.visibility ?? 'public', mentions: n.mentions ?? [],
+      createdAt: at(), updatedAt: at(), seq: next(),
+    };
+    s.notes.set(note.id, note);
+    return note;
+  };
+  const noteRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
+    if (method === 'GET' && rest === '/notes') {
+      const seq = notesSeq(c.id);
+      const since = query.get('since');
+      if (since !== null && Number(since) >= seq) return json(200, { unchanged: true, seq });
+      return json(200, { notes: [...s.notes.values()].filter((n) => n.campaignId === c.id).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map((n) => noteFor(n, role)).filter(Boolean), seq });
+    }
+    const m = rest.match(/^\/notes\/([^/]+)$/);
+    if (!m) return null;
+    if (role === 'viewer') return json(403, { error: 'forbidden' });
+    const cur = s.notes.get(m[1]!);
+    if (method === 'PUT') {
+      if (cur?.deleted) return json(409, { error: 'removed' });
+      if (body.visibility === 'leader' && role !== 'leader') return json(403, { error: 'forbidden' });
+      if (cur && cur.authorId !== me.id && role !== 'leader') return json(403, { error: 'forbidden' });
+      const fields = { battleId: (body.battleId as string | null) ?? null, turn: (body.turn as number | null) ?? null, kind: String(body.kind ?? 'general'), text: String(body.text), mentions: (body.mentions as unknown[]) ?? [] };
+      if (cur) Object.assign(cur, fields, cur.authorId === me.id ? { visibility: body.visibility ?? 'public' } : {}, { updatedAt: at(), seq: next(), edited: cur.edited || cur.text !== fields.text });
+      else s.notes.set(m[1]!, { id: m[1]!, campaignId: c.id, ...fields, authorId: me.id, author: me.displayName, visibility: (body.visibility as FakeNote['visibility']) ?? 'public', createdAt: at(), updatedAt: at(), seq: next() });
+      return json(200, { note: noteFor(s.notes.get(m[1]!)!, role), seq: notesSeq(c.id) });
+    }
+    if (method === 'DELETE') {
+      if (!cur || !noteFor(cur, role)) return json(404, { error: 'not_found' });
+      if (cur.authorId !== me.id && role !== 'leader') return json(403, { error: 'forbidden' });
+      cur.deleted = true;
+      cur.seq = next();
+      return json(200, { removed: true, seq: notesSeq(c.id) });
+    }
+    return json(404, { error: 'not_found' });
   };
 
   const battleRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
@@ -251,6 +311,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     const lead = role === 'leader';
     const forbidden = json(403, { error: 'forbidden' });
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
+    if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
     if (method === 'PATCH' && rest === '') { if (!lead) return forbidden; c.name = String(body.name).trim(); return json(200, view(c)); }
     let x: RegExpMatchArray | null;
@@ -434,5 +495,5 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, entryElsewhere };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, entryElsewhere, noteFrom };
 }
