@@ -71,16 +71,17 @@ export function flushOutbox(userId: string): Promise<number> {
 export const countOutbox = (userId: string) => db.outbox.filter((i) => i.userId === userId).count();
 
 /** What still waits for this battle, live. */
-export function useOutbox(battleId: string): OutboxItem[] {
-  return useLiveQuery(() => db.outbox.where('battleId').equals(battleId).sortBy('at'), [battleId]) ?? [];
+export function useOutbox(battleId: string, userId: string): OutboxItem[] {
+  // filtered after the query, not in it: a plain range query is one Dexie updates at once, without a new round (no flicker)
+  return useLiveQuery(() => db.outbox.where('battleId').equals(battleId).sortBy('at').then((all) => all.filter((i) => i.userId === userId)), [battleId, userId]) ?? [];
 }
 
 /** The notes of a campaign that still wait, live. */
-export function useNoteOutbox(campaignId: string): OutboxItem[] {
-  return useLiveQuery(() => db.outbox.filter((i) => i.campaignId === campaignId && (i.op === 'note.put' || i.op === 'note.delete')).sortBy('at'), [campaignId]) ?? [];
+export function useNoteOutbox(campaignId: string, userId: string): OutboxItem[] {
+  return useLiveQuery(() => db.outbox.filter((i) => i.userId === userId && i.campaignId === campaignId && (i.op === 'note.put' || i.op === 'note.delete')).sortBy('at'), [campaignId, userId]) ?? [];
 }
 
 /** The pictures of a campaign that still wait, live. */
-export function usePictureOutbox(campaignId: string): OutboxItem[] {
-  return useLiveQuery(() => db.outbox.filter((i) => i.campaignId === campaignId && (i.op === 'attachment.put' || i.op === 'attachment.delete')).sortBy('at'), [campaignId]) ?? [];
+export function usePictureOutbox(campaignId: string, userId: string): OutboxItem[] {
+  return useLiveQuery(() => db.outbox.filter((i) => i.userId === userId && i.campaignId === campaignId && (i.op === 'attachment.put' || i.op === 'attachment.delete')).sortBy('at'), [campaignId, userId]) ?? [];
 }

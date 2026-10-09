@@ -15,9 +15,10 @@ export function useNotes(cid: string, me: { id: string; displayName: string } | 
   const [notes, setNotes] = useState<Note[] | null>(null);
   const [sending, setSending] = useState<OutboxItem[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const outbox = useNoteOutbox(cid);
+  const outbox = useNoteOutbox(cid, me?.id ?? '');
   const userId = me?.id;
-  const refresh = useCallback((): Promise<void> => db.outbox.filter((i) => i.campaignId === cid && i.op.startsWith('note.')).toArray()
+  // only one's own wait here: another account's on this device are not shown (security review CLIENT-1)
+  const refresh = useCallback((): Promise<void> => db.outbox.filter((i) => i.userId === userId && i.campaignId === cid && i.op.startsWith('note.')).toArray()
     .then((items) => { setSending(items); return userId ? flushOutbox(userId) : 0; })
     .then(() => getNotes(cid))
     .then((r) => { setNotes(r.notes); setSending([]); setError(null); })

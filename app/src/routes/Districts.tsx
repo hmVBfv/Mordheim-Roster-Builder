@@ -6,7 +6,7 @@ import * as core from '@mordheim/core';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useMemo } from 'react';
 import { Link, useParams } from 'react-router';
-import type { CampaignView } from '../campaign/api.ts';
+import { campaignKey, type CampaignView } from '../campaign/api.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { FLAVOUR } from '../flavour.ts';
 import { useGameData } from '../game/useGameData.ts';
@@ -16,6 +16,7 @@ import trade from '../roster/Trade.module.css';
 import { useEditor } from '../roster/useEditor.ts';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
+import { useWarbandRecord } from '../sync/local.ts';
 
 /* a district's prices never move gold already in hand, like a price house rule */
 const KEEP = { gold: 'keep' } as const;
@@ -25,7 +26,7 @@ const HOLDS: [Hold, string][] = [['none', 'None'], ['foothold', 'Foothold'], ['c
 function useOthers(rec: StoredWarband) {
   return useLiveQuery(async () => {
     if (FLAVOUR !== 'campaign' || !rec.campaignId) return [];
-    const v = (await db.meta.get(`campaign:${rec.campaignId}`))?.value as CampaignView | undefined;
+    const v = (await db.meta.get(campaignKey(rec.campaignId)))?.value as CampaignView | undefined;
     return (v?.enrolments ?? []).filter((e) => e.warbandId !== rec.id && e.status === 'active').map((e) => ({ name: e.name || e.wbName, districts: e.districts ?? [] }));
   }, [rec.id, rec.campaignId]) ?? [];
 }
@@ -93,7 +94,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 
 export function Districts() {
   const { id = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null) {
     return (

@@ -26,7 +26,17 @@ function set(next: Session) {
     if (next.status === 'in') localStorage.setItem(KEY, JSON.stringify(next.user));
     else if (next.status === 'out') localStorage.removeItem(KEY);
   } catch { /* storage may be unavailable; the session still works */ }
+  // signed out: the campaign data kept here goes; signed in: everybody else's (security review CLIENT-1)
+  if (next.status === 'out' || next.status === 'in') {
+    const keep = next.status === 'in' ? next.user.id : null;
+    void import('./owner.ts').then((m) => m.forgetCampaignData(keep)).catch(() => undefined);
+  }
   for (const l of listeners) l();
+}
+
+/** The user last known on this device (kept until a sign-out), for the moment before the server has answered. */
+export function knownUser(): Me | null {
+  return cached();
 }
 
 function cached(): Me | null {

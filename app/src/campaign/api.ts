@@ -4,6 +4,7 @@
 import { api } from '../account/api.ts';
 import type { BattleSummary, FrozenChange, Outcome } from '../battle/api.ts';
 import { db } from '../db/db.ts';
+import { ownKey } from '../account/owner.ts';
 
 export type CampaignRole = 'leader' | 'player' | 'viewer';
 export interface Totals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
@@ -38,8 +39,10 @@ export interface CampaignWarband {
   tags: Tag[];
 }
 
-const listKey = (userId: string) => `campaigns:${userId}`;
-const viewKey = (id: string) => `campaign:${id}`;
+const listKey = (userId: string) => `campaigns:${userId}:list`;
+/** Where this account keeps a campaign's overview on the device (account/owner.ts). */
+export const campaignKey = (id: string) => ownKey('campaign:', id);
+const viewKey = campaignKey;
 
 /** The stage a campaign is in, as the Roster Builder names it (core roundLabel): the founding, then after each round's battles. */
 export const roundName = (round: number) => (round > 0 ? `After battle ${round}` : 'Setup');
