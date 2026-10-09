@@ -5,7 +5,8 @@
    yet: every battle's protocol, and the marks of the warbands. A position
    is only given to who may see its block (ADR 0011): a leaders' note's
    place never reaches a player. Each one moves their own blocks, a leader
-   all of them; every move is logged. */
+   all of them; every move is logged. A published chapter (4a5) is a block
+   too: public, placed by a leader. */
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
@@ -14,7 +15,7 @@ import { noteById } from './notes.ts';
 
 const iso = (d: Date) => d.toISOString();
 
-export const ITEM_TYPES = ['note', 'picture', 'entry'] as const;
+export const ITEM_TYPES = ['note', 'picture', 'entry', 'chapter'] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
 
 export interface Position { itemType: ItemType; itemId: string; segment: string; pos: string; movedBy: string; movedAt: string }
@@ -39,6 +40,11 @@ function blockOf(db: DB, campaignId: string, type: ItemType, id: string, v: View
     const a = attachmentById(db, id);
     if (!a || a.campaign_id !== campaignId || !visibleTo(a, v)) return null;
     return { owner: a.uploader_id, visibility: a.visibility, sealed: false };
+  }
+  if (type === 'chapter') {
+    // a published chapter (4a5): everyone reads it, a leader places it
+    const c = db.prepare('SELECT campaign_id, deleted_at FROM chapters WHERE id = ?').get(id) as { campaign_id: string; deleted_at: string | null } | undefined;
+    return c && !c.deleted_at && c.campaign_id === campaignId ? { owner: null, visibility: 'public', sealed: false } : null;
   }
   const e = db.prepare('SELECT e.*, b.campaign_id FROM protocol_entries e JOIN battles b ON b.id = e.battle_id WHERE e.id = ?').get(id) as { campaign_id: string; deleted_at: string | null } | undefined;
   if (!e || e.deleted_at || e.campaign_id !== campaignId) return null;
@@ -77,6 +83,14 @@ export function campaignMarks(db: DB, campaignId: string) {
     .map((t) => ({ id: t.id, warbandId: t.warband_id, warband: t.name, kind: t.kind, round: t.round, battleId: t.battle_id, rev: t.rev, changes: t.n, unexplained: t.u, createdAt: t.created_at }));
 }
 
+/** Why a place is not one in this campaign's story, or null when it is. */
+export function checkPlace(db: DB, campaignId: string, to: { segment: string; pos: string }): string | null {
+  const m = SEGMENT.exec(to.segment);
+  if (!m || !POS.test(to.pos) || to.pos.endsWith('0')) return 'no such place in the story';
+  if (m[2] && battleById(db, m[2])?.campaign_id !== campaignId) return 'no such battle in this campaign';
+  return null;
+}
+
 export type Moved = { ok: true; position: Position } | { ok: false; status: 400 | 403 | 404; error: string; problem?: string };
 
 /** Moves a block to a place in the story – its own sender, or a leader; a sealed note only once it is open; the protocol only a leader. */
@@ -86,9 +100,8 @@ export function moveBlock(db: DB, campaignId: string, type: ItemType, id: string
     if (!block) return { ok: false, status: 404, error: 'not_found' };
     const own = block.owner === by.id;
     if ((!own && !by.leader) || (block.sealed && !own)) return { ok: false, status: 403, error: 'forbidden' };
-    const m = SEGMENT.exec(to.segment);
-    if (!m || !POS.test(to.pos) || to.pos.endsWith('0')) return { ok: false, status: 400, error: 'invalid', problem: 'no such place in the story' };
-    if (m[2] && battleById(db, m[2])?.campaign_id !== campaignId) return { ok: false, status: 400, error: 'invalid', problem: 'no such battle in this campaign' };
+    const bad = checkPlace(db, campaignId, to);
+    if (bad) return { ok: false, status: 400, error: 'invalid', problem: bad };
     const seq = audit(db, { actorId: by.id, action: 'timeline.move', targetType: type, targetId: id, campaignId, visibility: block.visibility === 'leader' ? 'leader' : block.visibility === 'sealed' ? 'sealed' : 'public', payload: { segment: to.segment } }, now);
     db.prepare(`INSERT INTO timeline_positions (campaign_id, item_type, item_id, segment, pos, moved_by, moved_at, seq) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (item_type, item_id) DO UPDATE SET segment = excluded.segment, pos = excluded.pos, moved_by = excluded.moved_by, moved_at = excluded.moved_at, seq = excluded.seq`)
