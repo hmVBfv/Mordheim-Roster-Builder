@@ -21,6 +21,7 @@ import {
 import styles from './Campaign.module.css';
 import { NewBattleSheet } from './NewBattle.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
+import { TimelineTab } from '../timeline/Timeline.tsx';
 import { battleTitle } from '../battle/api.ts';
 
 /** The campaign as last seen on this device, then as the server has it now. */
@@ -365,6 +366,7 @@ export function Campaign() {
   const lead = view.role === 'leader';
   const manage = tab === 'manage' && lead;
   const notes = tab === 'notes';
+  const timeline = tab === 'timeline';
   return (
     <section className={ui.page}>
       <header>
@@ -375,13 +377,16 @@ export function Campaign() {
       <nav className={styles0.tabs} aria-label="Campaign">
         <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
         <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
+        <NavLink to={`/campaign/${id}/timeline`}>Timeline</NavLink>
         {lead && <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>}
       </nav>
       {manage
         ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
         : notes
           ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
-          : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
+          : timeline
+            ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
+            : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>

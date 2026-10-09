@@ -2372,3 +2372,30 @@ screen; a route may now say otherwise, and a picture's bytes, which never
 change under their id, may be kept by the browser. And the app's service
 worker would have answered a picture opened in its own tab with the app
 itself; the API is now never the app.
+
+## October 9, 2026 (cont.) — the timeline
+
+The story of a campaign is not the order in which things were typed. An
+intention is written before the battle and belongs before it; a scene
+remembered the next morning belongs in the turn it happened. The timeline
+now shows the campaign as a story: fixed anchors – before the campaign,
+each battle's before, course and aftermath, an interlude after each round
+– with the battle reports and the marks, and between them every note,
+picture and protocol entry the user may see. Blocks stand where their
+battle and time put them, ordered by turn; anyone moves their own up, down
+or to another part of the story, a leader any block, the protocol only a
+leader. Moving changes only the place in the story, never when something
+was recorded, and it is logged.
+
+The server keeps only the places blocks were moved to – one row per moved
+block, its key a fraction of digits: between two keys there is always
+another, so a move never renumbers anything. The rest of the order the app
+works out from what it already has, and the server gives what it does not:
+every battle's protocol, who fought, the marks. A place only reaches who
+may see its block; a leaders' note's place never reaches a player.
+
+One mistake the test caught: the first block of the story could not move
+up, even with empty anchors above it – the button asked "is this the first
+block?" instead of "is there anywhere to go?".
+
+Dragging blocks with a long press waits for the overhaul of the interface.
