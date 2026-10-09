@@ -2,7 +2,7 @@
    A campaign is read from the server; the last answer is kept on the device,
    so the overview still shows offline what it showed last. */
 import { api } from '../account/api.ts';
-import type { BattleSummary, FrozenChange } from '../battle/api.ts';
+import type { BattleSummary, FrozenChange, Outcome } from '../battle/api.ts';
 import { db } from '../db/db.ts';
 
 export type CampaignRole = 'leader' | 'player' | 'viewer';
@@ -77,3 +77,26 @@ export const setHouseRules = (id: string, rules: Record<string, unknown>) => api
 /** Moves the campaign on (a leader), once the battles of the next round are closed; who fought none sat it out. */
 export const advanceRound = (id: string) => api<CampaignView>(`/campaigns/${id}/rounds/advance`, { body: {} }).then(keep);
 export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/campaigns/${id}/warbands/${wid}`);
+
+/** A battle of the campaign's history (phase 4a5): played before the app, recorded afterwards by a leader. `outcomes`: who fought, and how it ended for them ('' not known). */
+export interface PastBattle { round: number; title: string; district: string; playedOn: string | null; outcomes: Record<string, Outcome> }
+/** Records a battle of the history, or corrects it (the same id) – while the campaign has no battle of its own. */
+export const putPastBattle = (id: string, bid: string, b: PastBattle) => api<CampaignView>(`/campaigns/${id}/history/${bid}`, { method: 'PUT', body: b }).then(keep);
+export const removePastBattle = (id: string, bid: string) => api<CampaignView>(`/campaigns/${id}/history/${bid}`, { method: 'DELETE' }).then(keep);
+
+/** "12 June 2026" from "2026-06-12" (the day a battle of the history was played). */
+export function dayName(d: string): string {
+  const [y, m, day] = d.split('-').map(Number);
+  return new Date(Date.UTC(y ?? 2000, (m ?? 1) - 1, day ?? 1)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+
+/** The campaign's history: its battles before the app, the round it ends with, the warbands that fought in it; open while no battle of the app is there. */
+export function historyOf(view: Pick<CampaignView, 'battles'>): { battles: BattleSummary[]; round: number; warbandIds: string[]; open: boolean } {
+  const battles = (view.battles ?? []).filter((b) => b.takenOver);
+  return {
+    battles,
+    round: battles.reduce((m, b) => Math.max(m, b.round), 0),
+    warbandIds: [...new Set(battles.flatMap((b) => b.warbandIds ?? []))],
+    open: !(view.battles ?? []).some((b) => !b.takenOver),
+  };
+}

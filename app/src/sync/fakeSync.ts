@@ -12,7 +12,8 @@
    `opts.changes`, which the specs compute with core as the server does),
    moving the campaign on; the campaign's house rules, and what the
    overview shows of each warband's newest version (rules that differ,
-   districts held); pictures – a raw body arrives as { raw, type }. */
+   districts held); pictures – a raw body arrives as { raw, type }; the
+   campaign's history (4a5). */
 import { effectiveHouse, houseDifferences } from '@mordheim/core';
 export interface FakeVersion { rev: number; data: unknown; createdAt: string; source: string; note?: string }
 export interface FakeWarband {
@@ -39,6 +40,8 @@ export interface FakeBattle {
   entries: FakeEntry[];
   proposals: FakeProposal[];
   closedAt?: string | null;
+  /** Phase 4a5: a battle of the history, played before the app, and the day it was played. */
+  takenOver?: boolean; playedAt?: string | null;
 }
 export interface FakeTotals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
 export interface FakeChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
@@ -134,14 +137,20 @@ export function createFakeSync(opts: {
   const nameOf = (warbandId: string) => [...s.campaigns.values()].flatMap((c) => c.enrolments).find((e) => e.warbandId === warbandId);
   const battleSummary = (b: FakeBattle) => {
     const ws = b.participants.map((p) => ({ id: p.warbandId, name: nameOf(p.warbandId)?.name ?? '' })).sort((x, y) => x.name.localeCompare(y.name));
-    return { id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((w) => w.name), warbandIds: ws.map((w) => w.id), marked: Object.keys(marksOf(b)), createdAt: b.createdAt, closedAt: b.closedAt ?? null };
+    return {
+      id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((w) => w.name), warbandIds: ws.map((w) => w.id), marked: Object.keys(marksOf(b)), createdAt: b.createdAt, closedAt: b.closedAt ?? null,
+      takenOver: !!b.takenOver, playedAt: b.playedAt ?? (b.takenOver ? null : b.createdAt),
+    };
   };
   /** The marks that stand after a battle, by warband. */
   const marksOf = (b: FakeBattle) => Object.fromEntries([...s.campaigns.values()].flatMap((c) => c.enrolments).flatMap((e) => (e.tags ?? [])
     .filter((t) => t.battleId === b.id && t.kind === 'after_battle' && !t.supersededBy)
     .map((t) => [e.warbandId, { tagId: t.id, rev: t.rev, totals: t.totals, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }])));
   const battleView = (b: FakeBattle) => ({
-    battle: { id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: b.closedAt ?? null },
+    battle: {
+      id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: b.closedAt ?? null,
+      takenOver: !!b.takenOver, playedAt: b.playedAt ?? (b.takenOver ? null : b.createdAt),
+    },
     seq: b.seq,
     participants: b.participants.map((p) => {
       const e = nameOf(p.warbandId)!;
@@ -160,6 +169,34 @@ export function createFakeSync(opts: {
       entries: [], proposals: [],
     };
     s.battles.set(b.id, b);
+    return b;
+  };
+  /** The campaign's history (server/src/history.ts): its round follows the last battle before the app, the warbands' start marks move along. */
+  const followHistory = (c: FakeCampaign) => {
+    const round = Math.max(0, ...[...s.battles.values()].filter((b) => b.campaignId === c.id && b.takenOver).map((b) => b.round));
+    c.round = round;
+    for (const e of c.enrolments.filter((x) => x.status === 'active')) {
+      const start = (e.tags ?? []).find((t) => t.kind === 'start' && !t.supersededBy);
+      if (!start || start.round === round) continue;
+      const moved: FakeTag = { ...start, id: `${start.id}-r${round}`, round, createdAt: at() };
+      start.supersededBy = moved.id;
+      e.tags = [...(e.tags ?? []), moved];
+      e.tag = moved;
+    }
+  };
+  /** A battle of the history, as a leader records it (PUT …/history/:bid). */
+  const pastBattle = (campaignId: string, o: { id?: string; round: number; title?: string; district?: string; playedOn?: string | null; outcomes: Record<string, string> }): FakeBattle | string => {
+    const c = s.campaigns.get(campaignId)!;
+    if ([...s.battles.values()].some((b) => b.campaignId === c.id && !b.takenOver)) return 'history_closed';
+    const id = o.id ?? `00000000-0000-4000-8000-${String(s.battles.size + 1).padStart(12, '0')}`;
+    const there = s.battles.get(id);
+    const b: FakeBattle = {
+      ...(there ?? { id, campaignId, status: 'closed', turn: 1, createdAt: at(), closedAt: at(), entries: [], proposals: [], takenOver: true }),
+      round: o.round, title: (o.title ?? '').trim(), district: o.district ?? '', playedAt: o.playedOn ?? null, seq: next(),
+      participants: Object.entries(o.outcomes).map(([warbandId, outcome]) => ({ warbandId, outcome })),
+    } as FakeBattle;
+    s.battles.set(id, b);
+    followHistory(c);
     return b;
   };
   /** Another leader's device writes an entry. */
@@ -469,6 +506,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline')) return timelineRoutes(c, role, method, rest, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
+    let x0: RegExpMatchArray | null;
     if (method === 'POST' && rest === '/rounds/advance') {
       if (!lead) return forbidden;
       const nextRound = c.round + 1;
@@ -486,6 +524,19 @@ export function createFakeSync(opts: {
       return json(200, view(c));
     }
     if (method === 'PATCH' && rest === '') { if (!lead) return forbidden; c.name = String(body.name).trim(); return json(200, view(c)); }
+    if ((x0 = rest.match(/^\/history\/([^/]+)$/))) {
+      if (!lead) return forbidden;
+      if (method === 'PUT') {
+        const r = pastBattle(c.id, { ...(body as { round: number; outcomes: Record<string, string> }), id: x0[1]! });
+        return typeof r === 'string' ? json(409, { error: r }) : json(200, view(c));
+      }
+      if (method === 'DELETE') {
+        if ([...s.battles.values()].some((b) => b.campaignId === c.id && !b.takenOver)) return json(409, { error: 'history_closed' });
+        s.battles.delete(x0[1]!);
+        followHistory(c);
+        return json(200, view(c));
+      }
+    }
     if (method === 'PUT' && rest === '/house-rules') {
       if (!lead) return forbidden;
       c.houseRules = { ...effectiveHouse(body.rules), showRarity: false } as unknown as Record<string, unknown>;
@@ -672,5 +723,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, entryElsewhere, noteFrom, pictureFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom };
 }

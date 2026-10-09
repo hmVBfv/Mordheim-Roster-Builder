@@ -12,7 +12,7 @@ import { Link, useParams } from 'react-router';
 import { errorText, type Me } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { useOnline } from '../app/SyncState.tsx';
-import { cachedCampaign, getCampaign, type CampaignRole } from '../campaign/api.ts';
+import { cachedCampaign, dayName, getCampaign, type CampaignRole } from '../campaign/api.ts';
 import { db, type OutboxItem } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { useNotice } from '../ui/Notice.tsx';
@@ -180,6 +180,8 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
 
   const waiting = outbox.filter((i) => !i.refused).length;
   const closed = view.battle.status === 'closed';
+  // a battle of the history (4a5): played before the app – who fought and how it ended is all there is
+  const past = !!view.battle.takenOver;
   // the battle shown takes what was entered at once, so nothing flickers once it is sent
   const writeEntry = async (entryId: string, body: EntryBody, text: string) => {
     const at = new Date().toISOString();
@@ -223,18 +225,21 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
       </header>
       {!online && <p className={styles.banner} role="status">⚡ No connection. Everything you enter stays on this phone and is sent when the campaign server is reachable again. Nothing is lost.</p>}
       {online && error && <p className={styles.banner} role="status">{error} Shown as last seen.</p>}
-      {closed && <p className={ui.message}>This battle is closed: its protocol is fixed. Each player does the aftermath of their warband and marks it.</p>}
+      {closed && !past && <p className={ui.message}>This battle is closed: its protocol is fixed. Each player does the aftermath of their warband and marks it.</p>}
+      {past && <p className={ui.message}>Played before the app{view.battle.playedAt ? `, on ${dayName(view.battle.playedAt)}` : ''}: the campaign knows who fought and how it ended. Notes and pictures about it are welcome – under Notes.</p>}
 
       <div className={styles.columns}>
         <div className={ui.page}>
-          <div className={styles.turn} aria-label="Turn">
-            {lead && !closed ? <button type="button" className={ui.buttonQuiet} aria-label="One turn back" disabled={shownTurn <= 1} onClick={() => step(-1)}>−</button> : <span />}
-            <span aria-live="polite">Turn {shownTurn}</span>
-            {lead && !closed ? <button type="button" className={ui.buttonQuiet} aria-label="Next turn" onClick={() => step(1)}>+</button> : <span />}
-          </div>
+          {!past && (
+            <div className={styles.turn} aria-label="Turn">
+              {lead && !closed ? <button type="button" className={ui.buttonQuiet} aria-label="One turn back" disabled={shownTurn <= 1} onClick={() => step(-1)}>−</button> : <span />}
+              <span aria-live="polite">Turn {shownTurn}</span>
+              {lead && !closed ? <button type="button" className={ui.buttonQuiet} aria-label="Next turn" onClick={() => step(1)}>+</button> : <span />}
+            </div>
+          )}
           <section aria-labelledby="b-protocol" className={ui.page}>
-            <h2 id="b-protocol">Protocol</h2>
-            {timeline.length === 0 && <p className={ui.muted}>Nothing yet.{lead ? ' Who goes out of action, you enter below.' : ' A leader writes the protocol; notes and quotes everybody.'}</p>}
+            <h2 id="b-protocol">{past ? 'Notes and pictures' : 'Protocol'}</h2>
+            {timeline.length === 0 && <p className={ui.muted}>{past ? 'Nothing about it yet.' : `Nothing yet.${lead ? ' Who goes out of action, you enter below.' : ' A leader writes the protocol; notes and quotes everybody.'}`}</p>}
             <ul className={styles.protocol} aria-label="Protocol">
               {timeline.map((t) => (t.picture
                 ? <PictureCard key={t.picture.id} p={t.picture} cid={cid} canRemove={canPropose && (t.picture.uploaderId === user.id || lead)} onRemove={() => void pictures.remove(t.picture!)} />
@@ -264,11 +269,11 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
                 <li key={p.warbandId} className={styles.fighter}>
                   <span>
                     {p.name}<small>{p.player} · {p.wbName}</small>
-                    {closed && (() => {
+                    {closed && !past && (() => {
                       const m = view.marks?.[p.warbandId];
                       return <small className={m ? styles.marked : styles.unmarked}>{m ? `✓ Marked after battle ${view.battle.round} · version ${m.rev}${m.unexplained ? ` · ⚠ ${m.unexplained} without a cause` : ''}` : 'Aftermath not marked yet'}</small>;
                     })()}
-                    {closed && p.playerId === user.id && <Link to={`/warbands/${p.warbandId}/aftermath/${bid}`} className={styles.aftermath}>Your aftermath →</Link>}
+                    {closed && !past && p.playerId === user.id && <Link to={`/warbands/${p.warbandId}/aftermath/${bid}`} className={styles.aftermath}>Your aftermath →</Link>}
                   </span>
                   {lead && !closed
                     ? (

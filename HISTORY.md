@@ -2399,3 +2399,39 @@ up, even with empty anchors above it – the button asked "is this the first
 block?" instead of "is there anywhere to go?".
 
 Dragging blocks with a long press waits for the overhaul of the interface.
+
+## October 9, 2026 (cont.) — a campaign that began elsewhere
+
+The group's campaign did not start in the app: four battles and their
+chapters are behind it, played with the Roster Builder. To go on in the
+app, it needs that past – not every wound and coin of it, which the saves
+carry anyway, but which battles were fought, by whom, and how they ended.
+
+The plan said to rebuild the marks from the stage snapshots in the saves.
+Looking at the real saves settled that quickly (Decision E): the group never
+switched the Roster Builder's campaign mode on, so the saves stand at
+"Setup" with no snapshots, no battles and no log. There is nothing to
+rebuild, and so the history is simple: a leader records each earlier
+battle by hand – number, title, district, the day, who fought and how it
+ended – and that is all such a battle holds. It is closed from the start,
+with no protocol, no aftermath, nothing to mark. It can be corrected until
+the campaign's first battle in the app; then it is fixed, so it can never
+interleave with what the app records. The campaign stands after the last
+of those battles, and each warband's start mark moves there, on the same
+version with the same frozen totals – the first "What changed" runs from
+the takeover to the next battle.
+
+The saves still believe they are at "Setup", which matters: before a
+warband's first battle it buys from its lists, afterwards at the Trading
+Post. Rob decided on 29 September that the new builder should ask where a
+running campaign stands rather than guess; here the campaign answers. A
+warband that fought in the history takes the campaign's stage on its
+roster with one tap – without closing the stages in between, because the
+aftermath of a battle would otherwise serve a wounded warrior's missed
+game once for every stage it skipped. The aftermath of the first battle
+in the app does the same if the tap was missed.
+
+On the way, the leak matrix turned out to have probed with a warband type
+that does not exist: every enrolment it tried to confirm failed quietly,
+and the probes that need a confirmed warband were answered with refusals
+it accepts for an allowed role. It probes with a real one now.

@@ -18,7 +18,11 @@ export interface Participant { warbandId: string; name: string; wbType: string; 
 /** A warband marked "after battle N" (phase 4a4): its version, and how many changes were frozen with it. */
 export interface Mark { tagId: string; rev: number; totals: unknown; changes: number; unexplained: number; createdAt: string }
 export interface BattleView {
-  battle: { id: string; campaignId: string; round: number; title: string; scenario: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; updatedAt: string; closedAt: string | null };
+  battle: {
+    id: string; campaignId: string; round: number; title: string; scenario: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; updatedAt: string; closedAt: string | null;
+    /** Phase 4a5 (absent in a view kept from before): a battle of the history, played before the app, and the day it was played. */
+    takenOver?: boolean; playedAt?: string | null;
+  };
   seq: number;
   participants: Participant[];
   entries: Entry[];
@@ -28,8 +32,12 @@ export interface BattleView {
 }
 /** A change frozen with a mark, as core found and explained it (server/src/aftermath.ts). */
 export interface FrozenChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
-/** `warbandIds`, `marked`: phase 4a4 (who fought, whose warband is marked after it); absent in a summary kept from before. */
-export interface BattleSummary { id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds?: string[]; marked?: string[]; createdAt: string; closedAt: string | null }
+/** `warbandIds`, `marked`: phase 4a4 (who fought, whose warband is marked after it); `takenOver`, `playedAt`: phase 4a5 (a battle of the
+    history, played before the app; the day it was played). Absent in a summary kept from before. */
+export interface BattleSummary {
+  id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds?: string[]; marked?: string[]; createdAt: string; closedAt: string | null;
+  takenOver?: boolean; playedAt?: string | null;
+}
 
 const key = (bid: string) => `battle:${bid}`;
 export const battleTitle = (b: { round: number; title: string }) => `Battle ${b.round}${b.title ? ` · ${b.title}` : ''}`;
