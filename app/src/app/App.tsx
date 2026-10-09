@@ -17,6 +17,7 @@ const Export = lazy(() => import('../routes/Export.tsx').then((m) => ({ default:
 const TradingPost = lazy(() => import('../routes/TradingPost.tsx').then((m) => ({ default: m.TradingPost })));
 const Hire = lazy(() => import('../routes/Hire.tsx').then((m) => ({ default: m.Hire })));
 const HouseRules = lazy(() => import('../routes/HouseRules.tsx').then((m) => ({ default: m.HouseRules })));
+const Districts = lazy(() => import('../routes/Districts.tsx').then((m) => ({ default: m.Districts })));
 // accounts: only the campaign app has a server (phase 3g)
 const SignIn = lazy(() => import('../account/SignIn.tsx').then((m) => ({ default: m.SignIn })));
 const LinkAccept = lazy(() => import('../account/LinkAccept.tsx').then((m) => ({ default: m.LinkAccept })));
@@ -30,6 +31,7 @@ const Campaign = lazy(() => import('../campaign/Campaign.tsx').then((m) => ({ de
 const CampaignWarband = lazy(() => import('../campaign/CampaignWarband.tsx').then((m) => ({ default: m.CampaignWarband })));
 const Battle = lazy(() => import('../battle/Battle.tsx').then((m) => ({ default: m.Battle })));
 const Aftermath = lazy(() => import('../aftermath/Aftermath.tsx').then((m) => ({ default: m.Aftermath })));
+const CampaignRules = lazy(() => import('../campaign/CampaignRules.tsx').then((m) => ({ default: m.CampaignRules })));
 const NotesHome = lazy(() => import('../notes/Notes.tsx').then((m) => ({ default: m.NotesHome })));
 
 export function AppRoutes() {
@@ -45,10 +47,12 @@ export function AppRoutes() {
           <Route path="/warbands/:id/trade" element={<TradingPost />} />
           <Route path="/warbands/:id/hire" element={<Hire />} />
           <Route path="/warbands/:id/house" element={<HouseRules />} />
+          <Route path="/warbands/:id/districts" element={<Districts />} />
           {FLAVOUR === 'campaign' && <Route path="/campaign" element={<Campaigns />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id" element={<Campaign />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/warbands/:wid" element={<CampaignWarband />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/battles/:bid" element={<Battle />} />}
+          {FLAVOUR === 'campaign' && <Route path="/campaign/:id/house-rules" element={<CampaignRules />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/:tab" element={<Campaign />} />}
           {FLAVOUR === 'campaign' && <Route path="/notes" element={<NotesHome />} />}
           {FLAVOUR === 'campaign' && <Route path="/sign-in" element={<SignIn />} />}

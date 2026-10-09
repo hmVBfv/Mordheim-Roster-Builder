@@ -1,6 +1,7 @@
 /* On the roster of a warband entered in a campaign (phase 4a1): where it is
    entered, and leaving – the warband is then free again; what the campaign
-   marked of it stays in the campaign's history. */
+   marked of it stays in the campaign's history. Its own house rules where
+   they differ from the campaign's (4a4), to take them over. */
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { errorText } from '../account/api.ts';
@@ -10,10 +11,14 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { getCampaign, withdrawEnrolment, type CampaignView } from './api.ts';
 import { useCampaignName } from './name.ts';
+import { differingRules } from '../roster/house.ts';
+import { useCampaignRules } from './rules.ts';
 
 export function InCampaign({ rec, onNotice }: { rec: StoredWarband; onNotice: (t: string) => void }) {
   const id = rec.campaignId!;
   const name = useCampaignName(id);
+  const camp = useCampaignRules(id);
+  const differs = camp ? differingRules(camp.rules, rec.state.house) : [];
   const { ref, open, close } = useSheet();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +38,7 @@ export function InCampaign({ rec, onNotice }: { rec: StoredWarband; onNotice: (t
   return (
     <>
       <Link to={`/campaign/${id}`} className={ui.buttonQuiet}>In {name ?? 'a campaign'}</Link>
+      {differs.length > 0 && <Link to={`/warbands/${rec.id}/house`} className={ui.buttonQuiet}>⚠ House rules differ from the campaign’s</Link>}
       <button type="button" className={ui.buttonQuiet} onClick={() => { setError(null); open(); }}>Leave the campaign…</button>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="leave-title">
         <div className={ui.page}>
