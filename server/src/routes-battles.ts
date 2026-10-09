@@ -13,7 +13,7 @@ import { campaignById, openEnrolment, roleIn, type CampaignRole, type CampaignRo
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
 import { gameData } from './rules.ts';
-import { changesOf, closeBattle, markAfterBattle, marksOf } from './aftermath.ts';
+import { closeBattle, markAfterBattle, marksOf } from './aftermath.ts';
 import { snapshot } from './backup.ts';
 import { warbandById } from './warbands.ts';
 
