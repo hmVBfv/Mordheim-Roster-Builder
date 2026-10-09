@@ -23,13 +23,40 @@ export async function encodeSave(save: unknown): Promise<string> {
   return `v1.${toB64url(await pipe(json, new CompressionStream('deflate-raw')))}`;
 }
 
+/** A link this long, or a save inflating to more, is no warband (security review CLIENT-4: a small link can inflate to
+    gigabytes and freeze the tab). Warbands are a few dozen KB. */
+export const MAX_FRAGMENT = 256 * 1024;
+export const MAX_INFLATED = 4 * 1024 * 1024;
+
+/** Inflates, stopping as soon as more than `max` bytes come out. */
+async function inflate(bytes: Uint8Array, max: number): Promise<Uint8Array | null> {
+  const source = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(bytes); c.close(); } });
+  const reader = source.pipeThrough(new DecompressionStream('deflate-raw') as unknown as ReadableWritablePair<Uint8Array, Uint8Array>).getReader();
+  const parts: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    if (size > max) {
+      await reader.cancel();
+      return null;
+    }
+    parts.push(value);
+  }
+  const out = new Uint8Array(size);
+  let at = 0;
+  for (const p of parts) { out.set(p, at); at += p.length; }
+  return out;
+}
+
 /** The save in a fragment, or null if it is not one. */
 export async function decodeSave(fragment: string): Promise<unknown> {
   const f = fragment.replace(/^#/, '');
-  if (!f.startsWith('v1.')) return null;
+  if (!f.startsWith('v1.') || f.length > MAX_FRAGMENT) return null;
   try {
-    const json = await pipe(fromB64url(f.slice(3)), new DecompressionStream('deflate-raw'));
-    return JSON.parse(new TextDecoder().decode(json)) as unknown;
+    const json = await inflate(fromB64url(f.slice(3)), MAX_INFLATED);
+    return json ? JSON.parse(new TextDecoder().decode(json)) as unknown : null;
   } catch {
     return null;
   }
@@ -39,13 +66,18 @@ export async function decodeSave(fragment: string): Promise<unknown> {
 
 const KEY = 'mordheim-server';
 
-/** https://host[:port] or http for a home network address; '' for anything else. */
+/** A host of the home network: a private IPv4 address, localhost, or a name under .local, .lan or .home.arpa. */
+const homeHost = (h: string) => /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.)/.test(h) || h === 'localhost' || /\.(local|lan|home\.arpa)$/.test(h);
+
+/** https://host[:port] – or http for a home network address; '' for anything else (security review CLIENT-5: a page
+    fetched over plain http from the internet can be swapped on the way, and that page reads the warband from the link). */
 export function cleanServer(raw: string): string {
   const t = raw.trim().replace(/\/+$/, '');
   if (!t) return '';
   if (/^[a-z][a-z0-9+.-]*:\/\//i.test(t) && !/^https?:\/\//i.test(t)) return '';
   try {
-    const u = new URL(/^https?:\/\//.test(t) ? t : `https://${t}`);
+    const u = new URL(/^https?:\/\//i.test(t) ? t : `https://${t}`);
+    if (u.protocol === 'http:' && !homeHost(u.hostname)) return '';
     if (u.protocol !== 'https:' && u.protocol !== 'http:') return '';
     return u.origin;
   } catch {
@@ -54,7 +86,8 @@ export function cleanServer(raw: string): string {
 }
 
 export function getServer(): string {
-  try { return localStorage.getItem(KEY) ?? ''; } catch { return ''; }
+  // an address kept before the check above is checked again
+  try { return cleanServer(localStorage.getItem(KEY) ?? ''); } catch { return ''; }
 }
 
 export function setServer(origin: string): void {

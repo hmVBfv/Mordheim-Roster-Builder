@@ -291,6 +291,13 @@ kommt mit Notizen und Hintergrund dazu.
   angeheuerten Klinge sind schlichte Schlüssel (`[A-Za-z0-9_-]`, höchstens
   64 Zeichen): Das Legacy-Tool setzt sie in HTML ein, eine Warband darf dort
   nichts ausführen können (CLIENT-3).
+- **Links aus dem Quick Build** (`app/src/share/link.ts`): Ein Fragment über
+  256 KB oder eines, das sich auf mehr als 4 MB entpackt, liest die App
+  nicht – ein kleiner Link kann sich sonst auf Gigabytes entpacken und den
+  Tab einfrieren (CLIENT-4). Die Adresse des Kampagnen-Servers nimmt der
+  Quick Build nur mit `https://`, schlichtes `http://` nur im Heimnetz
+  (private IPv4-Adressen, `localhost`, `.local`, `.lan`, `.home.arpa`;
+  CLIENT-5).
 - **Uploads:** nur Bilder (PNG, JPEG, WebP), höchstens 5 MB. Der Client
   verkleinert und kodiert neu – dabei fallen EXIF-Daten mit GPS-Koordinaten
   weg. Der Server prüft Dateityp anhand der Bytes und Größe und liefert mit
