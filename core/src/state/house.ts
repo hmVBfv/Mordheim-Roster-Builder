@@ -31,3 +31,32 @@ export function houseActive(s: WarbandState): boolean {
   for (const k of Object.keys(d)) if (String(h[k]) !== String(d[k])) return true;
   return false;
 }
+
+/* ---- a campaign's house rules (phase 4a4) ----
+   A campaign sets house rules for every warband in it; a warband whose own
+   differ is marked (concept.md 4.4). Only the rules count: the notes are
+   words, and "Show rarity" is a display setting. */
+
+/** The keys that are rules – not the notes, not the display setting. */
+export const HOUSE_RULE_KEYS: readonly string[] = Object.keys(houseDefaults()).filter((k) => k !== 'notes' && k !== 'showRarity');
+
+/** House rules as they act: defaults for anything missing, the grades in
+    full, a value that only counts with its switch (the ranged cap, armour
+    for body armour only) cleared when the switch is off. */
+export function effectiveHouse(raw: unknown): HouseRules {
+  const d = houseDefaults();
+  const h = { ...d, ...((raw && typeof raw === 'object' ? raw : {}) as Partial<HouseRules>) };
+  h.hsGrades = { ...d.hsGrades, ...(h.hsGrades ?? {}) };
+  h.dpGrades = { ...d.dpGrades, ...(h.dpGrades ?? {}) };
+  if (!h.rangedCapOn) h.rangedCap = 0;
+  if (Number(h.priceArmour) === 100) h.armourBodyOnly = false;
+  return h;
+}
+
+/** The rules in which two sets of house rules differ (keys of houseDefaults). */
+export function houseDifferences(a: unknown, b: unknown): string[] {
+  const x = effectiveHouse(a) as unknown as Record<string, unknown>;
+  const y = effectiveHouse(b) as unknown as Record<string, unknown>;
+  const same = (p: unknown, q: unknown) => (p && typeof p === 'object' ? JSON.stringify(p) === JSON.stringify(q) : String(p) === String(q));
+  return HOUSE_RULE_KEYS.filter((k) => !same(x[k], y[k]));
+}
