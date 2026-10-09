@@ -398,7 +398,9 @@ Ultimate FAQ 10.1 (Stufen 6, 8 und 9) und mordheimer.net *Campaigns* und
    Ausrüstung gesperrt wie die aller anderen. Die echten Stände der Gruppe
    haben den Kampagnenmodus aus und stehen auf „Setup“ – beim Import einer
    laufenden Kampagne fragt der neue Builder deshalb, ab welcher Stufe sie
-   steht, statt es aus den Schlachten abzuleiten.
+   steht, statt es aus den Schlachten abzuleiten. (Umsetzung 4a5: die
+   Kampagne sagt es – eine Warband, die in ihrer Vorgeschichte kämpfte,
+   übernimmt im Roster „Take the campaign’s stage“, `app/src/campaign/stage.ts`.)
 3. **Verkauf zum halben Preis,** gerechnet vom Preis, der gerade gilt – also
    auch die Hälfte eines Preises, den eine Hausregel ändert; bei Seltenem mit
    Zufallspreis die Hälfte des Grundpreises. Regeln, die den Verkauf ändern
