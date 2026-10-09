@@ -14,6 +14,7 @@ import { can, isAction, type Action, type Actor } from './policy.ts';
 import { readActor, registerAccountRoutes } from './routes-accounts.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
 import { registerNoteRoutes } from './routes-notes.ts';
+import { registerAttachmentRoutes } from './routes-attachments.ts';
 import { registerCampaignRoutes } from './routes-campaigns.ts';
 import { registerShareRoutes } from './routes-shares.ts';
 import { registerWarbandRoutes } from './routes-warbands.ts';
@@ -40,7 +41,9 @@ export interface RegisteredRoute {
 }
 
 export interface AppDeps {
-  config: Pick<Config, 'version'> & Partial<Pick<Config, 'publicOrigin' | 'dataDir'>>;
+  config: Pick<Config, 'version'> & Partial<Pick<Config, 'publicOrigin' | 'dataDir' | 'uploadDir'>>;
+  /** What one campaign may keep in pictures (tests set it small). */
+  pictureQuota?: number;
   health: Health;
   /** The database once it is checked and migrated; null keeps every data endpoint closed. */
   db?: DB | null;
@@ -108,7 +111,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   app.addHook('onSend', async (req, reply) => {
     reply.header('X-Content-Type-Options', 'nosniff');
-    if (req.url.startsWith('/api/')) reply.header('Cache-Control', 'no-store');
+    // answers are not kept – unless a route says otherwise (a picture's bytes never change under its id)
+    if (req.url.startsWith('/api/') && !reply.hasHeader('Cache-Control')) reply.header('Cache-Control', 'no-store');
   });
 
   // one line per request: the route's pattern, never its raw URL (tokens)
@@ -140,6 +144,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerCampaignRoutes(app, { db, now });
   registerBattleRoutes(app, { db, now, dataDir: deps.config.dataDir ?? null, log: app.log });
   registerNoteRoutes(app, { db, now });
+  registerAttachmentRoutes(app, { db, now, uploadDir: deps.config.uploadDir ?? null, ...(deps.pictureQuota ? { quota: deps.pictureQuota } : {}) });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);
