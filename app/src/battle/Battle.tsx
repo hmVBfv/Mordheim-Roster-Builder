@@ -27,6 +27,8 @@ import type { FullNote, Kind } from '../notes/api.ts';
 import { NoteCard, NoteSheet } from '../notes/NoteParts.tsx';
 import { noteRights, useNoteActions } from '../notes/Notes.tsx';
 import { useNotes } from '../notes/useNotes.ts';
+import { PictureCard, PictureSheet } from '../pictures/PictureParts.tsx';
+import { usePictureActions, usePictures } from '../pictures/usePictures.ts';
 import { usePicks, useWarbandLoader } from './picks.ts';
 import styles from './Battle.module.css';
 import { enqueue, flushOutbox, useOutbox } from './outbox.ts';
@@ -159,15 +161,21 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const noteSheet = useSheet();
   const [noteOf, setNoteOf] = useState<{ note: FullNote | null; kind: Kind }>({ note: null, kind: 'general' });
   const openNote = (note: FullNote | null, kind: Kind) => { setNoteOf({ note, kind }); setFormKey((k) => k + 1); setWantPicks(true); noteSheet.open(); };
+  // pictures of this battle (4a3, part 2): a screenshot from TTS, a photo of the table
+  const pics = usePictures(cid, user, POLL_MS);
+  const battlePics = useMemo(() => (pics.pictures ?? []).filter((p) => p.battleId === bid), [pics.pictures, bid]);
+  const pictures = usePictureActions(cid, user, notify, pics.refresh);
+  const { ref: pictureRef, open: openPicture, close: closePicture } = useSheet();
 
   const merged = useMemo(() => merge(view, outbox, user.id), [view, outbox, user.id]);
   const timeline = useMemo(() => {
     const turnOf = (n: (typeof battleNotes)[number]) => ('turn' in n && n.turn) || 0;
     return [
-      ...merged.entries.map((e) => ({ turn: e.turn, at: e.createdAt, entry: e, note: null })),
-      ...battleNotes.map((n) => ({ turn: turnOf(n), at: n.createdAt, entry: null, note: n })),
+      ...merged.entries.map((e) => ({ turn: e.turn, at: e.createdAt, entry: e, note: null, picture: null })),
+      ...battleNotes.map((n) => ({ turn: turnOf(n), at: n.createdAt, entry: null, note: n, picture: null })),
+      ...battlePics.map((p) => ({ turn: p.turn ?? 0, at: p.createdAt, entry: null, note: null, picture: p })),
     ].sort((a, b) => b.turn - a.turn || b.at.localeCompare(a.at));
-  }, [merged.entries, battleNotes]);
+  }, [merged.entries, battleNotes, battlePics]);
   const names = useMemo(() => Object.fromEntries(view.participants.map((p) => [p.warbandId, p.name])), [view]);
 
   const waiting = outbox.filter((i) => !i.refused).length;
@@ -226,9 +234,11 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </div>
           <section aria-labelledby="b-protocol" className={ui.page}>
             <h2 id="b-protocol">Protocol</h2>
-            {merged.entries.length === 0 && battleNotes.length === 0 && <p className={ui.muted}>Nothing yet.{lead ? ' Who goes out of action, you enter below.' : ' A leader writes the protocol; notes and quotes everybody.'}</p>}
+            {timeline.length === 0 && <p className={ui.muted}>Nothing yet.{lead ? ' Who goes out of action, you enter below.' : ' A leader writes the protocol; notes and quotes everybody.'}</p>}
             <ul className={styles.protocol} aria-label="Protocol">
-              {timeline.map((t) => (t.entry
+              {timeline.map((t) => (t.picture
+                ? <PictureCard key={t.picture.id} p={t.picture} cid={cid} canRemove={canPropose && (t.picture.uploaderId === user.id || lead)} onRemove={() => void pictures.remove(t.picture!)} />
+                : t.entry
                 ? (
                   <EntryCard key={t.entry.id} e={t.entry} names={names} lead={lead && !closed} canPropose={canPropose && !closed}
                     onCorrect={() => { setEditing(t.entry!); setFormKey((k) => k + 1); if (t.entry!.kind === 'casualty') { setWantPicks(true); cas.open(); } else ev.open(); }}
@@ -314,6 +324,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           {lead && mine.length > 0 && <button type="button" className={ui.buttonQuiet} onClick={() => void removeEntry(mine.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]!)}>Undo last</button>}
           <button type="button" className={ui.button} onClick={() => openNote(null, 'general')}>+ Note</button>
           <button type="button" className={ui.button} onClick={() => openNote(null, 'quote')}>+ Quote</button>
+          <button type="button" className={ui.button} onClick={() => { setFormKey((k) => k + 1); openPicture(); }}>+ Picture</button>
           {!lead && <button type="button" className={ui.buttonQuiet} onClick={() => { setAbout(null); setFormKey((k) => k + 1); prop.open(); }}>Suggest a correction</button>}
         </div>
       )}
@@ -350,6 +361,9 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </div>
         </div>
       </dialog>
+      <PictureSheet dialogRef={pictureRef} close={closePicture} formKey={formKey} battles={[{ id: bid, label: `battle ${view.battle.round}`, open: !closed }]}
+        fixed={{ battleId: bid, turn: shownTurn }} canLead={lead}
+        onSave={(meta, bytes) => { void pictures.send(newId(), meta, bytes).catch((e: unknown) => notify(errorText(e))); }} />
       <NoteSheet dialogRef={noteSheet.ref} close={noteSheet.close} formKey={formKey} battles={[{ id: bid, label: `battle ${view.battle.round}`, open: !closed }]}
         fixed={{ battleId: bid, turn: shownTurn }} kind={noteOf.kind} canLead={lead} warbands={view.participants.map((p) => ({ warbandId: p.warbandId, name: p.name }))} picks={picks}
         note={noteOf.note} wordsOnly={!!noteOf.note && noteOf.note.authorId !== user.id}

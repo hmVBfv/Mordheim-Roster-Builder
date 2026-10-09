@@ -150,6 +150,8 @@ Begriff einführt, trägt ihn hier ein.
 | Runde weiterschalten | Move on to After battle N | `POST /campaigns/:id/rounds/advance` |
 | Offen für dich | Open for you | `openAftermaths()` in der Übersicht der Kampagne |
 | Hausregeln | House rules | `house_rules`, `S.house` |
+| Bild (Screenshot, Foto) | Picture · New picture · + Picture | `attachments`, `app/src/pictures/` |
+| verkleinert auf dem Gerät | made smaller on the phone (only the pixels leave it) | `shrink()` |
 | Hausregeln der Kampagne | (Campaign) house rules · Set the house rules | `campaigns.house_rules`, `/campaign/:id/house-rules` |
 | eigene Datei weicht ab | its own house rules differ · own file differs | `houseDiffers`, `houseDifferences()` |
 | Regeln der Kampagne übernehmen | Take the campaign’s rules | `adoptHouse()` (app) |

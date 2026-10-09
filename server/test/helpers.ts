@@ -67,7 +67,7 @@ export async function startServer(opts: TestServerOptions = {}): Promise<Omit<St
   const s = await start({
     logger: log.logger,
     ...opts,
-    env: { DATA_DIR: data, PORT: '0', HOST: '127.0.0.1', STATIC_DIR: '', ROSTER_VERSION: 'test-version', ...opts.env },
+    env: { DATA_DIR: data, UPLOAD_DIR: join(data, 'uploads'), PORT: '0', HOST: '127.0.0.1', STATIC_DIR: '', ROSTER_VERSION: 'test-version', ...opts.env },
   });
   cleanup.push(() => s.close());
   const addr = s.app.server.address();

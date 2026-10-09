@@ -64,6 +64,8 @@ export default defineConfig(({ mode, command }) => {
           // the roster sheet's template too, so a sheet can be made offline
           globPatterns: ['**/*.{js,css,html,svg,png,pdf}', '**/*-latin-*.woff2'],
           navigateFallback: 'index.html',
+          // the API is never the app: a picture opened in its own tab is the picture
+          navigateFallbackDenylist: [/\/api\//],
           cleanupOutdatedCaches: true,
         },
       }),

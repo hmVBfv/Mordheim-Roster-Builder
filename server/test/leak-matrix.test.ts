@@ -3,6 +3,7 @@
    matrix allows – never a hash or a secret (ADR 0011). */
 import { describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import { join } from 'node:path';
 import { ACTIONS, type Action } from '../src/policy.ts';
 import { createBattle, putEntry, putProposal } from '../src/battles.ts';
 import { confirmEnrolment, createCampaign, enrol, setMember } from '../src/campaigns.ts';
@@ -10,7 +11,8 @@ import { putNote } from '../src/notes.ts';
 import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
-import { MATRIX, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
+import { putAttachment, storeFile } from '../src/attachments.ts';
+import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
 
 /** Every key and string value of an answer, at any depth. */
@@ -84,6 +86,17 @@ describe('leak-test matrix', () => {
     note('SEALED-SECRET: the ferryman takes the coin.', 'sealed', victim.id, true);
     note('LEADER-SECRET: the Countess pays him.', 'leader', victim.id, true);
     const ownNoteId = note('Rain over the Stir.', 'public', player.id, false);
+    // pictures in the victim's campaign: a leaders' one the player must never see, and the player's own
+    const picture = (caption: string, visibility: 'public' | 'leader', by: string, leader: boolean, stored: boolean) => {
+      const aid = randomUUID();
+      const r = putAttachment(s.db, theirs.id, aid, { battleId: battle.id, turn: 1, mime: 'image/png', bytes: PNG.length, width: 1, height: 1, caption, visibility }, { id: by, leader }, t0);
+      if (!r.ok) throw new Error(r.error);
+      if (stored && !storeFile(s.db, join(s.data, 'uploads'), r.row, PNG, 'image/png', by, t0).ok) throw new Error('not stored');
+      return aid;
+    };
+    picture('LEADER-SECRET: the Countess’s seal.', 'leader', victim.id, true, true);
+    const ownPictureId = picture('The ferry burns.', 'public', player.id, false, true);
+    const pendingPictureId = picture('Still on its way.', 'public', player.id, false, false);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -91,7 +104,7 @@ describe('leak-test matrix', () => {
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
-      battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId,
+      battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
@@ -106,7 +119,7 @@ describe('leak-test matrix', () => {
       for (const [route, probe] of Object.entries(row.routes)) {
         for (const role of ROLES) {
           const p = probe(ctx);
-          const res = await s.call({ method: p.method, url: p.url, body: p.body, token: tokenFor[role]() });
+          const res = await s.call({ method: p.method, url: p.url, body: p.body, token: tokenFor[role](), ...(p.headers ? { headers: p.headers } : {}) });
           probes++;
           const where = `${role} ${route} (${action})`;
           const json = (res.headers['content-type'] ?? '').startsWith('application/json') && res.body ? (res.json() as Record<string, unknown>) : null;

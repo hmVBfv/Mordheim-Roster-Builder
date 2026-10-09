@@ -2,7 +2,9 @@
    everyone writes at the same time, each note with one author (ADR 0010);
    who may read it is chosen when writing – everyone, sealed until a battle
    is closed, or leaders only – and kept on the server (ADR 0011). Grouped
-   by battle, newest first; written offline, a note waits on the device. */
+   by battle, newest first; written offline, a note waits on the device.
+   Pictures (4a3, part 2) stand among the notes: a screenshot from TTS or a
+   photo of the table, for everyone or leaders only. */
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 import type { Me } from '../account/api.ts';
@@ -21,6 +23,9 @@ import { isSealed, type FullNote, type Note, type NoteBody } from './api.ts';
 import { NoteCard, NoteSheet, type BattleChoice } from './NoteParts.tsx';
 import styles from './Notes.module.css';
 import { useNotes } from './useNotes.ts';
+import { PictureCard, PictureSheet } from '../pictures/PictureParts.tsx';
+import { usePictureActions, usePictures } from '../pictures/usePictures.ts';
+import type { ShownPicture } from '../pictures/api.ts';
 
 /** Writing, editing, taking out: the same for the Notes tab and the game night. */
 export function useNoteActions(cid: string, user: Me, notify: (t: string) => void, refresh: () => Promise<void>) {
@@ -64,29 +69,42 @@ export function NotesTab({ id, view, user, lead }: { id: string; view: CampaignV
   };
   const { save, remove } = useNoteActions(id, user, notify, refresh);
   const open = (n: FullNote | null) => { setEditing(n); setFormKey((k) => k + 1); setWantPicks(true); sheet.open(); };
+  const pics = usePictures(id, user);
+  const pictures = usePictureActions(id, user, notify, pics.refresh);
+  const pictureSheet = useSheet();
 
-  // grouped by battle, newest battle first; then the campaign in general
+  // grouped by battle, newest battle first; then the campaign in general – notes and pictures together, newest first
   const groups = useMemo(() => {
-    const list = notes ?? [];
-    const out: { key: string; title: string; notes: typeof list }[] = battles.map((b) => ({ key: b.id, title: b.label, notes: list.filter((n) => n.battleId === b.id) }));
-    out.push({ key: 'campaign', title: 'The campaign in general', notes: list.filter((n) => !n.battleId || !battles.some((b) => b.id === n.battleId)) });
-    return out.filter((g) => g.notes.length > 0);
-  }, [notes, battles]);
+    type Item = { at: string; note: NonNullable<typeof notes>[number] | null; picture: ShownPicture | null };
+    const items: (Item & { battleId: string | null })[] = [
+      ...(notes ?? []).map((n) => ({ at: n.createdAt, battleId: n.battleId, note: n, picture: null })),
+      ...(pics.pictures ?? []).map((p) => ({ at: p.createdAt, battleId: p.battleId, note: null, picture: p })),
+    ].sort((a, b) => b.at.localeCompare(a.at));
+    const out: { key: string; title: string; items: Item[] }[] = battles.map((b) => ({ key: b.id, title: b.label, items: items.filter((x) => x.battleId === b.id) }));
+    out.push({ key: 'campaign', title: 'The campaign in general', items: items.filter((x) => !x.battleId || !battles.some((b) => b.id === x.battleId)) });
+    return out.filter((g) => g.items.length > 0);
+  }, [notes, pics.pictures, battles]);
 
   return (
     <div className={ui.page}>
-      {writer && <div className={ui.row}><button type="button" className={ui.button} onClick={() => open(null)}>New note</button></div>}
+      {writer && (
+        <div className={ui.row}>
+          <button type="button" className={ui.button} onClick={() => open(null)}>New note</button>
+          <button type="button" className={ui.buttonQuiet} onClick={() => { setFormKey((k) => k + 1); pictureSheet.open(); }}>New picture</button>
+        </div>
+      )}
       {error && <p className={ui.message} role="status">{error}{notes ? ' Shown as last seen.' : ''}</p>}
-      {notes && notes.length === 0 && <p className={ui.muted}>No notes yet. Scenes, quotes, dice moments, open threads – whatever the story should keep.</p>}
+      {notes && notes.length === 0 && (pics.pictures ?? []).length === 0 && <p className={ui.muted}>No notes yet. Scenes, quotes, dice moments, open threads, pictures of the table – whatever the story should keep.</p>}
       {groups.map((g) => (
         <section key={g.key} className={styles.section} aria-label={g.title}>
           <h2>{g.title}</h2>
           <ul className={styles.list}>
-            {[...g.notes].reverse().map((n) => {
-              const r = noteRights(n, user, lead, writer);
+            {g.items.map(({ note: n, picture: p }) => {
+              if (p) return <PictureCard key={p.id} p={p} cid={id} canRemove={writer && (p.uploaderId === user.id || lead)} onRemove={() => void pictures.remove(p)} />;
+              const r = noteRights(n!, user, lead, writer);
               return (
-                <NoteCard key={n.id} n={n} battleName={battleName} pending={'pending' in n ? n.pending : false} refused={'refused' in n ? n.refused : undefined}
-                  canEdit={r.edit} canRemove={r.remove} onEdit={() => open(n as FullNote)} onRemove={() => void remove(n)} />
+                <NoteCard key={n!.id} n={n!} battleName={battleName} pending={'pending' in n! ? n.pending : false} refused={'refused' in n! ? n.refused : undefined}
+                  canEdit={r.edit} canRemove={r.remove} onEdit={() => open(n as FullNote)} onRemove={() => void remove(n!)} />
               );
             })}
           </ul>
@@ -100,6 +118,8 @@ export function NotesTab({ id, view, user, lead }: { id: string; view: CampaignV
           void save(nid, editing && editing.authorId !== user.id ? { ...body, kind: editing.kind, visibility: editing.visibility, mentions: editing.mentions, battleId: editing.battleId, turn: editing.turn } : body, editing ? 'Saved.' : 'Note saved.')
             .catch((e: unknown) => notify(errorText(e)));
         }} />
+      <PictureSheet dialogRef={pictureSheet.ref} close={pictureSheet.close} formKey={formKey} battles={battles} canLead={lead}
+        onSave={(meta, bytes) => { void pictures.send(newId(), meta, bytes).catch((e: unknown) => notify(errorText(e))); }} />
       {notice}
     </div>
   );

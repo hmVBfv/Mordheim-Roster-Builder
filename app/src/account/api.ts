@@ -42,6 +42,32 @@ export class ApiError extends Error {
 
 const BASE = `${import.meta.env.BASE_URL}api/v1`;
 
+/** The address of an endpoint, for what the browser fetches itself (a picture in an <img>). */
+export const apiUrl = (path: string) => `${BASE}${path}`;
+
+/** The server's answer as JSON, or the error it means. */
+async function answer<T>(res: Response): Promise<T> {
+  const parsed: unknown = (res.headers.get('content-type') ?? '').includes('application/json') ? await res.json().catch(() => null) : null;
+  if (!parsed || typeof parsed !== 'object') throw new ApiError(res.status, 'unavailable');
+  const json = parsed as Record<string, unknown>;
+  if (!res.ok) {
+    const retry = Number(json.retryAfter);
+    throw new ApiError(res.status, String(json.error ?? 'error'), typeof json.problem === 'string' ? json.problem : undefined, Number.isFinite(retry) ? retry : undefined, json);
+  }
+  return json as T;
+}
+
+/** Sends bytes as they are (a picture, phase 4a3): the one write that is not JSON. */
+export async function apiBytes<T>(path: string, bytes: ArrayBuffer, type: string): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type }, body: bytes });
+  } catch {
+    throw new ApiError(0, 'offline');
+  }
+  return answer<T>(res);
+}
+
 export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown } = {}): Promise<T> {
   const method = init.method ?? (init.body === undefined ? 'GET' : 'POST');
   const write = method !== 'GET';
@@ -58,14 +84,7 @@ export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PU
   } catch {
     throw new ApiError(0, 'offline');
   }
-  const parsed: unknown = (res.headers.get('content-type') ?? '').includes('application/json') ? await res.json().catch(() => null) : null;
-  if (!parsed || typeof parsed !== 'object') throw new ApiError(res.status, 'unavailable');
-  const json = parsed as Record<string, unknown>;
-  if (!res.ok) {
-    const retry = Number(json.retryAfter);
-    throw new ApiError(res.status, String(json.error ?? 'error'), typeof json.problem === 'string' ? json.problem : undefined, Number.isFinite(retry) ? retry : undefined, json);
-  }
-  return json as T;
+  return answer<T>(res);
 }
 
 /** What to tell the player when a request failed. */
@@ -85,6 +104,7 @@ export function errorText(e: unknown): string {
     case 'cross_origin': return 'The request did not come from the app. Reload the page and try again.';
     case 'totp_unavailable': return 'The server cannot set up authenticators yet (TOTP_KEY is missing).';
     case 'invalid': return e.problem ? sentence(e.problem) : 'That was not accepted.';
+    case 'quota': return 'The campaign has no room for more pictures.';
     default: return 'Something went wrong.';
   }
 }

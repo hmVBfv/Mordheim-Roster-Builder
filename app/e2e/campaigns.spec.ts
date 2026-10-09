@@ -2,6 +2,7 @@
    server (e2e/play.ts): the overview, another player's warband to read,
    entering a warband, what a leader manages, starting a campaign. Campaign
    app only (playwright.config.ts). */
+import { crc32, deflateSync } from 'node:zlib';
 import { expect, test } from '@playwright/test';
 import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
 import { playServer, SAVE, serverWarband } from './play.ts';
@@ -446,4 +447,61 @@ test('the districts: set by hand beside the others’ footholds; the campaign’
   await noSideScroll(page);
   await tapTargets(page);
   await shot(page, 'parchment-warband-districts');
+});
+
+/* Pictures (phase 4a3, part 2): a real picture, made smaller by the browser. */
+
+/** A 960×540 PNG – a dusk sky over a dark street, as a TTS screenshot might be. */
+function screenshotPng(): Buffer {
+  const w = 960, h = 540;
+  const rows = Buffer.alloc((w * 3 + 1) * h);
+  for (let y = 0; y < h; y++) {
+    rows[y * (w * 3 + 1)] = 0;
+    for (let x = 0; x < w; x++) {
+      const o = y * (w * 3 + 1) + 1 + x * 3;
+      const ground = y > h * 0.62 + Math.sin(x / 37) * 18;
+      rows[o] = ground ? 30 : 90 + Math.round((y / h) * 120);
+      rows[o + 1] = ground ? 26 : 60 + Math.round((x / w) * 40);
+      rows[o + 2] = ground ? 34 : 110 - Math.round((y / h) * 60);
+    }
+  }
+  const chunk = (type: string, data: Buffer) => {
+    const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const td = Buffer.concat([Buffer.from(type, 'latin1'), data]);
+    const crc = Buffer.alloc(4); crc.writeUInt32BE(crc32(td));
+    return Buffer.concat([len, td, crc]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 2;
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(rows)), chunk('IEND', Buffer.alloc(0))]);
+}
+
+test('a picture at the game night and among the notes: made smaller here, shown from the server', async ({ page }) => {
+  const srv = await playServer(page, true, { totp: true });
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+  await page.goto(`campaign/${c.id}/battles/${b.id}`);
+  await page.getByRole('button', { name: 'Next turn' }).click();
+  await page.getByRole('button', { name: '+ Picture' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A picture · turn 2' });
+  await sheet.getByLabel('Screenshot or photo').setInputFiles({ name: 'tts-turn-2.png', mimeType: 'image/png', buffer: screenshotPng() });
+  await expect(sheet.getByText(/960 × 540 · \d+ KB · only the pixels leave this phone/)).toBeVisible();
+  await sheet.getByLabel('Caption (optional)').fill('Turn two: the ferry from above.');
+  await tapTargets(page);
+  await shot(page, 'picture-new');
+  await sheet.getByRole('button', { name: 'Save the picture' }).click();
+  await expect.poll(() => [...srv.state.pictures.values()].map((p) => [p.stored, p.mime, p.width, p.turn])).toEqual([[true, 'image/webp', 960, 2]]);
+  const pic = [...srv.state.pictures.values()][0]!;
+  // what arrived is a WebP made here, not the file picked
+  expect(Buffer.from(pic.data!).subarray(8, 12).toString('latin1')).toBe('WEBP');
+  const img = page.getByRole('list', { name: 'Protocol' }).getByRole('img', { name: 'Turn two: the ferry from above.' });
+  await expect(img).toBeVisible();
+  await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).naturalWidth)).toBe(960);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'game-night-picture');
+  await page.goto(`campaign/${c.id}/notes`);
+  await expect(page.getByRole('region', { name: 'Battle 1 · Hel Fenn ferry' }).getByRole('img', { name: 'Turn two: the ferry from above.' })).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'notes-picture');
 });

@@ -1,11 +1,12 @@
 /* What the game night gathered and still has to send (phase 4a2): protocol
-   entries, their removals, corrections. Kept on the device first, so a
+   entries, their removals, corrections; notes (4a3) and pictures with
+   their bytes (4a3, part 2) too. Kept on the device first, so a
    battle at a table without a connection loses nothing (concept.md 4.5),
    and sent in order once the server answers – by the game night itself and
    by every round of the sync. Each carries the id the server keeps it
    under: sent twice, it is there once. */
 import { useLiveQuery } from 'dexie-react-hooks';
-import { api, ApiError, errorText } from '../account/api.ts';
+import { api, apiBytes, ApiError, errorText } from '../account/api.ts';
 import { db, type OutboxItem } from '../db/db.ts';
 
 export async function enqueue(item: Omit<OutboxItem, 'at'>): Promise<void> {
@@ -14,10 +15,25 @@ export async function enqueue(item: Omit<OutboxItem, 'at'>): Promise<void> {
 
 const pathOf = (i: OutboxItem) => {
   if (i.op === 'note.put' || i.op === 'note.delete') return `/campaigns/${i.campaignId}/notes/${i.targetId}`;
+  if (i.op === 'attachment.put' || i.op === 'attachment.delete') return `/campaigns/${i.campaignId}/attachments/${i.targetId}`;
   const base = `/campaigns/${i.campaignId}/battles/${i.battleId}`;
   return i.op === 'proposal.put' ? `${base}/proposals/${i.targetId}` : `${base}/protocol/${i.targetId}`;
 };
-const DELETES: ReadonlySet<OutboxItem['op']> = new Set(['entry.delete', 'note.delete']);
+const DELETES: ReadonlySet<OutboxItem['op']> = new Set(['entry.delete', 'note.delete', 'attachment.delete']);
+
+/** A picture waiting: what it is, and its bytes (already shrunk on the device). */
+export interface PictureItem { meta: { mime: string } & Record<string, unknown>; bytes: ArrayBuffer }
+
+/** One item to the server: a picture first says what it is, then sends its bytes. */
+async function send(i: OutboxItem): Promise<void> {
+  if (i.op === 'attachment.put') {
+    const b = i.body as PictureItem;
+    await api(pathOf(i), { method: 'PUT', body: b.meta });
+    await apiBytes(`${pathOf(i)}/file`, b.bytes, b.meta.mime);
+    return;
+  }
+  await api(pathOf(i), DELETES.has(i.op) ? { method: 'DELETE' } : { method: 'PUT', body: i.body });
+}
 
 let flushing: Promise<number> | null = null;
 let queued: Promise<number> | null = null;
@@ -35,7 +51,7 @@ export function flushOutbox(userId: string): Promise<number> {
       const items = (await db.outbox.orderBy('at').toArray()).filter((i) => i.userId === userId && !i.refused);
       for (const i of items) {
         try {
-          await api(pathOf(i), DELETES.has(i.op) ? { method: 'DELETE' } : { method: 'PUT', body: i.body });
+          await send(i);
           await db.outbox.delete(i.key);
           sent++;
         } catch (e) {
@@ -62,4 +78,9 @@ export function useOutbox(battleId: string): OutboxItem[] {
 /** The notes of a campaign that still wait, live. */
 export function useNoteOutbox(campaignId: string): OutboxItem[] {
   return useLiveQuery(() => db.outbox.filter((i) => i.campaignId === campaignId && (i.op === 'note.put' || i.op === 'note.delete')).sortBy('at'), [campaignId]) ?? [];
+}
+
+/** The pictures of a campaign that still wait, live. */
+export function usePictureOutbox(campaignId: string): OutboxItem[] {
+  return useLiveQuery(() => db.outbox.filter((i) => i.campaignId === campaignId && (i.op === 'attachment.put' || i.op === 'attachment.delete')).sortBy('at'), [campaignId]) ?? [];
 }
