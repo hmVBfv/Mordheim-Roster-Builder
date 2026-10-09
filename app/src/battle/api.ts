@@ -15,14 +15,21 @@ export type EntryBody = { turn: number; kind: 'casualty'; payload: CasualtyPaylo
 export type Entry = EntryBody & { id: string; author: string; createdAt: string; updatedAt: string };
 export interface Proposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: { text: string }; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
 export interface Participant { warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null }
+/** A warband marked "after battle N" (phase 4a4): its version, and how many changes were frozen with it. */
+export interface Mark { tagId: string; rev: number; totals: unknown; changes: number; unexplained: number; createdAt: string }
 export interface BattleView {
   battle: { id: string; campaignId: string; round: number; title: string; scenario: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; updatedAt: string; closedAt: string | null };
   seq: number;
   participants: Participant[];
   entries: Entry[];
   proposals: Proposal[];
+  /** Phase 4a4; absent in a view kept from before it. */
+  marks?: Record<string, Mark>;
 }
-export interface BattleSummary { id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; createdAt: string; closedAt: string | null }
+/** A change frozen with a mark, as core found and explained it (server/src/aftermath.ts). */
+export interface FrozenChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
+/** `warbandIds`, `marked`: phase 4a4 (who fought, whose warband is marked after it); absent in a summary kept from before. */
+export interface BattleSummary { id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds?: string[]; marked?: string[]; createdAt: string; closedAt: string | null }
 
 const key = (bid: string) => `battle:${bid}`;
 export const battleTitle = (b: { round: number; title: string }) => `Battle ${b.round}${b.title ? ` · ${b.title}` : ''}`;
@@ -43,6 +50,11 @@ export async function getBattle(cid: string, bid: string, since?: number): Promi
 export const createBattle = (cid: string, b: { id: string; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep);
 export const patchBattle = (cid: string, bid: string, p: { title?: string; district?: string; turn?: number; outcomes?: Record<string, Outcome> }) =>
   api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep);
+/** Closes the battle (a leader): the protocol is fixed, its sealed notes open. */
+export const closeBattle = (cid: string, bid: string) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/close`, { body: {} }).then(keep);
+/** Marks a version of one's warband "after" this battle; marked again, the newer mark corrects the earlier. */
+export const markBattle = (cid: string, bid: string, warbandId: string, rev: number) =>
+  api<{ tag: { id: string; rev: number; round: number }; changes: FrozenChange[] }>(`/campaigns/${cid}/battles/${bid}/marks`, { body: { warbandId, rev } });
 export const decideProposal = (cid: string, bid: string, pid: string, accept: boolean) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/proposals/${pid}/${accept ? 'accept' : 'reject'}`, { body: {} }).then(keep);
 
 /** A casualty in words: "Magda (The Silver Caravan) is out of action – by Skritch (Clan Skrittle)." */

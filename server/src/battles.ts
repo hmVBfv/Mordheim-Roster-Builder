@@ -59,7 +59,8 @@ export function checkEntry(kind: 'casualty' | 'event', payload: unknown, partici
 
 /* ---- what leaves the server ---- */
 
-export interface BattleSummary { id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; createdAt: string; closedAt: string | null }
+/** `warbandIds`: who fought; `marked`: whose warband is marked after it (phase 4a4). */
+export interface BattleSummary { id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds: string[]; marked: string[]; createdAt: string; closedAt: string | null }
 export interface Participant { warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null }
 export interface Entry { id: string; turn: number; kind: 'casualty' | 'event'; payload: unknown; author: string; createdAt: string; updatedAt: string }
 export interface Proposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: unknown; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
@@ -81,8 +82,15 @@ export const participantIds = (db: DB, battleId: string) => (db.prepare('SELECT 
 
 export function listBattles(db: DB, campaignId: string): BattleSummary[] {
   const rows = db.prepare('SELECT * FROM battles WHERE campaign_id = ? ORDER BY round, created_at').all(campaignId) as BattleRow[];
-  const names = db.prepare('SELECT w.name FROM battle_participants p JOIN warbands w ON w.id = p.warband_id WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE');
-  return rows.map((b) => ({ id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: (names.all(b.id) as { name: string }[]).map((r) => r.name), createdAt: b.created_at, closedAt: b.closed_at }));
+  const names = db.prepare('SELECT w.id, w.name FROM battle_participants p JOIN warbands w ON w.id = p.warband_id WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE');
+  const marked = db.prepare("SELECT warband_id FROM tags WHERE battle_id = ? AND kind = 'after_battle' AND superseded_by IS NULL ORDER BY created_at");
+  return rows.map((b) => {
+    const ws = names.all(b.id) as { id: string; name: string }[];
+    return {
+      id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((r) => r.name), warbandIds: ws.map((r) => r.id),
+      marked: (marked.all(b.id) as { warband_id: string }[]).map((r) => r.warband_id), createdAt: b.created_at, closedAt: b.closed_at,
+    };
+  });
 }
 
 export function battleView(db: DB, b: BattleRow): BattleView {

@@ -53,7 +53,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Suchwurf je Held mit Modifikatoren, Chance | – | ✓ | ✓ | trading-post | 3b | neu (V5/V6); `searchOdds`, ein Wurf je Held und Stufe |
 | Verkaufen zum halben Preis | – | ✓ | ✓ | trading-post | 3b | neu (V6); abrunden, mindestens 1 gc, eine Gruppe zusammen |
 | Umverteilen zwischen Kriegern und Lager | – | ✓ | ✓ | trading-post | 3b | neu (V4); `giveItem` mit Grund, wenn nicht |
-| Lager (Truhe): Gegenstände, Wyrdstone, Gold | ✓ | ✓ | ◐ | roster, trading-post | 3b | Gegenstände und Gold im Trading Post; Wyrdstone und Gold von Hand fehlen (kommt mit der Post-Battle-Sequenz, 4a) |
+| Lager (Truhe): Gegenstände, Wyrdstone, Gold | ✓ | ✓ | ◐ | roster, trading-post | 3b | Gegenstände und Gold im Trading Post; Wyrdstone in der Nachbereitung (4a4); Wyrdstone außerhalb einer Kampagnenschlacht fehlt noch |
 | Kassenbuch mit Anlass je Buchung | – | ✓ | ✓ | trading-post | 3b | neu (V7), ab der ersten Schlacht; ohne neue Formatnummer |
 | Regeltexte als Tooltip (Gegenstände, Fertigkeiten, Zauber, Fähigkeiten) | ✓ | ✓ | ✓ | trading-post, roster | 3b/3d | Gegenstände: Regeltext im Trading Post. Rob, 02.10.2026: „essentiell und muss drin sein“ – auf jeder Karte öffnet jedes Wort, das eine Regel nennt, eine Blase mit Werten und Regeltext (Antippen; mit Maus auch Darüberfahren): Sonderregeln (neue Zeile „Rules“, in der Fassung der Einheit), Ausrüstung samt Aufwertung, seltene Gegenstände, Fertigkeiten, Zauber, Mutationen, Mal, Verletzungen; bei Hired Swords auch ihre festen Fertigkeiten, wie im Roster Builder (`app/src/roster/tips.ts`, `app/src/ui/Tip.tsx`) |
 
@@ -88,13 +88,13 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
-| Kampagnenmodus, Stufen („Setup“, „After battle N“), Snapshots, Stufenvergleich | ✓ | ✓ | – | changes | 4a | |
+| Kampagnenmodus, Stufen („Setup“, „After battle N“), Snapshots, Stufenvergleich | ✓ | ✓ | ◐ | changes | 4a | **App (09.10.2026):** die Nachbereitung schaltet die Stufe beim Übernehmen einer Schlacht weiter (mit Snapshot); „What changed“ seit der letzten Markierung statt des Stufenvergleichs. Den Kampagnenmodus von Hand ein- und ausschalten und Stufen ohne Server gibt es in der App noch nicht |
 | Chronik: Ereignisse, Notizen | ✓ | ✓ | – | timeline | 4a | |
-| Schlachtformular mit Seiten und Verlusten | ✓ | ✓ | – | game-night | 4a | |
-| Bezirke, Footholds, Kontrolle, Effekte | ✓ | ✓ | – | – | 4a | |
-| Post-Battle-Sequenz: Schritte, Wyrdstone-Verkauf, Erkundungswürfel | ✓ | ✓ | – | trading-post (Schritte 6, 8, 9) | 4a | |
+| Schlachtformular mit Seiten und Verlusten | ✓ | ✓ | ◐ | game-night | 4a | **App:** der Spielabend (4a2) schreibt das Protokoll, die Nachbereitung übernimmt es über `saveBattleDraft` in den Speicherstand (4a4). Eine Schlacht ohne Kampagnenserver von Hand eintragen gibt es noch nicht |
+| Bezirke, Footholds, Kontrolle, Effekte | ✓ | ✓ | ◐ | – | 4a | **App:** die Karte folgt dem Ergebnis beim Übernehmen (`applyBattleTerritory`), die Effekte wirken beim Verletzungswurf; Bezirke von Hand setzen und anzeigen fehlt noch (4a4 Teil 2) |
+| Post-Battle-Sequenz: Schritte, Wyrdstone-Verkauf, Erkundungswürfel | ✓ | ✓ | ✓ | trading-post (Schritte 6, 8, 9) | 4a | **App (09.10.2026):** Nachbereitung einer Kampagnenschlacht (`/warbands/:id/aftermath/:bid`): die zehn Schritte in Reihenfolge, Verletzungen würfeln, Erkundungswürfel, Wyrdstein im Lager und Verkauf mit Rücknahme, Links zu Hire und Trading Post |
 | Nachschlagetabellen nach der Schlacht (Helfer) | ✓ | Daten ✓ | – | roster (Advance, Injury) | 4a | |
-| Ausstehende Erfahrung, Schlachtergebnisse anwenden | ✓ | ✓ | – | changes | 4a | |
+| Ausstehende Erfahrung, Schlachtergebnisse anwenden | ✓ | ✓ | ✓ | changes | 4a | **App:** „Grant the battle’s experience“ (`awardBattleXp`, einmal je Schlacht: `xpAwarded`), „Write it onto the roster“ (`applyBattleResults`) |
 | Kampagnendatei: mehrere Warbands, Zusammenführen, Statistik | ✓ | ✓ | – | – | 4a | übernimmt dann der Server |
 | Auswertung je Krieger, Lebenslauf, Erzähl-Export | ✓ | ✓ | – | timeline, background | 4b | |
 

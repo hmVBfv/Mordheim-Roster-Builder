@@ -29,6 +29,7 @@ const Campaigns = lazy(() => import('../campaign/Campaigns.tsx').then((m) => ({ 
 const Campaign = lazy(() => import('../campaign/Campaign.tsx').then((m) => ({ default: m.Campaign })));
 const CampaignWarband = lazy(() => import('../campaign/CampaignWarband.tsx').then((m) => ({ default: m.CampaignWarband })));
 const Battle = lazy(() => import('../battle/Battle.tsx').then((m) => ({ default: m.Battle })));
+const Aftermath = lazy(() => import('../aftermath/Aftermath.tsx').then((m) => ({ default: m.Aftermath })));
 const NotesHome = lazy(() => import('../notes/Notes.tsx').then((m) => ({ default: m.NotesHome })));
 
 export function AppRoutes() {
@@ -56,6 +57,7 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/admin" element={<Admin />} />}
           {FLAVOUR === 'campaign' && <Route path="/admin/:tab" element={<Admin />} />}
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/versions" element={<Versions />} />}
+          {FLAVOUR === 'campaign' && <Route path="/warbands/:id/aftermath/:bid" element={<Aftermath />} />}
           {FLAVOUR === 'campaign' && <Route path="/import" element={<ImportLink />} />}
           <Route path="/more" element={<More />} />
           <Route path="*" element={<Placeholder title="Not found" text="There is nothing at this address." />} />

@@ -280,3 +280,122 @@ test('notes and quotes at the game night, in the protocol by turn', async ({ pag
   await tapTargets(page);
   await shot(page, 'game-night-notes');
 });
+
+/* After the battle (phase 4a4): the leader closes it, the player takes it
+   over into the warband, goes through the post-battle sequence and marks it;
+   the campaign moves on. */
+async function battleFought(page: Parameters<typeof playServer>[0]) {
+  const srv = await playServer(page, true, { totp: true });
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+  const mine = crypto.randomUUID();
+  srv.handle('POST', `/campaigns/${c.id}/enrolments`, new URLSearchParams(), { warbandId: mine, data: { ...SAVE, name: 'The Silver Caravan' } });
+  const skrittle = c.enrolments.find((e) => e.name === 'Clan Skrittle')!.warbandId;
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry', warbandIds: [mine, skrittle] });
+  b.participants[0]!.outcome = 'victory';
+  b.participants[1]!.outcome = 'defeat';
+  srv.entryElsewhere(b.id, { id: '11111111-1111-4111-8111-111111111111', turn: 2, kind: 'casualty', author: 'Kai',
+    payload: { victim: { warbandId: mine, uid: 3, idx: 0, name: 'Magda', grade: 'hero', wb: 'merc' }, attacker: { warbandId: skrittle, uid: null, name: 'Clan Skrittle' }, note: 'on the gangway' } });
+  srv.entryElsewhere(b.id, { id: '22222222-2222-4222-8222-222222222222', turn: 4, kind: 'casualty', author: 'Kai',
+    payload: { victim: { warbandId: skrittle, uid: null, name: 'Clan Skrittle' }, attacker: { warbandId: mine, uid: 2, idx: 0, name: 'Ulrich the Grey', grade: 'hero', wb: 'merc' }, note: '' } });
+  return { srv, c, b, mine };
+}
+
+test('after the battle: the leader closes it, the player takes it over, goes through the steps and marks it', async ({ page }) => {
+  const { srv, c, b, mine } = await battleFought(page);
+  await page.goto(`campaign/${c.id}/battles/${b.id}`);
+  await page.getByRole('button', { name: 'Close the battle…' }).click();
+  const close = page.getByRole('dialog', { name: 'Close Battle 1 · Hel Fenn ferry?' });
+  await tapTargets(page);
+  await shot(page, 'battle-close');
+  await close.getByRole('button', { name: 'Close the battle' }).click();
+  await expect(page.getByText(/This battle is closed: its protocol is fixed/)).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'battle-closed');
+  await page.getByRole('link', { name: 'Your aftermath →' }).click();
+
+  await expect(page.getByRole('heading', { level: 1, name: 'After battle 1' })).toBeVisible();
+  await expect(page.getByRole('list', { name: 'From the protocol' })).toContainText('Magda (The Silver Caravan) out of action – by someone of Clan Skrittle.');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'aftermath-take');
+  await page.getByRole('button', { name: 'Take it over' }).click();
+
+  // injuries
+  const casualties = page.getByRole('list', { name: 'Casualties' });
+  await casualties.getByRole('button', { name: 'Roll' }).click();
+  const roll = page.getByRole('dialog', { name: 'Serious injury · Magda' });
+  await roll.getByLabel('D66 as rolled').fill('45');
+  await roll.getByRole('button', { name: 'Apply' }).click();
+  await expect(page.getByText('Nothing left to roll.')).toBeVisible();
+  await page.getByRole('button', { name: 'Done – next step' }).click();
+  // experience
+  await page.getByRole('button', { name: 'Grant the battle’s experience' }).click();
+  await expect(page.getByRole('list', { name: 'Experience held' })).toContainText('Ulrich the Grey +1');
+  await page.getByRole('button', { name: 'Write it onto the roster' }).click();
+  await page.getByRole('button', { name: 'Done – next step' }).click();
+  // exploration: two shards found
+  await page.getByRole('button', { name: 'One shard more' }).click();
+  await page.getByRole('button', { name: 'One shard more' }).click();
+  await page.getByRole('button', { name: 'Done – next step' }).click();
+  // wyrdstone
+  await page.getByRole('button', { name: /^Sell for \d+ gc$/ }).click();
+  await expect(page.getByText(/✓ Sold 2 shards for \d+ gc/)).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Changes' })).toContainText('Ulrich the Grey');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'aftermath-steps');
+
+  await page.getByRole('button', { name: 'Looks right – mark after battle 1' }).click();
+  await expect(page.getByText(/✓ Marked after battle 1 – version 2/)).toBeVisible({ timeout: 10000 });
+  const e = c.enrolments.find((x) => x.warbandId === mine)!;
+  expect(e.tag).toMatchObject({ kind: 'after_battle', rev: 2, battleId: b.id });
+  expect(e.tag!.changes!.map((x) => x.kind)).toEqual(expect.arrayContaining(['experience', 'gold']));
+  expect(srv.state.warbands.get(mine)!.headRev).toBe(2);
+  await shot(page, 'aftermath-marked');
+
+  // on a desktop the sequence and what changed stand side by side
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const steps = await page.getByRole('heading', { level: 2, name: 'After the battle' }).boundingBox();
+  const changed = await page.getByRole('heading', { level: 2, name: 'What changed' }).boundingBox();
+  expect(changed!.x).toBeGreaterThan(steps!.x + 200);
+  await shot(page, 'aftermath-desktop');
+});
+
+test('the aftermath in parchment', async ({ page }) => {
+  await useTheme(page, 'parchment');
+  const { c, b, mine } = await battleFought(page);
+  b.status = 'closed';
+  await page.goto(`campaign/${c.id}`);
+  await expect(page.getByRole('region', { name: 'Open for you' })).toBeVisible();
+  await page.goto(`warbands/${mine}/aftermath/${b.id}`);
+  await page.getByRole('button', { name: 'Take it over' }).click();
+  await expect(page.getByRole('list', { name: 'Casualties' })).toContainText('Magda was put out of action');
+  await noSideScroll(page);
+  await shot(page, 'parchment-aftermath');
+});
+
+test('the campaign after the battle: open for each player, and a leader moves it on', async ({ page }) => {
+  const { c, b } = await battleFought(page);
+  b.status = 'closed';
+  await page.goto(`campaign/${c.id}`);
+  const open = page.getByRole('region', { name: 'Open for you' });
+  await expect(open.getByRole('link')).toContainText('Battle 1 · Hel Fenn ferry · The Silver Caravan');
+  await expect(page.getByRole('list', { name: 'Battles' })).toContainText('closed · 0/2 marked');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-open-for-you');
+  await page.getByRole('link', { name: 'Manage' }).click();
+  await expect(page.getByText(/The Grey Penitents fought none/)).toBeVisible();
+  await page.getByRole('button', { name: 'Move on to After battle 1' }).click();
+  await expect(page.getByText('On to After battle 1.')).toBeVisible();
+  // no battle of round 2 yet: the button says so by looking disabled too
+  const next = page.getByRole('button', { name: 'Move on to After battle 2' });
+  await expect(next).toBeDisabled();
+  expect(Number(await next.evaluate((el) => getComputedStyle(el).opacity))).toBeLessThan(1);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-next-round');
+  await page.getByRole('link', { name: 'Overview' }).click();
+  await expect(page.getByRole('list', { name: 'Warbands' })).toContainText('Sat out battle 1');
+});

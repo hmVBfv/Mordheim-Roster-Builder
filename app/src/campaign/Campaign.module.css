@@ -141,3 +141,8 @@
     align-items: start;
   }
 }
+
+/* across both columns: what is open for the user (phase 4a4) */
+.wide {
+  grid-column: 1 / -1;
+}

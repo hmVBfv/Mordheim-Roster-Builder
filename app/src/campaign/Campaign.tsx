@@ -2,7 +2,8 @@
    the overview every member sees – the warbands entered with their player,
    type and the totals frozen at their last mark, the members – and, for
    leaders, Manage: the name, members and roles, the warbands waiting for a
-   leader. Battles, notes and the timeline follow in the next steps of 4a. */
+   leader, moving on to the next round (4a4). Battles (4a2) and their
+   aftermath (4a4): what is open for the user is at the top. */
 import { useCallback, useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate, useParams } from 'react-router';
 import { ApiError, errorText } from '../account/api.ts';
@@ -14,7 +15,7 @@ import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
-  cachedCampaign, confirmEnrolment, declineEnrolment, forgetCampaign, getCampaign, removeMember, renameCampaign, ROLE_NAMES, roundName, setMember,
+  advanceRound, cachedCampaign, confirmEnrolment, declineEnrolment, forgetCampaign, getCampaign, removeMember, renameCampaign, ROLE_NAMES, roundName, setMember,
   type CampaignRole, type CampaignView, type Enrolment,
 } from './api.ts';
 import styles from './Campaign.module.css';
@@ -44,7 +45,8 @@ function useCampaign(id: string) {
 const stateWord = (e: Enrolment) => {
   if (e.status === 'pending') return { word: 'Waiting for a leader', cls: styles.waiting };
   if (!e.tag) return { word: 'Entered', cls: styles.ok };
-  return { word: e.tag.kind === 'start' ? '✓ Start' : `✓ After round ${e.tag.round}`, cls: styles.ok };
+  if (e.tag.kind === 'sat_out') return { word: `Sat out battle ${e.tag.round}`, cls: '' };
+  return { word: e.tag.kind === 'start' ? '✓ Start' : `✓ After battle ${e.tag.round}`, cls: styles.ok };
 };
 
 function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: string }) {
@@ -120,9 +122,33 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
   );
 }
 
+/** The closed battles one of the user's warbands fought and has not marked yet. */
+export function openAftermaths(view: CampaignView, me: string): { battleId: string; warbandId: string; label: string }[] {
+  const mine = view.enrolments.filter((e) => e.playerId === me && e.status === 'active');
+  return (view.battles ?? []).filter((b) => b.status === 'closed').flatMap((b) => mine
+    .filter((e) => (b.warbandIds ?? []).includes(e.warbandId) && !(b.marked ?? []).includes(e.warbandId))
+    .map((e) => ({ battleId: b.id, warbandId: e.warbandId, label: `${battleTitle(b)} · ${e.name || e.wbName}` })));
+}
+
 function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignView; me: string; lead: boolean; onView: (v: CampaignView) => void }) {
+  const open = openAftermaths(view, me);
   return (
     <div className={styles.columns}>
+      {open.length > 0 && (
+        <section className={`${styles.section} ${styles.wide}`} aria-labelledby="c-open">
+          <h2 id="c-open">Open for you</h2>
+          <ul className={styles.list}>
+            {open.map((o) => (
+              <li key={`${o.battleId}:${o.warbandId}`}>
+                <Link to={`/warbands/${o.warbandId}/aftermath/${o.battleId}`} className={styles.entry}>
+                  <span>Aftermath<small>{o.label}</small></span>
+                  <span className={`${styles.chip} ${styles.waiting}`}>to mark</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section className={styles.section} aria-labelledby="c-warbands">
         <h2 id="c-warbands">Warbands</h2>
         <WarbandRows id={id} view={view} me={me} />
@@ -148,7 +174,9 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
                 <li key={b.id}>
                   <Link to={`/campaign/${id}/battles/${b.id}`} className={styles.entry}>
                     <span>{battleTitle(b)}<small>{b.warbands.join(' · ')}</small></span>
-                    <span className={`${styles.chip} ${b.status === 'open' ? styles.ok : ''}`}>{b.status === 'open' ? 'live' : 'closed'}</span>
+                    <span className={`${styles.chip} ${b.status === 'open' ? styles.ok : ''}`}>
+                      {b.status === 'open' ? 'live' : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -181,6 +209,10 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
     } catch (e) { setError(e instanceof ApiError && e.code === 'last_leader' ? 'A campaign keeps at least one leader: make someone else leader first.' : errorText(e)); } finally { setBusy(false); }
   };
   const waiting = view.enrolments.filter((e) => e.status === 'pending');
+  const nextRound = view.campaign.round + 1;
+  const ofNext = (view.battles ?? []).filter((b) => b.round === nextRound);
+  const stillOpen = ofNext.filter((b) => b.status === 'open').length;
+  const satOut = view.enrolments.filter((e) => e.status === 'active' && !ofNext.some((b) => (b.warbandIds ?? []).includes(e.warbandId)));
   const outside = (people ?? []).filter((p) => !view.members.some((m) => m.userId === p.id));
   if (!canLead) {
     return <p className={ui.message}>Leading needs the authenticator: set it up under More → Account, then come back.</p>;
@@ -203,6 +235,18 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
               </li>
             ))}
           </ul>
+        </section>
+        <section className={styles.section} aria-labelledby="m-round">
+          <h2 id="m-round">The next round</h2>
+          <p className={ui.muted}>
+            Now: {roundName(view.campaign.round)}.{' '}
+            {ofNext.length === 0 ? `No battle of round ${nextRound} yet.` : stillOpen ? `${stillOpen} of ${ofNext.length} battle${ofNext.length === 1 ? '' : 's'} of round ${nextRound} still being fought.` : `The battle${ofNext.length === 1 ? '' : 's'} of round ${nextRound} ${ofNext.length === 1 ? 'is' : 'are'} closed.`}
+            {ofNext.length > 0 && satOut.length > 0 ? ` ${satOut.map((e) => e.name || e.wbName).join(', ')} fought none: moving on marks ${satOut.length === 1 ? 'it' : 'them'} as having sat the round out.` : ''}
+          </p>
+          <div className={ui.row}>
+            <button type="button" className={ui.button} disabled={busy || ofNext.length === 0 || stillOpen > 0}
+              onClick={() => void run(() => advanceRound(id), `On to ${roundName(nextRound)}.`)}>Move on to {roundName(nextRound)}</button>
+          </div>
         </section>
         <form className={styles.section} onSubmit={(e) => { e.preventDefault(); void run(() => renameCampaign(id, name), 'Name saved.'); }}>
           <h2>Name</h2>
