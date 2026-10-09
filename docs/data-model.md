@@ -157,10 +157,11 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | --- | --- | --- |
 | `notes` | `id`, `campaign_id`, `battle_id`, `turn`, `author_id`, `kind` (`general` · `scene` · `quote` · `dice` · `hook`), `text`, `lang`, `visibility` (`public` · `sealed` · `leader`), `sealed_until_battle`, `mentions` (JSON: `[{ warbandId, uid, name }]`), `protocol_entry_id`, `created_at`, `updated_at`, `deleted_at`, `seq` | seit Migration 7. `id` vom Gerät (doppelt gesendet: eine Notiz; dieselbe ID ändert sie). Höchstens 20 KB Text. `sealed`: nur mit `sealed_until_battle` = eine offene Schlacht der Kampagne; bis sie geschlossen ist, bekommen alle außer dem Autor – auch Leiter und Admin – nur einen Platzhalter (`id`, `battleId`, Autor, `sealedUntil`, `createdAt`; kein Text, keine Art, keine Erwähnungen); danach liest sie jeder (`opened`) und sie bleibt offen. `leader`: nur Leiter mit Authenticator schreiben und lesen sie, Spieler und Zuschauer bekommen sie gar nicht. Bei einem Zitat ist die erste Erwähnung der Sprecher. `lang`: `de` · `en` · leer (wird gewählt). Ein Leiter darf den Text einer fremden Notiz korrigieren (`note.edit_other`), nie eine noch versiegelte und nie, wer sie lesen darf. `seq`: mit `?since=` fragt ein Gerät nur nach Neuem |
 | `note_revisions` | `note_id`, `text`, `edited_by`, `edited_at` | seit Migration 7: die frühere Fassung bei jeder Textänderung |
-| `timeline_positions` | `campaign_id`, `item_type` (`note` · `picture` · `entry`), `item_id`, `segment`, `pos`, `turn`, `moved_by`, `moved_at`, `seq` | seit Migration 10; nur verschobene Bausteine haben eine Zeile (siehe Abschnitt 5). Verschieben: der Autor seine, ein Leiter alle; das Protokoll nur ein Leiter; eine versiegelte Notiz bis zum Öffnen nur ihr Autor; geloggt (`timeline.move`). Eine Position bekommt nur, wer ihren Baustein sehen darf |
+| `timeline_positions` | `campaign_id`, `item_type` (`note` · `picture` · `entry` · `chapter`), `item_id`, `segment`, `pos`, `turn`, `moved_by`, `moved_at`, `seq` | seit Migration 10; nur verschobene Bausteine haben eine Zeile (siehe Abschnitt 5). Verschieben: der Autor seine, ein Leiter alle; das Protokoll nur ein Leiter; eine versiegelte Notiz bis zum Öffnen nur ihr Autor; geloggt (`timeline.move`). Eine Position bekommt nur, wer ihren Baustein sehen darf |
 | `attachments` | `id`, `campaign_id`, `battle_id`, `turn`, `uploader_id`, `mime` (`image/png` · `image/jpeg` · `image/webp`), `bytes`, `width`, `height`, `sha256`, `caption`, `visibility` (`public` · `leader`), `created_at`, `updated_at`, `stored_at`, `deleted_at`, `seq` | seit Migration 9: Bilder (Screenshot aus TTS, Foto vom Tisch) an einer Schlacht (mit Zug) oder an der Kampagne allgemein. `id` vom Gerät; erst angekündigt (`PUT …/attachments/:aid`, wartend), dann die Bytes (`PUT …/:aid/file`, roh, höchstens 5 MB, Typ nach den ersten Bytes geprüft, Größe wie angekündigt). Im Client verkleinert und neu kodiert (keine EXIF-Daten). Auf der Platte unter `<UPLOAD_DIR>/<campaign_id>/<id>.<png·jpg·webp>` – der Pfad entsteht nur aus IDs. `leader`: nur Leiter mit Authenticator (und wer es hochlud) bekommen Zeile und Bytes. Höchstens 1 GB je Kampagne. Herausgenommen: `deleted_at`, die Datei wird gelöscht. `seq`: mit `?since=` nur Neues |
 | `questions` | `id`, `campaign_id`, `battle_id`, `asked_by`, `to_user_id`, `text`, `answer_note_id`, `status` (`open` · `answered` · `withdrawn`) | |
-| `chapter_drafts` | `id`, `campaign_id`, `segment`, `ref_key`, `lang`, `text`, `source` (`ai` · `manual`), `status` (`draft` · `approved` · `published`), `created_at` | Entwürfe für die Chronik |
+| `chapters` | `id`, `campaign_id`, `ref_key`, `kind` (`prologue` · `battle` · `interlude` · `chapter`), `published_on`, `de` (JSON), `en` (JSON), `created_by`, `created_at`, `updated_at`, `deleted_at`, `seq` | seit Migration 12 (4a5, Teil 2): die **veröffentlichten Kapitel** der Chronik. Eine Zeile je Kapitel, beide Sprachen nebeneinander, wie die Chronik sie über ihr `ref` verbindet (`ref_key`: `prolog`, `battle-1`, `interlude-1` …; eines je Kampagne, ADR 0013). `de`/`en`: `{ label, title, icDate, place, victor, text }` (Markdown wie veröffentlicht, höchstens 200 000 Zeichen) oder leer, wenn die Sprache fehlt. Ein Leiter importiert (`PUT …/chapters/:chid`, dieselbe ID importiert neu) und nimmt heraus (`deleted_at`, das `ref` ist dann wieder frei); jedes Mitglied liest (veröffentlicht = öffentlich, ADR 0002): `GET …/timeline` listet sie ohne Text (mit Länge), `GET …/chapters/:chid` mit. In der Zeitleiste ein Baustein (`item_type` `chapter`), seine Stelle kommt mit dem Import; verschieben nur ein Leiter. Migration 12 baut `timeline_positions` dafür neu auf (SQLite ändert kein CHECK), die Zeilen bleiben |
+| `chapter_drafts` | `id`, `campaign_id`, `segment`, `ref_key`, `lang`, `text`, `source` (`ai` · `manual`), `status` (`draft` · `approved` · `published`), `created_at` | Entwürfe für die Chronik (4b) |
 
 ### Hintergrund (nur Leiter)
 
@@ -242,14 +243,19 @@ Ständen:
 
 - **Segmente:** `pre` (vor der Kampagne), je Schlacht `b<id>:before`,
   `b<id>:battle`, `b<id>:after`, nach der letzten Schlacht einer Runde
-  `i<n>` (Zwischenspiel N). Schlachten nach Runde, dann Anlegezeit.
+  `i<n>` (Zwischenspiel N). Schlachten nach Runde, dann Anlegezeit. Eine
+  Schlacht der Vorgeschichte (4a5, `taken_over`) ist ein einziges Segment
+  `b<id>:battle`; ihr `before` und `after` zählen als dieses.
 - **`pos`:** fraktionaler Sortierschlüssel aus Ziffern, gelesen als
   `0.<pos>` (`app/src/timeline/order.ts` `between`); zwischen zwei Schlüsseln
   gibt es immer einen dritten, er endet nie auf 0. Verschieben ändert genau
   eine Zeile, nichts wird neu durchnummeriert.
 - **Feste Anker:** Schlachten mit ihrem Bericht (wer kämpfte, wie es
-  ausging) und Tags (`start` → `pre`, `after_battle` → `b<id>:after`,
-  `sat_out` → `i<n>`) haben keine verschiebbare Position.
+  ausging) und Tags (`start` → `pre`, nach Schlacht N eingetreten – auch bei
+  der Übernahme – `i<n>`; `after_battle` → `b<id>:after`, `sat_out` →
+  `i<n>`) haben keine verschiebbare Position.
+- **Kapitel** (4a5) haben immer eine Zeile: ihre Stelle kommt mit dem Import
+  (an den Anfang ihres Segments), verschieben nur Leiter.
 - **Ohne Zeile** (nie verschoben) steht ein Baustein, wo Schlacht und Zeit ihn
   hinstellen (`app/src/timeline/build.ts`): Protokolleintrag → `b<id>:battle`;
   Notiz oder Bild einer Schlacht → `before`, wenn vor ihr geschrieben oder

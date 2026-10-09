@@ -69,6 +69,9 @@ export interface ProbeContext {
   historyCampaignId: string;
   historyWarbandId: string;
   pastBattleId: string;
+  /** A published chapter in the victim's campaign, and one in the admin's (phase 4a5, part 2). */
+  chapterId: string;
+  ledChapterId: string;
 }
 
 export interface Probe {
@@ -287,8 +290,9 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id/attachments': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments` }),
       'GET /api/v1/campaigns/:id/attachments/:aid/file': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.ownPictureId}/file` }),
       'GET /api/v1/campaigns/:id/timeline': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/timeline` }),
+      'GET /api/v1/campaigns/:id/chapters/:chid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/chapters/${c.chapterId}` }),
     },
-    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks'] },
+    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks', 'chapters', 'chapter'] },
   },
   'campaign.warband.read': {
     allowed: ['user'],
@@ -316,8 +320,10 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'PUT /api/v1/campaigns/:id/house-rules': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/house-rules`, body: { rules: { freeDagger: true } } }),
       'PUT /api/v1/campaigns/:id/history/:bid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.historyCampaignId}/history/${randomUUID()}`, body: { round: 2, title: 'The probed mill', outcomes: { [c.historyWarbandId]: 'victory' } } }),
       'DELETE /api/v1/campaigns/:id/history/:bid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.historyCampaignId}/history/${c.pastBattleId}` }),
+      'PUT /api/v1/campaigns/:id/chapters/:chid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/chapters/${randomUUID()}`, body: { refKey: `probe-${randomUUID().slice(0, 8)}`, kind: 'chapter', de: { title: 'Die Sonde', text: 'Nebel.' }, place: { segment: 'pre', pos: '5' } } }),
+      'DELETE /api/v1/campaigns/:id/chapters/:chid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/chapters/${c.ledChapterId}` }),
     },
-    fields: { admin: [...VIEW, 'left'] },
+    fields: { admin: [...VIEW, 'left', 'chapter', 'removed'] },
   },
   'battle.write': {
     // the user role is a player there (403), the admin leads it
