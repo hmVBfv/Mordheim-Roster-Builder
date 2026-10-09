@@ -2435,3 +2435,33 @@ On the way, the leak matrix turned out to have probed with a warband type
 that does not exist: every enrolment it tried to confirm failed quietly,
 and the probes that need a confirmed warband were answered with refusals
 it accepts for an allowed role. It probes with a real one now.
+
+## October 9, 2026 (cont.) — the chapters come along
+
+The campaign's story so far is not in any save: it is in the chronicle, a
+prologue, a chapter per battle and the interludes, German and English. The
+timeline should hold the whole story, so the published chapters come in
+too – the chronicle's own files, imported by a leader in one go. A German
+and an English file with the same `ref` are one chapter, side by side, and
+each stands at the head of the part of the story it tells: the prologue
+before the campaign, `battle-1` at battle 1, `interlude-1` in its
+interlude. One the ref does not place – the chronicle has a
+`pits-interlude` – goes after the last battle published before it. The
+leader sees every place before the import and can change it.
+
+The reader shows the text as the chronicle writes it – headings, the rules
+between scenes, names in bold – as plain pieces built in the app, never as
+HTML from the file. The list in the timeline carries no texts (the longest
+chapter is over 50,000 characters, and the timeline is asked again every
+fifteen seconds); a chapter's text comes when someone opens it, and stays
+on the phone until it changes.
+
+A chapter's place is a timeline position like a note's. SQLite cannot
+change a CHECK constraint, so letting "chapter" in meant building the
+positions table anew and carrying its rows over; a test does exactly that
+from the schema before.
+
+Before writing the reader, the parser ran over all sixteen real files of
+the chronicle (not copied into this repository – the tests use files made
+up in the same form): every one read, every language guessed right from
+its prose, the long folded `victor` of the fourth battle included.

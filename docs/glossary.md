@@ -190,7 +190,8 @@ Begriff einführt, trägt ihn hier ein.
 | KI-Paket | AI pack | `ai-pack` |
 | Kapitelentwurf | Chapter draft | `chapter_drafts` |
 | Chronik (Reiter der Kampagne: die ganze Geschichte) | Chronicle | `chapters` |
-| Kapitel importieren | Import a chapter | Entwurf aus Text oder .md/.txt |
+| Kapitel importieren | Import chapters… (veröffentlichte, 4a5) · Import a chapter (Entwurf, 4b) | `PUT …/chapters/:chid`, `readChapterFile()`; Entwurf aus Text oder .md/.txt |
+| veröffentlichtes Kapitel | Chapter · Read · Deutsch / English · Take the chapter out | `chapters`, `app/src/timeline/ChapterParts.tsx` |
 
 ## Verborgene Ebene und Welt
 
