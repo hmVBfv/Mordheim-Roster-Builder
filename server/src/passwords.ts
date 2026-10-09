@@ -18,11 +18,25 @@ const KEYLEN = 32;
 /** At most two hashes at once: each needs its 32 MiB, and the Pi's memory is
     shared (CLAUDE.md, "Design for the Pi's limits"). */
 export const MAX_PARALLEL = 2;
+/** At most this many wait for their turn (security review AUTH-8): a crowd
+    of sign-ins from many addresses – each one under the brake – would
+    otherwise make everybody wait for minutes. Beyond it the answer is
+    "busy" at once (503 with Retry-After, app.ts). */
+export const MAX_WAITING = 20;
 let running = 0;
 const queue: (() => void)[] = [];
 
+/** Too many password checks waiting already. */
+export class HashBusyError extends Error {
+  override name = 'HashBusyError';
+  constructor() { super('too many password checks at once'); }
+}
+
 async function scrypt(pw: string, salt: Buffer, cost: HashCost): Promise<Buffer> {
-  if (running >= MAX_PARALLEL) await new Promise<void>((go) => queue.push(go));
+  if (running >= MAX_PARALLEL) {
+    if (queue.length >= MAX_WAITING) throw new HashBusyError();
+    await new Promise<void>((go) => queue.push(go));
+  }
   running++;
   try {
     const opts: ScryptOptions = { ...cost, maxmem: 256 * cost.N * cost.r * cost.p + 1024 * 1024 };

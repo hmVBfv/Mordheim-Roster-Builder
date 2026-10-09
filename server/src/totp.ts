@@ -108,4 +108,18 @@ export function newRecoveryCodes(n = 10): string[] {
   });
 }
 
-export const hashCode = (code: string) => createHash('sha256').update(code.toLowerCase().replace(/[^a-z0-9]/g, '')).digest('base64url');
+const normalCode = (code: string) => code.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+/** How a recovery code was kept before the security review: a plain hash. About 40 bits are found by trying them all, so a
+    copy of the database gave the codes away (AUTH-10); still accepted for codes kept that way. */
+export const hashCode = (code: string) => createHash('sha256').update(normalCode(code)).digest('base64url');
+
+/** How a recovery code is kept now: keyed with TOTP_KEY, which no backup holds ("h1:…"). */
+export const keyedCode = (code: string, key: Buffer) => `h1:${createHmac('sha256', key).update(`recovery:${normalCode(code)}`).digest('base64url')}`;
+
+/** Where a code is in the kept list (either way of keeping), or -1. */
+export function findCode(kept: string[], code: string, key: Buffer | null): number {
+  const keyed = key ? keyedCode(code, key) : null;
+  const plain = hashCode(code);
+  return kept.findIndex((h) => h === keyed || h === plain);
+}
