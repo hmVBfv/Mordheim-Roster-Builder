@@ -43,6 +43,11 @@ export interface FakeBattle {
   /** Phase 4a5: a battle of the history, played before the app, and the day it was played. */
   takenOver?: boolean; playedAt?: string | null;
 }
+/** A published chapter of the chronicle (4a5): both languages, each { label, title, icDate, place, victor, text }. */
+export interface FakeChapter {
+  id: string; campaignId: string; refKey: string; kind: string; publishedOn: string | null; createdAt: string; updatedAt: string;
+  de: Record<string, string> | null; en: Record<string, string> | null; deleted?: boolean;
+}
 export interface FakeTotals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
 export interface FakeChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
 export interface FakeTag {
@@ -101,6 +106,7 @@ export function createFakeSync(opts: {
     notes: new Map<string, FakeNote>(),
     pictures: new Map<string, FakePicture>(),
     positions: new Map<string, { campaignId: string; itemType: string; itemId: string; segment: string; pos: string; movedBy: string; movedAt: string }>(),
+    chapters: new Map<string, FakeChapter>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -325,17 +331,47 @@ export function createFakeSync(opts: {
     const visible = (type: string, id: string) => {
       if (type === 'note') { const n = s.notes.get(id); return n && n.campaignId === c.id ? noteFor(n, role) : null; }
       if (type === 'picture') { const p = s.pictures.get(id); return p && p.campaignId === c.id && pictureFor(p, role) ? p : null; }
+      if (type === 'chapter') { const ch = s.chapters.get(id); return ch && ch.campaignId === c.id && !ch.deleted ? {} : null; }
       return battles.flatMap((b) => b.entries).find((e) => e.id === id && !e.deleted) ?? null;
     };
+    const summary = (ch: FakeChapter) => {
+      const short = (l: Record<string, string> | null) => { if (!l) return null; const { text, ...rest } = l; return { ...rest, length: (text ?? '').length }; };
+      return { id: ch.id, refKey: ch.refKey, kind: ch.kind, publishedOn: ch.publishedOn, createdAt: ch.createdAt, updatedAt: ch.updatedAt, de: short(ch.de), en: short(ch.en) };
+    };
+    const chapters = [...s.chapters.values()].filter((ch) => ch.campaignId === c.id && !ch.deleted);
+    const cm = rest.match(/^\/chapters\/([^/]+)$/);
+    if (cm) {
+      const ch = s.chapters.get(cm[1]!);
+      if (method === 'GET') return ch && ch.campaignId === c.id && !ch.deleted ? json(200, { chapter: { ...summary(ch), de: ch.de, en: ch.en } }) : json(404, { error: 'not_found' });
+      if (role !== 'leader') return json(403, { error: 'forbidden' });
+      if (method === 'DELETE') {
+        if (!ch || ch.deleted) return json(404, { error: 'not_found' });
+        ch.deleted = true;
+        s.positions.delete(`chapter:${ch.id}`);
+        return json(200, { removed: true });
+      }
+      if (chapters.some((x) => x.refKey === body.refKey && x.id !== cm[1])) return json(409, { error: 'exists' });
+      const place = body.place as { segment: string; pos: string } | undefined;
+      if (!ch && !place) return json(400, { error: 'invalid', problem: 'a new chapter needs its place in the story' });
+      const next: FakeChapter = {
+        id: cm[1]!, campaignId: c.id, refKey: String(body.refKey), kind: String(body.kind), publishedOn: (body.publishedOn as string | null) ?? null,
+        createdAt: ch?.createdAt ?? at(), updatedAt: at(), de: (body.de as Record<string, string> | null) ?? null, en: (body.en as Record<string, string> | null) ?? null,
+      };
+      s.seq++;
+      s.chapters.set(next.id, next);
+      if (place) s.positions.set(`chapter:${next.id}`, { campaignId: c.id, itemType: 'chapter', itemId: next.id, segment: place.segment, pos: place.pos, movedBy: me.id, movedAt: at() });
+      return json(200, { chapter: summary(next) });
+    }
     if (method === 'GET' && rest === '/timeline') {
       return json(200, {
         positions: [...s.positions.values()].filter((p) => p.campaignId === c.id && visible(p.itemType, p.itemId)).map((p) => ({ itemType: p.itemType, itemId: p.itemId, segment: p.segment, pos: p.pos, movedBy: p.movedBy, movedAt: p.movedAt })),
         entries: battles.flatMap((b) => b.entries.filter((e) => !e.deleted).map((e) => ({ id: e.id, battleId: b.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt }))),
         outcomes: battles.flatMap((b) => b.participants.map((p) => ({ battleId: b.id, warbandId: p.warbandId, name: nameOf(p.warbandId)?.name ?? '', outcome: p.outcome }))),
         marks: c.enrolments.flatMap((e) => (e.tags ?? []).filter((t) => !t.supersededBy).map((t) => ({ id: t.id, warbandId: e.warbandId, warband: e.name, kind: t.kind, round: t.round, battleId: t.battleId, rev: t.rev, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }))),
+        chapters: chapters.sort((x, y) => (x.publishedOn ?? '').localeCompare(y.publishedOn ?? '')).map(summary),
       });
     }
-    const m = rest.match(/^\/timeline\/(note|picture|entry)\/([^/]+)$/);
+    const m = rest.match(/^\/timeline\/(note|picture|entry|chapter)\/([^/]+)$/);
     if (!m || method !== 'PUT') return null;
     if (role === 'viewer') return json(403, { error: 'forbidden' });
     const block = visible(m[1]!, m[2]!) as { authorId?: string; uploaderId?: string } | null;
@@ -504,7 +540,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
-    if (rest.startsWith('/timeline')) return timelineRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
     let x0: RegExpMatchArray | null;
     if (method === 'POST' && rest === '/rounds/advance') {

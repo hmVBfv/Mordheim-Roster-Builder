@@ -5,7 +5,9 @@
    every note, picture and protocol entry the user may see. Each one moves
    their own blocks with ↑ ↓ or "Move to…", a leader all of them (the
    protocol only a leader); moving changes only the place in the story,
-   never when something was recorded. */
+   never when something was recorded. The chronicle's published chapters
+   (4a5) stand at the head of the part they tell: everyone reads them, a
+   leader imports and places them. */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { errorText, type Me } from '../account/api.ts';
 import { casualtyText, OUTCOME_NAMES, type CasualtyPayload } from '../battle/api.ts';
@@ -18,7 +20,9 @@ import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useNotice } from '../ui/Notice.tsx';
 import { useSheet } from '../ui/useSheet.ts';
-import { cachedTimeline, getTimeline, moveBlock, type Position, type TimelineData, type TimelineMark } from './api.ts';
+import { cachedTimeline, getTimeline, moveBlock, removeChapter, type ChapterSummary, type Position, type TimelineData, type TimelineMark } from './api.ts';
+import { ChapterCard, ChapterSheet, chapterTitle, ImportChaptersSheet } from './ChapterParts.tsx';
+import type { Lang } from './chapters.ts';
 import { buildTimeline, stepPlace, type Block, type Segment } from './build.ts';
 import { between } from './order.ts';
 import styles from './Timeline.module.css';
@@ -53,7 +57,8 @@ const markText = (m: TimelineMark) => (m.kind === 'start'
   : m.kind === 'sat_out' ? `Sat out round ${m.round} · ${m.warband}`
     : `✓ After battle ${m.round} · ${m.warband} · version ${m.rev}, ${m.changes} change${m.changes === 1 ? '' : 's'}${m.unexplained ? `, ⚠ ${m.unexplained} without a cause` : ''}`);
 
-function BlockBody({ b, cid, names }: { b: Block; cid: string; names: Record<string, string> }) {
+function BlockBody({ b, cid, names, onRead }: { b: Block; cid: string; names: Record<string, string>; onRead: (c: ChapterSummary, lang: Lang) => void }) {
+  if (b.type === 'chapter') return <ChapterCard c={b.chapter} onRead={(lang) => onRead(b.chapter, lang)} />;
   if (b.type === 'picture') {
     const p = b.picture;
     const src = p.localUrl ?? (p.stored ? pictureUrl(cid, p.id) : undefined);
@@ -99,6 +104,11 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
   const { ref: moveRef, open: openMove, close: closeMove } = useSheet();
   const undoCount = useRef(0);
   const [moving, setMoving] = useState<Block | null>(null);
+  // the chronicle's chapters (4a5): read by everyone, imported by a leader
+  const { ref: readRef, open: openRead, close: closeRead } = useSheet();
+  const [reading, setReading] = useState<{ c: ChapterSummary; lang: Lang } | null>(null);
+  const { ref: importRef, open: openImport, close: closeImport } = useSheet();
+  const [importKey, setImportKey] = useState(0);
   const names = useMemo(() => Object.fromEntries(view.enrolments.map((e) => [e.warbandId, e.name || e.wbName])), [view.enrolments]);
   const segs: Segment[] = useMemo(() => (tl.data ? buildTimeline(view.battles ?? [], notes.notes ?? [], pics.pictures ?? [], tl.data) : []), [view.battles, notes.notes, pics.pictures, tl.data]);
   const writer = view.role !== 'viewer';
@@ -106,7 +116,7 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
   /** Each moves their own, a leader all; the protocol only a leader; a sealed note only its author. */
   const canMove = (b: Block) => {
     if (!writer) return false;
-    if (b.type === 'entry') return lead;
+    if (b.type === 'entry' || b.type === 'chapter') return lead;
     if (b.type === 'picture') return !b.picture.pending && (b.picture.uploaderId === user.id || lead);
     if (isSealed(b.note)) return false;
     return !b.note.pending && (b.note.authorId === user.id || lead);
@@ -134,6 +144,7 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
         The order below is the order of the story. {writer ? 'Move your blocks with ↑ ↓ or ⋯ to where they happen' : 'Players and leaders move blocks to where they happen'}{lead ? ' – as a leader, any block' : ''}.
         Battles, their reports and the marks stay where they are. Moving changes only the place in the story, never when something was recorded.
       </p>
+      {lead && <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => { setImportKey((k) => k + 1); openImport(); }}>Import chapters…</button></div>}
       {tl.error && <p className={ui.message} role="status">{tl.error}{tl.data ? ' Shown as last seen.' : ''}</p>}
       {!tl.data && !tl.error && <p className={ui.muted}>Loading the timeline…</p>}
       <ol className={styles.timeline} aria-label="Timeline">
@@ -155,10 +166,10 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
               ))}
               {s.blocks.map((b) => {
                 const hidden = (b.type === 'note' && !isSealed(b.note) && b.note.visibility === 'leader') || (b.type === 'picture' && b.picture.visibility === 'leader');
-                const label = b.type === 'picture' ? (b.picture.caption || 'the picture') : b.type === 'entry' ? `the protocol entry of turn ${b.entry.turn}` : isSealed(b.note) ? 'the sealed note' : b.note.text.slice(0, 40);
+                const label = b.type === 'chapter' ? `the chapter ${chapterTitle(b.chapter)}` : b.type === 'picture' ? (b.picture.caption || 'the picture') : b.type === 'entry' ? `the protocol entry of turn ${b.entry.turn}` : isSealed(b.note) ? 'the sealed note' : b.note.text.slice(0, 40);
                 return (
-                  <li key={`${b.type}:${b.id}`} className={`${styles.block} ${hidden ? styles.hiddenBlock : ''}`}>
-                    <div className={styles.body}><BlockBody b={b} cid={id} names={names} /></div>
+                  <li key={`${b.type}:${b.id}`} className={`${styles.block} ${hidden ? styles.hiddenBlock : ''} ${b.type === 'chapter' ? styles.chapterBlock : ''}`}>
+                    <div className={styles.body}><BlockBody b={b} cid={id} names={names} onRead={(c, lang) => { setReading({ c, lang }); openRead(); }} /></div>
                     {canMove(b) && (
                       <div className={styles.tools}>
                         <button type="button" aria-label={`Move up: ${label}`} disabled={!stepPlace(segs, b.id, -1)} onClick={() => step(b, -1)}>↑</button>
@@ -185,6 +196,10 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
           <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => closeMove()}>Cancel</button></div>
         </div>
       </dialog>
+      <ChapterSheet dialogRef={readRef} close={closeRead} cid={id} chapter={reading?.c ?? null} lang={reading?.lang ?? 'de'} canRemove={lead}
+        onRemove={(c) => { removeChapter(id, c.id).then(() => { void tl.refresh(); notify(`${chapterTitle(c)} is out of the timeline.`); }).catch((e: unknown) => notify(errorText(e))); }} />
+      <ImportChaptersSheet dialogRef={importRef} close={closeImport} formKey={importKey} cid={id} segs={segs} battles={view.battles ?? []} chapters={tl.data?.chapters ?? []}
+        onDone={(n) => { void tl.refresh(); notify(`${n} chapter${n === 1 ? '' : 's'} imported.`); }} />
       {undo && <UndoToast key={undo.n} text={undo.text} onUndo={() => { undo.back(); setUndo(null); }} onDone={() => setUndo(null)} />}
       {!undo && notice}
     </div>
