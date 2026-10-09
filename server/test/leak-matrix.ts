@@ -62,13 +62,21 @@ export interface ProbeContext {
   ledWarbandId: string;
   /** A note of the user role's in the victim's campaign. */
   ownNoteId: string;
+  /** Pictures of the user role's in the victim's campaign: one stored, one waiting for its bytes (phase 4a3). */
+  ownPictureId: string;
+  pendingPictureId: string;
 }
 
 export interface Probe {
   method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   url: string;
   body?: unknown;
+  /** For a body that is not JSON (a picture's bytes). */
+  headers?: Record<string, string>;
 }
+
+/** A real 1×1 PNG: the bytes of a picture probe. */
+export const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
 
 export interface MatrixRow {
   /** Who may call it at all. */
@@ -272,8 +280,10 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id/battles': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/battles` }),
       'GET /api/v1/campaigns/:id/battles/:bid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/battles/${c.battleId}` }),
       'GET /api/v1/campaigns/:id/notes': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/notes` }),
+      'GET /api/v1/campaigns/:id/attachments': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments` }),
+      'GET /api/v1/campaigns/:id/attachments/:aid/file': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.ownPictureId}/file` }),
     },
-    fields: { user: [...VIEW, ...BATTLE, 'notes'] },
+    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments'] },
   },
   'campaign.warband.read': {
     allowed: ['user'],
@@ -329,8 +339,11 @@ export const MATRIX: Record<Action, MatrixRow> = {
     routes: {
       'PUT /api/v1/campaigns/:id/notes/:nid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/notes/${randomUUID()}`, body: { battleId: c.battleId, turn: 2, kind: 'quote', text: 'Bolt the doors.' } }),
       'DELETE /api/v1/campaigns/:id/notes/:nid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/notes/${c.ownNoteId}` }),
+      'PUT /api/v1/campaigns/:id/attachments/:aid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/attachments/${randomUUID()}`, body: { mime: 'image/png', bytes: PNG.length, width: 1, height: 1, caption: 'Probing the ferry' } }),
+      'PUT /api/v1/campaigns/:id/attachments/:aid/file': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.pendingPictureId}/file`, body: PNG, headers: { 'content-type': 'image/png' } }),
+      'DELETE /api/v1/campaigns/:id/attachments/:aid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.ownPictureId}` }),
     },
-    fields: { user: ['note', 'seq', 'removed'] },
+    fields: { user: ['note', 'seq', 'removed', 'attachment'] },
   },
   'battle.propose': {
     allowed: ['user'],
