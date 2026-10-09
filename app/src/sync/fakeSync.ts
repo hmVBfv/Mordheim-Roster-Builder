@@ -12,7 +12,7 @@
    `opts.changes`, which the specs compute with core as the server does),
    moving the campaign on; the campaign's house rules, and what the
    overview shows of each warband's newest version (rules that differ,
-   districts held). */
+   districts held); pictures – a raw body arrives as { raw, type }. */
 import { effectiveHouse, houseDifferences } from '@mordheim/core';
 export interface FakeVersion { rev: number; data: unknown; createdAt: string; source: string; note?: string }
 export interface FakeWarband {
@@ -28,6 +28,10 @@ export interface FakeProposal { id: string; targetType: 'battle' | 'protocol_ent
 export interface FakeNote {
   id: string; campaignId: string; battleId: string | null; turn: number | null; authorId: string; author: string; kind: string; text: string;
   visibility: 'public' | 'sealed' | 'leader'; mentions: unknown[]; createdAt: string; updatedAt: string; seq: number; deleted?: boolean; edited?: boolean;
+}
+export interface FakePicture {
+  id: string; campaignId: string; battleId: string | null; turn: number | null; uploaderId: string; uploader: string; mime: string; bytes: number; width: number; height: number;
+  caption: string; visibility: 'public' | 'leader'; stored: boolean; createdAt: string; updatedAt: string; seq: number; deleted?: boolean; data?: Uint8Array;
 }
 export interface FakeBattle {
   id: string; campaignId: string; round: number; title: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
@@ -92,6 +96,7 @@ export function createFakeSync(opts: {
     campaigns: new Map<string, FakeCampaign>(),
     battles: new Map<string, FakeBattle>(),
     notes: new Map<string, FakeNote>(),
+    pictures: new Map<string, FakePicture>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -214,6 +219,64 @@ export function createFakeSync(opts: {
       cur.deleted = true;
       cur.seq = next();
       return json(200, { removed: true, seq: notesSeq(c.id) });
+    }
+    return json(404, { error: 'not_found' });
+  };
+
+  /* ---- pictures (as server/src/attachments.ts filters them) ---- */
+  const pictureFor = (p: FakePicture, role: FakeRole) => !p.deleted && (p.visibility !== 'leader' || role === 'leader' || p.uploaderId === me.id) && (p.stored || p.uploaderId === me.id);
+  const pictureView = (p: FakePicture) => ({
+    id: p.id, battleId: p.battleId, turn: p.turn, uploaderId: p.uploaderId, uploader: p.uploader, mime: p.mime, bytes: p.bytes, width: p.width, height: p.height,
+    caption: p.caption, visibility: p.visibility, stored: p.stored, createdAt: p.createdAt, updatedAt: p.updatedAt,
+  });
+  const picturesSeq = (cid: string) => Math.max(0, ...[...s.pictures.values()].filter((p) => p.campaignId === cid).map((p) => p.seq));
+  /** Another member sends a picture. */
+  const pictureFrom = (campaignId: string, p: { uploader: string; caption?: string; battleId?: string | null; turn?: number | null; visibility?: FakePicture['visibility'] }) => {
+    const pic: FakePicture = {
+      id: `${String(s.pictures.size + 1).padStart(8, '0')}-1111-4000-8000-000000000000`, campaignId, battleId: p.battleId ?? null, turn: p.turn ?? null, uploaderId: `user-${p.uploader.toLowerCase()}`, uploader: p.uploader,
+      mime: 'image/png', bytes: 3, width: 1, height: 1, caption: p.caption ?? '', visibility: p.visibility ?? 'public', stored: true, createdAt: at(), updatedAt: at(), seq: next(),
+    };
+    s.pictures.set(pic.id, pic);
+    return pic;
+  };
+  const pictureRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
+    if (method === 'GET' && rest === '/attachments') {
+      const seq = picturesSeq(c.id);
+      const since = query.get('since');
+      if (since !== null && Number(since) >= seq) return json(200, { unchanged: true, seq });
+      return json(200, { attachments: [...s.pictures.values()].filter((p) => p.campaignId === c.id && pictureFor(p, role)).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map(pictureView), seq });
+    }
+    const m = rest.match(/^\/attachments\/([^/]+)(\/file)?$/);
+    if (!m) return null;
+    const cur = s.pictures.get(m[1]!);
+    if (method === 'GET' && m[2]) {
+      if (!cur || !pictureFor(cur, role) || !cur.data) return json(404, { error: 'not_found' });
+      return new Response(new Blob([cur.data as BlobPart], { type: cur.mime }), { status: 200, headers: { 'content-type': cur.mime } });
+    }
+    if (role === 'viewer') return json(403, { error: 'forbidden' });
+    if (method === 'PUT' && !m[2]) {
+      if (cur?.deleted) return json(409, { error: 'removed' });
+      if (body.visibility === 'leader' && role !== 'leader') return json(403, { error: 'forbidden' });
+      if (cur && cur.uploaderId !== me.id) return json(403, { error: 'forbidden' });
+      const fields = { battleId: (body.battleId as string | null) ?? null, turn: (body.turn as number | null) ?? null, caption: String(body.caption ?? ''), visibility: (body.visibility as FakePicture['visibility']) ?? 'public' };
+      if (cur) Object.assign(cur, fields, { updatedAt: at(), seq: next() });
+      else s.pictures.set(m[1]!, { id: m[1]!, campaignId: c.id, ...fields, uploaderId: me.id, uploader: me.displayName, mime: String(body.mime), bytes: Number(body.bytes), width: Number(body.width), height: Number(body.height), stored: false, createdAt: at(), updatedAt: at(), seq: next() });
+      return json(200, { attachment: pictureView(s.pictures.get(m[1]!)!), seq: picturesSeq(c.id) });
+    }
+    if (method === 'PUT' && m[2]) {
+      if (!cur || !pictureFor(cur, role)) return json(404, { error: 'not_found' });
+      if (cur.uploaderId !== me.id) return json(403, { error: 'forbidden' });
+      const raw = body.raw as Uint8Array | undefined;
+      if (body.type !== cur.mime || !raw || raw.byteLength !== cur.bytes) return json(400, { error: 'invalid', problem: 'not the picture announced' });
+      Object.assign(cur, { stored: true, data: raw, updatedAt: at(), seq: next() });
+      return json(200, { attachment: pictureView(cur), seq: picturesSeq(c.id) });
+    }
+    if (method === 'DELETE') {
+      if (!cur || !pictureFor(cur, role)) return json(404, { error: 'not_found' });
+      if (cur.uploaderId !== me.id && role !== 'leader') return json(403, { error: 'forbidden' });
+      cur.deleted = true;
+      cur.seq = next();
+      return json(200, { removed: true, seq: picturesSeq(c.id) });
     }
     return json(404, { error: 'not_found' });
   };
@@ -374,6 +437,7 @@ export function createFakeSync(opts: {
     const forbidden = json(403, { error: 'forbidden' });
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
+    if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
     if (method === 'POST' && rest === '/rounds/advance') {
       if (!lead) return forbidden;
@@ -578,5 +642,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, entryElsewhere, noteFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, entryElsewhere, noteFrom, pictureFrom };
 }

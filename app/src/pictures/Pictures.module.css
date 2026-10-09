@@ -1,0 +1,91 @@
+/* Pictures of a campaign (phase 4a3, part 2). */
+.picture {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.picture figure {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.picture figcaption {
+  display: grid;
+  gap: var(--space-1);
+  overflow-wrap: anywhere;
+}
+
+.picture figcaption small {
+  color: var(--text-muted);
+}
+
+/* a leaders' picture looks hidden, like a leaders' note */
+.leader {
+  border-style: dashed;
+  border-color: var(--gold);
+  background: repeating-linear-gradient(135deg, var(--surface) 0 12px, var(--hidden-bg) 12px 14px);
+}
+
+.frame {
+  display: grid;
+  place-items: center;
+  min-height: var(--tap);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.frame img,
+.preview img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.visible,
+.pending {
+  color: var(--gold);
+}
+
+.refused {
+  color: var(--danger);
+}
+
+.preview {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  justify-items: center;
+}
+
+.who {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.choice input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}

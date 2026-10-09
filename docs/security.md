@@ -251,7 +251,18 @@ kommt mit Notizen und Hintergrund dazu.
 - **Uploads:** nur Bilder (PNG, JPEG, WebP), höchstens 5 MB. Der Client
   verkleinert und kodiert neu – dabei fallen EXIF-Daten mit GPS-Koordinaten
   weg. Der Server prüft Dateityp anhand der Bytes und Größe und liefert mit
-  festem `Content-Type` und `nosniff` aus.
+  festem `Content-Type` und `nosniff` aus. Umgesetzt in Phase 4a3, Teil 2
+  (`server/src/attachments.ts`): erst angekündigt (Typ, Größe, wo es hängt,
+  wer es sieht), dann die Bytes roh an eine eigene Route – nur dort gibt es
+  einen Parser für Bilder, mit eigener Grenze von 5 MB; Typ nach den ersten
+  Bytes und wie angekündigt, Größe wie angekündigt, sonst 400. Der Pfad
+  entsteht nur aus Kampagnen- und Bild-ID (beide als UUID geprüft), nie aus
+  einem Dateinamen; geschrieben wird erst neben die Datei und dann
+  umbenannt. Ausgeliefert mit `Content-Security-Policy: default-src 'none';
+  sandbox` und `Cache-Control: private` (die Bytes einer ID ändern sich
+  nie). Ein Leiterbild bekommen Spieler und Zuschauer weder als Zeile noch
+  als Bytes (404). Höchstens 1 GB je Kampagne. Die Uploads gehen nachts mit
+  ins restic-Backup (`ops/lib/roster-backup`).
 - **Ausgabe:** React entschärft Text automatisch; `dangerouslySetInnerHTML`
   ist per Lint-Regel verboten. Markdown in Notizen wird nicht als HTML
   gerendert.
