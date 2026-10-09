@@ -20,6 +20,7 @@ import {
 } from './api.ts';
 import styles from './Campaign.module.css';
 import { NewBattleSheet } from './NewBattle.tsx';
+import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
 import { TimelineTab } from '../timeline/Timeline.tsx';
 import { battleTitle } from '../battle/api.ts';
@@ -47,7 +48,8 @@ const stateWord = (e: Enrolment) => {
   if (e.status === 'pending') return { word: 'Waiting for a leader', cls: styles.waiting };
   if (!e.tag) return { word: 'Entered', cls: styles.ok };
   if (e.tag.kind === 'sat_out') return { word: `Sat out battle ${e.tag.round}`, cls: '' };
-  return { word: e.tag.kind === 'start' ? '✓ Start' : `✓ After battle ${e.tag.round}`, cls: styles.ok };
+  if (e.tag.kind === 'start') return { word: e.tag.round > 0 ? `✓ Entered after battle ${e.tag.round}` : '✓ Start', cls: styles.ok };
+  return { word: `✓ After battle ${e.tag.round}`, cls: styles.ok };
 };
 
 function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: string }) {
@@ -127,10 +129,10 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
   );
 }
 
-/** The closed battles one of the user's warbands fought and has not marked yet. */
+/** The closed battles one of the user's warbands fought and has not marked yet – not those of the history, played before the app (4a5). */
 export function openAftermaths(view: CampaignView, me: string): { battleId: string; warbandId: string; label: string }[] {
   const mine = view.enrolments.filter((e) => e.playerId === me && e.status === 'active');
-  return (view.battles ?? []).filter((b) => b.status === 'closed').flatMap((b) => mine
+  return (view.battles ?? []).filter((b) => b.status === 'closed' && !b.takenOver).flatMap((b) => mine
     .filter((e) => (b.warbandIds ?? []).includes(e.warbandId) && !(b.marked ?? []).includes(e.warbandId))
     .map((e) => ({ battleId: b.id, warbandId: e.warbandId, label: `${battleTitle(b)} · ${e.name || e.wbName}` })));
 }
@@ -196,7 +198,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
                   <Link to={`/campaign/${id}/battles/${b.id}`} className={styles.entry}>
                     <span>{battleTitle(b)}<small>{b.warbands.join(' · ')}</small></span>
                     <span className={`${styles.chip} ${b.status === 'open' ? styles.ok : ''}`}>
-                      {b.status === 'open' ? 'live' : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
+                      {b.takenOver ? 'before the app' : b.status === 'open' ? 'live' : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
                     </span>
                   </Link>
                 </li>
@@ -271,6 +273,7 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
             ))}
           </ul>
         </section>
+        <HistorySection id={id} view={view} onView={onView} onNotice={onNotice} />
         <section className={styles.section} aria-labelledby="m-rules">
           <h2 id="m-rules">House rules</h2>
           <p className={ui.muted}>

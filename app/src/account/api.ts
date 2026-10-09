@@ -105,6 +105,8 @@ export function errorText(e: unknown): string {
     case 'totp_unavailable': return 'The server cannot set up authenticators yet (TOTP_KEY is missing).';
     case 'invalid': return e.problem ? sentence(e.problem) : 'That was not accepted.';
     case 'quota': return 'The campaign has no room for more pictures.';
+    case 'history_closed': return 'The campaign has played a battle in the app: its history is closed.';
+    case 'in_use': return 'Notes or pictures belong to this battle: it stays.';
     default: return 'Something went wrong.';
   }
 }

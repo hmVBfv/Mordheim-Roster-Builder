@@ -21,6 +21,7 @@ import { useSession } from '../account/session.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import { battleTitle, cachedBattle, casualtyText, getBattle, markBattle, OUTCOME_NAMES, type BattleView, type CasualtyPayload } from '../battle/api.ts';
 import { readWarband } from '../campaign/api.ts';
+import { useCampaignRules } from '../campaign/rules.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { injuryEnv } from '../roster/injury.ts';
@@ -351,6 +352,9 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
 
   // the injury sheet is there from the first render on (useSheet), whatever is shown around it
   const view = cid && signedIn ? b.view : null;
+  // where the campaign's history ends, if this warband fought in it (4a5)
+  const camp = useCampaignRules(cid);
+  const historyRound = camp?.history.warbandIds.includes(rec.id) ? camp.history.round : 0;
   const fought = view?.participants.some((p) => p.warbandId === rec.id);
   const roll = (c: CasualtyView) => {
     const m = ctx.s.models.find((x) => x.uid === c.uid);
@@ -375,10 +379,11 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
       {cid && signedIn && !view && (b.error ? <p className={ui.message} role="alert">{b.error}</p> : <p className={ui.muted}>Loading the battle…</p>)}
       {view && !fought && <p className={ui.message}>{rec.name} did not fight this battle.</p>}
       {view && fought && view.battle.status === 'open' && <p className={ui.message}>The battle is still being fought. Once a leader closes it, its aftermath begins here.</p>}
-      {view && fought && view.battle.status === 'closed' && !a && (
-        <TakeOver view={view} wid={rec.id} onTake={() => ed.edit((c) => takeOverBattle(data, c.s, view, rec.id, today()), `${battleTitle(view.battle)} taken over.`, { gold: 'keep' })} />
+      {view && fought && view.battle.takenOver && <p className={ui.message}>Played before the app: this battle has no aftermath here.</p>}
+      {view && fought && view.battle.status === 'closed' && !view.battle.takenOver && !a && (
+        <TakeOver view={view} wid={rec.id} onTake={() => ed.edit((c) => takeOverBattle(data, c.s, view, rec.id, today(), historyRound), `${battleTitle(view.battle)} taken over.`, { gold: 'keep' })} />
       )}
-      {view && fought && view.battle.status === 'closed' && a && (
+      {view && fought && view.battle.status === 'closed' && !view.battle.takenOver && a && (
         <div className={styles.columns}>
           <Steps a={a} data={data} wid={rec.id} acts={{ edit: ed.edit, roll }} />
           <MarkSection data={data} rec={rec} state={ed.state} view={view} cid={cid!} round={a.round} toRoll={a.toRoll} onMarked={b.reload} notify={notify} />

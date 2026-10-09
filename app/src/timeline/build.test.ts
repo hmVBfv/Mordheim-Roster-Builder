@@ -24,6 +24,24 @@ describe('the timeline', () => {
     ]);
   });
 
+  it('a battle of the history (4a5) is one segment; a warband entered after it starts in the interlude', () => {
+    const P1 = '33333333-3333-4333-8333-333333333333';
+    const past = { ...battle(P1, 1, '2026-10-09T10:00:00Z', '2026-10-09T10:00:00Z'), title: 'Das Urteil im Nebel', takenOver: true, playedAt: '2026-06-12' };
+    const own = battle(B2, 2, '2026-10-12T19:00:00Z', null);
+    const data: TimelineData = {
+      ...EMPTY,
+      marks: [{ id: 't0', warbandId: 'w1', warband: 'Die Silberne Karavane', kind: 'start', round: 1, battleId: null, rev: 1, changes: 0, unexplained: 0, createdAt: '2026-10-09T10:00:00Z' }],
+      positions: [{ itemType: 'note', itemId: 'moved', segment: `b${P1}:before`, pos: '5', movedBy: 'u1', movedAt: '2026-10-10T10:00:00Z' }],
+    };
+    const segs = buildTimeline([own, past], [note('fog', '2026-10-10T12:00:00Z', { battleId: P1 }), note('moved', '2026-10-10T13:00:00Z')], [], data);
+    expect(segs.map((x) => x.title)).toEqual(['Before the campaign', 'Battle 1 · Das Urteil im Nebel · before the app', 'Interlude 1', 'Battle 2 · before', 'Battle 2 · course', 'Battle 2 · aftermath', 'Interlude 2']);
+    expect(segs[1]!.report).toMatchObject({ battle: { id: P1 } });
+    // a note about it, and one moved to its "before", stand in its one segment
+    expect(segs[1]!.blocks.map((b) => b.id).sort()).toEqual(['fog', 'moved']);
+    expect(segs[2]!.marks.map((m) => m.id)).toEqual(['t0']);
+    expect(segs[0]!.marks).toEqual([]);
+  });
+
   it('blocks never moved stand where their battle and time put them, by turn in the course', () => {
     const data: TimelineData = {
       ...EMPTY,
