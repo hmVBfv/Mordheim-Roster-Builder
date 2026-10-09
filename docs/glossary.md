@@ -47,6 +47,10 @@ Begriff einführt, trägt ihn hier ein.
 | Ergebnis | Outcome: Victory, Defeat, Draw, Routed | `battle_participants.outcome` |
 | Korrekturvorschlag | Suggest a correction; Take over / Reject | `proposals` |
 | Postausgang (auf dem Gerät) | “on this phone”, “N waiting” | `db.outbox`, `flushOutbox` |
+| Notiz; Arten: Notiz, Szene, Zitat, Würfelmoment, offener Faden | Note; Note, Scene, Quote, Dice moment, Open thread | `notes.kind`: `general`, `scene`, `quote`, `dice`, `hook` |
+| Wer darf es lesen: alle · versiegelt · nur Leiter | Who can read this? Everyone · Sealed until battle N is closed · Leaders only | `notes.visibility`: `public`, `sealed`, `leader` |
+| Sprecher (eines Zitats) | Who says it? | erste Erwähnung (`mentions[0]`) |
+| Krieger nennen | Who is in it? / Name a warrior… | `notes.mentions` |
 | Teilen (eine Kopie an andere) | Share… | `ShareSheet`, `warband_shares`, `POST /shares` |
 | Kopie schicken | Send a copy | `sendCopy`, `to_user` |
 | Teilen-Code | Share code | `makeCode`, `code_hash`, `POST /shares/peek`, `POST /shares/redeem` |

@@ -60,6 +60,8 @@ export interface ProbeContext {
   ledProposalIds: [string, string];
   /** The user role's warband confirmed in the admin's campaign. */
   ledWarbandId: string;
+  /** A note of the user role's in the victim's campaign. */
+  ownNoteId: string;
 }
 
 export interface Probe {
@@ -269,8 +271,9 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}` }),
       'GET /api/v1/campaigns/:id/battles': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/battles` }),
       'GET /api/v1/campaigns/:id/battles/:bid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/battles/${c.battleId}` }),
+      'GET /api/v1/campaigns/:id/notes': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/notes` }),
     },
-    fields: { user: [...VIEW, ...BATTLE] },
+    fields: { user: [...VIEW, ...BATTLE, 'notes'] },
   },
   'campaign.warband.read': {
     allowed: ['user'],
@@ -310,6 +313,14 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { admin: [...BATTLE, 'entry', 'removed'] },
   },
+  'notes.write': {
+    allowed: ['user'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/notes/:nid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/notes/${randomUUID()}`, body: { battleId: c.battleId, turn: 2, kind: 'quote', text: 'Bolt the doors.' } }),
+      'DELETE /api/v1/campaigns/:id/notes/:nid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/notes/${c.ownNoteId}` }),
+    },
+    fields: { user: ['note', 'seq', 'removed'] },
+  },
   'battle.propose': {
     allowed: ['user'],
     routes: {
@@ -322,4 +333,6 @@ export const MATRIX: Record<Action, MatrixRow> = {
 /** Keys no answer may carry, at any depth. */
 export const SECRET_KEYS = ['pw_hash', 'pwHash', 'token_hash', 'tokenHash', 'totp_secret_enc', 'totp_pending_enc', 'totp_recovery', 'password'];
 /** Values no answer may carry: a password hash, an encrypted secret. */
-export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/];
+export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
+  // a sealed note before its battle is closed, and a leaders' note: no role of the matrix may ever read them (ADR 0011)
+  /SEALED-SECRET/, /LEADER-SECRET/];
