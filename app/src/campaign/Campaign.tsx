@@ -59,7 +59,11 @@ function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: str
         return (
           <li key={e.id}>
             <Link to={e.playerId === me ? `/warbands/${e.warbandId}` : `/campaign/${id}/warbands/${e.warbandId}`} className={styles.entry}>
-              <span>{e.name || e.wbName}<small>{e.player} · {e.wbName}{t ? ` · Rating ${t.rating}` : ''}</small></span>
+              <span>
+                {e.name || e.wbName}
+                <small>{e.player} · {e.wbName}{t ? ` · Rating ${t.rating}` : ''}{(e.districts ?? []).length ? ` · holds ${(e.districts ?? []).map((d) => `${d.name}${d.hold === 'control' ? ' (control)' : ''}`).join(', ')}` : ''}</small>
+                {(e.houseDiffers ?? []).length > 0 && <small className={styles.differs}>⚠ its own house rules differ</small>}
+              </span>
               <span className={`${styles.chip} ${st.cls}`}>{st.word}</span>
             </Link>
           </li>
@@ -97,7 +101,7 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
       <dialog ref={ref} className={ui.sheet} aria-labelledby="enter-title">
         <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void submit(); }}>
           <h2 id="enter-title">Enter a warband</h2>
-          <p className={ui.muted}>A copy goes into the campaign; the warband you pick stays as it is, for other games. A leader confirms the copy, and its start is marked.</p>
+          <p className={ui.muted}>A copy goes into the campaign, under the campaign’s house rules; the warband you pick stays as it is, for other games. A leader confirms the copy, and its start is marked.</p>
           {free.length === 0 && <p className={ui.muted}>None of your warbands is free yet: make a new one for the campaign.</p>}
           {free.length > 0 && (
             <fieldset className={styles.people}>
@@ -130,6 +134,19 @@ export function openAftermaths(view: CampaignView, me: string): { battleId: stri
     .map((e) => ({ battleId: b.id, warbandId: e.warbandId, label: `${battleTitle(b)} · ${e.name || e.wbName}` })));
 }
 
+/** Who holds which district (phase 4a4): a sole foothold is control, as the Roster Builder's campaign file worked it out. */
+export function campaignMap(view: CampaignView): { id: string; name: string; holders: string[] }[] {
+  const by = new Map<string, { id: string; name: string; holders: string[] }>();
+  for (const e of view.enrolments.filter((x) => x.status === 'active')) {
+    for (const d of e.districts ?? []) {
+      const cur = by.get(d.id) ?? { id: d.id, name: d.name, holders: [] };
+      cur.holders.push(e.name || e.wbName);
+      by.set(d.id, cur);
+    }
+  }
+  return [...by.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
 function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignView; me: string; lead: boolean; onView: (v: CampaignView) => void }) {
   const open = openAftermaths(view, me);
   return (
@@ -152,7 +169,10 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
       <section className={styles.section} aria-labelledby="c-warbands">
         <h2 id="c-warbands">Warbands</h2>
         <WarbandRows id={id} view={view} me={me} />
-        {view.role !== 'viewer' && <div className={ui.row}><EnterSheet id={id} onDone={onView} /></div>}
+        <div className={ui.row}>
+          {view.role !== 'viewer' && <EnterSheet id={id} onDone={onView} />}
+          <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
+        </div>
       </section>
       <div className={ui.page}>
         <section className={styles.section} aria-labelledby="c-members">
@@ -183,6 +203,20 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
             </ul>
           )}
           {lead && <div className={ui.row}><NewBattleSheet id={id} view={view} /></div>}
+        </section>
+        <section className={styles.section} aria-labelledby="c-map">
+          <h2 id="c-map">The map</h2>
+          {campaignMap(view).length === 0 && <p className={ui.muted}>No warband holds a district yet.</p>}
+          {campaignMap(view).length > 0 && (
+            <ul className={styles.list} aria-label="Districts held">
+              {campaignMap(view).map((d) => (
+                <li key={d.id} className={styles.member}>
+                  <span>{d.name}<small>{d.holders.join(', ')}</small></span>
+                  <span className={`${styles.chip} ${d.holders.length === 1 ? styles.ok : ''}`}>{d.holders.length === 1 ? 'control' : `${d.holders.length} footholds`}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </div>
@@ -235,6 +269,14 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
               </li>
             ))}
           </ul>
+        </section>
+        <section className={styles.section} aria-labelledby="m-rules">
+          <h2 id="m-rules">House rules</h2>
+          <p className={ui.muted}>
+            The same for every warband of the campaign; each player takes a change over into the warband’s file.
+            {view.enrolments.some((e) => (e.houseDiffers ?? []).length) ? ` ${view.enrolments.filter((e) => (e.houseDiffers ?? []).length).map((e) => e.name || e.wbName).join(', ')}: own rules differ.` : ''}
+          </p>
+          <div className={ui.row}><Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>Set the house rules</Link></div>
         </section>
         <section className={styles.section} aria-labelledby="m-round">
           <h2 id="m-round">The next round</h2>

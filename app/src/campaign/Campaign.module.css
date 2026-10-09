@@ -146,3 +146,8 @@
 .wide {
   grid-column: 1 / -1;
 }
+
+/* a warband whose own house rules differ from the campaign's (phase 4a4) */
+.entry small.differs {
+  color: var(--gold);
+}

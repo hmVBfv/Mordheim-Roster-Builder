@@ -118,7 +118,7 @@ export function NewWarband() {
       <h1>New warband</h1>
       {campaignId && (
         <p className={`${ui.card} ${ui.muted}`}>
-          For {campaign ?? 'the campaign'}: the warband is yours under Warbands, free for other games; a copy of it is entered in the campaign at once, and that copy opens.
+          For {campaign ?? 'the campaign'}: the warband is yours under Warbands, free for other games; a copy of it is entered in the campaign at once, under its house rules, and that copy opens.
         </p>
       )}
       <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}>

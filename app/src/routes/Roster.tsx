@@ -283,6 +283,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
         <Link to={`/warbands/${rec.id}/hire`} className={ui.buttonQuiet}>Hire…</Link>
         <Link to={`/warbands/${rec.id}/house`} className={ui.buttonQuiet}>House rules</Link>
+        {(ctx.s.campaign?.on || rec.campaignId) && <Link to={`/warbands/${rec.id}/districts`} className={ui.buttonQuiet}>Districts</Link>}
         <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
         <Link to={`/warbands/${rec.id}/export`} className={ui.buttonQuiet}>Export…</Link>

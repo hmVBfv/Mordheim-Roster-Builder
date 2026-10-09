@@ -7,8 +7,8 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
-  campaignById, campaignView, confirmEnrolment, createCampaign, endEnrolment, enrol, enrolmentById, listCampaigns, openEnrolment,
-  removeMember, renameCampaign, roleIn, ROLES, setMember, tagsOf, type CampaignRole, type CampaignRow,
+  campaignById, campaignView, confirmEnrolment, createCampaign, endEnrolment, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
+  removeMember, renameCampaign, roleIn, ROLES, setHouseRules, setMember, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
@@ -64,6 +64,19 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     const name = trimmed((req.body as { name: string }).name);
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
     if (name !== t.c.name) renameCampaign(db(), t.c, name, req.actor!.id, now());
+    return view(t.c, t.role);
+  });
+
+  /** The campaign's house rules (a leader): for every warband in it; a warband whose own differ is marked for everyone. */
+  app.put('/api/v1/campaigns/:id/house-rules', { config: { action: 'campaign.manage' }, schema: body({ rules: { type: 'object' } }, ['rules']) }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    const parsed = HouseRulesBody.safeParse((req.body as { rules: unknown }).rules);
+    if (!parsed.success) {
+      const first = parsed.error.issues.slice(0, 2).map((i) => `${i.path.join('.') || '(top)'}: ${i.message}`).join('; ');
+      return reply.code(400).send({ error: 'invalid', problem: `not house rules (${first})` });
+    }
+    setHouseRules(db(), t.c, parsed.data, req.actor!.id, now());
     return view(t.c, t.role);
   });
 
