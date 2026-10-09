@@ -5,7 +5,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { declaration, houseView, setBodyOnly, setGrade, setRule, stepRule } from './house.ts';
+import { adoptHouse, campaignHouseState, declaration, differingRules, houseView, setBodyOnly, setGrade, setRule, stepRule } from './house.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
 const rule = (s: WarbandState, key: string) => houseView(data, s).groups.flatMap((g) => g.rules).find((r) => r.key === key)!;
@@ -82,5 +82,30 @@ describe('house rules', () => {
     expect(declaration(ctx(s))).toBe('House rules: All daggers free: on');
     s = setRule(ctx(s), 'freeDagger', false);
     expect(houseView(data, s).count).toBe(0);
+  });
+});
+
+describe('a campaign’s house rules (phase 4a4)', () => {
+  const CAMPAIGN = { freeDagger: true, priceArmour: 80, armourBodyOnly: true, hsGrades: { '2a': false }, rangedCapOn: true, rangedCap: 40, notes: 'Daggers are on the house.' };
+
+  it('shown for every warband: as written is each warband’s own; the display setting is the player’s', () => {
+    const v = houseView(data, campaignHouseState(data, CAMPAIGN), { campaign: true });
+    expect(v.count).toBe(4);
+    const rules = v.groups.flatMap((g) => g.rules);
+    expect(rules.find((r) => r.key === 'startGold')!.std).toBe('each warband’s own');
+    expect(rules.some((r) => r.key === 'showRarity')).toBe(false);
+  });
+
+  it('a warband names where its own rules differ, and takes the campaign’s over with core’s own switches', () => {
+    let s: WarbandState = core.newWarband(data, 'merc');
+    s = setRule(ctx(s), 'priceAll', true);
+    s = core.setHouseBool(ctx(s), 'showRarity', true);
+    expect(differingRules(CAMPAIGN, s.house)).toEqual(['All equipment', 'Armour', 'Armour: body armour only', 'All daggers free', 'Limit models with ranged weapons', 'Hired Sword grades played']);
+    s = adoptHouse(ctx(s), CAMPAIGN);
+    expect(differingRules(CAMPAIGN, s.house)).toEqual([]);
+    expect(core.houseRules(s)).toMatchObject({ priceAll: 100, priceArmour: 80, armourBodyOnly: true, freeDagger: true, rangedCapOn: true, rangedCap: 40, notes: 'Daggers are on the house.', showRarity: true });
+    expect(core.houseRules(s).hsGrades).toMatchObject({ '1a': true, '2a': false });
+    // nothing to take over: the same warband
+    expect(adoptHouse(ctx(s), CAMPAIGN)).toBe(s);
   });
 });

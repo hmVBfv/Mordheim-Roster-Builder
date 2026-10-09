@@ -17,6 +17,9 @@ export interface Member { userId: string; displayName: string; username: string;
 export interface Enrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
   createdAt: string; confirmedAt: string | null; name: string; wbType: string; wbName: string; headRev: number; updatedAt: string; tag: Tag | null;
+  /** Phase 4a4, from its newest version: the house rules (keys) in which it differs from the campaign's, the districts it holds. */
+  houseDiffers?: string[];
+  districts?: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
   campaign: { id: string; name: string; round: number; houseRules: unknown; createdAt: string; updatedAt: string };
@@ -69,6 +72,8 @@ export const removeMember = (id: string, userId: string) => api<CampaignView | {
 export const confirmEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}/confirm`, { body: {} }).then(keep);
 export const declineEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}/decline`, { body: {} }).then(keep);
 export const withdrawEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}`, { method: 'DELETE' }).then(keep);
+/** The campaign's house rules (a leader): for every warband in it. */
+export const setHouseRules = (id: string, rules: Record<string, unknown>) => api<CampaignView>(`/campaigns/${id}/house-rules`, { method: 'PUT', body: { rules } }).then(keep);
 /** Moves the campaign on (a leader), once the battles of the next round are closed; who fought none sat it out. */
 export const advanceRound = (id: string) => api<CampaignView>(`/campaigns/${id}/rounds/advance`, { body: {} }).then(keep);
 export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/campaigns/${id}/warbands/${wid}`);

@@ -2319,3 +2319,30 @@ move on to. Every disabled button in the app now looks it.
 
 Rob, looking ahead: after the campaign setup, the whole interface gets an
 overhaul, the desktop workspace part of it.
+
+## October 9, 2026 (cont.) — one set of rules for the campaign
+
+House rules were a warband's own until now. In a campaign they belong to
+the campaign: its leaders switch them, for every warband at once, on the
+same screen a warband uses for its own. The question was what "the
+campaign's rules count" should mean for a warband whose file says
+otherwise. Working the roster out with rules the save does not carry would
+have meant swapping them in everywhere the app computes – and the server,
+which freezes totals from the save, would have counted differently. So a
+warband takes the campaign's rules into its file, with one tap and Undo;
+until it does, everyone in the campaign sees that its own differ. The
+server reads that – and the districts each warband holds – straight from
+the newest version with `json_extract`, without loading the whole save. A
+copy entered in a campaign plays by its rules from the start.
+
+The districts came along: the Roster Builder's campaign panel, every
+district of Mordheim by area with what a foothold or control there gives,
+set by hand where a battle did not already move the map. In a campaign the
+other warbands' footholds stand beside each district, and the overview
+draws the map – a sole foothold is control, as the old campaign file
+worked it out.
+
+Rob, for phase 4c: whoever reports a bug will mostly write "does not
+work". So the report carries its context on its own – the screen and tab,
+the last steps, the settings, the house rules – and shows it before it is
+sent.

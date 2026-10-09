@@ -376,7 +376,7 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
       {view && !fought && <p className={ui.message}>{rec.name} did not fight this battle.</p>}
       {view && fought && view.battle.status === 'open' && <p className={ui.message}>The battle is still being fought. Once a leader closes it, its aftermath begins here.</p>}
       {view && fought && view.battle.status === 'closed' && !a && (
-        <TakeOver view={view} wid={rec.id} onTake={() => ed.edit((c) => takeOverBattle(data, c.s, view, rec.id, today()), `${battleTitle(view.battle)} taken over.`)} />
+        <TakeOver view={view} wid={rec.id} onTake={() => ed.edit((c) => takeOverBattle(data, c.s, view, rec.id, today()), `${battleTitle(view.battle)} taken over.`, { gold: 'keep' })} />
       )}
       {view && fought && view.battle.status === 'closed' && a && (
         <div className={styles.columns}>

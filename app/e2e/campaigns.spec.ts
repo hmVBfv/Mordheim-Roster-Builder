@@ -399,3 +399,51 @@ test('the campaign after the battle: open for each player, and a leader moves it
   await page.getByRole('link', { name: 'Overview' }).click();
   await expect(page.getByRole('list', { name: 'Warbands' })).toContainText('Sat out battle 1');
 });
+
+/* The campaign's house rules and the districts (phase 4a4, part 2). */
+async function enteredCampaign(page: Parameters<typeof playServer>[0], o: { totp?: boolean } = {}) {
+  const srv = await playServer(page, true, o);
+  const skrittle = { ...SAVE, name: 'Clan Skrittle', campaign: { ...(SAVE.campaign as object), districts: { artisanquarter: 'foothold', richquarter: 'foothold' } } };
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: o.totp ? 'leader' : 'player', others: [{ ...others[0]!, role: 'leader', data: { ...SAVE, name: 'The Grey Penitents', house: { priceArmour: 80 } } }, { player: 'Ben', data: skrittle }] });
+  const mine = crypto.randomUUID();
+  srv.handle('POST', `/campaigns/${c.id}/enrolments`, new URLSearchParams(), { warbandId: mine, data: { ...SAVE, name: 'The Silver Caravan' } });
+  return { srv, c, mine };
+}
+
+test('the campaign’s house rules: a leader sets them; a warband whose file differs takes them over', async ({ page }) => {
+  const { c, mine } = await enteredCampaign(page, { totp: true });
+  await page.goto(`campaign/${c.id}/manage`);
+  await page.getByRole('link', { name: 'Set the house rules' }).click();
+  await page.getByRole('checkbox', { name: 'All daggers free' }).check();
+  await expect(page.getByRole('list', { name: 'Warbands that differ' })).toContainText('The Silver Caravan (Kai): All daggers free');
+  await expect.poll(() => c.houseRules?.freeDagger).toBe(true);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-house-rules');
+
+  await page.goto(`warbands/${mine}`);
+  await page.getByRole('link', { name: '⚠ House rules differ from the campaign’s' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'own file differs' })).toContainText('All daggers free');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'warband-house-in-campaign');
+  await page.getByRole('button', { name: 'Take The Hel Fenn Campaign’s rules' }).click();
+  await expect(page.getByText(/own file differs/)).toBeHidden();
+});
+
+test('the districts: set by hand beside the others’ footholds; the campaign’s map', async ({ page }) => {
+  await useTheme(page, 'parchment');
+  const { c, mine } = await enteredCampaign(page);
+  await page.goto(`campaign/${c.id}`);
+  await expect(page.getByRole('list', { name: 'Districts held' })).toContainText('Artisan QuarterClan Skrittlecontrol');
+  await shot(page, 'parchment-campaign-map');
+  await page.goto(`warbands/${mine}`);
+  await page.getByRole('link', { name: 'Districts' }).click();
+  const artisan = page.getByRole('group', { name: 'Artisan Quarter' });
+  await artisan.getByRole('button', { name: 'Foothold' }).click();
+  await expect(artisan.getByRole('button', { name: 'Foothold' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('Also a foothold here: Clan Skrittle').first()).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'parchment-warband-districts');
+});
