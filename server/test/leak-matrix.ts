@@ -298,6 +298,7 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'POST /api/v1/campaigns/:id/enrolments/:eid/confirm': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[0]}/confirm`, body: {} }),
       'POST /api/v1/campaigns/:id/enrolments/:eid/decline': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[1]}/decline`, body: {} }),
       'POST /api/v1/campaigns/:id/rounds/advance': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/rounds/advance`, body: {} }),
+      'PUT /api/v1/campaigns/:id/house-rules': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/house-rules`, body: { rules: { freeDagger: true } } }),
     },
     fields: { admin: [...VIEW, 'left'] },
   },
