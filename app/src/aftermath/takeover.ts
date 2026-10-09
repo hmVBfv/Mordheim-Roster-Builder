@@ -3,7 +3,9 @@
    Roster Builder's mechanics, 1:1. Once per battle (the battle in the save
    carries the server's id):
    - the campaign layer on, and the stage moved on to the battle's round
-     (each stage closed with its snapshot, as "Next stage" did);
+     (each stage closed with its snapshot, as "Next stage" did) – from the
+     end of the campaign's history, for a warband that fought in it (4a5:
+     those stages were played before the app);
    - the battle recorded through the Roster Builder's battle form (core
      saveBattleDraft): every side with its outcome, the casualties this
      warband was part of – as victim or as attacker – and the map following
@@ -13,6 +15,7 @@ import * as core from '@mordheim/core';
 import type { BattleDraft, DraftCasualty, GameData, WarbandState } from '@mordheim/core';
 import { OUTCOME_NAMES, type BattleView, type CasualtyPayload, type Side } from '../battle/api.ts';
 import { keyOf } from '../battle/sides.ts';
+import { takeStage } from '../campaign/stage.ts';
 
 export interface LocalBattle { id: number; round: number; serverId: string; xpAwarded?: boolean }
 
@@ -54,12 +57,14 @@ export function draftOf(data: GameData, s: WarbandState, view: BattleView, warba
   return { round: view.battle.round, district: view.battle.district, notes: view.battle.title, sides, cas };
 }
 
-/** The save with the battle taken over (the same save when it is there already). */
-export function takeOverBattle(data: GameData, s0: WarbandState, view: BattleView, warbandId: string, today: string): WarbandState {
+/** The save with the battle taken over (the same save when it is there already). `history`: the round the campaign's history ends with,
+    if this warband fought in it (4a5) – a save still before it takes that stage first, without closing the stages on the way. */
+export function takeOverBattle(data: GameData, s0: WarbandState, view: BattleView, warbandId: string, today: string, history = 0): WarbandState {
   if (localBattle(s0, view.battle.id)) return s0;
   const ctx = (s: WarbandState) => core.ctxOf(data, s);
   let s = s0;
   if (!s.campaign?.on) s = core.setCampaignOn(ctx(s), true);
+  if (history < view.battle.round && (Number(s.campaign?.round) || 0) < history) s = takeStage(ctx(s), history);
   while ((Number(s.campaign?.round) || 0) < view.battle.round) s = core.advanceRound(ctx(s), today);
   s = core.saveBattleDraft(ctx(s), null, draftOf(data, s, view, warbandId)).s;
   const local = (s.campaign?.battles ?? []).at(-1) as { id: number };

@@ -531,3 +531,52 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await shot(page, `${theme}-timeline`);
   });
 }
+
+/* Taking over a running campaign (phase 4a5): its battles before the app. */
+test('the history: a leader records a battle before the app; the warband that fought it takes the campaign’s stage', async ({ page }) => {
+  const { c, mine } = await enteredCampaign(page, { totp: true });
+  await page.goto(`campaign/${c.id}/manage`);
+  await page.getByRole('button', { name: '+ A battle before the app' }).click();
+  const sheet = page.getByRole('dialog', { name: 'New battle before the app' });
+  await sheet.getByLabel('Title (optional)').fill('Das Urteil im Nebel');
+  await sheet.getByRole('combobox', { name: 'District' }).selectOption('quayside');
+  await sheet.getByLabel('Played on (optional)').fill('2026-06-12');
+  await sheet.getByRole('combobox', { name: /The Silver Caravan/ }).selectOption('routed');
+  await sheet.getByRole('combobox', { name: /Clan Skrittle/ }).selectOption('victory');
+  await sheet.getByRole('combobox', { name: /The Grey Penitents/ }).selectOption('-');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-history-new');
+  await sheet.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByText('Battle 1 · Das Urteil im Nebel is in the history.')).toBeVisible();
+  await expect(page.getByText(/After battle 1 · you are leader/)).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Battles before the app' })).toContainText('12 June 2026 · Clan Skrittle · The Silver Caravan');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-history');
+
+  await page.goto(`campaign/${c.id}`);
+  await expect(page.getByRole('list', { name: 'Battles' }).getByRole('link')).toContainText('before the app');
+  await expect(page.getByRole('heading', { name: 'Open for you' })).toHaveCount(0);
+  await page.getByRole('list', { name: 'Battles' }).getByRole('link').click();
+  await expect(page.getByText('Played before the app, on 12 June 2026', { exact: false })).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'battle-before-the-app');
+
+  await page.goto(`warbands/${mine}`);
+  const flag = page.getByRole('status').filter({ hasText: 'fought before the app' });
+  await expect(flag).toContainText('its own stage is Setup');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'warband-campaign-stage');
+  await flag.getByRole('button', { name: 'Take the campaign’s stage' }).click();
+  await expect(page.getByText('Stage: After battle 1, as the campaign.')).toBeVisible();
+  await expect(page.getByText(/· After battle 1/).first()).toBeVisible();
+
+  await page.goto(`campaign/${c.id}/timeline`);
+  const past = page.getByRole('listitem', { name: 'Battle 1 · Das Urteil im Nebel · before the app' });
+  await expect(past).toContainText('Clan Skrittle: Victory');
+  await expect(page.getByRole('listitem', { name: 'Interlude 1' })).toContainText('Entered after battle 1 · The Silver Caravan');
+  await noSideScroll(page);
+  await shot(page, 'timeline-history');
+});

@@ -13,7 +13,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import type { CampaignView } from './api.ts';
 import styles from './Campaign.module.css';
 
-function Districts({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function Districts({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const data = useGameData();
   return (
     <select className={ui.select} value={value} onChange={(e) => onChange(e.target.value)}>

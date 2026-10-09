@@ -4,8 +4,9 @@
    after each round – and in it every block the user may see: notes,
    pictures, the protocol. A block stands where it was moved to; one never
    moved stands where its battle and time put it, ordered by turn and by
-   when it was recorded. Battle reports and marks are fixed. Kept apart
-   from React so it can be tested. */
+   when it was recorded. Battle reports and marks are fixed. A battle of
+   the campaign's history, played before the app (4a5), is a single
+   segment. Kept apart from React so it can be tested. */
 import type { BattleSummary } from '../battle/api.ts';
 import { isSealed, type Note } from '../notes/api.ts';
 import type { ShownPicture } from '../pictures/api.ts';
@@ -45,19 +46,29 @@ function defaultSegment(battles: BattleSummary[], battleId: string | null, at: s
 export function buildTimeline(battles: BattleSummary[], notes: (Note & { pending?: boolean })[], pictures: ShownPicture[], data: TimelineData): Segment[] {
   const list = ordered(battles);
   const segs: Segment[] = [{ key: 'pre', title: 'Before the campaign', report: null, marks: [], blocks: [] }];
+  // a battle of the history (4a5), played before the app, is one segment: its before and aftermath are that too
+  const alias = new Map<string, string>();
   list.forEach((b, i) => {
     const name = `Battle ${b.round}${b.title ? ` · ${b.title}` : ''}`;
-    segs.push(
-      { key: `b${b.id}:before`, title: `${name} · before`, report: null, marks: [], blocks: [] },
-      { key: `b${b.id}:battle`, title: `${name} · course`, report: { battle: b, outcomes: data.outcomes.filter((o) => o.battleId === b.id) }, marks: [], blocks: [] },
-      { key: `b${b.id}:after`, title: `${name} · aftermath`, report: null, marks: [], blocks: [] },
-    );
+    const report = { battle: b, outcomes: data.outcomes.filter((o) => o.battleId === b.id) };
+    if (b.takenOver) {
+      segs.push({ key: `b${b.id}:battle`, title: `${name} · before the app`, report, marks: [], blocks: [] });
+      alias.set(`b${b.id}:before`, `b${b.id}:battle`).set(`b${b.id}:after`, `b${b.id}:battle`);
+    } else {
+      segs.push(
+        { key: `b${b.id}:before`, title: `${name} · before`, report: null, marks: [], blocks: [] },
+        { key: `b${b.id}:battle`, title: `${name} · course`, report, marks: [], blocks: [] },
+        { key: `b${b.id}:after`, title: `${name} · aftermath`, report: null, marks: [], blocks: [] },
+      );
+    }
     // the interlude after the round's last battle
     if (list[i + 1]?.round !== b.round) segs.push({ key: `i${b.round}`, title: `Interlude ${b.round}`, report: null, marks: [], blocks: [] });
   });
   const by = new Map(segs.map((s) => [s.key, s]));
+  for (const [from, to] of alias) by.set(from, by.get(to)!);
   for (const m of data.marks) {
-    const seg = m.kind === 'start' ? 'pre' : m.kind === 'after_battle' && m.battleId ? `b${m.battleId}:after` : `i${m.round}`;
+    // a warband entered after a battle – or at the takeover, after the history – starts in that round's interlude
+    const seg = m.kind === 'start' ? (m.round > 0 && by.has(`i${m.round}`) ? `i${m.round}` : 'pre') : m.kind === 'after_battle' && m.battleId ? `b${m.battleId}:after` : `i${m.round}`;
     by.get(seg)?.marks.push(m);
   }
   const moved = new Map(data.positions.map((p) => [`${p.itemType}:${p.itemId}`, p]));
