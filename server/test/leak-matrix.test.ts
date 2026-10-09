@@ -12,6 +12,7 @@ import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
 import { putAttachment, storeFile } from '../src/attachments.ts';
+import { putPastBattle } from '../src/history.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
 
@@ -101,6 +102,14 @@ describe('leak-test matrix', () => {
     picture('LEADER-SECRET: the Countess’s seal.', 'leader', victim.id, true, true);
     const ownPictureId = picture('The ferry burns.', 'public', player.id, false, true);
     const pendingPictureId = picture('Still on its way.', 'public', player.id, false, false);
+    // a campaign the admin takes over: no battle of its own, one of its history
+    const taken = createCampaign(s.db, { name: 'The Admin’s Old Campaign', by: admin.id }, t0);
+    setMember(s.db, taken.id, player.id, 'player', admin.id, t0);
+    const takenEntered = entry(taken, player.id);
+    confirm(taken, takenEntered);
+    const pastBattleId = randomUUID();
+    const past = putPastBattle(s.db, taken, pastBattleId, { round: 1, title: 'The old ferry', district: '', playedOn: null, outcomes: { [takenEntered.warband_id]: 'defeat' } }, admin.id, t0);
+    if (!past.ok) throw new Error(`${past.error}: ${past.problem}`);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -109,6 +118,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {

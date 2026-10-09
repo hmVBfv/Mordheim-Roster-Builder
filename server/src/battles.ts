@@ -17,6 +17,8 @@ const iso = (d: Date) => d.toISOString();
 export interface BattleRow {
   id: string; campaign_id: string; round: number; title: string; scenario_id: string; district: string; played_at: string | null;
   status: 'open' | 'closed'; turn: number; result: string; created_by: string; created_at: string; updated_at: string; closed_at: string | null; seq: number;
+  /** Phase 4a5: 1 for a battle of the history (before the app), recorded afterwards. */
+  taken_over: number;
 }
 interface EntryRow { id: string; battle_id: string; turn: number; kind: 'casualty' | 'event'; payload: string; author_id: string; created_at: string; updated_at: string; status: string; deleted_at: string | null }
 export interface ProposalRow {
@@ -59,13 +61,20 @@ export function checkEntry(kind: 'casualty' | 'event', payload: unknown, partici
 
 /* ---- what leaves the server ---- */
 
-/** `warbandIds`: who fought; `marked`: whose warband is marked after it (phase 4a4). */
-export interface BattleSummary { id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds: string[]; marked: string[]; createdAt: string; closedAt: string | null }
+/** `warbandIds`: who fought; `marked`: whose warband is marked after it (phase 4a4); `takenOver`: a battle of the history, played before the app,
+    and `playedAt` the day it was played (phase 4a5; for a battle of the app, when it was set up). */
+export interface BattleSummary {
+  id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds: string[]; marked: string[]; createdAt: string; closedAt: string | null;
+  takenOver: boolean; playedAt: string | null;
+}
 export interface Participant { warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null }
 export interface Entry { id: string; turn: number; kind: 'casualty' | 'event'; payload: unknown; author: string; createdAt: string; updatedAt: string }
 export interface Proposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: unknown; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
 export interface BattleView {
-  battle: { id: string; campaignId: string; round: number; title: string; scenario: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; updatedAt: string; closedAt: string | null };
+  battle: {
+    id: string; campaignId: string; round: number; title: string; scenario: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; updatedAt: string; closedAt: string | null;
+    takenOver: boolean; playedAt: string | null;
+  };
   seq: number;
   participants: Participant[];
   entries: Entry[];
@@ -89,6 +98,7 @@ export function listBattles(db: DB, campaignId: string): BattleSummary[] {
     return {
       id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((r) => r.name), warbandIds: ws.map((r) => r.id),
       marked: (marked.all(b.id) as { warband_id: string }[]).map((r) => r.warband_id), createdAt: b.created_at, closedAt: b.closed_at,
+      takenOver: !!b.taken_over, playedAt: b.played_at,
     };
   });
 }
@@ -105,7 +115,7 @@ export function battleView(db: DB, b: BattleRow): BattleView {
     LEFT JOIN users d ON d.id = p.decided_by WHERE p.battle_id = ? ORDER BY p.created_at`).all(b.id) as (ProposalRow & { author: string; decider: string | null })[])
     .map((p) => ({ id: p.id, targetType: p.target_type, targetId: p.target_id, authorId: p.author_id, author: p.author, payload: JSON.parse(p.payload) as unknown, status: p.status, decidedBy: p.decider, createdAt: p.created_at }));
   return {
-    battle: { id: b.id, campaignId: b.campaign_id, round: b.round, title: b.title, scenario: b.scenario_id, district: b.district, status: b.status, turn: b.turn, createdAt: b.created_at, updatedAt: b.updated_at, closedAt: b.closed_at },
+    battle: { id: b.id, campaignId: b.campaign_id, round: b.round, title: b.title, scenario: b.scenario_id, district: b.district, status: b.status, turn: b.turn, createdAt: b.created_at, updatedAt: b.updated_at, closedAt: b.closed_at, takenOver: !!b.taken_over, playedAt: b.played_at },
     seq: b.seq, participants, entries, proposals,
   };
 }

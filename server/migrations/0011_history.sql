@@ -1,0 +1,11 @@
+-- Taking over a running campaign (phase 4a5; docs/data-model.md
+-- "Kampagne", roadmap 4a5): the battles played before the campaign moved
+-- into the app are recorded afterwards by a leader – its history.
+--
+-- taken_over = 1: such a battle. It is closed from the start and has no
+-- protocol, aftermath or marks: who fought it and how it ended for them is
+-- all it holds (battle_participants, rev_before empty). played_at is then
+-- the day it was played as the leader gives it (YYYY-MM-DD), or empty.
+-- History is written only while the campaign has no battle of its own;
+-- its round follows the last battle of the history.
+ALTER TABLE battles ADD COLUMN taken_over INTEGER NOT NULL DEFAULT 0 CHECK (taken_over IN (0, 1));
