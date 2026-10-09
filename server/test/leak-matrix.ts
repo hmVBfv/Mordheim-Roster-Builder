@@ -83,7 +83,7 @@ const signedIn: Role[] = ['user', 'admin'];
 /** A campaign as its members see it. */
 const VIEW = ['campaign', 'role', 'members', 'enrolments', 'battles'];
 /** A battle as its campaign's members see it. */
-const BATTLE = ['battle', 'seq', 'participants', 'entries', 'proposals', 'unchanged'];
+const BATTLE = ['battle', 'seq', 'participants', 'entries', 'proposals', 'unchanged', 'marks'];
 const same = (roles: Role[], fields: string[]) => Object.fromEntries(roles.map((r) => [r, fields])) as Partial<Record<Role, string[]>>;
 
 export const MATRIX: Record<Action, MatrixRow> = {
@@ -297,6 +297,7 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'DELETE /api/v1/campaigns/:id/members/:userId': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/members/${c.victimId}` }),
       'POST /api/v1/campaigns/:id/enrolments/:eid/confirm': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[0]}/confirm`, body: {} }),
       'POST /api/v1/campaigns/:id/enrolments/:eid/decline': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[1]}/decline`, body: {} }),
+      'POST /api/v1/campaigns/:id/rounds/advance': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/rounds/advance`, body: {} }),
     },
     fields: { admin: [...VIEW, 'left'] },
   },
@@ -310,8 +311,17 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'DELETE /api/v1/campaigns/:id/battles/:bid/protocol/:eid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/protocol/${c.ledEntryId}` }),
       'POST /api/v1/campaigns/:id/battles/:bid/proposals/:pid/accept': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/proposals/${c.ledProposalIds[0]}/accept`, body: {} }),
       'POST /api/v1/campaigns/:id/battles/:bid/proposals/:pid/reject': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/proposals/${c.ledProposalIds[1]}/reject`, body: {} }),
+      'POST /api/v1/campaigns/:id/battles/:bid/close': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/close`, body: {} }),
     },
     fields: { admin: [...BATTLE, 'entry', 'removed'] },
+  },
+  'battle.mark': {
+    // a mark is the player's own: the user role marks its warband in the admin's campaign (still open: refused, but reached)
+    allowed: ['user'],
+    routes: {
+      'POST /api/v1/campaigns/:id/battles/:bid/marks': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/marks`, body: { warbandId: c.ledWarbandId, rev: 1 } }),
+    },
+    fields: { user: ['tag', 'changes'] },
   },
   'notes.write': {
     allowed: ['user'],

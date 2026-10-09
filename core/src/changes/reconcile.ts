@@ -8,7 +8,7 @@
    explains at most one change. Some changes need none: choices a player
    makes freely in the post-battle sequence (buying and selling gear, hiring,
    dismissing), names, and the totals that follow from everything else. */
-import type { Casualty, LogEntry } from '../state/types.ts';
+import type { Casualty, LogEntry, WarbandState } from '../state/types.ts';
 import type { Change, ChangeKind } from './diff.ts';
 
 export interface ReconciledChange extends Change {
@@ -21,6 +21,19 @@ export interface ReconciledChange extends Change {
 const FREE: ReadonlySet<ChangeKind> = new Set(['renamed', 'gear_added', 'gear_removed', 'rare_removed', 'hired', 'released', 'gold', 'rating', 'worth']);
 
 export interface Evidence { log: LogEntry[]; casualties?: Casualty[] }
+
+/** The evidence of one battle of the campaign server in a save (phase 4a4,
+    ADR 0016): the chronicle of its round, and the casualties of the battle
+    as the app took it over (the save's battle carries the server's id).
+    The app's preview and the server's mark read it alike. */
+export function battleEvidence(s: WarbandState, serverBattleId: string, round: number): Evidence {
+  const camp = s.campaign ?? {};
+  const local = (camp.battles ?? []).find((x) => (x as { serverId?: unknown }).serverId === serverBattleId);
+  return {
+    log: (camp.log ?? []).filter((e) => Number(e.round) === round),
+    casualties: local ? (camp.casualties ?? []).filter((c) => c.battleId === local.id) : [],
+  };
+}
 
 /** Matches changes with the events and casualty records of the same
     interval (the caller selects them: those of the battle the changes

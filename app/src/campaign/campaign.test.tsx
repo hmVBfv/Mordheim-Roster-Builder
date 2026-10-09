@@ -79,7 +79,7 @@ describe('the Campaign tab', () => {
     srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
     at('/campaign');
     const list = await screen.findByRole('list', { name: 'Your campaigns' });
-    expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands', 'Summer in SylvaniaViewer · Round 3 · 0 warbands']);
+    expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands', 'Summer in SylvaniaViewer · After battle 3 · 0 warbands']);
   });
 
   it('signed out: campaigns need the account', async () => {

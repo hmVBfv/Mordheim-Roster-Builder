@@ -2,12 +2,16 @@
    A campaign is read from the server; the last answer is kept on the device,
    so the overview still shows offline what it showed last. */
 import { api } from '../account/api.ts';
-import type { BattleSummary } from '../battle/api.ts';
+import type { BattleSummary, FrozenChange } from '../battle/api.ts';
 import { db } from '../db/db.ts';
 
 export type CampaignRole = 'leader' | 'player' | 'viewer';
 export interface Totals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
-export interface Tag { id: string; kind: 'start' | 'after_battle' | 'sat_out'; rev: number; round: number; battleId: string | null; totals: Totals; createdBy: string; createdAt: string }
+export interface Tag {
+  id: string; kind: 'start' | 'after_battle' | 'sat_out'; rev: number; round: number; battleId: string | null; totals: Totals; createdBy: string; createdAt: string;
+  /** What changed, frozen with the mark (phase 4a4): in the warband's own read only. */
+  changes?: FrozenChange[];
+}
 export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string }
 export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string; canLead?: boolean }
 export interface Enrolment {
@@ -34,8 +38,8 @@ export interface CampaignWarband {
 const listKey = (userId: string) => `campaigns:${userId}`;
 const viewKey = (id: string) => `campaign:${id}`;
 
-/** Round 0 is the founding of the warbands. */
-export const roundName = (round: number) => (round > 0 ? `Round ${round}` : 'Setup');
+/** The stage a campaign is in, as the Roster Builder names it (core roundLabel): the founding, then after each round's battles. */
+export const roundName = (round: number) => (round > 0 ? `After battle ${round}` : 'Setup');
 export const ROLE_NAMES: Record<CampaignRole, string> = { leader: 'Leader', player: 'Player', viewer: 'Viewer' };
 
 export async function listCampaigns(userId: string): Promise<CampaignSummary[]> {
@@ -65,4 +69,6 @@ export const removeMember = (id: string, userId: string) => api<CampaignView | {
 export const confirmEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}/confirm`, { body: {} }).then(keep);
 export const declineEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}/decline`, { body: {} }).then(keep);
 export const withdrawEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}`, { method: 'DELETE' }).then(keep);
+/** Moves the campaign on (a leader), once the battles of the next round are closed; who fought none sat it out. */
+export const advanceRound = (id: string) => api<CampaignView>(`/campaigns/${id}/rounds/advance`, { body: {} }).then(keep);
 export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/campaigns/${id}/warbands/${wid}`);

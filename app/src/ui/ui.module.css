@@ -38,6 +38,15 @@
   border-color: var(--border);
 }
 
+/* a button that cannot be pressed looks it */
+.button:disabled,
+.buttonQuiet:disabled,
+.button[aria-disabled='true'],
+.buttonQuiet[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;
