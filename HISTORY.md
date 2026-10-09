@@ -2346,3 +2346,29 @@ Rob, for phase 4c: whoever reports a bug will mostly write "does not
 work". So the report carries its context on its own – the screen and tab,
 the last steps, the settings, the house rules – and shows it before it is
 sent.
+
+## October 9, 2026 (cont.) — pictures
+
+The game night's last missing button was "+ Screenshot": a picture of the
+table from Tabletop Simulator, or a photo, at the turn it was taken. A
+picture is the first thing the server keeps that is not JSON, so it got a
+small path of its own. The phone draws the picture anew, at most 1600
+pixels wide, and encodes it as WebP – only the pixels leave it, nothing of
+what the file carried (a photo's GPS coordinates among them). It then says
+what it is going to send – type, size, where it hangs, who may see it – and
+sends the bytes raw to a route that alone accepts pictures, with its own
+limit. The server believes neither the type nor the size it is told: it
+looks at the first bytes and counts. The file lands under a name made only
+of the campaign's and the picture's ids, and goes out with a fixed type and
+a sandbox. Without a connection the picture waits in the same outbox as the
+notes, bytes and all, and shows from the phone until it is sent.
+
+A leaders' picture follows a leaders' note: a player's phone gets neither
+its row nor its bytes. The leak matrix now plants one.
+
+Two small things on the way. Every API answer was sent with "no-store",
+which would have made the browser fetch the same picture again on every
+screen; a route may now say otherwise, and a picture's bytes, which never
+change under their id, may be kept by the browser. And the app's service
+worker would have answered a picture opened in its own tab with the app
+itself; the API is now never the app.
