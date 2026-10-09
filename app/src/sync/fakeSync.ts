@@ -97,6 +97,7 @@ export function createFakeSync(opts: {
     battles: new Map<string, FakeBattle>(),
     notes: new Map<string, FakeNote>(),
     pictures: new Map<string, FakePicture>(),
+    positions: new Map<string, { campaignId: string; itemType: string; itemId: string; segment: string; pos: string; movedBy: string; movedAt: string }>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -281,6 +282,34 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
+  /* ---- the timeline (as server/src/timeline.ts gives it) ---- */
+  const timelineRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response | null => {
+    const battles = [...s.battles.values()].filter((b) => b.campaignId === c.id);
+    const visible = (type: string, id: string) => {
+      if (type === 'note') { const n = s.notes.get(id); return n && n.campaignId === c.id ? noteFor(n, role) : null; }
+      if (type === 'picture') { const p = s.pictures.get(id); return p && p.campaignId === c.id && pictureFor(p, role) ? p : null; }
+      return battles.flatMap((b) => b.entries).find((e) => e.id === id && !e.deleted) ?? null;
+    };
+    if (method === 'GET' && rest === '/timeline') {
+      return json(200, {
+        positions: [...s.positions.values()].filter((p) => p.campaignId === c.id && visible(p.itemType, p.itemId)).map((p) => ({ itemType: p.itemType, itemId: p.itemId, segment: p.segment, pos: p.pos, movedBy: p.movedBy, movedAt: p.movedAt })),
+        entries: battles.flatMap((b) => b.entries.filter((e) => !e.deleted).map((e) => ({ id: e.id, battleId: b.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt }))),
+        outcomes: battles.flatMap((b) => b.participants.map((p) => ({ battleId: b.id, warbandId: p.warbandId, name: nameOf(p.warbandId)?.name ?? '', outcome: p.outcome }))),
+        marks: c.enrolments.flatMap((e) => (e.tags ?? []).filter((t) => !t.supersededBy).map((t) => ({ id: t.id, warbandId: e.warbandId, warband: e.name, kind: t.kind, round: t.round, battleId: t.battleId, rev: t.rev, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }))),
+      });
+    }
+    const m = rest.match(/^\/timeline\/(note|picture|entry)\/([^/]+)$/);
+    if (!m || method !== 'PUT') return null;
+    if (role === 'viewer') return json(403, { error: 'forbidden' });
+    const block = visible(m[1]!, m[2]!) as { authorId?: string; uploaderId?: string } | null;
+    if (!block) return json(404, { error: 'not_found' });
+    const owner = block.authorId ?? block.uploaderId ?? null;
+    if (owner !== me.id && role !== 'leader') return json(403, { error: 'forbidden' });
+    const position = { itemType: m[1]!, itemId: m[2]!, segment: String(body.segment), pos: String(body.pos), movedBy: me.id, movedAt: at() };
+    s.positions.set(`${m[1]}:${m[2]}`, { campaignId: c.id, ...position });
+    return json(200, { position });
+  };
+
   const battleRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
     const lead = role === 'leader';
     if (rest === '/battles') {
@@ -438,6 +467,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
+    if (rest.startsWith('/timeline')) return timelineRoutes(c, role, method, rest, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
     if (method === 'POST' && rest === '/rounds/advance') {
       if (!lead) return forbidden;
