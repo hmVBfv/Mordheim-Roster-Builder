@@ -288,7 +288,12 @@ dem KI-Paket.
 
 ## Phase 4c – Bug-Tracker
 
-- „Report a problem“ mit Kontext; Status für den Meldenden.
+- „Report a problem“ mit Kontext; Status für den Meldenden. Der Kontext geht
+  ohne Zutun mit (Rob, 09.10.2026: Meldende schreiben meist nur
+  „funktioniert nicht“): Bildschirm und Reiter, die letzten Schritte davor,
+  Einstellungen (Theme, Layout, Flavour, Online/Sync, Rolle), Hausregeln von
+  Warband und Kampagne, letzte JS-Fehler – vor dem Senden lesbar angezeigt
+  (concept.md 4.12).
 - `roster-cli`/API-Zugang mit Bug-Token; Bereiniger für Testvorlagen.
 - `.claude/commands/bugs.md` (Ablauf `/bugs`) und
   `.claude/agents/reviewer.md`.
