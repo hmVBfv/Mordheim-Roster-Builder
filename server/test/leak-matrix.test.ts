@@ -13,6 +13,7 @@ import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
 import { putAttachment, storeFile } from '../src/attachments.ts';
 import { putPastBattle } from '../src/history.ts';
+import { putChapter } from '../src/chapters.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
 
@@ -110,6 +111,15 @@ describe('leak-test matrix', () => {
     const pastBattleId = randomUUID();
     const past = putPastBattle(s.db, taken, pastBattleId, { round: 1, title: 'The old ferry', district: '', playedOn: null, outcomes: { [takenEntered.warband_id]: 'defeat' } }, admin.id, t0);
     if (!past.ok) throw new Error(`${past.error}: ${past.problem}`);
+    // published chapters, one in each campaign
+    const chapter = (c: { id: string }, by: string) => {
+      const chid = randomUUID();
+      const r = putChapter(s.db, c.id, chid, { refKey: 'prolog', kind: 'prologue', publishedOn: '2026-06-01', de: { label: 'Prolog', title: 'Auf Flügeln aus Feuer', icDate: '', place: '', victor: '', text: 'Der Komet fiel.' }, en: null, place: { segment: 'pre', pos: '5' } }, by, t0);
+      if (!r.ok) throw new Error(r.error);
+      return chid;
+    };
+    const chapterId = chapter(theirs, victim.id);
+    const ledChapterId = chapter(led, admin.id);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -118,7 +128,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
