@@ -15,6 +15,7 @@ import { readActor, registerAccountRoutes } from './routes-accounts.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
 import { registerNoteRoutes } from './routes-notes.ts';
 import { registerAttachmentRoutes } from './routes-attachments.ts';
+import { registerTimelineRoutes } from './routes-timeline.ts';
 import { registerCampaignRoutes } from './routes-campaigns.ts';
 import { registerShareRoutes } from './routes-shares.ts';
 import { registerWarbandRoutes } from './routes-warbands.ts';
@@ -145,6 +146,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerBattleRoutes(app, { db, now, dataDir: deps.config.dataDir ?? null, log: app.log });
   registerNoteRoutes(app, { db, now });
   registerAttachmentRoutes(app, { db, now, uploadDir: deps.config.uploadDir ?? null, ...(deps.pictureQuota ? { quota: deps.pictureQuota } : {}) });
+  registerTimelineRoutes(app, { db, now });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);
