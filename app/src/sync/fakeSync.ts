@@ -7,7 +7,10 @@
    server/src/routes-shares.ts: the others, copies sent, share codes.
    Campaigns as in server/src/routes-campaigns.ts (phase 4a1): members,
    warbands entered (the signed-in user's among the sync's own, the others'
-   kept here), a leader's confirmation with the start tag. */
+   kept here), a leader's confirmation with the start tag. After a battle
+   (phase 4a4): closing it, marking a warband "after" it (the changes from
+   `opts.changes`, which the specs compute with core as the server does),
+   moving the campaign on. */
 export interface FakeVersion { rev: number; data: unknown; createdAt: string; source: string; note?: string }
 export interface FakeWarband {
   id: string; headRev: number; versions: FakeVersion[]; archivedAt: string | null; seq: number;
@@ -28,12 +31,21 @@ export interface FakeBattle {
   participants: { warbandId: string; outcome: string }[];
   entries: FakeEntry[];
   proposals: FakeProposal[];
+  closedAt?: string | null;
 }
 export interface FakeTotals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
+export interface FakeChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
+export interface FakeTag {
+  id: string; kind: 'start' | 'after_battle' | 'sat_out'; rev: number; round: number; battleId: string | null; totals: FakeTotals; createdBy: string; createdAt: string;
+  changes?: FakeChange[]; supersededBy?: string;
+}
 export interface FakeEnrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
   createdAt: string; confirmedAt: string | null; name: string; wbType: string;
-  tag: { id: string; kind: 'start'; rev: number; round: number; battleId: null; totals: FakeTotals; createdBy: string; createdAt: string } | null;
+  /** The newest mark that stands. */
+  tag: FakeTag | null;
+  /** Every mark, the corrected ones too, oldest first. */
+  tags?: FakeTag[];
   /** Another player's warband: its save, kept here. */
   data?: unknown;
 }
@@ -56,7 +68,11 @@ const CODES = ['K7M2Q9XD', 'H4TR8WNP', 'Z3FB6YCM'];
 
 const NO_TOTALS: FakeTotals = { rating: 0, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 };
 
-export function createFakeSync(opts: { me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; wbName?: (wb: string) => string } = {}) {
+export function createFakeSync(opts: {
+  me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; wbName?: (wb: string) => string;
+  /** What changed between two saves, as the server's core finds and explains it. */
+  changes?: (before: unknown, after: unknown, battle: { id: string; round: number }) => FakeChange[];
+} = {}) {
   const me = opts.me ?? { id: 'u1', username: 'kai', displayName: ME_NAME };
   const totalsOf = opts.totals ?? (() => NO_TOTALS);
   const s = {
@@ -87,18 +103,27 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
       members: c.members.map(({ canLead, ...m }) => ({ ...m, joinedAt: c.createdAt, ...(role === 'leader' ? { canLead } : {}) })),
       enrolments: c.enrolments.map((e) => ({
         id: e.id, warbandId: e.warbandId, playerId: e.playerId, player: e.player, status: e.status, fromRound: e.fromRound,
-        createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag,
+        createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
         headRev: s.warbands.get(e.warbandId)?.headRev ?? 1, updatedAt: c.createdAt,
       })),
       battles: [...s.battles.values()].filter((b) => b.campaignId === c.id).map(battleSummary),
     };
   };
 
+  const publicTag = (t: FakeTag) => ({ id: t.id, kind: t.kind, rev: t.rev, round: t.round, battleId: t.battleId, totals: t.totals, createdBy: t.createdBy, createdAt: t.createdAt });
+
   /* ---- battles ---- */
   const nameOf = (warbandId: string) => [...s.campaigns.values()].flatMap((c) => c.enrolments).find((e) => e.warbandId === warbandId);
-  const battleSummary = (b: FakeBattle) => ({ id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: b.participants.map((p) => nameOf(p.warbandId)?.name ?? '').sort(), createdAt: b.createdAt, closedAt: null });
+  const battleSummary = (b: FakeBattle) => {
+    const ws = b.participants.map((p) => ({ id: p.warbandId, name: nameOf(p.warbandId)?.name ?? '' })).sort((x, y) => x.name.localeCompare(y.name));
+    return { id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((w) => w.name), warbandIds: ws.map((w) => w.id), marked: Object.keys(marksOf(b)), createdAt: b.createdAt, closedAt: b.closedAt ?? null };
+  };
+  /** The marks that stand after a battle, by warband. */
+  const marksOf = (b: FakeBattle) => Object.fromEntries([...s.campaigns.values()].flatMap((c) => c.enrolments).flatMap((e) => (e.tags ?? [])
+    .filter((t) => t.battleId === b.id && t.kind === 'after_battle' && !t.supersededBy)
+    .map((t) => [e.warbandId, { tagId: t.id, rev: t.rev, totals: t.totals, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }])));
   const battleView = (b: FakeBattle) => ({
-    battle: { id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: null },
+    battle: { id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: b.closedAt ?? null },
     seq: b.seq,
     participants: b.participants.map((p) => {
       const e = nameOf(p.warbandId)!;
@@ -106,6 +131,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     }),
     entries: b.entries.filter((e) => !e.deleted).sort((x, y) => x.turn - y.turn || x.createdAt.localeCompare(y.createdAt)).map((e) => ({ id: e.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt, updatedAt: e.updatedAt })),
     proposals: b.proposals,
+    marks: marksOf(b),
   });
   /** A battle in a campaign, of the warbands confirmed there (all of them, unless named). */
   const addBattle = (campaignId: string, o: { title?: string; warbandIds?: string[]; round?: number } = {}) => {
@@ -217,7 +243,30 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
       b.seq = next();
       return json(200, { ok: true, seq: b.seq });
     }
+    if (method === 'POST' && sub === '/marks') {
+      if (role === 'viewer') return json(403, { error: 'forbidden' });
+      const w = s.warbands.get(String(body.warbandId));
+      if (!w) return json(403, { error: 'forbidden' });
+      if (b.status !== 'closed') return json(409, { error: 'open', problem: 'a battle is marked once it is closed' });
+      const e = c.enrolments.find((q) => q.warbandId === w.id);
+      if (!e || !b.participants.some((p) => p.warbandId === w.id)) return json(400, { error: 'invalid', problem: 'this warband did not fight the battle' });
+      const v = w.versions.find((q) => q.rev === Number(body.rev));
+      if (!v) return json(404, { error: 'not_found' });
+      const before = [...(e.tags ?? [])].reverse().find((t) => !t.supersededBy && t.round < b.round);
+      if (!before) return json(409, { error: 'no_start' });
+      const changes = opts.changes?.(w.versions.find((q) => q.rev === before.rev)!.data, v.data, { id: b.id, round: b.round }) ?? [];
+      const tag: FakeTag = { id: `tag-${b.id}-${w.id}-${next()}`, kind: 'after_battle', rev: v.rev, round: b.round, battleId: b.id, totals: totalsOf(v.data), createdBy: me.displayName, createdAt: at(), changes };
+      for (const t of e.tags ?? []) if (t.battleId === b.id && t.kind === 'after_battle' && !t.supersededBy) t.supersededBy = tag.id;
+      e.tags = [...(e.tags ?? []), tag];
+      e.tag = tag;
+      b.seq = next();
+      return json(200, { tag: publicTag(tag), changes });
+    }
     if (!lead) return json(403, { error: 'forbidden' });
+    if (method === 'POST' && sub === '/close') {
+      if (b.status !== 'closed') { b.status = 'closed'; b.closedAt = at(); b.seq = next(); }
+      return json(200, battleView(b));
+    }
     if (b.status === 'closed') return json(409, { error: 'closed' });
     if (method === 'PATCH' && sub === '') {
       if (body.turn !== undefined) b.turn = Number(body.turn);
@@ -268,6 +317,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     e.confirmedAt = at();
     const w = s.warbands.get(e.warbandId);
     e.tag = { id: `tag-${e.id}`, kind: 'start', rev: w?.headRev ?? 1, round: c.round, battleId: null, totals: totalsOf(dataOf(e)), createdBy: me.displayName, createdAt: at() };
+    e.tags = [e.tag];
     if (w) w.seq = next();
   };
   const leave = (c: FakeCampaign, e: FakeEnrolment) => {
@@ -313,6 +363,22 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
+    if (method === 'POST' && rest === '/rounds/advance') {
+      if (!lead) return forbidden;
+      const nextRound = c.round + 1;
+      const battles = [...s.battles.values()].filter((b) => b.campaignId === c.id && b.round === nextRound);
+      if (!battles.length) return json(409, { error: 'no_battle', problem: `no battle of round ${nextRound} yet` });
+      if (battles.some((b) => b.status !== 'closed')) return json(409, { error: 'open', problem: `a battle of round ${nextRound} is still open` });
+      const fought = new Set(battles.flatMap((b) => b.participants.map((p) => p.warbandId)));
+      for (const e of c.enrolments.filter((q) => q.status === 'active' && !fought.has(q.warbandId))) {
+        const w = s.warbands.get(e.warbandId);
+        const t: FakeTag = { id: `tag-sat-${e.id}-${nextRound}`, kind: 'sat_out', rev: w?.headRev ?? 1, round: nextRound, battleId: null, totals: totalsOf(dataOf(e)), createdBy: me.displayName, createdAt: at() };
+        e.tags = [...(e.tags ?? []), t];
+        e.tag = t;
+      }
+      c.round = nextRound;
+      return json(200, view(c));
+    }
     if (method === 'PATCH' && rest === '') { if (!lead) return forbidden; c.name = String(body.name).trim(); return json(200, view(c)); }
     let x: RegExpMatchArray | null;
     if ((x = rest.match(/^\/members\/([^/]+)$/))) {
@@ -373,7 +439,7 @@ export function createFakeSync(opts: { me?: { id: string; username: string; disp
         player: { id: e.playerId, displayName: e.player }, status: e.status,
         head: { rev: w?.headRev ?? 1, data: dataOf(e), createdAt: e.createdAt, source: 'import', note: '', format: 2, appVersion: '', createdBy: e.player, bytes: 0 },
         draft: w?.draft && w.draft.baseRev === w.headRev ? { data: w.draft.data, updatedAt: w.draft.updatedAt } : null,
-        tags: e.tag ? [e.tag] : [],
+        tags: (e.tags ?? []).filter((t) => !t.supersededBy).map((t) => ({ ...publicTag(t), changes: t.changes ?? [] })),
       });
     }
     return json(404, { error: 'not_found' });
