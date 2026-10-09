@@ -176,3 +176,26 @@
     align-items: start;
   }
 }
+
+/* after the battle is closed (phase 4a4): whose aftermath is marked */
+.fighter small.marked {
+  color: var(--accent);
+}
+
+.fighter small.unmarked {
+  color: var(--gold);
+}
+
+.aftermath {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  font-weight: 600;
+}
+
+.closeList {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: grid;
+  gap: var(--space-1);
+}

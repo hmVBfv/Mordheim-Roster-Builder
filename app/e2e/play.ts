@@ -3,7 +3,7 @@
    by Playwright itself, signed in as Kai. */
 import { readFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
-import { ctxOf, loadSave, stageTotals } from '@mordheim/core';
+import { battleEvidence, ctxOf, diffWarbands, loadSave, reconcile, stageTotals } from '@mordheim/core';
 import { loadGameData } from '@mordheim/core/node';
 import { createFakeSync } from '../src/sync/fakeSync.ts';
 
@@ -16,9 +16,16 @@ const totals = (save: unknown) => {
   return r.ok ? stageTotals(ctxOf(rules, r.state)) : { rating: 0, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 };
 };
 
+/** What changed between two saves, as the server finds and explains it when a warband is marked (server/src/aftermath.ts). */
+const changes = (before: unknown, after: unknown, b: { id: string; round: number }) => {
+  const sb = loadSave(rules, before), sa = loadSave(rules, after);
+  if (!sb.ok || !sa.ok) return [];
+  return reconcile(diffWarbands(rules, sb.state, sa.state, b.round), battleEvidence(sa.state, b.id, b.round));
+};
+
 /** The server: signed in as Kai, the warband endpoints from the stand-in. */
 export async function playServer(page: Page, signedIn = true, o: { totp?: boolean } = {}) {
-  const f = createFakeSync({ totals, wbName: (wb) => rules.WARBANDS[wb]?.name ?? wb });
+  const f = createFakeSync({ totals, changes, wbName: (wb) => rules.WARBANDS[wb]?.name ?? wb });
   let me = signedIn;
   const user = { ...KAI, totp: !!o.totp };
   await page.route('**/api/v1/**', async (route) => {

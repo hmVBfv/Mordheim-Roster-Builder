@@ -138,7 +138,17 @@ Begriff einführt, trägt ihn hier ein.
 | Korrekturvorschlag | Correction proposal | `proposals` |
 | Spielzug | Turn | `turn` |
 | Spielabend-Modus | Game night | `/game-night` |
-| Post-Battle-Sequenz | Post-battle sequence | `core/campaign` |
+| Post-Battle-Sequenz | Post-battle sequence (After the battle) | `core/campaign`, `PB_STEPS` |
+| Schlacht schließen | Close the battle | `POST …/battles/:bid/close`, `closeBattle()` |
+| Nachbereitung (einer Warband) | Aftermath (Your aftermath) | `/warbands/:id/aftermath/:bid`, `app/src/aftermath/` |
+| Schlacht übernehmen | Take the battle over (Take it over) | `takeOverBattle()`, `campaign.battles[].serverId` |
+| Erfahrung der Schlacht | The battle’s experience (Grant …) | `awardBattleXp()`, `campaign.battles[].xpAwarded` |
+| Markieren „Nach Schlacht N“ | Mark after battle N | `POST …/battles/:bid/marks`, Tag `after_battle` |
+| Was sich geändert hat | What changed | `diffWarbands()`, `reconcile()`, Tabelle `changes` |
+| ohne Anlass | no cause found (without a cause) | `unexplained` |
+| ausgesetzt (Runde) | Sat out battle N | Tag `sat_out` |
+| Runde weiterschalten | Move on to After battle N | `POST /campaigns/:id/rounds/advance` |
+| Offen für dich | Open for you | `openAftermaths()` in der Übersicht der Kampagne |
 | Hausregeln | House rules | `house_rules`, `S.house` |
 | Stilvorgaben | Style guide | `campaign_docs`, `kind: 'style'` |
 

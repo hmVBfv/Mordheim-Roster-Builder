@@ -4,7 +4,9 @@
    the protocol; everybody sees it live (asked every few seconds, only for
    what is newer) and players send corrections. Whatever is entered goes to
    the outbox first and is sent when the server answers: a table without a
-   connection loses nothing. */
+   connection loses nothing. A leader closes the battle at the end (phase
+   4a4): the protocol is fixed, sealed notes open, and each player goes on
+   to the aftermath of their warband. */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { errorText, type Me } from '../account/api.ts';
@@ -17,7 +19,7 @@ import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
-  battleTitle, cachedBattle, casualtyText, decideProposal, getBattle, OUTCOME_NAMES, patchBattle,
+  battleTitle, cachedBattle, casualtyText, closeBattle, decideProposal, getBattle, OUTCOME_NAMES, patchBattle,
   type BattleView, type CasualtyPayload, type Entry, type EntryBody, type Outcome, type Proposal,
 } from './api.ts';
 import { CasualtySheet, EventSheet, ProposalSheet } from './BattleSheets.tsx';
@@ -142,6 +144,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const cas = useSheet();
   const ev = useSheet();
   const prop = useSheet();
+  const { ref: closeRef, open: openClose, close: closeClose } = useSheet();
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<Shown | null>(null);
   const [about, setAbout] = useState<Shown | null>(null);
@@ -196,6 +199,9 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const outcome = (warbandId: string, o: Outcome) => {
     patchBattle(cid, bid, { outcomes: { [warbandId]: o } }).then((v) => { setView(v); notify('Outcome saved.'); }).catch((e: unknown) => notify(errorText(e)));
   };
+  const close = () => {
+    closeBattle(cid, bid).then((v) => { setView(v); notify('Closed. Each player now does the aftermath of their warband.'); }).catch((e: unknown) => notify(errorText(e)));
+  };
   const decide = (p: Proposal, accept: boolean) => {
     decideProposal(cid, bid, p.id, accept).then((v) => { setView(v); notify(accept ? 'Taken over – correct the entry if it needs it.' : 'Not taken over.'); }).catch((e: unknown) => notify(errorText(e)));
   };
@@ -209,7 +215,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
       </header>
       {!online && <p className={styles.banner} role="status">⚡ No connection. Everything you enter stays on this phone and is sent when the campaign server is reachable again. Nothing is lost.</p>}
       {online && error && <p className={styles.banner} role="status">{error} Shown as last seen.</p>}
-      {closed && <p className={ui.message}>This battle is closed: its protocol is fixed.</p>}
+      {closed && <p className={ui.message}>This battle is closed: its protocol is fixed. Each player does the aftermath of their warband and marks it.</p>}
 
       <div className={styles.columns}>
         <div className={ui.page}>
@@ -246,7 +252,14 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
             <ul className={styles.fighters}>
               {view.participants.map((p) => (
                 <li key={p.warbandId} className={styles.fighter}>
-                  <span>{p.name}<small>{p.player} · {p.wbName}</small></span>
+                  <span>
+                    {p.name}<small>{p.player} · {p.wbName}</small>
+                    {closed && (() => {
+                      const m = view.marks?.[p.warbandId];
+                      return <small className={m ? styles.marked : styles.unmarked}>{m ? `✓ Marked after battle ${view.battle.round} · version ${m.rev}${m.unexplained ? ` · ⚠ ${m.unexplained} without a cause` : ''}` : 'Aftermath not marked yet'}</small>;
+                    })()}
+                    {closed && p.playerId === user.id && <Link to={`/warbands/${p.warbandId}/aftermath/${bid}`} className={styles.aftermath}>Your aftermath →</Link>}
+                  </span>
                   {lead && !closed
                     ? (
                       <select className={ui.select} aria-label={`Outcome for ${p.name}`} value={p.outcome} onChange={(e) => outcome(p.warbandId, e.target.value as Outcome)}>
@@ -259,6 +272,13 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
               ))}
             </ul>
           </section>
+          {lead && !closed && (
+            <section aria-labelledby="b-end" className={ui.page}>
+              <h2 id="b-end">End of the battle</h2>
+              <p className={ui.muted}>When the last turn is played and the protocol is right, close the battle.</p>
+              <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={openClose}>Close the battle…</button></div>
+            </section>
+          )}
           {merged.proposals.length > 0 && (
             <section aria-labelledby="b-proposals" className={ui.page}>
               <h2 id="b-proposals">Corrections</h2>
@@ -313,6 +333,23 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           void enqueue({ key: pid, op: 'proposal.put', userId: user.id, campaignId: cid, battleId: bid, targetId: pid, body: { entryId, text } })
             .then(() => { notify('Sent to the leader.'); void refresh(); });
         }} />
+      <dialog ref={closeRef} className={ui.sheet} aria-labelledby="close-title">
+        <div className={ui.page}>
+          <h2 id="close-title">Close {battleTitle(view.battle)}?</h2>
+          <ul className={styles.closeList}>
+            <li>The protocol is fixed: no more entries, corrections or outcomes.</li>
+            <li>Notes sealed until this battle open for everyone.</li>
+            <li>The campaign server takes a backup.</li>
+            <li>Each player then does the aftermath of their warband and marks it.</li>
+          </ul>
+          {waiting > 0 && <p className={`${ui.message} ${ui.error}`}>{waiting} entr{waiting === 1 ? 'y waits' : 'ies wait'} on this phone: send {waiting === 1 ? 'it' : 'them'} first – connect, and wait a moment.</p>}
+          {merged.proposals.some((p) => p.status === 'open') && <p className={ui.muted}>Corrections still open stay as they are.</p>}
+          <div className={ui.row}>
+            <button type="button" className={ui.button} disabled={waiting > 0 || !online} onClick={() => closeClose(close)}>Close the battle</button>
+            <button type="button" className={ui.buttonQuiet} onClick={() => closeClose()}>Cancel</button>
+          </div>
+        </div>
+      </dialog>
       <NoteSheet dialogRef={noteSheet.ref} close={noteSheet.close} formKey={formKey} battles={[{ id: bid, label: `battle ${view.battle.round}`, open: !closed }]}
         fixed={{ battleId: bid, turn: shownTurn }} kind={noteOf.kind} canLead={lead} warbands={view.participants.map((p) => ({ warbandId: p.warbandId, name: p.name }))} picks={picks}
         note={noteOf.note} wordsOnly={!!noteOf.note && noteOf.note.authorId !== user.id}

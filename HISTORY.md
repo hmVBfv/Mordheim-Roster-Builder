@@ -2278,3 +2278,44 @@ author; only a closed battle opens one now. And the game night briefly
 lost an entry just taken out: an answer asked for before the change came
 back after it and was shown. Every change made on the screen now counts
 up, and an answer asked for before the last one is not shown.
+
+## October 9, 2026 — after the battle
+
+The fourth step of 4a closes the loop of a game night. A leader closes the
+battle: the protocol is fixed, the notes sealed for it open, the server
+takes a snapshot. Then each player does the aftermath of their warband.
+
+The question that decided the shape was where a warband's campaign lives.
+The data model had planned to move it – round, battles, casualties, log,
+stage snapshots, the post-battle progress – into server tables. But every
+rule that runs after a battle is already in `core`, ported one to one and
+checked against the old app, and all of it works on exactly that part of
+the save. Moving it would have meant writing the mechanics a second time
+with nobody checking them. So the campaign stays in the save (ADR 0016,
+proposed): the server keeps what everyone shares – the battle, its
+protocol, the notes, the marks – and the app takes a closed battle over
+into the warband once, through the old app's own battle form
+(`saveBattleDraft`), so the Fallen link and the map follow as they always
+did. The player sees what is taken over before it is.
+
+From there it is the Roster Builder's post-battle sequence, step by step:
+injuries rolled for whoever went out of action, the battle's experience
+granted once and written onto the roster, the exploration dice, wyrdstone
+into the stash and sold, then hiring and buying where those screens
+already are. Beside it, what changed since the last mark – found and
+explained exactly as the server will freeze it, because the app and the
+server call the same `core` function for the evidence. "Mark after battle
+N" saves a version and marks it; marked again, the newer mark corrects the
+older, which stays. The campaign overview shows each player what is open
+for them, and a leader moves the campaign on once the round's battles are
+closed; whoever fought none sat it out.
+
+Two things found on the way. The marking route imported a function it
+never used – the lint caught it only now, because the server part had been
+committed without the full check; the full check runs before every push
+again. And a disabled button looked exactly like one that could be
+pressed: "Move on to After battle 2" stood bright green with no battle to
+move on to. Every disabled button in the app now looks it.
+
+Rob, looking ahead: after the campaign setup, the whole interface gets an
+overhaul, the desktop workspace part of it.
