@@ -5,7 +5,7 @@
    totals and changes; then a leader moves the campaign on to the next
    round – warbands that did not fight are marked as having sat it out. */
 import { randomUUID } from 'node:crypto';
-import { ctxOf, diffWarbands, loadSave, reconcile, stageTotals, type Casualty, type LogEntry, type ReconciledChange, type WarbandState } from '@mordheim/core';
+import { battleEvidence, ctxOf, diffWarbands, loadSave, reconcile, stageTotals, type ReconciledChange, type WarbandState } from '@mordheim/core';
 import { audit } from './accounts.ts';
 import { participantIds, type BattleRow } from './battles.ts';
 import { latestTag, type CampaignRow, type Tag } from './campaigns.ts';
@@ -32,16 +32,6 @@ const readState = (raw: unknown): WarbandState | null => {
   return r.ok ? r.state : null;
 };
 
-/** The evidence of one battle in a save: its log of that round, and the casualties of the battle as taken over (ADR 0016). */
-function evidenceOf(s: WarbandState, battleId: string, round: number): { log: LogEntry[]; casualties: Casualty[] } {
-  const camp = s.campaign ?? {};
-  const local = (camp.battles ?? []).find((x) => (x as { serverId?: unknown }).serverId === battleId) as { id?: number } | undefined;
-  return {
-    log: (camp.log ?? []).filter((e) => Number(e.round) === round),
-    casualties: local ? (camp.casualties ?? []).filter((c) => c.battleId === local.id) : [],
-  };
-}
-
 export type Marked = { ok: true; tag: Tag; changes: FrozenChange[] } | { ok: false; status: 400 | 404 | 409; error: string; problem?: string };
 
 /** Marks a version of a warband "after battle N": totals and changes frozen; a second mark corrects the first (it stays, superseded). */
@@ -60,7 +50,7 @@ export function markAfterBattle(db: DB, c: CampaignRow, b: BattleRow, warbandId:
     const sb = readState(versionOf(db, warbandId, before.rev)?.data);
     const sa = readState(v.data);
     if (!sb || !sa) return { ok: false, status: 400, error: 'invalid', problem: 'the rules cannot read this warband' };
-    const changes: ReconciledChange[] = reconcile(diffWarbands(gameData(), sb, sa, b.round), evidenceOf(sa, b.id, b.round));
+    const changes: ReconciledChange[] = reconcile(diffWarbands(gameData(), sb, sa, b.round), battleEvidence(sa, b.id, b.round));
     const totals = stageTotals(ctxOf(gameData(), sa));
     const old = db.prepare("SELECT id FROM tags WHERE warband_id = ? AND battle_id = ? AND kind = 'after_battle' AND superseded_by IS NULL").get(warbandId, b.id) as { id: string } | undefined;
     const tagId = randomUUID();
