@@ -53,13 +53,14 @@ export type SyncConflict =
 export interface MetaRow { key: string; value: unknown }
 
 /** What waits to be sent to a campaign (phase 4a2): a protocol entry, its
-    removal, a correction, a note (4a3) – each with the id the server keeps
-    it under, so sending it twice makes it once (ADR 0010). Sent in order of
-    `at`. `battleId` is empty for a note about the campaign in general. */
+    removal, a correction, a note (4a3), a picture with its bytes (4a3,
+    part 2) – each with the id the server keeps it under, so sending it
+    twice makes it once (ADR 0010). Sent in order of `at`. `battleId` is
+    empty for a note or picture about the campaign in general. */
 export interface OutboxItem {
   /** The record's own id (entry or proposal); a removal waits under `<id>:delete`. */
   key: string;
-  op: 'entry.put' | 'entry.delete' | 'proposal.put' | 'note.put' | 'note.delete';
+  op: 'entry.put' | 'entry.delete' | 'proposal.put' | 'note.put' | 'note.delete' | 'attachment.put' | 'attachment.delete';
   userId: string;
   campaignId: string;
   battleId: string;

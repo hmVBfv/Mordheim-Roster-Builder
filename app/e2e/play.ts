@@ -36,8 +36,11 @@ export async function playServer(page: Page, signedIn = true, o: { totp?: boolea
     if (path === '/auth/me') return route.fulfill({ json: { user: me ? user : null, pending: false } });
     if (path === '/auth/sessions') return route.fulfill({ json: { sessions: [] } });
     f.state.calls.push(`${req.method()} ${path}`);
-    const res = f.handle(req.method(), path, url.searchParams, (req.postDataJSON() ?? {}) as Record<string, unknown>);
-    return route.fulfill({ status: res.status, headers: { 'content-type': 'application/json' }, body: await res.text() });
+    const type = (await req.headerValue('content-type')) ?? '';
+    // a picture's bytes arrive as they are
+    const body = type.startsWith('image/') ? { raw: new Uint8Array(req.postDataBuffer() ?? Buffer.alloc(0)), type } : ((req.postDataJSON() ?? {}) as Record<string, unknown>);
+    const res = f.handle(req.method(), path, url.searchParams, body);
+    return route.fulfill({ status: res.status, headers: { 'content-type': res.headers.get('content-type') ?? 'application/json' }, body: Buffer.from(await res.arrayBuffer()) });
   });
   return { ...f, signIn: () => { me = true; } };
 }
