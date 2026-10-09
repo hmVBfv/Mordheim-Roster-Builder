@@ -49,7 +49,7 @@ function useTimelineData(cid: string) {
 }
 
 const markText = (m: TimelineMark) => (m.kind === 'start'
-  ? `Start · ${m.warband} (version ${m.rev})`
+  ? `${m.round > 0 ? `Entered after battle ${m.round}` : 'Start'} · ${m.warband} (version ${m.rev})`
   : m.kind === 'sat_out' ? `Sat out round ${m.round} · ${m.warband}`
     : `✓ After battle ${m.round} · ${m.warband} · version ${m.rev}, ${m.changes} change${m.changes === 1 ? '' : 's'}${m.unexplained ? `, ⚠ ${m.unexplained} without a cause` : ''}`);
 

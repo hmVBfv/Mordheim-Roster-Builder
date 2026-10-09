@@ -12,6 +12,7 @@ import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
 import { putAttachment, storeFile } from '../src/attachments.ts';
+import { putPastBattle } from '../src/history.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
 
@@ -28,8 +29,8 @@ function walk(v: unknown, keys: string[] = [], values: string[] = []): { keys: s
   return { keys, values };
 }
 
-/** A warband save as small as the schema allows. */
-const SAVE = { wb: 'reikland', name: 'The Probes', models: [], format: 2 };
+/** A warband save as small as the rules read it (an unknown warband type would leave every enrolment unconfirmed). */
+const SAVE = { wb: 'merc', name: 'The Probes', models: [], format: 2 };
 
 const DENIED = ['sign_in', 'forbidden'];
 
@@ -58,17 +59,21 @@ describe('leak-test matrix', () => {
     // campaigns: one the victim leads (the player in it, the admin outside), one the admin leads
     const t0 = s.clock.now();
     const entry = (c: ReturnType<typeof createCampaign>, playerId: string) => enrol(s.db, { campaign: c, playerId, warbandId: randomUUID(), data: SAVE, json, copiedFrom: null, appVersion: '' }, t0).enrolment;
+    const confirm = (c: ReturnType<typeof createCampaign>, e: ReturnType<typeof entry>) => {
+      const r = confirmEnrolment(s.db, c, e, c.created_by, t0);
+      if (!r.ok) throw new Error(`not confirmed: ${r.error}`);
+    };
     const theirs = createCampaign(s.db, { name: 'The Victim’s Campaign', by: victim.id }, t0);
     setMember(s.db, theirs.id, player.id, 'player', victim.id, t0);
     const entered = entry(theirs, victim.id);
-    confirmEnrolment(s.db, theirs, entered, victim.id, t0);
+    confirm(theirs, entered);
     const own = entry(theirs, player.id);
     const led = createCampaign(s.db, { name: 'The Admin’s Campaign', by: admin.id }, t0);
     setMember(s.db, led.id, player.id, 'player', admin.id, t0);
     setMember(s.db, led.id, victim.id, 'player', admin.id, t0);
     const pending: [string, string] = [entry(led, player.id).id, entry(led, player.id).id];
     const ledEntered = entry(led, player.id);
-    confirmEnrolment(s.db, led, ledEntered, admin.id, t0);
+    confirm(led, ledEntered);
     // battles: one in each campaign; in the admin's an entry and two corrections of the player's
     const battle = createBattle(s.db, { id: randomUUID(), campaignId: theirs.id, round: 1, title: 'The ferry', scenario: '', district: '', warbandIds: [entered.warband_id], by: victim.id }, t0);
     const ledBattle = createBattle(s.db, { id: randomUUID(), campaignId: led.id, round: 1, title: 'The bridge', scenario: '', district: '', warbandIds: [ledEntered.warband_id], by: admin.id }, t0);
@@ -97,6 +102,14 @@ describe('leak-test matrix', () => {
     picture('LEADER-SECRET: the Countess’s seal.', 'leader', victim.id, true, true);
     const ownPictureId = picture('The ferry burns.', 'public', player.id, false, true);
     const pendingPictureId = picture('Still on its way.', 'public', player.id, false, false);
+    // a campaign the admin takes over: no battle of its own, one of its history
+    const taken = createCampaign(s.db, { name: 'The Admin’s Old Campaign', by: admin.id }, t0);
+    setMember(s.db, taken.id, player.id, 'player', admin.id, t0);
+    const takenEntered = entry(taken, player.id);
+    confirm(taken, takenEntered);
+    const pastBattleId = randomUUID();
+    const past = putPastBattle(s.db, taken, pastBattleId, { round: 1, title: 'The old ferry', district: '', playedOn: null, outcomes: { [takenEntered.warband_id]: 'defeat' } }, admin.id, t0);
+    if (!past.ok) throw new Error(`${past.error}: ${past.problem}`);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -105,6 +118,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {

@@ -38,6 +38,7 @@ export type Marked = { ok: true; tag: Tag; changes: FrozenChange[] } | { ok: fal
 export function markAfterBattle(db: DB, c: CampaignRow, b: BattleRow, warbandId: string, rev: number, by: string, now: Date): Marked {
   return db.transaction((): Marked => {
     if (b.status !== 'closed') return { ok: false, status: 409, error: 'open', problem: 'a battle is marked once it is closed' };
+    if (b.taken_over) return { ok: false, status: 409, error: 'history', problem: 'a battle of the history, played before the app, is not marked' };
     if (!participantIds(db, b.id).includes(warbandId)) return { ok: false, status: 400, error: 'invalid', problem: 'this warband did not fight the battle' };
     const w = warbandById(db, warbandId)!;
     if (w.campaign_id !== c.id) return { ok: false, status: 409, error: 'invalid', problem: 'the warband is no longer in the campaign' };

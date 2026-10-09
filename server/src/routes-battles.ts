@@ -16,6 +16,7 @@ import { gameData } from './rules.ts';
 import { closeBattle, markAfterBattle, marksOf } from './aftermath.ts';
 import { snapshot } from './backup.ts';
 import { warbandById } from './warbands.ts';
+import { roundAfterHistory } from './history.ts';
 
 export interface BattleDeps {
   db: DB | null; now: () => Date;
@@ -82,8 +83,11 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const ws = fighters(t.c, b.warbandIds);
     if (typeof ws === 'string') return reply.code(400).send({ error: 'invalid', problem: ws });
     if (!districtOk(b.district)) return reply.code(400).send({ error: 'invalid', problem: 'no such district' });
+    const round = b.round ?? t.c.round + 1;
+    const before = roundAfterHistory(db(), t.c.id, round);
+    if (before) return reply.code(400).send({ error: 'invalid', problem: before });
     const made = createBattle(db(), {
-      id: bid, campaignId: t.c.id, round: b.round ?? t.c.round + 1, title: (b.title ?? '').trim(), scenario: (b.scenario ?? '').trim(), district: b.district ?? '', warbandIds: ws, by: req.actor!.id,
+      id: bid, campaignId: t.c.id, round, title: (b.title ?? '').trim(), scenario: (b.scenario ?? '').trim(), district: b.district ?? '', warbandIds: ws, by: req.actor!.id,
     }, now());
     return reply.code(201).send(view(made));
   });

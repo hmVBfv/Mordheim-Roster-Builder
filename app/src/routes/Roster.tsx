@@ -27,7 +27,8 @@ import { ShareSheet } from '../share/ShareSheet.tsx';
 import { useSession } from '../account/session.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import { FLAVOUR } from '../flavour.ts';
-import { InCampaign } from '../campaign/InCampaign.tsx';
+import { CampaignStage, InCampaign } from '../campaign/InCampaign.tsx';
+import { takeStage } from '../campaign/stage.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
@@ -259,6 +260,9 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         </dl>
       </header>
       <ConflictBanner data={data} rec={rec} />
+      {FLAVOUR === 'campaign' && rec.campaignId && (
+        <CampaignStage rec={rec} state={ed.state} onTake={(round) => ed.edit((c) => takeStage(c, round), `Stage: ${core.roundLabel(round)}, as the campaign.`, { gold: 'keep' })} />
+      )}
       {v.warnings.length > 0 && (
         <ul className={`${ui.card} ${styles.warnings}`} aria-label="Warnings">
           {v.warnings.map((w) => <li key={w}>{w}</li>)}

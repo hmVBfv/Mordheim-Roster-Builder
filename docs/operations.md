@@ -204,6 +204,37 @@ Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
 | `sign-out <name>` | beendet alle Sitzungen des Kontos |
 | `users` | Konten mit Admin, Faktor, gesperrt, Geräten, zuletzt gesehen |
 
+### Die laufende Kampagne übernehmen (einmalig, Phase 4a5)
+
+Die Kampagne der Gruppe läuft seit mehreren Schlachten im Roster Builder.
+So kommt sie in die App – erst als **Probelauf auf der Testinstanz**
+(`roster-deploy --staging`; was dort entsteht, ist nach dem nächsten
+nächtlichen Wiederherstellungstest wieder weg), dann genauso produktiv:
+
+1. Der Leiter (mit Authenticator) legt die Kampagne an, nimmt die
+   Mitspieler auf und setzt ihre Hausregeln (Manage → „Set the house
+   rules“) – die Kopien, die eintreten, übernehmen sie sofort.
+2. Jeder Spieler importiert seinen aktuellen Stand aus dem Roster Builder
+   (Datei oder Text-Export: Warbands → Import) und trägt ihn ein
+   („Enter a warband“); der Leiter bestätigt unter Manage.
+3. Der Leiter trägt unter Manage → „Before the app“ jede bisherige Schlacht
+   ein: Nummer, Titel (der Titel des Kapitels), Bezirk, Tag, wer kämpfte und
+   wie es ausging. Die Kampagne steht danach „After battle N“, und die
+   Starts der Warbands wandern dorthin („Entered after battle N“). Fehler
+   lassen sich korrigieren oder herausnehmen – aber nur, bis die erste
+   Schlacht in der App angelegt ist; danach ist die Vorgeschichte fest.
+4. Jeder Spieler öffnet sein Roster und tippt „Take the campaign’s stage“:
+   die Stufe „After battle N“, die Kampagnenebene an, ab jetzt Trading Post
+   (behaviour-changes.md, Entscheidung 2). Spätestens die Nachbereitung der
+   ersten Schlacht in der App holt das nach.
+5. Prüfen: die Übersicht (jede Warband „✓ Entered after battle N“, die
+   Schlachten „before the app“, nichts „Open for you“), die Zeitleiste.
+6. Der nächste Spielabend: „New battle“ legt Schlacht N+1 an.
+
+Die Stände der Gruppe tragen keine Stufen-Snapshots (Entscheidung E in der
+[Roadmap](roadmap.md#offene-entscheidungen)): der erste Vergleich „What
+changed“ läuft von der Übernahme bis nach Schlacht N+1.
+
 ### Stufe 3 – Übungen (Abnahme Phase 2)
 
 1. **Rollback-Übung:** `roster-deploy drill-broken; echo "exit=$?"` – ein

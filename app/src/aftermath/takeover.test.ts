@@ -44,6 +44,21 @@ function battle(entries: Entry[] = ENTRIES()): BattleView {
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
 
 describe('taking a battle over', () => {
+  it('after a history (4a5): a save still at Setup takes the history’s last stage first – no stages closed before it, only the one before the battle', () => {
+    const s0 = sampleSave();
+    s0.models[0]!.miss = 1;
+    const view = battle();
+    view.battle.round = 5;
+    const s = takeOverBattle(data, s0, view, ME, '2026-10-05', 4);
+    expect(s.campaign!.round).toBe(5);
+    // the stage "After battle 4" closed with its snapshot, the game missed served there – none before
+    expect(Object.keys(s.campaign!.snapshots ?? {})).toEqual(['4']);
+    expect(s.models[0]!.miss).toBe(0);
+    expect((s.campaign!.log ?? []).filter((e) => e.type === 'missed').map((e) => e.round)).toEqual([4]);
+    // without the history, each stage up to the battle closes, as the Roster Builder's "Next stage" did
+    expect(Object.keys(takeOverBattle(data, sampleSave(), view, ME, '2026-10-05').campaign!.snapshots ?? {})).toEqual(['0', '1', '2', '3', '4']);
+  });
+
   it('records it as the battle form would: the stage moved on, every side, the casualties this warband was part of, the map', () => {
     const s0 = sampleSave();
     const s = takeOverBattle(data, s0, battle(), ME, '2026-10-05');

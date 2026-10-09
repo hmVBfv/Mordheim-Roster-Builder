@@ -157,6 +157,9 @@ Begriff einführt, trägt ihn hier ein.
 | Bild (Screenshot, Foto) | Picture · New picture · + Picture | `attachments`, `app/src/pictures/` |
 | verkleinert auf dem Gerät | made smaller on the phone (only the pixels leave it) | `shrink()` |
 | Hausregeln der Kampagne | (Campaign) house rules · Set the house rules | `campaigns.house_rules`, `/campaign/:id/house-rules` |
+| Vorgeschichte (Schlachten vor der App) | Before the app · A battle before the app | `battles.taken_over`, `PUT …/history/:bid`, `historyOf()` |
+| Stufe der Kampagne übernehmen | Take the campaign’s stage | `takeStage()`, `stageBehind()` (app) |
+| eingetreten nach Schlacht N | Entered after battle N | Tag `start` mit `round` > 0 |
 | eigene Datei weicht ab | its own house rules differ · own file differs | `houseDiffers`, `houseDifferences()` |
 | Regeln der Kampagne übernehmen | Take the campaign’s rules | `adoptHouse()` (app) |
 | Bezirke (einer Warband) | Districts · None / Foothold / Control | `/warbands/:id/districts`, `setDistrict()` |
