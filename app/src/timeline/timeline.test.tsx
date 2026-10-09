@@ -110,3 +110,70 @@ describe('the timeline', () => {
     expect(texts(await segment('Battle 1 · Hel Fenn ferry · aftermath')).join()).toMatch(/The ferry burns/);
   });
 });
+
+/* The chronicle's published chapters (4a5, part 2), in the chronicle's own form. */
+const BATTLE_DE = '---\nref: "battle-1"\ntitle: "Das Urteil im Nebel"\nchapter: "Erste Schlacht"\nic_date: "Frühes Jahr 2000 IC"\ndate: 2026-06-14\n---\n\n### Am Kai\n\nDer Nebel lag über dem Stir, und **Ottilie** rang den Great Crest zu Boden.\n';
+const BATTLE_EN = '---\nref: "battle-1"\ntitle: "The Verdict in the Fog"\nchapter: "First Battle"\ndate: 2026-06-14\n---\n\n### At the Quay\n\nThe fog lay over the Stir, and the gulls did not cry.\n';
+const INTERLUDE_DE = '---\nref: "interlude-1"\nkind: "interlude"\ntitle: "Der Nebel hebt sich"\nchapter: "Zwischenspiel"\ndate: 2026-06-21\n---\n\nDie Tage danach waren still, und der Regen hielt an.\n';
+
+describe('the chronicle’s chapters', () => {
+  it('a leader imports the chronicle’s files: German and English one chapter, at the head of its part; everyone reads it', async () => {
+    const { srv, c, b } = story('leader', { totp: true });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/timeline`);
+    await segment('Battle 1 · Hel Fenn ferry · course');
+    await user.click(screen.getByRole('button', { name: 'Import chapters…' }));
+    const sheet = screen.getByRole('dialog', { name: 'Import chapters' });
+    await user.upload(within(sheet).getByLabelText('Chapter files'), [
+      new File([BATTLE_DE], '2026-06-14-das-urteil-im-nebel.md', { type: 'text/markdown' }),
+      new File([BATTLE_EN], '2026-06-14-the-verdict-in-the-fog.md', { type: 'text/markdown' }),
+      new File([INTERLUDE_DE], '2026-06-21-der-nebel-hebt-sich.md', { type: 'text/markdown' }),
+      new File(['# Notes\n\nNothing here.'], 'notes.md', { type: 'text/markdown' }),
+    ]);
+    const list = await within(sheet).findByRole('list', { name: 'Chapters to import' });
+    expect(within(list).getAllByRole('listitem').map((x) => x.querySelector('span')?.textContent)).toEqual([
+      'Erste Schlacht · Das Urteil im Nebel · Deutsch, English',
+      'Zwischenspiel · Der Nebel hebt sich · Deutsch',
+    ]);
+    expect(within(list).getAllByRole('combobox').map((x) => (x as HTMLSelectElement).value)).toEqual([`b${b.id}:battle`, 'i1']);
+    expect(within(sheet).getByRole('list', { name: 'Files not read' }).textContent).toMatch(/notes\.md: no front matter/);
+    await user.click(within(sheet).getByRole('button', { name: 'Import 2 chapters' }));
+    expect(await screen.findByText('2 chapters imported.')).toBeTruthy();
+    expect([...srv.state.chapters.values()].map((x) => [x.refKey, x.de?.title, x.en?.title ?? null])).toEqual([['battle-1', 'Das Urteil im Nebel', 'The Verdict in the Fog'], ['interlude-1', 'Der Nebel hebt sich', null]]);
+    // at the head of its part: after the fixed report, before every block
+    const course = await segment('Battle 1 · Hel Fenn ferry · course');
+    await waitFor(() => expect(texts(course)[1]).toMatch(/^Chapter · Erste Schlacht · Frühes Jahr 2000 ICDas Urteil im NebelThe Verdict in the Fog/));
+    expect(texts(course)).toHaveLength(6);
+    expect(texts(await segment('Interlude 1'))[0]).toMatch(/Chapter · Zwischenspiel/);
+    // a leader moves it like the protocol
+    expect(screen.getByRole('button', { name: 'Move to…: the chapter Das Urteil im Nebel' })).toBeTruthy();
+    // read in either language
+    await user.click(screen.getByRole('button', { name: 'Read Das Urteil im Nebel in English' }));
+    const reader = await screen.findByRole('dialog', { name: 'The Verdict in the Fog' });
+    expect(await within(reader).findByText('The fog lay over the Stir, and the gulls did not cry.')).toBeTruthy();
+    await user.click(within(reader).getByRole('button', { name: 'Deutsch' }));
+    expect(within(reader).getByRole('heading', { name: 'Am Kai' })).toBeTruthy();
+    expect(within(reader).getByText('Ottilie').tagName).toBe('STRONG');
+    // taken out again
+    await user.click(within(reader).getByRole('button', { name: 'Take the chapter out' }));
+    expect(await screen.findByText('Das Urteil im Nebel is out of the timeline.')).toBeTruthy();
+    await waitFor(() => expect(texts(course).join()).not.toMatch(/Erste Schlacht/));
+  });
+
+  it('a player reads a chapter; imports, moves and takes out none', async () => {
+    const { srv, c } = story('player');
+    const id = '0000000c-0000-4000-8000-000000000000';
+    srv.state.chapters.set(id, { id, campaignId: c.id, refKey: 'interlude-1', kind: 'interlude', publishedOn: '2026-06-21', createdAt: '2026-10-09T10:00:00.000Z', updatedAt: '2026-10-09T10:00:00.000Z', de: { label: 'Zwischenspiel', title: 'Der Nebel hebt sich', icDate: '', place: '', victor: '', text: 'Die Tage danach waren still.' }, en: null });
+    srv.state.positions.set(`chapter:${id}`, { campaignId: c.id, itemType: 'chapter', itemId: id, segment: 'i1', pos: '05', movedBy: 'user-anna', movedAt: '2026-10-09T10:00:00.000Z' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/timeline`);
+    const interlude = await segment('Interlude 1');
+    await waitFor(() => expect(texts(interlude)[0]).toMatch(/Der Nebel hebt sich/));
+    expect(screen.queryByRole('button', { name: 'Import chapters…' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /the chapter Der Nebel hebt sich/ })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Read Der Nebel hebt sich in Deutsch' }));
+    const reader = await screen.findByRole('dialog', { name: 'Der Nebel hebt sich' });
+    expect(await within(reader).findByText('Die Tage danach waren still.')).toBeTruthy();
+    expect(within(reader).queryByRole('button', { name: 'Take the chapter out' })).toBeNull();
+  });
+});

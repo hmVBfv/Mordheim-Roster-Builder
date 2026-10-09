@@ -580,3 +580,48 @@ test('the history: a leader records a battle before the app; the warband that fo
   await noSideScroll(page);
   await shot(page, 'timeline-history');
 });
+
+/* The chronicle's published chapters in the timeline (phase 4a5, part 2). */
+const chapterFile = (name: string, front: string, body: string) => ({ name, mimeType: 'text/markdown', buffer: Buffer.from(`---\n${front}\n---\n\n${body}\n`) });
+const PROSE_DE = '### Am Kai\n\nQuayside war einst das schlagende Herz des Handels von Mordheim gewesen – jene lange Reihe von Kais und Lagerhäusern am Ufer des Stir. Nun lagen die Anlegestege gebrochen im Wasser, und über allem stand noch ein Ladekran aus schwarzem Eichenholz.\n\n**Ottilie**, Robbas Lehrling und alles andere als eine geübte Klinge, rang den Great Crest **Wonton** zu Boden, ehe sie selbst überwältigt wurde.\n\n---\n\nDie Kinder des Sotek zogen sich zurück in den Nebel, aus dem sie gekommen waren.';
+const PROSE_EN = '### At the Quay\n\nQuayside had once been the beating heart of Mordheim’s trade – the long row of quays and warehouses along the Stir. Now the landing stages lay broken in the water, and above it all still stood a crane of black oak.\n\n**Ottilie**, Robba’s apprentice and anything but a practised blade, wrestled the Great Crest **Wonton** to the ground before she was overwhelmed herself.';
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the chronicle's chapters: a leader imports them, everyone reads them, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const { srv, c } = await enteredCampaign(page, { totp: true });
+    const [gp, sk] = c.enrolments.map((e) => e.warbandId) as [string, string];
+    srv.pastBattle(c.id, { round: 1, title: 'Das Urteil im Nebel', district: 'quayside', outcomes: { [gp]: 'routed', [sk]: 'victory' } });
+    await page.goto(`campaign/${c.id}/timeline`);
+    await page.getByRole('button', { name: 'Import chapters…' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Import chapters' });
+    await sheet.getByLabel('Chapter files').setInputFiles([
+      chapterFile('2026-06-01-auf-fluegeln-aus-feuer.md', 'ref: "prolog"\nkind: "prologue"\ntitle: "Auf Flügeln aus Feuer"\nchapter: "Prolog"\ndate: 2026-06-01', 'Der Komet fiel, und die Stadt brannte. Drei Warbands machten sich auf den Weg.'),
+      chapterFile('2026-06-14-das-urteil-im-nebel.md', 'ref: "battle-1"\ntitle: "Das Urteil im Nebel"\nchapter: "Erste Schlacht"\nic_date: "Frühes Jahr 2000 IC"\nplace: "Quayside, Mordheim"\nvictor: >-\n  Das Feld blieb den Reavers – die Karawane wich\n  mit ihren Waren in den Nebel.\ndate: 2026-06-14', PROSE_DE),
+      chapterFile('2026-06-14-the-verdict-in-the-fog.md', 'ref: "battle-1"\ntitle: "The Verdict in the Fog"\nchapter: "First Battle"\nic_date: "Early 2000 IC"\nplace: "Quayside, Mordheim"\ndate: 2026-06-14', PROSE_EN),
+      chapterFile('2026-06-21-der-nebel-hebt-sich.md', 'ref: "interlude-1"\nkind: "interlude"\ntitle: "Der Nebel hebt sich"\nchapter: "Zwischenspiel"\ndate: 2026-06-21', 'Die Tage danach waren still, und der Regen hielt an.'),
+    ]);
+    await expect(sheet.getByRole('list', { name: 'Chapters to import' }).getByRole('listitem')).toHaveCount(3);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-chapters-import`);
+    await sheet.getByRole('button', { name: 'Import 3 chapters' }).click();
+    await expect(page.getByText('3 chapters imported.')).toBeVisible();
+    const past = page.getByRole('listitem', { name: 'Battle 1 · Das Urteil im Nebel · before the app' });
+    await expect(past).toContainText('Chapter · Erste Schlacht · Frühes Jahr 2000 IC · Quayside, Mordheim');
+    await expect(page.getByRole('listitem', { name: 'Before the campaign' })).toContainText('Auf Flügeln aus Feuer');
+    await expect(page.getByRole('listitem', { name: 'Interlude 1' })).toContainText('Der Nebel hebt sich');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-timeline-chapters`);
+    await page.getByRole('button', { name: 'Read Das Urteil im Nebel in Deutsch' }).click();
+    const reader = page.getByRole('dialog', { name: 'Das Urteil im Nebel' });
+    await expect(reader.getByRole('heading', { name: 'Am Kai' })).toBeVisible();
+    await expect(reader.getByText('Das Feld blieb den Reavers – die Karawane wich mit ihren Waren in den Nebel.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-chapter-read`);
+    await reader.getByRole('button', { name: 'English' }).click();
+    await expect(page.getByRole('dialog', { name: 'The Verdict in the Fog' }).getByRole('heading', { name: 'At the Quay' })).toBeVisible();
+  });
+}

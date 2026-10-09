@@ -153,3 +153,56 @@
 .moveTo button[aria-current='true'] {
   border-color: var(--accent);
 }
+
+/* a published chapter of the chronicle (4a5): the head of its part of the story */
+.chapterBlock {
+  border-color: var(--accent);
+  border-left-width: 4px;
+}
+
+.chapterTitle {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+}
+
+.read {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.victor {
+  margin: 0;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* the text read in its sheet: a page of prose */
+.chapterText {
+  max-width: 38rem;
+  line-height: 1.6;
+}
+
+.chapterText p {
+  margin: 0 0 var(--space-3);
+}
+
+.chapterText h3 {
+  margin: var(--space-3) 0 var(--space-2);
+  font-size: 1.05rem;
+}
+
+.chapterText hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--space-3) 0;
+}
+
+.importList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}

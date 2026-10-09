@@ -10,13 +10,14 @@
 import type { BattleSummary } from '../battle/api.ts';
 import { isSealed, type Note } from '../notes/api.ts';
 import type { ShownPicture } from '../pictures/api.ts';
-import type { ItemType, Position, TimelineData, TimelineEntry, TimelineMark, TimelineOutcome } from './api.ts';
+import type { ChapterSummary, ItemType, Position, TimelineData, TimelineEntry, TimelineMark, TimelineOutcome } from './api.ts';
 import { defaultKey } from './order.ts';
 
 export type Block =
   | { type: 'note'; id: string; key: string; at: string; note: Note & { pending?: boolean } }
   | { type: 'picture'; id: string; key: string; at: string; picture: ShownPicture }
-  | { type: 'entry'; id: string; key: string; at: string; entry: TimelineEntry };
+  | { type: 'entry'; id: string; key: string; at: string; entry: TimelineEntry }
+  | { type: 'chapter'; id: string; key: string; at: string; chapter: ChapterSummary };
 
 export interface Segment {
   key: string;
@@ -90,6 +91,11 @@ export function buildTimeline(battles: BattleSummary[], notes: (Note & { pending
     if (!list.some((b) => b.id === e.battleId)) continue;
     const { seg, key } = place('entry', e.id, `b${e.battleId}:battle`, e.createdAt, e.turn);
     seg.blocks.push({ type: 'entry', id: e.id, key, at: e.createdAt, entry: e });
+  }
+  // a chapter (4a5) stands where its import put it; one without a place, before the campaign
+  for (const c of data.chapters ?? []) {
+    const { seg, key } = place('chapter', c.id, 'pre', c.createdAt, 0);
+    seg.blocks.push({ type: 'chapter', id: c.id, key, at: c.publishedOn ?? c.createdAt, chapter: c });
   }
   for (const s of segs) s.blocks.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : a.at.localeCompare(b.at)));
   return segs;
