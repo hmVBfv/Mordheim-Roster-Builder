@@ -79,7 +79,9 @@ export function oneNote(db: DB, id: string, v: Viewer): Note | null {
 }
 
 /** The newest change to any note of the campaign. */
-export const notesSeq = (db: DB, campaignId: string) => (db.prepare('SELECT coalesce(max(seq), 0) AS n FROM notes WHERE campaign_id = ?').get(campaignId) as { n: number }).n;
+/** The newest change among the notes this viewer may see (a placeholder counts): a leaders' note moves nothing for a player (security review AUTHZ-3). */
+export const notesSeq = (db: DB, campaignId: string, v: Viewer) => (db.prepare("SELECT coalesce(max(seq), 0) AS n FROM notes WHERE campaign_id = ? AND (visibility != 'leader' OR ? OR author_id = ?)")
+  .get(campaignId, v.leader ? 1 : 0, v.id) as { n: number }).n;
 
 const auditVisibility = (v: Visibility) => (v === 'public' ? 'public' : v);
 
@@ -102,7 +104,7 @@ export function putNote(db: DB, campaignId: string, id: string, input: NoteInput
     }
     const mentions = JSON.stringify(input.mentions);
     if (!cur) {
-      const seq = audit(db, { actorId: by.id, action: 'note.create', targetType: 'note', targetId: id, campaignId, visibility: auditVisibility(input.visibility), payload: { kind: input.kind, battle: input.battleId } }, now);
+      const seq = audit(db, { actorId: by.id, action: 'note.create', targetType: 'note', targetId: id, campaignId, visibility: auditVisibility(input.visibility), payload: input.visibility === 'sealed' ? { battle: input.battleId } : { kind: input.kind, battle: input.battleId } }, now);
       db.prepare(`INSERT INTO notes (id, campaign_id, battle_id, turn, author_id, kind, text, lang, visibility, sealed_until_battle, mentions, protocol_entry_id, created_at, updated_at, seq)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(id, campaignId, input.battleId, input.turn, by.id, input.kind, input.text, input.lang, input.visibility,
         input.visibility === 'sealed' ? input.battleId : null, mentions, input.protocolEntryId, iso(now), iso(now), seq);

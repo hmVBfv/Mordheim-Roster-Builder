@@ -48,9 +48,13 @@ export const modelSchema = z.looseObject({
   heirloom: z.string().nullable().optional(),
 });
 
+/** A key or id that is written into markup by older readers (the Roster Builder's inline handlers): letters, digits, `_` and `-`
+    only (security review CLIENT-3). The Roster Builder makes `hs…`/`dp…` ids, the data's keys are such keys. */
+const plainKey = z.string().regex(/^[A-Za-z0-9_-]{1,64}$/, 'letters, digits, _ and - only');
+
 export const hireRecordSchema = z.looseObject({
-  key: z.string(),
-  uid: z.string(),
+  key: plainKey,
+  uid: plainKey,
   name: z.string().optional(),
   exp: num.optional(),
   skills: z.array(z.string()).optional(),
