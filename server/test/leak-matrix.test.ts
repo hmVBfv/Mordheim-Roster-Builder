@@ -28,8 +28,8 @@ function walk(v: unknown, keys: string[] = [], values: string[] = []): { keys: s
   return { keys, values };
 }
 
-/** A warband save as small as the schema allows. */
-const SAVE = { wb: 'reikland', name: 'The Probes', models: [], format: 2 };
+/** A warband save as small as the rules read it (an unknown warband type would leave every enrolment unconfirmed). */
+const SAVE = { wb: 'merc', name: 'The Probes', models: [], format: 2 };
 
 const DENIED = ['sign_in', 'forbidden'];
 
@@ -58,17 +58,21 @@ describe('leak-test matrix', () => {
     // campaigns: one the victim leads (the player in it, the admin outside), one the admin leads
     const t0 = s.clock.now();
     const entry = (c: ReturnType<typeof createCampaign>, playerId: string) => enrol(s.db, { campaign: c, playerId, warbandId: randomUUID(), data: SAVE, json, copiedFrom: null, appVersion: '' }, t0).enrolment;
+    const confirm = (c: ReturnType<typeof createCampaign>, e: ReturnType<typeof entry>) => {
+      const r = confirmEnrolment(s.db, c, e, c.created_by, t0);
+      if (!r.ok) throw new Error(`not confirmed: ${r.error}`);
+    };
     const theirs = createCampaign(s.db, { name: 'The Victim’s Campaign', by: victim.id }, t0);
     setMember(s.db, theirs.id, player.id, 'player', victim.id, t0);
     const entered = entry(theirs, victim.id);
-    confirmEnrolment(s.db, theirs, entered, victim.id, t0);
+    confirm(theirs, entered);
     const own = entry(theirs, player.id);
     const led = createCampaign(s.db, { name: 'The Admin’s Campaign', by: admin.id }, t0);
     setMember(s.db, led.id, player.id, 'player', admin.id, t0);
     setMember(s.db, led.id, victim.id, 'player', admin.id, t0);
     const pending: [string, string] = [entry(led, player.id).id, entry(led, player.id).id];
     const ledEntered = entry(led, player.id);
-    confirmEnrolment(s.db, led, ledEntered, admin.id, t0);
+    confirm(led, ledEntered);
     // battles: one in each campaign; in the admin's an entry and two corrections of the player's
     const battle = createBattle(s.db, { id: randomUUID(), campaignId: theirs.id, round: 1, title: 'The ferry', scenario: '', district: '', warbandIds: [entered.warband_id], by: victim.id }, t0);
     const ledBattle = createBattle(s.db, { id: randomUUID(), campaignId: led.id, round: 1, title: 'The bridge', scenario: '', district: '', warbandIds: [ledEntered.warband_id], by: admin.id }, t0);
