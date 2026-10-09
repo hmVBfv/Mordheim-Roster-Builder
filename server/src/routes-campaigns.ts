@@ -14,6 +14,8 @@ import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
 import { totalsOf } from './rules.ts';
 import { advanceRound, changesOf } from './aftermath.ts';
+import { battleById } from './battles.ts';
+import { PastBattleBody, putPastBattle, removePastBattle } from './history.ts';
 import { checkSave, draftOfUser, metaOf, versionOf, warbandById } from './warbands.ts';
 
 export interface CampaignDeps { db: DB | null; now: () => Date }
@@ -189,6 +191,31 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
       // each mark with what changed since the one before, frozen (phase 4a4)
       tags: tagsOf(db(), w.id, t.c.id).map((g) => ({ ...g, changes: changesOf(db(), g.id) })),
     };
+  });
+
+  /** A battle of the campaign's history (phase 4a5), recorded or corrected by a leader while the campaign has no battle of its own. */
+  app.put('/api/v1/campaigns/:id/history/:bid', { config: { action: 'campaign.manage' }, schema: { params: { type: 'object', properties: { bid: { type: 'string', pattern: UUID } } }, body: { type: 'object' } } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    const parsed = PastBattleBody.safeParse(req.body);
+    if (!parsed.success) {
+      const first = parsed.error.issues.slice(0, 2).map((i) => `${i.path.join('.') || '(top)'}: ${i.message}`).join('; ');
+      return reply.code(400).send({ error: 'invalid', problem: `not a battle of the history (${first})` });
+    }
+    const r = putPastBattle(db(), t.c, (req.params as { bid: string }).bid.toLowerCase(), parsed.data, req.actor!.id, now());
+    if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
+    return view(t.c, t.role);
+  });
+
+  /** A battle taken out of the history again (a leader), while nothing refers to it. */
+  app.delete('/api/v1/campaigns/:id/history/:bid', { config: { action: 'campaign.manage' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    const b = battleById(db(), (req.params as { bid: string }).bid.toLowerCase());
+    if (!b || b.campaign_id !== t.c.id) return reply.code(404).send({ error: 'not_found' });
+    const r = removePastBattle(db(), t.c, b, req.actor!.id, now());
+    if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
+    return view(t.c, t.role);
   });
 
   /** The campaign moves on to the next round, once its battles are closed; who fought none sat it out. */
