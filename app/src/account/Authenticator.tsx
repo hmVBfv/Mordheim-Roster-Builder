@@ -2,7 +2,10 @@
    scanning a QR code (or opening the link on the same phone, or typing the
    key), confirm with its first code, keep the ten recovery codes. Required
    for the admin – and later for leaders – optional for players, who may turn
-   it off again with their password. */
+   it off again with their password and a code. A new phone in place of the
+   old takes a code of the old one, or a recovery code (security review
+   AUTH-3, AUTH-15): a stolen session alone does not change the second
+   factor. */
 import { useEffect, useState } from 'react';
 import { copyText, saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
@@ -40,6 +43,7 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
   const { ref, open, close } = useSheet();
   const [step, setStep] = useState<Step>({ at: 'intro' });
   const [code, setCode] = useState('');
+  const [current, setCurrent] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,20 +56,22 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
   const start = () => run(async () => {
     const s = await api<{ secret: string; uri: string }>('/account/totp/setup', { body: {} });
     setCode('');
+    setCurrent('');
     setStep({ at: 'scan', ...s });
   });
   const enable = () => run(async () => {
-    const r = await api<{ recoveryCodes: string[] }>('/account/totp/enable', { body: { code } });
+    const r = await api<{ recoveryCodes: string[] }>('/account/totp/enable', { body: user.totp ? { code, current } : { code } });
     setStep({ at: 'codes', codes: r.recoveryCodes });
     await refreshSession();
   });
   const disable = () => run(async () => {
-    await api('/account/totp/disable', { body: { password } });
+    await api('/account/totp/disable', { body: { password, code: current } });
     setPassword('');
+    setCurrent('');
     await refreshSession();
     close(() => onNotice('Authenticator turned off.'));
   });
-  const show = () => { setStep({ at: 'intro' }); setError(null); setCode(''); setPassword(''); open(); };
+  const show = () => { setStep({ at: 'intro' }); setError(null); setCode(''); setCurrent(''); setPassword(''); open(); };
 
   const codesText = step.at === 'codes' ? `Mordheim Campaign – recovery codes for ${user.username}\nEach works once instead of the authenticator's code.\n\n${step.codes.join('\n')}\n` : '';
 
@@ -83,11 +89,16 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
                 <p className={ui.muted}>Admins keep the authenticator. Without the phone and the codes, <code className={styles.cmd}>roster-cli totp-reset</code> on the Pi removes it.</p>
               ) : (
                 <form className={styles.form} onSubmit={(e) => { e.preventDefault(); void disable(); }}>
+                  <p className={ui.muted}>To turn it off: your password and a code.</p>
                   <label className={ui.field}>
-                    <span>Your password, to turn it off</span>
+                    <span>Your password</span>
                     <input className={ui.input} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                   </label>
-                  <div className={ui.row}><button type="submit" className={ui.buttonQuiet} disabled={busy || !password}>Turn off</button></div>
+                  <label className={ui.field}>
+                    <span>A code from the authenticator – or a recovery code</span>
+                    <input className={`${ui.input} ${styles.code}`} autoComplete="one-time-code" maxLength={20} value={current} onChange={(e) => setCurrent(e.target.value)} required />
+                  </label>
+                  <div className={ui.row}><button type="submit" className={ui.buttonQuiet} disabled={busy || !password || !current.trim()}>Turn off</button></div>
                 </form>
               )}
               {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
@@ -122,13 +133,19 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
                 <p className={ui.muted}>Time-based, 6 digits, every 30 seconds.</p>
               </details>
               <label className={ui.field}>
-                <span>2. The code the app shows now</span>
+                <span>{user.totp ? '2. The code the new app shows now' : '2. The code the app shows now'}</span>
                 <input className={`${ui.input} ${styles.code}`} inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,7}" maxLength={7}
                   value={code} onChange={(e) => setCode(e.target.value)} required />
               </label>
+              {user.totp && (
+                <label className={ui.field}>
+                  <span>3. A code from your current authenticator – or a recovery code</span>
+                  <input className={`${ui.input} ${styles.code}`} autoComplete="off" maxLength={20} value={current} onChange={(e) => setCurrent(e.target.value)} required />
+                </label>
+              )}
               {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
               <div className={ui.row}>
-                <button type="submit" className={ui.button} disabled={busy || code.replace(/\s/g, '').length !== 6}>Turn on</button>
+                <button type="submit" className={ui.button} disabled={busy || code.replace(/\s/g, '').length !== 6 || (user.totp && !current.trim())}>{user.totp ? 'Switch to the new phone' : 'Turn on'}</button>
                 <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
               </div>
             </form>

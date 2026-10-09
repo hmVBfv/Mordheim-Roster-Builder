@@ -150,6 +150,36 @@ describe('the account', () => {
     expect(s.calls.filter((c) => c.path === '/auth/me').length).toBeGreaterThan(1);
   });
 
+  it('a new phone in place of the old: a code of the current authenticator goes with it; turning it off takes the password and a code (security review AUTH-3, AUTH-15)', async () => {
+    let totp = true;
+    const s = fakeServer({
+      'GET /auth/me': () => ({ user: { ...ME, totp }, pending: false }),
+      'GET /auth/sessions': () => ({ sessions: [] }),
+      'POST /account/totp/setup': () => ({ secret: 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP', uri: 'otpauth://totp/Mordheim%20Campaign%3Akai?secret=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP&issuer=Mordheim%20Campaign' }),
+      'POST /account/totp/enable': (b) => (b.current === '654321' ? { recoveryCodes: ['abcd-efgh'] } : [400, { error: 'invalid', problem: 'a code from your current authenticator (or a recovery code) is needed' }]),
+      'POST /account/totp/disable': (b) => (b.password === 'correct horse battery' && b.code === '111111' ? (totp = false, { ok: true }) : [400, { error: 'invalid', problem: 'the code is not right' }]),
+    });
+    const user = userEvent.setup();
+    at('/more');
+    await user.click(await screen.findByRole('button', { name: 'Manage' }));
+    const sheet = screen.getByRole('dialog', { name: 'Authenticator' });
+    await user.click(within(sheet).getByRole('button', { name: 'Set up on a new phone' }));
+    await user.type(await within(sheet).findByLabelText('2. The code the new app shows now'), '123456');
+    await user.type(within(sheet).getByLabelText('3. A code from your current authenticator – or a recovery code'), '654321');
+    await user.click(within(sheet).getByRole('button', { name: 'Switch to the new phone' }));
+    expect(await within(sheet).findByRole('list', { name: 'Recovery codes' })).toBeTruthy();
+    expect(s.calls.find((c) => c.path === '/account/totp/enable')!.body).toEqual({ code: '123456', current: '654321' });
+    await user.click(within(sheet).getByRole('button', { name: 'I have kept them' }));
+
+    await user.click(await screen.findByRole('button', { name: 'Manage' }));
+    const again = screen.getByRole('dialog', { name: 'Authenticator' });
+    await user.type(within(again).getByLabelText('Your password'), 'correct horse battery');
+    await user.type(within(again).getByLabelText('A code from the authenticator – or a recovery code'), '111111');
+    await user.click(within(again).getByRole('button', { name: 'Turn off' }));
+    expect(await screen.findByText('Authenticator turned off.')).toBeTruthy();
+    expect(s.calls.find((c) => c.path === '/account/totp/disable')!.body).toEqual({ password: 'correct horse battery', code: '111111' });
+  });
+
   it('changes the password and signs out other devices', async () => {
     const now = new Date().toISOString();
     let sessions = [
