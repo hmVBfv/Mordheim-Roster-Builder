@@ -5,6 +5,7 @@
    it showed last. */
 import { api } from '../account/api.ts';
 import type { CasualtyPayload, EventPayload, Outcome } from '../battle/api.ts';
+import { ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 import type { ChapterKind, ChapterLang } from './chapters.ts';
 
@@ -23,7 +24,7 @@ export interface Chapter extends Omit<ChapterSummary, 'de' | 'en'> { de: Chapter
 /** `chapters`: phase 4a5, absent in a timeline kept from before. */
 export interface TimelineData { positions: Position[]; entries: TimelineEntry[]; outcomes: TimelineOutcome[]; marks: TimelineMark[]; chapters?: ChapterSummary[] }
 
-const key = (cid: string) => `timeline:${cid}`;
+const key = (cid: string) => ownKey('timeline:', cid);
 
 export async function cachedTimeline(cid: string): Promise<TimelineData | null> {
   return ((await db.meta.get(key(cid)))?.value as TimelineData | undefined) ?? null;
@@ -40,10 +41,10 @@ export const moveBlock = (cid: string, type: ItemType, id: string, to: { segment
 
 /** A chapter with its texts: kept on the device once read, asked anew when the timeline lists a newer one. */
 export async function getChapter(cid: string, c: Pick<ChapterSummary, 'id' | 'updatedAt'>): Promise<Chapter> {
-  const kept = (await db.meta.get(`chapter:${c.id}`))?.value as Chapter | undefined;
+  const kept = (await db.meta.get(ownKey('chapter:', c.id)))?.value as Chapter | undefined;
   if (kept && kept.updatedAt === c.updatedAt) return kept;
   const r = await api<{ chapter: Chapter }>(`/campaigns/${cid}/chapters/${c.id}`);
-  await db.meta.put({ key: `chapter:${c.id}`, value: r.chapter });
+  await db.meta.put({ key: ownKey('chapter:', c.id), value: r.chapter });
   return r.chapter;
 }
 /** Imports a chapter (a leader): its languages and, for a new one or a new place, where it stands in the story. */

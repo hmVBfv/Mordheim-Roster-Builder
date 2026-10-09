@@ -4,16 +4,15 @@
    warband lists load it with the app shell. */
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db.ts';
+import { ownerId, ownKey } from '../account/owner.ts';
 
 export function useCampaignName(id: string | null | undefined): string | null {
   return useLiveQuery(async () => {
     if (!id) return null;
-    const v = (await db.meta.get(`campaign:${id}`))?.value as { campaign?: { name?: string } } | undefined;
+    const v = (await db.meta.get(ownKey('campaign:', id)))?.value as { campaign?: { name?: string } } | undefined;
     if (v?.campaign?.name) return v.campaign.name;
-    for (const row of await db.meta.where('key').startsWith('campaigns:').toArray()) {
-      const c = (row.value as { id: string; name: string }[]).find((x) => x.id === id);
-      if (c) return c.name;
-    }
-    return null;
+    // the list of this account's campaigns, not another account's on the same device
+    const list = (await db.meta.get(`campaigns:${ownerId()}:list`))?.value as { id: string; name: string }[] | undefined;
+    return list?.find((x) => x.id === id)?.name ?? null;
   }, [id]) ?? null;
 }

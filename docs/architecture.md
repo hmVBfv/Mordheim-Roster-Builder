@@ -313,6 +313,15 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
   Nutzer; was ohne Anmeldung entstand, bleibt auf dem Gerät, bis die
   Spielerin es mit „Keep … in my account“ ins Konto nimmt. Listen zeigen
   keine Warbands eines anderen Kontos (ein geteiltes Gerät).
+- **Ein Gerät, mehrere Konten** (Sicherheitsprüfung 09.10.2026, CLIENT-1):
+  Was das Gerät von Kampagnen behält (Kampagne, Liste, Notizen, Bilder,
+  Zeitleiste, Kapitel, Schlachten, Warbands einer Kampagne), steht unter
+  einem Schlüssel mit der Nutzer-ID (`app/src/account/owner.ts`). Beim
+  Abmelden löscht die App alles davon, beim Anmelden eines anderen Kontos das
+  der anderen; der Server schickt beim Abmelden zusätzlich
+  `Clear-Site-Data: "cache"`. Die Warteschlange zeigt und sendet nur, was das
+  angemeldete Konto selbst geschrieben hat. Abgemeldet zeigen Listen nur
+  Warbands ohne Besitzer.
 - **Kopfzeile:** „Saved and synced“, „n waiting“ (auch offline, auf dem
   Gerät gezählt), „Check“ bei einem Konflikt, „Not synced“ bei einem Fehler;
   ohne Anmeldung wie bisher „Saved on this device“.

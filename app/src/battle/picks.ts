@@ -6,6 +6,7 @@
 import type { GameData } from '@mordheim/core';
 import { useCallback, useEffect, useState } from 'react';
 import { readWarband } from '../campaign/api.ts';
+import { ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 import { loadGameData } from '../game/gameData.ts';
 import { warriorsOf, type Pick } from './sides.ts';
@@ -13,7 +14,7 @@ import { warriorsOf, type Pick } from './sides.ts';
 /** Loads a warband of the campaign as members see it; offline, as last seen here. */
 export function useWarbandLoader(cid: string): (warbandId: string) => Promise<unknown> {
   return useCallback(async (wid: string) => {
-    const k = `cw:${cid}:${wid}`;
+    const k = ownKey('cw:', `${cid}:${wid}`);
     try {
       const r = await readWarband(cid, wid);
       const data = r.draft?.data ?? r.head.data;

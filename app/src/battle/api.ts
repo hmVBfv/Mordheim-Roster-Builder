@@ -2,6 +2,7 @@
    The last state of a battle is kept on the device, so the game night
    shows it offline; with its seq the device asks only for what is newer. */
 import { api } from '../account/api.ts';
+import { ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 
 export type Outcome = '' | 'victory' | 'defeat' | 'draw' | 'routed';
@@ -39,7 +40,7 @@ export interface BattleSummary {
   takenOver?: boolean; playedAt?: string | null;
 }
 
-const key = (bid: string) => `battle:${bid}`;
+const key = (bid: string) => ownKey('battle:', bid);
 export const battleTitle = (b: { round: number; title: string }) => `Battle ${b.round}${b.title ? ` · ${b.title}` : ''}`;
 
 export async function cachedBattle(bid: string): Promise<BattleView | null> {

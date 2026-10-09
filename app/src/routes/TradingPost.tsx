@@ -5,10 +5,9 @@
    ledger (V4–V7, docs/behaviour-changes.md). Before the first battle the
    warband buys from its lists (⋯ → Equipment on a warrior's card). */
 import * as core from '@mordheim/core';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { db, type StoredWarband } from '../db/db.ts';
+import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
   buyRecipients, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
@@ -19,6 +18,7 @@ import styles from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
+import { useWarbandRecord } from '../sync/local.ts';
 
 const TABS = [['buy', 'Buy'], ['search', 'Search rare'], ['sell', 'Sell'], ['give', 'Give']] as const;
 /** Rare items listed before "Show all". */
@@ -409,7 +409,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 
 export function TradingPost() {
   const { id = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null) {
     return (
