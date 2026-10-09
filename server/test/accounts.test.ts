@@ -313,12 +313,12 @@ describe('one\'s own account', () => {
     expect((await s.call({ url: '/api/v1/auth/me', token: theirs })).json()).toMatchObject({ user: { username: 'other' } });
   });
 
-  it('a player may turn the authenticator off again, with the password', async () => {
+  it('a player may turn the authenticator off again, with the password and a code (security review AUTH-15)', async () => {
     const s = await startAccounts();
     const p = await s.user('player', { totp: true });
     const token = p.session();
-    expect((await s.call({ url: '/api/v1/account/totp/disable', body: { password: 'wrong password!' }, token })).statusCode).toBe(400);
-    expect((await s.call({ url: '/api/v1/account/totp/disable', body: { password: PASSWORD }, token })).json()).toEqual({ ok: true });
+    expect((await s.call({ url: '/api/v1/account/totp/disable', body: { password: 'wrong password!', code: p.code() }, token })).statusCode).toBe(400);
+    expect((await s.call({ url: '/api/v1/account/totp/disable', body: { password: PASSWORD, code: p.code() }, token })).json()).toEqual({ ok: true });
     expect((await login(s, 'player')).json()).toMatchObject({ stage: 'full' });
   });
 

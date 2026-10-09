@@ -24,3 +24,8 @@ type Log = Pick<pino.BaseLogger, 'warn'>;
 export function loginFailed(log: Log, ip: string, account: string): void {
   log.warn({ event: 'login_failed', ip, account }, 'login failed');
 }
+
+/** A try the brake refused – not a failure Fail2Ban counts: the owner of a locked-out account must not get the own address banned. */
+export function loginBraked(log: Log, ip: string, account: string): void {
+  log.warn({ event: 'login_braked', ip, account }, 'login braked');
+}
