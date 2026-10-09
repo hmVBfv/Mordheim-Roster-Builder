@@ -1,13 +1,15 @@
 /* The timeline (phase 4a3, part 2; docs/architecture.md "Endpunkte"): what
    the app needs to put the story together beyond notes and pictures – the
-   protocol of every battle, the marks, the places blocks were moved to –
-   and moving a block. What each may see is decided in timeline.ts for the
+   protocol of every battle, the marks, the places blocks were moved to,
+   the published chapters (4a5) – and moving a block; reading a chapter,
+   importing one. What each may see is decided in timeline.ts for the
    one who asks (ADR 0011). */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { campaignById, roleIn, type CampaignRole, type CampaignRow } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { can, type Action, type Actor } from './policy.ts';
 import { campaignEntries, campaignMarks, campaignOutcomes, ITEM_TYPES, listPositions, moveBlock, type ItemType } from './timeline.ts';
+import { chapterById, ChapterBody, chapterOf, listChapters, putChapter, removeChapter, summaryOf } from './chapters.ts';
 
 export interface TimelineDeps { db: DB | null; now: () => Date }
 
@@ -33,7 +35,43 @@ export function registerTimelineRoutes(app: FastifyInstance, deps: TimelineDeps)
   app.get('/api/v1/campaigns/:id/timeline', { config: { action: 'campaign.read' } }, async (req, reply) => {
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
-    return { positions: listPositions(db(), t.c.id, viewer(req.actor!, t.role)), entries: campaignEntries(db(), t.c.id), outcomes: campaignOutcomes(db(), t.c.id), marks: campaignMarks(db(), t.c.id) };
+    return {
+      positions: listPositions(db(), t.c.id, viewer(req.actor!, t.role)), entries: campaignEntries(db(), t.c.id), outcomes: campaignOutcomes(db(), t.c.id), marks: campaignMarks(db(), t.c.id),
+      chapters: listChapters(db(), t.c.id),
+    };
+  });
+
+  /** A published chapter with its text (4a5): every member reads it. */
+  app.get('/api/v1/campaigns/:id/chapters/:chid', { config: { action: 'campaign.read' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.read');
+    if (!t) return reply;
+    const r = chapterById(db(), (req.params as { chid: string }).chid.toLowerCase());
+    if (!r || r.campaign_id !== t.c.id || r.deleted_at) return reply.code(404).send({ error: 'not_found' });
+    return { chapter: chapterOf(r) };
+  });
+
+  /** Imports a chapter, or imports it anew (a leader): its languages and its place in the story. */
+  app.put('/api/v1/campaigns/:id/chapters/:chid', { config: { action: 'campaign.manage' }, schema: { body: { type: 'object' } } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    const chid = (req.params as { chid: string }).chid.toLowerCase();
+    if (!UUID.test(chid)) return reply.code(400).send({ error: 'invalid', problem: 'no such chapter' });
+    const parsed = ChapterBody.safeParse(req.body);
+    if (!parsed.success) {
+      const first = parsed.error.issues.slice(0, 2).map((i) => `${i.path.join('.') || '(top)'}: ${i.message}`).join('; ');
+      return reply.code(400).send({ error: 'invalid', problem: `not a chapter (${first})` });
+    }
+    const r = putChapter(db(), t.c.id, chid, parsed.data, req.actor!.id, deps.now());
+    if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
+    return { chapter: summaryOf(r.chapter) };
+  });
+
+  /** Takes a chapter out of the timeline again (a leader). */
+  app.delete('/api/v1/campaigns/:id/chapters/:chid', { config: { action: 'campaign.manage' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    if (!removeChapter(db(), t.c.id, (req.params as { chid: string }).chid.toLowerCase(), req.actor!.id, deps.now())) return reply.code(404).send({ error: 'not_found' });
+    return { removed: true };
   });
 
   app.put('/api/v1/campaigns/:id/timeline/:type/:itemId', {

@@ -227,9 +227,18 @@ nächtlichen Wiederherstellungstest wieder weg), dann genauso produktiv:
    die Stufe „After battle N“, die Kampagnenebene an, ab jetzt Trading Post
    (behaviour-changes.md, Entscheidung 2). Spätestens die Nachbereitung der
    ersten Schlacht in der App holt das nach.
-5. Prüfen: die Übersicht (jede Warband „✓ Entered after battle N“, die
-   Schlachten „before the app“, nichts „Open for you“), die Zeitleiste.
-6. Der nächste Spielabend: „New battle“ legt Schlacht N+1 an.
+5. Der Leiter importiert die veröffentlichten Kapitel: Zeitleiste →
+   „Import chapters…“, alle Dateien aus `_posts/de/` und `_posts/en/` des
+   Chronik-Repos auf einmal. Deutsche und englische Datei desselben `ref`
+   werden ein Kapitel; jedes bekommt seine Stelle (Prolog vor der Kampagne,
+   `battle-N` bei Schlacht N, `interlude-N` im Zwischenspiel N, ein anderes
+   wie `pits-interlude` nach der letzten Schlacht, die vor ihm erschien) –
+   vor dem Import prüfen und bei Bedarf ändern. Ein späterer Import
+   desselben Kapitels ersetzt den Text und lässt die Stelle.
+6. Prüfen: die Übersicht (jede Warband „✓ Entered after battle N“, die
+   Schlachten „before the app“, nichts „Open for you“), die Zeitleiste mit
+   den Kapiteln.
+7. Der nächste Spielabend: „New battle“ legt Schlacht N+1 an.
 
 Die Stände der Gruppe tragen keine Stufen-Snapshots (Entscheidung E in der
 [Roadmap](roadmap.md#offene-entscheidungen)): der erste Vergleich „What
