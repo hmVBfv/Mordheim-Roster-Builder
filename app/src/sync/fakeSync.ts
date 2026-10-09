@@ -10,7 +10,10 @@
    kept here), a leader's confirmation with the start tag. After a battle
    (phase 4a4): closing it, marking a warband "after" it (the changes from
    `opts.changes`, which the specs compute with core as the server does),
-   moving the campaign on. */
+   moving the campaign on; the campaign's house rules, and what the
+   overview shows of each warband's newest version (rules that differ,
+   districts held). */
+import { effectiveHouse, houseDifferences } from '@mordheim/core';
 export interface FakeVersion { rev: number; data: unknown; createdAt: string; source: string; note?: string }
 export interface FakeWarband {
   id: string; headRev: number; versions: FakeVersion[]; archivedAt: string | null; seq: number;
@@ -51,6 +54,7 @@ export interface FakeEnrolment {
 }
 export interface FakeCampaign {
   id: string; name: string; round: number; createdAt: string;
+  houseRules?: Record<string, unknown>;
   members: { userId: string; displayName: string; username: string; role: FakeRole; canLead: boolean }[];
   enrolments: FakeEnrolment[];
 }
@@ -72,6 +76,7 @@ export function createFakeSync(opts: {
   me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; wbName?: (wb: string) => string;
   /** What changed between two saves, as the server's core finds and explains it. */
   changes?: (before: unknown, after: unknown, battle: { id: string; round: number }) => FakeChange[];
+  districtName?: (id: string) => string;
 } = {}) {
   const me = opts.me ?? { id: 'u1', username: 'kai', displayName: ME_NAME };
   const totalsOf = opts.totals ?? (() => NO_TOTALS);
@@ -98,18 +103,25 @@ export function createFakeSync(opts: {
   const view = (c: FakeCampaign) => {
     const role = roleOf(c)!;
     return {
-      campaign: { id: c.id, name: c.name, round: c.round, houseRules: {}, createdAt: c.createdAt, updatedAt: c.createdAt },
+      campaign: { id: c.id, name: c.name, round: c.round, houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
       role,
       members: c.members.map(({ canLead, ...m }) => ({ ...m, joinedAt: c.createdAt, ...(role === 'leader' ? { canLead } : {}) })),
       enrolments: c.enrolments.map((e) => ({
         id: e.id, warbandId: e.warbandId, playerId: e.playerId, player: e.player, status: e.status, fromRound: e.fromRound,
         createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
         headRev: s.warbands.get(e.warbandId)?.headRev ?? 1, updatedAt: c.createdAt,
+        ...standing(c, e),
       })),
       battles: [...s.battles.values()].filter((b) => b.campaignId === c.id).map(battleSummary),
     };
   };
 
+  /** What every member sees of a warband's newest version (server/src/campaigns.ts standing). */
+  const standing = (c: FakeCampaign, e: FakeEnrolment) => {
+    const d = (dataOf(e) ?? {}) as { house?: unknown; campaign?: { districts?: Record<string, string> } };
+    const held = Object.entries(d.campaign?.districts ?? {}).filter(([, v]) => v === 'foothold' || v === 'control');
+    return { houseDiffers: houseDifferences(c.houseRules ?? {}, d.house), districts: held.map(([id, hold]) => ({ id, name: opts.districtName?.(id) ?? id, hold })) };
+  };
   const publicTag = (t: FakeTag) => ({ id: t.id, kind: t.kind, rev: t.rev, round: t.round, battleId: t.battleId, totals: t.totals, createdBy: t.createdBy, createdAt: t.createdAt });
 
   /* ---- battles ---- */
@@ -380,6 +392,11 @@ export function createFakeSync(opts: {
       return json(200, view(c));
     }
     if (method === 'PATCH' && rest === '') { if (!lead) return forbidden; c.name = String(body.name).trim(); return json(200, view(c)); }
+    if (method === 'PUT' && rest === '/house-rules') {
+      if (!lead) return forbidden;
+      c.houseRules = { ...effectiveHouse(body.rules), showRarity: false } as unknown as Record<string, unknown>;
+      return json(200, view(c));
+    }
     let x: RegExpMatchArray | null;
     if ((x = rest.match(/^\/members\/([^/]+)$/))) {
       if (!lead) return forbidden;

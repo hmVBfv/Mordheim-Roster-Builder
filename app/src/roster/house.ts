@@ -4,7 +4,9 @@
    equipment list", on by default, is offered the other way round as
    "Equipment beyond the lists". Switching a rule on starts it at a sensible
    value; its value then moves in steps. The changes are core's own house
-   rule actions (setHouseNum, setHouseBool, setHsGrade …). */
+   rule actions (setHouseNum, setHouseBool, setHsGrade …). A campaign's
+   house rules (phase 4a4) are the same switches, held on the server; a
+   warband in the campaign takes them over into its own file. */
 import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 
@@ -102,17 +104,18 @@ function valueOf(h: Record<string, unknown>, r: RuleDef): string {
 
 const bounds = (r: RuleDef) => (r.kind === 'price' ? { min: 25, max: 200, step: 5 } : { min: r.min ?? 0, max: r.max ?? 999, step: r.step ?? 1 });
 
-export function houseView(data: core.GameData, s: WarbandState): { groups: { key: string; label: string; rules: RuleView[] }[]; count: number } {
+/** `campaign`: a campaign's rules, for every warband – what a rule says as written is each warband's own, and the display setting is the player's, not the campaign's. */
+export function houseView(data: core.GameData, s: WarbandState, o: { campaign?: boolean } = {}): { groups: { key: string; label: string; rules: RuleView[] }[]; count: number } {
   const h = hr(s);
   const plain = core.ctxOf(data, { ...s, house: core.houseDefaults() });
-  const rules = RULES.map((r): RuleView => {
+  const rules = RULES.filter((r) => !o.campaign || r.group !== 'show').map((r): RuleView => {
     const on = isOn(h, r);
     const b = bounds(r);
     const n = Number(h[r.key]);
     const grades = r.grades?.map((g) => ({ grade: g, played: ((h[r.key] ?? {}) as Record<string, boolean>)[g] !== false })) ?? [];
     return {
       key: r.key, group: r.group, label: r.label, kind: r.kind,
-      std: typeof r.std === 'function' ? r.std(plain) : r.std,
+      std: typeof r.std === 'function' ? (o.campaign ? 'each warband’s own' : r.std(plain)) : r.std,
       on, effect: r.on ?? '', value: on ? valueOf(h, r) : '', unit: r.unit ?? '', grades,
       bodyOnly: r.key === 'priceArmour' && on ? !!h.armourBodyOnly : null,
       canLess: on && r.kind !== 'bool' && r.kind !== 'grades' && n - b.step >= b.min,
@@ -120,7 +123,7 @@ export function houseView(data: core.GameData, s: WarbandState): { groups: { key
     };
   });
   return {
-    groups: GROUPS.map(([key, label]) => ({ key, label, rules: rules.filter((r) => r.group === key) })),
+    groups: GROUPS.map(([key, label]) => ({ key, label, rules: rules.filter((r) => r.group === key) })).filter((g) => g.rules.length > 0),
     count: rules.filter((r) => r.on).length,
   };
 }
@@ -177,3 +180,39 @@ export function declaration(ctx: core.Ctx): string {
   return d.length ? `House rules: ${d.map((x) => `${x.label}: ${x.value}`).join('; ')}` : '';
 }
 
+
+/* ---- a campaign's house rules (phase 4a4) ---- */
+
+const LABEL_OF: Record<string, string> = { eqLimitOn: 'Equipment beyond the lists', rangedCapOn: 'Limit models with ranged weapons', armourBodyOnly: 'Armour: body armour only' };
+
+/** A rule's name, for a key core reports (houseDifferences). */
+export function ruleLabel(key: string): string {
+  return LABEL_OF[key] ?? ruleOf(key)?.label ?? key;
+}
+
+/** The rules in which a warband's own differ from its campaign's, by name (one name for a rule and its value). */
+export function differingRules(campaign: unknown, own: unknown): string[] {
+  return [...new Set(core.houseDifferences(campaign, own).map((k) => (k === 'rangedCap' ? ruleLabel('rangedCapOn') : ruleLabel(k))))];
+}
+
+/** A stand-in warband carrying a campaign's rules, so the warband's own switches work on them. */
+export function campaignHouseState(data: core.GameData, rules: unknown): WarbandState {
+  return { ...core.newWarband(data, 'merc'), house: core.effectiveHouse(rules) };
+}
+
+/** Takes a campaign's house rules over into the warband: each rule that differs, with core's own actions; the campaign's notes if it has any. "Show rarity" stays the player's. */
+export function adoptHouse(ctx: core.Ctx, rules: unknown): WarbandState {
+  const t = core.effectiveHouse(rules) as unknown as Record<string, unknown>;
+  let s = ctx.s;
+  const c = () => core.ctxOf(ctx.data, s);
+  for (const k of core.houseDifferences(rules, s.house)) {
+    const v = t[k];
+    if (k === 'hsGrades' || k === 'dpGrades') {
+      for (const [g, on] of Object.entries(v as Record<string, boolean>)) s = k === 'hsGrades' ? core.setHsGrade(c(), g, on) : core.setDpGrade(c(), g, on);
+    } else if (typeof v === 'boolean') s = core.setHouseBool(c(), k as Parameters<typeof core.setHouseBool>[1], v);
+    else s = core.setHouseNum(c(), k as Parameters<typeof core.setHouseNum>[1], v);
+  }
+  const notes = String(t.notes ?? '');
+  if (notes && notes !== core.houseRules(s).notes) s = core.setHouseNotes(c(), notes);
+  return s;
+}

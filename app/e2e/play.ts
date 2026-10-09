@@ -25,7 +25,7 @@ const changes = (before: unknown, after: unknown, b: { id: string; round: number
 
 /** The server: signed in as Kai, the warband endpoints from the stand-in. */
 export async function playServer(page: Page, signedIn = true, o: { totp?: boolean } = {}) {
-  const f = createFakeSync({ totals, changes, wbName: (wb) => rules.WARBANDS[wb]?.name ?? wb });
+  const f = createFakeSync({ totals, changes, wbName: (wb) => rules.WARBANDS[wb]?.name ?? wb, districtName: (id) => rules.DISTRICTS.find((d) => d.id === id)?.name ?? id });
   let me = signedIn;
   const user = { ...KAI, totp: !!o.totp };
   await page.route('**/api/v1/**', async (route) => {

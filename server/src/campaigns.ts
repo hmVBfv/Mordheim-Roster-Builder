@@ -6,7 +6,8 @@
    (ADR 0002). Changing a warband's enrolment gives the warband a new seq, so
    its owner's devices learn it on the next sync. */
 import { randomUUID } from 'node:crypto';
-import type { StageTotals } from '@mordheim/core';
+import { effectiveHouse, houseDifferences, type StageTotals } from '@mordheim/core';
+import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { listBattles, type BattleSummary } from './battles.ts';
 import type { DB } from './db.ts';
@@ -40,6 +41,9 @@ export interface Enrolment {
   name: string; wbType: string; wbName: string; headRev: number; updatedAt: string;
   /** The latest tag in this campaign (start, after a battle), with its frozen totals. */
   tag: Tag | null;
+  /** Phase 4a4, read from its newest version: the house rules in which it differs from the campaign's (keys), and the districts it holds. */
+  houseDiffers: string[];
+  districts: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
   campaign: { id: string; name: string; round: number; houseRules: unknown; createdAt: string; updatedAt: string };
@@ -86,7 +90,20 @@ export function tagsOf(db: DB, warbandId: string, campaignId: string): Tag[] {
   return rows.map(tagOf);
 }
 
+/** What every member sees of a warband's newest version beside its tag: where its house rules differ from the campaign's, the districts it holds. */
+function standing(db: DB, warbandId: string, rev: number, house: unknown): Pick<Enrolment, 'houseDiffers' | 'districts'> {
+  const r = db.prepare("SELECT json_extract(data, '$.house') AS house, json_extract(data, '$.campaign.districts') AS districts FROM warband_versions WHERE warband_id = ? AND rev = ?")
+    .get(warbandId, rev) as { house: string | null; districts: string | null } | undefined;
+  const parse = (x: string | null | undefined): unknown => { try { return x ? JSON.parse(x) as unknown : null; } catch { return null; } };
+  const held = Object.entries((parse(r?.districts) ?? {}) as Record<string, unknown>).filter(([, v]) => v === 'foothold' || v === 'control');
+  return {
+    houseDiffers: houseDifferences(house, parse(r?.house)),
+    districts: held.map(([id, hold]) => ({ id, name: gameData().DISTRICTS.find((d) => d.id === id)?.name ?? id, hold: String(hold) })),
+  };
+}
+
 export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): CampaignView {
+  const house = JSON.parse(c.house_rules) as unknown;
   const members = (db.prepare(`SELECT m.*, u.display_name, u.username, u.totp_enabled_at FROM members m JOIN users u ON u.id = m.user_id
     WHERE m.campaign_id = ? AND m.left_at IS NULL ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'player' THEN 1 ELSE 2 END, u.display_name COLLATE NOCASE`).all(c.id) as
     (MemberRow & { display_name: string; username: string; totp_enabled_at: string | null })[])
@@ -99,9 +116,10 @@ export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): Campai
       id: e.id, warbandId: e.warband_id, playerId: e.player_id, player: e.player, status: e.status, fromRound: e.from_round,
       createdAt: e.created_at, confirmedAt: e.confirmed_at, name: e.name, wbType: e.wb_type, wbName: gameData().WARBANDS[e.wb_type]?.name ?? e.wb_type, headRev: e.head_rev, updatedAt: e.w_updated,
       tag: latestTag(db, e.warband_id, c.id),
+      ...standing(db, e.warband_id, e.head_rev, house),
     }));
   return {
-    campaign: { id: c.id, name: c.name, round: c.round, houseRules: JSON.parse(c.house_rules) as unknown, createdAt: c.created_at, updatedAt: c.updated_at },
+    campaign: { id: c.id, name: c.name, round: c.round, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
     role, members, enrolments, battles: listBattles(db, c.id),
   };
 }
@@ -132,6 +150,34 @@ export function renameCampaign(db: DB, c: CampaignRow, name: string, by: string,
   db.transaction(() => {
     db.prepare('UPDATE campaigns SET name = ?, updated_at = ? WHERE id = ?').run(name, iso(now), c.id);
     log(db, by, 'campaign.rename', c.id, { type: 'campaign', id: c.id }, { from: c.name, to: name }, now);
+  })();
+}
+
+/* ---- the campaign's house rules (phase 4a4) ---- */
+
+const grades = (keys: string[]) => z.object(Object.fromEntries(keys.map((k) => [k, z.boolean()]))).partial().strict();
+const int = (min: number, max: number) => z.number().int().min(min).max(max);
+const orNone = (min: number, max: number) => z.union([z.literal(''), int(min, max)]);
+/** House rules as a leader sends them: the Roster Builder's keys, each within the bounds the app offers. */
+export const HouseRulesBody = z.object({
+  startGold: orNone(0, 10_000), min: orNone(1, 40), max: orNone(1, 40), heroes: int(1, 20),
+  priceAll: int(25, 200), priceArmour: int(25, 200), priceBP: int(25, 200), priceMissile: int(25, 200),
+  clubSurcharge: int(0, 50), slingSurcharge: int(0, 50), rangedCap: int(0, 100),
+  armourBodyOnly: z.boolean(), freeDagger: z.boolean(), miscHench: z.boolean(), freeMarket: z.boolean(), allSkills: z.boolean(), showRarity: z.boolean(),
+  rangedCapOn: z.boolean(), rerollOne: z.boolean(), eqLimitOn: z.boolean(), hireNewLeader: z.boolean(), hsEquip: z.boolean(),
+  hsGrades: grades(['1a', '1b', '1c', '2a']), dpGrades: grades(['core', '1a', '1b', '1c', '2a']),
+  notes: z.string().max(2000),
+}).partial().strict();
+
+/** Sets the campaign's house rules – for every warband in it; "Show rarity" is each player's own display. Logged with the rules that changed. */
+export function setHouseRules(db: DB, c: CampaignRow, rules: z.infer<typeof HouseRulesBody>, by: string, now: Date): void {
+  const next = { ...effectiveHouse(rules), showRarity: false };
+  const changed = houseDifferences(JSON.parse(c.house_rules) as unknown, next);
+  const notes = (effectiveHouse(JSON.parse(c.house_rules) as unknown).notes ?? '') !== next.notes;
+  if (!changed.length && !notes) return;
+  db.transaction(() => {
+    db.prepare('UPDATE campaigns SET house_rules = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(next), iso(now), c.id);
+    log(db, by, 'campaign.house_rules', c.id, { type: 'campaign', id: c.id }, { changed, notes }, now);
   })();
 }
 

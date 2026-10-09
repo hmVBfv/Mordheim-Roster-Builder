@@ -316,6 +316,16 @@ aber vollständig und geordnet:
 - Automatisch angehängt: App-Version, Gerät, Ansicht, letzte JS-Fehler; mit
   Zustimmung die betroffene Warband-Version (macht den Fehler exakt
   nachstellbar). Verborgene Daten werden nie angehängt.
+- **Einfach melden, auch mit „funktioniert nicht“** (Rob, 09.10.2026): Wer
+  meldet, schreibt meist nur das. Deshalb trägt jede Meldung ohne Zutun den
+  Zusammenhang mit – der Bildschirm und Reiter, auf dem gemeldet wurde (mit
+  offenem Bereich von unten), die letzten Schritte davor (Bildschirme und
+  Aktionen, ohne eingegebene Texte), die Einstellungen (Theme, Layout,
+  Flavour, Online- und Sync-Stand, Rolle in der Kampagne), die Hausregeln der
+  Warband und der Kampagne. Das Formular fragt freundlich nach („Was wolltest
+  du tun? Was ist stattdessen passiert?“), verlangt aber nichts außer einem
+  Satz; ein Knopf „Problem melden“ ist überall mit einem Tipp erreichbar.
+  Was mitgeht, steht vor dem Senden lesbar da.
 - Status: neu → bestätigt → in Arbeit → behoben in Version X → geschlossen.
   Der Meldende sieht den Stand.
 - **Bearbeitung nur auf Zuruf:** Claude Code mit `/bugs` (siehe

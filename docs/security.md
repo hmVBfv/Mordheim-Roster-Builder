@@ -179,7 +179,12 @@ Protokoll und Vorschläge sind öffentlich für die Kampagne und stehen mit
 nur Leiter mit Authenticator; seine Warband „after battle N“ markieren nur
 ihr Spieler (`battle.mark`, dazu der Besitz der Warband). Der Server rechnet
 dabei Kennzahlen und Änderungen selbst aus den gespeicherten Versionen –
-was ein Gerät behauptet, zählt nicht (ADR 0005, ADR 0016).
+was ein Gerät behauptet, zählt nicht (ADR 0005, ADR 0016). Die Hausregeln
+der Kampagne setzen nur Leiter mit Authenticator (`campaign.manage`); der
+Server prüft jeden Schlüssel und seine Grenzen und speichert nichts
+Unbekanntes. Abweichende Hausregeln und gehaltene Bezirke einer Warband
+liest er per `json_extract` aus ihrer neuesten Version – Mechanik, offen
+für alle Mitglieder.
 
 **Notizen (Phase 4a3):** Was jemand von einer Notiz bekommt, entscheidet
 `server/src/notes.ts` für den Fragenden: versiegelt – bis die Schlacht
