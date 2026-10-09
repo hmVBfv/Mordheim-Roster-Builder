@@ -10,6 +10,6 @@ export async function loadScreens(): Promise<void> {
     import('../routes/Roster.tsx'), import('../routes/NewWarband.tsx'), import('../routes/TradingPost.tsx'), import('../routes/Hire.tsx'), import('../routes/HouseRules.tsx'),
     import('../account/SignIn.tsx'), import('../account/LinkAccept.tsx'), import('../account/Admin.tsx'), import('../account/Account.tsx'),
     import('../routes/Versions.tsx'), import('../routes/ImportLink.tsx'),
-    import('../campaign/Campaigns.tsx'), import('../campaign/Campaign.tsx'), import('../campaign/CampaignWarband.tsx'), import('../battle/Battle.tsx'),
+    import('../campaign/Campaigns.tsx'), import('../campaign/Campaign.tsx'), import('../campaign/CampaignWarband.tsx'), import('../battle/Battle.tsx'), import('../notes/Notes.tsx'),
   ]);
 }

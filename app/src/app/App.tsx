@@ -29,6 +29,7 @@ const Campaigns = lazy(() => import('../campaign/Campaigns.tsx').then((m) => ({ 
 const Campaign = lazy(() => import('../campaign/Campaign.tsx').then((m) => ({ default: m.Campaign })));
 const CampaignWarband = lazy(() => import('../campaign/CampaignWarband.tsx').then((m) => ({ default: m.CampaignWarband })));
 const Battle = lazy(() => import('../battle/Battle.tsx').then((m) => ({ default: m.Battle })));
+const NotesHome = lazy(() => import('../notes/Notes.tsx').then((m) => ({ default: m.NotesHome })));
 
 export function AppRoutes() {
   return (
@@ -48,7 +49,7 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/warbands/:wid" element={<CampaignWarband />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/battles/:bid" element={<Battle />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/:tab" element={<Campaign />} />}
-          {FLAVOUR === 'campaign' && <Route path="/notes" element={<Placeholder title="Notes" text="Notes, quotes and the timeline arrive with the campaign server." />} />}
+          {FLAVOUR === 'campaign' && <Route path="/notes" element={<NotesHome />} />}
           {FLAVOUR === 'campaign' && <Route path="/sign-in" element={<SignIn />} />}
           {FLAVOUR === 'campaign' && <Route path="/invite" element={<LinkAccept />} />}
           {FLAVOUR === 'campaign' && <Route path="/reset" element={<LinkAccept />} />}

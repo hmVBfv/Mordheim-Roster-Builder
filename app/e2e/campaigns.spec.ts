@@ -223,3 +223,60 @@ test('a player at the game night sees the protocol and suggests a correction', a
   await tapTargets(page);
   await shot(page, 'game-night-player');
 });
+
+/* Notes (phase 4a3). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Notes tab: who can read a note, chosen when writing, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.noteFrom(c.id, { author: 'Ben', text: 'Skritch goes for the captain.', battleId: b.id, visibility: 'sealed' });
+    srv.noteFrom(c.id, { author: 'Anna', text: 'Brother Anselm passes his fear test on a double one.', battleId: b.id, turn: 3, kind: 'dice' });
+    srv.noteFrom(c.id, { author: 'Anna', text: 'The ferryman is in the Countess’s pay.', battleId: b.id, visibility: 'leader' });
+    await page.goto(`campaign/${c.id}/notes`);
+    await expect(page.getByText('This note is sealed. It opens for everyone when battle 1 is closed.')).toBeVisible();
+    await page.getByRole('button', { name: 'New note' }).click();
+    const sheet = page.getByRole('dialog', { name: 'A note' });
+    await sheet.getByLabel('What happened').fill('Ulrich means to cut the ferry rope once the rats are aboard.');
+    await sheet.getByRole('radio', { name: /Sealed until/ }).check();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-note-new`);
+    await sheet.getByRole('button', { name: 'Save the note' }).click();
+    await expect(page.getByRole('region', { name: 'Battle 1 · Hel Fenn ferry' }).getByText('Ulrich means to cut the ferry rope once the rats are aboard.')).toBeVisible();
+    await expect.poll(() => [...srv.state.notes.values()].filter((n) => n.author === 'Kai').length, { timeout: 8000 }).toBe(1);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-notes`);
+  });
+}
+
+test('notes and quotes at the game night, in the protocol by turn', async ({ page }) => {
+  const srv = await playServer(page);
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others[0]!, role: 'leader' }, { ...others[1]!, pending: false }] });
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+  b.turn = 3;
+  srv.entryElsewhere(b.id, { id: '11111111-1111-4111-8111-111111111111', turn: 2, kind: 'event', payload: { text: 'The ferry drifts.' }, author: 'Anna' });
+  await page.goto(`campaign/${c.id}/battles/${b.id}`);
+  await page.getByRole('button', { name: '+ Quote' }).click();
+  const q = page.getByRole('dialog', { name: 'A quote · turn 3' });
+  await expect(q.getByLabel('Who says it?').locator('option')).not.toHaveCount(1);
+  await q.getByLabel('Who says it?').selectOption({ index: 1 });
+  await q.getByLabel('What was said').fill('Bolt the doors. Whatever knocks tonight is not a customer.');
+  await tapTargets(page);
+  await shot(page, 'game-night-quote');
+  await q.getByRole('button', { name: 'Save the note' }).click();
+  await page.getByRole('button', { name: '+ Note' }).click();
+  const n = page.getByRole('dialog', { name: 'A note · turn 3' });
+  await n.getByLabel('Kind').selectOption('scene');
+  await n.getByLabel('What happened').fill('Ulrich holds the gangway alone.');
+  await n.getByRole('button', { name: 'Save the note' }).click();
+  const protocol = page.getByRole('list', { name: 'Protocol' });
+  await expect(protocol.getByRole('listitem')).toHaveCount(3);
+  await expect(protocol.getByRole('listitem').last()).toContainText('The ferry drifts.');
+  await expect.poll(() => srv.state.notes.size, { timeout: 8000 }).toBe(2);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'game-night-notes');
+});

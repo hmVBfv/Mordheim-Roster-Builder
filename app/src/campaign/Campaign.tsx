@@ -19,6 +19,7 @@ import {
 } from './api.ts';
 import styles from './Campaign.module.css';
 import { NewBattleSheet } from './NewBattle.tsx';
+import { NotesTab } from '../notes/Notes.tsx';
 import { battleTitle } from '../battle/api.ts';
 
 /** The campaign as last seen on this device, then as the server has it now. */
@@ -277,6 +278,7 @@ export function Campaign() {
   if (!view || !user) return error ? <section className={ui.page}><p className={ui.message} role="alert">{error}</p></section> : null;
   const lead = view.role === 'leader';
   const manage = tab === 'manage' && lead;
+  const notes = tab === 'notes';
   return (
     <section className={ui.page}>
       <header>
@@ -284,15 +286,16 @@ export function Campaign() {
         <p className={ui.muted}>{roundName(view.campaign.round)} · you are {view.role === 'viewer' ? 'watching' : ROLE_NAMES[view.role].toLowerCase()}</p>
       </header>
       {error && <p className={ui.message} role="status">{error} Shown as last seen.</p>}
-      {lead && (
-        <nav className={styles0.tabs} aria-label="Campaign">
-          <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
-          <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>
-        </nav>
-      )}
+      <nav className={styles0.tabs} aria-label="Campaign">
+        <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
+        <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
+        {lead && <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>}
+      </nav>
       {manage
         ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
-        : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
+        : notes
+          ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
+          : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>

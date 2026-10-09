@@ -1,41 +1,13 @@
 /* The sheets of the game night (phase 4a2): a casualty and an event for the
    protocol (leaders), a correction (players). What they make goes to the
    outbox first – a table without a connection loses nothing. */
-import type { GameData } from '@mordheim/core';
-import { useEffect, useId, useState, type RefObject } from 'react';
-import { loadGameData } from '../game/gameData.ts';
+import { useId, useState, type RefObject } from 'react';
 import ui from '../ui/ui.module.css';
 import type { CasualtyPayload, Entry, Participant, Side } from './api.ts';
-import { keyOf, warriorsOf, type Pick } from './sides.ts';
+import { keyOf, type Pick } from './sides.ts';
 import styles from './Battle.module.css';
 
 type Sheet = { dialogRef: RefObject<HTMLDialogElement | null>; close: (then?: () => void) => void };
-
-/** The warriors of every warband that fought, from their states as members read them. */
-export function usePicks(participants: Participant[], load: (warbandId: string) => Promise<unknown>, active: boolean): { picks: Record<string, Pick[]>; error: string | null } {
-  const [picks, setPicks] = useState<Record<string, Pick[]>>({});
-  const [error, setError] = useState<string | null>(null);
-  const ids = participants.map((p) => p.warbandId).join();
-  useEffect(() => {
-    if (!active) return;
-    let live = true;
-    void (async () => {
-      try {
-        const [{ readSave }, data] = await Promise.all([import('../sync/engine.ts'), loadGameData()]);
-        const out: Record<string, Pick[]> = {};
-        for (const id of ids.split(',').filter(Boolean)) {
-          const state = readSave(data as GameData, await load(id));
-          out[id] = state ? warriorsOf(data, state, id) : [];
-        }
-        if (live) { setPicks(out); setError(null); }
-      } catch {
-        if (live) setError('The rosters could not be loaded: pick the warband, and type the name.');
-      }
-    })();
-    return () => { live = false; };
-  }, [ids, load, active]);
-  return { picks, error };
-}
 
 const ENV = 'env';
 const OTHER = 'other';
@@ -163,7 +135,7 @@ function EventForm({ close, turn, entry, onSave }: EventFormProps & { close: She
         <h2 id="ev-title">{entry ? 'Correct the event' : `Event · turn ${turn}`}</h2>
         <label className={ui.field}>
           <span>What happened</span>
-          <textarea className={ui.textarea} value={text} maxLength={1000} rows={3} required onChange={(e) => setText(e.target.value)} />
+          <textarea className={`${ui.textarea} ${ui.writing}`} value={text} maxLength={1000} rows={3} required onChange={(e) => setText(e.target.value)} />
         </label>
         <div className={ui.row}>
           <button type="submit" className={ui.button} disabled={!text.trim()}>{entry ? 'Save the correction' : 'Add to the protocol'}</button>
@@ -192,7 +164,7 @@ function ProposalForm({ close, about, onSave }: ProposalFormProps & { close: She
         <p className={ui.muted}>{about ? `About: ${about}` : 'About the battle.'} Only a leader writes the protocol; they take it over or not.</p>
         <label className={ui.field}>
           <span>What should it say?</span>
-          <textarea className={ui.textarea} value={text} maxLength={1000} rows={3} required onChange={(e) => setText(e.target.value)} />
+          <textarea className={`${ui.textarea} ${ui.writing}`} value={text} maxLength={1000} rows={3} required onChange={(e) => setText(e.target.value)} />
         </label>
         <div className={ui.row}>
           <button type="submit" className={ui.button} disabled={!text.trim()}>Send to the leader</button>
