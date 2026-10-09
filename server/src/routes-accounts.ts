@@ -253,6 +253,8 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
   app.post('/api/v1/auth/logout', { config: { action: 'auth.logout' } }, async (req, reply) => {
     revokeSession(db(), req.actor!.sessionId, now());
     setCookie(reply, '', secure, null);
+    // what the browser keeps of this account's answers (a leaders' picture's bytes) goes too (security review CLIENT-1)
+    reply.header('Clear-Site-Data', '"cache"');
     return { ok: true };
   });
 
@@ -529,6 +531,6 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
 
   app.get('/api/v1/admin/audit', { config: { action: 'admin.audit.read' } }, async (req) => {
     const p = page(req);
-    return { entries: listAudit(db(), p.limit, p.before) };
+    return { entries: listAudit(db(), req.actor!.id, p.limit, p.before) };
   });
 }

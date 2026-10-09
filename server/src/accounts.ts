@@ -216,15 +216,22 @@ export function audit(db: DB, e: AuditEntry, now: Date): number {
 
 export interface AuditSummary { seq: number; at: string; actor: string | null; action: string; targetType: string | null; target: string | null; payload: unknown }
 
-export function listAudit(db: DB, limit: number, beforeSeq?: number): AuditSummary[] {
-  const rows = db.prepare(`SELECT a.*, u.username AS actor_name, t.username AS target_name FROM audit_log a
+/** The admin's view of the log. Of a campaign the admin is not part of,
+    what happened and who did it – never what it said (names, titles,
+    wordings): the admin has no special access to campaign content
+    (docs/security.md, section 4; security review AUTHZ-1). Of a campaign
+    the admin is part of, what every member may read: the public entries. */
+export function listAudit(db: DB, adminId: string, limit: number, beforeSeq?: number): AuditSummary[] {
+  const rows = db.prepare(`SELECT a.*, u.username AS actor_name, t.username AS target_name,
+      (a.campaign_id IS NULL OR (a.visibility = 'public' AND EXISTS (SELECT 1 FROM members m WHERE m.campaign_id = a.campaign_id AND m.user_id = ? AND m.left_at IS NULL))) AS readable
+    FROM audit_log a
     LEFT JOIN users u ON u.id = a.actor_id
     LEFT JOIN users t ON a.target_type = 'user' AND t.id = a.target_id
-    WHERE a.seq < ? AND a.action != 'warband.autosave' ORDER BY a.seq DESC LIMIT ?`).all(beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
-    seq: number; at: string; actor_name: string | null; action: string; target_type: string | null; target_id: string | null; target_name: string | null; payload: string | null;
+    WHERE a.seq < ? AND a.action != 'warband.autosave' ORDER BY a.seq DESC LIMIT ?`).all(adminId, beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
+    seq: number; at: string; actor_name: string | null; action: string; target_type: string | null; target_id: string | null; target_name: string | null; payload: string | null; readable: number;
   }[];
   return rows.map((r) => ({
     seq: r.seq, at: r.at, actor: r.actor_name, action: r.action, targetType: r.target_type,
-    target: r.target_name ?? r.target_id, payload: r.payload ? JSON.parse(r.payload) as unknown : null,
+    target: r.target_name ?? r.target_id, payload: r.payload && r.readable ? JSON.parse(r.payload) as unknown : null,
   }));
 }

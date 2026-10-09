@@ -38,7 +38,7 @@ export function registerNoteRoutes(app: FastifyInstance, deps: NoteDeps): void {
   }, async (req, reply) => {
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
-    const seq = notesSeq(db(), t.c.id);
+    const seq = notesSeq(db(), t.c.id, viewer(req.actor!, t.role));
     const since = (req.query as { since?: number }).since;
     if (since !== undefined && since >= seq) return { unchanged: true, seq };
     return { notes: listNotes(db(), t.c.id, viewer(req.actor!, t.role)), seq };
@@ -60,7 +60,7 @@ export function registerNoteRoutes(app: FastifyInstance, deps: NoteDeps): void {
     const v = viewer(req.actor!, t.role);
     const r = putNote(db(), t.c.id, nid, { ...parsed.data, battleId: parsed.data.battleId?.toLowerCase() ?? null, protocolEntryId: parsed.data.protocolEntryId?.toLowerCase() ?? null }, v, now());
     if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
-    return { note: oneNote(db(), nid, v), seq: notesSeq(db(), t.c.id) };
+    return { note: oneNote(db(), nid, v), seq: notesSeq(db(), t.c.id, viewer(req.actor!, t.role)) };
   });
 
   app.delete('/api/v1/campaigns/:id/notes/:nid', { config: { action: 'notes.write' } }, async (req, reply) => {
@@ -72,6 +72,6 @@ export function registerNoteRoutes(app: FastifyInstance, deps: NoteDeps): void {
     if (!n || n.campaign_id !== t.c.id || !oneNote(db(), n.id, v)) return reply.code(404).send({ error: 'not_found' });
     const r = deleteNote(db(), n, v, now());
     if (r === 'forbidden') return reply.code(403).send({ error: 'forbidden' });
-    return { removed: r === 'ok', seq: notesSeq(db(), t.c.id) };
+    return { removed: r === 'ok', seq: notesSeq(db(), t.c.id, viewer(req.actor!, t.role)) };
   });
 }
