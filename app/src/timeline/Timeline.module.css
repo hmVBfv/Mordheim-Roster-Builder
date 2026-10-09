@@ -1,0 +1,155 @@
+/* The Timeline tab (phase 4a3, part 2; docs/mockups/timeline.html). */
+.timeline,
+.blocks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.segment {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.anchor {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3) 0 var(--space-1);
+  border-bottom: 1px solid var(--border);
+}
+
+.anchor h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.fixed {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.block {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.fixedBlock {
+  display: grid;
+  gap: 2px;
+  background: var(--surface-2);
+}
+
+.hiddenBlock {
+  border-style: dashed;
+  border-color: var(--gold);
+  background: repeating-linear-gradient(135deg, var(--surface) 0 12px, var(--hidden-bg) 12px 14px);
+}
+
+.body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.block p,
+.fixedBlock p {
+  margin: 0;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.hidden {
+  color: var(--gold);
+}
+
+.quote {
+  margin: 0;
+  font-style: italic;
+}
+
+.quote footer {
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+.thumb {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 180px;
+  width: auto;
+  border-radius: var(--radius);
+}
+
+/* ↑ ↓ ⋯: three taps wide, beside the block */
+.tools {
+  display: grid;
+  grid-template-columns: repeat(3, var(--tap));
+  gap: 2px;
+  flex: none;
+}
+
+.tools button {
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.tools button:hover {
+  background: var(--surface-2);
+}
+
+.tools button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* on a phone the tools go below the text, which keeps the full width */
+@media (max-width: 520px) {
+  .block {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tools {
+    justify-content: end;
+  }
+}
+
+.moveTo {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.moveTo button {
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.moveTo button[aria-current='true'] {
+  border-color: var(--accent);
+}

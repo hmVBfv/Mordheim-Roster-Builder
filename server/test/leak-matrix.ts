@@ -282,8 +282,9 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id/notes': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/notes` }),
       'GET /api/v1/campaigns/:id/attachments': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments` }),
       'GET /api/v1/campaigns/:id/attachments/:aid/file': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.ownPictureId}/file` }),
+      'GET /api/v1/campaigns/:id/timeline': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/timeline` }),
     },
-    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments'] },
+    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks'] },
   },
   'campaign.warband.read': {
     allowed: ['user'],
@@ -337,13 +338,15 @@ export const MATRIX: Record<Action, MatrixRow> = {
   'notes.write': {
     allowed: ['user'],
     routes: {
+      // first: the note is taken out further down
+      'PUT /api/v1/campaigns/:id/timeline/:type/:itemId': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/timeline/note/${c.ownNoteId}`, body: { segment: 'pre', pos: '5' } }),
       'PUT /api/v1/campaigns/:id/notes/:nid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/notes/${randomUUID()}`, body: { battleId: c.battleId, turn: 2, kind: 'quote', text: 'Bolt the doors.' } }),
       'DELETE /api/v1/campaigns/:id/notes/:nid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/notes/${c.ownNoteId}` }),
       'PUT /api/v1/campaigns/:id/attachments/:aid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/attachments/${randomUUID()}`, body: { mime: 'image/png', bytes: PNG.length, width: 1, height: 1, caption: 'Probing the ferry' } }),
       'PUT /api/v1/campaigns/:id/attachments/:aid/file': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.pendingPictureId}/file`, body: PNG, headers: { 'content-type': 'image/png' } }),
       'DELETE /api/v1/campaigns/:id/attachments/:aid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.ownPictureId}` }),
     },
-    fields: { user: ['note', 'seq', 'removed', 'attachment'] },
+    fields: { user: ['note', 'seq', 'removed', 'attachment', 'position'] },
   },
   'battle.propose': {
     allowed: ['user'],

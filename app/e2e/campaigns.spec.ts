@@ -505,3 +505,29 @@ test('a picture at the game night and among the notes: made smaller here, shown 
   await noSideScroll(page);
   await shot(page, 'notes-picture');
 });
+
+/* The timeline (phase 4a3, part 2). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the timeline: the story in its order, a block moved, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others[0]!, role: 'leader' }, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    b.participants[0]!.outcome = 'victory';
+    b.participants[1]!.outcome = 'defeat';
+    srv.entryElsewhere(b.id, { id: '11111111-1111-4111-8111-111111111111', turn: 3, kind: 'event', payload: { text: 'The ferry burns and drifts towards the Stir.' }, author: 'Anna' });
+    srv.state.notes.set('0000000a-0000-4000-8000-000000000000', { id: '0000000a-0000-4000-8000-000000000000', campaignId: c.id, battleId: b.id, turn: 2, authorId: 'u1', author: 'Kai', kind: 'quote', text: 'Bolt the doors. Whatever knocks tonight is not a customer.', visibility: 'public', mentions: [], createdAt: '2026-10-04T12:00:30.000Z', updatedAt: '2026-10-04T12:00:30.000Z', seq: ++srv.state.seq });
+    srv.noteFrom(c.id, { author: 'Anna', text: 'Brother Anselm sets the mill wheel on fire to smoke the rats out of the cellar.', battleId: b.id, turn: 4, kind: 'scene' });
+    b.status = 'closed';
+    b.closedAt = '2026-10-04T13:00:00.000Z';
+    await page.goto(`campaign/${c.id}/timeline`);
+    const course = page.getByRole('listitem', { name: 'Battle 1 · Hel Fenn ferry · course' });
+    await expect(course).toContainText('Bolt the doors');
+    await page.getByRole('button', { name: /^Move up: Bolt the doors/ }).click();
+    await expect.poll(() => [...srv.state.positions.values()].map((p) => p.segment)).toEqual([`b${b.id}:before`]);
+    await expect(page.getByRole('listitem', { name: 'Battle 1 · Hel Fenn ferry · before' })).toContainText('Bolt the doors');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-timeline`);
+  });
+}

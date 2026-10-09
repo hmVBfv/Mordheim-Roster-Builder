@@ -150,6 +150,10 @@ Begriff einführt, trägt ihn hier ein.
 | Runde weiterschalten | Move on to After battle N | `POST /campaigns/:id/rounds/advance` |
 | Offen für dich | Open for you | `openAftermaths()` in der Übersicht der Kampagne |
 | Hausregeln | House rules | `house_rules`, `S.house` |
+| Zeitleiste | Timeline | `/campaign/:id/timeline`, `app/src/timeline/` |
+| Abschnitt (der Zeitleiste) | before · course · aftermath · Interlude N · Before the campaign | Segment `pre`, `b<id>:before|battle|after`, `i<n>` |
+| Baustein | block | Notiz, Bild, Protokolleintrag (`item_type`) |
+| Verschieben | Move up · Move down · Move to… | `PUT …/timeline/:type/:itemId`, `between()` |
 | Bild (Screenshot, Foto) | Picture · New picture · + Picture | `attachments`, `app/src/pictures/` |
 | verkleinert auf dem Gerät | made smaller on the phone (only the pixels leave it) | `shrink()` |
 | Hausregeln der Kampagne | (Campaign) house rules · Set the house rules | `campaigns.house_rules`, `/campaign/:id/house-rules` |
