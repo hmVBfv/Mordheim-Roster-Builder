@@ -19,9 +19,17 @@ name: CI
 #           test with restic, roster-restore, Fail2Ban
 #   publish when all of the above are green on a push: the image for
 #           linux/arm64 (the Pi) and linux/amd64 to ghcr.io/hmvbfv/mordheim-roster
-#           as :<first 7 of the commit>; on master also :master and
-#           :drill-broken (for the rollback drill). Monthly on master, a
-#           fresh build for the base image's security updates (ADR 0009).
+#           as :<first 7 of the commit>; on master also :<the whole commit>,
+#           :master and :drill-broken (for the rollback drill). Monthly on
+#           master, a fresh build for the base image's security updates
+#           (ADR 0009). Every image is signed keyless with Sigstore: the
+#           certificate names this workflow, the branch and the commit.
+#           roster-deploy puts only master's into production (ADR 0017),
+#           and this job checks right away that the Pi's check passes for
+#           master and refuses a branch.
+#
+# Actions are pinned to a commit (the tag in the comment): a moved tag cannot
+# change what runs here while this job can push images (security review OPS-7).
 #
 # The runner is pinned to ubuntu-24.04: ubuntu-latest moves to Ubuntu 26 from
 # 19.10.2026, and the move should be a deliberate change with a green run
@@ -46,8 +54,9 @@ jobs:
   legacy:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: Legacy tests (rebuilds single-file + parity check)
@@ -56,8 +65,9 @@ jobs:
   core:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: Typecheck
@@ -70,8 +80,9 @@ jobs:
   app:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: App tests (unit and components)
@@ -88,14 +99,15 @@ jobs:
         run: npm run e2e -w app
       - name: Screenshots
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with: { name: app-screens, path: app/test-results/, if-no-files-found: ignore }
 
   server:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '22', cache: npm }
       - run: npm ci
       - name: Server tests
@@ -108,7 +120,8 @@ jobs:
     env:
       IMAGE: localtest/mordheim-roster
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
       - name: Tag
         run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
       - name: Build the image (amd64) and the two drill images
@@ -123,6 +136,8 @@ jobs:
         run: shellcheck -x -P ops/lib ops/install.sh ops/bin/* ops/lib/* ops/test/*.sh ops/image/roster-cli ops/ddns/*
       - name: DynDNS updater against a stand-in for the Porkbun API
         run: ops/test/ddns.sh
+      - name: roster-verify against stand-ins for docker and cosign
+        run: ops/test/verify.sh
       - name: Caddyfile and compose file
         run: |
           printf 'ROSTER_HOST=mordheim.example.org\nROSTER_LAN_IP=192.168.178.20\n' > "$RUNNER_TEMP/site.env"
@@ -131,6 +146,8 @@ jobs:
           sed -i 's#/mnt/ssd/roster#'"$RUNNER_TEMP"'/data#g' "$RUNNER_TEMP/rendered/compose.yaml"
           mkdir -p "$RUNNER_TEMP/data" && touch "$RUNNER_TEMP/data/app.env" "$RUNNER_TEMP/data/staging.env"
           ROSTER_TAG=test docker compose -f "$RUNNER_TEMP/rendered/compose.yaml" config -q
+      - name: Caddy with its hardening on 443, keeping the app's own CSP
+        run: sudo ops/test/caddy.sh
       - name: Tools for the ops test
         timeout-minutes: 8
         run: |
@@ -149,44 +166,77 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # keyless signing: GitHub's OIDC token names workflow, branch and commit
+      id-token: write
     env:
       REPO: ghcr.io/hmvbfv/mordheim-roster
     steps:
-      - uses: actions/checkout@v7
-      - uses: docker/setup-qemu-action@v4
-      - uses: docker/setup-buildx-action@v4
-      - uses: docker/login-action@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          # the same as ops/install.sh puts on the Pi
+          cosign-release: v3.1.3
       - name: Tags
         run: |
           short=${GITHUB_SHA::7}
           if [ "$GITHUB_EVENT_NAME" = schedule ]; then
             tags="-t $REPO:master-$(date -u +%Y%m%d) -t $REPO:master"
           elif [ "$GITHUB_REF" = refs/heads/master ]; then
-            tags="-t $REPO:$short -t $REPO:master"
+            tags="-t $REPO:$short -t $REPO:$GITHUB_SHA -t $REPO:master"
           else
             tags="-t $REPO:$short"
           fi
           echo "TAGS=$tags" >> "$GITHUB_ENV"
-      - name: Build and push (linux/arm64, linux/amd64)
+      - name: Build and push (linux/arm64, linux/amd64), then sign
         run: |
           # shellcheck disable=SC2086
           docker buildx build --push --platform linux/arm64,linux/amd64 \
+            --metadata-file "$RUNNER_TEMP/build.json" \
             --build-arg ROSTER_VERSION="$GITHUB_SHA" $TAGS .
-      - name: The broken image for the rollback drill (master)
+          digest=$(jq -r '."containerimage.digest"' "$RUNNER_TEMP/build.json")
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "no digest from the build: $digest" >&2; exit 1; }
+          echo "DIGEST=$digest" >> "$GITHUB_ENV"
+          cosign sign --yes "$REPO@$digest"
+      - name: The broken image for the rollback drill (master), signed
         if: github.ref == 'refs/heads/master'
         run: |
           docker buildx build --push --platform linux/arm64,linux/amd64 \
+            --metadata-file "$RUNNER_TEMP/drill.json" \
             --build-arg ROSTER_VERSION="$GITHUB_SHA" --target drill-broken -t "$REPO:drill-broken" .
+          cosign sign --yes "$REPO@$(jq -r '."containerimage.digest"' "$RUNNER_TEMP/drill.json")"
+      - name: The Pi's check (ops/lib/roster-verify) - master passes, a branch is refused
+        run: |
+          docker pull -q "$REPO@$DIGEST" >/dev/null
+          if [ "$GITHUB_REF" = refs/heads/master ]; then
+            ops/lib/roster-verify "$REPO@$DIGEST" "${GITHUB_SHA::7}"
+          else
+            code=0
+            ops/lib/roster-verify "$REPO@$DIGEST" "${GITHUB_SHA::7}" || code=$?
+            [ "$code" = 1 ] || { echo "roster-verify did not refuse a branch's image (exit $code)" >&2; exit 1; }
+            # signed all the same - by this branch: the same check with this
+            # branch in master's place passes, so signing and checking work
+            sed "s|^REF=refs/heads/master\$|REF=$GITHUB_REF|" ops/lib/roster-verify >"$RUNNER_TEMP/roster-verify-branch"
+            grep -qx "REF=$GITHUB_REF" "$RUNNER_TEMP/roster-verify-branch"
+            bash "$RUNNER_TEMP/roster-verify-branch" "$REPO@$DIGEST" "${GITHUB_SHA::7}"
+          fi
       - name: Summary
         run: |
           {
             echo "### Image"
             echo
-            echo "Pushed: \`${TAGS//-t /}\`"
+            echo "Pushed and signed: \`${TAGS//-t /}\` (\`$DIGEST\`)"
             echo
-            echo "On the Pi: \`roster-deploy --staging ${GITHUB_SHA::7}\`, then \`roster-deploy ${GITHUB_SHA::7}\`"
+            if [ "$GITHUB_REF" = refs/heads/master ]; then
+              echo "On the Pi: \`roster-deploy --staging ${GITHUB_SHA::7}\`, then \`roster-deploy ${GITHUB_SHA::7}\`"
+            else
+              echo "A branch build: only for the test instance – \`roster-deploy --staging ${GITHUB_SHA::7}\`. Production takes master's builds only."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"

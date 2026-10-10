@@ -3,11 +3,17 @@
 # docs/operations.md section 6): the latest backup from restic goes into the
 # test instance, which is started and must be healthy. If this fails, the
 # backup is not usable – healthchecks.io says so.
+# Before it starts, every account of the copy gets the one test password
+# (secrets/staging.pass), loses its authenticator and its sessions
+# (roster-cli test-accounts; security review OPS-3): the test instance is
+# plain http in the home network, and nothing of production's that signs in
+# may work there. Without the password file it does not start at all.
 set -euo pipefail
 # shellcheck source=common.sh
 . "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
 
 WAIT=${ROSTER_RESTORE_WAIT:-90}
+STAGING_PASS="$ROSTER_DATA/secrets/staging.pass"
 tmp="$ROSTER_DATA/staging/restore-tmp"
 data="$ROSTER_DATA/staging/data"
 uploads="$ROSTER_DATA/staging/uploads"
@@ -20,6 +26,9 @@ trap 'rm -rf "$tmp"' EXIT
 
 require_marker
 hc_ping RESTORE_TEST start
+if [ ! -f "$STAGING_PASS" ] || [ -L "$STAGING_PASS" ]; then
+  fail "$STAGING_PASS is missing (sudo ops/install.sh makes it); the test instance stays off"
+fi
 rm -rf "$tmp"
 mkdir -p "$tmp" "$data" "$uploads"
 restic_cmd restore latest --host roster --target "$tmp" >/dev/null || fail "restic restore failed"
@@ -29,13 +38,21 @@ latest=$(find "$snapdir" -maxdepth 1 -name '*.sqlite' 2>/dev/null | sort | tail 
 log "restoring $(basename "$latest") into the test instance"
 
 compose stop staging >/dev/null 2>&1 || true
-touch "$data/.roster-volume"
+# the test instance could have made any of these a symlink: replaced, not written through
+rm -f "$data/.roster-volume"
+install -m 644 /dev/null "$data/.roster-volume"
 rm -f "$data/roster.sqlite" "$data/roster.sqlite-wal" "$data/roster.sqlite-shm"
-cp "$latest" "$data/roster.sqlite"
+copy_db "$latest" "$data/roster.sqlite"
 find "$uploads" -mindepth 1 -delete
 if [ -d "$tmp$ROSTER_DATA/uploads" ]; then
   cp -a "$tmp$ROSTER_DATA/uploads/." "$uploads/"
 fi
+# with the test instance's image, before it serves anything: its accounts
+# sign in with the test password only
+if ! out=$(compose run --rm --no-deps -T staging roster-cli test-accounts <"$STAGING_PASS" 2>&1); then
+  fail "roster-cli test-accounts failed, the test instance stays off: $out"
+fi
+log "test instance: $out"
 compose up -d --no-deps staging >/dev/null 2>&1 || fail "the test instance did not start"
 
 url="http://${ROSTER_LAN_IP:-127.0.0.1}:8081/api/v1/health"

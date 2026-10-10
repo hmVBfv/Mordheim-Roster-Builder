@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# roster-verify – does this image come from the master branch's CI?
+# (ADR 0017, docs/operations.md section 5). roster-deploy runs it before
+# every production deploy; CI runs it after every push it publishes.
+#
+#   roster-verify <image> [<tag asked for>]
+#
+# <image> is a reference Docker has pulled (repo:tag or repo@sha256:…).
+#   1. its digest in the registry (RepoDigests): what CI signed
+#   2. the commit it was built from (ROSTER_VERSION, 40 hex digits); a tag
+#      of hex digits asked for must be its start – no older image under a
+#      newer name
+#   3. cosign: a signature on that digest from a certificate that names
+#      .github/workflows/ci.yml at refs/heads/master of this repository and
+#      that very commit (keyless, Sigstore; the certificate comes from
+#      GitHub's OIDC token, which a branch cannot have for master)
+# Prints the verified repo@digest. Exit: 0 verified, 1 refused, 2 usage or
+# the image cannot be read.
+set -euo pipefail
+
+REF=refs/heads/master
+SIGNER="^https://github\\.com/hmvbfv/mordheim-roster-builder/\\.github/workflows/ci\\.yml@${REF//./\\.}\$"
+ISSUER='https://token.actions.githubusercontent.com'
+
+ref=${1:-}
+want=${2:-}
+if [ -z "$ref" ] || [ $# -gt 2 ]; then
+  sed -n '5,7p' "$0" | sed 's/^# \{0,1\}//' >&2
+  exit 2
+fi
+refuse() {
+  echo "roster-verify: REFUSED $ref: $*" >&2
+  exit 1
+}
+unreadable() {
+  echo "roster-verify: $ref: $*" >&2
+  exit 2
+}
+
+command -v cosign >/dev/null || unreadable "cosign is not installed (sudo ops/install.sh installs it)"
+case "$ref" in
+  *@*) repo=${ref%@*} ;;
+  *) repo=${ref%:*} ;;
+esac
+[[ "$repo" =~ ^[a-z0-9./_-]+$ ]] || unreadable "not an image name"
+
+# 1. the digest it was pulled by (an image built here has none)
+digests=$(docker image inspect -f '{{range .RepoDigests}}{{println .}}{{end}}' "$ref" 2>/dev/null) || unreadable "not pulled"
+digest=$(grep -m 1 -E "^${repo//./\\.}@sha256:[0-9a-f]{64}$" <<<"$digests" || true)
+[ -n "$digest" ] || refuse "no digest from $repo – an image built or tagged on this machine, not pulled from the registry"
+
+# 2. the commit it says it was built from
+version=$(docker image inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$ref" | sed -n 's/^ROSTER_VERSION=//p' | head -n 1)
+[[ "$version" =~ ^[0-9a-f]{40}$ ]] || refuse "it names no commit (ROSTER_VERSION=${version:-nothing})"
+if [[ "$want" =~ ^[0-9a-f]{7,40}$ ]] && [[ "$version" != "$want"* ]]; then
+  refuse "you asked for $want, but it was built from $version"
+fi
+
+# 3. the signature: master's CI, that commit
+if ! out=$(cosign verify --certificate-identity-regexp "(?i)$SIGNER" --certificate-oidc-issuer "$ISSUER" \
+  --certificate-github-workflow-sha "$version" "$digest" 2>&1 >/dev/null); then
+  refuse "no signature from master's CI for commit $version
+$(tail -n 5 <<<"$out")"
+fi
+echo "$digest"
