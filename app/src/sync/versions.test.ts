@@ -108,6 +108,12 @@ describe('from the Quick Build', () => {
     expect(cleanServer('http://pi.local:8081')).toBe('http://pi.local:8081');
     expect(cleanServer('http://evil.example.com')).toBe('');
     expect(cleanServer('http://8.8.8.8')).toBe('');
+    // a name that only starts like a home address is none (independent review)
+    expect(cleanServer('http://10.evil.example')).toBe('');
+    expect(cleanServer('http://192.168.attacker.net')).toBe('');
+    expect(cleanServer('http://127.0.0.1.nip.io')).toBe('');
+    expect(cleanServer('http://172.32.0.1')).toBe('');
+    expect(cleanServer('http://172.31.255.1')).toBe('http://172.31.255.1');
     // an address kept before the check is not used any more
     localStorage.setItem('mordheim-server', 'http://evil.example.com');
     expect(getServer()).toBe('');
