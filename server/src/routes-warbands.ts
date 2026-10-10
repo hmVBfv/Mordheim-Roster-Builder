@@ -9,7 +9,7 @@ import type { DB } from './db.ts';
 import { getMeta } from './db.ts';
 import { can, type Action } from './policy.ts';
 import {
-  addVersion, checkSave, createWarband, draftOfUser, dropDraft, listVersions, listWarbands, metaOf, saveDraft, setArchived,
+  ACCOUNT_FULL, addVersion, checkSave, createWarband, currentSize, draftOfUser, dropDraft, fitsAccount, listVersions, listWarbands, metaOf, saveDraft, setArchived,
   SOURCES, syncFor, versionOf, warbandById, type Source, type WarbandRow,
 } from './warbands.ts';
 
@@ -70,6 +70,7 @@ export function registerWarbandRoutes(app: FastifyInstance, deps: WarbandDeps): 
         return reply.code(400).send({ error: 'invalid', problem: 'a copy names a warband and version of your own' });
       }
     }
+    if (!fitsAccount(db(), a.id, c.json.length)) return reply.code(413).send(ACCOUNT_FULL);
     const w = createWarband(db(), {
       id, ownerId: a.id, data: c.data, json: c.json, source: b.source, note: b.note ?? '', appVersion: b.appVersion ?? '',
       copiedFrom: b.source === 'copy' && b.copiedFrom ? { id: b.copiedFrom.id.toLowerCase(), rev: b.copiedFrom.rev } : null,
@@ -107,6 +108,7 @@ export function registerWarbandRoutes(app: FastifyInstance, deps: WarbandDeps): 
     const b = req.body as { baseRev: number; data: unknown; source?: Source; note?: string; appVersion?: string };
     const c = checkSave(b.data);
     if (!c.ok) return refuse(reply, c);
+    if (!fitsAccount(db(), req.actor!.id, c.json.length, { warbandId: w.id, head: true })) return reply.code(413).send(ACCOUNT_FULL);
     const r = addVersion(db(), { id: w.id, userId: req.actor!.id, baseRev: b.baseRev, data: c.data, json: c.json, source: b.source ?? 'save', note: b.note ?? '', appVersion: b.appVersion ?? '' }, now());
     // someone saved in between: the app offers the newer state or a copy (ADR 0003)
     if (!r.ok) return reply.code(409).send({ error: 'stale', headRev: r.head });
@@ -124,6 +126,7 @@ export function registerWarbandRoutes(app: FastifyInstance, deps: WarbandDeps): 
     if (b.baseRev > w.head_rev) return reply.code(400).send({ error: 'invalid', problem: 'no such version to build on' });
     const c = checkSave(b.data);
     if (!c.ok) return refuse(reply, c);
+    if (!fitsAccount(db(), req.actor!.id, c.json.length, { warbandId: w.id, head: false })) return reply.code(413).send(ACCOUNT_FULL);
     const r = saveDraft(db(), { id: w.id, userId: req.actor!.id, baseRev: b.baseRev, json: c.json, device: b.device ?? '', afterSeq: b.afterSeq ?? null, force: !!b.force }, now());
     // another device of the same user drafted meanwhile: the app asks which to keep
     if (!r.ok) return reply.code(409).send({ error: 'draft_conflict', draft: r.draft });
@@ -149,6 +152,7 @@ export function registerWarbandRoutes(app: FastifyInstance, deps: WarbandDeps): 
     const w = target(req, reply, 'warband.write');
     if (!w) return reply;
     if (!w.archived_at) return { warband: metaOf(w) };
+    if (!fitsAccount(db(), req.actor!.id, currentSize(db(), w.id, req.actor!.id))) return reply.code(413).send(ACCOUNT_FULL);
     return { warband: metaOf(setArchived(db(), w.id, req.actor!.id, false, now())) };
   });
 

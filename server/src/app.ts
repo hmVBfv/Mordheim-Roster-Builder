@@ -62,6 +62,24 @@ export interface AppDeps {
 
 /** Request body limit for the whole request (docs/security.md: 3 MB). */
 export const BODY_LIMIT = 3 * 1024 * 1024;
+/** Without an account (sign-in, an invite) a body is a few fields (security review INPUT-2). */
+export const ANONYMOUS_BODY_LIMIT = 64 * 1024;
+/** Objects and arrays in one JSON body. A 3 MB body of `{}` grew about 45 times
+    in memory while parsed – two at once would fill the container's 256 MB. A
+    long campaign's warband has a few thousand (security review INPUT-2). */
+export const MAX_JSON_CONTAINERS = 50_000;
+
+/** Counts `{` and `[` – inside strings too, so it is an upper bound – and stops past the limit. */
+function tooManyContainers(text: string): boolean {
+  let n = 0;
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i);
+    if ((c === 123 || c === 91) && ++n > MAX_JSON_CONTAINERS) return true;
+  }
+  return false;
+}
+
+const tooLarge = (message: string) => Object.assign(new Error(message), { statusCode: 413 });
 
 export class UncheckedRouteError extends Error {
   override name = 'UncheckedRouteError';
@@ -81,6 +99,17 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   // only JSON is parsed: a form or text/plain from another site cannot carry a write
   app.removeContentTypeParser('text/plain');
+  // JSON as Fastify parses it (prototype poisoning refused), after two checks
+  // on the text: small without an account, and not a pile of tiny objects.
+  // Parsing comes after onRequest, so the actor is known here.
+  const json = app.getDefaultJsonParser('error', 'error');
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    const text = body as string;
+    if (!req.actor && text.length > ANONYMOUS_BODY_LIMIT) return done(tooLarge('body too large without an account'), undefined);
+    if (tooManyContainers(text)) return done(tooLarge('too many objects in one body'), undefined);
+    json(req, text, done);
+  });
 
   // no route without an action: the check cannot be forgotten
   app.decorate('registeredRoutes', [] as RegisteredRoute[]);

@@ -11,7 +11,7 @@ import {
   type ShareRow,
 } from './shares.ts';
 import { userById } from './accounts.ts';
-import { checkSave, metaOf, versionOf, warbandById } from './warbands.ts';
+import { ACCOUNT_FULL, checkSave, fitsAccount, metaOf, versionOf, warbandById } from './warbands.ts';
 
 export interface ShareDeps { db: DB | null; now: () => Date }
 
@@ -36,6 +36,7 @@ export function registerShareRoutes(app: FastifyInstance, deps: ShareDeps): void
   /** What the recipient's device needs to show the new warband at once. */
   const taken = (reply: FastifyReply, r: ShareRow, userId: string, warbandId: string) => {
     if (warbandById(db(), warbandId)) return reply.code(409).send({ error: 'exists' });
+    if (!fitsAccount(db(), userId, r.data.length)) return reply.code(413).send(ACCOUNT_FULL);
     const w = takeShare(db(), r, userId, warbandId, now());
     return reply.code(201).send({ warband: metaOf(w), head: versionOf(db(), w.id, 1) });
   };
