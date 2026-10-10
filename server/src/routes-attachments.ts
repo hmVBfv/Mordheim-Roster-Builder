@@ -55,9 +55,10 @@ export function registerAttachmentRoutes(app: FastifyInstance, deps: AttachmentD
   }, async (req, reply) => {
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
-    const seq = attachmentsSeq(db(), t.c.id);
+    const seq = attachmentsSeq(db(), t.c.id, viewer(req.actor!, t.role));
     const since = (req.query as { since?: number }).since;
-    if (since !== undefined && since >= seq) return { unchanged: true, seq };
+    // exactly the number the device has: one that is higher means something it saw is hidden now
+    if (since !== undefined && since === seq) return { unchanged: true, seq };
     return { attachments: listAttachments(db(), t.c.id, viewer(req.actor!, t.role)), seq };
   });
 
@@ -85,7 +86,7 @@ export function registerAttachmentRoutes(app: FastifyInstance, deps: AttachmentD
     }
     const r = putAttachment(db(), t.c.id, aid, { ...parsed.data, battleId: parsed.data.battleId?.toLowerCase() ?? null }, viewer(req.actor!, t.role), now(), deps.quota ?? CAMPAIGN_QUOTA);
     if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
-    return { attachment: oneAttachment(db(), aid), seq: attachmentsSeq(db(), t.c.id) };
+    return { attachment: oneAttachment(db(), aid), seq: attachmentsSeq(db(), t.c.id, viewer(req.actor!, t.role)) };
   });
 
   app.put('/api/v1/campaigns/:id/attachments/:aid/file', { config: { action: 'notes.write' }, bodyLimit: MAX_BYTES }, async (req, reply) => {
@@ -95,9 +96,9 @@ export function registerAttachmentRoutes(app: FastifyInstance, deps: AttachmentD
     if (!a) return reply;
     if (!Buffer.isBuffer(req.body)) return reply.code(400).send({ error: 'invalid', problem: 'the picture’s bytes, as image/png, image/jpeg or image/webp' });
     if (!deps.uploadDir) return reply.code(503).send({ error: 'unavailable' });
-    const r = storeFile(db(), deps.uploadDir, a, req.body, String(req.headers['content-type'] ?? '').split(';')[0]!.trim(), req.actor!.id, now());
+    const r = storeFile(db(), deps.uploadDir, a, req.body, String(req.headers['content-type'] ?? '').split(';')[0]!.trim(), req.actor!.id, now(), deps.quota ?? CAMPAIGN_QUOTA);
     if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
-    return { attachment: oneAttachment(db(), a.id), seq: attachmentsSeq(db(), t.c.id) };
+    return { attachment: oneAttachment(db(), a.id), seq: attachmentsSeq(db(), t.c.id, viewer(req.actor!, t.role)) };
   });
 
   app.delete('/api/v1/campaigns/:id/attachments/:aid', { config: { action: 'notes.write' } }, async (req, reply) => {
@@ -107,6 +108,6 @@ export function registerAttachmentRoutes(app: FastifyInstance, deps: AttachmentD
     if (!a) return reply;
     const r = deleteAttachment(db(), deps.uploadDir ?? '', a, viewer(req.actor!, t.role), now());
     if (r === 'forbidden') return reply.code(403).send({ error: 'forbidden' });
-    return { removed: true, seq: attachmentsSeq(db(), t.c.id) };
+    return { removed: true, seq: attachmentsSeq(db(), t.c.id, viewer(req.actor!, t.role)) };
   });
 }

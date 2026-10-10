@@ -227,6 +227,22 @@ Notiz, die man nicht sehen darf, gibt es beim Löschen nicht (404). Im
 Notiz. Die Leak-Matrix legt eine versiegelte und eine Leiter-Notiz mit
 Merkwörtern an, die in keiner Antwort an irgendeine Rolle vorkommen dürfen.
 
+**Nach der Sicherheitsprüfung (09.10.2026, `docs/security-review.md`):**
+Das Audit-Log zeigt dem Admin von einer Kampagne nur öffentliche Einträge –
+eine versiegelte oder Leiter-Notiz, ein Leiter-Bild nicht einmal als
+Zeile; von einer Kampagne, in der er nicht Mitglied ist, auch diese nur als
+Aktion, Zeit und Handelnden, ohne Namen, Titel oder Wörter. Für eine
+versiegelte Notiz steht nicht einmal ihre Art im Log. Die Zahl, mit der ein
+Gerät fragt, ob etwas neu ist (`seq` bei Notizen und Bildern), rechnet der
+Server je Fragendem: Eine Leiter-Notiz verrät sich einem Spieler nicht
+dadurch, dass sich die Zahl bewegt. „Unverändert“ gilt nur bei genau der
+Zahl, die das Gerät hat – wird eine öffentliche Notiz zur Leiter-Notiz,
+sinkt die Zahl des Spielers, und seine Liste kommt neu, ohne sie. Jede
+Anfrage der App nennt das Konto, für das sie gemacht ist
+(`X-Roster-User`); gehört das Cookie einem anderen, antwortet der Server
+nicht für dieses, sondern mit 409 `other_user`. Aus welcher eigenen Warband eine
+eingetragene Kopie stammt (`copiedFrom`), erfährt nur ihr Besitzer.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,
@@ -277,7 +293,17 @@ kommt mit Notizen und Hintergrund dazu.
 - **Eingaben:** ein Schema für jeden Körper – Warband- und Notizdaten mit den
   Zod-Schemas aus `core/format` (ab 3h), die kleinen Körper der Konten mit
   JSON Schema, das Fastify selbst prüft; Größengrenzen (Warband-Version
-  2 MB, Notiz 20 KB, Anfrage insgesamt 3 MB).
+  2 MB, Notiz 20 KB, Anfrage insgesamt 3 MB). Schlüssel und `uid` einer
+  angeheuerten Klinge sind schlichte Schlüssel (`[A-Za-z0-9_-]`, höchstens
+  64 Zeichen): Das Legacy-Tool setzt sie in HTML ein, eine Warband darf dort
+  nichts ausführen können (CLIENT-3).
+- **Links aus dem Quick Build** (`app/src/share/link.ts`): Ein Fragment über
+  256 KB oder eines, das sich auf mehr als 4 MB entpackt, liest die App
+  nicht – ein kleiner Link kann sich sonst auf Gigabytes entpacken und den
+  Tab einfrieren (CLIENT-4). Die Adresse des Kampagnen-Servers nimmt der
+  Quick Build nur mit `https://`, schlichtes `http://` nur im Heimnetz
+  (private IPv4-Adressen, `localhost`, `.local`, `.lan`, `.home.arpa`;
+  CLIENT-5).
 - **Uploads:** nur Bilder (PNG, JPEG, WebP), höchstens 5 MB. Der Client
   verkleinert und kodiert neu – dabei fallen EXIF-Daten mit GPS-Koordinaten
   weg. Der Server prüft Dateityp anhand der Bytes und Größe und liefert mit
@@ -291,7 +317,10 @@ kommt mit Notizen und Hintergrund dazu.
   umbenannt. Ausgeliefert mit `Content-Security-Policy: default-src 'none';
   sandbox` und `Cache-Control: private` (die Bytes einer ID ändern sich
   nie). Ein Leiterbild bekommen Spieler und Zuschauer weder als Zeile noch
-  als Bytes (404). Höchstens 1 GB je Kampagne. Die Uploads gehen nachts mit
+  als Bytes (404). Höchstens 1 GB je Kampagne; gezählt wird, was
+  gespeichert ist, nicht was angekündigt wurde, und beim Eintreffen der
+  Bytes wird noch einmal gezählt. Je Mitglied warten höchstens 20
+  angekündigte Bilder auf ihre Bytes (409, AUTHZ-2). Die Uploads gehen nachts mit
   ins restic-Backup (`ops/lib/roster-backup`).
 - **Ausgabe:** React entschärft Text automatisch; `dangerouslySetInnerHTML`
   ist per Lint-Regel verboten. Markdown in Notizen wird nicht als HTML

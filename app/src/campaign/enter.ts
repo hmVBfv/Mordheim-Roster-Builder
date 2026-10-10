@@ -7,13 +7,14 @@
 import * as core from '@mordheim/core';
 import type { GameData } from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';
+import { asker } from '../account/owner.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { readSave } from '../sync/engine.ts';
 import { currentUserId } from '../sync/local.ts';
 import { adoptHouse } from '../roster/house.ts';
 import { applyEdit } from '../roster/useEditor.ts';
-import { getCampaign, type CampaignView } from './api.ts';
+import { campaignKey, getCampaign, type CampaignView } from './api.ts';
 
 /** A warband made on this device goes to the account first, so the campaign's copy can name it as its source. */
 async function onServer(data: GameData, rec: StoredWarband): Promise<StoredWarband> {
@@ -37,7 +38,7 @@ interface Entered { enrolmentId: string; warband: { id: string; createdAt: strin
 
 /** The warband as it enters: under the campaign's house rules. */
 async function underCampaignRules(data: GameData, campaignId: string, s: core.WarbandState): Promise<core.WarbandState> {
-  const view = ((await db.meta.get(`campaign:${campaignId}`))?.value as CampaignView | undefined) ?? await getCampaign(campaignId);
+  const view = ((await db.meta.get(campaignKey(campaignId)))?.value as CampaignView | undefined) ?? await getCampaign(campaignId);
   const rules = view.campaign.houseRules;
   if (!core.houseDifferences(rules, s.house).length) return s;
   return applyEdit(data, s, (c) => adoptHouse(c, rules), 'House rules of the campaign', { gold: 'keep' });
@@ -46,6 +47,7 @@ async function underCampaignRules(data: GameData, campaignId: string, s: core.Wa
 export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband): Promise<{ id: string; campaign: CampaignView }> {
   const rec = await onServer(data, from);
   const entering = await underCampaignRules(data, campaignId, rec.state);
+  const who = asker();
   const r = await api<Entered>(`/campaigns/${campaignId}/enrolments`, {
     body: {
       warbandId: newId(), data: core.writeSave(core.ctxOf(data, entering), __APP_VERSION__), appVersion: __APP_VERSION__,
@@ -59,6 +61,6 @@ export async function enterWarband(data: GameData, campaignId: string, from: Sto
     createdAt: r.warband.createdAt, updatedAt: stamp, syncedAt: stamp, ownerId: currentUserId(), serverRev: r.head.rev, draftSeq: null,
     origin: 'copy', ...(rec.serverRev !== undefined ? { copiedFrom: { id: rec.id, rev: rec.serverRev } } : {}), campaignId: r.warband.campaignId,
   });
-  await db.meta.put({ key: `campaign:${campaignId}`, value: r.campaign });
+  await who.keep('campaign:', campaignId, r.campaign);
   return { id: r.warband.id, campaign: r.campaign };
 }

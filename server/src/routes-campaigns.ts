@@ -183,7 +183,8 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!e || !w) return reply.code(404).send({ error: 'not_found' });
     const draft = draftOfUser(db(), w.id, w.owner_id);
     return {
-      warband: metaOf(w),
+      // the warband it was copied from is its owner's own: nobody else learns its id (security review AUTHZ-5)
+      warband: { ...metaOf(w), copiedFrom: w.owner_id === req.actor!.id ? metaOf(w).copiedFrom : null },
       player: { id: e.player_id, displayName: userById(db(), e.player_id)?.display_name ?? '' },
       status: e.status,
       head: versionOf(db(), w.id, w.head_rev),

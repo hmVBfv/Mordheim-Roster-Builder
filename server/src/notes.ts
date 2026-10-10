@@ -79,7 +79,16 @@ export function oneNote(db: DB, id: string, v: Viewer): Note | null {
 }
 
 /** The newest change to any note of the campaign. */
-export const notesSeq = (db: DB, campaignId: string) => (db.prepare('SELECT coalesce(max(seq), 0) AS n FROM notes WHERE campaign_id = ?').get(campaignId) as { n: number }).n;
+/** The newest change among the notes this viewer may see (a placeholder counts): a leaders' note moves nothing for a player (security review AUTHZ-3). */
+/** The latest entry of a campaign that narrows what someone may see: a note or picture turned leaders'-only, a role changed or
+    taken. It counts in everybody's number, so a device asks again and drops what it may no longer show – also when newer
+    notes stand in front of it (independent check of AUTHZ-3). */
+export const NARROWING = ['note.hide', 'attachment.hide', 'member.role', 'member.remove'] as const;
+export const narrowedSeq = (db: DB, campaignId: string) => (db.prepare(`SELECT coalesce(max(seq), 0) AS n FROM audit_log WHERE campaign_id = ? AND action IN (${NARROWING.map(() => '?').join(', ')})`)
+  .get(campaignId, ...NARROWING) as { n: number }).n;
+
+export const notesSeq = (db: DB, campaignId: string, v: Viewer) => Math.max(narrowedSeq(db, campaignId), (db.prepare("SELECT coalesce(max(seq), 0) AS n FROM notes WHERE campaign_id = ? AND (visibility != 'leader' OR ? OR author_id = ?)")
+  .get(campaignId, v.leader ? 1 : 0, v.id) as { n: number }).n);
 
 const auditVisibility = (v: Visibility) => (v === 'public' ? 'public' : v);
 
@@ -102,7 +111,7 @@ export function putNote(db: DB, campaignId: string, id: string, input: NoteInput
     }
     const mentions = JSON.stringify(input.mentions);
     if (!cur) {
-      const seq = audit(db, { actorId: by.id, action: 'note.create', targetType: 'note', targetId: id, campaignId, visibility: auditVisibility(input.visibility), payload: { kind: input.kind, battle: input.battleId } }, now);
+      const seq = audit(db, { actorId: by.id, action: 'note.create', targetType: 'note', targetId: id, campaignId, visibility: auditVisibility(input.visibility), payload: input.visibility === 'sealed' ? { battle: input.battleId } : { kind: input.kind, battle: input.battleId } }, now);
       db.prepare(`INSERT INTO notes (id, campaign_id, battle_id, turn, author_id, kind, text, lang, visibility, sealed_until_battle, mentions, protocol_entry_id, created_at, updated_at, seq)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(id, campaignId, input.battleId, input.turn, by.id, input.kind, input.text, input.lang, input.visibility,
         input.visibility === 'sealed' ? input.battleId : null, mentions, input.protocolEntryId, iso(now), iso(now), seq);
@@ -119,6 +128,8 @@ export function putNote(db: DB, campaignId: string, id: string, input: NoteInput
       && cur.battle_id === input.battleId && cur.turn === input.turn && cur.protocol_entry_id === input.protocolEntryId;
     if (same) return { ok: true, note: cur };
     if (cur.text !== input.text) db.prepare('INSERT INTO note_revisions (note_id, text, edited_by, edited_at) VALUES (?, ?, ?, ?)').run(id, cur.text, by.id, iso(now));
+    // turned leaders'-only: everybody's number moves, so the devices that showed it drop it (no words in the entry)
+    if (visibility === 'leader' && cur.visibility !== 'leader') audit(db, { actorId: by.id, action: 'note.hide', targetType: 'note', targetId: id, campaignId, visibility: 'public' }, now);
     const seq = audit(db, { actorId: by.id, action: own ? 'note.edit' : 'note.edit_other', targetType: 'note', targetId: id, campaignId, visibility: auditVisibility(visibility), payload: { author: cur.author_id } }, now);
     db.prepare(`UPDATE notes SET battle_id = ?, turn = ?, kind = ?, text = ?, lang = ?, visibility = ?, sealed_until_battle = ?, mentions = ?, protocol_entry_id = ?, updated_at = ?, seq = ? WHERE id = ?`)
       .run(input.battleId, input.turn, input.kind, input.text, input.lang, visibility, sealedUntil, mentions, input.protocolEntryId, iso(now), seq, id);

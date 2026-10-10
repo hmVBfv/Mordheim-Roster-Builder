@@ -13,7 +13,6 @@
    Every change is an action of core through the editor, with Undo. */
 import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
@@ -38,6 +37,7 @@ import { groupChanges, previewChanges, type AnyChange, type ChangeGroup } from '
 import styles from './Aftermath.module.css';
 import { takeOverBattle } from './takeover.ts';
 import { aftermathView, grantBattleXp, type AftermathView, type CasualtyView } from './view.ts';
+import { useWarbandRecord } from '../sync/local.ts';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
@@ -405,7 +405,7 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
 
 export function Aftermath() {
   const { id = '', bid = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null || rec.removedAt) {
     return (

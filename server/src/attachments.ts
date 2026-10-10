@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
+import { narrowedSeq } from './notes.ts';
 
 const iso = (d: Date) => d.toISOString();
 
@@ -75,7 +76,14 @@ export function oneAttachment(db: DB, id: string): Attachment | null {
 }
 
 /** The newest change to any picture of the campaign. */
-export const attachmentsSeq = (db: DB, campaignId: string) => (db.prepare('SELECT coalesce(max(seq), 0) AS n FROM attachments WHERE campaign_id = ?').get(campaignId) as { n: number }).n;
+/** The newest change among the pictures this viewer may see: a leaders' picture moves nothing for a player (security review AUTHZ-3). */
+export const attachmentsSeq = (db: DB, campaignId: string, v: Viewer) => Math.max(narrowedSeq(db, campaignId), (db.prepare("SELECT coalesce(max(seq), 0) AS n FROM attachments WHERE campaign_id = ? AND (visibility != 'leader' OR ? OR uploader_id = ?)")
+  .get(campaignId, v.leader ? 1 : 0, v.id) as { n: number }).n);
+
+/** Pictures announced whose bytes have not come yet, per member (security review AUTHZ-2). */
+export const MAX_WAITING = 20;
+/** The room the kept pictures of a campaign take (one announced but never sent takes none). */
+const roomUsed = (db: DB, campaignId: string) => (db.prepare('SELECT coalesce(sum(bytes), 0) AS n FROM attachments WHERE campaign_id = ? AND deleted_at IS NULL AND stored_at IS NOT NULL').get(campaignId) as { n: number }).n;
 
 /** Where its bytes are kept: made from ids only (both checked as UUIDs on the way in). */
 export const fileOf = (uploadDir: string, a: Pick<AttachmentRow, 'campaign_id' | 'id' | 'mime'>) => join(uploadDir, a.campaign_id, `${a.id}.${MIMES[a.mime]}`);
@@ -93,8 +101,9 @@ export function putAttachment(db: DB, campaignId: string, id: string, input: Att
     }
     if (input.visibility === 'leader' && !by.leader) return { ok: false, status: 403, error: 'forbidden' };
     if (!cur) {
-      const used = (db.prepare('SELECT coalesce(sum(bytes), 0) AS n FROM attachments WHERE campaign_id = ? AND deleted_at IS NULL').get(campaignId) as { n: number }).n;
-      if (used + input.bytes > quota) return { ok: false, status: 413, error: 'quota', problem: 'the campaign has no room for more pictures' };
+      if (roomUsed(db, campaignId) + input.bytes > quota) return { ok: false, status: 413, error: 'quota', problem: 'the campaign has no room for more pictures' };
+      const waiting = (db.prepare('SELECT count(*) AS n FROM attachments WHERE campaign_id = ? AND uploader_id = ? AND deleted_at IS NULL AND stored_at IS NULL').get(campaignId, by.id) as { n: number }).n;
+      if (waiting >= MAX_WAITING) return { ok: false, status: 409, error: 'too_many_waiting', problem: `${waiting} pictures of yours still wait for their bytes` };
       const seq = audit(db, { actorId: by.id, action: 'attachment.create', targetType: 'attachment', targetId: id, campaignId, visibility: input.visibility, payload: { battle: input.battleId, mime: input.mime, bytes: input.bytes } }, now);
       db.prepare(`INSERT INTO attachments (id, campaign_id, battle_id, turn, uploader_id, mime, bytes, width, height, caption, visibility, created_at, updated_at, seq)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(id, campaignId, input.battleId, input.turn, by.id, input.mime, input.bytes, input.width, input.height, input.caption, input.visibility, iso(now), iso(now), seq);
@@ -105,6 +114,8 @@ export function putAttachment(db: DB, campaignId: string, id: string, input: Att
     if (cur.mime !== input.mime || cur.bytes !== input.bytes) return { ok: false, status: 409, error: 'exists', problem: 'another picture under this id' };
     const same = cur.caption === input.caption && cur.visibility === input.visibility && cur.battle_id === input.battleId && cur.turn === input.turn;
     if (same) return { ok: true, row: cur };
+    // turned leaders'-only: everybody's number moves, so the devices that showed it drop it (notes.ts, narrowedSeq)
+    if (input.visibility === 'leader' && cur.visibility !== 'leader') audit(db, { actorId: by.id, action: 'attachment.hide', targetType: 'attachment', targetId: id, campaignId, visibility: 'public' }, now);
     const seq = audit(db, { actorId: by.id, action: 'attachment.edit', targetType: 'attachment', targetId: id, campaignId, visibility: input.visibility, payload: { battle: input.battleId } }, now);
     db.prepare('UPDATE attachments SET battle_id = ?, turn = ?, caption = ?, visibility = ?, updated_at = ?, seq = ? WHERE id = ?')
       .run(input.battleId, input.turn, input.caption, input.visibility, iso(now), seq, id);
@@ -120,10 +131,10 @@ export function sniff(b: Buffer): Mime | null {
   return null;
 }
 
-export type Stored = { ok: true; row: AttachmentRow } | { ok: false; status: 400 | 403 | 409 | 503; error: string; problem?: string };
+export type Stored = { ok: true; row: AttachmentRow } | { ok: false; status: 400 | 403 | 409 | 413 | 503; error: string; problem?: string };
 
 /** Keeps the bytes of an announced picture – its sender only; checked against what was announced. Sent again, the same bytes change nothing. */
-export function storeFile(db: DB, uploadDir: string, a: AttachmentRow, body: Buffer, contentType: string, by: string, now: Date): Stored {
+export function storeFile(db: DB, uploadDir: string, a: AttachmentRow, body: Buffer, contentType: string, by: string, now: Date, quota = CAMPAIGN_QUOTA): Stored {
   if (a.uploader_id !== by) return { ok: false, status: 403, error: 'forbidden' };
   if (a.deleted_at) return { ok: false, status: 409, error: 'removed' };
   const kind = sniff(body);
@@ -131,6 +142,8 @@ export function storeFile(db: DB, uploadDir: string, a: AttachmentRow, body: Buf
   if (body.length !== a.bytes && !a.stored_at) return { ok: false, status: 400, error: 'invalid', problem: `${body.length} bytes arrived, ${a.bytes} were announced` };
   const sha = createHash('sha256').update(body).digest('hex');
   if (a.stored_at) return a.sha256 === sha ? { ok: true, row: a } : { ok: false, status: 409, error: 'exists', problem: 'another picture under this id' };
+  // the room is taken when the bytes come: others may have filled it since the announcement
+  if (roomUsed(db, a.campaign_id) + body.length > quota) return { ok: false, status: 413, error: 'quota', problem: 'the campaign has no room for more pictures' };
   const file = fileOf(uploadDir, a);
   try {
     mkdirSync(join(uploadDir, a.campaign_id), { recursive: true });

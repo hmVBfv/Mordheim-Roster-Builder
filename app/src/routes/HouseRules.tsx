@@ -8,11 +8,10 @@
    warband's own file marked where it differs, with "Take the campaign's
    rules". Only the display setting stays the player's. */
 import * as core from '@mordheim/core';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useCampaignRules, type CampaignRules } from '../campaign/rules.ts';
-import { db, type StoredWarband } from '../db/db.ts';
+import { type StoredWarband } from '../db/db.ts';
 import { FLAVOUR } from '../flavour.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { adoptHouse, campaignHouseState, declaration, differingRules, houseView, setBodyOnly, setGrade, setRule, stepRule } from '../roster/house.ts';
@@ -22,6 +21,7 @@ import styles from '../roster/House.module.css';
 import trade from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
+import { useWarbandRecord } from '../sync/local.ts';
 
 const KEEP = { gold: 'keep' } as const;
 
@@ -128,7 +128,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 
 export function HouseRules() {
   const { id = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null) {
     return (

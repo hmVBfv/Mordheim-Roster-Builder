@@ -24,15 +24,18 @@ const DELETES: ReadonlySet<OutboxItem['op']> = new Set(['entry.delete', 'note.de
 /** A picture waiting: what it is, and its bytes (already shrunk on the device). */
 export interface PictureItem { meta: { mime: string } & Record<string, unknown>; bytes: ArrayBuffer }
 
-/** One item to the server: a picture first says what it is, then sends its bytes. */
+/** One item to the server, sent for its author: if the device's cookie belongs to somebody else by now, the server refuses it
+    (other_user) and it waits – never goes as another account's (independent review of CLIENT-1). A picture first says what it
+    is, then sends its bytes. */
 async function send(i: OutboxItem): Promise<void> {
+  const as = i.userId;
   if (i.op === 'attachment.put') {
     const b = i.body as PictureItem;
-    await api(pathOf(i), { method: 'PUT', body: b.meta });
-    await apiBytes(`${pathOf(i)}/file`, b.bytes, b.meta.mime);
+    await api(pathOf(i), { method: 'PUT', body: b.meta, as });
+    await apiBytes(`${pathOf(i)}/file`, b.bytes, b.meta.mime, as);
     return;
   }
-  await api(pathOf(i), DELETES.has(i.op) ? { method: 'DELETE' } : { method: 'PUT', body: i.body });
+  await api(pathOf(i), DELETES.has(i.op) ? { method: 'DELETE', as } : { method: 'PUT', body: i.body, as });
 }
 
 let flushing: Promise<number> | null = null;
@@ -55,7 +58,8 @@ export function flushOutbox(userId: string): Promise<number> {
           await db.outbox.delete(i.key);
           sent++;
         } catch (e) {
-          if (e instanceof ApiError && e.unreachable) break;
+          // not there, the device belongs to another account now, or its author was signed out elsewhere: it waits for its author
+          if (e instanceof ApiError && (e.unreachable || e.code === 'other_user' || e.code === 'sign_in')) break;
           // refused for good (the battle closed, a check failed): kept and shown, not sent again
           await db.outbox.update(i.key, { refused: errorText(e) });
         }
@@ -71,16 +75,17 @@ export function flushOutbox(userId: string): Promise<number> {
 export const countOutbox = (userId: string) => db.outbox.filter((i) => i.userId === userId).count();
 
 /** What still waits for this battle, live. */
-export function useOutbox(battleId: string): OutboxItem[] {
-  return useLiveQuery(() => db.outbox.where('battleId').equals(battleId).sortBy('at'), [battleId]) ?? [];
+export function useOutbox(battleId: string, userId: string): OutboxItem[] {
+  // filtered after the query, not in it: a plain range query is one Dexie updates at once, without a new round (no flicker)
+  return useLiveQuery(() => db.outbox.where('battleId').equals(battleId).sortBy('at').then((all) => all.filter((i) => i.userId === userId)), [battleId, userId]) ?? [];
 }
 
 /** The notes of a campaign that still wait, live. */
-export function useNoteOutbox(campaignId: string): OutboxItem[] {
-  return useLiveQuery(() => db.outbox.filter((i) => i.campaignId === campaignId && (i.op === 'note.put' || i.op === 'note.delete')).sortBy('at'), [campaignId]) ?? [];
+export function useNoteOutbox(campaignId: string, userId: string): OutboxItem[] {
+  return useLiveQuery(() => db.outbox.filter((i) => i.userId === userId && i.campaignId === campaignId && (i.op === 'note.put' || i.op === 'note.delete')).sortBy('at'), [campaignId, userId]) ?? [];
 }
 
 /** The pictures of a campaign that still wait, live. */
-export function usePictureOutbox(campaignId: string): OutboxItem[] {
-  return useLiveQuery(() => db.outbox.filter((i) => i.campaignId === campaignId && (i.op === 'attachment.put' || i.op === 'attachment.delete')).sortBy('at'), [campaignId]) ?? [];
+export function usePictureOutbox(campaignId: string, userId: string): OutboxItem[] {
+  return useLiveQuery(() => db.outbox.filter((i) => i.userId === userId && i.campaignId === campaignId && (i.op === 'attachment.put' || i.op === 'attachment.delete')).sortBy('at'), [campaignId, userId]) ?? [];
 }
