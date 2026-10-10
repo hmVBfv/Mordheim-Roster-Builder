@@ -11,7 +11,8 @@ import type { DB } from './db.ts';
 import type { Health } from './health.ts';
 import type { HashCost } from './passwords.ts';
 import { can, isAction, type Action, type Actor } from './policy.ts';
-import { readActor, registerAccountRoutes } from './routes-accounts.ts';
+import { readActor, registerAccountRoutes, sessionCookie } from './routes-accounts.ts';
+import { HashBusyError } from './passwords.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
 import { registerNoteRoutes } from './routes-notes.ts';
 import { registerAttachmentRoutes } from './routes-attachments.ts';
@@ -105,7 +106,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       if (req.method !== 'GET' && req.method !== 'HEAD' && !sameOrigin(req, deps.config.publicOrigin ?? null)) {
         return reply.code(403).send({ error: 'cross_origin' });
       }
-      req.actor = readActor(db, req, now());
+      // a session in use lives on – its cookie with it (security review AUTH-14)
+      req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), 90)));
     }
     if (!can(req.actor, action)) return reply.code(req.actor ? 403 : 401).send({ error: req.actor ? 'forbidden' : 'sign_in' });
   });
@@ -164,6 +166,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   app.setNotFoundHandler((_req, reply) => notFound(reply));
   app.setErrorHandler((err, req, reply) => {
+    // a crowd of password checks: try again in a moment (passwords.ts)
+    if (err instanceof HashBusyError) return reply.code(503).header('Retry-After', '5').send({ error: 'busy' });
     const status = (err as { statusCode?: number }).statusCode ?? 500;
     if (status >= 500) req.log.error({ event: 'error', err }, 'request failed');
     return reply.code(status).send({ error: status >= 500 ? 'internal' : 'bad_request' });

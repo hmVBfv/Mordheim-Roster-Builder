@@ -69,7 +69,10 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
   (N = 2¹⁵, r = 8, p = 1; 32 MiB für einen Augenblick, höchstens zwei
   gleichzeitig) mit seinen Parametern, damit ein späterer Aufwand alte Hashes
   noch prüft. Ein unbekannter Nutzername kostet dieselbe Zeit wie ein
-  falsches Passwort.
+  falsches Passwort. Warten schon 20 Prüfungen, heißt die Antwort sofort
+  „busy“ (503 mit `Retry-After`) – ein Schwall von Anmeldungen aus vielen
+  Adressen ließe sonst alle minutenlang warten (Prüfung 09.10.2026,
+  AUTH-8).
 - **Sitzungen:**
   - Zufälliges 256-Bit-Token, in der Datenbank nur als Hash.
   - Cookie `mh_session`, `HttpOnly; Secure; SameSite=Lax; Path=/`
@@ -77,11 +80,17 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
   - 90 Tage, verlängert sich bei Nutzung.
   - Geräteliste im Profil; jede Sitzung einzeln beendbar, „überall sonst
     abmelden“. Eine neue Anmeldung beendet die vorige Sitzung desselben
-    Geräts; ein neues Passwort beendet alle anderen, ein Reset alle.
+    Geräts; ein neues Passwort beendet alle anderen, ein Reset alle, ein
+    neu eingerichteter Authenticator alle anderen (sie kamen nur mit dem
+    Passwort herein). Verlängert sich die Sitzung, bekommt auch der Cookie
+    neue 90 Tage. Eine Passwortänderung, deren Sitzung währenddessen beendet
+    wurde, gilt nicht.
 - **Zweiter Faktor (TOTP, Authenticator-App):** Pflicht für Admin und Leiter,
   optional für Spieler. Beim Einrichten 10 Einmal-Wiederherstellungscodes.
   Geht beides verloren, setzt der Admin den Faktor zurück (geloggt); für den
-  Admin selbst gibt es den Weg über `roster-cli` auf dem Pi.
+  Admin selbst gibt es den Weg über `roster-cli` auf dem Pi. Ein
+  Admin-Konto setzt nur `roster-cli` zurück (Faktor und Reset-Link), nie die
+  App: Wer die Sitzung eines Admins stiehlt, übernimmt damit kein zweites.
   - Anmeldung in zwei Schritten: Passwort → Sitzung im Zustand `totp`
     (5 Minuten, darf nur den Code schicken) → mit dem Code eine volle
     Sitzung mit neuem Token.
@@ -89,19 +98,40 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
     jede Richtung, jeder Code nur einmal.
   - Das Geheimnis liegt mit `TOTP_KEY` (aus `app.env`, nicht im Backup)
     verschlüsselt in der Datenbank: Eine Kopie der Datenbank allein verrät
-    keine Codes. Ohne `TOTP_KEY` lässt sich kein Faktor einrichten.
+    keine Codes. Ohne `TOTP_KEY` lässt sich kein Faktor einrichten. Auch
+    die Wiederherstellungscodes liegen mit `TOTP_KEY` verschlüsselt-gehasht
+    (HMAC, `h1:…`) – ein einfacher Hash der rund 40 Bit ließe sich aus einer
+    Kopie durchprobieren; so gespeicherte ältere Codes gelten weiter.
+  - Den zweiten Faktor schützt der zweite Faktor: Ein Authenticator auf
+    einem neuen Handy ersetzt den alten nur mit einem Code des alten (oder
+    einem Wiederherstellungscode), Ausschalten verlangt Passwort und Code.
+    Eine gestohlene Sitzung allein ändert daran nichts.
   - Ein Admin ohne eingerichteten Faktor darf nur sein eigenes Konto
     pflegen (Faktor einrichten, Passwort, Geräte, abmelden); abschalten kann
     er ihn nicht. Das Zurücksetzen durch den Admin meldet das Konto überall
     ab (ein verlorenes Handy ist oft noch angemeldet).
 - **Passwort vergessen:** Nur der Admin erzeugt einen Reset-Link (einmal
   gültig, 24 Stunden), in der App oder mit `roster-cli reset`. Kein
-  E-Mail-Versand.
-- **Bremse:** Pro Konto und pro IP höchstens 5 Fehlversuche in 15 Minuten,
-  danach wachsende Wartezeit (30 Sekunden, verdoppelt je weiterem Fehler,
-  höchstens 15 Minuten; `429` mit `Retry-After`). Versuche, die die Bremse
-  abweist, verlängern sie nicht – Abwarten hilft immer. Sie gilt auch für den
-  Code nach dem Passwort. Fehlversuche werden als eigene Logzeile
+  E-Mail-Versand. Verbraucht wird ein Link erst in derselben Transaktion,
+  die das Passwort setzt, und nur, wenn er dann noch gilt: zweimal zugleich
+  eingelöst, widerrufen oder ersetzt, während das Passwort gehasht wurde –
+  er setzt kein Passwort. Sperren oder „überall abmelden“ durch den Admin
+  widerruft offene Reset-Links.
+- **Bremse:** höchstens 5 Fehlversuche in 15 Minuten für ein Konto von
+  einer Adresse und von einer Adresse für beliebige Konten, 25 für ein
+  Konto von allen Adressen zusammen; danach wachsende Wartezeit (30
+  Sekunden, verdoppelt je weiterem Fehler, höchstens 15 Minuten; `429` mit
+  `Retry-After`). So sperrt niemand ein fremdes Konto mit ein paar falschen
+  Passwörtern aus (Prüfung 09.10.2026, AUTH-9). Versuche, die die Bremse
+  abweist, verlängern sie nicht – Abwarten hilft immer – und zählen für
+  Fail2Ban nicht (`login_braked` statt `login_failed`), sonst bekäme der
+  ausgesperrte Besitzer die eigene Adresse gesperrt. Sie gilt auch für den
+  Code nach dem Passwort und für jede Passwortprüfung eines Angemeldeten
+  (Passwort ändern, Authenticator ausschalten). Je Konto läuft höchstens
+  eine Passwortprüfung zugleich, je Adresse drei (sonst `429` für eine
+  Sekunde): Gleichzeitige Anfragen wären sonst alle geprüft worden, bevor
+  der erste Fehler zählt (AUTH-1); drei, weil Spieler hinter einem Router
+  sich am Spielabend im selben Moment anmelden. Fehlversuche werden als eigene Logzeile
   geschrieben; eine Fail2Ban-Regel sperrt IPs mit vielen Fehlversuchen.
 - **CSRF:** `SameSite=Lax`, Prüfung des `Origin`-Headers bei jeder
   schreibenden Anfrage (gleich `PUBLIC_ORIGIN`; ohne ihn der eigene Host),

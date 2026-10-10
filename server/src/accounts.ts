@@ -100,10 +100,11 @@ export function sessionByToken(db: DB, token: string, now: Date): { session: Ses
   return { session, user };
 }
 
-/** A session in use lives on: at most once an hour its expiry moves to 90 days from now. */
-export function touchSession(db: DB, s: SessionRow, ip: string, now: Date): void {
-  if (s.stage !== 'full' || now.getTime() - Date.parse(s.last_seen_at) < 60 * 60 * 1000) return;
+/** A session in use lives on: at most once an hour its expiry moves to 90 days from now. Whether it moved (the cookie moves with it). */
+export function touchSession(db: DB, s: SessionRow, ip: string, now: Date): boolean {
+  if (s.stage !== 'full' || now.getTime() - Date.parse(s.last_seen_at) < 60 * 60 * 1000) return false;
   db.prepare('UPDATE sessions SET last_seen_at = ?, expires_at = ?, ip = ? WHERE id = ?').run(iso(now), after(now, SESSION_DAYS * DAY), ip, s.id);
+  return true;
 }
 
 /** The code was right: the session is a full one now, with a new token. */
@@ -154,8 +155,15 @@ export function inviteByToken(db: DB, token: string, now: Date): InviteRow | nul
   return row;
 }
 
-export function useInvite(db: DB, id: string, now: Date): void {
-  db.prepare('UPDATE invites SET used_at = ? WHERE id = ?').run(iso(now), id);
+/** Uses a link up – only if it is still good at this moment (two taps at once, a revocation while the password was hashed:
+    security review AUTH-2). Whether it was. */
+export function useInvite(db: DB, id: string, now: Date): boolean {
+  return db.prepare('UPDATE invites SET used_at = ? WHERE id = ? AND used_at IS NULL AND revoked_at IS NULL AND expires_at > ?').run(iso(now), id, iso(now)).changes === 1;
+}
+
+/** Ends a user's open reset links: when the account is disabled or signed out everywhere (security review AUTH-12). */
+export function revokeResetLinks(db: DB, userId: string, now: Date): number {
+  return db.prepare("UPDATE invites SET revoked_at = ? WHERE kind = 'reset' AND for_user_id = ? AND used_at IS NULL AND revoked_at IS NULL").run(iso(now), userId).changes;
 }
 
 export function revokeInvite(db: DB, id: string, now: Date): boolean {
@@ -178,15 +186,15 @@ export function recordAttempt(db: DB, a: { username: string; ip: string; ok: boo
   db.prepare('DELETE FROM login_attempts WHERE at < ?').run(after(now, -ATTEMPT_DAYS * DAY));
 }
 
-/** Failed attempts in the last 15 minutes for this account and this address,
-    and the latest of them. A try refused by the brake does not count, so
-    waiting out the brake always works. */
-export function recentFailures(db: DB, username: string, ip: string, now: Date): { user: number; ip: number; last: string | null } {
+/** Failed attempts in the last 15 minutes – for this account from this
+    address, from this address for any account, for this account from
+    anywhere – and the latest of each. A try refused by the brake does not
+    count, so waiting out the brake always works. */
+export function recentFailures(db: DB, username: string, ip: string, now: Date): Record<'pair' | 'ip' | 'user', { n: number; last: string | null }> {
   const since = after(now, -15 * 60 * 1000);
-  const u = db.prepare("SELECT count(*) AS n, max(at) AS last FROM login_attempts WHERE username = ? AND ok = 0 AND reason != 'braked' AND at > ?").get(username.toLowerCase(), since) as { n: number; last: string | null };
-  const i = db.prepare("SELECT count(*) AS n, max(at) AS last FROM login_attempts WHERE ip = ? AND ok = 0 AND reason != 'braked' AND at > ?").get(ip, since) as { n: number; last: string | null };
-  const last = [u.last, i.last].filter(Boolean).sort().pop() ?? null;
-  return { user: u.n, ip: i.n, last };
+  const count = (where: string, ...args: string[]) => db.prepare(`SELECT count(*) AS n, max(at) AS last FROM login_attempts WHERE ${where} AND ok = 0 AND reason != 'braked' AND at > ?`).get(...args, since) as { n: number; last: string | null };
+  const name = username.toLowerCase();
+  return { pair: count('username = ? AND ip = ?', name, ip), ip: count('ip = ?', ip), user: count('username = ?', name) };
 }
 
 export interface AttemptSummary { id: number; username: string; ip: string; at: string; ok: boolean; reason: string }
