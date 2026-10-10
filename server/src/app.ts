@@ -10,7 +10,8 @@ import type { Config } from './config.ts';
 import type { DB } from './db.ts';
 import type { Health } from './health.ts';
 import type { HashCost } from './passwords.ts';
-import { can, isAction, type Action, type Actor } from './policy.ts';
+import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
+import { ACTIONS, can, isAction, type Action, type Actor } from './policy.ts';
 import { readActor, registerAccountRoutes, sessionCookie } from './routes-accounts.ts';
 import { HashBusyError } from './passwords.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
@@ -62,6 +63,11 @@ export interface AppDeps {
 
 /** Request body limit for the whole request (docs/security.md: 3 MB). */
 export const BODY_LIMIT = 3 * 1024 * 1024;
+/** Without an account (sign-in, an invite) a body is a few fields (security review INPUT-2). */
+export const ANONYMOUS_BODY_LIMIT = 64 * 1024;
+const tooManyContainers = (text: string) => countContainers(text, MAX_JSON_CONTAINERS) > MAX_JSON_CONTAINERS;
+
+const tooLarge = (message: string) => Object.assign(new Error(message), { statusCode: 413 });
 
 export class UncheckedRouteError extends Error {
   override name = 'UncheckedRouteError';
@@ -71,7 +77,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const app = Fastify({
     ...(deps.logger ? { loggerInstance: deps.logger } : { logger: false }),
     trustProxy: deps.trustProxy,
-    bodyLimit: BODY_LIMIT,
+    // the server's own limit, for a path without a route too; routes for members raise theirs (onRoute)
+    bodyLimit: ANONYMOUS_BODY_LIMIT,
     // our own single line per request (onResponse below)
     logController: new LogController({ disableRequestLogging: true }),
     return503OnClosing: true,
@@ -81,6 +88,17 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   // only JSON is parsed: a form or text/plain from another site cannot carry a write
   app.removeContentTypeParser('text/plain');
+  // JSON as Fastify parses it (prototype poisoning refused), after two checks
+  // on the text: small without an account, and not a pile of tiny objects.
+  // Parsing comes after onRequest, so the actor is known here.
+  const json = app.getDefaultJsonParser('error', 'error');
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    const text = body as string;
+    if (!req.actor && text.length > ANONYMOUS_BODY_LIMIT) return done(tooLarge('body too large without an account'), undefined);
+    if (tooManyContainers(text)) return done(tooLarge('too many objects in one body'), undefined);
+    json(req, text, done);
+  });
 
   // no route without an action: the check cannot be forgotten
   app.decorate('registeredRoutes', [] as RegisteredRoute[]);
@@ -93,6 +111,10 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       throw new UncheckedRouteError(`${String(route.method)} ${route.url}: every route names its action for can() (server/src/policy.ts)`);
     }
     for (const method of [route.method].flat()) app.registeredRoutes.push({ method, url: route.url, action });
+    // open to everybody (signing in, an invite, the code after the password) and paths without a route: no more than 64 KB is
+    // even read (INPUT-2); routes for members up to 3 MB, unless they set their own (a picture's bytes)
+    const who = ACTIONS[action].who;
+    if (route.bodyLimit === undefined) route.bodyLimit = who === 'public' || who === 'pending' ? ANONYMOUS_BODY_LIMIT : BODY_LIMIT;
   });
 
   app.addHook('onRequest', async (req, reply) => {

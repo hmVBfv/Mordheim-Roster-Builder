@@ -3,7 +3,7 @@
    make it find another. Secrets never reach the log. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { loginFailed } from '../src/log.ts';
+import { loginBraked, loginFailed } from '../src/log.ts';
 import { captureLog } from './helpers.ts';
 
 const FILTER = readFileSync(new URL('../../ops/fail2ban/filter.d/roster-auth.conf', import.meta.url), 'utf8');
@@ -31,8 +31,18 @@ describe('Fail2Ban', () => {
     expect(all).toEqual(['203.0.113.9']);
   });
 
-  it('watches the container by name', () => {
-    expect(FILTER).toMatch(/^journalmatch\s*=\s*CONTAINER_NAME=roster-app$/m);
+  it('only an IP address reaches the line (security review OPS-6): a forwarded name cannot point a ban elsewhere', () => {
+    const log = captureLog();
+    loginFailed(log.logger, 'player.example.org', 'player');
+    loginBraked(log.logger, '203.0.113.9, 192.0.2.1', 'player');
+    expect(JSON.parse(log.lines[0]!)).toMatchObject({ event: 'login_failed', ip: 'invalid' });
+    expect(JSON.parse(log.lines[1]!)).toMatchObject({ event: 'login_braked', ip: 'invalid' });
+    expect(failregex().exec(log.lines[0]!)).toBeNull();
+    expect(/^usedns\s*=\s*no$/m.test(readFileSync(new URL('../../ops/fail2ban/jail.d/roster.local', import.meta.url), 'utf8'))).toBe(true);
+  });
+
+  it('watches both containers by name: the test instance holds a copy of the accounts (security review OPS-3)', () => {
+    expect(FILTER).toMatch(/^journalmatch\s*=\s*CONTAINER_NAME=roster-app \+ CONTAINER_NAME=roster-staging$/m);
   });
 });
 

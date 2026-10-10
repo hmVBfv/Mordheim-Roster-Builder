@@ -74,10 +74,12 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
    (der zuletzt gemergte Pull Request), dann `sudo ops/install.sh`. Legt an:
    das Drop-in, mit dem Docker auf die SSD wartet; die Verzeichnisse unter
    `/mnt/ssd/roster/` samt Markerdatei (nur, wenn `/mnt/ssd` eingebunden ist);
-   `app.env`, `staging.env`, `secrets/healthchecks.env` (600);
+   `app.env`, `staging.env`, `secrets/healthchecks.env`,
+   `secrets/staging.pass` (600);
    `~/server/roster/compose.yaml`, `Caddyfile`, `.env`;
    `/etc/roster/roster.conf`, `roster-deploy`, `roster-restore`, die Skripte
-   unter `/usr/local/lib/roster/`, die systemd-Units und -Timer, die
+   unter `/usr/local/lib/roster/`, `cosign` (feste Version, Prüfsumme im
+   Skript), die systemd-Units und -Timer, die
    Fail2Ban-Regel. Startet Caddy und die Timer für Backup und
    Wiederherstellungstest; `roster-alive` erst in Stufe 2.
 8. **restic-Repo:**
@@ -133,7 +135,7 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
     `lsblk -o NAME,SIZE,MODEL,TRAN,MOUNTPOINTS` bestimmen (Größe der Karte,
     `TRAN` = `usb`; das falsche Gerät wird überschrieben), eingehängte
     Partitionen aushängen, dann
-    `sudo dd if=/dev/sdX bs=4M status=progress | zstd -T0 > ~/backup/piServer-<Datum>.img.zst`
+    `sudo dd if=/dev/sdX bs=4M status=progress | zstd -T0 > ~/backup/<name>-<Datum>.img.zst`
     und auf die Reservekarte (mindestens so groß wie die Originalkarte)
     `zstdcat … | sudo dd of=/dev/sdY bs=4M status=progress conv=fsync`.
     Die Reservekarte in den Pi, booten, `docker ps`, `roster-deploy --status`
@@ -188,10 +190,23 @@ Einladungslinks aus der App:
    Passwortmanager.
 4. Mitspieler bekommen ihren Link aus der App (Admin → Einladungen).
 
-Die Testinstanz hat eine eigene Datenbank, aber denselben `TOTP_KEY`. Ein
-Konto, das du dort anlegst, gilt nur dort und ist nach dem nächsten
-nächtlichen Wiederherstellungstest wieder weg; danach meldest du dich dort mit
-deinem Produktions-Konto und dessen Authenticator an.
+**Anmelden auf der Testinstanz** (seit der Sicherheitsprüfung, OPS-3): Sie
+bekommt jede Nacht eine Kopie der Produktion, mit allen Konten – aber kein
+Geheimnis der Produktion wirkt dort. Nach jeder Wiederherstellung setzt
+`roster-cli test-accounts` für **jedes** Konto dasselbe Testpasswort, entfernt
+alle Authenticatoren und beendet alle Sitzungen; offene Einladungen und
+Reset-Links verfallen. Die Testinstanz hat einen eigenen `TOTP_KEY`.
+
+- Das Testpasswort: `cat /mnt/ssd/roster/secrets/staging.pass` (legt
+  `install.sh` einmal an). Anmelden mit deinem Nutzernamen und diesem
+  Passwort.
+- Als Admin richtest du dort den Authenticator neu ein, bevor die
+  Admin-Werkzeuge aufgehen – als eigener Eintrag in der App, z. B.
+  „Mordheim Test“. Nach der nächsten Nacht ist er wieder weg.
+- Ein Konto, das du dort anlegst, gilt nur dort und ist nach der nächsten
+  Nacht wieder weg.
+- Die Testinstanz läuft über schlichtes http im Heimnetz: Das Passwort der
+  Produktion gehört dort nie hinein.
 
 `roster-cli` für Konten (immer `docker exec roster-app roster-cli …`; jeder
 Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
@@ -203,6 +218,7 @@ Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
 | `totp-reset <name>` | entfernt den Authenticator und meldet das Konto überall ab – der Weg zurück, wenn ein Admin Handy und Codes verloren hat |
 | `sign-out <name>` | beendet alle Sitzungen des Kontos |
 | `users` | Konten mit Admin, Faktor, gesperrt, Geräten, zuletzt gesehen |
+| `test-accounts` | nur auf der Testinstanz (`ROSTER_STAGING=1` in `staging.env`, sonst verweigert): Testpasswort von stdin für jedes Konto, keine Authenticatoren, keine Sitzungen, offene Links verfallen. Ruft der nächtliche Wiederherstellungstest selbst auf |
 
 ### Die laufende Kampagne übernehmen (einmalig, Phase 4a5)
 
@@ -310,16 +326,17 @@ roster-deploy --staging <tag> && roster-deploy <tag>
   ops.log             was roster-deploy, Backup, Test und Wiederherstellung getan haben
 /etc/roster/roster.conf            Werte für die Skripte (von install.sh erzeugt)
 /usr/local/bin/roster-deploy, roster-restore
-/usr/local/lib/roster/             roster-backup, roster-restore-test, roster-alive, common.sh
+/usr/local/lib/roster/             roster-backup, roster-restore-test, roster-alive, roster-verify, common.sh
+/usr/local/bin/cosign              prüft die Signatur eines Images (ADR 0017)
 /mnt/ssd/roster/
   data/               roster.sqlite (+ -wal, -shm), .roster-volume, snapshots/
   uploads/            Bilder
   backups/restic/     verschlüsseltes Backup-Repo
-  secrets/            restic.pass, healthchecks.env (Verzeichnis 700)
+  secrets/            restic.pass, healthchecks.env, staging.pass (Verzeichnis 700)
   app.env             Laufzeit-Konfiguration der App (600)
-  staging.env         dasselbe für die Testinstanz (600)
+  staging.env         dasselbe für die Testinstanz, mit eigenem TOTP_KEY (600)
   staging/            Daten der Testinstanz (data/, uploads/)
-  caddy/              Zertifikate und Konfiguration von Caddy
+  caddy/              Zertifikate und Konfiguration von Caddy (gehört root, 700)
 /mnt/ssd/agent/eingang/chronik/   KI-Pakete für chronik N (ab Phase 4b)
 ```
 
@@ -331,13 +348,13 @@ roster-deploy --staging <tag> && roster-deploy <tag>
 | [`Caddyfile`](../ops/Caddyfile) | `~/server/roster/Caddyfile` | TLS, Header, Weiterleitung an die App |
 | [`env/*.example`](../ops/env/) | `app.env`, `staging.env`, `secrets/healthchecks.env` | nur angelegt, nie überschrieben |
 | [`bin/roster-deploy`](../ops/bin/roster-deploy), [`bin/roster-restore`](../ops/bin/roster-restore) | `/usr/local/bin/` | Deploy mit Rollback; Wiederherstellung |
-| [`lib/`](../ops/lib/) | `/usr/local/lib/roster/` | Backup, Wiederherstellungstest, Totmannschalter |
+| [`lib/`](../ops/lib/) | `/usr/local/lib/roster/` | Backup, Wiederherstellungstest, Totmannschalter, Herkunftsprüfung (`roster-verify`) |
 | [`systemd/`](../ops/systemd/) | `/etc/systemd/system/` | Timer und Dienste; Docker wartet auf die SSD |
 | [`fail2ban/`](../ops/fail2ban/) | `/etc/fail2ban/` | Filter und Jail `roster-auth` |
 | [`ddns/porkbun-ddns`](../ops/ddns/porkbun-ddns) | `/usr/local/sbin/` | DynDNS der Domain; nur, wenn `/etc/porkbun-ddns.env` existiert (Abschnitt 11) |
 | [`image/roster-cli`](../ops/image/roster-cli) | im Image | `roster-cli` im Container |
 | [`install.sh`](../ops/install.sh) | – | spielt alles ein; `--render <dir>` erzeugt nur die Dateien |
-| [`test/`](../ops/test/) | – | Rauch- und Ende-zu-Ende-Test der CI, DynDNS-Updater gegen einen API-Ersatz |
+| [`test/`](../ops/test/) | – | Rauch- und Ende-zu-Ende-Test der CI (läuft nur auf einem frischen CI-Runner, nie auf dem Pi), DynDNS-Updater gegen einen API-Ersatz, `roster-verify` gegen Ersatz für docker und cosign, Caddy mit seiner Härtung |
 
 Platzhalter in den Vorlagen (`{{ROSTER_HOST}}`, `{{ROSTER_LAN_IP}}`,
 `{{ROSTER_DATA}}`, `{{ROSTER_MOUNT}}`, `{{ROSTER_UID}}` …) füllt `install.sh`
@@ -348,14 +365,19 @@ bricht ab, solange er nicht eingebunden ist.
 ### `compose.yaml`
 
 - **Caddy** im Host-Netz (UFW und Fail2Ban greifen, die App sieht die echte
-  Client-IP), 128 MB. Watchtower darf Caddy weiter aktualisieren.
+  Client-IP), 128 MB. Watchtower darf Caddy weiter aktualisieren. Gehärtet
+  (Sicherheitsprüfung, OPS-4): root im Container, aber ohne Capabilities
+  außer `NET_BIND_SERVICE` (Port 443), Dateisystem nur lesbar außer `/data`,
+  `/config` und `/tmp`, `no-new-privileges`, höchstens 256 Prozesse. Seine
+  Verzeichnisse unter `caddy/` gehören darum root (`install.sh`).
 - **App** (`roster-app`) auf `127.0.0.1:3000`, als `<user>` (1000:1000),
   256 MB, 1,5 Kerne; Logs an journald (für Fail2Ban); Watchtower
   ausgeschlossen. Gehärtet: Dateisystem nur lesbar außer `/data`,
   `/uploads` und `/tmp`, keine Capabilities, `no-new-privileges`, höchstens
   128 Prozesse, `init`.
 - **Testinstanz** (`roster-staging`) auf `<pi-lan-ip>:8081`, 192 MB, eigene
-  Daten unter `staging/`, sonst wie die App. Sie schreibt nichts nach
+  Daten unter `staging/`, eigener `TOTP_KEY`, ein Testpasswort für alle
+  Konten (siehe Konten), sonst wie die App. Sie schreibt nichts nach
   `eingang/`.
 - Der Chronik-Eingang wird erst in Phase 4b eingebunden – vorher braucht die
   App ihn nicht, und was sie nicht braucht, sieht sie nicht.
@@ -368,7 +390,9 @@ bricht ab, solange er nicht eingebunden ist.
   ein geänderter Caddyfile wirkt nach einem Neustart, den `install.sh`
   selbst auslöst).
 - Header wie in [security.md](security.md#2-netz), dazu
-  `Permissions-Policy`; Anfragen höchstens 6 MB.
+  `Permissions-Policy`; Anfragen höchstens 6 MB. Die CSP setzt Caddy nur,
+  wo die App keine eigene schickt (`?Content-Security-Policy`): Bilder
+  kommen mit einer strengeren (`sandbox`), die bleibt.
 
 ### `app.env` (Schlüssel, keine Werte im Repo)
 
@@ -376,7 +400,7 @@ bricht ab, solange er nicht eingebunden ist.
 | --- | --- | --- |
 | `PUBLIC_ORIGIN` | `https://<ROSTER_HOST>` (für die `Origin`-Prüfung); `install.sh` warnt, wenn es nicht zu `site.env` passt | Phase 2 |
 | `LOG_LEVEL` | `info` | Phase 2 |
-| `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse (32 Byte, base64). `install.sh` hängt ihn an, wenn er fehlt (`openssl rand -base64 32`), und ersetzt ihn nie. Die Testinstanz bekommt **denselben** Schlüssel (`install.sh` gleicht `staging.env` an `app.env` an, nie umgekehrt): Der nächtliche Wiederherstellungstest spielt ihr eine Kopie der Produktion ein, und mit einem eigenen Schlüssel wäre dort kein Authenticator lesbar. **Kopie in den Passwortmanager** – er liegt nicht im Backup. Ein falscher Wert hält den Server an (`ConfigError`); fehlt er, startet der Server, aber niemand kann einen Faktor einrichten | Phase 3g |
+| `TOTP_KEY` | Schlüssel zum Verschlüsseln der TOTP-Geheimnisse (32 Byte, base64). `install.sh` hängt ihn an, wenn er fehlt (`openssl rand -base64 32`), und ersetzt ihn nie. Die Testinstanz hat einen **eigenen** (seit der Sicherheitsprüfung, OPS-3; `install.sh` ersetzt in `staging.env` einen fehlenden oder den der Produktion): Mit dem der Produktion ließen sich dort die Authenticatoren der nächtlichen Kopie lesen. **Kopie in den Passwortmanager** – er liegt nicht im Backup. Ein falscher Wert hält den Server an (`ConfigError`); fehlt er, startet der Server, aber niemand kann einen Faktor einrichten | Phase 3g |
 | `BUGS_TOKEN_HASH` | Hash des Tokens für die Bug-Arbeit des Agenten | Phase 4c |
 
 `DATA_DIR` (`/data`), `UPLOAD_DIR` (`/uploads`), `PORT` (3000) und die
@@ -391,13 +415,15 @@ das:
 
 ```
 failregex = "event":"login_failed","ip":"<HOST>"
-journalmatch = CONTAINER_NAME=roster-app
+journalmatch = CONTAINER_NAME=roster-app + CONTAINER_NAME=roster-staging
 ```
 
 Jail `roster-auth`: 10 Fehlversuche in einer Stunde sperren die Adresse für
-einen Tag, auf Port 443. Ein Test prüft, dass ein Kontoname keine fremde
+einen Tag, auf den Ports 443 und 8081 (Testinstanz). `usedns = no`: Fail2Ban
+löst nie einen Namen auf, und der Server schreibt nur gültige IP-Adressen in
+die Zeile, sonst `invalid`. Ein Test prüft, dass ein Kontoname keine fremde
 Adresse in die Zeile schmuggeln kann; die CI sperrt eine Adresse mit
-echten Journal-Zeilen.
+echten Journal-Zeilen, aus beiden Containern.
 
 ## 5. Deploy und Rollback
 
@@ -405,8 +431,12 @@ Die CI baut für jeden Push ein Image für `linux/arm64` und `linux/amd64` und
 legt es als `ghcr.io/hmvbfv/mordheim-roster:<commit>` ab (die ersten sieben
 Zeichen des Commits) – aber erst, wenn alle Tests grün sind, auch der
 Rauchtest des Images und der Ende-zu-Ende-Test der Betriebsdateien. Auf
-`master` zusätzlich `:master` und `:drill-broken` (Rollback-Übung). Auf den Pi
-kommt ein Image nur bewusst, als `<user>` per SSH in `tmux`:
+`master` zusätzlich `:<ganzer Commit>`, `:master` und `:drill-broken`
+(Rollback-Übung). Jedes Image ist mit Sigstore signiert; das Zertifikat nennt
+Workflow, Branch und Commit ([ADR 0017](decisions/0017-signed-images-from-master.md)).
+**In die Produktion kommt nur, was die CI auf `master` gebaut hat** – ein
+Branch-Build nur auf die Testinstanz. Auf den Pi kommt ein Image nur bewusst,
+als `<user>` per SSH in `tmux`:
 
 ```bash
 roster-deploy --staging <commit>   # zuerst die Testinstanz, im Heimnetz prüfen
@@ -417,7 +447,17 @@ roster-deploy --status             # was läuft wo
 Ablauf von `roster-deploy <commit>`:
 
 1. Markerdatei auf der SSD prüfen, sonst Abbruch.
-2. Image holen; schlägt das fehl, hat sich nichts geändert.
+2. Image holen und seine Herkunft prüfen (`roster-verify`, mit `cosign`, das
+   `install.sh` in fester Version installiert): signiert von
+   `.github/workflows/ci.yml` auf `refs/heads/master`, für genau den Commit,
+   den das Image nennt, und der beginnt mit `<commit>`. Namen wie `master`
+   nimmt die Produktion nicht – jeder Branch kann sie verschieben –, nur
+   Commits (`<commit>-<datum>` für den monatlichen Neubau) und für die
+   Rollback-Übung `drill-broken`, das dann das Übungs-Image sein muss.
+   Schlägt eins davon fehl, hat sich nichts geändert („REFUSED …“ sagt, was
+   fehlte). Die Testinstanz nimmt jedes Image und meldet nur, ob es eines
+   von master ist. Compose zieht selbst nie (`pull_policy: never`): Es läuft
+   nur, was `roster-deploy` geholt und geprüft hat.
 3. Sicherung: `roster-cli backup --label pre-deploy-<commit>` im laufenden
    Container (läuft keiner, mit dem bisherigen Image); Schemastand merken.
 4. In `.env`: `PREVIOUS_TAG` ← bisheriger Tag, `ROSTER_TAG` ← `<commit>`;
@@ -481,9 +521,13 @@ danach `docker exec roster-app roster-cli epoch renew`.
 
 Jede Nacht um 03:00, nach dem Backup und vor dem Neustart um 03:30
 (`roster-restore-test.timer`): letzten Stand aus restic in
-`/mnt/ssd/roster/staging/` zurückspielen, Testinstanz neu starten, Health über
-die LAN-Adresse prüfen, Ping an `roster-restore-test`. Schlägt das fehl, ist
-das Backup nicht brauchbar – Meldung kommt über healthchecks.io.
+`/mnt/ssd/roster/staging/` zurückspielen, mit dem Image der Testinstanz
+`roster-cli test-accounts` laufen lassen (ein Testpasswort für alle Konten,
+keine Authenticatoren, keine Sitzungen – Abschnitt 4, Konten), erst dann die
+Testinstanz neu starten, Health über die LAN-Adresse prüfen, Ping an
+`roster-restore-test`. Schlägt das fehl, ist das Backup nicht brauchbar oder
+die Testinstanz trüge noch Zugangsdaten der Produktion – sie startet dann
+nicht, und die Meldung kommt über healthchecks.io.
 
 ## 7. Überwachung
 
@@ -516,7 +560,7 @@ Keine Agenten-Läufe während eines Spielabends.
 
 | Wann | Was |
 | --- | --- |
-| monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:master-<datum>`; Testinstanz, dann produktiv deployen |
+| monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:<commit>-<datum>` (und `:master-<datum>`); Testinstanz, dann produktiv `roster-deploy <commit>-<datum>` – produktiv nur Commits, nie Namen wie `master` |
 | monatlich | Blick auf healthchecks.io und `docker image prune -f`; alte `roster.sqlite.failed-*` und `…before-restore-*` in `data/` löschen, wenn nicht mehr gebraucht |
 | vierteljährlich | SD-Klon auffrischen (wie Schritt 14; alte Abbilder bis auf das letzte löschen) |
 | jährlich | restic-Passwort aus der Offline-Ablage testweise verwenden |

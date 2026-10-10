@@ -114,6 +114,43 @@ describe('roster-cli: accounts', () => {
     expect(run(['users'], s.data).out).toBe('player\t-\t0 devices\tlast seen 2026-09-30T12:00:00.000Z');
   });
 
+  it('test-accounts, on the test instance after the nightly restore (security review OPS-3): one test password for every account, no authenticators, no sessions, no open links', async () => {
+    const s = await startAccounts();
+    const player = await s.user('player', { totp: true });
+    await s.user('boss', { admin: true, totp: true });
+    const token = player.session();
+    const link = /#([\w-]{43})$/.exec(run(['invite'], s.data).out)![1]!;
+    const TEST = 'staging test password 1';
+    const staged = (input: string, staging = true) => {
+      const out: string[] = [];
+      const err: string[] = [];
+      const code = runCli(['test-accounts'], { ...env(s.data), ...(staging ? { ROSTER_STAGING: '1' } : {}) }, { out: (l) => out.push(l), err: (l) => err.push(l), input: () => input }, clock().now);
+      return { code, out: out.join('\n'), err: err.join('\n') };
+    };
+    // anywhere but the test instance: refused, nothing changed
+    expect(staged(`${TEST}\n`, false)).toMatchObject({ code: 2, err: expect.stringMatching(/only on the test instance/) });
+    expect(player.row().totp_enabled_at).not.toBeNull();
+    expect(staged('short\n')).toMatchObject({ code: 2, err: expect.stringMatching(/the test password/) });
+    expect(player.row().totp_enabled_at).not.toBeNull();
+
+    const r = staged(`${TEST}\n`);
+    expect(r.code).toBe(0);
+    expect(r.out).toMatch(/^2 accounts: one test password, no authenticators; \d+ sessions ended, 1 open links revoked$/);
+    expect(player.row()).toMatchObject({ totp_enabled_at: null, totp_secret_enc: null, totp_recovery: null });
+    expect(s.db.prepare('SELECT count(*) AS n FROM sessions WHERE revoked_at IS NULL').get()).toEqual({ n: 0 });
+    expect((await s.call({ url: '/api/v1/auth/me', token })).json()).toMatchObject({ user: null });
+    // the test password signs in, production's no longer does
+    expect((await s.call({ url: '/api/v1/auth/login', body: { username: 'player', password: TEST } })).statusCode).toBe(200);
+    expect((await s.call({ url: '/api/v1/auth/login', body: { username: 'boss', password: PASSWORD } })).statusCode).toBe(401);
+    // a link sent for production does nothing here
+    expect((await s.call({ url: '/api/v1/invites/accept', body: { token: link, username: 'newcomer', password: PASSWORD } })).json()).toMatchObject({ error: 'invalid_link' });
+    // logged, never the password
+    const row = s.db.prepare("SELECT actor_id, payload FROM audit_log WHERE action = 'user.test_accounts'").get() as { actor_id: string | null; payload: string };
+    expect(row.actor_id).toBeNull();
+    expect(JSON.parse(row.payload)).toMatchObject({ via: 'roster-cli', accounts: 2, links: 1 });
+    expect(JSON.stringify(s.db.prepare('SELECT * FROM audit_log').all())).not.toContain(TEST);
+  });
+
   it('refuses before the server has made the accounts', () => {
     const data = dataDir();
     expect(run(['invite'], data)).toMatchObject({ code: 3, err: expect.stringMatching(/no database yet/) });

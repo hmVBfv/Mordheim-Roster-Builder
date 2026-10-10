@@ -2465,3 +2465,58 @@ Before writing the reader, the parser ran over all sixteen real files of
 the chronicle (not copied into this repository – the tests use files made
 up in the same form): every one read, every language guessed right from
 its prose, the long folded `victor` of the fourth battle included.
+
+## October 10, 2026 — the security review
+
+Before the first real game night in the new app, Rob asked for one thing:
+that nothing can be exploited, from outside or signed in. Five reviews ran
+side by side, each blind to the others – sign-in and sessions, rights and
+visibility, inputs and resources, the app in the browser, the Pi itself –
+and each proved what it claimed with a test against the real server before
+deleting it. The findings, what was fixed and what stays open are in
+`docs/security-review.md`.
+
+Three were serious. Any push to any branch could put an image under a tag
+Rob deploys, because a branch runs its own copy of the workflow and the
+package hangs off the repository – branch protection on `master` never
+applied to the registry. Production now takes only images that master's CI
+signed with Sigstore for the very commit asked for (ADR 0017), and CI
+proves on every push that this check passes for master and refuses a
+branch. On a shared phone, the next account read the previous one's
+leaders' notes and sealed words straight from the device's cache; every
+cache now belongs to an account and goes when it signs out. And one
+request could stop the server for good: an advance of 1e15, then "mark",
+and the matching of advances with their events counted to 1e15. That
+report reached us cut off mid-sentence – the review of inputs had been
+blocked – so its second half was redone by hand, which found two more
+ways for a member to fill the 256 MB (a body of empty objects, and nine
+warbands of 2 MB in one sync).
+
+Wrong turns. A first test for a race – a reset link revoked while its
+hash was queued – only asserted when the race happened to go one way;
+"tests are unconditional" meant replacing it with a test of the one
+statement that settles it. Filtering the battle outbox by account inside
+the Dexie query cost the instant update the protocol relied on (a filter
+with a function cannot be applied optimistically); filtering after the
+query kept it. And the path check in `install.sh` first refused the root
+mount the guard test uses, because it put a slash in front of a path that
+already had one.
+
+Two decisions were Rob's: check where images come from (rather than only
+stopping branches from publishing, which a branch's own workflow could
+undo), and swap the test instance's credentials after every nightly
+restore instead of moving it behind TLS – it keeps real data for trying
+things, but nothing that signs in to production works there any more.
+
+Then a further review, blind to how the fixes were made, read them the way
+an attacker would – and found the seams. A second tab still acting for the
+account that had signed out in the first one sent its sync and its unsent
+notes with the new account's cookie; an answer on its way across a change of
+account was filed under the next one's key. Requests now say whose they are,
+and the server refuses one made for somebody other than its cookie's. The
+account cap counted characters, so 113 small saves full of empty lists fit
+it and still overflowed the sync; objects count now too. A failed swap of
+the test credentials left the production copy where the next staging deploy
+would have started it. And the case-insensitive match that was meant to
+forgive GitHub's spelling of the owner also forgave a branch called
+"Master" – only owner and repository match loosely now.

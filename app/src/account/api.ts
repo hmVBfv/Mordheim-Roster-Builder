@@ -123,6 +123,7 @@ export function errorText(e: unknown): string {
     case 'totp_unavailable': return 'The server cannot set up authenticators yet (TOTP_KEY is missing).';
     case 'invalid': return e.problem ? sentence(e.problem) : 'That was not accepted.';
     case 'quota': return 'The campaign has no room for more pictures.';
+    case 'account_full': return 'Your warbands hold 16 MB already – archive some you no longer play first.';
     case 'other_user': return 'Somebody else signed in on this device meanwhile – the app now goes on as them.';
     case 'busy': return 'The campaign server is busy with sign-ins right now. Try again in a few seconds.';
     case 'history_closed': return 'The campaign has played a battle in the app: its history is closed.';

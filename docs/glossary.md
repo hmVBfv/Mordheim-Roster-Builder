@@ -229,6 +229,11 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Synchronisation | Sync | `GET /api/v1/sync` |
 | Epoche | Epoch | `meta.epoch`; neu bei jedem Start auf einer Snapshot-Kopie (`server/src/db.ts`) |
 | Testinstanz | Staging | Container `roster-staging`, `roster-deploy --staging` |
+| Testpasswort (der Testinstanz) | – | `secrets/staging.pass`, `roster-cli test-accounts`, `ROSTER_STAGING=1` |
+| Herkunftsprüfung (eines Images) | – | `ops/lib/roster-verify`, `cosign verify`, ADR 0017 |
+| Signiertes Image (von master) | – | `cosign sign` in `ci.yml` (Job `publish`) |
+| Platz eines Kontos (seine Warbands) | “Your warbands hold 16 MB already” | `ACCOUNT_VOLUME`, `fitsAccount`, `account_full` |
+| Sicherheitsprüfung | – | `docs/security-review.md`, Befunde `AUTH-…`, `AUTHZ-…`, `CLIENT-…`, `INPUT-…`, `OPS-…` |
 | Markerdatei | Marker file | `/data/.roster-volume` (`server/src/volume.ts`) |
 | Snapshot (der Datenbank) | Snapshot | `data/snapshots/<zeit>-<label>.sqlite`, `roster-cli backup` |
 | Wiederherstellungstest | Restore test | `roster-restore-test.timer` |

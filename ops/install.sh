@@ -14,6 +14,8 @@
 #   /etc/roster/roster.conf, /usr/local/bin/roster-{deploy,restore},
 #     /usr/local/lib/roster/, systemd units and timers, the Docker drop-in
 #     that waits for the SSD, the Fail2Ban filter and jail
+#   /usr/local/bin/cosign (pinned release, checksum checked), with which
+#     roster-deploy checks that an image is master's (ADR 0017)
 #   /usr/local/sbin/porkbun-ddns and its timer, only if /etc/porkbun-ddns.env
 #     exists (the domain's DynDNS, ops/env/porkbun-ddns.env.example)
 # then starts Caddy and the backup and restore-test timers. roster-alive is
@@ -76,6 +78,9 @@ ROSTER_GID=$(id -g "$ROSTER_USER")
 [[ "$ROSTER_LAN_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || die "ROSTER_LAN_IP is not an IPv4 address: $ROSTER_LAN_IP"
 [[ "$ROSTER_MOUNT" =~ ^/[A-Za-z0-9/_.-]*$ ]] || die "ROSTER_MOUNT is not a plain absolute path: $ROSTER_MOUNT"
 [[ "$ROSTER_DATA" =~ ^/[A-Za-z0-9/_.-]+$ ]] || die "ROSTER_DATA is not a plain absolute path: $ROSTER_DATA"
+for p in "$ROSTER_MOUNT" "$ROSTER_DATA"; do
+  case "${p%/}/" in */../* | */./* | *//*) die "$p: no '.', '..' or empty parts in the path" ;; esac
+done
 case "$ROSTER_DATA/" in "${ROSTER_MOUNT%/}/"?*) ;; *) die "ROSTER_DATA ($ROSTER_DATA) is not on ROSTER_MOUNT ($ROSTER_MOUNT)" ;; esac
 [[ "$ROSTER_IMAGE" =~ ^[a-z0-9./:_-]+$ ]] || die "ROSTER_IMAGE is not an image name: $ROSTER_IMAGE"
 
@@ -140,9 +145,21 @@ while [ -z "$unsafe" ] && [ "$dir" != / ]; do
   dir=$(dirname "$dir")
 done
 [ -z "$unsafe" ] || die "$unsafe ($(stat -c '%A %U:%G' "$unsafe")) can be changed by someone else; not running files from there as root"
+# what it reads and where it writes as root, and the directories above them,
+# the same way (security review OPS-9)
+for f in "$site" "$ROSTER_DIR"; do
+  if [ -L "$f" ]; then die "$f is a symlink; give the real path"; fi
+  d=$f
+  [ -e "$d" ] || d=$(dirname "$d")
+  while [ "$d" != / ]; do
+    unsafe=$(changeable "$d" -maxdepth 0)
+    [ -z "$unsafe" ] || die "$unsafe ($(stat -c '%A %U:%G' "$unsafe")) can be changed by someone else; not using $f as root"
+    d=$(dirname "$d")
+  done
+done
 
 # 1. what must be there
-for cmd in docker restic curl openssl flock systemctl sed; do
+for cmd in docker restic curl openssl flock systemctl sed sha256sum; do
   command -v "$cmd" >/dev/null || die "$cmd is not installed (restic: sudo apt install restic)"
 done
 docker compose version >/dev/null 2>&1 || die "the docker compose plugin is missing"
@@ -153,13 +170,21 @@ fi
 mountpoint -q "$ROSTER_MOUNT" || die "$ROSTER_MOUNT is not mounted – not installing onto the SD card"
 
 # 2. directories on the SSD
-as_user() { install -d -o "$ROSTER_USER" -g "$ROSTER_GID" -m "${2:-750}" "$1"; }
+# install -d follows a symlink and would hand its target to the user: none here
+plain_dir() { if [ -L "$1" ]; then die "$1 is a symlink; not changing what it points to"; fi; }
+as_user() { plain_dir "$1"; install -d -o "$ROSTER_USER" -g "$ROSTER_GID" -m "${2:-750}" "$1"; }
 for d in "$ROSTER_DATA" "$ROSTER_DATA/data" "$ROSTER_DATA/uploads" "$ROSTER_DATA/backups" \
-  "$ROSTER_DATA/caddy" "$ROSTER_DATA/caddy/data" "$ROSTER_DATA/caddy/config" \
   "$ROSTER_DATA/staging" "$ROSTER_DATA/staging/data" "$ROSTER_DATA/staging/uploads"; do
   as_user "$d"
 done
 as_user "$ROSTER_DATA/secrets" 700
+# Caddy runs as root without DAC_OVERRIDE (compose.yaml): its directories
+# and everything it wrote there are root's
+for d in "$ROSTER_DATA/caddy" "$ROSTER_DATA/caddy/data" "$ROSTER_DATA/caddy/config"; do
+  plain_dir "$d"
+  install -d -o root -g root -m 700 "$d"
+done
+chown -R -P root:root "$ROSTER_DATA/caddy"
 for m in "$ROSTER_DATA/data/.roster-volume" "$ROSTER_DATA/staging/data/.roster-volume"; do
   if [ ! -f "$m" ]; then
     install -o "$ROSTER_USER" -g "$ROSTER_GID" -m 644 /dev/null "$m"
@@ -202,39 +227,66 @@ if ! grep -Eq '^TOTP_KEY=.+' "$ROSTER_DATA/app.env"; then
   printf 'TOTP_KEY=%s\n' "$(openssl rand -base64 32)" >>"$ROSTER_DATA/app.env"
   say "added a TOTP_KEY to $ROSTER_DATA/app.env – keep a copy in your password manager, then: cd $ROSTER_DIR && docker compose up -d --force-recreate app"
 fi
-# the test instance uses the same key: every night the restore test puts a
-# copy of production into it, and with a key of its own no authenticator of
-# that copy could be read there. staging.env's key is replaced if it differs
-# (only staging.env, never app.env).
-app_key=$(grep -E '^TOTP_KEY=.+' "$ROSTER_DATA/app.env" | tail -n 1)
-if [ "$(grep -E '^TOTP_KEY=' "$ROSTER_DATA/staging.env" || true)" != "$app_key" ]; then
+# The test instance holds a nightly copy of production, served over plain
+# http in the home network, so none of production's secrets may work there
+# (security review OPS-3, Rob 09.10.2026): it has a TOTP_KEY of its own –
+# replaced if it is missing or production's – and ROSTER_STAGING=1, without
+# which roster-cli refuses test-accounts. After every restore the restore
+# test gives every account one test password (secrets/staging.pass, made
+# here once), removes every authenticator and ends every session.
+staging_env() { # <key> <value>: replaces the key's line in staging.env
+  local staged
   staged=$(mktemp "$ROSTER_DATA/staging.env.XXXXXX")
-  { grep -Ev '^TOTP_KEY=' "$ROSTER_DATA/staging.env" || true; printf '%s\n' "$app_key"; } >"$staged"
+  { grep -Ev "^$1=" "$ROSTER_DATA/staging.env" || true; printf '%s=%s\n' "$1" "$2"; } >"$staged"
   chown "$ROSTER_USER:$ROSTER_GID" "$staged"
   chmod 600 "$staged"
   mv "$staged" "$ROSTER_DATA/staging.env"
-  say "staging.env now has production's TOTP_KEY; restart the test instance: cd $ROSTER_DIR && docker compose up -d --force-recreate staging"
+}
+app_key=$(grep -E '^TOTP_KEY=.+' "$ROSTER_DATA/app.env" | tail -n 1)
+staging_key=$(grep -E '^TOTP_KEY=.+' "$ROSTER_DATA/staging.env" | tail -n 1 || true)
+if [ -z "$staging_key" ] || [ "$staging_key" = "$app_key" ]; then
+  staging_env TOTP_KEY "$(openssl rand -base64 32)"
+  say "the test instance has a TOTP_KEY of its own now; it takes it with its next start through roster-deploy --staging <tag> (which also gives its copy the test password first)"
 fi
-unset app_key
+unset app_key staging_key
+grep -qx 'ROSTER_STAGING=1' "$ROSTER_DATA/staging.env" || staging_env ROSTER_STAGING 1
+if [ -L "$ROSTER_DATA/secrets/staging.pass" ]; then die "$ROSTER_DATA/secrets/staging.pass is a symlink"; fi
+if [ ! -e "$ROSTER_DATA/secrets/staging.pass" ]; then
+  install -o "$ROSTER_USER" -g "$ROSTER_GID" -m 600 /dev/null "$ROSTER_DATA/secrets/staging.pass"
+  openssl rand -base64 18 | tr '+/' '-_' >"$ROSTER_DATA/secrets/staging.pass"
+  say "the test instance's password for every account is in $ROSTER_DATA/secrets/staging.pass (from the next nightly restore on)"
+fi
 [ -f "$ROSTER_DATA/secrets/restic.pass" ] || warn "$ROSTER_DATA/secrets/restic.pass is missing – backups will fail (Stufe 1: restic)"
 [ -f "$ROSTER_DATA/backups/restic/config" ] || warn "no restic repository in $ROSTER_DATA/backups/restic – run: restic init -r $ROSTER_DATA/backups/restic --password-file $ROSTER_DATA/secrets/restic.pass"
 
 # 4. compose project
+plain_dir "$ROSTER_DIR"
 install -d -o "$ROSTER_USER" -g "$ROSTER_GID" -m 755 "$ROSTER_DIR"
+for f in compose.yaml Caddyfile .env ops.log; do
+  if [ -L "$ROSTER_DIR/$f" ]; then die "$ROSTER_DIR/$f is a symlink; not writing through it"; fi
+done
 old_caddy=$(sha256sum "$ROSTER_DIR/Caddyfile" 2>/dev/null | cut -d' ' -f1 || true)
 for f in compose.yaml Caddyfile; do
-  render "$ops/$f" >"$ROSTER_DIR/$f.new"
-  chown "$ROSTER_USER:$ROSTER_GID" "$ROSTER_DIR/$f.new"
-  chmod 644 "$ROSTER_DIR/$f.new"
-  mv "$ROSTER_DIR/$f.new" "$ROSTER_DIR/$f"
+  # a new file of root's, then renamed over the old one: nothing is written through a link
+  new=$(mktemp "$ROSTER_DIR/.$f.XXXXXX")
+  render "$ops/$f" >"$new"
+  chown -h "$ROSTER_USER:$ROSTER_GID" "$new"
+  chmod 644 "$new"
+  mv "$new" "$ROSTER_DIR/$f"
 done
 if [ ! -f "$ROSTER_DIR/.env" ]; then
-  printf 'ROSTER_IMAGE=%s\n' "$ROSTER_IMAGE" >"$ROSTER_DIR/.env"
-  chown "$ROSTER_USER:$ROSTER_GID" "$ROSTER_DIR/.env"
+  install -o "$ROSTER_USER" -g "$ROSTER_GID" -m 644 /dev/null "$ROSTER_DIR/.env"
+  printf 'ROSTER_IMAGE=%s\n' "$ROSTER_IMAGE" >>"$ROSTER_DIR/.env"
 elif ! grep -q '^ROSTER_IMAGE=' "$ROSTER_DIR/.env"; then
   printf 'ROSTER_IMAGE=%s\n' "$ROSTER_IMAGE" >>"$ROSTER_DIR/.env"
 fi
-touch "$ROSTER_DIR/ops.log" && chown "$ROSTER_USER:$ROSTER_GID" "$ROSTER_DIR/ops.log"
+[ -f "$ROSTER_DIR/ops.log" ] || install -o "$ROSTER_USER" -g "$ROSTER_GID" -m 644 /dev/null "$ROSTER_DIR/ops.log"
+# a test instance holding a copy of production without the test password (installed before OPS-3) stops until it has it
+if [ -f "$ROSTER_DATA/staging/data/roster.sqlite" ] && [ ! -f "$ROSTER_DATA/staging/.credentials-swapped" ] &&
+  [ "$(docker inspect -f '{{.State.Running}}' roster-staging 2>/dev/null || true)" = true ]; then
+  (cd "$ROSTER_DIR" && docker compose stop staging >/dev/null) &&
+    say "stopped the test instance: its copy of production still signs in with production's passwords. roster-deploy --staging <tag> (or tonight's restore test) gives it the test password and starts it"
+fi
 
 # 5. scripts and their configuration
 install -d -m 755 /etc/roster /usr/local/lib/roster
@@ -242,7 +294,28 @@ conf >/etc/roster/roster.conf
 chmod 644 /etc/roster/roster.conf
 install -m 755 "$ops/bin/roster-deploy" "$ops/bin/roster-restore" /usr/local/bin/
 install -m 644 "$ops/lib/common.sh" /usr/local/lib/roster/
-install -m 755 "$ops/lib/roster-backup" "$ops/lib/roster-restore-test" "$ops/lib/roster-alive" /usr/local/lib/roster/
+install -m 755 "$ops/lib/roster-backup" "$ops/lib/roster-restore-test" "$ops/lib/roster-alive" "$ops/lib/roster-verify" /usr/local/lib/roster/
+
+# 5b. cosign, a pinned release whose checksum is written here: roster-deploy
+#     checks with it that an image was built and signed by master's CI
+COSIGN_VERSION=v3.1.3
+case "$(uname -m)" in
+  aarch64 | arm64) cosign_arch=arm64 cosign_sum=c5d324e091826b0d7a78eb16fef316450b4eb9aaec045611c08ba06f5e73220a ;;
+  x86_64 | amd64) cosign_arch=amd64 cosign_sum=4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71 ;;
+  *) die "no cosign for $(uname -m)" ;;
+esac
+if [ "$(sha256sum /usr/local/bin/cosign 2>/dev/null | cut -d' ' -f1)" != "$cosign_sum" ]; then
+  cosign_tmp=$(mktemp)
+  curl -fsSL -m 300 -o "$cosign_tmp" "https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION/cosign-linux-$cosign_arch" ||
+    { rm -f "$cosign_tmp"; die "could not download cosign $COSIGN_VERSION"; }
+  if [ "$(sha256sum "$cosign_tmp" | cut -d' ' -f1)" != "$cosign_sum" ]; then
+    rm -f "$cosign_tmp"
+    die "the cosign download does not match its checksum; nothing installed"
+  fi
+  install -m 755 "$cosign_tmp" /usr/local/bin/cosign
+  rm -f "$cosign_tmp"
+  say "installed cosign $COSIGN_VERSION"
+fi
 
 # 6. systemd
 for u in "${UNITS[@]}"; do
@@ -295,12 +368,15 @@ fi
 if [ -z "$no_caddy" ]; then
   new_caddy=$(sha256sum "$ROSTER_DIR/Caddyfile" | cut -d' ' -f1)
   cd "$ROSTER_DIR"
-  if [ "$(docker inspect -f '{{.State.Running}}' roster-caddy 2>/dev/null)" = true ]; then
-    if [ "$old_caddy" != "$new_caddy" ]; then
-      docker compose restart caddy >/dev/null && say "Caddy restarted with the new Caddyfile"
-    fi
-  else
-    docker compose up -d caddy >/dev/null && say "Caddy started"
+  was_running=$(docker inspect -f '{{.State.Running}}' roster-caddy 2>/dev/null || true)
+  before=$(docker inspect -f '{{.Id}}' roster-caddy 2>/dev/null || true)
+  # recreates Caddy when its part of compose.yaml changed (its hardening), starts it if it is not running
+  docker compose up -d caddy >/dev/null
+  after=$(docker inspect -f '{{.Id}}' roster-caddy 2>/dev/null || true)
+  if [ "$before" != "$after" ]; then
+    say "Caddy $([ "$was_running" = true ] && echo recreated || echo started)"
+  elif [ "$old_caddy" != "$new_caddy" ]; then
+    docker compose restart caddy >/dev/null && say "Caddy restarted with the new Caddyfile"
   fi
 fi
 
