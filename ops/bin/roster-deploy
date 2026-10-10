@@ -59,6 +59,12 @@ deploy_staging() {
   fi
   id=$(image_id "$image")
   env_set STAGING_TAG "$tag"
+  # a copy of production that has not had the test password yet never serves (OPS-3; the restore test failed, or an install before it)
+  if [ -f "$ROSTER_DATA/staging/data/roster.sqlite" ] && [ ! -f "$STAGING_SWAPPED" ]; then
+    log "staging: its copy of production has not had the test password yet - giving it first, with $tag"
+    compose stop staging >/dev/null 2>&1 || true
+    swap_staging || die "staging: not started - its database would still sign in with production's passwords"
+  fi
   compose up -d --no-deps staging
   if wait_healthy roster-staging "$id" "$WAIT"; then
     log "staging: $tag is healthy"

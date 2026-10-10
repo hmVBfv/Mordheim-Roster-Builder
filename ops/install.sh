@@ -281,6 +281,12 @@ elif ! grep -q '^ROSTER_IMAGE=' "$ROSTER_DIR/.env"; then
   printf 'ROSTER_IMAGE=%s\n' "$ROSTER_IMAGE" >>"$ROSTER_DIR/.env"
 fi
 [ -f "$ROSTER_DIR/ops.log" ] || install -o "$ROSTER_USER" -g "$ROSTER_GID" -m 644 /dev/null "$ROSTER_DIR/ops.log"
+# a test instance holding a copy of production without the test password (installed before OPS-3) stops until it has it
+if [ -f "$ROSTER_DATA/staging/data/roster.sqlite" ] && [ ! -f "$ROSTER_DATA/staging/.credentials-swapped" ] &&
+  [ "$(docker inspect -f '{{.State.Running}}' roster-staging 2>/dev/null || true)" = true ]; then
+  (cd "$ROSTER_DIR" && docker compose stop staging >/dev/null) &&
+    say "stopped the test instance: its copy of production still signs in with production's passwords. roster-deploy --staging <tag> (or tonight's restore test) gives it the test password and starts it"
+fi
 
 # 5. scripts and their configuration
 install -d -m 755 /etc/roster /usr/local/lib/roster

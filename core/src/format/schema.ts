@@ -117,7 +117,8 @@ export const warbandSaveSchema = z.looseObject({
   hired: z.array(hireRecordSchema).optional(),
   dp: z.array(hireRecordSchema).optional(),
   stash: z.looseObject({ wyrd: num.optional(), gold: num.nullable().optional(), items: z.array(z.looseObject({ name: z.string(), qty: count, key: z.string().optional(), rare: z.boolean().optional(), paid: num.optional() })).optional() }).optional(),
-  house: z.record(z.string(), z.unknown()).optional(),
+  // a few settings; every campaign view reads them of every warband entered (independent review of INPUT-3)
+  house: z.record(z.string(), z.unknown()).refine((v) => JSON.stringify(v).length <= 16_384, { message: 'at most 16 KB' }).optional(),
   campaign: campaignSchema.optional(),
   leaderUid: z.number().nullable().optional(),
   mark: z.string().nullable().optional(),

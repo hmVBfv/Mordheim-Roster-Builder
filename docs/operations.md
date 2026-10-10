@@ -450,9 +450,14 @@ Ablauf von `roster-deploy <commit>`:
 2. Image holen und seine Herkunft prüfen (`roster-verify`, mit `cosign`, das
    `install.sh` in fester Version installiert): signiert von
    `.github/workflows/ci.yml` auf `refs/heads/master`, für genau den Commit,
-   den das Image nennt, und der beginnt mit `<commit>`. Schlägt eins davon
-   fehl, hat sich nichts geändert („REFUSED …“ sagt, was fehlte). Die
-   Testinstanz nimmt jedes Image und meldet nur, ob es eines von master ist.
+   den das Image nennt, und der beginnt mit `<commit>`. Namen wie `master`
+   nimmt die Produktion nicht – jeder Branch kann sie verschieben –, nur
+   Commits (`<commit>-<datum>` für den monatlichen Neubau) und für die
+   Rollback-Übung `drill-broken`, das dann das Übungs-Image sein muss.
+   Schlägt eins davon fehl, hat sich nichts geändert („REFUSED …“ sagt, was
+   fehlte). Die Testinstanz nimmt jedes Image und meldet nur, ob es eines
+   von master ist. Compose zieht selbst nie (`pull_policy: never`): Es läuft
+   nur, was `roster-deploy` geholt und geprüft hat.
 3. Sicherung: `roster-cli backup --label pre-deploy-<commit>` im laufenden
    Container (läuft keiner, mit dem bisherigen Image); Schemastand merken.
 4. In `.env`: `PREVIOUS_TAG` ← bisheriger Tag, `ROSTER_TAG` ← `<commit>`;
@@ -555,7 +560,7 @@ Keine Agenten-Läufe während eines Spielabends.
 
 | Wann | Was |
 | --- | --- |
-| monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:master-<datum>`; Testinstanz, dann produktiv deployen |
+| monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:<commit>-<datum>` (und `:master-<datum>`); Testinstanz, dann produktiv `roster-deploy <commit>-<datum>` – produktiv nur Commits, nie Namen wie `master` |
 | monatlich | Blick auf healthchecks.io und `docker image prune -f`; alte `roster.sqlite.failed-*` und `…before-restore-*` in `data/` löschen, wenn nicht mehr gebraucht |
 | vierteljährlich | SD-Klon auffrischen (wie Schritt 14; alte Abbilder bis auf das letzte löschen) |
 | jährlich | restic-Passwort aus der Offline-Ablage testweise verwenden |

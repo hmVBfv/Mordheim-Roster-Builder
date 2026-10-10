@@ -38,6 +38,9 @@ describe('the size of what a request makes the server hold (INPUT-2)', () => {
     await s.user('kai');
     const big = await s.call({ url: '/api/v1/auth/login', body: { username: 'kai', password: PASSWORD, pad: 'x'.repeat(70 * 1024) } });
     expect(big.statusCode).toBe(413);
+    // any type: the routes open to everybody read no more than that at all (independent review – not 3 MB first)
+    const png = await s.app.inject({ method: 'POST', url: '/api/v1/auth/login', headers: { origin: 'http://mordheim.test', 'content-type': 'image/png' }, payload: Buffer.alloc(100 * 1024) });
+    expect(png.statusCode).toBe(413);
     expect((await s.call({ url: '/api/v1/auth/login', body: { username: 'kai', password: PASSWORD } })).statusCode).toBe(200);
   });
 
@@ -54,6 +57,22 @@ describe('the size of what a request makes the server hold (INPUT-2)', () => {
 });
 
 describe('what one account keeps (INPUT-3)', () => {
+  it('counted in objects too: many small saves of empty lists stop at 200,000 – the sync parses them all (independent review)', async () => {
+    const s = await startAccounts();
+    const token = (await s.user('kai')).session();
+    const lists = (i: number) => ({ ...SAVE, name: `Lists ${i}`, pad: Array.from({ length: 45_000 }, () => []) });
+    const codes: number[] = [];
+    for (let i = 0; i < 5; i++) codes.push((await s.call({ url: '/api/v1/warbands', body: { id: randomUUID(), data: lists(i), source: 'save' }, token })).statusCode);
+    expect(codes).toEqual([201, 201, 201, 201, 413]);
+  });
+
+  it('house rules are a few settings: at most 16 KB – every campaign view reads them of every warband (independent review)', async () => {
+    const s = await startAccounts();
+    const token = (await s.user('kai')).session();
+    const r = await s.call({ url: '/api/v1/warbands', body: { id: randomUUID(), data: { ...SAVE, house: { pad: 'x'.repeat(20_000) } }, source: 'save' }, token });
+    expect(r.json()).toMatchObject({ error: 'invalid', problem: expect.stringMatching(/house/) });
+  });
+
   it('its current warbands hold at most 16 MB – the sync sends them at once; drafts included; a new version of one replaces it, an archived one counts no more', async () => {
     const s = await startAccounts();
     const token = (await s.user('kai')).session();

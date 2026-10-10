@@ -22,7 +22,7 @@ name: CI
 #           as :<first 7 of the commit>; on master also :<the whole commit>,
 #           :master and :drill-broken (for the rollback drill). Monthly on
 #           master, a fresh build for the base image's security updates
-#           (ADR 0009). Every image is signed keyless with Sigstore: the
+#           (ADR 0009), as :<first 7>-<date>. Every image is signed keyless with Sigstore: the
 #           certificate names this workflow, the branch and the commit.
 #           roster-deploy puts only master's into production (ADR 0017),
 #           and this job checks right away that the Pi's check passes for
@@ -188,7 +188,8 @@ jobs:
         run: |
           short=${GITHUB_SHA::7}
           if [ "$GITHUB_EVENT_NAME" = schedule ]; then
-            tags="-t $REPO:master-$(date -u +%Y%m%d) -t $REPO:master"
+            # the commit with the date: roster-deploy takes commits, not names
+            tags="-t $REPO:$short-$(date -u +%Y%m%d) -t $REPO:master-$(date -u +%Y%m%d) -t $REPO:master"
           elif [ "$GITHUB_REF" = refs/heads/master ]; then
             tags="-t $REPO:$short -t $REPO:$GITHUB_SHA -t $REPO:master"
           else
