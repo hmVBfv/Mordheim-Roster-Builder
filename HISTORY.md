@@ -2507,3 +2507,16 @@ stopping branches from publishing, which a branch's own workflow could
 undo), and swap the test instance's credentials after every nightly
 restore instead of moving it behind TLS – it keeps real data for trying
 things, but nothing that signs in to production works there any more.
+
+Then a further review, blind to how the fixes were made, read them the way
+an attacker would – and found the seams. A second tab still acting for the
+account that had signed out in the first one sent its sync and its unsent
+notes with the new account's cookie; an answer on its way across a change of
+account was filed under the next one's key. Requests now say whose they are,
+and the server refuses one made for somebody other than its cookie's. The
+account cap counted characters, so 113 small saves full of empty lists fit
+it and still overflowed the sync; objects count now too. A failed swap of
+the test credentials left the production copy where the next staging deploy
+would have started it. And the case-insensitive match that was meant to
+forgive GitHub's spelling of the owner also forgave a branch called
+"Master" – only owner and repository match loosely now.

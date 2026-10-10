@@ -11,7 +11,9 @@ Sitzungen, Betrieb“) · Geprüft: `master` bei `22ef27f` (nach Phase 4a5)
   Browser, der Betrieb auf dem Pi – jede mit Proben als Tests gegen den
   echten Server, danach gelöscht; dazu eine eigene Durchsicht (SQL,
   Zahlen in Pfaden, statische Dateien, Rechenzeit großer Stände). Jede
-  Behebung beginnt mit einem Test, der vorher fehlschlug.
+  Behebung beginnt mit einem Test, der vorher fehlschlug. Danach hat eine
+  weitere, unabhängige Prüfung die Behebungen selbst geprüft (Sichtbarkeit
+  ist S1); was sie fand, ist ebenfalls behoben (unten).
 - **Ergebnis:** 47 Befunde (3 hoch, 10 mittel). Behoben: alle hohen und
   mittleren und die meisten übrigen. Bewusst offen oder später: 7, dazu Teile
   von 4 – unten mit Grund.
@@ -34,16 +36,17 @@ Sitzungen, Betrieb“) · Geprüft: `master` bei `22ef27f` (nach Phase 4a5)
 2. **Auf dem Pi:** `cd ~/src/Mordheim-Roster-Builder && git pull --ff-only && sudo ops/install.sh`.
    Das installiert `cosign`, gibt der Testinstanz einen eigenen
    `TOTP_KEY`, legt `secrets/staging.pass` an, übergibt Caddys
-   Verzeichnisse an root und baut Caddy gehärtet neu.
+   Verzeichnisse an root, baut Caddy gehärtet neu und hält die Testinstanz
+   an, weil ihre Kopie noch die Passwörter der Produktion trägt.
 3. **Erst die Testinstanz, dann produktiv** mit dem ersten signierten Build
-   von `master`: `roster-deploy --staging <tag>`, dann `roster-deploy <tag>`.
+   von `master` (Tag = Commit, nie `master`): `roster-deploy --staging <tag>`
+   – das gibt der Kopie zuerst das Testpasswort –, dann `roster-deploy <tag>`.
    Ältere Builds hatten keine Signatur – produktiv nimmt `roster-deploy`
    sie nicht mehr (zurückrollen auf das laufende geht weiter).
-4. **Einmal den Wiederherstellungstest von Hand:**
-   `sudo systemctl start roster-restore-test.service` – danach gilt auf der
-   Testinstanz das Testpasswort (`cat /mnt/ssd/roster/secrets/staging.pass`).
-   Als Admin dort den Authenticator neu einrichten (eigener Eintrag in der
-   App, z. B. „Mordheim Test“; jede Nacht neu).
+4. **Testinstanz:** anmelden mit dem Testpasswort
+   (`cat /mnt/ssd/roster/secrets/staging.pass`); als Admin dort den
+   Authenticator neu einrichten (eigener Eintrag in der App, z. B. „Mordheim
+   Test“; nach jedem nächtlichen Wiederherstellungstest neu).
 5. **Offen zur Entscheidung:** der Klarname in der Git-Geschichte (OPS-8,
    unten).
 
@@ -129,6 +132,30 @@ beim Start gelesenen Liste, `__proto__` wird von Fastify abgewiesen.
 | OPS-9 | `install.sh` (als root) folgte `..` und Symlinks in Pfaden des Nutzers | niedrig | behoben |
 | OPS-10 | Die Ping-URL von healthchecks.io stand auf der Kommandozeile von curl | Info | behoben: über stdin |
 | OPS-11 | `ops/test/e2e.sh` hätte auf dem Pi `site.env` überschrieben | Info | behoben: läuft nur auf einem frischen CI-Runner |
+
+## Unabhängige Prüfung der Behebungen (10.10.2026)
+
+Eine weitere Prüfung, die die Behebungen nicht kannte, hat den ganzen Stand
+gelesen und mit Proben getestet. Alles Folgende ist behoben, jeweils mit
+einem Test, der vorher fehlschlug:
+
+| Befund | Schwere | Behebung |
+| --- | --- | --- |
+| Arbeit für Konto A lief nach einem Kontowechsel unter B weiter: ein zweiter Tab mit B's Cookie, Antworten, die nach dem Wechsel ankamen und unter B's Schlüssel landeten, Einträge der Warteschlange, die als B gingen | mittel | Jede Anfrage nennt ihr Konto (`X-Roster-User`; Warteschlange: der Autor, Abgleich: das Konto der Runde); der Server lehnt eine für ein anderes Konto als das des Cookies ab (409 `other_user`), die App fragt neu, wer angemeldet ist – auch wenn ein anderer Tab wechselt; Antworten werden nur unter dem Konto abgelegt, für das gefragt wurde |
+| INPUT-3 nicht ganz: 113 kleine Stände voller leerer Listen hielten 16 MB ein und brachten den Abgleich trotzdem über 256 MB | mittel | auch Objekte und Listen zählen (200 000 je Konto); Hausregeln höchstens 16 KB |
+| OPS-3: Misslang der Tausch der Zugangsdaten, blieb die Kopie liegen, und `roster-deploy --staging` hätte sie gestartet | mittel | die Kopie wird dann gelöscht; ohne Tausch startet die Testinstanz nicht, `roster-deploy --staging` holt ihn nach; `install.sh` hält eine ungetauschte an; der Test nimmt die Sperre des Deploys |
+| AUTHZ-3: Eine öffentliche Notiz, die zur Leiter-Notiz wurde, blieb auf den Geräten der Spieler | niedrig | „unverändert“ nur bei genau der Zahl des Geräts |
+| AUTHZ-1: Der Admin sah noch, dass verborgene Notizen existieren (Aktion, Autor, Zeit) | niedrig | nicht-öffentliche Einträge einer Kampagne erscheinen gar nicht mehr |
+| OPS-1: Namen wie `master` oder `drill-broken` prüften keinen Commit – ein Branch konnte sie auf einen älteren signierten Build zeigen lassen; ein Branch „Master“ hätte die Signaturprüfung bestanden (Groß-/Kleinschreibung) | niedrig / mittel | produktiv nur Commits (der monatliche Neubau als `<commit>-<datum>`), `drill-broken` nur für das Übungs-Image; Branch und Workflow werden genau verglichen; Compose zieht nie selbst |
+| CLIENT-5: `http://10.evil.example` galt als Heimnetz | niedrig | nur ganze private IPv4-Adressen |
+| INPUT-2: Die 64-KB-Grenze ohne Konto griff erst, nachdem 3 MB gelesen waren | niedrig | Routen, die jeder erreicht, lesen höchstens 64 KB |
+| Drei Spieler hinter einem Router konnten sich nicht im selben Moment anmelden (429) | niedrig | eine Prüfung je Konto, drei je Adresse |
+| Fail2Ban kann den veröffentlichten Port 8081 der Testinstanz nicht sperren | Info | Fehlversuche dort zählen für die Sperre auf 443; 8081 ist nur im Heimnetz |
+
+Bewusst offen aus dieser Prüfung: Warteschlange und Warbands eines
+abgemeldeten Kontos bleiben auf dem Gerät (versteckt, nicht gelöscht – sonst
+gingen unsendete Einträge verloren); ohne Verbindung lässt sich nicht
+abmelden, die Daten des Kontos bleiben bis zur nächsten Verbindung.
 
 ## Was bleibt (und warum)
 
