@@ -154,7 +154,7 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
       if (w.removedAt) {
         if (now.getTime() - Date.parse(w.removedAt) < undoMs) continue;
         if (w.serverRev !== undefined) {
-          const kept = await api(`/warbands/${w.id}`, { method: 'DELETE' }).then(() => false, (e: unknown) => {
+          const kept = await api(`/warbands/${w.id}`, { method: 'DELETE', as: deps.userId }).then(() => false, (e: unknown) => {
             // entered in a campaign: it stays until it has left the campaign
             if (e instanceof ApiError && e.code === 'enrolled') return true;
             if (!(e instanceof ApiError && e.status === 404)) throw e;
@@ -173,12 +173,12 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
           const copy = w.origin === 'copy' && w.copiedFrom ? await db.warbands.get(w.copiedFrom.id) : undefined;
           const asCopy = !!copy && copy.ownerId === deps.userId && copy.serverRev !== undefined;
           const source = w.origin === 'copy' ? (asCopy ? 'copy' : 'save') : (w.origin ?? 'save');
-          await api('/warbands', { body: { id: w.id, data: writeSave(data, w, deps.appVersion), source, ...(asCopy ? { copiedFrom: w.copiedFrom } : {}), appVersion: deps.appVersion ?? '' } });
+          await api('/warbands', { body: { id: w.id, data: writeSave(data, w, deps.appVersion), source, ...(asCopy ? { copiedFrom: w.copiedFrom } : {}), appVersion: deps.appVersion ?? '' }, as: deps.userId });
           await db.warbands.update(w.id, { serverRev: 1, syncedAt: sent, draftSeq: null });
         } catch (e) {
           if (!(e instanceof ApiError && e.code === 'exists')) throw e;
           // the id is taken – by this account (the server knows it already) or by nobody we may see
-          const there = await api<{ warband: { headRev: number } }>(`/warbands/${w.id}`).catch(() => null);
+          const there = await api<{ warband: { headRev: number } }>(`/warbands/${w.id}`, { as: deps.userId }).catch(() => null);
           if (there) await db.warbands.update(w.id, { serverRev: there.warband.headRev });
           else await db.transaction('rw', db.warbands, async () => { await db.warbands.delete(w.id); await db.warbands.add({ ...w, id: newId() }); });
         }
@@ -187,7 +187,7 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
       }
       if (w.restore) {
         const sent = w.updatedAt;
-        const r = await api<{ rev: number }>(`/warbands/${w.id}/versions`, { body: { baseRev: w.serverRev, data: writeSave(data, w, deps.appVersion), source: 'restore', note: 'from a device, after the server was restored', appVersion: deps.appVersion ?? '' } });
+        const r = await api<{ rev: number }>(`/warbands/${w.id}/versions`, { body: { baseRev: w.serverRev, data: writeSave(data, w, deps.appVersion), source: 'restore', note: 'from a device, after the server was restored', appVersion: deps.appVersion ?? '' }, as: deps.userId });
         await db.warbands.update(w.id, { serverRev: r.rev, restore: undefined, syncedAt: sent, draftSeq: null });
         pushed++;
         continue;
@@ -195,7 +195,7 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
       if (isDirty(w)) {
         const sent = w.updatedAt;
         try {
-          const r = await api<{ seq: number }>(`/warbands/${w.id}/autosave`, { method: 'PUT', body: { baseRev: w.serverRev, data: writeSave(data, w, deps.appVersion), device: deps.device ?? '', afterSeq: w.draftSeq ?? null } });
+          const r = await api<{ seq: number }>(`/warbands/${w.id}/autosave`, { method: 'PUT', body: { baseRev: w.serverRev, data: writeSave(data, w, deps.appVersion), device: deps.device ?? '', afterSeq: w.draftSeq ?? null }, as: deps.userId });
           await db.warbands.update(w.id, { syncedAt: sent, draftSeq: r.seq });
         } catch (e) {
           if (!(e instanceof ApiError) || e.unreachable) throw e;
@@ -205,7 +205,8 @@ async function push(deps: SyncDeps, data: GameData, now: Date): Promise<number> 
           } else if (e.code === 'archived') {
             await db.warbands.update(w.id, { conflict: { kind: 'removed' } });
           } else if (e.status === 404) {
-            // gone from the account: it stays on this device
+            // gone from the account: it stays on this device. (Sent for deps.userId: if the device's cookie
+            // belongs to somebody else by now, the answer is other_user, never this 404 – independent review.)
             await db.warbands.update(w.id, { ownerId: undefined, serverRev: undefined, syncedAt: undefined, draftSeq: undefined });
           } else throw e;
         }
@@ -225,9 +226,9 @@ export async function syncOnce(deps: SyncDeps): Promise<SyncResult> {
   const now = deps.now ?? (() => new Date());
   const key = metaKey(deps.userId);
   const meta = (await db.meta.get(key))?.value as SyncMeta | undefined;
-  let answer = await api<SyncAnswer>(`/sync?cursor=${meta?.cursor ?? 0}`);
+  let answer = await api<SyncAnswer>(`/sync?cursor=${meta?.cursor ?? 0}`, { as: deps.userId });
   const restored = !!meta?.epoch && answer.epoch !== meta.epoch;
-  if (restored && meta!.cursor > 0) answer = await api<SyncAnswer>('/sync?cursor=0');
+  if (restored && meta!.cursor > 0) answer = await api<SyncAnswer>('/sync?cursor=0', { as: deps.userId });
   const mine = await db.warbands.filter((w) => w.ownerId === deps.userId).toArray();
   const data = answer.warbands.length || mine.length ? await deps.data() : null;
   let pulled = 0;

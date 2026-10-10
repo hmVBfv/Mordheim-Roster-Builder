@@ -4,7 +4,7 @@
    user is kept on the device so that offline the app still knows whose it
    is – only the name and flags, never a token (the cookie is HttpOnly). */
 import { useSyncExternalStore } from 'react';
-import { api, ApiError, type Me } from './api.ts';
+import { api, ApiError, bindAccount, type Me } from './api.ts';
 
 export type Session =
   | { status: 'loading' }
@@ -50,6 +50,18 @@ function cached(): Me | null {
 
 export const getSession = () => state;
 
+/** The account this tab acts for: signed in, out of reach, or still being asked (the last one known) – null for nobody. */
+export function accountId(): string | null {
+  const s = state;
+  const u = s.status === 'in' || s.status === 'unreachable' ? s.user : s.status === 'loading' ? cached() : null;
+  return u?.id ?? null;
+}
+
+// every request says whose it is; the server's "another account" means the session changed elsewhere: ask again
+bindAccount(accountId, () => { void refreshSession(); });
+// another tab signed in or out (it keeps the last user under KEY): ask again
+if (typeof window !== 'undefined') window.addEventListener('storage', (e) => { if (e.key === KEY) void refreshSession(); });
+
 export function subscribeSession(cb: () => void): () => void {
   listeners.add(cb);
   return () => listeners.delete(cb);
@@ -62,7 +74,7 @@ export function useSession(): Session {
 /** Asks the server who this device belongs to. */
 export async function refreshSession(): Promise<Session> {
   try {
-    const me = await api<{ user: Me | null; pending: boolean }>('/auth/me');
+    const me = await api<{ user: Me | null; pending: boolean }>('/auth/me', { as: null });
     set(me.user ? { status: 'in', user: me.user } : me.pending ? { status: 'pending' } : { status: 'out' });
   } catch (e) {
     // a refusal means nobody signed in; anything else, that the server is not there

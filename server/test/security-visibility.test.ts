@@ -45,8 +45,9 @@ describe('the admin’s log', () => {
     const a = await audit(rob);
     const text = JSON.stringify(a);
     expect(text).not.toMatch(/SECRET-CAMPAIGN|SECRET-BATTLE|FIRST-WORDING|"kind":"hook"/);
-    // the entries are there, as entries
-    expect(a.entries.map((e) => e.action)).toEqual(expect.arrayContaining(['campaign.create', 'battle.create', 'note.create', 'protocol.correct']));
+    // the public entries are there, as entries; the sealed note not even as one (independent review)
+    expect(a.entries.map((e) => e.action)).toEqual(expect.arrayContaining(['campaign.create', 'battle.create', 'protocol.correct']));
+    expect(a.entries.map((e) => e.action)).not.toContain('note.create');
     expect(a.entries.filter((e) => ['campaign.create', 'battle.create', 'protocol.correct'].includes(e.action)).every((e) => e.payload === null)).toBe(true);
   });
 
@@ -54,9 +55,13 @@ describe('the admin’s log', () => {
     const { s, id, bid, anna, kai, rob } = await world({ robInside: true });
     await kai('PUT', `/campaigns/${id}/notes/${randomUUID()}`, { battleId: bid, kind: 'hook', text: 'sealed words', visibility: 'sealed' });
     await anna('PUT', `/campaigns/${id}/notes/${randomUUID()}`, { battleId: bid, kind: 'scene', text: 'leader words', visibility: 'leader' });
-    const text = JSON.stringify(await audit(rob));
+    await kai('PUT', `/campaigns/${id}/notes/${randomUUID()}`, { battleId: bid, kind: 'quote', text: 'open words', visibility: 'public' });
+    const a = await audit(rob);
+    const text = JSON.stringify(a);
     expect(text).toMatch(/SECRET-CAMPAIGN/);
     expect(text).not.toMatch(/"kind":"hook"|"kind":"scene"/);
+    // a hidden note is not even an entry: only the public one is listed (independent review)
+    expect(a.entries.filter((e) => e.action === 'note.create').map((e) => e.payload)).toEqual([expect.objectContaining({ kind: 'quote' })]);
     // the log itself keeps no sealed note's kind
     expect(JSON.stringify(s.db.prepare("SELECT payload FROM audit_log WHERE action = 'note.create'").all())).not.toMatch(/hook/);
   });
@@ -75,6 +80,20 @@ describe('the numbers a device asks with', () => {
     expect((await kai('GET', `/campaigns/${id}/attachments?since=${p0.seq}`)).json()).toEqual({ unchanged: true, seq: p0.seq });
     // the leader is told
     expect((await anna('GET', `/campaigns/${id}/notes?since=${n0.seq}`)).json()).not.toHaveProperty('unchanged');
+  });
+});
+
+describe('a note that becomes hidden', () => {
+  it('AUTHZ-3: turned into a leaders\u2019 note, it leaves the players\u2019 lists – the number they asked with no longer matches (independent review)', async () => {
+    const { id, anna, kai } = await world();
+    const note = randomUUID();
+    await anna('PUT', `/campaigns/${id}/notes/${note}`, { text: 'open words', visibility: 'public' });
+    const seen = (await kai('GET', `/campaigns/${id}/notes`)).json() as { seq: number; notes: { id: string }[] };
+    expect(seen.notes.map((n) => n.id)).toContain(note);
+    await anna('PUT', `/campaigns/${id}/notes/${note}`, { text: 'now hidden', visibility: 'leader' });
+    const after = (await kai('GET', `/campaigns/${id}/notes?since=${seen.seq}`)).json() as { unchanged?: boolean; notes: { id: string }[] };
+    expect(after.unchanged).toBeUndefined();
+    expect(after.notes.map((n) => n.id)).not.toContain(note);
   });
 });
 
@@ -119,6 +138,20 @@ describe('what a warband may carry', () => {
     expect((await kai('POST', '/warbands', { id: randomUUID(), data: bad, source: 'save' })).json()).toMatchObject({ error: 'invalid', problem: expect.stringMatching(/hired\.0\.uid/) });
     const good = { ...SAVE, hired: [{ key: 'ogre', uid: 'hs1700000000000123', exp: 0 }] };
     expect((await kai('POST', '/warbands', { id: randomUUID(), data: good, source: 'save' })).statusCode).toBe(201);
+  });
+});
+
+describe('whose a request is', () => {
+  it('CLIENT-1: a request made for another account than the cookie’s is refused – a tab where somebody else signed in meanwhile (independent review)', async () => {
+    const { u, s, id } = await world();
+    const token = u.kai.session();
+    const as = (who: string) => s.call({ url: `/api/v1/campaigns/${id}/notes`, token, headers: { 'x-roster-user': who } });
+    expect((await as(u.anna.id)).statusCode).toBe(409);
+    expect((await as(u.anna.id)).json()).toEqual({ error: 'other_user' });
+    expect((await as(u.kai.id)).statusCode).toBe(200);
+    // without the header, as before; signed out, the header changes nothing
+    expect((await s.call({ url: `/api/v1/campaigns/${id}/notes`, token })).statusCode).toBe(200);
+    expect((await s.call({ url: '/api/v1/auth/me', headers: { 'x-roster-user': u.anna.id } })).json()).toMatchObject({ user: null });
   });
 });
 

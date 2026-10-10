@@ -6,7 +6,7 @@
 import type { GameData } from '@mordheim/core';
 import { useCallback, useEffect, useState } from 'react';
 import { readWarband } from '../campaign/api.ts';
-import { ownKey } from '../account/owner.ts';
+import { asker, ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 import { loadGameData } from '../game/gameData.ts';
 import { warriorsOf, type Pick } from './sides.ts';
@@ -15,10 +15,11 @@ import { warriorsOf, type Pick } from './sides.ts';
 export function useWarbandLoader(cid: string): (warbandId: string) => Promise<unknown> {
   return useCallback(async (wid: string) => {
     const k = ownKey('cw:', `${cid}:${wid}`);
+    const who = asker();
     try {
       const r = await readWarband(cid, wid);
       const data = r.draft?.data ?? r.head.data;
-      await db.meta.put({ key: k, value: data });
+      await who.keep('cw:', `${cid}:${wid}`, data);
       return data;
     } catch {
       return (await db.meta.get(k))?.value ?? null;

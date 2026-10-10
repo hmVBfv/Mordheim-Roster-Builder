@@ -42,6 +42,22 @@ export class ApiError extends Error {
 
 const BASE = `${import.meta.env.BASE_URL}api/v1`;
 
+/* Whose a request is: the account this tab acts for goes along as
+   X-Roster-User, and the server refuses a request made for another account
+   than its cookie's (409 other_user) – a second tab where somebody else
+   signed in meanwhile, or an answer still on its way when the account
+   changed (independent review of CLIENT-1). session.ts says who. */
+let accountOf: () => string | null = () => null;
+let onOtherAccount: () => void = () => undefined;
+export function bindAccount(who: () => string | null, other: () => void): void {
+  accountOf = who;
+  onOtherAccount = other;
+}
+const whose = (as: string | null | undefined): Record<string, string> => {
+  const id = as === undefined ? accountOf() : as;
+  return id ? { 'X-Roster-User': id } : {};
+};
+
 /** The address of an endpoint, for what the browser fetches itself (a picture in an <img>). */
 export const apiUrl = (path: string) => `${BASE}${path}`;
 
@@ -51,24 +67,26 @@ async function answer<T>(res: Response): Promise<T> {
   if (!parsed || typeof parsed !== 'object') throw new ApiError(res.status, 'unavailable');
   const json = parsed as Record<string, unknown>;
   if (!res.ok) {
+    if (res.status === 409 && json.error === 'other_user') onOtherAccount();
     const retry = Number(json.retryAfter);
     throw new ApiError(res.status, String(json.error ?? 'error'), typeof json.problem === 'string' ? json.problem : undefined, Number.isFinite(retry) ? retry : undefined, json);
   }
   return json as T;
 }
 
-/** Sends bytes as they are (a picture, phase 4a3): the one write that is not JSON. */
-export async function apiBytes<T>(path: string, bytes: ArrayBuffer, type: string): Promise<T> {
+/** Sends bytes as they are (a picture, phase 4a3): the one write that is not JSON. `as`: the account it is sent for (the outbox: its author). */
+export async function apiBytes<T>(path: string, bytes: ArrayBuffer, type: string, as?: string | null): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type }, body: bytes });
+    res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type, ...whose(as) }, body: bytes });
   } catch {
     throw new ApiError(0, 'offline');
   }
   return answer<T>(res);
 }
 
-export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown } = {}): Promise<T> {
+/** `as`: the account the request is made for – by default the one this tab acts for, null for nobody (asking who is signed in). */
+export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown; as?: string | null } = {}): Promise<T> {
   const method = init.method ?? (init.body === undefined ? 'GET' : 'POST');
   const write = method !== 'GET';
   let res: Response;
@@ -77,7 +95,7 @@ export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PU
       method,
       credentials: 'same-origin',
       cache: 'no-store',
-      headers: write ? { Accept: 'application/json', 'Content-Type': 'application/json' } : { Accept: 'application/json' },
+      headers: { ...(write ? { Accept: 'application/json', 'Content-Type': 'application/json' } : { Accept: 'application/json' }), ...whose(init.as) },
       // a write always carries a JSON body: the server reads nothing else
       ...(write ? { body: JSON.stringify(init.body ?? {}) } : {}),
     });
@@ -105,6 +123,7 @@ export function errorText(e: unknown): string {
     case 'totp_unavailable': return 'The server cannot set up authenticators yet (TOTP_KEY is missing).';
     case 'invalid': return e.problem ? sentence(e.problem) : 'That was not accepted.';
     case 'quota': return 'The campaign has no room for more pictures.';
+    case 'other_user': return 'Somebody else signed in on this device meanwhile – the app now goes on as them.';
     case 'busy': return 'The campaign server is busy with sign-ins right now. Try again in a few seconds.';
     case 'history_closed': return 'The campaign has played a battle in the app: its history is closed.';
     case 'in_use': return 'Notes or pictures belong to this battle: it stays.';
