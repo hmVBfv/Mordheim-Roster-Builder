@@ -246,7 +246,7 @@ app_key=$(grep -E '^TOTP_KEY=.+' "$ROSTER_DATA/app.env" | tail -n 1)
 staging_key=$(grep -E '^TOTP_KEY=.+' "$ROSTER_DATA/staging.env" | tail -n 1 || true)
 if [ -z "$staging_key" ] || [ "$staging_key" = "$app_key" ]; then
   staging_env TOTP_KEY "$(openssl rand -base64 32)"
-  say "the test instance has a TOTP_KEY of its own now; restart it: cd $ROSTER_DIR && docker compose up -d --force-recreate staging"
+  say "the test instance has a TOTP_KEY of its own now; it takes it with its next start through roster-deploy --staging <tag> (which also gives its copy the test password first)"
 fi
 unset app_key staging_key
 grep -qx 'ROSTER_STAGING=1' "$ROSTER_DATA/staging.env" || staging_env ROSTER_STAGING 1

@@ -26,6 +26,8 @@ set -euo pipefail
 REF=refs/heads/master
 SIGNER="^(?i:https://github\\.com/hmvbfv/mordheim-roster-builder)/\\.github/workflows/ci\\.yml@${REF//./\\.}\$"
 ISSUER='https://token.actions.githubusercontent.com'
+# the same facts once more through cosign's own exact comparisons of the certificate's GitHub fields
+REPOSITORY='hmVBfv/Mordheim-Roster-Builder'
 
 ref=${1:-}
 want=${2:-}
@@ -71,6 +73,7 @@ fi
 
 # 3. the signature: master's CI, that commit
 if ! out=$(cosign verify --certificate-identity-regexp "$SIGNER" --certificate-oidc-issuer "$ISSUER" \
+  --certificate-github-workflow-repository "$REPOSITORY" --certificate-github-workflow-ref "$REF" \
   --certificate-github-workflow-sha "$version" "$digest" 2>&1 >/dev/null); then
   refuse "no signature from master's CI for commit $version
 $(tail -n 5 <<<"$out")"

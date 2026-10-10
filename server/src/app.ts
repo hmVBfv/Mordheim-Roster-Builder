@@ -77,7 +77,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const app = Fastify({
     ...(deps.logger ? { loggerInstance: deps.logger } : { logger: false }),
     trustProxy: deps.trustProxy,
-    bodyLimit: BODY_LIMIT,
+    // the server's own limit, for a path without a route too; routes for members raise theirs (onRoute)
+    bodyLimit: ANONYMOUS_BODY_LIMIT,
     // our own single line per request (onResponse below)
     logController: new LogController({ disableRequestLogging: true }),
     return503OnClosing: true,
@@ -110,9 +111,10 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       throw new UncheckedRouteError(`${String(route.method)} ${route.url}: every route names its action for can() (server/src/policy.ts)`);
     }
     for (const method of [route.method].flat()) app.registeredRoutes.push({ method, url: route.url, action });
-    // open to everybody (signing in, an invite, the code after the password): no more than 64 KB is even read (INPUT-2)
+    // open to everybody (signing in, an invite, the code after the password) and paths without a route: no more than 64 KB is
+    // even read (INPUT-2); routes for members up to 3 MB, unless they set their own (a picture's bytes)
     const who = ACTIONS[action].who;
-    if ((who === 'public' || who === 'pending') && route.bodyLimit === undefined) route.bodyLimit = ANONYMOUS_BODY_LIMIT;
+    if (route.bodyLimit === undefined) route.bodyLimit = who === 'public' || who === 'pending' ? ANONYMOUS_BODY_LIMIT : BODY_LIMIT;
   });
 
   app.addHook('onRequest', async (req, reply) => {
