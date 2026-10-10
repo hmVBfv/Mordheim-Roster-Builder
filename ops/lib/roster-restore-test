@@ -13,7 +13,6 @@ set -euo pipefail
 . "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
 
 WAIT=${ROSTER_RESTORE_WAIT:-90}
-STAGING_PASS="$ROSTER_DATA/secrets/staging.pass"
 tmp="$ROSTER_DATA/staging/restore-tmp"
 data="$ROSTER_DATA/staging/data"
 uploads="$ROSTER_DATA/staging/uploads"
@@ -26,6 +25,9 @@ trap 'rm -rf "$tmp"' EXIT
 
 require_marker
 hc_ping RESTORE_TEST start
+# not while roster-deploy works on the test instance: it could start it between the copy and the swap
+exec 9>"$ROSTER_DIR/.deploy.lock"
+flock -w 900 9 || fail "a roster-deploy has been running for 15 minutes; no restore test tonight"
 if [ ! -f "$STAGING_PASS" ] || [ -L "$STAGING_PASS" ]; then
   fail "$STAGING_PASS is missing (sudo ops/install.sh makes it); the test instance stays off"
 fi
@@ -38,6 +40,7 @@ latest=$(find "$snapdir" -maxdepth 1 -name '*.sqlite' 2>/dev/null | sort | tail 
 log "restoring $(basename "$latest") into the test instance"
 
 compose stop staging >/dev/null 2>&1 || true
+rm -f "$STAGING_SWAPPED"
 # the test instance could have made any of these a symlink: replaced, not written through
 rm -f "$data/.roster-volume"
 install -m 644 /dev/null "$data/.roster-volume"
@@ -48,11 +51,12 @@ if [ -d "$tmp$ROSTER_DATA/uploads" ]; then
   cp -a "$tmp$ROSTER_DATA/uploads/." "$uploads/"
 fi
 # with the test instance's image, before it serves anything: its accounts
-# sign in with the test password only
-if ! out=$(compose run --rm --no-deps -T staging roster-cli test-accounts <"$STAGING_PASS" 2>&1); then
-  fail "roster-cli test-accounts failed, the test instance stays off: $out"
+# sign in with the test password only. If that fails, the copy goes – it
+# would sign in with production's passwords (independent review)
+if ! swap_staging; then
+  rm -f "$data/roster.sqlite" "$data/roster.sqlite-wal" "$data/roster.sqlite-shm"
+  fail "roster-cli test-accounts failed: the restored copy is deleted, the test instance stays off (see ops.log; an old image on the test instance? roster-deploy --staging <tag>)"
 fi
-log "test instance: $out"
 compose up -d --no-deps staging >/dev/null 2>&1 || fail "the test instance did not start"
 
 url="http://${ROSTER_LAN_IP:-127.0.0.1}:8081/api/v1/health"

@@ -4,6 +4,7 @@
    owner) is asked in the routes through can(). Every change takes a seq
    from the audit log, which drives GET /sync. */
 import { warbandSaveSchema } from '@mordheim/core/format';
+import { countContainers } from './json-limits.ts';
 import { audit } from './accounts.ts';
 import type { DB } from './db.ts';
 
@@ -78,25 +79,38 @@ export function checkSave(raw: unknown): Checked {
     so it is bounded – some hundred times what a real account holds; nine
     warbands of 2 MB took the server past its 256 MB (security review INPUT-3). */
 export const ACCOUNT_VOLUME = 16 * 1024 * 1024;
+/** …and in objects and arrays, which the sync parses one by one: 113 small
+    saves of empty lists took it past 256 MB within 16 MB (independent
+    review). A real account has a few ten thousand. */
+export const ACCOUNT_CONTAINERS = 200_000;
 
-/** Whether `chars` more still fit the account, counting out what they
-    replace: a new version replaces the warband's head and its draft, a draft
+/** What a stored JSON text weighs: characters, and objects and arrays. */
+export interface Weight { chars: number; containers: number }
+export const weightOf = (json: string): Weight => ({ chars: json.length, containers: countContainers(json) });
+// `{` and `[` in a stored text, counted by SQLite
+const CONTAINERS = (col: string) => `length(${col}) - length(replace(replace(${col}, '{', ''), '[', ''))`;
+
+/** Whether `add` more still fits the account, counting out what it
+    replaces: a new version replaces the warband's head and its draft, a draft
     the draft before it. */
-export function fitsAccount(db: DB, userId: string, chars: number, replacing: { warbandId: string; head: boolean } | null = null): boolean {
+export function fitsAccount(db: DB, userId: string, add: Weight, replacing: { warbandId: string; head: boolean } | null = null): boolean {
   const id = replacing?.warbandId ?? '';
-  const heads = (db.prepare(`SELECT coalesce(sum(length(v.data)), 0) AS n FROM warbands w
+  const heads = db.prepare(`SELECT coalesce(sum(length(v.data)), 0) AS chars, coalesce(sum(${CONTAINERS('v.data')}), 0) AS containers FROM warbands w
     JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev
-    WHERE w.owner_id = ? AND w.archived_at IS NULL AND NOT (w.id = ? AND ? = 1)`).get(userId, id, replacing?.head ? 1 : 0) as { n: number }).n;
-  const drafts = (db.prepare(`SELECT coalesce(sum(length(a.data)), 0) AS n FROM warband_autosaves a
+    WHERE w.owner_id = ? AND w.archived_at IS NULL AND NOT (w.id = ? AND ? = 1)`).get(userId, id, replacing?.head ? 1 : 0) as Weight;
+  const drafts = db.prepare(`SELECT coalesce(sum(length(a.data)), 0) AS chars, coalesce(sum(${CONTAINERS('a.data')}), 0) AS containers FROM warband_autosaves a
     JOIN warbands w ON w.id = a.warband_id
-    WHERE a.user_id = ? AND w.archived_at IS NULL AND a.warband_id != ?`).get(userId, id) as { n: number }).n;
-  return heads + drafts + chars <= ACCOUNT_VOLUME;
+    WHERE a.user_id = ? AND w.archived_at IS NULL AND a.warband_id != ?`).get(userId, id) as Weight;
+  return heads.chars + drafts.chars + add.chars <= ACCOUNT_VOLUME && heads.containers + drafts.containers + add.containers <= ACCOUNT_CONTAINERS;
 }
 
 /** What a warband adds to its owner's volume when it is no longer archived. */
-export function currentSize(db: DB, warbandId: string, userId: string): number {
-  return (db.prepare(`SELECT coalesce((SELECT length(v.data) FROM warbands w JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev WHERE w.id = ?), 0)
-    + coalesce((SELECT length(data) FROM warband_autosaves WHERE warband_id = ? AND user_id = ?), 0) AS n`).get(warbandId, warbandId, userId) as { n: number }).n;
+export function currentSize(db: DB, warbandId: string, userId: string): Weight {
+  const head = db.prepare(`SELECT coalesce(sum(length(v.data)), 0) AS chars, coalesce(sum(${CONTAINERS('v.data')}), 0) AS containers
+    FROM warbands w JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev WHERE w.id = ?`).get(warbandId) as Weight;
+  const draft = db.prepare(`SELECT coalesce(sum(length(data)), 0) AS chars, coalesce(sum(${CONTAINERS('data')}), 0) AS containers
+    FROM warband_autosaves WHERE warband_id = ? AND user_id = ?`).get(warbandId, userId) as Weight;
+  return { chars: head.chars + draft.chars, containers: head.containers + draft.containers };
 }
 
 /** The refusal when an account is full. */

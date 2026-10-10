@@ -161,6 +161,20 @@ expect "the test instance holds the backed-up state" test "$(probe_get roster-st
 expect "production is untouched" test "$(probe_get)" = after-backup
 expect "the copy's accounts got the test password first" grep -q 'test instance: .* accounts: one test password' "$home/server/roster/ops.log"
 expect "production refuses test-accounts" sh -c "! echo 'staging test password 1' | docker exec -i roster-app roster-cli test-accounts"
+expect "the swap is marked outside the container's reach" test -f "$root/staging/.credentials-swapped"
+
+echo "# a swap that fails leaves nothing that signs in (independent review)"
+cp "$root/secrets/staging.pass" "$work_dir/staging.pass"
+echo short >"$root/secrets/staging.pass"
+expect "the restore test fails" sh -c '! systemctl start roster-restore-test.service'
+expect "the restored copy is gone" test ! -e "$root/staging/data/roster.sqlite"
+expect "the test instance is off" sh -c '! docker inspect -f "{{.State.Running}}" roster-staging 2>/dev/null | grep -q true'
+expect "and not marked as swapped" test ! -e "$root/staging/.credentials-swapped"
+cat "$work_dir/staging.pass" >"$root/secrets/staging.pass"
+expect "with the password back, the restore test passes" systemctl start roster-restore-test.service
+rm -f "$root/staging/.credentials-swapped"
+expect_exit 0 "roster-deploy --staging swaps a copy that was not swapped" as roster-deploy --staging "$good"
+expect "  and marks it" test -f "$root/staging/.credentials-swapped"
 
 echo "# rollback drill: an image that does not start"
 epoch=$(health | field epoch)

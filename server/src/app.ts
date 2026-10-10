@@ -10,7 +10,8 @@ import type { Config } from './config.ts';
 import type { DB } from './db.ts';
 import type { Health } from './health.ts';
 import type { HashCost } from './passwords.ts';
-import { can, isAction, type Action, type Actor } from './policy.ts';
+import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
+import { ACTIONS, can, isAction, type Action, type Actor } from './policy.ts';
 import { readActor, registerAccountRoutes, sessionCookie } from './routes-accounts.ts';
 import { HashBusyError } from './passwords.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
@@ -64,20 +65,7 @@ export interface AppDeps {
 export const BODY_LIMIT = 3 * 1024 * 1024;
 /** Without an account (sign-in, an invite) a body is a few fields (security review INPUT-2). */
 export const ANONYMOUS_BODY_LIMIT = 64 * 1024;
-/** Objects and arrays in one JSON body. A 3 MB body of `{}` grew about 45 times
-    in memory while parsed – two at once would fill the container's 256 MB. A
-    long campaign's warband has a few thousand (security review INPUT-2). */
-export const MAX_JSON_CONTAINERS = 50_000;
-
-/** Counts `{` and `[` – inside strings too, so it is an upper bound – and stops past the limit. */
-function tooManyContainers(text: string): boolean {
-  let n = 0;
-  for (let i = 0; i < text.length; i++) {
-    const c = text.charCodeAt(i);
-    if ((c === 123 || c === 91) && ++n > MAX_JSON_CONTAINERS) return true;
-  }
-  return false;
-}
+const tooManyContainers = (text: string) => countContainers(text, MAX_JSON_CONTAINERS) > MAX_JSON_CONTAINERS;
 
 const tooLarge = (message: string) => Object.assign(new Error(message), { statusCode: 413 });
 
@@ -122,6 +110,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       throw new UncheckedRouteError(`${String(route.method)} ${route.url}: every route names its action for can() (server/src/policy.ts)`);
     }
     for (const method of [route.method].flat()) app.registeredRoutes.push({ method, url: route.url, action });
+    // open to everybody (signing in, an invite, the code after the password): no more than 64 KB is even read (INPUT-2)
+    const who = ACTIONS[action].who;
+    if ((who === 'public' || who === 'pending') && route.bodyLimit === undefined) route.bodyLimit = ANONYMOUS_BODY_LIMIT;
   });
 
   app.addHook('onRequest', async (req, reply) => {

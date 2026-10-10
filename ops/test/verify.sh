@@ -38,11 +38,12 @@ SH
 chmod +x "$work/bin/docker" "$work/bin/cosign"
 export FAKE=$work PATH="$work/bin:$PATH"
 
-image() { # image <digests> <ROSTER_VERSION> [signed]
+image() { # image <digests> <ROSTER_VERSION> [signed] [drill]
   rm -f "$work/signed" "$work/cosign-args"
   touch "$work/exists"
   printf '%s\n' "$1" >"$work/digests"
   printf 'PATH=/usr/local/bin\nROSTER_VERSION=%s\nNODE_ENV=production\n' "$2" >"$work/env"
+  [ "${4:-}" != drill ] || echo 'ROSTER_DRILL=broken' >>"$work/env"
   [ "${3:-}" != signed ] || touch "$work/signed"
 }
 verify() { "$src/lib/roster-verify" "$@" >"$work/out" 2>"$work/err"; }
@@ -54,11 +55,20 @@ image "$R@$DIGEST" "$SHA" signed
 expect "a signed master image passes" verify "$R:0123456" 0123456
 expect "it prints the digest it verified" test "$(cat "$work/out")" = "$R@$DIGEST"
 expect "cosign checks the digest, not the tag" test "$(tail -n 1 "$work/cosign-args")" = "$R@$DIGEST"
-expect "only master's ci.yml of this repository signs" test "$(arg_after --certificate-identity-regexp)" = '(?i)^https://github\.com/hmvbfv/mordheim-roster-builder/\.github/workflows/ci\.yml@refs/heads/master$'
+# owner and repository in any case (GitHub's names are), the workflow and the branch exactly: a branch "Master" is not master
+expect "only master's ci.yml of this repository signs" test "$(arg_after --certificate-identity-regexp)" = '^(?i:https://github\.com/hmvbfv/mordheim-roster-builder)/\.github/workflows/ci\.yml@refs/heads/master$'
 expect "through GitHub's OIDC" test "$(arg_after --certificate-oidc-issuer)" = https://token.actions.githubusercontent.com
 expect "for the commit the image names" test "$(arg_after --certificate-github-workflow-sha)" = "$SHA"
 expect "the full commit as tag passes" verify "$R:$SHA" "$SHA"
-expect "a name that is no commit (master, drill-broken) passes on the signature" verify "$R:master" master
+expect "the monthly rebuild of a commit passes" verify "$R:0123456-20261103" 0123456-20261103
+# a name moves: a branch can point it at an older signed build (independent review)
+expect "a name instead of a commit (master) is refused" test "$(code "$R:master" master)" = 1
+expect "  it says to name the commit" grep -q 'not a commit' "$work/err"
+image "$R@$DIGEST" "$SHA" signed drill
+expect "the drill image under a commit's tag is refused" test "$(code "$R:0123456" 0123456)" = 1
+expect "the drill image as drill-broken passes (roster-deploy drill-broken)" verify "$R:drill-broken" drill-broken
+image "$R@$DIGEST" "$SHA" signed
+expect "a release under the drill's name is refused (the drill would deploy it)" test "$(code "$R:drill-broken" drill-broken)" = 1
 
 image "$R@$DIGEST" "$SHA"
 expect "unsigned (a branch, or someone else): refused" test "$(code "$R:0123456" 0123456)" = 1

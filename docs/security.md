@@ -43,12 +43,16 @@ Gelegenheitsangriffe sicher abzuwehren.
   `TOTP_KEY`; nach jeder Wiederherstellung und vor dem Start ein Testpasswort
   für alle Konten, keine Authenticatoren, keine Sitzungen, keine offenen
   Links (`roster-cli test-accounts`, verweigert ohne `ROSTER_STAGING=1`).
-  Fehlversuche dort zählen für Fail2Ban mit. Die verborgene Erzählung der
+  Misslingt das, wird die Kopie gelöscht; eine Kopie ohne diesen Schritt
+  startet auch `roster-deploy --staging` nicht, ohne ihn nachzuholen.
+  Fehlversuche dort zählen für Fail2Ban mit (Sperre auf 443). Die verborgene Erzählung der
   Kopie liegt dort weiterhin – geschützt durch dieselben Regeln der App, aber
   ohne TLS im Heimnetz.
 - **Was in die Produktion darf** (OPS-1, ADR 0017): nur Images, die die CI
   auf `master` gebaut und mit Sigstore signiert hat; `roster-deploy` prüft
-  Signatur, Branch und Commit mit `cosign`, bevor sich etwas ändert.
+  Signatur, Branch und Commit mit `cosign`, bevor sich etwas ändert – nur
+  für Commits, nie für verschiebbare Namen wie `master`; Compose zieht nie
+  selbst.
   Branch-Builds nur auf die Testinstanz. Die Actions der Workflows sind auf
   Commits festgelegt (OPS-7).
 - Caddy bedient nur den konfigurierten Hostnamen.
@@ -323,12 +327,15 @@ kommt mit Notizen und Hintergrund dazu.
     einzeln ab, und ein untergeschobenes 1e9 ließ den Server endlos rechnen
     oder den Speicher sprengen. Die Zuordnung von Steigerungen zu Ereignissen
     hört auf, sobald keins mehr passt.
-  - Ohne Konto ist ein Körper höchstens 64 KB groß; jeder JSON-Körper hat
-    höchstens 50 000 Objekte und Listen – beides geprüft, bevor er gelesen
-    wird (ein Körper aus lauter `{}` wuchs beim Lesen auf das 45-Fache).
+  - Routen, die jeder erreicht (Anmelden, Einladung, Code nach dem
+    Passwort), lesen höchstens 64 KB; jeder JSON-Körper hat höchstens
+    50 000 Objekte und Listen, geprüft, bevor er gelesen wird (ein Körper
+    aus lauter `{}` wuchs beim Lesen auf das 45-Fache).
   - Die aktuellen Warbands eines Kontos (neueste Versionen und Entwürfe der
-    nicht entfernten) fassen höchstens 16 MB; der Abgleich schickt sie auf
-    einmal (413 `account_full`).
+    nicht entfernten) fassen höchstens 16 MB und 200 000 Objekte und Listen;
+    der Abgleich schickt sie auf einmal (413 `account_full`). Hausregeln
+    einer Warband höchstens 16 KB – jede Kampagnenansicht liest sie von
+    allen eingetragenen.
   - Bewusst offen: Ältere Versionen und entfernte Warbands wachsen auf der
     Platte ohne Grenze – nur eingeladene Mitglieder können das, und der
     Platz der SSD steht in `roster-alive`.

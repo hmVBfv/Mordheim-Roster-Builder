@@ -23,10 +23,15 @@ Produktion bringt, läuft dort als `roster-app` mit allen Daten und dem
 - `roster-deploy <tag>` bringt ein Image nur in die Produktion, wenn
   `roster-verify` (`ops/lib/roster-verify`) es bestätigt: Signatur auf dem
   Digest, mit dem es gezogen wurde, von `.github/workflows/ci.yml` an
-  `refs/heads/master` dieses Repositorys, für den Commit, den das Image
-  nennt (`ROSTER_VERSION`); ein Tag aus Hex-Ziffern muss dessen Anfang
-  sein, damit kein älteres Image unter neuem Namen kommt. Sonst bricht der
-  Deploy ab, bevor sich etwas ändert.
+  `refs/heads/master` dieses Repositorys (Eigentümer und Repository ohne
+  Rücksicht auf Groß-/Kleinschreibung wie bei GitHub, Workflow und Branch
+  genau), für den Commit, den das Image nennt (`ROSTER_VERSION`). Der Tag
+  muss ein Commit sein – dessen Anfang, beim monatlichen Neubau mit
+  `-<datum>` –, damit kein älteres Image unter neuem Namen kommt; Namen wie
+  `master` verschiebt jeder Branch, sie gelten nicht. `drill-broken` nur für
+  das Übungs-Image (`ROSTER_DRILL=broken`), und dieses nie unter einem
+  Commit. Sonst bricht der Deploy ab, bevor sich etwas ändert. Compose zieht
+  nie selbst (`pull_policy: never`): Es läuft nur, was geprüft wurde.
 - Die Testinstanz nimmt jedes Image, auch Branch-Builds
   (`roster-deploy --staging <tag>`), und sagt nur, ob es eines von master ist.
 - `ops/install.sh` installiert eine feste cosign-Version, deren Prüfsumme im
