@@ -11,7 +11,10 @@
 # <tag> is a commit (the first 7 characters are enough), as CI tags the images.
 # Production, step by step:
 #   1. the marker file on the SSD, else stop
-#   2. pull the image (nothing has changed if that fails)
+#   2. pull the image and check where it comes from (roster-verify, ADR 0017):
+#      signed by master's CI for the commit asked for, else stop – nothing
+#      has changed if either fails. The test instance takes any image (branch
+#      builds included) and only says whether it is master's.
 #   3. snapshot the database (roster-cli backup --label pre-deploy-<tag>)
 #   4. .env: PREVIOUS_TAG <- the running tag, ROSTER_TAG <- <tag>; start it
 #   5. wait up to 60 s: the container runs the new image and health is ok
@@ -25,6 +28,7 @@ set -euo pipefail
 . "${ROSTER_LIB:-/usr/local/lib/roster}/common.sh"
 
 WAIT=${ROSTER_DEPLOY_WAIT:-60}
+VERIFY=${ROSTER_LIB:-/usr/local/lib/roster}/roster-verify
 
 usage() {
   sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2
@@ -46,6 +50,13 @@ deploy_staging() {
   image="$ROSTER_IMAGE:$tag"
   log "staging: deploying $tag"
   pull_image "$image" || die "staging: cannot pull $image"
+  if [ "${ROSTER_NO_PULL:-}" != 1 ]; then
+    if "$VERIFY" "$image" "$tag" >/dev/null 2>&1; then
+      log "staging: $tag is a signed build of master"
+    else
+      log "staging: $tag is not a signed build of master (a branch?) - fine here, never for production"
+    fi
+  fi
   id=$(image_id "$image")
   env_set STAGING_TAG "$tag"
   compose up -d --no-deps staging
@@ -70,6 +81,14 @@ deploy() {
   log "deploying $tag (running: ${current:-nothing})"
 
   pull_image "$image" || die "cannot pull $image; nothing was changed"
+  # 2b. only what master's CI built and signed goes into production
+  if [ "${ROSTER_NO_PULL:-}" = 1 ]; then
+    log "origin NOT checked: a local image (ROSTER_NO_PULL=1, for tests only)"
+  else
+    local verified
+    verified=$("$VERIFY" "$image" "$tag" 2>&1) || die "$verified - nothing was changed"
+    log "verified: $verified is master's CI build of $tag"
+  fi
   new_id=$(image_id "$image")
   if [ -n "$current" ] && running roster-app && [ "$(docker inspect -f '{{.Image}}' roster-app)" = "$new_id" ]; then
     log "$tag already runs"
@@ -88,7 +107,10 @@ deploy() {
     log "no database yet: first deploy, nothing to back up"
     schema_before=0
   fi
-  [ -z "$snap" ] || log "snapshot: $data/snapshots/$snap (schema $schema_before)"
+  if [ -n "$snap" ]; then
+    valid_snapshot "$snap" || die "the backup named an odd file ($snap); nothing was changed"
+    log "snapshot: $data/snapshots/$snap (schema $schema_before)"
+  fi
 
   # 4. switch
   cp "$ROSTER_ENV" "$ROSTER_ENV.before-deploy"
@@ -122,7 +144,7 @@ deploy() {
     for ext in wal shm; do
       [ ! -f "$data/roster.sqlite-$ext" ] || mv "$data/roster.sqlite-$ext" "$data/$kept-$ext"
     done
-    cp "$data/snapshots/$snap" "$data/roster.sqlite.restoring"
+    copy_db "$data/snapshots/$snap" "$data/roster.sqlite.restoring"
     mv "$data/roster.sqlite.restoring" "$data/roster.sqlite"
   fi
   compose up -d --no-deps app

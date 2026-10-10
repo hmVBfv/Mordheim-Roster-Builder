@@ -12,6 +12,13 @@
 set -Eeuo pipefail
 
 good=${1:?good tag} broken=${2:?broken tag} drill=${3:?migration drill tag}
+# never on the Pi or any machine that runs the service: this rewrites
+# ~/server/roster/site.env and installs and removes systemd units and files
+# in /etc (security review OPS-11)
+if [ -z "${GITHUB_ACTIONS:-}" ] || [ -e /etc/roster/roster.conf ]; then
+  echo "e2e.sh runs only on a fresh CI runner (GITHUB_ACTIONS set, no /etc/roster/roster.conf)" >&2
+  exit 1
+fi
 IMAGE=${IMAGE:-localtest/mordheim-roster}
 user=${SUDO_USER:?run with sudo}
 [ "$(id -u)" -eq 0 ] || { echo "run with sudo" >&2; exit 1; }
@@ -86,19 +93,31 @@ as restic init -q -r "$root/backups/restic" --password-file "$root/secrets/resti
 expect "install.sh created the marker file on the (mounted) SSD" test -f "$data/.roster-volume"
 expect "app.env is private" test "$(stat -c %a "$root/app.env")" = 600
 expect "install.sh gave app.env a TOTP_KEY" grep -Eq '^TOTP_KEY=[A-Za-z0-9+/]{43}=$' "$root/app.env"
-expect "staging has production's key, once" sh -c "test \"\$(grep '^TOTP_KEY=' '$root/staging.env')\" = \"\$(grep '^TOTP_KEY=' '$root/app.env')\" -a \"\$(grep -c '^TOTP_KEY=' '$root/staging.env')\" = 1"
+expect "staging has a key of its own, once" sh -c "test \"\$(grep '^TOTP_KEY=' '$root/staging.env')\" != \"\$(grep '^TOTP_KEY=' '$root/app.env')\" -a \"\$(grep -c '^TOTP_KEY=' '$root/staging.env')\" = 1"
+expect "staging is marked as the test instance" grep -qx 'ROSTER_STAGING=1' "$root/staging.env"
+expect "the test password is there, private" test "$(stat -c '%a %U' "$root/secrets/staging.pass")" = "600 $user"
+expect "cosign is installed, the pinned release" sh -c "/usr/local/bin/cosign version 2>&1 | grep -q 'v3.1.3'"
+expect "roster-verify is installed" test -x /usr/local/lib/roster/roster-verify
+expect "Caddy's directories are root's" test "$(stat -c '%U %a' "$root/caddy/data")" = "root 700"
 totp_key=$(grep '^TOTP_KEY=' "$root/app.env")
+staging_key=$(grep '^TOTP_KEY=' "$root/staging.env")
 expect "Docker and the timers wait for the SSD" grep -q "RequiresMountsFor=$mnt" /etc/systemd/system/docker.service.d/ssd.conf /etc/systemd/system/roster-backup.service
 expect "the timers are enabled" systemctl is-enabled --quiet roster-backup.timer roster-restore-test.timer
 expect "roster-alive waits for Stufe 2" sh -c '! systemctl is-enabled --quiet roster-alive.timer'
 expect "no DynDNS updater without its settings" test ! -e /etc/systemd/system/porkbun-ddns.timer
 
-echo "# a test instance with a key of its own (installed before the fix) gets production's"
-sed -i 's/^TOTP_KEY=.*/TOTP_KEY=c3RhZ2luZy1rZXktb2YtaXRzLW93bi0zMi1ieXRlcyE=/' "$root/staging.env"
+echo "# install.sh again: the test instance keeps its key; one with production's (installed before OPS-3) gets its own"
 "$ops/install.sh" --no-caddy >/dev/null
-expect "staging has production's key again" test "$(grep '^TOTP_KEY=' "$root/staging.env")" = "$totp_key"
+expect "staging keeps its own key" test "$(grep '^TOTP_KEY=' "$root/staging.env")" = "$staging_key"
+sed -i "s|^TOTP_KEY=.*|$totp_key|" "$root/staging.env"
+sed -i '/^ROSTER_STAGING=/d' "$root/staging.env"
+"$ops/install.sh" --no-caddy >/dev/null
+expect "production's key is replaced there" sh -c "test \"\$(grep '^TOTP_KEY=' '$root/staging.env')\" != '$totp_key' -a \"\$(grep -c '^TOTP_KEY=' '$root/staging.env')\" = 1"
+expect "and the mark is back" grep -qx 'ROSTER_STAGING=1' "$root/staging.env"
 expect "staging.env stays private" test "$(stat -c %a "$root/staging.env")" = 600
 expect "staging keeps its origin" grep -q '^PUBLIC_ORIGIN=' "$root/staging.env"
+pass_before=$(cat "$root/secrets/staging.pass")
+expect "the test password is kept" test "$(cat "$root/secrets/staging.pass")" = "$pass_before"
 
 echo "# a new hostname: app.env is kept, and install.sh says what to change"
 sed -i 's/^ROSTER_HOST=.*/ROSTER_HOST=roster2.test/' "$home/server/roster/site.env"
@@ -140,6 +159,8 @@ expect "roster-restore-test.service" systemctl start roster-restore-test.service
 expect "the test instance is healthy" sh -c "curl -fsS -m 5 http://127.0.0.1:8081/api/v1/health | grep -q '\"status\":\"ok\"'"
 expect "the test instance holds the backed-up state" test "$(probe_get roster-staging)" = before-backup
 expect "production is untouched" test "$(probe_get)" = after-backup
+expect "the copy's accounts got the test password first" grep -q 'test instance: .* accounts: one test password' "$home/server/roster/ops.log"
+expect "production refuses test-accounts" sh -c "! echo 'staging test password 1' | docker exec -i roster-app roster-cli test-accounts"
 
 echo "# rollback drill: an image that does not start"
 epoch=$(health | field epoch)
@@ -199,6 +220,18 @@ if systemctl is-active --quiet fail2ban; then
   done
   expect "ten failed logins ban the address" test -n "$banned"
   fail2ban-client set roster-auth unbanip 198.51.100.23 >/dev/null 2>&1 || true
+  # the test instance's log counts too (security review OPS-3)
+  for i in $(seq 1 12); do
+    printf 'CONTAINER_NAME=roster-staging\nMESSAGE={"level":"warn","time":"%s","event":"login_failed","ip":"198.51.100.24","account":"x%s","msg":"login failed"}\n' "$(date -u +%FT%TZ)" "$i" |
+      logger --journald
+  done
+  banned=""
+  for _ in $(seq 1 20); do
+    if fail2ban-client status roster-auth | grep -q 198.51.100.24; then banned=1; break; fi
+    sleep 1
+  done
+  expect "failed logins on the test instance ban the address too" test -n "$banned"
+  fail2ban-client set roster-auth unbanip 198.51.100.24 >/dev/null 2>&1 || true
 else
   bad "fail2ban is not running"
 fi

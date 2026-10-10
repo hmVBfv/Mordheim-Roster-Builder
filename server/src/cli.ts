@@ -16,12 +16,18 @@
                           everywhere – the way back for an admin who lost it
      sign-out <username>  ends every session of the account (taken over?)
      users                the accounts, one per line
+     test-accounts        the test instance only (ROSTER_STAGING=1): one
+                          test password from stdin for every account, no
+                          authenticators, no sessions, no open links – the
+                          nightly restore test runs it on its copy of
+                          production (security review OPS-3)
 
    It never migrates and never creates a database; like the server it refuses
    to run without the marker file on the SSD. Links are printed once; only
    their hashes are stored. Bug work arrives in phase 4c. */
 import { existsSync, statSync } from 'node:fs';
 import { audit, createInvite, listUsers, revokeUserSessions, userByName } from './accounts.ts';
+import { hashPasswordSync, passwordProblem } from './passwords.ts';
 import { listSnapshots, snapshot } from './backup.ts';
 import { readConfig } from './config.ts';
 import { dbPath, getMeta, openDb, renewEpoch, type DB } from './db.ts';
@@ -38,7 +44,9 @@ export const USAGE = `usage: roster-cli <command>
   reset <username>           print a link to set a new password (24 hours)
   totp-reset <username>      remove the authenticator, sign the account out everywhere
   sign-out <username>        end every session of the account
-  users                      list the accounts`;
+  users                      list the accounts
+  test-accounts              test instance only: one password (stdin) for every account,
+                             no authenticators, no sessions, no open links`;
 
 /** The accounts arrived with this schema version (migrations/0002_accounts.sql). */
 const ACCOUNTS_SCHEMA = 2;
@@ -46,6 +54,8 @@ const ACCOUNTS_SCHEMA = 2;
 export interface CliIO {
   out(line: string): void;
   err(line: string): void;
+  /** Standard input, read whole (test-accounts reads its password there, never from the command line). */
+  input?(): string;
 }
 
 export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: () => Date = () => new Date()): number {
@@ -54,9 +64,14 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
     io.out(USAGE);
     return cmd ? 0 : 2;
   }
-  const known = ['backup', 'schema-version', 'info', 'epoch', 'invite', 'reset', 'totp-reset', 'sign-out', 'users'];
+  const known = ['backup', 'schema-version', 'info', 'epoch', 'invite', 'reset', 'totp-reset', 'sign-out', 'users', 'test-accounts'];
   if (!known.includes(cmd)) {
     io.err(`roster-cli: unknown command "${cmd}"\n${USAGE}`);
+    return 2;
+  }
+  // a copy of production gets one test password for every account: never anywhere but the test instance
+  if (cmd === 'test-accounts' && env.ROSTER_STAGING !== '1') {
+    io.err('roster-cli test-accounts: only on the test instance (ROSTER_STAGING=1 in staging.env) – it gives every account the same password');
     return 2;
   }
   try {
@@ -144,7 +159,8 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
       case 'reset':
       case 'totp-reset':
       case 'sign-out':
-      case 'users': {
+      case 'users':
+      case 'test-accounts': {
         if (!exists) {
           io.err(`roster-cli ${cmd}: there is no database yet`);
           return 3;
@@ -155,6 +171,7 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
             io.err(`roster-cli ${cmd}: the database has no accounts yet – start the new version of the server first`);
             return 3;
           }
+          if (cmd === 'test-accounts') return testAccounts(rest, db, io, now());
           return accounts(cmd, rest, db, config.publicOrigin, io, now());
         } finally {
           db.close();
@@ -166,6 +183,36 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
     io.err(`roster-cli ${cmd}: ${(err as Error).message}`);
     return 1;
   }
+}
+
+/** The test instance after the nightly restore (security review OPS-3, Rob
+    09.10.2026): it holds a copy of production, served over plain http in
+    the home network, so nothing of production's that signs in may work
+    there. Every account gets the one test password, every authenticator
+    goes (its secret is under production's key anyway), every session ends
+    and every open invite or reset link is revoked. */
+function testAccounts(rest: string[], db: DB, io: CliIO, now: Date): number {
+  if (rest.length) {
+    io.err('usage: roster-cli test-accounts < <file with the password>');
+    return 2;
+  }
+  const pw = (io.input?.() ?? '').split(/\r?\n/)[0] ?? '';
+  const problem = passwordProblem(pw);
+  if (problem) {
+    io.err(`roster-cli test-accounts: the test password (stdin): ${problem}`);
+    return 2;
+  }
+  const hash = hashPasswordSync(pw);
+  const t = now.toISOString();
+  const n = db.transaction(() => {
+    const accounts = db.prepare('UPDATE users SET pw_hash = ?, totp_secret_enc = NULL, totp_pending_enc = NULL, totp_enabled_at = NULL, totp_recovery = NULL, totp_last_step = 0').run(hash).changes;
+    const sessions = db.prepare('UPDATE sessions SET revoked_at = ? WHERE revoked_at IS NULL').run(t).changes;
+    const links = db.prepare('UPDATE invites SET revoked_at = ? WHERE used_at IS NULL AND revoked_at IS NULL').run(t).changes;
+    audit(db, { actorId: null, action: 'user.test_accounts', payload: { via: 'roster-cli', accounts, sessions, links } }, now);
+    return { accounts, sessions, links };
+  })();
+  io.out(`${n.accounts} accounts: one test password, no authenticators; ${n.sessions} sessions ended, ${n.links} open links revoked`);
+  return 0;
 }
 
 function accounts(cmd: 'invite' | 'reset' | 'totp-reset' | 'sign-out' | 'users', rest: string[], db: DB, origin: string | null, io: CliIO, now: Date): number {

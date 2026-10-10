@@ -74,6 +74,22 @@ snapshot_label() {
   printf '%.64s' "$l"
 }
 
+# A snapshot as roster-cli names it: <UTC stamp>-<label>.sqlite. The name
+# comes out of a container, so it is checked before it becomes a host path.
+valid_snapshot() {
+  [[ "$1" =~ ^[0-9]{8}T[0-9]{6}Z-[a-z0-9._-]{1,64}\.sqlite$ ]]
+}
+
+# copy_db <file> <target>: a database file from a directory a container can
+# write – only a plain file (never a symlink, which would read a host file
+# into the container's volume), and the target is replaced, never written
+# through.
+copy_db() {
+  if [ ! -f "$1" ] || [ -L "$1" ]; then die "$1 is not a plain file; not copying it"; fi
+  rm -f "$2"
+  install -m 640 "$1" "$2"
+}
+
 running() {
   [ "$(docker inspect -f '{{.State.Running}}' "$1" 2>/dev/null)" = true ]
 }
@@ -113,7 +129,13 @@ hc_ping() {
   url=$(sed -n "s/^HC_$which=//p" "$HC_ENV" | tail -n 1)
   [ -n "$url" ] || return 0
   [ -n "$suffix" ] && url="$url/$suffix"
-  curl -fsS -m 10 --retry 3 -o /dev/null --data-raw "$msg" "$url" || log "ping to healthchecks.io failed ($which $suffix)"
+  # whoever knows the URL can report "ok": it goes to curl on stdin, never
+  # onto its command line, which every user of the Pi can read in /proc
+  if [[ ! "$url" =~ ^https://[A-Za-z0-9._~/-]+$ ]]; then
+    log "HC_$which in $HC_ENV is not a plain https URL; no ping"
+    return 0
+  fi
+  printf 'url = "%s"\n' "$url" | curl -fsS -m 10 --retry 3 -o /dev/null --data-raw "$msg" -K - || log "ping to healthchecks.io failed ($which $suffix)"
 }
 
 restic_cmd() {
