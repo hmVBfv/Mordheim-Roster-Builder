@@ -136,18 +136,29 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     return true;
   };
 
-  /* One password check at a time per account and per address (security
-     review AUTH-1): the brake counts failures, and requests sent at once
-     would all be checked before the first failure is counted. */
-  const checking = new Set<string>();
+  /* One password check at a time per account, and a few per address
+     (security review AUTH-1): the brake counts failures, and requests sent
+     at once would all be checked before the first failure is counted. A few
+     per address, not one: players behind one router sign in at the same
+     moment on a game night. */
+  const PER_ADDRESS = 3;
+  const accounts = new Set<string>();
+  const addresses = new Map<string, number>();
   const oneAtATime = (req: FastifyRequest, reply: FastifyReply, username: string): (() => void) | null => {
-    const keys = [`u:${username.toLowerCase()}`, `i:${req.ip}`];
-    if (keys.some((k) => checking.has(k))) {
+    const account = username.toLowerCase();
+    const at = addresses.get(req.ip) ?? 0;
+    if (accounts.has(account) || at >= PER_ADDRESS) {
       void reply.code(429).header('Retry-After', '1').send({ error: 'too_many_attempts', retryAfter: 1 });
       return null;
     }
-    keys.forEach((k) => checking.add(k));
-    return () => keys.forEach((k) => checking.delete(k));
+    accounts.add(account);
+    addresses.set(req.ip, at + 1);
+    return () => {
+      accounts.delete(account);
+      const left = (addresses.get(req.ip) ?? 1) - 1;
+      if (left > 0) addresses.set(req.ip, left);
+      else addresses.delete(req.ip);
+    };
   };
 
   /** A password checked for a signed-in user (changing it, turning the authenticator off): braked like signing in, a wrong one counted.

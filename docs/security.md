@@ -127,10 +127,11 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
   Fail2Ban nicht (`login_braked` statt `login_failed`), sonst bekäme der
   ausgesperrte Besitzer die eigene Adresse gesperrt. Sie gilt auch für den
   Code nach dem Passwort und für jede Passwortprüfung eines Angemeldeten
-  (Passwort ändern, Authenticator ausschalten). Je Konto und je Adresse
-  läuft höchstens eine Passwortprüfung zugleich (sonst `429` für eine
+  (Passwort ändern, Authenticator ausschalten). Je Konto läuft höchstens
+  eine Passwortprüfung zugleich, je Adresse drei (sonst `429` für eine
   Sekunde): Gleichzeitige Anfragen wären sonst alle geprüft worden, bevor
-  der erste Fehler zählt (AUTH-1). Fehlversuche werden als eigene Logzeile
+  der erste Fehler zählt (AUTH-1); drei, weil Spieler hinter einem Router
+  sich am Spielabend im selben Moment anmelden. Fehlversuche werden als eigene Logzeile
   geschrieben; eine Fail2Ban-Regel sperrt IPs mit vielen Fehlversuchen.
 - **CSRF:** `SameSite=Lax`, Prüfung des `Origin`-Headers bei jeder
   schreibenden Anfrage (gleich `PUBLIC_ORIGIN`; ohne ihn der eigene Host),
