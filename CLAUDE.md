@@ -137,9 +137,9 @@ changing anything structural.
 
 - **Every bug fix starts with a failing regression test.** Tests are
   unconditional — no branch that silently skips an assertion.
-- Commit as `M. Robin R. <155396440+hmVBfv@users.noreply.github.com>`: before
+- Commit as `Rob <155396440+hmVBfv@users.noreply.github.com>`: before
   the first commit of a session run
-  `git config user.name "M. Robin R."` and
+  `git config user.name "Rob"` and
   `git config user.email "155396440+hmVBfv@users.noreply.github.com"`.
   Never commit under a real name or address (both repos are public).
 - Work on branches, one topic per branch, started from `master`. Never push
