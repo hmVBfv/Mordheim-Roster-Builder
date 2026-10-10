@@ -327,8 +327,10 @@ kommt mit Notizen und Hintergrund dazu.
     einzeln ab, und ein untergeschobenes 1e9 ließ den Server endlos rechnen
     oder den Speicher sprengen. Die Zuordnung von Steigerungen zu Ereignissen
     hört auf, sobald keins mehr passt.
-  - Routen, die jeder erreicht (Anmelden, Einladung, Code nach dem
-    Passwort), lesen höchstens 64 KB; jeder JSON-Körper hat höchstens
+  - Der Server liest höchstens 64 KB – auf Routen, die jeder erreicht
+    (Anmelden, Einladung, Code nach dem Passwort), und an Pfaden ohne Route;
+    Routen für Mitglieder 3 MB, die für die Bytes eines Bildes 5 MB. Jeder
+    JSON-Körper hat höchstens
     50 000 Objekte und Listen, geprüft, bevor er gelesen wird (ein Körper
     aus lauter `{}` wuchs beim Lesen auf das 45-Fache).
   - Die aktuellen Warbands eines Kontos (neueste Versionen und Entwürfe der

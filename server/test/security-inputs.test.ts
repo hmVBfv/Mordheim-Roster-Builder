@@ -44,6 +44,22 @@ describe('the size of what a request makes the server hold (INPUT-2)', () => {
     expect((await s.call({ url: '/api/v1/auth/login', body: { username: 'kai', password: PASSWORD } })).statusCode).toBe(200);
   });
 
+  it('a path without a route reads no more than 64 KB either (independent review, second round)', async () => {
+    const s = await startAccounts();
+    for (const url of ['/api/v1/no-such-route', '/no-such-page']) {
+      const r = await s.app.inject({ method: 'POST', url, headers: { origin: 'http://mordheim.test', 'content-type': 'application/json' }, payload: JSON.stringify({ pad: 'x'.repeat(100 * 1024) }) });
+      expect(r.statusCode, url).toBe(413);
+      const png = await s.app.inject({ method: 'POST', url, headers: { origin: 'http://mordheim.test', 'content-type': 'image/png' }, payload: Buffer.alloc(100 * 1024) });
+      expect(png.statusCode, `${url} as a picture`).toBe(413);
+    }
+    // nor is more read before that answer: the server's own limit is 64 KB, the routes for members raise theirs
+    expect(s.app.initialConfig.bodyLimit).toBe(64 * 1024)
+    // a member's warband still has its 3 MB
+    const token = (await s.user('kai')).session();
+    const big = { ...SAVE, notes: 'x'.repeat(1_000_000) };
+    expect((await s.call({ url: '/api/v1/warbands', body: { id: randomUUID(), data: big, source: 'save' }, token })).statusCode).toBe(201);
+  });
+
   it('a body of many tiny objects is refused before it is parsed – a 3 MB body of {} grew about 45 times in memory', async () => {
     const s = await startAccounts();
     const token = (await s.user('kai')).session();

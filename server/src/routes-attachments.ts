@@ -22,7 +22,8 @@ export function registerAttachmentRoutes(app: FastifyInstance, deps: AttachmentD
   const now = deps.now;
 
   // a picture's bytes arrive as they are: only on the route that takes them (the schema of every other route wants an object)
-  app.addContentTypeParser(Object.keys(MIMES), { parseAs: 'buffer', bodyLimit: MAX_BYTES }, (_req, body, done) => done(null, body));
+  // the limit is the route's (5 MB on the one that takes bytes), never the parser's: elsewhere a picture type gets no more room
+  app.addContentTypeParser(Object.keys(MIMES), { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
 
   const target = (req: FastifyRequest, reply: FastifyReply, action: Action): { c: CampaignRow; role: CampaignRole } | null => {
     const c = campaignById(db(), (req.params as { id: string }).id);

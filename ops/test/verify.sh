@@ -59,6 +59,7 @@ expect "cosign checks the digest, not the tag" test "$(tail -n 1 "$work/cosign-a
 expect "only master's ci.yml of this repository signs" test "$(arg_after --certificate-identity-regexp)" = '^(?i:https://github\.com/hmvbfv/mordheim-roster-builder)/\.github/workflows/ci\.yml@refs/heads/master$'
 expect "through GitHub's OIDC" test "$(arg_after --certificate-oidc-issuer)" = https://token.actions.githubusercontent.com
 expect "for the commit the image names" test "$(arg_after --certificate-github-workflow-sha)" = "$SHA"
+expect "  repository and branch once more, compared exactly by cosign" test "$(arg_after --certificate-github-workflow-repository) $(arg_after --certificate-github-workflow-ref)" = "hmVBfv/Mordheim-Roster-Builder refs/heads/master"
 expect "the full commit as tag passes" verify "$R:$SHA" "$SHA"
 expect "the monthly rebuild of a commit passes" verify "$R:0123456-20261103" 0123456-20261103
 # a name moves: a branch can point it at an older signed build (independent review)

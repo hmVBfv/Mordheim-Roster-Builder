@@ -136,19 +136,21 @@ beim Start gelesenen Liste, `__proto__` wird von Fastify abgewiesen.
 ## Unabhängige Prüfung der Behebungen (10.10.2026)
 
 Eine weitere Prüfung, die die Behebungen nicht kannte, hat den ganzen Stand
-gelesen und mit Proben getestet. Alles Folgende ist behoben, jeweils mit
-einem Test, der vorher fehlschlug:
+gelesen und mit Proben getestet, und nach den Nachbesserungen ein zweites
+Mal. Alles Folgende ist behoben, jeweils mit einem Test, der vorher
+fehlschlug:
 
 | Befund | Schwere | Behebung |
 | --- | --- | --- |
 | Arbeit für Konto A lief nach einem Kontowechsel unter B weiter: ein zweiter Tab mit B's Cookie, Antworten, die nach dem Wechsel ankamen und unter B's Schlüssel landeten, Einträge der Warteschlange, die als B gingen | mittel | Jede Anfrage nennt ihr Konto (`X-Roster-User`; Warteschlange: der Autor, Abgleich: das Konto der Runde); der Server lehnt eine für ein anderes Konto als das des Cookies ab (409 `other_user`), die App fragt neu, wer angemeldet ist – auch wenn ein anderer Tab wechselt; Antworten werden nur unter dem Konto abgelegt, für das gefragt wurde |
 | INPUT-3 nicht ganz: 113 kleine Stände voller leerer Listen hielten 16 MB ein und brachten den Abgleich trotzdem über 256 MB | mittel | auch Objekte und Listen zählen (200 000 je Konto); Hausregeln höchstens 16 KB |
 | OPS-3: Misslang der Tausch der Zugangsdaten, blieb die Kopie liegen, und `roster-deploy --staging` hätte sie gestartet | mittel | die Kopie wird dann gelöscht; ohne Tausch startet die Testinstanz nicht, `roster-deploy --staging` holt ihn nach; `install.sh` hält eine ungetauschte an; der Test nimmt die Sperre des Deploys |
-| AUTHZ-3: Eine öffentliche Notiz, die zur Leiter-Notiz wurde, blieb auf den Geräten der Spieler | niedrig | „unverändert“ nur bei genau der Zahl des Geräts |
+| AUTHZ-3: Eine öffentliche Notiz (oder ein Bild), die zur Leiter-Notiz wurde, blieb auf den Geräten der Spieler – auch, wenn neuere davor standen | niedrig | „unverändert“ nur bei genau der Zahl des Geräts; Einträge, die verengen, wer etwas sieht (verborgen gemacht, Rolle geändert), zählen in jedermanns Zahl (Index: Migration 14) |
 | AUTHZ-1: Der Admin sah noch, dass verborgene Notizen existieren (Aktion, Autor, Zeit) | niedrig | nicht-öffentliche Einträge einer Kampagne erscheinen gar nicht mehr |
 | OPS-1: Namen wie `master` oder `drill-broken` prüften keinen Commit – ein Branch konnte sie auf einen älteren signierten Build zeigen lassen; ein Branch „Master“ hätte die Signaturprüfung bestanden (Groß-/Kleinschreibung) | niedrig / mittel | produktiv nur Commits (der monatliche Neubau als `<commit>-<datum>`), `drill-broken` nur für das Übungs-Image; Branch und Workflow werden genau verglichen; Compose zieht nie selbst |
 | CLIENT-5: `http://10.evil.example` galt als Heimnetz | niedrig | nur ganze private IPv4-Adressen |
-| INPUT-2: Die 64-KB-Grenze ohne Konto griff erst, nachdem 3 MB gelesen waren | niedrig | Routen, die jeder erreicht, lesen höchstens 64 KB |
+| INPUT-2: Die 64-KB-Grenze ohne Konto griff erst, nachdem 3 MB gelesen waren – an Pfaden ohne Route auch danach nicht | niedrig | der Server liest höchstens 64 KB; nur Routen für Mitglieder 3 MB, die für Bilder 5 MB |
+| Unsendete Einträge eines Autors, der anderswo abgemeldet wurde, wurden endgültig abgelehnt | Info | sie warten auf ihn |
 | Drei Spieler hinter einem Router konnten sich nicht im selben Moment anmelden (429) | niedrig | eine Prüfung je Konto, drei je Adresse |
 | Fail2Ban kann den veröffentlichten Port 8081 der Testinstanz nicht sperren | Info | Fehlversuche dort zählen für die Sperre auf 443; 8081 ist nur im Heimnetz |
 
