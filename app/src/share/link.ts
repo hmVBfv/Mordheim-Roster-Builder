@@ -66,8 +66,16 @@ export async function decodeSave(fragment: string): Promise<unknown> {
 
 const KEY = 'mordheim-server';
 
-/** A host of the home network: a private IPv4 address, localhost, or a name under .local, .lan or .home.arpa. */
-const homeHost = (h: string) => /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.)/.test(h) || h === 'localhost' || /\.(local|lan|home\.arpa)$/.test(h);
+/** A host of the home network: a private IPv4 address (the whole host, not a name that starts like one), localhost, or a name
+    under .local, .lan or .home.arpa. */
+function homeHost(h: string): boolean {
+  const ip = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(h);
+  if (ip) {
+    const [a, b] = [Number(ip[1]), Number(ip[2])];
+    return a === 10 || a === 127 || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
+  }
+  return h === 'localhost' || /\.(local|lan|home\.arpa)$/.test(h);
+}
 
 /** https://host[:port] – or http for a home network address; '' for anything else (security review CLIENT-5: a page
     fetched over plain http from the internet can be swapped on the way, and that page reads the warband from the link). */
