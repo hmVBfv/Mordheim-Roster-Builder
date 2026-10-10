@@ -73,6 +73,35 @@ export function checkSave(raw: unknown): Checked {
   return { ok: true, data: data as Record<string, unknown>, json };
 }
 
+/** What one account keeps in its warbands that are not archived: their
+    newest versions and its drafts. GET /sync answers with all of it at once,
+    so it is bounded – some hundred times what a real account holds; nine
+    warbands of 2 MB took the server past its 256 MB (security review INPUT-3). */
+export const ACCOUNT_VOLUME = 16 * 1024 * 1024;
+
+/** Whether `chars` more still fit the account, counting out what they
+    replace: a new version replaces the warband's head and its draft, a draft
+    the draft before it. */
+export function fitsAccount(db: DB, userId: string, chars: number, replacing: { warbandId: string; head: boolean } | null = null): boolean {
+  const id = replacing?.warbandId ?? '';
+  const heads = (db.prepare(`SELECT coalesce(sum(length(v.data)), 0) AS n FROM warbands w
+    JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev
+    WHERE w.owner_id = ? AND w.archived_at IS NULL AND NOT (w.id = ? AND ? = 1)`).get(userId, id, replacing?.head ? 1 : 0) as { n: number }).n;
+  const drafts = (db.prepare(`SELECT coalesce(sum(length(a.data)), 0) AS n FROM warband_autosaves a
+    JOIN warbands w ON w.id = a.warband_id
+    WHERE a.user_id = ? AND w.archived_at IS NULL AND a.warband_id != ?`).get(userId, id) as { n: number }).n;
+  return heads + drafts + chars <= ACCOUNT_VOLUME;
+}
+
+/** What a warband adds to its owner's volume when it is no longer archived. */
+export function currentSize(db: DB, warbandId: string, userId: string): number {
+  return (db.prepare(`SELECT coalesce((SELECT length(v.data) FROM warbands w JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev WHERE w.id = ?), 0)
+    + coalesce((SELECT length(data) FROM warband_autosaves WHERE warband_id = ? AND user_id = ?), 0) AS n`).get(warbandId, warbandId, userId) as { n: number }).n;
+}
+
+/** The refusal when an account is full. */
+export const ACCOUNT_FULL = { error: 'account_full', problem: `your warbands hold ${ACCOUNT_VOLUME / 1024 / 1024} MB already – archive some first` } as const;
+
 const nameOf = (d: Record<string, unknown>) => (typeof d.name === 'string' ? d.name.slice(0, 120) : '');
 const formatOf = (d: Record<string, unknown>) => (Number.isInteger(d.format) ? (d.format as number) : 0);
 

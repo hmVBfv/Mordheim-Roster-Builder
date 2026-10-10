@@ -61,6 +61,17 @@ describe('diffWarbands and reconcile', () => {
     expect(one(changes(a, core.addAdvance(ctx(once), uid, 'S')), 'stat').unexplained).toBe(false);
   });
 
+  it('a crafted gain of 1e15 (or Infinity) is unexplained at once – it never loops point by point (security review INPUT-1)', () => {
+    const a = start(), uid = a.models[0]!.uid;
+    const once = core.addAdvance(ctx(a), uid, 'S');
+    for (const gain of [1e15, 'Infinity']) {
+      const huge = { ...once, models: once.models.map((m) => (m.uid === uid ? { ...m, adv: { S: gain } } : m)) } as WarbandState;
+      const t = performance.now();
+      expect(one(changes(a, huge), 'stat')).toMatchObject({ unexplained: true, eventRef: null });
+      expect(performance.now() - t).toBeLessThan(1000);
+    }
+  });
+
   it('skills: learned by advance, repeated, and taken away', () => {
     const a = start(), uid = a.models[0]!.uid;
     const b = core.addSkillFromList(ctx(a), uid, 'Strike to Injure');
