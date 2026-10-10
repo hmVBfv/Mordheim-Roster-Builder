@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
+import { narrowedSeq } from './notes.ts';
 
 const iso = (d: Date) => d.toISOString();
 
@@ -76,8 +77,8 @@ export function oneAttachment(db: DB, id: string): Attachment | null {
 
 /** The newest change to any picture of the campaign. */
 /** The newest change among the pictures this viewer may see: a leaders' picture moves nothing for a player (security review AUTHZ-3). */
-export const attachmentsSeq = (db: DB, campaignId: string, v: Viewer) => (db.prepare("SELECT coalesce(max(seq), 0) AS n FROM attachments WHERE campaign_id = ? AND (visibility != 'leader' OR ? OR uploader_id = ?)")
-  .get(campaignId, v.leader ? 1 : 0, v.id) as { n: number }).n;
+export const attachmentsSeq = (db: DB, campaignId: string, v: Viewer) => Math.max(narrowedSeq(db, campaignId), (db.prepare("SELECT coalesce(max(seq), 0) AS n FROM attachments WHERE campaign_id = ? AND (visibility != 'leader' OR ? OR uploader_id = ?)")
+  .get(campaignId, v.leader ? 1 : 0, v.id) as { n: number }).n);
 
 /** Pictures announced whose bytes have not come yet, per member (security review AUTHZ-2). */
 export const MAX_WAITING = 20;
@@ -113,6 +114,8 @@ export function putAttachment(db: DB, campaignId: string, id: string, input: Att
     if (cur.mime !== input.mime || cur.bytes !== input.bytes) return { ok: false, status: 409, error: 'exists', problem: 'another picture under this id' };
     const same = cur.caption === input.caption && cur.visibility === input.visibility && cur.battle_id === input.battleId && cur.turn === input.turn;
     if (same) return { ok: true, row: cur };
+    // turned leaders'-only: everybody's number moves, so the devices that showed it drop it (notes.ts, narrowedSeq)
+    if (input.visibility === 'leader' && cur.visibility !== 'leader') audit(db, { actorId: by.id, action: 'attachment.hide', targetType: 'attachment', targetId: id, campaignId, visibility: 'public' }, now);
     const seq = audit(db, { actorId: by.id, action: 'attachment.edit', targetType: 'attachment', targetId: id, campaignId, visibility: input.visibility, payload: { battle: input.battleId } }, now);
     db.prepare('UPDATE attachments SET battle_id = ?, turn = ?, caption = ?, visibility = ?, updated_at = ?, seq = ? WHERE id = ?')
       .run(input.battleId, input.turn, input.caption, input.visibility, iso(now), seq, id);

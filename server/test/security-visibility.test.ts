@@ -97,6 +97,30 @@ describe('a note that becomes hidden', () => {
   });
 });
 
+describe('hidden after being seen, behind newer ones', () => {
+  it('AUTHZ-3: a note or picture turned leaders\u2019-only moves everybody\u2019s number, even when newer ones exist (independent review, second round)', async () => {
+    const { id, anna, kai } = await world();
+    const p = randomUUID();
+    await anna('PUT', `/campaigns/${id}/notes/${p}`, { text: 'first words', visibility: 'public' });
+    await anna('PUT', `/campaigns/${id}/notes/${randomUUID()}`, { text: 'newer words', visibility: 'public' });
+    const seen = (await kai('GET', `/campaigns/${id}/notes`)).json() as { seq: number };
+    await anna('PUT', `/campaigns/${id}/notes/${p}`, { text: 'first words', visibility: 'leader' });
+    const after = (await kai('GET', `/campaigns/${id}/notes?since=${seen.seq}`)).json() as { unchanged?: boolean; notes: { id: string }[] };
+    expect(after.unchanged).toBeUndefined();
+    expect(after.notes.map((n) => n.id)).not.toContain(p);
+
+    const pic = randomUUID();
+    const meta = { mime: 'image/png', bytes: 10, width: 1, height: 1 };
+    await anna('PUT', `/campaigns/${id}/attachments/${pic}`, { ...meta, visibility: 'public' });
+    await anna('PUT', `/campaigns/${id}/attachments/${randomUUID()}`, { ...meta, visibility: 'public' });
+    const pics = (await kai('GET', `/campaigns/${id}/attachments`)).json() as { seq: number };
+    await anna('PUT', `/campaigns/${id}/attachments/${pic}`, { ...meta, visibility: 'leader' });
+    const later = (await kai('GET', `/campaigns/${id}/attachments?since=${pics.seq}`)).json() as { unchanged?: boolean; attachments: { id: string }[] };
+    expect(later.unchanged).toBeUndefined();
+    expect(later.attachments.map((x) => x.id)).not.toContain(pic);
+  });
+});
+
 describe('the picture quota', () => {
   it('AUTHZ-2: what is announced but never sent takes no room; at most 20 wait per member; the room is checked again when the bytes come', async () => {
     const { s, id, u } = await world();

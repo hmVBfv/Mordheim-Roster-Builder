@@ -58,8 +58,8 @@ export function flushOutbox(userId: string): Promise<number> {
           await db.outbox.delete(i.key);
           sent++;
         } catch (e) {
-          // not there, or the device belongs to another account now: it waits for its author
-          if (e instanceof ApiError && (e.unreachable || e.code === 'other_user')) break;
+          // not there, the device belongs to another account now, or its author was signed out elsewhere: it waits for its author
+          if (e instanceof ApiError && (e.unreachable || e.code === 'other_user' || e.code === 'sign_in')) break;
           // refused for good (the battle closed, a check failed): kept and shown, not sent again
           await db.outbox.update(i.key, { refused: errorText(e) });
         }
