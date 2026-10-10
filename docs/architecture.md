@@ -322,6 +322,14 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
   `Clear-Site-Data: "cache"`. Die Warteschlange zeigt und sendet nur, was das
   angemeldete Konto selbst geschrieben hat. Abgemeldet zeigen Listen nur
   Warbands ohne Besitzer.
+  Jede Anfrage sagt, für wen sie ist (`X-Roster-User`; die Warteschlange:
+  für den Autor, der Abgleich: für das Konto seiner Runde). Gehört das
+  Cookie inzwischen einem anderen Konto – ein zweiter Tab, in dem jemand
+  anderes sich angemeldet hat –, lehnt der Server ab (409 `other_user`),
+  und die App fragt neu, wer angemeldet ist; ebenso, wenn ein anderer Tab
+  das Konto wechselt (`storage`-Ereignis). Eine Antwort wird unter dem Konto
+  abgelegt, für das gefragt wurde, und gar nicht, wenn das Konto unterwegs
+  wechselte (unabhängige Prüfung der Behebungen).
 - **Kopfzeile:** „Saved and synced“, „n waiting“ (auch offline, auf dem
   Gerät gezählt), „Check“ bei einem Konflikt, „Not synced“ bei einem Fehler;
   ohne Anmeldung wie bisher „Saved on this device“.

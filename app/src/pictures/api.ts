@@ -3,7 +3,7 @@
    offline what it showed last; a picture's bytes come straight from the
    server into an <img>, and the browser keeps them (they never change). */
 import { api, apiUrl } from '../account/api.ts';
-import { ownKey } from '../account/owner.ts';
+import { asker, ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 
 export type PictureVisibility = 'public' | 'leader';
@@ -24,8 +24,9 @@ export async function cachedPictures(cid: string): Promise<Picture[] | null> {
 }
 
 export async function getPictures(cid: string): Promise<Picture[]> {
+  const who = asker();
   const r = await api<{ attachments: Picture[] }>(`/campaigns/${cid}/attachments`);
-  await db.meta.put({ key: key(cid), value: r.attachments });
+  await who.keep('pictures:', cid, r.attachments);
   return r.attachments;
 }
 

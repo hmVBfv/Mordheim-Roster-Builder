@@ -228,13 +228,19 @@ Notiz. Die Leak-Matrix legt eine versiegelte und eine Leiter-Notiz mit
 Merkwörtern an, die in keiner Antwort an irgendeine Rolle vorkommen dürfen.
 
 **Nach der Sicherheitsprüfung (09.10.2026, `docs/security-review.md`):**
-Das Audit-Log zeigt dem Admin Einträge einer Kampagne, in der er nicht
-Mitglied ist, nur als Aktion, Zeit und Handelnden – ohne Namen, Titel oder
-Wörter; in einer, in der er Mitglied ist, nur die öffentlichen. Für eine
+Das Audit-Log zeigt dem Admin von einer Kampagne nur öffentliche Einträge –
+eine versiegelte oder Leiter-Notiz, ein Leiter-Bild nicht einmal als
+Zeile; von einer Kampagne, in der er nicht Mitglied ist, auch diese nur als
+Aktion, Zeit und Handelnden, ohne Namen, Titel oder Wörter. Für eine
 versiegelte Notiz steht nicht einmal ihre Art im Log. Die Zahl, mit der ein
 Gerät fragt, ob etwas neu ist (`seq` bei Notizen und Bildern), rechnet der
 Server je Fragendem: Eine Leiter-Notiz verrät sich einem Spieler nicht
-dadurch, dass sich die Zahl bewegt. Aus welcher eigenen Warband eine
+dadurch, dass sich die Zahl bewegt. „Unverändert“ gilt nur bei genau der
+Zahl, die das Gerät hat – wird eine öffentliche Notiz zur Leiter-Notiz,
+sinkt die Zahl des Spielers, und seine Liste kommt neu, ohne sie. Jede
+Anfrage der App nennt das Konto, für das sie gemacht ist
+(`X-Roster-User`); gehört das Cookie einem anderen, antwortet der Server
+nicht für dieses, sondern mit 409 `other_user`. Aus welcher eigenen Warband eine
 eingetragene Kopie stammt (`copiedFrom`), erfährt nur ihr Besitzer.
 
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine

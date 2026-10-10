@@ -2,7 +2,7 @@
    The last state of a battle is kept on the device, so the game night
    shows it offline; with its seq the device asks only for what is newer. */
 import { api } from '../account/api.ts';
-import { ownKey } from '../account/owner.ts';
+import { asker, ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 
 export type Outcome = '' | 'victory' | 'defeat' | 'draw' | 'routed';
@@ -46,25 +46,27 @@ export const battleTitle = (b: { round: number; title: string }) => `Battle ${b.
 export async function cachedBattle(bid: string): Promise<BattleView | null> {
   return ((await db.meta.get(key(bid)))?.value as BattleView | undefined) ?? null;
 }
-async function keep(v: BattleView): Promise<BattleView> {
-  await db.meta.put({ key: key(v.battle.id), value: v });
+/** Keeps a battle's view for the account that asked – take it before the request (account/owner.ts, asker). */
+const keep = (a = asker()) => async (v: BattleView): Promise<BattleView> => {
+  await a.keep('battle:', v.battle.id, v);
   return v;
-}
+};
 
 /** The battle; with `since`, null when nothing is newer than that. */
 export async function getBattle(cid: string, bid: string, since?: number): Promise<BattleView | null> {
+  const who = keep();
   const r = await api<BattleView | { unchanged: true; seq: number }>(`/campaigns/${cid}/battles/${bid}${since !== undefined ? `?since=${since}` : ''}`);
-  return 'unchanged' in r ? null : keep(r);
+  return 'unchanged' in r ? null : who(r);
 }
-export const createBattle = (cid: string, b: { id: string; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep);
+export const createBattle = (cid: string, b: { id: string; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep());
 export const patchBattle = (cid: string, bid: string, p: { title?: string; district?: string; turn?: number; outcomes?: Record<string, Outcome> }) =>
-  api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep);
+  api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep());
 /** Closes the battle (a leader): the protocol is fixed, its sealed notes open. */
-export const closeBattle = (cid: string, bid: string) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/close`, { body: {} }).then(keep);
+export const closeBattle = (cid: string, bid: string) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/close`, { body: {} }).then(keep());
 /** Marks a version of one's warband "after" this battle; marked again, the newer mark corrects the earlier. */
 export const markBattle = (cid: string, bid: string, warbandId: string, rev: number) =>
   api<{ tag: { id: string; rev: number; round: number }; changes: FrozenChange[] }>(`/campaigns/${cid}/battles/${bid}/marks`, { body: { warbandId, rev } });
-export const decideProposal = (cid: string, bid: string, pid: string, accept: boolean) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/proposals/${pid}/${accept ? 'accept' : 'reject'}`, { body: {} }).then(keep);
+export const decideProposal = (cid: string, bid: string, pid: string, accept: boolean) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/proposals/${pid}/${accept ? 'accept' : 'reject'}`, { body: {} }).then(keep());
 
 /** A casualty in words: "Magda (The Silver Caravan) is out of action – by Skritch (Clan Skrittle)." */
 export function casualtyText(c: CasualtyPayload, names: Record<string, string>): { victim: string; by: string | null } {

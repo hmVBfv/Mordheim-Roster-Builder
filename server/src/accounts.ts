@@ -216,18 +216,20 @@ export function audit(db: DB, e: AuditEntry, now: Date): number {
 
 export interface AuditSummary { seq: number; at: string; actor: string | null; action: string; targetType: string | null; target: string | null; payload: unknown }
 
-/** The admin's view of the log. Of a campaign the admin is not part of,
-    what happened and who did it – never what it said (names, titles,
-    wordings): the admin has no special access to campaign content
-    (docs/security.md, section 4; security review AUTHZ-1). Of a campaign
-    the admin is part of, what every member may read: the public entries. */
+/** The admin's view of the log. Of a campaign, only its public entries –
+    a sealed or leaders' note or picture is not even listed. Of a campaign
+    the admin is not part of, those as what happened and who did it, never
+    what it said (names, titles, wordings): the admin has no special access
+    to campaign content (docs/security.md, section 4; security review
+    AUTHZ-1). Of a campaign the admin is part of, what every member reads. */
 export function listAudit(db: DB, adminId: string, limit: number, beforeSeq?: number): AuditSummary[] {
   const rows = db.prepare(`SELECT a.*, u.username AS actor_name, t.username AS target_name,
-      (a.campaign_id IS NULL OR (a.visibility = 'public' AND EXISTS (SELECT 1 FROM members m WHERE m.campaign_id = a.campaign_id AND m.user_id = ? AND m.left_at IS NULL))) AS readable
+      (a.campaign_id IS NULL OR EXISTS (SELECT 1 FROM members m WHERE m.campaign_id = a.campaign_id AND m.user_id = ? AND m.left_at IS NULL)) AS readable
     FROM audit_log a
     LEFT JOIN users u ON u.id = a.actor_id
     LEFT JOIN users t ON a.target_type = 'user' AND t.id = a.target_id
-    WHERE a.seq < ? AND a.action != 'warband.autosave' ORDER BY a.seq DESC LIMIT ?`).all(adminId, beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
+    WHERE a.seq < ? AND a.action != 'warband.autosave' AND (a.campaign_id IS NULL OR a.visibility = 'public')
+    ORDER BY a.seq DESC LIMIT ?`).all(adminId, beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
     seq: number; at: string; actor_name: string | null; action: string; target_type: string | null; target_id: string | null; target_name: string | null; payload: string | null; readable: number;
   }[];
   return rows.map((r) => ({

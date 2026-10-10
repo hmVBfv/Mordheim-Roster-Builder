@@ -7,20 +7,29 @@
    everyone else's. Unsent items in the outbox stay their author's: shown to
    and sent by nobody else. */
 import { db } from '../db/db.ts';
-import { getSession, knownUser } from './session.ts';
+import { accountId } from './session.ts';
 
 export const CAMPAIGN_CACHES = ['campaign:', 'campaigns:', 'notes:', 'pictures:', 'timeline:', 'chapter:', 'battle:', 'cw:'] as const;
 export type CampaignCache = (typeof CAMPAIGN_CACHES)[number];
 
 /** The account this device answers for now: signed in, out of reach, or still being asked – '-' for nobody. */
-export function ownerId(): string {
-  const s = getSession();
-  const u = s.status === 'in' ? s.user : s.status === 'unreachable' ? s.user : s.status === 'loading' ? knownUser() : null;
-  return u?.id ?? '-';
-}
+export const ownerId = (): string => accountId() ?? '-';
 
 /** The key of a cache of this account's: `<kind><account>:<rest>`. */
 export const ownKey = (kind: CampaignCache, rest: string) => `${kind}${ownerId()}:${rest}`;
+
+/** The account a request is made for, fixed when it starts – call it before the request. Its answer is kept under that account,
+    and not at all if the account changed while it was on its way (independent review of CLIENT-1: an answer for the last
+    account landed under the next one's key). */
+export function asker() {
+  const owner = ownerId();
+  return {
+    owner,
+    keep: async (kind: CampaignCache, rest: string, value: unknown): Promise<void> => {
+      if (owner !== '-' && ownerId() === owner) await db.meta.put({ key: `${kind}${owner}:${rest}`, value });
+    },
+  };
+}
 
 /** Removes the campaign data kept on this device – all of it, or all but `keep`'s. */
 export async function forgetCampaignData(keep: string | null = null): Promise<number> {

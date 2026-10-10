@@ -11,7 +11,8 @@ fortgeschrieben. Bezeichner sind englisch, Erklärungen deutsch.
 - **`seq`:** Jede Schreibaktion bekommt eine global fortlaufende Nummer. Sie
   treibt die Synchronisation (`GET /sync?cursor=`). Wo nicht jeder alles
   sieht (Notizen, Bilder), meldet der Server je Fragendem die höchste `seq`
-  dessen, was er sehen darf (Sicherheitsprüfung 09.10.2026, AUTHZ-3).
+  dessen, was er sehen darf (Sicherheitsprüfung 09.10.2026, AUTHZ-3);
+  „unverändert“ nur bei genau dieser Zahl (wird etwas verborgen, sinkt sie).
 - **Zeit:** ISO 8601 in UTC. `created_at` ist die Erfassungszeit und wird nie
   geändert.
 - **Nichts wird überschrieben:** Warband-Stände sind Versionen; Notizen und
@@ -189,7 +190,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | --- | --- | --- |
 | `bugs` | `id`, `reporter_id`, `kind` (`bug` · `wish` · `rules`), `title`, `text`, `source_ref`, `severity` (`S1`–`S4`), `area`, `status` (`new` · `confirmed` · `in_progress` · `fixed` · `closed` · `duplicate`), `app_version`, `device`, `view`, `js_errors` (JSON), `context` (JSON), `warband_id`, `rev`, `consent_attach`, `fixed_in`, `created_at` | `context` (Rob, 09.10.2026): was ohne Zutun mitgeht – Bildschirm und Reiter samt offenem Bereich, die letzten Schritte (ohne eingegebene Texte), Einstellungen (Theme, Layout, Flavour, Online/Sync, Rolle), Hausregeln von Warband und Kampagne; Meldende schreiben oft nur „funktioniert nicht“ (concept.md 4.12) |
 | `bug_comments` | `id`, `bug_id`, `author_id`, `text`, `created_at` | Rückfragen |
-| `audit_log` | `seq`, `at`, `actor_id`, `action`, `target_type`, `target_id`, `campaign_id`, `visibility` (`public` · `sealed` · `leader` · `admin`), `payload` (JSON) | seit Migration 2; jede Schreibaktion; Quelle für `seq`. `actor_id` leer: `roster-cli` (dann `payload.via`). Konto-Aktionen (`user.*`, `invite.*`, `totp.*`, `session.*`, `sessions.*`) haben `admin`; nie Passwörter, Tokens oder Codes im `payload`, bei einer versiegelten Notiz nur die Schlacht. Der Admin liest Einträge ohne Kampagne und die öffentlichen der Kampagnen, in denen er Mitglied ist, ganz; von allen anderen nur Aktion, Zeit und Handelnden (`payload` leer, AUTHZ-1) |
+| `audit_log` | `seq`, `at`, `actor_id`, `action`, `target_type`, `target_id`, `campaign_id`, `visibility` (`public` · `sealed` · `leader` · `admin`), `payload` (JSON) | seit Migration 2; jede Schreibaktion; Quelle für `seq`. `actor_id` leer: `roster-cli` (dann `payload.via`). Konto-Aktionen (`user.*`, `invite.*`, `totp.*`, `session.*`, `sessions.*`) haben `admin`; nie Passwörter, Tokens oder Codes im `payload`, bei einer versiegelten Notiz nur die Schlacht. Der Admin liest Einträge ohne Kampagne ganz; von Kampagnen nur die öffentlichen (verborgene nicht einmal als Zeile) – von denen, in denen er Mitglied ist, ganz, von allen anderen nur Aktion, Zeit und Handelnden (`payload` leer, AUTHZ-1) |
 | `schema_migrations` | `version`, `name`, `applied_at` | legt der Migrationsrahmen selbst an (`server/src/migrations.ts`); eine Zeile je Datei `server/migrations/NNNN_name.sql` |
 | `meta` | `key`, `value` | seit Migration 1; was der Server über sich selbst weiß: `epoch` (wechselt bei jeder Wiederherstellung, siehe [architecture.md](architecture.md#6-synchronisation)), `created_at` (Anlage der Datenbank), `restored_from` (nur in Snapshot-Kopien: Label und Zeit; ein Server, der auf der Kopie startet, nimmt eine neue Epoche und löscht den Eintrag) |
 

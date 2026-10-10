@@ -7,6 +7,7 @@
 import * as core from '@mordheim/core';
 import type { GameData } from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';
+import { asker } from '../account/owner.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { readSave } from '../sync/engine.ts';
@@ -46,6 +47,7 @@ async function underCampaignRules(data: GameData, campaignId: string, s: core.Wa
 export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband): Promise<{ id: string; campaign: CampaignView }> {
   const rec = await onServer(data, from);
   const entering = await underCampaignRules(data, campaignId, rec.state);
+  const who = asker();
   const r = await api<Entered>(`/campaigns/${campaignId}/enrolments`, {
     body: {
       warbandId: newId(), data: core.writeSave(core.ctxOf(data, entering), __APP_VERSION__), appVersion: __APP_VERSION__,
@@ -59,6 +61,6 @@ export async function enterWarband(data: GameData, campaignId: string, from: Sto
     createdAt: r.warband.createdAt, updatedAt: stamp, syncedAt: stamp, ownerId: currentUserId(), serverRev: r.head.rev, draftSeq: null,
     origin: 'copy', ...(rec.serverRev !== undefined ? { copiedFrom: { id: rec.id, rev: rec.serverRev } } : {}), campaignId: r.warband.campaignId,
   });
-  await db.meta.put({ key: campaignKey(campaignId), value: r.campaign });
+  await who.keep('campaign:', campaignId, r.campaign);
   return { id: r.warband.id, campaign: r.campaign };
 }

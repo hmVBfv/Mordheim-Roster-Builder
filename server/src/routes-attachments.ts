@@ -57,7 +57,8 @@ export function registerAttachmentRoutes(app: FastifyInstance, deps: AttachmentD
     if (!t) return reply;
     const seq = attachmentsSeq(db(), t.c.id, viewer(req.actor!, t.role));
     const since = (req.query as { since?: number }).since;
-    if (since !== undefined && since >= seq) return { unchanged: true, seq };
+    // exactly the number the device has: one that is higher means something it saw is hidden now
+    if (since !== undefined && since === seq) return { unchanged: true, seq };
     return { attachments: listAttachments(db(), t.c.id, viewer(req.actor!, t.role)), seq };
   });
 

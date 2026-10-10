@@ -15,6 +15,7 @@ import { NotesTab } from '../notes/Notes.tsx';
 import { sampleSave } from '../test/data.ts';
 import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
+import { flushOutbox } from '../battle/outbox.ts';
 import { forgetCampaignData } from './owner.ts';
 import { resetSession, signedIn, signedOut } from './session.ts';
 
@@ -30,7 +31,7 @@ const T = '2026-10-01T10:00:00Z';
 const leaderNote = { id: 'n1', battleId: null, turn: null, kind: 'general', text: 'LEADER-ONLY-SECRET', visibility: 'leader', mentions: [], authorId: 'uA', author: 'Anna', lang: 'en', sealedUntil: null, opened: false, protocolEntryId: null, createdAt: T, updatedAt: T, edited: false };
 const SEQ = 7;
 
-/** The server as routes-notes.ts answers: `since` at or past the newest seq is "unchanged", whoever asks. */
+/** The server as routes-notes.ts answered before the review: `since` at or past the newest seq is "unchanged", whoever asks. */
 function serverFor(who: 'A' | 'B') {
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
     const url = new URL(String(input), 'http://localhost/');
@@ -88,6 +89,51 @@ describe('one device, two accounts', () => {
     await db.meta.bulkPut([{ key: `notes:uA:${CID}`, value: 1 }, { key: `notes:uB:${CID}`, value: 2 }, { key: `campaigns:uA:list`, value: [] }, { key: 'sync:uA', value: { cursor: 3 } }]);
     await forgetCampaignData('uB');
     expect((await db.meta.toArray()).map((r) => r.key).sort()).toEqual([`notes:uB:${CID}`, 'sync:uA'].sort());
+  });
+});
+
+describe('requests on their way when the account changes (independent review of CLIENT-1)', () => {
+  const json = (v: unknown, status = 200) => new Response(JSON.stringify(v), { status, headers: { 'content-type': 'application/json' } });
+  const sentAs = (init?: RequestInit) => new Headers(init?.headers).get('X-Roster-User');
+
+  it('an answer for the last account that arrives after the next one signed in is not kept', async () => {
+    let answer!: (r: Response) => void;
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL) => (String(input).endsWith('/notes')
+      ? new Promise<Response>((go) => { answer = go; })
+      : Promise.resolve(json({ user: null, pending: false })))));
+    signedIn({ stage: 'full', user: A });
+    const asked = getNotes(CID);
+    await waitFor(() => expect(answer).toBeTypeOf('function'));
+    signedIn({ stage: 'full', user: B });
+    answer(json({ notes: [leaderNote], seq: SEQ }));
+    await asked;
+    await new Promise((r) => setTimeout(r, 20));
+    expect(JSON.stringify(await db.meta.toArray())).not.toContain('LEADER-ONLY-SECRET');
+  });
+
+  it('every request says whose it is; when the server’s cookie belongs to another account, the app asks again who is signed in', async () => {
+    const calls: { url: string; as: string | null }[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ url, as: sentAs(init) });
+      if (url.endsWith('/auth/me')) return json({ user: B, pending: false });
+      return json({ error: 'other_user' }, 409);
+    }));
+    signedIn({ stage: 'full', user: A });
+    await expect(getNotes(CID)).rejects.toMatchObject({ code: 'other_user' });
+    expect(calls[0]).toMatchObject({ as: 'uA' });
+    await waitFor(() => expect(calls.some((c) => c.url.endsWith('/auth/me') && c.as === null)).toBe(true));
+  });
+
+  it('an unsent note goes only as its author: the device signed in as somebody else, it waits', async () => {
+    await db.outbox.put({ key: 'n3', op: 'note.put', userId: 'uA', campaignId: CID, battleId: '', targetId: 'n3', at: T,
+      body: { battleId: null, turn: null, kind: 'scene', text: 'WORDS-OF-ANNA', visibility: 'leader', mentions: [] } });
+    // the server: the cookie is Ben's; a request made for anybody else is refused
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => (sentAs(init) && sentAs(init) !== 'uB' ? json({ error: 'other_user' }, 409) : json({ note: {} }))));
+    signedIn({ stage: 'full', user: B });
+    expect(await flushOutbox('uA')).toBe(0);
+    expect(await db.outbox.get('n3')).toMatchObject({ userId: 'uA' });
+    expect((await db.outbox.get('n3'))?.refused).toBeUndefined();
   });
 });
 

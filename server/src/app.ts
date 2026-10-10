@@ -108,6 +108,10 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       }
       // a session in use lives on – its cookie with it (security review AUTH-14)
       req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), 90)));
+      // the account the app made the request for: another than the cookie's is refused, never answered for the cookie
+      // (a tab where somebody else signed in meanwhile; its unsent items stay its author's – independent review of CLIENT-1)
+      const claimed = req.headers['x-roster-user'];
+      if (typeof claimed === 'string' && req.actor && claimed !== req.actor.id) return reply.code(409).send({ error: 'other_user' });
     }
     if (!can(req.actor, action)) return reply.code(req.actor ? 403 : 401).send({ error: req.actor ? 'forbidden' : 'sign_in' });
   });
