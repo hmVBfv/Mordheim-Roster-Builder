@@ -13,6 +13,10 @@ fortgeschrieben. Bezeichner sind englisch, Erklärungen deutsch.
   sieht (Notizen, Bilder), meldet der Server je Fragendem die höchste `seq`
   dessen, was er sehen darf (Sicherheitsprüfung 09.10.2026, AUTHZ-3);
   „unverändert“ nur bei genau dieser Zahl (wird etwas verborgen, sinkt sie).
+  Einträge, die verengen, wer etwas sieht (`note.hide`, `attachment.hide`:
+  zur Leiter-Notiz bzw. zum Leiter-Bild gemacht; `member.role`,
+  `member.remove`), zählen in jedermanns Zahl – sonst bliebe Verborgenes auf
+  Geräten, solange neuere Notizen davor stehen (Index seit Migration 14).
 - **Zeit:** ISO 8601 in UTC. `created_at` ist die Erfassungszeit und wird nie
   geändert.
 - **Nichts wird überschrieben:** Warband-Stände sind Versionen; Notizen und

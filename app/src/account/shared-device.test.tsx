@@ -137,6 +137,17 @@ describe('requests on their way when the account changes (independent review of 
   });
 });
 
+describe('an unsent note when its author was signed out elsewhere', () => {
+  it('waits for the author to sign in again instead of being refused for good (independent review, second round)', async () => {
+    await db.outbox.put({ key: 'n4', op: 'note.put', userId: 'uA', campaignId: CID, battleId: '', targetId: 'n4', at: T,
+      body: { battleId: null, turn: null, kind: 'general', text: 'LATER', visibility: 'public', mentions: [] } });
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ error: 'sign_in' }), { status: 401, headers: { 'content-type': 'application/json' } })));
+    signedIn({ stage: 'full', user: A });
+    expect(await flushOutbox('uA')).toBe(0);
+    expect((await db.outbox.get('n4'))?.refused).toBeUndefined();
+  });
+});
+
 describe('signed out', () => {
   it('an account’s warbands are neither listed nor opened; the device’s own are', async () => {
     serverFor('B');
