@@ -21,6 +21,16 @@ describe('requests at once', () => {
     expect(res.filter((r) => r.statusCode === 429).length).toBeGreaterThanOrEqual(15);
   });
 
+  it('AUTH-1: players behind one router signing in at the same moment all get in; many accounts from one address at once still wait (independent review)', async () => {
+    const s = await startAccounts();
+    for (const n of ['ann', 'ben', 'cid']) await s.user(n);
+    const three = await Promise.all(['ann', 'ben', 'cid'].map((username) => s.call({ url: '/api/v1/auth/login', body: { username, password: PASSWORD } })));
+    expect(three.map((r) => r.statusCode)).toEqual([200, 200, 200]);
+    for (let i = 0; i < 10; i++) await s.user(`spray${i}`);
+    const spray = await Promise.all(Array.from({ length: 10 }, (_, i) => s.call({ url: '/api/v1/auth/login', body: { username: `spray${i}`, password: `wrong guess ${i}!!` } })));
+    expect(spray.filter((r) => r.statusCode === 429).length).toBeGreaterThanOrEqual(5);
+  });
+
   it('AUTH-8: a crowd waiting for the password hash is answered "busy" at once instead of queueing for minutes', async () => {
     const cost = { N: 2 ** 12, r: 8, p: 1 };
     const stored = await hashPassword('a fine long password', cost);
