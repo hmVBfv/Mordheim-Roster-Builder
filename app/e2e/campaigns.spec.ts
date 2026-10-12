@@ -869,3 +869,72 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(page.getByRole('dialog', { name: 'The Verdict in the Fog' }).getByRole('heading', { name: 'At the Quay' })).toBeVisible();
   });
 }
+
+/* The AI pack and the style guide (phase 4b4a): a leader's prompt for whoever writes the next chapter, and the style it carries. */
+function packScene(srv: Awaited<ReturnType<typeof playServer>>) {
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+  b.participants[0]!.outcome = 'victory';
+  b.participants[1]!.outcome = 'defeat';
+  srv.entryElsewhere(b.id, { id: '11111111-1111-4111-8111-111111111111', turn: 3, kind: 'event', payload: { text: 'The ferry burns.' }, author: 'Anna' });
+  srv.noteFrom(c.id, { author: 'Kai', text: 'Bolt the doors.', battleId: b.id, turn: 2, kind: 'quote' });
+  srv.noteFrom(c.id, { author: 'Kai', text: 'LEADER-ONLY plan: the ferryman turns on them.', battleId: b.id, turn: 5, kind: 'general', visibility: 'leader' });
+  b.status = 'closed';
+  b.closedAt = '2026-10-04T13:00:00.000Z';
+  const e = c.enrolments[0]!;
+  e.tags = [...(e.tags ?? []), {
+    id: 'tag-anna-1', kind: 'after_battle', rev: 1, round: b.round, battleId: b.id, totals: { rating: 1, spent: 0, models: 3, heroes: 1, gold: 0, fallen: 0 }, createdBy: 'Anna', createdAt: '2026-10-04T14:00:00.000Z',
+    changes: [{ kind: 'died', uid: 77, name: 'Hans', changeKey: '1:died:hans', payload: { hero: true }, eventRef: null, unexplained: true }],
+  }];
+  srv.backgroundFrom(c.id, { kind: 'figure', title: 'The Pale Man', truth: 'He is the ferryman’s brother.', status: 'active', reveal: 'hidden' });
+  srv.backgroundFrom(c.id, { kind: 'thread', title: 'The eel coin', truth: 'The Countess pays the ferrymen.', status: 'active', reveal: 'hint', hintLimits: 'a coin, an eel, wet money' });
+  srv.styleFrom(c.id, 'German, past tense, close third person.\nNo dice, no game terms.');
+  return c;
+}
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the AI pack: a leader chooses the parts and the language and copies the prompt, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = packScene(srv);
+    await page.goto(`campaign/${c.id}/timeline`);
+    const open = page.getByRole('button', { name: 'AI pack…' });
+    await expect(open).toBeEnabled();
+    await open.click();
+    const sheet = page.getByRole('dialog', { name: 'AI pack' });
+    const prompt = sheet.getByLabel('The prompt, as it will be copied');
+    await expect(prompt).toHaveValue(/Bolt the doors\./);
+    await expect(prompt).toHaveValue(/Rule: HIDDEN/);
+    await expect(prompt).not.toHaveValue(/LEADER-ONLY/);
+    await expect(sheet.getByRole('list', { name: 'Gaps in the material' })).toContainText('Clan Skrittle has not been marked after this battle');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-ai-pack`);
+    await sheet.getByRole('radio', { name: 'English' }).check();
+    await expect(prompt).toHaveValue(/Write the chapter in English\./);
+    await sheet.getByRole('checkbox', { name: /^Style/ }).uncheck();
+    await expect(prompt).not.toHaveValue(/close third person/);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-ai-pack-english`);
+    await sheet.getByRole('button', { name: 'Close' }).click();
+    await expect(sheet).toBeHidden();
+  });
+
+  test(`the style guide: a leader writes it under Manage, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    await page.goto(`campaign/${c.id}/manage`);
+    await expect(page.getByRole('heading', { name: 'Style guide ⚑' })).toBeVisible();
+    const box = page.getByLabel('Instructions for the writer');
+    await expect(box).toBeEnabled();
+    await box.fill('German, past tense, close third person.\nNo dice, no game terms.');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-style-guide`);
+    await page.getByRole('button', { name: 'Save the style' }).click();
+    await expect(page.getByText('Style guide saved.')).toBeVisible();
+    await expect.poll(() => srv.state.styles.get(c.id)?.text, { timeout: 8000 }).toMatch(/close third person/);
+  });
+}

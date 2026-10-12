@@ -8,7 +8,7 @@
    never when something was recorded. The chronicle's published chapters
    (4a5) stand at the head of the part they tell: everyone reads them, a
    leader imports and places them. */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { errorText, type Me } from '../account/api.ts';
 import { casualtyText, OUTCOME_NAMES, type CasualtyPayload } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
@@ -26,6 +26,8 @@ import type { Lang } from './chapters.ts';
 import { buildTimeline, stepPlace, type Block, type Segment } from './build.ts';
 import { between } from './order.ts';
 import styles from './Timeline.module.css';
+
+const PackForm = lazy(() => import('../pack/PackSheet.tsx').then((m) => ({ default: m.PackForm })));
 
 export const TIMELINE_EVERY_MS = 15_000;
 
@@ -109,6 +111,9 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
   const [reading, setReading] = useState<{ c: ChapterSummary; lang: Lang } | null>(null);
   const { ref: importRef, open: openImport, close: closeImport } = useSheet();
   const [importKey, setImportKey] = useState(0);
+  // the AI pack (4b4a): a leader's prompt for whoever writes the next chapter
+  const { ref: packRef, open: openPack, close: closePack } = useSheet();
+  const [packKey, setPackKey] = useState<number | null>(null);
   const names = useMemo(() => Object.fromEntries(view.enrolments.map((e) => [e.warbandId, e.name || e.wbName])), [view.enrolments]);
   const segs: Segment[] = useMemo(() => (tl.data ? buildTimeline(view.battles ?? [], notes.notes ?? [], pics.pictures ?? [], tl.data) : []), [view.battles, notes.notes, pics.pictures, tl.data]);
   const writer = view.role !== 'viewer';
@@ -144,7 +149,12 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
         The order below is the order of the story. {writer ? 'Move your blocks with ↑ ↓ or ⋯ to where they happen' : 'Players and leaders move blocks to where they happen'}{lead ? ' – as a leader, any block' : ''}.
         Battles, their reports and the marks stay where they are. Moving changes only the place in the story, never when something was recorded.
       </p>
-      {lead && <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => { setImportKey((k) => k + 1); openImport(); }}>Import chapters…</button></div>}
+      {lead && (
+        <div className={ui.row}>
+          <button type="button" className={ui.button} disabled={(view.battles ?? []).length === 0 || !tl.data || !notes.notes || !pics.pictures} onClick={() => { setPackKey((k) => (k ?? 0) + 1); openPack(); }}>AI pack…</button>
+          <button type="button" className={ui.buttonQuiet} onClick={() => { setImportKey((k) => k + 1); openImport(); }}>Import chapters…</button>
+        </div>
+      )}
       {tl.error && <p className={ui.message} role="status">{tl.error}{tl.data ? ' Shown as last seen.' : ''}</p>}
       {!tl.data && !tl.error && <p className={ui.muted}>Loading the timeline…</p>}
       <ol className={styles.timeline} aria-label="Timeline">
@@ -200,6 +210,15 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
         onRemove={(c) => { removeChapter(id, c.id).then(() => { void tl.refresh(); notify(`${chapterTitle(c)} is out of the timeline.`); }).catch((e: unknown) => notify(errorText(e))); }} />
       <ImportChaptersSheet dialogRef={importRef} close={closeImport} formKey={importKey} cid={id} segs={segs} battles={view.battles ?? []} chapters={tl.data?.chapters ?? []}
         onDone={(n) => { void tl.refresh(); notify(`${n} chapter${n === 1 ? '' : 's'} imported.`); }} />
+      {lead && (
+        <dialog ref={packRef} className={ui.sheet} aria-labelledby="pack-title">
+          {packKey !== null && (
+            <Suspense fallback={<p className={ui.muted}>Loading…</p>}>
+              <PackForm key={packKey} titleId="pack-title" cid={id} campaign={view.campaign.name} view={view} segs={segs} close={() => closePack()} />
+            </Suspense>
+          )}
+        </dialog>
+      )}
       {undo && <UndoToast key={undo.n} text={undo.text} onUndo={() => { undo.back(); setUndo(null); }} onDone={() => setUndo(null)} />}
       {!undo && notice}
     </div>
