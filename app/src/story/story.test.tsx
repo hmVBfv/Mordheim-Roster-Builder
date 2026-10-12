@@ -21,6 +21,8 @@ const stored = async () => (await db.warbands.get('w1'))!.state;
 
 beforeAll(loadScreens, SCREENS_MS);
 beforeAll(polyfillDialog);
+// the page is a lazy chunk: load it before the first test, which would pay for it on a slow runner
+beforeAll(async () => { await import('./Story.tsx'); }, SCREENS_MS);
 
 /** The Grey Company after its first battle: a Captain and two Warriors, the campaign at round 1. */
 function band(): core.WarbandState {
@@ -39,7 +41,7 @@ beforeEach(async () => { await db.warbands.clear(); });
 afterEach(() => cleanup());
 
 describe('the story page', () => {
-  it('the prologue, an interlude after the first battle and the names are written into the save', async () => {
+  it('the prologue is written into the save', async () => {
     await seed(band());
     const user = userEvent.setup();
     at('/warbands/w1/story');
@@ -53,10 +55,14 @@ describe('the story page', () => {
     await user.paste('They came up the river with the last barge.');
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('They came up the river with the last barge.')).toBeTruthy();
-    expect(core.storyOf(await stored()).prologue).toBe('They came up the river with the last barge.');
+    await waitFor(async () => expect(core.storyOf(await stored()).prologue).toBe('They came up the river with the last barge.'));
+  });
 
-    // the round has one interlude to write; none for rounds that have not been fought
-    const card = screen.getByRole('article', { name: 'Interlude 1' });
+  it('an interlude after the first battle, and none for a round not yet fought', async () => {
+    await seed(band());
+    const user = userEvent.setup();
+    at('/warbands/w1/story');
+    const card = await screen.findByRole('article', { name: 'Interlude 1' });
     expect(screen.queryByRole('article', { name: 'Interlude 2' })).toBeNull();
     await user.click(within(card).getByRole('button', { name: 'Write' }));
     const inter = await screen.findByRole('dialog', { name: 'Interlude 1' });
@@ -64,7 +70,7 @@ describe('the story page', () => {
     await user.paste('Rain for three days; the captain drank alone.');
     await user.click(within(inter).getByRole('button', { name: 'Save' }));
     expect(await within(card).findByText('Rain for three days; the captain drank alone.')).toBeTruthy();
-    expect(core.storyOf(await stored()).interludes).toEqual({ '1': 'Rain for three days; the captain drank alone.' });
+    await waitFor(async () => expect(core.storyOf(await stored()).interludes).toEqual({ '1': 'Rain for three days; the captain drank alone.' }));
   });
 
   it('names in both languages, and an emptied text leaves no trace', async () => {
@@ -79,7 +85,7 @@ describe('the story page', () => {
     await user.paste('The Grey Company');
     await user.click(within(names).getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('German: Die Graue Kompanie · English: The Grey Company')).toBeTruthy();
-    expect(core.canonOf(await stored())).toEqual({ name_de: 'Die Graue Kompanie', name_en: 'The Grey Company' });
+    await waitFor(async () => expect(core.canonOf(await stored())).toEqual({ name_de: 'Die Graue Kompanie', name_en: 'The Grey Company' }));
 
     // the prologue emptied: no story key is left in the save
     await user.click(screen.getByRole('button', { name: 'Edit the prologue' }));
