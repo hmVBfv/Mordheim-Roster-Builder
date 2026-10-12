@@ -113,6 +113,10 @@ export const ACTIONS = {
   'questions.write': { who: 'user', target: 'leader' },
   /** Answering with a note – leaders and players; only the one it is asked of gets through. */
   'questions.answer': { who: 'user', target: 'player' },
+  /** The world – factions, NPCs, reputation (phase 4b3b): mechanics, so every member reads it, viewers too (ADR 0002). */
+  'world.read': { who: 'user', target: 'member' },
+  /** Writing the world: leaders alone, with the authenticator – a leader puts an NPC there when the players may know it exists. */
+  'world.write': { who: 'user', target: 'leader' },
   /** The background – the truth behind the story, ADR 0002 – read by the campaign's leaders alone, with the authenticator (phase 4b1). */
   'background.read': { who: 'user', target: 'leader' },
   /** Writing the background, taking entries out and revealing: leaders alone, with the authenticator (phase 4b1). */

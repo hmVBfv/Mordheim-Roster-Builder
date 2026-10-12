@@ -78,6 +78,11 @@ export interface ProbeContext {
   /** The user role's id, and an open question of the victim's campaign asked of the user role (phase 4b3). */
   userId: string;
   ownQuestionId: string;
+  /** The world of the admin's campaign (phase 4b3b): a faction to rate and to put NPCs under, a spare faction, an NPC and a reputation event to take out. */
+  ledFactionId: string;
+  spareFactionId: string;
+  ledNpcId: string;
+  ledEventId: string;
 }
 
 export interface Probe {
@@ -386,6 +391,25 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'POST /api/v1/campaigns/:id/questions/:qid/answer': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.campaignId}/questions/${c.ownQuestionId}/answer`, body: { noteId: randomUUID(), text: 'We slept in the barn.' } }),
     },
     fields: { user: ['question', 'note', 'seq'] },
+  },
+  'world.read': {
+    // the user role is a player in the victim's campaign, the admin outside it – a viewer would read it too: it is mechanics
+    allowed: ['user'],
+    routes: { 'GET /api/v1/campaigns/:id/world': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/world` }) },
+    fields: { user: ['factions', 'npcs', 'reputation', 'seq'] },
+  },
+  'world.write': {
+    // the user role is a player in the admin's campaign (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/world/factions/:fid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/world/factions/${randomUUID()}`, body: { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing' } }),
+      'PUT /api/v1/campaigns/:id/world/npcs/:nid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/world/npcs/${randomUUID()}`, body: { factionId: c.ledFactionId, nameEn: 'Old Marek', publicStatus: 'alive' } }),
+      'PUT /api/v1/campaigns/:id/world/reputation/:rid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/world/reputation/${randomUUID()}`, body: { warbandId: c.ledWarbandId, factionId: c.ledFactionId, delta: 2, reason: 'Escorted the barge.' } }),
+      'DELETE /api/v1/campaigns/:id/world/reputation/:rid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/world/reputation/${c.ledEventId}` }),
+      'DELETE /api/v1/campaigns/:id/world/npcs/:nid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/world/npcs/${c.ledNpcId}` }),
+      'DELETE /api/v1/campaigns/:id/world/factions/:fid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/world/factions/${c.spareFactionId}` }),
+    },
+    fields: { admin: ['factions', 'npcs', 'reputation', 'seq', 'removed'] },
   },
   'background.read': {
     // the user role is a player there (403), the admin leads it

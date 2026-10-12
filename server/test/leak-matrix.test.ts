@@ -16,6 +16,7 @@ import { putPastBattle } from '../src/history.ts';
 import { putChapter } from '../src/chapters.ts';
 import { putEntry as putBackground } from '../src/background.ts';
 import { putQuestion } from '../src/questions.ts';
+import { addReputation, putFaction, putNpc } from '../src/world.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
 
@@ -141,6 +142,21 @@ describe('leak-test matrix', () => {
     };
     question('QUESTION-SECRET: what does the captain know about the ferryman?', victim.id);
     const ownQuestionId = question('How did the night after the ferry go?', player.id);
+    // the world of the admin's campaign: a faction to rate, a spare to take out, an NPC and a reputation event to take out
+    const faction = (nameEn: string) => {
+      const fid = randomUUID();
+      const r = putFaction(s.db, led.id, fid, { nameDe: '', nameEn, publicStatus: '' }, { id: admin.id }, t0);
+      if (!r.ok) throw new Error(r.error);
+      return fid;
+    };
+    const ledFactionId = faction('The Watch');
+    const spareFactionId = faction('A spare faction');
+    const ledNpcId = randomUUID();
+    const npcMade = putNpc(s.db, led.id, ledNpcId, { factionId: ledFactionId, nameDe: '', nameEn: 'Captain Brandt', publicStatus: 'alive', statlineTts: '' }, { id: admin.id }, t0);
+    if (!npcMade.ok) throw new Error(npcMade.error);
+    const ledEventId = randomUUID();
+    const eventMade = addReputation(s.db, led.id, ledEventId, { warbandId: ledEntered.warband_id, factionId: ledFactionId, delta: 1, reason: 'Paid the toll.', battleId: null }, { id: admin.id }, t0);
+    if (!eventMade.ok) throw new Error(eventMade.error);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -149,7 +165,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
