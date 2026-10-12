@@ -305,6 +305,21 @@ nur herausgenommen; das Log (`world.*`, Sichtbarkeit `public`) trägt Kennungen
 und höchstens `delta` und Schlacht, nie Namen, Status oder Gründe. Obergrenzen
 je Kampagne: 100 Fraktionen, 500 NPCs, 5 000 Ereignisse.
 
+**Szenarien (Phase 4b3c):** ein Entwurf ist verborgene Erzählung, ein
+freigegebenes Szenario Mechanik (ADR 0002). `scenarios.read` für jedes
+Mitglied; was die Antwort enthält, entscheidet `scenarios.ts` für den, der
+fragt: ein Leiter mit Authenticator liest Entwürfe und freigegebene, alle
+anderen – Spieler, Zuschauer, ein Leiter ohne Authenticator – nur die
+freigegebenen; ein Entwurf fehlt bei ihnen ganz, auch als Zahl (`seq`).
+`scenarios.write` (anlegen, ändern, freigeben, einen Entwurf herausnehmen) nur
+Leiter mit Authenticator; ein Außenstehender bekommt 404, auch der Admin. Freigeben
+heißt, einer Schlacht der Kampagne zuweisen, und wird nicht zurückgenommen –
+sonst könnte ein Leiter einen gelesenen Text wieder „nie dagewesen“ machen. Das
+Log (`scenario.*`) trägt Kennungen, nie Titel oder Texte; die Einträge eines
+Entwurfs haben Sichtbarkeit `leader`. Die Leak-Matrix legt einen Entwurf mit
+Merkwort an eine fremde Kampagne (`SCENARIO-SECRET`) und prüft, dass ihn
+kein Spieler liest.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,
