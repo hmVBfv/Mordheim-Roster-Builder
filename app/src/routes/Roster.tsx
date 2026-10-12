@@ -156,6 +156,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         save: (nm) => ed.edit((c) => core.setModelName(c, w.uid, nm || w.type), 'Name saved.'),
       }),
     },
+    { label: w.hero ? 'Story so far & profile' : 'Story so far', run: () => { void navigate(`/warbands/${rec.id}/story?who=${w.uid}`); } },
     ...(w.xp ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: w.uid, name: w.name }); openTakenSheet(); } }] : []),
     ...(() => {
       const mv = mutationView(ctx, w.uid);
@@ -194,6 +195,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           save: (nm) => ed.edit((c) => (hs ? core.setHsName(c, h.uid, nm) : core.setDpName(c, h.uid, nm)), 'Name saved.'),
         }),
       },
+      { label: 'Story so far & profile', run: () => { void navigate(`/warbands/${rec.id}/story?who=${h.uid}`); } },
       ...(hs ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: h.uid, name: h.name }); openTakenSheet(); } }] : []),
       { label: 'Tabletop Simulator card', run: () => { void navigate(`/warbands/${rec.id}/export#tts-${h.uid}`); } },
       {
@@ -289,6 +291,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         {(ctx.s.campaign?.on || rec.campaignId) && <Link to={`/warbands/${rec.id}/districts`} className={ui.buttonQuiet}>Districts</Link>}
         <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
         <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
+        <Link to={`/warbands/${rec.id}/story`} className={ui.buttonQuiet}>Story</Link>
         <Link to={`/warbands/${rec.id}/export`} className={ui.buttonQuiet}>Export…</Link>
         {FLAVOUR === 'campaign' && rec.ownerId && <Link to={`/warbands/${rec.id}/versions`} className={ui.buttonQuiet}>Versions{rec.serverRev ? ` · ${rec.serverRev}` : ''}</Link>}
         <button type="button" className={ui.buttonQuiet}

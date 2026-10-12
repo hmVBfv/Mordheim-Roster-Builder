@@ -33,7 +33,8 @@ import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
-import { groupChanges, previewChanges, type AnyChange, type ChangeGroup } from './changes.ts';
+import { FieldsSheet, type FieldsEdit } from '../story/FieldsSheet.tsx';
+import { groupChanges, previewChanges, type AnyChange, type ChangeGroup, type ChangeLine } from './changes.ts';
 import styles from './Aftermath.module.css';
 import { takeOverBattle } from './takeover.ts';
 import { aftermathView, grantBattleXp, type AftermathView, type CasualtyView } from './view.ts';
@@ -244,7 +245,7 @@ function Steps({ a, data, wid, acts }: { a: AftermathView; data: GameData; wid: 
   );
 }
 
-export function ChangeList({ groups, label }: { groups: ChangeGroup[]; label: string }) {
+export function ChangeList({ groups, label, onExplain }: { groups: ChangeGroup[]; label: string; onExplain?: (l: ChangeLine, who: string) => void }) {
   return (
     <div className={styles.changes} aria-label={label} role="list">
       {groups.map((g) => (
@@ -260,6 +261,12 @@ export function ChangeList({ groups, label }: { groups: ChangeGroup[]; label: st
               </div>
               {l.why && <small>✓ {l.why}</small>}
               {l.unexplained && <small>Nothing in the chronicle explains it. Everyone in the campaign sees this mark; it blocks nothing.</small>}
+              {l.said && <p className={styles.said}>{l.said}</p>}
+              {onExplain && l.story && (
+                <button type="button" className={`${ui.buttonQuiet} ${styles.explainButton}`} onClick={() => onExplain(l, g.name || 'The warband')}>
+                  {l.said ? 'Edit what happened' : 'Say what happened'}
+                </button>
+              )}
             </div>
           ))}
         </article>
@@ -269,9 +276,9 @@ export function ChangeList({ groups, label }: { groups: ChangeGroup[]; label: st
 }
 
 /** What changed since the last mark, and marking. */
-function MarkSection({ data, rec, state, view, cid, round, toRoll, onMarked, notify }: {
+function MarkSection({ data, rec, state, view, cid, round, toRoll, onMarked, notify, onExplain }: {
   data: GameData; rec: StoredWarband; state: WarbandState; view: BattleView; cid: string; round: number; toRoll: number;
-  onMarked: () => void; notify: (t: string) => void;
+  onMarked: () => void; notify: (t: string) => void; onExplain: (l: ChangeLine, who: string) => void;
 }) {
   const [before, setBefore] = useState<{ state: WarbandState; label: string } | null>(null);
   const [beforeError, setBeforeError] = useState<string | null>(null);
@@ -293,7 +300,8 @@ function MarkSection({ data, rec, state, view, cid, round, toRoll, onMarked, not
   }, [cid, rec.id, data, view.battle.round]);
   const changes: AnyChange[] = useMemo(() => (before ? previewChanges(data, before.state, state, view.battle.id, round) : []), [data, before, state, view.battle.id, round]);
   const groups = useMemo(() => groupChanges(changes, state, data), [changes, state, data]);
-  const unexplained = changes.filter((c) => c.unexplained).length;
+  const unexplained = changes.filter((c) => c.unexplained && !(core.storyOf(state).explain[c.changeKey] ?? '').trim()).length;
+  const unsaid = core.missingExplanations(changes as never, core.storyOf(state).explain).length;
   const mark = view.marks?.[rec.id];
 
   const doMark = async () => {
@@ -319,10 +327,12 @@ function MarkSection({ data, rec, state, view, cid, round, toRoll, onMarked, not
         <dl className={styles.summary}>
           <div><dt>Changes</dt><dd>{changes.length}</dd></div>
           <div><dt>Without a cause</dt><dd>{unexplained}</dd></div>
+          <div><dt>Not told yet</dt><dd>{unsaid}</dd></div>
         </dl>
       )}
       {before && changes.length === 0 && <p className={ui.muted}>Nothing changed yet.</p>}
-      {groups.length > 0 && <ChangeList groups={groups} label="Changes" />}
+      {groups.length > 0 && <ChangeList groups={groups} label="Changes" onExplain={onExplain} />}
+      {unsaid > 0 && <p className={ui.muted}>“Say what happened” on a change adds a line to that warrior’s story. It is never required: the mark does not wait for it.</p>}
       <div className={`${ui.card} ${styles.mark}`}>
         {mark && <p>✓ Marked after battle {view.battle.round} – version {mark.rev}, {mark.changes} change{mark.changes === 1 ? '' : 's'}{mark.unexplained ? `, ${mark.unexplained} without a cause` : ''}. Changed something since? Mark again: the newer mark corrects this one.</p>}
         {!mark && toRoll > 0 && <p className={styles.warn}>{toRoll} injur{toRoll === 1 ? 'y is' : 'ies are'} not rolled yet.</p>}
@@ -349,6 +359,19 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
   const v = useMemo(() => rosterView(data, ed.state), [data, ed.state]);
   const inj = useSheet();
   const [injFor, setInjFor] = useState<(InjuryFor & { key: number }) | null>(null);
+  const said = useSheet();
+  const [saying, setSaying] = useState<FieldsEdit | null>(null);
+  // what happened behind a change: one text, kept in the save under the change's key (4b2)
+  const explain = (l: ChangeLine, who: string) => {
+    setSaying((p) => ({
+      key: (p?.key ?? 0) + 1, title: `${who}: ${l.what} ${l.to}`.trim(),
+      intro: 'Why did it happen? It joins the warrior’s story, and everyone in the campaign can read it.',
+      fields: [{ key: 'text', label: 'What happened', kind: 'text', max: core.STORY_LIMITS.explanation, rows: 5 }],
+      values: { text: l.said ?? '' },
+      save: (vals) => ed.edit((c) => core.setExplanation(c, l.key, vals.text ?? ''), 'Written down.', { gold: 'keep' }),
+    }));
+    said.open();
+  };
 
   // the injury sheet is there from the first render on (useSheet), whatever is shown around it
   const view = cid && signedIn ? b.view : null;
@@ -386,7 +409,7 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
       {view && fought && view.battle.status === 'closed' && !view.battle.takenOver && a && (
         <div className={styles.columns}>
           <Steps a={a} data={data} wid={rec.id} acts={{ edit: ed.edit, roll }} />
-          <MarkSection data={data} rec={rec} state={ed.state} view={view} cid={cid!} round={a.round} toRoll={a.toRoll} onMarked={b.reload} notify={notify} />
+          <MarkSection data={data} rec={rec} state={ed.state} view={view} cid={cid!} round={a.round} toRoll={a.toRoll} onMarked={b.reload} notify={notify} onExplain={explain} />
         </div>
       )}
       {view && (
@@ -395,6 +418,7 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
           <Link to={`/warbands/${rec.id}`} className={ui.buttonQuiet}>The roster</Link>
         </div>
       )}
+      <FieldsSheet dialogRef={said.ref} close={said.close} edit={saying} />
       <InjurySheet dialogRef={inj.ref} close={inj.close} who={injFor}
         onApply={(r, text) => { if (injFor) { const uid = injFor.uid; ed.edit((c) => core.injure(c, uid as number, r), text, { gold: 'keep' }); } }} />
       {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}

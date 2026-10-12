@@ -13,7 +13,7 @@ const written = () => ({
   story: { chapters: ['what the leader knows'] },
   house: { notes: 'we play the pits with a D6', startGold: '' },
   models: [
-    { uid: 1, uid_def: 'matri', name: 'Mother Hildegard', profile: { text: 'born in Nuln, hates bats', title: 'Abbess' } },
+    { uid: 1, uid_def: 'matri', name: 'Mother Hildegard', profile: { text: 'born in Nuln, hates bats', voice: 'whispers, always', origin: 'a Nuln orphanage', name_de: 'Mutter Hildegard', title: 'Abbess' } },
     { uid: 2, uid_def: 'augur', name: 'Ottilie' },
   ],
   fallen: [{ kind: 'hero', m: { uid: 3, uid_def: 'super', name: 'Sister Agna', profile: { text: 'secretly a witch' } } }],
@@ -40,9 +40,9 @@ describe('sanitizeSave', () => {
     const s = clean(written());
     expect(s.story).toBeUndefined();
     const text = JSON.stringify(s);
-    for (const secret of ['what the leader knows', 'born in Nuln', 'secretly a witch', 'old background']) expect(text).not.toContain(secret);
-    // what else sits in the profile stays
-    expect((s.models as { profile?: object }[])[0]!.profile).toEqual({ title: 'Abbess' });
+    for (const secret of ['what the leader knows', 'born in Nuln', 'whispers, always', 'Nuln orphanage', 'secretly a witch', 'old background']) expect(text).not.toContain(secret);
+    // his names and titles stay: they are public in the chronicle
+    expect((s.models as { profile?: object }[])[0]!.profile).toEqual({ name_de: 'Mutter Hildegard', title: 'Abbess' });
   });
 
   it('replaces what players wrote with placeholders, and leaves empty texts empty', () => {

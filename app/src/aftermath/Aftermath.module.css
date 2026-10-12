@@ -225,3 +225,14 @@
 .mark > p {
   margin: 0;
 }
+
+.said {
+  margin: 0;
+  font-style: italic;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.explainButton {
+  justify-self: start;
+}

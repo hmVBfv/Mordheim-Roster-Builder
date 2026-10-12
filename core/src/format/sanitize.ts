@@ -1,7 +1,8 @@
 /* Cleaning a save before it becomes a test fixture (docs/security.md §6).
 
    Both repositories are public, and a save from the running campaign carries
-   what the players wrote themselves: the story, a warrior's background,
+   what the players wrote themselves: the story, a warrior's background (his
+   voice, origin and the lines about him),
    notes in the chronicle, accounts of battles, remarks on casualties,
    house-rule notes, and in a campaign file the players' own names. All of it
    is removed or replaced by a fixed placeholder. Everything the rules work
@@ -43,10 +44,12 @@ export function sanitizeSave(data: GameData, raw: unknown): unknown {
       if (k === 'story') continue; // the narrative of the new builder
       out[k] = clean(v);
     }
-    // a warrior's background
-    if (isRec(out.profile) && 'text' in out.profile) {
+    // a warrior's background: what the player wrote about him – his names and titles are public in the chronicle and stay
+    if (isRec(out.profile) && ('text' in out.profile || 'voice' in out.profile || 'origin' in out.profile)) {
       const p = { ...out.profile };
       delete p.text;
+      delete p.voice;
+      delete p.origin;
       out.profile = p;
     }
     // a chronicle entry written or corrected by hand

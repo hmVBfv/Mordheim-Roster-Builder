@@ -129,6 +129,38 @@ describe('the aftermath of one’s warband', () => {
     expect(screen.getByRole('button', { name: 'Mark after battle 1 again' })).toBeTruthy();
   });
 
+  it('says what happened behind a change; it joins the warband’s story and the line stops being a mystery', async () => {
+    const { b, mine } = await world();
+    b.status = 'closed';
+    const user = userEvent.setup();
+    at(`/warbands/${mine}/aftermath/${b.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Take it over' }));
+    await screen.findByRole('list', { name: 'Casualties' });
+    // a characteristic risen with no advance rolled: a change nothing in the chronicle explains
+    const rec = (await db.warbands.get(mine))!;
+    // (written as if from another tab: a change newer than the screen's own wins)
+    await db.warbands.update(mine, {
+      updatedAt: new Date(Date.now() + 60_000).toISOString(),
+      state: { ...rec.state, models: rec.state.models.map((m) => (m.uid === 2 ? { ...m, adv: { ...(m.adv ?? {}), WS: (Number(m.adv?.WS) || 0) + 1 } } : m)) },
+    });
+    const list = await screen.findByRole('list', { name: 'Changes' });
+    const champion = (await within(list).findAllByRole('listitem')).find((x) => within(x).queryByRole('heading', { name: 'Champion' }))!;
+    expect(within(champion).getByText('⚠ no cause found')).toBeTruthy();
+    expect(screen.getByText('Not told yet')).toBeTruthy();
+
+    await user.click(within(champion).getByRole('button', { name: 'Say what happened' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Champion: WS +1' });
+    await user.click(within(sheet).getByLabelText('What happened'));
+    await user.paste('Three weeks of drill with the ferry guard.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    expect(await within(champion).findByText('Three weeks of drill with the ferry guard.')).toBeTruthy();
+    expect(within(champion).queryByText('⚠ no cause found')).toBeNull();
+    expect(within(champion).getByRole('button', { name: 'Edit what happened' })).toBeTruthy();
+    const kept = (await db.warbands.get(mine))!.state.story as { explain: Record<string, string> };
+    expect(Object.values(kept.explain)).toEqual(['Three weeks of drill with the ferry guard.']);
+    expect(Object.keys(kept.explain)[0]).toMatch(/^1:2:stat:/);
+  });
+
   it('waits while the battle is still being fought', async () => {
     const { b, mine } = await world();
     at(`/warbands/${mine}/aftermath/${b.id}`);

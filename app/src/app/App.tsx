@@ -18,6 +18,7 @@ const TradingPost = lazy(() => import('../routes/TradingPost.tsx').then((m) => (
 const Hire = lazy(() => import('../routes/Hire.tsx').then((m) => ({ default: m.Hire })));
 const HouseRules = lazy(() => import('../routes/HouseRules.tsx').then((m) => ({ default: m.HouseRules })));
 const Districts = lazy(() => import('../routes/Districts.tsx').then((m) => ({ default: m.Districts })));
+const Story = lazy(() => import('../story/Story.tsx').then((m) => ({ default: m.Story })));
 // accounts: only the campaign app has a server (phase 3g)
 const SignIn = lazy(() => import('../account/SignIn.tsx').then((m) => ({ default: m.SignIn })));
 const LinkAccept = lazy(() => import('../account/LinkAccept.tsx').then((m) => ({ default: m.LinkAccept })));
@@ -48,6 +49,7 @@ export function AppRoutes() {
           <Route path="/warbands/:id/hire" element={<Hire />} />
           <Route path="/warbands/:id/house" element={<HouseRules />} />
           <Route path="/warbands/:id/districts" element={<Districts />} />
+          <Route path="/warbands/:id/story" element={<Story />} />
           {FLAVOUR === 'campaign' && <Route path="/campaign" element={<Campaigns />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id" element={<Campaign />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/warbands/:wid" element={<CampaignWarband />} />}
