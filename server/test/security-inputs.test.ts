@@ -32,6 +32,31 @@ describe('counts in a save (INPUT-1)', () => {
   });
 });
 
+describe('what players write in a save (phase 4b2)', () => {
+  it('a prologue, an interlude, an explanation or a profile beyond its limit is refused; what fits passes', async () => {
+    const s = await startAccounts();
+    const token = (await s.user('kai')).session();
+    const post = (data: unknown) => s.call({ url: '/api/v1/warbands', body: { id: randomUUID(), data, source: 'save' }, token });
+    const story = (over: Record<string, unknown>) => ({ ...SAVE, story: { prologue: '', interludes: {}, explain: {}, ...over } });
+    for (const [what, data] of [
+      ['prologue', story({ prologue: 'x'.repeat(20_001) })],
+      ['interlude', story({ interludes: { '1': 'x'.repeat(20_001) } })],
+      ['too many interludes', story({ interludes: Object.fromEntries(Array.from({ length: 201 }, (_, i) => [String(i + 1), 'x'])) })],
+      ['explanation', story({ explain: { '1:1:stat:WS': 'x'.repeat(2_001) } })],
+      ['change key', story({ explain: { ['k'.repeat(201)]: 'x' } })],
+      ['profile text', withModel({ profile: { text: 'x'.repeat(5_001) } })],
+      ['profile name', withModel({ profile: { name_en: 'x'.repeat(121) } })],
+      ['canon', { ...SAVE, canon: { name_de: 'x'.repeat(121) } }],
+    ] as const) {
+      const r = await post(data);
+      expect(r.statusCode, what).toBe(400);
+      expect(r.json(), what).toMatchObject({ error: 'invalid' });
+    }
+    expect((await post({ ...story({ prologue: 'x'.repeat(20_000), interludes: { '1': 'Rain.' }, explain: { '1:1:stat:WS': 'Drill.' } }), canon: { name_en: 'The Silver Caravan' } })).statusCode).toBe(201);
+    expect((await post(withModel({ profile: { name_en: 'Aldric Voss', voice: 'Few words.' } }))).statusCode).toBe(201);
+  });
+});
+
 describe('the size of what a request makes the server hold (INPUT-2)', () => {
   it('without an account, a body stays small: 64 KB', async () => {
     const s = await startAccounts();

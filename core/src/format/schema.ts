@@ -7,6 +7,7 @@
    does not match as notes instead of refusing; the server (phase 2) checks
    what it stores against the same schemas. */
 import { z } from 'zod';
+import { STORY_LIMITS } from '../narrative/story.ts';
 
 /** A number, or one the legacy app kept as typed text ("7"). */
 const num = z.union([z.number(), z.string()]);
@@ -28,6 +29,26 @@ export const injurySchema = z.looseObject({
 });
 
 export const spellSchema = z.looseObject({ name: z.string(), red: z.number().optional() });
+
+/** What players write themselves (phase 4b2; narrative/story.ts): kept in the save, so held to a limit – the server refuses what goes beyond it. */
+const text = (max: number) => z.string().max(max);
+const texts = (keyMax: number, valueMax: number, entries: number) => z.record(z.string().max(keyMax), text(valueMax)).refine((v) => Object.keys(v).length <= entries, { message: `at most ${entries} entries` });
+
+/** A warrior's profile: the names in both languages, how he speaks, where he comes from, a few lines about him. */
+export const profileSchema = z.looseObject({
+  name_de: text(STORY_LIMITS.name).optional(), name_en: text(STORY_LIMITS.name).optional(),
+  title_de: text(STORY_LIMITS.title).optional(), title_en: text(STORY_LIMITS.title).optional(),
+  voice: text(STORY_LIMITS.voice).optional(), origin: text(STORY_LIMITS.origin).optional(), text: text(STORY_LIMITS.text).optional(),
+});
+
+/** The prologue, an interlude after each round, the explanation of a change. */
+export const storySchema = z.looseObject({
+  prologue: text(STORY_LIMITS.prologue).optional(),
+  interludes: texts(3, STORY_LIMITS.interlude, STORY_LIMITS.interludes).optional(),
+  explain: texts(STORY_LIMITS.key, STORY_LIMITS.explanation, STORY_LIMITS.explanations).optional(),
+});
+
+export const canonSchema = z.looseObject({ name_de: text(STORY_LIMITS.name).optional(), name_en: text(STORY_LIMITS.name).optional() });
 
 export const modelSchema = z.looseObject({
   uid: z.number(),
@@ -54,6 +75,7 @@ export const modelSchema = z.looseObject({
   captive: z.looseObject({ by: z.string(), round: z.number(), casualtyId: z.number().nullable().optional() }).optional(),
   xpPaid: num.optional(),
   heirloom: z.string().nullable().optional(),
+  profile: profileSchema.optional(),
 });
 
 /** A key or id that is written into markup by older readers (the Roster Builder's inline handlers): letters, digits, `_` and `-`
@@ -70,6 +92,7 @@ export const hireRecordSchema = z.looseObject({
   adv: stats.optional(),
   opt: z.string().optional(),
   eq: z.record(z.string(), count).optional(),
+  profile: profileSchema.optional(),
 });
 
 export const logEntrySchema = z.looseObject({
@@ -124,6 +147,8 @@ export const warbandSaveSchema = z.looseObject({
   mark: z.string().nullable().optional(),
   fallen: z.array(z.looseObject({ id: z.number().optional(), kind: z.string(), m: modelSchema })).optional(),
   uidSeq: z.number().optional(),
+  canon: canonSchema.optional(),
+  story: storySchema.optional(),
   goldNow: z.number().optional(),
   /** The gold ledger (V7), from the warband's first battle on. */
   ledger: z.array(z.looseObject({ id: z.number(), kind: z.enum(['open', 'roster', 'buy', 'sell', 'search', 'adjust']), amount: z.number(), text: z.string(), round: z.number().optional(), uid: z.union([z.number(), z.string()]).optional(), item: z.string().optional(), qty: z.number().optional(), found: z.boolean().optional() })).optional(),

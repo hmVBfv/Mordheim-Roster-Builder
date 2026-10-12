@@ -64,7 +64,8 @@ describe('a warband of one’s own', () => {
       expect(r.statusCode, JSON.stringify(data)).toBe(400);
       expect(r.json()).toMatchObject({ error: 'invalid', problem: expect.stringMatching(/^not a warband save/) });
     }
-    const big = { ...SAVE, story: { prologue: 'x'.repeat(2 * 1024 * 1024) } };
+    // (the texts players write have limits of their own, 20,000 characters for the prologue; the cap here is on the whole save)
+    const big = { ...SAVE, models: [{ ...SAVE.models[0]!, name: 'x'.repeat(2 * 1024 * 1024) }, ...SAVE.models.slice(1)] };
     expect((await create(kai, big)).res.json()).toMatchObject({ error: 'too_large' });
     const { id } = await create(kai, { ...SAVE, _open: true, models: [{ uid: 1, uid_def: 'captain', _edit: 'x' }] });
     expect(((await kai('GET', `/warbands/${id}`)).json() as { head: { data: unknown } }).head.data).toEqual({ ...SAVE, models: [{ uid: 1, uid_def: 'captain' }] });
