@@ -21,6 +21,7 @@ import { registerTimelineRoutes } from './routes-timeline.ts';
 import { registerBackgroundRoutes } from './routes-background.ts';
 import { registerQuestionRoutes } from './routes-questions.ts';
 import { registerScenarioRoutes } from './routes-scenarios.ts';
+import { registerStyleRoutes } from './routes-style.ts';
 import { registerWorldRoutes } from './routes-world.ts';
 import { registerCampaignRoutes } from './routes-campaigns.ts';
 import { registerShareRoutes } from './routes-shares.ts';
@@ -183,6 +184,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerQuestionRoutes(app, { db, now });
   registerWorldRoutes(app, { db, now });
   registerScenarioRoutes(app, { db, now });
+  registerStyleRoutes(app, { db, now });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);

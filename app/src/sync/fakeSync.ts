@@ -139,6 +139,8 @@ export function createFakeSync(opts: {
     npcs: new Map<string, FakeNpc>(),
     reputation: new Map<string, FakeReputation>(),
     scenarios: new Map<string, FakeScenario>(),
+    /** The style guide per campaign (4b4a); none until a leader writes one. */
+    styles: new Map<string, { text: string; updatedBy: string; updatedAt: string; seq: number }>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -549,6 +551,29 @@ export function createFakeSync(opts: {
     return answer(cur);
   };
 
+  /* ---- style guide (as server/src/routes-style.ts: leaders only, one text per campaign) ---- */
+  const styleOf = (cid: string) => {
+    const x = s.styles.get(cid);
+    return x ? { ...x } : { text: '', updatedBy: null, updatedAt: null, seq: 0 };
+  };
+  /** A leader wrote the style earlier (or on another device). */
+  const styleFrom = (campaignId: string, text: string, by = 'Anna') => {
+    s.styles.set(campaignId, { text, updatedBy: by, updatedAt: at(), seq: next() });
+    return styleOf(campaignId);
+  };
+  const styleRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (rest !== '/style') return json(404, { error: 'not_found' });
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    if (method === 'GET') return json(200, { style: styleOf(c.id) });
+    if (method !== 'PUT') return json(404, { error: 'not_found' });
+    if (typeof body.text !== 'string' || body.text.length > 10_000) return json(400, { error: 'invalid', problem: 'not a style guide (text: too big)' });
+    const cur = styleOf(c.id);
+    if (cur.text === body.text && cur.seq !== 0) return json(200, { style: cur });
+    if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: cur });
+    s.styles.set(c.id, { text: body.text, updatedBy: me.displayName, updatedAt: at(), seq: next() });
+    return json(200, { style: styleOf(c.id) });
+  };
+
   /* ---- pictures (as server/src/attachments.ts filters them) ---- */
   const pictureFor = (p: FakePicture, role: FakeRole) => !p.deleted && (p.visibility !== 'leader' || role === 'leader' || p.uploaderId === me.id) && (p.stored || p.uploaderId === me.id);
   const pictureView = (p: FakePicture) => ({
@@ -827,6 +852,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/questions')) return questionRoutes(c, role, method, rest, body);
     if (rest.startsWith('/world')) return worldRoutes(c, role, method, rest, body);
     if (rest.startsWith('/scenarios')) return scenarioRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/style')) return styleRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
@@ -1048,5 +1074,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom };
 }

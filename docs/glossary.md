@@ -186,8 +186,11 @@ Begriff einführt, trägt ihn hier ein.
 | Abschnitt | Segment | `segment` |
 | Erzählzeit | Story order | `pos` |
 | Erfassungszeit | Recorded at | `created_at` |
-| Briefing | Briefing | `core/narrative` |
-| KI-Paket | AI pack | `ai-pack` |
+| Briefing (erster Teil des KI-Pakets) | Briefing | `core/narrative` |
+| KI-Paket (Prompt für den Schreibenden; Zeitleiste, nur Leiter) | AI pack | `buildPack` in `core/narrative/pack.ts`, `PACK_FORMAT` |
+| Teil des Pakets | Part | `PACK_PARTS` (`aftermath`, `canon`, `world`, `notes`, `background`, `story`, `style`) |
+| Enthüllungsregel (im Paket) | Rule | `PackBackground.rule`: `hidden` · `hint` · `revealed` |
+| Lücke im Material | Gap | `Gathered.warnings`, Liste „Gaps in the material“ |
 | Kapitelentwurf | Chapter draft | `chapter_drafts` |
 | Chronik (Reiter der Kampagne: die ganze Geschichte) | Chronicle | `chapters` |
 | Kapitel importieren | Import chapters… (veröffentlichte, 4a5) · Import a chapter (Entwurf, 4b) | `PUT …/chapters/:chid`, `readChapterFile()`; Entwurf aus Text oder .md/.txt |

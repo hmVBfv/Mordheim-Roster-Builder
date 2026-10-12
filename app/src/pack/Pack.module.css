@@ -1,0 +1,8 @@
+/* The AI pack sheet (phase 4b4a): what goes in, the language, the prompt as it will be copied. */
+.parts { display: grid; gap: var(--space-2); border: 0; padding: 0; margin: 0; }
+.parts legend { font-weight: 700; padding: 0; margin-bottom: var(--space-1); }
+.prompt { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; min-height: 12rem; }
+.size { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+.leader { margin: 0; font-weight: 600; }
+.box { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.box p { margin: 0; flex: 1 1 14rem; }
