@@ -36,3 +36,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0015](0015-develop-in-cloud-operate-on-pi.md) | Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi |
 | [0016](0016-campaign-state-stays-in-the-save.md) | Die Kampagnenmechanik einer Warband bleibt in ihrem Speicherstand (vorgeschlagen) |
 | [0017](0017-signed-images-from-master.md) | In die Produktion nur signierte Images von master |
+| [0018](0018-ai-pack-by-hand.md) | KI-Paket von Hand weitergeben; keine Ablage in `eingang/chronik/` (ersetzt Teile von 0004) |

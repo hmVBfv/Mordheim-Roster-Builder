@@ -120,6 +120,7 @@ const SEGMENT_TITLE: Record<PackStoryItem['segment'], string> = { before: 'Befor
 
 const ADVANCE_KINDS = new Set(['stat', 'skill', 'spell', 'promoted']);
 const AFTERMATH_KINDS = new Set(['died', 'injury']);
+const GEAR_KINDS = new Set(['gear_added', 'gear_removed', 'gold']);
 const OTHER_KINDS = new Set(['recruited', 'released', 'hired', 'rare_added', 'rare_removed', 'district', 'renamed', 'group_size']);
 
 /** What one warrior did in this battle, from the protocol. */
@@ -183,6 +184,7 @@ export function buildPack(data: GameData, input: PackInput, options: PackOptions
     };
     section('Aftermath', AFTERMATH_KINDS, false);
     section('Advances', ADVANCE_KINDS, true);
+    section('Equipment and gold', GEAR_KINDS, false);
     section('Other changes', OTHER_KINDS, false);
     const inter = input.warbands.filter((w) => w.interlude.trim());
     if (inter.length) {

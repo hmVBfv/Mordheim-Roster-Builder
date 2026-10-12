@@ -465,7 +465,8 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
 
 - Keine Hintergrund-Inhalte, keine versiegelten Notizen, keine GM-Notizen in
   einem Repo – auch nicht in `notes/` des Chronik-Repos. Die Chronik-Pipeline
-  bekommt den Hintergrund nur über `eingang/` (lokal, nicht versioniert).
+  bekommt den Hintergrund nur, wenn ein Leiter das KI-Paket bewusst von Hand
+  weitergibt (ADR 0018).
 - Keine Hostnamen, Zugangsdaten oder Tokens im Repo; in der Doku stehen
   Platzhalter.
 - **Testvorlagen aus echten Speicherständen** (Bug-Meldungen, Stände der
@@ -487,8 +488,8 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
 - Bug-Arbeit nutzt ein Token, das nur `GET/PATCH /bugs` erlaubt; es liegt als
   Umgebungsvariable in der Cloud-Umgebung, deren erlaubte Domains den Server
   einschließen. Das
-  Schreib-Material für die Chronik (KI-Paket) erreicht die Pipeline nur über
-  `eingang/chronik/`.
+  Schreib-Material für die Chronik (KI-Paket) erreicht die Pipeline nur von
+  Hand, durch den Leiter (ADR 0018).
 - `master` ist per GitHub-Regelwerk geschützt: Änderungen nur per Pull
   Request mit grüner CI. Agenten arbeiten auf eigenen Branches.
 - Gemergt und deployt wird von Rob. Vor `sudo ops/install.sh` zeigt

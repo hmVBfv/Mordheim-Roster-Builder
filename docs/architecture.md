@@ -11,7 +11,7 @@ Stand: 27. September 2026 · Grundlage: [concept.md](concept.md), ADRs 0001, 000
 │  ├ core/  Regeln, Diff   │  Fritzbox │   └► server/ 127.0.0.1:3000   │
 │  ├ Dexie (IndexedDB)     │   :443    │        Fastify + SQLite       │
 │  └ Warteschlange (Outbox)│           │        /mnt/ssd/roster/data   │
-└──────────────────────────┘           │   KI-Paket ► eingang/chronik/ │
+└──────────────────────────┘           │                               │
                                        └──────────────────────────────┘
  GitHub Pages: Quick Build              GitHub Actions: Tests, Builds,
  (derselbe app/-Build, ohne Server)     Image → ghcr.io → roster-deploy
@@ -248,7 +248,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Schlachten | `GET/POST /campaigns/:id/battles`, `GET/PATCH /campaigns/:id/battles/:bid` (`?since=seq`; Titel, Szenario, Bezirk, Zug, Teilnehmer, Ergebnisse), `PUT/DELETE …/battles/:bid/protocol/:eid` (Geräte-ID), `PUT …/battles/:bid/proposals/:pid`, `POST …/proposals/:pid/accept`, `…/reject` – Phase 4a2; `POST …/battles/:bid/close` (Leiter), `POST …/battles/:bid/marks` (`warbandId`, `rev`; der Spieler), `POST /campaigns/:id/rounds/advance` (Leiter) – Phase 4a4; `PUT/DELETE /campaigns/:id/history/:bid` (Schlacht der Vorgeschichte: `round`, `title`, `district`, `playedOn`, `outcomes`; Leiter, solange die Kampagne keine eigene Schlacht hat) – Phase 4a5 |
 | Erzählung | `GET /campaigns/:id/notes` (`?since=seq`; was der Fragende sehen darf), `PUT/DELETE /campaigns/:id/notes/:nid` (Geräte-ID) – Phase 4a3; `GET /campaigns/:id/attachments` (`?since=seq`), `PUT/DELETE …/attachments/:aid` (Geräte-ID; was es ist), `PUT …/attachments/:aid/file` (die Bytes, roh), `GET …/attachments/:aid/file`, `GET /campaigns/:id/timeline` (Positionen, Protokoll aller Schlachten, Markierungen), `PUT …/timeline/:type/:itemId` (`segment`, `pos`) – Phase 4a3, Teil 2; `GET/PUT/DELETE /campaigns/:id/chapters/:chid` (veröffentlichte Kapitel; lesen alle, importieren und herausnehmen ein Leiter; die Liste ohne Texte kommt mit `GET …/timeline`) – Phase 4a5; `GET /campaigns/:id/questions` (jedes Mitglied; Leiter sehen alle, der Gefragte seine eigenen), `PUT …/questions/:qid` (Geräte-ID; nur Leiter mit Authenticator: stellen, ändern, zurückziehen), `POST …/questions/:qid/answer` (nur der Gefragte: die Antwort ist eine Notiz) – Phase 4b3a |
 | Hintergrund | `GET /campaigns/:id/background` (`?since=seq`), `GET/PUT/DELETE …/background/:eid` (Geräte-ID; `baseSeq`), `POST …/background/:eid/reveal` – nur Leiter mit Authenticator, Phase 4b1; `?as=player` an Notizen, Anhängen und Zeitleiste zeigt einem Leiter, was ein Spieler bekäme (nur verengend) |
-| Leiter | `GET/PUT /campaigns/:id/style` (Stilvorgaben; `baseSeq`, sonst 409 `stale`; nur Leiter mit Authenticator) – Phase 4b4a; Briefing und KI-Paket baut der Client aus dem, was er schon liest (ADR 0005), eine Route dafür gibt es nicht; `…/ai-pack/:battleId` als Ablage in `eingang/chronik/` folgt in 4b4b |
+| Leiter | `GET/PUT /campaigns/:id/style` (Stilvorgaben; `baseSeq`, sonst 409 `stale`; nur Leiter mit Authenticator) – Phase 4b4a; Briefing und KI-Paket baut der Client aus dem, was er schon liest (ADR 0005), eine Route dafür gibt es nicht; eine Ablage in `eingang/chronik/` gibt es nicht (ADR 0018) |
 | Welt | `GET /campaigns/:id/world` (jedes Mitglied: Fraktionen, NPCs, Ruf-Ereignisse, `seq`), `PUT/DELETE …/world/factions/:fid`, `PUT/DELETE …/world/npcs/:nid`, `PUT/DELETE …/world/reputation/:rid` (Geräte-ID; nur Leiter mit Authenticator; die Antwort ist jeweils die ganze Welt) – Phase 4b3b; Bezirke bleiben abgeleitet (`district_control` entfällt) |
 | Szenarien | `GET /campaigns/:id/scenarios` (jedes Mitglied: die freigegebenen, ein Leiter mit Authenticator zusätzlich die Entwürfe; `seq`), `PUT /campaigns/:id/scenarios/:sid` (Geräte-ID, `baseSeq`), `POST …/scenarios/:sid/release` (`{ battleId }`), `DELETE …/scenarios/:sid` (nur Entwürfe) – schreiben nur Leiter mit Authenticator – Phase 4b3c |
 | Teilen | `GET /people` (Anzeigename und Nutzername der anderen), `GET/POST /shares`, `POST /shares/peek`, `POST /shares/redeem` (Code), `POST /shares/:id/accept`, `POST /shares/:id/decline`, `DELETE /shares/:id` – Rob, 05.10.2026 |
@@ -414,5 +414,5 @@ Claude-App oder claude.ai/code), mit diesem Repo als Quelle:
   unverändert und für die Chronik zuständig.
 
 Produktion (`~/server/roster/`, `/mnt/ssd/roster/`) und Agenten-Umgebung
-(`/mnt/ssd/agent/`) bleiben getrennt. Die einzige Brücke ist das Ablegen des
-KI-Pakets in `/mnt/ssd/agent/eingang/chronik/`.
+(`/mnt/ssd/agent/`) bleiben getrennt. Es gibt keine automatische Brücke: das KI-Paket gibt
+ein Leiter von Hand weiter (ADR 0018).

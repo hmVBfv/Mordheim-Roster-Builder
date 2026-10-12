@@ -144,7 +144,7 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
     Karte und Abbild liegen `site.env`, `app.env` und die SSH-Schlüssel,
     nicht das restic-Passwort).
 
-Der Chronik-Eingang (`eingang/chronik/`) wird erst in Phase 4b gebraucht.
+Einen Chronik-Eingang bindet die App nicht ein (ADR 0018).
 
 ### Stufe 2 – Freischalten
 
@@ -337,7 +337,7 @@ roster-deploy --staging <tag> && roster-deploy <tag>
   staging.env         dasselbe für die Testinstanz, mit eigenem TOTP_KEY (600)
   staging/            Daten der Testinstanz (data/, uploads/)
   caddy/              Zertifikate und Konfiguration von Caddy (gehört root, 700)
-/mnt/ssd/agent/eingang/chronik/   KI-Pakete für chronik N (ab Phase 4b)
+/mnt/ssd/agent/eingang/chronik/   Sache der Chronik-Pipeline; die Roster-App legt dort nichts ab (ADR 0018)
 ```
 
 ## 4. Die Betriebsdateien
@@ -379,8 +379,8 @@ bricht ab, solange er nicht eingebunden ist.
   Daten unter `staging/`, eigener `TOTP_KEY`, ein Testpasswort für alle
   Konten (siehe Konten), sonst wie die App. Sie schreibt nichts nach
   `eingang/`.
-- Der Chronik-Eingang wird erst in Phase 4b eingebunden – vorher braucht die
-  App ihn nicht, und was sie nicht braucht, sieht sie nicht.
+- Den Chronik-Eingang bindet die App nicht ein (ADR 0018): was sie nicht
+  braucht, sieht sie nicht.
 
 ### `Caddyfile`
 

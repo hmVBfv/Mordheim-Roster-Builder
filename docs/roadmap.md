@@ -279,7 +279,7 @@ Desktop-Arbeitsfläche ist ein Teil davon.
 - Hintergrund mit Enthüllungsstufen, „Als Spieler ansehen“.
 - Welt: Fraktionen, NPCs, Ruf, Bezirke, Szenarien.
 - Briefing, KI-Paket (auch als Prompt zum Kopieren aus der Timeline),
-  Ablage in `eingang/chronik/`, Kanon-Export für den Chronik-Linter.
+  Kanon-Export für den Chronik-Linter als Download (keine Ablage in `eingang/chronik/`, ADR 0018).
 - Reiter „Chronicle“: die ganze Geschichte, Textimport von Kapiteln als
   Entwurf mit Prüfung, Download (Mockup `chronicle.html`, 02.10.2026).
 
@@ -299,7 +299,7 @@ eigener Pull Request aus `master`, in dieser Reihenfolge:
 | 4b3b Welt | Fraktionen, NPCs, Ruf. **Stand 12.10.2026:** umgesetzt (Migration 17, Tabellen `factions`, `npcs`, `reputation_events`, `server/src/world.ts`, `routes-world.ts`, Policy `world.read|write`, neue Zeilen der Leak-Matrix; App `app/src/world/`, Reiter „World“). Öffentliche Mechanik (ADR 0002): jedes Mitglied liest alles, Zuschauer eingeschlossen; nur Leiter mit Authenticator schreiben. Ruf ist ein Log aus Ereignissen mit Grund und optionaler Schlacht, der Stand ist die Summe; ein Ereignis wird nie geändert, nur herausgenommen. Die Wahrheit über einen NPC bleibt im Hintergrund. **Entschieden:** keine Tabelle `district_control` – Bezirke bleiben aus den Ständen der Warbands abgeleitet (ADR 0016, `campaignMap`). Schreiben nur online. |
 | 4b3c Szenarien | Szenarien mit Regeln und NPC-Werten im TTS-Format. **Stand 12.10.2026:** umgesetzt (Migration 18, Tabellen `scenarios`, `scenario_revisions`, `server/src/scenarios.ts`, `routes-scenarios.ts`, Policy `scenarios.read|write`, neue Zeilen der Leak-Matrix mit Merkwort; App `app/src/scenarios/`, Abschnitt „Scenarios“ im Reiter „World“, „Copy statlines“ für den TTS-Tisch). Ein Entwurf ist nur für Leiter mit Authenticator da; **Freigeben** = einer Schlacht der Kampagne zuweisen, danach lesen alle Mitglieder, und es wird nicht zurückgenommen. Ein freigegebenes Szenario darf korrigiert werden (frühere Fassung bleibt), aber nicht herausgenommen; ein Entwurf schon. **Abgrenzung (entschieden):** das Szenario ist das spielbare Paket des Leiters; Pläne, Ideen und Notizen darum bleiben im Hintergrund (Art „Scenarios“ dort). Schreiben nur online. |
 | 4b4a Briefing, KI-Paket, Stilvorgaben | **Stand 12.10.2026:** umgesetzt (Migration 19, Tabelle `campaign_docs`, `server/src/style.ts`, `routes-style.ts`, Policy `style.read|write`, neue Zeilen der Leak-Matrix mit Merkwort; `core/narrative/pack.ts` mit `buildPack`; App `app/src/pack/`, Knopf **„AI pack…“** in der Zeitleiste, Abschnitt „Style guide ⚑“ unter Manage). Das **Briefing ist der erste Teil des KI-Pakets** (Schlacht in Story-Reihenfolge, Aftermath, Aufstiege mit Erklärung und Taten); wer nur das will, wählt die anderen Teile ab. Das Paket baut das Gerät des Leiters aus dem, was die App schon liest (ADR 0005); die **eingefrorenen Änderungen der Markierung** liefern Aftermath und Aufstiege (ADR 0003: nichts wird neu gerechnet), deshalb braucht es keine Vorher-/Nachher-Stände fremder Warbands und keine neue Server-Route. **Was ein Schreibender nie bekommt (entschieden):** Notizen nur für Leiter, GM-Notizen, Szenario-Pläne des Hintergrunds, Einträge mit Status „planned“, Bilder nur für Leiter. Hintergrund geht mit Regel hinein (HIDDEN · HINT ONLY mit Grenze · REVEALED); eine Wahrheit, die erst ab einer späteren Schlacht öffentlich ist, geht als HIDDEN hinein. Die Zusammenfassung der früheren Kapitel schreibt keine KI: Liste der Kapitel, das letzte im Volltext. Fehlendes (Warband nicht markiert, nichts protokolliert) nennt das Blatt als Lücke, statt es zu verschweigen. Lesen und Schreiben der Stilvorgaben nur online und nur für Leiter mit Authenticator. |
-| 4b4b Kanon-Export und Ablage | Kanon-Export (Schreibweisenliste für den Chronik-Linter, z. B. `notes/agent/spielbegriffe.txt`) und Ablage des Pakets in `eingang/chronik/` (Route `…/ai-pack/:battleId`, Änderung in `ops/`, Rob wendet sie mit `sudo ops/install.sh` an) – **vor dem Bauen mit Rob abstimmen**; ADR 0004: die Pipeline schreibt Hintergrund nie in `notes/` des öffentlichen Chronik-Repos. |
+| 4b4b Kanon-Export (klein, optional) | **Entschieden (Rob, 12.10.2026, ADR 0018):** keine Ablage in `eingang/chronik/`, keine Route, keine Änderung an `ops/`; das KI-Paket gibt der Leiter von Hand weiter. Übrig bleibt der Kanon-Export als Download von Hand (Schreibweisenliste für den Chronik-Linter, z. B. `spielbegriffe.txt`); `campaign_docs.kind = 'canon_extra'` ist dafür reserviert. Nachtrag zu 4b4a: Ausrüstung und Gold (`gear_added`, `gear_removed`, `gold`) stehen jetzt als Abschnitt „Equipment and gold“ im Paket. |
 | 4b5 Chronicle | Reiter „Chronicle“: Kapitel als Entwurf, Prüfung auf verborgene Begriffe, Download. |
 
 „Als Spieler ansehen“ zeigt in 4b1 Notizen und Bilder; die ganze Zeitleiste
@@ -337,8 +337,7 @@ Reviewer.
 Diese offenen Punkte des Pi müssen vor Phase 2 erledigt sein:
 
 - cgroup-Speicher aktivieren (sonst greifen keine Container-Limits).
-- Chronik-Eingang nach `eingang/chronik/` umziehen (gebraucht erst ab
-  Phase 4b; bis dahin bindet die App ihn nicht ein).
+- Chronik-Eingang: die App bindet ihn nicht ein (ADR 0018); kein Umzug nötig.
 - WireGuard: prüfen, aus welchem Netz VPN-Geräte kommen (betrifft den
   Zugriff auf die Testinstanz von unterwegs).
 
@@ -362,7 +361,7 @@ Siehe [decisions/](decisions/). Kurzfassung:
 | 0001 | Pi liefert App und API unter einer eigenen Hostname; Pages bleibt als Quick Build |
 | 0002 | Mechanik offen, Erzählung darf verborgen sein |
 | 0003 | Versionen statt Überschreiben; markierte Stände; eingefrorene Kennzahlen |
-| 0004 | KI ohne API; Anbindung an die Chronik-Pipeline über `eingang/chronik/` |
+| 0004 | KI ohne API (Ablage in `eingang/chronik/` ersetzt durch [0018](decisions/0018-ai-pack-by-hand.md)) |
 | 0005 | React 19 + TypeScript als PWA, kein Rendern auf dem Server; Client rechnet, Server verwahrt |
 | 0006 | Gemeinsamer Kern `core/`, herausgelöst mit Paritätstests |
 | 0007 | SQLite auf der SSD; Backups auf dem Pi, Kopie auf dem Desktop, nichts außer Haus |

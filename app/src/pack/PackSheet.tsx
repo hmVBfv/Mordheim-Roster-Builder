@@ -18,7 +18,7 @@ import { gatherPack, packInput, type Gathered } from './gather.ts';
 import styles from './Pack.module.css';
 
 const PARTS: Record<PackPart, [string, string]> = {
-  aftermath: ['Aftermath and advances', 'deaths, injuries and advances per warband, each with the player’s explanation and what the warrior did in this battle'],
+  aftermath: ['Aftermath and advances', 'deaths, injuries, advances, equipment and gold per warband, each with the player’s explanation and what the warrior did in this battle'],
   canon: ['Canon', 'names, titles and voices in German and English, from the warriors’ profiles'],
   world: ['World', 'the districts held, factions, people and the standing of each warband'],
   notes: ['Notes of the round', 'the public notes of the interlude; sealed ones once opened'],
