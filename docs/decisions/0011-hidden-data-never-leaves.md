@@ -11,8 +11,9 @@ zugänglich sein – weder über die App noch über ein Repo.
   Sync). Hintergrund-Daten gehen nur an Leiter.
 - Eine **Leak-Test-Matrix** (Rolle × Endpunkt × Sichtbarkeit) ist Pflicht in
   der CI.
-- Verborgene Inhalte kommen in kein Repo. Die Chronik-Pipeline bekommt den
-  Hintergrund nur über `eingang/` und schreibt ihn nie nach `notes/`.
+- Verborgene Inhalte kommen in kein Repo. Der Hintergrund erreicht die
+  Chronik-Pipeline nur, wenn ein Leiter das KI-Paket von Hand weitergibt
+  (ADR 0018), und gehört nie nach `notes/`.
 - Testvorlagen aus echten Daten werden vor dem Commit bereinigt.
 - Der verborgene Bereich heißt „Hintergrund / Background“, nicht „Roter
   Faden“, weil `notes/roter-faden.md` im Chronik-Repo öffentlich ist.

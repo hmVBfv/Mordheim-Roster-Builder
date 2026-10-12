@@ -1,5 +1,5 @@
 # 0004 – KI ohne API
-Status: angenommen · Datum: 2026-09-27
+Status: angenommen, in Teilen ersetzt durch [0018](0018-ai-pack-by-hand.md) (keine Ablage in `eingang/chronik/`) · Datum: 2026-09-27
 
 ## Kontext
 Das Epos wird mit Claude geschrieben, inzwischen über eine Chronik-Pipeline

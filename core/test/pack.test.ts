@@ -24,6 +24,9 @@ const INPUT: PackInput = {
         change('injury', 5, 'Magda', { added: true, injury: 'Leg Wound' }, true),
         change('stat', 2, 'Ulrich the Grey', { stat: 'WS', before: 4, after: 5 }),
         change('recruited', null, 'The Silver Caravan', { unit: 'Warrior', qty: 1 }),
+        change('gear_added', 2, 'Ulrich the Grey', { item: 'sword', qty: 1 }),
+        change('gear_removed', 5, 'Magda', { item: 'sword', qty: 1 }),
+        change('gold', null, 'The Silver Caravan', { before: 40, after: 12 }),
       ],
       explain: { [wsKey]: 'He learned it the hard way.' },
       interlude: 'They buried Hans by the river.',
@@ -69,6 +72,17 @@ describe('buildPack', () => {
     expect(md).toContain('# The Hel Fenn Campaign — Battle 5: The Old Mill');
     expect(md).toContain('Never state what the background marks as hidden, and hint only where it allows.');
     expect(md).toContain('Quotes are verbatim');
+  });
+
+  it('lists equipment and gold changes: a writer must know who carries what after the battle', () => {
+    const section = md.slice(md.indexOf('## Equipment and gold'));
+    expect(md).toContain('## Equipment and gold');
+    expect(section).toMatch(/\*\*Ulrich the Grey\*\* took up/);
+    expect(section).toMatch(/\*\*Magda\*\* gave up/);
+    expect(section).toContain('gold 40 → 12');
+    expect(md.indexOf('## Equipment and gold')).toBeGreaterThan(md.indexOf('## Advances'));
+    // part of the aftermath part: gone with it
+    expect(pack({ parts: ALL.filter((p) => p !== 'aftermath') })).not.toContain('## Equipment and gold');
   });
 
   it('names who fought, where and the scenario with its rules', () => {

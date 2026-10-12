@@ -56,8 +56,6 @@ services:
     volumes:
       - {{ROSTER_DATA}}/data:/data
       - {{ROSTER_DATA}}/uploads:/uploads
-      # phase 4b adds the chronicle inbox:
-      # - /mnt/ssd/agent/eingang/chronik:/export/chronik
     mem_limit: 256m
     cpus: 1.5
 

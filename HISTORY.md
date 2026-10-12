@@ -2781,3 +2781,20 @@ counts as the leader's once she types, and a copy from the device that arrives
 after the server's is dropped. In the first version of the test the textarea
 was clicked while it was still disabled for loading, which showed the last
 point for real: the field waits for what the server has before it takes text.
+
+## October 12, 2026 (cont.) — by hand, not by pipeline
+
+The plan was that the server drops each AI pack into the agent's inbox on the Pi
+and `chronik N` picks it up. Rob decided against wiring anything to automated
+writing for now: he wants cleanly assembled notes, events, equipment and
+warband changes that he hands over himself. The pack from the Timeline is
+exactly that, so the drop-off, its route and the `ops/` change are gone from the
+plan (ADR 0018; ADR 0004 stays otherwise). It also settles the worry behind
+the old rule that the pipeline must never write the background into the public
+chronicle repo: nothing leaves the server unless a leader copies or downloads
+the pack, and every background piece in it carries its rule.
+
+Looking at what "equipment and warband changes" the pack really carried turned
+up a gap: gear taken up or given up, and gold, were frozen into every mark but
+never listed by the pack (the old briefing left them out as bookkeeping). They
+now have their own section, "Equipment and gold", found by a failing test first.

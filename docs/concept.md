@@ -265,10 +265,9 @@ aber vollständig und geordnet:
 - **KI-Paket** (nur Leiter): Briefing + Stilvorgaben + Kanon + Hintergrund mit
   Enthüllungsregeln + Zusammenfassung der bisherigen Kapitel. Die
   Enthüllungsstufen stehen als harte Regeln darin.
-- **Anbindung an die Chronik-Pipeline:** Der Server legt das KI-Paket in
-  `/mnt/ssd/agent/eingang/chronik/` ab; `chronik N` holt es dort ab. Die
-  Pipeline schreibt den Hintergrund nie in `notes/` des öffentlichen
-  Chronik-Repos.
+- **Keine Anbindung an die Chronik-Pipeline (Rob, 12.10.2026, ADR 0018):** Das
+  KI-Paket gibt der Leiter von Hand weiter; der Server legt nichts in
+  `eingang/chronik/` ab.
 - **Kanon-Export:** Die Schreibweisen für den Chronik-Linter
   (`notes/agent/spielbegriffe.txt` o. ä.) können aus dem Kanon der App erzeugt
   werden – eine Quelle für richtige Namen.
@@ -343,8 +342,8 @@ aber vollständig und geordnet:
 3. **Nachbereitung Spieler:** Post-Battle-Sequenz → Änderungsvorschau →
    Markierung „nach Schlacht X“ → Erklärungen und Zwischenspiel schreiben.
 4. **Nachbereitung Leiter:** Protokoll abschließen → Zeitleiste ordnen,
-   Notizen bündeln → Fragen an Spieler → Briefing prüfen → KI-Paket nach
-   `eingang/chronik/` → `chronik N`.
+   Notizen bündeln → Fragen an Spieler → Briefing prüfen → KI-Paket
+   kopieren oder laden und von Hand weitergeben.
 5. **Quick Build → Kampagne:** Warband auf Pages bauen → „An Kampagnenserver
    senden“ → Vorschau → übernehmen.
 6. **Problem melden:** Formular → Kontext wird angehängt → Status verfolgen.
