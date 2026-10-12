@@ -146,6 +146,12 @@ describe('what changed', () => {
     expect(groups.map((g) => g.name)).toEqual(['Mercenary Captain', 'Champion', 'The warband']);
     expect(groups[0]!.lines[0]).toMatchObject({ what: 'Experience', from: '42', to: '43', why: 'Mercenary Captain gained 1 experience.' });
     expect(groups[1]!.lines[0]).toMatchObject({ what: 'WS', to: '+1', unexplained: true, why: null });
+    // a change of the story can be explained by its player; what is said is kept under its key
+    const key = groups[1]!.lines[0]!.key;
+    expect(groups[1]!.lines[0]).toMatchObject({ story: true, said: null });
+    expect(groups[0]!.lines[0]).toMatchObject({ story: false });
+    const told = groupChanges(changes, core.setExplanation(ctx(s), key, 'Years in the cellar.'), data);
+    expect(told[1]!.lines[0]).toMatchObject({ story: true, said: 'Years in the cellar.', unexplained: false });
     expect(lineOf({ kind: 'gold', uid: null, name: '', changeKey: 'k', payload: { before: 35, after: 55 }, eventRef: null, unexplained: false })).toEqual({ what: 'Gold', from: '35 gc', to: '55 gc' });
   });
 });

@@ -10,7 +10,13 @@ import * as core from '@mordheim/core';
 /** A change as core reports it (and as the server freezes it). */
 export interface AnyChange { kind: string; uid: number | string | null; hireUid?: string; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
 
-export interface ChangeLine { key: string; what: string; from: string | null; to: string; why: string | null; unexplained: boolean; free: boolean }
+export interface ChangeLine {
+  key: string; what: string; from: string | null; to: string; why: string | null; unexplained: boolean; free: boolean;
+  /** A change that belongs to the story: its player is asked what happened behind it (4b2). */
+  story: boolean;
+  /** What its player wrote about it (`story.explain`), if anything. */
+  said: string | null;
+}
 export interface ChangeGroup { key: string; name: string; lines: ChangeLine[] }
 
 const FREE = new Set(['renamed', 'gear_added', 'gear_removed', 'rare_removed', 'hired', 'released', 'gold', 'rating', 'worth']);
@@ -68,10 +74,15 @@ function causeOf(s: WarbandState | null, data: GameData | null, ref: string | nu
 export function groupChanges(changes: AnyChange[], s: WarbandState | null = null, data: GameData | null = null): ChangeGroup[] {
   const groups = new Map<string, ChangeGroup>();
   const band: ChangeGroup = { key: 'wb', name: 'The warband', lines: [] };
+  const explain = s ? core.storyOf(s).explain : {};
   for (const c of changes) {
     const who = c.hireUid ?? (c.uid == null ? null : String(c.uid));
     const g = who == null ? band : groups.get(who) ?? groups.set(who, { key: who, name: c.name, lines: [] }).get(who)!;
-    g.lines.push({ key: c.changeKey, ...lineOf(c, data), why: causeOf(s, data, c.eventRef), unexplained: c.unexplained, free: FREE.has(c.kind) });
+    const said = (explain[c.changeKey] ?? '').trim();
+    g.lines.push({
+      key: c.changeKey, ...lineOf(c, data), why: causeOf(s, data, c.eventRef), unexplained: c.unexplained && !said, free: FREE.has(c.kind),
+      story: core.STORY_KINDS.has(c.kind as never), said: said || null,
+    });
   }
   return [...groups.values(), ...(band.lines.length ? [band] : [])];
 }
