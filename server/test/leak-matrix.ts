@@ -72,6 +72,9 @@ export interface ProbeContext {
   /** A published chapter in the victim's campaign, and one in the admin's (phase 4a5, part 2). */
   chapterId: string;
   ledChapterId: string;
+  /** Background entries of the admin's campaign: one to read and reveal, a spare to take out (phase 4b1). */
+  ledBackgroundId: string;
+  spareBackgroundId: string;
 }
 
 export interface Probe {
@@ -360,6 +363,24 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { user: ['note', 'seq', 'removed', 'attachment', 'position'] },
   },
+  'background.read': {
+    // the user role is a player there (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'GET /api/v1/campaigns/:id/background': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/background` }),
+      'GET /api/v1/campaigns/:id/background/:eid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/background/${c.ledBackgroundId}` }),
+    },
+    fields: { admin: ['entries', 'seq', 'entry', 'revisions', 'reveals'] },
+  },
+  'background.write': {
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/background/:eid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/background/${randomUUID()}`, body: { kind: 'thread', title: 'Probing the ferryman', truth: 'Nothing of this may leave.' } }),
+      'POST /api/v1/campaigns/:id/background/:eid/reveal': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/background/${c.ledBackgroundId}/reveal`, body: { noteId: randomUUID(), text: 'The ferryman did not come back.', level: 'hint' } }),
+      'DELETE /api/v1/campaigns/:id/background/:eid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/background/${c.spareBackgroundId}` }),
+    },
+    fields: { admin: ['entry', 'seq', 'note', 'removed'] },
+  },
   'battle.propose': {
     allowed: ['user'],
     routes: {
@@ -374,4 +395,6 @@ export const SECRET_KEYS = ['pw_hash', 'pwHash', 'token_hash', 'tokenHash', 'tot
 /** Values no answer may carry: a password hash, an encrypted secret. */
 export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   // a sealed note before its battle is closed, and a leaders' note: no role of the matrix may ever read them (ADR 0011)
-  /SEALED-SECRET/, /LEADER-SECRET/];
+  /SEALED-SECRET/, /LEADER-SECRET/,
+  // the background's truth (phase 4b1): only leaders read it – and the entries the probes read in the admin's own campaign do not carry it
+  /BACKGROUND-SECRET/];
