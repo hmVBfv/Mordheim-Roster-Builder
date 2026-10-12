@@ -1,0 +1,176 @@
+/* The background (phase 4b1; docs/mockups/background.html): everything here
+   is the leaders' alone – shown with ⚑ and a dashed edge, so it is never
+   mistaken for what players see. */
+.secret {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius);
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+
+.kinds {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.kinds button {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kinds button[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+
+.card {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+
+.card h3 {
+  margin: 0;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.level {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--space-2);
+  align-items: center;
+}
+
+.level small {
+  grid-column: 2;
+  color: var(--text-muted);
+}
+
+.dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-muted);
+  display: inline-block;
+}
+
+.dots .on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.part {
+  display: grid;
+  gap: 2px;
+}
+
+.part p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.truth {
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius);
+}
+
+.refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.refs li {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.log {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.legend {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.legend summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+}
+
+.history li {
+  padding: var(--space-2);
+  border-left: 3px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
+.warn {
+  color: var(--gold);
+}

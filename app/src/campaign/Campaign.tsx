@@ -23,6 +23,8 @@ import { NewBattleSheet } from './NewBattle.tsx';
 import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
 import { TimelineTab } from '../timeline/Timeline.tsx';
+import { BackgroundTab } from '../background/Background.tsx';
+import { AsPlayerTab } from '../notes/AsPlayer.tsx';
 import { battleTitle } from '../battle/api.ts';
 
 /** The campaign as last seen on this device, then as the server has it now. */
@@ -370,6 +372,9 @@ export function Campaign() {
   const manage = tab === 'manage' && lead;
   const notes = tab === 'notes';
   const timeline = tab === 'timeline';
+  // the background and the view as a player: leaders with the authenticator only (the server refuses anyone else)
+  const background = tab === 'background' && lead && user.totp;
+  const asPlayer = tab === 'as-player' && lead && user.totp;
   return (
     <section className={ui.page}>
       <header>
@@ -381,15 +386,20 @@ export function Campaign() {
         <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
         <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
         <NavLink to={`/campaign/${id}/timeline`}>Timeline</NavLink>
+        {lead && user.totp && <NavLink to={`/campaign/${id}/background`}>Background ⚑</NavLink>}
         {lead && <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>}
       </nav>
       {manage
         ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
         : notes
           ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
-          : timeline
-            ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
-            : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
+          : background
+            ? <BackgroundTab id={id} view={view} />
+            : asPlayer
+              ? <AsPlayerTab id={id} view={view} />
+              : timeline
+                ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
+                : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>

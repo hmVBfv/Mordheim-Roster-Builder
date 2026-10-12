@@ -72,6 +72,14 @@ export interface FakeCampaign {
 }
 
 export interface FakePerson { id: string; username: string; displayName: string }
+/** An entry of the background (4b1): leaders only, as server/src/background.ts keeps it. */
+export interface FakeBackground {
+  id: string; campaignId: string; kind: string; title: string; truth: string; playersKnow: string; status: string; reveal: string; hintLimits: string;
+  revealFromBattle: string | null; refs: unknown[]; battleId: string | null; updatedBy: string; createdAt: string; updatedAt: string; seq: number; deleted?: boolean;
+  lastReveal: { by: string; at: string; noteId: string; battleId: string | null; level: string } | null;
+  revisions: { snapshot: Record<string, unknown>; editedBy: string; editedAt: string }[];
+}
+
 export interface FakeShare {
   id: string; name: string; wbType: string; from: string; to: string | null; toId: string | null; code: string | null; data: unknown;
   createdAt: string; expiresAt: string; answeredAt: string | null; accepted: boolean | null; uses: number; revokedAt: string | null;
@@ -108,6 +116,7 @@ export function createFakeSync(opts: {
     pictures: new Map<string, FakePicture>(),
     positions: new Map<string, { campaignId: string; itemType: string; itemId: string; segment: string; pos: string; movedBy: string; movedAt: string }>(),
     chapters: new Map<string, FakeChapter>(),
+    background: new Map<string, FakeBackground>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -239,6 +248,10 @@ export function createFakeSync(opts: {
     return note;
   };
   const noteRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
+    if (method === 'GET' && rest === '/notes' && query.get('as') === 'player') {
+      const asNobody = (n: FakeNote) => (n.visibility === 'leader' ? null : noteFor({ ...n, authorId: '' }, 'player'));
+      return json(200, { notes: [...s.notes.values()].filter((n) => n.campaignId === c.id && !n.deleted).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map(asNobody).filter(Boolean), seq: notesSeq(c.id) });
+    }
     if (method === 'GET' && rest === '/notes') {
       const seq = notesSeq(c.id);
       const since = query.get('since');
@@ -268,6 +281,72 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
+  /* ---- the background (as server/src/routes-background.ts: leaders only) ---- */
+  const bgView = (b: FakeBackground) => {
+    const e: Partial<FakeBackground> = { ...b };
+    delete e.revisions; delete e.deleted; delete e.campaignId;
+    return e;
+  };
+  const bgSeq = (cid: string) => Math.max(0, ...[...s.background.values()].filter((b) => b.campaignId === cid).map((b) => b.seq));
+  /** A leader wrote an entry earlier (or on another device). */
+  const backgroundFrom = (campaignId: string, e: { kind?: string; title: string; truth?: string; playersKnow?: string; status?: string; reveal?: string; hintLimits?: string; battleId?: string | null }) => {
+    const entry: FakeBackground = {
+      id: `00000000-0000-4000-9000-${String(s.background.size + 1).padStart(12, '0')}`, campaignId, kind: e.kind ?? 'thread', title: e.title, truth: e.truth ?? '', playersKnow: e.playersKnow ?? '',
+      status: e.status ?? 'planned', reveal: e.reveal ?? 'hidden', hintLimits: e.hintLimits ?? '', revealFromBattle: null, refs: [], battleId: e.battleId ?? null,
+      updatedBy: 'Anna', createdAt: at(), updatedAt: at(), seq: next(), lastReveal: null, revisions: [],
+    };
+    s.background.set(entry.id, entry);
+    return entry;
+  };
+  const backgroundRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response => {
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    const list = [...s.background.values()].filter((b) => b.campaignId === c.id && !b.deleted);
+    if (method === 'GET' && rest === '/background') {
+      const since = query.get('since');
+      if (since !== null && Number(since) === bgSeq(c.id)) return json(200, { unchanged: true, seq: bgSeq(c.id) });
+      return json(200, { entries: list.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).map(bgView), seq: bgSeq(c.id) });
+    }
+    const m = rest.match(/^\/background\/([^/]+)(\/reveal)?$/);
+    if (!m) return json(404, { error: 'not_found' });
+    const cur = s.background.get(m[1]!);
+    if (method === 'GET') return cur && cur.campaignId === c.id && !cur.deleted ? json(200, { entry: bgView(cur), revisions: [...cur.revisions].reverse(), reveals: cur.lastReveal ? [{ noteId: cur.lastReveal.noteId, battleId: cur.lastReveal.battleId, level: cur.lastReveal.level, at: cur.lastReveal.at, by: cur.lastReveal.by }] : [] }) : json(404, { error: 'not_found' });
+    if (method === 'DELETE') {
+      if (!cur || cur.deleted) return json(404, { error: 'not_found' });
+      cur.deleted = true;
+      cur.seq = next();
+      return json(200, { removed: true, seq: bgSeq(c.id) });
+    }
+    const snapshot = (e: FakeBackground) => ({ kind: e.kind, title: e.title, truth: e.truth, playersKnow: e.playersKnow, status: e.status, reveal: e.reveal, hintLimits: e.hintLimits, revealFromBattle: e.revealFromBattle, refs: e.refs, battleId: e.battleId });
+    if (method === 'POST' && m[2]) {
+      if (!cur || cur.deleted) return json(404, { error: 'not_found' });
+      const noteId = String(body.noteId);
+      if (cur.lastReveal?.noteId === noteId) return json(200, { entry: bgView(cur), note: noteId, seq: bgSeq(c.id) });
+      s.notes.set(noteId, { id: noteId, campaignId: c.id, battleId: (body.battleId as string | null) ?? null, turn: null, kind: 'general', text: String(body.text), mentions: [], authorId: me.id, author: me.displayName, visibility: 'public', createdAt: at(), updatedAt: at(), seq: next() });
+      const place = body.place as { segment: string; pos: string } | null;
+      if (place) s.positions.set(`note:${noteId}`, { campaignId: c.id, itemType: 'note', itemId: noteId, segment: place.segment, pos: place.pos, movedBy: me.id, movedAt: at() });
+      cur.revisions.push({ snapshot: snapshot(cur), editedBy: me.displayName, editedAt: at() });
+      cur.playersKnow = cur.playersKnow ? `${cur.playersKnow}\n\n${String(body.text)}` : String(body.text);
+      cur.reveal = String(body.level);
+      cur.revealFromBattle = body.level === 'revealed' ? ((body.battleId as string | null) ?? null) : null;
+      cur.lastReveal = { by: me.displayName, at: at(), noteId, battleId: (body.battleId as string | null) ?? null, level: String(body.level) };
+      cur.updatedBy = me.displayName; cur.updatedAt = at(); cur.seq = next();
+      return json(200, { entry: bgView(cur), note: noteId, seq: bgSeq(c.id) });
+    }
+    if (method === 'PUT') {
+      const fields = { kind: String(body.kind), title: String(body.title), truth: String(body.truth ?? ''), playersKnow: String(body.playersKnow ?? ''), status: String(body.status ?? 'planned'), reveal: String(body.reveal ?? 'hidden'), hintLimits: String(body.hintLimits ?? ''), revealFromBattle: (body.revealFromBattle as string | null) ?? null, refs: (body.refs as unknown[]) ?? [], battleId: (body.battleId as string | null) ?? null };
+      if (!cur) {
+        s.background.set(m[1]!, { id: m[1]!, campaignId: c.id, ...fields, updatedBy: me.displayName, createdAt: at(), updatedAt: at(), seq: next(), lastReveal: null, revisions: [] });
+      } else {
+        if (cur.deleted) return json(409, { error: 'removed' });
+        if (Number(body.baseSeq) !== cur.seq) return json(409, { error: 'stale', current: bgView(cur) });
+        cur.revisions.push({ snapshot: snapshot(cur), editedBy: me.displayName, editedAt: at() });
+        Object.assign(cur, fields, { updatedBy: me.displayName, updatedAt: at(), seq: next() });
+      }
+      return json(200, { entry: bgView(s.background.get(m[1]!)!), seq: bgSeq(c.id) });
+    }
+    return json(404, { error: 'not_found' });
+  };
+
   /* ---- pictures (as server/src/attachments.ts filters them) ---- */
   const pictureFor = (p: FakePicture, role: FakeRole) => !p.deleted && (p.visibility !== 'leader' || role === 'leader' || p.uploaderId === me.id) && (p.stored || p.uploaderId === me.id);
   const pictureView = (p: FakePicture) => ({
@@ -285,6 +364,9 @@ export function createFakeSync(opts: {
     return pic;
   };
   const pictureRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
+    if (method === 'GET' && rest === '/attachments' && query.get('as') === 'player') {
+      return json(200, { attachments: [...s.pictures.values()].filter((p) => p.campaignId === c.id && !p.deleted && p.visibility !== 'leader' && p.stored).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map(pictureView), seq: picturesSeq(c.id) });
+    }
     if (method === 'GET' && rest === '/attachments') {
       const seq = picturesSeq(c.id);
       const since = query.get('since');
@@ -539,6 +621,7 @@ export function createFakeSync(opts: {
     const lead = role === 'leader';
     const forbidden = json(403, { error: 'forbidden' });
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
+    if (rest.startsWith('/background')) return backgroundRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
@@ -760,5 +843,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom };
 }

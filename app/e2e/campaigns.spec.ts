@@ -253,6 +253,58 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* The background (phase 4b1): the leaders' side of the story, and what a player is sent of it. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Background tab: threads, the truth behind them, revealing a note, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.backgroundFrom(c.id, { title: 'Who pays the ferryman?', truth: 'Countess Adelheid von Rauch pays the ferrymen’s guild to row warbands into ambushes. She wants the Hel Fenn wyrdstone for her own alchemists.', playersKnow: 'Skritch was paid in advance. The coin carries the eel of the ferrymen’s guild.', status: 'active', reveal: 'hint', hintLimits: 'Traces yes – the Countess’s name never.', battleId: b.id });
+    srv.backgroundFrom(c.id, { title: 'The bell of St. Voss', truth: 'The bell tolls for whoever carries the reliquary. The Grey Penitents carry it without knowing.' });
+    srv.backgroundFrom(c.id, { title: 'Skritch’s debt', truth: 'Skritch owed the clan a warlock engineer; he paid with Nibble’s tail.', status: 'resolved', reveal: 'revealed' });
+    await page.goto(`campaign/${c.id}/background`);
+    await expect(page.getByText('Only campaign leaders see this area.', { exact: false })).toBeVisible();
+    const list = page.getByRole('list', { name: 'Threads' });
+    await expect(list.getByRole('listitem')).toHaveCount(3);
+    await expect(page.getByRole('link', { name: 'Background ⚑' })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-background`);
+
+    await list.getByRole('listitem').filter({ hasText: 'Who pays the ferryman?' }).getByRole('button', { name: 'Reveal…' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Reveal to everyone' });
+    await sheet.getByLabel('Public note').fill('The ferryman did not come back for the Caravan. Someone had paid him not to.');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-background-reveal`);
+    await sheet.getByRole('button', { name: 'Reveal to everyone' }).click();
+    await expect.poll(() => [...srv.state.notes.values()].filter((n) => n.visibility === 'public').length, { timeout: 8000 }).toBe(1);
+    await expect(page.getByText(/Revealed as a public note in/)).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+  });
+}
+
+test('View as player shows what the server gives a player', async ({ page }) => {
+  const srv = await playServer(page, true, { totp: true });
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+  const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+  srv.noteFrom(c.id, { author: 'Anna', text: 'The ferryman is in the Countess’s pay.', battleId: b.id, visibility: 'leader' });
+  srv.noteFrom(c.id, { author: 'Ben', text: 'Skritch goes for the captain.', battleId: b.id, visibility: 'sealed' });
+  srv.noteFrom(c.id, { author: 'Ben', text: 'The rain will not stop.', battleId: b.id });
+  await page.goto(`campaign/${c.id}/notes`);
+  await expect(page.getByText('The ferryman is in the Countess’s pay.')).toBeVisible();
+  await page.getByRole('link', { name: 'View as player' }).click();
+  await expect(page.getByText('The rain will not stop.')).toBeVisible();
+  await expect(page.getByText('This is what a player gets from the server', { exact: false })).toBeVisible();
+  await expect(page.getByText(/Countess/)).toHaveCount(0);
+  await expect(page.getByText(/Skritch goes/)).toHaveCount(0);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'notes-as-player');
+});
+
 test('notes and quotes at the game night, in the protocol by turn', async ({ page }) => {
   const srv = await playServer(page);
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others[0]!, role: 'leader' }, { ...others[1]!, pending: false }] });
