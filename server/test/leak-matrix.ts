@@ -75,6 +75,9 @@ export interface ProbeContext {
   /** Background entries of the admin's campaign: one to read and reveal, a spare to take out (phase 4b1). */
   ledBackgroundId: string;
   spareBackgroundId: string;
+  /** The user role's id, and an open question of the victim's campaign asked of the user role (phase 4b3). */
+  userId: string;
+  ownQuestionId: string;
 }
 
 export interface Probe {
@@ -363,6 +366,27 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { user: ['note', 'seq', 'removed', 'attachment', 'position'] },
   },
+  'questions.read': {
+    // the user role is a player in the victim's campaign, the admin outside it
+    allowed: ['user'],
+    routes: { 'GET /api/v1/campaigns/:id/questions': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/questions` }) },
+    fields: { user: ['questions', 'seq'] },
+  },
+  'questions.write': {
+    // the user role is a player in the admin's campaign (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/questions/:qid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/questions/${randomUUID()}`, body: { to: c.userId, text: 'How did the night go?' } }),
+    },
+    fields: { admin: ['question', 'seq'] },
+  },
+  'questions.answer': {
+    allowed: ['user'],
+    routes: {
+      'POST /api/v1/campaigns/:id/questions/:qid/answer': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.campaignId}/questions/${c.ownQuestionId}/answer`, body: { noteId: randomUUID(), text: 'We slept in the barn.' } }),
+    },
+    fields: { user: ['question', 'note', 'seq'] },
+  },
   'background.read': {
     // the user role is a player there (403), the admin leads it
     allowed: ['admin'],
@@ -397,4 +421,6 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   // a sealed note before its battle is closed, and a leaders' note: no role of the matrix may ever read them (ADR 0011)
   /SEALED-SECRET/, /LEADER-SECRET/,
   // the background's truth (phase 4b1): only leaders read it – and the entries the probes read in the admin's own campaign do not carry it
-  /BACKGROUND-SECRET/];
+  /BACKGROUND-SECRET/,
+  // a question asked of someone else (phase 4b3): no role of the matrix is its addressee
+  /QUESTION-SECRET/];
