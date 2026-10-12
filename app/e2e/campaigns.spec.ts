@@ -413,6 +413,71 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Scenarios (phase 4b3c): a leaders' draft, released to a battle for everybody – a leader writes and releases, a player reads the played ones. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Scenarios section: a leader writes a draft and releases it to a battle, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, { title: 'Fog on the Stir', body: 'Fog covers the table: no shooting beyond 8".\nThe ferry is a bridge: two models wide.', npcStatlines: 'Old Marek M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', battleId: b.id });
+    await page.goto(`campaign/${c.id}/world`);
+    await expect(page.getByRole('heading', { name: 'Scenarios' })).toBeVisible();
+    await expect(page.getByRole('article', { name: 'Fog on the Stir' })).toBeVisible();
+    await page.getByRole('button', { name: 'Write a scenario' }).click();
+    const form = page.getByRole('dialog', { name: 'Write a scenario' });
+    await form.getByLabel('Title').fill('The night at the ferry');
+    await form.getByLabel('Rules').fill('The Countess’s men wait on the far bank. They deploy hidden; a model that comes within 6" reveals them.');
+    await form.getByLabel('NPC statlines (optional)').fill('Captain Brandt M4 WS4 BS3 S3 T3 W1 I4 A1 Ld8\n• Cannot be ambushed');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-write`);
+    await form.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('Draft saved. Only leaders see it.')).toBeVisible();
+    const draft = page.getByRole('article', { name: 'Draft: The night at the ferry' });
+    await expect(draft.getByText('⚑ Draft – only leaders read it')).toBeVisible();
+    await expect.poll(() => srv.state.scenarios.size, { timeout: 8000 }).toBe(2);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenarios`);
+
+    await draft.getByRole('button', { name: 'Release The night at the ferry to a battle' }).click();
+    const release = page.getByRole('dialog', { name: 'Release The night at the ferry' });
+    await release.getByLabel('Played in').selectOption({ label: 'Battle 1 · Hel Fenn ferry' });
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-release`);
+    await release.getByRole('button', { name: 'Release', exact: true }).click();
+    await expect(page.getByText('Released. Everybody in the campaign reads it now.')).toBeVisible();
+    await expect(page.getByRole('article', { name: 'The night at the ferry' })).toBeVisible();
+    await expect.poll(() => [...srv.state.scenarios.values()].filter((x) => x.visibility === 'public').length, { timeout: 8000 }).toBe(2);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenarios-released`);
+  });
+
+  test(`the Scenarios section: a player reads the played ones, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, { title: 'ZEBRA the ambush', body: 'ZEBRA' });
+    srv.scenarioFrom(c.id, { title: 'Fog on the Stir', body: 'Fog covers the table: no shooting beyond 8".', npcStatlines: 'Old Marek M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', battleId: b.id });
+    await page.goto(`campaign/${c.id}`);
+    await page.getByRole('link', { name: 'World' }).click();
+    const card = page.getByRole('article', { name: 'Fog on the Stir' });
+    await expect(card).toBeVisible();
+    await expect(card.getByText(/Played in Battle 1 · Hel Fenn ferry/)).toBeVisible();
+    await card.getByText('Rules').click();
+    await expect(card.getByText('Fog covers the table: no shooting beyond 8".')).toBeVisible();
+    await expect(page.getByText(/ZEBRA/)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Write a scenario' })).toHaveCount(0);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenarios-player`);
+  });
+}
+
 test('View as player shows what the server gives a player', async ({ page }) => {
   const srv = await playServer(page, true, { totp: true });
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });

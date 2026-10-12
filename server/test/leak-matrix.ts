@@ -83,6 +83,9 @@ export interface ProbeContext {
   spareFactionId: string;
   ledNpcId: string;
   ledEventId: string;
+  /** Scenarios of the admin's campaign (phase 4b3c): a draft to release, a spare draft to take out. */
+  ledScenarioId: string;
+  spareScenarioId: string;
 }
 
 export interface Probe {
@@ -411,6 +414,22 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { admin: ['factions', 'npcs', 'reputation', 'seq', 'removed'] },
   },
+  'scenarios.read': {
+    // the user role is a player in the victim's campaign, the admin outside it. A player reads the released scenario there and never the draft
+    allowed: ['user'],
+    routes: { 'GET /api/v1/campaigns/:id/scenarios': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/scenarios` }) },
+    fields: { user: ['scenarios', 'seq'] },
+  },
+  'scenarios.write': {
+    // the user role is a player in the admin's campaign (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/scenarios/:sid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/scenarios/${randomUUID()}`, body: { title: 'The ferry at night', body: 'Rules of the night.', npcStatlines: 'Captain Brandt M4 WS4' } }),
+      'POST /api/v1/campaigns/:id/scenarios/:sid/release': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/scenarios/${c.ledScenarioId}/release`, body: { battleId: c.ledBattleId } }),
+      'DELETE /api/v1/campaigns/:id/scenarios/:sid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/scenarios/${c.spareScenarioId}` }),
+    },
+    fields: { admin: ['scenario', 'seq', 'removed'] },
+  },
   'background.read': {
     // the user role is a player there (403), the admin leads it
     allowed: ['admin'],
@@ -447,4 +466,6 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   // the background's truth (phase 4b1): only leaders read it – and the entries the probes read in the admin's own campaign do not carry it
   /BACKGROUND-SECRET/,
   // a question asked of someone else (phase 4b3): no role of the matrix is its addressee
-  /QUESTION-SECRET/];
+  /QUESTION-SECRET/,
+  // a draft scenario of the victim's campaign (phase 4b3c): only its leaders read it, and none of them is a role of the matrix
+  /SCENARIO-SECRET/];

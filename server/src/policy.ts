@@ -117,6 +117,10 @@ export const ACTIONS = {
   'world.read': { who: 'user', target: 'member' },
   /** Writing the world: leaders alone, with the authenticator – a leader puts an NPC there when the players may know it exists. */
   'world.write': { who: 'user', target: 'leader' },
+  /** Scenarios (phase 4b3c): every member reads – the released ones; a draft only a leader with the authenticator sees (ADR 0011). */
+  'scenarios.read': { who: 'user', target: 'member' },
+  /** Writing, releasing and taking out a draft: leaders alone, with the authenticator. */
+  'scenarios.write': { who: 'user', target: 'leader' },
   /** The background – the truth behind the story, ADR 0002 – read by the campaign's leaders alone, with the authenticator (phase 4b1). */
   'background.read': { who: 'user', target: 'leader' },
   /** Writing the background, taking entries out and revealing: leaders alone, with the authenticator (phase 4b1). */

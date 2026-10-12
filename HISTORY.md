@@ -2690,3 +2690,43 @@ screen reader would have read out; the buttons now carry the name of what they
 remove. The first end-to-end run expected a standing of −3 where a warband
 already had +2; the test, not the app, had picked the wrong warband.
 
+## October 12, 2026 (cont.) — scenarios, hidden until played
+
+A scenario is the one thing in the story layer that changes sides: before the
+table plays it, it is the leaders' secret (the ambush waits on the far bank);
+after, it is mechanics every player needs (the rules, the values of the NPCs
+at the ferry). So it is neither the Background, which is only ever for leaders,
+nor the world, which is open from the first line. It starts as a draft that a
+leader with the authenticator reads alone – not in a list, not as a number –
+and a leader *releases* it by assigning it to a battle of the campaign. From
+then on every member reads it, and that is not undone: otherwise a leader could
+make a text the players had read "never have been there". A released scenario
+may still be corrected, the earlier wording kept; it cannot be taken out. A
+draft can.
+
+The distinction to the Background is now written down instead of left to be
+guessed: a scenario is the leader's playable package; the plans, ideas and
+notes around it stay in the Background under the kind "Scenarios", and nothing
+is copied from one to the other behind anyone's back. The log carries ids and
+the battle, never a title or a word; a draft's entries are visible to leaders
+only. The leak matrix puts a draft with a marker word into a campaign no role
+of the matrix leads and checks that no player ever reads it.
+
+The NPC values are plain text in the form of the Tabletop Simulator export, and
+the app has one button for what the table needs: "Copy statlines" puts the
+title and the values on the clipboard. Without clipboard access the notice says
+so and the text can be selected.
+
+I pulled the sheet pieces both leader screens needed (the saving state that
+keeps a form open with its words when the server refuses, the Save/Cancel row,
+the dialog, the removal prompt) out of the world tab into `ui/FormSheet.tsx`
+instead of copying them a second time.
+
+Wrong turns. The world tab's test for a refused write clicked "Record
+reputation" as soon as the button existed – but it exists, disabled, before
+the world has arrived, and the extra request of the new section moved the
+timing enough to make the click land on a disabled button. That was a race in
+the test all along, not in the app; it now waits for the faction card first.
+In the new copy test I stubbed `navigator.clipboard` and then called
+`userEvent.setup()`, which installs its own clipboard over it; the test now
+reads back from that one.
