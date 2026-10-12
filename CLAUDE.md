@@ -173,7 +173,7 @@ changing anything structural.
 - **Both repos are public.** Never commit hidden campaign content, sealed
   notes, GM notes, hostnames, tokens or passwords. Sanitize fixtures built from
   real saves with `npm run sanitize-save` (drops `story`,
-  `models[].profile.text`, notes and player names).
+  `profile.text`/`voice`/`origin`, notes and player names).
 - New UI code: no `dangerouslySetInnerHTML`, no inline event handlers.
 
 ## UI checklist (new app)

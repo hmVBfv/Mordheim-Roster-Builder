@@ -77,14 +77,14 @@ Begriff einführt, trägt ihn hier ein.
 | Beleg | Evidence | `evt:<id>`, `cas:<id>` |
 | Ereignis | Event | `events` |
 | Änderungsschlüssel | Change key | `change_key` |
-| Kanon | Canon | `canon`, `profile.name_de/_en` |
-| Profil (eines Kriegers) | Profile | `models[].profile` |
+| Kanon | Canon | `canon`, `profile.name_de/_en`, `setCanon` |
+| Profil (eines Kriegers) | Profile | `models[].profile`, `hired[].profile`, `dp[].profile`, `setProfile` |
 | Söldner, Hired Sword | Hired Sword | `hired`, `HIREDSWORDS` |
 | Dramatis Personae (benannte Figur) | Dramatis Personae | `dp`, `DRAMATIS` |
 | Anheuern | Hire | `core` `hire`, `hireProblem`, `hireChoices`; Bildschirm `/warbands/:id/hire` |
 | Anheuergebühr / Unterhalt | Hire fee / Upkeep | `hsHireCost`, `hsUpkeepFor` |
 | Wanderer (bleibt eine Schlacht) | Wanderer | `wanderer` |
-| Lebenslauf | Service record | abgeleitet in `core/narrative` |
+| Lebenslauf | Service record | abgeleitet: `lifeOf` in `core/narrative/life.ts`; Bildschirm `/warbands/:id/story?who=<uid>` |
 | Formatnummer | Format version | `format` |
 | Gründung (bis zur ersten Schlacht) | Founding | `warbandHasFought()` ist falsch |
 | Gründungspreis | Founding price | Listenzeile `[name, preis, {start: true}]`, `startOnlyRow()`, `UPGRADES[…].start` |
@@ -177,9 +177,9 @@ Begriff einführt, trägt ihn hier ein.
 | offener Faden | Hook | `kind: 'hook'` |
 | versiegelt | Sealed | `visibility: 'sealed'`, `sealed_until_battle` |
 | Sichtbarkeit | Visibility | `visibility` |
-| Prolog | Prologue | `story.prologue` |
-| Zwischenspiel | Interlude | `story.interludes`, Segment `i<n>` |
-| Erklärung (einer Änderung) | Explanation | `story.explain` |
+| Prolog | Prologue | `story.prologue`, `setPrologue` |
+| Zwischenspiel | Interlude | `story.interludes`, `setInterlude`, Segment `i<n>` |
+| Erklärung (einer Änderung) | Explanation (UI: „Say what happened“) | `story.explain`, `setExplanation` |
 | fehlende Erklärung | Missing explanation | `missingExplanations`, `STORY_KINDS` |
 | Frage an Spieler | Question | `questions` |
 | Zeitleiste | Timeline | `timeline_positions` |

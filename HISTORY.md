@@ -2560,3 +2560,45 @@ afterwards. And a share test failed on CI for no reason in the code: the stand-i
 server had a hard-coded expiry date that passed on October 11, so every share
 in the tests counted as expired from then on. It now counts seven days from the
 moment it is made, like the real server.
+
+## October 12, 2026 (cont.) — the story of a warband
+
+The second piece of the story layer is the one the players write
+themselves: a prologue, an interlude after every round, the warband's name in
+German and English, a short profile for each warrior – and, behind every
+change the after-battle marks freeze, a line of what actually happened.
+
+The first thing I checked was where this lives, and it turned out to need no
+server work at all. ADR 0016 had already put it in the player's own save
+(`story`, `canon`, `profile`), so it travels with every export and the server
+only has to refuse what is too big. The pieces are therefore core actions
+(`setPrologue`, `setInterlude`, `setExplanation`, `setProfile`, `setCanon`),
+limits that the save schema enforces for the server too, and a page. An
+emptied text leaves no trace – a warband that never wrote a word has no
+`story` key – and every action returns the very state it was given when
+nothing changed, which is what the editor's undo relies on.
+
+A warrior's life is not stored anywhere. `lifeOf` reads it: the changes a mark
+froze for him, each with the explanation its player gave, the protocol entries
+he took part in, and the notes that mention him – in the order they happened,
+the campaign's own notes last. Without a mark (a warband outside a campaign, or
+a phone that cannot reach the server) the save's own chronicle stands in for
+the changes, so the page is never empty just because it is offline.
+
+One decision is worth writing down. The mockup had a visibility choice on each
+interlude. It is not there: the story sits in the save, the save is readable by
+the campaign once it is on the server, and a switch that only hides a text in
+the app would promise something the data does not keep. The page says so in
+one sentence at the top, and the place for something only one player should
+know before a battle remains the sealed note.
+
+Wrong turns. The first version of the life sheet opened itself from the
+`?who=` link by setting its state in an effect; the linter was right that this
+renders twice for nothing, and the initial state now comes from the link
+directly. The first Aftermath test for explanations "found no changes" for a
+reason that had nothing to do with the new code: the test wrote a change into
+the store as if from another tab, but the editor keeps its own newer state
+and rightly ignores an older write – the test now stamps it as newer, the way
+a real second tab would. And a test run hung for five minutes because I
+started the test runner with `-w`, which for Vitest means *watch*.
+
