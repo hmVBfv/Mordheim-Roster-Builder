@@ -54,7 +54,8 @@ describe('the story page', () => {
     await user.click(within(sheet).getByLabelText('Prologue'));
     await user.paste('They came up the river with the last barge.');
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
-    expect(await screen.findByText('They came up the river with the last barge.')).toBeTruthy();
+    // in the prologue's own region: the closed sheet may still hold the same words in its field
+    expect(await within(screen.getByRole('region', { name: 'Prologue' })).findByText('They came up the river with the last barge.')).toBeTruthy();
     await waitFor(async () => expect(core.storyOf(await stored()).prologue).toBe('They came up the river with the last barge.'));
   });
 

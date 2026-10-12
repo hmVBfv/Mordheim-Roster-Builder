@@ -107,6 +107,12 @@ export const ACTIONS = {
   'battle.mark': { who: 'user', target: 'player' },
   /** Writing one's notes (and a leader correcting another's words) – leaders and players, not viewers. */
   'notes.write': { who: 'user', target: 'player' },
+  /** Questions to players (phase 4b3): every member reads – a leader all of them, the one asked their own (ADR 0011). */
+  'questions.read': { who: 'user', target: 'member' },
+  /** Asking a question and changing or withdrawing it: leaders alone, with the authenticator. */
+  'questions.write': { who: 'user', target: 'leader' },
+  /** Answering with a note – leaders and players; only the one it is asked of gets through. */
+  'questions.answer': { who: 'user', target: 'player' },
   /** The background – the truth behind the story, ADR 0002 – read by the campaign's leaders alone, with the authenticator (phase 4b1). */
   'background.read': { who: 'user', target: 'leader' },
   /** Writing the background, taking entries out and revealing: leaders alone, with the authenticator (phase 4b1). */

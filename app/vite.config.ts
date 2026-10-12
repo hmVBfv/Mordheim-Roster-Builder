@@ -83,6 +83,9 @@ export default defineConfig(({ mode, command }) => {
       setupFiles: ['src/test/setup.ts'],
       // the contrast test reads the design tokens
       css: { include: [/tokens\.css/] },
+      // a screen test types, saves and reads back; on a CI runner busy with the other files the five-second default has
+      // failed first-of-a-file tests that take well under a second here (story, campaign)
+      testTimeout: 20_000,
     },
   };
 });

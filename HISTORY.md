@@ -2602,3 +2602,49 @@ and rightly ignores an older write – the test now stamps it as newer, the way
 a real second tab would. And a test run hung for five minutes because I
 started the test runner with `-w`, which for Vitest means *watch*.
 
+## October 12, 2026 (cont.) — questions, and what waits for you
+
+The third piece of the story layer is a conversation: a leader can ask one
+player a pointed question – "How did Robba spend the night after the ferry?" –
+and the player answers it, as a note of their own, with the visibility they
+choose. The same step gave the players one place that says what is waiting:
+"Open for you".
+
+4b3 was two features in one row of the roadmap, so I split it. This is the
+first half (questions and "Open for you"); the world – factions, NPCs,
+reputation, scenarios – is the second and gets its own pull request.
+
+The thing to get right was who may see what. A question is read by the leaders
+and by the one it is asked of, and by nobody else – not the viewers, and a
+withdrawn one not even by the player. The answer is a different matter: it is
+an ordinary note, so it follows the note rules (sealed only for a battle that
+is still open, "leaders only" only for a leader), and the server makes it in
+one step under the answering player's id. That one step is deliberate. With
+two steps (write a note, then mark the question answered) a lost connection in
+between leaves a note with no question and a question that still asks. The
+question's words are never copied into the note or the log; the audit entry
+carries only who was asked and which battle. Every route has its row in the
+leak matrix, as ADR 0011 demands, and a probe that reads the question text out
+of everything a bystander can fetch.
+
+"Open for you" is a pure function of what the screens already have – the
+campaign's view, the questions, the player's own warbands on the device – so
+the campaign overview and Home share it and Home does not load the campaign
+screens. It lists questions, aftermaths still to mark and the interlude of the
+latest round. I left out an entry for missing explanations on purpose: the
+aftermath already shows them ("Not told yet"), nothing waits on them, and an
+entry would cost a request per warband just to nag.
+
+Wrong turns. The first version of the tab put its sheets directly in the
+screen; the linter (rightly) refused reading a sheet's ref while rendering,
+and the other screens already keep each sheet in a component of its own, so
+this one does too. The first end-to-end run failed the touch-target check
+for a small "Read the notes" text link inside a card – it is a button-sized
+link now. And two older tests bit back. A campaign test timed out at the five-second
+default on the CI runner after taking 128 ms here, so the limit is now raised
+for the whole app suite instead of file by file. The first story test, which I
+had blamed on load too, turned out to be a real race of its own: right after
+Save, the closed sheet still held the new prologue in its field while the page
+already showed it, so `findByText` saw two matches and kept failing until the
+timeout. Looking for it in the prologue's own region fixed it; raising a
+timeout would only have hidden that.

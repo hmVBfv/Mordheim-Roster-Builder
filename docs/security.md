@@ -279,6 +279,20 @@ gesehene Liste (pro Konto getrennt, wie die Notizen). Grenze wie bei
 versiegelten Notizen: wer die Datenbank oder die Backups lesen kann, liest
 auch den Hintergrund.
 
+**Fragen an Spieler (Phase 4b3a):** `questions.read` für jedes Mitglied, aber
+die Antwort wird für den Fragenden gefiltert (`questions.ts`): die Leiter mit
+Authenticator sehen alle Fragen, der Gefragte seine eigenen (eine
+zurückgezogene nicht mehr), alle anderen – Zuschauer, ein Leiter ohne
+Authenticator, ein anderer Spieler – keine. `questions.write` nur Leiter mit
+Authenticator. `questions.answer` kann jedes Mitglied mit Schreibrecht
+aufrufen, durch kommt nur der Gefragte (ein Leiter, der nicht gefragt wurde,
+bekommt 403, ein anderer Spieler 404). Der Wortlaut der Frage steht in keiner
+Notiz, keiner Zeitleiste und keinem Log-Eintrag (nur `question.*` mit
+Sichtbarkeit `leader`). Die Leak-Matrix legt eine Frage mit Merkwort an einen
+Leiter einer fremden Kampagne; keine Rolle darf sie je lesen. Die Antwort ist
+eine Notiz mit den Regeln der Notizen: versiegelt nur bis eine offene Schlacht
+geschlossen ist, nie „nur Leiter“ für einen Spieler.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

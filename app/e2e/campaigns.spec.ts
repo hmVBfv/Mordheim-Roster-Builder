@@ -286,6 +286,70 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Questions to players (phase 4b3a): a leader asks, a player finds the question under "Open for you" and answers. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`questions: a leader asks one player, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    await page.goto(`campaign/${c.id}/questions`);
+    await expect(page.getByRole('heading', { name: 'Questions to players' })).toBeVisible();
+    await expect(page.getByText('No questions yet.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-questions-empty`);
+
+    await page.getByRole('button', { name: 'Ask a question' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Ask a question' });
+    await sheet.getByLabel('To').selectOption('user-anna');
+    await sheet.getByLabel('About').selectOption(b.id);
+    await sheet.getByLabel('Question').fill('How did Robba spend the night after the ferry? Who paid for the rooms, and what did the landlord say?');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-questions-ask`);
+    await sheet.getByRole('button', { name: 'Ask', exact: true }).click();
+    const list = page.getByRole('list', { name: 'Questions' });
+    await expect(list.getByText('To Anna')).toBeVisible();
+    await expect(list.getByText('How did Robba spend the night', { exact: false })).toBeVisible();
+    await expect.poll(() => srv.state.questions.size, { timeout: 8000 }).toBe(1);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-questions`);
+  });
+
+  test(`questions: a player finds it under Open for you and answers, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.questionFrom(c.id, { text: 'How did Robba spend the night after the ferry? Who paid for the rooms, and what did the landlord say?', battleId: b.id });
+    await page.goto('./');
+    const open = page.getByRole('list', { name: 'Open for you' });
+    await expect(open.getByRole('link', { name: /Question from Anna/ })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-home-open`);
+    await open.getByRole('link', { name: /Question from Anna/ }).click();
+    await expect(page.getByRole('heading', { name: 'Questions for you' })).toBeVisible();
+    await page.getByRole('button', { name: 'Answer' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Answer' });
+    await expect(sheet.getByLabel(/Sealed until/)).toBeVisible();
+    await sheet.getByLabel('Your answer').fill('In the Three Crows, losing at dice. The landlord said nothing; he had been paid.');
+    await sheet.getByLabel(/Sealed until/).check();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-questions-answer`);
+    await sheet.getByRole('button', { name: 'Answer', exact: true }).click();
+    await expect(page.getByText('Answered. Your note is in Notes.')).toBeVisible();
+    await expect.poll(() => [...srv.state.notes.values()].filter((n) => n.visibility === 'sealed').length, { timeout: 8000 }).toBe(1);
+    await expect(page.getByRole('list', { name: 'Questions' }).getByText('Answered', { exact: true })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-questions-answered`);
+  });
+}
+
 test('View as player shows what the server gives a player', async ({ page }) => {
   const srv = await playServer(page, true, { totp: true });
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });

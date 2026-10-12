@@ -7,7 +7,8 @@ import ui from '../ui/ui.module.css';
 import styles from './Share.module.css';
 import { declineShare, listShares, type Share } from './shares.ts';
 
-export function Incoming() {
+/** `nothing`: no other line waits either, so an empty list says so. */
+export function Incoming({ nothing = true }: { nothing?: boolean }) {
   const navigate = useNavigate();
   const [shares, setShares] = useState<Share[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +17,7 @@ export function Incoming() {
     listShares().then((r) => setShares(r.incoming)).catch(() => setShares([]));
   }, []);
   useEffect(load, [load]);
-  if (!shares || shares.length === 0) return <p className={ui.muted}>Nothing waiting. Questions, sealed notes and battles to write up will appear here once you are part of a campaign.</p>;
+  if (!shares || shares.length === 0) return !nothing ? null : <p className={ui.muted}>Nothing waiting. Questions, sealed notes and battles to write up will appear here once you are part of a campaign.</p>;
   const run = async (f: () => Promise<void>) => {
     setBusy(true);
     setError(null);

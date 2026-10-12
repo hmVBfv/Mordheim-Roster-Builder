@@ -1,0 +1,13 @@
+/* Questions to players (phase 4b3a). */
+.section { display: grid; gap: var(--space-2); }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.item { display: grid; gap: var(--space-1); padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow-wrap: anywhere; }
+.item p { margin: 0; white-space: pre-wrap; }
+.item small { color: var(--text-muted); }
+.open { border-left: 4px solid var(--gold); }
+.line { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: var(--space-2); }
+.status { font-size: 0.85rem; color: var(--text-muted); }
+.statusOpen { color: var(--gold); }
+.quote { margin: 0; padding: var(--space-2) var(--space-3); border-left: 4px solid var(--border); white-space: pre-wrap; overflow-wrap: anywhere; font-style: italic; }
+.count { color: var(--text-muted); text-align: right; }
+.lead { margin: 0; }

@@ -80,6 +80,12 @@ export interface FakeBackground {
   revisions: { snapshot: Record<string, unknown>; editedBy: string; editedAt: string }[];
 }
 
+/** A question to a player (4b3a), as server/src/questions.ts keeps it. */
+export interface FakeQuestion {
+  id: string; campaignId: string; battleId: string | null; askedBy: string; askedByName: string; to: string; toName: string; text: string;
+  status: 'open' | 'answered' | 'withdrawn'; answerNoteId: string | null; createdAt: string; updatedAt: string; answeredAt: string | null; seq: number;
+}
+
 export interface FakeShare {
   id: string; name: string; wbType: string; from: string; to: string | null; toId: string | null; code: string | null; data: unknown;
   createdAt: string; expiresAt: string; answeredAt: string | null; accepted: boolean | null; uses: number; revokedAt: string | null;
@@ -117,6 +123,7 @@ export function createFakeSync(opts: {
     positions: new Map<string, { campaignId: string; itemType: string; itemId: string; segment: string; pos: string; movedBy: string; movedAt: string }>(),
     chapters: new Map<string, FakeChapter>(),
     background: new Map<string, FakeBackground>(),
+    questions: new Map<string, FakeQuestion>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -343,6 +350,59 @@ export function createFakeSync(opts: {
         Object.assign(cur, fields, { updatedBy: me.displayName, updatedAt: at(), seq: next() });
       }
       return json(200, { entry: bgView(s.background.get(m[1]!)!), seq: bgSeq(c.id) });
+    }
+    return json(404, { error: 'not_found' });
+  };
+
+  /* ---- questions to players (as server/src/questions.ts filters them: leaders all, the one asked their own) ---- */
+  const questionShown = (q: FakeQuestion, role: FakeRole) => (role === 'leader' || (q.to === me.id && q.status !== 'withdrawn'));
+  const questionView = (q: FakeQuestion) => { const v: Partial<FakeQuestion> = { ...q }; delete v.campaignId; return v; };
+  const questionsSeq = (cid: string, role: FakeRole) => Math.max(0, ...[...s.questions.values()].filter((q) => q.campaignId === cid && questionShown(q, role)).map((q) => q.seq));
+  /** A leader asked earlier (or on another device): of `to` (default: the signed-in user). */
+  const questionFrom = (campaignId: string, q: { text: string; to?: { id: string; displayName: string }; askedBy?: string; battleId?: string | null; status?: FakeQuestion['status'] }) => {
+    const to = q.to ?? { id: me.id, displayName: me.displayName };
+    const fq: FakeQuestion = {
+      id: `${String(s.questions.size + 1).padStart(8, '0')}-2222-4000-8000-000000000000`, campaignId, battleId: q.battleId ?? null, askedBy: 'user-anna', askedByName: q.askedBy ?? 'Anna',
+      to: to.id, toName: to.displayName, text: q.text, status: q.status ?? 'open', answerNoteId: null, createdAt: at(), updatedAt: at(), answeredAt: null, seq: next(),
+    };
+    s.questions.set(fq.id, fq);
+    return fq;
+  };
+  const questionRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (method === 'GET' && rest === '/questions') {
+      const rank = { open: 0, answered: 1, withdrawn: 2 } as const;
+      const list = [...s.questions.values()].filter((q) => q.campaignId === c.id && questionShown(q, role)).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).sort((a, b) => rank[a.status] - rank[b.status]);
+      return json(200, { questions: list.map(questionView), seq: questionsSeq(c.id, role) });
+    }
+    const m = rest.match(/^\/questions\/([^/]+)(\/answer)?$/);
+    if (!m) return json(404, { error: 'not_found' });
+    const cur = s.questions.get(m[1]!);
+    if (method === 'PUT' && !m[2]) {
+      if (role !== 'leader') return json(403, { error: 'forbidden' });
+      const to = c.members.find((x) => x.userId === body.to);
+      if (!to || to.role === 'viewer') return json(400, { error: 'invalid', problem: 'a question is asked of a leader or a player of this campaign' });
+      const fields = { text: String(body.text).trim(), battleId: (body.battleId as string | null) ?? null };
+      if (!cur) {
+        s.questions.set(m[1]!, { id: m[1]!, campaignId: c.id, ...fields, askedBy: me.id, askedByName: me.displayName, to: to.userId, toName: to.displayName, status: 'open', answerNoteId: null, createdAt: at(), updatedAt: at(), answeredAt: null, seq: next() });
+      } else {
+        if (cur.status === 'answered') return json(409, { error: 'answered' });
+        Object.assign(cur, fields, { status: body.status === 'withdrawn' ? 'withdrawn' : 'open', updatedAt: at(), seq: next() });
+      }
+      return json(200, { question: questionView(s.questions.get(m[1]!)!), seq: questionsSeq(c.id, role) });
+    }
+    if (method === 'POST' && m[2]) {
+      if (role === 'viewer') return json(403, { error: 'forbidden' });
+      if (!cur || cur.to !== me.id) return json(role === 'leader' && cur ? 403 : 404, { error: role === 'leader' && cur ? 'forbidden' : 'not_found' });
+      if (cur.status === 'withdrawn') return json(409, { error: 'withdrawn' });
+      const noteId = String(body.noteId);
+      if (cur.status === 'answered') return cur.answerNoteId === noteId ? json(200, { question: questionView(cur), note: null, seq: questionsSeq(c.id, role) }) : json(409, { error: 'answered' });
+      const visibility = (body.visibility as FakeNote['visibility'] | undefined) ?? 'public';
+      const battle = cur.battleId ? s.battles.get(cur.battleId) : undefined;
+      if (visibility === 'leader' && role !== 'leader') return json(403, { error: 'forbidden' });
+      if (visibility === 'sealed' && (!battle || battle.status === 'closed')) return json(400, { error: 'invalid', problem: 'a note is sealed until a battle that is still open' });
+      s.notes.set(noteId, { id: noteId, campaignId: c.id, battleId: cur.battleId, turn: null, kind: String(body.kind ?? 'general'), text: String(body.text), mentions: [], authorId: me.id, author: me.displayName, visibility, createdAt: at(), updatedAt: at(), seq: next() });
+      Object.assign(cur, { status: 'answered', answerNoteId: noteId, answeredAt: at(), updatedAt: at(), seq: next() });
+      return json(200, { question: questionView(cur), note: noteFor(s.notes.get(noteId)!, role), seq: questionsSeq(c.id, role) });
     }
     return json(404, { error: 'not_found' });
   };
@@ -622,6 +682,7 @@ export function createFakeSync(opts: {
     const forbidden = json(403, { error: 'forbidden' });
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/background')) return backgroundRoutes(c, role, method, rest, query, body);
+    if (rest.startsWith('/questions')) return questionRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
@@ -843,5 +904,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom };
 }
