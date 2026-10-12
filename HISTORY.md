@@ -2730,3 +2730,54 @@ the test all along, not in the app; it now waits for the faction card first.
 In the new copy test I stubbed `navigator.clipboard` and then called
 `userEvent.setup()`, which installs its own clipboard over it; the test now
 reads back from that one.
+
+## October 12, 2026 (cont.) — the pack for whoever writes the chapter
+
+The chronicle's chapters are written by Claude from the material of a battle,
+and until now somebody had to gather that material by hand: the protocol, who
+died, which advance the player explained, what the background forbids to tell.
+The AI pack is that gathering, as one prompt: a leader opens "AI pack…" on the
+Timeline, picks the battle, the parts and the language, and copies the prompt
+(or downloads it as a `.md`) into a chat. The app still calls no AI (ADR 0004).
+
+Where it is built was the first question. The briefing that already lived in
+`core` wants a before and an after state of each warband, but a leader's device
+only holds the head state of other players' warbands. What it does hold is the
+list of changes frozen into each warband's mark (ADR 0003: tagged states freeze
+what was computed, history is never recomputed). So `buildPack` takes those
+frozen changes plus the explanations and profiles from each warband's save, and
+the old briefing function stays where it was, untouched and unused. The pack is
+made on the leader's device from reads the app already makes (ADR 0005), so
+there is no new route and nothing for the leak matrix except the one new thing
+the server stores.
+
+What the writer is told is chosen in one place (`gather.ts`), not piece by piece
+by the leader, because "I forgot to untick the plan" is exactly the leak the
+background's levels exist to prevent. Leaders' own notes, GM notes, the
+background's scenario plans, entries that have not started and pictures only
+leaders see stay out. Background goes in with its rule written as a rule:
+HIDDEN (say nothing, hint at nothing), HINT ONLY (within the limit the leader
+wrote), REVEALED. A truth that becomes public only from a later battle goes in
+as hidden for this one. The summary of earlier chapters is not an AI summary –
+nobody should have to trust a summary of a summary – but the list of chapters
+and the last one in full. What is missing (a warband not marked, nothing
+recorded of the battle) is listed in the sheet as a gap instead of being left
+out silently.
+
+The only new server data is the style guide: one text per campaign in a new
+table `campaign_docs` (migration 19), read and written by leaders with the
+authenticator, `baseSeq` against two leaders overwriting each other. The log
+says that it changed, never what it says.
+
+Wrong turns. The sheet first read the Timeline's data on every render, and the
+Timeline polls every 15 seconds – the prompt would have changed under a leader's
+hands while she read it. The sheet now keeps the stand of the Timeline from the
+moment it opened. The "AI pack…" button first enabled as soon as the campaign
+had a battle, which let a quick tap build a pack from an empty timeline and
+report "nothing recorded"; it now waits for the timeline, the notes and the
+pictures. The style editor first let what arrived from the server overwrite what
+the leader had already typed (a stale closure on a `loaded` flag); the text now
+counts as the leader's once she types, and a copy from the device that arrives
+after the server's is dropped. In the first version of the test the textarea
+was clicked while it was still disabled for loading, which showed the last
+point for real: the field waits for what the server has before it takes text.
