@@ -2640,7 +2640,11 @@ screen; the linter (rightly) refused reading a sheet's ref while rendering,
 and the other screens already keep each sheet in a component of its own, so
 this one does too. The first end-to-end run failed the touch-target check
 for a small "Read the notes" text link inside a card – it is a button-sized
-link now. And one older test (the first story test) ran into its five-second
-limit when the whole suite ran at once; it passes when run alone,
-so its limit is raised instead of the test shortened.
-
+link now. And two older tests bit back. A campaign test timed out at the five-second
+default on the CI runner after taking 128 ms here, so the limit is now raised
+for the whole app suite instead of file by file. The first story test, which I
+had blamed on load too, turned out to be a real race of its own: right after
+Save, the closed sheet still held the new prologue in its field while the page
+already showed it, so `findByText` saw two matches and kept failing until the
+timeout. Looking for it in the prologue's own region fixed it; raising a
+timeout would only have hidden that.

@@ -7,7 +7,7 @@ import * as core from '@mordheim/core';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { AppRoutes } from '../app/App.tsx';
 import { db } from '../db/db.ts';
 import { createWarband } from '../roster/view.ts';
@@ -41,9 +41,6 @@ beforeEach(async () => { await db.warbands.clear(); });
 afterEach(() => cleanup());
 
 describe('the story page', () => {
-  // typing, a sheet and a save: on a runner that is busy with the other files this takes longer than the 5 s default
-  vi.setConfig({ testTimeout: 20_000 });
-
   it('the prologue is written into the save', async () => {
     await seed(band());
     const user = userEvent.setup();
@@ -57,7 +54,8 @@ describe('the story page', () => {
     await user.click(within(sheet).getByLabelText('Prologue'));
     await user.paste('They came up the river with the last barge.');
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
-    expect(await screen.findByText('They came up the river with the last barge.')).toBeTruthy();
+    // in the prologue's own region: the closed sheet may still hold the same words in its field
+    expect(await within(screen.getByRole('region', { name: 'Prologue' })).findByText('They came up the river with the last barge.')).toBeTruthy();
     await waitFor(async () => expect(core.storyOf(await stored()).prologue).toBe('They came up the river with the last barge.'));
   });
 
