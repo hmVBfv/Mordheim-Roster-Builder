@@ -214,6 +214,10 @@ Begriff einführt, trägt ihn hier ein.
 | Fraktion | Faction | `factions` |
 | NPC | NPC | `npcs` (Wahrheit bleibt im Hintergrund) |
 | Öffentlicher Status | Status everyone may read | `public_status` |
+| Szenario | Scenario | Tabelle `scenarios`, Abschnitt im Reiter „World“; das spielbare Paket (Regeln, NPC-Werte im TTS-Format). Der Hintergrund hält Pläne und Ideen (`kind: 'scenario'`) |
+| Entwurf (Szenario) | Draft | `visibility: 'leader'`: nur Leiter mit Authenticator, nicht einmal als Zahl für andere |
+| Freigeben (Szenario) | Release | `POST …/scenarios/:sid/release { battleId }`: einer Schlacht zuweisen, danach `public` und nicht zurückzunehmen |
+| NPC-Werte | NPC statlines | `npc_statlines`; „Copy statlines“ für den TTS-Tisch |
 | Ruf | Reputation | `reputation_events` (Ereignis-Log; Stand = Summe) |
 | Ruf eintragen | Record reputation | `PUT …/world/reputation/:rid`; wird nie geändert, nur herausgenommen („Take out“) |
 | Bezirk | District | abgeleitet aus den Ständen der Warbands (`campaignMap`), keine Tabelle |
