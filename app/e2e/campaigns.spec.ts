@@ -350,6 +350,69 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* The world (phase 4b3b): factions, the people around them and the reputation log – a leader writes, a player reads. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the World tab: a leader adds a faction and records reputation, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing, and every coin that passes it' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', nameDe: 'Der alte Marek', factionId: f.id, publicStatus: 'alive', statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7\n• Knows every shoal of the Stir' });
+    srv.reputationFrom(c.id, { warbandId: c.enrolments[0]!.warbandId, factionId: f.id, delta: 2, reason: 'Escorted the barge through the fog.', battleId: b.id });
+    await page.goto(`campaign/${c.id}/world`);
+    await expect(page.getByRole('heading', { name: 'The world' })).toBeVisible();
+    const card = page.getByRole('article', { name: 'The Ferrymen' });
+    await expect(card.getByText('Old Marek')).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Reputation log' })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world`);
+
+    await page.getByRole('button', { name: 'Record reputation' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Record reputation' });
+    await sheet.getByLabel('Warband').selectOption({ label: 'Clan Skrittle · Ben' });
+    await sheet.getByLabel('Loses reputation').check();
+    await sheet.getByLabel('By how much (1–100)').fill('3');
+    await sheet.getByLabel('Why').fill('Sank the ferryman’s skiff and let the crew swim.');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world-record`);
+    await sheet.getByRole('button', { name: 'Record', exact: true }).click();
+    await expect(page.getByText('Reputation recorded.')).toBeVisible();
+    await expect.poll(() => srv.state.reputation.size, { timeout: 8000 }).toBe(2);
+    await expect(page.getByRole('list', { name: 'Standing with The Ferrymen' }).getByText('−3')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world-after`);
+
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const npc = page.getByRole('dialog', { name: 'Add an NPC' });
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world-npc`);
+    await npc.getByRole('button', { name: 'Cancel' }).click();
+  });
+
+  test(`the World tab: a player reads it, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', factionId: f.id, publicStatus: 'alive', statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7' });
+    srv.reputationFrom(c.id, { warbandId: c.enrolments[0]!.warbandId, factionId: f.id, delta: 2, reason: 'Escorted the barge through the fog.' });
+    await page.goto(`campaign/${c.id}`);
+    await page.getByRole('link', { name: 'World' }).click();
+    await expect(page.getByRole('article', { name: 'The Ferrymen' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add a faction' })).toHaveCount(0);
+    await page.getByText('Statline').click();
+    await expect(page.getByText('M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world-player`);
+  });
+}
+
 test('View as player shows what the server gives a player', async ({ page }) => {
   const srv = await playServer(page, true, { totp: true });
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });

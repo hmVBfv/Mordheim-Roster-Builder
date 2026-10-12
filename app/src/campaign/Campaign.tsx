@@ -28,6 +28,7 @@ import { OpenList } from '../open/OpenList.tsx';
 import { QuestionsTab } from '../questions/Questions.tsx';
 import { useQuestions } from '../questions/useQuestions.ts';
 import { useWarbands } from '../sync/local.ts';
+import { WorldTab } from '../world/World.tsx';
 import { AsPlayerTab } from '../notes/AsPlayer.tsx';
 import { battleTitle } from '../battle/api.ts';
 
@@ -362,9 +363,18 @@ export function Campaign() {
   const notes = tab === 'notes';
   const timeline = tab === 'timeline';
   const questions = tab === 'questions' && view.role !== 'viewer';
+  const world = tab === 'world';
   // the background and the view as a player: leaders with the authenticator only (the server refuses anyone else)
   const background = tab === 'background' && lead && user.totp;
   const asPlayer = tab === 'as-player' && lead && user.totp;
+  const content = manage ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
+    : notes ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
+    : world ? <WorldTab id={id} view={view} lead={lead && user.totp} />
+    : questions ? <QuestionsTab id={id} view={view} user={user} lead={lead && user.totp} />
+    : background ? <BackgroundTab id={id} view={view} />
+    : asPlayer ? <AsPlayerTab id={id} view={view} />
+    : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
+    : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />;
   return (
     <section className={ui.page}>
       <header>
@@ -376,23 +386,12 @@ export function Campaign() {
         <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
         <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
         <NavLink to={`/campaign/${id}/timeline`}>Timeline</NavLink>
+        <NavLink to={`/campaign/${id}/world`}>World</NavLink>
         {view.role !== 'viewer' && <NavLink to={`/campaign/${id}/questions`}>Questions</NavLink>}
         {lead && user.totp && <NavLink to={`/campaign/${id}/background`}>Background ⚑</NavLink>}
         {lead && <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>}
       </nav>
-      {manage
-        ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
-        : notes
-          ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
-          : questions
-            ? <QuestionsTab id={id} view={view} user={user} lead={lead && user.totp} />
-            : background
-              ? <BackgroundTab id={id} view={view} />
-              : asPlayer
-                ? <AsPlayerTab id={id} view={view} />
-                : timeline
-                  ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
-                  : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
+      {content}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>
