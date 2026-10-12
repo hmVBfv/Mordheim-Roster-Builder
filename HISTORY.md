@@ -2520,3 +2520,43 @@ the test credentials left the production copy where the next staging deploy
 would have started it. And the case-insensitive match that was meant to
 forgive GitHub's spelling of the owner also forgave a branch called
 "Master" – only owner and repository match loosely now.
+
+## October 12, 2026 — the background
+
+With the security review merged and deployed, Rob's direction for the rest
+of the roster builder was short: leave the chronicle for now, finish what is
+left so that afterwards only polish remains. The first piece is the one the
+whole story layer hangs on – the leaders' background: the threads the world
+is spinning behind the players' backs, who pays the ferryman and why.
+
+A background entry holds three things apart: the truth, what the players
+know, and how much of it the story may show – hidden, a hint within a limit
+written down, or revealed from a battle on. Only a leader with the
+authenticator reads or writes any of it; for everyone else the route does not
+exist as far as the answer goes (the outsider is told the campaign is not
+there), and the leak matrix plants a marker in the truth of a campaign the
+probing users do not belong to. Revealing is a deliberate step and the only
+way something leaves: the leader writes the words, the server makes them a
+public note, puts it in the timeline and raises the level – the truth is never
+copied. The step is idempotent by the note's id, so a phone that retries after
+a dropped answer does not publish twice, and a reveal that fails halfway
+changes nothing. Entries keep their last fifty wordings, and a change made
+from a stale state is refused instead of overwriting another leader.
+
+"View as player" is the same idea turned around: the notes and pictures routes
+take `?as=player` and answer exactly as they would for someone who is not a
+leader and not the author – so a leader can see what the table sees, their
+own sealed notes included as placeholders. It can only narrow what comes back,
+never widen it, and the app does not keep the answer.
+
+Wrong turns. The first reveal in the app test came back "Public." instead of
+"Public since battle 1": the default place was the interlude after the
+battle, and an interlude belongs to no battle in the timeline's keys – so the
+note had none either. An interlude now belongs to the last battle of its
+round. Before that, the new PR chain went wrong in a way that is worth
+writing down: two fixes were opened against the branch they were stacked on
+instead of `master`, merged there, and never arrived; they came in as one PR
+afterwards. And a share test failed on CI for no reason in the code: the stand-in
+server had a hard-coded expiry date that passed on October 11, so every share
+in the tests counted as expired from then on. It now counts seven days from the
+moment it is made, like the real server.

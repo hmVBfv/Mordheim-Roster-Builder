@@ -286,6 +286,22 @@ Desktop-Arbeitsfläche ist ein Teil davon.
 **Abnahme:** Das Kapitel zur nächsten Schlacht entsteht mit `chronik N` aus
 dem KI-Paket.
 
+**Schritte (12.10.2026):** Rob will den Roster Builder fertigstellen, sodass
+danach nur noch nachgebessert wird („Chronicle“ ignorieren wir zunächst; die
+Oberfläche überarbeiten und der Desktop kommen später). Jeder Schritt ein
+eigener Pull Request aus `master`, in dieser Reihenfolge:
+
+| Schritt | Inhalt |
+| --- | --- |
+| 4b1 Hintergrund | Hintergrund nur für Leiter (mit Authenticator): Handlungsstränge, Figuren, Orte, Szenarien, GM-Notizen; Wahrheit, „Was die Spieler wissen“, Enthüllungsstufe (verborgen · Andeutung · enthüllt) mit Grenze für Andeutungen; frühere Fassungen bleiben (die letzten 50); **Enthüllen** erzeugt eine öffentliche Notiz, setzt sie in die Zeitleiste und hebt die Stufe an, die Wahrheit bleibt unberührt; „Als Spieler ansehen“ (`?as=player`) für Notizen und Bilder. **Stand 12.10.2026:** umgesetzt (Migration 15, `server/src/background.ts`, `routes-background.ts`, `viewer.ts`, `app/src/background/`, `app/src/notes/AsPlayer.tsx`); neue Zeilen der Leak-Matrix. |
+| 4b2 Story der Warband | Prolog, Zwischenspiele, Erklärungen zu jeder Änderung, Profile mit zweisprachigem Kanon, Lebenslauf. |
+| 4b3 Fragen und Welt | Fragen an Spieler, „Offen für dich“; Fraktionen, NPCs, Ruf, Szenarien. |
+| 4b4 Briefing und KI-Paket | Briefing, KI-Paket (auch als Prompt zum Kopieren aus der Zeitleiste), Kanon-Export für den Chronik-Linter; Ablage in `eingang/chronik/` braucht eine Änderung in `ops/` (mit Rob abstimmen). |
+| 4b5 Chronicle | Reiter „Chronicle“: Kapitel als Entwurf, Prüfung auf verborgene Begriffe, Download. |
+
+„Als Spieler ansehen“ zeigt in 4b1 Notizen und Bilder; die ganze Zeitleiste
+und die Welt kommen dazu, sobald es sie gibt.
+
 ## Phase 4c – Bug-Tracker
 
 - „Report a problem“ mit Kontext; Status für den Meldenden. Der Kontext geht
@@ -300,6 +316,10 @@ dem KI-Paket.
 
 **Abnahme:** Ein echter Bug ist von der Meldung bis „fixed in <version>“
 durchgelaufen.
+
+**Reihenfolge (12.10.2026):** nach 4b5, ein Pull Request für Tabelle, Meldung
+mit Kontext und Status, ein weiterer für Triage, Bug-Token, `/bugs` und den
+Reviewer.
 
 ## Phase 5 – Extras
 
