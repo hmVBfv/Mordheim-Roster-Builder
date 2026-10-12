@@ -4,7 +4,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect } from 'react';
 import { db } from '../db/db.ts';
-import { getCampaign, historyOf, setHouseRules, type CampaignView } from './api.ts';
+import { campaignKey, getCampaign, historyOf, setHouseRules, type CampaignView } from './api.ts';
 
 export interface CampaignRules {
   id: string; name: string; rules: Record<string, unknown>; lead: boolean;
@@ -17,7 +17,7 @@ export function useCampaignRules(id: string | null | undefined): CampaignRules |
   useEffect(() => { if (id) getCampaign(id).catch(() => undefined); }, [id]);
   return useLiveQuery(async () => {
     if (!id) return null;
-    const v = (await db.meta.get(`campaign:${id}`))?.value as CampaignView | undefined;
+    const v = (await db.meta.get(campaignKey(id)))?.value as CampaignView | undefined;
     if (!v) return null;
     const h = historyOf(v);
     return { id, name: v.campaign.name, rules: (v.campaign.houseRules ?? {}) as Record<string, unknown>, lead: v.role === 'leader', history: { round: h.round, warbandIds: h.warbandIds } };

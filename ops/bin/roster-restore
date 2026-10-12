@@ -64,7 +64,7 @@ if [ -f "$data/roster.sqlite" ]; then
   done
   log "the replaced database is kept as $data/$kept"
 fi
-cp "$snap" "$data/roster.sqlite.restoring"
+copy_db "$snap" "$data/roster.sqlite.restoring"
 mv "$data/roster.sqlite.restoring" "$data/roster.sqlite"
 if [ "$from" = restic ] && [ -d "$tmp$ROSTER_DATA/uploads" ]; then
   # add what the backup has, keep what is newer

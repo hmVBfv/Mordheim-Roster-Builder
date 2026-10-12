@@ -5,10 +5,9 @@
    own ⋯ menu leads straight to its Tabletop Simulator entry
    (`#tts-<uid>`). */
 import * as core from '@mordheim/core';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { db, type StoredWarband } from '../db/db.ts';
+import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { exportCtx, readableText, toolFile, ttsCards, type TtsCard } from '../roster/exports.ts';
 import { officialSheet } from '../roster/pdf.ts';
@@ -18,6 +17,7 @@ import { FLAVOUR } from '../flavour.ts';
 import { encodeSave, getServer, importLink } from '../share/link.ts';
 import { copyText, saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
+import { useWarbandRecord } from '../sync/local.ts';
 
 /** A field to copy from: read-only, selected on focus, with its button. */
 function CopyField({ label, value, rows, onCopied }: { label: string; value: string; rows: number; onCopied: (what: string) => void }) {
@@ -176,7 +176,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 
 export function Export() {
   const { id = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null) {
     return (

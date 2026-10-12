@@ -29,7 +29,7 @@ export function mergePictures(server: Picture[], waiting: OutboxItem[], me: Pick
 export function usePictures(cid: string, me: Me | null, every = PICTURES_EVERY_MS) {
   const [pictures, setPictures] = useState<Picture[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const outbox = usePictureOutbox(cid);
+  const outbox = usePictureOutbox(cid, me?.id ?? '');
   const userId = me?.id;
   const refresh = useCallback((): Promise<void> => (userId ? flushOutbox(userId) : Promise.resolve(0))
     .then(() => getPictures(cid))

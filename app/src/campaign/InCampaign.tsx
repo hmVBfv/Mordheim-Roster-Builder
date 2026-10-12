@@ -10,7 +10,7 @@ import { db, type StoredWarband } from '../db/db.ts';
 import { requestSync } from '../sync/runner.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { getCampaign, roundName, withdrawEnrolment, type CampaignView } from './api.ts';
+import { campaignKey, getCampaign, roundName, withdrawEnrolment, type CampaignView } from './api.ts';
 import { useCampaignName } from './name.ts';
 import { differingRules } from '../roster/house.ts';
 import { useCampaignRules } from './rules.ts';
@@ -45,7 +45,7 @@ export function InCampaign({ rec, onNotice }: { rec: StoredWarband; onNotice: (t
     setBusy(true);
     setError(null);
     try {
-      const view = (await db.meta.get(`campaign:${id}`))?.value as CampaignView | undefined;
+      const view = (await db.meta.get(campaignKey(id)))?.value as CampaignView | undefined;
       const e = (view?.enrolments.find((x) => x.warbandId === rec.id) ? view : await getCampaign(id)).enrolments.find((x) => x.warbandId === rec.id);
       if (e) await withdrawEnrolment(id, e.id);
       // the sheet closes first: free again, the roster shows no sheet of this kind

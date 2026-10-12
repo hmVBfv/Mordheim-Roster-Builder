@@ -16,7 +16,7 @@ import { totalsOf } from './rules.ts';
 import { advanceRound, changesOf } from './aftermath.ts';
 import { battleById } from './battles.ts';
 import { PastBattleBody, putPastBattle, removePastBattle } from './history.ts';
-import { checkSave, draftOfUser, metaOf, versionOf, warbandById } from './warbands.ts';
+import { ACCOUNT_FULL, checkSave, draftOfUser, fitsAccount, metaOf, versionOf, warbandById, weightOf } from './warbands.ts';
 
 export interface CampaignDeps { db: DB | null; now: () => Date }
 
@@ -122,6 +122,7 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!totalsOf(c.data)) return reply.code(400).send({ error: 'invalid', problem: 'the rules cannot read this warband' });
     const id = b.warbandId.toLowerCase();
     if (warbandById(db(), id)) return reply.code(409).send({ error: 'exists' });
+    if (!fitsAccount(db(), a.id, weightOf(c.json))) return reply.code(413).send(ACCOUNT_FULL);
     // the copy names its source only if that is one of the player's own
     const from = b.copiedFrom ? warbandById(db(), b.copiedFrom.id.toLowerCase()) : undefined;
     const copiedFrom = from && can(a, 'warband.read', { ownerId: from.owner_id }) && versionOf(db(), from.id, b.copiedFrom!.rev) ? { id: from.id, rev: b.copiedFrom!.rev } : null;
@@ -183,7 +184,8 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!e || !w) return reply.code(404).send({ error: 'not_found' });
     const draft = draftOfUser(db(), w.id, w.owner_id);
     return {
-      warband: metaOf(w),
+      // the warband it was copied from is its owner's own: nobody else learns its id (security review AUTHZ-5)
+      warband: { ...metaOf(w), copiedFrom: w.owner_id === req.actor!.id ? metaOf(w).copiedFrom : null },
       player: { id: e.player_id, displayName: userById(db(), e.player_id)?.display_name ?? '' },
       status: e.status,
       head: versionOf(db(), w.id, w.head_rev),

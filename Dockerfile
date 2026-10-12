@@ -76,6 +76,8 @@ CMD ["node", "server/dist/server.js"]
 # For the rollback drill (docs/operations.md, Stufe 3): the same image, but it
 # exits at once. roster-deploy must notice and go back.
 FROM runtime AS drill-broken
+# roster-verify takes it only as drill-broken, never under a commit's tag
+ENV ROSTER_DRILL=broken
 CMD ["node", "-e", "console.error('deliberately broken image for the rollback drill'); process.exit(1)"]
 
 # The default target

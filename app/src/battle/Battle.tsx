@@ -136,7 +136,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   cid: string; bid: string; user: Me; role: CampaignRole | null; view: BattleView; setView: (v: BattleView) => void; error: string | null; refresh: () => Promise<void>;
 }) {
   const online = useOnline();
-  const outbox = useOutbox(bid);
+  const outbox = useOutbox(bid, user.id);
   const [notice, notify] = useNotice();
   const lead = role === 'leader' && user.totp;
   const canPropose = role === 'leader' || role === 'player';

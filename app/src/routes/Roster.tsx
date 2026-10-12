@@ -2,10 +2,9 @@
    of core, saved on this device at once; the notice after it offers "Undo"
    instead of asking first (docs/ui.md §1.6). */
 import * as core from '@mordheim/core';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { db, type StoredWarband } from '../db/db.ts';
+import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { Hire, Warrior } from '../roster/Cards.tsx';
 import { AdvanceSheet, TakenSheet, type AdvanceChoice, type Correction } from '../roster/AdvanceSheet.tsx';
@@ -21,7 +20,7 @@ import { ExpSheet, MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type ExpSet
 import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import { ConflictBanner } from '../sync/ConflictBanner.tsx';
-import { removeWarband } from '../sync/local.ts';
+import { removeWarband, useWarbandRecord } from '../sync/local.ts';
 import { makeCopy } from '../sync/versions.ts';
 import { ShareSheet } from '../share/ShareSheet.tsx';
 import { useSession } from '../account/session.ts';
@@ -352,7 +351,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
 
 export function Roster() {
   const { id = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null || rec.removedAt) {
     return (

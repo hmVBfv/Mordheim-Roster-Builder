@@ -4,6 +4,7 @@
    owner) is asked in the routes through can(). Every change takes a seq
    from the audit log, which drives GET /sync. */
 import { warbandSaveSchema } from '@mordheim/core/format';
+import { countContainers } from './json-limits.ts';
 import { audit } from './accounts.ts';
 import type { DB } from './db.ts';
 
@@ -72,6 +73,48 @@ export function checkSave(raw: unknown): Checked {
   if (Buffer.byteLength(json) > MAX_VERSION_BYTES) return { ok: false, status: 413, error: 'too_large', problem: 'a warband may be at most 2 MB' };
   return { ok: true, data: data as Record<string, unknown>, json };
 }
+
+/** What one account keeps in its warbands that are not archived: their
+    newest versions and its drafts. GET /sync answers with all of it at once,
+    so it is bounded – some hundred times what a real account holds; nine
+    warbands of 2 MB took the server past its 256 MB (security review INPUT-3). */
+export const ACCOUNT_VOLUME = 16 * 1024 * 1024;
+/** …and in objects and arrays, which the sync parses one by one: 113 small
+    saves of empty lists took it past 256 MB within 16 MB (independent
+    review). A real account has a few ten thousand. */
+export const ACCOUNT_CONTAINERS = 200_000;
+
+/** What a stored JSON text weighs: characters, and objects and arrays. */
+export interface Weight { chars: number; containers: number }
+export const weightOf = (json: string): Weight => ({ chars: json.length, containers: countContainers(json) });
+// `{` and `[` in a stored text, counted by SQLite
+const CONTAINERS = (col: string) => `length(${col}) - length(replace(replace(${col}, '{', ''), '[', ''))`;
+
+/** Whether `add` more still fits the account, counting out what it
+    replaces: a new version replaces the warband's head and its draft, a draft
+    the draft before it. */
+export function fitsAccount(db: DB, userId: string, add: Weight, replacing: { warbandId: string; head: boolean } | null = null): boolean {
+  const id = replacing?.warbandId ?? '';
+  const heads = db.prepare(`SELECT coalesce(sum(length(v.data)), 0) AS chars, coalesce(sum(${CONTAINERS('v.data')}), 0) AS containers FROM warbands w
+    JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev
+    WHERE w.owner_id = ? AND w.archived_at IS NULL AND NOT (w.id = ? AND ? = 1)`).get(userId, id, replacing?.head ? 1 : 0) as Weight;
+  const drafts = db.prepare(`SELECT coalesce(sum(length(a.data)), 0) AS chars, coalesce(sum(${CONTAINERS('a.data')}), 0) AS containers FROM warband_autosaves a
+    JOIN warbands w ON w.id = a.warband_id
+    WHERE a.user_id = ? AND w.archived_at IS NULL AND a.warband_id != ?`).get(userId, id) as Weight;
+  return heads.chars + drafts.chars + add.chars <= ACCOUNT_VOLUME && heads.containers + drafts.containers + add.containers <= ACCOUNT_CONTAINERS;
+}
+
+/** What a warband adds to its owner's volume when it is no longer archived. */
+export function currentSize(db: DB, warbandId: string, userId: string): Weight {
+  const head = db.prepare(`SELECT coalesce(sum(length(v.data)), 0) AS chars, coalesce(sum(${CONTAINERS('v.data')}), 0) AS containers
+    FROM warbands w JOIN warband_versions v ON v.warband_id = w.id AND v.rev = w.head_rev WHERE w.id = ?`).get(warbandId) as Weight;
+  const draft = db.prepare(`SELECT coalesce(sum(length(data)), 0) AS chars, coalesce(sum(${CONTAINERS('data')}), 0) AS containers
+    FROM warband_autosaves WHERE warband_id = ? AND user_id = ?`).get(warbandId, userId) as Weight;
+  return { chars: head.chars + draft.chars, containers: head.containers + draft.containers };
+}
+
+/** The refusal when an account is full. */
+export const ACCOUNT_FULL = { error: 'account_full', problem: `your warbands hold ${ACCOUNT_VOLUME / 1024 / 1024} MB already – archive some first` } as const;
 
 const nameOf = (d: Record<string, unknown>) => (typeof d.name === 'string' ? d.name.slice(0, 120) : '');
 const formatOf = (d: Record<string, unknown>) => (Number.isInteger(d.format) ? (d.format as number) : 0);

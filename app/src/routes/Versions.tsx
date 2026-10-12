@@ -2,14 +2,13 @@
    Story · Versions"): save one on purpose, with a note; see them all; make
    an older one the newest again, or the start of a copy. Campaign app, a
    warband of the signed-in account. */
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { stamp } from '../account/time.ts';
 import { useOnline } from '../app/SyncState.tsx';
-import { db, type StoredWarband } from '../db/db.ts';
+import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import trade from '../roster/Trade.module.css';
 import styles from '../account/Account.module.css';
@@ -19,6 +18,7 @@ import { listVersions, loadNewest, makeCopy, restoreVersion, saveVersion, versio
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
+import { useWarbandRecord } from '../sync/local.ts';
 
 const SOURCE: Record<VersionInfo['source'], string> = { save: 'saved', import: 'imported', copy: 'copied', restore: 'brought back', migration: 'converted' };
 
@@ -141,7 +141,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 export function Versions() {
   const { id = '' } = useParams();
   const session = useSession();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   const head = (
     <div>
@@ -149,7 +149,7 @@ export function Versions() {
       <h1>Versions</h1>
     </div>
   );
-  if (rec === null || rec.removedAt) return <section className={ui.page}>{head}<p className={ui.muted}>This warband is not stored here (any more).</p></section>;
+  // signed out, an account's warband is not shown (rec is null): signing in is still the way to it
   if (session.status !== 'in' && session.status !== 'unreachable') {
     return (
       <section className={ui.page}>
@@ -159,6 +159,7 @@ export function Versions() {
       </section>
     );
   }
+  if (rec === null || rec.removedAt) return <section className={ui.page}>{head}<p className={ui.muted}>This warband is not stored here (any more).</p></section>;
   return (
     <section className={ui.page}>
       {head}

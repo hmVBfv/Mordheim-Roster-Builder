@@ -35,3 +35,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0014](0014-performance-budgets-in-ci.md) | Leistungsgrenzen in der CI |
 | [0015](0015-develop-in-cloud-operate-on-pi.md) | Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi |
 | [0016](0016-campaign-state-stays-in-the-save.md) | Die Kampagnenmechanik einer Warband bleibt in ihrem Speicherstand (vorgeschlagen) |
+| [0017](0017-signed-images-from-master.md) | In die Produktion nur signierte Images von master |

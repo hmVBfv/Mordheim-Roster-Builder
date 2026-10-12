@@ -6,6 +6,7 @@
    Security events have a fixed shape, because Fail2Ban reads them
    (ops/fail2ban/filter.d/roster-auth.conf): `"event"` first, then `"ip"`,
    before any field a user controls. */
+import { isIP } from 'node:net';
 import pino, { type LoggerOptions } from 'pino';
 
 export function loggerOptions(level: string): LoggerOptions {
@@ -20,12 +21,16 @@ export function loggerOptions(level: string): LoggerOptions {
 
 type Log = Pick<pino.BaseLogger, 'warn'>;
 
+/** Only an address reaches the line Fail2Ban reads, never a name it might
+    look up (security review OPS-6; the jail has usedns = no as well). */
+const address = (ip: string) => (isIP(ip) ? ip : 'invalid');
+
 /** A failed login (phase 3 calls it); Fail2Ban bans an IP after 10 in an hour. */
 export function loginFailed(log: Log, ip: string, account: string): void {
-  log.warn({ event: 'login_failed', ip, account }, 'login failed');
+  log.warn({ event: 'login_failed', ip: address(ip), account }, 'login failed');
 }
 
 /** A try the brake refused – not a failure Fail2Ban counts: the owner of a locked-out account must not get the own address banned. */
 export function loginBraked(log: Log, ip: string, account: string): void {
-  log.warn({ event: 'login_braked', ip, account }, 'login braked');
+  log.warn({ event: 'login_braked', ip: address(ip), account }, 'login braked');
 }

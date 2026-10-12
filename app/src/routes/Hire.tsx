@@ -7,10 +7,9 @@
    in reach without scrolling, and after hiring the list starts at its
    filters again. */
 import * as core from '@mordheim/core';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Fragment, Suspense, useId, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { db, type StoredWarband } from '../db/db.ts';
+import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { filterRows, gradesOf, hireDetail, hireFigures, hireRows, type HireKind, type HireOrder, type HireRow } from '../roster/hire.ts';
 import { STATS, type Fact, type StatCell } from '../roster/view.ts';
@@ -22,6 +21,7 @@ import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
+import { useWarbandRecord } from '../sync/local.ts';
 
 const KINDS = [['hs', 'Hired Swords'], ['dp', 'Dramatis Personae']] as const;
 const ORDERS = [['name', 'By name'], ['fee', 'By hire fee'], ['rating', 'By rating']] as const;
@@ -207,7 +207,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 
 export function Hire() {
   const { id = '' } = useParams();
-  const rec = useLiveQuery(async () => (await db.warbands.get(id)) ?? null, [id]);
+  const rec = useWarbandRecord(id);
   if (rec === undefined) return null;
   if (rec === null) {
     return (

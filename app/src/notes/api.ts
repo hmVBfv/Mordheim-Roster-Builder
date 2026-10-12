@@ -4,6 +4,7 @@
    battle is closed; a leaders' note never reaches a player. The last list
    is kept on the device, so the notes are there offline. */
 import { api } from '../account/api.ts';
+import { asker, ownKey } from '../account/owner.ts';
 import { db, type OutboxItem } from '../db/db.ts';
 
 export type Kind = 'general' | 'scene' | 'quote' | 'dice' | 'hook';
@@ -19,7 +20,7 @@ export interface SealedNote { id: string; battleId: string | null; authorId: str
 export type Note = FullNote | SealedNote;
 export const isSealed = (n: Note): n is SealedNote => 'sealed' in n;
 
-const key = (cid: string) => `notes:${cid}`;
+const key = (cid: string) => ownKey('notes:', cid);
 interface Kept { notes: Note[]; seq: number }
 
 export async function cachedNotes(cid: string): Promise<Kept | null> {
@@ -28,10 +29,11 @@ export async function cachedNotes(cid: string): Promise<Kept | null> {
 
 /** The notes; with what was seen last, the server says only whether anything is newer. */
 export async function getNotes(cid: string): Promise<Kept> {
+  const who = asker();
   const cur = await cachedNotes(cid);
   const r = await api<Kept | { unchanged: true; seq: number }>(`/campaigns/${cid}/notes${cur ? `?since=${cur.seq}` : ''}`);
   if ('unchanged' in r) return cur!;
-  await db.meta.put({ key: key(cid), value: r });
+  await who.keep('notes:', cid, r);
   return r;
 }
 

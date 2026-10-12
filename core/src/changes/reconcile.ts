@@ -65,11 +65,17 @@ export function reconcile(changes: Change[], evidence: Evidence): ReconciledChan
           ?? findEvent((e) => e.type === 'injury' && (d(e).uid === c.uid || (d(e).uid == null && d(e).uid_def != null)));
         break;
       case 'stat': {
-        // one advance per point gained; a fall has no advance behind it
+        // one advance per point gained; a fall has no advance behind it.
+        // Once no advance is left, none will be: the search stops there, so a
+        // crafted gain of 1e15 costs no more than the log is long (INPUT-1).
         const gained = Number(p.after) - Number(p.before);
         if (gained <= 0) break;
         const refs: string[] = [];
-        for (let i = 0; i < gained; i++) { const r = findEvent((e) => e.type === 'advance' && d(e).uid === c.uid && d(e).stat === p.stat); if (r) refs.push(r); }
+        while (refs.length < gained) {
+          const r = findEvent((e) => e.type === 'advance' && d(e).uid === c.uid && d(e).stat === p.stat);
+          if (!r) break;
+          refs.push(r);
+        }
         ref = refs.length === gained ? (refs[0] as string) : null;
         break;
       }

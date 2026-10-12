@@ -10,7 +10,15 @@ import { z } from 'zod';
 
 /** A number, or one the legacy app kept as typed text ("7"). */
 const num = z.union([z.number(), z.string()]);
-const stats = z.record(z.string(), num);
+
+/** How many of one thing a warband can hold: a group's size, gear, an advance.
+    The rules count these one by one (worth, the names of a group, matching
+    advances with their events), so a crafted 1e9 made the server loop or run
+    out of memory (security review INPUT-1). Text that is no number passes as
+    before – it counts as nothing. */
+export const MAX_COUNT = 1000;
+const count = num.refine((v) => !(Math.abs(Number(v)) > MAX_COUNT), { message: `at most ${MAX_COUNT}` });
+const stats = z.record(z.string(), count);
 
 export const injurySchema = z.looseObject({
   code: z.string().optional(),
@@ -26,10 +34,10 @@ export const modelSchema = z.looseObject({
   uid_def: z.string(),
   name: z.string().optional(),
   names: z.array(z.string().nullable()).optional(),
-  qty: num.optional(),
+  qty: count.optional(),
   exp: num.optional(),
-  eq: z.record(z.string(), num).optional(),
-  rare: z.record(z.string(), z.looseObject({ q: num, paid: num.optional(), on: z.string().optional() })).optional(),
+  eq: z.record(z.string(), count).optional(),
+  rare: z.record(z.string(), z.looseObject({ q: count, paid: num.optional(), on: z.string().optional() })).optional(),
   mut: z.array(z.string()).optional(),
   adv: stats.optional(),
   skills: z.array(z.string()).optional(),
@@ -48,16 +56,20 @@ export const modelSchema = z.looseObject({
   heirloom: z.string().nullable().optional(),
 });
 
+/** A key or id that is written into markup by older readers (the Roster Builder's inline handlers): letters, digits, `_` and `-`
+    only (security review CLIENT-3). The Roster Builder makes `hs…`/`dp…` ids, the data's keys are such keys. */
+const plainKey = z.string().regex(/^[A-Za-z0-9_-]{1,64}$/, 'letters, digits, _ and - only');
+
 export const hireRecordSchema = z.looseObject({
-  key: z.string(),
-  uid: z.string(),
+  key: plainKey,
+  uid: plainKey,
   name: z.string().optional(),
   exp: num.optional(),
   skills: z.array(z.string()).optional(),
   spells: z.array(spellSchema).optional(),
   adv: stats.optional(),
   opt: z.string().optional(),
-  eq: z.record(z.string(), num).optional(),
+  eq: z.record(z.string(), count).optional(),
 });
 
 export const logEntrySchema = z.looseObject({
@@ -104,8 +116,9 @@ export const warbandSaveSchema = z.looseObject({
   models: z.array(modelSchema),
   hired: z.array(hireRecordSchema).optional(),
   dp: z.array(hireRecordSchema).optional(),
-  stash: z.looseObject({ wyrd: num.optional(), gold: num.nullable().optional(), items: z.array(z.looseObject({ name: z.string(), qty: num, key: z.string().optional(), rare: z.boolean().optional(), paid: num.optional() })).optional() }).optional(),
-  house: z.record(z.string(), z.unknown()).optional(),
+  stash: z.looseObject({ wyrd: num.optional(), gold: num.nullable().optional(), items: z.array(z.looseObject({ name: z.string(), qty: count, key: z.string().optional(), rare: z.boolean().optional(), paid: num.optional() })).optional() }).optional(),
+  // a few settings; every campaign view reads them of every warband entered (independent review of INPUT-3)
+  house: z.record(z.string(), z.unknown()).refine((v) => JSON.stringify(v).length <= 16_384, { message: 'at most 16 KB' }).optional(),
   campaign: campaignSchema.optional(),
   leaderUid: z.number().nullable().optional(),
   mark: z.string().nullable().optional(),

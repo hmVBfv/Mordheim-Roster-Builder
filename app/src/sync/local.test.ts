@@ -32,7 +32,9 @@ describe('whose a warband is', () => {
     expect(shown(rec(), KAI.id)).toBe(true);
     expect(shown(rec({ ownerId: KAI.id }), KAI.id)).toBe(true);
     expect(shown(rec({ ownerId: 'ben' }), KAI.id)).toBe(false);
-    expect(shown(rec({ ownerId: 'ben' }), undefined)).toBe(true);
+    // signed out, an account's warbands stay hidden – the device's own are still there (security review CLIENT-1)
+    expect(shown(rec({ ownerId: 'ben' }), undefined)).toBe(false);
+    expect(shown(rec(), undefined)).toBe(true);
     expect(shown(rec({ removedAt: '2026-10-04T10:00:00Z' }), undefined)).toBe(false);
   });
 });

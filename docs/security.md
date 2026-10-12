@@ -1,6 +1,6 @@
 # Sicherheit
 
-Stand: 30. September 2026 · Grundlage: ADRs 0002, 0008, 0011, 0012, 0015
+Stand: 10. Oktober 2026 (nach der Sicherheitsprüfung, [security-review.md](security-review.md)) · Grundlage: ADRs 0002, 0008, 0011, 0012, 0015, 0017
 
 ## 1. Was geschützt wird und wovor
 
@@ -10,7 +10,7 @@ Stand: 30. September 2026 · Grundlage: ADRs 0002, 0008, 0011, 0012, 0015
 | Kampagnendaten | Bug, Bedienfehler, Konto-Übernahme | Versionen statt Überschreiben; Audit-Log; Backups |
 | Konten | Passwort-Raten aus dem Internet | Bremse, Fail2Ban, TOTP für Admin und Leiter |
 | Der Pi selbst (die übrigen Dienste) | Angriff über den neuen Webdienst | nur 443 offen, App nur auf `127.0.0.1`, Container gehärtet und begrenzt |
-| Der Pi als Ganzes | untergeschobene Betriebsdateien (`install.sh` läuft als root); ein fremdes Image | Klon außerhalb der Agenten-Verzeichnisse, `install.sh` prüft das; `master` nur per Pull Request; Zwei-Faktor-Anmeldung bei GitHub; Deploy nur bewusst per Commit-Tag |
+| Der Pi als Ganzes | untergeschobene Betriebsdateien (`install.sh` läuft als root); ein fremdes Image | Klon außerhalb der Agenten-Verzeichnisse, `install.sh` prüft das; `master` nur per Pull Request; Zwei-Faktor-Anmeldung bei GitHub; Deploy nur bewusst per Commit-Tag und nur mit Signatur der CI von `master` (ADR 0017) |
 | Rob selbst | Rückschluss vom öffentlichen Repo auf Person und Heimnetz | keine Hostnamen, Adressen, Kontonamen, Klarnamen oder E-Mail-Adressen im Repo und in den Commits |
 | Agenten-Umgebung | eingeschleuste Anweisungen in Bug-Texten | Bug-Texte sind Daten; eng begrenzte Tokens; keine Produktionsdaten im Container |
 
@@ -30,18 +30,39 @@ Gelegenheitsangriffe sicher abzuwehren.
   Caddys Verbindung von dort an, und von außen erreicht niemand diesen Port
   (siehe [architecture.md](architecture.md#5-server)). Die Testinstanz ist
   ein Sonderfall: Ihr Port liegt auf der LAN-Adresse, also kann dort jedes
-  Gerät im Heimnetz eine Adresse vorgeben. Sie hat keine echten Konten.
+  Gerät im Heimnetz eine Adresse vorgeben.
 - **Container gehärtet:** Dateisystem nur lesbar (außer `/data`, `/uploads`,
   `/tmp`), keine Capabilities, `no-new-privileges`, Prozessgrenze, eigener
-  Nutzer 1000:1000 ([`ops/compose.yaml`](../ops/compose.yaml)).
+  Nutzer 1000:1000 ([`ops/compose.yaml`](../ops/compose.yaml)). Caddy, das
+  dem Internet zugewandt ist, ebenso – als root, aber nur mit
+  `NET_BIND_SERVICE`; seine Verzeichnisse gehören root (OPS-4).
 - **Testinstanz nur im Heimnetz** (`<pi-lan-ip>:8081`), ohne Weiterleitung an
-  der Fritzbox.
+  der Fritzbox, über schlichtes http. Sie bekommt jede Nacht eine Kopie der
+  Produktion – Konten, Erzählung, alles. Damit dort nichts wirkt, womit man
+  sich in der Produktion anmeldet (OPS-3, Rob 09.10.2026): eigener
+  `TOTP_KEY`; nach jeder Wiederherstellung und vor dem Start ein Testpasswort
+  für alle Konten, keine Authenticatoren, keine Sitzungen, keine offenen
+  Links (`roster-cli test-accounts`, verweigert ohne `ROSTER_STAGING=1`).
+  Misslingt das, wird die Kopie gelöscht; eine Kopie ohne diesen Schritt
+  startet auch `roster-deploy --staging` nicht, ohne ihn nachzuholen.
+  Fehlversuche dort zählen für Fail2Ban mit (Sperre auf 443). Die verborgene Erzählung der
+  Kopie liegt dort weiterhin – geschützt durch dieselben Regeln der App, aber
+  ohne TLS im Heimnetz.
+- **Was in die Produktion darf** (OPS-1, ADR 0017): nur Images, die die CI
+  auf `master` gebaut und mit Sigstore signiert hat; `roster-deploy` prüft
+  Signatur, Branch und Commit mit `cosign`, bevor sich etwas ändert – nur
+  für Commits, nie für verschiebbare Namen wie `master`; Compose zieht nie
+  selbst.
+  Branch-Builds nur auf die Testinstanz. Die Actions der Workflows sind auf
+  Commits festgelegt (OPS-7).
 - Caddy bedient nur den konfigurierten Hostnamen.
 - **Header** (Caddy):
   - `Strict-Transport-Security: max-age=31536000`
   - `X-Content-Type-Options: nosniff`
   - `Referrer-Policy: strict-origin-when-cross-origin`
   - `Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'`
+    – nur, wo die App keine eigene setzt: Bilder behalten ihre strengere mit
+    `sandbox` (OPS-5; `ops/test/caddy.sh` prüft beides).
 
   Die neue React-App hat keine Inline-Handler, daher ist die strenge Policy
   von Anfang an möglich. Schriften werden selbst ausgeliefert, nicht von
@@ -227,6 +248,22 @@ Notiz, die man nicht sehen darf, gibt es beim Löschen nicht (404). Im
 Notiz. Die Leak-Matrix legt eine versiegelte und eine Leiter-Notiz mit
 Merkwörtern an, die in keiner Antwort an irgendeine Rolle vorkommen dürfen.
 
+**Nach der Sicherheitsprüfung (09.10.2026, `docs/security-review.md`):**
+Das Audit-Log zeigt dem Admin von einer Kampagne nur öffentliche Einträge –
+eine versiegelte oder Leiter-Notiz, ein Leiter-Bild nicht einmal als
+Zeile; von einer Kampagne, in der er nicht Mitglied ist, auch diese nur als
+Aktion, Zeit und Handelnden, ohne Namen, Titel oder Wörter. Für eine
+versiegelte Notiz steht nicht einmal ihre Art im Log. Die Zahl, mit der ein
+Gerät fragt, ob etwas neu ist (`seq` bei Notizen und Bildern), rechnet der
+Server je Fragendem: Eine Leiter-Notiz verrät sich einem Spieler nicht
+dadurch, dass sich die Zahl bewegt. „Unverändert“ gilt nur bei genau der
+Zahl, die das Gerät hat – wird eine öffentliche Notiz zur Leiter-Notiz,
+sinkt die Zahl des Spielers, und seine Liste kommt neu, ohne sie. Jede
+Anfrage der App nennt das Konto, für das sie gemacht ist
+(`X-Roster-User`); gehört das Cookie einem anderen, antwortet der Server
+nicht für dieses, sondern mit 409 `other_user`. Aus welcher eigenen Warband eine
+eingetragene Kopie stammt (`copiedFrom`), erfährt nur ihr Besitzer.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,
@@ -236,8 +273,10 @@ nur angemeldet, und falsche Codes bremsen nach 10 Versuchen in 15 Minuten
 je Nutzer (429). Kann niemand mehr eine Kopie nehmen (beantwortet, zurückgenommen, abgelaufen), leert der Server die gespeicherte Warband. `GET /people` zeigt angemeldeten Nutzern nur Anzeige- und
 Nutzernamen aktiver Konten.
 
-**Geplant (Rob, 05.10.2026):** eine eigene Sicherheitsprüfung, dass sich
-weder von außen noch angemeldet etwas ausnutzen lässt (roadmap.md).
+**Sicherheitsprüfung (Rob, 05.10.2026; durchgeführt 09./10.10.2026):** ob
+sich weder von außen noch angemeldet etwas ausnutzen lässt – Endpunkte,
+Rechte, Eingaben, Sitzungen, Browser, Betrieb. Befunde, Behebungen und was
+bewusst bleibt: [security-review.md](security-review.md).
 
 ### Sichtbarkeit
 
@@ -277,7 +316,38 @@ kommt mit Notizen und Hintergrund dazu.
 - **Eingaben:** ein Schema für jeden Körper – Warband- und Notizdaten mit den
   Zod-Schemas aus `core/format` (ab 3h), die kleinen Körper der Konten mit
   JSON Schema, das Fastify selbst prüft; Größengrenzen (Warband-Version
-  2 MB, Notiz 20 KB, Anfrage insgesamt 3 MB).
+  2 MB, Notiz 20 KB, Anfrage insgesamt 3 MB). Schlüssel und `uid` einer
+  angeheuerten Klinge sind schlichte Schlüssel (`[A-Za-z0-9_-]`, höchstens
+  64 Zeichen): Das Legacy-Tool setzt sie in HTML ein, eine Warband darf dort
+  nichts ausführen können (CLIENT-3).
+- **Was eine Anfrage den Server tun lässt** (Sicherheitsprüfung, INPUT-1 bis
+  INPUT-3):
+  - Gruppengröße, Ausrüstung, Steigerungen und Lagerbestand einer Warband
+    höchstens 1000 je Sache (`MAX_COUNT` im Schema): Die Regeln zählen sie
+    einzeln ab, und ein untergeschobenes 1e9 ließ den Server endlos rechnen
+    oder den Speicher sprengen. Die Zuordnung von Steigerungen zu Ereignissen
+    hört auf, sobald keins mehr passt.
+  - Der Server liest höchstens 64 KB – auf Routen, die jeder erreicht
+    (Anmelden, Einladung, Code nach dem Passwort), und an Pfaden ohne Route;
+    Routen für Mitglieder 3 MB, die für die Bytes eines Bildes 5 MB. Jeder
+    JSON-Körper hat höchstens
+    50 000 Objekte und Listen, geprüft, bevor er gelesen wird (ein Körper
+    aus lauter `{}` wuchs beim Lesen auf das 45-Fache).
+  - Die aktuellen Warbands eines Kontos (neueste Versionen und Entwürfe der
+    nicht entfernten) fassen höchstens 16 MB und 200 000 Objekte und Listen;
+    der Abgleich schickt sie auf einmal (413 `account_full`). Hausregeln
+    einer Warband höchstens 16 KB – jede Kampagnenansicht liest sie von
+    allen eingetragenen.
+  - Bewusst offen: Ältere Versionen und entfernte Warbands wachsen auf der
+    Platte ohne Grenze – nur eingeladene Mitglieder können das, und der
+    Platz der SSD steht in `roster-alive`.
+- **Links aus dem Quick Build** (`app/src/share/link.ts`): Ein Fragment über
+  256 KB oder eines, das sich auf mehr als 4 MB entpackt, liest die App
+  nicht – ein kleiner Link kann sich sonst auf Gigabytes entpacken und den
+  Tab einfrieren (CLIENT-4). Die Adresse des Kampagnen-Servers nimmt der
+  Quick Build nur mit `https://`, schlichtes `http://` nur im Heimnetz
+  (private IPv4-Adressen, `localhost`, `.local`, `.lan`, `.home.arpa`;
+  CLIENT-5).
 - **Uploads:** nur Bilder (PNG, JPEG, WebP), höchstens 5 MB. Der Client
   verkleinert und kodiert neu – dabei fallen EXIF-Daten mit GPS-Koordinaten
   weg. Der Server prüft Dateityp anhand der Bytes und Größe und liefert mit
@@ -291,7 +361,10 @@ kommt mit Notizen und Hintergrund dazu.
   umbenannt. Ausgeliefert mit `Content-Security-Policy: default-src 'none';
   sandbox` und `Cache-Control: private` (die Bytes einer ID ändern sich
   nie). Ein Leiterbild bekommen Spieler und Zuschauer weder als Zeile noch
-  als Bytes (404). Höchstens 1 GB je Kampagne. Die Uploads gehen nachts mit
+  als Bytes (404). Höchstens 1 GB je Kampagne; gezählt wird, was
+  gespeichert ist, nicht was angekündigt wurde, und beim Eintreffen der
+  Bytes wird noch einmal gezählt. Je Mitglied warten höchstens 20
+  angekündigte Bilder auf ihre Bytes (409, AUTHZ-2). Die Uploads gehen nachts mit
   ins restic-Backup (`ops/lib/roster-backup`).
 - **Ausgabe:** React entschärft Text automatisch; `dangerouslySetInnerHTML`
   ist per Lint-Regel verboten. Markdown in Notizen wird nicht als HTML
@@ -308,7 +381,16 @@ kommt mit Notizen und Hintergrund dazu.
   geschwärzt, falls sie je mitgegeben werden. Fehlgeschlagene Logins haben
   eine feste Form, `"event":"login_failed","ip":"…"` vorn, damit ein
   Kontoname Fail2Ban keine fremde Adresse unterschieben kann (Test in
-  `server/test/log.test.ts`).
+  `server/test/log.test.ts`). In die Zeile kommt nur eine gültige
+  IP-Adresse, sonst `invalid`, und Fail2Ban löst keine Namen auf
+  (`usedns = no`, OPS-6).
+- **Betriebsskripte:** Namen und Dateien aus Verzeichnissen, die ein
+  Container beschreiben kann (Snapshots, Markerdatei, Datenbank), prüfen sie,
+  bevor daraus ein Pfad auf dem Pi wird, und folgen keinem Symlink (OPS-2).
+  `install.sh` nimmt keine Pfade mit `.`/`..`, schreibt nicht durch Symlinks
+  und prüft `site.env` und `~/server/roster` samt Verzeichnissen darüber wie
+  seinen eigenen Klon (OPS-9). Die Ping-URLs von healthchecks.io gehen curl
+  über stdin zu, nie über die Kommandozeile (OPS-10).
 - **Pakete:** npm führt keine Installationsskripte von Abhängigkeiten aus
   (`.npmrc`: `ignore-scripts=true`).
 

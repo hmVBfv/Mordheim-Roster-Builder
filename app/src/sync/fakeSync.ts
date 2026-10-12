@@ -79,7 +79,8 @@ export interface FakeShare {
   mine: boolean;
 }
 const ME_NAME = 'Kai';
-const SHARE_EXPIRES = '2026-10-11T12:00:00.000Z';
+/** Seven days from the moment it is made, as on the server: a fixed date ran out on 11 Oct 2026, and every share in the tests counted as expired from then on. */
+const shareExpires = () => new Date(Date.now() + 7 * 24 * 3600_000).toISOString();
 const CODES = ['K7M2Q9XD', 'H4TR8WNP', 'Z3FB6YCM'];
 
 const NO_TOTALS: FakeTotals = { rating: 0, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 };
@@ -660,7 +661,7 @@ export function createFakeSync(opts: {
   /** Another player sends the signed-in user a copy (or makes a code: `code`). */
   const shareFrom = (from: string, data: unknown, code: string | null = null) => {
     const d = data as { name?: string; wb?: string };
-    const sh: FakeShare = { id: `share-${s.shares.length + 1}`, name: d.name ?? String(d.wb), wbType: String(d.wb), from, to: code ? null : ME_NAME, toId: code ? null : 'me', code, data, createdAt: at(), expiresAt: SHARE_EXPIRES, answeredAt: null, accepted: null, uses: 0, revokedAt: null, mine: false };
+    const sh: FakeShare = { id: `share-${s.shares.length + 1}`, name: d.name ?? String(d.wb), wbType: String(d.wb), from, to: code ? null : ME_NAME, toId: code ? null : 'me', code, data, createdAt: at(), expiresAt: shareExpires(), answeredAt: null, accepted: null, uses: 0, revokedAt: null, mine: false };
     s.shares.push(sh);
     return sh;
   };
@@ -691,7 +692,7 @@ export function createFakeSync(opts: {
       const to = body.to ? s.people.find((p) => p.id === body.to) : undefined;
       if (body.to && !to) return json(400, { error: 'invalid', problem: 'no such player to send it to' });
       const code = to ? null : CODES[s.shares.filter((x) => x.code).length % CODES.length]!;
-      const sh: FakeShare = { id: `share-${s.shares.length + 1}`, name: d.name || d.wb, wbType: d.wb, from: ME_NAME, to: to?.displayName ?? null, toId: to?.id ?? null, code, data: d, createdAt: at(), expiresAt: SHARE_EXPIRES, answeredAt: null, accepted: null, uses: 0, revokedAt: null, mine: true };
+      const sh: FakeShare = { id: `share-${s.shares.length + 1}`, name: d.name || d.wb, wbType: d.wb, from: ME_NAME, to: to?.displayName ?? null, toId: to?.id ?? null, code, data: d, createdAt: at(), expiresAt: shareExpires(), answeredAt: null, accepted: null, uses: 0, revokedAt: null, mine: true };
       s.shares.push(sh);
       return json(201, { id: sh.id, code: code ? `${code.slice(0, 4)}-${code.slice(4)}` : null, expiresAt: sh.expiresAt });
     }

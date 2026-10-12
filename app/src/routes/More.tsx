@@ -25,7 +25,7 @@ function CampaignServer() {
       <div className={ui.row}>
         <button type="submit" className={ui.buttonQuiet} disabled={clean === saved || (!!value.trim() && !clean)}>Save the address</button>
       </div>
-      {!!value.trim() && !clean && <p className={ui.error}>That is not a web address.</p>}
+      {!!value.trim() && !clean && <p className={ui.error}>{/^http:\/\//i.test(value.trim()) ? 'Plain http only for an address in your home network – use https://.' : 'That is not a web address.'}</p>}
     </form>
   );
 }

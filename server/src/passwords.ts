@@ -2,7 +2,7 @@
    the list of common passwords, not the username; stored as a scrypt hash
    with its parameters, so a later change of cost still verifies old hashes.
    Node's own crypto, no extra package. */
-import { randomBytes, scrypt as scryptCb, timingSafeEqual, type ScryptOptions } from 'node:crypto';
+import { randomBytes, scrypt as scryptCb, scryptSync, timingSafeEqual, type ScryptOptions } from 'node:crypto';
 import { COMMON_PASSWORDS } from './common-passwords.ts';
 
 export const MIN_LENGTH = 12;
@@ -51,6 +51,14 @@ async function scrypt(pw: string, salt: Buffer, cost: HashCost): Promise<Buffer>
 export async function hashPassword(pw: string, cost: HashCost = DEFAULT_COST): Promise<string> {
   const salt = randomBytes(16);
   const key = await scrypt(pw, salt, cost);
+  return ['scrypt', cost.N, cost.r, cost.p, salt.toString('base64url'), key.toString('base64url')].join('$');
+}
+
+/** The same at once – for roster-cli, which makes one hash and has no
+    requests to keep answering meanwhile. */
+export function hashPasswordSync(pw: string, cost: HashCost = DEFAULT_COST): string {
+  const salt = randomBytes(16);
+  const key = scryptSync(pw.normalize('NFKC'), salt, KEYLEN, { ...cost, maxmem: 256 * cost.N * cost.r * cost.p + 1024 * 1024 });
   return ['scrypt', cost.N, cost.r, cost.p, salt.toString('base64url'), key.toString('base64url')].join('$');
 }
 
