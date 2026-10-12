@@ -320,6 +320,14 @@ Entwurfs haben Sichtbarkeit `leader`. Die Leak-Matrix legt einen Entwurf mit
 Merkwort an eine fremde Kampagne (`SCENARIO-SECRET`) und prüft, dass ihn
 kein Spieler liest.
 
+**Stilvorgaben (Phase 4b4a):** `style.read` und `style.write` für Leiter mit
+Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Der Text ist
+keine Wahrheit der Kampagne, gehört aber zu dem, was ein Leiter dem Schreibenden
+sagt („nenne die Gräfin nie“ kann selbst schon verraten); deshalb liest ihn
+sonst niemand. Das Log (`style.edit`, Sichtbarkeit `leader`) trägt keinen Text.
+Die Leak-Matrix legt einen Stil mit Merkwort (`STYLE-SECRET`) in eine fremde
+Kampagne.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

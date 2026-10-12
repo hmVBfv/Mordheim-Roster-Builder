@@ -86,6 +86,8 @@ export interface ProbeContext {
   /** Scenarios of the admin's campaign (phase 4b3c): a draft to release, a spare draft to take out. */
   ledScenarioId: string;
   spareScenarioId: string;
+  /** The style guide of the admin's campaign was written once: the seq an edit starts from (phase 4b4a). */
+  ledStyleSeq: number;
 }
 
 export interface Probe {
@@ -430,6 +432,17 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { admin: ['scenario', 'seq', 'removed'] },
   },
+  'style.read': {
+    // the admin leads the campaign (the user role is a player there: 403); the style guide of the victim's campaign carries a marker no role may read
+    allowed: ['admin'],
+    routes: { 'GET /api/v1/campaigns/:id/style': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/style` }) },
+    fields: { admin: ['style'] },
+  },
+  'style.write': {
+    allowed: ['admin'],
+    routes: { 'PUT /api/v1/campaigns/:id/style': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/style`, body: { text: 'German, past tense, close third person.', baseSeq: c.ledStyleSeq } }) },
+    fields: { admin: ['style'] },
+  },
   'background.read': {
     // the user role is a player there (403), the admin leads it
     allowed: ['admin'],
@@ -468,4 +481,6 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   // a question asked of someone else (phase 4b3): no role of the matrix is its addressee
   /QUESTION-SECRET/,
   // a draft scenario of the victim's campaign (phase 4b3c): only its leaders read it, and none of them is a role of the matrix
-  /SCENARIO-SECRET/];
+  /SCENARIO-SECRET/,
+  // the style guide of the victim's campaign (phase 4b4a): leaders' own, and none of its leaders is a role of the matrix
+  /STYLE-SECRET/];

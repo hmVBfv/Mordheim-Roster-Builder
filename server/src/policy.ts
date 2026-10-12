@@ -117,6 +117,9 @@ export const ACTIONS = {
   'world.read': { who: 'user', target: 'member' },
   /** Writing the world: leaders alone, with the authenticator – a leader puts an NPC there when the players may know it exists. */
   'world.write': { who: 'user', target: 'leader' },
+  /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
+  'style.read': { who: 'user', target: 'leader' },
+  'style.write': { who: 'user', target: 'leader' },
   /** Scenarios (phase 4b3c): every member reads – the released ones; a draft only a leader with the authenticator sees (ADR 0011). */
   'scenarios.read': { who: 'user', target: 'member' },
   /** Writing, releasing and taking out a draft: leaders alone, with the authenticator. */

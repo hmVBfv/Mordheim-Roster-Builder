@@ -17,6 +17,7 @@ import { putChapter } from '../src/chapters.ts';
 import { putEntry as putBackground } from '../src/background.ts';
 import { putQuestion } from '../src/questions.ts';
 import { releaseScenario, putScenario } from '../src/scenarios.ts';
+import { putStyle } from '../src/style.ts';
 import { addReputation, putFaction, putNpc } from '../src/world.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
@@ -171,6 +172,11 @@ describe('leak-test matrix', () => {
     if (!played.ok) throw new Error(played.error);
     const ledScenarioId = scenario(led, admin.id, 'A draft', 'To be released.');
     const spareScenarioId = scenario(led, admin.id, 'A spare draft', 'To be taken out.');
+    // style guides: one in the victim's campaign no role of the matrix may read, one in the admin's, which the probes read and change
+    const secretStyle = putStyle(s.db, theirs.id, { text: 'STYLE-SECRET: never name the Countess.', baseSeq: 0 }, victim.id, t0);
+    if (!secretStyle.ok) throw new Error(secretStyle.error);
+    const ledStyle = putStyle(s.db, led.id, { text: 'German, past tense.', baseSeq: 0 }, admin.id, t0);
+    if (!ledStyle.ok) throw new Error(ledStyle.error);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -179,7 +185,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
