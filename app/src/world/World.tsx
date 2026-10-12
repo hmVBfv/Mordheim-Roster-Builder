@@ -5,46 +5,21 @@
    about an NPC stays in the Background – a leader puts an NPC here when the
    players may know it exists. Writing needs the connection. */
 import { useId, useState } from 'react';
-import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
 import notes from '../notes/Notes.module.css';
+import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
+import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { addReputation, LIMITS, nameOf, otherName, putFaction, putNpc, removeFaction, removeNpc, removeReputation, signed, standings, type Faction, type Npc, type ReputationEvent, type World } from './api.ts';
 import { useWorld } from './useWorld.ts';
 import styles from './World.module.css';
 
-type Sheet = ReturnType<typeof useSheet>;
 type Option = { id: string; label: string };
-
-/** A sheet's form: it stays open with the words and says why, when the server refuses. */
-function useSaving(onSave: () => Promise<void>, close: () => void) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    onSave().then(() => close(), (err: unknown) => setError(errorText(err))).finally(() => setBusy(false));
-  };
-  return { busy, error, submit };
-}
-
-function Actions({ busy, ok, label, close, error }: { busy: boolean; ok: boolean; label: string; close: () => void; error: string | null }) {
-  return (
-    <>
-      {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !ok}>{label}</button>
-        <button type="button" className={ui.buttonQuiet} onClick={close}>Cancel</button>
-      </div>
-    </>
-  );
-}
 
 const PUBLIC = 'Everyone in the campaign reads this, viewers too. What only the leaders may know belongs in the Background.';
 
@@ -156,24 +131,6 @@ function ReputationForm({ warbands, factions, battles, close, onSave, titleId }:
       <Actions busy={busy} ok={!!warband && !!faction && valid && !!reason.trim()} label="Record" close={close} error={error} />
     </form>
   );
-}
-
-interface Removing { key: number; title: string; text: string; run: () => Promise<void> }
-
-function RemoveForm({ r, close, titleId }: { r: Removing; close: () => void; titleId: string }) {
-  const { busy, error, submit } = useSaving(r.run, close);
-  return (
-    <form className={ui.page} onSubmit={submit}>
-      <h2 id={titleId}>{r.title}</h2>
-      <p className={ui.muted}>{r.text}</p>
-      <Actions busy={busy} ok label="Remove" close={close} error={error} />
-    </form>
-  );
-}
-
-function FormSheet({ dialogRef, children }: { dialogRef: Sheet['ref']; children: (titleId: string) => React.ReactNode }) {
-  const id = useId();
-  return <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>{children(id)}</dialog>;
 }
 
 function Person({ n, lead, online, onEdit, onRemove }: { n: Npc; lead: boolean; online: boolean; onEdit: () => void; onRemove: () => void }) {
@@ -305,6 +262,8 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
           </ul>
         </section>
       )}
+
+      <Scenarios id={id} view={view} lead={lead} />
 
       {world.reputation.length > 0 && (
         <section className={styles.section} aria-labelledby="w-log">

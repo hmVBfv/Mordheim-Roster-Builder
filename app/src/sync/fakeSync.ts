@@ -91,6 +91,12 @@ export interface FakeFaction { id: string; campaignId: string; nameDe: string; n
 export interface FakeNpc { id: string; campaignId: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; updatedAt: string; seq: number; deleted?: boolean }
 export interface FakeReputation { id: string; campaignId: string; warbandId: string; factionId: string; delta: number; reason: string; battleId: string | null; actor: string; createdAt: string; seq: number; deleted?: boolean }
 
+/** A scenario (4b3c), as server/src/scenarios.ts keeps it: a draft only leaders read, released to a battle for everybody. */
+export interface FakeScenario {
+  id: string; campaignId: string; title: string; body: string; npcStatlines: string; visibility: 'leader' | 'public'; playedInBattle: string | null;
+  releasedAt: string | null; releasedBy: string | null; edited: boolean; createdAt: string; updatedAt: string; seq: number; deleted?: boolean;
+}
+
 export interface FakeShare {
   id: string; name: string; wbType: string; from: string; to: string | null; toId: string | null; code: string | null; data: unknown;
   createdAt: string; expiresAt: string; answeredAt: string | null; accepted: boolean | null; uses: number; revokedAt: string | null;
@@ -132,6 +138,7 @@ export function createFakeSync(opts: {
     factions: new Map<string, FakeFaction>(),
     npcs: new Map<string, FakeNpc>(),
     reputation: new Map<string, FakeReputation>(),
+    scenarios: new Map<string, FakeScenario>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -484,6 +491,64 @@ export function createFakeSync(opts: {
     return json(200, worldOf(c.id));
   };
 
+  /* ---- scenarios (as server/src/routes-scenarios.ts: drafts for leaders, released ones for every member) ---- */
+  const scenarioShown = (x: FakeScenario, role: FakeRole) => !x.deleted && (x.visibility === 'public' || role === 'leader');
+  const scenarioView = (x: FakeScenario) => { const v: Partial<FakeScenario> = { ...x }; delete v.campaignId; delete v.deleted; return v as Omit<FakeScenario, 'campaignId' | 'deleted'>; };
+  const scenariosSeq = (cid: string, role: FakeRole) => Math.max(0, ...[...s.scenarios.values()].filter((x) => x.campaignId === cid && (role === 'leader' || x.visibility === 'public')).map((x) => x.seq));
+  /** A leader wrote a scenario earlier (or on another device); `battleId` releases it. */
+  const scenarioFrom = (campaignId: string, x: { title: string; body?: string; npcStatlines?: string; battleId?: string | null; releasedBy?: string }) => {
+    const sc: FakeScenario = {
+      id: `${String(s.scenarios.size + 1).padStart(8, '0')}-6666-4000-8000-000000000000`, campaignId, title: x.title, body: x.body ?? '', npcStatlines: x.npcStatlines ?? '',
+      visibility: x.battleId ? 'public' : 'leader', playedInBattle: x.battleId ?? null, releasedAt: x.battleId ? at() : null, releasedBy: x.battleId ? (x.releasedBy ?? 'Anna') : null,
+      edited: false, createdAt: at(), updatedAt: at(), seq: next(),
+    };
+    s.scenarios.set(sc.id, sc);
+    return sc;
+  };
+  const scenarioRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (method === 'GET' && rest === '/scenarios') {
+      const list = [...s.scenarios.values()].filter((x) => x.campaignId === c.id && scenarioShown(x, role));
+      const drafts = list.filter((x) => x.visibility === 'leader').sort((a, b) => b.seq - a.seq);
+      const played = list.filter((x) => x.visibility === 'public').sort((a, b) => (b.releasedAt ?? '').localeCompare(a.releasedAt ?? '') || b.seq - a.seq);
+      return json(200, { scenarios: [...drafts, ...played].map(scenarioView), seq: scenariosSeq(c.id, role) });
+    }
+    const m = rest.match(/^\/scenarios\/([^/]+)(\/release)?$/);
+    if (!m) return json(404, { error: 'not_found' });
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    const cur = s.scenarios.get(m[1]!);
+    const answer = (x: FakeScenario) => json(200, { scenario: scenarioView(x), seq: scenariosSeq(c.id, role) });
+    if (method === 'DELETE' && !m[2]) {
+      if (!cur || cur.campaignId !== c.id) return json(404, { error: 'not_found' });
+      if (cur.deleted) return json(200, { removed: false, seq: scenariosSeq(c.id, role) });
+      if (cur.visibility === 'public') return json(409, { error: 'released' });
+      Object.assign(cur, { deleted: true, seq: next() });
+      return json(200, { removed: true, seq: scenariosSeq(c.id, role) });
+    }
+    if (method === 'POST' && m[2]) {
+      if (!cur || cur.campaignId !== c.id || cur.deleted) return json(404, { error: 'not_found' });
+      const battle = s.battles.get(String(body.battleId));
+      if (!battle || battle.campaignId !== c.id) return json(400, { error: 'invalid', problem: 'no such battle in this campaign' });
+      if (cur.visibility === 'public') return cur.playedInBattle === battle.id ? answer(cur) : json(409, { error: 'released' });
+      Object.assign(cur, { visibility: 'public', playedInBattle: battle.id, releasedAt: at(), releasedBy: me.displayName, updatedAt: at(), seq: next() });
+      return answer(cur);
+    }
+    if (method !== 'PUT' || m[2]) return json(404, { error: 'not_found' });
+    if (cur?.deleted) return json(409, { error: 'removed' });
+    if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
+    const title = String(body.title ?? '').trim();
+    if (!title) return json(400, { error: 'invalid', problem: 'not a scenario (title: too small)' });
+    const fields = { title, body: String(body.body ?? ''), npcStatlines: String(body.npcStatlines ?? '') };
+    if (!cur) {
+      const sc: FakeScenario = { id: m[1]!, campaignId: c.id, ...fields, visibility: 'leader', playedInBattle: null, releasedAt: null, releasedBy: null, edited: false, createdAt: at(), updatedAt: at(), seq: next() };
+      s.scenarios.set(sc.id, sc);
+      return answer(sc);
+    }
+    if (cur.title === fields.title && cur.body === fields.body && cur.npcStatlines === fields.npcStatlines) return answer(cur);
+    if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: scenarioView(cur) });
+    Object.assign(cur, fields, { edited: true, updatedAt: at(), seq: next() });
+    return answer(cur);
+  };
+
   /* ---- pictures (as server/src/attachments.ts filters them) ---- */
   const pictureFor = (p: FakePicture, role: FakeRole) => !p.deleted && (p.visibility !== 'leader' || role === 'leader' || p.uploaderId === me.id) && (p.stored || p.uploaderId === me.id);
   const pictureView = (p: FakePicture) => ({
@@ -761,6 +826,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/background')) return backgroundRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/questions')) return questionRoutes(c, role, method, rest, body);
     if (rest.startsWith('/world')) return worldRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/scenarios')) return scenarioRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
@@ -982,5 +1048,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom };
 }

@@ -192,7 +192,8 @@ describe('a leader writes the world', () => {
     const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
     const user = userEvent.setup();
     at(`/campaign/${c.id}/world`);
-    await user.click(await screen.findByRole('button', { name: 'Record reputation' }));
+    await screen.findByRole('article', { name: 'The Ferrymen' }); // the world is in: only then is there anything to rate, and the button works
+    await user.click(screen.getByRole('button', { name: 'Record reputation' }));
     const r = screen.getByRole('dialog', { name: 'Record reputation' });
     await user.selectOptions(within(r).getByLabelText('Warband'), `${WARBAND} · Anna`);
     await user.click(within(r).getByLabelText('Why'));
