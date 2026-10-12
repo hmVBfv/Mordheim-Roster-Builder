@@ -2648,3 +2648,45 @@ Save, the closed sheet still held the new prologue in its field while the page
 already showed it, so `findByText` saw two matches and kept failing until the
 timeout. Looking for it in the prologue's own region fixed it; raising a
 timeout would only have hidden that.
+
+## October 12, 2026 (cont.) — the world, in the open
+
+The world of a campaign – factions, the people around them, and what each
+warband has earned with each faction – is the first piece of the story layer
+that every player reads. That is the point of it: reputation and who holds what
+are mechanics, and the table rule from the start is that mechanics are open
+(ADR 0002). So where the Background had to be built around who may not see
+something, the world is built around who may *write*: a leader with the
+authenticator, nobody else. A member reads everything, a viewer too; someone
+outside the campaign gets a 404, the admin included.
+
+I split 4b3 once more. Scenarios are a different animal – hidden until played,
+with rules and NPC values in the TTS format – and they overlap with the
+"scenario" kind of the Background, which is planning and ideas. That is a
+question of its own, so they are 4b3c. And one table from the data model never
+got built: `district_control`. Who holds which district already lives in each
+warband's own save (ADR 0016) and the campaign overview works the map out from
+it; a second table would have kept the same mechanic twice and let them
+disagree.
+
+Reputation is a log, not a number. An event has a warband, a faction, a step
+(never nothing), a reason and optionally a battle; the standing is the sum, and
+the app does the sum. An event is never edited – sent twice it is the same
+event, sent again with other content it is a conflict – a mistake is taken out
+and the log says who did. Removing a faction hides its people's affiliation and
+its events with it, but touches nothing else. The one thing that is easy to get
+wrong is what a leader puts into the open: a leader adds an NPC when the
+players may know it exists, the truth about it stays in the Background, and
+every form says so in one sentence at the top. The log of the server carries
+ids, never the words.
+
+On a phone the step of a reputation event cannot be a number field with a
+minus sign: Android's numeric keyboard often has none. The form asks "gains" or
+"loses" and an amount from 1 to 100 instead.
+
+Wrong turns. The first draft of the tab had three buttons named "Remove" in one
+card – the faction's and each person's – which is a test failure and also what a
+screen reader would have read out; the buttons now carry the name of what they
+remove. The first end-to-end run expected a standing of −3 where a warband
+already had +2; the test, not the app, had picked the wrong warband.
+
