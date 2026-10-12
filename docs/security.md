@@ -293,6 +293,18 @@ Leiter einer fremden Kampagne; keine Rolle darf sie je lesen. Die Antwort ist
 eine Notiz mit den Regeln der Notizen: versiegelt nur bis eine offene Schlacht
 geschlossen ist, nie „nur Leiter“ für einen Spieler.
 
+**Welt (Phase 4b3b):** Fraktionen, NPCs und Ruf sind Mechanik und damit offen
+(ADR 0002): `world.read` für jedes Mitglied, Zuschauer eingeschlossen, ohne
+Filter nach Rolle – wer in der Kampagne ist, liest alles; wer nicht, bekommt
+404 (auch der Admin). `world.write` nur Leiter mit Authenticator. Was verborgen
+sein soll, steht nicht hier: die Wahrheit über einen NPC bleibt im Hintergrund,
+und ein Leiter legt einen NPC erst an, wenn die Spieler von ihm wissen dürfen
+(die App sagt es über jedem Formular). Die Leak-Matrix hat Zeilen für beide
+Aktionen und alle sechs Schreibrouten. Ein Ruf-Ereignis wird nie geändert,
+nur herausgenommen; das Log (`world.*`, Sichtbarkeit `public`) trägt Kennungen
+und höchstens `delta` und Schlacht, nie Namen, Status oder Gründe. Obergrenzen
+je Kampagne: 100 Fraktionen, 500 NPCs, 5 000 Ereignisse.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

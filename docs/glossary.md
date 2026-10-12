@@ -210,10 +210,13 @@ Begriff einführt, trägt ihn hier ein.
 | Grenze für Andeutungen | Limit for hints | `hint_limits` |
 | Was die Spieler wissen | What the players know | `players_know` |
 | Wahrheit | Truth | `truth` (nur Leiter) |
+| Welt | World | `/campaign/:id/world`, `app/src/world/`; öffentliche Mechanik, offen für alle Mitglieder |
 | Fraktion | Faction | `factions` |
-| NPC | NPC | `npcs` |
-| Ruf | Reputation | `reputation_events` |
-| Bezirk | District | `district_control` |
+| NPC | NPC | `npcs` (Wahrheit bleibt im Hintergrund) |
+| Öffentlicher Status | Status everyone may read | `public_status` |
+| Ruf | Reputation | `reputation_events` (Ereignis-Log; Stand = Summe) |
+| Ruf eintragen | Record reputation | `PUT …/world/reputation/:rid`; wird nie geändert, nur herausgenommen („Take out“) |
+| Bezirk | District | abgeleitet aus den Ständen der Warbands (`campaignMap`), keine Tabelle |
 | Szenario | Scenario | `scenarios` |
 
 **Achtung Namensgleichheit:** `notes/roter-faden.md` im Chronik-Repo ist eine

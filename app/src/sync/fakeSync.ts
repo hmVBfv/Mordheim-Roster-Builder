@@ -86,6 +86,11 @@ export interface FakeQuestion {
   status: 'open' | 'answered' | 'withdrawn'; answerNoteId: string | null; createdAt: string; updatedAt: string; answeredAt: string | null; seq: number;
 }
 
+/** The campaign world (4b3b), as server/src/world.ts keeps it: open to every member, written by leaders. */
+export interface FakeFaction { id: string; campaignId: string; nameDe: string; nameEn: string; publicStatus: string; updatedAt: string; seq: number; deleted?: boolean }
+export interface FakeNpc { id: string; campaignId: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; updatedAt: string; seq: number; deleted?: boolean }
+export interface FakeReputation { id: string; campaignId: string; warbandId: string; factionId: string; delta: number; reason: string; battleId: string | null; actor: string; createdAt: string; seq: number; deleted?: boolean }
+
 export interface FakeShare {
   id: string; name: string; wbType: string; from: string; to: string | null; toId: string | null; code: string | null; data: unknown;
   createdAt: string; expiresAt: string; answeredAt: string | null; accepted: boolean | null; uses: number; revokedAt: string | null;
@@ -124,6 +129,9 @@ export function createFakeSync(opts: {
     chapters: new Map<string, FakeChapter>(),
     background: new Map<string, FakeBackground>(),
     questions: new Map<string, FakeQuestion>(),
+    factions: new Map<string, FakeFaction>(),
+    npcs: new Map<string, FakeNpc>(),
+    reputation: new Map<string, FakeReputation>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -407,6 +415,75 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
+  /* ---- the world (as server/src/world.ts: every member reads, a leader writes) ---- */
+  const liveFactions = (cid: string) => [...s.factions.values()].filter((f) => f.campaignId === cid && !f.deleted);
+  const worldOf = (cid: string) => {
+    const factions = liveFactions(cid).sort((a, b) => (a.nameEn || a.nameDe).localeCompare(b.nameEn || b.nameDe));
+    const live = new Set(factions.map((f) => f.id));
+    const c = s.campaigns.get(cid)!;
+    const strip = <T extends { campaignId: string; deleted?: boolean }>(x: T): Omit<T, 'campaignId' | 'deleted'> => { const rest: Partial<T> = { ...x }; delete rest.campaignId; delete rest.deleted; return rest as Omit<T, 'campaignId' | 'deleted'>; };
+    return {
+      factions: factions.map(strip),
+      npcs: [...s.npcs.values()].filter((n) => n.campaignId === cid && !n.deleted).sort((a, b) => (a.nameEn || a.nameDe).localeCompare(b.nameEn || b.nameDe))
+        .map((n) => strip({ ...n, factionId: n.factionId && live.has(n.factionId) ? n.factionId : null })),
+      reputation: [...s.reputation.values()].filter((e) => e.campaignId === cid && !e.deleted && live.has(e.factionId)).sort((a, b) => b.seq - a.seq)
+        .map((e) => ({ ...strip(e), warband: c.enrolments.find((x) => x.warbandId === e.warbandId)?.name || '(removed warband)' })),
+      seq: Math.max(0, ...[...s.factions.values(), ...s.npcs.values(), ...s.reputation.values()].filter((x) => x.campaignId === cid).map((x) => x.seq)),
+    };
+  };
+  /** A leader set up a faction earlier (or on another device). */
+  const factionFrom = (campaignId: string, f: { nameEn: string; nameDe?: string; publicStatus?: string }) => {
+    const ff: FakeFaction = { id: `${String(s.factions.size + 1).padStart(8, '0')}-3333-4000-8000-000000000000`, campaignId, nameDe: f.nameDe ?? '', nameEn: f.nameEn, publicStatus: f.publicStatus ?? '', updatedAt: at(), seq: next() };
+    s.factions.set(ff.id, ff);
+    return ff;
+  };
+  const npcFrom = (campaignId: string, n: { nameEn: string; nameDe?: string; factionId?: string | null; publicStatus?: string; statlineTts?: string }) => {
+    const nn: FakeNpc = { id: `${String(s.npcs.size + 1).padStart(8, '0')}-4444-4000-8000-000000000000`, campaignId, factionId: n.factionId ?? null, nameDe: n.nameDe ?? '', nameEn: n.nameEn, publicStatus: n.publicStatus ?? '', statlineTts: n.statlineTts ?? '', updatedAt: at(), seq: next() };
+    s.npcs.set(nn.id, nn);
+    return nn;
+  };
+  const reputationFrom = (campaignId: string, e: { warbandId: string; factionId: string; delta: number; reason: string; battleId?: string | null; actor?: string }) => {
+    const ee: FakeReputation = { id: `${String(s.reputation.size + 1).padStart(8, '0')}-5555-4000-8000-000000000000`, campaignId, warbandId: e.warbandId, factionId: e.factionId, delta: e.delta, reason: e.reason, battleId: e.battleId ?? null, actor: e.actor ?? 'Anna', createdAt: at(), seq: next() };
+    s.reputation.set(ee.id, ee);
+    return ee;
+  };
+  const worldRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (method === 'GET' && rest === '/world') return json(200, worldOf(c.id));
+    const m = rest.match(/^\/world\/(factions|npcs|reputation)\/([^/]+)$/);
+    if (!m) return json(404, { error: 'not_found' });
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    const [, kind, id] = m as unknown as [string, 'factions' | 'npcs' | 'reputation', string];
+    const table = (kind === 'factions' ? s.factions : kind === 'npcs' ? s.npcs : s.reputation) as Map<string, { campaignId: string; deleted?: boolean; seq: number }>;
+    const cur = table.get(id);
+    if (method === 'DELETE') {
+      if (!cur || cur.campaignId !== c.id) return json(404, { error: 'not_found' });
+      const was = !cur.deleted;
+      Object.assign(cur, { deleted: true, seq: next() });
+      return json(200, { ...worldOf(c.id), removed: was });
+    }
+    if (method !== 'PUT') return json(404, { error: 'not_found' });
+    if (cur?.deleted) return json(409, { error: 'removed' });
+    const named = (b: Record<string, unknown>) => String(b.nameDe ?? '').trim() !== '' || String(b.nameEn ?? '').trim() !== '';
+    if (kind === 'factions') {
+      if (!named(body)) return json(400, { error: 'invalid', problem: 'not a faction (nameEn: a name, in German or English)' });
+      const f: FakeFaction = { id, campaignId: c.id, nameDe: String(body.nameDe ?? '').trim(), nameEn: String(body.nameEn ?? '').trim(), publicStatus: String(body.publicStatus ?? '').trim(), updatedAt: at(), seq: next() };
+      s.factions.set(id, f);
+    } else if (kind === 'npcs') {
+      if (!named(body)) return json(400, { error: 'invalid', problem: 'not an NPC (nameEn: a name, in German or English)' });
+      const fid = (body.factionId as string | null | undefined) ?? null;
+      if (fid && !liveFactions(c.id).some((f) => f.id === fid)) return json(400, { error: 'invalid', problem: 'no such faction in this campaign' });
+      s.npcs.set(id, { id, campaignId: c.id, factionId: fid, nameDe: String(body.nameDe ?? '').trim(), nameEn: String(body.nameEn ?? '').trim(), publicStatus: String(body.publicStatus ?? '').trim(), statlineTts: String(body.statlineTts ?? ''), updatedAt: at(), seq: next() });
+    } else {
+      if (cur) return json(409, { error: 'exists' });
+      const delta = Number(body.delta);
+      if (!Number.isInteger(delta) || delta === 0 || Math.abs(delta) > 100 || !String(body.reason ?? '').trim()) return json(400, { error: 'invalid', problem: 'not a reputation event' });
+      if (!c.enrolments.some((e) => e.warbandId === body.warbandId && e.status === 'active')) return json(400, { error: 'invalid', problem: 'no such warband in this campaign' });
+      if (!liveFactions(c.id).some((f) => f.id === body.factionId)) return json(400, { error: 'invalid', problem: 'no such faction in this campaign' });
+      s.reputation.set(id, { id, campaignId: c.id, warbandId: String(body.warbandId), factionId: String(body.factionId), delta, reason: String(body.reason).trim(), battleId: (body.battleId as string | null) ?? null, actor: me.displayName, createdAt: at(), seq: next() });
+    }
+    return json(200, worldOf(c.id));
+  };
+
   /* ---- pictures (as server/src/attachments.ts filters them) ---- */
   const pictureFor = (p: FakePicture, role: FakeRole) => !p.deleted && (p.visibility !== 'leader' || role === 'leader' || p.uploaderId === me.id) && (p.stored || p.uploaderId === me.id);
   const pictureView = (p: FakePicture) => ({
@@ -683,6 +760,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/battles')) return battleRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/background')) return backgroundRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/questions')) return questionRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/world')) return worldRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
@@ -904,5 +982,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom };
 }
