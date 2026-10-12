@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: 27. September 2026 · Status: Entwurf für Phase 3/4, wird mit dem Code
+Stand: 12. Oktober 2026 · Status: Entwurf für Phase 3/4, wird mit dem Code
 fortgeschrieben. Bezeichner sind englisch, Erklärungen deutsch.
 
 ## 1. Grundsätze
@@ -177,8 +177,9 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 
 | Tabelle | Spalten | Hinweise |
 | --- | --- | --- |
-| `background_entries` | `id`, `campaign_id`, `kind` (`thread` · `figure` · `place` · `scenario` · `gm_note`), `title`, `truth`, `players_know`, `status` (`planned` · `active` · `resolved`), `reveal` (`hidden` · `hint` · `revealed`), `hint_limits`, `reveal_from_battle`, `refs` (JSON), `battle_id`, `updated_by`, `updated_at` | `visibility` ist immer `leader` |
-| `background_revisions` | `entry_id`, `snapshot` (JSON), `edited_by`, `edited_at` | |
+| `background_entries` | `id`, `campaign_id`, `kind` (`thread` · `figure` · `place` · `scenario` · `gm_note`), `title`, `truth`, `players_know`, `status` (`planned` · `active` · `resolved`), `reveal` (`hidden` · `hint` · `revealed`), `hint_limits`, `reveal_from_battle`, `refs` (JSON: `[{ kind, id, label }]`), `battle_id`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`, `seq` | seit Migration 15 (4b1). Lesen und schreiben nur Leiter mit Authenticator (`background.read`, `background.write`); für Spieler, Zuschauer und den Admin außerhalb der Kampagne gibt es nichts davon – in keiner Liste, keinem Sync, keinem Export, im Admin-Log nur als „etwas hat sich geändert“ (`visibility` `leader`, kein Wort aus dem Eintrag). `id` vom Gerät (doppelt gesendet: ein Eintrag). Höchstens 500 je Kampagne, Texte höchstens 20 KB. `seq`: `audit_log.seq` der letzten Änderung; eine Änderung braucht `baseSeq` (der Stand, von dem aus bearbeitet wurde), sonst 409 `stale` mit dem aktuellen Eintrag (zwei Leiter). `reveal`: `hidden` nichts, `hint` Andeutungen innerhalb von `hint_limits`, `revealed` öffentlich ab `reveal_from_battle`. `battle_id` hängt eine GM-Notiz oder ein geplantes Szenario an eine Schlacht. Herausgenommen: `deleted_at`, die Zeile und ihre Fassungen bleiben |
+| `background_revisions` | `entry_id`, `snapshot` (JSON), `edited_by`, `edited_at` | seit Migration 15: der Eintrag, wie er vor jeder Änderung, jedem Herausnehmen und jedem Enthüllen lautete; die letzten 50 je Eintrag |
+| `background_reveals` | `note_id`, `entry_id`, `battle_id`, `level` (`hint` · `revealed`), `revealed_by`, `revealed_at` | seit Migration 15: jedes Enthüllen (`POST …/background/:eid/reveal`). Das Einzige, was den Hintergrund verlässt, ist die öffentliche Notiz (`note_id`, Art `general`, Sichtbarkeit `public`) aus den Worten, die der Leiter dort schreibt; sie kommt an eine Stelle der Zeitleiste, der Eintrag steigt auf `level`, und `players_know` wächst um diese Worte. Die Wahrheit bleibt verborgen. Dieselbe Notiz-ID zweimal gesendet: einmal enthüllt |
 
 ### Welt
 

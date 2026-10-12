@@ -107,6 +107,10 @@ export const ACTIONS = {
   'battle.mark': { who: 'user', target: 'player' },
   /** Writing one's notes (and a leader correcting another's words) – leaders and players, not viewers. */
   'notes.write': { who: 'user', target: 'player' },
+  /** The background – the truth behind the story, ADR 0002 – read by the campaign's leaders alone, with the authenticator (phase 4b1). */
+  'background.read': { who: 'user', target: 'leader' },
+  /** Writing the background, taking entries out and revealing: leaders alone, with the authenticator (phase 4b1). */
+  'background.write': { who: 'user', target: 'leader' },
 } as const satisfies Record<string, { who: Who; target?: TargetKind }>;
 
 export type Action = keyof typeof ACTIONS;

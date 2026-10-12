@@ -8,6 +8,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { campaignById, roleIn, type CampaignRole, type CampaignRow } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { can, type Action, type Actor } from './policy.ts';
+import { AS_PLAYER, asksAsPlayer, PLAYER_VIEW } from './viewer.ts';
 import { campaignEntries, campaignMarks, campaignOutcomes, ITEM_TYPES, listPositions, moveBlock, type ItemType } from './timeline.ts';
 import { chapterById, ChapterBody, chapterOf, listChapters, putChapter, removeChapter, summaryOf } from './chapters.ts';
 
@@ -32,11 +33,14 @@ export function registerTimelineRoutes(app: FastifyInstance, deps: TimelineDeps)
   };
   const viewer = (a: Actor, role: CampaignRole) => ({ id: a.id, leader: can(a, 'campaign.manage', { role }) });
 
-  app.get('/api/v1/campaigns/:id/timeline', { config: { action: 'campaign.read' } }, async (req, reply) => {
+  app.get('/api/v1/campaigns/:id/timeline', {
+    config: { action: 'campaign.read' },
+    schema: { querystring: { type: 'object', properties: { ...AS_PLAYER } } },
+  }, async (req, reply) => {
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
     return {
-      positions: listPositions(db(), t.c.id, viewer(req.actor!, t.role)), entries: campaignEntries(db(), t.c.id), outcomes: campaignOutcomes(db(), t.c.id), marks: campaignMarks(db(), t.c.id),
+      positions: listPositions(db(), t.c.id, asksAsPlayer(req) ? PLAYER_VIEW : viewer(req.actor!, t.role)), entries: campaignEntries(db(), t.c.id), outcomes: campaignOutcomes(db(), t.c.id), marks: campaignMarks(db(), t.c.id),
       chapters: listChapters(db(), t.c.id),
     };
   });

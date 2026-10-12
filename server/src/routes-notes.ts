@@ -7,6 +7,7 @@ import { campaignById, roleIn, type CampaignRole, type CampaignRow } from './cam
 import type { DB } from './db.ts';
 import { deleteNote, listNotes, NoteBody, noteById, notesSeq, oneNote, putNote } from './notes.ts';
 import { can, type Action, type Actor } from './policy.ts';
+import { AS_PLAYER, asksAsPlayer, PLAYER_VIEW } from './viewer.ts';
 
 export interface NoteDeps { db: DB | null; now: () => Date }
 
@@ -34,10 +35,12 @@ export function registerNoteRoutes(app: FastifyInstance, deps: NoteDeps): void {
 
   app.get('/api/v1/campaigns/:id/notes', {
     config: { action: 'campaign.read' },
-    schema: { querystring: { type: 'object', properties: { since: { type: 'integer', minimum: 0 } } } },
+    schema: { querystring: { type: 'object', properties: { since: { type: 'integer', minimum: 0 }, ...AS_PLAYER } } },
   }, async (req, reply) => {
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
+    // "view as player" (4b1): what a player would get, never kept as the device's own list
+    if (asksAsPlayer(req)) return { notes: listNotes(db(), t.c.id, PLAYER_VIEW), seq: notesSeq(db(), t.c.id, PLAYER_VIEW) };
     const seq = notesSeq(db(), t.c.id, viewer(req.actor!, t.role));
     const since = (req.query as { since?: number }).since;
     // exactly the number the device has: one that is higher means something it saw is hidden now (a public note turned leaders')

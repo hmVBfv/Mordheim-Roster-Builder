@@ -264,6 +264,21 @@ Anfrage der App nennt das Konto, für das sie gemacht ist
 nicht für dieses, sondern mit 409 `other_user`. Aus welcher eigenen Warband eine
 eingetragene Kopie stammt (`copiedFrom`), erfährt nur ihr Besitzer.
 
+**Hintergrund (Phase 4b1):** `background.read` und `background.write` nur
+Leiter mit Authenticator; ein Spieler, ein Zuschauer oder ein Leiter ohne
+Authenticator bekommt 403, wer nicht Mitglied ist (der Admin eingeschlossen)
+404. Der Inhalt steht in keiner anderen Antwort: nicht in Notizen,
+Zeitleiste, Sync oder Schlachten, und im Admin-Log nur als Aktion mit
+Sichtbarkeit `leader` ohne ein Wort aus dem Eintrag. Die Leak-Matrix legt
+Einträge mit Merkwort in einer fremden Kampagne an. Einzige Tür nach außen
+ist das Enthüllen: eine öffentliche Notiz aus den Worten, die der Leiter dort
+selbst schreibt. „Als Spieler ansehen“ (`?as=player`) verengt nur: der
+Betrachter ist niemand Bestimmtes, also auch nicht der Autor eigener
+versiegelter oder Leiter-Notizen. Das Gerät eines Leiters hält die zuletzt
+gesehene Liste (pro Konto getrennt, wie die Notizen). Grenze wie bei
+versiegelten Notizen: wer die Datenbank oder die Backups lesen kann, liest
+auch den Hintergrund.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

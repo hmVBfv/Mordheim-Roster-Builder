@@ -203,6 +203,10 @@ Begriff einführt, trägt ihn hier ein.
 | GM-Notiz | GM note | `kind: 'gm_note'` |
 | Enthüllungsstufe | Reveal level | `reveal: 'hidden' · 'hint' · 'revealed'` |
 | Enthüllen | Reveal | Aktion, erzeugt öffentliche Notiz |
+| Als Spieler ansehen | View as player | `?as=player` (Notizen, Bilder); nur Leiter, nur verengend |
+| Grenze für Andeutungen | Limit for hints | `hint_limits` |
+| Was die Spieler wissen | What the players know | `players_know` |
+| Wahrheit | Truth | `truth` (nur Leiter) |
 | Fraktion | Faction | `factions` |
 | NPC | NPC | `npcs` |
 | Ruf | Reputation | `reputation_events` |

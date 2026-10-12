@@ -91,6 +91,7 @@ export function NotesTab({ id, view, user, lead }: { id: string; view: CampaignV
         <div className={ui.row}>
           <button type="button" className={ui.button} onClick={() => open(null)}>New note</button>
           <button type="button" className={ui.buttonQuiet} onClick={() => { setFormKey((k) => k + 1); pictureSheet.open(); }}>New picture</button>
+          {lead && <Link to={`/campaign/${id}/as-player`} className={ui.buttonQuiet}>View as player</Link>}
         </div>
       )}
       {error && <p className={ui.message} role="status">{error}{notes ? ' Shown as last seen.' : ''}</p>}

@@ -14,6 +14,7 @@ import { startAccounts } from './accounts-helpers.ts';
 import { putAttachment, storeFile } from '../src/attachments.ts';
 import { putPastBattle } from '../src/history.ts';
 import { putChapter } from '../src/chapters.ts';
+import { putEntry as putBackground } from '../src/background.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
 
@@ -120,6 +121,16 @@ describe('leak-test matrix', () => {
     };
     const chapterId = chapter(theirs, victim.id);
     const ledChapterId = chapter(led, admin.id);
+    // the background: truths in the victim's campaign no role of the matrix may ever read; plain entries in the admin's, which the probes read, reveal and take out
+    const background = (c: { id: string }, by: string, title: string, truth: string) => {
+      const eid = randomUUID();
+      const r = putBackground(s.db, c.id, eid, { kind: 'thread', title, truth, playersKnow: '', status: 'active', reveal: 'hidden', hintLimits: '', revealFromBattle: null, refs: [], battleId: null, baseSeq: 0 }, by, t0);
+      if (!r.ok) throw new Error(r.error);
+      return eid;
+    };
+    background(theirs, victim.id, 'BACKGROUND-SECRET: who pays the ferryman', 'BACKGROUND-SECRET: the Countess pays him.');
+    const ledBackgroundId = background(led, admin.id, 'The ferryman', 'He is paid by somebody.');
+    const spareBackgroundId = background(led, admin.id, 'A spare', 'To be taken out.');
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -128,7 +139,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {
