@@ -10,7 +10,6 @@ import { ApiError, errorText } from '../account/api.ts';
 import styles0 from '../account/Account.module.css';
 import { useSession } from '../account/session.ts';
 import { listPeople, type Person } from '../share/shares.ts';
-import { useWarbands } from '../sync/local.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
@@ -24,6 +23,11 @@ import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
 import { TimelineTab } from '../timeline/Timeline.tsx';
 import { BackgroundTab } from '../background/Background.tsx';
+import { openItems } from '../open/items.ts';
+import { OpenList } from '../open/OpenList.tsx';
+import { QuestionsTab } from '../questions/Questions.tsx';
+import { useQuestions } from '../questions/useQuestions.ts';
+import { useWarbands } from '../sync/local.ts';
 import { AsPlayerTab } from '../notes/AsPlayer.tsx';
 import { battleTitle } from '../battle/api.ts';
 
@@ -131,14 +135,6 @@ function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => v
   );
 }
 
-/** The closed battles one of the user's warbands fought and has not marked yet – not those of the history, played before the app (4a5). */
-export function openAftermaths(view: CampaignView, me: string): { battleId: string; warbandId: string; label: string }[] {
-  const mine = view.enrolments.filter((e) => e.playerId === me && e.status === 'active');
-  return (view.battles ?? []).filter((b) => b.status === 'closed' && !b.takenOver).flatMap((b) => mine
-    .filter((e) => (b.warbandIds ?? []).includes(e.warbandId) && !(b.marked ?? []).includes(e.warbandId))
-    .map((e) => ({ battleId: b.id, warbandId: e.warbandId, label: `${battleTitle(b)} · ${e.name || e.wbName}` })));
-}
-
 /** Who holds which district (phase 4a4): a sole foothold is control, as the Roster Builder's campaign file worked it out. */
 export function campaignMap(view: CampaignView): { id: string; name: string; holders: string[] }[] {
   const by = new Map<string, { id: string; name: string; holders: string[] }>();
@@ -153,22 +149,15 @@ export function campaignMap(view: CampaignView): { id: string; name: string; hol
 }
 
 function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignView; me: string; lead: boolean; onView: (v: CampaignView) => void }) {
-  const open = openAftermaths(view, me);
+  const questions = useQuestions(id, view.role !== 'viewer');
+  const local = useWarbands();
+  const open = openItems(view, me, questions.data?.questions ?? [], local ?? []);
   return (
     <div className={styles.columns}>
       {open.length > 0 && (
         <section className={`${styles.section} ${styles.wide}`} aria-labelledby="c-open">
           <h2 id="c-open">Open for you</h2>
-          <ul className={styles.list}>
-            {open.map((o) => (
-              <li key={`${o.battleId}:${o.warbandId}`}>
-                <Link to={`/warbands/${o.warbandId}/aftermath/${o.battleId}`} className={styles.entry}>
-                  <span>Aftermath<small>{o.label}</small></span>
-                  <span className={`${styles.chip} ${styles.waiting}`}>to mark</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <OpenList items={open} />
         </section>
       )}
       <section className={styles.section} aria-labelledby="c-warbands">
@@ -372,6 +361,7 @@ export function Campaign() {
   const manage = tab === 'manage' && lead;
   const notes = tab === 'notes';
   const timeline = tab === 'timeline';
+  const questions = tab === 'questions' && view.role !== 'viewer';
   // the background and the view as a player: leaders with the authenticator only (the server refuses anyone else)
   const background = tab === 'background' && lead && user.totp;
   const asPlayer = tab === 'as-player' && lead && user.totp;
@@ -386,6 +376,7 @@ export function Campaign() {
         <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
         <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
         <NavLink to={`/campaign/${id}/timeline`}>Timeline</NavLink>
+        {view.role !== 'viewer' && <NavLink to={`/campaign/${id}/questions`}>Questions</NavLink>}
         {lead && user.totp && <NavLink to={`/campaign/${id}/background`}>Background ⚑</NavLink>}
         {lead && <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>}
       </nav>
@@ -393,13 +384,15 @@ export function Campaign() {
         ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
         : notes
           ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
-          : background
-            ? <BackgroundTab id={id} view={view} />
-            : asPlayer
-              ? <AsPlayerTab id={id} view={view} />
-              : timeline
-                ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
-                : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
+          : questions
+            ? <QuestionsTab id={id} view={view} user={user} lead={lead && user.totp} />
+            : background
+              ? <BackgroundTab id={id} view={view} />
+              : asPlayer
+                ? <AsPlayerTab id={id} view={view} />
+                : timeline
+                  ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
+                  : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>

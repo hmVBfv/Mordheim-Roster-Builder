@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
 import { useWarbands } from '../sync/local.ts';
 import { useSession } from '../account/session.ts';
-import { Incoming } from '../share/Incoming.tsx';
+import { HomeOpen } from '../open/HomeOpen.tsx';
 import ui from '../ui/ui.module.css';
 import { ImportSheet } from './ImportSheet.tsx';
 import { WarbandList } from './WarbandList.tsx';
@@ -17,7 +17,7 @@ export function Home() {
       {FLAVOUR === 'campaign' && (
         <div className={ui.card}>
           <h2>Open for you</h2>
-          {session.status === 'in' ? <Incoming /> : <p className={ui.muted}>Nothing waiting. Questions, sealed notes and battles to write up will appear here once you are part of a campaign.</p>}
+          {session.status === 'in' ? <HomeOpen me={session.user.id} /> : <p className={ui.muted}>Nothing waiting. Questions, sealed notes and battles to write up will appear here once you are part of a campaign.</p>}
         </div>
       )}
       <div>
