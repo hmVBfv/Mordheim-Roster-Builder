@@ -148,7 +148,7 @@ Begriff einführt, trägt ihn hier ein.
 | ohne Anlass | no cause found (without a cause) | `unexplained` |
 | ausgesetzt (Runde) | Sat out battle N | Tag `sat_out` |
 | Runde weiterschalten | Move on to After battle N | `POST /campaigns/:id/rounds/advance` |
-| Offen für dich | Open for you | `openAftermaths()` in der Übersicht der Kampagne |
+| Offen für dich | Open for you | `openItems()` (`app/src/open/items.ts`) in der Übersicht der Kampagne: Frage, Nachbereitung, Zwischenspiel |
 | Hausregeln | House rules | `house_rules`, `S.house` |
 | Zeitleiste | Timeline | `/campaign/:id/timeline`, `app/src/timeline/` |
 | Abschnitt (der Zeitleiste) | before · course · aftermath · Interlude N · Before the campaign | Segment `pre`, `b<id>:before|battle|after`, `i<n>` |
@@ -198,6 +198,9 @@ Begriff einführt, trägt ihn hier ein.
 | Deutsch | Englisch (UI) | Code |
 | --- | --- | --- |
 | Hintergrund | Background | `background_entries` |
+| Frage an Spieler | Question | Tabelle `questions`, `/campaign/:id/questions`; sehen nur Leiter und der Gefragte |
+| Antworten (auf eine Frage) | Answer | `POST …/questions/:qid/answer`: erzeugt die Notiz des Gefragten |
+| zurückgezogene Frage | Withdrawn | `status: 'withdrawn'`; kann wieder gestellt werden („Ask again“) |
 | Handlungsstrang | Plot thread | `kind: 'thread'` |
 | Figur | Figure | `kind: 'figure'` |
 | GM-Notiz | GM note | `kind: 'gm_note'` |
@@ -224,7 +227,7 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Kampagnenserver | Campaign app | Variante `campaign`, `server/` |
 | Schnellbau | Quick Build | Variante `quickbuild`, GitHub Pages |
 | Variante (der App) | Flavour | Build-Modus `campaign` / `quickbuild`, `app/src/flavour.ts` |
-| Offen für dich | Open for you | Startseite, `app/src/routes/Home.tsx` |
+| Offen für dich | Open for you | Startseite, `app/src/routes/Home.tsx` → `app/src/open/HomeOpen.tsx` (alle Kampagnen, zuletzt Gesehenes ohne Verbindung) |
 | Auf diesem Gerät gespeichert | Saved on this device | `app/src/app/SyncState.tsx` |
 | Neue Version – neu laden | New version available · Reload | `app/src/app/UpdateBanner.tsx` |
 | Gerätespeicher | Device store | Dexie-Datenbank `mordheim`, `app/src/db/db.ts` |
