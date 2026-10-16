@@ -23,3 +23,6 @@ export async function copyText(text: string): Promise<boolean> {
     return false;
   }
 }
+
+/** A name safe for a file: lower case, letters and digits, dashes between. */
+export const fileSlug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'campaign';
