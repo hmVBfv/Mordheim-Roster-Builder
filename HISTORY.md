@@ -2798,3 +2798,22 @@ Looking at what "equipment and warband changes" the pack really carried turned
 up a gap: gear taken up or given up, and gold, were frozen into every mark but
 never listed by the pack (the old briefing left them out as bookkeeping). They
 now have their own section, "Equipment and gold", found by a failing test first.
+
+## October 16, 2026 — the whole story in one place
+
+The chapters of the chronicle already stood in the Timeline, each at the head of
+the part of the story it tells. The Chronicle tab reads them the other way
+round: the story as a book, chapter after chapter, for everyone including
+viewers (published means public, ADR 0002). It needs nothing new from the
+server: the order is the Timeline's own (built without notes and pictures,
+which a reader of the story does not need), and the text of a chapter is
+fetched when it is opened, kept on the device like before. A chapter that
+exists only in the other language is shown in that one and says so, rather
+than disappearing from a language the reader chose; the downloaded `.md` marks
+the same chapters the same way.
+
+The tab was planned together with the import of new chapters as drafts. I split
+it: reading and downloading are done and need no migration; drafts, with the
+check for words from hidden background and a leader's approval before anything
+becomes public, come next as their own step, because a draft is exactly the kind
+of text that must not be readable by players.
