@@ -870,6 +870,64 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Chapters as drafts (phase 4b5b): a leader brings a chapter in, is warned of hidden words, publishes it. */
+const DRAFT_DE = 'Gerhard Voss wartete am Steg, die Münze mit dem Aal in der Hand.\n\nDie Aalmünze glänzte nass. Der Nebel stieg über der Stir, und niemand sprach ein Wort.';
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`chapter drafts: a leader brings one in, is warned of hidden words and publishes it, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    const b = srv.addBattle(c.id, { title: 'City Hall' });
+    b.status = 'closed';
+    b.closedAt = '2026-10-04T13:00:00.000Z';
+    srv.backgroundFrom(c.id, { kind: 'figure', title: 'The ferryman', truth: 'Gerhard Voss ferries the Countess across the Stir. He kills witnesses.', playersKnow: 'A ferryman takes coin.', status: 'active', reveal: 'hidden' });
+    srv.backgroundFrom(c.id, { kind: 'thread', title: 'Aalmünze', truth: 'Die Gräfin bezahlt die Fährleute mit einer Aalmünze.', playersKnow: 'Eine Münze mit einem Aal.', status: 'active', reveal: 'hint', hintLimits: 'a coin, an eel, wet money' });
+    await page.goto(`campaign/${c.id}/chronicle`);
+    await expect(page.getByRole('heading', { name: /Drafts/ })).toBeVisible();
+    await expect(page.getByText('No draft yet.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-drafts-empty`);
+
+    // bring one in from a file: the front matter fills the form, the check runs as it is read
+    await page.getByRole('button', { name: 'Bring in a chapter' }).click();
+    const form = page.getByRole('dialog', { name: 'Bring in a chapter' });
+    await form.getByLabel('From a file (optional)').setInputFiles(chapterFile('2026-10-12-das-rathaus.md', 'ref: "battle-1"\ntitle: "Das Rathaus"\nchapter: "Erste Schlacht"\nlang: "de"', DRAFT_DE));
+    await expect(form.getByLabel('Title')).toHaveValue('Das Rathaus');
+    await expect(form.getByRole('list', { name: 'Words of the hidden background' })).toContainText('Gerhard');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-drafts-form`);
+    await form.getByRole('button', { name: 'Save the draft' }).click();
+    const list = page.getByRole('list', { name: 'Drafts' });
+    await expect(list.getByRole('listitem')).toHaveCount(1);
+    await expect(page.getByRole('list', { name: 'Chapters' }).getByRole('listitem')).toHaveCount(0);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-drafts-list`);
+
+    // review: the words found, what a hint may say; publishing needs the leader's knowing yes
+    await page.getByRole('button', { name: 'Review Das Rathaus' }).click();
+    const review = page.getByRole('dialog', { name: 'Das Rathaus' });
+    await expect(review.getByRole('list', { name: 'Words of the hidden background' })).toContainText('Allowed: a coin, an eel, wet money');
+    const publish = review.getByRole('button', { name: 'Publish anyway' });
+    await expect(publish).toBeDisabled();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-drafts-review`);
+    await review.getByLabel('I have read the places above and publish anyway').check();
+    await expect(publish).toBeEnabled();
+    await publish.click();
+    await expect(page.getByText('“Das Rathaus” is published in Deutsch. Everyone in the campaign can read it now.')).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Chapters' }).getByRole('listitem')).toHaveCount(1);
+    await expect(list.getByRole('listitem')).toHaveCount(0);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-drafts-published`);
+  });
+}
+
 /* The AI pack and the style guide (phase 4b4a): a leader's prompt for whoever writes the next chapter, and the style it carries. */
 function packScene(srv: Awaited<ReturnType<typeof playServer>>) {
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });

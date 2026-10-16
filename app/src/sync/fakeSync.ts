@@ -48,6 +48,11 @@ export interface FakeChapter {
   id: string; campaignId: string; refKey: string; kind: string; publishedOn: string | null; createdAt: string; updatedAt: string;
   de: Record<string, string> | null; en: Record<string, string> | null; deleted?: boolean;
 }
+/** A chapter draft (4b5b): a leaders' own text, not yet a chapter. */
+export interface FakeDraft {
+  id: string; campaignId: string; refKey: string; kind: string; lang: 'de' | 'en'; title: string; label: string; icDate: string; place: string; victor: string; text: string;
+  status: 'draft' | 'published'; createdBy: string; createdAt: string; updatedAt: string; seq: number; deleted?: boolean;
+}
 export interface FakeTotals { rating: number; spent: number; models: number; heroes: number; gold: number; fallen: number }
 export interface FakeChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
 export interface FakeTag {
@@ -141,6 +146,8 @@ export function createFakeSync(opts: {
     scenarios: new Map<string, FakeScenario>(),
     /** The style guide per campaign (4b4a); none until a leader writes one. */
     styles: new Map<string, { text: string; updatedBy: string; updatedAt: string; seq: number }>(),
+    /** Chapter drafts (4b5b), leaders' own. */
+    drafts: new Map<string, FakeDraft>(),
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -635,6 +642,73 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
+  const chapterSummary = (ch: FakeChapter) => {
+    const short = (l: Record<string, string> | null) => { if (!l) return null; const { text, ...rest } = l; return { ...rest, length: (text ?? '').length }; };
+    return { id: ch.id, refKey: ch.refKey, kind: ch.kind, publishedOn: ch.publishedOn, createdAt: ch.createdAt, updatedAt: ch.updatedAt, de: short(ch.de), en: short(ch.en) };
+  };
+
+  /* ---- chapter drafts (as server/src/routes-drafts.ts: leaders only) ---- */
+  const draftView = (d: FakeDraft) => ({
+    id: d.id, refKey: d.refKey, kind: d.kind, lang: d.lang, title: d.title, label: d.label, icDate: d.icDate, place: d.place, victor: d.victor, text: d.text,
+    createdBy: d.createdBy, createdAt: d.createdAt, updatedAt: d.updatedAt, seq: d.seq,
+  });
+  const draftsOf = (cid: string) => [...s.drafts.values()].filter((d) => d.campaignId === cid && d.status === 'draft' && !d.deleted);
+  const draftsSeq = (cid: string) => Math.max(0, ...[...s.drafts.values()].filter((d) => d.campaignId === cid).map((d) => d.seq));
+  /** A leader brought a draft in earlier (or on another device). */
+  const draftFrom = (campaignId: string, x: { title: string; text: string; refKey?: string; kind?: string; lang?: 'de' | 'en'; label?: string; by?: string }) => {
+    const d: FakeDraft = {
+      id: `${String(s.drafts.size + 1).padStart(8, '0')}-7777-4000-8000-000000000000`, campaignId, refKey: x.refKey ?? 'battle-1', kind: x.kind ?? 'battle', lang: x.lang ?? 'de',
+      title: x.title, label: x.label ?? '', icDate: '', place: '', victor: '', text: x.text, status: 'draft', createdBy: x.by ?? 'Anna', createdAt: at(), updatedAt: at(), seq: next(),
+    };
+    s.drafts.set(d.id, d);
+    return draftView(d);
+  };
+  const draftRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    if (method === 'GET' && rest === '/chapter-drafts') return json(200, { drafts: draftsOf(c.id).sort((x, y) => y.seq - x.seq).map(draftView), seq: draftsSeq(c.id) });
+    const m = rest.match(/^\/chapter-drafts\/([^/]+)(\/publish)?$/);
+    if (!m) return json(404, { error: 'not_found' });
+    const cur = s.drafts.get(m[1]!);
+    if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
+    if (method === 'PUT' && !m[2]) {
+      if (typeof body.title !== 'string' || !body.title.trim() || typeof body.text !== 'string' || !body.text || body.text.length > 200_000) return json(400, { error: 'invalid', problem: 'not a chapter draft (title or text)' });
+      if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(String(body.refKey)) || !['de', 'en'].includes(String(body.lang))) return json(400, { error: 'invalid', problem: 'not a chapter draft (refKey or lang)' });
+      const fields = { refKey: String(body.refKey), kind: String(body.kind), lang: body.lang as 'de' | 'en', title: String(body.title).trim(), label: String(body.label ?? ''), icDate: String(body.icDate ?? ''), place: String(body.place ?? ''), victor: String(body.victor ?? ''), text: body.text };
+      if (!cur) {
+        if (draftsOf(c.id).length >= 100) return json(409, { error: 'full' });
+        const d: FakeDraft = { id: m[1]!, campaignId: c.id, ...fields, status: 'draft', createdBy: me.displayName, createdAt: at(), updatedAt: at(), seq: next() };
+        s.drafts.set(d.id, d);
+        return json(200, { draft: draftView(d), seq: draftsSeq(c.id) });
+      }
+      if (cur.deleted || cur.status === 'published') return json(409, { error: cur.deleted ? 'removed' : 'published' });
+      if (Object.entries(fields).every(([k, v]) => (cur as unknown as Record<string, unknown>)[k] === v)) return json(200, { draft: draftView(cur), seq: draftsSeq(c.id) });
+      if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: draftView(cur) });
+      Object.assign(cur, fields, { updatedAt: at(), seq: next() });
+      return json(200, { draft: draftView(cur), seq: draftsSeq(c.id) });
+    }
+    if (!cur || cur.deleted) return json(404, { error: 'not_found' });
+    if (method === 'DELETE' && !m[2]) {
+      if (cur.status === 'published') return json(409, { error: 'published' });
+      cur.deleted = true;
+      cur.seq = next();
+      return json(200, { removed: true, seq: draftsSeq(c.id) });
+    }
+    if (method === 'POST' && m[2]) {
+      const lang = { label: cur.label, title: cur.title, icDate: cur.icDate, place: cur.place, victor: cur.victor, text: cur.text };
+      const there = [...s.chapters.values()].find((ch) => ch.campaignId === c.id && ch.refKey === cur.refKey && !ch.deleted);
+      const place = body.at as { segment: string; pos: string } | undefined;
+      if (!there && !place) return json(400, { error: 'invalid', problem: 'a new chapter needs its place in the story' });
+      const ch: FakeChapter = there ?? { id: cur.id, campaignId: c.id, refKey: cur.refKey, kind: cur.kind, publishedOn: (body.publishedOn as string | null) ?? at().slice(0, 10), createdAt: at(), updatedAt: at(), de: null, en: null };
+      ch[cur.lang] = lang;
+      ch.updatedAt = at();
+      s.chapters.set(ch.id, ch);
+      if (place) s.positions.set(`chapter:${ch.id}`, { campaignId: c.id, itemType: 'chapter', itemId: ch.id, segment: place.segment, pos: place.pos, movedBy: me.id, movedAt: at() });
+      Object.assign(cur, { status: 'published' as const, seq: next() });
+      return json(200, { chapter: chapterSummary(ch), seq: draftsSeq(c.id) });
+    }
+    return json(404, { error: 'not_found' });
+  };
+
   /* ---- the timeline (as server/src/timeline.ts gives it) ---- */
   const timelineRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response | null => {
     const battles = [...s.battles.values()].filter((b) => b.campaignId === c.id);
@@ -644,10 +718,7 @@ export function createFakeSync(opts: {
       if (type === 'chapter') { const ch = s.chapters.get(id); return ch && ch.campaignId === c.id && !ch.deleted ? {} : null; }
       return battles.flatMap((b) => b.entries).find((e) => e.id === id && !e.deleted) ?? null;
     };
-    const summary = (ch: FakeChapter) => {
-      const short = (l: Record<string, string> | null) => { if (!l) return null; const { text, ...rest } = l; return { ...rest, length: (text ?? '').length }; };
-      return { id: ch.id, refKey: ch.refKey, kind: ch.kind, publishedOn: ch.publishedOn, createdAt: ch.createdAt, updatedAt: ch.updatedAt, de: short(ch.de), en: short(ch.en) };
-    };
+    const summary = chapterSummary;
     const chapters = [...s.chapters.values()].filter((ch) => ch.campaignId === c.id && !ch.deleted);
     const cm = rest.match(/^\/chapters\/([^/]+)$/);
     if (cm) {
@@ -853,6 +924,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/world')) return worldRoutes(c, role, method, rest, body);
     if (rest.startsWith('/scenarios')) return scenarioRoutes(c, role, method, rest, body);
     if (rest.startsWith('/style')) return styleRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/chapter-drafts')) return draftRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
@@ -1074,5 +1146,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, draftFrom };
 }

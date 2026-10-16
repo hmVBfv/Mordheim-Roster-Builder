@@ -15,6 +15,7 @@ import { fileSlug, saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
 import styles from './Chronicle.module.css';
 import { chronicleMarkdown, LANG_NAMES, told } from './download.ts';
+import { DraftsSection } from '../drafts/Drafts.tsx';
 
 const KIND: Record<string, string> = { prologue: 'Prologue', battle: 'Battle', interlude: 'Interlude', chapter: 'Chapter' };
 
@@ -40,7 +41,7 @@ function ChapterText({ cid, c, lang }: { cid: string; c: ChapterSummary; lang: L
   );
 }
 
-export function ChronicleTab({ id, view }: { id: string; view: CampaignView }) {
+export function ChronicleTab({ id, view, lead }: { id: string; view: CampaignView; lead: boolean }) {
   const [data, setData] = useState<TimelineData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lang, setLang] = useState<Lang>('de');
@@ -54,6 +55,9 @@ export function ChronicleTab({ id, view }: { id: string; view: CampaignView }) {
     getTimeline(id).then((d) => { if (live) { setData(d); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
     return () => { live = false; };
   }, [id]);
+
+  /** After a draft was published: the timeline anew, so the chapter is there. */
+  const reload = useCallback(() => { getTimeline(id).then((d) => { setData(d); setError(null); }).catch((e: unknown) => setError(errorText(e))); }, [id]);
 
   // the chapters in the order of the story, each with the part of the story it stands in
   const chapters = useMemo(() => (data
@@ -77,7 +81,7 @@ export function ChronicleTab({ id, view }: { id: string; view: CampaignView }) {
 
   return (
     <div className={ui.page}>
-      <p className={ui.muted}>The whole story as written, chapter by chapter, for everyone in the campaign. A leader brings chapters in on the Timeline.</p>
+      <p className={ui.muted}>The whole story as written, chapter by chapter, for everyone in the campaign. A leader brings chapters in{lead ? ' – as drafts below, or finished files on the Timeline' : ''}.</p>
       <div className={styles.bar}>
         <div className={styles.langs} role="group" aria-label="Language">
           {(['de', 'en'] as const).map((l) => (
@@ -113,6 +117,7 @@ export function ChronicleTab({ id, view }: { id: string; view: CampaignView }) {
           );
         })}
       </ol>
+      {lead && <DraftsSection id={id} view={view} chapters={data?.chapters ?? []} onPublished={reload} />}
     </div>
   );
 }
