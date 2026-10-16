@@ -938,3 +938,38 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect.poll(() => srv.state.styles.get(c.id)?.text, { timeout: 8000 }).toMatch(/close third person/);
   });
 }
+
+/* The Chronicle tab (phase 4b5a): the whole story as written, read chapter by chapter in either language, downloaded as one file. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Chronicle tab: a player reads the story and downloads it, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
+    const b = srv.addBattle(c.id, { title: 'City Hall' });
+    b.status = 'closed';
+    b.closedAt = '2026-10-04T13:00:00.000Z';
+    const lang = (label: string, title: string, text: string, o: { icDate?: string; place?: string; victor?: string } = {}) => ({ label, title, icDate: '', place: '', victor: '', ...o, text });
+    const put = (id: string, refKey: string, kind: string, day: string, de: ReturnType<typeof lang> | null, en: ReturnType<typeof lang> | null, segment: string) => {
+      srv.state.chapters.set(id, { id, campaignId: c.id, refKey, kind, publishedOn: day, createdAt: '2026-10-09T10:00:00.000Z', updatedAt: '2026-10-09T10:00:00.000Z', de, en });
+      srv.state.positions.set(`chapter:${id}`, { campaignId: c.id, itemType: 'chapter', itemId: id, segment, pos: '05', movedBy: 'u2', movedAt: '2026-10-09T10:00:00.000Z' });
+    };
+    put('0000000c-0000-4000-8000-000000000001', 'prolog', 'prologue', '2026-06-01', lang('Prolog', 'Der Weg nach Mordheim', 'Der Regen hatte die Straße nach Mordheim in einen Bach aus Lehm verwandelt, als **Ulrich der Graue** seine Leute zum letzten Mal zählte.\n\nSieben. Mehr waren es nicht.'), lang('Prologue', 'The road to Mordheim', 'The rain had turned the road to mud.'), 'pre');
+    put('0000000c-0000-4000-8000-000000000002', 'battle-1', 'battle', '2026-06-08', lang('Kapitel 1', 'Das Rathaus', 'Das Rathaus stand noch, wenn man es so nennen wollte.', { icDate: '3. Nachgeheim', place: 'Mordheim', victor: 'Die Silberne Karavane' }), null, `b${b.id}:battle`);
+    await page.goto(`campaign/${c.id}/chronicle`);
+    await expect(page.getByRole('list', { name: 'Chapters' }).getByRole('listitem')).toHaveCount(2);
+    await page.getByRole('button', { name: 'Read Der Weg nach Mordheim' }).click();
+    await expect(page.getByText('Sieben. Mehr waren es nicht.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-chronicle`);
+    await page.getByRole('button', { name: 'English' }).click();
+    await expect(page.getByText('The rain had turned the road to mud.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-chronicle-english`);
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download all (.md)' }).click();
+    expect((await download).suggestedFilename()).toBe('the-hel-fenn-campaign-chronicle-en.md');
+    await expect(page.getByText(/Saved 2 chapters as a \.md file/)).toBeVisible();
+  });
+}

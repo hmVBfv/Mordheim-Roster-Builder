@@ -12,7 +12,7 @@ import type { CampaignView } from '../campaign/api.ts';
 import { useGameData } from '../game/useGameData.ts';
 import notes from '../notes/Notes.module.css';
 import type { Segment } from '../timeline/build.ts';
-import { copyText, saveFile } from '../ui/files.ts';
+import { copyText, fileSlug, saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
 import { gatherPack, packInput, type Gathered } from './gather.ts';
 import styles from './Pack.module.css';
@@ -27,8 +27,6 @@ const PARTS: Record<PackPart, [string, string]> = {
   style: ['Style', 'the campaign’s style guide'],
 };
 const LANGS: [PackLang, string][] = [['de', 'Deutsch'], ['en', 'English'], ['both', 'Both']];
-
-const slug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'campaign';
 
 /** The inside of the sheet: made anew each time it opens, so it asks the server again. */
 export function PackForm({ cid, campaign, view, segs, close, titleId }: {
@@ -70,7 +68,7 @@ export function PackForm({ cid, campaign, view, segs, close, titleId }: {
   const copy = () => { void copyText(text).then((ok) => setStatus(ok ? 'Prompt copied. Paste it into a chat with Claude.' : 'Copying is not possible here. Select the text and copy it yourself.')); };
   const download = () => {
     if (!battle) return;
-    saveFile(`${slug(campaign)}-battle-${battle.round}-ai-pack.md`, text, 'text/markdown');
+    saveFile(`${fileSlug(campaign)}-battle-${battle.round}-ai-pack.md`, text, 'text/markdown');
     setStatus('Saved as a .md file.');
   };
 

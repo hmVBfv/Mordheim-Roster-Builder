@@ -22,6 +22,7 @@ import { NewBattleSheet } from './NewBattle.tsx';
 import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
 import { TimelineTab } from '../timeline/Timeline.tsx';
+import { ChronicleTab } from '../chronicle/Chronicle.tsx';
 import { StyleSection } from '../pack/StyleSection.tsx';
 import { campaignMap } from './map.ts';
 import { BackgroundTab } from '../background/Background.tsx';
@@ -352,6 +353,7 @@ export function Campaign() {
   const manage = tab === 'manage' && lead;
   const notes = tab === 'notes';
   const timeline = tab === 'timeline';
+  const chronicle = tab === 'chronicle';
   const questions = tab === 'questions' && view.role !== 'viewer';
   const world = tab === 'world';
   // the background and the view as a player: leaders with the authenticator only (the server refuses anyone else)
@@ -364,6 +366,7 @@ export function Campaign() {
     : background ? <BackgroundTab id={id} view={view} />
     : asPlayer ? <AsPlayerTab id={id} view={view} />
     : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
+    : chronicle ? <ChronicleTab id={id} view={view} />
     : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />;
   return (
     <section className={ui.page}>
@@ -376,6 +379,7 @@ export function Campaign() {
         <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
         <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
         <NavLink to={`/campaign/${id}/timeline`}>Timeline</NavLink>
+        <NavLink to={`/campaign/${id}/chronicle`}>Chronicle</NavLink>
         <NavLink to={`/campaign/${id}/world`}>World</NavLink>
         {view.role !== 'viewer' && <NavLink to={`/campaign/${id}/questions`}>Questions</NavLink>}
         {lead && user.totp && <NavLink to={`/campaign/${id}/background`}>Background ⚑</NavLink>}
