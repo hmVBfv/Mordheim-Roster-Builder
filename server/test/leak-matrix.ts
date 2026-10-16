@@ -88,6 +88,9 @@ export interface ProbeContext {
   spareScenarioId: string;
   /** The style guide of the admin's campaign was written once: the seq an edit starts from (phase 4b4a). */
   ledStyleSeq: number;
+  /** Chapter drafts of the admin's campaign (phase 4b5b): one to publish, a spare one to throw away. */
+  ledDraftId: string;
+  spareDraftId: string;
 }
 
 export interface Probe {
@@ -443,6 +446,21 @@ export const MATRIX: Record<Action, MatrixRow> = {
     routes: { 'PUT /api/v1/campaigns/:id/style': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/style`, body: { text: 'German, past tense, close third person.', baseSeq: c.ledStyleSeq } }) },
     fields: { admin: ['style'] },
   },
+  'drafts.read': {
+    // the admin leads the campaign (the user role is a player there: 403); the drafts of the victim's campaign carry a marker no role may read
+    allowed: ['admin'],
+    routes: { 'GET /api/v1/campaigns/:id/chapter-drafts': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/chapter-drafts` }) },
+    fields: { admin: ['drafts', 'seq'] },
+  },
+  'drafts.write': {
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/chapter-drafts/:did': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/chapter-drafts/${randomUUID()}`, body: { refKey: 'battle-2', kind: 'battle', lang: 'de', title: 'Die Mühle', text: 'Nebel lag über dem Mühlbach.' } }),
+      'POST /api/v1/campaigns/:id/chapter-drafts/:did/publish': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/chapter-drafts/${c.ledDraftId}/publish`, body: { at: { segment: 'pre', pos: '5' } } }),
+      'DELETE /api/v1/campaigns/:id/chapter-drafts/:did': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/chapter-drafts/${c.spareDraftId}` }),
+    },
+    fields: { admin: ['draft', 'chapter', 'seq', 'removed'] },
+  },
   'background.read': {
     // the user role is a player there (403), the admin leads it
     allowed: ['admin'],
@@ -483,4 +501,6 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   // a draft scenario of the victim's campaign (phase 4b3c): only its leaders read it, and none of them is a role of the matrix
   /SCENARIO-SECRET/,
   // the style guide of the victim's campaign (phase 4b4a): leaders' own, and none of its leaders is a role of the matrix
-  /STYLE-SECRET/];
+  /STYLE-SECRET/,
+  // a chapter draft of the victim's campaign (phase 4b5b): only its leaders read it, and none of them is a role of the matrix
+  /DRAFT-SECRET/];

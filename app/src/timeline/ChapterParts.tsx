@@ -88,7 +88,7 @@ function ChapterReader({ close, cid, c, first, canRemove, onRemove }: { close: (
 
 /* ---- importing (a leader) ---- */
 
-const textOf = (f: File) => (typeof f.text === 'function' ? f.text() : new Promise<string>((ok, no) => {
+export const textOf = (f: File) => (typeof f.text === 'function' ? f.text() : new Promise<string>((ok, no) => {
   const r = new FileReader();
   r.onload = () => ok(String(r.result));
   r.onerror = () => no(r.error);

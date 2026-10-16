@@ -191,7 +191,10 @@ Begriff einführt, trägt ihn hier ein.
 | Teil des Pakets | Part | `PACK_PARTS` (`aftermath`, `canon`, `world`, `notes`, `background`, `story`, `style`) |
 | Enthüllungsregel (im Paket) | Rule | `PackBackground.rule`: `hidden` · `hint` · `revealed` |
 | Lücke im Material | Gap | `Gathered.warnings`, Liste „Gaps in the material“ |
-| Kapitelentwurf | Chapter draft | `chapter_drafts` |
+| Kapitelentwurf | Chapter draft (Abschnitt „Drafts ⚑ Leaders only“) | `chapter_drafts`, `app/src/drafts/` |
+| Kapitel einbringen (als Entwurf) | Bring in a chapter · Save the draft | `PUT …/chapter-drafts/:did` |
+| Entwurf freigeben | Publish · Publish anyway (bei Funden der Prüfung) | `POST …/chapter-drafts/:did/publish` |
+| Prüfung auf verborgene Begriffe | Check before it is published · „Words of the hidden background“ | `checkLeaks`, `ruleAtRound` in `core/narrative/leaks.ts` |
 | Chronik (Reiter der Kampagne: die ganze Geschichte) | Chronicle | `chapters` |
 | Kapitel importieren | Import chapters… (veröffentlichte, 4a5) · Import a chapter (Entwurf, 4b) | `PUT …/chapters/:chid`, `readChapterFile()`; Entwurf aus Text oder .md/.txt |
 | veröffentlichtes Kapitel | Chapter · Read · Deutsch / English · Take the chapter out | `chapters`, `app/src/timeline/ChapterParts.tsx` |

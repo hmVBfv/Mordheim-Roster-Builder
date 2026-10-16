@@ -2817,3 +2817,34 @@ it: reading and downloading are done and need no migration; drafts, with the
 check for words from hidden background and a leader's approval before anything
 becomes public, come next as their own step, because a draft is exactly the kind
 of text that must not be readable by players.
+
+## October 16, 2026 (cont.) — drafts, and a check that only warns
+
+A chapter that comes in as text is exactly the kind of thing players must not
+read yet: it may name the ferryman the story has kept hidden for four battles.
+So it waits as a draft that only leaders with the authenticator see — for
+everyone else the routes answer 403, outside the campaign 404, and the leak
+matrix probes all four actions with a marker word in a foreign campaign. The
+draft is one row per language of a chapter; publishing puts its language into
+the chapter of the same `ref` (the other language stays, the same one is
+replaced, and the sheet says which before anyone clicks), or creates the
+chapter and needs its place in the story.
+
+The check for hidden words runs in the client, like the pack (ADR 0005), and
+shares one function with it: `ruleAtRound` now says when a revealed piece is
+public, and the pack's gather uses it instead of its own copy of the
+condition, so the two cannot drift apart. It finds words — a hidden piece's
+title and the names in its truth that neither "players know" nor the public
+names cover — not meaning, so it can only warn. A name at the start of a
+sentence and an ordinary German noun look the same to it; I accepted some noise
+over missing a leak, and made the leader read the excerpt and tick a box before
+"Publish anyway" is possible. Every background piece is held against the text,
+planned ones and the leaders' own notes included: the pack leaves those out
+because they are not truth yet, but a chapter must not give them away either.
+
+Wrong turns: my first ceiling test counted the published draft against the
+hundred open ones (it no longer counts); the first excerpts reached back into
+the title because the title and text are checked as one block, so the excerpt
+now stops at the paragraph. The mockup had the check in the import form, my
+first plan only in the review sheet — the form now checks as you type too,
+from the background read once when it opens.

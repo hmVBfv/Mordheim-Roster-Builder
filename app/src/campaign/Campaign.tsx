@@ -366,7 +366,7 @@ export function Campaign() {
     : background ? <BackgroundTab id={id} view={view} />
     : asPlayer ? <AsPlayerTab id={id} view={view} />
     : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
-    : chronicle ? <ChronicleTab id={id} view={view} />
+    : chronicle ? <ChronicleTab id={id} view={view} lead={lead && user.totp} />
     : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />;
   return (
     <section className={ui.page}>
