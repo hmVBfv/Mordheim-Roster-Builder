@@ -328,6 +328,18 @@ sonst niemand. Das Log (`style.edit`, Sichtbarkeit `leader`) trägt keinen Text.
 Die Leak-Matrix legt einen Stil mit Merkwort (`STYLE-SECRET`) in eine fremde
 Kampagne.
 
+**Kapitelentwürfe (Phase 4b5b):** `drafts.read` und `drafts.write` für Leiter
+mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein
+Entwurf ist noch kein Kapitel: er steht in keiner Zeitleiste und keinem
+Download, bis ein Leiter ihn freigibt; erst dann ist sein Text öffentlich
+(ADR 0002) und wird nicht zurückgenommen. Die Prüfung auf Begriffe aus
+verborgenem Hintergrund läuft im Client (ADR 0005, derselbe Grund wie beim
+KI-Paket) und warnt nur – der Leiter kann bewusst trotzdem freigeben; der
+Server prüft den Text nicht, er speichert ihn. Das Log (`chapter_draft.*`,
+Sichtbarkeit `leader`) nennt `ref` und Sprache, nie den Text. Die Leak-Matrix
+legt einen Entwurf mit Merkwort (`DRAFT-SECRET`) in eine fremde Kampagne und
+probt Lesen, Anlegen, Freigeben und Verwerfen.
+
 **Teilen (Rob, 05.10.2026):** immer als Kopie. Der Empfänger bekommt eine
 Warband für sich; die des Absenders bleibt privat. An einen Nutzer: nur er
 nimmt an oder lehnt ab, nur der Absender nimmt zurück (`can()` mit Ziel,

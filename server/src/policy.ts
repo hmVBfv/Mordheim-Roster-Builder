@@ -120,6 +120,9 @@ export const ACTIONS = {
   /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
   'style.read': { who: 'user', target: 'leader' },
   'style.write': { who: 'user', target: 'leader' },
+  /** Chapters as drafts (phase 4b5b): the campaign's leaders with the authenticator read, write, publish and throw away – for the rest they are not there. */
+  'drafts.read': { who: 'user', target: 'leader' },
+  'drafts.write': { who: 'user', target: 'leader' },
   /** Scenarios (phase 4b3c): every member reads – the released ones; a draft only a leader with the authenticator sees (ADR 0011). */
   'scenarios.read': { who: 'user', target: 'member' },
   /** Writing, releasing and taking out a draft: leaders alone, with the authenticator. */
