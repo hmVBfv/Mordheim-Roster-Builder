@@ -42,6 +42,16 @@ describe('checkLeaks', () => {
     expect(terms['Voss']!.excerpt).toContain('Gerhard Voss wartete am Ufer');
   });
 
+  it('shows the hit within its own paragraph, not the title or the paragraph before', () => {
+    const r = checkLeaks('Das Rathaus\n\nEin ruhiger Morgen.\n\nGerhard Voss wartete am Ufer.', [entry()]);
+    const excerpts = r.findings[0]!.terms.map((t) => t.excerpt);
+    expect(excerpts).toEqual(['Gerhard Voss wartete am Ufer.', 'Gerhard Voss wartete am Ufer.']);
+    const long = `${'Nebel '.repeat(30)}Voss${' Nebel'.repeat(30)}`;
+    const cut = checkLeaks(long, [entry({ title: '' })]).findings[0]!.terms[0]!.excerpt;
+    expect(cut.startsWith('…') && cut.endsWith('…') && cut.includes('Voss')).toBe(true);
+    expect(cut.length).toBeLessThan(long.length / 2);
+  });
+
   it('says nothing about a text that tells none of it, and skips what is public', () => {
     expect(checkLeaks('Ein ruhiger Morgen am Fluss.', [entry()]).findings).toEqual([]);
     expect(checkLeaks('Gerhard Voss wartete.', [entry({ rule: 'revealed' })]).findings).toEqual([]);

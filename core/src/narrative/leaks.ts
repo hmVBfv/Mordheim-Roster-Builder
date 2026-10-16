@@ -90,11 +90,16 @@ function termPattern(term: string): RegExp {
   return new RegExp(`(?<![\\p{L}\\p{N}])${escape(term)}(?:['’]s|s|es|n|en|nen)?(?![\\p{L}\\p{N}])`, 'giu');
 }
 
+/** The words around a hit, within its paragraph: a hit in the body does not drag the title in with it. */
 function excerpt(text: string, at: number, len: number): string {
-  const from = Math.max(0, at - EXCERPT);
-  const to = Math.min(text.length, at + len + EXCERPT);
+  const before = text.lastIndexOf('\n\n', at);
+  const lo = before < 0 ? 0 : before + 2;
+  const after = text.indexOf('\n\n', at + len);
+  const hi = after < 0 ? text.length : after;
+  const from = Math.max(lo, at - EXCERPT);
+  const to = Math.min(hi, at + len + EXCERPT);
   const cut = text.slice(from, to).replace(/\s+/g, ' ').trim();
-  return `${from > 0 ? '…' : ''}${cut}${to < text.length ? '…' : ''}`;
+  return `${from > lo ? '…' : ''}${cut}${to < hi ? '…' : ''}`;
 }
 
 /** Holds a chapter text against the background pieces that are not public at its place.
