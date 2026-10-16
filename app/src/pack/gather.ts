@@ -10,6 +10,7 @@
    with a rule), so do GM notes and scenario plans there; an entry that has
    not started is not in it; a truth that is public only from a later battle
    goes in as hidden. */
+import { ruleAtRound } from '@mordheim/core';
 import type { GameData, PackBackground, PackCanon, PackCasualty, PackChange, PackInput, PackLang, PackStoryItem } from '@mordheim/core';
 import { getBackground, type Entry } from '../background/api.ts';
 import { casualtyText, getBattle, type BattleSummary, type CasualtyPayload } from '../battle/api.ts';
@@ -166,10 +167,9 @@ export async function gatherPack(a: GatherArgs): Promise<Gathered> {
     .filter((e: Entry) => e.status !== 'planned' && e.kind !== 'gm_note' && e.kind !== 'scenario')
     .map((e: Entry) => {
       const from = roundOf(e.revealFromBattle);
-      const publicNow = e.reveal === 'revealed' && (!e.revealFromBattle || (!!from && (from.round < battle.round || from.id === battle.id)));
       return {
         kind: e.kind === 'figure' ? 'person' : e.kind, title: e.title, truth: e.truth, playersKnow: e.playersKnow,
-        rule: publicNow ? 'revealed' : e.reveal === 'hint' ? 'hint' : 'hidden', hintLimits: e.hintLimits, revealedFrom: from ? `Battle ${from.round}` : '',
+        rule: ruleAtRound(e, battle.round, (id) => roundOf(id)?.round), hintLimits: e.hintLimits, revealedFrom: from ? `Battle ${from.round}` : '',
       } as PackBackground;
     });
 
