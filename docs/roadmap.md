@@ -314,7 +314,8 @@ und die Welt kommen dazu, sobald es sie gibt.
   Einstellungen (Theme, Layout, Flavour, Online/Sync, Rolle), Hausregeln von
   Warband und Kampagne, letzte JS-Fehler – vor dem Senden lesbar angezeigt
   (concept.md 4.12).
-- `roster-cli`/API-Zugang mit Bug-Token; Bereiniger für Testvorlagen.
+- `roster-cli`/API-Zugang mit Bug-Token (ADR 0019); Bereiniger für
+  Testvorlagen.
 - `.claude/commands/bugs.md` (Ablauf `/bugs`) und
   `.claude/agents/reviewer.md`.
 
@@ -345,9 +346,28 @@ Text zum Weitergeben von Hand. Der Admin sortiert (Grad, Bereich, Status,
 warband“ – die Übergabe nach ADR 0018, ohne Anbindung. **Entschieden:**
 Kopie statt Verweis auf die Warband (sonst bräuchte der Admin einen Lesezugriff
 auf fremde Warbands); keine Tabelle `bug_comments` – Rückfragen gehen am Tisch
-oder im Chat. **Offen für 4c2:** Triage und Schweregrad durch Claude, Bug-Token
-(nur `GET/PATCH /bugs`), `roster-cli`, Bereiniger für Testvorlagen aus
-Meldungen, `.claude/commands/bugs.md`, `.claude/agents/reviewer.md`.
+oder im Chat.
+
+**Stand 17.10.2026 (4c2):** umgesetzt – der Zugang für Cloud-Sitzungen und der
+Ablauf `/bugs`. Migration 22 gibt jeder Meldung eine **Nummer** (`#7`, Commit
+`Fix #7`), Migration 23 legt die Tabelle `bug_tokens` an. Das **Bug-Token**
+([ADR 0019](decisions/0019-bug-token.md)) ist ein eigener Zugang: `Authorization:
+Bearer rbt_…`, nur `GET/PATCH /bugs` (`token: true` in `policy.ts`, auf jeder
+anderen Route 403 vor dem Handler, ein Test geht alle Routen durch), nur der
+Hash gespeichert, erzeugt nur mit `roster-cli bug-token create`, 60 Tage,
+höchstens fünf, widerrufbar; die Testinstanz widerruft nach jeder
+Wiederherstellung alle. `roster-cli` bekam `bug-token create|list|revoke`,
+`bugs` und `bugs show <n>`. In der Cloud-Umgebung liegt das Token als
+„Network secret“ (der Proxy hängt es an, die Sitzung sieht es nie); die
+Einrichtung steht in [operations.md](operations.md#bug-token-für-eine-cloud-sitzung-ab-phase-4c2).
+`npm run bugs` (`core/scripts/bugs.ts`) liest und sortiert Meldungen, zeigt sie
+als eingezäunte Daten und holt mit `fixture N` den Speicherstand einer Meldung
+durch den Bereiniger nach `core/test/saves/bug-N.json`. `.claude/commands/bugs.md`
+führt durch Einordnung (S1–S4, Sichtbarkeit ist S1), Korrektur (Test zuerst,
+`Fix #N`) und „fixed in“; `.claude/agents/reviewer.md` prüft S1-Korrekturen,
+sieht nur Meldung und Diff und kann nichts ändern. **Offen für die Abnahme:**
+ein echter Bug, der den ganzen Weg läuft – das geschieht mit der ersten echten
+Meldung.
 
 ## Phase 5 – Extras
 
@@ -398,4 +418,5 @@ Siehe [decisions/](decisions/). Kurzfassung:
 | 0013 | Oberfläche englisch; Kanon und Epos zweisprachig |
 | 0014 | Leistungsgrenzen werden in der CI geprüft |
 | 0015 | Entwicklung in Cloud-Sitzungen, Betrieb auf dem Pi; Pi-Konfiguration als `ops/` im Repo |
+| 0019 | Bug-Token: ein eigener Zugang für Cloud-Sitzungen, nur `GET/PATCH /bugs` ([0019](decisions/0019-bug-token.md), ergänzt 0012) |
 | – | Themes: „Chronicle“ (dunkel, Standard) und „Parchment“ (hell) wählbar; Druck immer hell ([ui.md](ui.md#4-themes-und-gestaltung)) |

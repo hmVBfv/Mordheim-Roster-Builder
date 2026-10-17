@@ -2903,3 +2903,43 @@ reference to the warband and a new admin read path; that would have given the
 admin a way into other players' warbands, so the report carries a copy instead.
 And the list of "your reports" did not update after sending on the same page,
 because nothing told it — now the sender notifies it.
+
+## October 17, 2026 — the bug token
+
+The second half of the bug tracker: how a cloud session reads the reports
+without being able to read anything else. A bug token is its own kind of
+access, not a session and not an account: `Authorization: Bearer rbt_…`, made
+only by `roster-cli bug-token create` on the Pi, shown once, stored as a hash,
+good for 60 days, at most five at a time. `policy.ts` gives `token: true` to
+exactly two actions, `bugs.read` and `bugs.write`; the request hook turns a
+token away with 403 on every other route before a handler runs, and a test
+walks every registered route to prove it. A cookie next to a token is never
+read, and a token needs no `Origin`: no browser sends that header by itself, so
+there is nothing to forge.
+
+The reports are text from the players and may contain instructions, so the
+interesting question was less what the token may do than who gets to see it.
+My first plan put it in an environment variable of the cloud environment. The
+documentation says plainly that anyone using the environment can read those
+values, and a session that holds the token can be talked into printing it. The
+environment also has "network secrets": the proxy attaches the header to
+requests for the server's host and the session never holds it. That is the
+documented route now; the variable `ROSTER_BUG_TOKEN` stays as a weaker
+fallback, in case the form a team plan shows has no such section.
+The script that reads the reports (`npm run bugs`) therefore works without a
+token of its own and only sends one when it has it.
+
+Wrong turns: Node's built-in `fetch` ignores `HTTPS_PROXY`, so the first run of
+the script died with "fetch failed" and no hint why; `NODE_USE_ENV_PROXY=1` in
+the npm script fixes it, and the error text now says what to look at. The
+script also printed the report as a plain block, which let a line of the text
+look like part of the script's own output; reports are now fenced with a
+longer fence than any run of backticks inside them, control codes removed, and
+labelled as data. And the numbers: ADR 0012 wanted `Fix #N` in the commit, but
+the reports only had uuids, so a migration gave them numbers (backfilled in the
+order they arrived) and `/bugs/:id` takes either.
+
+`/bugs` and the reviewer agent are plain files under `.claude/`; a test reads
+them and checks that every npm script and subcommand they name exists and that
+the reviewer has no tool that writes. The acceptance for 4c, a real bug from
+report to "fixed in <version>", waits for the first real report.

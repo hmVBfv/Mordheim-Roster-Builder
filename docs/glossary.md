@@ -271,6 +271,10 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Regelfehler | Rules issue | `bugs.kind: 'rules'` |
 | Wunsch | Wish | `bugs.kind: 'wish'` |
 | Prüf-Agent | Reviewer agent | `.claude/agents/reviewer.md` |
+| Meldungsnummer | Report number (`#7`) | `bugs.number`, Commit `Fix #7` |
+| Bug-Token | Bug token | `rbt_…`, Tabelle `bug_tokens`, `server/src/bug-tokens.ts`, ADR 0019 |
+| Network secret (der Cloud-Umgebung) | Network secret | hängt das Token an Anfragen für den Server-Host; die Sitzung sieht es nie |
+| `/bugs` | `/bugs` | `.claude/commands/bugs.md`, `npm run bugs` (`core/scripts/bugs.ts`) |
 | Cloud-Sitzung | Cloud session | Claude Code im Code-Tab bzw. claude.ai/code |
 | Betriebsdateien | Ops files | `ops/`, eingespielt mit `ops/install.sh` |
 | Standortdatei | Site config | `~/server/roster/site.env` (nur auf dem Pi) |

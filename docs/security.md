@@ -179,6 +179,7 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
 | Hintergrund lesen/schreiben | – | ✓ | – | – |
 | Runde weiterschalten, Schlacht abschließen | – | ✓ | – | – |
 | Nutzer, Einladungen, Bugs verwalten | ✓ | – | – | – |
+| Meldungen lesen und sortieren (`GET/PATCH /bugs`) mit dem Bug-Token | das Token, sonst nichts (ADR 0019) | – | – | – |
 | Problem melden, eigene Meldungen lesen | ✓ | ✓ | ✓ | ✓ |
 
 - Der Admin hat in der App **keinen** Sonderzugriff auf Kampagneninhalte; er
@@ -446,10 +447,13 @@ kommt mit Notizen und Hintergrund dazu.
 - **Ausgabe:** React entschärft Text automatisch; `dangerouslySetInnerHTML`
   ist per Lint-Regel verboten. Markdown in Notizen wird nicht als HTML
   gerendert.
-- **Geheimnisse** (Schlüssel für TOTP-Verschlüsselung, Bug-Token, restic-
-  Passwort, healthchecks-URLs) liegen in `/mnt/ssd/roster/app.env` bzw.
+- **Geheimnisse** (Schlüssel für TOTP-Verschlüsselung, restic-Passwort,
+  healthchecks-URLs) liegen in `/mnt/ssd/roster/app.env` bzw.
   `/mnt/ssd/roster/secrets/` mit Rechten `600`. Nie im Repo, nie in einem
-  Agenten-Container, nie in Logs.
+  Agenten-Container, nie in Logs. Das **Bug-Token** liegt nur als Hash in der
+  Datenbank (Tabelle `bug_tokens`); den Klartext sieht der, der es mit
+  `roster-cli bug-token create` erzeugt, und danach das „Network secret“ der
+  Cloud-Umgebung.
 - **Backups** sind mit restic verschlüsselt; das Passwort liegt zusätzlich
   offline (Passwortmanager, Papier).
 - **Logs:** eine Zeile je Anfrage mit der Route (dem Muster, nie der vollen
@@ -513,11 +517,25 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
 - Entwickelt wird in Cloud-Sitzungen (ADR 0015); sie haben keinen Zugang zu
   Produktionsdaten, Uploads, Backups oder `.env`. Auf dem Pi arbeitet kein
   Agent am Roster-Projekt. Tests laufen gegen Testdaten.
-- Bug-Arbeit nutzt ein Token, das nur `GET/PATCH /bugs` erlaubt; es liegt als
-  Umgebungsvariable in der Cloud-Umgebung, deren erlaubte Domains den Server
-  einschließen. Das
-  Schreib-Material für die Chronik (KI-Paket) erreicht die Pipeline nur von
-  Hand, durch den Leiter (ADR 0018).
+- **Bug-Token (4c2, ADR 0019):** Bug-Arbeit nutzt ein Token, das nur
+  `GET/PATCH /bugs` erlaubt (`bugs.read`, `bugs.write`; in `policy.ts` tragen
+  nur diese `token: true`). Es ist weder Sitzung noch Konto: `Authorization:
+  Bearer rbt_…`, nur der Hash liegt in der Datenbank, erzeugt wird es nur mit
+  `roster-cli bug-token create` auf dem Pi, einmal gezeigt, 60 Tage gültig
+  (höchstens 180), höchstens fünf zugleich, sofort widerrufbar. Auf jeder
+  anderen Route ist es 403, bevor ein Handler läuft; ein ungültiges, abgelaufenes
+  oder widerrufenes ist 401; ein Cookie daneben wird nie gelesen, einen
+  `Origin` braucht es nicht (kein Browser schickt den Header von selbst). Das
+  Audit-Log führt `bug-token:<Kennung>` mit `via: bug-token`, nie die Wörter.
+  In der Cloud-Umgebung liegt es als **Network secret**: der Proxy hängt es an
+  Anfragen für den Server-Host, die Sitzung sieht es nicht – eine
+  eingeschleuste Anweisung in einer Meldung kann es so nicht ausgeben. Der
+  Rückfall (Umgebungsvariable `ROSTER_BUG_TOKEN`) ist für alle lesbar, die die
+  Umgebung benutzen; dann ein kürzeres Token wählen. `npm run bugs` zeigt
+  Meldungen eingezäunt und als Daten gekennzeichnet; `/bugs` läuft nur auf
+  Zuruf. Die Testinstanz widerruft nach jeder Wiederherstellung alle Tokens.
+  Das Schreib-Material für die Chronik (KI-Paket) erreicht die Pipeline nur
+  von Hand, durch den Leiter (ADR 0018).
 - `master` ist per GitHub-Regelwerk geschützt: Änderungen nur per Pull
   Request mit grüner CI. Agenten arbeiten auf eigenen Branches.
 - Gemergt und deployt wird von Rob. Vor `sudo ops/install.sh` zeigt
@@ -543,6 +561,7 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
 - Der Meldende wählt die Art (Bug, Wunsch, Regelfehler), Claude Code setzt
   den Grad nach dieser Tabelle, Rob kann überschreiben.
 - Jede Meldung, die Sichtbarkeit betrifft, ist automatisch S1.
+- Meldungen haben eine Nummer (`#7`); Korrekturen heißen im Commit `Fix #7`.
 - S1-Korrekturen prüft ein unabhängiger Prüf-Agent (`.claude/agents/reviewer.md`),
   der nur Meldung und Änderung sieht.
 
