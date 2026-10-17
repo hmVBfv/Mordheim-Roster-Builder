@@ -11,7 +11,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sanitizeSave } from '../src/format/sanitize.ts';
+import { changedPaths, sanitizeSave } from '../src/format/sanitize.ts';
 import { loadGameData } from '../src/node.ts';
 
 const SAVES = fileURLToPath(new URL('../test/saves/', import.meta.url));
@@ -19,16 +19,6 @@ const SAVES = fileURLToPath(new URL('../test/saves/', import.meta.url));
 function parse(text: string): unknown {
   const marked = text.match(/MORDHEIM-DATA:\s*(\{[\s\S]*\})\s*$/);
   try { return JSON.parse(marked ? marked[1]! : text); } catch { return null; }
-}
-
-/* Paths whose value differs, for the report. */
-function changes(a: unknown, b: unknown, at = ''): string[] {
-  if (JSON.stringify(a) === JSON.stringify(b)) return [];
-  if (a && b && typeof a === 'object' && typeof b === 'object') {
-    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
-    return [...keys].flatMap((k) => changes((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k], at ? `${at}.${k}` : k));
-  }
-  return [at || '(top)'];
 }
 
 const [input, output] = process.argv.slice(2);
@@ -48,6 +38,6 @@ if (existsSync(target)) {
   process.exit(1);
 }
 writeFileSync(target, `${JSON.stringify(clean, null, 1)}\n`);
-const changed = changes(raw, clean);
+const changed = changedPaths(raw, clean);
 console.log(`${target}\n${changed.length} value(s) replaced or removed${changed.length ? ':' : '.'}`);
 for (const p of changed) console.log(`  ${p}`);

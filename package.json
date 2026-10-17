@@ -19,6 +19,7 @@
     "check": "npm run typecheck && npm run lint && npm test",
     "test:app": "npm test -w app",
     "sanitize-save": "node core/scripts/sanitize-save.ts",
+    "bugs": "node core/scripts/bugs.ts",
     "test:server": "npm test -w server"
   },
   "devDependencies": {
