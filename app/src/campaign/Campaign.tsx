@@ -24,6 +24,7 @@ import { NotesTab } from '../notes/Notes.tsx';
 import { TimelineTab } from '../timeline/Timeline.tsx';
 import { ChronicleTab } from '../chronicle/Chronicle.tsx';
 import { StyleSection } from '../pack/StyleSection.tsx';
+import { CanonSection } from '../canon/CanonSection.tsx';
 import { campaignMap } from './map.ts';
 import { BackgroundTab } from '../background/Background.tsx';
 import { openItems } from '../open/items.ts';
@@ -265,6 +266,7 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
           <div className={ui.row}><Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>Set the house rules</Link></div>
         </section>
         <StyleSection id={id} />
+        <CanonSection id={id} view={view} />
         <section className={styles.section} aria-labelledby="m-round">
           <h2 id="m-round">The next round</h2>
           <p className={ui.muted}>
