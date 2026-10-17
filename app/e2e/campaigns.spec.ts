@@ -995,6 +995,24 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(page.getByText('Style guide saved.')).toBeVisible();
     await expect.poll(() => srv.state.styles.get(c.id)?.text, { timeout: 8000 }).toMatch(/close third person/);
   });
+
+  test(`the canon export: a leader downloads the names for the linter under Manage, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [{ ...others[0]!, data: { ...SAVE, name: 'The Grey Penitents', canon: { name_de: 'Die Grauen Büßer', name_en: 'The Grey Penitents' } } }, { ...others[1]!, pending: false }] });
+    const ferry = srv.factionFrom(c.id, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the crossing' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', nameDe: 'Alter Marek', factionId: ferry.id, publicStatus: 'alive' });
+    await page.goto(`campaign/${c.id}/manage`);
+    await expect(page.getByRole('heading', { name: 'Canon for the linter' })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    const [file] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download the canon (.txt)' }).click()]);
+    expect(file.suggestedFilename()).toBe('the-hel-fenn-campaign-canon.txt');
+    await expect(page.getByText(/^Saved \d+ names?: /)).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-canon-export`);
+  });
 }
 
 /* The Chronicle tab (phase 4b5a): the whole story as written, read chapter by chapter in either language, downloaded as one file. */

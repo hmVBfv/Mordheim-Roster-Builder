@@ -2848,3 +2848,24 @@ the title because the title and text are checked as one block, so the excerpt
 now stops at the paragraph. The mockup had the check in the import form, my
 first plan only in the review sheet — the form now checks as you type too,
 from the background read once when it opens.
+
+## October 17, 2026 — names for the linter
+
+The canon export was planned as "the spellings for `spielbegriffe.txt`". Reading
+the chronicle's linter showed that was the wrong target: that file holds the game
+terms that must stay out of the prose (Wurf, Probe, Henchmen), which have nothing
+to do with the canon. What the canon can give the linter is the other thing it
+keeps by hand: `NUR_DEUTSCH` and `NUR_ENGLISCH`, the names that may stand in only
+one language version. So the file is those two lists, generated — whatever
+differs between the German and the English name of a warband, a warrior, a
+title, a faction or a person, without the article, sorted — plus the names that
+are the same in both languages, the ones still missing a language, and every
+pair for reading.
+
+It stays names only, on purpose: the chronicle's repository is public, and a
+profile's voice and origin, the background and the notes have no business in a
+file that may end up there. And it refuses to save at all when a warband could
+not be read, because a list that silently lacks a warband is worse than no list.
+The reserved `canon_extra` text was not needed; it waits until someone wants
+extra spellings in the file.
+

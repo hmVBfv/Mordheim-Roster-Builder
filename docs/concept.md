@@ -268,9 +268,12 @@ aber vollständig und geordnet:
 - **Keine Anbindung an die Chronik-Pipeline (Rob, 12.10.2026, ADR 0018):** Das
   KI-Paket gibt der Leiter von Hand weiter; der Server legt nichts in
   `eingang/chronik/` ab.
-- **Kanon-Export:** Die Schreibweisen für den Chronik-Linter
-  (`notes/agent/spielbegriffe.txt` o. ä.) können aus dem Kanon der App erzeugt
-  werden – eine Quelle für richtige Namen.
+- **Kanon-Export (4b4b):** Die Namen für den Chronik-Linter erzeugt die App
+  aus dem Kanon – ein Textdownload unter Manage mit den Listen, was nur in
+  einer Sprachfassung stehen darf (`NUR_DEUTSCH`/`NUR_ENGLISCH` in `lint.py`),
+  was in beiden gleich ist und was noch fehlt. Nicht `spielbegriffe.txt`: das
+  sind Spielbegriffe, die nicht in die Prosa dürfen. Nur Namen, nichts
+  Verborgenes; Rob gibt die Datei von Hand weiter.
 - **Von Hand, ohne Pipeline (Rob, 02.10.2026):** In der Timeline baut
   „AI pack…“ denselben Inhalt als einen Prompt – die Schlacht in der
   Reihenfolge der Timeline, Aftermath und Aufstiege, Kanon, Welt, Notizen,
