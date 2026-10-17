@@ -120,6 +120,8 @@ describe('roster-cli: accounts', () => {
     await s.user('boss', { admin: true, totp: true });
     const token = player.session();
     const link = /#([\w-]{43})$/.exec(run(['invite'], s.data).out)![1]!;
+    const bugToken = run(['bug-token', 'create', '--label', 'cloud'], s.data).out.split('\n')[0]!;
+    expect((await s.call({ url: '/api/v1/bugs', origin: null, headers: { authorization: `Bearer ${bugToken}` } })).statusCode).toBe(200);
     const TEST = 'staging test password 1';
     const staged = (input: string, staging = true) => {
       const out: string[] = [];
@@ -135,7 +137,9 @@ describe('roster-cli: accounts', () => {
 
     const r = staged(`${TEST}\n`);
     expect(r.code).toBe(0);
-    expect(r.out).toMatch(/^2 accounts: one test password, no authenticators; \d+ sessions ended, 1 open links revoked$/);
+    expect(r.out).toMatch(/^2 accounts: one test password, no authenticators; \d+ sessions ended, 1 open links revoked, 1 bug tokens revoked$/);
+    // the bug token of production does not open anything here
+    expect((await s.call({ url: '/api/v1/bugs', origin: null, headers: { authorization: `Bearer ${bugToken}` } })).statusCode).toBe(401);
     expect(player.row()).toMatchObject({ totp_enabled_at: null, totp_secret_enc: null, totp_recovery: null });
     expect(s.db.prepare('SELECT count(*) AS n FROM sessions WHERE revoked_at IS NULL').get()).toEqual({ n: 0 });
     expect((await s.call({ url: '/api/v1/auth/me', token })).json()).toMatchObject({ user: null });
@@ -147,8 +151,73 @@ describe('roster-cli: accounts', () => {
     // logged, never the password
     const row = s.db.prepare("SELECT actor_id, payload FROM audit_log WHERE action = 'user.test_accounts'").get() as { actor_id: string | null; payload: string };
     expect(row.actor_id).toBeNull();
-    expect(JSON.parse(row.payload)).toMatchObject({ via: 'roster-cli', accounts: 2, links: 1 });
+    expect(JSON.parse(row.payload)).toMatchObject({ via: 'roster-cli', accounts: 2, links: 1, tokens: 1 });
     expect(JSON.stringify(s.db.prepare('SELECT * FROM audit_log').all())).not.toContain(TEST);
+    expect(JSON.stringify(s.db.prepare('SELECT * FROM audit_log').all())).not.toContain(bugToken);
+  });
+
+  it('bug-token: create prints the token once, list and revoke work with the start of the id, and only the hash is stored', async () => {
+    const s = await startAccounts();
+    const made = run(['bug-token', 'create', '--days', '10', '--label', 'cloud session'], s.data);
+    expect(made.code).toBe(0);
+    const [token, note] = made.out.split('\n');
+    expect(token).toMatch(/^rbt_[\w-]{43}$/);
+    const id = /\(id ([0-9a-f]{8}), good until 2026-10-10 /.exec(note!)![1]!;
+    expect(JSON.stringify(s.db.prepare('SELECT * FROM bug_tokens').all())).not.toContain(token);
+    expect((await s.call({ url: '/api/v1/bugs', origin: null, headers: { authorization: `Bearer ${token}` } })).statusCode).toBe(200);
+    const list = run(['bug-token', 'list'], s.data).out;
+    expect(list).toMatch(new RegExp(`^${id}\\tgood\\tcloud session\\tuntil 2026-10-10\\tlast used 2026-09-30T12:00:00.000Z$`));
+    expect(list).not.toContain(token);
+    expect(run(['bug-token', 'revoke', id], s.data)).toMatchObject({ code: 0, out: `${id}: revoked` });
+    expect(run(['bug-token', 'revoke', id], s.data)).toMatchObject({ code: 0, out: `${id}: was revoked already` });
+    expect(run(['bug-token', 'list'], s.data).out).toMatch(/\trevoked\t/);
+    expect((await s.call({ url: '/api/v1/bugs', origin: null, headers: { authorization: `Bearer ${token}` } })).statusCode).toBe(401);
+    // logged with who made it and how long, never the token
+    const log = s.db.prepare("SELECT action, actor_id, payload FROM audit_log WHERE action LIKE 'bugtoken.%' ORDER BY seq").all() as { action: string; actor_id: string | null; payload: string }[];
+    expect(log.map((l) => l.action)).toEqual(['bugtoken.create', 'bugtoken.revoke']);
+    expect(log.every((l) => l.actor_id === null)).toBe(true);
+    expect(JSON.parse(log[0]!.payload)).toEqual({ via: 'roster-cli', days: 10, label: 'cloud session' });
+    expect(JSON.stringify(log)).not.toContain(token);
+  });
+
+  it('bug-token: refuses what makes no sense, and says why', async () => {
+    const s = await startAccounts();
+    expect(run(['bug-token', 'create', '--days', '0'], s.data)).toMatchObject({ code: 2, err: expect.stringMatching(/days is 1 to 180/) });
+    expect(run(['bug-token', 'create', '--days', '181'], s.data).code).toBe(2);
+    expect(run(['bug-token', 'create', '--nonsense'], s.data).code).toBe(2);
+    expect(run(['bug-token'], s.data).code).toBe(2);
+    expect(run(['bug-token', 'revoke'], s.data).code).toBe(2);
+    expect(run(['bug-token', 'revoke', 'zz'], s.data)).toMatchObject({ code: 3, err: expect.stringMatching(/at least 6 characters/) });
+    expect(run(['bug-token', 'revoke', 'abcdef'], s.data)).toMatchObject({ code: 3, err: expect.stringMatching(/no token starts with/) });
+    for (let i = 0; i < 5; i++) expect(run(['bug-token', 'create'], s.data).code).toBe(0);
+    expect(run(['bug-token', 'create'], s.data)).toMatchObject({ code: 2, err: expect.stringMatching(/5 tokens are good already/) });
+    expect(s.db.prepare('SELECT count(*) AS n FROM bug_tokens').get()).toEqual({ n: 5 });
+  });
+
+  it('bugs: the list, and one report as JSON without printing the warband', async () => {
+    const s = await startAccounts();
+    const anna = await s.user('anna');
+    const send = (title: string, extra: Record<string, unknown> = {}) => s.call({
+      method: 'POST', url: '/api/v1/bugs', token: anna.session(),
+      body: { id: crypto.randomUUID(), kind: 'bug', title, text: 'ZEBRA text', ...extra },
+    });
+    await send('Gold drifts\u001b[2J after the battle', { attach: { warbandId: crypto.randomUUID(), rev: 1, save: { name: 'ATTACH-ZEBRA', models: [] } } });
+    await send('The tooltip says five', { kind: 'rules', sourceRef: 'https://mordheimer.net/x' });
+    s.db.prepare("UPDATE bugs SET status = 'fixed', fixed_in = 'f00dbee' WHERE number = 2").run();
+    const open = run(['bugs'], s.data);
+    expect(open.code).toBe(0);
+    // somebody's text on a terminal: the escape code is gone
+    expect(open.out).toBe('#1\t-\tbug\tnew\tGold drifts [2J after the battle');
+    expect(run(['bugs', '--status', 'all'], s.data).out.split('\n')).toHaveLength(2);
+    expect(run(['bugs', '--status', 'fixed'], s.data).out).toMatch(/^#2\t-\trules\tfixed\t/);
+    expect(run(['bugs', '--status', 'nonsense'], s.data).code).toBe(2);
+    const shown = run(['bugs', 'show', '1'], s.data);
+    expect(shown.code).toBe(0);
+    expect(JSON.parse(shown.out)).toMatchObject({ number: 1, text: 'ZEBRA text', reporterName: 'anna' });
+    expect(shown.out).toMatch(/warband copy, \d+ KB \(not printed\)/);
+    expect(shown.out).not.toContain('ATTACH-ZEBRA');
+    expect(run(['bugs', 'show', '9'], s.data)).toMatchObject({ code: 3, err: expect.stringMatching(/there is no report/) });
+    expect(run(['bugs', 'show'], s.data).code).toBe(2);
   });
 
   it('refuses before the server has made the accounts', () => {
@@ -158,5 +227,18 @@ describe('roster-cli: accounts', () => {
     migrate(db, loadMigrations().slice(0, 1), clock().now);
     db.close();
     expect(run(['users'], data)).toMatchObject({ code: 3, err: expect.stringMatching(/no accounts yet/) });
+  });
+
+  it('a copy of production from before the report numbers and the bug token: the new commands wait for the server, test-accounts still works', () => {
+    const data = dataDir();
+    const db = openDb(join(data, 'roster.sqlite'));
+    migrate(db, loadMigrations().slice(0, 21), clock().now);
+    db.close();
+    expect(run(['bugs'], data)).toMatchObject({ code: 3, err: expect.stringMatching(/not at schema 22 yet/) });
+    expect(run(['bug-token', 'list'], data)).toMatchObject({ code: 3, err: expect.stringMatching(/not at schema 23 yet/) });
+    const out: string[] = [];
+    const code = runCli(['test-accounts'], { ...env(data), ROSTER_STAGING: '1' }, { out: (l) => out.push(l), err: (l) => out.push(l), input: () => 'staging test password 1\n' }, clock().now);
+    expect(code, out.join('\n')).toBe(0);
+    expect(out.join('\n')).toMatch(/0 bug tokens revoked/);
   });
 });

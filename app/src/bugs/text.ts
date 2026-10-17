@@ -12,6 +12,8 @@ export const KIND_LABEL: Record<BugKind, string> = { bug: 'Bug', wish: 'Wish', r
 
 export interface ReportDoc {
   id: string;
+  /** The server's number for it; none before it is sent. */
+  number?: number;
   kind: BugKind;
   title: string;
   text: string;
@@ -55,7 +57,7 @@ const rules = (r: Record<string, string | number | boolean> | null) =>
 
 export function reportText(r: ReportDoc): string {
   const out: string[] = [];
-  out.push(`# Problem report: ${r.title}`, '');
+  out.push(`# Problem report${r.number ? ` #${r.number}` : ''}: ${r.title}`, '');
   const head = [KIND_LABEL[r.kind], r.createdAt ? day(r.createdAt) : 'not sent yet', r.reporter ? `from ${r.reporter}` : '', r.appVersion ? `app ${r.appVersion.length === 40 ? r.appVersion.slice(0, 7) : r.appVersion}` : '', r.device].filter(Boolean);
   out.push(head.join(' · '));
   const sorted = [r.status ? `status ${r.status}` : '', r.severity ? `severity ${r.severity}` : '', r.area ? `area ${r.area}` : '', r.fixedIn ? `fixed in ${r.fixedIn}` : ''].filter(Boolean);

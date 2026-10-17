@@ -38,11 +38,15 @@ export interface Actor {
   sessionId: string;
   /** Password right, authenticator code still due. */
   pending: boolean;
+  /** A bug token, not an account (bug-tokens.ts): it may do the actions that name `token: true` and nothing else. */
+  token?: true;
 }
 
 /** totp: signed in with the authenticator set up. */
 type Who = 'public' | 'pending' | 'user' | 'totp' | 'admin';
 type TargetKind = 'owner' | 'member' | 'player' | 'leader';
+/** `token: true`: a bug token may do this too (ADR 0019). Anything without it is closed to a token. */
+interface Def { who: Who; target?: TargetKind; token?: true }
 
 export const ACTIONS = {
   /** GET /api/v1/health – for roster-deploy, the container healthcheck and roster-alive. */
@@ -130,18 +134,21 @@ export const ACTIONS = {
   /** Problem reports (phase 4c1): anyone signed in sends one and reads their own with its status; the reporter never reads another's. */
   'bugs.report': { who: 'user' },
   'bugs.mine': { who: 'user' },
-  /** Reading every report and sorting them (status, severity, area): the admin, with the authenticator. */
-  'bugs.read': { who: 'admin' },
-  'bugs.write': { who: 'admin' },
+  /** Reading every report and sorting them (status, severity, area): the admin, with the authenticator – and the bug token (phase 4c2, ADR 0019), which does these two and nothing else. */
+  'bugs.read': { who: 'admin', token: true },
+  'bugs.write': { who: 'admin', token: true },
   /** The background – the truth behind the story, ADR 0002 – read by the campaign's leaders alone, with the authenticator (phase 4b1). */
   'background.read': { who: 'user', target: 'leader' },
   /** Writing the background, taking entries out and revealing: leaders alone, with the authenticator (phase 4b1). */
   'background.write': { who: 'user', target: 'leader' },
-} as const satisfies Record<string, { who: Who; target?: TargetKind }>;
+} as const satisfies Record<string, Def>;
 
 export type Action = keyof typeof ACTIONS;
 
 export const isAction = (a: unknown): a is Action => typeof a === 'string' && Object.hasOwn(ACTIONS, a);
+
+/** Whether a bug token may do this action at all (ADR 0019). */
+export const tokenMay = (action: Action): boolean => (ACTIONS[action] as Def).token === true;
 
 /** Actions an account may use before its required authenticator is set up:
     looking after itself, and leaving. */
@@ -157,8 +164,8 @@ export type Target = { ownerId: string } | { role: CampaignRole | null };
 /** can(actor, action[, target]). Without a target an action with one only
     asks who is at the door; the handler asks again with the target. */
 export function can(actor: Actor | null, action: Action, target?: Target): boolean {
-  const def: { who: Who; target?: TargetKind } = ACTIONS[action];
-  if (!canAtDoor(actor, def.who, action)) return false;
+  const def: Def = ACTIONS[action];
+  if (!canAtDoor(actor, def, action)) return false;
   if (!target || !def.target) return true;
   if (def.target === 'owner') return 'ownerId' in target && actor!.id === target.ownerId;
   const role = 'role' in target ? target.role : null;
@@ -168,7 +175,10 @@ export function can(actor: Actor | null, action: Action, target?: Target): boole
   return role === 'leader' && actor!.totp;
 }
 
-function canAtDoor(actor: Actor | null, who: Who, action: Action): boolean {
+function canAtDoor(actor: Actor | null, def: Def, action: Action): boolean {
+  const who = def.who;
+  // a bug token does exactly the actions that name it, whatever `who` says
+  if (actor?.token) return def.token === true;
   if (who === 'public') return true;
   if (!actor) return false;
   if (who === 'pending') return actor.pending;

@@ -522,6 +522,8 @@ export const MATRIX: Record<Action, MatrixRow> = {
 export const SECRET_KEYS = ['pw_hash', 'pwHash', 'token_hash', 'tokenHash', 'totp_secret_enc', 'totp_pending_enc', 'totp_recovery', 'password'];
 /** Values no answer may carry: a password hash, an encrypted secret. */
 export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
+  // a bug token (phase 4c2) is shown once by roster-cli and never by the server
+  /^rbt_[\w-]{20,}$/,
   // a sealed note before its battle is closed, and a leaders' note: no role of the matrix may ever read them (ADR 0011)
   /SEALED-SECRET/, /LEADER-SECRET/,
   // the background's truth (phase 4b1): only leaders read it – and the entries the probes read in the admin's own campaign do not carry it

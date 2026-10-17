@@ -96,7 +96,7 @@ export const PatchBody = z.object({
 export type PatchInput = z.infer<typeof PatchBody>;
 
 interface Row {
-  id: string; reporter_id: string; kind: (typeof KINDS)[number]; title: string; text: string; source_ref: string; severity: (typeof SEVERITIES)[number] | null; area: string;
+  id: string; number: number; reporter_id: string; kind: (typeof KINDS)[number]; title: string; text: string; source_ref: string; severity: (typeof SEVERITIES)[number] | null; area: string;
   status: (typeof STATUSES)[number]; app_version: string; device: string; view: string; js_errors: string; context: string | null; warband_id: string | null; rev: number | null;
   consent_attach: 0 | 1; attachment: string | null; fixed_in: string; created_at: string; updated_at: string;
 }
@@ -108,7 +108,7 @@ export interface MyBug {
 
 /** One line of the admin's list. */
 export interface BugSummary {
-  id: string; reporterId: string; reporterName: string; kind: Row['kind']; title: string; status: Row['status']; severity: Row['severity']; area: string;
+  id: string; number: number; reporterId: string; reporterName: string; kind: Row['kind']; title: string; status: Row['status']; severity: Row['severity']; area: string;
   appVersion: string; view: string; fixedIn: string; consent: boolean; attached: boolean; createdAt: string; updatedAt: string;
 }
 
@@ -119,10 +119,14 @@ export interface BugDetail extends BugSummary {
 
 export const bugById = (db: DB, id: string) => db.prepare('SELECT * FROM bugs WHERE id = ?').get(id) as Row | undefined;
 
+/** A report by what people say: its number ("7"), or its id from the device. */
+export const bugByRef = (db: DB, ref: string): Row | undefined =>
+  /^[1-9]\d{0,8}$/.test(ref) ? (db.prepare('SELECT * FROM bugs WHERE number = ?').get(Number(ref)) as Row | undefined) : UUID.test(ref) ? bugById(db, ref.toLowerCase()) : undefined;
+
 const mine = (r: Row): MyBug => ({ id: r.id, kind: r.kind, title: r.title, text: r.text, sourceRef: r.source_ref, status: r.status, fixedIn: r.fixed_in, createdAt: r.created_at, updatedAt: r.updated_at });
 
 const summary = (r: Row, name: string): BugSummary => ({
-  id: r.id, reporterId: r.reporter_id, reporterName: name, kind: r.kind, title: r.title, status: r.status, severity: r.severity, area: r.area, appVersion: r.app_version, view: r.view,
+  id: r.id, number: r.number, reporterId: r.reporter_id, reporterName: name, kind: r.kind, title: r.title, status: r.status, severity: r.severity, area: r.area, appVersion: r.app_version, view: r.view,
   fixedIn: r.fixed_in, consent: r.consent_attach === 1, attached: r.attachment !== null, createdAt: r.created_at, updatedAt: r.updated_at,
 });
 
@@ -165,8 +169,9 @@ export function reportBug(db: DB, by: string, input: ReportInput, now: Date): Re
     const day = db.prepare('SELECT count(*) AS n FROM bugs WHERE reporter_id = ? AND created_at > ?').get(by, since) as { n: number };
     const all = db.prepare('SELECT count(*) AS n FROM bugs WHERE reporter_id = ?').get(by) as { n: number };
     if (day.n >= MAX_PER_DAY || all.n >= MAX_PER_USER) return { ok: false, status: 429, error: 'too_many' };
-    db.prepare(`INSERT INTO bugs (id, reporter_id, kind, title, text, source_ref, app_version, device, view, js_errors, context, warband_id, rev, consent_attach, attachment, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    // the next free number: one process writes, and this runs inside the transaction
+    db.prepare(`INSERT INTO bugs (id, number, reporter_id, kind, title, text, source_ref, app_version, device, view, js_errors, context, warband_id, rev, consent_attach, attachment, created_at, updated_at)
+      VALUES (?, (SELECT COALESCE(MAX(number), 0) + 1 FROM bugs), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       id, by, input.kind, input.title, input.text, input.sourceRef, input.appVersion, input.device, input.view, JSON.stringify(input.jsErrors),
       input.context ? JSON.stringify(input.context) : null, input.attach?.warbandId.toLowerCase() ?? null, input.attach?.rev ?? null, input.attach ? 1 : 0, attachment, iso(now), iso(now),
     );
@@ -190,7 +195,7 @@ export function oneBug(db: DB, id: string): BugDetail | null {
 export type Patch = { ok: true; bug: BugDetail } | { ok: false; status: 400 | 404; error: string; problem?: string };
 
 /** The admin sorts a report. A fixed one names its version; one back in work forgets it; a closed one or a duplicate lets go of the warband copy. */
-export function patchBug(db: DB, id: string, input: PatchInput, by: string, now: Date): Patch {
+export function patchBug(db: DB, id: string, input: PatchInput, by: string, now: Date, via: 'bug-token' | null = null): Patch {
   return db.transaction((): Patch => {
     const cur = bugById(db, id);
     if (!cur) return { ok: false, status: 404, error: 'not_found' };
@@ -208,7 +213,7 @@ export function patchBug(db: DB, id: string, input: PatchInput, by: string, now:
     const letGo = status === 'closed' || status === 'duplicate';
     const same = next.status === cur.status && next.severity === cur.severity && next.area === cur.area && next.kind === cur.kind && next.fixedIn === cur.fixed_in && !(letGo && cur.attachment !== null);
     if (!same) {
-      audit(db, { actorId: by, action: 'bug.update', targetType: 'bug', targetId: id, visibility: 'admin', payload: { from: cur.status, status: next.status, severity: next.severity } }, now);
+      audit(db, { actorId: by, action: 'bug.update', targetType: 'bug', targetId: id, visibility: 'admin', payload: { from: cur.status, status: next.status, severity: next.severity, ...(via ? { via } : {}) } }, now);
       db.prepare('UPDATE bugs SET status = ?, severity = ?, area = ?, kind = ?, fixed_in = ?, attachment = CASE WHEN ? THEN NULL ELSE attachment END, updated_at = ? WHERE id = ?')
         .run(next.status, next.severity, next.area, next.kind, next.fixedIn, letGo ? 1 : 0, iso(now), id);
     }

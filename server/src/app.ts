@@ -11,7 +11,8 @@ import type { DB } from './db.ts';
 import type { Health } from './health.ts';
 import type { HashCost } from './passwords.ts';
 import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
-import { ACTIONS, can, isAction, type Action, type Actor } from './policy.ts';
+import { bugTokenActor } from './bug-tokens.ts';
+import { ACTIONS, can, isAction, tokenMay, type Action, type Actor } from './policy.ts';
 import { readActor, registerAccountRoutes, sessionCookie } from './routes-accounts.ts';
 import { HashBusyError } from './passwords.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
@@ -132,15 +133,25 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     if (!infra) {
       // the data endpoints stay closed while the database is not ready (start.ts)
       if (!db) return reply.code(503).send({ error: 'unavailable' });
-      if (req.method !== 'GET' && req.method !== 'HEAD' && !sameOrigin(req, deps.config.publicOrigin ?? null)) {
-        return reply.code(403).send({ error: 'cross_origin' });
+      const bearer = bearerToken(req);
+      if (bearer !== null) {
+        // A bug token (ADR 0019): it is sent by hand in a header, which a browser never adds by itself and another site
+        // cannot add – so there is nothing to forge and no Origin to ask for. It gets no further than its own actions,
+        // a cookie beside it is not even read, and a token that is not good is not turned into "nobody" (a public route would answer).
+        if (!tokenMay(action)) return reply.code(403).send({ error: 'forbidden' });
+        req.actor = bugTokenActor(db, bearer, now());
+        if (!req.actor) return reply.code(401).send({ error: 'sign_in' });
+      } else {
+        if (req.method !== 'GET' && req.method !== 'HEAD' && !sameOrigin(req, deps.config.publicOrigin ?? null)) {
+          return reply.code(403).send({ error: 'cross_origin' });
+        }
+        // a session in use lives on – its cookie with it (security review AUTH-14)
+        req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), 90)));
+        // the account the app made the request for: another than the cookie's is refused, never answered for the cookie
+        // (a tab where somebody else signed in meanwhile; its unsent items stay its author's – independent review of CLIENT-1)
+        const claimed = req.headers['x-roster-user'];
+        if (typeof claimed === 'string' && req.actor && claimed !== req.actor.id) return reply.code(409).send({ error: 'other_user' });
       }
-      // a session in use lives on – its cookie with it (security review AUTH-14)
-      req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), 90)));
-      // the account the app made the request for: another than the cookie's is refused, never answered for the cookie
-      // (a tab where somebody else signed in meanwhile; its unsent items stay its author's – independent review of CLIENT-1)
-      const claimed = req.headers['x-roster-user'];
-      if (typeof claimed === 'string' && req.actor && claimed !== req.actor.id) return reply.code(409).send({ error: 'other_user' });
     }
     if (!can(req.actor, action)) return reply.code(req.actor ? 403 : 401).send({ error: req.actor ? 'forbidden' : 'sign_in' });
   });
@@ -232,6 +243,12 @@ function sameOrigin(req: FastifyRequest, publicOrigin: string | null): boolean {
   } catch {
     return false;
   }
+}
+
+/** The token of `Authorization: Bearer <token>`; null: the request does not use one. */
+function bearerToken(req: FastifyRequest): string | null {
+  const m = /^Bearer\s+(\S+)$/i.exec(req.headers.authorization ?? '');
+  return m ? m[1]! : null;
 }
 
 function acceptsHtml(req: FastifyRequest) {
