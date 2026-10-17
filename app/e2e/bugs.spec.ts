@@ -31,6 +31,10 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(srv.state.bugs[0]).toMatchObject({ kind: 'bug', status: 'new', title: 'The trading post does not open. I tap Buy and nothing happens.' });
     await done.getByRole('button', { name: 'Done' }).click();
     await expect(done).toBeHidden();
+    // closing a sheet takes its history entry away with a step back, which is
+    // still on its way when the dialog is already gone; a reload now would
+    // cancel it ("ERR_ABORTED") or be cancelled by it
+    await page.waitForFunction(() => !(history.state as { mordheimSheet?: boolean } | null)?.mordheimSheet);
     const section = page.getByRole('region', { name: 'Your reports' });
     await expect(section.getByText('Received')).toBeVisible();
     srv.state.bugs[0]!.status = 'fixed';
