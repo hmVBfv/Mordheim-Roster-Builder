@@ -91,6 +91,8 @@ export interface ProbeContext {
   /** Chapter drafts of the admin's campaign (phase 4b5b): one to publish, a spare one to throw away. */
   ledDraftId: string;
   spareDraftId: string;
+  /** A problem report of the user role's (phase 4c1): the admin reads and sorts it. */
+  bugId: string;
 }
 
 export interface Probe {
@@ -479,6 +481,34 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { admin: ['entry', 'seq', 'note', 'removed'] },
   },
+  'bugs.report': {
+    // anyone signed in may send one – the admin too, with the authenticator
+    allowed: signedIn,
+    routes: {
+      'POST /api/v1/bugs': () => ({ method: 'POST', url: '/api/v1/bugs', body: { id: randomUUID(), kind: 'bug', title: 'The roster does not scroll', text: 'It stops at the third hero.' } }),
+    },
+    fields: same(signedIn, ['bug']),
+  },
+  'bugs.mine': {
+    // each reads only their own; the other reporters' words and copies carry markers no role may read here
+    allowed: signedIn,
+    routes: { 'GET /api/v1/bugs/mine': () => ({ method: 'GET', url: '/api/v1/bugs/mine' }) },
+    fields: same(signedIn, ['bugs']),
+  },
+  'bugs.read': {
+    // the admin reads the list (a summary: no words, no copy) and one report that carries no marker
+    allowed: ['admin'],
+    routes: {
+      'GET /api/v1/bugs': () => ({ method: 'GET', url: '/api/v1/bugs?status=all' }),
+      'GET /api/v1/bugs/:id': (c) => ({ method: 'GET', url: `/api/v1/bugs/${c.bugId}` }),
+    },
+    fields: { admin: ['bugs', 'bug'] },
+  },
+  'bugs.write': {
+    allowed: ['admin'],
+    routes: { 'PATCH /api/v1/bugs/:id': (c) => ({ method: 'PATCH', url: `/api/v1/bugs/${c.bugId}`, body: { status: 'confirmed', severity: 'S3' } }) },
+    fields: { admin: ['bug'] },
+  },
   'battle.propose': {
     allowed: ['user'],
     routes: {
@@ -503,4 +533,6 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   // the style guide of the victim's campaign (phase 4b4a): leaders' own, and none of its leaders is a role of the matrix
   /STYLE-SECRET/,
   // a chapter draft of the victim's campaign (phase 4b5b): only its leaders read it, and none of them is a role of the matrix
-  /DRAFT-SECRET/];
+  /DRAFT-SECRET/,
+  // a problem report (phase 4c1): its words reach only its reporter and, in the report's own detail, the admin – the probes read a report without the marker; the list carries no words and no copy of a warband
+  /BUG-SECRET/];

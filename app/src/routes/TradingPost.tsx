@@ -245,13 +245,13 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   const heroes = searchers(ctx);
   const findable = rare.filter((it) => (kind === 'all' || it.kind === kind) && (!usable || it.usable));
 
-  const { ref: buyRef, open: openBuy, close: closeBuy } = useSheet();
+  const { ref: buyRef, open: openBuy, close: closeBuy } = useSheet('buy');
   const [buying, setBuying] = useState<{ key: number; item: ShopItem } | null>(null);
-  const { ref: searchRef, open: openSearch, close: closeSearch } = useSheet();
+  const { ref: searchRef, open: openSearch, close: closeSearch } = useSheet('search');
   const [seeking, setSeeking] = useState<{ key: number; uid: number | null; de: string | null } | null>(null);
-  const { ref: sellRef, open: openSell, close: closeSell } = useSheet();
+  const { ref: sellRef, open: openSell, close: closeSell } = useSheet('sell');
   const [selling, setSelling] = useState<{ key: number; h: Holding } | null>(null);
-  const { ref: giveRef, open: openGive, close: closeGive } = useSheet();
+  const { ref: giveRef, open: openGive, close: closeGive } = useSheet('give');
   const [giving, setGiving] = useState<{ key: number; h: Holding } | null>(null);
   const ids = { buy: useId(), search: useId(), sell: useId(), give: useId() };
   const rareName = (de: string) => rare.find((x) => x.de === de)?.name ?? de;

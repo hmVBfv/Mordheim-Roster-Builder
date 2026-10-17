@@ -8,7 +8,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 
 export function ImportSheet({ onImported, quiet = false }: { onImported: (id: string) => void; quiet?: boolean }) {
-  const { ref: sheetRef, open: openSheet, close: closeSheet } = useSheet();
+  const { ref: sheetRef, open: openSheet, close: closeSheet } = useSheet('import');
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

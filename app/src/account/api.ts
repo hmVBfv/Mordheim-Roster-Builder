@@ -5,6 +5,8 @@
    always JSON – anything else means it is not there (offline, a proxy page,
    the dev server without the API). */
 
+import { callPattern, note } from '../bugs/trail.ts';
+
 /** The signed-in user, as GET /auth/me tells it. */
 export interface Me {
   id: string;
@@ -80,9 +82,10 @@ export async function apiBytes<T>(path: string, bytes: ArrayBuffer, type: string
   try {
     res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type, ...whose(as) }, body: bytes });
   } catch {
+    note('api', `PUT ${callPattern(path)} → offline`);
     throw new ApiError(0, 'offline');
   }
-  return answer<T>(res);
+  return answer<T>(res).catch(failed('PUT', path));
 }
 
 /** `as`: the account the request is made for – by default the one this tab acts for, null for nobody (asking who is signed in). */
@@ -100,10 +103,17 @@ export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PU
       ...(write ? { body: JSON.stringify(init.body ?? {}) } : {}),
     });
   } catch {
+    note('api', `${method} ${callPattern(path)} → offline`);
     throw new ApiError(0, 'offline');
   }
-  return answer<T>(res);
+  return answer<T>(res).catch(failed(method, path));
 }
+
+/** A failed call goes into the trail of a problem report as a pattern with its status – never the address, never the body. */
+const failed = (method: string, path: string) => (e: unknown): never => {
+  if (e instanceof ApiError) note('api', `${method} ${callPattern(path)} → ${e.status || 'none'} ${e.code}`);
+  throw e;
+};
 
 /** What to tell the player when a request failed. */
 export function errorText(e: unknown): string {
@@ -125,6 +135,7 @@ export function errorText(e: unknown): string {
     case 'quota': return 'The campaign has no room for more pictures.';
     case 'account_full': return 'Your warbands hold 16 MB already – archive some you no longer play first.';
     case 'other_user': return 'Somebody else signed in on this device meanwhile – the app now goes on as them.';
+    case 'too_many': return 'You have sent a lot of reports today. Tell Rob in person, or try again tomorrow.';
     case 'busy': return 'The campaign server is busy with sign-ins right now. Try again in a few seconds.';
     case 'history_closed': return 'The campaign has played a battle in the app: its history is closed.';
     case 'in_use': return 'Notes or pictures belong to this battle: it stays.';

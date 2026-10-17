@@ -328,8 +328,21 @@ aber vollständig und geordnet:
   du tun? Was ist stattdessen passiert?“), verlangt aber nichts außer einem
   Satz; ein Knopf „Problem melden“ ist überall mit einem Tipp erreichbar.
   Was mitgeht, steht vor dem Senden lesbar da.
-- Status: neu → bestätigt → in Arbeit → behoben in Version X → geschlossen.
-  Der Meldende sieht den Stand.
+- **Umgesetzt in 4c1 (17.10.2026):** der Kontext besteht nur aus Struktur und
+  festen Wörtern (Bildschirm als Muster ohne Kennungen, Namen der Blätter,
+  „eine Änderung an der Warband“ statt ihres Inhalts, Sync- und Online-Stand,
+  fehlgeschlagene Aufrufe als Muster mit Status, die letzten fünf
+  JS-Fehler) – nichts, was jemand getippt hat, auch keine Namen und Titel
+  (ADR 0002). Die Warband geht **nur mit einem eigenen Haken** mit, als Kopie
+  zum Meldezeitpunkt, und wird beim Schließen oder als Duplikat verworfen.
+  Wer nicht senden kann (Quick Build, abgemeldet, offline), kopiert die
+  Meldung als Text und gibt sie von Hand weiter. Der Admin übergibt eine
+  Meldung ebenso von Hand: **„Copy for Claude“** (Text mit der Meldung als
+  Daten), „Download the report“ (.md) und „Download the warband“ (.json) – eine
+  Anbindung gibt es nicht (ADR 0018). Rückfragen gehen am Tisch oder im Chat;
+  eine Kommentarliste an der Meldung gibt es nicht.
+- Status: neu → bestätigt → in Arbeit → behoben in Version X → geschlossen
+  (oder Duplikat). Der Meldende sieht den Stand unter More → „Your reports“.
 - **Bearbeitung nur auf Zuruf:** Claude Code mit `/bugs` (siehe
   [roadmap.md](roadmap.md), Phase 4c). Einordnung nach festen Schweregraden
   (S1–S4, siehe [security.md](security.md)); Regelfehler entscheidet Rob;

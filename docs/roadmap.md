@@ -325,6 +325,30 @@ durchgelaufen.
 mit Kontext und Status, ein weiterer für Triage, Bug-Token, `/bugs` und den
 Reviewer.
 
+**Stand 17.10.2026 (4c1):** umgesetzt – Tabelle, Meldung mit Kontext, Status
+für den Meldenden und die Übergabe von Hand. Migration 21 (Tabelle `bugs`,
+`server/src/bugs.ts`, `routes-bugs.ts`, Policy `bugs.report|mine|read|write`,
+neue Zeilen der Leak-Matrix mit Merkwort). App `app/src/bugs/`: Knopf
+**„Report a problem“** im Kopf jeder Seite (Blatt mit Art, Text, bei
+Regelfehlern Quelle), **More → „Your reports“** mit dem Stand, Reiter
+**„Reports“** im Admin-Bereich. Der Kontext besteht nur aus Struktur und festen
+Wörtern (Bildschirm als Muster ohne Kennungen, Namen der Blätter, „eine
+Änderung an der Warband“, Sync- und Online-Stand, fehlgeschlagene Aufrufe als
+Muster mit Status, die letzten fünf JS-Fehler, Einstellungen, Hausregeln von
+Warband und Kampagne); nichts, was jemand getippt hat. Was mitgeht, steht vor
+dem Senden lesbar im Formular. Die Warband geht nur mit einem eigenen Haken
+mit, als Kopie zum Meldezeitpunkt, und wird beim Schließen oder als Duplikat
+wieder verworfen. Grenzen: 20 Meldungen je 24 Stunden, 300 je Nutzer. Ohne
+Netz oder ohne Konto (und im Quick Build) bleibt „Copy the report“ – der
+Text zum Weitergeben von Hand. Der Admin sortiert (Grad, Bereich, Status,
+„fixed in“) und hat „Copy for Claude“, „Download the report“ und „Download the
+warband“ – die Übergabe nach ADR 0018, ohne Anbindung. **Entschieden:**
+Kopie statt Verweis auf die Warband (sonst bräuchte der Admin einen Lesezugriff
+auf fremde Warbands); keine Tabelle `bug_comments` – Rückfragen gehen am Tisch
+oder im Chat. **Offen für 4c2:** Triage und Schweregrad durch Claude, Bug-Token
+(nur `GET/PATCH /bugs`), `roster-cli`, Bereiniger für Testvorlagen aus
+Meldungen, `.claude/commands/bugs.md`, `.claude/agents/reviewer.md`.
+
 ## Phase 5 – Extras
 
 - Volltextsuche (SQLite FTS5) über Notizen, Zeitleiste, Lebensläufe.

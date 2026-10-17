@@ -6,6 +6,7 @@
    data – is loaded only for the first round. */
 import { useSyncExternalStore } from 'react';
 import { deviceLabel } from '../account/device.ts';
+import { note } from '../bugs/trail.ts';
 import { ApiError } from '../account/api.ts';
 import { FLAVOUR } from '../flavour.ts';
 import { countPending } from './pending.ts';
@@ -24,7 +25,12 @@ export const AFTER_CHANGE_MS = 1500;
 
 let status: SyncStatus = { state: 'off' };
 const listeners = new Set<() => void>();
-const setStatus = (s: SyncStatus) => { status = s; for (const l of listeners) l(); };
+const setStatus = (s: SyncStatus) => {
+  // a change of state goes into the trail of a problem report (not each round)
+  if (s.state !== status.state) note('sync', s.state === 'error' ? `error: ${s.message.slice(0, 60)}` : s.state);
+  status = s;
+  for (const l of listeners) l();
+};
 
 export const getSyncStatus = () => status;
 export function useSyncStatus(): SyncStatus {

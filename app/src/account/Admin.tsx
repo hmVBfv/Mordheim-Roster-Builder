@@ -10,6 +10,7 @@ import { copyText } from '../ui/files.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
+import { AdminBugs } from '../bugs/AdminBugs.tsx';
 import { api, errorText } from './api.ts';
 import styles from './Account.module.css';
 import { useSession } from './session.ts';
@@ -24,6 +25,7 @@ export const TABS = [
   { key: 'invites', label: 'Invites' },
   { key: 'logins', label: 'Sign-ins' },
   { key: 'audit', label: 'Audit log' },
+  { key: 'bugs', label: 'Reports' },
 ] as const;
 
 const PAGE = 50;
@@ -316,6 +318,7 @@ export function Admin() {
       {current.key === 'invites' && <Invites onNotice={notify} />}
       {current.key === 'logins' && <Logins />}
       {current.key === 'audit' && <Audit />}
+      {current.key === 'bugs' && <AdminBugs onNotice={notify} />}
       {notice}
     </section>
   );
