@@ -5,9 +5,11 @@
      node core/scripts/bugs.ts set <number> [--status S] [--severity S1..S4|none] [--kind K] [--area TEXT] [--fixed-in VERSION]
      node core/scripts/bugs.ts fixture <number> [out.json]
 
-   Needs ROSTER_URL (the server's address, https) and ROSTER_BUG_TOKEN in the
-   environment – the cloud environment's settings, never a file in the
-   repository. The token opens GET and PATCH /bugs and nothing else. `fixture`
+   Needs ROSTER_URL (the server's address, https) in the environment – the
+   cloud environment's settings, never a file in the repository – and the bug
+   token: as ROSTER_BUG_TOKEN, or kept out of the session as a network secret
+   the environment's proxy adds to requests for that host. The token opens
+   GET and PATCH /bugs and nothing else. `fixture`
    takes the warband copy a reporter attached, cleans it as `sanitize-save`
    does (core/src/format/sanitize.ts) and writes it to core/test/saves/bug-<n>.json,
    or to the path given; it never overwrites a file. Names stay, as in the

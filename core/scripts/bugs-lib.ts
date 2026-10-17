@@ -7,24 +7,27 @@
    Two rules the code keeps:
    - The token is never printed, written or put into an error message; it
      travels only in the Authorization header, and only over https (plain
-     http only to this machine, for tests).
+     http only to this machine, for tests). A cloud environment can keep the
+     token out of the session altogether, as a network secret its proxy adds
+     to requests for the server's host: then ROSTER_BUG_TOKEN is not set and
+     the request goes without a header (docs/operations.md).
    - A report is somebody's text. It is shown fenced and labelled as data,
      control characters are taken out, and nothing in it is ever run. */
 
-export interface Config { base: URL; token: string }
+export interface Config { base: URL; /** null: the environment's proxy adds it (a network secret). */ token: string | null }
 
-/** ROSTER_URL and ROSTER_BUG_TOKEN of the session's environment. */
+/** ROSTER_URL and, if the session holds the token itself, ROSTER_BUG_TOKEN. */
 export function configFrom(env: Record<string, string | undefined>): { ok: true; config: Config } | { ok: false; problem: string } {
   const url = env.ROSTER_URL?.trim();
   const token = env.ROSTER_BUG_TOKEN?.trim();
-  if (!url || !token) return { ok: false, problem: 'ROSTER_URL and ROSTER_BUG_TOKEN are not set in this environment (docs/operations.md, "Bug-Token für eine Cloud-Sitzung")' };
+  if (!url) return { ok: false, problem: 'ROSTER_URL is not set in this environment (docs/operations.md, "Bug-Token für eine Cloud-Sitzung")' };
   let base: URL;
   try { base = new URL(url); } catch { return { ok: false, problem: 'ROSTER_URL is not an address' }; }
   const here = ['localhost', '127.0.0.1', '[::1]'].includes(base.hostname);
   if (base.protocol !== 'https:' && !(base.protocol === 'http:' && here)) return { ok: false, problem: 'ROSTER_URL must be https:// – the token never travels in the clear' };
   if (base.username || base.password) return { ok: false, problem: 'ROSTER_URL carries no user name or password' };
-  if (!/^rbt_[\w-]{20,}$/.test(token)) return { ok: false, problem: 'ROSTER_BUG_TOKEN is not a bug token (it starts with rbt_)' };
-  return { ok: true, config: { base: new URL(base.origin), token } };
+  if (token && !/^rbt_[\w-]{20,}$/.test(token)) return { ok: false, problem: 'ROSTER_BUG_TOKEN is not a bug token (it starts with rbt_)' };
+  return { ok: true, config: { base: new URL(base.origin), token: token || null } };
 }
 
 export type Fetch = (url: string, init: RequestInit) => Promise<Response>;
@@ -33,8 +36,11 @@ export class BugsError extends Error {
   override name = 'BugsError';
 }
 
+const reason401 = (config: Config) => config.token
+  ? 'the server does not know this token (revoked, expired or mistyped) – ask Rob for a new one'
+  : 'the server wants a bug token: ROSTER_BUG_TOKEN is not set and the environment’s network secret did not add one (is it set for this host? docs/operations.md)';
+
 const REASONS: Record<number, string> = {
-  401: 'the server does not know this token (revoked, expired or mistyped) – ask Rob for a new one',
   403: 'this token may not do that',
   404: 'there is no such report',
   429: 'too many requests',
@@ -46,7 +52,7 @@ export async function call(config: Config, method: 'GET' | 'PATCH', path: string
   try {
     res = await fetchFn(new URL(`/api/v1${path}`, config.base).toString(), {
       method,
-      headers: { authorization: `Bearer ${config.token}`, accept: 'application/json', ...(body !== undefined ? { 'content-type': 'application/json' } : {}) },
+      headers: { ...(config.token ? { authorization: `Bearer ${config.token}` } : {}), accept: 'application/json', ...(body !== undefined ? { 'content-type': 'application/json' } : {}) },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       // a redirect would take the header somewhere else
       redirect: 'error',
@@ -61,7 +67,8 @@ export async function call(config: Config, method: 'GET' | 'PATCH', path: string
   try { json = text ? JSON.parse(text) : null; } catch { /* not JSON: said below */ }
   if (!res.ok) {
     const problem = (json as { problem?: string; error?: string } | null)?.problem ?? (json as { error?: string } | null)?.error ?? '';
-    throw new BugsError(`${method} ${path}: ${res.status} ${REASONS[res.status] ?? problem}${REASONS[res.status] && problem ? ` (${problem})` : ''}`.trim());
+    const reason = res.status === 401 ? reason401(config) : REASONS[res.status];
+    throw new BugsError(`${method} ${path}: ${res.status} ${reason ?? problem}${reason && problem ? ` (${problem})` : ''}`.trim());
   }
   if (json === null) throw new BugsError(`${method} ${path}: the answer was not JSON`);
   return json;

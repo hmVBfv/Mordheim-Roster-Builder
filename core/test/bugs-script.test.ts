@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { BugsError, call, configFrom, isNumber, listLine, patchFrom, plain, renderReport, type Fetch } from '../scripts/bugs-lib.ts';
+import { BugsError, call, configFrom, isNumber, listLine, patchFrom, plain, renderReport, type Config, type Fetch } from '../scripts/bugs-lib.ts';
 
 const TOKEN = `rbt_${'k7Qz'.repeat(11)}`;
 const good = configFrom({ ROSTER_URL: 'https://roster.example', ROSTER_BUG_TOKEN: TOKEN });
@@ -18,12 +18,12 @@ const config = good.config;
 const answer = (status: number, body: unknown): Response => new Response(typeof body === 'string' ? body : JSON.stringify(body), { status });
 
 describe('the settings', () => {
-  it('want both variables, https, no credentials in the address and a token that looks like one', () => {
+  it('want the address (https, no credentials in it) and, if there is a token, one that looks like one', () => {
     const env = (o: Record<string, string>) => configFrom({ ROSTER_URL: 'https://roster.example', ROSTER_BUG_TOKEN: TOKEN, ...o });
     expect(env({})).toMatchObject({ ok: true });
-    expect(configFrom({})).toMatchObject({ ok: false, problem: expect.stringMatching(/not set/) });
+    expect(configFrom({})).toMatchObject({ ok: false, problem: expect.stringMatching(/ROSTER_URL is not set/) });
+    expect(configFrom({ ROSTER_BUG_TOKEN: TOKEN })).toMatchObject({ ok: false });
     expect(env({ ROSTER_URL: '' })).toMatchObject({ ok: false });
-    expect(env({ ROSTER_BUG_TOKEN: '' })).toMatchObject({ ok: false });
     expect(env({ ROSTER_URL: 'http://roster.example' })).toMatchObject({ ok: false, problem: expect.stringMatching(/https/) });
     expect(env({ ROSTER_URL: 'ftp://roster.example' })).toMatchObject({ ok: false });
     expect(env({ ROSTER_URL: 'roster.example' })).toMatchObject({ ok: false, problem: expect.stringMatching(/not an address/) });
@@ -35,6 +35,12 @@ describe('the settings', () => {
     // only the origin is kept: a path in the address does not move the API
     const withPath = env({ ROSTER_URL: 'https://roster.example/some/path?x=1' });
     expect(withPath.ok && withPath.config.base.href).toBe('https://roster.example/');
+  });
+
+  it('let the token be missing: the environment’s proxy may add it as a network secret', () => {
+    const r = configFrom({ ROSTER_URL: 'https://roster.example' });
+    expect(r).toMatchObject({ ok: true, config: { token: null } });
+    expect(configFrom({ ROSTER_URL: 'https://roster.example', ROSTER_BUG_TOKEN: '  ' })).toMatchObject({ ok: true, config: { token: null } });
   });
 
   it('never repeat the token in what they say', () => {
@@ -58,6 +64,15 @@ describe('a call', () => {
     await call(config, 'PATCH', '/bugs/7', { status: 'confirmed' }, fetchFn);
     expect(seen!.init.body).toBe('{"status":"confirmed"}');
     expect((seen!.init.headers as Record<string, string>)['content-type']).toBe('application/json');
+  });
+
+  it('sends no header at all without a token, and says what is missing when the server wants one', async () => {
+    const bare: Config = { base: config.base, token: null };
+    let init: RequestInit | null = null;
+    await call(bare, 'GET', '/bugs', undefined, async (_url, i) => { init = i; return answer(200, { bugs: [] }); });
+    expect(init!.headers).toEqual({ accept: 'application/json' });
+    const e = await call(bare, 'GET', '/bugs', undefined, async () => answer(401, { error: 'sign_in' })).then(() => null, (x: unknown) => x as Error);
+    expect(e!.message).toMatch(/401 the server wants a bug token: ROSTER_BUG_TOKEN is not set and the environment’s network secret did not add one/);
   });
 
   it('turns every kind of failure into a sentence without the token', async () => {
@@ -216,7 +231,7 @@ describe('npm run bugs', () => {
     const env = { ROSTER_URL: srv.url, ROSTER_BUG_TOKEN: TOKEN };
     const none = await run(['list'], {});
     expect(none.code).toBe(2);
-    expect(none.err).toMatch(/ROSTER_URL and ROSTER_BUG_TOKEN are not set/);
+    expect(none.err).toMatch(/ROSTER_URL is not set/);
     for (const args of [[], ['nonsense'], ['show'], ['show', 'seven'], ['set', '7'], ['set', '7', '--status', 'done'], ['list', '--status']]) {
       const r = await run(args, env);
       expect(r.code, args.join(' ')).toBe(2);
