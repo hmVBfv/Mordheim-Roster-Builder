@@ -104,7 +104,7 @@ export interface FakeScenario {
 
 /** A problem report (4c1) as the stand-in server keeps it. */
 export interface FakeBug {
-  id: string; reporterId: string; reporterName: string; kind: 'bug' | 'wish' | 'rules'; title: string; text: string; sourceRef: string;
+  id: string; number: number; reporterId: string; reporterName: string; kind: 'bug' | 'wish' | 'rules'; title: string; text: string; sourceRef: string;
   status: 'new' | 'confirmed' | 'in_progress' | 'fixed' | 'closed' | 'duplicate'; severity: 'S1' | 'S2' | 'S3' | 'S4' | null; area: string; fixedIn: string;
   appVersion: string; device: string; view: string; context: unknown; jsErrors: unknown[]; warbandId: string | null; rev: number | null; consent: boolean; attachment: unknown;
   createdAt: string; updatedAt: string;
@@ -1080,13 +1080,13 @@ export function createFakeSync(opts: {
   /* ---- problem reports (4c1) ---- */
   const bugMine = (b: FakeBug) => ({ id: b.id, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, status: b.status, fixedIn: b.fixedIn, createdAt: b.createdAt, updatedAt: b.updatedAt });
   const bugSummary = (b: FakeBug) => ({
-    id: b.id, reporterId: b.reporterId, reporterName: b.reporterName, kind: b.kind, title: b.title, status: b.status, severity: b.severity, area: b.area, appVersion: b.appVersion, view: b.view,
+    id: b.id, number: b.number, reporterId: b.reporterId, reporterName: b.reporterName, kind: b.kind, title: b.title, status: b.status, severity: b.severity, area: b.area, appVersion: b.appVersion, view: b.view,
     fixedIn: b.fixedIn, consent: b.consent, attached: b.attachment !== null, createdAt: b.createdAt, updatedAt: b.updatedAt,
   });
   const bugDetail = (b: FakeBug) => ({ ...bugSummary(b), text: b.text, sourceRef: b.sourceRef, device: b.device, jsErrors: b.jsErrors, context: b.context, warbandId: b.warbandId, rev: b.rev, attachment: b.attachment });
   const bugFrom = (x: Partial<FakeBug> & { title: string; text: string }): FakeBug => {
     const b: FakeBug = {
-      id: `bug-${s.bugs.length + 1}`, reporterId: 'user-ben', reporterName: 'Ben', kind: 'bug', sourceRef: '', status: 'new', severity: null, area: '', fixedIn: '', appVersion: 'abc1234', device: 'Firefox on Android', view: '/warbands/:id',
+      id: `bug-${s.bugs.length + 1}`, number: s.bugs.length + 1, reporterId: 'user-ben', reporterName: 'Ben', kind: 'bug', sourceRef: '', status: 'new', severity: null, area: '', fixedIn: '', appVersion: 'abc1234', device: 'Firefox on Android', view: '/warbands/:id',
       context: null, jsErrors: [], warbandId: null, rev: null, consent: false, attachment: null, createdAt: at(), updatedAt: at(), sent: {}, ...x,
     };
     s.bugs.push(b);

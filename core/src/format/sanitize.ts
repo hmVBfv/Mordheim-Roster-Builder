@@ -74,3 +74,13 @@ export function sanitizeSave(data: GameData, raw: unknown): unknown {
   }
   return out;
 }
+
+/** The paths whose value differs between two values, for the report of what a cleaning took out. */
+export function changedPaths(a: unknown, b: unknown, at = ''): string[] {
+  if (JSON.stringify(a) === JSON.stringify(b)) return [];
+  if (a && b && typeof a === 'object' && typeof b === 'object') {
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    return [...keys].flatMap((k) => changedPaths((a as Rec)[k], (b as Rec)[k], at ? `${at}.${k}` : k));
+  }
+  return [at || '(top)'];
+}

@@ -218,7 +218,10 @@ Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
 | `totp-reset <name>` | entfernt den Authenticator und meldet das Konto überall ab – der Weg zurück, wenn ein Admin Handy und Codes verloren hat |
 | `sign-out <name>` | beendet alle Sitzungen des Kontos |
 | `users` | Konten mit Admin, Faktor, gesperrt, Geräten, zuletzt gesehen |
-| `test-accounts` | nur auf der Testinstanz (`ROSTER_STAGING=1` in `staging.env`, sonst verweigert): Testpasswort von stdin für jedes Konto, keine Authenticatoren, keine Sitzungen, offene Links verfallen. Ruft der nächtliche Wiederherstellungstest selbst auf |
+| `test-accounts` | nur auf der Testinstanz (`ROSTER_STAGING=1` in `staging.env`, sonst verweigert): Testpasswort von stdin für jedes Konto, keine Authenticatoren, keine Sitzungen, offene Links verfallen, keine Bug-Tokens. Ruft der nächtliche Wiederherstellungstest selbst auf |
+| `bug-token create [--days <n>] [--label <text>]` | Token für eine Cloud-Sitzung (`GET`/`PATCH /bugs`, sonst nichts); einmal gezeigt, standardmäßig 60 Tage, höchstens 180, höchstens fünf gültige – [Abschnitt unten](#bug-token-für-eine-cloud-sitzung-ab-phase-4c2) |
+| `bug-token list` · `bug-token revoke <Kennung>` | die Tokens (gültig, abgelaufen, widerrufen, zuletzt benutzt) · eines sofort beenden |
+| `bugs [--status <status>]` · `bugs show <Nummer>` | die Problemmeldungen mit Nummer · eine als JSON, die angehängte Warband nur als Größe |
 
 ### Die laufende Kampagne übernehmen (einmalig, Phase 4a5)
 
@@ -259,6 +262,66 @@ nächtlichen Wiederherstellungstest wieder weg), dann genauso produktiv:
 Die Stände der Gruppe tragen keine Stufen-Snapshots (Entscheidung E in der
 [Roadmap](roadmap.md#offene-entscheidungen)): der erste Vergleich „What
 changed“ läuft von der Übernahme bis nach Schlacht N+1.
+
+### Bug-Token für eine Cloud-Sitzung (ab Phase 4c2)
+
+Eine Cloud-Sitzung (ADR 0015) liest die Problemmeldungen mit `/bugs`, ordnet
+sie ein und bearbeitet sie – nur auf Zuruf (ADR 0012). Dafür braucht sie ein
+**Bug-Token** ([ADR 0019](decisions/0019-bug-token.md)): Es öffnet
+`GET`/`PATCH /bugs` und sonst nichts. Es entsteht nur hier, auf dem Pi, wird
+einmal gezeigt und läuft nach 60 Tagen ab. Der Server erreicht die Sitzung über
+das Internet (Port 443 ist freigegeben), die Sitzung braucht also nichts im
+Heimnetz.
+
+Das Token soll die Sitzung nie *sehen*: Eine Meldung ist Text von Spielern und
+kann Anweisungen enthalten. Darum legst du es als **Network secret** in die
+Umgebung – der Proxy der Cloud-Sitzung hängt es an Anfragen für deinen Server,
+die Sitzung bekommt es nie in die Hand. (Quelle:
+[Cloud-Umgebungen](https://code.claude.com/docs/en/cloud-environments).)
+
+**Einrichten** – ein Schritt nach dem anderen:
+
+1. Auf dem Pi: `docker exec roster-app roster-cli bug-token create --label cloud --days 60`.
+   Die erste Zeile ist das Token (`rbt_…`), die zweite nennt Kennung und
+   Ablaufdatum. Das Token steht nur jetzt da – sofort kopieren.
+2. Auf claude.ai/code: die Umgebung des Projekts wählen (Auswahl unten im
+   Eingabefeld), dann das Zahnrad → „Edit cloud environment“.
+3. Unter „Environment variables“ eintragen: `ROSTER_URL=https://<ROSTER_HOST>`
+   (der Hostname des Servers, ohne Pfad).
+4. Unter „Network secrets“ → „Add secret“: Name `Roster bug token`,
+   „Allowed websites“ = `<ROSTER_HOST>`, „Custom headers“: Name
+   `Authorization`, Prefix `Bearer`, Wert = das Token. Speichern. Danach ist
+   der Wert nicht mehr einsehbar, und der Host ist auch ohne „Allowed domains“
+   erreichbar.
+5. Eine **neue** Sitzung starten (eine laufende liest Änderungen der Umgebung
+   nicht) und dort `/bugs` sagen. Zur Probe: „führe `npm run bugs -- list`
+   aus“ – es zeigt die Meldungen.
+
+*Rückfall, wenn die Umgebung keine „Network secrets“ anbietet* (z. B. in einem
+Team-Plan ohne Adminrolle sieht das Formular anders aus): Das Token als
+Variable `ROSTER_BUG_TOKEN=rbt_…` eintragen und unter „Network access“ auf
+„Custom“ stellen, `<ROSTER_HOST>` unter „Allowed domains“. Die Variable ist
+für **alle** lesbar, die die Umgebung benutzen, und die Sitzung sieht das
+Token – das ist der schwächere Weg; dann das Token kürzer wählen
+(`--days 14`).
+
+**Erneuern und beenden:**
+
+- Nach 60 Tagen läuft das Token ab, `/bugs` meldet dann 401 mit dem Hinweis.
+  Neues Token erzeugen (Schritt 1), das alte Network secret in der Umgebung
+  löschen und neu anlegen (ein Secret lässt sich nicht ändern, nur ersetzen).
+- `docker exec roster-app roster-cli bug-token list` zeigt die Tokens (gültig,
+  abgelaufen, widerrufen, zuletzt benutzt); `… bug-token revoke <Kennung>`
+  beendet eines sofort. Höchstens fünf sind zugleich gültig.
+- Beim Verdacht, dass jemand das Token hat: widerrufen, dann im Audit-Log
+  nachsehen, was `bug-token:<Kennung>` getan hat (`PATCH` auf Meldungen mit
+  `via: bug-token`; mehr kann das Token nicht).
+- Die Testinstanz widerruft nach jeder nächtlichen Wiederherstellung alle
+  Tokens: ein Token der Produktion gilt dort nicht.
+
+`roster-cli` für die Meldungen (auf dem Pi; ohne Token, nur zum Nachsehen):
+`bugs [--status <status>]` listet sie mit Nummer, `bugs show <Nummer>` zeigt
+eine als JSON (die angehängte Warband nur als Größe).
 
 ### Stufe 3 – Übungen (Abnahme Phase 2)
 

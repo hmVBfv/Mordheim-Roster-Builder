@@ -21,14 +21,14 @@ const SEVERITIES: Severity[] = ['S1', 'S2', 'S3', 'S4'];
 /** A report as the text to hand on. */
 export function docOf(b: BugDetail): ReportDoc {
   return {
-    id: b.id, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, appVersion: b.appVersion, device: b.device, view: b.view, createdAt: b.createdAt,
+    id: b.id, number: b.number, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, appVersion: b.appVersion, device: b.device, view: b.view, createdAt: b.createdAt,
     reporter: b.reporterName, status: STATUS_NAMES[b.status].toLowerCase(), severity: b.severity, area: b.area, fixedIn: b.fixedIn ? shownVersion(b.fixedIn) : '',
     context: b.context, jsErrors: b.jsErrors, consent: b.consent,
     attached: b.attachment ? { warbandId: b.warbandId ?? '', rev: b.rev, bytes: JSON.stringify(b.attachment).length } : null,
   };
 }
 
-const fileBase = (b: BugDetail) => `report-${b.id.slice(0, 8)}-${fileSlug(b.title).slice(0, 40)}`;
+const fileBase = (b: BugDetail) => `report-${b.number}-${fileSlug(b.title).slice(0, 40)}`;
 
 function Flags({ b }: { b: BugSummary }) {
   return (
@@ -139,7 +139,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
                 <button type="button" className={ui.buttonQuiet} onClick={() => show(b.id)} aria-label={`Open: ${b.title}`}>Open</button>
               </div>
               <Flags b={b} />
-              <small className={ui.muted}>{b.reporterName} · {ago(b.createdAt)} · app {shownVersion(b.appVersion) || 'unknown'}</small>
+              <small className={ui.muted}>#{b.number} · {b.reporterName} · {ago(b.createdAt)} · app {shownVersion(b.appVersion) || 'unknown'}</small>
             </li>
           ))}
         </ul>
@@ -151,7 +151,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
             <Flags b={chosen} />
             <p className={styles.words}>{chosen.text}</p>
             {/^https:\/\//i.test(chosen.sourceRef) && <p><a href={chosen.sourceRef} target="_blank" rel="noopener noreferrer">{chosen.sourceRef}</a></p>}
-            <small className={ui.muted}>{chosen.reporterName} · {ago(chosen.createdAt)} · {chosen.device || 'no device given'}</small>
+            <small className={ui.muted}>#{chosen.number} · {chosen.reporterName} · {ago(chosen.createdAt)} · {chosen.device || 'no device given'}</small>
             <Sorter key={chosen.id + chosen.updatedAt} bug={chosen} onSaved={(b) => { setChosen(b); load(filter); }} onNotice={onNotice} close={() => close()} />
             <div className={ui.row}>
               <button type="button" className={ui.button} onClick={copy}>Copy for Claude</button>

@@ -3,12 +3,10 @@
    them. What each may see is decided in bugs.ts. Every route names its
    action, `can()` decides before the handler runs. */
 import type { FastifyInstance } from 'fastify';
-import { bugById, listBugs, myBugs, oneBug, oneOfMine, patchBug, PatchBody, reportBug, ReportBody, STATUSES } from './bugs.ts';
+import { bugByRef, listBugs, myBugs, oneBug, oneOfMine, patchBug, PatchBody, reportBug, ReportBody, STATUSES } from './bugs.ts';
 import type { DB } from './db.ts';
 
 export interface BugDeps { db: DB | null; now: () => Date }
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 const problem = (error: { issues: { path: PropertyKey[]; message: string }[] }, what: string) =>
   `not ${what} (${error.issues.slice(0, 2).map((i) => `${i.path.join('.') || '(top)'}: ${i.message}`).join('; ')})`;
@@ -38,19 +36,20 @@ export function registerBugRoutes(app: FastifyInstance, deps: BugDeps): void {
     return { bugs: listBugs(db(), { status: status as 'open', limit: n }) };
   });
 
+  /** One report, by its number ("7") or its id. */
   app.get('/api/v1/bugs/:id', { config: { action: 'bugs.read' } }, async (req, reply) => {
-    const id = (req.params as { id: string }).id.toLowerCase();
-    const bug = UUID.test(id) ? oneBug(db(), id) : null;
+    const row = bugByRef(db(), (req.params as { id: string }).id);
+    const bug = row ? oneBug(db(), row.id) : null;
     if (!bug) return reply.code(404).send({ error: 'not_found' });
     return { bug };
   });
 
   app.patch('/api/v1/bugs/:id', { config: { action: 'bugs.write' }, schema: { body: { type: 'object' } } }, async (req, reply) => {
-    const id = (req.params as { id: string }).id.toLowerCase();
-    if (!UUID.test(id) || !bugById(db(), id)) return reply.code(404).send({ error: 'not_found' });
+    const row = bugByRef(db(), (req.params as { id: string }).id);
+    if (!row) return reply.code(404).send({ error: 'not_found' });
     const parsed = PatchBody.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: 'invalid', problem: problem(parsed.error, 'a change') });
-    const r = patchBug(db(), id, parsed.data, req.actor!.id, deps.now());
+    const r = patchBug(db(), row.id, parsed.data, req.actor!.id, deps.now(), req.actor!.token ? 'bug-token' : null);
     if (!r.ok) return reply.code(r.status).send({ error: r.error, ...(r.problem ? { problem: r.problem } : {}) });
     return { bug: r.bug };
   });

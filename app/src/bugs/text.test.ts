@@ -30,6 +30,10 @@ describe('titleOf', () => {
 });
 
 describe('the report as text', () => {
+  it('carries the number once the server has given one, so that a fix can say Fix #N', () => {
+    expect(reportText(doc({ number: 7 }))).toContain('# Problem report #7: The trading post does not open');
+    expect(reportText(doc())).toContain('# Problem report: The trading post does not open');
+  });
   it('names the kind, the time, the app, the words, the screen, the settings, the rules, the steps and the errors', () => {
     const t = reportText(doc({ reporter: 'anna', status: 'new' }));
     expect(t).toContain('# Problem report: The trading post does not open');

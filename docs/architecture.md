@@ -194,7 +194,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Validierung | dieselben Zod-Schemas aus `core/format` für Warbands und Notizen (ab 3h); die Körper der Konten mit JSON Schema in Fastify |
 | Logs | JSON auf stdout (pino); eine Zeile je Anfrage; Login-Fehler als eigene Zeilen für Fail2Ban |
 | Auslieferung | statische Dateien des `campaign`-Builds, API unter `/api/v1` |
-| CLI | `roster-cli`: Backup, Schemastand, Epoche, Einladung (auch für den ersten Admin), Reset-Link, Faktor zurücksetzen, abmelden, Nutzerliste; später Bugs, KI-Paket |
+| CLI | `roster-cli`: Backup, Schemastand, Epoche, Einladung (auch für den ersten Admin), Reset-Link, Faktor zurücksetzen, abmelden, Nutzerliste, Bug-Token (`bug-token create|list|revoke`), Meldungen (`bugs`, `bugs show <n>`); später KI-Paket |
 | Build | `server/build.mjs` bündelt mit rolldown nach `server/dist/` (Server, CLI, Healthcheck); Pakete bleiben extern |
 
 - **Kein Rendern auf dem Server**, kein Next.js.
@@ -253,7 +253,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Szenarien | `GET /campaigns/:id/scenarios` (jedes Mitglied: die freigegebenen, ein Leiter mit Authenticator zusätzlich die Entwürfe; `seq`), `PUT /campaigns/:id/scenarios/:sid` (Geräte-ID, `baseSeq`), `POST …/scenarios/:sid/release` (`{ battleId }`), `DELETE …/scenarios/:sid` (nur Entwürfe) – schreiben nur Leiter mit Authenticator – Phase 4b3c |
 | Teilen | `GET /people` (Anzeigename und Nutzername der anderen), `GET/POST /shares`, `POST /shares/peek`, `POST /shares/redeem` (Code), `POST /shares/:id/accept`, `POST /shares/:id/decline`, `DELETE /shares/:id` – Rob, 05.10.2026 |
 | Sync | `GET /sync?cursor=` – Phase 3h: die eigenen Warbands mit neuester Version und Entwurf, Entferntes ohne Version, dazu `epoch` und der nächste `cursor` |
-| Bugs | Phase 4c1: `POST /bugs` (Meldung; Geräte-ID, gleiche Wörter nochmal → dieselbe Antwort, sonst 409 `exists`; 429 `too_many`), `GET /bugs/mine` (die eigenen, nur Art, Titel, Text, Quelle, Stand, „fixed in“, Zeiten), `GET /bugs?status=open\|all\|<stand>&limit=` und `GET/PATCH /bugs/:id` (nur Admin mit Authenticator; Bug-Token ab 4c2) |
+| Bugs | Phase 4c1: `POST /bugs` (Meldung; Geräte-ID, gleiche Wörter nochmal → dieselbe Antwort, sonst 409 `exists`; 429 `too_many`), `GET /bugs/mine` (die eigenen, nur Art, Titel, Text, Quelle, Stand, „fixed in“, Zeiten), `GET /bugs?status=open\|all\|<stand>&limit=` und `GET/PATCH /bugs/:id` (Nummer oder Kennung; nur Admin mit Authenticator – und das Bug-Token aus 4c2, ADR 0019, mit `Authorization: Bearer`, sonst nichts) |
 | Betrieb | `GET /health` (Phase 2, öffentlich) |
 
 Details und Felder: [data-model.md](data-model.md). Rechte:
@@ -394,9 +394,11 @@ Claude-App oder claude.ai/code), mit diesem Repo als Quelle:
   Tests laufen (auch Playwright, Chromium ist dort vorhanden) und pusht den
   Branch. Rob prüft den Diff und merged per Pull Request.
 - Die Cloud-Sitzung hat keinerlei Zugang zu den Produktionsdaten auf dem Pi.
-- Für `/bugs` bekommt die Cloud-Umgebung die Domain des Servers als erlaubte
-  Domain und das Bug-Token als Umgebungsvariable. Das Token erlaubt nur
-  `GET/PATCH /bugs`.
+- Für `/bugs` bekommt die Cloud-Umgebung `ROSTER_URL` und das Bug-Token als
+  „Network secret“ für den Server-Host: der Proxy hängt es an, die Sitzung
+  sieht es nie. Das Token erlaubt nur `GET/PATCH /bugs`
+  ([operations.md](operations.md#bug-token-für-eine-cloud-sitzung-ab-phase-4c2),
+  ADR 0019).
 
 **Betrieben wird auf dem Pi:**
 

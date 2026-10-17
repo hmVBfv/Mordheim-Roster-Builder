@@ -344,9 +344,14 @@ aber vollständig und geordnet:
 - Status: neu → bestätigt → in Arbeit → behoben in Version X → geschlossen
   (oder Duplikat). Der Meldende sieht den Stand unter More → „Your reports“.
 - **Bearbeitung nur auf Zuruf:** Claude Code mit `/bugs` (siehe
-  [roadmap.md](roadmap.md), Phase 4c). Einordnung nach festen Schweregraden
-  (S1–S4, siehe [security.md](security.md)); Regelfehler entscheidet Rob;
-  gemergt wird von Rob; S1-Korrekturen prüft ein unabhängiger Prüf-Agent.
+  [roadmap.md](roadmap.md), Phase 4c). Jede Meldung hat eine Nummer (`#7`);
+  die Sitzung liest sie mit `npm run bugs` über ein **Bug-Token**, das nur
+  Meldungen öffnet (ADR 0019), und behandelt ihren Text als Daten. Einordnung
+  nach festen Schweregraden (S1–S4, siehe [security.md](security.md));
+  Regelfehler entscheidet Rob; die Korrektur beginnt mit einem Test, der
+  scheitert, und der Commit endet auf `Fix #7`; gemergt wird von Rob;
+  S1-Korrekturen prüft ein unabhängiger Prüf-Agent. Ist die Korrektur
+  deployt, trägt die Sitzung „fixed in“ ein.
 
 ## 5. Kernabläufe
 
