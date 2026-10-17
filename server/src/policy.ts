@@ -127,6 +127,12 @@ export const ACTIONS = {
   'scenarios.read': { who: 'user', target: 'member' },
   /** Writing, releasing and taking out a draft: leaders alone, with the authenticator. */
   'scenarios.write': { who: 'user', target: 'leader' },
+  /** Problem reports (phase 4c1): anyone signed in sends one and reads their own with its status; the reporter never reads another's. */
+  'bugs.report': { who: 'user' },
+  'bugs.mine': { who: 'user' },
+  /** Reading every report and sorting them (status, severity, area): the admin, with the authenticator. */
+  'bugs.read': { who: 'admin' },
+  'bugs.write': { who: 'admin' },
   /** The background – the truth behind the story, ADR 0002 – read by the campaign's leaders alone, with the authenticator (phase 4b1). */
   'background.read': { who: 'user', target: 'leader' },
   /** Writing the background, taking entries out and revealing: leaders alone, with the authenticator (phase 4b1). */

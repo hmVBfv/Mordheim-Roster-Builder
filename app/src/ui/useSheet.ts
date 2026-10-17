@@ -5,11 +5,15 @@
    again; anything that should happen afterwards, such as moving to another
    screen, waits until it is gone, so it does not land on the sheet's entry. */
 import { useCallback, useEffect, useRef } from 'react';
+import { note } from '../bugs/trail.ts';
 
 const MARK = 'mordheimSheet';
 const marked = () => !!(history.state as Record<string, unknown> | null)?.[MARK];
 
-export function useSheet() {
+/** `name`: what the sheet is called in the trail of a problem report (a fixed word, never a title or a name);
+    without one it is "a sheet", with `false` it leaves no trace. */
+export function useSheet(name?: string | false) {
+  const label = name === false ? null : (name ?? 'a sheet');
   const ref = useRef<HTMLDialogElement>(null);
   const after = useRef<(() => void) | null>(null);
   const leaving = useRef(false);
@@ -30,6 +34,7 @@ export function useSheet() {
       }
     };
     const onClose = () => {
+      if (label) note('sheet', `closed ${label}`);
       if (d.dataset.byBack) { delete d.dataset.byBack; return; }
       if (marked()) { leaving.current = true; history.back(); return; }
       const f = after.current; after.current = null; f?.();
@@ -37,14 +42,15 @@ export function useSheet() {
     window.addEventListener('popstate', onPop);
     d.addEventListener('close', onClose);
     return () => { window.removeEventListener('popstate', onPop); d.removeEventListener('close', onClose); };
-  }, []);
+  }, [label]);
 
   const open = useCallback(() => {
     const d = ref.current;
     if (!d || d.open) return;
+    if (label) note('sheet', `opened ${label}`);
     history.pushState({ ...(history.state as object | null), [MARK]: true }, '');
     d.showModal();
-  }, []);
+  }, [label]);
 
   /** Closes the sheet; `then` runs once its history entry is gone. */
   const close = useCallback((then?: () => void) => {

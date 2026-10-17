@@ -115,7 +115,7 @@ function Body({ rec }: { rec: StoredWarband }) {
   const [stat, setStat] = useState<{ stat: string; op: (typeof OPS)[number]; val: string }>({ stat: '', op: '>=', val: '' });
   const [off, setOff] = useState<Record<HireKind, string[]>>({ hs: [], dp: [] });
   const [picked, setPicked] = useState<{ n: number; key: string } | null>(null);
-  const { ref: sheetRef, open: openSheet, close: closeSheet } = useSheet();
+  const { ref: sheetRef, open: openSheet, close: closeSheet } = useSheet('hire');
   const titleId = useId();
   const top = useRef<HTMLDivElement>(null);
 

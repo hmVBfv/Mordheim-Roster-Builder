@@ -19,6 +19,7 @@ import { putQuestion } from '../src/questions.ts';
 import { releaseScenario, putScenario } from '../src/scenarios.ts';
 import { putDraft } from '../src/chapter-drafts.ts';
 import { putStyle } from '../src/style.ts';
+import { reportBug } from '../src/bugs.ts';
 import { addReputation, putFaction, putNpc } from '../src/world.ts';
 import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
 import { startServer } from './helpers.ts';
@@ -188,6 +189,15 @@ describe('leak-test matrix', () => {
     draft(theirs, victim.id, 'DRAFT-SECRET: der Verrat', 'DRAFT-SECRET: Die Gräfin zahlt den Fährmann.');
     const ledDraftId = draft(led, admin.id, 'Der Entwurf', 'Ein Entwurf, der veröffentlicht wird.');
     const spareDraftId = draft(led, admin.id, 'Ein zweiter Entwurf', 'Ein Entwurf, der verworfen wird.');
+    // problem reports: the player's own one, which the probes read and sort, and two of the victim's – their words and a warband copy – that no role of the matrix may read in the list or among their own
+    const bug = (by: string, title: string, text: string, save?: Record<string, unknown>) => {
+      const id = randomUUID();
+      const r = reportBug(s.db, by, { id, kind: 'bug', title, text, sourceRef: '', appVersion: '', device: '', view: '', context: null, jsErrors: [], attach: save ? { warbandId: randomUUID(), rev: 1, save } : null }, t0);
+      if (!r.ok) throw new Error(r.error);
+      return id;
+    };
+    const bugId = bug(player.id, 'The roster does not scroll', 'It stops at the third hero.');
+    bug(victim.id, 'Gold drifts', 'BUG-SECRET: the Countess pays the ferryman.', { name: 'BUG-SECRET: the Countess’s warband' });
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,
@@ -196,7 +206,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, ledDraftId, spareDraftId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, ledDraftId, spareDraftId, bugId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {

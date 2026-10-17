@@ -23,6 +23,7 @@ import { registerQuestionRoutes } from './routes-questions.ts';
 import { registerScenarioRoutes } from './routes-scenarios.ts';
 import { registerStyleRoutes } from './routes-style.ts';
 import { registerDraftRoutes } from './routes-drafts.ts';
+import { registerBugRoutes } from './routes-bugs.ts';
 import { registerWorldRoutes } from './routes-world.ts';
 import { registerCampaignRoutes } from './routes-campaigns.ts';
 import { registerShareRoutes } from './routes-shares.ts';
@@ -187,6 +188,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerScenarioRoutes(app, { db, now });
   registerStyleRoutes(app, { db, now });
   registerDraftRoutes(app, { db, now });
+  registerBugRoutes(app, { db, now });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);

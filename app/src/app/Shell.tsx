@@ -1,8 +1,10 @@
 /* The frame around every screen: title and sync state on top, navigation at
    the bottom on a phone and on the left from tablet width on. */
 import { useEffect, type ReactNode } from 'react';
-import { NavLink, useMatch } from 'react-router';
+import { NavLink, useLocation, useMatch } from 'react-router';
 import { startSession, subscribeSession, getSession } from '../account/session.ts';
+import { ReportProblem } from '../bugs/ReportProblem.tsx';
+import { note, routePattern } from '../bugs/trail.ts';
 import { startSync, stopSync } from '../sync/runner.ts';
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { navItems } from './nav.ts';
@@ -14,6 +16,9 @@ export function Shell({ children }: { children: ReactNode }) {
   const items = navItems();
   // the game night is full screen on a phone: its own buttons for one hand instead of the navigation
   const bare = !!useMatch('/campaign/:id/battles/:bid');
+  // the screens the reporter passed, for a problem report (as patterns, never with the ids)
+  const { pathname } = useLocation();
+  useEffect(() => { note('screen', routePattern(pathname)); }, [pathname]);
   // who is signed in: asked once, never waited for (the builder works without)
   useEffect(() => { if (FLAVOUR === 'campaign') startSession(); }, []);
   // the sync runs while someone is signed in (also offline: changes wait on the device)
@@ -33,6 +38,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <header className={styles.header}>
         <span className={styles.title}>{APP_NAME}</span>
         <SyncState />
+        <ReportProblem />
       </header>
       <nav className={styles.nav} aria-label="Main">
         <ul style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>

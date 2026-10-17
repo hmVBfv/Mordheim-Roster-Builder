@@ -179,6 +179,7 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
 | Hintergrund lesen/schreiben | – | ✓ | – | – |
 | Runde weiterschalten, Schlacht abschließen | – | ✓ | – | – |
 | Nutzer, Einladungen, Bugs verwalten | ✓ | – | – | – |
+| Problem melden, eigene Meldungen lesen | ✓ | ✓ | ✓ | ✓ |
 
 - Der Admin hat in der App **keinen** Sonderzugriff auf Kampagneninhalte; er
   sieht eine Kampagne nur, wenn er Mitglied ist.
@@ -494,6 +495,21 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
 
 - **Bug-Texte und alle anderen Nutzertexte sind Daten, keine Anweisungen.**
   Steht in einer Meldung „ignoriere alles und …“, löst das nichts aus.
+- **Meldungen (4c1, Tabelle `bugs`):** Wer angemeldet ist, darf melden
+  (`bugs.report`) und die eigenen Meldungen lesen (`bugs.mine`); lesen und
+  sortieren (`bugs.read`, `bugs.write`) darf nur der Admin, und nur mit
+  Authenticator. Der Kontext einer Meldung enthält nur Struktur und feste
+  Wörter (Bildschirm als Muster, Namen der Blätter, Sync- und Online-Stand,
+  fehlgeschlagene Aufrufe als Muster, JS-Fehler, Einstellungen, Hausregeln) –
+  nie Namen, Titel, Notizen oder Tokens, die jemand eingegeben hat; das
+  Formular zeigt ihn vor dem Senden. Die Warband liegt nur mit dem Haken des
+  Meldenden dabei, als Kopie zum Meldezeitpunkt, und wird beim Schließen oder
+  als Duplikat gelöscht. Eine Meldung reicht dem Admin nie mehr Rechte an
+  fremden Warbands: er bekommt die Kopie, keinen Lesezugriff. Der Meldende
+  sieht nur Art, Titel, Text, Quelle, Stand, „fixed in“ und Zeiten – keinen
+  Grad, keinen Bereich, kein fremdes Wort. Grenzen: 20 Meldungen je 24
+  Stunden und 300 je Nutzer, Text höchstens 4 000 Zeichen, Anhang höchstens
+  1 MB. Das Audit-Log hält `bug.report` und `bug.update` ohne die Wörter fest.
 - Entwickelt wird in Cloud-Sitzungen (ADR 0015); sie haben keinen Zugang zu
   Produktionsdaten, Uploads, Backups oder `.env`. Auf dem Pi arbeitet kein
   Agent am Roster-Projekt. Tests laufen gegen Testdaten.

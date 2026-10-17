@@ -102,6 +102,16 @@ export interface FakeScenario {
   releasedAt: string | null; releasedBy: string | null; edited: boolean; createdAt: string; updatedAt: string; seq: number; deleted?: boolean;
 }
 
+/** A problem report (4c1) as the stand-in server keeps it. */
+export interface FakeBug {
+  id: string; reporterId: string; reporterName: string; kind: 'bug' | 'wish' | 'rules'; title: string; text: string; sourceRef: string;
+  status: 'new' | 'confirmed' | 'in_progress' | 'fixed' | 'closed' | 'duplicate'; severity: 'S1' | 'S2' | 'S3' | 'S4' | null; area: string; fixedIn: string;
+  appVersion: string; device: string; view: string; context: unknown; jsErrors: unknown[]; warbandId: string | null; rev: number | null; consent: boolean; attachment: unknown;
+  createdAt: string; updatedAt: string;
+  /** The body as it was sent. */
+  sent: Record<string, unknown>;
+}
+
 export interface FakeShare {
   id: string; name: string; wbType: string; from: string; to: string | null; toId: string | null; code: string | null; data: unknown;
   createdAt: string; expiresAt: string; answeredAt: string | null; accepted: boolean | null; uses: number; revokedAt: string | null;
@@ -148,6 +158,8 @@ export function createFakeSync(opts: {
     styles: new Map<string, { text: string; updatedBy: string; updatedAt: string; seq: number }>(),
     /** Chapter drafts (4b5b), leaders' own. */
     drafts: new Map<string, FakeDraft>(),
+    /** Problem reports (4c1), the newest last. */
+    bugs: [] as FakeBug[],
   };
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
@@ -1065,8 +1077,59 @@ export function createFakeSync(opts: {
     return json(201, { warband: meta(w), head: w.versions[0] });
   };
 
+  /* ---- problem reports (4c1) ---- */
+  const bugMine = (b: FakeBug) => ({ id: b.id, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, status: b.status, fixedIn: b.fixedIn, createdAt: b.createdAt, updatedAt: b.updatedAt });
+  const bugSummary = (b: FakeBug) => ({
+    id: b.id, reporterId: b.reporterId, reporterName: b.reporterName, kind: b.kind, title: b.title, status: b.status, severity: b.severity, area: b.area, appVersion: b.appVersion, view: b.view,
+    fixedIn: b.fixedIn, consent: b.consent, attached: b.attachment !== null, createdAt: b.createdAt, updatedAt: b.updatedAt,
+  });
+  const bugDetail = (b: FakeBug) => ({ ...bugSummary(b), text: b.text, sourceRef: b.sourceRef, device: b.device, jsErrors: b.jsErrors, context: b.context, warbandId: b.warbandId, rev: b.rev, attachment: b.attachment });
+  const bugFrom = (x: Partial<FakeBug> & { title: string; text: string }): FakeBug => {
+    const b: FakeBug = {
+      id: `bug-${s.bugs.length + 1}`, reporterId: 'user-ben', reporterName: 'Ben', kind: 'bug', sourceRef: '', status: 'new', severity: null, area: '', fixedIn: '', appVersion: 'abc1234', device: 'Firefox on Android', view: '/warbands/:id',
+      context: null, jsErrors: [], warbandId: null, rev: null, consent: false, attachment: null, createdAt: at(), updatedAt: at(), sent: {}, ...x,
+    };
+    s.bugs.push(b);
+    return b;
+  };
+  const bugRoutes = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
+    let m: RegExpMatchArray | null;
+    if (method === 'POST' && path === '/bugs') {
+      const ex = s.bugs.find((b) => b.id === body.id);
+      if (ex) return JSON.stringify(ex.sent) === JSON.stringify(body) ? json(200, { bug: bugMine(ex) }) : json(409, { error: 'exists' });
+      if (!['bug', 'wish', 'rules'].includes(String(body.kind)) || !String(body.text ?? '').trim()) return json(400, { error: 'invalid', problem: 'not a report' });
+      const attach = body.attach as { warbandId: string; rev: number | null; save: unknown } | null;
+      const b = bugFrom({
+        id: String(body.id), reporterId: me.id, reporterName: me.displayName, kind: body.kind as FakeBug['kind'], title: String(body.title), text: String(body.text), sourceRef: String(body.sourceRef ?? ''),
+        appVersion: String(body.appVersion ?? ''), device: String(body.device ?? ''), view: String(body.view ?? ''), context: body.context ?? null, jsErrors: (body.jsErrors as unknown[]) ?? [],
+        warbandId: attach?.warbandId ?? null, rev: attach?.rev ?? null, consent: !!attach, attachment: attach?.save ?? null, sent: body,
+      });
+      return json(201, { bug: bugMine(b) });
+    }
+    if (method === 'GET' && path === '/bugs/mine') return json(200, { bugs: s.bugs.filter((b) => b.reporterId === me.id).map(bugMine).reverse() });
+    if (method === 'GET' && path === '/bugs') {
+      const st = query.get('status') ?? 'open';
+      const keep = (b: FakeBug) => st === 'all' || (st === 'open' ? ['new', 'confirmed', 'in_progress'].includes(b.status) : b.status === st);
+      return json(200, { bugs: s.bugs.filter(keep).map(bugSummary).reverse() });
+    }
+    if ((m = path.match(/^\/bugs\/([^/]+)$/))) {
+      const b = s.bugs.find((x) => x.id === m![1]);
+      if (!b) return json(404, { error: 'not_found' });
+      if (method === 'GET') return json(200, { bug: bugDetail(b) });
+      if (method === 'PATCH') {
+        const next = { ...b, ...(body as Partial<FakeBug>) };
+        if (next.status === 'fixed' && !String(next.fixedIn).trim()) return json(400, { error: 'invalid', problem: 'a fixed report names the version it is fixed in' });
+        Object.assign(b, body, { updatedAt: at() });
+        if (b.status === 'closed' || b.status === 'duplicate') b.attachment = null;
+        return json(200, { bug: bugDetail(b) });
+      }
+    }
+    return null;
+  };
+
   const handle = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown>): Response => {
     let m: RegExpMatchArray | null;
+    if (path.startsWith('/bugs')) return bugRoutes(method, path, query, body) ?? json(404, { error: 'not_found' });
     if (path.startsWith('/campaigns')) return campaignRoutes(method, path, query, body) ?? json(404, { error: 'not_found' });
     if (method === 'GET' && path === '/people') return json(200, { people: s.people });
     if (method === 'GET' && path === '/shares') {
@@ -1146,5 +1209,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, draftFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, draftFrom, bugFrom };
 }

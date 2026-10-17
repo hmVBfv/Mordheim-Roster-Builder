@@ -55,19 +55,19 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     void navigate('.', { replace: true, state: null });
     setTimeout(() => window.print(), 100);
   }, [printing, navigate]);
-  const { ref: eqRef, open: openEqSheet, close: closeEq } = useSheet();
+  const { ref: eqRef, open: openEqSheet, close: closeEq } = useSheet('equipment');
   const [eqOf, setEqOf] = useState<number | null>(null);
   const eqView = eqOf != null ? equipmentView(ctx, eqOf) : null;
   const trade = `/warbands/${rec.id}/trade`;
-  const { ref: advRef, open: openAdvSheet, close: closeAdv } = useSheet();
+  const { ref: advRef, open: openAdvSheet, close: closeAdv } = useSheet('advance');
   const [advOf, setAdvOf] = useState<{ key: number; id: number | string } | null>(null);
   const advView = advOf ? advanceView(ctx, advOf.id) : null;
-  const { ref: takenRef, open: openTakenSheet, close: closeTaken } = useSheet();
+  const { ref: takenRef, open: openTakenSheet, close: closeTaken } = useSheet('taken-out');
   const [takenFor, setTakenFor] = useState<{ id: number | string; name: string } | null>(null);
   const openAdvance = (id: number | string) => { setAdvOf((p) => ({ key: (p?.key ?? 0) + 1, id })); openAdvSheet(); };
 
   /* Injuries (V1): one roll, one action of core, from the card or the menu. */
-  const { ref: injRef, open: openInjSheet, close: closeInj } = useSheet();
+  const { ref: injRef, open: openInjSheet, close: closeInj } = useSheet('injury');
   const [injFor, setInjFor] = useState<(InjuryFor & { key: number }) | null>(null);
   const openInjury = (w: InjuryFor) => { setInjFor((p) => ({ ...w, key: (p?.key ?? 0) + 1 })); openInjSheet(); };
   const injureWarrior = (w: WarriorView, dice?: string) => {
@@ -78,18 +78,18 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     const by = env.attacker ? [env.attacker.name, env.attacker.wb && `(${env.attacker.wb})`].filter(Boolean).join(' ') : null;
     openInjury({ kind: 'hero', uid: w.uid, name: w.name, env, by, dice });
   };
-  const { ref: injuriesRef, open: openInjuriesSheet, close: closeInjuries } = useSheet();
+  const { ref: injuriesRef, open: openInjuriesSheet, close: closeInjuries } = useSheet('injuries');
   const [injuriesOf, setInjuriesOf] = useState<number | null>(null);
-  const { ref: mutRef, open: openMutSheet, close: closeMut } = useSheet();
+  const { ref: mutRef, open: openMutSheet, close: closeMut } = useSheet('mutation');
   const [mutOf, setMutOf] = useState<number | null>(null);
   const mutView = mutOf != null ? mutationView(ctx, mutOf) : null;
-  const { ref: markRef, open: openMarkSheet, close: closeMark } = useSheet();
+  const { ref: markRef, open: openMarkSheet, close: closeMark } = useSheet('mark');
   const [markKey, setMarkKey] = useState(0);
   const mView = markView(ctx);
-  const { ref: menRef, open: openMenSheet, close: closeMen } = useSheet();
+  const { ref: menRef, open: openMenSheet, close: closeMen } = useSheet('men');
   const [menFor, setMenFor] = useState<{ key: number; uid: number } | null>(null);
   const menView = menFor ? moreMenView(ctx, menFor.uid) : null;
-  const { ref: captiveRef, open: openCaptiveSheet, close: closeCaptive } = useSheet();
+  const { ref: captiveRef, open: openCaptiveSheet, close: closeCaptive } = useSheet('captive');
   const [captiveOf, setCaptiveOf] = useState<{ key: number; uid: number; name: string; by: string } | null>(null);
   const openCaptive = (w: WarriorView) => { setCaptiveOf((p) => ({ key: (p?.key ?? 0) + 1, uid: w.uid, name: w.name, by: w.captive ?? '' })); openCaptiveSheet(); };
   const injuriesView = injuriesOf != null ? v.heroes.concat(v.henchmen).find((w) => w.uid === injuriesOf) ?? null : null;
@@ -127,13 +127,13 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     return core.spellReduce(x, id, c.index, -1);
   }, text);
 
-  const { ref: menuRef, open: openMenuSheet, close: closeMenu } = useSheet();
+  const { ref: menuRef, open: openMenuSheet, close: closeMenu } = useSheet('menu');
   const [menuOf, setMenuOf] = useState<{ title: string; items: MenuItem[] }>({ title: '', items: [] });
-  const { ref: nameRef, open: openNameSheet, close: closeName } = useSheet();
+  const { ref: nameRef, open: openNameSheet, close: closeName } = useSheet('name');
   const [naming, setNaming] = useState<Naming | null>(null);
-  const { ref: expRef, open: openExpSheet, close: closeExp } = useSheet();
+  const { ref: expRef, open: openExpSheet, close: closeExp } = useSheet('experience');
   const [expSet, setExpSet] = useState<ExpSetting | null>(null);
-  const { ref: recruitRef, open: openRecruit, close: closeRecruit } = useSheet();
+  const { ref: recruitRef, open: openRecruit, close: closeRecruit } = useSheet('recruit');
 
   // a new key each time, so the form starts from the value it is given
   const askName = (n: Omit<Naming, 'key'>) => { setNaming((prev) => ({ ...n, key: (prev?.key ?? 0) + 1 })); openNameSheet(); };

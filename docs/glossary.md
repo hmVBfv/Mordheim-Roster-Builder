@@ -264,6 +264,10 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Totmannschalter | Dead man's switch | healthchecks.io |
 | Leak-Test | Leak test | CI-Matrix Rolle × Endpunkt × Sichtbarkeit |
 | Schweregrad | Severity | `S1`–`S4` |
+| Problemmeldung | Report a problem | Tabelle `bugs`, `app/src/bugs/` |
+| Spur (die letzten Schritte vor einer Meldung) | Trail | `app/src/bugs/trail.ts` |
+| Technische Angaben (einer Meldung) | What goes along | `app/src/bugs/context.ts`, `bugs.context` |
+| Für Claude kopieren | Copy for Claude | `reportText` in `app/src/bugs/text.ts` (Übergabe von Hand, ADR 0018) |
 | Regelfehler | Rules issue | `bugs.kind: 'rules'` |
 | Wunsch | Wish | `bugs.kind: 'wish'` |
 | Prüf-Agent | Reviewer agent | `.claude/agents/reviewer.md` |

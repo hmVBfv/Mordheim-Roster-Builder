@@ -5,6 +5,7 @@
 import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { addError, note } from '../bugs/trail.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { requestSync } from '../sync/runner.ts';
 import { editableState } from './view.ts';
@@ -77,9 +78,14 @@ export function useEditor(data: GameData, rec: StoredWarband, now: () => Date = 
     const base = latest.current && latest.current.stamp >= rec.updatedAt ? latest.current.stamp : rec.updatedAt;
     const stamp = nextStamp(base, now());
     latest.current = { s: next, stamp };
+    note('edit', 'a change to the warband');
     setLocal(latest.current);
     const fields = savedFields(data, next, stamp);
-    writes.current = writes.current.then(() => db.warbands.update(rec.id, fields)).then(() => requestSync()).catch((e: unknown) => { console.error('saving the warband failed', e); });
+    writes.current = writes.current.then(() => db.warbands.update(rec.id, fields)).then(() => requestSync()).catch((e: unknown) => {
+      console.error('saving the warband failed', e);
+      // the one failure that must not pass unseen: a report of lost work names it
+      addError(`Saving the warband failed (${e instanceof Error ? e.name : typeof e})`);
+    });
   }, [data, rec.id, rec.updatedAt, now]);
 
   const edit = useCallback((action: (ctx: core.Ctx) => WarbandState, text?: string, opts?: EditOptions) => {

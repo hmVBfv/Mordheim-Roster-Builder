@@ -2869,3 +2869,37 @@ not be read, because a list that silently lacks a warband is worse than no list.
 The reserved `canon_extra` text was not needed; it waits until someone wants
 extra spellings in the file.
 
+
+## October 17, 2026 — report a problem
+
+The first half of the bug tracker: a button in the header of every page, a
+sheet that asks for a sentence, and a status the reporter can read later under
+More. Rob's note from the planning (people mostly write "it doesn't work")
+decided the shape: the report has to carry its own context, and the context has
+to be safe to carry.
+
+So the context is built from structure only. The app keeps a small in-memory
+trail — which screen (as a pattern, no ids), which sheet opened or closed, that
+a change was made (not which), the sync and network state, failed calls as
+`METHOD /pattern → status`, the last five script errors — and nothing anyone
+typed. A warband name or a hidden title in a heading must not travel into a
+report (ADR 0002), and the cheapest way to be sure is that the trail has no
+place to put them; the tests plant secrets in names, notes and tokens and check
+none arrives. The form shows all of it before sending. The warband itself goes
+along only with its own tick, as a copy taken at report time, and is thrown
+away when the report is closed or marked a duplicate.
+
+Hand-over stays by hand (ADR 0018, and Rob's "no direct connection for now"):
+the admin gets "Copy for Claude", a .md of the report and the warband as .json.
+The token route for a cloud session comes in the second pull request.
+
+Wrong turns: I first put the open sheet's name into the context as its own
+field, then found the header button sits behind the modal and cannot be tapped
+while a sheet is open — the field could never hold anything, so it went, and the
+sheets live in the trail instead. A `bug_comments` table was planned and dropped:
+follow-up questions happen at the table or in the chat, and a comment list would
+have been one more place for words to leak. For the attachment I started with a
+reference to the warband and a new admin read path; that would have given the
+admin a way into other players' warbands, so the report carries a copy instead.
+And the list of "your reports" did not update after sending on the same page,
+because nothing told it — now the sender notifies it.
