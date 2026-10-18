@@ -16,7 +16,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // a '#…' opens a page on another tab, so its controls are clicked too
 const SCREENS = ['home', 'warbands', 'roster', 'story', 'changes', 'trading-post', 'trading-post#search', 'trading-post#sell', 'trading-post#give', 'hire', 'chronicle', 'house-rules', 'house-rules#campaign', 'house-rules#leader',
-  'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more', 'desktop'];
+  'campaign', 'visibility', 'timeline', 'world', 'background', 'manage', 'game-night', 'more', 'desktop', 'roster-v2'];
 const PAGES = ['index', ...SCREENS];
 const CONTROLS = 'button:visible, a:visible, input[type=checkbox]:visible, summary:visible';
 const IN_SHEET = 'button:visible, a:visible, input[type=checkbox]:visible';
@@ -165,6 +165,53 @@ for (const name of DESKTOP) {
     await themesFit(page, name, 360, `${shot}-360`);
   });
 }
+
+/* Roster v2 (Rob, 17.10.2026: "modern, intuitive, functional … the space used
+   … nothing hidden behind menus"): the warriors are rows that open in place
+   with tabs, and from 1100 px a table with a pane beside it. The crawl above
+   clicks what is on the page; a warrior's own controls only exist once his
+   row is open, so they are clicked here – every tab, every control. */
+test('mockup roster-v2: a warrior opens in place and every control in him reacts', async ({ page }) => {
+  test.setTimeout(600_000);
+  const dead: string[] = [];
+  const tabs = ['Overview', 'Gear', 'Skills & injuries', 'Story & more'];
+  for (const who of ['ulrich', 'magda', 'warrior']) {
+    for (const tab of tabs) {
+      await go(page, 'roster-v2');
+      const open = async () => {
+        await go(page, 'roster-v2');
+        await page.locator(`.row[data-id="${who}"] .row-btn`).click();
+        await page.locator(`.row[data-id="${who}"] [role=tab]`, { hasText: tab }).click();
+      };
+      await open();
+      const count = await page.locator(`.row[data-id="${who}"] .open`).locator('button:visible:not([role=tab]), a:visible').count();
+      // a tab may be empty by design (a group has no skills yet), the first two never are
+      if (tab === 'Overview' || tab === 'Gear') expect(count, `${who} / ${tab} has controls`).toBeGreaterThan(0);
+      for (let i = 0; i < count; i++) {
+        await open();
+        const el = page.locator(`.row[data-id="${who}"] .open`).locator('button:visible:not([role=tab]), a:visible').nth(i);
+        if (await skipped(el)) continue;
+        const wrong = await verdict(page, el);
+        if (wrong) dead.push(`${who} / ${tab}: ${await labelOf(el)} ${wrong}`);
+      }
+    }
+  }
+  expect(dead, 'controls of an opened warrior that do nothing').toEqual([]);
+});
+
+test('mockup roster-v2 at 1440 px: table and pane, every control reacts', async ({ page }) => {
+  test.setTimeout(600_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await go(page, 'roster-v2');
+  await expect(page.locator('#detail')).toBeVisible();
+  await themesFit(page, 'roster-v2', 1440, 'roster-v2-1440');
+  expect(await crawl(page, 'roster-v2'), 'controls on roster-v2 that do nothing').toEqual([]);
+  // the whole of a warrior is open at once: no tab, no menu in the way
+  await expect(page.locator('#detail [role=tab]')).toHaveCount(0);
+  for (const h of ['Profile', 'Experience', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Name', 'Leaving the warband']) {
+    await expect(page.locator('#detail h3', { hasText: h })).toBeVisible();
+  }
+});
 
 test('mockup desktop: a panel is moved by dragging, or by its menu', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

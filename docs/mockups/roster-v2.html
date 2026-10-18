@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en" data-theme="chronicle">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roster v2 mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pirata+One&display=swap">
+<style>
+/* Roster v2 (docs/ui.md §3): one page, two layouts. On the phone every
+   warrior is a row with his whole profile and experience in sight and opens
+   in place, with tabs instead of a ⋯ menu. From 1100 px the rows become a
+   table and the opened warrior stays in a pane beside it, every section open.
+   Same design tokens as app/src/theme/tokens.css. Static: nothing is saved. */
+:root, :root[data-theme='chronicle'] {
+  --bg: #16181a; --surface: #1f2225; --surface-2: #2a2e32; --border: #3d4349;
+  --text: #ece6d8; --text-muted: #aaa393; --accent: #7fd88b; --accent-ink: #0f1a11;
+  --danger: #f08a7a; --warn: #e8c46a; --gold: #d6b46a; --shadow: rgba(0,0,0,.5);
+  --font-title: 'Cinzel', 'EB Garamond', Georgia, serif; color-scheme: dark;
+}
+:root[data-theme='parchment'] {
+  --bg: #e9dcc0; --surface: #f4ead3; --surface-2: #ddcca6; --border: #b9a473;
+  --text: #1d1916; --text-muted: #5a4a38; --accent: #7a1410; --accent-ink: #fbf5e6;
+  --danger: #8e1a14; --warn: #7a5a10; --gold: #6e5520; --shadow: rgba(0,0,0,.25);
+  --font-title: 'Pirata One', 'EB Garamond', Georgia, serif; color-scheme: light;
+}
+:root { --font-body: 'EB Garamond', Georgia, serif; --tap: 44px; --radius: 6px; --bar: 56px; --side: 220px; }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 18px/1.4 var(--font-body); font-variant-numeric: lining-nums tabular-nums; }
+h1, h2, h3 { font-family: var(--font-title); font-weight: 700; margin: 0; line-height: 1.15; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+svg.i { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.muted { color: var(--text-muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* mockup strip, not part of the app */
+.mock { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 12px; font-size: .8rem; background: #000; color: #ddd; }
+.mock b { font-weight: 600; }
+.mock button { min-height: 28px; padding: 0 10px; border: 1px solid #666; border-radius: 14px; background: transparent; color: #ddd; font-size: .8rem; }
+.mock button[aria-pressed='true'] { background: #ddd; color: #000; }
+.mock a { color: #ddd; margin-left: 6px; }
+
+/* app frame */
+.app { display: grid; grid-template-columns: 1fr; min-height: 100vh; padding-bottom: calc(var(--bar) + env(safe-area-inset-bottom)); }
+.appbar { position: sticky; top: 0; z-index: 30; height: var(--bar); display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.appbar .brand { font-family: var(--font-title); font-size: 1.05rem; letter-spacing: .02em; }
+.appbar .sync { font-size: .85rem; color: var(--text-muted); }
+.appbar .sync::before { content: '✓ '; color: var(--accent); }
+.appbar .tools { display: flex; align-items: center; gap: 4px; }
+.iconbtn { width: var(--tap); height: var(--tap); display: grid; place-items: center; border: 0; background: transparent; border-radius: var(--radius); }
+.tabbar { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; height: calc(var(--bar) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(5, 1fr); background: var(--surface); border-top: 1px solid var(--border); }
+.tabbar a, .side a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: var(--tap); color: var(--text-muted); text-decoration: none; font-size: .78rem; }
+.tabbar a[aria-current], .side a[aria-current] { color: var(--accent); }
+.side { display: none; }
+.page { padding: 12px 16px 24px; min-width: 0; }
+
+/* warband head */
+.head { display: contents; }
+.head h1 { font-size: 1.55rem; display: flex; align-items: center; gap: 6px; }
+.head .sub { margin: 2px 0 10px; color: var(--text-muted); }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0 0 12px; }
+.tile { padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); min-width: 0; }
+.tile dt { font-size: .74rem; color: var(--text-muted); }
+.tile dd { margin: 0; font-size: 1.15rem; font-weight: 600; white-space: nowrap; }
+.tile.gold { border-color: color-mix(in srgb, var(--gold) 55%, var(--border)); }
+.tile.gold dd { color: var(--gold); }
+.meter { display: block; height: 4px; margin-top: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--accent); }
+
+.toolbar { position: sticky; top: var(--bar); z-index: 20; display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 6px; margin: 0 -16px 12px; padding: 8px 16px; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--border); }
+.btn { min-height: var(--tap); padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); white-space: nowrap; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.gold { background: var(--gold); border-color: var(--gold); color: var(--bg); font-weight: 600; }
+.btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, var(--border)); background: transparent; }
+.btn.quiet { background: transparent; }
+.btn[disabled] { opacity: .45; cursor: default; }
+
+/* warrior list */
+.board { display: block; }
+.group-head { display: flex; align-items: baseline; justify-content: space-between; margin: 16px 0 6px; }
+.group-head h2 { font-size: 1.05rem; }
+.group-head span { font-size: .85rem; color: var(--text-muted); }
+.rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.row { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--kind, var(--border)); border-radius: var(--radius); overflow: hidden; }
+.row[data-kind='hero'] { --kind: var(--gold); }
+.row[data-kind='hench'] { --kind: var(--accent); }
+.row[data-kind='hired'] { --kind: var(--text-muted); }
+.row[aria-current='true'] { background: var(--surface-2); border-color: var(--accent); }
+.row-btn { width: 100%; display: grid; gap: 4px; padding: 8px 10px 8px 10px; border: 0; background: transparent; text-align: left; min-height: var(--tap); }
+.r1 { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px; }
+.r1 .nm { font-family: var(--font-title); font-size: 1.02rem; }
+.r1 .ty { margin-left: 6px; font-size: .88rem; color: var(--text-muted); font-family: var(--font-body); font-weight: 400; }
+.xpc { display: grid; gap: 3px; justify-items: end; font-size: .85rem; color: var(--text-muted); white-space: nowrap; }
+.xpc b { color: var(--text); font-weight: 600; }
+.xpc.ready b, .xpc.ready { color: var(--gold); }
+.strip { display: grid; grid-template-columns: repeat(var(--n, 10), minmax(0, 1fr)); gap: 2px; font-size: .92rem; text-align: center; }
+.strip span { padding: 1px 0; border-radius: 3px; background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
+.strip .ch { color: var(--accent); font-weight: 600; }
+.strip small { display: block; font-size: .64rem; line-height: 1; color: var(--text-muted); padding-top: 2px; }
+.r3 { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: .9rem; color: var(--text-muted); }
+.r3 .gear { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+.chev { transition: transform .15s; }
+.row[data-open='true'] .chev { transform: rotate(180deg); }
+.chip { display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border: 1px solid var(--border); border-radius: 11px; font-size: .78rem; color: var(--text); background: var(--surface); white-space: nowrap; }
+.chip.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, var(--border)); }
+.chip.gold { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 55%, var(--border)); }
+.men { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* experience bar: one segment per step */
+.xp { display: grid; grid-template-columns: repeat(var(--steps), 1fr); gap: 2px; width: 100%; min-width: 64px; }
+.xpc .xp { width: 96px; }
+.xp i { height: 6px; border-radius: 1px; background: var(--surface-2); position: relative; overflow: hidden; }
+.xp i.on { background: var(--accent); }
+.xp i.part::after { content: ''; position: absolute; inset: 0 auto 0 0; width: var(--p); background: var(--accent); }
+.xp i.base { background: transparent; border: 1px dashed var(--border); }
+.xp i.due { background: var(--gold); }
+
+/* the opened warrior */
+.open { padding: 0 10px 12px; border-top: 1px solid var(--border); }
+.tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin: 8px 0 10px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.tabs button { min-height: var(--tap); padding: 0 4px; border: 0; border-left: 1px solid var(--border); background: transparent; font-size: .9rem; line-height: 1.1; }
+.tabs button:first-child { border-left: 0; }
+.tabs button[aria-selected='true'] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.sec { display: grid; gap: 8px; margin-bottom: 14px; }
+.sec > h3 { font-size: .95rem; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sec > h3 span { font-family: var(--font-body); font-weight: 400; font-size: .82rem; color: var(--text-muted); }
+.prof { width: 100%; border-collapse: collapse; text-align: center; }
+.prof th { font-size: .74rem; font-weight: 400; color: var(--text-muted); padding: 0 0 2px; }
+.prof td { font-size: 1.3rem; padding: 4px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.prof td.ch { color: var(--accent); font-weight: 600; }
+.xpbox { display: grid; gap: 8px; }
+.xpline { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: .9rem; color: var(--text-muted); }
+.stepper { display: inline-flex; align-items: stretch; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.stepper button { width: var(--tap); min-height: var(--tap); border: 0; background: var(--surface); font-size: 1.2rem; }
+.stepper output { min-width: 96px; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; color: var(--text); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; border: 1px solid var(--border); border-radius: var(--radius); }
+.list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: var(--tap); padding: 4px 10px; border-top: 1px solid var(--border); }
+.list li:first-child { border-top: 0; }
+.list .w { text-decoration: underline dotted var(--text-muted); text-underline-offset: 3px; }
+.list .d { display: block; font-size: .82rem; color: var(--text-muted); text-decoration: none; }
+.list .end { display: flex; gap: 4px; }
+.list button.mini { min-height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; font-size: .85rem; }
+.field { display: grid; gap: 3px; font-size: .85rem; color: var(--text-muted); }
+.field input { min-height: var(--tap); padding: 0 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font: inherit; }
+.rowlink { text-decoration: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: var(--tap); padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-align: left; width: 100%; }
+.rowlink small { display: block; color: var(--text-muted); font-size: .82rem; }
+.empty { padding: 10px; border: 1px dashed var(--border); border-radius: var(--radius); color: var(--text-muted); font-size: .92rem; }
+
+.panel { margin-top: 18px; display: grid; gap: 6px; }
+.panel h2 { font-size: 1.05rem; margin-bottom: 2px; }
+.panel .cols { display: grid; gap: 6px; }
+.detail { display: none; }
+.toasts { position: fixed; z-index: 50; left: 12px; right: 12px; bottom: calc(var(--bar) + 12px + env(safe-area-inset-bottom)); display: flex; justify-content: center; pointer-events: none; }
+.toast { display: flex; align-items: center; gap: 4px; max-width: 560px; padding: 4px 4px 4px 14px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 6px 20px var(--shadow); }
+.toast[hidden] { display: none; }
+.toast button { pointer-events: auto; min-width: var(--tap); min-height: var(--tap); padding: 0 10px; border: 0; background: transparent; color: var(--accent); }
+.toast #toast-close { color: var(--text-muted); }
+
+/* wide: table, pane, sidebar */
+@media (min-width: 1100px) {
+  .app { grid-template-columns: var(--side) minmax(0, 1fr); grid-template-rows: var(--bar) 1fr; padding-bottom: 0; }
+  .appbar { grid-column: 1 / -1; }
+  .tabbar { display: none; }
+  .side { display: flex; flex-direction: column; gap: 2px; padding: 12px 8px; position: sticky; top: var(--bar); align-self: start; height: calc(100vh - var(--bar)); border-right: 1px solid var(--border); background: var(--surface); }
+  .side a { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 0 12px; font-size: .95rem; border-radius: var(--radius); }
+  .side a[aria-current] { background: var(--surface-2); }
+  .page { padding: 16px 24px 32px; }
+  .toasts { bottom: 20px; }
+  .head { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; align-items: end; }
+  .head .tiles { grid-column: 1; grid-template-columns: repeat(4, minmax(104px, 150px)); margin-bottom: 12px; }
+  .head .titles { grid-column: 1; }
+  .toolbar { position: static; grid-column: 2; grid-row: 1 / span 2; margin: 0 0 12px; padding: 0; border: 0; background: none; backdrop-filter: none; grid-template-columns: repeat(4, auto); align-self: end; }
+  .board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 420px); gap: 20px; align-items: start; }
+  .group-head { margin-top: 10px; }
+  .rows { gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+  .row { border: 0; border-left: 4px solid var(--kind); border-top: 1px solid var(--border); border-radius: 0; }
+  .rows .row:first-child { border-top: 0; }
+  .row[aria-current='true'] { box-shadow: inset 0 0 0 2px var(--accent); }
+  .row-btn { padding: 8px 12px; }
+  .row-btn .chev { display: none; }
+  .row > .open { display: none; }
+  .detail { display: block; position: sticky; top: calc(var(--bar) + 12px); max-height: calc(100vh - var(--bar) - 24px); overflow: auto; padding: 14px 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .detail .tabs { display: none; }
+  .detail h2 { font-size: 1.3rem; }
+  .detail .who { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .detail .sec { margin-top: 14px; }
+  .panel .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* roomy: the row becomes a table line – name, whole profile, experience */
+@media (min-width: 1360px) {
+  .board { grid-template-columns: minmax(0, 1fr) 440px; }
+  .row-btn { grid-template-columns: minmax(150px, 1.1fr) minmax(300px, 1.6fr) minmax(110px, .6fr); align-items: center; gap: 4px 16px; }
+  .row-btn .r1 { display: contents; }
+  .row-btn .r1 > :first-child { grid-column: 1; grid-row: 1; }
+  .row-btn .r1 .nm, .row-btn .r1 .ty { display: block; margin: 0; }
+  .row-btn .xpc { grid-column: 3; grid-row: 1 / span 2; justify-items: stretch; }
+  .xpc .xp { width: 100%; }
+  .row-btn .strip { grid-column: 2; grid-row: 1; }
+  .row-btn .r3 { grid-column: 1 / 3; grid-row: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+</style>
+</head>
+<body>
+<div class="mock"><span><b>Mockup</b> · Roster v2</span>
+  <span><button type="button" data-theme="chronicle" aria-pressed="true">Chronicle</button> <button type="button" data-theme="parchment" aria-pressed="false">Parchment</button> <a href="index.html">All</a></span></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 1h12l-2 4 2 4H5"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20c6 0 12-6 16-16-8 2-12 6-16 16zM4 20l6-6"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/></symbol>
+</svg>
+
+<div class="app">
+  <header class="appbar">
+    <span class="brand">Mordheim Campaign</span>
+    <span class="tools"><span class="sync">Saved</span><button class="iconbtn" type="button" aria-label="Report a problem" data-note="Report a problem opens the sheet from the app."><svg class="i"><use href="#i-flag"/></svg></button></span>
+  </header>
+  <nav class="side" aria-label="Main">
+    <a href="home.html"><svg class="i"><use href="#i-home"/></svg>Home</a>
+    <a href="warbands.html" aria-current="page"><svg class="i"><use href="#i-flag"/></svg>Warbands</a>
+    <a href="campaign.html"><svg class="i"><use href="#i-map"/></svg>Campaign</a>
+    <a href="visibility.html"><svg class="i"><use href="#i-pen"/></svg>Notes</a>
+    <a href="more.html"><svg class="i"><use href="#i-dots"/></svg>More</a>
+  </nav>
+
+  <main class="page">
+    <section class="head" aria-labelledby="wb-title">
+      <div class="titles">
+        <h1 id="wb-title">The Silver Caravan <button class="iconbtn" type="button" aria-label="Rename the warband" data-note="Rename: the name becomes a field, as in the app."><svg class="i"><use href="#i-edit"/></svg></button></h1>
+        <p class="sub">Mercenaries · Reikland · Setup</p>
+      </div>
+      <dl class="tiles">
+        <div class="tile gold"><dt>Gold</dt><dd>35 gc</dd></div>
+        <div class="tile"><dt>Rating</dt><dd>107</dd></div>
+        <div class="tile"><dt>Models</dt><dd>8 / 15</dd><span class="meter" aria-hidden="true"><i style="width:53%"></i></span></div>
+        <div class="tile"><dt>Worth</dt><dd>409</dd></div>
+      </dl>
+      <div class="toolbar" role="toolbar" aria-label="Warband actions">
+        <a class="btn primary" href="roster.html">+ Recruit</a>
+        <a class="btn" href="hire.html">Hire</a>
+        <a class="btn" href="trading-post.html">Trade</a>
+        <button class="btn" type="button" data-note="Export: text, file, Tabletop Simulator cards, PDF, print – the sheet from the app.">Export</button>
+      </div>
+    </section>
+
+    <div class="board">
+      <div id="list"></div>
+      <aside class="detail" id="detail" aria-label="Selected warrior"></aside>
+    </div>
+
+    <section class="panel" aria-labelledby="wb-panel">
+      <h2 id="wb-panel">Warband</h2>
+      <div class="cols">
+        <a class="rowlink" href="house-rules.html"><span>House rules<small>Off</small></span><span aria-hidden="true">›</span></a>
+        <button class="rowlink" type="button" data-note="Districts: the sheet from the app."><span>Districts<small>Reikland</small></span><span aria-hidden="true">›</span></button>
+        <a class="rowlink" href="story.html"><span>Story of the warband<small>Prologue, interludes, profiles</small></span><span aria-hidden="true">›</span></a>
+        <button class="rowlink" type="button" data-note="Versions: every saved state, with Restore."><span>Versions<small>Every saved state</small></span><span aria-hidden="true">›</span></button>
+        <a class="rowlink" href="warbands.html"><span>All warbands<small>Switch or start another</small></span><span aria-hidden="true">›</span></a>
+        <button class="rowlink" type="button" data-note="Make a copy: same men, a new warband."><span>Make a copy<small>Same men, new warband</small></span><span aria-hidden="true">›</span></button>
+      </div>
+      <button class="btn danger" type="button" style="justify-self:start" data-note="Remove from this device asks first – the server copy stays.">Remove from this device</button>
+    </section>
+  </main>
+
+  <nav class="tabbar nav" aria-label="Main">
+    <a href="home.html"><svg class="i"><use href="#i-home"/></svg>Home</a>
+    <a href="warbands.html" aria-current="page"><svg class="i"><use href="#i-flag"/></svg>Warbands</a>
+    <a href="campaign.html"><svg class="i"><use href="#i-map"/></svg>Campaign</a>
+    <a href="visibility.html"><svg class="i"><use href="#i-pen"/></svg>Notes</a>
+    <a href="more.html"><svg class="i"><use href="#i-dots"/></svg>More</a>
+  </nav>
+</div>
+
+<div class="toasts" aria-live="polite"><div class="toast" id="toast" hidden><span id="toast-text"></span><button type="button" id="toast-undo" hidden>Undo</button><button type="button" id="toast-close" aria-label="Dismiss">✕</button></div></div>
+<script>
+(function () {
+  var STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'Sv'];
+  var HERO_STEPS = [2, 4, 6, 8, 11, 14, 17, 20, 24, 28, 32, 36, 41, 46, 51, 57, 63, 69, 76, 83, 90];
+  var MAN_STEPS = [2, 5, 9, 14];
+  var GEAR = {
+    'Dagger': ['Close combat', 'free'], 'Sword': ['Close combat', '10 gc'], 'Light armour': ['Armour · Sv 6+', '20 gc'],
+    'Shield': ['Armour · +1 Sv', '5 gc'], 'Crossbow': ['Missile · S4, 30"', '25 gc']
+  };
+  /* the real men of the warband, as in the app's roster screenshot */
+  var W = [
+    { id: 'ulrich', kind: 'hero', name: 'Ulrich the Grey', type: 'Mercenary Captain', leader: true, exp: 26, steps: HERO_STEPS,
+      p: [4, 5, 4, 3, 3, 1, 4, 1, 8, '6+'], ch: [1, 6], gear: ['Dagger', 'Sword', 'Light armour', 'Shield'], rules: ['Leader'], skills: ['Strike to Injure'], inj: [], adv: ['+1 WS', '+1 I'] },
+    { id: 'magda', kind: 'hero', name: 'Magda', type: 'Champion', exp: 8, steps: HERO_STEPS,
+      p: [3, 4, 3, 3, 3, 1, 3, 1, 7, '–'], ch: [0], gear: ['Dagger'], rules: [], skills: [], inj: ['Leg Wound (−1 M)'], adv: [] },
+    { id: 'champion', kind: 'hero', name: 'Champion', type: 'Champion', exp: 8, steps: HERO_STEPS,
+      p: [4, 4, 3, 3, 3, 1, 3, 1, 7, '–'], ch: [], gear: ['Dagger'], rules: [], skills: [], inj: [], adv: [] },
+    { id: 'youngblood', kind: 'hero', name: 'Youngblood', type: 'Youngblood', exp: 0, steps: HERO_STEPS,
+      p: [4, 2, 2, 3, 3, 1, 3, 1, 6, '–'], ch: [], gear: ['Dagger'], rules: [], skills: [], inj: [], adv: [] },
+    { id: 'warrior', kind: 'hench', name: 'Warrior', qty: 3, type: 'Henchman group', men: ['Otto', 'Fritz', 'Warrior 3'], exp: 0, steps: MAN_STEPS, group: true, buy: '25 gc',
+      p: [4, 3, 3, 3, 3, 1, 3, 1, 7, '–'], ch: [], gear: ['Dagger'], rules: [], skills: [], inj: [], adv: [] },
+    { id: 'marksman', kind: 'hench', name: 'Marksman', qty: 1, type: 'Henchman group', men: ['Marksman'], exp: 0, steps: MAN_STEPS, group: true, buy: '50 gc',
+      p: [4, 3, 4, 3, 3, 1, 3, 1, 7, '–'], ch: [2], gear: ['Dagger', 'Crossbow'], rules: [], skills: [], inj: [], adv: [] },
+    { id: 'ogre', kind: 'hired', name: 'Ogre Bodyguard', type: 'Hired Sword', exp: 0, steps: HERO_STEPS.slice(0, 4),
+      p: [6, 3, 2, 4, 4, 3, 3, 2, 7], ch: [], gear: [], rules: ['Fear', 'Large Target'], skills: [], inj: [], adv: [] }
+  ];
+  var GROUPS = [['hero', 'Heroes', '4 of 6'], ['hench', 'Henchmen', '4 men'], ['hired', 'Hired Swords & Dramatis Personae', '']];
+  W.forEach(function (w) { w.taken = reached(w); });
+  var state = { sel: 'ulrich', open: null, tab: 'overview' };
+  var wide = window.matchMedia('(min-width: 1100px)');
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function nextStep(w) { for (var i = 0; i < w.steps.length; i++) if (w.steps[i] > w.exp) return w.steps[i]; return null; }
+  function reached(w) { var n = 0; for (var i = 0; i < w.steps.length; i++) if (w.steps[i] <= w.exp) n++; return n; }
+  /* an advance waits when more steps are reached than advances were taken */
+  function waiting(w) { return reached(w) > w.taken; }
+
+  /* the bar: one segment per step; reached steps filled, the way to the next one partly */
+  function bar(w) {
+    var s = w.steps, nx = nextStep(w), html = '', prev = 0, i;
+    for (i = 0; i < s.length; i++) {
+      var cls = '';
+      if (s[i] <= w.exp) cls = 'on' + (i >= w.taken ? ' due' : '');
+      else if (s[i] === nx) { var p = Math.round(100 * (w.exp - prev) / (s[i] - prev)); cls = 'next' + (p > 0 ? ' part' : ''); html += '<i class="' + cls + '" style="--p:' + p + '%"></i>'; prev = s[i]; continue; }
+      html += '<i class="' + cls + '"></i>'; prev = s[i];
+    }
+    return '<span class="xp" style="--steps:' + s.length + '" role="img" aria-label="Experience ' + w.exp + (nx ? ', next advance at ' + nx : ', all steps reached') + '">' + html + '</span>';
+  }
+  function strip(w) {
+    var out = '';
+    for (var i = 0; i < w.p.length; i++) out += '<span' + (w.ch.indexOf(i) >= 0 ? ' class="ch"' : '') + '>' + w.p[i] + '<small>' + STATS[i] + '</small></span>';
+    return '<span class="strip" style="--n:' + w.p.length + '">' + out + '</span>';
+  }
+  function title(w) { return esc(w.name) + (w.qty ? ' ×' + w.qty : ''); }
+
+  function rowHtml(w) {
+    var nx = nextStep(w), rdy = waiting(w);
+    var men = w.men ? '<span class="men">' + w.men.map(function (m) { return '<span class="chip">' + esc(m) + '</span>'; }).join('') + '</span>' : '';
+    var inj = w.inj.map(function (x) { return '<span class="chip danger">' + esc(x) + '</span>'; }).join('');
+    var lead = w.leader ? '<span class="chip gold">Leader</span>' : '';
+    var open = state.open === w.id;
+    return '<li class="row" data-kind="' + w.kind + '" data-id="' + w.id + '" data-open="' + (open && !wide.matches) + '"' + (wide.matches && state.sel === w.id ? ' aria-current="true"' : '') + '>' +
+      '<button class="row-btn" type="button" ' + (wide.matches ? 'aria-pressed="' + (state.sel === w.id) + '"' : 'aria-expanded="' + open + '"') + ' data-pick="' + w.id + '">' +
+      '<span class="r1"><span><span class="nm">' + title(w) + '</span><span class="ty">' + esc(w.type) + '</span></span>' +
+      '<span class="xpc' + (rdy ? ' ready' : '') + '"><span>' + (rdy ? '◆ Advance ready' : 'Exp <b>' + w.exp + '</b>' + (nx ? ' / ' + nx : '')) + '</span>' + bar(w) + '</span></span>' +
+      strip(w) +
+      '<span class="r3">' + lead + inj + '<span class="gear">' + (men || esc(w.gear.concat(w.rules).join(' · ') || 'No equipment')) + '</span><svg class="i chev"><use href="#i-down"/></svg></span>' +
+      '</button>' + (open && !wide.matches ? '<div class="open">' + detail(w, true) + '</div>' : '') + '</li>';
+  }
+
+  function sec(h, side, body) { return '<section class="sec"><h3>' + h + (side ? '<span>' + side + '</span>' : '') + '</h3>' + body + '</section>'; }
+  function profile(w) {
+    var th = '', td = '';
+    for (var i = 0; i < w.p.length; i++) { th += '<th scope="col">' + STATS[i] + '</th>'; td += '<td' + (w.ch.indexOf(i) >= 0 ? ' class="ch"' : '') + '>' + w.p[i] + '</td>'; }
+    return '<table class="prof"><thead><tr>' + th + '</tr></thead><tbody><tr>' + td + '</tr></tbody></table>';
+  }
+  function overview(w) {
+    var nx = nextStep(w), rdy = waiting(w);
+    var left = nx ? (rdy ? 'advance waiting' : (nx - w.exp) + ' to go') : 'all steps reached';
+    return sec('Profile', w.group ? 'same for the whole group' : '', profile(w)) +
+      sec('Experience', 'next advance at ' + (nx || '–') + ' · ' + left,
+        '<div class="xpbox">' + bar(w) + '<div class="xpline"><span class="stepper"><button type="button" data-xp="-1" aria-label="One experience less"' + (w.exp <= 0 ? ' disabled' : '') + '>−</button><output><span>Exp <b>' + w.exp + '</b>' + (w.group ? ' (group)' : '') + '</span></output><button type="button" data-xp="1" aria-label="One experience more">+</button></span>' +
+        '<span class="acts"><button class="btn ' + (rdy ? 'gold' : '') + '" type="button" data-note="Advance: roll on the table, then the result – the sheet from Roster.">Advance</button><button class="btn" type="button" data-note="Injury: the d66 roll and what follows – the sheet from Roster.">Injury</button>' + (w.buy ? '<button class="btn" type="button" data-note="+ Man: one more man in the group for ' + w.buy + '.">+ Man · ' + w.buy + '</button>' : '') + '</span></div></div>') +
+      (w.rules.length ? sec('Special rules', '', '<div class="men">' + w.rules.map(function (r) { return '<span class="chip">' + esc(r) + '</span>'; }).join('') + '</div>') : '');
+  }
+  function gear(w) {
+    var items = w.gear.map(function (g) {
+      var d = GEAR[g] || ['', ''];
+      return '<li><span><span class="w">' + esc(g) + '</span><span class="d">' + esc(d[0]) + (d[1] ? ' · ' + d[1] : '') + '</span></span><span class="end"><button class="mini" type="button" data-note="Swap ' + esc(g) + ': pick what he carries instead – the equipment sheet.">Swap</button><button class="mini" type="button" data-drop="' + esc(g) + '" aria-label="Remove ' + esc(g) + '">✕</button></span></li>';
+    }).join('');
+    return sec('Equipment', w.gear.length + ' carried',
+      (items ? '<ul class="list">' + items + '</ul>' : '<p class="empty">Nothing carried yet.</p>') +
+      '<div class="acts"><button class="btn primary" type="button" data-note="Add equipment: what the warband may buy for him, with price and rule text.">+ Add equipment</button><a class="btn" href="trading-post.html">Trading Post</a><button class="btn" type="button" data-note="Rare items: search roll, price, and who may carry what.">Rare items</button></div>');
+  }
+  function skills(w) {
+    var s = w.skills.map(function (x) { return '<li><span class="w">' + esc(x) + '</span><span class="end"><button class="mini" type="button" data-note="Correct: take the entry out or change it – it stays in the history.">Correct</button></span></li>'; }).join('');
+    var i = w.inj.map(function (x) { return '<li><span class="w" style="color:var(--danger)">' + esc(x) + '</span><span class="end"><button class="mini" type="button" data-note="Correct: take the entry out or change it – it stays in the history.">Correct</button></span></li>'; }).join('');
+    var a = w.adv.map(function (x) { return '<li><span>' + esc(x) + '</span><span class="end"><button class="mini" type="button" data-note="Correct: take the entry out or change it – it stays in the history.">Correct</button></span></li>'; }).join('');
+    return sec('Skills', '', s ? '<ul class="list">' + s + '</ul>' : '<p class="empty">No skills yet. The next advance can bring one.</p>') +
+      sec('Injuries', '', i ? '<ul class="list">' + i + '</ul>' : '<p class="empty">No lasting injuries.</p>') +
+      sec('Advances taken', 'correct a wrong entry', a ? '<ul class="list">' + a + '</ul>' : '<p class="empty">None yet.</p>');
+  }
+  function story(w) {
+    return sec('Name', '', '<label class="field">Name on the roster<input value="' + esc(w.name) + '" autocomplete="off"></label>') +
+      sec('Story and table', '',
+        '<a class="rowlink" href="story.html?who=' + w.id + '"><span>Story so far &amp; profile<small>Write his part of the chronicle</small></span><span aria-hidden="true">›</span></a>' +
+        '<button class="rowlink" type="button" data-note="Copied: name and description of ' + esc(w.name) + ' for the Tabletop Simulator model."><span>Tabletop Simulator card<small>Copy name and description for the model</small></span><span aria-hidden="true">›</span></button>') +
+      sec('Leaving the warband', '', '<div class="acts"><button class="btn danger" type="button" data-note="Out of action for good: asks how, then moves him to the fallen.">Out of action for good…</button><button class="btn danger" type="button" data-note="Remove from the roster: asks first. Undo stays for a while.">Remove from the roster</button></div>');
+  }
+  var TABS = [['overview', 'Overview', overview], ['gear', 'Gear', gear], ['skills', 'Skills & injuries', skills], ['story', 'Story & more', story]];
+  function detail(w, tabs) {
+    var head = tabs ? '' : '<div class="who"><h2>' + title(w) + '</h2><span class="muted">' + esc(w.type) + '</span></div>';
+    if (!tabs) return head + overview(w) + gear(w) + skills(w) + story(w);
+    var t = TABS.map(function (x) { return '<button type="button" role="tab" aria-selected="' + (state.tab === x[0]) + '" data-tab="' + x[0] + '">' + x[1] + '</button>'; }).join('');
+    var cur = TABS.filter(function (x) { return x[0] === state.tab; })[0];
+    return '<div class="tabs" role="tablist">' + t + '</div>' + cur[2](w);
+  }
+
+  function render() {
+    var html = '';
+    GROUPS.forEach(function (g) {
+      var ws = W.filter(function (w) { return w.kind === g[0]; });
+      html += '<div class="group-head"><h2>' + g[1] + '</h2><span>' + g[2] + '</span></div><ul class="rows">' + ws.map(rowHtml).join('') + '</ul>';
+    });
+    document.getElementById('list').innerHTML = html;
+    var sel = W.filter(function (w) { return w.id === state.sel; })[0];
+    document.getElementById('detail').innerHTML = detail(sel, false);
+  }
+  function byId(id) { return W.filter(function (w) { return w.id === id; })[0]; }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button'); if (!t) return;
+    if (t.id === 'toast-close') { hideToast(); return; }
+    if (t.id === 'toast-undo') { if (undo) undo(); hideToast(); render(); return; }
+    if (t.dataset.theme) { setTheme(t.dataset.theme); return; }
+    if (t.dataset.note) { toast(t.dataset.note); return; }
+    if (t.dataset.drop) {
+      var cur = byId(wide.matches ? state.sel : state.open), item = t.dataset.drop, at = cur.gear.indexOf(item);
+      cur.gear.splice(at, 1);
+      toast(item + ' taken off ' + cur.name + '.', function () { cur.gear.splice(at, 0, item); });
+      render(); return;
+    }
+    if (t.dataset.pick) {
+      if (wide.matches) state.sel = t.dataset.pick; else { state.open = state.open === t.dataset.pick ? null : t.dataset.pick; state.tab = 'overview'; }
+      render(); return;
+    }
+    if (t.dataset.tab) { state.tab = t.dataset.tab; render(); return; }
+    if (t.dataset.xp) {
+      var w = byId(wide.matches ? state.sel : state.open); if (!w) return;
+      w.exp = Math.max(0, w.exp + Number(t.dataset.xp)); render();
+    }
+  });
+  wide.addEventListener('change', render);
+  function setTheme(name) {
+    document.documentElement.dataset.theme = name;
+    document.querySelectorAll('.mock [data-theme]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.theme === name)); });
+  }
+  /* the notice of the app: short, dismissable, only its buttons catch taps */
+  var timer = null, undo = null;
+  function hideToast() { document.getElementById('toast').hidden = true; undo = null; clearTimeout(timer); }
+  function toast(text, onUndo) {
+    undo = onUndo || null;
+    document.getElementById('toast-text').textContent = text;
+    document.getElementById('toast-undo').hidden = !onUndo;
+    document.getElementById('toast').hidden = false;
+    clearTimeout(timer); timer = setTimeout(hideToast, 5000);
+  }
+  var q = new URLSearchParams(location.search);
+  if (q.get('theme')) setTheme(q.get('theme'));
+  if (q.get('open')) { state.open = q.get('open'); state.sel = q.get('open'); }
+  if (q.get('tab')) state.tab = q.get('tab');
+  render();
+})();
+</script>
+</body>
+</html>
