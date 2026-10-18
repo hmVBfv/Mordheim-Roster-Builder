@@ -1,5 +1,5 @@
 /* What every spec of the app checks (docs/ui.md checklist). */
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 export async function shot(page: Page, name: string) {
   await page.screenshot({ path: `test-results/screens/${test.info().project.name}-${name}.png`, fullPage: true });
@@ -28,4 +28,17 @@ export async function tapTargets(page: Page) {
 
 export async function useTheme(page: Page, theme: string) {
   await page.addInitScript((t) => { localStorage.setItem('mordheim-theme', t); }, theme);
+}
+
+export type Tab = 'Overview' | 'Gear' | 'Skills & injuries' | 'Story & more';
+
+/* A warrior on the roster (docs/ui.md §3): his row is opened – on a phone
+   under the row, on a desktop in the pane – and with `tab` the section he is
+   asked for (a desktop shows them all). Gives his card. */
+export async function unit(page: Page, name: string, tab?: Tab): Promise<Locator> {
+  const row = page.getByRole('button', { name: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(,|$)`) });
+  const open = (await row.getAttribute('aria-expanded')) === 'true' || (await row.getAttribute('aria-pressed')) === 'true';
+  if (!open) await row.click();
+  if (tab && (await page.getByRole('tablist', { name: 'Sections' }).count())) await page.getByRole('tab', { name: tab }).click();
+  return page.getByRole('article', { name, exact: true });
 }

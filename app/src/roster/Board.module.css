@@ -6,9 +6,17 @@
 
 /* ---------- the page: header strip, tiles, toolbar ---------- */
 
+/* a flex column, not a grid: a sticky toolbar holds on in the whole page, not in its own cell */
 .page {
   container: page / inline-size;
   --bars: calc(57px + env(safe-area-inset-top, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.page > * {
+  min-width: 0;
 }
 
 /* on a phone the head's parts are the page's own, so the toolbar can stay on top */
@@ -138,6 +146,7 @@
     column-gap: var(--space-5);
     row-gap: var(--space-2);
     align-items: end;
+    margin-bottom: var(--space-2);
   }
 
   .head > :not(.toolbar) {
@@ -224,12 +233,25 @@
   align-items: start;
 }
 
+/* split: the list and the warband's functions in the left column, the pane beside both, so it can follow the reader down the whole of them */
 .board[data-layout='split'] {
   grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+  grid-template-rows: auto 1fr;
+}
+
+.board[data-layout='split'] .list {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.board[data-layout='split'] .pane {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 .board[data-layout='split'] .side {
-  grid-column: 1 / -1;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .board[data-layout='triple'] {
@@ -335,9 +357,11 @@
 }
 
 .ty {
+  display: inline-block;
   margin-left: 6px;
   font-size: 0.88rem;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* "Exp 26 / 28" above the bar of steps */
@@ -969,7 +993,8 @@
 
 .printCards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* two columns on a sheet of paper, one where the page is narrow */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: var(--space-3);
 }
 

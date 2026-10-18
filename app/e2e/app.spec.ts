@@ -1,7 +1,7 @@
 /* The built app on a phone-sized screen. */
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
+import { noSideScroll, shot, tapTargets, unit, useTheme } from './helpers.ts';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
 /* the same warband after its first battle: trading has begun (V4–V7) */
@@ -44,12 +44,18 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-home`);
 
     await importSample(page);
-    await expect(page.getByRole('article')).toHaveCount(7);
-    await expect(page.getByRole('heading', { name: 'Ulrich the Grey' })).toBeVisible();
-    // experience as the framed steps of the track, not a bare number (Rob, 29.09.2026)
-    await expect(page.getByRole('list', { name: 'Experience steps' }).first().getByRole('listitem')).toHaveCount(21);
+    // a row each, the whole profile in a line, nothing open until asked (Rob, 18.10.2026)
+    await expect(page.getByRole('img', { name: /^M \S+, WS \S+, BS \S+/ })).toHaveCount(7);
+    await expect(page.getByRole('button', { name: /^Ulrich the Grey/ })).toBeVisible();
+    await expect(page.getByRole('article')).toHaveCount(0);
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-roster`);
+    // opened under his row: experience as the framed steps of the track, not a bare number (Rob, 29.09.2026)
+    const ulrich = await unit(page, 'Ulrich the Grey');
+    await expect(ulrich.getByRole('list', { name: 'Experience steps' }).getByRole('listitem')).toHaveCount(21);
+    await expect(page.getByRole('article')).toHaveCount(1);
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-roster-open`);
 
     await page.getByRole('link', { name: 'More' }).click();
     await expect(page.getByRole('radio', { name: /Parchment/ })).toBeVisible();
@@ -83,12 +89,12 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-recruit`);
     await sheet.getByRole('button', { name: /^Mercenary Captain/ }).click();
     await expect(page.locator('dialog[open]')).toHaveCount(0);
-    await expect(page.getByRole('article', { name: 'Mercenary Captain' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Mercenary Captain/ })).toBeVisible();
     await expect(page.getByText('Recruited Mercenary Captain')).toBeVisible();
     await page.getByRole('button', { name: '+ Recruit' }).click();
     await expect(sheet.getByRole('button', { name: /^Mercenary Captain/ })).toBeDisabled();
     await sheet.getByRole('button', { name: /^Warrior/ }).click();
-    const group = page.getByRole('article', { name: 'Warrior' });
+    const group = await unit(page, 'Warrior');
     await group.getByRole('button', { name: /\+ Man/ }).click();
     await sheet.getByRole('button', { name: 'One man more' }).click();
     await noSideScroll(page); await tapTargets(page);
@@ -109,26 +115,26 @@ for (const theme of THEMES) {
     await expect(group.getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
 
     // experience one step at a time
-    const captain = page.getByRole('article', { name: 'Mercenary Captain' });
+    const captain = await unit(page, 'Mercenary Captain');
     await captain.getByRole('button', { name: /One experience more/ }).click();
     await expect(captain.getByText('Exp 21')).toBeVisible();
 
-    // ⋯: the menu of a warrior, and a name for the Captain
-    await captain.getByRole('button', { name: 'More for Mercenary Captain', exact: true }).click();
+    // the last tab: the Captain's name is a field – Enter saves it
+    await unit(page, 'Mercenary Captain', 'Story & more');
     await noSideScroll(page); await tapTargets(page);
-    await shot(page, `${theme}-warrior-menu`);
-    await page.locator('dialog[open]').getByRole('button', { name: /^Name/ }).click();
-    await page.locator('dialog[open]').getByRole('textbox').fill('Ulrich the Grey');
-    await page.locator('dialog[open]').getByRole('button', { name: 'Save' }).click();
+    await shot(page, `${theme}-warrior-story`);
+    await captain.getByRole('textbox', { name: 'Name of this Mercenary Captain' }).fill('Ulrich the Grey');
+    await page.keyboard.press('Enter');
     await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Ulrich the Grey, Mercenary Captain/ })).toBeVisible();
 
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-roster-edited`);
 
     // everything is on the device: a reload shows the same
     await page.reload();
-    await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toContainText('Exp 21');
-    await expect(page.getByRole('article', { name: 'Warrior' }).getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
+    await expect(await unit(page, 'Ulrich the Grey')).toContainText('Exp 21');
+    await expect((await unit(page, 'Warrior')).getByRole('button', { name: 'Bruno: name or dismiss' })).toBeVisible();
   });
 }
 
@@ -140,8 +146,7 @@ for (const theme of THEMES) {
     await importSample(page);
     const gold = async () => Number((await page.locator('dt:text-is("Gold") + dd').textContent())!.replace(/\D/g, ''));
     const before = await gold();
-    await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
-    await page.locator('dialog[open]').getByRole('button', { name: /Equipment & rare items/ }).click();
+    await (await unit(page, 'Magda', 'Gear')).getByRole('button', { name: /Equipment & rare items/ }).click();
     const sheet = page.locator('dialog[open]');
     await expect(sheet.getByRole('heading', { name: 'Equipment · Magda' })).toBeVisible();
     await sheet.getByRole('button', { name: 'One Sword more' }).click();
@@ -156,7 +161,7 @@ for (const theme of THEMES) {
     await expect(page.getByRole('article', { name: 'Magda' })).toContainText('Sword');
     await expect.poll(gold).toBeLessThan(before - 9);
     // the Trading Post says what applies before the first battle
-    await page.getByRole('link', { name: /^Trading Post/ }).click();
+    await page.getByRole('link', { name: 'Trade' }).click();
     await expect(page.getByText('Until its first battle the warband buys from its lists')).toBeVisible();
   });
 }
@@ -167,7 +172,7 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await page.goto('./');
     await importText(page, FOUGHT);
-    await page.getByRole('link', { name: /^Trading Post/ }).click();
+    await page.getByRole('link', { name: 'Trade' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Trading Post' })).toBeVisible();
     const gold = async () => Number((await page.locator('dt:text-is("Gold in hand") + dd').textContent())!.replace(/\D/g, ''));
     const start = await gold();
@@ -241,8 +246,7 @@ for (const theme of THEMES) {
     const sheet = page.locator('dialog[open]');
     await importText(page, JSON.stringify({ wb: 'possessed', name: 'The Fallen Choir', models: [{ uid: 1, uid_def: 'mag' }, { uid: 2, uid_def: 'mut', name: 'Grell' }] }), 'The Fallen Choir');
     await expect(page.getByRole('list', { name: 'Warnings' })).toContainText('Mutant needs at least 1 mutation');
-    await page.getByRole('button', { name: 'More for Grell', exact: true }).click();
-    await sheet.getByRole('button', { name: 'Mutations' }).click();
+    await (await unit(page, 'Grell', 'Skills & injuries')).getByRole('button', { name: 'Mutations' }).click();
     await sheet.getByRole('button', { name: 'One Great Claw more' }).click();
     await sheet.getByRole('button', { name: 'One Cloven Hooves more' }).click();
     await expect(sheet).toContainText('Together: 130 gc');
@@ -255,7 +259,8 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-mutations`);
     await sheet.getByRole('button', { name: 'Close' }).click();
     const grell = page.getByRole('article', { name: 'Grell' });
-    await expect(grell).toContainText('Great Claw, Cloven Hooves');
+    await expect(grell).toContainText('Great Claw');
+    await expect(grell).toContainText('Cloven Hooves');
     await expect(page.getByRole('list', { name: 'Warnings' })).not.toContainText('Mutant needs');
   });
 
@@ -264,15 +269,13 @@ for (const theme of THEMES) {
     await page.goto('./');
     const sheet = page.locator('dialog[open]');
     await importText(page, JSON.stringify({ wb: 'maraudersofchaos', name: 'Sons of the Crow', models: [{ uid: 1, uid_def: 'chieftain', name: 'Skarr' }, { uid: 2, uid_def: 'seer', name: 'Vala' }] }), 'Sons of the Crow');
-    await page.getByRole('button', { name: 'More for Vala', exact: true }).click();
-    await sheet.getByRole('button', { name: /Mark of Chaos/ }).click();
+    await (await unit(page, 'Vala', 'Skills & injuries')).getByRole('button', { name: /Mark of Chaos/ }).click();
     await sheet.getByRole('button', { name: /^Mark of Tchar/ }).click();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-mark`);
     await sheet.getByRole('button', { name: 'Apply' }).click();
     await expect(page.getByRole('article', { name: 'Vala' })).toContainText('Sorcerer of Tchar');
-    await page.getByRole('button', { name: 'More for Skarr', exact: true }).click();
-    await sheet.getByRole('button', { name: /^Take the Mark of Tchar/ }).click();
+    await (await unit(page, 'Skarr', 'Skills & injuries')).getByRole('button', { name: /^Take the Mark of Tchar/ }).click();
     await expect(page.getByRole('article', { name: 'Skarr' })).toContainText('Touched by Tchar');
   });
 }
@@ -284,7 +287,7 @@ test('more men after the first battle: the veterans roll', async ({ page }) => {
   await importText(page, FOUGHT);
   const sheet = page.locator('dialog[open]');
   const gold = async () => parseInt((await page.locator('dt:text-is("Gold") + dd').textContent())!, 10);
-  const group = page.getByRole('article', { name: 'Warrior', exact: true });
+  const group = await unit(page, 'Warrior');
   for (let i = 0; i < 3; i++) await group.getByRole('button', { name: 'One experience more for Warrior', exact: true }).click();
   await expect(group).toContainText('Exp 3');
   const before = await gold();
@@ -319,11 +322,12 @@ test('a recruit after the first battle buys from his list', async ({ page }) => 
   await page.getByRole('button', { name: '+ Recruit' }).click();
   await sheet.getByRole('button', { name: /^Youngblood/ }).click();
   await expect(sheet).toHaveCount(0);
-  const young = page.getByRole('article', { name: 'Youngblood' }).last();
-  await expect(page.getByRole('article', { name: 'Youngblood' })).toHaveCount(2);
+  const rows = page.getByRole('button', { name: /^Youngblood(,|$)/ });
+  await expect(rows).toHaveCount(2);
   const before = await gold();
-  await young.getByRole('button', { name: /More for Youngblood/ }).click();
-  await sheet.getByRole('button', { name: 'Equipment & rare items' }).click();
+  await rows.last().click();
+  await page.getByRole('tab', { name: 'Gear' }).click();
+  await page.getByRole('article', { name: 'Youngblood' }).getByRole('button', { name: 'Equipment & rare items' }).click();
   await expect(sheet).toContainText('until his own he buys from his list');
   await sheet.getByRole('button', { name: 'One Sword more' }).click();
   await expect.poll(gold).toBe(before - 10);
@@ -331,8 +335,7 @@ test('a recruit after the first battle buys from his list', async ({ page }) => 
   await shot(page, 'recruit-list');
   await sheet.getByRole('button', { name: 'Done' }).click();
   // a warrior who has fought goes to the Trading Post
-  await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
-  await expect(sheet.getByRole('button', { name: /Equipment – at the Trading Post/ })).toBeVisible();
+  await expect((await unit(page, 'Magda', 'Gear')).getByRole('link', { name: /Equipment – at the Trading Post/ })).toBeVisible();
 });
 
 /* After the first battle a dismissed warrior refunds nothing; his
@@ -342,14 +345,13 @@ test('a warrior dismissed after the first battle leaves his equipment', async ({
   await importText(page, FOUGHT);
   const gold = async () => (await page.locator('dt:text-is("Gold") + dd').textContent())!;
   const before = await gold();
-  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-  await page.locator('dialog[open]').getByRole('button', { name: /Dismiss – his equipment goes to the stash/ }).click();
-  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toHaveCount(0);
+  await (await unit(page, 'Ulrich the Grey', 'Story & more')).getByRole('button', { name: /Dismiss – his equipment goes to the stash/ }).click();
+  await expect(page.getByRole('button', { name: /^Ulrich the Grey/ })).toHaveCount(0);
+  await expect(page.getByRole('article')).toHaveCount(0);
   await expect.poll(gold).toBe(before);
-  await expect(page.getByRole('link', { name: /Trading Post · stash/ })).toBeVisible();
-  // ⋯ → Equipment leads to the Trading Post
-  await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
-  await page.locator('dialog[open]').getByRole('button', { name: /Equipment – at the Trading Post/ }).click();
+  await expect(page.getByRole('link', { name: /^Trade, stash/ })).toBeVisible();
+  // his Gear leads to the Trading Post
+  await (await unit(page, 'Magda', 'Gear')).getByRole('link', { name: /Equipment – at the Trading Post/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Trading Post' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Give items' })).toBeVisible();
 });
@@ -361,7 +363,7 @@ for (const theme of THEMES) {
     await page.goto('./');
     await importSample(page);
     const sheet = page.locator('dialog[open]');
-    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+    const ulrich = await unit(page, 'Ulrich the Grey');
 
     // 7: +1 WS or +1 BS
     await ulrich.getByRole('button', { name: 'Advance' }).click();
@@ -382,10 +384,11 @@ for (const theme of THEMES) {
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-advance-skill`);
     await sheet.getByRole('button', { name: 'Apply' }).click();
+    await unit(page, 'Ulrich the Grey', 'Skills & injuries');
     await expect(ulrich).toContainText(name);
 
     // 11 for a group: one man becomes a Hero, with two skill lists
-    const group = page.getByRole('article', { name: 'Warrior', exact: true });
+    let group = await unit(page, 'Warrior');
     await group.getByRole('button', { name: 'Advance' }).click();
     await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('11');
     await sheet.getByRole('group', { name: 'Who' }).getByRole('button', { name: 'Fritz' }).click();
@@ -394,12 +397,12 @@ for (const theme of THEMES) {
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-advance-talent`);
     await sheet.getByRole('button', { name: 'Apply' }).click();
-    await expect(page.getByRole('article', { name: 'Fritz' })).toContainText('Promoted');
+    await expect(await unit(page, 'Fritz')).toContainText('Promoted');
+    group = await unit(page, 'Warrior');
     await expect(group.getByRole('list', { name: 'Men of Warrior' }).getByRole('listitem')).toHaveCount(2);
 
-    // a mistake taken back, from ⋯
-    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-    await sheet.getByRole('button', { name: /Advances taken – correct/ }).click();
+    // a mistake taken back, from his skills
+    await (await unit(page, 'Ulrich the Grey', 'Skills & injuries')).getByRole('button', { name: /Advances taken – correct/ }).click();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-advances-taken`);
     await sheet.getByRole('listitem').filter({ hasText: name }).getByRole('button', { name: 'Remove' }).click();
@@ -418,7 +421,7 @@ for (const theme of THEMES) {
     const sheet = page.locator('dialog[open]');
 
     // 23 Arm Wound asks a D6: 2–6, he misses the next game
-    const magda = page.getByRole('article', { name: 'Magda' });
+    const magda = await unit(page, 'Magda');
     await magda.getByRole('button', { name: 'Injury for Magda' }).click();
     await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('23');
     await sheet.getByRole('button', { name: /^2–6 — misses the next game/ }).click();
@@ -428,7 +431,7 @@ for (const theme of THEMES) {
     await expect(magda).toContainText('Misses 1 game');
 
     // Multiple Injuries: two more, one of them a lost pit fight with its own roll
-    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+    const ulrich = await unit(page, 'Ulrich the Grey');
     await ulrich.getByRole('button', { name: 'Injury for Ulrich the Grey' }).click();
     await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('21');
     await sheet.getByRole('group', { name: 'D6: how many more' }).getByRole('button', { name: '2', exact: true }).click();
@@ -442,10 +445,11 @@ for (const theme of THEMES) {
     await sheet.getByRole('button', { name: 'Apply' }).click();
     await expect(ulrich).toContainText('Leg Wound');
     await expect(ulrich).toContainText('Hand Injury');
+    await unit(page, 'Ulrich the Grey', 'Gear');
     await expect(ulrich).not.toContainText('Sword');
 
     // a Henchman rolls a D6 for the man who went down
-    const group = page.getByRole('article', { name: 'Warrior', exact: true });
+    const group = await unit(page, 'Warrior');
     await group.getByRole('button', { name: 'Injury for Warrior' }).click();
     await sheet.getByRole('group', { name: 'Who' }).getByRole('button', { name: 'Otto' }).click();
     await sheet.getByRole('textbox', { name: 'D6 as rolled' }).fill('2');
@@ -457,7 +461,7 @@ for (const theme of THEMES) {
     await expect(group).not.toContainText('Otto');
 
     // 61 Captured, held for now (Rob, 02.10.2026): on the roster but not fighting, until ransomed
-    const young = page.getByRole('article', { name: 'Youngblood' });
+    const young = await unit(page, 'Youngblood');
     await young.getByRole('button', { name: 'Injury for Youngblood' }).click();
     await sheet.getByRole('textbox', { name: 'D66 as rolled' }).fill('61');
     await sheet.getByRole('button', { name: /^Held for now/ }).click();
@@ -474,9 +478,8 @@ for (const theme of THEMES) {
     await expect(young).not.toContainText('Captive');
     await expect(page.locator('dl dt', { hasText: 'Gold' }).locator('xpath=following-sibling::dd')).toHaveText(`${parseInt(goldBefore!, 10) - 20} gc`);
 
-    // an injury entered by mistake is taken back from ⋯
-    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-    await sheet.getByRole('button', { name: /Injuries – correct/ }).click();
+    // an injury entered by mistake is taken back from his injuries
+    await (await unit(page, 'Ulrich the Grey', 'Skills & injuries')).getByRole('button', { name: /Injuries – correct/ }).click();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-injuries-correct`);
     await sheet.getByRole('listitem').filter({ hasText: 'Leg Wound' }).getByRole('button', { name: 'Remove' }).click();
@@ -485,18 +488,17 @@ for (const theme of THEMES) {
     await expect(ulrich).toContainText('Leg Wound');
 
     // out of action for good: the Champion joins the Fallen
-    await page.getByRole('button', { name: 'More for Champion', exact: true }).click();
-    await sheet.getByRole('button', { name: /Out of action for good/ }).click();
+    await (await unit(page, 'Champion', 'Story & more')).getByRole('button', { name: /Out of action for good/ }).click();
     await expect(sheet.getByRole('textbox', { name: 'D66 as rolled' })).toHaveValue('11');
     await sheet.getByRole('button', { name: 'Apply' }).click();
-    await expect(page.getByRole('article', { name: 'Champion', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /^Champion(,|$)/ })).toHaveCount(0);
     await expect(page.getByText(/^Fallen \(\d+\)$/)).toBeVisible();
 
     // a Hired Sword rolls a D6 too: on a 1 he is gone
-    await page.getByRole('button', { name: 'Injury for Ogre Bodyguard' }).click();
+    await (await unit(page, 'Ogre Bodyguard')).getByRole('button', { name: 'Injury for Ogre Bodyguard' }).click();
     await sheet.getByRole('textbox', { name: 'D6 as rolled' }).fill('1');
     await sheet.getByRole('button', { name: 'Apply' }).click();
-    await expect(page.getByRole('article', { name: 'Ogre Bodyguard' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /^Ogre Bodyguard/ })).toHaveCount(0);
   });
 }
 
@@ -504,15 +506,13 @@ for (const theme of THEMES) {
 test('a warrior removed from the roster comes back with Undo', async ({ page }) => {
   await page.goto('./');
   await importSample(page);
-  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-  await page.locator('dialog[open]').getByRole('button', { name: /Remove from the roster/ }).click();
-  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toHaveCount(0);
+  await (await unit(page, 'Ulrich the Grey', 'Story & more')).getByRole('button', { name: /Remove from the roster/ }).click();
+  await expect(page.getByRole('button', { name: /^Ulrich the Grey/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'Undo' }).click();
-  await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Ulrich the Grey/ })).toBeVisible();
 });
 
-/* Back closes the sheets of the roster too, and a sheet opened from the ⋯
-   menu leaves no step of the menu behind. */
+/* Back closes the sheets of the roster too, also one opened from a card. */
 test('Back closes the sheets of the roster', async ({ page }) => {
   await page.goto('./');
   await importSample(page);
@@ -522,9 +522,8 @@ test('Back closes the sheets of the roster', async ({ page }) => {
   await page.goBack();
   await expect(page.locator('dialog[open]')).toHaveCount(0);
   expect(page.url()).toBe(roster);
-  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-  await page.locator('dialog[open]').getByRole('button', { name: /^Name/ }).click();
-  await expect(page.locator('dialog[open]').getByRole('textbox')).toBeVisible();
+  await (await unit(page, 'Ulrich the Grey')).getByRole('button', { name: 'Advance' }).click();
+  await expect(page.locator('dialog[open]').getByRole('textbox', { name: '2D6 as rolled' })).toBeVisible();
   await page.goBack();
   await expect(page.locator('dialog[open]')).toHaveCount(0);
   expect(page.url()).toBe(roster);
@@ -605,15 +604,76 @@ test('the undo notice goes quickly, can be dismissed and lets taps through', asy
   await expect(toast).toBeHidden({ timeout: 500 });
 });
 
-/* On a desktop screen the cards stand side by side. */
-test('the roster uses the width of a desktop screen', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+/* On a desktop screen the list and the selected warrior stand side by side
+   (Rob, 18.10.2026: the whole width is used, the information is in sight at
+   once, and many warriors are not a wall of text). */
+for (const theme of THEMES) {
+  test(`the roster uses the width of a desktop screen, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('./');
+    await importSample(page);
+    await expect(page.locator('[data-layout]')).toHaveAttribute('data-layout', 'split');
+    // the first warrior is selected; every section stands in the pane, nothing behind tabs
+    const pane = page.getByRole('complementary', { name: 'Selected warrior' });
+    await expect(pane.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+    await expect(page.getByRole('tablist')).toHaveCount(0);
+    for (const h of ['Profile', 'Experience', 'Equipment', 'Skills', 'Injuries', 'Name', 'Leaving the warband']) {
+      await expect(pane.getByRole('heading', { level: 3, name: new RegExp(`^${h}`) })).toBeVisible();
+    }
+    // the list beside the pane; a row is one table line: name, profile and experience across
+    const heroes = page.getByRole('region', { name: 'Heroes' }).getByRole('listitem');
+    const row = (await heroes.first().boundingBox())!;
+    const side = (await pane.boundingBox())!;
+    expect(side.x, 'the pane stands beside the list').toBeGreaterThan(row.x + row.width);
+    expect(row.height, 'a row is a line or two, not a card').toBeLessThan(90);
+    expect(row.width + side.width, 'the width is used').toBeGreaterThan(1000);
+    // the warband's own functions are in sight, not behind a menu
+    await expect(page.getByRole('link', { name: 'House rules', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Make a copy' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Trade' })).toBeVisible();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-desktop-roster`);
+
+    // another warrior fills the pane; the experience is changed there
+    await page.getByRole('button', { name: /^Magda/ }).click();
+    await expect(page.getByRole('button', { name: /^Magda/ })).toHaveAttribute('aria-pressed', 'true');
+    const magda = pane.getByRole('article', { name: 'Magda' });
+    await expect(magda).toBeVisible();
+    await magda.getByRole('button', { name: /One experience more for Magda/ }).click();
+    await expect(magda.getByRole('button', { name: /Experience of Magda: 9\./ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Magda/ })).toContainText('Exp 9');
+    // his name is a field in the pane: leaving it saves
+    await magda.getByRole('textbox', { name: 'Name of this Champion' }).fill('Magda the Red');
+    await magda.getByRole('textbox', { name: 'Name of this Champion' }).blur();
+    await expect(page.getByRole('button', { name: /^Magda the Red/ })).toBeVisible();
+    await shot(page, `${theme}-desktop-roster-magda`);
+  });
+
+  test(`a very wide screen adds a third column, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto('./');
+    await importSample(page);
+    await expect(page.locator('[data-layout]')).toHaveAttribute('data-layout', 'triple');
+    const pane = (await page.getByRole('complementary', { name: 'Selected warrior' }).boundingBox())!;
+    const warband = (await page.getByRole('heading', { level: 2, name: 'Warband' }).boundingBox())!;
+    expect(warband.x, 'the warband’s functions are the third column').toBeGreaterThan(pane.x + pane.width);
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-desktop-wide-roster`);
+  });
+}
+
+/* The same page on a phone that is turned: the list is wide enough for table lines, the warrior still opens in place. */
+test('a tablet in landscape shows table lines and opens a warrior under his row', async ({ page }) => {
+  await page.setViewportSize({ width: 820, height: 1000 });
   await page.goto('./');
   await importSample(page);
-  const tops = await page.getByRole('article').evaluateAll((els) => els.slice(0, 2).map((e) => Math.round(e.getBoundingClientRect().top)));
-  expect(tops[0], 'the first two warriors share a row').toBe(tops[1]);
+  await expect(page.locator('[data-layout]')).toHaveAttribute('data-layout', 'stack');
+  await (await unit(page, 'Ulrich the Grey')).getByRole('list', { name: 'Experience steps' }).scrollIntoViewIfNeeded();
+  await expect(page.getByRole('tablist', { name: 'Sections' })).toBeVisible();
   await noSideScroll(page);
-  await shot(page, 'desktop-roster');
+  await shot(page, 'tablet-roster-open');
 });
 
 test('the navigation fits the flavour', async ({ page }) => {
@@ -734,6 +794,7 @@ test.describe('start-up budgets', () => {
   test('a step of experience shows in under 100 ms', async ({ page }) => {
     await page.goto('./');
     await importSample(page);
+    await unit(page, 'Ulrich the Grey');
     await throttle(page);
     const button = 'article[aria-label="Ulrich the Grey"] button[aria-label^="One experience more"]';
     await expect(page.locator(button)).toBeVisible();
@@ -760,11 +821,12 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await page.goto('./');
     await importSample(page);
-    const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+    const ulrich = await unit(page, 'Ulrich the Grey');
     // his own Leader rule: 12" in a Reikland warband
     await ulrich.getByRole('button', { name: 'Leader', exact: true }).click();
     const tip = page.getByRole('tooltip');
     await expect(tip).toContainText('Reikland');
+    await unit(page, 'Ulrich the Grey', 'Gear');
     await ulrich.getByRole('button', { name: 'Sword', exact: true }).click();
     await expect(tip).toHaveCount(1);
     await expect(tip).toContainText('Parry');
@@ -777,13 +839,13 @@ for (const theme of THEMES) {
     await page.getByRole('heading', { level: 1 }).click();
     await expect(tip).toHaveCount(0);
     // an injury, a skill, a Hired Sword's rule
-    await page.getByRole('article', { name: 'Magda' }).getByRole('button', { name: /Leg Wound/ }).click();
+    await (await unit(page, 'Magda', 'Skills & injuries')).getByRole('button', { name: /Leg Wound/ }).click();
     await expect(tip).toContainText('Movement permanently');
-    await ulrich.getByRole('button', { name: 'Strike to Injure' }).click();
+    await (await unit(page, 'Ulrich the Grey', 'Skills & injuries')).getByRole('button', { name: 'Strike to Injure' }).click();
     await expect(tip).toContainText('Skill');
     await page.keyboard.press('Escape');
     await expect(tip).toHaveCount(0);
-    await page.getByRole('article', { name: /Ogre/ }).getByRole('button', { name: 'Fear', exact: true }).click();
+    await (await unit(page, 'Ogre Bodyguard')).getByRole('button', { name: 'Fear', exact: true }).click();
     await expect(tip).toBeVisible();
   });
 }
@@ -796,7 +858,7 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await page.goto('./');
     await importSample(page);
-    await page.getByRole('link', { name: 'Hire…' }).click();
+    await page.getByRole('link', { name: 'Hire', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Hire' })).toBeVisible();
     const list = page.getByRole('list', { name: 'Hired Swords' });
     // the Ogre is already with the Silver Caravan
@@ -824,14 +886,14 @@ for (const theme of THEMES) {
 
     // and he is on the roster
     await page.getByRole('link', { name: /‹ The Silver Caravan/ }).click();
-    await expect(page.getByRole('article', { name: /Troll Slayer/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Troll Slayer, Hired Sword/ })).toBeVisible();
   });
 }
 
 test('one who may not join says why, and cannot be hired', async ({ page }) => {
   await page.goto('./');
   await importSample(page);
-  await page.getByRole('link', { name: 'Hire…' }).click();
+  await page.getByRole('link', { name: 'Hire', exact: true }).click();
   await page.getByRole('checkbox', { name: 'Only those this warband may hire' }).uncheck();
   await page.getByRole('searchbox', { name: 'Find by name or race' }).fill('Dark Elf Assassin');
   await page.getByRole('list', { name: 'Hired Swords' }).getByRole('button').first().click();
@@ -880,9 +942,8 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await page.goto('./');
     await importSample(page);
-    // a card's ⋯ menu leads to its Tabletop Simulator entry
-    await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-    await page.locator('dialog[open]').getByRole('button', { name: 'Tabletop Simulator card' }).click();
+    // the last tab of a warrior leads to his Tabletop Simulator entry
+    await (await unit(page, 'Ulrich the Grey', 'Story & more')).getByRole('link', { name: /^Tabletop Simulator card/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Export' })).toBeVisible();
     const card = page.locator('details[open]').filter({ hasText: 'Ulrich the Grey' });
     await expect(card.getByRole('textbox', { name: 'Name' })).toHaveValue('[B8860B]Ulrich the Grey[-]');
@@ -916,7 +977,7 @@ test('experience set at once, a rare item’s price by hand, the roster printed'
   await page.addInitScript(() => { (window as unknown as { printed: number }).printed = 0; window.print = () => { (window as unknown as { printed: number }).printed++; }; });
   await page.goto('./');
   await importSample(page);
-  const ulrich = page.getByRole('article', { name: 'Ulrich the Grey' });
+  const ulrich = await unit(page, 'Ulrich the Grey');
   await ulrich.getByRole('button', { name: /Experience of Ulrich the Grey: \d+\. Set it/ }).click();
   let sheet = page.locator('dialog[open]');
   await sheet.getByRole('group', { name: 'Steps of the track' }).getByRole('button', { name: '36', exact: true }).click();
@@ -927,8 +988,7 @@ test('experience set at once, a rare item’s price by hand, the roster printed'
   await expect(ulrich.getByRole('button', { name: /Experience of Ulrich the Grey: 36/ })).toBeVisible();
 
   // the price rolled at the table, entered by hand
-  await page.getByRole('button', { name: 'More for Magda', exact: true }).click();
-  await page.locator('dialog[open]').getByRole('button', { name: /Equipment & rare items/ }).click();
+  await (await unit(page, 'Magda', 'Gear')).getByRole('button', { name: /Equipment & rare items/ }).click();
   sheet = page.locator('dialog[open]');
   await sheet.getByRole('combobox', { name: 'Rare item to add' }).selectOption({ index: 1 });
   await sheet.getByRole('button', { name: 'Add', exact: true }).click();
@@ -940,7 +1000,7 @@ test('experience set at once, a rare item’s price by hand, the roster printed'
   await sheet.getByRole('button', { name: 'Done' }).click();
 
   // printing: from Export to the roster, which prints once, without the screen's buttons
-  await page.getByRole('link', { name: 'Export…' }).click();
+  await page.getByRole('link', { name: 'Export', exact: true }).click();
   await page.getByRole('button', { name: 'Print the roster' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeVisible();
   await expect.poll(() => page.evaluate(() => (window as unknown as { printed: number }).printed)).toBe(1);
