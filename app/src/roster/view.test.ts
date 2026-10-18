@@ -219,3 +219,50 @@ describe('the row of a warrior in the list', () => {
     expect(unitChips({ ...hero, leader: false, missGames: 1 }).map((c) => c.label)).toEqual(['Misses 1 game']);
   });
 });
+
+/* Rob, 19.10.2026: the Fallen showed only names; gold, equipment and the
+   experience lost with them belong there, as in the Roster Builder. */
+describe('the Fallen', () => {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  /** A Captain, a Champion "Magda" (11 Exp, a sword bought) and three Warriors, one of them "Otto". */
+  function band(): core.WarbandState {
+    let s = createWarband(data, 'merc', null, 'The Grey Company');
+    for (const id of ['capt', 'champ', 'warr']) s = core.addUnit(c(s), id);
+    s = core.setQty(c(s), s.models[2]!.uid, 3);
+    s = core.setMemberName(c(s), s.models[2]!.uid, 1, 'Otto');
+    s = structuredClone(s);
+    s.models[1]!.name = 'Magda';
+    s.models[1]!.exp = 11;
+    s.models[2]!.exp = 2;
+    return s;
+  }
+
+  it('lists nothing while nobody has fallen', () => {
+    const v = rosterView(data, band()).fallen;
+    expect(v).toEqual({ count: 0, goldLost: 0, xpLost: 0, groups: [] });
+  });
+
+  it('groups the dead by Hero and Henchman and unit, with experience, equipment and gold lost', () => {
+    let s = band();
+    const champ = s.models[1]!.uid, warr = s.models[2]!.uid;
+    s = core.killHero(c(s), champ);
+    s = core.killHenchMember(c(s), warr, 0);
+    s = core.killHenchMember(c(s), warr, 0); // Otto, now first of the group
+    s = core.killHenchMember(c(s), warr, 0);
+    const v = rosterView(data, s).fallen;
+    const ctx = c(core.normalizeState(c(s)));
+    expect(v.count).toBe(4);
+    expect(v.goldLost).toBe(core.fallenGoldLost(ctx));
+    expect(v.xpLost).toBe(core.fallenExpLost(ctx));
+    expect(v.xpLost).toBe(9); // Magda earned 3 beyond her starting 8, each Warrior 2
+    expect(v.groups.map((g) => [g.kind, g.unit, g.count])).toEqual([['hero', 'Champion', 1], ['hench', 'Warrior', 3]]);
+    const [hero, hench] = v.groups as [typeof v.groups[0], typeof v.groups[0]];
+    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!) }]);
+    expect(hero.xpEarned).toBe(3);
+    // a man with a name of his own is remembered by it; the nameless are counted together
+    expect(hench.entries.map((e) => [e.name, e.count, e.xp])).toEqual([['Otto', 1, 2], ['Warrior', 2, 2]]);
+    expect(hench.goldLost).toBe(hench.entries.reduce((n, e) => n + e.worth, 0));
+    expect(hench.xpTotal).toBe(6);
+    expect(hench.equipment).toEqual(core.fallenEqAgg(ctx, ctx.s.fallen!.slice(1).map((f) => f.m)));
+  });
+});

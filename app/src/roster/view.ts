@@ -112,8 +112,59 @@ export interface RosterView {
   warnings: string[];
   henchmen: WarriorView[];
   hires: HireView[];
-  fallen: string[];
+  fallen: FallenView;
   recruit: RecruitGroup[];
+}
+
+/** One line of the Fallen: a Hero, a henchman with a name of his own, or the nameless of one kind counted together. */
+export interface FallenEntry { name: string; count: number; xp: number; equipment: string[]; worth: number }
+/** The dead of one unit, Heroes and Henchmen apart (a promoted man stays with the Heroes). */
+export interface FallenGroup { key: string; kind: 'hero' | 'hench'; unit: string; count: number; xpTotal: number; xpEarned: number; equipment: string[]; goldLost: number; entries: FallenEntry[] }
+export interface FallenView { count: number; goldLost: number; xpLost: number; groups: FallenGroup[] }
+
+/* The Fallen as the Roster Builder lists them (legacy renderFallen): grouped
+   by the kind of death and the unit, Heroes one by one, henchmen by name or,
+   without one, counted together when they carried the same and had the same
+   experience. Gold is what was really lost (core.fallenGoldOf), experience
+   lost only what was earned in play (core.fallenExpEarned). */
+export function fallenView(ctx: core.Ctx): FallenView {
+  const all = ctx.s.fallen ?? [];
+  const byType = new Map<string, core.FallenRecord[]>();
+  for (const e of all) {
+    const key = `${e.kind}|${e.uid_def || e.m?.uid_def}`;
+    byType.set(key, [...(byType.get(key) ?? []), e]);
+  }
+  const xpOf = (e: core.FallenRecord) => Number(e.m && e.m.exp != null ? e.m.exp : e.exp) || 0;
+  const groups = [...byType].map(([key, grp]): FallenGroup => {
+    const first = grp[0]!;
+    const ud = first.uid_def || first.m.uid_def;
+    const unit = (ud && core.unitDef(ctx, ud)?.name) || core.modelLabel(ctx, first.m);
+    const entry = (e: core.FallenRecord): FallenEntry => ({ name: e.m.name || unit, count: 1, xp: Number(e.m.exp) || 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: core.fallenGoldOf(ctx, e) });
+    let entries: FallenEntry[];
+    if (first.kind === 'hero') entries = grp.map(entry);
+    else {
+      const named = grp.filter((e) => { const n = (e.m.name || '').trim(); return !!n && n !== unit; });
+      const subs = new Map<string, FallenEntry>();
+      for (const e of grp) {
+        if (named.includes(e)) continue;
+        const sig = core.fallenEqSig(e.m);
+        const su = subs.get(sig) ?? { name: unit, count: 0, xp: Number(e.exp) || 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: 0 };
+        su.count++;
+        su.worth += core.fallenGoldOf(ctx, e);
+        subs.set(sig, su);
+      }
+      entries = [...named.map(entry), ...subs.values()];
+    }
+    return {
+      key, kind: first.kind, unit, count: grp.length,
+      xpTotal: grp.reduce((n, e) => n + xpOf(e), 0),
+      xpEarned: grp.reduce((n, e) => n + core.fallenExpEarned(ctx, e), 0),
+      equipment: core.fallenEqAgg(ctx, grp.map((e) => e.m)),
+      goldLost: grp.reduce((n, e) => n + core.fallenGoldOf(ctx, e), 0),
+      entries,
+    };
+  });
+  return { count: all.length, goldLost: core.fallenGoldLost(ctx), xpLost: core.fallenExpLost(ctx), groups };
 }
 
 const show = (v: unknown) => (v == null || v === '' ? '–' : String(v));
@@ -315,7 +366,7 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
       ...(ctx.s.hired ?? []).map((h) => hire(ctx, h, 'Hired Sword')),
       ...(ctx.s.dp ?? []).map((h) => hire(ctx, h, 'Dramatis Personae')),
     ].filter((x): x is HireView => !!x),
-    fallen: (ctx.s.fallen ?? []).map((f) => core.modelLabel(ctx, f.m)),
+    fallen: fallenView(ctx),
     recruit: recruitList(ctx),
   };
 }

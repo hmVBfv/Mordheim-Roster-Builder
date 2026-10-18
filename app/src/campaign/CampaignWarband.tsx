@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { stamp } from '../account/time.ts';
 import { useGameData } from '../game/useGameData.ts';
+import { FallenList } from '../roster/Fallen.tsx';
 import { Board } from '../roster/Board.tsx';
 import board from '../roster/Board.module.css';
 import { usePrinting } from '../roster/Print.tsx';
@@ -43,12 +44,7 @@ function Body({ id, read }: { id: string; read: Read }) {
       </p>
       <Board
         v={v} printing={printing}
-        after={v.fallen.length > 0 ? (
-          <details className={ui.card}>
-            <summary className={board.fallen}>Fallen ({v.fallen.length})</summary>
-            <ul>{v.fallen.map((f, i) => <li key={i}>{f}</li>)}</ul>
-          </details>
-        ) : undefined} />
+        after={<FallenList f={v.fallen} />} />
       <div className={ui.row}><Link to={`/campaign/${id}`} className={ui.buttonQuiet}>Back to the campaign</Link></div>
     </section>
   );
