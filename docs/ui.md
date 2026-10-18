@@ -141,7 +141,8 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | `questions` (kein Mockup) | Reiter „Questions“ der Kampagne (Leiter und Spieler, nicht Zuschauer): Leiter stellen, ändern, ziehen zurück und stellen wieder; der Gefragte antwortet in einem Sheet mit Sichtbarkeit (alle · versiegelt bis zum Ende der Schlacht der Frage, solange sie läuft · nur Leiter, wenn er Leiter ist); die Frage steht nie bei der Notiz. Schreiben nur online (Knöpfe gesperrt), Lesen aus dem Gerätespeicher |
 | `world` (kein Mockup) | Reiter „World“ der Kampagne, für alle Mitglieder (Zuschauer eingeschlossen): je Fraktion eine Karte mit Status, ihren Leuten (Statline aufklappbar) und dem Stand jeder Warband (Summe des Rufs, +/−); darunter Leute ohne Fraktion und das Ruf-Log, neueste zuerst. Leiter (mit Authenticator) legen Fraktionen und NPCs an, ändern und entfernen sie (mit Rückfrage) und tragen Ruf ein („Gains / Loses reputation“, Betrag 1–100 – kein Minuszeichen auf dem Handy nötig); ein Eintrag wird nie geändert, nur herausgenommen. Jedes Formular sagt, dass alle es lesen und das Verborgene in den Hintergrund gehört. Schreiben nur online, Lesen aus dem Gerätespeicher |
 | `scenarios` (kein Mockup) | Abschnitt „Scenarios“ im Reiter „World“ (zwischen Fraktionen und Ruf-Log). Alle Mitglieder lesen die **gespielten** Szenarien: Karte mit Titel, „Played in Battle n · released by …“ (und „corrected since“), Regeln und NPC-Werte aufklappbar, **„Copy statlines“** (Titel plus Werte als Text für den Tabletop-Simulator-Tisch). Leiter mit Authenticator sehen zuerst die **Entwürfe** (gestrichelte Karte, „⚑ Draft – only leaders read it“) mit „Change“, **„Release“** und „Remove“ (mit Rückfrage), und „Write a scenario“. Das Freigeben-Blatt sagt, dass es alle Mitglieder lesen lassen und nicht rückgängig zu machen ist, und lässt die Schlacht wählen, in der gespielt wird; ein freigegebenes Szenario hat nur noch „Change“ (das Formular sagt, dass alle die Korrektur sehen). Schreiben nur online, Lesen aus dem Gerätespeicher |
-| `roster.html` | Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1); Henchmen-Gruppen mit „+ Man“ (Kosten aus Einheit, gleicher Ausrüstung und 2 gc je Erfahrungspunkt, Veteranenwurf, Grenzen: 5 je Gruppe, Einheit, 15 Modelle), Namen der einzelnen Männer, „The lad's got talent“ (Mann wird Held mit zwei Skill-Listen und sofortigem Aufstieg), Tod eines Mannes (W6), Anwerben neuer Gruppen und Helden; beim Aufstieg alle Fertigkeiten der Listen des Kriegers (Captain alle fünf, Champion Combat/Shooting/Strength, Youngblood Combat/Shooting/Speed, Beförderter seine zwei, Ogre Combat/Strength) mit ihrem Regeltext aus `data/skills.json` (`rules-data.js`) |
+| `roster.html` | (Aufbau seit 18.10.2026 ersetzt durch `roster-v2.html`, die Regeln darin gelten weiter) Karte je Krieger mit Werten, Erfahrungsstufen (jede Schwelle gerahmt, die nächste markiert, „Advance due“), Ausrüstung und den häufigen Aktionen; Aufstieg und Verletzung mit Folgeentscheidung (V1); Henchmen-Gruppen mit „+ Man“ (Kosten aus Einheit, gleicher Ausrüstung und 2 gc je Erfahrungspunkt, Veteranenwurf, Grenzen: 5 je Gruppe, Einheit, 15 Modelle), Namen der einzelnen Männer, „The lad's got talent“ (Mann wird Held mit zwei Skill-Listen und sofortigem Aufstieg), Tod eines Mannes (W6), Anwerben neuer Gruppen und Helden; beim Aufstieg alle Fertigkeiten der Listen des Kriegers (Captain alle fünf, Champion Combat/Shooting/Strength, Youngblood Combat/Shooting/Speed, Beförderter seine zwei, Ogre Combat/Strength) mit ihrem Regeltext aus `data/skills.json` (`rules-data.js`) |
+| `roster-v2.html` | **Umgesetzt (18.10.2026), Rob: „am Desktop (wichtiger als App) die gesamte Breite nutzen, die Info möglichst direkt ersichtlich, bei vielen Einheiten nicht erschlagen werden von einer Wall of Text“.** Eine Zeile je Krieger statt einer Karte; die geöffnete Karte erst unter der Zeile (Handy) oder in einem Fenster neben der Liste (Desktop). Beschreibung unten, „Roster v2 in der App“ |
 | `home.html` | „Offen für dich“ (**umgesetzt in 4b3a, 12.10.2026:** Fragen an dich, Nachbereitungen, Zwischenspiele aller Kampagnen, je Zeile ein Link dorthin; dazu die Kopien, die andere dir schickten), eigene Warbands, Kampagnen; Mordheim bei Nacht als Pixelbild (Komet über der Stadt, flackernde Fenster, Wyrdstein, der in den Trümmern aufleuchtet); bei jedem dritten Aufruf schlägt der Zweischweifige Komet ein (Blitz, Feuerball, Rauch, danach glüht der Krater), `?impact=1` bzw. `0` erzwingt es; still und ohne Blitz bei „weniger Bewegung“ (`city-art.js`, auch am Desktop); eine Frage einer Mitspielerin beantworten |
 | Wappen der Warbands | `warband-art.js`: je Warband ein eigenes Wappen aus schlichten heraldischen Elementen, passend zu Volk und Fraktion (Rob, 30.09.2026: lieber Wappen als Figuren) – silberner Schild mit blauem Bord und schwarzem Adler (Silver Caravan, Söldner des Imperiums), grauer Schild mit rotem Haupt, Zweischweifigem Kometen und goldenem Kriegshammer (Grey Penitents, Schwestern des Sigmar), schwarzer Lumpen an einer Stange mit Rattenschädel über gekreuzten Klingen (Clan Skrittle, Eshin); keine Symbole aus Games-Workshop-Material; auf Home, Warbands, Campaign, Roster und am Desktop |
 | `warbands.html` | eigene Warbands, **„New warband“** (Warband nach Stufe gruppiert, Variante, Name; auch von Home aus, Rob, 02.10.2026: „zu gut versteckt“), Import, die Warbands der Mitspieler nur lesend |
@@ -151,10 +152,74 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | `campaign.html` | Übersicht: laufende Schlacht mit Weg in den Spielabend, Warbands mit Stand, Schlachten 1–5, Bezirke |
 | `world.html` | Bezirke (Wirkungen aus `data/campaign.json`, wer sie hält, Korrektur durch Leiter), Fraktionen mit Ruf, Personen, Orte |
 | `manage.html` | nur Leiter: Rollen, Einladung, Hausregeln als Schalter, Schlacht schließen (unumkehrbar, daher mit Bestätigung). **Seit 4b4a:** Abschnitt „Style guide ⚑“ (zwischen Hausregeln und „The next round“): ein Textfeld „Instructions for the writer“ (höchstens 10 000 Zeichen), „Save the style“; nur Leiter mit Authenticator. Hat ein anderer Leiter zuerst gespeichert, zeigt das Feld dessen Text mit dem Hinweis, die Änderung neu zu machen. Offline ist der letzte gesehene Text da, speichern geht nur online. **Seit 4b4b:** Abschnitt „Canon for the linter“ direkt darunter: „Download the canon (.txt)“ lädt die Namen der Kampagne in Deutsch und Englisch als Datei für den Chronik-Linter (nur Namen, nichts Verborgenes); die Meldung sagt, wie viele Namen es sind, wie viele sich zwischen den Sprachen unterscheiden und wie viele noch nicht fertig sind; kann eine Warband nicht gelesen werden, wird nichts gespeichert, und die Meldung nennt sie. Offline ist der Knopf gesperrt |
-| `story.html` | Reiter „Story“ der Warband: Prolog, Zwischenspiel je Runde, Namen in beiden Sprachen, Lebenslauf jedes Kriegers (auch aus ⋯ → „Story so far & profile“). **Umgesetzt in 4b2 (12.10.2026)** ohne Sichtbarkeit je Zwischenspiel: die Story liegt im Stand der Warband (ADR 0016) und ist für die Kampagne lesbar, die Seite sagt das oben. Zu jeder Änderung der Nachbereitung gehört „Say what happened“ (nie Pflicht) |
+| `story.html` | Reiter „Story“ der Warband: Prolog, Zwischenspiel je Runde, Namen in beiden Sprachen, Lebenslauf jedes Kriegers (auch über den letzten Reiter des Kriegers im Roster → „Story so far & profile“). **Umgesetzt in 4b2 (12.10.2026)** ohne Sichtbarkeit je Zwischenspiel: die Story liegt im Stand der Warband (ADR 0016) und ist für die Kampagne lesbar, die Seite sagt das oben. Zu jeder Änderung der Nachbereitung gehört „Say what happened“ (nie Pflicht) |
 | `more.html` | Geräte, Authenticator, Passwort, Theme, Layout auf diesem Gerät, „Report a problem“ (Knopf im Kopf jeder Seite, Blatt mit Art, Text, bei Regelfehlern Quelle; „What goes along“ zeigt den Kontext lesbar vor dem Senden; offline, abgemeldet oder im Quick Build bleibt „Copy the report“), „Your reports“ mit Status und „fixed in“, Admin (Nutzer, Einladungen, Reports, Backups; **Umgesetzt in 4c1, 17.10.2026:** Reiter „Reports“ mit Filter Open/Fixed/All, Blatt zum Sortieren – Status, Grad, Bereich, „Fixed in version“ – und „Copy for Claude“, „Download the report“, „Download the warband“; **4c2:** Liste und Blatt zeigen die Nummer `#N`, die Dateien heißen `report-N-…`) |
 | `desktop.html` | die Arbeitsfläche aus Panels (Vorschlag, siehe §2), für jedes Ziel der Leiste eine eigene (`#home`, `#warbands`, `#campaign`, `#notes`, `#more`; ohne Anker die Warband): Views, Ziehen an der Titelleiste, Menü ⋯, Dock, verknüpfte Auswahl; Aufstieg als Sheet in der Mitte mit allen Fertigkeiten seiner Listen und ihrem Text; beim Trading Post zeigt ein Tipp auf den Namen, was der Gegenstand tut; bei 1440 px drei Spalten, unter 1024 px gestapelt; Seiten ohne eigenes Panel öffnen sich in einem großen Panel (`?embed=1` blendet Leiste und Mockup-Streifen aus), die Arbeitsfläche wird nie verlassen; Layout unter More |
 | `trading-post.html` | Händler als Pixelbild (drei Bilder, steht still bei „weniger Bewegung“); Kaufen (Gewöhnliches, wer es benutzen darf und warum nicht), Suchen (ein Wurf je Held, Mindestwurf und Chance, Modifikatoren, Preis mit Zufallsanteil), Verkaufen (halber Preis, abgerundet, mindestens 1 gc; Wyrdstein nach der Tabelle für die Warband-Größe), Geben (Gruppe braucht je Mann ein Stück), Kassenbuch (V7); alle 70 seltenen Gegenstände, die eine Reikland-Warband suchen darf (106 weitere gehören anderen Warbands), mit Filter und „wer darf es benutzen“; `#search`, `#sell`, `#give` öffnen den jeweiligen Reiter; jeder Gegenstand mit Regeltext, auch beim Suchen für den gewählten Gegenstand (Rob, 30.09.2026) |
+
+### Roster v2 in der App
+
+Rob, 18.10.2026: zuerst der Desktop (wichtiger als die App am Handy), die
+Information möglichst gleich sichtbar, und bei vielen Einheiten keine Wand aus
+Text. Das Mockup `docs/mockups/roster-v2.html` (PR #70) ist der Entwurf; die
+App setzt es um (`app/src/roster/Board.tsx`, `Detail.tsx`, `Panel.tsx`,
+`Board.module.css`). Dieselbe Liste zeigt auch die Warband eines Mitspielers,
+nur lesend (`CampaignWarband`, ohne Aktionen).
+
+**Kopf.** Name der Warband (mit Stift zum Umbenennen), eine Zeile mit Typ,
+Stufe und – falls an – „⚖ N house rules“, vier Kacheln (Gold, Rating, Models
+mit Anzeige gegen das Maximum, Worth) und eine Leiste mit den Aktionen der
+Warband: **+ Recruit, Hire, Trade** (mit dem Lager als Zahl) und **Export**.
+Auf dem Handy bleibt die Leiste beim Scrollen oben stehen; am Desktop steht
+sie neben den Kacheln. Nichts davon liegt hinter einem Menü.
+
+**Die Zeile eines Kriegers** (Helden, Henchmen-Gruppen, Hired Swords): Name
+(bei Gruppen ×N), Art, die **ganze Statline** auf einen Blick (abweichende
+Werte gefärbt, Verletzungen und Aufstiege schon eingerechnet), Erfahrung als
+Zahl und als Leiste mit den Stufen (erreichte Schwellen gefüllt, noch nicht
+übernommene Aufstiege golden), bis zu vier Marken (Leader, Verletzung,
+gefangen, Aufstieg fällig …) und was er trägt. Am Desktop wird daraus eine
+Tabellenzeile: Name und Statline stehen nebeneinander (Container-Query ab
+620 px Breite der Liste, nicht der des Fensters). Eine Zeile ist ein
+Knopf; sein Name sagt „Name, N men, Art“, der Rest steht in der Beschreibung
+(`aria-describedby`) – ein Screenreader hört dieselbe Information.
+
+**Drei Anordnungen**, gemessen an der Breite der Arbeitsfläche selbst
+(Seitenleiste und Rand schon abgezogen; `useLayout`, ResizeObserver, nicht
+Media-Query):
+
+| Anordnung | ab Breite | Verhalten |
+| --- | --- | --- |
+| `stack` | unter 860 px | eine Spalte; ein Tipp öffnet den Krieger **unter seiner Zeile**, mit vier Reitern (Overview, Gear, Skills & injuries, Story & more; Hired Swords haben kein Gear); ein zweiter Tipp schließt ihn; geöffnet scrollt die Zeile unter die festen Leisten (kein Sheet, also kein eigener Schritt im Verlauf) |
+| `split` | ab 860 px | die Liste und daneben das **Fenster** mit dem gewählten Krieger, alle Abschnitte offen und ohne Reiter; es bleibt beim Scrollen stehen und scrollt in sich; vorgewählt ist der erste Krieger |
+| `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, All warbands, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
+
+Unter 860 px steht dieselbe Liste „Warband“ unter den Kriegern. Die Arbeitsfläche
+(Shell) wird auf dem Roster bis 1920 px breit (`.main.wide`), sonst bleibt es
+bei der Spaltenbreite der übrigen Seiten.
+
+**Was wo liegt** (früher im ⋯-Menü der Karte): Overview – Erfahrung (Stepper,
+Stufen), Advance, Injury bzw. Captivity, „+ Man“, Anführer („Lead the
+warband“), Männer einer Gruppe mit Namen und Entlassen, Sonderregeln; Gear –
+die Liste, „Equipment & rare items“ bzw. der Weg zum Trading Post; Skills &
+injuries – Fertigkeiten, Zauber, Mutationen, Mal des Chaos und Segnungen,
+Verletzungen mit Korrektur, genommene Aufstiege mit Korrektur; Story & more –
+Name, „Story so far“, „Tabletop Simulator card“ und, getrennt, „Out of
+action for good…“ bzw. Entlassen. Die Beschriftungen der Knöpfe und der
+Stepper sind dieselben wie zuvor.
+
+**Druck.** Das Blatt zum Drucken gibt es nur, solange der Browser druckt
+(`beforeprint` bis `afterprint`): jeder Krieger in voller Länge, ohne Knöpfe.
+Auf dem Bildschirm steht die Liste nie doppelt. „Export“ → „Print the
+roster“ führt zurück auf den Roster, der einmal `window.print()` aufruft; der
+Test ersetzt es und schaltet dann auf Druckmedien.
+
+**Grenzen für Gestaltung und Prüfung.** 360 px ohne Seitwärtsscrollen,
+Tippflächen mindestens 44 px, beide Themes, Screenshots bei 360, 820, 1440 und
+1920 px (`app/e2e/app.spec.ts`, `campaign-*-roster*.png`). Die übrigen
+Bildschirme folgen denselben Regeln – jeder als eigener Pull Request:
+Information sofort sichtbar, kein Menü für etwas Wichtiges, die Breite
+nutzen, bei vielen Einträgen Zeilen mit Aufklappen statt Fließtext.
 
 ## 4. Themes und Gestaltung
 

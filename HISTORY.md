@@ -2990,3 +2990,60 @@ Things that bit me on the way:
   app asks for everything it shows when the stream opens, when it comes back to
   the front and after a long silence, which is what makes losing a signal
   harmless.
+
+## October 18, 2026 — the roster as a list
+
+Rob approved the second roster mockup (PR #70) and asked for two things in
+the real app: the desktop matters more than the phone, so use the whole width
+and show the information at once; and with many units nobody should be buried
+under a wall of text. The old roster was a card per warrior with everything
+inside and a ⋯ menu behind it for the rest, which is exactly the wall.
+
+The shape now: one row per warrior – name, the whole profile, experience as a
+number and as a bar of its steps, up to four marks, what he carries. The row
+is a button. On a phone it opens in place under itself with four tabs
+(Overview, Gear, Skills & injuries, Story & more); from 860 px of workspace it
+selects the warrior into a pane beside the list with every section open, no
+tabs; from 1560 px the warband's own functions (house rules, districts, story,
+versions, copy …) stand in a third column as a plain list. Everything the ⋯
+menu held has a visible place now, and the menu sheet is gone.
+
+Decisions worth remembering:
+
+- **The width that counts is the workspace's, not the window's.** The sidebar
+  and the page padding are already gone from it, so a media query on the
+  window said "desktop" for a workspace that was still phone-sized. A
+  ResizeObserver on the board itself picks `stack`, `split` or `triple`; the
+  table-like rows and the header use container queries for the same reason.
+  In jsdom, without a ResizeObserver, it stays on `stack`, so the unit tests
+  read the phone layout.
+- **The print sheet exists only while printing.** Paper wants every warrior
+  in full, the screen wants rows; a hidden second copy would have put the
+  whole list in the page twice (for screen readers, for tests, for the
+  budget). `beforeprint` mounts the sheet (with `flushSync`, the browser lays
+  out right after the event) and `afterprint` removes it.
+- **One board for both own and foreign warbands.** The read-only campaign
+  view passes no actions and gets the same list; it cannot drift from the
+  editable one.
+- **A row says the same to a screen reader as to an eye**: the button is named
+  "name, N men, type" and describes experience, profile, marks and equipment.
+  The steppers and buttons inside kept their old labels, which is what let
+  most of the e2e flows survive with an `unit(page, name, tab)` helper in
+  front.
+
+Things that bit me on the way:
+
+- The toolbar would not stay on top: `position: sticky` inside a grid cell
+  sticks only within that cell. The page had to become a flex column (and
+  then it needed its `gap` back – the first screenshots showed everything
+  touching, which I only saw because the checklist says to look at them).
+- A type label ("Henchman group") wrapped into two lines in a narrow row;
+  `nowrap` on that span only, not on the row.
+- Pressing Esc in the name field still saved what was typed, because leaving
+  the field commits. The unit test for the field caught it; a flag set by Esc
+  and read by the commit fixed it.
+- The first e2e run with the old tests failed all of them at 7–30 s each. I
+  stopped it and rewrote the flows instead of waiting for the timeouts.
+- Status marks appear twice on an opened warrior (in the row, which shows four,
+  and in Overview, which shows all). I left it: the row must stay short, and
+  the card must not make you look for what the row cut off.

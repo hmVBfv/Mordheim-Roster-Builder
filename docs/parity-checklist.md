@@ -36,8 +36,8 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | --- | --- | --- | --- | --- | --- | --- |
 | Warband wählen (49, Reihenfolge nach Grad), Stadt/Variante, Name | ✓ | ✓ | ✓ | – | 3a | „New warband“; ohne Mockup, die App selbst ist es (Liste und Auswahl wie gehabt); umbenennen über ✎ |
 | Startgold, Budget, Sonderregeln wie Trantio (+20 %) | ✓ | ✓ | ✓ | – | 3a | Startgold schon bei der Auswahl |
-| Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | ✓ | roster (Recruit) | 3a | Liste wie im Builder (Helden, Henchmen, Fahrzeuge), mit Grund, wenn nicht; entlassen über ⋯ mit Undo |
-| Anführer bestimmen | ✓ | ✓ | ✓ | – | 3a | ⋯ → „Lead the warband“ bei jedem Helden, der führen darf |
+| Einheiten anwerben und entlassen, Höchst- und Mindestzahlen | ✓ | ✓ | ✓ | roster (Recruit) | 3a | Liste wie im Builder (Helden, Henchmen, Fahrzeuge), mit Grund, wenn nicht; entlassen im letzten Reiter des Kriegers („Story & more“) mit Undo |
+| Anführer bestimmen | ✓ | ✓ | ✓ | – | 3a | „Lead the warband“ im Reiter „Overview“ jedes Helden, der führen darf |
 | Henchmen-Gruppen: Größe, Namen der Männer, Nachrekrutieren mit Aufpreis | ✓ | ✓ | ✓ | roster (+ Man mit Veteranenwurf und Grenzen, Namen antippen) | 3a/3c | „+ Man“ mit Preis samt Aufpreis und Grund, wenn nicht; Namen antippen; einen bestimmten Mann entlassen (neu, `dismissMember`). Seit 3c öffnet „+ Man“ das Sheet „More men“: wie viele, Preis, Namen; nach der ersten Schlacht bei einer Gruppe mit Erfahrung der Veteranenwurf der Runde (neu, `setVeteransRoll`, `addMen`) |
 | Warnungen zur Legalität (Seitenleiste) | ✓ | ✓ | ✓ | – | 1e | |
 | Rating, Worth, Gold, Modelle | ✓ | ✓ | ✓ | roster | 3a | |
@@ -46,7 +46,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 
 | Funktion | alt | core | App | Mockup | Phase | Anmerkung |
 | --- | --- | --- | --- | --- | --- | --- |
-| Ausrüstungslisten je Einheit, erster Dolch frei, Waffengrenzen | ✓ | ✓ | ✓ | trading-post | 3b | bis zur ersten Schlacht ⋯ → „Equipment & rare items“ mit Stepper je Gegenstand; Waffengrenzen als Warnung |
+| Ausrüstungslisten je Einheit, erster Dolch frei, Waffengrenzen | ✓ | ✓ | ✓ | trading-post | 3b | bis zur ersten Schlacht im Reiter „Gear“ → „Equipment & rare items“ mit Stepper je Gegenstand; Waffengrenzen als Warnung |
 | Preise nach Hausregeln und Bezirken (halber Preis) | ✓ | ✓ | ✓ | trading-post | 3b | Liste und Trading Post zeigen den Preis, der gerade gilt |
 | Gründungspreise und Trading Post (C2, C3, C7) | ✓ | ✓ | ✓ | trading-post | 3b | Trading Post ab der ersten Schlacht (`/warbands/:id/trade`) |
 | Seltenes: Katalog, bezahlter Preis, Material-Upgrades (Gromril, Ithilmar …) | ✓ | ✓ | ✓ | trading-post | 3b | hinzufügen, Anzahl, Waffe eines Upgrades; den bezahlten Preis von Hand ändern fehlt noch **3f (03.10.2026):** bezahlter Preis von Hand im Ausrüstungs-Sheet. |
@@ -65,10 +65,10 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Erfahrung mit Schwellen (gerahmt, nächste markiert), „Advance due“ | ✓ | ✓ | ✓ | roster | 1e | App: mit Pull Request #4 |
 | Erfahrung setzen (Stepper, Sprung auf eine Schwelle) | ✓ | ✓ | ✓ | roster | 3a | Stepper (nicht unter die Starterfahrung, Hired Swords bis 14); Sprung auf eine Schwelle fehlt **3f:** „Exp n“ antippen öffnet ein Sheet mit den Schwellen der Leiste und einem Zahlenfeld. |
 | Aufstiege: Werte, Fertigkeiten (eigene Listen, Sperren wie `noSkills`), Zauber | ✓ | ✓ | ✓ | roster (Advance) | 3c | „Advance“ auf jeder Karte: Wurf nach den Tabellen, Werte bis zum Rassenmaximum, Fertigkeit aus seinen Listen oder ein Zauber stattdessen; Korrektur über ⋯ |
-| Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ✓ | App (Liste, Auswahl) | 3c | ⋯ → „Mutations“ bzw. „Blessings of Nurgle“ (Preis, Regeltext, Summe; auch über die Fertigkeit „Mutant“); Seher ⋯ → „Mark of Chaos…“, Häuptling ⋯ → „Take the Mark“; die Regeln des Mals auf der Karte |
+| Mutationen, Male der Marauder, Segnungen | ✓ | ✓ | ✓ | App (Liste, Auswahl) | 3c | Reiter „Skills & injuries“ → „Mutations“ bzw. „Blessings of Nurgle“ (Preis, Regeltext, Summe; auch über die Fertigkeit „Mutant“); Seher „Mark of Chaos…“, Häuptling „Take the Mark“ im selben Reiter; die Regeln des Mals auf der Karte |
 | Beförderung („The lad's got talent“) und Rücknahme | ✓ | ✓ | ◐ | roster (Advance 10–12) | 3c | 10–12 einer Gruppe: wer, zwei Listen; Rücknahme über Undo, eine spätere Rücknahme fehlt noch |
 | Schwere Verletzungen (D66) mit Folgeentscheidungen, ausgesetzte Spiele | ✓ | ✓ | ✓ | roster (Injury, V1) | 3c | „Injury“ auf jeder Karte: D66 wie gewürfelt (oder „Roll the dice“), jede Nachfrage der Tabelle, verschachtelt bei Multiple Injuries und verlorenem Grubenkampf; Bezirke und Peg Leg; Henchmen und Hired Swords W6. Neue Logik `core` `injure` (V1), beide Eingänge gleich. Korrektur und ausgesetzte Spiele über ⋯ |
-| Tod, Gefallene, Rücknahme, verlorener Wert | ✓ | ✓ | ◐ | roster („Out of action for good“) | 3c | Tod über die Verletzung (auch „Out of action for good…“ im ⋯), Rücknahme über Undo; App listet Gefallene. Eine spätere Rücknahme und feste IDs (V2) folgen |
+| Tod, Gefallene, Rücknahme, verlorener Wert | ✓ | ✓ | ◐ | roster („Out of action for good“) | 3c | Tod über die Verletzung (auch „Out of action for good…“ im Reiter „Story & more“), Rücknahme über Undo; App listet Gefallene. Eine spätere Rücknahme und feste IDs (V2) folgen |
 
 ## Hired Swords und Dramatis Personae
 
@@ -105,7 +105,7 @@ Paritätstest, **App** = neue App heute, **Mockup** = Seite unter
 | Speichern und Laden auf dem Gerät, Liste, Löschen | ✓ | ✓ | ✓ | index | 1e | App: Import, Liste, „Remove from this device“ |
 | Import: Datei, eingefügte Datei, Text-Export | ✓ | ✓ | ✓ | – | 1e | Kampagnendatei noch nicht |
 | Export: Text mit eingebettetem Stand, Datei | ✓ | ✓ | ✓ | – | 3e | Roster → Export…: Text anzeigen, kopieren, als .txt (Name mit Stufe und Tag); Tool-Datei als .json (`writeSave`, mit Format und Gold in der Hand); beide lassen sich wieder importieren |
-| Tabletop-Simulator-Karten (Krieger, Männer, Hired Swords, DP) | ✓ | ✓ | ✓ | roster (TTS) | 3e | je Held, Gruppe, Mann einer Gruppe (eigener Name) und Angeheuertem Name und Beschreibung zum Kopieren; vom ⋯-Menü einer Karte direkt dorthin |
+| Tabletop-Simulator-Karten (Krieger, Männer, Hired Swords, DP) | ✓ | ✓ | ✓ | roster (TTS) | 3e | je Held, Gruppe, Mann einer Gruppe (eigener Name) und Angeheuertem Name und Beschreibung zum Kopieren; vom Reiter „Story & more“ des Kriegers („Tabletop Simulator card“) direkt dorthin |
 | Offizielles Rostersheet als PDF | ✓ | ✓ | ✓ | – | 3e | pdf-lib 1.17.1 (wie `vendor/`) und die Vorlage `assets/sheet.pdf` werden erst beim Erstellen geladen; beide auch offline im Service Worker |
 | Drucken | ✓ | n/a | ✓ | – | 3f | Export → „Print the roster“: das Roster ohne Navigation und Knöpfe, immer hell; oder das offizielle Rostersheet als PDF |
 

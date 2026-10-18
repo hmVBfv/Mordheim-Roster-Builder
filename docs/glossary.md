@@ -293,3 +293,11 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Layout auf diesem Gerät | Layout on this device (Phone / Desktop) | von Hand gewählt, nur auf dem Gerät; die App wechselt nie von selbst |
 | Regeltext-Blase | – (Antippen eines unterstrichenen Worts) | App: `TipWord` (`app/src/ui/Tip.tsx`), Texte aus `app/src/roster/tips.ts`; Mockup: `.tip`, `window.mockTips` |
 | Neue Warband | New warband | App: `/warbands/new` |
+| Zeile (eines Kriegers) | Row | App: `RowView` in `app/src/roster/Board.tsx`, Daten aus `unitRow` (`view.ts`); Name, Statline, Erfahrung, Marken, Ausrüstung |
+| Reiter eines Kriegers | Tabs: Overview · Gear · Skills & injuries · Story & more | App: `TabId`, `tabsFor` in `Detail.tsx`; nur in der Anordnung `stack` |
+| Fenster des gewählten Kriegers | Selected warrior (Pane) | App: `aside` in `Board.tsx`, alle Abschnitte offen, ab 860 px |
+| Anordnung des Rosters | Layout `stack` · `split` · `triple` | App: `useLayout` (Breite der Arbeitsfläche; 860 und 1560 px); nicht zu verwechseln mit „Layout auf diesem Gerät“ |
+| Leiste der Warband | Warband actions (+ Recruit, Hire, Trade, Export) | App: `Roster.tsx`; auf dem Handy oben fest |
+| Funktionen der Warband | Warband (House rules, Districts, Story, Versions, All warbands, Make a copy) | App: `Panel.tsx`; sichtbare Liste statt ⋯-Menü |
+| Druckblatt | Print sheet | App: `PrintSheet` in `Print.tsx`; nur zwischen `beforeprint` und `afterprint` im Dokument |
+| Offener Aufstieg (golden in der Erfahrungsleiste) | Advance due | `XpView.owed` (Erfahrung − übernommene Aufstiege) |

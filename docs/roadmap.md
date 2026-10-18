@@ -382,6 +382,21 @@ der Strom steht). Kein Eintrag im Header (die neue Oberfläche entscheidet, ob
 „live“ sichtbar wird). Abnahme: zwei Browser, ein Spieler schreibt eine Notiz,
 der andere sieht sie nach etwa einer Sekunde.
 
+## Zwischenschritt – Roster v2 (Oberfläche, Beginn)
+
+Rob, 18.10.2026: den Entwurf `docs/mockups/roster-v2.html` (PR #70) in die App
+bauen, **am Desktop die ganze Breite nutzen** (wichtiger als die App), die
+Information gleich sichtbar, und bei vielen Einheiten keine Wall of Text.
+**Stand 18.10.2026:** umgesetzt – eine Zeile je Krieger mit ganzer Statline,
+Erfahrungsleiste und Marken; auf dem Handy öffnet sich der Krieger unter seiner
+Zeile mit vier Reitern, ab 860 px steht er in einem Fenster neben der Liste,
+ab 1560 px kommen die Funktionen der Warband als dritte Spalte dazu; Kopf mit
+Kacheln und Leiste (+ Recruit, Hire, Trade, Export) statt ⋯-Menü; Druckblatt nur
+beim Drucken; dieselbe Liste für Warbands anderer Spieler (lesend). Beschreibung
+in [ui.md](ui.md#roster-v2-in-der-app). **Danach, je ein eigener Pull Request
+nach denselben Regeln:** die übrigen Bildschirme (zuerst die, die Rob am
+häufigsten benutzt – Rob entscheidet die Reihenfolge).
+
 ## Phase 5 – Extras
 
 - Volltextsuche (SQLite FTS5) über Notizen, Zeitleiste, Lebensläufe.
