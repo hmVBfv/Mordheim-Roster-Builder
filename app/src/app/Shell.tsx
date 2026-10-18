@@ -16,6 +16,10 @@ export function Shell({ children }: { children: ReactNode }) {
   const items = navItems();
   // the game night is full screen on a phone: its own buttons for one hand instead of the navigation
   const bare = !!useMatch('/campaign/:id/battles/:bid');
+  // the roster uses the whole width: list and warrior side by side (docs/ui.md §3)
+  const own = useMatch('/warbands/:id');
+  const other = useMatch('/campaign/:id/warbands/:wid');
+  const wide = !!own || !!other;
   // the screens the reporter passed, for a problem report (as patterns, never with the ids)
   const { pathname } = useLocation();
   useEffect(() => { note('screen', routePattern(pathname)); }, [pathname]);
@@ -52,7 +56,7 @@ export function Shell({ children }: { children: ReactNode }) {
           ))}
         </ul>
       </nav>
-      <main className={styles.main}>
+      <main className={`${styles.main} ${wide ? styles.wide : ''}`}>
         <UpdateBanner />
         {children}
       </main>

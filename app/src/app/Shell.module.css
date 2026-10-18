@@ -177,6 +177,11 @@
     padding: var(--space-5);
     max-width: 1320px;
   }
+
+  /* the roster: the whole width the screen has, up to a very wide monitor */
+  .main.wide {
+    max-width: 1920px;
+  }
 }
 
 /* on paper: only the page itself */

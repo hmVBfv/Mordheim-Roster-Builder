@@ -4,7 +4,7 @@
    there. Against the stand-in server, which only supplies the warband
    (e2e/play.ts). Campaign app only (playwright.config.ts). */
 import { expect, test } from '@playwright/test';
-import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
+import { noSideScroll, shot, tapTargets, unit, useTheme } from './helpers.ts';
 import { playServer, serverWarband } from './play.ts';
 
 let errors: string[] = [];
@@ -69,13 +69,12 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
-test('his story so far, from the warrior’s menu on the roster', async ({ page }) => {
+test('his story so far, from the last tab of the warrior on the roster', async ({ page }) => {
   const srv = await playServer(page);
   serverWarband(srv, 'The Silver Caravan');
   await page.goto('warbands');
   await page.getByRole('link', { name: /The Silver Caravan/ }).click();
-  await page.getByRole('button', { name: 'More for Ulrich the Grey', exact: true }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Story so far & profile' }).click();
+  await (await unit(page, 'Ulrich the Grey', 'Story & more')).getByRole('link', { name: /^Story so far & profile/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Story' })).toBeVisible();
   await expect(page.getByRole('dialog', { name: 'Ulrich the Grey' })).toBeVisible();
   // Back closes the sheet and stays in the app

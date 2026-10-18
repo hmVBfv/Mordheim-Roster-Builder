@@ -20,7 +20,11 @@ export interface XpStep { at: number; state: 'base' | 'on' | 'next' | 'open' }
     for those who gain no experience. `min`/`max` bound the stepper: never
     below the starting experience (unless the warrior already is), and a
     Hired Sword stops at the last step of the Henchmen's track. */
-export interface XpView { value: number; steps: XpStep[]; next: number | null; min: number; max: number | null }
+export interface XpView {
+  value: number; steps: XpStep[]; next: number | null; min: number; max: number | null;
+  /** Advances earned in play and not yet taken: the last reached steps wait for them. */
+  owed: number;
+}
 
 /** One man of a henchman group. */
 export interface ManView { i: number; name: string; named: boolean }
@@ -121,10 +125,10 @@ function statCells(p: Profile | null, base: Profile | null | undefined, attacks?
   });
 }
 
-function track(thresholds: readonly number[], start: number, value: number, max: number | null = null): XpView {
+function track(thresholds: readonly number[], start: number, value: number, max: number | null = null, owed = 0): XpView {
   const next = thresholds.find((t) => t > value) ?? null;
   return {
-    value, next, min: Math.min(start, value), max,
+    value, next, min: Math.min(start, value), max, owed,
     steps: thresholds.map((at) => ({ at, state: at <= start ? 'base' : at <= value ? 'on' : at === next ? 'next' : 'open' })),
   };
 }
@@ -160,7 +164,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     canLead: !leader && core.canBeLeader(ctx, m),
     fought: core.warriorHasFought(ctx, m),
     exp: Number(m.exp) || 0,
-    xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp) : null,
+    xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp, null, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
     missGames: Number(m.miss) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
@@ -179,11 +183,12 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
   // Hired Swords gain experience on the Henchmen's steps; Dramatis Personae gain none
   const hs = kind === 'Hired Sword';
   const facts = hireFacts(ctx, rec, e, hs ? 'hs' : 'dp', rec.key);
+  const adv = hs ? core.hsAdvanceStatus(ctx, rec, e) : null;
   return {
     key: `${kind}:${rec.uid}`, uid: rec.uid, name: rec.name || e.name, type: e.name, kind,
     exp: Number(rec.exp) || 0,
-    xp: hs ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX) : null,
-    advanceDue: hs && core.hsAdvanceStatus(ctx, rec, e).due,
+    xp: hs && adv ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX, Math.max(0, adv.earned - adv.applied)) : null,
+    advanceDue: !!adv?.due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),
     ...facts,
   };
@@ -211,6 +216,73 @@ function recruitList(ctx: core.Ctx): RecruitGroup[] {
   return groups
     .map(([label, f, hero]) => ({ label, units: wb.units.filter(f).map((u) => line(u, hero)) }))
     .filter((g) => g.units.length);
+}
+
+/* ---------- the list: one compact row per warrior ---------- */
+
+export type Tone = 'plain' | 'gold' | 'danger';
+export interface Chip { label: string; tone: Tone }
+
+/** What the list shows of one warrior or hired one: name, the whole profile,
+    experience, what sets him apart and what he carries – at a glance. */
+export interface UnitRow {
+  key: string;
+  kind: 'hero' | 'hench' | 'hired';
+  name: string;
+  /** Men in a henchman group; null for anyone else. */
+  count: number | null;
+  /** The line after the name: his type, or what kind of unit he is. */
+  sub: string | null;
+  stats: StatCell[];
+  /** The armour save; null for those who show none (hired ones). */
+  save: string | null;
+  xp: XpView | null;
+  exp: number;
+  /** An advance waits to be taken. */
+  ready: boolean;
+  /** Leader, injuries, captivity … at most `CHIPS_IN_ROW`; the rest is counted. */
+  chips: Chip[];
+  chipsMore: number;
+  /** Equipment and special rules in one line ("" when he carries nothing). */
+  carries: string;
+}
+
+export const CHIPS_IN_ROW = 4;
+
+export const isWarrior = (u: WarriorView | HireView): u is WarriorView => 'hero' in u;
+
+/** What sets a warrior apart, in the order it matters (all of it; the row cuts it). */
+export function unitChips(u: WarriorView | HireView): Chip[] {
+  if (!isWarrior(u)) return [];
+  const out: Chip[] = [];
+  if (u.leader) out.push({ label: 'Leader', tone: 'gold' });
+  if (u.promoted) out.push({ label: 'Promoted', tone: 'plain' });
+  if (u.captive != null) out.push({ label: u.captive ? `Captive of ${u.captive}` : 'Captive', tone: 'danger' });
+  if (u.retire) out.push({ label: 'Blind: must retire', tone: 'danger' });
+  if (u.missGames > 0) out.push({ label: `Misses ${u.missGames} game${u.missGames > 1 ? 's' : ''}`, tone: 'danger' });
+  for (const f of u.injuries) out.push({ label: f.label, tone: 'danger' });
+  return out;
+}
+
+export function unitRow(u: WarriorView | HireView): UnitRow {
+  const chips = unitChips(u);
+  if (isWarrior(u)) {
+    const group = !u.hero;
+    return {
+      key: u.key, kind: group ? 'hench' : 'hero', name: u.name, count: group ? u.count : null,
+      sub: group ? (u.name !== u.type ? `${u.type} · group` : 'Henchman group') : u.name !== u.type ? u.type : null,
+      stats: u.stats, save: u.save, xp: u.xp, exp: u.exp, ready: u.advanceDue,
+      chips: chips.slice(0, CHIPS_IN_ROW), chipsMore: Math.max(0, chips.length - CHIPS_IN_ROW),
+      carries: [...u.equipment, ...u.rules].map((f) => f.label).join(' · '),
+    };
+  }
+  return {
+    key: u.key, kind: 'hired', name: u.name, count: null,
+    sub: `${u.kind}${u.name !== u.type ? ` · ${u.type}` : ''}`,
+    stats: u.stats, save: null, xp: u.xp, exp: u.exp, ready: u.advanceDue,
+    chips: [], chipsMore: 0,
+    carries: u.rules.map((f) => f.label).join(' · '),
+  };
 }
 
 /** The state as the screens use it: read and tidied by core, as on load. */

@@ -22,7 +22,7 @@ test('send to the campaign server: the address once in More, then a link that ca
   await page.getByRole('button', { name: 'Import', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeVisible();
   const roster = page.url();
-  await page.getByRole('link', { name: 'Export…' }).click();
+  await page.getByRole('link', { name: 'Export', exact: true }).click();
   await expect(page.getByText('enter its address under More → Campaign server', { exact: false })).toBeVisible();
 
   await page.goto('#/more');

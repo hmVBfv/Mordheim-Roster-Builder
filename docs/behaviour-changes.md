@@ -268,7 +268,7 @@ Warbandgröße.
 2. **Robbed** ist nur der Verlust der Ausrüstung: ein Ereignis in der
    Chronik, keine bleibende Verletzung.
 3. **Zweites Auge:** so lassen – Warnung im Sheet, „Blind: must retire“ auf
-   der Karte, entlassen von Hand über ⋯.
+   der Karte, entlassen von Hand im letzten Reiter des Kriegers.
 4. **Gefangen als Zustand:** ja. 61 bietet „Held for now“: Er bleibt im
    Roster (`m.captive = { by, round, casualtyId }`), zählt fürs Rating,
    kämpft nicht und kann nicht erneut verwundet werden; die Karte zeigt

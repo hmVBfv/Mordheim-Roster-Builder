@@ -2,7 +2,7 @@
 import * as core from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data, fixtures } from '../test/data.ts';
-import { createWarband, editableState, newWarbandChoice, rosterView, STATS } from './view.ts';
+import { CHIPS_IN_ROW, createWarband, editableState, newWarbandChoice, rosterView, STATS, unitChips, unitRow } from './view.ts';
 
 describe('roster view', () => {
   it.each(fixtures.filter((_, i) => i % 4 === 0).map((f) => [f.label, f] as const))('%s', (_l, f) => {
@@ -138,5 +138,84 @@ describe('editing a roster', () => {
   it('shows the worth of the warband', () => {
     const f = fixtures.find((x) => x.state.models.length > 3)!;
     expect(rosterView(data, f.state).worth).toBe(core.warbandWorth(core.ctxOf(data, editableState(data, f.state))));
+  });
+
+  it('counts the advances earned and not yet taken, so the bar can mark them', () => {
+    let s = core.addUnit(ctx(fresh()), 'capt');
+    s = core.addUnit(ctx(s), 'warr');
+    s = core.hireHS(ctx(s), 'ogre');
+    const uid = s.models[0]!.uid;
+    // the Captain starts on 20: steps 24 and 28 reached make two advances waiting
+    s = core.setModelExp(ctx(s), uid, 29);
+    expect(rosterView(data, s).heroes[0]!.xp).toMatchObject({ owed: 2 });
+    s = core.addAdvance(ctx(s), uid, 'WS');
+    expect(rosterView(data, s).heroes[0]!.xp).toMatchObject({ owed: 1 });
+    s = core.addAdvance(ctx(s), uid, 'I');
+    expect(rosterView(data, s).heroes[0]!.xp).toMatchObject({ owed: 0 });
+    expect(rosterView(data, s).heroes[0]!.advanceDue).toBe(false);
+    // a Henchman group and a Hired Sword the same
+    s = core.setModelExp(ctx(s), s.models[1]!.uid, 6);
+    s = core.setHsExp(ctx(s), s.hired![0]!.uid, 3);
+    const v = rosterView(data, s);
+    expect(v.henchmen[0]!.xp).toMatchObject({ owed: 2 });
+    expect(v.hires[0]!.xp).toMatchObject({ owed: 1 });
+    // nothing to be taken: none owed
+    expect(rosterView(data, core.addUnit(ctx(fresh()), 'capt')).heroes[0]!.xp).toMatchObject({ owed: 0 });
+  });
+});
+
+describe('the row of a warrior in the list', () => {
+  const ctx = (s: core.WarbandState) => core.ctxOf(data, s);
+  const fresh = () => createWarband(data, 'merc', null, 'The Grey Company');
+  const band = () => {
+    let s = core.addUnit(ctx(fresh()), 'capt');
+    s = core.addUnit(ctx(s), 'warr');
+    s = core.hireHS(ctx(s), 'ogre');
+    return rosterView(data, s);
+  };
+
+  it('has his name, what he is, the whole profile and his experience', () => {
+    const v = band();
+    const [hero] = v.heroes;
+    const row = unitRow(hero!);
+    expect(row).toMatchObject({ kind: 'hero', name: hero!.name, count: null, sub: null, exp: 20, ready: false, chipsMore: 0 });
+    expect(row.stats.map((c) => c.key)).toEqual([...STATS]);
+    expect(row.save).toBe(hero!.save);
+    expect(row.xp).toBe(hero!.xp);
+    // a Hero with a name of his own shows what he is
+    expect(unitRow({ ...hero!, name: 'Ulrich the Grey' }).sub).toBe(hero!.type);
+  });
+
+  it('shows a group by its men and a hired one by his kind, without a save', () => {
+    const v = band();
+    const group = unitRow(v.henchmen[0]!);
+    expect(group).toMatchObject({ kind: 'hench', count: 1, sub: 'Henchman group' });
+    expect(unitRow({ ...v.henchmen[0]!, name: 'The Dogs' }).sub).toBe(`${v.henchmen[0]!.type} · group`);
+    const hired = unitRow(v.hires[0]!);
+    expect(hired).toMatchObject({ kind: 'hired', count: null, sub: 'Hired Sword', save: null, chips: [] });
+    expect(unitRow({ ...v.hires[0]!, name: 'Grunt' }).sub).toBe(`Hired Sword · ${v.hires[0]!.type}`);
+  });
+
+  it('carries his equipment and special rules in one line, and says when an advance is ready', () => {
+    const v = band();
+    const hero = v.heroes[0]!;
+    expect(unitRow(hero).carries).toBe([...hero.equipment, ...hero.rules].map((f) => f.label).join(' · '));
+    expect(unitRow({ ...hero, advanceDue: true }).ready).toBe(true);
+    expect(unitRow(v.hires[0]!).carries).toBe(v.hires[0]!.rules.map((f) => f.label).join(' · '));
+  });
+
+  it('puts what sets him apart in chips, the danger ones marked, and counts those that do not fit', () => {
+    const hero = band().heroes[0]!;
+    const all = { ...hero, leader: true, promoted: true, captive: 'Anna', missGames: 2, retire: true, injuries: [{ label: 'Leg Wound', tips: [] }] };
+    expect(unitChips(all)).toEqual([
+      { label: 'Leader', tone: 'gold' }, { label: 'Promoted', tone: 'plain' }, { label: 'Captive of Anna', tone: 'danger' },
+      { label: 'Blind: must retire', tone: 'danger' }, { label: 'Misses 2 games', tone: 'danger' }, { label: 'Leg Wound', tone: 'danger' },
+    ]);
+    const row = unitRow(all);
+    expect(row.chips).toHaveLength(CHIPS_IN_ROW);
+    expect(row.chipsMore).toBe(2);
+    expect(unitChips({ ...hero, leader: false, captive: '' }).map((c) => c.label)).toEqual(['Captive']);
+    expect(unitChips({ ...hero, leader: false })).toEqual([]);
+    expect(unitChips({ ...hero, leader: false, missGames: 1 }).map((c) => c.label)).toEqual(['Misses 1 game']);
   });
 });
