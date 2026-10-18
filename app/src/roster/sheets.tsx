@@ -1,5 +1,5 @@
-/* The sheets of the roster (docs/mockups/roster.html): the ⋯ menu of a
-   warrior, a name, and the recruit list. Each runs what was chosen only
+/* The sheets of the roster (docs/mockups/roster.html): a name, the
+   experience, more men and the recruit list. Each runs what was chosen only
    once it has closed, so a following sheet or an undo notice is not hidden
    behind it, and Back never lands on a closed sheet (useSheet). */
 import { useId, useState } from 'react';
@@ -12,29 +12,6 @@ import { moreMenVerdict, type MoreMenView } from './men.ts';
 type Sheet = ReturnType<typeof useSheet>;
 /** The dialog's ref and its close(), from useSheet in the screen. */
 interface SheetProps { dialogRef: Sheet['ref']; close: Sheet['close'] }
-
-export interface MenuItem { label: string; danger?: boolean; run: () => void }
-
-export function MenuSheet({ dialogRef, close, title, items }: SheetProps & { title: string; items: MenuItem[] }) {
-  const id = useId();
-  return (
-    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
-      <div className={ui.page}>
-        <h2 id={id}>{title}</h2>
-        <ul className={styles.menu}>
-          {items.map((it) => (
-            <li key={it.label}>
-              <button type="button" className={it.danger ? styles.danger : undefined} onClick={() => close(it.run)}>
-                {it.label} <span aria-hidden="true">›</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
-      </div>
-    </dialog>
-  );
-}
 
 /** What a name sheet edits: a warrior, a group, one man, the warband. */
 export interface Naming {

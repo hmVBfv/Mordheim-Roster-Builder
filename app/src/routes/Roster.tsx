@@ -6,7 +6,10 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
-import { Hire, Warrior } from '../roster/Cards.tsx';
+import { Board } from '../roster/Board.tsx';
+import { Panel, PanelLink } from '../roster/Panel.tsx';
+import { usePrinting } from '../roster/Print.tsx';
+import type { UnitActs } from '../roster/Detail.tsx';
 import { AdvanceSheet, TakenSheet, type AdvanceChoice, type Correction } from '../roster/AdvanceSheet.tsx';
 import { advanceView, takenOf } from '../roster/advance.ts';
 import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
@@ -16,7 +19,7 @@ import { markRole, markView, mutationView } from '../roster/chaos.ts';
 import { MarkSheet, MutationSheet } from '../roster/ChaosSheets.tsx';
 import { equipmentView } from '../roster/equipment.ts';
 import { houseView } from '../roster/house.ts';
-import { ExpSheet, MenuSheet, MoreMenSheet, NameSheet, RecruitSheet, type ExpSetting, type MenuItem, type Naming } from '../roster/sheets.tsx';
+import { ExpSheet, MoreMenSheet, NameSheet, RecruitSheet, type ExpSetting, type Naming } from '../roster/sheets.tsx';
 import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import { ConflictBanner } from '../sync/ConflictBanner.tsx';
@@ -33,7 +36,7 @@ import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
-import styles from '../roster/Roster.module.css';
+import board from '../roster/Board.module.css';
 
 function RosterBody({ rec }: { rec: StoredWarband }) {
   const data = useGameData();
@@ -49,12 +52,13 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const navigate = useNavigate();
   // "Print the roster" (Export) comes here and prints once
   const location = useLocation();
-  const printing = !!(location.state as { print?: boolean } | null)?.print;
+  const asked = !!(location.state as { print?: boolean } | null)?.print;
+  const { printing, print } = usePrinting();
   useEffect(() => {
-    if (!printing) return;
+    if (!asked) return;
     void navigate('.', { replace: true, state: null });
-    setTimeout(() => window.print(), 100);
-  }, [printing, navigate]);
+    setTimeout(print, 100);
+  }, [asked, navigate, print]);
   const { ref: eqRef, open: openEqSheet, close: closeEq } = useSheet('equipment');
   const [eqOf, setEqOf] = useState<number | null>(null);
   const eqView = eqOf != null ? equipmentView(ctx, eqOf) : null;
@@ -127,8 +131,6 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     return core.spellReduce(x, id, c.index, -1);
   }, text);
 
-  const { ref: menuRef, open: openMenuSheet, close: closeMenu } = useSheet('menu');
-  const [menuOf, setMenuOf] = useState<{ title: string; items: MenuItem[] }>({ title: '', items: [] });
   const { ref: nameRef, open: openNameSheet, close: closeName } = useSheet('name');
   const [naming, setNaming] = useState<Naming | null>(null);
   const { ref: expRef, open: openExpSheet, close: closeExp } = useSheet('experience');
@@ -137,72 +139,9 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
 
   // a new key each time, so the form starts from the value it is given
   const askName = (n: Omit<Naming, 'key'>) => { setNaming((prev) => ({ ...n, key: (prev?.key ?? 0) + 1 })); openNameSheet(); };
-  const openMenu = (title: string, items: MenuItem[]) => { setMenuOf({ title, items }); openMenuSheet(); };
   const askExp = (who: string, xp: NonNullable<WarriorView['xp']>, save: (v: number) => void) => {
     setExpSet((prev) => ({ key: (prev?.key ?? 0) + 1, who, value: xp.value, steps: xp.steps.map((s) => s.at), min: xp.min, max: xp.max, save }));
     openExpSheet();
-  };
-
-  const warriorMenu = (w: WarriorView) => openMenu(w.name, [
-    // his own list until his first battle, then the Trading Post (Rob, 02.10.2026)
-    w.fought
-      ? { label: 'Equipment – at the Trading Post', run: () => { void navigate(`${trade}#give`); } }
-      : { label: 'Equipment & rare items', run: () => { setEqOf(w.uid); openEqSheet(); } },
-    {
-      label: w.hero ? 'Name' : 'Name of the group',
-      run: () => askName({
-        title: w.hero ? 'Name' : 'Name of the group', label: w.hero ? `Name of this ${w.type}` : 'Name of the group',
-        value: w.name === w.type ? '' : w.name, fallback: w.type,
-        save: (nm) => ed.edit((c) => core.setModelName(c, w.uid, nm || w.type), 'Name saved.'),
-      }),
-    },
-    { label: w.hero ? 'Story so far & profile' : 'Story so far', run: () => { void navigate(`/warbands/${rec.id}/story?who=${w.uid}`); } },
-    ...(w.xp ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: w.uid, name: w.name }); openTakenSheet(); } }] : []),
-    ...(() => {
-      const mv = mutationView(ctx, w.uid);
-      return mv ? [{ label: mv.label, run: () => { setMutOf(w.uid); openMutSheet(); } }] : [];
-    })(),
-    ...(() => {
-      const role = markRole(ctx, w.uid);
-      if (role === 'seer') return [{ label: 'Mark of Chaos…', run: () => { setMarkKey((k) => k + 1); openMarkSheet(); } }];
-      const mk = ctx.s.mark ? core.markName(ctx, ctx.s.mark) : '';
-      const on = !!ctx.s.models.find((m) => m.uid === w.uid)?.caster;
-      if (role === 'chief' && mk) {
-        return [{ label: on ? 'Give up the Mark' : `Take the ${mk.split(' — ')[0]}`, run: () => ed.edit((c) => core.setCaster(c, w.uid, !on), on ? `${w.name} no longer bears the Mark.` : `${w.name} takes the Mark.`) }];
-      }
-      return [];
-    })(),
-    { label: 'Tabletop Simulator card', run: () => { void navigate(`/warbands/${rec.id}/export#tts-${w.uid}`); } },
-    ...(w.canLead ? [{ label: 'Lead the warband', run: () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) }] : []),
-    ...(w.injuries.length || w.missGames ? [{ label: 'Injuries – correct', run: () => { setInjuriesOf(w.uid); openInjuriesSheet(); } }] : []),
-    ...(w.captive != null ? [{ label: 'Captivity – how it ended…', run: () => openCaptive(w) }] : []),
-    ...(w.hero && w.captive == null ? [{ label: 'Out of action for good…', danger: true, run: () => injureWarrior(w, '11') }] : []),
-    w.fought
-      ? { label: 'Dismiss – his equipment goes to the stash', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
-      : locked
-        // a recruit who has not fought: his hire is undone, at its price
-        ? { label: 'Remove from the roster – he has not fought', danger: true, run: () => ed.edit((c) => core.removeUnit(c, w.uid), `${w.name} removed from the roster; his price is back.`) }
-        : { label: 'Remove from the roster', danger: true, run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} removed from the roster.`) },
-  ]);
-
-  const hireMenu = (h: HireView) => {
-    const hs = h.kind === 'Hired Sword';
-    openMenu(h.name, [
-      {
-        label: 'Name',
-        run: () => askName({
-          title: 'Name', label: `Name of this ${h.type}`, value: h.name === h.type ? '' : h.name, fallback: h.type,
-          save: (nm) => ed.edit((c) => (hs ? core.setHsName(c, h.uid, nm) : core.setDpName(c, h.uid, nm)), 'Name saved.'),
-        }),
-      },
-      { label: 'Story so far & profile', run: () => { void navigate(`/warbands/${rec.id}/story?who=${h.uid}`); } },
-      ...(hs ? [{ label: 'Advances taken – correct', run: () => { setTakenFor({ id: h.uid, name: h.name }); openTakenSheet(); } }] : []),
-      { label: 'Tabletop Simulator card', run: () => { void navigate(`/warbands/${rec.id}/export#tts-${h.uid}`); } },
-      {
-        label: 'Dismiss — upkeep ends', danger: true,
-        run: () => ed.edit((c) => core.dismissHire(c, h.uid, hs ? 'hs' : 'dp'), `${h.name} is dismissed.`, { gold: locked ? 'keep' : 'settle' }),
-      },
-    ]);
   };
 
   const manSheet = (w: WarriorView, i: number) => {
@@ -216,32 +155,86 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     });
   };
 
-  const warriorActs = (w: WarriorView) => ({
-    onMore: () => warriorMenu(w),
-    onXp: (d: number) => ed.edit((c) => core.setModelExp(c, w.uid, w.exp + d)),
-    onSetXp: () => { if (w.xp) askExp(w.name, w.xp, (v) => ed.edit((c) => core.setModelExp(c, w.uid, v), `${w.name}: experience ${v}.`)); },
-    onMan: (i: number) => manSheet(w, i),
-    onAdvance: () => openAdvance(w.uid),
-    onInjury: () => injureWarrior(w),
-    onCaptive: () => openCaptive(w),
-    onAddMan: () => {
-      if (!w.addMan || !('cost' in w.addMan)) return;
-      setMenFor((p) => ({ key: (p?.key ?? 0) + 1, uid: w.uid }));
-      openMenSheet();
-    },
-  });
-  const hireActs = (h: HireView) => ({
-    onMore: () => hireMenu(h),
-    onXp: (d: number) => ed.edit((c) => core.setHsExp(c, h.uid, h.exp + d)),
-    onSetXp: () => { if (h.xp) askExp(h.name, h.xp, (v) => ed.edit((c) => core.setHsExp(c, h.uid, v), `${h.name}: experience ${v}.`)); },
-    onAdvance: () => openAdvance(h.uid),
-    onInjury: () => openInjury({ kind: 'hire', uid: h.uid, name: h.name }),
-  });
+  /* What the opened warrior's buttons do (Detail.tsx): the ⋯ menu's items now stand in his sections. */
+  const storyOf = (uid: number | string) => `/warbands/${rec.id}/story?who=${uid}`;
+  const cardOf = (uid: number | string) => `/warbands/${rec.id}/export#tts-${uid}`;
+  const askTaken = (id: number | string, name: string) => { setTakenFor({ id, name }); openTakenSheet(); };
+
+  const warriorActs = (w: WarriorView): UnitActs => {
+    const m = ctx.s.models.find((x) => x.uid === w.uid);
+    const mv = mutationView(ctx, w.uid);
+    const role = markRole(ctx, w.uid);
+    const mk = ctx.s.mark ? core.markName(ctx, ctx.s.mark) : '';
+    const bears = !!m?.caster;
+    const chaos: UnitActs['chaos'] = [];
+    if (mv) chaos.push({ label: mv.label, run: () => { setMutOf(w.uid); openMutSheet(); } });
+    if (role === 'seer') chaos.push({ label: 'Mark of Chaos…', run: () => { setMarkKey((k) => k + 1); openMarkSheet(); } });
+    else if (role === 'chief' && mk) {
+      chaos.push({
+        label: bears ? 'Give up the Mark' : `Take the ${mk.split(' — ')[0]}`,
+        run: () => ed.edit((c) => core.setCaster(c, w.uid, !bears), bears ? `${w.name} no longer bears the Mark.` : `${w.name} takes the Mark.`),
+      });
+    }
+    return {
+      xp: (d) => ed.edit((c) => core.setModelExp(c, w.uid, w.exp + d)),
+      setXp: () => { if (w.xp) askExp(w.name, w.xp, (v) => ed.edit((c) => core.setModelExp(c, w.uid, v), `${w.name}: experience ${v}.`)); },
+      advance: () => openAdvance(w.uid),
+      injury: () => injureWarrior(w),
+      captive: () => openCaptive(w),
+      addMan: () => {
+        if (!w.addMan || !('cost' in w.addMan)) return;
+        setMenFor((p) => ({ key: (p?.key ?? 0) + 1, uid: w.uid }));
+        openMenSheet();
+      },
+      man: (i) => manSheet(w, i),
+      lead: w.canLead ? () => ed.edit((c) => core.setLeader(c, w.uid), `${w.name} leads the warband.`) : undefined,
+      // his own list until his first battle, then the Trading Post (Rob, 02.10.2026)
+      equipSheet: w.fought ? undefined : () => { setEqOf(w.uid); openEqSheet(); },
+      equipLink: w.fought ? `${trade}#give` : undefined,
+      rename: (nm) => ed.edit((c) => core.setModelName(c, w.uid, nm || w.type), 'Name saved.'),
+      nameLabel: w.hero ? `Name of this ${w.type}` : 'Name of the group',
+      nameValue: w.name === w.type ? '' : w.name,
+      story: storyOf(w.uid),
+      card: cardOf(w.uid),
+      taken: w.xp ? takenOf(ctx, w.uid) : null,
+      correctTaken: w.xp ? () => askTaken(w.uid, w.name) : undefined,
+      correctInjuries: w.injuries.length || w.missGames ? () => { setInjuriesOf(w.uid); openInjuriesSheet(); } : undefined,
+      chaos,
+      outOfAction: w.hero && w.captive == null ? () => injureWarrior(w, '11') : undefined,
+      leave: w.fought
+        ? { label: 'Dismiss – his equipment goes to the stash', run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
+        : locked
+          // a recruit who has not fought: his hire is undone, at its price
+          ? { label: 'Remove from the roster – he has not fought', run: () => ed.edit((c) => core.removeUnit(c, w.uid), `${w.name} removed from the roster; his price is back.`) }
+          : { label: 'Remove from the roster', run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} removed from the roster.`) },
+    };
+  };
+
+  const hireActs = (h: HireView): UnitActs => {
+    const hs = h.kind === 'Hired Sword';
+    return {
+      xp: (d) => ed.edit((c) => core.setHsExp(c, h.uid, h.exp + d)),
+      setXp: () => { if (h.xp) askExp(h.name, h.xp, (v) => ed.edit((c) => core.setHsExp(c, h.uid, v), `${h.name}: experience ${v}.`)); },
+      advance: () => openAdvance(h.uid),
+      injury: () => openInjury({ kind: 'hire', uid: h.uid, name: h.name }),
+      rename: (nm) => ed.edit((c) => (hs ? core.setHsName(c, h.uid, nm) : core.setDpName(c, h.uid, nm)), 'Name saved.'),
+      nameLabel: `Name of this ${h.type}`,
+      nameValue: h.name === h.type ? '' : h.name,
+      story: storyOf(h.uid),
+      card: cardOf(h.uid),
+      taken: hs ? takenOf(ctx, h.uid) : null,
+      correctTaken: hs ? () => askTaken(h.uid, h.name) : undefined,
+      chaos: [],
+      leave: { label: 'Dismiss — upkeep ends', run: () => ed.edit((c) => core.dismissHire(c, h.uid, hs ? 'hs' : 'dp'), `${h.name} is dismissed.`, { gold: locked ? 'keep' : 'settle' }) },
+    };
+  };
+  const actsOf = (u: WarriorView | HireView): UnitActs => ('hero' in u ? warriorActs(u) : hireActs(u));
+  const stash = locked ? (ctx.s.stash?.items ?? []).reduce((n, it) => n + (Number(it.qty) || 0), 0) : 0;
 
   return (
-    <section className={ui.page}>
-      <header>
-        <div className={styles.title}>
+    <section className={board.page}>
+      <header className={board.head}>
+        <div className={board.titleRow}>
           <h1>{v.name}</h1>
           <button type="button" className={ui.iconButton} aria-label="Rename the warband"
             onClick={() => askName({
@@ -249,68 +242,70 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
               save: (nm) => ed.edit((c) => core.setWarbandName(c, nm), 'Name saved.'),
             })}><IconEdit /></button>
         </div>
-        <p className={ui.muted}>
+        <p className={board.sub}>
           {v.type}{v.campaign ? ` · ${v.campaign}` : ''}
-          {houseOn > 0 && <> · <Link to={`/warbands/${rec.id}/house`} className={styles.houseLink}>⚖ {houseOn} house rule{houseOn > 1 ? 's' : ''}</Link></>}
+          {houseOn > 0 && <> · <Link to={`/warbands/${rec.id}/house`} className={board.houseLink}>⚖ {houseOn} house rule{houseOn > 1 ? 's' : ''}</Link></>}
         </p>
-        <dl className={styles.summary}>
-          <div><dt>Rating</dt><dd>{v.rating}</dd></div>
-          <div><dt>Gold</dt><dd>{v.gold} gc</dd></div>
-          <div><dt>Models</dt><dd>{v.models}/{v.maxModels}</dd></div>
-          <div><dt>Worth</dt><dd>{v.worth}</dd></div>
+        <dl className={board.tiles}>
+          <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>
+          <div className={board.tile}><dt>Rating</dt><dd>{v.rating}</dd></div>
+          <div className={board.tile}>
+            <dt>Models</dt>
+            <dd>{v.models}/{v.maxModels}<span className={board.meter} aria-hidden="true"><i style={{ width: `${Math.min(100, Math.round((100 * v.models) / Math.max(1, v.maxModels)))}%` }} /></span></dd>
+          </div>
+          <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
+        <div className={board.toolbar} role="group" aria-label="Warband actions">
+          <button type="button" className={`${board.btn} ${board.primary}`} onClick={openRecruit}>+ Recruit</button>
+          <Link to={`/warbands/${rec.id}/hire`} className={board.btn}>Hire</Link>
+          <Link to={trade} className={board.btn} aria-label={stash ? `Trade, stash ${stash}` : 'Trade'}>Trade{stash > 0 && <span className={board.badge} aria-hidden="true">{stash}</span>}</Link>
+          <Link to={`/warbands/${rec.id}/export`} className={board.btn}>Export</Link>
+        </div>
       </header>
       <ConflictBanner data={data} rec={rec} />
       {FLAVOUR === 'campaign' && rec.campaignId && (
         <CampaignStage rec={rec} state={ed.state} onTake={(round) => ed.edit((c) => takeStage(c, round), `Stage: ${core.roundLabel(round)}, as the campaign.`, { gold: 'keep' })} />
       )}
       {v.warnings.length > 0 && (
-        <ul className={`${ui.card} ${styles.warnings}`} aria-label="Warnings">
+        <ul className={`${ui.card} ${board.warnings}`} aria-label="Warnings">
           {v.warnings.map((w) => <li key={w}>{w}</li>)}
         </ul>
       )}
-      {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
-        <p className={`${ui.card} ${ui.muted}`}>No warriors yet. Recruit your Heroes and Henchmen: {v.gold} gc to spend.</p>
-      )}
-      {v.heroes.length > 0 && <div className={styles.sectionHead}><h2>Heroes</h2><span className={ui.muted}>{v.heroCount} of {v.heroMax}</span></div>}
-      <div className={styles.cards}>{v.heroes.map((w) => <Warrior key={w.key} w={w} act={warriorActs(w)} />)}</div>
-      {v.henchmen.length > 0 && <h2>Henchmen</h2>}
-      <div className={styles.cards}>{v.henchmen.map((w) => <Warrior key={w.key} w={w} act={warriorActs(w)} />)}</div>
-      {v.hires.length > 0 && <h2>Hired Swords &amp; Dramatis Personae</h2>}
-      <div className={styles.cards}>{v.hires.map((h) => <Hire key={h.key} h={h} act={hireActs(h)} />)}</div>
-      {v.fallen.length > 0 && (
-        <details className={ui.card}>
-          <summary className={styles.summaryToggle}>Fallen ({v.fallen.length})</summary>
-          <ul>{v.fallen.map((f, i) => <li key={i}>{f}</li>)}</ul>
-        </details>
-      )}
-      <div className={`${ui.row} ${styles.screenOnly}`}>
-        <button type="button" className={ui.button} onClick={openRecruit}>+ Recruit</button>
-        <Link to={`/warbands/${rec.id}/hire`} className={ui.buttonQuiet}>Hire…</Link>
-        <Link to={`/warbands/${rec.id}/house`} className={ui.buttonQuiet}>House rules</Link>
-        {(ctx.s.campaign?.on || rec.campaignId) && <Link to={`/warbands/${rec.id}/districts`} className={ui.buttonQuiet}>Districts</Link>}
-        <Link to={trade} className={ui.buttonQuiet}>Trading Post{locked && ctx.s.stash?.items?.length ? ` · stash ${ctx.s.stash.items.reduce((n, it) => n + (Number(it.qty) || 0), 0)}` : ''}</Link>
-        <Link to="/warbands" className={ui.buttonQuiet}>All warbands</Link>
-        <Link to={`/warbands/${rec.id}/story`} className={ui.buttonQuiet}>Story</Link>
-        <Link to={`/warbands/${rec.id}/export`} className={ui.buttonQuiet}>Export…</Link>
-        {FLAVOUR === 'campaign' && rec.ownerId && <Link to={`/warbands/${rec.id}/versions`} className={ui.buttonQuiet}>Versions{rec.serverRev ? ` · ${rec.serverRev}` : ''}</Link>}
-        <button type="button" className={ui.buttonQuiet}
-          onClick={() => { void makeCopy(rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }}>
-          Make a copy
-        </button>
-        {FLAVOUR === 'campaign' && session.status === 'in' && <ShareSheet data={data} rec={rec} state={ed.state} onNotice={notify} />}
-        {/* entered in a campaign: it leaves the campaign before it can be removed */}
-        {FLAVOUR === 'campaign' && rec.campaignId
-          ? <InCampaign rec={rec} onNotice={notify} />
-          : (
-            <button type="button" className={ui.buttonQuiet}
-              onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
-              {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}
-            </button>
+      <Board
+        v={v} acts={actsOf} printing={printing}
+        after={<>
+          {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
+            <p className={`${ui.card} ${ui.muted}`}>No warriors yet. Recruit your Heroes and Henchmen: {v.gold} gc to spend.</p>
           )}
-      </div>
+          {v.fallen.length > 0 && (
+            <details className={ui.card}>
+              <summary className={board.fallen}>Fallen ({v.fallen.length})</summary>
+              <ul>{v.fallen.map((f, i) => <li key={i}>{f}</li>)}</ul>
+            </details>
+          )}
+        </>}
+        panel={
+          <Panel foot={<>
+            {FLAVOUR === 'campaign' && session.status === 'in' && <ShareSheet data={data} rec={rec} state={ed.state} onNotice={notify} />}
+            {/* entered in a campaign: it leaves the campaign before it can be removed */}
+            {FLAVOUR === 'campaign' && rec.campaignId
+              ? <InCampaign rec={rec} onNotice={notify} />
+              : (
+                <button type="button" className={ui.buttonQuiet}
+                  onClick={() => { void removeWarband(rec).then(() => navigate('/warbands', { replace: true, state: { removed: rec } })); }}>
+                  {rec.ownerId ? 'Remove the warband' : 'Remove from this device'}
+                </button>
+              )}
+          </>}>
+            <PanelLink to={`/warbands/${rec.id}/house`} title="House rules" note={houseOn > 0 ? `${houseOn} on` : 'Off'} />
+            {(ctx.s.campaign?.on || rec.campaignId) && <PanelLink to={`/warbands/${rec.id}/districts`} title="Districts" note="Footholds on the map" />}
+            <PanelLink to={`/warbands/${rec.id}/story`} title="Story" note="Prologue, interludes, profiles" />
+            {FLAVOUR === 'campaign' && rec.ownerId && <PanelLink to={`/warbands/${rec.id}/versions`} title="Versions" note={rec.serverRev ? `Every saved state · ${rec.serverRev}` : 'Every saved state'} />}
+            <PanelLink to="/warbands" title="All warbands" note="Switch or start another" />
+            <PanelLink title="Make a copy" note="Same men, a new warband" run={() => { void makeCopy(rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }} />
+          </Panel>
+        } />
 
-      <MenuSheet dialogRef={menuRef} close={closeMenu} title={menuOf.title} items={menuOf.items} />
       <NameSheet dialogRef={nameRef} close={closeName} naming={naming} />
       <ExpSheet dialogRef={expRef} close={closeExp} setting={expSet} />
       <AdvanceSheet dialogRef={advRef} close={closeAdv} view={advView && advOf ? { ...advView, key: advOf.key } : null}

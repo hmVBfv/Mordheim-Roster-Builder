@@ -109,10 +109,13 @@ describe('the overview', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'The Grey Penitents' })).toBeTruthy();
     expect(screen.getByText(/^Anna · /)).toBeTruthy();
     expect(screen.getByText(new RegExp(`Start marked .* \\(version 1\\): rating ${totals(anna).rating}`))).toBeTruthy();
-    // to read only: no button to change anything on the cards
-    expect(screen.queryByRole('button', { name: 'Advance' })).toBeNull();
-    expect(screen.queryByRole('button', { name: /^More for / })).toBeNull();
-    expect(screen.getAllByRole('article').length).toBeGreaterThan(0);
+    // to read only: a row each, and opened a card without any button to change something
+    const row = (await screen.findAllByRole('button', { expanded: false }))[0]!;
+    await user.click(row);
+    const card = await screen.findByRole('article');
+    expect(within(card).getAllByRole('columnheader').length).toBeGreaterThan(8);
+    for (const name of ['Advance', /^Injury for /, /One experience (less|more)/, /^Recruit/, 'Remove from the roster']) expect(screen.queryByRole('button', { name })).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
   });
 
   it('entering a warband: a copy goes in, the warband stays free; a leader’s own takes part at once', async () => {

@@ -20,6 +20,12 @@ beforeAll(loadScreens, SCREENS_MS);
 
 beforeAll(polyfillDialog);
 
+/** Opens a warrior under his row (jsdom has no width, so the board stacks as on a phone) and gives his card. */
+async function open(user: ReturnType<typeof userEvent.setup>, row: RegExp, card: string) {
+  await user.click(await screen.findByRole('button', { name: row }));
+  return screen.findByRole('article', { name: card });
+}
+
 /** Adds `n` men through the "More men" sheet. */
 async function moreMen(user: ReturnType<typeof userEvent.setup>, group: HTMLElement, n = 1) {
   await user.click(within(group).getByRole('button', { name: /\+ Man/ }));
@@ -66,7 +72,7 @@ describe('the roster', () => {
     await seed(band());
     at('/warbands/w1');
     const user = userEvent.setup();
-    const captain = await screen.findByRole('article', { name: 'Mercenary Captain' });
+    const captain = await open(user, /^Mercenary Captain/, 'Mercenary Captain');
     expect(within(captain).getByRole('button', { name: /One experience less/ })).toHaveProperty('disabled', true);
     await user.click(within(captain).getByRole('button', { name: /One experience more/ }));
     await user.click(within(captain).getByRole('button', { name: /One experience more/ }));
@@ -79,7 +85,7 @@ describe('the roster', () => {
     await seed(band());
     at('/warbands/w1');
     const user = userEvent.setup();
-    const group = await screen.findByRole('article', { name: 'Warrior' });
+    const group = await open(user, /^Warrior,/, 'Warrior');
     const gold = (await stored()).state;
     const before = core.goldCurrent(core.ctxOf(data, gold));
     await moreMen(user, group);
@@ -96,7 +102,7 @@ describe('the roster', () => {
     await seed(band());
     at('/warbands/w1');
     const user = userEvent.setup();
-    const group = await screen.findByRole('article', { name: 'Warrior' });
+    const group = await open(user, /^Warrior,/, 'Warrior');
     await moreMen(user, group);
     expect(await screen.findByText(/joins Warrior/)).toBeTruthy();
     await user.click(within(group).getByRole('button', { name: /One experience more/ }));

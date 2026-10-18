@@ -33,13 +33,24 @@ describe('the app', () => {
     expect(screen.getByTitle('Saved on this device').textContent).toMatch(/Saved/);
   });
 
-  it('a roster shows every warrior with his profile', async () => {
+  it('a roster shows every warrior on a row with his whole profile; one opens under his row', async () => {
     const s = await seed();
     at('/warbands/w1');
+    const user = userEvent.setup();
     expect(await screen.findByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeTruthy();
-    const cards = await screen.findAllByRole('article');
-    expect(cards.length).toBe(s.models.length + (s.hired ?? []).length + (s.dp ?? []).length);
-    for (const c of cards.slice(0, s.models.length)) expect(within(c).getAllByRole('columnheader').map((h) => h.textContent).slice(0, 9)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);
+    const units = s.models.length + (s.hired ?? []).length + (s.dp ?? []).length;
+    // a row each, the profile in a line; nothing is open until asked
+    const strips = await screen.findAllByRole('img', { name: /^M \S+, WS \S+, BS/ });
+    expect(strips).toHaveLength(units);
+    expect(screen.queryAllByRole('article')).toHaveLength(0);
+    const first = screen.getAllByRole('button', { expanded: false })[0]!;
+    await user.click(first);
+    const card = await screen.findByRole('article');
+    expect(within(card).getAllByRole('columnheader').map((h) => h.textContent).slice(0, 9)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);
+    expect(within(screen.getByRole('tablist', { name: 'Sections' })).getAllByRole('tab').map((x) => x.textContent)).toEqual(['Overview', 'Gear', 'Skills & injuries', 'Story & more']);
+    // tapping him again closes him
+    await user.click(screen.getByRole('button', { expanded: true }));
+    expect(screen.queryAllByRole('article')).toHaveLength(0);
   });
 
   it('an unknown warband says so', async () => {
