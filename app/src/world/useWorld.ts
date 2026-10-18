@@ -1,5 +1,6 @@
 /* A campaign's world as this device has it: last seen first, then from the server (phase 4b3b). */
 import { useCallback, useEffect, useState } from 'react';
+import { useOnCampaign } from '../live/live.ts';
 import { ApiError, errorText } from '../account/api.ts';
 import { cachedWorld, getWorld, type World } from './api.ts';
 
@@ -15,5 +16,6 @@ export function useWorld(cid: string) {
     reload();
     return () => { live = false; };
   }, [cid, reload]);
+  useOnCampaign(cid, reload);
   return { data, setData, error, reload };
 }

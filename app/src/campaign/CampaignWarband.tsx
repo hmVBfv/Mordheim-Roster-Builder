@@ -3,6 +3,7 @@
    player's work since the last version included), the same cards as one's
    own roster without anything to change, and the totals frozen at its marks. */
 import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useOnCampaign } from '../live/live.ts';
 import { Link, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { stamp } from '../account/time.ts';
@@ -64,6 +65,8 @@ export function CampaignWarband() {
     readWarband(id, wid).then((r) => { if (live) setRead(r); }).catch((e: unknown) => { if (live) setError(errorText(e)); });
     return () => { live = false; };
   }, [id, wid]);
+  // its owner saved a new version
+  useOnCampaign(id, () => { readWarband(id, wid).then(setRead).catch(() => undefined); });
   if (error) {
     return (
       <section className={ui.page}>

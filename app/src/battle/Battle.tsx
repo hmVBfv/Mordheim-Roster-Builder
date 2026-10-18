@@ -8,6 +8,7 @@
    4a4): the protocol is fixed, sealed notes open, and each player goes on
    to the aftermath of their warband. */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { Link, useParams } from 'react-router';
 import { errorText, type Me } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
@@ -76,9 +77,11 @@ function useBattle(cid: string, bid: string, userId: string | undefined) {
     let live = true;
     void cachedBattle(bid).then((v) => { if (live && v) setShown((cur) => cur ?? v); });
     void refresh(true);
-    const t = setInterval(() => { if (document.visibilityState === 'visible') void refresh(); }, POLL_MS);
-    return () => { live = false; clearInterval(t); };
-  }, [bid, refresh]);
+    // the server's signal asks at once; the timer stays as the fallback (live/live.ts)
+    const stop = pollWhileVisible(() => refresh(), POLL_MS);
+    const off = onCampaign(cid, () => refresh());
+    return () => { live = false; stop(); off(); };
+  }, [cid, bid, refresh]);
   return { view, setView, error, refresh };
 }
 

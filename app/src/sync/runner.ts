@@ -1,6 +1,7 @@
 /* When the sync runs (docs/architecture.md section 6): when a user is
    signed in, at once, whenever the app comes back to the front or online,
-   every ten seconds while it is visible, and a moment after each change
+   every ten seconds while it is visible (every minute while the live stream
+   is open, which says when something changed), and a moment after each change
    here. One round at a time. The status is what the header shows
    (SyncState). This module is light: the engine – and with it the rules
    data – is loaded only for the first round. */
@@ -9,6 +10,7 @@ import { deviceLabel } from '../account/device.ts';
 import { note } from '../bugs/trail.ts';
 import { ApiError } from '../account/api.ts';
 import { FLAVOUR } from '../flavour.ts';
+import { onSync, pollWhileVisible, startLive, stopLive } from '../live/live.ts';
 import { countPending } from './pending.ts';
 
 export type SyncStatus =
@@ -41,7 +43,8 @@ let user: string | null = null;
 let running: Promise<void> | null = null;
 let again = false;
 let timer: ReturnType<typeof setTimeout> | null = null;
-let every: ReturnType<typeof setInterval> | null = null;
+let every: (() => void) | null = null;
+let offSignal: (() => void) | null = null;
 const counts = () => ('waiting' in status ? { waiting: status.waiting, conflicts: status.conflicts } : { waiting: 0, conflicts: 0 });
 
 async function round(): Promise<void> {
@@ -95,15 +98,21 @@ export function startSync(userId: string): void {
   document.addEventListener('visibilitychange', onVisible);
   window.addEventListener('online', onOnline);
   window.addEventListener('focus', onVisible);
-  every = setInterval(() => { if (document.visibilityState === 'visible') void syncNow(); }, EVERY_MS);
+  // the server says when something changed (live/live.ts); the clock stays as the fallback and, while the stream is open, only looks in now and then
+  every = pollWhileVisible(syncNow, EVERY_MS);
+  offSignal = onSync(() => syncNow());
+  startLive(userId);
   void syncNow();
 }
 
 export function stopSync(): void {
   user = null;
   if (timer) clearTimeout(timer);
-  if (every) clearInterval(every);
+  every?.();
   timer = every = null;
+  offSignal?.();
+  offSignal = null;
+  stopLive();
   document.removeEventListener('visibilitychange', onVisible);
   window.removeEventListener('online', onOnline);
   window.removeEventListener('focus', onVisible);

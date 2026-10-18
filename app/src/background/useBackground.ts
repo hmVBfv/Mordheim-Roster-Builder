@@ -2,6 +2,7 @@
    device at once, then from the server every twenty seconds while the screen
    is visible, asking only whether anything is newer. */
 import { useCallback, useEffect, useState } from 'react';
+import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { errorText } from '../account/api.ts';
 import { cachedBackground, getBackground, type Entry } from './api.ts';
 
@@ -17,8 +18,9 @@ export function useBackground(cid: string, every = BACKGROUND_EVERY_MS) {
     let live = true;
     void cachedBackground(cid).then((r) => { if (live && r) setEntries((cur) => cur ?? r.entries); });
     void refresh();
-    const t = setInterval(() => { if (document.visibilityState === 'visible') void refresh(); }, every);
-    return () => { live = false; clearInterval(t); };
+    const stop = pollWhileVisible(refresh, every);
+    const off = onCampaign(cid, refresh);
+    return () => { live = false; stop(); off(); };
   }, [cid, refresh, every]);
   return { entries, error, refresh };
 }

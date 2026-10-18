@@ -5,6 +5,7 @@
    leader, moving on to the next round (4a4). Battles (4a2) and their
    aftermath (4a4): what is open for the user is at the top. */
 import { useCallback, useEffect, useState } from 'react';
+import { useOnCampaign } from '../live/live.ts';
 import { Link, NavLink, useNavigate, useParams } from 'react-router';
 import { ApiError, errorText } from '../account/api.ts';
 import styles0 from '../account/Account.module.css';
@@ -52,6 +53,8 @@ function useCampaign(id: string) {
     reload();
     return () => { live = false; };
   }, [id, reload]);
+  // another member changed something here (live/live.ts)
+  useOnCampaign(id, reload);
   return { view, setView, error, gone, reload };
 }
 

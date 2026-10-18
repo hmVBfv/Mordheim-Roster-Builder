@@ -4,6 +4,7 @@
    this device has not sent yet laid over them. What is being sent stays
    laid over until the server's list has it, so nothing flickers away. */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { errorText } from '../account/api.ts';
 import { flushOutbox, useNoteOutbox } from '../battle/outbox.ts';
 import { db, type OutboxItem } from '../db/db.ts';
@@ -27,8 +28,9 @@ export function useNotes(cid: string, me: { id: string; displayName: string } | 
     let live = true;
     void cachedNotes(cid).then((r) => { if (live && r) setNotes((n) => n ?? r.notes); });
     void refresh();
-    const t = setInterval(() => { if (document.visibilityState === 'visible') void refresh(); }, every);
-    return () => { live = false; clearInterval(t); };
+    const stop = pollWhileVisible(refresh, every);
+    const off = onCampaign(cid, refresh);
+    return () => { live = false; stop(); off(); };
   }, [cid, refresh, every]);
   const shown = useMemo(() => {
     if (!notes || !me) return null;

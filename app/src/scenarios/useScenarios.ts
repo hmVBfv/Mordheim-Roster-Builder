@@ -1,5 +1,6 @@
 /* A campaign's scenarios as this device has them: last seen first, then from the server (phase 4b3c). */
 import { useCallback, useEffect, useState } from 'react';
+import { useOnCampaign } from '../live/live.ts';
 import { ApiError, errorText } from '../account/api.ts';
 import { cachedScenarios, getScenarios, type ScenarioList } from './api.ts';
 
@@ -15,5 +16,6 @@ export function useScenarios(cid: string) {
     reload();
     return () => { live = false; };
   }, [cid, reload]);
+  useOnCampaign(cid, reload);
   return { data, setData, error, reload };
 }

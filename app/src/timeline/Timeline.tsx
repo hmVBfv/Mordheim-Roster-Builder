@@ -9,6 +9,7 @@
    (4a5) stand at the head of the part they tell: everyone reads them, a
    leader imports and places them. */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { errorText, type Me } from '../account/api.ts';
 import { casualtyText, OUTCOME_NAMES, type CasualtyPayload } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
@@ -44,8 +45,9 @@ function useTimelineData(cid: string) {
     let live = true;
     void cachedTimeline(cid).then((d) => { if (live && d) setData((cur) => cur ?? d); });
     void refresh();
-    const t = setInterval(() => { if (document.visibilityState === 'visible') void refresh(); }, TIMELINE_EVERY_MS);
-    return () => { live = false; clearInterval(t); };
+    const stop = pollWhileVisible(refresh, TIMELINE_EVERY_MS);
+    const off = onCampaign(cid, refresh);
+    return () => { live = false; stop(); off(); };
   }, [cid, refresh]);
   const place = useCallback((p: Position) => {
     moves.current++;
