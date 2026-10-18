@@ -27,6 +27,8 @@ import { registerDraftRoutes } from './routes-drafts.ts';
 import { registerBugRoutes } from './routes-bugs.ts';
 import { registerWorldRoutes } from './routes-world.ts';
 import { registerCampaignRoutes } from './routes-campaigns.ts';
+import { registerLiveRoutes } from './routes-live.ts';
+import { createHub, type LiveOptions } from './live.ts';
 import { registerShareRoutes } from './routes-shares.ts';
 import { registerWarbandRoutes } from './routes-warbands.ts';
 import type { StaticFiles } from './static.ts';
@@ -67,6 +69,8 @@ export interface AppDeps {
   trustProxy: string[];
   /** false: silent (tests that do not look at the log). */
   logger: Logger | false;
+  /** The live stream's limits (ADR 0020); tests shorten them. */
+  live?: Partial<LiveOptions>;
 }
 
 /** Request body limit for the whole request (docs/security.md: 3 MB). */
@@ -200,6 +204,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerStyleRoutes(app, { db, now });
   registerDraftRoutes(app, { db, now });
   registerBugRoutes(app, { db, now });
+  registerLiveRoutes(app, { hub: db ? createHub(db, now, deps.live) : null });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
     const path = decodePath(req.url);

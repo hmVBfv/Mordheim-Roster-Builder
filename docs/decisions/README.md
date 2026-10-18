@@ -38,3 +38,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0017](0017-signed-images-from-master.md) | In die Produktion nur signierte Images von master |
 | [0018](0018-ai-pack-by-hand.md) | KI-Paket von Hand weitergeben; keine Ablage in `eingang/chronik/` (ersetzt Teile von 0004) |
 | [0019](0019-bug-token.md) | Bug-Token: ein eigener Zugang für Cloud-Sitzungen, nur `GET/PATCH /bugs` (ergänzt 0012) |
+| [0020](0020-live-updates-signal-stream.md) | Live-Aktualisierung: ein Strom von Signalen je offener App, die App holt über die gewohnten Endpunkte nach (ergänzt 0005, 0010, 0011) |

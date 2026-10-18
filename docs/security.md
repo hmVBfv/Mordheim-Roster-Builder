@@ -389,6 +389,31 @@ Kampagnen-Aktion probieren also ein Mitglied, ein Mitglied ohne das Recht
 (403) und ein Außenstehender (404). Die Sichtbarkeit verborgener Inhalte
 kommt mit Notizen und Hintergrund dazu.
 
+### Live-Strom (ADR 0020)
+
+- `GET /api/v1/events` (Aktion `events.read`, jeder Angemeldete) trägt **nur
+  Signale**: `{"campaign":"<id>"}` oder `{"sync":true}`. Kein Titel, kein Name,
+  keine Nummer, kein Inhalt – ein Signal verrät höchstens, dass sich in einer
+  Kampagne, der man angehört, etwas geändert hat. Was die App danach sieht,
+  entscheiden die gewohnten Endpunkte (`can()`, Filter).
+- Wer ein Signal bekommt, folgt der Sichtbarkeit des Audit-Eintrags
+  (`server/src/live.ts`): öffentlich → aktive Mitglieder; nur Leiter → die
+  Leiter; versiegelt → nur der Autor; Admin → niemand. Wer die Kampagne
+  verlassen hat, bekommt nichts mehr. Warband-Entwürfe gehen nur an die Geräte
+  des Besitzers.
+- Der Strom gehört zur Sitzung: alle 20 Sekunden prüft der Server, ob sie noch
+  gilt (nicht abgemeldet, nicht abgelaufen, Konto nicht gesperrt), und beendet
+  sonst den Strom; nach 15 Minuten endet er ohnehin. Das Konto steht in der
+  Adresse und wird wie bei jeder Anfrage gegen die Sitzung gehalten (409
+  `other_user`).
+- Grenzen gegen Missbrauch und Fehler: 6 Ströme je Konto (der älteste weicht),
+  150 insgesamt (dann 503 mit `Retry-After`), ein langsamer Leser wird
+  getrennt.
+- Leak-Matrix: Zeile `events.read`; die Probe `stream` liest Kopf und erste
+  Zeile und schließt. `server/test/live.test.ts` prüft pro Rolle, wer ein
+  Signal bekommt und wer nicht (Außenstehender, ausgetretenes Mitglied, Spieler
+  bei Leiter-Eintrag, andere bei versiegeltem Eintrag, Admin-Einträge).
+
 ## 5. Daten
 
 - **Eingaben:** ein Schema für jeden Körper – Warband- und Notizdaten mit den

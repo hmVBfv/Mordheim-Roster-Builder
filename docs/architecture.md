@@ -254,6 +254,7 @@ verkleinert (siehe [ui.md](ui.md#leistungsgrenzen)).
 | Teilen | `GET /people` (Anzeigename und Nutzername der anderen), `GET/POST /shares`, `POST /shares/peek`, `POST /shares/redeem` (Code), `POST /shares/:id/accept`, `POST /shares/:id/decline`, `DELETE /shares/:id` – Rob, 05.10.2026 |
 | Sync | `GET /sync?cursor=` – Phase 3h: die eigenen Warbands mit neuester Version und Entwurf, Entferntes ohne Version, dazu `epoch` und der nächste `cursor` |
 | Bugs | Phase 4c1: `POST /bugs` (Meldung; Geräte-ID, gleiche Wörter nochmal → dieselbe Antwort, sonst 409 `exists`; 429 `too_many`), `GET /bugs/mine` (die eigenen, nur Art, Titel, Text, Quelle, Stand, „fixed in“, Zeiten), `GET /bugs?status=open\|all\|<stand>&limit=` und `GET/PATCH /bugs/:id` (Nummer oder Kennung; nur Admin mit Authenticator – und das Bug-Token aus 4c2, ADR 0019, mit `Authorization: Bearer`, sonst nichts) |
+| Live | `GET /events` (`?user=<id>`; Server-Sent Events, jeder Angemeldete): nur Signale `{campaign}` oder `{sync}`, nie Inhalt – ADR 0020 |
 | Betrieb | `GET /health` (Phase 2, öffentlich) |
 
 Details und Felder: [data-model.md](data-model.md). Rechte:
@@ -271,8 +272,15 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
   UUID. Der Server nutzt sie als Idempotenzschlüssel: doppelt gesendet ergibt
   keinen doppelten Eintrag.
 - **Häufigkeit:** beim Öffnen, beim Fokus und alle ~10 Sekunden, solange die
-  App sichtbar ist. Am Spielabend erscheinen Protokolleinträge damit nach
-  wenigen Sekunden bei allen. Server-Sent Events sind eine spätere Option.
+  App sichtbar ist – das ist der Rückfall. Zusätzlich hält jede angemeldete
+  App einen **Live-Strom** (`GET /api/v1/events`, ADR 0020): der Server
+  meldet „Kampagne X hat Neues“ oder „deine Warbands haben Neues“, nie
+  Inhalte, und die App fragt die gewohnten Endpunkte neu (Sync,
+  Notizen, Zeitleiste, Gefecht, Welt …). Änderungen anderer erscheinen so nach
+  etwa einer Sekunde. Solange der Strom steht, fragen die Timer nur noch in
+  jeder sechsten Runde; fällt er aus, gilt wieder der alte Takt. Verpasste
+  Signale werden nicht nachgeliefert: beim Öffnen des Stroms, beim Zurückkehren
+  und nach langem Schweigen fragt die App alles neu.
 - **Epoche:** Der Server trägt eine Epochen-ID, die sich bei jeder
   Wiederherstellung aus einem Backup ändert. Sieht ein Gerät eine neue
   Epoche, gleicht es vollständig neu ab und bietet alle lokalen Einträge an,

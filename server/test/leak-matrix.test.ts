@@ -10,6 +10,9 @@ import { confirmEnrolment, createCampaign, enrol, setMember } from '../src/campa
 import { putNote } from '../src/notes.ts';
 import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
+import type { LightMyRequestResponse } from 'fastify';
+import { COOKIE } from '../src/routes-accounts.ts';
+import { bodyOf, openStream } from './stream-client.ts';
 import { startAccounts } from './accounts-helpers.ts';
 import { putAttachment, storeFile } from '../src/attachments.ts';
 import { putPastBattle } from '../src/history.ts';
@@ -41,6 +44,23 @@ function walk(v: unknown, keys: string[] = [], values: string[] = []): { keys: s
 const SAVE = { wb: 'merc', name: 'The Probes', models: [], format: 2 };
 
 const DENIED = ['sign_in', 'forbidden'];
+
+/** A stream (the live signals): the status, headers and first bytes over a real connection of its own, then hung up on. */
+async function callStream(url: string, token: string | null): Promise<LightMyRequestResponse> {
+  const o = await openStream(url, token ? { cookie: `${COOKIE}=${token}` } : {});
+  try {
+    let body: string;
+    if (o.status === 200 && String(o.headers['content-type']).startsWith('text/event-stream')) {
+      o.res.setEncoding('utf8');
+      body = await new Promise<string>((resolve) => o.res.once('data', (c: string) => resolve(c)));
+    } else {
+      body = await bodyOf(o);
+    }
+    return { statusCode: o.status, headers: o.headers, body, json: () => JSON.parse(body) as unknown } as unknown as LightMyRequestResponse;
+  } finally {
+    o.hangUp();
+  }
+}
 
 describe('leak-test matrix', () => {
   it('has a row for every action, naming exactly the routes that carry it', async () => {
@@ -221,7 +241,9 @@ describe('leak-test matrix', () => {
       for (const [route, probe] of Object.entries(row.routes)) {
         for (const role of ROLES) {
           const p = probe(ctx);
-          const res = await s.call({ method: p.method, url: p.url, body: p.body, token: tokenFor[role](), ...(p.headers ? { headers: p.headers } : {}) });
+          const res = p.stream
+            ? await callStream(`${s.url}${p.url}`, tokenFor[role]())
+            : await s.call({ method: p.method, url: p.url, body: p.body, token: tokenFor[role](), ...(p.headers ? { headers: p.headers } : {}) });
           probes++;
           const where = `${role} ${route} (${action})`;
           const json = (res.headers['content-type'] ?? '').startsWith('application/json') && res.body ? (res.json() as Record<string, unknown>) : null;

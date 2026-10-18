@@ -101,6 +101,8 @@ export interface Probe {
   body?: unknown;
   /** For a body that is not JSON (a picture's bytes). */
   headers?: Record<string, string>;
+  /** A stream that does not end by itself: the test reads its first bytes over a real connection and hangs up. */
+  stream?: true;
 }
 
 /** A real 1×1 PNG: the bytes of a picture probe. */
@@ -134,6 +136,11 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /*': () => ({ method: 'GET', url: '/index.html' }),
       'HEAD /*': () => ({ method: 'HEAD', url: '/index.html' }),
     },
+  },
+  'events.read': {
+    allowed: signedIn,
+    // an answer that is a stream has no fields to list; a refusal is JSON like any other
+    routes: { 'GET /api/v1/events': () => ({ method: 'GET', url: '/api/v1/events', stream: true }) },
   },
   'auth.me': {
     allowed: ROLES,

@@ -2,6 +2,7 @@
    TOTP_KEY, and accounts made straight in the database. Requests go through
    app.inject, as a browser on the app's own origin would send them. */
 import type { LightMyRequestResponse } from 'fastify';
+import type { LiveOptions } from '../src/live.ts';
 import { createInvite, createSession, createUser, userByName } from '../src/accounts.ts';
 import { hashPassword, type HashCost } from '../src/passwords.ts';
 import { COOKIE } from '../src/routes-accounts.ts';
@@ -25,9 +26,9 @@ export interface Req {
   headers?: Record<string, string>;
 }
 
-export async function startAccounts(opts: { env?: NodeJS.ProcessEnv } = {}) {
+export async function startAccounts(opts: { env?: NodeJS.ProcessEnv; live?: Partial<LiveOptions>; closeGraceMs?: number } = {}) {
   const c = clock();
-  const s = await startServer({ now: c.now, hashCost: FAST, env: { TOTP_KEY, PUBLIC_ORIGIN: ORIGIN, ...opts.env } });
+  const s = await startServer({ now: c.now, hashCost: FAST, env: { TOTP_KEY, PUBLIC_ORIGIN: ORIGIN, ...opts.env }, ...(opts.live ? { live: opts.live } : {}), ...(opts.closeGraceMs ? { closeGraceMs: opts.closeGraceMs } : {}) });
   const key = parseKey(TOTP_KEY)!;
 
   async function call(r: Req): Promise<LightMyRequestResponse> {

@@ -5,6 +5,7 @@
    when) live in policy.ts and the routes. */
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import type { DB } from './db.ts';
+import { notifyAudit } from './live.ts';
 
 export const SESSION_DAYS = 90;
 /** How long the authenticator's code may take after the password. */
@@ -211,6 +212,8 @@ export interface AuditEntry { actorId: string | null; action: string; targetType
 export function audit(db: DB, e: AuditEntry, now: Date): number {
   const r = db.prepare('INSERT INTO audit_log (at, actor_id, action, target_type, target_id, campaign_id, visibility, payload) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
     .run(iso(now), e.actorId, e.action, e.targetType ?? null, e.targetId ?? null, e.campaignId ?? null, e.visibility ?? 'admin', e.payload === undefined ? null : JSON.stringify(e.payload));
+  // the apps that are open hear that something changed (ADR 0020); what, and who may see it, they ask the endpoints
+  notifyAudit(db, e);
   return Number(r.lastInsertRowid);
 }
 
