@@ -36,9 +36,9 @@ function CopyField({ label, value, rows, onCopied }: { label: string; value: str
   );
 }
 
-function Card({ c, open, onCopied }: { c: TtsCard; open: boolean; onCopied: (what: string) => void }) {
+function Card({ c, open, onOpen, onCopied }: { c: TtsCard; open: boolean; onOpen: (open: boolean) => void; onCopied: (what: string) => void }) {
   return (
-    <details id={c.id} className={styles.card} open={open}>
+    <details id={c.id} className={styles.card} open={open} onToggle={(e) => onOpen(e.currentTarget.open)}>
       <summary className={styles.summary}>
         <span>{c.label}</span>
         {c.group && <small className={ui.muted}>of {c.group}</small>}
@@ -83,6 +83,20 @@ function Body({ rec }: { rec: StoredWarband }) {
   const cards = useMemo(() => ttsCards(ctx), [ctx]);
   const { hash } = useLocation();
   const navigate = useNavigate();
+  // which cards are open: the one the address names, and whatever the player opens or closes after that
+  const [opened, setOpened] = useState<ReadonlySet<string>>(() => new Set(hash.startsWith('#tts-') ? [hash.slice(1)] : []));
+  const setOpen = (id: string, on: boolean) => setOpened((cur) => {
+    if (cur.has(id) === on) return cur;
+    const next = new Set(cur);
+    if (on) next.add(id); else next.delete(id);
+    return next;
+  });
+  // an address that names another card opens that one too (state adjusted while rendering, not in an effect)
+  const [seenHash, setSeenHash] = useState(hash);
+  if (hash !== seenHash) {
+    setSeenHash(hash);
+    if (hash.startsWith('#tts-')) setOpened((cur) => new Set(cur).add(hash.slice(1)));
+  }
   const [note, setNote] = useState('');
   const [text, setText] = useState<string | null>(null);
   const [pdf, setPdf] = useState<'idle' | 'making' | string>('idle');
@@ -91,7 +105,7 @@ function Body({ rec }: { rec: StoredWarband }) {
 
   // a card's ⋯ menu lands here on its entry
   useEffect(() => {
-    if (hash.startsWith('#tts-')) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+    if (hash.startsWith('#tts-')) document.getElementById(hash.slice(1))?.scrollIntoView?.({ block: 'start' });
   }, [hash]);
   useEffect(() => {
     if (!note) return;
@@ -125,8 +139,14 @@ function Body({ rec }: { rec: StoredWarband }) {
       <section className={styles.group} aria-labelledby="ex-tts">
         <h2 id="ex-tts">Tabletop Simulator</h2>
         <p className={ui.muted}>Two fields for each model, each copied on its own into the model’s Name and Description. Colour codes like [7AD1A4] show as colours there. A henchman group gives one card for each man, with his own name.</p>
+        {cards.length > 1 && (
+          <div className={styles.cardTools}>
+            <button type="button" className={ui.buttonQuiet} onClick={() => setOpened(new Set(cards.map((c) => c.id)))}>Expand all</button>
+            <button type="button" className={ui.buttonQuiet} onClick={() => setOpened(new Set())}>Collapse all</button>
+          </div>
+        )}
         <div className={styles.cards}>
-          {cards.map((c) => <Card key={c.id} c={c} open={hash === `#${c.id}`} onCopied={copied} />)}
+          {cards.map((c) => <Card key={c.id} c={c} open={opened.has(c.id)} onOpen={(on) => setOpen(c.id, on)} onCopied={copied} />)}
           {cards.length === 0 && <p className={ui.muted}>No warriors yet.</p>}
         </div>
       </section>
