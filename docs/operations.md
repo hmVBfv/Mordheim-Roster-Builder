@@ -456,6 +456,13 @@ bricht ab, solange er nicht eingebunden ist.
   `Permissions-Policy`; Anfragen höchstens 6 MB. Die CSP setzt Caddy nur,
   wo die App keine eigene schickt (`?Content-Security-Policy`): Bilder
   kommen mit einer strengeren (`sandbox`), die bleibt.
+- Der **Live-Strom** (`/api/v1/events`, ADR 0020) braucht nichts Eigenes:
+  `reverse_proxy` reicht `text/event-stream` sofort weiter, und `encode`
+  fasst die Antwort wegen `Cache-Control: no-transform` nicht an.
+  `ops/test/caddy.sh` prüft beides gegen eine Nachbildung. Von Hand, nach dem
+  Deploy: im Browser (angemeldet) in den Entwicklerwerkzeugen unter
+  „Netzwerk“ den Eintrag `events` öffnen – er bleibt offen, und im Reiter
+  „EventStream“ erscheint alle 20 Sekunden ein `ping`.
 
 ### `app.env` (Schlüssel, keine Werte im Repo)
 
@@ -537,6 +544,11 @@ Exit-Codes: 0 deployt; 1 nicht deployt, der vorige Stand läuft wieder;
 2 auch der vorige Stand ist nicht gesund – dann das Ausfall-Handbuch. Alles
 steht zusätzlich in `~/server/roster/ops.log`.
 
+Ein Deploy (und jeder Neustart) trennt die **Live-Ströme** (ADR 0020): der
+Server schließt sie beim Beenden, nach 3 Sekunden trennt er, was noch hängt
+(`stop_grace_period` ist 20 Sekunden). Die offenen Apps verbinden sich nach
+wenigen Sekunden neu und fragen alles neu; niemand muss etwas tun.
+
 ## 6. Backups
 
 | Wann | Was | Wohin |
@@ -614,6 +626,7 @@ nicht, und die Meldung kommt über healthchecks.io.
 | `roster-app` | 256 MB, 1,5 Kerne (gemessen im Rauchtest der CI: rund 30 MB; über 160 MB schlägt er fehl) |
 | `roster-staging` | 192 MB, 1 Kern |
 | `roster-caddy` | 128 MB (typisch < 50 MB) |
+| Live-Ströme | ein offener Strom je Gerät; höchstens 6 je Konto, 150 insgesamt (`server/src/live.ts`), im Speicher von `roster-app` (wenige KB je Strom) |
 | Agenten-Läufe | 2 GB, 2 Kerne je Rolle, nie parallel |
 | Jellyfin, TeamSpeak | wie bisher |
 

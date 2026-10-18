@@ -3,8 +3,10 @@
 # NET_BIND_SERVICE, no-new-privileges, its directories root's) it still
 # starts and answers on 443, sends the headers of docs/security.md, and keeps
 # a Content-Security-Policy the app set itself (security review OPS-4,
-# OPS-5). The Caddyfile is install.sh's, with a local certificate instead of
-# Let's Encrypt and a stand-in for the app on 127.0.0.1:18080.
+# OPS-5), and passes the live stream (ADR 0020) on as it is written instead of
+# holding it back or compressing it. The Caddyfile is install.sh's, with a
+# local certificate instead of Let's Encrypt and a stand-in for the app on
+# 127.0.0.1:18080 (the stream's stand-in on 18081).
 # Needs docker with the compose plugin, root (the directories), port 443 free.
 # Run by CI: sudo ops/test/caddy.sh
 set -euo pipefail
@@ -24,7 +26,9 @@ expect() { # expect <what> <command...>
   fi
 }
 compose() { docker compose --project-directory "$work/r" -f "$work/r/compose.yaml" "$@"; }
+sse_pid=
 cleanup() {
+  [ -z "$sse_pid" ] || kill "$sse_pid" 2>/dev/null || true
   compose down >/dev/null 2>&1 || true
   rm -rf "$work"
 }
@@ -45,6 +49,9 @@ cat >>"$work/Caddyfile" <<'EOF'
 
 # any host: reverse_proxy passes the visitor's Host (roster.test) on
 http://:18080 {
+	handle /api/v1/events {
+		reverse_proxy 127.0.0.1:18081
+	}
 	handle /picture {
 		header Content-Security-Policy "default-src 'none'; img-src 'self'; sandbox"
 		respond "picture"
@@ -57,6 +64,30 @@ if ! grep -q 'tls internal' "$work/r/Caddyfile" || ! grep -q 'reverse_proxy 127.
   echo "could not adapt the Caddyfile" >&2
   exit 1
 fi
+
+# the stream as the app sends it (server/src/routes-live.ts): a first line at once, the next one four seconds later
+cat >"$work/sse.py" <<'EOF'
+import http.server, time
+
+class Stream(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
+        self.send_header('Cache-Control', 'no-store, no-transform')
+        self.end_headers()
+        self.wfile.write(b': connected\n\n')
+        self.wfile.flush()
+        time.sleep(4)
+        self.wfile.write(b'event: ping\ndata: 0\n\n')
+        self.wfile.flush()
+
+    def log_message(self, *args):
+        pass
+
+http.server.ThreadingHTTPServer(('127.0.0.1', 18081), Stream).serve_forever()
+EOF
+python3 "$work/sse.py" &
+sse_pid=$!
 
 # as install.sh leaves them: Caddy's directories root's, 700
 install -d -m 750 "$data"
@@ -78,6 +109,17 @@ docker inspect -f '{{.HostConfig.ReadonlyRootfs}} {{.HostConfig.CapDrop}} {{.Hos
 expect "read-only, only NET_BIND_SERVICE, no-new-privileges" grep -Eqx 'true \[(CAP_)?ALL\] \[(CAP_)?NET_BIND_SERVICE\] \[no-new-privileges:true\]' "$work/inspect"
 expect "what Caddy wrote is root's" test -z "$(find "$data/caddy" ! -user root -print -quit)"
 expect "  and it wrote its certificate" test -n "$(find "$data/caddy/data" -name '*.crt' -print -quit)"
+
+# the stream: the first line must be out while the second is still four seconds away, and nothing may be compressed
+curl -sk -N --noproxy '*' -m 10 -H 'Accept-Encoding: gzip, zstd' --resolve roster.test:443:127.0.0.1 -D "$work/sse-headers" -o "$work/sse-body" https://roster.test/api/v1/events &
+curl_pid=$!
+sleep 2
+expect "the stream's first line arrives at once, not with the last" sh -c "grep -q ': connected' '$work/sse-body' && ! grep -q ping '$work/sse-body'"
+wait "$curl_pid" || true
+expect "  and the next one follows" grep -q 'event: ping' "$work/sse-body"
+expect "  as an event stream" grep -qi '^content-type: text/event-stream' "$work/sse-headers"
+expect "  not compressed" sh -c "! grep -qi '^content-encoding:' '$work/sse-headers'"
+expect "  and with the app's no-transform" grep -qi '^cache-control: no-store, no-transform' "$work/sse-headers"
 
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed"
