@@ -2943,3 +2943,50 @@ order they arrived) and `/bugs/:id` takes either.
 them and checks that every npm script and subcommand they name exists and that
 the reviewer has no tool that writes. The acceptance for 4c, a real bug from
 report to "fixed in <version>", waits for the first real report.
+
+## October 18, 2026 — live updates
+
+The question that started it was a simple one: if Ben writes a note, does Anna
+have to reload to see it? Until now, yes, or wait. Every screen polled on its
+own clock (the sync every ten seconds, notes and pictures ten, the background
+twenty, the timeline fifteen, the battle five), and half the screens, the
+campaign, the chronicle, the world, scenarios, questions and the lists, only
+loaded when you opened them. Nothing was wrong with writing — the server is
+the single writer and every change carries its base revision — it was only
+that nobody heard about it.
+
+The shape is Server-Sent Events, but with one hard rule: the stream carries
+signals, never content. "Campaign X has news", "your warbands have news", and
+that is all; no title, no name, not even a sequence number (it counts every
+campaign's activity, which would tell one campaign's members how busy another
+is). The app asks the same endpoints it always asked, so everything about who
+may see what stays in `can()` and the filters, and a bug in the live code can
+make an app reload for nothing but cannot leak a note. Who gets a signal is
+decided by the visibility the audit log already records: public entries reach
+the active members, leader entries the leaders, a sealed note only its author,
+admin entries nobody. I considered WebSocket (a second write path next to the
+endpoints with their conflict checks, for no gain) and sending the content
+(a second place to get filtering wrong), and dropped both.
+
+Things that bit me on the way:
+
+- Fastify's `onClose` does not end a stream, so `app.close()` hung; the hook
+  that runs before the server stops listening is `preClose`.
+- After a client aborts a stream, Node 22 does not treat the next keep-alive
+  connection as idle, so `server.close()` waited for the client's own keep-alive
+  timeout. I reproduced it in plain Node, then made the tests use a plain
+  `http` client without keep-alive and gave `start.ts` a grace period after
+  which it cuts what is left.
+- A heartbeat sent as an SSE comment never reaches JavaScript, so the app could
+  not tell a dead line from a quiet one. It is an `event: ping` now, and the
+  app reconnects after seventy seconds of silence.
+- The first full run of the server tests was reported green while the real run
+  was still going in the background (my wrapper returned at once) and the
+  leak matrix was red because of the shutdown issue above. I said so and ran it
+  again properly.
+- The old timers stay as the fallback and only thin out while the stream is
+  open, so a browser or proxy that refuses the stream costs nothing but the
+  old wait. Signals that arrive while the app is away are not replayed; the
+  app asks for everything it shows when the stream opens, when it comes back to
+  the front and after a long silence, which is what makes losing a signal
+  harmless.
