@@ -52,6 +52,17 @@
   --tap: 44px;
   --nav-height: 60px;
   --sidebar-width: 220px;
+  /* the size of a control's label: a little under the running text (18 px) */
+  --control-font: 1.0625rem;
+}
+
+/* with a mouse or a trackpad (no finger) controls are smaller and calmer:
+   36 px is still a comfortable target for a pointer (docs/ui.md §5) */
+@media (hover: hover) and (pointer: fine) {
+  :root {
+    --tap: 36px;
+    --control-font: 1rem;
+  }
 }
 
 /* on paper always light – whichever theme is chosen (the attribute
