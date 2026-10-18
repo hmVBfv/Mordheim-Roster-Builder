@@ -20,9 +20,11 @@ export function xpNote(xp: XpView): string {
 /** For a screen reader, on the bar. */
 export const xpWords = (xp: XpView): string => `Experience ${xp.value}, ${xpNote(xp)}`;
 
-/* One segment per step: below the starting experience dashed, reached filled
-   (the ones whose advance is still to be taken in gold), the next one filling
-   as the experience grows. */
+/* One segment per step, filled from the left up to where he stands – the
+   steps below his starting experience as well (Rob, 19.10.2026: a bar that
+   turned green only in the middle looked wrong); those whose advance is still
+   to be taken in gold, the next one filling as the experience grows. The
+   card's own steps keep the starting experience apart (Steps in Detail.tsx). */
 export function XpBar({ xp }: { xp: XpView }) {
   const reached = xp.steps.filter((s) => s.state === 'on').length;
   let seen = 0;
@@ -32,7 +34,7 @@ export function XpBar({ xp }: { xp: XpView }) {
       {xp.steps.map((s) => {
         if (s.state === 'on') seen++;
         const due = s.state === 'on' && seen > reached - xp.owed;
-        const cls = s.state === 'next' ? styles.next : due ? styles.due : s.state === 'on' ? styles.on : s.state === 'base' ? styles.base : undefined;
+        const cls = s.state === 'next' ? styles.next : due ? styles.due : s.state === 'on' || s.state === 'base' ? styles.on : undefined;
         return <i key={s.at} className={cls} style={s.state === 'next' ? { '--p': `${p}%` } as CSSProperties : undefined} />;
       })}
     </span>

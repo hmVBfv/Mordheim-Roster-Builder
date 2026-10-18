@@ -416,11 +416,6 @@
   background: var(--gold);
 }
 
-.xpBar i.base {
-  background: transparent;
-  border: 1px dashed var(--border);
-}
-
 .xpBar i.next::after {
   content: '';
   position: absolute;
