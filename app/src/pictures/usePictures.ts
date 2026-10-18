@@ -3,6 +3,7 @@
    the screen is visible; what this device has not sent yet laid over them,
    shown from its own bytes. */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { errorText, type Me } from '../account/api.ts';
 import { flushOutbox, usePictureOutbox, type PictureItem } from '../battle/outbox.ts';
 import { db, type OutboxItem } from '../db/db.ts';
@@ -39,8 +40,9 @@ export function usePictures(cid: string, me: Me | null, every = PICTURES_EVERY_M
     let live = true;
     void cachedPictures(cid).then((p) => { if (live && p) setPictures((cur) => cur ?? p); });
     void refresh();
-    const t = setInterval(() => { if (document.visibilityState === 'visible') void refresh(); }, every);
-    return () => { live = false; clearInterval(t); };
+    const stop = pollWhileVisible(refresh, every);
+    const off = onCampaign(cid, refresh);
+    return () => { live = false; stop(); off(); };
   }, [cid, refresh, every]);
   // the bytes still on this device, each with an address while it waits
   const urls = useMemo(() => new Map(outbox.filter((i) => i.op === 'attachment.put').flatMap((i) => { const u = localUrl(i.body as PictureItem); return u ? [[i.targetId, u] as const] : []; })), [outbox]);

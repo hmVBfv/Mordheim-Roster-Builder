@@ -5,6 +5,7 @@
    the whole can be downloaded as one .md file. Reading works from what the
    device kept; the text of a chapter is fetched when it is opened. */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useOnCampaign } from '../live/live.ts';
 import { errorText } from '../account/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
 import { cachedTimeline, getChapter, getTimeline, type Chapter, type ChapterSummary, type TimelineData } from '../timeline/api.ts';
@@ -58,6 +59,7 @@ export function ChronicleTab({ id, view, lead }: { id: string; view: CampaignVie
 
   /** After a draft was published: the timeline anew, so the chapter is there. */
   const reload = useCallback(() => { getTimeline(id).then((d) => { setData(d); setError(null); }).catch((e: unknown) => setError(errorText(e))); }, [id]);
+  useOnCampaign(id, reload);
 
   // the chapters in the order of the story, each with the part of the story it stands in
   const chapters = useMemo(() => (data

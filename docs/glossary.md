@@ -248,6 +248,7 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Spiegel (Legacy-Tests gegen `core/`) | Mirror | `core/test/mirror/` |
 | Warteschlange | Outbox | Dexie-Tabelle `outbox` |
 | Synchronisation | Sync | `GET /api/v1/sync` |
+| Live-Strom, Signal | Live updates (no label) | `GET /api/v1/events`, `server/src/live.ts`, `app/src/live/live.ts`, ADR 0020 |
 | Epoche | Epoch | `meta.epoch`; neu bei jedem Start auf einer Snapshot-Kopie (`server/src/db.ts`) |
 | Testinstanz | Staging | Container `roster-staging`, `roster-deploy --staging` |
 | Testpasswort (der Testinstanz) | – | `secrets/staging.pass`, `roster-cli test-accounts`, `ROSTER_STAGING=1` |

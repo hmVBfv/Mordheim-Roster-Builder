@@ -73,6 +73,8 @@ export const ACTIONS = {
   /** Who signed in when, from where (Rob, 03.10.2026: log data next to logins). */
   'admin.logins.read': { who: 'admin' },
   'admin.audit.read': { who: 'admin' },
+  /** The live stream (ADR 0020): whoever is signed in hears that something changed – a campaign they are in, or the sync of their warbands – never what. Who is told of which change is decided by live.ts from the visibility the audit log carries. */
+  'events.read': { who: 'user' },
   /** One's own warbands: the list, and what changed since a cursor (GET /sync). */
   'warbands.list': { who: 'user' },
   /** A new warband of one's own (made, imported or copied). */

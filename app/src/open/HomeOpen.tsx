@@ -4,6 +4,7 @@
    the device), then from the server; without a connection the last seen
    stays, as it is. */
 import { useEffect, useState } from 'react';
+import { useOnAnyCampaign } from '../live/live.ts';
 import { cachedCampaign, cachedCampaigns, getCampaign, listCampaigns, type CampaignView } from '../campaign/api.ts';
 import { cachedQuestions, getQuestions, type Question } from '../questions/api.ts';
 import { Incoming } from '../share/Incoming.tsx';
@@ -34,6 +35,8 @@ export function HomeOpen({ me }: { me: string }) {
     void load(me, true).then((r) => { if (live) setLoaded(r); }, () => undefined);
     return () => { live = false; };
   }, [me]);
+  // what is open for you changes when anything in any of your campaigns does
+  useOnAnyCampaign(() => { void load(me, true).then(setLoaded, () => undefined); });
   const items = loaded.flatMap((l) => openItems(l.view, me, l.asked, local ?? []));
   return (
     <>

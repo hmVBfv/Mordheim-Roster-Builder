@@ -1,5 +1,6 @@
 /* A campaign's questions as this device has them: last seen first, then from the server (phase 4b3a). */
 import { useCallback, useEffect, useState } from 'react';
+import { useOnCampaign } from '../live/live.ts';
 import { ApiError, errorText } from '../account/api.ts';
 import { cachedQuestions, getQuestions, type Kept } from './api.ts';
 
@@ -17,5 +18,6 @@ export function useQuestions(cid: string, enabled = true) {
     reload();
     return () => { live = false; };
   }, [cid, enabled, reload]);
+  useOnCampaign(enabled ? cid : undefined, reload);
   return { data, error, reload };
 }

@@ -15,6 +15,7 @@ import { snapshot } from './backup.ts';
 import { readConfig, type Config } from './config.ts';
 import { dbPath, openDb, settleEpoch, type DB } from './db.ts';
 import { Health } from './health.ts';
+import type { LiveOptions } from './live.ts';
 import { loggerOptions } from './log.ts';
 import type { HashCost } from './passwords.ts';
 import { currentVersion, loadMigrations, migrate, pending, MIGRATIONS_DIR } from './migrations.ts';
@@ -41,6 +42,10 @@ export interface StartOptions {
   readRoutes?: () => string;
   /** scrypt's cost, for tests. */
   hashCost?: HashCost;
+  /** The live stream's limits, for tests (ADR 0020). */
+  live?: Partial<LiveOptions>;
+  /** How long a stop waits for connections to finish before it cuts them (default 3 s). */
+  closeGraceMs?: number;
 }
 
 /** Starts the server; throws (VolumeError, ConfigError) only when it must not run at all. */
@@ -85,6 +90,7 @@ export async function start(opts: StartOptions = {}): Promise<Started> {
   const app = buildApp({
     config, health, files, trustProxy: trustedProxies(config.trustProxy, opts.readRoutes), logger: log,
     db: ready ? db : null, now, totpKey: config.totpKey, hashCost: opts.hashCost,
+    ...(opts.live ? { live: opts.live } : {}),
   });
   await app.listen({ host: config.host, port: config.port });
   log.info({ event: 'started', version: config.version, ready, files: files.count }, 'server started');
@@ -98,7 +104,15 @@ export async function start(opts: StartOptions = {}): Promise<Started> {
     async close() {
       if (closed) return;
       closed = true;
-      await app.close();
+      // A connection that Node does not count as idle (a keep-alive socket after a stream the app hung up on) would hold
+      // the stop until its client lets go; requests in flight get this long, then the rest is cut.
+      const cut = setTimeout(() => app.server.closeAllConnections(), opts.closeGraceMs ?? 3000);
+      cut.unref();
+      try {
+        await app.close();
+      } finally {
+        clearTimeout(cut);
+      }
       db?.close();
     },
   };

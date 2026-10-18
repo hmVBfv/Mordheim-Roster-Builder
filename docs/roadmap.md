@@ -369,6 +369,19 @@ sieht nur Meldung und Diff und kann nichts ändern. **Offen für die Abnahme:**
 ein echter Bug, der den ganzen Weg läuft – das geschieht mit der ersten echten
 Meldung.
 
+## Zwischenschritt – Live-Aktualisierung (ADR 0020)
+
+Rob, 18.10.2026: Änderungen anderer Spieler sollen direkt erscheinen, ohne
+Neuladen. **Stand 18.10.2026:** umgesetzt – `GET /api/v1/events` (Server-Sent
+Events, nur Signale), Hub im Speicher (`server/src/live.ts`), `events.read`
+in Policy und Leak-Matrix; in der App `app/src/live/live.ts`: ein Strom je
+angemeldeter App, Kampagne, Notizen, Chronik, Bilder, Gefecht, Zeitleiste,
+Hintergrund, Welt, Szenarien, Fragen, Listen und der Sync fragen bei einem
+Signal neu; die alten Timer bleiben als Rückfall (jede sechste Runde, solange
+der Strom steht). Kein Eintrag im Header (die neue Oberfläche entscheidet, ob
+„live“ sichtbar wird). Abnahme: zwei Browser, ein Spieler schreibt eine Notiz,
+der andere sieht sie nach etwa einer Sekunde.
+
 ## Phase 5 – Extras
 
 - Volltextsuche (SQLite FTS5) über Notizen, Zeitleiste, Lebensläufe.

@@ -2,6 +2,7 @@
    one, straight to it – and starting a new one, which makes its starter the
    first leader and so needs the authenticator (ADR 0008). */
 import { useEffect, useState } from 'react';
+import { useOnAnyCampaign } from '../live/live.ts';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
@@ -60,6 +61,9 @@ export function Campaigns() {
     listCampaigns(userId).then((c) => { if (live) { setList(c); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
     return () => { live = false; };
   }, [userId]);
+  useOnAnyCampaign(() => {
+    if (userId) listCampaigns(userId).then((c) => { setList(c); setError(null); }).catch(() => undefined);
+  });
 
   if (session.status === 'loading') return null;
   if (!user) {
