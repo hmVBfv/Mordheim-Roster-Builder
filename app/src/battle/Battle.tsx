@@ -7,7 +7,7 @@
    connection loses nothing. A leader closes the battle at the end (phase
    4a4): the protocol is fixed, sealed notes open, and each player goes on
    to the aftermath of their warband. */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { Link, useParams } from 'react-router';
 import { errorText, type Me } from '../account/api.ts';
@@ -34,6 +34,7 @@ import { usePicks, useWarbandLoader } from './picks.ts';
 import styles from './Battle.module.css';
 import { enqueue, flushOutbox, useOutbox } from './outbox.ts';
 import { OwnPlan } from '../plans/Plans.tsx';
+const BattleOpponents = lazy(() => import('../opponents/Opponents.tsx').then((m) => ({ default: m.BattleOpponents })));
 import { BeforeAfter, VersionLine, useConfirm } from './Versions.tsx';
 
 export const POLL_MS = 5000;
@@ -158,6 +159,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const loadWarband = useWarbandLoader(cid);
   const [wantPicks, setWantPicks] = useState(false);
   const fighters = useMemo(() => view.participants.map((p) => p.warbandId), [view.participants]);
+  const fighterRefs = useMemo(() => view.participants.map((p) => ({ id: p.warbandId, name: p.name || p.wbName })), [view.participants]);
   const { picks, error: picksError } = usePicks(fighters, loadWarband, wantPicks);
   // notes of this battle, everybody's (phase 4a3), laid into the protocol by turn
   const noteState = useNotes(cid, user, POLL_MS);
@@ -298,6 +300,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
               ))}
             </ul>
           </section>
+          {lead && !closed && <Suspense fallback={null}><BattleOpponents cid={cid} fighters={fighterRefs} notify={notify} /></Suspense>}
           {lead && !past && (
             <section aria-labelledby="b-compare" className={ui.page}>
               <h2 id="b-compare">Before and after</h2>

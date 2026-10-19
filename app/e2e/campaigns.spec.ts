@@ -1100,6 +1100,33 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await shot(page, `${theme}-opponents-tts`);
   });
+
+  test(`opponents at the game night: a leader sets one against the warbands while the battle runs, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.opponentGroupFrom(c.id, { name: 'The ferrymen', profiles: [{ id: 'p1', name: 'Old Marek', type: 'Hero', count: 1, profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '2', I: '4', A: '2', Ld: '8' }, sv: '5+', skills: [], equipment: '', rules: '', note: '', from: null }] });
+    await page.goto(`campaign/${c.id}/battles/${b.id}`);
+    await expect(page.getByRole('heading', { name: 'Opponents ⚑' })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Opponent groups' }).getByText('Old Marek')).toBeVisible();
+    await page.getByRole('button', { name: 'New group' }).click();
+    const form = page.getByRole('dialog', { name: 'New group of opponents' });
+    await form.getByLabel('Group name').fill('Latecomers');
+    await form.getByRole('button', { name: 'Write your own' }).click();
+    await form.getByLabel('Name', { exact: true }).fill('Stray ogre');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-battle-form`);
+    await form.getByRole('button', { name: 'Save the group' }).click();
+    const groups = page.getByRole('list', { name: 'Opponent groups' });
+    await expect(groups.getByText('Stray ogre')).toBeVisible();
+    await expect(page.getByRole('button', { name: '+ Casualty' })).toBeVisible();
+    await page.getByRole('heading', { name: 'Opponents ⚑' }).scrollIntoViewIfNeeded();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-battle`);
+  });
 }
 
 /* The AI pack and the style guide (phase 4b4a): a leader's prompt for whoever writes the next chapter, and the style it carries. */

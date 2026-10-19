@@ -3260,3 +3260,25 @@ jsdom needs several the first time the rules data is read; the pickers now
 have their own Suspense boundary, so the group form never blanks while the
 rules load.
 
+## October 19, 2026 — opponents at the game table
+
+Rob asked whether an opponent can be made while the battle is already running.
+It could not: the groups lived under Background, a full-screen game night away
+from the table, so a leader who needed a stray ogre now had to leave the
+protocol, find the tab and come back.
+
+The Opponents section is now one component with two homes. On the game night's
+page a leader with the authenticator gets it under "Who fought" while the battle
+runs – the groups, "New group", "Edit" and the TTS cards; the campaign's own
+skills stay with the tab, but a skill typed into a profile can still be kept
+among them on the spot. It takes a list of warbands instead of a whole campaign
+view, so the battle page, which has none, can offer "Our warriors" from the
+campaign's enrolments the device already kept (the fighters otherwise). The panel
+is loaded on demand, so the battle page's start costs nothing more; and for a
+player, a leader without the authenticator or a closed battle it is not
+rendered and the server is not asked.
+
+A wrong turn in the test, not in the code: the second case showed the panel in a
+closed battle because the device still held the first case's cached view under
+the same ids. A real device changes accounts with its cache cleared; the test
+now does the same between its cases.

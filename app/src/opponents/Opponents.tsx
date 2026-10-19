@@ -12,7 +12,7 @@ import type { OpponentProfile, OpponentSkill, OpponentTemplate, StatKey, Templat
 import { Suspense, useDeferredValue, useEffect, useId, useMemo, useState } from 'react';
 import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
-import { readWarband, type CampaignView } from '../campaign/api.ts';
+import { cachedCampaign, readWarband } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { Card } from '../roster/TtsCard.tsx';
@@ -28,9 +28,13 @@ const KIND_LABEL: Record<TemplateKind, string> = { unit: 'Warbands', hired: 'Hir
 const TYPES = ['Hero', 'Henchman', 'Hired Sword', 'Dramatis Persona', 'Animal', 'Monster'];
 const SHOWN = 40;
 
+/** A warband of the campaign whose warriors can be copied: its id and the name it plays under. */
+export interface WarbandRef { id: string; name: string }
+
 const statline = (p: Pick<OpponentProfile, 'profile' | 'sv'>) => `${STATS.map((k) => `${k} ${(p.profile[k] ?? '').trim() || '-'}`).join(' ')} Sv ${p.sv.trim() || '-'}`;
 
-export function OpponentsSection({ id, view, notify }: { id: string; view: CampaignView; notify: (text: string) => void }) {
+/** `compact`: the game night's own panel – the groups only; the campaign's own skills stay with the Background tab. */
+export function OpponentsSection({ id, warbands, notify, compact = false }: { id: string; warbands: WarbandRef[]; notify: (text: string) => void; compact?: boolean }) {
   const online = useOnline();
   const [data, setData] = useState<Opponents | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -53,8 +57,10 @@ export function OpponentsSection({ id, view, notify }: { id: string; view: Campa
   const skills = data?.skills ?? [];
   return (
     <section className={ui.page} aria-labelledby="opp-title">
-      <h2 id="opp-title" className={styles.title}>Opponents</h2>
-      <p className={ui.muted}>The men and beasts you set against the warbands, in groups. Copy a profile from any model of the game or write your own; every profile is a Tabletop Simulator card. Only leaders see them.</p>
+      <h2 id="opp-title" className={styles.title}>Opponents{compact ? ' ⚑' : ''}</h2>
+      <p className={ui.muted}>{compact
+        ? '⚑ Only leaders see this. Set an opponent against the warbands while the battle runs: copy a profile from any model of the game or write your own; every profile is a Tabletop Simulator card.'
+        : 'The men and beasts you set against the warbands, in groups. Copy a profile from any model of the game or write your own; every profile is a Tabletop Simulator card. Only leaders see them.'}</p>
       {error && <p className={ui.message} role="status">{error}{data ? ' Shown as last seen.' : ''}</p>}
       {!data && !error && <p className={ui.muted}>Loading the opponents…</p>}
       {data && groups.length === 0 && <p className={ui.muted}>No group yet.</p>}
@@ -82,23 +88,28 @@ export function OpponentsSection({ id, view, notify }: { id: string; view: Campa
       </ul>
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => { setEditing((e) => ({ group: null, key: (e?.key ?? 0) + 1 })); openGroup(); }}>New group</button></div>
 
-      <h3 className={styles.sub}>Our own skills</h3>
-      <p className={ui.muted}>Skills the game does not have, with the text a card shows for them. They can be added to any profile.</p>
-      {data && skills.length === 0 && <p className={ui.muted}>No skill of our own yet.</p>}
-      <ul className={styles.skills} aria-label="Our own skills">
-        {skills.map((s) => (
-          <li key={s.id}>
-            <strong>{s.name}</strong>
-            {s.text && <span className={styles.meta}>{s.text}</span>}
-            <button type="button" className={ui.buttonQuiet} aria-label={`Edit the skill ${s.name}`} onClick={() => { setSkill((k) => ({ skill: s, key: (k?.key ?? 0) + 1 })); openSkill(); }}>Edit</button>
-          </li>
-        ))}
-      </ul>
-      <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => { setSkill((k) => ({ skill: null, key: (k?.key ?? 0) + 1 })); openSkill(); }}>New skill</button></div>
+      {!compact && (
+        <>
+        <h3 className={styles.sub}>Our own skills</h3>
+        <p className={ui.muted}>Skills the game does not have, with the text a card shows for them. They can be added to any profile.</p>
+        {data && skills.length === 0 && <p className={ui.muted}>No skill of our own yet.</p>}
+        <ul className={styles.skills} aria-label="Our own skills">
+          {skills.map((s) => (
+            <li key={s.id}>
+              <strong>{s.name}</strong>
+              {s.text && <span className={styles.meta}>{s.text}</span>}
+              <button type="button" className={ui.buttonQuiet} aria-label={`Edit the skill ${s.name}`} onClick={() => { setSkill((k) => ({ skill: s, key: (k?.key ?? 0) + 1 })); openSkill(); }}>Edit</button>
+            </li>
+          ))}
+        </ul>
+        <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => { setSkill((k) => ({ skill: null, key: (k?.key ?? 0) + 1 })); openSkill(); }}>New skill</button></div>
+
+        </>
+      )}
 
       <dialog ref={groupRef} className={ui.sheet} aria-labelledby="opp-group-title">
         {editing && (
-          <GroupForm key={editing.key} cid={id} view={view} group={editing.group} skills={skills} online={online} close={closeGroup}
+          <GroupForm key={editing.key} cid={id} warbands={warbands} group={editing.group} skills={skills} online={online} close={closeGroup}
             onSkill={refresh}
             onSaved={(g, gone) => { refresh(); notify(gone ? `“${g.name}” taken out.` : `“${g.name}” saved. Only leaders see it.`); }} />
         )}
@@ -173,31 +184,30 @@ function SkillForm({ cid, skill, online, close, onSaved }: { cid: string; skill:
 }
 
 /** The warriors of the campaign's warbands as templates, read when first asked for. */
-function useWarriors(cid: string, view: CampaignView, want: boolean) {
+function useWarriors(cid: string, warbands: WarbandRef[], want: boolean) {
   const data = useGameData();
   const [list, setList] = useState<OpponentTemplate[] | null>(null);
   const [missing, setMissing] = useState(0);
   useEffect(() => {
     if (!want || list) return;
     let live = true;
-    const active = view.enrolments.filter((e) => e.status === 'active');
-    void Promise.all(active.map(async (e) => {
-      const w = await readWarband(cid, e.warbandId).catch(() => null);
+    void Promise.all(warbands.map(async (e) => {
+      const w = await readWarband(cid, e.id).catch(() => null);
       const s = w ? readSave(data, w.head.data) : null;
-      return s ? core.warriorTemplates(core.ctxOf(data, s), e.warbandId, e.name || e.wbName) : null;
+      return s ? core.warriorTemplates(core.ctxOf(data, s), e.id, e.name) : null;
     })).then((r) => { if (live) { setList(r.flatMap((x) => x ?? [])); setMissing(r.filter((x) => !x).length); } });
     return () => { live = false; };
-  }, [cid, view, want, list, data]);
+  }, [cid, warbands, want, list, data]);
   return { list, missing };
 }
 
-function TemplatePicker({ cid, view, onPick, onClose }: { cid: string; view: CampaignView; onPick: (t: OpponentTemplate) => void; onClose: () => void }) {
+function TemplatePicker({ cid, warbands, onPick, onClose }: { cid: string; warbands: WarbandRef[]; onPick: (t: OpponentTemplate) => void; onClose: () => void }) {
   const ids = useId();
   const data = useGameData();
   const all = useMemo(() => core.opponentTemplates(data), [data]);
   const [query, setQuery] = useState('');
   const [kinds, setKinds] = useState<TemplateKind[]>([]);
-  const warriors = useWarriors(cid, view, kinds.length === 0 || kinds.includes('warrior'));
+  const warriors = useWarriors(cid, warbands, kinds.length === 0 || kinds.includes('warrior'));
   const q = useDeferredValue(query);
   const found = useMemo(() => core.searchTemplates([...(warriors.list ?? []), ...all], q, kinds), [all, warriors.list, q, kinds]);
   const toggle = (k: TemplateKind) => setKinds((cur) => (cur.includes(k) ? cur.filter((x) => x !== k) : [...cur, k]));
@@ -325,8 +335,8 @@ function ProfileEditor({ cid, p, own, open, onChange, onRemove, onOwn }: {
   );
 }
 
-function GroupForm({ cid, view, group, skills, online, close, onSaved, onSkill }: {
-  cid: string; view: CampaignView; group: Group | null; skills: OwnSkill[]; online: boolean; close: (then?: () => void) => void;
+function GroupForm({ cid, warbands, group, skills, online, close, onSaved, onSkill }: {
+  cid: string; warbands: WarbandRef[]; group: Group | null; skills: OwnSkill[]; online: boolean; close: (then?: () => void) => void;
   onSaved: (g: { name: string }, gone?: boolean) => void; onSkill: () => void;
 }) {
   const ids = useId();
@@ -374,7 +384,7 @@ function GroupForm({ cid, view, group, skills, online, close, onSaved, onSkill }
         ))}
       </div>
       {full && <p className={ui.muted}>A group holds at most {MAX_PROFILES} profiles.</p>}
-      {picking && !full && <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}><TemplatePicker cid={cid} view={view} onClose={() => setPicking(false)} onPick={(t) => add(core.profileFrom(newId(), t))} /></Suspense>}
+      {picking && !full && <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}><TemplatePicker cid={cid} warbands={warbands} onClose={() => setPicking(false)} onPick={(t) => add(core.profileFrom(newId(), t))} /></Suspense>}
       {!picking && (
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} disabled={full} onClick={() => setPicking(true)}>Copy a model from the game…</button>
@@ -390,4 +400,17 @@ function GroupForm({ cid, view, group, skills, online, close, onSaved, onSkill }
       </div>
     </form>
   );
+}
+
+/** The panel on the game night's page: every warband of the campaign can be copied from, as far as the device knows them; else the fighters. */
+export function BattleOpponents({ cid, fighters, notify }: { cid: string; fighters: WarbandRef[]; notify: (text: string) => void }) {
+  const [all, setAll] = useState<WarbandRef[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    void cachedCampaign(cid).then((v) => {
+      if (live && v) setAll(v.enrolments.filter((e) => e.status === 'active').map((e) => ({ id: e.warbandId, name: e.name || e.wbName })));
+    });
+    return () => { live = false; };
+  }, [cid]);
+  return <OpponentsSection id={cid} warbands={all ?? fighters} notify={notify} compact />;
 }

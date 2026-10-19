@@ -224,3 +224,58 @@ describe('the protocol', () => {
     expect(within(list).queryByRole('button', { name: 'Take over' })).toBeNull();
   });
 });
+
+describe('opponents in a running battle', () => {
+  it('a leader sets an opponent against the warbands without leaving the game night', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.opponentGroupFrom(c.id, { name: 'The ferrymen' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    expect(await screen.findByRole('heading', { name: 'Opponents ⚑' }, { timeout: 15_000 })).toBeTruthy();
+    expect(await within(await screen.findByRole('list', { name: 'Opponent groups' })).findByText('The ferrymen')).toBeTruthy();
+    // no campaign skills here: they stay with the Background tab
+    expect(screen.queryByRole('list', { name: 'Our own skills' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'New group' }));
+    const form = await screen.findByRole('dialog', { name: 'New group of opponents' });
+    await user.type(within(form).getByLabelText('Group name'), 'Latecomers');
+    await user.click(within(form).getByRole('button', { name: 'Write your own' }));
+    await user.type(within(form).getByLabelText('Name'), 'Stray ogre');
+    await user.click(within(form).getByRole('button', { name: 'Save the group' }));
+    await waitFor(() => expect([...srv.state.opponentGroups.values()].map((g) => g.name).sort()).toEqual(['Latecomers', 'The ferrymen']));
+    expect(await screen.findByText('“Latecomers” saved. Only leaders see it.')).toBeTruthy();
+    expect(within(await screen.findByRole('list', { name: 'Opponent groups' })).getByText('Stray ogre')).toBeTruthy();
+    // still on the game night
+    expect(screen.getByRole('button', { name: '+ Casualty' })).toBeTruthy();
+  });
+
+  it('is for leaders with the authenticator only, and only while the battle runs', async () => {
+    // a player
+    let srv = server({ totp: true });
+    let c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others()[0]!, role: 'leader' }, others()[1]!] });
+    let b = srv.addBattle(c.id);
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    expect(await screen.findByRole('heading', { name: 'Who fought' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Opponents/ })).toBeNull();
+    cleanup(); await db.meta.clear(); // the device kept the first campaign's views under the same ids
+    // a leader without the authenticator
+    srv = server({ totp: false });
+    c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    b = srv.addBattle(c.id);
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    expect(await screen.findByRole('heading', { name: 'Who fought' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Opponents/ })).toBeNull();
+    cleanup(); await db.meta.clear();
+    // a leader, the battle closed
+    srv = server({ totp: true });
+    c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    b = srv.addBattle(c.id);
+    b.status = 'closed';
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    expect(await screen.findByRole('heading', { name: 'Who fought' })).toBeTruthy();
+    expect(await screen.findByText(/This battle is closed/)).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: /Opponents/ })).toBeNull();
+    expect(srv.state.calls.filter((x) => x.includes('/opponents'))).toEqual([]);
+  });
+});
