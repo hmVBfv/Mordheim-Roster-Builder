@@ -493,6 +493,14 @@ for (const theme of THEMES) {
     await sheet.getByRole('button', { name: 'Apply' }).click();
     await expect(page.getByRole('button', { name: /^Champion(,|$)/ })).toHaveCount(0);
     await expect(page.getByText(/^Fallen \(\d+\)$/)).toBeVisible();
+    // the Fallen say what was lost with him: experience, equipment, gold
+    await page.getByText(/^Fallen \(\d+\)$/).click();
+    const champion = page.getByRole('region', { name: '1× Champion' });
+    await expect(champion).toContainText(/\d+ Exp · \d+ gc/);
+    await expect(champion).toContainText('Dagger');
+    await expect(page.getByText(/^\d+ gc lost/)).toBeVisible();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-fallen`);
 
     // a Hired Sword rolls a D6 too: on a 1 he is gone
     await (await unit(page, 'Ogre Bodyguard')).getByRole('button', { name: 'Injury for Ogre Bodyguard' }).click();

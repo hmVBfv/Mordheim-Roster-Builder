@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
+import { FallenList } from '../roster/Fallen.tsx';
 import { Board } from '../roster/Board.tsx';
 import { Panel, PanelLink } from '../roster/Panel.tsx';
 import { usePrinting } from '../roster/Print.tsx';
@@ -277,12 +278,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
             <p className={`${ui.card} ${ui.muted}`}>No warriors yet. Recruit your Heroes and Henchmen: {v.gold} gc to spend.</p>
           )}
-          {v.fallen.length > 0 && (
-            <details className={ui.card}>
-              <summary className={board.fallen}>Fallen ({v.fallen.length})</summary>
-              <ul>{v.fallen.map((f, i) => <li key={i}>{f}</li>)}</ul>
-            </details>
-          )}
+          <FallenList f={v.fallen} />
         </>}
         panel={
           <Panel foot={<>
