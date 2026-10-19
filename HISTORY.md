@@ -3344,7 +3344,7 @@ campaign near 250 kB while the phone test stays what it is – more would need
 a desktop profile of its own, which nobody has asked for.
 
 So the campaign gets 250 kB and the Quick Build keeps 200 kB (ADR 0021,
-proposed). The Quick Build is what a newcomer opens on a phone from a link,
+accepted by Rob on October 19). The Quick Build is what a newcomer opens on a phone from a link,
 without cache or account, and the two flavours share nearly all their code:
 the extra room is only ever filled by code that belongs to the campaign alone.
 The padding was code that mostly sat idle at start; code that runs at start

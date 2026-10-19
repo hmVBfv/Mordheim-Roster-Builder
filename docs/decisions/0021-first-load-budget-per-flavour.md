@@ -1,5 +1,5 @@
 # 0021 – Erste-Laden-Grenze je Ausgabe: Kampagne 250 KB, Quick Build 200 KB
-Status: vorgeschlagen · Datum: 2026-10-19 · ergänzt [0014](0014-performance-budgets-in-ci.md)
+Status: angenommen (Rob, 19.10.2026) · Datum: 2026-10-19 · ergänzt [0014](0014-performance-budgets-in-ci.md)
 
 ## Kontext
 ADR 0014 setzt für das JavaScript beim ersten Laden eine Grenze von 200 KB
