@@ -21,6 +21,8 @@ import { putEntry as putBackground } from '../src/background.ts';
 import { putQuestion } from '../src/questions.ts';
 import { releaseScenario, putScenario } from '../src/scenarios.ts';
 import { putDraft } from '../src/chapter-drafts.ts';
+import { putGroup, putSkill } from '../src/opponents.ts';
+import { putPlan } from '../src/plans.ts';
 import { putStyle } from '../src/style.ts';
 import { reportBug } from '../src/bugs.ts';
 import { addReputation, putFaction, putNpc } from '../src/world.ts';
@@ -200,6 +202,18 @@ describe('leak-test matrix', () => {
     // style guides: one in the victim's campaign no role of the matrix may read, one in the admin's, which the probes read and change
     const secretStyle = putStyle(s.db, theirs.id, { text: 'STYLE-SECRET: never name the Countess.', baseSeq: 0 }, victim.id, t0);
     if (!secretStyle.ok) throw new Error(secretStyle.error);
+    const secretPlan = putPlan(s.db, theirs.id, 2, { text: 'PLAN-SECRET: the ferryman dies at the jetty.', baseSeq: 0 }, victim.id, t0);
+    if (!secretPlan.ok) throw new Error(secretPlan.error);
+    // opponents: a group and a skill in the victim's campaign no role of the matrix may read, a spare group and skill in the admin's for the probes to take out
+    const opp = (c: { id: string }, by: string, name: string, skill: string) => {
+      const gid = randomUUID(), sid = randomUUID();
+      const g = putGroup(s.db, c.id, gid, { name, note: '', profiles: [{ id: 'p1', name, type: 'Henchman', count: 1, profile: { M: '4' }, sv: '', skills: [{ name: skill, text: skill }], equipment: '', rules: '', note: '', from: null }], baseSeq: 0 }, by, t0);
+      const k = putSkill(s.db, c.id, sid, { name: skill, text: skill, baseSeq: 0 }, by, t0);
+      if (!g.ok || !k.ok) throw new Error('opponents');
+      return { gid, sid };
+    };
+    opp(theirs, victim.id, 'OPPONENT-SECRET: the Countess’s guard', 'OPPONENT-SECRET skill');
+    const spareOpp = opp(led, admin.id, 'Spare gang', 'Spare skill');
     const ledStyle = putStyle(s.db, led.id, { text: 'German, past tense.', baseSeq: 0 }, admin.id, t0);
     if (!ledStyle.ok) throw new Error(ledStyle.error);
     // chapter drafts: one in the victim's campaign no role of the matrix may read, two in the admin's, which the probes publish and throw away
@@ -230,7 +244,7 @@ describe('leak-test matrix', () => {
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
       doomedCampaignId: doomed.id, doomedCampaignName: doomed.name,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, ledDraftId, spareDraftId, bugId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, spareOpponentGroupId: spareOpp.gid, spareOpponentSkillId: spareOpp.sid, ledDraftId, spareDraftId, bugId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {

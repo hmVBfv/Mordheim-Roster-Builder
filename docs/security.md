@@ -240,7 +240,10 @@ Protokoll und Vorschläge sind öffentlich für die Kampagne und stehen mit
 
 **Nach der Schlacht (Phase 4a4):** Schließen und die Runde weiterschalten
 nur Leiter mit Authenticator; seine Warband „after battle N“ markieren nur
-ihr Spieler (`battle.mark`, dazu der Besitz der Warband). Der Server rechnet
+ihr Spieler (`battle.mark`, dazu der Besitz der Warband). Die Version, die in eine
+Schlacht geht, bestätigt vorher ihr Spieler oder für ihn ein Leiter
+(`battle.confirm`, solange die Schlacht offen ist); die Bestätigung ist für
+die Kampagne öffentlich wie das Protokoll (Mechanik) und steht im Log. Der Server rechnet
 dabei Kennzahlen und Änderungen selbst aus den gespeicherten Versionen –
 was ein Gerät behauptet, zählt nicht (ADR 0005, ADR 0016). Die Hausregeln
 der Kampagne setzen nur Leiter mit Authenticator (`campaign.manage`); der
@@ -339,6 +342,30 @@ sagt („nenne die Gräfin nie“ kann selbst schon verraten); deshalb liest ihn
 sonst niemand. Das Log (`style.edit`, Sichtbarkeit `leader`) trägt keinen Text.
 Die Leak-Matrix legt einen Stil mit Merkwort (`STYLE-SECRET`) in eine fremde
 Kampagne.
+
+**Vorgeschichte (Migration 26):** `backstory.read` für alle Mitglieder (auch
+Zuschauer), `backstory.write` nur für Leiter mit Authenticator, sonst 403, für
+Außenstehende 404 (auch der Admin). Anders als Stilvorgaben und Entwürfe ist
+sie **öffentlich innerhalb der Kampagne**: es ist die Geschichte, die die Spieler
+erlebt haben. Was verborgen bleiben soll, gehört in den Hintergrund mit einer
+Regel – das Importblatt sagt es dem Leiter, bevor er speichert, und prüft den
+Text auf Namen aus dem verborgenen Hintergrund. Das Log (`backstory.edit`,
+Sichtbarkeit `public`) trägt nur die Zahl der Abschnitte, nie Text.
+
+**Pläne je Schlacht (Migration 27):** `plans.read` und `plans.write` für Leiter
+mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein Plan
+ist Leiterwissen wie der Hintergrund; das KI-Paket trägt ihn als Richtung für
+den Schreibenden, nie als etwas, das die Spieler lesen. Das Log (`plan.edit`,
+`plan.remove`, Sichtbarkeit `leader`) nennt nur die Nummer der Schlacht. Die
+Leak-Matrix legt einen Plan mit Merkwort (`PLAN-SECRET`) in eine fremde
+Kampagne.
+
+**Gegner (Migration 28):** `opponents.read` und `opponents.write` für Leiter mit
+Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Gegner sind
+immer nur Leiterwissen (Rob, 19.10.2026): keine Freigabe, kein Weg zu den
+Spielern; der TTS-Export ist ein Text, den der Leiter selbst kopiert. Das Log
+trägt nur Ids. Die Leak-Matrix legt eine Gruppe und einen Skill mit Merkwort
+(`OPPONENT-SECRET`) in eine fremde Kampagne.
 
 **Kapitelentwürfe (Phase 4b5b):** `drafts.read` und `drafts.write` für Leiter
 mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein

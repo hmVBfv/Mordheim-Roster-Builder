@@ -3101,3 +3101,147 @@ open campaign is read from the device's own copy (a live query on the cached
 view), so an archived campaign or one whose list has not come yet still has
 its sections at the side – otherwise hiding the page's tabs on a desktop
 would have left no way to them.
+
+## 19.10.2026 – Pixelart auf jeder Seite
+
+Rob: die Seiten wirkten leer, es fehle immer etwas, und er wollte auf jeder
+Seite passende Pixelart. Entschieden: ein Banner im Seitenkopf plus eine große
+Szene im leeren Zustand, auch bei „weniger Bewegung“.
+
+- **Im Code gezeichnet statt als Bilddateien.** Elf Szenen aus einem kleinen
+  Pixelmaler (`app/src/art/`), ein SVG mit einem Pfad je Farbe. Das bleibt
+  klein (die App liegt bei 193,5 von 200 kB beim ersten Laden), scharf in
+  jeder Größe und lässt sich im Test prüfen: feste Palette, kein Zufall, das
+  Motiv bleibt in seiner Breite.
+- **Das Banner ist nur in der Mitte gezeichnet.** Der erste Versuch war ein
+  Bild über die ganze Breite; am Desktop (1600 px) wäre es entweder gestreckt
+  oder abgeschnitten gewesen. Jetzt stehen Himmel und Boden als harte Bänder
+  daneben (derselbe Verlauf wie im Bild), und das Motiv sitzt in der Mitte.
+- **Der Test der Motivbreite fand echte Fehler:** ein Streifen über die ganze
+  Breite in der Stadt, eine Kerze und ein Dolch außerhalb der Karte, ein
+  Schlüssel weit rechts neben der Tür.
+- Der Komet schlägt nicht ein (anders als im Mockup): in der App soll das Bild
+  ruhig stehen; Wappen der Warbands kommen später, wenn Rob sie dort will.
+- Im leeren Zustand bleibt der bisherige Satz als Titel stehen, weil Tests
+  und E2E ihn genau abfragen; die Erklärung steht darunter.
+
+## October 19, 2026 — which version goes into a battle
+
+Rob wanted the versions of every warband checked before and after each
+battle: the player confirms the one that goes in, the leader sees it beside
+the one that comes out. The "after" half already existed (the mark after the
+battle, ADR 0016); the "before" half was only a number, `rev_before`, which
+the server guessed as the newest version when the battle began – so nobody had
+ever said which version it was.
+
+The confirmation is now a fact of the participant: who confirmed which
+version, when, and the totals frozen at that moment (`stageTotals`, the same
+function the tags use, so before and after compare like with like). The
+player confirms by saving the warband as a version "before battle N" – the
+number on the table is then the one the player saw – and a leader may confirm
+for them with what stands on the server. A confirmation can be repeated while
+the battle is open; each one replaces the last. It never blocks anything: a
+battle with an unconfirmed warband is fought as before and says so.
+
+The server refuses one thing: marking a warband after the battle with a
+version older than the one confirmed before it (409 `older`). That can only
+be a stale device saving over a newer state. The diff of the changes still
+starts at the previous tag, not at the confirmed version – ADR 0016 stands –
+so a warband improved between the tag and the confirmation reports those
+improvements as changes of this battle, as it did before.
+
+Wrong turns: the first client tests looked for rows by the warband's name,
+which also stands in selects and headings; they now ask the "Who fought"
+region. The stand-in server had only the entered data of other players'
+warbands and answered 403 to a leader's confirmation for them – it now treats
+that as version 1, as the real server does.
+
+## October 19, 2026 — a battle number of one's own, and the backstory
+
+Two wishes that belong together: start a campaign in the app at battle 4
+without entering battles 1–3 one by one, and still have the group's old
+chronicle in the app.
+
+The number was the easy half. The server already took a `round` when a battle
+was created and only refused the ones the history before the app had taken;
+only the sheet insisted on "round + 1". The catch is the round of the
+campaign: "move on" looks for the battles of round + 1, so a campaign that
+starts at battle 4 would wait forever for a battle 1. Creating battle N now
+brings the campaign to N − 1 (never backwards, no sat-out marks for rounds
+nobody played here) and writes it in the log as skipped.
+
+The backstory is not a chapter and not history. Chapters are prose with a
+place on the timeline; the history is a list of battles with who fought and
+how it ended; the backstory is the group's old text, cut into sections, which
+everybody reads and the AI pack carries. I made it a table of its own with
+the sections as one JSON list that is replaced as a whole – the same shape as
+the style guide, with the same stand check against two leaders – because a
+section-by-section merge would only invent conflicts. Unlike the style guide
+it is readable by every member, viewers included: it is the story the players
+lived. That is why the import sheet holds each section, at its own battle,
+against the hidden background before saving and wants a knowing tick when it
+finds something.
+
+The pack says "format 2" now: a new heading, and the format is meant to rise
+whenever a heading does. Only the sections before the battle go in – what a
+section tells of this battle or a later one is what the chapter is about to
+say.
+
+Wrong turns: the first splitter took "Battle 3 was the worst of them all." for
+a heading; a line that ends like a sentence is not one now. And the worktree's
+`node_modules` was a link to the main checkout, so the app resolved `core` from
+there and did not see the new pack input until the worktree got its own
+`@mordheim/*` links.
+
+## October 19, 2026 — the leaders' plan for a battle
+
+Rob wanted to set the red thread of a coming battle in advance – for the
+write-up and as his own note. The background already had threads and GM
+notes, but the AI pack leaves planned threads and GM notes out on purpose:
+they are what may not slip into the prose. A plan is different: it is
+direction, not a secret to keep consistent with. So it became its own small
+table, keyed by the battle's number rather than its id, because the plan is
+written before the battle is set up. The pack carries the plan of its battle
+only, as "The leaders' plan ⚑", with an instruction never to contradict what
+was recorded; it is a part the leader can switch off like the others. The
+format number stays 2 – it rose with the backstory in the same series of
+changes, none of them released yet.
+
+At the battle a leader sees the plan folded, so it is not on the screen by
+accident when the table looks over. The first test for that was green for the
+wrong reason and then red for a wrong one: the player's device in the test
+still held the leader's cached campaign view from the step before, saw itself
+as leader for a moment and asked for the plans (and got a 403). A real device
+changes accounts with its cache cleared; the test now does the same.
+
+## October 19, 2026 — opponents
+
+Rob wanted to build opponents ahead of a battle: profiles with the usual
+characteristics, copied from any model of the game or invented, grouped,
+changed, with skills from the game or of his own, and on the TTS table. He
+chose that they stay leaders' only – no release to the players, unlike
+scenarios.
+
+The templates come from everything the rules data already holds – every
+model of every warband, the Hired Swords, the Dramatis Personae – plus the
+warriors of the campaign's warbands as they stand, read through the same
+core functions the TTS export uses, so a copied veteran carries his advances,
+skills and kit. Animals were the gap: the data had six mounts, the project's
+bestiary doc fourteen creatures. They went into a new `data/bestiary.json`
+that only the new app loads (legacy keeps its own file list); it is template
+data for leaders' opponents, never a warband's entry, and still Rob's to
+audit like any rules data.
+
+A copy is never a link: a profile is the leader's from the moment it is made,
+characteristics as text ("3(4)", "D6") because opponents are not bound to a
+rules engine. A skill on a profile carries its tooltip text with it, so a
+card still reads right after the campaign's own skill was changed or taken
+out.
+
+Wrong turns: the first search results said "Hired Sword · Hired Sword · 1a ·
+1a" – the source repeated the type and the grade; hires now name their book.
+And the first client test waited a second for the model search, which in
+jsdom needs several the first time the rules data is read; the pickers now
+have their own Suspense boundary, so the group form never blanks while the
+rules load.
+

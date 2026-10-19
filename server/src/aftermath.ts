@@ -32,6 +32,30 @@ const readState = (raw: unknown): WarbandState | null => {
   return r.ok ? r.state : null;
 };
 
+export type Confirmed = { ok: true; rev: number; totals: unknown } | { ok: false; status: 400 | 404 | 409; error: string; problem?: string };
+
+/** Confirms the version of a warband that goes into a battle (before it is fought): the player's, or a leader's for them. Totals are frozen with it; confirming again, as long as the battle is open, takes another version. */
+export function confirmBefore(db: DB, c: CampaignRow, b: BattleRow, warbandId: string, rev: number, by: string, now: Date): Confirmed {
+  return db.transaction((): Confirmed => {
+    if (b.status !== 'open') return { ok: false, status: 409, error: 'closed', problem: 'a battle is confirmed before it is closed' };
+    if (b.taken_over) return { ok: false, status: 409, error: 'history', problem: 'a battle of the history, played before the app, is not confirmed' };
+    if (!participantIds(db, b.id).includes(warbandId)) return { ok: false, status: 400, error: 'invalid', problem: 'this warband does not fight the battle' };
+    const w = warbandById(db, warbandId)!;
+    if (w.campaign_id !== c.id) return { ok: false, status: 409, error: 'invalid', problem: 'the warband is no longer in the campaign' };
+    const v = versionOf(db, warbandId, rev);
+    if (!v) return { ok: false, status: 404, error: 'not_found', problem: 'no such version' };
+    const s = readState(v.data);
+    if (!s) return { ok: false, status: 400, error: 'invalid', problem: 'the rules cannot read this warband' };
+    const totals = stageTotals(ctxOf(gameData(), s));
+    db.prepare('UPDATE battle_participants SET rev_before = ?, before_confirmed_at = ?, before_confirmed_by = ?, before_totals = ? WHERE battle_id = ? AND warband_id = ?')
+      .run(rev, iso(now), by, JSON.stringify(totals), b.id, warbandId);
+    const seq = audit(db, { actorId: by, action: 'battle.confirm', targetType: 'warband', targetId: warbandId, campaignId: c.id, visibility: 'public', payload: { battle: b.id, rev, totals, forOther: w.owner_id !== by } }, now);
+    db.prepare('UPDATE battles SET seq = ?, updated_at = ? WHERE id = ?').run(seq, iso(now), b.id);
+    db.prepare('UPDATE campaigns SET updated_at = ? WHERE id = ?').run(iso(now), c.id);
+    return { ok: true, rev, totals };
+  })();
+}
+
 export type Marked = { ok: true; tag: Tag; changes: FrozenChange[] } | { ok: false; status: 400 | 404 | 409; error: string; problem?: string };
 
 /** Marks a version of a warband "after battle N": totals and changes frozen; a second mark corrects the first (it stays, superseded). */
@@ -44,6 +68,9 @@ export function markAfterBattle(db: DB, c: CampaignRow, b: BattleRow, warbandId:
     if (w.campaign_id !== c.id) return { ok: false, status: 409, error: 'invalid', problem: 'the warband is no longer in the campaign' };
     const v = versionOf(db, warbandId, rev);
     if (!v) return { ok: false, status: 404, error: 'not_found', problem: 'no such version' };
+    // a version older than the one confirmed for the battle cannot be the one after it
+    const confirmed = db.prepare('SELECT rev_before AS rev FROM battle_participants WHERE battle_id = ? AND warband_id = ? AND before_confirmed_at IS NOT NULL').get(b.id, warbandId) as { rev: number } | undefined;
+    if (confirmed && rev < confirmed.rev) return { ok: false, status: 409, error: 'older', problem: `version ${rev} is older than version ${confirmed.rev}, which was confirmed for this battle` };
     // the mark before: the start, an earlier battle's, or a round sat out
     const before = db.prepare(`SELECT id, rev FROM tags WHERE warband_id = ? AND campaign_id = ? AND superseded_by IS NULL AND round < ?
       ORDER BY round DESC, created_at DESC LIMIT 1`).get(warbandId, c.id, b.round) as { id: string; rev: number } | undefined;
@@ -112,3 +139,10 @@ export function advanceRound(db: DB, c: CampaignRow, by: string, now: Date): Adv
   })();
 }
 
+/** A battle number the leader chose beyond the next one (a campaign that comes into the app at battle 4): the campaign comes to the round before it, so "move on" still means the battle just played. The rounds in between are not played here – nobody sits them out. Never moves back. */
+export function comeToRound(db: DB, c: CampaignRow, battleRound: number, by: string, now: Date): void {
+  const round = battleRound - 1;
+  if (round <= c.round) return;
+  db.prepare('UPDATE campaigns SET round = ?, updated_at = ? WHERE id = ?').run(round, iso(now), c.id);
+  audit(db, { actorId: by, action: 'campaign.round', targetType: 'campaign', targetId: c.id, campaignId: c.id, visibility: 'public', payload: { round, skipped: true } }, now);
+}

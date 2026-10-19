@@ -27,6 +27,14 @@ export function openAftermaths(view: CampaignView, me: string): { battleId: stri
     .map((e) => ({ battleId: b.id, warbandId: e.warbandId, label: `${battleTitle(b)} · ${e.name || e.wbName}` })));
 }
 
+/** The battles being fought that one of the user's warbands is in, with no version confirmed for it yet (not those of the history). */
+export function openConfirmations(view: CampaignView, me: string): { battleId: string; warbandId: string; label: string }[] {
+  const mine = view.enrolments.filter((e) => e.playerId === me && e.status === 'active');
+  return (view.battles ?? []).filter((b) => b.status === 'open' && !b.takenOver).flatMap((b) => mine
+    .filter((e) => (b.warbandIds ?? []).includes(e.warbandId) && !(b.confirmed ?? []).includes(e.warbandId))
+    .map((e) => ({ battleId: b.id, warbandId: e.warbandId, label: `${battleTitle(b)} · ${e.name || e.wbName}` })));
+}
+
 const gist = (text: string, max = 90) => {
   const one = text.replace(/\s+/g, ' ').trim();
   return one.length > max ? `${one.slice(0, max - 1)}…` : one;
@@ -58,8 +66,11 @@ export function openItems(view: CampaignView, me: string, questions: readonly Qu
   const asked = openFor([...questions], me).map((q): OpenItem => ({
     ...base, key: `question:${q.id}`, to: `/campaign/${view.campaign.id}/questions`, title: `Question from ${q.askedByName}`, detail: gist(q.text), chip: 'to answer',
   }));
+  const confirms = openConfirmations(view, me).map((o): OpenItem => ({
+    ...base, key: `confirm:${o.battleId}:${o.warbandId}`, to: `/campaign/${view.campaign.id}/battles/${o.battleId}`, title: 'Confirm your version', detail: o.label, chip: 'to confirm',
+  }));
   const marks = openAftermaths(view, me).map((o): OpenItem => ({
     ...base, key: `aftermath:${o.battleId}:${o.warbandId}`, to: `/warbands/${o.warbandId}/aftermath/${o.battleId}`, title: 'Aftermath', detail: o.label, chip: 'to mark',
   }));
-  return [...asked, ...marks, ...interludes(view, me, local)];
+  return [...asked, ...confirms, ...marks, ...interludes(view, me, local)];
 }

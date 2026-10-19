@@ -12,6 +12,7 @@ import styles0 from '../account/Account.module.css';
 import { useSession } from '../account/session.ts';
 import { listPeople, type Person } from '../share/shares.ts';
 import { useNotice } from '../ui/Notice.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
@@ -70,7 +71,7 @@ const stateWord = (e: Enrolment) => {
 };
 
 function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: string }) {
-  if (!view.enrolments.length) return <p className={ui.muted}>No warband entered yet.</p>;
+  if (!view.enrolments.length) return <Empty scene="camp" title="No warband entered yet." />;
   return (
     <ul className={styles.list} aria-label="Warbands">
       {view.enrolments.map((e) => {
@@ -179,7 +180,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
         </section>
         <section className={styles.section} aria-labelledby="c-battles">
           <h2 id="c-battles">Battles</h2>
-          {(view.battles ?? []).length === 0 && <p className={ui.muted}>No battles yet.</p>}
+          {(view.battles ?? []).length === 0 && <Empty scene="battle" title="No battles yet." />}
           {(view.battles ?? []).length > 0 && (
             <ul className={styles.list} aria-label="Battles">
               {[...(view.battles ?? [])].reverse().map((b) => (
@@ -187,7 +188,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
                   <Link to={`/campaign/${id}/battles/${b.id}`} className={styles.entry}>
                     <span>{battleTitle(b)}<small>{b.warbands.join(' · ')}</small></span>
                     <span className={`${styles.chip} ${b.status === 'open' ? styles.ok : ''}`}>
-                      {b.takenOver ? 'before the app' : b.status === 'open' ? 'live' : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
+                      {b.takenOver ? 'before the app' : b.status === 'open' ? (b.confirmed && b.warbandIds ? `live · ${b.confirmed.length}/${b.warbandIds.length} confirmed` : 'live') : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
                     </span>
                   </Link>
                 </li>
@@ -198,7 +199,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
         </section>
         <section className={styles.section} aria-labelledby="c-map">
           <h2 id="c-map">The map</h2>
-          {campaignMap(view).length === 0 && <p className={ui.muted}>No warband holds a district yet.</p>}
+          {campaignMap(view).length === 0 && <Empty scene="map" title="No warband holds a district yet." />}
           {campaignMap(view).length > 0 && (
             <ul className={styles.list} aria-label="Districts held">
               {campaignMap(view).map((d) => (

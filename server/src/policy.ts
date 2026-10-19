@@ -115,6 +115,8 @@ export const ACTIONS = {
   'battle.propose': { who: 'user', target: 'player' },
   /** Marking one's warband "after battle N" – its player (phase 4a4). */
   'battle.mark': { who: 'user', target: 'player' },
+  /** Confirming the version of one's warband that goes into a battle – its player, or a leader for them. */
+  'battle.confirm': { who: 'user', target: 'player' },
   /** Writing one's notes (and a leader correcting another's words) – leaders and players, not viewers. */
   'notes.write': { who: 'user', target: 'player' },
   /** Questions to players (phase 4b3): every member reads – a leader all of them, the one asked their own (ADR 0011). */
@@ -127,6 +129,15 @@ export const ACTIONS = {
   'world.read': { who: 'user', target: 'member' },
   /** Writing the world: leaders alone, with the authenticator – a leader puts an NPC there when the players may know it exists. */
   'world.write': { who: 'user', target: 'leader' },
+  /** The backstory – what came before the app, told in sections: every member reads it (it is the story the players lived), a leader with the authenticator brings it in. */
+  'backstory.read': { who: 'user', target: 'member' },
+  'backstory.write': { who: 'user', target: 'leader' },
+  /** The leaders' plan for a battle – the red thread the battle and its chapter should follow: leaders with the authenticator, read and write. */
+  'plans.read': { who: 'user', target: 'leader' },
+  'plans.write': { who: 'user', target: 'leader' },
+  /** Opponents – groups of profiles and the campaign's own skills: leaders with the authenticator, read and write – for the rest they are not there. */
+  'opponents.read': { who: 'user', target: 'leader' },
+  'opponents.write': { who: 'user', target: 'leader' },
   /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
   'style.read': { who: 'user', target: 'leader' },
   'style.write': { who: 'user', target: 'leader' },

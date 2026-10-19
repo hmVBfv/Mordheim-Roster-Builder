@@ -152,10 +152,13 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | Seite | Was sie zeigt |
 | --- | --- |
 | `game-night.html` | Vollbild ohne Navigation, Spielzug-Zähler, vier große Knöpfe im unteren Drittel, „letzten Eintrag rückgängig“, Offline-Hinweis mit Zahl der wartenden Einträge |
+| `game-night` (Version vor der Schlacht, 4c) | In „Who fought“ steht unter jeder Warband, welche Version in die Schlacht geht: „Version not confirmed yet“ oder „✓ Version N goes in · confirmed by …“. Der Spieler bestätigt seine eigene Warband mit **„Confirm my warband for battle N“** (das speichert den Gerätestand als Version „before battle N“ und friert ihre Zahlen ein); ein Leiter kann **„Confirm for <Spieler>“** (die neueste Version auf dem Server) und, wenn danach eine neuere Version entstand, **„Take version N instead“**. Nichts davon hält eine Schlacht auf: ohne Bestätigung steht nur „Went in without a confirmed version“. Leiter mit Authenticator sehen darunter „Before and after“: je Warband Rating, Gold, Models und Fallen vor und nach der Schlacht mit Unterschied. In „What changed“ der Nacharbeit steht dieselbe Karte für die eigene Warband. In „Open for you“ erscheint „Confirm your version“ (Marke „to confirm“), solange die Schlacht läuft und die eigene Warband nicht bestätigt ist; die Kampagnenübersicht zeigt „live · n/m confirmed“ |
 | `timeline.html` | feste Anker je Schlacht, Verschieben per langem Drücken, ↑/↓ und „Move to…“, Erfassungszeit bleibt sichtbar, Leiter-Ebene schaltbar; **„AI pack…“** (nur Leiter): ein Prompt aus der Schlacht in Story-Reihenfolge, Aftermath und Aufstiegen, Kanon, Welt, Notizen, Hintergrund ⚑ mit Enthüllungsregeln, bisheriger Geschichte und Stil – Teile abwählbar, Sprache, kopieren oder als .md. **Umgesetzt in 4b4a (12.10.2026):** der Knopf ist nur für Leiter mit Authenticator da und wartet, bis Zeitleiste, Notizen und Bilder geladen sind; das Blatt „AI pack“ ist ein Sheet mit Schlacht-Auswahl (neueste zuerst), den sieben Teilen als Kästchen mit Zahl (der Verlauf der Schlacht ist immer dabei), Sprache Deutsch/English/Both, der Liste „Gaps in the material“, dem Prompt als schreibgeschütztem Feld und seiner Größe (Zeichen, etwa Tokens); „Copy prompt“ und „Download .md“ (`<kampagne>-battle-<n>-ai-pack.md`). Das Blatt hält den Stand der Zeitleiste vom Öffnen fest (sie fragt alle 15 s neu), beim nächsten Öffnen fragt es den Server neu |
 | `changes.html` | je Krieger vorher → nachher mit gefundenem Anlass, ⚠ ohne Anlass, Erklärungsfelder mit Zähler, Markieren „After battle N“ |
 | `visibility.html` | Auswahl öffentlich / versiegelt / nur Leiter mit Symbol, Wort und eigener Fläche; „View as player“ |
 | `background.html` | Handlungsstränge mit Wahrheit, Wissen der Spieler, Enthüllungsstufe (●○○) samt Grenze in Worten; Enthüllen als bewusster Schritt. **Umgesetzt in 4b1 (12.10.2026):** Reiter „Background ⚑“ nur für Leiter mit Authenticator; fünf Arten (Threads, People, Places, Scenarios, GM notes) als Auswahl mit Zahl; Enthüllen wählt den Ort in der Zeitleiste (Vorgabe: der Zwischenspiel-Anker nach der letzten Schlacht), „View as player“ liegt bei den Notizen und zeigt Notizen und Bilder, wie ein Spieler sie bekommt |
+| `plans` (kein Mockup) | Im Reiter „Background ⚑“ ein weiterer Knopf **„Plans“** neben den Arten: die Pläne der Leiter je Schlacht als Karten („Battle N · Titel · next / being fought / played“, Text, von wem), „Plan a battle“ öffnet ein Blatt mit „Battle number“ (Vorgabe: die nächste; eine Nummer mit Plan wird ersetzt und sagt es) und „The red thread“; „Edit“ öffnet denselben Plan, „Take the plan out“ nimmt ihn heraus. Hat ein anderer Leiter inzwischen geändert, zeigt das Blatt dessen Text und überschreibt erst beim zweiten Speichern. In der Schlacht sehen Leiter mit Authenticator über „Who fought“ **„Your plan for this battle ⚑“** zugeklappt (oder einen Verweis, wo man einen schreibt); das KI-Paket hat den Teil „The leaders’ plan ⚑“. Speichern nur online |
+| `opponents` (kein Mockup) | Im Reiter „Background ⚑“ der Knopf **„Opponents“**: Gegnergruppen als Karten (Name, Notiz, je Profil Name ×Anzahl, Typ, Wertezeile, Skills), „Edit“ und **„Tabletop Simulator“** (ein Blatt mit einer TTS-Karte je Profil: Name und Description zum Kopieren, wie im Export), „New group“; darunter „Our own skills“ (Name, Tooltip-Text, „Edit“, „New skill“). Das Gruppenblatt: Name, Notiz, Profile als aufklappbare Editoren (Name, Type mit Vorschlägen, How many, die neun Werte und Sv als Raster – 5 Spalten am Handy, 10 ab 560 px –, Skills als Chips mit ×, „Add a skill“, Equipment, Special rules, Note), **„Copy a model from the game…“** (Suche über alle Modelle aller Warbands, Hired Swords, Dramatis Personae, das Bestiarium und „Our warriors“ – die Krieger der eingetragenen Warbands, wie sie jetzt stehen –, mit Filterknöpfen; die ersten 40 Treffer mit Wertezeile und „Add“) und „Write your own“. „Add a skill“ sucht in allen Skill-Listen des Spiels und unseren eigenen; „Or write one in“ nimmt Name und Tooltip, auf Wunsch gleich als eigener Skill gespeichert. Hat ein anderer Leiter inzwischen geändert, überschreibt erst das zweite Speichern. Immer nur Leiter (Rob, 19.10.2026); speichern nur online |
 | `questions` (kein Mockup) | Reiter „Questions“ der Kampagne (Leiter und Spieler, nicht Zuschauer): Leiter stellen, ändern, ziehen zurück und stellen wieder; der Gefragte antwortet in einem Sheet mit Sichtbarkeit (alle · versiegelt bis zum Ende der Schlacht der Frage, solange sie läuft · nur Leiter, wenn er Leiter ist); die Frage steht nie bei der Notiz. Schreiben nur online (Knöpfe gesperrt), Lesen aus dem Gerätespeicher |
 | `world` (kein Mockup) | Reiter „World“ der Kampagne, für alle Mitglieder (Zuschauer eingeschlossen): je Fraktion eine Karte mit Status, ihren Leuten (Statline aufklappbar) und dem Stand jeder Warband (Summe des Rufs, +/−); darunter Leute ohne Fraktion und das Ruf-Log, neueste zuerst. Leiter (mit Authenticator) legen Fraktionen und NPCs an, ändern und entfernen sie (mit Rückfrage) und tragen Ruf ein („Gains / Loses reputation“, Betrag 1–100 – kein Minuszeichen auf dem Handy nötig); ein Eintrag wird nie geändert, nur herausgenommen. Jedes Formular sagt, dass alle es lesen und das Verborgene in den Hintergrund gehört. Schreiben nur online, Lesen aus dem Gerätespeicher |
 | `scenarios` (kein Mockup) | Abschnitt „Scenarios“ im Reiter „World“ (zwischen Fraktionen und Ruf-Log). Alle Mitglieder lesen die **gespielten** Szenarien: Karte mit Titel, „Played in Battle n · released by …“ (und „corrected since“), Regeln und NPC-Werte aufklappbar, **„Copy statlines“** (Titel plus Werte als Text für den Tabletop-Simulator-Tisch). Leiter mit Authenticator sehen zuerst die **Entwürfe** (gestrichelte Karte, „⚑ Draft – only leaders read it“) mit „Change“, **„Release“** und „Remove“ (mit Rückfrage), und „Write a scenario“. Das Freigeben-Blatt sagt, dass es alle Mitglieder lesen lassen und nicht rückgängig zu machen ist, und lässt die Schlacht wählen, in der gespielt wird; ein freigegebenes Szenario hat nur noch „Change“ (das Formular sagt, dass alle die Korrektur sehen). Schreiben nur online, Lesen aus dem Gerätespeicher |
@@ -167,6 +170,7 @@ Kampagne) und More (`more.html`). Game night ist ein Vollbild ohne Leiste;
 | `hire.html` | (in der App umgesetzt: `/warbands/:id/hire`) Hired Swords und Dramatis Personae mit den echten Regeldaten: Suche, Stufen, „nur wen diese Warband anheuern darf“, Sortierung; Sheet mit Werten, Regeln, Optionen, Kosten und Grund, wenn nicht |
 | `house-rules.html` | Hausregeln (3e), drei Fälle über den Mockup-Streifen: eine Warband für sich (Quick Build oder vor der Kampagne) stellt sie selbst ein; in einer Kampagne sieht der Spieler nur, was die Leiter eingeschaltet haben, und ob die eigene Datei der Warband abweicht („Take Hel Fenn’s rules“); als Leiter für alle Warbands der Kampagne (von Manage aus). Jede Regel mit Schalter, „As written: …“, Wert per Stepper nur wenn an; Gruppen wie im Roster Builder; Wirkung auf das Gold einer Gründung; Notizen; „On every export“ zeigt die Erklärung wörtlich; alles zurück mit Undo. Vom Roster aus über den Hinweis „⚖ 1 house rule“ |
 | `chronicle.html` | **Umgesetzt in 4b5a (16.10.2026) und 4b5b (16.10.2026; „Import a chapter“ heißt in der App „Bring in a chapter“ und liegt als Abschnitt „Drafts ⚑ Leaders only“ unter den Kapiteln, nur für Leiter; die Prüfung läuft schon beim Eintippen im Formular und noch einmal im Prüfblatt, „Add as draft“ ist „Save the draft“, freigegeben wird im Prüfblatt):** Reiter „Chronicle“ für alle Mitglieder zwischen Timeline und World; Sprachwahl Deutsch/English oben, „Download all (.md)“, die Kapitel als Karten in Story-Reihenfolge (Art · Label · IC-Datum · Ort, Titel, Abschnitt der Zeitleiste und vorhandene Sprachen, Sieger), „Read“ klappt den Text an Ort und Stelle auf. Reiter „Chronicle“ der Kampagne: die ganze geschriebene Geschichte, Kapitel für Kapitel (Prolog zweisprachig); **„Import a chapter“** als Text (eingefügt oder .md/.txt) mit Titel, Schlacht und Sprache, Prüfung auf Begriffe aus verborgenem Hintergrund und erlaubte Andeutungen, landet als Entwurf; „Download all (.md)“ |
+| `backstory` (kein Mockup, 4c) | Abschnitt „Backstory“ im Reiter „Chronicle“, über den Kapiteln: die Vorgeschichte als aufklappbare Abschnitte (Überschrift, „before the first battle“ oder „Battle N“), **für alle Mitglieder** lesbar, auch Zuschauer, aus dem Gerätespeicher. Leiter mit Authenticator haben **„Bring in the backstory…“** (später „Replace the backstory…“): Text einfügen oder .md/.txt lesen; das Blatt schneidet ihn an Überschriften („Battle 3 …“, „Schlacht 3 …“, Markdown) in „Sections found“ (Überschrift, Schlacht, Wörter), hält jeden Abschnitt bei seiner Schlacht gegen den verborgenen Hintergrund („Check before it is saved“, Befunde je Abschnitt) und verlangt bei Befunden ein bewusstes Häkchen („everyone in the campaign may read this“); es sagt, wie viele Abschnitte es ersetzt, und weist einen Stand zurück, den ein anderer Leiter inzwischen ersetzt hat. Speichern nur online. „New battle“ hat das Feld **„Battle number“** (Vorgabe: die nächste; nicht kleiner als die erste Nummer nach der Vorgeschichte; eine größere sagt, dass die Kampagne auf die Runde davor rückt) |
 | `campaign.html` | Übersicht: laufende Schlacht mit Weg in den Spielabend, Warbands mit Stand, Schlachten 1–5, Bezirke |
 | `world.html` | Bezirke (Wirkungen aus `data/campaign.json`, wer sie hält, Korrektur durch Leiter), Fraktionen mit Ruf, Personen, Orte |
 | `manage.html` | nur Leiter: Rollen, Einladung, Hausregeln als Schalter, Schlacht schließen (unumkehrbar, daher mit Bestätigung). **Seit 4b4a:** Abschnitt „Style guide ⚑“ (zwischen Hausregeln und „The next round“): ein Textfeld „Instructions for the writer“ (höchstens 10 000 Zeichen), „Save the style“; nur Leiter mit Authenticator. Hat ein anderer Leiter zuerst gespeichert, zeigt das Feld dessen Text mit dem Hinweis, die Änderung neu zu machen. Offline ist der letzte gesehene Text da, speichern geht nur online. **Seit 4b4b:** Abschnitt „Canon for the linter“ direkt darunter: „Download the canon (.txt)“ lädt die Namen der Kampagne in Deutsch und Englisch als Datei für den Chronik-Linter (nur Namen, nichts Verborgenes); die Meldung sagt, wie viele Namen es sind, wie viele sich zwischen den Sprachen unterscheiden und wie viele noch nicht fertig sind; kann eine Warband nicht gelesen werden, wird nichts gespeichert, und die Meldung nennt sie. Offline ist der Knopf gesperrt |
@@ -258,6 +262,51 @@ Themes, beide wählbar. **Standard ist „Chronicle“ (dunkel).**
 - Zierschriften nur für Titel; Fließtext und Werte in einer gut lesbaren
   Schrift, Zahlen tabellarisch ausgerichtet.
 - Kontrast mindestens WCAG AA in beiden Themes.
+
+### Bilder (Pixelart)
+
+**Entschieden (Rob, 19.10.2026):** jede Seite hat ein passendes Pixelbild –
+ein **Banner** im Seitenkopf und, wo etwas fehlt, eine **große Szene** im
+leeren Zustand. Beides bleibt auch bei „weniger Bewegung“ stehen; nur die
+kleinen Lichter (Fenster, Feuer, Wyrdstein, Sterne) bewegen sich sonst ein
+wenig.
+
+- **Gezeichnet im Code** (`app/src/art/`): `draw.ts` ist ein kleiner
+  Pixelmaler (Gitter aus Ein-Buchstaben-Farben, feste Palette, Sterne und
+  erleuchtete Fenster aus einem Zufallsgenerator mit festem Startwert – ein
+  Bild sieht immer gleich aus), `scenes.ts` hat die elf Szenen, `Pixels.tsx`
+  macht daraus ein SVG mit einem Pfad je Farbe. Eigene Motive, nichts aus
+  Games-Workshop-Material.
+- **Banner:** die Szene steht in der Mitte, die Nacht (Himmelsbänder und
+  Boden) setzt sich links und rechts fort, so ist das Bild so breit wie der
+  Bildschirm und bleibt scharf. 60 px hoch am Handy, bis 112 px am Desktop.
+  Es ist Dekoration (`aria-hidden`), nicht antippbar, und fehlt nur bei der
+  Spielnacht (`/campaign/:id/battles/:bid`, Vollbild am Handy).
+- **Leere Szene:** `<Empty scene title>text</Empty>` – Bild, Titel (der bisherige
+  Satz, z. B. „No battles yet.“) und darunter, was zu tun ist. Sie zeigt ein
+  anderes Motiv als das Banner derselben Seite.
+- **Welche Seite welches Bild:** `art/route.ts`, die erste passende Regel
+  gewinnt (Test in `art.test.tsx`).
+
+| Szene | Motiv | Seiten |
+| --- | --- | --- |
+| `city` | Mordheim bei Nacht, Komet, Wyrdstein in den Trümmern | Home |
+| `camp` | Zelte, Banner, Lagerfeuer | Warbands, Roster, Neue Warband, Manage |
+| `market` | Marktstände, Münzen | Trading Post, Hire, Import |
+| `dice` | Tisch, zwei Würfel, kleiner Krieger | TTS-Karten (Export) |
+| `tome` | aufgeschlagenes Buch zwischen Kerzen | House rules, Chronicle |
+| `map` | Karte mit Straßen, Fluss, Nadeln | Districts, World, Kampagnenliste |
+| `scribe` | Schreibtisch, Schriftrolle, Feder, Bücher | Story, Versions, Notes, Timeline |
+| `fire` | Lagerfeuer nach der Schlacht, zwei Sitzende | Nachbereitung |
+| `gate` | zerstörtes Stadttor mit Fackeln | Kampagnen-Übersicht |
+| `battle` | Schild vor gekreuzten Schwertern | Schlachten |
+| `lock` | Tür mit Vorhängeschloss, Schlüssel | Account, Admin, Fragen, Hintergrund |
+
+- Die Szenen im Mockup (`city-art.js`, `warband-art.js`) bleiben Vorlage für
+  den Stil; der Kometeneinschlag und die Wappen der Warbands sind nicht
+  übernommen.
+- Neue Szene: in `SCENES` eintragen (`span` = Breite des Motivs, der Test
+  prüft, dass nichts darüber hinausragt) und in `route.ts` einer Seite geben.
 
 ## 5. Bedienung
 

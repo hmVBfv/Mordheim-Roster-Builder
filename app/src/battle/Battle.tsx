@@ -33,6 +33,8 @@ import { usePictureActions, usePictures } from '../pictures/usePictures.ts';
 import { usePicks, useWarbandLoader } from './picks.ts';
 import styles from './Battle.module.css';
 import { enqueue, flushOutbox, useOutbox } from './outbox.ts';
+import { OwnPlan } from '../plans/Plans.tsx';
+import { BeforeAfter, VersionLine, useConfirm } from './Versions.tsx';
 
 export const POLL_MS = 5000;
 
@@ -181,6 +183,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   }, [merged.entries, battleNotes, battlePics]);
   const names = useMemo(() => Object.fromEntries(view.participants.map((p) => [p.warbandId, p.name])), [view]);
 
+  const conf = useConfirm(cid, bid, user, view.battle.round, setView, notify);
   const waiting = outbox.filter((i) => !i.refused).length;
   const closed = view.battle.status === 'closed';
   // a battle of the history (4a5): played before the app – who fought and how it ended is all there is
@@ -265,6 +268,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </section>
         </div>
         <div className={ui.page}>
+          {lead && <OwnPlan cid={cid} round={view.battle.round} />}
           <section aria-labelledby="b-fighters" className={ui.page}>
             <h2 id="b-fighters">Who fought</h2>
             <ul className={styles.fighters}>
@@ -276,6 +280,10 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
                       const m = view.marks?.[p.warbandId];
                       return <small className={m ? styles.marked : styles.unmarked}>{m ? `✓ Marked after battle ${view.battle.round} · version ${m.rev}${m.unexplained ? ` · ⚠ ${m.unexplained} without a cause` : ''}` : 'Aftermath not marked yet'}</small>;
                     })()}
+                    {!past && (
+                      <VersionLine p={p} round={view.battle.round} mine={p.playerId === user.id && canPropose} lead={lead} open={!closed} busy={conf.busy === p.warbandId}
+                        error={conf.error?.id === p.warbandId ? conf.error.text : null} online={online} onConfirm={() => void conf.confirm(p)} />
+                    )}
                     {closed && !past && p.playerId === user.id && <Link to={`/warbands/${p.warbandId}/aftermath/${bid}`} className={styles.aftermath}>Your aftermath →</Link>}
                   </span>
                   {lead && !closed
@@ -290,6 +298,13 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
               ))}
             </ul>
           </section>
+          {lead && !past && (
+            <section aria-labelledby="b-compare" className={ui.page}>
+              <h2 id="b-compare">Before and after</h2>
+              <p className={ui.muted}>The version each warband went in with, as the player confirmed it, beside the one marked after the battle.</p>
+              <BeforeAfter view={view} />
+            </section>
+          )}
           {lead && !closed && (
             <section aria-labelledby="b-end" className={ui.page}>
               <h2 id="b-end">End of the battle</h2>

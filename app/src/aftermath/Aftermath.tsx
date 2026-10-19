@@ -18,6 +18,7 @@ import { Link, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { useOnline } from '../app/SyncState.tsx';
+import { BeforeAfter } from '../battle/Versions.tsx';
 import { battleTitle, cachedBattle, casualtyText, getBattle, markBattle, OUTCOME_NAMES, type BattleView, type CasualtyPayload } from '../battle/api.ts';
 import { readWarband } from '../campaign/api.ts';
 import { useCampaignRules } from '../campaign/rules.ts';
@@ -322,6 +323,7 @@ function MarkSection({ data, rec, state, view, cid, round, toRoll, onMarked, not
     <section aria-labelledby="am-changes" className={ui.page}>
       <h2 id="am-changes">What changed</h2>
       {before && <p className={ui.muted}>Since {before.label}{mark ? '' : ' · a preview; nothing is marked yet'}.</p>}
+      <BeforeAfter view={view} only={rec.id} />
       {beforeError && <p className={ui.message} role="status">The comparison needs the campaign server: {beforeError}</p>}
       {before && (
         <dl className={styles.summary}>

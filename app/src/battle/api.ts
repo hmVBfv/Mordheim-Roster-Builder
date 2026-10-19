@@ -15,7 +15,11 @@ export interface EventPayload { text: string }
 export type EntryBody = { turn: number; kind: 'casualty'; payload: CasualtyPayload } | { turn: number; kind: 'event'; payload: EventPayload };
 export type Entry = EntryBody & { id: string; author: string; createdAt: string; updatedAt: string };
 export interface Proposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: { text: string }; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
-export interface Participant { warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null }
+/** `revBefore`: the version that goes in; confirmed once `confirmedAt` is set (before that only the head when the battle was set up). `beforeTotals` are frozen with the confirmation, `headRev` is the newest version now. Absent in a view kept from before the confirmation. */
+export interface Participant {
+  warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null;
+  confirmedAt?: string | null; confirmedBy?: string | null; beforeTotals?: unknown; headRev?: number;
+}
 /** A warband marked "after battle N" (phase 4a4): its version, and how many changes were frozen with it. */
 export interface Mark { tagId: string; rev: number; totals: unknown; changes: number; unexplained: number; createdAt: string }
 export interface BattleView {
@@ -36,7 +40,7 @@ export interface FrozenChange { kind: string; uid: number | string | null; name:
 /** `warbandIds`, `marked`: phase 4a4 (who fought, whose warband is marked after it); `takenOver`, `playedAt`: phase 4a5 (a battle of the
     history, played before the app; the day it was played). Absent in a summary kept from before. */
 export interface BattleSummary {
-  id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds?: string[]; marked?: string[]; createdAt: string; closedAt: string | null;
+  id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds?: string[]; marked?: string[]; confirmed?: string[]; createdAt: string; closedAt: string | null;
   takenOver?: boolean; playedAt?: string | null;
 }
 
@@ -58,11 +62,14 @@ export async function getBattle(cid: string, bid: string, since?: number): Promi
   const r = await api<BattleView | { unchanged: true; seq: number }>(`/campaigns/${cid}/battles/${bid}${since !== undefined ? `?since=${since}` : ''}`);
   return 'unchanged' in r ? null : who(r);
 }
-export const createBattle = (cid: string, b: { id: string; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep());
+export const createBattle = (cid: string, b: { id: string; round?: number; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep());
 export const patchBattle = (cid: string, bid: string, p: { title?: string; district?: string; turn?: number; outcomes?: Record<string, Outcome> }) =>
   api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep());
 /** Closes the battle (a leader): the protocol is fixed, its sealed notes open. */
 export const closeBattle = (cid: string, bid: string) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/close`, { body: {} }).then(keep());
+/** Confirms the version of a warband that goes into the battle (its player, or a leader for them) – before it is fought. */
+export const confirmBattle = (cid: string, bid: string, warbandId: string, rev: number) =>
+  api<BattleView>(`/campaigns/${cid}/battles/${bid}/confirm`, { body: { warbandId, rev } }).then(keep());
 /** Marks a version of one's warband "after" this battle; marked again, the newer mark corrects the earlier. */
 export const markBattle = (cid: string, bid: string, warbandId: string, rev: number) =>
   api<{ tag: { id: string; rev: number; round: number }; changes: FrozenChange[] }>(`/campaigns/${cid}/battles/${bid}/marks`, { body: { warbandId, rev } });

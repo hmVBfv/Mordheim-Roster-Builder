@@ -15,6 +15,7 @@ import { newId } from '../db/ids.ts';
 import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
 import { copyText } from '../ui/files.ts';
 import { useNotice } from '../ui/Notice.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { LIMITS, putScenario, releaseScenario, removeScenario, staleScenario, ttsText, type Scenario, type ScenarioList } from './api.ts';
@@ -167,7 +168,7 @@ export function Scenarios({ id, view, lead }: { id: string; view: CampaignView; 
           <button type="button" className={ui.button} disabled={!online} onClick={() => openEdit(null)}>Write a scenario</button>
         </div>
       )}
-      {data && drafts.length === 0 && played.length === 0 && <p className={ui.muted}>{lead ? 'No scenario yet.' : 'No scenario has been played yet.'}</p>}
+      {data && drafts.length === 0 && played.length === 0 && <Empty scene="battle" title={lead ? 'No scenario yet.' : 'No scenario has been played yet.'} />}
       {drafts.length > 0 && (
         <>
           <p className={styles.group}>Drafts</p>

@@ -36,6 +36,7 @@ export * from './campaign/postbattle.ts';
 export * from './campaign/analysis.ts';
 export * from './campaign/file.ts';
 export * from './campaign/forms.ts';
+export * from './campaign/opponents.ts';
 export * from './export/rulesText.ts';
 export * from './export/text.ts';
 export * from './export/tts.ts';
