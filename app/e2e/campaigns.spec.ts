@@ -49,6 +49,43 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* The Warbands tab (Rob, 19.10.2026): every warband as a card for a quick overview – side by side on a desktop, one under the other on a phone. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Warbands tab: cards side by side on a desktop, stacked on a phone, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const four = [
+      { player: 'Anna', data: { ...SAVE, name: 'The Grey Penitents' }, role: 'leader' as const },
+      { player: 'Ben', data: { ...SAVE, name: 'Clan Skrittle' } },
+      { player: 'Cleo', data: { ...SAVE, name: 'The Ferrymen of the Stir' } },
+      { player: 'Dag', data: { ...SAVE, name: 'Sisters of the Ashen Rose' }, pending: true },
+    ];
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: four });
+    await page.goto(`campaign/${c.id}/warbands`);
+    const cards = page.getByRole('list', { name: 'Warbands', exact: true }).getByRole('link');
+    await expect(cards).toHaveCount(3);
+    await expect(page.getByRole('list', { name: 'Waiting warbands' }).getByRole('link')).toHaveCount(1);
+    await expect(cards.first()).toContainText('Rating');
+    // a phone: one under the other
+    await noSideScroll(page);
+    await tapTargets(page);
+    const phone = await Promise.all([0, 1].map((i) => cards.nth(i).boundingBox()));
+    expect(phone[1]!.y, 'stacked').toBeGreaterThan(phone[0]!.y + phone[0]!.height - 1);
+    await shot(page, `${theme}-campaign-warbands`);
+    // a desktop: side by side
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await noSideScroll(page);
+    const wide = await Promise.all([0, 1, 2].map((i) => cards.nth(i).boundingBox()));
+    expect(Math.abs(wide[0]!.y - wide[1]!.y), 'two side by side').toBeLessThan(2);
+    expect(wide[1]!.x, 'to the right').toBeGreaterThan(wide[0]!.x + wide[0]!.width - 1);
+    await shot(page, `${theme}-campaign-warbands-desktop`);
+    // the side navigation has it as a section, and it opens a warband
+    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Warbands' }).last()).toBeVisible();
+    await cards.nth(1).click();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
+}
+
 test('a leader manages: confirms a warband, adds someone, changes a role', async ({ page }) => {
   const srv = await playServer(page, true, { totp: true });
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
@@ -171,7 +208,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await page.goto(`campaign/${c.id}/timeline`);
     const nav = page.getByRole('navigation', { name: 'Main' });
     const sections = nav.getByRole('list', { name: 'The Hel Fenn Campaign: sections' });
-    await expect(sections.getByRole('link')).toHaveText(['Overview', 'Notes', 'Timeline', 'Chronicle', 'World', 'Questions', 'Background ⚑', 'Manage']);
+    await expect(sections.getByRole('link')).toHaveText(['Overview', 'Warbands', 'Notes', 'Timeline', 'Chronicle', 'World', 'Questions', 'Background ⚑', 'Manage']);
     await expect(sections.getByRole('link', { name: 'Timeline' })).toHaveAttribute('aria-current', 'page');
     await expect(nav.getByRole('link', { name: 'Summer in Sylvania' })).toBeVisible();
     // the campaign's own tabs are the phone's: here the side carries them
