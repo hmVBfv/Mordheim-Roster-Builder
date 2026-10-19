@@ -105,6 +105,10 @@ export const ACTIONS = {
   'campaign.enrol': { who: 'user', target: 'player' },
   /** Name, members and roles, confirming warbands – leaders, with the authenticator. */
   'campaign.manage': { who: 'user', target: 'leader' },
+  /** Deleting the campaign for everyone (a tombstone; the admin can bring it back) – leaders, with the authenticator (Rob, 19.10.2026). */
+  'campaign.delete': { who: 'user', target: 'leader' },
+  /** Filing the campaign away in one's own list, or taking it back – every member, for themselves. */
+  'campaign.archive': { who: 'user', target: 'member' },
   /** Setting up a battle and writing its protocol, deciding corrections – leaders only (ADR 0010). */
   'battle.write': { who: 'user', target: 'leader' },
   /** A correction of the protocol – leaders and players; they see it live and propose (concept.md 4.5). */

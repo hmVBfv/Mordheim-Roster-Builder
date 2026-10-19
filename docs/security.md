@@ -219,6 +219,16 @@ ihr erster Leiter. Ob ein Mitglied den Authenticator hat, sehen nur Leiter
 Kampagne. Jede Kampagnen-Aktion steht mit `campaign_id` und Sichtbarkeit
 `public` im `audit_log`.
 
+**Löschen und Archiv (19.10.2026):** `campaign.delete` nur Leiter mit
+Authenticator, und nur mit dem Namen der Kampagne im Körper. Gelöscht ist
+ein Grabstein (`deleted_at`): `campaignById` findet die Kampagne nicht mehr,
+also antwortet jede Route unter `/campaigns/:id` 404 – für Mitglieder wie
+für alle anderen; kein Inhalt verlässt den Server mehr, auch nicht über
+alte Links. Die eingetragenen Warbands gehen zurück an ihre Besitzer.
+Zurückholen kann nur der Admin über `roster-cli` (kein Endpunkt).
+`campaign.archive` jedes Mitglied, nur für die eigene Zeile in `members`;
+es ändert nichts, was andere sehen.
+
 **Schlachten (Phase 4a2):** lesen jedes Mitglied (`campaign.read`), auch
 Zuschauer; anlegen, ändern, Protokoll schreiben und Vorschläge entscheiden
 nur Leiter mit Authenticator (`battle.write`, ADR 0010); Korrekturen

@@ -38,6 +38,8 @@ Begriff einführt, trägt ihn hier ein.
 | bestätigen / ablehnen | Confirm / Decline | `confirmEnrolment`, `declineEnrolment` |
 | Kampagne verlassen | Leave the campaign… | `DELETE …/enrolments/:eid`, `withdrawEnrolment`, `status = 'left'` |
 | Verwaltung | Manage | `/campaign/:id/manage`, `campaign.manage` |
+| Kampagne löschen | Delete the campaign | `DELETE /campaigns/:id`, `campaigns.deleted_at` (Grabstein), `campaign.delete`; zurück nur mit `roster-cli campaign restore` |
+| Archiv (der eigenen Kampagnenliste) | Archive · Archived · Back to the list | `PUT /campaigns/:id/archive`, `members.archived_at`, `CampaignSummary.archived` |
 | Gründung (Runde 0) | Setup | `campaigns.round = 0`, `roundName` |
 | Schlacht anlegen | New battle → Start the game night | `POST /campaigns/:id/battles`, `NewBattleSheet` |
 | Spielabend | Game night | `/campaign/:id/battles/:bid`, `Battle.tsx` |

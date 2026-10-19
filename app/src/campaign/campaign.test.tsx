@@ -105,6 +105,32 @@ describe('the Campaign tab', () => {
     expect(screen.queryByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeNull();
   });
 
+  /* Rob, 19.10.2026: every player files campaigns away in their own list, in a section of its own. */
+  it('a campaign is archived in one’s own list and taken back; a single one left in play opens at once', async () => {
+    const srv = server();
+    srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
+    srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
+    const user = userEvent.setup();
+    at('/campaign');
+    const list = await screen.findByRole('list', { name: 'Your campaigns' });
+    await waitFor(() => expect(within(list).getAllByRole('link')).toHaveLength(2));
+    expect(screen.queryByRole('heading', { name: 'Archived' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Archive: Summer in Sylvania' }));
+    const archived = await screen.findByRole('list', { name: 'Archived campaigns' });
+    expect(within(archived).getAllByRole('link').map((a) => a.textContent)).toEqual(['Summer in SylvaniaViewer · After battle 3 · 0 warbands']);
+    expect(within(screen.getByRole('list', { name: 'Your campaigns' })).getAllByRole('link')).toHaveLength(1);
+    await waitFor(() => expect(srv.state.campaigns.get('campaign-2')!.archivedBy).toEqual([KAI.id]));
+    // opened again with one campaign left in play: straight to it; "All campaigns" shows the archive too
+    cleanup();
+    at('/campaign');
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
+    cleanup();
+    render(<MemoryRouter initialEntries={[{ pathname: '/campaign', state: { all: true } }]}><AppRoutes /></MemoryRouter>);
+    await user.click(await screen.findByRole('button', { name: 'Back to the list: Summer in Sylvania' }));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Archived' })).toBeNull());
+    expect(srv.state.campaigns.get('campaign-2')!.archivedBy).toEqual([]);
+  });
+
   it('signed out: campaigns need the account', async () => {
     createFakeSync();
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ user: null, pending: false }), { headers: { 'content-type': 'application/json' } })));
@@ -266,6 +292,28 @@ describe('Manage', () => {
     expect(await screen.findByText('Anna: Player.')).toBeTruthy();
     await user.selectOptions(screen.getByLabelText('Role of Kai'), 'player');
     expect((await screen.findByRole('alert')).textContent).toMatch(/keeps at least one leader/);
+  });
+
+  /* Rob, 19.10.2026: a leader deletes the campaign, with its name typed to be sure; the warbands in it are free again. */
+  it('a leader deletes the campaign by typing its name; it is gone, and the list says so', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [{ player: 'Anna', data: saveOf('The Grey Penitents') }] });
+    srv.addCampaign({ name: 'Summer in Sylvania', role: 'player' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/manage`);
+    await user.click(await screen.findByRole('button', { name: 'Delete the campaign…' }));
+    const sheet = screen.getByRole('dialog', { name: /Delete “The Hel Fenn Campaign”/ });
+    expect(sheet.textContent).toMatch(/The warband in it goes back to its player, free/);
+    const go = within(sheet).getByRole('button', { name: 'Delete it for everyone' });
+    expect((go as HTMLButtonElement).disabled).toBe(true);
+    await user.type(within(sheet).getByLabelText('Type the name of the campaign'), 'The Hel Fenn');
+    expect((go as HTMLButtonElement).disabled).toBe(true);
+    await user.type(within(sheet).getByLabelText('Type the name of the campaign'), ' Campaign');
+    await user.click(go);
+    expect(await screen.findByText('“The Hel Fenn Campaign” is deleted. Its warbands are with their players again.')).toBeTruthy();
+    expect(srv.state.campaigns.has(c.id)).toBe(false);
+    const list = await screen.findByRole('list', { name: 'Your campaigns' });
+    await waitFor(() => expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['Summer in SylvaniaPlayer · Setup · 0 warbands']));
   });
 
   it('a leader without the authenticator is told to set it up', async () => {

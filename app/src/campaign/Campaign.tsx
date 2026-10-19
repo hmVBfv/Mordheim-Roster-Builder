@@ -15,7 +15,7 @@ import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
-  advanceRound, cachedCampaign, confirmEnrolment, declineEnrolment, forgetCampaign, getCampaign, removeMember, renameCampaign, ROLE_NAMES, roundName, setMember,
+  advanceRound, cachedCampaign, confirmEnrolment, declineEnrolment, deleteCampaign, forgetCampaign, getCampaign, removeMember, renameCampaign, ROLE_NAMES, roundName, setMember,
   type CampaignRole, type CampaignView, type Enrolment,
 } from './api.ts';
 import styles from './Campaign.module.css';
@@ -33,6 +33,7 @@ import { OpenList } from '../open/OpenList.tsx';
 import { QuestionsTab } from '../questions/Questions.tsx';
 import { useQuestions } from '../questions/useQuestions.ts';
 import { useWarbands } from '../sync/local.ts';
+import { requestSync } from '../sync/runner.ts';
 import { WorldTab } from '../world/World.tsx';
 import { AsPlayerTab } from '../notes/AsPlayer.tsx';
 import { battleTitle } from '../battle/api.ts';
@@ -44,7 +45,8 @@ function useCampaign(id: string) {
   const [gone, setGone] = useState(false);
   const reload = useCallback(() => {
     getCampaign(id).then((v) => { setView(v); setError(null); }).catch((e: unknown) => {
-      if (e instanceof ApiError && e.status === 404) { setGone(true); void forgetCampaign(id); } else setError(errorText(e));
+      // gone (left, or deleted by a leader): forget it, and let the sync fetch the warbands that are free again
+      if (e instanceof ApiError && e.status === 404) { setGone(true); void forgetCampaign(id); requestSync(0); } else setError(errorText(e));
     });
   }, [id]);
   useEffect(() => {
@@ -333,8 +335,58 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
           )}
         </form>
         {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
+        <DeleteSection id={id} name={view.campaign.name} warbands={view.enrolments.filter((e) => e.status === 'active' || e.status === 'pending').length} />
       </div>
     </div>
+  );
+}
+
+/* Deleting the campaign (Rob, 19.10.2026): a leader, with its name typed to
+   be sure. Gone for every member; the warbands entered go back to their
+   owners as free warbands; the admin can bring it back. */
+function DeleteSection({ id, name, warbands }: { id: string; name: string; warbands: number }) {
+  const { ref, open, close } = useSheet();
+  const navigate = useNavigate();
+  const [typed, setTyped] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const same = typed.trim().replace(/\s+/g, ' ') === name;
+  const submit = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await deleteCampaign(id, typed);
+      requestSync(0);
+      close(() => void navigate('/campaign', { replace: true, state: { all: true, deleted: name } }));
+    } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
+  };
+  return (
+    <section className={`${styles.section} ${styles.dangerZone}`} aria-labelledby="m-delete">
+      <h2 id="m-delete">Delete the campaign</h2>
+      <p className={ui.muted}>For every member at once. The warbands in it stay with their players as free warbands, with all their versions.</p>
+      <div className={ui.row}>
+        <button type="button" className={`${ui.buttonQuiet} ${styles.dangerButton}`} onClick={() => { setTyped(''); setError(null); open(); }}>Delete the campaign…</button>
+      </div>
+      <dialog ref={ref} className={ui.sheet} aria-labelledby="del-title">
+        <form className={ui.page} onSubmit={(e) => { e.preventDefault(); if (same) void submit(); }}>
+          <h2 id="del-title">Delete “{name}”?</h2>
+          <ul className={ui.muted}>
+            <li>Nobody can open it any more: its battles, notes, timeline, chronicle and world go with it.</li>
+            <li>{warbands === 0 ? 'No warband is entered in it.' : `The ${warbands === 1 ? 'warband' : `${warbands} warbands`} in it ${warbands === 1 ? 'goes' : 'go'} back to ${warbands === 1 ? 'its player' : 'their players'}, free, with every version.`}</li>
+            <li>Only the admin can bring it back.</li>
+          </ul>
+          <label className={ui.field}>
+            <span>Type the name of the campaign</span>
+            <input className={ui.input} value={typed} autoComplete="off" spellCheck={false} onChange={(e) => setTyped(e.target.value)} />
+          </label>
+          {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
+          <div className={ui.row}>
+            <button type="submit" className={`${ui.button} ${styles.dangerFill}`} disabled={busy || !same}>Delete it for everyone</button>
+            <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Keep it</button>
+          </div>
+        </form>
+      </dialog>
+    </section>
   );
 }
 
@@ -348,7 +400,7 @@ export function Campaign() {
     return (
       <section className={ui.page}>
         <h1>Not a campaign of yours</h1>
-        <p className={ui.muted}>This campaign does not exist, or you are no longer part of it.</p>
+        <p className={ui.muted}>This campaign does not exist, you are no longer part of it, or a leader deleted it. Warbands of yours that were entered in it are with you again, free.</p>
         <p><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></p>
       </section>
     );

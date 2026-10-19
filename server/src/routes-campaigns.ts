@@ -7,8 +7,8 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
-  campaignById, campaignView, confirmEnrolment, createCampaign, endEnrolment, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
-  removeMember, renameCampaign, roleIn, ROLES, setHouseRules, setMember, tagsOf, type CampaignRole, type CampaignRow,
+  campaignById, campaignView, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
+  removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
@@ -67,6 +67,24 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
     if (name !== t.c.name) renameCampaign(db(), t.c, name, req.actor!.id, now());
     return view(t.c, t.role);
+  });
+
+  /** A leader deletes the campaign, typing its name to be sure: gone for every member, the warbands back with their owners (Rob, 19.10.2026). */
+  app.delete('/api/v1/campaigns/:id', { config: { action: 'campaign.delete' }, schema: body({ name: { type: 'string', maxLength: 200 } }, ['name']) }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.delete');
+    if (!t) return reply;
+    if (trimmed((req.body as { name: string }).name) !== t.c.name) return reply.code(400).send({ error: 'invalid', problem: 'type the name of the campaign to delete it' });
+    deleteCampaign(db(), t.c, req.actor!.id, now());
+    return { deleted: true };
+  });
+
+  /** A member files the campaign away in their own list, or takes it back. */
+  app.put('/api/v1/campaigns/:id/archive', { config: { action: 'campaign.archive' }, schema: body({ archived: { type: 'boolean' } }, ['archived']) }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.archive');
+    if (!t) return reply;
+    const archived = (req.body as { archived: boolean }).archived;
+    setArchived(db(), t.c.id, req.actor!.id, archived, now());
+    return { archived };
   });
 
   /** The campaign's house rules (a leader): for every warband in it; a warband whose own differ is marked for everyone. */
