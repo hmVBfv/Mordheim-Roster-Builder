@@ -46,6 +46,12 @@
   height: 100%;
 }
 
+.emptyBody {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
 .emptyTitle {
   margin: var(--space-2) 0 0;
 }
@@ -53,6 +59,29 @@
 .emptyText {
   margin: 0;
   max-width: 46ch;
+}
+
+/* an empty part of a page (a list with nothing in it yet): the scene small, the words beside it */
+.compact {
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-items: start;
+  align-items: center;
+  column-gap: var(--space-3);
+  padding: var(--space-1) 0;
+  text-align: left;
+}
+
+.compact .frame {
+  width: 132px;
+}
+
+.compact .emptyBody {
+  justify-items: start;
+  gap: var(--space-1);
+}
+
+.compact .emptyTitle {
+  margin: 0;
 }
 
 /* the lights move a little: windows flicker, wyrdstone breathes, stars wink */

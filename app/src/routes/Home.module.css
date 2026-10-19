@@ -1,0 +1,17 @@
+/* Home: one column on a phone; from tablet width what waits and the warbands
+   on the left, the campaigns on the right. Without campaigns (the Quick
+   Build) the warbands have the whole width. */
+.home {
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .home {
+    grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr);
+    column-gap: calc(var(--space-4) * 2);
+  }
+
+  .solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

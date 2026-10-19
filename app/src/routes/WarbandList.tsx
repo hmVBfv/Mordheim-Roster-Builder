@@ -9,10 +9,10 @@ function CampaignMark({ id }: { id: string }) {
   return <> · in {name ?? 'a campaign'}</>;
 }
 
-/** With `marks` (someone signed in): which are only on this device, and which wait for a decision. */
-export function WarbandList({ warbands, marks = false }: { warbands: StoredWarband[]; marks?: boolean }) {
+/** With `marks` (someone signed in): which are only on this device, and which wait for a decision. With `grid`, a desktop lays them side by side. */
+export function WarbandList({ warbands, marks = false, grid = false }: { warbands: StoredWarband[]; marks?: boolean; grid?: boolean }) {
   return (
-    <ul className={ui.list}>
+    <ul className={`${ui.list} ${grid ? ui.listGrid : ''}`}>
       {warbands.map((w) => (
         <li key={w.id}>
           <Link to={`/warbands/${w.id}`} className={ui.listLink}>

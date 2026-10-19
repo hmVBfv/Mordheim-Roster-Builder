@@ -419,6 +419,17 @@ verwirren. **Entschieden (Rob):** Gruppen mit Unterpunkten, „More“ heißt
 (Seitenleiste ab 900 px mit Warbands, Kampagnen und den Abschnitten der offenen
 Kampagne; „Account“ mit Person, im Quick Build „Settings“).
 
+## Zwischenschritt – Desktop-Übersicht
+
+Rob, 19.10.2026: „Dann auch die Desktopübersicht angehen.“ (Der Hauptfokus der
+Kampagne liegt am Desktop.) **Stand 19.10.2026:** Home und die Übersicht einer
+Kampagne nutzen die Breite – siehe [ui.md](ui.md#2-navigation) (Home in zwei
+Spalten mit der neuen Karte „Campaigns“, Warbands als Raster; die Übersicht
+trennt „wer“ von „was geschah“, Mitglieder eine Zeile je Person, leere Teile
+mit kleinem Bild). Ab 1920 px bleibt der Inhalt bei 1320 px (nur das Roster
+ist breiter). **Danach, je ein eigener Pull Request:** die übrigen
+Bildschirme – Rob entscheidet die Reihenfolge.
+
 ## Phase 5 – Extras
 
 - Volltextsuche (SQLite FTS5) über Notizen, Zeitleiste, Lebensläufe.

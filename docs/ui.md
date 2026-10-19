@@ -79,6 +79,21 @@ Report a problem   überall erreichbar (Knopf im Kopf jeder Seite; Account → Y
   nebeneinander (z. B. Roster links, gewählter Krieger rechts). Karten
   stehen nebeneinander, so viele die Breite fasst (Roster: ab 1440 px drei
   Spalten); der Inhalt ist bis 1320 px breit.
+- **Home und Kampagnen-Übersicht am Desktop (Rob, 19.10.2026: „Dann auch die
+  Desktopübersicht angehen“):** Home steht ab 900 px in zwei Spalten – links
+  „Open for you“ und die zuletzt geänderten Warbands als Raster (sechs statt
+  drei, zwei bis vier nebeneinander), rechts „Campaigns“: die Kampagnen im
+  Spiel, eine Zeile je Kampagne mit Rolle, Runde und Zahl der Warbands; „All
+  campaigns“ führt zur Liste mit dem Archiv. Auf dem Handy steht die Karte
+  unter den Warbands (dort trägt die Leiste unten dieselbe Aufgabe). Der Quick
+  Build hat keine Kampagnen und gibt den Warbands die ganze Breite. Die
+  Übersicht einer Kampagne sortiert **wer** nach links (Warbands, Mitglieder –
+  eine Zeile je Person mit Rolle, zwei nebeneinander) von **was geschah** nach
+  rechts (Schlachten, Karte); die Reihenfolge auf dem Handy bleibt Warbands,
+  Mitglieder, Schlachten, Karte. Ein leerer Teil einer Seite zeigt sein Bild
+  klein neben dem Satz (`Empty compact`), nicht als Plakat; das große Bild
+  bleibt dem leeren Bildschirm. Breiter als 1320 px wird der Inhalt nicht
+  (nur das Roster nutzt bis 1920 px).
 - **Vorschlag (Mockup `desktop.html`, 29.09.2026, noch nicht entschieden):**
   Auf Robs Wunsch nach „mehreren ggf. verschiebbaren Fenstern … ohne
   clutter“ wird der Desktop eine Arbeitsfläche aus Panels. Ein Panel ist ein
