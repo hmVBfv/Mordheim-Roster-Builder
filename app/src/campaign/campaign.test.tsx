@@ -167,6 +167,28 @@ describe('the overview', () => {
     expect(screen.queryByRole('textbox')).toBeNull();
   });
 
+  /* Rob, 19.10.2026: a section of its own, for the quick overview of every warband. */
+  it('the Warbands tab: a card each with the numbers of its last mark, the waiting ones apart; a card opens the warband', async () => {
+    const srv = server();
+    const anna = saveOf('The Grey Penitents');
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: anna, role: 'leader' }, { player: 'Ben', data: saveOf('Clan Skrittle'), pending: true }] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    // the bottom navigation has a Warbands entry too: the campaign's tab is the one that goes to this campaign's warbands
+    const tab = () => document.querySelector<HTMLElement>(`a[href="/campaign/${c.id}/warbands"]`);
+    await waitFor(() => expect(tab()).toBeTruthy());
+    await user.click(tab()!);
+    const playing = await screen.findByRole('list', { name: 'Warbands' });
+    const t = totals(anna);
+    expect(within(playing).getAllByRole('link').map((a) => a.textContent)).toEqual([
+      `The Grey Penitents✓ StartAnna · MercenariesRating${t.rating}Warriors${t.models}Heroes${t.heroes}Gold${t.gold}Fallen${t.fallen}`,
+    ]);
+    const waiting = screen.getByRole('list', { name: 'Waiting warbands' });
+    expect(within(waiting).getAllByRole('link').map((a) => a.textContent)).toEqual(['Clan SkrittleWaiting for a leaderBen · MercenariesNo mark yet – its numbers come with the first one.']);
+    await user.click(within(playing).getAllByRole('link')[0]!);
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Grey Penitents' })).toBeTruthy();
+  });
+
   it('entering a warband: a copy goes in, the warband stays free; a leader’s own takes part at once', async () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign' });

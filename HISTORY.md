@@ -3412,6 +3412,19 @@ server does not check that a faction or NPC exists, as it does not for a
 battle reference: a reference to something since removed is harmless, and
 refusing to save an entry because of it would be worse.
 
+## October 19, 2026 — a Warbands section under Campaign
+
+Rob asked for a sub-entry on the left under Campaign, "like Warbands", for a
+quick overview. The overview already listed the warbands in a line each, which
+is a list to find one warband in, not a way to compare them. The new section
+shows a card per warband that takes part, with what the last mark froze
+(rating, warriors, heroes, gold, fallen), a bar against the strongest, the
+districts it holds, and the ones waiting for a leader apart. The numbers come
+from the enrolment's tag, so the page costs no extra request and works from
+what the device kept – the price is that they are those of the last mark, not
+live ones, which the page says. `EnterSheet` moved into its own file so both
+the overview and this section can use it.
+
 
 ## October 19, 2026 — NPCs in a scenario, with parts the players cannot read yet
 

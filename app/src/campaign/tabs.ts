@@ -12,6 +12,7 @@ export function campaignTabs(id: string, role: CampaignRole, totp: boolean): Cam
   const lead = role === 'leader';
   return [
     { to: at(''), label: 'Overview', end: true },
+    { to: at('/warbands'), label: 'Warbands' },
     { to: at('/notes'), label: 'Notes' },
     { to: at('/timeline'), label: 'Timeline' },
     { to: at('/chronicle'), label: 'Chronicle' },

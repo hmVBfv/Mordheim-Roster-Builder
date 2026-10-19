@@ -71,7 +71,7 @@ describe('the side navigation', () => {
     const sub = await waitForList(nav, 'nav-campaign');
     await vi.waitFor(() => expect(within(sub).getAllByRole('link').map((a) => a.textContent)).toContain('Summer in Sylvania'));
     const sections = await within(sub).findByRole('list', { name: 'The Hel Fenn Campaign: sections' });
-    expect(within(sections).getAllByRole('link').map((a) => a.textContent)).toEqual(['Overview', 'Notes', 'Timeline', 'Chronicle', 'World', 'Questions', 'Background ⚑', 'Manage']);
+    expect(within(sections).getAllByRole('link').map((a) => a.textContent)).toEqual(['Overview', 'Warbands', 'Notes', 'Timeline', 'Chronicle', 'World', 'Questions', 'Background ⚑', 'Manage']);
     expect(within(sections).getByRole('link', { name: 'Timeline' }).getAttribute('aria-current')).toBe('page');
     // the other campaign shows no sections until it is the open one
     expect(within(sub).queryByRole('list', { name: 'Summer in Sylvania: sections' })).toBeNull();
