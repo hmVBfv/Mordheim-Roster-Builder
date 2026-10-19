@@ -135,6 +135,9 @@ export const ACTIONS = {
   /** The leaders' plan for a battle – the red thread the battle and its chapter should follow: leaders with the authenticator, read and write. */
   'plans.read': { who: 'user', target: 'leader' },
   'plans.write': { who: 'user', target: 'leader' },
+  /** Opponents – groups of profiles and the campaign's own skills: leaders with the authenticator, read and write – for the rest they are not there. */
+  'opponents.read': { who: 'user', target: 'leader' },
+  'opponents.write': { who: 'user', target: 'leader' },
   /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
   'style.read': { who: 'user', target: 'leader' },
   'style.write': { who: 'user', target: 'leader' },

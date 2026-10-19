@@ -1,6 +1,7 @@
 /* Tabletop Simulator: name and description texts for model cards (legacy
    js/tts.js). TTS reads BBCode-style colour tags: [RRGGBB]text[-]. */
 import type { HireEntry, UnitDef } from '../data/types.ts';
+import type { OpponentProfile } from '../campaign/opponents.ts';
 import type { HireRecord, Model } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
 import { isHeroModel } from '../rules/costs.ts';
@@ -91,4 +92,21 @@ export function ttsTextHS(ctx: Ctx, hs: HireEntry, disp: string | null | undefin
   const rulesTxt = rules.length ? rules.map((r) => '• ' + r).join('\n') : '• None';
   const title = (disp && disp !== hs.name) ? `${disp} — ${hs.name}` : hs.name;
   return `${title}  [Hired Sword · ${hs.grade}]\n${statline}${opt}${xp}${adv}${sk}${spl}\n\nEquipment: ${rec ? hsChosenEq(ctx, rec, hs) : hs.eq}${extraEq}${psp}\n\nSpecial Rules:\n${rulesTxt}`;
+}
+
+/** An opponent's name for the TTS Name box: gold like a Hero unless it is one of the rank and file. */
+export function ttsOpponentName(p: Pick<OpponentProfile, 'name' | 'type'>): string {
+  return ttsNameFor(p.name || 'Opponent', !/hench|rank|file|animal/i.test(p.type));
+}
+
+/** An opponent's description, laid out like a warband model's: profile and save, special rules and skills, equipment. */
+export function ttsOpponentText(p: OpponentProfile): string {
+  const has = STATS.some((x) => (p.profile[x] ?? '').trim());
+  const statline = has ? STATS.map((x) => `${x} ${(p.profile[x] ?? '').trim() || '-'}`).join('   ') + `   Sv ${p.sv.trim() || '-'}` : '';
+  const rules = [
+    ...p.rules.split('\n').map((x) => x.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean),
+    ...p.skills.map((s) => (s.text.trim() ? `${s.name}: ${s.text.trim()}` : s.name)),
+  ];
+  const rulesTxt = rules.length ? rules.map((r) => `• ${r}`).join('\n') : 'None';
+  return `${statline ? `[7AD1A4]${statline}[-]\n` : ''}[5ACFFF]Special Rules:[-]\n${rulesTxt}\n[5ACFFF]Equipment:[-] ${p.equipment.trim() || 'None'}`;
 }

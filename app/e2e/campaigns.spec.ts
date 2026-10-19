@@ -1045,6 +1045,63 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Plans and opponents (leaders only): the red thread of the next battle, and a group of opponents copied from the game, changed, carded for TTS. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`plans and opponents: a leader plans the next battle and builds a group of opponents, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    await page.goto(`campaign/${c.id}/background`);
+    await page.getByRole('button', { name: 'Plans' }).click();
+    await page.getByRole('button', { name: 'Plan a battle' }).click();
+    const plan = page.getByRole('dialog', { name: 'Plan a battle' });
+    await plan.getByLabel('The red thread').fill('The ferrymen turn on the Caravan halfway across. The Countess stays unseen – only her coin is found.');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-plan-form`);
+    await plan.getByRole('button', { name: 'Save the plan' }).click();
+    await expect(page.getByRole('list', { name: 'Plans' }).getByRole('listitem')).toHaveCount(1);
+    await noSideScroll(page);
+    await shot(page, `${theme}-plans`);
+
+    await page.getByRole('button', { name: 'Opponents' }).click();
+    await page.getByRole('button', { name: 'New group' }).click();
+    const form = page.getByRole('dialog', { name: 'New group of opponents' });
+    await form.getByLabel('Group name').fill('The ferrymen');
+    await form.getByRole('button', { name: 'Copy a model from the game…' }).click();
+    const picker = form.getByRole('group', { name: 'Copy a model' });
+    await picker.getByLabel('Search every model').fill('ogre');
+    await expect(picker.getByRole('list', { name: 'Models found' }).getByRole('listitem').first()).toBeVisible();
+    await picker.getByRole('list', { name: 'Models found' }).scrollIntoViewIfNeeded();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-picker`);
+    await picker.getByRole('button', { name: /^Add Ogre Bodyguard \(/ }).click();
+    await picker.getByRole('button', { name: 'Done adding' }).click();
+    await form.getByLabel('Name', { exact: true }).fill('Big Grul');
+    await form.getByRole('button', { name: 'Add a skill' }).click();
+    const adder = form.getByRole('group', { name: 'Add a skill' });
+    await adder.getByLabel('Find a skill').fill('step aside');
+    await adder.getByRole('button', { name: 'Add the skill Step Aside' }).click();
+    await adder.getByRole('button', { name: 'Done' }).click();
+    await form.getByRole('group', { name: 'Characteristics' }).scrollIntoViewIfNeeded();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-profile`);
+    await form.getByRole('button', { name: 'Save the group' }).click();
+    const groups = page.getByRole('list', { name: 'Opponent groups' });
+    await expect(groups.getByText('Big Grul')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents`);
+    await page.getByRole('button', { name: 'Tabletop Simulator cards of The ferrymen' }).click();
+    const tts = page.getByRole('dialog', { name: 'The ferrymen · Tabletop Simulator' });
+    await expect(tts.getByLabel('Description')).toHaveValue(/Step Aside: /);
+    await noSideScroll(page);
+    await shot(page, `${theme}-opponents-tts`);
+  });
+}
+
 /* The AI pack and the style guide (phase 4b4a): a leader's prompt for whoever writes the next chapter, and the style it carries. */
 function packScene(srv: Awaited<ReturnType<typeof playServer>>) {
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });

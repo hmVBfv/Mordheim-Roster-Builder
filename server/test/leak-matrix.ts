@@ -89,6 +89,9 @@ export interface ProbeContext {
   /** Scenarios of the admin's campaign (phase 4b3c): a draft to release, a spare draft to take out. */
   ledScenarioId: string;
   spareScenarioId: string;
+  /** Opponents of the admin's campaign: a group and a skill to take out. */
+  spareOpponentGroupId: string;
+  spareOpponentSkillId: string;
   /** The style guide of the admin's campaign was written once: the seq an edit starts from (phase 4b4a). */
   ledStyleSeq: number;
   /** Chapter drafts of the admin's campaign (phase 4b5b): one to publish, a spare one to throw away. */
@@ -490,6 +493,22 @@ export const MATRIX: Record<Action, MatrixRow> = {
     routes: { 'PUT /api/v1/campaigns/:id/plans/:round': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/plans/2`, body: { text: 'The ferry burns.', baseSeq: 0 } }) },
     fields: { admin: ['plan'] },
   },
+  'opponents.read': {
+    // the admin leads the campaign (the user role is a player there: 403); the opponents of the victim's campaign carry a marker no role may read
+    allowed: ['admin'],
+    routes: { 'GET /api/v1/campaigns/:id/opponents': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/opponents` }) },
+    fields: { admin: ['groups', 'skills', 'seq'] },
+  },
+  'opponents.write': {
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/opponents/groups/:gid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/opponents/groups/${randomUUID()}`, body: { name: 'The ferrymen', profiles: [{ id: 'p1', name: 'Ferryman', profile: { M: '4', WS: '3' } }], baseSeq: 0 } }),
+      'DELETE /api/v1/campaigns/:id/opponents/groups/:gid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/opponents/groups/${c.spareOpponentGroupId}` }),
+      'PUT /api/v1/campaigns/:id/opponents/skills/:sid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/opponents/skills/${randomUUID()}`, body: { name: 'Ferryman’s Luck', text: 'Re-roll one dice.', baseSeq: 0 } }),
+      'DELETE /api/v1/campaigns/:id/opponents/skills/:sid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/opponents/skills/${c.spareOpponentSkillId}` }),
+    },
+    fields: { admin: ['group', 'skill', 'removed', 'seq'] },
+  },
   'style.read': {
     // the admin leads the campaign (the user role is a player there: 403); the style guide of the victim's campaign carries a marker no role may read
     allowed: ['admin'],
@@ -589,6 +608,8 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   /STYLE-SECRET/,
   // a battle plan of the victim's campaign: leaders' own, and none of its leaders is a role of the matrix
   /PLAN-SECRET/,
+  // the opponents of the victim's campaign: leaders' own, and none of its leaders is a role of the matrix
+  /OPPONENT-SECRET/,
   // a chapter draft of the victim's campaign (phase 4b5b): only its leaders read it, and none of them is a role of the matrix
   /DRAFT-SECRET/,
   // a problem report (phase 4c1): its words reach only its reporter and, in the report's own detail, the admin – the probes read a report without the marker; the list carries no words and no copy of a warband
