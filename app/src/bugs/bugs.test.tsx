@@ -208,7 +208,7 @@ describe('reporting a problem', () => {
 });
 
 describe('following a report', () => {
-  it('under More the reporter reads the words and the status of their own reports – never of others’, never the severity', async () => {
+  it('under Account the reporter reads the words and the status of their own reports – never of others’, never the severity', async () => {
     const { srv, me } = server();
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Gold drifts', text: 'After the battle the gold is off.', status: 'fixed', fixedIn: '0123456789abcdef0123456789abcdef01234567', severity: 'S1', area: 'gold ledger' });
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Dark mode please', text: 'A darker theme.', kind: 'wish', status: 'new' });
@@ -223,10 +223,10 @@ describe('following a report', () => {
     expect(section.textContent).not.toMatch(/Ben|S1|gold ledger/);
   });
 
-  it('nothing under More until the player has sent a report', async () => {
+  it('nothing under Account until the player has sent a report', async () => {
     server();
     at('/more');
-    await screen.findByRole('heading', { level: 1, name: 'More' });
+    await screen.findByRole('heading', { level: 1, name: 'Account' });
     await waitFor(() => expect(screen.queryByRole('region', { name: 'Your reports' })).toBeNull());
   });
 });

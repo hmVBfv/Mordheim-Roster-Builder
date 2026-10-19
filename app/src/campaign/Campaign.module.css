@@ -177,3 +177,10 @@
   border-color: var(--danger);
   color: var(--bg);
 }
+
+/* the campaign's own tabs: on a phone only; from tablet width on the side navigation carries them (app/Shell.tsx) */
+@media (min-width: 900px) {
+  .pageTabs {
+    display: none;
+  }
+}

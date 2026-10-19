@@ -295,6 +295,9 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Layout auf diesem Gerät | Layout on this device (Phone / Desktop) | von Hand gewählt, nur auf dem Gerät; die App wechselt nie von selbst |
 | Regeltext-Blase | – (Antippen eines unterstrichenen Worts) | App: `TipWord` (`app/src/ui/Tip.tsx`), Texte aus `app/src/roster/tips.ts`; Mockup: `.tip`, `window.mockTips` |
 | Neue Warband | New warband | App: `/warbands/new` |
+| Konto (letztes Ziel der Navigation) | Account (Kampagnen-App) · Settings (Quick Build) | `/more`, `accountLabel()` in `app/src/app/nav.ts`; früher „More“ |
+| Unterpunkte der Seitenleiste | – (Pfeil: Open/Close Warbands, Campaign) | `useNavChildren`, `useSideNav` in `app/src/app/navChildren.ts`; ab 900 px |
+| Abschnitte einer Kampagne | Overview · Notes · Timeline · Chronicle · World · Questions · Background ⚑ · Manage | `campaignTabs` in `app/src/campaign/tabs.ts` |
 | Zeile (eines Kriegers) | Row | App: `RowView` in `app/src/roster/Board.tsx`, Daten aus `unitRow` (`view.ts`); Name, Statline, Erfahrung, Marken, Ausrüstung |
 | Reiter eines Kriegers | Tabs: Overview · Gear · Skills & injuries · Story & more | App: `TabId`, `tabsFor` in `Detail.tsx`; nur in der Anordnung `stack` |
 | Fenster des gewählten Kriegers | Selected warrior (Pane) | App: `aside` in `Board.tsx`, alle Abschnitte offen, ab 860 px |

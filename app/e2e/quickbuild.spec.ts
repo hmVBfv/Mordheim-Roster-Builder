@@ -15,7 +15,7 @@ test.beforeEach(({ page }) => {
 });
 test.afterEach(() => { expect(errors, 'console errors').toEqual([]); });
 
-test('send to the campaign server: the address once in More, then a link that carries the warband', async ({ page }) => {
+test('send to the campaign server: the address once in Settings, then a link that carries the warband', async ({ page }) => {
   await page.goto('#/warbands');
   await page.getByRole('button', { name: 'Import a warband' }).first().click();
   await page.getByRole('textbox').fill(SAVE);
@@ -23,7 +23,7 @@ test('send to the campaign server: the address once in More, then a link that ca
   await expect(page.getByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeVisible();
   const roster = page.url();
   await page.getByRole('link', { name: 'Export', exact: true }).click();
-  await expect(page.getByText('enter its address under More → Campaign server', { exact: false })).toBeVisible();
+  await expect(page.getByText('enter its address under Settings → Campaign server', { exact: false })).toBeVisible();
 
   await page.goto('#/more');
   await page.getByLabel('Campaign server').fill('mordheim.example.org/');

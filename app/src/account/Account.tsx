@@ -1,7 +1,7 @@
-/* The account in More (campaign flavour; docs/mockups/more.html, phase
+/* The account on the Account screen (campaign flavour; docs/mockups/more.html, phase
    3g): who is signed in, the authenticator, the password, the devices, and
-   for the admin the way to the admin tools. Loaded with More only in the
-   campaign app. */
+   for the admin the way to the admin tools. Loaded with the Account
+   screen only in the campaign app. */
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useNotice } from '../ui/Notice.tsx';
@@ -196,7 +196,7 @@ export function AccountSection() {
   return (
     <>
       <section className={`${ui.card} ${styles.section}`} aria-labelledby="acc-h">
-        <h2 id="acc-h">Account</h2>
+        <h2 id="acc-h">Sign-in and security</h2>
         {body}
         {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       </section>

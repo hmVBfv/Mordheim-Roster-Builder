@@ -125,7 +125,7 @@ export function Campaigns() {
         ? <div className={ui.row}><StartSheet /></div>
         : (
           <>
-            <p className={ui.muted}>Starting a campaign needs the authenticator – a leader’s account is worth more to an intruder. Set it up under More → Account.</p>
+            <p className={ui.muted}>Starting a campaign needs the authenticator – a leader’s account is worth more to an intruder. Set it up under Account.</p>
             <div className={ui.row}><Link to="/more" className={ui.buttonQuiet}>To the account</Link></div>
           </>
         )}

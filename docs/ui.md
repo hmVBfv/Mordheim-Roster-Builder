@@ -50,13 +50,31 @@ Game night   Vollbild, aus einer Schlacht heraus (4a2: /campaign/:id/battles/:bi
              auf dem Handy ohne die Leiste unten)
 Profile      Devices · Authenticator · Password
 Admin*       Users · Invites · Reports · Backups
-Report a problem   überall erreichbar (Knopf im Kopf jeder Seite; More → Your reports; Admin → Reports)
+Report a problem   überall erreichbar (Knopf im Kopf jeder Seite; Account → Your reports; Admin → Reports)
                                   (* nur Leiter bzw. Admin)
 ```
 
-- **Handy:** Navigationsleiste unten (Home, Warbands, Campaign, Notes, More);
-  Formulare und Auswahl als Bereich, der von unten aufklappt (native
-  `<dialog>`), statt Pop-up-Fenstern.
+- **Handy:** Navigationsleiste unten (Home, Warbands, Campaign, Notes,
+  Account); Formulare und Auswahl als Bereich, der von unten aufklappt (native
+  `<dialog>`), statt Pop-up-Fenstern. Die Abschnitte einer Kampagne stehen dort
+  als Reiter über der Kampagne.
+- **„Account“ statt „More“ (Rob, 19.10.2026):** Das letzte Ziel heißt in der
+  Kampagnen-App „Account“ und zeigt eine Person; drei Punkte lasen sich wie ein
+  Menü oder Einstellungen. Im Quick Build, der kein Konto hat, heißt es
+  „Settings“ mit Zahnrad. Die Adresse bleibt `/more`; die Karte mit Anmeldung,
+  Authenticator und Passwort darin heißt „Sign-in and security“.
+- **Seitenleiste mit Unterpunkten (Rob, 19.10.2026: „aufklappbare
+  Unterreiter“):** ab 900 px öffnen sich Warbands und Campaign in ihre
+  Einträge – unter Warbands die sechs zuletzt geänderten eigenen Warbands und
+  „+ New warband“, unter Campaign die eigenen Kampagnen im Spiel (archivierte
+  nicht) und unter der offenen Kampagne ihre Abschnitte (Overview, Notes,
+  Timeline, Chronicle, World, Questions, Background ⚑, Manage – wer was sieht,
+  wie auf den Seiten selbst; `campaign/tabs.ts`). Eine Gruppe ist offen, wo
+  man gerade ist; der Pfeil daneben öffnet oder schließt sie, und die Wahl
+  bleibt auf dem Gerät (`mordheim-nav-open`). Die Reiter über der Kampagne
+  entfallen dann, weil die Seitenleiste sie trägt; eine archivierte oder noch
+  nicht geladene Kampagne, die offen ist, steht trotzdem mit ihren
+  Abschnitten da (aus dem Speicher des Geräts).
 - **Desktop:** Seitenleiste links, Inhalt mit Liste und Detail
   nebeneinander (z. B. Roster links, gewählter Krieger rechts). Karten
   stehen nebeneinander, so viele die Breite fasst (Roster: ab 1440 px drei
@@ -89,7 +107,7 @@ Report a problem   überall erreichbar (Knopf im Kopf jeder Seite; More → Your
 - **Layout von Hand, je Gerät (Rob, 02.10.2026):** Die App wechselt nie von
   selbst zwischen Handy und Desktop – im Mockup sprang die Arbeitsfläche bei
   manchen Klicks auf eine Handy-Seite, ohne Weg zurück. Gewählt wird unter
-  More → „Layout on this device“ (Phone / Desktop), gespeichert auf dem
+  Account → „Layout on this device“ (Phone / Desktop), gespeichert auf dem
   Gerät; auf einem breiten Bildschirm fragt die App beim ersten Start einmal.
   Was am Desktop noch kein eigenes Panel hat, öffnet sich dort in einem
   großen Panel in der Mitte, nie als Handy-Seite.

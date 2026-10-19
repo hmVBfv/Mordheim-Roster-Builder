@@ -3078,3 +3078,26 @@ only on arrival.
 The leak matrix probes the delete with a campaign of its own that the
 admin's probe (the last role) deletes, so no later probe stands on a
 tombstone.
+
+## October 19, 2026 — a side navigation that opens, and an account that is a person
+
+Rob found the three dots of "More" confusing – three dots usually mean a menu
+or settings – and wanted the entries on the left to open into what is under
+them. The last entry is now "Account" with a person in the campaign app and
+"Settings" with a gear in the Quick Build, which has no account; the address
+stays /more so no link breaks.
+
+From 900 px on, Warbands opens into one's newest warbands and Campaign into
+one's campaigns, and under the campaign one is in, its sections. Which
+sections a player sees was written out in the campaign page itself; it is a
+small function now (`campaign/tabs.ts`) that the page and the side share, so
+the two cannot drift apart.
+
+Two things decided the shape. The side entries are only rendered when the
+screen is wide (a media query in script, not only in CSS): in jsdom and on a
+phone the campaign keeps its own tabs and no link appears twice, which kept
+every existing test that looks for "Manage" or "Timeline" by name. And the
+open campaign is read from the device's own copy (a live query on the cached
+view), so an archived campaign or one whose list has not come yet still has
+its sections at the side – otherwise hiding the page's tabs on a desktop
+would have left no way to them.

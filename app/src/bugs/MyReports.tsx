@@ -1,4 +1,4 @@
-/* "Your reports" under More: what the reporter sent and where it stands. The
+/* "Your reports" under Account: what the reporter sent and where it stands. The
    reporter reads their words and the status – never the severity or the
    technical details. Needs the connection; offline it says so. */
 import { useEffect, useState } from 'react';

@@ -19,6 +19,7 @@ import {
   type CampaignRole, type CampaignView, type Enrolment,
 } from './api.ts';
 import styles from './Campaign.module.css';
+import { campaignTabs } from './tabs.ts';
 import { NewBattleSheet } from './NewBattle.tsx';
 import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
@@ -240,7 +241,7 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
   const satOut = view.enrolments.filter((e) => e.status === 'active' && !ofNext.some((b) => (b.warbandIds ?? []).includes(e.warbandId)));
   const outside = (people ?? []).filter((p) => !view.members.some((m) => m.userId === p.id));
   if (!canLead) {
-    return <p className={ui.message}>Leading needs the authenticator: set it up under More → Account, then come back.</p>;
+    return <p className={ui.message}>Leading needs the authenticator: set it up under Account, then come back.</p>;
   }
   return (
     <div className={styles.columns}>
@@ -432,15 +433,9 @@ export function Campaign() {
         <p className={ui.muted}>{roundName(view.campaign.round)} · you are {view.role === 'viewer' ? 'watching' : ROLE_NAMES[view.role].toLowerCase()}</p>
       </header>
       {error && <p className={ui.message} role="status">{error} Shown as last seen.</p>}
-      <nav className={styles0.tabs} aria-label="Campaign">
-        <NavLink to={`/campaign/${id}`} end>Overview</NavLink>
-        <NavLink to={`/campaign/${id}/notes`}>Notes</NavLink>
-        <NavLink to={`/campaign/${id}/timeline`}>Timeline</NavLink>
-        <NavLink to={`/campaign/${id}/chronicle`}>Chronicle</NavLink>
-        <NavLink to={`/campaign/${id}/world`}>World</NavLink>
-        {view.role !== 'viewer' && <NavLink to={`/campaign/${id}/questions`}>Questions</NavLink>}
-        {lead && user.totp && <NavLink to={`/campaign/${id}/background`}>Background ⚑</NavLink>}
-        {lead && <NavLink to={`/campaign/${id}/manage`}>Manage</NavLink>}
+      {/* on a phone the sections are tabs here; from tablet width on they stand in the side navigation */}
+      <nav className={`${styles0.tabs} ${styles.pageTabs}`} aria-label="Campaign">
+        {campaignTabs(id, view.role, user.totp).map((t) => <NavLink key={t.to} to={t.to} end={t.end}>{t.label}</NavLink>)}
       </nav>
       {content}
       <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>

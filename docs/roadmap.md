@@ -331,7 +331,7 @@ für den Meldenden und die Übergabe von Hand. Migration 21 (Tabelle `bugs`,
 `server/src/bugs.ts`, `routes-bugs.ts`, Policy `bugs.report|mine|read|write`,
 neue Zeilen der Leak-Matrix mit Merkwort). App `app/src/bugs/`: Knopf
 **„Report a problem“** im Kopf jeder Seite (Blatt mit Art, Text, bei
-Regelfehlern Quelle), **More → „Your reports“** mit dem Stand, Reiter
+Regelfehlern Quelle), **Account → „Your reports“** mit dem Stand, Reiter
 **„Reports“** im Admin-Bereich. Der Kontext besteht nur aus Struktur und festen
 Wörtern (Bildschirm als Muster ohne Kennungen, Namen der Blätter, „eine
 Änderung an der Warband“, Sync- und Online-Stand, fehlgeschlagene Aufrufe als
@@ -410,6 +410,14 @@ unter Manage ganz unten „Delete the campaign…“ mit Blatt, das die Folgen
 nennt und den Namen verlangt; in der Kampagnenliste je Eintrag „Archive“, die
 archivierten stehen im Abschnitt „Archived“ mit „Back to the list“. Wer nur
 noch eine Kampagne im Spiel hat, landet weiter direkt dort.
+
+## Zwischenschritt – Navigation mit Unterpunkten, „Account“
+
+Rob, 19.10.2026: aufklappbare Unterreiter links; die drei Punkte für „More“
+verwirren. **Entschieden (Rob):** Gruppen mit Unterpunkten, „More“ heißt
+„Account“. **Stand 19.10.2026:** umgesetzt – siehe [ui.md](ui.md#2-navigation)
+(Seitenleiste ab 900 px mit Warbands, Kampagnen und den Abschnitten der offenen
+Kampagne; „Account“ mit Person, im Quick Build „Settings“).
 
 ## Phase 5 – Extras
 

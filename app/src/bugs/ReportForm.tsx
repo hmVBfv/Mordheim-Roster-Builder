@@ -85,7 +85,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
     return (
       <div className={ui.page}>
         <h2 id="report-title">Sent</h2>
-        <p className={ui.message} role="status">Thank you – Rob will look at it. You can follow it under More → Your reports.</p>
+        <p className={ui.message} role="status">Thank you – Rob will look at it. You can follow it under Account → Your reports.</p>
         <div className={ui.row}><button type="button" className={ui.button} onClick={close}>Done</button></div>
       </div>
     );

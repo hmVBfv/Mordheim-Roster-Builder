@@ -170,7 +170,7 @@ spricht mit `/api/v1` (gleicher Ursprung, Cookie, Schreiben nur als JSON),
 Gerät online kommt; der Builder wartet nie darauf. Auf dem Gerät bleibt nur
 der zuletzt bekannte Nutzer (Name und Flags, kein Token – das Cookie ist
 `HttpOnly`). Bildschirme: `/sign-in`, `/invite#…` und `/reset#…` (das Token
-verlässt sofort die Adresszeile), das Konto in More, `/admin/:tab`
+verlässt sofort die Adresszeile), das Konto unter „Account“, `/admin/:tab`
 (Nutzer, Einladungen, Anmelde-Log, Audit-Log). Im Dev-Server leitet Vite
 `/api` an `127.0.0.1:3000` weiter.
 
@@ -353,7 +353,7 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
   der sie kam (`copied_from`), sofern diese dem Konto gehört und auf dem
   Server liegt.
 - **„Send to campaign server“** (Quick Build, concept.md 4.11): die Adresse
-  steht unter More; Export öffnet `https://<server>/import#v1.<Warband>`
+  steht unter „Settings“; Export öffnet `https://<server>/import#v1.<Warband>`
   (JSON, `deflate-raw`, base64url, `app/src/share/link.ts`). Die
   Kampagnen-App nimmt das Fragment sofort aus der Adresszeile, zeigt die
   Warband und legt sie als neue an oder als nächste Version einer eigenen

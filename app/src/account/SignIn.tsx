@@ -2,7 +2,7 @@
    password, then – with an authenticator – its code, or one of the recovery
    codes instead. Accounts come from an invite only, so there is no
    "register" here. After signing in the app goes where it was sent from
-   (`?next=`), or to the account in More. */
+   (`?next=`), or to the account (Account in the navigation). */
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useOnline } from '../app/SyncState.tsx';

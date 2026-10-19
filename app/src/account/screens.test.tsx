@@ -45,24 +45,24 @@ describe('signing in', () => {
     await user.click(screen.getByRole('button', { name: 'Use the app’s code' }));
     await user.type(screen.getByLabelText('Code from your authenticator app'), '123456');
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
-    // the account in More
-    expect(await screen.findByRole('heading', { level: 1, name: 'More' })).toBeTruthy();
-    const account = screen.getByRole('region', { name: 'Account' });
+    // the account on the Account screen
+    expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
+    const account = screen.getByRole('region', { name: 'Sign-in and security' });
     expect(within(account).getByText('Kai')).toBeTruthy();
     expect(within(account).getByText(/On – a code after the password/)).toBeTruthy();
     expect(await screen.findByText('Chrome on Android')).toBeTruthy();
   });
 
-  it('More, signed out: the way to sign in, no devices, no admin', async () => {
+  it('Account, signed out: the way to sign in, no devices, no admin', async () => {
     fakeServer({ 'GET /auth/me': () => ({ user: null, pending: false }) });
     at('/more');
-    const account = await screen.findByRole('region', { name: 'Account' });
+    const account = await screen.findByRole('region', { name: 'Sign-in and security' });
     expect(await within(account).findByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(screen.queryByRole('region', { name: 'Devices' })).toBeNull();
     expect(screen.queryByRole('region', { name: /Admin/ })).toBeNull();
   });
 
-  it('More, the server unreachable: the warbands still work, the last user is named', async () => {
+  it('Account, the server unreachable: the warbands still work, the last user is named', async () => {
     localStorage.setItem('mordheim-me', JSON.stringify(ME));
     // Caddy's answer while the app is down: no JSON
     vi.stubGlobal('fetch', vi.fn(async () => new Response('', { status: 502, headers: { 'content-type': 'text/plain' } })));
@@ -100,7 +100,7 @@ describe('a link from the admin', () => {
     await user.clear(screen.getByLabelText('Username'));
     await user.type(screen.getByLabelText('Username'), 'kai');
     await user.click(screen.getByRole('button', { name: 'Create the account' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'More' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
     expect(s.calls.filter((c) => c.path === '/invites/accept').at(-1)!.body).toMatchObject({ token: 'tok-123', username: 'kai', password: 'correct horse battery' });
   });
 
@@ -234,6 +234,17 @@ describe('the admin', () => {
     { id: 'a1', username: 'rob', displayName: 'Rob', isAdmin: true, totp: true, createdAt: '2026-10-01T10:00:00Z', disabledAt: null, lastSeenAt: '2026-10-03T10:00:00Z', sessions: 2 },
     { id: 'u1', username: 'kai', displayName: 'Kai', isAdmin: false, totp: true, createdAt: '2026-10-02T10:00:00Z', disabledAt: null, lastSeenAt: null, sessions: 1 },
   ];
+
+  it('the way back from the admin tools is named like the screen it leads to', async () => {
+    fakeServer({
+      'GET /auth/me': () => ({ user: ADMIN, pending: false }),
+      'GET /admin/users': () => ({ users }),
+    });
+    at('/admin/users');
+    expect(await screen.findByText('Kai')).toBeTruthy();
+    expect(screen.getByRole('link', { name: '‹ Account' }).getAttribute('href')).toBe('/more');
+    expect(screen.queryByRole('link', { name: '‹ More' })).toBeNull();
+  });
 
   it('users: a reset link for a player, shown once; not for oneself', async () => {
     const s = fakeServer({
