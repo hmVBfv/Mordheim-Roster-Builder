@@ -351,7 +351,12 @@ wenig.
 - **Sheets:** Die Knöpfe eines Sheets (Hire, Save, Start …) stehen am unteren
   Rand fest und sind ohne Scrollen erreichbar (Rob, 02.10.2026: „Hire“ lag
   unter langen Werten). Nach dem Anheuern steht die Liste wieder oben bei den
-  Filtern.
+  Filtern. Am Handy ist ein Sheet ein Blatt vom unteren Rand; ab 900 px ein
+  Fenster in der Mitte (bis 920 px breit, `ui.sheetWide` bis 1180 px), dessen
+  Felder in zwei Spalten stehen – Titel, Hinweise, lange Texte und die Knöpfe
+  nehmen die ganze Zeile. Solange ein Sheet offen ist, bleibt die Seite dahinter
+  stehen und scrollt nicht mit (Rob, 19.10.2026: das Sheet klebte unten, oben
+  war Platz, und die Seite musste erst ganz nach unten gescrollt werden).
 - **Statuswerte** (M WS BS S T W I A Ld Sv) als feste Tabelle mit
   gleichbreiten Ziffern; auf 360 px ohne horizontales Scrollen.
 - **Game night:** große Knöpfe im unteren Drittel (+ Casualty, + Note,

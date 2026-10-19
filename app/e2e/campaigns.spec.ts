@@ -537,6 +537,34 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* A sheet on a desktop is a window in the middle of the screen, wide, with its fields side by side – and the page behind it stays put
+   (Rob, 19.10.2026: it hugged the bottom edge with room left above, and the page had to be scrolled down to reach its end). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`a sheet on a desktop sits in the middle and is wide, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [] });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/world`);
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Add an NPC' });
+    const box = (await sheet.boundingBox())!;
+    expect(box.width, 'wide').toBeGreaterThan(800);
+    expect(box.y, 'room above').toBeGreaterThan(20);
+    expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
+    expect(Math.abs(box.x + box.width / 2 - 720), 'centred').toBeLessThan(2);
+    // the fields stand two to a row
+    const a = (await sheet.getByLabel('Faction').boundingBox())!;
+    const b = (await sheet.getByLabel('Name (English)').boundingBox())!;
+    expect(Math.abs(a.y - b.y), 'same row').toBeLessThan(2);
+    expect(b.x, 'to the right').toBeGreaterThan(a.x + a.width);
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow), 'page behind does not scroll').toBe('hidden');
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-sheet-desktop.png` });
+    await sheet.getByRole('button', { name: 'Cancel' }).click();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('visible');
+  });
+}
+
 /* Scenarios (phase 4b3c): a leaders' draft, released to a battle for everybody – a leader writes and releases, a player reads the played ones. */
 for (const theme of ['chronicle', 'parchment'] as const) {
   test(`the Scenarios section: a leader writes a draft and releases it to a battle, in ${theme}`, async ({ page }) => {
