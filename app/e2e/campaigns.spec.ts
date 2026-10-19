@@ -209,6 +209,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await page.goto(`campaign/${c.id}`);
     await page.getByRole('button', { name: 'New battle' }).click();
     const setup = page.getByRole('dialog', { name: 'Battle 1' });
+    await expect(setup.getByLabel('Battle number')).toHaveValue('1');
     await setup.getByLabel('Title (optional)').fill('Hel Fenn ferry');
     await tapTargets(page);
     await shot(page, `${theme}-battle-new`);
@@ -998,6 +999,49 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-drafts-published`);
+  });
+}
+
+/* The backstory: a leader brings in the group's old chronicle, is warned of hidden words, and everyone reads it as sections. */
+const BACKSTORY = [
+  '# The Hel Fenn chronicle', '', 'The Silver Caravan left Nuln in the spring, and the road was long.', '',
+  '## Battle 1 – the ferry', 'Rain over the Stir. Gerhard Voss waited at the jetty with a coin in his hand.', '',
+  '## Battle 2 – the quay', 'A building collapsed on the quay; nobody was found.', '',
+].join('\n');
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the backstory: a leader brings it in from a file, is warned of hidden words, and it is read as sections, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    srv.backgroundFrom(c.id, { kind: 'figure', title: 'The ferryman', truth: 'Gerhard Voss ferries the Countess across the Stir. He kills witnesses.', playersKnow: 'A ferryman takes coin.', status: 'active', reveal: 'hidden' });
+    await page.goto(`campaign/${c.id}/chronicle`);
+    await expect(page.getByRole('heading', { name: 'Backstory' })).toBeVisible();
+    await expect(page.getByText('No backstory yet.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-backstory-empty`);
+
+    await page.getByRole('button', { name: 'Bring in the backstory…' }).click();
+    const form = page.getByRole('dialog', { name: 'Bring in the backstory' });
+    await form.getByLabel('From a file (optional)').setInputFiles({ name: 'chronicle.md', mimeType: 'text/markdown', buffer: Buffer.from(BACKSTORY) });
+    await expect(form.getByRole('list', { name: 'Sections found' }).getByRole('listitem')).toHaveCount(3);
+    await expect(form.getByRole('list', { name: 'Words of the hidden background' })).toContainText('Gerhard');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-backstory-form`);
+    await form.getByRole('button', { name: 'Save the backstory' }).click();
+    await expect(form.getByText(/tick that you want everyone to read this/)).toBeVisible();
+    await form.getByRole('checkbox', { name: /everyone in the campaign may read this/ }).check();
+    await form.getByRole('button', { name: 'Save the backstory' }).click();
+    await expect(page.getByText('Backstory saved: 3 sections. Everyone in the campaign can read it.')).toBeVisible();
+    const list = page.getByRole('list', { name: 'Backstory sections' });
+    await expect(list.getByRole('listitem')).toHaveCount(3);
+    await list.getByText('Battle 1 – the ferry').click();
+    await expect(list.getByText(/Rain over the Stir/)).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-backstory-read`);
   });
 }
 

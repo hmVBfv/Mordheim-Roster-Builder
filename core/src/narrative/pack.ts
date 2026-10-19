@@ -14,7 +14,7 @@ import type { Change } from '../changes/diff.ts';
 import { describeChange } from './briefing.ts';
 
 /** The version of the pack's layout; it rises whenever a heading or a rule changes. */
-export const PACK_FORMAT = 1;
+export const PACK_FORMAT = 2;
 
 export type PackLang = 'de' | 'en' | 'both';
 /** What a leader may leave out; the battle itself is always in. */
@@ -79,6 +79,9 @@ export interface PackBackground {
   revealedFrom: string;
 }
 
+/** A section of the backstory – what came before the app – as a leader brought it in. */
+export interface PackBackstory { heading: string; /** The battle it tells of; null: the time before the first. */ battleNo: number | null; text: string }
+
 export interface PackChapter { label: string; title: string; icDate: string; place: string; victor: string }
 
 export interface PackInput {
@@ -96,6 +99,8 @@ export interface PackInput {
   /** The chapters written so far, oldest first; the last one comes in full. */
   chapters: PackChapter[];
   lastChapter: { heading: string; text: string } | null;
+  /** What came before the app, in the order the leader gave it – only what precedes this battle (the caller chooses). */
+  backstory?: PackBackstory[];
   style: string;
 }
 
@@ -233,8 +238,13 @@ export function buildPack(data: GameData, input: PackInput, options: PackOptions
   }
 
   /* ---- the story so far ---- */
-  if (on('story') && (input.chapters.length || input.lastChapter)) {
+  const told = (input.backstory ?? []).filter((s) => s.text.trim());
+  if (on('story') && (told.length || input.chapters.length || input.lastChapter)) {
     L.push('', '## The story so far');
+    if (told.length) {
+      L.push('', '### Backstory — before the app', '', 'What happened before this chronicle began, as the group wrote it down. It is canon: keep to it.');
+      for (const s of told) L.push('', `#### ${s.heading}`, '', s.text.trim());
+    }
     if (input.chapters.length) {
       L.push('', 'Chapters written:');
       for (const c of input.chapters) L.push(`- ${c.label ? `${c.label} · ` : ''}${c.title}${[c.icDate, c.place, c.victor && `victor: ${c.victor}`].filter(Boolean).length ? ` (${[c.icDate, c.place, c.victor && `victor: ${c.victor}`].filter(Boolean).join(', ')})` : ''}`);

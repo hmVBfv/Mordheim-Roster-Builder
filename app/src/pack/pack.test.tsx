@@ -112,13 +112,36 @@ async function openPack(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('the AI pack', () => {
+  it('carries the backstory that precedes the battle, as part of the story so far; what tells of this battle or a later one stays out', async () => {
+    const { srv, c } = scene();
+    srv.backstoryFrom(c.id, [
+      { heading: 'Before the war', battleNo: null, text: 'The Silver Caravan left Nuln in the spring.' },
+      { heading: 'Battle 1 – the ferry', battleNo: 1, text: 'BACKSTORY-THIS-BATTLE: told in a chapter already.' },
+      { heading: 'Battle 2 – the quay', battleNo: 2, text: 'BACKSTORY-LATER: has not happened yet.' },
+    ]);
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/timeline`);
+    const { sheet, prompt } = await openPack(user);
+    const t = prompt.value;
+    expect(t).toContain('### Backstory — before the app');
+    expect(t).toContain('#### Before the war');
+    expect(t).toContain('The Silver Caravan left Nuln in the spring.');
+    expect(t).not.toContain('BACKSTORY-THIS-BATTLE');
+    expect(t).not.toContain('BACKSTORY-LATER');
+    expect(t.indexOf('### Backstory — before the app')).toBeGreaterThan(t.indexOf('## The story so far'));
+    // the story part counts it with the chapters, and without that part it is gone
+    expect(within(sheet).getByRole('checkbox', { name: /The story so far \(2\)/ })).toBeTruthy();
+    await userEvent.setup().click(within(sheet).getByRole('checkbox', { name: /The story so far/ }));
+    await waitFor(() => expect((within(sheet).getByLabelText('The prompt, as it will be copied') as HTMLTextAreaElement).value).not.toContain('Before the war'));
+  });
+
   it('a leader gets the battle in story order, with all that goes with it – and nothing only leaders may read', async () => {
     const { c } = scene();
     const user = userEvent.setup();
     at(`/campaign/${c.id}/timeline`);
     const { sheet, prompt } = await openPack(user);
     const t = prompt.value;
-    expect(t.split('\n')[0]).toBe('<!-- mordheim-ai-pack format=1 -->');
+    expect(t.split('\n')[0]).toBe('<!-- mordheim-ai-pack format=2 -->');
     expect(t).toContain('# The Hel Fenn Campaign — Battle 1: Hel Fenn ferry');
     // who fought, the scenario
     expect(t).toMatch(/\*\*The Grey Penitents\*\*.*played by Anna.*Victory/);

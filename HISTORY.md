@@ -3156,3 +3156,40 @@ region. The stand-in server had only the entered data of other players'
 warbands and answered 403 to a leader's confirmation for them – it now treats
 that as version 1, as the real server does.
 
+## October 19, 2026 — a battle number of one's own, and the backstory
+
+Two wishes that belong together: start a campaign in the app at battle 4
+without entering battles 1–3 one by one, and still have the group's old
+chronicle in the app.
+
+The number was the easy half. The server already took a `round` when a battle
+was created and only refused the ones the history before the app had taken;
+only the sheet insisted on "round + 1". The catch is the round of the
+campaign: "move on" looks for the battles of round + 1, so a campaign that
+starts at battle 4 would wait forever for a battle 1. Creating battle N now
+brings the campaign to N − 1 (never backwards, no sat-out marks for rounds
+nobody played here) and writes it in the log as skipped.
+
+The backstory is not a chapter and not history. Chapters are prose with a
+place on the timeline; the history is a list of battles with who fought and
+how it ended; the backstory is the group's old text, cut into sections, which
+everybody reads and the AI pack carries. I made it a table of its own with
+the sections as one JSON list that is replaced as a whole – the same shape as
+the style guide, with the same stand check against two leaders – because a
+section-by-section merge would only invent conflicts. Unlike the style guide
+it is readable by every member, viewers included: it is the story the players
+lived. That is why the import sheet holds each section, at its own battle,
+against the hidden background before saving and wants a knowing tick when it
+finds something.
+
+The pack says "format 2" now: a new heading, and the format is meant to rise
+whenever a heading does. Only the sections before the battle go in – what a
+section tells of this battle or a later one is what the chapter is about to
+say.
+
+Wrong turns: the first splitter took "Battle 3 was the worst of them all." for
+a heading; a line that ends like a sentence is not one now. And the worktree's
+`node_modules` was a link to the main checkout, so the app resolved `core` from
+there and did not see the new pack input until the worktree got its own
+`@mordheim/*` links.
+

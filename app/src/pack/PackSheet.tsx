@@ -23,7 +23,7 @@ const PARTS: Record<PackPart, [string, string]> = {
   world: ['World', 'the districts held, factions, people and the standing of each warband'],
   notes: ['Notes of the round', 'the public notes of the interlude; sealed ones once opened'],
   background: ['Background ⚑', 'threads, people and places that have started, each with how far it may be told as a hard rule'],
-  story: ['The story so far', 'the chapters written so far and the last one in full'],
+  story: ['The story so far', 'the backstory before the app, the chapters written so far and the last one in full'],
   style: ['Style', 'the campaign’s style guide'],
 };
 const LANGS: [PackLang, string][] = [['de', 'Deutsch'], ['en', 'English'], ['both', 'Both']];
@@ -61,7 +61,7 @@ export function PackForm({ cid, campaign, view, segs, close, titleId }: {
   const count = (p: PackPart): string => {
     const b = ready.g?.base;
     if (!b) return '';
-    const n = p === 'background' ? b.background.length : p === 'canon' ? b.canon.length : p === 'notes' ? b.roundNotes.length : p === 'story' ? ready.g!.chapters.length : -1;
+    const n = p === 'background' ? b.background.length : p === 'canon' ? b.canon.length : p === 'notes' ? b.roundNotes.length : p === 'story' ? ready.g!.chapters.length + (b.backstory?.length ?? 0) : -1;
     return n >= 0 ? ` (${n})` : '';
   };
 

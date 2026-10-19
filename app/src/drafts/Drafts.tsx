@@ -271,7 +271,7 @@ function DraftForm({ close, cid, view, draft, online, onSaved }: {
 
 /* ---- reviewing, publishing, throwing away ---- */
 
-function Findings({ checked, quiet = false }: { checked: Checked; quiet?: boolean }) {
+export function Findings({ checked, quiet = false }: { checked: Checked; quiet?: boolean }) {
   const { check, held } = checked;
   if (check.findings.length === 0) {
     return <p className={ui.message} role={quiet ? undefined : 'status'}>No word of the {held} hidden or hinted piece{held === 1 ? '' : 's'} of the background was found. The check finds words, not meaning: read the text yourself.</p>;

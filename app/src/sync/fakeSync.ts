@@ -158,6 +158,8 @@ export function createFakeSync(opts: {
     scenarios: new Map<string, FakeScenario>(),
     /** The style guide per campaign (4b4a); none until a leader writes one. */
     styles: new Map<string, { text: string; updatedBy: string; updatedAt: string; seq: number }>(),
+    /** The backstory per campaign (server/src/backstory.ts); none until a leader brings one in. */
+    backstories: new Map<string, { sections: { heading: string; battleNo: number | null; text: string }[]; updatedBy: string; updatedAt: string; seq: number }>(),
     /** Chapter drafts (4b5b), leaders' own. */
     drafts: new Map<string, FakeDraft>(),
     /** Problem reports (4c1), the newest last. */
@@ -599,6 +601,31 @@ export function createFakeSync(opts: {
     return json(200, { style: styleOf(c.id) });
   };
 
+  /* ---- backstory (as server/src/routes-backstory.ts: every member reads it, leaders replace it) ---- */
+  const backstoryOf = (cid: string) => {
+    const x = s.backstories.get(cid);
+    return x ? { ...x } : { sections: [], updatedBy: null, updatedAt: null, seq: 0 };
+  };
+  /** A leader brought the backstory in earlier (or on another device). */
+  const backstoryFrom = (campaignId: string, sections: { heading: string; battleNo: number | null; text: string }[], by = 'Anna') => {
+    s.backstories.set(campaignId, { sections, updatedBy: by, updatedAt: at(), seq: next() });
+    return backstoryOf(campaignId);
+  };
+  const backstoryRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (rest !== '/backstory') return json(404, { error: 'not_found' });
+    if (method === 'GET') return json(200, { backstory: backstoryOf(c.id) });
+    if (method !== 'PUT') return json(404, { error: 'not_found' });
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    const list = body.sections;
+    if (!Array.isArray(list) || list.length > 200) return json(400, { error: 'invalid', problem: 'not a backstory (sections)' });
+    const sections = list as { heading: string; battleNo: number | null; text: string }[];
+    const cur = backstoryOf(c.id);
+    if (cur.seq !== 0 && JSON.stringify(cur.sections) === JSON.stringify(sections)) return json(200, { backstory: cur });
+    if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: cur });
+    s.backstories.set(c.id, { sections, updatedBy: me.displayName, updatedAt: at(), seq: next() });
+    return json(200, { backstory: backstoryOf(c.id) });
+  };
+
   /* ---- pictures (as server/src/attachments.ts filters them) ---- */
   const pictureFor = (p: FakePicture, role: FakeRole) => !p.deleted && (p.visibility !== 'leader' || role === 'leader' || p.uploaderId === me.id) && (p.stored || p.uploaderId === me.id);
   const pictureView = (p: FakePicture) => ({
@@ -965,6 +992,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/world')) return worldRoutes(c, role, method, rest, body);
     if (rest.startsWith('/scenarios')) return scenarioRoutes(c, role, method, rest, body);
     if (rest.startsWith('/style')) return styleRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/backstory')) return backstoryRoutes(c, role, method, rest, body);
     if (rest.startsWith('/chapter-drafts')) return draftRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
@@ -1255,5 +1283,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, draftFrom, bugFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, draftFrom, bugFrom };
 }
