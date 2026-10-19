@@ -33,6 +33,7 @@ import { usePictureActions, usePictures } from '../pictures/usePictures.ts';
 import { usePicks, useWarbandLoader } from './picks.ts';
 import styles from './Battle.module.css';
 import { enqueue, flushOutbox, useOutbox } from './outbox.ts';
+import { OwnPlan } from '../plans/Plans.tsx';
 import { BeforeAfter, VersionLine, useConfirm } from './Versions.tsx';
 
 export const POLL_MS = 5000;
@@ -267,6 +268,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </section>
         </div>
         <div className={ui.page}>
+          {lead && <OwnPlan cid={cid} round={view.battle.round} />}
           <section aria-labelledby="b-fighters" className={ui.page}>
             <h2 id="b-fighters">Who fought</h2>
             <ul className={styles.fighters}>

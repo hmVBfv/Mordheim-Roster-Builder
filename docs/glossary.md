@@ -163,6 +163,7 @@ Begriff einführt, trägt ihn hier ein.
 | Hausregeln der Kampagne | (Campaign) house rules · Set the house rules | `campaigns.house_rules`, `/campaign/:id/house-rules` |
 | Vorgeschichte (Schlachten vor der App) | Before the app · A battle before the app | `battles.taken_over`, `PUT …/history/:bid`, `historyOf()` |
 | Vorgeschichte als Text (Backstory) | Backstory · Bring in the backstory | `backstory` (Tabelle), `GET/PUT …/backstory`, `splitBackstory()` |
+| Plan der Leiter je Schlacht (roter Faden) | Plans · Plan a battle · The red thread · Your plan for this battle · The leaders’ plan | `battle_plans`, `GET …/plans`, `PUT …/plans/:round`, `PackInput.plan` |
 | Schlachtnummer wählen | Battle number | `POST …/battles` mit `round`, `comeToRound()` |
 | Stufe der Kampagne übernehmen | Take the campaign’s stage | `takeStage()`, `stageBehind()` (app) |
 | eingetreten nach Schlacht N | Entered after battle N | Tag `start` mit `round` > 0 |

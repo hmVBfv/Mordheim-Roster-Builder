@@ -2,7 +2,7 @@
    leader's device from what the app already reads – the timeline in its
    order, the battle's protocol, the frozen changes of each warband's mark,
    the explanations and profiles in each warband's save, the world, the
-   scenario, the background, the backstory, the chapters and the style – and handed to
+   scenario, the background, the leaders' plan, the backstory, the chapters and the style – and handed to
    core's `buildPack`. Kept apart from React so it can be tested.
 
    What a writer is told is chosen here, not by the leader piece by piece:
@@ -14,6 +14,7 @@ import { ruleAtRound } from '@mordheim/core';
 import type { GameData, PackBackground, PackCanon, PackCasualty, PackChange, PackInput, PackLang, PackStoryItem } from '@mordheim/core';
 import { getBackground, type Entry } from '../background/api.ts';
 import { before as backstoryBefore, getBackstory } from '../backstory/api.ts';
+import { getPlans } from '../plans/api.ts';
 import { casualtyText, getBattle, type BattleSummary, type CasualtyPayload } from '../battle/api.ts';
 import { readWarband, type CampaignView } from '../campaign/api.ts';
 import { campaignMap } from '../campaign/map.ts';
@@ -76,7 +77,7 @@ export async function gatherPack(a: GatherArgs): Promise<Gathered> {
   const { cid, view, battle, segs, data } = a;
   const warnings: string[] = [];
   const names = Object.fromEntries(view.enrolments.map((e) => [e.warbandId, e.name || e.wbName]));
-  const [bv, world, scenarios, background, style, backstory] = await Promise.all([getBattle(cid, battle.id), getWorld(cid), getScenarios(cid), getBackground(cid), getStyle(cid), getBackstory(cid).catch(() => null)]);
+  const [bv, world, scenarios, background, style, backstory, plans] = await Promise.all([getBattle(cid, battle.id), getWorld(cid), getScenarios(cid), getBackground(cid), getStyle(cid), getBackstory(cid).catch(() => null), getPlans(cid).catch(() => null)]);
   if (!bv) throw new Error('The battle did not come back.');
   const fought = bv.participants;
 
@@ -182,6 +183,7 @@ export async function gatherPack(a: GatherArgs): Promise<Gathered> {
 
   /* ---- the backstory: what came before the app, as far as it precedes this battle ---- */
   if (!backstory) warnings.push('The backstory could not be read; it is not in the pack.');
+  if (!plans) warnings.push('The leaders’ plans could not be read; the plan for this battle is not in the pack.');
 
   const base: Gathered['base'] = {
     campaign: a.campaign,
@@ -199,6 +201,7 @@ export async function gatherPack(a: GatherArgs): Promise<Gathered> {
     },
     background: bg,
     backstory: backstory ? backstoryBefore(backstory, battle.round) : [],
+    plan: plans?.find((p) => p.round === battle.round)?.text ?? '',
     style: style.text,
   };
   if (!story.length) warnings.push('Nothing was recorded of the battle itself: no protocol, no notes.');

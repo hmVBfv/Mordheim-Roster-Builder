@@ -18,7 +18,7 @@ export const PACK_FORMAT = 2;
 
 export type PackLang = 'de' | 'en' | 'both';
 /** What a leader may leave out; the battle itself is always in. */
-export const PACK_PARTS = ['aftermath', 'canon', 'world', 'notes', 'background', 'story', 'style'] as const;
+export const PACK_PARTS = ['aftermath', 'canon', 'world', 'notes', 'plan', 'background', 'story', 'style'] as const;
 export type PackPart = (typeof PACK_PARTS)[number];
 
 export type PackChange = Change & { unexplained: boolean };
@@ -99,6 +99,8 @@ export interface PackInput {
   /** The chapters written so far, oldest first; the last one comes in full. */
   chapters: PackChapter[];
   lastChapter: { heading: string; text: string } | null;
+  /** The leaders' plan for this battle: the red thread the chapter should follow (empty: none). */
+  plan?: string;
   /** What came before the app, in the order the leader gave it – only what precedes this battle (the caller chooses). */
   backstory?: PackBackstory[];
   style: string;
@@ -225,6 +227,11 @@ export function buildPack(data: GameData, input: PackInput, options: PackOptions
       if (n.quote) L.push(`- ${n.label}${n.author ? ` (${n.author})` : ''}:`, quoted(n.text));
       else L.push(`- ${n.label}${n.author ? ` (${n.author})` : ''}: ${n.text}`);
     }
+  }
+
+  /* ---- the leaders' plan: direction ---- */
+  if (on('plan') && input.plan?.trim()) {
+    L.push('', '## The leaders’ plan ⚑', '', 'Direction for the writer alone: where the leaders want this chapter to go. Steer the story toward it as far as the material allows; never contradict what was recorded, and do not tell the players anything here that the story does not show.', '', input.plan.trim());
   }
 
   /* ---- background: hard rules ---- */

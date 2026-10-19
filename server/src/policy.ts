@@ -132,6 +132,9 @@ export const ACTIONS = {
   /** The backstory – what came before the app, told in sections: every member reads it (it is the story the players lived), a leader with the authenticator brings it in. */
   'backstory.read': { who: 'user', target: 'member' },
   'backstory.write': { who: 'user', target: 'leader' },
+  /** The leaders' plan for a battle – the red thread the battle and its chapter should follow: leaders with the authenticator, read and write. */
+  'plans.read': { who: 'user', target: 'leader' },
+  'plans.write': { who: 'user', target: 'leader' },
   /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
   'style.read': { who: 'user', target: 'leader' },
   'style.write': { who: 'user', target: 'leader' },

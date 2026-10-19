@@ -112,6 +112,20 @@ async function openPack(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('the AI pack', () => {
+  it('hands the leaders’ plan of this battle to the writer as direction – not the plan of another battle', async () => {
+    const { srv, c } = scene();
+    srv.planFrom(c.id, 1, 'The ferrymen turn on the Caravan halfway across.');
+    srv.planFrom(c.id, 2, 'PLAN-OF-BATTLE-2: the quay collapses.');
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/timeline`);
+    const { sheet, prompt } = await openPack(user);
+    expect(prompt.value).toContain('## The leaders’ plan ⚑');
+    expect(prompt.value).toContain('The ferrymen turn on the Caravan halfway across.');
+    expect(prompt.value).not.toContain('PLAN-OF-BATTLE-2');
+    await userEvent.setup().click(within(sheet).getByRole('checkbox', { name: /The leaders’ plan/ }));
+    await waitFor(() => expect((within(sheet).getByLabelText('The prompt, as it will be copied') as HTMLTextAreaElement).value).not.toContain('The ferrymen turn on the Caravan'));
+  });
+
   it('carries the backstory that precedes the battle, as part of the story so far; what tells of this battle or a later one stays out', async () => {
     const { srv, c } = scene();
     srv.backstoryFrom(c.id, [

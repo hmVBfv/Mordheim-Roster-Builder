@@ -23,6 +23,7 @@ import { registerBackgroundRoutes } from './routes-background.ts';
 import { registerQuestionRoutes } from './routes-questions.ts';
 import { registerScenarioRoutes } from './routes-scenarios.ts';
 import { registerBackstoryRoutes } from './routes-backstory.ts';
+import { registerPlanRoutes } from './routes-plans.ts';
 import { registerStyleRoutes } from './routes-style.ts';
 import { registerDraftRoutes } from './routes-drafts.ts';
 import { registerBugRoutes } from './routes-bugs.ts';
@@ -204,6 +205,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerScenarioRoutes(app, { db, now });
   registerStyleRoutes(app, { db, now });
   registerBackstoryRoutes(app, { db, now });
+  registerPlanRoutes(app, { db, now });
   registerDraftRoutes(app, { db, now });
   registerBugRoutes(app, { db, now });
   registerLiveRoutes(app, { hub: db ? createHub(db, now, deps.live) : null });
