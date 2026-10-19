@@ -22,8 +22,8 @@ export const OPPONENT_STATS: readonly StatKey[] = ['M', 'WS', 'BS', 'S', 'T', 'W
 /** A skill on a profile: from the game, from the campaign's own skills (`ref`), or written in by hand. The text is the tooltip. */
 export interface OpponentSkill { name: string; text: string; ref?: string }
 
-export type TemplateKind = 'unit' | 'hired' | 'dramatis' | 'beast' | 'warrior';
-export const TEMPLATE_KIND_NAMES: Record<TemplateKind, string> = { unit: 'Warband model', hired: 'Hired Sword', dramatis: 'Dramatis Persona', beast: 'Bestiary', warrior: 'Warrior of the campaign' };
+export type TemplateKind = 'unit' | 'hired' | 'dramatis' | 'beast' | 'warrior' | 'npc';
+export const TEMPLATE_KIND_NAMES: Record<TemplateKind, string> = { unit: 'Warband model', hired: 'Hired Sword', dramatis: 'Dramatis Persona', beast: 'Bestiary', warrior: 'Warrior of the campaign', npc: 'NPC of the campaign' };
 
 export interface OpponentProfile {
   /** The device's id, so a profile keeps its identity through edits. */

@@ -18,18 +18,33 @@ export const MAX_PROFILES = 40;
 export const MAX_SKILLS = 300;
 
 const Skill = z.object({ name: z.string().trim().min(1).max(80), text: z.string().max(2000).default(''), ref: z.string().max(64).optional() }).strict();
+const From = z.object({ kind: z.enum(['unit', 'hired', 'dramatis', 'beast', 'warrior', 'npc']), key: z.string().max(160), label: z.string().max(240) }).strict();
+const Stats = z.object({ M: STAT, WS: STAT, BS: STAT, S: STAT, T: STAT, W: STAT, I: STAT, A: STAT, Ld: STAT }).partial().strict();
+
+/** The values of an NPC of the world or of a scenario: an opponent's profile without its id, name, number and note. */
+export const NpcProfileBody = z.object({
+  type: z.string().trim().max(60).default(''),
+  profile: Stats,
+  sv: STAT.default(''),
+  skills: z.array(Skill).max(40).default([]),
+  equipment: z.string().max(2000).default(''),
+  rules: z.string().max(6000).default(''),
+  from: From.nullable().default(null),
+}).strict();
+export type NpcProfileInput = z.infer<typeof NpcProfileBody>;
+
 const Profile = z.object({
   id: z.string().min(1).max(64),
   name: z.string().trim().max(120),
   type: z.string().trim().max(60).default(''),
   count: z.number().int().min(1).max(50).default(1),
-  profile: z.object({ M: STAT, WS: STAT, BS: STAT, S: STAT, T: STAT, W: STAT, I: STAT, A: STAT, Ld: STAT }).partial().strict(),
+  profile: Stats,
   sv: STAT.default(''),
   skills: z.array(Skill).max(40).default([]),
   equipment: z.string().max(2000).default(''),
   rules: z.string().max(6000).default(''),
   note: z.string().max(4000).default(''),
-  from: z.object({ kind: z.enum(['unit', 'hired', 'dramatis', 'beast', 'warrior']), key: z.string().max(160), label: z.string().max(240) }).strict().nullable().default(null),
+  from: From.nullable().default(null),
 }).strict();
 
 export const GroupBody = z.object({

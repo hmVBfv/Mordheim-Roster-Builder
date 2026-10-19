@@ -537,6 +537,71 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* An NPC is written as values – a grid for movement, weapon skill and the rest – and, when it is a monster of the game, copied from it
+   (Rob, 19.10.2026: typing the Tabletop Simulator text by hand was too much work). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the World tab: a leader writes an NPC as values, copied from a monster, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    srv.factionFrom(c.id, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing' });
+    await page.goto(`campaign/${c.id}/world`);
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const npc = page.getByRole('dialog', { name: 'Add an NPC' });
+    await expect(npc.getByRole('group', { name: 'Characteristics' })).toBeVisible(); // the grid is the start …
+    await expect(npc.getByLabel('Statline and rules as text')).toHaveCount(0); // … the text is the fallback
+    await npc.getByRole('button', { name: 'Copy from a model…' }).click();
+    await npc.getByLabel('Search every model').fill('ogre bodyguard');
+    await npc.getByRole('button', { name: /^Copy Ogre Bodyguard \(/ }).click();
+    await npc.getByLabel('Name (English)').fill('Big Grul');
+    await npc.getByLabel('Named', { exact: false }).check();
+    await expect(npc.getByLabel('S of Big Grul', { exact: true })).toHaveValue('4');
+    await npc.getByLabel('Equipment').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-values.png` });
+    await noSideScroll(page);
+    await tapTargets(page);
+    await npc.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('NPC added.')).toBeVisible();
+    await expect.poll(() => [...srv.state.npcs.values()].map((n) => [n.nameEn, n.named, (n.profile as { profile?: { S?: string } } | null)?.profile?.S]), { timeout: 8000 }).toEqual([['Big Grul', true, '4']]);
+    const person = page.getByRole('listitem').filter({ hasText: 'Big Grul' });
+    await expect(person.getByText('Named')).toBeVisible();
+    await expect(person.getByRole('table', { name: 'Characteristics of Big Grul' })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world-npc-card`);
+  });
+
+  test(`the World tab on a desktop: the NPC form is wide and holds the picker beside the grid, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [] });
+    srv.npcFrom(c.id, { nameEn: 'Black Hand', named: true, publicStatus: 'alive', statlineTts: 'M4 WS4 BS3 S4 T3 W2 I4 A2 Ld8 Sv 5+', profile: { type: 'Hero', profile: { M: '4', WS: '4', BS: '3', S: '4', T: '3', W: '2', I: '4', A: '2', Ld: '8' }, sv: '5+', skills: [], equipment: 'Sword', rules: 'Fear', from: null } });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/world`);
+    await expect(page.getByRole('table', { name: 'Characteristics of Black Hand' })).toBeVisible();
+    await shot(page, `${theme}-world-npc-card-desktop`);
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const npc = page.getByRole('dialog', { name: 'Add an NPC' });
+    const box = (await npc.boundingBox())!;
+    expect(box.width, 'wider than an ordinary sheet').toBeGreaterThan(1000);
+    expect(box.y, 'room above').toBeGreaterThan(20);
+    expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
+    await npc.getByRole('button', { name: 'Copy from a model…' }).click();
+    await npc.getByLabel('Search every model').fill('ogre');
+    const hits = npc.getByRole('list', { name: 'Models found' }).getByRole('listitem');
+    await expect(hits.first()).toBeVisible();
+    const [h1, h2] = [(await hits.nth(0).boundingBox())!, (await hits.nth(1).boundingBox())!];
+    expect(Math.abs(h1.y - h2.y), 'two hits to a row').toBeLessThan(2);
+    expect(h2.x, 'side by side').toBeGreaterThan(h1.x + h1.width - 1);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-picker-desktop.png` });
+    await npc.getByRole('button', { name: /^Copy Ogre Bodyguard \(/ }).click();
+    const grid = (await npc.getByRole('group', { name: 'Characteristics' }).boundingBox())!;
+    expect(grid.height, 'the ten characteristics in one row').toBeLessThan(110);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-values-desktop.png` });
+    await npc.getByRole('button', { name: 'Cancel' }).click();
+  });
+}
+
 /* A sheet on a desktop is a window in the middle of the screen, wide, with its fields side by side – and the page behind it stays put
    (Rob, 19.10.2026: it hugged the bottom edge with room left above, and the page had to be scrolled down to reach its end). */
 for (const theme of ['chronicle', 'parchment'] as const) {

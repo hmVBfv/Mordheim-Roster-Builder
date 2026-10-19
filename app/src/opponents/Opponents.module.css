@@ -22,6 +22,8 @@
 .editor { padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); min-width: 0; }
 .editor[open] { padding-bottom: var(--space-3); display: grid; gap: var(--space-2); }
 .editor summary { min-height: var(--tap); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); cursor: pointer; overflow-wrap: anywhere; }
+.bare { display: grid; gap: var(--space-3); min-width: 0; }
+.bare .head { grid-template-columns: minmax(0, 22rem); }
 .head { display: grid; gap: var(--space-2); grid-template-columns: minmax(0, 1fr); }
 .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-2); border: 0; margin: 0; padding: 0; min-width: 0; }
 .stats legend { padding: 0; margin-bottom: var(--space-1); }
@@ -29,6 +31,7 @@
 .stat input { text-align: center; padding-left: 0; padding-right: 0; min-width: 0; }
 .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .chips li { display: inline-flex; align-items: center; gap: 2px; padding-left: var(--space-3); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); }
+.chips .none { padding-right: var(--space-3); }
 .chips button { min-width: var(--tap); min-height: var(--tap); border: 0; background: none; color: var(--text-muted); font: inherit; font-size: 1.1rem; cursor: pointer; }
 .write { display: grid; gap: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2) var(--space-3) var(--space-3); margin: 0; min-width: 0; }
 .check { display: flex; align-items: center; gap: var(--space-2); min-height: var(--tap); }
@@ -39,4 +42,9 @@
 }
 @media (min-width: 900px) {
   .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* on a desktop the hits sit two to a row – a long list is less to scroll */
+  .picker .found { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* an NPC's values: skills beside equipment, the characteristics and the rules across */
+  .bare { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); align-items: start; }
+  .bare > .head, .bare > .stats, .bare > .meta, .bare > :last-child { grid-column: 1 / -1; }
 }

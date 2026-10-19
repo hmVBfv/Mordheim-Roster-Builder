@@ -46,7 +46,8 @@ export function RemoveForm({ r, close, titleId }: { r: Removing; close: () => vo
   );
 }
 
-export function FormSheet({ dialogRef, children }: { dialogRef: Sheet['ref']; children: (titleId: string) => React.ReactNode }) {
+/** `wide`: a form with many parts (an NPC's values, a scenario) – on a desktop it takes more of the screen. */
+export function FormSheet({ dialogRef, wide = false, children }: { dialogRef: Sheet['ref']; wide?: boolean; children: (titleId: string) => React.ReactNode }) {
   const id = useId();
-  return <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>{children(id)}</dialog>;
+  return <dialog ref={dialogRef} className={wide ? `${ui.sheet} ${ui.sheetWide}` : ui.sheet} aria-labelledby={id}>{children(id)}</dialog>;
 }

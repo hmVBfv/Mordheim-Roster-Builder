@@ -8,7 +8,7 @@ import { startAccounts } from './accounts-helpers.ts';
 
 const SAVE = JSON.parse(readFileSync(new URL('../../app/e2e/fixtures/silver-caravan.json', import.meta.url), 'utf8')) as Record<string, unknown>;
 type Faction = { id: string; nameDe: string; nameEn: string; publicStatus: string };
-type Npc = { id: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string };
+type Npc = { id: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; named: boolean; profile: Record<string, unknown> | null };
 type Event = { id: string; warbandId: string; warband: string; factionId: string; delta: number; reason: string; battleId: string | null; actor: string };
 type World = { factions: Faction[]; npcs: Npc[]; reputation: Event[]; seq: number; removed?: boolean };
 
@@ -92,7 +92,7 @@ describe('writing', () => {
     expect((await anna('PUT', `${base}/npcs/${nid}`, { factionId: randomUUID(), nameEn: 'Old Marek' })).json()).toMatchObject({ problem: 'no such faction in this campaign' });
     expect((await anna('PUT', `${base}/npcs/${nid}`, { factionId: fid, nameEn: 'Old Marek', publicStatus: 'alive' })).statusCode).toBe(200);
     expect((await anna('PUT', `${base}/npcs/${nid}`, { factionId: fid, nameEn: 'Old Marek', publicStatus: 'dead' })).statusCode).toBe(200);
-    expect((await anna('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'A', statlineTts: 'x'.repeat(2_001) })).statusCode).toBe(400);
+    expect((await anna('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'A', statlineTts: 'x'.repeat(12_001) })).statusCode).toBe(400);
     await anna('PUT', `${base}/reputation/${randomUUID()}`, { warbandId: w, factionId: fid, delta: 2, reason: 'Escorted the barge.' });
     let world = await get(anna);
     expect(world.factions[0]!.publicStatus).toBe('driven from the Stir');
@@ -107,6 +107,58 @@ describe('writing', () => {
     expect((await anna('PUT', `${base}/factions/${fid}`, { nameEn: 'Back again' })).json()).toEqual({ error: 'removed' });
     expect((await anna('DELETE', `${base}/factions/${randomUUID()}`)).statusCode).toBe(404);
     expect((await anna('DELETE', `${base}/npcs/${nid}`)).json()).toMatchObject({ removed: true, npcs: [] });
+  });
+});
+
+/* Rob, 19.10.2026: an NPC gets its values in a form (characteristics, save, skills, equipment, rules) and can be a named, unique person;
+   the text stays for the NPCs that have only that. */
+describe('the values of an NPC', () => {
+  const values = { type: 'Hero', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '6+', skills: [{ name: 'Step Aside', text: 'Dodges the first hit.' }], equipment: 'Dagger', rules: 'Knows every shoal', from: { kind: 'beast', key: 'beast/wardog', label: 'Wardog (Bestiary)' } };
+
+  it('keeps the values and the named flag, and every member reads them; an NPC with only a text has neither', async () => {
+    const { anna, kai, vic, base, get } = await table();
+    const named = randomUUID(), plain = randomUUID();
+    expect((await anna('PUT', `${base}/npcs/${named}`, { nameEn: 'Old Marek', named: true, profile: values, statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7 Sv 6+' })).statusCode).toBe(200);
+    expect((await anna('PUT', `${base}/npcs/${plain}`, { nameEn: 'A ferryman', statlineTts: 'M4 WS3' })).statusCode).toBe(200);
+    for (const who of [anna, kai, vic]) {
+      const w = await get(who);
+      expect(w.npcs.find((n) => n.id === named)).toMatchObject({ named: true, profile: values, statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7 Sv 6+' });
+      expect(w.npcs.find((n) => n.id === plain)).toMatchObject({ named: false, profile: null, statlineTts: 'M4 WS3' });
+    }
+  });
+
+  it('a change of the values or the flag is a change; the same again is not', async () => {
+    const { anna, base, get } = await table();
+    const id = randomUUID();
+    const body = { nameEn: 'Old Marek', named: true, profile: values, statlineTts: 'x' };
+    await anna('PUT', `${base}/npcs/${id}`, body);
+    const seq0 = (await get(anna)).seq;
+    await anna('PUT', `${base}/npcs/${id}`, body);
+    expect((await get(anna)).seq).toBe(seq0);
+    await anna('PUT', `${base}/npcs/${id}`, { ...body, profile: { ...values, sv: '5+' } });
+    const w1 = await get(anna);
+    expect(w1.seq).toBeGreaterThan(seq0);
+    expect(w1.npcs[0]!.profile).toMatchObject({ sv: '5+' });
+    await anna('PUT', `${base}/npcs/${id}`, { ...body, profile: { ...values, sv: '5+' }, named: false });
+    expect((await get(anna)).npcs[0]).toMatchObject({ named: false });
+  });
+
+  it('takes no value it does not know, no more than the limits, and a longer text than before', async () => {
+    const { anna, base } = await table();
+    const put = (body: Record<string, unknown>) => anna('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'Old Marek', ...body });
+    expect((await put({ profile: { ...values, profile: { ...values.profile, Mana: '9' } } })).statusCode).toBe(400);
+    expect((await put({ profile: { ...values, skills: Array.from({ length: 41 }, (_, i) => ({ name: `S${i}`, text: '' })) } })).statusCode).toBe(400);
+    expect((await put({ profile: { ...values, rules: 'x'.repeat(6001) } })).statusCode).toBe(400);
+    expect((await put({ profile: { ...values, from: { kind: 'dragon', key: 'x', label: 'x' } } })).statusCode).toBe(400);
+    expect((await put({ profile: { ...values, note: 'not part of an NPC' } })).statusCode).toBe(400);
+    expect((await put({ named: 'yes' })).statusCode).toBe(400);
+    expect((await put({ statlineTts: 'x'.repeat(12_000) })).statusCode).toBe(200);
+    expect((await put({ statlineTts: 'x'.repeat(12_001) })).statusCode).toBe(400);
+  });
+
+  it('only a leader with the authenticator writes them', async () => {
+    const { ben, kai, base } = await table();
+    for (const who of [ben, kai]) expect((await who('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'Old Marek', named: true, profile: values })).statusCode).toBe(403);
   });
 });
 

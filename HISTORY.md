@@ -3364,3 +3364,32 @@ built. From 900 px on a sheet now is a window in the middle (920 px, wider with
 touching every sheet, and while one is open the page behind does not scroll
 (`html:has(dialog[open])`), so scrolling inside the sheet cannot drag the page
 along. A phone keeps the bottom sheet.
+
+## October 19, 2026 — NPCs as values, not as a text to type
+
+Rob: adding an NPC to the world meant typing its statline in the Tabletop
+Simulator format by hand, which gets tedious fast; the form should have a
+template with Movement, WS, BS and so on, so only the numbers go in. The text
+may stay, but as a fallback. And when the NPC is a monster, copy it from the
+bestiary right there; and give the bigger options more room.
+
+The pieces already existed for opponents (a profile with the nine
+characteristics, a save, skills, equipment and rules; the picker over every
+model of the game), so the NPC form reuses them instead of growing a second
+editor – they moved into `ProfileTools.tsx`, and the picker learned to offer
+the world's own NPCs as templates, so a person made once can be copied into
+the next. The NPC keeps its values in a new `profile` column; the text
+`statlineTts` is written from them, so the world, the older readers and the
+scenarios' TTS copy keep working unchanged. An NPC written as text before this
+opens as text; "Values" reads it back with `parseStatline` when it names at
+least five characteristics, and otherwise says so and keeps the text rather
+than silently dropping it.
+
+One thing I weighed and did not do: storing only the values and deriving the
+text on read. Older NPCs have only text, and a hand-written text may say more
+than the grid holds, so the text stays a column of its own and the values are
+optional.
+
+The form is loaded when it is opened, so the first-load budget does not pay for
+the picker. Also new: a `Named` flag on an NPC – a person of its own rather
+than one of a crowd – which threads of the Background will refer to next.
