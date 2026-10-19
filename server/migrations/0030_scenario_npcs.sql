@@ -1,0 +1,11 @@
+-- NPCs of a scenario (Rob, 19.10.2026): a scenario carries its own NPCs –
+-- made for it, copied from the world, from the game or from an earlier
+-- scenario – each with the parts the leader keeps from the players (the name,
+-- single characteristics or all of them, skills, equipment, rules). Until the
+-- release only leaders read the scenario; after it, the server answers every
+-- non-leader with a "?" in place of each hidden part (ADR 0022), and what was
+-- hidden may be revealed but never changed.
+--
+-- npcs: JSON, a list of server/src/scenarios.ts ScenarioNpcBody. The text
+-- column npc_statlines stays as it is, typed by hand and shown as written.
+ALTER TABLE scenarios ADD COLUMN npcs TEXT NOT NULL DEFAULT '[]';

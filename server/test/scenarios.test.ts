@@ -8,8 +8,11 @@ import { revisionsOf } from '../src/scenarios.ts';
 import { startAccounts } from './accounts-helpers.ts';
 
 const SAVE = JSON.parse(readFileSync(new URL('../../app/e2e/fixtures/silver-caravan.json', import.meta.url), 'utf8')) as Record<string, unknown>;
+type Npc = {
+  id: string; name: string; type: string; hidden: string[]; profile: Record<string, string>; sv: string; skills: { name: string; text: string }[]; equipment: string; rules: string; from: unknown;
+};
 type Scenario = {
-  id: string; title: string; body: string; npcStatlines: string; visibility: 'leader' | 'public'; playedInBattle: string | null;
+  id: string; title: string; body: string; npcStatlines: string; npcs: Npc[]; visibility: 'leader' | 'public'; playedInBattle: string | null;
   releasedAt: string | null; releasedBy: string | null; edited: boolean; seq: number;
 };
 type List = { scenarios: Scenario[]; seq: number };
@@ -223,3 +226,132 @@ describe('the log', () => {
     expect(JSON.stringify(s.db.prepare('SELECT * FROM audit_log').all())).not.toMatch(/ZEBRA/);
   });
 });
+
+/* The NPCs of a scenario (ADR 0022): the leader hides parts of them; after the release everyone but a leader with the authenticator reads a "?" there. */
+const GERHARD = {
+  name: 'Gerhard QUOKKA-Voss', type: 'Hero', profile: { M: '4', WS: 'QUOKKA-9', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
+  skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook', rules: 'QUOKKA kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'QUOKKA Ogre (Rulebook)' },
+};
+const npc = (over: Record<string, unknown> = {}) => ({ id: randomUUID(), ...GERHARD, hidden: ['name', 'WS', 'rules'], ...over });
+
+describe('the NPCs of a scenario', () => {
+  it('a leader writes them into a draft and reads them back as written, hidden parts included; the order of the parts is the form’s', async () => {
+    const { anna, draft, list } = await table();
+    const n = npc({ hidden: ['rules', 'WS', 'name', 'WS'] });
+    const { r, scenario } = await draft({ npcs: [n] });
+    expect(r.statusCode).toBe(200);
+    expect(scenario.npcs).toEqual([{ ...n, hidden: ['name', 'WS', 'rules'] }]);
+    expect((await list(anna)).scenarios[0]!.npcs).toEqual(scenario.npcs);
+  });
+
+  it('wants a name, a known part to hide, each NPC once, at most 30, and nothing foreign', async () => {
+    const { anna, base, draft } = await table();
+    const put = async (npcs: unknown[]) => (await anna('PUT', `${base}/${randomUUID()}`, { title: 'x', npcs })).statusCode;
+    expect(await put([npc({ name: '' })])).toBe(400);
+    expect(await put([npc({ hidden: ['name', 'luck'] })])).toBe(400);
+    expect(await put([npc({ id: 'not-an-id' })])).toBe(400);
+    const same = npc();
+    expect(await put([same, { ...same }])).toBe(400);
+    expect(await put(Array.from({ length: 31 }, () => npc()))).toBe(400);
+    expect(await put([{ ...npc(), surprise: 1 }])).toBe(400);
+    expect(await put([npc({ profile: { M: 'x'.repeat(13) } })])).toBe(400);
+    expect(await put(Array.from({ length: 30 }, () => npc()))).toBe(200);
+    expect((await draft({ npcs: [] })).r.statusCode).toBe(200);
+  });
+
+  it('sent twice it is one; an NPC added later is a change with the earlier wording kept', async () => {
+    const { anna, s, base, draft } = await table();
+    const first = npc();
+    const { sid, scenario } = await draft({ npcs: [first] });
+    const again = await anna('PUT', `${base}/${sid}`, { title: 'The night at the ferry', body: SECRET, npcStatlines: STATS, npcs: [first], baseSeq: scenario.seq });
+    expect((again.json() as { scenario: Scenario }).scenario.seq).toBe(scenario.seq); // nothing changed, nothing written
+    const more = await anna('PUT', `${base}/${sid}`, { title: 'The night at the ferry', body: SECRET, npcStatlines: STATS, npcs: [first, npc({ name: 'Second', hidden: [] })], baseSeq: scenario.seq });
+    expect((more.json() as { scenario: Scenario }).scenario.npcs).toHaveLength(2);
+    expect(revisionsOf(s.db, sid)[0]!.npcs).toHaveLength(1);
+  });
+
+  it('after the release a player, a viewer and a leader without the authenticator read a "?" for every hidden part – and not one hidden word reaches them', async () => {
+    const { anna, ben, kai, lea, vic, base, bid, draft, list } = await table();
+    const { sid } = await draft({ npcs: [npc({ hidden: ['name', 'WS', 'rules'] })] });
+    for (const who of [kai, vic, ben]) expect((await list(who)).scenarios).toEqual([]); // a draft is nobody else's
+    await anna('POST', `${base}/${sid}/release`, { battleId: bid });
+    for (const who of [kai, lea, vic, ben]) {
+      const body = JSON.stringify((await who('GET', `${base}`)).json());
+      expect(body).not.toMatch(/QUOKKA/);
+      expect(body).not.toMatch(/Gerhard|Voss/);
+      const n = (await list(who)).scenarios[0]!.npcs[0]!;
+      expect(n).toMatchObject({ name: '?', type: '?', hidden: ['name', 'WS', 'rules'], profile: { M: '4', WS: '?', BS: '3' }, sv: '5+', rules: '?', equipment: 'Boat hook', from: null });
+      expect(n.skills).toEqual([{ name: 'Strongman', text: 'Hits harder.' }]);
+    }
+    // the leader with the authenticator reads it all
+    const mine = (await list(anna)).scenarios[0]!.npcs[0]!;
+    expect(mine).toMatchObject({ name: 'Gerhard QUOKKA-Voss', profile: { WS: 'QUOKKA-9' }, rules: 'QUOKKA kills witnesses', hidden: ['name', 'WS', 'rules'] });
+  });
+
+  it('one NPC with nothing hidden is read as it is', async () => {
+    const { anna, kai, base, bid, draft, list } = await table();
+    const { sid } = await draft({ npcs: [npc({ hidden: [] })] });
+    await anna('POST', `${base}/${sid}/release`, { battleId: bid });
+    expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: 'Gerhard QUOKKA-Voss', profile: { WS: 'QUOKKA-9' }, rules: 'QUOKKA kills witnesses', hidden: [], from: null });
+  });
+});
+
+describe('the NPCs of a released scenario', () => {
+  const released = async () => {
+    const t = await table();
+    const n = npc({ hidden: ['name', 'WS', 'rules'] });
+    const { sid } = await t.draft({ npcs: [n] });
+    const r = (await t.anna('POST', `${t.base}/${sid}/release`, { battleId: t.bid })).json() as { scenario: Scenario };
+    const change = (npcs: unknown[], seq = r.scenario.seq) => t.anna('PUT', `${t.base}/${sid}`, { title: 'The night at the ferry', body: SECRET, npcStatlines: STATS, npcs, baseSeq: seq });
+    return { ...t, sid, n, seq: r.scenario.seq, change };
+  };
+
+  it('a hidden value cannot be changed any more – also not while it is revealed; nothing is hidden that was read', async () => {
+    const { n, change, list, kai } = await released();
+    for (const bad of [{ ...n, profile: { ...n.profile, WS: '3' } }, { ...n, name: 'Someone else' }, { ...n, rules: 'Harmless' }, { ...n, hidden: ['name'], rules: 'Harmless' }, { ...n, hidden: ['name', 'WS', 'rules', 'Ld'] }]) {
+      const res = await change([bad]);
+      expect(res.statusCode).toBe(409);
+      expect(res.json()).toMatchObject({ error: 'frozen', problem: expect.stringMatching(/hidden|changed/) });
+    }
+    const gone = await change([]);
+    expect(gone.statusCode).toBe(409);
+    expect(gone.json()).toMatchObject({ error: 'frozen' });
+    expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: '?', profile: { WS: '?' } }); // nothing moved
+  });
+
+  it('what is not hidden may be corrected, and a new NPC may come with its own hidden parts', async () => {
+    const { n, change, list, kai, anna } = await released();
+    const res = await change([{ ...n, equipment: 'Boat hook and net', profile: { ...n.profile, BS: '4' } }, npc({ name: 'A newcomer', hidden: ['Ld'] })]);
+    expect(res.statusCode).toBe(200);
+    const read = (await list(kai)).scenarios[0]!.npcs;
+    expect(read[0]).toMatchObject({ name: '?', equipment: 'Boat hook and net', profile: { BS: '4', WS: '?' } });
+    expect(read[1]).toMatchObject({ name: 'A newcomer', profile: { Ld: '?' } });
+    expect((await list(anna)).scenarios[0]!.npcs[1]!.profile.Ld).toBe('8');
+  });
+
+  it('a reveal shows the value it always had, is not undone, and the log says where – never what', async () => {
+    const { s, n, sid, change, list, kai, seq } = await released();
+    const step = await change([{ ...n, hidden: ['WS'] }]);
+    expect(step.statusCode).toBe(200);
+    const read = (await list(kai)).scenarios[0]!.npcs[0]!;
+    expect(read).toMatchObject({ name: 'Gerhard QUOKKA-Voss', rules: 'QUOKKA kills witnesses', profile: { WS: '?' }, hidden: ['WS'] });
+    // what was hidden again is refused
+    const again = await change([{ ...n, hidden: ['WS', 'name'] }], (step.json() as { scenario: Scenario }).scenario.seq);
+    expect(again.statusCode).toBe(409);
+    const rows = s.db.prepare("SELECT action, visibility, payload FROM audit_log WHERE action = 'scenario.reveal'").all() as { action: string; visibility: string; payload: string }[];
+    expect(rows).toEqual([{ action: 'scenario.reveal', visibility: 'public', payload: JSON.stringify({ npc: n.id, parts: ['name', 'rules'] }) }]);
+    expect(JSON.stringify(s.db.prepare('SELECT * FROM audit_log').all())).not.toMatch(/QUOKKA/);
+    expect(seq).toBeLessThan((step.json() as { scenario: Scenario }).scenario.seq);
+    expect(revisionsOf(s.db, sid)[0]!.npcs[0]!.hidden).toEqual(['name', 'WS', 'rules']);
+  });
+
+  it('a draft can still hide and show as it likes – nobody has read it', async () => {
+    const { anna, base, draft } = await table();
+    const n = npc({ hidden: ['name'] });
+    const { sid, scenario } = await draft({ npcs: [n] });
+    const res = await anna('PUT', `${base}/${sid}`, { title: 'The night at the ferry', body: SECRET, npcStatlines: STATS, npcs: [{ ...n, hidden: ['WS', 'Ld'], name: 'Renamed' }], baseSeq: scenario.seq });
+    expect(res.statusCode).toBe(200);
+    expect((res.json() as { scenario: Scenario }).scenario.npcs[0]).toMatchObject({ name: 'Renamed', hidden: ['WS', 'Ld'] });
+  });
+});
+

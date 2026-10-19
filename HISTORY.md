@@ -3412,3 +3412,31 @@ server does not check that a faction or NPC exists, as it does not for a
 battle reference: a reference to something since removed is harmless, and
 refusing to save an entry because of it would be worse.
 
+
+## October 19, 2026 — NPCs in a scenario, with parts the players cannot read yet
+
+Rob: a scenario should take NPCs, added or made once the scenario exists, with
+a tick that hides single stats or all of them (maybe the name) as "?" in the
+Tabletop Simulator copy – so a scenario can be released without explaining a
+creature that may come back, and the NPC can later be dragged into another
+scenario.
+
+The first answer to "hidden values" was already in the repo, and it was no:
+ADR 0002 keeps mechanics open and only narrative hidden. The new case is
+different in kind – a leader keeps a value from the players for a while, then
+shows it – so it got its own ADR (0022) instead of bending the old one, and
+the ADR names the rule that keeps the old promise: the **server** replaces a
+hidden part by "?" before it answers (visibility is only ever filtered there),
+a leader reads everything, and after the release a hidden part can be shown but
+never changed or newly hidden. Without that last rule, "hidden" would be a way
+to rewrite what the table had already seen; showing a part is logged as
+`scenario.reveal` for the same reason. The free-text statlines are not
+redacted – the server cannot know what a line means – and the form says so.
+
+The form reuses the NPC grid, the model picker and the skill adder of the
+world's NPCs (`ProfileEditor` only learned a `locked` list), and is loaded when
+it opens. "Bring along from another scenario" copies the NPC with what was
+hidden: an NPC that was still a mystery stays one until the leader decides
+otherwise. A wrong turn worth keeping: the first version labelled the name
+field "Name" and the hide-checkbox "Name" as well, and the test (and a screen
+reader) could not tell them apart – the field is now "Name of the NPC".

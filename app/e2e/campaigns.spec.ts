@@ -3,6 +3,7 @@
    entering a warband, what a leader manages, starting a campaign. Campaign
    app only (playwright.config.ts). */
 import { crc32, deflateSync } from 'node:zlib';
+import type { ScenarioNpc } from '@mordheim/core';
 import { expect, test } from '@playwright/test';
 import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
 import { playServer, SAVE, serverWarband } from './play.ts';
@@ -752,6 +753,103 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-scenarios-player`);
+  });
+}
+
+/* The NPCs of a scenario (ADR 0022): added once the scenario exists; what the leader hides reads "?" for the players. */
+const brandt = (o: Partial<ScenarioNpc> = {}): ScenarioNpc => ({
+  id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: [],
+  profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '1', I: '4', A: '1', Ld: '8' }, sv: '5+',
+  skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', rules: 'Cannot be ambushed', from: null, ...o,
+});
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Scenarios section: a leader adds an NPC after the scenario exists and hides parts of it, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', body: 'The Countess’s men wait on the far bank.' });
+    await page.goto(`campaign/${c.id}/world`);
+    const draft = page.getByRole('article', { name: 'Draft: The night at the ferry' });
+    await draft.getByRole('button', { name: 'Add the NPCs of The night at the ferry' }).click();
+    const form = page.getByRole('dialog', { name: 'NPCs of The night at the ferry' });
+    await form.getByRole('button', { name: 'New NPC' }).click();
+    await form.getByLabel('Name of the NPC').fill('Captain Brandt');
+    for (const [k, v] of Object.entries({ M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '1', I: '4', A: '1', Ld: '8' })) await form.getByLabel(`${k} of Captain Brandt`, { exact: true }).fill(v);
+    await form.getByLabel('Save of Captain Brandt', { exact: true }).fill('5+');
+    await form.getByLabel('Equipment', { exact: true }).fill('Sword');
+    await form.getByLabel('Hide WS of Captain Brandt', { exact: true }).check();
+    await form.getByLabel('Hide BS of Captain Brandt', { exact: true }).check();
+    await form.getByLabel('Hide the skills of Captain Brandt', { exact: true }).check();
+    await expect(form.getByRole('table', { name: 'Characteristics of Captain Brandt' }).getByRole('cell').nth(1)).toHaveText('?');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npc-form`);
+    await form.getByLabel('Hide all stats of Captain Brandt', { exact: true }).check();
+    await shot(page, `${theme}-scenario-npc-form-all`);
+    await form.getByLabel('Hide all stats of Captain Brandt', { exact: true }).uncheck();
+    await form.getByLabel('Hide WS of Captain Brandt', { exact: true }).check(); // the skills stay hidden
+    await form.getByRole('button', { name: 'Save NPCs' }).click();
+    await expect(page.getByText('NPCs saved.')).toBeVisible();
+    await expect.poll(() => srv.state.scenarios.get(sc.id)!.npcs.length, { timeout: 8000 }).toBe(1);
+    expect(srv.state.scenarios.get(sc.id)!.npcs[0]).toMatchObject({ name: 'Captain Brandt', hidden: ['WS', 'skills'] });
+    await expect(draft.getByText(/The players read “\?” for: WS, skills\./)).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npcs-card`);
+  });
+
+  test(`the Scenarios section: a player reads the “?” of a released scenario, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, {
+      title: 'The night at the ferry', body: 'The Countess’s men wait on the far bank.', battleId: b.id,
+      npcs: [brandt({ name: 'QUOKKA Brandt', hidden: ['name', 'WS', 'BS', 'skills', 'equipment'] }), brandt({ id: '22222222-2222-4222-8222-222222222222', name: 'Old Marek', equipment: 'Boat hook' })],
+    });
+    await page.goto(`campaign/${c.id}`);
+    await page.getByRole('link', { name: 'World' }).click();
+    const card = page.getByRole('article', { name: 'The night at the ferry' });
+    await expect(card.getByRole('table', { name: 'Characteristics of ?' })).toBeVisible();
+    await expect(card.getByRole('table', { name: 'Characteristics of Old Marek' })).toBeVisible();
+    await expect(page.getByText(/QUOKKA/)).toHaveCount(0);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npcs-player`);
+  });
+
+  test(`the Scenarios section on a desktop: the NPC form is wide, the NPCs of a card sit side by side, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', body: 'The Countess’s men wait on the far bank.', battleId: b.id, npcs: [
+      brandt({ hidden: ['WS', 'BS', 'skills'] }),
+      brandt({ id: '22222222-2222-4222-8222-222222222222', name: 'Old Marek', equipment: 'Boat hook', hidden: ['name'] }),
+      brandt({ id: '33333333-3333-4333-8333-333333333333', name: 'The Ferryman', equipment: 'Pole' }),
+    ] });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/world`);
+    const card = page.getByRole('article', { name: 'The night at the ferry' });
+    const tables = card.getByRole('table');
+    await expect(tables).toHaveCount(3);
+    const [t1, t2] = [(await tables.nth(0).boundingBox())!, (await tables.nth(1).boundingBox())!];
+    expect(Math.abs(t1.y - t2.y), 'two NPCs to a row').toBeLessThan(2);
+    await shot(page, `${theme}-scenario-npcs-desktop`);
+    await card.getByRole('button', { name: 'Change the NPCs of The night at the ferry' }).click();
+    const form = page.getByRole('dialog', { name: 'NPCs of The night at the ferry' });
+    const box = (await form.boundingBox())!;
+    expect(box.width, 'wider than an ordinary sheet').toBeGreaterThan(1000);
+    expect(box.y, 'room above').toBeGreaterThan(20);
+    await expect(form.getByLabel('Name of the NPC').first()).toBeVisible();
+    // after the release what was hidden is fixed: the value cannot be typed over, nothing else can be hidden
+    await expect(form.getByLabel('WS of Captain Brandt', { exact: true })).toBeDisabled();
+    await expect(form.getByLabel('Hide T of Captain Brandt', { exact: true })).toBeDisabled();
+    await expect(form.getByLabel('BS of Captain Brandt', { exact: true })).toBeDisabled();
+    await expect(form.getByLabel('Hide WS of Captain Brandt', { exact: true })).toBeEnabled(); // to show it
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-scenario-npc-form-desktop.png` });
+    await form.getByRole('button', { name: 'Cancel' }).click();
   });
 }
 

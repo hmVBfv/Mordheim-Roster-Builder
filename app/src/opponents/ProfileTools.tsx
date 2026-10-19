@@ -135,12 +135,15 @@ function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string; own: Own
   );
 }
 
-/** `bare`: the values of one person, not a profile of a group – no name, number or note, no folding, nothing to take out; the name is the form's. */
-export function ProfileEditor({ cid, p, own, open, bare = false, onChange, onRemove, onOwn }: {
-  cid: string; p: OpponentProfile; own: OwnSkill[]; open?: boolean; bare?: boolean; onChange: (p: OpponentProfile) => void; onRemove?: () => void; onOwn: () => void;
+/** `bare`: the values of one person, not a profile of a group – no name, number or note, no folding, nothing to take out; the name is the form's.
+    `locked`: parts that cannot be changed – a characteristic by its key (`WS`), the save (`sv`), `skills`, `equipment`, `rules`, and `name` for the type
+    (a scenario's NPC once its hidden values were released: ADR 0022). */
+export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], onChange, onRemove, onOwn }: {
+  cid: string; p: OpponentProfile; own: OwnSkill[]; open?: boolean; bare?: boolean; locked?: readonly string[]; onChange: (p: OpponentProfile) => void; onRemove?: () => void; onOwn: () => void;
 }) {
   const ids = useId();
   const [adding, setAdding] = useState(false);
+  const fixed = (k: string) => locked.includes(k);
   const set = <K extends keyof OpponentProfile>(k: K, v: OpponentProfile[K]) => onChange({ ...p, [k]: v });
   const setStat = (k: StatKey, v: string) => onChange({ ...p, profile: { ...p.profile, [k]: v } });
   const Wrap = bare ? 'div' : 'details';
@@ -150,16 +153,16 @@ export function ProfileEditor({ cid, p, own, open, bare = false, onChange, onRem
       {p.from && <p className={styles.meta}>Copied from {p.from.label}</p>}
       <div className={styles.head}>
         {!bare && <div className={ui.field}><label htmlFor={`${ids}-n`}>Name</label><input id={`${ids}-n`} className={ui.input} value={p.name} maxLength={120} onChange={(e) => set('name', e.target.value)} /></div>}
-        <div className={ui.field}><label htmlFor={`${ids}-ty`}>Type</label><input id={`${ids}-ty`} className={ui.input} list={`${ids}-types`} value={p.type} maxLength={60} onChange={(e) => set('type', e.target.value)} />
+        <div className={ui.field}><label htmlFor={`${ids}-ty`}>Type</label><input id={`${ids}-ty`} className={ui.input} list={`${ids}-types`} value={p.type} maxLength={60} disabled={fixed('name')} onChange={(e) => set('type', e.target.value)} />
           <datalist id={`${ids}-types`}>{TYPES.map((t) => <option key={t} value={t} />)}</datalist></div>
         {!bare && <div className={ui.field}><label htmlFor={`${ids}-c`}>How many</label><input id={`${ids}-c`} className={ui.input} type="number" inputMode="numeric" min={1} max={50} value={p.count} onChange={(e) => set('count', Math.max(1, Math.min(50, Math.round(Number(e.target.value) || 1))))} /></div>}
       </div>
       <fieldset className={styles.stats}>
         <legend>Characteristics</legend>
         {STATS.map((k) => (
-          <label key={k} className={styles.stat}><span>{k}</span><input className={ui.input} value={p.profile[k] ?? ''} maxLength={12} aria-label={`${k} of ${p.name || 'the profile'}`} onChange={(e) => setStat(k, e.target.value)} /></label>
+          <label key={k} className={styles.stat}><span>{k}</span><input className={ui.input} value={p.profile[k] ?? ''} maxLength={12} disabled={fixed(k)} aria-label={`${k} of ${p.name || 'the profile'}`} onChange={(e) => setStat(k, e.target.value)} /></label>
         ))}
-        <label className={styles.stat}><span>Sv</span><input className={ui.input} value={p.sv} maxLength={12} placeholder="-" aria-label={`Save of ${p.name || 'the profile'}`} onChange={(e) => set('sv', e.target.value)} /></label>
+        <label className={styles.stat}><span>Sv</span><input className={ui.input} value={p.sv} maxLength={12} placeholder="-" disabled={fixed('sv')} aria-label={`Save of ${p.name || 'the profile'}`} onChange={(e) => set('sv', e.target.value)} /></label>
       </fieldset>
       <div className={ui.field}>
         <span>Skills</span>
@@ -167,16 +170,16 @@ export function ProfileEditor({ cid, p, own, open, bare = false, onChange, onRem
           {p.skills.map((s, i) => (
             <li key={`${i}:${s.name}`} title={s.text || undefined}>
               <span>{s.name}</span>
-              <button type="button" aria-label={`Take ${s.name} away`} onClick={() => set('skills', p.skills.filter((_, j) => j !== i))}>×</button>
+              <button type="button" aria-label={`Take ${s.name} away`} disabled={fixed('skills')} onClick={() => set('skills', p.skills.filter((_, j) => j !== i))}>×</button>
             </li>
           ))}
           {p.skills.length === 0 && <li className={`${ui.muted} ${styles.none}`}>None.</li>}
         </ul>
-        {!adding && <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => setAdding(true)}>Add a skill</button></div>}
+        {!adding && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={fixed('skills')} onClick={() => setAdding(true)}>Add a skill</button></div>}
         {adding && <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}><SkillAdder cid={cid} own={own} onOwn={onOwn} onClose={() => setAdding(false)} onAdd={(s) => { if (!p.skills.some((x) => x.name === s.name)) set('skills', [...p.skills, s]); }} /></Suspense>}
       </div>
-      <div className={ui.field}><label htmlFor={`${ids}-e`}>Equipment</label><textarea id={`${ids}-e`} className={ui.textarea} rows={2} value={p.equipment} maxLength={2000} onChange={(e) => set('equipment', e.target.value)} /></div>
-      <div className={ui.field}><label htmlFor={`${ids}-r`}>Special rules (one per line)</label><textarea id={`${ids}-r`} className={ui.textarea} rows={4} value={p.rules} maxLength={6000} onChange={(e) => set('rules', e.target.value)} /></div>
+      <div className={ui.field}><label htmlFor={`${ids}-e`}>Equipment</label><textarea id={`${ids}-e`} className={ui.textarea} rows={2} value={p.equipment} maxLength={2000} disabled={fixed('equipment')} onChange={(e) => set('equipment', e.target.value)} /></div>
+      <div className={ui.field}><label htmlFor={`${ids}-r`}>Special rules (one per line)</label><textarea id={`${ids}-r`} className={ui.textarea} rows={4} value={p.rules} maxLength={6000} disabled={fixed('rules')} onChange={(e) => set('rules', e.target.value)} /></div>
       {!bare && <div className={ui.field}><label htmlFor={`${ids}-no`}>Note (not on the card)</label><textarea id={`${ids}-no`} className={ui.textarea} rows={2} value={p.note} maxLength={4000} onChange={(e) => set('note', e.target.value)} /></div>}
       {!bare && onRemove && <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={onRemove}>Take this profile out of the group</button></div>}
     </Wrap>
