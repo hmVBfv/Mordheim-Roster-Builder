@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
+import { NpcProfileBody, type NpcProfileInput } from './opponents.ts';
 
 const iso = (d: Date) => d.toISOString();
 
@@ -19,6 +20,8 @@ const iso = (d: Date) => d.toISOString();
 export const MAX_FACTIONS = 100;
 export const MAX_NPCS = 500;
 export const MAX_EVENTS = 5_000;
+/** The text form of an NPC's values: the rules of a profile alone can fill 6,000 characters. */
+export const MAX_STATLINE = 12_000;
 
 const Name = z.string().trim().max(120).default('');
 const named = (b: { nameDe: string; nameEn: string }) => b.nameDe !== '' || b.nameEn !== '';
@@ -38,8 +41,12 @@ export const NpcBody = z.object({
   nameEn: Name,
   /** Alive, dead, now leads …: what everybody in the campaign may read. */
   publicStatus: z.string().trim().max(200).default(''),
-  /** The profile and rules as the table needs them, in the text form of the TTS export. */
-  statlineTts: z.string().max(2_000).default(''),
+  /** The profile and rules as the table needs them, in plain text: what the form writes from the values, or what a leader typed by hand. */
+  statlineTts: z.string().max(MAX_STATLINE).default(''),
+  /** A named, unique person (a character with a name), against a kind of creature or an anonymous hand. */
+  named: z.boolean().default(false),
+  /** The values in the form: characteristics, save, skills, equipment, rules. Without them the text above is all there is. */
+  profile: NpcProfileBody.nullable().default(null),
 }).strict().refine(named, NAMED);
 export type NpcInput = z.infer<typeof NpcBody>;
 
@@ -54,11 +61,11 @@ export const ReputationBody = z.object({
 export type ReputationInput = z.infer<typeof ReputationBody>;
 
 interface FactionRow { id: string; campaign_id: string; name_de: string; name_en: string; public_status: string; created_by: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
-interface NpcRow { id: string; campaign_id: string; faction_id: string | null; name_de: string; name_en: string; public_status: string; statline_tts: string; created_by: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
+interface NpcRow { id: string; campaign_id: string; faction_id: string | null; name_de: string; name_en: string; public_status: string; statline_tts: string; named: number; profile: string; created_by: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 interface EventRow { id: string; campaign_id: string; warband_id: string; faction_id: string; delta: number; reason: string; battle_id: string | null; actor_id: string; created_at: string; deleted_at: string | null; seq: number }
 
 export interface Faction { id: string; nameDe: string; nameEn: string; publicStatus: string; updatedAt: string; seq: number }
-export interface Npc { id: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; updatedAt: string; seq: number }
+export interface Npc { id: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; named: boolean; profile: NpcProfileInput | null; updatedAt: string; seq: number }
 export interface ReputationEvent { id: string; warbandId: string; warband: string; factionId: string; delta: number; reason: string; battleId: string | null; actor: string; createdAt: string; seq: number }
 export interface World { factions: Faction[]; npcs: Npc[]; reputation: ReputationEvent[] }
 
@@ -69,7 +76,7 @@ const eventById = (db: DB, id: string) => db.prepare('SELECT * FROM reputation_e
 const factionOut = (f: FactionRow): Faction => ({ id: f.id, nameDe: f.name_de, nameEn: f.name_en, publicStatus: f.public_status, updatedAt: f.updated_at, seq: f.seq });
 const npcOut = (n: NpcRow, liveFaction: Set<string>): Npc => ({
   id: n.id, factionId: n.faction_id && liveFaction.has(n.faction_id) ? n.faction_id : null, nameDe: n.name_de, nameEn: n.name_en,
-  publicStatus: n.public_status, statlineTts: n.statline_tts, updatedAt: n.updated_at, seq: n.seq,
+  publicStatus: n.public_status, statlineTts: n.statline_tts, named: n.named === 1, profile: n.profile ? (JSON.parse(n.profile) as NpcProfileInput) : null, updatedAt: n.updated_at, seq: n.seq,
 });
 
 const label = (f: { name_en: string; name_de: string }) => f.name_en || f.name_de;
@@ -135,6 +142,9 @@ export function removeFaction(db: DB, campaignId: string, id: string, by: { id: 
 }
 
 export function putNpc(db: DB, campaignId: string, id: string, input: NpcInput, by: { id: string }, now: Date): Put<NpcRow> {
+  // the values as one canonical text, so "unchanged" is a comparison of strings
+  const profile = input.profile ? JSON.stringify(input.profile) : '';
+  const named01 = input.named ? 1 : 0;
   return db.transaction((): Put<NpcRow> => {
     const cur = npcById(db, id);
     if (cur && (cur.campaign_id !== campaignId || cur.deleted_at)) return { ok: false, status: 409, error: cur.deleted_at ? 'removed' : 'exists' };
@@ -145,14 +155,14 @@ export function putNpc(db: DB, campaignId: string, id: string, input: NpcInput, 
     if (!cur) {
       if (count(db, 'npcs', campaignId) >= MAX_NPCS) return invalid(`a campaign holds at most ${MAX_NPCS} NPCs`);
       const seq = audit(db, { actorId: by.id, action: 'world.npc.create', targetType: 'npc', targetId: id, campaignId, visibility: 'public' }, now);
-      db.prepare('INSERT INTO npcs (id, campaign_id, faction_id, name_de, name_en, public_status, statline_tts, created_by, created_at, updated_at, seq) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        .run(id, campaignId, input.factionId, input.nameDe, input.nameEn, input.publicStatus, input.statlineTts, by.id, iso(now), iso(now), seq);
+      db.prepare('INSERT INTO npcs (id, campaign_id, faction_id, name_de, name_en, public_status, statline_tts, named, profile, created_by, created_at, updated_at, seq) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .run(id, campaignId, input.factionId, input.nameDe, input.nameEn, input.publicStatus, input.statlineTts, named01, profile, by.id, iso(now), iso(now), seq);
       return { ok: true, row: npcById(db, id)! };
     }
-    if (cur.faction_id === input.factionId && cur.name_de === input.nameDe && cur.name_en === input.nameEn && cur.public_status === input.publicStatus && cur.statline_tts === input.statlineTts) return { ok: true, row: cur };
+    if (cur.faction_id === input.factionId && cur.name_de === input.nameDe && cur.name_en === input.nameEn && cur.public_status === input.publicStatus && cur.statline_tts === input.statlineTts && cur.named === named01 && cur.profile === profile) return { ok: true, row: cur };
     const seq = audit(db, { actorId: by.id, action: 'world.npc.edit', targetType: 'npc', targetId: id, campaignId, visibility: 'public' }, now);
-    db.prepare('UPDATE npcs SET faction_id = ?, name_de = ?, name_en = ?, public_status = ?, statline_tts = ?, updated_at = ?, seq = ? WHERE id = ?')
-      .run(input.factionId, input.nameDe, input.nameEn, input.publicStatus, input.statlineTts, iso(now), seq, id);
+    db.prepare('UPDATE npcs SET faction_id = ?, name_de = ?, name_en = ?, public_status = ?, statline_tts = ?, named = ?, profile = ?, updated_at = ?, seq = ? WHERE id = ?')
+      .run(input.factionId, input.nameDe, input.nameEn, input.publicStatus, input.statlineTts, named01, profile, iso(now), seq, id);
     return { ok: true, row: npcById(db, id)! };
   })();
 }

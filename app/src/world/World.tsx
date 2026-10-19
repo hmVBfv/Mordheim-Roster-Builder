@@ -4,7 +4,8 @@
    too; a leader (with the authenticator) writes. What only a leader may know
    about an NPC stays in the Background – a leader puts an NPC here when the
    players may know it exists. Writing needs the connection. */
-import { useId, useState } from 'react';
+import { lazy, Suspense, useId, useState } from 'react';
+import { npcAsOpponent, OPPONENT_STATS, ttsOpponentName, ttsOpponentText, type NpcProfile, type OpponentTemplate } from '@mordheim/core';
 import { useOnline } from '../app/SyncState.tsx';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
@@ -14,11 +15,16 @@ import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
 import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
 import { Empty } from '../art/Pixels.tsx';
+import { CopyField } from '../roster/TtsCard.tsx';
+import type { WarbandRef } from '../opponents/ProfileTools.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { addReputation, LIMITS, nameOf, otherName, putFaction, putNpc, removeFaction, removeNpc, removeReputation, signed, standings, type Faction, type Npc, type ReputationEvent, type World } from './api.ts';
+import { bodyOf, draftOf, npcTemplates, type NpcDraft } from './npcDraft.ts';
 import { useWorld } from './useWorld.ts';
 import styles from './World.module.css';
+
+const NpcFields = lazy(() => import('./NpcFields.tsx').then((m) => ({ default: m.NpcFields })));
 
 type Option = { id: string; label: string };
 
@@ -45,17 +51,20 @@ function FactionForm({ edit, close, onSave, titleId }: { edit: Faction | null; c
   );
 }
 
-function NpcForm({ edit, factions, close, onSave, titleId }: {
-  edit: Npc | null; factions: Faction[]; close: () => void; titleId: string;
-  onSave: (b: { factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string }) => Promise<void>;
+export interface NpcSave { factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; named: boolean; profile: NpcProfile | null }
+
+function NpcForm({ cid, edit, factions, templates, warbands, close, onSave, titleId }: {
+  cid: string; edit: Npc | null; factions: Faction[]; templates: OpponentTemplate[]; warbands: WarbandRef[]; close: () => void; titleId: string;
+  onSave: (b: NpcSave) => Promise<void>;
 }) {
   const ids = useId();
   const [faction, setFaction] = useState(edit?.factionId ?? '');
   const [nameEn, setNameEn] = useState(edit?.nameEn ?? '');
   const [nameDe, setNameDe] = useState(edit?.nameDe ?? '');
   const [status, setStatus] = useState(edit?.publicStatus ?? '');
-  const [statline, setStatline] = useState(edit?.statlineTts ?? '');
-  const { busy, error, submit } = useSaving(() => onSave({ factionId: faction || null, nameEn: nameEn.trim(), nameDe: nameDe.trim(), publicStatus: status.trim(), statlineTts: statline.trim() }), close);
+  const [named, setNamed] = useState(edit?.named ?? false);
+  const [draft, setDraft] = useState<NpcDraft>(() => draftOf(edit));
+  const { busy, error, submit } = useSaving(() => onSave({ factionId: faction || null, nameEn: nameEn.trim(), nameDe: nameDe.trim(), publicStatus: status.trim(), named, ...bodyOf(draft) }), close);
   return (
     <form className={ui.page} onSubmit={submit}>
       <h2 id={titleId}>{edit ? 'Change the NPC' : 'Add an NPC'}</h2>
@@ -71,11 +80,14 @@ function NpcForm({ edit, factions, close, onSave, titleId }: {
         <input id={`${ids}-de`} className={ui.input} value={nameDe} maxLength={LIMITS.name} autoComplete="off" onChange={(e) => setNameDe(e.target.value)} /></label>
       <label className={ui.field} htmlFor={`${ids}-st`}><span>Status everyone may read</span>
         <input id={`${ids}-st`} className={ui.input} value={status} maxLength={LIMITS.status} placeholder="alive · dead · now leads the Watch" autoComplete="off" onChange={(e) => setStatus(e.target.value)} /></label>
-      <div className={ui.field}>
-        <label htmlFor={`${ids}-sl`}>Statline (optional)</label>
-        <textarea id={`${ids}-sl`} className={`${ui.textarea} ${ui.writing}`} rows={4} value={statline} maxLength={LIMITS.statline} onChange={(e) => setStatline(e.target.value)} />
-        <small className={ui.muted}>Profile and rules the way the Tabletop Simulator export writes them. Players read it too.</small>
-      </div>
+      <label className={styles.check}>
+        <input type="checkbox" checked={named} onChange={(e) => setNamed(e.target.checked)} />
+        <span><strong>Named</strong> – a person of its own, not one of a crowd. A thread of the Background can refer to it.</span>
+      </label>
+      <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}>
+        <NpcFields cid={cid} warbands={warbands} extra={templates} name={nameEn.trim() || nameDe.trim()} draft={draft} onDraft={setDraft}
+          onCopied={(from) => { if (!nameEn.trim() && !nameDe.trim()) setNameEn(from); }} />
+      </Suspense>
       <Actions busy={busy} ok={!!(nameEn.trim() || nameDe.trim())} label="Save" close={close} error={error} />
     </form>
   );
@@ -134,15 +146,49 @@ function ReputationForm({ warbands, factions, battles, close, onSave, titleId }:
   );
 }
 
-function Person({ n, lead, online, onEdit, onRemove }: { n: Npc; lead: boolean; online: boolean; onEdit: () => void; onRemove: () => void }) {
-  const other = otherName(n);
+/** The characteristics of an NPC in a row, the way the rule book prints them. */
+function StatTable({ p, name }: { p: NpcProfile; name: string }) {
   return (
-    <li className={styles.person}>
+    <div className={styles.statsWrap}>
+      <table className={styles.stats} aria-label={`Characteristics of ${name}`}>
+        <thead><tr>{OPPONENT_STATS.map((k) => <th key={k} scope="col">{k}</th>)}<th scope="col">Sv</th></tr></thead>
+        <tbody><tr>{OPPONENT_STATS.map((k) => <td key={k}>{p.profile[k]?.trim() || '-'}</td>)}<td>{p.sv.trim() || '-'}</td></tr></tbody>
+      </table>
+    </div>
+  );
+}
+
+function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead: boolean; online: boolean; onEdit: () => void; onRemove: () => void; onCopied: (what: string) => void }) {
+  const other = otherName(n);
+  const p = n.profile;
+  const rules = p ? p.rules.split('\n').map((x) => x.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean) : [];
+  const card = p ? npcAsOpponent(nameOf(n), p) : null;
+  return (
+    <li className={`${styles.person} ${n.named ? styles.named : ''}`}>
       <div className={styles.line}>
-        <strong>{nameOf(n)}{other && <span className={styles.other}> · {other}</span>}</strong>
+        <strong>{nameOf(n)}{other && <span className={styles.other}> · {other}</span>}{n.named && <span className={styles.badge}>Named</span>}</strong>
         {n.publicStatus && <small>{n.publicStatus}</small>}
       </div>
-      {n.statlineTts && (
+      {p && <small>{p.type}</small>}
+      {p && <StatTable p={p} name={nameOf(n)} />}
+      {p && (p.skills.length > 0 || p.equipment.trim() || rules.length > 0) && (
+        <details className={styles.more}>
+          <summary>Skills, equipment and rules</summary>
+          <div className={styles.rules}>
+            {p.skills.length > 0 && <p><strong>Skills:</strong> {p.skills.map((s) => s.name).join(', ')}</p>}
+            {p.equipment.trim() && <p><strong>Equipment:</strong> {p.equipment.trim()}</p>}
+            {rules.length > 0 && <ul>{rules.map((r, i) => <li key={`${i}:${r}`}>{r}</li>)}</ul>}
+          </div>
+        </details>
+      )}
+      {card && (
+        <details className={styles.more}>
+          <summary>Tabletop Simulator</summary>
+          <CopyField label="Name" value={ttsOpponentName(card)} rows={1} onCopied={onCopied} />
+          <CopyField label="Description" value={ttsOpponentText(card)} rows={7} onCopied={onCopied} />
+        </details>
+      )}
+      {!p && n.statlineTts && (
         <details className={styles.more}>
           <summary>Statline</summary>
           <pre className={styles.statline}>{n.statlineTts}</pre>
@@ -178,6 +224,8 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
   const warbands = view.enrolments.filter((e) => e.status === 'active').map((e) => ({ id: e.warbandId, label: `${e.name || e.wbName} · ${e.player}` }));
   const battles = (view.battles ?? []).filter((b) => !b.takenOver).map((b) => ({ id: b.id, label: battleTitle(b) }));
   const loose = world.npcs.filter((n) => !n.factionId);
+  const fighters: WarbandRef[] = view.enrolments.filter((e) => e.status === 'active').map((e) => ({ id: e.warbandId, name: e.name || e.wbName }));
+  const copied = (what: string) => notify(what ? `${what} copied.` : 'Copying is not possible here: the text is selected, copy it yourself.');
 
   /** A write that worked: the world it answers with is the world now. */
   const done = (message: string) => (w: World) => { setData(w); notify(message); };
@@ -227,7 +275,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
                 <article key={f.id} className={`${ui.card} ${styles.card}`} aria-label={nameOf(f)}>
                   <h3>{nameOf(f)}{other && <span className={styles.other}> · {other}</span>}</h3>
                   {f.publicStatus && <p className={styles.status}>{f.publicStatus}</p>}
-                  {people.length > 0 && <ul className={styles.list} aria-label={`People of ${nameOf(f)}`}>{people.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} />)}</ul>}
+                  {people.length > 0 && <ul className={styles.list} aria-label={`People of ${nameOf(f)}`}>{people.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onCopied={copied} />)}</ul>}
                   {stand.length > 0 && (
                     <ul className={styles.list} aria-label={`Standing with ${nameOf(f)}`}>
                       {stand.map((x) => (
@@ -259,7 +307,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
         <section className={styles.section} aria-labelledby="w-loose">
           <h2 id="w-loose">People without a faction</h2>
           <ul className={styles.list} aria-label="People without a faction">
-            {loose.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} />)}
+            {loose.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onCopied={copied} />)}
           </ul>
         </section>
       )}
@@ -299,9 +347,9 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
             onSave={(b) => putFaction(id, factionEdit.edit?.id ?? newId(), b).then(done(factionEdit.edit ? 'Faction changed.' : 'Faction added.'))} />
         )}
       </FormSheet>
-      <FormSheet dialogRef={npcSheet.ref}>
+      <FormSheet dialogRef={npcSheet.ref} wide>
         {(titleId) => npcEdit && (
-          <NpcForm key={npcEdit.key} titleId={titleId} edit={npcEdit.edit} factions={world.factions} close={() => npcSheet.close()}
+          <NpcForm key={npcEdit.key} titleId={titleId} cid={id} edit={npcEdit.edit} factions={world.factions} warbands={fighters} templates={npcTemplates(world.npcs, world.factions, npcEdit.edit?.id)} close={() => npcSheet.close()}
             onSave={(b) => putNpc(id, npcEdit.edit?.id ?? newId(), b).then(done(npcEdit.edit ? 'NPC changed.' : 'NPC added.'))} />
         )}
       </FormSheet>

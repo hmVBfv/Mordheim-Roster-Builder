@@ -95,7 +95,7 @@ export interface FakeQuestion {
 
 /** The campaign world (4b3b), as server/src/world.ts keeps it: open to every member, written by leaders. */
 export interface FakeFaction { id: string; campaignId: string; nameDe: string; nameEn: string; publicStatus: string; updatedAt: string; seq: number; deleted?: boolean }
-export interface FakeNpc { id: string; campaignId: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; updatedAt: string; seq: number; deleted?: boolean }
+export interface FakeNpc { id: string; campaignId: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; named: boolean; profile: unknown; updatedAt: string; seq: number; deleted?: boolean }
 export interface FakeReputation { id: string; campaignId: string; warbandId: string; factionId: string; delta: number; reason: string; battleId: string | null; actor: string; createdAt: string; seq: number; deleted?: boolean }
 
 /** A scenario (4b3c), as server/src/scenarios.ts keeps it: a draft only leaders read, released to a battle for everybody. */
@@ -478,8 +478,8 @@ export function createFakeSync(opts: {
     s.factions.set(ff.id, ff);
     return ff;
   };
-  const npcFrom = (campaignId: string, n: { nameEn: string; nameDe?: string; factionId?: string | null; publicStatus?: string; statlineTts?: string }) => {
-    const nn: FakeNpc = { id: `${String(s.npcs.size + 1).padStart(8, '0')}-4444-4000-8000-000000000000`, campaignId, factionId: n.factionId ?? null, nameDe: n.nameDe ?? '', nameEn: n.nameEn, publicStatus: n.publicStatus ?? '', statlineTts: n.statlineTts ?? '', updatedAt: at(), seq: next() };
+  const npcFrom = (campaignId: string, n: { nameEn: string; nameDe?: string; factionId?: string | null; publicStatus?: string; statlineTts?: string; named?: boolean; profile?: unknown }) => {
+    const nn: FakeNpc = { id: `${String(s.npcs.size + 1).padStart(8, '0')}-4444-4000-8000-000000000000`, campaignId, factionId: n.factionId ?? null, nameDe: n.nameDe ?? '', nameEn: n.nameEn, publicStatus: n.publicStatus ?? '', statlineTts: n.statlineTts ?? '', named: n.named ?? false, profile: n.profile ?? null, updatedAt: at(), seq: next() };
     s.npcs.set(nn.id, nn);
     return nn;
   };
@@ -513,7 +513,7 @@ export function createFakeSync(opts: {
       if (!named(body)) return json(400, { error: 'invalid', problem: 'not an NPC (nameEn: a name, in German or English)' });
       const fid = (body.factionId as string | null | undefined) ?? null;
       if (fid && !liveFactions(c.id).some((f) => f.id === fid)) return json(400, { error: 'invalid', problem: 'no such faction in this campaign' });
-      s.npcs.set(id, { id, campaignId: c.id, factionId: fid, nameDe: String(body.nameDe ?? '').trim(), nameEn: String(body.nameEn ?? '').trim(), publicStatus: String(body.publicStatus ?? '').trim(), statlineTts: String(body.statlineTts ?? ''), updatedAt: at(), seq: next() });
+      s.npcs.set(id, { id, campaignId: c.id, factionId: fid, nameDe: String(body.nameDe ?? '').trim(), nameEn: String(body.nameEn ?? '').trim(), publicStatus: String(body.publicStatus ?? '').trim(), statlineTts: String(body.statlineTts ?? ''), named: body.named === true, profile: body.profile ?? null, updatedAt: at(), seq: next() });
     } else {
       if (cur) return json(409, { error: 'exists' });
       const delta = Number(body.delta);

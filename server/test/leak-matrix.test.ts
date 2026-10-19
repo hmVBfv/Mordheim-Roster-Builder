@@ -181,7 +181,7 @@ describe('leak-test matrix', () => {
     const ledFactionId = faction('The Watch');
     const spareFactionId = faction('A spare faction');
     const ledNpcId = randomUUID();
-    const npcMade = putNpc(s.db, led.id, ledNpcId, { factionId: ledFactionId, nameDe: '', nameEn: 'Captain Brandt', publicStatus: 'alive', statlineTts: '' }, { id: admin.id }, t0);
+    const npcMade = putNpc(s.db, led.id, ledNpcId, { factionId: ledFactionId, nameDe: '', nameEn: 'Captain Brandt', publicStatus: 'alive', statlineTts: '', named: false, profile: null }, { id: admin.id }, t0);
     if (!npcMade.ok) throw new Error(npcMade.error);
     const ledEventId = randomUUID();
     const eventMade = addReputation(s.db, led.id, ledEventId, { warbandId: ledEntered.warband_id, factionId: ledFactionId, delta: 1, reason: 'Paid the toll.', battleId: null }, { id: admin.id }, t0);
