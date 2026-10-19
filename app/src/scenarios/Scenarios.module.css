@@ -60,3 +60,10 @@
 .previewName { margin: 0; }
 .previewName small { color: var(--text-muted); }
 .reveal { margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--gold); border-radius: var(--radius); }
+
+/* On a desktop the scenarios sit side by side (Rob, 19.10.2026: use the width). */
+@media (min-width: 900px) {
+  .cards { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); align-items: start; }
+  /* a scenario with NPCs takes the row: its NPCs sit side by side inside it */
+  .cards > li:has(.npcs) { grid-column: 1 / -1; }
+}
