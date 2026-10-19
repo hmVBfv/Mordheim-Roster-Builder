@@ -57,7 +57,7 @@ for (const theme of THEMES) {
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-roster-open`);
 
-    await page.getByRole('link', { name: 'More' }).click();
+    await page.getByRole('link', { name: test.info().project.name === 'quickbuild' ? 'Settings' : 'Account' }).click();
     await expect(page.getByRole('radio', { name: /Parchment/ })).toBeVisible();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-more`);
@@ -700,7 +700,7 @@ test('a tablet in landscape shows table lines and opens a warrior under his row'
 test('the navigation fits the flavour', async ({ page }) => {
   await page.goto('./');
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();
-  expect(labels).toEqual(test.info().project.name === 'quickbuild' ? ['Home', 'Warbands', 'More'] : ['Home', 'Warbands', 'Campaign', 'Notes', 'More']);
+  expect(labels).toEqual(test.info().project.name === 'quickbuild' ? ['Home', 'Warbands', 'Settings'] : ['Home', 'Warbands', 'Campaign', 'Notes', 'Account']);
   await expect(page).toHaveTitle(test.info().project.name === 'quickbuild' ? 'Mordheim Quick Build' : 'Mordheim Campaign');
 });
 
@@ -720,11 +720,11 @@ test('without crypto.randomUUID (plain http) a warband can be started and import
   await importSample(page);
 });
 
-test('the account is the campaign app’s: More shows it there, the Quick Build has none', async ({ page }) => {
+test('the account is the campaign app’s: Account shows it there, the Quick Build has settings instead', async ({ page }) => {
   const quick = test.info().project.name === 'quickbuild';
   await page.goto(quick ? '#/more' : 'more');
-  await expect(page.getByRole('heading', { level: 1, name: 'More' })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Account' })).toHaveCount(quick ? 0 : 1);
+  await expect(page.getByRole('heading', { level: 1, name: quick ? 'Settings' : 'Account' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Sign-in and security' })).toHaveCount(quick ? 0 : 1);
   await page.goto(quick ? '#/sign-in' : 'sign-in');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(quick ? 'Not found' : 'Sign in');
 });
@@ -794,7 +794,7 @@ test.describe('start-up budgets', () => {
       starts.push(Date.now() - t0);
     }
     expect(median(starts), `starts from the cache: ${starts.join(', ')} ms`).toBeLessThan(1000);
-    await page.getByRole('link', { name: 'More' }).click();
+    await page.getByRole('link', { name: test.info().project.name === 'quickbuild' ? 'Settings' : 'Account' }).click();
     // the screen must be there before its reaction is timed
     await expect(page.locator('input[value=parchment]')).toBeAttached();
     const reactions: number[] = [];

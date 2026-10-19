@@ -79,7 +79,7 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.nav ul {
+.nav > ul {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -153,7 +153,7 @@
     min-height: calc(100dvh - 57px);
   }
 
-  .nav ul {
+  .nav > ul {
     grid-template-columns: 1fr !important;
     padding: var(--space-3) var(--space-2);
     gap: var(--space-1);
@@ -171,6 +171,87 @@
 
   .navLink.active {
     background: var(--surface-2);
+  }
+
+  /* a group: its entry, the button that opens it, and what is under it */
+  .groupHead {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .groupHead .navLink {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .toggle {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border: 0;
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .toggle:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .toggle svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.15s;
+  }
+
+  .toggleOpen svg {
+    transform: rotate(90deg);
+  }
+
+  .sub,
+  .subSub {
+    list-style: none;
+    margin: 2px 0 var(--space-2);
+    padding: 0 0 0 calc(var(--space-3) + 24px + var(--space-3) - var(--space-2));
+    display: grid;
+    gap: 1px;
+  }
+
+  .subSub {
+    margin: 1px 0 var(--space-1);
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--border);
+    margin-left: var(--space-2);
+  }
+
+  .subLink {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding: 0 var(--space-2);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .subLink:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .subLink.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--surface-2) 60%, transparent);
   }
 
   .main {

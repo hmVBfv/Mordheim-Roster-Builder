@@ -1,6 +1,7 @@
 /* The account (campaign app) and the settings of this device. */
 import { lazy, Suspense, useState } from 'react';
 import { cleanServer, getServer, setServer } from '../share/link.ts';
+import { accountLabel } from '../app/nav.ts';
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { setChoice, THEME_CHOICES, useThemeChoice } from '../theme/theme.ts';
 import { shownVersion } from '../version.ts';
@@ -35,7 +36,7 @@ export function More() {
   const choice = useThemeChoice();
   return (
     <section className={ui.page}>
-      <h1>More</h1>
+      <h1>{accountLabel()}</h1>
       {FLAVOUR === 'campaign' && <Suspense fallback={null}><AccountSection /></Suspense>}
       {FLAVOUR === 'campaign' && <Suspense fallback={null}><MyReports /></Suspense>}
       {FLAVOUR === 'quickbuild' && <CampaignServer />}

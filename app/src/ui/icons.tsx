@@ -8,6 +8,12 @@ export const BannerIcon = (): ReactElement => <svg {...base}><path d="M6 3v18" /
 export const MapIcon = (): ReactElement => <svg {...base}><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z" /><path d="M9 4v14M15 6v14" /></svg>;
 export const QuillIcon = (): ReactElement => <svg {...base}><path d="M20 4c-6 0-11 5-12 12l-2 4" /><path d="M8 16c4 0 8-3 9-8" /></svg>;
 export const MoreIcon = (): ReactElement => <svg {...base}><circle cx="5" cy="12" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="19" cy="12" r="1.2" /></svg>;
+/** The account (campaign app): a person, not three dots – three dots read as a menu or settings (Rob, 19.10.2026). */
+export const PersonIcon = (): ReactElement => <svg {...base}><circle cx="12" cy="8" r="4" /><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6" /></svg>;
+/** The Quick Build's settings: it has no account. */
+export const GearIcon = (): ReactElement => <svg {...base}><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" /></svg>;
+/** Opens or closes a group of the navigation. */
+export const ChevronIcon = (): ReactElement => <svg {...base}><path d="M9 6l6 6-6 6" /></svg>;
 export const IconClose = (): ReactElement => <svg {...base}><path d="M6 6l12 12M18 6L6 18" /></svg>;
 export const IconEdit = (): ReactElement => <svg {...base}><path d="M4 20h4l11-11-4-4L4 16z" /><path d="M13 7l4 4" /></svg>;
 export const ReportIcon = (): ReactElement => <svg {...base}><path d="M5 21V4" /><path d="M5 4h13l-3 4.5L18 13H5" /></svg>;

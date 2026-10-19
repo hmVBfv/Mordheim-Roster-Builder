@@ -5,6 +5,7 @@
    again (can()). */
 import { useCallback, useEffect, useState } from 'react';
 import { Link, NavLink, useParams } from 'react-router';
+import { accountLabel } from '../app/nav.ts';
 import trade from '../roster/Trade.module.css';
 import { copyText } from '../ui/files.ts';
 import { useNotice } from '../ui/Notice.tsx';
@@ -285,7 +286,7 @@ export function Admin() {
   const [notice, notify] = useNotice();
   const head = (
     <>
-      <Link className={trade.back} to="/more">‹ More</Link>
+      <Link className={trade.back} to="/more">‹ {accountLabel()}</Link>
       <div className={styles.head}>
         <h1>Admin</h1>
         <span className={styles.adminOnly} title="Only the admin sees this"><span aria-hidden="true">⚑</span> Admin only</span>
@@ -302,7 +303,7 @@ export function Admin() {
           {session.status === 'unreachable' ? 'The campaign server does not answer right now.'
             : !user ? 'Sign in as the admin to see this.'
               : !user.isAdmin ? 'Only the admin sees this.'
-                : 'The admin tools open once your authenticator is set up (More → Account).'}
+                : 'The admin tools open once your authenticator is set up (Account).'}
         </p>
       </section>
     );

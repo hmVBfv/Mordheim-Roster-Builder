@@ -342,7 +342,7 @@ aber vollständig und geordnet:
   Anbindung gibt es nicht (ADR 0018). Rückfragen gehen am Tisch oder im Chat;
   eine Kommentarliste an der Meldung gibt es nicht.
 - Status: neu → bestätigt → in Arbeit → behoben in Version X → geschlossen
-  (oder Duplikat). Der Meldende sieht den Stand unter More → „Your reports“.
+  (oder Duplikat). Der Meldende sieht den Stand unter Account → „Your reports“.
 - **Bearbeitung nur auf Zuruf:** Claude Code mit `/bugs` (siehe
   [roadmap.md](roadmap.md), Phase 4c). Jede Meldung hat eine Nummer (`#7`);
   die Sitzung liest sie mit `npm run bugs` über ein **Bug-Token**, das nur

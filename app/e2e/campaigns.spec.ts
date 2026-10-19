@@ -159,6 +159,33 @@ test('a player files a campaign away in the list; a leader deletes one by its na
   expect(srv.state.campaigns.has(c.id)).toBe(false);
 });
 
+/* Rob, 19.10.2026: the side navigation opens into its entries; the account is a person, not three dots. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the side navigation: warbands, campaigns and the open campaign's sections, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const srv = await playServer(page, true, { totp: true });
+    serverWarband(srv, 'The Silver Caravan');
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    srv.addCampaign({ name: 'Summer in Sylvania', role: 'player' });
+    await page.goto(`campaign/${c.id}/timeline`);
+    const nav = page.getByRole('navigation', { name: 'Main' });
+    const sections = nav.getByRole('list', { name: 'The Hel Fenn Campaign: sections' });
+    await expect(sections.getByRole('link')).toHaveText(['Overview', 'Notes', 'Timeline', 'Chronicle', 'World', 'Questions', 'Background ⚑', 'Manage']);
+    await expect(sections.getByRole('link', { name: 'Timeline' })).toHaveAttribute('aria-current', 'page');
+    await expect(nav.getByRole('link', { name: 'Summer in Sylvania' })).toBeVisible();
+    // the campaign's own tabs are the phone's: here the side carries them
+    await expect(page.getByRole('navigation', { name: 'Campaign' })).toBeHidden();
+    await nav.getByRole('button', { name: 'Open Warbands' }).click();
+    await expect(nav.getByRole('link', { name: 'The Silver Caravan' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Account' })).toBeVisible();
+    await noSideScroll(page);
+    await shot(page, `${theme}-side-nav`);
+    await sections.getByRole('link', { name: 'Manage' }).click();
+    await expect(page.getByRole('heading', { name: 'Waiting for a leader' })).toBeVisible();
+  });
+}
+
 test('on a desktop the warbands and the members stand side by side', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const srv = await playServer(page);

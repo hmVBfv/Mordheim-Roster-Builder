@@ -1,16 +1,16 @@
 /* Problem reports at 360 px (phase 4c1, docs/ui.md checklist): the button in
    the header of every screen, the form with what goes along, the reporter's
-   own list under More, and the admin's reports. Both themes. */
+   own list under Account, and the admin's reports. Both themes. */
 import { expect, test } from '@playwright/test';
 import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
 import { playServer } from './play.ts';
 
 for (const theme of ['chronicle', 'parchment'] as const) {
-  test(`a player reports a problem from the header and follows it under More, in ${theme}`, async ({ page }) => {
+  test(`a player reports a problem from the header and follows it under Account, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     const srv = await playServer(page);
     await page.goto('more');
-    await expect(page.getByRole('heading', { level: 1, name: 'More' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
     await page.getByRole('button', { name: 'Report a problem' }).click();
@@ -55,7 +55,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(form).toBeVisible();
     await page.goBack();
     await expect(form).toBeHidden();
-    await expect(page.getByRole('heading', { level: 1, name: 'More' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
   });
 
   test(`the admin reads and sorts the reports, in ${theme}`, async ({ page }) => {

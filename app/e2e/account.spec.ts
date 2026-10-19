@@ -106,7 +106,7 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await playServer(page, { stage: 'out', user: PLAYER });
     await page.goto('more');
-    await expect(page.getByRole('region', { name: 'Account' }).getByText(/Accounts are by invitation/)).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Sign-in and security' }).getByText(/Accounts are by invitation/)).toBeVisible();
     await shot(page, `${theme}-account-signed-out`);
     await page.getByRole('link', { name: 'Sign in' }).click();
     await page.getByLabel('Username').fill('kai');
@@ -123,7 +123,7 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-sign-in-code`);
     await page.getByLabel('Code from your authenticator app').fill('123456');
     await page.getByRole('button', { name: 'Confirm' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'More' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Devices' }).getByText('Firefox on Linux')).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
@@ -184,7 +184,7 @@ test('an invite: the account made from the link, the token gone from the address
   await shot(page, 'invite');
   await page.getByLabel('The password again').fill('correct horse battery');
   await page.getByRole('button', { name: 'Create the account' }).click();
-  await expect(page.getByRole('region', { name: 'Account' }).getByText('Dana of Marienburg')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Sign-in and security' }).getByText('Dana of Marienburg')).toBeVisible();
 });
 
 test('setting up the authenticator: the QR code, the first code, the recovery codes; Back closes the sheet', async ({ page }) => {

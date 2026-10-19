@@ -71,7 +71,7 @@ function SendToServer({ ctx, onCopied }: { ctx: core.Ctx; onCopied: (what: strin
           </div>
         </>
       ) : (
-        <p className={ui.muted}>To send warbands to your group’s campaign server, enter its address under More → Campaign server.</p>
+        <p className={ui.muted}>To send warbands to your group’s campaign server, enter its address under Settings → Campaign server.</p>
       )}
     </section>
   );
