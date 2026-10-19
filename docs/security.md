@@ -352,6 +352,14 @@ Regel – das Importblatt sagt es dem Leiter, bevor er speichert, und prüft den
 Text auf Namen aus dem verborgenen Hintergrund. Das Log (`backstory.edit`,
 Sichtbarkeit `public`) trägt nur die Zahl der Abschnitte, nie Text.
 
+**Pläne je Schlacht (Migration 27):** `plans.read` und `plans.write` für Leiter
+mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein Plan
+ist Leiterwissen wie der Hintergrund; das KI-Paket trägt ihn als Richtung für
+den Schreibenden, nie als etwas, das die Spieler lesen. Das Log (`plan.edit`,
+`plan.remove`, Sichtbarkeit `leader`) nennt nur die Nummer der Schlacht. Die
+Leak-Matrix legt einen Plan mit Merkwort (`PLAN-SECRET`) in eine fremde
+Kampagne.
+
 **Kapitelentwürfe (Phase 4b5b):** `drafts.read` und `drafts.write` für Leiter
 mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein
 Entwurf ist noch kein Kapitel: er steht in keiner Zeitleiste und keinem

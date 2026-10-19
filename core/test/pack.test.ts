@@ -153,6 +153,19 @@ describe('buildPack', () => {
   });
 });
 
+describe('buildPack – the leaders’ plan', () => {
+  it('stands before the background as direction for the writer, and is left out when not chosen or empty', () => {
+    const md = pack({}, { ...INPUT, plan: 'The ferrymen turn on the Caravan.\nThe Countess stays unseen.' });
+    expect(md).toContain('## The leaders’ plan ⚑');
+    expect(md).toContain('Direction for the writer alone');
+    expect(md).toContain('The ferrymen turn on the Caravan.\nThe Countess stays unseen.');
+    expect(md.indexOf('## The leaders’ plan')).toBeLessThan(md.indexOf('## Background'));
+    expect(pack({ parts: ALL.filter((x) => x !== 'plan') }, { ...INPUT, plan: 'X' })).not.toContain('leaders’ plan');
+    expect(pack({}, { ...INPUT, plan: '  ' })).not.toContain('leaders’ plan');
+    expect(pack({}, INPUT)).not.toContain('leaders’ plan');
+  });
+});
+
 describe('buildPack – the backstory', () => {
   const backstory = [
     { heading: 'Before the war', battleNo: null, text: 'The Silver Caravan left Nuln in the spring.' },

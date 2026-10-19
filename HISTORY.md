@@ -3193,3 +3193,24 @@ a heading; a line that ends like a sentence is not one now. And the worktree's
 there and did not see the new pack input until the worktree got its own
 `@mordheim/*` links.
 
+## October 19, 2026 — the leaders' plan for a battle
+
+Rob wanted to set the red thread of a coming battle in advance – for the
+write-up and as his own note. The background already had threads and GM
+notes, but the AI pack leaves planned threads and GM notes out on purpose:
+they are what may not slip into the prose. A plan is different: it is
+direction, not a secret to keep consistent with. So it became its own small
+table, keyed by the battle's number rather than its id, because the plan is
+written before the battle is set up. The pack carries the plan of its battle
+only, as "The leaders' plan ⚑", with an instruction never to contradict what
+was recorded; it is a part the leader can switch off like the others. The
+format number stays 2 – it rose with the backstory in the same series of
+changes, none of them released yet.
+
+At the battle a leader sees the plan folded, so it is not on the screen by
+accident when the table looks over. The first test for that was green for the
+wrong reason and then red for a wrong one: the player's device in the test
+still held the leader's cached campaign view from the step before, saw itself
+as leader for a moment and asked for the plans (and got a 403). A real device
+changes accounts with its cache cleared; the test now does the same.
+

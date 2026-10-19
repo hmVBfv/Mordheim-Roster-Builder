@@ -21,6 +21,7 @@ import { putEntry as putBackground } from '../src/background.ts';
 import { putQuestion } from '../src/questions.ts';
 import { releaseScenario, putScenario } from '../src/scenarios.ts';
 import { putDraft } from '../src/chapter-drafts.ts';
+import { putPlan } from '../src/plans.ts';
 import { putStyle } from '../src/style.ts';
 import { reportBug } from '../src/bugs.ts';
 import { addReputation, putFaction, putNpc } from '../src/world.ts';
@@ -200,6 +201,8 @@ describe('leak-test matrix', () => {
     // style guides: one in the victim's campaign no role of the matrix may read, one in the admin's, which the probes read and change
     const secretStyle = putStyle(s.db, theirs.id, { text: 'STYLE-SECRET: never name the Countess.', baseSeq: 0 }, victim.id, t0);
     if (!secretStyle.ok) throw new Error(secretStyle.error);
+    const secretPlan = putPlan(s.db, theirs.id, 2, { text: 'PLAN-SECRET: the ferryman dies at the jetty.', baseSeq: 0 }, victim.id, t0);
+    if (!secretPlan.ok) throw new Error(secretPlan.error);
     const ledStyle = putStyle(s.db, led.id, { text: 'German, past tense.', baseSeq: 0 }, admin.id, t0);
     if (!ledStyle.ok) throw new Error(ledStyle.error);
     // chapter drafts: one in the victim's campaign no role of the matrix may read, two in the admin's, which the probes publish and throw away

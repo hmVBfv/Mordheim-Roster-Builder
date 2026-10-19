@@ -158,6 +158,8 @@ export function createFakeSync(opts: {
     scenarios: new Map<string, FakeScenario>(),
     /** The style guide per campaign (4b4a); none until a leader writes one. */
     styles: new Map<string, { text: string; updatedBy: string; updatedAt: string; seq: number }>(),
+    /** The leaders' plans per campaign and battle number (server/src/plans.ts). */
+    plans: new Map<string, { round: number; text: string; updatedBy: string; updatedAt: string; seq: number }>(),
     /** The backstory per campaign (server/src/backstory.ts); none until a leader brings one in. */
     backstories: new Map<string, { sections: { heading: string; battleNo: number | null; text: string }[]; updatedBy: string; updatedAt: string; seq: number }>(),
     /** Chapter drafts (4b5b), leaders' own. */
@@ -601,6 +603,33 @@ export function createFakeSync(opts: {
     return json(200, { style: styleOf(c.id) });
   };
 
+  /* ---- plans (as server/src/routes-plans.ts: leaders only, by battle number) ---- */
+  const planKey = (cid: string, round: number) => `${cid}:${round}`;
+  const planOf = (cid: string, round: number) => {
+    const x = s.plans.get(planKey(cid, round));
+    return x ? { ...x } : { round, text: '', updatedBy: null, updatedAt: null, seq: 0 };
+  };
+  /** A leader wrote a plan earlier (or on another device). */
+  const planFrom = (campaignId: string, round: number, text: string, by = 'Anna') => {
+    s.plans.set(planKey(campaignId, round), { round, text, updatedBy: by, updatedAt: at(), seq: next() });
+    return planOf(campaignId, round);
+  };
+  const planRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    if (rest === '/plans' && method === 'GET') return json(200, { plans: [...s.plans.entries()].filter(([k]) => k.startsWith(`${c.id}:`)).map(([, v]) => ({ ...v })).sort((a, b) => a.round - b.round) });
+    const m = /^\/plans\/(\d+)$/.exec(rest);
+    if (!m || method !== 'PUT') return json(404, { error: 'not_found' });
+    const round = Number(m[1]);
+    if (round < 1 || round > 999 || typeof body.text !== 'string' || body.text.length > 20_000) return json(400, { error: 'invalid', problem: 'not a plan' });
+    const text = body.text.trim() ? body.text : '';
+    const cur = planOf(c.id, round);
+    if (cur.text === text) return json(200, { plan: cur });
+    if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: cur });
+    if (!text) { s.plans.delete(planKey(c.id, round)); return json(200, { plan: { round, text: '', updatedBy: null, updatedAt: null, seq: next() } }); }
+    s.plans.set(planKey(c.id, round), { round, text, updatedBy: me.displayName, updatedAt: at(), seq: next() });
+    return json(200, { plan: planOf(c.id, round) });
+  };
+
   /* ---- backstory (as server/src/routes-backstory.ts: every member reads it, leaders replace it) ---- */
   const backstoryOf = (cid: string) => {
     const x = s.backstories.get(cid);
@@ -993,6 +1022,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/scenarios')) return scenarioRoutes(c, role, method, rest, body);
     if (rest.startsWith('/style')) return styleRoutes(c, role, method, rest, body);
     if (rest.startsWith('/backstory')) return backstoryRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/plans')) return planRoutes(c, role, method, rest, body);
     if (rest.startsWith('/chapter-drafts')) return draftRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
@@ -1283,5 +1313,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, draftFrom, bugFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, planFrom, draftFrom, bugFrom };
 }

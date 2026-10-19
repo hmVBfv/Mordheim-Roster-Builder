@@ -19,6 +19,7 @@ import {
   endOfSegment, getEntry, KIND_NAMES, KIND_ONE, KINDS, LEVEL_NAMES, LEVEL_TEXT, putEntry, removeEntry, revealEntry, staleEntry,
   type Detail, type Entry, type EntryBody, type Kind, type Level, type Ref, type Status,
 } from './api.ts';
+import { PlansSection } from '../plans/Plans.tsx';
 import styles from './Background.module.css';
 import { useBackground } from './useBackground.ts';
 
@@ -262,7 +263,7 @@ function History({ close, detail, error }: { close: () => void; detail: Detail |
 
 export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) {
   const { entries, error, refresh } = useBackground(id);
-  const [kind, setKind] = useState<Kind>('thread');
+  const [kind, setKind] = useState<Kind | 'plans'>('thread');
   const [editing, setEditing] = useState<Entry | null>(null);
   const [revealing, setRevealing] = useState<Entry | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -309,7 +310,10 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       <p className={styles.secret}>⚑ Only campaign leaders see this area. It is never sent to players, never in an export, never in a repository.</p>
       <div className={styles.kinds} role="group" aria-label="Show">
         {KINDS.map((k) => <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{KIND_NAMES[k]} {counts[k]}</button>)}
+        <button type="button" aria-pressed={kind === 'plans'} onClick={() => setKind('plans')}>Plans</button>
       </div>
+      {kind === 'plans' && <PlansSection id={id} view={view} notify={notify} />}
+      {kind !== 'plans' && (<>
       <details className={`${ui.card} ${styles.legend}`}>
         <summary>How much may the story show?</summary>
         {(Object.keys(LEVEL_NAMES) as Level[]).map((l) => <div key={l} className={styles.level}><Dots level={l} /><span><b>{LEVEL_NAMES[l]}</b> – {LEVEL_TEXT[l]}</span></div>)}
@@ -321,8 +325,9 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       <ul className={styles.list} aria-label={KIND_NAMES[kind]}>
         {shown.map((e) => <EntryCard key={e.id} e={e} battles={view.battles} onReveal={() => { setRevealing(e); setProblem(null); setFormKey((k) => k + 1); openReveal(); }} onEdit={() => openEdit(e)} onHistory={() => openHistory(e)} />)}
       </ul>
+      </>)}
       <dialog ref={editRef} className={ui.sheet} aria-labelledby="background-title">
-        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
+        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind === 'plans' ? 'thread' : kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
       </dialog>
       <dialog ref={revealRef} className={ui.sheet} aria-labelledby="reveal-title">
         {revealing && <RevealForm key={`r${formKey}`} close={closeReveal} entry={revealing} places={places} onReveal={doReveal} problem={problem} />}

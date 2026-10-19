@@ -479,6 +479,17 @@ export const MATRIX: Record<Action, MatrixRow> = {
     routes: { 'PUT /api/v1/campaigns/:id/backstory': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/backstory`, body: { sections: [{ heading: 'Battle 1 – the ferry', battleNo: 1, text: 'Rain over the Stir.' }], baseSeq: 0 } }) },
     fields: { admin: ['backstory'] },
   },
+  'plans.read': {
+    // the admin leads the campaign (the user role is a player there: 403); the plans of the victim's campaign carry a marker no role may read
+    allowed: ['admin'],
+    routes: { 'GET /api/v1/campaigns/:id/plans': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/plans` }) },
+    fields: { admin: ['plans'] },
+  },
+  'plans.write': {
+    allowed: ['admin'],
+    routes: { 'PUT /api/v1/campaigns/:id/plans/:round': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/plans/2`, body: { text: 'The ferry burns.', baseSeq: 0 } }) },
+    fields: { admin: ['plan'] },
+  },
   'style.read': {
     // the admin leads the campaign (the user role is a player there: 403); the style guide of the victim's campaign carries a marker no role may read
     allowed: ['admin'],
@@ -576,6 +587,8 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   /SCENARIO-SECRET/,
   // the style guide of the victim's campaign (phase 4b4a): leaders' own, and none of its leaders is a role of the matrix
   /STYLE-SECRET/,
+  // a battle plan of the victim's campaign: leaders' own, and none of its leaders is a role of the matrix
+  /PLAN-SECRET/,
   // a chapter draft of the victim's campaign (phase 4b5b): only its leaders read it, and none of them is a role of the matrix
   /DRAFT-SECRET/,
   // a problem report (phase 4c1): its words reach only its reporter and, in the report's own detail, the admin – the probes read a report without the marker; the list carries no words and no copy of a warband
