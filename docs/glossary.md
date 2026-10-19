@@ -146,6 +146,8 @@ Begriff einführt, trägt ihn hier ein.
 | Schlacht übernehmen | Take the battle over (Take it over) | `takeOverBattle()`, `campaign.battles[].serverId` |
 | Erfahrung der Schlacht | The battle’s experience (Grant …) | `awardBattleXp()`, `campaign.battles[].xpAwarded` |
 | Markieren „Nach Schlacht N“ | Mark after battle N | `POST …/battles/:bid/marks`, Tag `after_battle` |
+| Version für die Schlacht bestätigen | Confirm for the battle | `POST …/battles/:bid/confirm`, `battle_participants.before_*` |
+| Vorher/Nachher einer Schlacht | Before and after | App: `BeforeAfter` in `battle/Versions.tsx`; `beforeTotals` und `marks[…].totals` |
 | Was sich geändert hat | What changed | `diffWarbands()`, `reconcile()`, Tabelle `changes` |
 | ohne Anlass | no cause found (without a cause) | `unexplained` |
 | ausgesetzt (Runde) | Sat out battle N | Tag `sat_out` |
@@ -160,6 +162,11 @@ Begriff einführt, trägt ihn hier ein.
 | verkleinert auf dem Gerät | made smaller on the phone (only the pixels leave it) | `shrink()` |
 | Hausregeln der Kampagne | (Campaign) house rules · Set the house rules | `campaigns.house_rules`, `/campaign/:id/house-rules` |
 | Vorgeschichte (Schlachten vor der App) | Before the app · A battle before the app | `battles.taken_over`, `PUT …/history/:bid`, `historyOf()` |
+| Vorgeschichte als Text (Backstory) | Backstory · Bring in the backstory | `backstory` (Tabelle), `GET/PUT …/backstory`, `splitBackstory()` |
+| Plan der Leiter je Schlacht (roter Faden) | Plans · Plan a battle · The red thread · Your plan for this battle · The leaders’ plan | `battle_plans`, `GET …/plans`, `PUT …/plans/:round`, `PackInput.plan` |
+| Gegner, Gegnergruppe, Gegnerprofil | Opponents · New group · Copy a model from the game · Write your own · Our own skills | `opponent_groups`, `opponent_skills`, `OpponentProfile`, `opponentTemplates()`, `warriorTemplates()`, `ttsOpponentText()` |
+| Bestiarium (Tiere als Gegnervorlagen) | Bestiary | `data/bestiary.json` (`BESTIARY`) |
+| Schlachtnummer wählen | Battle number | `POST …/battles` mit `round`, `comeToRound()` |
 | Stufe der Kampagne übernehmen | Take the campaign’s stage | `takeStage()`, `stageBehind()` (app) |
 | eingetreten nach Schlacht N | Entered after battle N | Tag `start` mit `round` > 0 |
 | eigene Datei weicht ab | its own house rules differ · own file differs | `houseDiffers`, `houseDifferences()` |
@@ -244,6 +251,8 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Schnellbau | Quick Build | Variante `quickbuild`, GitHub Pages |
 | Variante (der App) | Flavour | Build-Modus `campaign` / `quickbuild`, `app/src/flavour.ts` |
 | Offen für dich | Open for you | Startseite, `app/src/routes/Home.tsx` → `app/src/open/HomeOpen.tsx` (alle Kampagnen, zuletzt Gesehenes ohne Verbindung) |
+| Kampagnen im Spiel (Startseite) | Campaigns | Karte der Startseite, `app/src/campaign/HomeCampaigns.tsx`; die Liste kommt aus `useCampaigns` (`app/src/campaign/useCampaigns.ts`, auch für die Seitenleiste); „All campaigns“ führt zur Liste mit dem Archiv |
+| Leerer Teil einer Seite | Empty (compact) | `Empty` mit `compact` (`app/src/art/Pixels.tsx`): kleines Bild neben dem Satz statt Plakat |
 | Auf diesem Gerät gespeichert | Saved on this device | `app/src/app/SyncState.tsx` |
 | Neue Version – neu laden | New version available · Reload | `app/src/app/UpdateBanner.tsx` |
 | Gerätespeicher | Device store | Dexie-Datenbank `mordheim`, `app/src/db/db.ts` |
@@ -306,3 +315,5 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Funktionen der Warband | Warband (House rules, Districts, Story, Versions, All warbands, Make a copy) | App: `Panel.tsx`; sichtbare Liste statt ⋯-Menü |
 | Druckblatt | Print sheet | App: `PrintSheet` in `Print.tsx`; nur zwischen `beforeprint` und `afterprint` im Dokument |
 | Offener Aufstieg (golden in der Erfahrungsleiste) | Advance due | `XpView.owed` (Erfahrung − übernommene Aufstiege) |
+| Pixelbild im Seitenkopf | Banner (picture) | App: `Banner` in `art/Pixels.tsx`, Szene aus `art/route.ts` |
+| Große Szene im leeren Zustand | Empty scene | App: `Empty` in `art/Pixels.tsx` |

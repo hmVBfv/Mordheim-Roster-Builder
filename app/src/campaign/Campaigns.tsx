@@ -6,6 +6,7 @@ import { useOnAnyCampaign } from '../live/live.ts';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { archiveCampaign, cachedCampaigns, listCampaigns, ROLE_NAMES, roundName, startCampaign, type CampaignSummary } from './api.ts';
@@ -111,7 +112,7 @@ export function Campaigns() {
       <h1>Campaigns</h1>
       {deleted && <p className={ui.message} role="status">“{deleted}” is deleted. Its warbands are with their players again.</p>}
       {error && <p className={ui.message} role="status">{error}{list ? ' Shown as last seen.' : ''}</p>}
-      {list && list.length === 0 && <p className={ui.muted}>You are not part of a campaign yet. A leader adds you; or start one yourself.</p>}
+      {list && list.length === 0 && <Empty scene="gate" title="You are not part of a campaign yet.">A leader adds you; or start one yourself.</Empty>}
       {active && active.length > 0 && <ul className={styles.list} aria-label="Your campaigns">{active.map(entry)}</ul>}
       {active && active.length === 0 && filed.length > 0 && <p className={ui.muted}>Every campaign of yours is in the archive.</p>}
       {filed.length > 0 && (

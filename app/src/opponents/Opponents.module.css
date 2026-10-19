@@ -1,0 +1,42 @@
+/* Opponents in the Background tab: groups, profiles, the editor and the pickers. */
+.title { margin: 0; font-size: 1.15rem; }
+.sub { margin: var(--space-3) 0 0; font-size: 1rem; }
+.groups { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.group { display: grid; gap: var(--space-2); padding: var(--space-3); background: var(--surface); border: 1px dashed var(--border); border-left: 4px solid var(--gold); border-radius: var(--radius); min-width: 0; overflow-wrap: anywhere; }
+.group h3 { margin: 0; font-size: 1.05rem; }
+.note { margin: 0; color: var(--text-muted); }
+.profiles, .skills, .found { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.profiles li, .found li { display: grid; gap: 2px; min-width: 0; }
+.found li { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-2); padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+.found li > :not(button) { grid-column: 1; }
+.found li > button { grid-column: 2; grid-row: 1 / span 3; }
+.skills li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.meta { font-size: 0.8rem; color: var(--text-muted); }
+.line { font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.78rem; white-space: normal; overflow-wrap: anywhere; color: var(--text-muted); }
+.cards { display: grid; gap: var(--space-2); }
+.picker { display: grid; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--accent); border-radius: var(--radius); background: var(--surface); min-width: 0; }
+.kinds { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.kinds button { min-height: var(--tap); padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--text); font: inherit; cursor: pointer; }
+.kinds button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.editors { display: grid; gap: var(--space-2); }
+.editor { padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); min-width: 0; }
+.editor[open] { padding-bottom: var(--space-3); display: grid; gap: var(--space-2); }
+.editor summary { min-height: var(--tap); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); cursor: pointer; overflow-wrap: anywhere; }
+.head { display: grid; gap: var(--space-2); grid-template-columns: minmax(0, 1fr); }
+.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-2); border: 0; margin: 0; padding: 0; min-width: 0; }
+.stats legend { padding: 0; margin-bottom: var(--space-1); }
+.stat { display: grid; gap: 2px; text-align: center; font-size: 0.85rem; min-width: 0; }
+.stat input { text-align: center; padding-left: 0; padding-right: 0; min-width: 0; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chips li { display: inline-flex; align-items: center; gap: 2px; padding-left: var(--space-3); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); }
+.chips button { min-width: var(--tap); min-height: var(--tap); border: 0; background: none; color: var(--text-muted); font: inherit; font-size: 1.1rem; cursor: pointer; }
+.write { display: grid; gap: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2) var(--space-3) var(--space-3); margin: 0; min-width: 0; }
+.check { display: flex; align-items: center; gap: var(--space-2); min-height: var(--tap); }
+.check input { width: 1.5rem; height: 1.5rem; flex: none; }
+@media (min-width: 560px) {
+  .head { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 7rem); }
+  .stats { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -186,19 +186,79 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
-test('on a desktop the warbands and the members stand side by side', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  const srv = await playServer(page);
-  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
-  await page.goto(`campaign/${c.id}`);
-  const warbands = page.getByRole('heading', { name: 'Warbands' });
-  const members = page.getByRole('heading', { name: 'Members' });
-  await expect(warbands).toBeVisible();
-  const [a, b] = [await warbands.boundingBox(), await members.boundingBox()];
-  expect(Math.abs(a!.y - b!.y)).toBeLessThan(4);
-  expect(b!.x).toBeGreaterThan(a!.x + 200);
-  await shot(page, 'campaign-desktop');
-});
+/* Rob, 19.10.2026: the desktop overview. A campaign's overview sorts who (the
+   warbands, the members) to the left from what happened (battles, the map) to
+   the right; Home puts the campaigns beside the warbands. */
+const box = async (page: import('@playwright/test').Page, name: string | RegExp) => {
+  const b = await page.getByRole('heading', { name, exact: typeof name === 'string' }).first().boundingBox();
+  if (!b) throw new Error(`no heading ${String(name)} on the screen`);
+  return b;
+};
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`on a desktop the campaign overview has who on the left and what happened on the right, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others: [...others, { player: 'Carla', data: { ...SAVE, name: 'Sisters of the Pale Rose' } }] });
+    srv.addBattle(c.id, { title: 'The Well at Dusk' });
+    await page.goto(`campaign/${c.id}`);
+    await expect(page.getByRole('list', { name: 'Battles' }).getByRole('link')).toHaveCount(1);
+    const [warbands, members, battles, map] = [await box(page, 'Warbands'), await box(page, 'Members'), await box(page, 'Battles'), await box(page, 'The map')];
+    // who: one under the other on the left …
+    expect(Math.abs(members.x - warbands.x)).toBeLessThan(2);
+    expect(members.y).toBeGreaterThan(warbands.y + 150);
+    // … what happened: beside them on the right, the map under the battles
+    expect(battles.x).toBeGreaterThan(warbands.x + 300);
+    expect(Math.abs(battles.y - warbands.y)).toBeLessThan(4);
+    expect(Math.abs(map.x - battles.x)).toBeLessThan(2);
+    expect(map.y).toBeGreaterThan(battles.y + 100);
+    // the members are a line each, two to a row; an empty map is a small picture, not a poster
+    const people = page.getByRole('list', { name: 'Members' }).getByRole('listitem');
+    await expect(people).toHaveCount(4);
+    const [p1, p2, p3] = [await people.nth(0).boundingBox(), await people.nth(1).boundingBox(), await people.nth(2).boundingBox()];
+    expect(p1!.height).toBeLessThan(60);
+    expect(Math.abs(p1!.y - p2!.y)).toBeLessThan(2);
+    expect(p3!.y).toBeGreaterThan(p1!.y + p1!.height - 2);
+    expect((await page.locator('[data-scene="map"]').boundingBox())!.height).toBeLessThan(140);
+    await noSideScroll(page);
+    await shot(page, `${theme}-campaign-desktop`);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await noSideScroll(page);
+    await shot(page, `${theme}-campaign-desktop-wide`);
+  });
+
+  test(`on a desktop Home has the campaigns beside the warbands, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const srv = await playServer(page, true, { totp: true });
+    for (const name of ['The Silver Caravan', 'Brothers of the Black Ford', 'Ashes of Ostland']) serverWarband(srv, name);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others });
+    srv.addCampaign({ name: 'Summer in Sylvania', role: 'player' });
+    await page.goto('./');
+    const list = page.getByRole('list', { name: 'Your campaigns' });
+    await expect(list.getByRole('link')).toHaveText([/The Hel Fenn Campaign\s*Leader · Setup · 1 warband/, /Summer in Sylvania\s*Player · Setup · 0 warbands/]);
+    const warbandLinks = page.getByRole('main').getByRole('link').filter({ hasText: /Mercenaries/ });
+    await expect(warbandLinks).toHaveCount(3);
+    const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await warbandLinks.nth(0).boundingBox(), await warbandLinks.nth(1).boundingBox(), await warbandLinks.nth(2).boundingBox()];
+    // the campaigns stand on the right, at the top; the warbands on the left, two to a row
+    expect(campaigns.x).toBeGreaterThan(warbands.x + 400);
+    expect(campaigns.y).toBeLessThan(warbands.y);
+    expect(Math.abs(first!.y - second!.y)).toBeLessThan(2);
+    expect(second!.x).toBeGreaterThan(first!.x + 200);
+    expect(third!.y).toBeGreaterThan(first!.y + first!.height - 2);
+    // the button under the list stands apart from the last card, as the warbands' buttons do
+    const lastCampaign = await list.getByRole('link').last().boundingBox();
+    const allCampaigns = await page.getByRole('link', { name: 'All campaigns' }).boundingBox();
+    expect(allCampaigns!.y - (lastCampaign!.y + lastCampaign!.height)).toBeGreaterThanOrEqual(8);
+    await list.getByRole('link').first().click();
+    await expect(page).toHaveURL(new RegExp(`/campaign/${c.id}$`));
+    await expect(page.getByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeVisible();
+    await page.goBack();
+    await noSideScroll(page);
+    await shot(page, `${theme}-home-desktop`);
+  });
+}
 
 /* The game night (phase 4a2). */
 for (const theme of ['chronicle', 'parchment'] as const) {
@@ -209,6 +269,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await page.goto(`campaign/${c.id}`);
     await page.getByRole('button', { name: 'New battle' }).click();
     const setup = page.getByRole('dialog', { name: 'Battle 1' });
+    await expect(setup.getByLabel('Battle number')).toHaveValue('1');
     await setup.getByLabel('Title (optional)').fill('Hel Fenn ferry');
     await tapTargets(page);
     await shot(page, `${theme}-battle-new`);
@@ -232,6 +293,11 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect.poll(() => [...srv.state.battles.values()][0]!.entries.length, { timeout: 8000 }).toBe(2);
     await page.getByLabel('Outcome for The Grey Penitents').selectOption('victory');
     await expect(page.getByText('Outcome saved.')).toBeVisible();
+    // the version that goes in: a leader confirms Anna's warband, and the comparison starts
+    await expect(page.getByText('Version not confirmed yet').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Confirm for Anna' }).click();
+    await expect(page.getByText(/✓ Version 1 goes in · confirmed by/)).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Before and after' })).toContainText('before: version 1');
     // full screen on the phone: no navigation, the buttons for one hand instead
     await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
     await noSideScroll(page);
@@ -993,6 +1059,133 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-drafts-published`);
+  });
+}
+
+/* The backstory: a leader brings in the group's old chronicle, is warned of hidden words, and everyone reads it as sections. */
+const BACKSTORY = [
+  '# The Hel Fenn chronicle', '', 'The Silver Caravan left Nuln in the spring, and the road was long.', '',
+  '## Battle 1 – the ferry', 'Rain over the Stir. Gerhard Voss waited at the jetty with a coin in his hand.', '',
+  '## Battle 2 – the quay', 'A building collapsed on the quay; nobody was found.', '',
+].join('\n');
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the backstory: a leader brings it in from a file, is warned of hidden words, and it is read as sections, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    srv.backgroundFrom(c.id, { kind: 'figure', title: 'The ferryman', truth: 'Gerhard Voss ferries the Countess across the Stir. He kills witnesses.', playersKnow: 'A ferryman takes coin.', status: 'active', reveal: 'hidden' });
+    await page.goto(`campaign/${c.id}/chronicle`);
+    await expect(page.getByRole('heading', { name: 'Backstory' })).toBeVisible();
+    await expect(page.getByText('No backstory yet.')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-backstory-empty`);
+
+    await page.getByRole('button', { name: 'Bring in the backstory…' }).click();
+    const form = page.getByRole('dialog', { name: 'Bring in the backstory' });
+    await form.getByLabel('From a file (optional)').setInputFiles({ name: 'chronicle.md', mimeType: 'text/markdown', buffer: Buffer.from(BACKSTORY) });
+    await expect(form.getByRole('list', { name: 'Sections found' }).getByRole('listitem')).toHaveCount(3);
+    await expect(form.getByRole('list', { name: 'Words of the hidden background' })).toContainText('Gerhard');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-backstory-form`);
+    await form.getByRole('button', { name: 'Save the backstory' }).click();
+    await expect(form.getByText(/tick that you want everyone to read this/)).toBeVisible();
+    await form.getByRole('checkbox', { name: /everyone in the campaign may read this/ }).check();
+    await form.getByRole('button', { name: 'Save the backstory' }).click();
+    await expect(page.getByText('Backstory saved: 3 sections. Everyone in the campaign can read it.')).toBeVisible();
+    const list = page.getByRole('list', { name: 'Backstory sections' });
+    await expect(list.getByRole('listitem')).toHaveCount(3);
+    await list.getByText('Battle 1 – the ferry').click();
+    await expect(list.getByText(/Rain over the Stir/)).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-backstory-read`);
+  });
+}
+
+/* Plans and opponents (leaders only): the red thread of the next battle, and a group of opponents copied from the game, changed, carded for TTS. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`plans and opponents: a leader plans the next battle and builds a group of opponents, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    await page.goto(`campaign/${c.id}/background`);
+    await page.getByRole('button', { name: 'Plans' }).click();
+    await page.getByRole('button', { name: 'Plan a battle' }).click();
+    const plan = page.getByRole('dialog', { name: 'Plan a battle' });
+    await plan.getByLabel('The red thread').fill('The ferrymen turn on the Caravan halfway across. The Countess stays unseen – only her coin is found.');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-plan-form`);
+    await plan.getByRole('button', { name: 'Save the plan' }).click();
+    await expect(page.getByRole('list', { name: 'Plans' }).getByRole('listitem')).toHaveCount(1);
+    await noSideScroll(page);
+    await shot(page, `${theme}-plans`);
+
+    await page.getByRole('button', { name: 'Opponents' }).click();
+    await page.getByRole('button', { name: 'New group' }).click();
+    const form = page.getByRole('dialog', { name: 'New group of opponents' });
+    await form.getByLabel('Group name').fill('The ferrymen');
+    await form.getByRole('button', { name: 'Copy a model from the game…' }).click();
+    const picker = form.getByRole('group', { name: 'Copy a model' });
+    await picker.getByLabel('Search every model').fill('ogre');
+    await expect(picker.getByRole('list', { name: 'Models found' }).getByRole('listitem').first()).toBeVisible();
+    await picker.getByRole('list', { name: 'Models found' }).scrollIntoViewIfNeeded();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-picker`);
+    await picker.getByRole('button', { name: /^Add Ogre Bodyguard \(/ }).click();
+    await picker.getByRole('button', { name: 'Done adding' }).click();
+    await form.getByLabel('Name', { exact: true }).fill('Big Grul');
+    await form.getByRole('button', { name: 'Add a skill' }).click();
+    const adder = form.getByRole('group', { name: 'Add a skill' });
+    await adder.getByLabel('Find a skill').fill('step aside');
+    await adder.getByRole('button', { name: 'Add the skill Step Aside' }).click();
+    await adder.getByRole('button', { name: 'Done' }).click();
+    await form.getByRole('group', { name: 'Characteristics' }).scrollIntoViewIfNeeded();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-profile`);
+    await form.getByRole('button', { name: 'Save the group' }).click();
+    const groups = page.getByRole('list', { name: 'Opponent groups' });
+    await expect(groups.getByText('Big Grul')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents`);
+    await page.getByRole('button', { name: 'Tabletop Simulator cards of The ferrymen' }).click();
+    const tts = page.getByRole('dialog', { name: 'The ferrymen · Tabletop Simulator' });
+    await expect(tts.getByLabel('Description')).toHaveValue(/Step Aside: /);
+    await noSideScroll(page);
+    await shot(page, `${theme}-opponents-tts`);
+  });
+
+  test(`opponents at the game night: a leader sets one against the warbands while the battle runs, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.opponentGroupFrom(c.id, { name: 'The ferrymen', profiles: [{ id: 'p1', name: 'Old Marek', type: 'Hero', count: 1, profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '2', I: '4', A: '2', Ld: '8' }, sv: '5+', skills: [], equipment: '', rules: '', note: '', from: null }] });
+    await page.goto(`campaign/${c.id}/battles/${b.id}`);
+    await expect(page.getByRole('heading', { name: 'Opponents ⚑' })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Opponent groups' }).getByText('Old Marek')).toBeVisible();
+    await page.getByRole('button', { name: 'New group' }).click();
+    const form = page.getByRole('dialog', { name: 'New group of opponents' });
+    await form.getByLabel('Group name').fill('Latecomers');
+    await form.getByRole('button', { name: 'Write your own' }).click();
+    await form.getByLabel('Name', { exact: true }).fill('Stray ogre');
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-battle-form`);
+    await form.getByRole('button', { name: 'Save the group' }).click();
+    const groups = page.getByRole('list', { name: 'Opponent groups' });
+    await expect(groups.getByText('Stray ogre')).toBeVisible();
+    await expect(page.getByRole('button', { name: '+ Casualty' })).toBeVisible();
+    await page.getByRole('heading', { name: 'Opponents ⚑' }).scrollIntoViewIfNeeded();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-opponents-battle`);
   });
 }
 

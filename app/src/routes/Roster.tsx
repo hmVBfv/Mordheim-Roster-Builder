@@ -34,6 +34,7 @@ import { CampaignStage, InCampaign } from '../campaign/InCampaign.tsx';
 import { takeStage } from '../campaign/stage.ts';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
@@ -276,7 +277,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         v={v} acts={actsOf} printing={printing}
         after={<>
           {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
-            <p className={`${ui.card} ${ui.muted}`}>No warriors yet. Recruit your Heroes and Henchmen: {v.gold} gc to spend.</p>
+            <Empty scene="fire" title="No warriors yet.">Recruit your Heroes and Henchmen: {v.gold} gc to spend.</Empty>
           )}
           <FallenList f={v.fallen} />
         </>}

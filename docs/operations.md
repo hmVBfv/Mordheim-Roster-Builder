@@ -258,7 +258,22 @@ nächtlichen Wiederherstellungstest wieder weg), dann genauso produktiv:
 6. Prüfen: die Übersicht (jede Warband „✓ Entered after battle N“, die
    Schlachten „before the app“, nichts „Open for you“), die Zeitleiste mit
    den Kapiteln.
-7. Der nächste Spielabend: „New battle“ legt Schlacht N+1 an.
+7. Der nächste Spielabend: „New battle“ legt Schlacht N+1 an – oder die
+   Nummer, die der Leiter im Feld „Battle number“ wählt.
+
+**Ohne „Before the app“:** Schritt 3 ist freiwillig. Wer die Schlachten nicht
+einzeln eintragen will, holt die bisherige Geschichte als Text hinein:
+Reiter „Chronicle“ → Abschnitt „Backstory“ → „Bring in the backstory…“ (Text
+einfügen oder eine .md/.txt-Datei lesen). Der Text wird an seinen
+Überschriften in Abschnitte geschnitten („Battle 3 …“, „Schlacht 3 …“ oder
+jede Markdown-Überschrift; die Nummer sagt, von welcher Schlacht der Abschnitt
+erzählt), vor dem Speichern auf Namen aus dem verborgenen Hintergrund
+geprüft und ersetzt, was vorher dort stand. **Alle Mitglieder lesen ihn.**
+Das KI-Paket trägt jeden Abschnitt, der vor der jeweiligen Schlacht liegt,
+als „Backstory — before the app“ unter „The story so far“. Soll die Kampagne
+bei Schlacht 4 beginnen, wählt der Leiter beim ersten „New battle“ die Nummer
+4: die Kampagne rückt auf „After battle 3“, ohne dass Runden ausgesetzt
+werden.
 
 Die Stände der Gruppe tragen keine Stufen-Snapshots (Entscheidung E in der
 [Roadmap](roadmap.md#offene-entscheidungen)): der erste Vergleich „What

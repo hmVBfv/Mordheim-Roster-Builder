@@ -64,10 +64,16 @@ export function checkEntry(kind: 'casualty' | 'event', payload: unknown, partici
 /** `warbandIds`: who fought; `marked`: whose warband is marked after it (phase 4a4); `takenOver`: a battle of the history, played before the app,
     and `playedAt` the day it was played (phase 4a5; for a battle of the app, when it was set up). */
 export interface BattleSummary {
-  id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds: string[]; marked: string[]; createdAt: string; closedAt: string | null;
+  id: string; round: number; title: string; status: 'open' | 'closed'; turn: number; warbands: string[]; warbandIds: string[]; marked: string[];
+  /** whose version for this battle is confirmed (before it was fought) */
+  confirmed: string[]; createdAt: string; closedAt: string | null;
   takenOver: boolean; playedAt: string | null;
 }
-export interface Participant { warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null }
+/** `revBefore`: the version that goes in – confirmed when `confirmedAt` is set, otherwise only the head when the battle was set up; `beforeTotals` are frozen with the confirmation; `headRev`: the warband's newest version now. */
+export interface Participant {
+  warbandId: string; name: string; wbType: string; wbName: string; playerId: string; player: string; outcome: Outcome; revBefore: number | null;
+  confirmedAt: string | null; confirmedBy: string | null; beforeTotals: unknown; headRev: number;
+}
 export interface Entry { id: string; turn: number; kind: 'casualty' | 'event'; payload: unknown; author: string; createdAt: string; updatedAt: string }
 export interface Proposal { id: string; targetType: 'battle' | 'protocol_entry'; targetId: string; authorId: string; author: string; payload: unknown; status: 'open' | 'accepted' | 'rejected'; decidedBy: string | null; createdAt: string }
 export interface BattleView {
@@ -93,21 +99,29 @@ export function listBattles(db: DB, campaignId: string): BattleSummary[] {
   const rows = db.prepare('SELECT * FROM battles WHERE campaign_id = ? ORDER BY round, created_at').all(campaignId) as BattleRow[];
   const names = db.prepare('SELECT w.id, w.name FROM battle_participants p JOIN warbands w ON w.id = p.warband_id WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE');
   const marked = db.prepare("SELECT warband_id FROM tags WHERE battle_id = ? AND kind = 'after_battle' AND superseded_by IS NULL ORDER BY created_at");
+  const confirmed = db.prepare('SELECT warband_id FROM battle_participants WHERE battle_id = ? AND before_confirmed_at IS NOT NULL ORDER BY warband_id');
   return rows.map((b) => {
     const ws = names.all(b.id) as { id: string; name: string }[];
     return {
       id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((r) => r.name), warbandIds: ws.map((r) => r.id),
-      marked: (marked.all(b.id) as { warband_id: string }[]).map((r) => r.warband_id), createdAt: b.created_at, closedAt: b.closed_at,
+      marked: (marked.all(b.id) as { warband_id: string }[]).map((r) => r.warband_id),
+      confirmed: (confirmed.all(b.id) as { warband_id: string }[]).map((r) => r.warband_id), createdAt: b.created_at, closedAt: b.closed_at,
       takenOver: !!b.taken_over, playedAt: b.played_at,
     };
   });
 }
 
 export function battleView(db: DB, b: BattleRow): BattleView {
-  const participants = (db.prepare(`SELECT p.*, w.name, w.wb_type, w.owner_id, u.display_name FROM battle_participants p
-    JOIN warbands w ON w.id = p.warband_id JOIN users u ON u.id = w.owner_id WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE`).all(b.id) as
-    { warband_id: string; rev_before: number | null; outcome: Outcome; name: string; wb_type: string; owner_id: string; display_name: string }[])
-    .map((p) => ({ warbandId: p.warband_id, name: p.name, wbType: p.wb_type, wbName: gameData().WARBANDS[p.wb_type]?.name ?? p.wb_type, playerId: p.owner_id, player: p.display_name, outcome: p.outcome, revBefore: p.rev_before }));
+  const participants = (db.prepare(`SELECT p.*, w.name, w.wb_type, w.owner_id, w.head_rev, u.display_name, c.display_name AS confirmer FROM battle_participants p
+    JOIN warbands w ON w.id = p.warband_id JOIN users u ON u.id = w.owner_id LEFT JOIN users c ON c.id = p.before_confirmed_by
+    WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE`).all(b.id) as
+    { warband_id: string; rev_before: number | null; outcome: Outcome; name: string; wb_type: string; owner_id: string; display_name: string;
+      head_rev: number; before_confirmed_at: string | null; confirmer: string | null; before_totals: string | null }[])
+    .map((p) => ({
+      warbandId: p.warband_id, name: p.name, wbType: p.wb_type, wbName: gameData().WARBANDS[p.wb_type]?.name ?? p.wb_type, playerId: p.owner_id, player: p.display_name,
+      outcome: p.outcome, revBefore: p.rev_before, confirmedAt: p.before_confirmed_at, confirmedBy: p.confirmer,
+      beforeTotals: p.before_totals ? (JSON.parse(p.before_totals) as unknown) : null, headRev: p.head_rev,
+    }));
   const entries = (db.prepare(`SELECT e.*, u.display_name AS author FROM protocol_entries e JOIN users u ON u.id = e.author_id
     WHERE e.battle_id = ? AND e.deleted_at IS NULL ORDER BY e.turn, e.created_at`).all(b.id) as (EntryRow & { author: string })[])
     .map((e) => ({ id: e.id, turn: e.turn, kind: e.kind, payload: JSON.parse(e.payload) as unknown, author: e.author, createdAt: e.created_at, updatedAt: e.updated_at }));

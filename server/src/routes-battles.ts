@@ -13,7 +13,7 @@ import { campaignById, openEnrolment, roleIn, type CampaignRole, type CampaignRo
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
 import { gameData } from './rules.ts';
-import { closeBattle, markAfterBattle, marksOf } from './aftermath.ts';
+import { closeBattle, comeToRound, confirmBefore, markAfterBattle, marksOf } from './aftermath.ts';
 import { snapshot } from './backup.ts';
 import { warbandById } from './warbands.ts';
 import { roundAfterHistory } from './history.ts';
@@ -86,9 +86,13 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const round = b.round ?? t.c.round + 1;
     const before = roundAfterHistory(db(), t.c.id, round);
     if (before) return reply.code(400).send({ error: 'invalid', problem: before });
-    const made = createBattle(db(), {
-      id: bid, campaignId: t.c.id, round, title: (b.title ?? '').trim(), scenario: (b.scenario ?? '').trim(), district: b.district ?? '', warbandIds: ws, by: req.actor!.id,
-    }, now());
+    const when = now();
+    const made = db().transaction(() => {
+      comeToRound(db(), t.c, round, req.actor!.id, when);
+      return createBattle(db(), {
+        id: bid, campaignId: t.c.id, round, title: (b.title ?? '').trim(), scenario: (b.scenario ?? '').trim(), district: b.district ?? '', warbandIds: ws, by: req.actor!.id,
+      }, when);
+    })();
     return reply.code(201).send(view(made));
   });
 
@@ -194,6 +198,21 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
         deps.log?.warn({ event: 'snapshot_failed', battle: t.b!.id, err: String(e) }, 'snapshot after the battle failed');
       }
     }
+    return view(battleById(db(), t.b!.id)!);
+  });
+
+  /** Confirming the version that goes into the battle: the warband's player, or a leader for them, while the battle is open. */
+  app.post('/api/v1/campaigns/:id/battles/:bid/confirm', {
+    config: { action: 'battle.confirm' },
+    schema: body({ warbandId: id, rev: { type: 'integer', minimum: 1 } }, ['warbandId', 'rev']),
+  }, async (req, reply) => {
+    const t = target(req, reply, 'battle.confirm');
+    if (!t) return reply;
+    const b = req.body as { warbandId: string; rev: number };
+    const w = warbandById(db(), b.warbandId.toLowerCase());
+    if (!w || (w.owner_id !== req.actor!.id && t.role !== 'leader')) return reply.code(403).send({ error: 'forbidden' });
+    const r = confirmBefore(db(), t.c, t.b!, w.id, b.rev, req.actor!.id, now());
+    if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
     return view(battleById(db(), t.b!.id)!);
   });
 

@@ -8,11 +8,12 @@ ADR 0014 setzt für das JavaScript beim ersten Laden eine Grenze von 200 KB
 - Die Kampagne wird vor allem am Desktop gespielt (Rob, 19.10.2026: „Der
   Hauptfokus bei der Kampagne liegt auf dem Desktop“). Dort kostet ein
   größerer Start wenig, und danach liegt die App im Cache.
-- Die Grenze ist eng. Stand `master` (19.10.2026): Kampagne 190,0 KB, Quick
-  Build 188,8 KB. Das Pixel-Art-Gerüst allein kostete 5,4 KB; jede weitere
-  Änderung der letzten Wochen etwa 0,2 KB. Es blieben 4 bis 6 KB Luft. Die
-  beiden Ausgaben unterscheiden sich nur um 1,2 KB, weil sie fast denselben
-  Code laden.
+- Die Grenze ist eng. `master` vor den Pixel-Art- und Desktop-Änderungen
+  (19.10.2026): Kampagne 190,0 KB, Quick Build 188,8 KB. Das Pixel-Art-Gerüst
+  allein kostete 5,4 KB, jede weitere Änderung etwa 0,2 KB; mit der
+  Desktop-Übersicht stehen beide bei etwa 196 KB (196,2 und 196,0), es bleiben
+  rund 4 KB Luft. Die beiden Ausgaben unterscheiden sich kaum, weil sie fast
+  denselben Code laden.
 - Die Bytegrenze ist ein Ersatz für das, was zählt: die Zeit bis zur
   Bedienbarkeit. Die prüft Playwright auf einem Handy-Profil (1,6 Mbit/s,
   150 ms Latenz, CPU 4× gedrosselt) gegen 3 s. Gemessen am 19.10.2026: erster

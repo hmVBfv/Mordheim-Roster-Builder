@@ -5,19 +5,23 @@
    authenticator gets here, and the server sends nothing of it to anyone
    else (ADR 0011). Revealing is a deliberate step: the words written there
    become a public note in the timeline; the truth stays where it is. */
-import { useId, useMemo, useState } from 'react';
+import { lazy, Suspense, useId, useMemo, useState } from 'react';
 import { errorText } from '../account/api.ts';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
 import { buildTimeline } from '../timeline/build.ts';
 import { useNotice } from '../ui/Notice.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
   endOfSegment, getEntry, KIND_NAMES, KIND_ONE, KINDS, LEVEL_NAMES, LEVEL_TEXT, putEntry, removeEntry, revealEntry, staleEntry,
   type Detail, type Entry, type EntryBody, type Kind, type Level, type Ref, type Status,
 } from './api.ts';
+import { PlansSection } from '../plans/Plans.tsx';
+
+const OpponentsSection = lazy(() => import('../opponents/Opponents.tsx').then((m) => ({ default: m.OpponentsSection })));
 import styles from './Background.module.css';
 import { useBackground } from './useBackground.ts';
 
@@ -261,7 +265,7 @@ function History({ close, detail, error }: { close: () => void; detail: Detail |
 
 export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) {
   const { entries, error, refresh } = useBackground(id);
-  const [kind, setKind] = useState<Kind>('thread');
+  const [kind, setKind] = useState<Kind | 'plans' | 'opponents'>('thread');
   const [editing, setEditing] = useState<Entry | null>(null);
   const [revealing, setRevealing] = useState<Entry | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -274,6 +278,7 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
   const { ref: historyRef, open: openHistorySheet, close: closeHistory } = useSheet();
   const battles = useMemo(() => [...(view.battles ?? [])].sort((a, b) => b.round - a.round), [view.battles]);
   const places = useMemo(() => placesOf(view), [view]);
+  const warbands = useMemo(() => view.enrolments.filter((e) => e.status === 'active').map((e) => ({ id: e.warbandId, name: e.name || e.wbName })), [view.enrolments]);
   const counts = useMemo(() => Object.fromEntries(KINDS.map((k) => [k, (entries ?? []).filter((e) => e.kind === k).length])) as Record<Kind, number>, [entries]);
   const shown = (entries ?? []).filter((e) => e.kind === kind);
 
@@ -308,7 +313,12 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       <p className={styles.secret}>⚑ Only campaign leaders see this area. It is never sent to players, never in an export, never in a repository.</p>
       <div className={styles.kinds} role="group" aria-label="Show">
         {KINDS.map((k) => <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{KIND_NAMES[k]} {counts[k]}</button>)}
+        <button type="button" aria-pressed={kind === 'plans'} onClick={() => setKind('plans')}>Plans</button>
+        <button type="button" aria-pressed={kind === 'opponents'} onClick={() => setKind('opponents')}>Opponents</button>
       </div>
+      {kind === 'plans' && <PlansSection id={id} view={view} notify={notify} />}
+      {kind === 'opponents' && <Suspense fallback={<p className={ui.muted}>Loading the opponents…</p>}><OpponentsSection id={id} warbands={warbands} notify={notify} /></Suspense>}
+      {kind !== 'plans' && kind !== 'opponents' && (<>
       <details className={`${ui.card} ${styles.legend}`}>
         <summary>How much may the story show?</summary>
         {(Object.keys(LEVEL_NAMES) as Level[]).map((l) => <div key={l} className={styles.level}><Dots level={l} /><span><b>{LEVEL_NAMES[l]}</b> – {LEVEL_TEXT[l]}</span></div>)}
@@ -316,12 +326,13 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       </details>
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => { setEditing(null); setProblem(null); setFormKey((k) => k + 1); openEditSheet(); }}>New {KIND_ONE[kind].toLowerCase()}</button></div>
       {error && <p className={ui.message} role="status">{error}{entries ? ' Shown as last seen.' : ''}</p>}
-      {entries && shown.length === 0 && <p className={ui.muted}>Nothing here yet. {kind === 'thread' ? 'A thread is a story the world is telling behind the players’ backs: the truth, what they know, how much may show.' : 'Write what only you know.'}</p>}
+      {entries && shown.length === 0 && <Empty scene="tome" title="Nothing here yet.">{kind === 'thread' ? 'A thread is a story the world is telling behind the players’ backs: the truth, what they know, how much may show.' : 'Write what only you know.'}</Empty>}
       <ul className={styles.list} aria-label={KIND_NAMES[kind]}>
         {shown.map((e) => <EntryCard key={e.id} e={e} battles={view.battles} onReveal={() => { setRevealing(e); setProblem(null); setFormKey((k) => k + 1); openReveal(); }} onEdit={() => openEdit(e)} onHistory={() => openHistory(e)} />)}
       </ul>
+      </>)}
       <dialog ref={editRef} className={ui.sheet} aria-labelledby="background-title">
-        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
+        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind === 'plans' || kind === 'opponents' ? 'thread' : kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
       </dialog>
       <dialog ref={revealRef} className={ui.sheet} aria-labelledby="reveal-title">
         {revealing && <RevealForm key={`r${formKey}`} close={closeReveal} entry={revealing} places={places} onReveal={doReveal} problem={problem} />}

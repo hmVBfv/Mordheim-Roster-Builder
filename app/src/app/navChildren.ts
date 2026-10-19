@@ -7,10 +7,10 @@ import { useEffect, useState } from 'react';
 import { useMatch } from 'react-router';
 import { useSession } from '../account/session.ts';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { cachedCampaign, cachedCampaigns, listCampaigns, type CampaignSummary } from '../campaign/api.ts';
+import { cachedCampaign, type CampaignSummary } from '../campaign/api.ts';
 import { campaignTabs } from '../campaign/tabs.ts';
+import { useCampaigns } from '../campaign/useCampaigns.ts';
 import { FLAVOUR } from '../flavour.ts';
-import { useOnAnyCampaign } from '../live/live.ts';
 import { useWarbands } from '../sync/local.ts';
 
 export interface NavChild { to: string; label: string; end?: boolean; children?: NavChild[] }
@@ -38,18 +38,8 @@ export function useSideNav(): boolean {
 function useCampaignsInPlay(enabled: boolean): CampaignSummary[] {
   const session = useSession();
   const user = session.status === 'in' ? session.user : session.status === 'unreachable' ? session.user : null;
-  const userId = enabled && FLAVOUR === 'campaign' ? user?.id : undefined;
-  const [list, setList] = useState<CampaignSummary[]>([]);
-  const [tick, setTick] = useState(0);
-  useOnAnyCampaign(() => setTick((t) => t + 1));
-  useEffect(() => {
-    if (!userId) return;
-    let live = true;
-    void cachedCampaigns(userId).then((c) => { if (live && c) setList((l) => (l.length ? l : c)); });
-    listCampaigns(userId).then((c) => { if (live) setList(c); }).catch(() => undefined);
-    return () => { live = false; };
-  }, [userId, tick]);
-  return userId ? list.filter((c) => !(c as CampaignSummary & { archived?: boolean }).archived) : [];
+  const all = useCampaigns(enabled && FLAVOUR === 'campaign' ? user?.id : undefined);
+  return (all ?? []).filter((c) => !c.archived);
 }
 
 export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[] } {

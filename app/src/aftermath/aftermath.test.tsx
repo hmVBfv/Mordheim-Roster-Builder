@@ -180,8 +180,9 @@ describe('the campaign after the battle', () => {
 
     b.status = 'closed';
     at(`/campaign/${c.id}`);
+    // the device may still hold the battle as it was fought (then it asks for the version to confirm): wait for what the server says now
     const open = await screen.findByRole('region', { name: 'Open for you' });
-    expect(within(open).getByRole('link').getAttribute('href')).toBe(`/warbands/${mine}/aftermath/${b.id}`);
+    await waitFor(() => expect(within(open).getByRole('link').getAttribute('href')).toBe(`/warbands/${mine}/aftermath/${b.id}`));
     expect(within(open).getByRole('link').textContent).toMatch(/Battle 1 · Hel Fenn ferry · The Silver Caravan/);
     expect(screen.getByRole('list', { name: 'Battles' }).textContent).toMatch(/closed · 0\/2 marked/);
     cleanup();
@@ -194,5 +195,81 @@ describe('the campaign after the battle', () => {
     expect(c.enrolments.find((e) => e.warbandId === penitents)!.tag).toMatchObject({ kind: 'sat_out', round: 1 });
     await user.click(screen.getByRole('link', { name: 'Overview' }));
     expect((await screen.findByRole('list', { name: 'Warbands' })).textContent).toMatch(/Sat out battle 1/);
+  });
+});
+
+describe('before the battle: the version that goes in', () => {
+  it('a player confirms their warband – saved as a version, its numbers fixed; a leader confirms the others’ newest', async () => {
+    const { srv, c, b, mine, skrittle } = await world();
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    const fought = await screen.findByRole('region', { name: 'Who fought' });
+    const caravan = (await within(fought).findByText('The Silver Caravan')).closest('li')!;
+    const clan = within(fought).getByText('Clan Skrittle').closest('li')!;
+    expect(within(caravan).getByText('Version not confirmed yet')).toBeTruthy();
+    expect(within(clan).getByText('Version not confirmed yet')).toBeTruthy();
+    await user.click(within(caravan).getByRole('button', { name: 'Confirm my warband for battle 1' }));
+    expect(await within(caravan).findByText(/✓ Version 2 goes in · confirmed by/)).toBeTruthy();
+    expect(srv.state.calls).toContain(`POST /warbands/${mine}/versions`);
+    expect(srv.state.battles.get(b.id)!.participants[0]).toMatchObject({ warbandId: mine, confirm: { rev: 2 } });
+    expect(within(caravan).queryByRole('button', { name: /Confirm/ })).toBeNull();
+    // a leader confirms for Ben what stands on the server
+    await user.click(within(clan).getByRole('button', { name: 'Confirm for Ben' }));
+    expect(await within(clan).findByText(/✓ Version 1 goes in/)).toBeTruthy();
+    expect(srv.state.battles.get(b.id)!.participants.find((p) => p.warbandId === skrittle)).toMatchObject({ confirm: { rev: 1 } });
+    cleanup();
+    at(`/campaign/${c.id}`);
+    const battles = await screen.findByRole('list', { name: 'Battles' });
+    await waitFor(() => expect(battles.textContent).toMatch(/live · 2\/2 confirmed/));
+  });
+
+  it('what is open for a player: the version to confirm, until it is', async () => {
+    const { srv, c, b, mine } = await world();
+    at(`/campaign/${c.id}`);
+    const open = await screen.findByRole('region', { name: 'Open for you' });
+    const link = within(open).getByRole('link');
+    expect(link.getAttribute('href')).toBe(`/campaign/${c.id}/battles/${b.id}`);
+    expect(link.textContent).toMatch(/Confirm your version.*Battle 1 · Hel Fenn ferry · The Silver Caravan/);
+    expect(within(open).getByText('to confirm')).toBeTruthy();
+    cleanup();
+    await srv.handle('POST', `/campaigns/${c.id}/battles/${b.id}/confirm`, new URLSearchParams(), { warbandId: mine, rev: 1 });
+    at(`/campaign/${c.id}`);
+    const battles = await screen.findByRole('list', { name: 'Battles' });
+    await waitFor(() => expect(battles.textContent).toMatch(/live · 1\/2 confirmed/));
+    await waitFor(() => expect(screen.queryByRole('region', { name: 'Open for you' })).toBeNull());
+  });
+
+  it('a leader sees what went in beside what came out; the player sees their own in the aftermath', async () => {
+    const { srv, c, b, mine } = await world();
+    const user = userEvent.setup();
+    await srv.handle('POST', `/campaigns/${c.id}/battles/${b.id}/confirm`, new URLSearchParams(), { warbandId: mine, rev: 1 });
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    const compare = await screen.findByRole('list', { name: 'Before and after' });
+    const caravan = within(compare).getByText('The Silver Caravan').closest('li')!;
+    expect(caravan.textContent).toMatch(/before: version 1/);
+    expect(caravan.textContent).toMatch(/after: the battle is still on/);
+    const clan = within(compare).getByText('Clan Skrittle').closest('li')!;
+    expect(clan.textContent).toMatch(/before: not confirmed/);
+    cleanup();
+    b.status = 'closed';
+    at(`/warbands/${mine}/aftermath/${b.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Take it over' }));
+    const own = await screen.findByRole('list', { name: 'Before and after' });
+    expect(within(own).getAllByRole('listitem')).toHaveLength(1);
+    expect(own.textContent).toMatch(/before: version 1/);
+    expect(own.textContent).toMatch(/after: not marked yet/);
+    await user.click(await screen.findByRole('button', { name: /Looks right – mark after battle 1/ }));
+    await waitFor(() => expect(screen.getByRole('list', { name: 'Before and after' }).textContent).toMatch(/after: version 2/));
+  });
+
+  it('a version older than the confirmed one cannot be the one after the battle', async () => {
+    const { srv, c, b, mine } = await world();
+    const w = srv.state.warbands.get(mine)!;
+    w.headRev = 2;
+    w.versions.push({ rev: 2, data: w.versions[0]!.data, createdAt: '2026-10-05T10:00:00.000Z', source: 'save' });
+    await srv.handle('POST', `/campaigns/${c.id}/battles/${b.id}/confirm`, new URLSearchParams(), { warbandId: mine, rev: 2 });
+    b.status = 'closed';
+    const r = await srv.handle('POST', `/campaigns/${c.id}/battles/${b.id}/marks`, new URLSearchParams(), { warbandId: mine, rev: 1 });
+    expect(r.status).toBe(409);
   });
 });

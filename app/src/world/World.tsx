@@ -13,6 +13,7 @@ import notes from '../notes/Notes.module.css';
 import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
 import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { addReputation, LIMITS, nameOf, otherName, putFaction, putNpc, removeFaction, removeNpc, removeReputation, signed, standings, type Faction, type Npc, type ReputationEvent, type World } from './api.ts';
@@ -211,7 +212,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
             <button type="button" className={ui.buttonQuiet} disabled={!online || world.factions.length === 0 || warbands.length === 0} onClick={openRep}>Record reputation</button>
           </div>
         )}
-        {data && world.factions.length === 0 && loose.length === 0 && <p className={ui.muted}>{lead ? 'Nothing here yet.' : 'The leaders have not made anything of the world public yet.'}</p>}
+        {data && world.factions.length === 0 && loose.length === 0 && <Empty scene="gate" title={lead ? 'Nothing here yet.' : 'The leaders have not made anything of the world public yet.'} />}
       </section>
 
       {world.factions.length > 0 && (
