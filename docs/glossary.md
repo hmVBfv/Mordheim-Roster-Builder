@@ -306,7 +306,7 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Neue Warband | New warband | App: `/warbands/new` |
 | Konto (letztes Ziel der Navigation) | Account (Kampagnen-App) · Settings (Quick Build) | `/more`, `accountLabel()` in `app/src/app/nav.ts`; früher „More“ |
 | Unterpunkte der Seitenleiste | – (Pfeil: Open/Close Warbands, Campaign) | `useNavChildren`, `useSideNav` in `app/src/app/navChildren.ts`; ab 900 px |
-| Abschnitte einer Kampagne | Overview · Notes · Timeline · Chronicle · World · Questions · Background ⚑ · Manage | `campaignTabs` in `app/src/campaign/tabs.ts` |
+| Abschnitte einer Kampagne | Overview · Warbands · Notes · Timeline · Chronicle · World · Questions · Background ⚑ · Manage | `campaignTabs` in `app/src/campaign/tabs.ts` |
 | Zeile (eines Kriegers) | Row | App: `RowView` in `app/src/roster/Board.tsx`, Daten aus `unitRow` (`view.ts`); Name, Statline, Erfahrung, Marken, Ausrüstung |
 | Reiter eines Kriegers | Tabs: Overview · Gear · Skills & injuries · Story & more | App: `TabId`, `tabsFor` in `Detail.tsx`; nur in der Anordnung `stack` |
 | Fenster des gewählten Kriegers | Selected warrior (Pane) | App: `aside` in `Board.tsx`, alle Abschnitte offen, ab 860 px |
