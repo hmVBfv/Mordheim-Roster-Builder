@@ -3238,6 +3238,21 @@ rules engine. A skill on a profile carries its tooltip text with it, so a
 card still reads right after the campaign's own skill was changed or taken
 out.
 
+The bestiary was checked against mordheimer.net the same day, entry by entry.
+All fourteen profiles match, to the last digit, the project's copy of the
+Animal Bestiary and, where the live site still shows them, its pages (the
+Wardog, the horses, the Rhinox and the Temple Dog). Two things came out of it.
+The Wardog lacked the note the site credits to Tuomas Pirinen: in battle it
+counts for Rout tests like any warrior, in the campaign it is equipment and
+costs no upkeep – now a rule line of its own, with a test; the site marks
+whether it counts towards the maximum warband size as unclear, and the line
+says so. And the live Border Town Burning page has moved Skull of Iron and
+Staggered, but not down from the Rhinox and the Temple Dog into the
+introduction of the section, where they apply to every mount: same effect, so
+the entries keep them. The Blazing Saddles mounts and the Gnoblar no longer
+have a page of their own on the live site (only their prices survive on the
+spoils page), so for them the project's copy is the only check there is.
+
 Wrong turns: the first search results said "Hired Sword · Hired Sword · 1a ·
 1a" – the source repeated the type and the grade; hires now name their book.
 And the first client test waited a second for the model search, which in
