@@ -15,3 +15,21 @@
 .statline { margin: 0; padding: var(--space-2); white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; }
 .more summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
 .count { color: var(--text-muted); text-align: right; }
+
+/* NPC values */
+.tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.modes { display: inline-flex; flex-wrap: wrap; gap: var(--space-2); }
+.modes button { min-height: var(--tap); padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--text); font: inherit; cursor: pointer; }
+.modes button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.check { display: flex; align-items: center; gap: var(--space-2); min-height: var(--tap); }
+.check input { width: 1.5rem; height: 1.5rem; flex: none; }
+.badge { margin-left: var(--space-2); padding: 1px var(--space-2); border: 1px solid var(--gold); border-radius: 999px; color: var(--gold); font-size: 0.75rem; font-weight: 700; vertical-align: middle; }
+.named { border-left: 4px solid var(--gold); }
+.statsWrap { overflow-x: auto; }
+.stats { width: 100%; border-collapse: collapse; text-align: center; font-variant-numeric: tabular-nums; }
+.stats th, .stats td { padding: 2px var(--space-1); border: 1px solid var(--border); min-width: 1.9rem; }
+.stats th { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; background: var(--bg); }
+.stats td { font-weight: 700; }
+.rules { display: grid; gap: var(--space-1); }
+.rules p, .rules ul { margin: 0; }
+.rules ul { padding-left: var(--space-4); }

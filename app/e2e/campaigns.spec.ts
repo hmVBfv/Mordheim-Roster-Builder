@@ -447,6 +447,66 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* "Refers to" (Rob, 19.10.2026): a thread refers to a battle, a faction or a Named NPC – picked from tiles, not typed. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Background tab: a thread refers to a battle, a faction and a Named NPC, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen', publicStatus: 'hold the Stir crossing' });
+    srv.factionFrom(c.id, { nameEn: 'The Watch' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', factionId: f.id, named: true });
+    srv.npcFrom(c.id, { nameEn: 'The Countess', named: true });
+    await page.goto(`campaign/${c.id}/background`);
+    await page.getByRole('button', { name: 'New thread' }).click();
+    const sheet = page.getByRole('dialog', { name: 'New thread' });
+    await sheet.getByLabel('Title').fill('Who pays the ferryman?');
+    const kinds = sheet.getByRole('group', { name: 'What does it refer to?' });
+    await sheet.getByRole('button', { name: 'Battle 1 · Hel Fenn ferry' }).click();
+    await kinds.getByRole('button', { name: 'Faction' }).click();
+    await sheet.getByRole('button', { name: 'The Ferrymen' }).click();
+    await kinds.getByRole('button', { name: 'Named NPC' }).click();
+    await sheet.getByRole('button', { name: /^Old Marek/ }).click();
+    await sheet.getByRole('button', { name: /^The Countess/ }).scrollIntoViewIfNeeded();
+    await expect(sheet.getByRole('list', { name: 'Refers to' }).getByRole('listitem')).toHaveCount(3);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-background-refs.png` });
+    await sheet.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect.poll(() => [...srv.state.background.values()][0]?.refs.length, { timeout: 8000 }).toBe(3);
+    const card = page.getByRole('list', { name: 'Threads' }).getByRole('listitem').filter({ hasText: 'Who pays the ferryman?' });
+    await expect(card.getByRole('list', { name: 'Refers to' }).getByText('Named NPC')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-background-refs-card`);
+  });
+
+  test(`the Background tab on a desktop: the references sit across the window, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [] });
+    srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
+    for (const n of ['Old Marek', 'The Countess', 'Skritch', 'Brother Anselm', 'Gerhard Voss']) srv.npcFrom(c.id, { nameEn: n, factionId: f.id, named: true });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/background`);
+    await page.getByRole('button', { name: 'New thread' }).click();
+    const sheet = page.getByRole('dialog', { name: 'New thread' });
+    await sheet.getByRole('group', { name: 'What does it refer to?' }).getByRole('button', { name: 'Named NPC' }).click();
+    const pick = sheet.getByRole('list', { name: 'Named NPCs to pick' }); // a tile that is picked reads “✓ Old Marek …”
+    await pick.getByRole('button', { name: /Old Marek/ }).click();
+    await pick.getByRole('button', { name: /Skritch/ }).click();
+    const box = (await sheet.boundingBox())!;
+    const tiles = (await pick.boundingBox())!;
+    expect(tiles.width, 'the tiles use the width of the window').toBeGreaterThan(box.width * 0.8);
+    const [t1, t2] = [(await pick.getByRole('button', { name: /Brother Anselm/ }).boundingBox())!, (await pick.getByRole('button', { name: /Gerhard Voss/ }).boundingBox())!]; // the first two
+    expect(Math.abs(t1.y - t2.y), 'tiles in a row').toBeLessThan(2);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-background-refs-desktop.png` });
+    await sheet.getByRole('button', { name: 'Cancel' }).click();
+  });
+}
+
 /* Questions to players (phase 4b3a): a leader asks, a player finds the question under "Open for you" and answers. */
 for (const theme of ['chronicle', 'parchment'] as const) {
   test(`questions: a leader asks one player, in ${theme}`, async ({ page }) => {
@@ -571,6 +631,99 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-world-player`);
+  });
+}
+
+/* An NPC is written as values – a grid for movement, weapon skill and the rest – and, when it is a monster of the game, copied from it
+   (Rob, 19.10.2026: typing the Tabletop Simulator text by hand was too much work). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the World tab: a leader writes an NPC as values, copied from a monster, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    srv.factionFrom(c.id, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing' });
+    await page.goto(`campaign/${c.id}/world`);
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const npc = page.getByRole('dialog', { name: 'Add an NPC' });
+    await expect(npc.getByRole('group', { name: 'Characteristics' })).toBeVisible(); // the grid is the start …
+    await expect(npc.getByLabel('Statline and rules as text')).toHaveCount(0); // … the text is the fallback
+    await npc.getByRole('button', { name: 'Copy from a model…' }).click();
+    await npc.getByLabel('Search every model').fill('ogre bodyguard');
+    await npc.getByRole('button', { name: /^Copy Ogre Bodyguard \(/ }).click();
+    await npc.getByLabel('Name (English)').fill('Big Grul');
+    await npc.getByLabel('Named', { exact: false }).check();
+    await expect(npc.getByLabel('S of Big Grul', { exact: true })).toHaveValue('4');
+    await npc.getByLabel('Equipment').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-values.png` });
+    await noSideScroll(page);
+    await tapTargets(page);
+    await npc.getByRole('button', { name: 'Save' }).click();
+    await expect(page.getByText('NPC added.')).toBeVisible();
+    await expect.poll(() => [...srv.state.npcs.values()].map((n) => [n.nameEn, n.named, (n.profile as { profile?: { S?: string } } | null)?.profile?.S]), { timeout: 8000 }).toEqual([['Big Grul', true, '4']]);
+    const person = page.getByRole('listitem').filter({ hasText: 'Big Grul' });
+    await expect(person.getByText('Named')).toBeVisible();
+    await expect(person.getByRole('table', { name: 'Characteristics of Big Grul' })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-world-npc-card`);
+  });
+
+  test(`the World tab on a desktop: the NPC form is wide and holds the picker beside the grid, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [] });
+    srv.npcFrom(c.id, { nameEn: 'Black Hand', named: true, publicStatus: 'alive', statlineTts: 'M4 WS4 BS3 S4 T3 W2 I4 A2 Ld8 Sv 5+', profile: { type: 'Hero', profile: { M: '4', WS: '4', BS: '3', S: '4', T: '3', W: '2', I: '4', A: '2', Ld: '8' }, sv: '5+', skills: [], equipment: 'Sword', rules: 'Fear', from: null } });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/world`);
+    await expect(page.getByRole('table', { name: 'Characteristics of Black Hand' })).toBeVisible();
+    await shot(page, `${theme}-world-npc-card-desktop`);
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const npc = page.getByRole('dialog', { name: 'Add an NPC' });
+    const box = (await npc.boundingBox())!;
+    expect(box.width, 'wider than an ordinary sheet').toBeGreaterThan(1000);
+    expect(box.y, 'room above').toBeGreaterThan(20);
+    expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
+    await npc.getByRole('button', { name: 'Copy from a model…' }).click();
+    await npc.getByLabel('Search every model').fill('ogre');
+    const hits = npc.getByRole('list', { name: 'Models found' }).getByRole('listitem');
+    await expect(hits.first()).toBeVisible();
+    const [h1, h2] = [(await hits.nth(0).boundingBox())!, (await hits.nth(1).boundingBox())!];
+    expect(Math.abs(h1.y - h2.y), 'two hits to a row').toBeLessThan(2);
+    expect(h2.x, 'side by side').toBeGreaterThan(h1.x + h1.width - 1);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-picker-desktop.png` });
+    await npc.getByRole('button', { name: /^Copy Ogre Bodyguard \(/ }).click();
+    const grid = (await npc.getByRole('group', { name: 'Characteristics' }).boundingBox())!;
+    expect(grid.height, 'the ten characteristics in one row').toBeLessThan(110);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-values-desktop.png` });
+    await npc.getByRole('button', { name: 'Cancel' }).click();
+  });
+}
+
+/* A sheet on a desktop is a window in the middle of the screen, wide, with its fields side by side – and the page behind it stays put
+   (Rob, 19.10.2026: it hugged the bottom edge with room left above, and the page had to be scrolled down to reach its end). */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`a sheet on a desktop sits in the middle and is wide, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [] });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/world`);
+    await page.getByRole('button', { name: 'Add an NPC' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Add an NPC' });
+    const box = (await sheet.boundingBox())!;
+    expect(box.width, 'wide').toBeGreaterThan(800);
+    expect(box.y, 'room above').toBeGreaterThan(20);
+    expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
+    expect(Math.abs(box.x + box.width / 2 - 720), 'centred').toBeLessThan(2);
+    // the fields stand two to a row
+    const a = (await sheet.getByLabel('Faction').boundingBox())!;
+    const b = (await sheet.getByLabel('Name (English)').boundingBox())!;
+    expect(Math.abs(a.y - b.y), 'same row').toBeLessThan(2);
+    expect(b.x, 'to the right').toBeGreaterThan(a.x + a.width);
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow), 'page behind does not scroll').toBe('hidden');
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-sheet-desktop.png` });
+    await sheet.getByRole('button', { name: 'Cancel' }).click();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('visible');
   });
 }
 

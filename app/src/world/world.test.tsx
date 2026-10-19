@@ -90,14 +90,15 @@ describe('a leader writes the world', () => {
     await user.paste('Old Marek');
     await user.click(within(n).getByLabelText('Status everyone may read'));
     await user.paste('alive');
-    await user.click(within(n).getByLabelText('Statline (optional)'));
+    await user.click(await within(n).findByRole('button', { name: 'Text for Tabletop Simulator' }, { timeout: 15_000 })); // the fallback: the text the Tabletop Simulator copy reads
+    await user.click(within(n).getByLabelText('Statline and rules as text'));
     await user.paste('M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7');
     await user.click(within(n).getByRole('button', { name: 'Save' }));
     const people = await within(await screen.findByRole('article', { name: 'The Ferrymen' })).findByRole('list', { name: 'People of The Ferrymen' });
     expect(within(people).getByText('Old Marek')).toBeTruthy();
     expect(within(people).getByText('alive')).toBeTruthy();
     expect(within(people).getByText('M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7')).toBeTruthy();
-    expect([...srv.state.npcs.values()]).toMatchObject([{ nameEn: 'Old Marek', publicStatus: 'alive', factionId: [...srv.state.factions.keys()][0] }]);
+    expect([...srv.state.npcs.values()]).toMatchObject([{ nameEn: 'Old Marek', publicStatus: 'alive', statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', profile: null, named: false, factionId: [...srv.state.factions.keys()][0] }]);
 
     await user.click(screen.getByRole('button', { name: 'Record reputation' }));
     const r = screen.getByRole('dialog', { name: 'Record reputation' });
@@ -206,6 +207,105 @@ describe('a leader writes the world', () => {
   });
 });
 
+describe('the values of an NPC', () => {
+  const STATS = { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' } as const;
+  const scene = () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    return { srv, c };
+  };
+  const openForm = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('button', { name: 'Add an NPC' }));
+    return within(await screen.findByRole('dialog', { name: 'Add an NPC' }));
+  };
+
+  it('opens on the values: a grid to fill in, the text written from it, a Named flag; the text stays a fallback', async () => {
+    const { srv, c } = scene();
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const n = await openForm(user);
+    expect((await n.findByRole('button', { name: 'Values' }, { timeout: 15_000 })).getAttribute('aria-pressed')).toBe('true');
+    expect(n.getByRole('button', { name: 'Text for Tabletop Simulator' }).getAttribute('aria-pressed')).toBe('false');
+    expect(n.queryByLabelText('Statline and rules as text')).toBeNull();
+    await user.click(n.getByLabelText('Name (English)'));
+    await user.paste('Old Marek');
+    await user.click(n.getByLabelText('Named', { exact: false }));
+    for (const [k, v] of Object.entries(STATS)) await user.type(await n.findByLabelText(`${k} of Old Marek`, {}, { timeout: 15_000 }), v);
+    await user.type(n.getByLabelText('Save of Old Marek'), '6+');
+    await user.type(n.getByLabelText('Equipment'), 'Boat hook');
+    await user.type(n.getByLabelText('Special rules (one per line)'), 'Knows the river');
+    await user.click(n.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(srv.state.npcs.size).toBe(1));
+    expect([...srv.state.npcs.values()][0]).toMatchObject({
+      nameEn: 'Old Marek', named: true,
+      profile: { type: 'Hero', profile: STATS, sv: '6+', equipment: 'Boat hook', rules: 'Knows the river', skills: [] },
+      statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7 Sv 6+\nEquipment: Boat hook\n• Knows the river',
+    });
+    const person = (await screen.findByText('Old Marek')).closest('li')!;
+    expect(within(person).getByText('Named')).toBeTruthy();
+    const table = within(person).getByRole('table', { name: 'Characteristics of Old Marek' });
+    expect(within(table).getAllByRole('columnheader').map((x) => x.textContent)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'Sv']);
+    expect(within(table).getAllByRole('cell').map((x) => x.textContent)).toEqual(['4', '3', '3', '3', '3', '1', '3', '1', '7', '6+']);
+  });
+
+  it('copies the values of a monster of the game and, later, of another NPC', async () => {
+    const { srv, c } = scene();
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    let n = await openForm(user);
+    await user.click(await n.findByRole('button', { name: 'Copy from a model…' }, { timeout: 15_000 }));
+    let picker = within(await n.findByRole('group', { name: 'Copy a model' }, { timeout: 15_000 }));
+    await user.type(picker.getByLabelText('Search every model'), 'ogre bodyguard');
+    await user.click(await picker.findByRole('button', { name: /^Copy Ogre Bodyguard \(/ }));
+    expect(n.queryByRole('group', { name: 'Copy a model' })).toBeNull(); // one model was wanted
+    expect((n.getByLabelText('Name (English)') as HTMLInputElement).value).toBe('Ogre Bodyguard'); // the name was empty
+    expect((n.getByLabelText('S of Ogre Bodyguard') as HTMLInputElement).value).toBe('4');
+    expect(n.getByText(/Copied from Ogre Bodyguard \(/)).toBeTruthy();
+    await user.clear(n.getByLabelText('Name (English)'));
+    await user.type(n.getByLabelText('Name (English)'), 'Big Grul');
+    await user.click(n.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(srv.state.npcs.size).toBe(1));
+    expect([...srv.state.npcs.values()][0]).toMatchObject({ nameEn: 'Big Grul', named: false, profile: { type: 'Hired Sword', sv: '6+', from: { kind: 'hired', key: 'hired/ogre' } } });
+
+    // the NPC just made can be copied like any model
+    n = await openForm(user);
+    await user.click(n.getByRole('button', { name: 'Copy from a model…' }));
+    picker = within(await n.findByRole('group', { name: 'Copy a model' }, { timeout: 15_000 }));
+    await user.type(picker.getByLabelText('Search every model'), 'big grul');
+    await user.click(await picker.findByRole('button', { name: /^Copy Big Grul \(NPC · no faction\)/ }));
+    expect((n.getByLabelText('S of Big Grul') as HTMLInputElement).value).toBe('4');
+    expect(n.getByText(/Copied from Big Grul \(NPC · no faction\)/)).toBeTruthy();
+  });
+
+  it('an NPC written as text opens as text; “Values” reads what it can, and says so when there is nothing to read', async () => {
+    const { srv, c } = scene();
+    const old = srv.npcFrom(c.id, { nameEn: 'Old Marek', statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7 Sv 6+\nEquipment: Boat hook\n• Knows the river' });
+    const dumb = srv.npcFrom(c.id, { nameEn: 'The Ferryman', statlineTts: 'Just an old man with a pole.' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'Change Old Marek' }));
+    let n = within(await screen.findByRole('dialog', { name: 'Change the NPC' }));
+    expect((await n.findByRole('button', { name: 'Text for Tabletop Simulator' }, { timeout: 15_000 })).getAttribute('aria-pressed')).toBe('true');
+    await user.click(n.getByRole('button', { name: 'Values' }));
+    expect((await n.findByLabelText('WS of Old Marek', {}, { timeout: 15_000 }) as HTMLInputElement).value).toBe('3');
+    expect((n.getByLabelText('Save of Old Marek') as HTMLInputElement).value).toBe('6+');
+    expect((n.getByLabelText('Equipment') as HTMLTextAreaElement).value).toBe('Boat hook');
+    expect((n.getByLabelText('Special rules (one per line)') as HTMLTextAreaElement).value).toBe('Knows the river');
+    await user.click(n.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(srv.state.npcs.get(old.id)!.profile).toMatchObject({ profile: STATS, sv: '6+' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Change the NPC' })).toBeNull());
+
+    await user.click(await screen.findByRole('button', { name: 'Change The Ferryman' }));
+    n = within(await screen.findByRole('dialog', { name: 'Change the NPC' }));
+    await user.click(await n.findByRole('button', { name: 'Values' }));
+    expect(await n.findByText(/No statline found in the text/)).toBeTruthy();
+    expect(n.getByRole('button', { name: 'Text for Tabletop Simulator' }).getAttribute('aria-pressed')).toBe('true'); // nothing was lost
+    expect((n.getByLabelText('Statline and rules as text') as HTMLTextAreaElement).value).toBe('Just an old man with a pole.');
+    expect(srv.state.npcs.get(dumb.id)!.profile).toBeNull();
+  });
+});
+
 describe('everybody else reads', () => {
   const stocked = (srv: ReturnType<typeof server>, c: { id: string; enrolments: { warbandId: string }[] }) => {
     const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing' });
@@ -214,6 +314,22 @@ describe('everybody else reads', () => {
   };
 
   for (const role of ['player', 'viewer'] as const) {
+    it(`a ${role} reads the values of a named NPC and can copy its Tabletop Simulator card`, async () => {
+      const srv = server();
+      const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role, others: [{ ...others()[0]!, role: 'leader' as const }] });
+      srv.npcFrom(c.id, {
+        nameEn: 'Black Hand', named: true, statlineTts: 'M4 WS4 BS3 S4 T3 W2 I4 A2 Ld8',
+        profile: { type: 'Hero', profile: { M: '4', WS: '4', BS: '3', S: '4', T: '3', W: '2', I: '4', A: '2', Ld: '8' }, sv: '5+', skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', rules: 'Fear', from: null },
+      });
+      at(`/campaign/${c.id}/world`);
+      const person = (await screen.findByText('Black Hand')).closest('li')!;
+      expect(within(person).getByText('Named')).toBeTruthy();
+      expect(within(within(person).getByRole('table', { name: 'Characteristics of Black Hand' })).getAllByRole('cell').map((x) => x.textContent)).toEqual(['4', '4', '3', '4', '3', '2', '4', '2', '8', '5+']);
+      expect(within(person).getByText('Step Aside', { selector: 'p' })).toBeTruthy();
+      expect((within(person).getByLabelText('Name') as HTMLTextAreaElement).value).toBe('[B8860B]Black Hand[-]');
+      expect((within(person).getByLabelText('Description') as HTMLTextAreaElement).value).toContain('M 4   WS 4   BS 3   S 4   T 3   W 2   I 4   A 2   Ld 8   Sv 5+');
+    });
+
     it(`a ${role} reads all of it and cannot change anything`, async () => {
       const srv = server();
       const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role, others: [{ ...others()[0]!, role: 'leader' as const }] });

@@ -4,17 +4,19 @@
    The last answer is kept on the device (under the account's own key, like
    the notes), so the world still shows without a connection; writing needs
    the connection, and every write answers with the whole world. */
+import type { NpcProfile } from '@mordheim/core';
 import { api } from '../account/api.ts';
 import { asker, ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
 
 export interface Faction { id: string; nameDe: string; nameEn: string; publicStatus: string; updatedAt: string; seq: number }
-export interface Npc { id: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; updatedAt: string; seq: number }
+/** A person of the world. `profile`: the values (characteristics, save, skills …) when they were filled in as such; `statlineTts`: the same as text for the Tabletop Simulator – or, for an NPC written by hand, all there is. `named`: a person of its own, not one of a crowd. */
+export interface Npc { id: string; factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; named: boolean; profile: NpcProfile | null; updatedAt: string; seq: number }
 export interface ReputationEvent { id: string; warbandId: string; warband: string; factionId: string; delta: number; reason: string; battleId: string | null; actor: string; createdAt: string; seq: number }
 export interface World { factions: Faction[]; npcs: Npc[]; reputation: ReputationEvent[]; seq: number }
 
 /** The limits the server holds to (server/src/world.ts). */
-export const LIMITS = { name: 120, status: 200, statline: 2_000, reason: 500, step: 100 } as const;
+export const LIMITS = { name: 120, status: 200, statline: 12_000, reason: 500, step: 100 } as const;
 
 const key = (cid: string) => ownKey('world:', cid);
 const keep = (cid: string, who = asker()) => async (w: World & { removed?: boolean }): Promise<World> => {
@@ -36,7 +38,7 @@ export const putFaction = (cid: string, id: string, body: FactionBody) =>
 export const removeFaction = (cid: string, id: string) =>
   api<World>(`/campaigns/${cid}/world/factions/${id}`, { method: 'DELETE' }).then(keep(cid));
 
-export interface NpcBody { factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string }
+export interface NpcBody { factionId: string | null; nameDe: string; nameEn: string; publicStatus: string; statlineTts: string; named: boolean; profile: NpcProfile | null }
 export const putNpc = (cid: string, id: string, body: NpcBody) =>
   api<World>(`/campaigns/${cid}/world/npcs/${id}`, { method: 'PUT', body }).then(keep(cid));
 export const removeNpc = (cid: string, id: string) =>

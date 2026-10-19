@@ -3344,13 +3344,73 @@ campaign near 250 kB while the phone test stays what it is – more would need
 a desktop profile of its own, which nobody has asked for.
 
 So the campaign gets 250 kB and the Quick Build keeps 200 kB (ADR 0021,
-proposed). The Quick Build is what a newcomer opens on a phone from a link,
+accepted by Rob on October 19). The Quick Build is what a newcomer opens on a phone from a link,
 without cache or account, and the two flavours share nearly all their code:
 the extra room is only ever filled by code that belongs to the campaign alone.
 The padding was code that mostly sat idle at start; code that runs at start
 costs more CPU, which is one more reason to keep the time test the real
 guard. `size.mjs` now holds one limit per flavour, and a test checks that
 `docs/ui.md` names the same numbers, so the two cannot drift.
+
+## October 19, 2026 — sheets in the middle, wide, with the page held still
+
+Rob: the pop-ups sit badly – something is missing at the bottom, so the page
+behind has to be scrolled all the way down first, though there is room above;
+and on a desktop they may be much wider. The cause was one rule: `.sheet` was
+a bottom sheet at every width, 640 px wide, stuck to the lower edge. docs/ui.md
+had already promised "in the middle on a desktop" – the promise was never
+built. From 900 px on a sheet now is a window in the middle (920 px, wider with
+`sheetWide`), its fields in two columns by a rule on the form rather than by
+touching every sheet, and while one is open the page behind does not scroll
+(`html:has(dialog[open])`), so scrolling inside the sheet cannot drag the page
+along. A phone keeps the bottom sheet.
+
+## October 19, 2026 — NPCs as values, not as a text to type
+
+Rob: adding an NPC to the world meant typing its statline in the Tabletop
+Simulator format by hand, which gets tedious fast; the form should have a
+template with Movement, WS, BS and so on, so only the numbers go in. The text
+may stay, but as a fallback. And when the NPC is a monster, copy it from the
+bestiary right there; and give the bigger options more room.
+
+The pieces already existed for opponents (a profile with the nine
+characteristics, a save, skills, equipment and rules; the picker over every
+model of the game), so the NPC form reuses them instead of growing a second
+editor – they moved into `ProfileTools.tsx`, and the picker learned to offer
+the world's own NPCs as templates, so a person made once can be copied into
+the next. The NPC keeps its values in a new `profile` column; the text
+`statlineTts` is written from them, so the world, the older readers and the
+scenarios' TTS copy keep working unchanged. An NPC written as text before this
+opens as text; "Values" reads it back with `parseStatline` when it names at
+least five characteristics, and otherwise says so and keeps the text rather
+than silently dropping it.
+
+One thing I weighed and did not do: storing only the values and deriving the
+text on read. Older NPCs have only text, and a hand-written text may say more
+than the grid holds, so the text stays a column of its own and the values are
+optional.
+
+The form is loaded when it is opened, so the first-load budget does not pay for
+the picker. Also new: a `Named` flag on an NPC – a person of its own rather
+than one of a crowd – which threads of the Background will refer to next.
+
+## October 19, 2026 — a thread refers to a faction or a person, not only a battle
+
+Rob: "Refers to" on a thread could only point at a battle, and should also
+reach a faction or a Named NPC. The server already stored references as
+`{ kind, id, label }`, so the change is two new kinds (`faction`, `npc`) and a
+better way to choose: a dropdown that grows a section per kind gets long, so
+the form asks what the reference is about first and then shows what can be
+picked as tiles – a tap adds, a second tap takes it out.
+
+Two small decisions. Only NPCs marked Named are offered: a deckhand is not
+something a thread is about, and the flag Rob suggested at NPC creation is
+what keeps the list short. And the card shows the current name, not the one
+written down, because a renamed faction is still the same faction; the written
+label is the fallback, with a "(removed)" when the world no longer has it. The
+server does not check that a faction or NPC exists, as it does not for a
+battle reference: a reference to something since removed is harmless, and
+refusing to save an entry because of it would be worse.
 
 ## October 19, 2026 — a Warbands section under Campaign
 

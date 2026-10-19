@@ -229,6 +229,10 @@ Begriff einführt, trägt ihn hier ein.
 | Welt | World | `/campaign/:id/world`, `app/src/world/`; öffentliche Mechanik, offen für alle Mitglieder |
 | Fraktion | Faction | `factions` |
 | NPC | NPC | `npcs` (Wahrheit bleibt im Hintergrund) |
+| Named (NPC) | Named | `npcs.named`: eine Person für sich, nicht Teil einer Menge; Threads im Hintergrund können sich darauf beziehen |
+| Verweis (Hintergrund) | Refers to | `background_entries.refs`: `battle`, `faction`, `npc` (nur Named), `text` und die älteren `entry`/`warrior`/`note`; die Oberfläche zeigt den aktuellen Namen, die Beschriftung beim Eintragen bleibt als Rückfall |
+| Werte (NPC) | Values | `npcs.profile` (JSON: `type`, `profile`, `sv`, `skills`, `equipment`, `rules`, `from`; `NpcProfile` in `core/src/campaign/npc.ts`); der Text `statlineTts` wird daraus geschrieben und ist ohne Werte der Rückfall |
+| Modell kopieren | Copy from a model | Vorlagen aus `opponentTemplates` (Spiel), `warriorTemplates` (Krieger der Kampagne) und den NPCs der Welt (`npcTemplate`, Art `npc`); kopiert, nie verknüpft |
 | Öffentlicher Status | Status everyone may read | `public_status` |
 | Szenario | Scenario | Tabelle `scenarios`, Abschnitt im Reiter „World“; das spielbare Paket (Regeln, NPC-Werte im TTS-Format). Der Hintergrund hält Pläne und Ideen (`kind: 'scenario'`) |
 | Entwurf (Szenario) | Draft | `visibility: 'leader'`: nur Leiter mit Authenticator, nicht einmal als Zahl für andere |

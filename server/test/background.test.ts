@@ -10,7 +10,7 @@ import { startAccounts } from './accounts-helpers.ts';
 
 const SAVE = JSON.parse(readFileSync(new URL('../../app/e2e/fixtures/silver-caravan.json', import.meta.url), 'utf8')) as Record<string, unknown>;
 const TRUTH = 'ZEBRA-TRUTH: the Countess pays the ferrymen.';
-type Entry = { id: string; title: string; truth: string; playersKnow: string; reveal: string; revealFromBattle: string | null; seq: number; lastReveal: { by: string; noteId: string; level: string } | null };
+type Entry = { id: string; title: string; truth: string; playersKnow: string; reveal: string; revealFromBattle: string | null; seq: number; refs: unknown[]; lastReveal: { by: string; noteId: string; level: string } | null };
 
 /** Anna leads (authenticator), Ben leads without one, Kai plays, Vic watches, Rob (admin) is outside; one open battle. */
 async function world() {
@@ -98,6 +98,21 @@ describe('the background', () => {
     expect((await anna('GET', `${bg}/${eid}`)).statusCode).toBe(404);
     expect((await anna('PUT', `${bg}/${eid}`, { kind: 'thread', title: 'back' })).json()).toEqual({ error: 'removed' });
     expect(s.db.prepare('SELECT count(*) AS n FROM background_revisions WHERE entry_id = ?').get(eid)).toEqual({ n: 1 });
+  });
+
+  it('an entry may refer to a battle, a faction, a named NPC or a few words; anything else is refused', async () => {
+    const { anna, bg, bid, make } = await world();
+    const refs = [
+      { kind: 'battle', id: bid, label: 'Battle 1 · Hel Fenn ferry' },
+      { kind: 'faction', id: randomUUID(), label: 'The Ferrymen' },
+      { kind: 'npc', id: randomUUID(), label: 'Old Marek' },
+      { kind: 'text', id: '', label: 'the ford at dusk' },
+    ];
+    const { r, entry } = await make({ refs });
+    expect(r.statusCode).toBe(200);
+    expect(entry.refs).toEqual(refs);
+    expect((await anna('PUT', `${bg}/${randomUUID()}`, { kind: 'thread', title: 'x', refs: [{ kind: 'warband', id: '', label: 'x' }] })).statusCode).toBe(400);
+    expect((await anna('PUT', `${bg}/${randomUUID()}`, { kind: 'thread', title: 'x', refs: [{ kind: 'npc', id: randomUUID(), label: '' }] })).statusCode).toBe(400);
   });
 
   it('nothing of it reaches anyone else: not in any list a player reads, not in the admin’s log', async () => {
