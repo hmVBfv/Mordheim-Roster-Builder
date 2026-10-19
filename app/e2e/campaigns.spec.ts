@@ -186,19 +186,75 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
-test('on a desktop the warbands and the members stand side by side', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  const srv = await playServer(page);
-  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
-  await page.goto(`campaign/${c.id}`);
-  const warbands = page.getByRole('heading', { name: 'Warbands' });
-  const members = page.getByRole('heading', { name: 'Members' });
-  await expect(warbands).toBeVisible();
-  const [a, b] = [await warbands.boundingBox(), await members.boundingBox()];
-  expect(Math.abs(a!.y - b!.y)).toBeLessThan(4);
-  expect(b!.x).toBeGreaterThan(a!.x + 200);
-  await shot(page, 'campaign-desktop');
-});
+/* Rob, 19.10.2026: the desktop overview. A campaign's overview sorts who (the
+   warbands, the members) to the left from what happened (battles, the map) to
+   the right; Home puts the campaigns beside the warbands. */
+const box = async (page: import('@playwright/test').Page, name: string | RegExp) => {
+  const b = await page.getByRole('heading', { name, exact: typeof name === 'string' }).first().boundingBox();
+  if (!b) throw new Error(`no heading ${String(name)} on the screen`);
+  return b;
+};
+
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`on a desktop the campaign overview has who on the left and what happened on the right, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others: [...others, { player: 'Carla', data: { ...SAVE, name: 'Sisters of the Pale Rose' } }] });
+    srv.addBattle(c.id, { title: 'The Well at Dusk' });
+    await page.goto(`campaign/${c.id}`);
+    await expect(page.getByRole('list', { name: 'Battles' }).getByRole('link')).toHaveCount(1);
+    const [warbands, members, battles, map] = [await box(page, 'Warbands'), await box(page, 'Members'), await box(page, 'Battles'), await box(page, 'The map')];
+    // who: one under the other on the left …
+    expect(Math.abs(members.x - warbands.x)).toBeLessThan(2);
+    expect(members.y).toBeGreaterThan(warbands.y + 150);
+    // … what happened: beside them on the right, the map under the battles
+    expect(battles.x).toBeGreaterThan(warbands.x + 300);
+    expect(Math.abs(battles.y - warbands.y)).toBeLessThan(4);
+    expect(Math.abs(map.x - battles.x)).toBeLessThan(2);
+    expect(map.y).toBeGreaterThan(battles.y + 100);
+    // the members are a line each, two to a row; an empty map is a small picture, not a poster
+    const people = page.getByRole('list', { name: 'Members' }).getByRole('listitem');
+    await expect(people).toHaveCount(4);
+    const [p1, p2, p3] = [await people.nth(0).boundingBox(), await people.nth(1).boundingBox(), await people.nth(2).boundingBox()];
+    expect(p1!.height).toBeLessThan(60);
+    expect(Math.abs(p1!.y - p2!.y)).toBeLessThan(2);
+    expect(p3!.y).toBeGreaterThan(p1!.y + p1!.height - 2);
+    expect((await page.locator('[data-scene="map"]').boundingBox())!.height).toBeLessThan(140);
+    await noSideScroll(page);
+    await shot(page, `${theme}-campaign-desktop`);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await noSideScroll(page);
+    await shot(page, `${theme}-campaign-desktop-wide`);
+  });
+
+  test(`on a desktop Home has the campaigns beside the warbands, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const srv = await playServer(page, true, { totp: true });
+    for (const name of ['The Silver Caravan', 'Brothers of the Black Ford', 'Ashes of Ostland']) serverWarband(srv, name);
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others });
+    srv.addCampaign({ name: 'Summer in Sylvania', role: 'player' });
+    await page.goto('./');
+    const list = page.getByRole('list', { name: 'Your campaigns' });
+    await expect(list.getByRole('link')).toHaveText([/The Hel Fenn Campaign\s*Leader · Setup · 1 warband/, /Summer in Sylvania\s*Player · Setup · 0 warbands/]);
+    const warbandLinks = page.getByRole('main').getByRole('link').filter({ hasText: /Mercenaries/ });
+    await expect(warbandLinks).toHaveCount(3);
+    const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await warbandLinks.nth(0).boundingBox(), await warbandLinks.nth(1).boundingBox(), await warbandLinks.nth(2).boundingBox()];
+    // the campaigns stand on the right, at the top; the warbands on the left, two to a row
+    expect(campaigns.x).toBeGreaterThan(warbands.x + 400);
+    expect(campaigns.y).toBeLessThan(warbands.y);
+    expect(Math.abs(first!.y - second!.y)).toBeLessThan(2);
+    expect(second!.x).toBeGreaterThan(first!.x + 200);
+    expect(third!.y).toBeGreaterThan(first!.y + first!.height - 2);
+    await list.getByRole('link').first().click();
+    await expect(page).toHaveURL(new RegExp(`/campaign/${c.id}$`));
+    await expect(page.getByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeVisible();
+    await page.goBack();
+    await noSideScroll(page);
+    await shot(page, `${theme}-home-desktop`);
+  });
+}
 
 /* The game night (phase 4a2). */
 for (const theme of ['chronicle', 'parchment'] as const) {

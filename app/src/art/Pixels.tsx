@@ -69,17 +69,19 @@ export function Banner({ scene }: { scene: SceneId }): ReactElement {
   );
 }
 
-/** the large picture of an empty screen, with what to do about it */
-export function Empty({ scene, title, children }: { scene: SceneId; title: string; children?: ReactNode }): ReactElement {
+/** the picture of an empty screen, with what to do about it; `compact` for an empty part of a page: a small picture beside the words */
+export function Empty({ scene, title, children, compact = false }: { scene: SceneId; title: string; children?: ReactNode; compact?: boolean }): ReactElement {
   const span = SCENES[scene].span;
   const x0 = Math.floor((W - span) / 2);
   return (
-    <div className={styles.empty} data-scene={scene}>
+    <div className={`${styles.empty} ${compact ? styles.compact : ''}`} data-scene={scene}>
       <div className={styles.frame} style={{ aspectRatio: `${span} / ${H}` }}>
         <Picture scene={scene} view={`${x0} 0 ${span} ${H}`} />
       </div>
-      <h3 className={styles.emptyTitle}>{title}</h3>
-      {children && <p className={`${ui.muted} ${styles.emptyText}`}>{children}</p>}
+      <div className={styles.emptyBody}>
+        <h3 className={styles.emptyTitle}>{title}</h3>
+        {children && <p className={`${ui.muted} ${styles.emptyText}`}>{children}</p>}
+      </div>
     </div>
   );
 }

@@ -251,6 +251,8 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Schnellbau | Quick Build | Variante `quickbuild`, GitHub Pages |
 | Variante (der App) | Flavour | Build-Modus `campaign` / `quickbuild`, `app/src/flavour.ts` |
 | Offen für dich | Open for you | Startseite, `app/src/routes/Home.tsx` → `app/src/open/HomeOpen.tsx` (alle Kampagnen, zuletzt Gesehenes ohne Verbindung) |
+| Kampagnen im Spiel (Startseite) | Campaigns | Karte der Startseite, `app/src/campaign/HomeCampaigns.tsx`; die Liste kommt aus `useCampaigns` (`app/src/campaign/useCampaigns.ts`, auch für die Seitenleiste); „All campaigns“ führt zur Liste mit dem Archiv |
+| Leerer Teil einer Seite | Empty (compact) | `Empty` mit `compact` (`app/src/art/Pixels.tsx`): kleines Bild neben dem Satz statt Plakat |
 | Auf diesem Gerät gespeichert | Saved on this device | `app/src/app/SyncState.tsx` |
 | Neue Version – neu laden | New version available · Reload | `app/src/app/UpdateBanner.tsx` |
 | Gerätespeicher | Device store | Dexie-Datenbank `mordheim`, `app/src/db/db.ts` |

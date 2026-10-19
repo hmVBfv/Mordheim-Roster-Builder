@@ -71,7 +71,7 @@ const stateWord = (e: Enrolment) => {
 };
 
 function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: string }) {
-  if (!view.enrolments.length) return <Empty scene="camp" title="No warband entered yet." />;
+  if (!view.enrolments.length) return <Empty scene="camp" title="No warband entered yet." compact />;
   return (
     <ul className={styles.list} aria-label="Warbands">
       {view.enrolments.map((e) => {
@@ -159,28 +159,31 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
           <OpenList items={open} />
         </section>
       )}
-      <section className={styles.section} aria-labelledby="c-warbands">
-        <h2 id="c-warbands">Warbands</h2>
-        <WarbandRows id={id} view={view} me={me} />
-        <div className={ui.row}>
-          {view.role !== 'viewer' && <EnterSheet id={id} onDone={onView} />}
-          <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
-        </div>
-      </section>
       <div className={ui.page}>
+        <section className={styles.section} aria-labelledby="c-warbands">
+          <h2 id="c-warbands">Warbands</h2>
+          <WarbandRows id={id} view={view} me={me} />
+          <div className={ui.row}>
+            {view.role !== 'viewer' && <EnterSheet id={id} onDone={onView} />}
+            <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
+          </div>
+        </section>
         <section className={styles.section} aria-labelledby="c-members">
           <h2 id="c-members">Members</h2>
-          <ul className={styles.list} aria-label="Members">
+          <ul className={styles.crew} aria-label="Members">
             {view.members.map((m) => (
-              <li key={m.userId} className={styles.member}>
-                <span>{m.displayName}<small>{ROLE_NAMES[m.role]}</small></span>
+              <li key={m.userId} className={styles.crewMember}>
+                <span>{m.displayName}</span>
+                <span className={styles.chip}>{ROLE_NAMES[m.role]}</span>
               </li>
             ))}
           </ul>
         </section>
+      </div>
+      <div className={ui.page}>
         <section className={styles.section} aria-labelledby="c-battles">
           <h2 id="c-battles">Battles</h2>
-          {(view.battles ?? []).length === 0 && <Empty scene="battle" title="No battles yet." />}
+          {(view.battles ?? []).length === 0 && <Empty scene="battle" title="No battles yet." compact />}
           {(view.battles ?? []).length > 0 && (
             <ul className={styles.list} aria-label="Battles">
               {[...(view.battles ?? [])].reverse().map((b) => (
@@ -199,7 +202,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
         </section>
         <section className={styles.section} aria-labelledby="c-map">
           <h2 id="c-map">The map</h2>
-          {campaignMap(view).length === 0 && <Empty scene="map" title="No warband holds a district yet." />}
+          {campaignMap(view).length === 0 && <Empty scene="map" title="No warband holds a district yet." compact />}
           {campaignMap(view).length > 0 && (
             <ul className={styles.list} aria-label="Districts held">
               {campaignMap(view).map((d) => (

@@ -1,4 +1,4 @@
-import { cleanup, render as mount } from '@testing-library/react';
+import { cleanup, render as mount, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { GROUND, H, PALETTE, W, backdropRows } from './draw.ts';
 import { Banner, Empty, bands, layers } from './Pixels.tsx';
@@ -116,5 +116,16 @@ describe('the pieces on a screen', () => {
   it('an empty screen without a hint has no empty paragraph', () => {
     const { container } = mount(<Empty scene="battle" title="No battles yet." />);
     expect(container.querySelector('p')).toBeNull();
+  });
+
+  it('an empty part of a page is compact: the same words and picture, marked for the small layout', () => {
+    const full = mount(<Empty scene="map" title="No warband holds a district yet." />);
+    expect((full.container.firstElementChild as HTMLElement).className).not.toMatch(/compact/);
+    const small = mount(<Empty scene="map" title="No warband holds a district yet." compact />);
+    const root = small.container.firstElementChild as HTMLElement;
+    expect(root.className).toMatch(/compact/);
+    expect(root.getAttribute('data-scene')).toBe('map');
+    expect(within(root).getByRole('heading', { name: 'No warband holds a district yet.' })).toBeTruthy();
+    expect(small.container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
   });
 });

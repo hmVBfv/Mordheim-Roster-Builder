@@ -3282,3 +3282,37 @@ A wrong turn in the test, not in the code: the second case showed the panel in a
 closed battle because the device still held the first case's cached view under
 the same ids. A real device changes accounts with its cache cleared; the test
 now does the same between its cases.
+
+## October 19, 2026 — the desktop overview
+
+Rob's focus for the campaign is the desktop, and Home and a campaign's overview
+were still the phone's one column stretched wide. A picture of each at 1440 px
+showed it: on Home, a card and two rows as wide as the screen, and more than
+half of the page empty; on the overview, the warbands on the left with nothing
+under them, and everything else – four member cards, the battles, a poster-size
+picture for "no district yet" – piled up on the right.
+
+Home now has two columns from 900 px: what waits and the warbands (as a grid,
+six instead of three) on the left, and a new card with the campaigns in play on
+the right, one line each. The list comes from one hook, `useCampaigns`, that the
+side navigation already needed in its own copy; it answers `null` until a list
+has come, so "none in play yet" cannot flash up first. The overview sorts who
+(warbands, members) to the left from what happened (battles, the map) to the
+right, which also keeps the column that grows with the campaign – the battles –
+apart from the one that grows with the players. Members are a line each with
+their role as a chip instead of a card each, and an empty part of a page shows
+its scene small beside the sentence (`Empty compact`); the large picture stays
+for an empty screen. On a phone the order is what it was.
+
+A wrong turn that the picture caught and the tests did not: the campaign's own
+tabs came back on the desktop, next to the side navigation that carries them.
+They hide with a rule in `Campaign.module.css` that has the same specificity as
+the `.tabs` of `Account.module.css`, and which one wins was decided by which
+stylesheet the bundler put first. Home now imports the campaign's styles, which
+moved them ahead of the account's. The rule is `nav.pageTabs` now, so it wins
+either way. I saw it only because I looked at the screenshot; the new checks
+were green with the tabs doubled.
+
+Left alone on purpose: from 1920 px the content stays 1320 px wide. Stretching
+rows of three words across the whole screen would be worse than a measured
+column; a third column would be the next step, if Rob wants one.
