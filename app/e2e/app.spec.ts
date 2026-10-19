@@ -614,7 +614,10 @@ test('the undo notice goes quickly, can be dismissed and lets taps through', asy
 
 /* On a desktop screen the list and the selected warrior stand side by side
    (Rob, 18.10.2026: the whole width is used, the information is in sight at
-   once, and many warriors are not a wall of text). */
+   once, and many warriors are not a wall of text). A desktop has a mouse,
+   not a finger: the controls are the smaller ones (docs/ui.md §5). */
+test.describe('with a mouse', () => {
+test.use({ hasTouch: false, isMobile: false });
 for (const theme of THEMES) {
   test(`the roster uses the width of a desktop screen, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
@@ -671,6 +674,16 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-desktop-wide-roster`);
   });
 }
+
+test('the controls are smaller with a mouse than with a finger', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  await importSample(page);
+  const recruit = (await page.getByRole('button', { name: '+ Recruit' }).boundingBox())!;
+  expect(recruit.height).toBeGreaterThanOrEqual(32);
+  expect(recruit.height).toBeLessThan(44);
+});
+});
 
 /* The same page on a phone that is turned: the list is wide enough for table lines, the warrior still opens in place. */
 test('a tablet in landscape shows table lines and opens a warrior under his row', async ({ page }) => {

@@ -634,10 +634,20 @@ test('the campaign after the battle: open for each player, and a leader moves it
   await expect(page.getByText(/The Grey Penitents fought none/)).toBeVisible();
   await page.getByRole('button', { name: 'Move on to After battle 1' }).click();
   await expect(page.getByText('On to After battle 1.')).toBeVisible();
-  // no battle of round 2 yet: the button says so by looking disabled too
+  // no battle of round 2 yet: the button says so by looking disabled too – grey, not the accent (docs/ui.md §5)
   const next = page.getByRole('button', { name: 'Move on to After battle 2' });
   await expect(next).toBeDisabled();
-  expect(Number(await next.evaluate((el) => getComputedStyle(el).opacity))).toBeLessThan(1);
+  const look = await next.evaluate((el) => {
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--accent)';
+    document.body.append(probe);
+    const accent = getComputedStyle(probe).color;
+    probe.remove();
+    const s = getComputedStyle(el);
+    return { background: s.backgroundColor, accent, cursor: s.cursor };
+  });
+  expect(look.background).not.toBe(look.accent);
+  expect(look.cursor).toBe('not-allowed');
   await noSideScroll(page);
   await tapTargets(page);
   await shot(page, 'campaign-next-round');

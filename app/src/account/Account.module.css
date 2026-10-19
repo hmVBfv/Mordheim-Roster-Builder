@@ -150,29 +150,44 @@
   user-select: all;
 }
 
-/* the admin's tabs */
+/* tabs of a section (the campaign, the admin): a line of words, the
+   current one underlined; on a narrow screen the line scrolls sideways */
 .tabs {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tabs a {
   display: inline-flex;
+  flex: none;
   align-items: center;
   min-height: var(--tap);
   min-width: var(--tap);
+  margin-bottom: -1px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--text);
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: var(--control-font);
   text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+.tabs a:hover {
+  color: var(--text);
 }
 
 .tabs a[aria-current='page'] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
+  border-bottom-color: var(--accent);
+  color: var(--text);
+  font-weight: 600;
 }
 
 /* lists of the admin: cards side by side on a wide screen */

@@ -13,17 +13,19 @@ export async function noSideScroll(page: Page) {
 
 /* …and touch targets of at least 44 px – except a word in running text that
    opens its rules in a bubble (docs/ui.md §5). */
+/* Targets a finger can hit: 44 px; with a mouse and no touch 32 px are enough (docs/ui.md §5). */
 export async function tapTargets(page: Page) {
   const small = await page.evaluate(() => {
+    const min = matchMedia('(pointer: coarse)').matches ? 44 : 32;
     const out: string[] = [];
     for (const el of document.querySelectorAll<HTMLElement>('a, button:not([data-tip]), summary, label:has(input[type=radio]), input[type=file]')) {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || getComputedStyle(el).visibility === 'hidden') continue;
-      if (r.height < 44 || r.width < 44) out.push(`${el.tagName} "${(el.textContent ?? '').trim().slice(0, 30)}" ${Math.round(r.width)}×${Math.round(r.height)}`);
+      if (r.height < min || r.width < min) out.push(`${el.tagName} "${(el.textContent ?? '').trim().slice(0, 30)}" ${Math.round(r.width)}×${Math.round(r.height)}`);
     }
     return out;
   });
-  expect(small, 'touch targets under 44 px').toEqual([]);
+  expect(small, 'targets too small to hit').toEqual([]);
 }
 
 export async function useTheme(page: Page, theme: string) {

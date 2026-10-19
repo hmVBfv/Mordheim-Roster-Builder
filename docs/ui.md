@@ -246,6 +246,18 @@ Themes, beide wählbar. **Standard ist „Chronicle“ (dunkel).**
 - **Tippflächen** mindestens 44 × 44 px. Ausnahme: ein Regelwort im
   Fließtext einer Karte (siehe Regeltexte); seine Trefferfläche ist etwas
   größer als das Wort, ohne das Wort der nächsten Zeile zu überdecken.
+- **Mit Maus oder Trackpad** (`hover: hover` und `pointer: fine`) sind
+  Knöpfe, Felder und Reiter 36 px hoch und ihre Beschriftung 16 px statt 17 px
+  (Rob, 19.10.2026: die Knöpfe am Desktop waren „zu groß und klobig“). Das
+  steuert allein die Variable `--tap` (`app/src/theme/tokens.css`); mit dem
+  Finger bleibt es bei 44 px. Die Desktop-Tests laufen ohne Touch und
+  verlangen dort mindestens 32 px.
+- **Knöpfe:** Hauptaktion gefüllt in der Akzentfarbe, alles andere ruhig auf
+  der Fläche mit Rand; beim Darüberfahren etwas heller. Ein gesperrter Knopf
+  ist grau mit gedämpfter Schrift, nicht eine verblasste Akzentfarbe.
+- **Reiter einer Seite** (Kampagne, Admin) sind eine Zeile aus Wörtern, der
+  aktuelle unterstrichen; ist die Zeile zu lang, scrollt sie seitwärts, nicht
+  die Seite.
 - **Regeltexte auf jeder Karte (Rob, 02.10.2026: „essentiell und muss drin
   sein“):** Ausrüstung, seltene Gegenstände, Fertigkeiten, Zauber,
   Verletzungen, Mutationen und Sonderregeln sind gepunktet unterstrichen.
