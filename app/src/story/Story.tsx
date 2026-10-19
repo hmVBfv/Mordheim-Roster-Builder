@@ -12,6 +12,7 @@ import { useGameData } from '../game/useGameData.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import trade from '../roster/Trade.module.css';
 import { useWarbandRecord } from '../sync/local.ts';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
@@ -129,7 +130,7 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
       <section className={styles.section} aria-labelledby="story-lives">
         <h2 id="story-lives">Their lives</h2>
         <p className={ui.muted}>Battles, wounds, advances and what was written about each of them, in order.</p>
-        {people.length === 0 && <p className={ui.muted}>No warriors yet.</p>}
+        {people.length === 0 && <Empty scene="camp" title="No warriors yet." />}
         {groups.map(({ g, list }) => (
           <div key={g} role="group" aria-label={GROUP_NAMES[g]}>
             <h3>{GROUP_NAMES[g]}</h3>

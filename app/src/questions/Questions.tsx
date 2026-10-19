@@ -15,6 +15,7 @@ import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
 import notes from '../notes/Notes.module.css';
 import { useNotice } from '../ui/Notice.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { answerQuestion, MAX_QUESTION, putQuestion, STATUS_NAMES, type Question } from './api.ts';
@@ -203,7 +204,7 @@ export function QuestionsTab({ id, view, user, lead }: { id: string; view: Campa
         </p>
         {error && <p className={ui.message} role="status">{error}{data ? ' Shown as last seen.' : ''}</p>}
         {lead && <div className={ui.row}><button type="button" className={ui.button} disabled={!online || people.length === 0} onClick={() => openAsk(null)}>Ask a question</button></div>}
-        {data && questions.length === 0 && <p className={ui.muted}>{lead ? 'No questions yet.' : 'Nothing asked of you.'}</p>}
+        {data && questions.length === 0 && <Empty scene="scribe" title={lead ? 'No questions yet.' : 'Nothing asked of you.'} />}
         {questions.length > 0 && <ul className={styles.list} aria-label="Questions">{questions.map(item)}</ul>}
       </section>
       <AskSheet dialogRef={ask.ref} close={ask.close} asking={asking} battles={battles}

@@ -12,6 +12,7 @@ import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
 import { buildTimeline } from '../timeline/build.ts';
 import { useNotice } from '../ui/Notice.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
@@ -316,7 +317,7 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       </details>
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => { setEditing(null); setProblem(null); setFormKey((k) => k + 1); openEditSheet(); }}>New {KIND_ONE[kind].toLowerCase()}</button></div>
       {error && <p className={ui.message} role="status">{error}{entries ? ' Shown as last seen.' : ''}</p>}
-      {entries && shown.length === 0 && <p className={ui.muted}>Nothing here yet. {kind === 'thread' ? 'A thread is a story the world is telling behind the players’ backs: the truth, what they know, how much may show.' : 'Write what only you know.'}</p>}
+      {entries && shown.length === 0 && <Empty scene="tome" title="Nothing here yet.">{kind === 'thread' ? 'A thread is a story the world is telling behind the players’ backs: the truth, what they know, how much may show.' : 'Write what only you know.'}</Empty>}
       <ul className={styles.list} aria-label={KIND_NAMES[kind]}>
         {shown.map((e) => <EntryCard key={e.id} e={e} battles={view.battles} onReveal={() => { setRevealing(e); setProblem(null); setFormKey((k) => k + 1); openReveal(); }} onEdit={() => openEdit(e)} onHistory={() => openHistory(e)} />)}
       </ul>

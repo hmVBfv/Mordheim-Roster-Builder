@@ -259,6 +259,51 @@ Themes, beide wählbar. **Standard ist „Chronicle“ (dunkel).**
   Schrift, Zahlen tabellarisch ausgerichtet.
 - Kontrast mindestens WCAG AA in beiden Themes.
 
+### Bilder (Pixelart)
+
+**Entschieden (Rob, 19.10.2026):** jede Seite hat ein passendes Pixelbild –
+ein **Banner** im Seitenkopf und, wo etwas fehlt, eine **große Szene** im
+leeren Zustand. Beides bleibt auch bei „weniger Bewegung“ stehen; nur die
+kleinen Lichter (Fenster, Feuer, Wyrdstein, Sterne) bewegen sich sonst ein
+wenig.
+
+- **Gezeichnet im Code** (`app/src/art/`): `draw.ts` ist ein kleiner
+  Pixelmaler (Gitter aus Ein-Buchstaben-Farben, feste Palette, Sterne und
+  erleuchtete Fenster aus einem Zufallsgenerator mit festem Startwert – ein
+  Bild sieht immer gleich aus), `scenes.ts` hat die elf Szenen, `Pixels.tsx`
+  macht daraus ein SVG mit einem Pfad je Farbe. Eigene Motive, nichts aus
+  Games-Workshop-Material.
+- **Banner:** die Szene steht in der Mitte, die Nacht (Himmelsbänder und
+  Boden) setzt sich links und rechts fort, so ist das Bild so breit wie der
+  Bildschirm und bleibt scharf. 60 px hoch am Handy, bis 112 px am Desktop.
+  Es ist Dekoration (`aria-hidden`), nicht antippbar, und fehlt nur bei der
+  Spielnacht (`/campaign/:id/battles/:bid`, Vollbild am Handy).
+- **Leere Szene:** `<Empty scene title>text</Empty>` – Bild, Titel (der bisherige
+  Satz, z. B. „No battles yet.“) und darunter, was zu tun ist. Sie zeigt ein
+  anderes Motiv als das Banner derselben Seite.
+- **Welche Seite welches Bild:** `art/route.ts`, die erste passende Regel
+  gewinnt (Test in `art.test.tsx`).
+
+| Szene | Motiv | Seiten |
+| --- | --- | --- |
+| `city` | Mordheim bei Nacht, Komet, Wyrdstein in den Trümmern | Home |
+| `camp` | Zelte, Banner, Lagerfeuer | Warbands, Roster, Neue Warband, Manage |
+| `market` | Marktstände, Münzen | Trading Post, Hire, Import |
+| `dice` | Tisch, zwei Würfel, kleiner Krieger | TTS-Karten (Export) |
+| `tome` | aufgeschlagenes Buch zwischen Kerzen | House rules, Chronicle |
+| `map` | Karte mit Straßen, Fluss, Nadeln | Districts, World, Kampagnenliste |
+| `scribe` | Schreibtisch, Schriftrolle, Feder, Bücher | Story, Versions, Notes, Timeline |
+| `fire` | Lagerfeuer nach der Schlacht, zwei Sitzende | Nachbereitung |
+| `gate` | zerstörtes Stadttor mit Fackeln | Kampagnen-Übersicht |
+| `battle` | Schild vor gekreuzten Schwertern | Schlachten |
+| `lock` | Tür mit Vorhängeschloss, Schlüssel | Account, Admin, Fragen, Hintergrund |
+
+- Die Szenen im Mockup (`city-art.js`, `warband-art.js`) bleiben Vorlage für
+  den Stil; der Kometeneinschlag und die Wappen der Warbands sind nicht
+  übernommen.
+- Neue Szene: in `SCENES` eintragen (`span` = Breite des Motivs, der Test
+  prüft, dass nichts darüber hinausragt) und in `route.ts` einer Seite geben.
+
 ## 5. Bedienung
 
 - **Tippflächen** mindestens 44 × 44 px. Ausnahme: ein Regelwort im
