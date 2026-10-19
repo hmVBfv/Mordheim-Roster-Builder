@@ -38,6 +38,7 @@ export * from './campaign/file.ts';
 export * from './campaign/forms.ts';
 export * from './campaign/opponents.ts';
 export * from './campaign/npc.ts';
+export * from './campaign/scenarioNpc.ts';
 export * from './export/rulesText.ts';
 export * from './export/text.ts';
 export * from './export/tts.ts';

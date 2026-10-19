@@ -40,3 +40,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0019](0019-bug-token.md) | Bug-Token: ein eigener Zugang für Cloud-Sitzungen, nur `GET/PATCH /bugs` (ergänzt 0012) |
 | [0020](0020-live-updates-signal-stream.md) | Live-Aktualisierung: ein Strom von Signalen je offener App, die App holt über die gewohnten Endpunkte nach (ergänzt 0005, 0010, 0011) |
 | [0021](0021-first-load-budget-per-flavour.md) | Erste-Laden-Grenze je Ausgabe: Kampagne 250 KB, Quick Build 200 KB (angenommen, ergänzt 0014) |
+| [0022](0022-hidden-npc-values-in-scenarios.md) | Verborgene Teile bei den NPCs eines Szenarios: der Server schwärzt mit „?“, nach der Freigabe nur noch aufdecken (vorgeschlagen, ergänzt 0002, 0011) |

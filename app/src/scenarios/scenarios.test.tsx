@@ -1,6 +1,6 @@
 /* The scenarios of a campaign (phase 4b3c): a leaders' draft, released to a
    battle for everybody. Against the stand-in server (sync/fakeSync.ts). */
-import { ctxOf, writeSave } from '@mordheim/core';
+import { ctxOf, writeSave, type ScenarioNpc } from '@mordheim/core';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -41,12 +41,29 @@ function server(o: { totp?: boolean } = {}) {
 const others = () => [{ player: 'Anna', data: saveOf('The Grey Penitents') }, { player: 'Ben', data: saveOf('Clan Skrittle') }];
 const RULES = 'The ferry is dark: no shooting beyond 8".';
 const STATS = 'Captain Brandt M4 WS4 BS3 S3 T3 W1 I4 A1 Ld8';
+const LONG = { timeout: 15_000 }; // the NPC form is loaded when it opens
+
+/** An NPC of a scenario as the server keeps it (the leader's whole values); `hidden` is what the players must not read. */
+const brandt = (o: Partial<ScenarioNpc> = {}): ScenarioNpc => ({
+  id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: [],
+  profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '1', I: '4', A: '1', Ld: '8' }, sv: '5+',
+  skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', rules: 'Cannot be ambushed', from: null, ...o,
+});
 
 describe('ttsText', () => {
-  const sc = (npcStatlines: string): Scenario => ({ id: 'x', title: 'The night at the ferry', body: '', npcStatlines, visibility: 'public', playedInBattle: null, releasedAt: null, releasedBy: null, edited: false, createdAt: '', updatedAt: '', seq: 1 });
+  const sc = (npcStatlines: string, npcs: ScenarioNpc[] = []): Scenario => ({ id: 'x', title: 'The night at the ferry', body: '', npcStatlines, npcs, visibility: 'public', playedInBattle: null, releasedAt: null, releasedBy: null, edited: false, createdAt: '', updatedAt: '', seq: 1 });
   it('heads the statlines with the title; no statlines, no text', () => {
     expect(ttsText(sc(`  ${STATS}\n`))).toBe(`The night at the ferry\n${STATS}\n`);
     expect(ttsText(sc('  '))).toBe('');
+  });
+  it('writes each NPC as the players read it: a hidden part is a “?”', () => {
+    const t = ttsText(sc('', [brandt({ hidden: ['name', 'WS', 'equipment'] })]));
+    expect(t.startsWith('The night at the ferry\n')).toBe(true);
+    expect(t).not.toContain('Brandt');
+    expect(t).not.toContain('Sword');
+    expect(t).toMatch(/WS \?/);
+    expect(t).toContain('BS 3'); // what was not hidden stays
+    expect(ttsText(sc('', [brandt()]))).toContain('Captain Brandt');
   });
 });
 
@@ -218,4 +235,156 @@ describe('everybody else reads the released ones', () => {
     expect(await screen.findByText('No scenario has been played yet.')).toBeTruthy();
     await waitFor(() => expect(srv.state.scenarios.size).toBe(0));
   });
+});
+
+describe('the NPCs of a scenario (ADR 0022)', () => {
+  const open = async (user: ReturnType<typeof userEvent.setup>, title = 'The night at the ferry', verb = 'Add') => {
+    await user.click(await screen.findByRole('button', { name: `${verb} the NPCs of ${title}` }));
+    return within(await screen.findByRole('dialog', { name: `NPCs of ${title}` }, LONG));
+  };
+  const stats = { M: '4', WS: '4', BS: '3' };
+
+  it('adds an NPC to a draft after the scenario exists, with the grid, and hides single stats and the name', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user);
+    await user.click(await f.findByRole('button', { name: 'New NPC' }, LONG));
+    await user.type(f.getByLabelText('Name of the NPC'), 'Captain Brandt');
+    for (const [k, v] of Object.entries(stats)) await user.type(await f.findByLabelText(`${k} of Captain Brandt`, {}, LONG), v);
+    await user.click(f.getByRole('checkbox', { name: 'Hide WS of Captain Brandt' }));
+    const players = f.getByRole('table', { name: 'Characteristics of Captain Brandt' }); // the preview: as the players read it
+    expect(within(players).getAllByRole('cell').map((x) => x.textContent).slice(0, 3)).toEqual(['4', '?', '3']);
+    await user.click(f.getByRole('checkbox', { name: 'Hide the name of Captain Brandt' }));
+    expect(f.getByText('?', { selector: 'strong' })).toBeTruthy(); // the name in the preview
+    await user.click(f.getByRole('checkbox', { name: 'Hide the name of Captain Brandt' })); // and back
+    expect(f.queryByText('?', { selector: 'strong' })).toBeNull();
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    const card = await screen.findByRole('article', { name: 'Draft: The night at the ferry' });
+    expect(await within(card).findByText(/The players read “\?” for: WS\./)).toBeTruthy();
+    expect(srv.state.scenarios.get(sc.id)!.npcs).toMatchObject([{ name: 'Captain Brandt', hidden: ['WS'], profile: { M: '4', WS: '4', BS: '3' } }]);
+    expect(within(card).getByRole('button', { name: 'Change the NPCs of The night at the ferry' })).toBeTruthy();
+  }, 40_000);
+
+  it('“All stats” hides every characteristic and the save at once, and clears again', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt()] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user, 'The night at the ferry', 'Change');
+    const all = await f.findByRole('checkbox', { name: 'Hide all stats of Captain Brandt' }, LONG) as HTMLInputElement;
+    await user.click(f.getByRole('checkbox', { name: 'Hide BS of Captain Brandt' }));
+    expect(all.indeterminate).toBe(true); // some, not all
+    await user.click(all);
+    expect(all.checked).toBe(true);
+    expect(within(f.getByRole('table', { name: 'Characteristics of Captain Brandt' })).getAllByRole('cell').map((x) => x.textContent)).toEqual(Array(10).fill('?'));
+    await user.click(all);
+    expect(all.checked).toBe(false);
+    await user.click(all);
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    await waitFor(() => expect(srv.state.scenarios.get(sc.id)!.npcs[0]!.hidden).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'sv']));
+    // the Tabletop Simulator copy for the table has the “?” too
+    await user.click(await screen.findByRole('button', { name: 'Copy the statlines of The night at the ferry' }));
+    const text = await navigator.clipboard.readText();
+    expect(text).toMatch(/M \?\s+WS \?\s+BS \?/);
+    expect(text).not.toContain('WS 4');
+  }, 40_000);
+
+  it('copies an NPC from a model of the game, and the NPC keeps its own name', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user);
+    await user.click(await f.findByRole('button', { name: 'Copy from a model…' }, LONG));
+    const picker = within(await f.findByRole('group', { name: 'Copy a model' }, LONG));
+    await user.type(picker.getByLabelText('Search every model'), 'ogre bodyguard');
+    await user.click(await picker.findByRole('button', { name: /^Copy Ogre Bodyguard \(/ }));
+    expect((f.getByLabelText('Name of the NPC') as HTMLInputElement).value).toBe('Ogre Bodyguard');
+    expect((f.getByLabelText('S of Ogre Bodyguard') as HTMLInputElement).value).toBe('4');
+    await user.clear(f.getByLabelText('Name of the NPC'));
+    await user.type(f.getByLabelText('Name of the NPC'), 'Big Grul');
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    await waitFor(() => expect(srv.state.scenarios.get(sc.id)!.npcs).toHaveLength(1));
+    expect(srv.state.scenarios.get(sc.id)!.npcs[0]).toMatchObject({ name: 'Big Grul', hidden: [], profile: { S: '4' } });
+  }, 40_000);
+
+  it('brings an NPC along from another scenario, with what was hidden; the copy is a new NPC', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt({ hidden: ['WS'] })], battleId: b.id });
+    const later = srv.scenarioFrom(c.id, { title: 'The bridge' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user, 'The bridge');
+    await user.selectOptions(await f.findByLabelText('Bring along from another scenario', {}, LONG), 'Captain Brandt · The night at the ferry');
+    await user.click(f.getByRole('button', { name: 'Bring along' }));
+    expect((f.getByLabelText('Name of the NPC') as HTMLInputElement).value).toBe('Captain Brandt');
+    expect((f.getByRole('checkbox', { name: 'Hide WS of Captain Brandt' }) as HTMLInputElement).checked).toBe(true);
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    await waitFor(() => expect(srv.state.scenarios.get(later.id)!.npcs).toHaveLength(1));
+    const copy = srv.state.scenarios.get(later.id)!.npcs[0]!;
+    expect(copy).toMatchObject({ name: 'Captain Brandt', hidden: ['WS'], profile: { WS: '4' } });
+    expect(copy.id).not.toBe(brandt().id);
+  }, 40_000);
+
+  it('the players read “?” – the server has replaced the hidden parts before they arrive', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others()[0]!, role: 'leader' as const }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt({ name: 'QUOKKA Brandt', hidden: ['name', 'WS', 'skills', 'equipment'] }), brandt({ id: '22222222-2222-4222-8222-222222222222', name: 'Old Marek', equipment: 'Boat hook' })], battleId: b.id });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const card = await screen.findByRole('article', { name: 'The night at the ferry' });
+    const list = within(await within(card).findByRole('list', { name: 'NPCs of The night at the ferry' }));
+    expect(list.getAllByRole('listitem').length).toBeGreaterThanOrEqual(2);
+    expect(list.getByText('Old Marek')).toBeTruthy(); // the one nobody hid
+    expect(document.body.textContent).not.toContain('QUOKKA');
+    expect(document.body.textContent).not.toContain('Sword');
+    expect(within(list.getByRole('table', { name: 'Characteristics of ?' })).getAllByRole('cell').slice(0, 3).map((x) => x.textContent)).toEqual(['4', '?', '3']);
+    expect(list.queryByText(/The players read/)).toBeNull(); // the leader's note is the leader's
+    expect(within(card).queryByRole('button', { name: /NPCs of/ })).toBeNull();
+    await user.click(within(card).getByRole('button', { name: 'Copy the statlines of The night at the ferry' }));
+    expect(await navigator.clipboard.readText()).not.toContain('QUOKKA');
+  }, 40_000);
+
+  it('after the release what was hidden can be shown but not changed, nothing new is hidden, and the NPC stays', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt({ hidden: ['WS'] })], battleId: b.id });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user, 'The night at the ferry', 'Change');
+    expect((await f.findByLabelText('WS of Captain Brandt', {}, LONG) as HTMLInputElement).disabled).toBe(true); // hidden when the players read it
+    expect((f.getByLabelText('BS of Captain Brandt') as HTMLInputElement).disabled).toBe(false); // not hidden: a correction is fine
+    expect((f.getByRole('checkbox', { name: 'Hide BS of Captain Brandt' }) as HTMLInputElement).disabled).toBe(true); // too late to hide it
+    expect((f.getByRole('button', { name: 'Take Captain Brandt out' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(f.getByText(/Those values can be shown, not changed/)).toBeTruthy();
+    await user.click(f.getByRole('checkbox', { name: 'Hide WS of Captain Brandt' })); // show it
+    expect(f.getByRole('status').textContent).toMatch(/Saving shows WS to everybody in the campaign/);
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    await waitFor(() => expect(srv.state.scenarios.get(sc.id)!.npcs[0]!.hidden).toEqual([]));
+    expect(srv.state.scenarios.get(sc.id)!.npcs[0]!.profile.WS).toBe('4');
+  }, 40_000);
+
+  it('the server’s refusal of a change to what was read is shown in words, and nothing is lost', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt({ hidden: ['WS'] })], battleId: b.id });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user, 'The night at the ferry', 'Change');
+    await f.findByLabelText('WS of Captain Brandt', {}, LONG);
+    srv.state.scenarios.get(sc.id)!.npcs[0]!.profile.WS = '5'; // another device got the hidden value changed (the server would not have let it)
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    expect((await f.findByRole('alert')).textContent).toMatch(/The players have already read this scenario: what is hidden cannot be changed/);
+    expect(srv.state.scenarios.get(sc.id)!.npcs[0]!.profile.WS).toBe('5');
+  }, 40_000);
 });

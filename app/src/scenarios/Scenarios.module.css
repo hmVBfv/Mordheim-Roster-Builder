@@ -10,3 +10,53 @@
 .more summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
 .text { margin: 0; padding: var(--space-2); white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; }
 .statline { margin: 0; padding: var(--space-2); white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; }
+
+/* The NPCs of a scenario (ADR 0022). A card shows them side by side where the width allows. */
+.npcs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.npc { display: grid; gap: var(--space-1); align-content: start; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+.npcHidden { border-style: dashed; }
+.npcHead { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+.npcHead small { color: var(--text-muted); }
+.statsWrap { overflow-x: auto; }
+.stats { width: 100%; border-collapse: collapse; text-align: center; font-variant-numeric: tabular-nums; }
+.stats th, .stats td { padding: 2px var(--space-1); border: 1px solid var(--border); min-width: 1.9rem; }
+.stats th { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; background: var(--surface-2); }
+.stats td { font-weight: 700; }
+/* a cell the players read as "?": dashed and tinted, and the card says so in words as well */
+.hiddenCell { outline: 2px dashed var(--gold); outline-offset: -3px; background: color-mix(in srgb, var(--gold) 14%, transparent); }
+.rules { display: grid; gap: var(--space-1); }
+.rules p, .rules ul { margin: 0; }
+.rules ul { padding-left: var(--space-4); }
+
+@media (min-width: 900px) {
+  .npcs { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+}
+
+/* The NPC form: the blocks one below the other; inside a block the name and what is hidden beside the values. */
+.addRow { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-2) var(--space-3); }
+.bring { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-2); }
+.bring label { flex-basis: 100%; }
+.bring select { width: auto; min-width: 14rem; max-width: 100%; }
+.blocks { display: grid; gap: var(--space-3); }
+.block { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.block > summary { min-height: var(--tap); display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-3); cursor: pointer; }
+.blockBody { display: grid; gap: var(--space-3); padding: var(--space-2) var(--space-3) var(--space-3); border-top: 1px solid var(--border); }
+.blockSide, .blockMain { display: grid; gap: var(--space-3); align-content: start; min-width: 0; }
+
+@media (min-width: 900px) {
+  .blockBody { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: var(--space-5); }
+}
+
+.hide { margin: 0; padding: var(--space-2) var(--space-3) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); display: grid; gap: var(--space-2); }
+.hide legend { padding: 0 var(--space-1); font-weight: 700; }
+.hide p { margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap); padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); cursor: pointer; }
+.chip input { width: 1.25rem; height: 1.25rem; flex: none; }
+.chipOn { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 16%, var(--bg)); font-weight: 700; }
+.chipOff { color: var(--text-muted); cursor: not-allowed; }
+.chipAll { flex-basis: 100%; }
+.preview { display: grid; gap: var(--space-1); }
+.previewName { margin: 0; }
+.previewName small { color: var(--text-muted); }
+.reveal { margin: 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--gold); border-radius: var(--radius); }

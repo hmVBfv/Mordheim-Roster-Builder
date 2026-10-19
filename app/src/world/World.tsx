@@ -312,7 +312,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
         </section>
       )}
 
-      <Scenarios id={id} view={view} lead={lead} />
+      <Scenarios id={id} view={view} lead={lead} warbands={fighters} templates={npcTemplates(world.npcs, world.factions)} />
 
       {world.reputation.length > 0 && (
         <section className={styles.section} aria-labelledby="w-log">

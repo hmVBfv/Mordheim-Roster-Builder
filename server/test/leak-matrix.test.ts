@@ -19,7 +19,7 @@ import { putPastBattle } from '../src/history.ts';
 import { putChapter } from '../src/chapters.ts';
 import { putEntry as putBackground } from '../src/background.ts';
 import { putQuestion } from '../src/questions.ts';
-import { releaseScenario, putScenario } from '../src/scenarios.ts';
+import { releaseScenario, putScenario, type ScenarioInput } from '../src/scenarios.ts';
 import { putDraft } from '../src/chapter-drafts.ts';
 import { putGroup, putSkill } from '../src/opponents.ts';
 import { putPlan } from '../src/plans.ts';
@@ -187,14 +187,18 @@ describe('leak-test matrix', () => {
     const eventMade = addReputation(s.db, led.id, ledEventId, { warbandId: ledEntered.warband_id, factionId: ledFactionId, delta: 1, reason: 'Paid the toll.', battleId: null }, { id: admin.id }, t0);
     if (!eventMade.ok) throw new Error(eventMade.error);
     // scenarios: a draft in the victim's campaign no role of the matrix may read, a released one the player reads; drafts in the admin's, which the probes release and take out
-    const scenario = (c: { id: string }, by: string, title: string, body: string) => {
+    const scenario = (c: { id: string }, by: string, title: string, body: string, npcs: ScenarioInput['npcs'] = []) => {
       const sid = randomUUID();
-      const r = putScenario(s.db, c.id, sid, { title, body, npcStatlines: '', baseSeq: 0 }, by, t0);
+      const r = putScenario(s.db, c.id, sid, { title, body, npcStatlines: '', npcs, baseSeq: 0 }, by, t0);
       if (!r.ok) throw new Error(r.error);
       return sid;
     };
     scenario(theirs, victim.id, 'SCENARIO-SECRET: the ambush', 'SCENARIO-SECRET: the Countess’s men wait at the ferry.');
-    const playedScenario = scenario(theirs, victim.id, 'The night at the ferry', 'Rules of the night.');
+    // a played scenario with an NPC whose name, a characteristic, skills and rules are hidden: the player reads "?" there (ADR 0022)
+    const playedScenario = scenario(theirs, victim.id, 'The night at the ferry', 'Rules of the night.', [{
+      id: randomUUID(), name: 'NPC-HIDDEN-SECRET Voss', type: 'Hero', profile: { M: '4', WS: 'NPC-HIDDEN-SECRET' }, sv: '5+', skills: [{ name: 'NPC-HIDDEN-SECRET skill', text: '' }],
+      equipment: 'Boat hook', rules: 'NPC-HIDDEN-SECRET rule', from: { kind: 'hired', key: 'hired/ogre', label: 'NPC-HIDDEN-SECRET Ogre' }, hidden: ['name', 'WS', 'skills', 'rules'],
+    }]);
     const played = releaseScenario(s.db, theirs.id, playedScenario, battle.id, victim.id, t0);
     if (!played.ok) throw new Error(played.error);
     const ledScenarioId = scenario(led, admin.id, 'A draft', 'To be released.');

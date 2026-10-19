@@ -604,6 +604,8 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   /QUESTION-SECRET/,
   // a draft scenario of the victim's campaign (phase 4b3c): only its leaders read it, and none of them is a role of the matrix
   /SCENARIO-SECRET/,
+  // the hidden parts of an NPC in a played scenario (ADR 0022): the player of the victim's campaign reads a "?" there – the probes of the matrix never read them
+  /NPC-HIDDEN-SECRET/,
   // the style guide of the victim's campaign (phase 4b4a): leaders' own, and none of its leaders is a role of the matrix
   /STYLE-SECRET/,
   // a battle plan of the victim's campaign: leaders' own, and none of its leaders is a role of the matrix
