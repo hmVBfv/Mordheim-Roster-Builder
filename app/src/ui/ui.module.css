@@ -102,18 +102,56 @@
   color: var(--text-muted);
 }
 
-/* A panel that opens from the bottom (native <dialog>, docs/ui.md §2). */
+/* A panel that opens from the bottom on a phone (native <dialog>, docs/ui.md §2); from tablet width on it is a window
+   in the middle of the screen, as wide as the work needs (Rob, 19.10.2026: the sheet hugged the bottom edge, with
+   room left above, and was narrow on a desktop). */
 .sheet {
+  --sheet-pad: var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius) var(--radius) 0 0;
   background: var(--surface);
   color: var(--text);
-  padding: var(--space-4);
+  padding: var(--sheet-pad);
   width: 100%;
   max-width: 640px;
   margin: auto auto 0;
-  max-height: 85dvh;
+  max-height: calc(100dvh - var(--space-5));
   overflow-y: auto;
+  /* the end of the sheet is the end of the scrolling – the page behind does not move on */
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 900px) {
+  .sheet {
+    --sheet-pad: var(--space-5);
+    width: min(920px, calc(100% - 4rem));
+    max-width: none;
+    margin: auto;
+    max-height: calc(100dvh - 4rem);
+    border-radius: var(--radius);
+  }
+
+  /* a form with many parts (an NPC, a scenario) takes more of the screen */
+  .sheetWide {
+    width: min(1180px, calc(100% - 4rem));
+  }
+
+  /* the fields of a form side by side; whatever is not a field – titles, notes, long texts, the buttons – spans the row */
+  .sheet > form.page,
+  .sheet > .page {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-5);
+    align-items: start;
+  }
+
+  .sheet > form.page > :not(.field),
+  .sheet > .page > :not(.field),
+  .sheet > form.page > .field:has(textarea),
+  .sheet > .page > .field:has(textarea),
+  .sheet > form.page > .span2,
+  .sheet > .page > .span2 {
+    grid-column: 1 / -1;
+  }
 }
 
 .sheet::backdrop {
@@ -288,10 +326,10 @@
    sheet's edges, over the padding. */
 .sheetActions {
   position: sticky;
-  bottom: calc(-1 * var(--space-4));
+  bottom: calc(-1 * var(--sheet-pad, var(--space-4)));
   z-index: 1;
-  margin: 0 calc(-1 * var(--space-4)) calc(-1 * var(--space-4));
-  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  margin: 0 calc(-1 * var(--sheet-pad, var(--space-4))) calc(-1 * var(--sheet-pad, var(--space-4)));
+  padding: var(--space-3) var(--sheet-pad, var(--space-4)) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   background: var(--surface);
   border-top: 1px solid var(--border);
 }

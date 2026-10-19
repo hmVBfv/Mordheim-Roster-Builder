@@ -67,3 +67,9 @@ textarea {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* While a sheet is open the page behind stays where it is: no scrolling it by accident, no jump when the scrollbar goes. */
+html:has(dialog[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}

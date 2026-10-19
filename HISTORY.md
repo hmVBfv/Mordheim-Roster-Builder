@@ -3351,3 +3351,16 @@ The padding was code that mostly sat idle at start; code that runs at start
 costs more CPU, which is one more reason to keep the time test the real
 guard. `size.mjs` now holds one limit per flavour, and a test checks that
 `docs/ui.md` names the same numbers, so the two cannot drift.
+
+## October 19, 2026 — sheets in the middle, wide, with the page held still
+
+Rob: the pop-ups sit badly – something is missing at the bottom, so the page
+behind has to be scrolled all the way down first, though there is room above;
+and on a desktop they may be much wider. The cause was one rule: `.sheet` was
+a bottom sheet at every width, 640 px wide, stuck to the lower edge. docs/ui.md
+had already promised "in the middle on a desktop" – the promise was never
+built. From 900 px on a sheet now is a window in the middle (920 px, wider with
+`sheetWide`), its fields in two columns by a rule on the form rather than by
+touching every sheet, and while one is open the page behind does not scroll
+(`html:has(dialog[open])`), so scrolling inside the sheet cannot drag the page
+along. A phone keeps the bottom sheet.
