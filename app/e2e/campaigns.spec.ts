@@ -232,6 +232,11 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect.poll(() => [...srv.state.battles.values()][0]!.entries.length, { timeout: 8000 }).toBe(2);
     await page.getByLabel('Outcome for The Grey Penitents').selectOption('victory');
     await expect(page.getByText('Outcome saved.')).toBeVisible();
+    // the version that goes in: a leader confirms Anna's warband, and the comparison starts
+    await expect(page.getByText('Version not confirmed yet').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Confirm for Anna' }).click();
+    await expect(page.getByText(/✓ Version 1 goes in · confirmed by/)).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Before and after' })).toContainText('before: version 1');
     // full screen on the phone: no navigation, the buttons for one hand instead
     await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
     await noSideScroll(page);

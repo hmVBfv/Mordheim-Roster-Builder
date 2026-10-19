@@ -146,6 +146,8 @@ Begriff einführt, trägt ihn hier ein.
 | Schlacht übernehmen | Take the battle over (Take it over) | `takeOverBattle()`, `campaign.battles[].serverId` |
 | Erfahrung der Schlacht | The battle’s experience (Grant …) | `awardBattleXp()`, `campaign.battles[].xpAwarded` |
 | Markieren „Nach Schlacht N“ | Mark after battle N | `POST …/battles/:bid/marks`, Tag `after_battle` |
+| Version für die Schlacht bestätigen | Confirm for the battle | `POST …/battles/:bid/confirm`, `battle_participants.before_*` |
+| Vorher/Nachher einer Schlacht | Before and after | App: `BeforeAfter` in `battle/Versions.tsx`; `beforeTotals` und `marks[…].totals` |
 | Was sich geändert hat | What changed | `diffWarbands()`, `reconcile()`, Tabelle `changes` |
 | ohne Anlass | no cause found (without a cause) | `unexplained` |
 | ausgesetzt (Runde) | Sat out battle N | Tag `sat_out` |
