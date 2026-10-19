@@ -50,6 +50,11 @@ describe('opponentTemplates', () => {
     expect(byKey('beast/giantspider').profile.S).toBe('3(4)');
     expect(byKey('beast/coldone').rules.split('\n')).toEqual(['Fear: Causes fear.', expect.stringMatching(/^Stupid: /), expect.stringMatching(/^Scaly: /)]);
   });
+
+  it('tells at the table that a Wardog counts for Rout tests, as the Animal Bestiary notes (Tuomas Pirinen)', () => {
+    const rules = byKey('beast/wardog').rules.split('\n');
+    expect(rules).toEqual([expect.stringMatching(/^Animal: /), expect.stringMatching(/^Counts as a warrior: .*Rout tests.*no upkeep/)]);
+  });
 });
 
 describe('warriorTemplates', () => {

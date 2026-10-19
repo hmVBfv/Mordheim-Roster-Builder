@@ -3,7 +3,7 @@
   "BESTIARY": [
     { "key": "wardog", "name": "Wardog", "src": "Mordheim Rulebook", "grade": "Core",
       "profile": { "M": 6, "WS": 4, "BS": 0, "S": 4, "T": 3, "W": 1, "I": 4, "A": 1, "Ld": 5 },
-      "rules": [["Animal", "Never gains experience; put out of action, it recovers like a Henchman (1–2 dead, 3–6 alive)."]] },
+      "rules": [["Animal", "Never gains experience; put out of action, it recovers like a Henchman (1–2 dead, 3–6 alive)."], ["Counts as a warrior", "In battle it behaves like any other warrior, Rout tests included; in the campaign it is equipment, so no upkeep. It counts towards the warband's maximum size (noted as unclear on mordheimer.net). After Tuomas Pirinen."]] },
     { "key": "gnoblar", "name": "Gnoblar Fighter", "src": "Border Town Burning", "grade": "1c",
       "profile": { "M": 4, "WS": 2, "BS": 3, "S": 2, "T": 3, "W": 1, "I": 3, "A": 1, "Ld": 5 },
       "equipment": "Dagger and sharp stuff (thrown weapon: S2, range 8\", fires twice)",

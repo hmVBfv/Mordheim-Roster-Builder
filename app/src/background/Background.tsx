@@ -278,6 +278,7 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
   const { ref: historyRef, open: openHistorySheet, close: closeHistory } = useSheet();
   const battles = useMemo(() => [...(view.battles ?? [])].sort((a, b) => b.round - a.round), [view.battles]);
   const places = useMemo(() => placesOf(view), [view]);
+  const warbands = useMemo(() => view.enrolments.filter((e) => e.status === 'active').map((e) => ({ id: e.warbandId, name: e.name || e.wbName })), [view.enrolments]);
   const counts = useMemo(() => Object.fromEntries(KINDS.map((k) => [k, (entries ?? []).filter((e) => e.kind === k).length])) as Record<Kind, number>, [entries]);
   const shown = (entries ?? []).filter((e) => e.kind === kind);
 
@@ -316,7 +317,7 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
         <button type="button" aria-pressed={kind === 'opponents'} onClick={() => setKind('opponents')}>Opponents</button>
       </div>
       {kind === 'plans' && <PlansSection id={id} view={view} notify={notify} />}
-      {kind === 'opponents' && <Suspense fallback={<p className={ui.muted}>Loading the opponents…</p>}><OpponentsSection id={id} view={view} notify={notify} /></Suspense>}
+      {kind === 'opponents' && <Suspense fallback={<p className={ui.muted}>Loading the opponents…</p>}><OpponentsSection id={id} warbands={warbands} notify={notify} /></Suspense>}
       {kind !== 'plans' && kind !== 'opponents' && (<>
       <details className={`${ui.card} ${styles.legend}`}>
         <summary>How much may the story show?</summary>
