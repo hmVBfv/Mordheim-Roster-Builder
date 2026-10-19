@@ -360,6 +360,13 @@ den Schreibenden, nie als etwas, das die Spieler lesen. Das Log (`plan.edit`,
 Leak-Matrix legt einen Plan mit Merkwort (`PLAN-SECRET`) in eine fremde
 Kampagne.
 
+**Gegner (Migration 28):** `opponents.read` und `opponents.write` für Leiter mit
+Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Gegner sind
+immer nur Leiterwissen (Rob, 19.10.2026): keine Freigabe, kein Weg zu den
+Spielern; der TTS-Export ist ein Text, den der Leiter selbst kopiert. Das Log
+trägt nur Ids. Die Leak-Matrix legt eine Gruppe und einen Skill mit Merkwort
+(`OPPONENT-SECRET`) in eine fremde Kampagne.
+
 **Kapitelentwürfe (Phase 4b5b):** `drafts.read` und `drafts.write` für Leiter
 mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein
 Entwurf ist noch kein Kapitel: er steht in keiner Zeitleiste und keinem

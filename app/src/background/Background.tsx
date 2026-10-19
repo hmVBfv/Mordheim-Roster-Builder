@@ -5,7 +5,7 @@
    authenticator gets here, and the server sends nothing of it to anyone
    else (ADR 0011). Revealing is a deliberate step: the words written there
    become a public note in the timeline; the truth stays where it is. */
-import { useId, useMemo, useState } from 'react';
+import { lazy, Suspense, useId, useMemo, useState } from 'react';
 import { errorText } from '../account/api.ts';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
@@ -20,6 +20,8 @@ import {
   type Detail, type Entry, type EntryBody, type Kind, type Level, type Ref, type Status,
 } from './api.ts';
 import { PlansSection } from '../plans/Plans.tsx';
+
+const OpponentsSection = lazy(() => import('../opponents/Opponents.tsx').then((m) => ({ default: m.OpponentsSection })));
 import styles from './Background.module.css';
 import { useBackground } from './useBackground.ts';
 
@@ -263,7 +265,7 @@ function History({ close, detail, error }: { close: () => void; detail: Detail |
 
 export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) {
   const { entries, error, refresh } = useBackground(id);
-  const [kind, setKind] = useState<Kind | 'plans'>('thread');
+  const [kind, setKind] = useState<Kind | 'plans' | 'opponents'>('thread');
   const [editing, setEditing] = useState<Entry | null>(null);
   const [revealing, setRevealing] = useState<Entry | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -311,9 +313,11 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       <div className={styles.kinds} role="group" aria-label="Show">
         {KINDS.map((k) => <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{KIND_NAMES[k]} {counts[k]}</button>)}
         <button type="button" aria-pressed={kind === 'plans'} onClick={() => setKind('plans')}>Plans</button>
+        <button type="button" aria-pressed={kind === 'opponents'} onClick={() => setKind('opponents')}>Opponents</button>
       </div>
       {kind === 'plans' && <PlansSection id={id} view={view} notify={notify} />}
-      {kind !== 'plans' && (<>
+      {kind === 'opponents' && <Suspense fallback={<p className={ui.muted}>Loading the opponents…</p>}><OpponentsSection id={id} view={view} notify={notify} /></Suspense>}
+      {kind !== 'plans' && kind !== 'opponents' && (<>
       <details className={`${ui.card} ${styles.legend}`}>
         <summary>How much may the story show?</summary>
         {(Object.keys(LEVEL_NAMES) as Level[]).map((l) => <div key={l} className={styles.level}><Dots level={l} /><span><b>{LEVEL_NAMES[l]}</b> – {LEVEL_TEXT[l]}</span></div>)}
@@ -327,7 +331,7 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       </ul>
       </>)}
       <dialog ref={editRef} className={ui.sheet} aria-labelledby="background-title">
-        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind === 'plans' ? 'thread' : kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
+        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind === 'plans' || kind === 'opponents' ? 'thread' : kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
       </dialog>
       <dialog ref={revealRef} className={ui.sheet} aria-labelledby="reveal-title">
         {revealing && <RevealForm key={`r${formKey}`} close={closeReveal} entry={revealing} places={places} onReveal={doReveal} problem={problem} />}

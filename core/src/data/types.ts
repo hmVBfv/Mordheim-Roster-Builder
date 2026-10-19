@@ -317,12 +317,28 @@ export interface GameData {
   PB_ADVANCE_NOTES: string[];
   PB_EXPLORE_SHARDS: [total: string, shards: number][];
   PB_LOCATIONS: [dice: string, name: string, text: string][];
+  /* Animals and creatures for leaders' opponent profiles (data/bestiary.json;
+     the new app only – legacy does not load the file). */
+  BESTIARY_SOURCE: string;
+  BESTIARY: BeastDef[];
 }
 
-/** The data files, in the order legacy data/index.js loads them. */
+/** An animal or creature of the bestiary: a template for an opponent, never a warband's entry. */
+export interface BeastDef {
+  key: string;
+  name: string;
+  src: string;
+  grade: string;
+  profile: Profile;
+  sv?: string;
+  equipment?: string;
+  rules: [name: string, text: string][];
+}
+
+/** The data files, in the order legacy data/index.js loads them – and last the one only the new app reads (bestiary). */
 export const DATA_FILES = [
   'races', 'equipment', 'skills', 'spells', 'abilities', 'mutations', 'injuries', 'i18n',
-  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle',
+  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle', 'bestiary',
 ] as const;
 export type DataFile = (typeof DATA_FILES)[number];
 

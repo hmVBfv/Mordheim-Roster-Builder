@@ -9,7 +9,7 @@
 import { db } from '../db/db.ts';
 import { accountId } from './session.ts';
 
-export const CAMPAIGN_CACHES = ['campaign:', 'campaigns:', 'notes:', 'pictures:', 'timeline:', 'chapter:', 'battle:', 'cw:', 'background:', 'questions:', 'world:', 'scenarios:', 'style:', 'drafts:', 'backstory:', 'plans:'] as const;
+export const CAMPAIGN_CACHES = ['campaign:', 'campaigns:', 'notes:', 'pictures:', 'timeline:', 'chapter:', 'battle:', 'cw:', 'background:', 'questions:', 'world:', 'scenarios:', 'style:', 'drafts:', 'backstory:', 'plans:', 'opponents:'] as const;
 export type CampaignCache = (typeof CAMPAIGN_CACHES)[number];
 
 /** The account this device answers for now: signed in, out of reach, or still being asked – '-' for nobody. */

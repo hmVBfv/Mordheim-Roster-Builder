@@ -158,6 +158,9 @@ export function createFakeSync(opts: {
     scenarios: new Map<string, FakeScenario>(),
     /** The style guide per campaign (4b4a); none until a leader writes one. */
     styles: new Map<string, { text: string; updatedBy: string; updatedAt: string; seq: number }>(),
+    /** Opponent groups and the campaign's own skills (server/src/opponents.ts), by id. */
+    opponentGroups: new Map<string, { id: string; campaignId: string; name: string; note: string; profiles: unknown[]; updatedBy: string; updatedAt: string; seq: number; deleted?: boolean }>(),
+    opponentSkills: new Map<string, { id: string; campaignId: string; name: string; text: string; updatedBy: string; updatedAt: string; seq: number; deleted?: boolean }>(),
     /** The leaders' plans per campaign and battle number (server/src/plans.ts). */
     plans: new Map<string, { round: number; text: string; updatedBy: string; updatedAt: string; seq: number }>(),
     /** The backstory per campaign (server/src/backstory.ts); none until a leader brings one in. */
@@ -603,6 +606,56 @@ export function createFakeSync(opts: {
     return json(200, { style: styleOf(c.id) });
   };
 
+  /* ---- opponents (as server/src/routes-opponents.ts: leaders only) ---- */
+  const oppOut = (x: object) => Object.fromEntries(Object.entries(x).filter(([k]) => k !== 'campaignId' && k !== 'deleted'));
+  const opponentsOf = (cid: string) => {
+    const groups = [...s.opponentGroups.values()].filter((g) => g.campaignId === cid);
+    const skills = [...s.opponentSkills.values()].filter((k) => k.campaignId === cid);
+    return {
+      groups: groups.filter((g) => !g.deleted).sort((a, b) => a.name.localeCompare(b.name)).map(oppOut),
+      skills: skills.filter((k) => !k.deleted).sort((a, b) => a.name.localeCompare(b.name)).map(oppOut),
+      seq: Math.max(0, ...groups.map((g) => g.seq), ...skills.map((k) => k.seq)),
+    };
+  };
+  /** A leader kept a group earlier (or on another device). */
+  const opponentGroupFrom = (campaignId: string, g: { id?: string; name: string; note?: string; profiles?: unknown[] }, by = 'Anna') => {
+    const id = g.id ?? `0000000a-0000-4000-8000-${String(s.opponentGroups.size + 1).padStart(12, '0')}`;
+    s.opponentGroups.set(id, { id, campaignId, name: g.name, note: g.note ?? '', profiles: g.profiles ?? [], updatedBy: by, updatedAt: at(), seq: next() });
+    return id;
+  };
+  const opponentSkillFrom = (campaignId: string, k: { name: string; text?: string }, by = 'Anna') => {
+    const id = `0000000b-0000-4000-8000-${String(s.opponentSkills.size + 1).padStart(12, '0')}`;
+    s.opponentSkills.set(id, { id, campaignId, name: k.name, text: k.text ?? '', updatedBy: by, updatedAt: at(), seq: next() });
+    return id;
+  };
+  const opponentRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    if (rest === '/opponents' && method === 'GET') return json(200, opponentsOf(c.id));
+    const m = /^\/opponents\/(groups|skills)\/([^/]+)$/.exec(rest);
+    if (!m) return json(404, { error: 'not_found' });
+    const groups = m[1] === 'groups';
+    const table = (groups ? s.opponentGroups : s.opponentSkills) as Map<string, { id: string; campaignId: string; seq: number; deleted?: boolean; updatedBy: string; updatedAt: string; name: string }>;
+    const cur = table.get(m[2]!);
+    if (method === 'DELETE') {
+      if (!cur || cur.campaignId !== c.id) return json(404, { error: 'not_found' });
+      if (!cur.deleted) { cur.deleted = true; cur.seq = next(); }
+      return json(200, { removed: true, seq: cur.seq });
+    }
+    if (method !== 'PUT') return json(404, { error: 'not_found' });
+    const name = String(body.name ?? '').trim();
+    if (!name) return json(400, { error: 'invalid', problem: 'a name' });
+    if (cur?.deleted) return json(404, { error: 'not_found' });
+    const fields = groups ? { name, note: String(body.note ?? ''), profiles: (body.profiles as unknown[]) ?? [] } : { name, text: String(body.text ?? '') };
+    if (cur) {
+      const same = JSON.stringify(Object.fromEntries(Object.keys(fields).map((k) => [k, (cur as Record<string, unknown>)[k]]))) === JSON.stringify(fields);
+      if (same) return json(200, { [groups ? 'group' : 'skill']: oppOut(cur) });
+      if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: oppOut(cur) });
+    }
+    const row = { id: m[2]!, campaignId: c.id, ...fields, updatedBy: me.displayName, updatedAt: at(), seq: next() };
+    table.set(m[2]!, row as never);
+    return json(200, { [groups ? 'group' : 'skill']: oppOut(row) });
+  };
+
   /* ---- plans (as server/src/routes-plans.ts: leaders only, by battle number) ---- */
   const planKey = (cid: string, round: number) => `${cid}:${round}`;
   const planOf = (cid: string, round: number) => {
@@ -1023,6 +1076,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/style')) return styleRoutes(c, role, method, rest, body);
     if (rest.startsWith('/backstory')) return backstoryRoutes(c, role, method, rest, body);
     if (rest.startsWith('/plans')) return planRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/opponents')) return opponentRoutes(c, role, method, rest, body);
     if (rest.startsWith('/chapter-drafts')) return draftRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
@@ -1313,5 +1367,5 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, planFrom, draftFrom, bugFrom };
+  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, planFrom, opponentGroupFrom, opponentSkillFrom, draftFrom, bugFrom };
 }

@@ -3214,3 +3214,34 @@ still held the leader's cached campaign view from the step before, saw itself
 as leader for a moment and asked for the plans (and got a 403). A real device
 changes accounts with its cache cleared; the test now does the same.
 
+## October 19, 2026 — opponents
+
+Rob wanted to build opponents ahead of a battle: profiles with the usual
+characteristics, copied from any model of the game or invented, grouped,
+changed, with skills from the game or of his own, and on the TTS table. He
+chose that they stay leaders' only – no release to the players, unlike
+scenarios.
+
+The templates come from everything the rules data already holds – every
+model of every warband, the Hired Swords, the Dramatis Personae – plus the
+warriors of the campaign's warbands as they stand, read through the same
+core functions the TTS export uses, so a copied veteran carries his advances,
+skills and kit. Animals were the gap: the data had six mounts, the project's
+bestiary doc fourteen creatures. They went into a new `data/bestiary.json`
+that only the new app loads (legacy keeps its own file list); it is template
+data for leaders' opponents, never a warband's entry, and still Rob's to
+audit like any rules data.
+
+A copy is never a link: a profile is the leader's from the moment it is made,
+characteristics as text ("3(4)", "D6") because opponents are not bound to a
+rules engine. A skill on a profile carries its tooltip text with it, so a
+card still reads right after the campaign's own skill was changed or taken
+out.
+
+Wrong turns: the first search results said "Hired Sword · Hired Sword · 1a ·
+1a" – the source repeated the type and the grade; hires now name their book.
+And the first client test waited a second for the model search, which in
+jsdom needs several the first time the rules data is read; the pickers now
+have their own Suspense boundary, so the group form never blanks while the
+rules load.
+

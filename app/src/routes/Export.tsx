@@ -5,11 +5,12 @@
    own ⋯ menu leads straight to its Tabletop Simulator entry
    (`#tts-<uid>`). */
 import * as core from '@mordheim/core';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
-import { exportCtx, readableText, toolFile, ttsCards, type TtsCard } from '../roster/exports.ts';
+import { exportCtx, readableText, toolFile, ttsCards } from '../roster/exports.ts';
+import { Card } from '../roster/TtsCard.tsx';
 import { officialSheet } from '../roster/pdf.ts';
 import styles from '../roster/Export.module.css';
 import trade from '../roster/Trade.module.css';
@@ -19,36 +20,6 @@ import { copyText, saveFile } from '../ui/files.ts';
 import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useWarbandRecord } from '../sync/local.ts';
-
-/** A field to copy from: read-only, selected on focus, with its button. */
-function CopyField({ label, value, rows, onCopied }: { label: string; value: string; rows: number; onCopied: (what: string) => void }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  return (
-    <div className={styles.field}>
-      <div className={styles.fieldHead}>
-        <span className={ui.muted}>{label}</span>
-        <button type="button" className={ui.buttonQuiet}
-          onClick={() => { void copyText(value).then((ok) => { if (ok) onCopied(label); else { ref.current?.focus(); ref.current?.select(); onCopied(''); } }); }}>
-          Copy {label.toLowerCase()}
-        </button>
-      </div>
-      <textarea ref={ref} className={`${ui.input} ${styles.mono}`} readOnly rows={rows} value={value} aria-label={label} onFocus={(e) => e.currentTarget.select()} />
-    </div>
-  );
-}
-
-function Card({ c, open, onOpen, onCopied }: { c: TtsCard; open: boolean; onOpen: (open: boolean) => void; onCopied: (what: string) => void }) {
-  return (
-    <details id={c.id} className={styles.card} open={open} onToggle={(e) => onOpen(e.currentTarget.open)}>
-      <summary className={styles.summary}>
-        <span>{c.label}</span>
-        {c.group && <small className={ui.muted}>of {c.group}</small>}
-      </summary>
-      <CopyField label="Name" value={c.name} rows={1} onCopied={onCopied} />
-      <CopyField label="Description" value={c.text} rows={8} onCopied={onCopied} />
-    </details>
-  );
-}
 
 /** Quick Build → campaign server (concept.md 4.11): a link that carries the warband in its fragment. */
 function SendToServer({ ctx, onCopied }: { ctx: core.Ctx; onCopied: (what: string) => void }) {
