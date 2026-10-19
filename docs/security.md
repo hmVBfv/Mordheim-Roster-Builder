@@ -240,7 +240,10 @@ Protokoll und Vorschläge sind öffentlich für die Kampagne und stehen mit
 
 **Nach der Schlacht (Phase 4a4):** Schließen und die Runde weiterschalten
 nur Leiter mit Authenticator; seine Warband „after battle N“ markieren nur
-ihr Spieler (`battle.mark`, dazu der Besitz der Warband). Der Server rechnet
+ihr Spieler (`battle.mark`, dazu der Besitz der Warband). Die Version, die in eine
+Schlacht geht, bestätigt vorher ihr Spieler oder für ihn ein Leiter
+(`battle.confirm`, solange die Schlacht offen ist); die Bestätigung ist für
+die Kampagne öffentlich wie das Protokoll (Mechanik) und steht im Log. Der Server rechnet
 dabei Kennzahlen und Änderungen selbst aus den gespeicherten Versionen –
 was ein Gerät behauptet, zählt nicht (ADR 0005, ADR 0016). Die Hausregeln
 der Kampagne setzen nur Leiter mit Authenticator (`campaign.manage`); der

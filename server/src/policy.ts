@@ -115,6 +115,8 @@ export const ACTIONS = {
   'battle.propose': { who: 'user', target: 'player' },
   /** Marking one's warband "after battle N" – its player (phase 4a4). */
   'battle.mark': { who: 'user', target: 'player' },
+  /** Confirming the version of one's warband that goes into a battle – its player, or a leader for them. */
+  'battle.confirm': { who: 'user', target: 'player' },
   /** Writing one's notes (and a leader correcting another's words) – leaders and players, not viewers. */
   'notes.write': { who: 'user', target: 'player' },
   /** Questions to players (phase 4b3): every member reads – a leader all of them, the one asked their own (ADR 0011). */

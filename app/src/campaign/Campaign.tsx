@@ -188,7 +188,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
                   <Link to={`/campaign/${id}/battles/${b.id}`} className={styles.entry}>
                     <span>{battleTitle(b)}<small>{b.warbands.join(' · ')}</small></span>
                     <span className={`${styles.chip} ${b.status === 'open' ? styles.ok : ''}`}>
-                      {b.takenOver ? 'before the app' : b.status === 'open' ? 'live' : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
+                      {b.takenOver ? 'before the app' : b.status === 'open' ? (b.confirmed && b.warbandIds ? `live · ${b.confirmed.length}/${b.warbandIds.length} confirmed` : 'live') : b.marked && b.warbandIds ? `closed · ${b.marked.length}/${b.warbandIds.length} marked` : 'closed'}
                     </span>
                   </Link>
                 </li>

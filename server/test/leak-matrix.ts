@@ -390,6 +390,14 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { user: ['tag', 'changes'] },
   },
+  'battle.confirm': {
+    // the player confirms the version of its warband for a battle of the admin's campaign; the admin, a leader there, may do it for them
+    allowed: ['user', 'admin'],
+    routes: {
+      'POST /api/v1/campaigns/:id/battles/:bid/confirm': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/confirm`, body: { warbandId: c.ledWarbandId, rev: 1 } }),
+    },
+    fields: { user: [...BATTLE], admin: [...BATTLE] },
+  },
   'notes.write': {
     allowed: ['user'],
     routes: {

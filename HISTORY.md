@@ -3125,3 +3125,34 @@ Szene im leeren Zustand, auch bei „weniger Bewegung“.
 - Im leeren Zustand bleibt der bisherige Satz als Titel stehen, weil Tests
   und E2E ihn genau abfragen; die Erklärung steht darunter.
 
+## October 19, 2026 — which version goes into a battle
+
+Rob wanted the versions of every warband checked before and after each
+battle: the player confirms the one that goes in, the leader sees it beside
+the one that comes out. The "after" half already existed (the mark after the
+battle, ADR 0016); the "before" half was only a number, `rev_before`, which
+the server guessed as the newest version when the battle began – so nobody had
+ever said which version it was.
+
+The confirmation is now a fact of the participant: who confirmed which
+version, when, and the totals frozen at that moment (`stageTotals`, the same
+function the tags use, so before and after compare like with like). The
+player confirms by saving the warband as a version "before battle N" – the
+number on the table is then the one the player saw – and a leader may confirm
+for them with what stands on the server. A confirmation can be repeated while
+the battle is open; each one replaces the last. It never blocks anything: a
+battle with an unconfirmed warband is fought as before and says so.
+
+The server refuses one thing: marking a warband after the battle with a
+version older than the one confirmed before it (409 `older`). That can only
+be a stale device saving over a newer state. The diff of the changes still
+starts at the previous tag, not at the confirmed version – ADR 0016 stands –
+so a warband improved between the tag and the confirmation reports those
+improvements as changes of this battle, as it did before.
+
+Wrong turns: the first client tests looked for rows by the warband's name,
+which also stands in selects and headings; they now ask the "Who fought"
+region. The stand-in server had only the entered data of other players'
+warbands and answered 403 to a leader's confirmation for them – it now treats
+that as version 1, as the real server does.
+

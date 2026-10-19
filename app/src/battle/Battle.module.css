@@ -199,3 +199,55 @@
   display: grid;
   gap: var(--space-1);
 }
+
+/* the version that goes into the battle (confirmed before it is fought) */
+.confirm {
+  justify-self: start;
+  margin-top: var(--space-1);
+}
+
+.fighter small.warn {
+  color: var(--danger);
+}
+
+.compare {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.compare li {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: var(--space-2);
+}
+
+.stats div {
+  display: grid;
+}
+
+.stats dt {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.up {
+  color: var(--accent);
+}
+
+.down {
+  color: var(--danger);
+}

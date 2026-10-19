@@ -36,7 +36,7 @@ export interface FakePicture {
 }
 export interface FakeBattle {
   id: string; campaignId: string; round: number; title: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
-  participants: { warbandId: string; outcome: string }[];
+  participants: { warbandId: string; outcome: string; /** the version confirmed for the battle, by whom and when, and the numbers frozen with it */ confirm?: { rev: number; by: string; at: string; totals: unknown } }[];
   entries: FakeEntry[];
   proposals: FakeProposal[];
   closedAt?: string | null;
@@ -199,7 +199,7 @@ export function createFakeSync(opts: {
   const battleSummary = (b: FakeBattle) => {
     const ws = b.participants.map((p) => ({ id: p.warbandId, name: nameOf(p.warbandId)?.name ?? '' })).sort((x, y) => x.name.localeCompare(y.name));
     return {
-      id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((w) => w.name), warbandIds: ws.map((w) => w.id), marked: Object.keys(marksOf(b)), createdAt: b.createdAt, closedAt: b.closedAt ?? null,
+      id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((w) => w.name), warbandIds: ws.map((w) => w.id), marked: Object.keys(marksOf(b)), confirmed: b.participants.filter((p) => p.confirm).map((p) => p.warbandId), createdAt: b.createdAt, closedAt: b.closedAt ?? null,
       takenOver: !!b.takenOver, playedAt: b.playedAt ?? (b.takenOver ? null : b.createdAt),
     };
   };
@@ -215,7 +215,11 @@ export function createFakeSync(opts: {
     seq: b.seq,
     participants: b.participants.map((p) => {
       const e = nameOf(p.warbandId)!;
-      return { warbandId: p.warbandId, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, playerId: e.playerId, player: e.player, outcome: p.outcome, revBefore: 1 };
+      const head = s.warbands.get(p.warbandId)?.headRev ?? 1;
+      return {
+        warbandId: p.warbandId, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, playerId: e.playerId, player: e.player, outcome: p.outcome,
+        revBefore: p.confirm?.rev ?? 1, confirmedAt: p.confirm?.at ?? null, confirmedBy: p.confirm?.by ?? null, beforeTotals: p.confirm?.totals ?? null, headRev: head,
+      };
     }),
     entries: b.entries.filter((e) => !e.deleted).sort((x, y) => x.turn - y.turn || x.createdAt.localeCompare(y.createdAt)).map((e) => ({ id: e.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt, updatedAt: e.updatedAt })),
     proposals: b.proposals,
@@ -815,6 +819,22 @@ export function createFakeSync(opts: {
       b.seq = next();
       return json(200, { ok: true, seq: b.seq });
     }
+    if (method === 'POST' && sub === '/confirm') {
+      if (role === 'viewer') return json(403, { error: 'forbidden' });
+      const wid = String(body.warbandId);
+      const e = c.enrolments.find((q) => q.warbandId === wid);
+      if (!e || (e.playerId !== me.id && role !== 'leader')) return json(403, { error: 'forbidden' });
+      if (b.status !== 'open') return json(409, { error: 'closed' });
+      const part = b.participants.find((p) => p.warbandId === wid);
+      if (!part) return json(400, { error: 'invalid', problem: 'this warband does not fight the battle' });
+      // a warband another player entered here has only its entered data (version 1)
+      const w = s.warbands.get(wid);
+      const v = w ? w.versions.find((q) => q.rev === Number(body.rev)) : Number(body.rev) === 1 ? { rev: 1, data: e.data } : undefined;
+      if (!v) return json(404, { error: 'not_found' });
+      part.confirm = { rev: v.rev, by: me.displayName, at: at(), totals: totalsOf(v.data) };
+      b.seq = next();
+      return json(200, battleView(b));
+    }
     if (method === 'POST' && sub === '/marks') {
       if (role === 'viewer') return json(403, { error: 'forbidden' });
       const w = s.warbands.get(String(body.warbandId));
@@ -824,6 +844,8 @@ export function createFakeSync(opts: {
       if (!e || !b.participants.some((p) => p.warbandId === w.id)) return json(400, { error: 'invalid', problem: 'this warband did not fight the battle' });
       const v = w.versions.find((q) => q.rev === Number(body.rev));
       if (!v) return json(404, { error: 'not_found' });
+      const confirmedRev = b.participants.find((p) => p.warbandId === w.id)?.confirm?.rev;
+      if (confirmedRev !== undefined && v.rev < confirmedRev) return json(409, { error: 'older' });
       const before = [...(e.tags ?? [])].reverse().find((t) => !t.supersededBy && t.round < b.round);
       if (!before) return json(409, { error: 'no_start' });
       const changes = opts.changes?.(w.versions.find((q) => q.rev === before.rev)!.data, v.data, { id: b.id, round: b.round }) ?? [];
