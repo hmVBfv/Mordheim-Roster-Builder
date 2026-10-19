@@ -3,6 +3,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, useLocation, useMatch } from 'react-router';
 import { startSession, subscribeSession, getSession } from '../account/session.ts';
+import { Banner } from '../art/Pixels.tsx';
+import { sceneFor } from '../art/route.ts';
 import { ReportProblem } from '../bugs/ReportProblem.tsx';
 import { note, routePattern } from '../bugs/trail.ts';
 import { startSync, stopSync } from '../sync/runner.ts';
@@ -111,6 +113,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </nav>
       <main className={`${styles.main} ${wide ? styles.wide : ''}`}>
         <UpdateBanner />
+        {!bare && <Banner scene={sceneFor(pathname)} />}
         {children}
       </main>
     </div>

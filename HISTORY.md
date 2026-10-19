@@ -3101,3 +3101,27 @@ open campaign is read from the device's own copy (a live query on the cached
 view), so an archived campaign or one whose list has not come yet still has
 its sections at the side – otherwise hiding the page's tabs on a desktop
 would have left no way to them.
+
+## 19.10.2026 – Pixelart auf jeder Seite
+
+Rob: die Seiten wirkten leer, es fehle immer etwas, und er wollte auf jeder
+Seite passende Pixelart. Entschieden: ein Banner im Seitenkopf plus eine große
+Szene im leeren Zustand, auch bei „weniger Bewegung“.
+
+- **Im Code gezeichnet statt als Bilddateien.** Elf Szenen aus einem kleinen
+  Pixelmaler (`app/src/art/`), ein SVG mit einem Pfad je Farbe. Das bleibt
+  klein (die App liegt bei 193,5 von 200 kB beim ersten Laden), scharf in
+  jeder Größe und lässt sich im Test prüfen: feste Palette, kein Zufall, das
+  Motiv bleibt in seiner Breite.
+- **Das Banner ist nur in der Mitte gezeichnet.** Der erste Versuch war ein
+  Bild über die ganze Breite; am Desktop (1600 px) wäre es entweder gestreckt
+  oder abgeschnitten gewesen. Jetzt stehen Himmel und Boden als harte Bänder
+  daneben (derselbe Verlauf wie im Bild), und das Motiv sitzt in der Mitte.
+- **Der Test der Motivbreite fand echte Fehler:** ein Streifen über die ganze
+  Breite in der Stadt, eine Kerze und ein Dolch außerhalb der Karte, ein
+  Schlüssel weit rechts neben der Tür.
+- Der Komet schlägt nicht ein (anders als im Mockup): in der App soll das Bild
+  ruhig stehen; Wappen der Warbands kommen später, wenn Rob sie dort will.
+- Im leeren Zustand bleibt der bisherige Satz als Titel stehen, weil Tests
+  und E2E ihn genau abfragen; die Erklärung steht darunter.
+

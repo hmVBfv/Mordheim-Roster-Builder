@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { useSession } from '../account/session.ts';
 import type { StoredWarband } from '../db/db.ts';
 import { keepInAccount, restoreWarband, useWarbands } from '../sync/local.ts';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useNotice } from '../ui/Notice.tsx';
 import { UndoToast } from '../ui/UndoToast.tsx';
@@ -41,7 +42,7 @@ export function Warbands() {
           </div>
         </div>
       )}
-      {warbands && warbands.length === 0 && <p className={ui.muted}>No warband yet. Start a new one, or import one from the Roster Builder.</p>}
+      {warbands && warbands.length === 0 && <Empty scene="fire" title="No warband yet.">Start a new one, or import one from the Roster Builder.</Empty>}
       {warbands && warbands.length > 0 && <WarbandList warbands={warbands} marks={signedIn} />}
       {removed && (
         <UndoToast key={removed.id} text={`${removed.name} removed.`}

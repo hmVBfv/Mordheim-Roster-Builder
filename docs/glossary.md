@@ -306,3 +306,5 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Funktionen der Warband | Warband (House rules, Districts, Story, Versions, All warbands, Make a copy) | App: `Panel.tsx`; sichtbare Liste statt ⋯-Menü |
 | Druckblatt | Print sheet | App: `PrintSheet` in `Print.tsx`; nur zwischen `beforeprint` und `afterprint` im Dokument |
 | Offener Aufstieg (golden in der Erfahrungsleiste) | Advance due | `XpView.owed` (Erfahrung − übernommene Aufstiege) |
+| Pixelbild im Seitenkopf | Banner (picture) | App: `Banner` in `art/Pixels.tsx`, Szene aus `art/route.ts` |
+| Große Szene im leeren Zustand | Empty scene | App: `Empty` in `art/Pixels.tsx` |

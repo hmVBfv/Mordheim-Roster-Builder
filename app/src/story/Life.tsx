@@ -11,6 +11,7 @@ import { errorText } from '../account/api.ts';
 import { cachedCampaign, readWarband } from '../campaign/api.ts';
 import type { StoredWarband } from '../db/db.ts';
 import { cachedNotes, getNotes, isSealed, type Note } from '../notes/api.ts';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import type { Person } from './people.ts';
 import { PROFILE_FIELDS } from './people.ts';
@@ -82,7 +83,7 @@ export function Life({ data, rec, state, who, onProfile, close }: {
       )}
       {src.loading && <p className={ui.muted}>Looking up what the campaign knows…</p>}
       {src.partial && <p className={ui.message} role="status">{src.partial}</p>}
-      {life.length === 0 && !src.loading && <p className={ui.muted}>Nothing recorded yet. Battles, wounds, advances and the notes that mention him gather here.</p>}
+      {life.length === 0 && !src.loading && <Empty scene="fire" title="Nothing recorded yet.">Battles, wounds, advances and the notes that mention him gather here.</Empty>}
       {life.length > 0 && <ul className={styles.life} aria-label="Life">{life.map((e) => <Entry key={e.key} e={e} />)}</ul>}
       <div className={ui.row}>
         {onProfile && <button type="button" className={ui.buttonQuiet} onClick={onProfile}>Edit the profile</button>}

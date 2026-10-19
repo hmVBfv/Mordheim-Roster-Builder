@@ -16,6 +16,7 @@ import trade from '../roster/Trade.module.css';
 import { FLAVOUR } from '../flavour.ts';
 import { encodeSave, getServer, importLink } from '../share/link.ts';
 import { copyText, saveFile } from '../ui/files.ts';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useWarbandRecord } from '../sync/local.ts';
 
@@ -147,7 +148,7 @@ function Body({ rec }: { rec: StoredWarband }) {
         )}
         <div className={styles.cards}>
           {cards.map((c) => <Card key={c.id} c={c} open={opened.has(c.id)} onOpen={(on) => setOpen(c.id, on)} onCopied={copied} />)}
-          {cards.length === 0 && <p className={ui.muted}>No warriors yet.</p>}
+          {cards.length === 0 && <Empty scene="camp" title="No warriors yet." />}
         </div>
       </section>
 

@@ -17,6 +17,7 @@ import { cachedCampaigns, listCampaigns, type CampaignSummary, type CampaignView
 import { db } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { useNotice } from '../ui/Notice.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { isSealed, type FullNote, type Note, type NoteBody } from './api.ts';
@@ -95,7 +96,7 @@ export function NotesTab({ id, view, user, lead }: { id: string; view: CampaignV
         </div>
       )}
       {error && <p className={ui.message} role="status">{error}{notes ? ' Shown as last seen.' : ''}</p>}
-      {notes && notes.length === 0 && (pics.pictures ?? []).length === 0 && <p className={ui.muted}>No notes yet. Scenes, quotes, dice moments, open threads, pictures of the table – whatever the story should keep.</p>}
+      {notes && notes.length === 0 && (pics.pictures ?? []).length === 0 && <Empty scene="fire" title="No notes yet.">Scenes, quotes, dice moments, open threads, pictures of the table – whatever the story should keep.</Empty>}
       {groups.map((g) => (
         <section key={g.key} className={styles.section} aria-label={g.title}>
           <h2>{g.title}</h2>

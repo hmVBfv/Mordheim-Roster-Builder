@@ -4,6 +4,7 @@ import { FLAVOUR } from '../flavour.ts';
 import { useWarbands } from '../sync/local.ts';
 import { useSession } from '../account/session.ts';
 import { HomeOpen } from '../open/HomeOpen.tsx';
+import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { ImportSheet } from './ImportSheet.tsx';
 import { WarbandList } from './WarbandList.tsx';
@@ -22,7 +23,7 @@ export function Home() {
       )}
       <div>
         <h2>Your warbands</h2>
-        {recent && recent.length > 0 ? <WarbandList warbands={recent} /> : recent && <p className={ui.muted}>None yet.</p>}
+        {recent && recent.length > 0 ? <WarbandList warbands={recent} /> : recent && <Empty scene="camp" title="No warband yet.">Start one below, or bring one in from the Roster Builder.</Empty>}
       </div>
       <div className={ui.row}>
         <Link to="/warbands/new" className={ui.button}>New warband</Link>
