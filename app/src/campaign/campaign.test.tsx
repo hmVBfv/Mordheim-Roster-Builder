@@ -3,7 +3,7 @@
    warband (a copy), what a leader manages, and leaving – against the
    stand-in server (sync/fakeSync.ts). */
 import { FORMAT, ctxOf, stageTotals, writeSave } from '@mordheim/core';
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -78,8 +78,31 @@ describe('the Campaign tab', () => {
     cleanup();
     srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
     at('/campaign');
+    // what the device remembered shows first; the server's list follows
     const list = await screen.findByRole('list', { name: 'Your campaigns' });
-    expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands', 'Summer in SylvaniaViewer · After battle 3 · 0 warbands']);
+    await waitFor(() => expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands', 'Summer in SylvaniaViewer · After battle 3 · 0 warbands']));
+  });
+
+  /* A list this device remembered with one campaign must not open that one
+     by itself before the server has answered: since then the player may have
+     joined another (it made "several campaigns are listed" fail now and then). */
+  it('a single campaign remembered on this device does not open by itself while the server lists more', async () => {
+    const srv = server();
+    srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
+    at('/campaign');
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
+    cleanup();
+    srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
+    // the server answers the list a moment after the device's own memory
+    const answer = globalThis.fetch;
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (new URL(String(input), 'http://localhost/').pathname.endsWith('/campaigns')) await new Promise((r) => setTimeout(r, 150));
+      return answer(input, init);
+    }));
+    at('/campaign');
+    const list = await screen.findByRole('list', { name: 'Your campaigns' });
+    await waitFor(() => expect(within(list).getAllByRole('link')).toHaveLength(2));
+    expect(screen.queryByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeNull();
   });
 
   it('signed out: campaigns need the account', async () => {

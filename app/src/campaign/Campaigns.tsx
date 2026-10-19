@@ -52,13 +52,15 @@ export function Campaigns() {
   const location = useLocation();
   const user = session.status === 'in' ? session.user : session.status === 'unreachable' ? session.user : null;
   const [list, setList] = useState<CampaignSummary[] | null>(null);
+  // the list is the server's own (not only what this device remembered)
+  const [fresh, setFresh] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const userId = user?.id;
   useEffect(() => {
     if (!userId) return;
     let live = true;
     void cachedCampaigns(userId).then((c) => { if (live && c) setList((l) => l ?? c); });
-    listCampaigns(userId).then((c) => { if (live) { setList(c); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
+    listCampaigns(userId).then((c) => { if (live) { setList(c); setFresh(true); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
     return () => { live = false; };
   }, [userId]);
   useOnAnyCampaign(() => {
@@ -75,9 +77,10 @@ export function Campaigns() {
       </section>
     );
   }
-  // one campaign: straight to it (from there, "All campaigns" comes back here)
+  // one campaign: straight to it (from there, "All campaigns" comes back here) – once the server
+  // has said so, or cannot be reached; a list remembered from before may since have grown
   const all = !!(location.state as { all?: boolean } | null)?.all;
-  if (list && list.length === 1 && !all) return <Navigate to={`/campaign/${list[0]!.id}`} replace />;
+  if (list && list.length === 1 && !all && (fresh || error)) return <Navigate to={`/campaign/${list[0]!.id}`} replace />;
   return (
     <section className={ui.page}>
       <h1>Campaigns</h1>

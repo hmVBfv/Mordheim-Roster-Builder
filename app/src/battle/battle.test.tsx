@@ -134,7 +134,8 @@ describe('the protocol', () => {
     await user.click(within(ev).getByRole('button', { name: 'Add to the protocol' }));
     const protocol = screen.getByRole('list', { name: 'Protocol' });
     expect(await within(protocol).findByText('A building collapses.')).toBeTruthy();
-    expect(within(protocol).getByText(/on this phone/)).toBeTruthy();
+    // the mark follows once the entry is in the outbox: wait for it, do not look at once
+    expect(await within(protocol).findByText(/on this phone/)).toBeTruthy();
     expect(await screen.findByText('⏳ 1 waiting')).toBeTruthy();
     expect(await db.outbox.count()).toBe(1);
     expect(srv.state.battles.get(b.id)!.entries).toHaveLength(0);
