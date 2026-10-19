@@ -1,5 +1,5 @@
 # 0014 – Leistungsgrenzen in der CI
-Status: angenommen · Datum: 2026-09-27
+Status: angenommen · Datum: 2026-09-27 · ergänzt durch [0021](0021-first-load-budget-per-flavour.md) (Bytegrenze je Ausgabe)
 
 ## Kontext
 „Leicht und flüssig“ soll nicht nur ein Vorsatz sein, besonders wenn ein

@@ -3101,3 +3101,29 @@ open campaign is read from the device's own copy (a live query on the cached
 view), so an archived campaign or one whose list has not come yet still has
 its sections at the side – otherwise hiding the page's tabs on a desktop
 would have left no way to them.
+
+## October 19, 2026 — a budget per flavour
+
+Rob asked whether the 200 kB first-load budget should grow: the campaign is
+played mostly on a desktop, where more than 200 kB should be fine. The budget
+had two uses in the same number – a guard against an accidental heavy import,
+and a stand-in for "the app starts quickly on a phone" – and only the second
+is about the player.
+
+Measuring it came before deciding. On master the campaign loaded 190.0 kB and
+the Quick Build 188.8 kB, so 4–6 kB of room; the pixel art alone had cost 5.4
+kB, everything else about 0.2 kB per change. The start-up test (slow 4G, a
+phone with a 4× slower CPU, 3 s) takes about 2.0 s today. I padded the
+campaign build with 68 kB of throw-away code to see what more bytes cost:
+2.4 s, so roughly 0.6 s per 100 kB. That put the sensible ceiling for the
+campaign near 250 kB while the phone test stays what it is – more would need
+a desktop profile of its own, which nobody has asked for.
+
+So the campaign gets 250 kB and the Quick Build keeps 200 kB (ADR 0021,
+proposed). The Quick Build is what a newcomer opens on a phone from a link,
+without cache or account, and the two flavours share nearly all their code:
+the extra room is only ever filled by code that belongs to the campaign alone.
+The padding was code that mostly sat idle at start; code that runs at start
+costs more CPU, which is one more reason to keep the time test the real
+guard. `size.mjs` now holds one limit per flavour, and a test checks that
+`docs/ui.md` names the same numbers, so the two cannot drift.
