@@ -162,6 +162,8 @@ Begriff einführt, trägt ihn hier ein.
 | verkleinert auf dem Gerät | made smaller on the phone (only the pixels leave it) | `shrink()` |
 | Hausregeln der Kampagne | (Campaign) house rules · Set the house rules | `campaigns.house_rules`, `/campaign/:id/house-rules` |
 | Vorgeschichte (Schlachten vor der App) | Before the app · A battle before the app | `battles.taken_over`, `PUT …/history/:bid`, `historyOf()` |
+| Vorgeschichte als Text (Backstory) | Backstory · Bring in the backstory | `backstory` (Tabelle), `GET/PUT …/backstory`, `splitBackstory()` |
+| Schlachtnummer wählen | Battle number | `POST …/battles` mit `round`, `comeToRound()` |
 | Stufe der Kampagne übernehmen | Take the campaign’s stage | `takeStage()`, `stageBehind()` (app) |
 | eingetreten nach Schlacht N | Entered after battle N | Tag `start` mit `round` > 0 |
 | eigene Datei weicht ab | its own house rules differ · own file differs | `houseDiffers`, `houseDifferences()` |

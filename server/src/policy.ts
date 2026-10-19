@@ -129,6 +129,9 @@ export const ACTIONS = {
   'world.read': { who: 'user', target: 'member' },
   /** Writing the world: leaders alone, with the authenticator – a leader puts an NPC there when the players may know it exists. */
   'world.write': { who: 'user', target: 'leader' },
+  /** The backstory – what came before the app, told in sections: every member reads it (it is the story the players lived), a leader with the authenticator brings it in. */
+  'backstory.read': { who: 'user', target: 'member' },
+  'backstory.write': { who: 'user', target: 'leader' },
   /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
   'style.read': { who: 'user', target: 'leader' },
   'style.write': { who: 'user', target: 'leader' },
