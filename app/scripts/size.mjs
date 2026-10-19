@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-/* The budget "JavaScript on first load ≤ 200 KB compressed" (docs/ui.md,
-   ADR 0014), measured as the browser loads it: the entry script of each
+/* The budget "JavaScript on first load, compressed" (docs/ui.md, ADR 0014 and
+   0021), measured as the browser loads it: the entry script of each
    flavour's index.html and every chunk the page preloads with it. A glob
    over file names (as size-limit had it) misses a chunk the bundler splits
    off and the entry imports – that happened when the sync shared the store
@@ -11,7 +11,16 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-export const LIMIT = 200 * 1024;
+/** Per flavour (ADR 0021): the campaign is used mostly on a desktop and may
+    be larger; the Quick Build is what a newcomer opens on a phone from a link. */
+export const LIMITS = { campaign: 250 * 1024, quickbuild: 200 * 1024 };
+
+/** The line printed for one flavour, and whether it is over its own limit. */
+export function verdict(flavour, total) {
+  const limit = LIMITS[flavour];
+  if (limit === undefined) throw new Error(`no first-load limit for the flavour "${flavour}"`);
+  return { over: total > limit, line: `${flavour}: JavaScript on first load ${(total / 1024).toFixed(1)} kB gzipped (limit ${limit / 1024} kB)` };
+}
 
 /** The scripts index.html loads at once: the module entry and its preloads, each once. */
 export function firstLoad(html) {
@@ -32,10 +41,11 @@ function measure(flavour) {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   let over = false;
-  for (const flavour of ['campaign', 'quickbuild']) {
+  for (const flavour of Object.keys(LIMITS)) {
     const r = measure(flavour);
-    over ||= r.total > LIMIT;
-    console.log(`${flavour}: JavaScript on first load ${(r.total / 1024).toFixed(1)} kB gzipped (limit ${LIMIT / 1024} kB)`);
+    const v = verdict(flavour, r.total);
+    over ||= v.over;
+    console.log(v.line);
     for (const s of r.sizes.sort((a, b) => b.gz - a.gz)) console.log(`  ${(s.gz / 1024).toFixed(1).padStart(6)} kB  ${s.f}`);
   }
   if (over) { console.error('over the budget (docs/ui.md)'); process.exit(1); }
