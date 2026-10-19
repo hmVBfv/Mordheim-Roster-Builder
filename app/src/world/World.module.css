@@ -33,3 +33,10 @@
 .rules { display: grid; gap: var(--space-1); }
 .rules p, .rules ul { margin: 0; }
 .rules ul { padding-left: var(--space-4); }
+
+/* On a desktop the world is read across the window (Rob, 19.10.2026): the factions side by side, and the long lists in columns
+   instead of one narrow strip down a wide screen. */
+@media (min-width: 900px) {
+  .cards { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); align-items: start; }
+  .columns { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); align-items: start; }
+}

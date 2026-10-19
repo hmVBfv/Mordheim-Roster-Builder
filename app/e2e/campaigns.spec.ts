@@ -890,6 +890,40 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Rob, 19.10.2026: use the width of a desktop. The factions, the people without one, the scenarios and the log sit side by side. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the World tab on a desktop: factions, scenarios and the log sit side by side, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const watch = srv.factionFrom(c.id, { nameEn: 'The Watch', publicStatus: 'holds the Stir crossing' });
+    srv.factionFrom(c.id, { nameEn: 'Sisters of Sigmar', publicStatus: 'guards the shrine' });
+    srv.factionFrom(c.id, { nameEn: 'River rats', publicStatus: 'no one knows' });
+    srv.npcFrom(c.id, { nameEn: 'Captain Brandt', factionId: watch.id, named: true, profile: { type: 'Hero', profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '1', I: '4', A: '1', Ld: '8' }, sv: '5+', skills: [], equipment: 'Sword', rules: '', from: null } });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', publicStatus: 'alive' });
+    srv.npcFrom(c.id, { nameEn: 'The Ferryman', publicStatus: 'missing' });
+    srv.scenarioFrom(c.id, { title: 'Fog on the Stir', body: 'Fog covers the table.', battleId: b.id });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', body: 'The Countess’s men wait.', battleId: b.id });
+    srv.scenarioFrom(c.id, { title: 'The bridge', body: 'A draft.' });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/world`);
+    const sideBySide = async (a: ReturnType<typeof page.getByRole>, z: ReturnType<typeof page.getByRole>, what: string) => {
+      const [x, y] = [(await a.boundingBox())!, (await z.boundingBox())!];
+      expect(Math.abs(x.y - y.y), `${what}: one row`).toBeLessThan(2);
+      const [left, right] = x.x < y.x ? [x, y] : [y, x]; // the order the server lists them in is not the test's business
+      expect(right.x, `${what}: side by side`).toBeGreaterThan(left.x + left.width - 1);
+    };
+    await expect(page.getByRole('article', { name: 'The Watch' })).toBeVisible();
+    await shot(page, `${theme}-world-desktop`);
+    await sideBySide(page.getByRole('article', { name: 'The Watch' }), page.getByRole('article', { name: 'Sisters of Sigmar' }), 'two factions');
+    await sideBySide(page.getByRole('article', { name: 'Fog on the Stir' }), page.getByRole('article', { name: 'The night at the ferry' }), 'two scenarios');
+    await noSideScroll(page);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await shot(page, `${theme}-world-desktop-wide`);
+  });
+}
+
 test('View as player shows what the server gives a player', async ({ page }) => {
   const srv = await playServer(page, true, { totp: true });
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });

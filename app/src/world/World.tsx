@@ -306,7 +306,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
       {loose.length > 0 && (
         <section className={styles.section} aria-labelledby="w-loose">
           <h2 id="w-loose">People without a faction</h2>
-          <ul className={styles.list} aria-label="People without a faction">
+          <ul className={`${styles.list} ${styles.columns}`} aria-label="People without a faction">
             {loose.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onCopied={copied} />)}
           </ul>
         </section>
@@ -317,7 +317,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
       {world.reputation.length > 0 && (
         <section className={styles.section} aria-labelledby="w-log">
           <h2 id="w-log">Reputation log</h2>
-          <ul className={styles.list} aria-label="Reputation log">
+          <ul className={`${styles.list} ${styles.columns}`} aria-label="Reputation log">
             {log.map((e: ReputationEvent) => (
               <li key={e.id} className={styles.event}>
                 <div className={styles.line}>
