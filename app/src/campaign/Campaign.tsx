@@ -17,10 +17,12 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
   advanceRound, cachedCampaign, confirmEnrolment, declineEnrolment, deleteCampaign, forgetCampaign, getCampaign, removeMember, renameCampaign, ROLE_NAMES, roundName, setMember,
-  type CampaignRole, type CampaignView, type Enrolment,
+  type CampaignRole, type CampaignView,
 } from './api.ts';
 import styles from './Campaign.module.css';
 import { campaignTabs } from './tabs.ts';
+import { EnterSheet } from './EnterSheet.tsx';
+import { stateWord, WarbandsTab } from './WarbandsTab.tsx';
 import { NewBattleSheet } from './NewBattle.tsx';
 import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
@@ -62,14 +64,6 @@ function useCampaign(id: string) {
   return { view, setView, error, gone, reload };
 }
 
-const stateWord = (e: Enrolment) => {
-  if (e.status === 'pending') return { word: 'Waiting for a leader', cls: styles.waiting };
-  if (!e.tag) return { word: 'Entered', cls: styles.ok };
-  if (e.tag.kind === 'sat_out') return { word: `Sat out battle ${e.tag.round}`, cls: '' };
-  if (e.tag.kind === 'start') return { word: e.tag.round > 0 ? `✓ Entered after battle ${e.tag.round}` : '✓ Start', cls: styles.ok };
-  return { word: `✓ After battle ${e.tag.round}`, cls: styles.ok };
-};
-
 function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: string }) {
   if (!view.enrolments.length) return <Empty scene="camp" title="No warband entered yet." compact />;
   return (
@@ -91,59 +85,6 @@ function WarbandRows({ id, view, me }: { id: string; view: CampaignView; me: str
         );
       })}
     </ul>
-  );
-}
-
-/** Entering one of one's own warbands: a copy goes in, the warband stays free. */
-function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignView) => void }) {
-  const { ref, open, close } = useSheet();
-  const navigate = useNavigate();
-  const session = useSession();
-  const me = session.status === 'in' ? session.user.id : undefined;
-  const free = (useWarbands() ?? []).filter((w) => w.ownerId === me && !w.campaignId && !w.conflict);
-  const [chosen, setChosen] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const submit = async () => {
-    const rec = free.find((w) => w.id === chosen);
-    if (!rec) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const [{ enterWarband }, { loadGameData }] = await Promise.all([import('./enter.ts'), import('../game/gameData.ts')]);
-      const r = await enterWarband(await loadGameData(), id, rec);
-      onDone(r.campaign);
-      close(() => void navigate(`/warbands/${r.id}`));
-    } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
-  };
-  return (
-    <>
-      <button type="button" className={ui.button} onClick={() => { setChosen(''); setError(null); open(); }}>Enter a warband</button>
-      <dialog ref={ref} className={ui.sheet} aria-labelledby="enter-title">
-        <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void submit(); }}>
-          <h2 id="enter-title">Enter a warband</h2>
-          <p className={ui.muted}>A copy goes into the campaign, under the campaign’s house rules; the warband you pick stays as it is, for other games. A leader confirms the copy, and its start is marked.</p>
-          {free.length === 0 && <p className={ui.muted}>None of your warbands is free yet: make a new one for the campaign.</p>}
-          {free.length > 0 && (
-            <fieldset className={styles.people}>
-              <legend className="visually-hidden">Warband</legend>
-              {free.map((w) => (
-                <label key={w.id} className={styles.choice}>
-                  <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} onChange={() => setChosen(w.id)} />
-                  <span>{w.name} <small>· {w.wbName}</small></span>
-                </label>
-              ))}
-            </fieldset>
-          )}
-          {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            {free.length > 0 && <button type="submit" className={ui.button} disabled={busy || !chosen}>Enter a copy</button>}
-            <button type="button" className={free.length > 0 ? ui.buttonQuiet : ui.button} onClick={() => close(() => void navigate(`/warbands/new?campaign=${id}`))}>New warband for this campaign</button>
-            <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
-          </div>
-        </form>
-      </dialog>
-    </>
   );
 }
 
@@ -418,10 +359,12 @@ export function Campaign() {
   const chronicle = tab === 'chronicle';
   const questions = tab === 'questions' && view.role !== 'viewer';
   const world = tab === 'world';
+  const warbands = tab === 'warbands';
   // the background and the view as a player: leaders with the authenticator only (the server refuses anyone else)
   const background = tab === 'background' && lead && user.totp;
   const asPlayer = tab === 'as-player' && lead && user.totp;
   const content = manage ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
+    : warbands ? <WarbandsTab id={id} view={view} me={user.id} onView={setView} />
     : notes ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
     : world ? <WorldTab id={id} view={view} lead={lead && user.totp} />
     : questions ? <QuestionsTab id={id} view={view} user={user} lead={lead && user.totp} />
