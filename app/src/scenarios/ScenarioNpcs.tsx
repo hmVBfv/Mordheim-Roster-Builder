@@ -83,7 +83,8 @@ function NpcBlock({ cid, n, before, released, open, own, onOwn, onChange, onRemo
   const ids = useId();
   // once the players have read the NPC, what was hidden then is fixed (only revealed), and nothing else is hidden after the fact
   const fixed = released && before ? before.hidden : null;
-  const revealed = before ? (revealedBy([before], [n])[0]?.parts ?? []) : [];
+  // only a released scenario shows the players anything: in a draft, un-hiding is just editing
+  const revealed = released && before ? (revealedBy([before], [n])[0]?.parts ?? []) : [];
   const stays = released && before !== null && before.hidden.length > 0;
   const asOpponent = npcAsOpponent(n.name, n);
   const set = (p: OpponentProfile) => onChange({ ...n, type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, rules: p.rules, from: p.from });
