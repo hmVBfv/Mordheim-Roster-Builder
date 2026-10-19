@@ -3313,6 +3313,15 @@ moved them ahead of the account's. The rule is `nav.pageTabs` now, so it wins
 either way. I saw it only because I looked at the screenshot; the new checks
 were green with the tabs doubled.
 
+The cost, measured: first-load JavaScript went from 195.6 to 196.2 kB in the
+campaign app and from 194.4 to 196.0 kB in the Quick Build, which shows no
+campaigns at all – the card, the shared hook and the compact scene come in with
+the entry in both. Loading the card lazily or giving it the shared list styles
+instead of the campaign's own saved 0.1 to 0.2 kB each, so the second is what
+stayed (it also keeps Home from importing the campaign's stylesheet). The Quick
+Build has 4 kB left under its 200 kB; it is the flavour that will hit its limit
+first (ADR 0021, proposed in #88).
+
 Left alone on purpose: from 1920 px the content stays 1320 px wide. Stretching
 rows of three words across the whole screen would be worse than a measured
 column; a third column would be the next step, if Rob wants one.

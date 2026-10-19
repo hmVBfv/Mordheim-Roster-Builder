@@ -247,6 +247,10 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(Math.abs(first!.y - second!.y)).toBeLessThan(2);
     expect(second!.x).toBeGreaterThan(first!.x + 200);
     expect(third!.y).toBeGreaterThan(first!.y + first!.height - 2);
+    // the button under the list stands apart from the last card, as the warbands' buttons do
+    const lastCampaign = await list.getByRole('link').last().boundingBox();
+    const allCampaigns = await page.getByRole('link', { name: 'All campaigns' }).boundingBox();
+    expect(allCampaigns!.y - (lastCampaign!.y + lastCampaign!.height)).toBeGreaterThanOrEqual(8);
     await list.getByRole('link').first().click();
     await expect(page).toHaveURL(new RegExp(`/campaign/${c.id}$`));
     await expect(page.getByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeVisible();
