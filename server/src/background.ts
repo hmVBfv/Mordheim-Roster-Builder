@@ -28,7 +28,7 @@ export const MAX_REVISIONS = 50;
 export const MAX_TEXT = 20_000;
 
 const Ref = z.object({
-  kind: z.enum(['battle', 'entry', 'warrior', 'note', 'text']),
+  kind: z.enum(['battle', 'faction', 'npc', 'entry', 'warrior', 'note', 'text']),
   id: z.string().max(64).default(''),
   label: z.string().trim().min(1).max(120),
 }).strict();

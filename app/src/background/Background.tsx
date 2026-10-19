@@ -17,9 +17,13 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
   endOfSegment, getEntry, KIND_NAMES, KIND_ONE, KINDS, LEVEL_NAMES, LEVEL_TEXT, putEntry, removeEntry, revealEntry, staleEntry,
-  type Detail, type Entry, type EntryBody, type Kind, type Level, type Ref, type Status,
+  type Detail, type Entry, type EntryBody, type Kind, type Level, type Status,
 } from './api.ts';
 import { PlansSection } from '../plans/Plans.tsx';
+import { useWorld } from '../world/useWorld.ts';
+import type { World } from '../world/api.ts';
+import { RefPicker } from './RefPicker.tsx';
+import { REF_KIND_NAMES, refLabel } from './refs.ts';
 
 const OpponentsSection = lazy(() => import('../opponents/Opponents.tsx').then((m) => ({ default: m.OpponentsSection })));
 import styles from './Background.module.css';
@@ -42,7 +46,7 @@ export function placesOf(view: CampaignView): { key: string; title: string; batt
     .map((s) => ({ key: s.key, title: s.title, battleId: /^b([0-9a-f-]{36}):/.exec(s.key)?.[1] ?? (/^i(\d+)$/.test(s.key) ? lastOf(Number(s.key.slice(1))) : null) }));
 }
 
-function EntryCard({ e, battles, onReveal, onEdit, onHistory }: { e: Entry; battles: CampaignView['battles']; onReveal: () => void; onEdit: () => void; onHistory: () => void }) {
+function EntryCard({ e, battles, world, onReveal, onEdit, onHistory }: { e: Entry; battles: CampaignView['battles']; world: World | null; onReveal: () => void; onEdit: () => void; onHistory: () => void }) {
   const from = e.revealFromBattle ? (battles ?? []).find((b) => b.id === e.revealFromBattle) : undefined;
   const about = e.battleId ? (battles ?? []).find((b) => b.id === e.battleId) : undefined;
   return (
@@ -64,7 +68,11 @@ function EntryCard({ e, battles, onReveal, onEdit, onHistory }: { e: Entry; batt
         <small>What the players know</small>
         <p>{e.playersKnow || <span className={ui.muted}>Nothing yet.</span>}</p>
       </div>
-      {e.refs.length > 0 && <ul className={styles.refs} aria-label="Refers to">{e.refs.map((r, i) => <li key={`${r.kind}:${r.id}:${i}`}>{r.label}</li>)}</ul>}
+      {e.refs.length > 0 && (
+        <ul className={styles.refs} aria-label="Refers to">
+          {e.refs.map((r, i) => { const shown = refLabel(r, world, battles); return <li key={`${r.kind}:${r.id}:${i}`}><small className={styles.refKind}>{REF_KIND_NAMES[r.kind]}</small> <span>{shown.label}</span>{shown.gone && <small className={ui.muted}> (removed)</small>}</li>; })}
+        </ul>
+      )}
       {e.lastReveal && <p className={styles.log}>Last: {e.lastReveal.by} {e.lastReveal.level === 'revealed' ? 'revealed' : 'hinted'} · {stamp(e.lastReveal.at)}</p>}
       <div className={styles.acts}>
         {e.reveal !== 'revealed' && <button type="button" className={ui.button} onClick={onReveal}>Reveal…</button>}
@@ -77,16 +85,14 @@ function EntryCard({ e, battles, onReveal, onEdit, onHistory }: { e: Entry; batt
 
 const blank = (kind: Kind): EntryBody => ({ kind, title: '', truth: '', playersKnow: '', status: 'planned', reveal: 'hidden', hintLimits: '', revealFromBattle: null, refs: [], battleId: null });
 
-function EntryForm({ close, battles, entry, kind, onSave, onRemove, problem }: {
-  close: (then?: () => void) => void; battles: NonNullable<CampaignView['battles']>; entry: Entry | null; kind: Kind;
+function EntryForm({ close, battles, world, entry, kind, onSave, onRemove, problem }: {
+  close: (then?: () => void) => void; battles: NonNullable<CampaignView['battles']>; world: World | null; entry: Entry | null; kind: Kind;
   onSave: (b: EntryBody) => void; onRemove: (() => void) | null; problem: string | null;
 }) {
-  const ids = { kind: useId(), title: useId(), truth: useId(), know: useId(), status: useId(), level: useId(), limit: useId(), battle: useId(), from: useId(), ref: useId() };
+  const ids = { kind: useId(), title: useId(), truth: useId(), know: useId(), status: useId(), level: useId(), limit: useId(), battle: useId(), from: useId() };
   const [b, setB] = useState<EntryBody>(entry ? { kind: entry.kind, title: entry.title, truth: entry.truth, playersKnow: entry.playersKnow, status: entry.status, reveal: entry.reveal, hintLimits: entry.hintLimits, revealFromBattle: entry.revealFromBattle, refs: entry.refs, battleId: entry.battleId } : blank(kind));
   const [sure, setSure] = useState(false);
-  const [text, setText] = useState('');
   const set = <K extends keyof EntryBody>(k: K, v: EntryBody[K]) => setB((x) => ({ ...x, [k]: v }));
-  const addRef = (r: Ref) => { if (!b.refs.some((x) => x.kind === r.kind && x.id === r.id && x.label === r.label) && b.refs.length < 30) set('refs', [...b.refs, r]); };
   const wantsBattle = b.kind === 'gm_note' || b.kind === 'scenario';
   return (
     <form className={ui.page} onSubmit={(e) => { e.preventDefault(); onSave({ ...b, title: b.title.trim(), revealFromBattle: b.reveal === 'revealed' ? b.revealFromBattle : null }); }}>
@@ -148,22 +154,7 @@ function EntryForm({ close, battles, entry, kind, onSave, onRemove, problem }: {
           </select>
         </label>
       )}
-      <div className={ui.field}>
-        <label htmlFor={ids.ref}>Refers to (optional)</label>
-        {b.refs.length > 0 && (
-          <ul className={styles.refs} aria-label="Refers to">
-            {b.refs.map((r, i) => <li key={`${r.kind}:${r.id}:${i}`}>{r.label} <button type="button" className={ui.buttonQuiet} aria-label={`Take “${r.label}” out`} onClick={() => set('refs', b.refs.filter((_, j) => j !== i))}>✕</button></li>)}
-          </ul>
-        )}
-        <select id={ids.ref} className={ui.select} value="" onChange={(e) => { const x = battles.find((y) => y.id === e.target.value); if (x) addRef({ kind: 'battle', id: x.id, label: battleTitle(x) }); }}>
-          <option value="">A battle…</option>
-          {battles.map((x) => <option key={x.id} value={x.id}>{battleTitle(x)}</option>)}
-        </select>
-        <div className={ui.row}>
-          <input className={ui.select} value={text} maxLength={120} placeholder="A person, a place, a note…" aria-label="Another reference" onChange={(e) => setText(e.target.value)} />
-          <button type="button" className={ui.buttonQuiet} disabled={!text.trim()} onClick={() => { addRef({ kind: 'text', id: '', label: text.trim() }); setText(''); }}>Add</button>
-        </div>
-      </div>
+      <div className={ui.span2}><RefPicker refs={b.refs} battles={battles} world={world} onChange={(refs) => set('refs', refs)} /></div>
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
       <div className={ui.row}>
         <button type="submit" className={ui.button} disabled={!b.title.trim()}>Save</button>
@@ -265,6 +256,7 @@ function History({ close, detail, error }: { close: () => void; detail: Detail |
 
 export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) {
   const { entries, error, refresh } = useBackground(id);
+  const { data: world } = useWorld(id);
   const [kind, setKind] = useState<Kind | 'plans' | 'opponents'>('thread');
   const [editing, setEditing] = useState<Entry | null>(null);
   const [revealing, setRevealing] = useState<Entry | null>(null);
@@ -328,11 +320,11 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       {error && <p className={ui.message} role="status">{error}{entries ? ' Shown as last seen.' : ''}</p>}
       {entries && shown.length === 0 && <Empty scene="tome" title="Nothing here yet.">{kind === 'thread' ? 'A thread is a story the world is telling behind the players’ backs: the truth, what they know, how much may show.' : 'Write what only you know.'}</Empty>}
       <ul className={styles.list} aria-label={KIND_NAMES[kind]}>
-        {shown.map((e) => <EntryCard key={e.id} e={e} battles={view.battles} onReveal={() => { setRevealing(e); setProblem(null); setFormKey((k) => k + 1); openReveal(); }} onEdit={() => openEdit(e)} onHistory={() => openHistory(e)} />)}
+        {shown.map((e) => <EntryCard key={e.id} e={e} battles={view.battles} world={world} onReveal={() => { setRevealing(e); setProblem(null); setFormKey((k) => k + 1); openReveal(); }} onEdit={() => openEdit(e)} onHistory={() => openHistory(e)} />)}
       </ul>
       </>)}
       <dialog ref={editRef} className={ui.sheet} aria-labelledby="background-title">
-        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} entry={editing} kind={kind === 'plans' || kind === 'opponents' ? 'thread' : kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
+        <EntryForm key={`e${formKey}`} close={closeEdit} battles={battles} world={world} entry={editing} kind={kind === 'plans' || kind === 'opponents' ? 'thread' : kind} onSave={save} onRemove={editing ? remove : null} problem={problem} />
       </dialog>
       <dialog ref={revealRef} className={ui.sheet} aria-labelledby="reveal-title">
         {revealing && <RevealForm key={`r${formKey}`} close={closeReveal} entry={revealing} places={places} onReveal={doReveal} problem={problem} />}

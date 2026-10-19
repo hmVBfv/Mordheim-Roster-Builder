@@ -174,3 +174,19 @@
 .warn {
   color: var(--gold);
 }
+
+/* "Refers to": the references so far, the kinds to choose from and the tiles of what can be picked */
+.refPicker { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
+.refPicker legend { padding: 0; margin-bottom: var(--space-1); }
+.refKind { color: var(--text-muted); font-size: 0.75rem; margin-right: 2px; }
+.refKinds { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.refKinds button, .refTiles button {
+  min-height: var(--tap); padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: 999px;
+  background: var(--bg); color: var(--text); font: inherit; cursor: pointer;
+}
+.refKinds button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.refTiles { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-wrap: wrap; gap: var(--space-2); max-height: 14rem; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.refTiles button { display: inline-flex; align-items: baseline; gap: var(--space-2); text-align: left; }
+.refTiles button small { color: var(--text-muted); font-size: 0.75rem; }
+.refTiles button[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft, var(--surface)); color: var(--accent); font-weight: 700; }
+.refTiles button[aria-pressed='true']::before { content: '✓'; }

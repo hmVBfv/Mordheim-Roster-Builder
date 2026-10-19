@@ -145,6 +145,66 @@ describe('the Background tab', () => {
     expect(srv.state.background.get(e.id)).toMatchObject({ title: 'The bell of St. Voss (Ben)', truth: '' });
   });
 
+  it('a thread refers to a battle, a faction and a Named NPC – picked from tiles, taken out with a second tap', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', factionId: f.id, named: true });
+    srv.npcFrom(c.id, { nameEn: 'A deckhand', factionId: f.id }); // one of a crowd: not offered
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/background`);
+    await user.click(await screen.findByRole('button', { name: 'New thread' }));
+    const sheet = within(screen.getByRole('dialog', { name: 'New thread' }));
+    await user.click(sheet.getByLabelText('Title'));
+    await user.paste('Who pays the ferryman?');
+
+    const kinds = within(sheet.getByRole('group', { name: 'What does it refer to?' }));
+    expect(kinds.getAllByRole('button').map((b) => b.textContent)).toEqual(['Battle', 'Faction', 'Named NPC', 'Something else']);
+    await user.click(await sheet.findByRole('button', { name: 'Battle 1 · Hel Fenn ferry' }));
+    await user.click(kinds.getByRole('button', { name: 'Faction' }));
+    await user.click(await sheet.findByRole('button', { name: 'The Ferrymen' }));
+    await user.click(kinds.getByRole('button', { name: 'Named NPC' }));
+    expect(await sheet.findByRole('button', { name: /^Old Marek/ })).toBeTruthy();
+    expect(sheet.queryByRole('button', { name: /A deckhand/ })).toBeNull();
+    await user.click(sheet.getByRole('button', { name: /^Old Marek/ }));
+    await user.click(sheet.getByRole('button', { name: /^Old Marek/ })); // a second tap takes it out again
+    await user.click(sheet.getByRole('button', { name: /^Old Marek/ }));
+    await user.click(kinds.getByRole('button', { name: 'Something else' }));
+    await user.type(sheet.getByLabelText('Another reference'), 'the ford at dusk{Enter}');
+    const picked = within(sheet.getByRole('list', { name: 'Refers to' }));
+    expect(picked.getAllByRole('listitem').map((li) => li.textContent?.replace('✕', '').trim())).toEqual(['Battle Battle 1 · Hel Fenn ferry', 'Faction The Ferrymen', 'Named NPC Old Marek', 'Other the ford at dusk']);
+    await user.click(sheet.getByRole('button', { name: 'Save' }));
+
+    const list = await screen.findByRole('list', { name: 'Threads' });
+    await waitFor(() => expect([...srv.state.background.values()][0]?.refs).toEqual([
+      { kind: 'battle', id: expect.any(String), label: 'Battle 1 · Hel Fenn ferry' },
+      { kind: 'faction', id: f.id, label: 'The Ferrymen' },
+      { kind: 'npc', id: expect.any(String), label: 'Old Marek' },
+      { kind: 'text', id: '', label: 'the ford at dusk' },
+    ]));
+    const card = within(await within(list).findByRole('list', { name: 'Refers to' }));
+    expect(card.getByText('The Ferrymen')).toBeTruthy();
+    expect(card.getByText('Named NPC')).toBeTruthy();
+  });
+
+  it('says so when there is nothing to pick for a kind, and when a faction or NPC referred to has left the world', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.factionFrom(c.id, { nameEn: 'The Watch' });
+    srv.backgroundFrom(c.id, { title: 'The vanished', refs: [{ kind: 'faction', id: 'gone-1', label: 'The Old Guild' }, { kind: 'npc', id: 'gone-2', label: 'Nobody' }] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/background`);
+    const refs = within(await screen.findByRole('list', { name: 'Refers to' }));
+    await waitFor(() => expect(refs.getAllByText('(removed)')).toHaveLength(2)); // the world is read, and neither is in it
+    expect(refs.getByText('The Old Guild')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'New thread' }));
+    const sheet = within(screen.getByRole('dialog', { name: 'New thread' }));
+    expect(await sheet.findByText('No battle yet.')).toBeTruthy();
+    await user.click(sheet.getByRole('button', { name: 'Named NPC' }));
+    expect(await sheet.findByText(/No Named NPC yet\. Tick “Named” on an NPC in the World tab/)).toBeTruthy();
+  });
+
   it('an entry is taken out only after asking', async () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });

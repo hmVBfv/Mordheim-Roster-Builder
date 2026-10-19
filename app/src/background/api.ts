@@ -21,7 +21,7 @@ export const LEVEL_TEXT: Record<Level, string> = {
   hint: 'Traces are allowed, within the limit written down.',
   revealed: 'Public from a battle on; the chronicle may tell it.',
 };
-export interface Ref { kind: 'battle' | 'entry' | 'warrior' | 'note' | 'text'; id: string; label: string }
+export interface Ref { kind: 'battle' | 'faction' | 'npc' | 'entry' | 'warrior' | 'note' | 'text'; id: string; label: string }
 export interface EntryBody {
   kind: Kind; title: string; truth: string; playersKnow: string; status: Status; reveal: Level; hintLimits: string;
   revealFromBattle: string | null; refs: Ref[]; battleId: string | null;

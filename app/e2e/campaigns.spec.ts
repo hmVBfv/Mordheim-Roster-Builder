@@ -410,6 +410,66 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* "Refers to" (Rob, 19.10.2026): a thread refers to a battle, a faction or a Named NPC – picked from tiles, not typed. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the Background tab: a thread refers to a battle, a faction and a Named NPC, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen', publicStatus: 'hold the Stir crossing' });
+    srv.factionFrom(c.id, { nameEn: 'The Watch' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', factionId: f.id, named: true });
+    srv.npcFrom(c.id, { nameEn: 'The Countess', named: true });
+    await page.goto(`campaign/${c.id}/background`);
+    await page.getByRole('button', { name: 'New thread' }).click();
+    const sheet = page.getByRole('dialog', { name: 'New thread' });
+    await sheet.getByLabel('Title').fill('Who pays the ferryman?');
+    const kinds = sheet.getByRole('group', { name: 'What does it refer to?' });
+    await sheet.getByRole('button', { name: 'Battle 1 · Hel Fenn ferry' }).click();
+    await kinds.getByRole('button', { name: 'Faction' }).click();
+    await sheet.getByRole('button', { name: 'The Ferrymen' }).click();
+    await kinds.getByRole('button', { name: 'Named NPC' }).click();
+    await sheet.getByRole('button', { name: /^Old Marek/ }).click();
+    await sheet.getByRole('button', { name: /^The Countess/ }).scrollIntoViewIfNeeded();
+    await expect(sheet.getByRole('list', { name: 'Refers to' }).getByRole('listitem')).toHaveCount(3);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-background-refs.png` });
+    await sheet.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect.poll(() => [...srv.state.background.values()][0]?.refs.length, { timeout: 8000 }).toBe(3);
+    const card = page.getByRole('list', { name: 'Threads' }).getByRole('listitem').filter({ hasText: 'Who pays the ferryman?' });
+    await expect(card.getByRole('list', { name: 'Refers to' }).getByText('Named NPC')).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-background-refs-card`);
+  });
+
+  test(`the Background tab on a desktop: the references sit across the window, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [] });
+    srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    const f = srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
+    for (const n of ['Old Marek', 'The Countess', 'Skritch', 'Brother Anselm', 'Gerhard Voss']) srv.npcFrom(c.id, { nameEn: n, factionId: f.id, named: true });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`campaign/${c.id}/background`);
+    await page.getByRole('button', { name: 'New thread' }).click();
+    const sheet = page.getByRole('dialog', { name: 'New thread' });
+    await sheet.getByRole('group', { name: 'What does it refer to?' }).getByRole('button', { name: 'Named NPC' }).click();
+    const pick = sheet.getByRole('list', { name: 'Named NPCs to pick' }); // a tile that is picked reads “✓ Old Marek …”
+    await pick.getByRole('button', { name: /Old Marek/ }).click();
+    await pick.getByRole('button', { name: /Skritch/ }).click();
+    const box = (await sheet.boundingBox())!;
+    const tiles = (await pick.boundingBox())!;
+    expect(tiles.width, 'the tiles use the width of the window').toBeGreaterThan(box.width * 0.8);
+    const [t1, t2] = [(await pick.getByRole('button', { name: /Brother Anselm/ }).boundingBox())!, (await pick.getByRole('button', { name: /Gerhard Voss/ }).boundingBox())!]; // the first two
+    expect(Math.abs(t1.y - t2.y), 'tiles in a row').toBeLessThan(2);
+    await page.screenshot({ path: `test-results/screens/campaign-${theme}-background-refs-desktop.png` });
+    await sheet.getByRole('button', { name: 'Cancel' }).click();
+  });
+}
+
 /* Questions to players (phase 4b3a): a leader asks, a player finds the question under "Open for you" and answers. */
 for (const theme of ['chronicle', 'parchment'] as const) {
   test(`questions: a leader asks one player, in ${theme}`, async ({ page }) => {

@@ -345,10 +345,10 @@ export function createFakeSync(opts: {
   };
   const bgSeq = (cid: string) => Math.max(0, ...[...s.background.values()].filter((b) => b.campaignId === cid).map((b) => b.seq));
   /** A leader wrote an entry earlier (or on another device). */
-  const backgroundFrom = (campaignId: string, e: { kind?: string; title: string; truth?: string; playersKnow?: string; status?: string; reveal?: string; hintLimits?: string; battleId?: string | null }) => {
+  const backgroundFrom = (campaignId: string, e: { kind?: string; title: string; truth?: string; playersKnow?: string; status?: string; reveal?: string; hintLimits?: string; battleId?: string | null; refs?: unknown[] }) => {
     const entry: FakeBackground = {
       id: `00000000-0000-4000-9000-${String(s.background.size + 1).padStart(12, '0')}`, campaignId, kind: e.kind ?? 'thread', title: e.title, truth: e.truth ?? '', playersKnow: e.playersKnow ?? '',
-      status: e.status ?? 'planned', reveal: e.reveal ?? 'hidden', hintLimits: e.hintLimits ?? '', revealFromBattle: null, refs: [], battleId: e.battleId ?? null,
+      status: e.status ?? 'planned', reveal: e.reveal ?? 'hidden', hintLimits: e.hintLimits ?? '', revealFromBattle: null, refs: e.refs ?? [], battleId: e.battleId ?? null,
       updatedBy: 'Anna', createdAt: at(), updatedAt: at(), seq: next(), lastReveal: null, revisions: [],
     };
     s.background.set(entry.id, entry);
