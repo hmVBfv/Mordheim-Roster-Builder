@@ -397,6 +397,20 @@ in [ui.md](ui.md#roster-v2-in-der-app). **Danach, je ein eigener Pull Request
 nach denselben Regeln:** die übrigen Bildschirme (zuerst die, die Rob am
 häufigsten benutzt – Rob entscheidet die Reihenfolge).
 
+## Zwischenschritt – Kampagne löschen, Archiv
+
+Rob, 19.10.2026: Ein Leiter soll eine Kampagne löschen können, und jede
+Kampagnenliste braucht ein Archiv (kein neuer Reiter, ein Abschnitt).
+**Entschieden (Rob):** Die Warbands bleiben bei ihren Besitzern, das Löschen
+ist rückholbar. **Stand 19.10.2026:** umgesetzt (Migration 24,
+`campaigns.deleted_at`/`deleted_by`, `members.archived_at`;
+`DELETE /campaigns/:id` mit dem Namen, `PUT /campaigns/:id/archive`; neue
+Zeilen der Leak-Matrix; `roster-cli campaign deleted|restore`). In der App:
+unter Manage ganz unten „Delete the campaign…“ mit Blatt, das die Folgen
+nennt und den Namen verlangt; in der Kampagnenliste je Eintrag „Archive“, die
+archivierten stehen im Abschnitt „Archived“ mit „Back to the list“. Wer nur
+noch eine Kampagne im Spiel hat, landet weiter direkt dort.
+
 ## Phase 5 – Extras
 
 - Volltextsuche (SQLite FTS5) über Notizen, Zeitleiste, Lebensläufe.

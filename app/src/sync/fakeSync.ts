@@ -72,6 +72,8 @@ export interface FakeEnrolment {
 export interface FakeCampaign {
   id: string; name: string; round: number; createdAt: string;
   houseRules?: Record<string, unknown>;
+  /** Members who filed it away in their own list (migration 24). */
+  archivedBy?: string[];
   members: { userId: string; displayName: string; username: string; role: FakeRole; canLead: boolean }[];
   enrolments: FakeEnrolment[];
 }
@@ -914,7 +916,7 @@ export function createFakeSync(opts: {
   const campaignRoutes = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
     if (path === '/campaigns') {
       if (method === 'GET') {
-        return json(200, { campaigns: [...s.campaigns.values()].filter((c) => roleOf(c)).map((c) => ({ id: c.id, name: c.name, round: c.round, role: roleOf(c), members: c.members.length, warbands: c.enrolments.filter((e) => e.status === 'active').length, createdAt: c.createdAt })) });
+        return json(200, { campaigns: [...s.campaigns.values()].filter((c) => roleOf(c)).map((c) => ({ id: c.id, name: c.name, round: c.round, role: roleOf(c), members: c.members.length, warbands: c.enrolments.filter((e) => e.status === 'active').length, createdAt: c.createdAt, archived: (c.archivedBy ?? []).includes(me.id) })) });
       }
       if (method === 'POST') {
         const name = String(body.name ?? '').trim().replace(/\s+/g, ' ');
@@ -941,6 +943,23 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
     if (method === 'GET' && rest === '') return json(200, view(c));
+    // a leader deletes it by its name: gone for everyone, the warbands free again (server/src/campaigns.ts deleteCampaign)
+    if (method === 'DELETE' && rest === '') {
+      if (!lead) return forbidden;
+      if (String(body.name ?? '').trim().replace(/\s+/g, ' ') !== c.name) return json(400, { error: 'invalid', problem: 'type the name of the campaign to delete it' });
+      for (const e of c.enrolments) {
+        const w = s.warbands.get(e.warbandId);
+        if (w && w.campaignId === c.id) { w.campaignId = null; w.seq = next(); }
+      }
+      s.campaigns.delete(c.id);
+      return json(200, { deleted: true });
+    }
+    // every member files it away in their own list
+    if (method === 'PUT' && rest === '/archive') {
+      const archived = body.archived === true;
+      c.archivedBy = [...(c.archivedBy ?? []).filter((u) => u !== me.id), ...(archived ? [me.id] : [])];
+      return json(200, { archived });
+    }
     let x0: RegExpMatchArray | null;
     if (method === 'POST' && rest === '/rounds/advance') {
       if (!lead) return forbidden;

@@ -20,7 +20,7 @@ export type EnrolmentStatus = 'pending' | 'active' | 'declined' | 'left';
 
 const iso = (d: Date) => d.toISOString();
 
-export interface CampaignRow { id: string; name: string; round: number; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null }
+export interface CampaignRow { id: string; name: string; round: number; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
 interface MemberRow { campaign_id: string; user_id: string; role: CampaignRole; joined_at: string; left_at: string | null; added_by: string | null }
 export interface EnrolmentRow {
   id: string; campaign_id: string; warband_id: string; player_id: string; status: EnrolmentStatus; from_round: number | null;
@@ -30,7 +30,8 @@ interface TagRow { id: string; warband_id: string; rev: number; kind: string; ca
 
 /* ---- what leaves the server ---- */
 
-export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string }
+/** archived: filed away by this member for themselves (migration 24) – the list shows it in its own section. */
+export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string; archived: boolean }
 /** `canLead` (the authenticator is set up) only for leaders to see. */
 export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string; canLead?: boolean }
 export interface Tag { id: string; kind: string; rev: number; round: number; battleId: string | null; totals: StageTotals; createdBy: string; createdAt: string }
@@ -59,7 +60,8 @@ const tagOf = (t: TagRow & { by: string }): Tag => ({
 
 /* ---- reading ---- */
 
-export const campaignById = (db: DB, id: string) => db.prepare('SELECT * FROM campaigns WHERE id = ? AND archived_at IS NULL').get(id) as CampaignRow | undefined;
+/** A campaign that exists: a deleted one (a tombstone, migration 24) is gone for every route. */
+export const campaignById = (db: DB, id: string) => db.prepare('SELECT * FROM campaigns WHERE id = ? AND archived_at IS NULL AND deleted_at IS NULL').get(id) as CampaignRow | undefined;
 export const enrolmentById = (db: DB, id: string) => db.prepare('SELECT * FROM enrolments WHERE id = ?').get(id) as EnrolmentRow | undefined;
 
 /** The user's role in the campaign, or null when not (or no longer) a member. */
@@ -69,12 +71,12 @@ export function roleIn(db: DB, campaignId: string, userId: string): CampaignRole
 }
 
 export function listCampaigns(db: DB, userId: string): CampaignSummary[] {
-  const rows = db.prepare(`SELECT c.*, m.role,
+  const rows = db.prepare(`SELECT c.*, m.role, m.archived_at AS filed_at,
       (SELECT count(*) FROM members x WHERE x.campaign_id = c.id AND x.left_at IS NULL) AS n_members,
       (SELECT count(*) FROM enrolments e WHERE e.campaign_id = c.id AND e.status = 'active') AS n_warbands
     FROM campaigns c JOIN members m ON m.campaign_id = c.id AND m.user_id = ? AND m.left_at IS NULL
-    WHERE c.archived_at IS NULL ORDER BY c.updated_at DESC`).all(userId) as (CampaignRow & { role: CampaignRole; n_members: number; n_warbands: number })[];
-  return rows.map((c) => ({ id: c.id, name: c.name, round: c.round, role: c.role, members: c.n_members, warbands: c.n_warbands, createdAt: c.created_at }));
+    WHERE c.archived_at IS NULL AND c.deleted_at IS NULL ORDER BY c.updated_at DESC`).all(userId) as (CampaignRow & { role: CampaignRole; filed_at: string | null; n_members: number; n_warbands: number })[];
+  return rows.map((c) => ({ id: c.id, name: c.name, round: c.round, role: c.role, members: c.n_members, warbands: c.n_warbands, createdAt: c.created_at, archived: c.filed_at != null }));
 }
 
 /** The latest tag of a warband in a campaign that no correction replaced. */
@@ -151,6 +153,48 @@ export function renameCampaign(db: DB, c: CampaignRow, name: string, by: string,
     db.prepare('UPDATE campaigns SET name = ?, updated_at = ? WHERE id = ?').run(name, iso(now), c.id);
     log(db, by, 'campaign.rename', c.id, { type: 'campaign', id: c.id }, { from: c.name, to: name }, now);
   })();
+}
+
+/* ---- deleting and archiving (Rob, 19.10.2026; migration 24) ---- */
+
+/** A leader deletes the campaign: a tombstone, gone for every member. The
+    warbands entered in it (waiting or taking part) go back to their owners
+    as free warbands; the enrolments stay as they were, for a restore. */
+export function deleteCampaign(db: DB, c: CampaignRow, by: string, now: Date): void {
+  db.transaction(() => {
+    db.prepare('UPDATE campaigns SET deleted_at = ?, deleted_by = ?, updated_at = ? WHERE id = ?').run(iso(now), by, iso(now), c.id);
+    const seq = log(db, by, 'campaign.delete', c.id, { type: 'campaign', id: c.id }, { name: c.name }, now);
+    const entered = db.prepare("SELECT warband_id FROM enrolments WHERE campaign_id = ? AND status IN ('pending', 'active')").all(c.id) as { warband_id: string }[];
+    for (const e of entered) db.prepare('UPDATE warbands SET campaign_id = NULL, seq = ? WHERE id = ? AND campaign_id = ?').run(seq, e.warband_id, c.id);
+  })();
+}
+
+/** The deleted campaigns, newest first (roster-cli). */
+export function deletedCampaigns(db: DB): CampaignRow[] {
+  return db.prepare('SELECT * FROM campaigns WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC').all() as CampaignRow[];
+}
+
+/** The admin brings a deleted campaign back (roster-cli): its warbands that
+    are still free rejoin it; one entered elsewhere since stays there. */
+export function restoreCampaign(db: DB, id: string, now: Date): { ok: true; warbands: number; elsewhere: number } | { ok: false } {
+  return db.transaction(() => {
+    const c = db.prepare('SELECT * FROM campaigns WHERE id = ? AND deleted_at IS NOT NULL').get(id) as CampaignRow | undefined;
+    if (!c) return { ok: false as const };
+    db.prepare('UPDATE campaigns SET deleted_at = NULL, deleted_by = NULL, updated_at = ? WHERE id = ?').run(iso(now), id);
+    const seq = audit(db, { actorId: null, action: 'campaign.restore', targetType: 'campaign', targetId: id, campaignId: id, visibility: 'public', payload: { name: c.name, via: 'roster-cli' } }, now);
+    let warbands = 0, elsewhere = 0;
+    const entered = db.prepare("SELECT warband_id FROM enrolments WHERE campaign_id = ? AND status IN ('pending', 'active')").all(id) as { warband_id: string }[];
+    for (const e of entered) {
+      const r = db.prepare('UPDATE warbands SET campaign_id = ?, seq = ? WHERE id = ? AND campaign_id IS NULL AND archived_at IS NULL').run(id, seq, e.warband_id);
+      if (r.changes) warbands++; else elsewhere++;
+    }
+    return { ok: true as const, warbands, elsewhere };
+  })();
+}
+
+/** A member files the campaign away for themselves, or takes it back into the list. */
+export function setArchived(db: DB, campaignId: string, userId: string, archived: boolean, now: Date): void {
+  db.prepare('UPDATE members SET archived_at = ? WHERE campaign_id = ? AND user_id = ? AND left_at IS NULL').run(archived ? iso(now) : null, campaignId, userId);
 }
 
 /* ---- the campaign's house rules (phase 4a4) ---- */

@@ -128,6 +128,37 @@ test('starting a campaign, with the authenticator', async ({ page }) => {
   await tapTargets(page);
 });
 
+/* Rob, 19.10.2026: the archive of one's own list, and a leader deleting a campaign. */
+test('a player files a campaign away in the list; a leader deletes one by its name', async ({ page }) => {
+  const srv = await playServer(page, true, { totp: true });
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+  srv.addCampaign({ name: 'Summer in Sylvania', role: 'player' });
+  srv.addCampaign({ name: 'The Long Winter', role: 'viewer', round: 2 });
+  await page.goto('campaign');
+  const list = page.getByRole('list', { name: 'Your campaigns' });
+  await expect(list.getByRole('link')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Archive: The Long Winter' }).click();
+  await expect(page.getByRole('list', { name: 'Archived campaigns' }).getByRole('link')).toHaveCount(1);
+  await expect(list.getByRole('link')).toHaveCount(2);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-archive');
+
+  await page.goto(`campaign/${c.id}/manage`);
+  await page.getByRole('button', { name: 'Delete the campaign…' }).click();
+  const sheet = page.locator('dialog[open]');
+  await expect(sheet.getByRole('button', { name: 'Delete it for everyone' })).toBeDisabled();
+  await sheet.getByLabel('Type the name of the campaign').fill('The Hel Fenn Campaign');
+  await expect(sheet.getByRole('button', { name: 'Delete it for everyone' })).toBeEnabled();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-delete');
+  await sheet.getByRole('button', { name: 'Delete it for everyone' }).click();
+  await expect(page.getByText('“The Hel Fenn Campaign” is deleted. Its warbands are with their players again.')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Your campaigns' }).getByRole('link')).toHaveCount(1);
+  expect(srv.state.campaigns.has(c.id)).toBe(false);
+});
+
 test('on a desktop the warbands and the members stand side by side', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const srv = await playServer(page);

@@ -222,6 +222,7 @@ Aufruf steht im Audit-Log mit `"via":"roster-cli"`):
 | `bug-token create [--days <n>] [--label <text>]` | Token für eine Cloud-Sitzung (`GET`/`PATCH /bugs`, sonst nichts); einmal gezeigt, standardmäßig 60 Tage, höchstens 180, höchstens fünf gültige – [Abschnitt unten](#bug-token-für-eine-cloud-sitzung-ab-phase-4c2) |
 | `bug-token list` · `bug-token revoke <Kennung>` | die Tokens (gültig, abgelaufen, widerrufen, zuletzt benutzt) · eines sofort beenden |
 | `bugs [--status <status>]` · `bugs show <Nummer>` | die Problemmeldungen mit Nummer · eine als JSON, die angehängte Warband nur als Größe |
+| `campaign deleted` · `campaign restore <Kennung>` | die Kampagnen, die ein Leiter gelöscht hat (neueste zuerst) · eine zurückholen (Kennung oder ihr Anfang): Mitglieder und alles darin sind wieder da, ihre Warbands, die noch frei sind, kehren zurück; eine inzwischen anderswo eingetragene bleibt dort |
 
 ### Die laufende Kampagne übernehmen (einmalig, Phase 4a5)
 

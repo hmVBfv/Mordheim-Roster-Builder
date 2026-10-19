@@ -65,6 +65,9 @@ export interface ProbeContext {
   /** Pictures of the user role's in the victim's campaign: one stored, one waiting for its bytes (phase 4a3). */
   ownPictureId: string;
   pendingPictureId: string;
+  /** A campaign the admin leads, the user role a player in it, that the admin's probe deletes (with its name). */
+  doomedCampaignId: string;
+  doomedCampaignName: string;
   /** A campaign the admin leads with no battle of its own yet, the user role's warband confirmed in it, and a battle of its history (phase 4a5). */
   historyCampaignId: string;
   historyWarbandId: string;
@@ -334,6 +337,18 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'DELETE /api/v1/campaigns/:id/enrolments/:eid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.campaignId}/enrolments/${c.ownEnrolmentId}` }),
     },
     fields: { user: [...VIEW, 'enrolmentId', 'warband', 'head'] },
+  },
+  'campaign.delete': {
+    // the user role is a player there (403), the admin leads it; the admin's probe comes last and deletes it
+    allowed: ['admin'],
+    routes: { 'DELETE /api/v1/campaigns/:id': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.doomedCampaignId}`, body: { name: c.doomedCampaignName } }) },
+    fields: { admin: ['deleted'] },
+  },
+  'campaign.archive': {
+    // every member files it away for themselves; the admin is outside the victim's campaign (404)
+    allowed: ['user'],
+    routes: { 'PUT /api/v1/campaigns/:id/archive': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.campaignId}/archive`, body: { archived: true } }) },
+    fields: { user: ['archived'] },
   },
   'campaign.manage': {
     // the user role is a player there (403), the admin leads it

@@ -31,6 +31,10 @@
      bugs [--status S]    the problem reports, one per line: open ones, `all`,
                           or one status
      bugs show <number>   one report as JSON (the warband copy only as a size)
+     campaign deleted     the campaigns a leader deleted, newest first
+     campaign restore <id>
+                          bring a deleted campaign back (its id, or the first
+                          characters); its warbands that are still free rejoin
 
    It never migrates and never creates a database; like the server it refuses
    to run without the marker file on the SSD. Links and tokens are printed
@@ -39,6 +43,7 @@ import { existsSync, statSync } from 'node:fs';
 import { audit, createInvite, listUsers, revokeUserSessions, userByName } from './accounts.ts';
 import { bugByRef, listBugs, oneBug, STATUSES } from './bugs.ts';
 import { createBugToken, DEFAULT_DAYS, listBugTokens, revokeBugToken } from './bug-tokens.ts';
+import { deletedCampaigns, restoreCampaign } from './campaigns.ts';
 import { hashPasswordSync, passwordProblem } from './passwords.ts';
 import { listSnapshots, snapshot } from './backup.ts';
 import { readConfig } from './config.ts';
@@ -64,13 +69,17 @@ export const USAGE = `usage: roster-cli <command>
   bug-token list             the tokens: good, expired or revoked
   bug-token revoke <id>      end a token (its id, or the first characters)
   bugs [--status <s>]        the problem reports, one per line (open · all · a status)
-  bugs show <number>         one report as JSON`;
+  bugs show <number>         one report as JSON
+  campaign deleted           the campaigns a leader deleted, newest first
+  campaign restore <id>      bring a deleted campaign back; its warbands still free rejoin it`;
 
 /** The accounts arrived with this schema version (migrations/0002_accounts.sql). */
 const ACCOUNTS_SCHEMA = 2;
 /** Report numbers (0022_bug_numbers.sql) and the bug token (0023_bug_tokens.sql). */
 const BUG_NUMBERS_SCHEMA = 22;
 const BUG_TOKENS_SCHEMA = 23;
+/** Deleting campaigns (0024_campaign_delete_archive.sql). */
+const CAMPAIGN_DELETE_SCHEMA = 24;
 
 export interface CliIO {
   out(line: string): void;
@@ -85,7 +94,7 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
     io.out(USAGE);
     return cmd ? 0 : 2;
   }
-  const known = ['backup', 'schema-version', 'info', 'epoch', 'invite', 'reset', 'totp-reset', 'sign-out', 'users', 'test-accounts', 'bug-token', 'bugs'];
+  const known = ['backup', 'schema-version', 'info', 'epoch', 'invite', 'reset', 'totp-reset', 'sign-out', 'users', 'test-accounts', 'bug-token', 'bugs', 'campaign'];
   if (!known.includes(cmd)) {
     io.err(`roster-cli: unknown command "${cmd}"\n${USAGE}`);
     return 2;
@@ -183,7 +192,8 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
       case 'users':
       case 'test-accounts':
       case 'bug-token':
-      case 'bugs': {
+      case 'bugs':
+      case 'campaign': {
         if (!exists) {
           io.err(`roster-cli ${cmd}: there is no database yet`);
           return 3;
@@ -195,6 +205,13 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv, io: CliIO, now: (
             return 3;
           }
           if (cmd === 'test-accounts') return testAccounts(rest, db, io, now());
+          if (cmd === 'campaign') {
+            if (currentVersion(db) < CAMPAIGN_DELETE_SCHEMA) {
+              io.err(`roster-cli campaign: the database is not at schema ${CAMPAIGN_DELETE_SCHEMA} yet – start the new version of the server first`);
+              return 3;
+            }
+            return campaignCmd(rest, db, io, now());
+          }
           if (cmd === 'bug-token' || cmd === 'bugs') {
             const need = cmd === 'bug-token' ? BUG_TOKENS_SCHEMA : BUG_NUMBERS_SCHEMA;
             if (currentVersion(db) < need) {
@@ -369,6 +386,31 @@ function bugToken(rest: string[], db: DB, io: CliIO, now: Date): number {
       io.err('usage: roster-cli bug-token create [--days <n>] [--label <text>] | list | revoke <id>');
       return 2;
   }
+}
+
+/** Deleted campaigns (Rob, 19.10.2026): a leader's delete is a tombstone, the admin lists and brings back. */
+function campaignCmd(rest: string[], db: DB, io: CliIO, now: Date): number {
+  const [sub, ...args] = rest;
+  if (sub === 'deleted' && !args.length) {
+    for (const c of deletedCampaigns(db)) io.out(`${c.id.slice(0, 8)}\t${c.deleted_at}\t${c.name}`);
+    return 0;
+  }
+  if (sub === 'restore' && args.length === 1) {
+    const found = deletedCampaigns(db).filter((c) => c.id.startsWith(args[0]!));
+    if (found.length !== 1) {
+      io.err(`roster-cli campaign restore: ${found.length ? 'more than one deleted campaign starts so – give more of the id' : 'no deleted campaign has that id'}`);
+      return 3;
+    }
+    const r = restoreCampaign(db, found[0]!.id, now);
+    if (!r.ok) {
+      io.err('roster-cli campaign restore: no deleted campaign has that id');
+      return 3;
+    }
+    io.out(`${found[0]!.name}: back${r.warbands ? `, ${r.warbands} warband${r.warbands === 1 ? '' : 's'} in it again` : ''}${r.elsewhere ? `; ${r.elsewhere} entered elsewhere since, left there` : ''}`);
+    return 0;
+  }
+  io.err('usage: roster-cli campaign deleted | restore <id>');
+  return 2;
 }
 
 function bugs(rest: string[], db: DB, io: CliIO): number {

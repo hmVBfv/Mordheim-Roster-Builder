@@ -3047,3 +3047,34 @@ Things that bit me on the way:
 - Status marks appear twice on an opened warrior (in the row, which shows four,
   and in Overview, which shows all). I left it: the row must stay short, and
   the card must not make you look for what the row cut off.
+
+## October 19, 2026 — deleting a campaign, and an archive of one's own
+
+Rob asked for two things that sound alike and are not: a leader deleting a
+campaign, and every player filing campaigns away. The first changes what
+everybody sees, the second only one person's list.
+
+Deleting is a tombstone, as everything else that is deleted here: the row
+gets `deleted_at`, and because every campaign route already loads the
+campaign through `campaignById`, one more condition there makes every route
+answer 404 at once – notes, timeline, pictures, the world – without touching
+twenty handlers. Rob chose that the warbands stay with their players: their
+`campaign_id` goes back to NULL with a new `seq`, so the devices pick it up on
+the next sync. The enrolments stay as they were, which is what lets the
+admin bring a campaign back with `roster-cli campaign restore`; a warband
+that was entered somewhere else in the meantime stays where it is.
+
+Campaigns already had an `archived_at` column from migration 5 that nothing
+used. I did not reuse it for deleting: "archived" now means the player's own
+list, and a column named archived that means deleted would mislead the next
+reader. It stays unused and says so in the data model.
+
+The archive is `members.archived_at`, one row per player. The list shows the
+archived ones in their own section. One wrong turn: the list jumps straight
+into the only campaign one plays, and after archiving one of two it did just
+that – the player was carried off the list they were sorting. It now jumps
+only on arrival.
+
+The leak matrix probes the delete with a campaign of its own that the
+admin's probe (the last role) deletes, so no later probe stands on a
+tombstone.

@@ -138,6 +138,9 @@ describe('leak-test matrix', () => {
     const pastBattleId = randomUUID();
     const past = putPastBattle(s.db, taken, pastBattleId, { round: 1, title: 'The old ferry', district: '', playedOn: null, outcomes: { [takenEntered.warband_id]: 'defeat' } }, admin.id, t0);
     if (!past.ok) throw new Error(`${past.error}: ${past.problem}`);
+    // a campaign the admin's probe deletes
+    const doomed = createCampaign(s.db, { name: 'The Admin’s Doomed Campaign', by: admin.id }, t0);
+    setMember(s.db, doomed.id, player.id, 'player', admin.id, t0);
     // published chapters, one in each campaign
     const chapter = (c: { id: string }, by: string) => {
       const chid = randomUUID();
@@ -226,6 +229,7 @@ describe('leak-test matrix', () => {
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
+      doomedCampaignId: doomed.id, doomedCampaignName: doomed.name,
       historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, ledDraftId, spareDraftId, bugId,
     };
     // a fresh session per request: a probe may sign its role out

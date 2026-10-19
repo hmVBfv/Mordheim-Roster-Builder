@@ -13,7 +13,8 @@ export interface Tag {
   /** What changed, frozen with the mark (phase 4a4): in the warband's own read only. */
   changes?: FrozenChange[];
 }
-export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string }
+/** archived: filed away by this user for themselves – shown in the list's own section. */
+export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string; archived?: boolean }
 export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string; canLead?: boolean }
 export interface Enrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
@@ -77,6 +78,13 @@ export const removeMember = (id: string, userId: string) => api<CampaignView | {
 export const confirmEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}/confirm`, { body: {} }).then(keep());
 export const declineEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}/decline`, { body: {} }).then(keep());
 export const withdrawEnrolment = (id: string, eid: string) => api<CampaignView>(`/campaigns/${id}/enrolments/${eid}`, { method: 'DELETE' }).then(keep());
+/** A leader deletes the campaign, with its name typed to be sure (Rob, 19.10.2026): gone for everyone, the warbands free again. */
+export async function deleteCampaign(id: string, name: string): Promise<void> {
+  await api<{ deleted: true }>(`/campaigns/${id}`, { method: 'DELETE', body: { name } });
+  await forgetCampaign(id);
+}
+/** Files the campaign away in one's own list, or takes it back. */
+export const archiveCampaign = (id: string, archived: boolean) => api<{ archived: boolean }>(`/campaigns/${id}/archive`, { method: 'PUT', body: { archived } });
 /** The campaign's house rules (a leader): for every warband in it. */
 export const setHouseRules = (id: string, rules: Record<string, unknown>) => api<CampaignView>(`/campaigns/${id}/house-rules`, { method: 'PUT', body: { rules } }).then(keep());
 /** Moves the campaign on (a leader), once the battles of the next round are closed; who fought none sat it out. */

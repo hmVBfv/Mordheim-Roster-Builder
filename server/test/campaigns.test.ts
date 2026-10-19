@@ -184,3 +184,75 @@ describe('a warband in a campaign', () => {
     expect(((await anna('GET', `/campaigns/${id}`)).json() as View).enrolments).toEqual([]);
   });
 });
+
+/* Rob, 19.10.2026: a leader deletes a campaign (a tombstone the admin can
+   bring back; the warbands stay with their owners, free), and every member
+   files campaigns away in their own list. */
+describe('deleting a campaign', () => {
+  async function entered() {
+    const w = await campaign();
+    const copy = randomUUID();
+    const made = await w.kai('POST', `/campaigns/${w.id}/enrolments`, { warbandId: copy, data: SAVE, appVersion: 'test' });
+    const enrolmentId = (made.json() as { enrolmentId: string }).enrolmentId;
+    await w.anna('POST', `/campaigns/${w.id}/enrolments/${enrolmentId}/confirm`);
+    return { ...w, copy };
+  }
+
+  it('a leader deletes it by its name; it is gone for every member, the warbands are free again', async () => {
+    const { s, id, anna, kai, copy } = await entered();
+    // a player may not; a leader must type the name
+    expect((await kai('DELETE', `/campaigns/${id}`, { name: 'The Hel Fenn Campaign' })).json()).toEqual({ error: 'forbidden' });
+    expect((await anna('DELETE', `/campaigns/${id}`, { name: 'The Hel Fenn' })).statusCode).toBe(400);
+    const before = (await kai('GET', '/sync?cursor=0')).json() as { cursor: number };
+    s.clock.advance(1000);
+    expect((await anna('DELETE', `/campaigns/${id}`, { name: ' The Hel Fenn Campaign ' })).json()).toEqual({ deleted: true });
+    // gone: from the lists, and every route of it answers as if it never was
+    expect((await anna('GET', '/campaigns')).json()).toEqual({ campaigns: [] });
+    expect((await kai('GET', '/campaigns')).json()).toEqual({ campaigns: [] });
+    for (const path of ['', '/notes', '/timeline', '/battles', `/warbands/${copy}`]) {
+      expect((await kai('GET', `/campaigns/${id}${path}`)).statusCode, path).toBe(404);
+      expect((await anna('GET', `/campaigns/${id}${path}`)).statusCode, path).toBe(404);
+    }
+    expect((await anna('DELETE', `/campaigns/${id}`, { name: 'The Hel Fenn Campaign' })).statusCode).toBe(404);
+    // the warband stays with its owner, free, with its versions; the devices learn it on the next sync
+    expect((await kai('GET', `/sync?cursor=${before.cursor}`)).json()).toMatchObject({ warbands: [{ id: copy, campaignId: null }] });
+    expect((await kai('GET', `/warbands/${copy}`)).json()).toMatchObject({ warband: { id: copy, campaignId: null } });
+    // a tombstone, logged
+    expect(s.db.prepare('SELECT deleted_at IS NOT NULL AS gone FROM campaigns WHERE id = ?').get(id)).toEqual({ gone: 1 });
+    expect(s.db.prepare("SELECT action, visibility FROM audit_log WHERE action = 'campaign.delete'").all()).toEqual([{ action: 'campaign.delete', visibility: 'public' }]);
+  });
+
+  it('the admin brings it back: its warbands that are still free rejoin it, one entered elsewhere stays there', async () => {
+    const { s, id, anna, kai, ids, copy } = await entered();
+    const { restoreCampaign, deletedCampaigns } = await import('../src/campaigns.ts');
+    await anna('DELETE', `/campaigns/${id}`, { name: 'The Hel Fenn Campaign' });
+    expect(deletedCampaigns(s.db).map((c) => c.id)).toEqual([id]);
+    expect(restoreCampaign(s.db, id, s.clock.now())).toEqual({ ok: true, warbands: 1, elsewhere: 0 });
+    expect((await kai('GET', `/campaigns/${id}`)).json()).toMatchObject({ campaign: { name: 'The Hel Fenn Campaign' }, enrolments: [{ warbandId: copy, status: 'active' }] });
+    expect((await kai('GET', `/warbands/${copy}`)).json()).toMatchObject({ warband: { campaignId: id } });
+    expect(restoreCampaign(s.db, id, s.clock.now())).toEqual({ ok: false });
+    // deleted again; meanwhile Kai enters the free warband in another campaign
+    await anna('DELETE', `/campaigns/${id}`, { name: 'The Hel Fenn Campaign' });
+    const other = ((await anna('POST', '/campaigns', { name: 'Summer in Sylvania' })).json() as View).campaign.id;
+    s.db.prepare('UPDATE warbands SET campaign_id = ? WHERE id = ?').run(other, copy);
+    expect(restoreCampaign(s.db, id, s.clock.now())).toEqual({ ok: true, warbands: 0, elsewhere: 1 });
+    expect(ids.kai).toBeTruthy();
+  });
+});
+
+describe('the archive of one’s own list', () => {
+  it('each member files a campaign away for themselves; the others’ lists stay as they are', async () => {
+    const { id, anna, kai, ben, ids } = await campaign();
+    expect((await kai('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ id, archived: false }] });
+    expect((await kai('PUT', `/campaigns/${id}/archive`, { archived: true })).json()).toEqual({ archived: true });
+    expect((await kai('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ id, archived: true }] });
+    expect((await anna('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ id, archived: false }] });
+    // still a member: it reads as before
+    expect((await kai('GET', `/campaigns/${id}`)).statusCode).toBe(200);
+    expect((await kai('PUT', `/campaigns/${id}/archive`, { archived: false })).json()).toEqual({ archived: false });
+    expect((await kai('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ id, archived: false }] });
+    // outside the campaign there is nothing to file away
+    expect((await ben('PUT', `/campaigns/${id}/archive`, { archived: true })).statusCode).toBe(404);
+    expect(ids.ben).toBeTruthy();
+  });
+});

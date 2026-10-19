@@ -156,6 +156,25 @@ describe('roster-cli: accounts', () => {
     expect(JSON.stringify(s.db.prepare('SELECT * FROM audit_log').all())).not.toContain(bugToken);
   });
 
+  it('campaign deleted and restore: a leader’s delete is listed, and the admin brings it back with the start of its id', async () => {
+    const s = await startAccounts();
+    const anna = await s.user('anna', { totp: true });
+    const token = anna.session();
+    const made = await s.call({ url: '/api/v1/campaigns', body: { name: 'The Hel Fenn Campaign' }, token });
+    const id = (made.json() as { campaign: { id: string } }).campaign.id;
+    expect(run(['campaign', 'deleted'], s.data).out).toBe('');
+    await s.call({ method: 'DELETE', url: `/api/v1/campaigns/${id}`, body: { name: 'The Hel Fenn Campaign' }, token });
+    expect(run(['campaign', 'deleted'], s.data).out).toMatch(new RegExp(`^${id.slice(0, 8)}\t\\S+\tThe Hel Fenn Campaign$`));
+    expect(run(['campaign', 'restore', 'nope'], s.data)).toMatchObject({ code: 3, err: expect.stringMatching(/no deleted campaign/) });
+    expect(run(['campaign', 'restore', id.slice(0, 8)], s.data)).toMatchObject({ code: 0, out: 'The Hel Fenn Campaign: back' });
+    expect((await s.call({ url: `/api/v1/campaigns/${id}`, token })).statusCode).toBe(200);
+    const log = s.db.prepare("SELECT actor_id, payload FROM audit_log WHERE action = 'campaign.restore'").all() as { actor_id: string | null; payload: string }[];
+    expect(log).toHaveLength(1);
+    expect(log[0]!.actor_id).toBeNull();
+    expect(JSON.parse(log[0]!.payload)).toEqual({ name: 'The Hel Fenn Campaign', via: 'roster-cli' });
+    expect(run(['campaign'], s.data).code).toBe(2);
+  });
+
   it('bug-token: create prints the token once, list and revoke work with the start of the id, and only the hash is stored', async () => {
     const s = await startAccounts();
     const made = run(['bug-token', 'create', '--days', '10', '--label', 'cloud session'], s.data);
