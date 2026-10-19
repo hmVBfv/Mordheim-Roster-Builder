@@ -3393,3 +3393,22 @@ optional.
 The form is loaded when it is opened, so the first-load budget does not pay for
 the picker. Also new: a `Named` flag on an NPC – a person of its own rather
 than one of a crowd – which threads of the Background will refer to next.
+
+## October 19, 2026 — a thread refers to a faction or a person, not only a battle
+
+Rob: "Refers to" on a thread could only point at a battle, and should also
+reach a faction or a Named NPC. The server already stored references as
+`{ kind, id, label }`, so the change is two new kinds (`faction`, `npc`) and a
+better way to choose: a dropdown that grows a section per kind gets long, so
+the form asks what the reference is about first and then shows what can be
+picked as tiles – a tap adds, a second tap takes it out.
+
+Two small decisions. Only NPCs marked Named are offered: a deckhand is not
+something a thread is about, and the flag Rob suggested at NPC creation is
+what keeps the list short. And the card shows the current name, not the one
+written down, because a renamed faction is still the same faction; the written
+label is the fallback, with a "(removed)" when the world no longer has it. The
+server does not check that a faction or NPC exists, as it does not for a
+battle reference: a reference to something since removed is harmless, and
+refusing to save an entry because of it would be worse.
+
