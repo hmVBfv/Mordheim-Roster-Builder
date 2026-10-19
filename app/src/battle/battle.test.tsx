@@ -70,6 +70,43 @@ describe('setting up a battle', () => {
   });
 });
 
+describe('the number of a battle', () => {
+  it('is the next one unless the leader chooses another; the campaign comes to it', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'New battle' }));
+    const sheet = screen.getByRole('dialog', { name: 'Battle 1' });
+    const number = within(sheet).getByLabelText('Battle number') as HTMLInputElement;
+    expect(number.value).toBe('1');
+    await user.clear(number);
+    await user.type(number, '4');
+    expect(within(sheet).getByText(/battles 1–3 are not played here/)).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Start the game night' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Battle 4' })).toBeTruthy();
+    expect([...srv.state.battles.values()]).toMatchObject([{ round: 4 }]);
+    expect(c.round).toBe(3);
+  });
+
+  it('takes no number the history before the app has played', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const [anna] = c.enrolments.map((e) => e.warbandId) as [string];
+    srv.pastBattle(c.id, { round: 3, outcomes: { [anna]: 'victory' } });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'New battle' }));
+    const sheet = screen.getByRole('dialog', { name: 'Battle 4' });
+    const number = within(sheet).getByLabelText('Battle number') as HTMLInputElement;
+    expect(number.value).toBe('4');
+    await user.clear(number);
+    await user.type(number, '2');
+    expect(within(sheet).getByText(/From 4 – battles before it were played before the app/)).toBeTruthy();
+    expect(within(sheet).getByRole('button', { name: 'Start the game night' })).toHaveProperty('disabled', true);
+  });
+});
+
 describe('the protocol', () => {
   it('a leader enters who went out of action, by whom; corrects it; takes it out', async () => {
     const srv = server({ totp: true });

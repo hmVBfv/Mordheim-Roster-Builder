@@ -793,7 +793,12 @@ export function createFakeSync(opts: {
         if (there) return json(200, battleView(there));
         const ws = (body.warbandIds as string[] | undefined) ?? [];
         if (!ws.length) return json(400, { error: 'invalid', problem: 'a battle needs a warband that fought it' });
-        const b = addBattle(c.id, { title: String(body.title ?? ''), warbandIds: ws });
+        const round = body.round === undefined ? c.round + 1 : Number(body.round);
+        const h = Math.max(0, ...[...s.battles.values()].filter((x) => x.campaignId === c.id && x.takenOver).map((x) => x.round));
+        if (round <= h) return json(400, { error: 'invalid', problem: `round ${round} was played before the app (its history ends with battle ${h})` });
+        // a number beyond the next: the campaign comes to the round before it (server/src/aftermath.ts comeToRound)
+        if (round - 1 > c.round) c.round = round - 1;
+        const b = addBattle(c.id, { title: String(body.title ?? ''), warbandIds: ws, round });
         s.battles.delete(b.id);
         b.id = id;
         b.district = String(body.district ?? '');

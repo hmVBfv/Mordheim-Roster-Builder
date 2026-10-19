@@ -139,3 +139,10 @@ export function advanceRound(db: DB, c: CampaignRow, by: string, now: Date): Adv
   })();
 }
 
+/** A battle number the leader chose beyond the next one (a campaign that comes into the app at battle 4): the campaign comes to the round before it, so "move on" still means the battle just played. The rounds in between are not played here – nobody sits them out. Never moves back. */
+export function comeToRound(db: DB, c: CampaignRow, battleRound: number, by: string, now: Date): void {
+  const round = battleRound - 1;
+  if (round <= c.round) return;
+  db.prepare('UPDATE campaigns SET round = ?, updated_at = ? WHERE id = ?').run(round, iso(now), c.id);
+  audit(db, { actorId: by, action: 'campaign.round', targetType: 'campaign', targetId: c.id, campaignId: c.id, visibility: 'public', payload: { round, skipped: true } }, now);
+}
