@@ -343,6 +343,15 @@ sonst niemand. Das Log (`style.edit`, Sichtbarkeit `leader`) trägt keinen Text.
 Die Leak-Matrix legt einen Stil mit Merkwort (`STYLE-SECRET`) in eine fremde
 Kampagne.
 
+**Vorgeschichte (Migration 26):** `backstory.read` für alle Mitglieder (auch
+Zuschauer), `backstory.write` nur für Leiter mit Authenticator, sonst 403, für
+Außenstehende 404 (auch der Admin). Anders als Stilvorgaben und Entwürfe ist
+sie **öffentlich innerhalb der Kampagne**: es ist die Geschichte, die die Spieler
+erlebt haben. Was verborgen bleiben soll, gehört in den Hintergrund mit einer
+Regel – das Importblatt sagt es dem Leiter, bevor er speichert, und prüft den
+Text auf Namen aus dem verborgenen Hintergrund. Das Log (`backstory.edit`,
+Sichtbarkeit `public`) trägt nur die Zahl der Abschnitte, nie Text.
+
 **Kapitelentwürfe (Phase 4b5b):** `drafts.read` und `drafts.write` für Leiter
 mit Authenticator, sonst 403, für Außenstehende 404 (auch der Admin). Ein
 Entwurf ist noch kein Kapitel: er steht in keiner Zeitleiste und keinem

@@ -68,7 +68,7 @@ describe('buildPack', () => {
 
   it('says which layout it is, names the battle and tells the writer the rules of the job', () => {
     expect(md.split('\n')[0]).toBe(`<!-- mordheim-ai-pack format=${core.PACK_FORMAT} -->`);
-    expect(core.PACK_FORMAT).toBe(1);
+    expect(core.PACK_FORMAT).toBe(2);
     expect(md).toContain('# The Hel Fenn Campaign — Battle 5: The Old Mill');
     expect(md).toContain('Never state what the background marks as hidden, and hint only where it allows.');
     expect(md).toContain('Quotes are verbatim');
@@ -150,6 +150,36 @@ describe('buildPack', () => {
     expect(md.trimEnd().endsWith('## Style\n\nGerman, past tense, close third person.\nNo dice, no game terms.')).toBe(true);
     expect(md.indexOf('## Notes of the round')).toBeLessThan(md.indexOf('## Background'));
     expect(md).toContain('- Note (Ben): The rats drag Grot home on a door.');
+  });
+});
+
+describe('buildPack – the backstory', () => {
+  const backstory = [
+    { heading: 'Before the war', battleNo: null, text: 'The Silver Caravan left Nuln in the spring.' },
+    { heading: 'Battle 3 – the quay', battleNo: 3, text: 'A building collapsed on the quay.\nNobody was found.' },
+  ];
+
+  it('stands at the head of the story so far, in the order it was given, each section in full', () => {
+    const md = pack({}, { ...INPUT, backstory });
+    const so = md.slice(md.indexOf('## The story so far'));
+    expect(so).toContain('### Backstory — before the app');
+    expect(so.indexOf('#### Before the war')).toBeLessThan(so.indexOf('#### Battle 3 – the quay'));
+    expect(so).toContain('The Silver Caravan left Nuln in the spring.');
+    expect(so).toContain('A building collapsed on the quay.\nNobody was found.');
+    expect(so.indexOf('Backstory — before the app')).toBeLessThan(so.indexOf('Chapters written:'));
+  });
+
+  it('is part of the story: without that part it is not there; a story with only a backstory still has its heading', () => {
+    expect(pack({ parts: ALL.filter((x) => x !== 'story') }, { ...INPUT, backstory })).not.toContain('Before the war');
+    const only = pack({}, { ...INPUT, backstory, chapters: [], lastChapter: null });
+    expect(only).toContain('## The story so far');
+    expect(only).toContain('Before the war');
+    expect(only).not.toContain('Chapters written:');
+  });
+
+  it('leaves no heading for an empty backstory or sections without text', () => {
+    expect(pack({}, { ...INPUT, backstory: [] })).not.toContain('Backstory');
+    expect(pack({}, { ...INPUT, backstory: [{ heading: 'Empty', battleNo: null, text: '  ' }] })).not.toContain('Backstory');
   });
 });
 

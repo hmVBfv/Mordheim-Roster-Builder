@@ -467,6 +467,18 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { admin: ['scenario', 'seq', 'removed'] },
   },
+  'backstory.read': {
+    // the user role is a player in the victim's campaign, the admin outside it – a viewer would read it too: it is the story the players lived
+    allowed: ['user'],
+    routes: { 'GET /api/v1/campaigns/:id/backstory': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/backstory` }) },
+    fields: { user: ['backstory'] },
+  },
+  'backstory.write': {
+    // the user role is a player in the admin's campaign (403), the admin leads it
+    allowed: ['admin'],
+    routes: { 'PUT /api/v1/campaigns/:id/backstory': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/backstory`, body: { sections: [{ heading: 'Battle 1 – the ferry', battleNo: 1, text: 'Rain over the Stir.' }], baseSeq: 0 } }) },
+    fields: { admin: ['backstory'] },
+  },
   'style.read': {
     // the admin leads the campaign (the user role is a player there: 403); the style guide of the victim's campaign carries a marker no role may read
     allowed: ['admin'],

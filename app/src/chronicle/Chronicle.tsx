@@ -17,6 +17,7 @@ import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import styles from './Chronicle.module.css';
 import { chronicleMarkdown, LANG_NAMES, told } from './download.ts';
+import { BackstorySection } from '../backstory/Backstory.tsx';
 import { DraftsSection } from '../drafts/Drafts.tsx';
 
 const KIND: Record<string, string> = { prologue: 'Prologue', battle: 'Battle', interlude: 'Interlude', chapter: 'Chapter' };
@@ -96,6 +97,7 @@ export function ChronicleTab({ id, view, lead }: { id: string; view: CampaignVie
       {status && <p className={`${ui.message} ${status.error ? ui.error : ''}`} role={status.error ? 'alert' : 'status'}>{status.text}</p>}
       {error && <p className={ui.message} role="status">{error}{data ? ' Shown as last seen.' : ''}</p>}
       {!data && !error && <p className={ui.muted}>Loading the chronicle…</p>}
+      <BackstorySection id={id} view={view} lead={lead} />
       {data && chapters.length === 0 && <Empty scene="scribe" title="No chapter has been published yet." />}
       <ol className={styles.list} aria-label="Chapters">
         {chapters.map(({ segment, chapter: c }) => {

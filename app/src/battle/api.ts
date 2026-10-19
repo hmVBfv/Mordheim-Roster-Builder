@@ -62,7 +62,7 @@ export async function getBattle(cid: string, bid: string, since?: number): Promi
   const r = await api<BattleView | { unchanged: true; seq: number }>(`/campaigns/${cid}/battles/${bid}${since !== undefined ? `?since=${since}` : ''}`);
   return 'unchanged' in r ? null : who(r);
 }
-export const createBattle = (cid: string, b: { id: string; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep());
+export const createBattle = (cid: string, b: { id: string; round?: number; title: string; district: string; warbandIds: string[] }) => api<BattleView>(`/campaigns/${cid}/battles`, { body: b }).then(keep());
 export const patchBattle = (cid: string, bid: string, p: { title?: string; district?: string; turn?: number; outcomes?: Record<string, Outcome> }) =>
   api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep());
 /** Closes the battle (a leader): the protocol is fixed, its sealed notes open. */
