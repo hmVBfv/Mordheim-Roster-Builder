@@ -3453,3 +3453,13 @@ hidden: an NPC that was still a mystery stays one until the leader decides
 otherwise. A wrong turn worth keeping: the first version labelled the name
 field "Name" and the hide-checkbox "Name" as well, and the test (and a screen
 reader) could not tell them apart – the field is now "Name of the NPC".
+
+## October 20, 2026 — a shorter test run
+
+The browser tests had grown to over twenty minutes, and a wobbling check could
+fail a pull request that was fine (#97 failed on a unit test that read the
+screen a moment before it had redrawn). Where the time went: the mockups – frozen design
+sketches – were 12 of the 21 minutes. They now run on their own, only when
+something under `docs/mockups/` changes, and the rest runs with several workers
+(three locally, two in the CI): about seven minutes locally. The tests stay;
+two that measured too early now wait for the thing they measure.

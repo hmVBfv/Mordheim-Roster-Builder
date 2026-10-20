@@ -717,9 +717,11 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
     expect(Math.abs(box.x + box.width / 2 - 720), 'centred').toBeLessThan(2);
     // the fields stand two to a row
+    await expect(sheet.getByLabel('Name (English)')).toBeVisible(); // the form loads when it opens: measure once it is there
+    const y = async (label: string) => (await sheet.getByLabel(label).boundingBox())!.y;
+    await expect.poll(async () => Math.abs((await y('Faction')) - (await y('Name (English)'))), { message: 'same row' }).toBeLessThan(2);
     const a = (await sheet.getByLabel('Faction').boundingBox())!;
     const b = (await sheet.getByLabel('Name (English)').boundingBox())!;
-    expect(Math.abs(a.y - b.y), 'same row').toBeLessThan(2);
     expect(b.x, 'to the right').toBeGreaterThan(a.x + a.width);
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow), 'page behind does not scroll').toBe('hidden');
     await page.screenshot({ path: `test-results/screens/campaign-${theme}-sheet-desktop.png` });

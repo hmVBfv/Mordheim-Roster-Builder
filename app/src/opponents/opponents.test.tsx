@@ -81,7 +81,7 @@ describe('opponents', () => {
     await user.click(adder.getByRole('checkbox', { name: 'Keep it among our own skills' }));
     await user.click(adder.getByRole('button', { name: 'Add this skill' }));
     await waitFor(() => expect([...srv.state.opponentSkills.values()].map((k) => k.name)).toEqual(['Ferryman’s Luck']));
-    expect(within(within(form).getByRole('list', { name: 'Skills of Big Grul' })).getAllByRole('listitem').map((x) => x.textContent)).toEqual(['Step Aside×', 'Ferryman’s Luck×']);
+    await waitFor(() => expect(within(within(form).getByRole('list', { name: 'Skills of Big Grul' })).getAllByRole('listitem').map((x) => x.textContent)).toEqual(['Step Aside×', 'Ferryman’s Luck×']));
 
     await user.click(within(form).getByRole('button', { name: 'Save the group' }));
     await waitFor(() => expect(srv.state.opponentGroups.size).toBe(1));
