@@ -826,6 +826,17 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await shot(page, `${theme}-scenario-npc-form-all`);
     await form.getByLabel('Hide all stats of Captain Brandt', { exact: true }).uncheck();
     await form.getByLabel('Hide WS of Captain Brandt', { exact: true }).check(); // the skills stay hidden
+    // one click hides everything (Rob, 20.10.2026), and one click clears it again
+    await form.getByLabel('Hide everything of Captain Brandt', { exact: true }).check();
+    await expect(form.getByLabel('Hide the name of Captain Brandt', { exact: true })).toBeChecked();
+    await expect(form.getByLabel('Hide the special rules of Captain Brandt', { exact: true })).toBeChecked();
+    await expect(form.getByRole('table', { name: 'Characteristics of ?' }).getByRole('cell').nth(1)).toHaveText('?');
+    await shot(page, `${theme}-scenario-npc-form-everything`);
+    await form.getByLabel('Hide everything of Captain Brandt', { exact: true }).uncheck();
+    await expect(form.getByLabel('Hide the name of Captain Brandt', { exact: true })).not.toBeChecked();
+    await expect(form.getByLabel('Type', { exact: true })).toHaveCount(0); // nobody asks for the type, nobody reads it
+    await form.getByLabel('Hide WS of Captain Brandt', { exact: true }).check();
+    await form.getByLabel('Hide the skills of Captain Brandt', { exact: true }).check();
     await form.getByRole('button', { name: 'Save NPCs' }).click();
     await expect(page.getByText('NPCs saved.')).toBeVisible();
     await expect.poll(() => srv.state.scenarios.get(sc.id)!.npcs.length, { timeout: 8000 }).toBe(1);
@@ -834,6 +845,48 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-scenario-npcs-card`);
+    // the eye shows the card the way the players read it, and back; the fold-out has a chevron and opens
+    const eye = draft.getByRole('button', { name: 'Players’ view' });
+    await expect(eye).toHaveAttribute('aria-pressed', 'false');
+    const cell = (i: number) => draft.getByRole('table', { name: /^Characteristics of/ }).getByRole('cell').nth(i);
+    await expect(cell(1)).toHaveText('4');
+    await eye.click();
+    await expect(eye).toHaveAttribute('aria-pressed', 'true');
+    await expect(cell(1)).toHaveText('?');
+    await expect(draft.getByText('This is the card as the players read it.')).toBeVisible();
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npcs-eye`);
+    await eye.click();
+    await expect(cell(1)).toHaveText('4');
+    const fold = draft.getByText('Skills, equipment and rules');
+    await fold.click();
+    await expect(draft.getByText('Equipment: Sword')).toBeVisible();
+    await noSideScroll(page);
+    await shot(page, `${theme}-scenario-npcs-fold`);
+  });
+
+  test(`the Scenarios section: a leader adds a person made under World straight from the list, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const guard = srv.factionFrom(c.id, { nameEn: 'The Countess’s Guard' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', factionId: guard.id, profile: { type: 'Henchman', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '6+', skills: [], equipment: 'Boat hook', rules: 'Knows the river', from: null } });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', body: 'The Countess’s men wait on the far bank.' });
+    await page.goto(`campaign/${c.id}/world`);
+    await page.getByRole('article', { name: 'Draft: The night at the ferry' }).getByRole('button', { name: 'Add the NPCs of The night at the ferry' }).click();
+    const form = page.getByRole('dialog', { name: 'NPCs of The night at the ferry' });
+    const pick = form.getByLabel('Add an NPC of the world');
+    await expect(pick.locator('option')).toHaveCount(2);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npc-from-world`);
+    await pick.selectOption({ label: 'Old Marek' });
+    await form.getByRole('button', { name: 'Add this one' }).click();
+    await expect(form.getByLabel('Name of the NPC')).toHaveValue('Old Marek');
+    await expect(form.getByLabel('WS of Old Marek', { exact: true })).toHaveValue('3');
+    await form.getByRole('button', { name: 'Save NPCs' }).click();
+    await expect.poll(() => srv.state.scenarios.get(sc.id)!.npcs.length, { timeout: 8000 }).toBe(1);
+    expect(srv.state.scenarios.get(sc.id)!.npcs[0]).toMatchObject({ name: 'Old Marek', equipment: 'Boat hook', hidden: [] });
   });
 
   test(`the Scenarios section: a player reads the “?” of a released scenario, in ${theme}`, async ({ page }) => {
@@ -873,6 +926,9 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(tables).toHaveCount(3);
     const [t1, t2] = [(await tables.nth(0).boundingBox())!, (await tables.nth(1).boundingBox())!];
     expect(Math.abs(t1.y - t2.y), 'two NPCs to a row').toBeLessThan(2);
+    // the title of a fold-out carries a chevron: that it opens can be seen
+    const chevron = await card.getByText('Skills, equipment and rules').first().evaluate((el) => { const c = getComputedStyle(el, '::after'); return { content: c.content, width: c.borderRightWidth }; });
+    expect(chevron).toEqual({ content: '""', width: '2px' });
     await shot(page, `${theme}-scenario-npcs-desktop`);
     await card.getByRole('button', { name: 'Change the NPCs of The night at the ferry' }).click();
     const form = page.getByRole('dialog', { name: 'NPCs of The night at the ferry' });

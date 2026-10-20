@@ -20,17 +20,24 @@ Leiter ihm gegeben hat.
 ## Entscheidung
 - Ein Szenario trägt seine **eigenen NPCs** (`scenarios.npcs`): neu geschrieben,
   aus dem Spiel kopiert (Warbands, Hired Swords, Dramatis Personae, Bestiary),
-  aus der Welt oder aus einem früheren Szenario – kopiert, nie verknüpft.
+  aus der Welt (direkt aus der Liste der Welt-NPCs: „Add an NPC of the world“)
+  oder aus einem früheren Szenario – kopiert, nie verknüpft.
 - Der Leiter kann an jedem dieser NPCs **Teile verbergen**: den Namen, einzelne
   Werte (M WS BS S T W I A Ld, Sv) oder alle, Fertigkeiten, Ausrüstung,
-  Sonderregeln. Er wählt sie beim Anlegen oder Ändern.
+  Sonderregeln – oder mit einem Haken **alles** („Hide everything“, jeder Teil,
+  den es gibt). Er wählt sie beim Anlegen oder Ändern.
 - Für alle, die nicht Leiter mit Authenticator sind, ersetzt **der Server** jeden
   verborgenen Teil durch „?“, bevor er antwortet (ADR 0011). Der Wert verlässt
   den Server nicht. Auch der Hinweis, woher der NPC kopiert wurde (`from`), fällt
-  weg; ist der Name verborgen, ist es auch der Typ.
+  weg. **Der Typ (Hero, Henchman …) liest niemand**, auch nicht als „?“ (Rob,
+  20.10.2026: zu viel Spielmechanik für die Runde): Er wird weder abgefragt noch
+  angezeigt, der Server liefert ihn als leeren Text, die TTS-Karte hängt nicht
+  an ihm. Er bleibt als Wert im NPC (er kommt mit einer Kopie), nur nie zu sehen.
 - Leiter mit Authenticator sehen alles. Ihr Tabletop-Simulator-Export trägt das
   „?“ an den verborgenen Stellen – das ist die Karte für den Tisch –, und sie
-  können sich die ganze Karte zum eigenen Gebrauch kopieren.
+  können sich die ganze Karte zum eigenen Gebrauch kopieren. Mit dem **Auge**
+  („Players’ view“) sieht ein Leiter jede Karte so, wie die Spieler sie lesen,
+  und mit einem zweiten Klick wieder ganz.
 - Solange das Szenario ein Entwurf ist, lässt sich alles frei ändern: niemand
   hat es gelesen. **Nach der Freigabe** darf Verborgenes aufgedeckt, aber **nicht
   mehr geändert** werden (auch nicht beim Aufdecken), nichts bereits Gelesenes

@@ -135,8 +135,9 @@ function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string; own: Own
   );
 }
 
-/** `bare`: the values of one person, not a profile of a group – no name, number or note, no folding, nothing to take out; the name is the form's.
-    `locked`: parts that cannot be changed – a characteristic by its key (`WS`), the save (`sv`), `skills`, `equipment`, `rules`, and `name` for the type
+/** `bare`: the values of one person, not a profile of a group – no name, type, number or note, no folding, nothing to take out; the name is the form's,
+    and the type of an NPC is never asked for or shown (Rob, 20.10.2026: too much of the game for our table).
+    `locked`: parts that cannot be changed – a characteristic by its key (`WS`), the save (`sv`), `skills`, `equipment`, `rules`
     (a scenario's NPC once its hidden values were released: ADR 0022). */
 export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], onChange, onRemove, onOwn }: {
   cid: string; p: OpponentProfile; own: OwnSkill[]; open?: boolean; bare?: boolean; locked?: readonly string[]; onChange: (p: OpponentProfile) => void; onRemove?: () => void; onOwn: () => void;
@@ -151,12 +152,14 @@ export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], on
     <Wrap className={bare ? styles.bare : styles.editor} {...(bare ? {} : { open })}>
       {!bare && <summary><strong>{p.name || 'New profile'}</strong>{p.count > 1 ? ` ×${p.count}` : ''} <small className={styles.meta}>{p.type}</small></summary>}
       {p.from && <p className={styles.meta}>Copied from {p.from.label}</p>}
-      <div className={styles.head}>
-        {!bare && <div className={ui.field}><label htmlFor={`${ids}-n`}>Name</label><input id={`${ids}-n`} className={ui.input} value={p.name} maxLength={120} onChange={(e) => set('name', e.target.value)} /></div>}
-        <div className={ui.field}><label htmlFor={`${ids}-ty`}>Type</label><input id={`${ids}-ty`} className={ui.input} list={`${ids}-types`} value={p.type} maxLength={60} disabled={fixed('name')} onChange={(e) => set('type', e.target.value)} />
-          <datalist id={`${ids}-types`}>{TYPES.map((t) => <option key={t} value={t} />)}</datalist></div>
-        {!bare && <div className={ui.field}><label htmlFor={`${ids}-c`}>How many</label><input id={`${ids}-c`} className={ui.input} type="number" inputMode="numeric" min={1} max={50} value={p.count} onChange={(e) => set('count', Math.max(1, Math.min(50, Math.round(Number(e.target.value) || 1))))} /></div>}
-      </div>
+      {!bare && (
+        <div className={styles.head}>
+          <div className={ui.field}><label htmlFor={`${ids}-n`}>Name</label><input id={`${ids}-n`} className={ui.input} value={p.name} maxLength={120} onChange={(e) => set('name', e.target.value)} /></div>
+          <div className={ui.field}><label htmlFor={`${ids}-ty`}>Type</label><input id={`${ids}-ty`} className={ui.input} list={`${ids}-types`} value={p.type} maxLength={60} onChange={(e) => set('type', e.target.value)} />
+            <datalist id={`${ids}-types`}>{TYPES.map((t) => <option key={t} value={t} />)}</datalist></div>
+          <div className={ui.field}><label htmlFor={`${ids}-c`}>How many</label><input id={`${ids}-c`} className={ui.input} type="number" inputMode="numeric" min={1} max={50} value={p.count} onChange={(e) => set('count', Math.max(1, Math.min(50, Math.round(Number(e.target.value) || 1))))} /></div>
+        </div>
+      )}
       <fieldset className={styles.stats}>
         <legend>Characteristics</legend>
         {STATS.map((k) => (

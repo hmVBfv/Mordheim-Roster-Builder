@@ -1,15 +1,16 @@
 /* The NPCs of a scenario (ADR 0022), a leader's form, opened from the scenario
    once it exists: a new NPC with the grid of characteristics, a copy from any
-   model of the game or an NPC of the world, or one brought along from another
-   scenario – an NPC that turns up again. Each NPC has the parts the leader
-   keeps from the players: the name, single characteristics or all of them,
-   the save, skills, equipment, rules. The players read a "?" there, in the
+   model of the game, an NPC of the world added straight from its list, or one
+   brought along from another scenario – an NPC that turns up again. Each NPC
+   has the parts the leader keeps from the players: the name, single
+   characteristics or all of them, the save, skills, equipment, rules – or
+   everything at once. The players read a "?" there, in the
    scenario and in the Tabletop Simulator copy. A released scenario still takes
    NPCs and corrections, but what the players have seen may only be revealed,
    never changed or hidden after the fact. Loaded when the form opens. */
 import { useEffect, useId, useRef, useState } from 'react';
 import {
-  emptyScenarioNpc, normalizeHidden, npcAsOpponent, redactNpc, releasedChangeProblem, revealedBy, scenarioNpcFrom, STAT_PARTS,
+  emptyScenarioNpc, HIDABLE, normalizeHidden, npcAsOpponent, redactNpc, releasedChangeProblem, revealedBy, scenarioNpcFrom, STAT_PARTS,
   type Hidable, type OpponentProfile, type OpponentTemplate, type ScenarioNpc,
 } from '@mordheim/core';
 import { newId } from '../db/ids.ts';
@@ -40,10 +41,11 @@ const OTHER_PARTS: { key: Hidable; label: string }[] = [
   { key: 'skills', label: 'Skills' }, { key: 'equipment', label: 'Equipment' }, { key: 'rules', label: 'Special rules' },
 ];
 
-/** The checkboxes of what the players do not read: the name, every characteristic by itself or all of them, skills, equipment, rules.
+/** The checkboxes of what the players do not read: everything at once, or the name, every characteristic by itself or all of them, skills, equipment, rules.
     `fixed`: the NPC was already read by the players – only what was hidden then may be switched, back and forth until it is saved. */
 function HideParts({ n, fixed, onChange }: { n: ScenarioNpc; fixed: readonly Hidable[] | null; onChange: (hidden: Hidable[]) => void }) {
   const all = useRef<HTMLInputElement>(null);
+  const every = useRef<HTMLInputElement>(null);
   const who = n.name.trim() || 'this NPC';
   const has = (k: Hidable) => n.hidden.includes(k);
   const free = (k: Hidable) => fixed === null || fixed.includes(k);
@@ -52,6 +54,11 @@ function HideParts({ n, fixed, onChange }: { n: ScenarioNpc; fixed: readonly Hid
   const everyStat = count === ONLY_STATS.length;
   const statsFree = ONLY_STATS.every(free);
   useEffect(() => { if (all.current) all.current.indeterminate = count > 0 && !everyStat; }, [count, everyStat]);
+  // "everything" is every part there is: a part added to the NPC later is in it without a change here
+  const some = HIDABLE.some(has);
+  const everything = HIDABLE.every(has);
+  const everythingFree = HIDABLE.every(free);
+  useEffect(() => { if (every.current) every.current.indeterminate = some && !everything; }, [some, everything]);
   const chip = (k: Hidable, label: string, aria: string) => (
     <label key={k} className={`${styles.chip} ${has(k) ? styles.chipOn : ''} ${free(k) ? '' : styles.chipOff}`}>
       <input type="checkbox" checked={has(k)} disabled={!free(k)} aria-label={aria} onChange={(e) => set([k], e.target.checked)} />
@@ -62,6 +69,12 @@ function HideParts({ n, fixed, onChange }: { n: ScenarioNpc; fixed: readonly Hid
     <fieldset className={styles.hide}>
       <legend>Hide from the players</legend>
       <p className={ui.muted}>A hidden part reads “?” in the scenario and in the Tabletop Simulator copy. You always read all of it.</p>
+      <div className={styles.chips}>
+        <label className={`${styles.chip} ${styles.chipAll} ${everything ? styles.chipOn : ''} ${everythingFree ? '' : styles.chipOff}`}>
+          <input ref={every} type="checkbox" checked={everything} disabled={!everythingFree} aria-label={`Hide everything of ${who}`} onChange={(e) => set(HIDABLE, e.target.checked)} />
+          <span>Hide everything</span>
+        </label>
+      </div>
       <div className={styles.chips}>{chip('name', 'Name', `Hide the name of ${who}`)}</div>
       <div className={styles.chips} role="group" aria-label={`Characteristics of ${who}`}>
         <label className={`${styles.chip} ${styles.chipAll} ${everyStat ? styles.chipOn : ''} ${statsFree ? '' : styles.chipOff}`}>
@@ -91,7 +104,7 @@ function NpcBlock({ cid, n, before, released, open, own, onOwn, onChange, onRemo
   const preview = redactNpc(n);
   return (
     <details className={styles.block} open={open}>
-      <summary><strong>{n.name.trim() || 'New NPC'}</strong>{n.hidden.length > 0 && <small className={styles.secret}> ⚑ {n.hidden.length} hidden</small>}</summary>
+      <summary className={ui.fold}><span><strong>{n.name.trim() || 'New NPC'}</strong>{n.hidden.length > 0 && <small className={styles.secret}> ⚑ {n.hidden.length} hidden</small>}</span></summary>
       <div className={styles.blockBody}>
         <div className={styles.blockSide}>
           <div className={ui.field}>
@@ -101,7 +114,7 @@ function NpcBlock({ cid, n, before, released, open, own, onOwn, onChange, onRemo
           <HideParts n={n} fixed={fixed} onChange={(hidden) => onChange({ ...n, hidden })} />
           <div className={styles.preview}>
             <p className={styles.group}>As the players read it</p>
-            <p className={styles.previewName}><strong>{preview.name || '…'}</strong>{preview.type ? <small> {preview.type}</small> : null}</p>
+            <p className={styles.previewName}><strong>{preview.name || '…'}</strong></p>
             <NpcStats n={preview} marked={false} />
           </div>
           {fixed && fixed.length > 0 && <p className={ui.muted}>The players have read this NPC with {hiddenWords(fixed)} hidden. Those values can be shown, not changed.</p>}
@@ -130,6 +143,7 @@ export function ScenarioNpcsForm({ cid, s, others, templates, warbands, close, t
   const [fresh, setFresh] = useState<string | null>(null);
   const [copying, setCopying] = useState(false);
   const [bring, setBring] = useState('');
+  const [fromWorldKey, setFromWorldKey] = useState('');
   const released = s.visibility === 'public';
   const problem = released ? releasedChangeProblem(s.npcs, npcs) : null;
   const named = npcs.every((n) => n.name.trim());
@@ -141,6 +155,15 @@ export function ScenarioNpcsForm({ cid, s, others, templates, warbands, close, t
 
   const add = (n: ScenarioNpc) => { setNpcs((cur) => [...cur, n]); setFresh(n.id); };
   const fromModel = (t: OpponentTemplate) => { add(scenarioNpcFrom(newId(), t)); setCopying(false); };
+  // the NPCs made under World, straight from their list: the copy is a new NPC of this scenario with its own name
+  const worldNpcs = templates.filter((t) => t.kind === 'npc');
+  const worldGroups = [...new Set(worldNpcs.map((t) => t.source))].map((source) => ({ source, list: worldNpcs.filter((t) => t.source === source) }));
+  const fromWorld = () => {
+    const t = worldNpcs.find((x) => x.key === fromWorldKey);
+    if (!t) return;
+    add(scenarioNpcFrom(newId(), t));
+    setFromWorldKey('');
+  };
   const broughtAlong = others.flatMap((o) => o.npcs.map((n) => ({ key: `${o.id}/${n.id}`, label: `${n.name} · ${o.title}`, n })));
   const bringIn = () => {
     const found = broughtAlong.find((b) => b.key === bring);
@@ -160,6 +183,14 @@ export function ScenarioNpcsForm({ cid, s, others, templates, warbands, close, t
       <div className={styles.addRow}>
         <button type="button" className={ui.button} disabled={full} onClick={() => add(emptyScenarioNpc(newId()))}>New NPC</button>
         <button type="button" className={ui.buttonQuiet} disabled={full} aria-expanded={copying} onClick={() => setCopying((c) => !c)}>Copy from a model…</button>
+        <span className={styles.bring}>
+          <label htmlFor={`${ids}-w`} className={ui.muted}>Add an NPC of the world</label>
+          <select id={`${ids}-w`} className={ui.select} value={fromWorldKey} disabled={full || worldNpcs.length === 0} onChange={(e) => setFromWorldKey(e.target.value)}>
+            <option value="">{worldNpcs.length > 0 ? 'Choose a person…' : 'No NPC in the world yet'}</option>
+            {worldGroups.map((g) => <optgroup key={g.source} label={g.source}>{g.list.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}</optgroup>)}
+          </select>
+          <button type="button" className={ui.buttonQuiet} disabled={!fromWorldKey || full} onClick={fromWorld}>Add this one</button>
+        </span>
         {broughtAlong.length > 0 && (
           <span className={styles.bring}>
             <label htmlFor={`${ids}-b`} className={ui.muted}>Bring along from another scenario</label>
@@ -173,7 +204,7 @@ export function ScenarioNpcsForm({ cid, s, others, templates, warbands, close, t
       </div>
       {full && <p className={ui.muted} role="status">A scenario holds at most {MAX_NPCS} NPCs.</p>}
       {copying && <TemplatePicker cid={cid} warbands={warbands} extra={templates} verb="Copy" done="Close" onPick={fromModel} onClose={() => setCopying(false)} />}
-      {npcs.length === 0 && <p className={ui.message}>No NPC yet. Start a new one, or copy a model of the game, an NPC of the world or one from another scenario.</p>}
+      {npcs.length === 0 && <p className={ui.message}>No NPC yet. Start a new one, copy a model of the game, add an NPC of the world or bring one along from another scenario.</p>}
       <div className={styles.blocks}>
         {npcs.map((n) => (
           <NpcBlock key={n.id} cid={cid} n={n} before={s.npcs.find((x) => x.id === n.id) ?? null} released={released} open={n.id === fresh || npcs.length <= 3}

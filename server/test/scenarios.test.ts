@@ -229,7 +229,7 @@ describe('the log', () => {
 
 /* The NPCs of a scenario (ADR 0022): the leader hides parts of them; after the release everyone but a leader with the authenticator reads a "?" there. */
 const GERHARD = {
-  name: 'Gerhard QUOKKA-Voss', type: 'Hero', profile: { M: '4', WS: 'QUOKKA-9', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
+  name: 'Gerhard QUOKKA-Voss', type: 'QUOKKA-Hero', profile: { M: '4', WS: 'QUOKKA-9', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
   skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook', rules: 'QUOKKA kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'QUOKKA Ogre (Rulebook)' },
 };
 const npc = (over: Record<string, unknown> = {}) => ({ id: randomUUID(), ...GERHARD, hidden: ['name', 'WS', 'rules'], ...over });
@@ -280,7 +280,7 @@ describe('the NPCs of a scenario', () => {
       expect(body).not.toMatch(/QUOKKA/);
       expect(body).not.toMatch(/Gerhard|Voss/);
       const n = (await list(who)).scenarios[0]!.npcs[0]!;
-      expect(n).toMatchObject({ name: '?', type: '?', hidden: ['name', 'WS', 'rules'], profile: { M: '4', WS: '?', BS: '3' }, sv: '5+', rules: '?', equipment: 'Boat hook', from: null });
+      expect(n).toMatchObject({ name: '?', type: '', hidden: ['name', 'WS', 'rules'], profile: { M: '4', WS: '?', BS: '3' }, sv: '5+', rules: '?', equipment: 'Boat hook', from: null });
       expect(n.skills).toEqual([{ name: 'Strongman', text: 'Hits harder.' }]);
     }
     // the leader with the authenticator reads it all
@@ -292,7 +292,9 @@ describe('the NPCs of a scenario', () => {
     const { anna, kai, base, bid, draft, list } = await table();
     const { sid } = await draft({ npcs: [npc({ hidden: [] })] });
     await anna('POST', `${base}/${sid}/release`, { battleId: bid });
-    expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: 'Gerhard QUOKKA-Voss', profile: { WS: 'QUOKKA-9' }, rules: 'QUOKKA kills witnesses', hidden: [], from: null });
+    // ... except for its type, which the players never read: not as it is, not as a "?" (Rob, 20.10.2026), while the leader keeps it
+    expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: 'Gerhard QUOKKA-Voss', profile: { WS: 'QUOKKA-9' }, rules: 'QUOKKA kills witnesses', hidden: [], from: null, type: '' });
+    expect((await list(anna)).scenarios[0]!.npcs[0]).toMatchObject({ type: 'QUOKKA-Hero' });
   });
 });
 

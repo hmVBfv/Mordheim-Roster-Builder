@@ -196,7 +196,7 @@ describe('leak-test matrix', () => {
     scenario(theirs, victim.id, 'SCENARIO-SECRET: the ambush', 'SCENARIO-SECRET: the Countess’s men wait at the ferry.');
     // a played scenario with an NPC whose name, a characteristic, skills and rules are hidden: the player reads "?" there (ADR 0022)
     const playedScenario = scenario(theirs, victim.id, 'The night at the ferry', 'Rules of the night.', [{
-      id: randomUUID(), name: 'NPC-HIDDEN-SECRET Voss', type: 'Hero', profile: { M: '4', WS: 'NPC-HIDDEN-SECRET' }, sv: '5+', skills: [{ name: 'NPC-HIDDEN-SECRET skill', text: '' }],
+      id: randomUUID(), name: 'NPC-HIDDEN-SECRET Voss', type: 'NPC-HIDDEN-SECRET Hero', profile: { M: '4', WS: 'NPC-HIDDEN-SECRET' }, sv: '5+', skills: [{ name: 'NPC-HIDDEN-SECRET skill', text: '' }],
       equipment: 'Boat hook', rules: 'NPC-HIDDEN-SECRET rule', from: { kind: 'hired', key: 'hired/ogre', label: 'NPC-HIDDEN-SECRET Ogre' }, hidden: ['name', 'WS', 'skills', 'rules'],
     }]);
     const played = releaseScenario(s.db, theirs.id, playedScenario, battle.id, victim.id, t0);
