@@ -131,15 +131,25 @@ For several numbers or `all`:
 
 1. Triage them all first (section 2) and show Rob the short list. Then go on
    without waiting – the argument was the request – except for the reports below.
-2. **Order:** S1 first, then S2, S3, S4; within a severity the lower number first.
+2. **Order: you decide.** After triage, work out what depends on what – a fix
+   that another one builds on, two reports with one cause, a fix that makes
+   another test pass or fail, two touching the same code – and choose the order
+   that makes the whole run cheapest and safest. Without such ties, S1 first,
+   then S2, S3, S4, the lower number first. Say the order and the reasons in
+   one line each in the list before you start.
+   - Reports with **one cause**: one branch and one pull request that fixes
+     them all (each with its own regression test and its own `Fix #N`).
+   - A report that **needs another fix first**: its branch starts from the
+     other fix's branch instead of `origin/master`, and its pull request says
+     that it contains the other one and which to merge first.
 3. **Not fixed in the run, left for Rob** (say so in the list): a rules issue
    (section 3), a wish, a report you cannot understand, a duplicate, and any fix
    that needs a decision that could reasonably go either way.
 4. **One report at a time, completely:** a branch from `origin/master`
-   (`git fetch origin` before each; never stacked on the previous fix), the
+   (`git fetch origin` before each; stacked only on a fix it depends on, see 2), the
    steps of section 4 up to the pull request, then back to a clean
    `git checkout --detach origin/master` before the next. One report, one
-   branch, one pull request.
+   branch, one pull request (except reports with one cause, see 2).
 5. Do not wait for Rob to merge between reports. Do not wait for the CI of one
    pull request before starting the next, but look at every pull request's CI at
    the end and report one that is red.

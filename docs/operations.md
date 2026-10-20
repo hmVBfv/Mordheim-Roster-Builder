@@ -313,7 +313,7 @@ die Sitzung bekommt es nie in die Hand. (Quelle:
    nicht) und dort `/bugs` sagen. Zur Probe: „führe `npm run bugs -- list`
    aus“ – es zeigt die Meldungen.
 
-**Aufruf:** `/bugs` sortiert alle offenen Meldungen ein und ändert nichts; `/bugs 12` behebt eine; `/bugs 12 14 15` mehrere; `/bugs all` alle offenen – jeweils nacheinander, ein Zweig und ein Pull Request je Meldung, jede von `origin/master` aus. Regelfragen, Wünsche, Unverständliches und Dubletten bleiben bei dir; eine Meldung, die nicht gelingt, wird übersprungen und genannt, nie halb gepusht. Zum Schluss steht die Reihenfolge zum Mergen in der Antwort.
+**Aufruf:** `/bugs` sortiert alle offenen Meldungen ein und ändert nichts; `/bugs 12` behebt eine; `/bugs 12 14 15` mehrere; `/bugs all` alle offenen – jeweils nacheinander, ein Zweig und ein Pull Request je Meldung, jede von `origin/master` aus. Die Reihenfolge wählt Claude selbst nach Abhängigkeiten und nennt sie vorab (gleiche Ursache: ein PR; baut eine Meldung auf einer anderen auf: gestapelt, der PR sagt, was zuerst zu mergen ist); ohne Abhängigkeit zuerst die schweren. Regelfragen, Wünsche, Unverständliches und Dubletten bleiben bei dir; eine Meldung, die nicht gelingt, wird übersprungen und genannt, nie halb gepusht. Zum Schluss steht die Reihenfolge zum Mergen in der Antwort.
 
 *Rückfall, wenn die Umgebung keine „Network secrets“ anbietet* (z. B. in einem
 Team-Plan ohne Adminrolle sieht das Formular anders aus): Das Token als
