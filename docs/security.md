@@ -117,6 +117,19 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
     Sitzung mit neuem Token.
   - RFC 6238 (HMAC-SHA1, 30 Sekunden, 6 Ziffern), ein Zeitschritt Spiel in
     jede Richtung, jeder Code nur einmal.
+  - Der Code aus der App geht mit der sechsten Ziffer von selbst ab (Rob,
+    20.10.2026; die meisten Anmeldungen machen es so). Für den Server ändert
+    das nichts: Er prüft den Code wie vorher, die Bremse zählt jeden Versuch,
+    Fail2Ban jeden Fehlschlag, und wer die Bremse umgehen will, ruft die
+    Schnittstelle ohnehin nicht über das Formular auf. Neu ist nur, dass ein
+    Tippfehler an der sechsten Ziffer als Versuch zählt, bevor man ihn sehen
+    konnte – von fünf freien in 15 Minuten. Darum steht der falsche Code
+    markiert im Feld und geht erst nach einer Änderung wieder ab, ein
+    zweiter Versuch ist nie unterwegs, bevor der erste beantwortet ist, und
+    ein Hinweis unter dem Feld sagt es vorher (kein unangekündigter
+    Kontextwechsel für Screenreader). Wiederherstellungscodes haben keine
+    feste Länge und bleiben beim Knopf „Confirm“, der Knopf gilt auch für
+    den App-Code weiter. Test: `app/src/account/screens.test.tsx`.
   - Das Geheimnis liegt mit `TOTP_KEY` (aus `app.env`, nicht im Backup)
     verschlüsselt in der Datenbank: Eine Kopie der Datenbank allein verrät
     keine Codes. Ohne `TOTP_KEY` lässt sich kein Faktor einrichten. Auch
