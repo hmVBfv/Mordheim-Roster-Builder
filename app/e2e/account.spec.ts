@@ -138,10 +138,11 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await playServer(page, { stage: 'in', user: ADMIN });
     await page.goto('more');
-    const admin = page.getByRole('region', { name: /Admin/ });
-    await expect(admin.getByText('Admin only')).toBeVisible();
-    await admin.getByRole('link', { name: 'Users' }).click();
-    await expect(page.getByText('ben-the-unlucky')).toBeVisible();
+    // the admin's tools are a place of their own in the navigation, not a box on Account
+    await expect(page.getByRole('region', { name: /Admin/ })).toHaveCount(0);
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Admin' }).click();
+    await expect(page.getByText('Admin only')).toBeVisible();
+    await expect(page.getByRole('table', { name: 'Users' }).getByText('ben-the-unlucky')).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-admin-users`);
@@ -152,7 +153,7 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-admin-reset-link`);
     await page.goBack();
     await expect(sheet).toBeHidden();
-    await expect(page).toHaveURL(/\/admin\/users$/);
+    await expect(page).toHaveURL(/\/admin(\/users)?$/);
 
     await page.getByRole('link', { name: 'Invites' }).click();
     await page.getByLabel(/Who is it for/).fill('for Dana');
@@ -194,7 +195,7 @@ test('an invite: the account made from the link, the token gone from the address
 test('setting up the authenticator: the QR code, the first code, the recovery codes; Back closes the sheet', async ({ page }) => {
   await playServer(page, { stage: 'in', user: { ...ADMIN, totp: false, mustSetUpTotp: true } });
   await page.goto('more');
-  await expect(page.getByText('The admin tools open once your authenticator is set up.')).toBeVisible();
+  await expect(page.getByText(/Set it up to open the admin tools/)).toBeVisible();
   await shot(page, 'account-admin-without-authenticator');
   await page.getByRole('button', { name: 'Set up' }).click();
   const sheet = page.getByRole('dialog', { name: 'Authenticator' });
@@ -214,16 +215,22 @@ test('setting up the authenticator: the QR code, the first code, the recovery co
   await shot(page, 'authenticator-codes');
   await sheet.getByRole('button', { name: 'I have kept them' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Authenticator on.' })).toBeVisible();
-  await expect(page.getByRole('region', { name: /Admin/ }).getByRole('link', { name: 'Users' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Admin' })).toBeVisible();
 });
 
-test('the admin on a wide screen: the users side by side', async ({ page }) => {
+test('the admin on a wide screen: the users in a table, the tools in the side navigation', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await playServer(page, { stage: 'in', user: ADMIN });
   await page.goto('admin/users');
-  const cards = page.getByRole('listitem').filter({ hasText: /Last seen|Never signed in/ });
-  await expect(cards).toHaveCount(3);
-  const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
-  expect(Math.round(a!.y)).toBe(Math.round(b!.y));
+  const table = page.getByRole('table', { name: 'Users' });
+  await expect(table.getByRole('row')).toHaveCount(4);
+  const [a, b] = await Promise.all([table.getByRole('row').nth(1).boundingBox(), table.getByRole('row').nth(2).boundingBox()]);
+  // one row under the other, all columns in one line
+  expect(b!.y).toBeGreaterThan(a!.y);
+  await expect(table.getByRole('columnheader', { name: 'Last seen' })).toBeVisible();
+  const nav = page.getByRole('navigation', { name: 'Main' });
+  await expect(nav.getByRole('link', { name: 'Audit log' })).toBeVisible();
+  // the tabs on top are for the phone
+  await expect(page.getByRole('navigation', { name: 'Admin' })).toBeHidden();
   await shot(page, 'admin-users-desktop');
 });

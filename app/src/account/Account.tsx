@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { api, errorText, type Me } from './api.ts';
+import { api, errorText } from './api.ts';
 import styles from './Account.module.css';
 import { AuthenticatorRow } from './Authenticator.tsx';
 import { MIN_PASSWORD } from './LinkAccept.tsx';
@@ -107,27 +107,6 @@ function Devices({ onNotice }: { onNotice: (t: string) => void }) {
   );
 }
 
-function AdminLinks({ user }: { user: Me }) {
-  return (
-    <section className={`${ui.card} ${styles.section}`} aria-labelledby="adm-h">
-      <div className={styles.head}>
-        <h2 id="adm-h">Admin</h2>
-        <span className={styles.adminOnly} title="Only the admin sees this"><span aria-hidden="true">⚑</span> Admin only</span>
-      </div>
-      {user.mustSetUpTotp ? (
-        <p className={ui.muted}>The admin tools open once your authenticator is set up.</p>
-      ) : (
-        <div className={ui.row}>
-          <Link className={ui.buttonQuiet} to="/admin/users">Users</Link>
-          <Link className={ui.buttonQuiet} to="/admin/invites">Invites</Link>
-          <Link className={ui.buttonQuiet} to="/admin/logins">Sign-ins</Link>
-          <Link className={ui.buttonQuiet} to="/admin/audit">Audit log</Link>
-        </div>
-      )}
-    </section>
-  );
-}
-
 export function AccountSection() {
   const session = useSession();
   const navigate = useNavigate();
@@ -201,7 +180,6 @@ export function AccountSection() {
         {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       </section>
       {session.status === 'in' && <Devices key={session.user.id} onNotice={notify} />}
-      {session.status === 'in' && session.user.isAdmin && <AdminLinks user={session.user} />}
       {notice}
     </>
   );

@@ -5,6 +5,7 @@
    five entries at the bottom and the campaign its tabs on top. */
 import { useEffect, useState } from 'react';
 import { useMatch } from 'react-router';
+import { TABS } from '../account/adminTabs.ts';
 import { useSession } from '../account/session.ts';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { cachedCampaign, type CampaignSummary } from '../campaign/api.ts';
@@ -42,7 +43,7 @@ function useCampaignsInPlay(enabled: boolean): CampaignSummary[] {
   return (all ?? []).filter((c) => !c.archived);
 }
 
-export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[] } {
+export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[]; admin: NavChild[] } {
   const session = useSession();
   const totp = session.status === 'in' && session.user.totp;
   const warbands = useWarbands(WARBANDS_IN_NAV) ?? [];
@@ -51,7 +52,7 @@ export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campai
   // the campaign open on the screen, as the device keeps it: its name and one's role in it, even when
   // it is archived or the list has not come yet (its sections must be reachable from the side)
   const open = useLiveQuery(() => (enabled && here ? cachedCampaign(here) : Promise.resolve(null)), [enabled, here]);
-  if (!enabled) return { warbands: [], campaign: [] };
+  if (!enabled) return { warbands: [], campaign: [], admin: [] };
   const entries = campaigns.map((c) => ({ id: c.id, name: c.name, role: c.role }));
   if (here && open && !entries.some((c) => c.id === here)) entries.push({ id: here, name: open.campaign.name, role: open.role });
   return {
@@ -59,6 +60,7 @@ export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campai
       ...warbands.map((w) => ({ to: `/warbands/${w.id}`, label: w.name || w.wbName })),
       { to: '/warbands/new', label: '+ New warband' },
     ],
+    admin: TABS.map((t) => ({ to: `/admin/${t.key}`, label: t.label })),
     campaign: entries.map((c) => ({
       to: `/campaign/${c.id}`, label: c.name,
       ...(c.id === here ? { children: campaignTabs(c.id, open?.role ?? c.role, !!totp) } : {}),

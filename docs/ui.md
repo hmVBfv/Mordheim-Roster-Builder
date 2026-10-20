@@ -63,6 +63,13 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Menü oder Einstellungen. Im Quick Build, der kein Konto hat, heißt es
   „Settings“ mit Zahnrad. Die Adresse bleibt `/more`; die Karte mit Anmeldung,
   Authenticator und Passwort darin heißt „Sign-in and security“.
+- **„Admin“ als eigener Ort (Rob, 20.10.2026):** Wer Admin ist, hat in der
+  Navigation einen sechsten Eintrag **Admin** vor Account (Handy: sechs Einträge
+  unten); sonst gibt es ihn nicht. Der Kasten „Admin“ auf Account entfällt. Die
+  Werkzeuge (Users, Invites, Sign-ins, Audit log, Reports) stehen am Handy als
+  Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
+  (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
+  zur Karte, deren Zellen ihre Spalte nennen.
 - **Seitenleiste mit Unterpunkten (Rob, 19.10.2026: „aufklappbare
   Unterreiter“):** ab 900 px öffnen sich Warbands und Campaign in ihre
   Einträge – unter Warbands die sechs zuletzt geänderten eigenen Warbands und
