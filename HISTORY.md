@@ -3529,3 +3529,14 @@ sketches – were 12 of the 21 minutes. They now run on their own, only when
 something under `docs/mockups/` changes, and the rest runs with several workers
 (three locally, two in the CI): about seven minutes locally. The tests stay;
 two that measured too early now wait for the thing they measure.
+
+## October 20, 2026 — `/bugs` for several reports at once
+
+`/bugs` fixed exactly one report. Rob asked for "all". The obvious version – fix
+them in one branch – would have produced one pull request that nobody can merge
+in parts. So the batch is a loop over the single case: S1 first, each report on
+its own branch from `origin/master` and in its own pull request, never stacked
+(stacked branches were what caused the merge conflicts of that day), and a
+report that does not work out is skipped and named, not pushed half-done. What
+stays with Rob is unchanged: rules issues, wishes, anything that needs a
+decision.
