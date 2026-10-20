@@ -35,7 +35,7 @@ export function NpcFields({ cid, warbands, extra, name, draft, onDraft, onCopied
   const [note, setNote] = useState('');
 
   const asOpponent = npcAsOpponent(name, draft.profile);
-  const setProfile = (p: OpponentProfile) => onDraft({ ...draft, profile: { type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, rules: p.rules, from: p.from } });
+  const setProfile = (p: OpponentProfile) => onDraft({ ...draft, profile: { type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, equipmentTips: p.equipmentTips, rules: p.rules, from: p.from } });
   const copy = (t: OpponentTemplate) => {
     onDraft({ ...draft, mode: 'values', profile: npcProfileFrom(t) });
     onCopied(t.name);

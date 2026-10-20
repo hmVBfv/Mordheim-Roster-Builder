@@ -37,6 +37,7 @@ export * from './campaign/analysis.ts';
 export * from './campaign/file.ts';
 export * from './campaign/forms.ts';
 export * from './campaign/opponents.ts';
+export * from './campaign/equipment.ts';
 export * from './campaign/npc.ts';
 export * from './campaign/scenarioNpc.ts';
 export * from './export/rulesText.ts';

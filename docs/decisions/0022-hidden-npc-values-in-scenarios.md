@@ -26,6 +26,17 @@ Leiter ihm gegeben hat.
   Werte (M WS BS S T W I A Ld, Sv) oder alle, Fertigkeiten, Ausrüstung,
   Sonderregeln – oder mit einem Haken **alles** („Hide everything“, jeder Teil,
   den es gibt). Er wählt sie beim Anlegen oder Ändern.
+- **Die Tooltips der Ausrüstung** (`equipmentTips`: je Gegenstand Name und
+  Text, was er kann) sind ein **eigener verborgener Teil**: Die Spieler sehen
+  die riesige Sichel in der Hand des Gegners und müssen nicht gleich ihre Werte
+  kennen (Rob, 20.10.2026). Der Leiter wählt die Gegenstände aus allem
+  Ausrüstungsmaterial der Datenbank (`data/equipment.json`) oder schreibt sie
+  von Hand; die Tooltips kommen aus der Datenbank (Preis, Regeln, Reichweite)
+  oder aus seiner Feder und lassen sich beim Einfügen abwählen. Verborgen
+  ersetzt der Server sie durch ein einziges „?“ (auch wenn der Gegenstand nie
+  einen Tooltip hatte: ein „?“ verrät nicht, ob es einen gab). **Verborgene
+  Ausrüstung nimmt ihre Tooltips mit** – schon die Namen der Tooltips verrieten
+  den Gegenstand –; die Spieler lesen dann gar keine.
 - Für alle, die nicht Leiter mit Authenticator sind, ersetzt **der Server** jeden
   verborgenen Teil durch „?“, bevor er antwortet (ADR 0011). Der Wert verlässt
   den Server nicht. Auch der Hinweis, woher der NPC kopiert wurde (`from`), fällt
@@ -44,6 +55,9 @@ Leiter ihm gegeben hat.
   wird nachträglich verborgen, und ein NPC mit verborgenen Teilen bleibt
   (Versionen sind append-only, [0003](0003-versions-append-only.md)). Der Server
   antwortet sonst mit 409 `frozen`. Aufgedeckt bleibt aufgedeckt.
+- Die Tooltips folgen denselben Regeln nach der Freigabe wie jeder andere Teil
+  (`equipmentTips` ist ein Wert von `hidden`): gesperrt, solange verborgen,
+  aufdeckbar, nie nachträglich verborgen.
 - Jede Aufdeckung nach der Freigabe steht im Log als `scenario.reveal`: welcher
   NPC, welche Teile – nie der Wert.
 

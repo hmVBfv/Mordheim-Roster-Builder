@@ -38,7 +38,7 @@ function useOwnSkills(cid: string) {
 
 const ONLY_STATS: readonly Hidable[] = STAT_PARTS;
 const OTHER_PARTS: { key: Hidable; label: string }[] = [
-  { key: 'skills', label: 'Skills' }, { key: 'equipment', label: 'Equipment' }, { key: 'rules', label: 'Special rules' },
+  { key: 'skills', label: 'Skills' }, { key: 'equipment', label: 'Equipment' }, { key: 'equipmentTips', label: 'Equipment tooltips' }, { key: 'rules', label: 'Special rules' },
 ];
 
 /** The checkboxes of what the players do not read: everything at once, or the name, every characteristic by itself or all of them, skills, equipment, rules.
@@ -68,7 +68,7 @@ function HideParts({ n, fixed, onChange }: { n: ScenarioNpc; fixed: readonly Hid
   return (
     <fieldset className={styles.hide}>
       <legend>Hide from the players</legend>
-      <p className={ui.muted}>A hidden part reads “?” in the scenario and in the Tabletop Simulator copy. You always read all of it.</p>
+      <p className={ui.muted}>A hidden part reads “?” in the scenario and in the Tabletop Simulator copy. You always read all of it. The players can read the name of an item and still not what it does: hide the tooltips. Hidden equipment takes its tooltips with it.</p>
       <div className={styles.chips}>
         <label className={`${styles.chip} ${styles.chipAll} ${everything ? styles.chipOn : ''} ${everythingFree ? '' : styles.chipOff}`}>
           <input ref={every} type="checkbox" checked={everything} disabled={!everythingFree} aria-label={`Hide everything of ${who}`} onChange={(e) => set(HIDABLE, e.target.checked)} />
@@ -100,7 +100,7 @@ function NpcBlock({ cid, n, before, released, open, own, onOwn, onChange, onRemo
   const revealed = released && before ? (revealedBy([before], [n])[0]?.parts ?? []) : [];
   const stays = released && before !== null && before.hidden.length > 0;
   const asOpponent = npcAsOpponent(n.name, n);
-  const set = (p: OpponentProfile) => onChange({ ...n, type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, rules: p.rules, from: p.from });
+  const set = (p: OpponentProfile) => onChange({ ...n, type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, equipmentTips: p.equipmentTips, rules: p.rules, from: p.from });
   const preview = redactNpc(n);
   return (
     <details className={styles.block} open={open}>

@@ -113,7 +113,7 @@ describe('writing', () => {
 /* Rob, 19.10.2026: an NPC gets its values in a form (characteristics, save, skills, equipment, rules) and can be a named, unique person;
    the text stays for the NPCs that have only that. */
 describe('the values of an NPC', () => {
-  const values = { type: 'Hero', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '6+', skills: [{ name: 'Step Aside', text: 'Dodges the first hit.' }], equipment: 'Dagger', rules: 'Knows every shoal', from: { kind: 'beast', key: 'beast/wardog', label: 'Wardog (Bestiary)' } };
+  const values = { type: 'Hero', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '6+', skills: [{ name: 'Step Aside', text: 'Dodges the first hit.' }], equipment: 'Dagger', equipmentTips: [{ name: 'Dagger', text: 'Close combat · Strength: as user — Parry.' }], rules: 'Knows every shoal', from: { kind: 'beast', key: 'beast/wardog', label: 'Wardog (Bestiary)' } };
 
   it('keeps the values and the named flag, and every member reads them; an NPC with only a text has neither', async () => {
     const { anna, kai, vic, base, get } = await table();

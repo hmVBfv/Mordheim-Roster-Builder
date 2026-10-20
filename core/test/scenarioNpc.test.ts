@@ -5,7 +5,7 @@ import * as core from '../src/index.ts';
 const base = (over: Partial<core.ScenarioNpc> = {}): core.ScenarioNpc => ({
   id: 'n1', name: 'Gerhard Voss', hidden: [], type: 'Hero',
   profile: { M: '4', WS: '5', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
-  skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook, light armour', rules: 'Kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'Ogre Bodyguard (Rulebook)' },
+  skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook, light armour', equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }], rules: 'Kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'Ogre Bodyguard (Rulebook)' },
   ...over,
 });
 
@@ -39,6 +39,31 @@ describe('redactNpc', () => {
     expect(core.redactNpc(base({ hidden: ['skills'] })).skills).toEqual([{ name: '?', text: '' }]);
   });
 
+  it('hides the tooltips of the equipment on their own: the players see what he carries, not what it does', () => {
+    const r = core.redactNpc(base({ hidden: ['equipmentTips'] }));
+    expect(r.equipment).toBe('Boat hook, light armour');
+    expect(r.equipmentTips).toEqual([{ name: '?', text: '' }]);
+    expect(JSON.stringify(r)).not.toContain('Reach');
+    // an item without a tooltip hides the same: a "?" does not say whether there was one
+    expect(core.redactNpc(base({ equipmentTips: [], hidden: ['equipmentTips'] })).equipmentTips).toEqual([{ name: '?', text: '' }]);
+    // shown, they are as written
+    expect(core.redactNpc(base()).equipmentTips).toEqual([{ name: 'Boat hook', text: 'Reach: strikes first.' }]);
+  });
+
+  it('hidden equipment takes its tooltips with it – their names would give it away', () => {
+    const r = core.redactNpc(base({ hidden: ['equipment'] }));
+    expect(r.equipment).toBe('?');
+    expect(r.equipmentTips).toEqual([]);
+    expect(core.redactNpc(base({ hidden: ['equipment', 'equipmentTips'] })).equipmentTips).toEqual([]);
+  });
+
+  it('copes with an NPC saved before tooltips existed', () => {
+    const old = { ...base() } as Partial<core.ScenarioNpc>;
+    delete old.equipmentTips;
+    expect(core.redactNpc(old as core.ScenarioNpc).equipmentTips).toEqual([]);
+    expect(core.redactNpc({ ...old, hidden: ['equipmentTips'] } as core.ScenarioNpc).equipmentTips).toEqual([{ name: '?', text: '' }]);
+  });
+
   it('hides a characteristic that was never filled in as well – the "?" does not say whether there was a value', () => {
     expect(core.redactNpc(base({ profile: { M: '4' }, hidden: ['BS'] })).profile.BS).toBe('?');
   });
@@ -48,7 +73,7 @@ describe('redactNpc', () => {
     const before = JSON.stringify(n);
     const out = JSON.stringify(core.redactNpc(n));
     expect(JSON.stringify(n)).toBe(before);
-    for (const secret of ['Gerhard', 'Voss', 'Strongman', 'Hits harder', 'Boat hook', 'Kills witnesses', 'Ogre', 'Hero', '5+', '"5"', '"8"']) expect(out, secret).not.toContain(secret);
+    for (const secret of ['Gerhard', 'Voss', 'Strongman', 'Hits harder', 'Boat hook', 'Reach', 'Kills witnesses', 'Ogre', 'Hero', '5+', '"5"', '"8"']) expect(out, secret).not.toContain(secret);
   });
 
   it('puts the parts in the order of the form, once each', () => {
@@ -66,6 +91,15 @@ describe('scenarioNpcCard', () => {
     expect(c.text).toContain('• ?');
     expect(c.text).not.toContain('Kills witnesses');
     expect(c.text).toContain('Boat hook, light armour');
+  });
+
+  it('carries the tooltips of the equipment under it, or a "?" for them', () => {
+    expect(core.scenarioNpcCard(base()).text).toContain('[5ACFFF]Equipment:[-] Boat hook, light armour\n[5ACFFF]Equipment tooltips:[-]\n• Boat hook: Reach: strikes first.');
+    const hid = core.scenarioNpcCard(base({ hidden: ['equipmentTips'] })).text;
+    expect(hid).toContain('Boat hook, light armour\n[5ACFFF]Equipment tooltips:[-]\n• ?');
+    expect(hid).not.toContain('Reach');
+    expect(core.scenarioNpcCard(base({ hidden: ['equipmentTips'] }), true).text).toContain('Reach: strikes first.');
+    expect(core.scenarioNpcCard(base({ equipmentTips: [] })).text).not.toContain('Equipment tooltips');
   });
 
   it('does not depend on the type: the name has the same colour for a hero and for a henchman', () => {
@@ -107,6 +141,14 @@ describe('releasedChangeProblem', () => {
     expect(core.releasedChangeProblem([hidden], [{ ...hidden, profile: { ...hidden.profile, WS: '3' } }])).toMatch(/cannot be changed.*WS/);
     expect(core.releasedChangeProblem([hidden], [{ ...hidden, hidden: ['name'], rules: 'Harmless' }])).toMatch(/cannot be changed.*rules/);
     expect(core.releasedChangeProblem([hidden], [{ ...hidden, name: 'Someone else' }])).toMatch(/cannot be changed.*name/);
+  });
+
+  it('the tooltips of the equipment are a hidden part like the others: kept once hidden, revealed or not', () => {
+    const tips = base({ hidden: ['equipmentTips'] });
+    expect(core.releasedChangeProblem([tips], [{ ...tips, equipment: 'Axe' }])).toBeNull();
+    expect(core.releasedChangeProblem([tips], [{ ...tips, hidden: [] }])).toBeNull(); // revealed, as it always was
+    expect(core.releasedChangeProblem([tips], [{ ...tips, equipmentTips: [{ name: 'Boat hook', text: 'Harmless.' }] }])).toMatch(/cannot be changed.*equipmentTips/);
+    expect(core.releasedChangeProblem([base()], [base({ hidden: ['equipmentTips'] })])).toMatch(/cannot be hidden.*equipmentTips/);
   });
 
   it('the type is nobody’s to read, so changing it concerns nobody', () => {

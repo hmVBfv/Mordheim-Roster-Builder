@@ -8,11 +8,12 @@
 import { useState } from 'react';
 import { OPPONENT_STATS, redactNpc, scenarioNpcCard, type Hidable, type ScenarioNpc } from '@mordheim/core';
 import { CopyField } from '../roster/TtsCard.tsx';
+import { EquipmentTips } from '../ui/EquipmentTips.tsx';
 import { EyeIcon, EyeOffIcon } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
 import styles from './Scenarios.module.css';
 
-const PART_LABEL: Record<Hidable, string> = { name: 'name', M: 'M', WS: 'WS', BS: 'BS', S: 'S', T: 'T', W: 'W', I: 'I', A: 'A', Ld: 'Ld', sv: 'Sv', skills: 'skills', equipment: 'equipment', rules: 'special rules' };
+const PART_LABEL: Record<Hidable, string> = { name: 'name', M: 'M', WS: 'WS', BS: 'BS', S: 'S', T: 'T', W: 'W', I: 'I', A: 'A', Ld: 'Ld', sv: 'Sv', skills: 'skills', equipment: 'equipment', equipmentTips: 'equipment tooltips', rules: 'special rules' };
 
 /** What the players read in place of the hidden parts, in words. */
 export const hiddenWords = (hidden: readonly Hidable[]): string => hidden.map((k) => PART_LABEL[k]).join(', ');
@@ -40,6 +41,7 @@ export function NpcView({ n, lead, onCopied }: { n: ScenarioNpc; lead: boolean; 
   const [asPlayers, setAsPlayers] = useState(false);
   const secret = lead && n.hidden.length > 0;
   const shown = secret && asPlayers ? redactNpc(n) : n;
+  const tips = shown.equipmentTips ?? [];
   const rules = shown.rules.split('\n').map((x) => x.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean);
   const table = scenarioNpcCard(n);
   return (
@@ -55,12 +57,13 @@ export function NpcView({ n, lead, onCopied }: { n: ScenarioNpc; lead: boolean; 
       {secret && !asPlayers && <p className={styles.secret}>⚑ The players read “?” for: {hiddenWords(n.hidden)}.</p>}
       {secret && asPlayers && <p className={styles.secret} role="status">This is the card as the players read it.</p>}
       <NpcStats n={shown} marked={lead && !asPlayers} />
-      {(shown.skills.length > 0 || shown.equipment.trim() || rules.length > 0) && (
+      {(shown.skills.length > 0 || shown.equipment.trim() || tips.length > 0 || rules.length > 0) && (
         <details className={styles.more}>
           <summary className={ui.fold}>Skills, equipment and rules</summary>
           <div className={styles.rules}>
             {shown.skills.length > 0 && <p><strong>Skills:</strong> {shown.skills.map((s) => s.name).join(', ')}</p>}
             {shown.equipment.trim() && <p><strong>Equipment:</strong> {shown.equipment.trim()}</p>}
+            <EquipmentTips tips={tips} />
             {rules.length > 0 && <ul>{rules.map((r, i) => <li key={`${i}:${r}`}>{r}</li>)}</ul>}
           </div>
         </details>

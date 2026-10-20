@@ -278,6 +278,26 @@ describe('the values of an NPC', () => {
     expect(n.getByText(/Copied from Big Grul \(NPC · no faction\)/)).toBeTruthy();
   });
 
+  it('arms a person from the equipment the game lists, and the card says what the items do', async () => {
+    const { srv, c } = scene();
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const n = await openForm(user);
+    await user.type(await n.findByLabelText('Name (English)'), 'Big Grul');
+    await user.click(await n.findByRole('button', { name: 'Add equipment' }, { timeout: 15_000 }));
+    const adder = within(await n.findByRole('group', { name: 'Add equipment' }, { timeout: 15_000 }));
+    await user.type(adder.getByLabelText('Find equipment'), 'sword breaker');
+    await user.click(adder.getByRole('button', { name: 'Add the equipment Sword breaker' }));
+    await user.click(n.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(srv.state.npcs.size).toBe(1));
+    const saved = [...srv.state.npcs.values()][0]!.profile as { equipment: string; equipmentTips: { name: string; text: string }[] };
+    expect(saved.equipment).toBe('Sword breaker');
+    expect(saved.equipmentTips).toEqual([{ name: 'Sword breaker', text: expect.stringMatching(/^Close combat — Parry/) }]);
+    const person = (await screen.findByText('Big Grul')).closest('li')!;
+    expect(within(person).getByText('Skills, equipment and rules').closest('details')!.textContent).toMatch(/Equipment tooltips:.*Sword breaker: Close combat — Parry/);
+    expect(person.textContent).toContain('[5ACFFF]Equipment tooltips:[-]'); // and the Tabletop Simulator card carries them
+  });
+
   it('an NPC written as text opens as text; “Values” reads what it can, and says so when there is nothing to read', async () => {
     const { srv, c } = scene();
     const old = srv.npcFrom(c.id, { nameEn: 'Old Marek', statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7 Sv 6+\nEquipment: Boat hook\n• Knows the river' });
