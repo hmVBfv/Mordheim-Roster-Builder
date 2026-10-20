@@ -3463,3 +3463,16 @@ tracker people have seen. So the button is now a beetle with its word, "Bug",
 next to it (an icon alone was the mistake, not only the picture), and it opens
 the form with the kind "Bug" already chosen. The form keeps its name,
 "Report a problem": it also takes wishes and wrong rules.
+
+## October 20, 2026 — the authenticator's code signs in by itself
+
+Rob asked whether the six digits could sign in without pressing Confirm, "under
+realistic security assumptions". They can: the server sees the same request
+and keeps checking it, and the brake counts the tries, so a form that sends a
+little earlier gives a guesser nothing – a guesser does not use the form. What
+changes is for the honest player: a typo at the sixth digit used to be
+correctable before it was sent and is now a try, one of the five free in 15
+minutes. So the wrong code stays in the field, selected, and is sent again only
+once it was edited; a try on its way blocks a second one; a line under the field
+says it before anybody types. The recovery codes have no length to wait for and
+keep the button.
