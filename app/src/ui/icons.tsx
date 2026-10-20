@@ -17,3 +17,7 @@ export const ChevronIcon = (): ReactElement => <svg {...base}><path d="M9 6l6 6-
 export const IconClose = (): ReactElement => <svg {...base}><path d="M6 6l12 12M18 6L6 18" /></svg>;
 export const IconEdit = (): ReactElement => <svg {...base}><path d="M4 20h4l11-11-4-4L4 16z" /><path d="M13 7l4 4" /></svg>;
 export const ReportIcon = (): ReactElement => <svg {...base}><path d="M5 21V4" /><path d="M5 4h13l-3 4.5L18 13H5" /></svg>;
+/** The eye of a password field: "show what is behind it" – here, what the players read of an NPC. */
+export const EyeIcon = (): ReactElement => <svg {...base}><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>;
+/** The same eye struck through: the players' view is on. */
+export const EyeOffIcon = (): ReactElement => <svg {...base}><path d="M2 12s3.6-6.5 10-6.5c2 0 3.7.6 5.2 1.4M22 12s-3.6 6.5-10 6.5c-2 0-3.7-.6-5.2-1.4" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /><path d="M4 4l16 16" /></svg>;

@@ -114,7 +114,7 @@ function Card({ s, lead, online, battleLabel, onEdit, onNpcs, onRelease, onRemov
           : <p className={styles.meta}>Played in {battleLabel}{s.releasedBy ? ` · released by ${s.releasedBy}` : ''}{s.edited ? ' · corrected since' : ''}</p>}
         {s.body && (
           <details className={styles.more}>
-            <summary>Rules</summary>
+            <summary className={ui.fold}>Rules</summary>
             <p className={styles.text}>{s.body}</p>
           </details>
         )}
@@ -128,7 +128,7 @@ function Card({ s, lead, online, battleLabel, onEdit, onNpcs, onRelease, onRemov
         )}
         {s.npcStatlines && (
           <details className={styles.more}>
-            <summary>NPC statlines</summary>
+            <summary className={ui.fold}>NPC statlines</summary>
             <pre className={styles.statline}>{s.npcStatlines}</pre>
           </details>
         )}

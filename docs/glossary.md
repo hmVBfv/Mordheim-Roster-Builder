@@ -239,7 +239,8 @@ Begriff einführt, trägt ihn hier ein.
 | Freigeben (Szenario) | Release | `POST …/scenarios/:sid/release { battleId }`: einer Schlacht zuweisen, danach `public` und nicht zurückzunehmen |
 | NPC-Werte | NPC statlines | `npc_statlines`; der freie Text, den die Spieler ganz lesen; „Copy statlines“ für den TTS-Tisch |
 | NPC eines Szenarios | Scenario NPC | `scenarios.npcs` (JSON, `ScenarioNpc` in `core/src/campaign/scenarioNpc.ts`): die Werte eines NPCs (`NpcProfile`) mit `id`, eigenem Namen und `hidden`; „Add NPCs“ / „Change NPCs“ |
-| Verborgener Teil | Hidden part | `hidden`: eines aus `HIDABLE` (`name`, `M`…`Ld`, `sv`, `skills`, `equipment`, `rules`); die Spieler lesen „?“, der Server ersetzt vor der Antwort ([ADR 0022](decisions/0022-hidden-npc-values-in-scenarios.md)); „All stats“ setzt alle Eigenschaften und Sv zugleich |
+| Verborgener Teil | Hidden part | `hidden`: eines aus `HIDABLE` (`name`, `M`…`Ld`, `sv`, `skills`, `equipment`, `rules`); die Spieler lesen „?“, der Server ersetzt vor der Antwort ([ADR 0022](decisions/0022-hidden-npc-values-in-scenarios.md)); „All stats“ setzt alle Eigenschaften und Sv zugleich, „Hide everything“ jeden Teil |
+| Spielersicht (Auge) | Players’ view | Knopf an der NPC-Karte eines Leiters (`NpcView.tsx`): zeigt die Karte mit `redactNpc`, wie die Spieler sie lesen; Standard ist die Leitersicht |
 | Zeigen (verborgener Teil) | Show / reveal | ein verborgener Teil wird aufgedeckt; nach der Freigabe der einzige erlaubte Weg, protokolliert als `scenario.reveal` |
 | Ruf | Reputation | `reputation_events` (Ereignis-Log; Stand = Summe) |
 | Ruf eintragen | Record reputation | `PUT …/world/reputation/:rid`; wird nie geändert, nur herausgenommen („Take out“) |

@@ -3453,3 +3453,20 @@ hidden: an NPC that was still a mystery stays one until the leader decides
 otherwise. A wrong turn worth keeping: the first version labelled the name
 field "Name" and the hide-checkbox "Name" as well, and the test (and a screen
 reader) could not tell them apart – the field is now "Name of the NPC".
+
+## October 20, 2026 — NPCs without a type, with an eye, and straight from the world
+
+Rob's list after playing with the scenario NPCs: the type must never show, not
+even as a "?" ("too meta for our table"); one click should hide everything; the
+fold-outs under a card should look like something one can open; and the people
+made under World should be addable right where the NPCs of a scenario are. The
+first answer to the type was the obvious one – leave it out of the form. The
+wrong turn would have been to stop there: the server still sent it to the
+players (with a "?" when the name was hidden), and the Tabletop Simulator card
+took its name colour from it. So `redactNpc` now sends the type empty, whoever
+reads, the card does not depend on it, and a leak test carries a marker in the
+type. The eye next to the password field was Rob's picture for the leader and
+player views of a card; it is a toggle per card, leader's view by default, and
+only NPCs with something hidden have one – on the others there is nothing to
+compare. "Hide everything" is every part of `HIDABLE`, not a list of its own, so
+a part added later is in it without anybody remembering.

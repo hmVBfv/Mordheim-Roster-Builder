@@ -7,7 +7,8 @@
 .draft { border-style: dashed; }
 .meta { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
 .secret { margin: 0; font-weight: 600; }
-.more summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.more { margin-top: var(--space-1); }
+.more > :not(summary) { margin-top: var(--space-2); }
 .text { margin: 0; padding: var(--space-2); white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; }
 .statline { margin: 0; padding: var(--space-2); white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; }
 
@@ -15,8 +16,10 @@
 .npcs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
 .npc { display: grid; gap: var(--space-1); align-content: start; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
 .npcHidden { border-style: dashed; }
-.npcHead { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
-.npcHead small { color: var(--text-muted); }
+.npcHead { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.eye { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--tap); padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: inherit; font: inherit; font-size: 0.9rem; cursor: pointer; }
+.eye:hover { background: var(--surface-2); }
+.eyeOn { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 16%, var(--bg)); font-weight: 700; }
 .statsWrap { overflow-x: auto; }
 .stats { width: 100%; border-collapse: collapse; text-align: center; font-variant-numeric: tabular-nums; }
 .stats th, .stats td { padding: 2px var(--space-1); border: 1px solid var(--border); min-width: 1.9rem; }
@@ -39,7 +42,7 @@
 .bring select { width: auto; min-width: 14rem; max-width: 100%; }
 .blocks { display: grid; gap: var(--space-3); }
 .block { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
-.block > summary { min-height: var(--tap); display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-3); cursor: pointer; }
+.block > summary { border: 0; background: transparent; }
 .blockBody { display: grid; gap: var(--space-3); padding: var(--space-2) var(--space-3) var(--space-3); border-top: 1px solid var(--border); }
 .blockSide, .blockMain { display: grid; gap: var(--space-3); align-content: start; min-width: 0; }
 
