@@ -1,6 +1,6 @@
 ---
-description: Go through the open problem reports of Mordheim Campaign – triage, and fix the one Rob names. On request only (ADR 0012).
-argument-hint: "[number]"
+description: Go through the open problem reports of Mordheim Campaign – triage, and fix the one (or several, or all) Rob names. On request only (ADR 0012).
+argument-hint: "[number … | all]"
 allowed-tools: Bash(npm run bugs:*)
 ---
 
@@ -15,7 +15,13 @@ with a failing regression test, both repositories are public.
 
 Argument: `$ARGUMENTS`
 - no argument → triage every open report and say what you propose; fix nothing yet;
-- a report number → triage that one and fix it (Rob naming it is the request).
+- a report number → triage that one and fix it (Rob naming it is the request);
+- several numbers (`12 14 15`, `12,14`) → triage those and fix them one after
+  the other (section 6);
+- `all` or `list` (also "alle", "liste") → triage every open report, then fix
+  every one that can be fixed, one after the other (section 6). Rob saying
+  `all` is the request for all of them, and only for the reports that are open
+  now.
 
 ## What a report is
 
@@ -119,7 +125,36 @@ Only then – the reporter reads "fixed in …" and expects it to be live:
 3. A report that turns out not to be a problem: `--status closed`, and say why to
    Rob. Closing lets go of the attached warband copy.
 
+## 6. Several reports in one run
+
+For several numbers or `all`:
+
+1. Triage them all first (section 2) and show Rob the short list. Then go on
+   without waiting – the argument was the request – except for the reports below.
+2. **Order:** S1 first, then S2, S3, S4; within a severity the lower number first.
+3. **Not fixed in the run, left for Rob** (say so in the list): a rules issue
+   (section 3), a wish, a report you cannot understand, a duplicate, and any fix
+   that needs a decision that could reasonably go either way.
+4. **One report at a time, completely:** a branch from `origin/master`
+   (`git fetch origin` before each; never stacked on the previous fix), the
+   steps of section 4 up to the pull request, then back to a clean
+   `git checkout --detach origin/master` before the next. One report, one
+   branch, one pull request.
+5. Do not wait for Rob to merge between reports. Do not wait for the CI of one
+   pull request before starting the next, but look at every pull request's CI at
+   the end and report one that is red.
+6. If a report fails (the test cannot reproduce it, the fix grows beyond the
+   report, the check stays red): stop that report, set it back to `confirmed`
+   with nothing half-done on the branch (delete it unpushed), say why in the
+   final list, and go on with the next. Never push a failing fix.
+7. Fixes in the same area can conflict when Rob merges them. If you know two
+   touch the same file, say so, and name the order to merge them in.
+8. Section 5 happens later and per report, after Rob says what is merged and
+   deployed.
+
 ## Finish
 
 Say to Rob in two or three German sentences what happened to which report, and
-which step is his next. Not a recap of every command.
+which step is his next. Not a recap of every command. After a run of several
+reports: a short list, one line per report – number, pull request link or why it
+was left, and the order to merge in.

@@ -313,6 +313,8 @@ die Sitzung bekommt es nie in die Hand. (Quelle:
    nicht) und dort `/bugs` sagen. Zur Probe: „führe `npm run bugs -- list`
    aus“ – es zeigt die Meldungen.
 
+**Aufruf:** `/bugs` sortiert alle offenen Meldungen ein und ändert nichts; `/bugs 12` behebt eine; `/bugs 12 14 15` mehrere; `/bugs all` alle offenen – jeweils nacheinander, ein Zweig und ein Pull Request je Meldung, jede von `origin/master` aus. Regelfragen, Wünsche, Unverständliches und Dubletten bleiben bei dir; eine Meldung, die nicht gelingt, wird übersprungen und genannt, nie halb gepusht. Zum Schluss steht die Reihenfolge zum Mergen in der Antwort.
+
 *Rückfall, wenn die Umgebung keine „Network secrets“ anbietet* (z. B. in einem
 Team-Plan ohne Adminrolle sieht das Formular anders aus): Das Token als
 Variable `ROSTER_BUG_TOKEN=rbt_…` eintragen und unter „Network access“ auf
