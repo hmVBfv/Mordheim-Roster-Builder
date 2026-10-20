@@ -12,13 +12,20 @@ const base = (over: Partial<core.ScenarioNpc> = {}): core.ScenarioNpc => ({
 describe('redactNpc', () => {
   it('changes nothing that is not hidden – except where it was copied from, which is the leader’s own note', () => {
     const r = core.redactNpc(base());
-    expect(r).toEqual({ ...base(), from: null });
+    expect(r).toEqual({ ...base(), from: null, type: '' });
   });
 
-  it('makes a "?" of the name (and the type, which would give it away), of single characteristics, of the save', () => {
+  it('never shows the type – not as a "?" either: it is too much of the game for our table (Rob, 20.10.2026)', () => {
+    for (const hidden of [[], ['name'], [...core.HIDABLE]] as core.Hidable[][]) {
+      const out = core.redactNpc(base({ type: 'Henchman (Gnoblar)', hidden }));
+      expect(out.type, hidden.join()).toBe('');
+      expect(JSON.stringify(out), hidden.join()).not.toContain('Gnoblar');
+    }
+  });
+
+  it('makes a "?" of the name, of single characteristics, of the save', () => {
     const r = core.redactNpc(base({ hidden: ['name', 'WS', 'Ld', 'sv'] }));
     expect(r.name).toBe('?');
-    expect(r.type).toBe('?');
     expect(r.profile).toEqual({ M: '4', WS: '?', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '?' });
     expect(r.sv).toBe('?');
     expect(r.equipment).toBe('Boat hook, light armour');
@@ -61,6 +68,13 @@ describe('scenarioNpcCard', () => {
     expect(c.text).toContain('Boat hook, light armour');
   });
 
+  it('does not depend on the type: the name has the same colour for a hero and for a henchman', () => {
+    for (const all of [false, true]) {
+      expect(core.scenarioNpcCard(base({ type: 'Henchman' }), all)).toEqual(core.scenarioNpcCard(base({ type: 'Hero' }), all));
+      expect(core.scenarioNpcCard(base({ type: 'Animal' }), all).name).toBe(core.scenarioNpcCard(base({ type: '' }), all).name);
+    }
+  });
+
   it('the leader may have the whole card for his own use', () => {
     const c = core.scenarioNpcCard(base({ hidden: ['name', 'WS'] }), true);
     expect(c.name).toBe('[B8860B]Gerhard Voss[-]');
@@ -93,7 +107,11 @@ describe('releasedChangeProblem', () => {
     expect(core.releasedChangeProblem([hidden], [{ ...hidden, profile: { ...hidden.profile, WS: '3' } }])).toMatch(/cannot be changed.*WS/);
     expect(core.releasedChangeProblem([hidden], [{ ...hidden, hidden: ['name'], rules: 'Harmless' }])).toMatch(/cannot be changed.*rules/);
     expect(core.releasedChangeProblem([hidden], [{ ...hidden, name: 'Someone else' }])).toMatch(/cannot be changed.*name/);
-    expect(core.releasedChangeProblem([hidden], [{ ...hidden, type: 'Animal' }])).toMatch(/cannot be changed.*name/); // the type goes with the name
+  });
+
+  it('the type is nobody’s to read, so changing it concerns nobody', () => {
+    const hidden = base({ hidden: ['name', 'WS', 'rules'] });
+    expect(core.releasedChangeProblem([hidden], [{ ...hidden, type: 'Animal' }])).toBeNull();
   });
 
   it('refuses to hide what the players have read, and to take out an NPC that has hidden parts', () => {

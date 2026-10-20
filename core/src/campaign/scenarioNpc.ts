@@ -34,7 +34,7 @@ export const scenarioNpcFrom = (id: string, t: OpponentTemplate): ScenarioNpc =>
 /** The same parts once, in the order of `HIDABLE`. */
 export const normalizeHidden = (hidden: readonly string[]): Hidable[] => HIDABLE.filter((k) => hidden.includes(k));
 
-/** An NPC as the players read it: every hidden part a "?". Where it was copied from is the leader's own note and goes; with the name hidden the type goes too, it would give the name away. */
+/** An NPC as the players read it: every hidden part a "?". Where it was copied from is the leader's own note and goes. The type is never read by anybody, not even as a "?": it is too much of the game for our table (Rob, 20.10.2026), so it goes out empty. */
 export function redactNpc(n: ScenarioNpc): ScenarioNpc {
   const hidden = new Set<string>(n.hidden);
   const profile = { ...n.profile };
@@ -42,7 +42,7 @@ export function redactNpc(n: ScenarioNpc): ScenarioNpc {
   return {
     id: n.id, hidden: normalizeHidden(n.hidden),
     name: hidden.has('name') ? HIDDEN_MARK : n.name,
-    type: hidden.has('name') ? HIDDEN_MARK : n.type,
+    type: '',
     profile,
     sv: hidden.has('sv') ? HIDDEN_MARK : n.sv,
     // skills are read as rules in the card: with the rules hidden as well, one "?" says it
@@ -53,16 +53,17 @@ export function redactNpc(n: ScenarioNpc): ScenarioNpc {
   };
 }
 
-/** The two fields of the Tabletop Simulator card, as the table gets them: hidden parts a "?" (`all`: every value, for the leader's own use). */
+/** The two fields of the Tabletop Simulator card, as the table gets them: hidden parts a "?" (`all`: every value, for the leader's own use).
+    The type plays no part: the name has the colour of every NPC, whoever copies the card. */
 export function scenarioNpcCard(n: ScenarioNpc, all = false): { name: string; text: string } {
   const shown = all ? n : redactNpc(n);
-  const card = npcAsOpponent(shown.name, shown);
+  const card = npcAsOpponent(shown.name, { ...shown, type: '' });
   return { name: ttsOpponentName(card), text: ttsOpponentText(card) };
 }
 
-/** What a hidden part holds, as one string to compare. The name carries the type, which goes with it. */
+/** What a hidden part holds, as one string to compare. */
 function valueOf(n: ScenarioNpc, k: Hidable): string {
-  if (k === 'name') return `${n.name}\u0000${n.type}`;
+  if (k === 'name') return n.name;
   if (k === 'sv') return n.sv;
   if (k === 'skills') return JSON.stringify(n.skills.map((s) => [s.name, s.text]));
   if (k === 'equipment') return n.equipment;
