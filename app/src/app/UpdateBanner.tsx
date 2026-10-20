@@ -9,7 +9,7 @@ export function UpdateBanner() {
     return (
       <div className={styles.banner} role="status">
         <span>New version available.</span>
-        <button type="button" className={styles.bannerAction} onClick={() => { void updateServiceWorker(true); }}>Reload</button>
+        <button type="button" className={styles.bannerAction} onClick={() => { setNeedRefresh(false); void updateServiceWorker(true); }}>Reload</button>
         <button type="button" className={styles.bannerQuiet} onClick={() => setNeedRefresh(false)}>Later</button>
       </div>
     );
