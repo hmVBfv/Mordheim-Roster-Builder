@@ -287,6 +287,7 @@ heißt deshalb **Hintergrund / Background**, nicht „Roter Faden“.
 | Leak-Test | Leak test | CI-Matrix Rolle × Endpunkt × Sichtbarkeit |
 | Schweregrad | Severity | `S1`–`S4` |
 | Problemmeldung | Report a problem | Tabelle `bugs`, `app/src/bugs/` |
+| Bug-Knopf (Käfer im Kopf jeder Seite) | Report a bug | `ReportProblem.tsx`, `BugIcon` |
 | Spur (die letzten Schritte vor einer Meldung) | Trail | `app/src/bugs/trail.ts` |
 | Technische Angaben (einer Meldung) | What goes along | `app/src/bugs/context.ts`, `bugs.context` |
 | Für Claude kopieren | Copy for Claude | `reportText` in `app/src/bugs/text.ts` (Übergabe von Hand, ADR 0018) |
