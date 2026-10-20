@@ -22,6 +22,9 @@ export const OPPONENT_STATS: readonly StatKey[] = ['M', 'WS', 'BS', 'S', 'T', 'W
 /** A skill on a profile: from the game, from the campaign's own skills (`ref`), or written in by hand. The text is the tooltip. */
 export interface OpponentSkill { name: string; text: string; ref?: string }
 
+/** The tooltip of a piece of equipment on a profile: what the item does, from the game's list or written in. It is hidden from the players on its own (ADR 0022). */
+export interface EquipmentTip { name: string; text: string }
+
 export type TemplateKind = 'unit' | 'hired' | 'dramatis' | 'beast' | 'warrior' | 'npc';
 export const TEMPLATE_KIND_NAMES: Record<TemplateKind, string> = { unit: 'Warband model', hired: 'Hired Sword', dramatis: 'Dramatis Persona', beast: 'Bestiary', warrior: 'Warrior of the campaign', npc: 'NPC of the campaign' };
 
@@ -39,6 +42,8 @@ export interface OpponentProfile {
   sv: string;
   skills: OpponentSkill[];
   equipment: string;
+  /** What the equipment does, item by item; a profile saved before they existed has none. */
+  equipmentTips: EquipmentTip[];
   /** Special rules, one per line. */
   rules: string;
   note: string;
@@ -59,6 +64,8 @@ export interface OpponentTemplate {
   sv: string;
   skills: OpponentSkill[];
   equipment: string;
+  /** Only an NPC of the campaign has them: a model of the game carries its gear by name. */
+  equipmentTips?: EquipmentTip[];
   rules: string;
   grade: string;
 }
@@ -144,9 +151,10 @@ export function searchTemplates(list: OpponentTemplate[], query: string, kinds?:
 
 /** A new profile copied from a template (or an empty one). */
 export function profileFrom(id: string, t: OpponentTemplate | null): OpponentProfile {
-  if (!t) return { id, name: '', type: 'Henchman', count: 1, profile: {}, sv: '', skills: [], equipment: '', rules: '', note: '', from: null };
+  if (!t) return { id, name: '', type: 'Henchman', count: 1, profile: {}, sv: '', skills: [], equipment: '', equipmentTips: [], rules: '', note: '', from: null };
   return {
-    id, name: t.name, type: t.type, count: t.count, profile: { ...t.profile }, sv: t.sv, skills: t.skills.map((s) => ({ ...s })), equipment: t.equipment, rules: t.rules, note: '',
+    id, name: t.name, type: t.type, count: t.count, profile: { ...t.profile }, sv: t.sv, skills: t.skills.map((s) => ({ ...s })), equipment: t.equipment,
+    equipmentTips: (t.equipmentTips ?? []).map((e) => ({ ...e })), rules: t.rules, note: '',
     from: { kind: t.kind, key: t.key, label: `${t.name} (${t.source})` },
   };
 }

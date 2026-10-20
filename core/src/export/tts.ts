@@ -108,5 +108,7 @@ export function ttsOpponentText(p: OpponentProfile): string {
     ...p.skills.map((s) => (s.text.trim() ? `${s.name}: ${s.text.trim()}` : s.name)),
   ];
   const rulesTxt = rules.length ? rules.map((r) => `• ${r}`).join('\n') : 'None';
-  return `${statline ? `[7AD1A4]${statline}[-]\n` : ''}[5ACFFF]Special Rules:[-]\n${rulesTxt}\n[5ACFFF]Equipment:[-] ${p.equipment.trim() || 'None'}`;
+  // what the equipment does, item by item, under it (a profile saved before they existed has none)
+  const tips = (p.equipmentTips ?? []).map((t) => `• ${t.text.trim() ? `${t.name}: ${t.text.trim()}` : t.name}`);
+  return `${statline ? `[7AD1A4]${statline}[-]\n` : ''}[5ACFFF]Special Rules:[-]\n${rulesTxt}\n[5ACFFF]Equipment:[-] ${p.equipment.trim() || 'None'}${tips.length ? `\n[5ACFFF]Equipment tooltips:[-]\n${tips.join('\n')}` : ''}`;
 }

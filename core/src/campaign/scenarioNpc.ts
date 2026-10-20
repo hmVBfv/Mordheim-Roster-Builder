@@ -10,8 +10,8 @@ import { ttsOpponentName, ttsOpponentText } from '../export/tts.ts';
 import { emptyNpcProfile, npcAsOpponent, npcProfileFrom, type NpcProfile } from './npc.ts';
 import { OPPONENT_STATS, type OpponentTemplate } from './opponents.ts';
 
-/** The parts of an NPC that can be hidden: the name, each characteristic, the save, skills, equipment, special rules. */
-export const HIDABLE = ['name', 'M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'sv', 'skills', 'equipment', 'rules'] as const;
+/** The parts of an NPC that can be hidden: the name, each characteristic, the save, skills, equipment, the tooltips of the equipment, special rules. */
+export const HIDABLE = ['name', 'M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld', 'sv', 'skills', 'equipment', 'equipmentTips', 'rules'] as const;
 export type Hidable = (typeof HIDABLE)[number];
 
 /** The characteristics and the save: what "all stats" means. */
@@ -48,6 +48,8 @@ export function redactNpc(n: ScenarioNpc): ScenarioNpc {
     // skills are read as rules in the card: with the rules hidden as well, one "?" says it
     skills: hidden.has('skills') ? (hidden.has('rules') ? [] : [{ name: HIDDEN_MARK, text: '' }]) : n.skills.map((s) => ({ name: s.name, text: s.text })),
     equipment: hidden.has('equipment') ? HIDDEN_MARK : n.equipment,
+    // the players may see the scythe and not what it does; hidden equipment takes its tooltips along, their names would give it away
+    equipmentTips: hidden.has('equipment') ? [] : hidden.has('equipmentTips') ? [{ name: HIDDEN_MARK, text: '' }] : (n.equipmentTips ?? []).map((t) => ({ name: t.name, text: t.text })),
     rules: hidden.has('rules') ? HIDDEN_MARK : n.rules,
     from: null,
   };
@@ -67,6 +69,7 @@ function valueOf(n: ScenarioNpc, k: Hidable): string {
   if (k === 'sv') return n.sv;
   if (k === 'skills') return JSON.stringify(n.skills.map((s) => [s.name, s.text]));
   if (k === 'equipment') return n.equipment;
+  if (k === 'equipmentTips') return JSON.stringify((n.equipmentTips ?? []).map((t) => [t.name, t.text]));
   if (k === 'rules') return n.rules;
   return n.profile[k as StatKey] ?? '';
 }

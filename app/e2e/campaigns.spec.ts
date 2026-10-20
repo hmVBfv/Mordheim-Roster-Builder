@@ -654,7 +654,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await npc.getByLabel('Name (English)').fill('Big Grul');
     await npc.getByLabel('Named', { exact: false }).check();
     await expect(npc.getByLabel('S of Big Grul', { exact: true })).toHaveValue('4');
-    await npc.getByLabel('Equipment').scrollIntoViewIfNeeded();
+    await npc.getByLabel('Equipment', { exact: true }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-values.png` });
     await noSideScroll(page);
     await tapTargets(page);
@@ -797,7 +797,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
 const brandt = (o: Partial<ScenarioNpc> = {}): ScenarioNpc => ({
   id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: [],
   profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '1', I: '4', A: '1', Ld: '8' }, sv: '5+',
-  skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', rules: 'Cannot be ambushed', from: null, ...o,
+  skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', equipmentTips: [], rules: 'Cannot be ambushed', from: null, ...o,
 });
 
 for (const theme of ['chronicle', 'parchment'] as const) {
@@ -889,6 +889,52 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(srv.state.scenarios.get(sc.id)!.npcs[0]).toMatchObject({ name: 'Old Marek', equipment: 'Boat hook', hidden: [] });
   });
 
+  test(`the Scenarios section: a leader arms an NPC from the equipment list and hides what the item does, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [others[0]!, { ...others[1]!, pending: false }] });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', body: 'The Countess’s men wait on the far bank.' });
+    await page.goto(`campaign/${c.id}/world`);
+    const draft = page.getByRole('article', { name: 'Draft: The night at the ferry' });
+    await draft.getByRole('button', { name: 'Add the NPCs of The night at the ferry' }).click();
+    const form = page.getByRole('dialog', { name: 'NPCs of The night at the ferry' });
+    await form.getByRole('button', { name: 'New NPC' }).click();
+    await form.getByLabel('Name of the NPC').fill('Gaunt Reaper');
+    await form.getByRole('button', { name: 'Add equipment' }).click();
+    const adder = form.getByRole('group', { name: 'Add equipment' });
+    await expect(adder).toBeVisible({ timeout: 15_000 });
+    await adder.getByLabel('Find equipment').fill('sword breaker');
+    await expect(adder.getByRole('list', { name: 'Equipment found' }).getByRole('listitem')).toHaveCount(1);
+    await adder.evaluate((el) => el.scrollIntoView({ block: 'start' })); // the picker is what the picture is about
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npc-equipment-picker`);
+    await adder.getByRole('button', { name: 'Add the equipment Sword breaker' }).click();
+    // a thing the database does not know goes in by hand, with a tooltip of its own
+    await adder.getByLabel('Item name').fill('Huge sickle');
+    await adder.getByLabel('Tooltip (optional)').fill('Strikes the whole rank.');
+    await adder.getByRole('button', { name: 'Add this item' }).click();
+    await adder.getByRole('button', { name: 'Done' }).click();
+    await expect(form.getByRole('textbox', { name: 'Equipment' })).toHaveValue('Sword breaker, Huge sickle');
+    await form.getByLabel('Hide the equipment tooltips of Gaunt Reaper', { exact: true }).check();
+    await shot(page, `${theme}-scenario-npc-equipment-form`);
+    await form.getByRole('button', { name: 'Save NPCs' }).click();
+    await expect(page.getByText('NPCs saved.')).toBeVisible();
+    await expect.poll(() => srv.state.scenarios.get(sc.id)!.npcs.length, { timeout: 8000 }).toBe(1);
+    const saved = srv.state.scenarios.get(sc.id)!.npcs[0]!;
+    expect(saved).toMatchObject({ name: 'Gaunt Reaper', equipment: 'Sword breaker, Huge sickle', hidden: ['equipmentTips'] });
+    expect(saved.equipmentTips.map((t) => t.name)).toEqual(['Sword breaker', 'Huge sickle']);
+    // the leader reads the tooltips; the players’ view says what is carried and not what it does
+    await draft.getByText('Skills, equipment and rules').click();
+    await expect(draft.getByText('Huge sickle: Strikes the whole rank.', { exact: true })).toBeVisible();
+    await draft.getByRole('button', { name: 'Players’ view' }).click();
+    await expect(draft.getByText('Equipment: Sword breaker, Huge sickle', { exact: true })).toBeVisible();
+    await expect(draft.getByText('Strikes the whole rank.', { exact: false })).toHaveCount(0);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-scenario-npc-equipment-players`);
+  });
+
   test(`the Scenarios section: a player reads the “?” of a released scenario, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     const srv = await playServer(page);
@@ -896,13 +942,23 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
     srv.scenarioFrom(c.id, {
       title: 'The night at the ferry', body: 'The Countess’s men wait on the far bank.', battleId: b.id,
-      npcs: [brandt({ name: 'QUOKKA Brandt', hidden: ['name', 'WS', 'BS', 'skills', 'equipment'] }), brandt({ id: '22222222-2222-4222-8222-222222222222', name: 'Old Marek', equipment: 'Boat hook' })],
+      npcs: [
+        brandt({ name: 'QUOKKA Brandt', hidden: ['name', 'WS', 'BS', 'skills', 'equipment'], equipment: 'QUOKKA axe', equipmentTips: [{ name: 'QUOKKA axe', text: 'QUOKKA bleed' }] }),
+        brandt({ id: '22222222-2222-4222-8222-222222222222', name: 'Old Marek', equipment: 'Boat hook', equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }] }),
+        brandt({ id: '33333333-3333-4333-8333-333333333333', name: 'Gaunt Reaper', equipment: 'Huge sickle', equipmentTips: [{ name: 'Huge sickle', text: 'QUOKKA whole rank' }], hidden: ['equipmentTips'] }),
+      ],
     });
     await page.goto(`campaign/${c.id}`);
     await page.getByRole('link', { name: 'World' }).click();
     const card = page.getByRole('article', { name: 'The night at the ferry' });
     await expect(card.getByRole('table', { name: 'Characteristics of ?' })).toBeVisible();
     await expect(card.getByRole('table', { name: 'Characteristics of Old Marek' })).toBeVisible();
+    await expect(page.getByText(/QUOKKA/)).toHaveCount(0);
+    // the tooltips of a shown item are there; where they are hidden the item is, its effect is not
+    await card.getByRole('listitem').filter({ hasText: 'Old Marek' }).getByText('Skills, equipment and rules').click();
+    await expect(card.getByText('Boat hook: Reach: strikes first.', { exact: true })).toBeVisible();
+    await card.getByRole('listitem').filter({ hasText: 'Gaunt Reaper' }).getByText('Skills, equipment and rules').click();
+    await expect(card.getByText('Equipment: Huge sickle', { exact: true })).toBeVisible();
     await expect(page.getByText(/QUOKKA/)).toHaveCount(0);
     await noSideScroll(page);
     await tapTargets(page);

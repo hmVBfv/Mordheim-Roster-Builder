@@ -3470,3 +3470,29 @@ player views of a card; it is a toggle per card, leader's view by default, and
 only NPCs with something hidden have one – on the others there is nothing to
 compare. "Hide everything" is every part of `HIDABLE`, not a list of its own, so
 a part added later is in it without anybody remembering.
+
+## October 20, 2026 — equipment from the whole database, and tooltips the players do not read
+
+Equipment in an NPC had been a line of text, typed by hand. Rob wanted every
+item the database knows to be pickable – and, in the same breath, the tooltips
+to be hideable: the players see the huge sickle in the enemy's hand and are not
+told yet what it does. Two things came out of that. The picker reads
+`data/equipment.json` (245 items, 240 of them with a description) through
+`equipmentCatalog`, so there is no second list to keep in step with the audited
+data; the tooltip text is the item's own line (kind, range, strength, save –
+without price, rarity and who may buy it, which a tooltip for the table does not
+need) followed by its rules. And the tooltips became a hidable part of their own (`equipmentTips`)
+instead of a flag on the equipment, because the two are different secrets: the
+name of the item is what the players see, what it does is what they do not.
+
+The first idea was to hide the tooltips only when the equipment itself is
+hidden. That would have answered half of the request. The wrong turn to avoid
+on the other side: a hidden tooltip that simply disappears tells the players
+that there was one – so it reads a single "?" whether the item had a tooltip or
+not – and hidden *equipment* takes its tooltips with it, because their names
+alone would give the item away. Both are pinned by tests in the core and in the
+server's leak matrix, which carries a marker in a tooltip.
+
+The World tab shows the tooltips to everybody: an NPC under World is open
+mechanics (ADR 0002). Profiles saved before the field existed read as "no
+tooltips" – the field has a default in the schema, so no migration was needed.

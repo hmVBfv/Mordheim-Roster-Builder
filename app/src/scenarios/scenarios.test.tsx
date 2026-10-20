@@ -47,7 +47,7 @@ const LONG = { timeout: 15_000 }; // the NPC form is loaded when it opens
 const brandt = (o: Partial<ScenarioNpc> = {}): ScenarioNpc => ({
   id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: [],
   profile: { M: '4', WS: '4', BS: '3', S: '3', T: '3', W: '1', I: '4', A: '1', Ld: '8' }, sv: '5+',
-  skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', rules: 'Cannot be ambushed', from: null, ...o,
+  skills: [{ name: 'Step Aside', text: '' }], equipment: 'Sword', equipmentTips: [], rules: 'Cannot be ambushed', from: null, ...o,
 });
 
 describe('ttsText', () => {
@@ -431,6 +431,102 @@ describe('the NPCs of a scenario (ADR 0022)', () => {
     const pick = await f.findByLabelText('Add an NPC of the world', {}, LONG) as HTMLSelectElement;
     expect(pick.disabled).toBe(true);
     expect(within(pick).getByText('No NPC in the world yet')).toBeTruthy();
+  }, 40_000);
+
+  it('arms an NPC from everything the game lists, with the tooltip of the item – and the tooltips can be hidden on their own', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const sc = srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt()] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user, 'The night at the ferry', 'Change');
+    await user.click(await f.findByRole('button', { name: 'Add equipment' }, LONG));
+    const adder = within(await f.findByRole('group', { name: 'Add equipment' }, LONG));
+    await user.type(adder.getByLabelText('Find equipment'), 'handgun');
+    const hit = within(adder.getByRole('list', { name: 'Equipment found' }));
+    expect(hit.getByText('Handgun')).toBeTruthy();
+    expect(hit.getAllByText(/Range 24".*Strength 4/).length).toBeGreaterThan(0); // the tooltip is shown before it is taken
+    await user.click(hit.getByRole('button', { name: 'Add the equipment Handgun' }));
+    expect((f.getByRole('textbox', { name: 'Equipment' }) as HTMLTextAreaElement).value).toBe('Sword, Handgun'); // the name joins the list
+    const tips = within(f.getByRole('list', { name: 'Equipment tooltips of Captain Brandt' }));
+    expect(tips.getByText('Handgun')).toBeTruthy();
+    // the same item twice is one
+    await user.click(hit.getByRole('button', { name: 'Add the equipment Handgun' }));
+    expect((f.getByRole('textbox', { name: 'Equipment' }) as HTMLTextAreaElement).value).toBe('Sword, Handgun');
+    await user.click(f.getByRole('checkbox', { name: 'Hide the equipment tooltips of Captain Brandt' }));
+    await user.click(f.getByRole('button', { name: 'Save NPCs' }));
+    await waitFor(() => expect(srv.state.scenarios.get(sc.id)!.npcs[0]!.equipment).toBe('Sword, Handgun'));
+    const saved = srv.state.scenarios.get(sc.id)!.npcs[0]!;
+    expect(saved.hidden).toEqual(['equipmentTips']);
+    expect(saved.equipmentTips).toHaveLength(1);
+    expect(saved.equipmentTips[0]).toMatchObject({ name: 'Handgun', text: expect.stringMatching(/Move or fire/) });
+  }, 40_000);
+
+  it('an item can be taken without its tooltip, a kind narrows the search, and an item can be written in', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt({ equipment: '' })] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const f = await open(user, 'The night at the ferry', 'Change');
+    await user.click(await f.findByRole('button', { name: 'Add equipment' }, LONG));
+    const adder = within(await f.findByRole('group', { name: 'Add equipment' }, LONG));
+    // a kind narrows the list to that kind
+    await user.click(adder.getByRole('button', { name: 'Armour' }));
+    const armour = adder.getAllByRole('button', { name: /^Add the equipment / }).map((b) => b.getAttribute('aria-label'));
+    expect(armour).toContain('Add the equipment Light armour');
+    expect(armour).not.toContain('Add the equipment Handgun');
+    await user.click(adder.getByRole('button', { name: 'Armour' })); // and back to all
+    // without the tooltip: the name only
+    await user.click(adder.getByLabelText('Bring the tooltip along (what the item does)'));
+    await user.type(adder.getByLabelText('Find equipment'), 'axe');
+    await user.click(adder.getByRole('button', { name: 'Add the equipment Axe' }));
+    expect((f.getByRole('textbox', { name: 'Equipment' }) as HTMLTextAreaElement).value).toBe('Axe');
+    expect(within(f.getByRole('list', { name: 'Equipment tooltips of Captain Brandt' })).queryByText('Axe')).toBeNull();
+    // and one that is not in the game: typed in, with a tooltip of its own
+    await user.type(adder.getByLabelText('Item name'), 'Huge sickle');
+    await user.type(adder.getByLabelText('Tooltip (optional)'), 'S+2, two-handed, strikes last.');
+    await user.click(adder.getByRole('button', { name: 'Add this item' }));
+    expect((f.getByRole('textbox', { name: 'Equipment' }) as HTMLTextAreaElement).value).toBe('Axe, Huge sickle');
+    expect(within(f.getByRole('list', { name: 'Equipment tooltips of Captain Brandt' })).getByText('Huge sickle').closest('li')!.getAttribute('title')).toBe('S+2, two-handed, strikes last.');
+    // a tooltip can be taken away again, the item stays
+    await user.click(f.getByRole('button', { name: 'Take the tooltip of Huge sickle away' }));
+    expect(within(f.getByRole('list', { name: 'Equipment tooltips of Captain Brandt' })).queryByText('Huge sickle')).toBeNull();
+    expect((f.getByRole('textbox', { name: 'Equipment' }) as HTMLTextAreaElement).value).toBe('Axe, Huge sickle');
+  }, 40_000);
+
+  it('the players see the huge sickle and a “?” where it says what it does; the leader reads both', async () => {
+    const sickle = { equipment: 'Huge sickle', equipmentTips: [{ name: 'Huge sickle', text: 'S+2 SICKLE-STATS, two-handed.' }], hidden: ['equipmentTips' as const] };
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others()[0]!, role: 'leader' as const }] });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt(sickle)], battleId: b.id });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const card = await screen.findByRole('article', { name: 'The night at the ferry' });
+    const fold = (await within(card).findByText('Skills, equipment and rules')).closest('details')!;
+    expect(fold.textContent).toContain('Equipment: Huge sickle');
+    expect(within(fold).getByText('?', { selector: 'li' })).toBeTruthy();
+    expect(document.body.textContent).not.toContain('SICKLE-STATS');
+    await user.click(within(card).getByRole('button', { name: 'Copy the statlines of The night at the ferry' }));
+    const text = await navigator.clipboard.readText();
+    expect(text).toContain('Huge sickle');
+    expect(text).not.toContain('SICKLE-STATS');
+  }, 40_000);
+
+  it('a leader reads the tooltips, and the eye shows the players’ card without them', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', npcs: [brandt({ equipment: 'Huge sickle', equipmentTips: [{ name: 'Huge sickle', text: 'S+2 SICKLE-STATS, two-handed.' }], hidden: ['equipmentTips'] })] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    const card = await screen.findByRole('article', { name: 'Draft: The night at the ferry' });
+    const fold = (await within(card).findByText('Skills, equipment and rules')).closest('details')!;
+    expect(fold.textContent).toContain('Huge sickle: S+2 SICKLE-STATS');
+    await user.click(within(card).getByRole('button', { name: 'Players’ view' }));
+    expect(fold.textContent).toContain('Equipment: Huge sickle');
+    expect(fold.textContent).not.toContain('SICKLE-STATS');
+    expect(card.textContent).not.toContain('SICKLE-STATS');
   }, 40_000);
 
   it('copies an NPC from a model of the game, and the NPC keeps its own name', async () => {
