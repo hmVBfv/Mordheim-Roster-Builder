@@ -121,8 +121,12 @@ for (const theme of THEMES) {
     await expect(page.getByLabel('Code from your authenticator app')).toBeVisible();
     await tapTargets(page);
     await shot(page, `${theme}-sign-in-code`);
-    await page.getByLabel('Code from your authenticator app').fill('123456');
-    await page.getByRole('button', { name: 'Confirm' }).click();
+    // nobody confirms: the sixth digit signs in. A wrong code comes back selected, so the next one replaces it.
+    const code = page.getByLabel('Code from your authenticator app');
+    await code.pressSequentially('654321');
+    await expect(page.getByRole('alert')).toContainText('That code is not right');
+    await shot(page, `${theme}-sign-in-code-wrong`);
+    await code.pressSequentially('123456');
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Devices' }).getByText('Firefox on Linux')).toBeVisible();
     await noSideScroll(page);

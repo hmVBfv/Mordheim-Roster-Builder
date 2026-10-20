@@ -16,7 +16,16 @@ export const GearIcon = (): ReactElement => <svg {...base}><circle cx="12" cy="1
 export const ChevronIcon = (): ReactElement => <svg {...base}><path d="M9 6l6 6-6 6" /></svg>;
 export const IconClose = (): ReactElement => <svg {...base}><path d="M6 6l12 12M18 6L6 18" /></svg>;
 export const IconEdit = (): ReactElement => <svg {...base}><path d="M4 20h4l11-11-4-4L4 16z" /><path d="M13 7l4 4" /></svg>;
-export const ReportIcon = (): ReactElement => <svg {...base}><path d="M5 21V4" /><path d="M5 4h13l-3 4.5L18 13H5" /></svg>;
+/** A beetle, the sign everybody knows for "report a bug" (Rob, 20.10.2026: the flag was not found). */
+export const BugIcon = (): ReactElement => (
+  <svg {...base}>
+    <path d="M9.5 5L8 3M14.5 5L16 3" />
+    <path d="M9 7.5V7a3 3 0 0 1 6 0v.5" />
+    <path d="M12 21c-3 0-5.5-2.5-5.5-5.5v-3A4.5 4.5 0 0 1 11 7.5h2a4.5 4.5 0 0 1 4.5 4.5v3c0 3-2.5 5.5-5.5 5.5z" />
+    <path d="M12 10v11" />
+    <path d="M6.5 11L3 9.5M6.5 14.5H3M7 18l-3 2M17.5 11L21 9.5M17.5 14.5H21M17 18l3 2" />
+  </svg>
+);
 /** The eye of a password field: "show what is behind it" – here, what the players read of an NPC. */
 export const EyeIcon = (): ReactElement => <svg {...base}><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>;
 /** The same eye struck through: the players' view is on. */

@@ -37,20 +37,84 @@ describe('signing in', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
     const code = await screen.findByLabelText('Code from your authenticator app');
     expect(s.calls.find((c) => c.path === '/auth/login')!.body).toMatchObject({ username: 'kai', device: expect.any(String) });
+    // the sixth digit sends the code; nobody presses Confirm (Rob, 20.10.2026)
     await user.type(code, '654321');
-    await user.click(screen.getByRole('button', { name: 'Confirm' }));
     expect((await screen.findByRole('alert')).textContent).toMatch(/That code is not right/);
     await user.click(screen.getByRole('button', { name: 'Use a recovery code' }));
     expect(screen.getByLabelText('One of your recovery codes')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Use the app’s code' }));
     await user.type(screen.getByLabelText('Code from your authenticator app'), '123456');
-    await user.click(screen.getByRole('button', { name: 'Confirm' }));
     // the account on the Account screen
     expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
     const account = screen.getByRole('region', { name: 'Sign-in and security' });
     expect(within(account).getByText('Kai')).toBeTruthy();
     expect(within(account).getByText(/On – a code after the password/)).toBeTruthy();
     expect(await screen.findByText('Chrome on Android')).toBeTruthy();
+  });
+
+  /** The stand-in for the step after the password: the code 123456 is the right one. */
+  const codeStage = () => {
+    let stage: 'pending' | 'in' = 'pending';
+    const s = fakeServer({
+      'GET /auth/me': () => ({ user: stage === 'in' ? { ...ME, totp: true } : null, pending: stage === 'pending' }),
+      'POST /auth/totp': (b) => (b.code === '123456' || b.code === '123 456' || b.code === 'abcd-efgh' ? (stage = 'in', { stage: 'full', user: { ...ME, totp: true } }) : [401, { error: 'invalid_code' }]),
+      'GET /auth/sessions': () => ({ sessions: [] }),
+    });
+    return { sent: () => s.calls.filter((c) => c.path === '/auth/totp').map((c) => (c.body as { code: string }).code) };
+  };
+
+  it('the app’s code signs in on the sixth digit, once; a wrong one is sent again only after the player changed it', async () => {
+    const { sent } = codeStage();
+    const user = userEvent.setup();
+    at('/sign-in');
+    const code = await screen.findByLabelText('Code from your authenticator app');
+    // the player is told before typing: a change of context nobody announced would be wrong (WCAG 3.2.2)
+    expect(code.getAttribute('aria-describedby')).toBeTruthy();
+    expect(document.getElementById(code.getAttribute('aria-describedby')!)!.textContent).toMatch(/signs you in as soon as the sixth digit is in/i);
+    await user.type(code, '12345');
+    expect(sent()).toEqual([]);
+    expect((screen.getByRole('button', { name: 'Confirm' }) as HTMLButtonElement).disabled).toBe(false);
+    await user.type(code, '7');
+    expect((await screen.findByRole('alert')).textContent).toMatch(/That code is not right/);
+    expect(sent()).toEqual(['123457']);
+    // the wrong code is selected: typing replaces it, and nothing goes out before the sixth digit
+    expect(document.activeElement).toBe(code);
+    await user.keyboard('12345');
+    expect(sent()).toEqual(['123457']);
+    await user.keyboard('6');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
+    expect(sent()).toEqual(['123457', '123456']);
+  });
+
+  it('a code pasted with its space signs in once, and Confirm still works for whoever prefers it', async () => {
+    const { sent } = codeStage();
+    const user = userEvent.setup();
+    at('/sign-in');
+    await user.click(await screen.findByLabelText('Code from your authenticator app'));
+    await user.paste('123 456');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
+    expect(sent()).toEqual(['123 456']);
+  });
+
+  it('a recovery code is never sent by itself – its length is not six – the player confirms it', async () => {
+    const { sent } = codeStage();
+    const user = userEvent.setup();
+    at('/sign-in');
+    await user.click(await screen.findByRole('button', { name: 'Use a recovery code' }));
+    await user.type(screen.getByLabelText('One of your recovery codes'), 'abcd-efgh');
+    expect(sent()).toEqual([]);
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
+    expect(sent()).toEqual(['abcd-efgh']);
+  });
+
+  it('six digits in the recovery field are no reason to send either', async () => {
+    const { sent } = codeStage();
+    const user = userEvent.setup();
+    at('/sign-in');
+    await user.click(await screen.findByRole('button', { name: 'Use a recovery code' }));
+    await user.type(screen.getByLabelText('One of your recovery codes'), '123456');
+    expect(sent()).toEqual([]);
   });
 
   it('Account, signed out: the way to sign in, no devices, no admin', async () => {
