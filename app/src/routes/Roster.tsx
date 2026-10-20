@@ -232,6 +232,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   };
   const actsOf = (u: WarriorView | HireView): UnitActs => ('hero' in u ? warriorActs(u) : hireActs(u));
   const stash = locked ? (ctx.s.stash?.items ?? []).reduce((n, it) => n + (Number(it.qty) || 0), 0) : 0;
+  const shareOn = FLAVOUR === 'campaign' && session.status === 'in';
 
   return (
     <section className={board.page}>
@@ -257,11 +258,12 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           </div>
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
-        <div className={board.toolbar} role="group" aria-label="Warband actions">
+        <div className={`${board.toolbar} ${shareOn ? board.toolbarShare : ''}`} role="group" aria-label="Warband actions">
           <button type="button" className={`${board.btn} ${board.primary}`} onClick={openRecruit}>+ Recruit</button>
           <Link to={`/warbands/${rec.id}/hire`} className={board.btn}>Hire</Link>
           <Link to={trade} className={board.btn} aria-label={stash ? `Trade, stash ${stash}` : 'Trade'}>Trade{stash > 0 && <span className={board.badge} aria-hidden="true">{stash}</span>}</Link>
-          <Link to={`/warbands/${rec.id}/export`} className={board.btn}>Export</Link>
+          {shareOn && <ShareSheet data={data} rec={rec} state={ed.state} onNotice={notify} buttonClass={`${board.btn} ${board.half}`} />}
+          <Link to={`/warbands/${rec.id}/export`} className={shareOn ? `${board.btn} ${board.half}` : board.btn}>Export</Link>
         </div>
       </header>
       <ConflictBanner data={data} rec={rec} />
@@ -283,7 +285,6 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         </>}
         panel={
           <Panel foot={<>
-            {FLAVOUR === 'campaign' && session.status === 'in' && <ShareSheet data={data} rec={rec} state={ed.state} onNotice={notify} />}
             {/* entered in a campaign: it leaves the campaign before it can be removed */}
             {FLAVOUR === 'campaign' && rec.campaignId
               ? <InCampaign rec={rec} onNotice={notify} />

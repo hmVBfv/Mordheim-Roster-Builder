@@ -14,7 +14,7 @@ import styles from './Share.module.css';
 import { listPeople, listShares, revokeShare, type Person, type Share } from './shares.ts';
 import { makeCode, sendCopy } from './take.ts';
 
-export function ShareSheet({ data, rec, state, onNotice }: { data: GameData; rec: StoredWarband; state: WarbandState; onNotice: (t: string) => void }) {
+export function ShareSheet({ data, rec, state, onNotice, buttonClass = ui.buttonQuiet }: { data: GameData; rec: StoredWarband; state: WarbandState; onNotice: (t: string) => void; buttonClass?: string }) {
   const { ref, open, close } = useSheet();
   const online = useOnline();
   const [people, setPeople] = useState<Person[] | null>(null);
@@ -44,7 +44,7 @@ export function ShareSheet({ data, rec, state, onNotice }: { data: GameData; rec
 
   return (
     <>
-      <button type="button" className={ui.buttonQuiet} onClick={() => { setCode(null); setTo(''); load(); open(); }}>Share…</button>
+      <button type="button" className={buttonClass} onClick={() => { setCode(null); setTo(''); load(); open(); }}>Share…</button>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="share-title">
         <div className={ui.page}>
           <h2 id="share-title">Share {rec.name}</h2>
