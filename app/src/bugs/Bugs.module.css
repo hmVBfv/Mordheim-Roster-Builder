@@ -1,16 +1,20 @@
 /* Problem reports: the button in the header, the form, the lists. */
 .reportButton {
   flex-shrink: 0;
-  display: inline-grid;
-  place-items: center;
-  width: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: var(--tap);
   height: var(--tap);
   margin: calc(var(--space-2) * -1) 0;
-  padding: 0;
+  padding: 0 var(--space-2);
   border: 0;
   border-radius: var(--radius);
   background: transparent;
   color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
   cursor: pointer;
 }
 

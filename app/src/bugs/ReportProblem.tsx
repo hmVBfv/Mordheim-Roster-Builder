@@ -1,12 +1,13 @@
-/* "Report a problem", always one tap away: a button in the header of every
-   screen (docs/ui.md) and the sheet it opens. The snapshot of where the
+/* "Report a bug", always one tap away: a beetle with its word in the header of
+   every screen (docs/ui.md) and the sheet it opens – it opens the form
+   straight away, "Report a problem", where a bug is already the kind chosen. The snapshot of where the
    reporter is, the trail and the settings is taken when the button is
    pressed – a sheet that was open stays closed behind it, the trail
    remembers it. The form itself is loaded when first needed. */
 import { lazy, Suspense, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useSession } from '../account/session.ts';
-import { ReportIcon } from '../ui/icons.tsx';
+import { BugIcon } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import styles from './Bugs.module.css';
@@ -30,7 +31,7 @@ export function ReportProblem() {
   };
   return (
     <>
-      <button type="button" className={styles.reportButton} onClick={start} aria-label="Report a problem" title="Report a problem"><ReportIcon /></button>
+      <button type="button" className={styles.reportButton} onClick={start} aria-label="Report a bug" title="Report a bug – or a wish, or a wrong rule"><BugIcon /><span aria-hidden="true">Bug</span></button>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="report-title">
         {/* another account on this device starts with a clean form: a draft never goes out in somebody else's name */}
         {snap && <Suspense fallback={null}><ReportForm key={`${who}:${round}`} snap={snap} close={() => close()} onSent={() => { sent.current = true; }} /></Suspense>}

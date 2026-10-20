@@ -3453,3 +3453,13 @@ hidden: an NPC that was still a mystery stays one until the leader decides
 otherwise. A wrong turn worth keeping: the first version labelled the name
 field "Name" and the hide-checkbox "Name" as well, and the test (and a screen
 reader) could not tell them apart – the field is now "Name of the NPC".
+
+## October 20, 2026 — the report button is a beetle
+
+The "Report a problem" button had been in the header of every screen since
+4c1, drawn as a flag – the same flag as the warband banner in the navigation.
+Rob could not find it. A flag says nothing about bugs; a beetle does, in every
+tracker people have seen. So the button is now a beetle with its word, "Bug",
+next to it (an icon alone was the mistake, not only the picture), and it opens
+the form with the kind "Bug" already chosen. The form keeps its name,
+"Report a problem": it also takes wishes and wrong rules.
