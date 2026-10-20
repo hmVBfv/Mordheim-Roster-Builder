@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { LIMITS, type Faction, type Npc } from './api.ts';
 import { bodyOf, draftOf, isBlank, npcTemplates, valuesOf } from './npcDraft.ts';
 
-const filled = (): NpcProfile => ({ type: 'Hero', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '', skills: [], equipment: '', rules: '', from: null });
+const filled = (): NpcProfile => ({ type: 'Hero', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '', skills: [], equipment: '', equipmentTips: [], rules: '', from: null });
 const npc = (o: Partial<Npc>): Npc => ({ id: 'n', factionId: null, nameDe: '', nameEn: 'Marek', publicStatus: '', statlineTts: '', named: false, profile: null, updatedAt: '', seq: 1, ...o });
 const faction = (id: string, nameEn: string): Faction => ({ id, nameEn, nameDe: '', publicStatus: '', updatedAt: '', seq: 1 });
 

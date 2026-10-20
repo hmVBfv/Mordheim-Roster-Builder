@@ -13,6 +13,7 @@ import { newId } from '../db/ids.ts';
 import notes from '../notes/Notes.module.css';
 import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
+import { EquipmentTips } from '../ui/EquipmentTips.tsx';
 import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
 import { Empty } from '../art/Pixels.tsx';
 import { CopyField } from '../roster/TtsCard.tsx';
@@ -162,6 +163,7 @@ function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead:
   const other = otherName(n);
   const p = n.profile;
   const rules = p ? p.rules.split('\n').map((x) => x.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean) : [];
+  const tips = p?.equipmentTips ?? [];
   const card = p ? npcAsOpponent(nameOf(n), p) : null;
   return (
     <li className={`${styles.person} ${n.named ? styles.named : ''}`}>
@@ -169,28 +171,28 @@ function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead:
         <strong>{nameOf(n)}{other && <span className={styles.other}> · {other}</span>}{n.named && <span className={styles.badge}>Named</span>}</strong>
         {n.publicStatus && <small>{n.publicStatus}</small>}
       </div>
-      {p && <small>{p.type}</small>}
       {p && <StatTable p={p} name={nameOf(n)} />}
-      {p && (p.skills.length > 0 || p.equipment.trim() || rules.length > 0) && (
+      {p && (p.skills.length > 0 || p.equipment.trim() || tips.length > 0 || rules.length > 0) && (
         <details className={styles.more}>
-          <summary>Skills, equipment and rules</summary>
+          <summary className={ui.fold}>Skills, equipment and rules</summary>
           <div className={styles.rules}>
             {p.skills.length > 0 && <p><strong>Skills:</strong> {p.skills.map((s) => s.name).join(', ')}</p>}
             {p.equipment.trim() && <p><strong>Equipment:</strong> {p.equipment.trim()}</p>}
+            <EquipmentTips tips={tips} />
             {rules.length > 0 && <ul>{rules.map((r, i) => <li key={`${i}:${r}`}>{r}</li>)}</ul>}
           </div>
         </details>
       )}
       {card && (
         <details className={styles.more}>
-          <summary>Tabletop Simulator</summary>
+          <summary className={ui.fold}>Tabletop Simulator</summary>
           <CopyField label="Name" value={ttsOpponentName(card)} rows={1} onCopied={onCopied} />
           <CopyField label="Description" value={ttsOpponentText(card)} rows={7} onCopied={onCopied} />
         </details>
       )}
       {!p && n.statlineTts && (
         <details className={styles.more}>
-          <summary>Statline</summary>
+          <summary className={ui.fold}>Statline</summary>
           <pre className={styles.statline}>{n.statlineTts}</pre>
         </details>
       )}

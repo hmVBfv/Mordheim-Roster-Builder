@@ -229,8 +229,8 @@ describe('the log', () => {
 
 /* The NPCs of a scenario (ADR 0022): the leader hides parts of them; after the release everyone but a leader with the authenticator reads a "?" there. */
 const GERHARD = {
-  name: 'Gerhard QUOKKA-Voss', type: 'Hero', profile: { M: '4', WS: 'QUOKKA-9', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
-  skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook', rules: 'QUOKKA kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'QUOKKA Ogre (Rulebook)' },
+  name: 'Gerhard QUOKKA-Voss', type: 'QUOKKA-Hero', profile: { M: '4', WS: 'QUOKKA-9', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
+  skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook', equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }], rules: 'QUOKKA kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'QUOKKA Ogre (Rulebook)' },
 };
 const npc = (over: Record<string, unknown> = {}) => ({ id: randomUUID(), ...GERHARD, hidden: ['name', 'WS', 'rules'], ...over });
 
@@ -280,7 +280,7 @@ describe('the NPCs of a scenario', () => {
       expect(body).not.toMatch(/QUOKKA/);
       expect(body).not.toMatch(/Gerhard|Voss/);
       const n = (await list(who)).scenarios[0]!.npcs[0]!;
-      expect(n).toMatchObject({ name: '?', type: '?', hidden: ['name', 'WS', 'rules'], profile: { M: '4', WS: '?', BS: '3' }, sv: '5+', rules: '?', equipment: 'Boat hook', from: null });
+      expect(n).toMatchObject({ name: '?', type: '', hidden: ['name', 'WS', 'rules'], profile: { M: '4', WS: '?', BS: '3' }, sv: '5+', rules: '?', equipment: 'Boat hook', from: null });
       expect(n.skills).toEqual([{ name: 'Strongman', text: 'Hits harder.' }]);
     }
     // the leader with the authenticator reads it all
@@ -292,7 +292,45 @@ describe('the NPCs of a scenario', () => {
     const { anna, kai, base, bid, draft, list } = await table();
     const { sid } = await draft({ npcs: [npc({ hidden: [] })] });
     await anna('POST', `${base}/${sid}/release`, { battleId: bid });
-    expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: 'Gerhard QUOKKA-Voss', profile: { WS: 'QUOKKA-9' }, rules: 'QUOKKA kills witnesses', hidden: [], from: null });
+    // ... except for its type, which the players never read: not as it is, not as a "?" (Rob, 20.10.2026), while the leader keeps it
+    expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: 'Gerhard QUOKKA-Voss', profile: { WS: 'QUOKKA-9' }, rules: 'QUOKKA kills witnesses', hidden: [], from: null, type: '' });
+    expect((await list(anna)).scenarios[0]!.npcs[0]).toMatchObject({ type: 'QUOKKA-Hero' });
+  });
+});
+
+describe('the tooltips of an NPC’s equipment (Rob, 20.10.2026)', () => {
+  it('can be hidden on their own: the players read the boat hook and a “?” where it says what it does', async () => {
+    const { anna, kai, base, bid, draft, list } = await table();
+    const { sid } = await draft({ npcs: [npc({ hidden: ['equipmentTips'] })] });
+    await anna('POST', `${base}/${sid}/release`, { battleId: bid });
+    const n = (await list(kai)).scenarios[0]!.npcs[0]!;
+    expect(n).toMatchObject({ name: 'Gerhard QUOKKA-Voss', equipment: 'Boat hook', equipmentTips: [{ name: '?', text: '' }], hidden: ['equipmentTips'] });
+    expect(JSON.stringify((await kai('GET', `${base}`)).json())).not.toMatch(/reach/);
+    expect((await list(anna)).scenarios[0]!.npcs[0]).toMatchObject({ equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }] });
+  });
+
+  it('go with the equipment when that is hidden – their names would give it away – and are read as written when nothing is hidden', async () => {
+    const { anna, kai, base, bid, draft, list } = await table();
+    const { sid } = await draft({ npcs: [npc({ hidden: ['equipment'] }), npc({ hidden: [] })] });
+    await anna('POST', `${base}/${sid}/release`, { battleId: bid });
+    const read = (await list(kai)).scenarios[0]!.npcs;
+    expect(read[0]).toMatchObject({ equipment: '?', equipmentTips: [] });
+    expect(read[1]).toMatchObject({ equipment: 'Boat hook', equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }] });
+  });
+
+  it('are checked: a name, a text, nothing else, and not too many', async () => {
+    const { draft } = await table();
+    for (const bad of [[{ name: '', text: 'x' }], [{ name: 'Axe', text: 'x', extra: 1 }], Array.from({ length: 41 }, (_, i) => ({ name: `Item ${i}`, text: '' }))]) {
+      expect((await draft({ npcs: [npc({ equipmentTips: bad })] })).r.statusCode).toBe(400);
+    }
+  });
+
+  it('an NPC saved before they existed reads with none', async () => {
+    const { draft, list, anna } = await table();
+    const old: Record<string, unknown> = { ...npc({ hidden: [] }) };
+    delete old.equipmentTips;
+    expect((await draft({ npcs: [old] })).r.statusCode).toBe(200);
+    expect((await list(anna)).scenarios[0]!.npcs[0]).toMatchObject({ equipmentTips: [] });
   });
 });
 
@@ -317,6 +355,18 @@ describe('the NPCs of a released scenario', () => {
     expect(gone.statusCode).toBe(409);
     expect(gone.json()).toMatchObject({ error: 'frozen' });
     expect((await list(kai)).scenarios[0]!.npcs[0]).toMatchObject({ name: '?', profile: { WS: '?' } }); // nothing moved
+  });
+
+  it('hidden tooltips are fixed like the rest: they can be shown, not changed, and nothing new is hidden', async () => {
+    const t = await table();
+    const n = npc({ hidden: ['equipmentTips'] });
+    const { sid } = await t.draft({ npcs: [n] });
+    const r = (await t.anna('POST', `${t.base}/${sid}/release`, { battleId: t.bid })).json() as { scenario: Scenario };
+    const change = (npcs: unknown[]) => t.anna('PUT', `${t.base}/${sid}`, { title: 'The night at the ferry', body: SECRET, npcStatlines: STATS, npcs, baseSeq: r.scenario.seq });
+    const res = await change([{ ...n, equipmentTips: [{ name: 'Boat hook', text: 'Harmless.' }] }]);
+    expect(res.statusCode).toBe(409);
+    expect(res.json()).toMatchObject({ error: 'frozen', problem: expect.stringMatching(/equipmentTips/) });
+    expect((await change([{ ...n, hidden: [] }])).statusCode).toBe(200); // shown, as it always was
   });
 
   it('what is not hidden may be corrected, and a new NPC may come with its own hidden parts', async () => {

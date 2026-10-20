@@ -196,8 +196,8 @@ describe('leak-test matrix', () => {
     scenario(theirs, victim.id, 'SCENARIO-SECRET: the ambush', 'SCENARIO-SECRET: the Countess’s men wait at the ferry.');
     // a played scenario with an NPC whose name, a characteristic, skills and rules are hidden: the player reads "?" there (ADR 0022)
     const playedScenario = scenario(theirs, victim.id, 'The night at the ferry', 'Rules of the night.', [{
-      id: randomUUID(), name: 'NPC-HIDDEN-SECRET Voss', type: 'Hero', profile: { M: '4', WS: 'NPC-HIDDEN-SECRET' }, sv: '5+', skills: [{ name: 'NPC-HIDDEN-SECRET skill', text: '' }],
-      equipment: 'Boat hook', rules: 'NPC-HIDDEN-SECRET rule', from: { kind: 'hired', key: 'hired/ogre', label: 'NPC-HIDDEN-SECRET Ogre' }, hidden: ['name', 'WS', 'skills', 'rules'],
+      id: randomUUID(), name: 'NPC-HIDDEN-SECRET Voss', type: 'NPC-HIDDEN-SECRET Hero', profile: { M: '4', WS: 'NPC-HIDDEN-SECRET' }, sv: '5+', skills: [{ name: 'NPC-HIDDEN-SECRET skill', text: '' }],
+      equipment: 'Boat hook', equipmentTips: [{ name: 'Boat hook', text: 'NPC-HIDDEN-SECRET tooltip' }], rules: 'NPC-HIDDEN-SECRET rule', from: { kind: 'hired', key: 'hired/ogre', label: 'NPC-HIDDEN-SECRET Ogre' }, hidden: ['name', 'WS', 'skills', 'equipmentTips', 'rules'],
     }]);
     const played = releaseScenario(s.db, theirs.id, playedScenario, battle.id, victim.id, t0);
     if (!played.ok) throw new Error(played.error);
@@ -211,7 +211,7 @@ describe('leak-test matrix', () => {
     // opponents: a group and a skill in the victim's campaign no role of the matrix may read, a spare group and skill in the admin's for the probes to take out
     const opp = (c: { id: string }, by: string, name: string, skill: string) => {
       const gid = randomUUID(), sid = randomUUID();
-      const g = putGroup(s.db, c.id, gid, { name, note: '', profiles: [{ id: 'p1', name, type: 'Henchman', count: 1, profile: { M: '4' }, sv: '', skills: [{ name: skill, text: skill }], equipment: '', rules: '', note: '', from: null }], baseSeq: 0 }, by, t0);
+      const g = putGroup(s.db, c.id, gid, { name, note: '', profiles: [{ id: 'p1', name, type: 'Henchman', count: 1, profile: { M: '4' }, sv: '', skills: [{ name: skill, text: skill }], equipment: '', equipmentTips: [], rules: '', note: '', from: null }], baseSeq: 0 }, by, t0);
       const k = putSkill(s.db, c.id, sid, { name: skill, text: skill, baseSeq: 0 }, by, t0);
       if (!g.ok || !k.ok) throw new Error('opponents');
       return { gid, sid };

@@ -20,23 +20,44 @@ Leiter ihm gegeben hat.
 ## Entscheidung
 - Ein Szenario trägt seine **eigenen NPCs** (`scenarios.npcs`): neu geschrieben,
   aus dem Spiel kopiert (Warbands, Hired Swords, Dramatis Personae, Bestiary),
-  aus der Welt oder aus einem früheren Szenario – kopiert, nie verknüpft.
+  aus der Welt (direkt aus der Liste der Welt-NPCs: „Add an NPC of the world“)
+  oder aus einem früheren Szenario – kopiert, nie verknüpft.
 - Der Leiter kann an jedem dieser NPCs **Teile verbergen**: den Namen, einzelne
   Werte (M WS BS S T W I A Ld, Sv) oder alle, Fertigkeiten, Ausrüstung,
-  Sonderregeln. Er wählt sie beim Anlegen oder Ändern.
+  Sonderregeln – oder mit einem Haken **alles** („Hide everything“, jeder Teil,
+  den es gibt). Er wählt sie beim Anlegen oder Ändern.
+- **Die Tooltips der Ausrüstung** (`equipmentTips`: je Gegenstand Name und
+  Text, was er kann) sind ein **eigener verborgener Teil**: Die Spieler sehen
+  die riesige Sichel in der Hand des Gegners und müssen nicht gleich ihre Werte
+  kennen (Rob, 20.10.2026). Der Leiter wählt die Gegenstände aus allem
+  Ausrüstungsmaterial der Datenbank (`data/equipment.json`) oder schreibt sie
+  von Hand; die Tooltips kommen aus der Datenbank (Preis, Regeln, Reichweite)
+  oder aus seiner Feder und lassen sich beim Einfügen abwählen. Verborgen
+  ersetzt der Server sie durch ein einziges „?“ (auch wenn der Gegenstand nie
+  einen Tooltip hatte: ein „?“ verrät nicht, ob es einen gab). **Verborgene
+  Ausrüstung nimmt ihre Tooltips mit** – schon die Namen der Tooltips verrieten
+  den Gegenstand –; die Spieler lesen dann gar keine.
 - Für alle, die nicht Leiter mit Authenticator sind, ersetzt **der Server** jeden
   verborgenen Teil durch „?“, bevor er antwortet (ADR 0011). Der Wert verlässt
   den Server nicht. Auch der Hinweis, woher der NPC kopiert wurde (`from`), fällt
-  weg; ist der Name verborgen, ist es auch der Typ.
+  weg. **Der Typ (Hero, Henchman …) liest niemand**, auch nicht als „?“ (Rob,
+  20.10.2026: zu viel Spielmechanik für die Runde): Er wird weder abgefragt noch
+  angezeigt, der Server liefert ihn als leeren Text, die TTS-Karte hängt nicht
+  an ihm. Er bleibt als Wert im NPC (er kommt mit einer Kopie), nur nie zu sehen.
 - Leiter mit Authenticator sehen alles. Ihr Tabletop-Simulator-Export trägt das
   „?“ an den verborgenen Stellen – das ist die Karte für den Tisch –, und sie
-  können sich die ganze Karte zum eigenen Gebrauch kopieren.
+  können sich die ganze Karte zum eigenen Gebrauch kopieren. Mit dem **Auge**
+  („Players’ view“) sieht ein Leiter jede Karte so, wie die Spieler sie lesen,
+  und mit einem zweiten Klick wieder ganz.
 - Solange das Szenario ein Entwurf ist, lässt sich alles frei ändern: niemand
   hat es gelesen. **Nach der Freigabe** darf Verborgenes aufgedeckt, aber **nicht
   mehr geändert** werden (auch nicht beim Aufdecken), nichts bereits Gelesenes
   wird nachträglich verborgen, und ein NPC mit verborgenen Teilen bleibt
   (Versionen sind append-only, [0003](0003-versions-append-only.md)). Der Server
   antwortet sonst mit 409 `frozen`. Aufgedeckt bleibt aufgedeckt.
+- Die Tooltips folgen denselben Regeln nach der Freigabe wie jeder andere Teil
+  (`equipmentTips` ist ein Wert von `hidden`): gesperrt, solange verborgen,
+  aufdeckbar, nie nachträglich verborgen.
 - Jede Aufdeckung nach der Freigabe steht im Log als `scenario.reveal`: welcher
   NPC, welche Teile – nie der Wert.
 

@@ -23,7 +23,7 @@ async function table() {
 }
 
 const ferryman = { id: 'p1', name: 'Ferryman', type: 'Henchman', count: 3, profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '6+',
-  skills: [{ name: 'Step Aside', text: 'A 5+ save in close combat.' }, { name: 'Ferryman’s Luck', text: 'Re-roll one dice.', ref: 'own-1' }], equipment: 'Boat hook, dagger', rules: 'Knows the Stir', note: '', from: { kind: 'unit', key: 'merc/warr', label: 'Warrior (Mercenaries)' } };
+  skills: [{ name: 'Step Aside', text: 'A 5+ save in close combat.' }, { name: 'Ferryman’s Luck', text: 'Re-roll one dice.', ref: 'own-1' }], equipment: 'Boat hook, dagger', equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }], rules: 'Knows the Stir', note: '', from: { kind: 'unit', key: 'merc/warr', label: 'Warrior (Mercenaries)' } };
 
 describe('groups of opponents', () => {
   it('a leader keeps a group with its profiles as written; it is listed, changed from its stand, and taken out', async () => {

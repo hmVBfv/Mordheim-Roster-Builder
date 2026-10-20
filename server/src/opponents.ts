@@ -18,6 +18,8 @@ export const MAX_PROFILES = 40;
 export const MAX_SKILLS = 300;
 
 const Skill = z.object({ name: z.string().trim().min(1).max(80), text: z.string().max(2000).default(''), ref: z.string().max(64).optional() }).strict();
+/** What a piece of equipment does: its name and the tooltip (ADR 0022 hides the tooltips of a scenario's NPC on their own). */
+const Tip = z.object({ name: z.string().trim().min(1).max(120), text: z.string().max(2000).default('') }).strict();
 const From = z.object({ kind: z.enum(['unit', 'hired', 'dramatis', 'beast', 'warrior', 'npc']), key: z.string().max(160), label: z.string().max(240) }).strict();
 const Stats = z.object({ M: STAT, WS: STAT, BS: STAT, S: STAT, T: STAT, W: STAT, I: STAT, A: STAT, Ld: STAT }).partial().strict();
 
@@ -28,6 +30,7 @@ export const NpcProfileBody = z.object({
   sv: STAT.default(''),
   skills: z.array(Skill).max(40).default([]),
   equipment: z.string().max(2000).default(''),
+  equipmentTips: z.array(Tip).max(40).default([]),
   rules: z.string().max(6000).default(''),
   from: From.nullable().default(null),
 }).strict();
@@ -42,6 +45,7 @@ const Profile = z.object({
   sv: STAT.default(''),
   skills: z.array(Skill).max(40).default([]),
   equipment: z.string().max(2000).default(''),
+  equipmentTips: z.array(Tip).max(40).default([]),
   rules: z.string().max(6000).default(''),
   note: z.string().max(4000).default(''),
   from: From.nullable().default(null),

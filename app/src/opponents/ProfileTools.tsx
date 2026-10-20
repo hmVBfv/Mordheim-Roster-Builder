@@ -1,9 +1,11 @@
 /* The tools a profile is made with (Opponents, and the NPCs of the world and
    of scenarios): copying a model from the game, the campaign's warriors or
    other NPCs; adding a skill from the game's lists, the campaign's own or
-   typed in; and the editor of one profile's values. */
+   typed in; adding equipment from everything the game lists, with the
+   tooltip the rules give it, or typed in; and the editor of one profile's
+   values. */
 import * as core from '@mordheim/core';
-import type { OpponentProfile, OpponentSkill, OpponentTemplate, StatKey, TemplateKind } from '@mordheim/core';
+import type { CatalogCategory, EquipmentTip, OpponentProfile, OpponentSkill, OpponentTemplate, StatKey, TemplateKind } from '@mordheim/core';
 import { Suspense, useDeferredValue, useEffect, useId, useMemo, useState } from 'react';
 import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
@@ -135,15 +137,74 @@ function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string; own: Own
   );
 }
 
-/** `bare`: the values of one person, not a profile of a group – no name, number or note, no folding, nothing to take out; the name is the form's.
-    `locked`: parts that cannot be changed – a characteristic by its key (`WS`), the save (`sv`), `skills`, `equipment`, `rules`, and `name` for the type
+const GEAR_KINDS: CatalogCategory[] = ['cc', 'missile', 'bp', 'armour', 'misc'];
+
+/** Everything the game lists to carry, searched; a pick brings its name and – unless unticked – the tooltip the rules give it. Or typed in. */
+function EquipmentAdder({ onAdd, onClose }: { onAdd: (name: string, tip: string) => void; onClose: () => void }) {
+  const ids = useId();
+  const data = useGameData();
+  const catalog = useMemo(() => core.equipmentCatalog(data), [data]);
+  const [query, setQuery] = useState('');
+  const [kind, setKind] = useState<CatalogCategory | null>(null);
+  const [withTip, setWithTip] = useState(true);
+  const [name, setName] = useState('');
+  const [text, setText] = useState('');
+  const q = useDeferredValue(query);
+  const found = useMemo(() => core.searchEquipment(catalog, q, kind ?? undefined), [catalog, q, kind]);
+  const shown = found.slice(0, 20);
+  return (
+    <div className={styles.picker} role="group" aria-label="Add equipment">
+      <div className={ui.field}>
+        <label htmlFor={`${ids}-q`}>Find equipment</label>
+        <input id={`${ids}-q`} className={ui.input} type="search" value={query} placeholder="scythe, handgun, heavy armour, lucky charm …" onChange={(e) => setQuery(e.target.value)} />
+      </div>
+      <div className={styles.kinds} role="group" aria-label="Only">
+        {GEAR_KINDS.map((k) => <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(kind === k ? null : k)}>{core.GEAR_CATEGORY_NAMES[k]}</button>)}
+      </div>
+      <label className={styles.check}><input type="checkbox" checked={withTip} onChange={(e) => setWithTip(e.target.checked)} /><span>Bring the tooltip along (what the item does)</span></label>
+      <p className={ui.muted} role="status">{found.length.toLocaleString('en')} found{found.length > shown.length ? `, the first ${shown.length} shown – search to narrow it` : ''}.</p>
+      <ul className={styles.found} aria-label="Equipment found">
+        {shown.map((g) => (
+          <li key={g.name}>
+            <span><strong>{g.name}</strong> <small className={styles.meta}>{g.categoryName}</small></span>
+            {g.tip && <small className={styles.meta}>{g.tip.length > 160 ? `${g.tip.slice(0, 160)}…` : g.tip}</small>}
+            <button type="button" className={ui.buttonQuiet} aria-label={`Add the equipment ${g.name}`} onClick={() => onAdd(g.name, withTip ? g.tip : '')}>Add</button>
+          </li>
+        ))}
+      </ul>
+      <fieldset className={styles.write}>
+        <legend>Or write one in</legend>
+        <div className={ui.field}><label htmlFor={`${ids}-n`}>Item name</label><input id={`${ids}-n`} className={ui.input} value={name} maxLength={120} onChange={(e) => setName(e.target.value)} /></div>
+        <div className={ui.field}><label htmlFor={`${ids}-t`}>Tooltip (optional)</label><textarea id={`${ids}-t`} className={ui.textarea} rows={2} value={text} maxLength={2000} onChange={(e) => setText(e.target.value)} /></div>
+        <div className={ui.row}>
+          <button type="button" className={ui.buttonQuiet} disabled={!name.trim()} onClick={() => { onAdd(name.trim(), text.trim()); setName(''); setText(''); }}>Add this item</button>
+          <button type="button" className={ui.buttonQuiet} onClick={onClose}>Done</button>
+        </div>
+      </fieldset>
+    </div>
+  );
+}
+
+/** Equipment written as the name list it is: an item once, in the order it came. */
+const withItem = (equipment: string, name: string): string => {
+  const have = equipment.split(',').map((x) => x.trim().toLowerCase());
+  return have.includes(name.trim().toLowerCase()) ? equipment : equipment.trim() ? `${equipment.trim().replace(/,\s*$/, '')}, ${name}` : name;
+};
+
+/** `bare`: the values of one person, not a profile of a group – no name, type, number or note, no folding, nothing to take out; the name is the form's,
+    and the type of an NPC is never asked for or shown (Rob, 20.10.2026: too much of the game for our table).
+    `locked`: parts that cannot be changed – a characteristic by its key (`WS`), the save (`sv`), `skills`, `equipment`, `rules`
     (a scenario's NPC once its hidden values were released: ADR 0022). */
 export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], onChange, onRemove, onOwn }: {
   cid: string; p: OpponentProfile; own: OwnSkill[]; open?: boolean; bare?: boolean; locked?: readonly string[]; onChange: (p: OpponentProfile) => void; onRemove?: () => void; onOwn: () => void;
 }) {
   const ids = useId();
   const [adding, setAdding] = useState(false);
+  const [addingGear, setAddingGear] = useState(false);
   const fixed = (k: string) => locked.includes(k);
+  // a profile saved before the tooltips existed has none
+  const tips: EquipmentTip[] = p.equipmentTips ?? [];
+  const addGear = (name: string, tip: string) => onChange({ ...p, equipment: withItem(p.equipment, name), equipmentTips: tip && !tips.some((t) => t.name === name) ? [...tips, { name, text: tip }] : tips });
   const set = <K extends keyof OpponentProfile>(k: K, v: OpponentProfile[K]) => onChange({ ...p, [k]: v });
   const setStat = (k: StatKey, v: string) => onChange({ ...p, profile: { ...p.profile, [k]: v } });
   const Wrap = bare ? 'div' : 'details';
@@ -151,12 +212,14 @@ export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], on
     <Wrap className={bare ? styles.bare : styles.editor} {...(bare ? {} : { open })}>
       {!bare && <summary><strong>{p.name || 'New profile'}</strong>{p.count > 1 ? ` ×${p.count}` : ''} <small className={styles.meta}>{p.type}</small></summary>}
       {p.from && <p className={styles.meta}>Copied from {p.from.label}</p>}
-      <div className={styles.head}>
-        {!bare && <div className={ui.field}><label htmlFor={`${ids}-n`}>Name</label><input id={`${ids}-n`} className={ui.input} value={p.name} maxLength={120} onChange={(e) => set('name', e.target.value)} /></div>}
-        <div className={ui.field}><label htmlFor={`${ids}-ty`}>Type</label><input id={`${ids}-ty`} className={ui.input} list={`${ids}-types`} value={p.type} maxLength={60} disabled={fixed('name')} onChange={(e) => set('type', e.target.value)} />
-          <datalist id={`${ids}-types`}>{TYPES.map((t) => <option key={t} value={t} />)}</datalist></div>
-        {!bare && <div className={ui.field}><label htmlFor={`${ids}-c`}>How many</label><input id={`${ids}-c`} className={ui.input} type="number" inputMode="numeric" min={1} max={50} value={p.count} onChange={(e) => set('count', Math.max(1, Math.min(50, Math.round(Number(e.target.value) || 1))))} /></div>}
-      </div>
+      {!bare && (
+        <div className={styles.head}>
+          <div className={ui.field}><label htmlFor={`${ids}-n`}>Name</label><input id={`${ids}-n`} className={ui.input} value={p.name} maxLength={120} onChange={(e) => set('name', e.target.value)} /></div>
+          <div className={ui.field}><label htmlFor={`${ids}-ty`}>Type</label><input id={`${ids}-ty`} className={ui.input} list={`${ids}-types`} value={p.type} maxLength={60} onChange={(e) => set('type', e.target.value)} />
+            <datalist id={`${ids}-types`}>{TYPES.map((t) => <option key={t} value={t} />)}</datalist></div>
+          <div className={ui.field}><label htmlFor={`${ids}-c`}>How many</label><input id={`${ids}-c`} className={ui.input} type="number" inputMode="numeric" min={1} max={50} value={p.count} onChange={(e) => set('count', Math.max(1, Math.min(50, Math.round(Number(e.target.value) || 1))))} /></div>
+        </div>
+      )}
       <fieldset className={styles.stats}>
         <legend>Characteristics</legend>
         {STATS.map((k) => (
@@ -178,7 +241,22 @@ export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], on
         {!adding && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={fixed('skills')} onClick={() => setAdding(true)}>Add a skill</button></div>}
         {adding && <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}><SkillAdder cid={cid} own={own} onOwn={onOwn} onClose={() => setAdding(false)} onAdd={(s) => { if (!p.skills.some((x) => x.name === s.name)) set('skills', [...p.skills, s]); }} /></Suspense>}
       </div>
-      <div className={ui.field}><label htmlFor={`${ids}-e`}>Equipment</label><textarea id={`${ids}-e`} className={ui.textarea} rows={2} value={p.equipment} maxLength={2000} disabled={fixed('equipment')} onChange={(e) => set('equipment', e.target.value)} /></div>
+      <div className={ui.field}>
+        <label htmlFor={`${ids}-e`}>Equipment</label>
+        <textarea id={`${ids}-e`} className={ui.textarea} rows={2} value={p.equipment} maxLength={2000} disabled={fixed('equipment')} onChange={(e) => set('equipment', e.target.value)} />
+        <span>Tooltips of the equipment</span>
+        <ul className={styles.chips} aria-label={`Equipment tooltips of ${p.name || 'the profile'}`}>
+          {tips.map((t, i) => (
+            <li key={`${i}:${t.name}`} title={t.text || undefined}>
+              <span>{t.name}</span>
+              <button type="button" aria-label={`Take the tooltip of ${t.name} away`} disabled={fixed('equipmentTips')} onClick={() => set('equipmentTips', tips.filter((_, j) => j !== i))}>×</button>
+            </li>
+          ))}
+          {tips.length === 0 && <li className={`${ui.muted} ${styles.none}`}>None.</li>}
+        </ul>
+        {!addingGear && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={fixed('equipment') || fixed('equipmentTips')} onClick={() => setAddingGear(true)}>Add equipment</button></div>}
+        {addingGear && <Suspense fallback={<p className={ui.muted}>Loading the equipment…</p>}><EquipmentAdder onAdd={addGear} onClose={() => setAddingGear(false)} /></Suspense>}
+      </div>
       <div className={ui.field}><label htmlFor={`${ids}-r`}>Special rules (one per line)</label><textarea id={`${ids}-r`} className={ui.textarea} rows={4} value={p.rules} maxLength={6000} disabled={fixed('rules')} onChange={(e) => set('rules', e.target.value)} /></div>
       {!bare && <div className={ui.field}><label htmlFor={`${ids}-no`}>Note (not on the card)</label><textarea id={`${ids}-no`} className={ui.textarea} rows={2} value={p.note} maxLength={4000} onChange={(e) => set('note', e.target.value)} /></div>}
       {!bare && onRemove && <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={onRemove}>Take this profile out of the group</button></div>}

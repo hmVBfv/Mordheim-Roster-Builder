@@ -8,15 +8,15 @@
 import type { StatKey } from '../data/types.ts';
 import { OPPONENT_STATS, profileFrom, type OpponentProfile, type OpponentTemplate } from './opponents.ts';
 
-export type NpcProfile = Pick<OpponentProfile, 'type' | 'profile' | 'sv' | 'skills' | 'equipment' | 'rules' | 'from'>;
+export type NpcProfile = Pick<OpponentProfile, 'type' | 'profile' | 'sv' | 'skills' | 'equipment' | 'equipmentTips' | 'rules' | 'from'>;
 
-export const emptyNpcProfile = (): NpcProfile => ({ type: 'Hero', profile: {}, sv: '', skills: [], equipment: '', rules: '', from: null });
+export const emptyNpcProfile = (): NpcProfile => ({ type: 'Hero', profile: {}, sv: '', skills: [], equipment: '', equipmentTips: [], rules: '', from: null });
 
 /** The values of a template (a model of the game, an NPC …), or an empty set. */
 export function npcProfileFrom(t: OpponentTemplate | null): NpcProfile {
   if (!t) return emptyNpcProfile();
   const p = profileFrom('', t);
-  return { type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, rules: p.rules, from: p.from };
+  return { type: p.type, profile: p.profile, sv: p.sv, skills: p.skills, equipment: p.equipment, equipmentTips: p.equipmentTips, rules: p.rules, from: p.from };
 }
 
 /** An NPC's values as an opponent's profile, for what already works on those (the Tabletop Simulator card). */
@@ -30,7 +30,8 @@ const ruleLines = (p: NpcProfile): string[] => [
   ...p.skills.map((s) => (s.text.trim() ? `${s.name}: ${s.text.trim()}` : s.name)),
 ];
 
-/** The plain text form: the statline, the equipment, a line to each rule or skill – what the world shows and `parseStatline` reads. */
+/** The plain text form: the statline, the equipment, a line to each rule or skill – what the world shows and `parseStatline` reads.
+    The tooltips of the equipment are not in it: the text is the old, flat form, and the card reads them from the values. */
 export function npcStatline(p: NpcProfile): string {
   const out: string[] = [];
   if (hasValues(p)) out.push(`${OPPONENT_STATS.map((k) => `${k}${(p.profile[k] ?? '').trim() || '-'}`).join(' ')} Sv ${p.sv.trim() || '-'}`);
@@ -67,5 +68,5 @@ export function parseStatline(text: string): NpcProfile | null {
 
 /** An NPC as a template to copy from: another NPC of the campaign's world, or of a scenario. */
 export function npcTemplate(key: string, source: string, name: string, p: NpcProfile): OpponentTemplate {
-  return { key: `npc/${key}`, kind: 'npc', source, name, type: p.type, count: 1, profile: { ...p.profile }, sv: p.sv, skills: p.skills.map((s) => ({ ...s })), equipment: p.equipment, rules: p.rules, grade: '' };
+  return { key: `npc/${key}`, kind: 'npc', source, name, type: p.type, count: 1, profile: { ...p.profile }, sv: p.sv, skills: p.skills.map((s) => ({ ...s })), equipment: p.equipment, equipmentTips: (p.equipmentTips ?? []).map((e) => ({ ...e })), rules: p.rules, grade: '' };
 }

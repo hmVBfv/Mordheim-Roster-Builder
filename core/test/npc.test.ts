@@ -6,7 +6,7 @@ import { loadGameData } from '../src/node.ts';
 const data = loadGameData();
 const marek: core.NpcProfile = {
   type: 'Hero', profile: { M: '4', WS: '3', BS: '3', S: '3', T: '3', W: '1', I: '3', A: '1', Ld: '7' }, sv: '6+',
-  skills: [{ name: 'Step Aside', text: 'Dodges the first hit.' }, { name: 'Wits', text: '' }], equipment: 'Dagger, boat hook', rules: 'Knows every shoal of the Stir\nNever leaves the ferry', from: null,
+  skills: [{ name: 'Step Aside', text: 'Dodges the first hit.' }, { name: 'Wits', text: '' }], equipment: 'Dagger, boat hook', equipmentTips: [{ name: 'Dagger', text: 'Parry.' }], rules: 'Knows every shoal of the Stir\nNever leaves the ferry', from: null,
 };
 
 describe('npcStatline', () => {
