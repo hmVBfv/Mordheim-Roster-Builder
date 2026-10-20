@@ -259,17 +259,54 @@ describe('the admin’s reports', () => {
     seed(srv);
     const user = userEvent.setup();
     at('/admin/bugs');
-    const list = await screen.findByRole('list', { name: 'Reports' });
-    expect(within(list).getByText('Gold drifts')).toBeTruthy();
-    expect(within(list).getByText('Wrong tooltip')).toBeTruthy();
-    expect(within(list).queryByText('Old fix')).toBeNull();
-    expect(within(list).getByText('warband attached')).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: 'Fixed' }));
+    const table = await screen.findByRole('table', { name: 'Reports' });
+    expect(within(table).getByText('Gold drifts')).toBeTruthy();
+    expect(within(table).getByText('Wrong tooltip')).toBeTruthy();
+    expect(within(table).queryByText('Old fix')).toBeNull();
+    expect(within(table).getByText('warband attached')).toBeTruthy();
+    await user.selectOptions(screen.getByLabelText('Status'), 'fixed');
     expect(await screen.findByText('Old fix')).toBeTruthy();
     expect(screen.queryByText('Gold drifts')).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'All' }));
+    await user.selectOptions(screen.getByLabelText('Status'), 'all');
     expect(await screen.findByText('Gold drifts')).toBeTruthy();
     expect(screen.getByText('Old fix')).toBeTruthy();
+  });
+
+  it('a table with who and when, filtered by status, severity and kind', async () => {
+    const { srv } = server('admin');
+    srv.bugFrom({ title: 'Gold drifts', text: 'x', reporterName: 'Ben', status: 'confirmed', severity: 'S1', area: 'gold ledger', createdAt: '2026-10-17T10:00:00.000Z', updatedAt: '2026-10-19T12:30:00.000Z' });
+    srv.bugFrom({ title: 'Wrong tooltip', text: 'x', reporterName: 'Anna', severity: 'S3', createdAt: '2026-10-18T10:00:00.000Z', updatedAt: '2026-10-18T10:00:00.000Z' });
+    srv.bugFrom({ title: 'Dark mode please', text: 'x', reporterName: 'Kai', kind: 'wish', status: 'confirmed', severity: 'S4', createdAt: '2026-10-19T10:00:00.000Z', updatedAt: '2026-10-19T10:00:00.000Z' });
+    srv.bugFrom({ title: 'Old fix', text: 'x', reporterName: 'Ben', status: 'fixed', fixedIn: 'f00dbee', severity: 'S2', createdAt: '2026-10-01T10:00:00.000Z', updatedAt: '2026-10-02T10:00:00.000Z' });
+    const user = userEvent.setup();
+    at('/admin/bugs');
+    const table = await screen.findByRole('table', { name: 'Reports' });
+    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['#', 'Report', 'Kind', 'Status', 'Severity', 'Area', 'Reporter', 'Reported', 'Last change', 'Open']);
+    const rowOf = (title: string) => within(table).getByText(title).closest('tr')!;
+    const gold = rowOf('Gold drifts');
+    for (const cell of ['1', 'Bug', 'Confirmed', 'S1', 'gold ledger', 'Ben']) expect(within(gold).getByText(cell)).toBeTruthy();
+    // the dates are dates, not "2 days ago": the report's day and the day of the last change
+    expect(within(gold).getByText((_, el) => el?.tagName === 'TIME' && el.getAttribute('datetime') === '2026-10-17T10:00:00.000Z')).toBeTruthy();
+    expect(within(gold).getByText((_, el) => el?.tagName === 'TIME' && el.getAttribute('datetime') === '2026-10-19T12:30:00.000Z')).toBeTruthy();
+
+    // severity
+    await user.selectOptions(screen.getByLabelText('Severity'), 'S3');
+    expect(within(table).queryByText('Gold drifts')).toBeNull();
+    expect(within(table).getByText('Wrong tooltip')).toBeTruthy();
+    await user.selectOptions(screen.getByLabelText('Severity'), 'all');
+    // status: one status, narrower than "open"
+    await user.selectOptions(screen.getByLabelText('Status'), 'confirmed');
+    expect(within(table).getByText('Gold drifts')).toBeTruthy();
+    expect(within(table).getByText('Dark mode please')).toBeTruthy();
+    expect(within(table).queryByText('Wrong tooltip')).toBeNull();
+    // and kind on top
+    await user.selectOptions(screen.getByLabelText('Kind'), 'wish');
+    expect(within(table).queryByText('Gold drifts')).toBeNull();
+    expect(within(table).getByText('Dark mode please')).toBeTruthy();
+    await user.selectOptions(screen.getByLabelText('Kind'), 'bug');
+    await user.selectOptions(screen.getByLabelText('Status'), 'all');
+    await user.selectOptions(screen.getByLabelText('Severity'), 'none');
+    expect(screen.getByText('Nothing here.')).toBeTruthy();
   });
 
   it('opens one in full, sorts it, and a fixed one names its version', async () => {
