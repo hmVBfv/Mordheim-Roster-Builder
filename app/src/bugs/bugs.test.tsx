@@ -38,11 +38,27 @@ function server(as: 'player' | 'admin' | 'nobody' = 'player') {
 }
 
 const openForm = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.click(await screen.findByRole('button', { name: 'Report a problem' }));
+  await user.click(await screen.findByRole('button', { name: 'Report a bug' }));
   return screen.findByRole('dialog', { name: 'Report a problem' });
 };
 
 describe('reporting a problem', () => {
+  it('the beetle with its word is in the header of every screen and opens the form straight away, a bug already chosen', async () => {
+    server();
+    const user = userEvent.setup();
+    for (const path of ['/', '/more', '/world']) {
+      const { unmount } = at(path);
+      const button = await screen.findByRole('button', { name: 'Report a bug' });
+      // the word is on the button, not only in its name: a flag nobody recognised was not found (Rob, 20.10.2026)
+      expect(button.textContent).toBe('Bug');
+      expect(button.querySelector('svg')).toBeTruthy();
+      unmount();
+    }
+    at('/');
+    const form = await openForm(user);
+    expect((within(form).getByRole('radio', { name: /Bug/ }) as HTMLInputElement).checked).toBe(true);
+  });
+
   it('a kind and a sentence are enough: the technical details go along, and the player sees them first', async () => {
     const { srv, me } = server();
     const user = userEvent.setup();

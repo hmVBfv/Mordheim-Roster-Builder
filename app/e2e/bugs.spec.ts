@@ -13,9 +13,13 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
-    await page.getByRole('button', { name: 'Report a problem' }).click();
+    // the beetle carries its word; the header still fits the title and the sync state at 360 px
+    await expect(page.getByRole('button', { name: 'Report a bug' })).toHaveText('Bug');
+    await shot(page, `${theme}-bug-button`);
+    await page.getByRole('button', { name: 'Report a bug' }).click();
     const form = page.getByRole('dialog', { name: 'Report a problem' });
     await expect(form).toBeVisible();
+    await expect(form.getByRole('radio', { name: /Bug/ })).toBeChecked();
     await form.getByLabel(/What did you want to do/).fill('The trading post does not open. I tap Buy and nothing happens.');
     await form.getByText('What goes along').click();
     await expect(form.getByText(/^# Problem report: The trading post does not open\./)).toBeVisible();
@@ -50,7 +54,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await useTheme(page, theme);
     await playServer(page);
     await page.goto('more');
-    await page.getByRole('button', { name: 'Report a problem' }).click();
+    await page.getByRole('button', { name: 'Report a bug' }).click();
     const form = page.getByRole('dialog', { name: 'Report a problem' });
     await expect(form).toBeVisible();
     await page.goBack();

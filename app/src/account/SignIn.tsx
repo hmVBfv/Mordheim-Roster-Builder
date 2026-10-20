@@ -2,8 +2,16 @@
    password, then – with an authenticator – its code, or one of the recovery
    codes instead. Accounts come from an invite only, so there is no
    "register" here. After signing in the app goes where it was sent from
-   (`?next=`), or to the account (Account in the navigation). */
-import { useState } from 'react';
+   (`?next=`), or to the account (Account in the navigation).
+
+   The authenticator's code is sent by itself with its sixth digit (Rob,
+   20.10.2026: most sign-ins do). That asks nothing more of the server than
+   the button does: the code is checked there, and the brake (5 failures in
+   15 minutes, then a doubling wait; docs/security.md) counts every try. A
+   typo is now a try before the player could look at it, so a wrong code
+   comes back selected, and is sent again only after it was changed. A
+   recovery code has no length to wait for and stays with the button. */
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useOnline } from '../app/SyncState.tsx';
 import ui from '../ui/ui.module.css';
@@ -13,6 +21,9 @@ import { deviceLabel, safeNext } from './device.ts';
 import { signedIn, signedOut, useSession } from './session.ts';
 
 type Answer = { stage: 'totp' } | { stage: 'full'; user: Me };
+
+/** The app's code: six digits, typed or pasted with the space some apps print in the middle. */
+const isAppCode = (v: string): boolean => /^\d{6}$/.test(v.replace(/\s/g, ''));
 
 export function SignIn() {
   const session = useSession();
@@ -26,8 +37,13 @@ export function SignIn() {
   const [recovery, setRecovery] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const codeField = useRef<HTMLInputElement>(null);
+  // a try on its way: a second one (a field that changes twice) would be a second failure for the brake
+  const inFlight = useRef(false);
 
   const run = async (f: () => Promise<Answer>) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setError(null);
     try {
@@ -38,9 +54,17 @@ export function SignIn() {
     } catch (e) {
       setError(errorText(e));
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
+  const sendCode = (c: string) => run(() => api<Answer>('/auth/totp', { body: { code: c } }));
+  const typeCode = (v: string) => {
+    setCode(v);
+    if (!recovery && online && isAppCode(v)) void sendCode(v);
+  };
+  // a code that was not right is selected: the next one replaces it
+  useEffect(() => { if (error) codeField.current?.select(); }, [error]);
 
   if (session.status === 'in') {
     return (
@@ -56,7 +80,7 @@ export function SignIn() {
     return (
       <section className={ui.page}>
         <h1>Sign in</h1>
-        <form className={`${ui.card} ${styles.form}`} onSubmit={(e) => { e.preventDefault(); void run(() => api<Answer>('/auth/totp', { body: { code } })); }}>
+        <form className={`${ui.card} ${styles.form}`} onSubmit={(e) => { e.preventDefault(); void sendCode(code); }}>
           {recovery ? (
             <div className={ui.field}>
               <label className={ui.field}>
@@ -67,11 +91,14 @@ export function SignIn() {
               <small id="recovery-hint" className={ui.muted}>Each works once. Running low? Set up the authenticator again in your account for new ones.</small>
             </div>
           ) : (
-            <label className={ui.field}>
-              <span>Code from your authenticator app</span>
-              <input className={`${ui.input} ${styles.code}`} name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,7}" maxLength={7}
-                value={code} onChange={(e) => setCode(e.target.value)} required autoFocus />
-            </label>
+            <div className={ui.field}>
+              <label className={ui.field}>
+                <span>Code from your authenticator app</span>
+                <input ref={codeField} className={`${ui.input} ${styles.code}`} name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,7}" maxLength={7} aria-describedby="code-hint"
+                  value={code} onChange={(e) => typeCode(e.target.value)} required autoFocus />
+              </label>
+              <small id="code-hint" className={ui.muted}>It signs you in as soon as the sixth digit is in.</small>
+            </div>
           )}
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
           <div className={ui.row}>
