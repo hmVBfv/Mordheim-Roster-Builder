@@ -14,7 +14,8 @@ export default defineConfig({
   testDir: 'e2e',
   outputDir: 'test-results/output',
   fullyParallel: false,
-  workers: 1,
+  // the tests bring their own stand-in server and share nothing but the three preview servers below
+  workers: process.env.E2E_WORKERS ? Number(process.env.E2E_WORKERS) : process.env.CI ? 2 : 3,
   retries: process.env.CI ? 1 : 0,
   // in the CI a failing test also becomes an annotation of the run, readable
   // on its summary page without opening the log
@@ -27,12 +28,14 @@ export default defineConfig({
     { name: 'quickbuild', testIgnore: /legacy|mockups|account|sync|campaigns|story|bugs/, use: { baseURL: 'http://localhost:4174/' } },
     // the legacy Roster Builder (repo root), still live until phase 3
     { name: 'legacy', testMatch: /legacy\.spec\.ts/, use: { baseURL: 'http://127.0.0.1:4175/' } },
-    // the mockups of the new app (docs/mockups/), from the same server
-    { name: 'mockups', testMatch: /mockups\.spec\.ts/, use: { baseURL: 'http://127.0.0.1:4175/docs/mockups/' } },
+    // the mockups of the new app (docs/mockups/), from the same server. They are frozen design sketches and take half of the run, so
+    // they run on their own: `npm run e2e:mockups`, and in mockups.yml when something under docs/mockups/ changes
+    ...(process.env.E2E_MOCKUPS ? [{ name: 'mockups', testMatch: /mockups\.spec\.ts/, use: { baseURL: 'http://127.0.0.1:4175/docs/mockups/' } }] : []),
   ],
+  // the mockups are static pages: no build, no preview servers
   webServer: [
-    { command: 'npx vite preview --mode campaign --port 4173 --strictPort', url: 'http://localhost:4173/', reuseExistingServer: !process.env.CI },
-    { command: 'npx vite preview --mode quickbuild --port 4174 --strictPort', url: 'http://localhost:4174/', reuseExistingServer: !process.env.CI },
+    ...(process.env.E2E_MOCKUPS ? [] : [{ command: 'npx vite preview --mode campaign --port 4173 --strictPort', url: 'http://localhost:4173/', reuseExistingServer: !process.env.CI }]),
+    ...(process.env.E2E_MOCKUPS ? [] : [{ command: 'npx vite preview --mode quickbuild --port 4174 --strictPort', url: 'http://localhost:4174/', reuseExistingServer: !process.env.CI }]),
     { command: 'python3 -m http.server 4175 --bind 127.0.0.1 --directory ..', url: 'http://127.0.0.1:4175/index.html', reuseExistingServer: !process.env.CI, stdout: 'ignore', stderr: 'ignore' },
   ],
 });

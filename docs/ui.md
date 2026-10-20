@@ -149,7 +149,7 @@ Design-Variablen wie die App; ein Streifen oben schaltet zwischen beiden
 Themes um und gehört nicht zur App. Die Kampagne darin ist erfunden.
 Jeder Knopf und jeder Reiter tut etwas (Rob, 29.09.2026: „Wichtig ist, dass
 alle Buttons und Reiter ihre Funktion haben“). Playwright
-(`app/e2e/mockups.spec.ts`) klickt jede Bedienung jeder Seite einzeln an,
+(`app/e2e/mockups.spec.ts`, nur noch mit `npm run e2e:mockups` und im eigenen Workflow `mockups.yml`, wenn sich unter `docs/mockups/` etwas ändert – die Prüfung dauerte halb so lange wie alle anderen zusammen) klickt jede Bedienung jeder Seite einzeln an,
 dazu jede in jedem Sheet und in jedem Sheet, das ein Sheet öffnet; ein Link
 darf nicht auf „#“ zeigen und muss auf eine Seite führen, die es gibt; jede
 Seite hat die Leiste unten oder ←. Ein ← direkt nach dem Schließen eines

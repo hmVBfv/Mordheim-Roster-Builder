@@ -3519,3 +3519,13 @@ server's leak matrix, which carries a marker in a tooltip.
 The World tab shows the tooltips to everybody: an NPC under World is open
 mechanics (ADR 0002). Profiles saved before the field existed read as "no
 tooltips" – the field has a default in the schema, so no migration was needed.
+
+## October 20, 2026 — a shorter test run
+
+The browser tests had grown to over twenty minutes, and a wobbling check could
+fail a pull request that was fine (#97 failed on a unit test that read the
+screen a moment before it had redrawn). Where the time went: the mockups – frozen design
+sketches – were 12 of the 21 minutes. They now run on their own, only when
+something under `docs/mockups/` changes, and the rest runs with several workers
+(three locally, two in the CI): about seven minutes locally. The tests stay;
+two that measured too early now wait for the thing they measure.

@@ -15,6 +15,7 @@
     "test:watch": "vitest",
     "size": "node scripts/size.mjs",
     "e2e": "playwright test",
+    "e2e:mockups": "E2E_MOCKUPS=1 playwright test --project mockups",
     "icons": "node scripts/icons.mjs"
   },
   "dependencies": {

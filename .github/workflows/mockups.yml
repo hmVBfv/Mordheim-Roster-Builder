@@ -1,0 +1,35 @@
+name: Mockups
+
+# The design mockups in docs/mockups/ are frozen sketches. Their browser checks
+# take as long as all the others together, so they run only when a mockup (or
+# its check) changes – not on every push (ci.yml leaves them out).
+
+on:
+  push:
+    paths: ['docs/mockups/**', 'app/e2e/mockups.spec.ts', '.github/workflows/mockups.yml']
+  pull_request:
+    branches: [master]
+    paths: ['docs/mockups/**', 'app/e2e/mockups.spec.ts', '.github/workflows/mockups.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mockups-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mockups:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - name: Browser for Playwright
+        run: npx playwright install --with-deps chromium
+        working-directory: app
+      - name: Mockups at 360 px and 1440 px
+        run: npm run e2e:mockups -w app
