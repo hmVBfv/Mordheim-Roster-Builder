@@ -32,9 +32,10 @@ export default defineConfig({
     // they run on their own: `npm run e2e:mockups`, and in mockups.yml when something under docs/mockups/ changes
     ...(process.env.E2E_MOCKUPS ? [{ name: 'mockups', testMatch: /mockups\.spec\.ts/, use: { baseURL: 'http://127.0.0.1:4175/docs/mockups/' } }] : []),
   ],
+  // the mockups are static pages: no build, no preview servers
   webServer: [
-    { command: 'npx vite preview --mode campaign --port 4173 --strictPort', url: 'http://localhost:4173/', reuseExistingServer: !process.env.CI },
-    { command: 'npx vite preview --mode quickbuild --port 4174 --strictPort', url: 'http://localhost:4174/', reuseExistingServer: !process.env.CI },
+    ...(process.env.E2E_MOCKUPS ? [] : [{ command: 'npx vite preview --mode campaign --port 4173 --strictPort', url: 'http://localhost:4173/', reuseExistingServer: !process.env.CI }]),
+    ...(process.env.E2E_MOCKUPS ? [] : [{ command: 'npx vite preview --mode quickbuild --port 4174 --strictPort', url: 'http://localhost:4174/', reuseExistingServer: !process.env.CI }]),
     { command: 'python3 -m http.server 4175 --bind 127.0.0.1 --directory ..', url: 'http://127.0.0.1:4175/index.html', reuseExistingServer: !process.env.CI, stdout: 'ignore', stderr: 'ignore' },
   ],
 });
