@@ -149,6 +149,8 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     const id = serverWarband(srv, 'The Ardent Caravan');
     await page.goto(`warbands/${id}`);
     await expect(page.getByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeVisible();
+    await noSideScroll(page);
+    await shot(page, `${theme}-share-toolbar`);
     await page.getByRole('button', { name: 'Share…' }).click();
     const sheet = page.getByRole('dialog', { name: 'Share The Ardent Caravan' });
     await sheet.getByRole('radio', { name: /^Ben/ }).check();

@@ -74,6 +74,18 @@ describe('Share… on the roster', () => {
     expect(await within(sheet).findAllByRole('listitem')).toHaveLength(1);
   });
 
+  it('sits in the actions at the top, directly left of Export', async () => {
+    server();
+    const w = record();
+    await db.warbands.add(w);
+    at(`/warbands/${w.id}`);
+
+    const actions = await screen.findByRole('group', { name: 'Warband actions' });
+    const controls = [...actions.querySelectorAll('button, a')].filter((el) => !el.closest('dialog')).map((el) => el.textContent);
+    expect(controls.indexOf('Share…')).toBeGreaterThanOrEqual(0);
+    expect(controls.indexOf('Export')).toBe(controls.indexOf('Share…') + 1);
+  });
+
   it('only with the account: signed out there is no Share…', async () => {
     fakeSyncServer();
     const w = record({ ownerId: undefined });

@@ -113,6 +113,19 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* with Share…: Recruit, Hire and Trade above, Share… and Export side by side */
+.toolbarShare {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.toolbarShare > .btn {
+  grid-column: span 2;
+}
+
+.toolbarShare > .half {
+  grid-column: span 3;
+}
+
 @media (min-width: 900px) {
   .toolbar {
     margin-inline: calc(-1 * var(--space-5));
@@ -168,6 +181,15 @@
     border: 0;
     background: none;
     backdrop-filter: none;
+  }
+
+  .toolbarShare {
+    grid-template-columns: repeat(5, auto);
+  }
+
+  .toolbarShare > .btn,
+  .toolbarShare > .half {
+    grid-column: auto;
   }
 }
 
