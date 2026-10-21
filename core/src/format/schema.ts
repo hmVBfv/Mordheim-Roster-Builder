@@ -34,11 +34,12 @@ export const spellSchema = z.looseObject({ name: z.string(), red: z.number().opt
 const text = (max: number) => z.string().max(max);
 const texts = (keyMax: number, valueMax: number, entries: number) => z.record(z.string().max(keyMax), text(valueMax)).refine((v) => Object.keys(v).length <= entries, { message: `at most ${entries} entries` });
 
-/** A warrior's profile: the names in both languages, how he speaks, where he comes from, a few lines about him. */
+/** A warrior's profile: the names in both languages, how he speaks, where he comes from, a few lines about him, the faction he belongs to. */
 export const profileSchema = z.looseObject({
   name_de: text(STORY_LIMITS.name).optional(), name_en: text(STORY_LIMITS.name).optional(),
   title_de: text(STORY_LIMITS.title).optional(), title_en: text(STORY_LIMITS.title).optional(),
   voice: text(STORY_LIMITS.voice).optional(), origin: text(STORY_LIMITS.origin).optional(), text: text(STORY_LIMITS.text).optional(),
+  faction: text(STORY_LIMITS.name).optional(), faction_id: text(64).optional(),
 });
 
 /** The prologue, an interlude after each round, the explanation of a change. */

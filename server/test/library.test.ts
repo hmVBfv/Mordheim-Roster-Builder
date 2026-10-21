@@ -19,6 +19,32 @@ async function two() {
 }
 const idea = (text = 'A war band of ferrymen who know the Stir.', topic = 'warband') => ({ kind: 'idea', name: 'The ferrymen', body: { text, topic } });
 
+describe('the Library: factions', () => {
+  const faction = (over: Record<string, unknown> = {}) => ({ kind: 'faction', name: 'The Bell-ringers', body: { de: 'Die Glockenläuter', status: 'Known in the drowned quarter', lore: 'Monks who ring the bells and know what the water hides.', ...over } });
+
+  it('a faction is kept with its German name, what players may read and its lore', async () => {
+    const { kai } = await two();
+    const id = randomUUID();
+    const made = await kai('PUT', `/library/${id}`, faction());
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: { kind: string; name: string; body: unknown } }).item).toMatchObject({ kind: 'faction', name: 'The Bell-ringers', body: { de: 'Die Glockenläuter', status: 'Known in the drowned quarter', lore: expect.stringContaining('bells') } });
+    // the German name, the status and the lore may be left out: they are empty then
+    const bare = await kai('PUT', `/library/${randomUUID()}`, { kind: 'faction', name: 'The Ferrymen', body: {} });
+    expect((bare.json() as { item: { body: unknown } }).item.body).toEqual({ de: '', status: '', lore: '' });
+    const list = (await kai('GET', '/library')).json() as { items: { kind: string }[] };
+    expect(list.items.map((i) => i.kind).sort()).toEqual(['faction', 'faction']);
+  });
+
+  it('only a faction that fits: no idea’s words in it, the limits held', async () => {
+    const { kai } = await two();
+    const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
+    expect((await put({ kind: 'faction', name: 'x', body: { text: 'an idea', topic: 'other' } })).statusCode).toBe(400);
+    expect((await put(faction({ status: 'x'.repeat(201) }))).statusCode).toBe(400);
+    expect((await put(faction({ de: 'x'.repeat(121) }))).statusCode).toBe(400);
+    expect((await put(faction({ lore: 'x'.repeat(20_001) }))).statusCode).toBe(400);
+  });
+});
+
 describe('the Library: ideas', () => {
   it('an idea is written under the device’s id, read back, and changed from the state it was seen in', async () => {
     const { kai } = await two();
@@ -88,7 +114,7 @@ describe('the Library: ideas', () => {
   it('only what it can read: a kind that is not here yet, a body that does not fit, too much', async () => {
     const { kai } = await two();
     const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
-    expect((await put({ kind: 'faction', name: 'Not yet', body: {} })).statusCode).toBe(400);
+    expect((await put({ kind: 'npc', name: 'Not yet', body: {} })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: '', body: { text: 'x', topic: 'other' } })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: 'x', body: { text: 'x', topic: 'secret' } })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: 'x', body: { text: 'x'.repeat(20_001), topic: 'other' } })).statusCode).toBe(400);

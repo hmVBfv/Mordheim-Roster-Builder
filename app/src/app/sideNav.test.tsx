@@ -112,7 +112,7 @@ describe('the side navigation', () => {
     const nav = screen.getByRole('navigation', { name: 'Main' });
     expect((await within(nav).findByRole('link', { name: 'Library' })).getAttribute('href')).toBe('/library');
     const list = await waitForList(nav, 'nav-library');
-    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Ideas', '/library/ideas']]);
+    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Ideas', '/library/ideas'], ['Factions', '/library/factions']]);
     await user.click(within(nav).getByRole('button', { name: 'Close Library' }));
     expect(nav.querySelector('#nav-library')).toBeNull();
   });

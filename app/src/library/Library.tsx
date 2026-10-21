@@ -1,7 +1,7 @@
 /* The Library (ADR 0023): what a person writes without a campaign, kept with the account – ideas first, later
    factions, NPCs, groups and scenarios. Private: only its owner reads it. Reading works from what the device
    kept; writing needs the connection. */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, Navigate, NavLink, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
 import accountStyles from '../account/Account.module.css';
@@ -12,22 +12,10 @@ import { newId } from '../db/ids.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { cachedLibrary, getLibrary, MAX_IDEA, MAX_NAME, putIdea, removeItem, staleItem, TOPIC_NAMES, TOPICS, type Idea, type LibraryItem, type Topic } from './api.ts';
+import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleItem, TOPIC_NAMES, TOPICS, type Faction, type FactionBody, type Idea, type IdeaBody, type Topic } from './api.ts';
 import styles from './Library.module.css';
 import { LIBRARY_TABS } from './tabs.ts';
-
-/** The entries of the account: what the device kept first, then the server's. */
-function useLibrary() {
-  const [items, setItems] = useState<LibraryItem[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    let live = true;
-    void cachedLibrary().then((c) => { if (live && c) setItems((cur) => cur ?? c); });
-    getLibrary().then((l) => { if (live) { setItems(l); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
-    return () => { live = false; };
-  }, []);
-  return { items, setItems, error };
-}
+import { factionsOf, useLibrary } from './useLibrary.ts';
 
 function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
   idea: Idea | null; online: boolean; close: (then?: () => void) => void; onSaved: (i: Idea) => void; onRemoved: (i: Idea) => void;
@@ -48,7 +36,7 @@ function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
       const saved = await putIdea(id, name.trim(), { text, topic }, base);
       close(() => onSaved(saved));
     } catch (e) {
-      const cur = staleItem(e);
+      const cur = staleItem<IdeaBody>(e);
       if (cur) {
         setBase(cur.seq);
         setError(`This idea was changed on another device while you were writing. Theirs: “${cur.body.text.slice(0, 200)}${cur.body.text.length > 200 ? '…' : ''}” – save again to replace it with yours.`);
@@ -152,6 +140,132 @@ function IdeasTab({ notify }: { notify: (t: string) => void }) {
   );
 }
 
+function FactionForm({ faction, online, close, onSaved, onRemoved }: {
+  faction: Faction | null; online: boolean; close: (then?: () => void) => void; onSaved: (f: Faction) => void; onRemoved: (f: Faction) => void;
+}) {
+  const [name, setName] = useState(faction?.name ?? '');
+  const [de, setDe] = useState(faction?.body.de ?? '');
+  const [status, setStatus] = useState(faction?.body.status ?? '');
+  const [lore, setLore] = useState(faction?.body.lore ?? '');
+  const [base, setBase] = useState<number | undefined>(faction?.seq);
+  const [asking, setAsking] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [id] = useState(() => faction?.id ?? newId());
+
+  const save = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const saved = await putFaction(id, name.trim(), { de: de.trim(), status: status.trim(), lore }, base);
+      close(() => onSaved(saved));
+    } catch (e) {
+      const cur = staleItem<FactionBody>(e);
+      if (cur) {
+        setBase(cur.seq);
+        setError(`This faction was changed on another device while you were writing. Theirs: “${cur.name}${cur.body.status ? ` – ${cur.body.status}` : ''}” – save again to replace it with yours.`);
+      } else setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const remove = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await removeItem(id);
+      close(() => onRemoved(faction!));
+    } catch (e) {
+      setError(errorText(e));
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void save(); }}>
+      <h2 id="faction-form-title">{faction ? 'Edit faction' : 'A new faction'}</h2>
+      {!online && <p className={`${ui.message} ${ui.error}`}>Saving needs the connection.</p>}
+      <label className={ui.field}>
+        <span>Name (English)</span>
+        <input className={ui.input} value={name} maxLength={MAX_NAME} autoComplete="off" onChange={(e) => setName(e.target.value)} />
+      </label>
+      <label className={ui.field}>
+        <span>Name (German)</span>
+        <input className={ui.input} value={de} maxLength={MAX_NAME} autoComplete="off" placeholder="as the German chronicle spells it, if it differs" onChange={(e) => setDe(e.target.value)} />
+      </label>
+      <label className={ui.field}>
+        <span>What the players may read</span>
+        <input className={ui.input} value={status} maxLength={MAX_STATUS} autoComplete="off" placeholder="Known in the drowned quarter" onChange={(e) => setStatus(e.target.value)} />
+      </label>
+      <label className={ui.field}>
+        <span>The lore</span>
+        <textarea className={ui.textarea} rows={8} value={lore} maxLength={MAX_IDEA} onChange={(e) => setLore(e.target.value)} />
+      </label>
+      <p className={ui.muted}>Only you see the Library. In a campaign’s World a leader adds the faction from here: the names and what the players may read go along as a copy; the lore stays with you.</p>
+      {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
+      {asking ? (
+        <div className={ui.page}>
+          <p>Remove it for good? It is gone on every device. Campaigns that already have a copy keep it; a warrior who belongs to it keeps its name.</p>
+          <div className={ui.row}>
+            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
+            <button type="button" className={ui.buttonQuiet} onClick={() => setAsking(false)}>Keep it</button>
+          </div>
+        </div>
+      ) : (
+        <div className={ui.row}>
+          <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save</button>
+          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+          {faction && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => setAsking(true)}>Remove this faction</button>}
+        </div>
+      )}
+    </form>
+  );
+}
+
+function FactionsTab({ notify }: { notify: (t: string) => void }) {
+  const online = useOnline();
+  const { items, setItems, error } = useLibrary();
+  const { ref, open, close } = useSheet('faction-form');
+  const [editing, setEditing] = useState<{ faction: Faction | null; key: number } | null>(null);
+  const factions = factionsOf(items);
+  const edit = (faction: Faction | null) => { setEditing((e) => ({ faction, key: (e?.key ?? 0) + 1 })); open(); };
+  const reachable = online && !error;
+
+  return (
+    <section className={ui.page} aria-labelledby="factions-title">
+      <h2 id="factions-title" className={styles.title}>Factions</h2>
+      <p className={ui.muted}>Groups, houses, cults and powers of your own world, written once. A warrior of any of your warbands can belong to one, and a leader adds one to a campaign’s World from here. Only you see this.</p>
+      {error && <p className={ui.message} role="status">{error}{items ? ' Shown as last seen.' : ''}</p>}
+      {!items && !error && <p className={ui.muted}>Loading the factions…</p>}
+      {items && factions.length === 0 && <p className={ui.muted}>No factions yet. Write the first one down.</p>}
+      {factions.length > 0 && (
+        <ul className={styles.list} aria-label="Factions">
+          {factions.map((f) => (
+            <li key={f.id} className={styles.idea}>
+              <div className={styles.head}>
+                <strong>{f.name}</strong>
+                {f.body.de && f.body.de !== f.name && <span className={styles.chip}>{f.body.de}</span>}
+              </div>
+              {f.body.status && <p className={styles.excerpt}>{f.body.status}</p>}
+              {f.body.lore && <p className={styles.excerpt}>{f.body.lore.length > 200 ? `${f.body.lore.slice(0, 200)}…` : f.body.lore}</p>}
+              <small className={styles.meta}>Changed <time dateTime={f.updatedAt}>{stamp(f.updatedAt)}</time></small>
+              <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${f.name}`} onClick={() => edit(f)}>Edit</button></div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New faction</button></div>
+      <dialog ref={ref} className={ui.sheet} aria-labelledby="faction-form-title">
+        {editing && (
+          <FactionForm key={editing.key} faction={editing.faction} online={reachable} close={close}
+            onSaved={(f) => { setItems((cur) => [f, ...(cur ?? []).filter((x) => x.id !== f.id)]); notify('Faction saved. Only you see it.'); }}
+            onRemoved={(f) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== f.id)); notify('Faction removed.'); }} />
+        )}
+      </dialog>
+    </section>
+  );
+}
+
 export function Library() {
   const { tab = 'ideas' } = useParams();
   const session = useSession();
@@ -175,6 +289,7 @@ export function Library() {
         {LIBRARY_TABS.map((t) => <NavLink key={t.key} to={`/library/${t.key}`}>{t.label}</NavLink>)}
       </nav>
       {tab === 'ideas' && <IdeasTab notify={notify} />}
+      {tab === 'factions' && <FactionsTab notify={notify} />}
       {notice}
     </section>
   );

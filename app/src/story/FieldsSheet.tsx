@@ -11,8 +11,10 @@ export interface Field {
   /** The key in `values` (and in the save: `name_de`, `voice` …). */
   key: string;
   label: string;
-  /** A line, or words of several lines. */
-  kind: 'line' | 'text';
+  /** A line, words of several lines, or one of the `options`. */
+  kind: 'line' | 'text' | 'choice';
+  /** For a choice: what can be picked (the value is what is kept). */
+  options?: { value: string; label: string }[];
   max: number;
   hint?: string;
   placeholder?: string;
@@ -48,9 +50,11 @@ function Form({ close, edit, titleId }: { close: Sheet['close']; edit: FieldsEdi
         return (
           <div key={f.key} className={ui.field}>
             <label htmlFor={id}>{f.label}</label>
-            {f.kind === 'line'
-              ? <input id={id} className={ui.input} value={v} maxLength={f.max} placeholder={f.placeholder} autoComplete="off" onChange={(e) => set(e.target.value)} />
-              : <textarea id={id} className={`${ui.textarea} ${ui.writing}`} rows={f.rows ?? 5} value={v} maxLength={f.max} placeholder={f.placeholder} onChange={(e) => set(e.target.value)} />}
+            {f.kind === 'choice'
+              ? <select id={id} className={ui.select} value={v} onChange={(e) => set(e.target.value)}>{(f.options ?? []).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+              : f.kind === 'line'
+                ? <input id={id} className={ui.input} value={v} maxLength={f.max} placeholder={f.placeholder} autoComplete="off" onChange={(e) => set(e.target.value)} />
+                : <textarea id={id} className={`${ui.textarea} ${ui.writing}`} rows={f.rows ?? 5} value={v} maxLength={f.max} placeholder={f.placeholder} onChange={(e) => set(e.target.value)} />}
             {f.hint && <small className={ui.muted}>{f.hint}</small>}
             {v.length > f.max * 0.8 && <small className={styles.count}>{v.length} / {f.max}</small>}
           </div>

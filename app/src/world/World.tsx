@@ -6,10 +6,12 @@
    players may know it exists. Writing needs the connection. */
 import { lazy, Suspense, useId, useState } from 'react';
 import { npcAsOpponent, OPPONENT_STATS, ttsOpponentName, ttsOpponentText, type NpcProfile, type OpponentTemplate } from '@mordheim/core';
+import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
+import { putFaction as keepFaction } from '../library/api.ts';
 import notes from '../notes/Notes.module.css';
 import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
@@ -24,6 +26,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { addReputation, LIMITS, nameOf, otherName, putFaction, putNpc, removeFaction, removeNpc, removeReputation, signed, standings, type Faction, type Npc, type ReputationEvent, type World } from './api.ts';
 import { bodyOf, draftOf, npcTemplates, type NpcDraft } from './npcDraft.ts';
+import { FromLibrary } from './FromLibrary.tsx';
 import { useWorld } from './useWorld.ts';
 import styles from './World.module.css';
 
@@ -223,6 +226,8 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
   const online = useOnline();
   const [notice, notify] = useNotice();
   const factionSheet = useSheet();
+  const librarySheet = useSheet();
+  const [libraryKey, setLibraryKey] = useState<number | null>(null);
   const npcSheet = useSheet();
   const repSheet = useSheet();
   const removeSheet = useSheet();
@@ -246,6 +251,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
     removeSheet.open();
   };
   const openFaction = (edit: Faction | null) => { setFactionEdit((p) => ({ key: (p?.key ?? 0) + 1, edit })); factionSheet.open(); };
+  const openLibrary = () => { setLibraryKey((k) => (k ?? 0) + 1); librarySheet.open(); };
   const openNpc = (edit: Npc | null) => { setNpcEdit((p) => ({ key: (p?.key ?? 0) + 1, edit })); npcSheet.open(); };
   const openRep = () => { setRepKey((k) => (k ?? 0) + 1); repSheet.open(); };
 
@@ -268,6 +274,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
         {lead && (
           <div className={ui.row}>
             <button type="button" className={ui.button} disabled={!online} onClick={() => openFaction(null)}>Add a faction</button>
+            <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={openLibrary}>From the Library…</button>
             <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={() => openNpc(null)}>Add an NPC</button>
             <button type="button" className={ui.buttonQuiet} disabled={!online || world.factions.length === 0 || warbands.length === 0} onClick={openRep}>Record reputation</button>
           </div>
@@ -304,6 +311,8 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
                   {lead && (
                     <div className={ui.row}>
                       <button type="button" className={ui.buttonQuiet} aria-label={`Change ${nameOf(f)}`} disabled={!online} onClick={() => openFaction(f)}>Change</button>
+                      <button type="button" className={ui.buttonQuiet} aria-label={`Save ${nameOf(f)} to your Library`} disabled={!online}
+                        onClick={() => { keepFaction(newId(), nameOf(f), { de: f.nameDe && f.nameDe !== nameOf(f) ? f.nameDe : '', status: f.publicStatus, lore: '' }).then(() => notify('Saved to your Library.')).catch((e: unknown) => notify(errorText(e))); }}>Save to Library</button>
                       <button type="button" className={ui.buttonQuiet} aria-label={`Remove ${nameOf(f)}`} disabled={!online}
                         onClick={() => askRemove(`Remove ${nameOf(f)}?`, 'Its people stay, without a faction. Its reputation entries leave the view with it.', () => removeFaction(id, f.id), 'Faction removed.')}>Remove</button>
                     </div>
@@ -357,6 +366,12 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
         {(titleId) => factionEdit && (
           <FactionForm key={factionEdit.key} titleId={titleId} edit={factionEdit.edit} close={() => factionSheet.close()}
             onSave={(b) => putFaction(id, factionEdit.edit?.id ?? newId(), b).then(done(factionEdit.edit ? 'Faction changed.' : 'Faction added.'))} />
+        )}
+      </FormSheet>
+      <FormSheet dialogRef={librarySheet.ref}>
+        {(titleId) => libraryKey !== null && (
+          <FromLibrary key={libraryKey} titleId={titleId} world={world.factions} close={() => librarySheet.close()}
+            onAdd={(f) => putFaction(id, newId(), { nameEn: f.name, nameDe: f.body.de || f.name, publicStatus: f.body.status }).then(done(`${f.name} added from your Library.`))} />
         )}
       </FormSheet>
       <FormSheet dialogRef={npcSheet.ref} wide>

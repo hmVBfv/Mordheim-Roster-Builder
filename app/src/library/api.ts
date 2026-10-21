@@ -12,10 +12,14 @@ export const TOPICS = Object.keys(TOPIC_NAMES) as Topic[];
 /** The limits the server holds to (server/src/library.ts). */
 export const MAX_IDEA = 20_000;
 export const MAX_NAME = 120;
+export const MAX_STATUS = 200;
 
 export interface IdeaBody { text: string; topic: Topic }
+/** A faction as the Library keeps it; its `name` is the English one. */
+export interface FactionBody { de: string; status: string; lore: string }
 export interface LibraryItem<B = unknown> { id: string; kind: string; name: string; body: B; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
 export type Idea = LibraryItem<IdeaBody>;
+export type Faction = LibraryItem<FactionBody>;
 
 const KEY = 'items';
 
@@ -35,14 +39,16 @@ export async function getLibrary(): Promise<LibraryItem[]> {
   return items;
 }
 
-/** Writes one idea under the device's id; `baseSeq` is the state it is changed from (none for a new one). */
-export async function putIdea(id: string, name: string, body: IdeaBody, baseSeq?: number): Promise<Idea> {
+/** Writes one entry under the device's id; `baseSeq` is the state it is changed from (none for a new one). */
+export async function putItem<B>(kind: 'idea' | 'faction', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
   const who = asker();
-  const r = await api<{ item: Idea }>(`/library/${id}`, { method: 'PUT', body: { kind: 'idea', name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
+  const r = await api<{ item: LibraryItem<B> }>(`/library/${id}`, { method: 'PUT', body: { kind, name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
   const cur = (await cachedLibrary()) ?? [];
   await who.keep('library:', KEY, [r.item, ...cur.filter((i) => i.id !== id)]);
   return r.item;
 }
+export const putIdea = (id: string, name: string, body: IdeaBody, baseSeq?: number) => putItem<IdeaBody>('idea', id, name, body, baseSeq);
+export const putFaction = (id: string, name: string, body: FactionBody, baseSeq?: number) => putItem<FactionBody>('faction', id, name, body, baseSeq);
 
 export async function removeItem(id: string): Promise<void> {
   const who = asker();
@@ -55,6 +61,6 @@ export async function removeItem(id: string): Promise<void> {
 }
 
 /** The entry as it stands now, when it was changed from another device first (the server's 409 `stale`). */
-export function staleItem(e: unknown): Idea | null {
-  return e instanceof ApiError && e.status === 409 && e.code === 'stale' ? ((e.body as { item?: Idea } | undefined)?.item ?? null) : null;
+export function staleItem<B = unknown>(e: unknown): LibraryItem<B> | null {
+  return e instanceof ApiError && e.status === 409 && e.code === 'stale' ? ((e.body as { item?: LibraryItem<B> } | undefined)?.item ?? null) : null;
 }

@@ -57,6 +57,60 @@ describe('standings', () => {
   });
 });
 
+describe('the world and the Library (ADR 0023)', () => {
+  it('a leader adds a faction from the Library as a copy: the names and what players may read go along, the lore stays', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.libraryFrom({ name: 'The Bell-ringers', kind: 'faction', body: { de: 'Die Glockenläuter', status: 'Known in the drowned quarter', lore: 'SECRET LORE: they ring for the drowned.' } });
+    srv.libraryFrom({ name: 'An idea', body: { text: 'x', topic: 'other' } });
+    srv.libraryFrom({ name: 'Ben’s faction', kind: 'faction', body: { de: '', status: '', lore: '' }, owner: 'user-ben' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'From the Library…' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Add from your Library' });
+    // only one's own factions: no idea, nobody else's
+    const list = await within(sheet).findByRole('list', { name: 'Your factions' });
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([expect.stringContaining('The Bell-ringers')]);
+    await user.click(within(list).getByRole('button', { name: 'Add The Bell-ringers' }));
+    const made = () => [...srv.state.factions.values()].filter((f) => f.campaignId === c.id && !f.deleted);
+    await waitFor(() => expect(made()).toHaveLength(1));
+    expect(made()).toMatchObject([{ nameEn: 'The Bell-ringers', nameDe: 'Die Glockenläuter', publicStatus: 'Known in the drowned quarter' }]);
+    expect(JSON.stringify(made())).not.toContain('SECRET LORE');
+    expect(await screen.findByRole('article', { name: 'The Bell-ringers' })).toBeTruthy();
+    // the faction is there: the Library does not offer it again
+    await user.click(screen.getByRole('button', { name: 'From the Library…' }));
+    const again = within(await screen.findByRole('dialog', { name: 'Add from your Library' }));
+    expect((await again.findByRole('button', { name: 'Add The Bell-ringers' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(again.getByText('Already in this world')).toBeTruthy();
+  });
+
+  it('a leader keeps a faction of the world in the Library, as a copy', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'Add a faction' }));
+    const f = screen.getByRole('dialog', { name: 'Add a faction' });
+    await user.type(within(f).getByLabelText('Name (English)'), 'The Ferrymen');
+    await user.type(within(f).getByLabelText('Status everyone may read'), 'Ply the Stir');
+    await user.click(within(f).getByRole('button', { name: 'Save' }));
+    const card = await screen.findByRole('article', { name: 'The Ferrymen' });
+    await user.click(within(card).getByRole('button', { name: 'Save The Ferrymen to your Library' }));
+    expect(await screen.findByText('Saved to your Library.')).toBeTruthy();
+    expect([...srv.state.library.values()].filter((i) => !i.deletedAt)).toMatchObject([{ kind: 'faction', name: 'The Ferrymen', body: { de: '', status: 'Ply the Stir', lore: '' } }]);
+  });
+
+  it('players do not get the buttons', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: others() });
+    srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
+    at(`/campaign/${c.id}/world`);
+    expect(await screen.findByRole('article', { name: 'The Ferrymen' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'From the Library…' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /to your Library/ })).toBeNull();
+  });
+});
+
 describe('a leader writes the world', () => {
   it('adds a faction, a person under it, and records reputation; the standing and the log follow', async () => {
     const srv = server({ totp: true });

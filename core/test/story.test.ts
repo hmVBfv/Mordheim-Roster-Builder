@@ -129,6 +129,22 @@ describe('a profile', () => {
     expect(core.setProfile(ctx(s1), hero, { voice: 'terse' })).toBe(s1);
   });
 
+  it('names the faction the warrior belongs to: its id from the Library and its name as written down (ADR 0023)', () => {
+    const s0 = band();
+    const hero = s0.models[1]!.uid;
+    const id = '3f2a9c1e-5b7d-4f60-9a1c-2d8e7b6a5f40';
+    const s1 = core.setProfile(ctx(s0), hero, { faction: ' The Bell-ringers ', faction_id: id, voice: 'terse' });
+    expect(core.profileOf(s1.models[1])).toEqual({ faction: 'The Bell-ringers', faction_id: id, voice: 'terse' });
+    // leaving the faction takes both away; the rest of the profile stays
+    const s2 = core.setProfile(ctx(s1), hero, { faction: '', faction_id: '' });
+    expect(core.profileOf(s2.models[1])).toEqual({ voice: 'terse' });
+    // cut at the limits; the same words again change nothing
+    const long = core.setProfile(ctx(s0), hero, { faction: 'f'.repeat(500), faction_id: 'i'.repeat(200) });
+    expect(core.profileOf(long.models[1]).faction).toHaveLength(core.STORY_LIMITS.name);
+    expect(core.profileOf(long.models[1]).faction_id).toHaveLength(64);
+    expect(core.setProfile(ctx(s1), hero, { faction: 'The Bell-ringers', faction_id: id })).toBe(s1);
+  });
+
   it('cuts every field at its limit', () => {
     const s0 = band();
     const hero = s0.models[1]!.uid;
