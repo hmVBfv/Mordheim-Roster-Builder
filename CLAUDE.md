@@ -155,7 +155,9 @@ changing anything structural.
   a place in `core/src/format/schema.ts`; `FORMAT` rises only with a
   migration. Never rename or remove a key (`test/compat.mjs`).
   Principle change → new ADR. Notable change → `HISTORY.md` entry (why,
-  including wrong turns).
+  including wrong turns); in a run of several reports (`/bugs`) the entries
+  go into one separate docs pull request, not into each fix's branch, so the
+  pull requests do not conflict on the end of the file.
 - The legacy app is frozen, but must keep working until the switch; if Rob
   ever asks for a change there:
   - every function used from an inline handler must be listed in the

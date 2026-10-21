@@ -100,7 +100,8 @@ message, and the same steps as below apply.
    the report. Then the fix. Then `npm run check`, and the app build, size and
    e2e if the app changed. A save-format, endpoint or schema change updates
    `docs/data-model.md` in the same commit; a notable fix gets a `HISTORY.md`
-   entry (why, including wrong turns).
+   entry (why, including wrong turns) – **but not on its own branch when more
+   than one report is in the run** (section 6, "Shared files").
 5. Commit in English, no umlauts, a body that says why, and a last line
    `Fix #N`, plus the attribution lines of the session.
 6. **S1 gets an independent review before the pull request.** Start the
@@ -141,7 +142,12 @@ For several numbers or `all`:
      them all (each with its own regression test and its own `Fix #N`).
    - A report that **needs another fix first**: its branch starts from the
      other fix's branch instead of `origin/master`, and its pull request says
-     that it contains the other one and which to merge first.
+     that it contains the other one and which to merge first. **Its pull
+     request still targets `master`** – never the other fix's branch. A pull
+     request whose base is a branch merges into that branch, not into `master`
+     (21.10.2026: four stacked pull requests were "merged" one after the other
+     and `master` got none of them). The diff shrinks by itself once the first
+     one is in.
 3. **Not fixed in the run, left for Rob** (say so in the list): a rules issue
    (section 3), a wish, a report you cannot understand, a duplicate, and any fix
    that needs a decision that could reasonably go either way.
@@ -157,8 +163,28 @@ For several numbers or `all`:
    report, the check stays red): stop that report, set it back to `confirmed`
    with nothing half-done on the branch (delete it unpushed), say why in the
    final list, and go on with the next. Never push a failing fix.
-7. Fixes in the same area can conflict when Rob merges them. If you know two
-   touch the same file, say so, and name the order to merge them in.
+7. **Shared files.** Every pull request that appends to the end of the same
+   file conflicts with the next one – the second to be merged always does
+   (21.10.2026: every fix wrote its `HISTORY.md` entry at the end, and Rob had
+   to resolve it in every pull request). So in a run:
+   - **No fix touches `HISTORY.md`.** Collect the entries as you go (in your
+     notes) and, after the last fix, open **one** more branch from
+     `origin/master` with all of them, as a docs-only pull request
+     "History for the run of <date>" (one entry per report, the pull request
+     numbers named). It is the only pull request of the run that touches the
+     file.
+   - Other files that several fixes of the run edit at the same place (a row
+     of `docs/data-model.md`, a paragraph of `docs/ui.md`, a table in
+     `docs/behaviour-changes.md`): decide **before** the first fix. Two fixes
+     that need the same lines are a stacked pair (item 2), not two independent
+     branches. Before opening each pull request, merge `origin/master` into the
+     branch and look at what the other open pull requests of the run touch
+     (`gh pr diff <n> --name-only`).
+   - If you know two still touch the same file, say so, and name the order to
+     merge them in.
+   - After Rob merges, **a conflict on a pull request of the run is yours to
+     fix**: merge `origin/master` into its branch (never force-push) and say
+     so.
 8. Section 5 happens later and per report, after Rob says what is merged and
    deployed.
 
