@@ -1,0 +1,130 @@
+{
+  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Mordheim setting, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026, pages last updated 12.10.2026). Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group.",
+  "SOURCES": {
+    "flames": { "title": "The Empire in Flames", "url": "https://mordheimer.net/docs/introduction/the-empire-in-flames" },
+    "city": { "title": "The City of the Damned", "url": "https://mordheimer.net/docs/introduction/the-city-of-the-damned" },
+    "bands": { "title": "The Warbands of Mordheim", "url": "https://mordheimer.net/docs/introduction/the-warbands-of-mordheim" },
+    "ostermark": { "title": "The League of Ostermark (Fanatic Magazine #1, Nicodemus Kyme)", "url": "https://mordheimer.net/docs/introduction/additional-lore/league-of-ostermark" },
+    "reikland": { "title": "Mercenaries – Reikland", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#reikland" },
+    "middenheim": { "title": "Mercenaries – Middenheim", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#middenheim" },
+    "marienburg": { "title": "Mercenaries – Marienburg", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#marienburg" },
+    "ostermarkers": { "title": "Mercenaries – Ostermark", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark" }
+  },
+  "LORE": [
+    {
+      "id": "mordheim", "kind": "region", "name": "Mordheim", "de": "Mordheim", "source": ["flames", "city"],
+      "status": "The ruined City of the Damned, in Ostermark",
+      "text": "The capital of Ostermark, crowded with revellers from all over the Empire when the twin-tailed comet fell on the first day of 2000 and destroyed it. Fires and a glowing green miasma hung over the ruins for days. Then the first wyrdstone was found there, which drew treasure hunters, the Empire's rulers and every kind of monster. Inside, the air itself is poisonous and no law holds: it is kill or be killed."
+    },
+    {
+      "id": "the-pit", "kind": "region", "name": "The Pit", "de": "Die Grube", "source": ["bands"],
+      "status": "The crater where the hammer of Sigmar fell",
+      "text": "Where the comet struck, a pit remains whose edges are still hot and whose sides are glassy, as if the rock had run molten. The dead of the city can be seen in the glass, still posed as on that last night. Foul smoke rises from fissures in it. It is said that the Shadowlord, Master of the Possessed, dwells deep in the crater, and daemonic creatures come out of it to infest the ruins."
+    },
+    {
+      "id": "temple-of-sigmars-rock", "kind": "region", "name": "Temple of Sigmar's Rock", "de": "Tempel von Sigmars Fels", "source": ["bands"],
+      "status": "The Sisters' convent on an island in the River Stir",
+      "text": "The convent of the Sisters of Sigmar stands on a tall rocky island in the River Stir, which divides Mordheim in two. It survived the destruction unharmed. The Sisters say their unending prayer saved them; the Witch Hunters claim a daemonic pact let them betray the city and escape. The height of the rock lifts them above the poisonous vapours."
+    },
+    {
+      "id": "sigmarhaven", "kind": "region", "name": "Sigmarhaven", "de": "Sigmarhaven", "source": ["city"],
+      "status": "A tent camp outside the walls with paid watchmen",
+      "text": "One of the shabby fortified settlements that grew up outside the ruins. For all its disorder it is safe enough: paid watchmen keep the peace, and it holds a market for arms sellers, sutlers and victuallers whose wares fetch inflated prices."
+    },
+    {
+      "id": "cutthroats-den", "kind": "region", "name": "Cutthroat's Den", "de": "Halsabschneiders Loch", "source": ["city"],
+      "status": "A nest of murderers outside the walls",
+      "text": "An encampment little better than a den of murderers. Mutants walk freely there, and hooded men barter corpses to Necromancers in return for tainted gold."
+    },
+    {
+      "id": "ostermark", "kind": "region", "name": "Ostermark", "de": "Ostermark", "source": ["city", "ostermark"],
+      "status": "Eastern province of the Empire, lawless since Mordheim fell",
+      "text": "One of the largest provinces, on the eastern fringe of the Empire: flat farmland, pasture and hedges, with isolated farms and villages and crude dirt roads, and the Great Forest on the border to Talabecland. Its Elector, Count Steinhardt, died with his whole line when Mordheim fell, and since then brigands, mercenary bands and foreign armies roam it. Famine follows burnt fields, and Orcs and Goblins from the Worlds Edge Mountains and Beastmen from the Forest of Shadows threaten it. Wyrdstone fragments lie scattered across the whole province. Its towns are Bechafen and Badenhof, and its colours are yellow and purple."
+    },
+    {
+      "id": "eerie-downs", "kind": "region", "name": "The Eerie Downs", "de": "Die Unheimlichen Hügel", "source": ["ostermark"],
+      "status": "A haunted fog-bound plain south of Bechafen",
+      "text": "A wide open plain with an unnerving stillness. A permanent low fog rolls over the grass and crags jut from it like broken teeth. Travellers lost there are driven mad by the silence and the loss of direction. It is said the souls of the dead who died there still haunt it and howl at midnight, hungry for more souls."
+    },
+    {
+      "id": "ostermark-marches", "kind": "region", "name": "The Ostermark Marches", "de": "Die Ostermark-Marken", "source": ["ostermark"],
+      "status": "Frontier with Kislev, guarded by beacon towers",
+      "text": "The border lands to Kislev in the north, marked by wooden watch towers with warning beacons that are lit when invasion looms, and backed by the river Lower Talabec. The town of Bechafen lies deep in the Marches: a military town renowned for the smithies and armourers who supply the army of Ostermark, and so a valuable resource against Chaos from the north."
+    },
+    {
+      "id": "reikland", "kind": "region", "name": "Reikland", "de": "Reikland", "source": ["reikland", "bands"],
+      "status": "Heart of the Empire; seat of the Temple of Sigmar",
+      "text": "Its greatest city is Altdorf, home of the Grand Theogonist. Siegfried, who styles himself Grand Prince, claims the throne with the Grand Theogonist's backing and is opposed most strongly by Middenheim and the Priests of Ulric. Reiklanders are devout followers of Sigmar, known for discipline, loyalty between officers and men and good archery. They wear practical wargear and coloured ribbons for identification or rank, and sneer at the Count of Middenheim as the “lap-dog of Ulric”. Count Siegfried's alchemist van Hoffman is said to have turned lead into gold with wyrdstone."
+    },
+    {
+      "id": "middenheim", "kind": "region", "name": "Middenheim", "de": "Middenheim", "source": ["middenheim", "bands"],
+      "status": "City of the White Wolf, in Middenland",
+      "text": "A city on a mountain pinnacle among dark forest, sacred to Ulric, god of wolves and winter, whose priesthood is still strong there. Its Count, Mannfred Todbringer, is a chief contender for the throne, and the old rivalry with Reikland (and friction with the Temple of Sigmar) goes back hundreds of years. Middenheimers are big, strong, ferocious men, often bare-headed with long hair and beards, who wear wolf pelts as the mark of a wolf killed by hand."
+    },
+    {
+      "id": "marienburg", "kind": "region", "name": "Marienburg", "de": "Marienburg", "source": ["marienburg", "flames"],
+      "status": "The City of Gold, largest port of the Old World",
+      "text": "The most prosperous trading city of the Old World, where goods arrive from Ulthuan to Cathay and every craft is turned to profit. Merchant guilds hold great power there, above all the Freetraders, and its Burgomeisters wield patronage greater than many nobles. Its champion for the throne is Lady Magritta; the Grand Theogonist's refusal to crown her drove a wedge between the city and the Temple of Sigmar. Its warbands are lavishly dressed but ruthless, skilled in duelling and poison, and their rank and file are dockland thugs and ship's crews in leather coats and bandanas. Others mock Marienburgers as popinjays, but many envy their security."
+    },
+    {
+      "id": "talabecland", "kind": "region", "name": "Talabecland", "de": "Talabecland", "source": ["ostermark"],
+      "status": "Ostermark's main neighbour, home of the Ottilans",
+      "text": "The neighbouring province across the Great Forest, with the city of Talabheim. When the last Emperor, Sigismund, was killed at Altdorf and the Empire split into three claimants, Ostermark sided with the Ottilans of Talabecland. The alliance came to nothing when Magritta of Marienburg took power, and civil war and rivalry followed."
+    },
+    {
+      "id": "reikland-court", "kind": "faction", "name": "The Grand Prince of Reikland", "de": "Der Großfürst von Reikland", "source": ["reikland", "flames"],
+      "status": "Claimant to the throne, backed by the Grand Theogonist",
+      "text": "Siegfried, ruler of Reikland, who calls himself Grand Prince. He is among the richest and most ambitious contenders and hires mercenaries to bring him wyrdstone. His claim is supported by the Grand Theogonist and opposed by the Count of Middenheim and the Priests of Ulric."
+    },
+    {
+      "id": "middenheim-court", "kind": "faction", "name": "The Count of Middenheim", "de": "Der Graf von Middenheim", "source": ["middenheim", "bands"],
+      "status": "Mannfred Todbringer, claimant and rival of Reikland",
+      "text": "Mannfred Todbringer, one of the chief contenders for the throne and a sponsor of mercenary warbands in Mordheim. He is backed by the Priesthood of Ulric and in constant friction with the Temple of Sigmar."
+    },
+    {
+      "id": "lady-magritta", "kind": "faction", "name": "Lady Magritta of Marienburg", "de": "Lady Magritta von Marienburg", "source": ["marienburg", "flames"],
+      "status": "The merchant guilds' candidate for the throne",
+      "text": "The favourite of the merchant guilds and the common choice of the lesser states. The Grand Theogonist disqualified her under the doctrine of male ascent, by which no woman may wear Sigmar's crown. The Ostermark account has her as the young Empress who secured power, though many in the powerful institutions around Altdorf thought her a puppet of her elders."
+    },
+    {
+      "id": "freetraders", "kind": "group", "name": "The Freetraders", "de": "Die Freihändler", "source": ["marienburg", "flames", "bands"],
+      "status": "Secret circle of the richest guildsmen",
+      "text": "The High Order of Honourable Freetraders, an elite and secretive body of wealthy merchants based in Marienburg. They feel shackled by the old order and want power, and their candidate for Emperor is Lady Magritta. Their secret members hold positions of authority throughout the Empire, and through them most minor Electors were persuaded to back her. The Grand Theogonist has set himself against them. Some of those disappointed by the old order are said to turn to dark cults and sorcery."
+    },
+    {
+      "id": "count-von-carstein", "kind": "faction", "name": "Count von Carstein of Sylvania", "de": "Graf von Carstein von Sylvanien", "source": ["bands", "flames"],
+      "status": "Powerful claimant, secretly a necromancer and vampire",
+      "text": "The most powerful of the other claimants, though few are tempted by his gold because of his reputation: he is said to drink the blood of men and raise the dead. His minions are sly, skulk in the shadows and avoid daylight, yet they too come to Mordheim. Few suspect his true nature, perhaps only the Witch Hunters, who trust no one."
+    },
+    {
+      "id": "grand-theogonist", "kind": "faction", "name": "The Grand Theogonist of Sigmar", "de": "Der Großtheogonist Sigmars", "source": ["city", "bands"],
+      "status": "Spiritual head of the Empire, hungry for worldly power",
+      "text": "The leader of the Temple of Sigmar, whose temples stand in every town. He refused to crown Lady Magritta and is said to covet the crown himself. He preaches a holy crusade against mutants and sorcerers, and has sent the Witch Hunters into Mordheim, officially to cleanse it, but, it is said, also to gather wyrdstone for his own ends. Since the city fell, thousands have gathered at the holy places and penitents roam the roads."
+    },
+    {
+      "id": "witch-hunters", "kind": "group", "name": "The Witch Hunters", "de": "Die Hexenjäger", "source": ["city", "bands"],
+      "status": "Templars of Sigmar who persecute heretics",
+      "text": "The Order of Templars, called Witch Hunters by those who fear and hate them and by themselves, who take pride in persecuting heretics. They came to Mordheim with carts of cages, braziers and irons. They trust no one, curse the Sisters of Sigmar as heretics for their creed that denies women divinity in Sigmar's temple, and are ancient enemies of the Sisterhood."
+    },
+    {
+      "id": "sisters-of-sigmar", "kind": "group", "name": "The Sisters of Sigmar", "de": "Die Schwestern Sigmars", "source": ["bands", "flames"],
+      "status": "Holy Order, home of the Seeress who read the comet",
+      "text": "The Holy Order whose Seeress first saw the comet. Its members are daughters of the noblest houses of the Empire, and its cloisters have long sheltered those who would be troublesome to their families. Their convent, the Temple of Sigmar's Rock, survived the destruction. They fight side by side with the Witch Hunters yet are their deadliest enemies, in a holy rivalry that no forgiveness can end."
+    },
+    {
+      "id": "master-of-the-possessed", "kind": "faction", "name": "The Shadowlord and the Cult of the Possessed", "de": "Der Schattenherr und der Kult der Besessenen", "source": ["bands"],
+      "status": "Dark Emperor of the secret cults, said to dwell in the Pit",
+      "text": "The secret cults of the dark gods, made up of those who found the old order a shackle, and who practise sorcery, have found a leader: the Shadowlord, Master of the Possessed, a Dark Emperor of whom none can say whether he is man or Daemon. The cults gather wyrdstone in Mordheim. From the crater come twisted daemonic creatures of great strength that infest the ruins."
+    },
+    {
+      "id": "ostermark-warbands", "kind": "group", "name": "The Ostermark Warbands", "de": "Die Ostermark-Banden", "source": ["ostermark", "ostermarkers"],
+      "status": "Farmers turned fighters, defending what is left",
+      "text": "Farmers by trade, sturdy and capable fighters who have defended their land alone against mercenaries and brigands. Since Mordheim fell, some have abandoned burnt farms and formed warbands to take back what was taken, to defend their land, or simply to share the plunder. Their men do not give up easily and their captains may start with a wardog from the farm. They fight with pitchforks, axes and bows, and carry wooden shields and the heraldry of rams, bulls' heads, scythes and ears of corn."
+    },
+    {
+      "id": "ostermark-brigands", "kind": "group", "name": "The Brigands and Reavers of Ostermark", "de": "Die Räuber und Plünderer von Ostermark", "source": ["city", "ostermark"],
+      "status": "Bandits and roaming mercenary bands in the ruined countryside",
+      "text": "Since the fall of Mordheim, wild reavers, thieves, bandits and mercenary bands roam the neglected province, loot villages, burn homes and rob the weak. The only law they know is force of arms. Some fighters rise up against them out of a sense of justice, which the lawless time rarely rewards."
+    }
+  ]
+}

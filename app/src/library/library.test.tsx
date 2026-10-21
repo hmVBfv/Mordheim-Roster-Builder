@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'Lore']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -166,5 +166,36 @@ describe('the Library: factions', () => {
     at('/library/factions');
     expect(await screen.findByText('A faction')).toBeTruthy();
     expect(screen.queryByText('An idea')).toBeNull();
+  });
+});
+
+describe('the Library: lore', () => {
+  it('lists the setting’s regions, factions and groups with their source, and narrows them by kind', async () => {
+    server();
+    const user = userEvent.setup();
+    at('/library/lore');
+    const list = await screen.findByRole('list', { name: 'Lore' });
+    expect(within(list).getByText('Ostermark')).toBeTruthy();
+    expect(within(list).getByText('The Witch Hunters')).toBeTruthy();
+    const source = within(list).getAllByRole('link', { name: /The League of Ostermark/ })[0]!;
+    expect(source.getAttribute('href')).toBe('https://mordheimer.net/docs/introduction/additional-lore/league-of-ostermark');
+    await user.click(screen.getByRole('button', { name: 'Groups' }));
+    expect(within(screen.getByRole('list', { name: 'Lore' })).queryByText('Ostermark')).toBeNull();
+    expect(within(screen.getByRole('list', { name: 'Lore' })).getByText('The Witch Hunters')).toBeTruthy();
+  });
+
+  it('adds a faction or group to the Library as a faction, and a region as an idea about a campaign; each only once', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/lore');
+    const list = await screen.findByRole('list', { name: 'Lore' });
+    await user.click(within(list).getByRole('button', { name: 'Add The Witch Hunters to the Library' }));
+    await waitFor(() => expect(within(list).getByRole('button', { name: 'The Witch Hunters is in the Library' }).hasAttribute('disabled')).toBe(true));
+    await user.click(within(list).getByRole('button', { name: 'Add Ostermark to the Library' }));
+    await waitFor(() => expect(within(list).getByRole('button', { name: 'Ostermark is in the Library' })).toBeTruthy());
+    const kept = [...srv.state.library.values()];
+    expect(kept.find((i) => i.name === 'The Witch Hunters')).toMatchObject({ kind: 'faction', body: { de: 'Die Hexenjäger' } });
+    expect((kept.find((i) => i.name === 'The Witch Hunters')!.body as { lore: string }).lore).toMatch(/Source: .*https:\/\/mordheimer\.net\//);
+    expect(kept.find((i) => i.name === 'Ostermark')).toMatchObject({ kind: 'idea', body: { topic: 'campaign' } });
   });
 });

@@ -66,8 +66,13 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Unterpunkte der Seitenleiste (`library/tabs.ts`): bisher **Ideas** (Titel, „About“:
   Campaign · Faction · Warband · Something else, Text; Karten nebeneinander am
   Desktop; Entfernen erst nach Rückfrage) und **Factions** (Name englisch und
-  deutsch, „What the players may read“, die Lore). NPCs, Groups, Scenarios und
-  Lore folgen in eigenen Scheiben.
+  deutsch, „What the players may read“, die Lore) und **Lore**: ein schreibgeschützter
+  Katalog aus `data/lore.json` (Regionen, Fraktionen, Gruppen der Welt, je mit
+  eigener Zusammenfassung und Quelle auf mordheimer.net; nur Einträge mit mehr als
+  einem Nebensatz Lore). Filter All · Regions · Factions · Groups; „Add to Library“
+  kopiert eine Fraktion oder Gruppe als Faction, eine Region als Idea (About:
+  Campaign) in die eigene Library – ein Name, der dort schon steht, wird nicht noch
+  einmal angeboten. NPCs, Groups und Scenarios folgen in eigenen Scheiben.
   **Eine Fraktion in eine Kampagne:** in der World der Kampagne bietet ein Leiter
   „From the Library…“ an (eine Kopie: die Namen und was die Spieler lesen dürfen,
   die Lore bleibt in der Library; eine Fraktion gleichen Namens wird nicht noch
