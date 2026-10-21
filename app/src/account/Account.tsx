@@ -2,7 +2,7 @@
    3g): who is signed in, the authenticator, the password, the devices, and
    for the admin the way to the admin tools. Loaded with the Account
    screen only in the campaign app. */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
@@ -108,7 +108,8 @@ function Devices({ onNotice }: { onNotice: (t: string) => void }) {
   );
 }
 
-export function AccountSection() {
+/** `theme`: the theme picker of the screen, shown between the sign-in and the devices. */
+export function AccountSection({ theme }: { theme?: ReactNode }) {
   const session = useSession();
   const navigate = useNavigate();
   const [notice, notify] = useNotice();
@@ -181,6 +182,7 @@ export function AccountSection() {
         {body}
         {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       </section>
+      {theme}
       {session.status === 'in' && <Devices key={session.user.id} onNotice={notify} />}
       {notice}
     </>

@@ -56,6 +56,8 @@ export interface ProbeContext {
   /** A battle in the victim's campaign; one in the admin's, with a protocol entry and two open corrections of the user role's. */
   battleId: string;
   ledBattleId: string;
+  /** A second open battle in the admin's campaign, with nothing on it: the one that is taken out. */
+  spareBattleId: string;
   ledEntryId: string;
   ledProposalIds: [string, string];
   /** The user role's warband confirmed in the admin's campaign. */
@@ -377,6 +379,7 @@ export const MATRIX: Record<Action, MatrixRow> = {
     routes: {
       'POST /api/v1/campaigns/:id/battles': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles`, body: { id: randomUUID(), title: 'Probing the ferry', warbandIds: [c.ledWarbandId] } }),
       'PATCH /api/v1/campaigns/:id/battles/:bid': (c) => ({ method: 'PATCH', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}`, body: { turn: 2 } }),
+      'DELETE /api/v1/campaigns/:id/battles/:bid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.spareBattleId}` }),
       'PUT /api/v1/campaigns/:id/battles/:bid/protocol/:eid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/protocol/${randomUUID()}`, body: { turn: 2, kind: 'event', payload: { text: 'The ferry drifts.' } } }),
       'DELETE /api/v1/campaigns/:id/battles/:bid/protocol/:eid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/protocol/${c.ledEntryId}` }),
       'POST /api/v1/campaigns/:id/battles/:bid/proposals/:pid/accept': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/battles/${c.ledBattleId}/proposals/${c.ledProposalIds[0]}/accept`, body: {} }),
