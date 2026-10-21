@@ -49,7 +49,7 @@ export type TradeKind = { kind: 'common' } | { kind: 'rare'; rarity: number; de:
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9äöüß]/g, '');
 
 function chartEntry(ctx: Ctx, nm: string): CatalogItem | undefined {
-  const byDe = ctx.data.CATALOG.find((x) => x.de === nm) ?? ctx.data.CATALOG.find((x) => x.de === stripParen(nm));
+  const byDe = ctx.data.CATALOG.find((x) => x.de === nm || x.alias?.includes(nm)) ?? ctx.data.CATALOG.find((x) => x.de === stripParen(nm));
   if (byDe) return byDe;
   const en = norm(enItem(ctx.data, nm));
   if (!en) return undefined;

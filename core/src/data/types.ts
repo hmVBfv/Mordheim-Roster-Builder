@@ -130,6 +130,8 @@ export interface CatalogItem {
   /** The restriction as written ("Dwarfs only"); a note when `only` is absent. */
   wb: string;
   only?: CatalogOnly;
+  /** Other German keys the warbands' lists use for this very item (the Cathayan silk cloak is the silk clothes), so the lists' rarity and price follow the chart. */
+  alias?: string[];
 }
 
 export interface UpgradeDef {

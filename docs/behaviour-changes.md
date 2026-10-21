@@ -477,11 +477,16 @@ Neue Logik in `core/src/trade/` (`ledger.ts`, `market.ts`), Tests in
    (`tradeKind`). Listen und Preistabelle benennen manches verschieden; der
    Builder ordnet zu über den deutschen Schlüssel, den englischen Namen, den
    Namen in Klammern („Jagdgewehr“ = *Hunting rifle (Hochland long rifle)*),
+   den Eintrag `alias` der Preistabelle (der *Cathayan silk cloak* der Merchant
+   Caravans und der Battle Monks ist die *Cathayan silk clothes*, Rare 9; Rob,
+   21.10.2026, Bericht #20: auf den Listen zum Gründungspreis von 40 gc, später
+   nur über die Suche; Beleg: mordheimer.net, FAQ „Single use items“ nennt ihn
+   „Cathayan Silk Cloak (first rout test)“ – dieselbe Wirkung wie die Kleidung),
    ein Paar über die einzelne Waffe und „A/B“ über beide. Diese Gegenstände
    kennt die Preistabelle nicht; der Trading Post bietet sie gesondert an
    („Not in the price chart“), und der Tisch entscheidet: Black lotus und
    Dark venom für Geschosse, Bone helmet, Mark of the Old Ones, Oversized
-   Jaws, Poison Glands (Lizardmen); Cathayan Silk Cloak; die Ausrüstungen
+   Jaws, Poison Glands (Lizardmen); die Ausrüstungen
    der Pit Fighters (Chaos-, Empire-, Orc-, Skink-, Undead-, Witch-Elf-Kit);
    Choppa; Cutlass und die Ladungen der Swivel Gun (Pirates);
    Double-barrelled Hochland long rifle; Gnoblar Fighter; Gral-Reliquie;

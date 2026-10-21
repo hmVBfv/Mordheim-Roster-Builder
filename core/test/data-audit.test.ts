@@ -230,6 +230,15 @@ describe('rules texts of the catalogue', () => {
     expect(name('Kleine Leiter')).toBe('Small ladder');
     expect(name('Große Leiter')).toBe('Large ladder');
   });
+  // #20: the cloak has the silk clothes' effect (mordheimer.net, FAQ "Single use items": "Cathayan Silk Cloak (first rout test)")
+  it('the Cathayan silk cloak says what the silk clothes do: re-roll the first failed Rout test', () => {
+    const cloak = core.itemInfo(data, 'Kathay-Seidenumhang');
+    expect(cloak?.name).toBe('Cathayan silk cloak');
+    expect(cloak?.text).toMatch(/re-roll/i);
+    expect(cloak?.text).toMatch(/Rout test/);
+    expect(cloak?.text).not.toMatch(/to hit/);
+    expect(cloak?.line).not.toMatch(/Emissary/);
+  });
   // these showed the text of a plainer weapon whose pattern matched first
   // (the sword breaker the sword's, the Hammer of witches – a book – the mace's)
   it('a special weapon is not mistaken for the plain one', () => {
