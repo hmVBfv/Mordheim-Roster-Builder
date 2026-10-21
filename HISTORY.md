@@ -3661,6 +3661,17 @@ a table rebuild (migration 33, because SQLite cannot widen a CHECK) and that
 the order of two writes is not atomic; the worst case of a failed second write
 is a warband in no group, which the list shows as such.
 
+## October 21, 2026 — a search mask for the rare items (#22)
+
+The Hired Swords have a mask (name, grade, a characteristic compared with a
+value); the rare items only had a kind switch and a name box in the search
+sheet. The rare items carry their rules as prose, not as numbers, so there is
+no "S >= 4" to compare: the mask finds by name *or* effect and by the words
+that name a characteristic ("Movement", "Leadership", "save" …), and narrows by
+the highest rarity. That is approximate by nature – an item that says "Strength"
+only to say it is unaffected still matches – which is why the list now shows
+the first sentence of each item's rules, so the match can be judged at a
+glance. The same mask sits in the sheet a Hero's own Search button opens.
 ## October 21, 2026 — the Warhorse is rare (#21)
 
 The Knights Vanguard's list offers a Warhorse at 40 gc and the app had no price
