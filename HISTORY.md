@@ -3631,3 +3631,17 @@ title, rules and statlines; the NPCs travel along untouched and are changed in a
 campaign after the copy, as a draft, where their form already lives. That kept
 the slice small and, importantly, left the visibility rules alone: a copy always
 arrives as a leaders-only draft, and the Library is private to its owner.
+
+## October 21, 2026 — groups for one's own warbands
+
+Wish #10 wanted folders for the warbands list, assigned simply. The warbands
+themselves live on the device and sync as saves, and a save has a strict format
+that only rises with a migration – so a "group" field on the warband would have
+touched the format, the sync and the compat test for what is really a view the
+person keeps of their own list. The groups went where private, per-account,
+offline-readable things already live: the Library, as a sixth kind. A group
+holds the ids of its warbands, and assigning is one choice under a warband that
+rewrites at most two groups (the one it leaves, the one it joins). The cost is
+a table rebuild (migration 33, because SQLite cannot widen a CHECK) and that
+the order of two writes is not atomic; the worst case of a failed second write
+is a warband in no group, which the list shows as such.

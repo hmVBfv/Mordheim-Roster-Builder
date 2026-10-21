@@ -19,6 +19,29 @@ async function two() {
 }
 const idea = (text = 'A war band of ferrymen who know the Stir.', topic = 'warband') => ({ kind: 'idea', name: 'The ferrymen', body: { text, topic } });
 
+describe('the Library: groups of warbands', () => {
+  const wid = (n: number) => `0000000${n}-0000-4000-8000-000000000000`;
+  const wgroup = (over: Record<string, unknown> = {}) => ({ kind: 'warband_group', name: 'Reikland bands', body: { warbands: [wid(1), wid(2)], ...over } });
+
+  it('a group of warbands is kept with the ids of the warbands in it, and is nobody else’s', async () => {
+    const { kai, ben } = await two();
+    const made = await kai('PUT', `/library/${randomUUID()}`, wgroup());
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: unknown }).item).toMatchObject({ kind: 'warband_group', name: 'Reikland bands', body: { warbands: [wid(1), wid(2)] } });
+    expect((await kai('PUT', `/library/${randomUUID()}`, { kind: 'warband_group', name: 'Empty', body: {} })).statusCode).toBe(201);
+    expect(((await ben('GET', '/library')).json() as { items: unknown[] }).items).toEqual([]);
+  });
+
+  it('only a group that fits: ids, no repeat, a ceiling', async () => {
+    const { kai } = await two();
+    const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
+    expect((await put(wgroup({ warbands: [wid(1), wid(1)] }))).statusCode).toBe(400);
+    expect((await put(wgroup({ warbands: ['x'.repeat(65)] }))).statusCode).toBe(400);
+    expect((await put(wgroup({ warbands: Array.from({ length: 501 }, () => randomUUID()) }))).statusCode).toBe(400);
+    expect((await put(wgroup({ extra: 1 }))).statusCode).toBe(400);
+  });
+});
+
 describe('the Library: scenarios', () => {
   const npc = { id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: ['name', 'WS'], profile: { M: '4', WS: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
   const scenario = (over: Record<string, unknown> = {}) => ({ kind: 'scenario', name: 'The night at the ferry', body: { body: 'The ferry is dark: no shooting beyond 8".', npcStatlines: 'Captain Brandt M4 WS4', npcs: [npc], ...over } });

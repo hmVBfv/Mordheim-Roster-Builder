@@ -24,12 +24,15 @@ export interface NpcBody { de: string; status: string; faction: string; named: b
 export interface GroupBody { note: string; profiles: OpponentProfile[] }
 /** A scenario outside any campaign (server/src/library.ts): the campaign's scenario without a title of its own (the entry's `name`); its NPCs keep their hidden parts. */
 export interface ScenarioBody { body: string; npcStatlines: string; npcs: ScenarioNpc[] }
+/** A group of one's own warbands: the ids of the warbands in it (server/src/library.ts); the entry's `name` is the group's. */
+export interface WarbandGroupBody { warbands: string[] }
 export interface LibraryItem<B = unknown> { id: string; kind: string; name: string; body: B; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
 export type Idea = LibraryItem<IdeaBody>;
 export type Faction = LibraryItem<FactionBody>;
 export type LibraryNpc = LibraryItem<NpcBody>;
 export type LibraryGroup = LibraryItem<GroupBody>;
 export type LibraryScenario = LibraryItem<ScenarioBody>;
+export type LibraryWarbandGroup = LibraryItem<WarbandGroupBody>;
 
 const KEY = 'items';
 
@@ -50,7 +53,7 @@ export async function getLibrary(): Promise<LibraryItem[]> {
 }
 
 /** Writes one entry under the device's id; `baseSeq` is the state it is changed from (none for a new one). */
-export async function putItem<B>(kind: 'idea' | 'faction' | 'npc' | 'group' | 'scenario', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
+export async function putItem<B>(kind: 'idea' | 'faction' | 'npc' | 'group' | 'scenario' | 'warband_group', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
   const who = asker();
   const r = await api<{ item: LibraryItem<B> }>(`/library/${id}`, { method: 'PUT', body: { kind, name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
   const cur = (await cachedLibrary()) ?? [];
@@ -63,6 +66,7 @@ export const putFaction = (id: string, name: string, body: FactionBody, baseSeq?
 export const putNpc = (id: string, name: string, body: NpcBody, baseSeq?: number) => putItem<NpcBody>('npc', id, name, body, baseSeq);
 
 export const putScenario = (id: string, name: string, body: ScenarioBody, baseSeq?: number) => putItem<ScenarioBody>('scenario', id, name, body, baseSeq);
+export const putWarbandGroup = (id: string, name: string, body: WarbandGroupBody, baseSeq?: number) => putItem<WarbandGroupBody>('warband_group', id, name, body, baseSeq);
 export const putGroup = (id: string, name: string, body: GroupBody, baseSeq?: number) => putItem<GroupBody>('group', id, name, body, baseSeq);
 
 /** The profiles with no link to a campaign's own skills: that skill is only known there, so the copy keeps its name and tooltip. */

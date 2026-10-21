@@ -1,7 +1,7 @@
 /* The warbands: in the campaign app with an account those of the account
    (synced, phase 3h) and those made on this device while nobody was signed
    in, which can join the account. */
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useSession } from '../account/session.ts';
 import type { StoredWarband } from '../db/db.ts';
@@ -13,6 +13,8 @@ import { UndoToast } from '../ui/UndoToast.tsx';
 import { ImportSheet } from './ImportSheet.tsx';
 import { CodeSheet } from '../share/CodeSheet.tsx';
 import { WarbandList } from './WarbandList.tsx';
+
+const GroupedWarbands = lazy(() => import('./GroupedWarbands.tsx'));
 
 export function Warbands() {
   const warbands = useWarbands();
@@ -43,7 +45,12 @@ export function Warbands() {
         </div>
       )}
       {warbands && warbands.length === 0 && <Empty scene="fire" title="No warband yet.">Start a new one, or import one from the Roster Builder.</Empty>}
-      {warbands && warbands.length > 0 && <WarbandList warbands={warbands} marks={signedIn} grid />}
+      {warbands && warbands.length > 0 && !signedIn && <WarbandList warbands={warbands} grid />}
+      {warbands && warbands.length > 0 && signedIn && (
+        <Suspense fallback={<WarbandList warbands={warbands} marks grid />}>
+          <GroupedWarbands warbands={warbands} notify={notify} />
+        </Suspense>
+      )}
       {removed && (
         <UndoToast key={removed.id} text={`${removed.name} removed.`}
           onUndo={() => { void restoreWarband(removed).then(() => navigate('/warbands', { replace: true, state: null })); }}

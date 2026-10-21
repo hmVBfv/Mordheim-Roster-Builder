@@ -2,7 +2,7 @@
    themes. Campaign app only (playwright.config.ts), against the stand-in server (e2e/play.ts). */
 import { expect, test } from '@playwright/test';
 import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
-import { playServer } from './play.ts';
+import { playServer, serverWarband } from './play.ts';
 
 for (const theme of ['chronicle', 'parchment'] as const) {
   test(`an idea is written in the Library and read again, in ${theme}`, async ({ page }) => {
@@ -133,4 +133,24 @@ test('the Scenarios tab at 360 px: a scenario is read, nothing scrolls sideways'
   await tapTargets(page);
   await shot(page, 'library-scenario-form');
   expect([...srv.state.library.values()].filter((i) => i.kind === 'scenario')).toHaveLength(1);
+});
+
+test('groups of warbands at 360 px: the list under its groups, the choice under each warband', async ({ page }) => {
+  const srv = await playServer(page);
+  const wid = serverWarband(srv, 'The Grey Penitents');
+  serverWarband(srv, 'Clan Skrittle');
+  srv.libraryFrom({ name: 'Reikland bands', kind: 'warband_group', body: { warbands: [] } });
+  await page.goto('warbands');
+  await expect(page.getByRole('button', { name: 'Groups' })).toBeVisible();
+  await page.getByLabel('Group of The Grey Penitents').selectOption({ label: 'Reikland bands' });
+  await expect.poll(() => [...srv.state.library.values()].find((i) => i.kind === 'warband_group')?.body).toEqual({ warbands: [wid] });
+  await expect(page.getByRole('region', { name: 'Reikland bands' }).getByText('The Grey Penitents')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'warbands-groups');
+  await page.getByRole('button', { name: 'Groups' }).click();
+  await expect(page.getByRole('dialog', { name: 'Groups of warbands' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'warbands-groups-sheet');
 });
