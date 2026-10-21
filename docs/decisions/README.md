@@ -41,3 +41,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0020](0020-live-updates-signal-stream.md) | Live-Aktualisierung: ein Strom von Signalen je offener App, die App holt über die gewohnten Endpunkte nach (ergänzt 0005, 0010, 0011) |
 | [0021](0021-first-load-budget-per-flavour.md) | Erste-Laden-Grenze je Ausgabe: Kampagne 250 KB, Quick Build 200 KB (angenommen, ergänzt 0014) |
 | [0022](0022-hidden-npc-values-in-scenarios.md) | Verborgene Teile bei den NPCs eines Szenarios: der Server schwärzt mit „?“, nach der Freigabe nur noch aufdecken (vorgeschlagen, ergänzt 0002, 0011) |
+| [0023](0023-library-per-account.md) | Die Library: Ideen und Vorlagen (Fraktionen, NPCs, Gruppen, Szenarien) privat beim Konto, immer als Kopie in die Kampagne (vorgeschlagen, ergänzt 0002, 0005, 0011, 0022) |
