@@ -3660,3 +3660,19 @@ rewrites at most two groups (the one it leaves, the one it joins). The cost is
 a table rebuild (migration 33, because SQLite cannot widen a CHECK) and that
 the order of two writes is not atomic; the worst case of a failed second write
 is a warband in no group, which the list shows as such.
+
+## October 21, 2026 — the Warhorse is rare (#21)
+
+The Knights Vanguard's list offers a Warhorse at 40 gc and the app had no price
+chart entry for it, so it counted as "not in the price chart" and could be
+bought at any time. The Animal Bestiary on mordheimer.net gives it Rare 11,
+80 gc, humans only; Rob agreed to treat it like the silk cloak. Two things the
+first draft got wrong: a miscellaneous item has no category barrier, so every
+Hero of the Merchant Caravans would have been offered the found Warhorse – the
+list's footnote says Knights Vanguard only – and the legacy catalogue check only
+knows whole warbands in `notWb`, so teaching it units would have broken the
+parity suite. The unit restriction therefore lives in the trading rules
+(`keptFromUnit`), which have no legacy counterpart. The second: a recruit may
+not buy a rare list item, which would have shut a new Knight out of his own
+Warhorse; the founding-priced row is exempt, as Rob asked ("a new Hero with
+this Warhorse just pays").

@@ -138,6 +138,15 @@ export function piecesNeeded(ctx: Ctx, to: Holder): number {
   return m ? menOf(ctx, m) : 0;
 }
 
+/** A `notWb` entry of the catalogue may name units of a warband ('key/unit,unit'): the Merchant Caravans' Warhorse is for the Knights Vanguard alone.
+    New logic of the trading rules – the legacy `catalogAllowed` knows whole warbands only, so the parity of `rareEligibleItems` is untouched. */
+export function keptFromUnit(ctx: Ctx, it: CatalogItem, m: Model): boolean {
+  return (it.only?.notWb ?? []).some((e) => {
+    const [k = '', units] = e.split('/');
+    return !!units && k === (ctx.s.wb ?? '') && units.split(',').includes(m.uid_def);
+  });
+}
+
 /** May this warrior carry the item? Weapons and armour from his own list;
     rare items by the catalogue rule; equipment only Heroes may have. Hired
     Swords are not models and never get here (they take no equipment). The
@@ -159,7 +168,7 @@ export function canReceive(ctx: Ctx, to: Holder, g: Goods): Verdict {
   const it = catalogItem(ctx, g.key);
   if (!it) return { ok: false, reason: 'not in the catalogue' };
   if (isUpgrade(ctx.data, g.key)) return { ok: false, reason: 'a weapon upgrade stays with its weapon' };
-  if (!catalogAllowed(ctx, it, m)) return { ok: false, reason: 'kept for other warbands or warriors' };
+  if (!catalogAllowed(ctx, it, m) || keptFromUnit(ctx, it, m)) return { ok: false, reason: 'kept for other warbands or warriors' };
   if (!rareEligibleItems(ctx, m).some((x) => x.de === g.key)) return { ok: false, reason: `nothing of this kind in the equipment of a ${def.name}` };
   return { ok: true, reason: '' };
 }

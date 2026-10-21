@@ -346,6 +346,40 @@ describe('what is common and what is rare (V5)', () => {
     expect(kind('Cathay-Seidenkleidung')).toEqual(kind('Kathay-Seidenumhang'));
   });
 
+  // #21: the Warhorse is Rare 11 (Humans only, 80 gc; mordheimer.net, Animal Bestiary). On a list it is the founding price only;
+  // later it is found by a search – and in the Merchant Caravans only a Knights Vanguard may have one (the list's footnote)
+  describe('the Warhorse', () => {
+    const caravans = () => {
+      let s = core.newWarband(data, 'caravans');
+      for (const id of ['merchant', 'apprentice', 'knight']) s = core.addUnit(ctx(s), id);
+      const [merchant, apprentice, knight] = s.models.map((m) => m.uid) as [number, number, number];
+      s = structuredClone(s);
+      s.campaign = { ...s.campaign, on: true, round: 1 };
+      return { s, merchant, apprentice, knight };
+    };
+    it('is rare 11 in the price chart', () => {
+      expect(kind('Warhorse')).toEqual({ kind: 'rare', rarity: 11, de: 'Warhorse' });
+    });
+    it('is not bought after the first battle, even from the Knights Vanguard\'s own list', () => {
+      const { s, knight } = caravans();
+      expect(core.buyItem(ctx(s), knight, 'Warhorse')).toMatchObject({ ok: false, reason: 'a rare item: only a Hero\'s search finds it' });
+    });
+    it('is a new Knights Vanguard\'s own to buy at the list price, until his first battle', () => {
+      const { s } = caravans();
+      const hired = core.recruitUnit(ctx(s), 'knight');
+      const uid = hired.models.at(-1)!.uid;
+      const after = core.setListQty(ctx(hired), uid, 'Warhorse', 1);
+      expect(after.models.find((m) => m.uid === uid)?.eq?.['Warhorse']).toBe(1);
+    });
+    it('is found by a search – by a Knights Vanguard, not by the Merchant or the Apprentice', () => {
+      const { s, merchant, apprentice, knight } = caravans();
+      const may = (uid: number) => core.canReceive(ctx(s), uid, { key: 'Warhorse', rare: true });
+      expect(may(knight).ok).toBe(true);
+      expect(may(merchant)).toMatchObject({ ok: false, reason: 'kept for other warbands or warriors' });
+      expect(may(apprentice).ok).toBe(false);
+    });
+  });
+
   it('a rare item of the list is not bought after the first battle', () => {
     const { s, capt } = band();
     expect(core.buyItem(ctx(s), capt, 'Pistole')).toMatchObject({ ok: false, reason: 'a rare item: only a Hero\'s search finds it' });
