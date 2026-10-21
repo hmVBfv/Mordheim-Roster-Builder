@@ -47,7 +47,7 @@ export function resetTrail(): void {
 /** Every fixed word of the app's routes (App.tsx) and the campaign's tabs; anything else in an address is an id, a code or a token. */
 export const SCREEN_WORDS: ReadonlySet<string> = new Set([
   'warbands', 'new', 'export', 'trade', 'hire', 'house', 'districts', 'story', 'versions', 'aftermath', 'campaign', 'battles', 'house-rules', 'notes', 'sign-in', 'invite', 'reset',
-  'admin', 'import', 'more', 'users', 'invites', 'logins', 'audit', 'bugs',
+  'admin', 'import', 'more', 'users', 'invites', 'logins', 'audit', 'bugs', 'reports',
   'manage', 'timeline', 'chronicle', 'questions', 'world', 'background', 'as-player',
 ]);
 

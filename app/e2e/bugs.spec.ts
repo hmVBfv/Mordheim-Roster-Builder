@@ -39,12 +39,15 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     // still on its way when the dialog is already gone; a reload now would
     // cancel it ("ERR_ABORTED") or be cancelled by it
     await page.waitForFunction(() => !(history.state as { mordheimSheet?: boolean } | null)?.mordheimSheet);
-    const section = page.getByRole('region', { name: 'Your reports' });
-    await expect(section.getByText('Received')).toBeVisible();
+    // the reports are a tab of their own: the settings do not grow with them
+    await expect(page.getByRole('region', { name: 'Your reports' })).toHaveCount(0);
+    await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Your reports' }).click();
+    const table = page.getByRole('table', { name: 'Your reports' });
+    await expect(table.getByText('Received')).toBeVisible();
     srv.state.bugs[0]!.status = 'fixed';
     srv.state.bugs[0]!.fixedIn = '3f2a9c1';
     await page.reload();
-    await expect(page.getByRole('region', { name: 'Your reports' }).getByText('Fixed in 3f2a9c1')).toBeVisible();
+    await expect(page.getByRole('table', { name: 'Your reports' }).getByText('Fixed in 3f2a9c1')).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-your-reports`);

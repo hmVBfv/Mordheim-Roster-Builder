@@ -70,6 +70,13 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
+- **„Your reports“ als Reiter von Account (Rob, 20.10.2026):** Account hat zwei
+  Reiter, **Settings** (`/more`) und **Your reports** (`/more/reports`; am Handy
+  über der Seite, ab 900 px als Unterpunkte von Account in der Seitenleiste,
+  `account/accountTabs.ts`). Die eigenen Berichte stehen dort als Tabelle
+  (Titel, Art, Stand in den Worten des Meldenden, gesendet, letzte Änderung) und
+  verlängern die Einstellungen nicht mehr. Nie der Schweregrad, nie die
+  technischen Angaben.
 - **Seitenleiste mit Unterpunkten (Rob, 19.10.2026: „aufklappbare
   Unterreiter“):** ab 900 px öffnen sich Warbands und Campaign in ihre
   Einträge – unter Warbands die sechs zuletzt geänderten eigenen Warbands und
