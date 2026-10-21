@@ -250,7 +250,7 @@ function GiveForm({ ctx, h, close, onGive, titleId }: { ctx: core.Ctx; h: Holdin
 function HoldingList({ list, label, action, onPick }: { list: Holding[]; label: string; action: (h: Holding) => string; onPick: (h: Holding) => void }) {
   if (!list.length) return <p className={ui.muted}>Nothing to {label.toLowerCase()}.</p>;
   return (
-    <ul className={ui.list}>
+    <ul className={styles.rows}>
       {list.map((h) => (
         <li key={`${h.from}:${h.goods.rare ? 'r' : 'c'}:${h.goods.key}`}>
           <button type="button" className={styles.item} title={h.text || undefined} onClick={() => onPick(h)} aria-label={`${label} ${h.name} of ${h.owner}`}>
@@ -316,7 +316,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
             return (
               <div key={String(unlisted)} className={ui.page}>
                 {unlisted && <p className={ui.muted}>Not in the price chart – mounts, kits and items of this warband's own. Whether they can be bought now, the rules of the warband decide.</p>}
-                <ul className={ui.list} aria-label={unlisted ? 'Not in the price chart' : 'Common items'}>
+                <ul className={styles.rows} aria-label={unlisted ? 'Not in the price chart' : 'Common items'}>
                   {list.map((it) => (
                     <li key={it.key}>
                       <button type="button" className={styles.item} title={it.text || undefined}
@@ -335,7 +335,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
       {tab === 'search' && (
         <section className={ui.page} aria-label="Search for rare items">
           <p className={ui.muted}>Each Hero may look for one rare item after a battle: 2D6 equal to or above its rarity, less his modifiers. Heroes taken out of action in the last battle stay home – the app cannot tell yet.</p>
-          <ul className={ui.list}>
+          <ul className={styles.rows}>
             {heroes.map((h) => (
               <li key={h.uid} className={styles.searcher}>
                 <span>{h.name}<small className={h.why ? styles.no : undefined}>{h.last ?? h.why ?? 'may look for one rare item'}</small></span>
@@ -350,7 +350,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
           </div>
           <Seg label="Kind of rare item" value={kind} options={KINDS} onChange={setKind} />
           <RareMask q={q} stat={stat} max={max} onQ={setQ} onStat={setStat} onMax={setMax} shown={findable.length} total={pool.length} />
-          <ul className={ui.list}>
+          <ul className={styles.rows}>
             {findable.slice(0, all ? undefined : SHORT).map((it) => (
               <li key={it.de}>
                 <button type="button" className={styles.item} title={it.text || undefined} disabled={!heroes.some((h) => !h.why)}

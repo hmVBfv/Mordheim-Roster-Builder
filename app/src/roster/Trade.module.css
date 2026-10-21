@@ -82,34 +82,90 @@
   text-align: right;
 }
 
+/* the lists of the Trading Post: one panel, flat rows divided by a hairline – not a box around every item (wish #23) */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--border);
+}
+
+.rows .item {
+  min-height: 56px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.rows .item:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.rows .item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.rows .searcher {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  min-height: 56px;
+}
+
 /* who gets it: a list of choices with a note each */
 .pick {
   display: grid;
-  gap: var(--space-1);
+  gap: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .pick button {
   display: grid;
   gap: 2px;
   min-height: 52px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
   color: var(--text);
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
+.pick button:first-child {
+  border-top: 0;
+}
+
+.pick button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.pick button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .pick button[aria-pressed='true'] {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--surface-2);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .pick button:disabled {
   cursor: default;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .pick small {
@@ -298,7 +354,10 @@
 
 .giveCol h3 {
   margin: 0 0 var(--space-1);
-  font-size: 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 /* the search mask of the rare items */
