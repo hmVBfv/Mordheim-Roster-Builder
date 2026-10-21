@@ -213,6 +213,53 @@ describe('catalogue restrictions', () => {
    Gegenstaende machen." 58 items of the catalogue had no rules text, so
    neither app could say what they do (mostly miscellaneous equipment:
    lantern, banner, tarot cards, the Mordheim map ...). */
+/* #27: the catalogue holds the items of every campaign setting and every grade, each saying where it comes from, so a list
+   can be narrowed by them. What a warband the app does not have may carry is kept – and carried by nobody. */
+describe('the items of every campaign and grade', () => {
+  const found = data.CATALOG.filter((x) => x.settings);
+  const GRADES = ['core', '1a', '1b', '1c', '2a'];
+
+  it('names where each of them comes from: its settings, its grade where one is stated, an address on mordheim.net', () => {
+    expect(found.length).toBeGreaterThan(50);
+    for (const x of found) {
+      expect(x.settings!.length, x.en).toBeGreaterThan(0);
+      expect(x.grade == null || GRADES.includes(x.grade), x.en).toBe(true);
+      expect(x.source?.length, x.en).toBeGreaterThan(0);
+      for (const u of x.source!) expect(u, x.en).toMatch(/^https:\/\/mordheimer\.net\//);
+    }
+    const settings = new Set(found.flatMap((x) => x.settings!));
+    for (const s of ['core', 'empire-in-flames', 'border-town-burning']) expect(settings.has(s), s).toBe(true);
+    expect([...settings].some((s) => s.startsWith('warband:'))).toBe(true);
+    expect(new Set(found.map((x) => x.grade).filter(Boolean))).toEqual(new Set(['core', '1b', '1c', '2a']));
+  });
+
+  it('has every item once, with its own tooltip', () => {
+    const names = data.CATALOG.map((x) => x.en.toLowerCase());
+    expect(new Set(names).size).toBe(names.length);
+    for (const x of found) expect(core.itemInfo(data, x.en)?.name, x.en).toBe(x.en);
+  });
+
+  it('carries what the settings add: mounts, animals, the Merchant\'s dealings, a wardog', () => {
+    const by = (n: string) => data.CATALOG.find((x) => x.en === n)!;
+    expect(by('Mule')).toMatchObject({ rare: 'Rare 7', cost: 30, settings: ['border-town-burning', 'empire-in-flames'] });
+    expect(by('Rhinox')).toMatchObject({ rare: 'Rare 15', cost: '200+D6×10', only: { wb: ['maneaters', 'maraudersofchaos', 'norse', 'caravans'] } });
+    expect(by('Temple Dog')).toMatchObject({ rare: 'Rare 13', only: { wb: ['battlemonks', 'sos'] } });
+    expect(by('Wardog')).toMatchObject({ rare: 'Rare 10', grade: 'core', only: { notWb: ['skaven'] } });
+    expect(by('Magical Artefact')).toMatchObject({ rare: 'Rare 18', only: { wb: ['caravans'], heroes: true } });
+    // the same animal at another price in another setting is told apart by it
+    expect(by('Giant Spider (Empire in Flames)')).toMatchObject({ cost: 90, rare: 'Rare 10' });
+    expect(by('Giant Spider (Border Town Burning)')).toMatchObject({ cost: 100, rare: 'Rare 11' });
+  });
+
+  it('keeps what a warband the app does not have may carry out of everybody\'s reach', () => {
+    const mine = Object.keys(data.WARBANDS);
+    for (const x of found.filter((y) => y.settings!.every((s) => s.startsWith('warband:')) && y.grade === '2a')) {
+      expect(x.only?.wb, x.en).toEqual([]);
+      for (const k of mine) expect(x.only!.wb!.some((e) => e.split('/')[0] === k), `${x.en} / ${k}`).toBe(false);
+    }
+  });
+});
+
 describe('rules texts of the catalogue', () => {
   it('every item of the catalogue says what it does', () => {
     const bare = data.CATALOG.filter((x) => !core.itemInfo(data, x.de) && !core.itemInfo(data, x.en)).map((x) => x.en);

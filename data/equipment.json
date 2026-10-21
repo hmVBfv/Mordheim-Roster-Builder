@@ -2766,6 +2766,1220 @@
    "cost": "25+3D6",
    "rare": "Rare 9",
    "wb": ""
+  },
+  {
+   "de": "Mule",
+   "en": "Mule",
+   "cat": "misc",
+   "cost": 30,
+   "rare": "Rare 7",
+   "wb": "",
+   "settings": [
+    "border-town-burning",
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "Riding/Draft Horse (Empire in Flames)",
+   "en": "Riding/Draft Horse (Empire in Flames)",
+   "cat": "misc",
+   "cost": 40,
+   "rare": "Rare 8",
+   "wb": "",
+   "settings": [
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "Riding/Draft Horse (Border Town Burning)",
+   "en": "Riding/Draft Horse (Border Town Burning)",
+   "cat": "misc",
+   "cost": 40,
+   "rare": "Rare 8",
+   "wb": "Humans, Marauders and Norse only",
+   "only": {
+    "human": true
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals"
+   ]
+  },
+  {
+   "de": "Elven Steed",
+   "en": "Elven Steed",
+   "cat": "misc",
+   "cost": 90,
+   "rare": "Rare 10",
+   "wb": "Elves only",
+   "only": {
+    "wb": [
+     "woodelf",
+     "darkelves",
+     "shadowwarriors"
+    ]
+   },
+   "settings": [
+    "border-town-burning",
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "War Boar",
+   "en": "War Boar",
+   "cat": "misc",
+   "cost": 90,
+   "rare": "Rare 11",
+   "wb": "Orcs only",
+   "only": {
+    "wb": [
+     "orcmob",
+     "blackorcs"
+    ]
+   },
+   "settings": [
+    "border-town-burning",
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "Giant Wolf",
+   "en": "Giant Wolf",
+   "cat": "misc",
+   "cost": 85,
+   "rare": "Rare 10",
+   "wb": "Goblins only",
+   "only": {
+    "wb": [
+     "nightgoblins",
+     "forestgoblins",
+     "orcmob/goblin"
+    ]
+   },
+   "settings": [
+    "border-town-burning",
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "Giant Spider (Empire in Flames)",
+   "en": "Giant Spider (Empire in Flames)",
+   "cat": "misc",
+   "cost": 90,
+   "rare": "Rare 10",
+   "wb": "Goblins only",
+   "only": {
+    "wb": [
+     "nightgoblins",
+     "forestgoblins",
+     "orcmob/goblin"
+    ]
+   },
+   "settings": [
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "Giant Spider (Border Town Burning)",
+   "en": "Giant Spider (Border Town Burning)",
+   "cat": "misc",
+   "cost": 100,
+   "rare": "Rare 11",
+   "wb": "Goblins only",
+   "only": {
+    "wb": [
+     "nightgoblins",
+     "forestgoblins",
+     "orcmob/goblin"
+    ]
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals"
+   ]
+  },
+  {
+   "de": "Cathayan Candles",
+   "en": "Cathayan Candles",
+   "cat": "missile",
+   "cost": "25+D6",
+   "rare": "Rare 9",
+   "wb": "",
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#missile-weapons"
+   ]
+  },
+  {
+   "de": "Cold One",
+   "en": "Cold One",
+   "cat": "misc",
+   "cost": 100,
+   "rare": "Rare 11",
+   "wb": "Dark Elves, Lizardmen, Norse and Marauders only",
+   "only": {
+    "wb": [
+     "darkelves",
+     "lizardmen",
+     "norse",
+     "maraudersofchaos"
+    ]
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals"
+   ]
+  },
+  {
+   "de": "Chaos Steed",
+   "en": "Chaos Steed",
+   "cat": "misc",
+   "cost": 90,
+   "rare": "Rare 11",
+   "wb": "Possessed warbands and Marauders with Chosen of Chaos skill only",
+   "only": {
+    "wb": [
+     "possessed",
+     "maraudersofchaos"
+    ]
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals"
+   ]
+  },
+  {
+   "de": "Rhinox",
+   "en": "Rhinox",
+   "cat": "misc",
+   "cost": "200+D6×10",
+   "rare": "Rare 15",
+   "wb": "Ogres, Marauders, Norse and Merchant Caravans only",
+   "only": {
+    "wb": [
+     "maneaters",
+     "maraudersofchaos",
+     "norse",
+     "caravans"
+    ]
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/ridden-animals#rhinox"
+   ]
+  },
+  {
+   "de": "Temple Dog",
+   "en": "Temple Dog",
+   "cat": "misc",
+   "cost": "250+D6×10",
+   "rare": "Rare 13",
+   "wb": "Dragon Monks, Sisters of Sigmar and Priests only. Not available to Skaven, Undead and Chaos Dwarfs",
+   "only": {
+    "wb": [
+     "battlemonks",
+     "sos"
+    ]
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/ridden-animals#temple-dog"
+   ]
+  },
+  {
+   "de": "War Dog/Bear/Monkey",
+   "en": "War Dog/Bear/Monkey",
+   "cat": "misc",
+   "cost": "25+2D6",
+   "rare": "Rare 10",
+   "wb": "not available to Skaven",
+   "only": {
+    "notWb": [
+     "skaven",
+     "skavenpest"
+    ]
+   },
+   "settings": [
+    "border-town-burning"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war#mounts--animals"
+   ]
+  },
+  {
+   "de": "Wardog",
+   "en": "Wardog",
+   "cat": "misc",
+   "cost": "25+2D6",
+   "rare": "Rare 10",
+   "wb": "Not available to Skaven",
+   "only": {
+    "notWb": [
+     "skaven"
+    ]
+   },
+   "settings": [
+    "core"
+   ],
+   "grade": "core",
+   "source": [
+    "https://mordheimer.net/docs/trading-post"
+   ]
+  },
+  {
+   "de": "Trade Wagon",
+   "en": "Trade Wagon",
+   "cat": "misc",
+   "cost": 180,
+   "rare": "Common",
+   "wb": "Merchant Caravans only",
+   "only": {
+    "wb": [
+     "caravans"
+    ]
+   },
+   "settings": [
+    "warband:merchant-caravans"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans#trade-wagon"
+   ]
+  },
+  {
+   "de": "Dispel Scroll",
+   "en": "Dispel Scroll",
+   "cat": "misc",
+   "cost": "50+4D6",
+   "rare": "Rare 12",
+   "wb": "Merchant Caravans Merchant only (Connected skill); cannot be sold back",
+   "only": {
+    "wb": [
+     "caravans"
+    ],
+    "heroes": true
+   },
+   "settings": [
+    "warband:merchant-caravans"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans#connected"
+   ]
+  },
+  {
+   "de": "Lesser Artefact",
+   "en": "Lesser Artefact",
+   "cat": "misc",
+   "cost": "200+D6×15",
+   "rare": "Rare 16",
+   "wb": "Merchant Caravans Merchant only (Connected skill); cannot be sold back",
+   "only": {
+    "wb": [
+     "caravans"
+    ],
+    "heroes": true
+   },
+   "settings": [
+    "warband:merchant-caravans"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans#connected"
+   ]
+  },
+  {
+   "de": "Magical Artefact",
+   "en": "Magical Artefact",
+   "cat": "misc",
+   "cost": "350+D6×25",
+   "rare": "Rare 18",
+   "wb": "Merchant Caravans Merchant only (Connected skill); cannot be sold back",
+   "only": {
+    "wb": [
+     "caravans"
+    ],
+    "heroes": true
+   },
+   "settings": [
+    "warband:merchant-caravans"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans#connected"
+   ]
+  },
+  {
+   "de": "Magical Scroll",
+   "en": "Magical Scroll",
+   "cat": "misc",
+   "cost": 100,
+   "rare": "Rare 14",
+   "wb": "Merchant Caravans Merchant only (Connected skill); cannot be sold back",
+   "only": {
+    "wb": [
+     "caravans"
+    ],
+    "heroes": true
+   },
+   "settings": [
+    "warband:merchant-caravans"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans#connected"
+   ]
+  },
+  {
+   "de": "War chain",
+   "en": "War chain",
+   "cat": "cc",
+   "cost": 20,
+   "rare": "Common",
+   "wb": "Pit Fighters only",
+   "only": {
+    "wb": [
+     "pitfighters"
+    ]
+   },
+   "settings": [
+    "warband:pit-fighters-old"
+   ],
+   "grade": "1b",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1b-warbands/pit-fighters-old#war-chain"
+   ]
+  },
+  {
+   "de": "Slaaneshi Man-Catcher",
+   "en": "Slaaneshi Man-Catcher",
+   "cat": "cc",
+   "cost": 30,
+   "rare": "Rare 10",
+   "wb": "Whipmaster only",
+   "only": {
+    "wb": [
+     "cppleasures/whipmaster"
+    ],
+    "heroes": true
+   },
+   "settings": [
+    "warband:court-of-the-profane-pleasures"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/court-of-the-profane-pleasures#slaaneshi-man-catcher"
+   ]
+  },
+  {
+   "de": "Hedonist Whip",
+   "en": "Hedonist Whip",
+   "cat": "cc",
+   "cost": 15,
+   "rare": "Common",
+   "wb": "Heroes only",
+   "only": {
+    "wb": [
+     "cppleasures"
+    ],
+    "heroes": true
+   },
+   "settings": [
+    "warband:court-of-the-profane-pleasures"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/court-of-the-profane-pleasures#hedonist-whip"
+   ]
+  },
+  {
+   "de": "Hobgoblin Poisoned daggers",
+   "en": "Hobgoblin Poisoned daggers",
+   "cat": "cc",
+   "cost": 15,
+   "rare": "Rare 9",
+   "wb": "Hobgoblins of the Sons of Hashut",
+   "only": {
+    "wb": [
+     "sonsofhashut/hobgob"
+    ]
+   },
+   "settings": [
+    "warband:sons-of-hashut"
+   ],
+   "grade": "1c",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-1c-warbands/sons-of-hashut#editors-notes"
+   ]
+  },
+  {
+   "de": "Draich",
+   "en": "Draich",
+   "cat": "cc",
+   "cost": "25+1D6",
+   "rare": "Rare 8",
+   "wb": "Druchii Hero equipment list",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:druchii"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/druchii#draich"
+   ]
+  },
+  {
+   "de": "Darksteel Blade",
+   "en": "Darksteel Blade",
+   "cat": "cc",
+   "cost": "3× Preis",
+   "rare": "Rare 9",
+   "wb": "Any Druchii hero may use a close-combat weapon with a Darksteel blade",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:druchii"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/druchii#darksteel-blade"
+   ]
+  },
+  {
+   "de": "Throwing Axe",
+   "en": "Throwing Axe",
+   "cat": "missile",
+   "cost": 15,
+   "rare": "Rare 5",
+   "wb": "Common for Slayers, Rare 5 for non-Slayers",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:dwarf-slayer-cult"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/dwarf-slayer-cult#throwing-axe"
+   ]
+  },
+  {
+   "de": "Whirling Blades",
+   "en": "Whirling Blades",
+   "cat": "cc",
+   "cost": 30,
+   "rare": "Rare 9",
+   "wb": "Slayers only (Doomseeker's weapon); 30 gc per pair",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:dwarf-slayer-cult"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/dwarf-slayer-cult#whirling-blades"
+   ]
+  },
+  {
+   "de": "Hooded Lantern and Rig",
+   "en": "Hooded Lantern and Rig",
+   "cat": "misc",
+   "cost": "15+D6",
+   "rare": "Rare 9",
+   "wb": "Heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:grave-robbers"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers#hooded-lantern-and-rig"
+   ]
+  },
+  {
+   "de": "Pry Bar",
+   "en": "Pry Bar",
+   "cat": "cc",
+   "cost": 10,
+   "rare": "Special",
+   "wb": "Grave Robbers only",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:grave-robbers"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers#pry-bar"
+   ]
+  },
+  {
+   "de": "Surgeon's Journal",
+   "en": "Surgeon's Journal",
+   "cat": "misc",
+   "cost": "80+4D6",
+   "rare": "Rare 11",
+   "wb": "Heroes only (for the Medic)",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:grave-robbers"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers#surgeons-journal"
+   ]
+  },
+  {
+   "de": "Finger Pendant",
+   "en": "Finger Pendant",
+   "cat": "misc",
+   "cost": 15,
+   "rare": "Special",
+   "wb": "Grave Robbers only; heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:grave-robbers"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers#finger-pendant"
+   ]
+  },
+  {
+   "de": "Chainsaw Sword",
+   "en": "Chainsaw Sword",
+   "cat": "cc",
+   "cost": "15+D6",
+   "rare": "Special",
+   "wb": "Masters of Horror only; heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:masters-of-horror"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/masters-of-horror#chainsaw-sword"
+   ]
+  },
+  {
+   "de": "Electric Trident",
+   "en": "Electric Trident",
+   "cat": "cc",
+   "cost": "15+D6",
+   "rare": "Special",
+   "wb": "Masters of Horror only; heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:masters-of-horror"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/masters-of-horror#electric-trident"
+   ]
+  },
+  {
+   "de": "Repeater Pistol (Masters of Horror)",
+   "en": "Repeater Pistol (Masters of Horror)",
+   "cat": "bp",
+   "cost": "25+3D6",
+   "rare": "Special",
+   "wb": "Masters of Horror only; heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:masters-of-horror"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/masters-of-horror#repeater-pistol"
+   ]
+  },
+  {
+   "de": "Bearcloak",
+   "en": "Bearcloak",
+   "cat": "armour",
+   "cost": 10,
+   "rare": "Special",
+   "wb": "Sheepherders and Churls list; a Sheepherder pays 10 gc and must roll his Strength or less on a D6 to slay the bear (no test when starting the warband)",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:mazzalupo"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/mazzalupo#bearcloak"
+   ]
+  },
+  {
+   "de": "Staff of Damnation",
+   "en": "Staff of Damnation",
+   "cat": "cc",
+   "cost": 25,
+   "rare": "Special",
+   "wb": "Necrarch only; heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:necrarchs-the-soul-stealers"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/necrarchs-the-soul-stealers#staff-of-damnation"
+   ]
+  },
+  {
+   "de": "Damned Book",
+   "en": "Damned Book",
+   "cat": "misc",
+   "cost": "45+3D6",
+   "rare": "Rare 11",
+   "wb": "Heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:necrarchs-the-soul-stealers"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/necrarchs-the-soul-stealers#damned-book"
+   ]
+  },
+  {
+   "de": "Kanabo",
+   "en": "Kanabo",
+   "cat": "cc",
+   "cost": 15,
+   "rare": "Common",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:nipponese-expedition"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition#kanabo"
+   ]
+  },
+  {
+   "de": "Sashimono",
+   "en": "Sashimono",
+   "cat": "misc",
+   "cost": 15,
+   "rare": "Common",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:nipponese-expedition"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition#sashimono"
+   ]
+  },
+  {
+   "de": "Horo",
+   "en": "Horo",
+   "cat": "misc",
+   "cost": 10,
+   "rare": "Rare 6",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:nipponese-expedition"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition#horo"
+   ]
+  },
+  {
+   "de": "Kusarigama",
+   "en": "Kusarigama",
+   "cat": "cc",
+   "cost": 20,
+   "rare": "Rare 8",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:nipponese-expedition"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition#kusarigama"
+   ]
+  },
+  {
+   "de": "Katana",
+   "en": "Katana",
+   "cat": "cc",
+   "cost": 20,
+   "rare": "Special",
+   "wb": "Nippon Warrior, Noble, Shinobi and Warrior Monk lists",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:nipponese-expedition"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition#nippon-warrior-equipment-list"
+   ]
+  },
+  {
+   "de": "Sharp Stuff",
+   "en": "Sharp Stuff",
+   "cat": "missile",
+   "cost": "1st free/3",
+   "rare": "Common",
+   "wb": "Gnoblars only",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:ogre-hunting-party"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/ogre-hunting-party#sharp-stuff"
+   ]
+  },
+  {
+   "de": "Pigback Mount",
+   "en": "Pigback Mount",
+   "cat": "misc",
+   "cost": 50,
+   "rare": "Common",
+   "wb": "Gnoblar heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:ogre-hunting-party"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/ogre-hunting-party#pigback-mount"
+   ]
+  },
+  {
+   "de": "Blessed Bolts",
+   "en": "Blessed Bolts",
+   "cat": "misc",
+   "cost": 25,
+   "rare": "Common",
+   "wb": "Heroes only (Protectorate list); the Huntsman may also buy them",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:protectorate-of-sigmar"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/protectorate-of-sigmar#blessed-bolts"
+   ]
+  },
+  {
+   "de": "Shield of Sigmar",
+   "en": "Shield of Sigmar",
+   "cat": "armour",
+   "cost": 20,
+   "rare": "Rare 9",
+   "wb": "Heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:protectorate-of-sigmar"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/protectorate-of-sigmar#shield-of-sigmar"
+   ]
+  },
+  {
+   "de": "Beastwhip",
+   "en": "Beastwhip",
+   "cat": "cc",
+   "cost": "25 warp tokens",
+   "rare": "Rare 8",
+   "wb": "Clan Moulder only; Packmaster or Apprentices only; priced in Warp Tokens",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:skaven-of-clan-moulder"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/skaven-of-clan-moulder#beastwhip"
+   ]
+  },
+  {
+   "de": "Thingcatcher",
+   "en": "Thingcatcher",
+   "cat": "cc",
+   "cost": "20 warp tokens",
+   "rare": "Rare 9",
+   "wb": "Clan Moulder only; Packmaster or Apprentices only; priced in Warp Tokens",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:skaven-of-clan-moulder"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/skaven-of-clan-moulder#thingcatcher"
+   ]
+  },
+  {
+   "de": "Wolf Rat Mount",
+   "en": "Wolf Rat Mount",
+   "cat": "misc",
+   "cost": "90 warp tokens",
+   "rare": "Rare 11",
+   "wb": "Clan Moulder only; priced in Warp Tokens",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:skaven-of-clan-moulder"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/skaven-of-clan-moulder#wolf-rat-mount"
+   ]
+  },
+  {
+   "de": "Pointy Stick",
+   "en": "Pointy Stick",
+   "cat": "cc",
+   "cost": "1st free/2",
+   "rare": "Common",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:snotlings"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/snotlings#pointy-stick"
+   ]
+  },
+  {
+   "de": "Small Pebble",
+   "en": "Small Pebble",
+   "cat": "missile",
+   "cost": 0,
+   "rare": "Common",
+   "wb": "Snotling warband only; free",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:snotlings"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/snotlings#small-pebble"
+   ]
+  },
+  {
+   "de": "Slingshot",
+   "en": "Slingshot",
+   "cat": "missile",
+   "cost": 2,
+   "rare": "Common",
+   "wb": "Snotling warband only",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:snotlings"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/snotlings#slingshot"
+   ]
+  },
+  {
+   "de": "Power Squig",
+   "en": "Power Squig",
+   "cat": "misc",
+   "cost": "20+D6",
+   "rare": "Rare 8",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:snotlings"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/snotlings#power-squig"
+   ]
+  },
+  {
+   "de": "Wizard's Staff",
+   "en": "Wizard's Staff",
+   "cat": "cc",
+   "cost": 10,
+   "rare": "Common",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:sorcerous-society"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/sorcerous-society#wizards-staff"
+   ]
+  },
+  {
+   "de": "Chest Talon",
+   "en": "Chest Talon",
+   "cat": "cc",
+   "cost": 15,
+   "rare": "Special",
+   "wb": "Strigany only (designed for the Domnu)",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:survivors-of-strigos"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos#chest-talon"
+   ]
+  },
+  {
+   "de": "Black Gold Wristbands",
+   "en": "Black Gold Wristbands",
+   "cat": "misc",
+   "cost": "35+2D6",
+   "rare": "Rare 10",
+   "wb": "Heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:survivors-of-strigos"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos#black-gold-wristbands"
+   ]
+  },
+  {
+   "de": "Ring of Strigos",
+   "en": "Ring of Strigos",
+   "cat": "misc",
+   "cost": "20+D6",
+   "rare": "Rare 9",
+   "wb": "Heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:survivors-of-strigos"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos#ring-of-strigos"
+   ]
+  },
+  {
+   "de": "Cursed Book",
+   "en": "Cursed Book",
+   "cat": "misc",
+   "cost": "50+3D6",
+   "rare": "Rare 11",
+   "wb": "Heroes only",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:survivors-of-strigos"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos#cursed-book"
+   ]
+  },
+  {
+   "de": "Scythe (Vampire Hunters Of Sylvania)",
+   "en": "Scythe (Vampire Hunters Of Sylvania)",
+   "cat": "cc",
+   "cost": 10,
+   "rare": "Common",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:vampire-hunters-of-sylvania"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania#scythe"
+   ]
+  },
+  {
+   "de": "Scythe (Dreamwalkers Cult Of Morr)",
+   "en": "Scythe (Dreamwalkers Cult Of Morr)",
+   "cat": "cc",
+   "cost": "",
+   "rare": "Special",
+   "wb": "Priests of Morr",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:dreamwalkers-cult-of-morr"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/dreamwalkers-cult-of-morr#scythe"
+   ]
+  },
+  {
+   "de": "Silver-tip Stake",
+   "en": "Silver-tip Stake",
+   "cat": "cc",
+   "cost": 15,
+   "rare": "Common",
+   "wb": "",
+   "only": {
+    "wb": []
+   },
+   "settings": [
+    "warband:vampire-hunters-of-sylvania"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania#silver-tip-stake"
+   ]
+  },
+  {
+   "de": "Throat Guard",
+   "en": "Throat Guard",
+   "cat": "misc",
+   "cost": 10,
+   "rare": "Rare 7",
+   "wb": "Heroes only (Slayers)",
+   "only": {
+    "heroes": true,
+    "wb": []
+   },
+   "settings": [
+    "warband:vampire-hunters-of-sylvania"
+   ],
+   "grade": "2a",
+   "source": [
+    "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania#throat-guard"
+   ]
   }
  ],
  "EQEN": {
@@ -2959,6 +4173,699 @@
   "DL-Duellpistole": 65
  },
  "ITEMINFO": [
+  [
+   {
+    "__re": "^mule$",
+    "__f": "i"
+   },
+   {
+    "name": "Mule",
+    "line": "Miscellaneous · 30 gc · Rare 7",
+    "text": "A pack/riding animal sold on the Empire in Flames price chart. The page gives no profile of its own; the riding rules (Ride skill, led and unled animals, bolting) are those of Mounted Warriors."
+   }
+  ],
+  [
+   {
+    "__re": "^riding/draft\\ horse\\ \\(empire\\ in\\ flames\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Riding/Draft Horse (Empire in Flames)",
+    "line": "Miscellaneous · 40 gc · Rare 8",
+    "text": "A common riding or cart horse (also the draft animal for wagons). Riding bonus is the normal +1 armour save for a riding animal; no attacks of its own. Page lists no restriction (the core Trading Post says humans only)."
+   }
+  ],
+  [
+   {
+    "__re": "^riding/draft\\ horse\\ \\(border\\ town\\ burning\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Riding/Draft Horse (Border Town Burning)",
+    "line": "Miscellaneous · 40 gc · Rare 8",
+    "text": "Mount/animal listed only in the Border Town Burning price chart; the page gives no rules text (see the Animal Bestiary / warband pages). Marauders and Norse are humans."
+   }
+  ],
+  [
+   {
+    "__re": "^elven\\ steed$",
+    "__f": "i"
+   },
+   {
+    "name": "Elven Steed",
+    "line": "Miscellaneous · 90 gc · Rare 10",
+    "text": "A riding steed for Elf warbands. No separate profile on the price chart; uses the general riding animal rules (+1 armour save for the rider)."
+   }
+  ],
+  [
+   {
+    "__re": "^war\\ boar$",
+    "__f": "i"
+   },
+   {
+    "name": "War Boar",
+    "line": "Miscellaneous · 90 gc · Rare 11",
+    "text": "A riding boar for Orc warbands. No separate profile on the price chart; uses the general riding animal rules (+1 armour save for the rider)."
+   }
+  ],
+  [
+   {
+    "__re": "^giant\\ wolf$",
+    "__f": "i"
+   },
+   {
+    "name": "Giant Wolf",
+    "line": "Miscellaneous · 85 gc · Rare 10",
+    "text": "A riding wolf for Goblin warbands. No separate profile on the price chart; uses the general riding animal rules (+1 armour save for the rider)."
+   }
+  ],
+  [
+   {
+    "__re": "^giant\\ spider\\ \\(empire\\ in\\ flames\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Giant Spider (Empire in Flames)",
+    "line": "Miscellaneous · 90 gc · Rare 10",
+    "text": "A riding spider for Goblin warbands. No separate profile on the price chart; uses the general riding animal rules (+1 armour save for the rider)."
+   }
+  ],
+  [
+   {
+    "__re": "^giant\\ spider\\ \\(border\\ town\\ burning\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Giant Spider (Border Town Burning)",
+    "line": "Miscellaneous · 100 gc · Rare 11",
+    "text": "Mount/animal listed only in the Border Town Burning price chart; the page gives no rules text (see the Animal Bestiary / warband pages)."
+   }
+  ],
+  [
+   {
+    "__re": "^cathayan\\ candles$",
+    "__f": "i"
+   },
+   {
+    "name": "Cathayan Candles",
+    "line": "Missile · 25+D6 gc · Rare 9",
+    "text": "Missile-weapon entry in the price chart; the page gives no rules text for it."
+   }
+  ],
+  [
+   {
+    "__re": "^cold\\ one$",
+    "__f": "i"
+   },
+   {
+    "name": "Cold One",
+    "line": "Miscellaneous · 100 gc · Rare 11",
+    "text": "Mount/animal listed only in the Border Town Burning price chart; the page gives no rules text (see the Animal Bestiary / warband pages)."
+   }
+  ],
+  [
+   {
+    "__re": "^chaos\\ steed$",
+    "__f": "i"
+   },
+   {
+    "name": "Chaos Steed",
+    "line": "Miscellaneous · 90 gc · Rare 11",
+    "text": "Mount/animal listed only in the Border Town Burning price chart; the page gives no rules text (see the Animal Bestiary / warband pages). Marauders need the Chosen of Chaos skill."
+   }
+  ],
+  [
+   {
+    "__re": "^rhinox$",
+    "__f": "i"
+   },
+   {
+    "name": "Rhinox",
+    "line": "Miscellaneous · 200+D6×10 gc · Rare 15",
+    "text": "Ridden beast M7 WS3 S5 T5 W2 I2 A3 Ld5. Fear; rider adds +1 per Strength point to the rarity roll but must pass a Strength test or roll a Serious Injury; Bad Tempered (Ld test or must charge); charging over 7\" gives D3 impact hits. +20 warband rating; shots hit mount on 1-4."
+   }
+  ],
+  [
+   {
+    "__re": "^temple\\ dog$",
+    "__f": "i"
+   },
+   {
+    "name": "Temple Dog",
+    "line": "Miscellaneous · 250+D6×10 gc · Rare 13",
+    "text": "Stone construct mount M6 WS5 S5 T5 W3 I3 A3 Ld8. Fear; 5+ save not modified by Strength or other modifiers; +1 S when charging; magical attacks; immune to poison. +20 warband rating; shots hit mount on 1-4."
+   }
+  ],
+  [
+   {
+    "__re": "^war\\ dog/bear/monkey$",
+    "__f": "i"
+   },
+   {
+    "name": "War Dog/Bear/Monkey",
+    "line": "Miscellaneous · 25+2D6 gc · Rare 10",
+    "text": "Mount/animal listed only in the Border Town Burning price chart; the page gives no rules text (see the Animal Bestiary / warband pages)."
+   }
+  ],
+  [
+   {
+    "__re": "^wardog$",
+    "__f": "i"
+   },
+   {
+    "name": "Wardog",
+    "line": "Miscellaneous · 25+2D6 gc · Rare 10",
+    "text": "Attack animal bought as equipment; it fights alongside its owner using the Wardog profile from the bestiary (never gains experience, no upkeep)."
+   }
+  ],
+  [
+   {
+    "__re": "^trade\\ wagon$",
+    "__f": "i"
+   },
+   {
+    "name": "Trade Wagon",
+    "line": "Miscellaneous · 180 gc · Common",
+    "text": "Wagon (cart T8 W4, wheels T6 W1) with two draft horses (M8) included; needs a driver. Stores all the warband's equipment and treasures (all lost if it is destroyed); +1 to rare-search rolls per five different rare items stored; abandoned to the winner if the warband routs with no driver. A starting warband must include one."
+   }
+  ],
+  [
+   {
+    "__re": "^dispel\\ scroll$",
+    "__f": "i"
+   },
+   {
+    "name": "Dispel Scroll",
+    "line": "Miscellaneous · 50+4D6 gc · Rare 12",
+    "text": "Magical scroll; rules are in Mordheim Annual 2002 p. 31 (not repeated on the page). Only found by a Merchant using the Connected skill (black market table); never resold."
+   }
+  ],
+  [
+   {
+    "__re": "^lesser\\ artefact$",
+    "__f": "i"
+   },
+   {
+    "name": "Lesser Artefact",
+    "line": "Miscellaneous · 200+D6×15 gc · Rare 16",
+    "text": "Black-market artefact: on purchase roll on the Lesser Artefacts table. Only via the Merchant's Connected skill; never resold."
+   }
+  ],
+  [
+   {
+    "__re": "^magical\\ artefact$",
+    "__f": "i"
+   },
+   {
+    "name": "Magical Artefact",
+    "line": "Miscellaneous · 350+D6×25 gc · Rare 18",
+    "text": "Black-market artefact: on purchase roll on the Magical Artefact table of the Mordheim rulebook (p. 141). Only via the Merchant's Connected skill; never resold."
+   }
+  ],
+  [
+   {
+    "__re": "^magical\\ scroll$",
+    "__f": "i"
+   },
+   {
+    "name": "Magical Scroll",
+    "line": "Miscellaneous · 100 gc · Rare 14",
+    "text": "Black-market scroll: on purchase roll on the Magical Scroll Artefact table. Only via the Merchant's Connected skill; never resold."
+   }
+  ],
+  [
+   {
+    "__re": "^war\\ chain$",
+    "__f": "i"
+   },
+   {
+    "name": "War chain",
+    "line": "Close combat · 20 gc · Common",
+    "text": "Range 4\", Strength as user. Cannot be parried, Reach (as steel whip). Entangle: a natural 6 to hit entangles the target (treated as stunned; Initiative test each turn to free himself); the chain cannot be used while it holds him, the wielder uses his secondary weapon."
+   }
+  ],
+  [
+   {
+    "__re": "^slaaneshi\\ man\\-catcher$",
+    "__f": "i"
+   },
+   {
+    "name": "Slaaneshi Man-Catcher",
+    "line": "Close combat · 30 gc · Rare 10",
+    "text": "Close combat, Strength as user +1, two hands. Lock: an unsaved wound does not roll for injury; the target is knocked down and pinned while in combat with the wielder and cannot move away (not Large creatures or steeds). If still pinned at battle end he is captured (61 on the Serious Injury chart), even a henchman."
+   }
+  ],
+  [
+   {
+    "__re": "^hedonist\\ whip$",
+    "__f": "i"
+   },
+   {
+    "name": "Hedonist Whip",
+    "line": "Close combat · 15 gc · Common",
+    "text": "Close combat, Strength as user. Cannot be parried (no sword or buckler parries). Whipcrack: +1A on the turn the wielder charges, and +1A against the charger when charged (strikes first); only once in total, and with two whips only the first gets it."
+   }
+  ],
+  [
+   {
+    "__re": "^hobgoblin\\ poisoned\\ daggers$",
+    "__f": "i"
+   },
+   {
+    "name": "Hobgoblin Poisoned daggers",
+    "line": "Close combat · 15 gc · Rare 9",
+    "text": "Poisoned daggers of the Hobgoblins; as other daggers they give the target +1 armour save. Rarity 9 and the price are stated in the editors' notes (no rules block on the page); the starting-price discount was removed."
+   }
+  ],
+  [
+   {
+    "__re": "^draich$",
+    "__f": "i"
+   },
+   {
+    "name": "Draich",
+    "line": "Close combat · 25+1D6 gc · Rare 8",
+    "text": "Elven two-handed sword of the Executioners of Har Ganeth. Strength as user +2, two-handed (no shield/buckler/second weapon), but Swift: unlike other double-handed weapons it does not strike last."
+   }
+  ],
+  [
+   {
+    "__re": "^darksteel\\ blade$",
+    "__f": "i"
+   },
+   {
+    "name": "Darksteel Blade",
+    "line": "Close combat · 3× price · Rare 9",
+    "text": "Close-combat weapon upgrade from Hag Graef, cost 3 x the base weapon. Strength as user. Critical damage: +1 on the critical hit chart. Wicked edge: injury roll of 2-4 counts as stunned."
+   }
+  ],
+  [
+   {
+    "__re": "^throwing\\ axe$",
+    "__f": "i"
+   },
+   {
+    "name": "Throwing Axe",
+    "line": "Missile · 15 gc · Rare 5",
+    "text": "Range 6\", Strength as user. Thrown weapon: no penalty for moving or for over half range. Heroes with access to Shooting skills may learn the skill Axe Thrower (two axes per Shooting phase, both +1 S, split between targets; not combinable with Quick Shot or Knife Fighter)."
+   }
+  ],
+  [
+   {
+    "__re": "^whirling\\ blades$",
+    "__f": "i"
+   },
+   {
+    "name": "Whirling Blades",
+    "line": "Close combat · 30 gc · Rare 9",
+    "text": "Axe on a chain, bought as a pair. Strength as user, -1 extra save modifier (Cutting Edge), cannot be parried. Dance of Doom: +1A when charging or charged (also for the off-hand blade); Whirlwind of Death: those bonus attacks strike first when the wearer is charged."
+   }
+  ],
+  [
+   {
+    "__re": "^hooded\\ lantern\\ and\\ rig$",
+    "__f": "i"
+   },
+   {
+    "name": "Hooded Lantern and Rig",
+    "line": "Miscellaneous · 15+D6 gc · Rare 9",
+    "text": "Works as a Lantern but hides the light from enemy models (Concealed Light), and the rig leaves the Graver's hands free (Free-hand)."
+   }
+  ],
+  [
+   {
+    "__re": "^pry\\ bar$",
+    "__f": "i"
+   },
+   {
+    "name": "Pry Bar",
+    "line": "Close combat · 10 gc · Special",
+    "text": "Counts as a club, but allows the wielder to parry. Strength as user."
+   }
+  ],
+  [
+   {
+    "__re": "^surgeon's\\ journal$",
+    "__f": "i"
+   },
+   {
+    "name": "Surgeon's Journal",
+    "line": "Miscellaneous · 80+4D6 gc · Rare 11",
+    "text": "A Medic carrying it may modify one Serious Injury die for one friendly model by +/-1 instead of using his Sawbones skill."
+   }
+  ],
+  [
+   {
+    "__re": "^finger\\ pendant$",
+    "__f": "i"
+   },
+   {
+    "name": "Finger Pendant",
+    "line": "Miscellaneous · 15 gc · Special",
+    "text": "Death-Ward: a one-time 5+ save against Necromantic or Dark Arts magic."
+   }
+  ],
+  [
+   {
+    "__re": "^chainsaw\\ sword$",
+    "__f": "i"
+   },
+   {
+    "name": "Chainsaw Sword",
+    "line": "Close combat · 15+D6 gc · Special",
+    "text": "Strength as user. Causes Fear. Shredder: all blows from it are at -2 armour save."
+   }
+  ],
+  [
+   {
+    "__re": "^electric\\ trident$",
+    "__f": "i"
+   },
+   {
+    "name": "Electric Trident",
+    "line": "Close combat · 15+D6 gc · Special",
+    "text": "Strength as user. Zzap!: 2-4 on the injury table is stunned. Shocking: natural 6 to hit then 6 to wound gives all models within 2\" (not the bearer) a S3 hit. Nail in Boot: a 1 to hit gives the bearer a S3 hit."
+   }
+  ],
+  [
+   {
+    "__re": "^repeater\\ pistol\\ \\(masters\\ of\\ horror\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Repeater Pistol (Masters of Horror)",
+    "line": "Blackpowder · 25+3D6 gc · Special",
+    "text": "Range 8\", Strength 4, -2 armour save. Each shot: D6, 4+ works, 2-3 nothing, 1 misfire. May fire up to 3 times a turn, each extra shot needs one more (5+, then 6+). A different item from the Nuln Repeater pistol in the catalogue."
+   }
+  ],
+  [
+   {
+    "__re": "^bearcloak$",
+    "__f": "i"
+   },
+   {
+    "name": "Bearcloak",
+    "line": "Armour · 10 gc · Special",
+    "text": "Wearer gets +1 to armour saves against all shooting attacks."
+   }
+  ],
+  [
+   {
+    "__re": "^staff\\ of\\ damnation$",
+    "__f": "i"
+   },
+   {
+    "name": "Staff of Damnation",
+    "line": "Close combat · 25 gc · Special",
+    "text": "Two-handed staff, Strength as user. Magic-well: the Necrarch Vampire may cast a spell into it instead of casting normally and release it in a later shooting phase instead of casting another spell."
+   }
+  ],
+  [
+   {
+    "__re": "^damned\\ book$",
+    "__f": "i"
+   },
+   {
+    "name": "Damned Book",
+    "line": "Miscellaneous · 45+3D6 gc · Rare 11",
+    "text": "Cursed Aura: all enemy models within 2\" of the bearer suffer -1 to hit in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "^kanabo$",
+    "__f": "i"
+   },
+   {
+    "name": "Kanabo",
+    "line": "Close combat · 15 gc · Common",
+    "text": "Heavy club. Strength as user +1, two-handed, concussion (2-4 on the injury table is stunned)."
+   }
+  ],
+  [
+   {
+    "__re": "^sashimono$",
+    "__f": "i"
+   },
+   {
+    "name": "Sashimono",
+    "line": "Miscellaneous · 15 gc · Common",
+    "text": "Clan banner on the back (listed under armour): the wearer may re-roll all non-rout Leadership tests but must keep the second roll."
+   }
+  ],
+  [
+   {
+    "__re": "^horo$",
+    "__f": "i"
+   },
+   {
+    "name": "Horo",
+    "line": "Miscellaneous · 10 gc · Rare 6",
+    "text": "Silk cloak: +1 to armour saves against ranged weapons (6+ if no armour) while mounted on a horse or warhorse."
+   }
+  ],
+  [
+   {
+    "__re": "^kusarigama$",
+    "__f": "i"
+   },
+   {
+    "name": "Kusarigama",
+    "line": "Close combat · 20 gc · Rare 8",
+    "text": "Chain and sickle. Strength as user, two-handed, cannot be parried. Chain Strike: a model not in combat holding one can knock down enemies who fail a charge against it, or friends within 3\"."
+   }
+  ],
+  [
+   {
+    "__re": "^katana$",
+    "__f": "i"
+   },
+   {
+    "name": "Katana",
+    "line": "Close combat · 20 gc · Special",
+    "text": "Nipponese sword; the page gives a price (20 gc) only, no rarity and no rules."
+   }
+  ],
+  [
+   {
+    "__re": "^sharp\\ stuff$",
+    "__f": "i"
+   },
+   {
+    "name": "Sharp Stuff",
+    "line": "Missile · 1st free/3 gc · Common",
+    "text": "Scrap for throwing: range 8\", Strength 2, thrown weapon (no penalty for moving or over half range), targets hit get +1 armour save. Does not count toward the missile weapon limit. With Knife Thrower a Gnoblar may throw three pieces."
+   }
+  ],
+  [
+   {
+    "__re": "^pigback\\ mount$",
+    "__f": "i"
+   },
+   {
+    "name": "Pigback Mount",
+    "line": "Miscellaneous · 50 gc · Common",
+    "text": "A luckless Gnoblar (M5 WS2 S2 W1 I3 A1 Ld5) carries the hero. Mounted combat rules but not a large target, may enter buildings, no +1 armour save, no barding. Has one free hand: starts with a dagger, may get a club or axe, or a shield (+1 save for the rider, mount cannot attack)."
+   }
+  ],
+  [
+   {
+    "__re": "^blessed\\ bolts$",
+    "__f": "i"
+   },
+   {
+    "name": "Blessed Bolts",
+    "line": "Miscellaneous · 25 gc · Common",
+    "text": "Bolts blessed by the Warrior Priest: +1 Strength when fired against Chaotic targets (Undead, mutants, Possessed, Twisters of Magic). Range and Strength as the weapon."
+   }
+  ],
+  [
+   {
+    "__re": "^shield\\ of\\ sigmar$",
+    "__f": "i"
+   },
+   {
+    "name": "Shield of Sigmar",
+    "line": "Armour · 20 gc · Rare 9",
+    "text": "Shield with armour save 6 and Shield of Faith: special 6+ save against all ranged attacks, and no -1 penalty when combined with Heavy armour."
+   }
+  ],
+  [
+   {
+    "__re": "^beastwhip$",
+    "__f": "i"
+   },
+   {
+    "name": "Beastwhip",
+    "line": "Close combat · 25 warp tokens · Rare 8",
+    "text": "Strength as user, cannot be parried. Whipcrack: +1A on charging and +1A (strikes first) against the charger. Cruel Barbs: +1 to Difficulty checks for Goading. Price is 25 warp tokens."
+   }
+  ],
+  [
+   {
+    "__re": "^thingcatcher$",
+    "__f": "i"
+   },
+   {
+    "name": "Thingcatcher",
+    "line": "Close combat · 20 warp tokens · Rare 9",
+    "text": "Spiked jaws: Strength as user +1, two-handed. Iron Grip: beasts may re-roll a failed Stupidity test caused by a failed Goading attempt. Price is 20 warp tokens."
+   }
+  ],
+  [
+   {
+    "__re": "^wolf\\ rat\\ mount$",
+    "__f": "i"
+   },
+   {
+    "name": "Wolf Rat Mount",
+    "line": "Miscellaneous · 90 warp tokens · Rare 11",
+    "text": "Rideable Wolf Rat: M9 WS3 BS0 S4 T3 W1 I4 A1 Ld4. Its attacks are Strength 4 but do not modify armour saves. Price is 90 warp tokens."
+   }
+  ],
+  [
+   {
+    "__re": "^pointy\\ stick$",
+    "__f": "i"
+   },
+   {
+    "name": "Pointy Stick",
+    "line": "Close combat · 1st free/2 gc · Common",
+    "text": "Snotling dagger replacement. Strength as user; an enemy wounded by it gets +1 to his armour save (6+ if he has none)."
+   }
+  ],
+  [
+   {
+    "__re": "^small\\ pebble$",
+    "__f": "i"
+   },
+   {
+    "name": "Small Pebble",
+    "line": "Missile · 0 gc · Common",
+    "text": "Range 6\", Strength as user, thrown weapon (no range or movement penalties), targets get +1 armour save. Free and easily replaced; does not count toward the missile weapon limit. Cannot be used in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "^slingshot$",
+    "__f": "i"
+   },
+   {
+    "name": "Slingshot",
+    "line": "Missile · 2 gc · Common",
+    "text": "Maximum range 18\", Strength 2. If it did not move, may fire twice (only up to half range, 9\"), each shot at -1 to hit."
+   }
+  ],
+  [
+   {
+    "__re": "^power\\ squig$",
+    "__f": "i"
+   },
+   {
+    "name": "Power Squig",
+    "line": "Miscellaneous · 20+D6 gc · Rare 8",
+    "text": "Works exactly like a Familiar (as in the Shadow Warrior equipment list), just snotlingish."
+   }
+  ],
+  [
+   {
+    "__re": "^wizard's\\ staff$",
+    "__f": "i"
+   },
+   {
+    "name": "Wizard's Staff",
+    "line": "Close combat · 10 gc · Common",
+    "text": "Strength as user, two-handed (no shield/buckler/second weapon; shield still gives +1 against shooting), may parry like a sword, concussion (2-4 is stunned)."
+   }
+  ],
+  [
+   {
+    "__re": "^chest\\ talon$",
+    "__f": "i"
+   },
+   {
+    "name": "Chest Talon",
+    "line": "Close combat · 15 gc · Special",
+    "text": "Pick-like two-handed weapon, Strength as user +1. Heart-Pierce: +1 to wound against a blood-thirster."
+   }
+  ],
+  [
+   {
+    "__re": "^black\\ gold\\ wristbands$",
+    "__f": "i"
+   },
+   {
+    "name": "Black Gold Wristbands",
+    "line": "Miscellaneous · 35+2D6 gc · Rare 10",
+    "text": "Quickened: 6+ save against all missile fire, magical included; stacks with the Dodge skill."
+   }
+  ],
+  [
+   {
+    "__re": "^ring\\ of\\ strigos$",
+    "__f": "i"
+   },
+   {
+    "name": "Ring of Strigos",
+    "line": "Miscellaneous · 20+D6 gc · Rare 9",
+    "text": "Arcane Barrier: 6+ save against all spells that target or affect the wearer."
+   }
+  ],
+  [
+   {
+    "__re": "^cursed\\ book$",
+    "__f": "i"
+   },
+   {
+    "name": "Cursed Book",
+    "line": "Miscellaneous · 50+3D6 gc · Rare 11",
+    "text": "Cursed Aura: all enemy models within 2\" of the bearer suffer -1 to hit in close combat."
+   }
+  ],
+  [
+   {
+    "__re": "^scythe\\ \\(vampire\\ hunters\\ of\\ sylvania\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Scythe (Vampire Hunters Of Sylvania)",
+    "line": "Close combat · 10 gc · Common",
+    "text": "Strength as user +1, two-handed (no shield, buckler or second weapon in close combat)."
+   }
+  ],
+  [
+   {
+    "__re": "^scythe\\ \\(dreamwalkers\\ cult\\ of\\ morr\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Scythe (Dreamwalkers Cult Of Morr)",
+    "line": "Close combat · Special",
+    "text": "Heavier-built reaping scythe. Strength as user +1, two-handed (no shield, buckler or second weapon). The page gives no price or rarity."
+   }
+  ],
+  [
+   {
+    "__re": "^silver\\-tip\\ stake$",
+    "__f": "i"
+   },
+   {
+    "name": "Silver-tip Stake",
+    "line": "Close combat · 15 gc · Common",
+    "text": "Strength as user. Heart-seeker: +1 to the injury roll when it causes a wound (against Vampires). The equipment list says 10 gc, the item block 15 gc."
+   }
+  ],
+  [
+   {
+    "__re": "^throat\\ guard$",
+    "__f": "i"
+   },
+   {
+    "name": "Throat Guard",
+    "line": "Miscellaneous · 10 gc · Rare 7",
+    "text": "Life Saver: all injury rolls caused by a Vampire get a special 6+ save (not modified by Strength, bypassed by criticals that ignore armour). Wearable alone or with light or heavy armour."
+   }
+  ],
   [
    {
     "__re": "schwertbrecher|sword ?breaker",
