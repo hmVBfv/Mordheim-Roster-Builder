@@ -245,7 +245,7 @@ describe('the overview', () => {
     at('/warbands');
     await screen.findByRole('link', { name: /in The Hel Fenn Campaign/ });
     expect(screen.getAllByRole('link', { name: /Sons of Trantio/ }).map((a) => a.textContent)).toEqual(expect.arrayContaining([
-      expect.stringMatching(/· in The Hel Fenn Campaign$/), expect.not.stringMatching(/in The Hel Fenn/),
+      expect.stringMatching(/· in The Hel Fenn Campaign(Created|$)/), expect.not.stringMatching(/in The Hel Fenn/),
     ]));
   });
 

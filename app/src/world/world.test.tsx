@@ -348,7 +348,9 @@ describe('the values of an NPC', () => {
     expect(saved.equipment).toBe('Sword breaker');
     expect(saved.equipmentTips).toEqual([{ name: 'Sword breaker', text: expect.stringMatching(/^Close combat — Parry/) }]);
     const person = (await screen.findByText('Big Grul')).closest('li')!;
-    expect(within(person).getByText('Skills, equipment and rules').closest('details')!.textContent).toMatch(/Equipment tooltips:.*Sword breaker: Close combat — Parry/);
+    // the item on the card is a word with its tooltip, as the equipment of a unit in a warband is
+    await user.click(within(person).getByRole('button', { name: 'Sword breaker' }));
+    expect((await screen.findByRole('tooltip')).textContent).toMatch(/Sword breaker.*Close combat — Parry/);
     expect(person.textContent).toContain('[5ACFFF]Equipment tooltips:[-]'); // and the Tabletop Simulator card carries them
   });
 

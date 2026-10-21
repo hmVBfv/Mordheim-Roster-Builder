@@ -33,20 +33,24 @@ function CampaignServer() {
 
 export function More() {
   const choice = useThemeChoice();
+  const theme = (
+    <fieldset className={`${ui.card} ${styles.themes}`}>
+      <legend>Theme</legend>
+      {THEME_CHOICES.map((t) => (
+        <label key={t.value} className={styles.option}>
+          <input type="radio" name="theme" value={t.value} checked={choice === t.value} onChange={() => setChoice(t.value)} />
+          {t.label}
+        </label>
+      ))}
+    </fieldset>
+  );
   return (
-    <section className={ui.page}>
+    <section className={`${ui.page} ${ui.measure}`}>
       <h1>{accountLabel()}</h1>
-      {FLAVOUR === 'campaign' && <Suspense fallback={null}><AccountSection /></Suspense>}
+      {/* the account puts the theme between the sign-in and the devices; the player's reports have a tab of their own */}
+      {FLAVOUR === 'campaign' && <Suspense fallback={theme}><AccountSection theme={theme} /></Suspense>}
       {FLAVOUR === 'quickbuild' && <CampaignServer />}
-      <fieldset className={`${ui.card} ${styles.themes}`}>
-        <legend>Theme</legend>
-        {THEME_CHOICES.map((t) => (
-          <label key={t.value} className={styles.option}>
-            <input type="radio" name="theme" value={t.value} checked={choice === t.value} onChange={() => setChoice(t.value)} />
-            {t.label}
-          </label>
-        ))}
-      </fieldset>
+      {FLAVOUR === 'quickbuild' && theme}
       <p className={`${ui.muted} ${styles.version}`}>
         {APP_NAME} · version <span title={__APP_VERSION__}>{shownVersion(__APP_VERSION__)}</span>
         {FLAVOUR === 'quickbuild' && ' · warbands stay on this device'}

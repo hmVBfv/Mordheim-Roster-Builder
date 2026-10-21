@@ -116,7 +116,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
 - **Desktop:** Seitenleiste links, Inhalt mit Liste und Detail
   nebeneinander (z. B. Roster links, gewählter Krieger rechts). Karten
   stehen nebeneinander, so viele die Breite fasst (Roster: ab 1440 px drei
-  Spalten); der Inhalt ist bis 1320 px breit.
+  Spalten); der Inhalt ist bis 1920 px breit (Rob, 20.10.2026: vorher nur das Roster, alle anderen Seiten endeten bei 1320 px).
 - **Home und Kampagnen-Übersicht am Desktop (Rob, 19.10.2026: „Dann auch die
   Desktopübersicht angehen“):** Home steht ab 900 px in zwei Spalten – links
   „Open for you“ und die zuletzt geänderten Warbands als Raster (sechs statt
@@ -130,8 +130,11 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   rechts (Schlachten, Karte); die Reihenfolge auf dem Handy bleibt Warbands,
   Mitglieder, Schlachten, Karte. Ein leerer Teil einer Seite zeigt sein Bild
   klein neben dem Satz (`Empty compact`), nicht als Plakat; das große Bild
-  bleibt dem leeren Bildschirm. Breiter als 1320 px wird der Inhalt nicht
-  (nur das Roster nutzt bis 1920 px).
+  bleibt dem leeren Bildschirm. Der Inhalt wird bis 1920 px breit, auf jeder
+  Seite wie im Roster (Rob, 20.10.2026); nur Text und Formulare – Account,
+  Manage, Notes, Timeline, Chronicle, Questions, Background – behalten eine
+  Lesebreite von 1120 px (`ui.measure`), weil eine Zeile von 1900 px sich nicht
+  lesen lässt.
 - **Vorschlag (Mockup `desktop.html`, 29.09.2026, noch nicht entschieden):**
   Auf Robs Wunsch nach „mehreren ggf. verschiebbaren Fenstern … ohne
   clutter“ wird der Desktop eine Arbeitsfläche aus Panels. Ein Panel ist ein
@@ -271,8 +274,8 @@ Media-Query):
 | `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, All warbands, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
 
 Unter 860 px steht dieselbe Liste „Warband“ unter den Kriegern. Die Arbeitsfläche
-(Shell) wird auf dem Roster bis 1920 px breit (`.main.wide`), sonst bleibt es
-bei der Spaltenbreite der übrigen Seiten.
+(Shell) wird bis 1920 px breit, auf jeder Seite (früher nur auf dem Roster,
+`.main.wide`); Text und Formulare haben ihre Lesebreite.
 
 **Was wo liegt** (früher im ⋯-Menü der Karte): Overview – Erfahrung (Stepper,
 Stufen), Advance, Injury bzw. Captivity, „+ Man“, Anführer („Lead the

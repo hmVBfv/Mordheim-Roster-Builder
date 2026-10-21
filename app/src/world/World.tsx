@@ -16,6 +16,8 @@ import notes from '../notes/Notes.module.css';
 import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
 import { EquipmentTips } from '../ui/EquipmentTips.tsx';
+import { TipWord } from '../ui/Tip.tsx';
+import { equipmentWords } from './equipmentWords.ts';
 import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
 import { Empty } from '../art/Pixels.tsx';
 import { CopyField } from '../roster/TtsCard.tsx';
@@ -167,6 +169,7 @@ function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead:
   const p = n.profile;
   const rules = p ? p.rules.split('\n').map((x) => x.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean) : [];
   const tips = p?.equipmentTips ?? [];
+  const gear = p ? equipmentWords(p.equipment, tips) : null;
   const card = p ? npcAsOpponent(nameOf(n), p) : null;
   return (
     <li className={`${styles.person} ${n.named ? styles.named : ''}`}>
@@ -180,8 +183,15 @@ function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead:
           <summary className={ui.fold}>Skills, equipment and rules</summary>
           <div className={styles.rules}>
             {p.skills.length > 0 && <p><strong>Skills:</strong> {p.skills.map((s) => s.name).join(', ')}</p>}
-            {p.equipment.trim() && <p><strong>Equipment:</strong> {p.equipment.trim()}</p>}
-            <EquipmentTips tips={tips} />
+            {gear && gear.items.length > 0 && (
+              <p>
+                <strong>Equipment:</strong>{' '}
+                {gear.items.map((w, i) => (
+                  <span key={`${i}:${w.label}`}>{i > 0 && ', '}<TipWord label={w.label} tips={w.tip ? [{ name: w.tip.name, line: '', text: w.tip.text }] : []} /></span>
+                ))}
+              </p>
+            )}
+            <EquipmentTips tips={gear?.rest ?? []} />
             {rules.length > 0 && <ul>{rules.map((r, i) => <li key={`${i}:${r}`}>{r}</li>)}</ul>}
           </div>
         </details>

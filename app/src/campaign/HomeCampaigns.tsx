@@ -20,7 +20,7 @@ export function HomeCampaigns() {
         {!user && <p className={ui.muted}>Campaigns live on the campaign server: sign in to see yours.</p>}
         {user && active?.length === 0 && <p className={ui.muted}>None in play yet. A leader adds you to a campaign, or you start one.</p>}
         {active && active.length > 0 && (
-          <ul className={ui.list} aria-label="Your campaigns">
+          <ul className={`${ui.list} ${ui.listGrid}`} aria-label="Your campaigns">
             {active.map((c) => (
               <li key={c.id}>
                 <Link to={`/campaign/${c.id}`} className={ui.listLink}>
