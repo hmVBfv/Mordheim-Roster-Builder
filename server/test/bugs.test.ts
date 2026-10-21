@@ -152,6 +152,25 @@ describe('problem reports', () => {
     expect((await one(id)).severity).toBeNull();
   });
 
+  it('the admin gives a report a short headline: listed with it, read with it, never shown to the reporter, held to its limit', async () => {
+    const { send, anna, rob, one, list } = await table();
+    const { body } = await send(anna);
+    const id = body.id as string;
+    expect((await list())[0]).toMatchObject({ headline: '' });
+    const set = await rob('PATCH', `/bugs/${id}`, { headline: 'Trading post does not open' });
+    expect(set.statusCode).toBe(200);
+    expect((set.json() as { bug: Detail & { headline: string } }).bug.headline).toBe('Trading post does not open');
+    expect((await list())[0]).toMatchObject({ headline: 'Trading post does not open', title: 'The trading post does not open' });
+    expect(await one(id)).toMatchObject({ headline: 'Trading post does not open' });
+    // the reporter reads what they wrote, not how the admin worded it
+    expect(((await anna('GET', '/bugs/mine')).json() as { bugs: Mine[] }).bugs[0]).not.toHaveProperty('headline');
+    // a headline alone is a change; the same one again is none; it can be taken back; it has a limit
+    expect((await rob('PATCH', `/bugs/${id}`, { headline: 'Trading post does not open' })).statusCode).toBe(200);
+    expect((await rob('PATCH', `/bugs/${id}`, { headline: '' })).statusCode).toBe(200);
+    expect((await one(id)) as Detail & { headline: string }).toMatchObject({ headline: '' });
+    expect((await rob('PATCH', `/bugs/${id}`, { headline: 'x'.repeat(121) })).statusCode).toBe(400);
+  });
+
   it('closing a report, or calling it a duplicate, lets go of the warband copy; that it was attached stays', async () => {
     const { send, anna, rob, one, s } = await table();
     const a = await send(anna, { attach: { warbandId: randomUUID(), rev: 1, save: { name: 'ATTACH-ZEBRA' } } });

@@ -65,7 +65,12 @@ in the app.
      **S4** cosmetic.
    - an `area` in a few words ("trading post", "sync"), the kind if the reporter
      chose wrongly.
-4. Record it: `npm run bugs -- set N --severity S2 --area "trading post" --status confirmed`.
+4. Record it: `npm run bugs -- set N --severity S2 --area "trading post" --headline "Trading post will not open" --status confirmed`.
+   The **headline** is a few words (at most 120 characters) in your own words
+   that say what is wrong or wanted – the admin reads it over the report in
+   Admin → Reports. Never the reporter's words (section "What a report is"),
+   no names; write one for every report you sort, also a wish, and for an
+   older one that has none when you meet it.
    Leave a report you cannot understand at `new` and tell Rob what you would
    need to know (follow-up questions happen at the table or in the chat; there
    is no comment list). A duplicate: `--status duplicate` and name the number

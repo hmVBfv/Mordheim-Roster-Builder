@@ -20,7 +20,7 @@ export interface MyBug { id: string; kind: BugKind; title: string; text: string;
 
 /** One line of the admin's list. */
 export interface BugSummary {
-  id: string; /** What people say: "bug 7", and what a fix's commit names (`Fix #7`). */ number: number; reporterId: string; reporterName: string; kind: BugKind; title: string; status: BugStatus; severity: Severity | null; area: string;
+  id: string; /** What people say: "bug 7", and what a fix's commit names (`Fix #7`). */ number: number; reporterId: string; reporterName: string; kind: BugKind; title: string; status: BugStatus; severity: Severity | null; area: string; /** The admin's short heading over the report; empty until one is written. */ headline: string;
   appVersion: string; view: string; fixedIn: string; consent: boolean; attached: boolean; createdAt: string; updatedAt: string;
 }
 
@@ -54,5 +54,5 @@ export const myReports = () => api<{ bugs: MyBug[] }>('/bugs/mine').then((r) => 
 export type ListFilter = 'open' | 'fixed' | 'all';
 export const reportList = (status: ListFilter) => api<{ bugs: BugSummary[] }>(`/bugs?status=${status}&limit=200`).then((r) => r.bugs);
 export const oneReport = (id: string) => api<{ bug: BugDetail }>(`/bugs/${id}`).then((r) => r.bug);
-export interface Sorting { status?: BugStatus; severity?: Severity | null; area?: string; kind?: BugKind; fixedIn?: string }
+export interface Sorting { status?: BugStatus; severity?: Severity | null; area?: string; headline?: string; kind?: BugKind; fixedIn?: string }
 export const sortReport = (id: string, change: Sorting) => api<{ bug: BugDetail }>(`/bugs/${id}`, { method: 'PATCH', body: change }).then((r) => r.bug);

@@ -310,3 +310,16 @@
     flex: none;
   }
 }
+
+/* the reporter's words under a headline: a few lines, then "Show all" (wish #28) */
+.folded {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+.headlineField {
+  grid-column: 1 / -1;
+}
