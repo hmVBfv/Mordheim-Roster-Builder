@@ -77,6 +77,36 @@ describe('the side navigation', () => {
     expect(within(sub).queryByRole('list', { name: 'Summer in Sylvania: sections' })).toBeNull();
   });
 
+  it('the admin has Admin, which opens into the admin tools; a player has no such entry', async () => {
+    wide(true);
+    const srv = createFakeSync({ me: { id: KAI.id, username: KAI.username, displayName: KAI.displayName } });
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input), 'http://localhost/');
+      const path = url.pathname.replace(/^\/api\/v1/, '');
+      if (path === '/auth/me') return new Response(JSON.stringify({ user: { ...KAI, isAdmin: true, totp: true }, pending: false }), { headers: { 'content-type': 'application/json' } });
+      if (path.startsWith('/admin/')) return new Response(JSON.stringify({ users: [], invites: [], attempts: [], entries: [] }), { headers: { 'content-type': 'application/json' } });
+      return srv.handle(init?.method ?? 'GET', path, url.searchParams, {});
+    }));
+    signedIn({ stage: 'full', user: { ...KAI, isAdmin: true, totp: true } });
+    const user = userEvent.setup();
+    at('/admin/users');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    const entry = await within(nav).findByRole('link', { name: 'Admin' });
+    expect(entry.getAttribute('href')).toBe('/admin');
+    const list = await waitForList(nav, 'nav-admin');
+    expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['Users', 'Invites', 'Sign-ins', 'Audit log', 'Reports']);
+    await user.click(within(nav).getByRole('button', { name: 'Close Admin' }));
+    expect(nav.querySelector('#nav-admin')).toBeNull();
+  });
+
+  it('a player has no Admin entry', async () => {
+    wide(true);
+    signedIn({ stage: 'full', user: KAI });
+    at('/');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect(within(nav).queryByRole('link', { name: 'Admin' })).toBeNull();
+  });
+
   it('a phone keeps its five entries, the last one the account', async () => {
     wide(false);
     await seed('w1', 'The Silver Caravan');

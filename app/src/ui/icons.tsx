@@ -13,6 +13,8 @@ export const PersonIcon = (): ReactElement => <svg {...base}><circle cx="12" cy=
 /** The Quick Build's settings: it has no account. */
 export const GearIcon = (): ReactElement => <svg {...base}><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" /></svg>;
 /** Opens or closes a group of the navigation. */
+export const ShieldIcon = (): ReactElement => <svg {...base}><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z" /><path d="M9 12l2 2 4-4" /></svg>;
+
 export const ChevronIcon = (): ReactElement => <svg {...base}><path d="M9 6l6 6-6 6" /></svg>;
 export const IconClose = (): ReactElement => <svg {...base}><path d="M6 6l12 12M18 6L6 18" /></svg>;
 export const IconEdit = (): ReactElement => <svg {...base}><path d="M4 20h4l11-11-4-4L4 16z" /><path d="M13 7l4 4" /></svg>;

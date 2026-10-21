@@ -4,14 +4,13 @@
    admin with an authenticator gets here; the server checks every request
    again (can()). */
 import { useCallback, useEffect, useState } from 'react';
-import { Link, NavLink, useParams } from 'react-router';
-import { accountLabel } from '../app/nav.ts';
-import trade from '../roster/Trade.module.css';
+import { NavLink, useParams } from 'react-router';
 import { copyText } from '../ui/files.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { AdminBugs } from '../bugs/AdminBugs.tsx';
+import { TABS } from './adminTabs.ts';
 import { api, errorText } from './api.ts';
 import styles from './Account.module.css';
 import { useSession } from './session.ts';
@@ -21,13 +20,7 @@ import { attemptLine, auditLine, type Attempt, type AuditEntry } from './words.t
 interface User { id: string; username: string; displayName: string; isAdmin: boolean; totp: boolean; createdAt: string; disabledAt: string | null; lastSeenAt: string | null; sessions: number }
 interface Invite { id: string; kind: 'register' | 'reset'; note: string; forUser: string | null; createdAt: string; expiresAt: string }
 
-export const TABS = [
-  { key: 'users', label: 'Users' },
-  { key: 'invites', label: 'Invites' },
-  { key: 'logins', label: 'Sign-ins' },
-  { key: 'audit', label: 'Audit log' },
-  { key: 'bugs', label: 'Reports' },
-] as const;
+export { TABS };
 
 const PAGE = 50;
 
@@ -85,24 +78,30 @@ function Users({ meId, onNotice }: { meId: string; onNotice: (t: string) => void
     <>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {users && (
-        <ul className={styles.grid}>
-          {users.map((u) => (
-            <li key={u.id} className={styles.entry}>
-              <div className={styles.entryHead}>
-                <span><strong>{u.displayName}</strong>{u.displayName !== u.username && <span className={ui.muted}> · {u.username}</span>}</span>
-                {u.id === meId
-                  ? <span className={ui.muted}>you</span>
-                  : <button type="button" className={ui.buttonQuiet} onClick={() => { setChosen(u); setLink(null); setError(null); open(); }} aria-label={`What to do for ${u.displayName}`}>⋯</button>}
-              </div>
-              <div className={styles.flags}>
-                {u.isAdmin && <span className={styles.flag}>admin</span>}
-                <span className={styles.flag}>{u.totp ? 'authenticator' : 'no authenticator'}</span>
-                {u.disabledAt && <span className={`${styles.flag} ${styles.failed}`}>disabled</span>}
-              </div>
-              <small>{u.lastSeenAt ? `Last seen ${ago(u.lastSeenAt)}` : 'Never signed in'} · {u.sessions} device{u.sessions === 1 ? '' : 's'} · joined {ago(u.createdAt)}</small>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.tableWrap}>
+          <table className={styles.table} aria-label="Users">
+            <thead>
+              <tr><th scope="col">User</th><th scope="col">Role</th><th scope="col">Authenticator</th><th scope="col">Last seen</th><th scope="col">Devices</th><th scope="col">Joined</th><th scope="col"><span className="visually-hidden">What to do</span></th></tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td data-label="User"><strong>{u.displayName}</strong>{u.displayName !== u.username && <span className={ui.muted}> · {u.username}</span>}</td>
+                  <td data-label="Role">{u.isAdmin ? 'Admin' : 'Player'}{u.disabledAt && <span className={`${styles.flag} ${styles.failed}`}>disabled</span>}</td>
+                  <td data-label="Authenticator">{u.totp ? 'On' : 'Not set up'}</td>
+                  <td data-label="Last seen">{u.lastSeenAt ? ago(u.lastSeenAt) : 'Never signed in'}</td>
+                  <td data-label="Devices">{u.sessions}</td>
+                  <td data-label="Joined">{ago(u.createdAt)}</td>
+                  <td data-label="">
+                    {u.id === meId
+                      ? <span className={ui.muted}>you</span>
+                      : <button type="button" className={ui.buttonQuiet} onClick={() => { setChosen(u); setLink(null); setError(null); open(); }} aria-label={`What to do for ${u.displayName}`}>⋯</button>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       <dialog ref={ref} className={ui.sheet} aria-labelledby="user-title">
         {chosen && (
@@ -190,17 +189,23 @@ function Invites({ onNotice }: { onNotice: (t: string) => void }) {
         <h2 id="open-h">Open links</h2>
         {invites && invites.length === 0 && <p className={ui.muted}>None open.</p>}
         {invites && invites.length > 0 && (
-          <ul className={styles.grid}>
-            {invites.map((i) => (
-              <li key={i.id} className={styles.entry}>
-                <div className={styles.entryHead}>
-                  <span>{i.kind === 'reset' ? <>New password for <strong>{i.forUser}</strong></> : <strong>{i.note || 'Invite'}</strong>}</span>
-                  <button type="button" className={ui.buttonQuiet} onClick={() => void revoke(i.id)}>Revoke</button>
-                </div>
-                <small>Made {ago(i.createdAt)} · works until {stamp(i.expiresAt)}</small>
-              </li>
-            ))}
-          </ul>
+          <div className={styles.tableWrap}>
+            <table className={styles.table} aria-label="Open links">
+              <thead>
+                <tr><th scope="col">For</th><th scope="col">Made</th><th scope="col">Works until</th><th scope="col"><span className="visually-hidden">Revoke</span></th></tr>
+              </thead>
+              <tbody>
+                {invites.map((i) => (
+                  <tr key={i.id}>
+                    <td data-label="For">{i.kind === 'reset' ? <>New password for <strong>{i.forUser}</strong></> : <strong>{i.note || 'Invite'}</strong>}</td>
+                    <td data-label="Made">{ago(i.createdAt)}</td>
+                    <td data-label="Works until">{stamp(i.expiresAt)}</td>
+                    <td data-label=""><button type="button" className={ui.buttonQuiet} onClick={() => void revoke(i.id)}>Revoke</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </>
@@ -243,14 +248,23 @@ function Logins() {
     <>
       <p className={ui.muted}>Every sign-in and every failed try, kept for 180 days. Many failures from one address end up blocked by Fail2Ban on the Pi.</p>
       {log.error && <p className={`${ui.message} ${ui.error}`} role="alert">{log.error}</p>}
-      <ul className={styles.log} aria-label="Sign-ins">
-        {log.items.map((a) => (
-          <li key={a.id}>
-            <time dateTime={a.at}>{stamp(a.at)}</time>
-            <span><strong>{a.username}</strong> <span className={a.ok ? undefined : styles.failed}>{attemptLine(a)}</span><br /><small>from {a.ip}</small></span>
-          </li>
-        ))}
-      </ul>
+      <div className={styles.tableWrap}>
+        <table className={styles.table} aria-label="Sign-ins">
+          <thead>
+            <tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th><th scope="col">From</th></tr>
+          </thead>
+          <tbody>
+            {log.items.map((a) => (
+              <tr key={a.id}>
+                <td data-label="When"><time dateTime={a.at}>{stamp(a.at)}</time></td>
+                <td data-label="Who"><strong>{a.username}</strong></td>
+                <td data-label="What"><span className={a.ok ? undefined : styles.failed}>{attemptLine(a)}</span></td>
+                <td data-label="From">{a.ip}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {!log.busy && log.items.length === 0 && !log.error && <p className={ui.muted}>Nothing yet.</p>}
       {log.more && log.items.length > 0 && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={log.busy} onClick={log.next}>Older</button></div>}
     </>
@@ -263,17 +277,26 @@ function Audit() {
     <>
       <p className={ui.muted}>Every change, in order. For now the accounts; warbands and the campaign join with the next steps.</p>
       {log.error && <p className={`${ui.message} ${ui.error}`} role="alert">{log.error}</p>}
-      <ul className={styles.log} aria-label="Audit log">
-        {log.items.map((e) => {
-          const l = auditLine(e);
-          return (
-            <li key={e.seq}>
-              <time dateTime={e.at}>{stamp(e.at)}</time>
-              <span><strong>{l.who}</strong> {l.what}{l.detail && <><br /><small>{l.detail}</small></>}</span>
-            </li>
-          );
-        })}
-      </ul>
+      <div className={styles.tableWrap}>
+        <table className={styles.table} aria-label="Audit log">
+          <thead>
+            <tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th><th scope="col">Detail</th></tr>
+          </thead>
+          <tbody>
+            {log.items.map((e) => {
+              const l = auditLine(e);
+              return (
+                <tr key={e.seq}>
+                  <td data-label="When"><time dateTime={e.at}>{stamp(e.at)}</time></td>
+                  <td data-label="Who"><strong>{l.who}</strong></td>
+                  <td data-label="What">{l.what}</td>
+                  <td data-label="Detail">{l.detail}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       {!log.busy && log.items.length === 0 && !log.error && <p className={ui.muted}>Nothing yet.</p>}
       {log.more && log.items.length > 0 && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={log.busy} onClick={log.next}>Older</button></div>}
     </>
@@ -285,13 +308,10 @@ export function Admin() {
   const session = useSession();
   const [notice, notify] = useNotice();
   const head = (
-    <>
-      <Link className={trade.back} to="/more">‹ {accountLabel()}</Link>
-      <div className={styles.head}>
-        <h1>Admin</h1>
-        <span className={styles.adminOnly} title="Only the admin sees this"><span aria-hidden="true">⚑</span> Admin only</span>
-      </div>
-    </>
+    <div className={styles.head}>
+      <h1>Admin</h1>
+      <span className={styles.adminOnly} title="Only the admin sees this"><span aria-hidden="true">⚑</span> Admin only</span>
+    </div>
   );
   if (session.status === 'loading') return <section className={ui.page}>{head}</section>;
   const user = session.status === 'in' ? session.user : null;
@@ -312,7 +332,7 @@ export function Admin() {
   return (
     <section className={ui.page}>
       {head}
-      <nav className={styles.tabs} aria-label="Admin">
+      <nav className={`${styles.tabs} ${styles.sideTabs}`} aria-label="Admin">
         {TABS.map((t) => <NavLink key={t.key} to={`/admin/${t.key}`}>{t.label}</NavLink>)}
       </nav>
       {current.key === 'users' && <Users meId={user.id} onNotice={notify} />}

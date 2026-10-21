@@ -298,9 +298,9 @@ describe('the account', () => {
     fakeServer({ 'GET /auth/me': () => ({ user: { ...ADMIN, totp: false, mustSetUpTotp: true }, pending: false }), 'GET /auth/sessions': () => ({ sessions: [] }) });
     at('/more');
     expect(await screen.findByText(/Set it up to open the admin tools/)).toBeTruthy();
-    const admin = screen.getByRole('region', { name: /Admin/ });
-    expect(within(admin).queryByRole('link')).toBeNull();
-    expect(within(admin).getByText('Admin only')).toBeTruthy();
+    // the admin tools have their own place in the navigation, no box on the Account screen
+    expect(screen.queryByRole('region', { name: /Admin/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Users' })).toBeNull();
   });
 });
 
@@ -310,15 +310,19 @@ describe('the admin', () => {
     { id: 'u1', username: 'kai', displayName: 'Kai', isAdmin: false, totp: true, createdAt: '2026-10-02T10:00:00Z', disabledAt: null, lastSeenAt: null, sessions: 1 },
   ];
 
-  it('the way back from the admin tools is named like the screen it leads to', async () => {
+  it('the users are a table; the admin tools have no way back to Account, they are a place of their own', async () => {
     fakeServer({
       'GET /auth/me': () => ({ user: ADMIN, pending: false }),
       'GET /admin/users': () => ({ users }),
     });
     at('/admin/users');
-    expect(await screen.findByText('Kai')).toBeTruthy();
-    expect(screen.getByRole('link', { name: '‹ Account' }).getAttribute('href')).toBe('/more');
-    expect(screen.queryByRole('link', { name: '‹ More' })).toBeNull();
+    const table = await screen.findByRole('table', { name: 'Users' });
+    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['User', 'Role', 'Authenticator', 'Last seen', 'Devices', 'Joined', 'What to do']);
+    const rows = within(table).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(2);
+    expect(within(rows[1]!).getByText('Kai')).toBeTruthy();
+    expect(within(rows[1]!).getByText('Never signed in')).toBeTruthy();
+    expect(screen.queryByRole('link', { name: '‹ Account' })).toBeNull();
   });
 
   it('users: a reset link for a player, shown once; not for oneself', async () => {
@@ -372,14 +376,14 @@ describe('the admin', () => {
     });
     const user = userEvent.setup();
     at('/admin/logins');
-    const log = await screen.findByRole('list', { name: 'Sign-ins' });
+    const log = await screen.findByRole('table', { name: 'Sign-ins' });
     expect(await within(log).findAllByText('failed: wrong password')).toHaveLength(25);
     await user.click(screen.getByRole('button', { name: 'Older' }));
     expect(await within(log).findByText('failed: held back by the brake')).toBeTruthy();
     expect(s.calls.find((c) => c.url.searchParams.get('before'))!.url.searchParams.get('before')).toBe('51');
     expect(screen.queryByRole('button', { name: 'Older' })).toBeNull();
     await user.click(screen.getByRole('link', { name: 'Audit log' }));
-    const audit = await screen.findByRole('list', { name: 'Audit log' });
+    const audit = await screen.findByRole('table', { name: 'Audit log' });
     expect(within(audit).getByText('made an invite')).toBeTruthy();
     expect(within(audit).getByText('“for Ben”')).toBeTruthy();
   });
