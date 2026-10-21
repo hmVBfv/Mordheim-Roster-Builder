@@ -347,13 +347,15 @@
     padding: var(--space-1) 0;
   }
 
-  /* the name needs no label: it is the card's heading */
-  .table td[data-label='User'] {
+  /* the name (or the title of a report) needs no label: it is the card's heading */
+  .table td[data-label='User'],
+  .table td[data-label='Report'] {
     justify-content: flex-start;
     gap: 0;
   }
 
-  .table td[data-label='User']::before {
+  .table td[data-label='User']::before,
+  .table td[data-label='Report']::before {
     display: none;
   }
 

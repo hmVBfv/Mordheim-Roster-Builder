@@ -9,6 +9,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { api, errorText } from './api.ts';
 import styles from './Account.module.css';
+import { AccountTabs } from './AccountTabs.tsx';
 import { AuthenticatorRow } from './Authenticator.tsx';
 import { MIN_PASSWORD } from './LinkAccept.tsx';
 import { refreshSession, signedOut, useSession } from './session.ts';
@@ -175,6 +176,7 @@ export function AccountSection({ theme }: { theme?: ReactNode }) {
 
   return (
     <>
+      {session.status === 'in' && <AccountTabs />}
       <section className={`${ui.card} ${styles.section}`} aria-labelledby="acc-h">
         <h2 id="acc-h">Sign-in and security</h2>
         {body}

@@ -10,7 +10,6 @@ import styles from './More.module.css';
 
 // only the campaign app has accounts; the Quick Build never loads them
 const AccountSection = lazy(() => import('../account/Account.tsx').then((m) => ({ default: m.AccountSection })));
-const MyReports = lazy(() => import('../bugs/MyReports.tsx').then((m) => ({ default: m.MyReports })));
 
 /** Quick Build: where "Send to campaign server" points (concept.md 4.11). */
 function CampaignServer() {
@@ -48,9 +47,8 @@ export function More() {
   return (
     <section className={`${ui.page} ${ui.measure}`}>
       <h1>{accountLabel()}</h1>
-      {/* the account puts the theme between the sign-in and the devices */}
+      {/* the account puts the theme between the sign-in and the devices; the player's reports have a tab of their own */}
       {FLAVOUR === 'campaign' && <Suspense fallback={theme}><AccountSection theme={theme} /></Suspense>}
-      {FLAVOUR === 'campaign' && <Suspense fallback={null}><MyReports /></Suspense>}
       {FLAVOUR === 'quickbuild' && <CampaignServer />}
       {FLAVOUR === 'quickbuild' && theme}
       <p className={`${ui.muted} ${styles.version}`}>

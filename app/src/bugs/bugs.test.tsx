@@ -224,26 +224,46 @@ describe('reporting a problem', () => {
 });
 
 describe('following a report', () => {
-  it('under Account the reporter reads the words and the status of their own reports – never of others’, never the severity', async () => {
+  it('under Account → Your reports the reporter reads the words and the status of their own reports – never of others’, never the severity', async () => {
     const { srv, me } = server();
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Gold drifts', text: 'After the battle the gold is off.', status: 'fixed', fixedIn: '0123456789abcdef0123456789abcdef01234567', severity: 'S1', area: 'gold ledger' });
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Dark mode please', text: 'A darker theme.', kind: 'wish', status: 'new' });
     srv.bugFrom({ reporterId: 'user-ben', reporterName: 'Ben', title: 'Ben’s secret problem', text: 'BEN-SECRET', status: 'new' });
-    at('/more');
-    const section = await screen.findByRole('region', { name: 'Your reports' });
-    expect(within(section).getByText('Gold drifts')).toBeTruthy();
-    expect(within(section).getByText('Fixed in 0123456')).toBeTruthy();
-    expect(within(section).getByText('Dark mode please')).toBeTruthy();
-    expect(within(section).getByText('Received')).toBeTruthy();
-    expect(within(section).getByText('Wish')).toBeTruthy();
-    expect(section.textContent).not.toMatch(/Ben|S1|gold ledger/);
+    at('/more/reports');
+    const table = await screen.findByRole('table', { name: 'Your reports' });
+    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Report', 'Kind', 'Status', 'Sent', 'Last change']);
+    const rows = within(table).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(2);
+    const gold = within(table).getByText('Gold drifts').closest('tr')!;
+    expect(within(gold).getByText('Fixed in 0123456')).toBeTruthy();
+    expect(within(gold).getByText('Bug')).toBeTruthy();
+    const dark = within(table).getByText('Dark mode please').closest('tr')!;
+    expect(within(dark).getByText('Received')).toBeTruthy();
+    expect(within(dark).getByText('Wish')).toBeTruthy();
+    expect(table.textContent).not.toMatch(/Ben|S1|gold ledger|BEN-SECRET/);
   });
 
-  it('nothing under Account until the player has sent a report', async () => {
-    server();
+  it('a tab of its own: Account has Your reports beside it, and the settings do not grow with the reports', async () => {
+    const { srv, me } = server();
+    srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Gold drifts', text: 'x', status: 'new' });
+    const user = userEvent.setup();
     at('/more');
     await screen.findByRole('heading', { level: 1, name: 'Account' });
-    await waitFor(() => expect(screen.queryByRole('region', { name: 'Your reports' })).toBeNull());
+    // no box of reports on the settings page any more
+    expect(screen.queryByRole('region', { name: 'Your reports' })).toBeNull();
+    expect(screen.queryByText('Gold drifts')).toBeNull();
+    const tabs = screen.getByRole('navigation', { name: 'Account' });
+    expect(within(tabs).getAllByRole('link').map((a) => a.textContent)).toEqual(['Settings', 'Your reports']);
+    await user.click(within(tabs).getByRole('link', { name: 'Your reports' }));
+    expect(await screen.findByRole('table', { name: 'Your reports' })).toBeTruthy();
+    expect(screen.getByText('Gold drifts')).toBeTruthy();
+  });
+
+  it('nothing sent yet: the tab says so', async () => {
+    server();
+    at('/more/reports');
+    expect(await screen.findByText('You have not sent a report yet. The Bug button at the top of every screen opens the form.')).toBeTruthy();
+    expect(screen.queryByRole('table', { name: 'Your reports' })).toBeNull();
   });
 });
 

@@ -99,6 +99,18 @@ describe('the side navigation', () => {
     expect(nav.querySelector('#nav-admin')).toBeNull();
   });
 
+  it('Account opens into the settings and Your reports', async () => {
+    wide(true);
+    signedIn({ stage: 'full', user: KAI });
+    const user = userEvent.setup();
+    at('/more/reports');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    const list = await waitForList(nav, 'nav-account');
+    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Settings', '/more'], ['Your reports', '/more/reports']]);
+    await user.click(within(nav).getByRole('button', { name: 'Close Account' }));
+    expect(nav.querySelector('#nav-account')).toBeNull();
+  });
+
   it('a player has no Admin entry', async () => {
     wide(true);
     signedIn({ stage: 'full', user: KAI });
