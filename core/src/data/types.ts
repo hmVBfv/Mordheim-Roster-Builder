@@ -130,6 +130,12 @@ export interface CatalogItem {
   /** The restriction as written ("Dwarfs only"); a note when `only` is absent. */
   wb: string;
   only?: CatalogOnly;
+  /** Where the item comes from, for filtering: the campaign settings it is sold in (`core`, `empire-in-flames`, `border-town-burning`, `khemri`, `lustria` …) or `warband:<page>`. Absent on the rulebook's own items. */
+  settings?: string[];
+  /** The grade of its source (`core`, `1a`, `1b`, `1c`, `2a`), where the source states one. */
+  grade?: string | null;
+  /** Where it was read: addresses on mordheimer.net. */
+  source?: string[];
   /** Other German keys the warbands' lists use for this very item (the Cathayan silk cloak is the silk clothes), so the lists' rarity and price follow the chart. */
   alias?: string[];
 }

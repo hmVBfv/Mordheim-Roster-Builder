@@ -273,7 +273,9 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   const [usable, setUsable] = useState(true);
   const [all, setAll] = useState(false);
   const shop = useMemo(() => shopItems(ctx), [ctx]);
-  const rare = useMemo(() => rareItems(ctx), [ctx]);
+  const rare = useMemo(() => rareItems(ctx, true), [ctx]);
+  // a Hero looks for what the catalogue does not keep for other warbands only
+  const searchable = useMemo(() => rareItems(ctx), [ctx]);
   const held = useMemo(() => holdings(ctx), [ctx]);
   const heroes = searchers(ctx);
   // from tablet width on, Give is two columns to pick from; a phone keeps the list and the sheet
@@ -409,7 +411,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
           onBuy={(to, qty, cost) => ed.edit((c) => core.buyItem(c, to, buying.item.key, { qty }).state, `Bought ${buying.item.name}${to === 'stash' ? ' for the stash' : ''} (−${cost} gc).`)} />}
       </dialog>
       <dialog ref={searchRef} className={ui.sheet} aria-labelledby={ids.search}>
-        {seeking && <SearchForm key={seeking.key} ctx={ctx} start={seeking} items={rare} gold={gold} close={closeSearch} titleId={ids.search}
+        {seeking && <SearchForm key={seeking.key} ctx={ctx} start={seeking} items={searchable} gold={gold} close={closeSearch} titleId={ids.search}
           onFound={(uid, de, paid, to) => ed.edit((c) => core.recordSearch(c, uid, de, { found: true, paid, to }).state, `Found ${rareName(de)} (−${paid} gc).`)}
           onMissed={(uid, de) => ed.edit((c) => core.recordSearch(c, uid, de, { found: false }).state, `${rareName(de)}: not found this time.`)} />}
       </dialog>

@@ -109,6 +109,20 @@ describe('the Trading Post', () => {
   });
 });
 
+describe('rare items nobody here may carry (#27)', () => {
+  // a Reikland warband without a spellcaster: the Familiar is kept for spellcasters
+  it('are left out while only what someone here may use is asked for, and listed – marked unusable – when everything is', () => {
+    const { s } = band(1);
+    expect(rareItems(ctx(s)).some((x) => x.name === 'Familiar')).toBe(false);
+    const all = rareItems(ctx(s), true);
+    expect(all.find((x) => x.name === 'Familiar')).toMatchObject({ usable: false, rarity: 8 });
+    expect(all.find((x) => x.name === 'Barbed whip')).toMatchObject({ usable: false });
+    expect(all.length).toBeGreaterThan(rareItems(ctx(s)).length);
+    // what can be used is the same either way
+    expect(all.filter((x) => x.usable).map((x) => x.de)).toEqual(rareItems(ctx(s)).filter((x) => x.usable).map((x) => x.de));
+  });
+});
+
 describe('an edit after the first battle', () => {
   it('before it: the Roster Builder\'s action alone, no ledger', () => {
     const { s } = band(0);
