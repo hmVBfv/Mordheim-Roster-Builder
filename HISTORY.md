@@ -3687,3 +3687,14 @@ parity suite. The unit restriction therefore lives in the trading rules
 not buy a rare list item, which would have shut a new Knight out of his own
 Warhorse; the founding-priced row is exempt, as Rob asked ("a new Hero with
 this Warhorse just pays").
+
+## October 21, 2026 — the Trading Post without a box around every item (#23)
+
+"Ugly, especially the boxes around the items" was fair: every row of Buy,
+Search, Sell and Give – and every choice in the sheets and on the wide Give
+board – was its own bordered, filled box, so a list of twelve items was twelve
+boxes with gaps between them. The lists are now one panel each, with flat rows
+divided by a hairline, a quiet tint under the pointer, and a bar in the accent
+colour for the picked choice; the owners' names on the Give board are small
+labels. Only the CSS changed (and which class the lists use): the Hired Swords
+list still has its boxes, because nobody asked for that one.
