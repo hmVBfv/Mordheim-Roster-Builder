@@ -3698,3 +3698,66 @@ divided by a hairline, a quiet tint under the pointer, and a bar in the accent
 colour for the picked choice; the owners' names on the Give board are small
 labels. Only the CSS changed (and which class the lists use): the Hired Swords
 list still has its boxes, because nobody asked for that one.
+
+## October 21, 2026 — the rare items in cells that do not break (#24, #26)
+
+Two reports, one cause: a rare item's line was a name on the left and one
+right-aligned string ("Rare 9 · 10+1D6 · 28 %") that the browser broke wherever
+it ran out of room – a lone "%" on a line of its own on a phone – and the
+sheet's version stacked the name, the meta and the effect in a grid that
+overlapped on a narrow screen. Prices also said "gc" only when they were fixed
+numbers, because the catalogue stores dice prices as text. The line is now one
+component for the list and the sheet: rarity, chance and price are separate
+nowrap cells (under the name on a phone, columns from tablet width), the price
+always carries its unit and a dice price its average. The regression test
+measures the real boxes at 468 px instead of trusting the CSS, and waits for
+the fonts first – without that it failed once under load, when a late font
+changed where lines broke.
+
+## October 21, 2026 — the catalogue of every campaign and grade (#27)
+
+A reporter could not find the Familiar. It was in the catalogue all along: the
+Search tab left out every item kept for spellcasters when the warband had none,
+whatever the "only what someone here may use" box said – so the box, off,
+should show it, marked as unusable, and does now. The report also asked whether
+only the core rules had been read. They had, nearly: the catalogue held the
+Mordheim price chart and the warbands' own items, but not what the campaign
+settings sell. Five readers went through the downloaded pages of mordheimer.net
+(Empire in Flames, Border Town Burning, Khemri and Lustria, the warbands of
+the core and of grades 1a–1c, and grade 2a) and listed what was missing; I
+checked samples against the pages and merged the result. 63 items came in:
+mounts and animals of the settings, the Merchant's dealings, the Wardog, and
+the items of the 2a warbands – which the app does not have, so those carry
+`only: { wb: [] }`: kept, with their source and grade, carried by nobody.
+Each new item says where it comes from (`settings`, `grade`, `source`) so a
+list can be filtered by it later. The same animal at another price in another
+setting is a separate entry that names its setting. Left out on purpose: the
+starting-list items that have no rarity and are already rows of their
+warband's list (they would have been offered twice), and the lesser, chaos
+and Lustrian artefacts, which are random rewards with no price or rarity.
+Where a setting's chart disagrees with the core chart (Khemri and Lustria shift
+many rarities by one), nothing was changed: the core values stand and the list
+of differences went to Rob.
+
+## October 21, 2026 — sorting the rare items (#25)
+
+A select next to the search mask orders the list and the Hero's search sheet by
+name, rarity or price, each way round. A dice price sorts by what it comes to on
+average, and an item whose price is no number ("4 × price" of a weapon) goes last
+whichever way prices run – putting it first on "cheapest" would be a lie and on
+"dearest" a guess. Ties go by name so the order never jumps between renders.
+
+## October 21, 2026 — a headline for every report (#28)
+
+The admin's list showed each report by the first words of what the reporter
+typed, cut off with "…", which read badly once there were two dozen of them.
+A report now has a `headline`: a few words in the sorter's own voice, written
+by whoever sorts it – `/bugs` writes one with `--headline` when it triages,
+Rob can type one in the sorting form. The list shows it where the cut-off
+words were, the sheet shows it over the report with the reporter's words
+folded to four lines underneath ("Show all" opens them). Two things stayed as
+they were on purpose: the admin's list still carries no words (the headline
+is the only text it adds, and it is the admin's own), and the reporter never
+reads it – it is part of the sorting, like the area and the severity, and
+not part of what they wrote. The old reports have none yet; a report without
+one shows the old way until it gets one.
