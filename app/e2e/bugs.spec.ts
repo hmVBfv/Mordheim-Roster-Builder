@@ -76,8 +76,8 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     });
     srv.bugFrom({ title: 'The tooltip says five', text: 'It should say six.', reporterName: 'Anna', kind: 'rules', sourceRef: 'https://mordheimer.net/example' });
     await page.goto('admin/bugs');
-    const list = page.getByRole('list', { name: 'Reports' });
-    await expect(list.getByRole('listitem')).toHaveCount(2);
+    const table = page.getByRole('table', { name: 'Reports' });
+    await expect(table.getByRole('row')).toHaveCount(3);
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-admin-reports`);
@@ -96,6 +96,6 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(srv.state.bugs[0]!.fixedIn).toBe('3f2a9c1');
     // a fixed report leaves the "Open" list: wait for the list to be read again
     await expect(sheet).toBeHidden();
-    await expect(list.getByRole('listitem')).toHaveCount(1);
+    await expect(table.getByRole('row')).toHaveCount(2);
   });
 }
