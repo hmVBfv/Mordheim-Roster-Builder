@@ -372,16 +372,54 @@
   grid-template-columns: 1fr 1fr;
 }
 
-.what {
+/* a rare item's line: name; rarity, chance, price (cells that do not break); what it does */
+.pick button.rareRow,
+.rows button.rareRow {
   display: grid;
-  gap: 2px;
-  min-width: 0;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: 'n n n' 'r c p' 'e e e';
+  column-gap: var(--space-3);
+  row-gap: 2px;
+  align-items: baseline;
+  justify-content: stretch;
+  width: 100%;
   text-align: left;
 }
 
-.item .effect,
-.pick .effect {
-  display: block;
+.rareRow .rn { grid-area: n; min-width: 0; }
+.rareRow .rr { grid-area: r; }
+.rareRow .rc { grid-area: c; }
+.rareRow .rp { grid-area: p; }
+.rareRow .re { grid-area: e; text-align: left; }
+
+.rareRow .rr,
+.rareRow .rc,
+.rareRow .rp {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.rareRow small {
   text-align: left;
   color: var(--text-muted);
+}
+
+.rareRow .rp small {
+  font-size: 0.85em;
+}
+
+@media (min-width: 720px) {
+  .pick button.rareRow,
+  .rows button.rareRow {
+    grid-template-columns: minmax(0, 1fr) 5.5rem 4.5rem 12rem;
+    grid-template-areas: 'n r c p' 'e r c p';
+    align-items: center;
+  }
+
+  .rareRow .rr,
+  .rareRow .rc,
+  .rareRow .rp {
+    text-align: right;
+  }
 }
