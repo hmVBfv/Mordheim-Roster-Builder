@@ -9,3 +9,6 @@
 @media (min-width: 900px) {
   .list { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); align-items: start; }
 }
+
+.sources { display: grid; gap: 0; color: var(--text-muted); font-size: 0.85rem; }
+.source { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }

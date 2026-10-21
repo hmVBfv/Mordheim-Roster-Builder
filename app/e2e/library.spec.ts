@@ -68,3 +68,16 @@ test('a faction is written in the Library, taken into a campaign and given to a 
   await shot(page, 'library-factions');
   expect([...srv.state.library.values()].filter((i) => !i.deletedAt && i.kind === 'faction')).toHaveLength(1);
 });
+
+test('the Lore tab lists the setting and adds an entry to the Library, at 360 px', async ({ page }) => {
+  const srv = await playServer(page);
+  await page.goto('library/lore');
+  const list = page.getByRole('list', { name: 'Lore' });
+  await expect(list.getByText('The Witch Hunters', { exact: true })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-lore');
+  await list.getByRole('button', { name: 'Add The Witch Hunters to the Library' }).click();
+  await expect(list.getByRole('button', { name: 'The Witch Hunters is in the Library' })).toBeDisabled();
+  await expect.poll(() => [...srv.state.library.values()].filter((i) => i.kind === 'faction').length).toBe(1);
+});
