@@ -18,7 +18,7 @@ export function registerBugRoutes(app: FastifyInstance, deps: BugDeps): void {
   app.post('/api/v1/bugs', { config: { action: 'bugs.report' }, schema: { body: { type: 'object' } } }, async (req, reply) => {
     const parsed = ReportBody.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: 'invalid', problem: problem(parsed.error, 'a report') });
-    const r = reportBug(db(), req.actor!.id, parsed.data, deps.now());
+    const r = reportBug(db(), req.actor!.id, parsed.data, deps.now(), req.actor!.isAdmin);
     if (!r.ok) return reply.code(r.status).send({ error: r.error, ...(r.problem ? { problem: r.problem } : {}) });
     return reply.code(r.created ? 201 : 200).send({ bug: oneOfMine(r.bug) });
   });

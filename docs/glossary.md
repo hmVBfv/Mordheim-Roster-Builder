@@ -228,6 +228,7 @@ Begriff einführt, trägt ihn hier ein.
 | Wahrheit | Truth | `truth` (nur Leiter) |
 | Welt | World | `/campaign/:id/world`, `app/src/world/`; öffentliche Mechanik, offen für alle Mitglieder |
 | Fraktion | Faction | `factions` |
+| Lore-Katalog | Lore (Library tab) | `data/lore.json` |
 | NPC | NPC | `npcs` (Wahrheit bleibt im Hintergrund) |
 | Named (NPC) | Named | `npcs.named`: eine Person für sich, nicht Teil einer Menge; Threads im Hintergrund können sich darauf beziehen |
 | Verweis (Hintergrund) | Refers to | `background_entries.refs`: `battle`, `faction`, `npc` (nur Named), `text` und die älteren `entry`/`warrior`/`note`; die Oberfläche zeigt den aktuellen Namen, die Beschriftung beim Eintragen bleibt als Rückfall |

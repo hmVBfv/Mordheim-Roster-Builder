@@ -3592,3 +3592,22 @@ bracket matching would have understood – and which would have silently broken
 the Artisan Quarter's half price, because that matches the English name
 exactly. So the chart entry got an `alias` instead: the German keys the lists
 use for the same item.
+## October 21, 2026 — lore for world building
+
+Wish #18 asked for ready-made regions, factions and groups to start a world
+from. mordheimer.net has the lore: the Empire in Flames, the City of the
+Damned, the Warbands of Mordheim, the Ostermark article and the mercenary
+warbands' home cities. I read those pages and wrote one short summary of
+my own per entry into `data/lore.json`, each with its source link, keeping
+only what has more than a subordinate clause of lore behind it – so Ostermark,
+the Eerie Downs, the Freetraders and the Witch Hunters are in, while the
+Skaven (one sentence, "their story is their own") and Badenhof (a name) are
+not. It is not rules data, so it sits next to the audited files but outside
+the loader the legacy app uses, and nothing in it is playable.
+
+In the Library it is a read-only tab with an "Add" button that copies an entry
+into one's own factions (or, for a region, into an idea about a campaign):
+the catalogue stays as it is, the copy can be rewritten. The two sources of
+this lore disagree about one thing – the Ostermark article has Magritta on the
+throne, the core introduction has her refused – and the entry says both rather
+than picking one.
