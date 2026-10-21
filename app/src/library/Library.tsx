@@ -15,6 +15,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleItem, TOPIC_NAMES, TOPICS, type Faction, type FactionBody, type Idea, type IdeaBody, type Topic } from './api.ts';
 import styles from './Library.module.css';
 import { LoreTab } from './LoreTab.tsx';
+import { NpcsTab } from './NpcsTab.tsx';
 import { LIBRARY_TABS } from './tabs.ts';
 import { factionsOf, useLibrary } from './useLibrary.ts';
 
@@ -291,6 +292,7 @@ export function Library() {
       </nav>
       {tab === 'ideas' && <IdeasTab notify={notify} />}
       {tab === 'factions' && <FactionsTab notify={notify} />}
+      {tab === 'npcs' && <NpcsTab notify={notify} />}
       {tab === 'lore' && <LoreTab notify={notify} />}
       {notice}
     </section>

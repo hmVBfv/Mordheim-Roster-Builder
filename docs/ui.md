@@ -72,7 +72,14 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   einem Nebensatz Lore). Filter All · Regions · Factions · Groups; „Add to Library“
   kopiert eine Fraktion oder Gruppe als Faction, eine Region als Idea (About:
   Campaign) in die eigene Library – ein Name, der dort schon steht, wird nicht noch
-  einmal angeboten. NPCs, Groups und Scenarios folgen in eigenen Scheiben.
+  einmal angeboten. **NPCs** (Name englisch und deutsch, Fraktion als Name, Status,
+  „Named“ und die Werte wie in der World, nur ohne Kampagne: keine eigenen Fertigkeiten
+  der Kampagne, keine Krieger zum Kopieren). Groups und Scenarios folgen in eigenen
+  Scheiben.
+  **Ein NPC in eine Kampagne:** „NPCs from the Library…“ in der World (eine Kopie
+  mit den Werten; die Fraktion wird in der World nach Namen gesucht, sonst ohne
+  Fraktion; ein NPC gleichen Namens wird nicht noch einmal angeboten) und „Save to
+  Library“ an jedem NPC der World (eine Kopie zurück).
   **Eine Fraktion in eine Kampagne:** in der World der Kampagne bietet ein Leiter
   „From the Library…“ an (eine Kopie: die Namen und was die Spieler lesen dürfen,
   die Lore bleibt in der Library; eine Fraktion gleichen Namens wird nicht noch

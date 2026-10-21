@@ -1,6 +1,7 @@
 /* The Library on the server (server/src/routes-library.ts, ADR 0023): one's own ideas – later factions, NPCs,
    groups and scenarios – with the account, private to it. The last list is kept on the device (under the
    account's own key) so it reads offline; writing needs the connection. */
+import type { NpcProfile } from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';
 import { asker, ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
@@ -17,9 +18,12 @@ export const MAX_STATUS = 200;
 export interface IdeaBody { text: string; topic: Topic }
 /** A faction as the Library keeps it; its `name` is the English one. */
 export interface FactionBody { de: string; status: string; lore: string }
+/** An NPC outside any campaign (server/src/library.ts): the world's NPC with its faction as a name. `statlineTts`/`profile` as in a world's NPC. */
+export interface NpcBody { de: string; status: string; faction: string; named: boolean; statlineTts: string; profile: NpcProfile | null }
 export interface LibraryItem<B = unknown> { id: string; kind: string; name: string; body: B; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
 export type Idea = LibraryItem<IdeaBody>;
 export type Faction = LibraryItem<FactionBody>;
+export type LibraryNpc = LibraryItem<NpcBody>;
 
 const KEY = 'items';
 
@@ -40,7 +44,7 @@ export async function getLibrary(): Promise<LibraryItem[]> {
 }
 
 /** Writes one entry under the device's id; `baseSeq` is the state it is changed from (none for a new one). */
-export async function putItem<B>(kind: 'idea' | 'faction', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
+export async function putItem<B>(kind: 'idea' | 'faction' | 'npc', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
   const who = asker();
   const r = await api<{ item: LibraryItem<B> }>(`/library/${id}`, { method: 'PUT', body: { kind, name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
   const cur = (await cachedLibrary()) ?? [];
@@ -49,6 +53,8 @@ export async function putItem<B>(kind: 'idea' | 'faction', id: string, name: str
 }
 export const putIdea = (id: string, name: string, body: IdeaBody, baseSeq?: number) => putItem<IdeaBody>('idea', id, name, body, baseSeq);
 export const putFaction = (id: string, name: string, body: FactionBody, baseSeq?: number) => putItem<FactionBody>('faction', id, name, body, baseSeq);
+
+export const putNpc = (id: string, name: string, body: NpcBody, baseSeq?: number) => putItem<NpcBody>('npc', id, name, body, baseSeq);
 
 export async function removeItem(id: string): Promise<void> {
   const who = asker();

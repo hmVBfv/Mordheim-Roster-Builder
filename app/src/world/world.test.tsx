@@ -100,6 +100,41 @@ describe('the world and the Library (ADR 0023)', () => {
     expect([...srv.state.library.values()].filter((i) => !i.deletedAt)).toMatchObject([{ kind: 'faction', name: 'The Ferrymen', body: { de: '', status: 'Ply the Stir', lore: '' } }]);
   });
 
+  it('a leader adds an NPC from the Library as a copy: its values go along, its faction is found by name', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const ferry = srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
+    const profile = { type: 'Monk', profile: { M: '4', WS: '3' }, sv: '', skills: [{ name: 'Dodge', text: '' }], equipment: 'Bell hammer', equipmentTips: [], rules: '', from: null };
+    srv.libraryFrom({ name: 'Old Brother Anselm', kind: 'npc', body: { de: 'Der alte Bruder Anselm', status: 'Rings the bells', faction: 'the ferrymen', named: true, statlineTts: 'M4 WS3', profile } });
+    srv.libraryFrom({ name: 'Ben’s NPC', kind: 'npc', body: { de: '', status: '', faction: '', named: false, statlineTts: '', profile: null }, owner: 'user-ben' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'NPCs from the Library…' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Add NPCs from your Library' });
+    const list = await within(sheet).findByRole('list', { name: 'Your NPCs' });
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([expect.stringContaining('Old Brother Anselm')]);
+    await user.click(within(list).getByRole('button', { name: 'Add Old Brother Anselm' }));
+    const made = () => [...srv.state.npcs.values()].filter((n) => n.campaignId === c.id);
+    await waitFor(() => expect(made()).toHaveLength(1));
+    expect(made()).toMatchObject([{ nameEn: 'Old Brother Anselm', nameDe: 'Der alte Bruder Anselm', publicStatus: 'Rings the bells', named: true, factionId: ferry.id, profile: { type: 'Monk', equipment: 'Bell hammer' } }]);
+    // it is there: the Library does not offer it again
+    await user.click(screen.getByRole('button', { name: 'NPCs from the Library…' }));
+    const again = within(await screen.findByRole('dialog', { name: 'Add NPCs from your Library' }));
+    expect((await again.findByRole('button', { name: 'Add Old Brother Anselm' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('a leader keeps an NPC of the world in the Library, as a copy with the name of its faction', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const ferry = srv.factionFrom(c.id, { nameEn: 'The Ferrymen' });
+    srv.npcFrom(c.id, { nameEn: 'Old Marek', nameDe: 'Der alte Marek', factionId: ferry.id, publicStatus: 'alive', statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', named: true });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'Save Old Marek to your Library' }));
+    expect(await screen.findByText('Saved to your Library.')).toBeTruthy();
+    expect([...srv.state.library.values()].filter((i) => !i.deletedAt)).toMatchObject([{ kind: 'npc', name: 'Old Marek', body: { de: 'Der alte Marek', status: 'alive', faction: 'The Ferrymen', named: true, statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', profile: null } }]);
+  });
+
   it('players do not get the buttons', async () => {
     const srv = server();
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: others() });
