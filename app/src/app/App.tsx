@@ -2,7 +2,7 @@
    answers every path with the app (browser history); the Quick Build lives
    on GitHub Pages, which cannot, so it keeps the route after a "#". */
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, HashRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, HashRouter, Navigate, Route, Routes } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
 import { Home } from '../routes/Home.tsx';
 import { More } from '../routes/More.tsx';
@@ -34,7 +34,6 @@ const CampaignWarband = lazy(() => import('../campaign/CampaignWarband.tsx').the
 const Battle = lazy(() => import('../battle/Battle.tsx').then((m) => ({ default: m.Battle })));
 const Aftermath = lazy(() => import('../aftermath/Aftermath.tsx').then((m) => ({ default: m.Aftermath })));
 const CampaignRules = lazy(() => import('../campaign/CampaignRules.tsx').then((m) => ({ default: m.CampaignRules })));
-const NotesHome = lazy(() => import('../notes/Notes.tsx').then((m) => ({ default: m.NotesHome })));
 
 export function AppRoutes() {
   return (
@@ -57,7 +56,8 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/battles/:bid" element={<Battle />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/house-rules" element={<CampaignRules />} />}
           {FLAVOUR === 'campaign' && <Route path="/campaign/:id/:tab" element={<Campaign />} />}
-          {FLAVOUR === 'campaign' && <Route path="/notes" element={<NotesHome />} />}
+          {/* the old address of the Notes tab: notes are a section of each campaign */}
+          {FLAVOUR === 'campaign' && <Route path="/notes" element={<Navigate to="/campaign" replace />} />}
           {FLAVOUR === 'campaign' && <Route path="/sign-in" element={<SignIn />} />}
           {FLAVOUR === 'campaign' && <Route path="/invite" element={<LinkAccept />} />}
           {FLAVOUR === 'campaign' && <Route path="/reset" element={<LinkAccept />} />}

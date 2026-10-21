@@ -230,7 +230,8 @@ describe('the Background tab', () => {
     const lead = srv.addCampaign({ name: 'Without the authenticator', others: others() });
     at(`/campaign/${lead.id}`);
     expect((await screen.findAllByRole('link', { name: 'Notes' })).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('link', { name: /Background/ })).toBeNull();
+    // the tabs come first from what this device kept of the campaign; the server's answer settles them
+    await waitFor(() => expect(screen.queryByRole('link', { name: /Background/ })).toBeNull());
     cleanup();
     // the address alone gets nothing either
     at(`/campaign/${lead.id}/background`);
@@ -242,13 +243,15 @@ describe('the Background tab', () => {
     const player = srv2.addCampaign({ name: 'As a player', role: 'player', others: others() });
     at(`/campaign/${player.id}/background`);
     expect((await screen.findAllByRole('link', { name: 'Notes' })).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('link', { name: /Background/ })).toBeNull();
+    // the tabs come first from what this device kept of the campaign; the server's answer settles them
+    await waitFor(() => expect(screen.queryByRole('link', { name: /Background/ })).toBeNull());
     expect(screen.queryByText(/Only campaign leaders see this area/)).toBeNull();
     cleanup();
     const watched = srv2.addCampaign({ name: 'Watching', role: 'viewer' });
     at(`/campaign/${watched.id}`);
     expect((await screen.findAllByRole('link', { name: 'Notes' })).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('link', { name: /Background/ })).toBeNull();
+    // the tabs come first from what this device kept of the campaign; the server's answer settles them
+    await waitFor(() => expect(screen.queryByRole('link', { name: /Background/ })).toBeNull());
   });
 });
 

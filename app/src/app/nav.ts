@@ -5,9 +5,9 @@
    which has no account. The address stays /more. */
 import type { ReactElement } from 'react';
 import { FLAVOUR, type Flavour } from '../flavour.ts';
-import { BannerIcon, GearIcon, HomeIcon, MapIcon, PersonIcon, QuillIcon, ShieldIcon } from '../ui/icons.tsx';
+import { BannerIcon, GearIcon, HomeIcon, MapIcon, PersonIcon, ShieldIcon } from '../ui/icons.tsx';
 
-export type Section = 'home' | 'warbands' | 'campaign' | 'notes' | 'admin' | 'account';
+export type Section = 'home' | 'warbands' | 'campaign' | 'admin' | 'account';
 export interface NavItem { to: string; label: string; icon: () => ReactElement; section: Section }
 
 /** What the last entry is called: the page's own heading says the same. */
@@ -20,7 +20,8 @@ export function navItems(flavour: Flavour = FLAVOUR, admin = false): NavItem[] {
     { to: '/warbands', label: 'Warbands', icon: BannerIcon, section: 'warbands' },
   ];
   if (flavour === 'campaign') {
-    items.push({ to: '/campaign', label: 'Campaign', icon: MapIcon, section: 'campaign' }, { to: '/notes', label: 'Notes', icon: QuillIcon, section: 'notes' });
+    // Notes belong to a campaign: they are one of its sections (campaign/tabs.ts), not a place of their own (Rob, 20.10.2026)
+    items.push({ to: '/campaign', label: 'Campaign', icon: MapIcon, section: 'campaign' });
 
     if (admin) items.push({ to: '/admin', label: 'Admin', icon: ShieldIcon, section: 'admin' });
   }

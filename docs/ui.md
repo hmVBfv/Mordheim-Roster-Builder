@@ -54,10 +54,14 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
                                   (* nur Leiter bzw. Admin)
 ```
 
-- **Handy:** Navigationsleiste unten (Home, Warbands, Campaign, Notes,
-  Account); Formulare und Auswahl als Bereich, der von unten aufklappt (native
+- **Handy:** Navigationsleiste unten (Home, Warbands, Campaign, Account; für
+  den Admin dazu Admin); Formulare und Auswahl als Bereich, der von unten aufklappt (native
   `<dialog>`), statt Pop-up-Fenstern. Die Abschnitte einer Kampagne stehen dort
   als Reiter über der Kampagne.
+- **Notes nur in einer Kampagne (Rob, 20.10.2026):** Notes hat keinen eigenen
+  Eintrag in der Navigation mehr; es ist ein Reiter jeder Kampagne (unter
+  Campaign → die Kampagne → Notes). Die alte Adresse `/notes` führt zur Liste
+  der Kampagnen.
 - **„Account“ statt „More“ (Rob, 19.10.2026):** Das letzte Ziel heißt in der
   Kampagnen-App „Account“ und zeigt eine Person; drei Punkte lasen sich wie ein
   Menü oder Einstellungen. Im Quick Build, der kein Konto hat, heißt es
