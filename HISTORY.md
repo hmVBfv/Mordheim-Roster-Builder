@@ -3611,3 +3611,52 @@ the catalogue stays as it is, the copy can be rewritten. The two sources of
 this lore disagree about one thing – the Ostermark article has Magritta on the
 throne, the core introduction has her refused – and the entry says both rather
 than picking one.
+
+## October 21, 2026 — NPCs that outlive a campaign
+
+Wish #8: an NPC lived only inside one campaign, so a person who should turn up
+in the next one had to be typed in again. The Library got a third kind, `npc`,
+shaped like the world's NPC with one change: the faction is a *name*, not an id,
+because a faction id means nothing outside its campaign. When a leader imports
+the NPC into a world, the faction is looked up there by name and the NPC simply
+has none if there is no match – better than inventing a faction in someone
+else's world. The values form is the campaign's own; it only had to learn that
+there may be no campaign (no own skills to keep, no warriors to copy from).
+
+## October 21, 2026 — opponent groups in the Library
+
+The second half of wish #13. A group of opponents is a name, a note and a list
+of profiles, so the Library kind is the campaign's group minus the things that
+only make sense inside a campaign: the `baseSeq` (the Library has its own) and
+the links to the campaign's own skills. That last one mattered: a profile's
+skill can point at a skill a leader wrote for one campaign (`ref`), and a copy
+into another campaign would point at nothing. So copies in either direction
+keep the skill's name and tooltip and drop the link; the other campaign shows
+it like any skill that was typed in. Every profile also gets a new id on the
+way into a campaign, because a profile's id is its identity inside its group.
+
+## October 21, 2026 — scenarios in the Library
+
+The last kind of wish #13. A scenario carries NPCs with parts hidden from the
+players (ADR 0022), and the form that edits those hides, reveals and freezes
+things against a campaign's release state – none of which means anything in the
+Library, where nothing is ever released. So the Library keeps the whole scenario
+(rules, statlines, NPCs with their `hidden` lists) and only lets one edit the
+title, rules and statlines; the NPCs travel along untouched and are changed in a
+campaign after the copy, as a draft, where their form already lives. That kept
+the slice small and, importantly, left the visibility rules alone: a copy always
+arrives as a leaders-only draft, and the Library is private to its owner.
+
+## October 21, 2026 — groups for one's own warbands
+
+Wish #10 wanted folders for the warbands list, assigned simply. The warbands
+themselves live on the device and sync as saves, and a save has a strict format
+that only rises with a migration – so a "group" field on the warband would have
+touched the format, the sync and the compat test for what is really a view the
+person keeps of their own list. The groups went where private, per-account,
+offline-readable things already live: the Library, as a sixth kind. A group
+holds the ids of its warbands, and assigning is one choice under a warband that
+rewrites at most two groups (the one it leaves, the one it joins). The cost is
+a table rebuild (migration 33, because SQLite cannot widen a CHECK) and that
+the order of two writes is not atomic; the worst case of a failed second write
+is a warband in no group, which the list shows as such.

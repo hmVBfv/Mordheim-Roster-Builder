@@ -2,7 +2,7 @@
    themes. Campaign app only (playwright.config.ts), against the stand-in server (e2e/play.ts). */
 import { expect, test } from '@playwright/test';
 import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
-import { playServer } from './play.ts';
+import { playServer, serverWarband } from './play.ts';
 
 for (const theme of ['chronicle', 'parchment'] as const) {
   test(`an idea is written in the Library and read again, in ${theme}`, async ({ page }) => {
@@ -80,4 +80,77 @@ test('the Lore tab lists the setting and adds an entry to the Library, at 360 px
   await list.getByRole('button', { name: 'Add The Witch Hunters to the Library' }).click();
   await expect(list.getByRole('button', { name: 'The Witch Hunters is in the Library' })).toBeDisabled();
   await expect.poll(() => [...srv.state.library.values()].filter((i) => i.kind === 'faction').length).toBe(1);
+});
+
+test('the NPCs tab at 360 px: an NPC is written and read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.libraryFrom({ name: 'Old Brother Anselm', kind: 'npc', body: { de: 'Der alte Bruder Anselm', status: 'Rings the bells at dusk', faction: 'The Bell-ringers', named: true, statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', profile: null } });
+  await page.goto('library/npcs');
+  await expect(page.getByRole('list', { name: 'NPCs' }).getByText('Old Brother Anselm')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-npcs');
+  await page.getByRole('button', { name: 'New NPC' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A new NPC' });
+  await sheet.getByLabel('Name (English)').fill('The ferryman');
+  await expect(sheet.getByText('Loading the rules…')).toBeHidden();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-npc-form');
+  await sheet.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('list', { name: 'NPCs' }).getByText('The ferryman')).toBeVisible();
+  await expect.poll(() => [...srv.state.library.values()].filter((i) => i.kind === 'npc').length).toBe(2);
+});
+
+test('the Groups tab at 360 px: a group is read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.libraryFrom({ name: 'The ferrymen of the Stir', kind: 'group', body: { note: 'Smugglers on the river.', profiles: [{ id: 'p1', name: 'Ferryman', type: 'Henchman', count: 3, profile: { M: '4', WS: '3' }, sv: '6+', skills: [], equipment: '', equipmentTips: [], rules: '', note: '', from: null }] } });
+  await page.goto('library/groups');
+  await expect(page.getByRole('list', { name: 'Groups' }).getByText('The ferrymen of the Stir')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-groups');
+  await page.getByRole('button', { name: 'New group' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A new group' });
+  await sheet.getByRole('button', { name: 'Write your own' }).click();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-group-form');
+  expect([...srv.state.library.values()].filter((i) => i.kind === 'group')).toHaveLength(1);
+});
+
+test('the Scenarios tab at 360 px: a scenario is read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.libraryFrom({ name: 'The night at the ferry', kind: 'scenario', body: { body: 'The ferry is dark: no shooting beyond 8".', npcStatlines: '', npcs: [] } });
+  await page.goto('library/scenarios');
+  await expect(page.getByRole('list', { name: 'Scenarios' }).getByText('The night at the ferry')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-scenarios');
+  await page.getByRole('button', { name: 'New scenario' }).click();
+  await expect(page.getByRole('dialog', { name: 'A new scenario' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-scenario-form');
+  expect([...srv.state.library.values()].filter((i) => i.kind === 'scenario')).toHaveLength(1);
+});
+
+test('groups of warbands at 360 px: the list under its groups, the choice under each warband', async ({ page }) => {
+  const srv = await playServer(page);
+  const wid = serverWarband(srv, 'The Grey Penitents');
+  serverWarband(srv, 'Clan Skrittle');
+  srv.libraryFrom({ name: 'Reikland bands', kind: 'warband_group', body: { warbands: [] } });
+  await page.goto('warbands');
+  await expect(page.getByRole('button', { name: 'Groups' })).toBeVisible();
+  await page.getByLabel('Group of The Grey Penitents').selectOption({ label: 'Reikland bands' });
+  await expect.poll(() => [...srv.state.library.values()].find((i) => i.kind === 'warband_group')?.body).toEqual({ warbands: [wid] });
+  await expect(page.getByRole('region', { name: 'Reikland bands' }).getByText('The Grey Penitents')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'warbands-groups');
+  await page.getByRole('button', { name: 'Groups' }).click();
+  await expect(page.getByRole('dialog', { name: 'Groups of warbands' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'warbands-groups-sheet');
 });

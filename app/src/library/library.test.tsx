@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'Lore']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Scenarios', 'Lore']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -197,5 +197,118 @@ describe('the Library: lore', () => {
     expect(kept.find((i) => i.name === 'The Witch Hunters')).toMatchObject({ kind: 'faction', body: { de: 'Die Hexenjäger' } });
     expect((kept.find((i) => i.name === 'The Witch Hunters')!.body as { lore: string }).lore).toMatch(/Source: .*https:\/\/mordheimer\.net\//);
     expect(kept.find((i) => i.name === 'Ostermark')).toMatchObject({ kind: 'idea', body: { topic: 'campaign' } });
+  });
+});
+
+describe('the Library: NPCs', () => {
+  it('writes an NPC outside any campaign, reads it in the list, changes it, takes it out', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/npcs');
+    expect(await screen.findByText(/No NPCs yet/)).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'New NPC' }));
+    let sheet = screen.getByRole('dialog', { name: 'A new NPC' });
+    await user.type(within(sheet).getByLabelText('Name (English)'), 'Old Brother Anselm');
+    await user.type(within(sheet).getByLabelText('Name (German)'), 'Der alte Bruder Anselm');
+    await user.type(within(sheet).getByLabelText('Faction'), 'The Bell-ringers');
+    await user.type(within(sheet).getByLabelText('Status everyone may read'), 'Rings the bells at dusk');
+    await user.click(within(sheet).getByRole('checkbox', { name: /Named/ }));
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    const list = await screen.findByRole('list', { name: 'NPCs' });
+    expect(within(list).getByText('Old Brother Anselm')).toBeTruthy();
+    expect(within(list).getByText('The Bell-ringers')).toBeTruthy();
+    expect(within(list).getByText('Rings the bells at dusk')).toBeTruthy();
+    const kept = () => [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept()).toMatchObject([{ kind: 'npc', name: 'Old Brother Anselm', body: { de: 'Der alte Bruder Anselm', faction: 'The Bell-ringers', status: 'Rings the bells at dusk', named: true } }]);
+
+    await user.click(within(list).getByRole('button', { name: 'Edit Old Brother Anselm' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit NPC' });
+    const status = within(sheet).getByLabelText('Status everyone may read');
+    await user.clear(status);
+    await user.type(status, 'Gone to the Rock');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'NPCs' })).getByText('Gone to the Rock')).toBeTruthy());
+    expect(kept()).toMatchObject([{ body: { status: 'Gone to the Rock' } }]);
+
+    await user.click(within(screen.getByRole('list', { name: 'NPCs' })).getByRole('button', { name: 'Edit Old Brother Anselm' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit NPC' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this NPC' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect(screen.queryByRole('list', { name: 'NPCs' })).toBeNull());
+    expect(kept()).toEqual([]);
+  });
+});
+
+describe('the Library: groups', () => {
+  it('writes a group of opponents outside any campaign, reads it, changes it, takes it out', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/groups');
+    expect(await screen.findByText(/No groups yet/)).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'New group' }));
+    let sheet = screen.getByRole('dialog', { name: 'A new group' });
+    await user.type(within(sheet).getByLabelText('Group name'), 'The ferrymen of the Stir');
+    await user.type(within(sheet).getByLabelText('Note'), 'Smugglers on the river.');
+    await user.click(within(sheet).getByRole('button', { name: 'Write your own' }));
+    await user.type(within(sheet).getByLabelText('Name'), 'Ferryman');
+    await user.click(within(sheet).getByRole('button', { name: 'Save the group' }));
+    const list = await screen.findByRole('list', { name: 'Groups' });
+    expect(within(list).getByText('The ferrymen of the Stir')).toBeTruthy();
+    expect(within(list).getByText('Smugglers on the river.')).toBeTruthy();
+    expect(within(list).getByText('Ferryman')).toBeTruthy();
+    const kept = () => [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept()).toMatchObject([{ kind: 'group', name: 'The ferrymen of the Stir', body: { note: 'Smugglers on the river.', profiles: [{ name: 'Ferryman', count: 1 }] } }]);
+
+    await user.click(within(list).getByRole('button', { name: 'Edit The ferrymen of the Stir' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit The ferrymen of the Stir' });
+    const note = within(sheet).getByLabelText('Note');
+    await user.clear(note);
+    await user.type(note, 'Gone upriver.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save the group' }));
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'Groups' })).getByText('Gone upriver.')).toBeTruthy());
+    expect(kept()).toMatchObject([{ body: { note: 'Gone upriver.' } }]);
+
+    await user.click(within(screen.getByRole('list', { name: 'Groups' })).getByRole('button', { name: 'Edit The ferrymen of the Stir' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit The ferrymen of the Stir' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this group' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect(screen.queryByRole('list', { name: 'Groups' })).toBeNull());
+    expect(kept()).toEqual([]);
+  });
+});
+
+describe('the Library: scenarios', () => {
+  const brandt = { id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: ['name'], profile: { M: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
+
+  it('writes a scenario outside any campaign, reads it, changes it – its NPCs travel along untouched – and takes it out', async () => {
+    const srv = server();
+    srv.libraryFrom({ name: 'The night at the ferry', kind: 'scenario', body: { body: 'The ferry is dark.', npcStatlines: '', npcs: [brandt] } });
+    const user = userEvent.setup();
+    at('/library/scenarios');
+    const list = await screen.findByRole('list', { name: 'Scenarios' });
+    expect(within(list).getByText('The night at the ferry')).toBeTruthy();
+    expect(within(list).getByText('1 NPC')).toBeTruthy();
+
+    await user.click(within(list).getByRole('button', { name: 'Edit The night at the ferry' }));
+    let sheet = screen.getByRole('dialog', { name: 'Edit The night at the ferry' });
+    const rules = within(sheet).getByLabelText('Rules');
+    await user.clear(rules);
+    await user.type(rules, 'The ferry is lit.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'Scenarios' })).getByText(/The ferry is lit/)).toBeTruthy());
+    const kept = () => [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept()).toMatchObject([{ kind: 'scenario', body: { body: 'The ferry is lit.', npcs: [{ name: 'Captain Brandt', hidden: ['name'] }] } }]);
+
+    await user.click(screen.getByRole('button', { name: 'New scenario' }));
+    sheet = screen.getByRole('dialog', { name: 'A new scenario' });
+    await user.type(within(sheet).getByLabelText('Title'), 'Ambush at the bridge');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(kept()).toHaveLength(2));
+
+    await user.click(await within(screen.getByRole('list', { name: 'Scenarios' })).findByRole('button', { name: 'Edit Ambush at the bridge' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit Ambush at the bridge' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this scenario' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect(kept()).toHaveLength(1));
   });
 });

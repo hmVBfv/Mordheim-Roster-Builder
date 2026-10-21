@@ -36,7 +36,7 @@ export const NpcProfileBody = z.object({
 }).strict();
 export type NpcProfileInput = z.infer<typeof NpcProfileBody>;
 
-const Profile = z.object({
+export const Profile = z.object({
   id: z.string().min(1).max(64),
   name: z.string().trim().max(120),
   type: z.string().trim().max(60).default(''),

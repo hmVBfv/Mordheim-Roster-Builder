@@ -3,11 +3,13 @@
    device's id, changed only from the state it was seen in (`baseSeq`), and taken out as a tombstone. */
 import { z } from 'zod';
 import type { DB } from './db.ts';
+import { MAX_PROFILES, NpcProfileBody, Profile } from './opponents.ts';
+import { ScenarioBody } from './scenarios.ts';
 
-export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario'] as const;
+export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group'] as const;
 export type Kind = (typeof KINDS)[number];
-/** The kinds the server reads so far; the others have their place in the table and come with their slices. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction'];
+/** The kinds the server reads: all of them since the scenarios came. */
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
@@ -23,7 +25,27 @@ const Faction = z.object({
   status: z.string().trim().max(200).default(''),
   lore: z.string().max(20_000).default(''),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction };
+/** An NPC outside any campaign: the world's NPC without its faction id – the faction is only a name here, matched when the NPC goes into a world. */
+const Npc = z.object({
+  de: z.string().trim().max(120).default(''),
+  status: z.string().trim().max(200).default(''),
+  faction: z.string().trim().max(120).default(''),
+  named: z.boolean().default(false),
+  statlineTts: z.string().max(12_000).default(''),
+  profile: NpcProfileBody.nullable().default(null),
+}).strict();
+/** A group of opponents outside any campaign: a campaign's group (server/src/opponents.ts) without its name (the entry's `name`) and its `baseSeq`. */
+const Group = z.object({
+  note: z.string().max(4000).default(''),
+  profiles: z.array(Profile).max(MAX_PROFILES).default([]),
+}).strict();
+/** A scenario outside any campaign: a campaign's scenario (server/src/scenarios.ts) without its title (the entry's `name`) and its `baseSeq`. Its NPCs keep their hidden parts (ADR 0022); nobody but the owner reads it. */
+const Scenario = ScenarioBody.omit({ title: true, baseSeq: true });
+/** A group of one's own warbands (the list's folders): the ids of the warbands in it, each in at most one group – the client moves one warband from group to group. */
+const WarbandGroup = z.object({
+  warbands: z.array(z.string().min(1).max(64)).max(500).default([]).refine((l) => new Set(l).size === l.length, { message: 'a warband twice' }),
+}).strict();
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group, scenario: Scenario, warband_group: WarbandGroup };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }

@@ -13,10 +13,11 @@ import { isBlank, type NpcDraft } from './npcDraft.ts';
 import styles from './World.module.css';
 
 /** The campaign's own skills, as far as the device knows them, then as the server has them. */
-function useOwnSkills(cid: string) {
+function useOwnSkills(cid: string | null) {
   const [own, setOwn] = useState<OwnSkill[]>([]);
   const [tick, setTick] = useState(0);
   useEffect(() => {
+    if (!cid) return;
     let live = true;
     void cachedOpponents(cid).then((c) => { if (live && c) setOwn(c.skills); });
     if (tick === 0) getOpponents(cid).then((o) => { if (live) setOwn(o.skills); }).catch(() => undefined);
@@ -26,7 +27,7 @@ function useOwnSkills(cid: string) {
 }
 
 export function NpcFields({ cid, warbands, extra, name, draft, onDraft, onCopied }: {
-  cid: string; warbands: WarbandRef[]; extra: OpponentTemplate[]; /** the name as typed, for the labels */ name: string;
+  /** null outside a campaign (the Library): no own skills, no warriors */ cid: string | null; warbands: WarbandRef[]; extra: OpponentTemplate[]; /** the name as typed, for the labels */ name: string;
   draft: NpcDraft; onDraft: (d: NpcDraft) => void; /** after a copy: the name of the model it came from */ onCopied: (name: string) => void;
 }) {
   const ids = useId();

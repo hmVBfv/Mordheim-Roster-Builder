@@ -29,7 +29,7 @@ export interface WarbandRef { id: string; name: string }
 export const statline = (p: Pick<OpponentProfile, 'profile' | 'sv'>) => `${STATS.map((k) => `${k} ${(p.profile[k] ?? '').trim() || '-'}`).join(' ')} Sv ${p.sv.trim() || '-'}`;
 
 /** The warriors of the campaign's warbands as templates, read when first asked for. */
-function useWarriors(cid: string, warbands: WarbandRef[], want: boolean) {
+function useWarriors(cid: string | null, warbands: WarbandRef[], want: boolean) {
   const data = useGameData();
   const [list, setList] = useState<OpponentTemplate[] | null>(null);
   const [missing, setMissing] = useState(0);
@@ -37,7 +37,7 @@ function useWarriors(cid: string, warbands: WarbandRef[], want: boolean) {
     if (!want || list) return;
     let live = true;
     void Promise.all(warbands.map(async (e) => {
-      const w = await readWarband(cid, e.id).catch(() => null);
+      const w = cid ? await readWarband(cid, e.id).catch(() => null) : null;
       const s = w ? readSave(data, w.head.data) : null;
       return s ? core.warriorTemplates(core.ctxOf(data, s), e.id, e.name) : null;
     })).then((r) => { if (live) { setList(r.flatMap((x) => x ?? [])); setMissing(r.filter((x) => !x).length); } });
@@ -48,7 +48,7 @@ function useWarriors(cid: string, warbands: WarbandRef[], want: boolean) {
 
 /** `extra`: more to copy from than the game and the campaign's warriors – the NPCs of the world and of scenarios. */
 export function TemplatePicker({ cid, warbands, extra = [], verb = 'Add', done = 'Done adding', onPick, onClose }: {
-  cid: string; warbands: WarbandRef[]; extra?: OpponentTemplate[]; /** the button of every hit and the one that closes the picker */ verb?: string; done?: string; onPick: (t: OpponentTemplate) => void; onClose: () => void;
+  /** null outside a campaign: no warriors to copy from */ cid: string | null; warbands: WarbandRef[]; extra?: OpponentTemplate[]; /** the button of every hit and the one that closes the picker */ verb?: string; done?: string; onPick: (t: OpponentTemplate) => void; onClose: () => void;
 }) {
   const ids = useId();
   const data = useGameData();
@@ -85,7 +85,7 @@ export function TemplatePicker({ cid, warbands, extra = [], verb = 'Add', done =
   );
 }
 
-function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string; own: OwnSkill[]; onAdd: (s: OpponentSkill) => void; onOwn: () => void; onClose: () => void }) {
+function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string | null; own: OwnSkill[]; onAdd: (s: OpponentSkill) => void; onOwn: () => void; onClose: () => void }) {
   const ids = useId();
   const data = useGameData();
   const online = useOnline();
@@ -101,7 +101,7 @@ function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string; own: Own
     const skill: OpponentSkill = { name: name.trim(), text: text.trim() };
     if (!skill.name) return;
     setError(null);
-    if (keep) {
+    if (keep && cid) {
       try { const s = await putSkill(cid, newId(), skill, 0); skill.ref = s.id; onOwn(); } catch (e) { setError(errorText(e)); return; }
     }
     onAdd(skill);
@@ -126,7 +126,7 @@ function SkillAdder({ cid, own, onAdd, onOwn, onClose }: { cid: string; own: Own
         <legend>Or write one in</legend>
         <div className={ui.field}><label htmlFor={`${ids}-n`}>Skill name</label><input id={`${ids}-n`} className={ui.input} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} /></div>
         <div className={ui.field}><label htmlFor={`${ids}-t`}>Tooltip (optional)</label><textarea id={`${ids}-t`} className={ui.textarea} rows={2} value={text} maxLength={2000} onChange={(e) => setText(e.target.value)} /></div>
-        <label className={styles.check}><input type="checkbox" checked={keep} disabled={!online} onChange={(e) => setKeep(e.target.checked)} /><span>Keep it among our own skills</span></label>
+        {cid && <label className={styles.check}><input type="checkbox" checked={keep} disabled={!online} onChange={(e) => setKeep(e.target.checked)} /><span>Keep it among our own skills</span></label>}
         {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} disabled={!name.trim()} onClick={() => void write()}>Add this skill</button>
@@ -196,7 +196,7 @@ const withItem = (equipment: string, name: string): string => {
     `locked`: parts that cannot be changed – a characteristic by its key (`WS`), the save (`sv`), `skills`, `equipment`, `rules`
     (a scenario's NPC once its hidden values were released: ADR 0022). */
 export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], onChange, onRemove, onOwn }: {
-  cid: string; p: OpponentProfile; own: OwnSkill[]; open?: boolean; bare?: boolean; locked?: readonly string[]; onChange: (p: OpponentProfile) => void; onRemove?: () => void; onOwn: () => void;
+  /** null outside a campaign: no own skills to keep */ cid: string | null; p: OpponentProfile; own: OwnSkill[]; open?: boolean; bare?: boolean; locked?: readonly string[]; onChange: (p: OpponentProfile) => void; onRemove?: () => void; onOwn: () => void;
 }) {
   const ids = useId();
   const [adding, setAdding] = useState(false);
