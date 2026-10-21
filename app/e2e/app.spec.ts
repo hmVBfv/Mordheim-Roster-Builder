@@ -194,6 +194,58 @@ test('the Trading Post on a wide screen: Give is two columns, pick an item, then
   await expect.poll(gold).toBe(start);
 });
 
+/* #24, #26: the rare items on a narrow phone (468 px): every price says what it is, nothing breaks in a bad place, nothing
+   overlaps – in the list and in the sheet a Hero's Search opens. */
+test('the rare items are readable on a narrow phone: a price says gc, the texts do not overlap', async ({ page }) => {
+  test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');
+  await page.setViewportSize({ width: 468, height: 911 });
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  await page.getByRole('link', { name: 'Trade' }).click();
+  await page.getByRole('button', { name: 'Search rare' }).click();
+  // the fonts decide where lines break: measure after they are in
+  const inspect = async (selector: string) => { await page.evaluate(() => document.fonts.ready); await expect(page.locator(selector).first()).toBeVisible(); return page.evaluate((sel) => {
+    const rows = Array.from(document.querySelectorAll<HTMLElement>(sel)).filter((r) => /Rare \d+/.test(r.innerText));
+    const problems: string[] = [];
+    for (const row of rows.slice(0, 40)) {
+      const text = (row.innerText || '').replace(/\s+/g, ' ').trim();
+      if (!/\b(gc|price)\b/i.test(text)) problems.push(`no unit: ${text.slice(0, 60)}`);
+      // a cell that holds nothing but the sign, or a figure and its sign on two lines, is a bad break
+      for (const cell of Array.from(row.querySelectorAll<HTMLElement>('*')).filter((e) => e.children.length === 0 && /%/.test(e.textContent || ''))) {
+        const range = document.createRange();
+        range.selectNodeContents(cell);
+        const lines = new Set(Array.from(range.getClientRects()).map((q) => Math.round(q.top)));
+        if (lines.size > 1 || (cell.textContent || '').trim().startsWith('%')) problems.push(`orphan %: ${text.slice(0, 60)}`);
+      }
+      const leaves = Array.from(row.querySelectorAll<HTMLElement>('*')).filter((e) => e.children.length === 0 && (e.textContent || '').trim());
+      const boxes = leaves.map((e) => ({ t: (e.textContent || '').trim().slice(0, 20), r: e.getBoundingClientRect() }));
+      for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i]!.r, b = boxes[j]!.r;
+        const w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (w > 1 && h > 1) problems.push(`overlap: "${boxes[i]!.t}" and "${boxes[j]!.t}"`);
+      }
+      const box = row.getBoundingClientRect();
+      if (box.right > window.innerWidth + 1) problems.push(`wider than the screen: ${text.slice(0, 40)}`);
+    }
+    return { count: rows.length, problems };
+  }, selector); };
+  const list = await inspect('section[aria-label="Search for rare items"] ul li button');
+  expect(list.count).toBeGreaterThan(5);
+  expect(list.problems).toEqual([]);
+  await page.getByRole('heading', { name: 'What can be found' }).scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollBy(0, 560));
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-rare-468.png` });
+  await page.setViewportSize({ width: 1100, height: 800 });
+  await page.getByRole('heading', { name: 'What can be found' }).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-rare-wide.png` });
+  await page.setViewportSize({ width: 468, height: 911 });
+  await page.getByRole('listitem').filter({ hasText: 'Ulrich the Grey' }).getByRole('button', { name: 'Search' }).click();
+  const sheet = await inspect('dialog[open] [role=group][aria-label="Rare items"] button');
+  expect(sheet.count).toBeGreaterThan(5);
+  expect(sheet.problems).toEqual([]);
+  await noSideScroll(page);
+});
+
 /* Phase 3b: the Trading Post after the first battle, every tab and sheet. */
 for (const theme of THEMES) {
   test(`the Trading Post after the first battle, in ${theme}`, async ({ page }) => {

@@ -14,7 +14,8 @@ import {
   buyRecipients, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
   type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
 } from '../roster/equipment.ts';
-import { effectLine, filterRare, STAT_FILTERS, type StatFilter } from '../roster/rareFilter.ts';
+import { filterRare, STAT_FILTERS, type StatFilter } from '../roster/rareFilter.ts';
+import { RareLine } from './RareLine.tsx';
 import { useEditor } from '../roster/useEditor.ts';
 import styles from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
@@ -163,9 +164,8 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
       <RareMask q={q} stat={stat} max={max} onQ={setQ} onStat={setStat} onMax={setMax} shown={matching.length} total={items.length} />
       <div className={`${styles.pick} ${styles.scroll}`} role="group" aria-label="Rare items">
         {shown.map((x) => (
-          <button key={x.de} type="button" aria-pressed={x.de === de} onClick={() => setDe(x.de)}>
-            {x.name}<small>Rare {x.rarity} · {x.price}{x.usable ? '' : ' · nobody here may use it'}</small>
-            {x.text && <small className={styles.effect}>{effectLine(x.text)}</small>}
+          <button key={x.de} type="button" className={styles.rareRow} aria-pressed={x.de === de} onClick={() => setDe(x.de)}>
+            <RareLine it={x} />
           </button>
         ))}
       </div>
@@ -353,13 +353,9 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
           <ul className={styles.rows}>
             {findable.slice(0, all ? undefined : SHORT).map((it) => (
               <li key={it.de}>
-                <button type="button" className={styles.item} title={it.text || undefined} disabled={!heroes.some((h) => !h.why)}
+                <button type="button" className={`${styles.item} ${styles.rareRow}`} title={it.text || undefined} disabled={!heroes.some((h) => !h.why)}
                   onClick={() => { setSeeking((p) => ({ key: (p?.key ?? 0) + 1, uid: null, de: it.de })); openSearch(); }}>
-                  <span className={styles.what}>
-                    <span>{it.name}</span>
-                    {it.text && <small className={styles.effect}>{effectLine(it.text)}</small>}
-                  </span>
-                  <small>Rare {it.rarity} · {it.price} · {Math.round(core.chance2d6(it.rarity) * 100)} %</small>
+                  <RareLine it={it} />
                 </button>
               </li>
             ))}

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { RareItem } from './equipment.ts';
 import { effectLine, filterRare, STAT_FILTERS } from './rareFilter.ts';
 
-const item = (name: string, text: string, rarity = 8, kind: RareItem['kind'] = 'misc'): RareItem => ({ de: name, name, kind, rarity, price: '25 gc', fixed: 25, text, usable: true });
+const item = (name: string, text: string, rarity = 8, kind: RareItem['kind'] = 'misc'): RareItem => ({ de: name, name, kind, rarity, price: '25 gc', avg: null, fixed: 25, text, usable: true });
 
 const ITEMS = [
   item('Lucky charm', 'Once per battle the wearer may re-roll one failed to-hit roll.', 6),
