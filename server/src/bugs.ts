@@ -26,7 +26,7 @@ export const SEVERITIES = ['S1', 'S2', 'S3', 'S4'] as const;
 /** The statuses that still ask for work. */
 export const OPEN = ['new', 'confirmed', 'in_progress'] as const;
 
-/** A friend group sends a handful; these are ceilings against a runaway client. */
+/** A friend group sends a handful; these are ceilings against a runaway client. The admin uses the reports as a tool and has none. */
 export const MAX_PER_DAY = 20;
 export const MAX_PER_USER = 300;
 export const MAX_TEXT = 4_000;
@@ -155,7 +155,7 @@ export const oneOfMine = (r: Row): MyBug => mine(r);
 export type Report = { ok: true; bug: Row; created: boolean } | { ok: false; status: 400 | 409 | 429; error: string; problem?: string };
 
 /** Takes a report under the device's id; the same id with the same words again is the same report. */
-export function reportBug(db: DB, by: string, input: ReportInput, now: Date): Report {
+export function reportBug(db: DB, by: string, input: ReportInput, now: Date, unlimited = false): Report {
   return db.transaction((): Report => {
     const id = input.id.toLowerCase();
     const cur = bugById(db, id);
@@ -168,7 +168,7 @@ export function reportBug(db: DB, by: string, input: ReportInput, now: Date): Re
     const since = iso(new Date(now.getTime() - 24 * 3_600_000));
     const day = db.prepare('SELECT count(*) AS n FROM bugs WHERE reporter_id = ? AND created_at > ?').get(by, since) as { n: number };
     const all = db.prepare('SELECT count(*) AS n FROM bugs WHERE reporter_id = ?').get(by) as { n: number };
-    if (day.n >= MAX_PER_DAY || all.n >= MAX_PER_USER) return { ok: false, status: 429, error: 'too_many' };
+    if (!unlimited && (day.n >= MAX_PER_DAY || all.n >= MAX_PER_USER)) return { ok: false, status: 429, error: 'too_many' };
     // the next free number: one process writes, and this runs inside the transaction
     db.prepare(`INSERT INTO bugs (id, number, reporter_id, kind, title, text, source_ref, app_version, device, view, js_errors, context, warband_id, rev, consent_attach, attachment, created_at, updated_at)
       VALUES (?, (SELECT COALESCE(MAX(number), 0) + 1 FROM bugs), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(

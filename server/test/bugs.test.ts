@@ -222,6 +222,11 @@ describe('problem reports', () => {
     expect((await anna('POST', '/bugs', report())).statusCode).toBe(201);
   });
 
+  it('the admin is not held back by the daily limit', async () => {
+    const { rob, report } = await table();
+    for (let i = 0; i < MAX_PER_DAY + 1; i++) expect((await rob('POST', '/bugs', report())).statusCode).toBe(201);
+  });
+
   it('the log says that a report came in and was sorted, never what it says', async () => {
     const { s, send, anna, rob } = await table();
     const { body } = await send(anna, { title: 'ZEBRA title', text: 'ZEBRA words', attach: { warbandId: randomUUID(), rev: 1, save: { name: 'ATTACH-ZEBRA' } } });
