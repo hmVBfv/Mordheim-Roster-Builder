@@ -3672,6 +3672,21 @@ the highest rarity. That is approximate by nature – an item that says "Strengt
 only to say it is unaffected still matches – which is why the list now shows
 the first sentence of each item's rules, so the match can be judged at a
 glance. The same mask sits in the sheet a Hero's own Search button opens.
+## October 21, 2026 — the Warhorse is rare (#21)
+
+The Knights Vanguard's list offers a Warhorse at 40 gc and the app had no price
+chart entry for it, so it counted as "not in the price chart" and could be
+bought at any time. The Animal Bestiary on mordheimer.net gives it Rare 11,
+80 gc, humans only; Rob agreed to treat it like the silk cloak. Two things the
+first draft got wrong: a miscellaneous item has no category barrier, so every
+Hero of the Merchant Caravans would have been offered the found Warhorse – the
+list's footnote says Knights Vanguard only – and the legacy catalogue check only
+knows whole warbands in `notWb`, so teaching it units would have broken the
+parity suite. The unit restriction therefore lives in the trading rules
+(`keptFromUnit`), which have no legacy counterpart. The second: a recruit may
+not buy a rare list item, which would have shut a new Knight out of his own
+Warhorse; the founding-priced row is exempt, as Rob asked ("a new Hero with
+this Warhorse just pays").
 
 ## October 21, 2026 — the Trading Post without a box around every item (#23)
 

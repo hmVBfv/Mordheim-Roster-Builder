@@ -106,7 +106,7 @@ export interface InjuryDef {
 export interface CatalogOnly {
   /** Warbands that may: 'key', 'key:variant', 'key/unit,unit'. */
   wb?: string[];
-  /** Warbands that may not. */
+  /** Warbands that may not: 'key', or 'key/unit,unit' for only those units of it (the Merchant Caravans' Warhorse is for the Knights Vanguard alone). */
   notWb?: string[];
   heroes?: boolean;
   /** Only warbands of men (WBHIRE[…].human). */
