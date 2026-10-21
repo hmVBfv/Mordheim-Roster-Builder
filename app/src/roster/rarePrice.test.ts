@@ -8,6 +8,10 @@ describe('priceText', () => {
     expect(priceText('20+1D6')).toBe('20+1D6 gc');
     expect(priceText('100+D6×10')).toBe('100+D6×10 gc');
   });
+  it('leaves another unit alone and says so when there is no price', () => {
+    expect(priceText('25 warp tokens')).toBe('25 warp tokens');
+    expect(priceText('')).toBe('—');
+  });
   it('writes a pair and a multiple of the weapon\'s price in words', () => {
     expect(priceText('30 (Paar 60)')).toBe('30 gc (pair 60 gc)');
     expect(priceText('25+1D6 (Paar 46+2D6)')).toBe('25+1D6 gc (pair 46+2D6 gc)');

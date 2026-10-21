@@ -94,6 +94,8 @@ Begriff einführt, trägt ihn hier ein.
 | Ausrüstung aus der Liste (bis zur ersten Schlacht) | Equipment & rare items | `EquipmentSheet`, `setEqQty()`, `addRare()` |
 | nur für Helden (Listenzeile) | Heroes only | `{heroes: true}` |
 | einer Warband vorbehalten (Katalog) | – | `CATALOG[…].only`, `catalogAllowed()` |
+| Herkunft eines Gegenstands (Kampagne, Grad, Quelle) | – | `CATALOG[…].settings`, `.grade`, `.source` |
+| unter anderem Namen dieselbe Ware (Liste ↔ Preistabelle) | – | `CATALOG[…].alias`, `tradeKind()` |
 | nur für eine Variante (Stadt, Stamm) | – | `{sub: ['midd']}` |
 | gesperrter Skill einer Warband | – | `WARBANDS[…].noSkills` |
 | Post-Battle-Hilfe | Post-battle | `postBattleHelp()`, `data/postbattle.json` |

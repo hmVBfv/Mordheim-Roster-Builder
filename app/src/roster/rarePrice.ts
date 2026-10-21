@@ -5,6 +5,8 @@
 export function priceText(cost: number | string): string {
   if (typeof cost === 'number') return `${cost} gc`;
   const c = cost.trim();
+  if (!c) return '—';
+  if (/[a-z]{3,}/i.test(c) && !/Preis|Paar/.test(c)) return c; // priced in something else (warp tokens)
   const mult = /^(\d+)\s*[×x]\s*Preis$/i.exec(c);
   if (mult) return `${mult[1]} × price`;
   const pair = /^(.*?)\s*\(Paar\s+(.+)\)$/.exec(c);
