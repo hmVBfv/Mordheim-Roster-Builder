@@ -2691,6 +2691,20 @@
    "wb": ""
   },
   {
+   "de": "Warhorse",
+   "en": "Warhorse",
+   "cat": "misc",
+   "cost": 80,
+   "rare": "Rare 11",
+   "wb": "Humans only; Merchant Caravans: Knights Vanguard only",
+   "only": {
+    "human": true,
+    "notWb": [
+     "caravans/merchant,apprentice,magician"
+    ]
+   }
+  },
+  {
    "de": "Rikscha",
    "en": "Rickshaw",
    "cat": "misc",
@@ -9207,7 +9221,10 @@
     ],
     [
      "Warhorse",
-     40
+     40,
+     {
+      "start": true
+     }
     ]
    ]
   },

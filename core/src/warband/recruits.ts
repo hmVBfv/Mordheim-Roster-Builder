@@ -18,7 +18,7 @@
    Extra Arm. One whose effect cannot add up is taken once (ONCE). */
 import type { Model, WarbandState } from '../state/types.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
-import { mutKindFor, warbandHasFought } from '../rules/equipment.ts';
+import { mutKindFor, startOnlyRow, warbandHasFought } from '../rules/equipment.ts';
 import { unitDef } from '../rules/lookup.ts';
 import { tradeKind } from '../trade/market.ts';
 import { addUnit, setEqQty } from './roster.ts';
@@ -67,7 +67,8 @@ export function listProblem(ctx: Ctx, uid: number, key: string, qty: number): st
   if (!m) return 'no such warrior';
   if (warriorHasFought(ctx, m)) return 'after his first battle he trades at the Trading Post';
   const have = Number(m.eq?.[key]) || 0;
-  if (qty > have && isNewRecruit(ctx, m) && tradeKind(ctx, key).kind === 'rare') return 'rare: only through a search at the Trading Post';
+  // a row of his list that is priced for the founding (the Knights Vanguard's Warhorse) is his to buy at that price until his first battle
+  if (qty > have && isNewRecruit(ctx, m) && tradeKind(ctx, key).kind === 'rare' && !startOnlyRow(ctx, unitDef(ctx, m.uid_def), key)) return 'rare: only through a search at the Trading Post';
   return '';
 }
 

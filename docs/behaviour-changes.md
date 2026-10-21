@@ -477,6 +477,13 @@ Neue Logik in `core/src/trade/` (`ledger.ts`, `market.ts`), Tests in
    (`tradeKind`). Listen und Preistabelle benennen manches verschieden; der
    Builder ordnet zu über den deutschen Schlüssel, den englischen Namen, den
    Namen in Klammern („Jagdgewehr“ = *Hunting rifle (Hochland long rifle)*),
+   das **Warhorse** (Rare 11, 80 gc, nur Menschen – Rob, 21.10.2026, Bericht #21;
+   mordheimer.net, Animal Bestiary): die Zeile der Knights Vanguard der Merchant
+   Caravans (40 gc) gilt nur für die Gründung und für einen neuen Krieger bis zu
+   seiner ersten Schlacht; danach nur über die Suche, und dort nur für die Knights
+   Vanguard dieser Warband (Fußnote der Liste; `notWb` nennt dafür die anderen
+   Helden, `keptFromUnit` in `trade/market.ts` – neue Handelslogik, die
+   Legacy-Prüfung kennt nur ganze Warbands),
    den Eintrag `alias` der Preistabelle (der *Cathayan silk cloak* der Merchant
    Caravans und der Battle Monks ist die *Cathayan silk clothes*, Rare 9; Rob,
    21.10.2026, Bericht #20: auf den Listen zum Gründungspreis von 40 gc, später
@@ -492,7 +499,7 @@ Neue Logik in `core/src/trade/` (`ledger.ts`, `market.ts`), Tests in
    Double-barrelled Hochland long rifle; Gnoblar Fighter; Gral-Reliquie;
    Hedonist Whip und Slaaneshi Man-Catcher; Lizardman Sword, Lizardmen Skin
    Cloak, Schädelmaske, Trophy Slann Headdress, Warhound (Lustrian Reavers);
-   Pferd, Warhorse, Warhorse (upgrade); Pigeon bombs; Poisoned Daggers;
+   Pferd, Warhorse (upgrade); Pigeon bombs; Poisoned Daggers;
    Staff, Staff/Club; Throwing axes, spears, stars, weapons. Vorschlag: in
    den Regeldaten je Gegenstand „gewöhnlich“ oder „selten N“ nachtragen,
    mit Quelle.
