@@ -3556,3 +3556,23 @@ never open, so while anything alive hangs on the battle it stays (409
 `in_use`), as for a battle of the history, and only what was taken out itself
 lets go. The warbands' versions are not touched: before a battle is closed
 there is no mark for it.
+
+## October 21, 2026 — the Library: where ideas live
+
+Rob wanted a place for ideas, and in the same list of wishes: factions, NPCs,
+groups and scenarios that do not belong to one campaign, to be written once and
+loaded into several. All of them are things a person owns, not a campaign, so
+they got one home: a private store on the account, a "Library" in the
+navigation with a tab for each kind, ideas first. The decisions he took – on
+the server rather than on the device, a copy rather than a link when something
+goes into a campaign, readable by the owner alone – are in ADR 0023.
+
+The wrong turn to avoid was the device. A note kept in the browser is what you
+lose with the phone, and an idea is exactly what you do not want to lose.
+The other one was reusing the campaign tables with a null campaign: it would
+have put a person's private drafts behind the rules for campaign members, and
+every query would have had to remember that the campaign can be missing. A table
+of its own has one rule – the owner – and one place in the leak matrix. Its
+`seq` is the owner's own counter rather than the audit log's, because the audit
+log is read by the admin and a private idea does not belong in it.
+

@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { ACTIONS, type Action } from '../src/policy.ts';
 import { createBattle, putEntry, putProposal } from '../src/battles.ts';
 import { confirmEnrolment, createCampaign, enrol, setMember } from '../src/campaigns.ts';
+import { putItem as putLibraryItem } from '../src/library.ts';
 import { putNote } from '../src/notes.ts';
 import { createShare } from '../src/shares.ts';
 import { createWarband, warbandById } from '../src/warbands.ts';
@@ -122,6 +123,8 @@ describe('leak-test matrix', () => {
     note('SEALED-SECRET: the ferryman takes the coin.', 'sealed', victim.id, true);
     note('LEADER-SECRET: the Countess pays him.', 'leader', victim.id, true);
     const ownNoteId = note('Rain over the Stir.', 'public', player.id, false);
+    const ownLibraryItemId = randomUUID();
+    putLibraryItem(s.db, player.id, { id: ownLibraryItemId, kind: 'idea', name: 'The ferrymen', body: { text: 'Smugglers on the Stir.', topic: 'warband' } }, t0);
     // pictures in the victim's campaign: a leaders' one the player must never see, and the player's own
     const picture = (caption: string, visibility: 'public' | 'leader', by: string, leader: boolean, stored: boolean) => {
       const aid = randomUUID();
@@ -247,7 +250,7 @@ describe('leak-test matrix', () => {
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
-      battleId: battle.id, ledBattleId: ledBattle.id, spareBattleId: spareBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
+      battleId: battle.id, ledBattleId: ledBattle.id, spareBattleId: spareBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownLibraryItemId, ownPictureId, pendingPictureId,
       doomedCampaignId: doomed.id, doomedCampaignName: doomed.name,
       historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, spareOpponentGroupId: spareOpp.gid, spareOpponentSkillId: spareOpp.sid, ledDraftId, spareDraftId, bugId,
     };

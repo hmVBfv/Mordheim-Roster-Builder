@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useMatch } from 'react-router';
 import { ACCOUNT_TABS } from '../account/accountTabs.ts';
 import { TABS } from '../account/adminTabs.ts';
+import { LIBRARY_TABS } from '../library/tabs.ts';
 import { useSession } from '../account/session.ts';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { cachedCampaign, type CampaignSummary } from '../campaign/api.ts';
@@ -44,7 +45,7 @@ function useCampaignsInPlay(enabled: boolean): CampaignSummary[] {
   return (all ?? []).filter((c) => !c.archived);
 }
 
-export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[]; admin: NavChild[]; account: NavChild[] } {
+export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[]; admin: NavChild[]; library: NavChild[]; account: NavChild[] } {
   const session = useSession();
   const totp = session.status === 'in' && session.user.totp;
   const warbands = useWarbands(WARBANDS_IN_NAV) ?? [];
@@ -53,7 +54,7 @@ export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campai
   // the campaign open on the screen, as the device keeps it: its name and one's role in it, even when
   // it is archived or the list has not come yet (its sections must be reachable from the side)
   const open = useLiveQuery(() => (enabled && here ? cachedCampaign(here) : Promise.resolve(null)), [enabled, here]);
-  if (!enabled) return { warbands: [], campaign: [], admin: [], account: [] };
+  if (!enabled) return { warbands: [], campaign: [], admin: [], library: [], account: [] };
   const entries = campaigns.map((c) => ({ id: c.id, name: c.name, role: c.role }));
   if (here && open && !entries.some((c) => c.id === here)) entries.push({ id: here, name: open.campaign.name, role: open.role });
   return {
@@ -62,6 +63,7 @@ export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campai
       { to: '/warbands/new', label: '+ New warband' },
     ],
     admin: TABS.map((t) => ({ to: `/admin/${t.key}`, label: t.label })),
+    library: FLAVOUR === 'campaign' && session.status === 'in' ? LIBRARY_TABS.map((t) => ({ to: `/library/${t.key}`, label: t.label })) : [],
     // the player's own reports are for the signed-in; the settings alone are no group
     account: FLAVOUR === 'campaign' && session.status === 'in' ? ACCOUNT_TABS.map((t) => ({ to: t.to, label: t.label, end: t.end })) : [],
     campaign: entries.map((c) => ({

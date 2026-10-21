@@ -25,7 +25,7 @@ export default defineConfig({
     { name: 'campaign', testIgnore: /legacy|mockups|quickbuild\.spec/, use: { baseURL: 'http://localhost:4173/' } },
     // accounts are the campaign app's (account.spec.ts); app.spec.ts checks the Quick Build has none;
     // story.spec.ts takes its warband from the campaign server (the page itself is the same code in both); bugs.spec.ts reports to it
-    { name: 'quickbuild', testIgnore: /legacy|mockups|account|sync|campaigns|story|bugs/, use: { baseURL: 'http://localhost:4174/' } },
+    { name: 'quickbuild', testIgnore: /legacy|mockups|account|sync|campaigns|story|bugs|library/, use: { baseURL: 'http://localhost:4174/' } },
     // the legacy Roster Builder (repo root), still live until phase 3
     { name: 'legacy', testMatch: /legacy\.spec\.ts/, use: { baseURL: 'http://127.0.0.1:4175/' } },
     // the mockups of the new app (docs/mockups/), from the same server. They are frozen design sketches and take half of the run, so
