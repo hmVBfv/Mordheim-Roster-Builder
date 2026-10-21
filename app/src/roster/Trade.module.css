@@ -300,3 +300,29 @@
   margin: 0 0 var(--space-1);
   font-size: 1rem;
 }
+
+/* the search mask of the rare items */
+.filters {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.filterRow {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: 1fr 1fr;
+}
+
+.what {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.item .effect,
+.pick .effect {
+  display: block;
+  text-align: left;
+  color: var(--text-muted);
+}

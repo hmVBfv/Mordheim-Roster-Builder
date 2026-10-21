@@ -239,6 +239,16 @@ for (const theme of THEMES) {
     // Ulrich searches; a 12 finds anything
     await page.getByRole('button', { name: 'Search rare' }).click();
     await noSideScroll(page); await tapTargets(page);
+    // the search mask: by name or effect, by the characteristic an item touches (wish #22)
+    const find = page.getByRole('searchbox', { name: 'Find by name or effect' });
+    await expect(page.getByText(/^\d+ of \d+ shown$/)).toBeVisible();
+    await find.fill('zzzz-nothing');
+    await expect(page.getByText(/^0 of \d+ shown$/)).toBeVisible();
+    await find.fill('');
+    await page.getByLabel('Characteristic it touches').selectOption('Ld');
+    await expect(page.getByText(/^\d+ of \d+ shown$/)).toBeVisible();
+    await page.getByLabel('Characteristic it touches').selectOption('');
+    await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-trade-search`);
     await page.getByRole('listitem').filter({ hasText: 'Ulrich the Grey' }).getByRole('button', { name: 'Search' }).click();
     await sheet.getByRole('group', { name: 'Rare items' }).getByRole('button').first().click();

@@ -14,6 +14,7 @@ import {
   buyRecipients, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
   type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
 } from '../roster/equipment.ts';
+import { effectLine, filterRare, STAT_FILTERS, type StatFilter } from '../roster/rareFilter.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import styles from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
@@ -23,6 +24,8 @@ import { useWarbandRecord } from '../sync/local.ts';
 import { GiveBoard } from './GiveBoard.tsx';
 
 const TABS = [['buy', 'Buy'], ['search', 'Search rare'], ['sell', 'Sell'], ['give', 'Give']] as const;
+/** The highest rarity a search may be narrowed to. */
+const RARITY_STEPS = [6, 8, 10, 12] as const;
 /** Rare items listed before "Show all". */
 const SHORT = 12;
 type Tab = (typeof TABS)[number][0];
@@ -89,6 +92,32 @@ function BuyForm({ ctx, item, gold, close, onBuy, titleId }: { ctx: core.Ctx; it
   );
 }
 
+/** The search mask of the rare items: by name or effect, by the characteristic an item touches, by rarity. */
+function RareMask({ q, stat, max, onQ, onStat, onMax, shown, total }: {
+  q: string; stat: StatFilter | ''; max: number | null; onQ: (v: string) => void; onStat: (v: StatFilter | '') => void; onMax: (v: number | null) => void; shown: number; total: number;
+}) {
+  return (
+    <div className={styles.filters}>
+      <input className={ui.input} type="search" value={q} placeholder="Find by name or effect" aria-label="Find by name or effect" autoComplete="off" onChange={(e) => onQ(e.target.value)} />
+      <div className={styles.filterRow}>
+        <label className={ui.field}><span className={ui.muted}>Touches</span>
+          <select className={ui.select} value={stat} aria-label="Characteristic it touches" onChange={(e) => onStat(e.target.value as StatFilter | '')}>
+            <option value="">any characteristic</option>
+            {STAT_FILTERS.map(([k, l]) => <option key={k} value={k}>{k} · {l}</option>)}
+          </select>
+        </label>
+        <label className={ui.field}><span className={ui.muted}>Rarity</span>
+          <select className={ui.select} value={max ?? ''} aria-label="Highest rarity" onChange={(e) => onMax(e.target.value ? Number(e.target.value) : null)}>
+            <option value="">any rarity</option>
+            {RARITY_STEPS.map((r) => <option key={r} value={r}>Rare {r} or less</option>)}
+          </select>
+        </label>
+      </div>
+      <p className={ui.muted} aria-live="polite">{shown} of {total} shown</p>
+    </div>
+  );
+}
+
 /* ---- search ---- */
 
 function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId }: {
@@ -99,6 +128,8 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
   const [uid, setUid] = useState<number | null>(start.uid ?? who[0]?.uid ?? null);
   const [de, setDe] = useState<string | null>(start.de);
   const [q, setQ] = useState('');
+  const [stat, setStat] = useState<StatFilter | ''>('');
+  const [max, setMax] = useState<number | null>(null);
   const [extra, setExtra] = useState('');
   const [roll, setRoll] = useState('');
   const [price, setPrice] = useState('');
@@ -117,7 +148,8 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
       return { to: m.uid, name: m.name || core.unitDef(ctx, m.uid_def)?.name || m.uid_def, ok: v.ok, note: v.ok ? 'may use it' : v.reason, cost: 0 };
     }),
   ] : [];
-  const shown = items.filter((x) => x.de === de || !q.trim() || x.name.toLowerCase().includes(q.trim().toLowerCase())).slice(0, 60);
+  const matching = filterRare(items, { q, stat, maxRarity: max });
+  const shown = [...items.filter((x) => x.de === de && !matching.includes(x)), ...matching].slice(0, 60);
   return (
     <div className={ui.page}>
       <h2 id={titleId}>{uid != null ? `${who.find((w) => w.uid === uid)?.name ?? 'A Hero'} searches` : 'Search for a rare item'}</h2>
@@ -128,13 +160,12 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
           </select>
         </label>
       )}
-      <label className={ui.field}><span>Item</span>
-        <input className={ui.input} type="search" value={q} placeholder="Find an item" autoComplete="off" onChange={(e) => setQ(e.target.value)} />
-      </label>
+      <RareMask q={q} stat={stat} max={max} onQ={setQ} onStat={setStat} onMax={setMax} shown={matching.length} total={items.length} />
       <div className={`${styles.pick} ${styles.scroll}`} role="group" aria-label="Rare items">
         {shown.map((x) => (
           <button key={x.de} type="button" aria-pressed={x.de === de} onClick={() => setDe(x.de)}>
             {x.name}<small>Rare {x.rarity} · {x.price}{x.usable ? '' : ' · nobody here may use it'}</small>
+            {x.text && <small className={styles.effect}>{effectLine(x.text)}</small>}
           </button>
         ))}
       </div>
@@ -247,7 +278,11 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   const heroes = searchers(ctx);
   // from tablet width on, Give is two columns to pick from; a phone keeps the list and the sheet
   const wide = useSideNav();
-  const findable = rare.filter((it) => (kind === 'all' || it.kind === kind) && (!usable || it.usable));
+  const [q, setQ] = useState('');
+  const [stat, setStat] = useState<StatFilter | ''>('');
+  const [max, setMax] = useState<number | null>(null);
+  const pool = rare.filter((it) => (kind === 'all' || it.kind === kind) && (!usable || it.usable));
+  const findable = filterRare(pool, { q, stat, maxRarity: max });
 
   const { ref: buyRef, open: openBuy, close: closeBuy } = useSheet('buy');
   const [buying, setBuying] = useState<{ key: number; item: ShopItem } | null>(null);
@@ -314,12 +349,17 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
             <label className={styles.check}><input type="checkbox" checked={usable} onChange={(e) => setUsable(e.target.checked)} /> Only what someone here may use</label>
           </div>
           <Seg label="Kind of rare item" value={kind} options={KINDS} onChange={setKind} />
+          <RareMask q={q} stat={stat} max={max} onQ={setQ} onStat={setStat} onMax={setMax} shown={findable.length} total={pool.length} />
           <ul className={ui.list}>
             {findable.slice(0, all ? undefined : SHORT).map((it) => (
               <li key={it.de}>
                 <button type="button" className={styles.item} title={it.text || undefined} disabled={!heroes.some((h) => !h.why)}
                   onClick={() => { setSeeking((p) => ({ key: (p?.key ?? 0) + 1, uid: null, de: it.de })); openSearch(); }}>
-                  <span>{it.name}</span><small>Rare {it.rarity} · {it.price} · {Math.round(core.chance2d6(it.rarity) * 100)} %</small>
+                  <span className={styles.what}>
+                    <span>{it.name}</span>
+                    {it.text && <small className={styles.effect}>{effectLine(it.text)}</small>}
+                  </span>
+                  <small>Rare {it.rarity} · {it.price} · {Math.round(core.chance2d6(it.rarity) * 100)} %</small>
                 </button>
               </li>
             ))}
