@@ -4,6 +4,7 @@ export const LIBRARY_TABS = [
   { key: 'ideas', label: 'Ideas' },
   { key: 'factions', label: 'Factions' },
   { key: 'npcs', label: 'NPCs' },
+  { key: 'groups', label: 'Groups' },
   { key: 'lore', label: 'Lore' },
 ] as const;
 export type LibraryTab = (typeof LIBRARY_TABS)[number]['key'];

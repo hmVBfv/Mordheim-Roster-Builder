@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Lore']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Lore']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -235,6 +235,44 @@ describe('the Library: NPCs', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Remove this NPC' }));
     await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
     await waitFor(() => expect(screen.queryByRole('list', { name: 'NPCs' })).toBeNull());
+    expect(kept()).toEqual([]);
+  });
+});
+
+describe('the Library: groups', () => {
+  it('writes a group of opponents outside any campaign, reads it, changes it, takes it out', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/groups');
+    expect(await screen.findByText(/No groups yet/)).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'New group' }));
+    let sheet = screen.getByRole('dialog', { name: 'A new group' });
+    await user.type(within(sheet).getByLabelText('Group name'), 'The ferrymen of the Stir');
+    await user.type(within(sheet).getByLabelText('Note'), 'Smugglers on the river.');
+    await user.click(within(sheet).getByRole('button', { name: 'Write your own' }));
+    await user.type(within(sheet).getByLabelText('Name'), 'Ferryman');
+    await user.click(within(sheet).getByRole('button', { name: 'Save the group' }));
+    const list = await screen.findByRole('list', { name: 'Groups' });
+    expect(within(list).getByText('The ferrymen of the Stir')).toBeTruthy();
+    expect(within(list).getByText('Smugglers on the river.')).toBeTruthy();
+    expect(within(list).getByText('Ferryman')).toBeTruthy();
+    const kept = () => [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept()).toMatchObject([{ kind: 'group', name: 'The ferrymen of the Stir', body: { note: 'Smugglers on the river.', profiles: [{ name: 'Ferryman', count: 1 }] } }]);
+
+    await user.click(within(list).getByRole('button', { name: 'Edit The ferrymen of the Stir' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit The ferrymen of the Stir' });
+    const note = within(sheet).getByLabelText('Note');
+    await user.clear(note);
+    await user.type(note, 'Gone upriver.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save the group' }));
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'Groups' })).getByText('Gone upriver.')).toBeTruthy());
+    expect(kept()).toMatchObject([{ body: { note: 'Gone upriver.' } }]);
+
+    await user.click(within(screen.getByRole('list', { name: 'Groups' })).getByRole('button', { name: 'Edit The ferrymen of the Stir' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit The ferrymen of the Stir' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this group' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect(screen.queryByRole('list', { name: 'Groups' })).toBeNull());
     expect(kept()).toEqual([]);
   });
 });

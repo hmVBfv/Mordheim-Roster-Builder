@@ -1,7 +1,7 @@
 /* The Library (ADR 0023): what a person writes without a campaign, kept with the account – ideas first, later
    factions, NPCs, groups and scenarios. Private: only its owner reads it. Reading works from what the device
    kept; writing needs the connection. */
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Link, Navigate, NavLink, useParams } from 'react-router';
 import { errorText } from '../account/api.ts';
 import accountStyles from '../account/Account.module.css';
@@ -16,8 +16,11 @@ import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleI
 import styles from './Library.module.css';
 import { LoreTab } from './LoreTab.tsx';
 import { NpcsTab } from './NpcsTab.tsx';
+
 import { LIBRARY_TABS } from './tabs.ts';
 import { factionsOf, useLibrary } from './useLibrary.ts';
+
+const GroupsTab = lazy(() => import('./GroupsTab.tsx').then((m) => ({ default: m.GroupsTab })));
 
 function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
   idea: Idea | null; online: boolean; close: (then?: () => void) => void; onSaved: (i: Idea) => void; onRemoved: (i: Idea) => void;
@@ -293,6 +296,7 @@ export function Library() {
       {tab === 'ideas' && <IdeasTab notify={notify} />}
       {tab === 'factions' && <FactionsTab notify={notify} />}
       {tab === 'npcs' && <NpcsTab notify={notify} />}
+      {tab === 'groups' && <Suspense fallback={<p className={ui.muted}>Loading…</p>}><GroupsTab notify={notify} /></Suspense>}
       {tab === 'lore' && <LoreTab notify={notify} />}
       {notice}
     </section>

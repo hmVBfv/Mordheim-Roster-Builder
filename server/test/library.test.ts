@@ -19,6 +19,29 @@ async function two() {
 }
 const idea = (text = 'A war band of ferrymen who know the Stir.', topic = 'warband') => ({ kind: 'idea', name: 'The ferrymen', body: { text, topic } });
 
+describe('the Library: groups of opponents', () => {
+  const profile = { id: 'p1', name: 'Ferryman', type: 'Henchman', count: 3, profile: { M: '4', WS: '3' }, sv: '6+', skills: [{ name: 'Dodge', text: '' }], equipment: 'Boat hook', equipmentTips: [], rules: '', note: '', from: null };
+  const group = (over: Record<string, unknown> = {}) => ({ kind: 'group', name: 'The ferrymen of the Stir', body: { note: 'Smugglers on the river.', profiles: [profile], ...over } });
+
+  it('a group is kept with its note and its profiles, and is nobody else’s', async () => {
+    const { kai, ben } = await two();
+    const made = await kai('PUT', `/library/${randomUUID()}`, group());
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: unknown }).item).toMatchObject({ kind: 'group', name: 'The ferrymen of the Stir', body: { note: 'Smugglers on the river.', profiles: [{ name: 'Ferryman', count: 3, skills: [{ name: 'Dodge' }] }] } });
+    expect((await kai('PUT', `/library/${randomUUID()}`, { kind: 'group', name: 'Empty', body: {} })).statusCode).toBe(201);
+    expect(((await ben('GET', '/library')).json() as { items: unknown[] }).items).toEqual([]);
+  });
+
+  it('only a group that fits: the limits of a campaign’s group held', async () => {
+    const { kai } = await two();
+    const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
+    expect((await put(group({ note: 'x'.repeat(4001) }))).statusCode).toBe(400);
+    expect((await put(group({ profiles: Array.from({ length: 41 }, (_, i) => ({ ...profile, id: `p${i}` })) }))).statusCode).toBe(400);
+    expect((await put(group({ profiles: [{ ...profile, count: 51 }] }))).statusCode).toBe(400);
+    expect((await put(group({ extra: 1 }))).statusCode).toBe(400);
+  });
+});
+
 describe('the Library: NPCs', () => {
   const npc = (over: Record<string, unknown> = {}) => ({
     kind: 'npc', name: 'Old Brother Anselm',
@@ -143,7 +166,7 @@ describe('the Library: ideas', () => {
   it('only what it can read: a kind that is not here yet, a body that does not fit, too much', async () => {
     const { kai } = await two();
     const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
-    expect((await put({ kind: 'group', name: 'Not yet', body: {} })).statusCode).toBe(400);
+    expect((await put({ kind: 'scenario', name: 'Not yet', body: {} })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: '', body: { text: 'x', topic: 'other' } })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: 'x', body: { text: 'x', topic: 'secret' } })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: 'x', body: { text: 'x'.repeat(20_001), topic: 'other' } })).statusCode).toBe(400);
