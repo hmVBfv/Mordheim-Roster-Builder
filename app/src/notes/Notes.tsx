@@ -5,15 +5,14 @@
    by battle, newest first; written offline, a note waits on the device.
    Pictures (4a3, part 2) stand among the notes: a screenshot from TTS or a
    photo of the table, for everyone or leaders only. */
-import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate } from 'react-router';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import type { Me } from '../account/api.ts';
 import { errorText } from '../account/api.ts';
-import { useSession } from '../account/session.ts';
 import { battleTitle } from '../battle/api.ts';
 import { enqueue } from '../battle/outbox.ts';
 import { usePicks, useWarbandLoader } from '../battle/picks.ts';
-import { cachedCampaigns, listCampaigns, type CampaignSummary, type CampaignView } from '../campaign/api.ts';
+import type { CampaignView } from '../campaign/api.ts';
 import { db } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { useNotice } from '../ui/Notice.tsx';
@@ -124,42 +123,5 @@ export function NotesTab({ id, view, user, lead }: { id: string; view: CampaignV
         onSave={(meta, bytes) => { void pictures.send(newId(), meta, bytes).catch((e: unknown) => notify(errorText(e))); }} />
       {notice}
     </div>
-  );
-}
-
-/** The Notes button below: the campaign's notes – with several campaigns, which one first. */
-export function NotesHome() {
-  const session = useSession();
-  const user = session.status === 'in' ? session.user : session.status === 'unreachable' ? session.user : null;
-  const [list, setList] = useState<CampaignSummary[] | null>(null);
-  const userId = user?.id;
-  useEffect(() => {
-    if (!userId) return;
-    let live = true;
-    void cachedCampaigns(userId).then((c) => { if (live && c) setList((l) => l ?? c); });
-    listCampaigns(userId).then((c) => { if (live) setList(c); }).catch(() => undefined);
-    return () => { live = false; };
-  }, [userId]);
-  if (session.status === 'loading') return null;
-  if (!user) {
-    return (
-      <section className={ui.page}>
-        <h1>Notes</h1>
-        <p className={ui.muted}>Notes belong to a campaign on the campaign server: sign in to write yours.</p>
-        <p><Link to="/sign-in" className={ui.button}>Sign in</Link></p>
-      </section>
-    );
-  }
-  if (list && list.length === 1) return <Navigate to={`/campaign/${list[0]!.id}/notes`} replace />;
-  return (
-    <section className={ui.page}>
-      <h1>Notes</h1>
-      {list && list.length === 0 && <p className={ui.muted}>Notes belong to a campaign. Once you are part of one, they are here.</p>}
-      {list && list.length > 1 && (
-        <ul className={styles.list} aria-label="Campaigns">
-          {list.map((c) => <li key={c.id}><Link to={`/campaign/${c.id}/notes`} className={ui.buttonQuiet}>{c.name}</Link></li>)}
-        </ul>
-      )}
-    </section>
   );
 }

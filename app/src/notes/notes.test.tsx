@@ -119,12 +119,16 @@ describe('the Notes tab', () => {
     expect(screen.queryByRole('button', { name: 'New note' })).toBeNull();
   });
 
-  it('Notes below with a single campaign opens its notes', async () => {
+  it('Notes belong to a campaign: no place of their own in the navigation, and the old address leads to the campaigns', async () => {
     const srv = server();
-    srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
     at('/notes');
-    expect(await screen.findByRole('link', { name: 'Notes' })).toBeTruthy();
-    expect(screen.getAllByRole('link', { name: 'Notes' }).some((a) => a.getAttribute('aria-current') === 'page')).toBe(true);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Campaigns' })).toBeTruthy();
+    expect(within(screen.getByRole('navigation', { name: 'Main' })).queryByRole('link', { name: 'Notes' })).toBeNull();
+    cleanup();
+    // inside the campaign they are one of its sections
+    at(`/campaign/${c.id}/notes`);
+    expect((await screen.findAllByRole('link', { name: 'Notes' })).some((a) => a.getAttribute('aria-current') === 'page')).toBe(true);
   });
 });
 

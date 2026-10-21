@@ -728,7 +728,7 @@ test('a tablet in landscape shows table lines and opens a warrior under his row'
 test('the navigation fits the flavour', async ({ page }) => {
   await page.goto('./');
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();
-  expect(labels).toEqual(test.info().project.name === 'quickbuild' ? ['Home', 'Warbands', 'Settings'] : ['Home', 'Warbands', 'Campaign', 'Notes', 'Account']);
+  expect(labels).toEqual(test.info().project.name === 'quickbuild' ? ['Home', 'Warbands', 'Settings'] : ['Home', 'Warbands', 'Campaign', 'Account']);
   await expect(page).toHaveTitle(test.info().project.name === 'quickbuild' ? 'Mordheim Quick Build' : 'Mordheim Campaign');
 });
 

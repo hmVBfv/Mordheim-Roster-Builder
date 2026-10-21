@@ -21,7 +21,6 @@ const RULES: ReadonlyArray<readonly [RegExp, SceneId]> = [
   [/^\/campaign\/[^/]+\/(manage|as-player)$/, 'camp'],
   [/^\/campaign\/[^/]+$/, 'gate'],
   [/^\/campaign$/, 'map'],
-  [/^\/notes$/, 'scribe'],
   [/^\/(more|admin|sign-in|invite|reset)(\/|$)/, 'lock'],
   [/^\/import$/, 'market']
 ];

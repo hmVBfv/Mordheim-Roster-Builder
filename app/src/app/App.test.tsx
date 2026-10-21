@@ -29,7 +29,7 @@ describe('the app', () => {
     expect(screen.getByRole('heading', { name: 'Open for you' })).toBeTruthy();
     expect(await screen.findByRole('link', { name: /The Silver Caravan/ })).toBeTruthy();
     const nav = screen.getByRole('navigation', { name: 'Main' });
-    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Home', 'Warbands', 'Campaign', 'Notes', 'Account']);
+    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Home', 'Warbands', 'Campaign', 'Account']);
     expect(screen.getByTitle('Saved on this device').textContent).toMatch(/Saved/);
   });
 

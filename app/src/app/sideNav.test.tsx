@@ -119,12 +119,12 @@ describe('the side navigation', () => {
     expect(within(nav).queryByRole('link', { name: 'Admin' })).toBeNull();
   });
 
-  it('a phone keeps its five entries, the last one the account', async () => {
+  it('a phone keeps its four entries, the last one the account', async () => {
     wide(false);
     await seed('w1', 'The Silver Caravan');
     at('/warbands/w1');
     const nav = screen.getByRole('navigation', { name: 'Main' });
-    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Home', 'Warbands', 'Campaign', 'Notes', 'Account']);
+    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Home', 'Warbands', 'Campaign', 'Account']);
     expect(within(nav).queryByRole('button')).toBeNull();
   });
 });
