@@ -9,7 +9,7 @@
    to the aftermath of their warband. */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { onCampaign, pollWhileVisible } from '../live/live.ts';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { errorText, type Me } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { useOnline } from '../app/SyncState.tsx';
@@ -20,7 +20,7 @@ import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import {
-  battleTitle, cachedBattle, casualtyText, closeBattle, decideProposal, getBattle, OUTCOME_NAMES, patchBattle,
+  battleTitle, cachedBattle, casualtyText, closeBattle, decideProposal, deleteBattle, getBattle, OUTCOME_NAMES, patchBattle,
   type BattleView, type CasualtyPayload, type Entry, type EntryBody, type Outcome, type Proposal,
 } from './api.ts';
 import { CasualtySheet, EventSheet, ProposalSheet } from './BattleSheets.tsx';
@@ -153,6 +153,8 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const ev = useSheet();
   const prop = useSheet();
   const { ref: closeRef, open: openClose, close: closeClose } = useSheet();
+  const { ref: dropRef, open: openDrop, close: closeDrop } = useSheet();
+  const navigate = useNavigate();
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<Shown | null>(null);
   const [about, setAbout] = useState<Shown | null>(null);
@@ -219,6 +221,9 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   };
   const close = () => {
     closeBattle(cid, bid).then((v) => { setView(v); notify('Closed. Each player now does the aftermath of their warband.'); }).catch((e: unknown) => notify(errorText(e)));
+  };
+  const drop = () => {
+    deleteBattle(cid, bid).then(() => navigate(`/campaign/${cid}`)).catch((e: unknown) => notify(errorText(e)));
   };
   const decide = (p: Proposal, accept: boolean) => {
     decideProposal(cid, bid, p.id, accept).then((v) => { setView(v); notify(accept ? 'Taken over – correct the entry if it needs it.' : 'Not taken over.'); }).catch((e: unknown) => notify(errorText(e)));
@@ -312,7 +317,10 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
             <section aria-labelledby="b-end" className={ui.page}>
               <h2 id="b-end">End of the battle</h2>
               <p className={ui.muted}>When the last turn is played and the protocol is right, close the battle.</p>
-              <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={openClose}>Close the battle…</button></div>
+              <div className={ui.row}>
+                <button type="button" className={ui.buttonQuiet} onClick={openClose}>Close the battle…</button>
+                {!past && <button type="button" className={ui.buttonQuiet} onClick={openDrop}>Delete the battle…</button>}
+              </div>
             </section>
           )}
           {merged.proposals.length > 0 && (
@@ -370,6 +378,22 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           void enqueue({ key: pid, op: 'proposal.put', userId: user.id, campaignId: cid, battleId: bid, targetId: pid, body: { entryId, text } })
             .then(() => { notify('Sent to the leader.'); void refresh(); });
         }} />
+      <dialog ref={dropRef} className={ui.sheet} aria-labelledby="drop-title">
+        <div className={ui.page}>
+          <h2 id="drop-title">Delete {battleTitle(view.battle)}?</h2>
+          <ul className={styles.closeList}>
+            <li>For a battle made by mistake: it is taken out of the campaign for everyone.</li>
+            <li>Its protocol ({merged.entries.length} entr{merged.entries.length === 1 ? 'y' : 'ies'}) and the corrections go with it.</li>
+            <li>The warbands and their versions stay as they are.</li>
+            <li>While notes, pictures or other things of the campaign belong to this battle, the server keeps it – take those out first.</li>
+          </ul>
+          {!online && <p className={`${ui.message} ${ui.error}`}>Deleting needs the connection.</p>}
+          <div className={ui.row}>
+            <button type="button" className={ui.button} disabled={!online} onClick={() => closeDrop(drop)}>Delete the battle</button>
+            <button type="button" className={ui.buttonQuiet} onClick={() => closeDrop()}>Keep it</button>
+          </div>
+        </div>
+      </dialog>
       <dialog ref={closeRef} className={ui.sheet} aria-labelledby="close-title">
         <div className={ui.page}>
           <h2 id="close-title">Close {battleTitle(view.battle)}?</h2>

@@ -279,3 +279,46 @@ describe('opponents in a running battle', () => {
     expect(srv.state.calls.filter((x) => x.includes('/opponents'))).toEqual([]);
   });
 });
+
+describe('taking an open battle out', () => {
+  it('a leader deletes a battle made by mistake after asking twice; it is gone here and on the server', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Made by mistake' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Delete the battle…' }));
+    const sheet = screen.getByRole('dialog', { name: 'Delete Battle 1 · Made by mistake?' });
+    // the warbands' versions stay; say what goes
+    expect(sheet.textContent).toMatch(/protocol/i);
+    await user.click(within(sheet).getByRole('button', { name: 'Keep it' }));
+    expect(srv.state.battles.has(b.id)).toBe(true);
+
+    await user.click(screen.getByRole('button', { name: 'Delete the battle…' }));
+    await user.click(within(screen.getByRole('dialog', { name: 'Delete Battle 1 · Made by mistake?' })).getByRole('button', { name: 'Delete the battle' }));
+    await waitFor(() => expect(srv.state.battles.has(b.id)).toBe(false));
+    expect(srv.state.calls).toContain(`DELETE /campaigns/${c.id}/battles/${b.id}`);
+    // back on the campaign, which no longer lists it; nothing of it is kept on the phone
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
+    expect(screen.queryByText(/Made by mistake/)).toBeNull();
+    expect((await db.meta.toArray()).filter((m) => String(m.key).includes(`battle:`) && String(m.key).includes(b.id))).toEqual([]);
+  });
+
+  it('a player sees no such button, nor does a leader on a closed battle', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
+    srv.state.battles.get(b.id)!.status = 'closed';
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Battle 1 · Hel Fenn ferry' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Delete the battle…' })).toBeNull();
+    cleanup();
+
+    const srv2 = server();
+    const c2 = srv2.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others()[0]!, role: 'leader' }, others()[1]!] });
+    const b2 = srv2.addBattle(c2.id, { title: 'Hel Fenn ferry' });
+    at(`/campaign/${c2.id}/battles/${b2.id}`);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Battle 1 · Hel Fenn ferry' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Delete the battle…' })).toBeNull();
+  });
+});
