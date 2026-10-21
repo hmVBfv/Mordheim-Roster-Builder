@@ -3576,3 +3576,19 @@ of its own has one rule – the owner – and one place in the leak matrix. Its
 `seq` is the owner's own counter rather than the audit log's, because the audit
 log is read by the admin and a private idea does not belong in it.
 
+
+## October 21, 2026 — one item under two names (#20)
+
+The Merchant Caravans' equipment list has a "Cathayan silk cloak" at 40 gc and
+the price chart has "Cathayan silk clothes" at 50+2D6 gc, Rare 9. The app took
+them for two items, so the cloak was "not in the price chart" and could be
+bought at any time after the first battle – and its tooltip said "−1 to hit
+missile weapons", which I could not find on mordheimer.net at all. A reporter
+said they are one item under two names; Rob agreed, and the site backs the
+effect: the FAQ's list of single-use items says "Cathayan Silk Cloak (first
+rout test)", which is the clothes' re-roll. I first tried renaming the chart
+entry to "Cathayan silk clothes (Cathayan silk cloak)", which the existing
+bracket matching would have understood – and which would have silently broken
+the Artisan Quarter's half price, because that matches the English name
+exactly. So the chart entry got an `alias` instead: the German keys the lists
+use for the same item.

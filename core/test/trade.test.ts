@@ -339,6 +339,13 @@ describe('what is common and what is rare (V5)', () => {
     expect(kind('Orc-Stil (Helm/Dolch/Axt/Schild)')).toEqual({ kind: 'unknown' });
   });
 
+  // #20: the Cathayan silk cloak of the Merchant Caravans and the Battle Monks is the Cathayan silk clothes (Rare 9, 50+2D6 gc)
+  // under another name; it is on the lists at 40 gc for the founding only
+  it('the Cathayan silk cloak is the silk clothes: rare, found by a search after the first battle', () => {
+    expect(kind('Kathay-Seidenumhang')).toEqual({ kind: 'rare', rarity: 9, de: 'Cathay-Seidenkleidung' });
+    expect(kind('Cathay-Seidenkleidung')).toEqual(kind('Kathay-Seidenumhang'));
+  });
+
   it('a rare item of the list is not bought after the first battle', () => {
     const { s, capt } = band();
     expect(core.buyItem(ctx(s), capt, 'Pistole')).toMatchObject({ ok: false, reason: 'a rare item: only a Hero\'s search finds it' });

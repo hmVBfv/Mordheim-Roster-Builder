@@ -1732,6 +1732,9 @@
   {
    "de": "Cathay-Seidenkleidung",
    "en": "Cathayan silk clothes",
+   "alias": [
+    "Kathay-Seidenumhang"
+   ],
    "cat": "misc",
    "cost": "50+2D6",
    "rare": "Rare 9",
@@ -4103,9 +4106,9 @@
     "__f": "i"
    },
    {
-    "name": "Cathayan Silk Cloak",
-    "line": "Miscellaneous · Emissary only",
-    "text": "A finely woven silk cloak. A warrior aiming a missile weapon at the wearer suffers −1 to hit."
+    "name": "Cathayan silk cloak",
+    "line": "Miscellaneous · 40 gc on the lists · Rare 9 (like the silk clothes)",
+    "text": "The same as the Cathayan silk clothes under another name: the warband whose leader wears it may re-roll its first failed Rout test. After every battle in which the leader was taken out of action, roll a D6: on 1–3 it is ruined. On the lists for the founding only; later it is a Rare 9 item that a Hero's search must find."
    }
   ],
   [
