@@ -113,13 +113,13 @@ export function Campaigns() {
       {deleted && <p className={ui.message} role="status">“{deleted}” is deleted. Its warbands are with their players again.</p>}
       {error && <p className={ui.message} role="status">{error}{list ? ' Shown as last seen.' : ''}</p>}
       {list && list.length === 0 && <Empty scene="gate" title="You are not part of a campaign yet.">A leader adds you; or start one yourself.</Empty>}
-      {active && active.length > 0 && <ul className={styles.list} aria-label="Your campaigns">{active.map(entry)}</ul>}
+      {active && active.length > 0 && <ul className={`${styles.list} ${styles.listWide}`} aria-label="Your campaigns">{active.map(entry)}</ul>}
       {active && active.length === 0 && filed.length > 0 && <p className={ui.muted}>Every campaign of yours is in the archive.</p>}
       {filed.length > 0 && (
         <section className={styles.section} aria-labelledby="c-archived">
           <h2 id="c-archived">Archived</h2>
           <p className={ui.muted}>Filed away for you alone: the others still see them in their lists, and nothing in them changes.</p>
-          <ul className={styles.list} aria-label="Archived campaigns">{filed.map(entry)}</ul>
+          <ul className={`${styles.list} ${styles.listWide}`} aria-label="Archived campaigns">{filed.map(entry)}</ul>
         </section>
       )}
       {user.totp

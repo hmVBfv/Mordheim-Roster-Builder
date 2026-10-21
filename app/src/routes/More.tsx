@@ -35,7 +35,7 @@ function CampaignServer() {
 export function More() {
   const choice = useThemeChoice();
   return (
-    <section className={ui.page}>
+    <section className={`${ui.page} ${ui.measure}`}>
       <h1>{accountLabel()}</h1>
       {FLAVOUR === 'campaign' && <Suspense fallback={null}><AccountSection /></Suspense>}
       {FLAVOUR === 'campaign' && <Suspense fallback={null}><MyReports /></Suspense>}

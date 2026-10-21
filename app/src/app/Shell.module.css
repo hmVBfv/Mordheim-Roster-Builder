@@ -254,13 +254,10 @@
     background: color-mix(in srgb, var(--surface-2) 60%, transparent);
   }
 
+  /* every screen: the whole width the screen has, up to a very wide monitor (Rob, 20.10.2026: the roster used
+     1920 px, the others stopped at 1320). Text and forms keep a measure of their own (ui.module.css, .measure). */
   .main {
     padding: var(--space-5);
-    max-width: 1320px;
-  }
-
-  /* the roster: the whole width the screen has, up to a very wide monitor */
-  .main.wide {
     max-width: 1920px;
   }
 }
