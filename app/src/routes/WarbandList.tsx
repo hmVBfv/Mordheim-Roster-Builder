@@ -11,7 +11,10 @@ function CampaignMark({ id }: { id: string }) {
 }
 
 /** With `marks` (someone signed in): which are only on this device, and which wait for a decision. With `grid`, a desktop lays them side by side. */
-export function WarbandList({ warbands, marks = false, grid = false }: { warbands: StoredWarband[]; marks?: boolean; grid?: boolean }) {
+export interface GroupChoice { options: { id: string; name: string }[]; of: (warbandId: string) => string; assign: (warbandId: string, groupId: string) => void; disabled: boolean }
+
+/** With `groups` (someone signed in): a choice under each warband to put it in one of their groups. */
+export function WarbandList({ warbands, marks = false, grid = false, groups }: { warbands: StoredWarband[]; marks?: boolean; grid?: boolean; groups?: GroupChoice }) {
   return (
     <ul className={`${ui.list} ${grid ? ui.listGrid : ''}`}>
       {warbands.map((w) => (
@@ -30,6 +33,12 @@ export function WarbandList({ warbands, marks = false, grid = false }: { warband
               {w.updatedAt !== w.createdAt && <> · <time dateTime={w.updatedAt}>Updated {stamp(w.updatedAt)}</time></>}
             </small>
           </Link>
+          {groups && (
+            <select className={ui.select} aria-label={`Group of ${w.name}`} value={groups.of(w.id)} disabled={groups.disabled} onChange={(e) => groups.assign(w.id, e.target.value)}>
+              <option value="">No group</option>
+              {groups.options.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          )}
         </li>
       ))}
     </ul>

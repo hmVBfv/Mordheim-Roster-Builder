@@ -104,6 +104,15 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   ohne Library lesbar bleibt, und die Fraktion steht in der Liste und im Leben der
   Figur. Lesen geht aus dem Gerätespeicher, Schreiben
   braucht die Verbindung.
+- **Gruppen für Warbands (Wunsch #10, Rob, 21.10.2026):** Wer angemeldet ist, hat
+  auf der Warband-Liste die Schaltfläche **Groups**: eigene Gruppen anlegen,
+  umbenennen, entfernen (die Warbands darin bleiben, ohne Gruppe). Unter jeder
+  Warband steht eine Auswahl „Group of …“ (eine Gruppe oder „No group“) – das ist
+  das Zuweisen. Gibt es Gruppen, teilt sich die Liste in je einen Abschnitt je Gruppe
+  (nach Namen) und „Not in a group“; ohne Gruppe bleibt die Liste, wie sie war. Die
+  Gruppen sind Library-Einträge (`warband_group`, [ADR 0023](decisions/0023-library-per-account.md)):
+  nur für einen selbst, auf jedem Gerät, lesbar auch ohne Verbindung; Ändern braucht
+  sie. Ohne Anmeldung (und im Quick Build) gibt es keine Gruppen.
 - **Notes nur in einer Kampagne (Rob, 20.10.2026):** Notes hat keinen eigenen
   Eintrag in der Navigation mehr; es ist ein Reiter jeder Kampagne (unter
   Campaign → die Kampagne → Notes). Die alte Adresse `/notes` führt zur Liste
