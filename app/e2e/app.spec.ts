@@ -300,6 +300,13 @@ for (const theme of THEMES) {
     await page.getByLabel('Characteristic it touches').selectOption('Ld');
     await expect(page.getByText(/^\d+ of \d+ shown$/)).toBeVisible();
     await page.getByLabel('Characteristic it touches').selectOption('');
+    // sorted by rarity, the hardest to find first (wish #25)
+    await page.getByLabel('Sort by').first().selectOption('rarity-desc');
+    const firstRarity = async () => Number(/Rare (\d+)/.exec((await page.locator('section[aria-label="Search for rare items"] ul li button', { hasText: /Rare \d+/ }).first().innerText()))![1]);
+    const hardest = await firstRarity();
+    await page.getByLabel('Sort by').first().selectOption('rarity-asc');
+    expect(await firstRarity()).toBeLessThan(hardest);
+    await page.getByLabel('Sort by').first().selectOption('name');
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-trade-search`);
     await page.getByRole('listitem').filter({ hasText: 'Ulrich the Grey' }).getByRole('button', { name: 'Search' }).click();

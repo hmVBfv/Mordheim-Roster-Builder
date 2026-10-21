@@ -37,3 +37,28 @@ export function effectLine(text: string, max = 140): string {
   const first = end ? t.slice(0, end.index + 1) : t;
   return first.length > max ? `${first.slice(0, max).trimEnd()}…` : first;
 }
+
+export const SORT_ORDERS = [
+  ['name', 'Name, A to Z'],
+  ['rarity-asc', 'Rarity, easiest first'],
+  ['rarity-desc', 'Rarity, hardest first'],
+  ['price-asc', 'Price, cheapest first'],
+  ['price-desc', 'Price, dearest first'],
+] as const;
+export type SortOrder = (typeof SORT_ORDERS)[number][0];
+
+/** What an item costs for ordering: its price, or what a dice price comes to on average; null where the price is no number. */
+const priceValue = (i: RareItem): number | null => i.fixed ?? i.avg;
+
+/** A sorted copy (wish #25). Ties go by name; an item whose price is no number goes last, whichever way the prices run. */
+export function sortRare(items: RareItem[], order: SortOrder): RareItem[] {
+  const byName = (a: RareItem, b: RareItem) => a.name.localeCompare(b.name);
+  const dir = order.endsWith('desc') ? -1 : 1;
+  return [...items].sort((a, b) => {
+    if (order === 'name') return byName(a, b);
+    if (order.startsWith('rarity')) return dir * (a.rarity - b.rarity) || byName(a, b);
+    const pa = priceValue(a), pb = priceValue(b);
+    if (pa == null || pb == null) return pa == null && pb == null ? byName(a, b) : pa == null ? 1 : -1;
+    return dir * (pa - pb) || byName(a, b);
+  });
+}
