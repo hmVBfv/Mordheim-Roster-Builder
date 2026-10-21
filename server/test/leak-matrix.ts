@@ -64,6 +64,8 @@ export interface ProbeContext {
   ledWarbandId: string;
   /** A note of the user role's in the victim's campaign. */
   ownNoteId: string;
+  /** An idea in the user role's own Library. */
+  ownLibraryItemId: string;
   /** Pictures of the user role's in the victim's campaign: one stored, one waiting for its bytes (phase 4a3). */
   ownPictureId: string;
   pendingPictureId: string;
@@ -273,6 +275,23 @@ export const MATRIX: Record<Action, MatrixRow> = {
     fields: { user: ['warband', 'rev', 'seq', 'dropped'] },
   },
   // sharing (Rob, 05.10.2026): names of the others, and copies only
+  // the Library (ADR 0023): one's own entries; the admin has no way into another person's
+  'library.read': {
+    allowed: signedIn,
+    routes: { 'GET /api/v1/library': () => ({ method: 'GET', url: '/api/v1/library' }) },
+    fields: same(signedIn, ['items', 'seq']),
+  },
+  'library.write': {
+    allowed: signedIn,
+    routes: { 'PUT /api/v1/library/:id': () => ({ method: 'PUT', url: `/api/v1/library/${randomUUID()}`, body: { kind: 'idea', name: 'A probe', body: { text: 'Fog.', topic: 'other' } } }) },
+    fields: same(signedIn, ['item']),
+  },
+  'library.remove': {
+    // the idea is the user role's: for the admin it does not exist
+    allowed: ['user'],
+    routes: { 'DELETE /api/v1/library/:id': (c) => ({ method: 'DELETE', url: `/api/v1/library/${c.ownLibraryItemId}` }) },
+    fields: { user: ['removed'] },
+  },
   'people.list': {
     allowed: signedIn,
     routes: { 'GET /api/v1/people': () => ({ method: 'GET', url: '/api/v1/people' }) },

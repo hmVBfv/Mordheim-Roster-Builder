@@ -32,6 +32,7 @@ import { registerWorldRoutes } from './routes-world.ts';
 import { registerCampaignRoutes } from './routes-campaigns.ts';
 import { registerLiveRoutes } from './routes-live.ts';
 import { createHub, type LiveOptions } from './live.ts';
+import { registerLibraryRoutes } from './routes-library.ts';
 import { registerShareRoutes } from './routes-shares.ts';
 import { registerWarbandRoutes } from './routes-warbands.ts';
 import type { StaticFiles } from './static.ts';
@@ -195,6 +196,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerAccountRoutes(app, { db, now, config: { publicOrigin: deps.config.publicOrigin ?? null }, totpKey: deps.totpKey ?? null, hashCost: deps.hashCost });
   registerWarbandRoutes(app, { db, now });
   registerShareRoutes(app, { db, now });
+  registerLibraryRoutes(app, { db, now });
   registerCampaignRoutes(app, { db, now });
   registerBattleRoutes(app, { db, now, dataDir: deps.config.dataDir ?? null, log: app.log });
   registerNoteRoutes(app, { db, now });

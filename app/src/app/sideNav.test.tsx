@@ -99,6 +99,24 @@ describe('the side navigation', () => {
     expect(nav.querySelector('#nav-admin')).toBeNull();
   });
 
+  it('Library opens into its tabs, for whoever is signed in', async () => {
+    wide(true);
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const path = new URL(String(input), 'http://localhost/').pathname.replace(/^\/api\/v1/, '');
+      const body = path === '/auth/me' ? { user: KAI, pending: false } : { items: [], seq: 0 };
+      return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
+    }));
+    signedIn({ stage: 'full', user: KAI });
+    const user = userEvent.setup();
+    at('/library/ideas');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect((await within(nav).findByRole('link', { name: 'Library' })).getAttribute('href')).toBe('/library');
+    const list = await waitForList(nav, 'nav-library');
+    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Ideas', '/library/ideas']]);
+    await user.click(within(nav).getByRole('button', { name: 'Close Library' }));
+    expect(nav.querySelector('#nav-library')).toBeNull();
+  });
+
   it('Account opens into the settings and Your reports', async () => {
     wide(true);
     signedIn({ stage: 'full', user: KAI });

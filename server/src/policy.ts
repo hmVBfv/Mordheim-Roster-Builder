@@ -83,6 +83,11 @@ export const ACTIONS = {
   'warband.read': { who: 'user', target: 'owner' },
   /** A new version, the draft, removing and bringing back – its owner only. */
   'warband.write': { who: 'user', target: 'owner' },
+  /** One's own Library (ADR 0023): ideas, later factions, NPCs, groups and scenarios – the owner only, the admin not even. */
+  'library.read': { who: 'user' },
+  'library.write': { who: 'user' },
+  /** Taking out one entry of one's own Library – the owner only; for anyone else it does not exist. */
+  'library.remove': { who: 'user', target: 'owner' },
   /** Who else is signed up – names only – to send a copy to (Rob, 05.10.2026). */
   'people.list': { who: 'user' },
   /** One's shares: sent, and waiting to be answered. */

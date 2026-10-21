@@ -49,7 +49,7 @@ function SubList({ items, id }: { items: NavChild[]; id: string }) {
 
 export function Shell({ children }: { children: ReactNode }) {
   const session = useSession();
-  const items = navItems(FLAVOUR, session.status === 'in' && session.user.isAdmin);
+  const items = navItems(FLAVOUR, session.status === 'in' && session.user.isAdmin, session.status === 'in');
   const side = useSideNav();
   const groups = useNavChildren(side);
   const [opened, setOpened] = useState(readOpen);
@@ -59,7 +59,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   useEffect(() => { note('screen', routePattern(pathname)); }, [pathname]);
   // a group is open where one is, unless the player closed it; the player's choice stays on the device
-  const inSection = (sec: Section) => (sec === 'warbands' ? pathname.startsWith('/warbands') : sec === 'campaign' ? pathname.startsWith('/campaign') : sec === 'admin' ? pathname.startsWith('/admin') : sec === 'account' ? pathname.startsWith('/more') : false);
+  const inSection = (sec: Section) => (sec === 'warbands' ? pathname.startsWith('/warbands') : sec === 'campaign' ? pathname.startsWith('/campaign') : sec === 'admin' ? pathname.startsWith('/admin') : sec === 'library' ? pathname.startsWith('/library') : sec === 'account' ? pathname.startsWith('/more') : false);
   const isOpen = (sec: Section) => opened[sec] ?? inSection(sec);
   const toggle = (sec: Section) => setOpened((cur) => { const next = { ...cur, [sec]: !isOpen(sec) }; writeOpen(next); return next; });
   // who is signed in: asked once, never waited for (the builder works without)
@@ -86,7 +86,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <nav className={styles.nav} aria-label="Main">
         <ul style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
           {items.map((it) => {
-            const sub = it.section === 'warbands' ? groups.warbands : it.section === 'campaign' ? groups.campaign : it.section === 'admin' ? groups.admin : it.section === 'account' ? groups.account : [];
+            const sub = it.section === 'warbands' ? groups.warbands : it.section === 'campaign' ? groups.campaign : it.section === 'admin' ? groups.admin : it.section === 'library' ? groups.library : it.section === 'account' ? groups.account : [];
             const open = sub.length > 0 && isOpen(it.section);
             return (
               <li key={it.to} className={sub.length ? styles.group : undefined}>

@@ -161,6 +161,8 @@ export function createFakeSync(opts: {
     /** Opponent groups and the campaign's own skills (server/src/opponents.ts), by id. */
     opponentGroups: new Map<string, { id: string; campaignId: string; name: string; note: string; profiles: unknown[]; updatedBy: string; updatedAt: string; seq: number; deleted?: boolean }>(),
     opponentSkills: new Map<string, { id: string; campaignId: string; name: string; text: string; updatedBy: string; updatedAt: string; seq: number; deleted?: boolean }>(),
+    /** The Library (server/src/library.ts), private to its owner: every entry carries its owner. */
+    library: new Map<string, { id: string; owner: string; kind: string; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }>(),
     /** The leaders' plans per campaign and battle number (server/src/plans.ts). */
     plans: new Map<string, { round: number; text: string; updatedBy: string; updatedAt: string; seq: number }>(),
     /** The backstory per campaign (server/src/backstory.ts); none until a leader brings one in. */
@@ -1307,6 +1309,35 @@ export function createFakeSync(opts: {
     let m: RegExpMatchArray | null;
     if (path.startsWith('/bugs')) return bugRoutes(method, path, query, body) ?? json(404, { error: 'not_found' });
     if (path.startsWith('/campaigns')) return campaignRoutes(method, path, query, body) ?? json(404, { error: 'not_found' });
+    // the Library: the caller's own entries; another person's do not exist (server/src/routes-library.ts)
+    if (path === '/library' && method === 'GET') {
+      const since = Number(query.get('since') ?? 0);
+      const mine = [...s.library.values()].filter((x) => x.owner === me.id).sort((a, b) => a.seq - b.seq);
+      return json(200, { items: mine.filter((x) => x.seq > since).map(libraryView), seq: mine.at(-1)?.seq ?? 0 });
+    }
+    if ((m = /^\/library\/([^/]+)$/.exec(path))) {
+      const id = m[1]!;
+      const there = s.library.get(id);
+      if (method === 'PUT') {
+        if (there && there.owner !== me.id) return json(409, { error: 'exists' });
+        if (there?.deletedAt) return json(409, { error: 'removed' });
+        const b = body as { kind: string; name: string; body: unknown; baseSeq?: number };
+        if (!there) {
+          const item = { id, owner: me.id, kind: b.kind, name: b.name, body: b.body, createdAt: at(), updatedAt: at(), deletedAt: null, seq: next() };
+          s.library.set(id, item);
+          return json(201, { item: libraryView(item) });
+        }
+        if (JSON.stringify(there.body) === JSON.stringify(b.body) && there.name === b.name) return json(200, { item: libraryView(there) });
+        if (b.baseSeq !== there.seq) return json(409, { error: 'stale', item: libraryView(there) });
+        Object.assign(there, { name: b.name, body: b.body, updatedAt: at(), seq: next() });
+        return json(200, { item: libraryView(there) });
+      }
+      if (method === 'DELETE') {
+        if (!there || there.owner !== me.id) return json(404, { error: 'not_found' });
+        Object.assign(there, { deletedAt: there.deletedAt ?? at(), seq: next() });
+        return json(200, { removed: true });
+      }
+    }
     if (method === 'GET' && path === '/people') return json(200, { people: s.people });
     if (method === 'GET' && path === '/shares') {
       return json(200, { incoming: s.shares.filter((x) => x.toId === 'me' && open(x)).map(summary), outgoing: s.shares.filter((x) => x.mine).map(summary) });
@@ -1385,5 +1416,13 @@ export function createFakeSync(opts: {
     return json(404, { error: 'not_found' });
   };
 
-  return { state: s, handle, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, planFrom, opponentGroupFrom, opponentSkillFrom, draftFrom, bugFrom };
+  /** An entry as the server answers: without its owner. */
+  const libraryView = (x: typeof s.library extends Map<string, infer V> ? V : never) => ({ id: x.id, kind: x.kind, name: x.name, body: x.body, createdAt: x.createdAt, updatedAt: x.updatedAt, deletedAt: x.deletedAt, seq: x.seq });
+  /** An entry in someone's Library (the signed-in user's unless `owner` says otherwise). */
+  const libraryFrom = (x: { name: string; body: unknown; kind?: string; owner?: string }) => {
+    const item = { id: `lib-${s.library.size + 1}`, owner: x.owner ?? me.id, kind: x.kind ?? 'idea', name: x.name, body: x.body, createdAt: at(), updatedAt: at(), deletedAt: null, seq: next() };
+    s.library.set(item.id, item);
+    return item;
+  };
+  return { state: s, handle, libraryFrom, versionElsewhere, draftElsewhere, shareFrom, addCampaign, addBattle, pastBattle, entryElsewhere, noteFrom, pictureFrom, backgroundFrom, questionFrom, factionFrom, npcFrom, reputationFrom, scenarioFrom, styleFrom, backstoryFrom, planFrom, opponentGroupFrom, opponentSkillFrom, draftFrom, bugFrom };
 }

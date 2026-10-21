@@ -54,10 +54,20 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
                                   (* nur Leiter bzw. Admin)
 ```
 
-- **Handy:** Navigationsleiste unten (Home, Warbands, Campaign, Account; für
+- **Handy:** Navigationsleiste unten (Home, Warbands, Campaign, Library, Account; für
   den Admin dazu Admin); Formulare und Auswahl als Bereich, der von unten aufklappt (native
   `<dialog>`), statt Pop-up-Fenstern. Die Abschnitte einer Kampagne stehen dort
   als Reiter über der Kampagne.
+- **Library (Rob, 21.10.2026, [ADR 0023](decisions/0023-library-per-account.md)):**
+  Wer angemeldet ist, hat in der Navigation einen Eintrag **Library** vor Admin
+  und Account (am Handy fünf Einträge unten, mit Admin sechs). Dort liegt, was man ohne
+  Kampagne schreibt und aufbewahrt, beim Konto, auf jedem Gerät da und **nur für
+  einen selbst** lesbar. Reiter am Handy über der Seite, ab 900 px als
+  Unterpunkte der Seitenleiste (`library/tabs.ts`): bisher **Ideas** (Titel, „About“:
+  Campaign · Faction · Warband · Something else, Text; Karten nebeneinander am
+  Desktop; Entfernen erst nach Rückfrage); Factions, NPCs, Groups, Scenarios und
+  Lore folgen in eigenen Scheiben. Lesen geht aus dem Gerätespeicher, Schreiben
+  braucht die Verbindung.
 - **Notes nur in einer Kampagne (Rob, 20.10.2026):** Notes hat keinen eigenen
   Eintrag in der Navigation mehr; es ist ein Reiter jeder Kampagne (unter
   Campaign → die Kampagne → Notes). Die alte Adresse `/notes` führt zur Liste
