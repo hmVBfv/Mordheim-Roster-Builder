@@ -355,6 +355,41 @@ describe('the admin’s reports', () => {
     await waitFor(() => expect(srv.state.bugs[0]).toMatchObject({ status: 'fixed', fixedIn: '3f2a9c1' }));
   });
 
+  it('a headline stands over the report in the list and the sheet; the words sit below it, folded to a few lines until opened up', async () => {
+    const { srv } = server('admin');
+    const long = `${'The gold on the sheet is off after the battle. '.repeat(12)}The end.`;
+    srv.bugFrom({ title: 'The gold on the sheet is off after the battle. The gold on…', text: long, headline: 'Gold drifts after a battle', reporterName: 'Ben' });
+    srv.bugFrom({ title: 'Plain report', text: 'Short words.', reporterName: 'Ben' });
+    const user = userEvent.setup();
+    at('/admin/bugs');
+    const table = await screen.findByRole('table', { name: 'Reports' });
+    // the headline replaces the cut-off beginning; a report without one shows what it always showed
+    expect(within(table).getByText('Gold drifts after a battle')).toBeTruthy();
+    expect(within(table).queryByText(/The gold on the sheet is off/)).toBeNull();
+    expect(within(table).getByText('Plain report')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Open: Gold drifts after a battle' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Gold drifts after a battle' });
+    const words = within(sheet).getByText(/The end\.$/);
+    expect(words.getAttribute('data-folded')).toBe('true');
+    await user.click(within(sheet).getByRole('button', { name: 'Show all' }));
+    expect(words.getAttribute('data-folded')).toBe('false');
+    await user.click(within(sheet).getByRole('button', { name: 'Show less' }));
+    expect(words.getAttribute('data-folded')).toBe('true');
+
+    // the admin writes or changes one with the sorting
+    const field = within(sheet).getByLabelText('Headline');
+    await user.clear(field);
+    await user.type(field, 'Gold is off');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(srv.state.bugs[0]).toMatchObject({ headline: 'Gold is off' }));
+
+    // a short report has nothing to fold
+    await user.click(await screen.findByRole('button', { name: 'Open: Plain report' }));
+    const plain = await screen.findByRole('dialog', { name: 'Plain report' });
+    expect(within(plain).queryByRole('button', { name: 'Show all' })).toBeNull();
+  });
+
   it('hands a report on by hand: copy for Claude, the report and the warband as files', async () => {
     const { srv } = server('admin');
     seed(srv);

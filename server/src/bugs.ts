@@ -89,6 +89,8 @@ export const PatchBody = z.object({
   status: z.enum(STATUSES),
   severity: z.enum(SEVERITIES).nullable(),
   area: word(60),
+  /** The admin's short heading over the report. */
+  headline: word(120),
   kind: z.enum(KINDS),
   /** The version the fix is in (the app's version string). */
   fixedIn: word(80),
@@ -96,7 +98,7 @@ export const PatchBody = z.object({
 export type PatchInput = z.infer<typeof PatchBody>;
 
 interface Row {
-  id: string; number: number; reporter_id: string; kind: (typeof KINDS)[number]; title: string; text: string; source_ref: string; severity: (typeof SEVERITIES)[number] | null; area: string;
+  id: string; number: number; reporter_id: string; kind: (typeof KINDS)[number]; title: string; text: string; source_ref: string; severity: (typeof SEVERITIES)[number] | null; area: string; headline: string;
   status: (typeof STATUSES)[number]; app_version: string; device: string; view: string; js_errors: string; context: string | null; warband_id: string | null; rev: number | null;
   consent_attach: 0 | 1; attachment: string | null; fixed_in: string; created_at: string; updated_at: string;
 }
@@ -108,7 +110,7 @@ export interface MyBug {
 
 /** One line of the admin's list. */
 export interface BugSummary {
-  id: string; number: number; reporterId: string; reporterName: string; kind: Row['kind']; title: string; status: Row['status']; severity: Row['severity']; area: string;
+  id: string; number: number; reporterId: string; reporterName: string; kind: Row['kind']; title: string; status: Row['status']; severity: Row['severity']; area: string; headline: string;
   appVersion: string; view: string; fixedIn: string; consent: boolean; attached: boolean; createdAt: string; updatedAt: string;
 }
 
@@ -126,7 +128,7 @@ export const bugByRef = (db: DB, ref: string): Row | undefined =>
 const mine = (r: Row): MyBug => ({ id: r.id, kind: r.kind, title: r.title, text: r.text, sourceRef: r.source_ref, status: r.status, fixedIn: r.fixed_in, createdAt: r.created_at, updatedAt: r.updated_at });
 
 const summary = (r: Row, name: string): BugSummary => ({
-  id: r.id, number: r.number, reporterId: r.reporter_id, reporterName: name, kind: r.kind, title: r.title, status: r.status, severity: r.severity, area: r.area, appVersion: r.app_version, view: r.view,
+  id: r.id, number: r.number, reporterId: r.reporter_id, reporterName: name, kind: r.kind, title: r.title, status: r.status, severity: r.severity, area: r.area, headline: r.headline, appVersion: r.app_version, view: r.view,
   fixedIn: r.fixed_in, consent: r.consent_attach === 1, attached: r.attachment !== null, createdAt: r.created_at, updatedAt: r.updated_at,
 });
 
@@ -207,15 +209,16 @@ export function patchBug(db: DB, id: string, input: PatchInput, by: string, now:
       status,
       severity: input.severity !== undefined ? input.severity : cur.severity,
       area: input.area ?? cur.area,
+      headline: (input.headline ?? cur.headline).trim(),
       kind: input.kind ?? cur.kind,
       fixedIn: fixedIn.trim(),
     };
     const letGo = status === 'closed' || status === 'duplicate';
-    const same = next.status === cur.status && next.severity === cur.severity && next.area === cur.area && next.kind === cur.kind && next.fixedIn === cur.fixed_in && !(letGo && cur.attachment !== null);
+    const same = next.status === cur.status && next.severity === cur.severity && next.area === cur.area && next.headline === cur.headline && next.kind === cur.kind && next.fixedIn === cur.fixed_in && !(letGo && cur.attachment !== null);
     if (!same) {
       audit(db, { actorId: by, action: 'bug.update', targetType: 'bug', targetId: id, visibility: 'admin', payload: { from: cur.status, status: next.status, severity: next.severity, ...(via ? { via } : {}) } }, now);
-      db.prepare('UPDATE bugs SET status = ?, severity = ?, area = ?, kind = ?, fixed_in = ?, attachment = CASE WHEN ? THEN NULL ELSE attachment END, updated_at = ? WHERE id = ?')
-        .run(next.status, next.severity, next.area, next.kind, next.fixedIn, letGo ? 1 : 0, iso(now), id);
+      db.prepare('UPDATE bugs SET status = ?, severity = ?, area = ?, headline = ?, kind = ?, fixed_in = ?, attachment = CASE WHEN ? THEN NULL ELSE attachment END, updated_at = ? WHERE id = ?')
+        .run(next.status, next.severity, next.area, next.headline, next.kind, next.fixedIn, letGo ? 1 : 0, iso(now), id);
     }
     return { ok: true, bug: detail(db, bugById(db, id)!) };
   })();

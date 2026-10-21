@@ -46,10 +46,24 @@ function Flags({ b }: { b: BugSummary }) {
   );
 }
 
+/** The reporter's words. Under a headline they are folded to a few lines, for the whole of them to be opened up (wish #28). */
+function Words({ text, fold }: { text: string; fold: boolean }) {
+  const [open, setOpen] = useState(false);
+  const long = fold && text.length > 240;
+  const folded = long && !open;
+  return (
+    <>
+      <p className={`${styles.words} ${folded ? styles.folded : ''}`} data-folded={folded ? 'true' : 'false'}>{text}</p>
+      {long && <button type="button" className={ui.buttonQuiet} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Show less' : 'Show all'}</button>}
+    </>
+  );
+}
+
 function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b: BugDetail) => void; onNotice: (t: string) => void; close: () => void }) {
   const [status, setStatus] = useState<BugStatus>(bug.status);
   const [severity, setSeverity] = useState<Severity | ''>(bug.severity ?? '');
   const [area, setArea] = useState(bug.area);
+  const [headline, setHeadline] = useState(bug.headline);
   const [kind, setKind] = useState<BugKind>(bug.kind);
   const [fixedIn, setFixedIn] = useState(bug.fixedIn || shownVersion(__APP_VERSION__));
   const [busy, setBusy] = useState(false);
@@ -58,7 +72,7 @@ function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b
     e.preventDefault();
     setBusy(true);
     setError(null);
-    sortReport(bug.id, { status, severity: severity || null, area: area.trim(), kind, ...(status === 'fixed' ? { fixedIn: fixedIn.trim() } : {}) })
+    sortReport(bug.id, { status, severity: severity || null, area: area.trim(), headline: headline.trim(), kind, ...(status === 'fixed' ? { fixedIn: fixedIn.trim() } : {}) })
       .then((b) => { onSaved(b); onNotice('Saved.'); close(); })
       .catch((err: unknown) => setError(errorText(err)))
       .finally(() => setBusy(false));
@@ -66,6 +80,10 @@ function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b
   return (
     <form className={ui.page} onSubmit={save}>
       <div className={styles.sorting}>
+        <label className={`${ui.field} ${styles.headlineField}`}>
+          <span>Headline</span>
+          <input className={ui.input} maxLength={120} value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="a few words: what is wrong" />
+        </label>
         <label className={ui.field}>
           <span>Status</span>
           <select className={ui.select} value={status} onChange={(e) => setStatus(e.target.value as BugStatus)}>
@@ -178,7 +196,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
                 <tr key={b.id}>
                   <td data-label="#">{b.number}</td>
                   <td data-label="Report" className={styles.titleCell}>
-                    <strong>{b.title}</strong>
+                    <strong>{b.headline || b.title}</strong>
                     {b.attached && <span className={styles.flag}>warband attached</span>}
                   </td>
                   <td data-label="Kind">{KIND_NAMES[b.kind]}</td>
@@ -188,7 +206,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
                   <td data-label="Reporter">{b.reporterName}</td>
                   <td data-label="Reported"><time dateTime={b.createdAt} title={`app ${shownVersion(b.appVersion) || 'unknown'}`}>{stamp(b.createdAt)}</time></td>
                   <td data-label="Last change"><time dateTime={b.updatedAt}>{stamp(b.updatedAt)}</time></td>
-                  <td data-label=""><button type="button" className={ui.buttonQuiet} onClick={() => show(b.id)} aria-label={`Open: ${b.title}`}>Open</button></td>
+                  <td data-label=""><button type="button" className={ui.buttonQuiet} onClick={() => show(b.id)} aria-label={`Open: ${b.headline || b.title}`}>Open</button></td>
                 </tr>
               ))}
             </tbody>
@@ -198,9 +216,9 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
       <dialog ref={ref} className={ui.sheet} aria-labelledby="report-detail-title">
         {chosen && (
           <div className={ui.page}>
-            <h2 id="report-detail-title">{chosen.title}</h2>
+            <h2 id="report-detail-title">{chosen.headline || chosen.title}</h2>
             <Flags b={chosen} />
-            <p className={styles.words}>{chosen.text}</p>
+            <Words text={chosen.text} fold={!!chosen.headline} />
             {/^https:\/\//i.test(chosen.sourceRef) && <p><a href={chosen.sourceRef} target="_blank" rel="noopener noreferrer">{chosen.sourceRef}</a></p>}
             <small className={ui.muted}>#{chosen.number} · {chosen.reporterName} · {ago(chosen.createdAt)} · {chosen.device || 'no device given'}</small>
             <Sorter key={chosen.id + chosen.updatedAt} bug={chosen} onSaved={(b) => { setChosen(b); load(); }} onNotice={onNotice} close={() => close()} />

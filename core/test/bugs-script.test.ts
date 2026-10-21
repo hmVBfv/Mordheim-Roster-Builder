@@ -136,6 +136,8 @@ describe('a report on the screen', () => {
   it('lists one line per report', () => {
     expect(listLine({ id: 'x', number: 7, kind: 'bug', title: 'Gold\u001b[2J drifts', status: 'fixed', severity: 'S1', area: 'gold ledger', fixedIn: 'f00dbee' })).toBe('#7  S1  bug  fixed (in f00dbee)  Gold [2J drifts  [gold ledger]');
     expect(listLine({ id: 'x', number: 8, kind: 'wish', title: 'More', status: 'new', severity: null, area: '', fixedIn: '' })).toBe('#8  -  wish  new  More');
+    // a headline, where there is one, stands for the cut-off beginning of the words
+    expect(listLine({ id: 'x', number: 9, kind: 'bug', title: 'Gold drif…', headline: 'Gold\u001b[2J drifts after a battle', status: 'new', severity: null, area: '', fixedIn: '' })).toBe('#9  -  bug  new  Gold [2J drifts after a battle');
     expect(plain('a\u0000b\nc')).toBe('a b\nc');
   });
 });
@@ -145,6 +147,8 @@ describe('sorting', () => {
     expect(patchFrom(['--status', 'fixed', '--fixed-in', 'f00dbee', '--severity', 'S2', '--area', 'trading post', '--kind', 'bug'])).toEqual({
       ok: true, body: { status: 'fixed', fixedIn: 'f00dbee', severity: 'S2', area: 'trading post', kind: 'bug' },
     });
+    expect(patchFrom(['--headline', 'Trading post does not open'])).toEqual({ ok: true, body: { headline: 'Trading post does not open' } });
+    expect(patchFrom(['--headline', 'x'.repeat(200)])).toEqual({ ok: true, body: { headline: 'x'.repeat(120) } });
     expect(patchFrom(['--severity', 'none'])).toEqual({ ok: true, body: { severity: null } });
     for (const bad of [[], ['--status'], ['--status', 'done'], ['--severity', 'S5'], ['--kind', 'idea'], ['--colour', 'red'], ['status', 'new']]) {
       expect(patchFrom(bad), bad.join(' ')).toMatchObject({ ok: false });

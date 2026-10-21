@@ -85,10 +85,10 @@ const oneLine = (text: unknown, max: number) => plain(text, max).replace(/\s+/g,
 /** A fence longer than any run of backticks in the text, so the text cannot close it. */
 const fenceFor = (text: string) => '`'.repeat(Math.max(3, ...(text.match(/`+/g) ?? []).map((m) => m.length + 1)));
 
-export interface Summary { id: string; number: number; kind: string; title: string; status: string; severity: string | null; area: string; fixedIn: string }
+export interface Summary { id: string; number: number; kind: string; title: string; /** The admin's heading, where there is one. */ headline?: string; status: string; severity: string | null; area: string; fixedIn: string }
 
 export function listLine(b: Summary): string {
-  return `#${b.number}  ${b.severity ?? '-'}  ${b.kind}  ${b.status}${b.fixedIn ? ` (in ${oneLine(b.fixedIn, 40)})` : ''}  ${oneLine(b.title, 100)}${b.area ? `  [${oneLine(b.area, 60)}]` : ''}`;
+  return `#${b.number}  ${b.severity ?? '-'}  ${b.kind}  ${b.status}${b.fixedIn ? ` (in ${oneLine(b.fixedIn, 40)})` : ''}  ${oneLine(b.headline || b.title, 100)}${b.area ? `  [${oneLine(b.area, 60)}]` : ''}`;
 }
 
 type Rec = Record<string, unknown>;
@@ -160,10 +160,11 @@ export function patchFrom(args: string[]): { ok: true; body: Rec } | { ok: false
       if (!KINDS.includes(value)) return { ok: false, problem: `kind is one of ${KINDS.join(', ')}` };
       body.kind = value;
     } else if (flag === '--area') body.area = value.slice(0, 60);
+    else if (flag === '--headline') body.headline = value.slice(0, 120);
     else if (flag === '--fixed-in') body.fixedIn = value.slice(0, 80);
     else return { ok: false, problem: `unknown option ${flag}` };
   }
-  if (!Object.keys(body).length) return { ok: false, problem: 'nothing to change (--status, --severity, --kind, --area, --fixed-in)' };
+  if (!Object.keys(body).length) return { ok: false, problem: 'nothing to change (--status, --severity, --kind, --area, --headline, --fixed-in)' };
   return { ok: true, body };
 }
 

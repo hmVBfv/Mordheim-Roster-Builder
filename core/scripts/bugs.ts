@@ -2,7 +2,7 @@
 
      node core/scripts/bugs.ts list [--status open|all|new|confirmed|in_progress|fixed|closed|duplicate]
      node core/scripts/bugs.ts show <number>
-     node core/scripts/bugs.ts set <number> [--status S] [--severity S1..S4|none] [--kind K] [--area TEXT] [--fixed-in VERSION]
+     node core/scripts/bugs.ts set <number> [--status S] [--severity S1..S4|none] [--kind K] [--area TEXT] [--headline TEXT] [--fixed-in VERSION]
      node core/scripts/bugs.ts fixture <number> [out.json]
 
    Needs ROSTER_URL (the server's address, https) in the environment – the
@@ -24,7 +24,7 @@ import { BugsError, call, configFrom, isNumber, listLine, patchFrom, renderRepor
 const SAVES = fileURLToPath(new URL('../test/saves/', import.meta.url));
 const USAGE = `usage: npm run bugs -- list [--status open|all|<status>]
        npm run bugs -- show <number>
-       npm run bugs -- set <number> [--status <s>] [--severity S1..S4|none] [--kind <k>] [--area <text>] [--fixed-in <version>]
+       npm run bugs -- set <number> [--status <s>] [--severity S1..S4|none] [--kind <k>] [--area <text>] [--headline <text>] [--fixed-in <version>]
        npm run bugs -- fixture <number> [out.json]`;
 
 const fail = (message: string, code = 1): never => {
