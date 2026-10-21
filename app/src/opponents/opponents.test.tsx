@@ -145,3 +145,45 @@ describe('opponents', () => {
     expect(await screen.findByText('No group yet.')).toBeTruthy();
   });
 });
+
+describe('opponents and the Library (ADR 0023)', () => {
+  const profile = (over: Record<string, unknown> = {}) => ({ id: 'p-lib-1', name: 'Ferryman', type: 'Henchman', count: 3, profile: { M: '4', WS: '3' }, sv: '6+', skills: [{ name: 'Dodge', text: '' }, { name: 'Ferryman’s Luck', text: 'Re-roll one dice.', ref: 'skill-of-another-campaign' }], equipment: 'Boat hook', equipmentTips: [], rules: '', note: '', from: null, ...over });
+
+  it('a leader sets a group of the Library against the warbands as a copy: new ids, no link to another campaign’s own skills', async () => {
+    const { srv, c } = scene();
+    srv.libraryFrom({ name: 'The ferrymen', kind: 'group', body: { note: 'Smugglers.', profiles: [profile()] } });
+    srv.libraryFrom({ name: 'An idea', body: { text: 'x', topic: 'other' } });
+    srv.libraryFrom({ name: 'Ben’s group', kind: 'group', body: { note: '', profiles: [] }, owner: 'user-ben' });
+    const user = userEvent.setup();
+    await openOpponents(user, c.id);
+    await user.click(await screen.findByRole('button', { name: 'Groups from the Library…' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Add groups from your Library' });
+    const list = await within(sheet).findByRole('list', { name: 'Your groups' });
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([expect.stringContaining('The ferrymen')]);
+    await user.click(within(list).getByRole('button', { name: 'Add The ferrymen' }));
+    await waitFor(() => expect(srv.state.opponentGroups.size).toBe(1));
+    const g = [...srv.state.opponentGroups.values()][0]!;
+    expect(g).toMatchObject({ name: 'The ferrymen', note: 'Smugglers.' });
+    const p = (g.profiles as { id: string; name: string; count: number; skills: { name: string; ref?: string }[] }[])[0]!;
+    expect(p).toMatchObject({ name: 'Ferryman', count: 3, skills: [{ name: 'Dodge' }, { name: 'Ferryman’s Luck' }] });
+    expect(p.id).not.toBe('p-lib-1');
+    expect(p.skills.every((s) => !('ref' in s))).toBe(true);
+    // it is there: the Library does not offer it again
+    await user.click(screen.getByRole('button', { name: 'Groups from the Library…' }));
+    const again = within(await screen.findByRole('dialog', { name: 'Add groups from your Library' }));
+    expect((await again.findByRole('button', { name: 'Add The ferrymen' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('a leader keeps a group of the campaign in the Library, as a copy without links to the campaign’s own skills', async () => {
+    const { srv, c } = scene();
+    srv.opponentGroupFrom(c.id, { name: 'Turncoats', note: 'Deserters.', profiles: [profile({ id: 'p-camp-1', name: 'Deserter' })] });
+    const user = userEvent.setup();
+    await openOpponents(user, c.id);
+    await user.click(await screen.findByRole('button', { name: 'Save Turncoats to your Library' }));
+    expect(await screen.findByText('Saved to your Library.')).toBeTruthy();
+    const kept = [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept).toMatchObject([{ kind: 'group', name: 'Turncoats', body: { note: 'Deserters.', profiles: [{ name: 'Deserter', count: 3 }] } }]);
+    const skills = (kept[0]!.body as { profiles: { skills: object[] }[] }).profiles[0]!.skills;
+    expect(skills.every((s) => !('ref' in s))).toBe(true);
+  });
+});

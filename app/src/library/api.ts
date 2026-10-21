@@ -1,7 +1,7 @@
 /* The Library on the server (server/src/routes-library.ts, ADR 0023): one's own ideas – later factions, NPCs,
    groups and scenarios – with the account, private to it. The last list is kept on the device (under the
    account's own key) so it reads offline; writing needs the connection. */
-import type { NpcProfile } from '@mordheim/core';
+import type { NpcProfile, OpponentProfile } from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';
 import { asker, ownKey } from '../account/owner.ts';
 import { db } from '../db/db.ts';
@@ -20,10 +20,13 @@ export interface IdeaBody { text: string; topic: Topic }
 export interface FactionBody { de: string; status: string; lore: string }
 /** An NPC outside any campaign (server/src/library.ts): the world's NPC with its faction as a name. `statlineTts`/`profile` as in a world's NPC. */
 export interface NpcBody { de: string; status: string; faction: string; named: boolean; statlineTts: string; profile: NpcProfile | null }
+/** A group of opponents outside any campaign (server/src/library.ts): the campaign's group without ids of its own skills. */
+export interface GroupBody { note: string; profiles: OpponentProfile[] }
 export interface LibraryItem<B = unknown> { id: string; kind: string; name: string; body: B; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
 export type Idea = LibraryItem<IdeaBody>;
 export type Faction = LibraryItem<FactionBody>;
 export type LibraryNpc = LibraryItem<NpcBody>;
+export type LibraryGroup = LibraryItem<GroupBody>;
 
 const KEY = 'items';
 
@@ -44,7 +47,7 @@ export async function getLibrary(): Promise<LibraryItem[]> {
 }
 
 /** Writes one entry under the device's id; `baseSeq` is the state it is changed from (none for a new one). */
-export async function putItem<B>(kind: 'idea' | 'faction' | 'npc', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
+export async function putItem<B>(kind: 'idea' | 'faction' | 'npc' | 'group', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
   const who = asker();
   const r = await api<{ item: LibraryItem<B> }>(`/library/${id}`, { method: 'PUT', body: { kind, name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
   const cur = (await cachedLibrary()) ?? [];
@@ -55,6 +58,11 @@ export const putIdea = (id: string, name: string, body: IdeaBody, baseSeq?: numb
 export const putFaction = (id: string, name: string, body: FactionBody, baseSeq?: number) => putItem<FactionBody>('faction', id, name, body, baseSeq);
 
 export const putNpc = (id: string, name: string, body: NpcBody, baseSeq?: number) => putItem<NpcBody>('npc', id, name, body, baseSeq);
+
+export const putGroup = (id: string, name: string, body: GroupBody, baseSeq?: number) => putItem<GroupBody>('group', id, name, body, baseSeq);
+
+/** The profiles with no link to a campaign's own skills: that skill is only known there, so the copy keeps its name and tooltip. */
+export const withoutRefs = (profiles: OpponentProfile[]): OpponentProfile[] => profiles.map((p) => ({ ...p, skills: p.skills.map((s) => ({ name: s.name, text: s.text })) }));
 
 export async function removeItem(id: string): Promise<void> {
   const who = asker();

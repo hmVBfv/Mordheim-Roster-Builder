@@ -3607,3 +3607,15 @@ the NPC into a world, the faction is looked up there by name and the NPC simply
 has none if there is no match – better than inventing a faction in someone
 else's world. The values form is the campaign's own; it only had to learn that
 there may be no campaign (no own skills to keep, no warriors to copy from).
+
+## October 21, 2026 — opponent groups in the Library
+
+The second half of wish #13. A group of opponents is a name, a note and a list
+of profiles, so the Library kind is the campaign's group minus the things that
+only make sense inside a campaign: the `baseSeq` (the Library has its own) and
+the links to the campaign's own skills. That last one mattered: a profile's
+skill can point at a skill a leader wrote for one campaign (`ref`), and a copy
+into another campaign would point at nothing. So copies in either direction
+keep the skill's name and tooltip and drop the link; the other campaign shows
+it like any skill that was typed in. Every profile also gets a new id on the
+way into a campaign, because a profile's id is its identity inside its group.

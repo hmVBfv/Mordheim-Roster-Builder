@@ -13,12 +13,14 @@ import { Suspense, useEffect, useId, useMemo, useState } from 'react';
 import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import { cachedCampaign } from '../campaign/api.ts';
+import { putGroup as keepGroup, withoutRefs } from '../library/api.ts';
 import { newId } from '../db/ids.ts';
 import { Card } from '../roster/TtsCard.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { cachedOpponents, getOpponents, MAX_PROFILES, putGroup, putSkill, removeGroup, removeSkill, staleOf, type Group, type Opponents, type OwnSkill } from './api.ts';
 import styles from './Opponents.module.css';
+import { GroupsFromLibrary } from './GroupsFromLibrary.tsx';
 import { ProfileEditor, TemplatePicker, statline, type WarbandRef } from './ProfileTools.tsx';
 
 export type { WarbandRef };
@@ -33,6 +35,8 @@ export function OpponentsSection({ id, warbands, notify, compact = false }: { id
   const { ref: groupRef, open: openGroup, close: closeGroup } = useSheet();
   const { ref: ttsRef, open: openTts, close: closeTts } = useSheet();
   const { ref: skillRef, open: openSkill, close: closeSkill } = useSheet();
+  const { ref: libRef, open: openLib, close: closeLib } = useSheet();
+  const [libKey, setLibKey] = useState(0);
   const [editing, setEditing] = useState<{ group: Group | null; key: number } | null>(null);
   const [tts, setTts] = useState<Group | null>(null);
   const [skill, setSkill] = useState<{ skill: OwnSkill | null; key: number } | null>(null);
@@ -73,12 +77,17 @@ export function OpponentsSection({ id, warbands, notify, compact = false }: { id
             </ul>
             <div className={ui.row}>
               <button type="button" className={ui.buttonQuiet} aria-label={`Edit ${g.name}`} onClick={() => { setEditing((e) => ({ group: g, key: (e?.key ?? 0) + 1 })); openGroup(); }}>Edit</button>
+              <button type="button" className={ui.buttonQuiet} aria-label={`Save ${g.name} to your Library`} disabled={!online}
+                onClick={() => { keepGroup(newId(), g.name, { note: g.note, profiles: withoutRefs(g.profiles) }).then(() => notify('Saved to your Library.')).catch((e: unknown) => notify(errorText(e))); }}>Save to Library</button>
               <button type="button" className={ui.buttonQuiet} aria-label={`Tabletop Simulator cards of ${g.name}`} disabled={g.profiles.length === 0} onClick={() => { setTts(g); openTts(); }}>Tabletop Simulator</button>
             </div>
           </li>
         ))}
       </ul>
-      <div className={ui.row}><button type="button" className={ui.button} onClick={() => { setEditing((e) => ({ group: null, key: (e?.key ?? 0) + 1 })); openGroup(); }}>New group</button></div>
+      <div className={ui.row}>
+        <button type="button" className={ui.button} onClick={() => { setEditing((e) => ({ group: null, key: (e?.key ?? 0) + 1 })); openGroup(); }}>New group</button>
+        <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={() => { setLibKey((k) => k + 1); openLib(); }}>Groups from the Library…</button>
+      </div>
 
       {!compact && (
         <>
@@ -104,6 +113,16 @@ export function OpponentsSection({ id, warbands, notify, compact = false }: { id
           <GroupForm key={editing.key} cid={id} warbands={warbands} group={editing.group} skills={skills} online={online} close={closeGroup}
             onSkill={refresh}
             onSaved={(g, gone) => { refresh(); notify(gone ? `“${g.name}” taken out.` : `“${g.name}” saved. Only leaders see it.`); }} />
+        )}
+      </dialog>
+      <dialog ref={libRef} className={ui.sheet} aria-labelledby="opp-library-title">
+        {libKey > 0 && (
+          <GroupsFromLibrary key={libKey} close={closeLib} here={groups.map((g) => g.name)}
+            onAdd={async (g) => {
+              await putGroup(id, newId(), { name: g.name, note: g.body.note, profiles: withoutRefs(g.body.profiles).map((p) => ({ ...p, id: newId() })) }, 0);
+              refresh();
+              notify(`“${g.name}” added from your Library. Only leaders see it.`);
+            }} />
         )}
       </dialog>
       <dialog ref={ttsRef} className={ui.sheet} aria-labelledby="opp-tts-title">

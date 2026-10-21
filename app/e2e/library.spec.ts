@@ -101,3 +101,20 @@ test('the NPCs tab at 360 px: an NPC is written and read, nothing scrolls sidewa
   await expect(page.getByRole('list', { name: 'NPCs' }).getByText('The ferryman')).toBeVisible();
   await expect.poll(() => [...srv.state.library.values()].filter((i) => i.kind === 'npc').length).toBe(2);
 });
+
+test('the Groups tab at 360 px: a group is read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.libraryFrom({ name: 'The ferrymen of the Stir', kind: 'group', body: { note: 'Smugglers on the river.', profiles: [{ id: 'p1', name: 'Ferryman', type: 'Henchman', count: 3, profile: { M: '4', WS: '3' }, sv: '6+', skills: [], equipment: '', equipmentTips: [], rules: '', note: '', from: null }] } });
+  await page.goto('library/groups');
+  await expect(page.getByRole('list', { name: 'Groups' }).getByText('The ferrymen of the Stir')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-groups');
+  await page.getByRole('button', { name: 'New group' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A new group' });
+  await sheet.getByRole('button', { name: 'Write your own' }).click();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-group-form');
+  expect([...srv.state.library.values()].filter((i) => i.kind === 'group')).toHaveLength(1);
+});

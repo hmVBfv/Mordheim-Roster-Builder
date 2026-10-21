@@ -3,12 +3,12 @@
    device's id, changed only from the state it was seen in (`baseSeq`), and taken out as a tombstone. */
 import { z } from 'zod';
 import type { DB } from './db.ts';
-import { NpcProfileBody } from './opponents.ts';
+import { MAX_PROFILES, NpcProfileBody, Profile } from './opponents.ts';
 
 export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario'] as const;
 export type Kind = (typeof KINDS)[number];
 /** The kinds the server reads so far; the others have their place in the table and come with their slices. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc'];
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
@@ -33,7 +33,12 @@ const Npc = z.object({
   statlineTts: z.string().max(12_000).default(''),
   profile: NpcProfileBody.nullable().default(null),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc };
+/** A group of opponents outside any campaign: a campaign's group (server/src/opponents.ts) without its name (the entry's `name`) and its `baseSeq`. */
+const Group = z.object({
+  note: z.string().max(4000).default(''),
+  profiles: z.array(Profile).max(MAX_PROFILES).default([]),
+}).strict();
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
