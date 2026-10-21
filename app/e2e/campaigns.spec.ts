@@ -1746,3 +1746,27 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(page.getByText(/Saved 2 chapters as a \.md file/)).toBeVisible();
   });
 }
+
+/* The width of a monitor (Rob, 20.10.2026): the roster used up to 1920 px, every other page stopped at 1320. Pages of cards and
+   lists now take the same width; text and forms keep a measure that is good to read. */
+test('on a wide monitor the pages use its width: lists and cards take it, text and forms keep a measure', async ({ page }) => {
+  await page.setViewportSize({ width: 2560, height: 1440 });
+  const srv = await playServer(page);
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others });
+  const width = async (path: string) => {
+    await page.goto(path);
+    await expect(page.locator('main > section').first()).toBeVisible();
+    return Math.round((await page.locator('main').boundingBox())!.width);
+  };
+  const widthOfPage = async () => Math.round((await page.locator('main > section').first().boundingBox())!.width);
+  // the screens with cards and lists: the whole width the roster has
+  for (const path of ['./', 'warbands', `campaign/${c.id}`, `campaign/${c.id}/world`]) {
+    expect(await width(path), path).toBeGreaterThanOrEqual(1900);
+    expect(await widthOfPage(), `${path} page`).toBeGreaterThanOrEqual(1800);
+  }
+  // text and forms: a line of 1900 px is no way to read
+  for (const path of [`campaign/${c.id}/chronicle`, `campaign/${c.id}/timeline`, `campaign/${c.id}/manage`, 'more']) {
+    await width(path);
+    expect(await widthOfPage(), `${path} page`).toBeLessThanOrEqual(1120);
+  }
+});

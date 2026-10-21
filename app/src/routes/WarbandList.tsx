@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { stamp } from '../account/time.ts';
 import { useCampaignName } from '../campaign/name.ts';
 import type { StoredWarband } from '../db/db.ts';
 import ui from '../ui/ui.module.css';
@@ -22,6 +23,11 @@ export function WarbandList({ warbands, marks = false, grid = false }: { warband
               {marks && !w.ownerId && ' · only on this device'}
               {w.campaignId && <CampaignMark id={w.campaignId} />}
               {w.conflict && <strong className={ui.error}> · changed elsewhere too – check</strong>}
+            </small>
+            {/* when it was made and last changed: two warbands of one name differ by it */}
+            <small>
+              <time dateTime={w.createdAt}>Created {stamp(w.createdAt)}</time>
+              {w.updatedAt !== w.createdAt && <> · <time dateTime={w.updatedAt}>Updated {stamp(w.updatedAt)}</time></>}
             </small>
           </Link>
         </li>
