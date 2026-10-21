@@ -187,7 +187,8 @@ test('the Trading Post on a wide screen: Give is two columns, pick an item, then
   await shot(page, 'trade-give-wide');
   await what.getByRole('button', { name: 'Sword' }).first().click();
   await expect(who.getByText(/^Sword from /)).toBeVisible();
-  await shot(page, 'trade-give-wide-picked');
+  // the window only: a full-page screenshot resizes it for a moment, the layout chooses again, and the pick is gone
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-give-wide-picked.png` });
   await who.getByRole('button', { name: /^Stash/ }).click();
   await expect(page.getByRole('region', { name: 'Stash' }).getByText('Sword')).toBeVisible();
   await expect.poll(gold).toBe(start);
