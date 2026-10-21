@@ -7,6 +7,7 @@
 import * as core from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
@@ -19,6 +20,7 @@ import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { useWarbandRecord } from '../sync/local.ts';
+import { GiveBoard } from './GiveBoard.tsx';
 
 const TABS = [['buy', 'Buy'], ['search', 'Search rare'], ['sell', 'Sell'], ['give', 'Give']] as const;
 /** Rare items listed before "Show all". */
@@ -243,6 +245,8 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   const rare = useMemo(() => rareItems(ctx), [ctx]);
   const held = useMemo(() => holdings(ctx), [ctx]);
   const heroes = searchers(ctx);
+  // from tablet width on, Give is two columns to pick from; a phone keeps the list and the sheet
+  const wide = useSideNav();
   const findable = rare.filter((it) => (kind === 'all' || it.kind === kind) && (!usable || it.usable));
 
   const { ref: buyRef, open: openBuy, close: closeBuy } = useSheet('buy');
@@ -334,7 +338,9 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
       {tab === 'give' && (
         <section className={ui.page} aria-label="Give items">
           <p className={ui.muted}>Move an item between warriors and the stash, without gold. Only those who may use it can take it; a group takes one for every man.</p>
-          <HoldingList list={held} label="Give" action={() => 'give'} onPick={(h) => { setGiving((p) => ({ key: (p?.key ?? 0) + 1, h })); openGive(); }} />
+          {wide
+            ? <GiveBoard held={held} recipientsFor={(h) => giveRecipients(ctx, h)} onGive={(h, to) => ed.edit((c) => core.giveItem(c, h.from, to, h.goods).state, `${h.name} given.`)} />
+            : <HoldingList list={held} label="Give" action={() => 'give'} onPick={(h) => { setGiving((p) => ({ key: (p?.key ?? 0) + 1, h })); openGive(); }} />}
         </section>
       )}
 
