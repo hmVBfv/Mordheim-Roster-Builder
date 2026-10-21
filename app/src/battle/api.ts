@@ -1,8 +1,9 @@
 /* A campaign's battles on the server (phase 4a2; server/src/routes-battles.ts).
    The last state of a battle is kept on the device, so the game night
    shows it offline; with its seq the device asks only for what is newer. */
-import { api } from '../account/api.ts';
+import { api, ApiError } from '../account/api.ts';
 import { asker, ownKey } from '../account/owner.ts';
+import { campaignKey, type CampaignView } from '../campaign/api.ts';
 import { db } from '../db/db.ts';
 
 export type Outcome = '' | 'victory' | 'defeat' | 'draw' | 'routed';
@@ -67,6 +68,19 @@ export const patchBattle = (cid: string, bid: string, p: { title?: string; distr
   api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep());
 /** Closes the battle (a leader): the protocol is fixed, its sealed notes open. */
 export const closeBattle = (cid: string, bid: string) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/close`, { body: {} }).then(keep());
+/** Takes an open battle out (a leader; one made by mistake): its protocol goes with it. What was kept of it on this device goes too; a battle already gone is as good. */
+export async function deleteBattle(cid: string, bid: string): Promise<void> {
+  try {
+    await api<{ removed: true }>(`/campaigns/${cid}/battles/${bid}`, { method: 'DELETE' });
+  } catch (e) {
+    if (!(e instanceof ApiError && e.status === 404)) throw e;
+  }
+  await db.meta.delete(key(bid));
+  await db.outbox.where('battleId').equals(bid).delete();
+  // the campaign as last seen no longer lists it
+  const seen = (await db.meta.get(campaignKey(cid)))?.value as CampaignView | undefined;
+  if (seen?.battles) await db.meta.put({ key: campaignKey(cid), value: { ...seen, battles: seen.battles.filter((b) => b.id !== bid) } });
+}
 /** Confirms the version of a warband that goes into the battle (its player, or a leader for them) – before it is fought. */
 export const confirmBattle = (cid: string, bid: string, warbandId: string, rev: number) =>
   api<BattleView>(`/campaigns/${cid}/battles/${bid}/confirm`, { body: { warbandId, rev } }).then(keep());

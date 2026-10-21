@@ -43,7 +43,7 @@ export function Warbands() {
         </div>
       )}
       {warbands && warbands.length === 0 && <Empty scene="fire" title="No warband yet.">Start a new one, or import one from the Roster Builder.</Empty>}
-      {warbands && warbands.length > 0 && <WarbandList warbands={warbands} marks={signedIn} />}
+      {warbands && warbands.length > 0 && <WarbandList warbands={warbands} marks={signedIn} grid />}
       {removed && (
         <UndoToast key={removed.id} text={`${removed.name} removed.`}
           onUndo={() => { void restoreWarband(removed).then(() => navigate('/warbands', { replace: true, state: null })); }}

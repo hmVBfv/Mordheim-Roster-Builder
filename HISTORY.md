@@ -3540,3 +3540,19 @@ its own branch from `origin/master` and in its own pull request, never stacked
 report that does not work out is skipped and named, not pushed half-done. What
 stays with Rob is unchanged: rules issues, wishes, anything that needs a
 decision.
+
+## October 20, 2026 — a battle made by mistake can go again
+
+A leader who started a battle by mistake had to keep it: the server knew no way
+to take one out, and the closing, the marks and the tags all assume a battle
+stays. The wish was to delete it as long as it is open. Two things made that
+more than a button. First, a device that made the battle offline sends its
+"create" again with the same id – sending twice must still be one battle
+(ADR 0010) – so a deleted battle would have come back from the outbox; the id
+is now kept in `removed_battles` and answered with 409. Second, other things
+point at a battle: notes sealed until it is closed, pictures, questions. The
+first idea was to let go of them all; that would have left sealed notes that
+never open, so while anything alive hangs on the battle it stays (409
+`in_use`), as for a battle of the history, and only what was taken out itself
+lets go. The warbands' versions are not touched: before a battle is closed
+there is no mark for it.

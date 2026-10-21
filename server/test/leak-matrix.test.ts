@@ -107,6 +107,7 @@ describe('leak-test matrix', () => {
     // battles: one in each campaign; in the admin's an entry and two corrections of the player's
     const battle = createBattle(s.db, { id: randomUUID(), campaignId: theirs.id, round: 1, title: 'The ferry', scenario: '', district: '', warbandIds: [entered.warband_id], by: victim.id }, t0);
     const ledBattle = createBattle(s.db, { id: randomUUID(), campaignId: led.id, round: 1, title: 'The bridge', scenario: '', district: '', warbandIds: [ledEntered.warband_id], by: admin.id }, t0);
+    const spareBattle = createBattle(s.db, { id: randomUUID(), campaignId: led.id, round: 1, title: 'The spare ford', scenario: '', district: '', warbandIds: [ledEntered.warband_id], by: admin.id }, t0);
     const ledEntryId = randomUUID();
     putEntry(s.db, ledBattle, { id: ledEntryId, turn: 1, kind: 'event', payload: { text: 'Rain.' }, by: admin.id }, t0);
     const ledProposalIds: [string, string] = [randomUUID(), randomUUID()];
@@ -246,7 +247,7 @@ describe('leak-test matrix', () => {
       warbandId, spareWarbandId, save: SAVE, headRev: () => warbandById(s.db, warbandId)!.head_rev,
       incomingShareId: incoming.id, outgoingShareId: outgoing.id, shareCode: code.code!,
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
-      battleId: battle.id, ledBattleId: ledBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
+      battleId: battle.id, ledBattleId: ledBattle.id, spareBattleId: spareBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownPictureId, pendingPictureId,
       doomedCampaignId: doomed.id, doomedCampaignName: doomed.name,
       historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, spareOpponentGroupId: spareOpp.gid, spareOpponentSkillId: spareOpp.sid, ledDraftId, spareDraftId, bugId,
     };
