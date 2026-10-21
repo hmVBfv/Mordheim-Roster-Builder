@@ -34,11 +34,15 @@ export const STORY_LIMITS = {
 export interface Story { prologue: string; interludes: Record<string, string>; explain: Record<string, string> }
 
 /** A warrior's profile: the source of the canon (names are fixed once and used everywhere). */
-export interface WarriorProfile { name_de?: string; name_en?: string; title_de?: string; title_en?: string; voice?: string; origin?: string; text?: string }
-export const PROFILE_FIELDS = ['name_de', 'name_en', 'title_de', 'title_en', 'voice', 'origin', 'text'] as const satisfies readonly (keyof WarriorProfile)[];
+export interface WarriorProfile {
+  name_de?: string; name_en?: string; title_de?: string; title_en?: string; voice?: string; origin?: string; text?: string;
+  /** The faction he belongs to (ADR 0023): its name as written down, readable by anyone the warband is shared with, and the id of its entry in the owner's Library. */
+  faction?: string; faction_id?: string;
+}
+export const PROFILE_FIELDS = ['name_de', 'name_en', 'title_de', 'title_en', 'voice', 'origin', 'text', 'faction', 'faction_id'] as const satisfies readonly (keyof WarriorProfile)[];
 const PROFILE_MAX: Record<keyof WarriorProfile, number> = {
   name_de: STORY_LIMITS.name, name_en: STORY_LIMITS.name, title_de: STORY_LIMITS.title, title_en: STORY_LIMITS.title,
-  voice: STORY_LIMITS.voice, origin: STORY_LIMITS.origin, text: STORY_LIMITS.text,
+  voice: STORY_LIMITS.voice, origin: STORY_LIMITS.origin, text: STORY_LIMITS.text, faction: STORY_LIMITS.name, faction_id: 64,
 };
 
 /** The warband's name in both languages (data-model: `canon`). */

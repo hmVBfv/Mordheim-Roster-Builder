@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -117,5 +117,54 @@ describe('the Library: ideas', () => {
     at('/library/ideas');
     expect(await screen.findByText('Mine')).toBeTruthy();
     expect(screen.queryByText('Ben’s secret')).toBeNull();
+  });
+});
+
+describe('the Library: factions', () => {
+  it('writes a faction with its two names, what players may read and its lore; changes it; takes it out', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/factions');
+    expect(await screen.findByText(/No factions yet/)).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'New faction' }));
+    let sheet = screen.getByRole('dialog', { name: 'A new faction' });
+    await user.type(within(sheet).getByLabelText('Name (English)'), 'The Bell-ringers');
+    await user.type(within(sheet).getByLabelText('Name (German)'), 'Die Glockenläuter');
+    await user.type(within(sheet).getByLabelText('What the players may read'), 'Known in the drowned quarter');
+    await user.type(within(sheet).getByLabelText('The lore'), 'Monks who ring the bells and know what the water hides.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    const list = await screen.findByRole('list', { name: 'Factions' });
+    expect(within(list).getByText('The Bell-ringers')).toBeTruthy();
+    expect(within(list).getByText('Die Glockenläuter')).toBeTruthy();
+    expect(within(list).getByText('Known in the drowned quarter')).toBeTruthy();
+    expect([...srv.state.library.values()].filter((i) => !i.deletedAt)).toMatchObject([{ kind: 'faction', name: 'The Bell-ringers', body: { de: 'Die Glockenläuter', status: 'Known in the drowned quarter', lore: expect.stringContaining('bells') } }]);
+
+    await user.click(within(list).getByRole('button', { name: 'Edit The Bell-ringers' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    const status = within(sheet).getByLabelText('What the players may read');
+    await user.clear(status);
+    await user.type(status, 'Feared in the drowned quarter');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    expect(await within(await screen.findByRole('list', { name: 'Factions' })).findByText('Feared in the drowned quarter')).toBeTruthy();
+
+    await user.click(within(screen.getByRole('list', { name: 'Factions' })).getByRole('button', { name: 'Edit The Bell-ringers' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this faction' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect([...srv.state.library.values()].filter((i) => !i.deletedAt)).toHaveLength(0));
+    expect(await screen.findByText(/No factions yet/)).toBeTruthy();
+  });
+
+  it('ideas and factions are kept apart, each on its own tab', async () => {
+    const srv = server();
+    srv.libraryFrom({ name: 'An idea', body: { text: 'x', topic: 'other' } });
+    srv.libraryFrom({ name: 'A faction', kind: 'faction', body: { de: '', status: '', lore: '' } });
+    at('/library/ideas');
+    expect(await screen.findByText('An idea')).toBeTruthy();
+    expect(screen.queryByText('A faction')).toBeNull();
+    cleanup();
+    at('/library/factions');
+    expect(await screen.findByText('A faction')).toBeTruthy();
+    expect(screen.queryByText('An idea')).toBeNull();
   });
 });

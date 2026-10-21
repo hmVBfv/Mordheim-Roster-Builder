@@ -65,8 +65,18 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   einen selbst** lesbar. Reiter am Handy über der Seite, ab 900 px als
   Unterpunkte der Seitenleiste (`library/tabs.ts`): bisher **Ideas** (Titel, „About“:
   Campaign · Faction · Warband · Something else, Text; Karten nebeneinander am
-  Desktop; Entfernen erst nach Rückfrage); Factions, NPCs, Groups, Scenarios und
-  Lore folgen in eigenen Scheiben. Lesen geht aus dem Gerätespeicher, Schreiben
+  Desktop; Entfernen erst nach Rückfrage) und **Factions** (Name englisch und
+  deutsch, „What the players may read“, die Lore). NPCs, Groups, Scenarios und
+  Lore folgen in eigenen Scheiben.
+  **Eine Fraktion in eine Kampagne:** in der World der Kampagne bietet ein Leiter
+  „From the Library…“ an (eine Kopie: die Namen und was die Spieler lesen dürfen,
+  die Lore bleibt in der Library; eine Fraktion gleichen Namens wird nicht noch
+  einmal angeboten) und „Save to Library“ an jeder Fraktion der World (eine Kopie
+  zurück, ohne Lore). **Eine Figur einer Warband** bekommt ihre Fraktion im Profil
+  (Story → die Figur → „Edit the profile“ → Faction, nur für Angemeldete mit der
+  Auswahl aus der eigenen Library); die Warband behält den Namen, damit er auch
+  ohne Library lesbar bleibt, und die Fraktion steht in der Liste und im Leben der
+  Figur. Lesen geht aus dem Gerätespeicher, Schreiben
   braucht die Verbindung.
 - **Notes nur in einer Kampagne (Rob, 20.10.2026):** Notes hat keinen eigenen
   Eintrag in der Navigation mehr; es ist ein Reiter jeder Kampagne (unter

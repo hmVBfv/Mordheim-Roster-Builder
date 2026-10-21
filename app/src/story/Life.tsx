@@ -71,14 +71,17 @@ export function Life({ data, rec, state, who, onProfile, close }: {
 }) {
   const src = useLifeSources(rec, who.uid);
   const life = useMemo(() => core.lifeOf(data, state, { uid: who.uid, marks: src.marks, notes: src.notes }), [data, state, who.uid, src.marks, src.notes]);
-  const filled = PROFILE_FIELDS.filter((f) => who.profile[f.key as keyof typeof who.profile]);
+  const filled = [
+    ...PROFILE_FIELDS.filter((f) => who.profile[f.key as keyof typeof who.profile]).map((f) => ({ key: f.key, label: f.label, value: String(who.profile[f.key as keyof typeof who.profile]) })),
+    ...(who.profile.faction ? [{ key: 'faction', label: 'Faction', value: who.profile.faction }] : []),
+  ];
   return (
     <div className={ui.page}>
       <h2 id="life-title">{who.name}</h2>
       <p className={ui.muted}>{who.sub}</p>
       {filled.length > 0 && (
         <dl className={styles.profile} aria-label="Profile">
-          {filled.map((f) => <div key={f.key}><dt>{f.label}</dt><dd>{who.profile[f.key as keyof typeof who.profile]}</dd></div>)}
+          {filled.map((f) => <div key={f.key}><dt>{f.label}</dt><dd>{f.value}</dd></div>)}
         </dl>
       )}
       {src.loading && <p className={ui.muted}>Looking up what the campaign knows…</p>}

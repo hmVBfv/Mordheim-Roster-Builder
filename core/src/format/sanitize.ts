@@ -45,11 +45,14 @@ export function sanitizeSave(data: GameData, raw: unknown): unknown {
       out[k] = clean(v);
     }
     // a warrior's background: what the player wrote about him – his names and titles are public in the chronicle and stay
-    if (isRec(out.profile) && ('text' in out.profile || 'voice' in out.profile || 'origin' in out.profile)) {
+    if (isRec(out.profile) && ('text' in out.profile || 'voice' in out.profile || 'origin' in out.profile || 'faction' in out.profile || 'faction_id' in out.profile)) {
       const p = { ...out.profile };
       delete p.text;
       delete p.voice;
       delete p.origin;
+      // the faction a player invented for him, and the id of its entry in a private Library
+      delete p.faction;
+      delete p.faction_id;
       out.profile = p;
     }
     // a chronicle entry written or corrected by hand

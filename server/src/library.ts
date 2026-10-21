@@ -7,7 +7,7 @@ import type { DB } from './db.ts';
 export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario'] as const;
 export type Kind = (typeof KINDS)[number];
 /** The kinds the server reads so far; the others have their place in the table and come with their slices. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea'];
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
@@ -17,7 +17,13 @@ const Idea = z.object({
   /** What the idea is about; "Make a …" comes later. */
   topic: z.enum(['campaign', 'faction', 'warband', 'other']).default('other'),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea };
+/** A faction as a person writes it: the German name next to the English one (the entry's `name`), what the players may read of it, and the lore behind it. */
+const Faction = z.object({
+  de: z.string().trim().max(120).default(''),
+  status: z.string().trim().max(200).default(''),
+  lore: z.string().max(20_000).default(''),
+}).strict();
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }

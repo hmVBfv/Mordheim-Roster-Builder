@@ -7,8 +7,11 @@
 import * as core from '@mordheim/core';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
+import { useSession } from '../account/session.ts';
 import type { StoredWarband } from '../db/db.ts';
+import { FLAVOUR } from '../flavour.ts';
 import { useGameData } from '../game/useGameData.ts';
+import { factionsOf, useLibrary } from '../library/useLibrary.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import trade from '../roster/Trade.module.css';
 import { useWarbandRecord } from '../sync/local.ts';
@@ -16,7 +19,7 @@ import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
-import { FieldsSheet, type FieldsEdit } from './FieldsSheet.tsx';
+import { FieldsSheet, type Field, type FieldsEdit } from './FieldsSheet.tsx';
 import { Life } from './Life.tsx';
 import { CANON_FIELDS, L, peopleOf, PROFILE_FIELDS, PROLOGUE_QUESTIONS, type Person } from './people.ts';
 import styles from './Story.module.css';
@@ -35,6 +38,10 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
   const written = Object.keys(story.interludes).map(Number);
   const rounds = Array.from({ length: Math.max(round, ...written, 0) }, (_, i) => i + 1).reverse();
 
+  // the factions of one's own Library, to give a warrior one (ADR 0023): only for whoever is signed in
+  const session = useSession();
+  const library = useLibrary(FLAVOUR === 'campaign' && session.status === 'in');
+  const factions = factionsOf(library.items);
   const { ref: fieldsRef, open: openFields, close: closeFields } = useSheet();
   const [edit, setEdit] = useState<FieldsEdit | null>(null);
   const { ref: lifeRef, open: openLife, close: closeLife } = useSheet();
@@ -47,18 +54,43 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
   const openedAtOnce = useRef(lifeOf !== null);
   useEffect(() => { if (openedAtOnce.current) openLife(); }, [openLife]);
 
-  const ask = (e: Omit<FieldsEdit, 'key'>) => { setEdit((p) => ({ ...e, key: (p?.key ?? 0) + 1 })); openFields(); };
+  const ask = (e: Omit<FieldsEdit, 'key'>) => { setProfileOf(null); setEdit((p) => ({ ...e, key: (p?.key ?? 0) + 1 })); openFields(); };
   const save = (action: (c: core.Ctx) => core.WarbandState, text: string) => ed.edit(action, text, { gold: 'keep' });
 
   const writeProse = (title: string, intro: string | undefined, label: string, max: number, value: string, run: (text: string) => void, rows = 8) =>
     ask({ title, intro, fields: [{ key: 'text', label, kind: 'text', max, rows }], values: { text: value }, save: (v) => run(v.text ?? '') });
 
-  const editProfile = (w: Person) => ask({
-    title: `${w.name}: names, voice, story`,
-    intro: 'Spellings are fixed once here and used everywhere the chronicle names him.',
-    fields: PROFILE_FIELDS, values: { ...w.profile } as Record<string, string>,
-    save: (v) => save((c) => core.setProfile(c, w.uid, v), `${w.name}: profile saved.`),
-  });
+  /** The faction to choose from: the Library's, and what the warrior has if the Library does not (any more). */
+  const factionField = (w: Person): Field[] => {
+    if (!(FLAVOUR === 'campaign' && session.status === 'in')) return [];
+    const has = w.profile.faction_id ?? '';
+    const options = [
+      { value: '', label: 'None' },
+      ...factions.map((f) => ({ value: f.id, label: f.name })),
+      ...(has && !factions.some((f) => f.id === has) ? [{ value: has, label: `${w.profile.faction ?? ''} (not in your Library)` }] : []),
+    ];
+    return options.length > 1 ? [{ key: 'faction_id', label: 'Faction', kind: 'choice', max: 64, options, hint: 'From your own Library. The warband keeps the name, so it reads on for whoever it is shown to.' }] : [];
+  };
+  // the profile sheet is worked out at every render, so the factions of the Library may arrive after it was opened
+  const [profileOf, setProfileOf] = useState<{ key: number; who: Person } | null>(null);
+  const editProfile = (w: Person) => { setProfileOf((p) => ({ key: (p?.key ?? 0) + 1, who: w })); setEdit(null); openFields(); };
+  const profileEdit: FieldsEdit | null = (() => {
+    if (!profileOf) return null;
+    const w = profileOf.who;
+    const pick = factionField(w);
+    return {
+      key: profileOf.key,
+      title: `${w.name}: names, voice, story`,
+      intro: 'Spellings are fixed once here and used everywhere the chronicle names him.',
+      fields: [...PROFILE_FIELDS, ...pick], values: { ...w.profile, faction_id: w.profile.faction_id ?? '' } as Record<string, string>,
+      save: (v) => {
+        // with a choice the name follows the id; without one (signed out) what the warrior has is left as it is
+        const id = pick.length ? (v.faction_id ?? '') : (w.profile.faction_id ?? '');
+        const name = factions.find((f) => f.id === id)?.name ?? (id && id === w.profile.faction_id ? (w.profile.faction ?? '') : '');
+        save((c) => core.setProfile(c, w.uid, { ...v, faction: name, faction_id: name ? id : '' }), `${w.name}: profile saved.`);
+      },
+    };
+  })();
   const showLife = (w: Person) => { setLifeOf((p) => ({ key: (p?.key ?? 0) + 1, who: w })); openLife(); };
 
   const lifeWho = lifeOf ? people.find((p) => p.key === lifeOf.who.key) ?? lifeOf.who : null;
@@ -135,7 +167,7 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
           <div key={g} role="group" aria-label={GROUP_NAMES[g]}>
             <h3>{GROUP_NAMES[g]}</h3>
             <ul className={styles.lives}>
-              {list.map((w) => <li key={w.key}><button type="button" onClick={() => showLife(w)}>{w.name}<small>{w.sub}</small></button></li>)}
+              {list.map((w) => <li key={w.key}><button type="button" onClick={() => showLife(w)}>{w.name}<small>{w.sub}{w.profile.faction ? ` · ${w.profile.faction}` : ''}</small></button></li>)}
             </ul>
           </div>
         ))}
@@ -146,7 +178,7 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
         <Link to={`/warbands/${rec.id}`} className={ui.buttonQuiet}>The roster</Link>
       </div>
 
-      <FieldsSheet dialogRef={fieldsRef} close={closeFields} edit={edit} />
+      <FieldsSheet dialogRef={fieldsRef} close={closeFields} edit={profileEdit ?? edit} />
       <dialog ref={lifeRef} className={ui.sheet} aria-labelledby="life-title">
         {lifeWho && lifeOf && (
           <Life key={lifeOf.key} data={data} rec={rec} state={state} who={lifeWho} close={() => closeLife()}

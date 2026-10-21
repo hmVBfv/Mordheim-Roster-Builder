@@ -48,3 +48,23 @@ test('the Library on a wide screen: its tabs stand in the side navigation, the i
   expect(Math.round(a!.y)).toBe(Math.round(b!.y));
   await shot(page, 'library-ideas-desktop');
 });
+
+test('a faction is written in the Library, taken into a campaign and given to a warrior', async ({ page }) => {
+  const srv = await playServer(page);
+  await page.goto('library/factions');
+  await expect(page.getByText(/No factions yet/)).toBeVisible();
+  await page.getByRole('button', { name: 'New faction' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A new faction' });
+  await sheet.getByLabel('Name (English)').fill('The Bell-ringers');
+  await sheet.getByLabel('Name (German)').fill('Die Glockenläuter');
+  await sheet.getByLabel('What the players may read').fill('Known in the drowned quarter');
+  await sheet.getByLabel('The lore').fill('Monks who ring the bells of the drowned quarter and know what the water hides.');
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-faction-form');
+  await sheet.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('list', { name: 'Factions' }).getByText('The Bell-ringers')).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'library-factions');
+  expect([...srv.state.library.values()].filter((i) => !i.deletedAt && i.kind === 'faction')).toHaveLength(1);
+});
