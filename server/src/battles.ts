@@ -155,6 +155,51 @@ export function createBattle(db: DB, n: NewBattle, now: Date): BattleRow {
   })();
 }
 
+export type RemovedBattle = { ok: true } | { ok: false; status: 409; error: 'closed' | 'history' | 'in_use'; problem: string };
+
+/** Where a battle's own blocks of the story are placed: the segment is `b<id>:before`, `b<id>:course` … */
+const SEGMENT_OF = (battleId: string) => `b${battleId}:%`;
+
+/**
+ * Takes an open battle out (a battle made by mistake): its protocol, corrections and fighters go with it.
+ * While something of the campaign hangs on it – a note, a picture, a question, a background entry, a
+ * reputation event, a released scenario or a block of the timeline – it stays; what was taken out itself
+ * lets go of it. The warbands' versions are not touched. The id stays used (`removed_battles`).
+ */
+export function removeOpenBattle(db: DB, b: BattleRow, by: string, now: Date): RemovedBattle {
+  return db.transaction((): RemovedBattle => {
+    if (b.taken_over) return { ok: false, status: 409, error: 'history', problem: 'a battle of the history is taken out of the history' };
+    if (b.status !== 'open') return { ok: false, status: 409, error: 'closed', problem: 'a closed battle stays: it is part of the story and of the marks' };
+    const live = db.prepare(`
+      SELECT 1 FROM notes WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM attachments WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM questions WHERE battle_id = ? AND status != 'withdrawn'
+      UNION ALL SELECT 1 FROM background_entries WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM reputation_events WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM scenarios WHERE played_in_battle = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ?
+      LIMIT 1`).get(b.id, b.id, b.id, b.id, b.id, b.id, b.campaign_id, SEGMENT_OF(b.id));
+    if (live) return { ok: false, status: 409, error: 'in_use', problem: 'notes, pictures or other things of the campaign belong to this battle' };
+    // what was taken out itself keeps its row (a grave) but lets go of the battle
+    for (const table of ['notes', 'attachments', 'questions', 'background_entries', 'reputation_events', 'background_reveals', 'scenarios']) {
+      const col = table === 'scenarios' ? 'played_in_battle' : 'battle_id';
+      db.prepare(`UPDATE ${table} SET ${col} = NULL WHERE ${col} = ?`).run(b.id);
+    }
+    db.prepare('UPDATE notes SET sealed_until_battle = NULL WHERE sealed_until_battle = ?').run(b.id);
+    db.prepare('DELETE FROM proposals WHERE battle_id = ?').run(b.id);
+    db.prepare('DELETE FROM protocol_entries WHERE battle_id = ?').run(b.id);
+    db.prepare('DELETE FROM battle_participants WHERE battle_id = ?').run(b.id);
+    db.prepare('DELETE FROM battles WHERE id = ?').run(b.id);
+    db.prepare('INSERT INTO removed_battles (id, campaign_id, removed_by, removed_at) VALUES (?, ?, ?, ?)').run(b.id, b.campaign_id, by, iso(now));
+    audit(db, { actorId: by, action: 'battle.remove', targetType: 'battle', targetId: b.id, campaignId: b.campaign_id, visibility: 'public', payload: { round: b.round, title: b.title } }, now);
+    db.prepare('UPDATE campaigns SET updated_at = ? WHERE id = ?').run(iso(now), b.campaign_id);
+    return { ok: true };
+  })();
+}
+
+/** Whether a battle with this id was taken out: it is not made a second time. */
+export const wasRemoved = (db: DB, battleId: string): boolean => !!db.prepare('SELECT 1 FROM removed_battles WHERE id = ?').get(battleId);
+
 /** The warbands that fought: new ones start from their latest version; outcomes of those staying are kept. */
 function setParticipants(db: DB, battleId: string, warbandIds: string[]): void {
   const keep = new Set(warbandIds);

@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
   battleById, battleView, checkEntry, createBattle, decideProposal, deleteEntry, listBattles, OUTCOMES, participantIds, ProposalPayload, proposalById,
-  putEntry, putProposal, updateBattle, type BattleRow, type Outcome,
+  putEntry, putProposal, removeOpenBattle, updateBattle, wasRemoved, type BattleRow, type Outcome,
 } from './battles.ts';
 import { campaignById, openEnrolment, roleIn, type CampaignRole, type CampaignRow } from './campaigns.ts';
 import type { DB } from './db.ts';
@@ -80,6 +80,7 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const there = battleById(db(), bid);
     // the same battle sent twice (an answer lost on the way): it is there
     if (there) return there.campaign_id === t.c.id ? view(there) : reply.code(409).send({ error: 'exists' });
+    if (wasRemoved(db(), bid)) return reply.code(409).send({ error: 'removed' });
     const ws = fighters(t.c, b.warbandIds);
     if (typeof ws === 'string') return reply.code(400).send({ error: 'invalid', problem: ws });
     if (!districtOk(b.district)) return reply.code(400).send({ error: 'invalid', problem: 'no such district' });
@@ -135,6 +136,15 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
       ...(p.outcomes ? { outcomes: Object.fromEntries(Object.entries(p.outcomes).map(([w, o]) => [w.toLowerCase(), o])) } : {}),
     }, req.actor!.id, now());
     return view(battleById(db(), t.b!.id)!);
+  });
+
+  /** An open battle made by mistake goes (a leader); a closed one stays. */
+  app.delete('/api/v1/campaigns/:id/battles/:bid', { config: { action: 'battle.write' } }, async (req, reply) => {
+    const t = target(req, reply, 'battle.write');
+    if (!t) return reply;
+    const r = removeOpenBattle(db(), t.b!, req.actor!.id, now());
+    if (!r.ok) return reply.code(r.status).send({ error: r.error, problem: r.problem });
+    return { removed: true };
   });
 
   app.put('/api/v1/campaigns/:id/battles/:bid/protocol/:eid', {

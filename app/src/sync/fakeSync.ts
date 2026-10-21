@@ -990,6 +990,10 @@ export function createFakeSync(opts: {
       return json(200, battleView(b));
     }
     if (b.status === 'closed') return json(409, { error: 'closed' });
+    if (method === 'DELETE' && sub === '') {
+      s.battles.delete(b.id);
+      return json(200, { removed: true });
+    }
     if (method === 'PATCH' && sub === '') {
       if (body.turn !== undefined) b.turn = Number(body.turn);
       if (body.title !== undefined) b.title = String(body.title);
