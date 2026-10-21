@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'Lore']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Lore']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -197,5 +197,44 @@ describe('the Library: lore', () => {
     expect(kept.find((i) => i.name === 'The Witch Hunters')).toMatchObject({ kind: 'faction', body: { de: 'Die Hexenjäger' } });
     expect((kept.find((i) => i.name === 'The Witch Hunters')!.body as { lore: string }).lore).toMatch(/Source: .*https:\/\/mordheimer\.net\//);
     expect(kept.find((i) => i.name === 'Ostermark')).toMatchObject({ kind: 'idea', body: { topic: 'campaign' } });
+  });
+});
+
+describe('the Library: NPCs', () => {
+  it('writes an NPC outside any campaign, reads it in the list, changes it, takes it out', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/npcs');
+    expect(await screen.findByText(/No NPCs yet/)).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'New NPC' }));
+    let sheet = screen.getByRole('dialog', { name: 'A new NPC' });
+    await user.type(within(sheet).getByLabelText('Name (English)'), 'Old Brother Anselm');
+    await user.type(within(sheet).getByLabelText('Name (German)'), 'Der alte Bruder Anselm');
+    await user.type(within(sheet).getByLabelText('Faction'), 'The Bell-ringers');
+    await user.type(within(sheet).getByLabelText('Status everyone may read'), 'Rings the bells at dusk');
+    await user.click(within(sheet).getByRole('checkbox', { name: /Named/ }));
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    const list = await screen.findByRole('list', { name: 'NPCs' });
+    expect(within(list).getByText('Old Brother Anselm')).toBeTruthy();
+    expect(within(list).getByText('The Bell-ringers')).toBeTruthy();
+    expect(within(list).getByText('Rings the bells at dusk')).toBeTruthy();
+    const kept = () => [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept()).toMatchObject([{ kind: 'npc', name: 'Old Brother Anselm', body: { de: 'Der alte Bruder Anselm', faction: 'The Bell-ringers', status: 'Rings the bells at dusk', named: true } }]);
+
+    await user.click(within(list).getByRole('button', { name: 'Edit Old Brother Anselm' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit NPC' });
+    const status = within(sheet).getByLabelText('Status everyone may read');
+    await user.clear(status);
+    await user.type(status, 'Gone to the Rock');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'NPCs' })).getByText('Gone to the Rock')).toBeTruthy());
+    expect(kept()).toMatchObject([{ body: { status: 'Gone to the Rock' } }]);
+
+    await user.click(within(screen.getByRole('list', { name: 'NPCs' })).getByRole('button', { name: 'Edit Old Brother Anselm' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit NPC' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this NPC' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect(screen.queryByRole('list', { name: 'NPCs' })).toBeNull());
+    expect(kept()).toEqual([]);
   });
 });

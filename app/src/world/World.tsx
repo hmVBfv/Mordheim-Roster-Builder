@@ -11,7 +11,7 @@ import { useOnline } from '../app/SyncState.tsx';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
-import { putFaction as keepFaction } from '../library/api.ts';
+import { putFaction as keepFaction, putNpc as keepNpc } from '../library/api.ts';
 import notes from '../notes/Notes.module.css';
 import { Scenarios } from '../scenarios/Scenarios.tsx';
 import { useNotice } from '../ui/Notice.tsx';
@@ -26,7 +26,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { addReputation, LIMITS, nameOf, otherName, putFaction, putNpc, removeFaction, removeNpc, removeReputation, signed, standings, type Faction, type Npc, type ReputationEvent, type World } from './api.ts';
 import { bodyOf, draftOf, npcTemplates, type NpcDraft } from './npcDraft.ts';
-import { FromLibrary } from './FromLibrary.tsx';
+import { FromLibrary, NpcsFromLibrary } from './FromLibrary.tsx';
 import { useWorld } from './useWorld.ts';
 import styles from './World.module.css';
 
@@ -164,7 +164,7 @@ function StatTable({ p, name }: { p: NpcProfile; name: string }) {
   );
 }
 
-function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead: boolean; online: boolean; onEdit: () => void; onRemove: () => void; onCopied: (what: string) => void }) {
+function Person({ n, lead, online, onEdit, onRemove, onKeep, onCopied }: { n: Npc; lead: boolean; online: boolean; onEdit: () => void; onRemove: () => void; onKeep: () => void; onCopied: (what: string) => void }) {
   const other = otherName(n);
   const p = n.profile;
   const rules = p ? p.rules.split('\n').map((x) => x.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean) : [];
@@ -212,6 +212,7 @@ function Person({ n, lead, online, onEdit, onRemove, onCopied }: { n: Npc; lead:
       {lead && (
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} aria-label={`Change ${nameOf(n)}`} disabled={!online} onClick={onEdit}>Change</button>
+          <button type="button" className={ui.buttonQuiet} aria-label={`Save ${nameOf(n)} to your Library`} disabled={!online} onClick={onKeep}>Save to Library</button>
           <button type="button" className={ui.buttonQuiet} aria-label={`Remove ${nameOf(n)}`} disabled={!online} onClick={onRemove}>Remove</button>
         </div>
       )}
@@ -228,6 +229,8 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
   const factionSheet = useSheet();
   const librarySheet = useSheet();
   const [libraryKey, setLibraryKey] = useState<number | null>(null);
+  const npcLibrarySheet = useSheet();
+  const [npcLibraryKey, setNpcLibraryKey] = useState<number | null>(null);
   const npcSheet = useSheet();
   const repSheet = useSheet();
   const removeSheet = useSheet();
@@ -252,9 +255,14 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
   };
   const openFaction = (edit: Faction | null) => { setFactionEdit((p) => ({ key: (p?.key ?? 0) + 1, edit })); factionSheet.open(); };
   const openLibrary = () => { setLibraryKey((k) => (k ?? 0) + 1); librarySheet.open(); };
+  const openNpcLibrary = () => { setNpcLibraryKey((k) => (k ?? 0) + 1); npcLibrarySheet.open(); };
   const openNpc = (edit: Npc | null) => { setNpcEdit((p) => ({ key: (p?.key ?? 0) + 1, edit })); npcSheet.open(); };
   const openRep = () => { setRepKey((k) => (k ?? 0) + 1); repSheet.open(); };
 
+  const keepNpcToLibrary = (n: Npc) => {
+    keepNpc(newId(), nameOf(n), { de: n.nameDe && n.nameDe !== nameOf(n) ? n.nameDe : '', status: n.publicStatus, faction: n.factionId ? factionName(n.factionId) : '', named: n.named, statlineTts: n.statlineTts, profile: n.profile })
+      .then(() => notify('Saved to your Library.')).catch((e: unknown) => notify(errorText(e)));
+  };
   const removeNpcAsk = (n: Npc) => askRemove(`Remove ${nameOf(n)}?`, 'Everyone in the campaign stops seeing this person.', () => removeNpc(id, n.id), 'NPC removed.');
   const peopleOf = (fid: string | null) => (fid ? world.npcs.filter((n) => n.factionId === fid) : loose);
   const factionName = (fid: string) => { const f = world.factions.find((x) => x.id === fid); return f ? nameOf(f) : ''; };
@@ -276,6 +284,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
             <button type="button" className={ui.button} disabled={!online} onClick={() => openFaction(null)}>Add a faction</button>
             <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={openLibrary}>From the Library…</button>
             <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={() => openNpc(null)}>Add an NPC</button>
+            <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={openNpcLibrary}>NPCs from the Library…</button>
             <button type="button" className={ui.buttonQuiet} disabled={!online || world.factions.length === 0 || warbands.length === 0} onClick={openRep}>Record reputation</button>
           </div>
         )}
@@ -294,7 +303,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
                 <article key={f.id} className={`${ui.card} ${styles.card}`} aria-label={nameOf(f)}>
                   <h3>{nameOf(f)}{other && <span className={styles.other}> · {other}</span>}</h3>
                   {f.publicStatus && <p className={styles.status}>{f.publicStatus}</p>}
-                  {people.length > 0 && <ul className={styles.list} aria-label={`People of ${nameOf(f)}`}>{people.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onCopied={copied} />)}</ul>}
+                  {people.length > 0 && <ul className={styles.list} aria-label={`People of ${nameOf(f)}`}>{people.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onKeep={() => keepNpcToLibrary(n)} onCopied={copied} />)}</ul>}
                   {stand.length > 0 && (
                     <ul className={styles.list} aria-label={`Standing with ${nameOf(f)}`}>
                       {stand.map((x) => (
@@ -328,7 +337,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
         <section className={styles.section} aria-labelledby="w-loose">
           <h2 id="w-loose">People without a faction</h2>
           <ul className={`${styles.list} ${styles.columns}`} aria-label="People without a faction">
-            {loose.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onCopied={copied} />)}
+            {loose.map((n) => <Person key={n.id} n={n} lead={lead} online={online} onEdit={() => openNpc(n)} onRemove={() => removeNpcAsk(n)} onKeep={() => keepNpcToLibrary(n)} onCopied={copied} />)}
           </ul>
         </section>
       )}
@@ -372,6 +381,15 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
         {(titleId) => libraryKey !== null && (
           <FromLibrary key={libraryKey} titleId={titleId} world={world.factions} close={() => librarySheet.close()}
             onAdd={(f) => putFaction(id, newId(), { nameEn: f.name, nameDe: f.body.de || f.name, publicStatus: f.body.status }).then(done(`${f.name} added from your Library.`))} />
+        )}
+      </FormSheet>
+      <FormSheet dialogRef={npcLibrarySheet.ref}>
+        {(titleId) => npcLibraryKey !== null && (
+          <NpcsFromLibrary key={npcLibraryKey} titleId={titleId} world={world.npcs} close={() => npcLibrarySheet.close()}
+            onAdd={(n) => putNpc(id, newId(), {
+              factionId: world.factions.find((f) => nameOf(f).trim().toLowerCase() === n.body.faction.trim().toLowerCase() && n.body.faction.trim())?.id ?? null,
+              nameEn: n.name, nameDe: n.body.de || n.name, publicStatus: n.body.status, statlineTts: n.body.statlineTts, named: n.body.named, profile: n.body.profile,
+            }).then(done(`${n.name} added from your Library.`))} />
         )}
       </FormSheet>
       <FormSheet dialogRef={npcSheet.ref} wide>

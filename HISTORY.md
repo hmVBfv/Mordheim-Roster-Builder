@@ -3596,3 +3596,14 @@ the catalogue stays as it is, the copy can be rewritten. The two sources of
 this lore disagree about one thing – the Ostermark article has Magritta on the
 throne, the core introduction has her refused – and the entry says both rather
 than picking one.
+
+## October 21, 2026 — NPCs that outlive a campaign
+
+Wish #8: an NPC lived only inside one campaign, so a person who should turn up
+in the next one had to be typed in again. The Library got a third kind, `npc`,
+shaped like the world's NPC with one change: the faction is a *name*, not an id,
+because a faction id means nothing outside its campaign. When a leader imports
+the NPC into a world, the faction is looked up there by name and the NPC simply
+has none if there is no match – better than inventing a faction in someone
+else's world. The values form is the campaign's own; it only had to learn that
+there may be no campaign (no own skills to keep, no warriors to copy from).

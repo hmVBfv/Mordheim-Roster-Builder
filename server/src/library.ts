@@ -3,11 +3,12 @@
    device's id, changed only from the state it was seen in (`baseSeq`), and taken out as a tombstone. */
 import { z } from 'zod';
 import type { DB } from './db.ts';
+import { NpcProfileBody } from './opponents.ts';
 
 export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario'] as const;
 export type Kind = (typeof KINDS)[number];
 /** The kinds the server reads so far; the others have their place in the table and come with their slices. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction'];
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
@@ -23,7 +24,16 @@ const Faction = z.object({
   status: z.string().trim().max(200).default(''),
   lore: z.string().max(20_000).default(''),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction };
+/** An NPC outside any campaign: the world's NPC without its faction id – the faction is only a name here, matched when the NPC goes into a world. */
+const Npc = z.object({
+  de: z.string().trim().max(120).default(''),
+  status: z.string().trim().max(200).default(''),
+  faction: z.string().trim().max(120).default(''),
+  named: z.boolean().default(false),
+  statlineTts: z.string().max(12_000).default(''),
+  profile: NpcProfileBody.nullable().default(null),
+}).strict();
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }

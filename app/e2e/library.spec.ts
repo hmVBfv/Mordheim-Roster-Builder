@@ -81,3 +81,23 @@ test('the Lore tab lists the setting and adds an entry to the Library, at 360 px
   await expect(list.getByRole('button', { name: 'The Witch Hunters is in the Library' })).toBeDisabled();
   await expect.poll(() => [...srv.state.library.values()].filter((i) => i.kind === 'faction').length).toBe(1);
 });
+
+test('the NPCs tab at 360 px: an NPC is written and read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.libraryFrom({ name: 'Old Brother Anselm', kind: 'npc', body: { de: 'Der alte Bruder Anselm', status: 'Rings the bells at dusk', faction: 'The Bell-ringers', named: true, statlineTts: 'M4 WS3 BS3 S3 T3 W1 I3 A1 Ld7', profile: null } });
+  await page.goto('library/npcs');
+  await expect(page.getByRole('list', { name: 'NPCs' }).getByText('Old Brother Anselm')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-npcs');
+  await page.getByRole('button', { name: 'New NPC' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A new NPC' });
+  await sheet.getByLabel('Name (English)').fill('The ferryman');
+  await expect(sheet.getByText('Loading the rules…')).toBeHidden();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-npc-form');
+  await sheet.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('list', { name: 'NPCs' }).getByText('The ferryman')).toBeVisible();
+  await expect.poll(() => [...srv.state.library.values()].filter((i) => i.kind === 'npc').length).toBe(2);
+});
