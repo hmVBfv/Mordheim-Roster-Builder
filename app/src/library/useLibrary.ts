@@ -2,7 +2,7 @@
    asked while `enabled` is false (nobody signed in). */
 import { useEffect, useState } from 'react';
 import { errorText } from '../account/api.ts';
-import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc } from './api.ts';
+import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario } from './api.ts';
 
 export function useLibrary(enabled = true) {
   const [items, setItems] = useState<LibraryItem[] | null>(null);
@@ -23,3 +23,5 @@ export const factionsOf = (items: LibraryItem[] | null): Faction[] => (items ?? 
 export const npcsOf = (items: LibraryItem[] | null): LibraryNpc[] => (items ?? []).filter((i): i is LibraryNpc => i.kind === 'npc').sort((a, b) => a.name.localeCompare(b.name));
 /** The groups of opponents among the entries, by name. */
 export const groupsOf = (items: LibraryItem[] | null): LibraryGroup[] => (items ?? []).filter((i): i is LibraryGroup => i.kind === 'group').sort((a, b) => a.name.localeCompare(b.name));
+/** The scenarios among the entries, by name. */
+export const scenariosOf = (items: LibraryItem[] | null): LibraryScenario[] => (items ?? []).filter((i): i is LibraryScenario => i.kind === 'scenario').sort((a, b) => a.name.localeCompare(b.name));

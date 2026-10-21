@@ -75,13 +75,21 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   einmal angeboten. **NPCs** (Name englisch und deutsch, Fraktion als Name, Status,
   „Named“ und die Werte wie in der World, nur ohne Kampagne: keine eigenen Fertigkeiten
   der Kampagne, keine Krieger zum Kopieren) und **Groups** (Gegnergruppen: Name,
-  Note, Profile wie im Background → Opponents, ebenfalls ohne Kampagne). Scenarios
-  folgen in einer eigenen Scheibe.
+  Note, Profile wie im Background → Opponents, ebenfalls ohne Kampagne) und
+  **Scenarios** (Titel, Regeln, NPC-Statlines; die NPCs eines Szenarios samt
+  verborgenen Teilen reisen unverändert mit und werden in der Kampagne geändert,
+  wo ihr Formular liegt).
   **Eine Gruppe in eine Kampagne:** „Groups from the Library…“ bei den Opponents
   (nur Leiter; eine Kopie mit allen Profilen, jedes mit eigener ID, ohne Verweis auf
   eigene Fertigkeiten einer anderen Kampagne – Name und Text bleiben; eine Gruppe
   gleichen Namens wird nicht noch einmal angeboten) und „Save to Library“ an jeder
   Gruppe (eine Kopie zurück, ebenfalls ohne diese Verweise).
+  **Ein Szenario in eine Kampagne:** „Scenarios from the Library…“ bei den Szenarien
+  (nur Leiter; kommt als **Entwurf** herein – nur Leiter lesen ihn, bis er einem
+  Kampf zugewiesen wird –, mit Regeln, Statlines und den NPCs samt ihren
+  verborgenen Teilen; ein Titel, der schon da ist, wird nicht noch einmal
+  angeboten) und „Save to Library“ an jedem Szenario (eine Kopie zurück; auch die
+  Library ist nur für einen selbst).
   **Ein NPC in eine Kampagne:** „NPCs from the Library…“ in der World (eine Kopie
   mit den Werten; die Fraktion wird in der World nach Namen gesucht, sonst ohne
   Fraktion; ein NPC gleichen Namens wird nicht noch einmal angeboten) und „Save to

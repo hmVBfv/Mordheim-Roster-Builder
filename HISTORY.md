@@ -3619,3 +3619,15 @@ into another campaign would point at nothing. So copies in either direction
 keep the skill's name and tooltip and drop the link; the other campaign shows
 it like any skill that was typed in. Every profile also gets a new id on the
 way into a campaign, because a profile's id is its identity inside its group.
+
+## October 21, 2026 — scenarios in the Library
+
+The last kind of wish #13. A scenario carries NPCs with parts hidden from the
+players (ADR 0022), and the form that edits those hides, reveals and freezes
+things against a campaign's release state – none of which means anything in the
+Library, where nothing is ever released. So the Library keeps the whole scenario
+(rules, statlines, NPCs with their `hidden` lists) and only lets one edit the
+title, rules and statlines; the NPCs travel along untouched and are changed in a
+campaign after the copy, as a draft, where their form already lives. That kept
+the slice small and, importantly, left the visibility rules alone: a copy always
+arrives as a leaders-only draft, and the Library is private to its owner.

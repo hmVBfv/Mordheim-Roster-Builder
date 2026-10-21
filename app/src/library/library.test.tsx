@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Lore']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Scenarios', 'Lore']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -274,5 +274,41 @@ describe('the Library: groups', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
     await waitFor(() => expect(screen.queryByRole('list', { name: 'Groups' })).toBeNull());
     expect(kept()).toEqual([]);
+  });
+});
+
+describe('the Library: scenarios', () => {
+  const brandt = { id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: ['name'], profile: { M: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
+
+  it('writes a scenario outside any campaign, reads it, changes it – its NPCs travel along untouched – and takes it out', async () => {
+    const srv = server();
+    srv.libraryFrom({ name: 'The night at the ferry', kind: 'scenario', body: { body: 'The ferry is dark.', npcStatlines: '', npcs: [brandt] } });
+    const user = userEvent.setup();
+    at('/library/scenarios');
+    const list = await screen.findByRole('list', { name: 'Scenarios' });
+    expect(within(list).getByText('The night at the ferry')).toBeTruthy();
+    expect(within(list).getByText('1 NPC')).toBeTruthy();
+
+    await user.click(within(list).getByRole('button', { name: 'Edit The night at the ferry' }));
+    let sheet = screen.getByRole('dialog', { name: 'Edit The night at the ferry' });
+    const rules = within(sheet).getByLabelText('Rules');
+    await user.clear(rules);
+    await user.type(rules, 'The ferry is lit.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'Scenarios' })).getByText(/The ferry is lit/)).toBeTruthy());
+    const kept = () => [...srv.state.library.values()].filter((i) => !i.deletedAt);
+    expect(kept()).toMatchObject([{ kind: 'scenario', body: { body: 'The ferry is lit.', npcs: [{ name: 'Captain Brandt', hidden: ['name'] }] } }]);
+
+    await user.click(screen.getByRole('button', { name: 'New scenario' }));
+    sheet = screen.getByRole('dialog', { name: 'A new scenario' });
+    await user.type(within(sheet).getByLabelText('Title'), 'Ambush at the bridge');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(kept()).toHaveLength(2));
+
+    await user.click(await within(screen.getByRole('list', { name: 'Scenarios' })).findByRole('button', { name: 'Edit Ambush at the bridge' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit Ambush at the bridge' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove this scenario' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
+    await waitFor(() => expect(kept()).toHaveLength(1));
   });
 });

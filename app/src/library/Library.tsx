@@ -16,6 +16,7 @@ import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleI
 import styles from './Library.module.css';
 import { LoreTab } from './LoreTab.tsx';
 import { NpcsTab } from './NpcsTab.tsx';
+import { ScenariosTab } from './ScenariosTab.tsx';
 
 import { LIBRARY_TABS } from './tabs.ts';
 import { factionsOf, useLibrary } from './useLibrary.ts';
@@ -297,6 +298,7 @@ export function Library() {
       {tab === 'factions' && <FactionsTab notify={notify} />}
       {tab === 'npcs' && <NpcsTab notify={notify} />}
       {tab === 'groups' && <Suspense fallback={<p className={ui.muted}>Loading…</p>}><GroupsTab notify={notify} /></Suspense>}
+      {tab === 'scenarios' && <ScenariosTab notify={notify} />}
       {tab === 'lore' && <LoreTab notify={notify} />}
       {notice}
     </section>
