@@ -166,6 +166,33 @@ for (const theme of THEMES) {
   });
 }
 
+/* Give on a wide screen (Rob, 20.10.2026): who holds what beside who may take it. */
+test('the Trading Post on a wide screen: Give is two columns, pick an item, then who takes it', async ({ page }) => {
+  test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  await page.getByRole('link', { name: 'Trade' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Trading Post' })).toBeVisible();
+  const gold = async () => Number((await page.locator('dt:text-is("Gold in hand") + dd').textContent())!.replace(/\D/g, ''));
+  const start = await gold();
+  await page.getByRole('button', { name: 'Give', exact: true }).click();
+  const what = page.getByRole('region', { name: 'What to give' });
+  const who = page.getByRole('region', { name: 'Who takes it' });
+  await expect(who.getByText('Pick an item on the left.')).toBeVisible();
+  // two columns, side by side
+  const [a, b] = await Promise.all([what.boundingBox(), who.boundingBox()]);
+  expect(Math.round(a!.y)).toBe(Math.round(b!.y));
+  expect(b!.x).toBeGreaterThan(a!.x + a!.width - 1);
+  await shot(page, 'trade-give-wide');
+  await what.getByRole('button', { name: 'Sword' }).first().click();
+  await expect(who.getByText(/^Sword from /)).toBeVisible();
+  await shot(page, 'trade-give-wide-picked');
+  await who.getByRole('button', { name: /^Stash/ }).click();
+  await expect(page.getByRole('region', { name: 'Stash' }).getByText('Sword')).toBeVisible();
+  await expect.poll(gold).toBe(start);
+});
+
 /* Phase 3b: the Trading Post after the first battle, every tab and sheet. */
 for (const theme of THEMES) {
   test(`the Trading Post after the first battle, in ${theme}`, async ({ page }) => {
@@ -718,6 +745,11 @@ test('without crypto.randomUUID (plain http) a warband can be started and import
   await expect(page.getByRole('heading', { level: 1, name: 'Over plain http' })).toBeVisible();
   await page.goto(quick ? '#/warbands' : 'warbands');
   await importSample(page);
+  // the list tells apart warbands of one name by when they were made and changed
+  await page.goto(quick ? '#/warbands' : 'warbands');
+  await expect(page.getByRole('link', { name: /Over plain http/ }).getByText(/^Created /)).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'warband-list-dates');
 });
 
 test('the account is the campaign app’s: Account shows it there, the Quick Build has settings instead', async ({ page }) => {

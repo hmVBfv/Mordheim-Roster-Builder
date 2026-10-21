@@ -117,6 +117,17 @@ describe('signing in', () => {
     expect(sent()).toEqual([]);
   });
 
+  it('Account, signed in: the theme comes before the devices', async () => {
+    fakeServer({
+      'GET /auth/me': () => ({ user: ME, pending: false }),
+      'GET /auth/sessions': () => ({ sessions: [{ id: 's1', device: 'Firefox on Linux', createdAt: '2026-10-20T10:00:00.000Z', lastSeenAt: '2026-10-20T10:00:00.000Z', current: true }] }),
+    });
+    at('/more');
+    const devices = await screen.findByRole('region', { name: 'Devices' });
+    const theme = screen.getByRole('group', { name: 'Theme' });
+    expect(theme.compareDocumentPosition(devices) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('Account, signed out: the way to sign in, no devices, no admin', async () => {
     fakeServer({ 'GET /auth/me': () => ({ user: null, pending: false }) });
     at('/more');

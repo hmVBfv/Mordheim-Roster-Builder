@@ -4,6 +4,11 @@
   gap: var(--space-4);
 }
 
+/* text and forms on a wide screen: a line of 1900 px is no way to read (the screens of cards and lists take the whole width) */
+.measure {
+  max-width: 1120px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
