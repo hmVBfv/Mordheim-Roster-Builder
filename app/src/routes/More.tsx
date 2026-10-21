@@ -46,7 +46,7 @@ export function More() {
     </fieldset>
   );
   return (
-    <section className={ui.page}>
+    <section className={`${ui.page} ${ui.measure}`}>
       <h1>{accountLabel()}</h1>
       {/* the account puts the theme between the sign-in and the devices */}
       {FLAVOUR === 'campaign' && <Suspense fallback={theme}><AccountSection theme={theme} /></Suspense>}
