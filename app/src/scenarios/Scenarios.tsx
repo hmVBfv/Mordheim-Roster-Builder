@@ -14,6 +14,7 @@ import { useOnline } from '../app/SyncState.tsx';
 import { battleTitle } from '../battle/api.ts';
 import type { CampaignView } from '../campaign/api.ts';
 import { newId } from '../db/ids.ts';
+import { putScenario as keepScenario } from '../library/api.ts';
 import type { WarbandRef } from '../opponents/ProfileTools.tsx';
 import { Actions, FormSheet, RemoveForm, useSaving, type Removing } from '../ui/FormSheet.tsx';
 import { copyText } from '../ui/files.ts';
@@ -23,6 +24,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { frozenProblem, LIMITS, putScenario, releaseScenario, removeScenario, staleScenario, ttsText, type Scenario, type ScenarioList } from './api.ts';
 import { NpcView } from './NpcView.tsx';
+import { ScenariosFromLibrary } from './ScenariosFromLibrary.tsx';
 import styles from './Scenarios.module.css';
 import { useScenarios } from './useScenarios.ts';
 
@@ -99,9 +101,9 @@ function ReleaseForm({ s, battles, close, onRelease, titleId }: {
   );
 }
 
-function Card({ s, lead, online, battleLabel, onEdit, onNpcs, onRelease, onRemove, onCopy, onCopied }: {
+function Card({ s, lead, online, battleLabel, onEdit, onNpcs, onRelease, onRemove, onKeep, onCopy, onCopied }: {
   s: Scenario; lead: boolean; online: boolean; battleLabel: string;
-  onEdit: () => void; onNpcs: () => void; onRelease: () => void; onRemove: () => void; onCopy: () => void; onCopied: (what: string) => void;
+  onEdit: () => void; onNpcs: () => void; onRelease: () => void; onRemove: () => void; onKeep: () => void; onCopy: () => void; onCopied: (what: string) => void;
 }) {
   const draft = s.visibility === 'leader';
   const copyable = !!s.npcStatlines.trim() || s.npcs.length > 0;
@@ -136,6 +138,7 @@ function Card({ s, lead, online, battleLabel, onEdit, onNpcs, onRelease, onRemov
           {copyable && <button type="button" className={ui.buttonQuiet} aria-label={`Copy the statlines of ${s.title}`} onClick={onCopy}>Copy statlines</button>}
           {lead && <button type="button" className={ui.buttonQuiet} aria-label={`Change ${s.title}`} disabled={!online} onClick={onEdit}>Change</button>}
           {lead && <button type="button" className={ui.buttonQuiet} aria-label={`${s.npcs.length > 0 ? 'Change' : 'Add'} the NPCs of ${s.title}`} disabled={!online} onClick={onNpcs}>{s.npcs.length > 0 ? 'Change NPCs' : 'Add NPCs'}</button>}
+          {lead && <button type="button" className={ui.buttonQuiet} aria-label={`Save ${s.title} to your Library`} disabled={!online} onClick={onKeep}>Save to Library</button>}
           {lead && draft && <button type="button" className={ui.button} aria-label={`Release ${s.title} to a battle`} disabled={!online} onClick={onRelease}>Release</button>}
           {lead && draft && <button type="button" className={ui.buttonQuiet} aria-label={`Remove ${s.title}`} disabled={!online} onClick={onRemove}>Remove</button>}
         </div>
@@ -154,6 +157,8 @@ export function Scenarios({ id, view, lead, warbands = [], templates = [] }: {
   const releaseSheet = useSheet();
   const removeSheet = useSheet();
   const npcSheet = useSheet();
+  const librarySheet = useSheet();
+  const [libraryKey, setLibraryKey] = useState<number | null>(null);
   const [npcsOf, setNpcsOf] = useState<{ key: number; s: Scenario } | null>(null);
   const [editing, setEditing] = useState<{ key: number; edit: Scenario | null } | null>(null);
   const [releasing, setReleasing] = useState<{ key: number; s: Scenario } | null>(null);
@@ -175,6 +180,10 @@ export function Scenarios({ id, view, lead, warbands = [], templates = [] }: {
     setRemoving((p) => ({ key: (p?.key ?? 0) + 1, title: `Remove ${s.title}?`, text: 'Only you could read this draft. It is taken out for good.', run: () => removeScenario(id, s.id).then(done('Draft removed.')) }));
     removeSheet.open();
   };
+  const keep = (s: Scenario) => {
+    keepScenario(newId(), s.title, { body: s.body, npcStatlines: s.npcStatlines, npcs: s.npcs })
+      .then(() => notify('Saved to your Library.')).catch((e: unknown) => notify(errorText(e)));
+  };
   const copy = (s: Scenario) => { void copyText(ttsText(s)).then((ok) => notify(ok ? 'Statlines copied.' : 'Copying is not possible here. Open the statlines and select the text.')); };
   const copied = (what: string) => notify(what ? `${what} copied.` : 'Copying is not possible here: the text is selected, copy it yourself.');
 
@@ -190,6 +199,7 @@ export function Scenarios({ id, view, lead, warbands = [], templates = [] }: {
       {lead && (
         <div className={ui.row}>
           <button type="button" className={ui.button} disabled={!online} onClick={() => openEdit(null)}>Write a scenario</button>
+          <button type="button" className={ui.buttonQuiet} disabled={!online} onClick={() => { setLibraryKey((k) => (k ?? 0) + 1); librarySheet.open(); }}>Scenarios from the Library…</button>
         </div>
       )}
       {data && drafts.length === 0 && played.length === 0 && <Empty scene="battle" title={lead ? 'No scenario yet.' : 'No scenario has been played yet.'} />}
@@ -197,7 +207,7 @@ export function Scenarios({ id, view, lead, warbands = [], templates = [] }: {
         <>
           <p className={styles.group}>Drafts</p>
           <ul className={styles.cards} aria-label="Drafts">
-            {drafts.map((s) => <Card key={s.id} s={s} lead={lead} online={online} battleLabel="" onEdit={() => openEdit(s)} onNpcs={() => openNpcs(s)} onRelease={() => openRelease(s)} onRemove={() => askRemove(s)} onCopy={() => copy(s)} onCopied={copied} />)}
+            {drafts.map((s) => <Card key={s.id} s={s} lead={lead} online={online} battleLabel="" onEdit={() => openEdit(s)} onNpcs={() => openNpcs(s)} onRelease={() => openRelease(s)} onRemove={() => askRemove(s)} onKeep={() => keep(s)} onCopy={() => copy(s)} onCopied={copied} />)}
           </ul>
         </>
       )}
@@ -205,7 +215,7 @@ export function Scenarios({ id, view, lead, warbands = [], templates = [] }: {
         <>
           {drafts.length > 0 && <p className={styles.group}>Played</p>}
           <ul className={styles.cards} aria-label="Played scenarios">
-            {played.map((s) => <Card key={s.id} s={s} lead={lead} online={online} battleLabel={battleLabel(s.playedInBattle)} onEdit={() => openEdit(s)} onNpcs={() => openNpcs(s)} onRelease={() => undefined} onRemove={() => undefined} onCopy={() => copy(s)} onCopied={copied} />)}
+            {played.map((s) => <Card key={s.id} s={s} lead={lead} online={online} battleLabel={battleLabel(s.playedInBattle)} onEdit={() => openEdit(s)} onNpcs={() => openNpcs(s)} onRelease={() => undefined} onRemove={() => undefined} onKeep={() => keep(s)} onCopy={() => copy(s)} onCopied={copied} />)}
           </ul>
         </>
       )}
@@ -214,6 +224,12 @@ export function Scenarios({ id, view, lead, warbands = [], templates = [] }: {
         {(titleId) => editing && (
           <ScenarioForm key={editing.key} titleId={titleId} edit={editing.edit} close={() => editSheet.close()} onStale={reload}
             onSave={(b) => putScenario(id, editing.edit?.id ?? newId(), b, editing.edit?.seq ?? 0).then(done(editing.edit ? 'Saved.' : 'Draft saved. Only leaders see it.'))} />
+        )}
+      </FormSheet>
+      <FormSheet dialogRef={librarySheet.ref}>
+        {(titleId) => libraryKey !== null && (
+          <ScenariosFromLibrary key={libraryKey} titleId={titleId} here={list.scenarios.map((x) => x.title)} close={() => librarySheet.close()}
+            onAdd={(l) => putScenario(id, newId(), { title: l.name, body: l.body.body, npcStatlines: l.body.npcStatlines, npcs: l.body.npcs }, 0).then(done(`${l.name} added from your Library as a draft. Only leaders see it.`))} />
         )}
       </FormSheet>
       <FormSheet dialogRef={npcSheet.ref} wide>

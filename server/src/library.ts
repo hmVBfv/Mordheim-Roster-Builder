@@ -4,11 +4,12 @@
 import { z } from 'zod';
 import type { DB } from './db.ts';
 import { MAX_PROFILES, NpcProfileBody, Profile } from './opponents.ts';
+import { ScenarioBody } from './scenarios.ts';
 
 export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario'] as const;
 export type Kind = (typeof KINDS)[number];
-/** The kinds the server reads so far; the others have their place in the table and come with their slices. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group'];
+/** The kinds the server reads: all of them since the scenarios came. */
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group', 'scenario'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
@@ -38,7 +39,9 @@ const Group = z.object({
   note: z.string().max(4000).default(''),
   profiles: z.array(Profile).max(MAX_PROFILES).default([]),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group };
+/** A scenario outside any campaign: a campaign's scenario (server/src/scenarios.ts) without its title (the entry's `name`) and its `baseSeq`. Its NPCs keep their hidden parts (ADR 0022); nobody but the owner reads it. */
+const Scenario = ScenarioBody.omit({ title: true, baseSeq: true });
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group, scenario: Scenario };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }

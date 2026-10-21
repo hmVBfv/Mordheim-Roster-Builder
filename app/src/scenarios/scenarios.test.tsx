@@ -624,3 +624,35 @@ describe('the NPCs of a scenario (ADR 0022)', () => {
     expect(srv.state.scenarios.get(sc.id)!.npcs[0]!.profile.WS).toBe('5');
   }, 40_000);
 });
+
+describe('scenarios and the Library (ADR 0023)', () => {
+  it('a leader brings a scenario of the Library in as a draft: the rules, the statlines and the NPCs with their hidden parts', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.libraryFrom({ name: 'The night at the ferry', kind: 'scenario', body: { body: RULES, npcStatlines: STATS, npcs: [brandt({ hidden: ['name', 'WS'] })] } });
+    srv.libraryFrom({ name: 'An idea', body: { text: 'x', topic: 'other' } });
+    srv.libraryFrom({ name: 'Ben’s scenario', kind: 'scenario', body: { body: '', npcStatlines: '', npcs: [] }, owner: 'user-ben' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'Scenarios from the Library…' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Add scenarios from your Library' });
+    const list = await within(sheet).findByRole('list', { name: 'Your scenarios' });
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual([expect.stringContaining('The night at the ferry')]);
+    await user.click(within(list).getByRole('button', { name: 'Add The night at the ferry' }));
+    await waitFor(() => expect(srv.state.scenarios.size).toBe(1));
+    const sc = [...srv.state.scenarios.values()][0]!;
+    expect(sc).toMatchObject({ title: 'The night at the ferry', body: RULES, npcStatlines: STATS, visibility: 'leader', playedInBattle: null, npcs: [{ name: 'Captain Brandt', hidden: ['name', 'WS'] }] });
+    expect(await screen.findByRole('article', { name: 'Draft: The night at the ferry' })).toBeTruthy();
+  });
+
+  it('a leader keeps a scenario of the campaign in the Library, as a copy', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.scenarioFrom(c.id, { title: 'The night at the ferry', body: RULES, npcStatlines: STATS, npcs: [brandt({ hidden: ['equipment'] })] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'Save The night at the ferry to your Library' }));
+    expect(await screen.findByText('Saved to your Library.')).toBeTruthy();
+    expect([...srv.state.library.values()].filter((i) => !i.deletedAt)).toMatchObject([{ kind: 'scenario', name: 'The night at the ferry', body: { body: RULES, npcStatlines: STATS, npcs: [{ name: 'Captain Brandt', hidden: ['equipment'] }] } }]);
+  });
+});

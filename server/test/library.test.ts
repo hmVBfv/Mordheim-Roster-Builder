@@ -19,6 +19,30 @@ async function two() {
 }
 const idea = (text = 'A war band of ferrymen who know the Stir.', topic = 'warband') => ({ kind: 'idea', name: 'The ferrymen', body: { text, topic } });
 
+describe('the Library: scenarios', () => {
+  const npc = { id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: ['name', 'WS'], profile: { M: '4', WS: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
+  const scenario = (over: Record<string, unknown> = {}) => ({ kind: 'scenario', name: 'The night at the ferry', body: { body: 'The ferry is dark: no shooting beyond 8".', npcStatlines: 'Captain Brandt M4 WS4', npcs: [npc], ...over } });
+
+  it('a scenario is kept with its rules, its statlines and its NPCs with their hidden parts, and is nobody else’s', async () => {
+    const { kai, ben } = await two();
+    const made = await kai('PUT', `/library/${randomUUID()}`, scenario());
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: unknown }).item).toMatchObject({ kind: 'scenario', name: 'The night at the ferry', body: { body: expect.stringContaining('ferry is dark'), npcs: [{ name: 'Captain Brandt', hidden: ['name', 'WS'] }] } });
+    expect((await kai('PUT', `/library/${randomUUID()}`, { kind: 'scenario', name: 'Bare', body: {} })).statusCode).toBe(201);
+    expect(((await ben('GET', '/library')).json() as { items: unknown[] }).items).toEqual([]);
+  });
+
+  it('only a scenario that fits: the limits of a campaign’s scenario held', async () => {
+    const { kai } = await two();
+    const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
+    expect((await put(scenario({ body: 'x'.repeat(20_001) }))).statusCode).toBe(400);
+    expect((await put(scenario({ npcStatlines: 'x'.repeat(10_001) }))).statusCode).toBe(400);
+    expect((await put(scenario({ npcs: [npc, npc] }))).statusCode).toBe(400);
+    expect((await put(scenario({ npcs: [{ ...npc, hidden: ['secret'] }] }))).statusCode).toBe(400);
+    expect((await put(scenario({ title: 'a second title' }))).statusCode).toBe(400);
+  });
+});
+
 describe('the Library: groups of opponents', () => {
   const profile = { id: 'p1', name: 'Ferryman', type: 'Henchman', count: 3, profile: { M: '4', WS: '3' }, sv: '6+', skills: [{ name: 'Dodge', text: '' }], equipment: 'Boat hook', equipmentTips: [], rules: '', note: '', from: null };
   const group = (over: Record<string, unknown> = {}) => ({ kind: 'group', name: 'The ferrymen of the Stir', body: { note: 'Smugglers on the river.', profiles: [profile], ...over } });
@@ -166,7 +190,7 @@ describe('the Library: ideas', () => {
   it('only what it can read: a kind that is not here yet, a body that does not fit, too much', async () => {
     const { kai } = await two();
     const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
-    expect((await put({ kind: 'scenario', name: 'Not yet', body: {} })).statusCode).toBe(400);
+    expect((await put({ kind: 'rumour', name: 'Not a kind', body: {} })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: '', body: { text: 'x', topic: 'other' } })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: 'x', body: { text: 'x', topic: 'secret' } })).statusCode).toBe(400);
     expect((await put({ kind: 'idea', name: 'x', body: { text: 'x'.repeat(20_001), topic: 'other' } })).statusCode).toBe(400);

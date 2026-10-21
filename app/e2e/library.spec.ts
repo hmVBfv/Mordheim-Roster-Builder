@@ -118,3 +118,19 @@ test('the Groups tab at 360 px: a group is read, nothing scrolls sideways', asyn
   await shot(page, 'library-group-form');
   expect([...srv.state.library.values()].filter((i) => i.kind === 'group')).toHaveLength(1);
 });
+
+test('the Scenarios tab at 360 px: a scenario is read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  srv.libraryFrom({ name: 'The night at the ferry', kind: 'scenario', body: { body: 'The ferry is dark: no shooting beyond 8".', npcStatlines: '', npcs: [] } });
+  await page.goto('library/scenarios');
+  await expect(page.getByRole('list', { name: 'Scenarios' }).getByText('The night at the ferry')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-scenarios');
+  await page.getByRole('button', { name: 'New scenario' }).click();
+  await expect(page.getByRole('dialog', { name: 'A new scenario' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-scenario-form');
+  expect([...srv.state.library.values()].filter((i) => i.kind === 'scenario')).toHaveLength(1);
+});
