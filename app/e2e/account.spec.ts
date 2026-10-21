@@ -168,7 +168,7 @@ for (const theme of THEMES) {
     await noSideScroll(page);
     await shot(page, `${theme}-admin-sign-ins`);
     await page.getByRole('link', { name: 'Audit log' }).click();
-    await expect(page.getByText('roster-cli on the Pi')).toBeVisible();
+    await expect(page.getByText('Raspberry Pi (roster-cli)')).toBeVisible();
     await noSideScroll(page);
     await shot(page, `${theme}-admin-audit`);
   });

@@ -101,7 +101,7 @@ describe('helpers', () => {
 
   it('the logs in words', () => {
     expect(auditLine({ seq: 1, at: '', actor: null, action: 'invite.create', targetType: 'invite', target: 'x', payload: { via: 'roster-cli', admin: true, note: 'Rob' } }))
-      .toEqual({ who: 'roster-cli on the Pi', what: 'made an invite', detail: '“Rob” · an admin account' });
+      .toEqual({ who: 'Raspberry Pi (roster-cli)', what: 'made an invite', detail: '“Rob” · an admin account' });
     expect(auditLine({ seq: 2, at: '', actor: 'rob', action: 'totp.reset', targetType: 'user', target: 'kai', payload: { signedOut: 2 } }))
       .toEqual({ who: 'rob', what: 'removed the authenticator of kai', detail: '2 signed out' });
     expect(auditLine({ seq: 3, at: '', actor: 'kai', action: 'something.new', targetType: null, target: null, payload: null }).what).toBe('something.new');

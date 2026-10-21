@@ -28,7 +28,8 @@ const ON_SOMEONE = new Set(['user.disable', 'user.enable', 'invite.reset', 'totp
 
 export function auditLine(e: AuditEntry): { who: string; what: string; detail: string } {
   const p = (e.payload ?? {}) as Record<string, unknown>;
-  const who = e.actor ?? (p.via === 'roster-cli' ? 'roster-cli on the Pi' : 'someone');
+  const VIA: Record<string, string> = { 'bug-token': 'Claude (bug token)', 'roster-cli': 'Raspberry Pi (roster-cli)' };
+  const who = e.actor ?? (typeof p.via === 'string' ? VIA[p.via] : undefined) ?? 'unknown actor';
   let what = ACTIONS[e.action] ?? e.action;
   if (ON_SOMEONE.has(e.action) && e.targetType === 'user' && e.target) what += ` ${e.target}`;
   const detail: string[] = [];
