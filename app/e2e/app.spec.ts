@@ -718,6 +718,11 @@ test('without crypto.randomUUID (plain http) a warband can be started and import
   await expect(page.getByRole('heading', { level: 1, name: 'Over plain http' })).toBeVisible();
   await page.goto(quick ? '#/warbands' : 'warbands');
   await importSample(page);
+  // the list tells apart warbands of one name by when they were made and changed
+  await page.goto(quick ? '#/warbands' : 'warbands');
+  await expect(page.getByRole('link', { name: /Over plain http/ }).getByText(/^Created /)).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'warband-list-dates');
 });
 
 test('the account is the campaign app’s: Account shows it there, the Quick Build has settings instead', async ({ page }) => {
