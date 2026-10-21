@@ -204,3 +204,109 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* the filters of the admin's table: three fields side by side, wrapping on a phone */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.filters label {
+  flex: 1 1 140px;
+}
+
+/* the reports as a table: columns from tablet width on, a card per row on a phone (the cells carry
+   their column's name in data-label, so nothing scrolls sideways at 360 px) */
+.tableWrap {
+  margin-block: var(--space-2);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-weight: normal;
+  color: var(--text-muted);
+  font-size: 0.85em;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.titleCell .flag {
+  margin-left: var(--space-1);
+}
+
+@media (max-width: 699px) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .table td {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: space-between;
+    border-bottom: 0;
+    padding: var(--space-1) 0;
+  }
+
+  /* the title is the card's heading, the number in front of it on the same line; neither needs a label */
+  .table td[data-label='Report'],
+  .table td[data-label='#'] {
+    display: inline-flex;
+    vertical-align: top;
+    justify-content: flex-start;
+    gap: 0;
+  }
+
+  .table td[data-label='#'] {
+    color: var(--text-muted);
+    margin-right: var(--space-2);
+  }
+
+  .table td[data-label='#']::after {
+    content: '.';
+  }
+
+  .table td[data-label='Report']::before,
+  .table td[data-label='#']::before {
+    display: none;
+  }
+
+  .table td[data-label]:not([data-label=''])::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 0.85em;
+    flex: none;
+  }
+}

@@ -6,16 +6,20 @@
    an authenticator gets here; the server checks every request again. */
 import { useCallback, useEffect, useState } from 'react';
 import { errorText } from '../account/api.ts';
-import { ago } from '../account/time.ts';
+import { ago, stamp } from '../account/time.ts';
 import { fileSlug, copyText, saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { shownVersion } from '../version.ts';
-import { KIND_NAMES, oneReport, reportList, sortReport, STATUS_NAMES, STATUS_ORDER, type BugDetail, type BugKind, type BugStatus, type BugSummary, type ListFilter, type Severity } from './api.ts';
+import { KIND_NAMES, oneReport, reportList, sortReport, STATUS_NAMES, STATUS_ORDER, type BugDetail, type BugKind, type BugStatus, type BugSummary, type Severity } from './api.ts';
 import styles from './Bugs.module.css';
 import { reportText, type ReportDoc } from './text.ts';
 
-const FILTERS: { key: ListFilter; label: string }[] = [{ key: 'open', label: 'Open' }, { key: 'fixed', label: 'Fixed' }, { key: 'all', label: 'All' }];
+/** What "open" means in the status filter: reports that still ask something of someone (server/src/bugs.ts OPEN). */
+const OPEN_STATUSES: BugStatus[] = ['new', 'confirmed', 'in_progress'];
+type StatusFilter = 'open' | 'all' | BugStatus;
+type SeverityFilter = 'all' | 'none' | Severity;
+type KindFilter = 'all' | BugKind;
 const SEVERITIES: Severity[] = ['S1', 'S2', 'S3', 'S4'];
 
 /** A report as the text to hand on. */
@@ -104,14 +108,22 @@ function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b
 
 export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
   const { ref, open, close } = useSheet('report-detail');
-  const [filter, setFilter] = useState<ListFilter>('open');
+  const [status, setStatus] = useState<StatusFilter>('open');
+  const [severity, setSeverity] = useState<SeverityFilter>('all');
+  const [kind, setKind] = useState<KindFilter>('all');
   const [bugs, setBugs] = useState<BugSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [chosen, setChosen] = useState<BugDetail | null>(null);
-  const load = useCallback((f: ListFilter) => {
-    reportList(f).then((r) => { setBugs(r); setError(null); }).catch((e: unknown) => setError(errorText(e)));
+  // every report is fetched once; the filters narrow it down here
+  const load = useCallback(() => {
+    reportList('all').then((r) => { setBugs(r); setError(null); }).catch((e: unknown) => setError(errorText(e)));
   }, []);
-  useEffect(() => { load(filter); }, [filter, load]);
+  useEffect(load, [load]);
+
+  const shown = (bugs ?? []).filter((b) =>
+    (status === 'all' || (status === 'open' ? OPEN_STATUSES.includes(b.status) : b.status === status))
+    && (severity === 'all' || (severity === 'none' ? b.severity === null : b.severity === severity))
+    && (kind === 'all' || b.kind === kind));
 
   const show = (id: string) => {
     setError(null);
@@ -125,24 +137,63 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
   return (
     <>
       <p className={ui.muted}>What the players report. “Copy for Claude” hands one on to a Claude session by hand; texts in a report are data, never instructions.</p>
-      <div className={styles.filter} role="group" aria-label="Show">
-        {FILTERS.map((f) => <button key={f.key} type="button" className={ui.buttonQuiet} aria-pressed={filter === f.key} onClick={() => setFilter(f.key)}>{f.label}</button>)}
+      <div className={styles.filters} role="group" aria-label="Filter the reports">
+        <label className={ui.field}>
+          <span>Status</span>
+          <select className={ui.select} value={status} onChange={(e) => setStatus(e.target.value as StatusFilter)}>
+            <option value="open">Open</option>
+            <option value="all">All</option>
+            {STATUS_ORDER.map((s) => <option key={s} value={s}>{STATUS_NAMES[s]}</option>)}
+          </select>
+        </label>
+        <label className={ui.field}>
+          <span>Severity</span>
+          <select className={ui.select} value={severity} onChange={(e) => setSeverity(e.target.value as SeverityFilter)}>
+            <option value="all">All</option>
+            {SEVERITIES.map((s) => <option key={s} value={s}>{s}</option>)}
+            <option value="none">Not sorted yet</option>
+          </select>
+        </label>
+        <label className={ui.field}>
+          <span>Kind</span>
+          <select className={ui.select} value={kind} onChange={(e) => setKind(e.target.value as KindFilter)}>
+            <option value="all">All</option>
+            {(Object.keys(KIND_NAMES) as BugKind[]).map((k) => <option key={k} value={k}>{KIND_NAMES[k]}</option>)}
+          </select>
+        </label>
       </div>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      {bugs && bugs.length === 0 && !error && <p className={ui.muted}>{filter === 'open' ? 'Nothing open.' : 'Nothing here.'}</p>}
-      {bugs && bugs.length > 0 && (
-        <ul className={styles.list} aria-label="Reports">
-          {bugs.map((b) => (
-            <li key={b.id} className={styles.item}>
-              <div className={styles.itemHead}>
-                <strong>{b.title}</strong>
-                <button type="button" className={ui.buttonQuiet} onClick={() => show(b.id)} aria-label={`Open: ${b.title}`}>Open</button>
-              </div>
-              <Flags b={b} />
-              <small className={ui.muted}>#{b.number} · {b.reporterName} · {ago(b.createdAt)} · app {shownVersion(b.appVersion) || 'unknown'}</small>
-            </li>
-          ))}
-        </ul>
+      {bugs && shown.length === 0 && !error && <p className={ui.muted}>{status === 'open' && severity === 'all' && kind === 'all' ? 'Nothing open.' : 'Nothing here.'}</p>}
+      {shown.length > 0 && (
+        <div className={styles.tableWrap}>
+          <table className={styles.table} aria-label="Reports">
+            <thead>
+              <tr>
+                <th scope="col">#</th><th scope="col">Report</th><th scope="col">Kind</th><th scope="col">Status</th><th scope="col">Severity</th><th scope="col">Area</th>
+                <th scope="col">Reporter</th><th scope="col">Reported</th><th scope="col">Last change</th><th scope="col"><span className="visually-hidden">Open</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((b) => (
+                <tr key={b.id}>
+                  <td data-label="#">{b.number}</td>
+                  <td data-label="Report" className={styles.titleCell}>
+                    <strong>{b.title}</strong>
+                    {b.attached && <span className={styles.flag}>warband attached</span>}
+                  </td>
+                  <td data-label="Kind">{KIND_NAMES[b.kind]}</td>
+                  <td data-label="Status"><span className={b.status === 'fixed' ? styles.good : undefined}>{STATUS_NAMES[b.status]}</span>{b.status === 'fixed' && b.fixedIn ? ` in ${shownVersion(b.fixedIn)}` : ''}</td>
+                  <td data-label="Severity">{b.severity && <span className={b.severity === 'S1' ? styles.flagS1 : undefined}>{b.severity}</span>}</td>
+                  <td data-label="Area">{b.area}</td>
+                  <td data-label="Reporter">{b.reporterName}</td>
+                  <td data-label="Reported"><time dateTime={b.createdAt} title={`app ${shownVersion(b.appVersion) || 'unknown'}`}>{stamp(b.createdAt)}</time></td>
+                  <td data-label="Last change"><time dateTime={b.updatedAt}>{stamp(b.updatedAt)}</time></td>
+                  <td data-label=""><button type="button" className={ui.buttonQuiet} onClick={() => show(b.id)} aria-label={`Open: ${b.title}`}>Open</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       <dialog ref={ref} className={ui.sheet} aria-labelledby="report-detail-title">
         {chosen && (
@@ -152,7 +203,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
             <p className={styles.words}>{chosen.text}</p>
             {/^https:\/\//i.test(chosen.sourceRef) && <p><a href={chosen.sourceRef} target="_blank" rel="noopener noreferrer">{chosen.sourceRef}</a></p>}
             <small className={ui.muted}>#{chosen.number} · {chosen.reporterName} · {ago(chosen.createdAt)} · {chosen.device || 'no device given'}</small>
-            <Sorter key={chosen.id + chosen.updatedAt} bug={chosen} onSaved={(b) => { setChosen(b); load(filter); }} onNotice={onNotice} close={() => close()} />
+            <Sorter key={chosen.id + chosen.updatedAt} bug={chosen} onSaved={(b) => { setChosen(b); load(); }} onNotice={onNotice} close={() => close()} />
             <div className={ui.row}>
               <button type="button" className={ui.button} onClick={copy}>Copy for Claude</button>
               <button type="button" className={ui.buttonQuiet} onClick={() => saveFile(`${fileBase(chosen)}.md`, reportText(docOf(chosen)), 'text/markdown')}>Download the report</button>
