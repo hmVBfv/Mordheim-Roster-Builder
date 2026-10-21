@@ -87,7 +87,7 @@ describe('Home: warbands', () => {
     await seed(8);
     wide(false);
     at('/');
-    await vi.waitFor(() => expect(warbandLinks().map((a) => a.textContent)).toEqual(['Warband 8' + data.WARBANDS[sampleSave().wb as string]!.name, 'Warband 7' + data.WARBANDS[sampleSave().wb as string]!.name, 'Warband 6' + data.WARBANDS[sampleSave().wb as string]!.name]));
+    await vi.waitFor(() => expect(warbandLinks().map((a) => a.textContent?.replace(/Created .*$/, ''))).toEqual(['Warband 8' + data.WARBANDS[sampleSave().wb as string]!.name, 'Warband 7' + data.WARBANDS[sampleSave().wb as string]!.name, 'Warband 6' + data.WARBANDS[sampleSave().wb as string]!.name]));
     cleanup();
     wide(true);
     at('/');

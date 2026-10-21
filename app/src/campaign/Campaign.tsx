@@ -373,8 +373,10 @@ export function Campaign() {
     : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
     : chronicle ? <ChronicleTab id={id} view={view} lead={lead && user.totp} />
     : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />;
+  // the tabs of text and forms keep a measure; those of cards and lists (overview, warbands, world) take the whole width
+  const prose = manage || notes || timeline || chronicle || questions || background || asPlayer;
   return (
-    <section className={ui.page}>
+    <section className={`${ui.page} ${prose ? ui.measure : ''}`}>
       <header>
         <h1>{view.campaign.name}</h1>
         <p className={ui.muted}>{roundName(view.campaign.round)} · you are {view.role === 'viewer' ? 'watching' : ROLE_NAMES[view.role].toLowerCase()}</p>
