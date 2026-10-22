@@ -3,7 +3,7 @@
    its first battle (V4–V7). Kept apart from React so it can be tested. */
 import * as core from '@mordheim/core';
 import type { CatalogItem, Model, WarbandState } from '@mordheim/core';
-import { priceAverage, priceText } from './rarePrice.ts';
+import { priceAverage, priceRange, priceText } from './rarePrice.ts';
 
 const CATS: Record<string, string> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour', Besonderes: 'Other', 'Besonderes (nur Heldinnen)': 'Other (Heroines only)' };
 export const KINDS = [['all', 'All'], ['cc', 'Close'], ['missile', 'Missile'], ['armour', 'Armour'], ['misc', 'Other']] as const;
@@ -176,7 +176,7 @@ export function searchers(ctx: core.Ctx): Searcher[] {
   });
 }
 
-export interface RareItem { de: string; name: string; kind: Kind; rarity: number; /** with its unit: "35 gc", "20+1D6 gc" */ price: string; /** what a dice price comes to on average */ avg: number | null; fixed: number | null; text: string; usable: boolean }
+export interface RareItem { de: string; name: string; kind: Kind; rarity: number; /** with its unit: "35 gc", "20+1D6 gc" */ price: string; /** what a dice price comes to on average */ avg: number | null; /** lowest and highest a dice price can come to */ range: [number, number] | null; fixed: number | null; text: string; usable: boolean }
 
 /** Rare items the warband may find: those the catalogue keeps for it (or for
     nobody in particular), with whether someone here may carry one. With `everything`, those kept for other warbands as well. */
@@ -189,7 +189,7 @@ export function rareItems(ctx: core.Ctx, everything = false): RareItem[] {
     // what the catalogue keeps for other warbands is listed only when everything is asked for (#27), marked as unusable here
     if (it.only && !allowedSomewhere && !everything) continue;
     const usable = ctx.s.models.some((m) => core.canReceive(ctx, m.uid, { key: it.de, rare: true }).ok);
-    out.push({ de: it.de, name: it.en, kind: KIND_OF[it.cat] ?? 'misc', rarity: r, price: priceText(it.cost), avg: priceAverage(it.cost), fixed: typeof it.cost === 'number' ? it.cost : null, text: itemText(ctx.data, it.en), usable });
+    out.push({ de: it.de, name: it.en, kind: KIND_OF[it.cat] ?? 'misc', rarity: r, price: priceText(it.cost), avg: priceAverage(it.cost), range: priceRange(it.cost), fixed: typeof it.cost === 'number' ? it.cost : null, text: itemText(ctx.data, it.en), usable });
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
