@@ -1,6 +1,6 @@
 /* How a rare item's price is written (wish #24): always with its unit, a dice price with what it comes to on average. */
 import { describe, expect, it } from 'vitest';
-import { priceAverage, priceText } from './rarePrice.ts';
+import { priceAverage, priceRange, priceText } from './rarePrice.ts';
 
 describe('priceText', () => {
   it('says gc for a fixed price and for a dice price alike', () => {
@@ -32,5 +32,19 @@ describe('priceAverage', () => {
     expect(priceAverage('30 (Paar 60)')).toBeNull();
     expect(priceAverage('4× Preis')).toBeNull();
     expect(priceAverage('+15/+20')).toBeNull();
+  });
+});
+
+describe('priceRange', () => {
+  it('runs from the lowest to the highest the dice allow (wish #29)', () => {
+    expect(priceRange('20+1D6')).toEqual([21, 26]);
+    expect(priceRange('50+2D6')).toEqual([52, 62]);
+    expect(priceRange('100+D6×10')).toEqual([110, 160]);
+    expect(priceRange('25+1D6 (Paar 46+2D6)')).toEqual([26, 31]);
+  });
+  it('is nothing for a fixed price or one that is not dice', () => {
+    expect(priceRange(35)).toBeNull();
+    expect(priceRange('4× Preis')).toBeNull();
+    expect(priceRange('+15/+20')).toBeNull();
   });
 });
