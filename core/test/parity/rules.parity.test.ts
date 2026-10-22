@@ -15,6 +15,10 @@ import { rng } from '../support/random.ts';
 
 const data = loadGameData();
 const fixtures = generateFixtures(data);
+/* Intended difference (docs/behaviour-changes.md, "Zauberer-Gegenstände"): items for
+   spellcasters only are offered to whoever casts from a spell list; legacy knew
+   only a `magic` key that no unit has. Left out of the comparison, nothing else. */
+const casterItems = new Set(data.CATALOG.filter((it) => it.only?.casters).map((it) => it.de));
 let L: Legacy;
 
 beforeAll(async () => { L = await loadLegacy(); });
@@ -188,7 +192,7 @@ function report(c: Calc): Record<string, unknown> {
       surcharge: c.henchRecruitSurcharge(m), recruitCost: c.henchRecruitCost(m), loss: c.lossValueOf(m),
       eqMarket: c.eqMarketValue(m), market: c.modelMarketValue(m), worthAdv: c.worthAdvOf(m),
       sv: c.svOfModel(m), limit: c.eqWeaponLimit(m), heirloom: c.heirloomDiscount(m), rareCost: c.rareCost(m),
-      rareEligible: c.rareEligibleItems(m).map((it) => it.de),
+      rareEligible: c.rareEligibleItems(m).map((it) => it.de).filter((de) => !casterItems.has(de)),
       weapons,
       upgradesByWeapon: weapons.map((w) => c.weaponUpgradesFor(m, w.nm).map((x) => x.de)),
       upgradeTargets: upgradeKeys.map((de) => c.upgradeTargets(m, de).map((w) => w.nm)),
