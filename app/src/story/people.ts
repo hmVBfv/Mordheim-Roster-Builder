@@ -28,7 +28,7 @@ export function peopleOf(data: GameData, s: WarbandState): Person[] {
     const p = core.profileOf(model(w.uid));
     out.push({ key: w.key, uid: w.uid, name: w.name, sub: p.title_en || w.type, group: 'hero', profile: p });
   }
-  for (const w of v.henchmen) out.push({ key: w.key, uid: w.uid, name: w.name, sub: `${w.count} × ${w.type}`, group: 'group', profile: {} });
+  for (const w of v.henchmen) out.push({ key: w.key, uid: w.uid, name: w.name, sub: `${w.count} × ${w.type}`, group: 'group', profile: core.profileOf(model(w.uid)) });
   for (const h of v.hires) {
     const rec = [...(s.hired ?? []), ...(s.dp ?? [])].find((x) => x.uid === h.uid);
     const p = core.profileOf(rec);
