@@ -178,6 +178,8 @@ export function houseDeviations(ctx: Ctx): { key: string; label: string; value: 
       let v: unknown = h[k];
       if (k === 'eqLimitOn') v = h[k] ? 'enforced' : 'NOT enforced (equipment beyond the list allowed)';
       else if (k === 'hireNewLeader') v = h[k] ? 'allowed (may re-hire a leader after the original is slain)' : null;
+      else if (k === 'startGoldPlus') v = `+${String(v)} gc`;
+      else if (k === 'startGoldPct') v = `+${String(v)} % (rounded up)`;
       else if (typeof v === 'boolean') v = v ? 'on' : 'off';
       else if (v && typeof v === 'object') {
         const o = v as Record<string, unknown>;

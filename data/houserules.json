@@ -1,6 +1,8 @@
 {
  "HR_LABELS": {
   "startGold": "Starting gold",
+  "startGoldPlus": "Starting gold: extra for every warband",
+  "startGoldPct": "Starting gold: raised for every warband",
   "min": "Min. models",
   "max": "Max. models",
   "heroes": "Max. Heroes",

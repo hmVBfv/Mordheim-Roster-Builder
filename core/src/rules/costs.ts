@@ -89,13 +89,28 @@ export function lossValueOf(ctx: Ctx, m: Model | null | undefined): number {
   return modelUnitCost(ctx, { ...m, qty: 1 }) + (Number(m.xpPaid) || 0);
 }
 
-export function startGold(ctx: Ctx): number {
-  const h = houseRules(ctx.s);
-  if (h && h.startGold !== '' && h.startGold != null && !isNaN(Number(h.startGold))) return Number(h.startGold);
+/** What a warband starts with by the rules: its own gold, its subtype's if it has one. */
+function ownStartGold(ctx: Ctx): number {
   const wb = warbandDef(ctx);
   if (!wb) return 500;
   const sub = ctx.s.subtype && wb.subtypes ? wb.subtypes.find((x) => x.key === ctx.s.subtype) : undefined;
   return sub && sub.gold != null ? sub.gold : wb.gold || 500;
+}
+
+const given = (v: unknown): v is number | string => v !== '' && v != null && !isNaN(Number(v));
+
+/** The starting gold. The house rule has three forms (report #36, Rob 22.10.2026): the same for everybody (`startGold`, as in the
+    Roster Builder), so much more for everybody (`startGoldPlus`), or so many percent more (`startGoldPct`, rounded up to the next
+    full gc) – the last two from what each warband starts with. The app keeps only one of them on; if several are set, the first
+    of these wins. */
+export function startGold(ctx: Ctx): number {
+  const h = houseRules(ctx.s);
+  if (h && given(h.startGold)) return Number(h.startGold);
+  const base = ownStartGold(ctx);
+  if (h && given(h.startGoldPlus)) return base + Number(h.startGoldPlus);
+  // whole numbers until the division, so that 500 gc and 10 % is 550 and not 550.0000000000001 rounded up
+  if (h && given(h.startGoldPct)) return Math.ceil((base * (100 + Number(h.startGoldPct))) / 100);
+  return base;
 }
 
 /** The treasury as stored; empty means starting gold. */

@@ -10,6 +10,7 @@ import * as core from '../../src/index.ts';
 import type { HireEntry, HireRecord, Model, WarbandState } from '../../src/index.ts';
 import { loadGameData } from '../../src/node.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
+import { withoutNewHouseKeys } from '../support/canon.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng } from '../support/random.ts';
 
@@ -146,7 +147,7 @@ function coreCalc(s: WarbandState): Calc {
       itemHalf: data.CATALOG.map((it) => core.itemHalfActive(ctx, it.en)),
       hsGrades: data.HS_GRADE_ORDER.map((g) => [core.hsGradeIdx(ctx, g), core.hsGradeAllowed(ctx, g)]),
       dpGrades: data.DP_GRADE_ORDER.map((g) => core.dpGradeAllowed(ctx, g)),
-      house: core.houseRules(s), houseActive: core.houseActive(s),
+      house: withoutNewHouseKeys(core.houseRules(s)), houseActive: core.houseActive(s),
     }),
     hireRec: (r) => {
       const ent = core.entryOf(ctx, r);
