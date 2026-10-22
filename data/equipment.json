@@ -25,7 +25,18 @@
    "cat": "cc",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Eisenkugel & Kette",
@@ -184,7 +195,18 @@
    "cat": "cc",
    "cost": 2,
    "rare": "Common",
-   "wb": "1st free"
+   "wb": "1st free",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Dark-Elf-Klinge",
@@ -219,7 +241,18 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Zwergenaxt",
@@ -259,7 +292,18 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Great Axe",
@@ -281,7 +325,14 @@
    "cat": "cc",
    "cost": "4× Preis",
    "rare": "Rare 11",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Hellebarde",
@@ -289,7 +340,18 @@
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Hammer",
@@ -305,7 +367,14 @@
    "cat": "cc",
    "cost": 12,
    "rare": "Rare 10",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "empire-in-flames"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart"
+   ]
   },
   {
    "de": "Ithilmar-Waffe",
@@ -313,7 +382,16 @@
    "cat": "cc",
    "cost": "3× Preis",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Katar",
@@ -355,7 +433,16 @@
    "cat": "cc",
    "cost": 40,
    "rare": "Rare 8",
-   "wb": "cavalry only"
+   "wb": "cavalry only",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Streitkolben",
@@ -384,7 +471,16 @@
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Obsidianwaffe",
@@ -430,7 +526,14 @@
      "tileans",
      "caravans/sellsword"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Rapier",
@@ -481,7 +584,18 @@
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Stachelhandschuh",
@@ -543,7 +657,18 @@
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Schwertbrecher",
@@ -621,7 +746,14 @@
      "forestgoblins",
      "reavers/conqueror,slayer,beastmaster,shadow,trapmaster"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Bolas",
@@ -635,7 +767,14 @@
      "lizardmen",
      "amazonslustria"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Bogen",
@@ -643,7 +782,18 @@
    "cat": "missile",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Armbrust",
@@ -651,7 +801,18 @@
    "cat": "missile",
    "cost": 25,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Armbrustpistole",
@@ -659,7 +820,18 @@
    "cat": "missile",
    "cost": 35,
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Elfenbogen",
@@ -667,7 +839,16 @@
    "cat": "missile",
    "cost": "35+3D6",
    "rare": "Rare 12",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Javelin",
@@ -684,7 +865,16 @@
      "lizardmen/skinkpriest,greatcrest,skinkbrave",
      "reavers/conqueror,slayer,beastmaster,shadow,trapmaster"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Langbogen",
@@ -692,7 +882,16 @@
    "cat": "missile",
    "cost": 15,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Nehekharan-Javelin",
@@ -713,7 +912,18 @@
    "cat": "missile",
    "cost": 40,
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Kurzbogen",
@@ -721,7 +931,16 @@
    "cat": "missile",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Schleuder",
@@ -729,7 +948,18 @@
    "cat": "missile",
    "cost": 2,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Sonnenhandschuh",
@@ -797,7 +1027,18 @@
    "cat": "bp",
    "cost": 30,
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Fangstange",
@@ -859,7 +1100,14 @@
      "battlemonks",
      "maneaters/captain"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Kampfstab",
@@ -972,7 +1220,14 @@
     "wb": [
      "cavalcade/aristocrat"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "empire-in-flames"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart"
+   ]
   },
   {
    "de": "Banner des Adelshauses",
@@ -1285,7 +1540,14 @@
      "gunnery",
      "ostlander/jaeger"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "DL-Duellpistole",
@@ -1319,7 +1581,18 @@
    "cat": "bp",
    "cost": "30 (Paar 60)",
    "rare": "Rare 10",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Handmörser",
@@ -1333,7 +1606,14 @@
      "gunnery",
      "maneaters"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Handfeuerwaffe",
@@ -1341,7 +1621,18 @@
    "cat": "bp",
    "cost": 35,
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Brieftaubenbomben",
@@ -1362,7 +1653,14 @@
    "cat": "bp",
    "cost": 200,
    "rare": "Rare 11",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Ostländer DL-Jagdbüchse",
@@ -1396,7 +1694,18 @@
    "cat": "bp",
    "cost": "15 (Paar 30)",
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Repetier-Handfeuerwaffe",
@@ -1496,7 +1805,18 @@
    "cat": "armour",
    "cost": 20,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Schwere Rüstung",
@@ -1504,7 +1824,16 @@
    "cat": "armour",
    "cost": 50,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Toughened Leathers",
@@ -1512,7 +1841,14 @@
    "cat": "armour",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Schild",
@@ -1520,7 +1856,18 @@
    "cat": "armour",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Buckler",
@@ -1528,7 +1875,18 @@
    "cat": "armour",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Helm",
@@ -1536,7 +1894,18 @@
    "cat": "armour",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Kochtopf-Helm",
@@ -1557,7 +1926,18 @@
    "cat": "armour",
    "cost": 90,
    "rare": "Rare 11",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Gromril-Rüstung",
@@ -1565,7 +1945,16 @@
    "cat": "armour",
    "cost": 150,
    "rare": "Rare 11",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Chaosrüstung",
@@ -1592,7 +1981,14 @@
    "cat": "armour",
    "cost": 25,
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Rossharnisch (Barding)",
@@ -1600,7 +1996,18 @@
    "cat": "armour",
    "cost": 80,
    "rare": "Rare 8",
-   "wb": "Warhorses only"
+   "wb": "Warhorses only",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "empire-in-flames",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Bretonnischer Rossharnisch",
@@ -1621,7 +2028,18 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Glücksbringer",
@@ -1629,7 +2047,18 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 6",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Laterne",
@@ -1637,7 +2066,18 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Fackel",
@@ -1645,7 +2085,16 @@
    "cat": "misc",
    "cost": 2,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "empire-in-flames"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart"
+   ]
   },
   {
    "de": "Netz",
@@ -1653,7 +2102,18 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Jagdpfeile",
@@ -1661,7 +2121,18 @@
    "cat": "misc",
    "cost": "25+1D6",
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Geweihtes Wasser",
@@ -1676,7 +2147,16 @@
      "restless",
      "tombguardians"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Heiliges/Unheiliges Relikt",
@@ -1684,7 +2164,18 @@
    "cat": "misc",
    "cost": "15+3D6",
    "rare": "Rare 8",
-   "wb": "Rare 6 for Warrior-Priests/Sisters"
+   "wb": "Rare 6 for Warrior-Priests/Sisters",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Heiliger Foliant",
@@ -1727,7 +2218,14 @@
      "darkelves",
      "shadowwarriors"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Cathay-Seidenkleidung",
@@ -1738,7 +2236,14 @@
    "cat": "misc",
    "cost": "50+2D6",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Elfenumhang",
@@ -1769,7 +2274,14 @@
      "restless",
      "tombguardians"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Halbling-Kochbuch",
@@ -1785,7 +2297,14 @@
      "tombguardians",
      "carnival"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Banner",
@@ -1793,7 +2312,14 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 5",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Krähenfüße",
@@ -1801,7 +2327,14 @@
    "cat": "misc",
    "cost": "15+2D6",
    "rare": "Rare 6",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Feuerpfeile",
@@ -1809,7 +2342,14 @@
    "cat": "misc",
    "cost": "30+1D6",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Feuerbombe",
@@ -1817,7 +2357,14 @@
    "cat": "misc",
    "cost": "35+2D6",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Blitzpulver",
@@ -1825,7 +2372,14 @@
    "cat": "misc",
    "cost": "25+2D6",
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Eisenbeschlagene Stiefel",
@@ -1841,7 +2395,14 @@
    "cat": "misc",
    "cost": 15,
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "empire-in-flames"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart"
+   ]
   },
   {
    "de": "Mordheim-Karte",
@@ -1857,7 +2418,14 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 5",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Tarotkarten",
@@ -1879,7 +2447,14 @@
    "cat": "misc",
    "cost": "75+3D6",
    "rare": "Rare 10",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Kriegshorn",
@@ -1887,7 +2462,14 @@
    "cat": "misc",
    "cost": "30+2D6",
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Überlegenes Schwarzpulver",
@@ -1895,7 +2477,18 @@
    "cat": "misc",
    "cost": 30,
    "rare": "Rare 11",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Opulente Kutsche",
@@ -1903,7 +2496,14 @@
    "cat": "misc",
    "cost": 250,
    "rare": "Rare 10",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Hexenhammer",
@@ -1938,7 +2538,18 @@
    "cat": "misc",
    "cost": "35+1D6",
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Dunkles Gift",
@@ -1960,7 +2571,16 @@
    "cat": "misc",
    "cost": "20+2D6",
    "rare": "Rare 8",
-   "wb": "Common for Amazons (Lustria)"
+   "wb": "Common for Amazons (Lustria)",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Mad-Cap-Pilze",
@@ -1968,7 +2588,14 @@
    "cat": "misc",
    "cost": "30+3D6",
    "rare": "Rare 9",
-   "wb": "Common if warband includes Goblins"
+   "wb": "Common if warband includes Goblins",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Alraunenwurzel",
@@ -1976,7 +2603,16 @@
    "cat": "misc",
    "cost": "25+1D6",
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Tränen der Shallaya",
@@ -1992,7 +2628,16 @@
      "restless",
      "tombguardians"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "khemri",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Reptiliengift",
@@ -2108,7 +2753,14 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Lampe des Dschinn",
@@ -2116,7 +2768,14 @@
    "cat": "misc",
    "cost": "50+2D6",
    "rare": "Rare 12",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Affenpfote",
@@ -2124,7 +2783,14 @@
    "cat": "misc",
    "cost": "50+1D6",
    "rare": "Rare 10",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Fliegender Teppich",
@@ -2132,7 +2798,14 @@
    "cat": "misc",
    "cost": "50+4D6",
    "rare": "Rare 12",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Magischer Kürbis",
@@ -2140,7 +2813,14 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 7",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Nehekharan-Karte",
@@ -2148,7 +2828,14 @@
    "cat": "misc",
    "cost": "20+4D6",
    "rare": "Rare 10",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Nomadenrobe",
@@ -2156,7 +2843,14 @@
    "cat": "misc",
    "cost": 25,
    "rare": "Rare 8",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Skorpionring",
@@ -2164,7 +2858,14 @@
    "cat": "misc",
    "cost": "10+1D6",
    "rare": "Rare 11",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Schlangenbeschwörer-Flöte",
@@ -2172,7 +2873,14 @@
    "cat": "misc",
    "cost": "10+1D6",
    "rare": "Rare 9",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Giftring",
@@ -2180,7 +2888,14 @@
    "cat": "misc",
    "cost": "20+1D6",
    "rare": "Rare 10",
-   "wb": "(Arabian/Khemri)"
+   "wb": "(Arabian/Khemri)",
+   "settings": [
+    "core",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Magische Gubbinz",
@@ -2533,7 +3248,14 @@
     "wb": [
      "skavenpest"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "lustria"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
+   ]
   },
   {
    "de": "Skelettstreitwagen",
@@ -2554,7 +3276,14 @@
    "cat": "misc",
    "cost": 200,
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "empire-in-flames"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart"
+   ]
   },
   {
    "de": "Flussboot",
@@ -2562,7 +3291,14 @@
    "cat": "misc",
    "cost": 100,
    "rare": "Rare 8",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "empire-in-flames"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart"
+   ]
   },
   {
    "de": "Ruderboot",
@@ -2586,7 +3322,14 @@
    "cat": "armour",
    "cost": 120,
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Buch der Toten",
@@ -2608,7 +3351,14 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Knallfrösche",
@@ -2616,7 +3366,14 @@
    "cat": "misc",
    "cost": 20,
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Große Leiter",
@@ -2632,7 +3389,14 @@
    "cat": "misc",
    "cost": "20+4D6",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Mantikor-Fährte",
@@ -2640,7 +3404,14 @@
    "cat": "misc",
    "cost": "30+2D6",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Spinnenspucke",
@@ -2648,7 +3419,14 @@
    "cat": "misc",
    "cost": "30+D6",
    "rare": "Rare 7",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Pulverfass",
@@ -2656,7 +3434,14 @@
    "cat": "misc",
    "cost": 15,
    "rare": "Rare 7",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Regenmantel",
@@ -2664,7 +3449,14 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Rosenkranz",
@@ -2672,7 +3464,14 @@
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 6",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Kleine Leiter",
@@ -2688,7 +3487,14 @@
    "cat": "misc",
    "cost": "30+2D6",
    "rare": "Rare 10",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Warhorse",
@@ -2702,7 +3508,16 @@
     "notWb": [
      "caravans/merchant,apprentice,magician"
     ]
-   }
+   },
+   "settings": [
+    "core",
+    "empire-in-flames",
+    "khemri"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
+   ]
   },
   {
    "de": "Rikscha",
@@ -2721,7 +3536,14 @@
    "cat": "misc",
    "cost": 8,
    "rare": "Common",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Schubkarre",
@@ -2729,7 +3551,14 @@
    "cat": "misc",
    "cost": 5,
    "rare": "Rare 5",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Winterpelze",
@@ -2765,7 +3594,14 @@
    "cat": "misc",
    "cost": "25+3D6",
    "rare": "Rare 9",
-   "wb": ""
+   "wb": "",
+   "settings": [
+    "core",
+    "border-town-burning"
+   ],
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
+   ]
   },
   {
    "de": "Mule",
@@ -2791,6 +3627,24 @@
    "cost": 40,
    "rare": "Rare 8",
    "wb": "",
+   "settings": [
+    "empire-in-flames"
+   ],
+   "grade": null,
+   "source": [
+    "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames/price-chart#miscellaneous-equipment"
+   ]
+  },
+  {
+   "de": "Horse (Empire in Flames)",
+   "en": "Horse (Empire in Flames)",
+   "cat": "misc",
+   "cost": 80,
+   "rare": "Rare 11",
+   "wb": "Humans only",
+   "only": {
+    "human": true
+   },
    "settings": [
     "empire-in-flames"
    ],
@@ -3069,11 +3923,15 @@
     ]
    },
    "settings": [
-    "core"
+    "core",
+    "khemri",
+    "lustria"
    ],
    "grade": "core",
    "source": [
-    "https://mordheimer.net/docs/trading-post"
+    "https://mordheimer.net/docs/trading-post",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
+    "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
    ]
   },
   {
@@ -4173,6 +5031,17 @@
   "DL-Duellpistole": 65
  },
  "ITEMINFO": [
+  [
+   {
+    "__re": "^horse\\ \\(empire\\ in\\ flames\\)$",
+    "__f": "i"
+   },
+   {
+    "name": "Horse (Empire in Flames)",
+    "line": "Miscellaneous · 80 gc · Rare 11",
+    "text": "A trained riding horse, sold on the Empire in Flames price chart next to the Warhorse at the same price and rarity; for humans only. The page gives no profile of its own: the riding rules (Ride skill, led and unled animals, bolting) are those of Mounted Warriors, the riding bonus the normal +1 armour save."
+   }
+  ],
   [
    {
     "__re": "^mule$",

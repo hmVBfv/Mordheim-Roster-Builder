@@ -230,12 +230,25 @@ test('the rare items are readable on a narrow phone: a price says gc, the texts 
       }
       const box = row.getBoundingClientRect();
       if (box.right > window.innerWidth + 1) problems.push(`wider than the screen: ${text.slice(0, 40)}`);
+      // what the row holds must lie inside the row, or it runs over the next one
+      for (const b of boxes) if (b.r.bottom > box.bottom + 1 || b.r.top < box.top - 1) problems.push(`runs out of its row: "${b.t}" in ${text.slice(0, 30)}`);
+      // and the rows lie one under the other
+      const next = row.closest('li')?.nextElementSibling?.querySelector('button') ?? row.nextElementSibling;
+      if (next && next.getBoundingClientRect().top < box.bottom - 1) problems.push(`row overlaps the next: ${text.slice(0, 30)}`);
     }
     return { count: rows.length, problems };
   }, selector); };
   const list = await inspect('section[aria-label="Search for rare items"] ul li button');
   expect(list.count).toBeGreaterThan(5);
   expect(list.problems).toEqual([]);
+  // by the campaign it was released with: the list shrinks, says where the items come from, and still reads well
+  const all = await page.getByText(/\d+ of \d+ shown/).first().textContent();
+  await page.getByLabel('Released with').first().selectOption('border-town-burning');
+  const bt = await inspect('section[aria-label="Search for rare items"] ul li button');
+  expect(bt.count).toBeGreaterThan(0);
+  expect(bt.problems).toEqual([]);
+  expect(await page.getByText(/\d+ of \d+ shown/).first().textContent()).not.toBe(all);
+  await page.getByLabel('Released with').first().selectOption('');
   await page.getByRole('heading', { name: 'What can be found' }).scrollIntoViewIfNeeded();
   await page.evaluate(() => window.scrollBy(0, 560));
   await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-rare-468.png` });
@@ -247,6 +260,11 @@ test('the rare items are readable on a narrow phone: a price says gc, the texts 
   const sheet = await inspect('dialog[open] [role=group][aria-label="Rare items"] button');
   expect(sheet.count).toBeGreaterThan(5);
   expect(sheet.problems).toEqual([]);
+  // a phone of 390 px, where it was reported
+  await page.setViewportSize({ width: 390, height: 844 });
+  const narrow = await inspect('dialog[open] [role=group][aria-label="Rare items"] button');
+  expect(narrow.problems).toEqual([]);
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-rare-sheet-390.png` });
   await noSideScroll(page);
 });
 

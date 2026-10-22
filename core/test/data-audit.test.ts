@@ -236,7 +236,24 @@ describe('the items of every campaign and grade', () => {
   it('has every item once, with its own tooltip', () => {
     const names = data.CATALOG.map((x) => x.en.toLowerCase());
     expect(new Set(names).size).toBe(names.length);
-    for (const x of found) expect(core.itemInfo(data, x.en)?.name, x.en).toBe(x.en);
+    // (an item of the core chart that a setting's chart lists as well keeps the core chart's tooltip, which may name it in the singular)
+    for (const x of found.filter((y) => !y.settings!.includes('core'))) expect(core.itemInfo(data, x.en)?.name, x.en).toBe(x.en);
+  });
+
+  /* Rob, 22.10.2026: "alle auf Mordheimer gefuehrten Items verfuegbar, ggf. mit Auswahl ueber die Kampagne". Every item of the
+     price charts of the four campaign settings is in the catalogue, and says which settings list it. */
+  it('says for every item of a setting\'s price chart that it is listed there, and keeps the core chart\'s items marked as core', () => {
+    const by = (n: string) => data.CATALOG.find((x) => x.en === n)!;
+    expect(by('Mule').settings).toEqual(['border-town-burning', 'empire-in-flames']);
+    expect(by('Horse (Empire in Flames)')).toMatchObject({ cost: 80, rare: 'Rare 11', only: { human: true }, settings: ['empire-in-flames'] });
+    // the Warhorse is in the core chart and in the charts of the settings that list it
+    expect(by('Warhorse').settings).toEqual(expect.arrayContaining(['core', 'empire-in-flames']));
+    // Khemri's and Lustria's charts list items of the core chart: they are found under those settings too
+    const listed = (s: string) => data.CATALOG.filter((x) => x.settings?.includes(s));
+    expect(listed('khemri').length).toBeGreaterThan(20);
+    expect(listed('lustria').length).toBeGreaterThan(20);
+    expect(listed('border-town-burning').length).toBeGreaterThan(40);
+    for (const x of data.CATALOG.filter((y) => y.settings?.some((s) => ['khemri', 'lustria'].includes(s)))) expect(x.source?.some((u) => /(khemri|lustria)\//.test(u)), x.en).toBe(true);
   });
 
   it('carries what the settings add: mounts, animals, the Merchant\'s dealings, a wardog', () => {
