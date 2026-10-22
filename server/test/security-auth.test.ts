@@ -209,7 +209,7 @@ describe('links, cookies and admins', () => {
     s.clock.advance(60 * MIN);
     const r = await s.call({ url: '/api/v1/auth/me', token });
     expect(cookieOf(r)).toBe(token);
-    expect(String(r.headers['set-cookie'])).toMatch(/Max-Age=7776000/);
+    expect(String(r.headers['set-cookie'])).toMatch(/Max-Age=2592000/);
   });
 
   it('AUTH-16: an admin account is not reset through the app – only with roster-cli on the Pi', async () => {

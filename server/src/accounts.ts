@@ -7,7 +7,11 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import type { DB } from './db.ts';
 import { notifyAudit } from './live.ts';
 
-export const SESSION_DAYS = 90;
+/** A device nobody has used for this long is signed out (Rob, 22.10.2026). */
+export const SESSION_DAYS = 30;
+/** More open devices than this, and those idle for IDLE_DAYS go at the next sign-in. */
+export const DEVICES_KEPT = 5;
+export const IDLE_DAYS = 7;
 /** How long the authenticator's code may take after the password. */
 export const TOTP_STAGE_MINUTES = 5;
 export const INVITE_DAYS = 7;
@@ -96,6 +100,8 @@ export function createSession(db: DB, s: { userId: string; stage: 'totp' | 'full
 export function sessionByToken(db: DB, token: string, now: Date): { session: SessionRow; user: UserRow } | null {
   const session = db.prepare('SELECT * FROM sessions WHERE token_hash = ?').get(hashToken(token)) as SessionRow | undefined;
   if (!session || session.revoked_at || session.expires_at <= iso(now)) return null;
+  // sessions made while the limit was 90 days still end 30 days after their last use
+  if (session.stage === 'full' && now.getTime() - Date.parse(session.last_seen_at) > SESSION_DAYS * DAY) return null;
   const user = userById(db, session.user_id);
   if (!user || user.disabled_at) return null;
   return { session, user };
@@ -122,6 +128,21 @@ export function revokeSession(db: DB, id: string, now: Date): void {
 /** Ends every session of a user, except `keep`. Returns how many. */
 export function revokeUserSessions(db: DB, userId: string, now: Date, keep?: string): number {
   return db.prepare('UPDATE sessions SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL AND id IS NOT ?').run(iso(now), userId, keep ?? null).changes;
+}
+
+/** Over DEVICES_KEPT open devices, ends those idle for IDLE_DAYS, the longest idle first, until DEVICES_KEPT are left; `keep` (the device just signed in) never goes. How many ended. */
+export function pruneDevices(db: DB, userId: string, keep: string, now: Date): number {
+  const rows = db.prepare("SELECT id, last_seen_at FROM sessions WHERE user_id = ? AND revoked_at IS NULL AND expires_at > ? AND stage = 'full' ORDER BY last_seen_at ASC, created_at ASC").all(userId, iso(now)) as { id: string; last_seen_at: string }[];
+  let over = rows.length - DEVICES_KEPT;
+  const idleBefore = now.getTime() - IDLE_DAYS * DAY;
+  let n = 0;
+  for (const r of rows) {
+    if (over <= 0) break;
+    if (r.id === keep || Date.parse(r.last_seen_at) > idleBefore) continue;
+    revokeSession(db, r.id, now);
+    over--; n++;
+  }
+  return n;
 }
 
 export interface SessionSummary { id: string; device: string; createdAt: string; lastSeenAt: string; current: boolean }

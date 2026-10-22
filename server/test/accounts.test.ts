@@ -52,7 +52,7 @@ describe('the first admin', () => {
 });
 
 describe('signing in', () => {
-  it('without an authenticator: one step, a cookie for 90 days, and /me knows the user', async () => {
+  it('without an authenticator: one step, a cookie for 30 days, and /me knows the user', async () => {
     const s = await startAccounts();
     await s.user('player');
     const res = await login(s, 'PLAYER');
@@ -60,7 +60,7 @@ describe('signing in', () => {
     const header = String(res.headers['set-cookie']);
     expect(header).toMatch(/HttpOnly/);
     expect(header).toMatch(/SameSite=Lax/);
-    expect(header).toMatch(/Max-Age=7776000/);
+    expect(header).toMatch(/Max-Age=2592000/);
     // http in the tests; Secure only behind https
     expect(header).not.toMatch(/Secure/);
     const me = await s.call({ url: '/api/v1/auth/me', token: cookieOf(res) });
@@ -138,15 +138,15 @@ describe('signing in', () => {
     expect((await s.call({ url: '/api/v1/auth/totp', body: { code: codes[4] }, token: b })).statusCode).toBe(200);
   });
 
-  it('a session lives 90 days from its last use; signing in again ends the one before on this device', async () => {
+  it('a session lives 30 days from its last use; signing in again ends the one before on this device', async () => {
     const s = await startAccounts();
     await s.user('player');
     const token = cookieOf(await login(s, 'player'))!;
-    s.clock.advance(80 * DAY);
+    s.clock.advance(25 * DAY);
     expect((await s.call({ url: '/api/v1/auth/me', token })).json()).toMatchObject({ user: { username: 'player' } });
-    s.clock.advance(80 * DAY);
+    s.clock.advance(25 * DAY);
     expect((await s.call({ url: '/api/v1/auth/me', token })).json()).toMatchObject({ user: { username: 'player' } });
-    s.clock.advance(91 * DAY);
+    s.clock.advance(31 * DAY);
     expect((await s.call({ url: '/api/v1/auth/me', token })).json()).toEqual({ user: null, pending: false });
 
     const one = cookieOf(await login(s, 'player'))!;
