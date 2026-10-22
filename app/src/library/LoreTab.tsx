@@ -8,7 +8,7 @@ import { newId } from '../db/ids.ts';
 import ui from '../ui/ui.module.css';
 import { putFaction, putIdea } from './api.ts';
 import styles from './Library.module.css';
-import { loadLore, LORE_KINDS, loreText, type Lore, type LoreEntry, type LoreKind } from './lore.ts';
+import { ancestors, inPlace, loadLore, LORE_KINDS, loreText, placeOptions, type Lore, type LoreEntry, type LoreKind } from './lore.ts';
 import { useLibrary } from './useLibrary.ts';
 
 export function LoreTab({ notify }: { notify: (t: string) => void }) {
@@ -16,6 +16,7 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
   const { items, setItems, error } = useLibrary();
   const [lore, setLore] = useState<Lore | null>(null);
   const [kind, setKind] = useState<LoreKind | null>(null);
+  const [place, setPlace] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   useEffect(() => { void loadLore().then(setLore); }, []);
@@ -39,7 +40,15 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
     }
   };
 
-  const shown = (lore?.entries ?? []).filter((e) => !kind || e.kind === kind);
+  const shown = lore ? lore.entries.filter((e) => (!kind || e.kind === kind) && inPlace(lore, e, place)) : [];
+  const places = lore ? placeOptions(lore) : [];
+  const nameOf = (id: string) => lore?.entries.find((x) => x.id === id)?.name ?? id;
+  /** Where an entry lies: a region under what contains it (Ostermark › Mordheim), a group or faction where it comes from. */
+  const whereLine = (e: LoreEntry): string => {
+    if (!lore) return '';
+    if (e.kind === 'region') { const up = ancestors(lore, e.id); return up.length ? `In ${up.map((a) => a.name).join(' › ')}` : ''; }
+    return e.regions?.length ? `From ${e.regions.map((r) => [...ancestors(lore, r).slice(-1), { name: nameOf(r) }].map((a) => a.name).join(' › ')).join(' · ')}` : '';
+  };
   return (
     <section className={ui.page} aria-labelledby="lore-title">
       <h2 id="lore-title" className={styles.title}>Lore</h2>
@@ -50,6 +59,14 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
           <button key={k.kind} type="button" className={kind === k.kind ? ui.button : ui.buttonQuiet} aria-pressed={kind === k.kind} onClick={() => setKind(k.kind)}>{k.label}</button>
         ))}
       </div>
+      {places.length > 0 && (
+        <label className={ui.field}><span className={ui.muted}>Place</span>
+          <select className={ui.select} value={place} aria-label="Place" onChange={(ev) => setPlace(ev.target.value)}>
+            <option value="">anywhere in the world</option>
+            {places.map((o) => <option key={o.id} value={o.id}>{`${'– '.repeat(o.depth)}${o.name}`}</option>)}
+          </select>
+        </label>
+      )}
       {(error || problem) && <p className={ui.message} role="status">{problem ?? error}</p>}
       {!lore && <p className={ui.muted}>Loading the lore…</p>}
       {lore && (
@@ -62,6 +79,7 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
                   <strong>{e.name}</strong>
                   <span className={styles.chip}>{LORE_KINDS.find((k) => k.kind === e.kind)!.label.replace(/s$/, '')}</span>
                 </div>
+                {whereLine(e) && <p className={styles.where}>{whereLine(e)}</p>}
                 <p className={styles.excerpt}>{e.status}</p>
                 <p className={styles.excerpt}>{e.text}</p>
                 <div className={styles.sources}>

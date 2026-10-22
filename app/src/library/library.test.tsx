@@ -184,6 +184,28 @@ describe('the Library: lore', () => {
     expect(within(screen.getByRole('list', { name: 'Lore' })).getByText('The Witch Hunters')).toBeTruthy();
   });
 
+  /* #39: places nest and groups come from places. */
+  it('shows where a place lies and where a group comes from, and narrows the list to a place and what lies in it', async () => {
+    server();
+    const user = userEvent.setup();
+    at('/library/lore');
+    const list = await screen.findByRole('list', { name: 'Lore' });
+    // the Pit lies in Mordheim, in Ostermark
+    const pit = within(list).getByText('The Pit').closest('li')!;
+    expect(within(pit).getByText(/^In .*Ostermark › Mordheim$/)).toBeTruthy();
+    // the Sisters come from the convent in Mordheim
+    const sisters = within(list).getByText('The Sisters of Sigmar').closest('li')!;
+    expect(within(sisters).getByText(/^From .*Mordheim/)).toBeTruthy();
+    // a place: itself, what lies in it, and the groups from it
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Place' }), 'mordheim');
+    const names = within(screen.getByRole('list', { name: 'Lore' })).getAllByRole('listitem').map((li) => li.querySelector('strong')!.textContent);
+    expect(names).toEqual(expect.arrayContaining(['Mordheim', 'The Pit', 'The Sisters of Sigmar', 'The Shadowlord and the Cult of the Possessed']));
+    expect(names).not.toContain('Ostermark');
+    expect(names).not.toContain('The Freetraders');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Place' }), '');
+    expect(within(screen.getByRole('list', { name: 'Lore' })).getByText('Ostermark')).toBeTruthy();
+  });
+
   it('adds a faction or group to the Library as a faction, and a region as an idea about a campaign; each only once', async () => {
     const srv = server();
     const user = userEvent.setup();
