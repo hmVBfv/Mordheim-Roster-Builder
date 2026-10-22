@@ -61,9 +61,9 @@ function Form({ close, edit, titleId }: { close: Sheet['close']; edit: FieldsEdi
         );
       })}
       {edit.note && <p className={ui.muted}>{edit.note}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!changed}>Save</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!changed}>Save</button>
       </div>
     </form>
   );

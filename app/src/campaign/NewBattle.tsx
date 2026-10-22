@@ -83,9 +83,9 @@ export function NewBattleSheet({ id, view }: { id: string; view: CampaignView })
             </Suspense>
           </label>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            <button type="submit" className={ui.button} disabled={busy || fighting.length === 0 || !valid}>Start the game night</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+            <button type="submit" className={ui.button} disabled={busy || fighting.length === 0 || !valid}>Start the game night</button>
           </div>
         </form>
       </dialog>

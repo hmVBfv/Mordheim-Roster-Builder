@@ -205,7 +205,7 @@ export function TimelineTab({ id, view, user, lead }: { id: string; view: Campai
               return <button key={s.key} type="button" aria-current={here} onClick={() => closeMove(() => { if (moving && !here) moveTo(moving, s); })}>{s.title}</button>;
             })}
           </div>
-          <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => closeMove()}>Cancel</button></div>
+          <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => closeMove()}>Cancel</button></div>
         </div>
       </dialog>
       <ChapterSheet dialogRef={readRef} close={closeRead} cid={id} chapter={reading?.c ?? null} lang={reading?.lang ?? 'de'} canRemove={lead}

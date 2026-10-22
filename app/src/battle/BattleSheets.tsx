@@ -109,9 +109,9 @@ function CasualtyForm({ close, participants, picks, picksError, turn, entry, onS
         <span>What happened (optional)</span>
         <input className={ui.input} value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} />
       </label>
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!ready}>{entry ? 'Save the correction' : 'Add to the protocol'}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!ready}>{entry ? 'Save the correction' : 'Add to the protocol'}</button>
       </div>
     </form>
   );
@@ -137,9 +137,9 @@ function EventForm({ close, turn, entry, onSave }: EventFormProps & { close: She
           <span>What happened</span>
           <textarea className={`${ui.textarea} ${ui.writing}`} value={text} maxLength={1000} rows={3} required onChange={(e) => setText(e.target.value)} />
         </label>
-        <div className={ui.row}>
-          <button type="submit" className={ui.button} disabled={!text.trim()}>{entry ? 'Save the correction' : 'Add to the protocol'}</button>
+        <div className={ui.actions}>
           <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+          <button type="submit" className={ui.button} disabled={!text.trim()}>{entry ? 'Save the correction' : 'Add to the protocol'}</button>
         </div>
       </form>
   );
@@ -166,9 +166,9 @@ function ProposalForm({ close, about, onSave }: ProposalFormProps & { close: She
           <span>What should it say?</span>
           <textarea className={`${ui.textarea} ${ui.writing}`} value={text} maxLength={1000} rows={3} required onChange={(e) => setText(e.target.value)} />
         </label>
-        <div className={ui.row}>
-          <button type="submit" className={ui.button} disabled={!text.trim()}>Send to the leader</button>
+        <div className={ui.actions}>
           <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+          <button type="submit" className={ui.button} disabled={!text.trim()}>Send to the leader</button>
         </div>
       </form>
   );

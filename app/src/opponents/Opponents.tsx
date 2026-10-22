@@ -153,7 +153,7 @@ function TtsCards({ group, close }: { group: Group; close: () => void }) {
         ))}
       </div>
       <p className={ui.muted} role="status" aria-live="polite">{note}</p>
-      <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
+      <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
     </div>
   );
 }
@@ -185,10 +185,10 @@ function SkillForm({ cid, skill, online, close, onSaved }: { cid: string; skill:
       <div className={ui.field}><label htmlFor={`${ids}-t`}>What it does (the tooltip)</label><textarea id={`${ids}-t`} className={ui.textarea} rows={4} value={text} maxLength={2000} onChange={(e) => setText(e.target.value)} /></div>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {!online && <p className={ui.message} role="status">Saving needs the connection.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save the skill</button>
+      <div className={ui.actions}>
         {skill && <button type="button" className={ui.buttonQuiet} disabled={busy || !online} onClick={() => void remove()}>Take it out</button>}
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save the skill</button>
       </div>
     </form>
   );
@@ -252,10 +252,10 @@ function GroupForm({ cid, warbands, group, skills, online, close, onSaved, onSki
       )}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {!online && <p className={ui.message} role="status">Saving needs the connection.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !online}>Save the group</button>
+      <div className={ui.actions}>
         {group && <button type="button" className={ui.buttonQuiet} disabled={busy || !online} onClick={() => void remove()}>Take the group out</button>}
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !online}>Save the group</button>
       </div>
     </form>
   );

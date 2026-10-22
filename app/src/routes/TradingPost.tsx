@@ -83,11 +83,11 @@ function BuyForm({ ctx, item, gold, close, onBuy, titleId }: { ctx: core.Ctx; it
           </span>
         </div>
       )}
-      <div className={ui.row}>
+      <div className={ui.actions}>
+        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
         <button type="button" className={ui.button} disabled={cost > gold} onClick={() => close(() => onBuy(to, qty, cost))}>
           {cost > gold ? `Not enough gold (${gc(cost)})` : `Buy · ${gc(cost)}`}
         </button>
-        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
       </div>
     </div>
   );
@@ -217,11 +217,11 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
           <Pick label="Goes to" items={dest} value={to} onChange={setTo} />
         </>
       )}
-      <div className={ui.row}>
-        <button type="button" className={ui.button} disabled={!found || !priceOk || paid > gold || uid == null}
-          onClick={() => close(() => onFound(uid!, de!, paid, to))}>{found && priceOk ? (paid > gold ? 'Not enough gold' : `Buy · ${gc(paid)}`) : 'Buy'}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} disabled={!it || uid == null} onClick={() => close(() => onMissed(uid!, de!))}>Not found</button>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="button" className={ui.button} disabled={!found || !priceOk || paid > gold || uid == null}
+          onClick={() => close(() => onFound(uid!, de!, paid, to))}>{found && priceOk ? (paid > gold ? 'Not enough gold' : `Buy · ${gc(paid)}`) : 'Buy'}</button>
       </div>
     </div>
   );
@@ -247,9 +247,9 @@ function SellForm({ h, close, onSell, titleId }: { h: Holding; close: SheetApi['
       <label className={ui.field}><span>Gold received</span>
         <input className={ui.input} inputMode="numeric" value={v} maxLength={4} onChange={(e) => setV(e.target.value.replace(/\D/g, ''))} />
       </label>
-      <div className={ui.row}>
-        <button type="button" className={ui.button} disabled={v === '' || !(n >= 0)} onClick={() => close(() => onSell(n))}>Sell · {gc(Number.isFinite(n) ? n : 0)}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="button" className={ui.button} disabled={v === '' || !(n >= 0)} onClick={() => close(() => onSell(n))}>Sell · {gc(Number.isFinite(n) ? n : 0)}</button>
       </div>
     </div>
   );
@@ -265,9 +265,9 @@ function GiveForm({ ctx, h, close, onGive, titleId }: { ctx: core.Ctx; h: Holdin
         <p className={ui.muted}>From {h.owner}{h.pieces > 1 ? ` · ${h.pieces} pieces` : ''}. No gold changes hands{h.goods.rare ? '; the price paid goes with it' : ''}.</p>
       </div>
       <Pick label="To" items={rec} value={to} onChange={setTo} />
-      <div className={ui.row}>
-        <button type="button" className={ui.button} disabled={to == null} onClick={() => close(() => onGive(to!))}>Give</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="button" className={ui.button} disabled={to == null} onClick={() => close(() => onGive(to!))}>Give</button>
       </div>
     </div>
   );

@@ -43,9 +43,9 @@ export function ImportSheet({ onImported, quiet = false }: { onImported: (id: st
             <textarea className={ui.textarea} value={text} onChange={(e) => setText(e.target.value)} spellCheck={false} />
           </label>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            <button type="submit" className={ui.button} disabled={busy || !text.trim()}>Import</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => closeSheet()}>Cancel</button>
+            <button type="submit" className={ui.button} disabled={busy || !text.trim()}>Import</button>
           </div>
         </form>
       </dialog>

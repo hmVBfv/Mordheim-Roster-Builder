@@ -25,9 +25,9 @@ export function Actions({ busy, ok, label, close, error }: { busy: boolean; ok: 
   return (
     <>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !ok}>{label}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={close}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !ok}>{label}</button>
       </div>
     </>
   );

@@ -45,7 +45,7 @@ export function ScenariosFromLibrary({ titleId, here, close, onAdd }: { titleId:
         </ul>
       )}
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
-      <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
+      <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
     </div>
   );
 }

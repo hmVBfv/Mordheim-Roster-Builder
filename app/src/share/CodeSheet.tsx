@@ -47,9 +47,9 @@ export function CodeSheet() {
           )}
           {!online && <p className={ui.message}>Codes need the connection.</p>}
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            <button type="submit" className={ui.button} disabled={busy || !online || code.replace(/[^0-9a-z]/gi, '').length < 8}>{look ? 'Add the copy' : 'Look it up'}</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+            <button type="submit" className={ui.button} disabled={busy || !online || code.replace(/[^0-9a-z]/gi, '').length < 8}>{look ? 'Add the copy' : 'Look it up'}</button>
           </div>
         </form>
       </dialog>

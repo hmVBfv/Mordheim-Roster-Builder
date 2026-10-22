@@ -136,10 +136,10 @@ export function HistorySection({ id, view, onView, onNotice }: { id: string; vie
             </fieldset>
             {held && <p className={`${ui.message} ${ui.error}`} role="alert">Notes or pictures belong to this battle. Taking it out now takes all of them with it – whoever wrote them – and nothing can bring them back.</p>}
             {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-            <div className={ui.row}>
-              <button type="submit" className={ui.button} disabled={busy || !roundOk || fighters.length === 0}>Save</button>
+            <div className={ui.actions}>
               {form.known && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => void takeOut()}>{held ? 'Take it out with everything on it' : 'Take it out'}</button>}
               <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+              <button type="submit" className={ui.button} disabled={busy || !roundOk || fighters.length === 0}>Save</button>
             </div>
           </form>
         )}
