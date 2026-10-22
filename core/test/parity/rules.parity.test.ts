@@ -5,6 +5,7 @@
  * functions reading their global state, once by core with an explicit
  * context — and the two reports must be identical. A difference names the
  * fixture and the value that disagrees. */
+import { legacyUnitMax } from '../support/orcLimits.ts';
 import { beforeAll, describe, expect, it } from 'vitest';
 import * as core from '../../src/index.ts';
 import type { HireEntry, HireRecord, Model, WarbandState } from '../../src/index.ts';
@@ -132,7 +133,7 @@ function coreCalc(s: WarbandState): Calc {
     weaponUpgradesFor: (m, nm) => core.weaponUpgradesFor(ctx, m, nm), upgradeTargets: (m, de) => core.upgradeTargets(ctx, m, de),
     upgradePaid: (m, de, nm) => core.upgradePaid(ctx, m, de, nm), daggerNameFor: (id) => core.daggerNameFor(ctx, def(id)),
     freeDaggerEq: (m) => core.withFreeDagger(ctx, m).eq, isHeroModel: (m) => core.isHeroModel(ctx, m), modelRating: (m) => core.modelRating(ctx, m),
-    unitMax: (id) => { const d = def(id); return d ? core.unitMax(ctx, d) : undefined; },
+    unitMax: (id) => { const d = def(id); return d ? legacyUnitMax(ctx, d) : undefined; },
     countOf: (id) => core.countOf(ctx, id), modelsOf: (id) => core.modelsOf(ctx, id), inlineUpgradeActive: (de) => core.inlineUpgradeActive(ctx, de),
     totals: () => ({
       totalSpent: core.totalSpent(ctx), goldCurrent: core.goldCurrent(ctx), goldTreasury: core.goldTreasury(ctx), startGold: core.startGold(ctx),

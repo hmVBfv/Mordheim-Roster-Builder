@@ -95,6 +95,16 @@ describe('editing a roster', () => {
     expect(unit('warr').why).toBeNull();
   });
 
+  it('an Orc Mob says what its Goblin and Squig limits rest on (#46)', () => {
+    let s = createWarband(data, 'orcmob', null, 'Test');
+    s = core.addUnit(ctx(s), 'boss');
+    s = core.addUnit(ctx(s), 'goblin');
+    s = core.setQty(ctx(s), s.models.find((m) => m.uid_def === 'goblin')!.uid, 2);
+    const unit = (id: string) => rosterView(data, s).recruit.flatMap((g) => g.units).find((u) => u.id === id)!;
+    expect(unit('goblin')).toMatchObject({ limit: '0–2', why: 'at most two Goblins for each Orc: the warband has all 2 it may have' });
+    expect(unit('squig')).toMatchObject({ limit: '0–2', why: null });
+  });
+
   it('offers another man at his price, until the group or the unit is full', () => {
     let s = core.addUnit(ctx(fresh()), 'warr');
     const uid = s.models[0]!.uid;

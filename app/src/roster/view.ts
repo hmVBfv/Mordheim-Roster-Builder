@@ -255,7 +255,11 @@ function recruitList(ctx: core.Ctx): RecruitGroup[] {
     const umx = st?.max;
     let why: string | null = null;
     if (st?.leaderGone) why = 'the leader has fallen; a surviving Hero takes command';
-    else if (umx != null && (st?.count ?? 0) >= umx) why = u.req ? 'the warband has its leader' : `the warband has all ${umx} it may have`;
+    else if (umx != null && (st?.count ?? 0) >= umx) {
+      // the Orc Mob's two ratios say what the limit rests on (report #46)
+      const ratio = ctx.s.wb === 'orcmob' ? ({ goblin: 'at most two Goblins for each Orc', squig: 'never more Cave Squigs than Goblins' } as Record<string, string>)[u.id] : undefined;
+      why = u.req ? 'the warband has its leader' : ratio ? `${ratio}: the warband has all ${umx} it may have` : `the warband has all ${umx} it may have`;
+    }
     else if (hero && heroesFull) why = `the warband has its ${heroMaxOf(ctx)} Heroes`;
     return { id: u.id, name: u.name, count: st?.count ?? 0, limit: st?.limit ?? 'any', cost: core.unitBaseCost(ctx, u), exp: Number(u.exp) || 0, note: u.sp ?? '', why };
   };

@@ -23,9 +23,18 @@ export function modelsOf(ctx: Ctx, id: string): number {
   return ctx.s.models.filter((m) => m.uid_def === id && !m.promoted).reduce((s, m) => s + (m.qty || 1), 0);
 }
 
-/** Maximum of a unit type; Kurgan marauders may take any number of warhounds. */
+/** The Orcs of an Orc Mob: Heroes and Boyz (a promoted Boy too), not Goblins, Squigs or the Troll. */
+const ORCS = ['boss', 'shaman', 'bigun', 'boyz'];
+
+/** Maximum of a unit type; Kurgan marauders may take any number of warhounds.
+    An Orc Mob takes at most two Goblins for each Orc, and never more Cave
+    Squigs than Goblins (mordheimer.net, Orc Mob; report #46). */
 export function unitMax(ctx: Ctx, def: UnitDef): number | null | undefined {
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && def.id === 'warhound') return null;
+  if (ctx.s.wb === 'orcmob') {
+    if (def.id === 'goblin') return 2 * ctx.s.models.filter((m) => ORCS.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
+    if (def.id === 'squig') return Math.min(def.max ?? 5, modelsOf(ctx, 'goblin'));
+  }
   return def.max;
 }
 
