@@ -66,6 +66,42 @@ describe('house rules', () => {
     expect(rule(s, 'rangedCap').canMore).toBe(false);
   });
 
+  /* #36: the starting gold in three forms; one at a time. */
+  it('the starting gold has three forms, and switching one on switches the others off', () => {
+    let s = core.newWarband(data, 'merc');
+    s = setRule(ctx(s), 'startGoldPlus', true);
+    expect(core.houseRules(s)).toMatchObject({ startGold: '', startGoldPlus: 100, startGoldPct: '' });
+    expect(core.startGold(ctx(s))).toBe(600);
+    expect(rule(s, 'startGoldPlus')).toMatchObject({ on: true, value: '+100 gc' });
+    s = setRule(ctx(s), 'startGoldPct', true);
+    expect(core.houseRules(s)).toMatchObject({ startGold: '', startGoldPlus: '', startGoldPct: 20 });
+    expect(core.startGold(ctx(s))).toBe(600);
+    expect(rule(s, 'startGoldPct')).toMatchObject({ on: true, value: '20 %', unit: '% of its own gold' });
+    expect(rule(s, 'startGoldPlus').on).toBe(false);
+    s = setRule(ctx(s), 'startGold', true);
+    expect(core.houseRules(s)).toMatchObject({ startGold: 600, startGoldPlus: '', startGoldPct: '' });
+    s = setRule(ctx(s), 'startGold', false);
+    expect(core.startGold(ctx(s))).toBe(500);
+  });
+
+  it('the extra and the percent step within their bounds', () => {
+    let s = setRule(ctx(core.newWarband(data, 'merc')), 'startGoldPct', true);
+    s = stepRule(ctx(s), 'startGoldPct', 1);
+    expect(core.houseRules(s).startGoldPct).toBe(25);
+    for (let i = 0; i < 100; i++) s = stepRule(ctx(s), 'startGoldPct', -1);
+    expect(core.houseRules(s).startGoldPct).toBe(5);
+    expect(rule(s, 'startGoldPct').canLess).toBe(false);
+    s = setRule(ctx(core.newWarband(data, 'merc')), 'startGoldPlus', true);
+    s = stepRule(ctx(s), 'startGoldPlus', 1);
+    expect(core.houseRules(s).startGoldPlus).toBe(125);
+  });
+
+  it('a campaign\'s starting gold in the new forms is taken over like any rule', () => {
+    const s = adoptHouse(ctx(core.newWarband(data, 'merc')), { startGoldPct: 10 });
+    expect(core.houseRules(s).startGoldPct).toBe(10);
+    expect(core.startGold(ctx(s))).toBe(550);
+  });
+
   it('grades of Hired Swords and Dramatis Personae', () => {
     let s = core.newWarband(data, 'merc');
     s = setGrade(ctx(s), 'hsGrades', '2a', false);

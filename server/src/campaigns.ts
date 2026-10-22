@@ -204,7 +204,7 @@ const int = (min: number, max: number) => z.number().int().min(min).max(max);
 const orNone = (min: number, max: number) => z.union([z.literal(''), int(min, max)]);
 /** House rules as a leader sends them: the Roster Builder's keys, each within the bounds the app offers. */
 export const HouseRulesBody = z.object({
-  startGold: orNone(0, 10_000), min: orNone(1, 40), max: orNone(1, 40), heroes: int(1, 20),
+  startGold: orNone(0, 10_000), startGoldPlus: orNone(0, 10_000), startGoldPct: orNone(0, 500), min: orNone(1, 40), max: orNone(1, 40), heroes: int(1, 20),
   priceAll: int(25, 200), priceArmour: int(25, 200), priceBP: int(25, 200), priceMissile: int(25, 200),
   clubSurcharge: int(0, 50), slingSurcharge: int(0, 50), rangedCap: int(0, 100),
   armourBodyOnly: z.boolean(), freeDagger: z.boolean(), miscHench: z.boolean(), freeMarket: z.boolean(), allSkills: z.boolean(), showRarity: z.boolean(),

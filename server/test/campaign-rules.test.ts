@@ -40,6 +40,16 @@ describe('the campaign’s house rules', () => {
     expect(s.db.prepare("SELECT payload FROM audit_log WHERE action = 'campaign.house_rules'").all()).toEqual([{ payload: JSON.stringify({ changed: ['priceArmour', 'freeDagger'], notes: true }) }]);
   });
 
+  /* #36: the starting gold in three forms. */
+  it('a leader may set the starting gold as an extra or as a percentage; a figure out of reach is refused', async () => {
+    const { id, anna, kai } = await world();
+    const v = (await anna('PUT', `/campaigns/${id}/house-rules`, { rules: { startGoldPct: 20 } })).json() as View;
+    expect(v.campaign.houseRules).toMatchObject({ startGoldPct: 20, startGoldPlus: '', startGold: '' });
+    expect(((await kai('GET', `/campaigns/${id}`)).json() as View).campaign.houseRules).toMatchObject({ startGoldPct: 20 });
+    expect(((await anna('PUT', `/campaigns/${id}/house-rules`, { rules: { startGoldPlus: 100 } })).json() as View).campaign.houseRules).toMatchObject({ startGoldPlus: 100, startGoldPct: '' });
+    for (const rules of [{ startGoldPct: 600 }, { startGoldPlus: -5 }, { startGoldPct: 1.5 }]) expect((await anna('PUT', `/campaigns/${id}/house-rules`, { rules })).statusCode).toBe(400);
+  });
+
   it('every member sees whose rules differ and which districts a warband holds, from its newest version', async () => {
     const { id, anna, kai, vic } = await world();
     await anna('PUT', `/campaigns/${id}/house-rules`, { rules: { freeDagger: true } });

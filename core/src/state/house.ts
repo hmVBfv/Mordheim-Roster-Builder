@@ -4,7 +4,7 @@ import type { HouseRules, WarbandState } from './types.ts';
     everything off, prices at 100 %. */
 export function houseDefaults(): HouseRules {
   return {
-    startGold: '', min: '', max: '', heroes: 6,
+    startGold: '', startGoldPlus: '', startGoldPct: '', min: '', max: '', heroes: 6,
     priceAll: 100, priceArmour: 100, priceBP: 100, priceMissile: 100,
     clubSurcharge: 0, slingSurcharge: 0,
     armourBodyOnly: false, freeDagger: false, miscHench: false, freeMarket: false,

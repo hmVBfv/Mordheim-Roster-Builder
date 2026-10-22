@@ -10,7 +10,7 @@
 import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 
-type Kind = 'bool' | 'gc' | 'n' | 'pct' | 'price' | 'plus' | 'grades';
+type Kind = 'bool' | 'gc' | 'extra' | 'n' | 'pct' | 'price' | 'plus' | 'grades';
 
 interface RuleDef {
   key: string;
@@ -35,7 +35,10 @@ export const GROUPS = [
 ] as const;
 
 const RULES: RuleDef[] = [
-  { key: 'startGold', group: 'comp', label: 'Starting gold', kind: 'gc', std: (c) => `the warband’s own: ${core.startGold(c)} gc`, step: 50, min: 0, max: 5000 },
+  // three forms of one rule (report #36); switching one on switches the others off (setRule)
+  { key: 'startGold', group: 'comp', label: 'Starting gold: the same for all', kind: 'gc', std: (c) => `the warband’s own: ${core.startGold(c)} gc`, on: 'every warband starts with exactly this', step: 50, min: 0, max: 5000 },
+  { key: 'startGoldPlus', group: 'comp', label: 'Starting gold: extra for all', kind: 'extra', std: (c) => `the warband’s own: ${core.startGold(c)} gc`, on: 'every warband starts with its own gold plus this: 500 gc becomes 600 gc, 600 gc becomes 700 gc', start: 100, step: 25, min: 25, max: 2000 },
+  { key: 'startGoldPct', group: 'comp', label: 'Starting gold: raised for all', kind: 'pct', std: (c) => `the warband’s own: ${core.startGold(c)} gc`, on: 'every warband starts with its own gold plus this share of it, rounded up to the next full gc', start: 20, step: 5, min: 5, max: 300, unit: '% of its own gold' },
   { key: 'min', group: 'comp', label: 'Fewest models', kind: 'n', std: (c) => `the warband’s own: ${core.warbandDef(c)?.min ?? 3}`, step: 1, min: 1, max: 30 },
   { key: 'max', group: 'comp', label: 'Most models', kind: 'n', std: (c) => `the warband’s own: ${core.warbandMax(c)}`, step: 1, min: 1, max: 40 },
   { key: 'heroes', group: 'comp', label: 'Most Heroes', kind: 'n', std: '6', start: 5, step: 1, min: 1, max: 12 },
@@ -95,6 +98,7 @@ function valueOf(h: Record<string, unknown>, r: RuleDef): string {
   switch (r.kind) {
     case 'price': return `${v} %`;
     case 'gc': return `${v} gc`;
+    case 'extra': return `+${v} gc`;
     case 'plus': return `+${v} gc each`;
     case 'pct': return `${v} %`;
     case 'n': return String(v);
@@ -129,6 +133,8 @@ export function houseView(data: core.GameData, s: WarbandState, o: { campaign?: 
 }
 
 const ruleOf = (key: string) => RULES.find((r) => r.key === key);
+/** The three forms of the starting gold: only one stays on. */
+const START_GOLD = ['startGold', 'startGoldPlus', 'startGoldPct'] as const;
 
 /** Switches a house rule on (at its starting value) or back to the rules as written. */
 export function setRule(ctx: core.Ctx, key: string, on: boolean): WarbandState {
@@ -151,7 +157,10 @@ export function setRule(ctx: core.Ctx, key: string, on: boolean): WarbandState {
   // a rule without a fixed start begins where the warband stands now
   const plain = core.ctxOf(ctx.data, { ...ctx.s, house: core.houseDefaults() });
   const start = r.start ?? (r.key === 'startGold' ? core.startGold(plain) + 100 : r.key === 'min' ? (core.warbandDef(plain)?.min ?? 3) + 1 : core.warbandMax(plain) - 1);
-  return num(r.key as Parameters<typeof core.setHouseNum>[1], start);
+  let s = num(r.key as Parameters<typeof core.setHouseNum>[1], start);
+  // one form of the starting gold at a time
+  if ((START_GOLD as readonly string[]).includes(r.key)) for (const other of START_GOLD) if (other !== r.key) s = core.setHouseNum(core.ctxOf(ctx.data, s), other, '');
+  return s;
 }
 
 /** Moves a rule's value by one step (up or down), within its bounds. */
