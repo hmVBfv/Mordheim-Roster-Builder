@@ -3923,3 +3923,39 @@ Wissenland, Ind, the Southlands, the Ogre Kingdoms – are still missing; that i
 for a session with access, or for Rob's own text. The pull requests are stacked
 (149, 150, 151); each targets `master`, merge them in that order. (Pull requests
 149, 150 and 151.)
+
+## October 22, 2026 — the second run: the reports #43 to #50
+
+Eight reports from one player in one afternoon, and Rob's answers to all of them
+at once. **#45** (literal `<b>` in the Recruit list): the data marks rule names with
+tags, the list printed the unit's text raw; a test now checks every unit of every
+warband. **#49** (the audit log needed F5): the log hook read only when its path
+changed, so clicking the open tab or going Back kept the old list; the location key
+is part of the effect now. **#44** (idle devices): sessions last 30 days from their
+last use instead of 90, and a sign-in on an account with more than five devices
+ends those idle for seven days, longest idle first; the cookie, two tests and the
+security doc had the 90 days in them. **#43** (own reports): the list shows the
+admin's heading and number with an Open sheet; two server tests had said the heading
+is "never shown to the reporter" – that was a choice, now reversed on purpose.
+**#50**: copies sent by other players also stand on the Warbands screen. **#48**:
+Henchmen groups have a profile; the core already could (`setProfile` works on any
+model), the story screen hid it.
+
+Two rules reports, decided by Rob. **#47**: a warrior who has not fought gets his
+list plus what the warband gives at the start (upgrades with a founding price, like
+gromril for Dwarfs); the catalogue's rare items were a founding privilege only in
+the old app. It is an interface change; two e2e steps that added a rare item at the
+founding now switch on the free market first. **#46**: the Orc Mob's limits
+(two Goblins per Orc, Squigs not above the Goblins) live in `unitMax`, so recruiting
+and group sizes obey them, and the parity suites needed a named exclusion for exactly
+these two units: fixtures, the screens comparison and the walk (which now skips a step
+the ratio would refuse, because core refuses what legacy accepts). Pull requests 153
+to 160.
+
+The wikis: Fandom answered through its MediaWiki API (the page URLs stay behind
+Cloudflare), Lexicanum did not. A researcher wrote 28 places and 20 groups in
+our own words from it; the Badlands links of two greenskin groups were dropped as
+too thin. "Add to Library" now carries the place chain into the text. Pull request 161.
+
+Rob also asked for a password-reset link an admin can hand to a player. It exists
+already (Admin → Users → "Make a link", 24 hours); there is no mail to send it by.
