@@ -166,6 +166,18 @@ for (const theme of THEMES) {
   });
 }
 
+/* #42: the Gold tile carried a gold frame as well as gold figures; the figures are enough. */
+test('the Gold tile has the frame of the other tiles, only its figures are gold', async ({ page }) => {
+  test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  const border = (label: string) => page.locator(`dt:text-is("${label}")`).locator('..').evaluate((el) => getComputedStyle(el).borderTopColor);
+  await expect(page.locator('dt:text-is("Gold")')).toBeVisible();
+  expect(await border('Gold')).toBe(await border('Rating'));
+  const figure = (label: string) => page.locator(`dt:text-is("${label}") + dd`).evaluate((el) => getComputedStyle(el).color);
+  expect(await figure('Gold')).not.toBe(await figure('Rating'));
+});
+
 /* Give on a wide screen (Rob, 20.10.2026; report #32): a card for every warrior and the stash, side by side in several columns,
    with his profile; pick an item, then give it where the card allows. */
 test('the Trading Post on a wide screen: Give is a grid of small cards, pick an item, then give it', async ({ page }) => {
