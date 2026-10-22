@@ -13,6 +13,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import { shownVersion } from '../version.ts';
 import { KIND_NAMES, oneReport, reportList, sortReport, STATUS_NAMES, STATUS_ORDER, type BugDetail, type BugKind, type BugStatus, type BugSummary, type Severity } from './api.ts';
 import styles from './Bugs.module.css';
+import { Words } from './Words.tsx';
 import { reportText, type ReportDoc } from './text.ts';
 
 /** What "open" means in the status filter: reports that still ask something of someone (server/src/bugs.ts OPEN). */
@@ -43,19 +44,6 @@ function Flags({ b }: { b: BugSummary }) {
       {b.area && <span className={styles.flag}>{b.area}</span>}
       {b.attached && <span className={styles.flag}>warband attached</span>}
     </div>
-  );
-}
-
-/** The reporter's words. Under a headline they are folded to a few lines, for the whole of them to be opened up (wish #28). */
-function Words({ text, fold }: { text: string; fold: boolean }) {
-  const [open, setOpen] = useState(false);
-  const long = fold && text.length > 240;
-  const folded = long && !open;
-  return (
-    <>
-      <p className={`${styles.words} ${folded ? styles.folded : ''}`} data-folded={folded ? 'true' : 'false'}>{text}</p>
-      {long && <button type="button" className={ui.buttonQuiet} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Show less' : 'Show all'}</button>}
-    </>
   );
 }
 

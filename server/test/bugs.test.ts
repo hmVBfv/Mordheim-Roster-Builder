@@ -138,6 +138,7 @@ describe('problem reports', () => {
     expect((await rob('PATCH', `/bugs/${id}`, { status: 'fixed', fixedIn: 'f00dbee' })).statusCode).toBe(200);
     const mine = ((await anna('GET', '/bugs/mine')).json() as { bugs: Mine[] }).bugs[0]!;
     expect(mine).toMatchObject({ status: 'fixed', fixedIn: 'f00dbee' });
+    expect(mine).toMatchObject({ number: expect.any(Number), headline: '' });
     expect(mine).not.toHaveProperty('severity');
     expect(mine).not.toHaveProperty('area');
     // a fixed report is out of the open list, in the one for fixed

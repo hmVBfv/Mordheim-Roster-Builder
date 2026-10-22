@@ -105,7 +105,7 @@ interface Row {
 
 /** What the reporter reads of their own report. */
 export interface MyBug {
-  id: string; kind: Row['kind']; title: string; text: string; sourceRef: string; status: Row['status']; fixedIn: string; createdAt: string; updatedAt: string;
+  id: string; number: number; headline: string; kind: Row['kind']; title: string; text: string; sourceRef: string; status: Row['status']; fixedIn: string; createdAt: string; updatedAt: string;
 }
 
 /** One line of the admin's list. */
@@ -125,7 +125,7 @@ export const bugById = (db: DB, id: string) => db.prepare('SELECT * FROM bugs WH
 export const bugByRef = (db: DB, ref: string): Row | undefined =>
   /^[1-9]\d{0,8}$/.test(ref) ? (db.prepare('SELECT * FROM bugs WHERE number = ?').get(Number(ref)) as Row | undefined) : UUID.test(ref) ? bugById(db, ref.toLowerCase()) : undefined;
 
-const mine = (r: Row): MyBug => ({ id: r.id, kind: r.kind, title: r.title, text: r.text, sourceRef: r.source_ref, status: r.status, fixedIn: r.fixed_in, createdAt: r.created_at, updatedAt: r.updated_at });
+const mine = (r: Row): MyBug => ({ id: r.id, number: r.number, headline: r.headline, kind: r.kind, title: r.title, text: r.text, sourceRef: r.source_ref, status: r.status, fixedIn: r.fixed_in, createdAt: r.created_at, updatedAt: r.updated_at });
 
 const summary = (r: Row, name: string): BugSummary => ({
   id: r.id, number: r.number, reporterId: r.reporter_id, reporterName: name, kind: r.kind, title: r.title, status: r.status, severity: r.severity, area: r.area, headline: r.headline, appVersion: r.app_version, view: r.view,

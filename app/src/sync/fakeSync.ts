@@ -1263,7 +1263,7 @@ export function createFakeSync(opts: {
   };
 
   /* ---- problem reports (4c1) ---- */
-  const bugMine = (b: FakeBug) => ({ id: b.id, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, status: b.status, fixedIn: b.fixedIn, createdAt: b.createdAt, updatedAt: b.updatedAt });
+  const bugMine = (b: FakeBug) => ({ id: b.id, number: b.number, headline: b.headline, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, status: b.status, fixedIn: b.fixedIn, createdAt: b.createdAt, updatedAt: b.updatedAt });
   const bugSummary = (b: FakeBug) => ({
     id: b.id, number: b.number, reporterId: b.reporterId, reporterName: b.reporterName, kind: b.kind, title: b.title, status: b.status, severity: b.severity, area: b.area, headline: b.headline, appVersion: b.appVersion, view: b.view,
     fixedIn: b.fixedIn, consent: b.consent, attached: b.attachment !== null, createdAt: b.createdAt, updatedAt: b.updatedAt,
