@@ -101,9 +101,9 @@ function Form({ campaignId }: { campaignId: string | null }) {
           placeholder={choice?.name ?? 'The name of your warband'} onChange={(e) => setName(e.target.value)} />
       </label>
       {choice && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>
+      <div className={ui.actions}>
         <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
+        <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>
       </div>
     </form>
   );

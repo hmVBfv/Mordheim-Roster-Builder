@@ -1,5 +1,5 @@
 {
-  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Mordheim setting, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026, pages last updated 12.10.2026). Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group.",
+  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Warhammer world, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026 and 22.10.2026) – never copied. Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group. Places nest (parent), factions and groups come from places (regions); ADR 0024.",
   "SOURCES": {
     "flames": { "title": "The Empire in Flames", "url": "https://mordheimer.net/docs/introduction/the-empire-in-flames" },
     "city": { "title": "The City of the Damned", "url": "https://mordheimer.net/docs/introduction/the-city-of-the-damned" },
@@ -8,96 +8,201 @@
     "reikland": { "title": "Mercenaries – Reikland", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#reikland" },
     "middenheim": { "title": "Mercenaries – Middenheim", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#middenheim" },
     "marienburg": { "title": "Mercenaries – Marienburg", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#marienburg" },
-    "ostermarkers": { "title": "Mercenaries – Ostermark", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark" }
+    "ostermarkers": { "title": "Mercenaries – Ostermark", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark" },
+    "lustriaset": { "title": "Campaign Setting: Lustria", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria" },
+    "lussettle": { "title": "Lustria: Settlements", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/optional-rules/settlements" },
+    "lusequip": { "title": "Lustria: Equipment", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment" },
+    "khemriset": { "title": "Campaign Setting: Khemri", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/khemri" },
+    "albionset": { "title": "Campaign Setting: Albion", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/albion" },
+    "eifset": { "title": "Campaign Setting: The Empire in Flames", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames" },
+    "btbset": { "title": "Campaign Setting: Border Town Burning", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning" },
+    "nemcrown": { "title": "Campaign Setting: The Nemesis Crown", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/the-nemesis-crown" },
+    "wbaverland": { "title": "Averlander Mercenaries", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/averlander" },
+    "wbostland": { "title": "Ostlander Mercenaries", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/ostlander" },
+    "wbkislev": { "title": "Kislevites", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/kislevites" },
+    "wbbretonnia": { "title": "Bretonnians", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/bretonnian" },
+    "wbnorse": { "title": "Norse", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/norse" },
+    "wbhochland": { "title": "Hochland Bandits", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/hochland-bandits" },
+    "wbtilean": { "title": "Tileans", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tileans" },
+    "wbaraby": { "title": "Arabian Tomb Raiders", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/arabian-tomb-raiders" },
+    "wbcathay": { "title": "Battle Monks of Cathay", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/battle-monks-of-cathay" },
+    "wbnippon": { "title": "Nipponese Expedition", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition" },
+    "wbstrigos": { "title": "Survivors of Strigos", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos" },
+    "wbblackdw": { "title": "Black Dwarfs", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/black-dwarfs" },
+    "wbhashut": { "title": "Sons of Hashut", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/sons-of-hashut" },
+    "wbshadow": { "title": "Shadow Warriors", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/shadow-warriors" },
+    "wbdarkelf": { "title": "Dark Elves", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dark-elves" },
+    "wbwoodelf": { "title": "Wood Elves of Athel Loren", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/wood-elves-of-athel-loren" },
+    "wbogre": { "title": "Ogre Hunting Party", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/ogre-hunting-party" },
+    "wbmarauder": { "title": "Marauders of Chaos", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos" },
+    "wbcaravan": { "title": "Merchant Caravans", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans" },
+    "wbmare": { "title": "Order of the Mare", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/order-of-the-mare" },
+    "wbstirwood": { "title": "Outlaws of Stirwood Forest (Redux)", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/outlaws-of-stirwood-forest-redux" },
+    "wbnecrarch": { "title": "Necrarchs, the Soul Stealers", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/necrarchs-the-soul-stealers" },
+    "wbundead": { "title": "Undead", "url": "https://mordheimer.net/docs/warbands/core-warbands/undead" },
+    "wbhunters": { "title": "Vampire Hunters of Sylvania", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania" },
+    "wbnuln": { "title": "Gunnery School of Nuln", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/gunnery-school-of-nuln" },
+    "wbhorned": { "title": "Horned Hunters", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/horned-hunters" },
+    "wbmoot": { "title": "Mootlanders", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/mootlanders" },
+    "wbamazon": { "title": "Amazons", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons" },
+    "wbdruchii": { "title": "Druchii", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/druchii" },
+    "wbmerc": { "title": "Mercenaries (core warbands)", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries" },
+    "wbreavers": { "title": "Lustrian Reavers", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/lustrian-reavers" },
+    "wblizard": { "title": "Lizardmen", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/lizardmen" },
+    "encbrig": { "title": "Encampments: Brigandsburg", "url": "https://mordheimer.net/docs/optional-rules/encampments/brigandsburg" },
+    "marauders": { "title": "Marauders of Chaos (Border Town Burning)", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos#follow-the-darkest-tribe" },
+    "norseexp": { "title": "Norse Explorers", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/norse" },
+    "btbwar": { "title": "Warbands and Hirelings (Border Town Burning)", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/warbands-and-hirelings" },
+    "beastmen": { "title": "Beastmen Raiders", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/beastmen-raiders" },
+    "carnival": { "title": "Carnival of Chaos", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/carnival-of-chaos" },
+    "eifwilds": { "title": "The Empire in Flames – campaign setting", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames" },
+    "dwtreasure": { "title": "Dwarf Treasure Hunters", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/dwarf-treasure-hunters" },
+    "dwrangers": { "title": "Dwarf Rangers", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dwarf-rangers" },
+    "slayers": { "title": "Dwarf Slayer Cult", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/dwarf-slayer-cult" },
+    "blackdwarfs": { "title": "Black Dwarfs", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/black-dwarfs" },
+    "sonshashut": { "title": "Sons of Hashut", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/sons-of-hashut" },
+    "kislev": { "title": "Kislevites", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/kislevites" },
+    "averland": { "title": "Averlander Mercenaries", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/averlander" },
+    "ostland": { "title": "Ostlander Mercenaries", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/ostlander" },
+    "orcmob": { "title": "Orc Mob", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/orc-mob" },
+    "blackorcs": { "title": "Black Orcs", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/black-orcs" },
+    "nightgob": { "title": "Night Goblins", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/night-goblins" },
+    "forestgob": { "title": "Forest Goblins", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/forest-goblins" },
+    "amazlus": { "title": "Amazons (Lustria)", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons-lustria" },
+    "amazmor": { "title": "Amazons (Mordheim)", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons" },
+    "lizardmen": { "title": "Lizardmen (Temple Guard)", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/lizardmen" },
+    "lustria": { "title": "Lustria – campaign setting", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria" },
+    "lusreavers": { "title": "Lustrian Reavers", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/lustrian-reavers" },
+    "darkelves": { "title": "Dark Elves", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dark-elves" },
+    "druchii": { "title": "Druchii", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/druchii" },
+    "shadow": { "title": "Shadow Warriors", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/shadow-warriors" },
+    "woodelves": { "title": "Wood Elves of Athel Loren", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/wood-elves-of-athel-loren" },
+    "tileans": { "title": "Tileans", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tileans" },
+    "mazzalupo": { "title": "Mazzalupo", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/mazzalupo" },
+    "pirates": { "title": "Pirates", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/pirates" },
+    "pitfighters": { "title": "Pit Fighters", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/pit-fighters" },
+    "arabs": { "title": "Arabian Tomb Raiders", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/arabian-tomb-raiders" },
+    "khemri": { "title": "Khemri – campaign setting", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/khemri" },
+    "tombguard": { "title": "Tomb Guardians", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tomb-guardians" },
+    "monks": { "title": "Battle Monks of Cathay", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/battle-monks-of-cathay" },
+    "caravans": { "title": "Merchant Caravans", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans" },
+    "maneaters": { "title": "Maneaters", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/maneaters" },
+    "nippon": { "title": "Nipponese Expedition", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition" },
+    "bretonnian": { "title": "Bretonnians", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/bretonnian" },
+    "chapel": { "title": "Bretonnian Chapel Guard", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/bretonnian-chapel-guard" },
+    "mare": { "title": "Order of the Mare", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/order-of-the-mare" },
+    "gunnery": { "title": "Gunnery School of Nuln", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/gunnery-school-of-nuln" },
+    "hochland": { "title": "Hochland Bandits", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/hochland-bandits" },
+    "stirwood": { "title": "Outlaws of Stirwood Forest", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/outlaws-of-stirwood-forest" },
+    "horned": { "title": "Horned Hunters", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/horned-hunters" },
+    "taal": { "title": "Prayers of Taal", "url": "https://mordheimer.net/docs/magic/prayers-of-taal" },
+    "mootlanders": { "title": "Mootlanders", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/mootlanders" },
+    "halflings": { "title": "Halflings", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/halflings" },
+    "eshin": { "title": "Skaven of Clan Eshin", "url": "https://mordheimer.net/docs/warbands/core-warbands/skaven-eshin" },
+    "pestilens": { "title": "Skaven of Clan Pestilens", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/skaven-pestilens" },
+    "moulder": { "title": "Skaven of Clan Moulder", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/skaven-of-clan-moulder" },
+    "dreamwalkers": { "title": "Dreamwalkers (Cult of Morr)", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/dreamwalkers-cult-of-morr" },
+    "morrproc": { "title": "The Procession of Morr – campaign overview", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/the-procession-of-morr/campaign-overview" },
+    "protectorate": { "title": "Protectorate of Sigmar", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/protectorate-of-sigmar" },
+    "society": { "title": "Sorcerous Society", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/sorcerous-society" },
+    "horror": { "title": "Masters of Horror", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/masters-of-horror" },
+    "profane": { "title": "Court of the Profane Pleasures", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/court-of-the-profane-pleasures" },
+    "aristocracy": { "title": "Aristocracy of the Night", "url": "https://mordheimer.net/docs/optional-rules/aristocracy-of-the-night" },
+    "lordsnight": { "title": "Lords of the Night", "url": "https://mordheimer.net/docs/optional-rules/lords-of-the-night" },
+    "necrarchs": { "title": "Necrarchs, the Soul Stealers", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/necrarchs-the-soul-stealers" },
+    "strigos": { "title": "Survivors of Strigos", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos" },
+    "graverobbers": { "title": "Grave Robbers", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers" },
+    "vhunters": { "title": "Vampire Hunters of Sylvania", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania" },
+    "mercs": { "title": "Mercenaries", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries" }
   },
   "LORE": [
     {
-      "id": "mordheim", "kind": "region", "name": "Mordheim", "de": "Mordheim", "source": ["flames", "city"],
+      "id": "mordheim", "kind": "region", "name": "Mordheim", "de": "Mordheim", "source": ["flames", "city"], "parent": "ostermark",
       "status": "The ruined City of the Damned, in Ostermark",
       "text": "The capital of Ostermark, crowded with revellers from all over the Empire when the twin-tailed comet fell on the first day of 2000 and destroyed it. Fires and a glowing green miasma hung over the ruins for days. Then the first wyrdstone was found there, which drew treasure hunters, the Empire's rulers and every kind of monster. Inside, the air itself is poisonous and no law holds: it is kill or be killed."
     },
     {
-      "id": "the-pit", "kind": "region", "name": "The Pit", "de": "Die Grube", "source": ["bands"],
+      "id": "the-pit", "kind": "region", "name": "The Pit", "de": "Die Grube", "source": ["bands"], "parent": "mordheim",
       "status": "The crater where the hammer of Sigmar fell",
       "text": "Where the comet struck, a pit remains whose edges are still hot and whose sides are glassy, as if the rock had run molten. The dead of the city can be seen in the glass, still posed as on that last night. Foul smoke rises from fissures in it. It is said that the Shadowlord, Master of the Possessed, dwells deep in the crater, and daemonic creatures come out of it to infest the ruins."
     },
     {
-      "id": "temple-of-sigmars-rock", "kind": "region", "name": "Temple of Sigmar's Rock", "de": "Tempel von Sigmars Fels", "source": ["bands"],
+      "id": "temple-of-sigmars-rock", "kind": "region", "name": "Temple of Sigmar's Rock", "de": "Tempel von Sigmars Fels", "source": ["bands"], "parent": "mordheim",
       "status": "The Sisters' convent on an island in the River Stir",
       "text": "The convent of the Sisters of Sigmar stands on a tall rocky island in the River Stir, which divides Mordheim in two. It survived the destruction unharmed. The Sisters say their unending prayer saved them; the Witch Hunters claim a daemonic pact let them betray the city and escape. The height of the rock lifts them above the poisonous vapours."
     },
     {
-      "id": "sigmarhaven", "kind": "region", "name": "Sigmarhaven", "de": "Sigmarhaven", "source": ["city"],
+      "id": "sigmarhaven", "kind": "region", "name": "Sigmarhaven", "de": "Sigmarhaven", "source": ["city"], "parent": "mordheim",
       "status": "A tent camp outside the walls with paid watchmen",
       "text": "One of the shabby fortified settlements that grew up outside the ruins. For all its disorder it is safe enough: paid watchmen keep the peace, and it holds a market for arms sellers, sutlers and victuallers whose wares fetch inflated prices."
     },
     {
-      "id": "cutthroats-den", "kind": "region", "name": "Cutthroat's Den", "de": "Halsabschneiders Loch", "source": ["city"],
+      "id": "cutthroats-den", "kind": "region", "name": "Cutthroat's Den", "de": "Halsabschneiders Loch", "source": ["city"], "parent": "mordheim",
       "status": "A nest of murderers outside the walls",
       "text": "An encampment little better than a den of murderers. Mutants walk freely there, and hooded men barter corpses to Necromancers in return for tainted gold."
     },
     {
-      "id": "ostermark", "kind": "region", "name": "Ostermark", "de": "Ostermark", "source": ["city", "ostermark"],
+      "id": "ostermark", "kind": "region", "name": "Ostermark", "de": "Ostermark", "source": ["city", "ostermark"], "parent": "the-empire",
       "status": "Eastern province of the Empire, lawless since Mordheim fell",
       "text": "One of the largest provinces, on the eastern fringe of the Empire: flat farmland, pasture and hedges, with isolated farms and villages and crude dirt roads, and the Great Forest on the border to Talabecland. Its Elector, Count Steinhardt, died with his whole line when Mordheim fell, and since then brigands, mercenary bands and foreign armies roam it. Famine follows burnt fields, and Orcs and Goblins from the Worlds Edge Mountains and Beastmen from the Forest of Shadows threaten it. Wyrdstone fragments lie scattered across the whole province. Its towns are Bechafen and Badenhof, and its colours are yellow and purple."
     },
     {
-      "id": "eerie-downs", "kind": "region", "name": "The Eerie Downs", "de": "Die Unheimlichen Hügel", "source": ["ostermark"],
+      "id": "eerie-downs", "kind": "region", "name": "The Eerie Downs", "de": "Die Unheimlichen Hügel", "source": ["ostermark"], "parent": "ostermark",
       "status": "A haunted fog-bound plain south of Bechafen",
       "text": "A wide open plain with an unnerving stillness. A permanent low fog rolls over the grass and crags jut from it like broken teeth. Travellers lost there are driven mad by the silence and the loss of direction. It is said the souls of the dead who died there still haunt it and howl at midnight, hungry for more souls."
     },
     {
-      "id": "ostermark-marches", "kind": "region", "name": "The Ostermark Marches", "de": "Die Ostermark-Marken", "source": ["ostermark"],
+      "id": "ostermark-marches", "kind": "region", "name": "The Ostermark Marches", "de": "Die Ostermark-Marken", "source": ["ostermark"], "parent": "ostermark",
       "status": "Frontier with Kislev, guarded by beacon towers",
       "text": "The border lands to Kislev in the north, marked by wooden watch towers with warning beacons that are lit when invasion looms, and backed by the river Lower Talabec. The town of Bechafen lies deep in the Marches: a military town renowned for the smithies and armourers who supply the army of Ostermark, and so a valuable resource against Chaos from the north."
     },
     {
-      "id": "reikland", "kind": "region", "name": "Reikland", "de": "Reikland", "source": ["reikland", "bands"],
+      "id": "reikland", "kind": "region", "name": "Reikland", "de": "Reikland", "source": ["reikland", "bands"], "parent": "the-empire",
       "status": "Heart of the Empire; seat of the Temple of Sigmar",
       "text": "Its greatest city is Altdorf, home of the Grand Theogonist. Siegfried, who styles himself Grand Prince, claims the throne with the Grand Theogonist's backing and is opposed most strongly by Middenheim and the Priests of Ulric. Reiklanders are devout followers of Sigmar, known for discipline, loyalty between officers and men and good archery. They wear practical wargear and coloured ribbons for identification or rank, and sneer at the Count of Middenheim as the “lap-dog of Ulric”. Count Siegfried's alchemist van Hoffman is said to have turned lead into gold with wyrdstone."
     },
     {
-      "id": "middenheim", "kind": "region", "name": "Middenheim", "de": "Middenheim", "source": ["middenheim", "bands"],
+      "id": "middenheim", "kind": "region", "name": "Middenheim", "de": "Middenheim", "source": ["middenheim", "bands"], "parent": "middenland",
       "status": "City of the White Wolf, in Middenland",
       "text": "A city on a mountain pinnacle among dark forest, sacred to Ulric, god of wolves and winter, whose priesthood is still strong there. Its Count, Mannfred Todbringer, is a chief contender for the throne, and the old rivalry with Reikland (and friction with the Temple of Sigmar) goes back hundreds of years. Middenheimers are big, strong, ferocious men, often bare-headed with long hair and beards, who wear wolf pelts as the mark of a wolf killed by hand."
     },
     {
-      "id": "marienburg", "kind": "region", "name": "Marienburg", "de": "Marienburg", "source": ["marienburg", "flames"],
+      "id": "marienburg", "kind": "region", "name": "Marienburg", "de": "Marienburg", "source": ["marienburg", "flames"], "parent": "wasteland",
       "status": "The City of Gold, largest port of the Old World",
       "text": "The most prosperous trading city of the Old World, where goods arrive from Ulthuan to Cathay and every craft is turned to profit. Merchant guilds hold great power there, above all the Freetraders, and its Burgomeisters wield patronage greater than many nobles. Its champion for the throne is Lady Magritta; the Grand Theogonist's refusal to crown her drove a wedge between the city and the Temple of Sigmar. Its warbands are lavishly dressed but ruthless, skilled in duelling and poison, and their rank and file are dockland thugs and ship's crews in leather coats and bandanas. Others mock Marienburgers as popinjays, but many envy their security."
     },
     {
-      "id": "talabecland", "kind": "region", "name": "Talabecland", "de": "Talabecland", "source": ["ostermark"],
+      "id": "talabecland", "kind": "region", "name": "Talabecland", "de": "Talabecland", "source": ["ostermark"], "parent": "the-empire",
       "status": "Ostermark's main neighbour, home of the Ottilans",
       "text": "The neighbouring province across the Great Forest, with the city of Talabheim. When the last Emperor, Sigismund, was killed at Altdorf and the Empire split into three claimants, Ostermark sided with the Ottilans of Talabecland. The alliance came to nothing when Magritta of Marienburg took power, and civil war and rivalry followed."
     },
     {
-      "id": "reikland-court", "kind": "faction", "name": "The Grand Prince of Reikland", "de": "Der Großfürst von Reikland", "source": ["reikland", "flames"],
+      "id": "reikland-court", "kind": "faction", "name": "The Grand Prince of Reikland", "de": "Der Großfürst von Reikland", "source": ["reikland", "flames"], "regions": ["reikland"],
       "status": "Claimant to the throne, backed by the Grand Theogonist",
       "text": "Siegfried, ruler of Reikland, who calls himself Grand Prince. He is among the richest and most ambitious contenders and hires mercenaries to bring him wyrdstone. His claim is supported by the Grand Theogonist and opposed by the Count of Middenheim and the Priests of Ulric."
     },
     {
-      "id": "middenheim-court", "kind": "faction", "name": "The Count of Middenheim", "de": "Der Graf von Middenheim", "source": ["middenheim", "bands"],
+      "id": "middenheim-court", "kind": "faction", "name": "The Count of Middenheim", "de": "Der Graf von Middenheim", "source": ["middenheim", "bands"], "regions": ["middenheim"],
       "status": "Mannfred Todbringer, claimant and rival of Reikland",
       "text": "Mannfred Todbringer, one of the chief contenders for the throne and a sponsor of mercenary warbands in Mordheim. He is backed by the Priesthood of Ulric and in constant friction with the Temple of Sigmar."
     },
     {
-      "id": "lady-magritta", "kind": "faction", "name": "Lady Magritta of Marienburg", "de": "Lady Magritta von Marienburg", "source": ["marienburg", "flames"],
+      "id": "lady-magritta", "kind": "faction", "name": "Lady Magritta of Marienburg", "de": "Lady Magritta von Marienburg", "source": ["marienburg", "flames"], "regions": ["marienburg"],
       "status": "The merchant guilds' candidate for the throne",
       "text": "The favourite of the merchant guilds and the common choice of the lesser states. The Grand Theogonist disqualified her under the doctrine of male ascent, by which no woman may wear Sigmar's crown. The Ostermark account has her as the young Empress who secured power, though many in the powerful institutions around Altdorf thought her a puppet of her elders."
     },
     {
-      "id": "freetraders", "kind": "group", "name": "The Freetraders", "de": "Die Freihändler", "source": ["marienburg", "flames", "bands"],
+      "id": "freetraders", "kind": "group", "name": "The Freetraders", "de": "Die Freihändler", "source": ["marienburg", "flames", "bands"], "regions": ["marienburg"],
       "status": "Secret circle of the richest guildsmen",
       "text": "The High Order of Honourable Freetraders, an elite and secretive body of wealthy merchants based in Marienburg. They feel shackled by the old order and want power, and their candidate for Emperor is Lady Magritta. Their secret members hold positions of authority throughout the Empire, and through them most minor Electors were persuaded to back her. The Grand Theogonist has set himself against them. Some of those disappointed by the old order are said to turn to dark cults and sorcery."
     },
     {
-      "id": "count-von-carstein", "kind": "faction", "name": "Count von Carstein of Sylvania", "de": "Graf von Carstein von Sylvanien", "source": ["bands", "flames"],
+      "id": "count-von-carstein", "kind": "faction", "name": "Count von Carstein of Sylvania", "de": "Graf von Carstein von Sylvanien", "source": ["bands", "flames"], "regions": ["sylvania"],
       "status": "Powerful claimant, secretly a necromancer and vampire",
       "text": "The most powerful of the other claimants, though few are tempted by his gold because of his reputation: he is said to drink the blood of men and raise the dead. His minions are sly, skulk in the shadows and avoid daylight, yet they too come to Mordheim. Few suspect his true nature, perhaps only the Witch Hunters, who trust no one."
     },
     {
-      "id": "grand-theogonist", "kind": "faction", "name": "The Grand Theogonist of Sigmar", "de": "Der Großtheogonist Sigmars", "source": ["city", "bands"],
+      "id": "grand-theogonist", "kind": "faction", "name": "The Grand Theogonist of Sigmar", "de": "Der Großtheogonist Sigmars", "source": ["city", "bands"], "regions": ["reikland"],
       "status": "Spiritual head of the Empire, hungry for worldly power",
       "text": "The leader of the Temple of Sigmar, whose temples stand in every town. He refused to crown Lady Magritta and is said to covet the crown himself. He preaches a holy crusade against mutants and sorcerers, and has sent the Witch Hunters into Mordheim, officially to cleanse it, but, it is said, also to gather wyrdstone for his own ends. Since the city fell, thousands have gathered at the holy places and penitents roam the roads."
     },
@@ -107,24 +212,654 @@
       "text": "The Order of Templars, called Witch Hunters by those who fear and hate them and by themselves, who take pride in persecuting heretics. They came to Mordheim with carts of cages, braziers and irons. They trust no one, curse the Sisters of Sigmar as heretics for their creed that denies women divinity in Sigmar's temple, and are ancient enemies of the Sisterhood."
     },
     {
-      "id": "sisters-of-sigmar", "kind": "group", "name": "The Sisters of Sigmar", "de": "Die Schwestern Sigmars", "source": ["bands", "flames"],
+      "id": "sisters-of-sigmar", "kind": "group", "name": "The Sisters of Sigmar", "de": "Die Schwestern Sigmars", "source": ["bands", "flames"], "regions": ["mordheim", "temple-of-sigmars-rock"],
       "status": "Holy Order, home of the Seeress who read the comet",
       "text": "The Holy Order whose Seeress first saw the comet. Its members are daughters of the noblest houses of the Empire, and its cloisters have long sheltered those who would be troublesome to their families. Their convent, the Temple of Sigmar's Rock, survived the destruction. They fight side by side with the Witch Hunters yet are their deadliest enemies, in a holy rivalry that no forgiveness can end."
     },
     {
-      "id": "master-of-the-possessed", "kind": "faction", "name": "The Shadowlord and the Cult of the Possessed", "de": "Der Schattenherr und der Kult der Besessenen", "source": ["bands"],
+      "id": "master-of-the-possessed", "kind": "faction", "name": "The Shadowlord and the Cult of the Possessed", "de": "Der Schattenherr und der Kult der Besessenen", "source": ["bands"], "regions": ["mordheim", "the-pit"],
       "status": "Dark Emperor of the secret cults, said to dwell in the Pit",
       "text": "The secret cults of the dark gods, made up of those who found the old order a shackle, and who practise sorcery, have found a leader: the Shadowlord, Master of the Possessed, a Dark Emperor of whom none can say whether he is man or Daemon. The cults gather wyrdstone in Mordheim. From the crater come twisted daemonic creatures of great strength that infest the ruins."
     },
     {
-      "id": "ostermark-warbands", "kind": "group", "name": "The Ostermark Warbands", "de": "Die Ostermark-Banden", "source": ["ostermark", "ostermarkers"],
+      "id": "ostermark-warbands", "kind": "group", "name": "The Ostermark Warbands", "de": "Die Ostermark-Banden", "source": ["ostermark", "ostermarkers"], "regions": ["ostermark"],
       "status": "Farmers turned fighters, defending what is left",
       "text": "Farmers by trade, sturdy and capable fighters who have defended their land alone against mercenaries and brigands. Since Mordheim fell, some have abandoned burnt farms and formed warbands to take back what was taken, to defend their land, or simply to share the plunder. Their men do not give up easily and their captains may start with a wardog from the farm. They fight with pitchforks, axes and bows, and carry wooden shields and the heraldry of rams, bulls' heads, scythes and ears of corn."
     },
     {
-      "id": "ostermark-brigands", "kind": "group", "name": "The Brigands and Reavers of Ostermark", "de": "Die Räuber und Plünderer von Ostermark", "source": ["city", "ostermark"],
+      "id": "ostermark-brigands", "kind": "group", "name": "The Brigands and Reavers of Ostermark", "de": "Die Räuber und Plünderer von Ostermark", "source": ["city", "ostermark"], "regions": ["ostermark"],
       "status": "Bandits and roaming mercenary bands in the ruined countryside",
       "text": "Since the fall of Mordheim, wild reavers, thieves, bandits and mercenary bands roam the neglected province, loot villages, burn homes and rob the weak. The only law they know is force of arms. Some fighters rise up against them out of a sense of justice, which the lawless time rarely rewards."
+    },
+    {
+      "id": "old-world", "kind": "region", "name": "Old World", "de": "Die Alte Welt", "source": ["wbcaravan", "btbset", "eifset"],
+      "status": "Home continent of the human realms and of Mordheim",
+      "text": "The western lands where the Empire, Kislev, Bretonnia and Tilea lie, cut off from the dwarfen and orc lands by great mountain ranges. Merchants from here sail to Lustria and the Southlands or trek over land to Ind and Cathay. Most warbands in the campaign start their journey from somewhere in this region."
+    },
+    {
+      "id": "the-empire", "kind": "region", "name": "The Empire", "de": "Das Imperium", "source": ["eifset", "flames", "city"], "parent": "old-world",
+      "status": "Greatest human realm; no Emperor, split between rival Electors",
+      "text": "A huge, heavily forested land ringed by the Sea of Claws, the Worlds Edge, Black and Grey Mountains. Around the year 2000 no Emperor rules and the Elector Counts and the Grand Theogonist fight over the crown, while bandits, mutants and Beastmen roam the wilds. The big electoral provinces, including the Halfling Mootland, each send fortune seekers to Mordheim."
+    },
+    {
+      "id": "averland", "kind": "region", "name": "Averland", "de": "Averland", "source": ["wbaverland"], "parent": "the-empire",
+      "status": "Rich southern province of the Empire; capital Averheim",
+      "text": "A prosperous county between the Aver and the Upper Reik, bordering the Black Mountains and the Worlds Edge Mountains. Its mines supply ore that is barged down the Aver to Nuln, and its soldiers are famed for lavish uniforms and good archery. Mercenaries from here know the Black Fire Pass trade route and its Night Goblin and Skaven dangers."
+    },
+    {
+      "id": "hochland", "kind": "region", "name": "Hochland", "de": "Hochland", "source": ["wbhochland"], "parent": "the-empire",
+      "status": "Forested province next to Talabecland, hit hard by the Storm of Chaos",
+      "text": "A province across the River Talabec from Talabecland. After the Storm of Chaos many Hochlanders fled across the border as refugees and clashed with the locals around Talabheim. Poverty and scarce trade drive some of them into banditry and into the Great Forest in search of rumoured treasure."
+    },
+    {
+      "id": "middenland", "kind": "region", "name": "Middenland", "de": "Middenland", "source": ["middenheim", "eifset"], "parent": "the-empire",
+      "status": "Duchy of the Count of Middenheim, land of the Ulric cult",
+      "text": "A northern electoral duchy, ruled from the mountaintop city of Middenheim by Count Mannfred Todbringer, one of the leading claimants to the throne. The Drakwald Forest surrounds the city, and the Great North Road leads from here to Marienburg. Its people are big, fierce and loyal to Ulric."
+    },
+    {
+      "id": "ostland", "kind": "region", "name": "Ostland", "de": "Ostland", "source": ["wbostland", "eifset"], "parent": "the-empire",
+      "status": "Sparse northern province with close ties to Kislev",
+      "text": "The thinly populated northernmost province, cut off from the rest of the Empire by the Forest of Shadows and the Middle Mountains. Its poor, hardy villagers live as farmers and trappers, honour Taal, and have suffered more than anyone from Chaos raids. They are self-reliant and will hire no mercenaries save Ogres."
+    },
+    {
+      "id": "stirland", "kind": "region", "name": "Stirland", "de": "Stirland", "source": ["wbstirwood"], "parent": "the-empire",
+      "status": "County along the River Stir, famed for strict law and outlaws",
+      "text": "A county whose Elector Count was feared for harsh justice; even petty criminals were declared outlaws. Many fled north into Stirwood, a small forest across the River Stir near Nuln, where they formed archer bands. Tales of Mordheim travelling down the river tempt such outlaws towards the ruined city."
+    },
+    {
+      "id": "sylvania", "kind": "region", "name": "Sylvania", "de": "Sylvanien", "source": ["wbundead", "wbhunters", "eifset"], "parent": "the-empire",
+      "status": "Province ruled by the von Carsteins, a land of vampires and fog",
+      "text": "Count Vlad von Carstein and his Countess rule from Drakenhof castle; the whole ruling class are vampires hiding behind a dire reputation. The land is full of bogs, fogs and the restless dead, so locals either flee or take up arms. Vampire hunters and Morr priests enter to break the dynasty, and Vlad's servants hunt wyrdstone in Mordheim."
+    },
+    {
+      "id": "moot", "kind": "region", "name": "Moot", "de": "Das Moot", "source": ["eifset", "wbmoot"], "parent": "the-empire",
+      "status": "Halfling Mootland, an electoral province of its own",
+      "text": "The Halfling homeland where the Aver Reach and the Blue Reach rivers meet. It counts among the Empire's electoral provinces. Halflings seldom leave, but now and then a restless elder gathers friends and marches to Mordheim hoping for gold, wyrdstone and kitchens."
+    },
+    {
+      "id": "wasteland", "kind": "region", "name": "Wasteland", "de": "Das Ödland", "source": ["eifset", "marienburg"], "parent": "old-world",
+      "status": "Low, windy, marshy plain around Marienburg",
+      "text": "A barren, marshy coastal plain exposed to the winds off the Sea of Claws, running from the Reikwald Forest to the Pale Sisters. Marienburg, the greatest port of the Old World, stands here at the mouth of the Reik. Rumours say Orcs and Beastmen lurk in the fens."
+    },
+    {
+      "id": "altdorf", "kind": "region", "name": "Altdorf", "de": "Altdorf", "source": ["wbmerc", "eifset", "wbdruchii"], "parent": "reikland",
+      "status": "Great Reikland city on an island in the Reik, home of the Grand Theogonist",
+      "text": "Reikland's greatest city, built on a mud-flat island where the Talabec meets the Reik, among marshes and shifting channels. It is home to the Grand Theogonist and the Temple of Sigmar and hosts the College of Magic."
+    },
+    {
+      "id": "nuln", "kind": "region", "name": "Nuln", "de": "Nuln", "source": ["wbnuln", "eifset"], "parent": "the-empire",
+      "status": "River city with the Imperial Gunnery School",
+      "text": "A great city on the Reik, where the Aver and the Upper Reik join. Its last bridge is a wonder with a liftable wooden centre. It is respected for the best handguns and war machines outside the dwarf holds and trains the Empire's gunners."
+    },
+    {
+      "id": "talabheim", "kind": "region", "name": "Talabheim", "de": "Talabheim", "source": ["wbhochland", "wbhorned", "eifset"], "parent": "talabecland",
+      "status": "Crater city of Talabecland, Taal's stronghold",
+      "text": "A large city on the Talabec, which is too wide to bridge here and so needs a big ferry. It is built in a great crater and honours Taal as Father of Rivers. It has strained to absorb refugees from the east, and Horned Hunters stay away from it."
+    },
+    {
+      "id": "great-forest", "kind": "region", "name": "Great Forest", "de": "Der Große Wald", "source": ["eifset", "nemcrown", "wbstirwood"], "parent": "the-empire",
+      "status": "Enormous forest in the heart of the Empire; border of Ostermark and Talabecland",
+      "text": "An ancient, huge woodland of old oaks and willows from the Middle Mountains to Nuln, and from Altdorf to Kislev's border. The River Stir cuts off its southern part as Stirwood. Many corners are too wild even for Imperial armies, so small warbands search them for secrets such as the Nemesis Crown."
+    },
+    {
+      "id": "forest-of-shadows", "kind": "region", "name": "Forest of Shadows", "de": "Der Schattenwald", "source": ["eifset", "wbostland"], "parent": "ostland",
+      "status": "Dark pine forest covering most of Ostland",
+      "text": "A dense, gloomy pine forest north of the Middle Mountains. Bandits, Chaos warbands, Forest Goblins and wolf packs haunt it. The road from Middenheim to Kislev's Erengrad runs through it."
+    },
+    {
+      "id": "drakwald-forest", "kind": "region", "name": "Drakwald Forest", "de": "Der Drakwald", "source": ["eifset", "nemcrown"], "parent": "middenland",
+      "status": "Sparse birch forest around Middenheim",
+      "text": "A thin birch forest on poor sandy soil that was never cleared for farming. It lies around Middenheim, and the road from Marienburg to Middenheim crosses it. Several wilderness scenarios are set in its 'Deeps' territory."
+    },
+    {
+      "id": "middle-mountains", "kind": "region", "name": "Middle Mountains", "de": "Das Mittelgebirge", "source": ["eifset", "wbostland"], "parent": "the-empire",
+      "status": "Highest uplands of the Empire, inhabited by Ogres and Chaos bands",
+      "text": "A tall range in the north of the Empire, ringed by dense forest and lacking any dwarf holds. Chaos warbands, Beastmen, Orcs and Goblins use the heights as hideouts, and Ogres live on the peaks. Few humans go there, apart from bandits."
+    },
+    {
+      "id": "river-reik", "kind": "region", "name": "River Reik", "de": "Der Reik", "source": ["eifset"], "parent": "the-empire",
+      "status": "Main trade artery of the Empire, from Black Fire Pass to Marienburg",
+      "text": "The most important river of the Empire, rising south of Black Fire Pass and flowing to the sea at Marienburg. More ships ply the stretch between Marienburg and Nuln than on all other imperial rivers together. The Reikland on its banks is the most prosperous part of the Empire."
+    },
+    {
+      "id": "river-stir", "kind": "region", "name": "River Stir", "de": "Die Stir", "source": ["eifset", "wbstirwood"], "parent": "the-empire",
+      "status": "River flowing through the ruins of Mordheim",
+      "text": "A large river that rises near Karak Kadrin and runs down through the Great Forest in a deep, wooded valley. Stirland lies to its south and Talabecland to its north, and there are few places to cross it. It flows through Mordheim, so rumours of the ruined city travel with it towards Stirland."
+    },
+    {
+      "id": "kislev", "kind": "region", "name": "Kislev", "de": "Kislev", "source": ["wbkislev", "eifset"], "parent": "old-world",
+      "status": "Northern realm of the Tzars, bulwark against Chaos",
+      "text": "A land of forests giving way to steppe toward the Worlds Edge Mountains, with long harsh winters and mostly timber towns, though the old capital has white buildings with gilded domes. It lies right on the edge of the Chaos Wastes and is often raided by Norse. Allied to the Empire, its people are cheerful, fond of vodka and good fighters."
+    },
+    {
+      "id": "bretonnia", "kind": "region", "name": "Bretonnia", "de": "Bretonnia", "source": ["wbbretonnia", "eifset"], "parent": "old-world",
+      "status": "Realm of chivalry beyond the Grey Mountains",
+      "text": "A kingdom of knights ruled by honour and under the Lady of the Lake. Its nobles see Mordheim as a vile place and thus a fitting test, so Questing Knights give up their domain and ride there, trailed by Knights Errant. The main road to the Empire leads over the Grey Mountains."
+    },
+    {
+      "id": "athel-loren", "kind": "region", "name": "Athel Loren", "de": "Athel Loren", "source": ["wbwoodelf", "wbmare"], "parent": "bretonnia",
+      "status": "Enchanted forest of the Wood Elves, said to lie in eastern Bretonnia",
+      "text": "A magical forest where the reclusive Wood Elves have long lived apart from their kin, ruled by Orion and Ariel. They hate Dark Elves and will not fight beside Chaos. Rarely, their warbands step out to shape events beyond the woods."
+    },
+    {
+      "id": "tilea", "kind": "region", "name": "Tilea", "de": "Tilea", "source": ["wbtilean", "btbset"], "parent": "old-world",
+      "status": "Land of rival merchant city-states and sea traders",
+      "text": "A wealthy land of feuding city-states whose people are proud of their civic status and have become skilled sailors and explorers. Tilean warbands are hired by city-states, guilds and merchants to probe jungles, deserts and ruins like Mordheim. Many caravans for the far east have set out from here."
+    },
+    {
+      "id": "miragliano", "kind": "region", "name": "Miragliano", "de": "Miragliano", "source": ["wbtilean"], "parent": "tilea",
+      "status": "Tilean city of crossbowmen who hate Skaven",
+      "text": "A Tilean city famed for its crossbows; its warbands shoot well with them. Its people have hated Skaven since the red pox of 1812 killed three quarters of its inhabitants."
+    },
+    {
+      "id": "remas", "kind": "region", "name": "Remas", "de": "Remas", "source": ["wbtilean", "btbset"], "parent": "tilea",
+      "status": "Tilean port city that loathes Dark Elves",
+      "text": "A coastal Tilean city invaded by a Dark Elf fleet in 1487. Its people ever since fight Dark Elves to the death, and its officers are stern leaders. Remas was the one city that refused to back the famous overland caravan to the east."
+    },
+    {
+      "id": "trantio", "kind": "region", "name": "Trantio", "de": "Trantio", "source": ["wbtilean"], "parent": "tilea",
+      "status": "Tilean city whose warbands were best equipped in Lustria",
+      "text": "A Tilean city-state that sends well-funded expeditions overseas. In Lustrian campaigns a Trantio warband starts with extra funds and thus counts as the best equipped human band there."
+    },
+    {
+      "id": "border-princes", "kind": "region", "name": "Border Princes", "de": "Die Grenzfürsten", "source": ["eifset", "wbaverland"], "parent": "old-world",
+      "status": "Wild southern lands beyond the Black Mountains",
+      "text": "The unruly southern borderland beyond the Black Mountains, outside the Empire's rule. Goods from here come to the Empire through Black Fire Pass."
+    },
+    {
+      "id": "black-mountains", "kind": "region", "name": "Black Mountains", "de": "Die Schwarzen Berge", "source": ["eifset", "wbaverland"], "parent": "old-world",
+      "status": "Southern mountain wall of the Empire, riddled with goblin tunnels",
+      "text": "A steep, hostile range between the Grey and Worlds Edge Mountains that divides the Empire from the Border Princes. The weather is erratic and the passes are dangerous. Night Goblins, Trolls and Skaven infest its crumbly tunnels."
+    },
+    {
+      "id": "black-fire-pass", "kind": "region", "name": "Black Fire Pass", "de": "Der Schwarzfeuerpass", "source": ["eifset", "wbaverland"], "parent": "black-mountains",
+      "status": "Only reliable pass over the southern mountains",
+      "text": "A deep fortified cleft that divides the Black Mountains from the Worlds Edge Mountains and guards the southern approach to the Empire. It follows an old dwarf road past Averheim, and goods go on by barge to Nuln. Sigmar is said to have beaten the Orcs in the valley in its middle."
+    },
+    {
+      "id": "grey-mountains", "kind": "region", "name": "Grey Mountains", "de": "Das Grau-Gebirge", "source": ["eifset"], "parent": "old-world",
+      "status": "Mountains separating the Empire from Bretonnia",
+      "text": "The western range, with few and less rich dwarf holds. Most passes are narrow, fit for merchants with pack animals only, while the biggest, Axe Bite Pass, is guarded by Helmgart. The Gisoreux Gap in the north is the main route between Bretonnia and the Empire."
+    },
+    {
+      "id": "worlds-edge-mountains", "kind": "region", "name": "Worlds Edge Mountains", "de": "Das Weltrandgebirge", "source": ["wbaverland", "eifset", "btbset"], "parent": "old-world",
+      "status": "Huge eastern range of dwarf holds, greenskins and monsters",
+      "text": "A very tall range along the eastern side of the Empire and Kislev, with a handful of passes and many underground routes. It holds rich dwarf mines but also Night Goblins, Skaven and monsters, and the ruined holds. Beyond its eastern side lie the Dark Lands, the start of the road to Cathay."
+    },
+    {
+      "id": "norsca", "kind": "region", "name": "Norsca", "de": "Norsca", "source": ["wbnorse", "btbset", "wbmarauder"],
+      "status": "Cold northern land of the Norse, across the Sea of Claws",
+      "text": "A land of snow, ice and mountains north of the Empire, home to mammoths, big wolves and polar bears. The Norse there live by war and raiding and are superb sailors, and the southern tribes are least touched by Chaos. They were the first humans to find Lustria and the Southlands, and many sell their swords as mercenaries."
+    },
+    {
+      "id": "the-chaos-wastes", "kind": "region", "name": "The Chaos Wastes", "de": "Die Chaos-Wüste", "source": ["wbmarauder", "wbkislev", "btbset"],
+      "status": "Frozen north where the winds of Chaos blow",
+      "text": "A land in the far north from which Chaos spills out, with Kislev lying right at its edge. Kurgan and Hung nomads of the Northern Wastes worship the dark gods, and the Kurgan raise monoliths where the winds of Chaos blow strong. Marauder chieftains lead warbands south to win glory."
+    },
+    {
+      "id": "eastern-steppes", "kind": "region", "name": "Eastern Steppes", "de": "Die Östlichen Steppen", "source": ["btbset", "wbcathay"], "parent": "cathay-and-the-east",
+      "status": "Endless grassland north of Cathay roamed by the Hung",
+      "text": "A vast plain on the northern edge of Grand Cathay, over which the nomadic Hung range. Hobgoblin riders also roam it, and Cathay built the Great Bastion against such raiders. The mutant Tong horde once swept across it."
+    },
+    {
+      "id": "lustria", "kind": "region", "name": "Lustria", "de": "Lustria", "source": ["lustriaset", "wblizard", "wbreavers"],
+      "status": "Jungle continent of the Lizardmen and the lost cities of gold",
+      "text": "A steaming continent across the western ocean of ancient ziggurat cities abandoned by the Lizardmen and guarded by their temple guards. Explorers seek gold, magic and arcane lore there and many never return. Norse, Tilean and Estalian colonies hug the coast, with High Elves in the south and a war between Lizardmen and Skaven in the interior."
+    },
+    {
+      "id": "skeggi", "kind": "region", "name": "Skeggi", "de": "Skeggi", "source": ["lussettle", "wbnorse", "wbamazon"], "parent": "lustria",
+      "status": "Oldest human colony in Lustria, founded by the Norse",
+      "text": "The Norse port founded by Losteriksson in the year 888 on Lustria's east coast, still home to his descendants. It has faded as the restless Norse sought raids elsewhere, but still offers good mercenaries and drinking halls. The Amazons are said to descend from Norse widows who left here."
+    },
+    {
+      "id": "santa-magritta", "kind": "region", "name": "Santa Magritta", "de": "Santa Magritta", "source": ["lussettle"], "parent": "lustria",
+      "status": "Estalian jewel of Lustria, on Colombo's Island",
+      "text": "A handsome Estalian port with a busy harbour, markets of Old World and exotic goods, and a militia that fights Lizardmen raids and Tileans. Settlers, convicts, mercenaries and missionaries all arrive here. Lizardmen, Amazons, Dark Elves, undead and Skaven warbands may not stay."
+    },
+    {
+      "id": "nuevo-luccini", "kind": "region", "name": "Nuevo Luccini", "de": "Nuevo Luccini", "source": ["lussettle"], "parent": "lustria",
+      "status": "Pirate-and-robber harbour on the Cactus Coast",
+      "text": "A lawless Tilean port on the sun-blessed Cactus Coast, known for robbers and pirates but a good place to buy goods. It has taverns, a trading post and a church of Luccan. Rare items cost no extra but all goods are harder to find."
+    },
+    {
+      "id": "scorpion-coast", "kind": "region", "name": "Scorpion Coast", "de": "Die Skorpionküste", "source": ["lusequip"], "parent": "lustria",
+      "status": "Lustrian coast with the fortified post of the Di Ranza family",
+      "text": "A stretch of Lustria's coast where the Tilean Di Ranza family, exiled after feuds, built a fortified trading post. It is used as a staging base for smaller warbands heading into the jungle."
+    },
+    {
+      "id": "citadel-of-dusk", "kind": "region", "name": "Citadel of Dusk", "de": "Die Zitadelle der Dämmerung", "source": ["lustriaset", "lusequip"], "parent": "lustria",
+      "status": "High Elf fortress on Lustria's southern tip",
+      "text": "A huge High Elf stronghold at the southern end of Lustria, where the sun rarely climbs high. It guards the western sea route to Cathay, and the elves send secretive expeditions into the jungle from it. They fight Estalian and Tilean fleets."
+    },
+    {
+      "id": "land-of-the-dead", "kind": "region", "name": "Land of the Dead", "de": "Das Land der Toten", "source": ["khemriset", "wbaraby"],
+      "status": "Desert ruins of Nehekhara, ruled by Tomb Kings and Liches",
+      "text": "The old human kingdom of Nehekhara south-east of the Old World, ruined by civil war and now a sand desert with a blood-coloured river. Mummy kings and Liche Lords command legions of the dead in huge necropolises, guarding treasures and necromantic writings. Tomb robbers, Crusaders and Arabian nomads venture in."
+    },
+    {
+      "id": "khemri", "kind": "region", "name": "Khemri", "de": "Khemri", "source": ["khemriset"], "parent": "land-of-the-dead",
+      "status": "Cursed city with the Great Pyramid and the Black Pyramid of Nagash",
+      "text": "A dead city at the heart of the Land of the Dead, ringed by tombs and crypts of kings and nobles. The Great Pyramid and the vaster Black Pyramid of Nagash dominate it. The dead still patrol and repair the tombs on some dark nights."
+    },
+    {
+      "id": "lahmia", "kind": "region", "name": "Lahmia", "de": "Lahmia", "source": ["wbnecrarch", "khemriset"], "parent": "land-of-the-dead",
+      "status": "Destroyed city of the first vampires, with a burned Great Library",
+      "text": "A city of Nehekhara whose destruction ended the kingdom of the Vampires and burned its Great Library. A few Necrarchs fled with Nagash's writings and now hide in towers around the world. Several of them have come to Mordheim."
+    },
+    {
+      "id": "araby", "kind": "region", "name": "Araby", "de": "Araby", "source": ["wbaraby", "khemriset"],
+      "status": "Desert land of nomad tribes west of the Land of the Dead",
+      "text": "The great desert west of the Land of the Dead where nomad tribes wander from oasis to oasis. They are fine desert guides, feared raiders, and bound by strict honour and blood feuds. Some raid the nearby necropolises."
+    },
+    {
+      "id": "cathay-and-the-east", "kind": "region", "name": "Cathay and the East", "de": "Cathay und der Osten", "source": ["btbset", "wbcaravan"],
+      "status": "Far eastern lands reached by the long overland roads",
+      "text": "The faraway lands of Cathay, Ind and Nippon, long known in the Old World only from rumour. Trade passes by sea around the Southlands or overland through the Dark Lands. Fortunes can be made there, but only a minority of caravans return."
+    },
+    {
+      "id": "grand-cathay", "kind": "region", "name": "Grand Cathay", "de": "Das Große Cathay", "source": ["btbset", "wbcathay"], "parent": "cathay-and-the-east",
+      "status": "Walled eastern empire under the Celestial Emperor",
+      "text": "A civilised eastern empire, rich in silk and jade, ruled from Weijin by a divine Emperor and a large bureaucracy. Old Worlders may trade only at a border reservation, and warrior monks guard its fortified frontiers. Monsters, Chaos tribes, Hobgoblins and Ogres press at its borders."
+    },
+    {
+      "id": "weijin", "kind": "region", "name": "Weijin", "de": "Weijin", "source": ["btbset", "wbcathay"], "parent": "grand-cathay",
+      "status": "Cathayan capital and seat of the Dragon Throne",
+      "text": "The city of the Celestial Emperor and his court, entirely devoted to serving the throne. All its food must be brought in from elsewhere, over a hundred tons weekly. The Emperor appoints emissaries from here to govern the border districts."
+    },
+    {
+      "id": "great-bastion", "kind": "region", "name": "Great Bastion", "de": "Der Große Wall", "source": ["btbset", "wbcathay"], "parent": "grand-cathay",
+      "status": "Immense wall on Cathay's northern frontier",
+      "text": "A seemingly endless wall guarding Cathay's northern border against the Hung. It is at least five men high and runs over hills. Its western end is the city of Nan-Gau, whose garrison patrols its length."
+    },
+    {
+      "id": "khuresh", "kind": "region", "name": "Khuresh", "de": "Khuresh", "source": ["btbset"], "parent": "grand-cathay",
+      "status": "Wild mountain and jungle land south of Cathay",
+      "text": "A rough land of mountains, deserts, jungles and marshes on Cathay's southern border. Exiles who want to overthrow the Emperor gather in its north, and ratmen mass there at times. Cathay keeps a second large military command nearby, which also protects the Spice Road to Ind."
+    },
+    {
+      "id": "silk-road", "kind": "region", "name": "Silk Road", "de": "Die Seidenstraße", "source": ["btbset", "wbcaravan"], "parent": "cathay-and-the-east",
+      "status": "Overland caravan route from Tilea to Cathay",
+      "text": "The great trade route opened by two Tilean brothers' caravan, passing the last dwarf hold and then crossing the Dark Lands and mountains to reach Cathay. It is deadly: roving greenskins, the restless dead, Chaos dwarfs, Ogres and deserts kill most caravans. Mercenary escorts find steady work here."
+    },
+    {
+      "id": "dark-lands", "kind": "region", "name": "Dark Lands", "de": "Die Schwarzen Lande", "source": ["eifset", "btbset", "wbblackdw"], "parent": "cathay-and-the-east",
+      "status": "Orc-infested wastes east of the Worlds Edge Mountains",
+      "text": "A bleak, desolate plain beyond the dwarf holds, haunted by greenskin wolf riders, wandering undead and dark metal monuments. Chaos dwarfs dominate parts of it from their land of Zharr. Merchants who cross it on the way to Cathay risk everything."
+    },
+    {
+      "id": "zharr-naggrund", "kind": "region", "name": "Zharr-Naggrund", "de": "Zharr-Naggrund", "source": ["wbblackdw", "wbhashut"], "parent": "dark-lands",
+      "status": "City of Fire and Desolation, seat of the Chaos Dwarfs",
+      "text": "The Chaos Dwarf city of the Dark Lands, where slaves toil in labour pits beneath an obsidian ziggurat tower. The Chaos Dwarfs of the ash-choked Plain of Zharr worship Hashut. Their sorcerers know of wyrdstone, and some send raiders to Mordheim for slaves and loot."
+    },
+    {
+      "id": "mountains-of-mourn", "kind": "region", "name": "Mountains of Mourn", "de": "Die Berge der Trauer", "source": ["wbogre", "wbcaravan", "btbset"], "parent": "cathay-and-the-east",
+      "status": "Ogre mountains on the way to Cathay, with ancient giant ruins",
+      "text": "A high mountain range of hostile weather and huge bears, home to tribes of Ogres and goblins living beside them. Ogres drift from here into foreign lands as hired muscle. Caravans fear the Ogres and the ruins of giant dwellings."
+    },
+    {
+      "id": "nippon", "kind": "region", "name": "Nippon", "de": "Nippon", "source": ["wbnippon", "btbset", "wbcaravan"], "parent": "cathay-and-the-east",
+      "status": "Far eastern land of clans, samurai and ronin",
+      "text": "A distant land south-east of Cathay, ruled by clans with samurai and ashigaru. Nipponese ronin sell their swords as caravan guards. Rare expeditions come to Mordheim for relics and knowledge as well as honour."
+    },
+    {
+      "id": "ulthuan", "kind": "region", "name": "Ulthuan", "de": "Ulthuan", "source": ["lustriaset", "wbshadow", "marienburg"],
+      "status": "Island kingdom of the High Elves",
+      "text": "The elven isle in the far west, from where High Elf ships once explored the world, and whose traders now sail widely. It was once home to Nagarythe, from which the Dark Elves broke away. Its goods turn up in Marienburg's shops."
+    },
+    {
+      "id": "nagarythe", "kind": "region", "name": "Nagarythe", "de": "Nagarythe", "source": ["wbshadow"], "parent": "ulthuan",
+      "status": "Fallen High Elf kingdom, home of the Shadow Warriors",
+      "text": "A once-rich High Elf kingdom that Malekith and Morathi led into Chaos worship. The loyal remnant fought a shadow war, then wandered as outcasts when Nagarythe was torn apart. Some of these Shadow Elves now seek fortune and revenge across the world."
+    },
+    {
+      "id": "naggaroth", "kind": "region", "name": "Naggaroth", "de": "Naggaroth", "source": ["wbdarkelf", "wbdruchii"],
+      "status": "Harsh land of the Dark Elves",
+      "text": "The cold, hard homeland of the Dark Elves (Druchii), who raid the world for slaves, gold and magic. Their ships hunt for wyrdstone and captives. They are feared more than Orcs."
+    },
+    {
+      "id": "albion", "kind": "region", "name": "Albion", "de": "Albion", "source": ["albionset"],
+      "status": "Fog-bound isle of Ogham Stones, fens and storms",
+      "text": "A misty island hidden from the world by thick fog, rich in rumoured treasure and the magic of its Ogham Stones. It has bogs, rain and storms, and dark and druidic wizards struggle there. Warbands usually find it by chance on a voyage."
+    },
+    {
+      "id": "strigos", "kind": "region", "name": "Strigos", "de": "Strigos", "source": ["wbstrigos"],
+      "status": "Lost realm of the Strigoi vampires and the Strigany",
+      "text": "A once-rich kingdom under the 'undying king' Ushoran, ruined with Mourkain. Its descendants, the Strigany, wander in caravans through human lands and are often blamed for serving the vampire Strigoi. Strigoi now haunt graveyards with ghouls."
+    },
+    {
+      "id": "brigandsburg", "kind": "region", "name": "Brigandsburg", "de": "Brigandsburg", "source": ["encbrig"], "parent": "mordheim",
+      "status": "Rough encampment near Mordheim, full of Middenheimers and hired swords",
+      "text": "One of the rival camps around the ruins, home to the shadier crowd, chiefly Middenheimers and Witch Hunters. It offers the most hired swords, at a discount, but the streets are dangerous. Marienburgers shun it as too filthy."
+    },
+    {
+      "id": "norse-tribes", "kind": "group", "name": "Norse Tribes", "de": "Norse-Stämme", "source": ["marauders", "norseexp"], "regions": ["norsca"],
+      "status": "Seafaring Chaos-worshipping raiders of the far north",
+      "text": "The Norse are the northern clans of Norsca: tall, fair and warlike people from a cold, mountainous coast haunted by mutant trolls and giants. They sail longships to raid the south and the far west, and many tribes serve the dark gods openly. With little loyalty beyond clan and ancestors they will also fight for pay. The clans that dwell farthest from the Realm of Chaos enjoy the least of their gods' favour, and that is why they are the ones most often met in the open in the lands of men."
+    },
+    {
+      "id": "kurgan-tribes", "kind": "group", "name": "Kurgan Tribes", "de": "Kurgan-Stämme", "source": ["marauders"], "regions": ["the-chaos-wastes"],
+      "status": "Dark-skinned horse and hound tribes of the Northern Wastes",
+      "text": "The Kurgan are a numerous, powerfully built people of the Northern Wastes, west of the Hung, and equally at home on foot or in the saddle. They come most eagerly and in the greatest numbers when Chaos hosts gather against the Old World, and the northernmost tribes are held to be the fiercest and most likely to win the gods' favour. Some tribes breed pit hounds to fight bears and trolls, and they craft bows from the bones of fallen foes. Having no ties to civilisation, they are never welcome on the farms and villages they raid."
+    },
+    {
+      "id": "hung-tribes", "kind": "group", "name": "Hung Tribes", "de": "Hung-Stämme", "source": ["marauders"], "regions": ["the-chaos-wastes", "cathay-and-the-east"],
+      "status": "Treacherous steppe horsemen who raid Cathay",
+      "text": "The Hung are an eastern people, shorter and stockier than the Cathayans but alike to them in looks, and rated the finest riders anywhere. Their small, hardy horses thrive where bigger mounts would starve, so the tribes hunt mutant beasts in poor mountain country and gather strength for raids on the softer lands of Cathay to their south. Their loyalty to one another is famously thin, which keeps their warbands small."
+    },
+    {
+      "id": "chaos-cultists-of-cathay", "kind": "group", "name": "Chaos Cultists of the Cathayan Borderlands", "de": "Chaoskultisten der cathayischen Grenzlande", "source": ["btbwar"], "regions": ["cathay-and-the-east", "the-chaos-wastes"],
+      "status": "Mutated outcasts gathered around fallen wizards",
+      "text": "Because the borderlands lie so close to the Realm of Chaos, many people there are touched by mutation. These outcasts gather around a fallen wizard seduced by dark rites and travel under cover, hiding their mutations as they slip into Cathay. They bring masques of plague and dances of contagion to each hamlet, using the empire as a place to practise their arts and sow future chaos."
+    },
+    {
+      "id": "beastmen-herds-of-the-wastes", "kind": "group", "name": "Beastmen of the Northern Wastes", "de": "Tiermenschen der Nordwüste", "source": ["btbwar"], "regions": ["the-chaos-wastes", "cathay-and-the-east"],
+      "status": "Hate-filled herds pushed out of the grasslands by Cathay",
+      "text": "Tribes of beast mutants thrive between the Great Maw and the Warpstone Desert, on the edge of the bamboo groves of Cathay. Their bitter hatred of mankind, sharpened by the harsh land and by an empire that drove them from the grass, turns any small herd into a devastating raiding party. All they sometimes need is a leader with vision."
+    },
+    {
+      "id": "beastmen-of-the-old-world-forests", "kind": "group", "name": "Beastmen Warbands of the Old World", "de": "Tiermenschen-Banden der Alten Welt", "source": ["beastmen", "ostland"], "regions": ["mordheim", "ostland"],
+      "status": "Roaming herds that haunt the forests around Mordheim",
+      "text": "Beastmen build no cities and obey no order, so they simply roam the great forests in small warbands led by the strongest of them, who is challenged and devoured when he weakens. Villagers around Mordheim say they outnumber men, and they raid isolated farms, tear down fences and walls, and soil crops for sport. A warband makes camp near roads, strikes once and moves on before any retaliation can reach it. Another account places Beastmen and Forest Goblins in the Forest of Shadows."
+    },
+    {
+      "id": "carnival-of-chaos-players", "kind": "group", "name": "Carnival of Chaos", "de": "Karneval des Chaos", "source": ["carnival", "eifwilds"], "regions": ["the-empire"],
+      "status": "Plague-bringing travelling players who serve Nurgle",
+      "text": "Rumour says this troupe began as a gypsy caravan, but it is now a wandering cavalcade of wagons whose players serve Nurgle. They give plays for rural villagers and at dusk throw off their disguises to reveal rotting daemons, spreading disease and carrying off survivors. The Carnival Master, a powerful sorcerer, calls up the daemons by sacrifice. Witch Hunters pursue it, but it always stays a step ahead."
+    },
+    {
+      "id": "dispossessed-dwarfs", "kind": "group", "name": "The Dispossessed", "de": "Die Heimatlosen", "source": ["dwtreasure"], "regions": ["worlds-edge-mountains"],
+      "status": "Dwarf nobles who lost their hold and hunt treasure for a new one",
+      "text": "When a hold falls to Goblins or Skaven, or a noble is banished for disgrace, the survivors are called the Dispossessed. Too proud to despair, such a noble gathers friends and kin to hunt treasure and hopes to win enough of a hoard to found a new hold. Dwarfs respect age, wealth and skill, and the greatest fortune in the Known World is said to lie in Mordheim, so that is where many of them go."
+    },
+    {
+      "id": "dwarf-rangers-of-the-old-ways", "kind": "group", "name": "Dwarf Rangers of the Old Ways", "de": "Zwergen-Waldläufer der Alten Wege", "source": ["dwrangers"], "regions": ["worlds-edge-mountains"],
+      "status": "Elder Dwarfs who distrust engineers and new-fangled arms",
+      "text": "These Dwarfs believe the old ways are best and that gadgets from younger Dwarfs, especially the Engineering Guild, weaken the race. They are mostly older warriors, led by freshly made Runesmiths as keepers of tradition. Using only traditional weapons, they recover lost treasures and artefacts and cleanse fallen holds of the scum that has taken them. They are willing to ally with other Dwarf bands but never fully trust them."
+    },
+    {
+      "id": "slayer-cult-of-grimnir", "kind": "group", "name": "Cult of Grimnir (Slayers)", "de": "Kult des Grimnir (Slayer)", "source": ["slayers"], "regions": ["worlds-edge-mountains"],
+      "status": "Dwarfs who seek a glorious death against great monsters",
+      "text": "Slayers join the cult of Grimnir for different reasons: to win back the honour of a failed clan, after being disowned, or to flee their past as in a foreign legion. The grimmest are those who have lost everything and have no kin to mourn them, and ironically they survive longest. They seek stronger foes and more desolate lands, younger Slayers follow them to learn, and the Giant Slayers teach in silence apart from their own Deathsong."
+    },
+    {
+      "id": "chaos-dwarfs-of-zharr-naggrund", "kind": "group", "name": "Black Dwarfs of Zharr-Naggrund", "de": "Schwarzzwerge von Zharr-Naggrund", "source": ["blackdwarfs"], "regions": ["dark-lands"],
+      "status": "Hashut-worshipping Dwarfs who raid for slaves, metal and wyrdstone",
+      "text": "The Dwarfs of Karak Vlag, cut off in holds under the ash plains of Zharr, turned in desperation to the bull-god Hashut and became sorcerer-smiths. They sell weapons and engines of metal and sorcery in exchange for food and captives, and drive slaves in the labour pits of Mingol Zharr-Naggrund. Their sorcerer-priests plan raids along the Silver Road for prisoners and hunt ore and wyrdstone, which is how some of their parties reach Mordheim."
+    },
+    {
+      "id": "hashutseps-expedition", "kind": "group", "name": "Hashutsep's Expedition", "de": "Hashutseps Expedition", "source": ["sonshashut"], "regions": ["dark-lands", "mordheim"],
+      "status": "A Chaos Dwarf sorcerer's quiet raid for slaves and witchstone",
+      "text": "A sorcerer named Hashutsep in Zharr-Naggrund, hunting rivals to keep his powers, learned of Mordheim's fall. Seeing a city with no law and no defence against raids, he sent his best apprentices rather than a full invasion, to avoid his rivals' notice. Their aim is slaves, loot, and above all sorcerer's stone."
+    },
+    {
+      "id": "kislevite-bands", "kind": "group", "name": "Kislevites", "de": "Kislev-Banden", "source": ["kislev"], "regions": ["kislev"],
+      "status": "Brave northerners who hate Chaos and fight it without mercy",
+      "text": "Kislev lies on the border of the Chaos Wastes, so every incursion passes through it first, and most Kislevites have lost homes or kin to Chaos. They are quiet with strangers but loud and merry among their own, and unforgiving toward any sign of Chaos worship. Close ties with the Empire send troops both ways."
+    },
+    {
+      "id": "gryphon-legion", "kind": "group", "name": "Gryphon Legion", "de": "Greifenlegion", "source": ["kislev"], "regions": ["kislev", "the-empire"],
+      "status": "Kislevite noble knights garrisoned in the Empire",
+      "text": "The Gryphon Legion is the pride of the Kislevite nobility, formed as a sign of the alliance between Kislev and the Empire. Its knights are all Kislevite nobles, but they are garrisoned and trained in the Empire."
+    },
+    {
+      "id": "bergjaeger-of-black-fire-pass", "kind": "group", "name": "Bergjaeger of Black Fire Pass", "de": "Bergjäger vom Schwarzfeuerpass", "source": ["averland"], "regions": ["averland", "black-mountains"],
+      "status": "Mountain rangers and marksmen of the Averland pass guard",
+      "text": "The Bergjaeger are a detachment of the Black Fire Pass guard, drawn from trappers and rangers of the surrounding mountains. They move silently over rock and serve as scouts. Many were gamekeepers, poachers pressed into service, or rustlers on the run, and all are expert marksmen. The pass is the only crossing between the Worlds Edge and Black Mountains and is infested with Night Goblins, trolls and Skaven."
+    },
+    {
+      "id": "ostlander-trappers", "kind": "group", "name": "Ostlander Freeswords", "de": "Ostländer-Freischwerter", "source": ["ostland"], "regions": ["ostland"],
+      "status": "Poor, hardy, Taal-fearing villagers of an isolated province",
+      "text": "Ostland is sparsely peopled and cut off from the rest of the Empire by the Forest of Shadows and the Middle Mountains, so its villages, mostly single extended families, live barely above subsistence. Married men farm and unmarried men trap, and Taal is widely worshipped. They love a brawl, hate Chaos fiercely after fighting beside Kislev in the Great War, and spend little coin on outsiders."
+    },
+    {
+      "id": "orc-warbosses", "kind": "group", "name": "Orc Mobs", "de": "Orkhorden", "source": ["orcmob"],
+      "status": "Brawling Greenskin bands drawn to Mordheim's loot",
+      "text": "Orcs love fighting and looting above all, and spend their lives fighting each other or some other enemy. Mordheim offers an ambitious Orc Warboss both foes and plunder, so many mobs have been drawn to the wyrdstone. They would rather ambush rival warbands for their stones than dig for them. Few Hired Swords will serve them, knowing they might be eaten."
+    },
+    {
+      "id": "black-orcs-of-grimgor", "kind": "group", "name": "Black Orcs of the Waaagh!", "de": "Schwarzorks des Waaagh!", "source": ["blackorcs"], "regions": ["the-empire"],
+      "status": "Big, vicious Orcs scattered across the Empire after the Storm of Chaos",
+      "text": "Black Orcs are bigger, smarter and better equipped than ordinary Orcs, and rumours about their origin say they were built rather than born. Many followed Grimgor Ironhide in his Waaagh! and now wander the Empire, where no one has the men to hunt them down. They have no plan but to fight whoever crosses their path."
+    },
+    {
+      "id": "night-goblin-tribes", "kind": "group", "name": "Night Goblin Tribes", "de": "Nachtgoblin-Stämme", "source": ["nightgob", "averland"], "regions": ["worlds-edge-mountains", "mordheim"],
+      "status": "Cave-dwelling Goblins who infest the catacombs",
+      "text": "Night Goblins prefer deep dark places and shun daylight, and tribes infest the Worlds Edge Mountains and the Black Fire Pass. In Mordheim they occupy the existing catacombs, grow fungus for food and poisons, and vandalise whatever they find. They bolster their numbers with cave squigs and, if lucky, a troll."
+    },
+    {
+      "id": "forest-goblin-tribes", "kind": "group", "name": "Forest Goblin Tribes", "de": "Waldgoblin-Stämme", "source": ["forestgob"], "regions": ["great-forest"],
+      "status": "Stealthy poison users who live deep in the Great Forest",
+      "text": "Forest Goblins have adapted to the Great Forest, using stealth and camouflage. They value gold only as a metal to coat their stone weapons, and a chieftain, usually the loudest Goblin, may send henchmen into an ambush just to collect their gilded weapons. Their poisons are said to surpass those of the Dark Elves, and they are rumoured to drive giant spiders into battle."
+    },
+    {
+      "id": "amazons-of-lustria", "kind": "group", "name": "Amazons of the Heart of Darkness", "de": "Amazonen des Herzens der Finsternis", "source": ["amazlus", "amazmor"], "regions": ["lustria"],
+      "status": "Isolated jungle warriors who sacrifice every man they catch",
+      "text": "The Amazons hold an island in a Lustrian river, covered in vines and overgrown pyramid ruins. They hunt Skinks for hides, hate men and the Norse above all, sacrifice captives to their gods and use salvaged Slann artefacts as weapons. Norse tradition holds that they descend from widows who left Skeggi and became Valkyries, and rumour credits them with an elixir of youth."
+    },
+    {
+      "id": "amazon-fugitives-of-mordheim", "kind": "group", "name": "Amazon Fugitives", "de": "Amazonen-Flüchtlinge", "source": ["amazmor"], "regions": ["mordheim", "lustria"],
+      "status": "Enslaved warrior women who escaped the Old World's courts",
+      "text": "Raiders such as Juan Cornetto's Tilean expedition carried Amazons off from Lustria and sold them in the courts and bazaars of the Old World. Count Steinhardt bought several hundred of them from slavers, and some got away from Mordheim during a feast and the city's destruction. They now live wild in the Empire, joined by runaways from travelling shows and from the fairs of Cutthroat's Den and the Black Pits. What they want is simply to get away."
+    },
+    {
+      "id": "skeggi-norse-colony", "kind": "group", "name": "Skeggi Colony", "de": "Kolonie Skeggi", "source": ["norseexp", "amazmor", "lustria"], "regions": ["lustria", "norsca"],
+      "status": "The first Norse settlement in Lustria",
+      "text": "Skeggi was founded on Lustria's eastern coast by Losteriksson, the first expedition to reach the continent. Many of its warriors deserted in search of gold, leaving their wives behind. Skeggi's raiders still plague the coasts for riches and saga, and have pushed inland to plunder Slann temples."
+    },
+    {
+      "id": "lizardmen-temple-guard", "kind": "group", "name": "Lizardmen Temple Guard", "de": "Echsenmenschen-Tempelwächter", "source": ["lizardmen", "lustria"], "regions": ["lustria"],
+      "status": "Skink and Saurus war parties defending the temple cities",
+      "text": "Lizardmen and their Slann masters serve the departed Old Ones and keep to their rituals and plans. Temple Guardians, skink and saurus war-parties, fight guerrilla raids against plunderers on the beaches, jungle and ruined cities, helped by traps and mazes of tunnels. Huatl, Tlax and Xahutec are raided most often, and they are in constant conflict with Clan Pestilens."
+    },
+    {
+      "id": "lustrian-reavers", "kind": "group", "name": "Lustrian Reavers", "de": "Lustrische Plünderer", "source": ["lusreavers"], "regions": ["lustria"],
+      "status": "Survivors of lost expeditions who claimed the jungle",
+      "text": "Reavers are the toughest and most resourceful survivors of expeditions broken by disease, jungle beasts and Lizardmen. They keep the best gear salvaged from fallen comrades, scorn newcomers as rivals for the gold, and accept few recruits. When a Reaver dies, the survivors recover the arms and armour, choose a successor and induct him with a ceremony and plenty of Estalian wine."
+    },
+    {
+      "id": "dark-elf-corsairs", "kind": "group", "name": "Dark Elf Raiders", "de": "Dunkelelfen-Plünderer", "source": ["darkelves", "druchii"], "regions": ["naggaroth", "lustria"],
+      "status": "Druchii slavers who sail Black Arks for plunder and artefacts",
+      "text": "The Druchii, evil kin of the High Elves, roam the Known World for slaves who are worked to death in mines, sacrificed to Khaine or tortured by the Brides of Khaine. In Lustria they come in Black Arks for Slann artefacts, striking from ambush before their victims know it. Rumour says they also reach Mordheim at night in black-sailed ships, craving wyrdstone and taking able-bodied prisoners as slaves."
+    },
+    {
+      "id": "shadow-warriors-of-nagarythe", "kind": "group", "name": "Shadow Warriors of Nagarythe", "de": "Schattenkrieger von Nagarythe", "source": ["shadow"], "regions": ["ulthuan"],
+      "status": "Loyal exiles of the Witch King's former kingdom",
+      "text": "Nagarythe's loyalists fought a secret war against Malekith and became wanderers, never welcome among other High Elves. Driven by revenge on the Witch King and his mother Morathi, they hunt Dark Elves and Chaos, and some serve as scouts for the Phoenix King. Some are sent on missions such as recovering relics left in the Old World, others are exiles or families on a vendetta."
+    },
+    {
+      "id": "wood-elves-of-athel-loren", "kind": "group", "name": "Wood Elves of Athel Loren", "de": "Waldelfen von Athel Loren", "source": ["woodelves"], "regions": ["athel-loren"],
+      "status": "Secretive forest guardians who rarely leave their realm",
+      "text": "The Wood Elves left the other Elves long ago and live hidden in the enchanted forest of Athel Loren, in harmony with the seasons and as guardians of all things natural. They do not try to protect the world like High Elves or rule it like Dark Elves, but sometimes the will of their King and Queen, Orion and Ariel, sends them beyond the forest edge."
+    },
+    {
+      "id": "miragliano-crossbowmen", "kind": "group", "name": "Miragleans", "de": "Miragliano-Armbrustschützen", "source": ["tileans"], "regions": ["tilea"],
+      "status": "Tilean crossbowmen who hate Skaven",
+      "text": "Miragliano's official weapon is the crossbow, and its warbands are deadly accurate with it. Three quarters of the city died in the red pox outbreak of 1812, and Miragleans have hated Skaven since."
+    },
+    {
+      "id": "remasen-warbands", "kind": "group", "name": "Remasens", "de": "Remasen", "source": ["tileans"], "regions": ["tilea"],
+      "status": "Tilean sailors who hate Dark Elves",
+      "text": "In 1487 Dark Elf warships fell on the coastal city of Remas, and its people have hated the Druchii ever since. A Remasen warband will fight Dark Elves to the last man. Its officers are well trained and hard to shake."
+    },
+    {
+      "id": "trantios-expedition", "kind": "group", "name": "Trantio Expeditions", "de": "Trantio-Expeditionen", "source": ["tileans", "lustria"], "regions": ["tilea", "lustria"],
+      "status": "The best-equipped human warbands in Lustria",
+      "text": "The Lustria writer credits the famed explorer Stephanus Cornette and his brave Trantios with the setting. Warbands from Trantio are the best equipped and most experienced humans there, starting with extra gold."
+    },
+    {
+      "id": "mazzalupo-companies", "kind": "group", "name": "Mazzalupo", "de": "Mazzalupo", "source": ["mazzalupo"], "regions": ["tilea"],
+      "status": "Ragtag Tilean bands formed after the legendary wolf hunt",
+      "text": "According to legend, a village in Tilea hired a wandering knight against a black wolf, and he gathered a fallen noble, a squire, a finance master, sheepherders and peasants who killed it. Since then such bands of vagabonds and rogues, held together by treasure or a feat that wins a lord's respect, are called Mazzalupo. Some end up in Mordheim from recklessness or because they are lost."
+    },
+    {
+      "id": "mordheim-pirate-crews", "kind": "group", "name": "River Pirates of Mordheim", "de": "Flusspiraten von Mordheim", "source": ["pirates"], "regions": ["mordheim"],
+      "status": "Pirate captains who raid ships and ruins through the fog",
+      "text": "Pirate captains are drawn to Mordheim because the nearby rivers carry gold in and wyrdstone out. They use the permanent fog and dust to navigate the rivers through the city, appear from nowhere, loot a ship and vanish. Some have found safe harbours and send raiding parties into the ruins."
+    },
+    {
+      "id": "pit-fighter-circuit", "kind": "group", "name": "The Pit-Fighting Circuit", "de": "Der Grubenkampf-Zirkel", "source": ["pitfighters"], "regions": ["the-pit", "cutthroats-den"],
+      "status": "Illegal gladiator rings run by gambling cartels and guilds",
+      "text": "Pit fights, outlawed in most regions, are kept alive by bribed officials and illegal gambling cartels, with merchant guilds earning on the side. They range from back-alley brawls to lavish contests near Mordheim, from Cutthroat's Haven to the Black Pits. Most fighters are slaves, trained hard, who hope to buy their freedom, and escapees form fugitive bands that make ideal hires for explorers of the ruins."
+    },
+    {
+      "id": "nomads-of-araby", "kind": "group", "name": "Nomad Tribes of Araby", "de": "Nomadenstämme Arabiens", "source": ["arabs", "khemri"], "regions": ["araby", "khemri"],
+      "status": "Desert tribes with feuds and a fear of the Land of the Dead",
+      "text": "Hundreds of tribes, from Tuareg to the legendary Muktarhin, roam the edge of the Araby desert, bound to oases. They have a strict honour code, and blood feuds can last generations. Stealing from a rival tribe is righteous, so they are feared raiders. Tales warn them from Nehekhara and Nagash, but a young sheikh seeking glory may lead his band into the Land of the Dead, from which many never return."
+    },
+    {
+      "id": "tomb-guardians-of-nehekhara", "kind": "group", "name": "Tomb Guardians of Nehekhara", "de": "Grabwächter von Nehekhara", "source": ["tombguard", "khemri"], "regions": ["khemri"],
+      "status": "Undead retinues of the mummified kings of Khemri",
+      "text": "Nehekhara was the first human civilisation, whose priests of the Mortuary Cult learned to mummify bodies so souls would last. Its kings were buried in huge pyramids in vast necropolises, with treasures from their lives. Nagash's ritual woke them as undead, and now Liche Priests and skeleton legions guard the tombs from all intruders."
+    },
+    {
+      "id": "battle-monks-of-cathay", "kind": "group", "name": "Celestial Dragon Monks", "de": "Himmelsdrachen-Mönche", "source": ["monks"], "regions": ["cathay-and-the-east"],
+      "status": "Warrior monks guarding Cathay's borderland monasteries",
+      "text": "In fortified monasteries on the slopes of Cathay's frontier, monks split their time between meditation, fishing, crafting and honing fighting techniques. Local peasants shelter near them against Ogres, Hobgoblins, Chaos marauders and beastmen. The army sees them as vigilantes but needs their skill, and they obey the emissary only because the Emperor commands it."
+    },
+    {
+      "id": "merchant-caravans-of-the-silk-road", "kind": "group", "name": "Merchant Caravans of the Silk Road", "de": "Handelskarawanen der Seidenstraße", "source": ["caravans"], "regions": ["cathay-and-the-east"],
+      "status": "Risky overland trade convoys to Cathay and Ind",
+      "text": "Merchants, guarded by sell-swords, gamble on the long trip east to Ind and Cathay through the Dark Lands and the Mountains of Mourn. Only one in ten succeeds, but a single venture can make a fortune, so many go again. The Silk Road was opened by the Tilean brothers Ricco and Robbio, and attracts Arabyan traders and Marienburg racketeers."
+    },
+    {
+      "id": "maneater-ogres", "kind": "group", "name": "Maneaters", "de": "Menschenfresser", "source": ["maneaters"], "regions": ["mountains-of-mourn"],
+      "status": "Ogre mercenaries who guard caravans and sometimes raid them",
+      "text": "Ogres move in herds in tribes across the Mountains of Mourn, and wander abroad to hire out as muscle. Some raid merchants on the Ivory Road instead, and others agree to escort a merchant's caravan over long dangerous routes. A few such retinues reach Mordheim."
+    },
+    {
+      "id": "nipponese-expedition-clan", "kind": "group", "name": "Nipponese Clan Expedition", "de": "Nipponesische Clan-Expedition", "source": ["nippon"], "regions": ["nippon"],
+      "status": "Samurai warband led by a Hatamoto, far from home",
+      "text": "A Hatamoto leads a clan warband of samurai and Ashigaru from Nippon to Mordheim, drawn by whispers of ancient relics and forbidden knowledge. They are bound by duty and honour and want to earn a place of honour in battle and honour their ancestors."
+    },
+    {
+      "id": "questing-knights-of-bretonnia", "kind": "group", "name": "Questing Knights of Bretonnia", "de": "Questritter Bretonias", "source": ["bretonnian"], "regions": ["bretonnia"],
+      "status": "Knights who leave their domain to seek the Grail in Mordheim",
+      "text": "To Bretonnian knights Mordheim is a vile place that needs virtue, so a quest there is a noble act. A Questing Knight gives up castle and domain, ranks above dukes, and is joined by Knights Errant and retainers. Dreams from the Lady of the Lake lead them, hoping for a drink from the Grail, and they fight the enemies of order."
+    },
+    {
+      "id": "chapel-guard-of-the-lady", "kind": "group", "name": "Chapel Guard of the Lady", "de": "Kapellenwache der Herrin", "source": ["chapel"], "regions": ["bretonnia"],
+      "status": "Defenders of the Lady's shrines and the damsels who tend them",
+      "text": "Bretonnia is dotted with chapels, from cathedrals to woodsheds, that mark places sacred to the Lady of the Lake. Damsels and prophetesses tend them. If a chapel is threatened, a damsel sends for help, and knights, squires, peasant archers and pilgrims gather, or wandering warriors feel the call without a message."
+    },
+    {
+      "id": "order-of-the-mare", "kind": "group", "name": "Order of the Mare", "de": "Orden der Stute", "source": ["mare"], "regions": ["bretonnia"],
+      "status": "Disgraced knights following the Prophetess of the Mare",
+      "text": "A prophetess, called the Mare witch by some, claims descent from heroes of Gilles le Breton and restores honour to shunned knights, who swear loyalty to her as Paragons. She sends them to Mordheim for wyrdstone, joined by the Dames of the Mare, who have strange powers. Squires are raised early to knighthood and replaced by girls who join the Dames."
+    },
+    {
+      "id": "imperial-gunnery-school-of-nuln", "kind": "group", "name": "Imperial Gunnery School", "de": "Kaiserliche Geschützschule", "source": ["gunnery"], "regions": ["nuln"],
+      "status": "Noble-born artillerists trained in Nuln",
+      "text": "Nuln is known for handguns and war machines, and its Gunnery School trains gunners to use weapons invented by the Colleges of Engineering. Most students are younger noble sons with a talent for mathematics, who may stay to become Master Gunners. Every student does fieldwork, travelling anywhere under a Senior Gunnery Officer and an instructor, always well equipped."
+    },
+    {
+      "id": "hochland-refugee-bandits", "kind": "group", "name": "Hochland Bandits", "de": "Hochland-Banditen", "source": ["hochland"], "regions": ["hochland", "talabecland"],
+      "status": "Refugee gangs hunting treasure in the Great Forest",
+      "text": "After the Storm of Chaos, refugees from Hochland, Ostermark and Ostland crowded into Talabecland and clashed in Talagaad's streets. A bad winter and failing trade left men desperate, and rumours of treasure in the Great Forest sent gangs of petty crooks led by villains into the wilderness, where people have vanished."
+    },
+    {
+      "id": "outlaws-of-stirwood", "kind": "group", "name": "Outlaws of Stirwood", "de": "Geächtete von Stirwood", "source": ["stirwood"], "regions": ["stirland"],
+      "status": "Stirland fugitives who hide as archers in the forest",
+      "text": "Stirwood lies north of Nuln and west of Wurtbad, where the Elector Count's law is enforced harshly, and even petty criminals are declared outlaws. Those who reach the forest band together, become fine archers by hunting the Count's deer, and ambush travellers. Sigmarite hermits tend them, and tales of Mordheim's riches reached them down the River Stir."
+    },
+    {
+      "id": "horned-hunters-of-taal", "kind": "group", "name": "Horned Hunters of Taal", "de": "Gehörnte Jäger des Taal", "source": ["horned", "taal"], "regions": ["talabecland"],
+      "status": "Forest worshippers who avoid cities and firearms",
+      "text": "Horned Hunters prowl the woods in the Taalbaston crater and across Talabecland, loyal only to Taal. His rites demand great strength of body and mind, so they shun gunpowder and the works of science and see cities as errors. They dress like their god, in animal skins with antlers, and in Talabheim he is Father of Rivers."
+    },
+    {
+      "id": "halfling-adventurers-of-the-moot", "kind": "group", "name": "Halflings of the Moot", "de": "Halblinge des Auenlandes", "source": ["mootlanders", "halflings"], "regions": ["moot"],
+      "status": "Peaceful folk with a few restless adventurers",
+      "text": "Halflings live in tight-knit communities and mostly want to eat, drink and be merry, but a village Elder sometimes grows restless and gathers like-minded folk to change the world. A few warbands march to Mordheim, dreaming of gold, wyrdstone and abandoned kitchens. One such tale is the Knights of the Kitchen Table, led by the rich archer Lord Charlie Gutbuckett."
+    },
+    {
+      "id": "clan-eshin", "kind": "group", "name": "Clan Eshin", "de": "Clan Eshin", "source": ["eshin", "btbwar"], "regions": ["mordheim", "cathay-and-the-east"],
+      "status": "Skaven assassins sent secretly into Mordheim",
+      "text": "Skaven live in tunnels beneath human cities and have gathered warpstone for ages. The Nightmaster of Clan Eshin keeps Mordheim's secret from other clans and sends small silent warbands of poison users and assassins through secret tunnels instead of armies. Eshin methods resemble Cathayan monks and assassins, and the clan is said to nearly call Cathay home."
+    },
+    {
+      "id": "clan-pestilens", "kind": "group", "name": "Clan Pestilens", "de": "Clan Pestilens", "source": ["pestilens", "lustria"], "regions": ["lustria", "mordheim"],
+      "status": "Skaven who revel in plague and wield censers",
+      "text": "Pestilens Skaven love filth and disease, and use their immunity to plagues against their foes. Plague priests, monks and novices stalk ruins swinging smoking censers, and the clan is locked in conflict with the Lizardmen of Lustria."
+    },
+    {
+      "id": "clan-moulder", "kind": "group", "name": "Clan Moulder", "de": "Clan Moulder", "source": ["moulder"], "regions": ["the-chaos-wastes", "mordheim"],
+      "status": "Skaven beastmasters who breed living weapons",
+      "text": "Second in wealth only to Clan Skryre, Moulder makes living weapons from flesh, using warpstone to mutate and cross-breed monsters. Packmasters capture trolls, manticores and other beasts for the Master Moulders' experiments. They come from the Hell Pit in the north, to Mordheim for warpstone and to the Chaos wastes for new creatures."
+    },
+    {
+      "id": "dreamwalkers-of-morr", "kind": "group", "name": "Dreamwalkers of Morr", "de": "Traumwandler des Morr", "source": ["dreamwalkers"], "regions": ["the-empire"],
+      "status": "Dream-guided hunters of Undead and necromancers",
+      "text": "Dreamwalkers are servants of Morr who believe their god sends dreams pointing out evils to crush. A band forms around a Priest of Morr or a Dreamer, whom a priest must certify, and Morr's temples support it. They are mostly human, middle-class Imperials, few but dedicated."
+    },
+    {
+      "id": "priests-of-morr-at-the-deaths-head", "kind": "group", "name": "Priests of Morr in the Death's Head", "de": "Morr-Priester im Totenkopf-Viertel", "source": ["morrproc"], "regions": ["mordheim"],
+      "status": "Rivals called to Mordheim by visions of the death god",
+      "text": "In the Procession of Morr, priests are summoned to Mordheim by troubled dreams, each sure the vision came from Morr himself. They distrust one another and recruit warbands before entering the city, for protection or hidden aims. The campaign is set in the Death's Head district, with its prison, chapels, graveyards and a large Temple of Morr."
+    },
+    {
+      "id": "protectorate-of-sigmar", "kind": "group", "name": "Protectorate of Sigmar", "de": "Protektorat Sigmars", "source": ["protectorate", "mercs"], "regions": ["reikland", "mordheim"],
+      "status": "Warrior-priests' personal guards sent to cleanse Mordheim",
+      "text": "Every high-ranking Warrior Priest keeps an entourage of warriors as a personal guard, called the Protectorate. In peacetime they turn to problems inside the Empire, and Mordheim is such a place. The Grand Theogonist endorses the Witch Hunters but gives the Protectorate his full blessing and sends them into the city."
+    },
+    {
+      "id": "sorcerous-societies", "kind": "group", "name": "Sorcerous Societies", "de": "Zaubergesellschaften", "source": ["society"], "regions": ["the-empire"],
+      "status": "Secret wizard circles that survived the Wizard Wars",
+      "text": "Magic users have long been suspect, and between 1982 and 1991 the cults of Sigmar and Ulric persecuted wizards in the Wizard Wars. Many fled or hid, and secret societies formed to protect magical teachings. They send members for artefacts and materials, to root out evil casters, and for other perilous tasks."
+    },
+    {
+      "id": "masters-of-horror", "kind": "group", "name": "Masters of Horror", "de": "Meister des Grauens", "source": ["horror"], "regions": ["reikland", "mordheim"],
+      "status": "An exiled scientist and his created monsters",
+      "text": "A scientist, once acclaimed, was cast out of Altdorf and now lives in a ruined tower in dead woods with a golem and mutated fiends. He wants to hurt those who expelled him, and needs wyrdstone to power his inventions, so he goes to Mordheim."
+    },
+    {
+      "id": "court-of-the-profane-pleasures", "kind": "group", "name": "Court of the Profane Pleasures", "de": "Hof der unheiligen Freuden", "source": ["profane"], "regions": ["ostermark", "mordheim"],
+      "status": "Ostermark nobles corrupted by the Lord of Pleasure",
+      "text": "When the Shadowlord demanded loyalty from Mordheim's hidden cultists, most kneeled willingly. Some Ostermark nobles had been corrupted by Slaanesh long before the comet. After the Cataclysm they emerged and hunt captives for rituals in the catacombs, drugging and lobotomising them. This draft comes from Tuomas Pirinen."
+    },
+    {
+      "id": "blood-dragon-vampires", "kind": "group", "name": "Blood Dragon Vampires", "de": "Blutdrachen-Vampire", "source": ["aristocracy"], "regions": ["bretonnia", "grey-mountains"],
+      "status": "Honourable warrior vampires of Abhorash's line",
+      "text": "The Blood Dragons are vampires said to descend from Abhorash, Lord of Blood. They are the most honourable bloodline and the closest to their human past: great warriors with a code of chivalry, rare in the Empire and found mostly in Bretonnia and the Blood Keep, which is said to lie in the Grey Mountains. They keep out of the politics of the other bloodlines."
+    },
+    {
+      "id": "lahmian-sisterhood", "kind": "group", "name": "Lahmian Sisterhood", "de": "Lahmianische Schwesternschaft", "source": ["aristocracy"], "regions": ["worlds-edge-mountains"],
+      "status": "Female vampires who rule by charm and infiltration",
+      "text": "The Lahmians are almost all female, chosen for beauty, led by Neferata of the Cult of Blood in the Silver Pinnacle in the Worlds Edge Mountains. They compete with the von Carsteins but infiltrate high society with art and statesmanship rather than force, always trying to manipulate other families."
+    },
+    {
+      "id": "necrarch-vampires", "kind": "group", "name": "Necrarchs", "de": "Necrarchen", "source": ["aristocracy", "necrarchs"], "regions": ["lahmia"],
+      "status": "Mad vampire necromancers who hoard dark lore",
+      "text": "After Lahmia fell and the Great Library burned, a few Necrarchs fled with books and scrolls of Nagash's dark lore, and hid in towers to study. They are cadaverous loners who hate the living and dislike other vampires, and seek an end to all life. Mordheim's wyrdstone draws them from their towers."
+    },
+    {
+      "id": "strigoi-ghoul-kings", "kind": "group", "name": "Strigoi Ghoul Kings", "de": "Strigoi-Ghulkönige", "source": ["aristocracy", "strigos"], "regions": ["sylvania"],
+      "status": "Cursed bestial vampires ruling packs of ghouls",
+      "text": "Strigoi vampires, the Cursed Ones, were cursed by other vampires and hate them. They are hunched brutes with ghoul courts in graveyards, who dream of destroying men and their kin. They descend from Ushoran, whose people the Strigany still remember."
+    },
+    {
+      "id": "strigany-of-mourkain", "kind": "group", "name": "Strigany", "de": "Strigany", "source": ["strigos"], "regions": ["sylvania"],
+      "status": "Wandering descendants of Strigos, blamed for serving vampires",
+      "text": "After Mourkain's destruction the Strigany became nomads, who dream that Ushoran will return to reclaim their land. Superstitious people accuse them of serving Strigoi, and persecute and kill them, though some bands do have such a protector."
+    },
+    {
+      "id": "dark-brotherhood", "kind": "group", "name": "The Dark Brotherhood", "de": "Die Dunkle Bruderschaft", "source": ["lordsnight"], "regions": ["mordheim"],
+      "status": "Secret guardians of sleeping vampires in merchants' cellars",
+      "text": "A brotherhood watches over vampires who sleep for centuries in coffins beneath the cellars of merchants and craftsmen, and waits for the hour to wake them. In Mordheim that hour has come, and the lords of the night walk the streets."
+    },
+    {
+      "id": "grave-robbers-of-sylvania", "kind": "group", "name": "Grave Robbers", "de": "Grabräuber", "source": ["graverobbers"], "regions": ["sylvania"],
+      "status": "Tomb looters who flee the law into Sylvania",
+      "text": "Grave robbers are harshly punished, so they flee to Sylvania where few lawmen follow. There the graves empty themselves and few return. Corpses sell well to dark arts and medical students, and experienced bands loot crypts of undead."
+    },
+    {
+      "id": "vampire-hunters-of-sylvania", "kind": "group", "name": "Vampire Hunters of Sylvania", "de": "Vampirjäger von Sylvania", "source": ["vhunters"], "regions": ["sylvania"],
+      "status": "Slayers and Morr priests who fight the von Carsteins",
+      "text": "Under the von Carsteins, Sylvanians cower indoors at night and their dead rise from the cursed soil. Those few who escape may return with hunters trained against undead, and priests of Morr who want to cleanse the land's rulers. They leave ash behind."
+    },
+    {
+      "id": "roadwardens-of-the-empire", "kind": "group", "name": "Roadwardens", "de": "Straßenwächter", "source": ["eifwilds"], "regions": ["the-empire"],
+      "status": "Marshals who patrol the Empire's roads from coaching inns",
+      "text": "Roadwardens are tireless marshals who patrol the roads against bandits and highwaymen and report trouble. They use the stout coaching inns as bases, and those inns become centres of defence in times of unrest."
     }
   ]
 }

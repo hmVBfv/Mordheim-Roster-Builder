@@ -44,7 +44,7 @@ export function GroupsSheet({ api, close, titleId }: { api: ReturnType<typeof us
         <button type="submit" className={ui.button} aria-label="Add the group" disabled={!online || busy || !name.trim()}>Add</button>
       </form>
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
-      <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
+      <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
     </div>
   );
 }

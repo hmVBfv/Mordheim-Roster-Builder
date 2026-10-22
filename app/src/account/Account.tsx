@@ -60,9 +60,9 @@ function PasswordRow({ onNotice }: { onNotice: (t: string) => void }) {
           </label>
           <p className={ui.muted}>Your other devices are signed out and sign in with the new one.</p>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            <button type="submit" className={ui.button} disabled={busy || !current || !next || !repeat}>Change the password</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+            <button type="submit" className={ui.button} disabled={busy || !current || !next || !repeat}>Change the password</button>
           </div>
         </form>
       </dialog>

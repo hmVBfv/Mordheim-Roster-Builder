@@ -102,9 +102,9 @@ function HeroBody({ w, close, onApply, titleId }: { w: Extract<InjuryFor, { kind
         <p className={ui.muted}>{w.dice === '11' ? 'Dead – or enter another result if it was a mistake.' : w.by ? `Out of action by ${w.by}.` : 'Heroes out of action roll a D66 after the battle.'}</p>
       </div>
       <RollFields d={d} set={setD} env={w.env} allowed={core.HERO_CODES} label="D66 as rolled" />
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!roll}>Apply</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!roll}>Apply</button>
       </div>
     </form>
   );
@@ -141,9 +141,9 @@ function D6Body({ w, close, onApply, titleId }: { w: Exclude<InjuryFor, { kind: 
         </span>
       </div>
       <p aria-live="polite">{verdict}</p>
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!ok}>Apply</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!ok}>Apply</button>
       </div>
     </form>
   );
@@ -188,7 +188,7 @@ export function InjuriesSheet({ dialogRef, close, name, injuries, miss, onRemove
             <button type="button" aria-label={`One game more for ${name}`} onClick={() => onMiss(1)}>+</button>
           </span>
         </div>
-        <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+        <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
       </div>
     </dialog>
   );
@@ -232,9 +232,9 @@ function CaptiveBody({ who, close, onEnd, titleId }: { who: { name: string; by: 
           <input id={goldId} className={ui.input} inputMode="numeric" value={gold} autoComplete="off" onChange={(e) => setGold(e.target.value.replace(/\D/g, ''))} />
         </div>
       )}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!fate}>Apply</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!fate}>Apply</button>
       </div>
     </form>
   );

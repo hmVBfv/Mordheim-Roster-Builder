@@ -92,16 +92,16 @@ function GroupForm({ group, online, close, onSaved, onRemoved }: {
       {asking ? (
         <div className={ui.page}>
           <p>Remove it for good? It is gone on every device. Campaigns that already have a copy keep it.</p>
-          <div className={ui.row}>
-            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => setAsking(false)}>Keep it</button>
+            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
           </div>
         </div>
       ) : (
-        <div className={ui.row}>
-          <button type="submit" className={ui.button} disabled={busy || !online}>Save the group</button>
-          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <div className={ui.actions}>
           {group && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => setAsking(true)}>Remove this group</button>}
+          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+          <button type="submit" className={ui.button} disabled={busy || !online}>Save the group</button>
         </div>
       )}
     </form>

@@ -96,9 +96,9 @@ function HireForm({ ctx, kind, hkey, gold, locked, titleId, close, onHire }: {
         <dt className={styles.sum}>Gold left</dt><dd className={`${styles.sum} ${left < 0 ? trade.no : ''}`}>{gc(left)}</dd>
       </dl>
       <p className={why ? `${styles.verdict} ${trade.no}` : styles.verdict} aria-live="polite">{verdict}</p>
-      <div className={`${ui.row} ${ui.sheetActions}`}>
-        <button type="submit" className={ui.button} disabled={!!why}>Hire</button>
+      <div className={`${ui.actions} ${ui.sheetActions}`}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button>
+        <button type="submit" className={ui.button} disabled={!!why}>Hire</button>
       </div>
     </form>
   );

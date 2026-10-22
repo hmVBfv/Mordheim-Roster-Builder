@@ -71,7 +71,9 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   eigener Zusammenfassung und Quelle auf mordheimer.net; nur Einträge mit mehr als
   einem Nebensatz Lore). Filter All · Regions · Factions · Groups; „Add to Library“
   kopiert eine Fraktion oder Gruppe als Faction, eine Region als Idea (About:
-  Campaign) in die eigene Library – ein Name, der dort schon steht, wird nicht noch
+  Campaign) in die eigene Library; Orte liegen ineinander (die Zeile nennt den Weg, „In
+  Ostermark › Mordheim“), Gruppen und Fraktionen nennen, woher sie kommen („From …“), und die
+  Auswahl „Place“ nimmt, was in einem Ort liegt, mit (ADR 0024) – ein Name, der dort schon steht, wird nicht noch
   einmal angeboten. **NPCs** (Name englisch und deutsch, Fraktion als Name, Status,
   „Named“ und die Werte wie in der World, nur ohne Kampagne: keine eigenen Fertigkeiten
   der Kampagne, keine Krieger zum Kopieren) und **Groups** (Gegnergruppen: Name,

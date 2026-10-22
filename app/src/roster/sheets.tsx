@@ -35,10 +35,10 @@ function NameForm({ close, naming, titleId }: { close: Sheet['close']; naming: N
         <span>{naming.label}</span>
         <input className={ui.input} value={value} placeholder={naming.fallback} maxLength={80} autoComplete="off" onChange={(e) => setValue(e.target.value)} />
       </label>
-      <div className={ui.row}>
-        <button type="submit" className={ui.button}>Save</button>
+      <div className={ui.actions}>
         {naming.extra && <button type="button" className={`${ui.buttonQuiet} ${styles.danger}`} onClick={() => close(naming.extra!.run)}>{naming.extra.label}</button>}
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button}>Save</button>
       </div>
     </form>
   );
@@ -82,9 +82,9 @@ function ExpForm({ close, e, titleId }: { close: Sheet['close']; e: ExpSetting; 
         <input className={ui.input} type="number" inputMode="numeric" min={e.min} max={e.max ?? undefined} value={value} onChange={(ev) => setValue(ev.target.value)} />
       </label>
       {!ok && <p className={styles.why}>{e.max != null ? `From ${e.min} to ${e.max}.` : `At least ${e.min}.`}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!ok}>Save</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!ok}>Save</button>
       </div>
     </form>
   );
@@ -127,7 +127,7 @@ export function RecruitSheet({ dialogRef, close, v, onRecruit }: SheetProps & { 
             <ul className={ui.list}>{g.units.map((u) => <UnitButton key={u.id} u={u} onPick={() => close(() => onRecruit(u))} />)}</ul>
           </section>
         ))}
-        <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+        <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
       </div>
     </dialog>
   );
@@ -190,9 +190,9 @@ function MoreMenBody({ v, close, onAdd, titleId }: { v: MoreMenView; close: Shee
       {who.map((_, i) => (
         <NameField key={i} label={`Name of new man ${i + 1}`} value={names[i] ?? ''} placeholder={v.fallbacks[i]!} onChange={(x) => setNames((p) => { const c = [...p]; c[i] = x; return c; })} />
       ))}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!!verdict}>Recruit</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!!verdict}>Recruit</button>
       </div>
     </form>
   );

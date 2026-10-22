@@ -128,10 +128,10 @@ function PlanForm({ cid, plan, plans, next, online, close, onSaved }: {
       </div>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {!online && <p className={ui.message} role="status">Saving a plan needs the connection.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !online || !text.trim() || !valid}>Save the plan</button>
+      <div className={ui.actions}>
         {plan && <button type="button" className={ui.buttonQuiet} disabled={busy || !online} onClick={() => void save('')}>Take the plan out</button>}
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !online || !text.trim() || !valid}>Save the plan</button>
       </div>
     </form>
   );

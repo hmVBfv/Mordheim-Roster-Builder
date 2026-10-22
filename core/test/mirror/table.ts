@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs';
 import * as core from '../../src/index.ts';
 import type { BattleDraft, CampaignFile, CasualtyDraft, Ctx, WarbandState } from '../../src/index.ts';
 import type { PdfLib } from '../../src/export/sheet.ts';
-import { canonOf, data } from '../support/canon.ts';
+import { canonOf, data, withoutNewHouseKeys } from '../support/canon.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 import { splitText } from '../parity/exportReport.ts';
 import { coreAbilities, coreScreens, coreTip, coreWarbandOptions, legacyScreens, parseAbilities, parseTip, parseWarbandOptions } from '../parity/screens.ts';
@@ -270,7 +270,7 @@ export const TABLE: Record<string, Spec> = {
   'engine.svLabel': pure((c) => core.svLabel(c.args[0])),
   'engine._svCombine': pure((c) => core.svCombine(c.args[0], c.args[1])),
   'engine._loadoutValue': pure((c) => core.loadoutValue(c.args[0], c.args[1], c.args[2])),
-  'state.houseDefaults': pure(() => core.houseDefaults()),
+  'state.houseDefaults': q(() => core.houseDefaults(), { norm: (v) => withoutNewHouseKeys(v) }),
   'info.abilityInfo': pure((c) => core.abilityInfo(data, c.args[0])),
 
   /* ---- exports ---- */

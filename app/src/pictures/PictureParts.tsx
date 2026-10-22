@@ -115,9 +115,9 @@ function PictureForm({ close, battles, fixed, canLead, onSave }: FormProps & { c
           <label className={styles.choice}><input type="radio" name="picture-visibility" checked={visibility === 'leader'} onChange={() => setVisibility('leader')} /> ⚑ Leaders only</label>
         </fieldset>
       )}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!shrunk || reading}>Save the picture</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!shrunk || reading}>Save the picture</button>
       </div>
     </form>
   );

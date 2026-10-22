@@ -156,17 +156,17 @@ function EntryForm({ close, battles, world, entry, kind, onSave, onRemove, probl
       )}
       <div className={ui.span2}><RefPicker refs={b.refs} battles={battles} world={world} onChange={(refs) => set('refs', refs)} /></div>
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!b.title.trim()}>Save</button>
-        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+      <div className={ui.actions}>
         {onRemove && !sure && <button type="button" className={ui.buttonQuiet} onClick={() => setSure(true)}>Take out…</button>}
+        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!b.title.trim()}>Save</button>
       </div>
       {onRemove && sure && (
         <div className={ui.card} role="group" aria-label="Take it out">
           <p>Take “{entry?.title}” out? Its earlier wordings stay on the server.</p>
-          <div className={ui.row}>
-            <button type="button" className={ui.button} onClick={onRemove}>Take it out</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => setSure(false)}>Keep it</button>
+            <button type="button" className={ui.button} onClick={onRemove}>Take it out</button>
           </div>
         </div>
       )}
@@ -214,9 +214,9 @@ function RevealForm({ close, entry, places, onReveal, problem }: {
       </label>
       <p className={`${styles.warn} ${ui.muted}`}>⚑ This is logged. It can be corrected, not taken back from those who read it.</p>
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!text.trim()}>Reveal to everyone</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!text.trim()}>Reveal to everyone</button>
       </div>
     </form>
   );
@@ -249,7 +249,7 @@ function History({ close, detail, error }: { close: () => void; detail: Detail |
           )}
         </>
       )}
-      <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
+      <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
     </div>
   );
 }

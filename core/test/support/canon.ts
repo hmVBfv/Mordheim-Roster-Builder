@@ -120,3 +120,12 @@ export function draftCanon(dr: unknown, s: WarbandState): unknown {
   for (const c of d.cas ?? []) if (c.id != null) c.id = (s.campaign?.casualties ?? []).findIndex((x) => x.id === c.id);
   return d;
 }
+
+/* Intended difference (docs/behaviour-changes.md, "Startgold in drei Formen", report #36): core's house rules have two keys legacy
+   does not know. Left out of the comparison of the house rules, these two and nothing else. */
+export const NEW_HOUSE_KEYS = ['startGoldPlus', 'startGoldPct'] as const;
+export function withoutNewHouseKeys<T>(h: T): T {
+  const o = { ...(h as Record<string, unknown>) };
+  for (const k of NEW_HOUSE_KEYS) delete o[k];
+  return o as T;
+}

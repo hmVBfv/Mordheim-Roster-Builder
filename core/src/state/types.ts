@@ -240,6 +240,10 @@ export interface CampaignState {
 
 export interface HouseRules {
   startGold: number | '';
+  /** Starting gold: this much more than each warband's own (report #36). */
+  startGoldPlus: number | '';
+  /** Starting gold: this many percent more than each warband's own, rounded up to a full gc. */
+  startGoldPct: number | '';
   min: number | '';
   max: number | '';
   heroes: number;

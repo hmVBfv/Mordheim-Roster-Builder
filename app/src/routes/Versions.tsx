@@ -129,7 +129,7 @@ function Body({ rec }: { rec: StoredWarband }) {
               </li>
             </ul>
             {error && <p className={ui.error} role="alert">{error}</p>}
-            <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+            <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
           </div>
         )}
       </dialog>

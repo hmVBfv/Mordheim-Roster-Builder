@@ -187,9 +187,9 @@ function ImportForm({ close, cid, segs, battles, chapters, onDone }: ImportProps
         </ul>
       )}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || found.length === 0}>{found.length ? `Import ${found.length} chapter${found.length === 1 ? '' : 's'}` : 'Import'}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || found.length === 0}>{found.length ? `Import ${found.length} chapter${found.length === 1 ? '' : 's'}` : 'Import'}</button>
       </div>
     </form>
   );

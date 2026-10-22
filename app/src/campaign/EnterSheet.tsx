@@ -52,10 +52,10 @@ export function EnterSheet({ id, onDone }: { id: string; onDone: (v: CampaignVie
             </fieldset>
           )}
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            {free.length > 0 && <button type="submit" className={ui.button} disabled={busy || !chosen}>Enter a copy</button>}
+          <div className={ui.actions}>
             <button type="button" className={free.length > 0 ? ui.buttonQuiet : ui.button} onClick={() => close(() => void navigate(`/warbands/new?campaign=${id}`))}>New warband for this campaign</button>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+            {free.length > 0 && <button type="submit" className={ui.button} disabled={busy || !chosen}>Enter a copy</button>}
           </div>
         </form>
       </dialog>
