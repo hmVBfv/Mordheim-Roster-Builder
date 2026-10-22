@@ -17,7 +17,7 @@ const legacyData = new WeakMap<object, core.GameData>();
 function withoutMaxPer(d: core.GameData): core.GameData {
   let out = legacyData.get(d);
   if (!out) {
-    const warbands = Object.fromEntries(Object.entries(d.WARBANDS).map(([k, w]) => [k, { ...w, units: w.units.map(({ maxPer: _drop, ...u }) => u) }]));
+    const warbands = Object.fromEntries(Object.entries(d.WARBANDS).map(([k, w]) => [k, { ...w, units: w.units.map((u) => ({ ...u, maxPer: undefined })) }]));
     out = { ...d, WARBANDS: warbands } as core.GameData;
     legacyData.set(d, out);
   }
