@@ -231,7 +231,7 @@ describe('following a report', () => {
     srv.bugFrom({ reporterId: 'user-ben', reporterName: 'Ben', title: 'Ben’s secret problem', text: 'BEN-SECRET', status: 'new' });
     at('/more/reports');
     const table = await screen.findByRole('table', { name: 'Your reports' });
-    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Report', 'Kind', 'Status', 'Sent', 'Last change']);
+    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['#', 'Report', 'Kind', 'Status', 'Sent', 'Last change', 'Open']);
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows).toHaveLength(2);
     const gold = within(table).getByText('Gold drifts').closest('tr')!;
@@ -241,6 +241,25 @@ describe('following a report', () => {
     expect(within(dark).getByText('Received')).toBeTruthy();
     expect(within(dark).getByText('Wish')).toBeTruthy();
     expect(table.textContent).not.toMatch(/Ben|S1|gold ledger|BEN-SECRET/);
+  });
+
+  it('the list of one’s own reports shows a short heading, as the admin’s does, and Open reads the whole of it', async () => {
+    const { srv, me } = server();
+    const long = 'After the battle the gold is off. '.repeat(12);
+    srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'After the battle the gold is off. After the battle…', text: long, headline: 'Gold drifts after a battle', status: 'confirmed', severity: 'S2', area: 'gold ledger' });
+    srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'A darker theme please, if that is possible', text: 'A darker theme please, if that is possible at all.', kind: 'wish' });
+    const user = userEvent.setup();
+    at('/more/reports');
+    const table = await screen.findByRole('table', { name: 'Your reports' });
+    // the heading stands where the cut-off beginning stood; a report without one shows the beginning
+    expect(within(table).getByText('Gold drifts after a battle')).toBeTruthy();
+    expect(table.textContent).not.toMatch(/After the battle the gold is off\. After the battle…/);
+    expect(within(table).getByText('A darker theme please, if that is possible')).toBeTruthy();
+    await user.click(within(table).getByRole('button', { name: 'Open: Gold drifts after a battle' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Gold drifts after a battle' });
+    expect(sheet.textContent).toContain('Confirmed');
+    expect(sheet.textContent).toContain('After the battle the gold is off.');
+    expect(sheet.textContent).not.toMatch(/S2|gold ledger/);
   });
 
   it('a tab of its own: Account has Your reports beside it, and the settings do not grow with the reports', async () => {

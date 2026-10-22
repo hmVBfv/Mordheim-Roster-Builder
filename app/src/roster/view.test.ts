@@ -105,6 +105,16 @@ describe('editing a roster', () => {
     expect(unit('squig')).toMatchObject({ limit: '0–2', why: null });
   });
 
+  it('shows the recruit notes of every warband as plain text, without markup', () => {
+    const marked = Object.keys(data.WARBANDS).flatMap((key) => {
+      const s = createWarband(data, key, null, 'Test');
+      return rosterView(data, s).recruit.flatMap((g) => g.units).filter((u) => /<[^>]*>/.test(u.note)).map((u) => `${key}/${u.id}`);
+    });
+    expect(marked).toEqual([]);
+    const goblin = rosterView(data, createWarband(data, 'orcmob', null, 'Test')).recruit.flatMap((g) => g.units).find((u) => u.id === 'goblin')!;
+    expect(goblin.note).toContain('Not Orcs: Orcs expect little');
+  });
+
   it('offers another man at his price, until the group or the unit is full', () => {
     let s = core.addUnit(ctx(fresh()), 'warr');
     const uid = s.models[0]!.uid;

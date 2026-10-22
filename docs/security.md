@@ -98,13 +98,17 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
   - Zufälliges 256-Bit-Token, in der Datenbank nur als Hash.
   - Cookie `mh_session`, `HttpOnly; Secure; SameSite=Lax; Path=/`
     (`Secure`, sobald `PUBLIC_ORIGIN` https ist).
-  - 90 Tage, verlängert sich bei Nutzung.
+  - 30 Tage ohne Nutzung, dann ist das Gerät abgemeldet; verlängert sich bei
+    Nutzung. Hat ein Konto mehr als fünf offene Geräte, beendet die nächste
+    Anmeldung die, die seit 7 Tagen nicht benutzt wurden (die am längsten
+    unbenutzten zuerst, bis fünf bleiben; das eben angemeldete nie). Audit:
+    `sessions.prune` (Wunsch #44, Rob 22.10.2026).
   - Geräteliste im Profil; jede Sitzung einzeln beendbar, „überall sonst
     abmelden“. Eine neue Anmeldung beendet die vorige Sitzung desselben
     Geräts; ein neues Passwort beendet alle anderen, ein Reset alle, ein
     neu eingerichteter Authenticator alle anderen (sie kamen nur mit dem
     Passwort herein). Verlängert sich die Sitzung, bekommt auch der Cookie
-    neue 90 Tage. Eine Passwortänderung, deren Sitzung währenddessen beendet
+    neue 30 Tage. Eine Passwortänderung, deren Sitzung währenddessen beendet
     wurde, gilt nicht.
 - **Zweiter Faktor (TOTP, Authenticator-App):** Pflicht für Admin und Leiter,
   optional für Spieler. Beim Einrichten 10 Einmal-Wiederherstellungscodes.

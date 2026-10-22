@@ -26,7 +26,8 @@ export function loadLore(): Promise<Lore> {
 
 /** What goes into the Library's text field: the summary and, last, where it was read. */
 export function loreText(e: LoreEntry, lore: Lore): string {
-  return `${e.text}\n\nSource: ${e.source.map((s) => `${lore.sources[s]!.title} – ${lore.sources[s]!.url}`).join('; ')}`;
+  const where = placeLine(e, lore);
+  return `${e.text}\n\n${where ? `${where}\n\n` : ''}Source: ${e.source.map((s) => `${lore.sources[s]!.title} – ${lore.sources[s]!.url}`).join('; ')}`;
 }
 
 /* ---- places nest (report #39) ---- */
@@ -64,4 +65,14 @@ export function inPlace(lore: Lore, e: LoreEntry, place: string): boolean {
   if (!place) return true;
   const within = (id: string) => id === place || ancestors(lore, id).some((a) => a.id === place);
   return e.kind === 'region' ? within(e.id) : (e.regions ?? []).some(within);
+}
+
+/** Where an entry lies as a line of the text it is kept as: a place under what contains it, a group or faction
+    where it comes from, each place with everything around it (Old World › The Empire › Ostermark). Empty without one. */
+export function placeLine(e: LoreEntry, lore: Lore): string {
+  const by = regionById(lore);
+  const chain = (id: string) => [...ancestors(lore, id), by.get(id)].filter((x): x is LoreEntry => !!x).map((x) => x.name).join(' › ');
+  if (e.kind === 'region') { const up = ancestors(lore, e.id).map((x) => x.name).join(' › '); return up ? `Place: ${up}` : ''; }
+  const from = (e.regions ?? []).map(chain).filter(Boolean).join(' · ');
+  return from ? `Comes from: ${from}` : '';
 }

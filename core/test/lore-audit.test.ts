@@ -49,4 +49,37 @@ describe('the lore catalogue', () => {
       for (const r of e.regions!) expect(byId.get(r)?.kind, `${e.id} → ${r}`).toBe('region');
     }
   });
+
+  /* #38: places far from Mordheim, for the warbands that travelled from far away, each in the place that holds it. */
+  it('covers the world, not only the ruins: realms and lands far from Mordheim, nested the way the setting has them', () => {
+    const chain = (id: string) => { const out: string[] = []; for (let p: string | null | undefined = id; p; p = byId.get(p)?.parent) out.unshift(p); return out; };
+    expect(chain('the-pit')).toEqual(['old-world', 'the-empire', 'ostermark', 'mordheim', 'the-pit']);
+    expect(chain('middenheim')).toEqual(['old-world', 'the-empire', 'middenland', 'middenheim']);
+    for (const id of ['kislev', 'bretonnia', 'tilea', 'norsca', 'the-chaos-wastes', 'lustria', 'khemri', 'araby', 'cathay-and-the-east', 'ulthuan', 'naggaroth', 'albion']) {
+      expect(byId.get(id)?.kind, id).toBe('region');
+    }
+    expect(chain('skeggi')).toEqual(['lustria', 'skeggi']);
+    expect(chain('weijin')).toEqual(['cathay-and-the-east', 'grand-cathay', 'weijin']);
+    // the realms stand at the top of the world; everything else lies in something
+    const top = lore.LORE.filter((e) => e.kind === 'region' && !e.parent).map((e) => e.id);
+    expect(top).toEqual(expect.arrayContaining(['old-world', 'lustria', 'ulthuan', 'naggaroth', 'norsca']));
+    expect(lore.LORE.filter((e) => e.kind === 'region').length).toBeGreaterThan(60);
+  });
+
+  /* #37: more groups, with where they come from – the three tribes of the Marauders of Chaos first. */
+  it('holds the tribes of the Marauders of Chaos and the groups that came from far away, each tied to where it comes from', () => {
+    const groups = lore.LORE.filter((e) => e.kind === 'group');
+    expect(groups.length).toBeGreaterThan(60);
+    expect(byId.get('norse-tribes')?.regions).toEqual(['norsca']);
+    expect(byId.get('kurgan-tribes')?.regions).toEqual(['the-chaos-wastes']);
+    expect(byId.get('hung-tribes')?.regions).toEqual(expect.arrayContaining(['the-chaos-wastes', 'cathay-and-the-east']));
+    // from far away: a group of Lustria, of Cathay, of Naggaroth, of Tilea
+    for (const [id, region] of [['amazons-of-lustria', 'lustria'], ['battle-monks-of-cathay', 'cathay-and-the-east'], ['dark-elf-corsairs', 'naggaroth'], ['mazzalupo-companies', 'tilea']] as const) {
+      expect(byId.get(id)?.regions, id).toContain(region);
+    }
+    // most groups say where they come from
+    expect(groups.filter((g) => g.regions?.length).length / groups.length).toBeGreaterThan(0.9);
+    // the groups of the first catalogue are tied to places as well
+    for (const id of ['reikland-court', 'middenheim-court', 'lady-magritta', 'count-von-carstein', 'sisters-of-sigmar', 'master-of-the-possessed']) expect(byId.get(id)?.regions?.length, id).toBeGreaterThan(0);
+  });
 });

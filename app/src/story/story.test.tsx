@@ -118,7 +118,24 @@ describe('a warrior’s life', () => {
     expect(core.profileOf((await stored()).models[0])).toMatchObject({ title_en: 'the Grey', voice: 'Few words, all of them orders.' });
   });
 
-  it('every kind of people is listed, a group without a profile', async () => {
+  it('a group of Henchmen has a profile as well, edited from its life, and shown there (wish #48)', async () => {
+    const s = band();
+    const group = s.models[1]!;
+    await seed(core.setProfile(core.ctxOf(data, s), group.uid, { voice: 'They sing when they march.' }));
+    const user = userEvent.setup();
+    at(`/warbands/w1/story?who=${group.uid}`);
+    const life = await screen.findByRole('dialog', { name: /Warrior/ });
+    expect(within(life).getByText('They sing when they march.')).toBeTruthy();
+    await user.click(within(life).getByRole('button', { name: 'Edit the profile' }));
+    const sheet = await screen.findByRole('dialog', { name: /names, voice, story/ });
+    await user.click(within(sheet).getByLabelText('Name (English)'));
+    await user.paste('The Ash Road Boys');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(async () => expect(core.profileOf((await stored()).models.find((m) => m.uid === group.uid)).name_en).toBe('The Ash Road Boys'));
+    expect(core.profileOf((await stored()).models.find((m) => m.uid === group.uid))).toMatchObject({ voice: 'They sing when they march.' });
+  });
+
+  it('every kind of people is listed', async () => {
     await seed(band());
     at('/warbands/w1/story');
     const heroes = await screen.findByRole('group', { name: 'Heroes' });

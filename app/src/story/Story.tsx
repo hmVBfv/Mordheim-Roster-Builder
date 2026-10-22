@@ -182,7 +182,7 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
       <dialog ref={lifeRef} className={ui.sheet} aria-labelledby="life-title">
         {lifeWho && lifeOf && (
           <Life key={lifeOf.key} data={data} rec={rec} state={state} who={lifeWho} close={() => closeLife()}
-            onProfile={lifeWho.group === 'group' ? null : () => closeLife(() => editProfile(lifeWho))} />
+            onProfile={() => closeLife(() => editProfile(lifeWho))} />
         )}
       </dialog>
       {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}

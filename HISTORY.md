@@ -3869,3 +3869,93 @@ and the search mask has "Released with" and "Warband grade". Deliberately not
 done: the artefact tables (lesser, chaos, Lustrian) have no price or rarity, so
 they cannot be searched for; and the Khemri/Lustria rarities that differ from
 the core chart stay as they are – both went to Rob.
+
+## October 22, 2026 — the Gold tile and the models bar (#42, #41)
+
+Two small things on the head of a warband. The Gold tile carried a gold frame as
+well as gold figures, and only it was framed; the figures are enough, so the
+frame is the other tiles'. And the campaign's view of a warband showed "Models
+15/15" as figures only, while the warband's own page has a bar under them – so
+one warband had a bar and another none, depending on where one looked. Both
+views use one component now, so they cannot drift apart again. (Pull requests
+145 and 146.)
+
+## October 22, 2026 — Cancel to the left of the main button (#40)
+
+Rob chose the layout: the main button at the right edge, Cancel to its left, other
+actions further left. The first idea was to turn the row around with CSS, which
+would have left the keyboard going right to left; so about seventy rows of
+buttons were reordered in the source, by a script for the regular ones and by
+hand for the ten that were not (a delete button in the same row, a link as
+Cancel, a button split over two lines). A test now reads the sources and checks
+that Cancel stands before the main button and that no sheet's buttons sit in a
+plain row; it failed on the old sources. (Pull request 147.)
+
+## October 22, 2026 — the starting gold in three forms (#36)
+
+The house rule could only give every warband the same gold. It has three forms
+now: the same for all (as before), so much more for all, or so many percent more
+for all, the last two from what each warband starts with. Percentages are rounded
+up to the next full gc and worked out in whole numbers, because 500 gc and 10 %
+as a decimal is 550.0000000000001, which rounded up is 551. The app keeps one
+form on at a time; if a saved file has several, fixed wins, then plus, then
+percent. The parity comparison broke on the first run – the legacy app does not
+know the two new keys and the comparison showed the whole house rule object – so
+exactly those two keys are left out of it, by name, and the mirror's entry for the
+house defaults had to stop being "pure", which skips the normaliser. (Pull request
+148.)
+
+## October 22, 2026 — the world, in places (#37, #38, #39)
+
+Three reports, one catalogue: places that lie in places, more regions, more
+groups. The Lore tab shows a place's way ("In Old World › The Empire › Ostermark ›
+Mordheim"), a group's origin ("From Norsca") and narrows the list to a place and
+what lies in it. ADR 0024 records Rob's decision that sources outside
+mordheimer.net are allowed when written in our own words. Content came from two
+researchers who read the downloaded mordheimer.net pages: 60 regions and 70 groups;
+I merged them after fixing the region ids they had invented differently
+(`chaos-wastes` and `the-chaos-wastes`, `cathay` and `cathay-and-the-east`, `the-moot`
+and `moot`), rewording seven entries that shared nine-word runs with the source
+pages, and dropping the four Marauder marks, which are gods, not groups. The wikis
+(Lexicanum, Fandom) were not reachable from the cloud session, so places that
+mordheimer.net does not describe – the Badlands, Troll Country, Nordland,
+Wissenland, Ind, the Southlands, the Ogre Kingdoms – are still missing; that is
+for a session with access, or for Rob's own text. The pull requests are stacked
+(149, 150, 151); each targets `master`, merge them in that order. (Pull requests
+149, 150 and 151.)
+
+## October 22, 2026 — the second run: the reports #43 to #50
+
+Eight reports from one player in one afternoon, and Rob's answers to all of them
+at once. **#45** (literal `<b>` in the Recruit list): the data marks rule names with
+tags, the list printed the unit's text raw; a test now checks every unit of every
+warband. **#49** (the audit log needed F5): the log hook read only when its path
+changed, so clicking the open tab or going Back kept the old list; the location key
+is part of the effect now. **#44** (idle devices): sessions last 30 days from their
+last use instead of 90, and a sign-in on an account with more than five devices
+ends those idle for seven days, longest idle first; the cookie, two tests and the
+security doc had the 90 days in them. **#43** (own reports): the list shows the
+admin's heading and number with an Open sheet; two server tests had said the heading
+is "never shown to the reporter" – that was a choice, now reversed on purpose.
+**#50**: copies sent by other players also stand on the Warbands screen. **#48**:
+Henchmen groups have a profile; the core already could (`setProfile` works on any
+model), the story screen hid it.
+
+Two rules reports, decided by Rob. **#47**: a warrior who has not fought gets his
+list plus what the warband gives at the start (upgrades with a founding price, like
+gromril for Dwarfs); the catalogue's rare items were a founding privilege only in
+the old app. It is an interface change; two e2e steps that added a rare item at the
+founding now switch on the free market first. **#46**: the Orc Mob's limits
+(two Goblins per Orc, Squigs not above the Goblins) live in `unitMax`, so recruiting
+and group sizes obey them, and the parity suites needed a named exclusion for exactly
+these two units: fixtures, the screens comparison and the walk (which now skips a step
+the ratio would refuse, because core refuses what legacy accepts). Pull requests 153
+to 160.
+
+The wikis: Fandom answered through its MediaWiki API (the page URLs stay behind
+Cloudflare), Lexicanum did not. A researcher wrote 28 places and 20 groups in
+our own words from it; the Badlands links of two greenskin groups were dropped as
+too thin. "Add to Library" now carries the place chain into the text. Pull request 161.
+
+Rob also asked for a password-reset link an admin can hand to a player. It exists
+already (Admin → Users → "Make a link", 24 hours); there is no mail to send it by.

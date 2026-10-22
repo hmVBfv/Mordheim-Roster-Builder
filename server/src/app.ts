@@ -13,6 +13,7 @@ import type { HashCost } from './passwords.ts';
 import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
 import { bugTokenActor } from './bug-tokens.ts';
 import { ACTIONS, can, isAction, tokenMay, type Action, type Actor } from './policy.ts';
+import { SESSION_DAYS } from './accounts.ts';
 import { readActor, registerAccountRoutes, sessionCookie } from './routes-accounts.ts';
 import { HashBusyError } from './passwords.ts';
 import { registerBattleRoutes } from './routes-battles.ts';
@@ -154,7 +155,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
           return reply.code(403).send({ error: 'cross_origin' });
         }
         // a session in use lives on – its cookie with it (security review AUTH-14)
-        req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), 90)));
+        req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), SESSION_DAYS)));
         // the account the app made the request for: another than the cookie's is refused, never answered for the cookie
         // (a tab where somebody else signed in meanwhile; its unsent items stay its author's – independent review of CLIENT-1)
         const claimed = req.headers['x-roster-user'];

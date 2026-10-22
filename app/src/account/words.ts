@@ -20,6 +20,7 @@ const ACTIONS: Record<string, string> = {
   'totp.recovery_used': 'signed in with a recovery code',
   'session.revoke': 'signed out a device',
   'sessions.revoke_others': 'signed out everywhere else',
+  'sessions.prune': 'idle devices signed out',
   'sessions.revoke_all': 'signed out everywhere:',
 };
 

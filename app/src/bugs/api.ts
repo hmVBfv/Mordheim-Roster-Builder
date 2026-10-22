@@ -16,7 +16,7 @@ export const STATUS_NAMES: Record<BugStatus, string> = { new: 'New', confirmed: 
 export const STATUS_ORDER: BugStatus[] = ['new', 'confirmed', 'in_progress', 'fixed', 'closed', 'duplicate'];
 
 /** What the reporter reads of their own report. */
-export interface MyBug { id: string; kind: BugKind; title: string; text: string; sourceRef: string; status: BugStatus; fixedIn: string; createdAt: string; updatedAt: string }
+export interface MyBug { id: string; /** What people say: "bug 7". */ number: number; /** The admin's short heading over the report; empty until one is written. */ headline: string; kind: BugKind; title: string; text: string; sourceRef: string; status: BugStatus; fixedIn: string; createdAt: string; updatedAt: string }
 
 /** One line of the admin's list. */
 export interface BugSummary {
