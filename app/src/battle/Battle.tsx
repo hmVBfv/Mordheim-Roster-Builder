@@ -10,7 +10,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { onCampaign, pollWhileVisible } from '../live/live.ts';
 import { Link, useNavigate, useParams } from 'react-router';
-import { errorText, type Me } from '../account/api.ts';
+import { ApiError, errorText, type Me } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import { cachedCampaign, dayName, getCampaign, type CampaignRole } from '../campaign/api.ts';
@@ -153,7 +153,10 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const ev = useSheet();
   const prop = useSheet();
   const { ref: closeRef, open: openClose, close: closeClose } = useSheet();
-  const { ref: dropRef, open: openDrop, close: closeDrop } = useSheet();
+  const { ref: dropRef, open: openDropSheet, close: closeDrop } = useSheet();
+  // notes, pictures … belong to the battle: the leader is asked once more before they go with it
+  const [held, setHeld] = useState(false);
+  const openDrop = () => { setHeld(false); openDropSheet(); };
   const navigate = useNavigate();
   const [formKey, setFormKey] = useState(0);
   const [editing, setEditing] = useState<Shown | null>(null);
@@ -222,8 +225,10 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const close = () => {
     closeBattle(cid, bid).then((v) => { setView(v); notify('Closed. Each player now does the aftermath of their warband.'); }).catch((e: unknown) => notify(errorText(e)));
   };
-  const drop = () => {
-    deleteBattle(cid, bid).then(() => navigate(`/campaign/${cid}`)).catch((e: unknown) => notify(errorText(e)));
+  const drop = (withContent: boolean) => {
+    deleteBattle(cid, bid, withContent).then(() => navigate(`/campaign/${cid}`)).catch((e: unknown) => {
+      if (!withContent && e instanceof ApiError && e.code === 'in_use') setHeld(true); else notify(errorText(e));
+    });
   };
   const decide = (p: Proposal, accept: boolean) => {
     decideProposal(cid, bid, p.id, accept).then((v) => { setView(v); notify(accept ? 'Taken over – correct the entry if it needs it.' : 'Not taken over.'); }).catch((e: unknown) => notify(errorText(e)));
@@ -265,7 +270,8 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
                 )
                 : (() => {
                   const n = t.note!;
-                  const r = noteRights(n, user, lead, canPropose && !closed);
+                  // a battle of the history is closed from the start, its notes are still the players' to take out (report #35)
+                  const r = noteRights(n, user, lead, canPropose && (!closed || past));
                   return (
                     <NoteCard key={n.id} n={n} battleName={() => `battle ${view.battle.round}`} pending={'pending' in n ? n.pending : false} refused={'refused' in n ? n.refused : undefined}
                       canEdit={r.edit} canRemove={r.remove} onEdit={() => openNote(n as FullNote, (n as FullNote).kind)} onRemove={() => void notes.remove(n)} />
@@ -385,11 +391,12 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
             <li>For a battle made by mistake: it is taken out of the campaign for everyone.</li>
             <li>Its protocol ({merged.entries.length} entr{merged.entries.length === 1 ? 'y' : 'ies'}) and the corrections go with it.</li>
             <li>The warbands and their versions stay as they are.</li>
-            <li>While notes, pictures or other things of the campaign belong to this battle, the server keeps it – take those out first.</li>
+            <li>If notes, pictures or other things of the campaign belong to this battle, you are asked once more before they go with it.</li>
           </ul>
+          {held && <p className={`${ui.message} ${ui.error}`} role="alert">Notes, pictures or other things of the campaign belong to this battle. Deleting it now takes all of them with it – whoever wrote them, sealed and leader-only ones too – and nothing can bring them back. The battle will never have been.</p>}
           {!online && <p className={`${ui.message} ${ui.error}`}>Deleting needs the connection.</p>}
           <div className={ui.row}>
-            <button type="button" className={ui.button} disabled={!online} onClick={() => closeDrop(drop)}>Delete the battle</button>
+            <button type="button" className={ui.button} disabled={!online} onClick={() => drop(held)}>{held ? 'Delete the battle and everything on it' : 'Delete the battle'}</button>
             <button type="button" className={ui.buttonQuiet} onClick={() => closeDrop()}>Keep it</button>
           </div>
         </div>

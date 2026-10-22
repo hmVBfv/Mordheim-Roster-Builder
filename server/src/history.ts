@@ -15,7 +15,8 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { audit } from './accounts.ts';
-import { battleById, OUTCOMES, participantIds, type BattleRow } from './battles.ts';
+import { battleById, dropFiles, OUTCOMES, participantIds, purgeBattleContent, type BattleRow, type RemoveOptions } from './battles.ts';
+import type { AttachmentRow } from './attachments.ts';
 import { openEnrolment, type CampaignRow } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { gameData } from './rules.ts';
@@ -97,20 +98,26 @@ export function putPastBattle(db: DB, c: CampaignRow, id: string, p: PastBattle,
 
 export type Removed = { ok: true } | { ok: false; status: 409; error: string; problem?: string };
 
-/** Takes a battle out of the history – while nothing refers to it: no note, picture or moved block. */
-export function removePastBattle(db: DB, c: CampaignRow, b: BattleRow, by: string, now: Date): Removed {
-  return db.transaction((): Removed => {
+/** Takes a battle out of the history – while nothing refers to it: no note, picture or moved block that is still there. With
+    `withContent` a leader takes those out with it (see purgeBattleContent). What was taken out itself lets go of the battle. */
+export function removePastBattle(db: DB, c: CampaignRow, b: BattleRow, by: string, now: Date, opts: RemoveOptions = {}): Removed {
+  let files: AttachmentRow[] = [];
+  const r = db.transaction((): Removed => {
     if (!b.taken_over) return { ok: false, status: 409, error: 'not_history', problem: 'only a battle of the history is taken out' };
     if (ownBattle(db, c.id)) return closedHistory;
-    const used = db.prepare('SELECT 1 FROM notes WHERE battle_id = ? UNION ALL SELECT 1 FROM attachments WHERE battle_id = ? UNION ALL SELECT 1 FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ? LIMIT 1')
+    if (opts.withContent) files = purgeBattleContent(db, b, by, now);
+    const used = db.prepare('SELECT 1 FROM notes WHERE battle_id = ? AND deleted_at IS NULL UNION ALL SELECT 1 FROM attachments WHERE battle_id = ? AND deleted_at IS NULL UNION ALL SELECT 1 FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ? LIMIT 1')
       .get(b.id, b.id, c.id, `b${b.id}:%`);
     if (used) return { ok: false, status: 409, error: 'in_use', problem: 'notes or pictures belong to this battle' };
+    for (const table of ['notes', 'attachments']) db.prepare(`UPDATE ${table} SET battle_id = NULL WHERE battle_id = ?`).run(b.id);
     db.prepare('DELETE FROM battle_participants WHERE battle_id = ?').run(b.id);
     db.prepare('DELETE FROM battles WHERE id = ?').run(b.id);
-    audit(db, { actorId: by, action: 'battle.history_remove', targetType: 'battle', targetId: b.id, campaignId: c.id, visibility: 'public', payload: { round: b.round, title: b.title } }, now);
+    audit(db, { actorId: by, action: 'battle.history_remove', targetType: 'battle', targetId: b.id, campaignId: c.id, visibility: 'public', payload: { round: b.round, title: b.title, ...(opts.withContent ? { withContent: true } : {}) } }, now);
     followHistory(db, c, by, now);
     return { ok: true };
   })();
+  if (r.ok) dropFiles(opts.uploadDir, files);
+  return r;
 }
 
 /** A battle of the campaign's own may not take a round of its history. */

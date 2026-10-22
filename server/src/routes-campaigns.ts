@@ -18,7 +18,7 @@ import { battleById } from './battles.ts';
 import { PastBattleBody, putPastBattle, removePastBattle } from './history.ts';
 import { ACCOUNT_FULL, checkSave, draftOfUser, fitsAccount, metaOf, versionOf, warbandById, weightOf } from './warbands.ts';
 
-export interface CampaignDeps { db: DB | null; now: () => Date }
+export interface CampaignDeps { db: DB | null; now: () => Date; uploadDir?: string | null }
 
 const UUID = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 const body = (props: Record<string, unknown>, required: string[]) => ({ body: { type: 'object', additionalProperties: false, required, properties: props } });
@@ -233,7 +233,7 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!t) return reply;
     const b = battleById(db(), (req.params as { bid: string }).bid.toLowerCase());
     if (!b || b.campaign_id !== t.c.id) return reply.code(404).send({ error: 'not_found' });
-    const r = removePastBattle(db(), t.c, b, req.actor!.id, now());
+    const r = removePastBattle(db(), t.c, b, req.actor!.id, now(), { withContent: (req.query as { content?: string }).content === '1', uploadDir: deps.uploadDir ?? null });
     if (!r.ok) return reply.code(r.status).send(r.problem ? { error: r.error, problem: r.problem } : { error: r.error });
     return view(t.c, t.role);
   });

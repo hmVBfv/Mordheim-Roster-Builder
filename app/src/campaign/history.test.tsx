@@ -102,6 +102,24 @@ describe('the history of a running campaign', () => {
     expect(screen.getByText(/After battle 1 · you are leader/)).toBeTruthy();
   });
 
+  it('with notes about it, taking it out is asked once more; then they go with it (report #35)', async () => {
+    const { srv, c, caravan } = campaign('leader', { totp: true });
+    const b = srv.pastBattle(c.id, { round: 1, title: 'Das Urteil im Nebel', outcomes: { [caravan]: 'victory' } });
+    if (typeof b === 'string') throw new Error(b);
+    const note = srv.noteFrom(c.id, { author: 'Kai', text: 'Fog over the Stir.', battleId: b.id });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/manage`);
+    await user.click(await screen.findByRole('button', { name: 'Change Battle 1 · Das Urteil im Nebel' }));
+    const change = await screen.findByRole('dialog', { name: 'A battle before the app' });
+    await user.click(within(change).getByRole('button', { name: 'Take it out' }));
+    expect(await within(change).findByRole('alert')).toBeTruthy();
+    expect(srv.state.battles.has(b.id)).toBe(true);
+    await user.click(within(change).getByRole('button', { name: 'Take it out with everything on it' }));
+    expect(await screen.findByText('Taken out of the history, with everything written about it.')).toBeTruthy();
+    expect(srv.state.battles.has(b.id)).toBe(false);
+    expect(srv.state.notes.get(note.id)).toMatchObject({ deleted: true, text: '' });
+  });
+
   it('the overview: battles before the app have no aftermath and nothing to mark', async () => {
     const { srv, c, caravan, reavers } = campaign('player');
     srv.pastBattle(c.id, { round: 1, title: 'Das Urteil im Nebel', outcomes: { [caravan]: 'routed', [reavers]: 'victory' } });

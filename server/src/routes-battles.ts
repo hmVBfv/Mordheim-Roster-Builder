@@ -22,6 +22,8 @@ export interface BattleDeps {
   db: DB | null; now: () => Date;
   /** Where the snapshot after each battle goes (docs/operations.md); null: none (some tests). */
   dataDir?: string | null;
+  /** Where pictures are kept: a leader who takes a battle out with its content takes the files out too. */
+  uploadDir?: string | null;
   log?: { warn: (o: object, msg: string) => void };
 }
 
@@ -138,11 +140,12 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     return view(battleById(db(), t.b!.id)!);
   });
 
-  /** An open battle made by mistake goes (a leader); a closed one stays. */
+  /** An open battle made by mistake goes (a leader); a closed one stays. `?content=1`: with everything written for it (reports #34, #35). */
   app.delete('/api/v1/campaigns/:id/battles/:bid', { config: { action: 'battle.write' } }, async (req, reply) => {
     const t = target(req, reply, 'battle.write');
     if (!t) return reply;
-    const r = removeOpenBattle(db(), t.b!, req.actor!.id, now());
+    const withContent = (req.query as { content?: string }).content === '1';
+    const r = removeOpenBattle(db(), t.b!, req.actor!.id, now(), { withContent, uploadDir: deps.uploadDir ?? null });
     if (!r.ok) return reply.code(r.status).send({ error: r.error, problem: r.problem });
     return { removed: true };
   });

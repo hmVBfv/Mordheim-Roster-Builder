@@ -85,4 +85,47 @@ describe('taking an open battle out', () => {
     expect((await anna('DELETE', url)).statusCode).toBe(404);
     expect((await anna('POST', `/campaigns/${id}/battles`, { id: randomUUID(), title: 'On purpose', warbandIds: [w] })).statusCode).toBe(201);
   });
+
+  describe('with everything written for it (reports #34 and #35)', () => {
+    /** Notes of three kinds, a question and a background entry hang on the open battle; the log is read for words afterwards. */
+    async function written() {
+      const w = await open();
+      const { id, anna, kai, bid, s } = w;
+      const pub = randomUUID(), sealed = randomUUID(), gm = randomUUID(), q = randomUUID(), bg = randomUUID();
+      await kai('PUT', `/campaigns/${id}/notes/${pub}`, { battleId: bid, text: 'Secret words of the ferryman.' });
+      await kai('PUT', `/campaigns/${id}/notes/${sealed}`, { battleId: bid, text: 'A sealed plan.', visibility: 'sealed' });
+      await anna('PUT', `/campaigns/${id}/notes/${gm}`, { battleId: bid, text: 'Leader only.', visibility: 'leader' });
+      await anna('PUT', `/campaigns/${id}/background/${bg}`, { kind: 'gm_note', title: 'The ferry plot', truth: 'The ferryman sells them.', battleId: bid });
+      const qr = await anna('PUT', `/campaigns/${id}/questions/${q}`, { to: (s.db.prepare('SELECT user_id FROM members WHERE campaign_id = ? AND role = ?').get(id, 'player') as { user_id: string }).user_id, battleId: bid, text: 'Who rows the boat?' });
+      expect(qr.statusCode, qr.body).toBeLessThan(300);
+      return { ...w, pub, sealed, gm, bg, q };
+    }
+
+    it('a leader takes the battle out with its notes, sealed ones included; their words are gone from the database', async () => {
+      const { s, id, anna, kai, url, pub, sealed, gm, bg, q, bid } = await written();
+      expect((await anna('DELETE', url)).statusCode).toBe(409);
+      expect((await kai('DELETE', `${url}?content=1`)).json()).toEqual({ error: 'forbidden' });
+      expect((await anna('DELETE', `${url}?content=1`)).statusCode).toBe(200);
+      expect((await anna('GET', url)).statusCode).toBe(404);
+      for (const n of [pub, sealed, gm]) {
+        expect(s.db.prepare('SELECT text, mentions, deleted_at IS NOT NULL AS gone, battle_id FROM notes WHERE id = ?').get(n)).toEqual({ text: '', mentions: '[]', gone: 1, battle_id: null });
+      }
+      expect(s.db.prepare('SELECT count(*) AS n FROM note_revisions WHERE note_id IN (?, ?, ?)').get(pub, sealed, gm)).toEqual({ n: 0 });
+      expect(s.db.prepare('SELECT title, truth, deleted_at IS NOT NULL AS gone FROM background_entries WHERE id = ?').get(bg)).toEqual({ title: '', truth: '', gone: 1 });
+      expect(s.db.prepare('SELECT text, status FROM questions WHERE id = ?').get(q)).toEqual({ text: '', status: 'withdrawn' });
+      // the notes are no longer listed to anybody; the log names no words
+      const listed = ((await kai('GET', `/campaigns/${id}/notes`)).json() as { notes: { id: string }[] }).notes.map((n) => n.id);
+      expect(listed).not.toContain(pub);
+      const log = JSON.stringify(s.db.prepare('SELECT action, payload FROM audit_log WHERE campaign_id = ?').all(id));
+      expect(log).not.toContain('ferryman');
+      expect(log).not.toContain('sealed plan');
+      expect(s.db.prepare("SELECT count(*) AS n FROM audit_log WHERE action = 'battle.remove' AND target_id = ?").get(bid)).toEqual({ n: 1 });
+    });
+
+    it('a closed battle stays, with or without its content', async () => {
+      const { anna, url } = await written();
+      expect((await anna('POST', `${url}/close`)).statusCode).toBe(200);
+      expect((await anna('DELETE', `${url}?content=1`)).json()).toMatchObject({ error: 'closed' });
+    });
+  });
 });

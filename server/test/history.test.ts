@@ -96,6 +96,24 @@ describe('the history of a running campaign', () => {
     expect((await anna('DELETE', `/campaigns/${id}/history/${randomUUID()}`)).statusCode).toBe(404);
   });
 
+  it('a note that was taken out itself no longer holds the battle back; a leader can take the live ones out with it (reports #34, #35)', async () => {
+    const { s, id, caravan, anna, kai, past } = await world();
+    const one = randomUUID(), two = randomUUID();
+    await past(anna, one, { round: 1, outcomes: { [caravan]: 'victory' } });
+    await past(anna, two, { round: 2, outcomes: { [caravan]: 'victory' } });
+    const gone = randomUUID(), live = randomUUID();
+    await kai('PUT', `/campaigns/${id}/notes/${gone}`, { battleId: one, text: 'Fog over the Stir.' });
+    await kai('PUT', `/campaigns/${id}/notes/${live}`, { battleId: two, text: 'The bridge was burning.' });
+    await kai('DELETE', `/campaigns/${id}/notes/${gone}`);
+    // a note taken out is no reason to keep the battle (it used to be, and could not be undone)
+    // the later battle goes first: the history ends where the campaign stands
+    expect((await anna('DELETE', `/campaigns/${id}/history/${two}`)).json()).toMatchObject({ error: 'in_use' });
+    expect((await kai('DELETE', `/campaigns/${id}/history/${two}?content=1`)).json()).toEqual({ error: 'forbidden' });
+    expect((await anna('DELETE', `/campaigns/${id}/history/${two}?content=1`)).statusCode).toBe(200);
+    expect(s.db.prepare('SELECT text, battle_id, deleted_at IS NOT NULL AS gone FROM notes WHERE id = ?').get(live)).toEqual({ text: '', battle_id: null, gone: 1 });
+    expect((await anna('DELETE', `/campaigns/${id}/history/${one}`)).statusCode).toBe(200);
+  });
+
   it('once the campaign plays a battle of its own, its history is closed; the new battle comes after it', async () => {
     const { id, caravan, reavers, anna, past } = await world();
     const one = randomUUID();
