@@ -114,6 +114,27 @@ describe('the history of a running campaign', () => {
     expect((await anna('DELETE', `/campaigns/${id}/history/${one}`)).statusCode).toBe(200);
   });
 
+  it('a question, a background entry or a reputation event about a battle of the history hold it back too; a leader takes them out with it', async () => {
+    const { s, id, caravan, anna, kai, past } = await world();
+    const one = randomUUID();
+    await past(anna, one, { round: 1, outcomes: { [caravan]: 'victory' } });
+    const bg = randomUUID(), q = randomUUID();
+    expect((await anna('PUT', `/campaigns/${id}/background/${bg}`, { kind: 'gm_note', title: 'The ferry plot', truth: 'The ferryman sells them.', battleId: one })).statusCode).toBeLessThan(300);
+    const to = (s.db.prepare('SELECT user_id FROM members WHERE campaign_id = ? AND role = ?').get(id, 'player') as { user_id: string }).user_id;
+    expect((await anna('PUT', `/campaigns/${id}/questions/${q}`, { to, battleId: one, text: 'Who rows the boat?' })).statusCode).toBeLessThan(300);
+    // an entry taken out earlier keeps no words once the battle goes
+    const old = randomUUID();
+    await anna('PUT', `/campaigns/${id}/background/${old}`, { kind: 'gm_note', title: 'Old plot', truth: 'Old truth.', battleId: one });
+    await anna('DELETE', `/campaigns/${id}/background/${old}`);
+    const refused = await anna('DELETE', `/campaigns/${id}/history/${one}`);
+    expect(refused.statusCode).toBe(409);
+    expect(refused.json()).toMatchObject({ error: 'in_use' });
+    expect((await kai('DELETE', `/campaigns/${id}/history/${one}?content=1`)).json()).toEqual({ error: 'forbidden' });
+    expect((await anna('DELETE', `/campaigns/${id}/history/${one}?content=1`)).statusCode).toBe(200);
+    expect(s.db.prepare('SELECT title, truth, battle_id FROM background_entries WHERE id IN (?, ?)').all(bg, old)).toEqual([{ title: '', truth: '', battle_id: null }, { title: '', truth: '', battle_id: null }]);
+    expect(s.db.prepare('SELECT text, status FROM questions WHERE id = ?').get(q)).toEqual({ text: '', status: 'withdrawn' });
+  });
+
   it('once the campaign plays a battle of its own, its history is closed; the new battle comes after it', async () => {
     const { id, caravan, reavers, anna, past } = await world();
     const one = randomUUID();

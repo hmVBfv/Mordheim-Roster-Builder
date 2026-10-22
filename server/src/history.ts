@@ -15,7 +15,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { audit } from './accounts.ts';
-import { battleById, dropFiles, OUTCOMES, participantIds, purgeBattleContent, type BattleRow, type RemoveOptions } from './battles.ts';
+import { battleById, dropFiles, letGoOfBattle, OUTCOMES, participantIds, purgeBattleContent, waitsFor, WAITS, type BattleRow, type RemoveOptions } from './battles.ts';
 import type { AttachmentRow } from './attachments.ts';
 import { openEnrolment, type CampaignRow } from './campaigns.ts';
 import type { DB } from './db.ts';
@@ -105,11 +105,19 @@ export function removePastBattle(db: DB, c: CampaignRow, b: BattleRow, by: strin
   const r = db.transaction((): Removed => {
     if (!b.taken_over) return { ok: false, status: 409, error: 'not_history', problem: 'only a battle of the history is taken out' };
     if (ownBattle(db, c.id)) return closedHistory;
+    if (waitsFor(db, b)) return { ok: false, status: 409, ...WAITS };
     if (opts.withContent) files = purgeBattleContent(db, b, by, now);
-    const used = db.prepare('SELECT 1 FROM notes WHERE battle_id = ? AND deleted_at IS NULL UNION ALL SELECT 1 FROM attachments WHERE battle_id = ? AND deleted_at IS NULL UNION ALL SELECT 1 FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ? LIMIT 1')
-      .get(b.id, b.id, c.id, `b${b.id}:%`);
-    if (used) return { ok: false, status: 409, error: 'in_use', problem: 'notes or pictures belong to this battle' };
-    for (const table of ['notes', 'attachments']) db.prepare(`UPDATE ${table} SET battle_id = NULL WHERE battle_id = ?`).run(b.id);
+    const used = db.prepare(`
+      SELECT 1 FROM notes WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM attachments WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM questions WHERE battle_id = ? AND status != 'withdrawn'
+      UNION ALL SELECT 1 FROM background_entries WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM reputation_events WHERE battle_id = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM scenarios WHERE played_in_battle = ? AND deleted_at IS NULL
+      UNION ALL SELECT 1 FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ?
+      LIMIT 1`).get(b.id, b.id, b.id, b.id, b.id, b.id, c.id, `b${b.id}:%`);
+    if (used) return { ok: false, status: 409, error: 'in_use', problem: 'notes, pictures or other things of the campaign belong to this battle' };
+    letGoOfBattle(db, b);
     db.prepare('DELETE FROM battle_participants WHERE battle_id = ?').run(b.id);
     db.prepare('DELETE FROM battles WHERE id = ?').run(b.id);
     audit(db, { actorId: by, action: 'battle.history_remove', targetType: 'battle', targetId: b.id, campaignId: c.id, visibility: 'public', payload: { round: b.round, title: b.title, ...(opts.withContent ? { withContent: true } : {}) } }, now);

@@ -157,7 +157,7 @@ export function createBattle(db: DB, n: NewBattle, now: Date): BattleRow {
   })();
 }
 
-export type RemovedBattle = { ok: true } | { ok: false; status: 409; error: 'closed' | 'history' | 'in_use'; problem: string };
+export type RemovedBattle = { ok: true } | { ok: false; status: 409; error: 'closed' | 'history' | 'in_use' | 'waits'; problem: string };
 
 /** Where a battle's own blocks of the story are placed: the segment is `b<id>:before`, `b<id>:course` … */
 const SEGMENT_OF = (battleId: string) => `b${battleId}:%`;
@@ -189,25 +189,52 @@ export function purgeBattleContent(db: DB, b: BattleRow, by: string, now: Date):
   db.prepare('DELETE FROM note_revisions WHERE note_id IN (SELECT id FROM notes WHERE battle_id = ?)').run(b.id);
   const files = db.prepare('SELECT * FROM attachments WHERE battle_id = ? AND deleted_at IS NULL').all(b.id) as AttachmentRow[];
   for (const a of files) tomb('attachments', a.id, a.visibility as 'public' | 'leader', `caption = '', deleted_at = '${at}'`);
+  db.prepare("UPDATE attachments SET caption = '' WHERE battle_id = ?").run(b.id);
   for (const q of db.prepare("SELECT id FROM questions WHERE battle_id = ? AND status != 'withdrawn'").all(b.id) as { id: string }[]) {
     tomb('questions', q.id, 'leader', `text = '', status = 'withdrawn'`);
   }
+  db.prepare("UPDATE questions SET text = '' WHERE battle_id = ?").run(b.id);
   for (const e of db.prepare('SELECT id FROM background_entries WHERE battle_id = ? AND deleted_at IS NULL').all(b.id) as { id: string }[]) {
-    tomb('background_entries', e.id, 'leader', `title = '', truth = '', players_know = '', hint_limits = '', refs = '[]', deleted_at = '${at}'`);
+    tomb('background_entries', e.id, 'leader', `deleted_at = '${at}'`);
   }
+  // the words of every entry of the battle, also of one taken out before
+  db.prepare("UPDATE background_entries SET title = '', truth = '', players_know = '', hint_limits = '', refs = '[]' WHERE battle_id = ?").run(b.id);
   db.prepare('DELETE FROM background_revisions WHERE entry_id IN (SELECT id FROM background_entries WHERE battle_id = ?)').run(b.id);
   for (const r of db.prepare('SELECT id FROM reputation_events WHERE battle_id = ? AND deleted_at IS NULL').all(b.id) as { id: string }[]) {
-    tomb('reputation_events', r.id, 'public', `reason = '', deleted_at = '${at}'`);
+    tomb('reputation_events', r.id, 'public', `deleted_at = '${at}'`);
   }
+  db.prepare("UPDATE reputation_events SET reason = '' WHERE battle_id = ?").run(b.id);
   db.prepare('DELETE FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ?').run(b.campaign_id, SEGMENT_OF(b.id));
   db.prepare('UPDATE scenarios SET played_in_battle = NULL WHERE played_in_battle = ?').run(b.id);
   return files;
 }
 
+
+/** Something that waits for the battle: a note sealed until it, or an entry revealed from it, would stay sealed for good or be shown at once. */
+export function waitsFor(db: DB, b: BattleRow): boolean {
+  return !!db.prepare(`
+    SELECT 1 FROM notes WHERE sealed_until_battle = ? AND battle_id IS NOT ?
+    UNION ALL SELECT 1 FROM background_entries WHERE reveal_from_battle = ? AND deleted_at IS NULL
+    LIMIT 1`).get(b.id, b.id, b.id);
+}
+export const WAITS: { error: 'waits'; problem: string } = { error: 'waits', problem: 'a note stays sealed until, or a background entry is revealed from, this battle: change those first' };
+
+/** What was taken out itself keeps its row (a grave) but lets go of the battle, so the battle row can go. */
+export function letGoOfBattle(db: DB, b: BattleRow): void {
+  for (const table of ['notes', 'attachments', 'questions', 'background_entries', 'reputation_events', 'background_reveals', 'scenarios']) {
+    const col = table === 'scenarios' ? 'played_in_battle' : 'battle_id';
+    db.prepare(`UPDATE ${table} SET ${col} = NULL WHERE ${col} = ?`).run(b.id);
+  }
+  // (only notes taken out are left here, see `waitsFor`: they stay hidden, as leader's)
+  db.prepare("UPDATE notes SET visibility = 'leader', sealed_until_battle = NULL WHERE sealed_until_battle = ?").run(b.id);
+  db.prepare('UPDATE background_entries SET reveal_from_battle = NULL WHERE reveal_from_battle = ?').run(b.id);
+}
+
 /** Deletes the bytes of pictures that were purged (after the transaction: a file cannot be rolled back). */
 export function dropFiles(uploadDir: string | null | undefined, files: AttachmentRow[]): void {
   if (!uploadDir) return;
-  for (const a of files) { const f = fileOf(uploadDir, a); if (existsSync(f)) rmSync(f, { force: true }); }
+  // the rows are gone already: a file that cannot be removed must not turn the answer into an error
+  for (const a of files) { try { const f = fileOf(uploadDir, a); if (existsSync(f)) rmSync(f, { force: true }); } catch { /* left for the sweep of orphans */ } }
 }
 
 /**
@@ -221,12 +248,7 @@ export function removeOpenBattle(db: DB, b: BattleRow, by: string, now: Date, op
   const r = db.transaction((): RemovedBattle => {
     if (b.taken_over) return { ok: false, status: 409, error: 'history', problem: 'a battle of the history is taken out of the history' };
     if (b.status !== 'open') return { ok: false, status: 409, error: 'closed', problem: 'a closed battle stays: it is part of the story and of the marks' };
-    // a note sealed until this battle or an entry revealed from it would be sealed or shown for good, or at once: the leader changes those first
-    const waits = db.prepare(`
-      SELECT 1 FROM notes WHERE sealed_until_battle = ? AND battle_id IS NOT ?
-      UNION ALL SELECT 1 FROM background_entries WHERE reveal_from_battle = ? AND deleted_at IS NULL
-      LIMIT 1`).get(b.id, b.id, b.id);
-    if (waits) return { ok: false, status: 409, error: 'in_use', problem: 'a note stays sealed until, or a background entry is revealed from, this battle: change those first' };
+    if (waitsFor(db, b)) return { ok: false, status: 409, ...WAITS };
     if (opts.withContent) files = purgeBattleContent(db, b, by, now);
     const live = db.prepare(`
       SELECT 1 FROM notes WHERE battle_id = ? AND deleted_at IS NULL
@@ -238,13 +260,7 @@ export function removeOpenBattle(db: DB, b: BattleRow, by: string, now: Date, op
       UNION ALL SELECT 1 FROM timeline_positions WHERE campaign_id = ? AND segment LIKE ?
       LIMIT 1`).get(b.id, b.id, b.id, b.id, b.id, b.id, b.campaign_id, SEGMENT_OF(b.id));
     if (live) return { ok: false, status: 409, error: 'in_use', problem: 'notes, pictures or other things of the campaign belong to this battle' };
-    // what was taken out itself keeps its row (a grave) but lets go of the battle
-    for (const table of ['notes', 'attachments', 'questions', 'background_entries', 'reputation_events', 'background_reveals', 'scenarios']) {
-      const col = table === 'scenarios' ? 'played_in_battle' : 'battle_id';
-      db.prepare(`UPDATE ${table} SET ${col} = NULL WHERE ${col} = ?`).run(b.id);
-    }
-    // (only notes taken out are left here, see `waits`: they stay hidden, as leader's)
-    db.prepare("UPDATE notes SET visibility = 'leader', sealed_until_battle = NULL WHERE sealed_until_battle = ?").run(b.id);
+    letGoOfBattle(db, b);
     db.prepare('DELETE FROM proposals WHERE battle_id = ?').run(b.id);
     db.prepare('DELETE FROM protocol_entries WHERE battle_id = ?').run(b.id);
     db.prepare('DELETE FROM battle_participants WHERE battle_id = ?').run(b.id);

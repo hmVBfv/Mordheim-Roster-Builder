@@ -122,6 +122,16 @@ describe('taking an open battle out', () => {
       expect(s.db.prepare("SELECT count(*) AS n FROM audit_log WHERE action = 'battle.remove' AND target_id = ?").get(bid)).toEqual({ n: 1 });
     });
 
+    it('an entry that is revealed from this battle on holds it back, content or not: it would be shown at once', async () => {
+      const { s, id, anna, url } = await open();
+      const bid = (s.db.prepare('SELECT id FROM battles WHERE campaign_id = ?').get(id) as { id: string }).id;
+      const bg = randomUUID();
+      const put = await anna('PUT', `/campaigns/${id}/background/${bg}`, { kind: 'thread', title: 'Dark thread', truth: 'Hidden.', reveal: 'revealed', revealFromBattle: bid });
+      expect(put.statusCode, put.body).toBeLessThan(300);
+      for (const q of ['', '?content=1']) expect((await anna('DELETE', `${url}${q}`)).json()).toMatchObject({ error: 'waits' });
+      expect((await anna('GET', url)).statusCode).toBe(200);
+    });
+
     it('a closed battle stays, with or without its content', async () => {
       const { anna, url } = await written();
       expect((await anna('POST', `${url}/close`)).statusCode).toBe(200);
