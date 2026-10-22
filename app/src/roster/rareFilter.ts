@@ -19,7 +19,45 @@ export const STAT_FILTERS = [
 
 export type StatFilter = (typeof STAT_FILTERS)[number][0];
 
-export interface RareQuery { q?: string; stat?: StatFilter | ''; maxRarity?: number | null }
+export interface RareQuery { q?: string; stat?: StatFilter | ''; maxRarity?: number | null; /** a source key, see sourceKeys */ from?: string; /** a grade of the warband an item belongs to */ grade?: string }
+
+/* Where an item comes from (Rob, 22.10.2026: every item of mordheimer.net, with a choice by the campaign it was released with): the
+   core rules, a campaign setting whose price chart lists it, or a warband's own list. */
+const SOURCE_NAMES: Readonly<Record<string, string>> = {
+  core: 'Core rules', 'empire-in-flames': 'Empire in Flames', 'border-town-burning': 'Border Town Burning', khemri: 'Khemri', lustria: 'Lustria', warband: 'A warband\'s own item',
+};
+export const GRADE_NAMES: Readonly<Record<string, string>> = { core: 'Core warbands', '1a': 'Grade 1a', '1b': 'Grade 1b', '1c': 'Grade 1c', '2a': 'Grade 2a' };
+
+const titled = (slug: string) => slug.split('-').map((w) => (w.length > 2 ? w[0]!.toUpperCase() + w.slice(1) : w)).join(' ');
+export const sourceName = (key: string) => SOURCE_NAMES[key] ?? titled(key);
+
+/** The sources of an item: the settings that list it, 'warband' for a warband's own, and 'core' for what the core chart has (an item no setting
+    names is the core chart's). */
+export function sourceKeys(i: Pick<RareItem, 'settings'>): string[] {
+  if (!i.settings.length) return ['core'];
+  const out = new Set<string>();
+  for (const s of i.settings) out.add(s.startsWith('warband:') ? 'warband' : s);
+  return [...out];
+}
+
+/** What to show next to an item that is not the core chart's: where it was released. */
+export function releasedWith(i: Pick<RareItem, 'settings'>): string[] {
+  const keys = sourceKeys(i);
+  return keys.includes('core') ? [] : keys.map(sourceName);
+}
+
+const ORDER = ['core', 'empire-in-flames', 'border-town-burning', 'khemri', 'lustria'];
+/** The choices of the "From" list: those that some item has, the core chart first. */
+export function sourceOptions(items: readonly Pick<RareItem, 'settings'>[]): [string, string][] {
+  const have = new Set(items.flatMap((i) => sourceKeys(i)));
+  const rank = (k: string) => (ORDER.includes(k) ? ORDER.indexOf(k) : k === 'warband' ? 100 : 50);
+  return [...have].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b)).map((k) => [k, sourceName(k)]);
+}
+
+export function gradeOptions(items: readonly Pick<RareItem, 'grade'>[]): [string, string][] {
+  const have = new Set(items.map((i) => i.grade).filter((g): g is string => !!g));
+  return Object.keys(GRADE_NAMES).filter((g) => have.has(g)).map((g) => [g, GRADE_NAMES[g]!]);
+}
 
 export function filterRare(items: RareItem[], f: RareQuery): RareItem[] {
   const q = (f.q ?? '').trim().toLowerCase();
@@ -27,6 +65,8 @@ export function filterRare(items: RareItem[], f: RareQuery): RareItem[] {
   return items.filter((i) =>
     (!q || `${i.name} ${i.text}`.toLowerCase().includes(q))
     && (!words || words.test(i.text))
+    && (!f.from || sourceKeys(i).includes(f.from))
+    && (!f.grade || i.grade === f.grade)
     && (f.maxRarity == null || i.rarity <= f.maxRarity));
 }
 

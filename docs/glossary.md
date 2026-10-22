@@ -94,7 +94,7 @@ Begriff einführt, trägt ihn hier ein.
 | Ausrüstung aus der Liste (bis zur ersten Schlacht) | Equipment & rare items | `EquipmentSheet`, `setEqQty()`, `addRare()` |
 | nur für Helden (Listenzeile) | Heroes only | `{heroes: true}` |
 | einer Warband vorbehalten (Katalog) | – | `CATALOG[…].only`, `catalogAllowed()` |
-| Herkunft eines Gegenstands (Kampagne, Grad, Quelle) | – | `CATALOG[…].settings`, `.grade`, `.source` |
+| Herkunft eines Gegenstands (Kampagne, Grad, Quelle) | „Released with“, „Warband grade“ (Auswahl in der Suche) | `CATALOG[…].settings` (`core` = die Preistabelle des Regelbuchs, `empire-in-flames`, `border-town-burning`, `khemri`, `lustria` = die Preistabelle dieser Kampagne führt ihn, `warband:<Seite>` = Liste einer Warband), `.grade`, `.source`; `sourceKeys`, `sourceOptions`, `filterRare` |
 | unter anderem Namen dieselbe Ware (Liste ↔ Preistabelle) | – | `CATALOG[…].alias`, `tradeKind()` |
 | nur für eine Variante (Stadt, Stamm) | – | `{sub: ['midd']}` |
 | gesperrter Skill einer Warband | – | `WARBANDS[…].noSkills` |

@@ -1,9 +1,9 @@
 /* The search mask of "What can be found" (wish #22): by name or effect, by the characteristic an item touches, by rarity. */
 import { describe, expect, it } from 'vitest';
 import type { RareItem } from './equipment.ts';
-import { effectLine, filterRare, sortRare, STAT_FILTERS, type SortOrder } from './rareFilter.ts';
+import { effectLine, filterRare, gradeOptions, releasedWith, sortRare, sourceKeys, sourceName, sourceOptions, STAT_FILTERS, type SortOrder } from './rareFilter.ts';
 
-const item = (name: string, text: string, rarity = 8, kind: RareItem['kind'] = 'misc'): RareItem => ({ de: name, name, kind, rarity, price: '25 gc', avg: null, range: null, fixed: 25, text, usable: true });
+const item = (name: string, text: string, rarity = 8, kind: RareItem['kind'] = 'misc'): RareItem => ({ de: name, name, kind, rarity, price: '25 gc', avg: null, range: null, fixed: 25, text, usable: true, settings: [], grade: null });
 
 const ITEMS = [
   item('Lucky charm', 'Once per battle the wearer may re-roll one failed to-hit roll.', 6),
@@ -68,5 +68,50 @@ describe('sortRare (wish #25)', () => {
     const before = rows.map((i) => i.name);
     sortRare(rows, 'rarity-desc');
     expect(rows.map((i) => i.name)).toEqual(before);
+  });
+});
+
+/* Rob, 22.10.2026: every item of mordheimer.net, with a choice by the campaign it was released with. */
+describe('the choice by where an item was released', () => {
+  const at = (name: string, settings: string[], grade: string | null = null): RareItem => ({ ...item(name, 'x'), settings, grade });
+  const MIXED = [
+    at('Sword of the core chart', []),
+    at('Javelins', ['core', 'khemri', 'lustria']),
+    at('Mule', ['border-town-burning', 'empire-in-flames']),
+    at('Wardog', ['core'], 'core'),
+    at('Trade Wagon', ['warband:merchant-caravans'], '1c'),
+    at('Snotling Pump Wagon', ['warband:snotlings'], '2a'),
+  ];
+
+  it('knows the core chart, the campaign settings and a warband\'s own', () => {
+    expect(sourceKeys(MIXED[0]!)).toEqual(['core']);
+    expect(sourceKeys(MIXED[1]!)).toEqual(['core', 'khemri', 'lustria']);
+    expect(sourceKeys(MIXED[4]!)).toEqual(['warband']);
+    expect(sourceName('border-town-burning')).toBe('Border Town Burning');
+    expect(sourceName('some-new-setting')).toBe('Some New Setting');
+  });
+
+  it('offers only what some item has, the core chart first and the warbands last', () => {
+    expect(sourceOptions(MIXED).map(([k]) => k)).toEqual(['core', 'empire-in-flames', 'border-town-burning', 'khemri', 'lustria', 'warband']);
+    expect(sourceOptions([MIXED[2]!]).map(([k]) => k)).toEqual(['empire-in-flames', 'border-town-burning']);
+    expect(gradeOptions(MIXED).map(([k]) => k)).toEqual(['core', '1c', '2a']);
+  });
+
+  it('narrows the list to a campaign or a grade', () => {
+    const names = (f: Parameters<typeof filterRare>[1]) => filterRare(MIXED, f).map((i) => i.name);
+    expect(names({ from: 'khemri' })).toEqual(['Javelins']);
+    expect(names({ from: 'core' })).toEqual(['Sword of the core chart', 'Javelins', 'Wardog']);
+    expect(names({ from: 'empire-in-flames' })).toEqual(['Mule']);
+    expect(names({ from: 'warband' })).toEqual(['Trade Wagon', 'Snotling Pump Wagon']);
+    expect(names({ grade: '2a' })).toEqual(['Snotling Pump Wagon']);
+    expect(names({ from: 'warband', grade: '1c' })).toEqual(['Trade Wagon']);
+    expect(names({})).toHaveLength(6);
+  });
+
+  it('names where an item that is not the core chart\'s was released', () => {
+    expect(releasedWith(MIXED[0]!)).toEqual([]);
+    expect(releasedWith(MIXED[1]!)).toEqual([]);
+    expect(releasedWith(MIXED[2]!)).toEqual(['Border Town Burning', 'Empire in Flames']);
+    expect(releasedWith(MIXED[4]!)).toEqual(['A warband\'s own item']);
   });
 });

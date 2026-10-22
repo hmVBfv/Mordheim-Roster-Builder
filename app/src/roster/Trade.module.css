@@ -182,6 +182,17 @@
   overflow-y: auto;
 }
 
+/* a list that scrolls keeps every row its full height: in a grid of a limited height the rows were squeezed
+   and the lines of one ran over the next (report on the Hero's search sheet, 22.10.2026) */
+.pick.scroll {
+  display: flex;
+  flex-direction: column;
+}
+
+.pick.scroll > * {
+  flex: none;
+}
+
 .between {
   display: flex;
   flex-wrap: wrap;
@@ -534,4 +545,14 @@
 .changed {
   color: var(--accent);
   font-weight: 600;
+}
+
+/* where an item was released, beside its name (not shown for the core chart's items) */
+.src {
+  color: var(--text-muted);
+}
+
+/* the notes after a name wrap as whole pieces, never in the middle (their boxes would run over each other) */
+.rareRow .rn small {
+  display: inline-block;
 }
