@@ -2,22 +2,23 @@
    elements. The page paints the backdrop bands beside it (Banner), which is
    why a picture can be as wide as the screen. Decorative: hidden from
    assistive technology. */
-import type { CSSProperties, ReactElement, ReactNode } from 'react';
-import { H, LIVE, PALETTE, W, backdropRows } from './draw.ts';
+import { useEffect, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react';
+import { H, LIVE, PALETTE, W, WB, backdropRows } from './draw.ts';
 import { paint, SCENES, type SceneId } from './scenes.ts';
 import styles from './art.module.css';
 import ui from '../ui/ui.module.css';
 
 interface Layer { color: string; live?: keyof typeof styles; d: string }
 
-const layerCache = new Map<SceneId, Layer[]>();
+const layerCache = new Map<string, Layer[]>();
 
-/** the picture cut into runs of one colour per row */
-export function layers(id: SceneId): Layer[] {
-  const hit = layerCache.get(id);
+/** the picture cut into runs of one colour per row; `wide`: the banner's rows, with the surroundings of its motif (wings.ts) */
+export function layers(id: SceneId, wide?: readonly string[]): Layer[] {
+  const key = `${id}:${wide ? 'wide' : 'narrow'}`;
+  const hit = layerCache.get(key);
   if (hit) return hit;
   const byLetter = new Map<string, string>();
-  paint(id).forEach((row, y) => {
+  (wide ?? paint(id)).forEach((row, y) => {
     let x = 0;
     while (x < row.length) {
       const c = row[x] ?? '.';
@@ -29,14 +30,14 @@ export function layers(id: SceneId): Layer[] {
   });
   const out: Layer[] = [];
   for (const [letter, d] of byLetter) out.push({ color: PALETTE[letter]!, live: LIVE[letter], d });
-  layerCache.set(id, out);
+  layerCache.set(key, out);
   return out;
 }
 
-function Picture({ scene, view }: { scene: SceneId; view: string }): ReactElement {
+function Picture({ scene, view, wide }: { scene: SceneId; view: string; wide?: readonly string[] }): ReactElement {
   return (
     <svg className={styles.svg} viewBox={view} shapeRendering="crispEdges" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-      {layers(scene).map((l, i) => <path key={i} d={l.d} fill={l.color} className={l.live ? styles[l.live] : undefined} />)}
+      {layers(scene, wide).map((l, i) => <path key={i} d={l.d} fill={l.color} className={l.live ? styles[l.live] : undefined} />)}
     </svg>
   );
 }
@@ -59,12 +60,25 @@ export function bands(): string {
   return bandCache;
 }
 
-/** the strip at the top of a screen: the picture in the middle, the night continuing to both sides */
+type Wings = { paintWide: (id: SceneId) => string[] };
+let wings: Wings | undefined;
+
+/** the strip at the top of a screen: the motif in the middle, its surroundings to both sides (wings.ts), the night beyond.
+    The surroundings load after the first paint (they are a chunk of their own: the first load has a budget); until then
+    the motif stands alone in the middle, as it always did. */
 export function Banner({ scene }: { scene: SceneId }): ReactElement {
+  const [loaded, setLoaded] = useState<Wings | undefined>(wings);
+  useEffect(() => {
+    if (wings) return;
+    let live = true;
+    void import('./wings.ts').then((m) => { wings = m; if (live) setLoaded(m); });
+    return () => { live = false; };
+  }, []);
   const style: CSSProperties = { background: bands() };
+  const x0 = Math.floor((W - WB) / 2);
   return (
     <div className={styles.banner} style={style} data-scene={scene} aria-hidden="true">
-      <Picture scene={scene} view={`0 0 ${W} ${H}`} />
+      <Picture scene={scene} view={loaded ? `0 0 ${WB} ${H}` : `${x0} 0 ${WB} ${H}`} wide={loaded?.paintWide(scene)} />
     </div>
   );
 }
