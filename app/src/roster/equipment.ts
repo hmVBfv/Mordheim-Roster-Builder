@@ -4,6 +4,7 @@
 import * as core from '@mordheim/core';
 import type { CatalogItem, Model, WarbandState } from '@mordheim/core';
 import { priceAverage, priceRange, priceText } from './rarePrice.ts';
+import { rosterView, type StatCell } from './view.ts';
 
 const CATS: Record<string, string> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour', Besonderes: 'Other', 'Besonderes (nur Heldinnen)': 'Other (Heroines only)' };
 export const KINDS = [['all', 'All'], ['cc', 'Close'], ['missile', 'Missile'], ['armour', 'Armour'], ['misc', 'Other']] as const;
@@ -148,6 +149,22 @@ export function holdings(ctx: core.Ctx): Holding[] {
     stash.set(id, { from: 'stash', owner: 'Stash', goods: g, name: it.name, pieces, paid: it.paid, sell: unpriced ? 0 : core.sellPrice(ctx, g, 1, it.paid), text: itemText(ctx.data, it.name), unpriced });
   }
   return [...out, ...stash.values()];
+}
+
+
+/** One holder on the Give board (wish #32): a warrior with what he is and can do – so one sees whom an item helps most – and what he
+    holds; the stash is the last card. */
+export interface GiveCard { holder: core.Holder; name: string; type: string; men: number; stats: StatCell[]; save: string; rules: string[]; items: Holding[] }
+
+export function giveCards(ctx: core.Ctx): GiveCard[] {
+  const held = holdings(ctx);
+  const view = rosterView(ctx.data, ctx.s);
+  const cards: GiveCard[] = [...view.heroes, ...view.henchmen].map((w) => ({
+    holder: w.uid, name: w.name, type: w.type, men: w.count, stats: w.stats, save: w.save,
+    rules: [...w.rules, ...w.skills, ...w.spells, ...w.mutations].map((f) => f.label),
+    items: held.filter((h) => h.from === w.uid),
+  }));
+  return [...cards, { holder: 'stash', name: 'Stash', type: '', men: 1, stats: [], save: '', rules: [], items: held.filter((h) => h.from === 'stash') }];
 }
 
 /** Where a held item could go, and why not. */

@@ -11,7 +11,7 @@ import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
-  buyRecipients, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
+  buyRecipients, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
   type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
 } from '../roster/equipment.ts';
 import { filterRare, SORT_ORDERS, sortRare, STAT_FILTERS, type SortOrder, type StatFilter } from '../roster/rareFilter.ts';
@@ -386,7 +386,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
         <section className={ui.page} aria-label="Give items">
           <p className={ui.muted}>Move an item between warriors and the stash, without gold. Only those who may use it can take it; a group takes one for every man.</p>
           {wide
-            ? <GiveBoard held={held} recipientsFor={(h) => giveRecipients(ctx, h)} onGive={(h, to) => ed.edit((c) => core.giveItem(c, h.from, to, h.goods).state, `${h.name} given.`)} />
+            ? <GiveBoard cards={giveCards(ctx)} recipientsFor={(h) => giveRecipients(ctx, h)} onGive={(h, to) => ed.edit((c) => core.giveItem(c, h.from, to, h.goods).state, `${h.name} given.`)} />
             : <HoldingList list={held} label="Give" action={() => 'give'} onPick={(h) => { setGiving((p) => ({ key: (p?.key ?? 0) + 1, h })); openGive(); }} />}
         </section>
       )}

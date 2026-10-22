@@ -1,58 +1,71 @@
-/* Give on a wide screen (Rob, 20.10.2026: "Einzelzeilen von klobigen Feldern" – he asked for two columns side by
-   side, to assign by picking): on the left what each warrior and the stash holds, on the right who may take the
-   picked item, and why not the others. A phone keeps the sheet (TradingPost.tsx). */
+/* Give on a wide screen (wishes of Rob, 20.10.2026 and report #32): every warrior and the stash as a small card side by side in
+   as many columns as fit – with his profile and rules, so one sees whom an item helps most – and what he holds as chips.
+   Pick a chip (or start dragging it): each card says whether it may take the item and why not; click "Give here" or drop the
+   chip on a card. A phone keeps the sheet (TradingPost.tsx). */
 import type * as core from '@mordheim/core';
-import { useMemo, useState } from 'react';
-import type { Holding, Recipient } from '../roster/equipment.ts';
+import { useState } from 'react';
+import type { GiveCard, Holding, Recipient } from '../roster/equipment.ts';
 import styles from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
 
 const keyOf = (h: Holding) => `${String(h.from)}:${h.goods.rare ? 'r' : 'c'}:${h.goods.key}`;
 
-export function GiveBoard({ held, recipientsFor, onGive }: { held: Holding[]; recipientsFor: (h: Holding) => Recipient[]; onGive: (h: Holding, to: core.Holder) => void }) {
+export function GiveBoard({ cards, recipientsFor, onGive }: { cards: GiveCard[]; recipientsFor: (h: Holding) => Recipient[]; onGive: (h: Holding, to: core.Holder) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
+  const [over, setOver] = useState<string | null>(null);
+  const all = cards.flatMap((c) => c.items);
   // what was given is no longer held by the one who gave it: nothing stays picked
-  const item = held.find((h) => keyOf(h) === picked) ?? null;
-  const groups = useMemo(() => {
-    const out: { owner: string; items: Holding[] }[] = [];
-    for (const h of held) {
-      const g = out.find((x) => x.owner === h.owner);
-      if (g) g.items.push(h); else out.push({ owner: h.owner, items: [h] });
-    }
-    return out;
-  }, [held]);
-  if (!held.length) return <p className={ui.muted}>Nothing to give.</p>;
+  const item = all.find((h) => keyOf(h) === picked) ?? null;
   const to = item ? recipientsFor(item) : [];
+  if (!all.length) return <p className={ui.muted}>Nothing to give.</p>;
+  const give = (r: Recipient | undefined) => {
+    if (!item || !r?.ok) return;
+    setPicked(null);
+    setOver(null);
+    onGive(item, r.to);
+  };
   return (
-    <div className={styles.giveBoard}>
-      <section aria-label="What to give" className={styles.giveCol}>
-        {groups.map((g) => (
-          <div key={g.owner}>
-            <h3>{g.owner}</h3>
-            <div className={styles.pick} role="group" aria-label={`Held by ${g.owner}`}>
-              {g.items.map((h) => (
-                <button key={keyOf(h)} type="button" title={h.text || undefined} aria-pressed={keyOf(h) === picked} onClick={() => setPicked(keyOf(h) === picked ? null : keyOf(h))}>
+    <div className={styles.giveBoard} aria-label="Warriors and the stash">
+      {item && <p className={styles.giveHint} role="status"><strong>{item.name}</strong> from {item.owner}{item.pieces > 1 ? ` · ${item.pieces} pieces` : ''} – no gold changes hands{item.goods.rare ? '; the price paid goes with it' : ''}. Click “Give here” or drop it on a card.</p>}
+      {!item && <p className={`${styles.giveHint} ${ui.muted}`}>Pick an item, or drag it onto a warrior.</p>}
+      {cards.map((c) => {
+        const r = to.find((x) => x.to === c.holder);
+        const mine = item?.from === c.holder;
+        return (
+          <article key={String(c.holder)} aria-label={c.name} className={`${styles.giveCard} ${over === String(c.holder) ? styles.giveOver : ''} ${item && !mine && r && !r.ok ? styles.giveNo : ''}`}
+            onDragOver={(e) => { if (item && r?.ok) { e.preventDefault(); setOver(String(c.holder)); } }}
+            onDragLeave={() => setOver((o) => (o === String(c.holder) ? null : o))}
+            onDrop={(e) => { e.preventDefault(); give(r); }}>
+            <header>
+              <h3>{c.name}{c.men > 1 && <small> ×{c.men}</small>}</h3>
+              {c.type && c.type !== c.name && <small className={ui.muted}>{c.type}</small>}
+            </header>
+            {c.stats.length > 0 && (
+              <dl className={styles.giveStats} aria-label="Profile">
+                {c.stats.map((st) => (<div key={st.key}><dt>{st.key}</dt><dd className={st.changed ? styles.changed : undefined}>{st.value}</dd></div>))}
+                {c.save && <div><dt>Sv</dt><dd>{c.save}</dd></div>}
+              </dl>
+            )}
+            {c.rules.length > 0 && <p className={styles.giveRules} title={c.rules.join(', ')}>{c.rules.join(' · ')}</p>}
+            <div className={styles.giveChips} role="group" aria-label={`Held by ${c.name}`}>
+              {c.items.length === 0 && <small className={ui.muted}>nothing</small>}
+              {c.items.map((h) => (
+                <button key={keyOf(h)} type="button" draggable title={h.text || undefined} aria-pressed={keyOf(h) === picked}
+                  onDragStart={(e) => { setPicked(keyOf(h)); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', h.name); }}
+                  onDragEnd={() => setOver(null)}
+                  onClick={() => setPicked(keyOf(h) === picked ? null : keyOf(h))}>
                   {h.name}{h.pieces > 1 ? ` ×${h.pieces}` : ''}
                 </button>
               ))}
             </div>
-          </div>
-        ))}
-      </section>
-      <section aria-label="Who takes it" className={styles.giveCol}>
-        {!item ? <p className={ui.muted}>Pick an item on the left.</p> : (
-          <>
-            <p><strong>{item.name} from {item.owner}</strong>{item.pieces > 1 ? <span className={ui.muted}> · {item.pieces} pieces</span> : null}<br /><span className={ui.muted}>No gold changes hands{item.goods.rare ? '; the price paid goes with it' : ''}.</span></p>
-            <div className={styles.pick} role="group" aria-label="Give to">
-              {to.map((r) => (
-                <button key={String(r.to)} type="button" disabled={!r.ok} onClick={() => { setPicked(null); onGive(item, r.to); }}>
-                  {r.name}<small className={r.ok ? undefined : styles.no}>{r.note}</small>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </section>
+            {item && !mine && r && (
+              <button type="button" className={styles.giveHere} disabled={!r.ok} onClick={() => give(r)} aria-label={`Give to ${c.name}`}>
+                {r.ok ? 'Give here' : 'Cannot take it'}<small className={r.ok ? undefined : styles.no}>{r.note}</small>
+              </button>
+            )}
+          </article>
+        );
+      })}
     </div>
   );
 }

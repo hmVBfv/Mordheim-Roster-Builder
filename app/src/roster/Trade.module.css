@@ -338,25 +338,132 @@
   color: var(--text-muted);
 }
 
-/* Give on a wide screen: who holds what beside who may take it */
+/* Give on a wide screen: a small card for every warrior and the stash, as many columns as fit */
 .giveBoard {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--space-3);
   align-items: start;
 }
 
-.giveCol {
-  display: grid;
-  gap: var(--space-3);
-  min-width: 0;
+.giveHint {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 
-.giveCol h3 {
-  margin: 0 0 var(--space-1);
+.giveCard {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.giveCard header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+}
+
+.giveCard h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.giveOver {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.giveNo {
+  opacity: 0.65;
+}
+
+.giveStats {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.giveStats dt {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+.giveStats dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.giveRules {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.giveChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.giveChips button {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
   font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  cursor: grab;
+}
+
+.giveChips button:hover {
+  background: var(--surface-2);
+}
+
+.giveChips button:focus-visible,
+.giveHere:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.giveChips button[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.giveHere {
+  display: grid;
+  gap: 2px;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.giveHere:disabled {
+  border-color: var(--border);
+  cursor: default;
+}
+
+.giveHere small {
   color: var(--text-muted);
 }
 
@@ -422,4 +529,9 @@
   .rareRow .rp {
     text-align: right;
   }
+}
+
+.changed {
+  color: var(--accent);
+  font-weight: 600;
 }
