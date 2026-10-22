@@ -95,7 +95,8 @@ export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/c
 export interface PastBattle { round: number; title: string; district: string; playedOn: string | null; outcomes: Record<string, Outcome> }
 /** Records a battle of the history, or corrects it (the same id) – while the campaign has no battle of its own. */
 export const putPastBattle = (id: string, bid: string, b: PastBattle) => api<CampaignView>(`/campaigns/${id}/history/${bid}`, { method: 'PUT', body: b }).then(keep());
-export const removePastBattle = (id: string, bid: string) => api<CampaignView>(`/campaigns/${id}/history/${bid}`, { method: 'DELETE' }).then(keep());
+/** `withContent`: the notes and pictures about it go too, for good. */
+export const removePastBattle = (id: string, bid: string, withContent = false) => api<CampaignView>(`/campaigns/${id}/history/${bid}${withContent ? '?content=1' : ''}`, { method: 'DELETE' }).then(keep());
 
 /** "12 June 2026" from "2026-06-12" (the day a battle of the history was played). */
 export function dayName(d: string): string {

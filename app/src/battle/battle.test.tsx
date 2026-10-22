@@ -304,6 +304,36 @@ describe('taking an open battle out', () => {
     expect((await db.meta.toArray()).filter((m) => String(m.key).includes(`battle:`) && String(m.key).includes(b.id))).toEqual([]);
   });
 
+  it('with notes on it, the leader is asked once more; then the notes go with it (reports #34, #35)', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const b = srv.addBattle(c.id, { title: 'Made by mistake' });
+    const note = srv.noteFrom(c.id, { author: 'Kai', text: 'The ferryman knows.', battleId: b.id });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/battles/${b.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Delete the battle…' }));
+    const sheet = screen.getByRole('dialog', { name: 'Delete Battle 1 · Made by mistake?' });
+    await user.click(within(sheet).getByRole('button', { name: 'Delete the battle' }));
+    // refused by the server: the sheet stays and says what else goes
+    expect(await within(sheet).findByRole('alert')).toBeTruthy();
+    expect(srv.state.battles.has(b.id)).toBe(true);
+    await user.click(within(sheet).getByRole('button', { name: 'Delete the battle and everything on it' }));
+    await waitFor(() => expect(srv.state.battles.has(b.id)).toBe(false));
+    expect(srv.state.calls.filter((x) => x.startsWith('DELETE'))).toEqual([`DELETE /campaigns/${c.id}/battles/${b.id}`, `DELETE /campaigns/${c.id}/battles/${b.id}`]);
+    expect(srv.state.notes.get(note.id)).toMatchObject({ deleted: true, text: '' });
+  });
+
+  it('on a battle of the history a leader can take out the notes about it', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    const past = srv.pastBattle(c.id, { round: 1, title: 'Das Urteil im Nebel', outcomes: {} });
+    if (typeof past === 'string') throw new Error(past);
+    srv.noteFrom(c.id, { author: 'Kai', text: 'Fog over the Stir.', battleId: past.id });
+    at(`/campaign/${c.id}/battles/${past.id}`);
+    expect(await screen.findByText('Fog over the Stir.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Take out' })).toBeTruthy();
+  });
+
   it('a player sees no such button, nor does a leader on a closed battle', async () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });

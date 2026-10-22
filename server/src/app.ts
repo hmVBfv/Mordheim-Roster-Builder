@@ -197,8 +197,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerWarbandRoutes(app, { db, now });
   registerShareRoutes(app, { db, now });
   registerLibraryRoutes(app, { db, now });
-  registerCampaignRoutes(app, { db, now });
-  registerBattleRoutes(app, { db, now, dataDir: deps.config.dataDir ?? null, log: app.log });
+  registerCampaignRoutes(app, { db, now, uploadDir: deps.config.uploadDir ?? null });
+  registerBattleRoutes(app, { db, now, dataDir: deps.config.dataDir ?? null, uploadDir: deps.config.uploadDir ?? null, log: app.log });
   registerNoteRoutes(app, { db, now });
   registerAttachmentRoutes(app, { db, now, uploadDir: deps.config.uploadDir ?? null, ...(deps.pictureQuota ? { quota: deps.pictureQuota } : {}) });
   registerTimelineRoutes(app, { db, now });
