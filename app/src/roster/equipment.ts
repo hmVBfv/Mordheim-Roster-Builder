@@ -68,8 +68,13 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
   });
   const recruit = core.isNewRecruit(ctx, m);
   const held = new Set(Object.keys(m.rare ?? {}));
-  // the catalogue's rare items belong to founding; a recruit searches
+  // Until his first battle a warrior has no Trading Post: his list, and the rare
+  // items the warband gives at the start (gromril at the founding price …).
+  // A recruit searches; the free market opens the catalogue (Rob, 22.10.2026, #47).
+  const free = !!core.houseRules(ctx.s).freeMarket;
+  const atStart = (de: string) => core.isUpgrade(ctx.data, de) && !!(core.upgradeStart(ctx, de) || core.upgradeAlways(ctx, de, m));
   const offer = recruit ? [] : core.rareEligibleItems(ctx, m)
+    .filter((it) => free || atStart(it.de))
     .filter((it) => !(held.has(it.de) && core.isUpgrade(ctx.data, it.de)))
     .map((it) => ({ de: it.de, name: it.en, price: typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost), rarity: it.rare || '' }))
     .sort((a, b) => a.name.localeCompare(b.name));

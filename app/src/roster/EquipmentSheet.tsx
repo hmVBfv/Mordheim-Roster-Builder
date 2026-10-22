@@ -40,7 +40,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
         <h2 id={titleId}>Equipment · {v.name}</h2>
         <p className={ui.muted}>{v.recruit
           ? 'Hired after the warband\'s first battle: until his own he buys from his list at its prices – common items freely, rare ones only by a search at the Trading Post. Taking an item back returns its price.'
-          : `Until the first battle every warrior buys from his own list${v.men > 1 ? ', a group for every man' : ''}; taking an item back returns its price.`}</p>
+          : `Until the first battle every warrior buys from his own list${v.men > 1 ? ', a group for every man' : ''}, with what the warband gives at the start; the Trading Post opens after his first battle. Taking an item back returns its price.`}</p>
       </div>
       {v.groups.map((g) => (
         <section key={g.label} className={styles.eqGroup} aria-label={g.label}>
@@ -96,7 +96,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
             </select>
             <button type="button" className={ui.buttonQuiet} disabled={!pick} onClick={() => { act.addRare(pick); setPick(''); }}>Add</button>
           </div>
-        ) : <p className={ui.muted}>{v.recruit ? 'Rare items: search for them at the Trading Post.' : 'Nothing from the catalogue fits this warrior.'}</p>}
+        ) : <p className={ui.muted}>Rare items are searched for at the Trading Post, after his first battle.</p>}
       </section>
       <div className={`${ui.row} ${ui.sheetActions}`}><button type="button" className={ui.button} onClick={() => close()}>Done</button></div>
     </div>

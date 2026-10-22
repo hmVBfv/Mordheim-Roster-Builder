@@ -151,9 +151,9 @@ for (const theme of THEMES) {
     await expect(sheet.getByRole('heading', { name: 'Equipment · Magda' })).toBeVisible();
     await sheet.getByRole('button', { name: 'One Sword more' }).click();
     await expect(sheet.getByRole('button', { name: 'One Sword less' })).toBeEnabled();
-    await sheet.getByRole('combobox', { name: 'Rare item to add' }).selectOption({ index: 1 });
-    await sheet.getByRole('button', { name: 'Add', exact: true }).click();
-    await expect(sheet.getByRole('region', { name: 'Rare and trading-post items' }).getByRole('listitem')).toHaveCount(1);
+    // no Trading Post before his first battle: no rare item to pick (#47)
+    await expect(sheet.getByRole('combobox', { name: 'Rare item to add' })).toHaveCount(0);
+    await expect(sheet.getByText('Rare items are searched for at the Trading Post, after his first battle.')).toBeVisible();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-equipment`);
     await sheet.getByRole('button', { name: 'Done' }).click();
@@ -1144,7 +1144,10 @@ test('experience set at once, a rare item’s price by hand, the roster printed'
   await sheet.getByRole('button', { name: 'Save' }).click();
   await expect(ulrich.getByRole('button', { name: /Experience of Ulrich the Grey: 36/ })).toBeVisible();
 
-  // the price rolled at the table, entered by hand
+  // the price rolled at the table, entered by hand (a rare item before the first battle needs the free market)
+  await page.getByRole('link', { name: 'House rules', exact: true }).click();
+  await page.getByRole('checkbox', { name: 'Free market', exact: true }).check();
+  await page.goBack();
   await (await unit(page, 'Magda', 'Gear')).getByRole('button', { name: /Equipment & rare items/ }).click();
   sheet = page.locator('dialog[open]');
   await sheet.getByRole('combobox', { name: 'Rare item to add' }).selectOption({ index: 1 });
