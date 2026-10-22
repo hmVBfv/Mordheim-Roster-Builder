@@ -33,8 +33,25 @@ describe('a warrior\'s list while the warband is founded', () => {
     expect(sword).toMatchObject({ name: 'Sword', price: 10, qty: 1, free: false });
     expect(v.groups[0]!.rows.find((r) => r.free)).toMatchObject({ key: 'Dolch (1. gratis)', qty: 1 });
     expect(v.men).toBe(1);
-    expect(v.offer.length).toBeGreaterThan(0);
-    expect(v.offer.every((o) => o.name)).toBe(true);
+    // before his first battle no rare item is on offer from the catalogue (#47)
+    expect(v.offer).toEqual([]);
+  });
+
+  it('a new warband’s heroes have no rare items to search for; only what the warband gives at the start (#47)', () => {
+    const { s, capt } = band(0);
+    expect(equipmentView(ctx(s), capt)!.offer).toEqual([]);
+    // the Dwarf Treasure Hunters start with gromril weapons at the founding price
+    let d = createWarband(data, 'dwarftreasure', null, '');
+    d = core.addUnit(ctx(d), 'noble');
+    const noble = d.models[0]!.uid;
+    core.toggleEq(ctx(d), noble, 'Schwert', true);
+    const dv = equipmentView(ctx(d), noble)!;
+    expect(dv.offer.map((o) => o.de)).toEqual(['Gromril-Waffe']);
+    // the free market opens the catalogue again
+    const free = core.setHouseBool(ctx(s), 'freeMarket', true);
+    expect(equipmentView(ctx(free), capt)!.offer.length).toBeGreaterThan(20);
+    // after the first battle the sheet is gone: the Trading Post takes over
+    expect(equipmentView(ctx(band(1).s), band(1).capt)!.offer).toEqual([]);
   });
 
   it('a group pays for every man, and sees no Heroes-only items', () => {
@@ -51,9 +68,9 @@ describe('a warrior\'s list while the warband is founded', () => {
 
   it('lists rare items held, with what was paid', () => {
     const { s, capt } = band(0);
-    const offer = equipmentView(ctx(s), capt)!.offer.find((o) => /gc$/.test(o.price))!;
-    const withRare = core.addRare(ctx(s), capt, offer.de);
-    expect(equipmentView(ctx(withRare), capt)!.rare).toEqual([expect.objectContaining({ de: offer.de, q: 1, upgrade: false })]);
+    const item = core.rareEligibleItems(ctx(s), s.models[0]!).find((o) => typeof o.cost === 'number' && !core.isUpgrade(data, o.de))!;
+    const withRare = core.addRare(ctx(s), capt, item.de);
+    expect(equipmentView(ctx(withRare), capt)!.rare).toEqual([expect.objectContaining({ de: item.de, q: 1, upgrade: false })]);
   });
 });
 
