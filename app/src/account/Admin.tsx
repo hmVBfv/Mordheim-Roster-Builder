@@ -4,7 +4,7 @@
    admin with an authenticator gets here; the server checks every request
    again (can()). */
 import { useCallback, useEffect, useState } from 'react';
-import { NavLink, useParams } from 'react-router';
+import { NavLink, useLocation, useParams } from 'react-router';
 import { copyText } from '../ui/files.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
@@ -212,8 +212,10 @@ function Invites({ onNotice }: { onNotice: (t: string) => void }) {
   );
 }
 
-/** A log read page by page, newest first. */
+/** A log read page by page, newest first. It reads again whenever the screen
+    is visited, also by the tab link of the tab already open or by Back. */
 function useLog<T>(path: string, key: string, cursor: (last: T) => number) {
+  const visit = useLocation().key;
   const [items, setItems] = useState<T[]>([]);
   const [more, setMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -229,7 +231,7 @@ function useLog<T>(path: string, key: string, cursor: (last: T) => number) {
       .catch((e: unknown) => { if (live) setError(errorText(e)); })
       .finally(() => { if (live) setBusy(false); });
     return () => { live = false; };
-  }, [fetchPage]);
+  }, [fetchPage, visit]);
   const next = () => {
     const last = items[items.length - 1];
     if (last === undefined) return;

@@ -388,6 +388,22 @@ describe('the admin', () => {
     expect(within(audit).getByText('“for Ben”')).toBeTruthy();
   });
 
+  it('the audit log reads again when its tab is opened again', async () => {
+    const entries = [{ seq: 3, at: '2026-10-03T10:00:00Z', actor: 'rob', action: 'invite.create', targetType: 'invite', target: 'i1', payload: { note: 'for Ben' } }];
+    const s = fakeServer({
+      'GET /auth/me': () => ({ user: ADMIN, pending: false }),
+      'GET /admin/audit': () => ({ entries: [...entries] }),
+    });
+    const user = userEvent.setup();
+    at('/admin/audit');
+    const audit = await screen.findByRole('table', { name: 'Audit log' });
+    expect(await within(audit).findByText('“for Ben”')).toBeTruthy();
+    entries.unshift({ seq: 4, at: '2026-10-03T11:00:00Z', actor: 'rob', action: 'invite.create', targetType: 'invite', target: 'i2', payload: { note: 'for Mia' } });
+    await user.click(screen.getByRole('link', { name: 'Audit log' }));
+    expect(await within(screen.getByRole('table', { name: 'Audit log' })).findByText('“for Mia”')).toBeTruthy();
+    expect(s.calls.filter((c) => c.path === '/admin/audit')).toHaveLength(2);
+  });
+
   it('a player at /admin is told it is the admin’s', async () => {
     fakeServer({ 'GET /auth/me': () => ({ user: ME, pending: false }) });
     at('/admin');
