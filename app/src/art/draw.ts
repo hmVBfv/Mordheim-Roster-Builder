@@ -5,6 +5,8 @@
    visit and in every test. Original art, no Games Workshop motifs. */
 
 export const W = 160;
+/** the width of a banner: wide enough for a desktop screen, the motif in the middle and its surroundings to both sides (wings.ts) */
+export const WB = 520;
 export const H = 32;
 /** the first row of the ground */
 export const GROUND = 24;
@@ -23,8 +25,10 @@ export const PALETTE: Readonly<Record<string, string>> = {
   w: '#e0a642', v: '#e0a642', W: '#6e4f1f',
   // wyrdstone and the comet
   g: '#6fe07a', G: '#2d6b36', l: '#d2ffb8', c: '#9be39b', t: '#3c6b46',
-  // fire and sparks, smoke
-  o: '#f0a030', O: '#b0461e', y: '#ffe08a', m: '#3a3a43', x: '#55555f',
+  // fire and sparks, smoke (X: smoke that drifts up, E: an ember that rises; wings.ts)
+  o: '#f0a030', O: '#b0461e', y: '#ffe08a', m: '#3a3a43', x: '#55555f', X: '#4a4a55', E: '#f0a030',
+  // bats (two flocks) and a bank of cloud that drifts across the haze
+  T: '#473b63', V: '#3a3254', C: '#222b3d',
   // cloth: red, blue, cream
   p: '#a8322a', u: '#2f5f9a', z: '#e8dcc0',
   // wood, parchment, ink, gold, steel
@@ -32,8 +36,9 @@ export const PALETTE: Readonly<Record<string, string>> = {
 };
 
 /** letters that move a little (docs/ui.md §4); reduced motion holds them still */
-export const LIVE: Readonly<Record<string, 'flicker' | 'flickerLate' | 'pulse' | 'twinkle'>> = {
-  w: 'flicker', v: 'flickerLate', g: 'pulse', a: 'twinkle', o: 'flicker', y: 'flickerLate'
+export const LIVE: Readonly<Record<string, 'flicker' | 'flickerLate' | 'pulse' | 'twinkle' | 'rise' | 'ember' | 'flyA' | 'flyB' | 'drift'>> = {
+  w: 'flicker', v: 'flickerLate', g: 'pulse', a: 'twinkle', o: 'flicker', y: 'flickerLate',
+  X: 'rise', E: 'ember', T: 'flyA', V: 'flyB', C: 'drift'
 };
 
 /** the generator behind the stars: mulberry32, seeded */
@@ -51,6 +56,8 @@ export function rng(seed: number): () => number {
 export class Grid {
   readonly w: number;
   readonly h: number;
+  /** how far everything drawn on this view is moved to the right (see `shifted`) */
+  ox = 0;
   private readonly cells: string[];
 
   constructor(w = W, h = H) {
@@ -59,13 +66,21 @@ export class Grid {
     this.cells = new Array<string>(w * h).fill('.');
   }
 
+  /** the same picture seen from `dx` columns further right: a scene drawn for the narrow grid lands in the middle of a wide one */
+  shifted(dx: number): Grid {
+    const view = Object.create(this) as Grid;
+    view.ox = this.ox + dx;
+    return view;
+  }
+
   get(x: number, y: number): string {
+    x += this.ox;
     if (x < 0 || y < 0 || x >= this.w || y >= this.h) return '.';
     return this.cells[y * this.w + x] ?? '.';
   }
 
   px(x: number, y: number, c: string): void {
-    x = Math.round(x);
+    x = Math.round(x) + this.ox;
     y = Math.round(y);
     if (x < 0 || y < 0 || x >= this.w || y >= this.h || c === '.') return;
     this.cells[y * this.w + x] = c;

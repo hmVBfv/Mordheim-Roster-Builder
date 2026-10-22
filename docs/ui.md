@@ -369,11 +369,24 @@ wenig.
   Bild sieht immer gleich aus), `scenes.ts` hat die elf Szenen, `Pixels.tsx`
   macht daraus ein SVG mit einem Pfad je Farbe. Eigene Motive, nichts aus
   Games-Workshop-Material.
-- **Banner:** die Szene steht in der Mitte, die Nacht (Himmelsbänder und
-  Boden) setzt sich links und rechts fort, so ist das Bild so breit wie der
-  Bildschirm und bleibt scharf. 60 px hoch am Handy, bis 112 px am Desktop.
-  Es ist Dekoration (`aria-hidden`), nicht antippbar, und fehlt nur bei der
-  Spielnacht (`/campaign/:id/battles/:bid`, Vollbild am Handy).
+- **Banner:** 520 Pixelspalten breit (`WB`), die Szene steht in der Mitte,
+  und zu beiden Seiten geht der Ort thematisch weiter (**Rob, 22.10.2026,
+  Bericht #33:** am Desktop passierte nur in der Mitte etwas, der Rest war
+  nackter Hintergrund). `wings.ts` streut je Szene ihre Umgebung entlang
+  des Bodens – ein Zufallsgenerator mit festem Startwert, nie zweimal
+  dasselbe hintereinander, die Szene behält ihren Platz: Mordheim mehr
+  Häuser, Türme und Trümmer mit Schloten, das Lager mehr Zelte, Feuer und
+  Wimpel, der Markt mehr Stände, Laternen, Fässer und Karren, die Bücherseiten
+  Regale, Leuchter und Schreibtische, die Karte Berge, Wälder und Flüsse,
+  das Stadttor Mauern mit Fackeln, das Schloss Türen, Truhen und Schlüssel
+  usw. Über die ganze Breite bewegt sich außerdem: Rauch steigt, Funken
+  steigen und verglühen, zwei Schwärme Fledermäuse ziehen über den Himmel,
+  eine Wolkenbank treibt durch den Dunst (bei „weniger Bewegung“ alles
+  still). 60 px hoch am Handy (zeigt nur die Mitte), bis 112 px am Desktop;
+  daneben malt die Seite weiter die Himmelsbänder, falls ein Bildschirm
+  breiter ist als das Bild. Es ist Dekoration (`aria-hidden`), nicht
+  antippbar, und fehlt nur bei der Spielnacht (`/campaign/:id/battles/:bid`,
+  Vollbild am Handy).
 - **Leere Szene:** `<Empty scene title>text</Empty>` – Bild, Titel (der bisherige
   Satz, z. B. „No battles yet.“) und darunter, was zu tun ist. Sie zeigt ein
   anderes Motiv als das Banner derselben Seite.
@@ -398,7 +411,8 @@ wenig.
   den Stil; der Kometeneinschlag und die Wappen der Warbands sind nicht
   übernommen.
 - Neue Szene: in `SCENES` eintragen (`span` = Breite des Motivs, der Test
-  prüft, dass nichts darüber hinausragt) und in `route.ts` einer Seite geben.
+  prüft, dass nichts darüber hinausragt), in `wings.ts` (`WINGS`) die Dinge
+  nennen, aus denen ihre Umgebung besteht, und in `route.ts` einer Seite geben.
 
 ## 5. Bedienung
 
