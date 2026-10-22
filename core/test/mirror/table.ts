@@ -13,6 +13,7 @@
  * Every function a legacy test calls must be listed; the mirror test fails
  * on one that is not. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { legacyCtx } from '../support/orcLimits.ts';
 import { readFileSync } from 'node:fs';
 import * as core from '../../src/index.ts';
 import type { BattleDraft, CampaignFile, CasualtyDraft, Ctx, WarbandState } from '../../src/index.ts';
@@ -86,8 +87,8 @@ function addInj(c: Call): Partial<World> {
 
 export const TABLE: Record<string, Spec> = {
   /* ---- the roster ---- */
-  'app.addUnit': st((x, [id]) => core.addUnit(x, id)),
-  'app.setQty': st((x, [u, v]) => core.setQty(x, u, v)),
+  'app.addUnit': st((x, [id]) => core.addUnit(legacyCtx(x), id)),
+  'app.setQty': st((x, [u, v]) => core.setQty(legacyCtx(x), u, v)),
   'app.setEqQty': st((x, [u, nm, n]) => core.setEqQty(x, u, nm, n)),
   'app.addRare': st((x, [u, de]) => core.addRare(x, u, de)),
   'app.toggleWeaponUpgrade': st((x, [u, de, nm, on]) => core.toggleWeaponUpgrade(x, u, de, nm, on)),

@@ -30,6 +30,8 @@ export interface UnitDef {
   exp?: number;
   /** Maximum number of models; `null`/missing means unlimited. */
   max?: number | null;
+  /** The unit hangs on others: at most `per` for each man of the units `of` in the warband (a Hero or a promoted henchman counts one, a group its men); together with `max` (report #46). */
+  maxPer?: { per: number; of: string[] };
   min?: number;
   /** The warband's leader. */
   req?: boolean;

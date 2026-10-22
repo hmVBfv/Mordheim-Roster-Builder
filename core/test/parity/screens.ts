@@ -2,6 +2,7 @@
    sidebar's warnings and unit list, the recruit menu, the abilities panel —
    read back out of the HTML it drew, and the same from core. Used by
    screens.parity.test.ts on the fixtures and by the walk on its states. */
+import { legacyMenuRow, withoutRatioWarnings } from '../support/orcLimits.ts';
 import * as core from '../../src/index.ts';
 import type { Ctx, GameData, WarbandState } from '../../src/index.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
@@ -58,7 +59,7 @@ function coreAddMenu(ctx: Ctx): unknown[] {
   for (const t of ['hero', 'hen', 'vehicle']) {
     for (const u of wb.units.filter((x) => (t === 'vehicle' ? !!x.vehicle : (x.t === t && !x.vehicle)))) {
       const r = core.recruitStatus(ctx, u.id)!;
-      out.push([u.id, r.count, r.limit, r.atMax, r.leaderGone]);
+      out.push(legacyMenuRow(ctx, u, [u.id, r.count, r.limit, r.atMax, r.leaderGone]));
     }
   }
   return out;
@@ -92,7 +93,7 @@ export function coreWarbandOptions(data: GameData): unknown {
 
 export function coreScreens(ctx: Ctx): unknown {
   return {
-    warnings: core.warbandWarnings(ctx),
+    warnings: withoutRatioWarnings(ctx.s.wb, core.warbandWarnings(ctx)),
     units: coreUnitList(ctx),
     menu: coreAddMenu(ctx),
     abilities: ctx.s.models.map((m) => coreAbilities(ctx, m)),
@@ -104,7 +105,7 @@ export function legacyScreens(L: Legacy): unknown {
   const store = withStore(() => { a.renderSidebar(); a.renderAddMenu(); });
   const S = L.state.S as WarbandState;
   return {
-    warnings: parseWarnings(store.warns?.innerHTML ?? ''),
+    warnings: withoutRatioWarnings(S.wb, parseWarnings(store.warns?.innerHTML ?? '') as string[]),
     units: parseUnitList(store.unitlist?.innerHTML ?? ''),
     menu: parseAddMenu(store.addmenu?.innerHTML ?? ''),
     abilities: S.models.map((m) => parseAbilities(a.abilitySection(L.engine.unitDef(m.uid_def), m))),

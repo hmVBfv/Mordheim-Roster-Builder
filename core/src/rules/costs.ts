@@ -23,10 +23,16 @@ export function modelsOf(ctx: Ctx, id: string): number {
   return ctx.s.models.filter((m) => m.uid_def === id && !m.promoted).reduce((s, m) => s + (m.qty || 1), 0);
 }
 
-/** Maximum of a unit type; Kurgan marauders may take any number of warhounds. */
+/** Maximum of a unit type; Kurgan marauders may take any number of warhounds.
+    A unit that hangs on others (`maxPer`: Goblins of an Orc Mob, Lizardmen
+    Saurus …) has the smaller of its own maximum and what they allow
+    (mordheimer.net, the warband pages; report #46). */
 export function unitMax(ctx: Ctx, def: UnitDef): number | null | undefined {
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && def.id === 'warhound') return null;
-  return def.max;
+  const mp = def.maxPer;
+  if (!mp) return def.max;
+  const men = ctx.s.models.filter((m) => mp.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
+  return Math.min(def.max ?? Infinity, mp.per * men);
 }
 
 export function warbandMax(ctx: Ctx): number {
