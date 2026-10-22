@@ -212,7 +212,7 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
 /* ---- sell and give ---- */
 
 function SellForm({ h, close, onSell, titleId }: { h: Holding; close: SheetApi['close']; onSell: (price: number) => void; titleId: string }) {
-  const [v, setV] = useState(String(h.sell));
+  const [v, setV] = useState(h.unpriced ? '' : String(h.sell));
   const n = Number(v);
   return (
     <div className={ui.page}>
@@ -221,8 +221,10 @@ function SellForm({ h, close, onSell, titleId }: { h: Holding; close: SheetApi['
         <p className={ui.muted}>{h.owner}{h.pieces > 1 ? ` · ${h.pieces} pieces, sold together` : ''}</p>
       </div>
       <div className={styles.result}>
-        <p>Half the price that applies now{h.goods.rare ? ' (a dice price counts its base)' : ''}, rounded down, at least 1 gc: <b>{gc(h.sell)}</b></p>
-        <p className={ui.muted}>Haggle, the Merchant's Trade or a district may change it: enter what you got.</p>
+        {h.unpriced
+          ? <p>Not in the price chart, so there is no price to halve. Enter what you got for it.</p>
+          : <><p>Half the price that applies now{h.goods.rare ? ' (a dice price counts its base)' : ''}, rounded down, at least 1 gc: <b>{gc(h.sell)}</b></p>
+            <p className={ui.muted}>Haggle, the Merchant's Trade or a district may change it: enter what you got.</p></>}
       </div>
       <label className={ui.field}><span>Gold received</span>
         <input className={ui.input} inputMode="numeric" value={v} maxLength={4} onChange={(e) => setV(e.target.value.replace(/\D/g, ''))} />
@@ -376,7 +378,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
       {tab === 'sell' && (
         <section className={ui.page} aria-label="Sell items">
           <p className={ui.muted}>Half the price that applies now, rounded down, at least 1 gc. A group sells all its pieces of an item together. The free dagger stays with its warrior.</p>
-          <HoldingList list={held} label="Sell" action={(h) => `sells for ${gc(h.sell)}`} onPick={(h) => { setSelling((p) => ({ key: (p?.key ?? 0) + 1, h })); openSell(); }} />
+          <HoldingList list={held} label="Sell" action={(h) => (h.unpriced ? 'you name the price' : `sells for ${gc(h.sell)}`)} onPick={(h) => { setSelling((p) => ({ key: (p?.key ?? 0) + 1, h })); openSell(); }} />
         </section>
       )}
 
