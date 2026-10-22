@@ -327,6 +327,7 @@ describe('taking an open battle out', () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
     const past = srv.pastBattle(c.id, { round: 1, title: 'Das Urteil im Nebel', outcomes: {} });
+    if (typeof past === 'string') throw new Error(past);
     srv.noteFrom(c.id, { author: 'Kai', text: 'Fog over the Stir.', battleId: past.id });
     at(`/campaign/${c.id}/battles/${past.id}`);
     expect(await screen.findByText('Fog over the Stir.')).toBeTruthy();
