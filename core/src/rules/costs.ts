@@ -26,11 +26,11 @@ export function modelsOf(ctx: Ctx, id: string): number {
 /** A unit limited by the size of others: at most `per` for each man of `of`
     (mordheimer.net, the warband pages; report #46). Heroes count one each, a
     promoted henchman one, a group its men. */
-interface Ratio { unit: string; of: string[]; per: number }
+export interface Ratio { unit: string; of: string[]; per: number }
 
 /** Orcs of an Orc Mob: Heroes and Boyz, not Goblins, Squigs or the Troll. */
 const ORCS = ['boss', 'shaman', 'bigun', 'boyz'];
-const RATIOS: Record<string, Ratio[]> = {
+export const RATIOS: Record<string, Ratio[]> = {
   orcmob: [{ unit: 'goblin', of: ORCS, per: 2 }, { unit: 'squig', of: ['goblin'], per: 1 }], // 2 Goblins for each Orc; never more Squigs than Goblins
   nightgoblins: [{ unit: 'squig', of: ['nightgob'], per: 1 }], // never more Cave Squigs than Night Goblins
   blackorcs: [{ unit: 'shootaz', of: ['boyz'], per: 1 }], // only as many Shootaz as Boyz
@@ -47,7 +47,7 @@ export const ratioUnitIds = (wb: string | null | undefined): string[] => (RATIOS
     maximum and what they allow. */
 export function unitMax(ctx: Ctx, def: UnitDef): number | null | undefined {
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && def.id === 'warhound') return null;
-  const r = (RATIOS[ctx.s.wb ?? ''] ?? []).find((x) => x.unit === def.id);
+  const r = ((ctx.data.RATIOS ?? RATIOS)[ctx.s.wb ?? ''] ?? []).find((x) => x.unit === def.id);
   if (!r) return def.max;
   const men = ctx.s.models.filter((m) => r.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
   return Math.min(def.max ?? Infinity, r.per * men);

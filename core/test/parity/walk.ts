@@ -16,7 +16,7 @@ import { canonOf, data } from '../support/canon.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures, type Fixture } from '../support/fixtures.ts';
 import { coreExportReport, legacyExportReport } from './exportReport.ts';
-import { ratioBinds } from '../support/orcLimits.ts';
+import { legacyCtx } from '../support/orcLimits.ts';
 import { coreScreens, legacyScreens } from './screens.ts';
 import { rng, type Rng } from '../support/random.ts';
 
@@ -92,11 +92,11 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
   // two extra slots for the Hired Sword operations, which have many variants
   const kind = roll > 36 ? 31 : roll;
   switch (kind) {
-    case 0: case 1: case 2: { const u = r.pick(wb.units); if (ratioBinds(ctx, u.id, core.modelsOf(ctx, u.id) + 1)) return null; return [`addUnit ${u.id}`, () => a.addUnit(u.id), (c) => core.addUnit(c, u.id)]; }
+    case 0: case 1: case 2: { const u = r.pick(wb.units); return [`addUnit ${u.id}`, () => a.addUnit(u.id), (c) => core.addUnit(legacyCtx(c), u.id)]; }
     case 3: if (!m) return null; return [`removeUnit ${m.uid}`, () => a.removeUnit(m.uid), (c) => core.removeUnit(c, m.uid)];
     case 4: { if (!m) return null; const nm = `Name ${r.int(1, 99)}`; return [`setName ${m.uid}`, () => a.setName(m.uid, nm), (c) => core.setModelName(c, m.uid, nm)]; }
     case 5: { if (!m) return null; const v = r.pick([0, 3, 12, 25, '7', '', -4]); return [`setExp ${m.uid}=${v}`, () => a.setExp(m.uid, v), (c) => core.setModelExp(c, m.uid, v)]; }
-    case 6: case 7: { if (!m) return null; const v = r.int(0, 6); if (ratioBinds(ctx, m.uid_def, core.modelsOf(ctx, m.uid_def) - (m.qty || 1) + Math.min(5, Math.max(1, v)))) return null; return [`setQty ${m.uid}=${v}`, () => a.setQty(m.uid, v), (c) => core.setQty(c, m.uid, v)]; }
+    case 6: case 7: { if (!m) return null; const v = r.int(0, 6);  return [`setQty ${m.uid}=${v}`, () => a.setQty(m.uid, v), (c) => core.setQty(legacyCtx(c), m.uid, v)]; }
     case 8: { if (!m || !items.length) return null; const nm = r.pick(items), on = r.chance(0.6); return [`toggleEq ${m.uid} ${nm} ${on}`, () => a.toggleEq(m.uid, nm, on), (c) => core.toggleEq(c, m.uid, nm, on)]; }
     case 9: case 10: { if (!m || !items.length) return null; const nm = r.pick(items), q = r.pick([0, 1, 2, 3, 12, '2']); return [`setEqQty ${m.uid} ${nm}=${q}`, () => a.setEqQty(m.uid, nm, q), (c) => core.setEqQty(c, m.uid, nm, q)]; }
     case 11: case 12: {

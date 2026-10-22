@@ -310,6 +310,8 @@ export interface GameData {
   WARBANDS: Record<string, WarbandDef>;
   WBEXTRA: Record<string, Record<string, unknown>>;
   WBRACE: Record<string, string>;
+  /** Units whose limit hangs on others, by warband; absent: the built-in table (rules/costs.ts). Tests set `{}` to get the legacy app's maxima. */
+  RATIOS?: Record<string, { unit: string; of: string[]; per: number }[]>;
   HIREDSWORDS: Record<string, HireEntry>;
   HS_GRADE_ORDER: string[];
   WBHIRE: Record<string, WarbandHireInfo>;

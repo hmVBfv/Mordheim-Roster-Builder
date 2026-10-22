@@ -12,17 +12,12 @@ import { data } from './canon.ts';
 /** Is the unit one whose limit hangs on others in this warband? */
 export const isRatioUnit = (ctx: Ctx, id: string): boolean => core.ratioUnitIds(ctx.s.wb).includes(id);
 
+/** The same state seen with the legacy app's maxima: no limit hangs on another unit. */
+export const legacyCtx = (ctx: Ctx): Ctx => core.ctxOf({ ...ctx.data, RATIOS: {} }, ctx.s);
+
 /** What legacy answers for the unit's maximum. */
 export function legacyUnitMax(ctx: Ctx, d: UnitDef): number | null | undefined {
   return isRatioUnit(ctx, d.id) ? d.max : core.unitMax(ctx, d);
-}
-
-/** Would core's ratio limit refuse (or cut) what legacy accepts: `count` men of the unit? */
-export function ratioBinds(ctx: Ctx, id: string, count: number): boolean {
-  const d = core.unitDef(ctx, id);
-  if (!d || !isRatioUnit(ctx, id)) return false;
-  const mx = core.unitMax(ctx, d);
-  return mx != null && count > mx;
 }
 
 /** The warnings legacy knows: not "Too many …" for these units. */
