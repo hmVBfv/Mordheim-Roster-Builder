@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
   audit, createInvite, createSession, createUser, inviteByToken, listAttempts, listAudit, listOpenInvites, listSessions, listUsers,
-  promoteSession, recentFailures, recordAttempt, revokeInvite, revokeResetLinks, revokeSession, revokeUserSessions, sessionByToken, setPassword,
+  promoteSession, pruneDevices, SESSION_DAYS, recentFailures, recordAttempt, revokeInvite, revokeResetLinks, revokeSession, revokeUserSessions, sessionByToken, setPassword,
   touchSession, useInvite, userById, userByName, usernameProblem, type UserRow,
 } from './accounts.ts';
 import type { DB } from './db.ts';
@@ -100,13 +100,20 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
   // the token rides in the fragment, which browsers never send to a server
   const linkFor = (token: string, kind: 'register' | 'reset') => `${deps.config.publicOrigin ?? ''}/${kind === 'register' ? 'invite' : 'reset'}#${token}`;
 
+  /** Devices that were not used for a week go once there are more than five (wish #44). */
+  const droppedDevices = (userId: string, keep: string) => {
+    const n = pruneDevices(db(), userId, keep, now());
+    if (n) audit(db(), { actorId: userId, action: 'sessions.prune', targetType: 'user', targetId: userId, payload: { n } }, now());
+  };
+
   /** Signs the user in on this device: a full session, or – with an authenticator – the step before the code. */
   const signIn = (req: FastifyRequest, reply: FastifyReply, u: UserRow, device: string) => {
     // whoever was signed in on this device before is signed out
     if (req.actor) revokeSession(db(), req.actor.sessionId, now());
     const stage = u.totp_enabled_at ? 'totp' : 'full';
     const s = createSession(db(), { userId: u.id, stage, device, ip: req.ip }, now());
-    setCookie(reply, s.token, secure, stage === 'full' ? 90 : 1 / 24 / 12);
+    setCookie(reply, s.token, secure, stage === 'full' ? SESSION_DAYS : 1 / 24 / 12);
+    if (stage === 'full') droppedDevices(u.id, s.id);
     return stage === 'totp' ? { stage: 'totp' as const } : { stage: 'full' as const, user: meOfRow(u) };
   };
 
@@ -246,7 +253,8 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
       return reply.code(401).send({ error: 'invalid_code' });
     }
     const token = promoteSession(db(), a.sessionId, t);
-    setCookie(reply, token, secure, 90);
+    droppedDevices(u.id, a.sessionId);
+    setCookie(reply, token, secure, SESSION_DAYS);
     return { stage: 'full', user: meOfRow(u) };
   });
 
