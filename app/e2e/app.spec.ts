@@ -166,8 +166,9 @@ for (const theme of THEMES) {
   });
 }
 
-/* Give on a wide screen (Rob, 20.10.2026): who holds what beside who may take it. */
-test('the Trading Post on a wide screen: Give is two columns, pick an item, then who takes it', async ({ page }) => {
+/* Give on a wide screen (Rob, 20.10.2026; report #32): a card for every warrior and the stash, side by side in several columns,
+   with his profile; pick an item, then give it where the card allows. */
+test('the Trading Post on a wide screen: Give is a grid of small cards, pick an item, then give it', async ({ page }) => {
   test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('./');
@@ -177,19 +178,22 @@ test('the Trading Post on a wide screen: Give is two columns, pick an item, then
   const gold = async () => Number((await page.locator('dt:text-is("Gold in hand") + dd').textContent())!.replace(/\D/g, ''));
   const start = await gold();
   await page.getByRole('button', { name: 'Give', exact: true }).click();
-  const what = page.getByRole('region', { name: 'What to give' });
-  const who = page.getByRole('region', { name: 'Who takes it' });
-  await expect(who.getByText('Pick an item on the left.')).toBeVisible();
-  // two columns, side by side
-  const [a, b] = await Promise.all([what.boundingBox(), who.boundingBox()]);
+  const board = page.getByLabel('Warriors and the stash');
+  await expect(board.getByText('Pick an item, or drag it onto a warrior.')).toBeVisible();
+  // several columns, and a card is small
+  const cards = board.getByRole('article');
+  expect(await cards.count()).toBeGreaterThan(2);
+  const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
   expect(Math.round(a!.y)).toBe(Math.round(b!.y));
   expect(b!.x).toBeGreaterThan(a!.x + a!.width - 1);
+  expect(a!.width).toBeLessThan(480);
+  await expect(cards.nth(0).getByLabel('Profile')).toBeVisible();
   await shot(page, 'trade-give-wide');
-  await what.getByRole('button', { name: 'Sword' }).first().click();
-  await expect(who.getByText(/^Sword from /)).toBeVisible();
+  await board.getByRole('button', { name: 'Sword' }).first().click();
+  await expect(board.getByRole('status')).toContainText('Sword from');
   // the window only: a full-page screenshot resizes it for a moment, the layout chooses again, and the pick is gone
   await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-give-wide-picked.png` });
-  await who.getByRole('button', { name: /^Stash/ }).click();
+  await board.getByRole('button', { name: 'Give to Stash' }).click();
   await expect(page.getByRole('region', { name: 'Stash' }).getByText('Sword')).toBeVisible();
   await expect.poll(gold).toBe(start);
 });
