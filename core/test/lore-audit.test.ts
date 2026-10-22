@@ -49,4 +49,20 @@ describe('the lore catalogue', () => {
       for (const r of e.regions!) expect(byId.get(r)?.kind, `${e.id} → ${r}`).toBe('region');
     }
   });
+
+  /* #38: places far from Mordheim, for the warbands that travelled from far away, each in the place that holds it. */
+  it('covers the world, not only the ruins: realms and lands far from Mordheim, nested the way the setting has them', () => {
+    const chain = (id: string) => { const out: string[] = []; for (let p: string | null | undefined = id; p; p = byId.get(p)?.parent) out.unshift(p); return out; };
+    expect(chain('the-pit')).toEqual(['old-world', 'the-empire', 'ostermark', 'mordheim', 'the-pit']);
+    expect(chain('middenheim')).toEqual(['old-world', 'the-empire', 'middenland', 'middenheim']);
+    for (const id of ['kislev', 'bretonnia', 'tilea', 'norsca', 'the-chaos-wastes', 'lustria', 'khemri', 'araby', 'cathay-and-the-east', 'ulthuan', 'naggaroth', 'albion']) {
+      expect(byId.get(id)?.kind, id).toBe('region');
+    }
+    expect(chain('skeggi')).toEqual(['lustria', 'skeggi']);
+    expect(chain('weijin')).toEqual(['cathay-and-the-east', 'grand-cathay', 'weijin']);
+    // the realms stand at the top of the world; everything else lies in something
+    const top = lore.LORE.filter((e) => e.kind === 'region' && !e.parent).map((e) => e.id);
+    expect(top).toEqual(expect.arrayContaining(['old-world', 'lustria', 'ulthuan', 'naggaroth', 'norsca']));
+    expect(lore.LORE.filter((e) => e.kind === 'region').length).toBeGreaterThan(60);
+  });
 });
