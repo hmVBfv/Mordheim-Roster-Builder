@@ -12,6 +12,7 @@ import { useNotice } from '../ui/Notice.tsx';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { ImportSheet } from './ImportSheet.tsx';
 import { CodeSheet } from '../share/CodeSheet.tsx';
+import { Incoming } from '../share/Incoming.tsx';
 import { WarbandList } from './WarbandList.tsx';
 
 const GroupedWarbands = lazy(() => import('./GroupedWarbands.tsx'));
@@ -33,6 +34,7 @@ export function Warbands() {
         <ImportSheet quiet onImported={(id) => { void navigate(`/warbands/${id}`); }} />
         {signedIn && <CodeSheet />}
       </div>
+      {signedIn && <Incoming nothing={false} />}
       {deviceOnly.length > 0 && (
         <div className={ui.card}>
           <p>{deviceOnly.length === 1 ? 'One warband is' : `${deviceOnly.length} warbands are`} only on this device. In your account {deviceOnly.length === 1 ? 'it is' : 'they are'} on your other devices too, and kept on the server.</p>
