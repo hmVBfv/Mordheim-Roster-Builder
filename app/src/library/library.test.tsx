@@ -220,6 +220,20 @@ describe('the Library: lore', () => {
     expect((kept.find((i) => i.name === 'The Witch Hunters')!.body as { lore: string }).lore).toMatch(/Source: .*https:\/\/mordheimer\.net\//);
     expect(kept.find((i) => i.name === 'Ostermark')).toMatchObject({ kind: 'idea', body: { topic: 'campaign' } });
   });
+
+  it('takes the place chain along into the idea or faction text (Rob, 22.10.2026)', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/lore');
+    const list = await screen.findByRole('list', { name: 'Lore' });
+    await user.click(within(list).getByRole('button', { name: 'Add The Pit to the Library' }));
+    await waitFor(() => expect(within(list).getByRole('button', { name: 'The Pit is in the Library' })).toBeTruthy());
+    await user.click(within(list).getByRole('button', { name: 'Add The Sisters of Sigmar to the Library' }));
+    await waitFor(() => expect(within(list).getByRole('button', { name: 'The Sisters of Sigmar is in the Library' })).toBeTruthy());
+    const kept = [...srv.state.library.values()];
+    expect((kept.find((i) => i.name === 'The Pit')!.body as { text: string }).text).toMatch(/Place: .*Ostermark › Mordheim\n/);
+    expect((kept.find((i) => i.name === 'The Sisters of Sigmar')!.body as { lore: string }).lore).toMatch(/Comes from: Old World › The Empire › Ostermark › Mordheim · .*Temple of Sigmar's Rock\n/);
+  });
 });
 
 describe('the Library: NPCs', () => {
