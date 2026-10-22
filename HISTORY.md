@@ -3869,3 +3869,57 @@ and the search mask has "Released with" and "Warband grade". Deliberately not
 done: the artefact tables (lesser, chaos, Lustrian) have no price or rarity, so
 they cannot be searched for; and the Khemri/Lustria rarities that differ from
 the core chart stay as they are – both went to Rob.
+
+## October 22, 2026 — the Gold tile and the models bar (#42, #41)
+
+Two small things on the head of a warband. The Gold tile carried a gold frame as
+well as gold figures, and only it was framed; the figures are enough, so the
+frame is the other tiles'. And the campaign's view of a warband showed "Models
+15/15" as figures only, while the warband's own page has a bar under them – so
+one warband had a bar and another none, depending on where one looked. Both
+views use one component now, so they cannot drift apart again. (Pull requests
+145 and 146.)
+
+## October 22, 2026 — Cancel to the left of the main button (#40)
+
+Rob chose the layout: the main button at the right edge, Cancel to its left, other
+actions further left. The first idea was to turn the row around with CSS, which
+would have left the keyboard going right to left; so about seventy rows of
+buttons were reordered in the source, by a script for the regular ones and by
+hand for the ten that were not (a delete button in the same row, a link as
+Cancel, a button split over two lines). A test now reads the sources and checks
+that Cancel stands before the main button and that no sheet's buttons sit in a
+plain row; it failed on the old sources. (Pull request 147.)
+
+## October 22, 2026 — the starting gold in three forms (#36)
+
+The house rule could only give every warband the same gold. It has three forms
+now: the same for all (as before), so much more for all, or so many percent more
+for all, the last two from what each warband starts with. Percentages are rounded
+up to the next full gc and worked out in whole numbers, because 500 gc and 10 %
+as a decimal is 550.0000000000001, which rounded up is 551. The app keeps one
+form on at a time; if a saved file has several, fixed wins, then plus, then
+percent. The parity comparison broke on the first run – the legacy app does not
+know the two new keys and the comparison showed the whole house rule object – so
+exactly those two keys are left out of it, by name, and the mirror's entry for the
+house defaults had to stop being "pure", which skips the normaliser. (Pull request
+148.)
+
+## October 22, 2026 — the world, in places (#37, #38, #39)
+
+Three reports, one catalogue: places that lie in places, more regions, more
+groups. The Lore tab shows a place's way ("In Old World › The Empire › Ostermark ›
+Mordheim"), a group's origin ("From Norsca") and narrows the list to a place and
+what lies in it. ADR 0024 records Rob's decision that sources outside
+mordheimer.net are allowed when written in our own words. Content came from two
+researchers who read the downloaded mordheimer.net pages: 60 regions and 70 groups;
+I merged them after fixing the region ids they had invented differently
+(`chaos-wastes` and `the-chaos-wastes`, `cathay` and `cathay-and-the-east`, `the-moot`
+and `moot`), rewording seven entries that shared nine-word runs with the source
+pages, and dropping the four Marauder marks, which are gods, not groups. The wikis
+(Lexicanum, Fandom) were not reachable from the cloud session, so places that
+mordheimer.net does not describe – the Badlands, Troll Country, Nordland,
+Wissenland, Ind, the Southlands, the Ogre Kingdoms – are still missing; that is
+for a session with access, or for Rob's own text. The pull requests are stacked
+(149, 150, 151); each targets `master`, merge them in that order. (Pull requests
+149, 150 and 151.)
