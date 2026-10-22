@@ -167,6 +167,21 @@ describe('the overview', () => {
     expect(screen.queryByRole('textbox')).toBeNull();
   });
 
+  /* #41: the warband's own page shows how full it is as a bar under "Models 12/12"; the campaign's view of it showed only the figures. */
+  it('a warband in the campaign shows its models as a bar too, as its own page does', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(within(await screen.findByRole('list', { name: 'Warbands' })).getAllByRole('link')[0]!);
+    await screen.findByRole('heading', { level: 1, name: 'The Grey Penitents' });
+    const tile = screen.getByText('Models').parentElement!;
+    const [have, max] = (tile.querySelector('dd')!.textContent ?? '').split('/').map(Number) as [number, number];
+    const bar = tile.querySelector('dd span[aria-hidden="true"] i') as HTMLElement | null;
+    expect(bar).toBeTruthy();
+    expect(bar!.style.width).toBe(`${Math.min(100, Math.round((100 * have) / Math.max(1, max)))}%`);
+  });
+
   /* Rob, 19.10.2026: a section of its own, for the quick overview of every warband. */
   it('the Warbands tab: a card each with the numbers of its last mark, the waiting ones apart; a card opens the warband', async () => {
     const srv = server();
