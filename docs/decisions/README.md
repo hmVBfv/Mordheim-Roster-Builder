@@ -42,3 +42,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0021](0021-first-load-budget-per-flavour.md) | Erste-Laden-Grenze je Ausgabe: Kampagne 250 KB, Quick Build 200 KB (angenommen, ergänzt 0014) |
 | [0022](0022-hidden-npc-values-in-scenarios.md) | Verborgene Teile bei den NPCs eines Szenarios: der Server schwärzt mit „?“, nach der Freigabe nur noch aufdecken (vorgeschlagen, ergänzt 0002, 0011) |
 | [0023](0023-library-per-account.md) | Die Library: Ideen und Vorlagen (Fraktionen, NPCs, Gruppen, Szenarien) privat beim Konto, immer als Kopie in die Kampagne (vorgeschlagen, ergänzt 0002, 0005, 0011, 0022) |
+| [0024](0024-lore-catalogue-places-and-sources.md) | Der Lore-Katalog: Orte ineinander, Gruppen mit Herkunftsorten, Quellen auch außerhalb von mordheimer.net, mit eigenen Worten (angenommen, ergänzt 0023) |
