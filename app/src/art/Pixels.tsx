@@ -60,7 +60,7 @@ export function bands(): string {
   return bandCache;
 }
 
-type Wings = typeof import('./wings.ts');
+type Wings = { paintWide: (id: SceneId) => string[] };
 let wings: Wings | undefined;
 
 /** the strip at the top of a screen: the motif in the middle, its surroundings to both sides (wings.ts), the night beyond.
