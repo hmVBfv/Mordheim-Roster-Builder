@@ -2050,6 +2050,7 @@
      "cost": 15,
      "exp": 0,
      "max": null,
+     "maxPer": { "per": 2, "of": ["boss", "shaman", "bigun", "boyz"] },
      "profile": {
       "M": 4,
       "WS": 2,
@@ -2071,6 +2072,7 @@
      "cost": 15,
      "exp": 0,
      "max": 5,
+     "maxPer": { "per": 1, "of": ["goblin"] },
      "profile": {
       "M": "2D6",
       "WS": 4,
@@ -3124,6 +3126,7 @@
      "cost": 25,
      "exp": 0,
      "max": null,
+     "maxPer": { "per": 1, "of": ["boyz"] },
      "profile": {
       "M": 4,
       "WS": 3,
@@ -3255,6 +3258,7 @@
      "cost": 15,
      "exp": 0,
      "max": 3,
+     "maxPer": { "per": 1, "of": ["paladin", "errant"] },
      "profile": {
       "M": 4,
       "WS": 2,
@@ -4686,6 +4690,7 @@
      "exp": 0,
      "max": 4,
      "bite": 1,
+     "maxPer": { "per": 1, "of": ["skinkbrave"] },
      "profile": {
       "M": 4,
       "WS": 3,
@@ -5585,6 +5590,7 @@
      "cost": 0,
      "exp": 0,
      "max": 5,
+     "maxPer": { "per": 1, "of": ["crew"] },
      "profile": {
       "M": 4,
       "WS": 2,
@@ -8395,6 +8401,7 @@
      "cost": 15,
      "exp": 0,
      "max": 5,
+     "maxPer": { "per": 1, "of": ["nightgob"] },
      "profile": {
       "M": "2D6",
       "WS": 4,

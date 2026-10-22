@@ -23,34 +23,16 @@ export function modelsOf(ctx: Ctx, id: string): number {
   return ctx.s.models.filter((m) => m.uid_def === id && !m.promoted).reduce((s, m) => s + (m.qty || 1), 0);
 }
 
-/** A unit limited by the size of others: at most `per` for each man of `of`
-    (mordheimer.net, the warband pages; report #46). Heroes count one each, a
-    promoted henchman one, a group its men. */
-export interface Ratio { unit: string; of: string[]; per: number }
-
-/** Orcs of an Orc Mob: Heroes and Boyz, not Goblins, Squigs or the Troll. */
-const ORCS = ['boss', 'shaman', 'bigun', 'boyz'];
-export const RATIOS: Record<string, Ratio[]> = {
-  orcmob: [{ unit: 'goblin', of: ORCS, per: 2 }, { unit: 'squig', of: ['goblin'], per: 1 }], // 2 Goblins for each Orc; never more Squigs than Goblins
-  nightgoblins: [{ unit: 'squig', of: ['nightgob'], per: 1 }], // never more Cave Squigs than Night Goblins
-  blackorcs: [{ unit: 'shootaz', of: ['boyz'], per: 1 }], // only as many Shootaz as Boyz
-  bretonnian: [{ unit: 'squire', of: ['paladin', 'errant'], per: 1 }], // no more Squires than Knights
-  lizardmen: [{ unit: 'saurusbrave', of: ['skinkbrave'], per: 1 }], // never more Saurus Braves than Skink Braves
-  pirates: [{ unit: 'swabbie', of: ['crew'], per: 1 }], // never more Swabbies than Crew
-};
-
-/** The units of a warband whose limit hangs on others (their ids). */
-export const ratioUnitIds = (wb: string | null | undefined): string[] => (RATIOS[wb ?? ''] ?? []).map((r) => r.unit);
-
 /** Maximum of a unit type; Kurgan marauders may take any number of warhounds.
-    A unit that hangs on others (see RATIOS) has the smaller of its own
-    maximum and what they allow. */
+    A unit that hangs on others (`maxPer`: Goblins of an Orc Mob, Lizardmen
+    Saurus …) has the smaller of its own maximum and what they allow
+    (mordheimer.net, the warband pages; report #46). */
 export function unitMax(ctx: Ctx, def: UnitDef): number | null | undefined {
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && def.id === 'warhound') return null;
-  const r = ((ctx.data.RATIOS ?? RATIOS)[ctx.s.wb ?? ''] ?? []).find((x) => x.unit === def.id);
-  if (!r) return def.max;
-  const men = ctx.s.models.filter((m) => r.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
-  return Math.min(def.max ?? Infinity, r.per * men);
+  const mp = def.maxPer;
+  if (!mp) return def.max;
+  const men = ctx.s.models.filter((m) => mp.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
+  return Math.min(def.max ?? Infinity, mp.per * men);
 }
 
 export function warbandMax(ctx: Ctx): number {

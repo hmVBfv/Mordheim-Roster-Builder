@@ -30,6 +30,8 @@ export interface UnitDef {
   exp?: number;
   /** Maximum number of models; `null`/missing means unlimited. */
   max?: number | null;
+  /** The unit hangs on others: at most `per` for each man of the units `of` in the warband (a Hero or a promoted henchman counts one, a group its men); together with `max` (report #46). */
+  maxPer?: { per: number; of: string[] };
   min?: number;
   /** The warband's leader. */
   req?: boolean;
@@ -310,8 +312,6 @@ export interface GameData {
   WARBANDS: Record<string, WarbandDef>;
   WBEXTRA: Record<string, Record<string, unknown>>;
   WBRACE: Record<string, string>;
-  /** Units whose limit hangs on others, by warband; absent: the built-in table (rules/costs.ts). Tests set `{}` to get the legacy app's maxima. */
-  RATIOS?: Record<string, { unit: string; of: string[]; per: number }[]>;
   HIREDSWORDS: Record<string, HireEntry>;
   HS_GRADE_ORDER: string[];
   WBHIRE: Record<string, WarbandHireInfo>;

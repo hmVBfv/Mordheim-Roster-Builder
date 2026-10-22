@@ -9,20 +9,32 @@ import * as core from '../../src/index.ts';
 import type { Ctx, UnitDef } from '../../src/index.ts';
 import { data } from './canon.ts';
 
-/** Is the unit one whose limit hangs on others in this warband? */
-export const isRatioUnit = (ctx: Ctx, id: string): boolean => core.ratioUnitIds(ctx.s.wb).includes(id);
+/** Is the unit one whose limit hangs on others (`maxPer` in the data)? */
+export const isRatioUnit = (ctx: Ctx, id: string): boolean => !!core.unitDef(ctx, id)?.maxPer;
 
-/** The same state seen with the legacy app's maxima: no limit hangs on another unit. */
-export const legacyCtx = (ctx: Ctx): Ctx => core.ctxOf({ ...ctx.data, RATIOS: {} }, ctx.s);
+const legacyData = new WeakMap<object, core.GameData>();
+/** The data as the legacy app knows it: no unit hangs on others. */
+function withoutMaxPer(d: core.GameData): core.GameData {
+  let out = legacyData.get(d);
+  if (!out) {
+    const warbands = Object.fromEntries(Object.entries(d.WARBANDS).map(([k, w]) => [k, { ...w, units: w.units.map(({ maxPer: _drop, ...u }) => u) }]));
+    out = { ...d, WARBANDS: warbands } as core.GameData;
+    legacyData.set(d, out);
+  }
+  return out;
+}
+
+/** The same state seen with the legacy app's maxima. */
+export const legacyCtx = (ctx: Ctx): Ctx => core.ctxOf(withoutMaxPer(ctx.data), ctx.s);
 
 /** What legacy answers for the unit's maximum. */
 export function legacyUnitMax(ctx: Ctx, d: UnitDef): number | null | undefined {
-  return isRatioUnit(ctx, d.id) ? d.max : core.unitMax(ctx, d);
+  return d.maxPer ? d.max : core.unitMax(ctx, d);
 }
 
 /** The warnings legacy knows: not "Too many …" for these units. */
 export function withoutRatioWarnings(wb: string | null | undefined, w: string[]): string[] {
-  const names = core.ratioUnitIds(wb).map((id) => data.WARBANDS[wb as string]?.units.find((u) => u.id === id)?.name).filter(Boolean) as string[];
+  const names = (data.WARBANDS[wb as string]?.units ?? []).filter((u) => u.maxPer).map((u) => u.name);
   return names.length ? w.filter((x) => !names.some((n) => x.startsWith(`Too many ${n} (`))) : w;
 }
 
