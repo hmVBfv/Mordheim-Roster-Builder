@@ -395,9 +395,9 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </ul>
           {held && <p className={`${ui.message} ${ui.error}`} role="alert">Notes, pictures or other things of the campaign belong to this battle. Deleting it now takes all of them with it – whoever wrote them, sealed and leader-only ones too – and nothing can bring them back. The battle will never have been.</p>}
           {!online && <p className={`${ui.message} ${ui.error}`}>Deleting needs the connection.</p>}
-          <div className={ui.row}>
-            <button type="button" className={ui.button} disabled={!online} onClick={() => drop(held)}>{held ? 'Delete the battle and everything on it' : 'Delete the battle'}</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => closeDrop()}>Keep it</button>
+            <button type="button" className={ui.button} disabled={!online} onClick={() => drop(held)}>{held ? 'Delete the battle and everything on it' : 'Delete the battle'}</button>
           </div>
         </div>
       </dialog>
@@ -412,9 +412,9 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
           </ul>
           {waiting > 0 && <p className={`${ui.message} ${ui.error}`}>{waiting} entr{waiting === 1 ? 'y waits' : 'ies wait'} on this phone: send {waiting === 1 ? 'it' : 'them'} first – connect, and wait a moment.</p>}
           {merged.proposals.some((p) => p.status === 'open') && <p className={ui.muted}>Corrections still open stay as they are.</p>}
-          <div className={ui.row}>
-            <button type="button" className={ui.button} disabled={waiting > 0 || !online} onClick={() => closeClose(close)}>Close the battle</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => closeClose()}>Cancel</button>
+            <button type="button" className={ui.button} disabled={waiting > 0 || !online} onClick={() => closeClose(close)}>Close the battle</button>
           </div>
         </div>
       </dialog>

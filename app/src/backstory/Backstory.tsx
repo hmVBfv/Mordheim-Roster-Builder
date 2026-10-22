@@ -202,9 +202,9 @@ function ImportForm({ close, cid, view, saved, online, onSaved, onStale }: {
       )}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {!online && <p className={ui.message} role="status">Saving the backstory needs the connection.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !online || sections.length === 0}>Save the backstory</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !online || sections.length === 0}>Save the backstory</button>
       </div>
     </form>
   );

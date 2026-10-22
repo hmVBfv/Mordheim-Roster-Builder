@@ -187,9 +187,9 @@ function NoteForm({ close, battles, fixed, kind: kind0, canLead, warbands, picks
           )}
         </fieldset>
       )}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!text.trim()}>{note ? 'Save' : 'Save the note'}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!text.trim()}>{note ? 'Save' : 'Save the note'}</button>
       </div>
     </form>
   );

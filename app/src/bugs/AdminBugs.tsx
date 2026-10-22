@@ -116,9 +116,9 @@ function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b
       </div>
       {(status === 'closed' || status === 'duplicate') && bug.attachment && <p className={ui.muted}>Closing lets go of the copy of the warband.</p>}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || (status === 'fixed' && !fixedIn.trim())}>Save</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={close}>Close</button>
+        <button type="submit" className={ui.button} disabled={busy || (status === 'fixed' && !fixedIn.trim())}>Save</button>
       </div>
     </form>
   );

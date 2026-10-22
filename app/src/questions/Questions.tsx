@@ -63,9 +63,9 @@ function AskForm({ battles, people, edit, close, onSave, titleId }: {
         {text.length > MAX_QUESTION * 0.8 && <small className={styles.count}>{text.length} / {MAX_QUESTION}</small>}
       </div>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !text.trim() || !to}>{edit ? 'Save' : 'Ask'}</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !text.trim() || !to}>{edit ? 'Save' : 'Ask'}</button>
       </div>
     </form>
   );
@@ -117,9 +117,9 @@ function AnswerForm({ q, battle, lead, close, onSave, titleId }: {
         )}
       </fieldset>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !text.trim()}>Answer</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !text.trim()}>Answer</button>
       </div>
     </form>
   );

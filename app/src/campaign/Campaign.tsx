@@ -326,9 +326,9 @@ function DeleteSection({ id, name, warbands }: { id: string; name: string; warba
             <input className={ui.input} value={typed} autoComplete="off" spellCheck={false} onChange={(e) => setTyped(e.target.value)} />
           </label>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            <button type="submit" className={`${ui.button} ${styles.dangerFill}`} disabled={busy || !same}>Delete it for everyone</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Keep it</button>
+            <button type="submit" className={`${ui.button} ${styles.dangerFill}`} disabled={busy || !same}>Delete it for everyone</button>
           </div>
         </form>
       </dialog>

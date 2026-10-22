@@ -133,9 +133,9 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
           </>
         )}
       </div>
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!choice}>Apply</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!choice}>Apply</button>
       </div>
     </form>
   );
@@ -176,7 +176,7 @@ export function TakenSheet({ dialogRef, close, name, taken, onRemove }: { dialog
             {taken.spells.map((s) => row(`p:${s.i}`, s.name, s.red ? `${s.red} easier to cast` : 'spell', s.red ? { kind: 'unreduce', index: s.i } : { kind: 'spell', index: s.i }, `${name}: ${s.red ? 'one step easier' : s.name} taken back.`))}
           </ul>
         )}
-        <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+        <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
       </div>
     </dialog>
   );

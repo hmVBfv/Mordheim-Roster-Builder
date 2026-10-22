@@ -261,9 +261,9 @@ function DraftForm({ close, cid, view, draft, online, onSaved }: {
       </details>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {!online && <p className={ui.message} role="status">Saving a draft needs the connection.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={busy || !online}>Save the draft</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={busy || !online}>Save the draft</button>
       </div>
     </form>
   );
@@ -397,16 +397,16 @@ function ReviewForm({ close, cid, view, draft, chapters, online, onEdit, onPubli
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {!online && <p className={ui.message} role="status">Publishing needs the connection.</p>}
       {asking ? (
-        <div className={ui.row} role="group" aria-label="Throw away the draft?">
-          <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void discard()}>Yes, throw it away</button>
+        <div className={ui.actions} role="group" aria-label="Throw away the draft?">
           <button type="button" className={ui.buttonQuiet} onClick={() => setAsking(false)}>Keep it</button>
+          <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void discard()}>Yes, throw it away</button>
         </div>
       ) : (
-        <div className={ui.row}>
-          <button type="button" className={ui.button} disabled={!ready} onClick={() => void publish()}>{warned ? 'Publish anyway' : 'Publish'}</button>
+        <div className={ui.actions}>
           <button type="button" className={ui.buttonQuiet} onClick={onEdit}>Edit</button>
           <button type="button" className={ui.buttonQuiet} onClick={() => setAsking(true)}>Throw away</button>
           <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button>
+          <button type="button" className={ui.button} disabled={!ready} onClick={() => void publish()}>{warned ? 'Publish anyway' : 'Publish'}</button>
         </div>
       )}
     </div>

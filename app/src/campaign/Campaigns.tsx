@@ -38,9 +38,9 @@ function StartSheet() {
             <input className={ui.input} value={name} maxLength={80} required autoFocus onChange={(e) => setName(e.target.value)} />
           </label>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}>
-            <button type="submit" className={ui.button} disabled={busy || !name.trim()}>Start it</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+            <button type="submit" className={ui.button} disabled={busy || !name.trim()}>Start it</button>
           </div>
         </form>
       </dialog>

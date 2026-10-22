@@ -101,7 +101,7 @@ export function ShareSheet({ data, rec, state, onNotice, buttonClass = ui.button
             </section>
           )}
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-          <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+          <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
         </div>
       </dialog>
     </>

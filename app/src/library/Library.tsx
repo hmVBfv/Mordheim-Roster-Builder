@@ -86,16 +86,16 @@ function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
       {asking ? (
         <div className={ui.page}>
           <p>Remove it for good? It is gone on every device.</p>
-          <div className={ui.row}>
-            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => setAsking(false)}>Keep it</button>
+            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
           </div>
         </div>
       ) : (
-        <div className={ui.row}>
-          <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save</button>
-          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <div className={ui.actions}>
           {idea && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => setAsking(true)}>Remove this idea</button>}
+          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+          <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save</button>
         </div>
       )}
     </form>
@@ -212,16 +212,16 @@ function FactionForm({ faction, online, close, onSaved, onRemoved }: {
       {asking ? (
         <div className={ui.page}>
           <p>Remove it for good? It is gone on every device. Campaigns that already have a copy keep it; a warrior who belongs to it keeps its name.</p>
-          <div className={ui.row}>
-            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
+          <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => setAsking(false)}>Keep it</button>
+            <button type="button" className={ui.button} disabled={busy || !online} onClick={() => void remove()}>Yes, remove it</button>
           </div>
         </div>
       ) : (
-        <div className={ui.row}>
-          <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save</button>
-          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <div className={ui.actions}>
           {faction && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => setAsking(true)}>Remove this faction</button>}
+          <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+          <button type="submit" className={ui.button} disabled={busy || !online || !name.trim()}>Save</button>
         </div>
       )}
     </form>

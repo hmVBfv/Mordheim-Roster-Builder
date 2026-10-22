@@ -88,9 +88,9 @@ export function Life({ data, rec, state, who, onProfile, close }: {
       {src.partial && <p className={ui.message} role="status">{src.partial}</p>}
       {life.length === 0 && !src.loading && <Empty scene="fire" title="Nothing recorded yet.">Battles, wounds, advances and the notes that mention him gather here.</Empty>}
       {life.length > 0 && <ul className={styles.life} aria-label="Life">{life.map((e) => <Entry key={e.key} e={e} />)}</ul>}
-      <div className={ui.row}>
-        {onProfile && <button type="button" className={ui.buttonQuiet} onClick={onProfile}>Edit the profile</button>}
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={close}>Close</button>
+        {onProfile && <button type="button" className={ui.buttonQuiet} onClick={onProfile}>Edit the profile</button>}
       </div>
     </div>
   );

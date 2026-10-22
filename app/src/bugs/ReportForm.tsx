@@ -131,10 +131,10 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
       {why && <p className={ui.muted}>{why}</p>}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {copied && <p className={ui.message} role="status">{copied}</p>}
-      <div className={ui.row}>
-        {FLAVOUR === 'campaign' && <button type="submit" className={ui.button} disabled={!canSend}>{phase === 'sending' ? 'Sending…' : 'Send'}</button>}
+      <div className={ui.actions}>
         <button type="button" className={FLAVOUR === 'campaign' ? ui.buttonQuiet : ui.button} disabled={!written} onClick={copy}>Copy the report</button>
         <button type="button" className={ui.buttonQuiet} onClick={close}>Cancel</button>
+        {FLAVOUR === 'campaign' && <button type="submit" className={ui.button} disabled={!canSend}>{phase === 'sending' ? 'Sending…' : 'Send'}</button>}
       </div>
       <p className={ui.muted}>App version {shownVersion(__APP_VERSION__)}.</p>
     </form>

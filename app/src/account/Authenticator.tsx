@@ -102,9 +102,9 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
                 </form>
               )}
               {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-              <div className={ui.row}>
-                <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => void start()}>Set up on a new phone</button>
+              <div className={ui.actions}>
                 <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button>
+                <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => void start()}>Set up on a new phone</button>
               </div>
             </>
           )}
@@ -113,9 +113,9 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
               <p>An authenticator app on your phone (Aegis, 2FAS, Google Authenticator, Microsoft Authenticator …) shows a new six-digit code every 30 seconds. With it, a stolen password alone does not get anyone into your account.</p>
               {user.isAdmin && <p className={ui.message}>Admins need it: the admin tools stay closed until it is set up.</p>}
               {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-              <div className={ui.row}>
-                <button type="button" className={ui.button} disabled={busy} onClick={() => void start()}>Set up</button>
+              <div className={ui.actions}>
                 <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Not now</button>
+                <button type="button" className={ui.button} disabled={busy} onClick={() => void start()}>Set up</button>
               </div>
             </>
           )}
@@ -144,9 +144,9 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
                 </label>
               )}
               {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
-              <div className={ui.row}>
-                <button type="submit" className={ui.button} disabled={busy || code.replace(/\s/g, '').length !== 6 || (user.totp && !current.trim())}>{user.totp ? 'Switch to the new phone' : 'Turn on'}</button>
+              <div className={ui.actions}>
                 <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+                <button type="submit" className={ui.button} disabled={busy || code.replace(/\s/g, '').length !== 6 || (user.totp && !current.trim())}>{user.totp ? 'Switch to the new phone' : 'Turn on'}</button>
               </div>
             </form>
           )}

@@ -42,7 +42,7 @@ export function MutationSheet({ dialogRef, close, view, onSet }: {
             ))}
           </ul>
           <p aria-live="polite">Together: <b>{view.cost} gc</b></p>
-          <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+          <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
         </div>
       )}
     </dialog>
@@ -78,9 +78,9 @@ function MarkBody({ v, close, onApply, titleId }: { v: MarkView; close: Sheet['c
         ))}
       </div>
       {v.mark && pick !== v.mark && <p>A new Mark: the Seer and the Chieftain forget the spells they know.</p>}
-      <div className={ui.row}>
-        <button type="submit" className={ui.button} disabled={!pick || pick === v.mark}>Apply</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        <button type="submit" className={ui.button} disabled={!pick || pick === v.mark}>Apply</button>
       </div>
     </form>
   );

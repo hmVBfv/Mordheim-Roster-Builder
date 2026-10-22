@@ -118,10 +118,10 @@ export function PackForm({ cid, campaign, view, segs, close, titleId }: {
           {status && <p className={ui.message} role="status">{status}</p>}
         </>
       )}
-      <div className={ui.row}>
-        <button type="button" className={ui.button} disabled={!ready.g} onClick={copy}>Copy prompt</button>
+      <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} disabled={!ready.g} onClick={download}>Download .md</button>
         <button type="button" className={ui.buttonQuiet} onClick={close}>Close</button>
+        <button type="button" className={ui.button} disabled={!ready.g} onClick={copy}>Copy prompt</button>
       </div>
     </div>
   );
