@@ -1,4 +1,4 @@
-/* Copies other players sent, under "Open for you" on Home (Rob, 05.10.2026). */
+/* Copies other players sent, under "Open for you" on Home (Rob, 05.10.2026) and above the list on Warbands (Rob, 22.10.2026). */
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';

@@ -117,6 +117,28 @@ describe('a copy sent to you', () => {
     expect(srv.state.warbands.get(mine[0]!.id)).toMatchObject({ headRev: 1, versions: [{ source: 'import', note: 'shared by Ben' }] });
   });
 
+  it('is offered under Warbands too, where it can be taken or declined (wish #50)', async () => {
+    const srv = server();
+    srv.shareFrom('Ben', saveOf('The Ardent Caravan'));
+    srv.shareFrom('Rob', saveOf('Rob’s Spare'));
+    const user = userEvent.setup();
+    at('/warbands');
+    const list = await screen.findByRole('list', { name: 'Sent to you' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+    await user.click(within(within(list).getAllByRole('listitem')[1]!).getByRole('button', { name: 'Decline' }));
+    expect(await within(list).findAllByRole('listitem')).toHaveLength(1);
+    await user.click(within(list).getByRole('button', { name: 'Take it' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeTruthy();
+  });
+
+  it('Warbands says nothing about copies while none is waiting', async () => {
+    server();
+    at('/warbands');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Warbands' })).toBeTruthy();
+    expect(screen.queryByRole('list', { name: 'Sent to you' })).toBeNull();
+    expect(screen.queryByText(/Nothing waiting/)).toBeNull();
+  });
+
   it('a copy taken is in step with the server: the next sync neither sends it nor brings it twice', async () => {
     const srv = server();
     const sh = srv.shareFrom('Ben', saveOf('The Ardent Caravan'));
