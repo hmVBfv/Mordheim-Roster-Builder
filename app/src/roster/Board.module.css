@@ -76,10 +76,7 @@
   white-space: nowrap;
 }
 
-.tileGold {
-  border-color: color-mix(in srgb, var(--gold) 55%, var(--border));
-}
-
+/* the gold figures are enough: no frame of its own (report #42) */
 .tileGold dd {
   color: var(--gold);
 }
