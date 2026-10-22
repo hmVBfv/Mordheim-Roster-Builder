@@ -120,10 +120,30 @@ export function rareBasePrice(ctx: Ctx, de: string): number {
   return catalogDefaultPaid(ctx, catalogItem(ctx, de));
 }
 
+/** What a stash item is. One that was bought here knows its key; one typed
+    in by hand has only a name, and is looked up each time – the price chart
+    (rare or common), then the warband's lists – so that it can be sold or
+    given like any other. Whatever is found nowhere stays a free-text item
+    with its name as key: it can be sold for a price the player names. */
+export function stashGoods(ctx: Ctx, it: StashItem): Goods {
+  if (it.key) return { key: it.key, rare: !!it.rare };
+  const name = (it.name ?? '').trim();
+  const entry = chartEntry(ctx, name);
+  if (entry) return { key: entry.de, rare: /Rare\s+\d/.test(entry.rare ?? '') };
+  const en = norm(name);
+  for (const u of warbandDef(ctx)?.units ?? []) {
+    const list = eqListFor(ctx, u) ?? {};
+    for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) if (nm === name || (en && norm(enItem(ctx.data, nm)) === en)) return { key: nm, rare: false };
+  }
+  return { key: name, rare: false };
+}
+
+const sameGoods = (c: Ctx, it: StashItem, g: Goods): boolean => { const x = stashGoods(c, it); return x.key === g.key && x.rare === g.rare; };
+
 /** Pieces of an item a holder can part with. */
 export function piecesHeld(ctx: Ctx, from: Holder, g: Goods): number {
   if (from === 'stash') {
-    return (ctx.s.stash?.items ?? []).filter((it) => it.key === g.key && !!it.rare === g.rare).reduce((n, it) => n + (Number(it.qty) || 0), 0);
+    return (ctx.s.stash?.items ?? []).filter((it) => sameGoods(ctx, it, g)).reduce((n, it) => n + (Number(it.qty) || 0), 0);
   }
   const m = findModel(ctx.s, from);
   if (!m) return 0;
@@ -184,7 +204,7 @@ function stashItems(d: WarbandDraft): StashItem[] {
 function intoStash(d: WarbandDraft, c: Ctx, g: Goods, qty: number, paid: number | undefined): void {
   if (qty <= 0) return;
   const items = stashItems(d);
-  const ex = items.find((it) => it.key === g.key && !!it.rare === g.rare && (it.paid ?? null) === (paid ?? null));
+  const ex = items.find((it) => sameGoods(c, it, g) && (it.paid ?? null) === (paid ?? null));
   if (ex) { ex.qty += qty; return; }
   const it: StashItem = { name: goodsName(c, g), qty, key: g.key };
   if (g.rare) it.rare = true;
@@ -193,12 +213,12 @@ function intoStash(d: WarbandDraft, c: Ctx, g: Goods, qty: number, paid: number 
 }
 
 /** Takes pieces out of the stash, oldest first; returns what each cost. */
-function outOfStash(d: WarbandDraft, g: Goods, qty: number): number[] {
+function outOfStash(d: WarbandDraft, c: Ctx, g: Goods, qty: number): number[] {
   const items = stashItems(d);
   const paid: number[] = [];
   for (let i = 0; i < items.length && paid.length < qty;) {
     const it = items[i]!;
-    if (it.key !== g.key || !!it.rare !== g.rare) { i++; continue; }
+    if (!sameGoods(c, it, g)) { i++; continue; }
     const take = Math.min(it.qty, qty - paid.length);
     for (let k = 0; k < take; k++) paid.push(Number(it.paid) || 0);
     it.qty -= take;
@@ -293,12 +313,15 @@ export function sellItem(ctx: Ctx, from: Holder, g: Goods, opts: { qty?: number;
   if (why) return refuse(ctx, why);
   const have = piecesHeld(ctx, from, g);
   if (!have) return refuse(ctx, 'there is nothing of it to sell');
+  // free text the chart does not know has no price of its own: the player names it
+  if (from === 'stash' && opts.price == null && !g.rare && commonPrice(ctx, g.key) == null
+    && !(ctx.s.stash?.items ?? []).some((it) => sameGoods(ctx, it, g) && Number(it.paid) > 0)) return refuse(ctx, 'no price is known for it');
   const s0 = ensureLedger(ctx);
   let sold = 0, price = 0;
   const state = update(ctxOf(ctx.data, s0), (d, c) => {
     let paid: number | undefined;
     if (from === 'stash') {
-      const ps = outOfStash(d, g, Math.min(have, Math.max(1, Math.round(Number(opts.qty) || have))));
+      const ps = outOfStash(d, c, g, Math.min(have, Math.max(1, Math.round(Number(opts.qty) || have))));
       sold = ps.length; paid = ps[0];
     } else {
       const out = outOfWarrior(d, c, from, g);
@@ -330,7 +353,7 @@ export function giveItem(ctx: Ctx, from: Holder, to: Holder, g: Goods): Trade {
   const state = update(ctxOf(ctx.data, s0), (d, c) => {
     let pieces: number, paid: number | undefined;
     if (from === 'stash') {
-      const ps = outOfStash(d, g, to === 'stash' ? have : need);
+      const ps = outOfStash(d, c, g, to === 'stash' ? have : need);
       pieces = ps.length; paid = ps[0];
     } else {
       ({ pieces, paid } = outOfWarrior(d, c, from, g));

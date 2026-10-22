@@ -145,3 +145,24 @@ describe('an edit after the first battle', () => {
     expect(applyEdit(data, s, (c) => c.s)).toBe(s);
   });
 });
+
+describe('what the stash holds that was typed in by hand', () => {
+  const typed = (items: { name: string; qty: number }[]) => {
+    const t = structuredClone(band(1).s);
+    t.stash = { wyrd: 0, gold: 0, ...t.stash, items };
+    return t;
+  };
+
+  it('is on the Sell list, priced like the item it turns out to be', () => {
+    const s = typed([{ name: 'Sword', qty: 2 }]);
+    const h = holdings(ctx(s)).filter((x) => x.from === 'stash');
+    expect(h).toHaveLength(1);
+    expect(h[0]).toMatchObject({ name: 'Sword', pieces: 2, goods: { key: 'Schwert', rare: false }, unpriced: false });
+    expect(h[0]!.sell).toBeGreaterThan(0);
+  });
+
+  it('is on the list without a price when the catalogue does not know it', () => {
+    const s = typed([{ name: 'Moonstone', qty: 1 }]);
+    expect(holdings(ctx(s)).find((x) => x.from === 'stash')).toMatchObject({ name: 'Moonstone', pieces: 1, unpriced: true, sell: 0 });
+  });
+});

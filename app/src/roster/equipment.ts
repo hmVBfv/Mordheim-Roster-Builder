@@ -118,7 +118,8 @@ export function buyRecipients(ctx: core.Ctx, key: string, price: number): Recipi
 }
 
 /** One item somebody holds: what the Sell and Give lists show. */
-export interface Holding { from: core.Holder; owner: string; goods: core.Goods; name: string; pieces: number; paid: number | undefined; sell: number; text: string }
+export interface Holding { from: core.Holder; owner: string; goods: core.Goods; name: string; pieces: number; paid: number | undefined; sell: number; text: string;
+  /** Typed in by hand and not in the catalogue: the player names the price. */ unpriced?: boolean }
 
 export function holdings(ctx: core.Ctx): Holding[] {
   const out: Holding[] = [];
@@ -136,12 +137,15 @@ export function holdings(ctx: core.Ctx): Holding[] {
   }
   const stash = new Map<string, Holding>();
   for (const it of ctx.s.stash?.items ?? []) {
-    if (!it.key) continue;
-    const g = { key: it.key, rare: !!it.rare };
+    // items typed in by hand are looked up in the catalogue each time (core stashGoods)
+    const g = core.stashGoods(ctx, it);
+    if (!g.key) continue;
     const id = `${g.rare ? 'r' : 'c'}:${g.key}`;
     if (stash.has(id)) continue;
     const pieces = core.piecesHeld(ctx, 'stash', g);
-    stash.set(id, { from: 'stash', owner: 'Stash', goods: g, name: it.name, pieces, paid: it.paid, sell: core.sellPrice(ctx, g, 1, it.paid), text: itemText(ctx.data, it.name) });
+    if (!pieces) continue;
+    const unpriced = !g.rare && core.commonPrice(ctx, g.key) == null && !(Number(it.paid) > 0);
+    stash.set(id, { from: 'stash', owner: 'Stash', goods: g, name: it.name, pieces, paid: it.paid, sell: unpriced ? 0 : core.sellPrice(ctx, g, 1, it.paid), text: itemText(ctx.data, it.name), unpriced });
   }
   return [...out, ...stash.values()];
 }
