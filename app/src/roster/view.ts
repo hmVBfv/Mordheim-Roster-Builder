@@ -257,7 +257,7 @@ function recruitList(ctx: core.Ctx): RecruitGroup[] {
     if (st?.leaderGone) why = 'the leader has fallen; a surviving Hero takes command';
     else if (umx != null && (st?.count ?? 0) >= umx) why = u.req ? 'the warband has its leader' : `the warband has all ${umx} it may have`;
     else if (hero && heroesFull) why = `the warband has its ${heroMaxOf(ctx)} Heroes`;
-    return { id: u.id, name: u.name, count: st?.count ?? 0, limit: st?.limit ?? 'any', cost: core.unitBaseCost(ctx, u), exp: Number(u.exp) || 0, note: u.sp ?? '', why };
+    return { id: u.id, name: u.name, count: st?.count ?? 0, limit: st?.limit ?? 'any', cost: core.unitBaseCost(ctx, u), exp: Number(u.exp) || 0, note: plainNote(u.sp), why };
   };
   const groups: [string, (u: UnitDef) => boolean, boolean][] = [
     ['Heroes', (u) => u.t === 'hero' && !u.vehicle, true],
@@ -383,6 +383,9 @@ export function newWarbandChoice(data: GameData, key: string): NewWarbandChoice 
 
 /** A fresh roster, as the Roster Builder starts one (chooseWb, then the
     chosen subtype and the name). */
+/* The data marks rule names with <b>; the recruit list shows plain text. */
+const plainNote = (sp: string | undefined) => (sp ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
+
 export function createWarband(data: GameData, key: string, subtype: string | null, name: string): WarbandState {
   let s = core.newWarband(data, key);
   if (subtype && subtype !== s.subtype) s = core.pickSubtype(core.ctxOf(data, s), subtype);
