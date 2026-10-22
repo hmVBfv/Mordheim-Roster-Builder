@@ -14,13 +14,21 @@ export function priceText(cost: number | string): string {
   return `${c.replace(/\s*\/\s*/g, ' / ')} gc`;
 }
 
-/** What a dice price comes to on average, or null for a fixed price and for one that is not dice. */
-export function priceAverage(cost: number | string): number | null {
+/** The lowest and highest a dice price can come to, or null for a fixed price and for one that is not dice. */
+export function priceRange(cost: number | string): [number, number] | null {
   if (typeof cost === 'number') return null;
   const main = cost.replace(/\s*\(.*\)\s*$/, '');
   const m = /^(\d+)?\s*\+\s*(\d*)D(\d+)(?:\s*[×x]\s*(\d+))?$/i.exec(main.trim());
   if (!m) return null;
   const dice = Number(m[2] || 1);
   const sides = Number(m[3]);
-  return Number(m[1] ?? 0) + (dice * (sides + 1)) / 2 * Number(m[4] ?? 1);
+  const base = Number(m[1] ?? 0);
+  const mult = Number(m[4] ?? 1);
+  return [base + dice * mult, base + dice * sides * mult];
+}
+
+/** What a dice price comes to on average (it orders the lists), or null for a fixed price and for one that is not dice. */
+export function priceAverage(cost: number | string): number | null {
+  const r = priceRange(cost);
+  return r ? (r[0] + r[1]) / 2 : null;
 }

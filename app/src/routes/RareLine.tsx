@@ -6,15 +6,13 @@ import { effectLine } from '../roster/rareFilter.ts';
 import type { RareItem } from '../roster/equipment.ts';
 import styles from '../roster/Trade.module.css';
 
-const average = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
-
 export function RareLine({ it }: { it: RareItem }) {
   return (
     <>
       <span className={styles.rn}>{it.name}{!it.usable && <small className={styles.no}> · nobody here may use it</small>}</span>
       <span className={styles.rr}>Rare {it.rarity}</span>
       <span className={styles.rc}>{Math.round(core.chance2d6(it.rarity) * 100)} %</span>
-      <span className={styles.rp}>{it.price}{it.avg != null && <small> ≈ {average(it.avg)} gc</small>}</span>
+      <span className={styles.rp}>{it.price}{it.range && <small> = {it.range[0]} – {it.range[1]} gc</small>}</span>
       {it.text && <small className={styles.re}>{effectLine(it.text)}</small>}
     </>
   );

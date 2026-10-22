@@ -1,9 +1,10 @@
-import { cleanup, render as mount, within } from '@testing-library/react';
+import { cleanup, render as mount, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { GROUND, H, PALETTE, W, backdropRows } from './draw.ts';
+import { GROUND, H, PALETTE, W, WB, backdropRows } from './draw.ts';
 import { Banner, Empty, bands, layers } from './Pixels.tsx';
 import { sceneFor } from './route.ts';
 import { SCENES, backdropOnly, paint, render, type SceneId } from './scenes.ts';
+import { backdropWide, motifColumns, paintWide, renderWide } from './wings.ts';
 
 afterEach(cleanup);
 
@@ -58,6 +59,60 @@ describe('the scenes', () => {
   });
 });
 
+/* Report #33: on a desktop only the middle of the banner had anything in it; the rest was bare night. */
+describe('the banner is as wide as a desktop screen', () => {
+  it('is drawn in one palette on a full grid, the same every time', () => {
+    for (const id of IDS) {
+      const rows = paintWide(id);
+      expect(rows.length, id).toBe(H);
+      for (const row of rows) {
+        expect(row.length, id).toBe(WB);
+        for (const c of row) expect(PALETTE[c], `${id}: ${c}`).toBeTruthy();
+      }
+      expect(renderWide(id), id).toEqual(renderWide(id));
+    }
+  });
+
+  it('goes on to both sides of its motif: something stands there, not only night', () => {
+    for (const id of IDS) {
+      const base = backdropWide(id);
+      const [x0, x1] = motifColumns(id);
+      const rows = paintWide(id);
+      const changed = (from: number, to: number) => rows.reduce((n, row, y) => n + [...row.slice(from, to)].filter((c, i) => c !== base[y]![from + i]).length, 0);
+      expect(changed(0, x0), `${id} left`).toBeGreaterThan(300);
+      expect(changed(x1, WB), `${id} right`).toBeGreaterThan(300);
+    }
+  });
+
+  it('keeps its motif where the narrow picture has it', () => {
+    for (const id of IDS) {
+      const [x0, x1] = motifColumns(id);
+      const wide = paintWide(id), narrow = paint(id), baseNarrow = backdropOnly(id), mid = Math.floor((WB - W) / 2);
+      narrow.forEach((row, y) => {
+        for (let x = Math.floor((W - SCENES[id].span) / 2); x < Math.floor((W - SCENES[id].span) / 2) + SCENES[id].span; x++) {
+          if (row[x] !== baseNarrow[y]![x]) expect(wide[y]![mid + x], `${id}: (${x}, ${y})`).toBe(row[x]);
+        }
+      });
+      expect(x1 - x0).toBe(SCENES[id].span);
+    }
+  });
+
+  it('moves over its whole width: bats and cloud in the sky, smoke and embers where there is fire', () => {
+    for (const id of IDS) {
+      const live = layers(id, paintWide(id)).map((l) => l.live);
+      expect(live, id).toContain('flyA');
+      expect(live, id).toContain('flyB');
+      expect(live, id).toContain('drift');
+    }
+    expect(layers('camp', paintWide('camp')).map((l) => l.live)).toContain('ember');
+    expect(layers('city', paintWide('city')).map((l) => l.live)).toContain('rise');
+  });
+
+  it('is still a handful of paths, not a rect per pixel', () => {
+    for (const id of IDS) expect(layers(id, paintWide(id)).length, id).toBeLessThan(45);
+  });
+});
+
 describe('which screen shows which picture', () => {
   it.each([
     ['/', 'city'],
@@ -94,12 +149,14 @@ describe('which screen shows which picture', () => {
 });
 
 describe('the pieces on a screen', () => {
-  it('the banner is decoration: hidden from a screen reader, the night painted in bands beside it', () => {
+  it('the banner is decoration: hidden from a screen reader, the night painted in bands beside it', async () => {
     const { container } = mount(<Banner scene="city" />);
     const banner = container.firstElementChild as HTMLElement;
     expect(banner.getAttribute('aria-hidden')).toBe('true');
     expect(banner.getAttribute('data-scene')).toBe('city');
     expect(banner.querySelectorAll('svg').length).toBe(1);
+    // the motif first, alone in the middle; then its surroundings arrive
+    await waitFor(() => expect(banner.querySelector('svg')?.getAttribute('viewBox')).toBe(`0 0 ${WB} ${H}`));
     expect(bands()).toMatch(/^linear-gradient\(to bottom, #0b0d12 0%/);
     expect(backdropRows().length).toBe(H);
   });

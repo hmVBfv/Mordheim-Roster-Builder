@@ -68,10 +68,10 @@ export const patchBattle = (cid: string, bid: string, p: { title?: string; distr
   api<BattleView>(`/campaigns/${cid}/battles/${bid}`, { method: 'PATCH', body: p }).then(keep());
 /** Closes the battle (a leader): the protocol is fixed, its sealed notes open. */
 export const closeBattle = (cid: string, bid: string) => api<BattleView>(`/campaigns/${cid}/battles/${bid}/close`, { body: {} }).then(keep());
-/** Takes an open battle out (a leader; one made by mistake): its protocol goes with it. What was kept of it on this device goes too; a battle already gone is as good. */
-export async function deleteBattle(cid: string, bid: string): Promise<void> {
+/** Takes an open battle out (a leader; one made by mistake): its protocol goes with it. `withContent`: its notes, pictures and the rest go too, for good (reports #34, #35). What was kept of it on this device goes too; a battle already gone is as good. */
+export async function deleteBattle(cid: string, bid: string, withContent = false): Promise<void> {
   try {
-    await api<{ removed: true }>(`/campaigns/${cid}/battles/${bid}`, { method: 'DELETE' });
+    await api<{ removed: true }>(`/campaigns/${cid}/battles/${bid}${withContent ? '?content=1' : ''}`, { method: 'DELETE' });
   } catch (e) {
     if (!(e instanceof ApiError && e.status === 404)) throw e;
   }

@@ -3761,3 +3761,90 @@ is the only text it adds, and it is the admin's own), and the reporter never
 reads it – it is part of the sorting, like the area and the severity, and
 not part of what they wrote. The old reports have none yet; a report without
 one shows the old way until it gets one.
+
+## October 22, 2026 — spellcasters get the spellcaster items (#30)
+
+A Magister could not find the Familiar. The catalogue marks it "spellcasters
+only", and the check asked whether the unit has a `magic` key – a key no unit
+in the data has, because the rules know who casts in another way: the
+warband's spell list plus "Wizard" in the unit's rules, a Marauder's mark, or a
+warrior made a caster by hand (`casterLore`). So no real caster ever passed.
+The legacy app has the same hole; it is frozen, so only `core/` changed, the
+difference is in `docs/behaviour-changes.md`, and the parity run leaves exactly
+the caster-only items out of its comparison (a named set, not a rule).
+(Pull request 137.)
+
+## October 22, 2026 — selling from the stash what was typed in (#31)
+
+The Sell tab listed only stash items that carried a `key`. Items typed in by
+hand, or kept from the old app, have a name and a count and no key, so they
+were silently skipped: a warrior's sword could be sold, the same sword in the
+stash could not. The tab now looks the name up each time (price chart, then
+the warband's lists, English or German, aliases included) and treats a hit
+like any item; what is found nowhere is sold for a price the player names, and
+the sale is refused without one. The lookup is a read, not a migration – the
+saved items stay as they were typed. (Pull request 138.)
+
+## October 22, 2026 — a dice price as a range (#29)
+
+"20+1D6 gc ≈ 23.5 gc" showed an average, which nobody ever pays. The line now
+shows what the dice allow, "= 21 – 26 gc". The average stays what orders the
+lists. (Pull request 139.)
+
+## October 22, 2026 — taking a battle out with what was written for it (#34, #35)
+
+Two reports, one cause: nothing a leader could do removed a battle that had
+notes on it, and notes of a battle of the history could not be taken out at
+all – the page treats that battle as closed, and a closed battle's notes had no
+button. Worse, a note that had been taken out still counted as "something
+hangs on this battle": the tombstone blocked the removal it was meant to allow.
+Rob's decision: a battle that was not finished and is removed never happened,
+so its notes never existed. `?content=1` (leader only, asked for in the app
+after the server says something belongs to the battle) removes the content too:
+the rows stay as tombstones so every device hears of it, but text, earlier
+wordings and picture files go, and the log names no words. Two cases still
+refuse, with their own code: a note sealed until this battle and an entry
+revealed from it – removing the battle would seal the first for good and show
+the second at once.
+
+The first version was reviewed independently (it touches sealed notes, so
+S1) and the review found four real things: removing a history battle with a
+question or background entry hanging on it failed with a server error because
+only notes and pictures let go of the battle row; the second confirmation was
+offered for the "waits" refusal too, where it could never succeed; rows taken
+out earlier kept their words; and a file that could not be deleted after the
+commit turned a finished removal into an error. All four are fixed and tested.
+Reputation events about a battle that never happened go with it, which changes
+the standing figures – Rob may want to look at that. (Pull request 140.)
+
+## October 22, 2026 — Give as cards (#32)
+
+The wide Give screen was two columns of flat boxes; the report called them too
+large and clunky and asked for every warrior with their stats and abilities,
+drag and drop, and giving from and to the stash. It is now a grid of small
+cards, one per warrior and one for the stash, each with the profile, the rules
+and the items as chips. An item is picked or dragged; every card says whether
+it may take it and why not. The stash being a card was the easy part – giving
+to and from it already worked, but the items typed in by hand never showed up
+(#31). (Pull request 141.)
+
+## October 22, 2026 — the banner pictures over the whole width (#33)
+
+On a desktop the pixel picture was 160 columns in the middle of a bar that
+the page filled with plain night. The banner is now 520 columns wide: the
+scene stays in the middle and a seeded list of props per scene continues the
+place to both sides – Mordheim's houses and towers, the camp's tents and
+fires, the market's stalls, shelves and candelabras for the books, mountains
+and rivers for the map. Smoke and embers rise, two flocks of bats cross the
+sky, a bank of cloud drifts; reduced motion holds it still. The first
+version pushed the quickbuild over its first-load budget (201.7 kB against
+200), so the surroundings are a chunk of their own that loads after the first
+paint. Wrong turn: a type-only `import()` in the loader failed the lint, fixed
+by naming the one function the banner uses. (Pull request 142.)
+
+## October 22, 2026 — on the way: a mismatch between merge order and tests
+
+Several of this run's pull requests append tests to the same files (the trade
+tests, the equipment tests) and conflicted before they were even opened. The
+tests of #30, #31 and #32 now live in files of their own, as the `/bugs`
+command asks for shared files.

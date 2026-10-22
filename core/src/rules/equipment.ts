@@ -7,6 +7,7 @@ import type { Ctx } from './context.ts';
 import { itemHalfActive } from './districts.ts';
 import { eqListFor, isUpgrade, itemFamily, stripParen, unitDef, unitFamilies } from './lookup.ts';
 import { adjPrice } from './pricing.ts';
+import { casterLore } from './profile.ts';
 
 const qtyOf = (m: Model, nm: string): number => Number((m.eq ?? {})[nm]) || 0;
 
@@ -253,7 +254,8 @@ export function catalogAllowed(ctx: Ctx, it: CatalogItem, m: Model): boolean {
   })) return false;
   if (o.heroes && !isHero) return false;
   if (o.human && !ctx.data.WBHIRE[wb]?.human) return false;
-  if (o.casters && !(def?.magic || m.magic)) return false;
+  // a caster is who casts from a spell list (casterLore), not only who has a `magic` key
+  if (o.casters && !(def?.magic || m.magic || casterLore(ctx, m))) return false;
   return true;
 }
 

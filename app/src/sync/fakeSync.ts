@@ -993,6 +993,10 @@ export function createFakeSync(opts: {
     }
     if (b.status === 'closed') return json(409, { error: 'closed' });
     if (method === 'DELETE' && sub === '') {
+      // what is written for it holds it back, unless the leader takes it out with it (?content=1; server/src/battles.ts)
+      const written = [...s.notes.values()].filter((n) => n.battleId === b.id && !n.deleted);
+      if (written.length && query.get('content') !== '1') return json(409, { error: 'in_use', problem: 'notes, pictures or other things of the campaign belong to this battle' });
+      for (const n of written) { n.deleted = true; n.text = ''; n.battleId = null; n.seq = next(); }
       s.battles.delete(b.id);
       return json(200, { removed: true });
     }
@@ -1145,6 +1149,9 @@ export function createFakeSync(opts: {
       }
       if (method === 'DELETE') {
         if ([...s.battles.values()].some((b) => b.campaignId === c.id && !b.takenOver)) return json(409, { error: 'history_closed' });
+        const written = [...s.notes.values()].filter((n) => n.battleId === x0![1] && !n.deleted);
+        if (written.length && query.get('content') !== '1') return json(409, { error: 'in_use', problem: 'notes or pictures belong to this battle' });
+        for (const n of written) { n.deleted = true; n.text = ''; n.battleId = null; n.seq = next(); }
         s.battles.delete(x0[1]!);
         followHistory(c);
         return json(200, view(c));

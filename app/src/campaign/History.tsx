@@ -6,7 +6,7 @@
    campaign stands after the last of them, and each warband's start is
    marked there. Open while the campaign has no battle of its own. */
 import { Suspense, useState } from 'react';
-import { errorText } from '../account/api.ts';
+import { ApiError, errorText } from '../account/api.ts';
 import { battleTitle, getBattle, OUTCOME_NAMES, type BattleSummary, type Outcome } from '../battle/api.ts';
 import { newId } from '../db/ids.ts';
 import ui from '../ui/ui.module.css';
@@ -28,13 +28,17 @@ export function HistorySection({ id, view, onView, onNotice }: { id: string; vie
   const [form, setForm] = useState<Form | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // notes or pictures belong to the battle: asked once more before they go with it (report #35)
+  const [held, setHeld] = useState(false);
   const fresh = () => {
     setError(null);
+    setHeld(false);
     setForm({ bid: newId(), known: false, round: String(h.round + 1), title: '', district: '', playedOn: '', picks: Object.fromEntries(active.map((e) => [e.warbandId, '' as Pick])) });
     open();
   };
   const change = (b: BattleSummary) => {
     setError(null);
+    setHeld(false);
     getBattle(id, b.id).then((v) => {
       const fought = Object.fromEntries(v!.participants.map((p) => [p.warbandId, p.outcome]));
       setForm({
@@ -65,9 +69,11 @@ export function HistorySection({ id, view, onView, onNotice }: { id: string; vie
     setBusy(true);
     setError(null);
     try {
-      onView(await removePastBattle(id, form.bid));
-      close(() => onNotice('Taken out of the history.'));
-    } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
+      onView(await removePastBattle(id, form.bid, held));
+      close(() => onNotice(held ? 'Taken out of the history, with everything written about it.' : 'Taken out of the history.'));
+    } catch (e) {
+      if (!held && e instanceof ApiError && e.code === 'in_use') setHeld(true); else setError(errorText(e));
+    } finally { setBusy(false); }
   };
   const set = (patch: Partial<Form>) => setForm((f) => (f ? { ...f, ...patch } : f));
   // a campaign that began in the app has nothing to show here
@@ -128,10 +134,11 @@ export function HistorySection({ id, view, onView, onNotice }: { id: string; vie
                 </label>
               ))}
             </fieldset>
+            {held && <p className={`${ui.message} ${ui.error}`} role="alert">Notes or pictures belong to this battle. Taking it out now takes all of them with it – whoever wrote them – and nothing can bring them back.</p>}
             {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
             <div className={ui.row}>
               <button type="submit" className={ui.button} disabled={busy || !roundOk || fighters.length === 0}>Save</button>
-              {form.known && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => void takeOut()}>Take it out</button>}
+              {form.known && <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => void takeOut()}>{held ? 'Take it out with everything on it' : 'Take it out'}</button>}
               <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
             </div>
           </form>
