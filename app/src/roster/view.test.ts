@@ -103,6 +103,11 @@ describe('editing a roster', () => {
     const unit = (id: string) => rosterView(data, s).recruit.flatMap((g) => g.units).find((u) => u.id === id)!;
     expect(unit('goblin')).toMatchObject({ limit: '0–2', why: 'at most two Goblins for each Orc: the warband has all 2 it may have' });
     expect(unit('squig')).toMatchObject({ limit: '0–2', why: null });
+    // the others that hang on another unit say so as well
+    let l = core.addUnit(ctx(createWarband(data, 'lizardmen', null, 'Test')), 'skinkpriest');
+    l = core.addUnit(ctx(l), 'saurusbrave');
+    const saurus = rosterView(data, l).recruit.flatMap((g) => g.units).find((u) => u.id === 'saurusbrave')!;
+    expect(saurus).toMatchObject({ limit: '0–0', why: 'never more Saurus Braves than Skink Braves: none to recruit yet' });
   });
 
   it('shows the recruit notes of every warband as plain text, without markup', () => {
