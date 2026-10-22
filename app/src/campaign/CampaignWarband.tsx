@@ -2,6 +2,7 @@
    mechanics are open to every member (ADR 0002). Its latest state (the
    player's work since the last version included), the same cards as one's
    own roster without anything to change, and the totals frozen at its marks. */
+import { ModelsTile } from '../roster/ModelsTile.tsx';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useOnCampaign } from '../live/live.ts';
 import { Link, useParams } from 'react-router';
@@ -33,7 +34,7 @@ function Body({ id, read }: { id: string; read: Read }) {
         <dl className={board.tiles}>
           <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>
           <div className={board.tile}><dt>Rating</dt><dd>{v.rating}</dd></div>
-          <div className={board.tile}><dt>Models</dt><dd>{v.models}/{v.maxModels}</dd></div>
+          <ModelsTile models={v.models} max={v.maxModels} />
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
       </header>

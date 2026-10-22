@@ -1,6 +1,7 @@
 /* One warband, to read and to change (phase 3a). Every change is an action
    of core, saved on this device at once; the notice after it offers "Undo"
    instead of asking first (docs/ui.md §1.6). */
+import { ModelsTile } from '../roster/ModelsTile.tsx';
 import * as core from '@mordheim/core';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
@@ -252,10 +253,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         <dl className={board.tiles}>
           <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>
           <div className={board.tile}><dt>Rating</dt><dd>{v.rating}</dd></div>
-          <div className={board.tile}>
-            <dt>Models</dt>
-            <dd>{v.models}/{v.maxModels}<span className={board.meter} aria-hidden="true"><i style={{ width: `${Math.min(100, Math.round((100 * v.models) / Math.max(1, v.maxModels)))}%` }} /></span></dd>
-          </div>
+          <ModelsTile models={v.models} max={v.maxModels} />
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
         <div className={`${board.toolbar} ${shareOn ? board.toolbarShare : ''}`} role="group" aria-label="Warband actions">
