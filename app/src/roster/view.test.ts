@@ -95,19 +95,16 @@ describe('editing a roster', () => {
     expect(unit('warr').why).toBeNull();
   });
 
-  it('an Orc Mob says what its Goblin and Squig limits rest on (#46)', () => {
+  it('a limit that hangs on other units shows its current maximum and says why nothing more may join (#46)', () => {
     let s = createWarband(data, 'orcmob', null, 'Test');
     s = core.addUnit(ctx(s), 'boss');
     s = core.addUnit(ctx(s), 'goblin');
     s = core.setQty(ctx(s), s.models.find((m) => m.uid_def === 'goblin')!.uid, 2);
-    const unit = (id: string) => rosterView(data, s).recruit.flatMap((g) => g.units).find((u) => u.id === id)!;
-    expect(unit('goblin')).toMatchObject({ limit: '0–2', why: 'at most two Goblins for each Orc: the warband has all 2 it may have' });
-    expect(unit('squig')).toMatchObject({ limit: '0–2', why: null });
-    // the others that hang on another unit say so as well
-    let l = core.addUnit(ctx(createWarband(data, 'lizardmen', null, 'Test')), 'skinkpriest');
-    l = core.addUnit(ctx(l), 'saurusbrave');
-    const saurus = rosterView(data, l).recruit.flatMap((g) => g.units).find((u) => u.id === 'saurusbrave')!;
-    expect(saurus).toMatchObject({ limit: '0–0', why: 'never more Saurus Braves than Skink Braves: none to recruit yet' });
+    const unit = (w: core.WarbandState, id: string) => rosterView(data, w).recruit.flatMap((g) => g.units).find((u) => u.id === id)!;
+    expect(unit(s, 'goblin')).toMatchObject({ limit: '0–2', why: 'the warband has all 2 it may have' });
+    expect(unit(s, 'squig')).toMatchObject({ limit: '0–2', why: null });
+    const l = core.addUnit(ctx(createWarband(data, 'lizardmen', null, 'Test')), 'skinkpriest');
+    expect(unit(l, 'saurusbrave')).toMatchObject({ limit: '0–0', why: 'the units it depends on are not in the warband yet' });
   });
 
   it('shows the recruit notes of every warband as plain text, without markup', () => {

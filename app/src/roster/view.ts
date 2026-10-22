@@ -255,11 +255,7 @@ function recruitList(ctx: core.Ctx): RecruitGroup[] {
     const umx = st?.max;
     let why: string | null = null;
     if (st?.leaderGone) why = 'the leader has fallen; a surviving Hero takes command';
-    else if (umx != null && (st?.count ?? 0) >= umx) {
-      // a limit that hangs on other units says what it rests on (report #46)
-      const ratio = RATIO_WORDS[`${ctx.s.wb}/${u.id}`];
-      why = u.req ? 'the warband has its leader' : ratio ? (umx === 0 ? `${ratio}: none to recruit yet` : `${ratio}: the warband has all ${umx} it may have`) : `the warband has all ${umx} it may have`;
-    }
+    else if (umx != null && (st?.count ?? 0) >= umx) why = u.req ? 'the warband has its leader' : umx === 0 ? 'the units it depends on are not in the warband yet' : `the warband has all ${umx} it may have`;
     else if (hero && heroesFull) why = `the warband has its ${heroMaxOf(ctx)} Heroes`;
     return { id: u.id, name: u.name, count: st?.count ?? 0, limit: st?.limit ?? 'any', cost: core.unitBaseCost(ctx, u), exp: Number(u.exp) || 0, note: plainNote(u.sp), why };
   };
@@ -387,14 +383,6 @@ export function newWarbandChoice(data: GameData, key: string): NewWarbandChoice 
 
 /** A fresh roster, as the Roster Builder starts one (chooseWb, then the
     chosen subtype and the name). */
-/** What the limits that hang on other units rest on, by warband and unit. */
-const RATIO_WORDS: Record<string, string> = {
-  'orcmob/goblin': 'at most two Goblins for each Orc', 'orcmob/squig': 'never more Cave Squigs than Goblins',
-  'nightgoblins/squig': 'never more Cave Squigs than Night Goblins', 'blackorcs/shootaz': 'only as many Shootaz as Boyz',
-  'bretonnian/squire': 'no more Squires than Knights', 'lizardmen/saurusbrave': 'never more Saurus Braves than Skink Braves',
-  'pirates/swabbie': 'never more Swabbies than Crew',
-};
-
 /* The data marks rule names with <b>; the recruit list shows plain text. */
 const plainNote = (sp: string | undefined) => (sp ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
 
