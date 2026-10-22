@@ -10,9 +10,11 @@ import accountStyles from '../account/Account.module.css';
 import { accountLabel } from '../app/nav.ts';
 import { stamp } from '../account/time.ts';
 import ui from '../ui/ui.module.css';
+import { useSheet } from '../ui/useSheet.ts';
 import { shownVersion } from '../version.ts';
 import { KIND_NAMES, myReports, onReportSent, type MyBug } from './api.ts';
 import styles from './Bugs.module.css';
+import { Words } from './Words.tsx';
 
 /** The status in the reporter's words. */
 export function statusWords(b: Pick<MyBug, 'status' | 'fixedIn'>): string {
@@ -49,6 +51,9 @@ export function MyReports() {
   const session = useSession();
   const me = session.status === 'in' ? session.user.id : null;
   const { bugs, error } = useMyReports(me);
+  const { ref, open, close } = useSheet('my-report');
+  const [chosen, setChosen] = useState<MyBug | null>(null);
+  const show = (b: MyBug) => { setChosen(b); open(); };
   return (
     <section className={ui.page}>
       <h1>{accountLabel()}</h1>
@@ -60,22 +65,39 @@ export function MyReports() {
         <div className={accountStyles.tableWrap}>
           <table className={accountStyles.table} aria-label="Your reports">
             <thead>
-              <tr><th scope="col">Report</th><th scope="col">Kind</th><th scope="col">Status</th><th scope="col">Sent</th><th scope="col">Last change</th></tr>
+              <tr><th scope="col">#</th><th scope="col">Report</th><th scope="col">Kind</th><th scope="col">Status</th><th scope="col">Sent</th><th scope="col">Last change</th><th scope="col"><span className="visually-hidden">Open</span></th></tr>
             </thead>
             <tbody>
               {bugs.map((b) => (
                 <tr key={b.id}>
-                  <td data-label="Report"><strong>{b.title}</strong></td>
+                  <td data-label="#">{b.number}</td>
+                  <td data-label="Report"><strong>{b.headline || b.title}</strong></td>
                   <td data-label="Kind">{KIND_NAMES[b.kind]}</td>
                   <td data-label="Status"><span className={b.status === 'fixed' ? styles.good : undefined}>{statusWords(b)}</span></td>
                   <td data-label="Sent"><time dateTime={b.createdAt}>{stamp(b.createdAt)}</time></td>
                   <td data-label="Last change"><time dateTime={b.updatedAt}>{stamp(b.updatedAt)}</time></td>
+                  <td data-label=""><button type="button" className={ui.buttonQuiet} onClick={() => show(b)} aria-label={`Open: ${b.headline || b.title}`}>Open</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+      <dialog ref={ref} className={ui.sheet} aria-labelledby="my-report-title">
+        {chosen && (
+          <div className={ui.page}>
+            <h2 id="my-report-title">{chosen.headline || chosen.title}</h2>
+            <div className={styles.flags}>
+              <span className={styles.flag}>{KIND_NAMES[chosen.kind]}</span>
+              <span className={`${styles.flag} ${chosen.status === 'fixed' ? styles.good : ''}`}>{statusWords(chosen)}</span>
+            </div>
+            <Words text={chosen.text} fold={false} />
+            {/^https:\/\//i.test(chosen.sourceRef) && <p><a href={chosen.sourceRef} target="_blank" rel="noopener noreferrer">{chosen.sourceRef}</a></p>}
+            <small className={ui.muted}>#{chosen.number} · sent <time dateTime={chosen.createdAt}>{stamp(chosen.createdAt)}</time> · last change <time dateTime={chosen.updatedAt}>{stamp(chosen.updatedAt)}</time></small>
+            <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
+          </div>
+        )}
+      </dialog>
     </section>
   );
 }

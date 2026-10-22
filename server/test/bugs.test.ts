@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { MAX_ATTACHMENT, MAX_PER_DAY } from '../src/bugs.ts';
 import { startAccounts } from './accounts-helpers.ts';
 
-type Mine = { id: string; kind: string; title: string; text: string; sourceRef: string; status: string; fixedIn: string; createdAt: string; updatedAt: string };
+type Mine = { id: string; number?: number; headline?: string; kind: string; title: string; text: string; sourceRef: string; status: string; fixedIn: string; createdAt: string; updatedAt: string };
 type Summary = { id: string; reporterName: string; kind: string; title: string; status: string; severity: string | null; area: string; fixedIn: string; consent: boolean; attached: boolean };
 type Detail = Summary & { text: string; sourceRef: string; device: string; jsErrors: { message: string }[]; context: { screen: string; steps: unknown[] } | null; warbandId: string | null; rev: number | null; attachment: { name?: string } | null };
 
@@ -47,7 +47,7 @@ describe('problem reports', () => {
     const bug = (res.json() as { bug: Mine }).bug;
     expect(bug).toMatchObject({ id: body.id, kind: 'bug', title: 'The trading post does not open', status: 'new', fixedIn: '' });
     // what the reporter reads is their words and the status – no severity, no technical details, no copy of a warband
-    expect(Object.keys(bug).sort()).toEqual(['createdAt', 'fixedIn', 'id', 'kind', 'sourceRef', 'status', 'text', 'title', 'updatedAt']);
+    expect(Object.keys(bug).sort()).toEqual(['createdAt', 'fixedIn', 'headline', 'id', 'kind', 'number', 'sourceRef', 'status', 'text', 'title', 'updatedAt']);
     const again = await anna('POST', '/bugs', body);
     expect(again.statusCode).toBe(200);
     expect((again.json() as { bug: Mine }).bug.id).toBe(body.id);
@@ -152,7 +152,7 @@ describe('problem reports', () => {
     expect((await one(id)).severity).toBeNull();
   });
 
-  it('the admin gives a report a short headline: listed with it, read with it, never shown to the reporter, held to its limit', async () => {
+  it('the admin gives a report a short headline: listed with it, read with it, shown to the reporter in their own list (wish #43), held to its limit', async () => {
     const { send, anna, rob, one, list } = await table();
     const { body } = await send(anna);
     const id = body.id as string;
@@ -163,7 +163,7 @@ describe('problem reports', () => {
     expect((await list())[0]).toMatchObject({ headline: 'Trading post does not open', title: 'The trading post does not open' });
     expect(await one(id)).toMatchObject({ headline: 'Trading post does not open' });
     // the reporter reads what they wrote, not how the admin worded it
-    expect(((await anna('GET', '/bugs/mine')).json() as { bugs: Mine[] }).bugs[0]).not.toHaveProperty('headline');
+    expect(((await anna('GET', '/bugs/mine')).json() as { bugs: Mine[] }).bugs[0]).toMatchObject({ headline: 'Trading post does not open' });
     // a headline alone is a change; the same one again is none; it can be taken back; it has a limit
     expect((await rob('PATCH', `/bugs/${id}`, { headline: 'Trading post does not open' })).statusCode).toBe(200);
     expect((await rob('PATCH', `/bugs/${id}`, { headline: '' })).statusCode).toBe(200);
