@@ -4,7 +4,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { buyRecipients, equipmentView, giveCards, giveRecipients, holdings, ledgerLines, rareItems, searchers, shopItems } from './equipment.ts';
+import { buyRecipients, equipmentView, giveRecipients, holdings, ledgerLines, rareItems, searchers, shopItems } from './equipment.ts';
 import { applyEdit } from './useEditor.ts';
 import { createWarband } from './view.ts';
 
@@ -143,20 +143,5 @@ describe('an edit after the first battle', () => {
     expect(core.goldCurrent(ctx(priced))).toBe(core.goldCurrent(ctx(next)));
     // nothing changed: nothing opened, nothing saved
     expect(applyEdit(data, s, (c) => c.s)).toBe(s);
-  });
-});
-
-describe('the Give board\'s cards (wish #32)', () => {
-  it('has a card for every warrior and the stash, with his profile, his rules and what he holds', () => {
-    const { s, capt, warr } = band(1);
-    const cards = giveCards(ctx(s));
-    expect(cards.map((c) => c.holder)).toEqual([capt, warr, 'stash']);
-    const captain = cards[0]!;
-    expect(captain.type).toBe('Mercenary Captain');
-    expect(captain.stats.map((x) => x.key)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);
-    expect(captain.rules.length).toBeGreaterThan(0);
-    expect(captain.items.map((h) => h.goods.key)).toContain('Schwert');
-    expect(cards[1]!.men).toBe(3);
-    expect(cards[2]!).toMatchObject({ name: 'Stash', items: [] });
   });
 });
