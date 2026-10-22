@@ -74,7 +74,9 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Campaign) in die eigene Library; Orte liegen ineinander (die Zeile nennt den Weg, „In
   Ostermark › Mordheim“), Gruppen und Fraktionen nennen, woher sie kommen („From …“), und die
   Auswahl „Place“ nimmt, was in einem Ort liegt, mit (ADR 0024) – ein Name, der dort schon steht, wird nicht noch
-  einmal angeboten. **NPCs** (Name englisch und deutsch, Fraktion als Name, Status,
+  einmal angeboten. Beim Kopieren geht der Weg in den Text mit („Place: Old World › The Empire ›
+  Ostermark“ bei einem Ort, „Comes from: …“ bei einer Gruppe oder Fraktion; Rob, 22.10.2026). Orte und
+  Gruppen, die mordheimer.net auslässt, stammen aus dem Warhammer Fantasy Wiki auf Fandom (je mit Quelle). **NPCs** (Name englisch und deutsch, Fraktion als Name, Status,
   „Named“ und die Werte wie in der World, nur ohne Kampagne: keine eigenen Fertigkeiten
   der Kampagne, keine Krieger zum Kopieren) und **Groups** (Gegnergruppen: Name,
   Note, Profile wie im Background → Opponents, ebenfalls ohne Kampagne) und

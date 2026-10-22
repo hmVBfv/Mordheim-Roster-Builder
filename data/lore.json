@@ -1,5 +1,5 @@
 {
-  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Warhammer world, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026 and 22.10.2026) – never copied. Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group. Places nest (parent), factions and groups come from places (regions); ADR 0024.",
+  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Warhammer world, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026 and 22.10.2026) and, for places and groups mordheimer.net leaves out, from the Warhammer Fantasy Wiki on Fandom (read through its API, 22.10.2026) – never copied. Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group. Places nest (parent), factions and groups come from places (regions); ADR 0024.",
   "SOURCES": {
     "flames": { "title": "The Empire in Flames", "url": "https://mordheimer.net/docs/introduction/the-empire-in-flames" },
     "city": { "title": "The City of the Damned", "url": "https://mordheimer.net/docs/introduction/the-city-of-the-damned" },
@@ -113,7 +113,53 @@
     "strigos": { "title": "Survivors of Strigos", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos" },
     "graverobbers": { "title": "Grave Robbers", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers" },
     "vhunters": { "title": "Vampire Hunters of Sylvania", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania" },
-    "mercs": { "title": "Mercenaries", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries" }
+    "mercs": { "title": "Mercenaries", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries" },
+    "fd-badlands": { "title": "Badlands (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Badlands" },
+    "fd-troll-country": { "title": "Troll Country (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Troll_Country" },
+    "fd-nordland": { "title": "Nordland (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Nordland" },
+    "fd-wissenland": { "title": "Wissenland (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Wissenland" },
+    "fd-ind": { "title": "Ind (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Ind" },
+    "fd-southlands": { "title": "Southlands (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Southlands" },
+    "fd-ogre-kingdoms": { "title": "Ogre Kingdoms (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Ogre_Kingdoms" },
+    "fd-solland": { "title": "Solland (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Solland" },
+    "fd-estalia": { "title": "Estalia (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Estalia" },
+    "fd-sartosa": { "title": "Sartosa (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Sartosa" },
+    "fd-luccini": { "title": "Luccini (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Luccini" },
+    "fd-pavona": { "title": "Pavona (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Pavona" },
+    "fd-verezzo": { "title": "Verezzo (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Verezzo" },
+    "fd-karaz-a-karak": { "title": "Karaz-a-Karak (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Karaz-a-Karak" },
+    "fd-barak-varr": { "title": "Barak Varr (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Barak_Varr" },
+    "fd-erengrad": { "title": "Erengrad (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Erengrad" },
+    "fd-praag": { "title": "Praag (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Praag" },
+    "fd-carroburg": { "title": "Carroburg (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Carroburg" },
+    "fd-salzenmund": { "title": "Salzenmund (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Salzenmund" },
+    "fd-kemperbad": { "title": "Kemperbad (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Kemperbad" },
+    "fd-laurelorn-forest": { "title": "Laurelorn Forest (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Laurelorn_Forest" },
+    "fd-sea-of-claws": { "title": "Sea of Claws (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Sea_of_Claws" },
+    "fd-zlatlan": { "title": "Zlatlan (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Zlatlan" },
+    "fd-naggarond": { "title": "Naggarond (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Naggarond" },
+    "fd-hag-graef": { "title": "Hag Graef (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Hag_Graef" },
+    "fd-har-ganeth": { "title": "Har Ganeth (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Har_Ganeth" },
+    "fd-blighted-marshes": { "title": "Blighted Marshes (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Blighted_Marshes" },
+    "fd-skavenblight": { "title": "Skavenblight (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Skavenblight" },
+    "fd-knights-panther": { "title": "Knights Panther (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Knights_Panther" },
+    "fd-reiksguard": { "title": "Grand Order of the Reiksguard (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Grand_Order_of_the_Reiksguard" },
+    "fd-blazing-sun": { "title": "Knights of the Blazing Sun (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Knights_of_the_Blazing_Sun" },
+    "fd-templar-wh": { "title": "Templar Witch Hunter (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Templar_Witch_Hunter" },
+    "fd-cult-sigmar": { "title": "Cult of Sigmar (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Sigmar" },
+    "fd-cult-ulric": { "title": "Cult of Ulric (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Ulric" },
+    "fd-cult-myrmidia": { "title": "Cult of Myrmidia (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Myrmidia" },
+    "fd-cult-manann": { "title": "Cult of Manann (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Manann" },
+    "fd-cult-taal": { "title": "Cult of Taal and Rhya (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Taal_and_Rhya" },
+    "fd-cult-ranald": { "title": "Cult of Ranald (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Ranald" },
+    "fd-cult-morr": { "title": "Cult of Morr (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Morr" },
+    "fd-cult-khaine": { "title": "Cult of Khaine (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Khaine" },
+    "fd-eonir": { "title": "Eonir (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Eonir" },
+    "fd-hobgoblins": { "title": "Hobgoblins (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Hobgoblins" },
+    "fd-ice-witch": { "title": "Ice Witch (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Ice_Witch" },
+    "fd-skaven": { "title": "Skaven (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Skaven" },
+    "fd-fimir": { "title": "Fimir (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Fimir" },
+    "fd-karaz-ankor": { "title": "Karaz Ankor (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Karaz_Ankor" }
   },
   "LORE": [
     {
@@ -207,7 +253,7 @@
       "text": "The leader of the Temple of Sigmar, whose temples stand in every town. He refused to crown Lady Magritta and is said to covet the crown himself. He preaches a holy crusade against mutants and sorcerers, and has sent the Witch Hunters into Mordheim, officially to cleanse it, but, it is said, also to gather wyrdstone for his own ends. Since the city fell, thousands have gathered at the holy places and penitents roam the roads."
     },
     {
-      "id": "witch-hunters", "kind": "group", "name": "The Witch Hunters", "de": "Die Hexenjäger", "source": ["city", "bands"],
+      "id": "witch-hunters", "kind": "group", "name": "The Witch Hunters", "de": "Die Hexenjäger", "source": ["city", "bands"], "regions": ["the-empire"],
       "status": "Templars of Sigmar who persecute heretics",
       "text": "The Order of Templars, called Witch Hunters by those who fear and hate them and by themselves, who take pride in persecuting heretics. They came to Mordheim with carts of cages, braziers and irons. They trust no one, curse the Sisters of Sigmar as heretics for their creed that denies women divinity in Sigmar's temple, and are ancient enemies of the Sisterhood."
     },
@@ -287,7 +333,7 @@
       "text": "Reikland's greatest city, built on a mud-flat island where the Talabec meets the Reik, among marshes and shifting channels. It is home to the Grand Theogonist and the Temple of Sigmar and hosts the College of Magic."
     },
     {
-      "id": "nuln", "kind": "region", "name": "Nuln", "de": "Nuln", "source": ["wbnuln", "eifset"], "parent": "the-empire",
+      "id": "nuln", "kind": "region", "name": "Nuln", "de": "Nuln", "source": ["wbnuln", "eifset"], "parent": "wissenland",
       "status": "River city with the Imperial Gunnery School",
       "text": "A great city on the Reik, where the Aver and the Upper Reik join. Its last bridge is a wonder with a liftable wooden centre. It is respected for the best handguns and war machines outside the dwarf holds and trains the Empire's gunners."
     },
@@ -592,7 +638,7 @@
       "text": "A sorcerer named Hashutsep in Zharr-Naggrund, hunting rivals to keep his powers, learned of Mordheim's fall. Seeing a city with no law and no defence against raids, he sent his best apprentices rather than a full invasion, to avoid his rivals' notice. Their aim is slaves, loot, and above all sorcerer's stone."
     },
     {
-      "id": "kislevite-bands", "kind": "group", "name": "Kislevites", "de": "Kislev-Banden", "source": ["kislev"], "regions": ["kislev"],
+      "id": "kislevite-bands", "kind": "group", "name": "Kislevites", "de": "Kislev-Banden", "source": ["kislev"], "regions": ["kislev", "troll-country"],
       "status": "Brave northerners who hate Chaos and fight it without mercy",
       "text": "Kislev lies on the border of the Chaos Wastes, so every incursion passes through it first, and most Kislevites have lost homes or kin to Chaos. They are quiet with strangers but loud and merry among their own, and unforgiving toward any sign of Chaos worship. Close ties with the Empire send troops both ways."
     },
@@ -722,7 +768,7 @@
       "text": "Merchants, guarded by sell-swords, gamble on the long trip east to Ind and Cathay through the Dark Lands and the Mountains of Mourn. Only one in ten succeeds, but a single venture can make a fortune, so many go again. The Silk Road was opened by the Tilean brothers Ricco and Robbio, and attracts Arabyan traders and Marienburg racketeers."
     },
     {
-      "id": "maneater-ogres", "kind": "group", "name": "Maneaters", "de": "Menschenfresser", "source": ["maneaters"], "regions": ["mountains-of-mourn"],
+      "id": "maneater-ogres", "kind": "group", "name": "Maneaters", "de": "Menschenfresser", "source": ["maneaters"], "regions": ["mountains-of-mourn", "ogre-kingdoms"],
       "status": "Ogre mercenaries who guard caravans and sometimes raid them",
       "text": "Ogres move in herds in tribes across the Mountains of Mourn, and wander abroad to hire out as muscle. Some raid merchants on the Ivory Road instead, and others agree to escort a merchant's caravan over long dangerous routes. A few such retinues reach Mordheim."
     },
@@ -747,7 +793,7 @@
       "text": "A prophetess, called the Mare witch by some, claims descent from heroes of Gilles le Breton and restores honour to shunned knights, who swear loyalty to her as Paragons. She sends them to Mordheim for wyrdstone, joined by the Dames of the Mare, who have strange powers. Squires are raised early to knighthood and replaced by girls who join the Dames."
     },
     {
-      "id": "imperial-gunnery-school-of-nuln", "kind": "group", "name": "Imperial Gunnery School", "de": "Kaiserliche Geschützschule", "source": ["gunnery"], "regions": ["nuln"],
+      "id": "imperial-gunnery-school-of-nuln", "kind": "group", "name": "Imperial Gunnery School", "de": "Kaiserliche Geschützschule", "source": ["gunnery"], "regions": ["nuln", "wissenland"],
       "status": "Noble-born artillerists trained in Nuln",
       "text": "Nuln is known for handguns and war machines, and its Gunnery School trains gunners to use weapons invented by the Colleges of Engineering. Most students are younger noble sons with a talent for mathematics, who may stay to become Master Gunners. Every student does fieldwork, travelling anywhere under a Senior Gunnery Officer and an instructor, always well equipped."
     },
@@ -860,6 +906,246 @@
       "id": "roadwardens-of-the-empire", "kind": "group", "name": "Roadwardens", "de": "Straßenwächter", "source": ["eifwilds"], "regions": ["the-empire"],
       "status": "Marshals who patrol the Empire's roads from coaching inns",
       "text": "Roadwardens are tireless marshals who patrol the roads against bandits and highwaymen and report trouble. They use the stout coaching inns as bases, and those inns become centres of defence in times of unrest."
+    },
+    {
+      "id": "badlands", "kind": "region", "name": "The Badlands", "de": "Die Ödlande", "source": ["fd-badlands"], "parent": "old-world",
+      "status": "Barren waste between the Worlds Edge Mountains and the Black Gulf",
+      "text": "A dry, rocky waste in the far south of the Old World, with weird rock spires and haunted ruins of the old Strigos empire. It holds more greenskin tribes than anywhere outside the Dark Lands, and ogres roam its south. Ghouls, carrion birds and Chaos hounds hunt on the plain. No traveller crosses it safely, whatever the escort. Dwarfs come here to look for a rumoured tunnel to the brightstone mines."
+    },
+    {
+      "id": "troll-country", "kind": "region", "name": "Troll Country", "de": "Trollland", "source": ["fd-troll-country"], "parent": "kislev",
+      "status": "Bleak steppe and tundra in northern Kislev",
+      "text": "The northernmost reach of Kislev, flat steppe that thins into tundra beneath the mountains at the edge of the Chaos Wastes. Nothing can be farmed and settlements are rare. Winter snow closes the paths, which also stops raiders. Nomad herders of several peoples live here, and beastmen and spirits roam too, but trolls rule the land: stone and river trolls in the south, mutated Chaos trolls farther north."
+    },
+    {
+      "id": "nordland", "kind": "region", "name": "Nordland", "de": "Nordland", "source": ["fd-nordland"], "parent": "the-empire",
+      "status": "Imperial province on the north-western coast",
+      "text": "An electoral province of the Empire on its north-western shore, home of the Imperial Navy's Second Fleet. It joined the Empire late, after its Jutone people had refused Sigmar's offer. Tolled coast roads feed its government, and sea fortresses and watchtowers face the Norscan raiders who cross the Sea of Claws. Raid and counter-raid are part of its way of life. Salzenmund is its capital."
+    },
+    {
+      "id": "wissenland", "kind": "region", "name": "Wissenland", "de": "Wissenland", "source": ["fd-wissenland"], "parent": "the-empire",
+      "status": "Southern province, the Empire's armoury",
+      "text": "A founding electoral province in the south of the Empire, known as its armoury because it holds Nuln, the largest industrial city of the Old World, whose workshops turn out the realm's best black-powder weapons. After Solland was ruined in the Orc invasion of the early eighteenth century of the Imperial calendar, its lands passed to Wissenland, which still bears Solland's flag on its own banners in memory."
+    },
+    {
+      "id": "ind", "kind": "region", "name": "Ind", "de": "Ind", "source": ["fd-ind"], "parent": "cathay-and-the-east",
+      "status": "The Land of a Thousand Gods, a rich peninsula in the Far East",
+      "text": "A great peninsula in the Far East, south of the Mountains of Mourn and south-west of Cathay. It is the nearest of the three human lands of the East to the Old World and draws spice merchants, though many never return. Wealthy lords live in grand palaces, the golden temples are many and the people honour a bewildering host of gods. Strange customs can anger locals, and bestial creatures and bloodthirsty cults wait along the way."
+    },
+    {
+      "id": "southlands", "kind": "region", "name": "The Southlands", "de": "Die Südlande", "source": ["fd-southlands"],
+      "status": "The Dark Continent far south of the Old World",
+      "text": "A mostly tropical continent far south beyond Araby and the Land of the Dead. Its north is desert studded with empty tomb-cities, its south untouched jungle and swamp. Legend says it was once joined to Lustria before the Old Ones remade the continents. The hidden Lizardmen city of Zlatlan lies here, High Elves keep an outpost on its southern tip, and few explorers return from the interior."
+    },
+    {
+      "id": "ogre-kingdoms", "kind": "region", "name": "The Ogre Kingdoms", "de": "Die Ogerreiche", "source": ["fd-ogre-kingdoms"], "parent": "cathay-and-the-east",
+      "status": "The homeland of the ogres in the Mountains of Mourn",
+      "text": "The scattered tribal realms on the slopes and valleys of the Mountains of Mourn, which every ogre calls home however far he wanders. Tyrants rule rival kingdoms there, warring and extorting tribute to feed the hunger of their god, the Great Maw. Ogre bands hire out as thugs and mercenaries across the world for gold and meat. They also broke the realm of the Skytitans and once held land on the Eastern Steppes."
+    },
+    {
+      "id": "solland", "kind": "region", "name": "Solland", "de": "Solland", "source": ["fd-solland"], "parent": "the-empire",
+      "status": "Ruined province, now part of Wissenland",
+      "text": "Once a southern province of the Empire, home of the Menogoth tribe whose sun emblem its nobles kept. An Orc Waaagh! under Gorbad Ironclaw wrecked it and killed its Elector Count in the early eighteenth century of the Imperial calendar. It later returned as the Barony of Sudenland, but was folded into Wissenland after the crisis of 2512. The River Sol was its border with Wissenland."
+    },
+    {
+      "id": "estalia", "kind": "region", "name": "Estalia", "de": "Estalia", "source": ["fd-estalia"], "parent": "old-world",
+      "status": "Peninsula of rival kingdoms in the south-west Old World",
+      "text": "A warm peninsula south of Bretonnia and south-west of the Empire, split among old rival kingdoms and proud cities, the chief ones being Bilbali in the north and Magritta in the south. Estalians are known for friendly merchants and skilful duellists. Their ruling families are bound by centuries of marriage, murder and betrayal. Orcs and beastmen come out of the Irrana Mountains, and undead land from the sea."
+    },
+    {
+      "id": "sartosa", "kind": "region", "name": "Sartosa", "de": "Sartosa", "source": ["fd-sartosa"], "parent": "old-world",
+      "status": "Anarchic pirate island south of Tilea",
+      "text": "A walled island city off the Tilean coast near Luccini, run by pirates and a haven for outlaws, brigands and mercenaries. Press-gangs, duels and thieves fill the docks. A deadly current guards its northern shore, and only pirates know the way through the shifting Skull Sands to the south, a secret whose betrayal is punished horribly. Wrecked ships there count as free salvage under pirate law."
+    },
+    {
+      "id": "luccini", "kind": "region", "name": "Luccini", "de": "Luccini", "source": ["fd-luccini"], "parent": "tilea",
+      "status": "Tilean city-state, boasting itself the oldest",
+      "text": "A Tilean principality that claims to be the country's oldest city, built on an Elf-made acropolis by the twin rulers Lucan and Luccina, whom its people treat as divine. Luccini is a strong sea power with a large galley fleet, kept up against the pirates of nearby Sartosa. Its army is reckoned among the best in Tilea, and many mercenaries have trained here."
+    },
+    {
+      "id": "pavona", "kind": "region", "name": "Pavona", "de": "Pavona", "source": ["fd-pavona"], "parent": "tilea",
+      "status": "Landlocked city-state in the middle of Tilea",
+      "text": "A prosperous principality at the heart of Tilea on the plains between the River Remo and the Apuccini Mountains, with a mild climate but no coast. It rose to rival Trantio for the eastern trade with the Dwarfs, the Border Princes and the Silk Road, and the contested land between them became a hunting ground for mercenary captains. The ruling families made many short-lived marriage pacts."
+    },
+    {
+      "id": "verezzo", "kind": "region", "name": "Verezzo", "de": "Verezzo", "source": ["fd-verezzo"], "parent": "tilea",
+      "status": "Wealthy republic in the Tilean heartland",
+      "text": "A rich republic in the centre of the Tilean peninsula, without a sea outlet and overshadowed by Remas and Luccini. Its story includes the Silk Road venture of 1699, when the merchant brothers Ricco and Robbio bought a Dragon-marked silk banner from Dwarfs in Karaz-a-Karak and wondered whether it showed an eastern way to Ulthuan. An earlier journey east by the explorer Marco Polare had been forgotten."
+    },
+    {
+      "id": "karaz-a-karak", "kind": "region", "name": "Karaz-a-Karak", "de": "Karaz-a-Karak", "source": ["fd-karaz-a-karak"], "parent": "worlds-edge-mountains",
+      "status": "Everpeak, capital hold of the Dwarf High King",
+      "text": "The greatest and most populous of the Dwarf holds, hidden behind a winding pass in the Worlds Edge Mountains. The High King holds court in a hall vast enough to swallow a human town, and the city keeps the Great Book of Grudges, the Book of Remembering and enormous hoards of treasure. It has withstood countless attacks without ever falling. Even far-off Dwarfs speak of it with fierce pride."
+    },
+    {
+      "id": "barak-varr", "kind": "region", "name": "Barak Varr", "de": "Barak Varr", "source": ["fd-barak-varr", "fd-badlands"], "parent": "badlands",
+      "status": "Gate to the Sea, the Dwarfs' harbour hold",
+      "text": "The only Dwarf hold built as a port. From the clifftop it looks like ships will smash into the stone, but the tides of the Black Gulf have cut sea caves into the white rock where the Dwarf trading fleet is moored. The hold was founded at the mouth of the Blood and Skull rivers, and its fleet shows that a folk of miners can take to the sea, as outsiders find hard to believe."
+    },
+    {
+      "id": "erengrad", "kind": "region", "name": "Erengrad", "de": "Erengrad", "source": ["fd-erengrad"], "parent": "kislev",
+      "status": "Kislev's main trading port on the Sea of Claws",
+      "text": "Kislev's biggest and busiest port at the mouth of the River Lynsk, second in the north only to Marienburg. It began as the walled Ungol town of Norvard, which the Gospodar armies overran. Ships from the Old World, the New World and even Norsca bring goods, slaves and gems. Kislev has no fleet, so Imperial warships and armed private vessels protect the waters, and the port is ringed with cannon, walls and sunken mines."
+    },
+    {
+      "id": "praag", "kind": "region", "name": "Praag", "de": "Praag", "source": ["fd-praag"], "parent": "kislev",
+      "status": "The Cursed City, bastion of northern Kislev",
+      "text": "The largest and best fortified city in the north of Kislev, rebuilt again and again by stubborn, mostly Ungol townsfolk after each assault by Norscans and other Chaos forces. Constant contact with Chaos has brought mutation, madness and decay to the streets, yet the people refuse to leave. Rumour says something hidden in the city is why the powers of Chaos keep returning."
+    },
+    {
+      "id": "carroburg", "kind": "region", "name": "Carroburg", "de": "Carroburg", "source": ["fd-carroburg"], "parent": "middenland",
+      "status": "Glassmaking city on the Reik, in Middenland",
+      "text": "A smaller Imperial city on the steep east bank of the River Reik, once seat of the Teutogen kings and capital of the old Drakwald province, later part of Middenland. It makes glass and pottery and lives from trade. The streets are a maze of stairs and winding lanes, and the richer a district, the higher up the hill it stands, which keeps the dockside boot cleaners busy."
+    },
+    {
+      "id": "salzenmund", "kind": "region", "name": "Salzenmund", "de": "Salzenmund", "source": ["fd-salzenmund"], "parent": "nordland",
+      "status": "Capital of Nordland on the River Salz",
+      "text": "The capital of Nordland, among hills where the tributaries of the River Salz meet, once a gathering place of the western Jutone people. Elector Counts built castles on the hilltops, among them the Jutone's Nest, whose keep needs no outer wall. It faces west to watch the Elves of Laurelorn. Its fairs and timber from the forest bring in trade, though business on the roads to Erengrad and Middenheim has lately dwindled."
+    },
+    {
+      "id": "kemperbad", "kind": "region", "name": "Kemperbad", "de": "Kemperbad", "source": ["fd-kemperbad"], "parent": "reikland",
+      "status": "Free town on the east bank of the Reik, known for brandy",
+      "text": "An old Imperial town in Reikland, famed for fine brandy. It is the only Reikland holding on the east bank of the Reik apart from Castle Reikguard. Reikland, Stirland and Talabecland nobles each ruled it by turns, until Emperor Boris Goldgather granted it a charter in 1066. A Council of Thirteen, with merchants and the temples of Sigmar and Shallya, has governed it as a free city since."
+    },
+    {
+      "id": "laurelorn-forest", "kind": "region", "name": "Laurelorn Forest", "de": "Der Laurelorn-Wald", "source": ["fd-laurelorn-forest"], "parent": "old-world",
+      "status": "Magical forest of the Eonir on the northern Imperial coast",
+      "text": "A magical forest on the northern coast of the Empire, west of Salzenmund and reaching to the border with the Wasteland. Middenland and Nordland both claim it, but its Eonir wood elves dare either to enforce the claim. They are an older, more open people than their kin in Athel Loren and keep traces of the first Ulthuani colonies. They are said to sympathise somewhat with the Dark Elves as outcasts."
+    },
+    {
+      "id": "sea-of-claws", "kind": "region", "name": "The Sea of Claws", "de": "Das Klauenmeer", "source": ["fd-sea-of-claws"], "parent": "old-world",
+      "status": "Cold, pirate-ridden sea between the northern Empire and Norsca",
+      "text": "A bitterly cold and rough part of the Great Ocean that divides the northern Empire from Norsca, notorious for piracy. Ships still cross it in numbers from Marienburg and other northern ports, bound for Norsca or farther afield. The Dragon's Maw, a jagged line of rocky islets off northern Bretonnia, has broken many ships."
+    },
+    {
+      "id": "zlatlan", "kind": "region", "name": "Zlatlan", "de": "Zlatlan", "source": ["fd-zlatlan"], "parent": "southlands",
+      "status": "The Hidden City of the Lizardmen in the Southlands",
+      "text": "The greatest Lizardmen temple-city of the Southlands and one of the few still inhabited. Its Slann mage-priests lost their link to those of Lustria, because the telepathic line across the jungle pyramids cannot cross the ocean, so they work in isolation. Their calculations of the Old Ones' plans can drift out of step with Lustria's. The city is said to date from before the Old Ones split the continents."
+    },
+    {
+      "id": "naggarond", "kind": "region", "name": "Naggarond", "de": "Naggarond", "source": ["fd-naggarond"], "parent": "naggaroth",
+      "status": "The Tower of Cold, the Witch King's city",
+      "text": "The oldest and largest city of the Dark Elves, ringed by black walls and a hundred towers at the foot of the Iron Mountains, and the seat of the Witch King Malekith. Heads and limbs rot on spikes outside as warnings. Inside lie mansions, barracks, slave pits and temples, where followers of Khaine cut out the hearts of living victims, so that murder seems to hang in the air."
+    },
+    {
+      "id": "hag-graef", "kind": "region", "name": "Hag Graef", "de": "Hag Graef", "source": ["fd-hag-graef"], "parent": "naggaroth",
+      "status": "City of Shadows, second city of Naggaroth",
+      "text": "A gloomy Dark Elf city at the bottom of a deep canyon, where sunlight never reaches the walls. Eight black towers rise from the canyon floor, linked by bridges and platforms of wood, bone, stone and spider silk, with whole districts on the larger platforms. Its mines hold veins of warpstone that animate the dead to labour. Hag Graef has grown so rich that it rivals Naggarond in power."
+    },
+    {
+      "id": "har-ganeth", "kind": "region", "name": "Har Ganeth", "de": "Har Ganeth", "source": ["fd-har-ganeth"], "parent": "naggaroth",
+      "status": "City of Executioners, fortress of the Khaine cult",
+      "text": "A cursed Dark Elf fortress-city in the north of Naggaroth, devoted to Khaine, the elven god of murder. It was founded by exiles from Nagarythe after the Sundering and became the bloody centre of the Cult of Khaine, ruled by its Hag Queens. It is also known as the City of Executioners and the Fortress of Ice."
+    },
+    {
+      "id": "blighted-marshes", "kind": "region", "name": "The Blighted Marshes", "de": "Die Verseuchten Sümpfe", "source": ["fd-blighted-marshes"], "parent": "tilea",
+      "status": "Rotten swamp in north-west Tilea, hiding the Skaven capital",
+      "text": "A fen in the Tilean principality of Tobaro, running between the River Trino and the Abasko Mountains. Locals also call it the Zombie Marshes. The Skaven keep their buried capital, Skavenblight, far in its depths."
+    },
+    {
+      "id": "skavenblight", "kind": "region", "name": "Skavenblight", "de": "Skavenblight", "source": ["fd-skavenblight"], "parent": "blighted-marshes",
+      "status": "The hidden Great City of the Skaven",
+      "text": "The secret underground capital of the Skaven Under-Empire and birthplace of their race, half sunk in the rotten heart of the Blighted Marshes. It is the largest city in the world, a sprawl of caverns and tunnels on an unimaginable scale, kept hidden by powerful magic. The Lords of Decay rule from here, and the clans trade here, which draws every sort of thief and renegade."
+    },
+    {
+      "id": "knights-panther", "kind": "group", "name": "Knights Panther", "de": "Die Pantherritter", "source": ["fd-knights-panther"], "regions": ["the-empire"],
+      "status": "Famed knightly order of the Empire, born in the Araby crusades",
+      "text": "A secular order of Imperial knights who hunt mutants and Chaos worshippers and defend the realm. It is among the three largest orders and the best known. It began in the Great Crusade against Araby, when knights pursuing the Sultan's remnants into the Atalan Mountains killed great wild cats and wore their pelts as cloaks. They brought living panthers home, and the Elector Counts recognised the order despite religious cults wanting only their own templars."
+    },
+    {
+      "id": "reiksguard", "kind": "group", "name": "Reiksguard", "de": "Die Reiksgarde", "source": ["fd-reiksguard"], "regions": ["reikland"],
+      "status": "Elite knights sworn to guard the Emperor",
+      "text": "A secular order of heavy cavalry and infantry, first raised under Count Wilhelm III of Reikland to protect his line, now the core of the Emperor's household guard. Its knights swear to give their lives for the Emperor, whom they see as the living form of Sigmar. The Emperor may lend a unit to another Elector Count's army, as support or to keep an eye on an unsteady noble."
+    },
+    {
+      "id": "knights-of-the-blazing-sun", "kind": "group", "name": "Knights of the Blazing Sun", "de": "Ritter der Blendenden Sonne", "source": ["fd-blazing-sun"], "regions": ["the-empire", "tilea", "estalia"],
+      "status": "Small elite order of Myrmidia's templars",
+      "text": "A wealthy, small knightly order devoted to the war goddess Myrmidia, which prizes skill and record over noble birth and studies the craft of war. Its knights roam the Old World for battles. The order traces itself to the Great Crusade against Araby and rode early to join Magnus the Pious against Chaos. In recent centuries it has spread out from Tilea and Estalia."
+    },
+    {
+      "id": "order-of-the-silver-hammer", "kind": "group", "name": "Order of the Silver Hammer", "de": "Orden des Silbernen Hammers", "source": ["fd-templar-wh"], "regions": ["the-empire"],
+      "status": "Sigmarite witch hunters with the Grand Theogonist's commission",
+      "text": "The state-sanctioned witch hunters of the Cult of Sigmar, feared by guilty and innocent alike. The Order of the Silver Hammer was formed by Grand Theogonist Siebold II, in a time of weak government, from warrior priests and investigators set on finding agents of Chaos. Each carried a letter under the Grand Theogonist's seal that opened any door."
+    },
+    {
+      "id": "cult-of-sigmar", "kind": "group", "name": "Cult of Sigmar", "de": "Kult des Sigmar", "source": ["fd-cult-sigmar"], "regions": ["the-empire"],
+      "status": "The Empire's state church",
+      "text": "The state church of the Empire, honouring its patron god Sigmar. It was founded in 73 of the Imperial calendar by the friar Johann Helstrum, who told of a vision of Sigmar crowned a god, and became its first Grand Theogonist. It grew into one of the most powerful forces in the realm, and Sigmar has partly replaced Ulric as the Empire's god of war."
+    },
+    {
+      "id": "cult-of-ulric", "kind": "group", "name": "Cult of Ulric", "de": "Kult des Ulric", "source": ["fd-cult-ulric"], "regions": ["middenheim", "middenland", "nordland", "ostland", "norsca"],
+      "status": "The cult of the god of war, winter and wolves",
+      "text": "An ancient religion that is second only to the Cult of Sigmar, older than the Empire. Ulric is the fiercest of the Old World gods and is honoured mainly in the northern provinces and in Norsca. Its heart is Middenheim, where a great temple was built round a silver-white flame that never goes out. The cult holds white wolves sacred, and devotees wear long hair and rough beards like their god."
+    },
+    {
+      "id": "cult-of-myrmidia", "kind": "group", "name": "Cult of Myrmidia", "de": "Kult der Myrmidia", "source": ["fd-cult-myrmidia"], "regions": ["tilea", "estalia"],
+      "status": "Cult of the goddess of war and strategy",
+      "text": "The religion of Myrmidia, goddess of war, strategy, honour and culture, favoured mostly by the southern lands. Her statues stand on nearly every street corner of Tilean and Estalian cities, and her name is called on against illness and beastmen alike. Soldiers pray to her before battle, and townsfolk and peasants for courage in the dark."
+    },
+    {
+      "id": "cult-of-manann", "kind": "group", "name": "Cult of Manann", "de": "Kult des Manann", "source": ["fd-cult-manann"], "regions": ["marienburg", "nordland"],
+      "status": "Cult of the sea god, strong on the western coast",
+      "text": "The religion of Manann, god of the sea and tides, most active along the western edge of the Empire where the Sea of Claws meets the rivers. It is strongest in Marienburg and important in Nordland. Its priests are sought as navigators and pilots, and a priest aboard is good luck. In Bretonnia it is a peasant faith, and in Tilea the god is called Mathann."
+    },
+    {
+      "id": "cult-of-taal-and-rhya", "kind": "group", "name": "Cult of Taal and Rhya", "de": "Kult von Taal und Rhya", "source": ["fd-cult-taal"], "regions": ["talabecland"],
+      "status": "Old nature cult of the wild and the harvest",
+      "text": "One of the oldest cults, descended from a single nature god Ishernos that split into Taal and Rhya. Taal rules wild places and animals and is followed by woodsmen, trackers and rangers. Rhya, of farming, fertility and love, is followed by farmers and orchard folk. The cult is the sanctioned religion of Talabecland."
+    },
+    {
+      "id": "cult-of-ranald", "kind": "group", "name": "Cult of Ranald", "de": "Kult des Ranald", "source": ["fd-cult-ranald"], "regions": ["old-world"],
+      "status": "Loose cult of thieves, gamblers and tricksters",
+      "text": "The cult of Ranald, god of luck, thieves and tricksters, has no grand temples or structure, only priests who are thieves, gamblers and charlatans in taverns, gaming halls and brothels. Ranald is the Night Prowler of rogues, the Deceiver of charlatans and the patron of gaming and luck. His sayings underlie the Thieves Tongue, and agitators for democracy also invoke him. Its origin is unknown."
+    },
+    {
+      "id": "cult-of-morr", "kind": "group", "name": "Cult of Morr", "de": "Kult des Morr", "source": ["fd-cult-morr"], "regions": ["the-empire", "tilea", "estalia"],
+      "status": "Cult of the god of death and dreams",
+      "text": "The religion of Morr, god of the dead, dreams and prophecy, followed widely across the Old World, above all in Tilea, Estalia and the Empire, but little in Bretonnia or Kislev. Most folk pray to him only for dreams, and he seldom tells what he knows. His faith helps people live with the constant presence of death."
+    },
+    {
+      "id": "cult-of-khaine", "kind": "group", "name": "Cult of Khaine", "de": "Kult des Khaine", "source": ["fd-cult-khaine"], "regions": ["naggaroth", "har-ganeth"],
+      "status": "Murder cult at the heart of Dark Elf society",
+      "text": "The main religion of the Dark Elves of Naggaroth, devoted to Khaine, elven god of murder and war. It started in Ulthuan as one of several excess cults and rose above the rest in Naggaroth, with the city of Har Ganeth as its centre. Hag Queens lead it, Hellebron foremost among them, and its sacrifices are public spectacles."
+    },
+    {
+      "id": "eonir-of-laurelorn", "kind": "group", "name": "Eonir of Laurelorn", "de": "Die Eonir von Laurelorn", "source": ["fd-eonir"], "regions": ["laurelorn-forest"],
+      "status": "Independent wood elves of the northern coast",
+      "text": "A separate enclave of wood elves in Laurelorn Forest, kin to the Asrai of Athel Loren but much less secretive, with peaceful if sometimes strained dealings with the Empire. Their realm began as an Ulthuani colony, long before the War of the Beard, and grew around the settlements of Tor Lithanel and Kor Immarmor."
+    },
+    {
+      "id": "hobgoblin-khanates", "kind": "group", "name": "Hobgoblin Khanates", "de": "Die Hobgoblin-Khanate", "source": ["fd-hobgoblins"], "regions": ["eastern-steppes"],
+      "status": "Steppe goblins under Chaos Dwarf patronage",
+      "text": "A sub-species of goblin found only in the Far East, on the Eastern Steppes, ruled by the Hobgobla-Khan and his empire. Other greenskins despise them for betraying the goblin slave revolt in Zharr-Naggrund, and they depend on the protection of the Chaos Dwarfs. They are cruel, filthy and treacherous even to each other and have long warred on Cathay."
+    },
+    {
+      "id": "ice-witches-of-kislev", "kind": "group", "name": "Ice Witches of Kislev", "de": "Eishexen von Kislev", "source": ["fd-ice-witch"], "regions": ["kislev"],
+      "status": "Sisterhood of cold-wielding wizards serving the Tzarina",
+      "text": "A women-only sisterhood of wizards in Kislev who command ice and tempest magic and grow stronger in winter. The Tzarina Katarin is the most famous and powerful, and the sisters back her in politics. They stay aloof from common people. The Ice Court officially accepts only young noble Gospodar women, though exceptions are common."
+    },
+    {
+      "id": "skaven-under-empire", "kind": "group", "name": "Skaven Under-Empire", "de": "Das Skaven-Unterimperium", "source": ["fd-skaven"], "regions": ["blighted-marshes", "skavenblight"],
+      "status": "Ratmen with a hidden empire beneath the world",
+      "text": "The Skaven are intelligent, treacherous rat-like folk numerous enough to threaten Men, living in a huge underground empire that spans the continents. Its capital and the likely birthplace of the race is Skavenblight in the Old World's south, deep in the Blighted Marshes. From there their corruption has spread to the far corners of the world."
+    },
+    {
+      "id": "pirates-of-sartosa", "kind": "group", "name": "Pirates of Sartosa", "de": "Piraten von Sartosa", "source": ["fd-sartosa"], "regions": ["sartosa"],
+      "status": "Outlaw crews of the City of Pirates",
+      "text": "The pirates, brigands and mercenaries who live on the island of Sartosa, south of Tilea. Some Northerners think all Tileans are pirates, but only the Sartosans truly are. Its harbour town press-gangs the unwary, and its ships raid the sea lanes, which is why neighbouring Luccini keeps a large fleet."
+    },
+    {
+      "id": "fimir-of-the-wasteland", "kind": "group", "name": "Fimir of the Wasteland", "de": "Fimir des Ödlands", "source": ["fd-fimir"], "regions": ["wasteland", "norsca", "albion"],
+      "status": "Cyclopean bog-dwellers loyal to Chaos",
+      "text": "One-eyed amphibious creatures loyal to Chaos that haunt fens and moors in the northern and western Old World, mostly in the Wasteland and Norsca, with tales of groups in Albion. Their craggy strongholds are hidden in mist that their Meargh matriarchs conjure. Their wizards are said to be skilled in shadow magic, which keeps them hidden from the Wastelanders."
+    },
+    {
+      "id": "dwarf-holds-of-karaz-ankor", "kind": "group", "name": "Dwarf Holds of Karaz Ankor", "de": "Zwergenfestungen des Karaz Ankor", "source": ["fd-karaz-ankor"], "regions": ["worlds-edge-mountains", "karaz-a-karak", "barak-varr"],
+      "status": "The Everlasting Realm of the Dwarfs",
+      "text": "The Dwarf realm, a chain of underground strongholds in the Worlds Edge Mountains, with outposts in the Grey and Black Mountains. The Dwarfs' original home was in the Southlands, and they moved north looking for metals and gems. The War of the Beard, the Time of Woes and the Goblin Wars have cost them many holds and mines. Karaz-a-Karak is its capital."
+    },
+    {
+      "id": "greenskin-tribes-of-the-badlands", "kind": "group", "name": "Greenskin Tribes of the Badlands", "de": "Grünhäute der Ödlande", "source": ["fd-badlands"], "regions": ["badlands"],
+      "status": "Orc and goblin tribes warring in the southern waste",
+      "text": "Countless orc and goblin tribes live in the Badlands, so many that, it is said, they could invade the Old World time and again if they ever stopped fighting each other. It is the greatest gathering of greenskins outside the Dark Lands. Ogre tribes hold the south of the region."
     }
   ]
 }
