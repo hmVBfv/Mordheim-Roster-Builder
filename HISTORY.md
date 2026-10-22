@@ -3848,3 +3848,24 @@ Several of this run's pull requests append tests to the same files (the trade
 tests, the equipment tests) and conflicted before they were even opened. The
 tests of #30, #31 and #32 now live in files of their own, as the `/bugs`
 command asks for shared files.
+
+## October 22, 2026 — the search list that still overlapped, and items by campaign
+
+The overlap of #26 came back on a phone (the Hero's search sheet): the lines of
+one item ran over the next. The first fix was tested at 468 px and checked only
+that the cells of one row did not touch each other – which cannot see a row that
+is too short for what it holds. The cause was the list itself: a grid of limited
+height whose rows were squeezed to fit. It is a flex column of whole rows now,
+and the test checks that what a row holds lies inside it and that rows lie one
+under the other, at 468 and 390 px; written first, it failed on the old CSS.
+
+The same day Rob asked that every item on mordheimer.net be available, chosen
+by the campaign it was released with. The parsed item blocks of the whole site
+were already in the catalogue; the price charts of the four campaign settings
+(Empire in Flames, Border Town Burning, Khemri, Lustria) were checked item by
+item, and one was missing – the Horse of Empire in Flames. Every item those
+charts list now says so in `settings`, items of the core chart carry `core`,
+and the search mask has "Released with" and "Warband grade". Deliberately not
+done: the artefact tables (lesser, chaos, Lustrian) have no price or rarity, so
+they cannot be searched for; and the Khemri/Lustria rarities that differ from
+the core chart stay as they are – both went to Rob.
