@@ -1,5 +1,5 @@
 {
-  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Mordheim setting, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026, pages last updated 12.10.2026). Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group.",
+  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Warhammer world, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026 and 22.10.2026) – never copied. Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group. Places nest (parent), factions and groups come from places (regions); ADR 0024.",
   "SOURCES": {
     "flames": { "title": "The Empire in Flames", "url": "https://mordheimer.net/docs/introduction/the-empire-in-flames" },
     "city": { "title": "The City of the Damned", "url": "https://mordheimer.net/docs/introduction/the-city-of-the-damned" },
@@ -8,7 +8,48 @@
     "reikland": { "title": "Mercenaries – Reikland", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#reikland" },
     "middenheim": { "title": "Mercenaries – Middenheim", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#middenheim" },
     "marienburg": { "title": "Mercenaries – Marienburg", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#marienburg" },
-    "ostermarkers": { "title": "Mercenaries – Ostermark", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark" }
+    "ostermarkers": { "title": "Mercenaries – Ostermark", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark" },
+    "lustriaset": { "title": "Campaign Setting: Lustria", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria" },
+    "lussettle": { "title": "Lustria: Settlements", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/optional-rules/settlements" },
+    "lusequip": { "title": "Lustria: Equipment", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment" },
+    "khemriset": { "title": "Campaign Setting: Khemri", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/khemri" },
+    "albionset": { "title": "Campaign Setting: Albion", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/albion" },
+    "eifset": { "title": "Campaign Setting: The Empire in Flames", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames" },
+    "btbset": { "title": "Campaign Setting: Border Town Burning", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning" },
+    "nemcrown": { "title": "Campaign Setting: The Nemesis Crown", "url": "https://mordheimer.net/docs/campaigns/campaign-settings/the-nemesis-crown" },
+    "wbaverland": { "title": "Averlander Mercenaries", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/averlander" },
+    "wbostland": { "title": "Ostlander Mercenaries", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/ostlander" },
+    "wbkislev": { "title": "Kislevites", "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/kislevites" },
+    "wbbretonnia": { "title": "Bretonnians", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/bretonnian" },
+    "wbnorse": { "title": "Norse", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/norse" },
+    "wbhochland": { "title": "Hochland Bandits", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/hochland-bandits" },
+    "wbtilean": { "title": "Tileans", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tileans" },
+    "wbaraby": { "title": "Arabian Tomb Raiders", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/arabian-tomb-raiders" },
+    "wbcathay": { "title": "Battle Monks of Cathay", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/battle-monks-of-cathay" },
+    "wbnippon": { "title": "Nipponese Expedition", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition" },
+    "wbstrigos": { "title": "Survivors of Strigos", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos" },
+    "wbblackdw": { "title": "Black Dwarfs", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/black-dwarfs" },
+    "wbhashut": { "title": "Sons of Hashut", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/sons-of-hashut" },
+    "wbshadow": { "title": "Shadow Warriors", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/shadow-warriors" },
+    "wbdarkelf": { "title": "Dark Elves", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dark-elves" },
+    "wbwoodelf": { "title": "Wood Elves of Athel Loren", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/wood-elves-of-athel-loren" },
+    "wbogre": { "title": "Ogre Hunting Party", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/ogre-hunting-party" },
+    "wbmarauder": { "title": "Marauders of Chaos", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos" },
+    "wbcaravan": { "title": "Merchant Caravans", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans" },
+    "wbmare": { "title": "Order of the Mare", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/order-of-the-mare" },
+    "wbstirwood": { "title": "Outlaws of Stirwood Forest (Redux)", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/outlaws-of-stirwood-forest-redux" },
+    "wbnecrarch": { "title": "Necrarchs, the Soul Stealers", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/necrarchs-the-soul-stealers" },
+    "wbundead": { "title": "Undead", "url": "https://mordheimer.net/docs/warbands/core-warbands/undead" },
+    "wbhunters": { "title": "Vampire Hunters of Sylvania", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania" },
+    "wbnuln": { "title": "Gunnery School of Nuln", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/gunnery-school-of-nuln" },
+    "wbhorned": { "title": "Horned Hunters", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/horned-hunters" },
+    "wbmoot": { "title": "Mootlanders", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/mootlanders" },
+    "wbamazon": { "title": "Amazons", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons" },
+    "wbdruchii": { "title": "Druchii", "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/druchii" },
+    "wbmerc": { "title": "Mercenaries (core warbands)", "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries" },
+    "wbreavers": { "title": "Lustrian Reavers", "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/lustrian-reavers" },
+    "wblizard": { "title": "Lizardmen", "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/lizardmen" },
+    "encbrig": { "title": "Encampments: Brigandsburg", "url": "https://mordheimer.net/docs/optional-rules/encampments/brigandsburg" }
   },
   "LORE": [
     {
@@ -37,7 +78,7 @@
       "text": "An encampment little better than a den of murderers. Mutants walk freely there, and hooded men barter corpses to Necromancers in return for tainted gold."
     },
     {
-      "id": "ostermark", "kind": "region", "name": "Ostermark", "de": "Ostermark", "source": ["city", "ostermark"],
+      "id": "ostermark", "kind": "region", "name": "Ostermark", "de": "Ostermark", "source": ["city", "ostermark"], "parent": "the-empire",
       "status": "Eastern province of the Empire, lawless since Mordheim fell",
       "text": "One of the largest provinces, on the eastern fringe of the Empire: flat farmland, pasture and hedges, with isolated farms and villages and crude dirt roads, and the Great Forest on the border to Talabecland. Its Elector, Count Steinhardt, died with his whole line when Mordheim fell, and since then brigands, mercenary bands and foreign armies roam it. Famine follows burnt fields, and Orcs and Goblins from the Worlds Edge Mountains and Beastmen from the Forest of Shadows threaten it. Wyrdstone fragments lie scattered across the whole province. Its towns are Bechafen and Badenhof, and its colours are yellow and purple."
     },
@@ -52,22 +93,22 @@
       "text": "The border lands to Kislev in the north, marked by wooden watch towers with warning beacons that are lit when invasion looms, and backed by the river Lower Talabec. The town of Bechafen lies deep in the Marches: a military town renowned for the smithies and armourers who supply the army of Ostermark, and so a valuable resource against Chaos from the north."
     },
     {
-      "id": "reikland", "kind": "region", "name": "Reikland", "de": "Reikland", "source": ["reikland", "bands"],
+      "id": "reikland", "kind": "region", "name": "Reikland", "de": "Reikland", "source": ["reikland", "bands"], "parent": "the-empire",
       "status": "Heart of the Empire; seat of the Temple of Sigmar",
       "text": "Its greatest city is Altdorf, home of the Grand Theogonist. Siegfried, who styles himself Grand Prince, claims the throne with the Grand Theogonist's backing and is opposed most strongly by Middenheim and the Priests of Ulric. Reiklanders are devout followers of Sigmar, known for discipline, loyalty between officers and men and good archery. They wear practical wargear and coloured ribbons for identification or rank, and sneer at the Count of Middenheim as the “lap-dog of Ulric”. Count Siegfried's alchemist van Hoffman is said to have turned lead into gold with wyrdstone."
     },
     {
-      "id": "middenheim", "kind": "region", "name": "Middenheim", "de": "Middenheim", "source": ["middenheim", "bands"],
+      "id": "middenheim", "kind": "region", "name": "Middenheim", "de": "Middenheim", "source": ["middenheim", "bands"], "parent": "middenland",
       "status": "City of the White Wolf, in Middenland",
       "text": "A city on a mountain pinnacle among dark forest, sacred to Ulric, god of wolves and winter, whose priesthood is still strong there. Its Count, Mannfred Todbringer, is a chief contender for the throne, and the old rivalry with Reikland (and friction with the Temple of Sigmar) goes back hundreds of years. Middenheimers are big, strong, ferocious men, often bare-headed with long hair and beards, who wear wolf pelts as the mark of a wolf killed by hand."
     },
     {
-      "id": "marienburg", "kind": "region", "name": "Marienburg", "de": "Marienburg", "source": ["marienburg", "flames"],
+      "id": "marienburg", "kind": "region", "name": "Marienburg", "de": "Marienburg", "source": ["marienburg", "flames"], "parent": "wasteland",
       "status": "The City of Gold, largest port of the Old World",
       "text": "The most prosperous trading city of the Old World, where goods arrive from Ulthuan to Cathay and every craft is turned to profit. Merchant guilds hold great power there, above all the Freetraders, and its Burgomeisters wield patronage greater than many nobles. Its champion for the throne is Lady Magritta; the Grand Theogonist's refusal to crown her drove a wedge between the city and the Temple of Sigmar. Its warbands are lavishly dressed but ruthless, skilled in duelling and poison, and their rank and file are dockland thugs and ship's crews in leather coats and bandanas. Others mock Marienburgers as popinjays, but many envy their security."
     },
     {
-      "id": "talabecland", "kind": "region", "name": "Talabecland", "de": "Talabecland", "source": ["ostermark"],
+      "id": "talabecland", "kind": "region", "name": "Talabecland", "de": "Talabecland", "source": ["ostermark"], "parent": "the-empire",
       "status": "Ostermark's main neighbour, home of the Ottilans",
       "text": "The neighbouring province across the Great Forest, with the city of Talabheim. When the last Emperor, Sigismund, was killed at Altdorf and the Empire split into three claimants, Ostermark sided with the Ottilans of Talabecland. The alliance came to nothing when Magritta of Marienburg took power, and civil war and rivalry followed."
     },
@@ -125,6 +166,306 @@
       "id": "ostermark-brigands", "kind": "group", "name": "The Brigands and Reavers of Ostermark", "de": "Die Räuber und Plünderer von Ostermark", "source": ["city", "ostermark"], "regions": ["ostermark"],
       "status": "Bandits and roaming mercenary bands in the ruined countryside",
       "text": "Since the fall of Mordheim, wild reavers, thieves, bandits and mercenary bands roam the neglected province, loot villages, burn homes and rob the weak. The only law they know is force of arms. Some fighters rise up against them out of a sense of justice, which the lawless time rarely rewards."
+    },
+    {
+      "id": "old-world", "kind": "region", "name": "Old World", "de": "Die Alte Welt", "source": ["wbcaravan", "btbset", "eifset"],
+      "status": "Home continent of the human realms and of Mordheim",
+      "text": "The western lands where the Empire, Kislev, Bretonnia and Tilea lie, cut off from the dwarfen and orc lands by great mountain ranges. Merchants from here sail to Lustria and the Southlands or trek over land to Ind and Cathay. Most warbands in the campaign start their journey from somewhere in this region."
+    },
+    {
+      "id": "the-empire", "kind": "region", "name": "The Empire", "de": "Das Imperium", "source": ["eifset", "flames", "city"], "parent": "old-world",
+      "status": "Greatest human realm; no Emperor, split between rival Electors",
+      "text": "A huge, heavily forested land ringed by the Sea of Claws, the Worlds Edge, Black and Grey Mountains. Around the year 2000 no Emperor rules and the Elector Counts and the Grand Theogonist fight over the crown, while bandits, mutants and Beastmen roam the wilds. The big electoral provinces, including the Halfling Mootland, each send fortune seekers to Mordheim."
+    },
+    {
+      "id": "averland", "kind": "region", "name": "Averland", "de": "Averland", "source": ["wbaverland"], "parent": "the-empire",
+      "status": "Rich southern province of the Empire; capital Averheim",
+      "text": "A prosperous county between the Aver and the Upper Reik, bordering the Black Mountains and the Worlds Edge Mountains. Its mines supply ore that is barged down the Aver to Nuln, and its soldiers are famed for lavish uniforms and good archery. Mercenaries from here know the Black Fire Pass trade route and its Night Goblin and Skaven dangers."
+    },
+    {
+      "id": "hochland", "kind": "region", "name": "Hochland", "de": "Hochland", "source": ["wbhochland"], "parent": "the-empire",
+      "status": "Forested province next to Talabecland, hit hard by the Storm of Chaos",
+      "text": "A province across the River Talabec from Talabecland. After the Storm of Chaos many Hochlanders fled across the border as refugees and clashed with the locals around Talabheim. Poverty and scarce trade drive some of them into banditry and into the Great Forest in search of rumoured treasure."
+    },
+    {
+      "id": "middenland", "kind": "region", "name": "Middenland", "de": "Middenland", "source": ["middenheim", "eifset"], "parent": "the-empire",
+      "status": "Duchy of the Count of Middenheim, land of the Ulric cult",
+      "text": "A northern electoral duchy, ruled from the mountaintop city of Middenheim by Count Mannfred Todbringer, one of the leading claimants to the throne. The Drakwald Forest surrounds the city, and the Great North Road leads from here to Marienburg. Its people are big, fierce and loyal to Ulric."
+    },
+    {
+      "id": "ostland", "kind": "region", "name": "Ostland", "de": "Ostland", "source": ["wbostland", "eifset"], "parent": "the-empire",
+      "status": "Sparse northern province with close ties to Kislev",
+      "text": "The thinly populated northernmost province, cut off from the rest of the Empire by the Forest of Shadows and the Middle Mountains. Its poor, hardy villagers live as farmers and trappers, honour Taal, and have suffered more than anyone from Chaos raids. They are self-reliant and will hire no mercenaries save Ogres."
+    },
+    {
+      "id": "stirland", "kind": "region", "name": "Stirland", "de": "Stirland", "source": ["wbstirwood"], "parent": "the-empire",
+      "status": "County along the River Stir, famed for strict law and outlaws",
+      "text": "A county whose Elector Count was feared for harsh justice; even petty criminals were declared outlaws. Many fled north into Stirwood, a small forest across the River Stir near Nuln, where they formed archer bands. Tales of Mordheim travelling down the river tempt such outlaws towards the ruined city."
+    },
+    {
+      "id": "sylvania", "kind": "region", "name": "Sylvania", "de": "Sylvanien", "source": ["wbundead", "wbhunters", "eifset"], "parent": "the-empire",
+      "status": "Province ruled by the von Carsteins, a land of vampires and fog",
+      "text": "Count Vlad von Carstein and his Countess rule from Drakenhof castle; the whole ruling class are vampires hiding behind a dire reputation. The land is full of bogs, fogs and the restless dead, so locals either flee or take up arms. Vampire hunters and Morr priests enter to break the dynasty, and Vlad's servants hunt wyrdstone in Mordheim."
+    },
+    {
+      "id": "moot", "kind": "region", "name": "Moot", "de": "Das Moot", "source": ["eifset", "wbmoot"], "parent": "the-empire",
+      "status": "Halfling Mootland, an electoral province of its own",
+      "text": "The Halfling homeland where the Aver Reach and the Blue Reach rivers meet. It counts among the Empire's electoral provinces. Halflings seldom leave, but now and then a restless elder gathers friends and marches to Mordheim hoping for gold, wyrdstone and kitchens."
+    },
+    {
+      "id": "wasteland", "kind": "region", "name": "Wasteland", "de": "Das Ödland", "source": ["eifset", "marienburg"], "parent": "old-world",
+      "status": "Low, windy, marshy plain around Marienburg",
+      "text": "A barren, marshy coastal plain exposed to the winds off the Sea of Claws, running from the Reikwald Forest to the Pale Sisters. Marienburg, the greatest port of the Old World, stands here at the mouth of the Reik. Rumours say Orcs and Beastmen lurk in the fens."
+    },
+    {
+      "id": "altdorf", "kind": "region", "name": "Altdorf", "de": "Altdorf", "source": ["wbmerc", "eifset", "wbdruchii"], "parent": "reikland",
+      "status": "Great Reikland city on an island in the Reik, home of the Grand Theogonist",
+      "text": "Reikland's greatest city, built on a mud-flat island where the Talabec meets the Reik, among marshes and shifting channels. It is home to the Grand Theogonist and the Temple of Sigmar and hosts the College of Magic."
+    },
+    {
+      "id": "nuln", "kind": "region", "name": "Nuln", "de": "Nuln", "source": ["wbnuln", "eifset"], "parent": "the-empire",
+      "status": "River city with the Imperial Gunnery School",
+      "text": "A great city on the Reik, where the Aver and the Upper Reik join. Its last bridge is a wonder with a liftable wooden centre. It is respected for the best handguns and war machines outside the dwarf holds and trains the Empire's gunners."
+    },
+    {
+      "id": "talabheim", "kind": "region", "name": "Talabheim", "de": "Talabheim", "source": ["wbhochland", "wbhorned", "eifset"], "parent": "talabecland",
+      "status": "Crater city of Talabecland, Taal's stronghold",
+      "text": "A large city on the Talabec, which is too wide to bridge here and so needs a big ferry. It is built in a great crater and honours Taal as Father of Rivers. It has strained to absorb refugees from the east, and Horned Hunters stay away from it."
+    },
+    {
+      "id": "great-forest", "kind": "region", "name": "Great Forest", "de": "Der Große Wald", "source": ["eifset", "nemcrown", "wbstirwood"], "parent": "the-empire",
+      "status": "Enormous forest in the heart of the Empire; border of Ostermark and Talabecland",
+      "text": "An ancient, huge woodland of old oaks and willows from the Middle Mountains to Nuln, and from Altdorf to Kislev's border. The River Stir cuts off its southern part as Stirwood. Many corners are too wild even for Imperial armies, so small warbands search them for secrets such as the Nemesis Crown."
+    },
+    {
+      "id": "forest-of-shadows", "kind": "region", "name": "Forest of Shadows", "de": "Der Schattenwald", "source": ["eifset", "wbostland"], "parent": "ostland",
+      "status": "Dark pine forest covering most of Ostland",
+      "text": "A dense, gloomy pine forest north of the Middle Mountains. Bandits, Chaos warbands, Forest Goblins and wolf packs haunt it. The road from Middenheim to Kislev's Erengrad runs through it."
+    },
+    {
+      "id": "drakwald-forest", "kind": "region", "name": "Drakwald Forest", "de": "Der Drakwald", "source": ["eifset", "nemcrown"], "parent": "middenland",
+      "status": "Sparse birch forest around Middenheim",
+      "text": "A thin birch forest on poor sandy soil that was never cleared for farming. It lies around Middenheim, and the road from Marienburg to Middenheim crosses it. Several wilderness scenarios are set in its 'Deeps' territory."
+    },
+    {
+      "id": "middle-mountains", "kind": "region", "name": "Middle Mountains", "de": "Das Mittelgebirge", "source": ["eifset", "wbostland"], "parent": "the-empire",
+      "status": "Highest uplands of the Empire, inhabited by Ogres and Chaos bands",
+      "text": "A tall range in the north of the Empire, ringed by dense forest and lacking any dwarf holds. Chaos warbands, Beastmen, Orcs and Goblins use the heights as hideouts, and Ogres live on the peaks. Few humans go there, apart from bandits."
+    },
+    {
+      "id": "river-reik", "kind": "region", "name": "River Reik", "de": "Der Reik", "source": ["eifset"], "parent": "the-empire",
+      "status": "Main trade artery of the Empire, from Black Fire Pass to Marienburg",
+      "text": "The most important river of the Empire, rising south of Black Fire Pass and flowing to the sea at Marienburg. More ships ply the stretch between Marienburg and Nuln than on all other imperial rivers together. The Reikland on its banks is the most prosperous part of the Empire."
+    },
+    {
+      "id": "river-stir", "kind": "region", "name": "River Stir", "de": "Die Stir", "source": ["eifset", "wbstirwood"], "parent": "the-empire",
+      "status": "River flowing through the ruins of Mordheim",
+      "text": "A large river that rises near Karak Kadrin and runs down through the Great Forest in a deep, wooded valley. Stirland lies to its south and Talabecland to its north, and there are few places to cross it. It flows through Mordheim, so rumours of the ruined city travel with it towards Stirland."
+    },
+    {
+      "id": "kislev", "kind": "region", "name": "Kislev", "de": "Kislev", "source": ["wbkislev", "eifset"], "parent": "old-world",
+      "status": "Northern realm of the Tzars, bulwark against Chaos",
+      "text": "A land of forests giving way to steppe toward the Worlds Edge Mountains, with long harsh winters and mostly timber towns, though the old capital has white buildings with gilded domes. It lies right on the edge of the Chaos Wastes and is often raided by Norse. Allied to the Empire, its people are cheerful, fond of vodka and good fighters."
+    },
+    {
+      "id": "bretonnia", "kind": "region", "name": "Bretonnia", "de": "Bretonnia", "source": ["wbbretonnia", "eifset"], "parent": "old-world",
+      "status": "Realm of chivalry beyond the Grey Mountains",
+      "text": "A kingdom of knights ruled by honour and under the Lady of the Lake. Its nobles see Mordheim as a vile place and thus a fitting test, so Questing Knights give up their domain and ride there, trailed by Knights Errant. The main road to the Empire leads over the Grey Mountains."
+    },
+    {
+      "id": "athel-loren", "kind": "region", "name": "Athel Loren", "de": "Athel Loren", "source": ["wbwoodelf", "wbmare"], "parent": "bretonnia",
+      "status": "Enchanted forest of the Wood Elves, said to lie in eastern Bretonnia",
+      "text": "A magical forest where the reclusive Wood Elves have long lived apart from their kin, ruled by Orion and Ariel. They hate Dark Elves and will not fight beside Chaos. Rarely, their warbands step out to shape events beyond the woods."
+    },
+    {
+      "id": "tilea", "kind": "region", "name": "Tilea", "de": "Tilea", "source": ["wbtilean", "btbset"], "parent": "old-world",
+      "status": "Land of rival merchant city-states and sea traders",
+      "text": "A wealthy land of feuding city-states whose people are proud of their civic status and have become skilled sailors and explorers. Tilean warbands are hired by city-states, guilds and merchants to probe jungles, deserts and ruins like Mordheim. Many caravans for the far east have set out from here."
+    },
+    {
+      "id": "miragliano", "kind": "region", "name": "Miragliano", "de": "Miragliano", "source": ["wbtilean"], "parent": "tilea",
+      "status": "Tilean city of crossbowmen who hate Skaven",
+      "text": "A Tilean city famed for its crossbows; its warbands shoot well with them. Its people have hated Skaven since the red pox of 1812 killed three quarters of its inhabitants."
+    },
+    {
+      "id": "remas", "kind": "region", "name": "Remas", "de": "Remas", "source": ["wbtilean", "btbset"], "parent": "tilea",
+      "status": "Tilean port city that loathes Dark Elves",
+      "text": "A coastal Tilean city invaded by a Dark Elf fleet in 1487. Its people ever since fight Dark Elves to the death, and its officers are stern leaders. Remas was the one city that refused to back the famous overland caravan to the east."
+    },
+    {
+      "id": "trantio", "kind": "region", "name": "Trantio", "de": "Trantio", "source": ["wbtilean"], "parent": "tilea",
+      "status": "Tilean city whose warbands were best equipped in Lustria",
+      "text": "A Tilean city-state that sends well-funded expeditions overseas. In Lustrian campaigns a Trantio warband starts with extra funds and thus counts as the best equipped human band there."
+    },
+    {
+      "id": "border-princes", "kind": "region", "name": "Border Princes", "de": "Die Grenzfürsten", "source": ["eifset", "wbaverland"], "parent": "old-world",
+      "status": "Wild southern lands beyond the Black Mountains",
+      "text": "The unruly southern borderland beyond the Black Mountains, outside the Empire's rule. Goods from here come to the Empire through Black Fire Pass."
+    },
+    {
+      "id": "black-mountains", "kind": "region", "name": "Black Mountains", "de": "Die Schwarzen Berge", "source": ["eifset", "wbaverland"], "parent": "old-world",
+      "status": "Southern mountain wall of the Empire, riddled with goblin tunnels",
+      "text": "A steep, hostile range between the Grey and Worlds Edge Mountains that divides the Empire from the Border Princes. The weather is erratic and the passes are dangerous. Night Goblins, Trolls and Skaven infest its crumbly tunnels."
+    },
+    {
+      "id": "black-fire-pass", "kind": "region", "name": "Black Fire Pass", "de": "Der Schwarzfeuerpass", "source": ["eifset", "wbaverland"], "parent": "black-mountains",
+      "status": "Only reliable pass over the southern mountains",
+      "text": "A deep fortified cleft that divides the Black Mountains from the Worlds Edge Mountains and guards the southern approach to the Empire. It follows an old dwarf road past Averheim, and goods go on by barge to Nuln. Sigmar is said to have beaten the Orcs in the valley in its middle."
+    },
+    {
+      "id": "grey-mountains", "kind": "region", "name": "Grey Mountains", "de": "Das Grau-Gebirge", "source": ["eifset"], "parent": "old-world",
+      "status": "Mountains separating the Empire from Bretonnia",
+      "text": "The western range, with few and less rich dwarf holds. Most passes are narrow, fit for merchants with pack animals only, while the biggest, Axe Bite Pass, is guarded by Helmgart. The Gisoreux Gap in the north is the main route between Bretonnia and the Empire."
+    },
+    {
+      "id": "worlds-edge-mountains", "kind": "region", "name": "Worlds Edge Mountains", "de": "Das Weltrandgebirge", "source": ["wbaverland", "eifset", "btbset"], "parent": "old-world",
+      "status": "Huge eastern range of dwarf holds, greenskins and monsters",
+      "text": "A very tall range along the eastern side of the Empire and Kislev, with a handful of passes and many underground routes. It holds rich dwarf mines but also Night Goblins, Skaven and monsters, and the ruined holds. Beyond its eastern side lie the Dark Lands, the start of the road to Cathay."
+    },
+    {
+      "id": "norsca", "kind": "region", "name": "Norsca", "de": "Norsca", "source": ["wbnorse", "btbset", "wbmarauder"],
+      "status": "Cold northern land of the Norse, across the Sea of Claws",
+      "text": "A land of snow, ice and mountains north of the Empire, home to mammoths, big wolves and polar bears. The Norse there live by war and raiding and are superb sailors, and the southern tribes are least touched by Chaos. They were the first humans to find Lustria and the Southlands, and many sell their swords as mercenaries."
+    },
+    {
+      "id": "the-chaos-wastes", "kind": "region", "name": "The Chaos Wastes", "de": "Die Chaos-Wüste", "source": ["wbmarauder", "wbkislev", "btbset"],
+      "status": "Frozen north where the winds of Chaos blow",
+      "text": "A land in the far north from which Chaos spills out, with Kislev lying right at its edge. Kurgan and Hung nomads of the Northern Wastes worship the dark gods, and the Kurgan raise monoliths where the winds of Chaos blow strong. Marauder chieftains lead warbands south to win glory."
+    },
+    {
+      "id": "eastern-steppes", "kind": "region", "name": "Eastern Steppes", "de": "Die Östlichen Steppen", "source": ["btbset", "wbcathay"], "parent": "cathay-and-the-east",
+      "status": "Endless grassland north of Cathay roamed by the Hung",
+      "text": "A vast plain on the northern edge of Grand Cathay, over which the nomadic Hung range. Hobgoblin riders also roam it, and Cathay built the Great Bastion against such raiders. The mutant Tong horde once swept across it."
+    },
+    {
+      "id": "lustria", "kind": "region", "name": "Lustria", "de": "Lustria", "source": ["lustriaset", "wblizard", "wbreavers"],
+      "status": "Jungle continent of the Lizardmen and the lost cities of gold",
+      "text": "A steaming continent across the western ocean of ancient ziggurat cities abandoned by the Lizardmen and guarded by their temple guards. Explorers seek gold, magic and arcane lore there and many never return. Norse, Tilean and Estalian colonies hug the coast, with High Elves in the south and a war between Lizardmen and Skaven in the interior."
+    },
+    {
+      "id": "skeggi", "kind": "region", "name": "Skeggi", "de": "Skeggi", "source": ["lussettle", "wbnorse", "wbamazon"], "parent": "lustria",
+      "status": "Oldest human colony in Lustria, founded by the Norse",
+      "text": "The Norse port founded by Losteriksson in the year 888 on Lustria's east coast, still home to his descendants. It has faded as the restless Norse sought raids elsewhere, but still offers good mercenaries and drinking halls. The Amazons are said to descend from Norse widows who left here."
+    },
+    {
+      "id": "santa-magritta", "kind": "region", "name": "Santa Magritta", "de": "Santa Magritta", "source": ["lussettle"], "parent": "lustria",
+      "status": "Estalian jewel of Lustria, on Colombo's Island",
+      "text": "A handsome Estalian port with a busy harbour, markets of Old World and exotic goods, and a militia that fights Lizardmen raids and Tileans. Settlers, convicts, mercenaries and missionaries all arrive here. Lizardmen, Amazons, Dark Elves, undead and Skaven warbands may not stay."
+    },
+    {
+      "id": "nuevo-luccini", "kind": "region", "name": "Nuevo Luccini", "de": "Nuevo Luccini", "source": ["lussettle"], "parent": "lustria",
+      "status": "Pirate-and-robber harbour on the Cactus Coast",
+      "text": "A lawless Tilean port on the sun-blessed Cactus Coast, known for robbers and pirates but a good place to buy goods. It has taverns, a trading post and a church of Luccan. Rare items cost no extra but all goods are harder to find."
+    },
+    {
+      "id": "scorpion-coast", "kind": "region", "name": "Scorpion Coast", "de": "Die Skorpionküste", "source": ["lusequip"], "parent": "lustria",
+      "status": "Lustrian coast with the fortified post of the Di Ranza family",
+      "text": "A stretch of Lustria's coast where the Tilean Di Ranza family, exiled after feuds, built a fortified trading post. It is used as a staging base for smaller warbands heading into the jungle."
+    },
+    {
+      "id": "citadel-of-dusk", "kind": "region", "name": "Citadel of Dusk", "de": "Die Zitadelle der Dämmerung", "source": ["lustriaset", "lusequip"], "parent": "lustria",
+      "status": "High Elf fortress on Lustria's southern tip",
+      "text": "A huge High Elf stronghold at the southern end of Lustria, where the sun rarely climbs high. It guards the western sea route to Cathay, and the elves send secretive expeditions into the jungle from it. They fight Estalian and Tilean fleets."
+    },
+    {
+      "id": "land-of-the-dead", "kind": "region", "name": "Land of the Dead", "de": "Das Land der Toten", "source": ["khemriset", "wbaraby"],
+      "status": "Desert ruins of Nehekhara, ruled by Tomb Kings and Liches",
+      "text": "The old human kingdom of Nehekhara south-east of the Old World, ruined by civil war and now a sand desert with a blood-coloured river. Mummy kings and Liche Lords command legions of the dead in huge necropolises, guarding treasures and necromantic writings. Tomb robbers, Crusaders and Arabian nomads venture in."
+    },
+    {
+      "id": "khemri", "kind": "region", "name": "Khemri", "de": "Khemri", "source": ["khemriset"], "parent": "land-of-the-dead",
+      "status": "Cursed city with the Great Pyramid and the Black Pyramid of Nagash",
+      "text": "A dead city at the heart of the Land of the Dead, ringed by tombs and crypts of kings and nobles. The Great Pyramid and the vaster Black Pyramid of Nagash dominate it. The dead still patrol and repair the tombs on some dark nights."
+    },
+    {
+      "id": "lahmia", "kind": "region", "name": "Lahmia", "de": "Lahmia", "source": ["wbnecrarch", "khemriset"], "parent": "land-of-the-dead",
+      "status": "Destroyed city of the first vampires, with a burned Great Library",
+      "text": "A city of Nehekhara whose destruction ended the kingdom of the Vampires and burned its Great Library. A few Necrarchs fled with Nagash's writings and now hide in towers around the world. Several of them have come to Mordheim."
+    },
+    {
+      "id": "araby", "kind": "region", "name": "Araby", "de": "Araby", "source": ["wbaraby", "khemriset"],
+      "status": "Desert land of nomad tribes west of the Land of the Dead",
+      "text": "The great desert west of the Land of the Dead where nomad tribes wander from oasis to oasis. They are fine desert guides, feared raiders, and bound by strict honour and blood feuds. Some raid the nearby necropolises."
+    },
+    {
+      "id": "cathay-and-the-east", "kind": "region", "name": "Cathay and the East", "de": "Cathay und der Osten", "source": ["btbset", "wbcaravan"],
+      "status": "Far eastern lands reached by the long overland roads",
+      "text": "The faraway lands of Cathay, Ind and Nippon, long known in the Old World only from rumour. Trade passes by sea around the Southlands or overland through the Dark Lands. Fortunes can be made there, but only a minority of caravans return."
+    },
+    {
+      "id": "grand-cathay", "kind": "region", "name": "Grand Cathay", "de": "Das Große Cathay", "source": ["btbset", "wbcathay"], "parent": "cathay-and-the-east",
+      "status": "Walled eastern empire under the Celestial Emperor",
+      "text": "A civilised eastern empire, rich in silk and jade, ruled from Weijin by a divine Emperor and a large bureaucracy. Old Worlders may trade only at a border reservation, and warrior monks guard its fortified frontiers. Monsters, Chaos tribes, Hobgoblins and Ogres press at its borders."
+    },
+    {
+      "id": "weijin", "kind": "region", "name": "Weijin", "de": "Weijin", "source": ["btbset", "wbcathay"], "parent": "grand-cathay",
+      "status": "Cathayan capital and seat of the Dragon Throne",
+      "text": "The city of the Celestial Emperor and his court, entirely devoted to serving the throne. All its food must be brought in from elsewhere, over a hundred tons weekly. The Emperor appoints emissaries from here to govern the border districts."
+    },
+    {
+      "id": "great-bastion", "kind": "region", "name": "Great Bastion", "de": "Der Große Wall", "source": ["btbset", "wbcathay"], "parent": "grand-cathay",
+      "status": "Immense wall on Cathay's northern frontier",
+      "text": "A seemingly endless wall guarding Cathay's northern border against the Hung. It is at least five men high and runs over hills. Its western end is the city of Nan-Gau, whose garrison patrols its length."
+    },
+    {
+      "id": "khuresh", "kind": "region", "name": "Khuresh", "de": "Khuresh", "source": ["btbset"], "parent": "grand-cathay",
+      "status": "Wild mountain and jungle land south of Cathay",
+      "text": "A rough land of mountains, deserts, jungles and marshes on Cathay's southern border. Exiles who want to overthrow the Emperor gather in its north, and ratmen mass there at times. Cathay keeps a second large military command nearby, which also protects the Spice Road to Ind."
+    },
+    {
+      "id": "silk-road", "kind": "region", "name": "Silk Road", "de": "Die Seidenstraße", "source": ["btbset", "wbcaravan"], "parent": "cathay-and-the-east",
+      "status": "Overland caravan route from Tilea to Cathay",
+      "text": "The great trade route opened by two Tilean brothers' caravan, passing the last dwarf hold and then crossing the Dark Lands and mountains to reach Cathay. It is deadly: roving greenskins, the restless dead, Chaos dwarfs, Ogres and deserts kill most caravans. Mercenary escorts find steady work here."
+    },
+    {
+      "id": "dark-lands", "kind": "region", "name": "Dark Lands", "de": "Die Schwarzen Lande", "source": ["eifset", "btbset", "wbblackdw"], "parent": "cathay-and-the-east",
+      "status": "Orc-infested wastes east of the Worlds Edge Mountains",
+      "text": "A bleak, desolate plain beyond the dwarf holds, haunted by greenskin wolf riders, wandering undead and dark metal monuments. Chaos dwarfs dominate parts of it from their land of Zharr. Merchants who cross it on the way to Cathay risk everything."
+    },
+    {
+      "id": "zharr-naggrund", "kind": "region", "name": "Zharr-Naggrund", "de": "Zharr-Naggrund", "source": ["wbblackdw", "wbhashut"], "parent": "dark-lands",
+      "status": "City of Fire and Desolation, seat of the Chaos Dwarfs",
+      "text": "The Chaos Dwarf city of the Dark Lands, where slaves toil in labour pits beneath an obsidian ziggurat tower. The Chaos Dwarfs of the ash-choked Plain of Zharr worship Hashut. Their sorcerers know of wyrdstone, and some send raiders to Mordheim for slaves and loot."
+    },
+    {
+      "id": "mountains-of-mourn", "kind": "region", "name": "Mountains of Mourn", "de": "Die Berge der Trauer", "source": ["wbogre", "wbcaravan", "btbset"], "parent": "cathay-and-the-east",
+      "status": "Ogre mountains on the way to Cathay, with ancient giant ruins",
+      "text": "A high mountain range of hostile weather and huge bears, home to tribes of Ogres and goblins living beside them. Ogres drift from here into foreign lands as hired muscle. Caravans fear the Ogres and the ruins of giant dwellings."
+    },
+    {
+      "id": "nippon", "kind": "region", "name": "Nippon", "de": "Nippon", "source": ["wbnippon", "btbset", "wbcaravan"], "parent": "cathay-and-the-east",
+      "status": "Far eastern land of clans, samurai and ronin",
+      "text": "A distant land south-east of Cathay, ruled by clans with samurai and ashigaru. Nipponese ronin sell their swords as caravan guards. Rare expeditions come to Mordheim for relics and knowledge as well as honour."
+    },
+    {
+      "id": "ulthuan", "kind": "region", "name": "Ulthuan", "de": "Ulthuan", "source": ["lustriaset", "wbshadow", "marienburg"],
+      "status": "Island kingdom of the High Elves",
+      "text": "The elven isle in the far west, from where High Elf ships once explored the world, and whose traders now sail widely. It was once home to Nagarythe, from which the Dark Elves broke away. Its goods turn up in Marienburg's shops."
+    },
+    {
+      "id": "nagarythe", "kind": "region", "name": "Nagarythe", "de": "Nagarythe", "source": ["wbshadow"], "parent": "ulthuan",
+      "status": "Fallen High Elf kingdom, home of the Shadow Warriors",
+      "text": "A once-rich High Elf kingdom that Malekith and Morathi led into Chaos worship. The loyal remnant fought a shadow war, then wandered as outcasts when Nagarythe was torn apart. Some of these Shadow Elves now seek fortune and revenge across the world."
+    },
+    {
+      "id": "naggaroth", "kind": "region", "name": "Naggaroth", "de": "Naggaroth", "source": ["wbdarkelf", "wbdruchii"],
+      "status": "Harsh land of the Dark Elves",
+      "text": "The cold, hard homeland of the Dark Elves (Druchii), who raid the world for slaves, gold and magic. Their ships hunt for wyrdstone and captives. They are feared more than Orcs."
+    },
+    {
+      "id": "albion", "kind": "region", "name": "Albion", "de": "Albion", "source": ["albionset"],
+      "status": "Fog-bound isle of Ogham Stones, fens and storms",
+      "text": "A misty island hidden from the world by thick fog, rich in rumoured treasure and the magic of its Ogham Stones. It has bogs, rain and storms, and dark and druidic wizards struggle there. Warbands usually find it by chance on a voyage."
+    },
+    {
+      "id": "strigos", "kind": "region", "name": "Strigos", "de": "Strigos", "source": ["wbstrigos"],
+      "status": "Lost realm of the Strigoi vampires and the Strigany",
+      "text": "A once-rich kingdom under the 'undying king' Ushoran, ruined with Mourkain. Its descendants, the Strigany, wander in caravans through human lands and are often blamed for serving the vampire Strigoi. Strigoi now haunt graveyards with ghouls."
+    },
+    {
+      "id": "brigandsburg", "kind": "region", "name": "Brigandsburg", "de": "Brigandsburg", "source": ["encbrig"], "parent": "mordheim",
+      "status": "Rough encampment near Mordheim, full of Middenheimers and hired swords",
+      "text": "One of the rival camps around the ruins, home to the shadier crowd, chiefly Middenheimers and Witch Hunters. It offers the most hired swords, at a discount, but the streets are dangerous. Marienburgers shun it as too filthy."
     }
   ]
 }
