@@ -22,7 +22,7 @@ import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { useWarbandRecord } from '../sync/local.ts';
-import { GiveBoard } from './GiveBoard.tsx';
+import { BuyBoard, GiveBoard, SellBoard } from './GiveBoard.tsx';
 
 const TABS = [['buy', 'Buy'], ['search', 'Search rare'], ['sell', 'Sell'], ['give', 'Give']] as const;
 /** The highest rarity a search may be narrowed to. */
@@ -346,7 +346,10 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
         <section className={ui.page} aria-label="Buy common items">
           <p className={ui.muted}>Common items, as many as you like, at the price that applies now. A group buys one for every man.</p>
           <Seg label="Kind" value={kind} options={KINDS} onChange={setKind} />
-          {[false, true].map((unlisted) => {
+          {wide
+            ? <BuyBoard cards={giveCards(ctx)} shop={shop.filter((it) => kind === 'all' || it.kind === kind)} gold={gold} recipientsFor={(it) => buyRecipients(ctx, it.key, it.price)}
+              onBuy={(it, to) => ed.edit((c) => core.buyItem(c, to, it.key, { qty: 1 }).state, `Bought ${it.name}${to === 'stash' ? ' for the stash' : ''}.`)} />
+            : [false, true].map((unlisted) => {
             const list = shop.filter((it) => it.unlisted === unlisted && (kind === 'all' || it.kind === kind));
             if (!list.length) return null;
             return (
@@ -403,7 +406,9 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
       {tab === 'sell' && (
         <section className={ui.page} aria-label="Sell items">
           <p className={ui.muted}>Half the price that applies now, rounded down, at least 1 gc. A group sells all its pieces of an item together. The free dagger stays with its warrior.</p>
-          <HoldingList list={held} label="Sell" action={(h) => (h.unpriced ? 'you name the price' : `sells for ${gc(h.sell)}`)} onPick={(h) => { setSelling((p) => ({ key: (p?.key ?? 0) + 1, h })); openSell(); }} />
+          {wide
+            ? <SellBoard cards={giveCards(ctx)} onPick={(h) => { setSelling((p) => ({ key: (p?.key ?? 0) + 1, h })); openSell(); }} />
+            : <HoldingList list={held} label="Sell" action={(h) => (h.unpriced ? 'you name the price' : `sells for ${gc(h.sell)}`)} onPick={(h) => { setSelling((p) => ({ key: (p?.key ?? 0) + 1, h })); openSell(); }} />}
         </section>
       )}
 

@@ -440,6 +440,20 @@
   cursor: grab;
 }
 
+.giveHeld {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.giveChips small {
+  color: var(--text-muted);
+}
+
 .giveFree {
   display: inline-flex;
   align-items: center;

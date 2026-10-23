@@ -3,8 +3,8 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { GiveCard, Holding, Recipient } from '../roster/equipment.ts';
-import { GiveBoard } from './GiveBoard.tsx';
+import type { GiveCard, Holding, Recipient, ShopItem } from '../roster/equipment.ts';
+import { BuyBoard, GiveBoard, SellBoard } from './GiveBoard.tsx';
 
 afterEach(cleanup);
 
@@ -97,5 +97,39 @@ describe('Give on a wide screen', () => {
     await user.click(chip);
     expect(screen.queryByRole('status')?.textContent ?? '').not.toMatch(/free/);
     expect(screen.queryByRole('button', { name: /^Give to/ })).toBeNull();
+  });
+});
+
+describe('Sell and Buy on a wide screen (#54)', () => {
+  it('Sell shows the same cards; an item opens the price sheet, the free dagger cannot be picked', async () => {
+    const onPick = vi.fn();
+    const user = userEvent.setup();
+    render(<SellBoard cards={cards} onPick={onPick} />);
+    expect(screen.getAllByRole('article').map((a) => a.getAttribute('aria-label'))).toEqual(['Ulrich the Grey', 'Magda', 'Warriors', 'Stash']);
+    const magda = within(screen.getByRole('group', { name: 'Held by Magda' }));
+    expect(magda.getAllByRole('button').map((b) => b.textContent)).toEqual(['Dagger · 5 gc']);
+    expect(magda.getByText('Dagger (free)')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Sell Sword of Ulrich the Grey' }));
+    expect(onPick).toHaveBeenCalledWith(sword);
+  });
+
+  const lamp: ShopItem = { key: 'Lampe', name: 'Lantern', kind: 'misc', price: 20, text: '', unlisted: false };
+  const buyers = (it: ShopItem): Recipient[] => [
+    { to: 'stash', name: 'Stash', ok: true, note: 'keep it for later', cost: it.price },
+    { to: 1, name: 'Ulrich the Grey', ok: true, note: `${it.price} gc`, cost: it.price },
+    { to: 3, name: 'Warriors', ok: true, note: '3 men: 60 gc', cost: it.price * 3 },
+  ];
+
+  it('Buy lists what is on sale; a picked item says on each card what it costs, and one click buys it', async () => {
+    const onBuy = vi.fn();
+    const user = userEvent.setup();
+    render(<BuyBoard cards={cards} shop={[lamp]} recipientsFor={buyers} gold={50} onBuy={onBuy} />);
+    await user.click(within(screen.getByRole('group', { name: 'For sale' })).getByRole('button', { name: /Lantern/ }));
+    expect(screen.getByRole('status').textContent).toMatch(/Lantern · 20 gc each/);
+    expect((screen.getByRole('button', { name: 'Buy for Warriors' }) as HTMLButtonElement).disabled).toBe(true); // 60 gc, 50 in hand
+    expect(screen.getByRole('button', { name: 'Buy for Warriors' }).textContent).toMatch(/Not enough gold/);
+    expect(screen.queryByRole('button', { name: 'Buy for Magda' })?.textContent ?? 'Cannot take it').toMatch(/Cannot take it/);
+    await user.click(screen.getByRole('button', { name: 'Buy for Ulrich the Grey' }));
+    expect(onBuy).toHaveBeenCalledWith(lamp, 1);
   });
 });
