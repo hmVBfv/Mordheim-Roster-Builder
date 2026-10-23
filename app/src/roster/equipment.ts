@@ -125,7 +125,8 @@ export function buyRecipients(ctx: core.Ctx, key: string, price: number): Recipi
 
 /** One item somebody holds: what the Sell and Give lists show. */
 export interface Holding { from: core.Holder; owner: string; goods: core.Goods; name: string; pieces: number; paid: number | undefined; sell: number; text: string;
-  /** Typed in by hand and not in the catalogue: the player names the price. */ unpriced?: boolean }
+  /** Typed in by hand and not in the catalogue: the player names the price. */ unpriced?: boolean;
+  /** The free dagger every warrior starts with (#52): shown so that all his equipment is there, but it stays with him. */ free?: boolean }
 
 export function holdings(ctx: core.Ctx): Holding[] {
   const out: Holding[] = [];
@@ -157,12 +158,25 @@ export function holdings(ctx: core.Ctx): Holding[] {
 }
 
 
+/** The free dagger of every warrior that has one, one per man (#52). It is listed under Give, marked, and never offered for a trade. */
+export function freeDaggers(ctx: core.Ctx): Holding[] {
+  const out: Holding[] = [];
+  for (const m of ctx.s.models) {
+    for (const key of Object.keys(m.eq ?? {})) {
+      if (!key.includes(FREE) || !(Number(m.eq![key]) >= 1)) continue;
+      const g = { key, rare: false };
+      out.push({ from: m.uid, owner: warriorName(ctx, m), goods: g, name: `${core.goodsName(ctx, g).replace(/\s*\(.*\)\s*$/, '')} (free)`, pieces: core.piecesNeeded(ctx, m.uid), paid: undefined, sell: 0, text: itemText(ctx.data, key), free: true });
+    }
+  }
+  return out;
+}
+
 /** One holder on the Give board (wish #32): a warrior with what he is and can do – so one sees whom an item helps most – and what he
     holds; the stash is the last card. */
 export interface GiveCard { holder: core.Holder; name: string; type: string; men: number; stats: StatCell[]; save: string; rules: string[]; items: Holding[] }
 
 export function giveCards(ctx: core.Ctx): GiveCard[] {
-  const held = holdings(ctx);
+  const held = [...holdings(ctx), ...freeDaggers(ctx)];
   const view = rosterView(ctx.data, ctx.s);
   const cards: GiveCard[] = [...view.heroes, ...view.henchmen].map((w) => ({
     holder: w.uid, name: w.name, type: w.type, men: w.count, stats: w.stats, save: w.save,

@@ -8,12 +8,12 @@ import type { GiveCard, Holding, Recipient } from '../roster/equipment.ts';
 import styles from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
 
-const keyOf = (h: Holding) => `${String(h.from)}:${h.goods.rare ? 'r' : 'c'}:${h.goods.key}`;
+const keyOf = (h: Holding) => `${String(h.from)}:${h.goods.rare ? 'r' : h.free ? 'f' : 'c'}:${h.goods.key}`;
 
 export function GiveBoard({ cards, recipientsFor, onGive }: { cards: GiveCard[]; recipientsFor: (h: Holding) => Recipient[]; onGive: (h: Holding, to: core.Holder) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
-  const all = cards.flatMap((c) => c.items);
+  const all = cards.flatMap((c) => c.items).filter((h) => !h.free);
   // what was given is no longer held by the one who gave it: nothing stays picked
   const item = all.find((h) => keyOf(h) === picked) ?? null;
   const to = item ? recipientsFor(item) : [];
@@ -49,14 +49,14 @@ export function GiveBoard({ cards, recipientsFor, onGive }: { cards: GiveCard[];
             {c.rules.length > 0 && <p className={styles.giveRules} title={c.rules.join(', ')}>{c.rules.join(' · ')}</p>}
             <div className={styles.giveChips} role="group" aria-label={`Held by ${c.name}`}>
               {c.items.length === 0 && <small className={ui.muted}>nothing</small>}
-              {c.items.map((h) => (
-                <button key={keyOf(h)} type="button" draggable title={h.text || undefined} aria-pressed={keyOf(h) === picked}
+              {c.items.map((h) => (h.free
+                ? <span key={keyOf(h)} className={styles.giveFree} title={`${h.text ? `${h.text} – ` : ''}The free dagger: it stays with ${c.name} and cannot be traded.`}>{h.name}{h.pieces > 1 ? ` ×${h.pieces}` : ''}</span>
+                : <button key={keyOf(h)} type="button" draggable title={h.text || undefined} aria-pressed={keyOf(h) === picked}
                   onDragStart={(e) => { setPicked(keyOf(h)); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', h.name); }}
                   onDragEnd={() => setOver(null)}
                   onClick={() => setPicked(keyOf(h) === picked ? null : keyOf(h))}>
                   {h.name}{h.pieces > 1 ? ` ×${h.pieces}` : ''}
-                </button>
-              ))}
+                </button>))}
             </div>
             {item && !mine && r && (
               <button type="button" className={styles.giveHere} disabled={!r.ok} onClick={() => give(r)} aria-label={`Give to ${c.name}`}>

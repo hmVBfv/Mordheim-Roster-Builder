@@ -13,7 +13,7 @@ const stats = [{ key: 'M', value: '4', changed: false }, { key: 'WS', value: '4'
 const sword = hold(1, 'Ulrich the Grey', 'Sword'), helmet = hold(1, 'Ulrich the Grey', 'Helmet'), shield = hold('stash', 'Stash', 'Shield', 2), dagger = hold(2, 'Magda', 'Dagger');
 const cards: GiveCard[] = [
   { holder: 1, name: 'Ulrich the Grey', type: 'Captain', men: 1, stats, save: '5+', rules: ['Leader', 'Strong'], items: [sword, helmet] },
-  { holder: 2, name: 'Magda', type: 'Champion', men: 1, stats, save: '', rules: [], items: [dagger] },
+  { holder: 2, name: 'Magda', type: 'Champion', men: 1, stats, save: '', rules: [], items: [dagger, { ...hold(2, 'Magda', 'Dagger (free)'), free: true }] },
   { holder: 3, name: 'Warriors', type: 'Warrior', men: 3, stats: [], save: '', rules: [], items: [] },
   { holder: 'stash', name: 'Stash', type: '', men: 1, stats: [], save: '', rules: [], items: [shield] },
 ];
@@ -85,5 +85,17 @@ describe('Give on a wide screen', () => {
   it('nothing held: it says so', () => {
     render(<GiveBoard cards={cards.map((c) => ({ ...c, items: [] }))} recipientsFor={recipients} onGive={() => undefined} />);
     expect(screen.getByText('Nothing to give.')).toBeTruthy();
+  });
+
+  it('shows the free dagger as a marked chip that cannot be picked or given (#52)', async () => {
+    const user = userEvent.setup();
+    render(<GiveBoard cards={cards} recipientsFor={recipients} onGive={() => undefined} />);
+    const held = within(screen.getByRole('group', { name: 'Held by Magda' }));
+    expect(held.getAllByRole('button').map((b) => b.textContent)).toEqual(['Dagger']);
+    const chip = held.getByText('Dagger (free)');
+    expect(chip.getAttribute('title')).toMatch(/cannot be traded/);
+    await user.click(chip);
+    expect(screen.queryByRole('status')?.textContent ?? '').not.toMatch(/free/);
+    expect(screen.queryByRole('button', { name: /^Give to/ })).toBeNull();
   });
 });
