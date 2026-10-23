@@ -210,6 +210,29 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await expect.poll(gold).toBe(start);
 });
 
+/* #54: Buy and Sell follow the Give board on a wide screen. */
+test('the Trading Post on a wide screen: Buy and Sell use the cards of Give', async ({ page }) => {
+  test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('./');
+  await importText(page, FOUGHT);
+  await page.getByRole('link', { name: 'Trade' }).click();
+  const gold = async () => Number((await page.locator('dt:text-is("Gold in hand") + dd').textContent())!.replace(/\D/g, ''));
+  const board = page.getByLabel('Warriors and the stash');
+  await page.getByRole('button', { name: 'Sell', exact: true }).click();
+  expect(await board.getByRole('article').count()).toBeGreaterThan(2);
+  await expect(board.getByLabel('Profile').first()).toBeVisible();
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-sell-wide.png` });
+  await page.getByRole('button', { name: 'Buy', exact: true }).click();
+  const sale = board.getByRole('group', { name: 'For sale' });
+  await sale.getByRole('button').first().click();
+  await expect(board.getByRole('status')).toContainText('each');
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-trade-buy-wide.png` });
+  const start = await gold();
+  await board.getByRole('button', { name: 'Buy for Stash' }).click();
+  await expect.poll(gold).toBeLessThan(start);
+});
+
 /* #24, #26: the rare items on a narrow phone (468 px): every price says what it is, nothing breaks in a bad place, nothing
    overlaps – in the list and in the sheet a Hero's Search opens. */
 test('the rare items are readable on a narrow phone: a price says gc, the texts do not overlap', async ({ page }) => {
