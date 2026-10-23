@@ -3,7 +3,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { giveCards } from './equipment.ts';
+import { giveCards, holdings } from './equipment.ts';
 import { createWarband } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -33,5 +33,15 @@ describe('the Give board\'s cards (wish #32)', () => {
     expect(captain.items.map((h) => h.goods.key)).toContain('Schwert');
     expect(cards[1]!.men).toBe(3);
     expect(cards[2]!).toMatchObject({ name: 'Stash', items: [] });
+  });
+
+  it('lists the free dagger of a warrior, one per man, marked as free and apart from what can be given (#52)', () => {
+    const { s, capt, warr } = band(1);
+    const cards = giveCards(ctx(s));
+    const free = (uid: number) => cards.find((c) => c.holder === uid)!.items.filter((h) => h.free);
+    expect(free(capt).map((h) => [h.name, h.pieces])).toEqual([['Dagger (free)', 1]]);
+    expect(free(warr).map((h) => [h.name, h.pieces])).toEqual([['Dagger (free)', 3]]);
+    // the tradable holdings do not contain it
+    expect(holdings(ctx(s)).some((h) => h.goods.key.includes('gratis'))).toBe(false);
   });
 });
