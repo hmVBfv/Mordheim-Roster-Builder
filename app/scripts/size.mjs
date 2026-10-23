@@ -11,9 +11,9 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-/** Per flavour (ADR 0021): the campaign is used mostly on a desktop and may
-    be larger; the Quick Build is what a newcomer opens on a phone from a link. */
-export const LIMITS = { campaign: 250 * 1024, quickbuild: 200 * 1024 };
+/** Per flavour (ADR 0021, ADR 0025): one limit each, so that one can move
+    without the other. Both 250 kB since 23.10.2026 (the Quick Build had 200). */
+export const LIMITS = { campaign: 250 * 1024, quickbuild: 250 * 1024 };
 
 /** The line printed for one flavour, and whether it is over its own limit. */
 export function verdict(flavour, total) {

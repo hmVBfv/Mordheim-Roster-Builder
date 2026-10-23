@@ -39,7 +39,8 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0018](0018-ai-pack-by-hand.md) | KI-Paket von Hand weitergeben; keine Ablage in `eingang/chronik/` (ersetzt Teile von 0004) |
 | [0019](0019-bug-token.md) | Bug-Token: ein eigener Zugang für Cloud-Sitzungen, nur `GET/PATCH /bugs` (ergänzt 0012) |
 | [0020](0020-live-updates-signal-stream.md) | Live-Aktualisierung: ein Strom von Signalen je offener App, die App holt über die gewohnten Endpunkte nach (ergänzt 0005, 0010, 0011) |
-| [0021](0021-first-load-budget-per-flavour.md) | Erste-Laden-Grenze je Ausgabe: Kampagne 250 KB, Quick Build 200 KB (angenommen, ergänzt 0014) |
+| [0021](0021-first-load-budget-per-flavour.md) | Erste-Laden-Grenze je Ausgabe: Kampagne 250 KB, Quick Build 200 KB (angenommen, ergänzt 0014; die 200 KB ersetzt durch 0025) |
 | [0022](0022-hidden-npc-values-in-scenarios.md) | Verborgene Teile bei den NPCs eines Szenarios: der Server schwärzt mit „?“, nach der Freigabe nur noch aufdecken (vorgeschlagen, ergänzt 0002, 0011) |
 | [0023](0023-library-per-account.md) | Die Library: Ideen und Vorlagen (Fraktionen, NPCs, Gruppen, Szenarien) privat beim Konto, immer als Kopie in die Kampagne (vorgeschlagen, ergänzt 0002, 0005, 0011, 0022) |
 | [0024](0024-lore-catalogue-places-and-sources.md) | Der Lore-Katalog: Orte ineinander, Gruppen mit Herkunftsorten, Quellen auch außerhalb von mordheimer.net, mit eigenen Worten (angenommen, ergänzt 0023) |
+| [0025](0025-quick-build-first-load-250-kb.md) | Erste-Laden-Grenze des Quick Builds: 250 KB wie die Kampagne (angenommen, ersetzt einen Teil von 0021) |
