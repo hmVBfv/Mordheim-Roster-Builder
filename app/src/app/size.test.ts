@@ -17,15 +17,15 @@ describe('the first-load budget', () => {
     expect(firstLoad(html)).toEqual(['/assets/index-abc.js', '/assets/db-123.js', '/assets/api-456.js']);
   });
 
-  it('holds each flavour to its own limit (ADR 0021): the campaign may be larger than the Quick Build', () => {
+  it('holds each flavour to its own limit (ADR 0021, ADR 0025): both 250 kB now, each can move alone', () => {
     const kB = (n: number) => n * 1024;
     expect(Object.keys(LIMITS).sort()).toEqual(['campaign', 'quickbuild']);
-    expect(LIMITS.campaign).toBeGreaterThan(LIMITS.quickbuild);
-    // 230 kB is fine for the campaign and too much for the Quick Build
-    expect(verdict('campaign', kB(230)).over).toBe(false);
-    expect(verdict('quickbuild', kB(230)).over).toBe(true);
+    expect(LIMITS).toEqual({ campaign: kB(250), quickbuild: kB(250) });
+    expect(verdict('quickbuild', kB(230)).over).toBe(false);
+    expect(verdict('campaign', kB(260)).over).toBe(true);
     // the limit itself still passes, one byte more does not
     expect(verdict('quickbuild', LIMITS.quickbuild).over).toBe(false);
+    expect(verdict('quickbuild', LIMITS.quickbuild + 1).over).toBe(true);
     expect(verdict('campaign', LIMITS.campaign + 1).over).toBe(true);
     expect(verdict('campaign', kB(190)).line).toBe('campaign: JavaScript on first load 190.0 kB gzipped (limit 250 kB)');
     expect(() => verdict('desktop', 1)).toThrow(/no first-load limit/);
