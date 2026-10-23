@@ -57,7 +57,7 @@ describe('Goblin Warriors: at most two for each Orc', () => {
     s = goblins(s, 5);
     expect(core.warbandWarnings(ctx(s)).some((w) => /Goblin/.test(w))).toBe(false);
     s = core.removeUnit(ctx(s), s.models.find((m) => m.uid_def === 'boyz')!.uid);   // 1 Orc: 2 Goblins
-    expect(core.warbandWarnings(ctx(s))).toContain('Too many Goblin (max. 2).');
+    expect(core.warbandWarnings(ctx(s))).toContain("Too many Goblin (max. 2): at most 2 for each Orc Boss, Orc Shaman, Orc Big 'Un or Orc Boyz in the warband (1 now).");
   });
 });
 
@@ -80,7 +80,19 @@ describe('Cave Squigs: up to five, never more than the Goblins', () => {
     expect(count(s, 'squig')).toBe(5);
     s = goblins(s, 4);
     s = goblins(s, 4);
-    expect(core.warbandWarnings(ctx(s))).toContain('Too many Cave Squig (max. 4).');
+    expect(core.warbandWarnings(ctx(s))).toContain('Too many Cave Squig (max. 4): never more than the Goblin in the warband (4 now).');
+  });
+});
+
+describe('the warning names what the limit rests on (report #51)', () => {
+  it('says so for a ratio, and keeps the plain text where the unit\'s own maximum is what is exceeded', () => {
+    // six Squigs: five is the Squigs' own maximum, with plenty of Goblins to allow more
+    let s = goblins(mob(5), 8);
+    s = core.addUnit(ctx(s), 'squig');
+    const squig = s.models.find((m) => m.uid_def === 'squig')!;
+    const six = structuredClone(s);
+    six.models = six.models.map((m) => (m.uid === squig.uid ? { ...m, qty: 6 } : m));
+    expect(core.warbandWarnings(ctx(six))).toContain('Too many Cave Squig (max. 5).');
   });
 });
 
