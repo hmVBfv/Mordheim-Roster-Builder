@@ -3959,3 +3959,24 @@ too thin. "Add to Library" now carries the place chain into the text. Pull reque
 
 Rob also asked for a password-reset link an admin can hand to a player. It exists
 already (Admin → Users → "Make a link", 24 hours); there is no mail to send it by.
+
+## October 23, 2026 — the third run: #52, #53, #54 (the Trading Post)
+
+Three reports about the Trading Post, one of them with a plain cause. **#53**: daggers
+in the stash could not be given to anyone ("not in the equipment list of a …"). The
+stash and the price chart call the item "Dolch", the equipment lists "Dolch (1. gratis)",
+and the lookup compared names exactly. The fix treats the two spellings as one good
+(also inside the stash, where they are now counted together), finds what a warrior
+holds under the name he already uses, and gives under the name of his own list, so the
+free dagger stays his. The reporter's other question, whether a group is charged the
+right count, was checked and is right: one piece per man. Giving single daggers to
+single men of a group is not possible by design; that would be a wish of its own.
+**#52** (wish, confirmed by Rob): the free dagger is listed under Give as "Dagger (free)"
+in a dashed chip that cannot be picked or dragged; the trade rules were not touched, it
+stays impossible to sell or give it. **#54** (wish, confirmed by Rob: the card view of
+Give is what is meant): on a wide screen Buy and Sell use the same cards. Sell turns
+the chips into buttons that open the price sheet; Buy puts the items on sale above the
+cards and a picked one says on each card whether the warrior may carry it and what it
+costs there. A phone keeps the lists and sheets. Pull requests 164 to 166, stacked
+(164, then 165, then 166). One e2e test of the Trading Post timed out once under load
+and passed alone; no cause in the change.
