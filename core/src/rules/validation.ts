@@ -7,7 +7,7 @@ import type { UnitDef } from '../data/types.ts';
 import type { Model } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
-import { countOf, goldCurrent, modelsOf, totalHeroes, totalModels, unitMax, warbandMax } from './costs.ts';
+import { countOf, goldCurrent, modelsOf, ratioMen, totalHeroes, totalModels, unitMax, warbandMax } from './costs.ts';
 import { eqWeaponLimit } from './equipment.ts';
 import { eqListFor, itemFamily, unitDef, warbandDef } from './lookup.ts';
 import { isMarauderSeer, leaderUid } from './profile.ts';
@@ -126,7 +126,7 @@ export function warbandWarnings(ctx: Ctx): string[] {
       else w.push('The Merchant is lost and no model can become the leader — buy an Apprentice as soon as possible (after the next game) to take over as the new Merchant.');
     }
   }
-  for (const u of wb.units) { const umx = unitMax(ctx, u); if (umx != null && modelsOf(ctx, u.id) > umx) w.push(`Too many ${u.name} (max. ${umx}).`); }
+  for (const u of wb.units) { const umx = unitMax(ctx, u); if (umx != null && modelsOf(ctx, u.id) > umx) { const why = ratioReason(ctx, u); w.push(`Too many ${u.name} (max. ${umx})${why ? `: ${why}` : ''}.`); } }
   for (const u of wb.units) if (u.min && modelsOf(ctx, u.id) < u.min) w.push(`At least ${u.min} ${u.name} required (currently ${modelsOf(ctx, u.id)}).`);
   for (const m of s.models) {
     const d = unitDef(ctx, m.uid_def);
@@ -136,6 +136,18 @@ export function warbandWarnings(ctx: Ctx): string[] {
     w.push('Seer without a Mark of Chaos — a Seer must choose one; the warband is not legal.');
   }
   return w;
+}
+
+/** What a unit's limit rests on when it hangs on others (`maxPer`) and they, not its own maximum, set it
+    ("at most 2 for each Orc Boss … in the warband (1 now)"); null otherwise (report #51). */
+export function ratioReason(ctx: Ctx, u: UnitDef): string | null {
+  const mp = u.maxPer;
+  if (!mp) return null;
+  const men = ratioMen(ctx, mp);
+  if (mp.per * men >= (u.max ?? Infinity)) return null;
+  const names = mp.of.map((id) => unitDef(ctx, id)?.name ?? id);
+  const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}` : (names[0] ?? '');
+  return `${mp.per === 1 ? 'never more than the' : `at most ${mp.per} for each`} ${list} in the warband (${men} now)`;
 }
 
 export interface RecruitStatus {

@@ -89,7 +89,7 @@ describe('Lizardmen: no more Saurus Braves than Skink Braves', () => {
     s = recruit(s, 'saurusbrave', 3);
     expect(core.warbandWarnings(ctx(s)).some((w) => /Saurus Brave/.test(w))).toBe(false);
     s = core.setQty(ctx(s), s.models.find((m) => m.uid_def === 'skinkbrave')!.uid, 1);
-    expect(core.warbandWarnings(ctx(s))).toContain('Too many Saurus Brave (max. 1).');
+    expect(core.warbandWarnings(ctx(s))).toContain('Too many Saurus Brave (max. 1): never more than the Skink Brave in the warband (1 now).');
   });
 });
 

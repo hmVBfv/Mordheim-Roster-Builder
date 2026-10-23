@@ -31,8 +31,12 @@ export function unitMax(ctx: Ctx, def: UnitDef): number | null | undefined {
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && def.id === 'warhound') return null;
   const mp = def.maxPer;
   if (!mp) return def.max;
-  const men = ctx.s.models.filter((m) => mp.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
-  return Math.min(def.max ?? Infinity, mp.per * men);
+  return Math.min(def.max ?? Infinity, mp.per * ratioMen(ctx, mp));
+}
+
+/** The men a `maxPer` limit counts: a Hero or a promoted henchman one each, a group its men. */
+export function ratioMen(ctx: Ctx, mp: NonNullable<UnitDef['maxPer']>): number {
+  return ctx.s.models.filter((m) => mp.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
 }
 
 export function warbandMax(ctx: Ctx): number {
