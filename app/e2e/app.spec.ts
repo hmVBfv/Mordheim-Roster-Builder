@@ -194,7 +194,9 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await expect(board.getByText('Pick an item, or drag it onto a warrior.')).toBeVisible();
   // several columns, and a card is small
   const cards = board.getByRole('article');
-  expect(await cards.count()).toBeGreaterThan(2);
+  await expect(cards.nth(2)).toBeVisible();
+  await expect(cards.nth(0)).toBeVisible();
+  await expect(cards.nth(1)).toBeVisible();
   const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
   expect(Math.round(a!.y)).toBe(Math.round(b!.y));
   expect(b!.x).toBeGreaterThan(a!.x + a!.width - 1);
