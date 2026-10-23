@@ -212,6 +212,24 @@ describe('giving equipment (V4)', () => {
     expect(gold(s)).toBe(before);
   });
 
+  it('a dagger in the stash goes to a warrior whose list names it "Dolch (1. gratis)" (#53)', () => {
+    const { s: s0, capt, warr } = band();
+    // a typed-in or bought stash item knows only "Dolch"; the lists name the first one free
+    let s = structuredClone(s0);
+    s.stash = { wyrd: 0, gold: 0, items: [{ name: 'Dagger', qty: 2, key: 'Dolch' }, { name: 'Dagger', qty: 2, key: 'Dolch (1. gratis)' }] };
+    expect(core.piecesHeld(ctx(s), 'stash', common('Dolch'))).toBe(4);
+    expect(core.canReceive(ctx(s), capt, common('Dolch'))).toEqual({ ok: true, reason: '' });
+    s = core.giveItem(ctx(s), 'stash', capt, common('Dolch')).state;
+    // one more besides the free one, kept under the list's own name
+    expect(model(s, capt).eq).toMatchObject({ 'Dolch (1. gratis)': 2 });
+    expect(model(s, capt).eq!.Dolch).toBeUndefined();
+    expect(core.piecesHeld(ctx(s), 'stash', common('Dolch'))).toBe(3);
+    // a group of three takes one per man, and the count taken off is three
+    s = core.giveItem(ctx(s), 'stash', warr, common('Dolch')).state;
+    expect(model(s, warr).eq!['Dolch (1. gratis)']).toBe(2);
+    expect(core.piecesHeld(ctx(s), 'stash', common('Dolch'))).toBe(0);
+  });
+
   it('refuses before the first battle, and to whom may not carry it', () => {
     const f = band(0);
     expect(core.giveItem(ctx(f.s), f.capt, f.champ, common('Schwert')).ok).toBe(false);

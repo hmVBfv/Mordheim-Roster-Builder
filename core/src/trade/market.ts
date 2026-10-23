@@ -34,6 +34,9 @@ export interface Verdict { ok: boolean; reason: string }
 
 const FREE_DAGGER = '(1. gratis)';
 
+/** "Dolch (1. gratis)" and "Dolch" are one item: a list names the first dagger free, the stash and the chart do not. */
+const bare = (key: string): string => key.replace(/\s*\(1\. gratis\)/, '');
+
 const catalogItem = (ctx: Ctx, de: string): CatalogItem | undefined => ctx.data.CATALOG.find((it) => it.de === de);
 
 /** How an item of an equipment list is traded after the first battle (V5):
@@ -95,7 +98,25 @@ function listEntry(ctx: Ctx, def: UnitDef | undefined, key: string): EquipmentEn
     const e = (list[cat] ?? []).find(([nm]) => nm === key);
     if (e) return e;
   }
+  for (const cat of Object.keys(list)) {
+    const e = (list[cat] ?? []).find(([nm]) => bare(nm) === bare(key));
+    if (e) return e;
+  }
   return undefined;
+}
+
+/** The name a warrior holds an item under: the one in his own list, else the key as given. */
+function heldKey(ctx: Ctx, m: Pick<Model, 'uid_def' | 'eq'>, key: string): string {
+  if (m.eq && key in m.eq) return key;
+  const own = Object.keys(m.eq ?? {}).find((k) => bare(k) === bare(key));
+  if (own) return own;
+  const def = unitDef(ctx, m.uid_def);
+  const list = def ? eqListFor(ctx, def) : undefined;
+  for (const cat of Object.keys(list ?? {})) {
+    const e = (list![cat] ?? []).find(([nm]) => bare(nm) === bare(key));
+    if (e) return e[0];
+  }
+  return key;
 }
 
 /** Men of a warrior: a henchman group counts each, a Hero is one. */
@@ -138,7 +159,7 @@ export function stashGoods(ctx: Ctx, it: StashItem): Goods {
   return { key: name, rare: false };
 }
 
-const sameGoods = (c: Ctx, it: StashItem, g: Goods): boolean => { const x = stashGoods(c, it); return x.key === g.key && x.rare === g.rare; };
+const sameGoods = (c: Ctx, it: StashItem, g: Goods): boolean => { const x = stashGoods(c, it); return bare(x.key) === bare(g.key) && x.rare === g.rare; };
 
 /** Pieces of an item a holder can part with. */
 export function piecesHeld(ctx: Ctx, from: Holder, g: Goods): number {
@@ -147,7 +168,8 @@ export function piecesHeld(ctx: Ctx, from: Holder, g: Goods): number {
   }
   const m = findModel(ctx.s, from);
   if (!m) return 0;
-  const perMan = g.rare ? Number(m.rare?.[g.key]?.q) || 0 : Math.max(0, (Number(m.eq?.[g.key]) || 0) - (g.key.includes(FREE_DAGGER) ? 1 : 0));
+  const hk = g.rare ? g.key : heldKey(ctx, m, g.key);
+  const perMan = g.rare ? Number(m.rare?.[g.key]?.q) || 0 : Math.max(0, (Number(m.eq?.[hk]) || 0) - (hk.includes(FREE_DAGGER) ? 1 : 0));
   return perMan * menOf(ctx, m);
 }
 
@@ -241,16 +263,17 @@ function outOfWarrior(d: WarbandDraft, c: Ctx, uid: number, g: Goods): { pieces:
     delete m.rare![g.key];
     return { pieces: q * men, paid };
   }
-  const have = Number(m.eq?.[g.key]) || 0;
-  const keep = g.key.includes(FREE_DAGGER) ? Math.min(1, have) : 0;
+  const hk = heldKey(c, m as Model, g.key);
+  const have = Number(m.eq?.[hk]) || 0;
+  const keep = hk.includes(FREE_DAGGER) ? Math.min(1, have) : 0;
   const q = have - keep;
   if (q <= 0) return { pieces: 0, paid: undefined };
-  if (keep) m.eq![g.key] = keep; else delete m.eq![g.key];
-  return { pieces: q * men, paid: commonPrice(c, g.key) ?? undefined };
+  if (keep) m.eq![hk] = keep; else delete m.eq![hk];
+  return { pieces: q * men, paid: commonPrice(c, hk) ?? undefined };
 }
 
 /** Gives a warrior one more of an item per man. */
-function toWarrior(d: WarbandDraft, uid: number, g: Goods, paid: number | undefined): void {
+function toWarrior(d: WarbandDraft, c: Ctx, uid: number, g: Goods, paid: number | undefined): void {
   const m = findModel(d, uid);
   if (!m) return;
   if (g.rare) {
@@ -262,7 +285,8 @@ function toWarrior(d: WarbandDraft, uid: number, g: Goods, paid: number | undefi
     return;
   }
   m.eq = m.eq ?? {};
-  m.eq[g.key] = (Number(m.eq[g.key]) || 0) + 1;
+  const key = heldKey(c, m as Model, g.key);
+  m.eq[key] = (Number(m.eq[key]) || 0) + 1;
 }
 
 /* ---- the Trading Post ---- */
@@ -290,7 +314,7 @@ export function buyItem(ctx: Ctx, to: Holder, key: string, opts: { qty?: number;
   const pieces = to === 'stash' ? Math.max(1, Math.round(Number(opts.qty) || 1)) : piecesNeeded(ctx, to);
   const s0 = ensureLedger(ctx);
   const state = update(ctxOf(ctx.data, s0), (d, c) => {
-    if (to === 'stash') intoStash(d, c, g, pieces, each); else toWarrior(d, to, g, each);
+    if (to === 'stash') intoStash(d, c, g, pieces, each); else toWarrior(d, c, to, g, each);
     bookOn(d, c, 'buy', -each * pieces, { text: `Bought ${goodsName(c, g)}${pieces > 1 ? ` ×${pieces}` : ''}`, uid: to === 'stash' ? undefined : to, item: key, qty: pieces });
   });
   return { state, ok: true, reason: '' };
@@ -359,7 +383,7 @@ export function giveItem(ctx: Ctx, from: Holder, to: Holder, g: Goods): Trade {
       ({ pieces, paid } = outOfWarrior(d, c, from, g));
     }
     let left = pieces;
-    if (to !== 'stash') { toWarrior(d, to, g, paid); left -= need; }
+    if (to !== 'stash') { toWarrior(d, c, to, g, paid); left -= need; }
     intoStash(d, c, g, left, paid);
     // no gold moves: what the warband owns changed, gold in hand did not
     syncTreasury(d, c);
@@ -459,7 +483,7 @@ export function recordSearch(ctx: Ctx, uid: number, de: string, result: { found:
       return;
     }
     const paid = Math.max(0, Math.round(result.paid));
-    if (to === 'stash') intoStash(d, c, g, 1, paid); else toWarrior(d, to, g, paid);
+    if (to === 'stash') intoStash(d, c, g, 1, paid); else toWarrior(d, c, to, g, paid);
     bookOn(d, c, 'search', -paid, { text: `${hero} found ${name}`, uid, item: de, qty: 1, found: true });
   });
   return { state, ok: true, reason: '' };
