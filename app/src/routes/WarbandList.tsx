@@ -28,10 +28,8 @@ export function WarbandList({ warbands, marks = false, grid = false, groups }: {
               {w.conflict && <strong className={ui.error}> · changed elsewhere too – check</strong>}
             </small>
             {/* when it was made and last changed: two warbands of one name differ by it */}
-            <small>
-              <time dateTime={w.createdAt}>Created {stamp(w.createdAt)}</time>
-              {w.updatedAt !== w.createdAt && <> · <time dateTime={w.updatedAt}>Updated {stamp(w.updatedAt)}</time></>}
-            </small>
+            <small><time dateTime={w.createdAt}>Created {stamp(w.createdAt)}</time></small>
+            <small>{w.updatedAt !== w.createdAt ? <time dateTime={w.updatedAt}>Updated {stamp(w.updatedAt)}</time> : <>Updated never</>}</small>
           </Link>
           {groups && (
             <select className={ui.select} aria-label={`Group of ${w.name}`} value={groups.of(w.id)} disabled={groups.disabled} onChange={(e) => groups.assign(w.id, e.target.value)}>
