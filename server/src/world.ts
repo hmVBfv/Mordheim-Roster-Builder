@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
+import { nameTaken } from './names.ts';
 import { NpcProfileBody, type NpcProfileInput } from './opponents.ts';
 
 const iso = (d: Date) => d.toISOString();
@@ -115,6 +116,7 @@ export function putFaction(db: DB, campaignId: string, id: string, input: Factio
   return db.transaction((): Put<FactionRow> => {
     const cur = factionById(db, id);
     if (cur && (cur.campaign_id !== campaignId || cur.deleted_at)) return { ok: false, status: 409, error: cur.deleted_at ? 'removed' : 'exists' };
+    if (nameTaken(db, 'factions', campaignId, ['name_en', 'name_de'], [input.nameEn, input.nameDe], id)) return invalid('a faction of this name exists already');
     if (!cur) {
       if (count(db, 'factions', campaignId) >= MAX_FACTIONS) return invalid(`a campaign holds at most ${MAX_FACTIONS} factions`);
       const seq = audit(db, { actorId: by.id, action: 'world.faction.create', targetType: 'faction', targetId: id, campaignId, visibility: 'public' }, now);
@@ -152,6 +154,7 @@ export function putNpc(db: DB, campaignId: string, id: string, input: NpcInput, 
       const f = factionById(db, input.factionId);
       if (!f || f.campaign_id !== campaignId || f.deleted_at) return invalid('no such faction in this campaign');
     }
+    if (nameTaken(db, 'npcs', campaignId, ['name_en', 'name_de'], [input.nameEn, input.nameDe], id)) return invalid('an NPC of this name exists already');
     if (!cur) {
       if (count(db, 'npcs', campaignId) >= MAX_NPCS) return invalid(`a campaign holds at most ${MAX_NPCS} NPCs`);
       const seq = audit(db, { actorId: by.id, action: 'world.npc.create', targetType: 'npc', targetId: id, campaignId, visibility: 'public' }, now);

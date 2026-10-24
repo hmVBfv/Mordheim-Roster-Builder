@@ -17,6 +17,7 @@ import { advanceRound, changesOf } from './aftermath.ts';
 import { battleById } from './battles.ts';
 import { PastBattleBody, putPastBattle, removePastBattle } from './history.ts';
 import { ACCOUNT_FULL, checkSave, draftOfUser, fitsAccount, metaOf, versionOf, warbandById, weightOf } from './warbands.ts';
+import { campaignNameTaken } from './names.ts';
 
 export interface CampaignDeps { db: DB | null; now: () => Date; uploadDir?: string | null }
 
@@ -52,6 +53,7 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
   app.post('/api/v1/campaigns', { config: { action: 'campaigns.create' }, schema: body({ name: NAME, place: PLACE }, ['name']) }, async (req, reply) => {
     const name = trimmed((req.body as { name: string }).name);
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
+    if (campaignNameTaken(db(), req.actor!.id, name, '')) return reply.code(400).send({ error: 'invalid', problem: 'you are in a campaign of this name already' });
     const c = createCampaign(db(), { name, place: (req.body as { place?: string }).place ?? '', by: req.actor!.id }, now());
     return reply.code(201).send(view(c, 'leader'));
   });
@@ -67,6 +69,7 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!t) return reply;
     const name = trimmed((req.body as { name: string }).name);
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
+    if (name !== t.c.name && campaignNameTaken(db(), req.actor!.id, name, t.c.id)) return reply.code(400).send({ error: 'invalid', problem: 'you are in a campaign of this name already' });
     if (name !== t.c.name) renameCampaign(db(), t.c, name, req.actor!.id, now());
     return view(t.c, t.role);
   });
