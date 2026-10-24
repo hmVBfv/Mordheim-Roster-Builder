@@ -3,7 +3,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { giveCards, giveRecipients, holdings, searchDestinations, stashPaid } from './equipment.ts';
+import { giveCards, giveRecipients, holdings, searchDestinations, searchers, stashPaid } from './equipment.ts';
 import { createWarband } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -43,6 +43,20 @@ describe('the Give board\'s cards (wish #32)', () => {
     expect(free(warr).map((h) => [h.name, h.pieces])).toEqual([['Dagger (free)', 3]]);
     // the tradable holdings do not contain it
     expect(holdings(ctx(s)).some((h) => h.goods.key.includes('gratis'))).toBe(false);
+  });
+});
+
+describe('who may look for the item picked (#60)', () => {
+  it('offers only a Spellcaster for a Familiar, and every Hero for a plain item', () => {
+    let s = createWarband(data, 'caravans', null, 'The Silver Caravan');
+    s = core.addUnit(ctx(s), 'merchant');
+    s = core.addUnit(ctx(s), 'magician');
+    s = structuredClone(s);
+    s.campaign = { ...s.campaign, on: true, round: 1 };
+    const names = (de?: string) => searchers(ctx(s), de).filter((x) => !x.why).map((x) => x.name);
+    expect(names()).toHaveLength(2);
+    expect(names('Vertrauter')).toHaveLength(1);
+    expect(searchers(ctx(s), 'Vertrauter').find((x) => x.why)?.why).toBe('only a Spellcaster may look for it');
   });
 });
 

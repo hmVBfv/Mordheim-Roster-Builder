@@ -267,6 +267,25 @@ describe('searching for rare items (V5)', () => {
     expect(core.searchModifiers(ctx(s), uid, other.de).map((x) => x.value)).toEqual([-1]);
   });
 
+  it('an item for Spellcasters only is searched for by a Spellcaster only (#60)', () => {
+    let s = core.newWarband(data, 'caravans');
+    s = core.addUnit(ctx(s), 'merchant');
+    s = core.addUnit(ctx(s), 'magician');
+    const merchant = s.models.find((m) => m.uid_def === 'merchant')!.uid;
+    const magician = s.models.find((m) => m.uid_def === 'magician')!.uid;
+    s = structuredClone(s);
+    s.campaign = { ...s.campaign, on: true, round: 1 };
+    expect(core.searchBlockFor(ctx(s), merchant, 'Vertrauter')).toBe('only a Spellcaster may look for it');
+    expect(core.searchBlockFor(ctx(s), magician, 'Vertrauter')).toBeNull();
+    // an item for everybody: both may look
+    const plain = rareFor(s, merchant);
+    expect(core.searchBlockFor(ctx(s), merchant, plain.de)).toBeNull();
+    // the search itself refuses what the sheet does not offer
+    const refused = core.recordSearch(ctx(s), merchant, 'Vertrauter', { found: false });
+    expect(refused).toMatchObject({ ok: false, reason: 'only a Spellcaster may look for it' });
+    expect(core.recordSearch(ctx(s), magician, 'Vertrauter', { found: false }).ok).toBe(true);
+  });
+
   it('one roll per Hero after a battle; a find is paid and stored', () => {
     const { s, capt, warr } = band();
     const it = rareFor(s, capt);

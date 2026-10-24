@@ -147,9 +147,12 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
   ctx: core.Ctx; start: { uid: number | null; de: string | null }; items: RareItem[]; gold: number; close: SheetApi['close'];
   onFound: (uid: number, de: string, paid: number, to: core.Holder) => void; onMissed: (uid: number, de: string) => void; titleId: string;
 }) {
-  const who = searchers(ctx).filter((s) => !s.why);
-  const [uid, setUid] = useState<number | null>(start.uid ?? who[0]?.uid ?? null);
   const [de, setDe] = useState<string | null>(start.de);
+  // once an item is chosen, only those who may look for it are offered (#60)
+  const who = searchers(ctx, de).filter((s) => !s.why);
+  const [picked, setUid] = useState<number | null>(start.uid ?? searchers(ctx).find((s) => !s.why)?.uid ?? null);
+  const uid = who.some((w) => w.uid === picked) ? picked : who[0]?.uid ?? null;
+  const onlyFor = de ? searchers(ctx, de).map((x) => x.why).find((w) => w?.startsWith('only a')) : null;
   const [q, setQ] = useState('');
   const [stat, setStat] = useState<StatFilter | ''>('');
   const [max, setMax] = useState<number | null>(null);
@@ -180,6 +183,7 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
           </select>
         </label>
       )}
+      {de && who.length === 0 && <p className={`${ui.message} ${styles.no}`} role="status">Nobody here may look for it{onlyFor ? ` – ${onlyFor}` : ''}.</p>}
       <RareMask q={q} stat={stat} max={max} sort={sort} from={from} grade={grade} items={items} onQ={setQ} onStat={setStat} onMax={setMax} onSort={setSort} onFrom={setFrom} onGrade={setGrade} shown={matching.length} total={items.length} />
       <div className={`${styles.pick} ${styles.scroll}`} role="group" aria-label="Rare items">
         {shown.map((x) => (

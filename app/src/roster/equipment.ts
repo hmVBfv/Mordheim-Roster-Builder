@@ -223,11 +223,12 @@ export function searchDestinations(ctx: core.Ctx, key: string, rare: boolean): R
 /** A Hero who may look for a rare item now, or why not. */
 export interface Searcher { uid: number; name: string; why: string | null; last: string | null }
 
-export function searchers(ctx: core.Ctx): Searcher[] {
+/** With `de`: who may look for that item – a Familiar is looked for by a Spellcaster only (#60). */
+export function searchers(ctx: core.Ctx, de?: string | null): Searcher[] {
   const round = Number(ctx.s.campaign?.round) || 0;
   return ctx.s.models.filter((m) => core.isHeroModel(ctx, m)).map((m) => {
     const e = (ctx.s.ledger ?? []).filter((x) => x.kind === 'search' && x.uid === m.uid && (Number(x.round) || 0) === round).at(-1);
-    return { uid: m.uid, name: warriorName(ctx, m), why: core.searchBlock(ctx, m.uid), last: e ? e.text : null };
+    return { uid: m.uid, name: warriorName(ctx, m), why: de ? core.searchBlockFor(ctx, m.uid, de) : core.searchBlock(ctx, m.uid), last: e ? e.text : null };
   });
 }
 

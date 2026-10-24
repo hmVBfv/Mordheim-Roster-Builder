@@ -459,11 +459,22 @@ export function searchBlock(ctx: Ctx, uid: number): string | null {
   return null;
 }
 
+/** Why a Hero may not search for this item: the reasons of `searchBlock`, or the item is for some warriors only – a Familiar is
+    looked for by a Spellcaster, nobody else (#60). Any other rare item is looked for by any Hero (Rob, 24.10.2026). */
+export function searchBlockFor(ctx: Ctx, uid: number, de: string): string | null {
+  const why = searchBlock(ctx, uid);
+  if (why) return why;
+  const it = catalogItem(ctx, de);
+  const m = findModel(ctx.s, uid);
+  if (it?.only && m && !(catalogAllowed(ctx, it, m) && !keptFromUnit(ctx, it, m))) return it.only.casters ? 'only a Spellcaster may look for it' : 'kept for other warriors';
+  return null;
+}
+
 /** Records a Hero's search: found or not. A found item is bought at the
     price paid (dice included) and goes to the stash (post-battle step 6) or
     straight to a warrior who may carry it. */
 export function recordSearch(ctx: Ctx, uid: number, de: string, result: { found: false } | { found: true; paid: number; to?: Holder }): Trade {
-  const block = searchBlock(ctx, uid);
+  const block = searchBlockFor(ctx, uid, de);
   if (block) return refuse(ctx, block);
   const g: Goods = { key: de, rare: true };
   if (!catalogItem(ctx, de)) return refuse(ctx, 'not in the catalogue');
