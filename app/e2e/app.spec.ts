@@ -77,7 +77,7 @@ test('a Wizard shows the spells of his school on his card', async ({ page }) => 
   await sheet.getByRole('button', { name: /^Merchant/ }).click();
   await page.getByRole('button', { name: '+ Recruit' }).click();
   await sheet.getByRole('button', { name: /^Magician/ }).click();
-  const wizard = await unit(page, 'Magician', 'Skills');
+  const wizard = await unit(page, 'Magician', 'Skills & injuries');
   const list = wizard.getByRole('list', { name: /^Spell list: / });
   await expect(list).toBeVisible();
   expect(await list.getByRole('listitem').count()).toBeGreaterThan(3);
