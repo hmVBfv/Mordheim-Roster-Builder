@@ -84,6 +84,12 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-admin-reports`);
+    // #67: the mark of an attached warband is a small pill of one line, not a bubble stretched to the height of the title
+    const flag = table.getByText('warband attached');
+    const pill = (await flag.boundingBox())!;
+    const card = (await table.getByRole('row').nth(2).boundingBox())!;
+    expect(pill.height).toBeLessThan(32);
+    expect(pill.x + pill.width).toBeLessThanOrEqual(card.x + card.width);
     await page.getByRole('button', { name: 'Open: Gold drifts after the second battle' }).click();
     const sheet = page.getByRole('dialog', { name: 'Gold drifts after the second battle' });
     await expect(sheet.getByText('After the battle the gold is off by 15.', { exact: true })).toBeVisible();
