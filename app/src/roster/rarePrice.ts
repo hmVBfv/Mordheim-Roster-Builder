@@ -27,6 +27,14 @@ export function priceRange(cost: number | string): [number, number] | null {
   return [base + dice * mult, base + dice * sides * mult];
 }
 
+/** One number of a spread, rounded to one decimal the usual way (from "x.y5" up) and without a trailing ".0". */
+const oneDecimal = (n: number): string => String(Math.round((n + Number.EPSILON) * 10) / 10);
+
+/** What a dice price comes to, in words (#59): "min. 21 gc, max. 26 gc, ⌀ 23.5 gc" – a dash between two prices reads like a minus. */
+export function priceSpread(range: [number, number], average: number): string {
+  return `min. ${oneDecimal(range[0])} gc, max. ${oneDecimal(range[1])} gc, ⌀ ${oneDecimal(average)} gc`;
+}
+
 /** What a dice price comes to on average (it orders the lists), or null for a fixed price and for one that is not dice. */
 export function priceAverage(cost: number | string): number | null {
   const r = priceRange(cost);

@@ -3,7 +3,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { giveCards, holdings, searchers } from './equipment.ts';
+import { giveCards, holdings, searchers, stashPaid } from './equipment.ts';
 import { createWarband } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -57,5 +57,13 @@ describe('who may look for the item picked (#60)', () => {
     expect(names()).toHaveLength(2);
     expect(names('Vertrauter')).toHaveLength(1);
     expect(searchers(ctx(s), 'Vertrauter').find((x) => x.why)?.why).toBe('only a Spellcaster may look for it');
+  });
+});
+
+describe('what a stash line says it cost (#62)', () => {
+  it('shows a price paid, and nothing for an item that cost nothing or has no price', () => {
+    expect(stashPaid(37)).toBe('37 gc each');
+    expect(stashPaid(0)).toBe('');
+    expect(stashPaid(undefined)).toBe('');
   });
 });

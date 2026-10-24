@@ -9,6 +9,7 @@ import { useSession } from '../account/session.ts';
 import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
+import { placeChoices, useLore } from './place.ts';
 import { archiveCampaign, cachedCampaigns, listCampaigns, ROLE_NAMES, roundName, startCampaign, type CampaignSummary } from './api.ts';
 import styles from './Campaign.module.css';
 
@@ -16,19 +17,21 @@ function StartSheet() {
   const { ref, open, close } = useSheet();
   const navigate = useNavigate();
   const [name, setName] = useState('');
+  const [place, setPlace] = useState('');
+  const lore = useLore();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const submit = async () => {
     setBusy(true);
     setError(null);
     try {
-      const v = await startCampaign(name);
+      const v = await startCampaign(name, place);
       close(() => void navigate(`/campaign/${v.campaign.id}/manage`));
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   };
   return (
     <>
-      <button type="button" className={ui.button} onClick={() => { setName(''); setError(null); open(); }}>Start a campaign</button>
+      <button type="button" className={ui.button} onClick={() => { setName(''); setPlace(''); setError(null); open(); }}>Start a campaign</button>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="start-title">
         <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void submit(); }}>
           <h2 id="start-title">Start a campaign</h2>
@@ -37,6 +40,15 @@ function StartSheet() {
             <span>Name of the campaign</span>
             <input className={ui.input} value={name} maxLength={80} required autoFocus onChange={(e) => setName(e.target.value)} />
           </label>
+          {lore && (
+            <label className={ui.field}>
+              <span>Place (optional)</span>
+              <select className={ui.select} value={place} onChange={(e) => setPlace(e.target.value)}>
+                <option value="">No particular place</option>
+                {placeChoices(lore).map((p) => <option key={p.id} value={p.id}>{'\u00A0\u00A0'.repeat(p.depth)}{p.name}</option>)}
+              </select>
+            </label>
+          )}
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
           <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>

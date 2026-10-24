@@ -158,6 +158,11 @@ export function holdings(ctx: core.Ctx): Holding[] {
 }
 
 
+/** What a stash line says it cost: nothing for an item that was found at no price or whose price is unknown (#62). */
+export function stashPaid(paid: number | undefined): string {
+  return Number(paid) > 0 ? `${paid} gc each` : '';
+}
+
 /** The free dagger of every warrior that has one, one per man (#52). It is listed under Give, marked, and never offered for a trade. */
 export function freeDaggers(ctx: core.Ctx): Holding[] {
   const out: Holding[] = [];

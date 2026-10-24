@@ -54,6 +54,21 @@ describe('starting a campaign', () => {
   });
 });
 
+describe('the place of a campaign (#66)', () => {
+  it('is optional, a key of the lore chosen when it starts, and every member reads it', async () => {
+    const { anna } = await world();
+    const plain = await anna('POST', '/campaigns', { name: 'Nowhere in particular' });
+    expect((plain.json() as { campaign: { place: string } }).campaign.place).toBe('');
+    const made = await anna('POST', '/campaigns', { name: 'The Hel Fenn Campaign', place: 'mordheim' });
+    expect(made.statusCode).toBe(201);
+    const { campaign } = made.json() as { campaign: { id: string; place: string } };
+    expect(campaign.place).toBe('mordheim');
+    expect((await anna('GET', `/campaigns/${campaign.id}`)).json()).toMatchObject({ campaign: { place: 'mordheim' } });
+    // not a key: refused, nothing is made
+    expect((await anna('POST', '/campaigns', { name: 'Bad place', place: 'A <script> place' })).statusCode).toBe(400);
+  });
+});
+
 describe('members', () => {
   it('a leader adds players and changes roles; a campaign keeps a leader', async () => {
     const { id, anna, kai, ben, rob, ids } = await campaign();
