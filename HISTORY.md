@@ -3980,3 +3980,37 @@ cards and a picked one says on each card whether the warrior may carry it and wh
 costs there. A phone keeps the lists and sheets. Pull requests 164 to 166, stacked
 (164, then 165, then 166). One e2e test of the Trading Post timed out once under load
 and passed alone; no cause in the change.
+
+## October 24, 2026 — the fourth run: #55 to #66 (the Trading Post on a phone, and a few campaign things)
+
+Twelve reports, all fixed. **#62**: a stash line printed "0 gc each" for an item found at
+no price; the price shows only above zero. **#58** looked like Give hiding a group that
+lacks pieces, but the Give list already named the reason ("the group needs 3, one for
+each man"); the real gap was the list of places a found item may go, which left every
+group out. It is one function now and the group stands there with its reason. I first
+tried to reproduce it through Give (two tests that passed) before reading the search
+sheet. **#64**: entering a warband with house rules of its own now asks whether the copy
+takes the campaign's rules or keeps its own, and does not enter until the player has
+answered; a warband without rules of its own is not asked. **#59**: a dice price reads
+"min. 21 gc, max. 26 gc, ⌀ 23.5 gc", the average to one decimal. **#55**: Created and
+Updated have a line each, "Updated never" when there is no update. **#66**: a campaign
+may start with a place of the lore; migration 35 adds `campaigns.place` (the key only).
+**#56, #57, #61** have one cause and one pull request: the phone lists of Sell and Give
+show carried items first and the stash under its own heading, and Give no longer lists
+the free dagger there (the wide cards keep it). **#63**: a Stash section under the
+roster with each item's text written out and Give from there.
+
+**#60** and **#65** waited for Rob's answer and were done after it. **#60**: the rules let any
+Hero search, but a Familiar says it is for Spellcasters, so a Hero is offered as searcher
+only where the catalogue's `only` allows him (`searchBlockFor`; `recordSearch` refuses the
+others too). **#65**: a name stands for one thing – a campaign's among a person's
+campaigns, and in a campaign its battles (round and title), scenarios, factions, NPCs and
+background entries. The first existing test that made two battles of one round without
+titles had to get titles. Pull requests 168 to 175 and 177 and 178; the stacked one is 175
+on 174. Three of them (169, 174, 175) got a merge conflict from the ones merged before them
+and were merged with master; a merge made in a temporary worktree committed its
+`node_modules` links (a symlink is not matched by the `node_modules/` rule), which a later
+commit on each branch took out again.
+
+One e2e run was killed by my own `timeout` and left an orphaned test web server on port
+4175; the next run could not start its servers until that process was ended.

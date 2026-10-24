@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
+import { nameTaken } from './names.ts';
 import { putNote } from './notes.ts';
 import { checkPlace, moveBlock } from './timeline.ts';
 
@@ -144,6 +145,7 @@ export function putEntry(db: DB, campaignId: string, id: string, input: EntryInp
     const cur = entryById(db, id);
     if (cur && (cur.campaign_id !== campaignId || cur.deleted_at)) return { ok: false, status: 409, error: cur.deleted_at ? 'removed' : 'exists' };
     if (!inCampaign(db, campaignId, input.battleId) || !inCampaign(db, campaignId, input.revealFromBattle)) return { ok: false, status: 400, error: 'invalid', problem: 'no such battle in this campaign' };
+    if (nameTaken(db, 'background_entries', campaignId, ['title'], [input.title], id)) return { ok: false, status: 400, error: 'invalid', problem: 'an entry of this title exists already' };
     const refs = JSON.stringify(input.refs);
     if (!cur) {
       const n = (db.prepare('SELECT count(*) AS n FROM background_entries WHERE campaign_id = ? AND deleted_at IS NULL').get(campaignId) as { n: number }).n;
