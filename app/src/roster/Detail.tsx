@@ -200,6 +200,18 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
     <>
       <Section title="Skills"><Facts items={u.skills} empty={u.xp ? 'No skills yet. The next advance can bring one.' : 'None.'} /></Section>
       {u.spells.length > 0 && <Section title="Spells"><Facts items={u.spells} /></Section>}
+      {u.lore && (
+        <Section title={`Spell list · ${u.lore.name}`}>
+          <ul className={styles.lore} aria-label={`Spell list: ${u.lore.name}`}>
+            {u.lore.spells.map((sp) => (
+              <li key={sp.name} className={sp.known ? styles.loreKnown : undefined}>
+                <span><b>{sp.name}</b>{sp.diff && <span className={styles.loreDiff}> · cast on {sp.diff}{sp.diff === 'auto' ? '' : '+'}</span>}{sp.known && <span className={styles.loreMark}> · known</span>}</span>
+                {sp.text && <small>{sp.text}</small>}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
       {w && w.mutations.length > 0 && <Section title="Mutations"><Facts items={w.mutations} /></Section>}
       {w && w.mark.length > 0 && <Section title="Mark of Chaos"><Facts items={w.mark} /></Section>}
       {acts && acts.chaos.length > 0 && (

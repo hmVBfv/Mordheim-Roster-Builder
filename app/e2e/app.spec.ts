@@ -64,6 +64,29 @@ for (const theme of THEMES) {
   });
 }
 
+/* #68: a caster's card shows the spell list of his school, with casting values and effects. */
+test('a Wizard shows the spells of his school on his card', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Warbands' }).click();
+  await page.getByRole('link', { name: 'New warband' }).click();
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('caravans');
+  await page.getByRole('textbox', { name: 'Name' }).fill('The Silver Caravan');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  const sheet = page.locator('dialog[open]');
+  await sheet.getByRole('button', { name: /^Merchant/ }).click();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await sheet.getByRole('button', { name: /^Magician/ }).click();
+  const wizard = await unit(page, 'Magician', 'Skills');
+  const list = wizard.getByRole('list', { name: /^Spell list: / });
+  await expect(list).toBeVisible();
+  expect(await list.getByRole('listitem').count()).toBeGreaterThan(3);
+  await expect(list.getByRole('listitem').first()).toContainText(/cast on \d/);
+  await noSideScroll(page);
+  await list.scrollIntoViewIfNeeded();
+  await shot(page, 'wizard-spell-list');
+});
+
 /* Phase 3a: a warband built from nothing, in both themes. Every sheet is
    checked open (width, touch targets) and photographed. */
 for (const theme of THEMES) {
