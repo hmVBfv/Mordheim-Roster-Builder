@@ -11,7 +11,7 @@ import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
-  buyRecipients, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
+  buyRecipients, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems, stashPaid,
   type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
 } from '../roster/equipment.ts';
 import { filterRare, gradeOptions, SORT_ORDERS, sortRare, sourceOptions, STAT_FILTERS, type SortOrder, type StatFilter } from '../roster/rareFilter.ts';
@@ -405,7 +405,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
         <h2 id="stash-h">Stash</h2>
         {stashItems.length ? (
           <ul className={styles.stash}>
-            {stashItems.map((it, i) => <li key={i}><span>{it.name}{it.qty > 1 && <span className={ui.muted}> ×{it.qty}</span>}</span><small>{it.paid != null ? `${gc(it.paid)} each` : ''}</small></li>)}
+            {stashItems.map((it, i) => <li key={i}><span>{it.name}{it.qty > 1 && <span className={ui.muted}> ×{it.qty}</span>}</span><small>{stashPaid(it.paid)}</small></li>)}
           </ul>
         ) : <p className={ui.muted}>Empty.</p>}
       </section>

@@ -37,16 +37,18 @@ async function onServer(data: GameData, rec: StoredWarband): Promise<StoredWarba
 interface Entered { enrolmentId: string; warband: { id: string; createdAt: string; campaignId: string | null }; head: { rev: number; data: unknown }; campaign: CampaignView }
 
 /** The warband as it enters: under the campaign's house rules. */
-async function underCampaignRules(data: GameData, campaignId: string, s: core.WarbandState): Promise<core.WarbandState> {
+async function underCampaignRules(data: GameData, campaignId: string, s: core.WarbandState, keepOwn: boolean): Promise<core.WarbandState> {
+  if (keepOwn) return s;
   const view = ((await db.meta.get(campaignKey(campaignId)))?.value as CampaignView | undefined) ?? await getCampaign(campaignId);
   const rules = view.campaign.houseRules;
   if (!core.houseDifferences(rules, s.house).length) return s;
   return applyEdit(data, s, (c) => adoptHouse(c, rules), 'House rules of the campaign', { gold: 'keep' });
 }
 
-export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband): Promise<{ id: string; campaign: CampaignView }> {
+/** `keepOwnRules`: the copy keeps the warband's own house rules instead of taking the campaign's (#64); the leaders then see that they differ. */
+export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband, opts: { keepOwnRules?: boolean } = {}): Promise<{ id: string; campaign: CampaignView }> {
   const rec = await onServer(data, from);
-  const entering = await underCampaignRules(data, campaignId, rec.state);
+  const entering = await underCampaignRules(data, campaignId, rec.state, !!opts.keepOwnRules);
   const who = asker();
   const r = await api<Entered>(`/campaigns/${campaignId}/enrolments`, {
     body: {

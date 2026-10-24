@@ -70,6 +70,23 @@ describe('the Campaign tab', () => {
     expect([...srv.state.campaigns.values()].map((c) => c.name)).toEqual(['The Hel Fenn Campaign']);
   });
 
+  it('a place of the lore can be chosen when it starts, and its name stands under the title (#66)', async () => {
+    const srv = server({ totp: true });
+    const user = userEvent.setup();
+    at('/campaign');
+    await user.click(await screen.findByRole('button', { name: 'Start a campaign' }));
+    const sheet = screen.getByRole('dialog', { name: 'Start a campaign' });
+    await user.type(within(sheet).getByLabelText('Name of the campaign'), 'The Hel Fenn Campaign');
+    // optional: starts without a place, the choice is a region of the lore
+    const place = await within(sheet).findByLabelText('Place (optional)');
+    expect((place as HTMLSelectElement).value).toBe('');
+    await user.selectOptions(place, 'mordheim');
+    await user.click(within(sheet).getByRole('button', { name: 'Start it' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
+    expect([...srv.state.campaigns.values()].map((c) => c.place)).toEqual(['mordheim']);
+    expect(await screen.findByText(/Setup · you are leader · Mordheim/)).toBeTruthy();
+  });
+
   it('several campaigns are listed; a single one opens at once', async () => {
     const srv = server();
     srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
