@@ -210,6 +210,15 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await board.getByRole('button', { name: 'Give to Stash' }).click();
   await expect(page.getByRole('region', { name: 'Stash' }).getByText('Sword')).toBeVisible();
   await expect.poll(gold).toBe(start);
+  // #63: the stash also stands under the roster, with what each item does, and gives on from there
+  await page.getByRole('link', { name: /^‹ / }).click();
+  const stash = page.getByRole('region', { name: 'Stash' });
+  await expect(stash.getByText('Sword')).toBeVisible();
+  await stash.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `test-results/screens/${test.info().project.name}-roster-stash.png` });
+  await stash.getByRole('button', { name: 'Give Sword' }).click();
+  await stash.getByRole('group', { name: 'Give Sword to' }).getByRole('button').filter({ hasNot: page.locator('[disabled]') }).first().click();
+  await expect(stash).toHaveCount(0);
 });
 
 /* #54: Buy and Sell follow the Give board on a wide screen. */

@@ -2,6 +2,7 @@
    of core, saved on this device at once; the notice after it offers "Undo"
    instead of asking first (docs/ui.md §1.6). */
 import { ModelsTile } from '../roster/ModelsTile.tsx';
+import { StashSection } from '../roster/StashSection.tsx';
 import * as core from '@mordheim/core';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
@@ -279,6 +280,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
           {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
             <Empty scene="fire" title="No warriors yet.">Recruit your Heroes and Henchmen: {v.gold} gc to spend.</Empty>
           )}
+          {locked && <StashSection ctx={ctx} onGive={(h, to) => ed.edit((c) => core.giveItem(c, h.from, to, h.goods).state, `${h.name} given.`)} />}
           <FallenList f={v.fallen} />
         </>}
         panel={
