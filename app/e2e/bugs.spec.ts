@@ -9,7 +9,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   test(`a player reports a problem from the header and follows it under Account, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     const srv = await playServer(page);
-    await page.goto('more');
+    await page.goto('account');
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
@@ -56,7 +56,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   test(`Back closes the report sheet and stays in the app, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     await playServer(page);
-    await page.goto('more');
+    await page.goto('account');
     await page.getByRole('button', { name: 'Report a bug' }).click();
     const form = page.getByRole('dialog', { name: 'Report a problem' });
     await expect(form).toBeVisible();

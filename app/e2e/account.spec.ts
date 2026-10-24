@@ -105,7 +105,7 @@ for (const theme of THEMES) {
   test(`signing in with the authenticator's code, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     await playServer(page, { stage: 'out', user: PLAYER });
-    await page.goto('more');
+    await page.goto('account');
     await expect(page.getByRole('region', { name: 'Sign-in and security' }).getByText(/Accounts are by invitation/)).toBeVisible();
     await shot(page, `${theme}-account-signed-out`);
     await page.getByRole('link', { name: 'Sign in' }).click();
@@ -137,7 +137,7 @@ for (const theme of THEMES) {
   test(`the admin's tools, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     await playServer(page, { stage: 'in', user: ADMIN });
-    await page.goto('more');
+    await page.goto('account');
     // the admin's tools are a place of their own in the navigation, not a box on Account
     await expect(page.getByRole('region', { name: /Admin/ })).toHaveCount(0);
     await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Admin' }).click();
@@ -194,14 +194,14 @@ test('an invite: the account made from the link, the token gone from the address
 
 test('setting up the authenticator: the QR code, the first code, the recovery codes; Back closes the sheet', async ({ page }) => {
   await playServer(page, { stage: 'in', user: { ...ADMIN, totp: false, mustSetUpTotp: true } });
-  await page.goto('more');
+  await page.goto('account');
   await expect(page.getByText(/Set it up to open the admin tools/)).toBeVisible();
   await shot(page, 'account-admin-without-authenticator');
   await page.getByRole('button', { name: 'Set up' }).click();
   const sheet = page.getByRole('dialog', { name: 'Authenticator' });
   await page.goBack();
   await expect(sheet).toBeHidden();
-  await expect(page).toHaveURL(/\/more$/);
+  await expect(page).toHaveURL(/\/account$/);
   await page.getByRole('button', { name: 'Set up' }).click();
   await sheet.getByRole('button', { name: 'Set up' }).click();
   await expect(sheet.getByRole('img', { name: 'QR code for your authenticator app' })).toBeVisible();

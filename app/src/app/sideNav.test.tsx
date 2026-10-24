@@ -121,10 +121,10 @@ describe('the side navigation', () => {
     wide(true);
     signedIn({ stage: 'full', user: KAI });
     const user = userEvent.setup();
-    at('/more/reports');
+    at('/account/reports');
     const nav = screen.getByRole('navigation', { name: 'Main' });
     const list = await waitForList(nav, 'nav-account');
-    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Settings', '/more'], ['Your reports', '/more/reports']]);
+    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Settings', '/account'], ['Your reports', '/account/reports']]);
     await user.click(within(nav).getByRole('button', { name: 'Close Account' }));
     expect(nav.querySelector('#nav-account')).toBeNull();
   });
