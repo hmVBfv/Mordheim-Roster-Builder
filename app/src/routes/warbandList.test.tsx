@@ -28,10 +28,18 @@ describe('the list of warbands', () => {
     expect(first!.querySelector('time[datetime="2026-10-20T12:00:00.000Z"]')).not.toBeNull();
   });
 
-  it('a warband never changed after it was made says so once', () => {
+  it('each date has a line of its own (#55)', () => {
+    render(<MemoryRouter><WarbandList warbands={[warband('a', '2026-10-03T12:00:00.000Z', '2026-10-20T12:00:00.000Z')]} /></MemoryRouter>);
+    const created = screen.getByText(/^Created 3 Oct, /).closest('small')!;
+    const updated = screen.getByText(/^Updated 20 Oct, /).closest('small')!;
+    expect(created).not.toBe(updated);
+    expect(created.textContent).not.toMatch(/Updated/);
+  });
+
+  it('a warband never changed after it was made says so on the Updated line (#55)', () => {
     render(<MemoryRouter><WarbandList warbands={[warband('b', '2026-10-05T12:00:00.000Z', '2026-10-05T12:00:00.000Z')]} /></MemoryRouter>);
     const link = screen.getByRole('link');
     expect(within(link).getByText(/^Created 5 Oct, /)).toBeTruthy();
-    expect(within(link).queryByText(/^Updated/)).toBeNull();
+    expect(within(link).getByText('Updated never').closest('small')).not.toBe(within(link).getByText(/^Created 5 Oct, /).closest('small'));
   });
 });

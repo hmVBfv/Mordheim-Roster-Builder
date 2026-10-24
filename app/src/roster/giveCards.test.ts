@@ -3,7 +3,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { giveCards, giveRecipients, holdings, searchDestinations } from './equipment.ts';
+import { giveCards, giveRecipients, holdings, searchDestinations, stashPaid } from './equipment.ts';
 import { createWarband } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -72,5 +72,13 @@ describe('a group that lacks pieces still shows, with its reason (#58)', () => {
     expect(to.map((r) => r.to)).toEqual(expect.arrayContaining(['stash', sw, mk]));
     expect(to.find((r) => r.to === sw)).toMatchObject({ ok: false, note: 'the group needs 3, one for each man – a find is one piece' });
     expect(to.find((r) => r.to === mk)?.ok).toBe(true);
+  });
+});
+
+describe('what a stash line says it cost (#62)', () => {
+  it('shows a price paid, and nothing for an item that cost nothing or has no price', () => {
+    expect(stashPaid(37)).toBe('37 gc each');
+    expect(stashPaid(0)).toBe('');
+    expect(stashPaid(undefined)).toBe('');
   });
 });
