@@ -129,6 +129,49 @@ describe('a warband in the campaign', () => {
   });
 });
 
+describe('a warband with house rules of its own enters (#64)', () => {
+  /** The warband brings its own armour price; the campaign has its own rule. */
+  async function enter(choice: RegExp | null) {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign' });
+    c.houseRules = { freeDagger: true };
+    const mine = record({ state: { ...sampleSave(), house: { priceArmour: 80 } } });
+    await db.warbands.add(mine);
+    await syncOnce({ userId: KAI.id, data: async () => data });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
+    const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
+    await user.click(await within(sheet).findByRole('radio', { name: /The Silver Caravan/ }));
+    return { user, sheet, mine, srv, c, choose: async () => { if (choice) await user.click(within(sheet).getByRole('radio', { name: choice })); } };
+  }
+
+  it('asks what to do with them, and does not enter until the player says', async () => {
+    const { sheet } = await enter(null);
+    const group = within(sheet).getByRole('group', { name: 'Its own house rules' });
+    expect(group.textContent).toMatch(/Armour/);
+    expect((within(sheet).getByRole('button', { name: 'Enter a copy' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('the copy can leave its own rules behind and take the campaign’s', async () => {
+    const { user, sheet, choose, mine } = await enter(/Take the campaign’s rules/);
+    await choose();
+    await user.click(within(sheet).getByRole('button', { name: 'Enter a copy' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeTruthy();
+    const copy = (await db.warbands.toArray()).find((w) => w.id !== mine.id)!;
+    expect(core.houseRules(copy.state)).toMatchObject({ freeDagger: true, priceArmour: 100 });
+  });
+
+  it('or keep them, so the leaders see that they differ', async () => {
+    const { user, sheet, choose, mine } = await enter(/Keep its own rules/);
+    await choose();
+    await user.click(within(sheet).getByRole('button', { name: 'Enter a copy' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Silver Caravan' })).toBeTruthy();
+    const copy = (await db.warbands.toArray()).find((w) => w.id !== mine.id)!;
+    expect(core.houseRules(copy.state)).toMatchObject({ freeDagger: false, priceArmour: 80 });
+  });
+});
+
 describe('the districts', () => {
   it('a player sets a foothold by hand, with the others’ beside it; the overview shows who holds what – a sole foothold is control', async () => {
     const srv = server();

@@ -105,7 +105,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
           <h2 id="c-warbands">Warbands</h2>
           <WarbandRows id={id} view={view} me={me} />
           <div className={ui.row}>
-            {view.role !== 'viewer' && <EnterSheet id={id} onDone={onView} />}
+            {view.role !== 'viewer' && <EnterSheet id={id} rules={view.campaign.houseRules} onDone={onView} />}
             <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
           </div>
         </section>
