@@ -1,7 +1,7 @@
 /* A rough place for an address, from a database on the Pi itself (wish #69, Rob, 24.10.2026: "not online, not on GitHub").
    The file is a MaxMind-format city database (for example DB-IP's free "City Lite") that Rob puts on the volume; nothing of it is
    in the repository and no address ever leaves the machine. Without the file there is no place, and everything else works. */
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { isIP } from 'node:net';
 import type { CityResponse } from 'maxmind';
 import type { Logger } from 'pino';
@@ -26,13 +26,21 @@ export function isLocal(ip: string): boolean {
 /** The place of an address through a lookup; local addresses are named as such. */
 export const placeOf = (ip: string, lookup: Geo | null): string => (isLocal(ip) ? 'local network' : lookup ? lookup(ip) : '');
 
-/** Opens the database file; null when there is none or it cannot be read (the server logs why and goes on without places). */
-export async function openGeo(file: string, log: Pick<Logger, 'info' | 'warn'>): Promise<Geo | null> {
+/** The reader holds the whole file in memory, and the server's container has 256 MB (ops/compose.yaml): a larger file is left alone. */
+export const GEOIP_MAX_MB = 64;
+
+/** Opens the database file; null when there is none, it is too large for the container, or it cannot be read (the server logs why and goes on without places). */
+export async function openGeo(file: string, log: Pick<Logger, 'info' | 'warn'>, maxMb = GEOIP_MAX_MB): Promise<Geo | null> {
   if (!existsSync(file)) {
     log.info({ event: 'geoip_missing' }, 'no database of places: sign-ins are listed without them');
     return null;
   }
   try {
+    const mb = statSync(file).size / (1024 * 1024);
+    if (mb > maxMb) {
+      log.warn({ event: 'geoip_too_large', mb: Math.round(mb), maxMb }, 'the database of places is too large for the container and is not used: take a smaller one (a country list) or raise GEOIP_MAX_MB with the container limit');
+      return null;
+    }
     const { open } = await import('maxmind');
     const reader = await open<CityResponse>(file);
     log.info({ event: 'geoip_open' }, 'database of places opened');

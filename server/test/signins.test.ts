@@ -107,3 +107,27 @@ describe('nobody but the admin reads it', () => {
     expect((await s.call({ url: '/api/v1/admin/users/nobody/signins?limit=9999', token: rob.session() })).statusCode).toBe(404);
   });
 });
+
+describe('the database of places on the Pi', () => {
+  it('is left out, with a word in the log, when it is missing, not a database, or too large for the container', async () => {
+    const { openGeo } = await import('../src/geo.ts');
+    const { tmpDir } = await import('./helpers.ts');
+    const { writeFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const said: string[] = [];
+    const log = { info: (o: { event: string }) => void said.push(o.event), warn: (o: { event: string }) => void said.push(o.event) } as never;
+    const dir = tmpDir();
+    expect(await openGeo(join(dir, 'none.mmdb'), log)).toBeNull();
+    writeFileSync(join(dir, 'garbage.mmdb'), 'this is not a database');
+    expect(await openGeo(join(dir, 'garbage.mmdb'), log)).toBeNull();
+    writeFileSync(join(dir, 'big.mmdb'), Buffer.alloc(3 * 1024 * 1024));
+    expect(await openGeo(join(dir, 'big.mmdb'), log, 1)).toBeNull();
+    expect(said).toEqual(['geoip_missing', 'geoip_unreadable', 'geoip_too_large']);
+  });
+
+  it('a sign-in goes through when noting it fails', async () => {
+    const { s, login } = await table();
+    s.db.exec('DROP TABLE signins');
+    expect((await login('kai', 'Firefox on Linux', '81.2.69.142')).statusCode).toBe(200);
+  });
+});

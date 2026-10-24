@@ -24,6 +24,8 @@ export interface Config {
   totpKey: Buffer | null;
   /** A MaxMind-format city database on the volume (wish #69): the rough place of a sign-in. Missing: no place. */
   geoipDb: string;
+  /** The largest database file read, in MB (the reader keeps it all in memory). */
+  geoipMaxMb: number;
 }
 
 const LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'];
@@ -63,5 +65,6 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     trustProxy: env.TRUST_PROXY ? env.TRUST_PROXY.split(',').map((s) => s.trim()).filter(Boolean) : null,
     totpKey,
     geoipDb: env.GEOIP_DB ?? join(env.DATA_DIR ?? '/data', 'geoip', 'city.mmdb'),
+    geoipMaxMb: Number(env.GEOIP_MAX_MB) > 0 ? Number(env.GEOIP_MAX_MB) : 64,
   };
 }

@@ -112,7 +112,12 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
 
   /** A complete sign-in is noted for the admin: the device, the address and its rough place (wish #69). */
   const noteSignIn = (userId: string, device: string, ip: string) => {
-    recordSignIn(db(), { userId, device: device.slice(0, 80), ip, place: placeOf(ip, deps.geo ?? null) }, now());
+    // a failure here must never stop a sign-in that has happened
+    try {
+      recordSignIn(db(), { userId, device: device.slice(0, 80), ip, place: placeOf(ip, deps.geo ?? null) }, now());
+    } catch (err) {
+      app.log.warn({ event: 'signin_not_noted', err }, 'a sign-in could not be noted');
+    }
   };
 
   /** Signs the user in on this device: a full session, or – with an authenticator – the step before the code. */
@@ -263,7 +268,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     }
     const token = promoteSession(db(), a.sessionId, t);
     droppedDevices(u.id, a.sessionId);
-    noteSignIn(u.id, (db().prepare('SELECT device_label FROM sessions WHERE id = ?').get(a.sessionId) as { device_label: string }).device_label, req.ip);
+    noteSignIn(u.id, (db().prepare('SELECT device_label FROM sessions WHERE id = ?').get(a.sessionId) as { device_label: string } | undefined)?.device_label ?? 'unknown device', req.ip);
     setCookie(reply, token, secure, SESSION_DAYS);
     return { stage: 'full', user: meOfRow(u) };
   });

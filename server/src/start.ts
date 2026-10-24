@@ -87,7 +87,7 @@ export async function start(opts: StartOptions = {}): Promise<Started> {
     log.error({ event: 'db_not_ready' }, 'database damaged or unreadable; not migrating, only health is answered');
   }
 
-  const geo = opts.geo ?? (ready ? await openGeo(config.geoipDb, log) : null);
+  const geo = opts.geo ?? (ready ? await openGeo(config.geoipDb, log, config.geoipMaxMb) : null);
   const files = loadStatic(config.staticDir);
   if (!files.index) log.warn({ event: 'static_missing', dir: config.staticDir }, 'no app build to serve');
   if (!config.totpKey) log.warn({ event: 'totp_key_missing' }, 'no TOTP_KEY: nobody can set up an authenticator, and an admin can only look after the own account');

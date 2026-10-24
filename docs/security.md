@@ -82,7 +82,11 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
   **ausschließlich vom Admin mit Authenticator** (`admin.signins.read`; im
   Leak-Test; nicht vom Nutzer selbst, nicht von Leitern, nicht vom Bug-Token);
   keine Antwort sonst – auch keine URL – liefert Ort oder Liste. Der Ort steht
-  nie in einem Log und nie im Audit-Log.
+  nie in einem Log und nie im Audit-Log. Grenze: Das „Gerät“ ist die
+  Bezeichnung, die der Browser bei der Anmeldung mitschickt (etwa „Firefox on
+  Linux“), nicht ein Merkmal, das sich nicht fälschen ließe; wer das Passwort
+  und den Code hat, könnte sie nachahmen. Die Liste hilft, Ungewöhnliches zu
+  sehen, sie ist kein Beweis. Die Orts-Datenbank ist grob (Stadt, Region).
 - **Nur auf Einladung.** Admin erzeugt einen Einladungslink (einmal gültig,
   7 Tage). Keine offene Registrierung. Der erste Admin entsteht über
   `roster-cli invite --admin` auf dem Pi; Admin-Einladungen gibt es nur dort.
