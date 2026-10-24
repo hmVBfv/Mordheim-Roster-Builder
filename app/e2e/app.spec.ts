@@ -710,6 +710,8 @@ test('Back closes the sheets of the roster', async ({ page }) => {
 /* Back closes a sheet instead of leaving the app (Rob, 28.09.2026). */
 test('Back closes the import sheet and stays on the screen', async ({ page }) => {
   await page.goto('./');
+  // the bare address leads on to Home (#70); that is the address Back returns to
+  await expect(page).toHaveURL(/\/home$/);
   const home = page.url();
   await page.getByRole('link', { name: 'Warbands' }).click();
   const here = page.url();
