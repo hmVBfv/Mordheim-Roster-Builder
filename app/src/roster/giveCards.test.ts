@@ -3,7 +3,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { giveCards, holdings } from './equipment.ts';
+import { giveCards, holdings, stashPaid } from './equipment.ts';
 import { createWarband } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -43,5 +43,13 @@ describe('the Give board\'s cards (wish #32)', () => {
     expect(free(warr).map((h) => [h.name, h.pieces])).toEqual([['Dagger (free)', 3]]);
     // the tradable holdings do not contain it
     expect(holdings(ctx(s)).some((h) => h.goods.key.includes('gratis'))).toBe(false);
+  });
+});
+
+describe('what a stash line says it cost (#62)', () => {
+  it('shows a price paid, and nothing for an item that cost nothing or has no price', () => {
+    expect(stashPaid(37)).toBe('37 gc each');
+    expect(stashPaid(0)).toBe('');
+    expect(stashPaid(undefined)).toBe('');
   });
 });
