@@ -3983,7 +3983,7 @@ and passed alone; no cause in the change.
 
 ## October 24, 2026 — the fourth run: #55 to #66 (the Trading Post on a phone, and a few campaign things)
 
-Twelve reports, ten fixed. **#62**: a stash line printed "0 gc each" for an item found at
+Twelve reports, all fixed. **#62**: a stash line printed "0 gc each" for an item found at
 no price; the price shows only above zero. **#58** looked like Give hiding a group that
 lacks pieces, but the Give list already named the reason ("the group needs 3, one for
 each man"); the real gap was the list of places a found item may go, which left every
@@ -4000,12 +4000,17 @@ show carried items first and the stash under its own heading, and Give no longer
 the free dagger there (the wide cards keep it). **#63**: a Stash section under the
 roster with each item's text written out and Give from there.
 
-Left for Rob. **#60**: after picking a rare item, which Heroes may search for it? The
-rules let any Hero search, the app only restricts who may carry it; the report wants the
-searchers cut to those who can use it – a rules question. **#65**: two battles or other
-events must not share a name; open is whether the app refuses the second or numbers it,
-and what counts as "other events". Pull requests 168 to 175; the stacked ones are 175
-on 174.
+**#60** and **#65** waited for Rob's answer and were done after it. **#60**: the rules let any
+Hero search, but a Familiar says it is for Spellcasters, so a Hero is offered as searcher
+only where the catalogue's `only` allows him (`searchBlockFor`; `recordSearch` refuses the
+others too). **#65**: a name stands for one thing – a campaign's among a person's
+campaigns, and in a campaign its battles (round and title), scenarios, factions, NPCs and
+background entries. The first existing test that made two battles of one round without
+titles had to get titles. Pull requests 168 to 175 and 177 and 178; the stacked one is 175
+on 174. Three of them (169, 174, 175) got a merge conflict from the ones merged before them
+and were merged with master; a merge made in a temporary worktree committed its
+`node_modules` links (a symlink is not matched by the `node_modules/` rule), which a later
+commit on each branch took out again.
 
 One e2e run was killed by my own `timeout` and left an orphaned test web server on port
 4175; the next run could not start its servers until that process was ended.
