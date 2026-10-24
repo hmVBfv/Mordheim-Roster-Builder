@@ -239,6 +239,10 @@
   font-size: 0.8rem;
 }
 
+.nowrap {
+  white-space: nowrap;
+}
+
 .failed {
   color: var(--danger);
 }

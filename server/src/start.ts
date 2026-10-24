@@ -17,6 +17,7 @@ import { dbPath, openDb, settleEpoch, type DB } from './db.ts';
 import { Health } from './health.ts';
 import type { LiveOptions } from './live.ts';
 import { loggerOptions } from './log.ts';
+import { openGeo, type Geo } from './geo.ts';
 import type { HashCost } from './passwords.ts';
 import { currentVersion, loadMigrations, migrate, pending, MIGRATIONS_DIR } from './migrations.ts';
 import { trustedProxies } from './net.ts';
@@ -44,6 +45,8 @@ export interface StartOptions {
   hashCost?: HashCost;
   /** The live stream's limits, for tests (ADR 0020). */
   live?: Partial<LiveOptions>;
+  /** The place of an address, for tests; otherwise the database file named by the configuration (wish #69). */
+  geo?: Geo;
   /** How long a stop waits for connections to finish before it cuts them (default 3 s). */
   closeGraceMs?: number;
 }
@@ -84,12 +87,13 @@ export async function start(opts: StartOptions = {}): Promise<Started> {
     log.error({ event: 'db_not_ready' }, 'database damaged or unreadable; not migrating, only health is answered');
   }
 
+  const geo = opts.geo ?? (ready ? await openGeo(config.geoipDb, log) : null);
   const files = loadStatic(config.staticDir);
   if (!files.index) log.warn({ event: 'static_missing', dir: config.staticDir }, 'no app build to serve');
   if (!config.totpKey) log.warn({ event: 'totp_key_missing' }, 'no TOTP_KEY: nobody can set up an authenticator, and an admin can only look after the own account');
   const app = buildApp({
     config, health, files, trustProxy: trustedProxies(config.trustProxy, opts.readRoutes), logger: log,
-    db: ready ? db : null, now, totpKey: config.totpKey, hashCost: opts.hashCost,
+    db: ready ? db : null, now, totpKey: config.totpKey, hashCost: opts.hashCost, geo,
     ...(opts.live ? { live: opts.live } : {}),
   });
   await app.listen({ host: config.host, port: config.port });

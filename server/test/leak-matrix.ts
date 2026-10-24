@@ -240,6 +240,12 @@ export const MATRIX: Record<Action, MatrixRow> = {
     routes: { 'GET /api/v1/admin/audit': () => ({ method: 'GET', url: '/api/v1/admin/audit' }) },
     fields: { admin: ['entries'] },
   },
+  // where and with what a person signed in (wish #69): the admin only – not the person themselves
+  'admin.signins.read': {
+    allowed: ['admin'],
+    routes: { 'GET /api/v1/admin/users/:id/signins': (c) => ({ method: 'GET', url: `/api/v1/admin/users/${c.victimId}/signins` }) },
+    fields: { admin: ['signins', 'devices', 'located'] },
+  },
   // each signed-in user lists and syncs only their own
   'warbands.list': {
     allowed: signedIn,

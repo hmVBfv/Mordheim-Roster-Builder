@@ -26,9 +26,9 @@ export interface Req {
   headers?: Record<string, string>;
 }
 
-export async function startAccounts(opts: { env?: NodeJS.ProcessEnv; live?: Partial<LiveOptions>; closeGraceMs?: number } = {}) {
+export async function startAccounts(opts: { env?: NodeJS.ProcessEnv; live?: Partial<LiveOptions>; closeGraceMs?: number; geo?: (ip: string) => string } = {}) {
   const c = clock();
-  const s = await startServer({ now: c.now, hashCost: FAST, env: { TOTP_KEY, PUBLIC_ORIGIN: ORIGIN, ...opts.env }, ...(opts.live ? { live: opts.live } : {}), ...(opts.closeGraceMs ? { closeGraceMs: opts.closeGraceMs } : {}) });
+  const s = await startServer({ now: c.now, hashCost: FAST, env: { TOTP_KEY, PUBLIC_ORIGIN: ORIGIN, ...opts.env }, ...(opts.live ? { live: opts.live } : {}), ...(opts.geo ? { geo: opts.geo } : {}), ...(opts.closeGraceMs ? { closeGraceMs: opts.closeGraceMs } : {}) });
   const key = parseKey(TOTP_KEY)!;
 
   async function call(r: Req): Promise<LightMyRequestResponse> {

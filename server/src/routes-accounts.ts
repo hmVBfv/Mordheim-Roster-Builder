@@ -15,6 +15,8 @@ import { loginBraked, loginFailed } from './log.ts';
 import { DEFAULT_COST, dummyHash, hashPassword, passwordProblem, verifyPassword, type HashCost } from './passwords.ts';
 import { mustSetUpTotp, type Actor } from './policy.ts';
 import { decryptSecret, encryptSecret, findCode, keyedCode, newRecoveryCodes, newSecret, otpauthUri, verifyTotp } from './totp.ts';
+import { placeOf, type Geo } from './geo.ts';
+import { listSignIns, recordSignIn } from './signins.ts';
 
 export const COOKIE = 'mh_session';
 
@@ -24,6 +26,8 @@ export interface AccountDeps {
   config: { publicOrigin: string | null };
   totpKey: Buffer | null;
   hashCost?: HashCost | undefined;
+  /** The place of an address (wish #69); null: none known. */
+  geo?: Geo | null;
 }
 
 /* ---- the session cookie ---- */
@@ -106,6 +110,11 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     if (n) audit(db(), { actorId: userId, action: 'sessions.prune', targetType: 'user', targetId: userId, payload: { n } }, now());
   };
 
+  /** A complete sign-in is noted for the admin: the device, the address and its rough place (wish #69). */
+  const noteSignIn = (userId: string, device: string, ip: string) => {
+    recordSignIn(db(), { userId, device: device.slice(0, 80), ip, place: placeOf(ip, deps.geo ?? null) }, now());
+  };
+
   /** Signs the user in on this device: a full session, or – with an authenticator – the step before the code. */
   const signIn = (req: FastifyRequest, reply: FastifyReply, u: UserRow, device: string) => {
     // whoever was signed in on this device before is signed out
@@ -113,7 +122,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     const stage = u.totp_enabled_at ? 'totp' : 'full';
     const s = createSession(db(), { userId: u.id, stage, device, ip: req.ip }, now());
     setCookie(reply, s.token, secure, stage === 'full' ? SESSION_DAYS : 1 / 24 / 12);
-    if (stage === 'full') droppedDevices(u.id, s.id);
+    if (stage === 'full') { droppedDevices(u.id, s.id); noteSignIn(u.id, device, req.ip); }
     return stage === 'totp' ? { stage: 'totp' as const } : { stage: 'full' as const, user: meOfRow(u) };
   };
 
@@ -254,6 +263,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     }
     const token = promoteSession(db(), a.sessionId, t);
     droppedDevices(u.id, a.sessionId);
+    noteSignIn(u.id, (db().prepare('SELECT device_label FROM sessions WHERE id = ?').get(a.sessionId) as { device_label: string }).device_label, req.ip);
     setCookie(reply, token, secure, SESSION_DAYS);
     return { stage: 'full', user: meOfRow(u) };
   });
@@ -451,6 +461,13 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
   /* ---- the admin ---- */
 
   app.get('/api/v1/admin/users', { config: { action: 'admin.users.read' } }, async () => ({ users: listUsers(db(), now()) }));
+
+  /** The last sign-ins of one person and the first time of each of their devices (wish #69). The admin with the authenticator only. */
+  app.get('/api/v1/admin/users/:id/signins', { config: { action: 'admin.signins.read' } }, async (req, reply) => {
+    const { id } = req.params as { id: string };
+    if (!userById(db(), id)) return reply.code(404).send({ error: 'not_found' });
+    return { ...listSignIns(db(), id), located: deps.geo != null };
+  });
 
   app.post('/api/v1/admin/users/:id/:op', {
     config: { action: 'admin.users.write' },

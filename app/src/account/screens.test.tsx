@@ -348,6 +348,48 @@ describe('the admin', () => {
     expect(s.calls.map((c) => `${c.method} ${c.path}`)).toContain('POST /admin/users/u1/totp-reset');
   });
 
+  it('users: the last sign-ins of one person, with device and place, the first time of a device marked (#69)', async () => {
+    const s = fakeServer({
+      'GET /auth/me': () => ({ user: ADMIN, pending: false }),
+      'GET /admin/users': () => ({ users }),
+      'GET /admin/users/u1/signins': () => ({
+        located: true,
+        signins: [
+          { at: '2026-10-03T10:00:00Z', device: 'Safari on iPhone', place: 'Sydney, Australia', ip: '203.0.113.7', firstTime: true },
+          { at: '2026-10-02T10:00:00Z', device: 'Firefox on Linux', place: 'Berlin, Germany', ip: '81.2.69.142', firstTime: false },
+        ],
+        devices: [{ device: 'Firefox on Linux', firstAt: '2026-10-01T10:00:00Z', firstIp: '81.2.69.142', firstPlace: 'Berlin, Germany' }],
+      }),
+    });
+    const user = userEvent.setup();
+    at('/admin/users');
+    await user.click(await screen.findByRole('button', { name: 'What to do for Kai' }));
+    const sheet = screen.getByRole('dialog', { name: 'Kai' });
+    expect(s.calls.map((c) => c.path)).not.toContain('/admin/users/u1/signins');
+    await user.click(within(sheet).getByRole('button', { name: 'Show sign-ins' }));
+    const table = await within(sheet).findByRole('table', { name: 'Recent sign-ins' });
+    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['When', 'Device', 'Place', 'Address']);
+    const rows = within(table).getAllByRole('row').slice(1);
+    expect(rows.map((r) => within(r).getAllByRole('cell').map((c) => c.textContent))).toEqual([
+      [expect.stringMatching(/^3 Oct/), 'Safari on iPhonenew device', 'Sydney, Australia', '203.0.113.7'],
+      [expect.stringMatching(/^2 Oct/), 'Firefox on Linux', 'Berlin, Germany', '81.2.69.142'],
+    ]);
+  });
+
+  it('users: without a database of places the table says so instead of showing empty cells (#69)', async () => {
+    fakeServer({
+      'GET /auth/me': () => ({ user: ADMIN, pending: false }),
+      'GET /admin/users': () => ({ users }),
+      'GET /admin/users/u1/signins': () => ({ located: false, signins: [{ at: '2026-10-03T10:00:00Z', device: 'Firefox on Linux', place: '', ip: '81.2.69.142', firstTime: false }], devices: [] }),
+    });
+    const user = userEvent.setup();
+    at('/admin/users');
+    await user.click(await screen.findByRole('button', { name: 'What to do for Kai' }));
+    const sheet = screen.getByRole('dialog', { name: 'Kai' });
+    await user.click(within(sheet).getByRole('button', { name: 'Show sign-ins' }));
+    expect(await within(sheet).findByText(/no database of places/i)).toBeTruthy();
+  });
+
   it('invites: make one with a note, revoke an open one', async () => {
     let open = [{ id: 'i1', kind: 'register', note: 'for Ben', forUser: null, createdAt: '2026-10-03T09:00:00Z', expiresAt: '2026-10-10T09:00:00Z' }];
     const s = fakeServer({

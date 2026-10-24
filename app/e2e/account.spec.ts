@@ -86,6 +86,15 @@ async function playServer(page: Page, w: World) {
         w.user = { ...w.user, totp: true, mustSetUpTotp: false };
         return json({ recoveryCodes: ['k7m2-q9xd', 'a3fh-7wze', 'p2rt-x8ka', 'zm4c-b6yh', 'h9vd-3qnt', 'w5ek-r2mf', 'c8jp-t4xs', 'n6ub-y3gw', 'f2qh-m7ec', 'u4xz-k9pa'] });
       case 'GET /admin/users': return json({ users });
+      case 'GET /admin/users/u1/signins':
+        return json({
+          located: true,
+          signins: [
+            { at: iso(60), device: 'Safari on iPhone, a long name that wraps on a narrow phone', place: 'Sydney, New South Wales, Australia', ip: '2001:db8:85a3::8a2e:370:7334', firstTime: true },
+            { at: iso(24 * 60), device: 'Firefox on Linux', place: 'Berlin, Berlin, Germany', ip: '81.2.69.142', firstTime: false },
+          ],
+          devices: [],
+        });
       case 'POST /admin/users/u1/reset': return json({ link: `${url.origin}/reset#a-reset-token-only-shown-once`, token: 'x' });
       case 'GET /admin/invites': return json({ invites });
       case 'POST /admin/invites':
@@ -148,6 +157,13 @@ for (const theme of THEMES) {
     await shot(page, `${theme}-admin-users`);
     await page.getByRole('button', { name: 'What to do for Kai' }).click();
     const sheet = page.getByRole('dialog', { name: 'Kai' });
+    // #69: where they signed in from – a table in the sheet, no sideways scroll at 360 px
+    await sheet.getByRole('button', { name: 'Show sign-ins' }).click();
+    await expect(sheet.getByRole('table', { name: 'Recent sign-ins' }).getByText('Sydney, New South Wales, Australia')).toBeVisible();
+    await expect(sheet.getByText('new device')).toBeVisible();
+    await noSideScroll(page);
+    await sheet.getByRole('table', { name: 'Recent sign-ins' }).scrollIntoViewIfNeeded();
+    await shot(page, `${theme}-admin-signins`);
     await sheet.getByRole('button', { name: 'Make a link' }).click();
     await expect(sheet.getByText(/a-reset-token-only-shown-once/)).toBeVisible();
     await shot(page, `${theme}-admin-reset-link`);

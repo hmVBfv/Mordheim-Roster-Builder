@@ -74,6 +74,15 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
 `passwords.ts`, `totp.ts`; Tests `server/test/accounts.test.ts`,
 `credentials.test.ts`, `leak-matrix.test.ts`).
 
+- **Wo und womit jemand angemeldet war (Wunsch #69, Rob, 24.10.2026).** Je
+  Person bleiben die **letzten 20 vollständigen Anmeldungen** (Gerät, Adresse,
+  grober Ort) und je Gerät das **erste Mal** (`signins`, `known_devices`). Der
+  Ort kommt aus einer Datenbankdatei **auf dem Pi** (`GEOIP_DB`), nie aus
+  einem Dienst im Netz und nie aus dem Repository. Gelesen wird das
+  **ausschließlich vom Admin mit Authenticator** (`admin.signins.read`; im
+  Leak-Test; nicht vom Nutzer selbst, nicht von Leitern, nicht vom Bug-Token);
+  keine Antwort sonst – auch keine URL – liefert Ort oder Liste. Der Ort steht
+  nie in einem Log und nie im Audit-Log.
 - **Nur auf Einladung.** Admin erzeugt einen Einladungslink (einmal gültig,
   7 Tage). Keine offene Registrierung. Der erste Admin entsteht über
   `roster-cli invite --admin` auf dem Pi; Admin-Einladungen gibt es nur dort.
