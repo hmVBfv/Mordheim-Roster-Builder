@@ -71,6 +71,7 @@ export interface FakeEnrolment {
 }
 export interface FakeCampaign {
   id: string; name: string; round: number; createdAt: string;
+  /** A key of the lore (#66). */ place?: string;
   houseRules?: Record<string, unknown>;
   /** Members who filed it away in their own list (migration 24). */
   archivedBy?: string[];
@@ -182,7 +183,7 @@ export function createFakeSync(opts: {
   const view = (c: FakeCampaign) => {
     const role = roleOf(c)!;
     return {
-      campaign: { id: c.id, name: c.name, round: c.round, houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
+      campaign: { id: c.id, name: c.name, round: c.round, place: c.place ?? '', houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
       role,
       members: c.members.map(({ canLead, ...m }) => ({ ...m, joinedAt: c.createdAt, ...(role === 'leader' ? { canLead } : {}) })),
       enrolments: c.enrolments.map((e) => ({
@@ -1058,9 +1059,9 @@ export function createFakeSync(opts: {
     if (w) { w.campaignId = null; w.seq = next(); }
   };
   /** A campaign the signed-in user is part of, with other players' warbands entered. */
-  const addCampaign = (c: { name: string; role?: FakeRole; round?: number; others?: { player: string; data: unknown; role?: FakeRole; pending?: boolean }[] }) => {
+  const addCampaign = (c: { name: string; place?: string; role?: FakeRole; round?: number; others?: { player: string; data: unknown; role?: FakeRole; pending?: boolean }[] }) => {
     const id = `campaign-${s.campaigns.size + 1}`;
-    const camp: FakeCampaign = { id, name: c.name, round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader', canLead: true }], enrolments: [] };
+    const camp: FakeCampaign = { id, name: c.name, ...(c.place ? { place: c.place } : {}), round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader', canLead: true }], enrolments: [] };
     for (const [i, o] of (c.others ?? []).entries()) {
       const userId = `user-${o.player.toLowerCase()}`;
       if (!camp.members.some((m) => m.userId === userId)) camp.members.push({ userId, username: o.player.toLowerCase(), displayName: o.player, role: o.role ?? 'player', canLead: false });
@@ -1081,7 +1082,9 @@ export function createFakeSync(opts: {
       if (method === 'POST') {
         const name = String(body.name ?? '').trim().replace(/\s+/g, ' ');
         if (!name) return json(400, { error: 'invalid', problem: 'a campaign needs a name' });
-        return json(201, view(addCampaign({ name })));
+        const place = String(body.place ?? '');
+        if (!/^[a-z0-9-]*$/.test(place)) return json(400, { error: 'invalid' });
+        return json(201, view(addCampaign({ name, place })));
       }
     }
     const m = path.match(/^\/campaigns\/([^/]+)(\/.*)?$/);
