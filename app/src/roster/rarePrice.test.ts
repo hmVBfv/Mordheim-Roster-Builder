@@ -1,6 +1,6 @@
 /* How a rare item's price is written (wish #24): always with its unit, a dice price with what it comes to on average. */
 import { describe, expect, it } from 'vitest';
-import { priceAverage, priceRange, priceText } from './rarePrice.ts';
+import { priceAverage, priceRange, priceSpread, priceText } from './rarePrice.ts';
 
 describe('priceText', () => {
   it('says gc for a fixed price and for a dice price alike', () => {
@@ -46,5 +46,17 @@ describe('priceRange', () => {
     expect(priceRange(35)).toBeNull();
     expect(priceRange('4× Preis')).toBeNull();
     expect(priceRange('+15/+20')).toBeNull();
+  });
+});
+
+describe('priceSpread', () => {
+  it('says min, max and average instead of a dash that reads like a minus (#59)', () => {
+    expect(priceSpread([21, 26], 23.5)).toBe('min. 21 gc, max. 26 gc, ⌀ 23.5 gc');
+    expect(priceSpread([52, 62], 57)).toBe('min. 52 gc, max. 62 gc, ⌀ 57 gc');
+  });
+  it('rounds to one decimal the usual way, from x.y5 up', () => {
+    expect(priceSpread([3, 5], 23.33)).toBe('min. 3 gc, max. 5 gc, ⌀ 23.3 gc');
+    expect(priceSpread([3, 5], 23.35)).toBe('min. 3 gc, max. 5 gc, ⌀ 23.4 gc');
+    expect(priceSpread([3, 5], 23.349)).toBe('min. 3 gc, max. 5 gc, ⌀ 23.3 gc');
   });
 });
