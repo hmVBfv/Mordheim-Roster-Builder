@@ -371,7 +371,7 @@ describe('the admin', () => {
     expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['When', 'Device', 'Place', 'Address']);
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows.map((r) => within(r).getAllByRole('cell').map((c) => c.textContent))).toEqual([
-      [expect.stringMatching(/^3 Oct/), 'Safari on iPhonenew device', 'Sydney, Australia', '203.0.113.7'],
+      [expect.stringMatching(/^3 Oct/), 'Safari on iPhone new device', 'Sydney, Australia', '203.0.113.7'],
       [expect.stringMatching(/^2 Oct/), 'Firefox on Linux', 'Berlin, Germany', '81.2.69.142'],
     ]);
   });
