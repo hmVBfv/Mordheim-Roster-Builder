@@ -214,7 +214,7 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await page.getByRole('link', { name: /^‹ / }).click();
   const stash = page.getByRole('region', { name: 'Stash' });
   await expect(stash.getByText('Sword')).toBeVisible();
-  await stash.scrollIntoViewIfNeeded();
+  // the roster settles for a moment after the sync; a screenshot of the window needs no stable element (scrollIntoViewIfNeeded did, and failed on a slow runner)
   await page.screenshot({ path: `test-results/screens/${test.info().project.name}-roster-stash.png` });
   await stash.getByRole('button', { name: 'Give Sword' }).click();
   await stash.getByRole('group', { name: 'Give Sword to' }).getByRole('button').filter({ hasNot: page.locator('[disabled]') }).first().click();
