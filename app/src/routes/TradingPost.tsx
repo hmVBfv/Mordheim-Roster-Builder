@@ -11,7 +11,7 @@ import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
-  buyRecipients, freeDaggers, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems, stashPaid,
+  buyRecipients, freeDaggers, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchDestinations, searchers, shopItems, stashPaid,
   type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
 } from '../roster/equipment.ts';
 import { filterRare, gradeOptions, SORT_ORDERS, sortRare, sourceOptions, STAT_FILTERS, type SortOrder, type StatFilter } from '../roster/rareFilter.ts';
@@ -169,13 +169,7 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
   const found = !!odds && rolled && r >= odds.target;
   const paid = it?.fixed != null && price === '' ? it.fixed : Number(price);
   const priceOk = Number.isFinite(paid) && paid >= 0 && (it?.fixed != null || price !== '');
-  const dest: Recipient[] = de ? [
-    { to: 'stash', name: 'Stash', ok: true, note: 'after the battle, found items go to the stash', cost: 0 },
-    ...ctx.s.models.filter((m) => core.piecesNeeded(ctx, m.uid) === 1).map((m) => {
-      const v = core.canReceive(ctx, m.uid, { key: de, rare: true });
-      return { to: m.uid, name: m.name || core.unitDef(ctx, m.uid_def)?.name || m.uid_def, ok: v.ok, note: v.ok ? 'may use it' : v.reason, cost: 0 };
-    }),
-  ] : [];
+  const dest: Recipient[] = de ? searchDestinations(ctx, de, true) : [];
   const matching = sortRare(filterRare(items, { q, stat, maxRarity: max, from, grade }), sort);
   const shown = [...items.filter((x) => x.de === de && !matching.includes(x)), ...matching].slice(0, 60);
   return (
