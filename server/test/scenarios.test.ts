@@ -36,9 +36,11 @@ async function table() {
   await anna('PUT', `/campaigns/${id}/members/${u.vic.id}`, { role: 'viewer' });
   const w = randomUUID();
   await anna('POST', `/campaigns/${id}/enrolments`, { warbandId: w, data: SAVE });
+  let made = 0;
   const battle = async () => {
     const bid = randomUUID();
-    await anna('POST', `/campaigns/${id}/battles`, { id: bid, title: 'Hel Fenn ferry', warbandIds: [w] });
+    // each battle has a name of its own (#65): the same round and title would clash
+    await anna('POST', `/campaigns/${id}/battles`, { id: bid, title: `Hel Fenn ferry${made++ ? ` ${made}` : ''}`, warbandIds: [w] });
     return bid;
   };
   const bid = await battle();
