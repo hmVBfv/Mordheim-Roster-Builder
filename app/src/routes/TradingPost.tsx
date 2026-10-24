@@ -11,7 +11,7 @@ import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
-  buyRecipients, freeDaggers, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
+  buyRecipients, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems,
   type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
 } from '../roster/equipment.ts';
 import { filterRare, gradeOptions, SORT_ORDERS, sortRare, sourceOptions, STAT_FILTERS, type SortOrder, type StatFilter } from '../roster/rareFilter.ts';
@@ -23,6 +23,7 @@ import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { useWarbandRecord } from '../sync/local.ts';
 import { BuyBoard, GiveBoard, SellBoard } from './GiveBoard.tsx';
+import { HoldingList } from './HoldingList.tsx';
 
 const TABS = [['buy', 'Buy'], ['search', 'Search rare'], ['sell', 'Sell'], ['give', 'Give']] as const;
 /** The highest rarity a search may be narrowed to. */
@@ -273,27 +274,6 @@ function GiveForm({ ctx, h, close, onGive, titleId }: { ctx: core.Ctx; h: Holdin
   );
 }
 
-function HoldingList({ list, label, action, onPick }: { list: Holding[]; label: string; action: (h: Holding) => string; onPick: (h: Holding) => void }) {
-  if (!list.length) return <p className={ui.muted}>Nothing to {label.toLowerCase()}.</p>;
-  return (
-    <ul className={styles.rows}>
-      {list.map((h) => (
-        <li key={`${h.from}:${h.goods.rare ? 'r' : h.free ? 'f' : 'c'}:${h.goods.key}`}>
-          {h.free ? (
-            <div className={styles.item} title={h.text || undefined}>
-              <span>{h.name}{h.pieces > 1 && <span className={ui.muted}> ×{h.pieces}</span>}</span>
-              <small>{h.owner} · stays with its warrior</small>
-            </div>
-          ) : <button type="button" className={styles.item} title={h.text || undefined} onClick={() => onPick(h)} aria-label={`${label} ${h.name} of ${h.owner}`}>
-            <span>{h.name}{h.pieces > 1 && <span className={ui.muted}> ×{h.pieces}</span>}</span>
-            <small>{h.owner} · {action(h)}</small>
-          </button>}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -417,7 +397,7 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
           <p className={ui.muted}>Move an item between warriors and the stash, without gold. Only those who may use it can take it; a group takes one for every man.</p>
           {wide
             ? <GiveBoard cards={giveCards(ctx)} recipientsFor={(h) => giveRecipients(ctx, h)} onGive={(h, to) => ed.edit((c) => core.giveItem(c, h.from, to, h.goods).state, `${h.name} given.`)} />
-            : <HoldingList list={[...held, ...freeDaggers(ctx)]} label="Give" action={() => 'give'} onPick={(h) => { setGiving((p) => ({ key: (p?.key ?? 0) + 1, h })); openGive(); }} />}
+            : <HoldingList list={held} label="Give" action={() => 'give'} onPick={(h) => { setGiving((p) => ({ key: (p?.key ?? 0) + 1, h })); openGive(); }} />}
         </section>
       )}
 
