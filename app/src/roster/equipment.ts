@@ -201,6 +201,20 @@ export function giveRecipients(ctx: core.Ctx, h: Holding): Recipient[] {
   return out;
 }
 
+/** Where a found item may go: the stash, or a warrior who may carry it. A group is listed too, with the reason it cannot take it:
+    a find is one piece and a group needs one for each man (#58). */
+export function searchDestinations(ctx: core.Ctx, key: string, rare: boolean): Recipient[] {
+  return [
+    { to: 'stash', name: 'Stash', ok: true, note: 'after the battle, found items go to the stash', cost: 0 },
+    ...ctx.s.models.map((m) => {
+      const v = core.canReceive(ctx, m.uid, { key, rare });
+      const need = core.piecesNeeded(ctx, m.uid);
+      const group = v.ok && need > 1;
+      return { to: m.uid, name: warriorName(ctx, m), ok: v.ok && !group, note: group ? `the group needs ${need}, one for each man – a find is one piece` : v.ok ? 'may use it' : v.reason, cost: 0 };
+    }),
+  ];
+}
+
 /** A Hero who may look for a rare item now, or why not. */
 export interface Searcher { uid: number; name: string; why: string | null; last: string | null }
 

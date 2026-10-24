@@ -3,7 +3,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { giveCards, holdings } from './equipment.ts';
+import { giveCards, giveRecipients, holdings, searchDestinations } from './equipment.ts';
 import { createWarband } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -43,5 +43,34 @@ describe('the Give board\'s cards (wish #32)', () => {
     expect(free(warr).map((h) => [h.name, h.pieces])).toEqual([['Dagger (free)', 3]]);
     // the tradable holdings do not contain it
     expect(holdings(ctx(s)).some((h) => h.goods.key.includes('gratis'))).toBe(false);
+  });
+});
+
+describe('a group that lacks pieces still shows, with its reason (#58)', () => {
+  /** Merchant Caravans after their first battle: three Sell-swords, a Marksman, a Merchant carrying a hammer. */
+  function caravan() {
+    let s = createWarband(data, 'caravans', null, 'The Silver Caravan');
+    for (const id of ['merchant', 'sellsword', 'marksman']) s = core.addUnit(ctx(s), id);
+    const uid = (def: string) => s.models.find((m) => m.uid_def === def)!.uid;
+    s = core.setQty(ctx(s), uid('sellsword'), 3);
+    s = core.toggleEq(ctx(s), uid('merchant'), 'Hammer', true);
+    s = structuredClone(s);
+    s.campaign = { ...s.campaign, on: true, round: 1 };
+    return { s, merchant: uid('merchant'), sw: uid('sellsword'), mk: uid('marksman') };
+  }
+
+  it('gives a single hammer to nobody in a group of three, and says why', () => {
+    const { s, merchant, sw } = caravan();
+    const hammer = holdings(ctx(s)).find((h) => h.from === merchant && h.goods.key === 'Hammer')!;
+    const to = giveRecipients(ctx(s), hammer);
+    expect(to.find((r) => r.to === sw)).toMatchObject({ ok: false, note: 'the group needs 3, one for each man – only 1 here' });
+  });
+
+  it('lists the group among the places a found item may go, with the reason it cannot take one piece', () => {
+    const { s, sw, mk } = caravan();
+    const to = searchDestinations(ctx(s), 'Hammer', false);
+    expect(to.map((r) => r.to)).toEqual(expect.arrayContaining(['stash', sw, mk]));
+    expect(to.find((r) => r.to === sw)).toMatchObject({ ok: false, note: 'the group needs 3, one for each man – a find is one piece' });
+    expect(to.find((r) => r.to === mk)?.ok).toBe(true);
   });
 });
