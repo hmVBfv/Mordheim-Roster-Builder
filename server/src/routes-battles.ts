@@ -17,6 +17,7 @@ import { closeBattle, comeToRound, confirmBefore, markAfterBattle, marksOf } fro
 import { snapshot } from './backup.ts';
 import { warbandById } from './warbands.ts';
 import { roundAfterHistory } from './history.ts';
+import { battleName, battleNameTaken } from './names.ts';
 
 export interface BattleDeps {
   db: DB | null; now: () => Date;
@@ -89,6 +90,8 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const round = b.round ?? t.c.round + 1;
     const before = roundAfterHistory(db(), t.c.id, round);
     if (before) return reply.code(400).send({ error: 'invalid', problem: before });
+    const title = (b.title ?? '').trim();
+    if (battleNameTaken(db(), t.c.id, round, title, bid)) return reply.code(400).send({ error: 'invalid', problem: `${battleName(round, title)} exists already${title ? '' : ': give this one a title of its own'}` });
     const when = now();
     const made = db().transaction(() => {
       comeToRound(db(), t.c, round, req.actor!.id, when);
@@ -131,6 +134,7 @@ export function registerBattleRoutes(app: FastifyInstance, deps: BattleDeps): vo
     const fought = new Set(warbandIds ?? participantIds(db(), t.b!.id));
     if (p.outcomes && Object.keys(p.outcomes).some((w) => !fought.has(w.toLowerCase()))) return reply.code(400).send({ error: 'invalid', problem: 'an outcome for a warband that did not fight' });
     if (!districtOk(p.district)) return reply.code(400).send({ error: 'invalid', problem: 'no such district' });
+    if (p.title !== undefined && battleNameTaken(db(), t.c.id, t.b!.round, p.title.trim(), t.b!.id)) return reply.code(400).send({ error: 'invalid', problem: `${battleName(t.b!.round, p.title.trim())} exists already${p.title.trim() ? '' : ': give this one a title of its own'}` });
     updateBattle(db(), t.b!, {
       ...(p.title !== undefined ? { title: p.title.trim() } : {}), ...(p.scenario !== undefined ? { scenario: p.scenario.trim() } : {}),
       ...(p.district !== undefined ? { district: p.district } : {}), ...(p.turn !== undefined ? { turn: p.turn } : {}),

@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { battleById } from './battles.ts';
 import type { DB } from './db.ts';
+import { nameTaken } from './names.ts';
 import { NpcProfileBody } from './opponents.ts';
 
 const iso = (d: Date) => d.toISOString();
@@ -122,6 +123,7 @@ export function putScenario(db: DB, campaignId: string, id: string, input: Scena
   return db.transaction((): Put => {
     const cur = scenarioById(db, id);
     if (cur && (cur.campaign_id !== campaignId || cur.deleted_at)) return { ok: false, status: 409, error: cur.deleted_at ? 'removed' : 'exists' };
+    if (nameTaken(db, 'scenarios', campaignId, ['title'], [input.title], id)) return { ok: false, status: 400, error: 'invalid', problem: 'a scenario of this name exists already' };
     if (!cur) {
       const n = (db.prepare('SELECT count(*) AS n FROM scenarios WHERE campaign_id = ? AND deleted_at IS NULL').get(campaignId) as { n: number }).n;
       if (n >= MAX_SCENARIOS) return { ok: false, status: 409, error: 'full', problem: `a campaign holds at most ${MAX_SCENARIOS} scenarios` };
