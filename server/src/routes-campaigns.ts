@@ -23,6 +23,8 @@ export interface CampaignDeps { db: DB | null; now: () => Date; uploadDir?: stri
 const UUID = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 const body = (props: Record<string, unknown>, required: string[]) => ({ body: { type: 'object', additionalProperties: false, required, properties: props } });
 const NAME = { type: 'string', minLength: 1, maxLength: 80 } as const;
+/** A key of the lore (data/lore.json): lower case, digits and hyphens; empty = no place (#66). */
+const PLACE = { type: 'string', maxLength: 64, pattern: '^[a-z0-9-]*$' } as const;
 
 export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps): void {
   const db = () => deps.db as DB;
@@ -47,10 +49,10 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
 
   app.get('/api/v1/campaigns', { config: { action: 'campaigns.list' } }, async (req) => ({ campaigns: listCampaigns(db(), req.actor!.id) }));
 
-  app.post('/api/v1/campaigns', { config: { action: 'campaigns.create' }, schema: body({ name: NAME }, ['name']) }, async (req, reply) => {
+  app.post('/api/v1/campaigns', { config: { action: 'campaigns.create' }, schema: body({ name: NAME, place: PLACE }, ['name']) }, async (req, reply) => {
     const name = trimmed((req.body as { name: string }).name);
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
-    const c = createCampaign(db(), { name, by: req.actor!.id }, now());
+    const c = createCampaign(db(), { name, place: (req.body as { place?: string }).place ?? '', by: req.actor!.id }, now());
     return reply.code(201).send(view(c, 'leader'));
   });
 
