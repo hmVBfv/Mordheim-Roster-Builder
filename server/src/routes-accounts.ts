@@ -106,6 +106,8 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
   const db = () => deps.db as DB;
   const now = deps.now;
   const deviceOf = (req: FastifyRequest, given?: string) => (given?.trim() || String(req.headers['user-agent'] ?? 'unknown device')).slice(0, 80);
+  /** The device of a try, as the body names it (the sign-in forms do), else the browser's own words. */
+  const attemptDevice = (req: FastifyRequest) => deviceOf(req, (req.body as { device?: unknown } | null | undefined)?.device as string | undefined);
   // the token rides in the fragment, which browsers never send to a server
   const linkFor = (token: string, kind: 'register' | 'reset') => `${deps.config.publicOrigin ?? ''}/${kind === 'register' ? 'invite' : 'reset'}#${token}`;
 
@@ -156,7 +158,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     const last = [f.pair.last, f.ip.last, f.user.last].filter(Boolean).sort().pop() ?? null;
     const wait = brakeWait(n, last, t);
     if (wait <= 0) return false;
-    recordAttempt(db(), { username, ip: req.ip, ok: false, reason: 'braked' }, t);
+    recordAttempt(db(), { username, ip: req.ip, device: attemptDevice(req), ok: false, reason: 'braked' }, t);
     loginBraked(req.log, req.ip, username);
     void reply.code(429).header('Retry-After', String(wait)).send({ error: 'too_many_attempts', retryAfter: wait });
     return true;
@@ -196,7 +198,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     try {
       if (await verifyPassword(password, u.pw_hash)) return 'ok';
     } finally { release(); }
-    recordAttempt(db(), { username: u.username, ip: req.ip, ok: false, reason: 'password' }, t);
+    recordAttempt(db(), { username: u.username, ip: req.ip, device: attemptDevice(req), ok: false, reason: 'password' }, t);
     loginFailed(req.log, req.ip, u.username);
     return 'wrong';
   };
@@ -248,11 +250,11 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
       ok = u && !u.disabled_at ? await verifyPassword(password, u.pw_hash) : (await verifyPassword(password, await dummyHash(cost)), false);
     } finally { release(); }
     if (!u || !ok || u.disabled_at) {
-      recordAttempt(db(), { username, ip: req.ip, ok: false, reason: !u ? 'unknown' : u.disabled_at ? 'disabled' : 'password' }, t);
+      recordAttempt(db(), { username, ip: req.ip, device: attemptDevice(req), ok: false, reason: !u ? 'unknown' : u.disabled_at ? 'disabled' : 'password' }, t);
       loginFailed(req.log, req.ip, username);
       return reply.code(401).send({ error: 'invalid_login' });
     }
-    if (!u.totp_enabled_at) recordAttempt(db(), { username: u.username, ip: req.ip, ok: true }, t);
+    if (!u.totp_enabled_at) recordAttempt(db(), { username: u.username, ip: req.ip, device: attemptDevice(req), ok: true }, t);
     return signIn(req, reply, u, deviceOf(req, device));
   });
 
@@ -266,7 +268,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     // six digits are quick to guess without the brake
     if (braked(req, reply, u.username, t)) return reply;
     const ok = secondFactor(req, u, (req.body as { code: string }).code, t);
-    recordAttempt(db(), { username: u.username, ip: req.ip, ok, reason: ok ? '' : 'code' }, t);
+    recordAttempt(db(), { username: u.username, ip: req.ip, device: attemptDevice(req), ok, reason: ok ? '' : 'code' }, t);
     if (!ok) {
       loginFailed(req.log, req.ip, u.username);
       return reply.code(401).send({ error: 'invalid_code' });
@@ -349,7 +351,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
         throw e;
       }
       if (!id) return reply.code(404).send({ error: 'invalid_link' });
-      recordAttempt(db(), { username, ip: req.ip, ok: true, reason: 'registered' }, t);
+      recordAttempt(db(), { username, ip: req.ip, device: attemptDevice(req), ok: true, reason: 'registered' }, t);
       return signIn(req, reply, userById(db(), id)!, deviceOf(req, b.device));
     }
     // a reset: a new password, every device signed out
@@ -424,7 +426,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
       if (braked(req, reply, u.username, t)) return reply;
       if (!current) return reply.code(400).send({ error: 'invalid', problem: 'a code from your current authenticator (or a recovery code) is needed' });
       if (!secondFactor(req, u, current, t)) {
-        recordAttempt(db(), { username: u.username, ip: req.ip, ok: false, reason: 'code' }, t);
+        recordAttempt(db(), { username: u.username, ip: req.ip, device: attemptDevice(req), ok: false, reason: 'code' }, t);
         loginFailed(req.log, req.ip, u.username);
         return reply.code(400).send({ error: 'invalid', problem: 'the code from your current authenticator is not right' });
       }
@@ -459,7 +461,7 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     if (checked === 'sent') return reply;
     if (checked === 'wrong') return reply.code(400).send({ error: 'invalid', problem: 'the password is not right' });
     if (u.totp_enabled_at && !(code && secondFactor(req, u, code, t))) {
-      recordAttempt(db(), { username: u.username, ip: req.ip, ok: false, reason: 'code' }, t);
+      recordAttempt(db(), { username: u.username, ip: req.ip, device: attemptDevice(req), ok: false, reason: 'code' }, t);
       return reply.code(400).send({ error: 'invalid', problem: code ? 'the code is not right' : 'a code from your authenticator (or a recovery code) is needed' });
     }
     if (!stillOpen(a.sessionId, t)) return reply.code(401).send({ error: 'sign_in' });
@@ -559,9 +561,14 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     return { limit, before: Number.isFinite(before) ? before : undefined };
   };
 
-  app.get('/api/v1/admin/logins', { config: { action: 'admin.logins.read' } }, async (req) => {
+  app.get('/api/v1/admin/logins', { config: { action: 'admin.logins.read' } }, async (req, reply) => {
     const p = page(req);
-    return { attempts: listAttempts(db(), p.limit, p.before) };
+    const q = req.query as { user?: string; type?: string; from?: string; to?: string };
+    const day = /^\d{4}-\d{2}-\d{2}$/;
+    if ((q.type !== undefined && !['signin', 'joined', 'failed'].includes(q.type)) || [q.from, q.to].some((d) => d !== undefined && (!day.test(d) || Number.isNaN(Date.parse(d))))) {
+      return reply.code(400).send({ error: 'invalid', problem: 'the filter is not one the log knows' });
+    }
+    return { attempts: listAttempts(db(), p.limit, p.before, { user: q.user?.slice(0, 64), type: q.type as 'signin' | 'joined' | 'failed' | undefined, from: q.from, to: q.to }) };
   });
 
   app.get('/api/v1/admin/audit', { config: { action: 'admin.audit.read' } }, async (req) => {

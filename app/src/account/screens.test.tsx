@@ -1,6 +1,6 @@
 /* The account screens as a player and the admin reach them, against a
    stand-in for the campaign server. */
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -370,6 +370,9 @@ describe('the admin', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Show sign-ins' }));
     const table = await within(sheet).findByRole('table', { name: 'Recent sign-ins' });
     expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['When', 'Device', 'Place', 'Address']);
+    // the addresses wait to be asked for (#72)
+    expect(within(table).queryByText('203.0.113.7')).toBeNull();
+    await user.click(within(sheet).getByRole('button', { name: 'Show addresses' }));
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows.map((r) => within(r).getAllByRole('cell').map((c) => c.textContent))).toEqual([
       [expect.stringMatching(/^3 Oct/), 'Safari on iPhone new device', 'Sydney, Australia', '203.0.113.7'],
@@ -430,6 +433,45 @@ describe('the admin', () => {
     const audit = await screen.findByRole('table', { name: 'Audit log' });
     expect(within(audit).getByText('made an invite')).toBeTruthy();
     expect(within(audit).getByText('“for Ben”')).toBeTruthy();
+  });
+
+  /* Wish #72: addresses are hidden until asked for (and hidden again on the next visit), the device is shown, and the log is filtered by person, kind and day. */
+  it('the sign-in log hides the addresses, shows the device and filters on the server (#72)', async () => {
+    const attempts = [
+      { id: 2, username: 'kai', ip: '203.0.113.9', device: 'Firefox on Linux', at: '2026-10-03T10:00:00Z', ok: true, reason: '' },
+      { id: 1, username: 'mia', ip: '198.51.100.7', device: 'Safari on iPhone', at: '2026-10-02T10:00:00Z', ok: false, reason: 'password' },
+    ];
+    const s = fakeServer({
+      'GET /auth/me': () => ({ user: ADMIN, pending: false }),
+      'GET /admin/logins': () => ({ attempts }),
+      'GET /admin/audit': () => ({ entries: [] }),
+    });
+    const user = userEvent.setup();
+    at('/admin/logins');
+    const log = await screen.findByRole('table', { name: 'Sign-ins' });
+    expect(await within(log).findByText('Firefox on Linux')).toBeTruthy();
+    expect(within(log).getByText('Safari on iPhone')).toBeTruthy();
+    expect(within(log).queryByText('203.0.113.9')).toBeNull();
+    expect(within(log).queryByText('198.51.100.7')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Show addresses' }));
+    expect(within(log).getByText('203.0.113.9')).toBeTruthy();
+    expect(within(log).getByText('198.51.100.7')).toBeTruthy();
+    // the next visit starts hidden again
+    await user.click(screen.getByRole('link', { name: 'Audit log' }));
+    await screen.findByRole('table', { name: 'Audit log' });
+    await user.click(screen.getByRole('link', { name: 'Sign-ins' }));
+    const again = await screen.findByRole('table', { name: 'Sign-ins' });
+    expect(await within(again).findByText('Firefox on Linux')).toBeTruthy();
+    expect(within(again).queryByText('203.0.113.9')).toBeNull();
+    // the filter goes to the server, which narrows the log (and its pages)
+    await user.selectOptions(screen.getByLabelText('Kind'), 'failed');
+    await user.type(screen.getByLabelText('Person'), 'mi');
+    fireEvent.change(screen.getByLabelText('From'), { target: { value: '2026-10-02' } });
+    fireEvent.change(screen.getByLabelText('To'), { target: { value: '2026-10-03' } });
+    await waitFor(() => {
+      const q = s.calls.filter((c) => c.path === '/admin/logins').at(-1)!.url.searchParams;
+      expect([q.get('type'), q.get('user'), q.get('from'), q.get('to')]).toEqual(['failed', 'mi', '2026-10-02', '2026-10-03']);
+    });
   });
 
   it('the audit log reads again when its tab is opened again', async () => {

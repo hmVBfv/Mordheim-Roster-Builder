@@ -133,6 +133,12 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
+- **Sign-ins filtern (Wunsch #72, Rob, 25.10.2026):** über der Tabelle ein Filter
+  nach Person (ein Teil des Namens), Art (Signed in · Joined · Failed) und Tag
+  (From, To, beide eingeschlossen); der Server filtert, auch über die Seiten.
+  Die Tabelle nennt das Gerät jedes Versuchs. **Adressen sind verborgen**, bis
+  der Admin „Show addresses“ drückt, und bei jedem erneuten Öffnen des Reiters
+  wieder verborgen; ebenso in der Liste der letzten Anmeldungen einer Person.
 - **„Your reports“ als Reiter von Account (Rob, 20.10.2026):** Account hat zwei
   Reiter, **Settings** (`/account`) und **Your reports** (`/account/reports`; am Handy
   über der Seite, ab 900 px als Unterpunkte von Account in der Seitenleiste,

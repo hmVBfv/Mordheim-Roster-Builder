@@ -3,7 +3,7 @@
    new one is never hidden. */
 
 export interface AuditEntry { seq: number; at: string; actor: string | null; action: string; targetType: string | null; target: string | null; payload: unknown }
-export interface Attempt { id: number; username: string; ip: string; at: string; ok: boolean; reason: string }
+export interface Attempt { id: number; username: string; ip: string; device: string; at: string; ok: boolean; reason: string }
 
 const ACTIONS: Record<string, string> = {
   'user.register': 'joined with an invite',

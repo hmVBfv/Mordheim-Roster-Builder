@@ -150,6 +150,7 @@ interface SignInRow { at: string; kind: 'signin' | 'moved'; device: string; plac
 
 /** The last sign-ins of one person (wish #69): when, with what, from where; the first time of a device marked. Only the admin gets this from the server. */
 function SignIns({ userId }: { userId: string }) {
+  const addresses = useAddresses();
   const [r, setR] = useState<{ signins: SignInRow[]; located: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -162,6 +163,7 @@ function SignIns({ userId }: { userId: string }) {
   if (!r.signins.length) return <p className={ui.muted}>No sign-in noted yet; the next one counts as the first of its device.</p>;
   return (
     <>
+      <AddressToggle addresses={addresses} />
       {!r.located && <p className={ui.muted}>There is no database of places on the Pi (see operations.md, GEOIP_DB): the place stays empty.</p>}
       <div className={styles.tableWrap}>
         <table className={styles.table} aria-label="Recent sign-ins">
@@ -172,7 +174,7 @@ function SignIns({ userId }: { userId: string }) {
                 <td data-label="When"><time dateTime={x.at}>{stamp(x.at)}</time></td>
                 <td data-label="Device"><span>{x.device}{x.firstTime && <> <span className={`${styles.flag} ${styles.nowrap}`}>new device</span></>}{x.kind === 'moved' && <> <span className={`${styles.flag} ${styles.nowrap}`}>session used from here</span></>}</span></td>
                 <td data-label="Place">{x.place || '–'}</td>
-                <td data-label="Address">{x.ip}</td>
+                <td data-label="Address">{addresses.shown ? x.ip : hiddenAddress}</td>
               </tr>
             ))}
           </tbody>
@@ -256,15 +258,15 @@ function Invites({ onNotice }: { onNotice: (t: string) => void }) {
 
 /** A log read page by page, newest first. It reads again whenever the screen
     is visited, also by the tab link of the tab already open or by Back. */
-function useLog<T>(path: string, key: string, cursor: (last: T) => number) {
+function useLog<T>(path: string, key: string, cursor: (last: T) => number, filter = '') {
   const visit = useLocation().key;
   const [items, setItems] = useState<T[]>([]);
   const [more, setMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
   const fetchPage = useCallback(
-    (before?: number) => api<Record<string, T[]>>(`${path}?limit=${PAGE}${before ? `&before=${before}` : ''}`).then((r) => r[key] ?? []),
-    [path, key],
+    (before?: number) => api<Record<string, T[]>>(`${path}?limit=${PAGE}${before ? `&before=${before}` : ''}${filter}`).then((r) => r[key] ?? []),
+    [path, key, filter],
   );
   useEffect(() => {
     let live = true;
@@ -286,16 +288,73 @@ function useLog<T>(path: string, key: string, cursor: (last: T) => number) {
   return { items, error, busy, more, next };
 }
 
+/** Addresses are hidden until the admin asks (wish #72): the choice lasts for the screen as it is, not for the next visit. */
+function useAddresses() {
+  const visit = useLocation().key;
+  // the choice belongs to the visit it was made in
+  const [chosen, setChosen] = useState<string | null>(null);
+  const shown = chosen === visit;
+  return { shown, toggle: () => setChosen(shown ? null : visit) };
+}
+
+function AddressToggle({ addresses }: { addresses: ReturnType<typeof useAddresses> }) {
+  return (
+    <div className={ui.row}>
+      <button type="button" className={ui.buttonQuiet} aria-pressed={addresses.shown} onClick={addresses.toggle}>{addresses.shown ? 'Hide addresses' : 'Show addresses'}</button>
+    </div>
+  );
+}
+
+const hiddenAddress = <span className={ui.muted} aria-label="hidden">hidden</span>;
+
+interface LoginFilter { user: string; type: string; from: string; to: string }
+const NO_FILTER: LoginFilter = { user: '', type: '', from: '', to: '' };
+
 function Logins() {
-  const log = useLog<Attempt>('/admin/logins', 'attempts', (a) => a.id);
+  const [filter, setFilter] = useState<LoginFilter>(NO_FILTER);
+  const [user, setUser] = useState('');
+  // the name is sent when the typing pauses, not with every letter
+  useEffect(() => {
+    const t = setTimeout(() => setFilter((f) => (f.user === user.trim() ? f : { ...f, user: user.trim() })), 250);
+    return () => clearTimeout(t);
+  }, [user]);
+  const query = Object.entries(filter).filter(([, v]) => v).map(([k, v]) => `&${k}=${encodeURIComponent(v)}`).join('');
+  const log = useLog<Attempt>('/admin/logins', 'attempts', (a) => a.id, query);
+  const addresses = useAddresses();
+  const filtered = query !== '';
   return (
     <>
       <p className={ui.muted}>Every sign-in and every failed try, kept for 180 days. Many failures from one address end up blocked by Fail2Ban on the Pi.</p>
+      <form className={styles.filters} role="search" aria-label="Filter the sign-ins" onSubmit={(e) => e.preventDefault()}>
+        <label className={ui.field}>
+          <span>Person</span>
+          <input className={ui.input} type="search" maxLength={64} value={user} onChange={(e) => setUser(e.target.value)} />
+        </label>
+        <label className={ui.field}>
+          <span>Kind</span>
+          <select className={ui.select} value={filter.type} onChange={(e) => setFilter({ ...filter, type: e.target.value })}>
+            <option value="">All</option>
+            <option value="signin">Signed in</option>
+            <option value="joined">Joined</option>
+            <option value="failed">Failed</option>
+          </select>
+        </label>
+        <label className={ui.field}>
+          <span>From</span>
+          <input className={ui.input} type="date" value={filter.from} max={filter.to || undefined} onChange={(e) => setFilter({ ...filter, from: e.target.value })} />
+        </label>
+        <label className={ui.field}>
+          <span>To</span>
+          <input className={ui.input} type="date" value={filter.to} min={filter.from || undefined} onChange={(e) => setFilter({ ...filter, to: e.target.value })} />
+        </label>
+        {filtered && <button type="button" className={ui.buttonQuiet} onClick={() => { setUser(''); setFilter(NO_FILTER); }}>Clear filter</button>}
+      </form>
+      <AddressToggle addresses={addresses} />
       {log.error && <p className={`${ui.message} ${ui.error}`} role="alert">{log.error}</p>}
       <div className={styles.tableWrap}>
         <table className={styles.table} aria-label="Sign-ins">
           <thead>
-            <tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th><th scope="col">From</th></tr>
+            <tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th><th scope="col">Device</th><th scope="col">From</th></tr>
           </thead>
           <tbody>
             {log.items.map((a) => (
@@ -303,13 +362,14 @@ function Logins() {
                 <td data-label="When"><time dateTime={a.at}>{stamp(a.at)}</time></td>
                 <td data-label="Who"><strong>{a.username}</strong></td>
                 <td data-label="What"><span className={a.ok ? undefined : styles.failed}>{attemptLine(a)}</span></td>
-                <td data-label="From">{a.ip}</td>
+                <td data-label="Device">{a.device || '–'}</td>
+                <td data-label="From">{addresses.shown ? a.ip : hiddenAddress}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {!log.busy && log.items.length === 0 && !log.error && <p className={ui.muted}>Nothing yet.</p>}
+      {!log.busy && log.items.length === 0 && !log.error && <p className={ui.muted}>{filtered ? 'Nothing matches this filter.' : 'Nothing yet.'}</p>}
       {log.more && log.items.length > 0 && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={log.busy} onClick={log.next}>Older</button></div>}
     </>
   );

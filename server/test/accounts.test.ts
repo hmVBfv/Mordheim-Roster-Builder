@@ -381,4 +381,39 @@ describe('the admin', () => {
     const logins = (await s.call({ url: '/api/v1/admin/logins', token })).json() as { attempts: { username: string; ok: boolean; reason: string }[] };
     expect(logins.attempts.map((a) => [a.username, a.ok, a.reason])).toEqual([['player', true, ''], ['player', false, 'disabled'], ['player', true, '']]);
   });
+
+  /* Wish #72: the sign-in log names the device, and is filtered by person, kind and day on the server. */
+  it('the sign-in log names the device of each try and filters by person, kind and day (#72)', async () => {
+    const s = await startAccounts();
+    const admin = await s.user('rob', { admin: true, totp: true });
+    await s.user('kai');
+    await s.user('mia');
+    const as = (username: string, password: string, device: string) => s.call({ url: '/api/v1/auth/login', body: { username, password, device }, token: null });
+    await as('kai', PASSWORD, 'Firefox on Linux');
+    s.clock.advance(DAY);
+    await as('mia', 'wrong password', 'Safari on iPhone');
+    await as('mia', PASSWORD, 'Safari on iPhone');
+    s.clock.advance(DAY);
+    await as('kai', PASSWORD, 'Chrome on Android');
+    const token = admin.session();
+    const get = async (query = '') => ((await s.call({ url: `/api/v1/admin/logins${query}`, token })).json() as { attempts: { username: string; device: string; ok: boolean; at: string }[] }).attempts;
+    expect((await get()).map((a) => [a.username, a.device])).toEqual([['kai', 'Chrome on Android'], ['mia', 'Safari on iPhone'], ['mia', 'Safari on iPhone'], ['kai', 'Firefox on Linux']]);
+    // a person: a part of the name is enough, the case does not matter
+    expect((await get('?user=KA')).map((a) => a.device)).toEqual(['Chrome on Android', 'Firefox on Linux']);
+    // the kind: a sign-in that worked, or a try that failed
+    expect((await get('?type=failed')).map((a) => a.username)).toEqual(['mia']);
+    expect((await get('?type=signin')).map((a) => a.username)).toEqual(['kai', 'mia', 'kai']);
+    // the days, both ends included
+    expect((await get('?from=2026-10-01&to=2026-10-01')).map((a) => a.username)).toEqual(['mia', 'mia']);
+    expect((await get('?from=2026-10-01')).map((a) => a.username)).toEqual(['kai', 'mia', 'mia']);
+    expect((await get('?to=2026-09-30')).map((a) => a.username)).toEqual(['kai']);
+    // together, and with paging (the filter holds on the next page too)
+    expect((await get('?user=mia&type=signin&from=2026-10-01&to=2026-10-02')).map((a) => a.username)).toEqual(['mia']);
+    const first = await s.call({ url: '/api/v1/admin/logins?user=kai&limit=1', token });
+    const last = (first.json() as { attempts: { id: number }[] }).attempts[0]!.id;
+    expect(((await s.call({ url: `/api/v1/admin/logins?user=kai&limit=1&before=${last}`, token })).json() as { attempts: { device: string }[] }).attempts.map((a) => a.device)).toEqual(['Firefox on Linux']);
+    // nonsense is refused, not ignored
+    expect((await s.call({ url: '/api/v1/admin/logins?type=everything', token })).statusCode).toBe(400);
+    expect((await s.call({ url: '/api/v1/admin/logins?from=yesterday', token })).statusCode).toBe(400);
+  });
 });
