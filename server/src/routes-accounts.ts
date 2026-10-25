@@ -42,13 +42,18 @@ function cookieToken(req: FastifyRequest): string | null {
 }
 
 /** Who is asking: the session cookie's user, or null. A full session in use lives on – `renew` hands its token back when it did, for a new cookie. */
-export function readActor(db: DB, req: FastifyRequest, now: Date, renew?: (token: string) => void): Actor | null {
+export function readActor(db: DB, req: FastifyRequest, now: Date, renew?: (token: string) => void, moved?: (s: { userId: string; device: string; prevIp: string; ip: string }) => void): Actor | null {
   const token = cookieToken(req);
   if (!token) return null;
   const found = sessionByToken(db, token, now);
   if (!found) return null;
   const { session, user } = found;
-  if (touchSession(db, session, req.ip, now)) renew?.(token);
+  const prevIp = session.ip;
+  if (touchSession(db, session, req.ip, now)) {
+    renew?.(token);
+    // used from another address than the session last was (checked at most once an hour, as the session is renewed): the admin may want to know
+    if (prevIp !== req.ip) moved?.({ userId: user.id, device: session.device_label, prevIp, ip: req.ip });
+  }
   return {
     id: user.id, username: user.username, displayName: user.display_name, isAdmin: !!user.is_admin,
     totp: !!user.totp_enabled_at, sessionId: session.id, pending: session.stage === 'totp',

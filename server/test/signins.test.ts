@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { KEEP_SIGNINS } from '../src/signins.ts';
 import { PASSWORD, startAccounts } from './accounts-helpers.ts';
 
-interface Row { at: string; device: string; place: string; ip: string; firstTime: boolean }
+interface Row { at: string; kind: string; device: string; place: string; ip: string; firstTime: boolean }
 interface Reply { signins: Row[]; devices: { device: string; firstAt: string; firstIp: string; firstPlace: string }[]; located: boolean }
 
 /** A tiny stand-in for the database on the Pi: the first number of the address says where it is. */
@@ -129,5 +129,58 @@ describe('the database of places on the Pi', () => {
     const { s, login } = await table();
     s.db.exec('DROP TABLE signins');
     expect((await login('kai', 'Firefox on Linux', '81.2.69.142')).statusCode).toBe(200);
+  });
+});
+
+describe('a session used from another place (#69, Rob: "Wechsel erfassen")', () => {
+  /** Signs kai in and gives back his session token. */
+  async function signedIn(s: Awaited<ReturnType<typeof table>>['s'], login: Awaited<ReturnType<typeof table>>['login'], ip: string) {
+    const r = await login('kai', 'Firefox on Linux', ip);
+    const cookie = String(([] as string[]).concat(r.headers['set-cookie'] ?? []).find((c) => c.startsWith('mh_session=')) ?? '');
+    const token = /mh_session=([^;]+)/.exec(cookie)?.[1] ?? '';
+    expect(token).not.toBe('');
+    return { token, use: (from: string) => s.call({ url: '/api/v1/auth/me', token, headers: { 'x-forwarded-for': from } }) };
+  }
+  const kinds = async (seen: (id: string) => Promise<Reply & { signins: (Row & { kind: string })[] }>, id: string) => (await seen(id)).signins.map((x) => [x.kind, x.place]);
+
+  it('is noted once the session is used from a different place, as a move and not as a sign-in', async () => {
+    const { s, kai, login, seen } = await table();
+    const { use } = await signedIn(s, login, '81.2.69.142');
+    s.clock.advance(2 * 3600_000);
+    expect((await use('203.0.113.7')).statusCode).toBe(200);
+    expect(await kinds(seen as never, kai.id)).toEqual([['moved', 'Sydney, Australia'], ['signin', 'Berlin, Germany']]);
+    // the first time of a device is a matter of sign-ins only
+    expect((await seen(kai.id)).signins.map((x) => x.firstTime)).toEqual([false, true]);
+  });
+
+  it('is not noted for the same place, however the address changes, nor within the hour', async () => {
+    const { s, kai, login, seen } = await table();
+    const { use } = await signedIn(s, login, '81.2.69.142');
+    s.clock.advance(30 * 60_000);
+    await use('203.0.113.7');
+    s.clock.advance(2 * 3600_000);
+    await use('81.2.69.200');
+    expect(await kinds(seen as never, kai.id)).toEqual([['signin', 'Berlin, Germany']]);
+  });
+
+  it('without a database of places a different address is the move', async () => {
+    const s = await startAccounts();
+    const rob = await s.user('rob', { admin: true, totp: true });
+    const kai = await s.user('kai');
+    const r = await s.call({ method: 'POST', url: '/api/v1/auth/login', body: { username: 'kai', password: PASSWORD, device: 'Firefox on Linux' }, headers: { 'x-forwarded-for': '81.2.69.142' } });
+    const token = /mh_session=([^;]+)/.exec(String(([] as string[]).concat(r.headers['set-cookie'] ?? [])[0]))![1]!;
+    s.clock.advance(2 * 3600_000);
+    await s.call({ url: '/api/v1/auth/me', token, headers: { 'x-forwarded-for': '81.2.69.143' } });
+    const seen = (await s.call({ url: `/api/v1/admin/users/${kai.id}/signins`, token: rob.session() })).json() as Reply & { signins: { kind: string }[] };
+    expect(seen.signins.map((x) => x.kind)).toEqual(['moved', 'signin']);
+  });
+
+  it('keeps the last few moves apart from the sign-ins', async () => {
+    const { s, kai, login, seen } = await table();
+    const { use } = await signedIn(s, login, '81.2.69.142');
+    for (let i = 0; i < KEEP_SIGNINS + 4; i++) { s.clock.advance(2 * 3600_000); await use(i % 2 ? '81.2.69.142' : '203.0.113.7'); }
+    const all = (await seen(kai.id)).signins as (Row & { kind: string })[];
+    expect(all.filter((x) => x.kind === 'moved')).toHaveLength(KEEP_SIGNINS);
+    expect(all.filter((x) => x.kind === 'signin')).toHaveLength(1);
   });
 });

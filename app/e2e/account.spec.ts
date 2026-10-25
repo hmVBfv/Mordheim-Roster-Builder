@@ -90,8 +90,9 @@ async function playServer(page: Page, w: World) {
         return json({
           located: true,
           signins: [
-            { at: iso(60), device: 'Safari on iPhone, a long name that wraps on a narrow phone', place: 'Sydney, New South Wales, Australia', ip: '2001:db8:85a3::8a2e:370:7334', firstTime: true },
-            { at: iso(24 * 60), device: 'Firefox on Linux', place: 'Berlin, Berlin, Germany', ip: '81.2.69.142', firstTime: false },
+            { at: iso(60), kind: 'signin', device: 'Safari on iPhone, a long name that wraps on a narrow phone', place: 'Sydney, New South Wales, Australia', ip: '2001:db8:85a3::8a2e:370:7334', firstTime: true },
+            { at: iso(120), kind: 'moved', device: 'Firefox on Linux', place: 'Paris, France', ip: '81.2.69.150', firstTime: false },
+            { at: iso(24 * 60), kind: 'signin', device: 'Firefox on Linux', place: 'Berlin, Berlin, Germany', ip: '81.2.69.142', firstTime: false },
           ],
           devices: [],
         });

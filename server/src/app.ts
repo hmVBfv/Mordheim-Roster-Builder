@@ -9,7 +9,8 @@ import type { Logger } from 'pino';
 import type { Config } from './config.ts';
 import type { DB } from './db.ts';
 import type { Health } from './health.ts';
-import type { Geo } from './geo.ts';
+import { placeOf, type Geo } from './geo.ts';
+import { recordMove } from './signins.ts';
 import type { HashCost } from './passwords.ts';
 import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
 import { bugTokenActor } from './bug-tokens.ts';
@@ -158,7 +159,10 @@ export function buildApp(deps: AppDeps): FastifyInstance {
           return reply.code(403).send({ error: 'cross_origin' });
         }
         // a session in use lives on – its cookie with it (security review AUTH-14)
-        req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), SESSION_DAYS)));
+        req.actor = readActor(db, req, now(), (token) => reply.header('Set-Cookie', sessionCookie(token, (deps.config.publicOrigin ?? '').startsWith('https:'), SESSION_DAYS)), (m) => {
+          // a failure here must never stop the request
+          try { recordMove(db, { ...m, place: placeOf(m.ip, deps.geo ?? null), prevPlace: placeOf(m.prevIp, deps.geo ?? null) }, now()); } catch (err) { app.log.warn({ event: 'move_not_noted', err }, 'a move of a session could not be noted'); }
+        });
         // the account the app made the request for: another than the cookie's is refused, never answered for the cookie
         // (a tab where somebody else signed in meanwhile; its unsent items stay its author's – independent review of CLIENT-1)
         const claimed = req.headers['x-roster-user'];
