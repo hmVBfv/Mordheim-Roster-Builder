@@ -2,7 +2,7 @@
    password, then – with an authenticator – its code, or one of the recovery
    codes instead. Accounts come from an invite only, so there is no
    "register" here. After signing in the app goes where it was sent from
-   (`?next=`), or to the account (Account in the navigation).
+   (`?next=`), or to Home (report #76: not to the account).
 
    The authenticator's code is sent by itself with its sixth digit (Rob,
    20.10.2026: most sign-ins do). That asks nothing more of the server than
