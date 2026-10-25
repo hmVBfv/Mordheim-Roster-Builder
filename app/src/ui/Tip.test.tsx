@@ -72,4 +72,21 @@ describe('a word with its rules', () => {
     expect(screen.queryByRole('button', { name: 'Lost his hat' })).toBeNull();
     expect(screen.getByText(/Lost his hat/)).toBeTruthy();
   });
+
+  /* #78: the bubble of a word inside an open sheet was drawn into <body>, under the sheet's top layer – a tap showed
+     nothing on a phone. Inside a dialog the bubble is drawn inside that dialog. */
+  it('inside a sheet the bubble is drawn inside the sheet, not behind it (#78)', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <dialog open aria-label="Sheet"><p><TipWord label="Sword" tips={SWORD} /></p></dialog>
+        <p><TipWord label="Fear" tips={FEAR} /></p>
+      </>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Sword' }));
+    expect(screen.getByRole('dialog', { name: 'Sheet' }).contains(screen.getByRole('tooltip'))).toBe(true);
+    // a word on the page itself keeps drawing into the body
+    await user.click(screen.getByRole('button', { name: 'Fear' }));
+    expect(document.querySelector('dialog')!.contains(screen.getByRole('tooltip'))).toBe(false);
+  });
 });
