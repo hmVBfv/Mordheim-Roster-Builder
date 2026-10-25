@@ -4047,3 +4047,36 @@ its `node_modules` links (a symbolic link is not matched by `node_modules/`); th
 removed again in the next commit of each branch. The "Give is a grid" e2e test, extended in
 #63, failed twice in CI on slow runners (`scrollIntoViewIfNeeded` on a section that was
 replaced meanwhile); pull request 184 takes the scrolling out. Pull requests 179 to 184.
+
+## October 25, 2026 — the sixth run: #72 to #75 (sign-in log, Library links, the Campaign tab), and the moves of #69
+
+Four reports. **#75**: with exactly one campaign in play the Campaign tab jumped straight into
+it, so the overview could not be reached from the navigation. The redirect (and the "all"
+marker that every link to the overview carried to overrule it, and a test for a race
+between the device's memory and the server that only existed because of it) is gone; the tab
+always shows the list. Two end-to-end tests had relied on the jump. **#72**: the sign-in log
+of the admin (the attempts, not the per-person list of #69) is filtered on the server by person (part of
+the name), kind and day, so the filter holds across pages; each try now records its device
+(migration 38); addresses are hidden until asked for and hidden again on the next visit, in
+this log and in the per-person list. My first version reset the choice in an effect and the
+linter rightly refused it (a state set synchronously in an effect); the choice now belongs to
+the visit it was made in.
+
+**#73 and #74** are one cause and one pull request: places of the world (a new Library kind
+with a free tag) and links between factions, NPCs, groups, scenarios and places. A link is
+stored on one entry and shown on both, openly in the Library, as Rob asked; a copy into a
+campaign takes none along (a test holds this for factions and NPCs), because what the Library
+knows of how things belong together should stay hidden in a campaign until a leader can unlock
+it, which is not built. Because the copy question touches visibility, the independent review ran
+although the reports are wishes: it found no leak and one real risk of data loss. My first
+version dropped, on every save, the links to entries this device did not show, which includes an
+entry written on another device that had not synced yet; a save now keeps every link and the list
+only hides an id it cannot find. The migration for the new kind needs the next number without a
+gap, so the pull request is stacked on #72's (migration 38 and 39): merge 189 first.
+
+A wrong turn of the check, not of the code: the mid-run edit of a test file during the full
+check was avoided by not touching the tree while it runs; the e2e run found the two tests that
+relied on the redirect only at the end, so a change to a route now gets a grep for its
+destination in `app/e2e/` before the check. Master had also gone red on a test that read the
+highlighted tab before the redirect had settled (pull request 187 waits for it). Pull
+requests 188 to 190.
