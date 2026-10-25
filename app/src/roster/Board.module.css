@@ -1139,3 +1139,40 @@
   color: var(--text-muted);
   font-size: 0.88rem;
 }
+
+/* The spell list of a caster's school (#68): one spell a row with its casting value, what it does under it */
+.lore {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lore li {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.lore small {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.loreKnown {
+  border-color: var(--accent);
+}
+
+.loreDiff,
+.loreMark {
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.loreMark {
+  color: var(--accent);
+}

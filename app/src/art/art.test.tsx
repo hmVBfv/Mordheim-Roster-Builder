@@ -136,7 +136,7 @@ describe('which screen shows which picture', () => {
     ['/campaign/c1/battles/b1', 'battle'],
     ['/campaign/c1/house-rules', 'tome'],
     ['/campaign/c1/warbands/w1', 'camp'],
-    ['/more', 'lock'],
+    ['/account', 'lock'],
     ['/admin/people', 'lock'],
     ['/nowhere', 'city']
   ])('%s shows %s', (path, scene) => {

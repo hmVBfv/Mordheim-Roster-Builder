@@ -122,7 +122,7 @@ describe('signing in', () => {
       'GET /auth/me': () => ({ user: ME, pending: false }),
       'GET /auth/sessions': () => ({ sessions: [{ id: 's1', device: 'Firefox on Linux', createdAt: '2026-10-20T10:00:00.000Z', lastSeenAt: '2026-10-20T10:00:00.000Z', current: true }] }),
     });
-    at('/more');
+    at('/account');
     const devices = await screen.findByRole('region', { name: 'Devices' });
     const theme = screen.getByRole('group', { name: 'Theme' });
     expect(theme.compareDocumentPosition(devices) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -130,7 +130,7 @@ describe('signing in', () => {
 
   it('Account, signed out: the way to sign in, no devices, no admin', async () => {
     fakeServer({ 'GET /auth/me': () => ({ user: null, pending: false }) });
-    at('/more');
+    at('/account');
     const account = await screen.findByRole('region', { name: 'Sign-in and security' });
     expect(await within(account).findByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(screen.queryByRole('region', { name: 'Devices' })).toBeNull();
@@ -141,7 +141,7 @@ describe('signing in', () => {
     localStorage.setItem('mordheim-me', JSON.stringify(ME));
     // Caddy's answer while the app is down: no JSON
     vi.stubGlobal('fetch', vi.fn(async () => new Response('', { status: 502, headers: { 'content-type': 'text/plain' } })));
-    at('/more');
+    at('/account');
     expect(await screen.findByText(/does not answer right now/)).toBeTruthy();
     expect(screen.getByText('Kai')).toBeTruthy();
   });
@@ -205,7 +205,7 @@ describe('the account', () => {
       'POST /account/totp/enable': (b) => (b.code === '123456' ? (totp = true, { recoveryCodes: ['abcd-efgh', 'jkmn-pqrs'] }) : [400, { error: 'invalid', problem: 'the code is not right – check the time on your phone' }]),
     });
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     await user.click(await screen.findByRole('button', { name: 'Set up' }));
     const sheet = screen.getByRole('dialog', { name: 'Authenticator' });
     await user.click(within(sheet).getByRole('button', { name: 'Set up' }));
@@ -235,7 +235,7 @@ describe('the account', () => {
       'POST /account/totp/disable': (b) => (b.password === 'correct horse battery' && b.code === '111111' ? (totp = false, { ok: true }) : [400, { error: 'invalid', problem: 'the code is not right' }]),
     });
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     await user.click(await screen.findByRole('button', { name: 'Manage' }));
     const sheet = screen.getByRole('dialog', { name: 'Authenticator' });
     await user.click(within(sheet).getByRole('button', { name: 'Set up on a new phone' }));
@@ -270,7 +270,7 @@ describe('the account', () => {
       'POST /account/password': (b) => (b.current === 'correct horse battery' ? { ok: true, signedOut: 0 } : [400, { error: 'invalid', problem: 'the current password is not right' }]),
     });
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const devices = await screen.findByRole('region', { name: 'Devices' });
     expect(await within(devices).findByText('Chrome on Android')).toBeTruthy();
     expect(within(devices).getByText(/This device/)).toBeTruthy();
@@ -296,7 +296,7 @@ describe('the account', () => {
 
   it('an admin without the authenticator is told to set it up; the admin tools stay closed', async () => {
     fakeServer({ 'GET /auth/me': () => ({ user: { ...ADMIN, totp: false, mustSetUpTotp: true }, pending: false }), 'GET /auth/sessions': () => ({ sessions: [] }) });
-    at('/more');
+    at('/account');
     expect(await screen.findByText(/Set it up to open the admin tools/)).toBeTruthy();
     // the admin tools have their own place in the navigation, no box on the Account screen
     expect(screen.queryByRole('region', { name: /Admin/ })).toBeNull();

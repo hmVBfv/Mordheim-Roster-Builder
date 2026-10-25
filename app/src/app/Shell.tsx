@@ -15,6 +15,7 @@ import { ChevronIcon } from '../ui/icons.tsx';
 import styles from './Shell.module.css';
 import { SyncState } from './SyncState.tsx';
 import { UpdateBanner } from './UpdateBanner.tsx';
+import { ACCOUNT, HOME } from './paths.ts';
 
 /* Which groups of the side navigation the player opened or closed, on this device. */
 const OPEN_KEY = 'mordheim-nav-open';
@@ -59,7 +60,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   useEffect(() => { note('screen', routePattern(pathname)); }, [pathname]);
   // a group is open where one is, unless the player closed it; the player's choice stays on the device
-  const inSection = (sec: Section) => (sec === 'warbands' ? pathname.startsWith('/warbands') : sec === 'campaign' ? pathname.startsWith('/campaign') : sec === 'admin' ? pathname.startsWith('/admin') : sec === 'library' ? pathname.startsWith('/library') : sec === 'account' ? pathname.startsWith('/more') : false);
+  const inSection = (sec: Section) => (sec === 'warbands' ? pathname.startsWith('/warbands') : sec === 'campaign' ? pathname.startsWith('/campaign') : sec === 'admin' ? pathname.startsWith('/admin') : sec === 'library' ? pathname.startsWith('/library') : sec === 'account' ? pathname.startsWith(ACCOUNT) : false);
   const isOpen = (sec: Section) => opened[sec] ?? inSection(sec);
   const toggle = (sec: Section) => setOpened((cur) => { const next = { ...cur, [sec]: !isOpen(sec) }; writeOpen(next); return next; });
   // who is signed in: asked once, never waited for (the builder works without)
@@ -91,7 +92,7 @@ export function Shell({ children }: { children: ReactNode }) {
             return (
               <li key={it.to} className={sub.length ? styles.group : undefined}>
                 <div className={styles.groupHead}>
-                  <NavLink to={it.to} end={it.to === '/'} className={({ isActive }) => (isActive ? `${styles.navLink} ${styles.active}` : styles.navLink)}>
+                  <NavLink to={it.to} end={it.to === HOME} className={({ isActive }) => (isActive ? `${styles.navLink} ${styles.active}` : styles.navLink)}>
                     <it.icon />
                     <span>{it.label}</span>
                   </NavLink>

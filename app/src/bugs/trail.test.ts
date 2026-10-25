@@ -16,11 +16,11 @@ describe('the steps', () => {
     note('edit', 'a change to the warband', T(2));
     note('edit', 'a change to the warband', T(3));
     note('edit', 'a change to the warband', T(4));
-    note('screen', '/more', T(5));
+    note('screen', '/account', T(5));
     expect(recentSteps()).toEqual([
       { at: T(1).toISOString(), kind: 'screen', what: '/', n: 1 },
       { at: T(4).toISOString(), kind: 'edit', what: 'a change to the warband', n: 3 },
-      { at: T(5).toISOString(), kind: 'screen', what: '/more', n: 1 },
+      { at: T(5).toISOString(), kind: 'screen', what: '/account', n: 1 },
     ]);
   });
 

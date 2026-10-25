@@ -1765,7 +1765,7 @@ test('on a wide monitor the pages use its width: lists and cards take it, text a
     expect(await widthOfPage(), `${path} page`).toBeGreaterThanOrEqual(1800);
   }
   // text and forms: a line of 1900 px is no way to read
-  for (const path of [`campaign/${c.id}/chronicle`, `campaign/${c.id}/timeline`, `campaign/${c.id}/manage`, 'more']) {
+  for (const path of [`campaign/${c.id}/chronicle`, `campaign/${c.id}/timeline`, `campaign/${c.id}/manage`, 'account']) {
     await width(path);
     expect(await widthOfPage(), `${path} page`).toBeLessThanOrEqual(1120);
   }

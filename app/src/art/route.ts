@@ -22,7 +22,7 @@ const RULES: ReadonlyArray<readonly [RegExp, SceneId]> = [
   [/^\/campaign\/[^/]+$/, 'gate'],
   [/^\/campaign$/, 'map'],
   [/^\/library(\/|$)/, 'scribe'],
-  [/^\/(more|admin|sign-in|invite|reset)(\/|$)/, 'lock'],
+  [/^\/(more|account|settings|admin|sign-in|invite|reset)(\/|$)/, 'lock'],
   [/^\/import$/, 'market']
 ];
 

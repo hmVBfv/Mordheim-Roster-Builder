@@ -289,6 +289,18 @@
     gap: 0;
   }
 
+  /* the mark of an attached warband is a pill of one line beside or under the title, never stretched to its height (#67) */
+  .table td[data-label='Report'] {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .titleCell .flag {
+    margin-left: 0;
+    align-self: center;
+  }
+
   .table td[data-label='#'] {
     color: var(--text-muted);
     margin-right: var(--space-2);

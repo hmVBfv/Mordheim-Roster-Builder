@@ -70,9 +70,31 @@ describe('the app', () => {
   });
 
   it('the theme can be chosen', async () => {
-    at('/more');
+    at('/account');
     await userEvent.click(screen.getByRole('radio', { name: 'Parchment (light)' }));
     expect(document.documentElement.dataset.theme).toBe('parchment');
     expect(localStorage.getItem('mordheim-theme')).toBe('parchment');
+  });
+});
+
+describe('the addresses (#70)', () => {
+  it('Home is /home and the account is /account; the old addresses lead on to them', async () => {
+    const nav = () => within(screen.getByRole('navigation', { name: 'Main' })).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')]);
+    at('/home');
+    expect(await screen.findByRole('heading', { name: 'Open for you' })).toBeTruthy();
+    expect(nav()).toEqual([['Home', '/home'], ['Warbands', '/warbands'], ['Campaign', '/campaign'], ['Account', '/account']]);
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('aria-current')).toBe('page');
+    cleanup();
+    // the bare address and the old ones are redirects, not screens of their own
+    for (const old of ['/', '/account']) {
+      at(old);
+      expect(await screen.findByRole('navigation', { name: 'Main' })).toBeTruthy();
+      const current = screen.getAllByRole('link').find((a) => a.getAttribute('aria-current') === 'page');
+      expect(current?.getAttribute('href')).toBe(old === '/' ? '/home' : '/account');
+      cleanup();
+    }
+    at('/more/reports');
+    expect(await screen.findByRole('navigation', { name: 'Main' })).toBeTruthy();
+    expect(screen.getAllByRole('link').find((a) => a.getAttribute('aria-current') === 'page')?.getAttribute('href')).toBe('/account');
   });
 });

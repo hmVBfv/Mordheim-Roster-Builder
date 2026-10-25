@@ -12,6 +12,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import { placeChoices, useLore } from './place.ts';
 import { archiveCampaign, cachedCampaigns, listCampaigns, ROLE_NAMES, roundName, startCampaign, type CampaignSummary } from './api.ts';
 import styles from './Campaign.module.css';
+import { ACCOUNT } from '../app/paths.ts';
 
 function StartSheet() {
   const { ref, open, close } = useSheet();
@@ -139,7 +140,7 @@ export function Campaigns() {
         : (
           <>
             <p className={ui.muted}>Starting a campaign needs the authenticator – a leader’s account is worth more to an intruder. Set it up under Account.</p>
-            <div className={ui.row}><Link to="/more" className={ui.buttonQuiet}>To the account</Link></div>
+            <div className={ui.row}><Link to={ACCOUNT} className={ui.buttonQuiet}>To the account</Link></div>
           </>
         )}
     </section>
