@@ -1,7 +1,7 @@
 /* Links between the entries of the Library (wish #74, Rob, 25.10.2026): a faction, an NPC, a group, a scenario or a
    place can point to others of the five – an NPC to its group, a group to a place. The Library shows them openly, from
    both ends. A copy into a campaign takes no link along: what the Library knows of how things belong together stays
-   there. A link to an entry that was taken out is not shown (and falls away with the next save of the entry). */
+   there. A link to an entry that is not in the list (taken out, or not yet synced from another device) is not shown, and a save keeps it. */
 import ui from '../ui/ui.module.css';
 import type { LibraryItem } from './api.ts';
 import styles from './Library.module.css';
@@ -20,8 +20,9 @@ export function linkedWith(items: LibraryItem[] | null, id: string): LibraryItem
     .sort((a, b) => LINK_KINDS.indexOf(a.kind as (typeof LINK_KINDS)[number]) - LINK_KINDS.indexOf(b.kind as (typeof LINK_KINDS)[number]) || a.name.localeCompare(b.name));
 }
 
-/** The links worth keeping: those to entries that still exist (and can be linked). */
-export const keepLinks = (items: LibraryItem[] | null, links: string[]): string[] => links.filter((l) => (items ?? []).some((i) => i.id === l && isLinkable(i)));
+/** The links a save sends: all of them. An id this device does not show may be an entry written on another device that has not
+    synced yet, so a save never drops what it cannot see; the list simply does not show it. */
+export const keepLinks = (_items: LibraryItem[] | null, links: string[]): string[] => links;
 
 /** On a card: what the entry is linked with. Nothing when there is nothing. */
 export function LinkChips({ items, id }: { items: LibraryItem[] | null; id: string }) {
@@ -38,7 +39,7 @@ export function LinkChips({ items, id }: { items: LibraryItem[] | null; id: stri
 export function LinksField({ items, selfId, links, onChange }: { items: LibraryItem[] | null; selfId: string; links: string[]; onChange: (l: string[]) => void }) {
   const all = (items ?? []).filter((i) => isLinkable(i) && i.id !== selfId);
   const byId = new Map(all.map((i) => [i.id, i]));
-  // links to entries that are gone are let go with the next save
+  // an id that is not shown (gone, or not yet synced) stays in the entry
   const shown = links.filter((l) => byId.has(l));
   const offered = all
     .filter((i) => !links.includes(i.id))
@@ -61,7 +62,7 @@ export function LinksField({ items, selfId, links, onChange }: { items: LibraryI
       )}
       <label className={ui.field}>
         <span className={ui.muted}>Add a link</span>
-        <select className={ui.select} value="" disabled={offered.length === 0} onChange={(e) => { if (e.target.value) onChange([...links.filter((l) => byId.has(l)), e.target.value]); }}>
+        <select className={ui.select} value="" disabled={offered.length === 0} onChange={(e) => { if (e.target.value) onChange([...links, e.target.value]); }}>
           <option value="">Choose …</option>
           {offered.map((i) => <option key={i.id} value={i.id}>{i.name} ({KIND_NAMES[i.kind]})</option>)}
         </select>

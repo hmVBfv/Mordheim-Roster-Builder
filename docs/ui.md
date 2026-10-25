@@ -103,8 +103,9 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   selbst, mit seiner Art) und „Remove link to …“; auf jeder Karte steht unter „Linked
   entries“, womit der Eintrag verbunden ist – **offen, von beiden Enden** (eine
   Verknüpfung wird nur auf einer Seite gespeichert). Ideen und Gruppen von Warbands
-  tragen keine. Ein Eintrag, der entfernt wurde, verschwindet aus der Anzeige und
-  mit dem nächsten Speichern aus der Liste. **Nichts davon geht in eine Kampagne:**
+  tragen keine. Ein Eintrag, der entfernt wurde (oder auf einem anderen Gerät
+  noch nicht angekommen ist), wird nicht angezeigt; das Speichern behält die
+  Verknüpfung, damit nichts verloren geht, was dieses Gerät nur noch nicht sieht. **Nichts davon geht in eine Kampagne:**
   eine Kopie (Fraktion, NPC, Gruppe, Szenario) nimmt die Verknüpfungen nicht mit; was
   die Library über das Zusammengehören weiß, bleibt dort, bis ein Leiter es später auf
   irgendeinem Weg freigibt (noch nicht gebaut). Orte nimmt eine Kampagne noch nicht

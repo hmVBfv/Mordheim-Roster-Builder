@@ -409,4 +409,18 @@ describe('the Library: places and links', () => {
     const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
     expect(within(card).queryByRole('list', { name: 'Linked entries' })).toBeNull();
   });
+
+  /* Not seen here does not mean gone: the target may be written on another device that has not synced yet.
+     A save of the entry must not drop what it cannot see. */
+  it('a save keeps a link to an entry this device does not know', async () => {
+    const srv = server();
+    const watch = srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '', links: ['written-elsewhere'] } });
+    const user = userEvent.setup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    await user.type(within(sheet).getByLabelText('What the players may read'), 'Known in the quarter');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(srv.state.library.get(watch.id)!.body).toMatchObject({ status: 'Known in the quarter', links: ['written-elsewhere'] }));
+  });
 });
