@@ -175,7 +175,7 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
     setError(null);
     try {
       const v = await f();
-      if ('left' in v) { void navigate('/campaign', { replace: true, state: { all: true } }); return; }
+      if ('left' in v) { void navigate('/campaign', { replace: true }); return; }
       onView(v);
       if (text) onNotice(text);
     } catch (e) { setError(e instanceof ApiError && e.code === 'last_leader' ? 'A campaign keeps at least one leader: make someone else leader first.' : errorText(e)); } finally { setBusy(false); }
@@ -304,7 +304,7 @@ function DeleteSection({ id, name, warbands }: { id: string; name: string; warba
     try {
       await deleteCampaign(id, typed);
       requestSync(0);
-      close(() => void navigate('/campaign', { replace: true, state: { all: true, deleted: name } }));
+      close(() => void navigate('/campaign', { replace: true, state: { deleted: name } }));
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   };
   return (
@@ -349,7 +349,7 @@ export function Campaign() {
       <section className={ui.page}>
         <h1>Not a campaign of yours</h1>
         <p className={ui.muted}>This campaign does not exist, you are no longer part of it, or a leader deleted it. Warbands of yours that were entered in it are with you again, free.</p>
-        <p><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></p>
+        <p><Link to="/campaign" className={ui.buttonQuiet}>All campaigns</Link></p>
       </section>
     );
   }
@@ -389,7 +389,7 @@ export function Campaign() {
         {campaignTabs(id, view.role, user.totp).map((t) => <NavLink key={t.to} to={t.to} end={t.end}>{t.label}</NavLink>)}
       </nav>
       {content}
-      <div className={ui.row}><Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link></div>
+      <div className={ui.row}><Link to="/campaign" className={ui.buttonQuiet}>All campaigns</Link></div>
       {notice}
     </section>
   );

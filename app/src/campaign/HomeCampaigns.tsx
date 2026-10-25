@@ -33,7 +33,7 @@ export function HomeCampaigns() {
         )}
       </div>
       <div className={ui.row}>
-        {user ? <Link to="/campaign" state={{ all: true }} className={ui.buttonQuiet}>All campaigns</Link> : <Link to="/sign-in" className={ui.buttonQuiet}>Sign in</Link>}
+        {user ? <Link to="/campaign" className={ui.buttonQuiet}>All campaigns</Link> : <Link to="/sign-in" className={ui.buttonQuiet}>Sign in</Link>}
       </div>
     </section>
   );

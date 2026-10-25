@@ -87,11 +87,13 @@ describe('the Campaign tab', () => {
     expect(await screen.findByText(/Setup · you are leader · Mordheim/)).toBeTruthy();
   });
 
-  it('several campaigns are listed; a single one opens at once', async () => {
+  it('the Campaign tab always shows the list, also with a single campaign (#75)', async () => {
     const srv = server();
     srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
     at('/campaign');
-    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
+    const one = await screen.findByRole('list', { name: 'Your campaigns' });
+    expect(within(one).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands']);
+    expect(screen.getByRole('heading', { level: 1, name: 'Campaigns' })).toBeTruthy();
     cleanup();
     srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
     at('/campaign');
@@ -100,30 +102,8 @@ describe('the Campaign tab', () => {
     await waitFor(() => expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands', 'Summer in SylvaniaViewer · After battle 3 · 0 warbands']));
   });
 
-  /* A list this device remembered with one campaign must not open that one
-     by itself before the server has answered: since then the player may have
-     joined another (it made "several campaigns are listed" fail now and then). */
-  it('a single campaign remembered on this device does not open by itself while the server lists more', async () => {
-    const srv = server();
-    srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
-    at('/campaign');
-    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
-    cleanup();
-    srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
-    // the server answers the list a moment after the device's own memory
-    const answer = globalThis.fetch;
-    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      if (new URL(String(input), 'http://localhost/').pathname.endsWith('/campaigns')) await new Promise((r) => setTimeout(r, 150));
-      return answer(input, init);
-    }));
-    at('/campaign');
-    const list = await screen.findByRole('list', { name: 'Your campaigns' });
-    await waitFor(() => expect(within(list).getAllByRole('link')).toHaveLength(2));
-    expect(screen.queryByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeNull();
-  });
-
   /* Rob, 19.10.2026: every player files campaigns away in their own list, in a section of its own. */
-  it('a campaign is archived in one’s own list and taken back; a single one left in play opens at once', async () => {
+  it('a campaign is archived in one’s own list and taken back', async () => {
     const srv = server();
     srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
     srv.addCampaign({ name: 'Summer in Sylvania', role: 'viewer', round: 3 });
@@ -137,12 +117,13 @@ describe('the Campaign tab', () => {
     expect(within(archived).getAllByRole('link').map((a) => a.textContent)).toEqual(['Summer in SylvaniaViewer · After battle 3 · 0 warbands']);
     expect(within(screen.getByRole('list', { name: 'Your campaigns' })).getAllByRole('link')).toHaveLength(1);
     await waitFor(() => expect(srv.state.campaigns.get('campaign-2')!.archivedBy).toEqual([KAI.id]));
-    // opened again with one campaign left in play: straight to it; "All campaigns" shows the archive too
+    // opened again with one campaign left in play: the list, with the archive in its own section
     cleanup();
     at('/campaign');
-    expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
+    expect(await screen.findByRole('list', { name: 'Archived campaigns' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeNull();
     cleanup();
-    render(<MemoryRouter initialEntries={[{ pathname: '/campaign', state: { all: true } }]}><AppRoutes /></MemoryRouter>);
+    render(<MemoryRouter initialEntries={[{ pathname: '/campaign' }]}><AppRoutes /></MemoryRouter>);
     await user.click(await screen.findByRole('button', { name: 'Back to the list: Summer in Sylvania' }));
     await waitFor(() => expect(screen.queryByRole('heading', { name: 'Archived' })).toBeNull());
     expect(srv.state.campaigns.get('campaign-2')!.archivedBy).toEqual([]);
