@@ -1,9 +1,9 @@
-/* The Campaign tab (phase 4a1): the campaigns one is part of – with a single
-   one, straight to it – and starting a new one, which makes its starter the
-   first leader and so needs the authenticator (ADR 0008). */
+/* The Campaign tab (phase 4a1): the campaigns one is part of – always the list,
+   also with a single one (#75) – and starting a new one, which makes its
+   starter the first leader and so needs the authenticator (ADR 0008). */
 import { useEffect, useState } from 'react';
 import { useOnAnyCampaign } from '../live/live.ts';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { Empty } from '../art/Pixels.tsx';
@@ -66,17 +66,13 @@ export function Campaigns() {
   const location = useLocation();
   const user = session.status === 'in' ? session.user : session.status === 'unreachable' ? session.user : null;
   const [list, setList] = useState<CampaignSummary[] | null>(null);
-  // the list is the server's own (not only what this device remembered)
-  const [fresh, setFresh] = useState(false);
-  // the player has sorted the list here (archived or taken back)
-  const [sorted, setSorted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const userId = user?.id;
   useEffect(() => {
     if (!userId) return;
     let live = true;
     void cachedCampaigns(userId).then((c) => { if (live && c) setList((l) => l ?? c); });
-    listCampaigns(userId).then((c) => { if (live) { setList(c); setFresh(true); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
+    listCampaigns(userId).then((c) => { if (live) { setList(c); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
     return () => { live = false; };
   }, [userId]);
   useOnAnyCampaign(() => {
@@ -93,17 +89,11 @@ export function Campaigns() {
       </section>
     );
   }
-  // one campaign: straight to it (from there, "All campaigns" comes back here) – once the server
-  // has said so, or cannot be reached; a list remembered from before may since have grown
-  const all = !!(location.state as { all?: boolean } | null)?.all;
   const deleted = (location.state as { deleted?: string } | null)?.deleted;
   // the list is split: the campaigns one plays, and those one filed away for oneself (Rob, 19.10.2026)
   const active = list?.filter((c) => !c.archived) ?? null;
   const filed = list?.filter((c) => c.archived) ?? [];
-  // only on arrival: filing one away here must not carry the player off into the other
-  if (active && active.length === 1 && !all && !sorted && (fresh || error)) return <Navigate to={`/campaign/${active[0]!.id}`} replace />;
   const file = (c: CampaignSummary, archived: boolean) => {
-    setSorted(true);
     setList((l) => l?.map((x) => (x.id === c.id ? { ...x, archived } : x)) ?? l);
     archiveCampaign(c.id, archived).catch((e: unknown) => {
       setList((l) => l?.map((x) => (x.id === c.id ? { ...x, archived: !archived } : x)) ?? l);

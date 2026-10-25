@@ -31,6 +31,8 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     const srv = await playServer(page);
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others });
     await page.goto('campaign');
+    // the tab lists the campaigns, also a single one (#75); the overview is one tap further
+    await page.getByRole('list', { name: 'Your campaigns' }).getByRole('link', { name: /The Hel Fenn Campaign/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeVisible();
     const list = page.getByRole('list', { name: 'Warbands' });
     await expect(list.getByRole('link')).toHaveCount(2);
