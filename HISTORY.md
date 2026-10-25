@@ -4014,3 +4014,36 @@ commit on each branch took out again.
 
 One e2e run was killed by my own `timeout` and left an orphaned test web server on port
 4175; the next run could not start its servers until that process was ended.
+
+## October 25, 2026 — the fifth run: #67 to #71 (admin, addresses, spell lists)
+
+Five reports, all fixed. **#67**: the "warband attached" mark of a report was a flex item
+that stretched to the height of a wrapped title and wrapped its own text on a phone; the
+cell now wraps its children and the mark is a one-line pill (the e2e test checks its
+height). **#71**: the audit log's detail column was empty for everything but the account
+actions; the line now names what the change was about (type and a short id) and the short
+facts of the entry, never a long text. **#70**: Home is `/home` and the account `/account`
+(`/settings` in the Quick Build), through one file, `app/src/app/paths.ts`; `/`, `/more`
+and `/more/reports` only redirect, as Rob asked ("no old stumps"). One e2e test had
+remembered the address before the redirect. **#68**: a caster's card lists the whole spell
+list of his school with the casting values, the known ones marked.
+
+**#69**, the one that touches who may see what: the admin sees the last 20 sign-ins of a
+person and the first time of each device, with a rough place. Rob's conditions drove the
+shape: the place comes from a database file on the Pi (`GEOIP_DB`), never from a service
+and never from the repository; only a few sign-ins are kept; an account that existed before
+counts its next sign-in as the first time once; only the admin with the authenticator reads
+it (the leak matrix has the route). The independent review found no leak and one real risk:
+the reader of the `.mmdb` file keeps it all in memory and the container has 256 MB, so a
+file over 64 MB is now left alone with a warning (City Lite is larger – a smaller file or a
+raised limit is Rob's call). The real reading of a database file is not exercised in CI,
+only a missing, a broken and a too large file; Rob has to try it once with his file.
+
+Two wrong turns of mine. I opened the pull request for #68 right after a check that had
+exited with an error (the typecheck of the test files): the grep that printed the result
+did not stop the push. The fix followed within minutes, and the pull request script now only
+runs after I have read `EXIT 0`. And a worktree made to resolve merge conflicts committed
+its `node_modules` links (a symbolic link is not matched by `node_modules/`); they were
+removed again in the next commit of each branch. The "Give is a grid" e2e test, extended in
+#63, failed twice in CI on slow runners (`scrollIntoViewIfNeeded` on a section that was
+replaced meanwhile); pull request 184 takes the scrolling out. Pull requests 179 to 184.
