@@ -309,3 +309,18 @@ export function endEnrolment(db: DB, e: EnrolmentRow, status: 'declined' | 'left
     touch(db, e.campaign_id, now);
   })();
 }
+
+/** What each active warband of a campaign has by now, for the catch-up of a warband that joins late (wish #77): the rating and
+    the value (all it owns at list prices plus its gold in hand) of its latest mark, and the closed battles it fought. No names:
+    the mechanics are open to every member, and who is who stays with the campaign. */
+export function catchUpPeers(db: DB, campaignId: string): { rating: number; value: number; battles: number }[] {
+  const rows = db.prepare("SELECT warband_id FROM enrolments WHERE campaign_id = ? AND status = 'active' ORDER BY created_at").all(campaignId) as { warband_id: string }[];
+  const fought = db.prepare("SELECT count(*) FROM battle_participants p JOIN battles b ON b.id = p.battle_id WHERE p.warband_id = ? AND b.campaign_id = ? AND b.status = 'closed'").pluck();
+  const out: { rating: number; value: number; battles: number }[] = [];
+  for (const r of rows) {
+    const t = latestTag(db, r.warband_id, campaignId)?.totals as { rating?: number; spent?: number; gold?: number } | undefined;
+    if (!t || typeof t.rating !== 'number') continue;
+    out.push({ rating: t.rating, value: (Number(t.spent) || 0) + (Number(t.gold) || 0), battles: Number(fought.get(r.warband_id, campaignId)) || 0 });
+  }
+  return out;
+}

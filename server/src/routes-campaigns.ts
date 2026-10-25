@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
-  campaignById, campaignView, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
+  campaignById, campaignView, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
   removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
@@ -155,6 +155,13 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     // a leader's own warband needs no one else's word
     if (can(a, 'campaign.manage', { role: t.role })) confirmEnrolment(db(), t.c, r.enrolment, a.id, now());
     return reply.code(201).send({ enrolmentId: r.enrolment.id, warband: metaOf(warbandById(db(), id)!), head: versionOf(db(), id, 1), campaign: view(t.c, t.role) });
+  });
+
+  // what the others have by now: the yardstick of a warband that joins late (wish #77); every member reads it
+  app.get('/api/v1/campaigns/:id/catchup', { config: { action: 'campaign.read' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.read');
+    if (!t) return reply;
+    return { peers: catchUpPeers(db(), t.c.id), round: t.c.round };
   });
 
   /** An open enrolment of this campaign, named by the route. */

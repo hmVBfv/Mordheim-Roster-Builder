@@ -1,6 +1,7 @@
 /* The campaign server's campaigns (phase 4a1; server/src/routes-campaigns.ts).
    A campaign is read from the server; the last answer is kept on the device,
    so the overview still shows offline what it showed last. */
+import type { PeerFigures } from '@mordheim/core';
 import { api } from '../account/api.ts';
 import type { BattleSummary, FrozenChange, Outcome } from '../battle/api.ts';
 import { db } from '../db/db.ts';
@@ -113,4 +114,9 @@ export function historyOf(view: Pick<CampaignView, 'battles'>): { battles: Battl
     warbandIds: [...new Set(battles.flatMap((b) => b.warbandIds ?? []))],
     open: !(view.battles ?? []).some((b) => !b.takenOver),
   };
+}
+
+/** What the warbands of a campaign have by now (server/src/campaigns.ts catchUpPeers): the yardstick of a warband that joins late. */
+export async function getCatchUp(id: string): Promise<{ peers: PeerFigures[]; round: number }> {
+  return api<{ peers: PeerFigures[]; round: number }>(`/campaigns/${id}/catchup`);
 }

@@ -99,6 +99,34 @@ describe('members', () => {
   });
 });
 
+/* Wish #77: what a warband that joins late is measured by – the figures of the warbands already in, without names. */
+describe('the figures of the others (catch-up)', () => {
+  it('rating, value and battles fought of each active warband; the pending and the left are not in; every member reads', async () => {
+    const { s, id, anna, kai, ben } = await campaign();
+    const mine = randomUUID();
+    await kai('POST', `/campaigns/${id}/enrolments`, { warbandId: mine, data: SAVE, appVersion: 'test' });
+    const enrolmentId = ((await kai('GET', `/campaigns/${id}`)).json() as View).enrolments[0]!.id;
+    // waiting for a leader: not yet one of the others
+    expect((await kai('GET', `/campaigns/${id}/catchup`)).json()).toEqual({ peers: [], round: 0 });
+    await anna('POST', `/campaigns/${id}/enrolments/${enrolmentId}/confirm`);
+    const t = totals(SAVE);
+    expect((await kai('GET', `/campaigns/${id}/catchup`)).json()).toEqual({ peers: [{ rating: t.rating, value: t.spent + t.gold, battles: 0 }], round: 0 });
+    // a closed battle it fought counts; an open one does not
+    const insert = (bid: string, status: string) => {
+      s.db.prepare("INSERT INTO battles (id, campaign_id, round, status, created_by, created_at, updated_at, seq) VALUES (?, ?, 1, ?, ?, '2026-10-01T00:00:00.000Z', '2026-10-01T00:00:00.000Z', 1)").run(bid, id, status, s.db.prepare('SELECT id FROM users WHERE username = ?').pluck().get('anna') as string);
+      s.db.prepare('INSERT INTO battle_participants (battle_id, warband_id) VALUES (?, ?)').run(bid, mine);
+    };
+    insert(randomUUID(), 'closed');
+    insert(randomUUID(), 'open');
+    expect((await kai('GET', `/campaigns/${id}/catchup`)).json()).toEqual({ peers: [{ rating: t.rating, value: t.spent + t.gold, battles: 1 }], round: 0 });
+    // nobody outside the campaign reads it
+    expect((await ben('GET', `/campaigns/${id}/catchup`)).statusCode).toBe(404);
+    // a warband that left is not one of the others
+    await kai('DELETE', `/campaigns/${id}/enrolments/${enrolmentId}`);
+    expect((await anna('GET', `/campaigns/${id}/catchup`)).json()).toEqual({ peers: [], round: 0 });
+  });
+});
+
 describe('entering a warband', () => {
   /* Wish #77: a planner is for planning; the server does not take it into a campaign as it is. */
   it('a planner is refused; the same warband without the mark enters', async () => {

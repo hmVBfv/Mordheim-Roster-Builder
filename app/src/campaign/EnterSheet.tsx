@@ -1,7 +1,7 @@
 /* Entering one of one's own warbands in a campaign (phase 4a1): a copy goes
    in, the warband stays free; or a new warband is started for the campaign. */
 import * as core from '@mordheim/core';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
@@ -12,19 +12,24 @@ import { useSheet } from '../ui/useSheet.ts';
 import type { CampaignView } from './api.ts';
 import styles from './Campaign.module.css';
 
+const Latecomer = lazy(() => import('./Latecomer.tsx').then((m) => ({ default: m.Latecomer })));
+
 /** Entering one of one's own warbands: a copy goes in, the warband stays free. */
 export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown; onDone: (v: CampaignView) => void }) {
   const { ref, open, close } = useSheet();
   const navigate = useNavigate();
   const session = useSession();
   const me = session.status === 'in' ? session.user.id : undefined;
-  // a planner (#77) does not enter a campaign
-  const free = (useWarbands() ?? []).filter((w) => w.ownerId === me && !w.campaignId && !w.conflict && !w.state.planner);
+  const mine = (useWarbands() ?? []).filter((w) => w.ownerId === me && !w.campaignId && !w.conflict);
+  const free = mine.filter((w) => !w.state.planner);
+  // a planner (#77) does not enter as it is: it joins late, measured against the others (Latecomer.tsx)
+  const planners = mine.filter((w) => w.state.planner);
   const [chosen, setChosen] = useState('');
   const [own, setOwn] = useState<'campaign' | 'own' | ''>('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const rec = free.find((w) => w.id === chosen);
+  const late = planners.find((w) => w.id === chosen);
   // a warband with house rules of its own that the campaign's do not match: the player says what the copy does with them (#64)
   const ownRules = rec && rules !== undefined && core.houseDifferences(rules, rec.state.house).length > 0 ? core.houseDifferences(undefined, rec.state.house) : [];
   const submit = async () => {
@@ -45,7 +50,7 @@ export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown;
         <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void submit(); }}>
           <h2 id="enter-title">Enter a warband</h2>
           <p className={ui.muted}>A copy goes into the campaign, under the campaign’s house rules; the warband you pick stays as it is, for other games. A leader confirms the copy, and its start is marked.</p>
-          {free.length === 0 && <p className={ui.muted}>None of your warbands is free yet: make a new one for the campaign.</p>}
+          {free.length === 0 && planners.length === 0 && <p className={ui.muted}>None of your warbands is free yet: make a new one for the campaign.</p>}
           {free.length > 0 && (
             <fieldset className={styles.people}>
               <legend className="visually-hidden">Warband</legend>
@@ -56,6 +61,23 @@ export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown;
                 </label>
               ))}
             </fieldset>
+          )}
+          {planners.length > 0 && (
+            <fieldset className={styles.people}>
+              <legend>Planners, to join late</legend>
+              {planners.map((w) => (
+                <label key={w.id} className={styles.choice}>
+                  <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} onChange={() => { setChosen(w.id); setOwn(''); }} />
+                  <span>{w.name} <small>· {w.wbName} · planner</small></span>
+                </label>
+              ))}
+            </fieldset>
+          )}
+          {late && (
+            <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}>
+              <Latecomer key={late.id} id={id} rec={late} onClose={() => close()}
+                onDone={(v, wid) => { onDone(v); close(() => void navigate(`/warbands/${wid}`)); }} />
+            </Suspense>
           )}
           {ownRules.length > 0 && (
             <fieldset className={styles.people}>
@@ -75,7 +97,7 @@ export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown;
           <div className={ui.actions}>
             <button type="button" className={free.length > 0 ? ui.buttonQuiet : ui.button} onClick={() => close(() => void navigate(`/warbands/new?campaign=${id}`))}>New warband for this campaign</button>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
-            {free.length > 0 && <button type="submit" className={ui.button} disabled={busy || !chosen || (ownRules.length > 0 && !own)}>Enter a copy</button>}
+            {free.length > 0 && !late && <button type="submit" className={ui.button} disabled={busy || !chosen || (ownRules.length > 0 && !own)}>Enter a copy</button>}
           </div>
         </form>
       </dialog>

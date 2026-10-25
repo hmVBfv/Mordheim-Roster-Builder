@@ -156,8 +156,18 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   brauchen keine Erfahrung: jede Karte nennt „Needs N exp for the advances …“ (ein
   Held nach den Heldenstufen, eine Henchmen-Gruppe nach ihren). In der Liste der Warbands
   steht sie im eigenen Abschnitt **Planners** und trägt die Marke „Planner“. Sie wird
-  einer Kampagne nicht angeboten und der Server lehnt sie ab; ein Planner tritt später
-  über den Nachzügler-Weg ein (Catch-up), nicht als Kopie.
+  einer Kampagne nicht als Kopie angeboten und der Server lehnt sie so ab.
+  **Spät einsteigen (Catch-up, [ADR 0026](decisions/0026-planner-and-catch-up.md)):**
+  im Blatt „Enter a warband“ stehen Planner unter **„Planners, to join late“**. Wer einen
+  wählt, sieht, wonach gemessen wird („Measured by the median of N warbands that have
+  fought: rating …, value … gc, … battles“), was er besitzen darf und wie viele
+  Wertungspunkte Erfahrung verteilt werden, und die Erfahrung je Modell: Gruppen fest
+  („+3 each“), Helden mit −/+ zwischen den Helden verschiebbar (unter den Schlachten und
+  über dem Anderthalbfachen geht es nicht). Was den Plan übersteigt, steht in Rot
+  („needs N exp …“, „Its value is …“) mit dem Satz, dass ein Leiter es trotzdem
+  bestätigen kann; der Knopf heißt dann **„Enter anyway“**, sonst **„Enter as a
+  latecomer“**. Eingetragen wird eine gewöhnliche Warband; wer sie liest, sieht auf ihrer
+  Seite den Kasten **„Joined late“** (Runde, Gold, Erfahrung, Maß, was übersteigt).
 - **Nach der Anmeldung: Home (Wunsch #76, Rob, 25.10.2026):** wer sich normal anmeldet,
   landet auf Home, nicht auf Account; kam er von einer Stelle, die ihn geschickt hat
   (`?next=`), geht es dorthin zurück. Die Einladung bleibt bei Account, weil dort als

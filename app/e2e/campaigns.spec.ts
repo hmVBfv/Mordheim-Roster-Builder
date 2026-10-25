@@ -130,6 +130,27 @@ test('entering a warband: a copy goes in and opens; it can leave again', async (
   await expect(page.getByRole('button', { name: 'Remove the warband' })).toBeVisible();
 });
 
+/* Wish #77: a planner joins a running campaign late, measured by the others. */
+test('a planner joins late at 360 px: the plan, the Heroes moved, an ordinary warband entered', async ({ page }) => {
+  const srv = await playServer(page);
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: others.slice(0, 1) });
+  srv.addBattle(c.id).status = 'closed';
+  serverWarband(srv, 'The Late Company', undefined, { planner: true });
+  await page.goto(`campaign/${c.id}`);
+  await page.getByRole('button', { name: 'Enter a warband' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Enter a warband' });
+  await sheet.getByRole('radio', { name: /The Late Company/ }).check();
+  await expect(sheet.getByText(/median of 1 warband that has fought/)).toBeVisible();
+  await expect(sheet.getByRole('list', { name: 'Experience from the catch-up' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'campaign-latecomer');
+  await sheet.getByRole('button', { name: /^Enter (as a latecomer|anyway)$/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Late Company' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'In The Hel Fenn Campaign' })).toBeVisible();
+  await noSideScroll(page);
+});
+
 test('a new warband for the campaign: free under Warbands, its copy entered and opened', async ({ page }) => {
   const srv = await playServer(page);
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: others.slice(0, 1) });

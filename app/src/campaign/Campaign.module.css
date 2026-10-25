@@ -304,3 +304,9 @@
     display: none;
   }
 }
+
+/* the catch-up of a planner joining late (Latecomer.tsx): a row each, the name left, the experience right in one line */
+.grants { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.grant { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); }
+.grant small { color: var(--text-muted); }
+.grantStep { display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; }

@@ -1108,6 +1108,14 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
+    // what the others have by now: the yardstick of a warband that joins late (server/src/campaigns.ts catchUpPeers)
+    if (method === 'GET' && rest === '/catchup') {
+      const peers = c.enrolments.filter((e) => e.status === 'active' && e.tag).map((e) => ({
+        rating: e.tag!.totals.rating, value: e.tag!.totals.spent + e.tag!.totals.gold,
+        battles: [...s.battles.values()].filter((b) => b.campaignId === c.id && b.status === 'closed' && b.participants.some((p) => p.warbandId === e.warbandId)).length,
+      }));
+      return json(200, { peers, round: c.round });
+    }
     if (method === 'GET' && rest === '') return json(200, view(c));
     // a leader deletes it by its name: gone for everyone, the warbands free again (server/src/campaigns.ts deleteCampaign)
     if (method === 'DELETE' && rest === '') {
