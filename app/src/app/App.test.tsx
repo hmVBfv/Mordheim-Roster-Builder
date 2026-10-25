@@ -1,5 +1,5 @@
 /* The screens as a player reaches them. */
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -89,12 +89,14 @@ describe('the addresses (#70)', () => {
     for (const old of ['/', '/account']) {
       at(old);
       expect(await screen.findByRole('navigation', { name: 'Main' })).toBeTruthy();
-      const current = screen.getAllByRole('link').find((a) => a.getAttribute('aria-current') === 'page');
-      expect(current?.getAttribute('href')).toBe(old === '/' ? '/home' : '/account');
+      await waitFor(() => {
+        const current = screen.getAllByRole('link').find((a) => a.getAttribute('aria-current') === 'page');
+        expect(current?.getAttribute('href')).toBe(old === '/' ? '/home' : '/account');
+      });
       cleanup();
     }
     at('/more/reports');
     expect(await screen.findByRole('navigation', { name: 'Main' })).toBeTruthy();
-    expect(screen.getAllByRole('link').find((a) => a.getAttribute('aria-current') === 'page')?.getAttribute('href')).toBe('/account');
+    await waitFor(() => expect(screen.getAllByRole('link').find((a) => a.getAttribute('aria-current') === 'page')?.getAttribute('href')).toBe('/account'));
   });
 });
