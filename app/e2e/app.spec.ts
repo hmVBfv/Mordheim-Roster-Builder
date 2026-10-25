@@ -710,6 +710,8 @@ test('Back closes the sheets of the roster', async ({ page }) => {
 /* Back closes a sheet instead of leaving the app (Rob, 28.09.2026). */
 test('Back closes the import sheet and stays on the screen', async ({ page }) => {
   await page.goto('./');
+  // the bare address leads on to Home (#70); that is the address Back returns to
+  await expect(page).toHaveURL(/\/home$/);
   const home = page.url();
   await page.getByRole('link', { name: 'Warbands' }).click();
   const here = page.url();
@@ -892,7 +894,7 @@ test('without crypto.randomUUID (plain http) a warband can be started and import
 
 test('the account is the campaign app’s: Account shows it there, the Quick Build has settings instead', async ({ page }) => {
   const quick = test.info().project.name === 'quickbuild';
-  await page.goto(quick ? '#/more' : 'more');
+  await page.goto(quick ? '#/settings' : 'account');
   await expect(page.getByRole('heading', { level: 1, name: quick ? 'Settings' : 'Account' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Sign-in and security' })).toHaveCount(quick ? 0 : 1);
   await page.goto(quick ? '#/sign-in' : 'sign-in');

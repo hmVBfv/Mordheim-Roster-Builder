@@ -19,6 +19,7 @@ import { api, errorText, type Me } from './api.ts';
 import styles from './Account.module.css';
 import { deviceLabel, safeNext } from './device.ts';
 import { signedIn, signedOut, useSession } from './session.ts';
+import { ACCOUNT } from '../app/paths.ts';
 
 type Answer = { stage: 'totp' } | { stage: 'full'; user: Me };
 
@@ -71,7 +72,7 @@ export function SignIn() {
       <section className={ui.page}>
         <h1>Sign in</h1>
         <p className={ui.card}>Signed in as <strong>{session.user.displayName}</strong>.</p>
-        <div className={ui.row}><Link className={ui.button} to="/more">Your account</Link></div>
+        <div className={ui.row}><Link className={ui.button} to={ACCOUNT}>Your account</Link></div>
       </section>
     );
   }

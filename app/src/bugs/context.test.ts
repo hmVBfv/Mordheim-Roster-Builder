@@ -19,7 +19,7 @@ describe('the house rules that go along', () => {
   });
 
   it('is null where there is no warband or campaign in view – and empty where all is as the rules say', () => {
-    const base = { pathname: '/more', steps: [], settings: { theme: 'chronicle', flavour: 'campaign', online: true, sync: 'off', role: null, viewport: '360×740', installed: false }, warbandHouse: undefined, campaignHouse: null };
+    const base = { pathname: '/account', steps: [], settings: { theme: 'chronicle', flavour: 'campaign', online: true, sync: 'off', role: null, viewport: '360×740', installed: false }, warbandHouse: undefined, campaignHouse: null };
     expect(buildContext({ ...base, hasWarband: false, hasCampaign: false }).houseRules).toEqual({ warband: null, campaign: null });
     expect(buildContext({ ...base, pathname: '/warbands/abc/house', hasWarband: true, hasCampaign: false }).houseRules).toEqual({ warband: {}, campaign: null });
     expect(buildContext({ ...base, pathname: '/warbands/abc/house', hasWarband: true, hasCampaign: false }).screen).toBe('/warbands/:id/house');
@@ -57,7 +57,7 @@ describe('the snapshot at the moment of reporting', () => {
   });
 
   it('is fine where there is nothing in view', async () => {
-    const snap = await takeSnapshot('/more');
+    const snap = await takeSnapshot('/account');
     expect(snap.context.houseRules).toEqual({ warband: null, campaign: null });
     expect(snap.context.settings).toMatchObject({ flavour: 'campaign', online: true });
     expect(snap.warband).toBeNull();

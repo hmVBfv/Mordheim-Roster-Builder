@@ -124,7 +124,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
 - **„Account“ statt „More“ (Rob, 19.10.2026):** Das letzte Ziel heißt in der
   Kampagnen-App „Account“ und zeigt eine Person; drei Punkte lasen sich wie ein
   Menü oder Einstellungen. Im Quick Build, der kein Konto hat, heißt es
-  „Settings“ mit Zahnrad. Die Adresse bleibt `/more`; die Karte mit Anmeldung,
+  „Settings“ mit Zahnrad. Die Adresse ist `/account` (Quick Build: `/settings`; `/more` leitet nur dorthin um); die Karte mit Anmeldung,
   Authenticator und Passwort darin heißt „Sign-in and security“.
 - **„Admin“ als eigener Ort (Rob, 20.10.2026):** Wer Admin ist, hat in der
   Navigation einen sechsten Eintrag **Admin** vor Account (Handy: sechs Einträge
@@ -134,7 +134,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
 - **„Your reports“ als Reiter von Account (Rob, 20.10.2026):** Account hat zwei
-  Reiter, **Settings** (`/more`) und **Your reports** (`/more/reports`; am Handy
+  Reiter, **Settings** (`/account`) und **Your reports** (`/account/reports`; am Handy
   über der Seite, ab 900 px als Unterpunkte von Account in der Seitenleiste,
   `account/accountTabs.ts`). Die eigenen Berichte stehen dort als Tabelle
   (Titel, Art, Stand in den Worten des Meldenden, gesendet, letzte Änderung) und
