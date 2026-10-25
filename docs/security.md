@@ -76,7 +76,11 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
 
 - **Wo und womit jemand angemeldet war (Wunsch #69, Rob, 24.10.2026).** Je
   Person bleiben die **letzten 20 vollständigen Anmeldungen** (Gerät, Adresse,
-  grober Ort) und je Gerät das **erste Mal** (`signins`, `known_devices`). Der
+  grober Ort) und je Gerät das **erste Mal** (`signins`, `known_devices`);
+  dazu die letzten 20 **Wechsel**: eine laufende Sitzung, die von einem
+  anderen Ort (ohne Datenbank: anderer Adresse) benutzt wird (höchstens einmal
+  je Stunde geprüft). Ein gestohlener Sitzungs-Cookie fällt so auf, auch wenn
+  sich niemand neu anmeldet. Der
   Ort kommt aus einer Datenbankdatei **auf dem Pi** (`GEOIP_DB`), nie aus
   einem Dienst im Netz und nie aus dem Repository. Gelesen wird das
   **ausschließlich vom Admin mit Authenticator** (`admin.signins.read`; im

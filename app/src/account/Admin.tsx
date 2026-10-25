@@ -146,7 +146,7 @@ function Users({ meId, onNotice }: { meId: string; onNotice: (t: string) => void
   );
 }
 
-interface SignInRow { at: string; device: string; place: string; ip: string; firstTime: boolean }
+interface SignInRow { at: string; kind: 'signin' | 'moved'; device: string; place: string; ip: string; firstTime: boolean }
 
 /** The last sign-ins of one person (wish #69): when, with what, from where; the first time of a device marked. Only the admin gets this from the server. */
 function SignIns({ userId }: { userId: string }) {
@@ -170,7 +170,7 @@ function SignIns({ userId }: { userId: string }) {
             {r.signins.map((x) => (
               <tr key={x.at + x.device}>
                 <td data-label="When"><time dateTime={x.at}>{stamp(x.at)}</time></td>
-                <td data-label="Device"><span>{x.device}{x.firstTime && <> <span className={`${styles.flag} ${styles.nowrap}`}>new device</span></>}</span></td>
+                <td data-label="Device"><span>{x.device}{x.firstTime && <> <span className={`${styles.flag} ${styles.nowrap}`}>new device</span></>}{x.kind === 'moved' && <> <span className={`${styles.flag} ${styles.nowrap}`}>session used from here</span></>}</span></td>
                 <td data-label="Place">{x.place || '–'}</td>
                 <td data-label="Address">{x.ip}</td>
               </tr>
