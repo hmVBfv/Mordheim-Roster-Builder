@@ -137,6 +137,9 @@ for (const theme of THEMES) {
     await expect(page.getByRole('alert')).toContainText('That code is not right');
     await shot(page, `${theme}-sign-in-code-wrong`);
     await code.pressSequentially('123456');
+    // signed in without being sent from anywhere: Home (#76); the account is one tap away
+    await expect(page).toHaveURL(/\/home$/);
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Account' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Devices' }).getByText('Firefox on Linux')).toBeVisible();
     await noSideScroll(page);

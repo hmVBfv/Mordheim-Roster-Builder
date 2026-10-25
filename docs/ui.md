@@ -149,6 +149,10 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
+- **Nach der Anmeldung: Home (Wunsch #76, Rob, 25.10.2026):** wer sich normal anmeldet,
+  landet auf Home, nicht auf Account; kam er von einer Stelle, die ihn geschickt hat
+  (`?next=`), geht es dorthin zurück. Die Einladung bleibt bei Account, weil dort als
+  Nächstes der Authenticator eingerichtet wird.
 - **Sign-ins filtern (Wunsch #72, Rob, 25.10.2026):** über der Tabelle ein Filter
   nach Person (ein Teil des Namens), Art (Signed in · Joined · Failed) und Tag
   (From, To, beide eingeschlossen); der Server filtert, auch über die Seiten.

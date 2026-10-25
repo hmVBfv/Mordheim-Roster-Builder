@@ -1,7 +1,7 @@
 /* A name for this device in the list of signed-in devices: browser and
    system, from the user agent ("Firefox on Android"). Only a label; the
    server falls back to the raw user agent. */
-import { ACCOUNT } from '../app/paths.ts';
+import { HOME } from '../app/paths.ts';
 
 export function deviceLabel(ua: string = navigator.userAgent): string {
   const browser = /Firefox\//.test(ua) ? 'Firefox'
@@ -22,8 +22,8 @@ export function deviceLabel(ua: string = navigator.userAgent): string {
   return system ? `${browser} on ${system}` : browser;
 }
 
-/** Where to go after signing in: a path of this app, never another site. */
-export function safeNext(next: string | null, fallback = ACCOUNT): string {
+/** Where to go after signing in: a path of this app, never another site; Home when nobody sent the player anywhere (#76). */
+export function safeNext(next: string | null, fallback = HOME): string {
   if (!next || !next.startsWith('/') || next.startsWith('//') || next.includes('\\')) return fallback;
   return next;
 }

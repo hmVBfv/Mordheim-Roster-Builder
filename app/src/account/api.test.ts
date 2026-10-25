@@ -81,10 +81,10 @@ describe('helpers', () => {
 
   it('goes only to a path of this app after signing in', () => {
     expect(safeNext('/warbands/7')).toBe('/warbands/7');
-    expect(safeNext('https://evil.example')).toBe('/account');
-    expect(safeNext('//evil.example')).toBe('/account');
-    expect(safeNext('/\\evil.example')).toBe('/account');
-    expect(safeNext(null)).toBe('/account');
+    expect(safeNext('https://evil.example')).toBe('/home');
+    expect(safeNext('//evil.example')).toBe('/home');
+    expect(safeNext('/\\evil.example')).toBe('/home');
+    expect(safeNext(null)).toBe('/home');
   });
 
   it('times: how long ago, and the logs’ stamp', () => {
