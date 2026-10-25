@@ -202,8 +202,8 @@ export function listOpenInvites(db: DB, now: Date): InviteSummary[] {
 
 /* ---- sign-in attempts ---- */
 
-export function recordAttempt(db: DB, a: { username: string; ip: string; ok: boolean; reason?: string }, now: Date): void {
-  db.prepare('INSERT INTO login_attempts (username, ip, at, ok, reason) VALUES (?, ?, ?, ?, ?)').run(a.username.slice(0, 64).toLowerCase(), a.ip, iso(now), a.ok ? 1 : 0, a.reason ?? '');
+export function recordAttempt(db: DB, a: { username: string; ip: string; device?: string; ok: boolean; reason?: string }, now: Date): void {
+  db.prepare('INSERT INTO login_attempts (username, ip, at, ok, reason, device) VALUES (?, ?, ?, ?, ?, ?)').run(a.username.slice(0, 64).toLowerCase(), a.ip, iso(now), a.ok ? 1 : 0, a.reason ?? '', (a.device ?? '').slice(0, 80));
   // keep them half a year; cheap, and the table never grows beyond that
   db.prepare('DELETE FROM login_attempts WHERE at < ?').run(after(now, -ATTEMPT_DAYS * DAY));
 }
@@ -219,11 +219,21 @@ export function recentFailures(db: DB, username: string, ip: string, now: Date):
   return { pair: count('username = ? AND ip = ?', name, ip), ip: count('ip = ?', ip), user: count('username = ?', name) };
 }
 
-export interface AttemptSummary { id: number; username: string; ip: string; at: string; ok: boolean; reason: string }
+export interface AttemptSummary { id: number; username: string; ip: string; device: string; at: string; ok: boolean; reason: string }
+/** What the admin narrows the log to: a part of the name, the kind of try, and days (`YYYY-MM-DD`, both ends included). */
+export interface AttemptFilter { user?: string; type?: 'signin' | 'joined' | 'failed'; from?: string; to?: string }
 
-export function listAttempts(db: DB, limit: number, beforeId?: number): AttemptSummary[] {
-  const rows = db.prepare('SELECT * FROM login_attempts WHERE id < ? ORDER BY id DESC LIMIT ?').all(beforeId ?? Number.MAX_SAFE_INTEGER, limit) as { id: number; username: string; ip: string; at: string; ok: number; reason: string }[];
-  return rows.map((r) => ({ id: r.id, username: r.username, ip: r.ip, at: r.at, ok: !!r.ok, reason: r.reason }));
+export function listAttempts(db: DB, limit: number, beforeId?: number, f: AttemptFilter = {}): AttemptSummary[] {
+  const where = ['id < ?'];
+  const args: (string | number)[] = [beforeId ?? Number.MAX_SAFE_INTEGER];
+  if (f.user) { where.push('instr(username, ?) > 0'); args.push(f.user.toLowerCase()); }
+  if (f.type === 'failed') where.push('ok = 0');
+  if (f.type === 'signin') where.push("ok = 1 AND reason <> 'registered'");
+  if (f.type === 'joined') where.push("ok = 1 AND reason = 'registered'");
+  if (f.from) { where.push('at >= ?'); args.push(f.from); }
+  if (f.to) { where.push('at < ?'); args.push(new Date(Date.parse(f.to) + DAY).toISOString().slice(0, 10)); }
+  const rows = db.prepare(`SELECT * FROM login_attempts WHERE ${where.join(' AND ')} ORDER BY id DESC LIMIT ?`).all(...args, limit) as { id: number; username: string; ip: string; device: string; at: string; ok: number; reason: string }[];
+  return rows.map((r) => ({ id: r.id, username: r.username, ip: r.ip, device: r.device, at: r.at, ok: !!r.ok, reason: r.reason }));
 }
 
 /* ---- audit log ---- */

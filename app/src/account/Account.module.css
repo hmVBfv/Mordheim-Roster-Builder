@@ -288,6 +288,15 @@
   }
 }
 
+/* the filter of the sign-in log: a row of fields that wraps, one under the other on a phone */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-2);
+  align-items: end;
+  margin-block: var(--space-2);
+}
+
 /* the admin's lists as tables: columns from tablet width on, a card per row on a phone (the cells carry
    their column's name in data-label, so nothing scrolls sideways at 360 px) */
 .tableWrap {

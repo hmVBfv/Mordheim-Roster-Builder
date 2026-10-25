@@ -105,7 +105,7 @@ describe('helpers', () => {
     expect(auditLine({ seq: 2, at: '', actor: 'rob', action: 'totp.reset', targetType: 'user', target: 'kai', payload: { signedOut: 2 } }))
       .toEqual({ who: 'rob', what: 'removed the authenticator of kai', detail: '2 signed out' });
     expect(auditLine({ seq: 3, at: '', actor: 'kai', action: 'something.new', targetType: null, target: null, payload: null }).what).toBe('something.new');
-    expect(attemptLine({ id: 1, username: 'kai', ip: '1.2.3.4', at: '', ok: false, reason: 'braked' })).toBe('failed: held back by the brake');
-    expect(attemptLine({ id: 2, username: 'kai', ip: '1.2.3.4', at: '', ok: true, reason: '' })).toBe('signed in');
+    expect(attemptLine({ id: 1, username: 'kai', ip: '1.2.3.4', device: '', at: '', ok: false, reason: 'braked' })).toBe('failed: held back by the brake');
+    expect(attemptLine({ id: 2, username: 'kai', ip: '1.2.3.4', device: '', at: '', ok: true, reason: '' })).toBe('signed in');
   });
 });
