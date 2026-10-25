@@ -44,6 +44,7 @@ function Users({ meId, onNotice }: { meId: string; onNotice: (t: string) => void
   const [users, setUsers] = useState<User[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [chosen, setChosen] = useState<User | null>(null);
+  const [watch, setWatch] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const load = useCallback(() => {
@@ -95,7 +96,7 @@ function Users({ meId, onNotice }: { meId: string; onNotice: (t: string) => void
                   <td data-label="">
                     {u.id === meId
                       ? <span className={ui.muted}>you</span>
-                      : <button type="button" className={ui.buttonQuiet} onClick={() => { setChosen(u); setLink(null); setError(null); open(); }} aria-label={`What to do for ${u.displayName}`}>⋯</button>}
+                      : <button type="button" className={ui.buttonQuiet} onClick={() => { setChosen(u); setLink(null); setWatch(null); setError(null); open(); }} aria-label={`What to do for ${u.displayName}`}>⋯</button>}
                   </td>
                 </tr>
               ))}
@@ -116,6 +117,10 @@ function Users({ meId, onNotice }: { meId: string; onNotice: (t: string) => void
                   <button type="button" className={ui.buttonQuiet} disabled={busy || !!chosen.disabledAt} onClick={() => void act('reset')}>Make a link</button>
                 </li>
                 <li>
+                  <span>Where they signed in from<small>The last sign-ins with device and place, and when each device was first seen</small></span>
+                  <button type="button" className={ui.buttonQuiet} disabled={busy} onClick={() => setWatch(chosen.id)}>Show sign-ins</button>
+                </li>
+                <li>
                   <span>Signed in somewhere strange<small>Ends every session of the account</small></span>
                   <button type="button" className={ui.buttonQuiet} disabled={busy || chosen.sessions === 0} onClick={() => void act('sign-out')}>Sign out</button>
                 </li>
@@ -131,11 +136,48 @@ function Users({ meId, onNotice }: { meId: string; onNotice: (t: string) => void
                 </li>
               </ul>
             )}
+            {watch === chosen.id && !link && <SignIns userId={chosen.id} />}
             {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
             <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>{link ? 'Done' : 'Close'}</button></div>
           </div>
         )}
       </dialog>
+    </>
+  );
+}
+
+interface SignInRow { at: string; device: string; place: string; ip: string; firstTime: boolean }
+
+/** The last sign-ins of one person (wish #69): when, with what, from where; the first time of a device marked. Only the admin gets this from the server. */
+function SignIns({ userId }: { userId: string }) {
+  const [r, setR] = useState<{ signins: SignInRow[]; located: boolean } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    api<{ signins: SignInRow[]; located: boolean }>(`/admin/users/${userId}/signins`).then((x) => { if (live) setR(x); }).catch((e: unknown) => { if (live) setError(errorText(e)); });
+    return () => { live = false; };
+  }, [userId]);
+  if (error) return <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>;
+  if (!r) return <p className={ui.muted}>Loading …</p>;
+  if (!r.signins.length) return <p className={ui.muted}>No sign-in noted yet; the next one counts as the first of its device.</p>;
+  return (
+    <>
+      {!r.located && <p className={ui.muted}>There is no database of places on the Pi (see operations.md, GEOIP_DB): the place stays empty.</p>}
+      <div className={styles.tableWrap}>
+        <table className={styles.table} aria-label="Recent sign-ins">
+          <thead><tr><th scope="col">When</th><th scope="col">Device</th><th scope="col">Place</th><th scope="col">Address</th></tr></thead>
+          <tbody>
+            {r.signins.map((x) => (
+              <tr key={x.at + x.device}>
+                <td data-label="When"><time dateTime={x.at}>{stamp(x.at)}</time></td>
+                <td data-label="Device"><span>{x.device}{x.firstTime && <> <span className={`${styles.flag} ${styles.nowrap}`}>new device</span></>}</span></td>
+                <td data-label="Place">{x.place || '–'}</td>
+                <td data-label="Address">{x.ip}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

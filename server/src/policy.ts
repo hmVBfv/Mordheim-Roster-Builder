@@ -73,6 +73,8 @@ export const ACTIONS = {
   /** Who signed in when, from where (Rob, 03.10.2026: log data next to logins). */
   'admin.logins.read': { who: 'admin' },
   'admin.audit.read': { who: 'admin' },
+  /** Where and with what one person signed in (wish #69, Rob, 24.10.2026): the last few sign-ins and each device's first time, with a rough place. The admin with the authenticator, and nobody else – not the person themselves, not a leader, not the bug token. */
+  'admin.signins.read': { who: 'admin' },
   /** The live stream (ADR 0020): whoever is signed in hears that something changed – a campaign they are in, or the sync of their warbands – never what. Who is told of which change is decided by live.ts from the visibility the audit log carries. */
   'events.read': { who: 'user' },
   /** One's own warbands: the list, and what changed since a cursor (GET /sync). */

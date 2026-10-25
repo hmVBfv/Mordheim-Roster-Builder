@@ -9,6 +9,7 @@ import type { Logger } from 'pino';
 import type { Config } from './config.ts';
 import type { DB } from './db.ts';
 import type { Health } from './health.ts';
+import type { Geo } from './geo.ts';
 import type { HashCost } from './passwords.ts';
 import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
 import { bugTokenActor } from './bug-tokens.ts';
@@ -70,6 +71,8 @@ export interface AppDeps {
   totpKey?: Buffer | null;
   /** scrypt's cost (tests pass a small one). */
   hashCost?: HashCost | undefined;
+  /** The place of an address (wish #69); null: none known. */
+  geo?: Geo | null;
   files: StaticFiles;
   trustProxy: string[];
   /** false: silent (tests that do not look at the log). */
@@ -194,7 +197,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     return reply.code(report.status === 'ok' ? 200 : 503).send(report);
   });
 
-  registerAccountRoutes(app, { db, now, config: { publicOrigin: deps.config.publicOrigin ?? null }, totpKey: deps.totpKey ?? null, hashCost: deps.hashCost });
+  registerAccountRoutes(app, { db, now, config: { publicOrigin: deps.config.publicOrigin ?? null }, totpKey: deps.totpKey ?? null, hashCost: deps.hashCost, geo: deps.geo ?? null });
   registerWarbandRoutes(app, { db, now });
   registerShareRoutes(app, { db, now });
   registerLibraryRoutes(app, { db, now });

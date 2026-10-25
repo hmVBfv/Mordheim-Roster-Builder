@@ -1,6 +1,7 @@
 /* The server's configuration, from the environment (app.env on the Pi, see
    docs/operations.md). Secrets arrive with the features that use them:
    TOTP_KEY with the accounts (phase 3g), BUGS_TOKEN_HASH later. */
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseKey } from './totp.ts';
 
@@ -21,6 +22,10 @@ export interface Config {
   trustProxy: string[] | null;
   /** TOTP_KEY (32 bytes, base64): encrypts the authenticators' secrets. null: none can be set up. */
   totpKey: Buffer | null;
+  /** A MaxMind-format city database on the volume (wish #69): the rough place of a sign-in. Missing: no place. */
+  geoipDb: string;
+  /** The largest database file read, in MB (the reader keeps it all in memory). */
+  geoipMaxMb: number;
 }
 
 const LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'];
@@ -59,5 +64,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     version: env.ROSTER_VERSION || 'dev',
     trustProxy: env.TRUST_PROXY ? env.TRUST_PROXY.split(',').map((s) => s.trim()).filter(Boolean) : null,
     totpKey,
+    geoipDb: env.GEOIP_DB ?? join(env.DATA_DIR ?? '/data', 'geoip', 'city.mmdb'),
+    geoipMaxMb: Number(env.GEOIP_MAX_MB) > 0 ? Number(env.GEOIP_MAX_MB) : 64,
   };
 }
