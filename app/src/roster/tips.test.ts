@@ -115,3 +115,32 @@ describe('rule texts on the card', () => {
     expect(explained / words).toBeGreaterThan(0.95);
   });
 });
+
+describe('the spell lore of a caster (#68)', () => {
+  function caravan() {
+    let s = core.newWarband(data, 'caravans');
+    s = core.addUnit(ctx(s), 'merchant');
+    s = core.addUnit(ctx(s), 'magician');
+    return structuredClone(s);
+  }
+
+  it('a Wizard shows the whole list of his school: each spell with its casting value and its effect, the ones he knows marked', () => {
+    const s = caravan();
+    const school = core.casterLore(ctx(s), s.models.find((m) => m.uid_def === 'magician')!)!;
+    const list = data.SPELLS[school]!.spells.filter(([n]) => !String(n).startsWith('▸'));
+    const known = list[1]![0];
+    s.models.find((m) => m.uid_def === 'magician')!.spells = [{ name: known }];
+    const v = rosterView(data, s);
+    const wiz = v.heroes.find((h) => h.type === 'Magician' || h.name.includes('Magic'))!;
+    expect(wiz.lore).toMatchObject({ name: data.SPELLS[school]!.name });
+    expect(wiz.lore!.spells).toHaveLength(list.length);
+    const first = wiz.lore!.spells[0]!;
+    expect(first).toMatchObject({ name: core.spellLabel(list[0]![0]), diff: expect.stringMatching(/^(\d+|auto)$/), text: list[0]![1], known: false });
+    expect(wiz.lore!.spells[1]).toMatchObject({ known: true });
+  });
+
+  it('a warrior who casts nothing has no lore', () => {
+    const v = rosterView(data, caravan());
+    expect(v.heroes.find((h) => h.type === 'Merchant')!.lore).toBeNull();
+  });
+});

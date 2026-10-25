@@ -2,7 +2,7 @@
    the React components so it can be tested without drawing anything. */
 import * as core from '@mordheim/core';
 import type { GameData, HireRecord, Model, Profile, UnitDef, WarbandState } from '@mordheim/core';
-import { hireFacts, warriorFacts, type Fact } from './tips.ts';
+import { hireFacts, warriorFacts, type Fact, type SpellLore } from './tips.ts';
 
 export type { Fact, Tip } from './tips.ts';
 
@@ -60,6 +60,8 @@ export interface WarriorView {
   skills: Fact[];
   spells: Fact[];
   mutations: Fact[];
+  /** The spell list of his school, if he casts (#68). */
+  lore: SpellLore | null;
   /** Marauders: what the warband's Mark gives him (the Seer; the Chieftain once he took it). */
   mark: Fact[];
   injuries: Fact[];
@@ -77,6 +79,7 @@ export interface HireView {
   key: string; uid: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
   exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[];
   rules: Fact[]; skills: Fact[]; spells: Fact[];
+  lore: SpellLore | null;
 }
 
 /** One line of the recruit list (legacy renderAddMenu). */
