@@ -386,11 +386,14 @@ describe('the Library: places and links', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toHaveLength(1));
     const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
+    // the list of the server follows the one the device kept: wait for it, as the card stays the same element
+    expect(await within(card).findByRole('list', { name: 'Linked entries' })).toBeTruthy();
     expect(within(within(card).getByRole('list', { name: 'Linked entries' })).getByText('Captain Brandt')).toBeTruthy();
     // the other side reads the link too
     cleanup();
     at('/library/npcs');
     const npcCard = within(await screen.findByRole('list', { name: 'NPCs' })).getByText('Captain Brandt').closest('li')!;
+    expect(await within(npcCard).findByRole('list', { name: 'Linked entries' })).toBeTruthy();
     expect(within(within(npcCard).getByRole('list', { name: 'Linked entries' })).getByText('The Watch')).toBeTruthy();
     // taken away
     cleanup();
@@ -407,6 +410,8 @@ describe('the Library: places and links', () => {
     srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '', links: ['gone-for-good'] } });
     at('/library/factions');
     const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
+    // let the server's list arrive before looking for what must not be there
+    await waitFor(() => expect(srv.state.calls).toContain('GET /library'));
     expect(within(card).queryByRole('list', { name: 'Linked entries' })).toBeNull();
   });
 
