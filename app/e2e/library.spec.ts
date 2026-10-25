@@ -135,6 +135,25 @@ test('the Scenarios tab at 360 px: a scenario is read, nothing scrolls sideways'
   expect([...srv.state.library.values()].filter((i) => i.kind === 'scenario')).toHaveLength(1);
 });
 
+test('the Locations tab at 360 px: a place with its links is read, nothing scrolls sideways', async ({ page }) => {
+  const srv = await playServer(page);
+  const watch = srv.libraryFrom({ name: 'The Watch of the Ferry Quarter', kind: 'faction', body: { de: '', status: '', lore: '' } });
+  srv.libraryFrom({ name: 'Ostermark', kind: 'location', body: { de: '', type: 'Region', lore: 'Forests, war and a long border.', links: [watch.id] } });
+  await page.goto('library/locations');
+  const list = page.getByRole('list', { name: 'Places' });
+  await expect(list.getByText('Ostermark')).toBeVisible();
+  await expect(list.getByRole('list', { name: 'Linked entries' }).getByText('The Watch of the Ferry Quarter')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-locations');
+  await page.getByRole('button', { name: 'New place' }).click();
+  const sheet = page.getByRole('dialog', { name: 'A new place' });
+  await expect(sheet.getByLabel('Add a link')).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'library-location-form');
+});
+
 test('groups of warbands at 360 px: the list under its groups, the choice under each warband', async ({ page }) => {
   const srv = await playServer(page);
   const wid = serverWarband(srv, 'The Grey Penitents');

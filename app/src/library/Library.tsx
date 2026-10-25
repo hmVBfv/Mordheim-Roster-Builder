@@ -12,8 +12,10 @@ import { newId } from '../db/ids.ts';
 import { useNotice } from '../ui/Notice.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleItem, TOPIC_NAMES, TOPICS, type Faction, type FactionBody, type Idea, type IdeaBody, type Topic } from './api.ts';
+import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleItem, TOPIC_NAMES, TOPICS, type Faction, type FactionBody, type Idea, type IdeaBody, type LibraryItem, type Topic } from './api.ts';
 import styles from './Library.module.css';
+import { LinkChips, LinksField, keepLinks } from './links.tsx';
+import { LocationsTab } from './LocationsTab.tsx';
 import { LoreTab } from './LoreTab.tsx';
 import { NpcsTab } from './NpcsTab.tsx';
 import { ScenariosTab } from './ScenariosTab.tsx';
@@ -146,13 +148,14 @@ function IdeasTab({ notify }: { notify: (t: string) => void }) {
   );
 }
 
-function FactionForm({ faction, online, close, onSaved, onRemoved }: {
-  faction: Faction | null; online: boolean; close: (then?: () => void) => void; onSaved: (f: Faction) => void; onRemoved: (f: Faction) => void;
+function FactionForm({ faction, items, online, close, onSaved, onRemoved }: {
+  faction: Faction | null; items: LibraryItem[] | null; online: boolean; close: (then?: () => void) => void; onSaved: (f: Faction) => void; onRemoved: (f: Faction) => void;
 }) {
   const [name, setName] = useState(faction?.name ?? '');
   const [de, setDe] = useState(faction?.body.de ?? '');
   const [status, setStatus] = useState(faction?.body.status ?? '');
   const [lore, setLore] = useState(faction?.body.lore ?? '');
+  const [links, setLinks] = useState<string[]>(faction?.body.links ?? []);
   const [base, setBase] = useState<number | undefined>(faction?.seq);
   const [asking, setAsking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -163,7 +166,7 @@ function FactionForm({ faction, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putFaction(id, name.trim(), { de: de.trim(), status: status.trim(), lore }, base);
+      const saved = await putFaction(id, name.trim(), { de: de.trim(), status: status.trim(), lore, links: keepLinks(items, links) }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<FactionBody>(e);
@@ -207,6 +210,7 @@ function FactionForm({ faction, online, close, onSaved, onRemoved }: {
         <span>The lore</span>
         <textarea className={ui.textarea} rows={8} value={lore} maxLength={MAX_IDEA} onChange={(e) => setLore(e.target.value)} />
       </label>
+      <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign’s World a leader adds the faction from here: the names and what the players may read go along as a copy; the lore stays with you.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {asking ? (
@@ -254,6 +258,7 @@ function FactionsTab({ notify }: { notify: (t: string) => void }) {
               </div>
               {f.body.status && <p className={styles.excerpt}>{f.body.status}</p>}
               {f.body.lore && <p className={styles.excerpt}>{f.body.lore.length > 200 ? `${f.body.lore.slice(0, 200)}…` : f.body.lore}</p>}
+              <LinkChips items={items} id={f.id} />
               <small className={styles.meta}>Changed <time dateTime={f.updatedAt}>{stamp(f.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${f.name}`} onClick={() => edit(f)}>Edit</button></div>
             </li>
@@ -263,7 +268,7 @@ function FactionsTab({ notify }: { notify: (t: string) => void }) {
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New faction</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="faction-form-title">
         {editing && (
-          <FactionForm key={editing.key} faction={editing.faction} online={reachable} close={close}
+          <FactionForm key={editing.key} faction={editing.faction} items={items} online={reachable} close={close}
             onSaved={(f) => { setItems((cur) => [f, ...(cur ?? []).filter((x) => x.id !== f.id)]); notify('Faction saved. Only you see it.'); }}
             onRemoved={(f) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== f.id)); notify('Faction removed.'); }} />
         )}
@@ -299,6 +304,7 @@ export function Library() {
       {tab === 'npcs' && <NpcsTab notify={notify} />}
       {tab === 'groups' && <Suspense fallback={<p className={ui.muted}>Loading…</p>}><GroupsTab notify={notify} /></Suspense>}
       {tab === 'scenarios' && <ScenariosTab notify={notify} />}
+      {tab === 'locations' && <LocationsTab notify={notify} />}
       {tab === 'lore' && <LoreTab notify={notify} />}
       {notice}
     </section>

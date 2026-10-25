@@ -129,7 +129,7 @@ describe('the Library: factions', () => {
     expect((made.json() as { item: { kind: string; name: string; body: unknown } }).item).toMatchObject({ kind: 'faction', name: 'The Bell-ringers', body: { de: 'Die Glockenläuter', status: 'Known in the drowned quarter', lore: expect.stringContaining('bells') } });
     // the German name, the status and the lore may be left out: they are empty then
     const bare = await kai('PUT', `/library/${randomUUID()}`, { kind: 'faction', name: 'The Ferrymen', body: {} });
-    expect((bare.json() as { item: { body: unknown } }).item.body).toEqual({ de: '', status: '', lore: '' });
+    expect((bare.json() as { item: { body: unknown } }).item.body).toEqual({ de: '', status: '', lore: '', links: [] });
     const list = (await kai('GET', '/library')).json() as { items: { kind: string }[] };
     expect(list.items.map((i) => i.kind).sort()).toEqual(['faction', 'faction']);
   });
@@ -231,5 +231,53 @@ describe('the Library: ideas', () => {
     expect(full.json()).toMatchObject({ error: 'full' });
     // another account is not held back by it
     expect((await ben('PUT', `/library/${randomUUID()}`, idea())).statusCode).toBe(201);
+  });
+});
+
+/* Wishes #73 and #74: places of the world, and links between factions, NPCs, groups, scenarios and places. */
+describe('the Library: places and links', () => {
+  const put = (kai: Awaited<ReturnType<typeof two>>['kai'], b: unknown, id: string = randomUUID()) => kai('PUT', `/library/${id}`, b);
+  const place = (over: Record<string, unknown> = {}) => ({ kind: 'location', name: 'Ostermark', body: { de: 'Ostermark', type: 'Region', lore: 'Forests and war.', ...over } });
+
+  it('a place is kept with its tag and lore, and is nobody else’s', async () => {
+    const { kai, ben } = await two();
+    const made = await put(kai, place());
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: unknown }).item).toMatchObject({ kind: 'location', name: 'Ostermark', body: { type: 'Region', lore: 'Forests and war.', links: [] } });
+    expect((await put(kai, { kind: 'location', name: 'Bare', body: {} })).statusCode).toBe(201);
+    expect(((await ben('GET', '/library')).json() as { items: unknown[] }).items).toEqual([]);
+    expect((await put(kai, place({ type: 'x'.repeat(41) }))).statusCode).toBe(400);
+    expect((await put(kai, place({ secret: 1 }))).statusCode).toBe(400);
+  });
+
+  it('factions, NPCs, groups, scenarios and places carry links to other entries; ideas and groups of warbands do not', async () => {
+    const { kai } = await two();
+    const other = [randomUUID(), randomUUID()];
+    const withLinks = { links: other };
+    const kinds: [string, Record<string, unknown>][] = [
+      ['faction', {}], ['npc', {}], ['group', {}], ['scenario', {}], ['location', {}],
+    ];
+    for (const [kind, body] of kinds) {
+      const made = await put(kai, { kind, name: `A ${kind}`, body: { ...body, ...withLinks } });
+      expect(made.statusCode, kind).toBe(201);
+      expect((made.json() as { item: { body: { links: string[] } } }).item.body.links, kind).toEqual(other);
+    }
+    expect((await put(kai, { kind: 'idea', name: 'Idea', body: { text: 'x', topic: 'other', ...withLinks } })).statusCode).toBe(400);
+    expect((await put(kai, { kind: 'warband_group', name: 'Group', body: { warbands: [], ...withLinks } })).statusCode).toBe(400);
+  });
+
+  it('only links that fit: ids, no repeat, no link to itself, a ceiling', async () => {
+    const { kai } = await two();
+    const id = randomUUID();
+    const f = (links: unknown) => ({ kind: 'faction', name: 'The Watch', body: { links } });
+    expect((await put(kai, f([randomUUID(), randomUUID()]), id)).statusCode).toBe(201);
+    const same = randomUUID();
+    expect((await put(kai, f([same, same]))).statusCode).toBe(400);
+    expect((await put(kai, f(['x'.repeat(65)]))).statusCode).toBe(400);
+    expect((await put(kai, f(['']))).statusCode).toBe(400);
+    expect((await put(kai, f(Array.from({ length: 101 }, () => randomUUID())))).statusCode).toBe(400);
+    // an entry that links to itself is a slip of the client, not something to keep
+    const me = randomUUID();
+    expect((await put(kai, f([me]), me)).statusCode).toBe(400);
   });
 });

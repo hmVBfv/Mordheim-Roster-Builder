@@ -19,3 +19,6 @@
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
+.links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); }
+.links > li { display: inline-flex; align-items: center; gap: var(--space-1); }

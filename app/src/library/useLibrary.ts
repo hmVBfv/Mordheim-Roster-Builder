@@ -2,7 +2,7 @@
    asked while `enabled` is false (nobody signed in). */
 import { useEffect, useState } from 'react';
 import { errorText } from '../account/api.ts';
-import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario, type LibraryWarbandGroup } from './api.ts';
+import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario, type LibraryLocation, type LibraryWarbandGroup } from './api.ts';
 
 export function useLibrary(enabled = true) {
   const [items, setItems] = useState<LibraryItem[] | null>(null);
@@ -27,3 +27,5 @@ export const groupsOf = (items: LibraryItem[] | null): LibraryGroup[] => (items 
 export const scenariosOf = (items: LibraryItem[] | null): LibraryScenario[] => (items ?? []).filter((i): i is LibraryScenario => i.kind === 'scenario').sort((a, b) => a.name.localeCompare(b.name));
 /** The groups of one's own warbands among the entries, by name. */
 export const warbandGroupsOf = (items: LibraryItem[] | null): LibraryWarbandGroup[] => (items ?? []).filter((i): i is LibraryWarbandGroup => i.kind === 'warband_group').sort((a, b) => a.name.localeCompare(b.name));
+/** The places of the world among the entries, by name. */
+export const locationsOf = (items: LibraryItem[] | null): LibraryLocation[] => (items ?? []).filter((i): i is LibraryLocation => i.kind === 'location').sort((a, b) => a.name.localeCompare(b.name));

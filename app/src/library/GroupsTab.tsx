@@ -14,16 +14,18 @@ import opp from '../opponents/Opponents.module.css';
 import { ProfileEditor, TemplatePicker, statline } from '../opponents/ProfileTools.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { MAX_NAME, putGroup, removeItem, staleItem, type GroupBody, type LibraryGroup } from './api.ts';
+import { MAX_NAME, putGroup, removeItem, staleItem, type GroupBody, type LibraryGroup, type LibraryItem } from './api.ts';
+import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
 import { groupsOf, useLibrary } from './useLibrary.ts';
 
-function GroupForm({ group, online, close, onSaved, onRemoved }: {
-  group: LibraryGroup | null; online: boolean; close: (then?: () => void) => void; onSaved: (g: LibraryGroup) => void; onRemoved: (g: LibraryGroup) => void;
+function GroupForm({ group, items, online, close, onSaved, onRemoved }: {
+  group: LibraryGroup | null; items: LibraryItem[] | null; online: boolean; close: (then?: () => void) => void; onSaved: (g: LibraryGroup) => void; onRemoved: (g: LibraryGroup) => void;
 }) {
   const ids = useId();
   const [name, setName] = useState(group?.name ?? '');
   const [note, setNote] = useState(group?.body.note ?? '');
+  const [links, setLinks] = useState<string[]>(group?.body.links ?? []);
   const [profiles, setProfiles] = useState<OpponentProfile[]>(group?.body.profiles ?? []);
   const [fresh, setFresh] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
@@ -40,7 +42,7 @@ function GroupForm({ group, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putGroup(id, name.trim(), { note, profiles }, base);
+      const saved = await putGroup(id, name.trim(), { note, profiles, links: keepLinks(items, links) }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<GroupBody>(e);
@@ -87,6 +89,7 @@ function GroupForm({ group, online, close, onSaved, onRemoved }: {
           <button type="button" className={ui.buttonQuiet} disabled={full} onClick={() => add(core.profileFrom(newId(), null))}>Write your own</button>
         </div>
       )}
+      <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign a leader sets the group against the warbands from here, as a copy.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {asking ? (
@@ -139,6 +142,7 @@ export function GroupsTab({ notify }: { notify: (t: string) => void }) {
                 ))}
                 {g.body.profiles.length === 0 && <li className={ui.muted}>No profile yet.</li>}
               </ul>
+              <LinkChips items={items} id={g.id} />
               <small className={styles.meta}>Changed <time dateTime={g.updatedAt}>{stamp(g.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${g.name}`} onClick={() => edit(g)}>Edit</button></div>
             </li>
@@ -148,7 +152,7 @@ export function GroupsTab({ notify }: { notify: (t: string) => void }) {
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New group</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="group-form-title">
         {editing && (
-          <GroupForm key={editing.key} group={editing.group} online={reachable} close={close}
+          <GroupForm key={editing.key} group={editing.group} items={items} online={reachable} close={close}
             onSaved={(g) => { setItems((cur) => [g, ...(cur ?? []).filter((x) => x.id !== g.id)]); notify('Group saved. Only you see it.'); }}
             onRemoved={(g) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== g.id)); notify('Group removed.'); }} />
         )}

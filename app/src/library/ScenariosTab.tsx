@@ -9,20 +9,22 @@ import { useOnline } from '../app/SyncState.tsx';
 import { newId } from '../db/ids.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { putScenario, removeItem, staleItem, type LibraryScenario, type ScenarioBody } from './api.ts';
+import { putScenario, removeItem, staleItem, type LibraryItem, type LibraryScenario, type ScenarioBody } from './api.ts';
+import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
 import { scenariosOf, useLibrary } from './useLibrary.ts';
 
 /** The limits the server holds to (server/src/scenarios.ts). */
 const LIMITS = { title: 120, body: 20_000, statlines: 10_000 } as const;
 
-function ScenarioForm({ scenario, online, close, onSaved, onRemoved }: {
-  scenario: LibraryScenario | null; online: boolean; close: (then?: () => void) => void; onSaved: (s: LibraryScenario) => void; onRemoved: (s: LibraryScenario) => void;
+function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
+  scenario: LibraryScenario | null; items: LibraryItem[] | null; online: boolean; close: (then?: () => void) => void; onSaved: (s: LibraryScenario) => void; onRemoved: (s: LibraryScenario) => void;
 }) {
   const ids = useId();
   const [title, setTitle] = useState(scenario?.name ?? '');
   const [body, setBody] = useState(scenario?.body.body ?? '');
   const [statlines, setStatlines] = useState(scenario?.body.npcStatlines ?? '');
+  const [links, setLinks] = useState<string[]>(scenario?.body.links ?? []);
   const [base, setBase] = useState<number | undefined>(scenario?.seq);
   const [asking, setAsking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -34,7 +36,7 @@ function ScenarioForm({ scenario, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putScenario(id, title.trim(), { body: body.trim(), npcStatlines: statlines.trim(), npcs }, base);
+      const saved = await putScenario(id, title.trim(), { body: body.trim(), npcStatlines: statlines.trim(), npcs, links: keepLinks(items, links) }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<ScenarioBody>(e);
@@ -73,6 +75,7 @@ function ScenarioForm({ scenario, online, close, onSaved, onRemoved }: {
         <textarea id={`${ids}-s`} className={`${ui.textarea} ${ui.writing}`} rows={5} value={statlines} maxLength={LIMITS.statlines} onChange={(e) => setStatlines(e.target.value)} />
       </div>
       {npcs.length > 0 && <p className={ui.muted}>{npcs.length} {npcs.length === 1 ? 'NPC' : 'NPCs'} with their hidden parts travel along with the scenario. They are changed in a campaign, once the scenario is there.</p>}
+      <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign a leader adds the scenario from here as a draft: only leaders read it until it is released to a battle.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {asking ? (
@@ -119,6 +122,7 @@ export function ScenariosTab({ notify }: { notify: (t: string) => void }) {
                 {s.body.npcs.length > 0 && <span className={styles.chip}>{s.body.npcs.length} {s.body.npcs.length === 1 ? 'NPC' : 'NPCs'}</span>}
               </div>
               {s.body.body && <p className={styles.excerpt}>{s.body.body.length > 200 ? `${s.body.body.slice(0, 200)}…` : s.body.body}</p>}
+              <LinkChips items={items} id={s.id} />
               <small className={styles.meta}>Changed <time dateTime={s.updatedAt}>{stamp(s.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${s.name}`} onClick={() => edit(s)}>Edit</button></div>
             </li>
@@ -128,7 +132,7 @@ export function ScenariosTab({ notify }: { notify: (t: string) => void }) {
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New scenario</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="scenario-form-title">
         {editing && (
-          <ScenarioForm key={editing.key} scenario={editing.scenario} online={reachable} close={close}
+          <ScenarioForm key={editing.key} scenario={editing.scenario} items={items} online={reachable} close={close}
             onSaved={(s) => { setItems((cur) => [s, ...(cur ?? []).filter((x) => x.id !== s.id)]); notify('Scenario saved. Only you see it.'); }}
             onRemoved={(s) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== s.id)); notify('Scenario removed.'); }} />
         )}

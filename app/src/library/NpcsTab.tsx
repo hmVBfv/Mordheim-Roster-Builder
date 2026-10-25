@@ -10,20 +10,22 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { bodyOf, draftOf, type NpcDraft } from '../world/npcDraft.ts';
 import worldStyles from '../world/World.module.css';
-import { MAX_NAME, MAX_STATUS, putNpc, removeItem, staleItem, type LibraryNpc, type NpcBody } from './api.ts';
+import { MAX_NAME, MAX_STATUS, putNpc, removeItem, staleItem, type LibraryItem, type LibraryNpc, type NpcBody } from './api.ts';
+import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
 import { npcsOf, useLibrary } from './useLibrary.ts';
 
 const NpcFields = lazy(() => import('../world/NpcFields.tsx').then((m) => ({ default: m.NpcFields })));
 
-function NpcForm({ npc, online, close, onSaved, onRemoved }: {
-  npc: LibraryNpc | null; online: boolean; close: (then?: () => void) => void; onSaved: (n: LibraryNpc) => void; onRemoved: (n: LibraryNpc) => void;
+function NpcForm({ npc, items, online, close, onSaved, onRemoved }: {
+  npc: LibraryNpc | null; items: LibraryItem[] | null; online: boolean; close: (then?: () => void) => void; onSaved: (n: LibraryNpc) => void; onRemoved: (n: LibraryNpc) => void;
 }) {
   const [nameEn, setNameEn] = useState(npc?.name ?? '');
   const [nameDe, setNameDe] = useState(npc?.body.de ?? '');
   const [faction, setFaction] = useState(npc?.body.faction ?? '');
   const [status, setStatus] = useState(npc?.body.status ?? '');
   const [named, setNamed] = useState(npc?.body.named ?? false);
+  const [links, setLinks] = useState<string[]>(npc?.body.links ?? []);
   const [draft, setDraft] = useState<NpcDraft>(() => draftOf(npc?.body ?? null));
   const [base, setBase] = useState<number | undefined>(npc?.seq);
   const [asking, setAsking] = useState(false);
@@ -36,7 +38,7 @@ function NpcForm({ npc, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const body: NpcBody = { de: nameDe.trim() === name ? '' : nameDe.trim(), status: status.trim(), faction: faction.trim(), named, ...bodyOf(draft) };
+      const body: NpcBody = { de: nameDe.trim() === name ? '' : nameDe.trim(), status: status.trim(), faction: faction.trim(), named, ...bodyOf(draft), links: keepLinks(items, links) };
       const saved = await putNpc(id, name, body, base);
       close(() => onSaved(saved));
     } catch (e) {
@@ -89,6 +91,7 @@ function NpcForm({ npc, online, close, onSaved, onRemoved }: {
         <NpcFields cid={null} warbands={[]} extra={[]} name={name} draft={draft} onDraft={setDraft}
           onCopied={(from) => { if (!name) setNameEn(from); }} />
       </Suspense>
+      <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign’s World a leader adds the NPC from here as a copy: everyone in that campaign then reads its names, status and values.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {asking ? (
@@ -138,6 +141,7 @@ export function NpcsTab({ notify }: { notify: (t: string) => void }) {
               {n.body.faction && <p className={styles.excerpt}>{n.body.faction}</p>}
               {n.body.status && <p className={styles.excerpt}>{n.body.status}</p>}
               {n.body.statlineTts && <p className={styles.excerpt}>{n.body.statlineTts.split('\n')[0]!.slice(0, 120)}</p>}
+              <LinkChips items={items} id={n.id} />
               <small className={styles.meta}>Changed <time dateTime={n.updatedAt}>{stamp(n.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${n.name}`} onClick={() => edit(n)}>Edit</button></div>
             </li>
@@ -147,7 +151,7 @@ export function NpcsTab({ notify }: { notify: (t: string) => void }) {
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New NPC</button></div>
       <dialog ref={ref} className={`${ui.sheet} ${ui.sheetWide}`} aria-labelledby="npc-form-title">
         {editing && (
-          <NpcForm key={editing.key} npc={editing.npc} online={reachable} close={close}
+          <NpcForm key={editing.key} npc={editing.npc} items={items} online={reachable} close={close}
             onSaved={(n) => { setItems((cur) => [n, ...(cur ?? []).filter((x) => x.id !== n.id)]); notify('NPC saved. Only you see it.'); }}
             onRemoved={(n) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== n.id)); notify('NPC removed.'); }} />
         )}

@@ -6,14 +6,16 @@ import type { DB } from './db.ts';
 import { MAX_PROFILES, NpcProfileBody, Profile } from './opponents.ts';
 import { ScenarioBody } from './scenarios.ts';
 
-export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group'] as const;
+export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location'] as const;
 export type Kind = (typeof KINDS)[number];
 /** The kinds the server reads: all of them since the scenarios came. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group'];
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
 const NAME = z.string().trim().min(1).max(120);
+/** The entries one entry points to (wish #74): factions, NPCs, groups, scenarios and places link to each other; the ids of the other entries of the same Library, no repeat. Seen openly in the Library, never copied into a campaign. */
+const Links = z.array(z.string().min(1).max(64)).max(100).default([]).refine((l) => new Set(l).size === l.length, { message: 'a link twice' });
 const Idea = z.object({
   text: z.string().max(20_000),
   /** What the idea is about; "Make a …" comes later. */
@@ -24,6 +26,7 @@ const Faction = z.object({
   de: z.string().trim().max(120).default(''),
   status: z.string().trim().max(200).default(''),
   lore: z.string().max(20_000).default(''),
+  links: Links,
 }).strict();
 /** An NPC outside any campaign: the world's NPC without its faction id – the faction is only a name here, matched when the NPC goes into a world. */
 const Npc = z.object({
@@ -33,19 +36,28 @@ const Npc = z.object({
   named: z.boolean().default(false),
   statlineTts: z.string().max(12_000).default(''),
   profile: NpcProfileBody.nullable().default(null),
+  links: Links,
 }).strict();
 /** A group of opponents outside any campaign: a campaign's group (server/src/opponents.ts) without its name (the entry's `name`) and its `baseSeq`. */
 const Group = z.object({
   note: z.string().max(4000).default(''),
   profiles: z.array(Profile).max(MAX_PROFILES).default([]),
+  links: Links,
 }).strict();
 /** A scenario outside any campaign: a campaign's scenario (server/src/scenarios.ts) without its title (the entry's `name`) and its `baseSeq`. Its NPCs keep their hidden parts (ADR 0022); nobody but the owner reads it. */
-const Scenario = ScenarioBody.omit({ title: true, baseSeq: true });
+const Scenario = ScenarioBody.omit({ title: true, baseSeq: true }).extend({ links: Links });
+/** A place of the world (wish #73): the German name, a tag to sort and find it by ("Region", "Town" … – free words), and the lore behind it. */
+const Location = z.object({
+  de: z.string().trim().max(120).default(''),
+  type: z.string().trim().max(40).default(''),
+  lore: z.string().max(20_000).default(''),
+  links: Links,
+}).strict();
 /** A group of one's own warbands (the list's folders): the ids of the warbands in it, each in at most one group – the client moves one warband from group to group. */
 const WarbandGroup = z.object({
   warbands: z.array(z.string().min(1).max(64)).max(500).default([]).refine((l) => new Set(l).size === l.length, { message: 'a warband twice' }),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group, scenario: Scenario, warband_group: WarbandGroup };
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group, scenario: Scenario, warband_group: WarbandGroup, location: Location };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
@@ -54,12 +66,15 @@ const view = (r: Row): Item => ({ id: r.id, kind: r.kind, name: r.name, body: JS
 
 export type Checked = { ok: true; name: string; body: unknown } | { ok: false; problem: string };
 
-export function checkItem(kind: string, name: unknown, body: unknown): Checked {
+export function checkItem(kind: string, name: unknown, body: unknown, id?: string): Checked {
   if (!ACTIVE_KINDS.includes(kind as Kind)) return { ok: false, problem: `no ${kind} in the Library yet` };
   const n = NAME.safeParse(name);
   if (!n.success) return { ok: false, problem: 'a name of 1 to 120 characters' };
   const b = BODIES[kind as Kind]!.safeParse(body);
   if (!b.success) return { ok: false, problem: `the ${kind} does not fit: ${b.error.issues[0]?.message ?? 'invalid'}` };
+  // an entry that points to itself is a slip of the client
+  const links = (b.data as { links?: string[] }).links;
+  if (id && links?.some((l) => l.toLowerCase() === id.toLowerCase())) return { ok: false, problem: `the ${kind} links to itself` };
   return { ok: true, name: n.data, body: b.data };
 }
 

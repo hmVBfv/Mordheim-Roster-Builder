@@ -84,6 +84,27 @@ describe('the world and the Library (ADR 0023)', () => {
     expect(again.getByText('Already in this world')).toBeTruthy();
   });
 
+  /* Wish #74 (Rob): what the Library knows of how its entries belong together stays there; a copy into a campaign
+     takes the names, the status and the values – never the links – until the leader unlocks more in some way. */
+  it('a faction and an NPC added from the Library take no links along (#74)', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
+    srv.libraryFrom({ name: 'The Bell-ringers', kind: 'faction', body: { de: '', status: 'Known in the drowned quarter', lore: '', links: ['LINKED-ENTRY-ID'] } });
+    srv.libraryFrom({ name: 'Captain Brandt', kind: 'npc', body: { de: '', status: '', faction: '', named: false, statlineTts: '', profile: null, links: ['LINKED-ENTRY-ID'] } });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/world`);
+    await user.click(await screen.findByRole('button', { name: 'From the Library…' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Add from your Library' });
+    await user.click(await within(sheet).findByRole('button', { name: 'Add The Bell-ringers' }));
+    await waitFor(() => expect([...srv.state.factions.values()].filter((f) => f.campaignId === c.id)).toHaveLength(1));
+    await screen.findByRole('article', { name: 'The Bell-ringers' });
+    await user.click(screen.getByRole('button', { name: 'NPCs from the Library…' }));
+    const npcs = await screen.findByRole('dialog', { name: 'Add NPCs from your Library' });
+    await user.click(await within(npcs).findByRole('button', { name: 'Add Captain Brandt' }));
+    await waitFor(() => expect([...srv.state.npcs.values()].filter((n) => n.campaignId === c.id)).toHaveLength(1));
+    expect(JSON.stringify([...srv.state.factions.values(), ...srv.state.npcs.values()])).not.toMatch(/LINKED-ENTRY-ID|links/);
+  });
+
   it('a leader keeps a faction of the world in the Library, as a copy', async () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });

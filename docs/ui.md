@@ -94,6 +94,21 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   verborgenen Teilen; ein Titel, der schon da ist, wird nicht noch einmal
   angeboten) und „Save to Library“ an jedem Szenario (eine Kopie zurück; auch die
   Library ist nur für einen selbst).
+  **Locations und Verknüpfungen (Wünsche #73 und #74, Rob, 25.10.2026):** der Reiter
+  **Locations** (zwischen Scenarios und Lore) hält Orte der eigenen Welt – Name
+  englisch und deutsch, „Kind of place“ als freier Tag („Region“, „Town“ … zum
+  Sortieren und Finden, höchstens 40 Zeichen) und die Lore. Fraktionen, NPCs,
+  Gruppen, Szenarien und Orte lassen sich **untereinander verknüpfen**: im Formular
+  „Linked to“ mit „Add a link“ (angeboten wird alles Verknüpfbare außer dem Eintrag
+  selbst, mit seiner Art) und „Remove link to …“; auf jeder Karte steht unter „Linked
+  entries“, womit der Eintrag verbunden ist – **offen, von beiden Enden** (eine
+  Verknüpfung wird nur auf einer Seite gespeichert). Ideen und Gruppen von Warbands
+  tragen keine. Ein Eintrag, der entfernt wurde, verschwindet aus der Anzeige und
+  mit dem nächsten Speichern aus der Liste. **Nichts davon geht in eine Kampagne:**
+  eine Kopie (Fraktion, NPC, Gruppe, Szenario) nimmt die Verknüpfungen nicht mit; was
+  die Library über das Zusammengehören weiß, bleibt dort, bis ein Leiter es später auf
+  irgendeinem Weg freigibt (noch nicht gebaut). Orte nimmt eine Kampagne noch nicht
+  auf.
   **Ein NPC in eine Kampagne:** „NPCs from the Library…“ in der World (eine Kopie
   mit den Werten; die Fraktion wird in der World nach Namen gesucht, sonst ohne
   Fraktion; ein NPC gleichen Namens wird nicht noch einmal angeboten) und „Save to
