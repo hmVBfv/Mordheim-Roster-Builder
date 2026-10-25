@@ -22,7 +22,7 @@ export function WarbandList({ warbands, marks = false, grid = false, groups }: {
           <Link to={`/warbands/${w.id}`} className={ui.listLink}>
             <span>{w.name}</span>
             <small>
-              {w.wbName}
+              {w.wbName}{w.state.planner && ' · Planner'}
               {marks && !w.ownerId && ' · only on this device'}
               {w.campaignId && <CampaignMark id={w.campaignId} />}
               {w.conflict && <strong className={ui.error}> · changed elsewhere too – check</strong>}

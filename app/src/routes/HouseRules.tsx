@@ -87,7 +87,9 @@ function Body({ rec }: { rec: StoredWarband }) {
       {!inCampaign && <p>Everything is played as written unless a house rule is switched on here. Every export names the rules that are on.</p>}
       <dl className={trade.figures}>
         <div><dt>House rules on</dt><dd>{count}</dd></div>
-        <div><dt>Gold in hand</dt><dd>{core.goldCurrent(ctx)} gc</dd></div>
+        {core.isPlanner(ctx.s)
+          ? <div><dt>Value</dt><dd>{core.plannerValue(ctx)} gc</dd></div>
+          : <div><dt>Gold in hand</dt><dd>{core.goldCurrent(ctx)} gc</dd></div>}
       </dl>
 
       {inCampaign

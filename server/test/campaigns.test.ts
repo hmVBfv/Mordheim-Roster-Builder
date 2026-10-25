@@ -100,6 +100,15 @@ describe('members', () => {
 });
 
 describe('entering a warband', () => {
+  /* Wish #77: a planner is for planning; the server does not take it into a campaign as it is. */
+  it('a planner is refused; the same warband without the mark enters', async () => {
+    const { id, kai } = await campaign();
+    const refused = await kai('POST', `/campaigns/${id}/enrolments`, { warbandId: randomUUID(), data: { ...SAVE, planner: true }, appVersion: 'test' });
+    expect(refused.statusCode).toBe(400);
+    expect(refused.json()).toMatchObject({ error: 'invalid', problem: expect.stringMatching(/planner/) });
+    expect((await kai('POST', `/campaigns/${id}/enrolments`, { warbandId: randomUUID(), data: SAVE, appVersion: 'test' })).statusCode).toBe(201);
+  });
+
   it('a copy of the player’s own waits for a leader; confirmed, its start is marked with the totals the rules compute', async () => {
     const { s, id, anna, kai, ids } = await campaign();
     const mine = randomUUID();

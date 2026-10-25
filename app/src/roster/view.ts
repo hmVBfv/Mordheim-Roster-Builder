@@ -73,6 +73,8 @@ export interface WarriorView {
   men: ManView[];
   /** For a group: another man, at what price or why not; null for a Hero. */
   addMan: AddMan | null;
+  /** A planner (#77): the experience his advances would need; null in any other warband. */
+  expNeeded: number | null;
 }
 
 export interface HireView {
@@ -106,6 +108,9 @@ export interface RosterView {
   rating: number;
   worth: number;
   gold: number;
+  /** A planner (#77): no gold limit; `value` is shown in place of the gold in hand. */
+  planner: boolean;
+  value: number;
   models: number;
   maxModels: number;
   heroes: WarriorView[];
@@ -228,6 +233,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     captive: m.captive ? m.captive.by : null,
     men: hero ? [] : core.memberNames(ctx, m).map((name, i) => ({ i, name, named: core.memberNamed(m, i) })),
     addMan: hero ? null : block ? { why: block } : { cost: core.henchRecruitCost(ctx, m) },
+    expNeeded: core.isPlanner(ctx.s) ? core.expNeeded(ctx, m) : null,
   };
 }
 
@@ -360,6 +366,8 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
     rating: core.totalRating(ctx),
     worth: core.warbandWorth(ctx),
     gold: core.goldCurrent(ctx),
+    planner: core.isPlanner(ctx.s),
+    value: core.plannerValue(ctx),
     models: core.totalModels(ctx),
     maxModels: core.warbandMax(ctx),
     campaign: camp?.on ? core.roundLabel(camp.round) : null,
@@ -392,9 +400,10 @@ export function newWarbandChoice(data: GameData, key: string): NewWarbandChoice 
 /* The data marks rule names with <b>; the recruit list shows plain text. */
 const plainNote = (sp: string | undefined) => (sp ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
 
-export function createWarband(data: GameData, key: string, subtype: string | null, name: string): WarbandState {
+export function createWarband(data: GameData, key: string, subtype: string | null, name: string, planner = false): WarbandState {
   let s = core.newWarband(data, key);
   if (subtype && subtype !== s.subtype) s = core.pickSubtype(core.ctxOf(data, s), subtype);
+  if (planner) s = core.asPlanner(core.ctxOf(data, s));
   const nm = name.trim();
   if (nm) s = core.setWarbandName(core.ctxOf(data, s), nm);
   return editableState(data, s);

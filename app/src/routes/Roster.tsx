@@ -248,11 +248,13 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
             })}><IconEdit /></button>
         </div>
         <p className={board.sub}>
-          {v.type}{v.campaign ? ` · ${v.campaign}` : ''}
+          {v.type}{v.planner ? ' · Planner' : ''}{v.campaign ? ` · ${v.campaign}` : ''}
           {houseOn > 0 && <> · <Link to={`/warbands/${rec.id}/house`} className={board.houseLink}>⚖ {houseOn} house rule{houseOn > 1 ? 's' : ''}</Link></>}
         </p>
         <dl className={board.tiles}>
-          <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>
+          {v.planner
+            ? <div className={`${board.tile} ${board.tileGold}`}><dt>Value</dt><dd>{v.value} gc</dd></div>
+            : <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>}
           <div className={board.tile}><dt>Rating</dt><dd>{v.rating}</dd></div>
           <ModelsTile models={v.models} max={v.maxModels} />
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
@@ -269,6 +271,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       {FLAVOUR === 'campaign' && rec.campaignId && (
         <CampaignStage rec={rec} state={ed.state} onTake={(round) => ed.edit((c) => takeStage(c, round), `Stage: ${core.roundLabel(round)}, as the campaign.`, { gold: 'keep' })} />
       )}
+      {v.planner && <p className={`${ui.card} ${ui.muted}`}>A planner: no gold limit, and advances without experience – each warrior shows the experience they would need. It does not take part in a campaign.</p>}
       {v.warnings.length > 0 && (
         <ul className={`${ui.card} ${board.warnings}`} aria-label="Warnings">
           {v.warnings.map((w) => <li key={w}>{w}</li>)}
@@ -278,7 +281,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         v={v} acts={actsOf} printing={printing}
         after={<>
           {v.heroes.length + v.henchmen.length + v.hires.length === 0 && (
-            <Empty scene="fire" title="No warriors yet.">Recruit your Heroes and Henchmen: {v.gold} gc to spend.</Empty>
+            <Empty scene="fire" title="No warriors yet.">{v.planner ? 'Recruit your Heroes and Henchmen: a planner has no gold limit.' : `Recruit your Heroes and Henchmen: ${v.gold} gc to spend.`}</Empty>
           )}
           {locked && <StashSection ctx={ctx} onGive={(h, to) => ed.edit((c) => core.giveItem(c, h.from, to, h.goods).state, `${h.name} given.`)} />}
           <FallenList f={v.fallen} />

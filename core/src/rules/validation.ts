@@ -7,6 +7,7 @@ import type { UnitDef } from '../data/types.ts';
 import type { Model } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
+import { isPlanner } from './planner.ts';
 import { countOf, goldCurrent, modelsOf, ratioMen, totalHeroes, totalModels, unitMax, warbandMax } from './costs.ts';
 import { eqWeaponLimit } from './equipment.ts';
 import { eqListFor, itemFamily, unitDef, warbandDef } from './lookup.ts';
@@ -66,7 +67,8 @@ export function warbandWarnings(ctx: Ctx): string[] {
   const minReq = (h.min !== '' && h.min != null) ? Number(h.min) : wb.min;
   const heroCap = Number(h.heroes) || 6;
   const has = (m: Model, nm: string) => !!m.eq && Number(m.eq[nm]) > 0;
-  if (gold < 0) w.push(`Not enough gold — short by ${-gold} gc.`);
+  // a planner has no gold to run out of (wish #77): only its value is shown
+  if (gold < 0 && !isPlanner(s)) w.push(`Not enough gold — short by ${-gold} gc.`);
   if (mc < (minReq as number)) w.push(`At least ${minReq} models required (currently ${mc}).`);
   if (mc > warbandMax(ctx)) w.push(`At most ${warbandMax(ctx)} models allowed (currently ${mc}).`);
   if (hc > heroCap) w.push(`A warband may have at most ${heroCap} Heroes (currently ${hc}).`);

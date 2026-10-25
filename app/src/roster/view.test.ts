@@ -287,4 +287,25 @@ describe('the Fallen', () => {
     expect(hench.xpTotal).toBe(6);
     expect(hench.equipment).toEqual(core.fallenEqAgg(ctx, ctx.s.fallen!.slice(1).map((f) => f.m)));
   });
+
+  /* Wish #77: a planner shows its value in place of the gold in hand, and what each model's advances would need. */
+  it('a planner shows its value, no gold to run out of, and the experience its advances need', () => {
+    const made = createWarband(data, 'merc', null, 'The Late Company', true);
+    expect(made.planner).toBe(true);
+    expect(createWarband(data, 'merc', null, 'Plain').planner).toBeUndefined();
+    let s = made;
+    for (const id of ['capt', 'champ', 'warr']) s = core.addUnit(core.ctxOf(data, s), id);
+    const champ = s.models.find((m) => m.uid_def === 'champ')!.uid;
+    for (const st of ['S', 'T', 'W'] as const) s = core.addAdvance(core.ctxOf(data, s), champ, st);
+    s = { ...s, stash: { ...s.stash!, gold: 5 } };
+    const v = rosterView(data, s);
+    expect(v.planner).toBe(true);
+    expect(v.value).toBe(core.totalSpent(core.ctxOf(data, editableState(data, s))));
+    expect(v.warnings.some((w) => /Not enough gold/.test(w))).toBe(false);
+    expect(v.heroes.find((h) => h.uid === champ)!.expNeeded).toBeGreaterThan(0);
+    // an ordinary warband has neither
+    const plain = rosterView(data, core.addUnit(core.ctxOf(data, core.newWarband(data, 'merc')), 'capt'));
+    expect(plain.planner).toBe(false);
+    expect(plain.heroes[0]!.expNeeded).toBeNull();
+  });
 });

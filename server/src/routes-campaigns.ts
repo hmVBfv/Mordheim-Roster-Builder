@@ -141,6 +141,8 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     const b = req.body as { warbandId: string; data: unknown; copiedFrom?: { id: string; rev: number }; appVersion?: string };
     const c = checkSave(b.data);
     if (!c.ok) return reply.code(c.status).send({ error: c.error, problem: c.problem });
+    // a planner is for planning (wish #77): it does not enter a campaign as it is
+    if ((c.data as { planner?: unknown }).planner === true) return reply.code(400).send({ error: 'invalid', problem: 'a planner does not enter a campaign' });
     // its start is marked with totals the rules compute: they must be able to read it
     if (!totalsOf(c.data)) return reply.code(400).send({ error: 'invalid', problem: 'the rules cannot read this warband' });
     const id = b.warbandId.toLowerCase();

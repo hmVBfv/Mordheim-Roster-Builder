@@ -26,6 +26,9 @@ export function Warbands() {
   const removed = (useLocation().state as { removed?: StoredWarband } | null)?.removed;
   const signedIn = session.status === 'in';
   const deviceOnly = signedIn ? (warbands ?? []).filter((w) => !w.ownerId) : [];
+  // planners (#77) are a kind of their own: a section under the warbands
+  const planners = (warbands ?? []).filter((w) => w.state.planner);
+  const played = (warbands ?? []).filter((w) => !w.state.planner);
   return (
     <section className={ui.page}>
       <h1>Warbands</h1>
@@ -47,11 +50,18 @@ export function Warbands() {
         </div>
       )}
       {warbands && warbands.length === 0 && <Empty scene="fire" title="No warband yet.">Start a new one, or import one from the Roster Builder.</Empty>}
-      {warbands && warbands.length > 0 && !signedIn && <WarbandList warbands={warbands} grid />}
-      {warbands && warbands.length > 0 && signedIn && (
-        <Suspense fallback={<WarbandList warbands={warbands} marks grid />}>
-          <GroupedWarbands warbands={warbands} notify={notify} />
+      {played.length > 0 && !signedIn && <WarbandList warbands={played} grid />}
+      {played.length > 0 && signedIn && (
+        <Suspense fallback={<WarbandList warbands={played} marks grid />}>
+          <GroupedWarbands warbands={played} notify={notify} />
         </Suspense>
+      )}
+      {planners.length > 0 && (
+        <section className={ui.page} aria-labelledby="planners-h">
+          <h2 id="planners-h">Planners</h2>
+          <p className={ui.muted}>To plan a strong late-game warband: no gold limit, advances without experience. They do not take part in a campaign.</p>
+          <WarbandList warbands={planners} marks={signedIn} grid />
+        </section>
       )}
       {removed && (
         <UndoToast key={removed.id} text={`${removed.name} removed.`}

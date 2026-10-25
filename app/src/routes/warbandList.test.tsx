@@ -42,4 +42,12 @@ describe('the list of warbands', () => {
     expect(within(link).getByText(/^Created 5 Oct, /)).toBeTruthy();
     expect(within(link).getByText('Updated never').closest('small')).not.toBe(within(link).getByText(/^Created 5 Oct, /).closest('small'));
   });
+
+  it('a planner says so (#77)', () => {
+    const w = warband('p', '2026-10-05T12:00:00.000Z', '2026-10-05T12:00:00.000Z');
+    render(<MemoryRouter><WarbandList warbands={[{ ...w, state: { ...w.state, planner: true } }, warband('q', '2026-10-05T12:00:00.000Z', '2026-10-05T12:00:00.000Z')]} /></MemoryRouter>);
+    const [planner, plain] = screen.getAllByRole('link');
+    expect(within(planner!).getByText(/Planner/)).toBeTruthy();
+    expect(within(plain!).queryByText(/Planner/)).toBeNull();
+  });
 });

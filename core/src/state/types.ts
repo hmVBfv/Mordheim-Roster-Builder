@@ -288,6 +288,8 @@ export interface WarbandState {
   fallen?: FallenRecord[];
   /** Next model uid to hand out (core only; see nextModelUid). */
   uidSeq?: number;
+  /** A planner (wish #77): no gold limit, advances without experience; see rules/planner.ts. Absent on every other warband. */
+  planner?: boolean;
   /** The gold ledger (V7); absent until the warband's first battle. */
   ledger?: LedgerEntry[];
   [key: string]: unknown;

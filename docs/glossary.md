@@ -115,6 +115,7 @@ Begriff einführt, trägt ihn hier ein.
 | Mann (einer Henchmen-Gruppe) | Man | `m.names[]`, `memberName()` |
 | einen Mann entlassen | Dismiss him | `dismissMember()` |
 | Mann nachrekrutieren | + Man | `setQty()`, `henchRecruitCost()` |
+| Planner | Planner | `planner` (Spielstand), `isPlanner`, `expNeeded`, `plannerValue` |
 | Warband anlegen | New warband · Start the warband | `createWarband()`, `/warbands/new` |
 | Anwerben | Recruit | `addUnit()`, `recruitStatus()`, Sheet `RecruitSheet` |
 | aus dem Roster nehmen | Remove from the roster | `removeUnit()` |

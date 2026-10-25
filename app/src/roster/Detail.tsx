@@ -141,6 +141,7 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
             </div>
           )}
           {!acts && <p className={styles.plain}>Exp <b>{u.xp.value}</b>{group ? ' (group)' : ''}</p>}
+          {w && w.expNeeded != null && <p className={styles.plain}>Needs <b>{w.expNeeded}</b> exp for the advances {group ? 'the group has' : 'he has'}.</p>}
         </Section>
       ) : (
         <p className={styles.empty}>Gains no experience.</p>

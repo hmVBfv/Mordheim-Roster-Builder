@@ -894,6 +894,32 @@ test('the navigation fits the flavour', async ({ page }) => {
   await expect(page).toHaveTitle(test.info().project.name === 'quickbuild' ? 'Mordheim Quick Build' : 'Mordheim Campaign');
 });
 
+/* Wish #77: a planner – no gold limit, its value shown, the experience its advances need. */
+test('a planner at 360 px: value instead of gold, advances with their experience, its own section in the list', async ({ page }) => {
+  const quick = test.info().project.name === 'quickbuild';
+  await page.goto(quick ? '#/warbands/new' : 'warbands/new');
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
+  await page.getByLabel('Name').fill('The Late Company');
+  await page.getByRole('checkbox', { name: /A planner/ }).check();
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'planner-new');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Late Company' })).toBeVisible();
+  await expect(page.getByText('Value', { exact: true })).toBeVisible();
+  await expect(page.getByText('Gold', { exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /^Mercenary Captain/ }).click();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'planner-roster');
+  await page.goto(quick ? '#/warbands' : 'warbands');
+  await expect(page.getByRole('heading', { name: 'Planners' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /The Late Company/ }).getByText(/Planner/)).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'planner-list');
+});
+
 /* Over http in the home network (the test instance) the browser has no
    crypto.randomUUID (Rob, 05.10.2026: import failed, "Start the warband"
    did nothing). The same without it here. */

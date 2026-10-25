@@ -227,6 +227,24 @@ describe('the overview', () => {
     expect(await syncOnce({ userId: KAI.id, data: async () => data })).toMatchObject({ pushed: 0, waiting: 0 });
   });
 
+  /* Wish #77: a planner is for planning; it is not offered to a campaign, and does not enter one. */
+  it('a planner is not offered when entering a warband', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign' });
+    const plain = record();
+    const planner = { ...record(), id: 'w-planner', name: 'The Late Company', state: { ...record().state, planner: true } };
+    await db.warbands.bulkAdd([plain, planner]);
+    await syncOnce({ userId: KAI.id, data: async () => data });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
+    const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
+    expect(within(sheet).getAllByRole('radio').map((r) => r.getAttribute('aria-label') ?? r.closest('label')?.textContent)).toEqual([expect.stringContaining('The Silver Caravan')]);
+    expect(within(sheet).queryByText(/The Late Company/)).toBeNull();
+    const { enterWarband } = await import('./enter.ts');
+    await expect(enterWarband(data, c.id, planner)).rejects.toThrow(/planner/i);
+  });
+
   it('a new warband for the campaign: made free under Warbands, its copy entered at once and opened (Rob, 05.10.2026)', async () => {
     const srv = server();
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });
