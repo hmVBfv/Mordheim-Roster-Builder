@@ -29,9 +29,9 @@ export function registerLibraryRoutes(app: FastifyInstance, deps: LibraryDeps): 
     },
   }, async (req, reply) => {
     const b = req.body as { kind: Kind; name: string; body: unknown; baseSeq?: number };
-    const c = checkItem(b.kind, b.name, b.body);
-    if (!c.ok) return reply.code(400).send({ error: 'invalid', problem: c.problem });
     const id = (req.params as { id: string }).id.toLowerCase();
+    const c = checkItem(b.kind, b.name, b.body, id);
+    if (!c.ok) return reply.code(400).send({ error: 'invalid', problem: c.problem });
     const r = putItem(db(), req.actor!.id, { id, kind: b.kind, name: c.name, body: c.body, ...(b.baseSeq !== undefined ? { baseSeq: b.baseSeq } : {}) }, deps.now());
     if (!r.ok) return reply.code(r.status).send(r.item ? { error: r.error, item: r.item } : { error: r.error });
     return reply.code(r.created ? 201 : 200).send({ item: r.item });

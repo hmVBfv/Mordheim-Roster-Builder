@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Scenarios', 'Lore']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Scenarios', 'Locations', 'Lore']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
@@ -346,5 +346,81 @@ describe('the Library: scenarios', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Remove this scenario' }));
     await user.click(within(sheet).getByRole('button', { name: 'Yes, remove it' }));
     await waitFor(() => expect(kept()).toHaveLength(1));
+  });
+});
+
+/* Wishes #73 and #74: places of the world, and links between the entries of the Library, seen openly there. */
+describe('the Library: places and links', () => {
+  const npcBody = { de: '', status: '', faction: '', named: false, statlineTts: '', profile: null };
+
+  it('a place is written with a tag and read in the list', async () => {
+    const srv = server();
+    const user = userEvent.setup();
+    at('/library/locations');
+    await user.click(await screen.findByRole('button', { name: 'New place' }));
+    const sheet = screen.getByRole('dialog', { name: 'A new place' });
+    await user.type(within(sheet).getByLabelText('Name (English)'), 'Ostermark');
+    await user.type(within(sheet).getByLabelText('Kind of place'), 'Region');
+    await user.type(within(sheet).getByLabelText('The lore'), 'Forests, war and a long border.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    const list = await screen.findByRole('list', { name: 'Places' });
+    expect(within(list).getByText('Ostermark')).toBeTruthy();
+    expect(within(list).getByText('Region')).toBeTruthy();
+    expect([...srv.state.library.values()]).toMatchObject([{ kind: 'location', name: 'Ostermark', body: { type: 'Region', lore: 'Forests, war and a long border.', links: [] } }]);
+  });
+
+  it('an entry is linked to another, and both show the link openly; a link is taken away again', async () => {
+    const srv = server();
+    const watch = srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '' } });
+    srv.libraryFrom({ kind: 'npc', name: 'Captain Brandt', body: npcBody });
+    srv.libraryFrom({ kind: 'idea', name: 'Not linkable', body: { text: 'x', topic: 'other' } });
+    const user = userEvent.setup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    let sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    const add = within(sheet).getByLabelText('Add a link');
+    // only entries that can be linked, named with their kind, and not itself
+    expect(within(add).getAllByRole('option').map((o) => o.textContent)).toEqual(['Choose …', 'Captain Brandt (NPC)']);
+    await user.selectOptions(add, 'Captain Brandt (NPC)');
+    expect(within(sheet).getByRole('button', { name: 'Remove link to Captain Brandt' })).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toHaveLength(1));
+    const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
+    expect(within(within(card).getByRole('list', { name: 'Linked entries' })).getByText('Captain Brandt')).toBeTruthy();
+    // the other side reads the link too
+    cleanup();
+    at('/library/npcs');
+    const npcCard = within(await screen.findByRole('list', { name: 'NPCs' })).getByText('Captain Brandt').closest('li')!;
+    expect(within(within(npcCard).getByRole('list', { name: 'Linked entries' })).getByText('The Watch')).toBeTruthy();
+    // taken away
+    cleanup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    await user.click(within(sheet).getByRole('button', { name: 'Remove link to Captain Brandt' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toEqual([]));
+  });
+
+  it('a link to an entry that is gone is not shown', async () => {
+    const srv = server();
+    srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '', links: ['gone-for-good'] } });
+    at('/library/factions');
+    const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
+    expect(within(card).queryByRole('list', { name: 'Linked entries' })).toBeNull();
+  });
+
+  /* Not seen here does not mean gone: the target may be written on another device that has not synced yet.
+     A save of the entry must not drop what it cannot see. */
+  it('a save keeps a link to an entry this device does not know', async () => {
+    const srv = server();
+    const watch = srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '', links: ['written-elsewhere'] } });
+    const user = userEvent.setup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    await user.type(within(sheet).getByLabelText('What the players may read'), 'Known in the quarter');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(srv.state.library.get(watch.id)!.body).toMatchObject({ status: 'Known in the quarter', links: ['written-elsewhere'] }));
   });
 });
