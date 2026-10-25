@@ -7,10 +7,10 @@
    that tap closes it. One bubble at a time.
 
    The bubble is drawn into <body>, fixed to the word and kept inside the
-   screen; it follows the word while the page scrolls. (Inside an open
-   <dialog> it would sit under the dialog's top layer – the cards are not in
-   one; a sheet that wants bubbles must draw them inside itself.) */
-import { Fragment, useEffect, useId, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
+   screen; it follows the word while the page scrolls. A word inside an open
+   <dialog> (a sheet) draws it into that dialog instead: <body> lies under the
+   dialog's top layer, and the bubble would not be seen (report #78). */
+import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import ui from './ui.module.css';
 
@@ -48,6 +48,8 @@ function TipButton({ label, tips }: { label: string; tips: readonly TipEntry[] }
   const pinned = useRef(false);
   const word = useRef<HTMLButtonElement>(null);
   const bubble = useRef<HTMLDivElement>(null);
+  // where the bubble is drawn: inside the sheet the word is in, else the body (#78); known once the word is touched
+  const [host, setHost] = useState<HTMLElement>(() => document.body);
 
   useLayoutEffect(() => {
     if (!open) { pinned.current = false; return; }
@@ -80,12 +82,13 @@ function TipButton({ label, tips }: { label: string; tips: readonly TipEntry[] }
         data-tip=""
         aria-expanded={open}
         aria-describedby={open ? bubbleId : undefined}
-        onClick={() => {
+        onClick={(e) => {
           if (open && pinned.current) { setOpen(null); return; }
           pinned.current = true;
+          setHost(e.currentTarget.closest('dialog') ?? document.body);
           setOpen(id);
         }}
-        onPointerEnter={(e) => { if (e.pointerType === 'mouse' && openId !== id) { pinned.current = false; setOpen(id); } }}
+        onPointerEnter={(e) => { if (e.pointerType === 'mouse' && openId !== id) { pinned.current = false; setHost(e.currentTarget.closest('dialog') ?? document.body); setOpen(id); } }}
         onPointerLeave={(e) => { if (e.pointerType === 'mouse' && openId === id && !pinned.current) setOpen(null); }}
       >
         {label}
@@ -100,7 +103,7 @@ function TipButton({ label, tips }: { label: string; tips: readonly TipEntry[] }
             </Fragment>
           ))}
         </div>,
-        document.body,
+        host,
       )}
     </>
   );

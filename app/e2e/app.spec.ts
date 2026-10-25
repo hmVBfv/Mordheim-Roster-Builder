@@ -1106,6 +1106,24 @@ for (const theme of THEMES) {
   });
 }
 
+/* Report #78: a word with rules inside the Hire sheet drew its bubble under the sheet, so a tap showed nothing. */
+test('a rule word in the Hire sheet opens its bubble above the sheet', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  await page.getByRole('link', { name: 'Hire', exact: true }).click();
+  await page.getByRole('checkbox', { name: 'Only those this warband may hire' }).uncheck();
+  await page.getByRole('searchbox', { name: 'Find by name or race' }).fill('Halfling Scout');
+  await page.getByRole('list', { name: 'Hired Swords' }).getByRole('button').first().click();
+  const sheet = page.locator('dialog[open]');
+  await sheet.getByRole('button', { name: 'Cook', exact: true }).click();
+  const bubble = page.getByRole('tooltip');
+  await expect(bubble).toBeVisible();
+  await expect(bubble).toContainText('MAXIMUM SIZE');
+  // <body> lies under the sheet's top layer: the bubble has to be drawn inside the sheet to be seen above it
+  await expect(sheet.getByRole('tooltip')).toBeVisible();
+  await shot(page, 'hire-sheet-tip');
+});
+
 test('one who may not join says why, and cannot be hired', async ({ page }) => {
   await page.goto('./');
   await importSample(page);
