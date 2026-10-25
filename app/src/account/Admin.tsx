@@ -324,7 +324,7 @@ function Audit() {
       <div className={styles.tableWrap}>
         <table className={styles.table} aria-label="Audit log">
           <thead>
-            <tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th><th scope="col">Detail</th></tr>
+            <tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What</th><th scope="col">Details</th></tr>
           </thead>
           <tbody>
             {log.items.map((e) => {
@@ -334,7 +334,7 @@ function Audit() {
                   <td data-label="When"><time dateTime={e.at}>{stamp(e.at)}</time></td>
                   <td data-label="Who"><strong>{l.who}</strong></td>
                   <td data-label="What">{l.what}</td>
-                  <td data-label="Detail">{l.detail}</td>
+                  <td data-label="Details">{l.detail}</td>
                 </tr>
               );
             })}

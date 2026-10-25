@@ -9,7 +9,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   test(`a player reports a problem from the header and follows it under Account, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     const srv = await playServer(page);
-    await page.goto('more');
+    await page.goto('account');
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
@@ -56,7 +56,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   test(`Back closes the report sheet and stays in the app, in ${theme}`, async ({ page }) => {
     await useTheme(page, theme);
     await playServer(page);
-    await page.goto('more');
+    await page.goto('account');
     await page.getByRole('button', { name: 'Report a bug' }).click();
     const form = page.getByRole('dialog', { name: 'Report a problem' });
     await expect(form).toBeVisible();
@@ -84,6 +84,12 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-admin-reports`);
+    // #67: the mark of an attached warband is a small pill of one line, not a bubble stretched to the height of the title
+    const flag = table.getByText('warband attached');
+    const pill = (await flag.boundingBox())!;
+    const card = (await table.getByRole('row').nth(2).boundingBox())!;
+    expect(pill.height).toBeLessThan(32);
+    expect(pill.x + pill.width).toBeLessThanOrEqual(card.x + card.width);
     await page.getByRole('button', { name: 'Open: Gold drifts after the second battle' }).click();
     const sheet = page.getByRole('dialog', { name: 'Gold drifts after the second battle' });
     await expect(sheet.getByText('After the battle the gold is off by 15.', { exact: true })).toBeVisible();

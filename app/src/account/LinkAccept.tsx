@@ -11,6 +11,7 @@ import { api, errorText, type Me } from './api.ts';
 import styles from './Account.module.css';
 import { deviceLabel } from './device.ts';
 import { signedIn } from './session.ts';
+import { ACCOUNT } from '../app/paths.ts';
 
 type Answer = { stage: 'totp' } | { stage: 'full'; user: Me };
 type Check = { kind: 'register' | 'reset'; expiresAt: string; username: string | null };
@@ -79,7 +80,7 @@ export function LinkAccept() {
       signedIn(a);
       taken = '';
       // with an authenticator the code is still due: the sign-in screen asks for it
-      navigate(a.stage === 'full' ? '/more' : '/sign-in?next=/more', { replace: true });
+      navigate(a.stage === 'full' ? ACCOUNT : `/sign-in?next=${ACCOUNT}`, { replace: true });
     } catch (e) {
       setError(errorText(e));
     } finally {

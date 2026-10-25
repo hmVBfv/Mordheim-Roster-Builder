@@ -64,6 +64,29 @@ for (const theme of THEMES) {
   });
 }
 
+/* #68: a caster's card shows the spell list of his school, with casting values and effects. */
+test('a Wizard shows the spells of his school on his card', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('link', { name: 'Warbands' }).click();
+  await page.getByRole('link', { name: 'New warband' }).click();
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('caravans');
+  await page.getByRole('textbox', { name: 'Name' }).fill('The Silver Caravan');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  const sheet = page.locator('dialog[open]');
+  await sheet.getByRole('button', { name: /^Merchant/ }).click();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await sheet.getByRole('button', { name: /^Magician/ }).click();
+  const wizard = await unit(page, 'Magician', 'Skills & injuries');
+  const list = wizard.getByRole('list', { name: /^Spell list: / });
+  await expect(list).toBeVisible();
+  expect(await list.getByRole('listitem').count()).toBeGreaterThan(3);
+  await expect(list.getByRole('listitem').first()).toContainText(/cast on \d/);
+  await noSideScroll(page);
+  await list.scrollIntoViewIfNeeded();
+  await shot(page, 'wizard-spell-list');
+});
+
 /* Phase 3a: a warband built from nothing, in both themes. Every sheet is
    checked open (width, touch targets) and photographed. */
 for (const theme of THEMES) {
@@ -214,7 +237,7 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await page.getByRole('link', { name: /^‹ / }).click();
   const stash = page.getByRole('region', { name: 'Stash' });
   await expect(stash.getByText('Sword')).toBeVisible();
-  await stash.scrollIntoViewIfNeeded();
+  // the roster settles for a moment after the sync; a screenshot of the window needs no stable element (scrollIntoViewIfNeeded did, and failed on a slow runner)
   await page.screenshot({ path: `test-results/screens/${test.info().project.name}-roster-stash.png` });
   await stash.getByRole('button', { name: 'Give Sword' }).click();
   await stash.getByRole('group', { name: 'Give Sword to' }).getByRole('button').filter({ hasNot: page.locator('[disabled]') }).first().click();
@@ -710,6 +733,8 @@ test('Back closes the sheets of the roster', async ({ page }) => {
 /* Back closes a sheet instead of leaving the app (Rob, 28.09.2026). */
 test('Back closes the import sheet and stays on the screen', async ({ page }) => {
   await page.goto('./');
+  // the bare address leads on to Home (#70); that is the address Back returns to
+  await expect(page).toHaveURL(/\/home$/);
   const home = page.url();
   await page.getByRole('link', { name: 'Warbands' }).click();
   const here = page.url();
@@ -892,7 +917,7 @@ test('without crypto.randomUUID (plain http) a warband can be started and import
 
 test('the account is the campaign app’s: Account shows it there, the Quick Build has settings instead', async ({ page }) => {
   const quick = test.info().project.name === 'quickbuild';
-  await page.goto(quick ? '#/more' : 'more');
+  await page.goto(quick ? '#/settings' : 'account');
   await expect(page.getByRole('heading', { level: 1, name: quick ? 'Settings' : 'Account' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Sign-in and security' })).toHaveCount(quick ? 0 : 1);
   await page.goto(quick ? '#/sign-in' : 'sign-in');

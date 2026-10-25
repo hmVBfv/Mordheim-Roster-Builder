@@ -25,7 +25,7 @@ test('send to the campaign server: the address once in Settings, then a link tha
   await page.getByRole('link', { name: 'Export', exact: true }).click();
   await expect(page.getByText('enter its address under Settings → Campaign server', { exact: false })).toBeVisible();
 
-  await page.goto('#/more');
+  await page.goto('#/settings');
   await page.getByLabel('Campaign server').fill('mordheim.example.org/');
   await page.getByRole('button', { name: 'Save the address' }).click();
   await expect(page.getByText('Export → “Send to campaign server” opens https://mordheim.example.org.')).toBeVisible();

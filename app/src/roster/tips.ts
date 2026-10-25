@@ -69,10 +69,25 @@ function rules(chips: (ItemInfo & { key: string })[], defs: core.RuleDef[], skip
   return out;
 }
 
+/** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */
+export interface SpellLore { name: string; note: string; spells: { name: string; diff: string; text: string; known: boolean }[] }
+
+/** A caster's school by its key in the data, with what he knows of it; null for no school or an unknown one. */
+export function loreView(ctx: core.Ctx, lore: string | null, known: { name: string }[]): SpellLore | null {
+  const l = lore ? ctx.data.SPELLS[lore] : undefined;
+  if (!l) return null;
+  // a line that starts with ▸ is a heading of the data (the Marks of the Marauders), not a spell
+  const spells = l.spells.filter(([n]) => !String(n).startsWith('▸')).map(([n, t]) => ({
+    name: core.spellLabel(n), diff: /\((\d+|auto)\)\s*$/i.exec(String(n))?.[1]?.toLowerCase() ?? '', text: plain(t), known: known.some((s) => s.name === n),
+  }));
+  return spells.length ? { name: l.name, note: plain(l.note), spells } : null;
+}
+
 /** Everything a warrior's card names, with its rules. */
 export interface WarriorFacts {
   rules: Fact[]; equipment: Fact[]; skills: Fact[]; spells: Fact[];
   mutations: Fact[]; mark: Fact[]; injuries: Fact[];
+  lore: SpellLore | null;
 }
 
 /* A warrior's special rules depend only on his unit, whether he is a Hero
@@ -113,6 +128,7 @@ export function warriorFacts(ctx: core.Ctx, m: Model): WarriorFacts {
       return fact(nm, tipOf(core.keyedInfo(data, key) ?? core.tooltipInfo(data, nm), nm, 'Skill'));
     }),
     spells: (m.spells ?? []).map((s) => fact(s.name, tipOf(core.spellInfo(data, s.name), core.spellLabel(s.name), 'Spell'))),
+    lore: loreView(ctx, core.casterLore(ctx, m), m.spells ?? []),
     mutations,
     mark,
     injuries: (m.inj ?? []).map((j) => injury(data, j)),
@@ -122,7 +138,7 @@ export function warriorFacts(ctx: core.Ctx, m: Model): WarriorFacts {
 /** Everything a Hired Sword's or Dramatis Persona's card names. His skills
     are those he comes with (and his persona's) and those he learned, as the
     Roster Builder lists them; his own wording of a skill comes first. */
-export interface HireFacts { rules: Fact[]; skills: Fact[]; spells: Fact[] }
+export interface HireFacts { rules: Fact[]; skills: Fact[]; spells: Fact[]; lore: SpellLore | null }
 
 export function hireFacts(ctx: core.Ctx, rec: HireRecord, e: HireEntry, kind: 'hs' | 'dp', key: string): HireFacts {
   const data = ctx.data;
@@ -146,5 +162,6 @@ export function hireFacts(ctx: core.Ctx, rec: HireRecord, e: HireEntry, kind: 'h
       const lbl = core.spellLabel(s.name);
       return fact(lbl, tipOf(core.spellInfo(data, s.name), lbl, 'Spell'));
     }),
+    lore: loreView(ctx, e.magic ?? null, rec.spells ?? []),
   };
 }

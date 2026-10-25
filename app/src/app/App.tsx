@@ -4,6 +4,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, HashRouter, Navigate, Route, Routes } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
+import { ACCOUNT, HOME, MY_REPORTS } from './paths.ts';
 import { Home } from '../routes/Home.tsx';
 import { More } from '../routes/More.tsx';
 import { Placeholder } from '../routes/Placeholder.tsx';
@@ -41,7 +42,8 @@ export function AppRoutes() {
     <Shell>
       <Suspense fallback={null}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Navigate to={HOME} replace />} />
+          <Route path={HOME} element={<Home />} />
           <Route path="/warbands" element={<Warbands />} />
           <Route path="/warbands/new" element={<NewWarband />} />
           <Route path="/warbands/:id" element={<Roster />} />
@@ -67,10 +69,12 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/versions" element={<Versions />} />}
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/aftermath/:bid" element={<Aftermath />} />}
           {FLAVOUR === 'campaign' && <Route path="/import" element={<ImportLink />} />}
-          <Route path="/more" element={<More />} />
+          <Route path={ACCOUNT} element={<More />} />
+          <Route path="/more" element={<Navigate to={ACCOUNT} replace />} />
           {FLAVOUR === 'campaign' && <Route path="/library" element={<Navigate to="/library/ideas" replace />} />}
           {FLAVOUR === 'campaign' && <Route path="/library/:tab" element={<Library />} />}
-          {FLAVOUR === 'campaign' && <Route path="/more/reports" element={<MyReports />} />}
+          {FLAVOUR === 'campaign' && <Route path={MY_REPORTS} element={<MyReports />} />}
+          {FLAVOUR === 'campaign' && <Route path="/more/reports" element={<Navigate to={MY_REPORTS} replace />} />}
           <Route path="*" element={<Placeholder title="Not found" text="There is nothing at this address." />} />
         </Routes>
       </Suspense>

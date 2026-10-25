@@ -46,7 +46,7 @@ describe('reporting a problem', () => {
   it('the beetle with its word is in the header of every screen and opens the form straight away, a bug already chosen', async () => {
     server();
     const user = userEvent.setup();
-    for (const path of ['/', '/more', '/world']) {
+    for (const path of ['/', '/account', '/world']) {
       const { unmount } = at(path);
       const button = await screen.findByRole('button', { name: 'Report a bug' });
       // the word is on the button, not only in its name: a flag nobody recognised was not found (Rob, 20.10.2026)
@@ -62,7 +62,7 @@ describe('reporting a problem', () => {
   it('a kind and a sentence are enough: the technical details go along, and the player sees them first', async () => {
     const { srv, me } = server();
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     // the report button waits for words
     const send = within(form).getByRole('button', { name: 'Send' });
@@ -72,7 +72,7 @@ describe('reporting a problem', () => {
     // what goes along is readable before sending
     await user.click(within(form).getByText('What goes along'));
     const preview = within(form).getByText(/^# Problem report: The trading post does not open\./);
-    expect(preview.textContent).toMatch(/Screen: \/more/);
+    expect(preview.textContent).toMatch(/Screen: \/account/);
     expect(preview.textContent).toMatch(/theme chronicle · campaign · online/);
     await user.click(send);
     expect(await screen.findByText('Sent')).toBeTruthy();
@@ -81,12 +81,12 @@ describe('reporting a problem', () => {
     expect(got).toHaveLength(1);
     expect(got[0]).toMatchObject({
       reporterId: me.id, kind: 'bug', title: 'The trading post does not open.', text: 'The trading post does not open.\nI tap Buy and nothing happens.', status: 'new',
-      view: '/more', consent: false, attachment: null,
+      view: '/account', consent: false, attachment: null,
     });
     const ctx = got[0]!.context as { screen: string; settings: { flavour: string; online: boolean }; steps: { kind: string; what: string }[]; houseRules: unknown };
-    expect(ctx.screen).toBe('/more');
+    expect(ctx.screen).toBe('/account');
     expect(ctx.settings).toMatchObject({ flavour: 'campaign', online: true });
-    expect(ctx.steps.map((s) => `${s.kind}:${s.what}`)).toContain('screen:/more');
+    expect(ctx.steps.map((s) => `${s.kind}:${s.what}`)).toContain('screen:/account');
     expect(ctx.houseRules).toEqual({ warband: null, campaign: null });
     expect(got[0]!.device).toMatch(/\S/);
   });
@@ -94,7 +94,7 @@ describe('reporting a problem', () => {
   it('the technical details can be left out; the sentence still goes', async () => {
     const { srv } = server();
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     await user.type(within(form).getByLabelText(/What did you want to do/), 'It does not work.');
     await user.click(within(form).getByRole('checkbox', { name: /Send the technical details/ }));
@@ -106,7 +106,7 @@ describe('reporting a problem', () => {
   it('a wish needs no source; a rules issue asks where the rule stands and sends it', async () => {
     const { srv } = server();
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     expect(within(form).queryByLabelText(/Where does the rule stand/)).toBeNull();
     await user.click(within(form).getByRole('radio', { name: /Rules issue/ }));
@@ -152,7 +152,7 @@ describe('reporting a problem', () => {
     const { srv } = server();
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     await user.type(within(form).getByLabelText(/What did you want to do/), 'Sync hangs.');
     expect((within(form).getByRole('button', { name: 'Send' }) as HTMLButtonElement).disabled).toBe(true);
@@ -162,7 +162,7 @@ describe('reporting a problem', () => {
     const text = await navigator.clipboard.readText(); // user-event's own clipboard
     expect(text).toMatch(/^# Problem report: Sync hangs\./);
     expect(text).toContain('Sync hangs.');
-    expect(text).toContain('Screen: /more');
+    expect(text).toContain('Screen: /account');
     expect(text).toContain('offline');
     expect(srv.state.bugs).toEqual([]);
   });
@@ -170,7 +170,7 @@ describe('reporting a problem', () => {
   it('signed out: the report can be copied, not sent', async () => {
     server('nobody');
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     await user.type(within(form).getByLabelText(/What did you want to do/), 'The sign-in page is odd.');
     expect(within(form).getByText(/Sign in to send it/)).toBeTruthy();
@@ -187,7 +187,7 @@ describe('reporting a problem', () => {
       return inner(input, init);
     }));
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     const words = within(form).getByLabelText(/What did you want to do/) as HTMLTextAreaElement;
     await user.type(words, 'Gold drifts.');
@@ -211,7 +211,7 @@ describe('reporting a problem', () => {
     await expect(api('/people')).rejects.toThrow();
     await expect(api('/warbands/3f2a9c1e-5b7d-4f60-9a1c-2d8e7b6a5f40/versions/3?x=SECRET')).rejects.toThrow();
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     const form = await openForm(user);
     await user.type(within(form).getByLabelText(/What did you want to do/), 'Nothing loads.');
     await user.click(within(form).getByRole('button', { name: 'Send' }));
@@ -229,7 +229,7 @@ describe('following a report', () => {
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Gold drifts', text: 'After the battle the gold is off.', status: 'fixed', fixedIn: '0123456789abcdef0123456789abcdef01234567', severity: 'S1', area: 'gold ledger' });
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Dark mode please', text: 'A darker theme.', kind: 'wish', status: 'new' });
     srv.bugFrom({ reporterId: 'user-ben', reporterName: 'Ben', title: 'Ben’s secret problem', text: 'BEN-SECRET', status: 'new' });
-    at('/more/reports');
+    at('/account/reports');
     const table = await screen.findByRole('table', { name: 'Your reports' });
     expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['#', 'Report', 'Kind', 'Status', 'Sent', 'Last change', 'Open']);
     const rows = within(table).getAllByRole('row').slice(1);
@@ -249,7 +249,7 @@ describe('following a report', () => {
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'After the battle the gold is off. After the battle…', text: long, headline: 'Gold drifts after a battle', status: 'confirmed', severity: 'S2', area: 'gold ledger' });
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'A darker theme please, if that is possible', text: 'A darker theme please, if that is possible at all.', kind: 'wish' });
     const user = userEvent.setup();
-    at('/more/reports');
+    at('/account/reports');
     const table = await screen.findByRole('table', { name: 'Your reports' });
     // the heading stands where the cut-off beginning stood; a report without one shows the beginning
     expect(within(table).getByText('Gold drifts after a battle')).toBeTruthy();
@@ -266,7 +266,7 @@ describe('following a report', () => {
     const { srv, me } = server();
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Gold drifts', text: 'x', status: 'new' });
     const user = userEvent.setup();
-    at('/more');
+    at('/account');
     await screen.findByRole('heading', { level: 1, name: 'Account' });
     // no box of reports on the settings page any more
     expect(screen.queryByRole('region', { name: 'Your reports' })).toBeNull();
@@ -280,7 +280,7 @@ describe('following a report', () => {
 
   it('nothing sent yet: the tab says so', async () => {
     server();
-    at('/more/reports');
+    at('/account/reports');
     expect(await screen.findByText('You have not sent a report yet. The Bug button at the top of every screen opens the form.')).toBeTruthy();
     expect(screen.queryByRole('table', { name: 'Your reports' })).toBeNull();
   });
