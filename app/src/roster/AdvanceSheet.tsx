@@ -59,7 +59,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
         {v.applied >= v.earned && <p className={ui.muted}>No advance is due by his experience; enter one only if the rules give it (a scenario, a house rule).</p>}
       </div>
       <details className={styles.table}>
-        <summary>The table</summary>
+        <summary className={ui.fold}>The table</summary>
         <ul>{v.table.map((r) => <li key={r.from}><b>{r.from === r.to ? r.from : `${r.from}–${r.to}`}</b> {r.label}</li>)}</ul>
       </details>
       <label className={ui.field}><span>2D6 as rolled</span>

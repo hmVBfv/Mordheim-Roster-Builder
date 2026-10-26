@@ -555,6 +555,12 @@ for (const theme of THEMES) {
 
     // 7: +1 WS or +1 BS
     await ulrich.getByRole('button', { name: 'Advance' }).click();
+    // #83: the table folds out, and its title looks like something to tap (a bar with a border), not like the text around it
+    const fold = sheet.getByText('The table', { exact: true });
+    expect(await fold.evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth))).toBeGreaterThan(0);
+    await fold.click();
+    await expect(sheet.locator('details li').first()).toBeVisible();
+    await fold.click();
     await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('7');
     await sheet.getByRole('button', { name: '+1 Weapon Skill' }).click();
     await noSideScroll(page); await tapTargets(page);
