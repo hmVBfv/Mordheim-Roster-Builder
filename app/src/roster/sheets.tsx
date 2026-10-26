@@ -119,7 +119,7 @@ export function RecruitSheet({ dialogRef, close, v, onRecruit }: SheetProps & { 
       <div className={ui.page}>
         <div>
           <h2 id={id}>Recruit</h2>
-          <p className={ui.muted}>{v.planner ? `Value ${v.value} gc, no limit` : `${v.gold} gc left`} · Heroes {v.heroCount} of {v.heroMax} · Models {v.models}/{v.maxModels}</p>
+          <p className={ui.muted}>{v.planner ? `Value ${v.value} gc, no limit` : `${v.gold} gc left`} · Heroes {v.heroCount} of {v.heroMax} · Models {v.models}/{v.maxModels - v.maxBonus}{v.maxBonus > 0 && ` (+${v.maxBonus})`}</p>
         </div>
         {v.recruit.map((g) => (
           <section key={g.label} className={styles.recruitGroup} aria-label={g.label}>

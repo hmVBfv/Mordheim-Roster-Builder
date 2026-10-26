@@ -35,7 +35,7 @@ function Body({ id, read }: { id: string; read: Read }) {
         <dl className={board.tiles}>
           <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>
           <div className={board.tile}><dt>Rating</dt><dd>{v.rating}</dd></div>
-          <ModelsTile models={v.models} max={v.maxModels} />
+          <ModelsTile models={v.models} max={v.maxModels} bonus={v.maxBonus} />
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
       </header>
