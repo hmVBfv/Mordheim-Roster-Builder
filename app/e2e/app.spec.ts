@@ -82,6 +82,10 @@ test('a Wizard shows the spells of his school on his card', async ({ page }) => 
   await expect(list).toBeVisible();
   expect(await list.getByRole('listitem').count()).toBeGreaterThan(3);
   await expect(list.getByRole('listitem').first()).toContainText(/cast on \d/);
+  // #81: the wizard's starting spell is chosen from the list; once he has it, the choice is closed
+  await list.getByRole('button', { name: /^Choose / }).first().click();
+  await expect(list.getByRole('listitem').filter({ hasText: 'known' })).toHaveCount(1);
+  await expect(list.getByRole('button', { name: /^Choose / })).toHaveCount(0);
   await noSideScroll(page);
   await list.scrollIntoViewIfNeeded();
   await shot(page, 'wizard-spell-list');

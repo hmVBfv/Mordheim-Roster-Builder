@@ -44,6 +44,8 @@ export interface UnitActs {
   taken: Taken | null;
   correctTaken?(): void;
   correctInjuries?(): void;
+  /** Chooses one of the spells he starts with (#81), by its name in the data. */
+  learnSpell?(name: string): void;
   /** Mutations and the Mark: one button each. */
   chaos: { label: string; run: () => void }[];
   outOfAction?(): void;
@@ -202,12 +204,15 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       <Section title="Skills"><Facts items={u.skills} empty={u.xp ? 'No skills yet. The next advance can bring one.' : 'None.'} /></Section>
       {u.spells.length > 0 && <Section title="Spells"><Facts items={u.spells} /></Section>}
       {u.lore && (
-        <Section title={`Spell list · ${u.lore.name}`}>
+        <Section title={`Spell list · ${u.lore.name}`} side={u.lore.open > 0 && acts?.learnSpell ? `${u.lore.open} to choose at the start` : undefined}>
           <ul className={styles.lore} aria-label={`Spell list: ${u.lore.name}`}>
             {u.lore.spells.map((sp) => (
               <li key={sp.name} className={sp.known ? styles.loreKnown : undefined}>
                 <span><b>{sp.name}</b>{sp.diff && <span className={styles.loreDiff}> · cast on {sp.diff}{sp.diff === 'auto' ? '' : '+'}</span>}{sp.known && <span className={styles.loreMark}> · known</span>}</span>
                 {sp.text && <small>{sp.text}</small>}
+                {!sp.known && u.lore!.open > 0 && acts?.learnSpell && (
+                  <button type="button" className={styles.btn} onClick={() => acts.learnSpell!(sp.key)}>{`Choose ${sp.name}`}</button>
+                )}
               </li>
             ))}
           </ul>
