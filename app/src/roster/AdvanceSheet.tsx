@@ -60,7 +60,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
       </div>
       <details className={styles.table}>
         <summary className={ui.fold}>The table</summary>
-        <ul>{v.table.map((r) => <li key={r.from}><b>{r.from === r.to ? r.from : `${r.from}–${r.to}`}</b> {r.label}</li>)}</ul>
+        <ul>{v.table.map((r) => <li key={r.from}><b>{r.from === r.to ? r.from : `${r.from}–${r.to}`}</b> {r.label}{r.how && <small> – {r.how}</small>}</li>)}</ul>
       </details>
       <label className={ui.field}><span>2D6 as rolled</span>
         <input className={ui.input} inputMode="numeric" maxLength={2} value={roll} autoComplete="off"

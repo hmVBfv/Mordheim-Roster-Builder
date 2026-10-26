@@ -564,6 +564,8 @@ for (const theme of THEMES) {
     expect(await fold.evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth))).toBeGreaterThan(0);
     await fold.click();
     await expect(sheet.locator('details li').first()).toBeVisible();
+    // #84: a result that needs a second roll says so in the table: 6 is a D6 for Strength or Attack
+    await expect(sheet.locator('details li', { hasText: '+1 Strength or +1 Attack' })).toContainText('Roll a D6: 1–3 Strength, 4–6 Attack.');
     await fold.click();
     await sheet.getByRole('textbox', { name: '2D6 as rolled' }).fill('7');
     await sheet.getByRole('button', { name: '+1 Weapon Skill' }).click();
