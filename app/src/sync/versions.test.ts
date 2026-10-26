@@ -11,7 +11,7 @@ import { cleanServer, decodeSave, encodeSave, getServer, importLink } from '../s
 import { data, sampleSave } from '../test/data.ts';
 import { syncOnce } from './engine.ts';
 import { fakeSyncServer } from './fakeServer.ts';
-import { importAsVersion, listVersions, makeCopy, restoreVersion, saveVersion } from './versions.ts';
+import { importAsVersion, listVersions, makeCopy, makePlannerCopy, restoreVersion, saveVersion } from './versions.ts';
 
 const T0 = '2026-10-04T10:00:00.000Z';
 const deps = { userId: KAI.id, data: async () => data, undoMs: 0 };
@@ -78,6 +78,20 @@ describe('a copy: the blueprint for a campaign start', () => {
     expect((await db.warbands.get(id))!.copiedFrom).toBeUndefined();
     await syncOnce(deps);
     expect(srv.state.warbands.get(id)).toMatchObject({ copiedFrom: null, versions: [{ source: 'save' }] });
+  });
+});
+
+describe('a copy as a planner (#88)', () => {
+  it('keeps the men and the gear as a new warband that is a planner with its Trading Post open; the source stays', async () => {
+    const w = record();
+    await db.warbands.add(w);
+    const id = await makePlannerCopy(data, (await db.warbands.get(w.id))!);
+    const copy = (await db.warbands.get(id))!;
+    expect(copy.state).toMatchObject({ planner: true, plannerTrade: true });
+    expect(copy.state.models.map((m) => [m.uid_def, m.name])).toEqual(w.state.models.map((m) => [m.uid_def, m.name]));
+    expect(copy.name).toBe('The Silver Caravan (planner)');
+    expect(copy.origin).toBe('copy');
+    expect((await db.warbands.get(w.id))!.state.planner).toBeUndefined();
   });
 });
 

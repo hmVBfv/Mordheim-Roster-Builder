@@ -74,9 +74,9 @@ export async function versionState(data: GameData, id: string, rev: number): Pro
 }
 
 /** A new warband from this one (or one of its versions): the blueprint's copy. Works offline and without an account. */
-export async function makeCopy(rec: StoredWarband, state: WarbandState = rec.state, rev?: number, now = new Date()): Promise<string> {
+export async function makeCopy(rec: StoredWarband, state: WarbandState = rec.state, rev?: number, now = new Date(), kind = 'copy'): Promise<string> {
   const id = newId();
-  const name = `${state.name || rec.name} (copy)`.slice(0, 80);
+  const name = `${state.name || rec.name} (${kind})`.slice(0, 80);
   const from = rec.serverRev !== undefined ? { id: rec.id, rev: rev ?? rec.serverRev } : undefined;
   const stamp = now.toISOString();
   await db.warbands.add({
@@ -85,6 +85,14 @@ export async function makeCopy(rec: StoredWarband, state: WarbandState = rec.sta
   });
   requestSync();
   return id;
+}
+
+/** A copy that is a planner (wish #88, Rob, 26.10.2026): the same men and gear, kept to plan the late game – its value shown in place of gold,
+    its Trading Post open. The warband it comes from stays as it is. */
+export async function makePlannerCopy(data: GameData, rec: StoredWarband, state: WarbandState = rec.state, now = new Date()): Promise<string> {
+  const ctx = core.ctxOf(data, state);
+  const planner = core.setPlannerTrade(core.ctxOf(data, core.asPlanner(ctx)), true);
+  return makeCopy(rec, planner, undefined, now, 'planner');
 }
 
 /** A save from elsewhere (the Quick Build) as the next version of a warband of the account. */

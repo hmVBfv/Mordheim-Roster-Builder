@@ -27,7 +27,7 @@ import { moreMenView } from '../roster/men.ts';
 import { useEditor } from '../roster/useEditor.ts';
 import { ConflictBanner } from '../sync/ConflictBanner.tsx';
 import { removeWarband, useWarbandRecord } from '../sync/local.ts';
-import { makeCopy } from '../sync/versions.ts';
+import { makeCopy, makePlannerCopy } from '../sync/versions.ts';
 import { ShareSheet } from '../share/ShareSheet.tsx';
 import { useSession } from '../account/session.ts';
 import { useNotice } from '../ui/Notice.tsx';
@@ -310,6 +310,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
             <PanelLink to="/warbands" title="All warbands" note="Switch or start another" />
             {v.planner && <PanelLink title="Trading Post" note={v.plannerTrade ? 'Open – tap to close' : 'Closed – tap to open'} run={() => ed.edit((c) => core.setPlannerTrade(c, !v.plannerTrade), v.plannerTrade ? 'The Trading Post is closed.' : 'The Trading Post is open: rare items can be had.')} />}
             <PanelLink title="Make a copy" note="Same men, a new warband" run={() => { void makeCopy(rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }} />
+            {!v.planner && <PanelLink title="Copy to the planner" note="Same men, no gold limit, Trading Post open" run={() => { void makePlannerCopy(data, rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }} />}
           </Panel>
         } />
 
