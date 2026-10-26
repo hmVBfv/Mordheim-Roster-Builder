@@ -167,9 +167,12 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
   const odds = uid != null && de ? core.searchOdds(ctx, uid, de, Number(extra) || 0) : null;
   const r = Number(roll);
   const rolled = Number.isInteger(r) && r >= 2 && r <= 12;
-  const found = !!odds && rolled && r >= odds.target;
-  const paid = it?.fixed != null && price === '' ? it.fixed : Number(price);
-  const priceOk = Number.isFinite(paid) && paid >= 0 && (it?.fixed != null || price !== '');
+  // a planner (#89) rolls nothing: the merchant has what it looks for, and a price left empty is the average
+  const planner = ctx.s.planner === true;
+  const average = planner && it?.avg != null ? Math.round(it.avg) : null;
+  const found = !!odds && (planner || (rolled && r >= odds.target));
+  const paid = price !== '' ? Number(price) : it?.fixed ?? average ?? NaN;
+  const priceOk = Number.isFinite(paid) && paid >= 0 && (it?.fixed != null || average != null || price !== '');
   const dest: Recipient[] = de ? searchDestinations(ctx, de, true) : [];
   const matching = sortRare(filterRare(items, { q, stat, maxRarity: max, from, grade }), sort);
   const shown = [...items.filter((x) => x.de === de && !matching.includes(x)), ...matching].slice(0, 60);
@@ -202,22 +205,24 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
       <label className={ui.field}><span>Other modifiers (a skill, a Hired Sword, the Merchant's reputation …)</span>
         <input className={ui.input} inputMode="numeric" value={extra} placeholder="0" maxLength={3} onChange={(e) => setExtra(e.target.value.replace(/[^\d-]/g, ''))} />
       </label>
-      <label className={ui.field}><span>2D6 as rolled</span>
-        <input className={ui.input} inputMode="numeric" value={roll} maxLength={2} autoComplete="off" onChange={(e) => setRoll(e.target.value.replace(/\D/g, ''))} />
-      </label>
-      <p className={`${styles.verdict} ${rolled ? (found ? styles.found : styles.missed) : ''}`} aria-live="polite">
-        {!it ? 'Choose the item he looks for.' : !rolled ? 'Enter the roll (2 to 12).' : found ? `${r} — found. The merchant has one.` : `${r} — not found this time.`}
+      {!planner && (
+        <label className={ui.field}><span>2D6 as rolled</span>
+          <input className={ui.input} inputMode="numeric" value={roll} maxLength={2} autoComplete="off" onChange={(e) => setRoll(e.target.value.replace(/\D/g, ''))} />
+        </label>
+      )}
+      <p className={`${styles.verdict} ${rolled || planner ? (found ? styles.found : styles.missed) : ''}`} aria-live="polite">
+        {!it ? 'Choose the item he looks for.' : planner ? 'A planner has no roll to make: the merchant has one.' : !rolled ? 'Enter the roll (2 to 12).' : found ? `${r} — found. The merchant has one.` : `${r} — not found this time.`}
       </p>
       {found && (
         <>
-          <label className={ui.field}><span>{it?.fixed != null ? `Price (${gc(it.fixed)}; Haggle may lower it)` : `Price as asked (${it?.price})`}</span>
-            <input className={ui.input} inputMode="numeric" value={price} placeholder={it?.fixed != null ? String(it.fixed) : ''} maxLength={4} onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))} />
+          <label className={ui.field}><span>{it?.fixed != null ? `Price (${gc(it.fixed)}; Haggle may lower it)` : planner && average != null ? `Price (left empty: the average, ${gc(average)})` : `Price as asked (${it?.price})`}</span>
+            <input className={ui.input} inputMode="numeric" value={price} placeholder={it?.fixed != null ? String(it.fixed) : average != null ? String(average) : ''} maxLength={4} onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))} />
           </label>
           <Pick label="Goes to" items={dest} value={to} onChange={setTo} />
         </>
       )}
       <div className={ui.actions}>
-        <button type="button" className={ui.buttonQuiet} disabled={!it || uid == null} onClick={() => close(() => onMissed(uid!, de!))}>Not found</button>
+        {!planner && <button type="button" className={ui.buttonQuiet} disabled={!it || uid == null} onClick={() => close(() => onMissed(uid!, de!))}>Not found</button>}
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
         <button type="button" className={ui.button} disabled={!found || !priceOk || paid > gold || uid == null}
           onClick={() => close(() => onFound(uid!, de!, paid, to))}>{found && priceOk ? (paid > gold ? 'Not enough gold' : `Buy · ${gc(paid)}`) : 'Buy'}</button>
@@ -277,7 +282,9 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   const navigate = useNavigate();
   const tab: Tab = (TABS.find(([t]) => `#${t}` === location.hash)?.[0]) ?? 'buy';
   const setTab = (t: Tab) => { void navigate({ hash: t === 'buy' ? '' : t }, { replace: true }); };
-  const gold = core.goldCurrent(ctx);
+  // a planner has no gold to run out of (#89)
+  const planner = ctx.s.planner === true;
+  const gold = planner ? Infinity : core.goldCurrent(ctx);
   const [kind, setKind] = useState<Kind>('all');
   const [usable, setUsable] = useState(true);
   const [all, setAll] = useState(false);
@@ -314,9 +321,9 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   return (
     <>
       <dl className={styles.figures}>
-        <div><dt>Gold in hand</dt><dd>{gc(gold)}</dd></div>
+        <div><dt>{planner ? 'Value' : 'Gold in hand'}</dt><dd>{planner ? gc(core.plannerValue(ctx)) : gc(gold)}</dd></div>
         <div><dt>Stash</dt><dd>{stashItems.reduce((n, it) => n + (Number(it.qty) || 0), 0)} items</dd></div>
-        <div><dt>Stage</dt><dd>{core.roundLabel(ctx.s.campaign?.round)}</dd></div>
+        <div><dt>Stage</dt><dd>{planner ? 'Planner' : core.roundLabel(ctx.s.campaign?.round)}</dd></div>
       </dl>
       <Seg label="What to do" value={tab} options={TABS} onChange={setTab} />
 
@@ -458,6 +465,7 @@ function Body({ rec }: { rec: StoredWarband }) {
       </div>
       {locked ? <Locked ed={ed} ctx={ctx} /> : (
         <div className={ui.card}>
+          {ctx.s.planner === true && <p>A planner trades once its Trading Post is opened: under the warband’s menu, <strong>Trading Post</strong>. Then rare items can be had too.</p>}
           <p>Until its first battle the warband buys from its lists, rare items of the list included, at the list price; taking an item back returns its price.</p>
           <p className={ui.muted}>On a warrior's card: ⋯ → Equipment. From the first battle on, common items are bought here, rare items only when a Hero finds them, and selling brings half the price (rulebook p. 46 and 104; Rob, 29.09.2026).</p>
           <p><Link to={`/warbands/${rec.id}`} className={ui.buttonQuiet}>Back to the roster</Link></p>

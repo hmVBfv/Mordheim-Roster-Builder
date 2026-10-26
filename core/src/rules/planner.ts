@@ -15,6 +15,13 @@ export function asPlanner(ctx: Ctx): WarbandState {
   return update(ctx, (d) => { d.planner = true; });
 }
 
+/** Opens or closes a planner's Trading Post (wish #89, Rob, 26.10.2026): open, it trades as a warband does after its first battle –
+    common items bought, rare ones found, selling at half price – while its gold stays no limit. Any other warband is left as it is. */
+export function setPlannerTrade(ctx: Ctx, on: boolean): WarbandState {
+  if (!isPlanner(ctx.s)) return ctx.s;
+  return update(ctx, (d) => { if (on) d.plannerTrade = true; else delete d.plannerTrade; });
+}
+
 /** Everything the planner owns, in gold at the list prices: the figure shown in place of the gold in hand. */
 export const plannerValue = (ctx: Ctx): number => totalSpent(ctx);
 

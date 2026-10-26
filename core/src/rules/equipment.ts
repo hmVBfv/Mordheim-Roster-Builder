@@ -123,6 +123,8 @@ export function upgradeTargets(ctx: Ctx, m: Model, de: string): WeaponRef[] {
     stage after battle 1. Until then it is being founded and buys at the
     founding prices of its list (docs/rules-audit.md, C2/C3/C7). */
 export function warbandHasFought(ctx: Ctx): boolean {
+  // a planner with its Trading Post open trades as one that has (wish #89)
+  if (ctx.s.planner === true && ctx.s.plannerTrade === true) return true;
   const c = ctx.s.campaign;
   if (!c || !c.on) return false;
   const rounds = (c.battles ?? []).map((b) => Number(b.round) || 0);

@@ -290,6 +290,8 @@ export interface WarbandState {
   uidSeq?: number;
   /** A planner (wish #77): no gold limit, advances without experience; see rules/planner.ts. Absent on every other warband. */
   planner?: boolean;
+  /** A planner whose Trading Post is open (wish #89): it trades as a warband after its first battle, without gold limit. */
+  plannerTrade?: boolean;
   /** The gold ledger (V7); absent until the warband's first battle. */
   ledger?: LedgerEntry[];
   [key: string]: unknown;

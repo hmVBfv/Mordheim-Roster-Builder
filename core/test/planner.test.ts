@@ -68,3 +68,33 @@ describe('the planner', () => {
     expect(plain.ok && 'planner' in plain.state).toBe(false);
   });
 });
+
+describe('the planner can open the Trading Post (#89)', () => {
+  it('a planner is founded without it, and opens it by choice; any other warband cannot', () => {
+    const plan = band(true);
+    expect(core.tradeLocked(ctx(plan))).toBe(false);
+    const open = core.setPlannerTrade(ctx(plan), true);
+    expect(core.tradeLocked(ctx(open))).toBe(true);
+    expect(core.tradeLocked(ctx(core.setPlannerTrade(ctx(open), false)))).toBe(false);
+    const plain = core.setPlannerTrade(ctx(band(false)), true);
+    expect(plain.plannerTrade).toBeUndefined();
+    expect(core.tradeLocked(ctx(plain))).toBe(false);
+  });
+
+  it('a rare item found there is booked at the price given, and counts to the value', () => {
+    let s = core.setPlannerTrade(ctx(band(true)), true);
+    const hero = s.models.find((m) => m.uid_def === 'capt')!.uid;
+    const before = core.plannerValue(ctx(s));
+    const rare = data.CATALOG.find((x) => typeof x.cost === 'number' && core.rarityOf(ctx(s), x.de) != null && core.canReceive(ctx(s), hero, { key: x.de, rare: true }).ok)!;
+    const t = core.recordSearch(ctx(s), hero, rare.de, { found: true, paid: Number(rare.cost), to: hero });
+    expect(t.ok).toBe(true);
+    s = t.state;
+    expect(core.plannerValue(ctx(s))).toBe(before + Number(rare.cost));
+  });
+
+  it('the mark survives saving and reading', () => {
+    const s = core.setPlannerTrade(ctx(band(true)), true);
+    const back = core.loadSave(data, JSON.parse(JSON.stringify(core.writeSave(ctx(s)))));
+    expect(back.ok && back.state.plannerTrade).toBe(true);
+  });
+});
