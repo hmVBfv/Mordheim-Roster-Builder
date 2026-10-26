@@ -14,7 +14,10 @@ import { UndoToast } from '../ui/UndoToast.tsx';
 import { ImportSheet } from './ImportSheet.tsx';
 import { CodeSheet } from '../share/CodeSheet.tsx';
 import { Incoming } from '../share/Incoming.tsx';
-import { WarbandList } from './WarbandList.tsx';
+import { WarbandList, type FavouriteChoice } from './WarbandList.tsx';
+import { useFavourites } from './useFavourites.ts';
+import { errorText } from '../account/api.ts';
+import { useOnline } from '../app/SyncState.tsx';
 
 const GroupedWarbands = lazy(() => import('./GroupedWarbands.tsx'));
 
@@ -26,6 +29,12 @@ export function Warbands() {
   const [busy, setBusy] = useState(false);
   const removed = (useLocation().state as { removed?: StoredWarband } | null)?.removed;
   const signedIn = session.status === 'in';
+  const online = useOnline();
+  const fav = useFavourites(signedIn);
+  const favourites: FavouriteChoice | undefined = signedIn
+    ? { has: fav.has, toggle: (id) => { fav.toggle(id).catch((e: unknown) => notify(errorText(e))); }, disabled: !online || !fav.ready || !!fav.error }
+    : undefined;
+  const favoured = signedIn ? (warbands ?? []).filter((w) => fav.has(w.id)) : [];
   const deviceOnly = signedIn ? (warbands ?? []).filter((w) => !w.ownerId) : [];
   // planners (#77) and the warbands entered in a campaign (#91) are kinds of their own: a section each under the free warbands
   const planners = (warbands ?? []).filter((w) => w.state.planner);
@@ -61,22 +70,27 @@ export function Warbands() {
         </div>
       )}
       {warbands && warbands.length === 0 && <Empty scene="fire" title="No warband yet.">Start a new one, or import one from the Roster Builder.</Empty>}
+      {favoured.length > 0 && (
+        <Group id="favourites-h" title="Favourites">
+          <WarbandList warbands={favoured} marks grid favourites={favourites} />
+        </Group>
+      )}
       {played.length > 0 && !signedIn && <WarbandList warbands={played} grid />}
       {played.length > 0 && signedIn && (
         <Suspense fallback={<WarbandList warbands={played} marks grid />}>
-          <GroupedWarbands warbands={played} notify={notify} />
+          <GroupedWarbands warbands={played} notify={notify} favourites={favourites!} />
         </Suspense>
       )}
       {inCampaigns.length > 0 && (
         <Group id="campaigns-h" title="In campaigns">
           <p className={ui.muted}>The copies of your warbands that take part in a campaign. They play there; the free warband they came from is above.</p>
-          <WarbandList warbands={inCampaigns} marks={signedIn} grid />
+          <WarbandList warbands={inCampaigns} marks={signedIn} grid favourites={favourites} />
         </Group>
       )}
       {planners.length > 0 && (
         <Group id="planners-h" title="Planners">
           <p className={ui.muted}>To plan a strong late-game warband: no gold limit, advances without experience. They do not take part in a campaign.</p>
-          <WarbandList warbands={planners} marks={signedIn} grid />
+          <WarbandList warbands={planners} marks={signedIn} grid favourites={favourites} />
         </Group>
       )}
       {removed && (

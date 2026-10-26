@@ -41,6 +41,42 @@ function server() {
 }
 const kept = (srv: ReturnType<typeof server>) => [...srv.state.library.values()].filter((i) => i.kind === 'warband_group' && !i.deletedAt);
 
+const favourites = (srv: ReturnType<typeof server>) => [...srv.state.library.values()].filter((i) => i.kind === 'warband_favourites' && !i.deletedAt);
+
+/* Wish #95 (Rob, 26.10.2026): a warband – a planner too – is marked as a favourite and then stands in a section of its own on top. */
+describe('favourite warbands (#95)', () => {
+  it('a warband is made a favourite and stands in the section Favourites on top; taken out, the section goes', async () => {
+    const srv = server();
+    await db.warbands.bulkPut([warband('wb-1', 'The Grey Penitents'), warband('wb-2', 'Clan Skrittle')]);
+    const user = userEvent.setup();
+    at('/warbands');
+    await user.click(await screen.findByRole('button', { name: 'Favourite The Grey Penitents' }, { timeout: 15_000 }));
+    await waitFor(() => expect(favourites(srv)).toMatchObject([{ body: { warbands: ['wb-1'] } }]));
+    const section = await screen.findByRole('region', { name: 'Favourites' });
+    expect(within(section).getByText('The Grey Penitents')).toBeTruthy();
+    expect(within(section).queryByText('Clan Skrittle')).toBeNull();
+    expect(within(section).getByText(/Favourite$/)).toBeTruthy();
+    // it stays in its own place, too; the toggle says what it does next
+    const again = screen.getAllByRole('button', { name: 'Take The Grey Penitents out of the favourites' });
+    await user.click(again[0]!);
+    await waitFor(() => expect(favourites(srv)).toMatchObject([{ body: { warbands: [] } }]));
+    await waitFor(() => expect(screen.queryByRole('region', { name: 'Favourites' })).toBeNull());
+  });
+
+  it('a planner can be a favourite, and carries both marks', async () => {
+    const srv = server();
+    const planner = warband('wb-2', 'The Late Company');
+    planner.state = { ...planner.state, planner: true };
+    srv.libraryFrom({ name: 'Favourites', kind: 'warband_favourites', body: { warbands: ['wb-2'] } });
+    await db.warbands.bulkPut([planner]);
+    at('/warbands');
+    const section = await screen.findByRole('region', { name: 'Favourites' }, { timeout: 15_000 });
+    const card = within(section).getByText('The Late Company').closest('li')!;
+    expect(card.textContent).toContain('Planner');
+    expect(card.textContent).toContain('Favourite');
+  });
+});
+
 describe('the kinds of warband apart (#91)', () => {
   it('a planner and a warband in a campaign stand in sections of their own, not among the free ones; the menu jumps to a section', async () => {
     server();

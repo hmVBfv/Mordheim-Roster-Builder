@@ -34,3 +34,13 @@ export const BugIcon = (): ReactElement => (
 export const EyeIcon = (): ReactElement => <svg {...base}><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>;
 /** The same eye struck through: the players' view is on. */
 export const EyeOffIcon = (): ReactElement => <svg {...base}><path d="M2 12s3.6-6.5 10-6.5c2 0 3.7.6 5.2 1.4M22 12s-3.6 6.5-10 6.5c-2 0-3.7-.6-5.2-1.4" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /><path d="M4 4l16 16" /></svg>;
+
+/** A comet with two tails in a round medal, the sign of a favourite warband (wish #95): pinned on the ribbon, the comet in the colour of the ribbon. */
+export const CometIcon = (): ReactElement => (
+  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" strokeLinecap="round" aria-hidden="true">
+    <circle cx="13" cy="13" r="11.5" fill="var(--bg)" stroke="currentColor" strokeWidth="1.6" />
+    <circle cx="17.4" cy="13" r="3.2" fill="currentColor" />
+    <path d="M15 11.4C12.4 9.6 9 8 5 6.4" stroke="currentColor" strokeWidth="2" />
+    <path d="M15 14.6C12.4 16.4 9 18 5 19.6" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);

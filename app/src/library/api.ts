@@ -30,6 +30,8 @@ export interface ScenarioBody extends Linked { body: string; npcStatlines: strin
 export interface LocationBody extends Linked { de: string; type: string; lore: string }
 /** A group of one's own warbands: the ids of the warbands in it (server/src/library.ts); the entry's `name` is the group's. */
 export interface WarbandGroupBody { warbands: string[] }
+/** The warbands marked as favourites (server/src/library.ts, wish #95): their ids; the entry's `name` is only a label. */
+export type WarbandFavouritesBody = WarbandGroupBody;
 export interface LibraryItem<B = unknown> { id: string; kind: string; name: string; body: B; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }
 export type Idea = LibraryItem<IdeaBody>;
 export type Faction = LibraryItem<FactionBody>;
@@ -38,6 +40,7 @@ export type LibraryGroup = LibraryItem<GroupBody>;
 export type LibraryScenario = LibraryItem<ScenarioBody>;
 export type LibraryWarbandGroup = LibraryItem<WarbandGroupBody>;
 export type LibraryLocation = LibraryItem<LocationBody>;
+export type LibraryWarbandFavourites = LibraryItem<WarbandFavouritesBody>;
 
 const KEY = 'items';
 
@@ -58,7 +61,7 @@ export async function getLibrary(): Promise<LibraryItem[]> {
 }
 
 /** Writes one entry under the device's id; `baseSeq` is the state it is changed from (none for a new one). */
-export async function putItem<B>(kind: 'idea' | 'faction' | 'npc' | 'group' | 'scenario' | 'warband_group' | 'location', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
+export async function putItem<B>(kind: 'idea' | 'faction' | 'npc' | 'group' | 'scenario' | 'warband_group' | 'location' | 'warband_favourites', id: string, name: string, body: B, baseSeq?: number): Promise<LibraryItem<B>> {
   const who = asker();
   const r = await api<{ item: LibraryItem<B> }>(`/library/${id}`, { method: 'PUT', body: { kind, name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
   const cur = (await cachedLibrary()) ?? [];
@@ -72,6 +75,7 @@ export const putNpc = (id: string, name: string, body: NpcBody, baseSeq?: number
 
 export const putScenario = (id: string, name: string, body: ScenarioBody, baseSeq?: number) => putItem<ScenarioBody>('scenario', id, name, body, baseSeq);
 export const putWarbandGroup = (id: string, name: string, body: WarbandGroupBody, baseSeq?: number) => putItem<WarbandGroupBody>('warband_group', id, name, body, baseSeq);
+export const putWarbandFavourites = (id: string, name: string, body: WarbandFavouritesBody, baseSeq?: number) => putItem<WarbandFavouritesBody>('warband_favourites', id, name, body, baseSeq);
 export const putLocation = (id: string, name: string, body: LocationBody, baseSeq?: number) => putItem<LocationBody>('location', id, name, body, baseSeq);
 export const putGroup = (id: string, name: string, body: GroupBody, baseSeq?: number) => putItem<GroupBody>('group', id, name, body, baseSeq);
 

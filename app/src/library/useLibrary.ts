@@ -2,7 +2,7 @@
    asked while `enabled` is false (nobody signed in). */
 import { useEffect, useState } from 'react';
 import { errorText } from '../account/api.ts';
-import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario, type LibraryLocation, type LibraryWarbandGroup } from './api.ts';
+import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario, type LibraryLocation, type LibraryWarbandFavourites, type LibraryWarbandGroup } from './api.ts';
 
 export function useLibrary(enabled = true) {
   const [items, setItems] = useState<LibraryItem[] | null>(null);
@@ -29,3 +29,5 @@ export const scenariosOf = (items: LibraryItem[] | null): LibraryScenario[] => (
 export const warbandGroupsOf = (items: LibraryItem[] | null): LibraryWarbandGroup[] => (items ?? []).filter((i): i is LibraryWarbandGroup => i.kind === 'warband_group').sort((a, b) => a.name.localeCompare(b.name));
 /** The places of the world among the entries, by name. */
 export const locationsOf = (items: LibraryItem[] | null): LibraryLocation[] => (items ?? []).filter((i): i is LibraryLocation => i.kind === 'location').sort((a, b) => a.name.localeCompare(b.name));
+/** The lists of favourite warbands among the entries, the oldest first (a second device may have written its own; they are read together). */
+export const warbandFavouritesOf = (items: LibraryItem[] | null): LibraryWarbandFavourites[] => (items ?? []).filter((i): i is LibraryWarbandFavourites => i.kind === 'warband_favourites').sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
