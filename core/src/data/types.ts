@@ -79,6 +79,8 @@ export interface WarbandSubtype {
 export interface WarbandDef {
   name: string;
   grade: string;
+  /** The race mordheimer.net lists the warband under (Human, Undead, Chaos Human/Demon …); not the stat race of WBRACE. */
+  siteRace?: string;
   min: number;
   max: number;
   gold?: number;
@@ -190,6 +192,8 @@ export interface Persona {
 export interface HireEntry {
   name: string;
   grade: string;
+  /** The race mordheimer.net lists the warband under (Human, Undead, Chaos Human/Demon …); not the stat race of WBRACE. */
+  siteRace?: string;
   src?: string;
   hire?: number;
   upkeep?: number;
@@ -339,6 +343,8 @@ export interface BeastDef {
   name: string;
   src: string;
   grade: string;
+  /** The race mordheimer.net lists the warband under (Human, Undead, Chaos Human/Demon …); not the stat race of WBRACE. */
+  siteRace?: string;
   profile: Profile;
   sv?: string;
   equipment?: string;
