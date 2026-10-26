@@ -429,3 +429,50 @@ describe('the Library: places and links', () => {
     await waitFor(() => expect(srv.state.library.get(watch.id)!.body).toMatchObject({ status: 'Known in the quarter', links: ['written-elsewhere'] }));
   });
 });
+
+/* Wish #99 (Rob, 26.10.2026): entries of every tab are sorted into folders of one's own; a tab shows them under the folders. */
+describe('the Library: folders', () => {
+  const npcBody = { de: '', status: '', faction: '', named: false, statlineTts: '', profile: null };
+
+  it('an entry is put in a folder, the tab shows its entries under the folders, and the other tabs offer the folder', async () => {
+    const srv = server();
+    const watch = srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '' } });
+    srv.libraryFrom({ kind: 'faction', name: 'The Guild', body: { de: '', status: '', lore: '' } });
+    srv.libraryFrom({ kind: 'npc', name: 'Captain Brandt', body: { ...npcBody, folder: 'Mordheim campaign' } });
+    const user = userEvent.setup();
+    at('/library/factions');
+    // no folder yet among the factions: one plain list
+    expect(await screen.findByRole('list', { name: 'Factions' })).toBeTruthy();
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    const field = within(sheet).getByLabelText('Folder');
+    // the folder of an entry in another tab is offered
+    await waitFor(() => expect([...document.querySelectorAll('#library-folders option')].map((o) => (o as HTMLOptionElement).value)).toEqual(['Mordheim campaign']));
+    await user.type(field, 'Mordheim campaign');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { folder: string }).folder).toBe('Mordheim campaign'));
+    const inFolder = await screen.findByRole('list', { name: 'Factions in Mordheim campaign' });
+    expect(within(inFolder).getByText('The Watch')).toBeTruthy();
+    const rest = screen.getByRole('list', { name: 'Factions in No folder' });
+    expect(within(rest).getByText('The Guild')).toBeTruthy();
+    expect(within(inFolder).queryByText('The Guild')).toBeNull();
+    // and the folder is a folder in the NPCs too
+    cleanup();
+    at('/library/npcs');
+    const npcs = await screen.findByRole('list', { name: 'NPCs in Mordheim campaign' });
+    expect(within(npcs).getByText('Captain Brandt')).toBeTruthy();
+  });
+
+  it('an entry is taken out of its folder by emptying the field', async () => {
+    const srv = server();
+    const watch = srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '', folder: 'Mordheim campaign' } });
+    const user = userEvent.setup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    await user.clear(within(sheet).getByLabelText('Folder'));
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { folder: string }).folder).toBe(''));
+    expect(await screen.findByRole('list', { name: 'Factions' })).toBeTruthy();
+  });
+});

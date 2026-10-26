@@ -16,8 +16,11 @@ export const MAX_ITEMS = 500;
 const NAME = z.string().trim().min(1).max(120);
 /** The entries one entry points to (wish #74): factions, NPCs, groups, scenarios and places link to each other; the ids of the other entries of the same Library, no repeat. Seen openly in the Library, never copied into a campaign. */
 const Links = z.array(z.string().min(1).max(64)).max(100).default([]).refine((l) => new Set(l).size === l.length, { message: 'a link twice' });
+/** The folder an entry stands in (wish #99): a name of one's own, shared by all the tabs; none by default. Warband groups and favourites are folders of their own. */
+const Folder = z.string().trim().max(60).default('');
 const Idea = z.object({
   text: z.string().max(20_000),
+  folder: Folder,
   /** What the idea is about; "Make a …" comes later. */
   topic: z.enum(['campaign', 'faction', 'warband', 'other']).default('other'),
 }).strict();
@@ -27,6 +30,7 @@ const Faction = z.object({
   status: z.string().trim().max(200).default(''),
   lore: z.string().max(20_000).default(''),
   links: Links,
+  folder: Folder,
 }).strict();
 /** An NPC outside any campaign: the world's NPC without its faction id – the faction is only a name here, matched when the NPC goes into a world. */
 const Npc = z.object({
@@ -37,21 +41,24 @@ const Npc = z.object({
   statlineTts: z.string().max(12_000).default(''),
   profile: NpcProfileBody.nullable().default(null),
   links: Links,
+  folder: Folder,
 }).strict();
 /** A group of opponents outside any campaign: a campaign's group (server/src/opponents.ts) without its name (the entry's `name`) and its `baseSeq`. */
 const Group = z.object({
   note: z.string().max(4000).default(''),
   profiles: z.array(Profile).max(MAX_PROFILES).default([]),
   links: Links,
+  folder: Folder,
 }).strict();
 /** A scenario outside any campaign: a campaign's scenario (server/src/scenarios.ts) without its title (the entry's `name`) and its `baseSeq`. Its NPCs keep their hidden parts (ADR 0022); nobody but the owner reads it. */
-const Scenario = ScenarioBody.omit({ title: true, baseSeq: true }).extend({ links: Links });
+const Scenario = ScenarioBody.omit({ title: true, baseSeq: true }).extend({ links: Links, folder: Folder });
 /** A place of the world (wish #73): the German name, a tag to sort and find it by ("Region", "Town" … – free words), and the lore behind it. */
 const Location = z.object({
   de: z.string().trim().max(120).default(''),
   type: z.string().trim().max(40).default(''),
   lore: z.string().max(20_000).default(''),
   links: Links,
+  folder: Folder,
 }).strict();
 /** A group of one's own warbands (the list's folders): the ids of the warbands in it, each in at most one group – the client moves one warband from group to group. */
 const WarbandGroup = z.object({

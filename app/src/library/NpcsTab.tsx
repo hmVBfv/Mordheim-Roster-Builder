@@ -11,6 +11,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import { bodyOf, draftOf, type NpcDraft } from '../world/npcDraft.ts';
 import worldStyles from '../world/World.module.css';
 import { MAX_NAME, MAX_STATUS, putNpc, removeItem, staleItem, type LibraryItem, type LibraryNpc, type NpcBody } from './api.ts';
+import { FolderField, FolderLists } from './folders.tsx';
 import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
 import { npcsOf, useLibrary } from './useLibrary.ts';
@@ -25,6 +26,7 @@ function NpcForm({ npc, items, online, close, onSaved, onRemoved }: {
   const [faction, setFaction] = useState(npc?.body.faction ?? '');
   const [status, setStatus] = useState(npc?.body.status ?? '');
   const [named, setNamed] = useState(npc?.body.named ?? false);
+  const [folder, setFolder] = useState(npc?.body.folder ?? '');
   const [links, setLinks] = useState<string[]>(npc?.body.links ?? []);
   const [draft, setDraft] = useState<NpcDraft>(() => draftOf(npc?.body ?? null));
   const [base, setBase] = useState<number | undefined>(npc?.seq);
@@ -38,7 +40,7 @@ function NpcForm({ npc, items, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const body: NpcBody = { de: nameDe.trim() === name ? '' : nameDe.trim(), status: status.trim(), faction: faction.trim(), named, ...bodyOf(draft), links: keepLinks(items, links) };
+      const body: NpcBody = { de: nameDe.trim() === name ? '' : nameDe.trim(), status: status.trim(), faction: faction.trim(), named, ...bodyOf(draft), links: keepLinks(items, links), folder: folder.trim() };
       const saved = await putNpc(id, name, body, base);
       close(() => onSaved(saved));
     } catch (e) {
@@ -91,6 +93,7 @@ function NpcForm({ npc, items, online, close, onSaved, onRemoved }: {
         <NpcFields cid={null} warbands={[]} extra={[]} name={name} draft={draft} onDraft={setDraft}
           onCopied={(from) => { if (!name) setNameEn(from); }} />
       </Suspense>
+      <FolderField items={items} value={folder} onChange={setFolder} />
       <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign’s World a leader adds the NPC from here as a copy: everyone in that campaign then reads its names, status and values.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
@@ -130,8 +133,7 @@ export function NpcsTab({ notify }: { notify: (t: string) => void }) {
       {!items && !error && <p className={ui.muted}>Loading the NPCs…</p>}
       {items && npcs.length === 0 && <p className={ui.muted}>No NPCs yet. Write the first one down.</p>}
       {npcs.length > 0 && (
-        <ul className={styles.list} aria-label="NPCs">
-          {npcs.map((n) => (
+        <FolderLists label="NPCs" entries={npcs} render={(n) => (
             <li key={n.id} className={styles.idea}>
               <div className={styles.head}>
                 <strong>{n.name}</strong>
@@ -145,8 +147,7 @@ export function NpcsTab({ notify }: { notify: (t: string) => void }) {
               <small className={styles.meta}>Changed <time dateTime={n.updatedAt}>{stamp(n.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${n.name}`} onClick={() => edit(n)}>Edit</button></div>
             </li>
-          ))}
-        </ul>
+          )} />
       )}
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New NPC</button></div>
       <dialog ref={ref} className={`${ui.sheet} ${ui.sheetWide}`} aria-labelledby="npc-form-title">

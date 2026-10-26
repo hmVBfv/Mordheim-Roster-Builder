@@ -110,6 +110,13 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   die Library über das Zusammengehören weiß, bleibt dort, bis ein Leiter es später auf
   irgendeinem Weg freigibt (noch nicht gebaut). Orte nimmt eine Kampagne noch nicht
   auf.
+  **Ordner (Wunsch #99, Rob, 26.10.2026: „für die gesamte Library“):** Jeder Eintrag – Idee,
+  Fraktion, NPC, Gruppe, Szenario, Ort – hat im Formular das Feld **Folder** (ein Name, mit den
+  schon benutzten zur Auswahl; leer = keiner). Ein Reiter zeigt seine Einträge unter den Ordnern
+  (Überschrift je Ordner nach Namen, „No folder“ zuletzt); sobald keiner einen Ordner trägt, bleibt
+  es die schlichte Liste. Derselbe Name in zwei Reitern ist ein Ordner. Ein Ordner besteht, solange ihn
+  ein Eintrag trägt – Umbenennen heißt, den Namen an den Einträgen zu ändern; eine Kopie in eine
+  Kampagne nimmt ihn nicht mit.
   **Ein NPC in eine Kampagne:** „NPCs from the Library…“ in der World (eine Kopie
   mit den Werten; die Fraktion wird in der World nach Namen gesucht, sonst ohne
   Fraktion; ein NPC gleichen Namens wird nicht noch einmal angeboten) und „Save to

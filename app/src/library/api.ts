@@ -16,8 +16,10 @@ export const MAX_NAME = 120;
 export const MAX_STATUS = 200;
 
 /** The entries an entry points to (server/src/library.ts, wish #74): ids of other entries; older entries have none. */
-export interface Linked { links?: string[] }
-export interface IdeaBody { text: string; topic: Topic }
+/** The folder an entry stands in (server/src/library.ts, wish #99): a name of one's own, empty for none; older entries have none. */
+export interface Foldered { folder?: string }
+export interface Linked extends Foldered { links?: string[] }
+export interface IdeaBody extends Foldered { text: string; topic: Topic }
 /** A faction as the Library keeps it; its `name` is the English one. */
 export interface FactionBody extends Linked { de: string; status: string; lore: string }
 /** An NPC outside any campaign (server/src/library.ts): the world's NPC with its faction as a name. `statlineTts`/`profile` as in a world's NPC. */

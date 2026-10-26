@@ -10,6 +10,7 @@ import { newId } from '../db/ids.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { putScenario, removeItem, staleItem, type LibraryItem, type LibraryScenario, type ScenarioBody } from './api.ts';
+import { FolderField, FolderLists } from './folders.tsx';
 import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
 import { scenariosOf, useLibrary } from './useLibrary.ts';
@@ -24,6 +25,7 @@ function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
   const [title, setTitle] = useState(scenario?.name ?? '');
   const [body, setBody] = useState(scenario?.body.body ?? '');
   const [statlines, setStatlines] = useState(scenario?.body.npcStatlines ?? '');
+  const [folder, setFolder] = useState(scenario?.body.folder ?? '');
   const [links, setLinks] = useState<string[]>(scenario?.body.links ?? []);
   const [base, setBase] = useState<number | undefined>(scenario?.seq);
   const [asking, setAsking] = useState(false);
@@ -36,7 +38,7 @@ function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putScenario(id, title.trim(), { body: body.trim(), npcStatlines: statlines.trim(), npcs, links: keepLinks(items, links) }, base);
+      const saved = await putScenario(id, title.trim(), { body: body.trim(), npcStatlines: statlines.trim(), npcs, links: keepLinks(items, links), folder: folder.trim() }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<ScenarioBody>(e);
@@ -75,6 +77,7 @@ function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
         <textarea id={`${ids}-s`} className={`${ui.textarea} ${ui.writing}`} rows={5} value={statlines} maxLength={LIMITS.statlines} onChange={(e) => setStatlines(e.target.value)} />
       </div>
       {npcs.length > 0 && <p className={ui.muted}>{npcs.length} {npcs.length === 1 ? 'NPC' : 'NPCs'} with their hidden parts travel along with the scenario. They are changed in a campaign, once the scenario is there.</p>}
+      <FolderField items={items} value={folder} onChange={setFolder} />
       <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign a leader adds the scenario from here as a draft: only leaders read it until it is released to a battle.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
@@ -114,8 +117,7 @@ export function ScenariosTab({ notify }: { notify: (t: string) => void }) {
       {!items && !error && <p className={ui.muted}>Loading the scenarios…</p>}
       {items && scenarios.length === 0 && <p className={ui.muted}>No scenarios yet. Write the first one down.</p>}
       {scenarios.length > 0 && (
-        <ul className={styles.list} aria-label="Scenarios">
-          {scenarios.map((s) => (
+        <FolderLists label="Scenarios" entries={scenarios} render={(s) => (
             <li key={s.id} className={styles.idea}>
               <div className={styles.head}>
                 <strong>{s.name}</strong>
@@ -126,8 +128,7 @@ export function ScenariosTab({ notify }: { notify: (t: string) => void }) {
               <small className={styles.meta}>Changed <time dateTime={s.updatedAt}>{stamp(s.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${s.name}`} onClick={() => edit(s)}>Edit</button></div>
             </li>
-          ))}
-        </ul>
+          )} />
       )}
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New scenario</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="scenario-form-title">

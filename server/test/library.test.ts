@@ -42,6 +42,31 @@ describe('the Library: groups of warbands', () => {
   });
 });
 
+/* Wish #99 (Rob, 26.10.2026): every entry of the Library can be put in a folder – one word or two, shared by all the tabs. */
+describe('the Library: folders', () => {
+  it.each([
+    ['idea', { text: 'x', topic: 'other' }],
+    ['faction', { de: '', status: '', lore: '' }],
+    ['npc', { de: '', status: '', faction: '', named: false, statlineTts: '', profile: null }],
+    ['group', { note: '', profiles: [] }],
+    ['scenario', { body: 'x', npcStatlines: '', npcs: [] }],
+    ['location', { de: '', type: '', lore: '' }],
+  ])('a %s carries a folder, trimmed, and none by default', async (kind, body) => {
+    const { kai } = await two();
+    const made = await kai('PUT', `/library/${randomUUID()}`, { kind, name: 'Entry', body: { ...body, folder: '  Mordheim campaign ' } });
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: { body: { folder: string } } }).item.body.folder).toBe('Mordheim campaign');
+    const plain = await kai('PUT', `/library/${randomUUID()}`, { kind, name: 'Other', body });
+    expect((plain.json() as { item: { body: { folder: string } } }).item.body.folder).toBe('');
+    expect((await kai('PUT', `/library/${randomUUID()}`, { kind, name: 'Long', body: { ...body, folder: 'x'.repeat(61) } })).statusCode).toBe(400);
+  });
+
+  it('a group of warbands has none: it is a folder of its own', async () => {
+    const { kai } = await two();
+    expect((await kai('PUT', `/library/${randomUUID()}`, { kind: 'warband_group', name: 'Group', body: { warbands: [], folder: 'x' } })).statusCode).toBe(400);
+  });
+});
+
 describe('the Library: scenarios', () => {
   const npc = { id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: ['name', 'WS'], profile: { M: '4', WS: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
   const scenario = (over: Record<string, unknown> = {}) => ({ kind: 'scenario', name: 'The night at the ferry', body: { body: 'The ferry is dark: no shooting beyond 8".', npcStatlines: 'Captain Brandt M4 WS4', npcs: [npc], ...over } });
@@ -129,7 +154,7 @@ describe('the Library: factions', () => {
     expect((made.json() as { item: { kind: string; name: string; body: unknown } }).item).toMatchObject({ kind: 'faction', name: 'The Bell-ringers', body: { de: 'Die Glockenläuter', status: 'Known in the drowned quarter', lore: expect.stringContaining('bells') } });
     // the German name, the status and the lore may be left out: they are empty then
     const bare = await kai('PUT', `/library/${randomUUID()}`, { kind: 'faction', name: 'The Ferrymen', body: {} });
-    expect((bare.json() as { item: { body: unknown } }).item.body).toEqual({ de: '', status: '', lore: '', links: [] });
+    expect((bare.json() as { item: { body: unknown } }).item.body).toEqual({ de: '', status: '', lore: '', links: [], folder: '' });
     const list = (await kai('GET', '/library')).json() as { items: { kind: string }[] };
     expect(list.items.map((i) => i.kind).sort()).toEqual(['faction', 'faction']);
   });

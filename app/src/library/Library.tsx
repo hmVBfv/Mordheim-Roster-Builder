@@ -14,6 +14,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { MAX_IDEA, MAX_NAME, MAX_STATUS, putFaction, putIdea, removeItem, staleItem, TOPIC_NAMES, TOPICS, type Faction, type FactionBody, type Idea, type IdeaBody, type LibraryItem, type Topic } from './api.ts';
 import styles from './Library.module.css';
+import { FolderField, FolderLists } from './folders.tsx';
 import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import { LocationsTab } from './LocationsTab.tsx';
 import { LoreTab } from './LoreTab.tsx';
@@ -25,12 +26,13 @@ import { factionsOf, useLibrary } from './useLibrary.ts';
 
 const GroupsTab = lazy(() => import('./GroupsTab.tsx').then((m) => ({ default: m.GroupsTab })));
 
-function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
-  idea: Idea | null; online: boolean; close: (then?: () => void) => void; onSaved: (i: Idea) => void; onRemoved: (i: Idea) => void;
+function IdeaForm({ idea, items, online, close, onSaved, onRemoved }: {
+  idea: Idea | null; items: LibraryItem[] | null; online: boolean; close: (then?: () => void) => void; onSaved: (i: Idea) => void; onRemoved: (i: Idea) => void;
 }) {
   const [name, setName] = useState(idea?.name ?? '');
   const [topic, setTopic] = useState<Topic>(idea?.body.topic ?? 'other');
   const [text, setText] = useState(idea?.body.text ?? '');
+  const [folder, setFolder] = useState(idea?.body.folder ?? '');
   const [base, setBase] = useState<number | undefined>(idea?.seq);
   const [asking, setAsking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -41,7 +43,7 @@ function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putIdea(id, name.trim(), { text, topic }, base);
+      const saved = await putIdea(id, name.trim(), { text, topic, folder: folder.trim() }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<IdeaBody>(e);
@@ -83,6 +85,7 @@ function IdeaForm({ idea, online, close, onSaved, onRemoved }: {
         <span>The idea</span>
         <textarea className={ui.textarea} rows={8} value={text} maxLength={MAX_IDEA} onChange={(e) => setText(e.target.value)} />
       </label>
+      <FolderField items={items} value={folder} onChange={setFolder} />
       <p className={ui.muted}>Only you see it. Later an idea can become a faction, a campaign or a warband.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {asking ? (
@@ -122,8 +125,7 @@ function IdeasTab({ notify }: { notify: (t: string) => void }) {
       {!items && !error && <p className={ui.muted}>Loading the ideas…</p>}
       {items && ideas.length === 0 && <p className={ui.muted}>No ideas yet. Write the first one down.</p>}
       {ideas.length > 0 && (
-        <ul className={styles.list} aria-label="Ideas">
-          {ideas.map((i) => (
+        <FolderLists label="Ideas" entries={ideas} render={(i) => (
             <li key={i.id} className={styles.idea}>
               <div className={styles.head}>
                 <strong>{i.name}</strong>
@@ -133,13 +135,12 @@ function IdeasTab({ notify }: { notify: (t: string) => void }) {
               <small className={styles.meta}>Changed <time dateTime={i.updatedAt}>{stamp(i.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${i.name}`} onClick={() => edit(i)}>Edit</button></div>
             </li>
-          ))}
-        </ul>
+          )} />
       )}
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New idea</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="idea-form-title">
         {editing && (
-          <IdeaForm key={editing.key} idea={editing.idea} online={reachable} close={close}
+          <IdeaForm key={editing.key} idea={editing.idea} items={items} online={reachable} close={close}
             onSaved={(i) => { setItems((cur) => [i, ...(cur ?? []).filter((x) => x.id !== i.id)]); notify('Idea saved. Only you see it.'); }}
             onRemoved={(i) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== i.id)); notify('Idea removed.'); }} />
         )}
@@ -155,6 +156,7 @@ function FactionForm({ faction, items, online, close, onSaved, onRemoved }: {
   const [de, setDe] = useState(faction?.body.de ?? '');
   const [status, setStatus] = useState(faction?.body.status ?? '');
   const [lore, setLore] = useState(faction?.body.lore ?? '');
+  const [folder, setFolder] = useState(faction?.body.folder ?? '');
   const [links, setLinks] = useState<string[]>(faction?.body.links ?? []);
   const [base, setBase] = useState<number | undefined>(faction?.seq);
   const [asking, setAsking] = useState(false);
@@ -166,7 +168,7 @@ function FactionForm({ faction, items, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putFaction(id, name.trim(), { de: de.trim(), status: status.trim(), lore, links: keepLinks(items, links) }, base);
+      const saved = await putFaction(id, name.trim(), { de: de.trim(), status: status.trim(), lore, links: keepLinks(items, links), folder: folder.trim() }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<FactionBody>(e);
@@ -210,6 +212,7 @@ function FactionForm({ faction, items, online, close, onSaved, onRemoved }: {
         <span>The lore</span>
         <textarea className={ui.textarea} rows={8} value={lore} maxLength={MAX_IDEA} onChange={(e) => setLore(e.target.value)} />
       </label>
+      <FolderField items={items} value={folder} onChange={setFolder} />
       <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign’s World a leader adds the faction from here: the names and what the players may read go along as a copy; the lore stays with you.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
@@ -249,8 +252,7 @@ function FactionsTab({ notify }: { notify: (t: string) => void }) {
       {!items && !error && <p className={ui.muted}>Loading the factions…</p>}
       {items && factions.length === 0 && <p className={ui.muted}>No factions yet. Write the first one down.</p>}
       {factions.length > 0 && (
-        <ul className={styles.list} aria-label="Factions">
-          {factions.map((f) => (
+        <FolderLists label="Factions" entries={factions} render={(f) => (
             <li key={f.id} className={styles.idea}>
               <div className={styles.head}>
                 <strong>{f.name}</strong>
@@ -262,8 +264,7 @@ function FactionsTab({ notify }: { notify: (t: string) => void }) {
               <small className={styles.meta}>Changed <time dateTime={f.updatedAt}>{stamp(f.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${f.name}`} onClick={() => edit(f)}>Edit</button></div>
             </li>
-          ))}
-        </ul>
+          )} />
       )}
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New faction</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="faction-form-title">
