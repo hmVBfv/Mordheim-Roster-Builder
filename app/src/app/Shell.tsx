@@ -82,7 +82,7 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className={`${styles.shell} ${bare ? styles.bare : ''}`}>
       <header className={styles.header}>
-        <span className={styles.title}>{APP_NAME}</span>
+        <Link to={HOME} className={styles.title}>{APP_NAME}</Link>
         <SyncState />
         <ReportProblem />
       </header>
