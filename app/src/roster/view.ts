@@ -110,6 +110,8 @@ export interface RosterView {
   gold: number;
   /** A planner (#77): no gold limit; `value` is shown in place of the gold in hand. */
   planner: boolean;
+  /** A planner whose Trading Post is open (#89). */
+  plannerTrade: boolean;
   value: number;
   models: number;
   maxModels: number;
@@ -369,6 +371,7 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
     worth: core.warbandWorth(ctx),
     gold: core.goldCurrent(ctx),
     planner: core.isPlanner(ctx.s),
+    plannerTrade: ctx.s.plannerTrade === true,
     value: core.plannerValue(ctx),
     models: core.totalModels(ctx),
     maxModels: core.warbandMax(ctx),
@@ -403,10 +406,11 @@ export function newWarbandChoice(data: GameData, key: string): NewWarbandChoice 
 /* The data marks rule names with <b>; the recruit list shows plain text. */
 const plainNote = (sp: string | undefined) => (sp ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
 
-export function createWarband(data: GameData, key: string, subtype: string | null, name: string, planner = false): WarbandState {
+export function createWarband(data: GameData, key: string, subtype: string | null, name: string, planner = false, trade = false): WarbandState {
   let s = core.newWarband(data, key);
   if (subtype && subtype !== s.subtype) s = core.pickSubtype(core.ctxOf(data, s), subtype);
   if (planner) s = core.asPlanner(core.ctxOf(data, s));
+  if (planner && trade) s = core.setPlannerTrade(core.ctxOf(data, s), true);
   const nm = name.trim();
   if (nm) s = core.setWarbandName(core.ctxOf(data, s), nm);
   return editableState(data, s);

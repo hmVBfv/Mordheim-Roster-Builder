@@ -932,6 +932,32 @@ test('a planner at 360 px: value instead of gold, advances with their experience
   await shot(page, 'planner-list');
 });
 
+/* Wish #89: a planner can open the Trading Post and get a rare item – no roll, a price left empty is the average. */
+test('a planner opens the Trading Post and takes a rare item without a roll', async ({ page }) => {
+  const quick = test.info().project.name === 'quickbuild';
+  await page.goto(quick ? '#/warbands/new' : 'warbands/new');
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
+  await page.getByLabel('Name').fill('The Rare Company');
+  await page.getByRole('checkbox', { name: /A planner/ }).check();
+  await page.getByRole('checkbox', { name: /Open the Trading Post/ }).check();
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /^Mercenary Captain/ }).click();
+  await page.getByRole('link', { name: 'Trade' }).click();
+  await page.getByRole('button', { name: 'Search rare' }).click();
+  await page.getByRole('listitem').filter({ hasText: 'Mercenary Captain' }).getByRole('button', { name: 'Search' }).click();
+  const sheet = page.locator('dialog[open]');
+  await expect(sheet.getByRole('textbox', { name: '2D6 as rolled' })).toHaveCount(0);
+  const dice = sheet.getByRole('group', { name: 'Rare items' }).getByRole('button').filter({ hasText: /\dD\d/ }).first();
+  await dice.click();
+  await expect(sheet.getByText(/left empty: the average/)).toBeVisible();
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'planner-trade-search');
+  await sheet.getByRole('button', { name: /^Buy · / }).click();
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+});
+
 /* Over http in the home network (the test instance) the browser has no
    crypto.randomUUID (Rob, 05.10.2026: import failed, "Start the warband"
    did nothing). The same without it here. */

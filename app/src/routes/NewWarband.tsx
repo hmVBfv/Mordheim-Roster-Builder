@@ -28,6 +28,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const [sub, setSub] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [planner, setPlanner] = useState(false);
+  const [trade, setTrade] = useState(false);
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const ids = { wb: useId(), sub: useId(), name: useId() };
@@ -38,7 +39,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const create = async () => {
     if (!choice) return;
     setBusy(true);
-    const s = createWarband(data, choice.key, subtype?.key ?? null, name, planner && !campaignId);
+    const s = createWarband(data, choice.key, subtype?.key ?? null, name, planner && !campaignId, planner && !campaignId && trade);
     const now = new Date().toISOString();
     const rec: StoredWarband = {
       id: newId(), name: s.name || choice.name, wb: choice.key, wbName: choice.name,
@@ -105,6 +106,12 @@ function Form({ campaignId }: { campaignId: string | null }) {
         <label className={ui.check}>
           <input type="checkbox" checked={planner} onChange={(e) => setPlanner(e.target.checked)} />
           <span><strong>A planner</strong> – to see what a strong late-game warband looks like: no gold limit (its value is shown), advances without experience (the experience they would need is shown). It does not take part in a campaign.</span>
+        </label>
+      )}
+      {!campaignId && planner && (
+        <label className={ui.check}>
+          <input type="checkbox" checked={trade} onChange={(e) => setTrade(e.target.checked)} />
+          <span><strong>Open the Trading Post</strong> – to get rare items (a search needs no roll, a price you leave empty is the average); it can be switched later under the warband’s menu.</span>
         </label>
       )}
       {choice && !planner && <p className={ui.muted}>Starting gold: {gold} gc.</p>}

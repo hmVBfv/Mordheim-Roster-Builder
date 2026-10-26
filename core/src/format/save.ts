@@ -29,7 +29,7 @@ export type LoadResult =
    counter, the narrative fields of the new builder, the gold ledger and the
    planner mark (data-model.md). None needs a default: a save without them is read as the
    Roster Builder reads it. */
-const KEPT = ['uidSeq', 'canon', 'story', 'ledger', 'planner'] as const;
+const KEPT = ['uidSeq', 'canon', 'story', 'ledger', 'planner', 'plannerTrade'] as const;
 
 /** An object with some keys renamed, in their order (data RENAMED: items
     that changed their name). A new name that is already there keeps the
