@@ -9,7 +9,7 @@ import { Link } from 'react-router';
 import { TipWord } from '../ui/Tip.tsx';
 import type { Taken } from './advance.ts';
 import { ChipView, xpNote } from './Bits.tsx';
-import { isWarrior, unitChips, type Fact, type HireView, type StatCell, type WarriorView, type XpView } from './view.ts';
+import { isWarrior, unitChips, type Fact, type HireView, type MaxLine, type StatCell, type WarriorView, type XpView } from './view.ts';
 import styles from './Board.module.css';
 
 export type TabId = 'overview' | 'gear' | 'skills' | 'story';
@@ -52,19 +52,28 @@ export interface UnitActs {
   leave: { label: string; run: () => void };
 }
 
-function Stats({ cells, save }: { cells: StatCell[]; save?: string }) {
+function Stats({ cells, save, max }: { cells: StatCell[]; save?: string; max?: MaxLine | null }) {
   return (
-    <table className={styles.prof}>
-      <thead>
-        <tr>{cells.map((c) => <th key={c.key} scope="col">{c.key}</th>)}{save != null && <th scope="col">Sv</th>}</tr>
-      </thead>
-      <tbody>
-        <tr>
-          {cells.map((c) => <td key={c.key} className={c.changed ? styles.changed : undefined}>{c.value}</td>)}
-          {save != null && <td>{save}</td>}
-        </tr>
-      </tbody>
-    </table>
+    <>
+      <table className={styles.prof}>
+        <thead>
+          <tr>{cells.map((c) => <th key={c.key} scope="col">{c.key}</th>)}{save != null && <th scope="col">Sv</th>}</tr>
+        </thead>
+        <tbody>
+          <tr>
+            {cells.map((c) => <td key={c.key} className={c.changed ? styles.changed : undefined}>{c.value}</td>)}
+            {save != null && <td>{save}</td>}
+          </tr>
+          {max && (
+            <tr className={styles.profMax} aria-label={`Racial maximum (${max.label})`}>
+              {max.cells.map((v, i) => <td key={cells[i]?.key ?? i}>{v}</td>)}
+              {save != null && <td />}
+            </tr>
+          )}
+        </tbody>
+      </table>
+      {max && <small className={styles.profMaxNote}>Racial maximum · {max.label}</small>}
+    </>
   );
 }
 
@@ -132,7 +141,7 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
     <>
       {chips.length > 0 && <div className={styles.chips} aria-label="Status">{chips.map((c, i) => <ChipView key={i} chip={c} />)}</div>}
       <Section title="Profile" side={group ? 'same for the whole group' : undefined}>
-        <Stats cells={u.stats} save={w?.save} />
+        <Stats cells={u.stats} save={w?.save} max={u.max} />
       </Section>
       {u.xp ? (
         <Section title="Experience" side={`${xpNote(u.xp)}${togo}`}>
