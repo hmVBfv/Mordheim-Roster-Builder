@@ -4117,3 +4117,35 @@ with a lowered allowance. Pull requests 195 and 196 (merge 195 first).
 Also this run: a test of mine for the Library links (from the earlier run) read a list the
 server had not yet answered and failed on a slow runner in CI; pull request 194 makes it wait.
 Pull requests 192, 193, 194, 195 and 196.
+
+## 26.10.2026 – Reports 80 to 84, from the second round of testing on the staging instance
+
+The reports were written on the staging instance, whose database is a nightly copy of production:
+the bug token of a cloud session reaches only production, so Rob entered them there again and they
+got their numbers 80 to 84 afresh. Lesson for the run: staging reports do not arrive; paste them,
+or write them down in production.
+
+- **81, S2, a caster cannot choose his starting spell.** The spell list (report 68) showed the
+  school but choosing was only possible in the Advance sheet, which needs earned experience. The
+  count of starting spells was already in core (`spellStartCount`); the card now offers "Choose"
+  on every unknown spell while fewer are known than he starts with, for a Wizard, the Warrior
+  Priest and a Hired Sword who casts. Pull request 198.
+- **83, S4, the table in the Advance sheet looked like text.** It had its own muted summary; the
+  shared fold bar (border, turning chevron) from the report of 20.10. is used now. Pull request 199.
+- **80, S4, Hatred beside Burn the Witch!.** The scan for keywords took "hates all spellcasters"
+  in the rule's text for a rule of the unit. A general "a keyword only the text of a named rule
+  mentions is not a rule" would have taken Fear, Immune to Psychology and more from about sixty
+  units (counted in a probe over all units), so the cut is narrow: only Hatred, only where a named
+  rule's text starts with "hates" and nothing outside says it. Hired Swords and Dramatis Personae
+  were not looked at. Pull request 200.
+- **82, wish, 12(+1).** `warbandMaxBonus` in core names what raises the printed maximum (Halfling
+  Scout, the carnival's cart); the tile and the Recruit sheet show `8/12(+1)`, the limit is still
+  the sum. The Cooking Book of the report is not in the data as a size bonus; asked in the pull
+  request. Pull request 201.
+- **84, rules issue, second roll of a result.** The sheet already had the line ("Roll a D6: 1–3
+  Strength, 4–6 Attack") but showed it only after the roll was entered; the table carries it now.
+  A display change, no data change, so Rob's rule for rules issues was not touched; the source
+  page could not be reached from the session to compare. Stacked on 199 (same lines), pull
+  request 202.
+- **79, wish, hidden NPC warbands.** Confirmed by Rob but not built: it needs decisions
+  (who sees what, free starting gold) that can go either way; open as a question.
