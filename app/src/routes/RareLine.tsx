@@ -13,7 +13,7 @@ export function RareLine({ it }: { it: RareItem }) {
       <span className={styles.rn}>{it.name}{releasedWith(it).length > 0 && <small className={styles.src}> · {releasedWith(it).join(', ')}</small>}{!it.usable && <small className={styles.no}> · nobody here may use it</small>}</span>
       <span className={styles.rr}>Rare {it.rarity}</span>
       <span className={styles.rc}>{Math.round(core.chance2d6(it.rarity) * 100)} %</span>
-      <span className={styles.rp}>{it.price}{it.range && <small> = {priceSpread(it.range, it.avg ?? (it.range[0] + it.range[1]) / 2)}</small>}</span>
+      <span className={styles.rp}>{it.price}{it.range && <small className={styles.rs}>{priceSpread(it.range, it.avg ?? (it.range[0] + it.range[1]) / 2)}</small>}</span>
       {it.text && <small className={styles.re}>{effectLine(it.text)}</small>}
     </>
   );
