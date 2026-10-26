@@ -102,6 +102,7 @@ expect "Caddy answers on 443 with its hardening" grep -qx page "$work/body"
 expect "  and the headers of docs/security.md" grep -qi '^strict-transport-security: max-age=31536000' "$work/headers"
 expect "  its CSP where the app sets none" grep -qi "^content-security-policy: default-src 'self'; script-src 'self'" "$work/headers"
 expect "  no Server header" sh -c "! grep -qi '^server:' '$work/headers'"
+expect "  and asks search engines to leave it out" grep -qi '^x-robots-tag: noindex, nofollow' "$work/headers"
 get /picture || true
 expect "the app's own CSP stays (sandbox)" grep -qi "^content-security-policy: default-src 'none'; img-src 'self'; sandbox" "$work/headers"
 expect "  and is the only one" test "$(grep -ci '^content-security-policy:' "$work/headers")" = 1

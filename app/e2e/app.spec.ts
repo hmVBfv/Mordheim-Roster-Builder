@@ -899,6 +899,22 @@ test('a tablet in landscape shows table lines and opens a warrior under his row'
   await shot(page, 'tablet-roster-open');
 });
 
+/* Rob, 26.10.2026: the campaign app is for its players, not for a search engine: robots.txt, a noindex meta tag. The Quick Build is a public tool and stays findable. */
+test('the campaign app asks search engines to leave it out; the Quick Build does not', async ({ page, request }) => {
+  const quick = test.info().project.name === 'quickbuild';
+  await page.goto('./');
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(quick ? 0 : 1);
+  if (!quick) await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  const robots = await request.get('robots.txt');
+  const text = await robots.text();
+  if (quick) expect(text).not.toMatch(/Disallow/i);
+  else {
+    expect(robots.status()).toBe(200);
+    expect(text).toMatch(/^User-agent: \*\s*$/m);
+    expect(text).toMatch(/^Disallow: \/\s*$/m);
+  }
+});
+
 test('the navigation fits the flavour', async ({ page }) => {
   await page.goto('./');
   const labels = await page.getByRole('navigation', { name: 'Main' }).getByRole('link').allTextContents();

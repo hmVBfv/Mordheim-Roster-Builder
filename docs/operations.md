@@ -474,6 +474,7 @@ bricht ab, solange er nicht eingebunden ist.
   `Permissions-Policy`; Anfragen höchstens 6 MB. Die CSP setzt Caddy nur,
   wo die App keine eigene schickt (`?Content-Security-Policy`): Bilder
   kommen mit einer strengeren (`sandbox`), die bleibt.
+- **Keine Suchmaschine** (Rob, 26.10.2026): die Kampagnen-App ist für ihre Spieler. Sie liefert `/robots.txt` (`Disallow: /`), trägt `<meta name="robots" content="noindex, nofollow">` und Caddy sendet `X-Robots-Tag: noindex, nofollow`. Das ist eine Bitte, die seriöse Suchmaschinen befolgen, kein Schutz: wer die Adresse kennt, kommt hinein (die Anmeldung schützt). Der Quick Build auf GitHub Pages bleibt auffindbar.
 - Der **Live-Strom** (`/api/v1/events`, ADR 0020) braucht nichts Eigenes:
   `reverse_proxy` reicht `text/event-stream` sofort weiter, und `encode`
   fasst die Antwort wegen `Cache-Control: no-transform` nicht an.
