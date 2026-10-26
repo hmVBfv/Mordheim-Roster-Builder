@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { StoredWarband } from '../db/db.ts';
 import { sampleSave } from '../test/data.ts';
+import ui from '../ui/ui.module.css';
 import { WarbandList } from './WarbandList.tsx';
 
 afterEach(cleanup);
@@ -49,5 +50,13 @@ describe('the list of warbands', () => {
     const [planner, plain] = screen.getAllByRole('link');
     expect(within(planner!).getByText(/Planner/)).toBeTruthy();
     expect(within(plain!).queryByText(/Planner/)).toBeNull();
+  });
+
+  it('a planner wears a ribbon with a P over its corner (#87), a played warband none', () => {
+    const w = warband('p', '2026-10-05T12:00:00.000Z', '2026-10-05T12:00:00.000Z');
+    render(<MemoryRouter><WarbandList warbands={[{ ...w, state: { ...w.state, planner: true } }, warband('q', '2026-10-05T12:00:00.000Z', '2026-10-05T12:00:00.000Z')]} /></MemoryRouter>);
+    const [planner, plain] = screen.getAllByRole('link');
+    expect(planner!.querySelector(`.${ui.ribbon}`)?.textContent).toBe('P');
+    expect(plain!.querySelector(`.${ui.ribbon}`)).toBeNull();
   });
 });

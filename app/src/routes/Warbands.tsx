@@ -9,6 +9,7 @@ import { keepInAccount, restoreWarband, useWarbands } from '../sync/local.ts';
 import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { useNotice } from '../ui/Notice.tsx';
+import { Group } from '../ui/Group.tsx';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { ImportSheet } from './ImportSheet.tsx';
 import { CodeSheet } from '../share/CodeSheet.tsx';
@@ -57,11 +58,10 @@ export function Warbands() {
         </Suspense>
       )}
       {planners.length > 0 && (
-        <section className={ui.page} aria-labelledby="planners-h">
-          <h2 id="planners-h">Planners</h2>
+        <Group id="planners-h" title="Planners">
           <p className={ui.muted}>To plan a strong late-game warband: no gold limit, advances without experience. They do not take part in a campaign.</p>
           <WarbandList warbands={planners} marks={signedIn} grid />
-        </section>
+        </Group>
       )}
       {removed && (
         <UndoToast key={removed.id} text={`${removed.name} removed.`}
