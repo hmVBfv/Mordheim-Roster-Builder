@@ -188,9 +188,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   technischen Angaben.
 - **Seitenleiste mit Unterpunkten (Rob, 19.10.2026: „aufklappbare
   Unterreiter“):** ab 900 px öffnen sich Warbands und Campaign in ihre
-  Einträge – unter Warbands die sechs zuletzt geänderten eigenen Warbands und
-  „+ New warband“ (dahinter, wo es sie gibt: **Planners**, **In campaigns** und die eigenen Gruppen – Wunsch #91, Rob, 26.10.2026; sie springen zu ihrem
-  Abschnitt der Liste, `/warbands?show=planners|campaigns|group-<id>`, und sind nie als „hier“ markiert; die Liste hält freie Warbands, Planner und Kampagnen-Warbands getrennt), unter Campaign die eigenen Kampagnen im Spiel (archivierte
+  Einträge – unter Warbands zuerst, wo es sie gibt, die **Überschriften** (klein, gesperrt, keine Seite) **Planners**, **In campaigns** und je eine für die eigenen Gruppen, jede mit ihren Warbands darunter (Wunsch #91, #92, #93, Rob, 26.10.2026; die Überschrift springt zu ihrem Abschnitt der Liste, `/warbands?show=planners|campaigns|group-<id>`, und ist nie als „hier“ markiert; eine neue oder gelöschte Gruppe, auch eine Warband darin, erscheint sofort, ohne Neuladen – jeder Schreibvorgang der Library meldet sich bei den anderen Bildschirmen), darunter unter **Free warbands** die freien Warbands ohne Gruppe (je Überschrift höchstens die sechs zuletzt geänderten; gibt es weder Planner noch Kampagnen-Warbands noch Gruppen, steht statt dessen die schlichte Liste der sechs zuletzt geänderten) und zuletzt „+ New warband“, unter Campaign die eigenen Kampagnen im Spiel (archivierte
   nicht) und unter der offenen Kampagne ihre Abschnitte (Overview, Warbands, Notes,
   Timeline, Chronicle, World, Questions, Background ⚑, Manage – wer was sieht,
   wie auf den Seiten selbst; `campaign/tabs.ts`). Eine Gruppe ist offen, wo
