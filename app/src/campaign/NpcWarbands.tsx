@@ -100,7 +100,7 @@ export function NpcWarbands({ id }: { id: string }) {
       <p className={ui.muted}>Warbands of the game master: reference and Tabletop Simulator data. No gold limit; what they own, the experience their advances need and their rating are shown. No other member sees them, and they take no part in the campaign.</p>
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
       {list.length === 0 && <p className={ui.muted}>None yet.</p>}
-      {list.length > 0 && <ul className={styles.cards} aria-label="NPC warbands">{list.map((w) => <Entry key={w.id} cid={id} w={w} data={data} onChanged={refresh} onReplace={(x) => { setReplacing(x); setName(x.name); }} />)}</ul>}
+      {list.length > 0 && <ul className={styles.cards} aria-label="NPC warbands">{list.map((w) => <Entry key={`${w.id}:${w.seq}`} cid={id} w={w} data={data} onChanged={refresh} onReplace={(x) => { setReplacing(x); setName(x.name); }} />)}</ul>}
       <form className={ui.card} onSubmit={(e) => { e.preventDefault(); void save(); }} aria-label={replacing ? `Replace ${replacing.name}` : 'Add an NPC warband'}>
         <h3>{replacing ? `Replace “${replacing.name}”` : 'Add an NPC warband'}</h3>
         <label className={ui.field}><span>From one of my warbands</span>
