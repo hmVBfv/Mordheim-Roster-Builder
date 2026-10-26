@@ -71,3 +71,15 @@ describe('the Halfling cookbook raises the maximum size', () => {
     expect(core.warbandMax(ctx(s))).toBe(10);
   });
 });
+
+describe('the warbands the cookbook excludes are the Undead and the Demons (Rob, 26.10.2026)', () => {
+  it('every warband carries the race mordheimer.net lists it under', () => {
+    for (const [id, w] of Object.entries(data.WARBANDS)) expect(w.siteRace, id).toBeTruthy();
+  });
+
+  it('the item excludes exactly those whose race names Undead or Demon', () => {
+    const book = data.CATALOG.find((x) => x.de === BOOK)!;
+    const expected = Object.entries(data.WARBANDS).filter(([, w]) => /undead|demon/i.test(w.siteRace ?? '')).map(([id]) => id).sort();
+    expect([...(book.only?.notWb ?? [])].sort()).toEqual(expected);
+  });
+});
