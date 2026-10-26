@@ -14,9 +14,10 @@ import { cachedCampaign, type CampaignSummary } from '../campaign/api.ts';
 import { campaignTabs } from '../campaign/tabs.ts';
 import { useCampaigns } from '../campaign/useCampaigns.ts';
 import { FLAVOUR } from '../flavour.ts';
+import { useWarbandGroups } from '../routes/useWarbandGroups.ts';
 import { useWarbands } from '../sync/local.ts';
 
-export interface NavChild { to: string; label: string; end?: boolean; children?: NavChild[] }
+export interface NavChild { to: string; label: string; end?: boolean; children?: NavChild[]; /** A place to jump to inside a page, not a page of its own: never marked as the one one is on. */ jump?: boolean }
 
 /** How many warbands stand under Warbands; the rest are a click on Warbands away. */
 export const WARBANDS_IN_NAV = 6;
@@ -48,7 +49,10 @@ function useCampaignsInPlay(enabled: boolean): CampaignSummary[] {
 export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[]; admin: NavChild[]; library: NavChild[]; account: NavChild[] } {
   const session = useSession();
   const totp = session.status === 'in' && session.user.totp;
-  const warbands = useWarbands(WARBANDS_IN_NAV) ?? [];
+  const all = useWarbands();
+  const warbands = (all ?? []).slice(0, WARBANDS_IN_NAV);
+  // the groups of one's own warbands (a signed-in person's), as the device kept them
+  const groups = useWarbandGroups(enabled && FLAVOUR === 'campaign' && session.status === 'in').groups;
   const campaigns = useCampaignsInPlay(enabled);
   const here = useMatch('/campaign/:id/*')?.params.id;
   // the campaign open on the screen, as the device keeps it: its name and one's role in it, even when
@@ -61,6 +65,10 @@ export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campai
     warbands: [
       ...warbands.map((w) => ({ to: `/warbands/${w.id}`, label: w.name || w.wbName })),
       { to: '/warbands/new', label: '+ New warband' },
+      // the kinds apart and the groups, as places in the list to jump to (#91; only where there are any)
+      ...((all ?? []).some((w) => w.state.planner) ? [{ to: '/warbands?show=planners', label: 'Planners', jump: true }] : []),
+      ...((all ?? []).some((w) => !w.state.planner && w.campaignId) ? [{ to: '/warbands?show=campaigns', label: 'In campaigns', jump: true }] : []),
+      ...groups.map((g) => ({ to: `/warbands?show=group-${g.id}`, label: g.name, jump: true })),
     ],
     admin: TABS.map((t) => ({ to: `/admin/${t.key}`, label: t.label })),
     library: FLAVOUR === 'campaign' && session.status === 'in' ? LIBRARY_TABS.map((t) => ({ to: `/library/${t.key}`, label: t.label })) : [],

@@ -41,6 +41,34 @@ function server() {
 }
 const kept = (srv: ReturnType<typeof server>) => [...srv.state.library.values()].filter((i) => i.kind === 'warband_group' && !i.deletedAt);
 
+describe('the kinds of warband apart (#91)', () => {
+  it('a planner and a warband in a campaign stand in sections of their own, not among the free ones; the menu jumps to a section', async () => {
+    server();
+    const plain = warband('wb-1', 'The Grey Penitents');
+    const planner = warband('wb-2', 'The Late Company');
+    planner.state = { ...planner.state, planner: true };
+    const inCampaign = { ...warband('wb-3', 'The Field Company'), campaignId: 'camp-1' };
+    await db.warbands.bulkPut([plain, planner, inCampaign]);
+    const scrolled: string[] = [];
+    Element.prototype.scrollIntoView = function (this: Element) { scrolled.push(this.id); };
+    at('/warbands?show=campaigns');
+    expect(await screen.findByText('The Grey Penitents')).toBeTruthy();
+    const planners = screen.getByRole('region', { name: 'Planners' });
+    const campaigns = screen.getByRole('region', { name: 'In campaigns' });
+    expect(within(planners).getByText('The Late Company')).toBeTruthy();
+    expect(within(campaigns).getByText('The Field Company')).toBeTruthy();
+    for (const sec of [planners, campaigns]) expect(within(sec).queryByText('The Grey Penitents')).toBeNull();
+    expect(within(campaigns).queryByText('The Late Company')).toBeNull();
+    // the free warbands are one list, without the other two kinds
+    const free = screen.getAllByRole('list').filter((l) => !planners.contains(l) && !campaigns.contains(l));
+    const names = free.flatMap((l) => within(l).queryAllByRole('link')).map((a) => a.textContent);
+    expect(names.join(' ')).toContain('The Grey Penitents');
+    expect(names.join(' ')).not.toContain('The Late Company');
+    expect(names.join(' ')).not.toContain('The Field Company');
+    await waitFor(() => expect(scrolled).toContain('campaigns-h'));
+  });
+});
+
 describe('groups of warbands', () => {
   it('a person makes a group, assigns two warbands to it with one choice each, and the list shows them under it', async () => {
     const srv = server();

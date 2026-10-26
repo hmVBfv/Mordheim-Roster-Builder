@@ -1,7 +1,7 @@
 /* The frame around every screen: title and sync state on top, navigation at
    the bottom on a phone and on the left from tablet width on. */
 import { useEffect, useState, type ReactNode } from 'react';
-import { NavLink, useLocation, useMatch } from 'react-router';
+import { Link, NavLink, useLocation, useMatch } from 'react-router';
 import { startSession, subscribeSession, getSession, useSession } from '../account/session.ts';
 import { Banner } from '../art/Pixels.tsx';
 import { sceneFor } from '../art/route.ts';
@@ -32,7 +32,9 @@ function SubList({ items, id }: { items: NavChild[]; id: string }) {
     <ul className={styles.sub} id={id}>
       {items.map((c) => (
         <li key={c.to}>
-          <NavLink to={c.to} end={c.end ?? !c.children} className={({ isActive }) => (isActive ? `${styles.subLink} ${styles.active}` : styles.subLink)}>{c.label}</NavLink>
+          {c.jump
+            ? <Link to={c.to} className={styles.subLink}>{c.label}</Link>
+            : <NavLink to={c.to} end={c.end ?? !c.children} className={({ isActive }) => (isActive ? `${styles.subLink} ${styles.active}` : styles.subLink)}>{c.label}</NavLink>}
           {c.children && (
             <ul className={styles.subSub} aria-label={`${c.label}: sections`}>
               {c.children.map((t) => (
