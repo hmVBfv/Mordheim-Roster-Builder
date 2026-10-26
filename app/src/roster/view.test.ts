@@ -309,3 +309,22 @@ describe('the Fallen', () => {
     expect(plain.heroes[0]!.expNeeded).toBeNull();
   });
 });
+
+const ctx = (s: core.WarbandState) => core.ctxOf(data, s);
+
+describe('the size bonus of a Halfling Scout stands apart from the maximum (#82)', () => {
+  it('the maximum is the warband’s own, the bonus is named, the sum still limits', () => {
+    const s = core.addUnit(ctx(core.newWarband(data, 'wh')), 'capt');
+    const plain = rosterView(data, s);
+    expect(plain).toMatchObject({ maxModels: 12, maxBonus: 0 });
+    const scout = rosterView(data, core.hireHS(ctx(s), 'halfling'));
+    expect(scout).toMatchObject({ maxModels: 13, maxBonus: 1 });
+  });
+
+  it('a house rule that sets the maximum names no bonus', () => {
+    let s = core.addUnit(ctx(core.newWarband(data, 'wh')), 'capt');
+    s = core.hireHS(ctx(s), 'halfling');
+    s = core.setHouseNum(ctx(s), 'max', 10);
+    expect(rosterView(data, s)).toMatchObject({ maxModels: 10, maxBonus: 0 });
+  });
+});

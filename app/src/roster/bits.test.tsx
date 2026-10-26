@@ -7,6 +7,7 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
 import { XpBar } from './Bits.tsx';
+import { ModelsTile } from './ModelsTile.tsx';
 import styles from './Board.module.css';
 import { createWarband, rosterView } from './view.ts';
 
@@ -40,5 +41,14 @@ describe('the experience bar', () => {
     const s = segments(xp);
     expect(s[8]).toBe('due');
     expect(s.slice(0, 8).every((x) => x === 'on')).toBe(true);
+  });
+});
+
+describe('the Models tile (#82)', () => {
+  it('shows the warband’s own maximum and the bonus beside it, not the sum', () => {
+    const { container } = render(<ModelsTile models={8} max={13} bonus={1} />);
+    expect(container.querySelector('dd')!.textContent).toBe('8/12(+1)');
+    cleanup();
+    expect(render(<ModelsTile models={8} max={12} />).container.querySelector('dd')!.textContent).toBe('8/12');
   });
 });

@@ -113,6 +113,8 @@ export interface RosterView {
   value: number;
   models: number;
   maxModels: number;
+  /** Of the maximum, what a Halfling Scout or the like adds to the warband's own (#82). */
+  maxBonus: number;
   heroes: WarriorView[];
   heroCount: number;
   heroMax: number;
@@ -370,6 +372,7 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
     value: core.plannerValue(ctx),
     models: core.totalModels(ctx),
     maxModels: core.warbandMax(ctx),
+    maxBonus: core.warbandMaxBonus(ctx),
     campaign: camp?.on ? core.roundLabel(camp.round) : null,
     warnings: core.warbandWarnings(ctx),
     heroes,

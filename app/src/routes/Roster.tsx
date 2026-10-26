@@ -256,7 +256,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
             ? <div className={`${board.tile} ${board.tileGold}`}><dt>Value</dt><dd>{v.value} gc</dd></div>
             : <div className={`${board.tile} ${board.tileGold}`}><dt>Gold</dt><dd>{v.gold} gc</dd></div>}
           <div className={board.tile}><dt>Rating</dt><dd>{v.rating}</dd></div>
-          <ModelsTile models={v.models} max={v.maxModels} />
+          <ModelsTile models={v.models} max={v.maxModels} bonus={v.maxBonus} />
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
         <div className={`${board.toolbar} ${shareOn ? board.toolbarShare : ''}`} role="group" aria-label="Warband actions">

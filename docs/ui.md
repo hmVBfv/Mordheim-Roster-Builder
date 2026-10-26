@@ -331,7 +331,7 @@ nur lesend (`CampaignWarband`, ohne Aktionen).
 
 **Kopf.** Name der Warband (mit Stift zum Umbenennen), eine Zeile mit Typ,
 Stufe und – falls an – „⚖ N house rules“, vier Kacheln (Gold, Rating, Models
-mit Anzeige gegen das Maximum, Worth) und eine Leiste mit den Aktionen der
+mit Anzeige gegen das Maximum – das der Warband selbst, ein Zuschlag etwa durch einen Halfling Scout steht dahinter: „8/12(+1)“ –, Worth) und eine Leiste mit den Aktionen der
 Warband: **+ Recruit, Hire, Trade** (mit dem Lager als Zahl) und **Export**.
 Auf dem Handy bleibt die Leiste beim Scrollen oben stehen; am Desktop steht
 sie neben den Kacheln. Nichts davon liegt hinter einem Menü.

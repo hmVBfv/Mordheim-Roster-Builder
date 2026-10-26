@@ -39,16 +39,21 @@ export function ratioMen(ctx: Ctx, mp: NonNullable<UnitDef['maxPer']>): number {
   return ctx.s.models.filter((m) => mp.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
 }
 
+/** What raises the warband's own maximum beyond its printed one (#82): a Halfling Scout, the carnival's cart. 0 where a house rule or the Hung sets the maximum outright. */
+export function warbandMaxBonus(ctx: Ctx): number {
+  const h = houseRules(ctx.s);
+  if (h.max !== '' && h.max != null) return 0;
+  if (!warbandDef(ctx) || (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'hung')) return 0;
+  return (ctx.s.wb === 'carnival' && ctx.s.models.some((m) => m.uid_def === 'cart') ? 2 : 0) + hsSizeBonus(ctx);
+}
+
 export function warbandMax(ctx: Ctx): number {
   const h = houseRules(ctx.s);
   if (h.max !== '' && h.max != null) return Number(h.max);
   const wb = warbandDef(ctx);
   if (!wb) return 0;
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'hung') return 12;
-  let mx = wb.max;
-  if (ctx.s.wb === 'carnival' && ctx.s.models.some((m) => m.uid_def === 'cart')) mx += 2;
-  mx += hsSizeBonus(ctx);
-  return mx;
+  return wb.max + warbandMaxBonus(ctx);
 }
 
 export function isHeroModel(ctx: Ctx, m: Model): boolean {
