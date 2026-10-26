@@ -171,16 +171,8 @@
 }
 
 /* the advance sheet */
-.table summary {
-  min-height: var(--tap);
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: var(--text-muted);
-}
-
 .table ul {
-  margin: 0;
+  margin: var(--space-2) 0 0;
   padding-left: 1.2em;
 }
 
