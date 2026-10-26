@@ -144,3 +144,22 @@ describe('the spell lore of a caster (#68)', () => {
     expect(v.heroes.find((h) => h.type === 'Merchant')!.lore).toBeNull();
   });
 });
+
+describe('Hatred as the explanation of a rule, not a rule of its own (#80)', () => {
+  const rulesOf = (wb: string, id: string) => {
+    const s = core.addUnit(ctx(core.newWarband(data, wb)), id);
+    return warriorFacts(ctx(s), s.models[0]!).rules.map((r) => r.label);
+  };
+
+  it('the Witch Hunter Captain and the Witch Hunter have Burn the Witch!, and no Hatred beside it', () => {
+    for (const id of ['capt', 'hunter']) {
+      const rules = rulesOf('wh', id);
+      expect(rules).toContain('Burn the Witch!');
+      expect(rules).not.toContain('Hatred');
+    }
+  });
+
+  it('a unit that simply hates someone keeps Hatred', () => {
+    expect(rulesOf('pitfighters', 'trollslayer')).toContain('Hatred');
+  });
+});

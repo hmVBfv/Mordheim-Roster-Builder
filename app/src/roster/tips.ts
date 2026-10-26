@@ -97,6 +97,18 @@ export interface WarriorFacts {
    kept for each data set and those inputs. */
 const RULES = new WeakMap<GameData, Map<string, Fact[]>>();
 
+/* "Hatred" is the explanation of a rule that says whom he hates, not a rule of the unit (#80): the Witch Hunter Captain's
+   "Burn the Witch!" is the rule, and its text ("hates all spellcasters") is where Hatred belongs. So Hatred stays a rule of its own
+   only where the text outside such named rules still names it ("Hates Orcs & Goblins."). */
+const HATES = /^hates?\b/i;
+
+function explained(sp: string, defs: core.RuleDef[], chips: (ItemInfo & { key: string })[]): (ItemInfo & { key: string })[] {
+  const named = defs.filter((d) => HATES.test(d.text));
+  if (!named.length) return chips;
+  const bare = named.reduce((t, d) => t.replace(d.text, ' '), sp);
+  return /\bhatred\b|\bhates?\b/i.test(bare) ? chips : chips.filter((c) => c.name !== 'Hatred');
+}
+
 function warriorRules(ctx: core.Ctx, def: UnitDef, m: Model, skip: readonly string[]): Fact[] {
   let memo = RULES.get(ctx.data);
   if (!memo) RULES.set(ctx.data, (memo = new Map()));
@@ -104,7 +116,8 @@ function warriorRules(ctx: core.Ctx, def: UnitDef, m: Model, skip: readonly stri
   let out = memo.get(key);
   if (!out) {
     const a = core.modelAbilities(ctx, def, m);
-    out = rules(a.abilities, core.ruleDefs(a.sp, `Special rule · ${def.name}`), skip);
+    const defs = core.ruleDefs(a.sp, `Special rule · ${def.name}`);
+    out = rules(explained(a.sp, defs, a.abilities), defs, skip);
     memo.set(key, out);
   }
   return out;
