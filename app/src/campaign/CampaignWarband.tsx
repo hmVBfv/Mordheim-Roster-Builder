@@ -26,6 +26,7 @@ function Body({ id, read }: { id: string; read: Read }) {
   const { printing } = usePrinting();
   if (!v) return <p className={ui.message}>This warband cannot be read by this version of the app.</p>;
   const start = read.tags.find((t) => t.kind === 'start');
+  const late = state?.campaign?.catchUp as { peers: number; rating: number; value: number; battles: number; gold: number; exp: number; round: number; over?: string[] } | undefined;
   return (
     <section className={board.page}>
       <header className={board.head}>
@@ -43,6 +44,12 @@ function Body({ id, read }: { id: string; read: Read }) {
         {start ? `Start marked ${stamp(start.createdAt)} (version ${start.rev}): rating ${start.totals.rating}, ${start.totals.gold} gc, ${start.totals.models} models. ` : ''}
         {read.draft ? `Shown with ${read.player.displayName}’s changes since version ${read.head.rev} (${stamp(read.draft.updatedAt)}).` : `Version ${read.head.rev}.`}
       </p>
+      {late && (
+        <div className={`${ui.card} ${ui.muted}`} aria-label="Joined late">
+          <p>Joined late, in round {late.round}: a catch-up of up to {late.gold} gc and {late.exp} rating points of experience, by the median of {late.peers} {late.peers === 1 ? 'warband' : 'warbands'} (rating {late.rating}, value {late.value} gc, {late.battles} {late.battles === 1 ? 'battle' : 'battles'}).</p>
+          {late.over && late.over.length > 0 && <><p>It exceeds the plan – a leader can still confirm it:</p><ul>{late.over.map((o) => <li key={o}>{o}</li>)}</ul></>}
+        </div>
+      )}
       <Board
         v={v} printing={printing}
         after={<FallenList f={v.fallen} />} />

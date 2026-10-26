@@ -45,11 +45,11 @@ export async function playServer(page: Page, signedIn = true, o: { totp?: boolea
   return { ...f, signIn: () => { me = true; } };
 }
 
-export function serverWarband(f: ReturnType<typeof createFakeSync>, name: string, draft?: { name: string; device: string }) {
+export function serverWarband(f: ReturnType<typeof createFakeSync>, name: string, draft?: { name: string; device: string }, extra: Record<string, unknown> = {}) {
   const id = crypto.randomUUID();
   const seq = ++f.state.seq;
   f.state.warbands.set(id, {
-    id, headRev: 1, versions: [{ rev: 1, data: { ...SAVE, name }, createdAt: T0, source: 'save' }], archivedAt: null, seq,
+    id, headRev: 1, versions: [{ rev: 1, data: { ...SAVE, name, ...extra }, createdAt: T0, source: 'save' }], archivedAt: null, seq,
     draft: draft ? { baseRev: 1, data: { ...SAVE, name: draft.name }, device: draft.device, updatedAt: T0, seq: ++f.state.seq } : null,
     copiedFrom: null, createdAt: T0,
   });

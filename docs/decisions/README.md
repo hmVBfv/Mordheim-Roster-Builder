@@ -44,3 +44,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0023](0023-library-per-account.md) | Die Library: Ideen und Vorlagen (Fraktionen, NPCs, Gruppen, Szenarien) privat beim Konto, immer als Kopie in die Kampagne (vorgeschlagen, ergänzt 0002, 0005, 0011, 0022) |
 | [0024](0024-lore-catalogue-places-and-sources.md) | Der Lore-Katalog: Orte ineinander, Gruppen mit Herkunftsorten, Quellen auch außerhalb von mordheimer.net, mit eigenen Worten (angenommen, ergänzt 0023) |
 | [0025](0025-quick-build-first-load-250-kb.md) | Erste-Laden-Grenze des Quick Builds: 250 KB wie die Kampagne (angenommen, ersetzt einen Teil von 0021) |
+| [0026](0026-planner-and-catch-up.md) | Der Planner und das Catch-up: eine Art Warband ohne Goldgrenze zum Planen, und der späte Einstieg in eine Kampagne nach dem Median (angenommen, ergänzt 0002, 0003) |

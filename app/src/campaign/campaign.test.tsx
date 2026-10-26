@@ -2,7 +2,7 @@
    campaign, the overview, another player's warband to read, entering a
    warband (a copy), what a leader manages, and leaving – against the
    stand-in server (sync/fakeSync.ts). */
-import { FORMAT, ctxOf, stageTotals, writeSave } from '@mordheim/core';
+import { FORMAT, addSkill, addUnit, asPlanner, ctxOf, newWarband, stageTotals, writeSave, type WarbandState } from '@mordheim/core';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -180,6 +180,20 @@ describe('the overview', () => {
     expect(bar!.style.width).toBe(`${Math.min(100, Math.round((100 * have) / Math.max(1, max)))}%`);
   });
 
+  /* Wish #77: a leader reads in the warband itself why it joined late and what it exceeds. */
+  it('a warband that joined late says so to those who read it, and what it exceeds', async () => {
+    const srv = server();
+    const late = { ...saveOf('The Late Company'), campaign: { on: false, districts: {}, catchUp: { round: 3, peers: 3, rating: 140, value: 900, battles: 3, gold: 900, exp: 88, over: ['A Champion needs 36 exp for its advances; the catch-up gives 30.'] } } };
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others: [{ player: 'Anna', data: late, role: 'player', pending: true }] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('link', { name: /The Late Company/ }));
+    const note = await screen.findByLabelText('Joined late');
+    expect(note.textContent).toMatch(/Joined late, in round 3: a catch-up of up to 900 gc and 88 rating points of experience, by the median of 3 warbands \(rating 140, value 900 gc, 3 battles\)/);
+    expect(note.textContent).toMatch(/It exceeds the plan – a leader can still confirm it/);
+    expect(note.textContent).toMatch(/needs 36 exp for its advances; the catch-up gives 30/);
+  });
+
   /* Rob, 19.10.2026: a section of its own, for the quick overview of every warband. */
   it('the Warbands tab: a card each with the numbers of its last mark, the waiting ones apart; a card opens the warband', async () => {
     const srv = server();
@@ -227,8 +241,8 @@ describe('the overview', () => {
     expect(await syncOnce({ userId: KAI.id, data: async () => data })).toMatchObject({ pushed: 0, waiting: 0 });
   });
 
-  /* Wish #77: a planner is for planning; it is not offered to a campaign, and does not enter one. */
-  it('a planner is not offered when entering a warband', async () => {
+  /* Wish #77: a planner does not enter as it is: it is offered apart, to join late, and the plain entry refuses it. */
+  it('a planner is offered apart from the warbands that enter as a copy, and does not enter as it is', async () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign' });
     const plain = record();
@@ -239,10 +253,68 @@ describe('the overview', () => {
     at(`/campaign/${c.id}`);
     await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
     const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
-    expect(within(sheet).getAllByRole('radio').map((r) => r.getAttribute('aria-label') ?? r.closest('label')?.textContent)).toEqual([expect.stringContaining('The Silver Caravan')]);
-    expect(within(sheet).queryByText(/The Late Company/)).toBeNull();
+    // the warbands that enter as a copy are under "Warband"; the planner is under its own heading, to join late
+    expect(within(within(sheet).getByRole('group', { name: 'Warband' })).getAllByRole('radio')).toHaveLength(1);
+    expect(within(within(sheet).getByRole('group', { name: 'Planners, to join late' })).getByRole('radio', { name: /The Late Company/ })).toBeTruthy();
     const { enterWarband } = await import('./enter.ts');
     await expect(enterWarband(data, c.id, planner)).rejects.toThrow(/planner/i);
+  });
+
+  /* Wish #77: a planner joins a running campaign late. It is measured against the others (the median of those that have
+     fought), enters as an ordinary warband, and the entry keeps a record of why. */
+  const planner = (extra?: (s: WarbandState) => WarbandState): StoredWarband => {
+    let s: WarbandState = { ...asPlanner(ctxOf(data, newWarband(data, 'merc'))), name: 'The Late Company' };
+    for (const id of ['capt', 'champ', 'warr']) s = addUnit(ctxOf(data, s), id);
+    if (extra) s = extra(s);
+    return { ...record(), name: 'The Late Company', wb: 'merc', state: s };
+  };
+  const campaignWithFight = () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });
+    srv.addBattle(c.id).status = 'closed';
+    return { srv, c };
+  };
+
+  it('a planner joins late: measured by the others, entered as an ordinary warband with the record of why', async () => {
+    const { srv, c } = campaignWithFight();
+    const mine = planner();
+    await db.warbands.add(mine);
+    await syncOnce({ userId: KAI.id, data: async () => data });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
+    const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
+    await user.click(within(sheet).getByRole('radio', { name: /The Late Company/ }));
+    expect(await within(sheet).findByText(/median of 1 warband that has fought/)).toBeTruthy();
+    expect(within(sheet).getByRole('list', { name: 'Experience from the catch-up' })).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Enter as a latecomer' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Late Company' })).toBeTruthy();
+    const all = await db.warbands.toArray();
+    const copy = all.find((w) => w.campaignId === c.id)!;
+    expect(copy.state.planner).toBeUndefined();
+    expect(copy.state.campaign?.catchUp).toMatchObject({ peers: 1, battles: 1, round: c.round });
+    // the planner itself stays a planner, free
+    expect(all.find((w) => w.id === mine.id)!.state.planner).toBe(true);
+    expect(srv.state.campaigns.get(c.id)!.enrolments.some((e) => e.warbandId === copy.id)).toBe(true);
+  });
+
+  it('what exceeds the plan is said, and the entry goes on with it for a leader to see', async () => {
+    const { c } = campaignWithFight();
+    // more advances than the experience of the plan pays for
+    const rich = planner((s) => { let t = s; const champ = t.models.find((m) => m.uid_def === 'champ')!.uid; for (let i = 0; i < 24; i++) t = addSkill(ctxOf(data, t), champ, `Skill ${i}`); return t; });
+    await db.warbands.add(rich);
+    await syncOnce({ userId: KAI.id, data: async () => data });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
+    const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
+    await user.click(within(sheet).getByRole('radio', { name: /The Late Company/ }));
+    expect(await within(sheet).findByText(/needs \d+ exp for its advances; the catch-up gives \d+/)).toBeTruthy();
+    expect(within(sheet).getByText(/A leader can still confirm an entry that exceeds the plan/)).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Enter anyway' }));
+    await waitFor(async () => expect((await db.warbands.toArray()).find((w) => w.campaignId === c.id)).toBeTruthy());
+    const copy = (await db.warbands.toArray()).find((w) => w.campaignId === c.id)!;
+    expect((copy.state.campaign?.catchUp as { over?: string[] }).over?.[0]).toMatch(/needs \d+ exp for its advances/);
   });
 
   it('a new warband for the campaign: made free under Warbands, its copy entered at once and opened (Rob, 05.10.2026)', async () => {

@@ -116,6 +116,7 @@ Begriff einführt, trägt ihn hier ein.
 | einen Mann entlassen | Dismiss him | `dismissMember()` |
 | Mann nachrekrutieren | + Man | `setQty()`, `henchRecruitCost()` |
 | Planner | Planner | `planner` (Spielstand), `isPlanner`, `expNeeded`, `plannerValue` |
+| Catch-up (später Einstieg) | Planners, to join late · Enter as a latecomer | `catchUpPlan`, `applyCatchUp`, `GET /campaigns/:id/catchup`, `campaign.catchUp` |
 | Warband anlegen | New warband · Start the warband | `createWarband()`, `/warbands/new` |
 | Anwerben | Recruit | `addUnit()`, `recruitStatus()`, Sheet `RecruitSheet` |
 | aus dem Roster nehmen | Remove from the roster | `removeUnit()` |

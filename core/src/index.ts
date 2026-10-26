@@ -31,6 +31,7 @@ export * from './warband/veterans.ts';
 export * from './warband/recruits.ts';
 export * from './warband/hires.ts';
 export * from './campaign/territory.ts';
+export * from './campaign/catchup.ts';
 export * from './campaign/chronicle.ts';
 export * from './campaign/stages.ts';
 export * from './campaign/postbattle.ts';

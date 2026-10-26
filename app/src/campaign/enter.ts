@@ -46,11 +46,11 @@ async function underCampaignRules(data: GameData, campaignId: string, s: core.Wa
 }
 
 /** `keepOwnRules`: the copy keeps the warband's own house rules instead of taking the campaign's (#64); the leaders then see that they differ. */
-export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband, opts: { keepOwnRules?: boolean } = {}): Promise<{ id: string; campaign: CampaignView }> {
+export async function enterWarband(data: GameData, campaignId: string, from: StoredWarband, opts: { keepOwnRules?: boolean; /** What the copy is, where it is not the warband as it stands: a planner joining late (Latecomer.tsx). */ state?: core.WarbandState } = {}): Promise<{ id: string; campaign: CampaignView }> {
   // a planner is for planning (#77): it does not enter a campaign as it is
-  if (from.state.planner) throw new Error('A planner does not enter a campaign.');
+  if (from.state.planner && !opts.state) throw new Error('A planner does not enter a campaign as it is: it joins late.');
   const rec = await onServer(data, from);
-  const entering = await underCampaignRules(data, campaignId, rec.state, !!opts.keepOwnRules);
+  const entering = await underCampaignRules(data, campaignId, opts.state ?? rec.state, !!opts.keepOwnRules);
   const who = asker();
   const r = await api<Entered>(`/campaigns/${campaignId}/enrolments`, {
     body: {

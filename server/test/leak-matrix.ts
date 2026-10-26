@@ -351,9 +351,10 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id/attachments': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments` }),
       'GET /api/v1/campaigns/:id/attachments/:aid/file': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/attachments/${c.ownPictureId}/file` }),
       'GET /api/v1/campaigns/:id/timeline': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/timeline` }),
+      'GET /api/v1/campaigns/:id/catchup': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/catchup` }),
       'GET /api/v1/campaigns/:id/chapters/:chid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/chapters/${c.chapterId}` }),
     },
-    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks', 'chapters', 'chapter'] },
+    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks', 'chapters', 'chapter', 'peers', 'round'] },
   },
   'campaign.warband.read': {
     allowed: ['user'],
