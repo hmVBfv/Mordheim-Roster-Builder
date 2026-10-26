@@ -4118,7 +4118,7 @@ Also this run: a test of mine for the Library links (from the earlier run) read 
 server had not yet answered and failed on a slow runner in CI; pull request 194 makes it wait.
 Pull requests 192, 193, 194, 195 and 196.
 
-## 26.10.2026 – Reports 80 to 84, from the second round of testing on the staging instance
+## October 26, 2026 — the eighth run: #80 to #84 (starting spells, Hatred, 12(+1), the advance table)
 
 The reports were written on the staging instance, whose database is a nightly copy of production:
 the bug token of a cloud session reaches only production, so Rob entered them there again and they
