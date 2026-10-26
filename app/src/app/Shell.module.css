@@ -249,6 +249,17 @@
     color: var(--text);
   }
 
+  /* a heading over warbands (#92): small, spaced out, not a page of its own */
+  .subHead {
+    min-height: calc(var(--tap) - 8px);
+    margin-top: var(--space-1);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.75;
+  }
+
   .subLink.active {
     color: var(--accent);
     background: color-mix(in srgb, var(--surface-2) 60%, transparent);

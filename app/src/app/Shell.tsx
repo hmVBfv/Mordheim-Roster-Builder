@@ -33,10 +33,10 @@ function SubList({ items, id }: { items: NavChild[]; id: string }) {
       {items.map((c) => (
         <li key={c.to}>
           {c.jump
-            ? <Link to={c.to} className={styles.subLink}>{c.label}</Link>
+            ? <Link to={c.to} className={c.head ? `${styles.subLink} ${styles.subHead}` : styles.subLink}>{c.label}</Link>
             : <NavLink to={c.to} end={c.end ?? !c.children} className={({ isActive }) => (isActive ? `${styles.subLink} ${styles.active}` : styles.subLink)}>{c.label}</NavLink>}
           {c.children && (
-            <ul className={styles.subSub} aria-label={`${c.label}: sections`}>
+            <ul className={styles.subSub} aria-label={`${c.label}: ${c.childrenLabel ?? 'sections'}`}>
               {c.children.map((t) => (
                 <li key={t.to}>
                   <NavLink to={t.to} end={t.end} className={({ isActive }) => (isActive ? `${styles.subLink} ${styles.active}` : styles.subLink)}>{t.label}</NavLink>
