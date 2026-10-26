@@ -162,6 +162,8 @@ export function createFakeSync(opts: {
     /** Opponent groups and the campaign's own skills (server/src/opponents.ts), by id. */
     opponentGroups: new Map<string, { id: string; campaignId: string; name: string; note: string; profiles: unknown[]; updatedBy: string; updatedAt: string; seq: number; deleted?: boolean }>(),
     opponentSkills: new Map<string, { id: string; campaignId: string; name: string; text: string; updatedBy: string; updatedAt: string; seq: number; deleted?: boolean }>(),
+    /** Hidden NPC warbands (server/src/npc-warbands.ts), leaders only, by id. */
+    npcWarbands: new Map<string, { id: string; campaignId: string; name: string; save: Record<string, unknown>; summary: Record<string, unknown>; updatedBy: string; createdAt: string; updatedAt: string; seq: number; deleted?: boolean }>(),
     /** The Library (server/src/library.ts), private to its owner: every entry carries its owner. */
     library: new Map<string, { id: string; owner: string; kind: string; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }>(),
     /** The leaders' plans per campaign and battle number (server/src/plans.ts). */
@@ -673,6 +675,33 @@ export function createFakeSync(opts: {
     return json(200, { [groups ? 'group' : 'skill']: oppOut(row) });
   };
 
+  /* ---- hidden NPC warbands (as server/src/routes-npc-warbands.ts: leaders only) ---- */
+  const npcOut = (w: { save: unknown } & Record<string, unknown>, withSave: boolean) => ({ id: w.id, name: w.name, summary: w.summary, updatedBy: w.updatedBy, createdAt: w.createdAt, updatedAt: w.updatedAt, seq: w.seq, ...(withSave ? { save: w.save } : {}) });
+  const npcRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, body: Record<string, unknown>): Response => {
+    if (role !== 'leader') return json(403, { error: 'forbidden' });
+    const live = () => [...s.npcWarbands.values()].filter((w) => w.campaignId === c.id && !w.deleted);
+    if (rest === '/npc-warbands' && method === 'GET') return json(200, { warbands: live().sort((a, b) => b.seq - a.seq).map((w) => npcOut(w, false)), seq: Math.max(0, ...[...s.npcWarbands.values()].filter((w) => w.campaignId === c.id).map((w) => w.seq)) });
+    const m = /^\/npc-warbands\/([^/]+)$/.exec(rest);
+    if (!m) return json(404, { error: 'not_found' });
+    const cur = s.npcWarbands.get(m[1]!);
+    if (method === 'GET') return cur && cur.campaignId === c.id && !cur.deleted ? json(200, { warband: npcOut(cur, true) }) : json(404, { error: 'not_found' });
+    if (method === 'DELETE') {
+      if (!cur || cur.campaignId !== c.id || cur.deleted) return json(404, { error: 'not_found' });
+      cur.deleted = true; cur.seq = next();
+      return json(200, { removed: true, seq: cur.seq });
+    }
+    if (method !== 'PUT') return json(404, { error: 'not_found' });
+    const name = String(body.name ?? '').trim();
+    const save = body.save as Record<string, unknown> | undefined;
+    if (!name || !save || save.planner !== true) return json(400, { error: 'invalid', problem: 'an NPC warband is a planner' });
+    if (cur?.deleted) return json(409, { error: 'removed' });
+    if (live().some((w) => w.id !== m[1] && w.name.toLowerCase() === name.toLowerCase())) return json(400, { error: 'invalid', problem: 'an NPC warband of this name exists already' });
+    if (cur && cur.seq !== Number(body.baseSeq ?? 0) && JSON.stringify(cur.save) !== JSON.stringify(save)) return json(409, { error: 'stale', current: npcOut(cur, true) });
+    const row = { id: m[1]!, campaignId: c.id, name, save, summary: (body.summary as Record<string, unknown>) ?? {}, updatedBy: me.displayName, createdAt: cur?.createdAt ?? at(), updatedAt: at(), seq: next() };
+    s.npcWarbands.set(m[1]!, row);
+    return json(200, { warband: npcOut(row, true), seq: row.seq });
+  };
+
   /* ---- plans (as server/src/routes-plans.ts: leaders only, by battle number) ---- */
   const planKey = (cid: string, round: number) => `${cid}:${round}`;
   const planOf = (cid: string, round: number) => {
@@ -1104,6 +1133,7 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/backstory')) return backstoryRoutes(c, role, method, rest, body);
     if (rest.startsWith('/plans')) return planRoutes(c, role, method, rest, body);
     if (rest.startsWith('/opponents')) return opponentRoutes(c, role, method, rest, body);
+    if (rest.startsWith('/npc-warbands')) return npcRoutes(c, role, method, rest, body);
     if (rest.startsWith('/chapter-drafts')) return draftRoutes(c, role, method, rest, body);
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);

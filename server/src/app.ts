@@ -27,6 +27,7 @@ import { registerQuestionRoutes } from './routes-questions.ts';
 import { registerScenarioRoutes } from './routes-scenarios.ts';
 import { registerBackstoryRoutes } from './routes-backstory.ts';
 import { registerPlanRoutes } from './routes-plans.ts';
+import { registerNpcWarbandRoutes } from './routes-npc-warbands.ts';
 import { registerOpponentRoutes } from './routes-opponents.ts';
 import { registerStyleRoutes } from './routes-style.ts';
 import { registerDraftRoutes } from './routes-drafts.ts';
@@ -211,6 +212,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerAttachmentRoutes(app, { db, now, uploadDir: deps.config.uploadDir ?? null, ...(deps.pictureQuota ? { quota: deps.pictureQuota } : {}) });
   registerTimelineRoutes(app, { db, now });
   registerBackgroundRoutes(app, { db, now });
+  registerNpcWarbandRoutes(app, { db, now });
   registerQuestionRoutes(app, { db, now });
   registerWorldRoutes(app, { db, now });
   registerScenarioRoutes(app, { db, now });

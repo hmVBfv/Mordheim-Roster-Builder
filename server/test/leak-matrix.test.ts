@@ -19,6 +19,7 @@ import { putAttachment, storeFile } from '../src/attachments.ts';
 import { putPastBattle } from '../src/history.ts';
 import { putChapter } from '../src/chapters.ts';
 import { putEntry as putBackground } from '../src/background.ts';
+import { putNpcWarband } from '../src/npc-warbands.ts';
 import { putQuestion } from '../src/questions.ts';
 import { releaseScenario, putScenario, type ScenarioInput } from '../src/scenarios.ts';
 import { putDraft } from '../src/chapter-drafts.ts';
@@ -166,6 +167,16 @@ describe('leak-test matrix', () => {
     background(theirs, victim.id, 'BACKGROUND-SECRET: who pays the ferryman', 'BACKGROUND-SECRET: the Countess pays him.');
     const ledBackgroundId = background(led, admin.id, 'The ferryman', 'He is paid by somebody.');
     const spareBackgroundId = background(led, admin.id, 'A spare', 'To be taken out.');
+    // hidden NPC warbands (wish #79): one of the victim's campaign no role of the matrix may ever read, plain ones in the admin's, which the probes read and take out
+    const npcWarband = (c: { id: string }, by: string, name: string) => {
+      const wid = randomUUID();
+      const r = putNpcWarband(s.db, c.id, wid, { name, save: { planner: true, name, note: name.startsWith('NPCWARBAND-SECRET') ? 'NPCWARBAND-SECRET: the Count’s own guard.' : '' }, summary: { value: 100, exp: 2, rating: 12, models: 3, kind: 'Mercenaries' }, baseSeq: 0 }, by, t0);
+      if (!r.ok) throw new Error(r.error);
+      return wid;
+    };
+    npcWarband(theirs, victim.id, 'NPCWARBAND-SECRET: the Count’s guard');
+    const ledNpcWarbandId = npcWarband(led, admin.id, 'The Watch');
+    const spareNpcWarbandId = npcWarband(led, admin.id, 'A spare watch');
     // questions in the victim's campaign: one asked of the victim that no role of the matrix may read, and one asked of the player
     const question = (text: string, to: string) => {
       const qid = randomUUID();
@@ -252,7 +263,7 @@ describe('leak-test matrix', () => {
       campaignId: theirs.id, enteredWarbandId: entered.warband_id, ownEnrolmentId: own.id, ledCampaignId: led.id, pendingEnrolmentIds: pending,
       battleId: battle.id, ledBattleId: ledBattle.id, spareBattleId: spareBattle.id, ledEntryId, ledProposalIds, ledWarbandId: ledEntered.warband_id, ownNoteId, ownLibraryItemId, ownPictureId, pendingPictureId,
       doomedCampaignId: doomed.id, doomedCampaignName: doomed.name,
-      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, spareOpponentGroupId: spareOpp.gid, spareOpponentSkillId: spareOpp.sid, ledDraftId, spareDraftId, bugId,
+      historyCampaignId: taken.id, historyWarbandId: takenEntered.warband_id, pastBattleId, chapterId, ledChapterId, ledBackgroundId, spareBackgroundId, ledNpcWarbandId, spareNpcWarbandId, userId: player.id, ownQuestionId, ledFactionId, spareFactionId, ledNpcId, ledEventId, ledScenarioId, spareScenarioId, ledStyleSeq: ledStyle.style.seq, spareOpponentGroupId: spareOpp.gid, spareOpponentSkillId: spareOpp.sid, ledDraftId, spareDraftId, bugId,
     };
     // a fresh session per request: a probe may sign its role out
     const tokenFor: Record<Role, () => string | null> = {

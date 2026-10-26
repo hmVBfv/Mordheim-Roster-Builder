@@ -5,7 +5,7 @@ import type { DB } from './db.ts';
 
 export const nameKey = (s: string): string => s.trim().replace(/\s+/g, ' ').toLowerCase();
 
-type Table = 'scenarios' | 'factions' | 'npcs' | 'background_entries';
+type Table = 'scenarios' | 'factions' | 'npcs' | 'background_entries' | 'npc_warbands';
 
 /** Is another live row of the campaign named like one of `names` (in any of the columns `cols`)? Empty names never clash. */
 export function nameTaken(db: DB, table: Table, campaignId: string, cols: string[], names: string[], exceptId: string): boolean {

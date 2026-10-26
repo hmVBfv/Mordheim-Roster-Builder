@@ -4,7 +4,7 @@
    (`expNeeded`). It never plays a battle; entering a campaign is a step of its own (the catch-up). */
 import type { Model, WarbandState } from '../state/types.ts';
 import type { Ctx } from './context.ts';
-import { totalSpent } from './costs.ts';
+import { totalRating, totalSpent } from './costs.ts';
 import { advanceStatus } from './profile.ts';
 import { update } from '../warband/update.ts';
 
@@ -34,4 +34,10 @@ export function expNeeded(ctx: Ctx, m: Model): number {
   const steps = st.thresholds.filter((t) => t > st.start);
   if (st.applied <= 0) return st.start;
   return steps[Math.min(st.applied, steps.length) - 1] ?? st.start;
+}
+
+/** What a planner is tracked by (wish #79): what it owns (`plannerValue`), the experience all its advances would need, and its rating. No limit and no rule
+    about how the experience is spread – the figures are only kept. */
+export function plannerFigures(ctx: Ctx): { value: number; exp: number; rating: number } {
+  return { value: plannerValue(ctx), exp: ctx.s.models.reduce((n, m) => n + expNeeded(ctx, m), 0), rating: totalRating(ctx) };
 }

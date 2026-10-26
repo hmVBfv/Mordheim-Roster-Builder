@@ -11,6 +11,7 @@ import ui from '../ui/ui.module.css';
 import type { CampaignView, Enrolment } from './api.ts';
 import styles from './Campaign.module.css';
 import { EnterSheet } from './EnterSheet.tsx';
+import { NpcWarbands } from './NpcWarbands.tsx';
 
 export const stateWord = (e: Enrolment) => {
   if (e.status === 'pending') return { word: 'Waiting for a leader', cls: styles.waiting };
@@ -82,6 +83,7 @@ export function WarbandsTab({ id, view, me, onView }: { id: string; view: Campai
           <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
         </div>
       </section>
+      {view.role === 'leader' && <NpcWarbands id={id} />}
       {waiting.length > 0 && (
         <section className={styles.section} aria-labelledby="w-waiting">
           <h2 id="w-waiting">Waiting for a leader</h2>

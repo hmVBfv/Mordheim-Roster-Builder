@@ -194,6 +194,33 @@ describe('the overview', () => {
     expect(note.textContent).toMatch(/needs 36 exp for its advances; the catch-up gives 30/);
   });
 
+  /* Wish #79: a leader keeps hidden NPC warbands – planners, tracked by value, experience and rating; nobody else sees the section. */
+  it('NPC warbands: a leader adds one of his warbands and reads its figures and cards; a player sees no such section', async () => {
+    const srv = server({ totp: true });
+    await db.warbands.add(record({ name: 'The Black Company' }));
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader', others: [] });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/warbands`);
+    const form = await screen.findByRole('form', { name: 'Add an NPC warband' });
+    await user.selectOptions(within(form).getByRole('combobox'), await within(form).findByRole('option', { name: /The Black Company/ }));
+    await user.click(within(form).getByRole('button', { name: 'Add as an NPC warband' }));
+    const list = await screen.findByRole('list', { name: 'NPC warbands' });
+    expect(list.textContent).toMatch(/The Black Company.*Value \d+ gc · Exp \d+ · Rating \d+ · \d+ models?/);
+    const saved = [...srv.state.npcWarbands.values()][0]!;
+    expect(saved.save).toMatchObject({ planner: true, plannerTrade: true });
+    await user.click(within(list).getByText(/The Black Company/));
+    expect(await within(list).findByRole('group', { name: /Tabletop Simulator cards of The Black Company/ })).toBeTruthy();
+  });
+
+  it('NPC warbands: a player is not offered the section', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });
+    at(`/campaign/${c.id}/warbands`);
+    await screen.findByRole('list', { name: 'Warbands' });
+    expect(screen.queryByText(/NPC warbands/)).toBeNull();
+    expect(screen.queryByRole('form', { name: 'Add an NPC warband' })).toBeNull();
+  });
+
   /* Rob, 19.10.2026: a section of its own, for the quick overview of every warband. */
   it('the Warbands tab: a card each with the numbers of its last mark, the waiting ones apart; a card opens the warband', async () => {
     const srv = server();
