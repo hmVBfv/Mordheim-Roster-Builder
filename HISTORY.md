@@ -4199,3 +4199,14 @@ the report alone: APPROVE; it found that an entry opened before "Replace" kept s
 a PUT with the id of an NPC warband of another campaign answers 409 `exists`, which tells a leader a
 guessed UUID is in use – not exploitable with random ids. The check (`npm run check`) does not run
 the server tests; I ran them by hand before the review. Pull request 212.
+
+## October 26, 2026 — #91: planners and campaign warbands apart, jumps in the side menu
+
+Rob's wish, with the variant he chose: the side menu under Warbands names the kinds as places to jump to,
+not as pages of their own. The list had mixed in the copies that play in a campaign with the free
+warbands (the planners already had their section), so the page got an "In campaigns" section first and
+the menu followed. The jumps are `/warbands?show=planners|campaigns|group-<id>`: not an `#anchor`,
+because the Quick Build's router lives in the fragment. A jump is a plain link, never the entry marked
+"here" (all of them lead to one page and would all have been). The groups come from the Library, as the
+list reads them. Pull request 214. In the e2e run one test of the rare list timed out once at a
+screenshot under load; alone it runs in three seconds, and nothing of the fix is in it.
