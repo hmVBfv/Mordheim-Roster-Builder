@@ -4080,3 +4080,40 @@ relied on the redirect only at the end, so a change to a route now gets a grep f
 destination in `app/e2e/` before the check. Master had also gone red on a test that read the
 highlighted tab before the redirect had settled (pull request 187 waits for it). Pull
 requests 188 to 190.
+
+## October 25, 2026 — the seventh run: #76 to #78 (sign-in lands on Home, rule words in sheets, the planner and the catch-up)
+
+**#76**: after a normal sign-in the app now goes to Home, not to the account; `?next=` still
+wins, and an accepted invite still opens the account, because the authenticator is set up
+there next. Four sign-in tests and one end-to-end test had the account hard-wired as the goal.
+
+**#78**: on a phone a tap on the underlined rule words of a Hired Sword in the Hire sheet
+(Scout, Cook) showed nothing. The bubble was there, but drawn into the page body, and the body
+lies under the top layer of an open dialog. The fix is in the bubble, not in the card: a word
+inside a dialog draws its bubble into that dialog, so every rule word in every sheet works,
+which was Rob's question ("check whether it is the same elsewhere"). My first version read a
+ref while rendering and the linter refused it; the dialog is now found when the word is
+touched. A unit test (the bubble is inside the sheet) and an end-to-end test cover it; the
+screenshot was looked at.
+
+**#77**, the wish for a late-game warband, grew into two pull requests and ADR 0026. The answer
+to "Rob: make it its own kind" was the **planner**: no gold limit, its value shown instead of
+gold, the experience each model's advances would need, its own section in the list, and no
+entry into a campaign as it is (the app does not offer it, the server refuses it). The harder
+half was how a late player joins a running campaign without rebuilding. Rob's idea was to measure
+by the median of the others. Two things in the rules shaped it: the warband rating counts
+experience once per man for a Henchmen group (`totalRating`), so the gap must be closed in
+rating points and the groups' share would otherwise eat it; and gold and gear do not count in
+the rating at all, which is why the value gets a figure of its own. Rob's rules for the
+experience (every group and Hero as many points as battles fought, the leader half as many
+again, the rest evenly among the Heroes, none above one and a half times the share, chosen
+advances) are in `core/src/campaign/catchup.ts` and tested with fixed numbers. The server gives
+the figures of the others without names (`GET /campaigns/:id/catchup`); a leader may confirm an
+entry that exceeds the plan, and the page of the warband says what it exceeds. Two fixtures were
+wrong at first: the Youngbloods of the Mercenaries are Heroes, not a Henchmen group, and the
+allowed value can never be below the starting gold, so "too rich" had to be tested on a plan
+with a lowered allowance. Pull requests 195 and 196 (merge 195 first).
+
+Also this run: a test of mine for the Library links (from the earlier run) read a list the
+server had not yet answered and failed on a slow runner in CI; pull request 194 makes it wait.
+Pull requests 192, 193, 194, 195 and 196.
