@@ -5,6 +5,7 @@ import { useOnline } from '../app/SyncState.tsx';
 import type { StoredWarband } from '../db/db.ts';
 import { FormSheet } from '../ui/FormSheet.tsx';
 import ui from '../ui/ui.module.css';
+import { Group } from '../ui/Group.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { GroupsSheet } from './GroupsSheet.tsx';
 import { WarbandList, type GroupChoice } from './WarbandList.tsx';
@@ -28,12 +29,11 @@ export default function GroupedWarbands({ warbands, notify }: { warbands: Stored
       <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => sheet.open()}>Groups</button></div>
       {api.groups.length === 0 && <WarbandList warbands={warbands} marks grid groups={choice} />}
       {api.groups.length > 0 && sections.map((sec) => (
-        <section key={sec.key} className={ui.page} aria-labelledby={`wbg-${sec.key}`}>
-          <h2 id={`wbg-${sec.key}`}>{sec.title}</h2>
+        <Group key={sec.key} id={`wbg-${sec.key}`} title={sec.title}>
           {sec.list.length === 0
             ? <p className={ui.muted}>{sec.key === 'none' ? 'Every warband is in a group.' : 'No warband in it yet. Choose this group under a warband.'}</p>
             : <WarbandList warbands={sec.list} marks grid groups={choice} />}
-        </section>
+        </Group>
       ))}
       <FormSheet dialogRef={sheet.ref}>
         {(titleId) => <GroupsSheet titleId={titleId} api={api} close={() => sheet.close()} />}

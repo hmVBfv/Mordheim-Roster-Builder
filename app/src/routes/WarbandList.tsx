@@ -20,6 +20,7 @@ export function WarbandList({ warbands, marks = false, grid = false, groups }: {
       {warbands.map((w) => (
         <li key={w.id}>
           <Link to={`/warbands/${w.id}`} className={ui.listLink}>
+            {w.state.planner && <span className={ui.ribbon} aria-hidden="true">P</span>}
             <span>{w.name}</span>
             <small>
               {w.wbName}{w.state.planner && ' · Planner'}
