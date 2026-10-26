@@ -35,7 +35,12 @@ export default defineConfig(({ mode, command }) => {
         name: 'mordheim-html',
         transformIndexHtml: (html: string) => html
           .replace('%APP_NAME%', names.name)
-          .replace('<!--CSP-->', command === 'build' ? `<meta http-equiv="Content-Security-Policy" content="${CSP}">` : ''),
+          .replace('<!--CSP-->', command === 'build' ? `<meta http-equiv="Content-Security-Policy" content="${CSP}">` : '')
+          // the campaign app is for its players: no search engine lists it (Rob, 26.10.2026); the Quick Build stays findable
+          .replace('<!--ROBOTS-->', flavour === 'campaign' ? '<meta name="robots" content="noindex, nofollow">' : ''),
+        generateBundle() {
+          if (flavour === 'campaign') this.emitFile({ type: 'asset', fileName: 'robots.txt', source: 'User-agent: *\nDisallow: /\n' });
+        },
       },
       VitePWA({
         registerType: 'prompt',
