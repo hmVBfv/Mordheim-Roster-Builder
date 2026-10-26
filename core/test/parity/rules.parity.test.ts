@@ -12,6 +12,7 @@ import type { HireEntry, HireRecord, Model, WarbandState } from '../../src/index
 import { loadGameData } from '../../src/node.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { withoutNewHouseKeys } from '../support/canon.ts';
+import { legacyMax } from '../support/cookbook.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng } from '../support/random.ts';
 
@@ -138,7 +139,7 @@ function coreCalc(s: WarbandState): Calc {
     totals: () => ({
       totalSpent: core.totalSpent(ctx), goldCurrent: core.goldCurrent(ctx), goldTreasury: core.goldTreasury(ctx), startGold: core.startGold(ctx),
       totalLarge: core.totalLarge(ctx), totalModels: core.totalModels(ctx), totalHeroes: core.totalHeroes(ctx), totalRating: core.totalRating(ctx),
-      warbandWorth: core.warbandWorth(ctx), warbandMax: core.warbandMax(ctx),
+      warbandWorth: core.warbandWorth(ctx), warbandMax: legacyMax(ctx),
       hsHireTotal: core.hsHireTotal(ctx), hsRatingTotal: core.hsRatingTotal(ctx), hsUpkeepTotal: core.hsUpkeepTotal(ctx), hsSizeBonus: core.hsSizeBonus(ctx),
       hsEqTotal: core.hsEqTotal(ctx), dpHireTotal: core.dpHireTotal(ctx), dpUpkeepTotal: core.dpUpkeepTotal(ctx), dpRatingTotal: core.dpRatingTotal(ctx),
       hsEquipOn: core.hsEquipOn(ctx), heroEqList: core.heroEqList(ctx),

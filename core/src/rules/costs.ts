@@ -39,12 +39,29 @@ export function ratioMen(ctx: Ctx, mp: NonNullable<UnitDef['maxPer']>): number {
   return ctx.s.models.filter((m) => mp.of.includes(m.uid_def)).reduce((n, m) => n + (m.promoted ? 1 : (m.qty || 1)), 0);
 }
 
+/** A house rule, or the Hung, sets the maximum outright; nothing raises it then. */
+function maxIsFixed(ctx: Ctx): boolean {
+  const h = houseRules(ctx.s);
+  return (h.max !== '' && h.max != null) || !warbandDef(ctx) || (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'hung');
+}
+
 /** What raises the warband's own maximum beyond its printed one (#82): a Halfling Scout, the carnival's cart. 0 where a house rule or the Hung sets the maximum outright. */
 export function warbandMaxBonus(ctx: Ctx): number {
-  const h = houseRules(ctx.s);
-  if (h.max !== '' && h.max != null) return 0;
-  if (!warbandDef(ctx) || (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'hung')) return 0;
-  return (ctx.s.wb === 'carnival' && ctx.s.models.some((m) => m.uid_def === 'cart') ? 2 : 0) + hsSizeBonus(ctx);
+  if (maxIsFixed(ctx)) return 0;
+  return (ctx.s.wb === 'carnival' && ctx.s.models.some((m) => m.uid_def === 'cart') ? 2 : 0) + hsSizeBonus(ctx) + cookbookBonus(ctx);
+}
+
+const COOKBOOK = 'Halbling-Kochbuch';
+
+/** The Halfling cookbook (report #82; the rare list, Rob 26.10.2026): +1 to the maximum, not cumulative, stacking with a Halfling Scout, kept when
+    its carrier dies or is out of action (it counts on a warrior, in the stash and on the fallen). Not for the warbands the item excludes. */
+export function cookbookBonus(ctx: Ctx): number {
+  if (maxIsFixed(ctx)) return 0;
+  const item = ctx.data.CATALOG.find((x) => x.de === COOKBOOK);
+  if (item?.only?.notWb?.includes(ctx.s.wb ?? '')) return 0;
+  const held = (m: Model | undefined) => Number(m?.rare?.[COOKBOOK]?.q) > 0;
+  const stashed = (ctx.s.stash?.items ?? []).some((it) => it.qty > 0 && (it.key === COOKBOOK || /^(halfling cookbook|halbling-kochbuch)$/i.test(it.name.trim())));
+  return ctx.s.models.some(held) || stashed || (ctx.s.fallen ?? []).some((f) => held(f.m)) ? 1 : 0;
 }
 
 export function warbandMax(ctx: Ctx): number {
