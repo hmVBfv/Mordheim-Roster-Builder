@@ -4155,3 +4155,29 @@ or write them down in production.
   request 202.
 - **79, wish, hidden NPC warbands.** Confirmed by Rob but not built: it needs decisions
   (who sees what, free starting gold) that can go either way; open as a question.
+
+## October 26, 2026 — the ninth run: #85 to #90 (copying in a sheet, the planner's list, copy and Trading Post)
+
+- **85, S3, "Copy for Claude" copied nothing in Firefox.** The fallback for a browser that refuses the
+  page's clipboard copies from a helper field; the field sat in the page body while the report is
+  open in a modal dialog, so it was inert. The same cause as the tooltip of report 78: anything that
+  has to be focused during an open sheet must live inside it. The field goes into the open dialog.
+  Pull request 206.
+- **90, S4, the spread of a dice price.** Min, max and average moved to a line of their own under
+  the price. Pull request 207.
+- **86 and 87, wishes, the planner's list.** One `Group` block (rail, title bar, space above the
+  block rather than between title and entries) now serves the Planners and the player's own groups;
+  a planner's entry wears a ribbon with a P across its top right corner. I looked at the
+  screenshot before committing. Pull request 208.
+- **89, wish, a planner with a Trading Post.** The choice is the save key `plannerTrade`; open, the
+  planner counts as one that has fought (`warbandHasFought`), so the whole Trading Post of the
+  campaign works – without a gold limit, without a roll, a price left empty is the average of
+  the dice price (Rob). Pull request 209.
+- **88, wish, "Copy to the planner".** A copy keeps the men and the gear (Rob), becomes a planner and
+  opens its Trading Post; the source is untouched. Stacked on 209 (it needs `setPlannerTrade`),
+  pull request 210.
+- **79 is still open** and was not built: it needs the two decisions (who sees the hidden NPC
+  warbands, how free the starting gold is).
+- A slip of mine, for the next run: the first push of 85 failed the lint (a test of mine used
+  `innerHTML`, which the app forbids even in tests); I read the log only after the check had
+  ended and had waited for it for nothing.
