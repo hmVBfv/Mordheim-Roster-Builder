@@ -202,6 +202,10 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       card: cardOf(w.uid),
       taken: w.xp ? takenOf(ctx, w.uid) : null,
       correctTaken: w.xp ? () => askTaken(w.uid, w.name) : undefined,
+      learnSpell: (name) => ed.edit((c) => {
+        const m = c.s.models.find((x) => x.uid === w.uid);
+        return m && core.magicOfModel(c, m) ? core.addSpellFromAdvance(c, w.uid, name) : core.addSpell(c, w.uid, name);
+      }, `${w.name} chose the spell ${core.spellLabel(name)}.`),
       correctInjuries: w.injuries.length || w.missGames ? () => { setInjuriesOf(w.uid); openInjuriesSheet(); } : undefined,
       chaos,
       outOfAction: w.hero && w.captive == null ? () => injureWarrior(w, '11') : undefined,
@@ -228,6 +232,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       card: cardOf(h.uid),
       taken: hs ? takenOf(ctx, h.uid) : null,
       correctTaken: hs ? () => askTaken(h.uid, h.name) : undefined,
+      learnSpell: hs ? (name) => ed.edit((c) => core.addHsSpell(c, h.uid, name), `${h.name} chose the spell ${core.spellLabel(name)}.`) : undefined,
       chaos: [],
       leave: { label: 'Dismiss — upkeep ends', run: () => ed.edit((c) => core.dismissHire(c, h.uid, hs ? 'hs' : 'dp'), `${h.name} is dismissed.`, { gold: locked ? 'keep' : 'settle' }) },
     };

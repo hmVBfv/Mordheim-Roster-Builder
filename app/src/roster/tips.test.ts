@@ -139,6 +139,25 @@ describe('the spell lore of a caster (#68)', () => {
     expect(wiz.lore!.spells[1]).toMatchObject({ known: true });
   });
 
+  it('#81: a caster has his starting spells still to choose until he knows as many as he starts with', () => {
+    const s = caravan();
+    const wizard = s.models.find((m) => m.uid_def === 'magician')!;
+    const open = (st: typeof s) => rosterView(data, st).heroes.find((h) => h.uid === wizard.uid)!.lore!.open;
+    expect(open(s)).toBe(1);
+    const t = caravan();
+    const school = core.casterLore(ctx(t), t.models.find((m) => m.uid_def === 'magician')!)!;
+    const name = data.SPELLS[school]!.spells.find(([n]) => !String(n).startsWith('▸'))![0];
+    t.models.find((m) => m.uid_def === 'magician')!.spells = [{ name }];
+    expect(rosterView(data, t).heroes.find((h) => h.uid === wizard.uid)!.lore!.open).toBe(0);
+  });
+
+  it('#81: the Warrior Priest has one prayer to choose at the start', () => {
+    let s = core.newWarband(data, 'wh');
+    s = core.addUnit(ctx(s), 'priest');
+    const priest = rosterView(data, s).heroes.find((h) => h.type === 'Warrior Priest')!;
+    expect(priest.lore).toMatchObject({ open: 1 });
+  });
+
   it('a warrior who casts nothing has no lore', () => {
     const v = rosterView(data, caravan());
     expect(v.heroes.find((h) => h.type === 'Merchant')!.lore).toBeNull();
