@@ -18,7 +18,8 @@ export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown;
   const navigate = useNavigate();
   const session = useSession();
   const me = session.status === 'in' ? session.user.id : undefined;
-  const free = (useWarbands() ?? []).filter((w) => w.ownerId === me && !w.campaignId && !w.conflict);
+  // a planner (#77) does not enter a campaign
+  const free = (useWarbands() ?? []).filter((w) => w.ownerId === me && !w.campaignId && !w.conflict && !w.state.planner);
   const [chosen, setChosen] = useState('');
   const [own, setOwn] = useState<'campaign' | 'own' | ''>('');
   const [busy, setBusy] = useState(false);

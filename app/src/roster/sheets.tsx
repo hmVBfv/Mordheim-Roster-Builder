@@ -119,7 +119,7 @@ export function RecruitSheet({ dialogRef, close, v, onRecruit }: SheetProps & { 
       <div className={ui.page}>
         <div>
           <h2 id={id}>Recruit</h2>
-          <p className={ui.muted}>{v.gold} gc left · Heroes {v.heroCount} of {v.heroMax} · Models {v.models}/{v.maxModels}</p>
+          <p className={ui.muted}>{v.planner ? `Value ${v.value} gc, no limit` : `${v.gold} gc left`} · Heroes {v.heroCount} of {v.heroMax} · Models {v.models}/{v.maxModels}</p>
         </div>
         {v.recruit.map((g) => (
           <section key={g.label} className={styles.recruitGroup} aria-label={g.label}>
@@ -186,7 +186,7 @@ function MoreMenBody({ v, close, onAdd, titleId }: { v: MoreMenView; close: Shee
         {v.surcharge > 0 && <><dt>Experience: {v.exp} × {v.perExp} gc</dt><dd>{v.surcharge} gc</dd></>}
         <dt className={styles.sum}>{n} × {v.each} gc</dt><dd className={styles.sum}>{total} gc</dd>
       </dl>
-      <p aria-live="polite" className={verdict ? styles.why : ui.muted}>{verdict || `Gold left: ${v.gold - total} gc.`}</p>
+      <p aria-live="polite" className={verdict ? styles.why : ui.muted}>{verdict || (v.planner ? '' : `Gold left: ${v.gold - total} gc.`)}</p>
       {who.map((_, i) => (
         <NameField key={i} label={`Name of new man ${i + 1}`} value={names[i] ?? ''} placeholder={v.fallbacks[i]!} onChange={(x) => setNames((p) => { const c = [...p]; c[i] = x; return c; })} />
       ))}

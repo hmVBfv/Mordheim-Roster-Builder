@@ -149,6 +149,15 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
+- **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
+  (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
+  wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**
+  (alles, was sie besitzt, zu Listenpreisen); „Not enough gold“ gibt es nicht. Steigerungen
+  brauchen keine Erfahrung: jede Karte nennt „Needs N exp for the advances …“ (ein
+  Held nach den Heldenstufen, eine Henchmen-Gruppe nach ihren). In der Liste der Warbands
+  steht sie im eigenen Abschnitt **Planners** und trägt die Marke „Planner“. Sie wird
+  einer Kampagne nicht angeboten und der Server lehnt sie ab; ein Planner tritt später
+  über den Nachzügler-Weg ein (Catch-up), nicht als Kopie.
 - **Nach der Anmeldung: Home (Wunsch #76, Rob, 25.10.2026):** wer sich normal anmeldet,
   landet auf Home, nicht auf Account; kam er von einer Stelle, die ihn geschickt hat
   (`?next=`), geht es dorthin zurück. Die Einladung bleibt bei Account, weil dort als

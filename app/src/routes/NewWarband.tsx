@@ -27,6 +27,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const [key, setKey] = useState('');
   const [sub, setSub] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [planner, setPlanner] = useState(false);
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const ids = { wb: useId(), sub: useId(), name: useId() };
@@ -37,7 +38,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const create = async () => {
     if (!choice) return;
     setBusy(true);
-    const s = createWarband(data, choice.key, subtype?.key ?? null, name);
+    const s = createWarband(data, choice.key, subtype?.key ?? null, name, planner && !campaignId);
     const now = new Date().toISOString();
     const rec: StoredWarband = {
       id: newId(), name: s.name || choice.name, wb: choice.key, wbName: choice.name,
@@ -100,7 +101,13 @@ function Form({ campaignId }: { campaignId: string | null }) {
         <input id={ids.name} className={ui.input} value={name} maxLength={80} autoComplete="off"
           placeholder={choice?.name ?? 'The name of your warband'} onChange={(e) => setName(e.target.value)} />
       </label>
-      {choice && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
+      {!campaignId && (
+        <label className={ui.check}>
+          <input type="checkbox" checked={planner} onChange={(e) => setPlanner(e.target.checked)} />
+          <span><strong>A planner</strong> – to see what a strong late-game warband looks like: no gold limit (its value is shown), advances without experience (the experience they would need is shown). It does not take part in a campaign.</span>
+        </label>
+      )}
+      {choice && !planner && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
       <div className={ui.actions}>
         <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
         <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>

@@ -146,7 +146,7 @@ export function hireDetail(ctx: core.Ctx, kind: HireKind, key: string, opt?: str
 }
 
 /** The figures over the list. */
-export interface HireFigures { gold: number; upkeep: number; hired: number; locked: boolean }
+export interface HireFigures { gold: number; upkeep: number; hired: number; locked: boolean; planner: boolean; value: number }
 
 export function hireFigures(ctx: core.Ctx): HireFigures {
   return {
@@ -154,5 +154,7 @@ export function hireFigures(ctx: core.Ctx): HireFigures {
     upkeep: core.hsUpkeepTotal(ctx) + core.dpUpkeepTotal(ctx),
     hired: (ctx.s.hired ?? []).length + (ctx.s.dp ?? []).length,
     locked: core.tradeLocked(ctx),
+    planner: core.isPlanner(ctx.s),
+    value: core.plannerValue(ctx),
   };
 }

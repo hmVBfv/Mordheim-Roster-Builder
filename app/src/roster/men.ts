@@ -25,6 +25,8 @@ export interface MoreMenView {
   gold: number;
   /** Gold is real from the first battle on: no more men than it pays for. */
   goldBinds: boolean;
+  /** A planner (#77): no gold to run out of. */
+  planner: boolean;
 }
 
 export function moreMenView(ctx: core.Ctx, uid: number): MoreMenView | null {
@@ -44,6 +46,7 @@ export function moreMenView(ctx: core.Ctx, uid: number): MoreMenView | null {
     veterans: v === undefined ? null : { roll: v?.roll ?? null, spent: v?.spent ?? 0 },
     gold: core.goldCurrent(ctx),
     goldBinds: core.tradeLocked(ctx),
+    planner: core.isPlanner(ctx.s),
   };
 }
 

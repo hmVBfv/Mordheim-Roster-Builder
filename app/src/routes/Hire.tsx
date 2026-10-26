@@ -56,11 +56,14 @@ function HireForm({ ctx, kind, hkey, gold, locked, titleId, close, onHire }: {
   if (!d) return null;
   const r = d.row;
   const why = core.hireProblem(ctx, kind, hkey, opt);
+  const planner = core.isPlanner(ctx.s);
   const left = gold - r.fee;
   const verdict = why
     ? `Not now: ${why}.`
-    : left < 0
-      ? `That is ${-left} gc more than the warband has; the roster will say so.`
+    : planner
+      ? 'A planner has no gold limit; his fee counts in its value.'
+      : left < 0
+        ? `That is ${-left} gc more than the warband has; the roster will say so.`
       : locked
         ? 'The fee is booked in the ledger; his upkeep is due after each battle.'
         : 'Until the first battle his fee comes back if he leaves again.';
@@ -93,7 +96,7 @@ function HireForm({ ctx, kind, hkey, gold, locked, titleId, close, onHire }: {
         <dd>{r.fee !== r.baseFee ? <><s>{gc(r.baseFee)}</s> {gc(r.fee)}</> : gc(r.fee)}{d.discount && <small> · half price: {d.discount}</small>}</dd>
         <dt>Upkeep after each battle</dt><dd>{r.upkeep ? gc(r.upkeep) : 'none'}</dd>
         <dt>Rating</dt><dd>+{r.rating}</dd>
-        <dt className={styles.sum}>Gold left</dt><dd className={`${styles.sum} ${left < 0 ? trade.no : ''}`}>{gc(left)}</dd>
+        {!planner && <><dt className={styles.sum}>Gold left</dt><dd className={`${styles.sum} ${left < 0 ? trade.no : ''}`}>{gc(left)}</dd></>}
       </dl>
       <p className={why ? `${styles.verdict} ${trade.no}` : styles.verdict} aria-live="polite">{verdict}</p>
       <div className={`${ui.actions} ${ui.sheetActions}`}>
@@ -134,7 +137,7 @@ function Body({ rec }: { rec: StoredWarband }) {
         <h1>Hire</h1>
       </div>
       <dl className={trade.figures}>
-        <div><dt>Gold in hand</dt><dd>{gc(fig.gold)}</dd></div>
+        {fig.planner ? <div><dt>Value</dt><dd>{gc(fig.value)}</dd></div> : <div><dt>Gold in hand</dt><dd>{gc(fig.gold)}</dd></div>}
         <div><dt>Upkeep after each battle</dt><dd>{gc(fig.upkeep)}</dd></div>
         <div><dt>Hired</dt><dd>{fig.hired}</dd></div>
       </dl>

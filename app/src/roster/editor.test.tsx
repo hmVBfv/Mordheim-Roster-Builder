@@ -138,6 +138,35 @@ describe('a new warband', () => {
     expect(all[0]!.state.subtype).toBe('trantio');
   });
 
+  /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
+  it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'merc');
+    await user.click(screen.getByRole('checkbox', { name: /A planner/ }));
+    expect(screen.queryByText(/Starting gold/)).toBeNull();
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'The Late Company');
+    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Late Company' })).toBeTruthy();
+    expect((await db.warbands.toArray())[0]!.state.planner).toBe(true);
+    expect(screen.getByText(/· Planner/)).toBeTruthy();
+    expect(screen.getByText('Value')).toBeTruthy();
+    expect(screen.queryByText('Gold')).toBeNull();
+    expect(screen.getByText(/A planner: no gold limit, and advances without experience/)).toBeTruthy();
+  });
+
+  it('is an ordinary warband unless asked', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'merc');
+    expect((screen.getByRole('checkbox', { name: /A planner/ }) as HTMLInputElement).checked).toBe(false);
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Plain');
+    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Plain' })).toBeTruthy();
+    expect((await db.warbands.toArray())[0]!.state.planner).toBeUndefined();
+    expect(screen.getByText('Gold')).toBeTruthy();
+  });
+
   it('is offered on Home and on the list of warbands', async () => {
     at('/');
     expect((await screen.findByRole('link', { name: 'New warband' })).getAttribute('href')).toBe('/warbands/new');
