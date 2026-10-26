@@ -142,6 +142,9 @@ export const ACTIONS = {
   /** The leaders' plan for a battle – the red thread the battle and its chapter should follow: leaders with the authenticator, read and write. */
   'plans.read': { who: 'user', target: 'leader' },
   'plans.write': { who: 'user', target: 'leader' },
+  /** Hidden NPC warbands (wish #79): reference and TTS data of the game master, read and written by the campaign's leaders alone, with the authenticator. */
+  'npcwarband.read': { who: 'user', target: 'leader' },
+  'npcwarband.write': { who: 'user', target: 'leader' },
   /** Opponents – groups of profiles and the campaign's own skills: leaders with the authenticator, read and write – for the rest they are not there. */
   'opponents.read': { who: 'user', target: 'leader' },
   'opponents.write': { who: 'user', target: 'leader' },

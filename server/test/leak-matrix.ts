@@ -81,6 +81,8 @@ export interface ProbeContext {
   ledChapterId: string;
   /** Background entries of the admin's campaign: one to read and reveal, a spare to take out (phase 4b1). */
   ledBackgroundId: string;
+  ledNpcWarbandId: string;
+  spareNpcWarbandId: string;
   spareBackgroundId: string;
   /** The user role's id, and an open question of the victim's campaign asked of the user role (phase 4b3). */
   userId: string;
@@ -582,6 +584,23 @@ export const MATRIX: Record<Action, MatrixRow> = {
     },
     fields: { admin: ['entry', 'seq', 'note', 'removed'] },
   },
+  'npcwarband.read': {
+    // the user role is a player there (403), the admin leads it
+    allowed: ['admin'],
+    routes: {
+      'GET /api/v1/campaigns/:id/npc-warbands': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/npc-warbands` }),
+      'GET /api/v1/campaigns/:id/npc-warbands/:wid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.ledCampaignId}/npc-warbands/${c.ledNpcWarbandId}` }),
+    },
+    fields: { admin: ['warbands', 'seq', 'warband'] },
+  },
+  'npcwarband.write': {
+    allowed: ['admin'],
+    routes: {
+      'PUT /api/v1/campaigns/:id/npc-warbands/:wid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/npc-warbands/${randomUUID()}`, body: { name: 'Probing the watch', save: { planner: true }, summary: { value: 0, exp: 0, rating: 0, models: 0 } } }),
+      'DELETE /api/v1/campaigns/:id/npc-warbands/:wid': (c) => ({ method: 'DELETE', url: `/api/v1/campaigns/${c.ledCampaignId}/npc-warbands/${c.spareNpcWarbandId}` }),
+    },
+    fields: { admin: ['warband', 'seq', 'removed'] },
+  },
   'bugs.report': {
     // anyone signed in may send one – the admin too, with the authenticator
     allowed: signedIn,
@@ -629,6 +648,8 @@ export const SECRET_VALUES = [/^scrypt\$/, /^v1:[\w-]+:[\w-]+:[\w-]+$/,
   /SEALED-SECRET/, /LEADER-SECRET/,
   // the background's truth (phase 4b1): only leaders read it – and the entries the probes read in the admin's own campaign do not carry it
   /BACKGROUND-SECRET/,
+  // a hidden NPC warband of the victim's campaign (wish #79): only its leaders read it, and none of them is a role of the matrix
+  /NPCWARBAND-SECRET/,
   // a question asked of someone else (phase 4b3): no role of the matrix is its addressee
   /QUESTION-SECRET/,
   // a draft scenario of the victim's campaign (phase 4b3c): only its leaders read it, and none of them is a role of the matrix

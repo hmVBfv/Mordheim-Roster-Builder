@@ -110,6 +110,8 @@ export interface RosterView {
   gold: number;
   /** A planner (#77): no gold limit; `value` is shown in place of the gold in hand. */
   planner: boolean;
+  /** A planner (#79): the experience all its advances would need. */
+  plannerExp: number;
   /** A planner whose Trading Post is open (#89). */
   plannerTrade: boolean;
   value: number;
@@ -371,6 +373,7 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
     worth: core.warbandWorth(ctx),
     gold: core.goldCurrent(ctx),
     planner: core.isPlanner(ctx.s),
+    plannerExp: core.isPlanner(ctx.s) ? core.plannerFigures(ctx).exp : 0,
     plannerTrade: ctx.s.plannerTrade === true,
     value: core.plannerValue(ctx),
     models: core.totalModels(ctx),

@@ -98,3 +98,18 @@ describe('the planner can open the Trading Post (#89)', () => {
     expect(back.ok && back.state.plannerTrade).toBe(true);
   });
 });
+
+describe('what a planner is tracked by (#79)', () => {
+  it('its value, the experience its advances would need, and its rating – with no rule on how the experience is spread', () => {
+    let s = band(true);
+    const f0 = core.plannerFigures(ctx(s));
+    expect(f0.value).toBe(core.totalSpent(ctx(s)));
+    expect(f0.rating).toBe(core.totalRating(ctx(s)));
+    const hero = s.models.find((m) => m.uid_def === 'champ')!;
+    // all the advances on one Hero, none on the others: allowed, and the experience shows it
+    for (let i = 0; i < 4; i++) s = core.addAdvance(ctx(s), hero.uid, 'WS');
+    const f1 = core.plannerFigures(ctx(s));
+    expect(f1.exp).toBeGreaterThan(f0.exp);
+    expect(f1.exp).toBe(s.models.reduce((n, m) => n + core.expNeeded(ctx(s), m), 0));
+  });
+});
