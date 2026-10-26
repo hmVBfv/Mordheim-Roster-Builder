@@ -569,6 +569,11 @@
   font-size: 0.85em;
 }
 
+/* what a dice price can come to: a line of its own under the price (#90) */
+.rareRow .rs {
+  display: block;
+}
+
 @media (min-width: 720px) {
   .pick button.rareRow,
   .rows button.rareRow {
