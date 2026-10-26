@@ -34,7 +34,8 @@ function copyByCommand(text: string): boolean {
   field.setAttribute('aria-hidden', 'true');
   field.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none';
   const before = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  document.body.append(field);
+  // an open sheet is a modal dialog: the rest of the page is inert, so the field must sit inside it
+  (document.querySelector('dialog[open]') ?? document.body).append(field);
   field.focus();
   field.select();
   field.setSelectionRange(0, text.length);
