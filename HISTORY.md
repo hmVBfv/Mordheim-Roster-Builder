@@ -4181,3 +4181,21 @@ or write them down in production.
 - A slip of mine, for the next run: the first push of 85 failed the lint (a test of mine used
   `innerHTML`, which the app forbids even in tests); I read the log only after the check had
   ended and had waited for it for nothing.
+
+## October 26, 2026 — #79: hidden NPC warbands for the game master
+
+Rob confirmed the wish with two answers: only leaders see them, and they are planners – no gold limit,
+but tracked: what was spent, how much experience, the rating, and no duty to spread the experience
+evenly. So they reuse the planner (report 77) and the leaders-only pattern of the background (phase
+4b1): table `npc_warbands` (migration 40), routes under `/campaigns/:id/npc-warbands`, actions
+`npcwarband.read` and `npcwarband.write`, entries in the leak matrix with a marker that no role of the
+matrix may ever read, and in the log only "something changed". The save is stored as it is; the list
+carries three figures (`summary`) instead of saves. The leader keeps them from his own warbands: an
+NPC warband is a copy, made a planner with its Trading Post open, and "Take a copy to work on" gives
+it back as a planner of his own. It is not an enrolment: no marks, no versions, no place in any list
+of the campaign (ADR 0027). S1 (it touches visibility), so the independent reviewer read the diff and
+the report alone: APPROVE; it found that an entry opened before "Replace" kept showing the old state
+(fixed by keying the entry on its seq) and two misplaced comments. One thing left as it is on purpose:
+a PUT with the id of an NPC warband of another campaign answers 409 `exists`, which tells a leader a
+guessed UUID is in use – not exploitable with random ids. The check (`npm run check`) does not run
+the server tests; I ran them by hand before the review. Pull request 212.
