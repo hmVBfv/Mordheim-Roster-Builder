@@ -958,6 +958,28 @@ test('a planner opens the Trading Post and takes a rare item without a roll', as
   await expect(page.locator('dialog[open]')).toHaveCount(0);
 });
 
+/* Wish #88: a copy of a warband that is a planner, to plan the late game from it. */
+test('a warband is copied to the planner: the same men, a value instead of gold, the source untouched', async ({ page }) => {
+  const quick = test.info().project.name === 'quickbuild';
+  await page.setViewportSize({ width: 1100, height: 800 });
+  await page.goto(quick ? '#/warbands/new' : 'warbands/new');
+  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
+  await page.getByLabel('Name').fill('The Played Company');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await page.getByRole('button', { name: '+ Recruit' }).click();
+  await page.locator('dialog[open]').getByRole('button', { name: /^Mercenary Captain/ }).click();
+  await page.getByRole('button', { name: 'Copy to the planner' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'The Played Company (planner)' })).toBeVisible();
+  await expect(page.getByText('Value', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Mercenary Captain/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Copy to the planner' })).toHaveCount(0);
+  await page.goto(quick ? '#/warbands' : 'warbands');
+  const list = page.getByRole('main');
+  await expect(list.getByRole('link', { name: /^The Played Company Mercenaries/ })).toBeVisible();
+  await expect(list.getByRole('link', { name: /^The Played Company \(planner\) Mercenaries · Planner/ })).toBeVisible();
+});
+
 /* Over http in the home network (the test instance) the browser has no
    crypto.randomUUID (Rob, 05.10.2026: import failed, "Start the warband"
    did nothing). The same without it here. */
