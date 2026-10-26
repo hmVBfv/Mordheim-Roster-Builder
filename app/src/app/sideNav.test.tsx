@@ -53,6 +53,27 @@ describe('the side navigation', () => {
     expect(nav.querySelector('#nav-warbands')).not.toBeNull();
   });
 
+  /* Wish #91 (Rob, 26.10.2026): planners and the warbands of a campaign are kept apart in the list and have a place of their own under Warbands. */
+  it('Warbands also names the kinds apart – planners, the warbands in a campaign – as places to jump to, only where there are such', async () => {
+    wide(true);
+    await seed('w1', 'The Silver Caravan', '2026-09-28T10:00:00.000Z');
+    at('/warbands');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    const none = await waitForList(nav, 'nav-warbands');
+    await vi.waitFor(() => expect(within(none).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Silver Caravan', '+ New warband']));
+    cleanup();
+    const plan = { ...sampleSave(), name: 'The Late Company', planner: true };
+    await db.warbands.add({ id: 'p1', name: 'The Late Company', wb: plan.wb as string, wbName: 'Mercenaries', state: plan, format: 1, createdAt: NOW, updatedAt: '2026-09-28T12:00:00.000Z' });
+    const inCamp = { ...sampleSave(), name: 'The Field Company' };
+    await db.warbands.add({ id: 'c1', name: 'The Field Company', wb: inCamp.wb as string, wbName: 'Mercenaries', state: inCamp, format: 1, createdAt: NOW, updatedAt: '2026-09-28T09:00:00.000Z', campaignId: 'camp-1' });
+    at('/warbands');
+    const nav2 = screen.getByRole('navigation', { name: 'Main' });
+    const sub = await waitForList(nav2, 'nav-warbands');
+    await vi.waitFor(() => expect(within(sub).getByRole('link', { name: 'Planners' })).toBeTruthy());
+    expect(within(sub).getByRole('link', { name: 'Planners' }).getAttribute('href')).toBe('/warbands?show=planners');
+    expect(within(sub).getByRole('link', { name: 'In campaigns' }).getAttribute('href')).toBe('/warbands?show=campaigns');
+  });
+
   it('Campaign lists one’s campaigns, and under the one that is open its sections', async () => {
     wide(true);
     const srv = createFakeSync({ me: { id: KAI.id, username: KAI.username, displayName: KAI.displayName } });

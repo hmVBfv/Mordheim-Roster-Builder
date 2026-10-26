@@ -1,8 +1,8 @@
 /* The warbands: in the campaign app with an account those of the account
    (synced, phase 3h) and those made on this device while nobody was signed
    in, which can join the account. */
-import { lazy, Suspense, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { useSession } from '../account/session.ts';
 import type { StoredWarband } from '../db/db.ts';
 import { keepInAccount, restoreWarband, useWarbands } from '../sync/local.ts';
@@ -27,9 +27,19 @@ export function Warbands() {
   const removed = (useLocation().state as { removed?: StoredWarband } | null)?.removed;
   const signedIn = session.status === 'in';
   const deviceOnly = signedIn ? (warbands ?? []).filter((w) => !w.ownerId) : [];
-  // planners (#77) are a kind of their own: a section under the warbands
+  // planners (#77) and the warbands entered in a campaign (#91) are kinds of their own: a section each under the free warbands
   const planners = (warbands ?? []).filter((w) => w.state.planner);
-  const played = (warbands ?? []).filter((w) => !w.state.planner);
+  const inCampaigns = (warbands ?? []).filter((w) => !w.state.planner && w.campaignId);
+  const played = (warbands ?? []).filter((w) => !w.state.planner && !w.campaignId);
+  // the menu jumps here: ?show=planners | campaigns | group-<id>
+  const [params] = useSearchParams();
+  const show = params.get('show');
+  const loaded = warbands !== undefined;
+  useEffect(() => {
+    if (!show || !loaded) return;
+    const id = show === 'planners' ? 'planners-h' : show === 'campaigns' ? 'campaigns-h' : show.startsWith('group-') ? `wbg-${show.slice(6)}` : null;
+    if (id) document.getElementById(id)?.scrollIntoView?.({ block: 'start' });
+  }, [show, loaded, planners.length, inCampaigns.length]);
   return (
     <section className={ui.page}>
       <h1>Warbands</h1>
@@ -56,6 +66,12 @@ export function Warbands() {
         <Suspense fallback={<WarbandList warbands={played} marks grid />}>
           <GroupedWarbands warbands={played} notify={notify} />
         </Suspense>
+      )}
+      {inCampaigns.length > 0 && (
+        <Group id="campaigns-h" title="In campaigns">
+          <p className={ui.muted}>The copies of your warbands that take part in a campaign. They play there; the free warband they came from is above.</p>
+          <WarbandList warbands={inCampaigns} marks={signedIn} grid />
+        </Group>
       )}
       {planners.length > 0 && (
         <Group id="planners-h" title="Planners">
