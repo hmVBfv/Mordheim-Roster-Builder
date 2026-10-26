@@ -4140,8 +4140,14 @@ or write them down in production.
   were not looked at. Pull request 200.
 - **82, wish, 12(+1).** `warbandMaxBonus` in core names what raises the printed maximum (Halfling
   Scout, the carnival's cart); the tile and the Recruit sheet show `8/12(+1)`, the limit is still
-  the sum. The Cooking Book of the report is not in the data as a size bonus; asked in the pull
-  request. Pull request 201.
+  the sum (pull request 201). I had written that the Cooking Book was not in the data as a size
+  bonus; it is the Halfling cookbook, a rare item whose text says so but which nothing calculated.
+  Rob gave the rule from the rare list (+1, not cumulative, +2 with a Halfling Scout, kept when the
+  carrier dies, not for Undead and Carnival); `cookbookBonus` counts it on a warrior, in the stash
+  and on the fallen. It is a difference from the legacy app, so the parity suites leave out exactly
+  that bonus (`core/test/support/cookbook.ts`) and `docs/behaviour-changes.md` has the row; a real
+  save of the campaign (Silver Caravan) carries the book, which is how the parity tests noticed.
+  Pull request 204.
 - **84, rules issue, second roll of a result.** The sheet already had the line ("Roll a D6: 1–3
   Strength, 4–6 Attack") but showed it only after the roll was entered; the table carries it now.
   A display change, no data change, so Rob's rule for rules issues was not touched; the source
