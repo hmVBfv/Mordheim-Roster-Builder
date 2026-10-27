@@ -380,7 +380,7 @@ describe('the Library: places and links', () => {
     let sheet = screen.getByRole('dialog', { name: 'Edit faction' });
     const add = within(sheet).getByLabelText('Add a link');
     // only entries that can be linked, named with their kind, and not itself
-    expect(within(add).getAllByRole('option').map((o) => o.textContent)).toEqual(['Choose …', 'Captain Brandt (NPC)']);
+    expect([...add.children].filter((o) => o.tagName === 'OPTION').map((o) => o.textContent)).toEqual(['Choose …', 'Captain Brandt (NPC)']);
     await user.selectOptions(add, 'Captain Brandt (NPC)');
     expect(within(sheet).getByRole('button', { name: 'Remove link to Captain Brandt' })).toBeTruthy();
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
@@ -403,6 +403,26 @@ describe('the Library: places and links', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Remove link to Captain Brandt' }));
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toEqual([]));
+  });
+
+  /* Report #100: a new faction or NPC is meant to be tied to a place or power of the lore catalogue, which lives outside the
+     Library; with no other entry the picker was even switched off. */
+  it('an entry is linked to a place of the lore catalogue, with nothing else in the Library', async () => {
+    const srv = server();
+    const watch = srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '' } });
+    const user = userEvent.setup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    const add = within(sheet).getByLabelText('Add a link');
+    await waitFor(() => expect((add as HTMLSelectElement).disabled).toBe(false));
+    await waitFor(() => expect(within(add).getByRole('option', { name: 'Mordheim (Region)' })).toBeTruthy());
+    await user.selectOptions(add, 'Mordheim (Region)');
+    expect(within(sheet).getByRole('button', { name: 'Remove link to Mordheim' })).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toEqual(['lore:mordheim']));
+    const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
+    expect(await within(card).findByText('Mordheim')).toBeTruthy();
   });
 
   it('a link to an entry that is gone is not shown', async () => {

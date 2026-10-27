@@ -35,6 +35,15 @@ beforeEach(async () => { await db.warbands.clear(); await db.meta.clear(); local
 afterEach(() => { cleanup(); stopSync(); resetSession(); vi.unstubAllGlobals(); });
 
 describe('the side navigation', () => {
+  /* Wish #94 (Rob, 26.10.2026): the name in the corner of the header is a way back to Home. */
+  it('the app name in the header leads to Home', async () => {
+    const user = userEvent.setup();
+    at('/warbands');
+    const header = screen.getByRole('banner');
+    await user.click(within(header).getByRole('link', { name: 'Mordheim Campaign' }));
+    expect(await screen.findByRole('heading', { name: 'Your warbands' })).toBeTruthy();
+  });
+
   it('Warbands opens into one’s newest warbands and a new one, and closes again; the choice stays on the device', async () => {
     wide(true);
     await seed('w1', 'The Silver Caravan', '2026-09-28T10:00:00.000Z');

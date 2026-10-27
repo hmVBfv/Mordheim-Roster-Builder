@@ -42,6 +42,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
 }
 
 .sync {
@@ -247,6 +252,17 @@
   .subLink:hover {
     background: var(--surface-2);
     color: var(--text);
+  }
+
+  /* a heading over warbands (#92): small, spaced out, not a page of its own */
+  .subHead {
+    min-height: calc(var(--tap) - 8px);
+    margin-top: var(--space-1);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.75;
   }
 
   .subLink.active {

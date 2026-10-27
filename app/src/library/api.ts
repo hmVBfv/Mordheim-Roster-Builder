@@ -43,6 +43,12 @@ export type LibraryLocation = LibraryItem<LocationBody>;
 
 const KEY = 'items';
 
+/* Every screen that shows the Library (a tab, the side navigation) asks the device for it on its own; a write tells the others,
+   so a group made on one screen is there on the next at once (#93). */
+const changed = new EventTarget();
+export const onLibraryChanged = (fn: () => void): (() => void) => { changed.addEventListener('change', fn); return () => changed.removeEventListener('change', fn); };
+const announce = () => changed.dispatchEvent(new Event('change'));
+
 /** What is alive: the server's answer also carries the graves of what was taken out. */
 const alive = (items: LibraryItem[]) => items.filter((i) => !i.deletedAt);
 
@@ -65,6 +71,7 @@ export async function putItem<B>(kind: 'idea' | 'faction' | 'npc' | 'group' | 's
   const r = await api<{ item: LibraryItem<B> }>(`/library/${id}`, { method: 'PUT', body: { kind, name, body, ...(baseSeq !== undefined ? { baseSeq } : {}) } });
   const cur = (await cachedLibrary()) ?? [];
   await who.keep('library:', KEY, [r.item, ...cur.filter((i) => i.id !== id)]);
+  announce();
   return r.item;
 }
 export const putIdea = (id: string, name: string, body: IdeaBody, baseSeq?: number) => putItem<IdeaBody>('idea', id, name, body, baseSeq);
@@ -88,6 +95,7 @@ export async function removeItem(id: string): Promise<void> {
     if (!(e instanceof ApiError && e.status === 404)) throw e;
   }
   await who.keep('library:', KEY, ((await cachedLibrary()) ?? []).filter((i) => i.id !== id));
+  announce();
 }
 
 /** The entry as it stands now, when it was changed from another device first (the server's 409 `stale`). */
