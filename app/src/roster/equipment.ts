@@ -22,7 +22,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 export interface ListRow { key: string; name: string; price: number; qty: number; free: boolean; text: string; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
-export interface RareRow { de: string; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
+export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; /** Used up in one game: the sheet says "Used" for taking it off. */ once: boolean; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
 export interface RareOffer { de: string; name: string; price: string; rarity: string }
 
 export interface EquipmentView {
@@ -57,14 +57,18 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
         return { key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), qty, free: nm.includes(FREE), text: itemText(ctx.data, nm), more: core.listProblem(ctx, uid, nm, qty + 1) };
       }),
   })).filter((g) => g.rows.length);
-  const rare: RareRow[] = Object.entries(m.rare ?? {}).map(([de, r]) => {
+  // one row for an item; a weapon upgrade has one row for every weapon it sits on (reports #109, #110)
+  const rare: RareRow[] = Object.entries(m.rare ?? {}).flatMap(([de, r]) => {
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     const upgrade = core.isUpgrade(ctx.data, de);
-    return {
-      de, name: it?.en ?? core.enItem(ctx.data, de), q: Number(r?.q) || 0, max: core.isArmourItem(ctx, de) ? 1 : 9, paid: Number(r?.paid) || 0, upgrade, on: (r?.on as string | undefined) ?? null,
-      targets: upgrade ? core.upgradeTargets(ctx, m, de).map((w) => ({ key: w.nm, name: core.enItem(ctx.data, w.nm) })) : [],
-      text: itemText(ctx.data, it?.en ?? de),
-    };
+    const base = { de, name: it?.en ?? core.enItem(ctx.data, de), upgrade, once: core.upgradeOnce(ctx, de), text: itemText(ctx.data, it?.en ?? de) };
+    if (!upgrade) return [{ ...base, slot: 0, q: Number(r?.q) || 0, max: core.isArmourItem(ctx, de) ? 1 : 9, paid: Number(r?.paid) || 0, on: (r?.on as string | undefined) ?? null, targets: [] }];
+    const free = core.upgradeFree(ctx, m, de);
+    return core.upgradeSlots(m, de).map((s, slot) => ({
+      ...base, slot, q: 1, max: 1, paid: s.paid, on: s.on,
+      // the weapons this copy could move to: those without one, and its own
+      targets: core.upgradeTargets(ctx, m, de).filter((w) => w.nm === s.on || free.some((f) => f.nm === w.nm)).map((w) => ({ key: w.nm, name: core.enItem(ctx.data, w.nm) })),
+    }));
   });
   const recruit = core.isNewRecruit(ctx, m);
   const held = new Set(Object.keys(m.rare ?? {}));
@@ -73,12 +77,25 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
   // A recruit searches; the free market opens the catalogue (Rob, 22.10.2026, #47).
   const free = !!core.houseRules(ctx.s).freeMarket;
   const atStart = (de: string) => core.isUpgrade(ctx.data, de) && !!(core.upgradeStart(ctx, de) || core.upgradeAlways(ctx, de, m));
-  const offer = recruit ? [] : core.rareEligibleItems(ctx, m)
+  // flat upgrades (Dark Elf blade, Dark venom) are the catalogue's too: the sheet has no weapon list to show them next to
+  const isHero = core.isHeroModel(ctx, m);
+  const flat = ctx.data.CATALOG.filter((it) => core.isUpgrade(ctx.data, it.de) && core.inlineUpgradeActive(ctx, it.de) && core.catalogAllowed(ctx, it, m)
+    && (!ctx.data.UPGRADES[it.de]?.heroesOnly || isHero) && core.upgradeTargets(ctx, m, it.de).length > 0);
+  const offer = recruit ? [] : [...core.rareEligibleItems(ctx, m), ...flat.filter((it) => !core.rareEligibleItems(ctx, m).includes(it))]
     .filter((it) => free || atStart(it.de))
-    .filter((it) => !(held.has(it.de) && (core.isUpgrade(ctx.data, it.de) || core.isArmourItem(ctx, it.de))))
-    .map((it) => ({ de: it.de, name: it.en, price: typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost), rarity: it.rare || '' }))
+    .filter((it) => !(held.has(it.de) && core.isArmourItem(ctx, it.de)))
+    .filter((it) => !core.isUpgrade(ctx.data, it.de) || core.upgradeFree(ctx, m, it.de).length > 0)
+    .map((it) => ({ de: it.de, name: it.en, price: upgradePrice(ctx, m, it), rarity: it.rare || '' }))
     .sort((a, b) => a.name.localeCompare(b.name));
   return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, men: menOf(ctx, m), recruit };
+}
+
+/** What the offer says an item costs; an upgrade says it as it is bought now – the founding multiplier where one holds (report #108). */
+function upgradePrice(ctx: core.Ctx, m: Model, it: core.CatalogItem): string {
+  const u = ctx.data.UPGRADES[it.de];
+  if (!u) return typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost);
+  if (u.mult) return `${core.upgradeStart(ctx, it.de)?.mult ?? core.upgradeAlways(ctx, it.de, m)?.mult ?? u.mult}× the weapon's price`;
+  return `+${core.upgradeBase(ctx, it.de)} gc`;
 }
 
 /* ---- the Trading Post, after the first battle ---- */

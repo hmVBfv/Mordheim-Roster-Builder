@@ -15,9 +15,11 @@ export interface EquipmentActions {
   qty: (key: string, qty: number, name: string) => void;
   addRare: (de: string) => void;
   rareQty: (de: string, q: number) => void;
-  target: (de: string, weapon: string) => void;
+  target: (de: string, weapon: string, slot: number) => void;
+  /** Takes one copy of a weapon upgrade off – a used-up poison as well. */
+  removeSlot: (de: string, slot: number) => void;
   /** What was paid for a rare item, set by hand (a price rolled at the table). */
-  paid: (de: string, gc: number) => void;
+  paid: (de: string, gc: number, slot: number) => void;
 }
 
 function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void }) {
@@ -63,25 +65,25 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
         {v.rare.length > 0 && (
           <ul className={styles.eqList}>
             {v.rare.map((r) => (
-              <li key={r.de} className={styles.eqRow}>
+              <li key={`${r.de}#${r.slot}`} className={styles.eqRow}>
                 <span className={styles.eqName} title={r.text || undefined}>
                   {r.name}
                   {r.upgrade && r.on && <small>on {r.targets.find((t) => t.key === r.on)?.name ?? r.on}</small>}
                   <label className={styles.paid}>
                     <small>Paid</small>
-                    <input key={r.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={r.paid} aria-label={`Paid for ${r.name}`}
-                      onBlur={(e) => { const n = Math.max(0, Math.round(Number(e.target.value) || 0)); if (n !== r.paid) act.paid(r.de, n); }} />
+                    <input key={r.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={r.paid} aria-label={`Paid for ${r.name}${r.on ? ` on ${r.targets.find((t) => t.key === r.on)?.name ?? r.on}` : ''}`}
+                      onBlur={(e) => { const n = Math.max(0, Math.round(Number(e.target.value) || 0)); if (n !== r.paid) act.paid(r.de, n, r.slot); }} />
                     <small>gc</small>
                   </label>
                 </span>
                 {r.upgrade ? (
                   <span className={styles.eqUpgrade}>
                     {r.targets.length > 1 && (
-                      <select className={ui.select} aria-label={`Weapon for ${r.name}`} value={r.on ?? ''} onChange={(e) => act.target(r.de, e.target.value)}>
+                      <select className={ui.select} aria-label={`Weapon for ${r.name}`} value={r.on ?? ''} onChange={(e) => act.target(r.de, e.target.value, r.slot)}>
                         {r.targets.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
                       </select>
                     )}
-                    <button type="button" className={ui.buttonQuiet} onClick={() => act.rareQty(r.de, 0)}>Remove</button>
+                    <button type="button" className={ui.buttonQuiet} aria-label={`${r.once ? 'Used' : 'Remove'} ${r.name}${r.on ? ` on ${r.targets.find((t) => t.key === r.on)?.name ?? r.on}` : ''}`} onClick={() => act.removeSlot(r.de, r.slot)}>{r.once ? 'Used' : 'Remove'}</button>
                   </span>
                 ) : <Stepper label={r.name} value={r.q} max={r.max} onChange={(q) => act.rareQty(r.de, q)} />}
               </li>

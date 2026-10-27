@@ -9,7 +9,7 @@ import type { Injury, Model } from '../state/types.ts';
 import { houseDefaults, houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
 import { daggerNameFor, inlineUpgradeActive, upgradeSlots } from '../rules/equipment.ts';
-import { eqListFor, isUpgrade, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
+import { eqListFor, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
 import { hsSpecialSkills, isMarauderChief, isMarauderSeer } from '../rules/profile.ts';
 import { keyedInfo, skillKey } from '../rules/abilities.ts';
 
