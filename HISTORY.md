@@ -4316,3 +4316,19 @@ Gromril weapon"), which the parity tests caught.
 #113: the Equipment section of a unit in the roster listed everything in one run, while the items are sorted by kind.
 The gear facts now carry a group (where the unit's list files the item, else the catalogue category) and the section
 shows one headed list per group, in the order of the equipment sheet (`tips.ts`, `Detail.tsx`). Pull request 238.
+
+## October 28, 2026 — three wishes: gear text size (#114), finding a warband (#116), the equipment sheet as tables (#115)
+
+#114: the lines of a unit's gear, skills and injuries took the page's full text size, larger than the rest of the card; they
+now take the card's. A style sheet test, because jsdom lays nothing out. Pull request 240.
+
+#116: the choice of a warband to start was one long select. `warbandFacts` gives each warband its grade, race, gold over its
+variants, most models, the Heroes it may start with (the most its hero units allow together, six at the most – 4, 5 or 6, as
+Rob said) and whether it has a big creature (the data's `large`: Kroxigor, Minotaur …); "Find a warband" filters and sorts on
+that. The data has no region, so there is no filter for one. A wrong turn: my labels for the search field and the sort
+options contained "Name", and six e2e tests that look the form's name field up by that label found two; renamed. Pull request 241.
+
+#115: the equipment sheet is wider, shows the list as one small table per kind, and below it a table of what the warrior
+carries with a line for each piece, so an upgrade is put on the piece it belongs to from a choice on that line. Rob: the same
+items are never merged ("2× dagger"), and the free dagger never takes an upgrade. The core functions of the earlier weapon
+upgrades (`also`) carry it; the old ones are untouched, so the parity tests needed no new exception. Pull request 242.
