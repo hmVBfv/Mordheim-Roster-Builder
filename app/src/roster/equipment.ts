@@ -22,7 +22,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 export interface ListRow { key: string; name: string; price: number; qty: number; free: boolean; text: string; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
-export interface RareRow { de: string; name: string; q: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
+export interface RareRow { de: string; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
 export interface RareOffer { de: string; name: string; price: string; rarity: string }
 
 export interface EquipmentView {
@@ -61,7 +61,7 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     const upgrade = core.isUpgrade(ctx.data, de);
     return {
-      de, name: it?.en ?? core.enItem(ctx.data, de), q: Number(r?.q) || 0, paid: Number(r?.paid) || 0, upgrade, on: (r?.on as string | undefined) ?? null,
+      de, name: it?.en ?? core.enItem(ctx.data, de), q: Number(r?.q) || 0, max: core.isArmourItem(ctx, de) ? 1 : 9, paid: Number(r?.paid) || 0, upgrade, on: (r?.on as string | undefined) ?? null,
       targets: upgrade ? core.upgradeTargets(ctx, m, de).map((w) => ({ key: w.nm, name: core.enItem(ctx.data, w.nm) })) : [],
       text: itemText(ctx.data, it?.en ?? de),
     };
@@ -75,7 +75,7 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
   const atStart = (de: string) => core.isUpgrade(ctx.data, de) && !!(core.upgradeStart(ctx, de) || core.upgradeAlways(ctx, de, m));
   const offer = recruit ? [] : core.rareEligibleItems(ctx, m)
     .filter((it) => free || atStart(it.de))
-    .filter((it) => !(held.has(it.de) && core.isUpgrade(ctx.data, it.de)))
+    .filter((it) => !(held.has(it.de) && (core.isUpgrade(ctx.data, it.de) || core.isArmourItem(ctx, it.de))))
     .map((it) => ({ de: it.de, name: it.en, price: typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost), rarity: it.rare || '' }))
     .sort((a, b) => a.name.localeCompare(b.name));
   return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, men: menOf(ctx, m), recruit };
