@@ -4278,3 +4278,19 @@ fail it, everything else is only printed. It is its own workflow, not a job of `
 cannot hold back the image of an unrelated fix – what goes to the Pi stays a person's decision (ADR 0009).
 Caddy is not covered by the lockfile; `docs/operations.md` has the commands for the Pi (the version, an
 update, and what Watchtower may still do for it).
+
+## October 27, 2026 — planner: the starting list with an open Trading Post (#107) and "No racial maximums" (#106)
+
+#107 came from a planner with its Trading Post open (wish #89): there every model counted as a new recruit after a
+first battle, because `warbandHasFought` is true as soon as the Trading Post is open. So rare items on a unit's own
+list (a Marksman's long rifle) were refused, and the founding prices of upgrades (gromril, the Dark Elf blade) were
+lost. A planner never plays a battle, so nobody in it is a new recruit now (`isNewRecruit`) and the founding prices
+stay (`isFounding`); the Trading Post is only added beside the list, for simulating earlier play at its own prices.
+Rob asked for exactly that second half after I had first described the list alone as the way in. Entering a
+campaign (`applyCatchUp`) also drops `plannerTrade`, so the entered warband is an ordinary one: new recruits are
+held to the rare-item rule again. Pull request 233.
+
+#106, a wish Rob confirmed: the house rule `noRacialMax` lifts the racial maximums when advancing (`canAdv`,
+`hsCanAdv`). Henchmen still raise each characteristic once. The advance sheet loses its "at his maximum" hints, the
+row under the profile reads "no limit", and the printed sheet leaves the maxima out. It is a toggle, off by
+default and named on the export, like the others, and left out of the parity comparison by name. Pull request 234.
