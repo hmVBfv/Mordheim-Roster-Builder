@@ -63,9 +63,13 @@ export function LinksField({ items, selfId, links, onChange }: { items: LibraryI
   const loreById = new Map((lore?.entries ?? []).map((e) => [LORE_PREFIX + e.id, e]));
   // an id that is not shown (gone, or not yet synced) stays in the entry
   const shown = links.filter((l) => byId.has(l) || loreById.has(l));
-  const offered = all
+  const library = all
     .filter((i) => !links.includes(i.id))
-    .sort((a, b) => LINK_KINDS.indexOf(a.kind as (typeof LINK_KINDS)[number]) - LINK_KINDS.indexOf(b.kind as (typeof LINK_KINDS)[number]) || a.name.localeCompare(b.name));
+    .map((i): Candidate => ({ value: i.id, name: i.name, kind: KIND_NAMES[i.kind]!, group: i.kind, order: LINK_KINDS.indexOf(i.kind as (typeof LINK_KINDS)[number]) }));
+  const fromLore = (lore?.entries ?? [])
+    .filter((e) => !links.includes(LORE_PREFIX + e.id))
+    .map((e): Candidate => ({ value: LORE_PREFIX + e.id, name: e.name, kind: loreLabel(e), group: `lore:${e.kind}`, order: LINK_KINDS.length + LORE_KINDS.findIndex((k) => k.kind === e.kind), de: e.de }));
+  const candidates = [...library, ...fromLore].sort((x, y) => x.order - y.order || x.name.localeCompare(y.name));
   return (
     <div className={ui.field}>
       <span>Linked to</span>
@@ -84,22 +88,46 @@ export function LinksField({ items, selfId, links, onChange }: { items: LibraryI
           })}
         </ul>
       )}
-      <label className={ui.field}>
-        <span className={ui.muted}>Add a link</span>
-        <select className={ui.select} value="" disabled={offered.length === 0 && !lore} onChange={(e) => { if (e.target.value) onChange([...links, e.target.value]); }}>
-          <option value="">Choose …</option>
-          {offered.map((i) => <option key={i.id} value={i.id}>{i.name} ({KIND_NAMES[i.kind]})</option>)}
-          {lore && LORE_KINDS.map((k) => {
-            const list = lore.entries.filter((e) => e.kind === k.kind && !links.includes(LORE_PREFIX + e.id)).sort((a, b) => a.name.localeCompare(b.name));
-            return list.length > 0 && (
-              <optgroup key={k.kind} label={`Lore – ${k.label}`}>
-                {list.map((e) => <option key={e.id} value={LORE_PREFIX + e.id}>{e.name} ({loreLabel(e)})</option>)}
-              </optgroup>
-            );
-          })}
-        </select>
-      </label>
+      <LinkSearch offered={candidates} onPick={(v) => onChange([...links, v])} />
       <small className={ui.muted}>Seen openly here, from both ends; the lore only from here. A copy in a campaign does not carry the links.</small>
+    </div>
+  );
+}
+
+interface Candidate { value: string; name: string; kind: string; group: string; order: number; de?: string }
+
+/** How many matches are listed at once. */
+const SHOWN = 12;
+
+/** What can be linked is long – the lore alone has hundreds – so it is searched by name and filtered by kind, not chosen from one list (report #104). */
+function LinkSearch({ offered, onPick }: { offered: Candidate[]; onPick: (value: string) => void }) {
+  const [query, setQuery] = useState('');
+  const [group, setGroup] = useState('');
+  const kinds = [...LINK_KINDS.map((k) => ({ key: k as string, label: KIND_NAMES[k]! })), ...LORE_KINDS.map((k) => ({ key: `lore:${k.kind}`, label: `Lore – ${k.label}` }))];
+  const q = query.trim().toLowerCase();
+  const found = q || group ? offered.filter((c) => (!group || c.group === group) && (!q || c.name.toLowerCase().includes(q) || (c.de ?? '').toLowerCase().includes(q))) : [];
+  return (
+    <div className={ui.field}>
+      <div className={ui.row}>
+        <input type="search" className={ui.input} aria-label="Search entries to link" placeholder="Add a link: search by name" value={query} autoComplete="off" onChange={(e) => setQuery(e.target.value)} />
+        <select className={ui.select} aria-label="Kind of entry to link" value={group} onChange={(e) => setGroup(e.target.value)}>
+          <option value="">All kinds</option>
+          {kinds.map((k) => <option key={k.key} value={k.key}>{k.label}</option>)}
+        </select>
+      </div>
+      {found.length > 0 && (
+        <ul className={styles.links} aria-label="Matches">
+          {found.slice(0, SHOWN).map((c) => (
+            <li key={c.value}>
+              <button type="button" className={ui.buttonQuiet} aria-label={`Link to ${c.name} (${c.kind})`} onClick={() => { onPick(c.value); setQuery(''); }}>
+                <span className={styles.chip}>{c.kind}</span> {c.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {found.length > SHOWN && <small className={ui.muted}>{found.length - SHOWN} more – type more to narrow the search.</small>}
+      {(q || group) && found.length === 0 && <small className={ui.muted}>Nothing matches.</small>}
     </div>
   );
 }
