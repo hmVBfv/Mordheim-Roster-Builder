@@ -9,6 +9,8 @@ export interface RareHolding {
   q: number | string;
   paid?: number | string;
   on?: string;
+  /** Further copies of a weapon upgrade, each on a weapon of its own (reports #109, #110); `q` counts all of them. */
+  also?: { on: string; paid: number }[];
   [key: string]: unknown;
 }
 

@@ -5,7 +5,7 @@ import type { Model } from '../state/types.ts';
 import type { HireRecord } from '../state/types.ts';
 import type { Ctx } from './context.ts';
 import { isHeroModel } from './costs.ts';
-import { mutCost } from './equipment.ts';
+import { mutCost, rareEntryCost } from './equipment.ts';
 import { dpHireTotal, hsEqTotal, hsHireTotal } from './hire.ts';
 import { eqListFor, isUpgrade, itemInfo, unitDef } from './lookup.ts';
 import { adjPrice, marketRarePrice, unitBaseCost } from './pricing.ts';
@@ -92,6 +92,7 @@ export function modelMarketValue(ctx: Ctx, m: Model): number {
     if (cat === 'cc' && !isUpgrade(ctx.data, de)) { const th = isTwoHanded(ctx, de) || isTwoHanded(ctx, it && it.en); for (let i = 0; i < q; i++) melee.push({ p: price, twoH: th }); }
     else if ((cat === 'missile' || cat === 'bp') && !isUpgrade(ctx.data, de)) { for (let i = 0; i < q; i++) ranged.push(price); }
     else if (isHandShield(de) || isHandShield(it && it.en)) { for (let i = 0; i < q; i++) shields.push(price); }
+    else if (r[de]?.also?.length) full += rareEntryCost(r[de]);
     else full += q * price;
   }
   return full + loadoutValue(melee, ranged, shields);

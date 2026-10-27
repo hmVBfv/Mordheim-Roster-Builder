@@ -7,6 +7,7 @@
 import * as core from '../../src/index.ts';
 import type { Ctx, GameData, HireRecord, Model, WarbandState } from '../../src/index.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
+import { legacyWeaponNames } from '../support/weaponNames.ts';
 
 const TODAY = '2026-09-27';
 
@@ -25,6 +26,10 @@ export function splitText(t: string, canon: (s: unknown) => unknown): { lines: s
 const undated = (name: string) => name.replace(/\d{4}-\d{2}-\d{2}$/, 'DATE');
 
 export function coreExportReport(ctx: Ctx, canon: (s: unknown) => unknown): unknown {
+  return legacyWeaponNames(coreReport(ctx, canon));
+}
+
+function coreReport(ctx: Ctx, canon: (s: unknown) => unknown): unknown {
   const s = ctx.s;
   const models = s.models;
   const rec = (list: HireRecord[] | undefined, tab: 'HIREDSWORDS' | 'DRAMATIS') => (list ?? []).map((r) => {

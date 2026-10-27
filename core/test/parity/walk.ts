@@ -104,10 +104,12 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
       if (!m) return null;
       const owned = Object.keys(m.rare ?? {});
       // intended difference (docs/behaviour-changes.md, "Rüstung nur einmal", report #111): a second armour is not added; core/test/armour-once.test.ts
-      if (owned.length && r.chance(0.3)) { const de = r.pick(owned); if (isArmour(de)) return null; return [`addRare(again) ${m.uid} ${de}`, () => a.addRare(m.uid, de), (c) => core.addRare(c, m.uid, de)]; }
+      if (owned.length && r.chance(0.3)) { const de = r.pick(owned); if (isArmour(de) || core.isUpgrade(d, de)) return null; return [`addRare(again) ${m.uid} ${de}`, () => a.addRare(m.uid, de), (c) => core.addRare(c, m.uid, de)]; }
       const pool = r.chance(0.7) ? core.rareEligibleItems(ctx, m) : d.CATALOG;
       if (!pool.length) return null;
       const de = r.pick(pool).de;
+      // intended difference ("Aufwertungen auf mehreren Waffen", #110): a weapon upgrade held already goes on a second weapon
+      if (m.rare?.[de] && core.isUpgrade(d, de)) return null;
       return [`addRare ${m.uid} ${de}`, () => a.addRare(m.uid, de), (c) => core.addRare(c, m.uid, de)];
     }
     case 13: {

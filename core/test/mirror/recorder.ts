@@ -18,6 +18,7 @@ import type { WarbandState } from '../../src/index.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 import { canonOf, cfCanon, data, draftCanon } from '../support/canon.ts';
 import { TABLE, type Call, type Io, type Spec, type World } from './table.ts';
+import { legacyWeaponNames } from '../support/weaponNames.ts';
 
 type Fn = (...args: unknown[]) => unknown;
 type Rec = Record<string, unknown>;
@@ -85,7 +86,7 @@ function firstDiff(a: unknown, b: unknown, path: string): [string, unknown, unkn
 const short = (v: unknown) => { const s = JSON.stringify(v) ?? 'undefined'; return s.length > 400 ? s.slice(0, 400) + '…' : s; };
 
 function compare(call: string, what: string, coreV: unknown, legacyV: unknown): void {
-  const d = firstDiff(stable(coreV), stable(legacyV), '');
+  const d = firstDiff(legacyWeaponNames(stable(coreV)), stable(legacyV), '');
   if (!d) return;
   report.differences++;
   if (report.findings.length < KEEP) report.findings.push({ call, n: report.calls[call] ?? 0, what, path: d[0], core: short(d[1]), legacy: short(d[2]) });

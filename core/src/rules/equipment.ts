@@ -1,7 +1,7 @@
 /* Equipment, mutations, rare items and weapon upgrades of a model
    (legacy engine.js eqCost … rareEligibleItems, app.js catalogEligible). */
 import type { CatalogItem, UnitDef, UpgradeDef } from '../data/types.ts';
-import type { Model } from '../state/types.ts';
+import type { Model, RareHolding } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
 import { itemHalfActive } from './districts.ts';
@@ -92,12 +92,36 @@ export function heirloomDiscount(ctx: Ctx, m: Model): number {
   return 0;
 }
 
+/** What one rare holding cost: pieces times the price, or – an upgrade on several weapons – each piece at its own. */
+export function rareEntryCost(r: RareHolding | undefined): number {
+  if (!r) return 0;
+  if (r.also?.length) return (Number(r.paid) || 0) + r.also.reduce((n, x) => n + (Number(x.paid) || 0), 0);
+  return (Number(r.q) || 0) * (Number(r.paid) || 0);
+}
+
 export function rareCost(m: Model): number {
   const r = m.rare || {};
   let c = 0;
-  for (const de of Object.keys(r)) c += (Number(r[de]?.q) || 0) * (Number(r[de]?.paid) || 0);
+  for (const de of Object.keys(r)) c += rareEntryCost(r[de]);
   return c;
 }
+
+/** The copies of a weapon upgrade a model has, each on its weapon (reports #109, #110): the first, then `also`. */
+export function upgradeSlots(m: Model, de: string): { on: string | null; paid: number }[] {
+  const r = m.rare?.[de];
+  if (!r) return [];
+  return [{ on: r.on ?? null, paid: Number(r.paid) || 0 }, ...(r.also ?? []).map((x) => ({ on: x.on, paid: Number(x.paid) || 0 }))];
+}
+
+/** Weapons of this model that could still take one more copy of the upgrade: one per weapon he carries. */
+export function upgradeFree(ctx: Ctx, m: Model, de: string): WeaponRef[] {
+  const used = new Map<string, number>();
+  for (const s of upgradeSlots(m, de)) if (s.on) used.set(s.on, (used.get(s.on) ?? 0) + 1);
+  return upgradeTargets(ctx, m, de).filter((w) => (used.get(w.nm) ?? 0) < qtyOf(m, w.nm));
+}
+
+/** Is the upgrade used up in one game (Dark venom)? */
+export const upgradeOnce = (ctx: Ctx, de: string): boolean => ctx.data.UPGRADES[de]?.once === true;
 
 export interface WeaponRef { nm: string; price: number; fam: string | null }
 

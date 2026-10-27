@@ -176,3 +176,46 @@ describe('armour is had once (#111)', () => {
     expect(v.offer.some((o) => o.de === 'Gromril-Rüstung')).toBe(false);
   });
 });
+
+describe('weapon upgrades in the sheet (#108, #109, #110, #112)', () => {
+  function rangers() {
+    let s = createWarband(data, 'dwarfrangers', null, '');
+    s = core.addUnit(ctx(s), 'runesmith');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
+    s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 1);
+    return { s, uid };
+  }
+
+  it('the offer says the founding multiplier, 3×, not the 4× of later (#108)', () => {
+    const { s, uid } = rangers();
+    const g = equipmentView(ctx(s), uid)!.offer.find((o) => o.de === 'Gromril-Waffe')!;
+    expect(g.price).toBe('3× the weapon\'s price');
+  });
+
+  it('a second gromril weapon can be added while a weapon is free, one row each (#110)', () => {
+    const { s, uid } = rangers();
+    let t = core.addRare(ctx(s), uid, 'Gromril-Waffe');
+    let v = equipmentView(ctx(t), uid)!;
+    expect(v.rare.filter((r) => r.de === 'Gromril-Waffe')).toHaveLength(1);
+    expect(v.offer.some((o) => o.de === 'Gromril-Waffe')).toBe(true);
+    t = core.addRare(ctx(t), uid, 'Gromril-Waffe');
+    v = equipmentView(ctx(t), uid)!;
+    const rows = v.rare.filter((r) => r.de === 'Gromril-Waffe');
+    expect(rows.map((r) => r.slot)).toEqual([0, 1]);
+    expect(rows.map((r) => r.on).sort()).toEqual(['Dolch (1. gratis)', 'Schwert']);
+    expect(v.offer.some((o) => o.de === 'Gromril-Waffe')).toBe(false);
+  });
+
+  it('the Dark Elf blade and Dark venom are on offer at the founding, the venom as used up (#112)', () => {
+    let s = createWarband(data, 'darkelves', null, '');
+    s = core.addUnit(ctx(s), 'highborn');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
+    const v = equipmentView(ctx(s), uid)!;
+    expect(v.offer.find((o) => o.de === 'Dark-Elf-Klinge')!.price).toBe('+15 gc');
+    expect(v.offer.find((o) => o.de === 'Dunkles Gift')!.price).toBe('+15 gc');
+    const t = core.addRare(ctx(s), uid, 'Dunkles Gift');
+    expect(equipmentView(ctx(t), uid)!.rare.find((r) => r.de === 'Dunkles Gift')).toMatchObject({ once: true, paid: 15 });
+  });
+});
