@@ -6,10 +6,10 @@ import type { DB } from './db.ts';
 import { MAX_PROFILES, NpcProfileBody, Profile } from './opponents.ts';
 import { ScenarioBody } from './scenarios.ts';
 
-export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location'] as const;
+export const KINDS = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location', 'warband_favourites'] as const;
 export type Kind = (typeof KINDS)[number];
 /** The kinds the server reads: all of them since the scenarios came. */
-export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location'];
+export const ACTIVE_KINDS: readonly Kind[] = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location', 'warband_favourites'];
 /** Entries a person may keep, and the text of one. */
 export const MAX_ITEMS = 500;
 
@@ -57,7 +57,9 @@ const Location = z.object({
 const WarbandGroup = z.object({
   warbands: z.array(z.string().min(1).max(64)).max(500).default([]).refine((l) => new Set(l).size === l.length, { message: 'a warband twice' }),
 }).strict();
-const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group, scenario: Scenario, warband_group: WarbandGroup, location: Location };
+/** The warbands a person marked as favourites (wish #95): their ids, one list for the account (a second device may write its own; the client reads them together). */
+const WarbandFavourites = WarbandGroup;
+const BODIES: Partial<Record<Kind, z.ZodType>> = { idea: Idea, faction: Faction, npc: Npc, group: Group, scenario: Scenario, warband_group: WarbandGroup, location: Location, warband_favourites: WarbandFavourites };
 
 interface Row { id: string; owner_id: string; kind: Kind; name: string; body: string; created_at: string; updated_at: string; deleted_at: string | null; seq: number }
 export interface Item { id: string; kind: Kind; name: string; body: unknown; createdAt: string; updatedAt: string; deletedAt: string | null; seq: number }

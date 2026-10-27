@@ -11,6 +11,7 @@ import ui from '../ui/ui.module.css';
 import { ImportSheet } from './ImportSheet.tsx';
 import styles from './Home.module.css';
 import { WarbandList } from './WarbandList.tsx';
+import { useFavourites } from './useFavourites.ts';
 
 /** How many warbands Home shows: a phone three, a desktop has room for more. */
 const ON_PHONE = 3;
@@ -22,6 +23,8 @@ export function Home() {
   const session = useSession();
   const navigate = useNavigate();
   const campaigns = FLAVOUR === 'campaign';
+  // the ribbon of a favourite shows here too; changing it is done on the Warbands screen
+  const fav = useFavourites(campaigns && session.status === 'in');
   return (
     <section className={`${ui.page} ${styles.home} ${campaigns ? '' : styles.solo}`}>
       <div className={ui.page}>
@@ -33,7 +36,7 @@ export function Home() {
         )}
         <div>
           <h2>Your warbands</h2>
-          {recent && recent.length > 0 ? <WarbandList warbands={recent} grid /> : recent && <Empty scene="camp" title="No warband yet.">Start one below, or bring one in from the Roster Builder.</Empty>}
+          {recent && recent.length > 0 ? <WarbandList warbands={recent} grid favourites={session.status === 'in' ? { has: fav.has } : undefined} /> : recent && <Empty scene="camp" title="No warband yet.">Start one below, or bring one in from the Roster Builder.</Empty>}
         </div>
         <div className={ui.row}>
           <Link to="/warbands/new" className={ui.button}>New warband</Link>
