@@ -4210,3 +4210,36 @@ because the Quick Build's router lives in the fragment. A jump is a plain link, 
 "here" (all of them lead to one page and would all have been). The groups come from the Library, as the
 list reads them. Pull request 214. In the e2e run one test of the rare list timed out once at a
 screenshot under load; alone it runs in three seconds, and nothing of the fix is in it.
+
+## October 27, 2026 — #92 to #100: navigation, favourites, Library folders, NPCs in scenarios, more lore
+
+A run of eight wishes (all confirmed by Rob) and one bug. #101 (filter and sort the audit log) was
+not confirmed and stays open. In the order they were built:
+
+- **100, bug, "Linked to" could not be opened.** The picker was switched off when the Library held no
+  other entry, and it could not offer what Rob meant – a region or faction of the lore catalogue,
+  which lives outside the Library. The link to it is stored as `lore:<id>` and followed only from
+  the entry (the catalogue has no entry to show it back). Pull request 217.
+- **94, the app name in the header is a link to Home.** First push failed the e2e touch-target check
+  (166 failures, one cause): the link was only as tall as its text. It now fills the 44 px; I had not run
+  the e2e before pushing a change to the header. Pull request 218.
+- **96, racial maximums under the profile.** One row under the values, column for column, and the
+  race named; the data was already there from the advance sheet. Pull request 219.
+- **92 and 93, one branch.** The kinds and the groups became small headings above the free
+  warbands, each with its own warbands under it; without any kind or group the list stays plain. The
+  groups did not follow a change on the Warbands screen because each screen read the Library on its
+  own: every write now announces itself and the others re-read what the device kept. Pull request 220.
+- **95, favourites.** A new Library kind (`warband_favourites`, migration 41 – the check list of the
+  table had to grow again, as for locations) holds the ids; a gold ribbon with a medal, a comet with
+  two tails, sits nearer the corner than the planner's "P", and the favourite section stands on top.
+  Rob's wish for "like a medal or a pin" turned the first, thin comet into a round badge. It contains
+  the branch of 92/93 (the Library hook is the same file). Pull request 221.
+- **99, folders for the whole Library.** I called them "Folder", not "Group", because the Library already
+  has a tab of opponent groups and the warband groups. A folder is a name in the body of each entry
+  (no migration, no kind of its own): it exists as long as an entry carries it. Renaming one means changing
+  the entries; a manager for that is not built. Pull request 222.
+- **97, NPCs of a scenario.** The free statline field is gone; an NPC is added from the Library (a copy under
+  the same id, linked) or made on the spot and kept under NPCs as well. Texts written earlier stay readable
+  and can be cleared. Stacked on 99 (same tab). Pull request 223.
+- **98, more lore.** Thirty-five entries, only where the wiki page has real lore behind it; written in my own
+  words, nothing from after the year 2000 IC, since Mordheim is set around 1999. Pull request 224.
