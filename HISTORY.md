@@ -4294,3 +4294,21 @@ held to the rare-item rule again. Pull request 233.
 `hsCanAdv`). Henchmen still raise each characteristic once. The advance sheet loses its "at his maximum" hints, the
 row under the profile reads "no limit", and the printed sheet leaves the maxima out. It is a toggle, off by
 default and named on the export, like the others, and left out of the parity comparison by name. Pull request 234.
+
+## October 28, 2026 — armour once (#111) and weapon upgrades on several weapons (#108–#110, #112)
+
+#111: the list stepper let a warrior take nine helmets, and a rare armour such as gromril armour could be added again
+and again. A list row of the armour group stops at one (`listProblem`), a catalogue armour is had once per warrior
+(`addRare`, `setRareQty`), and the sheet keeps its stepper at one. Pull request 236.
+
+#108–#110 and #112 turned out to be one story about weapon upgrades. The model could hold one copy of an upgrade, on one
+weapon, so a Dwarf Hero could not have a gromril sword and a gromril dagger (#110); the unit's line said only "Gromril
+weapon" (#109); and the offer named the later 4x price while the founding 3x was charged (#108 – the prices were right,
+the text was not). Looking at #112 (Dark Elves "missing" items) I found the real gap: the new app had no way at all to
+take a flat upgrade, the Dark Elf blade or Dark venom, because the sheet offered those "next to the weapon" and there is
+no weapon list in it. The data already held Beastlash (on the Beastmaster's list, as the page says) and the item texts;
+the only entry that was really missing was Dark venom's founding price. Rob chose the shape: one copy per weapon in a new
+optional field (`rare[].also`), the weapon named on the unit's line ("Dagger (Gromril)"), Dark venom as equipment that
+is taken off when used. The fix is stacked on #111's branch because both touch the same lines of the parity walk; pull
+request 237. Two wrong turns: my first label also renamed flat upgrades of other warbands and a stacked count ("2×
+Gromril weapon"), which the parity tests caught; and a first count of weapons let a Hero upgrade a weapon he did not hold.
