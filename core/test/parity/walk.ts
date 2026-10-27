@@ -91,6 +91,7 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
   if (roll > 38) return advanceStep(r, d, s, m);
   // two extra slots for the Hired Sword operations, which have many variants
   const kind = roll > 36 ? 31 : roll;
+  const isArmour = (de: string) => d.CATALOG.find((x) => x.de === de)?.cat === 'armour';
   switch (kind) {
     case 0: case 1: case 2: { const u = r.pick(wb.units); return [`addUnit ${u.id}`, () => a.addUnit(u.id), (c) => core.addUnit(legacyCtx(c), u.id)]; }
     case 3: if (!m) return null; return [`removeUnit ${m.uid}`, () => a.removeUnit(m.uid), (c) => core.removeUnit(c, m.uid)];
@@ -102,7 +103,8 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
     case 11: case 12: {
       if (!m) return null;
       const owned = Object.keys(m.rare ?? {});
-      if (owned.length && r.chance(0.3)) { const de = r.pick(owned); return [`addRare(again) ${m.uid} ${de}`, () => a.addRare(m.uid, de), (c) => core.addRare(c, m.uid, de)]; }
+      // intended difference (docs/behaviour-changes.md, "Rüstung nur einmal", report #111): a second armour is not added; core/test/armour-once.test.ts
+      if (owned.length && r.chance(0.3)) { const de = r.pick(owned); if (isArmour(de)) return null; return [`addRare(again) ${m.uid} ${de}`, () => a.addRare(m.uid, de), (c) => core.addRare(c, m.uid, de)]; }
       const pool = r.chance(0.7) ? core.rareEligibleItems(ctx, m) : d.CATALOG;
       if (!pool.length) return null;
       const de = r.pick(pool).de;
@@ -116,7 +118,7 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
       const de = r.pick(Object.keys(mm.rare ?? {}).filter((k) => d.UPGRADES[k])), nm = r.pick(core.eqWeaponsOf(ctx, mm)).nm;
       return [`setRareTarget ${mm.uid} ${de} ${nm}`, () => a.setRareTarget(mm.uid, de, nm), (c) => core.setRareTarget(c, mm.uid, de, nm)];
     }
-    case 14: { const de = m && r.pick([...Object.keys(m.rare ?? {}), 'Axt']); if (!m || !de) return null; const q = r.pick([0, 1, 2, 11]); return [`setRareQty ${m.uid} ${de}=${q}`, () => a.setRareQty(m.uid, de, q), (c) => core.setRareQty(c, m.uid, de, q)]; }
+    case 14: { const de = m && r.pick([...Object.keys(m.rare ?? {}), 'Axt']); if (!m || !de) return null; const q = r.pick([0, 1, 2, 11]); if (isArmour(de) && q > 1) return null; return [`setRareQty ${m.uid} ${de}=${q}`, () => a.setRareQty(m.uid, de, q), (c) => core.setRareQty(c, m.uid, de, q)]; }
     case 15: { const keys = Object.keys(m?.rare ?? {}); if (!m || !keys.length) return null; const de = r.pick(keys), v = r.pick([0, 5, 37, -3, 'x']); return [`setRarePaid ${m.uid} ${de}=${v}`, () => a.setRarePaid(m.uid, de, v), (c) => core.setRarePaid(c, m.uid, de, v)]; }
     case 16: { const keys = Object.keys(m?.rare ?? {}); if (!m || !keys.length) return null; const de = r.pick(keys); return [`removeRare ${m.uid} ${de}`, () => a.removeRare(m.uid, de), (c) => core.removeRare(c, m.uid, de)]; }
     case 17: {
