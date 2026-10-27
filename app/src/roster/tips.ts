@@ -12,7 +12,7 @@ export interface Tip { name: string; line: string; text: string }
 
 /** A word on a card and the rules behind it (more than one for a weapon
     with an upgrade); none when there is no text. */
-export interface Fact { label: string; tips: Tip[] }
+export interface Fact { label: string; tips: Tip[]; /** The kind of equipment (close combat, missile, armour, other), for the lines of a unit's gear. */ group?: string }
 
 /* The data's texts are plain; a stray tag would show as text, so it goes. */
 const plain = (s: unknown) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -33,9 +33,24 @@ export function itemTip(data: GameData, key: string): Tip[] {
   return tipOf(core.itemInfo(data, key) ?? core.itemInfo(data, en), en, 'Equipment');
 }
 
+/* The groups of a unit's equipment, in the order of the equipment sheet (#113). */
+const GROUPS = ['Close combat', 'Missile weapons', 'Armour', 'Other'] as const;
+const LIST_GROUP: Record<string, (typeof GROUPS)[number]> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour' };
+const CAT_GROUP: Record<string, (typeof GROUPS)[number]> = { cc: 'Close combat', missile: 'Missile weapons', bp: 'Missile weapons', armour: 'Armour' };
+
+/** Which group an item belongs to: where the unit's list files it, else the catalogue's category, else "Other". */
+function groupOf(ctx: core.Ctx, m: Model, key: string | undefined): (typeof GROUPS)[number] {
+  if (!key) return 'Other';
+  const list = core.eqListFor(ctx, core.unitDef(ctx, m.uid_def)) ?? {};
+  for (const cat of Object.keys(list)) if (list[cat]?.some(([nm]) => nm.replace(' (1. gratis)', '') === key)) return LIST_GROUP[cat] ?? 'Other';
+  return CAT_GROUP[ctx.data.CATALOG.find((x) => x.de === key)?.cat ?? ''] ?? 'Other';
+}
+
 function equipment(ctx: core.Ctx, m: Model): Fact[] {
-  return [...core.eqDisplayItems(ctx, m), ...core.rareDisplayItems(ctx, m)]
-    .map((x) => fact(x.label, x.items.flatMap((k) => itemTip(ctx.data, k))));
+  const facts = [...core.eqDisplayItems(ctx, m), ...core.rareDisplayItems(ctx, m)]
+    .map((x) => ({ ...fact(x.label, x.items.flatMap((k) => itemTip(ctx.data, k))), group: groupOf(ctx, m, x.items[0]) }));
+  // one group after the other, each in the order the items came
+  return GROUPS.flatMap((g) => facts.filter((f) => f.group === g));
 }
 
 /* An injury by its D66 code; older saves (and the fixtures) kept only its

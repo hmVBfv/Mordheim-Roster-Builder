@@ -1190,3 +1190,17 @@
 .loreMark {
   color: var(--accent);
 }
+
+/* the lines of a unit's equipment, by kind (#113) */
+.gearGroup + .gearGroup {
+  margin-top: 8px;
+}
+
+.gearGroup h4 {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
