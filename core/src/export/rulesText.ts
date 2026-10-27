@@ -8,8 +8,8 @@ import type { GameData, HireEntry, ItemInfo, Profile, UnitDef } from '../data/ty
 import type { Injury, Model } from '../state/types.ts';
 import { houseDefaults, houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
-import { daggerNameFor, inlineUpgradeActive } from '../rules/equipment.ts';
-import { eqListFor, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
+import { daggerNameFor, inlineUpgradeActive, upgradeSlots } from '../rules/equipment.ts';
+import { eqListFor, isUpgrade, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
 import { hsSpecialSkills, isMarauderChief, isMarauderSeer } from '../rules/profile.ts';
 import { keyedInfo, skillKey } from '../rules/abilities.ts';
 
@@ -250,7 +250,7 @@ export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
       const qty = Number((m.eq ?? {})[nm]) || 0;
       if (!qty) continue;
       const base = nm.replace(' (1. gratis)', '');
-      const ups = m.rare ? Object.keys(m.rare).filter((de) => inlineUpgradeActive(ctx, de) && m.rare![de]!.on === nm) : [];
+      const ups = m.rare ? Object.keys(m.rare).filter((de) => inlineUpgradeActive(ctx, de) && upgradeSlots(m, de).some((s) => s.on === nm)) : [];
       const us = ups.length ? ` [${ups.map((de) => enItem(ctx.data, de)).join(', ')}]` : '';
       const plural = ctx.data.BRACE_PLURAL[base];
       if (plural && qty >= 2) {
@@ -274,6 +274,12 @@ export function rareDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
   for (const de of Object.keys(r)) {
     if (inlineUpgradeActive(ctx, de)) continue;
     const it = ctx.data.CATALOG.find((x) => x.de === de);
+    // a weapon upgrade names its weapon, one label per copy: "Dagger (Gromril)" (#109)
+    if (ctx.data.UPGRADES[de]?.mult && r[de]!.on && (r[de]!.also || (Number(r[de]!.q) || 1) <= 1)) {
+      const short = (it ? it.en : de).replace(/ weapon$/i, '');
+      for (const s of upgradeSlots(m, de)) out.push({ label: s.on ? `${enItem(ctx.data, s.on.replace(' (1. gratis)', ''))} (${short})` : (it ? it.en : de), items: [de] });
+      continue;
+    }
     const q = Number(r[de]!.q) || 1;
     out.push({ label: (q > 1 ? q + '× ' : '') + (it ? it.en : de), items: [de] });
   }

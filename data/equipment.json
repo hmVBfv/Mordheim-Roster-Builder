@@ -16985,6 +16985,13 @@
    ],
    "mult": 0,
    "base": 15,
+   "start": {
+    "base": 15,
+    "wb": [
+     "darkelves"
+    ]
+   },
+   "once": true,
    "note": "Gift auf eine Nahkampfwaffe (1 Spiel)"
   },
   "Gromril-Waffe": {

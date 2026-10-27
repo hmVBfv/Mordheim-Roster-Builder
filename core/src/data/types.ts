@@ -159,6 +159,8 @@ export interface UpgradeDef {
   /** A price that holds at any time for the warbands and units listed. */
   always?: { mult?: number; base?: number; wb?: string[]; units?: string[] };
   note?: string;
+  /** Used up in one game (Dark venom): the sheet offers to take it off. */
+  once?: boolean;
 }
 
 export interface ItemInfo {

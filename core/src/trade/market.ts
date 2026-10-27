@@ -14,7 +14,7 @@
 import type { CatalogItem, EquipmentEntry, UnitDef } from '../data/types.ts';
 import type { Model, RareHolding, StashItem, WarbandState } from '../state/types.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
-import { catalogAllowed, rareEligibleItems } from '../rules/equipment.ts';
+import { catalogAllowed, rareEligibleItems, rareEntryCost } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, stripParen, unitDef, warbandDef } from '../rules/lookup.ts';
 import { adjPrice, catalogDefaultPaid } from '../rules/pricing.ts';
 import { memberCount } from '../rules/profile.ts';
@@ -511,7 +511,7 @@ function gearToStash(d: WarbandDraft, c: Ctx, m: Model, men: number): void {
   }
   for (const de of Object.keys(m.rare ?? {})) {
     const r = m.rare![de];
-    intoStash(d, c, { key: de, rare: true }, (Number(r?.q) || 0) * men, Number(r?.paid) || 0);
+    intoStash(d, c, { key: de, rare: true }, (Number(r?.q) || 0) * men, r?.also?.length ? Math.round(rareEntryCost(r) / (Number(r.q) || 1)) : Number(r?.paid) || 0);
   }
 }
 

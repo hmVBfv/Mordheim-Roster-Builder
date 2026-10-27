@@ -5,7 +5,7 @@ import type { Model, StashItem, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
-import { withFreeDagger, upgradeBase, upgradePaid, upgradeTargets } from '../rules/equipment.ts';
+import { withFreeDagger, upgradeBase, upgradeFree, upgradePaid, upgradeTargets } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
 import { catalogDefaultPaid } from '../rules/pricing.ts';
 import { logEvent } from './log.ts';
@@ -150,7 +150,14 @@ export function addRare(ctx: Ctx, uid: number, de: string): WarbandState {
     m.rare = m.rare || {};
     const have = m.rare[de];
     if (have && !isUpgrade(c.data, de)) { have.q = (Number(have.q) || 1) + 1; return; }
-    if (have) return;
+    if (have) {
+      // a weapon upgrade again: on the next weapon that has none yet (#110)
+      const free = upgradeFree(c, m, de)[0];
+      if (!isUpgrade(c.data, de) || !free) return;
+      (have.also = have.also ?? []).push({ on: free.nm, paid: upgradePaid(c, m, de, free.nm) });
+      have.q = 1 + have.also.length;
+      return;
+    }
     const it = c.data.CATALOG.find((x) => x.de === de);
     const o: { q: number; paid: number; on?: string | null } = { q: 1, paid: catalogDefaultPaid(c, it) };
     if (isUpgrade(c.data, de)) {
@@ -164,13 +171,34 @@ export function addRare(ctx: Ctx, uid: number, de: string): WarbandState {
   });
 }
 
-export function setRareTarget(ctx: Ctx, uid: number, de: string, nm: string): WarbandState {
+/** Puts one copy of an upgrade on another weapon (`slot` 0 is the first copy), repricing it where the price follows the weapon. */
+export function setRareTarget(ctx: Ctx, uid: number, de: string, nm: string, slot = 0): WarbandState {
   return update(ctx, (d, c) => {
     const m = findModel(d, uid);
     const r = m?.rare?.[de];
     if (!m || !r) return;
-    r.on = nm;
-    if (c.data.UPGRADES[de]?.mult) r.paid = upgradePaid(c, m, de, nm);
+    const at = slot > 0 ? r.also?.[slot - 1] : r;
+    if (!at) return;
+    at.on = nm;
+    if (c.data.UPGRADES[de]?.mult) at.paid = upgradePaid(c, m, de, nm);
+  });
+}
+
+/** Takes one copy of a weapon upgrade off (`slot` 0 is the first): the next one moves up; the last one removes the holding. */
+export function removeUpgradeSlot(ctx: Ctx, uid: number, de: string, slot = 0): WarbandState {
+  return update(ctx, (d) => {
+    const m = findModel(d, uid);
+    const r = m?.rare?.[de];
+    if (!m || !r) return;
+    const also = r.also ?? [];
+    if (slot > also.length) return;
+    if (slot === 0) {
+      const next = also.shift();
+      if (!next) { delete m.rare![de]; return; }
+      r.on = next.on; r.paid = next.paid;
+    } else also.splice(slot - 1, 1);
+    if (!also.length) delete r.also; else r.also = also;
+    r.q = 1 + (r.also?.length ?? 0);
   });
 }
 
@@ -179,15 +207,17 @@ export function setRareQty(ctx: Ctx, uid: number, de: string, qty: unknown): War
     const m = findModel(d, uid);
     if (!m || !m.rare || !m.rare[de]) return;
     const q = Math.max(0, Math.min(9, Number(qty) || 0));
-    if (q <= 0) delete m.rare[de]; else (m.rare[de] as { q: number }).q = q;
+    if (q <= 0) delete m.rare[de]; else if (!m.rare[de]!.also) (m.rare[de] as { q: number }).q = q;
   });
 }
 
-export function setRarePaid(ctx: Ctx, uid: number, de: string, v: unknown): WarbandState {
+export function setRarePaid(ctx: Ctx, uid: number, de: string, v: unknown, slot = 0): WarbandState {
   return update(ctx, (d) => {
     const m = findModel(d, uid);
-    if (!m || !m.rare || !m.rare[de]) return;
-    (m.rare[de] as { paid: number }).paid = Math.max(0, Number(v) || 0);
+    const r = m?.rare?.[de];
+    if (!m || !r) return;
+    const at = slot > 0 ? r.also?.[slot - 1] : r;
+    if (at) at.paid = Math.max(0, Number(v) || 0);
   });
 }
 
