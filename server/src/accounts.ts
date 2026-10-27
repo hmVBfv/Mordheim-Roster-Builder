@@ -256,14 +256,24 @@ export interface AuditSummary { seq: number; at: string; actor: string | null; a
     what it said (names, titles, wordings): the admin has no special access
     to campaign content (docs/security.md, section 4; security review
     AUTHZ-1). Of a campaign the admin is part of, what every member reads. */
-export function listAudit(db: DB, adminId: string, limit: number, beforeSeq?: number): AuditSummary[] {
+export interface AuditFilter { q?: string; from?: string; to?: string; /** `old`: oldest first, the page continues `after` the last seq it ended with. */ order?: 'new' | 'old'; afterSeq?: number }
+
+export function listAudit(db: DB, adminId: string, limit: number, beforeSeq?: number, f: AuditFilter = {}): AuditSummary[] {
+  const where = ['a.action != \'warband.autosave\'', '(a.campaign_id IS NULL OR a.visibility = \'public\')'];
+  const args: (string | number)[] = [adminId];
+  const oldest = f.order === 'old';
+  if (oldest) { where.push('a.seq > ?'); args.push(f.afterSeq ?? 0); } else { where.push('a.seq < ?'); args.push(beforeSeq ?? Number.MAX_SAFE_INTEGER); }
+  // a word: found in who did it, whom it was done to, or what was done (the same three the line shows)
+  if (f.q) { where.push("(instr(lower(COALESCE(u.username, '')), ?) > 0 OR instr(lower(COALESCE(t.username, a.target_id, '')), ?) > 0 OR instr(lower(a.action), ?) > 0)"); args.push(f.q.toLowerCase(), f.q.toLowerCase(), f.q.toLowerCase()); }
+  if (f.from) { where.push('a.at >= ?'); args.push(f.from); }
+  if (f.to) { where.push('a.at < ?'); args.push(new Date(Date.parse(f.to) + DAY).toISOString().slice(0, 10)); }
   const rows = db.prepare(`SELECT a.*, u.username AS actor_name, t.username AS target_name,
       (a.campaign_id IS NULL OR EXISTS (SELECT 1 FROM members m WHERE m.campaign_id = a.campaign_id AND m.user_id = ? AND m.left_at IS NULL)) AS readable
     FROM audit_log a
     LEFT JOIN users u ON u.id = a.actor_id
     LEFT JOIN users t ON a.target_type = 'user' AND t.id = a.target_id
-    WHERE a.seq < ? AND a.action != 'warband.autosave' AND (a.campaign_id IS NULL OR a.visibility = 'public')
-    ORDER BY a.seq DESC LIMIT ?`).all(adminId, beforeSeq ?? Number.MAX_SAFE_INTEGER, limit) as {
+    WHERE ${where.join(' AND ')}
+    ORDER BY a.seq ${oldest ? 'ASC' : 'DESC'} LIMIT ?`).all(...args, limit) as {
     seq: number; at: string; actor_name: string | null; action: string; target_type: string | null; target_id: string | null; target_name: string | null; payload: string | null; readable: number;
   }[];
   return rows.map((r) => ({

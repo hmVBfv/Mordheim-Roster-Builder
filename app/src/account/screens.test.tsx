@@ -477,6 +477,26 @@ describe('the admin', () => {
     });
   });
 
+  /* Wish #101: the audit log is filtered and sorted like the sign-ins and the reports – by a word, by day, newest or oldest first. */
+  it('the audit log is filtered by a word and by day and read oldest first, on the server (#101)', async () => {
+    const s = fakeServer({
+      'GET /auth/me': () => ({ user: ADMIN, pending: false }),
+      'GET /admin/audit': () => ({ entries: [{ seq: 3, at: '2026-10-03T10:00:00Z', actor: 'rob', action: 'invite.create', targetType: 'invite', target: 'i1', payload: null }] }),
+    });
+    const user = userEvent.setup();
+    at('/admin/audit');
+    await screen.findByRole('table', { name: 'Audit log' });
+    const last = () => s.calls.filter((c) => c.path === '/admin/audit').at(-1)!.url.searchParams;
+    expect(last().get('q')).toBeNull();
+    await user.type(screen.getByLabelText('Search'), 'invite');
+    fireEvent.change(screen.getByLabelText('From'), { target: { value: '2026-10-02' } });
+    fireEvent.change(screen.getByLabelText('To'), { target: { value: '2026-10-03' } });
+    await user.selectOptions(screen.getByLabelText('Order'), 'Oldest first');
+    await waitFor(() => expect([last().get('q'), last().get('from'), last().get('to'), last().get('order')]).toEqual(['invite', '2026-10-02', '2026-10-03', 'old']));
+    await user.click(screen.getByRole('button', { name: 'Clear filter' }));
+    await waitFor(() => expect([last().get('q'), last().get('from'), last().get('order')]).toEqual([null, null, null]));
+  });
+
   it('the audit log reads again when its tab is opened again', async () => {
     const entries = [{ seq: 3, at: '2026-10-03T10:00:00Z', actor: 'rob', action: 'invite.create', targetType: 'invite', target: 'i1', payload: { note: 'for Ben' } }];
     const s = fakeServer({

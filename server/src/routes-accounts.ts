@@ -571,8 +571,14 @@ export function registerAccountRoutes(app: FastifyInstance, deps: AccountDeps): 
     return { attempts: listAttempts(db(), p.limit, p.before, { user: q.user?.slice(0, 64), type: q.type as 'signin' | 'joined' | 'failed' | undefined, from: q.from, to: q.to }) };
   });
 
-  app.get('/api/v1/admin/audit', { config: { action: 'admin.audit.read' } }, async (req) => {
+  app.get('/api/v1/admin/audit', { config: { action: 'admin.audit.read' } }, async (req, reply) => {
     const p = page(req);
-    return { entries: listAudit(db(), req.actor!.id, p.limit, p.before) };
+    const q = req.query as { q?: string; from?: string; to?: string; order?: string; after?: string };
+    const day = /^\d{4}-\d{2}-\d{2}$/;
+    if ((q.order !== undefined && !['new', 'old'].includes(q.order)) || [q.from, q.to].some((d) => d !== undefined && (!day.test(d) || Number.isNaN(Date.parse(d))))) {
+      return reply.code(400).send({ error: 'invalid', problem: 'the filter is not one the log knows' });
+    }
+    const after = q.after ? Number(q.after) : undefined;
+    return { entries: listAudit(db(), req.actor!.id, p.limit, p.before, { q: q.q?.trim().slice(0, 64) || undefined, from: q.from, to: q.to, order: q.order as 'new' | 'old' | undefined, afterSeq: Number.isFinite(after) ? after : undefined }) };
   });
 }
