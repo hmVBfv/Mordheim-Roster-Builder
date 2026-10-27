@@ -113,11 +113,12 @@ export function upgradeSlots(m: Model, de: string): { on: string | null; paid: n
   return [{ on: r.on ?? null, paid: Number(r.paid) || 0 }, ...(r.also ?? []).map((x) => ({ on: x.on, paid: Number(x.paid) || 0 }))];
 }
 
-/** Weapons of this model that could still take one more copy of the upgrade: one per weapon he carries. */
+/** Weapons of this model that could still take one more copy of the upgrade: one per weapon he carries, the free dagger
+    never (Rob, 28.10.2026, #115) – a second dagger may. */
 export function upgradeFree(ctx: Ctx, m: Model, de: string): WeaponRef[] {
   const used = new Map<string, number>();
   for (const s of upgradeSlots(m, de)) if (s.on) used.set(s.on, (used.get(s.on) ?? 0) + 1);
-  return upgradeTargets(ctx, m, de).filter((w) => (used.get(w.nm) ?? 0) < qtyOf(m, w.nm));
+  return upgradeTargets(ctx, m, de).filter((w) => (used.get(w.nm) ?? 0) < upgradeRoom(m, w.nm));
 }
 
 /** Is the upgrade used up in one game (Dark venom)? */
@@ -139,6 +140,11 @@ export function upgradeTargets(ctx: Ctx, m: Model, de: string): WeaponRef[] {
   const u = ctx.data.UPGRADES[de];
   if (!u) return [];
   return eqWeaponsOf(ctx, m).filter((w) => w.fam != null && u.fams.includes(w.fam));
+}
+
+/** How many copies of an upgrade a weapon of this name can take: one per weapon carried, the free dagger not counted. */
+export function upgradeRoom(m: Model, nm: string): number {
+  return Math.max(0, qtyOf(m, nm) - (nm.indexOf('1. gratis') >= 0 ? 1 : 0));
 }
 
 /* ---- founding prices ---- */

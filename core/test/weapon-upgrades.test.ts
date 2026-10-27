@@ -14,7 +14,7 @@ function rangers() {
   s = core.addUnit(ctx(s), 'runesmith');
   const uid = s.models[0]!.uid;
   s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
-  s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 1);
+  s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 2);
   return { s, uid };
 }
 const held = (s: WarbandState, uid: number) => s.models.find((m) => m.uid === uid)!;
@@ -90,5 +90,52 @@ describe('Dark Elf upgrades at the founding (#112)', () => {
     expect(core.upgradeOnce(ctx(t), 'Dark-Elf-Klinge')).toBe(false);
     t = core.removeUpgradeSlot(ctx(t), uid, 'Dunkles Gift', 0);
     expect(Object.keys(held(t, uid).rare!)).toEqual(['Dark-Elf-Klinge']);
+  });
+});
+
+describe('one upgrade on the weapon you choose, never on the free dagger (#115)', () => {
+  it('the free dagger takes none; the second one does', () => {
+    const { s, uid } = rangers();
+    let one = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 1);
+    expect(core.upgradeFree(ctx(one), held(one, uid), 'Gromril-Waffe').map((w) => w.nm)).toEqual(['Schwert']);
+    expect(core.upgradeFree(ctx(s), held(s, uid), 'Gromril-Waffe').map((w) => w.nm).sort()).toEqual(['Dolch (1. gratis)', 'Schwert']);
+    // two daggers: one is the free one, so one can be upgraded – and only one
+    const t = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    expect(core.upgradeSlots(held(t, uid), 'Gromril-Waffe')).toEqual([{ on: 'Dolch (1. gratis)', paid: 6 }]);
+    expect(core.setUpgradeOn(ctx(t), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true)).toBe(t);
+    one = core.setUpgradeOn(ctx(one), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    expect(held(one, uid).rare?.['Gromril-Waffe']).toBeUndefined();
+  });
+
+  it('puts one on a chosen weapon and takes one off it again', () => {
+    const { s, uid } = rangers();
+    let t = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Schwert', true);
+    t = core.setUpgradeOn(ctx(t), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    expect(core.upgradeSlots(held(t, uid), 'Gromril-Waffe').map((x) => x.on)).toEqual(['Schwert', 'Dolch (1. gratis)']);
+    t = core.setUpgradeOn(ctx(t), uid, 'Gromril-Waffe', 'Schwert', false);
+    expect(core.upgradeSlots(held(t, uid), 'Gromril-Waffe')).toEqual([{ on: 'Dolch (1. gratis)', paid: 6 }]);
+    expect(held(t, uid).rare!['Gromril-Waffe']!.q).toBe(1);
+  });
+
+  it('a flat upgrade goes the same way', () => {
+    let s = core.newWarband(data, 'darkelves');
+    s = core.addUnit(ctx(s), 'highborn');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
+    s = core.setUpgradeOn(ctx(s), uid, 'Dark-Elf-Klinge', 'Schwert', true);
+    expect(core.upgradeSlots(held(s, uid), 'Dark-Elf-Klinge')).toEqual([{ on: 'Schwert', paid: 15 }]);
+  });
+});
+
+describe('taking a weapon away takes its upgrade with it (#115)', () => {
+  it('through the list: the copy on a weapon that is no longer carried goes, the others stay', () => {
+    const { s, uid } = rangers();
+    let t = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Schwert', true);
+    t = core.setUpgradeOn(ctx(t), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    t = core.setListQty(ctx(t), uid, 'Schwert', 0);
+    expect(core.upgradeSlots(held(t, uid), 'Gromril-Waffe').map((x) => x.on)).toEqual(['Dolch (1. gratis)']);
+    // the second dagger goes: the one upgraded went with it, the free one cannot carry it
+    t = core.setListQty(ctx(t), uid, 'Dolch (1. gratis)', 1);
+    expect(held(t, uid).rare?.['Gromril-Waffe']).toBeUndefined();
   });
 });

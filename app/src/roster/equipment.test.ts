@@ -44,9 +44,9 @@ describe('a warrior\'s list while the warband is founded', () => {
     let d = createWarband(data, 'dwarftreasure', null, '');
     d = core.addUnit(ctx(d), 'noble');
     const noble = d.models[0]!.uid;
-    core.toggleEq(ctx(d), noble, 'Schwert', true);
+    d = core.toggleEq(ctx(d), noble, 'Schwert', true);
     const dv = equipmentView(ctx(d), noble)!;
-    expect(dv.offer.map((o) => o.de)).toEqual(['Gromril-Waffe']);
+    expect(dv.carried.find((r) => r.key === 'Schwert')!.options.map((o) => o.de)).toEqual(['Gromril-Waffe']);
     // the free market opens the catalogue again
     const free = core.setHouseBool(ctx(s), 'freeMarket', true);
     expect(equipmentView(ctx(free), capt)!.offer.length).toBeGreaterThan(20);
@@ -177,45 +177,58 @@ describe('armour is had once (#111)', () => {
   });
 });
 
-describe('weapon upgrades in the sheet (#108, #109, #110, #112)', () => {
+describe('weapon upgrades in the sheet (#108, #109, #110, #112, #115)', () => {
   function rangers() {
     let s = createWarband(data, 'dwarfrangers', null, '');
     s = core.addUnit(ctx(s), 'runesmith');
     const uid = s.models[0]!.uid;
     s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
-    s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 1);
+    s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 2);
     return { s, uid };
   }
 
-  it('the offer says the founding multiplier, 3×, not the 4× of later (#108)', () => {
+  it('every piece he carries has a line of its own, two daggers are two lines, and the free one takes no upgrade (#115)', () => {
     const { s, uid } = rangers();
-    const g = equipmentView(ctx(s), uid)!.offer.find((o) => o.de === 'Gromril-Waffe')!;
-    expect(g.price).toBe('3× the weapon\'s price');
+    const rows = equipmentView(ctx(s), uid)!.carried;
+    const daggers = rows.filter((r) => r.key === 'Dolch (1. gratis)');
+    expect(daggers).toHaveLength(2);
+    expect(daggers[0]).toMatchObject({ free: true, price: 'free', options: [] });
+    expect(daggers[1]!.options.map((o) => o.de)).toEqual(['Gromril-Waffe']);
+    expect(rows.find((r) => r.key === 'Schwert')!.options).toEqual([{ de: 'Gromril-Waffe', name: 'Gromril weapon', price: 30 }]);
   });
 
-  it('a second gromril weapon can be added while a weapon is free, one row each (#110)', () => {
+  it('the offer is the price of that weapon, 3× at the founding, not the 4× of later (#108)', () => {
     const { s, uid } = rangers();
-    let t = core.addRare(ctx(s), uid, 'Gromril-Waffe');
-    let v = equipmentView(ctx(t), uid)!;
-    expect(v.rare.filter((r) => r.de === 'Gromril-Waffe')).toHaveLength(1);
-    expect(v.offer.some((o) => o.de === 'Gromril-Waffe')).toBe(true);
-    t = core.addRare(ctx(t), uid, 'Gromril-Waffe');
-    v = equipmentView(ctx(t), uid)!;
-    const rows = v.rare.filter((r) => r.de === 'Gromril-Waffe');
-    expect(rows.map((r) => r.slot)).toEqual([0, 1]);
-    expect(rows.map((r) => r.on).sort()).toEqual(['Dolch (1. gratis)', 'Schwert']);
-    expect(v.offer.some((o) => o.de === 'Gromril-Waffe')).toBe(false);
+    expect(equipmentView(ctx(s), uid)!.carried.find((r) => r.key === 'Dolch (1. gratis)' && !r.free)!.options[0]!.price).toBe(6);
   });
 
-  it('the Dark Elf blade and Dark venom are on offer at the founding, the venom as used up (#112)', () => {
+  it('gromril on the sword and on the second dagger: each on its line, the free dagger bare (#110)', () => {
+    const { s, uid } = rangers();
+    let t = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Schwert', true);
+    t = core.setUpgradeOn(ctx(t), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    const rows = equipmentView(ctx(t), uid)!.carried;
+    expect(rows.find((r) => r.key === 'Schwert')!.ups).toMatchObject([{ de: 'Gromril-Waffe', paid: 30 }]);
+    const daggers = rows.filter((r) => r.key === 'Dolch (1. gratis)');
+    expect(daggers.map((r) => r.ups.length)).toEqual([0, 1]);
+    expect(daggers[1]!.ups[0]).toMatchObject({ paid: 6 });
+    expect(daggers[1]!.options).toEqual([]);
+  });
+
+  it('the Dark Elf blade and Dark venom are on offer on the sword at the founding, the venom as used up (#112)', () => {
     let s = createWarband(data, 'darkelves', null, '');
     s = core.addUnit(ctx(s), 'highborn');
     const uid = s.models[0]!.uid;
     s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
-    const v = equipmentView(ctx(s), uid)!;
-    expect(v.offer.find((o) => o.de === 'Dark-Elf-Klinge')!.price).toBe('+15 gc');
-    expect(v.offer.find((o) => o.de === 'Dunkles Gift')!.price).toBe('+15 gc');
-    const t = core.addRare(ctx(s), uid, 'Dunkles Gift');
-    expect(equipmentView(ctx(t), uid)!.rare.find((r) => r.de === 'Dunkles Gift')).toMatchObject({ once: true, paid: 15 });
+    const sword = equipmentView(ctx(s), uid)!.carried.find((r) => r.key === 'Schwert')!;
+    expect(sword.options).toEqual([{ de: 'Dark-Elf-Klinge', name: 'Dark Elf blade', price: 15 }, { de: 'Dunkles Gift', name: 'Dark venom', price: 15 }]);
+    const t = core.setUpgradeOn(ctx(s), uid, 'Dunkles Gift', 'Schwert', true);
+    expect(equipmentView(ctx(t), uid)!.carried.find((r) => r.key === 'Schwert')!.ups).toMatchObject([{ de: 'Dunkles Gift', once: true, paid: 15 }]);
+  });
+
+  it('a weapon put back takes its upgrade with it', () => {
+    const { s, uid } = rangers();
+    let t = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Schwert', true);
+    t = core.setListQty(ctx(t), uid, 'Schwert', 0);
+    expect(equipmentView(ctx(t), uid)!.carried.some((r) => r.ups.length > 0)).toBe(false);
   });
 });
