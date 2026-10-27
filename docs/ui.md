@@ -105,8 +105,8 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   englisch und deutsch, „Kind of place“ als freier Tag („Region“, „Town“ … zum
   Sortieren und Finden, höchstens 40 Zeichen) und die Lore. Fraktionen, NPCs,
   Gruppen, Szenarien und Orte lassen sich **untereinander verknüpfen**: im Formular
-  „Linked to“ mit „Add a link“ (angeboten wird alles Verknüpfbare außer dem Eintrag
-  selbst, mit seiner Art) und „Remove link to …“; auf jeder Karte steht unter „Linked
+  „Linked to“ mit einer **Suche** (Meldung #104: eine reine Liste wäre zu lang; Suchfeld nach dem Namen, Auswahl „Kind of entry“ – Faction, NPC, Group, Scenario, Place, dazu die Lore als Regions, Factions und Groups –, höchstens zwölf Treffer, dann „n more – type more“; ohne Eingabe wird nichts angeboten; angeboten wird alles Verknüpfbare außer dem Eintrag
+  selbst, mit seiner Art, auch die Lore) und „Remove link to …“; auf jeder Karte steht unter „Linked
   entries“, womit der Eintrag verbunden ist – **offen, von beiden Enden** (eine
   Verknüpfung wird nur auf einer Seite gespeichert). Ideen und Gruppen von Warbands
   tragen keine. Ein Eintrag, der entfernt wurde (oder auf einem anderen Gerät

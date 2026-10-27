@@ -148,7 +148,7 @@ test('the Locations tab at 360 px: a place with its links is read, nothing scrol
   await shot(page, 'library-locations');
   await page.getByRole('button', { name: 'New place' }).click();
   const sheet = page.getByRole('dialog', { name: 'A new place' });
-  await expect(sheet.getByLabel('Add a link')).toBeVisible();
+  await expect(sheet.getByLabel('Search entries to link')).toBeVisible();
   await noSideScroll(page);
   await tapTargets(page);
   await shot(page, 'library-location-form');

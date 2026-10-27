@@ -378,10 +378,14 @@ describe('the Library: places and links', () => {
     at('/library/factions');
     await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
     let sheet = screen.getByRole('dialog', { name: 'Edit faction' });
-    const add = within(sheet).getByLabelText('Add a link');
-    // only entries that can be linked, named with their kind, and not itself
-    expect([...add.children].filter((o) => o.tagName === 'OPTION').map((o) => o.textContent)).toEqual(['Choose …', 'Captain Brandt (NPC)']);
-    await user.selectOptions(add, 'Captain Brandt (NPC)');
+    // a search, not a list: nothing is offered until one asks; only entries that can be linked, named with their kind, and not itself
+    const search = within(sheet).getByLabelText('Search entries to link');
+    expect(within(sheet).queryByRole('list', { name: 'Matches' })).toBeNull();
+    await user.type(search, 'not');
+    expect(within(sheet).queryByRole('button', { name: /Link to Not linkable/ })).toBeNull();
+    await user.clear(search);
+    await user.type(search, 'capt');
+    await user.click(within(sheet).getByRole('button', { name: 'Link to Captain Brandt (NPC)' }));
     expect(within(sheet).getByRole('button', { name: 'Remove link to Captain Brandt' })).toBeTruthy();
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toHaveLength(1));
@@ -414,15 +418,38 @@ describe('the Library: places and links', () => {
     at('/library/factions');
     await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
     const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
-    const add = within(sheet).getByLabelText('Add a link');
-    await waitFor(() => expect((add as HTMLSelectElement).disabled).toBe(false));
-    await waitFor(() => expect(within(add).getByRole('option', { name: 'Mordheim (Region)' })).toBeTruthy());
-    await user.selectOptions(add, 'Mordheim (Region)');
+    await user.type(within(sheet).getByLabelText('Search entries to link'), 'mordh');
+    await user.click(await within(sheet).findByRole('button', { name: 'Link to Mordheim (Region)' }));
     expect(within(sheet).getByRole('button', { name: 'Remove link to Mordheim' })).toBeTruthy();
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect((srv.state.library.get(watch.id)!.body as { links: string[] }).links).toEqual(['lore:mordheim']));
     const card = within(await screen.findByRole('list', { name: 'Factions' })).getByText('The Watch').closest('li')!;
     expect(await within(card).findByText('Mordheim')).toBeTruthy();
+  });
+
+  /* Report #104: the list of what can be linked is long (the lore alone has hundreds), so it is searched and filtered. */
+  it('the entries to link are searched by name and filtered by kind', async () => {
+    const srv = server();
+    srv.libraryFrom({ kind: 'faction', name: 'The Watch', body: { de: '', status: '', lore: '' } });
+    srv.libraryFrom({ kind: 'location', name: 'Ostermark docks', body: { de: '', type: 'Town', lore: '' } });
+    srv.libraryFrom({ kind: 'npc', name: 'Captain Brandt', body: npcBody });
+    const user = userEvent.setup();
+    at('/library/factions');
+    await user.click(await screen.findByRole('button', { name: 'Edit The Watch' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit faction' });
+    const matches = () => within(sheet).queryAllByRole('button', { name: /^Link to / }).map((b) => b.getAttribute('aria-label'));
+    await user.selectOptions(within(sheet).getByLabelText('Kind of entry to link'), 'Place');
+    expect(matches()).toEqual(['Link to Ostermark docks (Place)']);
+    await user.selectOptions(within(sheet).getByLabelText('Kind of entry to link'), 'Lore – Regions');
+    await user.type(within(sheet).getByLabelText('Search entries to link'), 'ostermark');
+    await waitFor(() => expect(matches()).toContain('Link to Ostermark (Region)'));
+    expect(matches()).not.toContain('Link to Ostermark docks (Place)');
+    await user.selectOptions(within(sheet).getByLabelText('Kind of entry to link'), 'All kinds');
+    await waitFor(() => expect(matches()).toContain('Link to Ostermark docks (Place)'));
+    // long answers stop at a number and say so
+    await user.clear(within(sheet).getByLabelText('Search entries to link'));
+    await user.type(within(sheet).getByLabelText('Search entries to link'), 'a');
+    await waitFor(() => expect(within(sheet).getByText(/more – type more/)).toBeTruthy());
   });
 
   it('a link to an entry that is gone is not shown', async () => {
