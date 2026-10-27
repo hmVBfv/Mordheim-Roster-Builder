@@ -4310,5 +4310,5 @@ no weapon list in it. The data already held Beastlash (on the Beastmaster's list
 the only entry that was really missing was Dark venom's founding price. Rob chose the shape: one copy per weapon in a new
 optional field (`rare[].also`), the weapon named on the unit's line ("Dagger (Gromril)"), Dark venom as equipment that
 is taken off when used. The fix is stacked on #111's branch because both touch the same lines of the parity walk; pull
-request 237. Two wrong turns: my first label also renamed flat upgrades of other warbands and a stacked count ("2×
-Gromril weapon"), which the parity tests caught; and a first count of weapons let a Hero upgrade a weapon he did not hold.
+request 237. One wrong turn: my first label also renamed flat upgrades of other warbands and a stacked count ("2×
+Gromril weapon"), which the parity tests caught.
