@@ -661,6 +661,53 @@ Keine Agenten-Läufe während eines Spielabends.
 | vierteljährlich | SD-Klon auffrischen (wie Schritt 14; alte Abbilder bis auf das letzte löschen) |
 | jährlich | restic-Passwort aus der Offline-Ablage testweise verwenden |
 
+### Sicherheitsmeldungen und Abhängigkeiten (Rob, 27.10.2026)
+
+Eine neue Lücke in einem Paket erscheint ohne einen Commit von uns. Darum prüft
+[`.github/workflows/audit.yml`](../.github/workflows/audit.yml) bei jedem Pull Request,
+bei jedem Push auf `master` und **jeden Montag** mit `npm audit`: Die Laufzeitpakete
+(`--omit=dev`) lassen den Lauf bei **hoch** oder **kritisch** scheitern – GitHub schickt
+dann eine Mail –, alle Pakete stehen nur zum Lesen im Protokoll (Bau und Tests laufen auf
+den Rechnern der CI, nicht auf dem Pi). Der Lauf ist bewusst **nicht** Teil von `ci.yml`:
+Eine Meldung über Nacht soll das Image einer unabhängigen Korrektur nicht aufhalten
+(ADR 0009). Er ändert nichts und deployt nichts.
+
+Wenn er rot wird, ist der Ablauf immer derselbe:
+
+1. Im Repo (Cloud-Sitzung oder eigener Klon): `npm audit fix` (nur die Lockdatei), dann
+   `npm run check` und `npm run test:server`, Pull Request, Merge.
+2. Auf dem Pi, wie jedes Deploy (Abschnitt 5) – zuerst die Testinstanz:
+   ```bash
+   cd ~/src/Mordheim-Roster-Builder
+   git fetch && git log --oneline HEAD..origin/master      # was neu ist
+   git diff HEAD origin/master -- ops/                      # was als root laufen wird
+   git pull --ff-only && sudo ops/install.sh                # nur wenn ops/ sich geändert hat
+   roster-deploy --staging <commit>                         # <commit>: die ersten 7 Zeichen des Merge-Commits
+   # die Testinstanz im Heimnetz ansehen, dann:
+   roster-deploy <commit>
+   roster-deploy --status                                   # ROSTER_TAG ist der neue Commit, alles „healthy“
+   ```
+3. Das Basis-Image und `caddy` nehmen **nicht** am Lockfile teil. Für sie gilt:
+   ```bash
+   docker exec roster-caddy caddy version                   # welche Version läuft
+   docker image ls caddy                                    # wie alt ist das Abbild
+   cd ~/server/roster
+   docker compose pull caddy && docker compose up -d caddy  # neueres Caddy holen und neu starten
+   docker logs --since 2m roster-caddy 2>&1 | grep -iE 'error|certificate' || echo ok
+   curl -sI https://<hostname> | head -3                    # von außen erreichbar
+   ```
+   (`pull_policy: never` gilt nur für die App; Caddy holt `compose pull` ausdrücklich.)
+   Das Basis-Image der App kommt mit dem monatlichen Neubau der CI (Abschnitt 9).
+
+**Automatisch?** Die Prüfung ja (der Montagslauf), das Einspielen bewusst nein: Eine App
+mit Datenbank und Migrationen soll nicht unbeaufsichtigt aktualisiert werden
+([ADR 0009](decisions/0009-deliberate-deploys.md): Watchtower für die App verworfen; die
+App-Container tragen `watchtower.enable=false`). Was geht: **Caddy** darf weiter von
+Watchtower aktualisiert werden (ADR 0009) – ob es dafür auf dem Pi läuft, zeigt
+`docker ps --filter name=watchtower` und `docker logs --since 7d watchtower 2>&1 | tail`.
+Läuft keiner, ist der Befehl aus Schritt 3 der Weg, einmal im Monat zusammen mit dem
+Neubau des Images.
+
 ## Ausfall-Handbuch
 
 | Fall | Erkennen | Folge | Vorgehen |

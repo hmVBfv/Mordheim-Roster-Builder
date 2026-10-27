@@ -4263,3 +4263,18 @@ Rob's second round on the same day, after he had seen #95 live.
 - A slip of mine, for the next run: while I built #101 the shell's safety check was unavailable for a long
   stretch; I wrote the UI test and the server change and ran the UI test only once it was back, so that
   test was not seen failing first.
+
+## October 27, 2026 — dependency audit: lockfile and a weekly check
+
+Rob pasted a list of recent vulnerabilities (PHP2Shell, Fastify, Vite, Caddy) from another chat. I checked it
+against the repo: none of the named CVEs applies (no PHP anywhere, Fastify and Vite are past the fixed
+versions, `@fastify/static` is not used) – but `npm audit` found three that the list did not: Zod
+(memory exhaustion on large collections, high; the server validates every request with it), Fastify
+5.12.5 (a header check that can be bypassed, low) and `fast-uri`, which Fastify and Ajv pull in. `npm audit fix`
+fixed all of them in the lockfile alone; `package.json` is unchanged and `npm run check` and the server
+tests are green. There was no audit anywhere, so `.github/workflows/audit.yml` now runs `npm audit` on every
+pull request, on every push to master and every Monday: high and critical advisories in the runtime packages
+fail it, everything else is only printed. It is its own workflow, not a job of `ci.yml`, so a new advisory
+cannot hold back the image of an unrelated fix – what goes to the Pi stays a person's decision (ADR 0009).
+Caddy is not covered by the lockfile; `docs/operations.md` has the commands for the Pi (the version, an
+update, and what Watchtower may still do for it).
