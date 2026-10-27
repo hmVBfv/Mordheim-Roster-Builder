@@ -2,7 +2,7 @@
    asked while `enabled` is false (nobody signed in). */
 import { useEffect, useState } from 'react';
 import { errorText } from '../account/api.ts';
-import { cachedLibrary, getLibrary, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario, type LibraryLocation, type LibraryWarbandGroup } from './api.ts';
+import { cachedLibrary, getLibrary, onLibraryChanged, type Faction, type LibraryGroup, type LibraryItem, type LibraryNpc, type LibraryScenario, type LibraryLocation, type LibraryWarbandGroup } from './api.ts';
 
 export function useLibrary(enabled = true) {
   const [items, setItems] = useState<LibraryItem[] | null>(null);
@@ -12,7 +12,9 @@ export function useLibrary(enabled = true) {
     let live = true;
     void cachedLibrary().then((c) => { if (live && c) setItems((cur) => cur ?? c); });
     getLibrary().then((l) => { if (live) { setItems(l); setError(null); } }).catch((e: unknown) => { if (live) setError(errorText(e)); });
-    return () => { live = false; };
+    // a write on another screen: what the device kept now
+    const off = onLibraryChanged(() => { void cachedLibrary().then((c) => { if (live && c) setItems(c); }); });
+    return () => { live = false; off(); };
   }, [enabled]);
   return { items, setItems, error };
 }
