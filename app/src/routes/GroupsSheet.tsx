@@ -11,7 +11,7 @@ const MAX_NAME = 120;
 function Row({ g, online, busy, run, api }: { g: LibraryWarbandGroup; online: boolean; busy: boolean; run: (f: () => Promise<void>) => void; api: ReturnType<typeof useWarbandGroups> }) {
   const [name, setName] = useState(g.name);
   return (
-    <li>
+    <li className={ui.groupRow}>
       <input className={ui.input} aria-label={`Name of ${g.name}`} value={name} maxLength={MAX_NAME} autoComplete="off" onChange={(e) => setName(e.target.value)} />
       <button type="button" className={ui.buttonQuiet} aria-label={`Rename ${g.name}`} disabled={!online || busy || !name.trim() || name.trim() === g.name} onClick={() => run(() => api.rename(g, name.trim()))}>Rename</button>
       <button type="button" className={ui.buttonQuiet} aria-label={`Remove ${g.name}`} disabled={!online || busy} onClick={() => run(() => api.remove(g))}>Remove</button>
