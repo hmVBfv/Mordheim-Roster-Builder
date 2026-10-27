@@ -41,6 +41,53 @@ function server() {
 }
 const kept = (srv: ReturnType<typeof server>) => [...srv.state.library.values()].filter((i) => i.kind === 'warband_group' && !i.deletedAt);
 
+/** A screen as wide as a desktop: the side navigation is there. */
+function wide() {
+  vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('min-width: 900px'), media: q, addEventListener: () => undefined, removeEventListener: () => undefined }));
+}
+const sideLinks = (nav: HTMLElement) => within(nav.querySelector<HTMLElement>('#nav-warbands')!).getAllByRole('link').map((a) => a.textContent);
+
+/* Wishes #92 and #93 (Rob, 26.10.2026): in the side navigation the kinds and the groups stand above the free warbands and do not look
+   like warbands; a group carries its warbands, and follows the groups as they change. */
+describe('the groups in the side navigation (#92, #93)', () => {
+  it('the sections come first, each with its warbands; what is free stands in a section of its own below, then a new one', async () => {
+    const srv = server();
+    wide();
+    srv.libraryFrom({ name: 'Reikland bands', kind: 'warband_group', body: { warbands: ['wb-1'] } });
+    const planner = warband('wb-2', 'The Late Company');
+    planner.state = { ...planner.state, planner: true };
+    await db.warbands.bulkPut([warband('wb-1', 'The Grey Penitents'), planner, { ...warband('wb-3', 'The Field Company'), campaignId: 'camp-1' }, warband('wb-4', 'Clan Skrittle')]);
+    at('/warbands');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    await waitFor(() => expect(sideLinks(nav)).toEqual(['Planners', 'The Late Company', 'In campaigns', 'The Field Company', 'Reikland bands', 'The Grey Penitents', 'Free warbands', 'Clan Skrittle', '+ New warband']), { timeout: 15_000 });
+    // a section is a place to jump to, a warband under it a page of its own
+    const sub = nav.querySelector<HTMLElement>('#nav-warbands')!;
+    expect(within(sub).getByRole('link', { name: 'Reikland bands' }).getAttribute('href')).toMatch(/^\/warbands\?show=group-/);
+    expect(within(sub).getByRole('link', { name: 'The Grey Penitents' }).getAttribute('href')).toBe('/warbands/wb-1');
+  });
+
+  it('a group appears, gains a warband and goes again at once, without a reload', async () => {
+    const srv = server();
+    wide();
+    await db.warbands.bulkPut([warband('wb-1', 'The Grey Penitents')]);
+    const user = userEvent.setup();
+    at('/warbands');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    await user.click(await screen.findByRole('button', { name: 'Groups' }, { timeout: 15_000 }));
+    const sheet = await screen.findByRole('dialog', { name: 'Groups of warbands' });
+    await user.type(within(sheet).getByLabelText('Name of the new group'), 'Reikland bands');
+    await user.click(within(sheet).getByRole('button', { name: 'Add the group' }));
+    await waitFor(() => expect(kept(srv)).toHaveLength(1));
+    await waitFor(() => expect(sideLinks(nav)).toContain('Reikland bands'));
+    await user.click(within(sheet).getByRole('button', { name: 'Close' }));
+    await user.selectOptions(await screen.findByLabelText('Group of The Grey Penitents'), 'Reikland bands');
+    await waitFor(() => expect(sideLinks(nav)).toEqual(['Reikland bands', 'The Grey Penitents', '+ New warband']));
+    await user.click(await screen.findByRole('button', { name: 'Groups' }));
+    await user.click(within(await screen.findByRole('dialog', { name: 'Groups of warbands' })).getByRole('button', { name: 'Remove Reikland bands' }));
+    await waitFor(() => expect(sideLinks(nav)).toEqual(['The Grey Penitents', '+ New warband']));
+  });
+});
+
 describe('the kinds of warband apart (#91)', () => {
   it('a planner and a warband in a campaign stand in sections of their own, not among the free ones; the menu jumps to a section', async () => {
     server();
