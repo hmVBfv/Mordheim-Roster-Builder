@@ -1,0 +1,43 @@
+name: Audit
+
+# Known vulnerabilities in the dependencies (docs/operations.md, "Sicherheitsmeldungen").
+#
+#   runtime  the packages that end up in the image and in the app: fails on a high or
+#            critical advisory. A new advisory can appear without any commit, so this
+#            also runs every Monday; GitHub mails the failed run.
+#   all      everything, dev tools included, only to be read (never fails): the build
+#            and the tests run on the CI's machines, not on the Pi.
+#
+# It is not part of ci.yml on purpose: a new advisory must not hold back the image of an
+# unrelated fix (ADR 0009: what goes to the Pi is decided by a person, not by a gate that
+# turns red overnight). Nothing here changes a file or deploys anything.
+# Actions are pinned to a commit (the tag in the comment), as in ci.yml.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '41 5 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with: { node-version: '22' }
+      - name: Runtime dependencies (fails on high and critical)
+        run: npm audit --omit=dev --audit-level=high
+      - name: All dependencies (to read, never fails)
+        if: always()
+        run: npm audit || true
