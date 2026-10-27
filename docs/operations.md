@@ -100,8 +100,7 @@ können. Schreibrecht für die eigene private Gruppe (Raspberry Pi OS: umask
     muss an sein, und `master` ändert sich nur per Pull Request.
 11. **Erster Start:** Tag = die ersten sieben Zeichen des Commits, für den die
     CI auf `master` grün ist (`git -C ~/src/Mordheim-Roster-Builder rev-parse --short=7 HEAD`).
-    `roster-deploy --staging <tag>`, im Heimnetz
-    `curl -s http://<pi-lan-ip>:8081/api/v1/health`; dann `roster-deploy <tag>`,
+    `roster-deploy <tag>`,
     `roster-deploy --status`, `curl -s http://127.0.0.1:3000/api/v1/health`.
     Nie `master` als Tag: der wandert, und ein Rollback hätte kein Ziel.
 12. **Backup und Test gleich einmal:** `sudo systemctl start roster-backup.service`,
@@ -371,7 +370,7 @@ cd ~/src/Mordheim-Roster-Builder
 git fetch && git log --oneline HEAD..origin/master     # was neu ist
 git diff HEAD origin/master -- ops/                     # was als root laufen wird
 git pull --ff-only && sudo ops/install.sh               # nur wenn ops/ sich geändert hat
-roster-deploy --staging <tag> && roster-deploy <tag>
+roster-deploy <tag>
 ```
 
 ### Nebeneinander mit den bestehenden Diensten
@@ -517,20 +516,23 @@ echten Journal-Zeilen, aus beiden Containern.
 
 ## 5. Deploy und Rollback
 
-Die CI baut für jeden Push ein Image für `linux/arm64` und `linux/amd64` und
-legt es als `ghcr.io/hmvbfv/mordheim-roster:<commit>` ab (die ersten sieben
-Zeichen des Commits) – aber erst, wenn alle Tests grün sind, auch der
-Rauchtest des Images und der Ende-zu-Ende-Test der Betriebsdateien. Auf
-`master` zusätzlich `:<ganzer Commit>`, `:master` und `:drill-broken`
-(Rollback-Übung). Jedes Image ist mit Sigstore signiert; das Zertifikat nennt
+Die CI baut bei jedem Push auf `master` (und monatlich neu) ein Image für
+`linux/arm64` und `linux/amd64` und legt es als
+`ghcr.io/hmvbfv/mordheim-roster:<commit>` ab (die ersten sieben Zeichen des
+Commits), zusätzlich `:<ganzer Commit>`, `:master` und `:drill-broken`
+(Rollback-Übung) – aber erst, wenn alle Tests grün sind, auch der Rauchtest
+des Images und der Ende-zu-Ende-Test der Betriebsdateien. **Ein Branch
+veröffentlicht kein Image** ([ADR 0028](decisions/0028-images-from-master-only.md)):
+seine Tests laufen am Pull Request, das Image wird dabei nur auf dem Läufer
+gebaut und geprüft. Jedes Image ist mit Sigstore signiert; das Zertifikat nennt
 Workflow, Branch und Commit ([ADR 0017](decisions/0017-signed-images-from-master.md)).
-**In die Produktion kommt nur, was die CI auf `master` gebaut hat** – ein
-Branch-Build nur auf die Testinstanz. Auf den Pi kommt ein Image nur bewusst,
-als `<user>` per SSH in `tmux`:
+Alte Branch-Images räumt der Workflow „Prune images“ jede Woche ab (Montag,
+`.github/workflows/prune-images.yml`; von Hand mit „Run workflow“ zuerst als
+Probelauf, der nur auflistet). Auf den Pi kommt ein Image nur bewusst, als
+`<user>` per SSH in `tmux`:
 
 ```bash
-roster-deploy --staging <commit>   # zuerst die Testinstanz, im Heimnetz prüfen
-roster-deploy <commit>             # dann produktiv
+roster-deploy <commit>             # produktiv (die Testinstanz ist nicht mehr nötig, ADR 0028)
 roster-deploy --status             # was läuft wo
 ```
 
@@ -545,8 +547,7 @@ Ablauf von `roster-deploy <commit>`:
    Commits (`<commit>-<datum>` für den monatlichen Neubau) und für die
    Rollback-Übung `drill-broken`, das dann das Übungs-Image sein muss.
    Schlägt eins davon fehl, hat sich nichts geändert („REFUSED …“ sagt, was
-   fehlte). Die Testinstanz nimmt jedes Image und meldet nur, ob es eines
-   von master ist. Compose zieht selbst nie (`pull_policy: never`): Es läuft
+   fehlte). Compose zieht selbst nie (`pull_policy: never`): Es läuft
    nur, was `roster-deploy` geholt und geprüft hat.
 3. Sicherung: `roster-cli backup --label pre-deploy-<commit>` im laufenden
    Container (läuft keiner, mit dem bisherigen Image); Schemastand merken.
@@ -656,7 +657,7 @@ Keine Agenten-Läufe während eines Spielabends.
 
 | Wann | Was |
 | --- | --- |
-| monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:<commit>-<datum>` (und `:master-<datum>`); Testinstanz, dann produktiv `roster-deploy <commit>-<datum>` – produktiv nur Commits, nie Namen wie `master` |
+| monatlich | CI baut das Image neu (Sicherheitsupdates des Basis-Images) als `:<commit>-<datum>` (und `:master-<datum>`); dann produktiv `roster-deploy <commit>-<datum>` – produktiv nur Commits, nie Namen wie `master` |
 | monatlich | Blick auf healthchecks.io und `docker image prune -f`; alte `roster.sqlite.failed-*` und `…before-restore-*` in `data/` löschen, wenn nicht mehr gebraucht |
 | vierteljährlich | SD-Klon auffrischen (wie Schritt 14; alte Abbilder bis auf das letzte löschen) |
 | jährlich | restic-Passwort aus der Offline-Ablage testweise verwenden |
@@ -676,15 +677,13 @@ Wenn er rot wird, ist der Ablauf immer derselbe:
 
 1. Im Repo (Cloud-Sitzung oder eigener Klon): `npm audit fix` (nur die Lockdatei), dann
    `npm run check` und `npm run test:server`, Pull Request, Merge.
-2. Auf dem Pi, wie jedes Deploy (Abschnitt 5) – zuerst die Testinstanz:
+2. Auf dem Pi, wie jedes Deploy (Abschnitt 5):
    ```bash
    cd ~/src/Mordheim-Roster-Builder
    git fetch && git log --oneline HEAD..origin/master      # was neu ist
    git diff HEAD origin/master -- ops/                      # was als root laufen wird
    git pull --ff-only && sudo ops/install.sh                # nur wenn ops/ sich geändert hat
-   roster-deploy --staging <commit>                         # <commit>: die ersten 7 Zeichen des Merge-Commits
-   # die Testinstanz im Heimnetz ansehen, dann:
-   roster-deploy <commit>
+   roster-deploy <commit>                                   # <commit>: die ersten 7 Zeichen des Merge-Commits
    roster-deploy --status                                   # ROSTER_TAG ist der neue Commit, alles „healthy“
    ```
 3. Das Basis-Image und `caddy` nehmen **nicht** am Lockfile teil. Für sie gilt:

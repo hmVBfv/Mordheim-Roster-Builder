@@ -17,16 +17,17 @@ name: CI
 #           epoch, memory), shellcheck, the Caddyfile, and ops/test/e2e.sh –
 #           install.sh, roster-deploy with both rollbacks, backup and restore
 #           test with restic, roster-restore, Fail2Ban
-#   publish when all of the above are green on a push: the image for
+#   publish when all of the above are green on a push to master: the image for
 #           linux/arm64 (the Pi) and linux/amd64 to ghcr.io/hmvbfv/mordheim-roster
-#           as :<first 7 of the commit>; on master also :<the whole commit>,
-#           :master and :drill-broken (for the rollback drill). Monthly on
-#           master, a fresh build for the base image's security updates
-#           (ADR 0009), as :<first 7>-<date>. Every image is signed keyless with Sigstore: the
-#           certificate names this workflow, the branch and the commit.
-#           roster-deploy puts only master's into production (ADR 0017),
-#           and this job checks right away that the Pi's check passes for
-#           master and refuses a branch.
+#           as :<first 7 of the commit>, :<the whole commit>, :master and
+#           :drill-broken (for the rollback drill). Monthly, a fresh build for
+#           the base image's security updates (ADR 0009), as :<first 7>-<date>.
+#           Every image is signed keyless with Sigstore: the certificate names
+#           this workflow, the branch and the commit. roster-deploy puts only
+#           master's into production (ADR 0017), and this job checks right
+#           away that the Pi's check passes for it. A branch publishes
+#           nothing (ADR 0028): its tests run on the pull request, and the
+#           image job above builds and tests the image on the runner.
 #
 # Actions are pinned to a commit (the tag in the comment): a moved tag cannot
 # change what runs here while this job can push images (security review OPS-7).
@@ -35,9 +36,11 @@ name: CI
 # 19.10.2026, and the move should be a deliberate change with a green run
 # (Playwright's browser dependencies), not a surprise on some Tuesday.
 
+# A branch is tested once, as a pull request (ADR 0028): a push to a branch with
+# a pull request used to run everything twice.
 on:
   push:
-    branches: ['**']
+    branches: [master]
   pull_request:
     branches: [master]
   schedule:
@@ -59,6 +62,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '22', cache: npm }
       - run: npm ci
+      - name: Image pruning rules (ADR 0028)
+        run: .github/scripts/test-images-to-prune.sh
       - name: Legacy tests (rebuilds single-file + parity check)
         run: node test/run.mjs
 
@@ -159,6 +164,7 @@ jobs:
         run: sudo GITHUB_ACTIONS="$GITHUB_ACTIONS" IMAGE="$IMAGE" ops/test/e2e.sh "$TAG" drill-broken drill-migration
 
   publish:
+    # push only reaches here for master
     if: github.event_name == 'push' || github.event_name == 'schedule'
     needs: [legacy, core, app, server, image]
     runs-on: ubuntu-24.04
@@ -190,10 +196,8 @@ jobs:
           if [ "$GITHUB_EVENT_NAME" = schedule ]; then
             # the commit with the date: roster-deploy takes commits, not names
             tags="-t $REPO:$short-$(date -u +%Y%m%d) -t $REPO:master-$(date -u +%Y%m%d) -t $REPO:master"
-          elif [ "$GITHUB_REF" = refs/heads/master ]; then
-            tags="-t $REPO:$short -t $REPO:$GITHUB_SHA -t $REPO:master"
           else
-            tags="-t $REPO:$short"
+            tags="-t $REPO:$short -t $REPO:$GITHUB_SHA -t $REPO:master"
           fi
           echo "TAGS=$tags" >> "$GITHUB_ENV"
       - name: Build and push (linux/arm64, linux/amd64), then sign
@@ -206,28 +210,16 @@ jobs:
           [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "no digest from the build: $digest" >&2; exit 1; }
           echo "DIGEST=$digest" >> "$GITHUB_ENV"
           cosign sign --yes "$REPO@$digest"
-      - name: The broken image for the rollback drill (master), signed
-        if: github.ref == 'refs/heads/master'
+      - name: The broken image for the rollback drill, signed
         run: |
           docker buildx build --push --platform linux/arm64,linux/amd64 \
             --metadata-file "$RUNNER_TEMP/drill.json" \
             --build-arg ROSTER_VERSION="$GITHUB_SHA" --target drill-broken -t "$REPO:drill-broken" .
           cosign sign --yes "$REPO@$(jq -r '."containerimage.digest"' "$RUNNER_TEMP/drill.json")"
-      - name: The Pi's check (ops/lib/roster-verify) - master passes, a branch is refused
+      - name: The Pi's check (ops/lib/roster-verify) - the image passes
         run: |
           docker pull -q "$REPO@$DIGEST" >/dev/null
-          if [ "$GITHUB_REF" = refs/heads/master ]; then
-            ops/lib/roster-verify "$REPO@$DIGEST" "${GITHUB_SHA::7}"
-          else
-            code=0
-            ops/lib/roster-verify "$REPO@$DIGEST" "${GITHUB_SHA::7}" || code=$?
-            [ "$code" = 1 ] || { echo "roster-verify did not refuse a branch's image (exit $code)" >&2; exit 1; }
-            # signed all the same - by this branch: the same check with this
-            # branch in master's place passes, so signing and checking work
-            sed "s|^REF=refs/heads/master\$|REF=$GITHUB_REF|" ops/lib/roster-verify >"$RUNNER_TEMP/roster-verify-branch"
-            grep -qx "REF=$GITHUB_REF" "$RUNNER_TEMP/roster-verify-branch"
-            bash "$RUNNER_TEMP/roster-verify-branch" "$REPO@$DIGEST" "${GITHUB_SHA::7}"
-          fi
+          ops/lib/roster-verify "$REPO@$DIGEST" "${GITHUB_SHA::7}"
       - name: Summary
         run: |
           {
@@ -235,9 +227,5 @@ jobs:
             echo
             echo "Pushed and signed: \`${TAGS//-t /}\` (\`$DIGEST\`)"
             echo
-            if [ "$GITHUB_REF" = refs/heads/master ]; then
-              echo "On the Pi: \`roster-deploy --staging ${GITHUB_SHA::7}\`, then \`roster-deploy ${GITHUB_SHA::7}\`"
-            else
-              echo "A branch build: only for the test instance – \`roster-deploy --staging ${GITHUB_SHA::7}\`. Production takes master's builds only."
-            fi
+            echo "On the Pi: \`roster-deploy ${GITHUB_SHA::7}\`"
           } >> "$GITHUB_STEP_SUMMARY"
