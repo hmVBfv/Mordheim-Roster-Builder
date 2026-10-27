@@ -2530,7 +2530,8 @@
      "wh",
      "sos"
     ]
-   }
+   },
+   "group": "Poisons and Drugs"
   },
   {
    "de": "Purpurschatten",
@@ -2549,7 +2550,8 @@
     "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
     "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart",
     "https://mordheimer.net/docs/campaigns/campaign-settings/lustria/equipment"
-   ]
+   ],
+   "group": "Poisons and Drugs"
   },
   {
    "de": "Dunkles Gift",
@@ -2563,7 +2565,8 @@
      "wh",
      "sos"
     ]
-   }
+   },
+   "group": "Poisons and Drugs"
   },
   {
    "de": "Heilkräuter",
@@ -2580,7 +2583,8 @@
    "source": [
     "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
     "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
-   ]
+   ],
+   "group": "Poisons and Drugs"
   },
   {
    "de": "Mad-Cap-Pilze",
@@ -2595,7 +2599,8 @@
    ],
    "source": [
     "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war"
-   ]
+   ],
+   "group": "Poisons and Drugs"
   },
   {
    "de": "Alraunenwurzel",
@@ -2612,7 +2617,8 @@
    "source": [
     "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning/spoils-of-war",
     "https://mordheimer.net/docs/campaigns/campaign-settings/khemri/price-chart"
-   ]
+   ],
+   "group": "Poisons and Drugs"
   },
   {
    "de": "Tränen der Shallaya",
@@ -13734,6 +13740,13 @@
     [
      "Seedrachenumhang",
      50
+    ],
+    [
+     "Dunkles Gift",
+     15,
+     {
+      "heroes": true
+     }
     ]
    ]
   },
@@ -13800,6 +13813,13 @@
     [
      "Seedrachenumhang",
      50
+    ],
+    [
+     "Dunkles Gift",
+     15,
+     {
+      "heroes": true
+     }
     ]
    ]
   },
@@ -16963,36 +16983,6 @@
      "darkelves"
     ]
    }
-  },
-  "Dunkles Gift": {
-   "en": "Dark venom",
-   "fams": [
-    "dagger",
-    "sword",
-    "axe",
-    "blunt",
-    "spear",
-    "halberd",
-    "twohanded",
-    "flail",
-    "whip",
-    "lance",
-    "claws"
-   ],
-   "heroesOnly": true,
-   "wb": [
-    "darkelves"
-   ],
-   "mult": 0,
-   "base": 15,
-   "start": {
-    "base": 15,
-    "wb": [
-     "darkelves"
-    ]
-   },
-   "once": true,
-   "note": "Gift auf eine Nahkampfwaffe (1 Spiel)"
   },
   "Gromril-Waffe": {
    "en": "Gromril weapon",

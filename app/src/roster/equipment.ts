@@ -22,7 +22,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 export interface ListRow { key: string; name: string; price: number; qty: number; /** The least the stepper goes to: the free dagger stays (#117). */ min: number; free: boolean; text: string; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
-export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; /** Used up in one game: the sheet says "Used" for taking it off. */ once: boolean; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
+export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
 /** One thing he carries – every one on a line of its own, never "2×" (#115). */
 export interface CarriedRow {
   id: string;
@@ -31,9 +31,11 @@ export interface CarriedRow {
   price: string; free: boolean; text: string;
   /** He keeps it: the free dagger is never given away or sold. */
   keep: boolean;
+  /** A poison or a drug: lasts one battle, and the line says "Used" for taking it away. */
+  used: boolean;
   /** A weapon takes upgrades, and the upgrades it has. */
   weapon: boolean;
-  ups: { de: string; name: string; paid: number; slot: number; once: boolean }[];
+  ups: { de: string; name: string; paid: number; slot: number }[];
   /** What it could be upgraded to now, each with the price on this weapon. */
   options: { de: string; name: string; price: number }[];
   /** How many of the key he has (what the − of this line sets it to, less one). */
@@ -79,7 +81,7 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
   const rare: RareRow[] = Object.entries(m.rare ?? {}).filter(([de]) => !core.isUpgrade(ctx.data, de)).flatMap(([de, r]) => {
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     const upgrade = core.isUpgrade(ctx.data, de);
-    const base = { de, name: it?.en ?? core.enItem(ctx.data, de), upgrade, once: core.upgradeOnce(ctx, de), text: itemText(ctx.data, it?.en ?? de) };
+    const base = { de, name: it?.en ?? core.enItem(ctx.data, de), upgrade, text: itemText(ctx.data, it?.en ?? de) };
     if (!upgrade) return [{ ...base, slot: 0, q: Number(r?.q) || 0, max: core.isArmourItem(ctx, de) ? 1 : 9, paid: Number(r?.paid) || 0, on: (r?.on as string | undefined) ?? null, targets: [] }];
     const free = core.upgradeFree(ctx, m, de);
     return core.upgradeSlots(m, de).map((s, slot) => ({
@@ -126,7 +128,7 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
         const ups = weapon && !freeOne ? upgrades.flatMap((de) => {
           const slots = core.upgradeSlots(m, de).map((s, slot) => ({ ...s, slot })).filter((s) => s.on === nm);
           const s = slots[plain];
-          return s ? [{ de, name: ctx.data.CATALOG.find((x) => x.de === de)?.en ?? de, paid: s.paid, slot: s.slot, once: core.upgradeOnce(ctx, de) }] : [];
+          return s ? [{ de, name: ctx.data.CATALOG.find((x) => x.de === de)?.en ?? de, paid: s.paid, slot: s.slot }] : [];
         }) : [];
         const options = weapon && !freeOne && !when.recruit ? upgrades.flatMap((de) => {
           const it = ctx.data.CATALOG.find((x) => x.de === de);
@@ -138,8 +140,8 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
           return [{ de, name: it.en, price: core.upgradePaid(ctx, m, de, nm) }];
         }) : [];
         out.push({
-          id: `l:${nm}:${i}`, key: nm, name: core.enItem(ctx.data, nm), group: CATS[cat] ?? cat, from: 'list',
-          price: freeOne ? 'free' : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, text: itemText(ctx.data, nm), weapon, ups, options, qty,
+          id: `l:${nm}:${i}`, key: nm, name: core.enItem(ctx.data, nm), group: core.itemGroup(ctx, nm) ?? CATS[cat] ?? cat, from: 'list',
+          price: freeOne ? 'free' : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, used: core.isConsumable(ctx, nm), text: itemText(ctx.data, nm), weapon, ups, options, qty,
         });
       }
     }
@@ -148,8 +150,8 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
     if (core.isUpgrade(ctx.data, de)) continue;
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     for (let i = 0; i < (Number(r?.q) || 0); i++) {
-      out.push({ id: `r:${de}:${i}`, key: de, name: it?.en ?? core.enItem(ctx.data, de), group: 'Rare and trading-post items', from: 'rare',
-        price: `${Number(r?.paid) || 0} gc`, free: false, keep: false, text: itemText(ctx.data, it?.en ?? de), weapon: false, ups: [], options: [], qty: Number(r?.q) || 0 });
+      out.push({ id: `r:${de}:${i}`, key: de, name: it?.en ?? core.enItem(ctx.data, de), group: core.itemGroup(ctx, de) ?? 'Rare and trading-post items', from: 'rare',
+        price: `${Number(r?.paid) || 0} gc`, free: false, keep: false, used: core.isConsumable(ctx, de), text: itemText(ctx.data, it?.en ?? de), weapon: false, ups: [], options: [], qty: Number(r?.q) || 0 });
     }
   }
   return out;
@@ -200,6 +202,7 @@ export function buyRecipients(ctx: core.Ctx, key: string, price: number): Recipi
 /** One item somebody holds: what the Sell and Give lists show. */
 export interface Holding { from: core.Holder; owner: string; goods: core.Goods; name: string; pieces: number; paid: number | undefined; sell: number; text: string;
   /** Typed in by hand and not in the catalogue: the player names the price. */ unpriced?: boolean;
+  /** A poison or a drug: it may be let go as used, for no gold. */ consumable?: boolean;
   /** The free dagger every warrior starts with (#52): shown so that all his equipment is there, but it stays with him. */ free?: boolean }
 
 export function holdings(ctx: core.Ctx): Holding[] {
@@ -208,12 +211,12 @@ export function holdings(ctx: core.Ctx): Holding[] {
     for (const key of Object.keys(m.eq ?? {})) {
       const g = { key, rare: false };
       const pieces = core.piecesHeld(ctx, m.uid, g);
-      if (pieces) out.push({ from: m.uid, owner: warriorName(ctx, m), goods: g, name: core.goodsName(ctx, g), pieces, paid: core.commonPrice(ctx, key) ?? undefined, sell: core.sellPrice(ctx, g, pieces), text: itemText(ctx.data, key) });
+      if (pieces) out.push({ from: m.uid, owner: warriorName(ctx, m), goods: g, name: core.goodsName(ctx, g), pieces, paid: core.commonPrice(ctx, key) ?? undefined, sell: core.sellPrice(ctx, g, pieces), text: itemText(ctx.data, key), consumable: core.isConsumable(ctx, key) });
     }
     for (const [de, r] of Object.entries(m.rare ?? {})) {
       const g = { key: de, rare: true };
       const pieces = core.piecesHeld(ctx, m.uid, g);
-      if (pieces) out.push({ from: m.uid, owner: warriorName(ctx, m), goods: g, name: core.goodsName(ctx, g), pieces, paid: Number(r?.paid) || 0, sell: core.sellPrice(ctx, g, pieces, Number(r?.paid) || 0), text: itemText(ctx.data, core.goodsName(ctx, g)) });
+      if (pieces) out.push({ from: m.uid, owner: warriorName(ctx, m), goods: g, name: core.goodsName(ctx, g), pieces, paid: Number(r?.paid) || 0, sell: core.sellPrice(ctx, g, pieces, Number(r?.paid) || 0), text: itemText(ctx.data, core.goodsName(ctx, g)), consumable: core.isConsumable(ctx, de) });
     }
   }
   const stash = new Map<string, Holding>();
@@ -226,7 +229,7 @@ export function holdings(ctx: core.Ctx): Holding[] {
     const pieces = core.piecesHeld(ctx, 'stash', g);
     if (!pieces) continue;
     const unpriced = !g.rare && core.commonPrice(ctx, g.key) == null && !(Number(it.paid) > 0);
-    stash.set(id, { from: 'stash', owner: 'Stash', goods: g, name: it.name, pieces, paid: it.paid, sell: unpriced ? 0 : core.sellPrice(ctx, g, 1, it.paid), text: itemText(ctx.data, it.name), unpriced });
+    stash.set(id, { from: 'stash', owner: 'Stash', goods: g, name: it.name, pieces, paid: it.paid, sell: unpriced ? 0 : core.sellPrice(ctx, g, 1, it.paid), text: itemText(ctx.data, it.name), unpriced, consumable: core.isConsumable(ctx, g.key) });
   }
   return [...out, ...stash.values()];
 }

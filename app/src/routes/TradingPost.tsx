@@ -233,7 +233,7 @@ function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId
 
 /* ---- sell and give ---- */
 
-function SellForm({ h, close, onSell, titleId }: { h: Holding; close: SheetApi['close']; onSell: (price: number) => void; titleId: string }) {
+function SellForm({ h, close, onSell, onUsed, titleId }: { h: Holding; close: SheetApi['close']; onSell: (price: number) => void; onUsed: () => void; titleId: string }) {
   const [v, setV] = useState(h.unpriced ? '' : String(h.sell));
   const n = Number(v);
   return (
@@ -253,6 +253,7 @@ function SellForm({ h, close, onSell, titleId }: { h: Holding; close: SheetApi['
       </label>
       <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
+        {h.consumable && <button type="button" className={ui.buttonQuiet} onClick={() => close(onUsed)}>Used up</button>}
         <button type="button" className={ui.button} disabled={v === '' || !(n >= 0)} onClick={() => close(() => onSell(n))}>Sell · {gc(Number.isFinite(n) ? n : 0)}</button>
       </div>
     </div>
@@ -441,7 +442,8 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
       </dialog>
       <dialog ref={sellRef} className={ui.sheet} aria-labelledby={ids.sell}>
         {selling && <SellForm key={selling.key} h={selling.h} close={closeSell} titleId={ids.sell}
-          onSell={(price) => ed.edit((c) => core.sellItem(c, selling.h.from, selling.h.goods, { price, qty: selling.h.pieces }).state, `Sold ${selling.h.name} (+${price} gc).`)} />}
+          onSell={(price) => ed.edit((c) => core.sellItem(c, selling.h.from, selling.h.goods, { price, qty: selling.h.pieces }).state, `Sold ${selling.h.name} (+${price} gc).`)}
+          onUsed={() => ed.edit((c) => core.sellItem(c, selling.h.from, selling.h.goods, { price: 0, qty: selling.h.pieces }).state, `${selling.h.name} used up.`)} />}
       </dialog>
       <dialog ref={giveRef} className={ui.sheet} aria-labelledby={ids.give}>
         {giving && <GiveForm key={giving.key} ctx={ctx} h={giving.h} close={closeGive} titleId={ids.give}

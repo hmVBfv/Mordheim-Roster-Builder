@@ -214,15 +214,17 @@ describe('weapon upgrades in the sheet (#108, #109, #110, #112, #115)', () => {
     expect(daggers[1]!.options).toEqual([]);
   });
 
-  it('the Dark Elf blade and Dark venom are on offer on the sword at the founding, the venom as used up (#112)', () => {
+  it('the Dark Elf blade is offered on the sword; Dark venom is a poison, listed under Poisons and Drugs with a "Used" line (#112, #118)', () => {
     let s = createWarband(data, 'darkelves', null, '');
     s = core.addUnit(ctx(s), 'highborn');
     const uid = s.models[0]!.uid;
     s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
     const sword = equipmentView(ctx(s), uid)!.carried.find((r) => r.key === 'Schwert')!;
-    expect(sword.options).toEqual([{ de: 'Dark-Elf-Klinge', name: 'Dark Elf blade', price: 15 }, { de: 'Dunkles Gift', name: 'Dark venom', price: 15 }]);
-    const t = core.setUpgradeOn(ctx(s), uid, 'Dunkles Gift', 'Schwert', true);
-    expect(equipmentView(ctx(t), uid)!.carried.find((r) => r.key === 'Schwert')!.ups).toMatchObject([{ de: 'Dunkles Gift', once: true, paid: 15 }]);
+    expect(sword.options).toEqual([{ de: 'Dark-Elf-Klinge', name: 'Dark Elf blade', price: 15 }]);
+    const row = equipmentView(ctx(s), uid)!.groups.flatMap((g) => g.rows).find((r) => r.key === 'Dunkles Gift')!;
+    expect(row).toMatchObject({ price: 15, qty: 0 });
+    const t = core.setListQty(ctx(s), uid, 'Dunkles Gift', 1);
+    expect(equipmentView(ctx(t), uid)!.carried.find((r) => r.key === 'Dunkles Gift')).toMatchObject({ group: 'Poisons and Drugs', used: true, keep: false, price: '15 gc' });
   });
 
   it('a weapon put back takes its upgrade with it', () => {
@@ -244,5 +246,25 @@ describe('the free dagger stays (#117)', () => {
     const two = core.setListQty(ctx(s), capt, 'Dolch (1. gratis)', 2);
     const daggers = equipmentView(ctx(two), capt)!.carried.filter((r) => r.key === 'Dolch (1. gratis)');
     expect(daggers.map((r) => r.keep)).toEqual([true, false]);
+  });
+});
+
+describe('a poison is let go as used (#118)', () => {
+  it('after the first battle the holding of a Hero says it may be used up, a sword does not', () => {
+    let s = createWarband(data, 'darkelves', null, '');
+    s = core.addUnit(ctx(s), 'highborn');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Dunkles Gift', 1);
+    s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
+    s = structuredClone(s);
+    s.campaign = { ...s.campaign, on: true, round: 1 };
+    const h = holdings(ctx(s));
+    expect(h.find((x) => x.goods.key === 'Dunkles Gift')!.consumable).toBe(true);
+    expect(h.find((x) => x.goods.key === 'Schwert')!.consumable).toBe(false);
+    // used up: it goes, no gold changes hands
+    const gold = core.goldCurrent(ctx(s));
+    const t = core.sellItem(ctx(s), uid, { key: 'Dunkles Gift', rare: false }, { price: 0, qty: 1 }).state;
+    expect(t.models[0]!.eq?.['Dunkles Gift']).toBeUndefined();
+    expect(core.goldCurrent(ctx(t))).toBe(gold);
   });
 });

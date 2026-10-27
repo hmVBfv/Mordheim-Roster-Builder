@@ -136,6 +136,8 @@ export interface CatalogItem {
   only?: CatalogOnly;
   /** Where the item comes from, for filtering: the campaign settings it is sold in (`core`, `empire-in-flames`, `border-town-burning`, `khemri`, `lustria` …) or `warband:<page>`. Absent on the rulebook's own items. */
   settings?: string[];
+  /** A group the price chart sets it in ("Poisons and Drugs"): one battle's use, and then it is gone. */
+  group?: string;
   /** The grade of its source (`core`, `1a`, `1b`, `1c`, `2a`), where the source states one. */
   grade?: string | null;
   /** Where it was read: addresses on mordheimer.net. */
@@ -159,8 +161,6 @@ export interface UpgradeDef {
   /** A price that holds at any time for the warbands and units listed. */
   always?: { mult?: number; base?: number; wb?: string[]; units?: string[] };
   note?: string;
-  /** Used up in one game (Dark venom): the sheet offers to take it off. */
-  once?: boolean;
 }
 
 export interface ItemInfo {

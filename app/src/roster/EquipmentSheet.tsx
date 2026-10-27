@@ -86,7 +86,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                               onBlur={(e) => { const n = Math.max(0, Math.round(Number(e.target.value) || 0)); if (n !== u.paid) act.paid(u.de, n, u.slot); }} />
                             <small>gc</small>
                           </label>
-                          <button type="button" className={ui.buttonQuiet} aria-label={`${u.once ? 'Used' : 'Remove'} ${u.name} on ${r.name}`} onClick={() => act.upgrade(u.de, r.key, false)}>{u.once ? 'Used' : 'Remove'}</button>
+                          <button type="button" className={ui.buttonQuiet} aria-label={`Remove ${u.name} on ${r.name}`} onClick={() => act.upgrade(u.de, r.key, false)}>Remove</button>
                         </span>
                       ))}
                       {r.options.length > 0 && (
@@ -99,7 +99,10 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                     </span>
                   </td>
                   <td>
-                    {r.keep ? <small className={ui.muted}>stays</small> : (
+                    {r.keep ? <small className={ui.muted}>stays</small> : r.used ? (
+                      <button type="button" className={ui.buttonQuiet} aria-label={`${r.name} used`}
+                        onClick={() => (r.from === 'list' ? act.qty(r.key, r.qty - 1, r.name) : act.rareQty(r.key, r.qty - 1))}>Used</button>
+                    ) : (
                       <button type="button" className={ui.buttonQuiet} aria-label={`Take one ${r.name} away`}
                         onClick={() => (r.from === 'list' ? act.qty(r.key, r.qty - 1, r.name) : act.rareQty(r.key, r.qty - 1))}>−</button>
                     )}

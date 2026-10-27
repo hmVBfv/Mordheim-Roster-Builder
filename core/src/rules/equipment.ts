@@ -121,8 +121,11 @@ export function upgradeFree(ctx: Ctx, m: Model, de: string): WeaponRef[] {
   return upgradeTargets(ctx, m, de).filter((w) => (used.get(w.nm) ?? 0) < upgradeRoom(m, w.nm));
 }
 
-/** Is the upgrade used up in one game (Dark venom)? */
-export const upgradeOnce = (ctx: Ctx, de: string): boolean => ctx.data.UPGRADES[de]?.once === true;
+/** The group the price chart sets an item in ("Poisons and Drugs"), if it names one. */
+export const itemGroup = (ctx: Ctx, key: string): string | null => ctx.data.CATALOG.find((x) => x.de === key)?.group ?? null;
+
+/** Poisons and drugs last one battle: the sheet says "Used" for taking one away, and the Trading Post lets it go for no gold. */
+export const isConsumable = (ctx: Ctx, key: string): boolean => itemGroup(ctx, key) === 'Poisons and Drugs';
 
 export interface WeaponRef { nm: string; price: number; fam: string | null }
 
