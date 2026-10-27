@@ -105,7 +105,8 @@ describe('a picture', () => {
     const ben = screen.getByText('Skritch on the roof.').closest('li')!;
     await user.click(within(ben).getByRole('button', { name: 'Take out' }));
     await waitFor(() => expect([...srv.state.pictures.values()].find((p) => p.caption === 'Skritch on the roof.')!.deleted).toBe(true));
-    expect(screen.queryByText('Skritch on the roof.')).toBeNull();
+    // the screen follows the server's answer a moment later: wait for it, do not look at once
+    await waitFor(() => expect(screen.queryByText('Skritch on the roof.')).toBeNull());
     cleanup();
     c.members.find((m) => m.userId === KAI.id)!.role = 'player';
     at(`/campaign/${c.id}/notes`);
