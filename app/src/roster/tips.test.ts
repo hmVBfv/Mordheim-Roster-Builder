@@ -182,3 +182,23 @@ describe('Hatred as the explanation of a rule, not a rule of its own (#80)', () 
     expect(rulesOf('pitfighters', 'trollslayer')).toContain('Hatred');
   });
 });
+
+/* Report #113: the equipment of a unit is told by kind, as the items are. */
+describe('the equipment of a unit in groups (#113)', () => {
+  it('close combat, missile, armour and the rest, each item in its group, in the order of the list', () => {
+    let s = core.newWarband(data, 'merc');
+    s = core.addUnit(ctx(s), 'capt');
+    const uid = s.models[0]!.uid;
+    for (const nm of ['Helm', 'Pistole', 'Schwert']) s = core.setEqQty(ctx(s), uid, nm, 1);
+    s = core.addRare(ctx(s), uid, 'Gromril-Rüstung');
+    const eq = rosterView(data, s).heroes[0]!.equipment;
+    const grouped = (g: string) => eq.filter((f) => f.group === g).map((f) => f.label);
+    expect(grouped('Close combat')).toContain('Sword');
+    expect(grouped('Missile weapons')).toContain('Pistol');
+    expect(grouped('Armour')).toEqual(expect.arrayContaining(['Helmet', 'Gromril armour']));
+    expect(eq.every((f) => !!f.group)).toBe(true);
+    // the groups follow one another, none split
+    const order = eq.map((f) => f.group);
+    expect(order.filter((g, i) => g !== order[i - 1])).toEqual([...new Set(order)]);
+  });
+});

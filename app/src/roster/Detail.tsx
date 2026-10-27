@@ -193,7 +193,14 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
 function Gear({ w, acts }: { w: WarriorView; acts?: UnitActs }) {
   return (
     <Section title="Equipment" side={w.equipment.length ? `${w.equipment.length} carried` : undefined}>
-      <Facts items={w.equipment} empty="Nothing carried yet." />
+      {w.equipment.length === 0 && <Facts items={[]} empty="Nothing carried yet." />}
+      {/* by kind, as the items are (#113) */}
+      {[...new Set(w.equipment.map((f) => f.group ?? ''))].map((g) => (
+        <div key={g} className={styles.gearGroup}>
+          {g && <h4>{g}</h4>}
+          <Facts items={w.equipment.filter((f) => (f.group ?? '') === g)} />
+        </div>
+      ))}
       {acts && (
         <div className={styles.acts}>
           {acts.equipSheet && <button type="button" className={`${styles.btn} ${styles.primary}`} onClick={acts.equipSheet}>Equipment &amp; rare items</button>}
