@@ -264,6 +264,8 @@ export interface HouseRules {
   rerollOne: boolean;
   eqLimitOn: boolean;
   hireNewLeader: boolean;
+  /** No racial characteristic maximums when advancing (wish #106). */
+  noRacialMax: boolean;
   hsGrades: Record<string, boolean>;
   dpGrades: Record<string, boolean>;
   hsEquip: boolean;

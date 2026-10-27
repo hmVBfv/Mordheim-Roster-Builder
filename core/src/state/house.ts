@@ -9,7 +9,7 @@ export function houseDefaults(): HouseRules {
     clubSurcharge: 0, slingSurcharge: 0,
     armourBodyOnly: false, freeDagger: false, miscHench: false, freeMarket: false,
     allSkills: false, showRarity: false, rangedCapOn: false, rangedCap: 0,
-    rerollOne: false, eqLimitOn: true, hireNewLeader: false,
+    rerollOne: false, eqLimitOn: true, hireNewLeader: false, noRacialMax: false,
     hsGrades: { '1a': true, '1b': true, '1c': true, '2a': true },
     dpGrades: { core: true, '1a': true, '1b': true, '1c': true, '2a': true },
     hsEquip: false, notes: '',

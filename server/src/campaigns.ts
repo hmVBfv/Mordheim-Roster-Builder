@@ -208,7 +208,7 @@ export const HouseRulesBody = z.object({
   priceAll: int(25, 200), priceArmour: int(25, 200), priceBP: int(25, 200), priceMissile: int(25, 200),
   clubSurcharge: int(0, 50), slingSurcharge: int(0, 50), rangedCap: int(0, 100),
   armourBodyOnly: z.boolean(), freeDagger: z.boolean(), miscHench: z.boolean(), freeMarket: z.boolean(), allSkills: z.boolean(), showRarity: z.boolean(),
-  rangedCapOn: z.boolean(), rerollOne: z.boolean(), eqLimitOn: z.boolean(), hireNewLeader: z.boolean(), hsEquip: z.boolean(),
+  rangedCapOn: z.boolean(), rerollOne: z.boolean(), eqLimitOn: z.boolean(), hireNewLeader: z.boolean(), noRacialMax: z.boolean(), hsEquip: z.boolean(),
   hsGrades: grades(['1a', '1b', '1c', '2a']), dpGrades: grades(['core', '1a', '1b', '1c', '2a']),
   notes: z.string().max(2000),
 }).partial().strict();

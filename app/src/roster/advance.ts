@@ -87,6 +87,8 @@ function spellChoices(ctx: core.Ctx, lore: string | null, own: boolean, known: {
 
 /* The Roster Builder's reading of a unit's rules: some Henchmen may gain
    experience but never become Heroes (legacy advSection). */
+/** What the advance sheet says when the house rule lifts the racial maximums (wish #106). */
+const NO_MAX_NOTE = 'House rule: no racial maximums.';
 const NO_PROMOTION = /never become a hero|cannot become a hero|can never become a hero|may never become heroes|lowest of the low|executes the slave|runts:/i;
 const WEAK = /may not choose strength|\bweak:/i;
 
@@ -98,7 +100,7 @@ function warriorView(ctx: core.Ctx, m: Model): AdvanceView | null {
   const mi = core.maxInfo(ctx, m);
   const canRaise: Partial<Record<StatKey, boolean>> = {};
   for (const k of STATS) canRaise[k] = core.canAdv(ctx, m, k);
-  const maxNote = mi ? `Maximum (${mi.label}): ${STATS.map((k) => `${k} ${mi.prof[k]}`).join(' · ')}${hero ? '' : '; a Henchman raises each characteristic once'}.` : 'No racial maximum on file: keep track by hand.';
+  const maxNote = core.noRacialMax(ctx) ? NO_MAX_NOTE : mi ? `Maximum (${mi.label}): ${STATS.map((k) => `${k} ${mi.prof[k]}`).join(' · ')}${hero ? '' : '; a Henchman raises each characteristic once'}.` : 'No racial maximum on file: keep track by hand.';
   const known = m.skills ?? [];
   const base: AdvanceView = {
     kind: hero ? 'hero' : 'hench', id: m.uid, name: m.name || def.name, earned: st.earned, applied: st.applied,
@@ -138,7 +140,7 @@ function hireView(ctx: core.Ctx, rec: HireRecord): AdvanceView | null {
   if (special.length) lists.push(['Special skills', special]);
   return {
     kind: 'hire', id: rec.uid, name: rec.name || e.name, earned: st.earned, applied: st.applied, table: HERO_TABLE, canRaise,
-    maxNote: mx ? `Maximum: ${STATS.map((k) => `${k} ${mx[k]}`).join(' · ')}.` : 'No racial maximum on file: keep track by hand.',
+    maxNote: core.noRacialMax(ctx) ? NO_MAX_NOTE : mx ? `Maximum: ${STATS.map((k) => `${k} ${mx[k]}`).join(' · ')}.` : 'No racial maximum on file: keep track by hand.',
     skills: groups(lists, known), spells: spellChoices(ctx, e.magic ?? null, true, rec.spells ?? []), talent: null,
   };
 }

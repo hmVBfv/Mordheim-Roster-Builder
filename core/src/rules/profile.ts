@@ -66,6 +66,9 @@ export function aDisp(ctx: Ctx, m: Model, p: Profile): string | number | undefin
   return def && def.bite ? a + '+' + def.bite : a;
 }
 
+/** The house rule that lifts the racial maximums when advancing (wish #106). */
+export const noRacialMax = (ctx: Ctx): boolean => houseRules(ctx.s).noRacialMax === true;
+
 export interface MaxInfo { prof: Profile; label: string; key?: string }
 
 /** Racial maximum profile of a model (Chosen of Chaos use the Warrior of Chaos maxima). */
@@ -87,7 +90,7 @@ export function canAdv(ctx: Ctx, m: Model, stat: StatKey): boolean {
   const base = def && def.profile ? def.profile[stat] : undefined;
   if (typeof base !== 'number') return true;
   if (!isHeroModel(ctx, m) && (Number((m.adv || {})[stat]) || 0) >= 1) return false;
-  const mi = maxInfo(ctx, m);
+  const mi = noRacialMax(ctx) ? null : maxInfo(ctx, m);
   const lim = mi?.prof[stat];
   if (mi && typeof lim === 'number' && base + (Number((m.adv || {})[stat]) || 0) >= lim) return false;
   return true;
@@ -362,7 +365,7 @@ export function hsEffProfile(rec: HireRecord | null | undefined, e: HireEntry | 
 }
 
 export function hsCanAdv(ctx: Ctx, rec: HireRecord, e: HireEntry | null | undefined, stat: StatKey): boolean {
-  const mx = hsRaceMax(ctx, e);
+  const mx = noRacialMax(ctx) ? null : hsRaceMax(ctx, e);
   if (!mx) return true;
   const cur = Number(hsEffProfile(rec, e)[stat]), lim = Number(mx[stat]);
   return isNaN(cur) || isNaN(lim) ? true : cur < lim;

@@ -189,6 +189,10 @@ const show = (v: unknown) => (v == null || v === '' ? '–' : String(v));
 
 const maxLine = (label: string, prof: core.Profile): MaxLine => ({ label, cells: STATS.map((k) => show(prof[k])) });
 
+/** The racial maximum row; with the house rule "no racial maximums" it says there is none (wish #106). */
+const maxRow = (ctx: core.Ctx, label: string | null, prof: core.Profile | null | undefined): MaxLine | null =>
+  core.noRacialMax(ctx) ? { label: 'no limit', cells: STATS.map(() => '–') } : label && prof ? maxLine(label, prof) : null;
+
 function statCells(p: Profile | null, base: Profile | null | undefined, attacks?: string | number): StatCell[] {
   return STATS.map((k) => {
     const v = k === 'A' && attacks != null ? attacks : p?.[k];
@@ -239,7 +243,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     advanceDue: !!adv?.due,
     missGames: Number(m.miss) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
-    max: ((mi) => (mi ? maxLine(mi.label, mi.prof) : null))(core.maxInfo(ctx, m)),
+    max: ((mi) => maxRow(ctx, mi?.label ?? null, mi?.prof))(core.maxInfo(ctx, m)),
     save: core.svLabel(core.svOfModel(ctx, m)),
     ...facts,
     retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
@@ -263,7 +267,7 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
     xp: hs && adv ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),
-    max: ((mx) => (mx && e.race ? maxLine(ctx.data.RACELABEL[e.race] || e.race, mx) : null))(core.hsRaceMax(ctx, e)),
+    max: ((mx) => maxRow(ctx, e.race ? ctx.data.RACELABEL[e.race] || e.race : null, mx))(core.hsRaceMax(ctx, e)),
     ...facts,
   };
 }
