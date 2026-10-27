@@ -378,6 +378,19 @@ describe('the admin', () => {
     const rest = (await s.call({ url: `/api/v1/admin/audit?limit=50&before=${page.entries[1]!.seq}`, token })).json() as { entries: unknown[] };
     expect(rest.entries).toHaveLength(3);
 
+    // wish #101: filtered by a word and by day, and read oldest first, page by page
+    const get = async (q: string) => (await s.call({ url: `/api/v1/admin/audit${q}`, token })).json() as { entries: { seq: number; action: string; target: string | null }[] };
+    expect((await get('?q=invite')).entries.map((e) => e.action)).toEqual(['invite.revoke', 'invite.create']);
+    expect((await get('?q=PLAYER')).entries.map((e) => e.action)).toEqual(['user.enable', 'user.disable', 'totp.reset']);
+    expect((await get('?q=nothing-like-this')).entries).toEqual([]);
+    expect((await get('?order=old')).entries.map((e) => e.action)).toEqual(['invite.create', 'invite.revoke', 'totp.reset', 'user.disable', 'user.enable']);
+    const first = await get('?order=old&limit=2');
+    expect((await get(`?order=old&limit=50&after=${first.entries[1]!.seq}`)).entries.map((e) => e.action)).toEqual(['totp.reset', 'user.disable', 'user.enable']);
+    expect((await get('?from=2999-01-01')).entries).toEqual([]);
+    expect((await get('?to=2000-01-01')).entries).toEqual([]);
+    expect((await get('?from=2000-01-01&to=2999-01-01')).entries).toHaveLength(5);
+    for (const bad of ['?order=sideways', '?from=yesterday', '?to=2026-13-45']) expect((await s.call({ url: `/api/v1/admin/audit${bad}`, token })).statusCode, bad).toBe(400);
+
     const logins = (await s.call({ url: '/api/v1/admin/logins', token })).json() as { attempts: { username: string; ok: boolean; reason: string }[] };
     expect(logins.attempts.map((a) => [a.username, a.ok, a.reason])).toEqual([['player', true, ''], ['player', false, 'disabled'], ['player', true, '']]);
   });

@@ -258,15 +258,15 @@ function Invites({ onNotice }: { onNotice: (t: string) => void }) {
 
 /** A log read page by page, newest first. It reads again whenever the screen
     is visited, also by the tab link of the tab already open or by Back. */
-function useLog<T>(path: string, key: string, cursor: (last: T) => number, filter = '') {
+function useLog<T>(path: string, key: string, cursor: (last: T) => number, filter = '', cursorParam = 'before') {
   const visit = useLocation().key;
   const [items, setItems] = useState<T[]>([]);
   const [more, setMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
   const fetchPage = useCallback(
-    (before?: number) => api<Record<string, T[]>>(`${path}?limit=${PAGE}${before ? `&before=${before}` : ''}${filter}`).then((r) => r[key] ?? []),
-    [path, key, filter],
+    (from?: number) => api<Record<string, T[]>>(`${path}?limit=${PAGE}${from ? `&${cursorParam}=${from}` : ''}${filter}`).then((r) => r[key] ?? []),
+    [path, key, filter, cursorParam],
   );
   useEffect(() => {
     let live = true;
@@ -375,11 +375,46 @@ function Logins() {
   );
 }
 
+interface AuditFilter { q: string; from: string; to: string; order: '' | 'old' }
+const NO_AUDIT_FILTER: AuditFilter = { q: '', from: '', to: '', order: '' };
+
 function Audit() {
-  const log = useLog<AuditEntry>('/admin/audit', 'entries', (e) => e.seq);
+  const [filter, setFilter] = useState<AuditFilter>(NO_AUDIT_FILTER);
+  const [word, setWord] = useState('');
+  // the word is sent when the typing pauses, not with every letter
+  useEffect(() => {
+    const t = setTimeout(() => setFilter((f) => (f.q === word.trim() ? f : { ...f, q: word.trim() })), 250);
+    return () => clearTimeout(t);
+  }, [word]);
+  const query = Object.entries(filter).filter(([, v]) => v).map(([k, v]) => `&${k}=${encodeURIComponent(v)}`).join('');
+  // read oldest first, a page goes on after the last one it ended with
+  const log = useLog<AuditEntry>('/admin/audit', 'entries', (e) => e.seq, query, filter.order === 'old' ? 'after' : 'before');
+  const filtered = query !== '';
   return (
     <>
-      <p className={ui.muted}>Every change, in order. For now the accounts; warbands and the campaign join with the next steps.</p>
+      <p className={ui.muted}>Every change, newest first or oldest first. For now the accounts; warbands and the campaign join with the next steps.</p>
+      <form className={styles.filters} role="search" aria-label="Filter the audit log" onSubmit={(e) => e.preventDefault()}>
+        <label className={ui.field}>
+          <span>Search</span>
+          <input className={ui.input} type="search" maxLength={64} placeholder="who, whom or what" value={word} onChange={(e) => setWord(e.target.value)} />
+        </label>
+        <label className={ui.field}>
+          <span>From</span>
+          <input className={ui.input} type="date" value={filter.from} max={filter.to || undefined} onChange={(e) => setFilter({ ...filter, from: e.target.value })} />
+        </label>
+        <label className={ui.field}>
+          <span>To</span>
+          <input className={ui.input} type="date" value={filter.to} min={filter.from || undefined} onChange={(e) => setFilter({ ...filter, to: e.target.value })} />
+        </label>
+        <label className={ui.field}>
+          <span>Order</span>
+          <select className={ui.select} value={filter.order} onChange={(e) => setFilter({ ...filter, order: e.target.value as AuditFilter['order'] })}>
+            <option value="">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </label>
+        {filtered && <button type="button" className={ui.buttonQuiet} onClick={() => { setWord(''); setFilter(NO_AUDIT_FILTER); }}>Clear filter</button>}
+      </form>
       {log.error && <p className={`${ui.message} ${ui.error}`} role="alert">{log.error}</p>}
       <div className={styles.tableWrap}>
         <table className={styles.table} aria-label="Audit log">
@@ -401,8 +436,8 @@ function Audit() {
           </tbody>
         </table>
       </div>
-      {!log.busy && log.items.length === 0 && !log.error && <p className={ui.muted}>Nothing yet.</p>}
-      {log.more && log.items.length > 0 && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={log.busy} onClick={log.next}>Older</button></div>}
+      {!log.busy && log.items.length === 0 && !log.error && <p className={ui.muted}>{filtered ? 'Nothing matches this filter.' : 'Nothing yet.'}</p>}
+      {log.more && log.items.length > 0 && <div className={ui.row}><button type="button" className={ui.buttonQuiet} disabled={log.busy} onClick={log.next}>{filter.order === 'old' ? 'Newer' : 'Older'}</button></div>}
     </>
   );
 }
