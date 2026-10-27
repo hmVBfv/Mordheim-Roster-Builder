@@ -123,43 +123,41 @@
   overflow: hidden;
 }
 
+/* The ribbons lie across the corner and are placed by `--c`, the distance of their centre line from the corner (measured along
+   the two edges); they are far longer than the box is deep, so the box cuts them edge to edge wherever they lie (report #102:
+   a planner's ribbon moved aside by a favourite's must stay as long). `--h` is how thick the ribbon is. */
 .ribbon {
+  --c: 44px;
+  --h: 20px;
   position: absolute;
-  top: 10px;
-  right: -26px;
-  width: 90px;
-  padding: 1px 0;
+  top: calc(var(--c) / 2 - var(--h) / 2);
+  right: calc(var(--c) / 2 - 130px);
+  width: 260px;
+  height: var(--h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--accent);
   color: var(--accent-ink);
   font-size: 0.8rem;
   font-weight: 700;
-  line-height: 1.3;
-  text-align: center;
+  line-height: 1;
   transform: rotate(45deg);
   pointer-events: none;
 }
 
-/* A favourite (#95): a gold ribbon with a medal – a comet with two tails pinned on it – across the corner; a planner that is a
-   favourite as well moves out of the corner, so both can be read */
+/* A favourite (#95, #103): a dark blue ribbon nearest the corner with a golden comet with two tails on it, the comet alone as
+   the medal; the blue is the same in both themes and sets itself apart from the planner's ribbon. A planner that is a
+   favourite as well lies further out, so both can be read. */
 .ribbonFavourite {
-  top: 6px;
-  right: -30px;
-  width: 92px;
-  padding: 0;
-  background: var(--gold);
-  color: var(--gold);
-  line-height: 0;
-}
-
-.ribbonFavourite svg {
-  display: block;
-  margin: 0 auto;
+  --c: 42px;
+  --h: 26px;
+  background: #1d3a73;
+  color: #f0c75e;
 }
 
 .ribbonFurther {
-  top: 44px;
-  right: -12px;
-  width: 112px;
+  --c: 84px;
 }
 
 /* A titled group of entries (#86): heading and entries are one block with room above it, little between title and entries */
