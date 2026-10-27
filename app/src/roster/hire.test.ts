@@ -51,6 +51,12 @@ describe('the lists', () => {
     expect(strong.map((r) => r.key)).toContain('ogre');
     expect(strong.every((r) => Number(r.entry.profile!.S) >= 4 || Number((r.entry.profile2 as { p?: { S?: number } } | undefined)?.p?.S) >= 4)).toBe(true);
     expect(f({ only: false, stat: { stat: 'S', op: '>=', val: '' } })).toHaveLength(rows.length);
+    // spellcasters only (#120): the Hired Swords with a spell list or prayers, none of the fighters
+    const casters = f({ only: false, casters: true });
+    expect(casters.map((r) => r.key)).toEqual(expect.arrayContaining(['warlock', 'elfmage', 'wolfpriest']));
+    expect(casters.map((r) => r.key)).not.toContain('ogre');
+    expect(casters.length).toBeLessThan(rows.length);
+    expect(f({ only: false, casters: false })).toHaveLength(rows.length);
     const byFee = f({ order: 'fee' }).map((r) => r.fee);
     expect(byFee).toEqual([...byFee].sort((a, b) => a - b));
   });

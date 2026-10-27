@@ -142,6 +142,11 @@ export function sortWarbands(list: WarbandFact[], by: WarbandSort): WarbandFact[
   return [...list].sort((a, b) => cmp[by](a, b) || name(a, b));
 }
 
+/** Does this Hired Sword or Dramatis Persona cast: a spell list of his own, or his rules name a Wizard, Prayers or Funerary Rites (wish #120)? */
+export function hireIsCaster(e: HireEntry): boolean {
+  return !!e.magic || /<b>\s*(?:Master\s+)?(?:Wizard|Prayers|Funerary Rites)\b/i.test(String(e.sp ?? ''));
+}
+
 /* ---- filtering the Hired Sword and Dramatis Personae lists ---- */
 
 export interface HireFilter { q?: string; stat?: string; op?: '>=' | '>' | '=' | '<=' | '<'; val?: string | number }
