@@ -21,7 +21,7 @@ import { ctxOf, type Ctx } from '../rules/context.ts';
 import { mutKindFor, startOnlyRow, warbandHasFought } from '../rules/equipment.ts';
 import { eqListFor, unitDef } from '../rules/lookup.ts';
 import { tradeKind } from '../trade/market.ts';
-import { addUnit, setEqQty } from './roster.ts';
+import { addUnit, setEqQty, trimUpgrades } from './roster.ts';
 import { findModel, update } from './update.ts';
 
 /** The campaign's round: the latest battle's, else the current stage. */
@@ -87,7 +87,7 @@ export function listProblem(ctx: Ctx, uid: number, key: string, qty: number): st
     battle (rare items then only by searching). */
 export function setListQty(ctx: Ctx, uid: number, key: string, qty: number): WarbandState {
   if (listProblem(ctx, uid, key, qty)) return ctx.s;
-  return setEqQty(ctx, uid, key, qty);
+  return trimUpgrades(ctxOf(ctx.data, setEqQty(ctx, uid, key, qty)), uid);
 }
 
 /* ---- mutations ---- */

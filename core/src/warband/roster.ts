@@ -5,7 +5,7 @@ import type { Model, StashItem, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
-import { withFreeDagger, upgradeBase, upgradeFree, upgradePaid, upgradeTargets } from '../rules/equipment.ts';
+import { withFreeDagger, upgradeBase, upgradeFree, upgradePaid, upgradeRoom, upgradeSlots, upgradeTargets } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
 import { catalogDefaultPaid } from '../rules/pricing.ts';
 import { logEvent } from './log.ts';
@@ -172,6 +172,55 @@ export function addRare(ctx: Ctx, uid: number, de: string): WarbandState {
     const who = m.name || unitDef(c, m.uid_def)?.name;
     logEvent(d, 'item', `${who} acquired ${it ? it.en : de}${o.paid ? ` (${o.paid} gc)` : ''}.`, { uid: m.uid, name: who, item: de, itemEn: it ? it.en : de, paid: o.paid || 0 });
   });
+}
+
+/** Puts one copy of a weapon upgrade on a weapon, or takes one off it (`on` false): the weapon must have room for it, and an upgrade
+    that is on nothing does not exist. */
+export function setUpgradeOn(ctx: Ctx, uid: number, de: string, weapon: string, on: boolean): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  if (!m0 || !isUpgrade(ctx.data, de)) return ctx.s;
+  if (on && !upgradeFree(ctx, m0, de).some((w) => w.nm === weapon)) return ctx.s;
+  if (!on && !upgradeSlots(m0, de).some((s) => s.on === weapon)) return ctx.s;
+  return update(ctx, (d, c) => {
+    const m = findModel(d, uid);
+    if (!m) return;
+    m.rare = m.rare || {};
+    const have = m.rare[de];
+    if (on) {
+      const paid = upgradePaid(c, m, de, weapon);
+      if (!have) { m.rare[de] = { q: 1, on: weapon, paid }; return; }
+      (have.also = have.also ?? []).push({ on: weapon, paid });
+      have.q = 1 + have.also.length;
+    } else {
+      const slot = upgradeSlots(m, de).map((s) => s.on).lastIndexOf(weapon);
+      const also = have?.also ?? [];
+      if (!have || slot < 0) return;
+      if (slot === 0) {
+        const next = also.shift();
+        if (!next) { delete m.rare[de]; return; }
+        have.on = next.on; have.paid = next.paid;
+      } else also.splice(slot - 1, 1);
+      if (!also.length) delete have.also; else have.also = also;
+      have.q = 1 + (have.also?.length ?? 0);
+    }
+  });
+}
+
+/** Takes off the upgrades a warrior has no weapon for any more: after a weapon is put back, the copies it carried go with it. */
+export function trimUpgrades(ctx: Ctx, uid: number): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  if (!m0?.rare) return ctx.s;
+  let s = ctx.s;
+  for (const de of Object.keys(m0.rare)) {
+    if (!isUpgrade(ctx.data, de)) continue;
+    for (;;) {
+      const m = findModel(s, uid) as Model;
+      const over = upgradeSlots(m, de).map((x) => x.on).filter((w, i, all) => w != null && all.filter((x) => x === w).length > upgradeRoom(m, w));
+      if (!over.length) break;
+      s = setUpgradeOn(ctxOf(ctx.data, s), uid, de, over[0] as string, false);
+    }
+  }
+  return s;
 }
 
 /** Puts one copy of an upgrade on another weapon (`slot` 0 is the first copy), repricing it where the price follows the weapon. */

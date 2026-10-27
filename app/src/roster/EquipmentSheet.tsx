@@ -15,9 +15,8 @@ export interface EquipmentActions {
   qty: (key: string, qty: number, name: string) => void;
   addRare: (de: string) => void;
   rareQty: (de: string, q: number) => void;
-  target: (de: string, weapon: string, slot: number) => void;
-  /** Takes one copy of a weapon upgrade off – a used-up poison as well. */
-  removeSlot: (de: string, slot: number) => void;
+  /** Puts an upgrade on a weapon, or takes it off again – a used-up poison as well. */
+  upgrade: (de: string, weapon: string, on: boolean) => void;
   /** What was paid for a rare item, set by hand (a price rolled at the table). */
   paid: (de: string, gc: number, slot: number) => void;
 }
@@ -44,22 +43,71 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
           ? 'Hired after the warband\'s first battle: until his own he buys from his list at its prices – common items freely, rare ones only by a search at the Trading Post. Taking an item back returns its price.'
           : `Until the first battle every warrior buys from his own list${v.men > 1 ? ', a group for every man' : ''}, with what the warband gives at the start; the Trading Post opens after his first battle. Taking an item back returns its price.`}</p>
       </div>
-      {v.groups.map((g) => (
-        <section key={g.label} className={styles.eqGroup} aria-label={g.label}>
-          <h3>{g.label}</h3>
-          <ul className={styles.eqList}>
-            {g.rows.map((r) => (
-              <li key={r.key} className={styles.eqRow}>
-                <span className={styles.eqName} title={r.text || undefined}>
-                  {r.name}
-                  <small>{r.free ? `first one free, then ${r.price} gc` : `${r.price} gc${per}`}{r.more && r.qty === 0 ? ` · ${r.more}` : ''}</small>
-                </span>
-                <Stepper label={r.name} value={r.qty} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      {/* the list, one small table for each kind, side by side where there is room (#115) */}
+      <div className={styles.eqTables}>
+        {v.groups.map((g) => (
+          <table key={g.label} className={styles.eqTable}>
+            <caption>{g.label}</caption>
+            <thead className="visually-hidden"><tr><th scope="col">Item</th><th scope="col">Price</th><th scope="col">How many</th></tr></thead>
+            <tbody>
+              {g.rows.map((r) => (
+                <tr key={r.key}>
+                  <th scope="row" className={styles.eqName} title={r.text || undefined}>
+                    {r.name}
+                    {r.more && r.qty === 0 && <small>{r.more}</small>}
+                  </th>
+                  <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : `${r.price} gc${per}`}</td>
+                  <td><Stepper label={r.name} value={r.qty} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ))}
+      </div>
+      {/* what he carries: every piece on its own line, so each weapon can be upgraded (#115) */}
+      <section className={styles.eqGroup} aria-label="Carried">
+        <h3>Carried</h3>
+        {v.carried.length === 0 ? <p className={ui.muted}>Nothing carried yet.</p> : (
+          <table className={`${styles.eqTable} ${styles.eqCarried}`}>
+            <thead><tr><th scope="col">Item</th><th scope="col">Price</th><th scope="col">Upgrade</th><th scope="col"><span className="visually-hidden">Take away</span></th></tr></thead>
+            <tbody>
+              {v.carried.map((r) => (
+                <tr key={r.id}>
+                  <th scope="row" className={styles.eqName} title={r.text || undefined}>{r.name}<small>{r.group}</small></th>
+                  <td className={styles.eqPrice}>{r.price}</td>
+                  <td>
+                    <span className={styles.eqUpgrade}>
+                      {r.ups.map((u) => (
+                        <span key={u.de} className={styles.eqUp}>
+                          <span>{u.name}</span>
+                          <label className={styles.paid}>
+                            <small>Paid</small>
+                            <input key={u.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={u.paid} aria-label={`Paid for ${u.name} on ${r.name}`}
+                              onBlur={(e) => { const n = Math.max(0, Math.round(Number(e.target.value) || 0)); if (n !== u.paid) act.paid(u.de, n, u.slot); }} />
+                            <small>gc</small>
+                          </label>
+                          <button type="button" className={ui.buttonQuiet} aria-label={`${u.once ? 'Used' : 'Remove'} ${u.name} on ${r.name}`} onClick={() => act.upgrade(u.de, r.key, false)}>{u.once ? 'Used' : 'Remove'}</button>
+                        </span>
+                      ))}
+                      {r.options.length > 0 && (
+                        <select className={ui.select} aria-label={`Upgrade ${r.name}`} value="" onChange={(e) => { if (e.target.value) act.upgrade(e.target.value, r.key, true); }}>
+                          <option value="">Upgrade…</option>
+                          {r.options.map((o) => <option key={o.de} value={o.de}>{o.name} – {o.price} gc</option>)}
+                        </select>
+                      )}
+                      {r.weapon && r.free && <small className={ui.muted}>the free dagger is never upgraded</small>}
+                    </span>
+                  </td>
+                  <td>
+                    <button type="button" className={ui.buttonQuiet} aria-label={`Take one ${r.name} away`}
+                      onClick={() => (r.from === 'list' ? act.qty(r.key, r.qty - 1, r.name) : act.rareQty(r.key, r.qty - 1))}>−</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
       <section className={styles.eqGroup} aria-label="Rare and trading-post items">
         <h3>Rare and trading-post items</h3>
         {v.rare.length > 0 && (
@@ -68,24 +116,14 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
               <li key={`${r.de}#${r.slot}`} className={styles.eqRow}>
                 <span className={styles.eqName} title={r.text || undefined}>
                   {r.name}
-                  {r.upgrade && r.on && <small>on {r.targets.find((t) => t.key === r.on)?.name ?? r.on}</small>}
                   <label className={styles.paid}>
                     <small>Paid</small>
-                    <input key={r.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={r.paid} aria-label={`Paid for ${r.name}${r.on ? ` on ${r.targets.find((t) => t.key === r.on)?.name ?? r.on}` : ''}`}
+                    <input key={r.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={r.paid} aria-label={`Paid for ${r.name}`}
                       onBlur={(e) => { const n = Math.max(0, Math.round(Number(e.target.value) || 0)); if (n !== r.paid) act.paid(r.de, n, r.slot); }} />
                     <small>gc</small>
                   </label>
                 </span>
-                {r.upgrade ? (
-                  <span className={styles.eqUpgrade}>
-                    {r.targets.length > 1 && (
-                      <select className={ui.select} aria-label={`Weapon for ${r.name}`} value={r.on ?? ''} onChange={(e) => act.target(r.de, e.target.value, r.slot)}>
-                        {r.targets.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
-                      </select>
-                    )}
-                    <button type="button" className={ui.buttonQuiet} aria-label={`${r.once ? 'Used' : 'Remove'} ${r.name}${r.on ? ` on ${r.targets.find((t) => t.key === r.on)?.name ?? r.on}` : ''}`} onClick={() => act.removeSlot(r.de, r.slot)}>{r.once ? 'Used' : 'Remove'}</button>
-                  </span>
-                ) : <Stepper label={r.name} value={r.q} max={r.max} onChange={(q) => act.rareQty(r.de, q)} />}
+                <Stepper label={r.name} value={r.q} max={r.max} onChange={(q) => act.rareQty(r.de, q)} />
               </li>
             ))}
           </ul>
@@ -108,7 +146,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
 export function EquipmentSheet({ dialogRef, close, view, act }: { dialogRef: Sheet['ref']; close: Sheet['close']; view: EquipmentView | null; act: EquipmentActions }) {
   const id = useId();
   return (
-    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
+    <dialog ref={dialogRef} className={`${ui.sheet} ${ui.sheetWide}`} aria-labelledby={id}>
       {view && <Body key={view.uid} v={view} act={act} close={close} titleId={id} />}
     </dialog>
   );

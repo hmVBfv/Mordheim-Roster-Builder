@@ -164,6 +164,58 @@
   justify-content: end;
 }
 
+.eqTables {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.eqTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.eqTable caption {
+  padding-bottom: var(--space-1);
+  text-align: left;
+  font-weight: 600;
+}
+
+.eqTable th,
+.eqTable td {
+  padding: var(--space-1) var(--space-2) var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.eqTable th[scope='row'] {
+  font-weight: inherit;
+}
+
+.eqPrice {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.eqTable th.eqName {
+  width: 42%;
+}
+
+.eqCarried thead th {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.eqUp {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
 .eqAdd {
   display: grid;
   grid-template-columns: 1fr auto;
