@@ -70,6 +70,78 @@ export function warbandPickerGroups(data: GameData): { grade: string; label: str
   })).filter((g) => g.warbands.length);
 }
 
+/* ---- finding a warband to start (wish #116) ---- */
+
+const GRADES = ['core', '1a', '1b', '1c', '2a'];
+const sortName = (n: string) => String(n).replace(/^(the|der|die|das)\s+/i, '').toLowerCase();
+
+/** What the picker knows of a warband: where it stands, how it is made, what it starts with. */
+export interface WarbandFact {
+  key: string; name: string; grade: string; race: string;
+  /** The starting gold, lowest and highest over its variants. */
+  gold: number; goldMax: number;
+  /** The fewest and the most models. */
+  min: number; max: number;
+  /** The most Heroes it may start with: what its hero units allow together, six at the most. */
+  heroes: number;
+  /** A big creature among its units (Kroxigor, Minotaur …). */
+  large: boolean;
+}
+
+export function warbandFacts(data: GameData): WarbandFact[] {
+  return Object.entries(data.WARBANDS).map(([key, wb]) => {
+    const golds = [Number(wb.gold) || 0, ...(wb.subtypes ?? []).map((x) => Number(x.gold ?? wb.gold) || 0)];
+    const heroes = wb.units.filter((u) => u.t === 'hero').reduce((n, u) => n + (u.max ?? 6), 0);
+    return {
+      key, name: wb.name, grade: (wb.grade as string) || 'core', race: String(wb.siteRace ?? ''),
+      gold: Math.min(...golds), goldMax: Math.max(...golds), min: Number(wb.min) || 0, max: Number(wb.max) || 0,
+      heroes: Math.min(6, heroes), large: wb.units.some((u) => !!u.large),
+    };
+  });
+}
+
+export interface WarbandFilter {
+  q?: string; race?: string; grade?: string; heroes?: number | ''; large?: '' | 'with' | 'without';
+  goldFrom?: number | ''; goldTo?: number | ''; sizeFrom?: number | ''; sizeTo?: number | '';
+}
+
+const given = (v: number | '' | undefined): v is number => typeof v === 'number' && !Number.isNaN(v);
+
+/** The warbands that pass every part of the filter that is set; the order stays. */
+export function filterWarbands(list: WarbandFact[], f: WarbandFilter): WarbandFact[] {
+  const q = (f.q ?? '').trim().toLowerCase();
+  return list.filter((w) => {
+    if (q && !w.name.toLowerCase().includes(q)) return false;
+    if (f.race && w.race !== f.race) return false;
+    if (f.grade && w.grade !== f.grade) return false;
+    if (given(f.heroes) && w.heroes !== f.heroes) return false;
+    if (f.large === 'with' && !w.large) return false;
+    if (f.large === 'without' && w.large) return false;
+    // the gold lies in a range when the variants differ: it passes where the range meets the wish
+    if (given(f.goldFrom) && w.goldMax < f.goldFrom) return false;
+    if (given(f.goldTo) && w.gold > f.goldTo) return false;
+    if (given(f.sizeFrom) && w.max < f.sizeFrom) return false;
+    if (given(f.sizeTo) && w.max > f.sizeTo) return false;
+    return true;
+  });
+}
+
+export type WarbandSort = 'grade' | 'name' | 'gold-asc' | 'gold-desc' | 'size-desc' | 'heroes-desc';
+
+/** A sorted copy: by grade (the picker's own order), name, gold, most models or Heroes; ties by name. */
+export function sortWarbands(list: WarbandFact[], by: WarbandSort): WarbandFact[] {
+  const name = (a: WarbandFact, b: WarbandFact) => sortName(a.name).localeCompare(sortName(b.name));
+  const cmp: Record<WarbandSort, (a: WarbandFact, b: WarbandFact) => number> = {
+    grade: (a, b) => GRADES.indexOf(a.grade) - GRADES.indexOf(b.grade),
+    name: () => 0,
+    'gold-asc': (a, b) => a.gold - b.gold,
+    'gold-desc': (a, b) => b.goldMax - a.goldMax,
+    'size-desc': (a, b) => b.max - a.max,
+    'heroes-desc': (a, b) => b.heroes - a.heroes,
+  };
+  return [...list].sort((a, b) => cmp[by](a, b) || name(a, b));
+}
+
 /* ---- filtering the Hired Sword and Dramatis Personae lists ---- */
 
 export interface HireFilter { q?: string; stat?: string; op?: '>=' | '>' | '=' | '<=' | '<'; val?: string | number }
