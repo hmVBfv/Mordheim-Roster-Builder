@@ -8,10 +8,10 @@ import ui from '../ui/ui.module.css';
 import { Group } from '../ui/Group.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { GroupsSheet } from './GroupsSheet.tsx';
-import { WarbandList, type GroupChoice } from './WarbandList.tsx';
+import { WarbandList, type FavouriteChoice, type GroupChoice } from './WarbandList.tsx';
 import { useWarbandGroups } from './useWarbandGroups.ts';
 
-export default function GroupedWarbands({ warbands, notify }: { warbands: StoredWarband[]; notify: (t: string) => void }) {
+export default function GroupedWarbands({ warbands, notify, favourites }: { warbands: StoredWarband[]; notify: (t: string) => void; favourites: FavouriteChoice }) {
   const online = useOnline();
   const api = useWarbandGroups(true);
   const sheet = useSheet('warband-groups');
@@ -27,12 +27,12 @@ export default function GroupedWarbands({ warbands, notify }: { warbands: Stored
   return (
     <>
       <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => sheet.open()}>Groups</button></div>
-      {api.groups.length === 0 && <WarbandList warbands={warbands} marks grid groups={choice} />}
+      {api.groups.length === 0 && <WarbandList warbands={warbands} marks grid groups={choice} favourites={favourites} />}
       {api.groups.length > 0 && sections.map((sec) => (
         <Group key={sec.key} id={`wbg-${sec.key}`} title={sec.title}>
           {sec.list.length === 0
             ? <p className={ui.muted}>{sec.key === 'none' ? 'Every warband is in a group.' : 'No warband in it yet. Choose this group under a warband.'}</p>
-            : <WarbandList warbands={sec.list} marks grid groups={choice} />}
+            : <WarbandList warbands={sec.list} marks grid groups={choice} favourites={favourites} />}
         </Group>
       ))}
       <FormSheet dialogRef={sheet.ref}>

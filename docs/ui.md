@@ -140,6 +140,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Gruppen sind Library-Einträge (`warband_group`, [ADR 0023](decisions/0023-library-per-account.md)):
   nur für einen selbst, auf jedem Gerät, lesbar auch ohne Verbindung; Ändern braucht
   sie. Ohne Anmeldung (und im Quick Build) gibt es keine Gruppen.
+- **Favoriten (Wunsch #95, Rob, 26.10.2026):** Wer angemeldet ist, kann jede Warband – auch einen Planner – über die Schaltfläche „Favourite“ unter ihrem Eintrag zum Favoriten machen (aria-pressed; erneutes Tippen nimmt es zurück). Favoriten stehen zusätzlich in einem eigenen Abschnitt **Favourites** ganz oben auf der Warband-Liste (sie bleiben auch an ihrem Platz in Gruppe, Planners oder In campaigns) und tragen ein goldenes **Band mit einer Medaille** (Komet mit zwei Schweifen) in der Ecke; ein Planner, der Favorit ist, trägt beide Bänder – das goldene näher an der Ecke, das „P“ weiter unten –, und die Zeile unter dem Namen nennt „Planner · Favourite“. Das Band zeigt auch Home. Gespeichert als Library-Eintrag `warband_favourites` (ADR 0023): nur für einen selbst, auf jedem Gerät, lesbar auch ohne Verbindung; Ändern braucht sie.
 - **Notes nur in einer Kampagne (Rob, 20.10.2026):** Notes hat keinen eigenen
   Eintrag in der Navigation mehr; es ist ein Reiter jeder Kampagne (unter
   Campaign → die Kampagne → Notes). Die alte Adresse `/notes` führt zur Liste

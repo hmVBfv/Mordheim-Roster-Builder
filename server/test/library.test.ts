@@ -67,6 +67,28 @@ describe('the Library: folders', () => {
   });
 });
 
+describe('the Library: favourite warbands', () => {
+  const wid = (n: number) => `0000000${n}-0000-4000-8000-000000000000`;
+  const fav = (over: Record<string, unknown> = {}) => ({ kind: 'warband_favourites', name: 'Favourites', body: { warbands: [wid(1), wid(2)], ...over } });
+
+  it('the favourites are kept as the ids of the warbands, and are nobody else’s', async () => {
+    const { kai, ben } = await two();
+    const made = await kai('PUT', `/library/${randomUUID()}`, fav());
+    expect(made.statusCode).toBe(201);
+    expect((made.json() as { item: unknown }).item).toMatchObject({ kind: 'warband_favourites', body: { warbands: [wid(1), wid(2)] } });
+    expect(((await ben('GET', '/library')).json() as { items: unknown[] }).items).toEqual([]);
+  });
+
+  it('only favourites that fit: ids, no repeat, a ceiling', async () => {
+    const { kai } = await two();
+    const put = (b: unknown) => kai('PUT', `/library/${randomUUID()}`, b);
+    expect((await put(fav({ warbands: [wid(1), wid(1)] }))).statusCode).toBe(400);
+    expect((await put(fav({ warbands: ['x'.repeat(65)] }))).statusCode).toBe(400);
+    expect((await put(fav({ warbands: Array.from({ length: 501 }, () => randomUUID()) }))).statusCode).toBe(400);
+    expect((await put(fav({ extra: 1 }))).statusCode).toBe(400);
+  });
+});
+
 describe('the Library: scenarios', () => {
   const npc = { id: '11111111-1111-4111-8111-111111111111', name: 'Captain Brandt', type: 'Hero', hidden: ['name', 'WS'], profile: { M: '4', WS: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
   const scenario = (over: Record<string, unknown> = {}) => ({ kind: 'scenario', name: 'The night at the ferry', body: { body: 'The ferry is dark: no shooting beyond 8".', npcStatlines: 'Captain Brandt M4 WS4', npcs: [npc], ...over } });

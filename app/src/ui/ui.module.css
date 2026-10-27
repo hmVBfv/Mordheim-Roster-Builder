@@ -139,6 +139,29 @@
   pointer-events: none;
 }
 
+/* A favourite (#95): a gold ribbon with a medal – a comet with two tails pinned on it – across the corner; a planner that is a
+   favourite as well moves out of the corner, so both can be read */
+.ribbonFavourite {
+  top: 6px;
+  right: -30px;
+  width: 92px;
+  padding: 0;
+  background: var(--gold);
+  color: var(--gold);
+  line-height: 0;
+}
+
+.ribbonFavourite svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.ribbonFurther {
+  top: 44px;
+  right: -12px;
+  width: 112px;
+}
+
 /* A titled group of entries (#86): heading and entries are one block with room above it, little between title and entries */
 .group {
   display: grid;
