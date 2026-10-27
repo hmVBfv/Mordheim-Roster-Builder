@@ -150,14 +150,14 @@
    the medal; the blue is the same in both themes and sets itself apart from the planner's ribbon. A planner that is a
    favourite as well lies further out, so both can be read. */
 .ribbonFavourite {
-  --c: 42px;
-  --h: 26px;
+  --c: 66px;
+  --h: 34px;
   background: #1d3a73;
   color: #f0c75e;
 }
 
 .ribbonFurther {
-  --c: 84px;
+  --c: 118px;
 }
 
 /* A titled group of entries (#86): heading and entries are one block with room above it, little between title and entries */
