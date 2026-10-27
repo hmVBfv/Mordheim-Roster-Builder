@@ -1,5 +1,5 @@
 # 0017 – In die Produktion nur signierte Images von master
-Status: angenommen (Rob, 09.10.2026) · Datum: 2026-10-09
+Status: angenommen (Rob, 09.10.2026) · Datum: 2026-10-09 · Teile ersetzt durch [0028](0028-images-from-master-only.md): Branches veröffentlichen kein Image mehr, die Testinstanz nimmt keine Branch-Builds mehr
 
 ## Kontext
 Die Sicherheitsprüfung vom 09.10.2026 (OPS-1, `docs/security-review.md`)

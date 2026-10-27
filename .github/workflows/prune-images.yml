@@ -1,0 +1,66 @@
+# Old images of the container package go (ADR 0028). Since branches publish nothing any more, what is
+# left is the builds of branches from before, and the signatures that belong to them. Master's
+# builds, :drill-broken, everything under 14 days and the platform images inside a multi-arch
+# image stay (.github/scripts/images-to-prune.sh holds the rules and says why).
+#
+# Weekly, and by hand: "Run workflow" with dry run left on lists what would go and deletes nothing.
+# Deleting a version of a package cannot be undone.
+name: Prune images
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: List what would be deleted, delete nothing
+        type: boolean
+        default: true
+  schedule:
+    - cron: '31 4 * * 1'
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: prune-images
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      OWNER: ${{ github.repository_owner }}
+      PACKAGE: mordheim-roster
+      # a scheduled run deletes; a run by hand only when asked to
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: The rules hold
+        run: .github/scripts/test-images-to-prune.sh
+      - name: Versions of the package
+        run: |
+          gh api --paginate "/users/$OWNER/packages/container/$PACKAGE/versions?per_page=100" | jq -s 'add // []' > "$RUNNER_TEMP/versions.json"
+          echo "versions in the package: $(jq length "$RUNNER_TEMP/versions.json")"
+      - name: Which go
+        run: |
+          .github/scripts/images-to-prune.sh < "$RUNNER_TEMP/versions.json" > "$RUNNER_TEMP/prune.txt"
+          {
+            echo "### Prune images"
+            echo
+            echo "Versions in the package: $(jq length "$RUNNER_TEMP/versions.json"); to delete: $(wc -l < "$RUNNER_TEMP/prune.txt") (dry run: $DRY_RUN)"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/prune.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/prune.txt"
+      - name: Delete
+        if: env.DRY_RUN != 'true'
+        run: |
+          while read -r id tags; do
+            echo "deleting $id ($tags)"
+            gh api -X DELETE "/users/$OWNER/packages/container/$PACKAGE/versions/$id"
+          done < "$RUNNER_TEMP/prune.txt"
