@@ -232,3 +232,17 @@ describe('weapon upgrades in the sheet (#108, #109, #110, #112, #115)', () => {
     expect(equipmentView(ctx(t), uid)!.carried.some((r) => r.ups.length > 0)).toBe(false);
   });
 });
+
+describe('the free dagger stays (#117)', () => {
+  it('its stepper goes no lower than one, and its line in Carried has no way to take it away', () => {
+    const { s, capt } = band(0);
+    const v = equipmentView(ctx(s), capt)!;
+    const row = v.groups.flatMap((g) => g.rows).find((r) => r.key === 'Dolch (1. gratis)')!;
+    expect(row).toMatchObject({ qty: 1, min: 1 });
+    expect(v.groups.flatMap((g) => g.rows).find((r) => r.key === 'Schwert')!.min).toBe(0);
+    expect(v.carried.find((r) => r.key === 'Dolch (1. gratis)')).toMatchObject({ free: true, keep: true });
+    const two = core.setListQty(ctx(s), capt, 'Dolch (1. gratis)', 2);
+    const daggers = equipmentView(ctx(two), capt)!.carried.filter((r) => r.key === 'Dolch (1. gratis)');
+    expect(daggers.map((r) => r.keep)).toEqual([true, false]);
+  });
+});

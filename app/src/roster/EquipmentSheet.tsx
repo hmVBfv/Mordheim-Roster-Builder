@@ -57,7 +57,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                     {r.more && r.qty === 0 && <small>{r.more}</small>}
                   </th>
                   <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : `${r.price} gc${per}`}</td>
-                  <td><Stepper label={r.name} value={r.qty} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} /></td>
+                  <td><Stepper label={r.name} value={r.qty} min={r.min} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} /></td>
                 </tr>
               ))}
             </tbody>
@@ -99,8 +99,10 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                     </span>
                   </td>
                   <td>
-                    <button type="button" className={ui.buttonQuiet} aria-label={`Take one ${r.name} away`}
-                      onClick={() => (r.from === 'list' ? act.qty(r.key, r.qty - 1, r.name) : act.rareQty(r.key, r.qty - 1))}>−</button>
+                    {r.keep ? <small className={ui.muted}>stays</small> : (
+                      <button type="button" className={ui.buttonQuiet} aria-label={`Take one ${r.name} away`}
+                        onClick={() => (r.from === 'list' ? act.qty(r.key, r.qty - 1, r.name) : act.rareQty(r.key, r.qty - 1))}>−</button>
+                    )}
                   </td>
                 </tr>
               ))}
