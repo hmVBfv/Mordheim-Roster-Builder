@@ -77,13 +77,15 @@ export interface HireFilters {
   /** A characteristic compared, as in the Roster Builder (either profile of
       a pair counts); no stat or no value: no filter. */
   stat?: core.HireFilter;
+  /** Only those who cast spells or prayers (wish #120). */
+  casters?: boolean;
 }
 
 export function filterRows(rows: HireRow[], f: HireFilters): HireRow[] {
   const q = f.q.trim().toLowerCase();
   const stat = { ...f.stat, q: '' };
   return rows
-    .filter((r) => f.grades.has(r.grade) && (!f.only || !r.why || r.hired) && (!q || `${r.name} ${r.race}`.toLowerCase().includes(q)) && core.passStatFilter(r.entry, stat))
+    .filter((r) => f.grades.has(r.grade) && (!f.only || !r.why || r.hired) && (!q || `${r.name} ${r.race}`.toLowerCase().includes(q)) && (!f.casters || core.hireIsCaster(r.entry)) && core.passStatFilter(r.entry, stat))
     .sort((a, b) => (f.order === 'name' ? 0 : a[f.order] - b[f.order]) || a.name.localeCompare(b.name));
 }
 

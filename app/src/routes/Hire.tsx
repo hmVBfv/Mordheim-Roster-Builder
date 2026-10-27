@@ -114,6 +114,7 @@ function Body({ rec }: { rec: StoredWarband }) {
   const [kind, setKind] = useState<HireKind>('hs');
   const [q, setQ] = useState('');
   const [only, setOnly] = useState(true);
+  const [casters, setCasters] = useState(false);
   const [order, setOrder] = useState<HireOrder>('name');
   const [stat, setStat] = useState<{ stat: string; op: (typeof OPS)[number]; val: string }>({ stat: '', op: '>=', val: '' });
   const [off, setOff] = useState<Record<HireKind, string[]>>({ hs: [], dp: [] });
@@ -125,7 +126,7 @@ function Body({ rec }: { rec: StoredWarband }) {
   const grades = gradesOf(ctx, kind);
   const shown = new Set(grades.filter((g) => !off[kind].includes(g)));
   const all = useMemo(() => hireRows(ctx, kind), [ctx, kind]);
-  const rows = filterRows(all, { q, grades: shown, only, order, stat });
+  const rows = filterRows(all, { q, grades: shown, only, order, stat, casters });
   const may = all.filter((r) => !r.why).length;
   const fig = hireFigures(ctx);
   const name = ed.state.name || data.WARBANDS[ed.state.wb as string]?.name || 'Warband';
@@ -154,6 +155,7 @@ function Body({ rec }: { rec: StoredWarband }) {
           ))}
         </div>
         <label className={trade.check}><input type="checkbox" checked={only} onChange={(e) => setOnly(e.target.checked)} /> Only those this warband may hire</label>
+        <label className={trade.check}><input type="checkbox" checked={casters} onChange={(e) => setCasters(e.target.checked)} /> Spellcasters only</label>
         <div className={styles.stat} role="group" aria-label="Characteristic">
           <span className={ui.muted}>Characteristic</span>
           <select className={ui.input} value={stat.stat} onChange={(e) => setStat((x) => ({ ...x, stat: e.target.value }))} aria-label="Which characteristic">
