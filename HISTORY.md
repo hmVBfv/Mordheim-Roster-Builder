@@ -4221,8 +4221,8 @@ not confirmed and stays open. In the order they were built:
   which lives outside the Library. The link to it is stored as `lore:<id>` and followed only from
   the entry (the catalogue has no entry to show it back). Pull request 217.
 - **94, the app name in the header is a link to Home.** First push failed the e2e touch-target check
-  (166 failures, one cause): the link was only as tall as its text. It now fills the 44 px; I only
-  ran the whole check once the CI had said so. Pull request 218.
+  (166 failures, one cause): the link was only as tall as its text. It now fills the 44 px; I had not run
+  the e2e before pushing a change to the header. Pull request 218.
 - **96, racial maximums under the profile.** One row under the values, column for column, and the
   race named; the data was already there from the advance sheet. Pull request 219.
 - **92 and 93, one branch.** The kinds and the groups became small headings above the free
