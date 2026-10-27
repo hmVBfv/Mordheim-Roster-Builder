@@ -4243,3 +4243,23 @@ not confirmed and stays open. In the order they were built:
   and can be cleared. Stacked on 99 (same tab). Pull request 223.
 - **98, more lore.** Thirty-five entries, only where the wiki page has real lore behind it; written in my own
   words, nothing from after the year 2000 IC, since Mordheim is set around 1999. Pull request 224.
+
+## October 27, 2026 — #101 to #104: ribbons, link search, audit log
+
+Rob's second round on the same day, after he had seen #95 live.
+
+- **102 and 103, one branch.** Rob did not like the favourite's mark: he wanted a plain ribbon with the comet
+  alone as the medal, the comet golden, the ribbon in a matching dark blue that does not clash with the
+  planner's green. The bug (102) was the same code: the planner's ribbon was only moved aside, so it began and
+  ended inside the box. Both ribbons are now placed by the distance of their centre line from the corner and are
+  a lot longer than the box is deep, so the box cuts them edge to edge wherever they lie. jsdom lays nothing
+  out, so the regression test reads the style sheet; the look I checked in a browser. Pull request 226.
+- **104.** The picker for a link was a drop-down with the whole lore catalogue in it. It is a search by name
+  with a filter by kind and twelve matches at a time now; nothing is offered before one asks. Pull request 227.
+- **101.** The audit log takes a word, days and an order, asked of the server like the sign-ins. The word
+  looks in the actor, the target and the action key, never in the payload, and the filter only narrows what
+  the admin sees already, so the visibility rules did not change. Newest-first pages continue `before` the last
+  seq, oldest-first pages `after` it. Pull request 228.
+- A slip of mine, for the next run: while I built #101 the shell's safety check was unavailable for a long
+  stretch; I wrote the UI test and the server change and ran the UI test only once it was back, so that
+  test was not seen failing first.
