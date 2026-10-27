@@ -80,9 +80,15 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   „Named“ und die Werte wie in der World, nur ohne Kampagne: keine eigenen Fertigkeiten
   der Kampagne, keine Krieger zum Kopieren) und **Groups** (Gegnergruppen: Name,
   Note, Profile wie im Background → Opponents, ebenfalls ohne Kampagne) und
-  **Scenarios** (Titel, Regeln, NPC-Statlines; die NPCs eines Szenarios samt
-  verborgenen Teilen reisen unverändert mit und werden in der Kampagne geändert,
-  wo ihr Formular liegt).
+  **Scenarios** (Titel, Regeln und NPCs – **kein Freifeld für NPC-Statlines mehr**, Wunsch #97,
+  Rob, 26.10.2026: „NPC hinzufügen oder erstellen“). Im Formular listet „NPCs of this scenario“ die
+  NPCs des Szenarios mit „Take out“; **„Add an NPC from the Library“** kopiert einen NPC der Library
+  hinein (die Kopie trägt dieselbe ID wie der NPC, nichts verborgen, ein NPC nur einmal) und **verknüpft** beide
+  – so zeigt jede Seite die andere; **„Create a new NPC“** legt einen neuen NPC an (Name und Werte wie im
+  Reiter NPCs), der **auch dort geführt wird**, und fügt ihn ein. „Take out“ nimmt Kopie und Verknüpfung
+  weg, der NPC bleibt in der Library. Die Kopie samt verborgenen Teilen reist unverändert mit und wird in der Kampagne
+  geändert, wo ihr Formular liegt. Statlines, die früher als Text geschrieben wurden, bleiben
+  lesbar („Statlines written earlier“) und lassen sich mit „Clear the earlier statlines“ löschen.
   **Eine Gruppe in eine Kampagne:** „Groups from the Library…“ bei den Opponents
   (nur Leiter; eine Kopie mit allen Profilen, jedes mit eigener ID, ohne Verweis auf
   eigene Fertigkeiten einer anderen Kampagne – Name und Text bleiben; eine Gruppe

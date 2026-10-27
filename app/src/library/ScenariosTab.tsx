@@ -9,17 +9,20 @@ import { useOnline } from '../app/SyncState.tsx';
 import { newId } from '../db/ids.ts';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
-import { putScenario, removeItem, staleItem, type LibraryItem, type LibraryScenario, type ScenarioBody } from './api.ts';
+import type { ScenarioNpc } from '@mordheim/core';
+import { putScenario, removeItem, staleItem, type LibraryItem, type LibraryNpc, type LibraryScenario, type ScenarioBody } from './api.ts';
 import { FolderField, FolderLists } from './folders.tsx';
 import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
+import { ScenarioNpcsField } from './ScenarioNpcs.tsx';
 import { scenariosOf, useLibrary } from './useLibrary.ts';
 
 /** The limits the server holds to (server/src/scenarios.ts). */
-const LIMITS = { title: 120, body: 20_000, statlines: 10_000 } as const;
+const LIMITS = { title: 120, body: 20_000 } as const;
 
-function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
+function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved, onNpcMade }: {
   scenario: LibraryScenario | null; items: LibraryItem[] | null; online: boolean; close: (then?: () => void) => void; onSaved: (s: LibraryScenario) => void; onRemoved: (s: LibraryScenario) => void;
+  /** An NPC made in the form is in the Library now. */ onNpcMade: (n: LibraryNpc) => void;
 }) {
   const ids = useId();
   const [title, setTitle] = useState(scenario?.name ?? '');
@@ -32,7 +35,7 @@ function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [id] = useState(() => scenario?.id ?? newId());
-  const npcs = scenario?.body.npcs ?? [];
+  const [npcs, setNpcs] = useState<ScenarioNpc[]>(scenario?.body.npcs ?? []);
 
   const save = async () => {
     setBusy(true);
@@ -72,11 +75,15 @@ function ScenarioForm({ scenario, items, online, close, onSaved, onRemoved }: {
         <label htmlFor={`${ids}-b`}>Rules</label>
         <textarea id={`${ids}-b`} className={`${ui.textarea} ${ui.writing}`} rows={8} value={body} maxLength={LIMITS.body} onChange={(e) => setBody(e.target.value)} />
       </div>
-      <div className={ui.field}>
-        <label htmlFor={`${ids}-s`}>NPC statlines (optional)</label>
-        <textarea id={`${ids}-s`} className={`${ui.textarea} ${ui.writing}`} rows={5} value={statlines} maxLength={LIMITS.statlines} onChange={(e) => setStatlines(e.target.value)} />
-      </div>
-      {npcs.length > 0 && <p className={ui.muted}>{npcs.length} {npcs.length === 1 ? 'NPC' : 'NPCs'} with their hidden parts travel along with the scenario. They are changed in a campaign, once the scenario is there.</p>}
+      {statlines && (
+        <div className={ui.field}>
+          <span>Statlines written earlier</span>
+          <pre className={ui.muted}>{statlines}</pre>
+          <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => setStatlines('')}>Clear the earlier statlines</button></div>
+          <small className={ui.muted}>They stay as they are until you clear them. NPCs are added below instead.</small>
+        </div>
+      )}
+      <ScenarioNpcsField items={items} npcs={npcs} onNpcs={setNpcs} links={links} onLinks={setLinks} online={online} onMade={onNpcMade} />
       <FolderField items={items} value={folder} onChange={setFolder} />
       <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign a leader adds the scenario from here as a draft: only leaders read it until it is released to a battle.</p>
@@ -134,6 +141,7 @@ export function ScenariosTab({ notify }: { notify: (t: string) => void }) {
       <dialog ref={ref} className={ui.sheet} aria-labelledby="scenario-form-title">
         {editing && (
           <ScenarioForm key={editing.key} scenario={editing.scenario} items={items} online={reachable} close={close}
+            onNpcMade={(n) => setItems((cur) => [n, ...(cur ?? []).filter((x) => x.id !== n.id)])}
             onSaved={(s) => { setItems((cur) => [s, ...(cur ?? []).filter((x) => x.id !== s.id)]); notify('Scenario saved. Only you see it.'); }}
             onRemoved={(s) => { setItems((cur) => (cur ?? []).filter((x) => x.id !== s.id)); notify('Scenario removed.'); }} />
         )}

@@ -476,3 +476,80 @@ describe('the Library: folders', () => {
     expect(await screen.findByRole('list', { name: 'Factions' })).toBeTruthy();
   });
 });
+
+/* Wish #97 (Rob, 26.10.2026): a scenario has no free field for the statlines of its NPCs; its NPCs are added from the Library
+   (a copy, linked to the original) or created there – and then stand under Library → NPCs. */
+describe('the Library: the NPCs of a scenario', () => {
+  const values = { type: 'Hero', profile: { M: '4', WS: '4' }, sv: '5+', skills: [], equipment: 'Sword', equipmentTips: [], rules: '', from: null };
+  const npcBody = { de: '', status: '', faction: '', named: true, statlineTts: 'M4 WS4 Sv 5+', profile: values };
+  const kept = (srv: ReturnType<typeof server>, kind: string) => [...srv.state.library.values()].filter((i) => !i.deletedAt && i.kind === kind);
+
+  it('has no free field for statlines; an NPC of the Library is added as a copy, linked, and the NPC shows the scenario', async () => {
+    const srv = server();
+    const brandt = srv.libraryFrom({ kind: 'npc', name: 'Captain Brandt', body: npcBody });
+    srv.libraryFrom({ kind: 'scenario', name: 'The night at the ferry', body: { body: '', npcStatlines: '', npcs: [] } });
+    const user = userEvent.setup();
+    at('/library/scenarios');
+    await user.click(await screen.findByRole('button', { name: 'Edit The night at the ferry' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit The night at the ferry' });
+    expect(within(sheet).queryByLabelText('NPC statlines (optional)')).toBeNull();
+    const pick = within(sheet).getByLabelText('Add an NPC from the Library');
+    await waitFor(() => expect(within(pick).getByRole('option', { name: 'Captain Brandt' })).toBeTruthy());
+    await user.selectOptions(pick, 'Captain Brandt');
+    await user.click(within(sheet).getByRole('button', { name: 'Add this NPC' }));
+    expect(within(within(sheet).getByRole('list', { name: 'NPCs of this scenario' })).getByText('Captain Brandt')).toBeTruthy();
+    // once in, it is not offered again
+    expect(within(within(sheet).getByLabelText('Add an NPC from the Library')).queryByRole('option', { name: 'Captain Brandt' })).toBeNull();
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(kept(srv, 'scenario')).toMatchObject([{ body: { npcs: [{ id: brandt.id, name: 'Captain Brandt', hidden: [], sv: '5+', profile: { M: '4', WS: '4' } }], links: [brandt.id] } }]));
+    expect(await screen.findByText('1 NPC')).toBeTruthy();
+    cleanup();
+    at('/library/npcs');
+    const card = (await within(await screen.findByRole('list', { name: 'NPCs' })).findByText('Captain Brandt')).closest('li')!;
+    expect(await within(card).findByText('The night at the ferry')).toBeTruthy();
+  });
+
+  it('a new NPC is made in the scenario, kept under NPCs, and added', async () => {
+    const srv = server();
+    srv.libraryFrom({ kind: 'scenario', name: 'The night at the ferry', body: { body: '', npcStatlines: '', npcs: [] } });
+    const user = userEvent.setup();
+    at('/library/scenarios');
+    await user.click(await screen.findByRole('button', { name: 'Edit The night at the ferry' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit The night at the ferry' });
+    await user.click(within(sheet).getByRole('button', { name: 'Create a new NPC' }));
+    await user.type(within(sheet).getByLabelText('Name of the new NPC'), 'Old Tom');
+    await user.click(within(sheet).getByRole('button', { name: 'Create and add' }));
+    await waitFor(() => expect(kept(srv, 'npc')).toMatchObject([{ name: 'Old Tom' }]));
+    expect(within(await within(sheet).findByRole('list', { name: 'NPCs of this scenario' })).getByText('Old Tom')).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    const tom = kept(srv, 'npc')[0]!;
+    await waitFor(() => expect(kept(srv, 'scenario')).toMatchObject([{ body: { npcs: [{ id: tom.id, name: 'Old Tom' }], links: [tom.id] } }]));
+  });
+
+  it('an NPC is taken out of the scenario again, with its link; the NPC itself stays in the Library', async () => {
+    const srv = server();
+    const brandt = srv.libraryFrom({ kind: 'npc', name: 'Captain Brandt', body: npcBody });
+    srv.libraryFrom({ kind: 'scenario', name: 'The night at the ferry', body: { body: '', npcStatlines: '', npcs: [{ id: brandt.id, name: 'Captain Brandt', hidden: [], ...values }], links: [brandt.id] } });
+    const user = userEvent.setup();
+    at('/library/scenarios');
+    await user.click(await screen.findByRole('button', { name: 'Edit The night at the ferry' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit The night at the ferry' });
+    await user.click(within(sheet).getByRole('button', { name: 'Take Captain Brandt out of the scenario' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(kept(srv, 'scenario')).toMatchObject([{ body: { npcs: [], links: [] } }]));
+    expect(kept(srv, 'npc')).toHaveLength(1);
+  });
+
+  it('statlines written earlier stay readable and can be cleared', async () => {
+    const srv = server();
+    srv.libraryFrom({ kind: 'scenario', name: 'The night at the ferry', body: { body: '', npcStatlines: 'Brandt M4 WS4', npcs: [] } });
+    const user = userEvent.setup();
+    at('/library/scenarios');
+    await user.click(await screen.findByRole('button', { name: 'Edit The night at the ferry' }));
+    const sheet = screen.getByRole('dialog', { name: 'Edit The night at the ferry' });
+    expect(within(sheet).getByText('Brandt M4 WS4')).toBeTruthy();
+    await user.click(within(sheet).getByRole('button', { name: 'Clear the earlier statlines' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(kept(srv, 'scenario')).toMatchObject([{ body: { npcStatlines: '' } }]));
+  });
+});
