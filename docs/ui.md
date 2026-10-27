@@ -163,6 +163,12 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
+- **Eine Warband finden (Wunsch #116, Rob, 28.10.2026):** unter „New warband“ klappt **„Find a warband“** einen Filter auf: Name,
+  Rasse, Grade, **Heldenzahl zum Start** (was die Heldeneinheiten der Warband zusammen erlauben, höchstens 6: „Up to 4/5/6“), ein
+  **großes Wesen** (Daten: `large`, z. B. Kroxigor, Minotaur), Startgold von–bis und höchste Modellzahl von–bis, dazu die Sortierung
+  (Stufe, Name, Gold, Modellzahl, Helden). Die Auswahl darunter zeigt nur, was passt, mit Gold, Größe und Helden je Zeile; die schon
+  gewählte bleibt in der Liste. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`,
+  `warbandFacts`, `filterWarbands`, `sortWarbands`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**

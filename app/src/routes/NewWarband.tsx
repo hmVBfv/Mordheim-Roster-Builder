@@ -6,7 +6,7 @@
    this campaign", ?campaign=<id>): the warband is made as always, free
    under Warbands, and a copy is entered in the campaign at once; the copy
    opens. Campaigns stay apart from the warbands themselves. */
-import { warbandPickerGroups } from '@mordheim/core';
+import { warbandFacts, type WarbandFact } from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { errorText } from '../account/api.ts';
@@ -19,11 +19,22 @@ import { FORMAT } from '@mordheim/core';
 import { useGameData } from '../game/useGameData.ts';
 import { createWarband, newWarbandChoice } from '../roster/view.ts';
 import ui from '../ui/ui.module.css';
+import { GRADE_NAMES, useWarbandFinder, WarbandFinder } from './WarbandFinder.tsx';
+
+const GRADE_GROUPS: [string, string][] = [['core', 'Core — official'], ['1a', 'Grade 1a — official supplements'], ['1b', 'Grade 1b — official magazines'],
+  ['1c', 'Grade 1c — semi-official'], ['2a', 'Grade 2a — fan-made, reliable']];
+
+/** What a warband says of itself in the list: its name, then gold, size and Heroes; the grade where the list is not grouped by it. */
+function optionText(w: WarbandFact, byGrade: boolean): string {
+  const gold = w.gold === w.goldMax ? `${w.gold} gc` : `${w.gold}–${w.goldMax} gc`;
+  return `${w.name} · ${gold} · up to ${w.max} models · up to ${w.heroes} Heroes${w.large ? ' · big creature' : ''}${byGrade ? '' : ` · ${GRADE_NAMES[w.grade] ?? w.grade}`}`;
+}
 
 function Form({ campaignId }: { campaignId: string | null }) {
   const data = useGameData();
   const [made, setMade] = useState<{ id: string; error: string } | null>(null);
-  const groups = useMemo(() => warbandPickerGroups(data), [data]);
+  const facts = useMemo(() => warbandFacts(data), [data]);
+  const finder = useWarbandFinder(facts);
   const [key, setKey] = useState('');
   const [sub, setSub] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -32,6 +43,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const ids = { wb: useId(), sub: useId(), name: useId() };
+  const listed = [...finder.shown, ...facts.filter((f) => f.key === key && !finder.shown.some((s) => s.key === f.key))];
   const choice = key ? newWarbandChoice(data, key) : null;
   const subtype = choice?.subtypes.find((x) => x.key === sub) ?? choice?.subtypes[0] ?? null;
   const gold = subtype?.gold ?? choice?.gold ?? 0;
@@ -82,13 +94,16 @@ function Form({ campaignId }: { campaignId: string | null }) {
         <select id={ids.wb} className={ui.select} value={key} required
           onChange={(e) => { setKey(e.target.value); setSub(null); }}>
           <option value="" disabled>Choose a warband…</option>
-          {groups.map((g) => (
-            <optgroup key={g.grade} label={g.label}>
-              {g.warbands.map((w) => <option key={w.key} value={w.key}>{w.name}</option>)}
-            </optgroup>
-          ))}
+          {/* the one chosen stays in the list when the filter would drop it */}
+          {finder.sort === 'grade'
+            ? GRADE_GROUPS.map(([grade, label]) => {
+              const here = listed.filter((w) => w.grade === grade);
+              return here.length ? <optgroup key={grade} label={label}>{here.map((w) => <option key={w.key} value={w.key}>{optionText(w, true)}</option>)}</optgroup> : null;
+            })
+            : listed.map((w) => <option key={w.key} value={w.key}>{optionText(w, false)}</option>)}
         </select>
       </label>
+      <WarbandFinder facts={facts} finder={finder} />
       {choice && choice.subtypes.length > 0 && (
         <label className={ui.field} htmlFor={ids.sub}>
           <span>{choice.subtypeLabel?.replace(/:\s*$/, '') || 'Variant'}</span>
