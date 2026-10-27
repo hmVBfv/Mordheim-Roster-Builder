@@ -196,7 +196,11 @@
 
 .eqPrice {
   color: var(--text-muted);
-  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.eqTable th.eqName {
+  width: 42%;
 }
 
 .eqCarried thead th {
