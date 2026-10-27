@@ -113,3 +113,53 @@ describe('what a planner is tracked by (#79)', () => {
     expect(f1.exp).toBe(s.models.reduce((n, m) => n + core.expNeeded(ctx(s), m), 0));
   });
 });
+
+describe('the planner\'s starting list stays open with the Trading Post (#107)', () => {
+  /** A planner with a Marksman, its Trading Post open. */
+  function trading() {
+    let s = core.asPlanner(ctx(core.newWarband(data, 'merc')));
+    s = core.addUnit(ctx(s), 'capt');
+    s = core.addUnit(ctx(s), 'mark');
+    s = core.setPlannerTrade(ctx(s), true);
+    return { s, mark: s.models.find((m) => m.uid_def === 'mark')!.uid };
+  }
+
+  it('a rare item of the Marksman\'s list is bought from it at the list price', () => {
+    const { s, mark } = trading();
+    expect(core.tradeKind(ctx(s), 'Jagdgewehr').kind).toBe('rare');
+    expect(core.isNewRecruit(ctx(s), s.models.find((m) => m.uid === mark)!)).toBe(false);
+    expect(core.listProblem(ctx(s), mark, 'Jagdgewehr', 1)).toBe('');
+    const t = core.setListQty(ctx(s), mark, 'Jagdgewehr', 1);
+    expect(t.models.find((m) => m.uid === mark)!.eq?.Jagdgewehr).toBe(1);
+  });
+
+  it('the founding price of an upgrade holds, open Trading Post or not', () => {
+    let s = core.asPlanner(ctx(core.newWarband(data, 'dwarftreasure')));
+    expect(core.upgradeStart(ctx(s), 'Gromril-Waffe')).not.toBeNull();
+    s = core.setPlannerTrade(ctx(s), true);
+    expect(core.upgradeStart(ctx(s), 'Gromril-Waffe')).not.toBeNull();
+  });
+
+  it('the Trading Post stays open beside the list: a search is booked at the price given', () => {
+    const { s } = trading();
+    expect(core.tradeLocked(ctx(s))).toBe(true);
+    const capt = s.models.find((m) => m.uid_def === 'capt')!.uid;
+    const rare = data.CATALOG.find((x) => typeof x.cost === 'number' && core.rarityOf(ctx(s), x.de) != null && core.canReceive(ctx(s), capt, { key: x.de, rare: true }).ok)!;
+    const t = core.recordSearch(ctx(s), capt, rare.de, { found: true, paid: 77, to: capt });
+    expect(t.ok).toBe(true);
+    expect(t.state.ledger!.at(-1)!.amount).toBe(-77);
+  });
+
+  it('entering a campaign makes it an ordinary warband: the flag is gone and a later recruit is held to the rules', () => {
+    const { s } = trading();
+    const plan = { grants: [], allowedValue: 0 } as never;
+    const joined = core.applyCatchUp(ctx(s), plan, {}, 3);
+    expect(joined.planner).toBeUndefined();
+    expect(joined.plannerTrade).toBeUndefined();
+    const running = { ...joined, campaign: { ...joined.campaign, on: true, round: 3 } } as WarbandState;
+    const hired = core.recruitUnit(ctx(running), 'mark');
+    const recruit = hired.models.find((m) => !s.models.some((o) => o.uid === m.uid))!;
+    expect(core.isNewRecruit(ctx(hired), recruit)).toBe(true);
+    expect(core.listProblem(ctx(hired), recruit.uid, 'Jagdgewehr', 1)).toBe('rare: only through a search at the Trading Post');
+  });
+});

@@ -131,10 +131,16 @@ export function warbandHasFought(ctx: Ctx): boolean {
   return Math.max(Number(c.round) || 0, 0, ...rounds) >= 1;
 }
 
+/** Does this warband still buy at the founding: before its first battle, and always as a planner – it never plays
+    one, and its open Trading Post is only there to simulate earlier play (#107, Rob, 27.10.2026). */
+export function isFounding(ctx: Ctx): boolean {
+  return ctx.s.planner === true || !warbandHasFought(ctx);
+}
+
 /** The founding price of an upgrade, while it applies to this warband. */
 export function upgradeStart(ctx: Ctx, de: string): UpgradeDef['start'] | null {
   const st = ctx.data.UPGRADES[de]?.start;
-  if (!st || warbandHasFought(ctx)) return null;
+  if (!st || !isFounding(ctx)) return null;
   if (st.wb && st.wb.indexOf(ctx.s.wb ?? '') < 0) return null;
   return st;
 }

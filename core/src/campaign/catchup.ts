@@ -181,6 +181,7 @@ export function applyCatchUp(ctx: Ctx, plan: CatchUpPlan, choice: CatchUpChoice,
   if (!isPlanner(ctx.s)) return ctx.s;
   return update(ctx, (d, c) => {
     delete d.planner;
+    delete d.plannerTrade;
     let total = 0;
     for (const m of d.models) {
       const g = plan.grants.find((x) => x.uid === m.uid);
