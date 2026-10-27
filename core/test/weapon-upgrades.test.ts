@@ -66,7 +66,7 @@ describe('the unit shows the weapon (#109)', () => {
   });
 });
 
-describe('Dark Elf upgrades at the founding (#112)', () => {
+describe('Dark Elf blade, and Dark venom as a poison (#112, #118)', () => {
   function elf() {
     let s = core.newWarband(data, 'darkelves');
     s = core.addUnit(ctx(s), 'highborn');
@@ -75,21 +75,34 @@ describe('Dark Elf upgrades at the founding (#112)', () => {
     return { s, uid };
   }
 
-  it('the blade and the venom both carry a founding price', () => {
-    const { s } = elf();
+  it('the blade carries a founding price; the venom is no upgrade at all, but a poison on the list', () => {
+    const { s, uid } = elf();
     expect(core.upgradeStart(ctx(s), 'Dark-Elf-Klinge')?.base).toBe(15);
-    expect(core.upgradeStart(ctx(s), 'Dunkles Gift')?.base).toBe(15);
+    expect(core.isUpgrade(data, 'Dunkles Gift')).toBe(false);
+    expect(core.itemGroup(ctx(s), 'Dunkles Gift')).toBe('Poisons and Drugs');
+    expect(core.isConsumable(ctx(s), 'Dunkles Gift')).toBe(true);
+    expect(core.isConsumable(ctx(s), 'Schwert')).toBe(false);
+    // on the list of the Dark Elf Heroes at 15 gc, not on the Corsairs' or the Shades'
+    const list = core.eqListFor(ctx(s), core.unitDef(ctx(s), 'highborn'))!;
+    expect(list.Besonderes!.find((r) => r[0] === 'Dunkles Gift')).toEqual(['Dunkles Gift', 15, { heroes: true }]);
+    const t = core.setListQty(ctx(s), uid, 'Dunkles Gift', 1);
+    expect(held(t, uid).eq?.['Dunkles Gift']).toBe(1);
+    expect(core.eqCost(ctx(t), held(t, uid))).toBeGreaterThanOrEqual(15);
   });
 
-  it('both can sit on the sword; the venom is used up (taken off) by removing it', () => {
+  it('used up is taking it off the list again, at its price back', () => {
     const { s, uid } = elf();
-    let t = core.addRare(ctx(s), uid, 'Dark-Elf-Klinge');
-    t = core.addRare(ctx(t), uid, 'Dunkles Gift');
-    expect(core.rareCost(held(t, uid))).toBe(30);
-    expect(core.upgradeOnce(ctx(t), 'Dunkles Gift')).toBe(true);
-    expect(core.upgradeOnce(ctx(t), 'Dark-Elf-Klinge')).toBe(false);
-    t = core.removeUpgradeSlot(ctx(t), uid, 'Dunkles Gift', 0);
-    expect(Object.keys(held(t, uid).rare!)).toEqual(['Dark-Elf-Klinge']);
+    const before = core.eqCost(ctx(s), held(s, uid));
+    let t = core.setListQty(ctx(s), uid, 'Dunkles Gift', 1);
+    t = core.setListQty(ctx(t), uid, 'Dunkles Gift', 0);
+    expect(held(t, uid).eq?.['Dunkles Gift']).toBeUndefined();
+    expect(core.eqCost(ctx(t), held(t, uid))).toBe(before);
+  });
+
+  it('the blade goes on the sword at the founding price', () => {
+    const { s, uid } = elf();
+    const t = core.addRare(ctx(s), uid, 'Dark-Elf-Klinge');
+    expect(core.rareCost(held(t, uid))).toBe(15);
   });
 });
 

@@ -75,7 +75,7 @@ function base(wb: string, on: boolean): Base {
   expect(Object.keys(h.eq ?? {}).length, `${wb}: hero equipment`).toBeGreaterThan(1);
   expect(Object.keys(h.rare ?? {}).some((de) => data.UPGRADES[de]), `${wb}: weapon upgrade`).toBe(true);
   if (wb === 'kislev') expect(h.heirloom, 'kislev heirloom').toBeTruthy();
-  if (wb === 'darkelves') expect(h.rare?.['Dunkles Gift'], 'dark venom').toBeTruthy();
+  if (wb === 'darkelves') expect(h.rare?.['Dark-Elf-Klinge'], 'Dark Elf blade').toBeTruthy();
   const cats = Object.keys(h.rare ?? {}).map((de) => data.CATALOG.find((x) => x.de === de)?.cat);
   expect(cats, `${wb}: rare categories`).toEqual(expect.arrayContaining(['cc', 'armour']));
   expect(s.models[1]!.qty).toBe(3);
