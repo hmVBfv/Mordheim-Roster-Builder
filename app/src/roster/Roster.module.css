@@ -216,6 +216,78 @@
   gap: var(--space-1) var(--space-2);
 }
 
+/* on a phone each line is a card: name and price on the left, the buttons on the right, the upgrades under both (#119) */
+@media (max-width: 640px) {
+  .eqTable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .eqTable,
+  .eqTable tbody,
+  .eqTable caption {
+    display: block;
+  }
+
+  .eqTable tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-2);
+    align-items: center;
+    padding: var(--space-1) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eqTable th,
+  .eqTable td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .eqListTable tr {
+    grid-template-areas: 'name act' 'price act';
+  }
+
+  .eqListTable th[scope='row'] {
+    grid-area: name;
+  }
+
+  .eqListTable td:nth-child(2) {
+    grid-area: price;
+  }
+
+  .eqListTable td:nth-child(3) {
+    grid-area: act;
+  }
+
+  .eqCarried tr {
+    grid-template-areas: 'name act' 'price act' 'up up';
+  }
+
+  .eqCarried th[scope='row'] {
+    grid-area: name;
+  }
+
+  .eqCarried td:nth-child(2) {
+    grid-area: price;
+  }
+
+  .eqCarried td:nth-child(3) {
+    grid-area: up;
+  }
+
+  .eqCarried td:nth-child(3):empty {
+    display: none;
+  }
+
+  .eqCarried td:nth-child(4) {
+    grid-area: act;
+  }
+}
+
 .eqAdd {
   display: grid;
   grid-template-columns: 1fr auto;
