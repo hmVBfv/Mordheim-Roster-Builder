@@ -4,7 +4,7 @@ import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
 import { advanceView, HENCH_TABLE, HERO_TABLE, rowFor, takenOf } from './advance.ts';
-import { createWarband } from './view.ts';
+import { createWarband, rosterView } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
 
@@ -110,5 +110,21 @@ describe('a Hired Sword', () => {
     expect(v.skills.length).toBeGreaterThan(0);
     s = core.addHsAdvance(ctx(s), uid, 'S');
     expect(takenOf(ctx(s), uid)!.advances).toEqual([{ stat: 'S', n: 1 }]);
+  });
+});
+
+describe('with the house rule "no racial maximums" (#106)', () => {
+  it('the sheet never says "at his maximum", and the maximum row says there is no limit', () => {
+    const { s, capt } = band();
+    let t = s;
+    for (let i = 0; i < 3; i++) t = core.addAdvance(ctx(t), capt, 'S');
+    expect(advanceView(ctx(t), capt)!.canRaise.S).toBe(false);
+    expect(advanceView(ctx(t), capt)!.maxNote).toMatch(/^Maximum/);
+    expect(rosterView(data, t).heroes.find((h) => h.uid === capt)!.max?.label).not.toBe('no limit');
+    const free = core.setHouseBool(ctx(t), 'noRacialMax', true);
+    const v = advanceView(ctx(free), capt)!;
+    expect(v.canRaise.S).toBe(true);
+    expect(v.maxNote).toBe('House rule: no racial maximums.');
+    expect(rosterView(data, free).heroes.find((h) => h.uid === capt)!.max).toEqual({ label: 'no limit', cells: ['–', '–', '–', '–', '–', '–', '–', '–', '–'] });
   });
 });

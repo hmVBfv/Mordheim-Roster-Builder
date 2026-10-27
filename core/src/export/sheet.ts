@@ -12,7 +12,7 @@ import type { Ctx } from '../rules/context.ts';
 import { dpRatingTotal, hsChosenEq, hsEqParts, hsEquipOn, hsExp, hsRatingTotal } from '../rules/hire.ts';
 import { isHeroModel, totalLarge, totalModels, totalRating } from '../rules/costs.ts';
 import { eqListFor, spellLabel, unitDef } from '../rules/lookup.ts';
-import { aDisp, effProfile, isLeaderModel, maxInfo } from '../rules/profile.ts';
+import { aDisp, effProfile, isLeaderModel, maxInfo, noRacialMax } from '../rules/profile.ts';
 import { svLabel, svOfEntry, svOfModel } from '../rules/saves.ts';
 import { enItem, enRules, eqDisplayParts, houseDeviations, markRulesFor, skillText, skillTextFor } from './rulesText.ts';
 import { leaderRuleText } from '../rules/abilities.ts';
@@ -189,7 +189,7 @@ export async function buildOfficialSheet(ctx: Ctx, PDFLib: PdfLib, template: Uin
       pp.A = aDisp(ctx, m, p);
       stats(pg, f, pp, T + 65, 9, svLabel(svOfModel(ctx, m)));
       const mi = maxInfo(ctx, m);
-      if (mi && mi.prof) stats(pg, f, mi.prof as Record<string, unknown>, T + 75, 6.5);
+      if (mi && mi.prof && !noRacialMax(ctx)) stats(pg, f, mi.prof as Record<string, unknown>, T + 75, 6.5);
       wrap(pg, f, eqDisplayParts(ctx, m).join(', '), 222, T + 16, 170, 5.5, 6.5, 5);
       const inj = (m.inj || []).map((j) => (j.name || j.code) as string);
       inj.forEach((t, n) => { if (n < 6) wrap(pg, f, t, 220, T + 58 + n * 10.5, 28, 5, 5, 2); });
@@ -249,7 +249,7 @@ export async function buildOfficialSheet(ctx: Ctx, PDFLib: PdfLib, template: Uin
       if (p && Object.keys(p).length) pp.A = aDisp(ctx, m, p);
       if (!def?.vehicle) stats(pg, f, pp, T + 51, 9, svLabel(svOfModel(ctx, m)));
       const mi = maxInfo(ctx, m);
-      if (mi && mi.prof && !def?.vehicle) stats(pg, f, mi.prof as Record<string, unknown>, T + 60, 6.5);
+      if (mi && mi.prof && !def?.vehicle && !noRacialMax(ctx)) stats(pg, f, mi.prof as Record<string, unknown>, T + 60, 6.5);
       wrap(pg, f, eqPerModel(m).join(', '), 222, T + 15, 170, 5.5, 6.5, 4);
       const rules = enRules(ctx.data, def?.sp).map((r) => r.split(':')[0]);
       (m.skills || []).forEach((nm) => { const t = skillTextFor(ctx, m, nm); if (t) NOTES.set(nm, t); });

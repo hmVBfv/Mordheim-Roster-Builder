@@ -44,6 +44,7 @@ const RULES: RuleDef[] = [
   { key: 'heroes', group: 'comp', label: 'Most Heroes', kind: 'n', std: '6', start: 5, step: 1, min: 1, max: 12 },
   { key: 'rangedCap', group: 'comp', label: 'Limit models with ranged weapons', kind: 'pct', std: 'no limit', start: 50, step: 5, min: 0, max: 100, unit: '% of the models at most' },
   { key: 'hireNewLeader', group: 'lead', label: 'A new leader may be hired', kind: 'bool', std: 'when the leader dies, the Hero with the highest Leadership takes over; no new leader can be hired' },
+  { key: 'noRacialMax', group: 'lead', label: 'No racial maximums', kind: 'bool', std: 'no one is advanced past the maximum of his race', on: 'a human may exceed Strength 4 and so on; Henchmen still raise each characteristic once' },
   { key: 'allSkills', group: 'lead', label: 'Heroes choose from every skill list', kind: 'bool', std: 'only from the lists of their type', on: 'Combat, Shooting, Academic, Strength and Speed for every Hero' },
   { key: 'priceAll', group: 'cost', label: 'All equipment', kind: 'price', std: '100 %', start: 80 },
   { key: 'priceArmour', group: 'cost', label: 'Armour', kind: 'price', std: '100 %', start: 80 },
