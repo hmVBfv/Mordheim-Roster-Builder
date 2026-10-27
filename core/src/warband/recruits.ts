@@ -74,6 +74,8 @@ export function listProblem(ctx: Ctx, uid: number, key: string, qty: number): st
   const m = findModel(ctx.s, uid);
   if (!m) return 'no such warrior';
   if (warriorHasFought(ctx, m)) return 'after his first battle he trades at the Trading Post';
+  // the free dagger is never given away or sold unless a rule says so outright (#117)
+  if (qty < 1 && key.includes('1. gratis')) return 'the free dagger stays';
   const have = Number(m.eq?.[key]) || 0;
   // one helmet, one shield, one suit: armour of the list is had once (#111)
   if (qty > 1 && isArmourRow(ctx, m, key)) return 'one of each kind of armour';
