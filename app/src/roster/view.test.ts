@@ -63,6 +63,32 @@ describe('roster view', () => {
 });
 
 /* Phase 3a: what the screen needs to change a roster. */
+/* Wish #96 (Rob, 26.10.2026): the racial maximums stand under the profile, in a smaller line. */
+describe('the racial maximum under the profile (#96)', () => {
+  it('a warrior carries the maximums of his race, in the order of the profile; none where none is on file', () => {
+    let named = 0;
+    for (const f of fixtures.filter((_, i) => i % 3 === 0)) {
+      const ctx = core.ctxOf(data, core.normalizeState(core.ctxOf(data, f.state)));
+      for (const w of [...rosterView(data, f.state).heroes, ...rosterView(data, f.state).henchmen]) {
+        const mi = core.maxInfo(ctx, ctx.s.models.find((m) => m.uid === w.uid)!);
+        if (!mi) { expect(w.max).toBeNull(); continue; }
+        named++;
+        expect(w.max).toEqual({ label: mi.label, cells: STATS.map((k) => String(mi.prof[k])) });
+      }
+    }
+    expect(named).toBeGreaterThan(10);
+  });
+
+  it('a Hired Sword carries the maximums of his race', () => {
+    const f = fixtures.find((x) => (x.state.hired ?? []).length > 0)!;
+    const ctx = core.ctxOf(data, core.normalizeState(core.ctxOf(data, f.state)));
+    const hs = rosterView(data, f.state).hires.find((h) => h.kind === 'Hired Sword')!;
+    const rec = (ctx.s.hired ?? []).find((r) => r.uid === hs.uid)!;
+    const mx = core.hsRaceMax(ctx, ctx.data.HIREDSWORDS[rec.key])!;
+    expect(hs.max?.cells).toEqual(STATS.map((k) => String(mx[k])));
+  });
+});
+
 describe('editing a roster', () => {
   const ctx = (s: core.WarbandState) => core.ctxOf(data, s);
   const fresh = () => createWarband(data, 'merc', null, 'The Grey Company');

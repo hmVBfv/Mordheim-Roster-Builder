@@ -12,6 +12,8 @@ export const STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
 export const GROUP_MAX = 5;
 
 export interface StatCell { key: string; value: string; changed: boolean }
+/** The racial maximum of a warrior or hire (#96): its race and one cell for each of the profile's stats, in that order. */
+export interface MaxLine { label: string; cells: string[] }
 
 /** One step of the experience track: below the starting experience, reached,
     the next one, or still open. */
@@ -52,6 +54,8 @@ export interface WarriorView {
   advanceDue: boolean;
   missGames: number;
   stats: StatCell[];
+  /** What each stat may reach, for the small line under the profile; none where no race is on file. */
+  max: MaxLine | null;
   save: string;
   /** His special rules (Leader, Fear, Large Target …); each word on the
       card carries its rule text for the bubble (tips.ts). */
@@ -79,7 +83,7 @@ export interface WarriorView {
 
 export interface HireView {
   key: string; uid: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
-  exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[];
+  exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[]; max: MaxLine | null;
   rules: Fact[]; skills: Fact[]; spells: Fact[];
   lore: SpellLore | null;
 }
@@ -183,6 +187,8 @@ export function fallenView(ctx: core.Ctx): FallenView {
 
 const show = (v: unknown) => (v == null || v === '' ? '–' : String(v));
 
+const maxLine = (label: string, prof: core.Profile): MaxLine => ({ label, cells: STATS.map((k) => show(prof[k])) });
+
 function statCells(p: Profile | null, base: Profile | null | undefined, attacks?: string | number): StatCell[] {
   return STATS.map((k) => {
     const v = k === 'A' && attacks != null ? attacks : p?.[k];
@@ -233,6 +239,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     advanceDue: !!adv?.due,
     missGames: Number(m.miss) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
+    max: ((mi) => (mi ? maxLine(mi.label, mi.prof) : null))(core.maxInfo(ctx, m)),
     save: core.svLabel(core.svOfModel(ctx, m)),
     ...facts,
     retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
@@ -256,6 +263,7 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
     xp: hs && adv ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),
+    max: ((mx) => (mx && e.race ? maxLine(ctx.data.RACELABEL[e.race] || e.race, mx) : null))(core.hsRaceMax(ctx, e)),
     ...facts,
   };
 }
