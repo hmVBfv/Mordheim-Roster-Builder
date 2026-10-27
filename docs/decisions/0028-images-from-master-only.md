@@ -1,5 +1,5 @@
 # 0028 – Images nur von master, alte Branch-Images wöchentlich weg, jeder Branch nur einmal getestet
-Status: angenommen (Rob, 28.10.2026) · Datum: 2026-10-28 · ersetzt Teile von [0009](0009-deploy-by-hand-on-the-pi.md) und [0017](0017-signed-images-from-master.md)
+Status: angenommen (Rob, 28.10.2026) · Datum: 2026-10-28 · ersetzt Teile von [0009](0009-deliberate-deploys.md) und [0017](0017-signed-images-from-master.md)
 
 ## Kontext
 Die CI veröffentlichte nach ADR 0017 für **jeden Push auf jeden Branch** ein signiertes Image
