@@ -1,5 +1,5 @@
 {
-  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Warhammer world, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026 and 22.10.2026) and, for places and groups mordheimer.net leaves out, from the Warhammer Fantasy Wiki on Fandom (read through its API, 22.10.2026) – never copied. Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group. Places nest (parent), factions and groups come from places (regions); ADR 0024.",
+  "//": "World-building catalogue for the Library (not rules data): regions, factions and groups of the Warhammer world, each summarised in our own words from mordheimer.net lore pages (read 21.10.2026 and 22.10.2026) and, for places and groups mordheimer.net leaves out, from the Warhammer Fantasy Wiki on Fandom (read through its API, 22.10.2026 and 26.10.2026) – never copied. Only entries with more than a subordinate clause of lore are listed. Every entry names its source; nothing here is playable. Kinds: region, faction, group. Places nest (parent), factions and groups come from places (regions); ADR 0024.",
   "SOURCES": {
     "flames": { "title": "The Empire in Flames", "url": "https://mordheimer.net/docs/introduction/the-empire-in-flames" },
     "city": { "title": "The City of the Damned", "url": "https://mordheimer.net/docs/introduction/the-city-of-the-damned" },
@@ -159,7 +159,42 @@
     "fd-ice-witch": { "title": "Ice Witch (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Ice_Witch" },
     "fd-skaven": { "title": "Skaven (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Skaven" },
     "fd-fimir": { "title": "Fimir (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Fimir" },
-    "fd-karaz-ankor": { "title": "Karaz Ankor (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Karaz_Ankor" }
+    "fd-karaz-ankor": { "title": "Karaz Ankor (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Karaz_Ankor" },
+    "fd-averheim": { "title": "Averheim (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Averheim" },
+    "fd-boegenhafen": { "title": "Bögenhafen (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/B%C3%B6genhafen" },
+    "fd-mousillon": { "title": "Mousillon (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Mousillon" },
+    "fd-couronne": { "title": "Couronne (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Couronne" },
+    "fd-bordeleaux": { "title": "Bordeleaux (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Bordeleaux" },
+    "fd-lyonesse": { "title": "Lyonesse (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Lyonesse" },
+    "fd-eataine": { "title": "Eataine (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Eataine" },
+    "fd-lothern": { "title": "Lothern (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Lothern" },
+    "fd-caledor": { "title": "Caledor (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Caledor" },
+    "fd-chrace": { "title": "Chrace (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Chrace" },
+    "fd-saphery": { "title": "Saphery (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Saphery" },
+    "fd-avelorn": { "title": "Avelorn (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Avelorn" },
+    "fd-karak-eight-peaks": { "title": "Karak Eight Peaks (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Karak_Eight_Peaks" },
+    "fd-karak-kadrin": { "title": "Karak Kadrin (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Karak_Kadrin" },
+    "fd-zhufbar": { "title": "Zhufbar (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Zhufbar" },
+    "fd-hexoatl": { "title": "Hexoatl (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Hexoatl" },
+    "fd-itza": { "title": "Itza (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Itza" },
+    "fd-castle-drakenhof": { "title": "Castle Drakenhof (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Castle_Drakenhof" },
+    "fd-tobaro": { "title": "Tobaro (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Tobaro" },
+    "fd-campogrotta": { "title": "Campogrotta (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Campogrotta" },
+    "fd-khorne": { "title": "Khorne (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Khorne" },
+    "fd-tzeentch": { "title": "Tzeentch (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Tzeentch" },
+    "fd-nurgle": { "title": "Nurgle (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Nurgle" },
+    "fd-slaanesh": { "title": "Slaanesh (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Slaanesh" },
+    "fd-cult-of-shallya": { "title": "Cult of Shallya (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Shallya" },
+    "fd-cult-of-verena": { "title": "Cult of Verena (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Cult_of_Verena" },
+    "fd-clan-skryre": { "title": "Clan Skryre (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Clan_Skryre" },
+    "fd-council-of-thirteen": { "title": "Council of Thirteen (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Council_of_Thirteen" },
+    "fd-swordmasters-of-hoeth": { "title": "Swordmasters of Hoeth (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Swordmasters_of_Hoeth" },
+    "fd-white-lions": { "title": "White Lions (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/White_Lions" },
+    "fd-phoenix-guard": { "title": "Phoenix Guard (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Phoenix_Guard" },
+    "fd-lothern-sea-guard": { "title": "Lothern Sea Guard (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Lothern_Sea_Guard" },
+    "fd-knights-white-wolf": { "title": "Knights of the White Wolf (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Knights_of_the_White_Wolf" },
+    "fd-teutogen-guard": { "title": "Teutogen Guard (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Teutogen_Guard" },
+    "fd-order-fiery-heart": { "title": "Order of the Fiery Heart (Warhammer Fantasy Wiki, Fandom)", "url": "https://warhammerfantasy.fandom.com/wiki/Order_of_the_Fiery_Heart" }
   },
   "LORE": [
     {
@@ -1146,6 +1181,181 @@
       "id": "greenskin-tribes-of-the-badlands", "kind": "group", "name": "Greenskin Tribes of the Badlands", "de": "Grünhäute der Ödlande", "source": ["fd-badlands"], "regions": ["badlands"],
       "status": "Orc and goblin tribes warring in the southern waste",
       "text": "Countless orc and goblin tribes live in the Badlands, so many that, it is said, they could invade the Old World time and again if they ever stopped fighting each other. It is the greatest gathering of greenskins outside the Dark Lands. Ogre tribes hold the south of the region."
+    },
+    {
+      "id": "averheim", "kind": "region", "name": "Averheim", "de": "Averheim", "source": ["fd-averheim"], "parent": "averland",
+      "status": "Capital of Averland on a bluff above the Aver",
+      "text": "The capital of Averland and the old seat of the Brigundian tribe, on a bluff above the River Aver that keeps it clear of the floods. The Elector Count's fortress, the Averburg, is said to go back to the first count Sigmar named. The city is also known for its stockyards, where the great cattle drives of summer end and the streets fill with cattle and the herders who have come to spend their pay."
+    },
+    {
+      "id": "boegenhafen", "kind": "region", "name": "Bögenhafen", "de": "Bögenhafen", "source": ["fd-boegenhafen"], "parent": "reikland",
+      "status": "Wealthy market town of the Reikland on the River Bögen",
+      "text": "A rich market town of some five thousand souls in the Reikland, on the highest reach of the Bögen that big sailing ships can still use, halfway along the Axe Bite trade road. Goods from Altdorf, Marienburg and Nuln are swapped here for local wool and wine, and lead and silver come down from the mountains for shipping. Merchants have always run it: a handful of guild families long held the town council and bent its trade to their own advantage."
+    },
+    {
+      "id": "mousillon", "kind": "region", "name": "Mousillon", "de": "Mousillon", "source": ["fd-mousillon"], "parent": "bretonnia",
+      "status": "The cursed, fallen dukedom on Bretonnia's west coast",
+      "text": "Once the fairest of Bretonnia's twelve dukedoms, now a cursed backwater of marsh, bog and swamp, and the smallest of them. After its last recognised duke died it lost its standing and no one wishes to rule it. The villages are rotting and poor, the people inbred and mutated, and they watch strangers in silence from behind their doors. Disease, dark powers and bad luck cling to the land, and the great city Mousillon is a place of feuding houses."
+    },
+    {
+      "id": "couronne", "kind": "region", "name": "Couronne", "de": "Couronne", "source": ["fd-couronne"], "parent": "bretonnia",
+      "status": "Bretonnian dukedom on the northern coast, seat of the royal court",
+      "text": "A founding dukedom of Bretonnia on its northern shore, and the kingdom's capital: the royal court sits in Castle Couronne. Its people are horse-mad, and a Couronnian knight is held to be among the best cavalrymen in the known world. Almost everyone has ridden since childhood, so horse breeding and racing matter in its politics, and rivals feud by sabotaging each other's mounts."
+    },
+    {
+      "id": "bordeleaux", "kind": "region", "name": "Bordeleaux", "de": "Bordeleaux", "source": ["fd-bordeleaux"], "parent": "bretonnia",
+      "status": "Wine-growing Bretonnian dukedom on the west coast, south of Mousillon",
+      "text": "A founding dukedom on Bretonnia's west coast, just south of cursed Mousillon, and the biggest exporter of wine in the kingdom; even peasants drink it at a third of what it fetches elsewhere. Its cliffs are high and its harbours many, so it competes with L'Anguille for the sea trade to Marienburg, Erengrad, Barak Varr and the Tilean cities. Beastmen raid the villages in the Forest of Châlons now and then."
+    },
+    {
+      "id": "lyonesse", "kind": "region", "name": "Lyonesse", "de": "Lyonesse", "source": ["fd-lyonesse"], "parent": "bretonnia",
+      "status": "Large Bretonnian dukedom of quarrelling fortress-lords",
+      "text": "One of the larger dukedoms of Bretonnia, on its north-western shore, grown by taking over Mousillon long ago. Lyonesse is famous for feuds among its own nobles rather than with other dukedoms: the land offers so many strong sites for castles that a Lyonen lord is hard to beat for good, so quarrels last for decades. Without an outside threat to unite them, its lords stay divided."
+    },
+    {
+      "id": "eataine", "kind": "region", "name": "Eataine", "de": "Eataine", "source": ["fd-eataine"], "parent": "ulthuan",
+      "status": "First of the ten High Elf kingdoms, around the city of Lothern",
+      "text": "The hinterland of the great city-state of Lothern and the foremost of Ulthuan's ten kingdoms, home to the Phoenix King's court. Eataine honours the Phoenix, Asuryan's messenger, and its noble houses wear reds, oranges and crimson. Vineyards, villas and summer estates dot the land, and its soldiers, skilled with bow or spear and finely equipped, are many; its colonists sail to every corner of the known world."
+    },
+    {
+      "id": "lothern", "kind": "region", "name": "Lothern", "de": "Lothern", "source": ["fd-lothern"], "parent": "eataine",
+      "status": "Greatest city of Ulthuan, open to foreign traders",
+      "text": "The largest city of Ulthuan, capital of Eataine and the traditional seat of the Phoenix King. It is a wonder of the world and a hub of trade, where human merchants are admitted and the Elves mingle with other peoples. A fortress city with mighty walls, it is guarded by ten thousand Lothern Sea Guard, and the fleets that carry the armies of Ulthuan overseas sail from its harbour."
+    },
+    {
+      "id": "caledor", "kind": "region", "name": "Caledor", "de": "Caledor", "source": ["fd-caledor"], "parent": "ulthuan",
+      "status": "Mountain kingdom of Ulthuan, home of the dragons",
+      "text": "A thinly peopled, mountainous kingdom of Ulthuan beneath the Dragonspine peaks, where the dragons dwell. Caledor Dragontamer bound them with truesteel harnesses forged in the volcano Vaul's Anvil, and his heirs, the Dragon Princes, were mages and warriors without equal. As the peaks cooled the dragons drifted into slumber and Caledor's power faded, yet its princes still ride out as formidable cavalry."
+    },
+    {
+      "id": "chrace", "kind": "region", "name": "Chrace", "de": "Chrace", "source": ["fd-chrace"], "parent": "ulthuan",
+      "status": "High Elf kingdom at war with the Dark Elves",
+      "text": "Once a quiet land for Elves who wished to return to nature, Chrace is now in permanent war, for it is the main road by which the Dark Elves try to reach the inner lands of Ulthuan. Its settlements are fortified and dark magic has twisted its forests. Hunters and scouts watch the passes and ambush intruders; to be counted a true hunter a Chracian must slay a white lion alone or tame one."
+    },
+    {
+      "id": "saphery", "kind": "region", "name": "Saphery", "de": "Saphery", "source": ["fd-saphery"], "parent": "ulthuan",
+      "status": "Enchanted kingdom of Elven mages",
+      "text": "An enchanted inner kingdom of Ulthuan, south-east of the Sea of Dreams, with rainbow skies, hills that move at night and glowing rivers. Magic runs in the blood of the Sapherian Elves and all its princes are mages, living apart in mansions that mirror their studies: one drifts across the sky, another is a garden of strange plants. They are thought odd even by other High Elves, but the Phoenix Kings prize their independent minds."
+    },
+    {
+      "id": "avelorn", "kind": "region", "name": "Avelorn", "de": "Avelorn", "source": ["fd-avelorn"], "parent": "ulthuan",
+      "status": "Ancient forest kingdom, ruled by the Everqueen",
+      "text": "The oldest of the ten kingdoms of Ulthuan, an enchanted forest where legendary creatures still walk. It is ruled by the Everqueen, chosen of the Earth Mother Isha, who holds one of the Twin Thrones beside the Phoenix King; the two thrones often rival each other, which the High Elves see as the right balance. Rangers guard its borders against monsters from the Annulii Mountains, and the Everqueen's court moves through the woods like a carnival."
+    },
+    {
+      "id": "karak-eight-peaks", "kind": "region", "name": "Karak Eight Peaks", "de": "Karak Acht-Gipfel", "source": ["fd-karak-eight-peaks"], "parent": "worlds-edge-mountains",
+      "status": "Dwarf hold once rivalling Karaz-a-Karak, now held by Skaven",
+      "text": "Once the Dwarf hold Vala-Azril-Ungol, 'Queen of the Silver Depths', it rivalled Karaz-a-Karak in power, wealth and beauty. It lies in a bowl ringed by eight named peaks, with a citadel in the valley and the greater part of the city carved far below in mines and tunnels. It has since fallen, and the Skaven who rule it call it the City of Pillars."
+    },
+    {
+      "id": "karak-kadrin", "kind": "region", "name": "Karak Kadrin", "de": "Karak Kadrin", "source": ["fd-karak-kadrin"], "parent": "worlds-edge-mountains",
+      "status": "The Slayer Keep guarding Peak Pass",
+      "text": "The Dwarf hold that guards Peak Pass, the trade route through the Worlds Edge Mountains from the east to the Old World. It has grown rich on tolls from the caravans it protects, and though besieged countless times it has never fallen. It is home to many Dwarf Slayers, which earns it the name Slayer Keep, and a centre for the worship of Grimnir; its kings follow the tradition of taking the Slayer Oath."
+    },
+    {
+      "id": "zhufbar", "kind": "region", "name": "Zhufbar", "de": "Zhufbar", "source": ["fd-zhufbar"], "parent": "worlds-edge-mountains",
+      "status": "Dwarf hold built into a waterfall, the forge of the Karaz Ankor",
+      "text": "A Dwarf hold of 'Torrent-gate', twin of Karak Varn, built into a chasm cut by a roaring waterfall. It is the most mechanised of the holds: water wheels, bellows and drop hammers never stop and the gorge glows at night with furnaces. Gromril from the mines is forged here into the weapons and armour that make the Dwarfs famous, and it holds the chief shrine of the Engineers' Guild. Greenskins press from outside and Skaven from below."
+    },
+    {
+      "id": "hexoatl", "kind": "region", "name": "Hexoatl", "de": "Hexoatl", "source": ["fd-hexoatl"], "parent": "lustria",
+      "status": "Northernmost Lizardman temple-city, Lustria's gate against invaders",
+      "text": "The 'City of the Sun', the northernmost temple-city of the Lizardmen, on the Isthmus of Pahuax and Lustria's first line of defence. High walls and towers ring it, Saurus and Temple Guard march its avenues, and Skink patrols with Stegadons sweep the land for hundreds of miles. A sentient mountain range raised north of it by Mazdamundi blocks the Dark Elf armies. Only the settlement of Skeggi survives of the outsiders' colonies."
+    },
+    {
+      "id": "itza", "kind": "region", "name": "Itza", "de": "Itza", "source": ["fd-itza"], "parent": "lustria",
+      "status": "The First City of the Lizardmen and seat of Lord Kroak",
+      "text": "Called the First City, Itza is the greatest surviving temple-city of the Lizardmen and home to the oldest and most powerful magic users anywhere, foremost the Slann Lord Kroak. It was the first temple-city the Old Ones raised, and its Great Pyramid of Itzl is where Kroak cast his final banishing spell against the Daemons of the first Chaos incursion. Though hard pressed many times, it has never yielded."
+    },
+    {
+      "id": "castle-drakenhof", "kind": "region", "name": "Castle Drakenhof", "de": "Schloss Drakenhof", "source": ["fd-castle-drakenhof"], "parent": "sylvania",
+      "status": "Former capital of Sylvania and seat of its vampire counts",
+      "text": "The seat of the rulers of Sylvania, alive and undead, and the old capital under its last Imperial count, Otto von Drak. Vlad von Carstein began his reign of terror here. It stands on the Drakenfelsen cliff, once a dragon's lair, with four towers, a huge keep and crypts, dungeons and torture chambers beneath. Its library of occult lore is said to hold the works of every great sorcerer; no one who went looking has returned."
+    },
+    {
+      "id": "tobaro", "kind": "region", "name": "Tobaro", "de": "Tobaro", "source": ["fd-tobaro"], "parent": "tilea",
+      "status": "Isolated Tilean city of sirens, pilots and navigators",
+      "text": "The only great Tilean city-state on the west shore of the Tilean Sea, called the City of Sirens or of Fools. The Abasko Mountains cut it off by land and the Fool's Rocks make approach by sea perilous, so only Tobaran pilots can bring ships to harbour, for a fee. Bird-like sirens lure sailors to the rocks, and the city keeps aloof from the quarrels of the other Tilean states."
+    },
+    {
+      "id": "campogrotta", "kind": "region", "name": "Campogrotta", "de": "Campogrotta", "source": ["fd-campogrotta"], "parent": "miragliano",
+      "status": "Tilean town at the Alimento Tunnel, with a Dwarf community",
+      "text": "A Tilean town in the principality of Miragliano by the entrance of the Alimento Tunnel, a cavern and river system under the mountains that feeds both the Söll in the Empire and the Cristallo in Tilea. Traders travel over a hundred and fifty miles by boat beneath the mountains, which lets them bypass the Marienburg and Nuln merchant houses. A Dwarf community lives in the town, and bandits have preyed on the route."
+    },
+    {
+      "id": "khorne", "kind": "faction", "name": "Khorne", "de": "Khorne", "source": ["fd-khorne"], "regions": ["the-chaos-wastes"],
+      "status": "The Blood God of war, rage and murder",
+      "text": "The Chaos God of war, hatred, rage, murder and martial honour, called the Blood God and Lord of Skulls. Every killing feeds him, the more senseless and bloody the better, and he is the most violent and least subtle of the four great Powers. He demands blood, not caring whose, and goads his followers into endless frenzy; in the Chaos Wastes his bellows are said to drive men mad."
+    },
+    {
+      "id": "tzeentch", "kind": "faction", "name": "Tzeentch", "de": "Tzeentch", "source": ["fd-tzeentch"], "regions": ["the-chaos-wastes"],
+      "status": "The Changer of Ways, god of sorcery, scheming and mutation",
+      "text": "The Chaos God of change, ambition, intrigue, destiny, trickery, sorcery and mutation, known under countless names, among them the Great Conspirator and the Raven God. He is the great schemer, fickle and not to be trusted, and embodies every mortal's wish to learn, grow and gain more. His followers seek the secrets of fate and magical power, and his gift of mutation is as likely a curse."
+    },
+    {
+      "id": "nurgle", "kind": "faction", "name": "Nurgle", "de": "Nurgle", "source": ["fd-nurgle"], "regions": ["the-chaos-wastes"],
+      "status": "The Plague Lord of disease, decay and rebirth",
+      "text": "The Chaos God of disease, decay, despair and death, but also of rebirth and endurance, called Grandfather Nurgle and the Plague Lord. He is the eldest of the four and the one closest to mortals, born of their fear of death and ageing. Those who spread plague and corruption follow him, and so do those who simply wish to survive, since decay is only one half of the cycle of life."
+    },
+    {
+      "id": "slaanesh", "kind": "faction", "name": "Slaanesh", "de": "Slaanesh", "source": ["fd-slaanesh"], "regions": ["the-chaos-wastes"],
+      "status": "The Dark Prince of pleasure, excess and obsession",
+      "text": "The youngest and weakest of the four great Chaos Powers, god of pleasure, passion, obsession, excess and pain, called the Dark Prince. He is born of mortal desire and inspiration, the muse who fulfils dreams, but also of frustration and agony. He urges mortals toward ever greater sensation with no care for morality, from gluttony and lust to vanity, and corrupts the decadent."
+    },
+    {
+      "id": "cult-of-shallya", "kind": "group", "name": "Cult of Shallya", "de": "Kult der Shallya", "source": ["fd-cult-of-shallya"], "regions": ["the-empire"],
+      "status": "Beloved cult of mercy and healing across the Old World",
+      "text": "The cult of the goddess of healing, mercy and childbirth, probably the most loved and respected of the Old World's religions: almost everyone is tended by her priestesses sooner or later. It stays out of politics, which makes it a favourite of charity, and its simple temples, from village to great city, spend the gifts on the relief of pain. Shallya is said to be the daughter of Verena and Morr, always weeping for the suffering of living things."
+    },
+    {
+      "id": "cult-of-verena", "kind": "group", "name": "Cult of Verena", "de": "Kult der Verena", "source": ["fd-cult-of-verena"], "regions": ["the-empire"],
+      "status": "Cult of knowledge, law and justice",
+      "text": "The cult of Verena, goddess of knowledge and justice, whose philosophy of the rule of law, in the view of its priests, keeps the Empire from sliding into tyranny while the warrior gods look to war. Some myths make her Morr's bride: he judges the dead, she judges the living. She is thought a stern, serious goddess and the mother of Shallya."
+    },
+    {
+      "id": "clan-skryre", "kind": "group", "name": "Clan Skryre", "de": "Clan Skryre", "source": ["fd-clan-skryre"], "regions": ["skavenblight"],
+      "status": "Skaven clan of warlock-engineers and warpstone weapons",
+      "text": "One of the four Skaven Great Clans, whose Warlock-Engineers fuse sorcery with warpstone science and engineering to build the Under-Empire's most monstrous weapons: the Poisoned Wind, the Warpfire-Thrower and the Warplock Jezzail. Their forges lie beneath Skavenblight. They sell arms to other clans who can pay, and many hold the clan to be the most powerful of all, thanks to its arsenal."
+    },
+    {
+      "id": "council-of-thirteen", "kind": "faction", "name": "Council of Thirteen", "de": "Rat der Dreizehn", "source": ["fd-council-of-thirteen"], "regions": ["skavenblight"],
+      "status": "The twelve Lords of Decay and the Horned Rat who rule the Skaven",
+      "text": "The body that rules the Skaven Under-Empire: twelve of the most powerful clan lords, called the Lords of Decay, and the Horned Rat himself as the symbolic thirteenth member. The seats have a descending order of precedence, the first and twelfth being the Horned Rat's right and left hand, A daemonic mirror of it, the Shadow Council, meets in the Horned Rat's realm."
+    },
+    {
+      "id": "swordmasters-of-hoeth", "kind": "group", "name": "Swordmasters of Hoeth", "de": "Schwertmeister von Hoeth", "source": ["fd-swordmasters-of-hoeth"], "regions": ["ulthuan"],
+      "status": "High Elf warrior-scholars trained at the White Tower",
+      "text": "High Elf swordsmen trained at the White Tower of Hoeth, masters of the Elven martial arts: each has studied war and personal combat for decades or centuries and has a style of his own. They were first loosed on the Cults of Excess when the Phoenix King Aethis asked the sages of the White Tower for help in a long secret struggle in Ulthuan's cities."
+    },
+    {
+      "id": "white-lions-of-chrace", "kind": "group", "name": "White Lions of Chrace", "de": "Weiße Löwen von Chrace", "source": ["fd-white-lions"], "regions": ["chrace"],
+      "status": "Honour guard of the Phoenix King, hunters from Chrace",
+      "text": "The honour guard of the Phoenix King since the time of Caledor I, drawn from the hunters of Chrace and clad in white lion pelts. They earned the post when Chracian woodsmen saved Caledor from Dark Elf assassins on his way to be crowned. They also guard lords and diplomats of the Asur, so one may be met even near the shores of the Old World."
+    },
+    {
+      "id": "phoenix-guard", "kind": "group", "name": "Phoenix Guard", "de": "Phönixgarde", "source": ["fd-phoenix-guard"], "regions": ["ulthuan"],
+      "status": "Silent warriors who guard the Shrine of Asuryan",
+      "text": "The warriors who guard the Shrine of Asuryan, a great pyramid-temple in Ulthuan's Sea of Dreams. Those who see the 'Chamber of Days', where the histories of past and future are written in fire, take a vow of silence and speak only with hand signs. Each sworn to the Creator God is shielded by his power, stands beyond the rule of any noble, and obeys only the Phoenix King."
+    },
+    {
+      "id": "lothern-sea-guard", "kind": "group", "name": "Lothern Sea Guard", "de": "Seewache von Lothern", "source": ["fd-lothern-sea-guard"], "regions": ["lothern", "eataine"],
+      "status": "Citizen-militia of Lothern, fighting on land and sea",
+      "text": "The citizen-militia of Eataine, as effective on land as at sea, skilled with spear, shield and bow. Ten thousand of them guard the walls of Lothern, and when Ulthuan's armies go to war they crew the Asur warships and form the vanguard, securing the beachheads before the rest come ashore. It is a point of pride in Lothern that their discipline is unmatched anywhere in Ulthuan."
+    },
+    {
+      "id": "knights-of-the-white-wolf", "kind": "group", "name": "Knights of the White Wolf", "de": "Ritter des Weißen Wolfs", "source": ["fd-knights-white-wolf"], "regions": ["middenheim", "middenland"],
+      "status": "Oldest and largest templar order, servants of Ulric",
+      "text": "The best known of the Empire's knightly orders and the oldest and largest, serving the Ar-Ulric and the cult of Ulric. They wear wolf pelts and fight with savage zeal, though they are highly disciplined. Founded in Middenheim after a victory over Chaos in the first years of Sigmar's reign, they have their base there."
+    },
+    {
+      "id": "teutogen-guard", "kind": "group", "name": "Teutogen Guard", "de": "Teutogenen-Garde", "source": ["fd-teutogen-guard"], "regions": ["middenheim"],
+      "status": "Elite foot guard of the Ar-Ulric",
+      "text": "The personal honour guard of the Ar-Ulric, the high priest of Ulric, at state occasions and in battle, named after the Teutogen tribe that helped Sigmar drive out the greenskins. Unlike the state troops' Greatswords they are picked from the Knights of the White Wolf and fight on foot, but still carry the order's warhammers. Selection goes by merit alone, and a tour with the guard is one of the highest honours a White Wolf can win."
+    },
+    {
+      "id": "order-of-the-fiery-heart", "kind": "group", "name": "Order of the Fiery Heart", "de": "Orden vom Feurigen Herzen", "source": ["fd-order-fiery-heart"], "regions": ["altdorf"],
+      "status": "Knightly order of Sigmar and bodyguard of the Grand Theogonist",
+      "text": "A lesser knightly order in the service of the cult of Sigmar, acting as the personal bodyguard of the Grand Theogonist and rivalling the Knights Griffon for influence in the High Temple. It goes back to 1360 IC, when Talabecland outlawed the cult of Sigmar, and has guarded Sigmarite temples and priests ever since. Its knights pursue a fanatical crusade against orcs and goblins and are said to obsess over a lost sword, Karaghul."
     }
   ]
 }
