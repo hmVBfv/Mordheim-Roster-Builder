@@ -15,6 +15,7 @@ import { ProfileEditor, TemplatePicker, statline } from '../opponents/ProfileToo
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { MAX_NAME, putGroup, removeItem, staleItem, type GroupBody, type LibraryGroup, type LibraryItem } from './api.ts';
+import { FolderField, FolderLists } from './folders.tsx';
 import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import styles from './Library.module.css';
 import { groupsOf, useLibrary } from './useLibrary.ts';
@@ -25,6 +26,7 @@ function GroupForm({ group, items, online, close, onSaved, onRemoved }: {
   const ids = useId();
   const [name, setName] = useState(group?.name ?? '');
   const [note, setNote] = useState(group?.body.note ?? '');
+  const [folder, setFolder] = useState(group?.body.folder ?? '');
   const [links, setLinks] = useState<string[]>(group?.body.links ?? []);
   const [profiles, setProfiles] = useState<OpponentProfile[]>(group?.body.profiles ?? []);
   const [fresh, setFresh] = useState<string | null>(null);
@@ -42,7 +44,7 @@ function GroupForm({ group, items, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putGroup(id, name.trim(), { note, profiles, links: keepLinks(items, links) }, base);
+      const saved = await putGroup(id, name.trim(), { note, profiles, links: keepLinks(items, links), folder: folder.trim() }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<GroupBody>(e);
@@ -89,6 +91,7 @@ function GroupForm({ group, items, online, close, onSaved, onRemoved }: {
           <button type="button" className={ui.buttonQuiet} disabled={full} onClick={() => add(core.profileFrom(newId(), null))}>Write your own</button>
         </div>
       )}
+      <FolderField items={items} value={folder} onChange={setFolder} />
       <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. In a campaign a leader sets the group against the warbands from here, as a copy.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
@@ -128,8 +131,7 @@ export function GroupsTab({ notify }: { notify: (t: string) => void }) {
       {!items && !error && <p className={ui.muted}>Loading the groups…</p>}
       {items && groups.length === 0 && <p className={ui.muted}>No groups yet. Write the first one down.</p>}
       {groups.length > 0 && (
-        <ul className={styles.list} aria-label="Groups">
-          {groups.map((g) => (
+        <FolderLists label="Groups" entries={groups} render={(g) => (
             <li key={g.id} className={styles.idea}>
               <div className={styles.head}><strong>{g.name}</strong></div>
               {g.body.note && <p className={styles.excerpt}>{g.body.note}</p>}
@@ -146,8 +148,7 @@ export function GroupsTab({ notify }: { notify: (t: string) => void }) {
               <small className={styles.meta}>Changed <time dateTime={g.updatedAt}>{stamp(g.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${g.name}`} onClick={() => edit(g)}>Edit</button></div>
             </li>
-          ))}
-        </ul>
+          )} />
       )}
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New group</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="group-form-title">

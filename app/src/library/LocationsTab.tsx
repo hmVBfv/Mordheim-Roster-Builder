@@ -11,6 +11,7 @@ import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
 import { MAX_IDEA, MAX_NAME, putLocation, removeItem, staleItem, type LibraryItem, type LibraryLocation, type LocationBody } from './api.ts';
 import styles from './Library.module.css';
+import { FolderField, FolderLists } from './folders.tsx';
 import { LinkChips, LinksField, keepLinks } from './links.tsx';
 import { locationsOf, useLibrary } from './useLibrary.ts';
 
@@ -24,6 +25,7 @@ function LocationForm({ place, items, online, close, onSaved, onRemoved }: {
   const [de, setDe] = useState(place?.body.de ?? '');
   const [type, setType] = useState(place?.body.type ?? '');
   const [lore, setLore] = useState(place?.body.lore ?? '');
+  const [folder, setFolder] = useState(place?.body.folder ?? '');
   const [links, setLinks] = useState<string[]>(place?.body.links ?? []);
   const [base, setBase] = useState<number | undefined>(place?.seq);
   const [asking, setAsking] = useState(false);
@@ -35,7 +37,7 @@ function LocationForm({ place, items, online, close, onSaved, onRemoved }: {
     setBusy(true);
     setError(null);
     try {
-      const saved = await putLocation(id, name.trim(), { de: de.trim(), type: type.trim(), lore, links: keepLinks(items, links) }, base);
+      const saved = await putLocation(id, name.trim(), { de: de.trim(), type: type.trim(), lore, links: keepLinks(items, links), folder: folder.trim() }, base);
       close(() => onSaved(saved));
     } catch (e) {
       const cur = staleItem<LocationBody>(e);
@@ -79,6 +81,7 @@ function LocationForm({ place, items, online, close, onSaved, onRemoved }: {
         <span>The lore</span>
         <textarea className={ui.textarea} rows={8} value={lore} maxLength={MAX_IDEA} onChange={(e) => setLore(e.target.value)} />
       </label>
+      <FolderField items={items} value={folder} onChange={setFolder} />
       <LinksField items={items} selfId={id} links={links} onChange={setLinks} />
       <p className={ui.muted}>Only you see the Library. Places stay here for now: a campaign’s own place is chosen when it starts.</p>
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
@@ -118,8 +121,7 @@ export function LocationsTab({ notify }: { notify: (t: string) => void }) {
       {!items && !error && <p className={ui.muted}>Loading the places…</p>}
       {items && places.length === 0 && <p className={ui.muted}>No places yet. Write the first one down.</p>}
       {places.length > 0 && (
-        <ul className={styles.list} aria-label="Places">
-          {places.map((p) => (
+        <FolderLists label="Places" entries={places} render={(p) => (
             <li key={p.id} className={styles.idea}>
               <div className={styles.head}>
                 <strong>{p.name}</strong>
@@ -131,8 +133,7 @@ export function LocationsTab({ notify }: { notify: (t: string) => void }) {
               <small className={styles.meta}>Changed <time dateTime={p.updatedAt}>{stamp(p.updatedAt)}</time></small>
               <div className={ui.row}><button type="button" className={ui.buttonQuiet} aria-label={`Edit ${p.name}`} onClick={() => edit(p)}>Edit</button></div>
             </li>
-          ))}
-        </ul>
+          )} />
       )}
       <div className={ui.row}><button type="button" className={ui.button} onClick={() => edit(null)}>New place</button></div>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="location-form-title">
