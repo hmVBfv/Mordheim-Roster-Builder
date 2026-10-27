@@ -4332,3 +4332,22 @@ options contained "Name", and six e2e tests that look the form's name field up b
 carries with a line for each piece, so an upgrade is put on the piece it belongs to from a choice on that line. Rob: the same
 items are never merged ("2× dagger"), and the free dagger never takes an upgrade. The core functions of the earlier weapon
 upgrades (`also`) carry it; the old ones are untouched, so the parity tests needed no new exception. Pull request 242.
+
+## October 28, 2026 — tables on a phone (#119), the free dagger (#117), Dark venom as a poison (#118), a Spellcasters filter (#120)
+
+#119: the equipment sheet's tables (from #115) kept their columns on a phone: names broke to one word a line. Below 640 px every
+line is a card, the name and price on the left, the stepper or the buttons on the right, the upgrades of a carried piece under
+both. The first guess at which "table" the report meant was this one (the report named no screen but the warband page); if it was
+another, it is still open. Pull request 244.
+
+#117: the free dagger can never be given away or sold, unless a rule says so outright (Rob). The trade code already kept it; the
+list's stepper could still set it to nothing and "Carried" offered a minus. Fixed in `listProblem` and the sheet; `setEqQty` and
+legacy are untouched. Pull request 245, stacked on 244.
+
+#118: Dark venom is a poison of the price chart's "Poisons and Drugs", not a weapon upgrade – Rob chose that after I had built it
+as an upgrade for #112, so that half of #112 was a wrong turn: the venom is gone from `UPGRADES` and has its 15 gc row on the Dark
+Elf Heroes' list. The six poisons and drugs carry a `group`; the sheet says "Used", the Trading Post "Used up" (a sale for no
+gold, from a warrior or the stash). Pull request 246, stacked on 245.
+
+#120: "Spellcasters only" on the Hire lists (`hireIsCaster`: a spell list of his own, or Wizard, Prayers or Funerary Rites in his
+rules). Pull request 247.
