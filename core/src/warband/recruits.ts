@@ -19,7 +19,7 @@
 import type { Model, WarbandState } from '../state/types.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { mutKindFor, startOnlyRow, warbandHasFought } from '../rules/equipment.ts';
-import { unitDef } from '../rules/lookup.ts';
+import { eqListFor, unitDef } from '../rules/lookup.ts';
 import { tradeKind } from '../trade/market.ts';
 import { addUnit, setEqQty } from './roster.ts';
 import { findModel, update } from './update.ts';
@@ -62,12 +62,21 @@ export function recruitUnit(ctx: Ctx, id: string): WarbandState {
   });
 }
 
+/** Is `key` a row of the armour group of this warrior's list? */
+function isArmourRow(ctx: Ctx, m: Model, key: string): boolean {
+  const def = unitDef(ctx, m.uid_def);
+  const list = def && def.eq ? eqListFor(ctx, def) : undefined;
+  return !!list?.['Rüstung']?.some((row) => row[0] === key);
+}
+
 /** Why the list may not set `key` to `qty` for this warrior now, or ''. */
 export function listProblem(ctx: Ctx, uid: number, key: string, qty: number): string {
   const m = findModel(ctx.s, uid);
   if (!m) return 'no such warrior';
   if (warriorHasFought(ctx, m)) return 'after his first battle he trades at the Trading Post';
   const have = Number(m.eq?.[key]) || 0;
+  // one helmet, one shield, one suit: armour of the list is had once (#111)
+  if (qty > 1 && isArmourRow(ctx, m, key)) return 'one of each kind of armour';
   // a row of his list that is priced for the founding (the Knights Vanguard's Warhorse) is his to buy at that price until his first battle
   if (qty > have && isNewRecruit(ctx, m) && tradeKind(ctx, key).kind === 'rare' && !startOnlyRow(ctx, unitDef(ctx, m.uid_def), key)) return 'rare: only through a search at the Trading Post';
   return '';

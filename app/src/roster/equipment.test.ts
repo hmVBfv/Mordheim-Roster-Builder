@@ -162,3 +162,17 @@ describe('an edit after the first battle', () => {
     expect(applyEdit(data, s, (c) => c.s)).toBe(s);
   });
 });
+
+describe('armour is had once (#111)', () => {
+  it('the list stops at one helmet, and a rare armour held is neither offered again nor steppable past one', () => {
+    const { s, capt } = band(0);
+    const one = core.setListQty(ctx(s), capt, 'Helm', 1);
+    const row = equipmentView(ctx(one), capt)!.groups.flatMap((g) => g.rows).find((r) => r.key === 'Helm')!;
+    expect(row.qty).toBe(1);
+    expect(row.more).toBe('one of each kind of armour');
+    const rare = core.addRare(ctx(one), capt, 'Gromril-Rüstung');
+    const v = equipmentView(ctx(rare), capt)!;
+    expect(v.rare.find((r) => r.de === 'Gromril-Rüstung')!.max).toBe(1);
+    expect(v.offer.some((o) => o.de === 'Gromril-Rüstung')).toBe(false);
+  });
+});

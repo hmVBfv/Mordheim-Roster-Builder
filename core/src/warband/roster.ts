@@ -140,6 +140,9 @@ export function setEqQty(ctx: Ctx, uid: number, nm: string, qty: unknown): Warba
   });
 }
 
+/** Armour of the catalogue is had once (#111). */
+export const isArmourItem = (ctx: Ctx, de: string): boolean => ctx.data.CATALOG.find((x) => x.de === de)?.cat === 'armour';
+
 /** Adds a rare / trading-post item; a second one of the same kind raises the
     quantity (upgrades exist once and sit on a weapon). */
 export function addRare(ctx: Ctx, uid: number, de: string): WarbandState {
@@ -149,7 +152,7 @@ export function addRare(ctx: Ctx, uid: number, de: string): WarbandState {
     if (!m) return;
     m.rare = m.rare || {};
     const have = m.rare[de];
-    if (have && !isUpgrade(c.data, de)) { have.q = (Number(have.q) || 1) + 1; return; }
+    if (have && !isUpgrade(c.data, de)) { if (!isArmourItem(c, de)) have.q = (Number(have.q) || 1) + 1; return; }
     if (have) return;
     const it = c.data.CATALOG.find((x) => x.de === de);
     const o: { q: number; paid: number; on?: string | null } = { q: 1, paid: catalogDefaultPaid(c, it) };
@@ -175,10 +178,10 @@ export function setRareTarget(ctx: Ctx, uid: number, de: string, nm: string): Wa
 }
 
 export function setRareQty(ctx: Ctx, uid: number, de: string, qty: unknown): WarbandState {
-  return update(ctx, (d) => {
+  return update(ctx, (d, c) => {
     const m = findModel(d, uid);
     if (!m || !m.rare || !m.rare[de]) return;
-    const q = Math.max(0, Math.min(9, Number(qty) || 0));
+    const q = Math.max(0, Math.min(isArmourItem(c, de) ? 1 : 9, Number(qty) || 0));
     if (q <= 0) delete m.rare[de]; else (m.rare[de] as { q: number }).q = q;
   });
 }

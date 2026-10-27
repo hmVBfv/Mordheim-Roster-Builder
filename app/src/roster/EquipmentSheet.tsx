@@ -83,7 +83,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                     )}
                     <button type="button" className={ui.buttonQuiet} onClick={() => act.rareQty(r.de, 0)}>Remove</button>
                   </span>
-                ) : <Stepper label={r.name} value={r.q} onChange={(q) => act.rareQty(r.de, q)} />}
+                ) : <Stepper label={r.name} value={r.q} max={r.max} onChange={(q) => act.rareQty(r.de, q)} />}
               </li>
             ))}
           </ul>
