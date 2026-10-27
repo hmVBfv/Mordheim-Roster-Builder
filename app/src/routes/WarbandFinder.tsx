@@ -6,7 +6,7 @@ import ui from '../ui/ui.module.css';
 import styles from './WarbandFinder.module.css';
 
 export const GRADE_NAMES: Record<string, string> = { core: 'Core', '1a': 'Grade 1a', '1b': 'Grade 1b', '1c': 'Grade 1c', '2a': 'Grade 2a' };
-const SORTS: [WarbandSort, string][] = [['grade', 'Grade, then name'], ['name', 'Name'], ['gold-asc', 'Gold, least first'], ['gold-desc', 'Gold, most first'],
+const SORTS: [WarbandSort, string][] = [['grade', 'Grade, A to Z'], ['name', 'A to Z'], ['gold-asc', 'Gold, least first'], ['gold-desc', 'Gold, most first'],
   ['size-desc', 'Most models, most first'], ['heroes-desc', 'Heroes at the start, most first']];
 
 const num = (v: string): number | '' => (v.trim() === '' ? '' : Number(v));
@@ -30,7 +30,7 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
     <details className={styles.finder} open={active || undefined}>
       <summary>Find a warband{active ? ` · ${shown.length} of ${facts.length}` : ''}</summary>
       <div className={styles.grid}>
-        <label className={ui.field}><span>Name</span>
+        <label className={ui.field}><span>Look for</span>
           <input className={ui.input} type="search" value={filter.q ?? ''} autoComplete="off" onChange={(e) => set({ q: e.target.value })} /></label>
         <label className={ui.field}><span>Race</span>
           <select className={ui.select} value={filter.race ?? ''} onChange={(e) => set({ race: e.target.value })}>

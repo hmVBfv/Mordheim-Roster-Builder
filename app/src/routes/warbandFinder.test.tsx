@@ -41,10 +41,10 @@ describe('finding a warband to start', () => {
     const user = userEvent.setup();
     render(<Harness />);
     await user.click(screen.getByText('Find a warband'));
-    await user.type(screen.getByLabelText('Name'), 'merc');
+    await user.type(screen.getByLabelText('Look for'), 'merc');
     expect(shown()).toContain('Mercenaries');
-    await user.clear(screen.getByLabelText('Name'));
-    await user.type(screen.getByLabelText('Name'), 'zzzz');
+    await user.clear(screen.getByLabelText('Look for'));
+    await user.type(screen.getByLabelText('Look for'), 'zzzz');
     expect(screen.getByRole('status').textContent).toBe('No warband fits.');
   });
 
