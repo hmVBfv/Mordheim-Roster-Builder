@@ -82,4 +82,16 @@ describe('the lore catalogue', () => {
     // the groups of the first catalogue are tied to places as well
     for (const id of ['reikland-court', 'middenheim-court', 'lady-magritta', 'count-von-carstein', 'sisters-of-sigmar', 'master-of-the-possessed']) expect(byId.get(id)?.regions?.length, id).toBeGreaterThan(0);
   });
+  /* #98 (Rob, 26.10.2026): more of the Warhammer world, only where there is lore enough behind each; each tied to the place that holds it. */
+  it('has the kingdoms, cities, holds, Powers and orders added for report #98, each tied to its place', () => {
+    const chain = (id: string) => { const out: string[] = []; for (let p: string | null | undefined = id; p; p = byId.get(p)?.parent) out.unshift(p); return out; };
+    expect(chain('lothern')).toEqual(['ulthuan', 'eataine', 'lothern']);
+    expect(chain('averheim')).toEqual(['old-world', 'the-empire', 'averland', 'averheim']);
+    expect(chain('mousillon')).toEqual(['old-world', 'bretonnia', 'mousillon']);
+    expect(chain('zhufbar')).toEqual(['old-world', 'worlds-edge-mountains', 'zhufbar']);
+    expect(chain('hexoatl')).toEqual(['lustria', 'hexoatl']);
+    for (const id of ['khorne', 'tzeentch', 'nurgle', 'slaanesh']) expect(byId.get(id)?.regions, id).toEqual(['the-chaos-wastes']);
+    expect(byId.get('council-of-thirteen')?.kind).toBe('faction');
+    expect(byId.get('teutogen-guard')?.regions).toEqual(['middenheim']);
+  });
 });
