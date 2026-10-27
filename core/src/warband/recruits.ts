@@ -44,9 +44,10 @@ export function warriorHasFought(ctx: Ctx, m: Model): boolean {
 }
 
 /** A new recruit after the warband's first battle: his list is open, but
-    rare items on it only through the trading rules. */
+    rare items on it only through the trading rules. A planner has no battles,
+    so nobody in it is one – with its Trading Post open too (#107). */
 export function isNewRecruit(ctx: Ctx, m: Model): boolean {
-  return warbandHasFought(ctx) && !warriorHasFought(ctx, m);
+  return ctx.s.planner !== true && warbandHasFought(ctx) && !warriorHasFought(ctx, m);
 }
 
 /** Recruits a warrior (core addUnit) and notes the round he joined in, so
