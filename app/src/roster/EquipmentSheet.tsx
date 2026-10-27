@@ -46,7 +46,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
       {/* the list, one small table for each kind, side by side where there is room (#115) */}
       <div className={styles.eqTables}>
         {v.groups.map((g) => (
-          <table key={g.label} className={styles.eqTable}>
+          <table key={g.label} className={`${styles.eqTable} ${styles.eqListTable}`}>
             <caption>{g.label}</caption>
             <thead className="visually-hidden"><tr><th scope="col">Item</th><th scope="col">Price</th><th scope="col">How many</th></tr></thead>
             <tbody>
