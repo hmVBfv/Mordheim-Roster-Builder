@@ -4361,7 +4361,7 @@ became "Max. models". The select is gone, so the one-line `selectOption` in ten 
 the warband's name. One wrong turn: my first gold test typed 400 into "to" and found no warband at all, since no warband starts
 below 400 – the test now uses the median.
 
-## October 28, 2026 — gear by mordheimer.net's kinds (#126, #127), one entry less in the panel (#128)
+## October 28, 2026 — gear by mordheimer.net's kinds (#126, #127), one entry less in the panel (#128), a movable report window (#129)
 
 #126, #127: one cause, one pull request (254). The Sea dragon cloak showed under "Other" on the unit's card although its tooltip
 says Armour: the price chart files it under "misc", and #113's grouping only knew the catalogue's category. A rare item the unit's
@@ -4372,3 +4372,8 @@ one game: the heading line of every poison and drug now ends in "one use". The f
 dropped – it would have been a data edit for a display wish.
 
 #128: the "All warbands" row in the roster's Warband panel is gone, the navigation leads there anyway. Pull request 253.
+
+#129: the report window can be moved by its heading on a desktop (from 900 px), so a reporter can look at the entries and gold behind
+it without closing and reopening it. Only this window (Rob), not every sheet: `useMovable` offsets the native dialog with a CSS
+`translate` and puts it back when it closes; the pointer stays inside the browser window so the heading cannot be lost. A phone
+keeps the bottom sheet. Pull request 256.
