@@ -69,7 +69,7 @@ test('a Wizard shows the spells of his school on his card', async ({ page }) => 
   await page.goto('./');
   await page.getByRole('link', { name: 'Warbands' }).click();
   await page.getByRole('link', { name: 'New warband' }).click();
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('caravans');
+  await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
   await page.getByRole('textbox', { name: 'Name' }).fill('The Silver Caravan');
   await page.getByRole('button', { name: 'Start the warband' }).click();
   await page.getByRole('button', { name: '+ Recruit' }).click();
@@ -99,7 +99,7 @@ for (const theme of THEMES) {
     await page.goto('./');
     await page.getByRole('link', { name: 'Warbands' }).click();
     await page.getByRole('link', { name: 'New warband' }).click();
-    await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+    await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
     await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
     await page.getByRole('textbox', { name: 'Name' }).fill('The Grey Company');
     await noSideScroll(page); await tapTargets(page);
@@ -926,7 +926,7 @@ test('the navigation fits the flavour', async ({ page }) => {
 test('a planner at 360 px: value instead of gold, advances with their experience, its own section in the list', async ({ page }) => {
   const quick = test.info().project.name === 'quickbuild';
   await page.goto(quick ? '#/warbands/new' : 'warbands/new');
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
   await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
   await page.getByLabel('Name').fill('The Late Company');
   await page.getByRole('checkbox', { name: /A planner/ }).check();
@@ -952,7 +952,7 @@ test('a planner at 360 px: value instead of gold, advances with their experience
 test('a planner opens the Trading Post and takes a rare item without a roll', async ({ page }) => {
   const quick = test.info().project.name === 'quickbuild';
   await page.goto(quick ? '#/warbands/new' : 'warbands/new');
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
   await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
   await page.getByLabel('Name').fill('The Rare Company');
   await page.getByRole('checkbox', { name: /A planner/ }).check();
@@ -979,7 +979,7 @@ test('a warband is copied to the planner: the same men, a value instead of gold,
   const quick = test.info().project.name === 'quickbuild';
   await page.setViewportSize({ width: 1100, height: 800 });
   await page.goto(quick ? '#/warbands/new' : 'warbands/new');
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
   await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
   await page.getByLabel('Name').fill('The Played Company');
   await page.getByRole('button', { name: 'Start the warband' }).click();
@@ -1003,7 +1003,7 @@ test('without crypto.randomUUID (plain http) a warband can be started and import
   await page.addInitScript(() => { Object.defineProperty(Crypto.prototype, 'randomUUID', { value: undefined, configurable: true }); });
   const quick = test.info().project.name === 'quickbuild';
   await page.goto(quick ? '#/warbands/new' : 'warbands/new');
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
   await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
   await page.getByLabel('Name').fill('Over plain http');
   await page.getByRole('button', { name: 'Start the warband' }).click();

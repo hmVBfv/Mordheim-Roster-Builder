@@ -5,25 +5,28 @@
   background: var(--surface);
 }
 
-.finder > summary {
-  display: flex;
-  align-items: center;
-  min-height: var(--tap);
-  padding: 0 var(--space-3);
-  cursor: pointer;
-}
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-3) var(--space-3);
+  padding: var(--space-3);
+  align-items: end;
 }
 
 .pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
+  align-items: end;
+}
+
+/* the field names sit on one line each, so the inputs below them line up across the grid */
+.grid label > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-muted);
+  font-size: 0.85em;
 }
 
 .foot {
@@ -33,4 +36,113 @@
   gap: var(--space-3);
   padding: 0 var(--space-3) var(--space-3);
   color: var(--text-muted);
+}
+
+/* the matching warbands as a table: columns from tablet width on, a card per row on a phone (cells carry their column's name in data-label) */
+.tableWrap {
+  margin-block: var(--space-1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  text-align: left;
+  font-weight: normal;
+  color: var(--text-muted);
+  font-size: 0.85em;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr.grade th {
+  text-align: left;
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: 0.8em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.pickLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.pickLabel input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+.big {
+  color: var(--text-muted);
+}
+
+.picked {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+@media (max-width: 699px) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table tr:not(.grade) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 0 var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .table tr:not(.grade) td {
+    border-bottom: 0;
+    padding: 0 0 var(--space-1);
+    font-size: 0.9em;
+  }
+
+  /* the name is the card's heading over the whole width */
+  .table td.pick {
+    grid-column: 1 / -1;
+    font-size: 1em;
+  }
+
+  .table td[data-label]:not([data-label=''])::before {
+    content: attr(data-label) ' ';
+    color: var(--text-muted);
+    font-size: 0.85em;
+  }
+
+  .table tr.grade,
+  .table tr.grade th {
+    display: block;
+  }
 }
