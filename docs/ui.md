@@ -378,7 +378,7 @@ Media-Query):
 | --- | --- | --- |
 | `stack` | unter 860 px | eine Spalte; ein Tipp öffnet den Krieger **unter seiner Zeile**, mit vier Reitern (Overview, Gear, Skills & injuries, Story & more; Hired Swords haben kein Gear); ein zweiter Tipp schließt ihn; geöffnet scrollt die Zeile unter die festen Leisten (kein Sheet, also kein eigener Schritt im Verlauf) |
 | `split` | ab 860 px | die Liste und daneben das **Fenster** mit dem gewählten Krieger, alle Abschnitte offen und ohne Reiter; es bleibt beim Scrollen stehen und scrollt in sich; vorgewählt ist der erste Krieger |
-| `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, All warbands, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
+| `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
 
 Unter 860 px steht dieselbe Liste „Warband“ unter den Kriegern. Die Arbeitsfläche
 (Shell) wird bis 1920 px breit, auf jeder Seite (früher nur auf dem Roster,
