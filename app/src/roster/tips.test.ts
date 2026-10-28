@@ -193,12 +193,42 @@ describe('the equipment of a unit in groups (#113)', () => {
     s = core.addRare(ctx(s), uid, 'Gromril-Rüstung');
     const eq = rosterView(data, s).heroes[0]!.equipment;
     const grouped = (g: string) => eq.filter((f) => f.group === g).map((f) => f.label);
-    expect(grouped('Close combat')).toContain('Sword');
-    expect(grouped('Missile weapons')).toContain('Pistol');
+    expect(grouped('Close combat weapons')).toContain('Sword');
+    expect(grouped('Blackpowder weapons')).toContain('Pistol');
     expect(grouped('Armour')).toEqual(expect.arrayContaining(['Helmet', 'Gromril armour']));
     expect(eq.every((f) => !!f.group)).toBe(true);
     // the groups follow one another, none split
     const order = eq.map((f) => f.group);
     expect(order.filter((g, i) => g !== order[i - 1])).toEqual([...new Set(order)]);
+  });
+});
+
+/* Reports #126, #127: the groups carry mordheimer.net's names; an item the list does not file (a rare one) is put by what its rule says it is. */
+describe('the equipment of a unit by mordheimer.net\u2019s kinds (#126, #127)', () => {
+  const gear = (...rare: string[]) => {
+    let s = core.newWarband(data, 'merc');
+    s = core.addUnit(ctx(s), 'capt');
+    const uid = s.models[0]!.uid;
+    for (const de of rare) s = core.addRare(ctx(s), uid, de);
+    return rosterView(data, s).heroes[0]!.equipment;
+  };
+
+  it('puts the Sea dragon cloak under Armour, not under Other', () => {
+    const cloak = gear('Seedrachen-Umhang').find((f) => f.label === 'Sea dragon cloak');
+    expect(cloak?.group).toBe('Armour');
+  });
+
+  it('names the six kinds as mordheimer.net does, and files a poison and a plain item under theirs', () => {
+    const eq = gear('Dunkles Gift', 'Seil & Haken');
+    expect(eq.find((f) => f.label === 'Dark venom')?.group).toBe('Poisons and Drugs');
+    expect(eq.find((f) => f.group === 'Miscellaneous equipment')).toBeTruthy();
+    expect(eq.some((f) => f.group === 'Other')).toBe(false);
+  });
+
+  it('says in the tooltip of a poison or drug that it is for one use', () => {
+    const venom = gear('Dunkles Gift').find((f) => f.label === 'Dark venom')!;
+    expect(venom.tips[0]!.line).toMatch(/one use/i);
+    const rope = gear('Seil & Haken').find((f) => f.group === 'Miscellaneous equipment')!;
+    expect(rope.tips[0]?.line ?? '').not.toMatch(/one use/i);
   });
 });

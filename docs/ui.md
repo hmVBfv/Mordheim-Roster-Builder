@@ -173,6 +173,11 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Überschriftszeile je Stufe, sonst mit Spalte Grade); am Handy wird jede Zeile zur Karte. Die schon gewählte Warband bleibt in
   der Tabelle. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`, `warbandFacts`,
   `filterWarbands`, `sortWarbands`; `app/src/routes/WarbandFinder.tsx`).
+- **Gear einer Einheit nach Art (Wunsch #113, Meldungen #126, #127, Rob, 28.10.2026):** die Ausrüstung auf der Karte steht in den Gruppen
+  **Close combat weapons, Missile weapons, Blackpowder weapons, Armour, Poisons and Drugs, Miscellaneous equipment** (Namen wie auf
+  mordheimer.net). Wohin ein Stück gehört, entscheidet zuerst die Preisliste (`group` im Katalog, Schwarzpulver), dann die Liste der
+  Einheit, dann die Art im Katalog, zuletzt die erste Zeile seiner Regel (so steht der Seedrachen-Umhang unter Armour, obwohl der
+  Katalog ihn als „misc“ führt). Der Tooltip eines Gifts oder einer Droge nennt in der Kopfzeile **„one use“** (`app/src/roster/tips.ts`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**
