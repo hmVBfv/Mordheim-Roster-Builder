@@ -4360,3 +4360,15 @@ all warbands (min and max, so nothing is filtered until a player narrows them; "
 became "Max. models". The select is gone, so the one-line `selectOption` in ten e2e and four unit tests became a radio check by
 the warband's name. One wrong turn: my first gold test typed 400 into "to" and found no warband at all, since no warband starts
 below 400 – the test now uses the median.
+
+## October 28, 2026 — gear by mordheimer.net's kinds (#126, #127), one entry less in the panel (#128)
+
+#126, #127: one cause, one pull request (254). The Sea dragon cloak showed under "Other" on the unit's card although its tooltip
+says Armour: the price chart files it under "misc", and #113's grouping only knew the catalogue's category. A rare item the unit's
+list does not file is now put by the price chart's group (the poisons from #118), by Blackpowder where the catalogue says so, and
+last by the first word of its rule line; the groups got mordheimer.net's names and Blackpowder weapons, Poisons and Drugs and
+Miscellaneous equipment joined them. Dark venom's tooltip said only "Weapon poison (upgrade, one weapon)", although its text says
+one game: the heading line of every poison and drug now ends in "one use". The first idea, a change to the data's `line`, was
+dropped – it would have been a data edit for a display wish.
+
+#128: the "All warbands" row in the roster's Warband panel is gone, the navigation leads there anyway. Pull request 253.
