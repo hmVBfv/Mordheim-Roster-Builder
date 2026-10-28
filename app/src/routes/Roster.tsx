@@ -309,7 +309,6 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
             {(ctx.s.campaign?.on || rec.campaignId) && <PanelLink to={`/warbands/${rec.id}/districts`} title="Districts" note="Footholds on the map" />}
             <PanelLink to={`/warbands/${rec.id}/story`} title="Story" note="Prologue, interludes, profiles" />
             {FLAVOUR === 'campaign' && rec.ownerId && <PanelLink to={`/warbands/${rec.id}/versions`} title="Versions" note={rec.serverRev ? `Every saved state · ${rec.serverRev}` : 'Every saved state'} />}
-            <PanelLink to="/warbands" title="All warbands" note="Switch or start another" />
             {v.planner && <PanelLink title="Trading Post" note={v.plannerTrade ? 'Open – tap to close' : 'Closed – tap to open'} run={() => ed.edit((c) => core.setPlannerTrade(c, !v.plannerTrade), v.plannerTrade ? 'The Trading Post is closed.' : 'The Trading Post is open: rare items can be had.')} />}
             <PanelLink title="Make a copy" note="Same men, a new warband" run={() => { void makeCopy(rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }} />
             {!v.planner && <PanelLink title="Copy to the planner" note="Same men, no gold limit, Trading Post open" run={() => { void makePlannerCopy(data, rec, ed.state).then((id) => navigate(`/warbands/${id}`)); }} />}

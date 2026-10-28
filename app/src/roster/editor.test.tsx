@@ -110,6 +110,15 @@ describe('the roster', () => {
     await waitFor(async () => expect((await stored()).state.models[1]).toMatchObject({ qty: 3, exp: 1 }));
   });
 
+  /* Bug #128: the warband's panel offered "All warbands" although the navigation already leads there. */
+  it('has the warband\u2019s functions in its panel, but no second way to All warbands', async () => {
+    await seed(band());
+    at('/warbands/w1');
+    const panel = (await screen.findByRole('heading', { level: 2, name: 'Warband' })).closest('section')!;
+    expect(within(panel).getByRole('link', { name: 'House rules' })).toBeTruthy();
+    expect(within(panel).queryByRole('link', { name: 'All warbands' })).toBeNull();
+  });
+
   it('shows what a warband without warriors may do', async () => {
     await seed(createWarband(data, 'merc', null, ''));
     at('/warbands/w1');
