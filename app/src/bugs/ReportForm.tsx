@@ -84,7 +84,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
   if (phase === 'sent') {
     return (
       <div className={ui.page}>
-        <h2 id="report-title">Sent</h2>
+        <h2 id="report-title" data-handle className={styles.handle}>Sent</h2>
         <p className={ui.message} role="status">Thank you – Rob will look at it. You can follow it under Account → Your reports.</p>
         <div className={ui.row}><button type="button" className={ui.button} onClick={close}>Done</button></div>
       </div>
@@ -93,7 +93,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
 
   return (
     <form className={ui.page} onSubmit={send}>
-      <h2 id="report-title">Report a problem</h2>
+      <h2 id="report-title" data-handle className={styles.handle}>Report a problem</h2>
       <fieldset className={styles.kinds}>
         <legend>What is it?</legend>
         {KINDS.map((k) => (

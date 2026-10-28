@@ -9,6 +9,7 @@ import { useLocation } from 'react-router';
 import { useSession } from '../account/session.ts';
 import { BugIcon } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
+import { useMovable } from '../ui/useMovable.ts';
 import { useSheet } from '../ui/useSheet.ts';
 import styles from './Bugs.module.css';
 import { takeSnapshot, type Snapshot } from './snapshot.ts';
@@ -18,6 +19,7 @@ const ReportForm = lazy(() => import('./ReportForm.tsx').then((m) => ({ default:
 export function ReportProblem() {
   // the report sheet itself leaves no trace in the trail
   const { ref, open, close } = useSheet(false);
+  useMovable(ref);
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const { pathname } = useLocation();
   const session = useSession();

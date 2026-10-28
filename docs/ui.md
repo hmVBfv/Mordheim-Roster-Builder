@@ -173,6 +173,10 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Überschriftszeile je Stufe, sonst mit Spalte Grade); am Handy wird jede Zeile zur Karte. Die schon gewählte Warband bleibt in
   der Tabelle. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`, `warbandFacts`,
   `filterWarbands`, `sortWarbands`; `app/src/routes/WarbandFinder.tsx`).
+- **Das Meldefenster ist verschiebbar (Wunsch #129, Rob, 28.10.2026):** ab 900 px Breite lässt sich „Report a problem“ an seiner Überschrift
+  mit der Maus ziehen, um zu sehen, was dahinter steht (Einträge, Gold), ohne es zu schließen. Der Zeiger bleibt im Fenster des
+  Browsers; beim Schließen springt das Blatt zurück. Am Handy bleibt es das Blatt von unten. Nur dieses Fenster, keine anderen Blätter
+  (`app/src/ui/useMovable.ts`).
 - **Gear einer Einheit nach Art (Wunsch #113, Meldungen #126, #127, Rob, 28.10.2026):** die Ausrüstung auf der Karte steht in den Gruppen
   **Close combat weapons, Missile weapons, Blackpowder weapons, Armour, Poisons and Drugs, Miscellaneous equipment** (Namen wie auf
   mordheimer.net). Wohin ein Stück gehört, entscheidet zuerst die Preisliste (`group` im Katalog, Schwarzpulver), dann die Liste der

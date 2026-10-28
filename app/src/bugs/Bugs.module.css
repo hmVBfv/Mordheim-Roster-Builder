@@ -335,3 +335,16 @@
 .headlineField {
   grid-column: 1 / -1;
 }
+
+/* the heading of the report window is its handle on a desktop (wish #129): drag it to look at what is behind */
+@media (min-width: 900px) {
+  .handle {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .handle:active {
+    cursor: grabbing;
+  }
+}
