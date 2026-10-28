@@ -24,10 +24,9 @@ Rob (28.10.2026): Die Testinstanz mit Branch-Images nutzt er nicht mehr.
 - Der Workflow `.github/workflows/prune-images.yml` löscht jede Woche (montags) und auf Wunsch von Hand
   (zuerst als Probelauf) Versionen des Pakets, die **älter als 14 Tage** sind und **nicht zu `master`
   gehören** – ohne Tag mit dem ganzen Commit, ohne `:master`, `:drill-broken`, `:master-<datum>` und
-  `:<commit>-<datum>`. Unberührt bleiben Versionen ohne Tag (die Plattform-Images im Inneren eines
-  Multi-Arch-Images; sie zu löschen zerstörte das behaltene Image) und die Signaturen von Versionen, die
-  bleiben. Die Regeln stehen in `.github/scripts/images-to-prune.sh`, getestet von
+  `:<commit>-<datum>`. Die Signaturen von Versionen, die bleiben, bleiben. Die Regeln stehen in `.github/scripts/images-to-prune.sh`, getestet von
   `.github/scripts/test-images-to-prune.sh` in der CI.
+- Versionen ohne Tag (die Plattform-Images und Nachweise hinter einem Multi-Arch-Image) gehen nur weg, wenn sie älter als 14 Tage sind und kein behaltenes Image sie auflistet (der Workflow liest die Manifeste der behaltenen Images). Lässt sich eines nicht lesen, bricht der Lauf ab, bevor etwas Untagged gelöscht wird.
 
 ## Folgen
 - Weniger Läufe (jeder Branch einmal statt zweimal), weniger Images, weniger „Downloads“ am Paket.

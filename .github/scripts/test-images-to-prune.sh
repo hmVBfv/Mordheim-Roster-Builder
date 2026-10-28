@@ -22,7 +22,27 @@ versions=$(cat <<JSON
 ]
 JSON
 )
-got=$(echo "$versions" | "$here/images-to-prune.sh" | cut -d' ' -f1 | sort -n | tr '\n' ' ')
+got=$(echo "$versions" | "$here/images-to-prune.sh" tagged | cut -d' ' -f1 | sort -n | tr '\n' ' ')
 want="2 5 "
 [ "$got" = "$want" ] || { echo "images-to-prune: wanted '$want', got '$got'" >&2; exit 1; }
+
+# what stays among the tagged ones: master's build, the drill, the monthly one, the recent branch build and the signatures of those
+keep=$(echo "$versions" | "$here/images-to-prune.sh" keep | sort | tr '\n' ' ')
+want_keep=$(printf 'sha256:%s sha256:m sha256:n sha256:s1 sha256:s3 sha256:%s ' "$d1" "$d3" | tr ' ' '\n' | sort | tr '\n' ' ')
+[ "$keep" = "$want_keep" ] || { echo "images-to-prune keep: wanted '$want_keep', got '$keep'" >&2; exit 1; }
+
+# untagged: only the old ones that no kept image lists
+kids=$(mktemp); trap 'rm -f "$kids"' EXIT
+printf 'sha256:c1\n' > "$kids"
+untagged=$(cat <<JSON
+[
+ {"id":20,"name":"sha256:c1","updated_at":"$old","metadata":{"container":{"tags":[]}}},
+ {"id":21,"name":"sha256:c2","updated_at":"$old","metadata":{"container":{"tags":[]}}},
+ {"id":22,"name":"sha256:c3","updated_at":"$new","metadata":{"container":{"tags":[]}}},
+ {"id":23,"name":"sha256:t","updated_at":"$old","metadata":{"container":{"tags":["1234567"]}}}
+]
+JSON
+)
+gotu=$(echo "$untagged" | "$here/images-to-prune.sh" untagged "$kids" | cut -d' ' -f1 | tr '\n' ' ')
+[ "$gotu" = "21 " ] || { echo "images-to-prune untagged: wanted '21 ', got '$gotu'" >&2; exit 1; }
 echo "images-to-prune: ok"
