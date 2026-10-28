@@ -4351,3 +4351,12 @@ gold, from a warrior or the stash). Pull request 246, stacked on 245.
 
 #120: "Spellcasters only" on the Hire lists (`hireIsCaster`: a spell list of his own, or Wizard, Prayers or Funerary Rites in his
 rules). Pull request 247.
+
+## October 28, 2026 — the new-warband picker as a table (#121–#125)
+
+Five wishes on one screen, one cause, one pull request (251). The #116 picker was a collapsed filter over a long `<select>`; Rob
+wanted the filter always open above a table, with its fields lined up, and the gold and model fields prefilled with the range over
+all warbands (min and max, so nothing is filtered until a player narrows them; "Clear filter" returns to the range). "Most models"
+became "Max. models". The select is gone, so the one-line `selectOption` in ten e2e and four unit tests became a radio check by
+the warband's name. One wrong turn: my first gold test typed 400 into "to" and found no warband at all, since no warband starts
+below 400 – the test now uses the median.
