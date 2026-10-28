@@ -2,7 +2,7 @@
    a sentence, the technical details go along and can be left out, a warband
    goes along only with a tick, the reporter follows the status, the admin
    sorts. Against the stand-in server (sync/fakeSync.ts). */
-import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -57,6 +57,42 @@ describe('reporting a problem', () => {
     at('/');
     const form = await openForm(user);
     expect((within(form).getByRole('radio', { name: /Bug/ }) as HTMLInputElement).checked).toBe(true);
+  });
+
+  /* Wish #129: on a desktop the window can be pushed aside by its heading, to see what a report is about behind it. */
+  it('can be moved by its heading on a desktop, and comes back in place when opened again', async () => {
+    server();
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: true, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }));
+    const user = userEvent.setup();
+    at('/account');
+    const form = await openForm(user);
+    const dialog = form.closest('dialog')!;
+    const heading = within(form).getByRole('heading', { name: 'Report a problem' });
+    expect(dialog.style.translate).toBe('');
+    fireEvent.pointerDown(heading, { clientX: 400, clientY: 300, button: 0, pointerId: 1 });
+    fireEvent.pointerMove(dialog, { clientX: 520, clientY: 340, pointerId: 1 });
+    expect(dialog.style.translate).toBe('120px 40px');
+    fireEvent.pointerUp(dialog, { pointerId: 1 });
+    fireEvent.pointerMove(dialog, { clientX: 900, clientY: 900, pointerId: 1 });
+    expect(dialog.style.translate).toBe('120px 40px');
+    // a press outside the heading moves nothing
+    fireEvent.pointerDown(within(form).getByLabelText(/What did you want to do/), { clientX: 10, clientY: 10, button: 0, pointerId: 1 });
+    fireEvent.pointerMove(dialog, { clientX: 50, clientY: 50, pointerId: 1 });
+    expect(dialog.style.translate).toBe('120px 40px');
+    dialog.close();
+    expect(dialog.style.translate).toBe('');
+  });
+
+  it('stays a bottom sheet on a phone: its heading does not move it', async () => {
+    server();
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }));
+    const user = userEvent.setup();
+    at('/account');
+    const form = await openForm(user);
+    const dialog = form.closest('dialog')!;
+    fireEvent.pointerDown(within(form).getByRole('heading', { name: 'Report a problem' }), { clientX: 400, clientY: 300, button: 0, pointerId: 1 });
+    fireEvent.pointerMove(dialog, { clientX: 520, clientY: 340, pointerId: 1 });
+    expect(dialog.style.translate).toBe('');
   });
 
   it('a kind and a sentence are enough: the technical details go along, and the player sees them first', async () => {

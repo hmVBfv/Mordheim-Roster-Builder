@@ -173,6 +173,10 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Überschriftszeile je Stufe, sonst mit Spalte Grade); am Handy wird jede Zeile zur Karte. Die schon gewählte Warband bleibt in
   der Tabelle. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`, `warbandFacts`,
   `filterWarbands`, `sortWarbands`; `app/src/routes/WarbandFinder.tsx`).
+- **Das Meldefenster ist verschiebbar (Wunsch #129, Rob, 28.10.2026):** ab 900 px Breite lässt sich „Report a problem“ an seiner Überschrift
+  mit der Maus ziehen, um zu sehen, was dahinter steht (Einträge, Gold), ohne es zu schließen. Der Zeiger bleibt im Fenster des
+  Browsers; beim Schließen springt das Blatt zurück. Am Handy bleibt es das Blatt von unten. Nur dieses Fenster, keine anderen Blätter
+  (`app/src/ui/useMovable.ts`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**
