@@ -163,12 +163,16 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
-- **Eine Warband finden (Wunsch #116, Rob, 28.10.2026):** unter „New warband“ klappt **„Find a warband“** einen Filter auf: Name,
+- **Eine Warband finden (Wunsch #116, Rob, 28.10.2026; umgebaut mit #121–#125, Rob, 28.10.2026):** unter „New warband“ steht
+  **„Find a warband“** immer offen (nicht einklappbar) über der **Tabelle** der passenden Warbands. Filter: Name („Look for“),
   Rasse, Grade, **Heldenzahl zum Start** (was die Heldeneinheiten der Warband zusammen erlauben, höchstens 6: „Up to 4/5/6“), ein
-  **großes Wesen** (Daten: `large`, z. B. Kroxigor, Minotaur), Startgold von–bis und höchste Modellzahl von–bis, dazu die Sortierung
-  (Stufe, Name, Gold, Modellzahl, Helden). Die Auswahl darunter zeigt nur, was passt, mit Gold, Größe und Helden je Zeile; die schon
-  gewählte bleibt in der Liste. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`,
-  `warbandFacts`, `filterWarbands`, `sortWarbands`).
+  **großes Wesen** (Daten: `large`, z. B. Kroxigor, Minotaur), **Gold from/to** und **Max. models from/to**, dazu die Sortierung
+  (Stufe, Name, Gold, Modellzahl, Helden). Gold und Modellzahl sind **vorbelegt** mit dem kleinsten und größten Wert über alle
+  Warbands: das lässt alles drin und zeigt die Spanne; erst ein engerer Wert filtert, „Clear filter“ stellt die Spanne wieder
+  her. Die Tabelle hat eine Zeile je Warband (Radio zum Wählen, Gold, Max. models, Heroes; bei Sortierung nach Stufe mit einer
+  Überschriftszeile je Stufe, sonst mit Spalte Grade); am Handy wird jede Zeile zur Karte. Die schon gewählte Warband bleibt in
+  der Tabelle. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`, `warbandFacts`,
+  `filterWarbands`, `sortWarbands`; `app/src/routes/WarbandFinder.tsx`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**

@@ -162,7 +162,7 @@ test('a new warband for the campaign: free under Warbands, its copy entered and 
   await shot(page, 'campaign-enter-none');
   await sheet.getByRole('button', { name: 'New warband for this campaign' }).click();
   await expect(page.getByText('For The Hel Fenn Campaign:', { exact: false })).toBeVisible();
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
   await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
   await page.getByLabel('Name').fill('The Ardent Caravan');
   await noSideScroll(page);

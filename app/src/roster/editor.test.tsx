@@ -123,9 +123,9 @@ describe('a new warband', () => {
   it('is chosen by warband, variant and name, and opens empty with its gold', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
-    const pick = await screen.findByRole('combobox', { name: 'Warband' });
+    const pick = await screen.findByRole('radio', { name: 'Tileans' });
     expect(screen.getByRole('button', { name: 'Start the warband' })).toHaveProperty('disabled', true);
-    await user.selectOptions(pick, 'tileans');
+    await user.click(pick);
     await user.selectOptions(screen.getByRole('combobox', { name: 'City' }), 'trantio');
     const trantio = data.WARBANDS.tileans!.subtypes!.find((x) => x.key === 'trantio')!;
     expect(screen.getByText(`Starting gold: ${trantio.gold} gc.`)).toBeTruthy();
@@ -142,7 +142,7 @@ describe('a new warband', () => {
   it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
-    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'merc');
+    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
     await user.click(screen.getByRole('checkbox', { name: /A planner/ }));
     expect(screen.queryByText(/Starting gold/)).toBeNull();
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'The Late Company');
@@ -158,7 +158,7 @@ describe('a new warband', () => {
   it('is an ordinary warband unless asked', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
-    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'merc');
+    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
     expect((screen.getByRole('checkbox', { name: /A planner/ }) as HTMLInputElement).checked).toBe(false);
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Plain');
     await user.click(screen.getByRole('button', { name: 'Start the warband' }));

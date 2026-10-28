@@ -39,7 +39,7 @@ test('the account’s warbands come to a new device; a change here goes up as th
 test('a new warband goes up; warbands made before signing in can join the account', async ({ page }) => {
   const srv = await playServer(page, false);
   await page.goto('warbands/new');
-  await page.getByRole('combobox', { name: 'Warband' }).selectOption('merc');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
   await page.getByRole('combobox', { name: 'City' }).selectOption('midd');
   await page.getByLabel('Name').fill('Made offline');
   await page.getByRole('button', { name: 'Start the warband' }).click();

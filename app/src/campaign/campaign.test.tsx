@@ -355,7 +355,7 @@ describe('the overview', () => {
     expect(within(sheet).queryByRole('button', { name: 'Enter a copy' })).toBeNull();
     await user.click(within(sheet).getByRole('button', { name: 'New warband for this campaign' }));
     expect(await screen.findByText(/For The Hel Fenn Campaign: the warband is yours under Warbands/)).toBeTruthy();
-    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'tileans');
+    await user.click(await screen.findByRole('radio', { name: 'Tileans' }));
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Sons of Trantio');
     await user.click(screen.getByRole('button', { name: 'Start the warband' }));
     expect(await screen.findByRole('link', { name: 'In The Hel Fenn Campaign' })).toBeTruthy();
@@ -384,7 +384,7 @@ describe('the overview', () => {
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
     const user = userEvent.setup();
     at(`/warbands/new?campaign=${c.id}`);
-    await user.selectOptions(await screen.findByRole('combobox', { name: 'Warband' }), 'tileans');
+    await user.click(await screen.findByRole('radio', { name: 'Tileans' }));
     srv.state.down = true;
     const fetchNow = globalThis.fetch;
     vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch'); }));
