@@ -177,6 +177,11 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   mit der Maus ziehen, um zu sehen, was dahinter steht (Einträge, Gold), ohne es zu schließen. Der Zeiger bleibt im Fenster des
   Browsers; beim Schließen springt das Blatt zurück. Am Handy bleibt es das Blatt von unten. Nur dieses Fenster, keine anderen Blätter
   (`app/src/ui/useMovable.ts`).
+- **Gear einer Einheit nach Art (Wunsch #113, Meldungen #126, #127, Rob, 28.10.2026):** die Ausrüstung auf der Karte steht in den Gruppen
+  **Close combat weapons, Missile weapons, Blackpowder weapons, Armour, Poisons and Drugs, Miscellaneous equipment** (Namen wie auf
+  mordheimer.net). Wohin ein Stück gehört, entscheidet zuerst die Preisliste (`group` im Katalog, Schwarzpulver), dann die Liste der
+  Einheit, dann die Art im Katalog, zuletzt die erste Zeile seiner Regel (so steht der Seedrachen-Umhang unter Armour, obwohl der
+  Katalog ihn als „misc“ führt). Der Tooltip eines Gifts oder einer Droge nennt in der Kopfzeile **„one use“** (`app/src/roster/tips.ts`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**
@@ -382,7 +387,7 @@ Media-Query):
 | --- | --- | --- |
 | `stack` | unter 860 px | eine Spalte; ein Tipp öffnet den Krieger **unter seiner Zeile**, mit vier Reitern (Overview, Gear, Skills & injuries, Story & more; Hired Swords haben kein Gear); ein zweiter Tipp schließt ihn; geöffnet scrollt die Zeile unter die festen Leisten (kein Sheet, also kein eigener Schritt im Verlauf) |
 | `split` | ab 860 px | die Liste und daneben das **Fenster** mit dem gewählten Krieger, alle Abschnitte offen und ohne Reiter; es bleibt beim Scrollen stehen und scrollt in sich; vorgewählt ist der erste Krieger |
-| `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, All warbands, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
+| `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
 
 Unter 860 px steht dieselbe Liste „Warband“ unter den Kriegern. Die Arbeitsfläche
 (Shell) wird bis 1920 px breit, auf jeder Seite (früher nur auf dem Roster,

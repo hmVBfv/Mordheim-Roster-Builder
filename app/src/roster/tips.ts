@@ -12,7 +12,7 @@ export interface Tip { name: string; line: string; text: string }
 
 /** A word on a card and the rules behind it (more than one for a weapon
     with an upgrade); none when there is no text. */
-export interface Fact { label: string; tips: Tip[]; /** The kind of equipment (close combat, missile, armour, other), for the lines of a unit's gear. */ group?: string }
+export interface Fact { label: string; tips: Tip[]; /** The kind of equipment (close combat, missile, blackpowder, armour, poisons and drugs, miscellaneous), for the lines of a unit's gear. */ group?: string }
 
 /* The data's texts are plain; a stray tag would show as text, so it goes. */
 const plain = (s: unknown) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -33,22 +33,34 @@ export function itemTip(data: GameData, key: string): Tip[] {
   return tipOf(core.itemInfo(data, key) ?? core.itemInfo(data, en), en, 'Equipment');
 }
 
-/* The groups of a unit's equipment, in the order of the equipment sheet (#113). */
-const GROUPS = ['Close combat', 'Missile weapons', 'Armour', 'Other'] as const;
-const LIST_GROUP: Record<string, (typeof GROUPS)[number]> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour' };
-const CAT_GROUP: Record<string, (typeof GROUPS)[number]> = { cc: 'Close combat', missile: 'Missile weapons', bp: 'Missile weapons', armour: 'Armour' };
+/* The groups of a unit's equipment, in the order of the equipment sheet (#113) and under the names of mordheimer.net's
+   equipment pages (#126). */
+const GROUPS = ['Close combat weapons', 'Missile weapons', 'Blackpowder weapons', 'Armour', 'Poisons and Drugs', 'Miscellaneous equipment'] as const;
+type Group = (typeof GROUPS)[number];
+const LIST_GROUP: Record<string, Group> = { Nahkampf: 'Close combat weapons', Fernkampf: 'Missile weapons', Rüstung: 'Armour' };
+const CAT_GROUP: Record<string, Group> = { cc: 'Close combat weapons', missile: 'Missile weapons', bp: 'Blackpowder weapons', armour: 'Armour' };
+/* What an item's own rule line begins with, for a rare item the catalogue files under "misc" (the Sea dragon cloak is armour). */
+const LINE_GROUP: [RegExp, Group][] = [[/^armour\b/i, 'Armour'], [/^close combat\b/i, 'Close combat weapons'], [/^black ?powder\b/i, 'Blackpowder weapons'],
+  [/^(weapon )?poison\b|^drug\b/i, 'Poisons and Drugs']];
 
-/** Which group an item belongs to: where the unit's list files it, else the catalogue's category, else "Other". */
-function groupOf(ctx: core.Ctx, m: Model, key: string | undefined): (typeof GROUPS)[number] {
-  if (!key) return 'Other';
+/** Which group an item belongs to: the price chart's own group, else the catalogue's category (a unit's list decides between weapon kinds),
+    else what its rule line says it is, else "Miscellaneous equipment". */
+function groupOf(ctx: core.Ctx, m: Model, key: string | undefined): Group {
+  if (!key) return 'Miscellaneous equipment';
+  const entry = ctx.data.CATALOG.find((x) => x.de === key);
+  if (entry?.group === 'Poisons and Drugs') return 'Poisons and Drugs';
+  const cat = CAT_GROUP[entry?.cat ?? ''];
+  if (cat === 'Blackpowder weapons') return cat;
   const list = core.eqListFor(ctx, core.unitDef(ctx, m.uid_def)) ?? {};
-  for (const cat of Object.keys(list)) if (list[cat]?.some(([nm]) => nm.replace(' (1. gratis)', '') === key)) return LIST_GROUP[cat] ?? 'Other';
-  return CAT_GROUP[ctx.data.CATALOG.find((x) => x.de === key)?.cat ?? ''] ?? 'Other';
+  for (const c of Object.keys(list)) if (list[c]?.some(([nm]) => nm.replace(' (1. gratis)', '') === key)) return LIST_GROUP[c] ?? 'Miscellaneous equipment';
+  if (cat) return cat;
+  const line = core.itemInfo(ctx.data, key)?.line ?? core.itemInfo(ctx.data, core.enItem(ctx.data, key))?.line ?? '';
+  return LINE_GROUP.find(([re]) => re.test(String(line)))?.[1] ?? 'Miscellaneous equipment';
 }
 
 function equipment(ctx: core.Ctx, m: Model): Fact[] {
   const facts = [...core.eqDisplayItems(ctx, m), ...core.rareDisplayItems(ctx, m)]
-    .map((x) => ({ ...fact(x.label, x.items.flatMap((k) => itemTip(ctx.data, k))), group: groupOf(ctx, m, x.items[0]) }));
+    .map((x) => ({ ...fact(x.label, x.items.flatMap((k) => itemTip(ctx.data, k).map((t) => (core.isConsumable(ctx, k) ? { ...t, line: `${t.line} · one use` } : t)))), group: groupOf(ctx, m, x.items[0]) }));
   // one group after the other, each in the order the items came
   return GROUPS.flatMap((g) => facts.filter((f) => f.group === g));
 }
