@@ -44,23 +44,51 @@ jobs:
         run: |
           gh api --paginate "/users/$OWNER/packages/container/$PACKAGE/versions?per_page=100" | jq -s 'add // []' > "$RUNNER_TEMP/versions.json"
           echo "versions in the package: $(jq length "$RUNNER_TEMP/versions.json")"
-      - name: Which go
+      - name: Which tagged versions go
         run: |
-          .github/scripts/images-to-prune.sh < "$RUNNER_TEMP/versions.json" > "$RUNNER_TEMP/prune.txt"
+          .github/scripts/images-to-prune.sh tagged < "$RUNNER_TEMP/versions.json" > "$RUNNER_TEMP/prune-tagged.txt"
+          .github/scripts/images-to-prune.sh keep < "$RUNNER_TEMP/versions.json" > "$RUNNER_TEMP/keep.txt"
+          echo "tagged to delete: $(wc -l < "$RUNNER_TEMP/prune-tagged.txt"), tagged that stay: $(wc -l < "$RUNNER_TEMP/keep.txt")"
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: The platform images inside what stays
+        run: |
+          # the digests of the children of every multi-arch image that stays; one that cannot be read stops the run,
+          # so nothing untagged is deleted on a guess
+          repo="ghcr.io/${OWNER,,}/$PACKAGE"
+          : > "$RUNNER_TEMP/children.txt"
+          while read -r digest; do
+            docker buildx imagetools inspect "$repo@$digest" --raw | jq -r '.manifests[]?.digest' >> "$RUNNER_TEMP/children.txt"
+          done < "$RUNNER_TEMP/keep.txt"
+          sort -u -o "$RUNNER_TEMP/children.txt" "$RUNNER_TEMP/children.txt"
+          n=$(wc -l < "$RUNNER_TEMP/children.txt")
+          echo "children of what stays: $n"
+          [ "$n" -gt 0 ] || { echo "no children found – the images that stay could not be read, nothing untagged is touched" >&2; exit 1; }
+      - name: Which untagged versions go
+        run: |
+          .github/scripts/images-to-prune.sh untagged "$RUNNER_TEMP/children.txt" < "$RUNNER_TEMP/versions.json" > "$RUNNER_TEMP/prune-untagged.txt"
           {
             echo "### Prune images"
             echo
-            echo "Versions in the package: $(jq length "$RUNNER_TEMP/versions.json"); to delete: $(wc -l < "$RUNNER_TEMP/prune.txt") (dry run: $DRY_RUN)"
+            echo "Versions in the package: $(jq length "$RUNNER_TEMP/versions.json") (dry run: $DRY_RUN)"
+            echo
+            echo "Tagged to delete: $(wc -l < "$RUNNER_TEMP/prune-tagged.txt"); untagged to delete: $(wc -l < "$RUNNER_TEMP/prune-untagged.txt")"
             echo
             echo '```'
-            cat "$RUNNER_TEMP/prune.txt"
+            cat "$RUNNER_TEMP/prune-tagged.txt"
+            echo '… and untagged, the first 40:'
+            head -40 "$RUNNER_TEMP/prune-untagged.txt"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          cat "$RUNNER_TEMP/prune.txt"
+          cat "$RUNNER_TEMP/prune-tagged.txt" "$RUNNER_TEMP/prune-untagged.txt"
       - name: Delete
         if: env.DRY_RUN != 'true'
         run: |
-          while read -r id tags; do
-            echo "deleting $id ($tags)"
+          # the tagged ones first, then the platform images nothing lists any more
+          while read -r id rest; do
+            echo "deleting $id ($rest)"
             gh api -X DELETE "/users/$OWNER/packages/container/$PACKAGE/versions/$id"
-          done < "$RUNNER_TEMP/prune.txt"
+          done < <(cat "$RUNNER_TEMP/prune-tagged.txt" "$RUNNER_TEMP/prune-untagged.txt")
