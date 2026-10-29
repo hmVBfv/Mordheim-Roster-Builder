@@ -191,6 +191,9 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
 - **Werte beim Anwerben (Wunsch #131, Rob, 29.10.2026):** im Blatt **Recruit** zeigt jede Einheit unter Preis und Grenze ihre neun Werte
   (M WS BS S T W I A Ld) in einer Zeile, damit man eine Anwerbung beurteilen kann, bevor man sie macht; Einheiten ohne Profil
   (Fahrzeuge) zeigen keine. Henchmen ebenso wie Helden (`RecruitUnit.stats`).
+- **Carried zuerst (Wunsch #135, Rob, 29.10.2026):** im Ausrüstungsblatt steht **„Carried“ ganz oben** in einem eigenen Kasten (Rand und
+  Balken in der Akzentfarbe); darunter, unter der Überschrift **„Buy from the list“** und einer Trennlinie, die Listen, aus denen man kauft,
+  zuletzt die seltenen Gegenstände.
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**
