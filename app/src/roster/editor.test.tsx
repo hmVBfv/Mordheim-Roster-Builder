@@ -119,6 +119,18 @@ describe('the roster', () => {
     expect(within(panel).queryByRole('link', { name: 'All warbands' })).toBeNull();
   });
 
+  /* Wish #131: the Recruit sheet shows the characteristics of each unit. */
+  it('shows the characteristics of a unit in the Recruit sheet before it is added (#131)', async () => {
+    await seed(core.newWarband(data, 'merc'));
+    at('/warbands/w1');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: '+ Recruit' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Recruit' });
+    const capt = within(sheet).getByRole('button', { name: /^Mercenary Captain/ });
+    const stats = within(capt).getByRole('group', { name: 'Characteristics' });
+    expect(stats.textContent).toBe('M4WS4BS4S3T3W1I4A1Ld8');
+  });
+
   it('shows what a warband without warriors may do', async () => {
     await seed(createWarband(data, 'merc', null, ''));
     at('/warbands/w1');

@@ -102,6 +102,8 @@ export interface RecruitUnit {
   note: string;
   /** Why none may be recruited now, or null. */
   why: string | null;
+  /** The unit's profile, to judge an addition before it is made (#131); empty for a unit without one (a vehicle). */
+  stats: StatCell[];
 }
 
 export interface RecruitGroup { label: string; units: RecruitUnit[] }
@@ -287,7 +289,7 @@ function recruitList(ctx: core.Ctx): RecruitGroup[] {
       why = u.req ? 'the warband has its leader' : `the warband has all ${umx} it may have${rests ? `: ${rests}` : ''}`;
     }
     else if (hero && heroesFull) why = `the warband has its ${heroMaxOf(ctx)} Heroes`;
-    return { id: u.id, name: u.name, count: st?.count ?? 0, limit: st?.limit ?? 'any', cost: core.unitBaseCost(ctx, u), exp: Number(u.exp) || 0, note: plainNote(u.sp), why };
+    return { id: u.id, name: u.name, count: st?.count ?? 0, limit: st?.limit ?? 'any', cost: core.unitBaseCost(ctx, u), exp: Number(u.exp) || 0, note: plainNote(u.sp), why, stats: u.profile ? statCells(u.profile, null) : [] };
   };
   const groups: [string, (u: UnitDef) => boolean, boolean][] = [
     ['Heroes', (u) => u.t === 'hero' && !u.vehicle, true],

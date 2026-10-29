@@ -121,6 +121,16 @@ describe('editing a roster', () => {
     expect(unit('warr').why).toBeNull();
   });
 
+  /* Wish #131: the profile is on each line of the recruit list, to judge an addition before making it. */
+  it('gives every unit to recruit its profile, the nine characteristics in order (#131)', () => {
+    const units = rosterView(data, fresh()).recruit.flatMap((g) => g.units);
+    const capt = units.find((u) => u.id === 'capt')!;
+    expect(capt.stats.map((c) => c.key)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);
+    expect(capt.stats.map((c) => c.value)).toEqual(['4', '4', '4', '3', '3', '1', '4', '1', '8']);
+    expect(units.every((u) => u.stats.length === 0 || u.stats.length === 9)).toBe(true);
+    expect(units.filter((u) => u.stats.length === 9).length).toBeGreaterThan(1);
+  });
+
   it('a limit that hangs on other units shows its current maximum and says why nothing more may join (#46)', () => {
     let s = createWarband(data, 'orcmob', null, 'Test');
     s = core.addUnit(ctx(s), 'boss');
