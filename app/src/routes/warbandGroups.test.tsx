@@ -210,7 +210,10 @@ describe('groups of warbands', () => {
     await user.type(name, 'Imperial bands');
     await user.click(within(sheet).getByRole('button', { name: 'Rename Reikland bands' }));
     await waitFor(() => expect(kept(srv)).toMatchObject([{ name: 'Imperial bands', body: { warbands: ['wb-1'] } }]));
-    await user.click(within(sheet).getByRole('button', { name: 'Remove Imperial bands' }));
+    // the sheet takes the rename in a moment after the server has it: wait for its button, not only for the server
+    const remove = await within(sheet).findByRole('button', { name: 'Remove Imperial bands' }, { timeout: 15_000 });
+    await waitFor(() => expect((remove as HTMLButtonElement).disabled).toBe(false), { timeout: 15_000 });
+    await user.click(remove);
     await waitFor(() => expect(kept(srv)).toEqual([]));
     await user.click(within(sheet).getByRole('button', { name: 'Close' }));
     expect(await screen.findByText('The Grey Penitents')).toBeTruthy();
