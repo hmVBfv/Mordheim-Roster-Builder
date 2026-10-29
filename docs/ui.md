@@ -190,6 +190,10 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
 - **Carried zuerst (Wunsch #135, Rob, 29.10.2026):** im Ausrüstungsblatt steht **„Carried“ ganz oben** in einem eigenen Kasten (Rand und
   Balken in der Akzentfarbe); darunter, unter der Überschrift **„Buy from the list“** und einer Trennlinie, die Listen, aus denen man kauft,
   zuletzt die seltenen Gegenstände.
+- **Gegenstände antippen (Wunsch #136, Rob, 29.10.2026):** im Ausrüstungsblatt ist jeder Name – in den Listen zum Kaufen, auch bei den
+  einfachen Startgegenständen, und in „Carried“ – ein Wort mit Blase (`TipWord`): ein Tipp zeigt die Art und die Stärke („Close combat ·
+  Strength: as user“, bei Zweihändern +2) und die Sonderregeln („Parry …“, „Strikes last“). Nur ein Name ohne Regeltext in den Daten
+  bleibt ein schlichtes Wort (`ListRow.tips`, `CarriedRow.tips`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**

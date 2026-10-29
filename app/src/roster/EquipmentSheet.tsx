@@ -4,6 +4,7 @@
    Builder. After the first battle equipment changes only at the Trading
    Post. Changes are made at once; a step back is the − beside it. */
 import { useId, useState } from 'react';
+import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import type { useSheet } from '../ui/useSheet.ts';
 import type { EquipmentView } from './equipment.ts';
@@ -52,7 +53,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
             <tbody>
               {v.carried.map((r) => (
                 <tr key={r.id}>
-                  <th scope="row" className={styles.eqName} title={r.text || undefined}>{r.name}<small>{r.group}</small></th>
+                  <th scope="row" className={styles.eqName}><TipWord label={r.name} tips={r.tips} /><small>{r.group}</small></th>
                   <td className={styles.eqPrice}>{r.price}</td>
                   <td>
                     <span className={styles.eqUpgrade}>
@@ -103,8 +104,8 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
             <tbody>
               {g.rows.map((r) => (
                 <tr key={r.key}>
-                  <th scope="row" className={styles.eqName} title={r.text || undefined}>
-                    {r.name}
+                  <th scope="row" className={styles.eqName}>
+                    <TipWord label={r.name} tips={r.tips} />
                     {r.more && r.qty === 0 && <small>{r.more}</small>}
                   </th>
                   <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : `${r.price} gc${per}`}</td>
