@@ -91,6 +91,23 @@ test('a long warband name wraps inside the side navigation', async ({ page }) =>
   expect(outside, 'nothing in the navigation reaches past its right edge').toEqual([]);
 });
 
+/* #139: on the Export page every heading sits closer to its own text than to the block above it. */
+test('the headings of the export page sit closer to their text than to the block above', async ({ page }) => {
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await page.getByRole('radio', { name: 'Mercenaries', exact: true }).check();
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await page.getByRole('link', { name: 'Export' }).click();
+  await expect(page.getByRole('heading', { name: 'Readable text' })).toBeVisible();
+  const gaps = await page.evaluate(() => [...document.querySelectorAll('main h2')].map((h) => {
+    const r = h.getBoundingClientRect();
+    const above = (h.closest('section')?.previousElementSibling ?? h.previousElementSibling)!.getBoundingClientRect();
+    const below = h.nextElementSibling!.getBoundingClientRect();
+    return { title: h.textContent, up: Math.round(r.top - above.bottom), down: Math.round(below.top - r.bottom) };
+  }));
+  expect(gaps.length).toBeGreaterThan(3);
+  for (const g of gaps) expect(g.up, `${g.title}: room above ${g.up}, room below ${g.down}`).toBeGreaterThan(g.down);
+});
+
 /* #68: a caster's card shows the spell list of his school, with casting values and effects. */
 test('a Wizard shows the spells of his school on his card', async ({ page }) => {
   await page.goto('./');

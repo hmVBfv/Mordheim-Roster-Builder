@@ -32,8 +32,8 @@ function SendToServer({ ctx, onCopied }: { ctx: core.Ctx; onCopied: (what: strin
     return () => { live = false; };
   }, [server, ctx]);
   return (
-    <section className={styles.group} aria-labelledby="ex-server">
-      <h2 id="ex-server">Campaign server</h2>
+    <section className={ui.group} aria-labelledby="ex-server">
+      <h2 id="ex-server" className={ui.groupTitle}>Campaign server</h2>
       {server ? (
         <>
           <p className={ui.muted}>Opens the campaign app at {server.replace(/^https?:\/\//, '')} with this warband: there you add it as a new warband or as the next version of one of yours. The warband travels in the link itself, not through any server.</p>
@@ -108,8 +108,8 @@ function Body({ rec }: { rec: StoredWarband }) {
         {rules > 0 ? ` Every export names its ${rules} house rule${rules > 1 ? 's' : ''}.` : ' No house rules: the rules as written.'}
       </p>
 
-      <section className={styles.group} aria-labelledby="ex-tts">
-        <h2 id="ex-tts">Tabletop Simulator</h2>
+      <section className={ui.group} aria-labelledby="ex-tts">
+        <h2 id="ex-tts" className={ui.groupTitle}>Tabletop Simulator</h2>
         <p className={ui.muted}>Two fields for each model, each copied on its own into the model’s Name and Description. Colour codes like [7AD1A4] show as colours there. A henchman group gives one card for each man, with his own name.</p>
         {cards.length > 1 && (
           <div className={styles.cardTools}>
@@ -123,8 +123,8 @@ function Body({ rec }: { rec: StoredWarband }) {
         </div>
       </section>
 
-      <section className={styles.group} aria-labelledby="ex-text">
-        <h2 id="ex-text">Readable text</h2>
+      <section className={ui.group} aria-labelledby="ex-text">
+        <h2 id="ex-text" className={ui.groupTitle}>Readable text</h2>
         <p className={ui.muted}>For reading and sharing. It ends in the warband’s data, so pasting it into Import brings the warband back.</p>
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} onClick={() => setText((t) => (t == null ? readableText(ctx, new Date()).text : null))}>{text == null ? 'Show the text' : 'Hide the text'}</button>
@@ -134,16 +134,16 @@ function Body({ rec }: { rec: StoredWarband }) {
         {text != null && <textarea className={`${ui.input} ${styles.mono}`} readOnly rows={14} value={text} aria-label="Readable text" />}
       </section>
 
-      <section className={styles.group} aria-labelledby="ex-file">
-        <h2 id="ex-file">Tool file</h2>
+      <section className={ui.group} aria-labelledby="ex-file">
+        <h2 id="ex-file" className={ui.groupTitle}>Tool file</h2>
         <p className={ui.muted}>The warband as data (.json): loads back into this app and into the Roster Builder through Import.</p>
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} onClick={() => { const f = toolFile(ctx, __APP_VERSION__); saveFile(f.filename, f.json, 'application/json'); }}>Save as .json</button>
         </div>
       </section>
 
-      <section className={styles.group} aria-labelledby="ex-pdf">
-        <h2 id="ex-pdf">Official roster sheet</h2>
+      <section className={ui.group} aria-labelledby="ex-pdf">
+        <h2 id="ex-pdf" className={ui.groupTitle}>Official roster sheet</h2>
         <p className={ui.muted}>The printed Mordheim roster sheet (PDF), filled in with the warband – to print or to keep.</p>
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} disabled={pdf === 'making'} onClick={() => { void makePdf(); }}>{pdf === 'making' ? 'Making the sheet…' : 'Save as PDF'}</button>
@@ -153,8 +153,8 @@ function Body({ rec }: { rec: StoredWarband }) {
 
       {FLAVOUR === 'quickbuild' && <SendToServer ctx={ctx} onCopied={copied} />}
 
-      <section className={styles.group} aria-labelledby="ex-print">
-        <h2 id="ex-print">Print</h2>
+      <section className={ui.group} aria-labelledby="ex-print">
+        <h2 id="ex-print" className={ui.groupTitle}>Print</h2>
         <p className={ui.muted}>The roster as it is on the screen, without the buttons; or the official sheet above, as a PDF.</p>
         <div className={ui.row}>
           <button type="button" className={ui.buttonQuiet} onClick={() => { void navigate(`/warbands/${rec.id}`, { state: { print: true } }); }}>Print the roster</button>
