@@ -29,9 +29,8 @@ export function CopyField({ label, value, rows, onCopied }: { label: string; val
 export function Card({ c, open, onOpen, onCopied }: { c: CardData; open: boolean; onOpen: (open: boolean) => void; onCopied: (what: string) => void }) {
   return (
     <details id={c.id} className={styles.card} open={open} onToggle={(e) => onOpen(e.currentTarget.open)}>
-      <summary className={styles.summary}>
-        <span>{c.label}</span>
-        {c.group && <small className={ui.muted}>of {c.group}</small>}
+      <summary className={`${styles.summary} ${ui.fold}`}>
+        <span className={styles.summaryText}><span>{c.label}</span>{c.group && <small className={ui.muted}>of {c.group}</small>}</span>
       </summary>
       <CopyField label="Name" value={c.name} rows={1} onCopied={onCopied} />
       <CopyField label="Description" value={c.text} rows={8} onCopied={onCopied} />
