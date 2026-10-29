@@ -4400,3 +4400,23 @@ finder. Pull request 260 (merge 258 first).
 #131: every unit on the Recruit sheet shows its nine characteristics under the price, henchmen too (Rob). A table does not belong in
 a button, so they are small spans in a grid (`role="group"`, "Characteristics"). Pull request 261; it adds a paragraph to `docs/ui.md`
 right below the one #130 changes, so a conflict there is to be expected if 261 is merged before 260.
+
+## October 29, 2026 (second run) — the Sea dragon cloak in Sv (#137), equipment sheet (#135, #136), export page (#139, #138)
+
+#137: the cloak gives +2 against shooting and +1 in close combat on top of armour, but the Sv on a card ignored it. Rob chose the
+reporter's idea: the worse value, +1, with an asterisk ("5+*"; "6+*" without armour, never better than 2+). The legacy `svOfModel` is
+left alone – exports, TTS and the parity suite use it – and the card takes a new `svShownLabel`; a row in `behaviour-changes.md` says
+so. Pull request 263.
+
+#135, #136: "Carried" is the first thing in the equipment sheet now, in a box of its own, the lists to buy from under their own heading
+(Rob: "carried ganz oben"). The names in the lists – the common start items too – and in Carried are words with a bubble: a tap shows the
+kind and strength line and the special rules; until now only a mouse saw them, as a `title`. 189 of the 190 list items have a text in
+the data, so no data was touched. #136 is stacked on #135 (the same sheet). Pull requests 264, 265.
+
+#139, #138: the Export page's headings sat closer to the block above them than to their own text (34 px against 38 px, measured by the
+new test); its sections use the titled group of the other screens now. The Tabletop Simulator cards got the fold bar with the turning
+arrow of the other fold-outs, since the reporter did not see that they open. #138 is stacked on #139. Pull requests 266, 267.
+
+One wrong turn on the way: a `vite preview` of mine, left running on port 4173 after a screenshot script, served an old build to the
+quickbuild flavour of the end-to-end tests and made a new test fail for no reason of its own; and `pkill -f "vite preview"` killed my own
+shell, since the command line contained the words. The scripts now start their server detached and stop it by process group.
