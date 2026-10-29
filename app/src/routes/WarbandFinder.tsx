@@ -41,7 +41,7 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
   return (
     <section className={styles.finder} aria-label="Find a warband">
       <div className={styles.grid}>
-        <label className={ui.field}><span>Look for</span>
+        <label className={`${ui.field} ${styles.search}`}><span>Look for</span>
           <input className={ui.input} type="search" value={filter.q ?? ''} autoComplete="off" onChange={(e) => set({ q: e.target.value })} /></label>
         <label className={ui.field}><span>Race</span>
           <select className={ui.select} value={filter.race ?? ''} onChange={(e) => set({ race: e.target.value })}>

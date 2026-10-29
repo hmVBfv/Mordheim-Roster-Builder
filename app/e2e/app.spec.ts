@@ -64,6 +64,16 @@ for (const theme of THEMES) {
   });
 }
 
+/* #134: "Look for" has a row of its own above the other filter fields, as wide as the filter. */
+test('the Look for field of the new-warband filter has a row of its own', async ({ page }) => {
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const look = (await page.getByLabel('Look for').boundingBox())!;
+  const race = (await page.getByLabel('Race').boundingBox())!;
+  expect(look.y + look.height, 'above the other fields').toBeLessThanOrEqual(race.y);
+  expect(look.width, 'wider than a single field').toBeGreaterThan(race.width * 2);
+});
+
 /* #132: a long warband name stays inside the navigation on a desktop and wraps there, it does not widen the bar and push the arrows. */
 test('a long warband name wraps inside the side navigation', async ({ page }) => {
   await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');

@@ -164,7 +164,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
 - **Eine Warband finden (Wunsch #116, Rob, 28.10.2026; umgebaut mit #121–#125, Rob, 28.10.2026):** unter „New warband“ steht
-  **„Find a warband“** immer offen (nicht einklappbar) über der **Tabelle** der passenden Warbands. Filter: Name („Look for“),
+  **„Find a warband“** immer offen (nicht einklappbar) über der **Tabelle** der passenden Warbands. Filter: Name („Look for“, eine eigene Zeile über den anderen Feldern, Meldung #134),
   Rasse, Grade, **Heldenzahl zum Start** (was die Heldeneinheiten der Warband zusammen erlauben, höchstens 6: „Up to 4/5/6“), ein
   **großes Wesen** (Daten: `large`, z. B. Kroxigor, Minotaur), **Gold from/to** und **Max. models from/to**, dazu die Sortierung
   (Stufe, Name, Gold, Modellzahl, Helden). Gold und Modellzahl sind **vorbelegt** mit dem kleinsten und größten Wert über alle
