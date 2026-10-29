@@ -74,6 +74,23 @@ test('the Look for field of the new-warband filter has a row of its own', async 
   expect(look.width, 'wider than a single field').toBeGreaterThan(race.width * 2);
 });
 
+/* #132: a long warband name stays inside the navigation on a desktop and wraps there, it does not widen the bar and push the arrows. */
+test('a long warband name wraps inside the side navigation', async ({ page }) => {
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
+  await page.getByRole('textbox', { name: 'Name' }).fill('The Ever So Very Long Named Merchants of the Stirwood Road and All Their Friends');
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  const outside = await page.evaluate(() => {
+    const nav = document.querySelector('nav')!.getBoundingClientRect();
+    return [...document.querySelectorAll('nav *')]
+      .map((e) => ({ tag: e.tagName, right: e.getBoundingClientRect().right, w: e.getBoundingClientRect().width }))
+      .filter((r) => r.w > 0 && r.right > nav.right + 0.5);
+  });
+  expect(outside, 'nothing in the navigation reaches past its right edge').toEqual([]);
+});
+
 /* #68: a caster's card shows the spell list of his school, with casting values and effects. */
 test('a Wizard shows the spells of his school on his card', async ({ page }) => {
   await page.goto('./');
