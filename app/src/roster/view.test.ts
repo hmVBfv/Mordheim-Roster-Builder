@@ -121,6 +121,17 @@ describe('editing a roster', () => {
     expect(unit('warr').why).toBeNull();
   });
 
+  /* Report #137: the Sea dragon cloak improves the save, the card says so with a star. */
+  it('shows the save one better, with a star, for a Sea dragon cloak (#137)', () => {
+    let s = fresh();
+    s = core.addUnit(ctx(s), 'capt');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Leichte Rüstung', 1);
+    expect(rosterView(data, s).heroes[0]!.save).toBe('6+');
+    s = core.addRare(ctx(s), uid, 'Seedrachen-Umhang');
+    expect(rosterView(data, s).heroes[0]!.save).toBe('5+*');
+  });
+
   /* Wish #131: the profile is on each line of the recruit list, to judge an addition before making it. */
   it('gives every unit to recruit its profile, the nine characteristics in order (#131)', () => {
     const units = rosterView(data, fresh()).recruit.flatMap((g) => g.units);

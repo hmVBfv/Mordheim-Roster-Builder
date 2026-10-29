@@ -246,7 +246,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     missGames: Number(m.miss) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
     max: ((mi) => maxRow(ctx, mi?.label ?? null, mi?.prof))(core.maxInfo(ctx, m)),
-    save: core.svLabel(core.svOfModel(ctx, m)),
+    save: core.svShownLabel(ctx, m),
     ...facts,
     retire: (m.inj ?? []).filter((j) => j.code === '31').length >= 2,
     captive: m.captive ? m.captive.by : null,
