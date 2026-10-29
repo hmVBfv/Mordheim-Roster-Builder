@@ -4377,3 +4377,16 @@ dropped – it would have been a data edit for a display wish.
 it without closing and reopening it. Only this window (Rob), not every sheet: `useMovable` offsets the native dialog with a CSS
 `translate` and puts it back when it closes; the pointer stays inside the browser window so the heading cannot be lost. A phone
 keeps the bottom sheet. Pull request 256.
+
+## October 29, 2026 — a long name in the side navigation (#132), "Look for" on its own row (#134)
+
+#132: the reporter wrote of "the right bar"; I first took it for the warband panel on the roster and only saw it in a screenshot at
+2000 px: it is the left navigation, where a warband's name is a nowrap link in a grid cell that could not shrink below its text.
+A long name widened the whole bar and pushed the arrows of the other groups. The cells may shrink now and the name wraps
+(`overflow-wrap: anywhere`). The e2e test measures that nothing in the navigation reaches past its edge; its first version failed in
+the quickbuild flavour for a reason of its own – a `vite preview` of mine left running on port 4173 served the wrong build – which
+cost a few runs. Pull request 257.
+
+#134: "Look for" spans the whole filter row of the new-warband picker. Pull request 258. The wishes #130, #131 and #133 (a Race column
+and a Yes/No column for big creatures, no radio look, filter fields in the order of the columns; stats shown when recruiting) wait for
+Rob's word.
