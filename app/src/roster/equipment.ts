@@ -4,6 +4,7 @@
 import * as core from '@mordheim/core';
 import type { CatalogItem, Model, WarbandState } from '@mordheim/core';
 import { priceAverage, priceRange, priceText } from './rarePrice.ts';
+import { itemTip, type Tip } from './tips.ts';
 import { rosterView, type StatCell } from './view.ts';
 
 const CATS: Record<string, string> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour', Besonderes: 'Other', 'Besonderes (nur Heldinnen)': 'Other (Heroines only)' };
@@ -20,7 +21,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 /* ---- a warrior's list, while the warband is founded ---- */
 
-export interface ListRow { key: string; name: string; price: number; qty: number; /** The least the stepper goes to: the free dagger stays (#117). */ min: number; free: boolean; text: string; /** Why no more may be taken from the list, or ''. */ more: string }
+export interface ListRow { key: string; name: string; price: number; qty: number; /** The least the stepper goes to: the free dagger stays (#117). */ min: number; free: boolean; text: string; /** What a tap on the name shows: its kind and strength, its special rules (#136). */ tips: Tip[]; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
 export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
 /** One thing he carries – every one on a line of its own, never "2×" (#115). */
@@ -28,7 +29,7 @@ export interface CarriedRow {
   id: string;
   /** The list item or the catalogue key it stands for, and where taking one away goes. */
   key: string; name: string; group: string; from: 'list' | 'rare';
-  price: string; free: boolean; text: string;
+  price: string; free: boolean; text: string; tips: Tip[];
   /** He keeps it: the free dagger is never given away or sold. */
   keep: boolean;
   /** A poison or a drug: lasts one battle, and the line says "Used" for taking it away. */
@@ -74,7 +75,7 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
       .filter(([nm]) => !ctx.data.BRACE_HIDE[nm])
       .map(([nm, pr]) => {
         const qty = Number(m.eq?.[nm]) || 0;
-        return { key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), qty, min: nm.includes(FREE) ? 1 : 0, free: nm.includes(FREE), text: itemText(ctx.data, nm), more: core.listProblem(ctx, uid, nm, qty + 1) };
+        return { key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), qty, min: nm.includes(FREE) ? 1 : 0, free: nm.includes(FREE), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), more: core.listProblem(ctx, uid, nm, qty + 1) };
       }),
   })).filter((g) => g.rows.length);
   // one row for an item; a weapon upgrade has one row for every weapon it sits on (reports #109, #110)
@@ -141,7 +142,7 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
         }) : [];
         out.push({
           id: `l:${nm}:${i}`, key: nm, name: core.enItem(ctx.data, nm), group: core.itemGroup(ctx, nm) ?? CATS[cat] ?? cat, from: 'list',
-          price: freeOne ? 'free' : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, used: core.isConsumable(ctx, nm), text: itemText(ctx.data, nm), weapon, ups, options, qty,
+          price: freeOne ? 'free' : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, used: core.isConsumable(ctx, nm), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon, ups, options, qty,
         });
       }
     }
@@ -151,7 +152,7 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     for (let i = 0; i < (Number(r?.q) || 0); i++) {
       out.push({ id: `r:${de}:${i}`, key: de, name: it?.en ?? core.enItem(ctx.data, de), group: core.itemGroup(ctx, de) ?? 'Rare and trading-post items', from: 'rare',
-        price: `${Number(r?.paid) || 0} gc`, free: false, keep: false, used: core.isConsumable(ctx, de), text: itemText(ctx.data, it?.en ?? de), weapon: false, ups: [], options: [], qty: Number(r?.q) || 0 });
+        price: `${Number(r?.paid) || 0} gc`, free: false, keep: false, used: core.isConsumable(ctx, de), text: itemText(ctx.data, it?.en ?? de), tips: itemTip(ctx.data, it?.en ?? de), weapon: false, ups: [], options: [], qty: Number(r?.q) || 0 });
     }
   }
   return out;
