@@ -21,12 +21,21 @@ export type AdvanceChoice =
 function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['close']; onApply: (c: AdvanceChoice, text: string) => void; titleId: string }) {
   const [roll, setRoll] = useState('');
   const [stat, setStat] = useState<StatKey | null>(null);
+  const [die, setDie] = useState('');
   const [pick, setPick] = useState<string | null>(null); // "skill:…", "spell:…", "reduce:i"
   const [man, setMan] = useState(0);
   const [lists, setLists] = useState<string[]>([]);
   const row = rowFor(v.table, Number(roll));
   const open = row?.stats?.filter((k) => v.canRaise[k]) ?? [];
-  const chosenStat = row?.kind === 'stat' ? (stat && open.includes(stat) ? stat : open.length === 1 ? open[0]! : null) : null;
+  // a row that says "roll a D6" is decided by the die, not chosen (#144): 1–3 the first, 4–6 the second; at his maximum he takes the other
+  const dieRow = row?.kind === 'stat' && row.d6 && row.stats?.length === 2 ? row.stats : null;
+  const dieN = /^[1-6]$/.test(die) ? Number(die) : 0;
+  const named = dieRow && dieN ? dieRow[dieN <= 3 ? 0 : 1]! : null;
+  const chosenStat = row?.kind === 'stat'
+    ? (dieRow ? (named && open.includes(named) ? named : named && open.length === 1 ? open[0]! : null)
+      : stat && open.includes(stat) ? stat : open.length === 1 ? open[0]! : null)
+    : null;
+  const again = row?.kind === 'stat' && !open.length;
   const talent = row?.kind === 'talent' ? v.talent : null;
   const talentOk = !!talent && 'men' in talent && (talent.fixed ? true : lists.length === 2);
   const all = v.skills.flatMap((g) => g.items);
@@ -64,7 +73,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
       </details>
       <label className={ui.field}><span>2D6 as rolled</span>
         <input className={ui.input} inputMode="numeric" maxLength={2} value={roll} autoComplete="off"
-          onChange={(e) => { setRoll(e.target.value.replace(/\D/g, '')); setStat(null); setPick(null); }} />
+          onChange={(e) => { setRoll(e.target.value.replace(/\D/g, '')); setStat(null); setPick(null); setDie(''); }} />
       </label>
       <div className={styles.result} aria-live="polite">
         {!row ? <p className={ui.muted}>Enter the total of two dice, 2–12.</p> : (
@@ -73,16 +82,32 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
             {row.how && <p>{row.how}</p>}
             {row.kind === 'stat' && (
               <>
-                <div className={styles.pickRow} role="group" aria-label="Characteristic">
-                  {row.stats!.map((k) => (
-                    <button key={k} type="button" disabled={!v.canRaise[k]} aria-pressed={chosenStat === k} onClick={() => setStat(k)}>
-                      +1 {STAT_NAMES[k]}{!v.canRaise[k] && <small> at his maximum</small>}
-                    </button>
-                  ))}
-                </div>
-                {!open.length && <p>{row.stats!.length > 1 ? 'Both are at his maximum: roll again.' : 'At his maximum: roll again.'}</p>}
-                {open.length > 0 && open.length < row.stats!.length && row.stats!.length > 1 && <p className={ui.muted}>One is at his maximum: he takes the other.</p>}
-                <p className={ui.muted}>{v.maxNote}</p>
+                {again ? (
+                  <div className={styles.again} role="alert">
+                    <p><b>Roll the 2D6 again.</b> {row.stats!.length > 1 ? 'Both are at his maximum.' : 'It is at his maximum.'}</p>
+                    <button type="button" className={ui.buttonQuiet} onClick={() => { setRoll(''); setStat(null); setDie(''); }}>Roll again</button>
+                  </div>
+                ) : dieRow ? (
+                  <>
+                    <label className={ui.field}><span>D6 as rolled</span>
+                      <input className={ui.input} inputMode="numeric" maxLength={1} value={die} autoComplete="off" onChange={(e) => setDie(e.target.value.replace(/[^1-6]/g, ''))} />
+                    </label>
+                    {chosenStat && <p><b>+1 {STAT_NAMES[chosenStat]}</b>{named && named !== chosenStat && <> · {STAT_NAMES[named]} is at his maximum: he takes {STAT_NAMES[chosenStat]}</>}</p>}
+                    <p className={ui.muted}>{v.maxNote}</p>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.pickRow} role="group" aria-label="Characteristic">
+                      {row.stats!.map((k) => (
+                        <button key={k} type="button" disabled={!v.canRaise[k]} aria-pressed={chosenStat === k} onClick={() => setStat(k)}>
+                          +1 {STAT_NAMES[k]}{!v.canRaise[k] && <small> at his maximum</small>}
+                        </button>
+                      ))}
+                    </div>
+                    {open.length > 0 && open.length < row.stats!.length && row.stats!.length > 1 && <p className={ui.muted}>One is at his maximum: he takes the other.</p>}
+                    <p className={ui.muted}>{v.maxNote}</p>
+                  </>
+                )}
               </>
             )}
             {row.kind === 'skill' && (

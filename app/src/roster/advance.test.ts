@@ -25,6 +25,8 @@ describe('the advance tables', () => {
     }
     expect(rowFor(HERO_TABLE, 7)!.stats).toEqual(['WS', 'BS']);
     expect(rowFor(HENCH_TABLE, 11)!.kind).toBe('talent');
+    // the rows that say "roll a D6" are decided by the die (#144); "choose one" is not
+    expect(HERO_TABLE.filter((r) => r.d6).map((r) => r.from)).toEqual([6, 8, 9]);
   });
 });
 

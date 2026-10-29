@@ -423,6 +423,15 @@ Name, „Story so far“, „Tabletop Simulator card“ und, getrennt, „Out of
 action for good…“ bzw. Entlassen. Die Beschriftungen der Knöpfe und der
 Stepper sind dieselben wie zuvor.
 
+**Aufstieg (Advance).** Die Zeilen der Heldentabelle, die einen zweiten Wurf
+verlangen (6: Stärke oder Attacken, 8: Initiative oder Mut, 9: Wunde oder
+Widerstand), fragen nach dem W6 („D6 as rolled“, 1–3 die erste, 4–6 die zweite
+Eigenschaft) statt eine freie Wahl zu lassen; nur 7 (WS oder BS) wird gewählt.
+Steht die genannte Eigenschaft am Maximum, nimmt der Held die andere und die
+Zeile sagt es. Sind beide am Maximum, steht an der Stelle eine Meldung „Roll the
+2D6 again“ mit dem Knopf „Roll again“, der den 2W6 leert; „Apply“ bleibt aus
+(#144, #145).
+
 **Druck.** Das Blatt zum Drucken gibt es nur, solange der Browser druckt
 (`beforeprint` bis `afterprint`): jeder Krieger in voller Länge, ohne Knöpfe.
 Auf dem Bildschirm steht die Liste nie doppelt. „Export“ → „Print the
