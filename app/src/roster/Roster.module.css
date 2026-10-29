@@ -155,6 +155,20 @@
   margin: 0;
 }
 
+/* what is carried comes first and is a box of its own (#135), the lists to buy from follow under their own heading */
+.eqCarriedBox {
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.eqBuyHead {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
 .eqList {
   display: grid;
   margin: 0;

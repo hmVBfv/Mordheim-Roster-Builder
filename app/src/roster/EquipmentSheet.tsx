@@ -43,29 +43,8 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
           ? 'Hired after the warband\'s first battle: until his own he buys from his list at its prices – common items freely, rare ones only by a search at the Trading Post. Taking an item back returns its price.'
           : `Until the first battle every warrior buys from his own list${v.men > 1 ? ', a group for every man' : ''}, with what the warband gives at the start; the Trading Post opens after his first battle. Taking an item back returns its price.`}</p>
       </div>
-      {/* the list, one small table for each kind, side by side where there is room (#115) */}
-      <div className={styles.eqTables}>
-        {v.groups.map((g) => (
-          <table key={g.label} className={`${styles.eqTable} ${styles.eqListTable}`}>
-            <caption>{g.label}</caption>
-            <thead className="visually-hidden"><tr><th scope="col">Item</th><th scope="col">Price</th><th scope="col">How many</th></tr></thead>
-            <tbody>
-              {g.rows.map((r) => (
-                <tr key={r.key}>
-                  <th scope="row" className={styles.eqName} title={r.text || undefined}>
-                    {r.name}
-                    {r.more && r.qty === 0 && <small>{r.more}</small>}
-                  </th>
-                  <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : `${r.price} gc${per}`}</td>
-                  <td><Stepper label={r.name} value={r.qty} min={r.min} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ))}
-      </div>
-      {/* what he carries: every piece on its own line, so each weapon can be upgraded (#115) */}
-      <section className={styles.eqGroup} aria-label="Carried">
+      {/* what he carries comes first and stands apart (#135): every piece on its own line, so each weapon can be upgraded (#115) */}
+      <section className={`${styles.eqGroup} ${styles.eqCarriedBox}`} aria-label="Carried">
         <h3>Carried</h3>
         {v.carried.length === 0 ? <p className={ui.muted}>Nothing carried yet.</p> : (
           <table className={`${styles.eqTable} ${styles.eqCarried}`}>
@@ -112,6 +91,30 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
             </tbody>
           </table>
         )}
+      </section>
+      <section className={styles.eqGroup} aria-label="Buy from the list">
+        <h3 className={styles.eqBuyHead}>Buy from the list</h3>
+      {/* the list, one small table for each kind, side by side where there is room (#115) */}
+      <div className={styles.eqTables}>
+        {v.groups.map((g) => (
+          <table key={g.label} className={`${styles.eqTable} ${styles.eqListTable}`}>
+            <caption>{g.label}</caption>
+            <thead className="visually-hidden"><tr><th scope="col">Item</th><th scope="col">Price</th><th scope="col">How many</th></tr></thead>
+            <tbody>
+              {g.rows.map((r) => (
+                <tr key={r.key}>
+                  <th scope="row" className={styles.eqName} title={r.text || undefined}>
+                    {r.name}
+                    {r.more && r.qty === 0 && <small>{r.more}</small>}
+                  </th>
+                  <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : `${r.price} gc${per}`}</td>
+                  <td><Stepper label={r.name} value={r.qty} min={r.min} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ))}
+      </div>
       </section>
       <section className={styles.eqGroup} aria-label="Rare and trading-post items">
         <h3>Rare and trading-post items</h3>
