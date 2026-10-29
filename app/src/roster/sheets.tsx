@@ -106,6 +106,11 @@ function UnitButton({ u, onPick }: { u: RecruitUnit; onPick: () => void }) {
       <button type="button" className={styles.unit} disabled={!!u.why} onClick={onPick}>
         <span className={styles.unitName}>{u.name}{u.count > 0 && <span className={styles.count}> ×{u.count}</span>}</span>
         <small>{facts}</small>
+        {u.stats.length > 0 && (
+          <span className={styles.unitStats} role="group" aria-label="Characteristics">
+            {u.stats.map((c) => <span key={c.key}><small>{c.key}</small>{c.value}</span>)}
+          </span>
+        )}
         {u.why ? <small className={styles.why}>Not now: {u.why}.</small> : u.note && <small className={styles.note}>{u.note}</small>}
       </button>
     </li>

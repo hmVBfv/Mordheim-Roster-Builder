@@ -182,6 +182,9 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   mordheimer.net). Wohin ein Stück gehört, entscheidet zuerst die Preisliste (`group` im Katalog, Schwarzpulver), dann die Liste der
   Einheit, dann die Art im Katalog, zuletzt die erste Zeile seiner Regel (so steht der Seedrachen-Umhang unter Armour, obwohl der
   Katalog ihn als „misc“ führt). Der Tooltip eines Gifts oder einer Droge nennt in der Kopfzeile **„one use“** (`app/src/roster/tips.ts`).
+- **Werte beim Anwerben (Wunsch #131, Rob, 29.10.2026):** im Blatt **Recruit** zeigt jede Einheit unter Preis und Grenze ihre neun Werte
+  (M WS BS S T W I A Ld) in einer Zeile, damit man eine Anwerbung beurteilen kann, bevor man sie macht; Einheiten ohne Profil
+  (Fahrzeuge) zeigen keine. Henchmen ebenso wie Helden (`RecruitUnit.stats`).
 - **Planner (Wunsch #77, Rob, 25.10.2026):** unter „New warband“ der Haken **„A planner“**
   (nicht bei einer Warband für eine Kampagne): eine Warband ohne Goldgrenze, die zeigt,
   wie eine starke späte Zusammenstellung aussieht. Statt Gold zeigt sie den **Wert**

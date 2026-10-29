@@ -110,6 +110,29 @@
   color: var(--text-muted);
 }
 
+/* the profile of a unit to recruit (#131): nine small cells, name over value, in one line */
+.unitStats {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 2px;
+  margin-block: 2px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.unitStats > span {
+  display: grid;
+  padding: 1px 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  line-height: 1.2;
+}
+
+.unitStats small {
+  font-size: 0.7rem;
+}
+
 .unitName {
   font-weight: 600;
 }
