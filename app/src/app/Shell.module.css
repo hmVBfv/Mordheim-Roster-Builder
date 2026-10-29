@@ -159,9 +159,16 @@
   }
 
   .nav > ul {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     padding: var(--space-3) var(--space-2);
     gap: var(--space-1);
+  }
+
+  /* a long name never widens the bar (#132): every level of the list may shrink below its text */
+  .nav li,
+  .sub,
+  .subSub {
+    min-width: 0;
   }
 
   .navLink {
@@ -235,18 +242,19 @@
     margin-left: var(--space-2);
   }
 
+  /* a name that does not fit goes on a second line, and a very long word breaks where it must (#132) */
   .subLink {
     display: flex;
     align-items: center;
+    min-width: 0;
     min-height: var(--tap);
-    padding: 0 var(--space-2);
+    padding: var(--space-1) var(--space-2);
     border-radius: var(--radius);
     color: var(--text-muted);
     font-size: 0.92rem;
+    line-height: 1.25;
     text-decoration: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   .subLink:hover {
