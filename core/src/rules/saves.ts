@@ -71,6 +71,24 @@ export function svOfModel(ctx: Ctx, m: Model): number | null {
   return best;
 }
 
+/** Does the model carry a Sea dragon cloak? It is a rare item under either spelling of its German name. */
+const hasSeaDragonCloak = (ctx: Ctx, m: Model): boolean =>
+  Object.entries(m.rare ?? {}).some(([de, r]) => (Number(r?.q) || 0) > 0 && String(ctx.data.EQEN[de] ?? de).toLowerCase() === 'sea dragon cloak');
+
+/** The save a card shows (report #137, Rob, 29.10.2026): the Sea dragon cloak gives +2 against shooting and +1 in close
+    combat on top of armour; the card counts the worse one, +1, and marks it with an asterisk. A model without armour has 6+
+    with it, as with any one-point modifier. `svOfModel` itself stays as legacy has it (exports, parity). */
+export function svShown(ctx: Ctx, m: Model): { value: number | null; starred: boolean } {
+  const base = svOfModel(ctx, m);
+  if (!hasSeaDragonCloak(ctx, m)) return { value: base, starred: false };
+  return { value: base == null ? 6 : Math.max(2, base - 1), starred: true };
+}
+
+export function svShownLabel(ctx: Ctx, m: Model): string {
+  const { value, starred } = svShown(ctx, m);
+  return svLabel(value) + (starred ? '*' : '');
+}
+
 /** The armour save of a Hired Sword or Dramatis Personae entry. */
 export function svOfEntry(ctx: Ctx, e: HireEntry | null | undefined, rec?: HireRecord | null): number | null {
   let best = svFromText(rec ? hsChosenEq(ctx, rec, e) : e && e.eq);
