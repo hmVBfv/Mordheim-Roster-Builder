@@ -163,6 +163,10 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Reiter über der Seite und ab 900 px als Unterpunkte der Seitenleiste
   (`account/adminTabs.ts`). Ihre Listen sind Tabellen; am Handy wird jede Zeile
   zur Karte, deren Zellen ihre Spalte nennen.
+- **Export: Gruppen und Aufklappkarten (Meldung #139, Wunsch #138, Rob, 29.10.2026):** die Abschnitte der Export-Seite sind **Gruppen mit
+  Titel** wie auf den anderen Seiten (Platz über dem Block, wenig zwischen Titel und Text; vorher saß die Überschrift näher am Block
+  darüber als an ihrem Text). Die Karten unter „Tabletop Simulator“ haben die **Leiste mit dem Pfeil** der anderen Aufklappfelder (`ui.fold`),
+  damit man sieht, dass man sie öffnen kann (`app/src/roster/TtsCard.tsx`).
 - **Eine Warband finden (Wunsch #116, Rob, 28.10.2026; umgebaut mit #121–#125, Rob, 28.10.2026):** unter „New warband“ steht
   **„Find a warband“** immer offen (nicht einklappbar) über der **Tabelle** der passenden Warbands. Filter: Name („Look for“, eine eigene Zeile über den anderen Feldern, Meldung #134),
   Rasse, Grade, **Heldenzahl zum Start** (was die Heldeneinheiten der Warband zusammen erlauben, höchstens 6: „Up to 4/5/6“), ein

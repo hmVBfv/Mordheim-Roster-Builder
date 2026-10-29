@@ -22,13 +22,22 @@
 }
 
 .summary {
+  min-height: var(--tap);
+}
+
+/* the title bar is the fold bar of the other fold-outs (an arrow that turns, #138); inside the card it needs no frame of its own */
+.card > .summary {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.summaryText {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0 var(--space-2);
-  min-height: var(--tap);
-  padding: var(--space-2) 0;
-  cursor: pointer;
 }
 
 .field {
