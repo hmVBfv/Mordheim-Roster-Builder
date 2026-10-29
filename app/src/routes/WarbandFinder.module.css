@@ -13,6 +13,11 @@
   align-items: end;
 }
 
+.search {
+  /* the name has a row of its own, as wide as the filter (#134) */
+  grid-column: 1 / -1;
+}
+
 .pair {
   display: grid;
   grid-template-columns: 1fr 1fr;

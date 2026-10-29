@@ -64,6 +64,16 @@ for (const theme of THEMES) {
   });
 }
 
+/* #134: "Look for" has a row of its own above the other filter fields, as wide as the filter. */
+test('the Look for field of the new-warband filter has a row of its own', async ({ page }) => {
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const look = (await page.getByLabel('Look for').boundingBox())!;
+  const race = (await page.getByLabel('Race').boundingBox())!;
+  expect(look.y + look.height, 'above the other fields').toBeLessThanOrEqual(race.y);
+  expect(look.width, 'wider than a single field').toBeGreaterThan(race.width * 2);
+});
+
 /* #68: a caster's card shows the spell list of his school, with casting values and effects. */
 test('a Wizard shows the spells of his school on his card', async ({ page }) => {
   await page.goto('./');
