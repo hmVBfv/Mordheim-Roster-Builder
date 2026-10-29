@@ -105,4 +105,41 @@ describe('finding a warband to start', () => {
     expect(screen.getByLabelText('Chosen').textContent).toBe('merc');
     expect((within(table).getByRole('radio', { name: 'Mercenaries' }) as HTMLInputElement).checked).toBe(true);
   });
+
+  /* Wishes #130, #133: Race and a Yes/No big-creature column last; the filter's fields in the order of the columns; a row is chosen by tapping it. */
+  it('has the columns Warband, Race, Gold, Max. models, Heroes, Big creature, in that order (#130)', () => {
+    render(<Harness />);
+    const head = screen.getByRole('table').querySelector('thead')!;
+    expect(within(head as HTMLElement).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Warband', 'Race', 'Gold', 'Max. models', 'Heroes', 'Big creature']);
+  });
+
+  it('shows the race and a plain Yes or No for a big creature in each row (#130)', () => {
+    render(<Harness />);
+    const table = screen.getByRole('table');
+    const big = facts.find((f) => f.large)!;
+    const small = facts.find((f) => !f.large)!;
+    const cells = (name: string) => within(within(table).getByRole('radio', { name }).closest('tr')!).getAllByRole('cell').map((c) => c.textContent);
+    expect(cells(big.name).at(-1)).toBe('Yes');
+    expect(cells(small.name).at(-1)).toBe('No');
+    expect(cells(big.name)[1]).toBe(big.race);
+    expect(cells(big.name)[0]).not.toMatch(/big creature/i);
+  });
+
+  it('chooses a warband by tapping anywhere in its row (#130)', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    const row = within(screen.getByRole('table')).getByRole('radio', { name: 'Mercenaries' }).closest('tr')!;
+    await user.click(within(row).getAllByRole('cell')[2]!);
+    expect(screen.getByLabelText('Chosen').textContent).toBe('merc');
+    expect(row.getAttribute('aria-selected') ?? row.dataset.picked).toBeTruthy();
+  });
+
+  it('lists the filter fields in the order of the columns (#133)', () => {
+    render(<Harness />);
+    const order = ['Look for', 'Race', 'Grade', 'Gold from', 'Max. models from', 'Heroes at the start', /Big creature/, 'Sort by'];
+    const fields = order.map((l) => screen.getByLabelText(l));
+    fields.slice(1).forEach((f, i) => {
+      expect(fields[i]!.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING, `${String(order[i + 1])} after ${String(order[i])}`).toBeTruthy();
+    });
+  });
 });

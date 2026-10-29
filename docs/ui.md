@@ -169,8 +169,10 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   **großes Wesen** (Daten: `large`, z. B. Kroxigor, Minotaur), **Gold from/to** und **Max. models from/to**, dazu die Sortierung
   (Stufe, Name, Gold, Modellzahl, Helden). Gold und Modellzahl sind **vorbelegt** mit dem kleinsten und größten Wert über alle
   Warbands: das lässt alles drin und zeigt die Spanne; erst ein engerer Wert filtert, „Clear filter“ stellt die Spanne wieder
-  her. Die Tabelle hat eine Zeile je Warband (Radio zum Wählen, Gold, Max. models, Heroes; bei Sortierung nach Stufe mit einer
-  Überschriftszeile je Stufe, sonst mit Spalte Grade); am Handy wird jede Zeile zur Karte. Die schon gewählte Warband bleibt in
+  her. Die Tabelle hat eine Zeile je Warband mit den Spalten **Warband, Race, (Grade), Gold, Max. models, Heroes, Big creature** (Yes/No) –
+  in dieser Reihenfolge stehen auch die Filterfelder (Wünsche #130, #133, Rob, 29.10.2026); bei Sortierung nach Stufe gibt es statt der
+  Spalte Grade eine Überschriftszeile je Stufe. Gewählt wird durch Tippen auf die Zeile (die gewählte hat einen Balken in der
+  Akzentfarbe); der Radio-Knopf ist unsichtbar über dem Namen und nur für Tastatur und Screenreader da. Am Handy wird jede Zeile zur Karte. Die schon gewählte Warband bleibt in
   der Tabelle. Eine **Region** gibt es in den Daten nicht, darum keinen Filter dafür (`core/src/rules/summary.ts`, `warbandFacts`,
   `filterWarbands`, `sortWarbands`; `app/src/routes/WarbandFinder.tsx`).
 - **Das Meldefenster ist verschiebbar (Wunsch #129, Rob, 28.10.2026):** ab 900 px Breite lässt sich „Report a problem“ an seiner Überschrift

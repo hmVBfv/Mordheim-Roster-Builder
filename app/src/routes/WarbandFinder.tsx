@@ -51,14 +51,6 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
           <select className={ui.select} value={filter.grade ?? ''} onChange={(e) => set({ grade: e.target.value })}>
             <option value="">Any</option>{grades.map((g) => <option key={g} value={g}>{GRADE_NAMES[g]}</option>)}
           </select></label>
-        <label className={ui.field}><span>Heroes at the start</span>
-          <select className={ui.select} value={String(filter.heroes ?? '')} onChange={(e) => set({ heroes: num(e.target.value) })}>
-            <option value="">Any</option>{[4, 5, 6].map((n) => <option key={n} value={n}>Up to {n}</option>)}
-          </select></label>
-        <label className={ui.field}><span>Big creature (Kroxigor, Minotaur …)</span>
-          <select className={ui.select} value={filter.large ?? ''} onChange={(e) => set({ large: e.target.value as WarbandFilter['large'] })}>
-            <option value="">Either way</option><option value="with">Has one</option><option value="without">Has none</option>
-          </select></label>
         <div className={styles.pair}>
           <label className={ui.field}><span>Gold from</span>
             <input className={ui.input} type="number" inputMode="numeric" min={0} step={50} value={filter.goldFrom ?? ''} onChange={(e) => set({ goldFrom: num(e.target.value) })} /></label>
@@ -71,6 +63,14 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
           <label className={ui.field}><span>Max. models to</span>
             <input className={ui.input} type="number" inputMode="numeric" min={0} value={filter.sizeTo ?? ''} onChange={(e) => set({ sizeTo: num(e.target.value) })} /></label>
         </div>
+        <label className={ui.field}><span>Heroes at the start</span>
+          <select className={ui.select} value={String(filter.heroes ?? '')} onChange={(e) => set({ heroes: num(e.target.value) })}>
+            <option value="">Any</option>{[4, 5, 6].map((n) => <option key={n} value={n}>Up to {n}</option>)}
+          </select></label>
+        <label className={ui.field}><span>Big creature</span>
+          <select className={ui.select} title="A big creature among its units: Kroxigor, Minotaur …" value={filter.large ?? ''} onChange={(e) => set({ large: e.target.value as WarbandFilter['large'] })}>
+            <option value="">Either way</option><option value="with">Has one</option><option value="without">Has none</option>
+          </select></label>
         <label className={ui.field}><span>Sort by</span>
           <select className={ui.select} value={sort} onChange={(e) => setSort(e.target.value as WarbandSort)}>
             {SORTS.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
@@ -84,29 +84,32 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
   );
 }
 
-/** The warbands that pass the filter, one row each: pick one with its radio. With the sort by grade, a heading row opens each grade. */
+/** The warbands that pass the filter, one row each: tap a row to pick it (its radio is hidden but there for the keyboard). With the sort by grade, a heading row opens each grade. */
 export function WarbandTable({ shown, sort, chosen, onChoose }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void }) {
   const byGrade = sort === 'grade';
   const row = (w: WarbandFact) => (
-    <tr key={w.key} className={w.key === chosen ? styles.picked : undefined}>
+    <tr key={w.key} className={w.key === chosen ? styles.picked : undefined} data-picked={w.key === chosen ? 'true' : undefined} onClick={() => onChoose(w.key)}>
       <td className={styles.pick} data-label="">
+        {/* the radio lies invisibly over the name, so a keyboard and a screen reader find the row; a tap anywhere in the row chooses it */}
         <label className={styles.pickLabel}>
           <input type="radio" name="warband" value={w.key} aria-label={w.name} checked={w.key === chosen} onChange={() => onChoose(w.key)} />
-          <span>{w.name}{w.large ? <small className={styles.big}> · big creature</small> : null}</span>
+          <span className={styles.name}>{w.name}</span>
         </label>
       </td>
+      <td data-label="Race">{w.race}</td>
+      {!byGrade && <td data-label="Grade">{GRADE_NAMES[w.grade] ?? w.grade}</td>}
       <td data-label="Gold">{w.gold === w.goldMax ? w.gold : `${w.gold}–${w.goldMax}`} gc</td>
       <td data-label="Max. models">{w.max}</td>
       <td data-label="Heroes">{w.heroes}</td>
-      {!byGrade && <td data-label="Grade">{GRADE_NAMES[w.grade] ?? w.grade}</td>}
+      <td data-label="Big creature">{w.large ? 'Yes' : 'No'}</td>
     </tr>
   );
-  const cols = byGrade ? 4 : 5;
+  const cols = byGrade ? 6 : 7;
   return (
     <div className={styles.tableWrap}>
       <table className={styles.table}>
         <thead><tr>
-          <th scope="col">Warband</th><th scope="col">Gold</th><th scope="col">Max. models</th><th scope="col">Heroes</th>{!byGrade && <th scope="col">Grade</th>}
+          <th scope="col">Warband</th><th scope="col">Race</th>{!byGrade && <th scope="col">Grade</th>}<th scope="col">Gold</th><th scope="col">Max. models</th><th scope="col">Heroes</th><th scope="col">Big creature</th>
         </tr></thead>
         <tbody>
           {byGrade

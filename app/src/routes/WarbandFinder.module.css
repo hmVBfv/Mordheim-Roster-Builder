@@ -19,6 +19,8 @@
 }
 
 .pair {
+  /* two inputs side by side take two cells of the grid, so their names fit (#133) */
+  grid-column: span 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
@@ -79,26 +81,42 @@
   border-bottom: 1px solid var(--border);
 }
 
+.table tbody tr:not(.grade) {
+  cursor: pointer;
+}
+
+.table tbody tr:not(.grade):hover {
+  background: var(--surface-2);
+}
+
 .pickLabel {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
   min-height: var(--tap);
   cursor: pointer;
 }
 
+/* the radio is not drawn (#130): the row is the control; it stays in the page for the keyboard and for screen readers */
 .pickLabel input {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
-.big {
-  color: var(--text-muted);
+.pickLabel:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
-.picked {
-  background: var(--surface);
+/* the chosen row: an accent bar in front and a stronger name */
+.table tbody tr.picked {
+  background: var(--surface-2);
+  box-shadow: inset 4px 0 0 var(--accent);
   font-weight: 600;
 }
 
