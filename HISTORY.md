@@ -4390,3 +4390,13 @@ cost a few runs. Pull request 257.
 #134: "Look for" spans the whole filter row of the new-warband picker. Pull request 258. The wishes #130, #131 and #133 (a Race column
 and a Yes/No column for big creatures, no radio look, filter fields in the order of the columns; stats shown when recruiting) wait for
 Rob's word.
+
+#130, #133: the Race column, a plain Yes/No column for a big creature as the last one, the filter's fields in the order of the columns,
+and no radio look. The radio could not simply go: a keyboard and a screen reader need it. It lies invisibly over the name (opacity 0,
+the whole cell), the row is the tap target, and the chosen row gets an accent bar. Its pairs of from/to fields now take two cells of
+the grid: "Max. models from" had been cut to "Max. models…". Stacked on #134's branch because both rewrite the same lines of the
+finder. Pull request 260 (merge 258 first).
+
+#131: every unit on the Recruit sheet shows its nine characteristics under the price, henchmen too (Rob). A table does not belong in
+a button, so they are small spans in a grid (`role="group"`, "Characteristics"). Pull request 261; it adds a paragraph to `docs/ui.md`
+right below the one #130 changes, so a conflict there is to be expected if 261 is merged before 260.
