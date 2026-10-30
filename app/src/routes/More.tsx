@@ -1,9 +1,12 @@
 /* The account (campaign app) and the settings of this device. */
 import { lazy, Suspense, useState } from 'react';
+import { ChangelogSheet } from '../changelog/ChangelogSheet.tsx';
+import { ENTRIES } from '../changelog/entries.ts';
 import { cleanServer, getServer, setServer } from '../share/link.ts';
 import { accountLabel } from '../app/nav.ts';
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { setChoice, THEME_CHOICES, useThemeChoice } from '../theme/theme.ts';
+import { useSheet } from '../ui/useSheet.ts';
 import { shownVersion } from '../version.ts';
 import ui from '../ui/ui.module.css';
 import styles from './More.module.css';
@@ -33,6 +36,7 @@ function CampaignServer() {
 
 export function More() {
   const choice = useThemeChoice();
+  const { ref, open, close } = useSheet('changelog');
   const theme = (
     <fieldset className={`${ui.card} ${styles.themes}`}>
       <legend>Theme</legend>
@@ -55,6 +59,8 @@ export function More() {
         {APP_NAME} · version <span title={__APP_VERSION__}>{shownVersion(__APP_VERSION__)}</span>
         {FLAVOUR === 'quickbuild' && ' · warbands stay on this device'}
       </p>
+      <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={open}>What's new</button></div>
+      <ChangelogSheet dialogRef={ref} close={close} title="What's new" entries={ENTRIES} />
     </section>
   );
 }

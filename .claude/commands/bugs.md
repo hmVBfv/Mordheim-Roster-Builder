@@ -107,16 +107,21 @@ message, and the same steps as below apply.
    `docs/data-model.md` in the same commit; a notable fix gets a `HISTORY.md`
    entry (why, including wrong turns) – **but not on its own branch when more
    than one report is in the run** (section 6, "Shared files").
-5. Commit in English, no umlauts, a body that says why, and a last line
+5. **A change the players see gets a changelog file** in the same commit: `changelog/YYYY-MM-DD-<short-name>.md`
+   (ADR 0029): `date: YYYY-MM-DD`, then one line a change, `- New: …`, `- Changed: …` or `- Fixed: …` – English,
+   short, in the players' words, **no report numbers**. One file for each pull request (for reports with one cause, one
+   file with a line each). Not for infrastructure, tests or docs. Never in `HISTORY.md`'s place: the files do not
+   conflict, so they stay in each fix's own branch.
+6. Commit in English, no umlauts, a body that says why, and a last line
    `Fix #N`, plus the attribution lines of the session.
-6. **S1 gets an independent review before the pull request.** Start the
+7. **S1 gets an independent review before the pull request.** Start the
    `reviewer` agent and give it only two things: the output of
    `npm run bugs -- show N` and the diff (`git diff origin/master...HEAD`). Not
    your reasoning, not your plan. Fix what it finds; do not argue with it. The
    pull request names the verdict.
-7. Push the branch, open the pull request yourself (German body: what changes for
+8. Push the branch, open the pull request yourself (German body: what changes for
    the players, then the attribution lines). Wait for the CI to be green.
-8. Tell Rob in German, one step at a time: the link, and that after merging he
+9. Tell Rob in German, one step at a time: the link, and that after merging he
    runs `roster-deploy` on the Pi.
 
 ## 5. After Rob says "gemergt und deployed"

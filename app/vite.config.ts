@@ -5,8 +5,11 @@
  * Each builds into dist/<flavour>/ with its own manifest name. */
 import babel from '@rolldown/plugin-babel';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import { readdirSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+import { newestFirst, parseEntry } from './src/changelog/parse.ts';
 
 type Flavour = 'campaign' | 'quickbuild';
 
@@ -40,6 +43,16 @@ export default defineConfig(({ mode, command }) => {
           .replace('<!--ROBOTS-->', flavour === 'campaign' ? '<meta name="robots" content="noindex, nofollow">' : ''),
         generateBundle() {
           if (flavour === 'campaign') this.emitFile({ type: 'asset', fileName: 'robots.txt', source: 'User-agent: *\nDisallow: /\n' });
+        },
+      },
+      {
+        /* The changelog of this build (wish #154), for the update notice of the version before it: not in the precache
+           (`json` is not in the globs below), so it is read from the network and is the new version's, not the cached one's. */
+        name: 'mordheim-changelog',
+        generateBundle() {
+          const dir = new URL('../changelog/', import.meta.url);
+          const entries = readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => parseEntry(f.replace(/\.md$/, ''), readFileSync(new URL(f, dir), 'utf8')));
+          this.emitFile({ type: 'asset', fileName: 'changelog.json', source: JSON.stringify(newestFirst(entries)) });
         },
       },
       VitePWA({

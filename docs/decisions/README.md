@@ -47,3 +47,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0026](0026-planner-and-catch-up.md) | Der Planner und das Catch-up: eine Art Warband ohne Goldgrenze zum Planen, und der späte Einstieg in eine Kampagne nach dem Median (angenommen, ergänzt 0002, 0003) |
 | [0027](0027-hidden-npc-warbands.md) | Versteckte NPC-Warbands: Planner als Referenz und TTS-Daten des Spielleiters, nur für Leiter sichtbar (angenommen, ergänzt 0002, 0011, 0026) |
 | [0028](0028-images-from-master-only.md) | Images nur von master veröffentlichen, alte Branch-Images wöchentlich löschen, jeder Branch nur einmal testen (angenommen, ersetzt Teile von 0009, 0017) |
+| [0029](0029-changelog-per-change.md) | Changelog: eine kleine Datei je Änderung in `changelog/`, mit dem Build ausgeliefert, „What's new“ unter „Reload“ und in More (angenommen) |
