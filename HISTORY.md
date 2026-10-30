@@ -4458,6 +4458,15 @@ way to do the same thing. Pull request 275.
 Merge order: 269, then 272; 270, then 271; 273, 274 and 275 stand alone. Several of them add to `docs/ui.md`, each at its own place;
 a test merge of all seven branches onto `master` had no conflict.
 
+## October 30, 2026 — the image test that failed with the line present
+
+The "image" job of #277 failed twice, for two reasons. First, the Dockerfile did not copy the new `changelog/` directory, so the app's
+build inside the image stopped (reproduced here by moving the directory away); the Dockerfile copies it now. Then `ops/test/smoke.sh`
+said "no restored log line" although the log, printed right below the message, has that very line. The check was
+`docker logs | grep -q …` under `set -o pipefail`: `grep -q` quits at its first match, `docker logs` then gets SIGPIPE, and pipefail
+reports the pipe as failed – whether it does depends on how much the log holds and on timing, so it passes most days. Reproduced with a
+fake `docker` that prints 20 000 lines (the old form fails, the new one passes). `log_has` reads the log whole, and the three other
+checks of the same form use it. Pull request: this one.
 ## October 30, 2026 — a changelog with every deploy (#154)
 
 Rob confirmed the wish and asked for it to go on with every deploy, not only a one-time list. The point that decides the design is who

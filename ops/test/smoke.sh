@@ -28,6 +28,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Does the container's log have a line like this? The log is read whole: `grep -q` quits at the first match, `docker logs`
+# gets SIGPIPE, and `pipefail` then calls a found line a failure (the run of 30.10.2026 failed that way with the line present).
+log_has() { local logs; logs=$(docker logs "$1" 2>&1); grep -Eq "$2" <<<"$logs"; }
 fail() { echo "SMOKE FAILED: $*" >&2; docker logs "$name" 2>&1 | tail -20 >&2 || true; exit 1; }
 
 health() { curl -fsS -m 5 "http://127.0.0.1:$port/api/v1/health"; }
@@ -57,7 +60,7 @@ for _ in $(seq 1 20); do
 done
 [ "$(docker inspect -f '{{.State.Running}}' "$name")" = false ] || fail "still running without the marker"
 [ "$(docker inspect -f '{{.State.ExitCode}}' "$name")" != 0 ] || fail "exit code 0 without the marker"
-docker logs "$name" 2>&1 | grep -q '"event":"volume_missing"' || fail "no volume_missing log line"
+log_has "$name" '"event":"volume_missing"' || fail "no volume_missing log line"
 [ -z "$(ls -A "$work/data")" ] || fail "created files without the marker: $(ls -A "$work/data")"
 docker rm -f "$name" >/dev/null
 
@@ -89,7 +92,7 @@ api -b "$work/cookies" -d '{}' "$origin/api/v1/account/totp/setup" | grep -q '"u
 [ "$(api -o /dev/null -w '%{http_code}' -d '{"username":"smoke","password":"wrong password!"}' "$origin/api/v1/auth/login")" = 401 ] ||
   fail "a wrong password was not turned away"
 sleep 0.5
-docker logs "$name" 2>&1 | grep '"event":"login_failed"' | grep -q '"account":"smoke"' || fail "no login_failed line for Fail2Ban"
+log_has "$name" '"event":"login_failed".*"account":"smoke"' || fail "no login_failed line for Fail2Ban"
 [ "$(curl -sS -o /dev/null -w '%{http_code}' -m 5 -H 'Content-Type: application/json' -H 'Origin: https://evil.example' \
   -d '{"username":"smoke","password":"x"}' "$origin/api/v1/auth/login")" = 403 ] || fail "a write from another origin was not refused"
 docker exec "$name" roster-cli users | grep -q $'^smoke\tadmin\t' || fail "roster-cli users does not list the admin"
@@ -107,7 +110,7 @@ api -b "$work/player" "$origin/api/v1/sync?cursor=0" | grep -q "\"id\":\"$wid\""
 echo "5. the client address behind the proxy"
 curl -s -o /dev/null -m 5 -H 'X-Forwarded-For: 203.0.113.9' "http://127.0.0.1:$port/api/v1/nope"
 sleep 0.5
-docker logs "$name" 2>&1 | grep '"route":"/api/v1/nope"' | grep -q '"ip":"203.0.113.9"' || fail "X-Forwarded-For from the gateway not believed"
+log_has "$name" '"ip":"203.0.113.9".*"route":"/api/v1/nope"' || fail "X-Forwarded-For from the gateway not believed"
 
 echo "6. the epoch"
 docker restart "$name" >/dev/null
@@ -119,7 +122,7 @@ rm -f "$work/data/roster.sqlite-wal" "$work/data/roster.sqlite-shm"
 docker start "$name" >/dev/null
 body=$(wait_healthy) || fail "not healthy on the restored snapshot"
 grep -q "\"epoch\":\"$epoch\"" <<<"$body" && fail "a restore kept the epoch"
-docker logs "$name" 2>&1 | grep -q '"event":"restored"' || fail "no restored log line"
+log_has "$name" '"event":"restored"' || fail "no restored log line"
 
 echo "7. memory"
 mem=$(docker stats --no-stream --format '{{.MemUsage}}' "$name" | awk '{print $1}')
