@@ -424,10 +424,10 @@ Verletzungen mit Korrektur, genommene Aufstiege mit Korrektur; Story & more –
 „Story so far“, „Tabletop Simulator card“ und, getrennt, „Out of
 action for good…“ bzw. Entlassen. Die Beschriftungen der Knöpfe und der
 Stepper sind dieselben wie zuvor.
-Der Name einer Einheit steht oben in Overview (am Handy als erste Zeile, am
-Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
-Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
-more“ entfällt (#152, #153).
+Der Name einer Einheit hat einen Stift daneben, der das Blatt zum Benennen
+öffnet – wie bei der Warband: am Handy in der aufgeklappten Zeile rechts neben dem
+Namen, ohne eigene Zeile (#156), am Desktop im Kopf des Fensters; das Namensfeld
+ganz unten in „Story & more“ entfällt (#152, #153).
 
 **What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
 „New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen
