@@ -7,12 +7,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
-  campaignById, campaignView, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
+  campaignById, campaignView, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, endVanilla, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
   removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
-import { totalsOf } from './rules.ts';
+import { isVanillaWarband, totalsOf } from './rules.ts';
 import { advanceRound, changesOf } from './aftermath.ts';
 import { battleById } from './battles.ts';
 import { PastBattleBody, putPastBattle, removePastBattle } from './history.ts';
@@ -50,11 +50,11 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
 
   app.get('/api/v1/campaigns', { config: { action: 'campaigns.list' } }, async (req) => ({ campaigns: listCampaigns(db(), req.actor!.id) }));
 
-  app.post('/api/v1/campaigns', { config: { action: 'campaigns.create' }, schema: body({ name: NAME, place: PLACE }, ['name']) }, async (req, reply) => {
+  app.post('/api/v1/campaigns', { config: { action: 'campaigns.create' }, schema: body({ name: NAME, place: PLACE, vanilla: { type: 'boolean' } }, ['name']) }, async (req, reply) => {
     const name = trimmed((req.body as { name: string }).name);
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
     if (campaignNameTaken(db(), req.actor!.id, name, '')) return reply.code(400).send({ error: 'invalid', problem: 'you are in a campaign of this name already' });
-    const c = createCampaign(db(), { name, place: (req.body as { place?: string }).place ?? '', by: req.actor!.id }, now());
+    const c = createCampaign(db(), { name, place: (req.body as { place?: string }).place ?? '', vanilla: (req.body as { vanilla?: boolean }).vanilla === true, by: req.actor!.id }, now());
     return reply.code(201).send(view(c, 'leader'));
   });
 
@@ -93,6 +93,17 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
   });
 
   /** The campaign's house rules (a leader): for every warband in it; a warband whose own differ is marked for everyone. */
+  // Vanilla Mordheim (#167): chosen at the start; a running campaign is never turned to it, a leader can turn it off, and it stays off
+  app.put('/api/v1/campaigns/:id/vanilla', { config: { action: 'campaign.manage' }, schema: body({ vanilla: { type: 'boolean' } }, ['vanilla']) }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    if ((req.body as { vanilla: boolean }).vanilla && t.c.vanilla !== 1) {
+      return reply.code(409).send({ error: 'conflict', problem: 'a running campaign cannot be turned to Vanilla Mordheim: it is chosen when the campaign starts' });
+    }
+    if (!(req.body as { vanilla: boolean }).vanilla) endVanilla(db(), t.c, req.actor!.id, now());
+    return view(t.c, t.role);
+  });
+
   app.put('/api/v1/campaigns/:id/house-rules', { config: { action: 'campaign.manage' }, schema: body({ rules: { type: 'object' } }, ['rules']) }, async (req, reply) => {
     const t = target(req, reply, 'campaign.manage');
     if (!t) return reply;
@@ -143,6 +154,10 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     if (!c.ok) return reply.code(c.status).send({ error: c.error, problem: c.problem });
     // a planner is for planning (wish #77): it does not enter a campaign as it is
     if ((c.data as { planner?: unknown }).planner === true) return reply.code(400).send({ error: 'invalid', problem: 'a planner does not enter a campaign' });
+    // Vanilla Mordheim takes only the warbands of the rulebook (#167)
+    if (t.c.vanilla === 1 && !isVanillaWarband((c.data as { wb?: unknown }).wb)) {
+      return reply.code(400).send({ error: 'invalid', problem: 'this campaign plays Vanilla Mordheim: only the warbands of the rulebook enter it' });
+    }
     // its start is marked with totals the rules compute: they must be able to read it
     if (!totalsOf(c.data)) return reply.code(400).send({ error: 'invalid', problem: 'the rules cannot read this warband' });
     const id = b.warbandId.toLowerCase();

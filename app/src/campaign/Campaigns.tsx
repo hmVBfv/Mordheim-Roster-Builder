@@ -19,6 +19,7 @@ function StartSheet() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [place, setPlace] = useState('');
+  const [vanilla, setVanilla] = useState(false);
   const lore = useLore();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +27,13 @@ function StartSheet() {
     setBusy(true);
     setError(null);
     try {
-      const v = await startCampaign(name, place);
+      const v = await startCampaign(name, place, vanilla);
       close(() => void navigate(`/campaign/${v.campaign.id}/manage`));
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   };
   return (
     <>
-      <button type="button" className={ui.button} onClick={() => { setName(''); setPlace(''); setError(null); open(); }}>Start a campaign</button>
+      <button type="button" className={ui.button} onClick={() => { setName(''); setPlace(''); setVanilla(false); setError(null); open(); }}>Start a campaign</button>
       <dialog ref={ref} className={ui.sheet} aria-labelledby="start-title">
         <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void submit(); }}>
           <h2 id="start-title">Start a campaign</h2>
@@ -50,6 +51,10 @@ function StartSheet() {
               </select>
             </label>
           )}
+          <label className={styles.choice}>
+            <input type="checkbox" checked={vanilla} onChange={(e) => setVanilla(e.target.checked)} />
+            <span>Vanilla Mordheim <small>· only the rulebook: its warbands, its items and its skills. It cannot be switched on later; a leader can switch it off for good.</small></span>
+          </label>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
           <div className={ui.actions}>
             <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>

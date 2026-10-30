@@ -79,7 +79,7 @@ export function WarbandsTab({ id, view, me, onView }: { id: string; view: Campai
           </>
         )}
         <div className={ui.row}>
-          {view.role !== 'viewer' && <EnterSheet id={id} rules={view.campaign.houseRules} onDone={onView} />}
+          {view.role !== 'viewer' && <EnterSheet id={id} rules={view.campaign.houseRules} vanilla={!!view.campaign.vanilla} onDone={onView} />}
           <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
         </div>
       </section>

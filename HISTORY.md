@@ -4548,3 +4548,15 @@ had written the old rule down: 19 server tests that kept "Ben, who leads without
 tests say so), the leak matrix (the user role may start a campaign), the app's tabs and buttons (`user.totp` in seven places, `canLead` on the
 member list), ten app tests, and the comments and docs. What is lost, and written in the ADR: a stolen password of a leader now reads the hidden
 parts of the campaign. A later option "the authenticator for the leaders of this campaign" is possible, not built.
+
+## October 31, 2026 — Vanilla Mordheim for a campaign (#167, step 2)
+
+Rob's wish #167 (new warbands restricted to a campaign, Vanilla or Core) came in three steps; he chose to start with the campaign (2), so the
+warbands can take its setting over. Decisions of his: "Core" and Vanilla are the same thing (only what the rulebook has, which narrows the items
+and skills strongly); a running campaign can never be turned to Vanilla, a leader can turn it off, and then it stays off; in a Vanilla campaign
+only Vanilla warbands. A column `campaigns.vanilla` (migration 42), chosen at the start (`POST /campaigns`), turned off by `PUT …/vanilla`
+(409 for `true` on a running one), a check at the entry (400 for a warband that is not of grade core – the six of the rulebook), a card on the
+House rules screen with a confirmation, and the lists of "Enter a warband" and "New warband for this campaign" follow. Not done, on purpose: the
+items and skills of the campaign (that is step 1, the warbands carrying the setting) and the areas (Khemri, Lustria …). One trap on the way: the
+campaign view is also read by the app's offline copy, so `vanilla` is optional in its type (a view kept from before it). #168 (leaders without
+an authenticator) is left for Rob: it changes ADR 0008 and what ADRs 0022 and 0027 say about "leaders with the authenticator".
