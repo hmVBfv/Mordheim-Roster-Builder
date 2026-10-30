@@ -59,7 +59,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
     setError(null);
     void (async () => {
       try {
-        const copy = attach && wb ? await warbandCopy(wb.id) : null;
+        const copy = attach && wb ? (wb.save ? { warbandId: wb.id, rev: wb.rev, save: wb.save } : await warbandCopy(wb.id)) : null;
         if (attach && wb && !copy) throw new Error('gone');
         await sendReport({
           id, kind, title: doc.title, text: doc.text, sourceRef: doc.sourceRef, appVersion: __APP_VERSION__, device: doc.device, view: doc.view, context: doc.context, jsErrors: doc.jsErrors,
@@ -121,7 +121,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
       {wb && (
         <label className={styles.check}>
           <input type="checkbox" checked={attach} onChange={(e) => setAttach(e.target.checked)} />
-          <span>Attach “{wb.name}” as it is on this device<small>About {wb.kb} KB, with its names and story. Only Rob and Claude read it, and it is dropped when the report is closed.</small></span>
+          <span>Attach “{wb.name}” as {wb.save ? 'the campaign shows it to you' : 'it is on this device'}<small>About {wb.kb} KB, with its names and story. Only Rob and Claude read it, and it is dropped when the report is closed.</small></span>
         </label>
       )}
       <details className={styles.details} open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
