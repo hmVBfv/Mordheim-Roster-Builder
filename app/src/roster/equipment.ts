@@ -23,7 +23,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 export interface ListRow { key: string; name: string; price: number; qty: number; /** The least the stepper goes to: the free dagger stays (#117). */ min: number; free: boolean; text: string; /** What a tap on the name shows: its kind and strength, its special rules (#136). */ tips: Tip[]; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
-export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string }
+export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string; /** What a tap on the name shows (#162): a `title` alone is never seen on a phone. */ tips: Tip[] }
 /** One thing he carries – every one on a line of its own, never "2×" (#115). */
 export interface CarriedRow {
   id: string;
@@ -82,7 +82,7 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
   const rare: RareRow[] = Object.entries(m.rare ?? {}).filter(([de]) => !core.isUpgrade(ctx.data, de)).flatMap(([de, r]) => {
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     const upgrade = core.isUpgrade(ctx.data, de);
-    const base = { de, name: it?.en ?? core.enItem(ctx.data, de), upgrade, text: itemText(ctx.data, it?.en ?? de) };
+    const base = { de, name: it?.en ?? core.enItem(ctx.data, de), upgrade, text: itemText(ctx.data, it?.en ?? de), tips: itemTip(ctx.data, it?.en ?? de) };
     if (!upgrade) return [{ ...base, slot: 0, q: Number(r?.q) || 0, max: core.isArmourItem(ctx, de) ? 1 : 9, paid: Number(r?.paid) || 0, on: (r?.on as string | undefined) ?? null, targets: [] }];
     const free = core.upgradeFree(ctx, m, de);
     return core.upgradeSlots(m, de).map((s, slot) => ({

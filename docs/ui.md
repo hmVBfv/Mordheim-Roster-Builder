@@ -429,6 +429,8 @@ Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
 Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
 more“ entfällt (#152, #153).
 
+**Seltene Gegenstände im Ausrüstungsblatt (#162).** Der Name steht in „Rare and trading-post items“ wie in „Carried“ als Wort mit Blase, nicht nur als `title`, den ein Handy nie zeigt.
+
 **Die Gefallenen (#159, #160, #161).** Je Einheit steht die Einheit als Überschrift („Hero unit“ oder „Henchmen unit“), darunter „N models fallen“
 mit Erfahrung und verlorenem Gold, dann die gefallenen Modelle als Liste („Fallen models of …“). Jedes Modell nennt, wo es
 aufgezeichnet wurde, die Runde, in der es fiel, und wer es ausgeschaltet hat, und die Runde, in der es dazukam. Die verlorene

@@ -59,3 +59,24 @@ describe('an item of the buy lists tells what it is on a tap (#136)', () => {
   });
 });
 
+/* Bug #162 (Rob, 30.10.2026): a rare item had no description to tap – its name in "Rare and trading-post items" carried only a `title`,
+   which a phone never shows – and the text itself was not the rule's. */
+describe('a rare item names its rules on a tap (#162)', () => {
+  it('opens the rules of the Magic Gourd from its name in the rare list, in the sheet', async () => {
+    const c = (s: core.WarbandState) => core.ctxOf(data, s);
+    let s = createWarband(data, 'merc', null, 'The Grey Company');
+    s = core.addUnit(c(s), 'capt');
+    const uid = s.models[0]!.uid;
+    s = core.addRare(c(s), uid, 'Magischer Kürbis');
+    const view = equipmentView(c(s), uid)!;
+    const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
+    render(<EquipmentSheet dialogRef={ref} close={() => {}} view={view} act={act} />);
+    const d = document.querySelector('dialog')!;
+    const rare = d.querySelector('section[aria-label="Rare and trading-post items"]')! as HTMLElement;
+    const user = userEvent.setup();
+    await user.click(within(rare).getByRole('button', { name: 'Magic gourd', hidden: true }));
+    const bubble = await within(d).findByRole('tooltip', { hidden: true });
+    expect(bubble.textContent).toMatch(/1D3 units of water/);
+    expect(bubble.textContent).toMatch(/shatters/);
+  });
+});

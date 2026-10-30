@@ -123,8 +123,8 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
           <ul className={styles.eqList}>
             {v.rare.map((r) => (
               <li key={`${r.de}#${r.slot}`} className={styles.eqRow}>
-                <span className={styles.eqName} title={r.text || undefined}>
-                  {r.name}
+                <span className={styles.eqName}>
+                  <TipWord label={r.name} tips={r.tips} />
                   <label className={styles.paid}>
                     <small>Paid</small>
                     <input key={r.paid} className={ui.input} type="number" inputMode="numeric" min={0} defaultValue={r.paid} aria-label={`Paid for ${r.name}`}
