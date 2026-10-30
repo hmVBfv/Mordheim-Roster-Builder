@@ -139,6 +139,22 @@ describe('the spell lore of a caster (#68)', () => {
     expect(wiz.lore!.spells[1]).toMatchObject({ known: true });
   });
 
+  it('#150: a known spell made easier to cast shows its lowered value on the card and, in the list, the step beside the printed one', () => {
+    const s = caravan();
+    const wizard = s.models.find((m) => m.uid_def === 'magician')!;
+    const school = core.casterLore(ctx(s), wizard)!;
+    const name = data.SPELLS[school]!.spells.find(([n]) => /\(\d+\)\s*$/.test(String(n)) && Number(/\((\d+)\)/.exec(String(n))![1]) > 4)![0];
+    const base = Number(/\((\d+)\)/.exec(name)![1]);
+    wizard.spells = [{ name, red: 1 }];
+    const hero = rosterView(data, s).heroes.find((h) => h.uid === wizard.uid)!;
+    expect(hero.spells[0]!.label).toBe(`${core.spellLabel(name)} (${base - 1})`);
+    const entry = hero.lore!.spells.find((x) => x.key === name)!;
+    expect(entry).toMatchObject({ known: true, diff: String(base), red: 1 });
+    const t = caravan();
+    t.models.find((m) => m.uid_def === 'magician')!.spells = [{ name }];
+    expect(rosterView(data, t).heroes.find((h) => h.uid === wizard.uid)!.spells[0]!.label).toBe(name);
+  });
+
   it('#81: a caster has his starting spells still to choose until he knows as many as he starts with', () => {
     const s = caravan();
     const wizard = s.models.find((m) => m.uid_def === 'magician')!;

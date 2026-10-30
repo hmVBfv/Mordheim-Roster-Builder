@@ -27,6 +27,12 @@ function tipOf(i: RuleText | null | undefined, name: string, line: string): Tip[
 
 const fact = (label: string, tips: Tip[]): Fact => ({ label, tips });
 
+/** A spell as the card names it: with the value it is cast on now, one step lower for each time he made it easier (#150). */
+const eased = (s: { name: string; red?: number }): string => {
+  const d = core.spellEffDiff(s);
+  return d == null ? s.name : s.name.replace(/\(\d+\)\s*$/, `(${d})`);
+};
+
 /** An item by its data key (German, or English). */
 export function itemTip(data: GameData, key: string): Tip[] {
   const en = core.enItem(data, key);
@@ -97,15 +103,15 @@ function rules(chips: (ItemInfo & { key: string })[], defs: core.RuleDef[], skip
 }
 
 /** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */
-export interface SpellLore { name: string; note: string; /** Starting spells he has still to choose (#81). */ open: number; spells: { key: string; name: string; diff: string; text: string; known: boolean }[] }
+export interface SpellLore { name: string; note: string; /** Starting spells he has still to choose (#81). */ open: number; spells: { key: string; name: string; diff: string; text: string; known: boolean; /** Steps he made it easier to cast (#150); `diff` stays the printed value. */ red: number }[] }
 
 /** A caster's school by its key in the data, with what he knows of it; null for no school or an unknown one. */
-export function loreView(ctx: core.Ctx, lore: string | null, known: { name: string }[], start = 0): SpellLore | null {
+export function loreView(ctx: core.Ctx, lore: string | null, known: { name: string; red?: number }[], start = 0): SpellLore | null {
   const l = lore ? ctx.data.SPELLS[lore] : undefined;
   if (!l) return null;
   // a line that starts with ▸ is a heading of the data (the Marks of the Marauders), not a spell
   const spells = l.spells.filter(([n]) => !String(n).startsWith('▸')).map(([n, t]) => ({
-    key: n, name: core.spellLabel(n), diff: /\((\d+|auto)\)\s*$/i.exec(String(n))?.[1]?.toLowerCase() ?? '', text: plain(t), known: known.some((s) => s.name === n),
+    key: n, name: core.spellLabel(n), diff: /\((\d+|auto)\)\s*$/i.exec(String(n))?.[1]?.toLowerCase() ?? '', text: plain(t), known: known.some((s) => s.name === n), red: Number(known.find((s) => s.name === n)?.red) || 0,
   }));
   return spells.length ? { name: l.name, note: plain(l.note), open: Math.max(0, start - known.length), spells } : null;
 }
@@ -167,7 +173,7 @@ export function warriorFacts(ctx: core.Ctx, m: Model): WarriorFacts {
       const key = core.skillKey(data, ctx.s.wb, def ?? undefined, nm);
       return fact(nm, tipOf(core.keyedInfo(data, key) ?? core.tooltipInfo(data, nm), nm, 'Skill'));
     }),
-    spells: (m.spells ?? []).map((s) => fact(s.name, tipOf(core.spellInfo(data, s.name), core.spellLabel(s.name), 'Spell'))),
+    spells: (m.spells ?? []).map((s) => fact(eased(s), tipOf(core.spellInfo(data, s.name), core.spellLabel(s.name), 'Spell'))),
     lore: loreView(ctx, core.casterLore(ctx, m), m.spells ?? [], def ? core.spellStartCount(ctx, def, m) : 0),
     mutations,
     mark,

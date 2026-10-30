@@ -198,7 +198,10 @@ export function TakenSheet({ dialogRef, close, name, taken, onRemove }: { dialog
           <ul className={styles.eqList}>
             {taken.advances.map((a) => row(`a:${a.stat}`, `+${a.n} ${STAT_NAMES[a.stat]}`, '', { kind: 'stat', stat: a.stat }, `${name}: one +1 ${STAT_NAMES[a.stat]} taken back.`))}
             {taken.skills.map((s) => row(`s:${s.i}`, s.name, s.text.slice(0, 90), { kind: 'skill', index: s.i }, `${name}: ${s.name} taken back.`))}
-            {taken.spells.map((s) => row(`p:${s.i}`, s.name, s.red ? `${s.red} easier to cast` : 'spell', s.red ? { kind: 'unreduce', index: s.i } : { kind: 'spell', index: s.i }, `${name}: ${s.red ? 'one step easier' : s.name} taken back.`))}
+            {taken.spells.flatMap((s) => s.red
+              // one entry for each time it was made easier, so each can be taken back on its own (#151)
+              ? Array.from({ length: s.red }, (_, n) => row(`p:${s.i}:${n}`, s.name, '1 easier to cast', { kind: 'unreduce', index: s.i }, `${name}: one step easier taken back.`))
+              : [row(`p:${s.i}`, s.name, 'spell', { kind: 'spell', index: s.i }, `${name}: ${s.name} taken back.`)])}
           </ul>
         )}
         <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>

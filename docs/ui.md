@@ -438,6 +438,13 @@ Auf dem Bildschirm steht die Liste nie doppelt. „Export“ → „Print the
 roster“ führt zurück auf den Roster, der einmal `window.print()` aufruft; der
 Test ersetzt es und schaltet dann auf Druckmedien.
 
+**Zauber leichter machen.** Ein bekannter Zauber, der beim Aufstieg leichter
+gewirkt werden soll, ändert den Wert in der Klammer („Zauber (6)“ statt (7));
+der Export zeigt denselben Wert. In der Zauberliste steht der gedruckte Wert mit
+dem Schritt daneben („cast on 7(−1)+“). In „Advances“ steht jeder Schritt als
+eigener Eintrag „1 easier to cast“ mit eigenem „Remove“, nicht zusammengefasst
+(#150, #151).
+
 **Grenzen für Gestaltung und Prüfung.** 360 px ohne Seitwärtsscrollen,
 Tippflächen mindestens 44 px, beide Themes, Screenshots bei 360, 820, 1440 und
 1920 px (`app/e2e/app.spec.ts`, `campaign-*-roster*.png`). Die übrigen
