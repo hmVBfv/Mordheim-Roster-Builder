@@ -433,7 +433,7 @@ more“ entfällt (#152, #153).
 mit Erfahrung und verlorenem Gold, dann die gefallenen Modelle als Liste („Fallen models of …“). Jedes Modell nennt, wo es
 aufgezeichnet wurde, die Runde, in der es fiel, und wer es ausgeschaltet hat, und die Runde, in der es dazukam. Die verlorene
 Erfahrung (die im Spiel verdiente) steht neben dem Gold, in der Zusammenfassung wie in jeder Zeile; jede Zahl bleibt in einem Stück.
-Nicht erfasst ist, an wie vielen Kämpfen ein Modell teilnahm: Die Warband führt dazu keine Zahl je Modell.
+Wie viele Kämpfe ein Modell mitmachte, zählt seit Wunsch #166 die Warband (Absatz „Zähler der Kämpfe“); die Gefallenen nennen die Zahl, wo sie gezählt wurde.
 
 **Zähler der Kämpfe (#166).** Wo die Kampagne die Kämpfe zählt, steht in „Experience“ eine Zeile „Battles fought“: Wer sie nicht
 ändern kann, sieht die Zahl, der Besitzer hat daneben − und +, um einen Stand nachzutragen, der vor dem Zähler begann. Gezählt wird
