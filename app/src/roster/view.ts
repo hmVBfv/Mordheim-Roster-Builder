@@ -137,7 +137,16 @@ export interface RosterView {
 }
 
 /** One line of the Fallen: a Hero, a henchman with a name of his own, or the nameless of one kind counted together. */
-export interface FallenEntry { name: string; count: number; xp: number; equipment: string[]; worth: number }
+export interface FallenEntry {
+  name: string; count: number; xp: number;
+  /** The part of it earned in play, which is what the warband lost (#161). */
+  xpEarned: number;
+  equipment: string[]; worth: number;
+  /** When and by whom he fell, from the casualty he belongs to; '' for a counted group and where nothing was recorded (#159). */
+  fell: string;
+  /** The round he joined in, when it is known. */
+  joined: string;
+}
 /** The dead of one unit, Heroes and Henchmen apart (a promoted man stays with the Heroes). */
 export interface FallenGroup { key: string; kind: 'hero' | 'hench'; unit: string; count: number; xpTotal: number; xpEarned: number; equipment: string[]; goldLost: number; entries: FallenEntry[] }
 export interface FallenView { count: number; goldLost: number; xpLost: number; groups: FallenGroup[] }
@@ -159,7 +168,17 @@ export function fallenView(ctx: core.Ctx): FallenView {
     const first = grp[0]!;
     const ud = first.uid_def || first.m.uid_def;
     const unit = (ud && core.unitDef(ctx, ud)?.name) || core.modelLabel(ctx, first.m);
-    const entry = (e: core.FallenRecord): FallenEntry => ({ name: e.m.name || unit, count: 1, xp: Number(e.m.exp) || 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: core.fallenGoldOf(ctx, e) });
+    const casualties = (ctx.s.campaign?.casualties ?? []) as core.Casualty[];
+    const fellOf = (e: core.FallenRecord): string => {
+      const cas = casualties.find((x) => (e.id != null && x.fallenRef === e.id) || (e.casualtyId != null && x.id === e.casualtyId));
+      if (!cas) return '';
+      const by = String(cas.attacker?.name ?? '').trim();
+      return `${Number(cas.round) > 0 ? `Fell in round ${cas.round}` : 'Fell during the setup'}${by ? ` · taken out by ${by}` : ''}`;
+    };
+    const entry = (e: core.FallenRecord): FallenEntry => ({
+      name: e.m.name || unit, count: 1, xp: Number(e.m.exp) || 0, xpEarned: core.fallenExpEarned(ctx, e), equipment: core.fallenEqAgg(ctx, [e.m]), worth: core.fallenGoldOf(ctx, e),
+      fell: fellOf(e), joined: e.m.joined ? `Joined in round ${e.m.joined}` : '',
+    });
     let entries: FallenEntry[];
     if (first.kind === 'hero') entries = grp.map(entry);
     else {
@@ -168,8 +187,9 @@ export function fallenView(ctx: core.Ctx): FallenView {
       for (const e of grp) {
         if (named.includes(e)) continue;
         const sig = core.fallenEqSig(e.m);
-        const su = subs.get(sig) ?? { name: unit, count: 0, xp: Number(e.exp) || 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: 0 };
+        const su = subs.get(sig) ?? { name: unit, count: 0, xp: Number(e.exp) || 0, xpEarned: 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: 0, fell: '', joined: '' };
         su.count++;
+        su.xpEarned += core.fallenExpEarned(ctx, e);
         su.worth += core.fallenGoldOf(ctx, e);
         subs.set(sig, su);
       }

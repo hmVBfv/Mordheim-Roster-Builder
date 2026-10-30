@@ -1087,8 +1087,19 @@
 }
 
 .fallenTotals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
   color: var(--danger);
   font-size: 0.92rem;
+}
+
+/* each figure stays in one piece: a line breaks between them, never inside one (#161) */
+.fallenTotals > span,
+.fallenNote > span,
+.fallenNums > span,
+.fallenWhen > span {
+  white-space: nowrap;
 }
 
 /* the groups side by side where the list is wide */
@@ -1122,6 +1133,9 @@
 }
 
 .fallenNote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
   margin: 2px 0 var(--space-2);
   color: var(--text-muted);
   font-size: 0.86rem;
@@ -1137,8 +1151,7 @@
 
 .fallenRows li {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: var(--space-2);
+  gap: 1px;
   padding-top: 6px;
   border-top: 1px solid var(--border);
 }
@@ -1153,14 +1166,16 @@
   overflow-wrap: anywhere;
 }
 
-.fallenNums {
+.fallenNums,
+.fallenWhen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
   color: var(--text-muted);
   font-size: 0.9rem;
-  white-space: nowrap;
 }
 
 .fallenGear {
-  grid-column: 1 / -1;
   color: var(--text-muted);
   font-size: 0.88rem;
 }

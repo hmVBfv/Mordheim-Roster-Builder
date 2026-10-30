@@ -754,9 +754,12 @@ for (const theme of THEMES) {
     // the Fallen say what was lost with him: experience, equipment, gold
     await page.getByText(/^Fallen \(\d+\)$/).click();
     const champion = page.getByRole('region', { name: '1× Champion' });
-    await expect(champion).toContainText(/\d+ Exp · \d+ gc/);
+    await expect(champion).toContainText(/\d+ Exp/);
+    await expect(champion).toContainText(/\d+ gc lost/);
     await expect(champion).toContainText('Dagger');
-    await expect(page.getByText(/^\d+ gc lost/)).toBeVisible();
+    await expect(champion.getByText('Hero unit')).toBeVisible();
+    await expect(champion.getByRole('list', { name: 'Fallen models of Champion' })).toBeVisible();
+    await expect(page.getByText(/^\d+ gc lost/).first()).toBeVisible();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-fallen`);
 
