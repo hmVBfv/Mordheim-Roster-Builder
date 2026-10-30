@@ -190,12 +190,17 @@ for (const theme of THEMES) {
     await captain.getByRole('button', { name: /One experience more/ }).click();
     await expect(captain.getByText('Exp 21')).toBeVisible();
 
-    // the last tab: the Captain's name is a field – Enter saves it
+    // the last tab: story and the way out; his name is no field down here any more
     await unit(page, 'Mercenary Captain', 'Story & more');
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-warrior-story`);
-    await captain.getByRole('textbox', { name: 'Name of this Mercenary Captain' }).fill('Ulrich the Grey');
-    await page.keyboard.press('Enter');
+    await expect(captain.getByRole('textbox', { name: 'Name of this Mercenary Captain' })).toHaveCount(0);
+    // #152, #153: his name stands at the top of the first tab with a pencil, which opens the sheet to name him
+    await unit(page, 'Mercenary Captain', 'Overview');
+    await captain.getByRole('button', { name: 'Rename Mercenary Captain' }).click();
+    const naming = page.locator('dialog[open]');
+    await naming.getByRole('textbox').fill('Ulrich the Grey');
+    await naming.getByRole('textbox').press('Enter');
     await expect(page.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Ulrich the Grey, Mercenary Captain/ })).toBeVisible();
 
@@ -874,8 +879,9 @@ for (const theme of THEMES) {
     // the first warrior is selected; every section stands in the pane, nothing behind tabs
     const pane = page.getByRole('complementary', { name: 'Selected warrior' });
     await expect(pane.getByRole('article', { name: 'Ulrich the Grey' })).toBeVisible();
+    await expect(pane.getByRole('button', { name: 'Rename Ulrich the Grey' })).toBeVisible();
     await expect(page.getByRole('tablist')).toHaveCount(0);
-    for (const h of ['Profile', 'Experience', 'Equipment', 'Skills', 'Injuries', 'Name', 'Leaving the warband']) {
+    for (const h of ['Profile', 'Experience', 'Equipment', 'Skills', 'Injuries', 'Leaving the warband']) {
       await expect(pane.getByRole('heading', { level: 3, name: new RegExp(`^${h}`) })).toBeVisible();
     }
     // the list beside the pane; a row is one table line: name, profile and experience across
@@ -900,9 +906,10 @@ for (const theme of THEMES) {
     await magda.getByRole('button', { name: /One experience more for Magda/ }).click();
     await expect(magda.getByRole('button', { name: /Experience of Magda: 9\./ })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Magda/ })).toContainText('Exp 9');
-    // his name is a field in the pane: leaving it saves
-    await magda.getByRole('textbox', { name: 'Name of this Champion' }).fill('Magda the Red');
-    await magda.getByRole('textbox', { name: 'Name of this Champion' }).blur();
+    // his name: the pencil in the head of the pane opens the sheet to name him
+    await magda.getByRole('button', { name: 'Rename Magda' }).click();
+    await page.locator('dialog[open]').getByRole('textbox').fill('Magda the Red');
+    await page.locator('dialog[open]').getByRole('textbox').press('Enter');
     await expect(page.getByRole('button', { name: /^Magda the Red/ })).toBeVisible();
     await shot(page, `${theme}-desktop-roster-magda`);
   });

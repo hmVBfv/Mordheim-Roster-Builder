@@ -4,9 +4,11 @@
    what leaves him. On a phone the sections sit behind four tabs under his
    row; from the width of a desktop they all stand in the pane beside the
    list. Without `acts` it only reads (another player's warband, the printout). */
-import { useRef, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
+import { IconEdit } from '../ui/icons.tsx';
 import { TipWord } from '../ui/Tip.tsx';
+import ui from '../ui/ui.module.css';
 import type { Taken } from './advance.ts';
 import { ChipView, xpNote } from './Bits.tsx';
 import { isWarrior, unitChips, type Fact, type HireView, type MaxLine, type StatCell, type WarriorView, type XpView } from './view.ts';
@@ -34,6 +36,8 @@ export interface UnitActs {
   equipSheet?(): void;
   equipLink?: string;
   rename(value: string): void;
+  /** Opens the sheet to name him (the pencil beside his name). */
+  editName(): void;
   /** The name of the field: "Name of this Mercenary Captain" or "Name of the group". */
   nameLabel: string;
   /** What the field shows: empty when he goes by his type. */
@@ -132,13 +136,19 @@ function Stepper({ xp, who, group, acts }: { xp: XpView; who: string; group: boo
   );
 }
 
-function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
+function Overview({ u, acts, nameLine }: { u: WarriorView | HireView; acts?: UnitActs; nameLine?: boolean }) {
   const w = isWarrior(u) ? u : null;
   const group = !!w && !w.hero;
   const chips = unitChips(u);
   const togo = u.xp?.next != null && !u.advanceDue ? ` · ${u.xp.next - u.xp.value} to go` : '';
   return (
     <>
+      {acts && nameLine && (
+        <div className={styles.nameLine}>
+          <b>{u.name}</b>
+          <button type="button" className={ui.iconButton} aria-label={`Rename ${u.name}`} onClick={acts.editName}><IconEdit /></button>
+        </div>
+      )}
       {chips.length > 0 && <div className={styles.chips} aria-label="Status">{chips.map((c, i) => <ChipView key={i} chip={c} />)}</div>}
       <Section title="Profile" side={group ? 'same for the whole group' : undefined}>
         <Stats cells={u.stats} save={w?.save} max={u.max} />
@@ -258,36 +268,11 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
   );
 }
 
-/* The name is a field: Enter or leaving it saves, Esc puts the old one back. */
-function NameField({ acts }: { acts: UnitActs }) {
-  const [text, setText] = useState(acts.nameValue);
-  // Esc puts the old name back, and the blur that follows must not save what was typed
-  const cancelled = useRef(false);
-  const commit = () => {
-    if (cancelled.current) { cancelled.current = false; return; }
-    if (text.trim() !== acts.nameValue.trim()) acts.rename(text.trim());
-  };
-  return (
-    <label className={styles.field}>
-      {acts.nameLabel}
-      <input
-        value={text} autoComplete="off" maxLength={80}
-        onChange={(e) => setText(e.target.value)} onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
-          if (e.key === 'Escape') { cancelled.current = true; setText(acts.nameValue); e.currentTarget.blur(); }
-        }}
-      />
-    </label>
-  );
-}
-
 function Story({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
   const w = isWarrior(u) ? u : null;
   if (!acts) return null;
   return (
     <>
-      <Section title="Name"><NameField key={`${u.uid}:${acts.nameValue}`} acts={acts} /></Section>
       <Section title="Story and table">
         <Link to={acts.story} className={styles.rowLink}><span>{w && !w.hero ? 'Story so far' : 'Story so far & profile'}<small>Write his part of the chronicle</small></span><span aria-hidden="true">›</span></Link>
         <Link to={acts.card} className={styles.rowLink}><span>Tabletop Simulator card<small>Name and description for the model</small></span><span aria-hidden="true">›</span></Link>
@@ -303,8 +288,8 @@ function Story({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
 }
 
 /** One section of the detail by its tab. */
-function Part({ id, u, acts }: { id: TabId; u: WarriorView | HireView; acts?: UnitActs }) {
-  if (id === 'overview') return <Overview u={u} acts={acts} />;
+function Part({ id, u, acts, nameLine }: { id: TabId; u: WarriorView | HireView; acts?: UnitActs; nameLine?: boolean }) {
+  if (id === 'overview') return <Overview u={u} acts={acts} nameLine={nameLine} />;
   if (id === 'gear') return isWarrior(u) ? <Gear w={u} acts={acts} /> : null;
   if (id === 'skills') return <Skills u={u} acts={acts} />;
   return <Story u={u} acts={acts} />;
@@ -319,10 +304,11 @@ export function Detail({ u, acts, tab, headed, id }: { u: WarriorView | HireView
       {headed && (
         <header className={styles.unitHead}>
           <h2>{u.name}{isWarrior(u) && !u.hero && <span className={styles.count}> ×{u.count}</span>}</h2>
+          {acts && <button type="button" className={ui.iconButton} aria-label={`Rename ${u.name}`} onClick={acts.editName}><IconEdit /></button>}
           <span>{u.name !== u.type ? u.type : kind}</span>
         </header>
       )}
-      {shown.map((t) => <Part key={t} id={t} u={u} acts={acts} />)}
+      {shown.map((t) => <Part key={t} id={t} u={u} acts={acts} nameLine={!headed} />)}
     </article>
   );
 }

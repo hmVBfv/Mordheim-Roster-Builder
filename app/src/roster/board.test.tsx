@@ -28,7 +28,7 @@ function band() {
 function acts(over: Partial<UnitActs> = {}): UnitActs {
   return {
     xp: vi.fn(), setXp: vi.fn(), advance: vi.fn(), injury: vi.fn(), captive: vi.fn(), addMan: vi.fn(), man: vi.fn(), lead: vi.fn(),
-    equipSheet: vi.fn(), rename: vi.fn(), nameLabel: 'Name of this Mercenary Captain', nameValue: '', story: '/story', card: '/card',
+    equipSheet: vi.fn(), rename: vi.fn(), editName: vi.fn(), nameLabel: 'Name of this Mercenary Captain', nameValue: '', story: '/story', card: '/card',
     taken: null, chaos: [], leave: { label: 'Remove from the roster', run: vi.fn() }, ...over,
   };
 }
@@ -112,7 +112,8 @@ describe('on a phone: a row each, opening under it with tabs', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Injuries' })).toBeTruthy();
     expect(screen.getByRole('heading', { level: 3, name: /^Advances taken/ })).toBeTruthy();
     await user.keyboard('{ArrowRight}');
-    expect(screen.getByRole('textbox', { name: 'Name of this Mercenary Captain' })).toBeTruthy();
+    // #152: the name is no longer a field at the bottom of the last tab
+    expect(screen.queryByRole('textbox', { name: 'Name of this Mercenary Captain' })).toBeNull();
     expect(screen.getByRole('link', { name: /^Story so far & profile/ }).getAttribute('href')).toBe('/story');
     expect(screen.getByRole('link', { name: /^Tabletop Simulator card/ }).getAttribute('href')).toBe('/card');
     expect(screen.queryByRole('button', { name: 'Out of action for good…' })).toBeNull();
@@ -134,7 +135,7 @@ describe('on a desktop: the list and the selected warrior beside it', () => {
     const pane = screen.getByRole('complementary', { name: 'Selected warrior' });
     const card = within(pane).getByRole('article', { name: 'Ulrich the Grey' });
     expect(within(card).getAllByRole('heading', { level: 3 }).map((h) => h.textContent!.replace(/(Equipment|Experience|Advances taken).*/, '$1'))).toEqual([
-      'Profile', 'Experience', 'Special rules', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Name', 'Story and table', 'Leaving the warband',
+      'Profile', 'Experience', 'Special rules', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Story and table', 'Leaving the warband',
     ]);
     expect(screen.queryByRole('tablist')).toBeNull();
     const first = screen.getByRole('button', { name: /^Ulrich/ });
@@ -212,26 +213,26 @@ describe('on a desktop: the list and the selected warrior beside it', () => {
     expect(a.captive).toHaveBeenCalledOnce();
   });
 
-  it('the name is a field: Enter or leaving saves it, Esc puts the old one back, no change saves nothing', async () => {
-    width = 1000;
+  it('#153: a pencil beside his name renames him – at the top of the first tab on a phone, in the head of the pane on a desktop', async () => {
     const user = userEvent.setup();
     const a = acts({ nameValue: 'Ulrich the Grey' });
     show({ acts: () => a });
-    const field = screen.getByRole('textbox', { name: 'Name of this Mercenary Captain' });
-    expect((field as HTMLInputElement).value).toBe('Ulrich the Grey');
-    await user.click(field);
-    await user.tab();
-    expect(a.rename).not.toHaveBeenCalled();
-    await user.clear(field);
-    await user.type(field, '  Ulrich the Bold {Enter}');
-    expect(a.rename).toHaveBeenLastCalledWith('Ulrich the Bold');
-    await user.clear(field);
-    await user.type(field, 'Nobody{Escape}');
-    expect((field as HTMLInputElement).value).toBe('Ulrich the Grey');
-    expect(a.rename).toHaveBeenCalledOnce();
-    await user.clear(field);
-    await user.tab();
-    expect(a.rename).toHaveBeenLastCalledWith('');
+    await user.click(screen.getByRole('button', { name: /^Ulrich/ }));
+    const phone = screen.getByRole('button', { name: 'Rename Ulrich the Grey' });
+    // #152: above his profile, not below the gear
+    const profile = screen.getByRole('heading', { level: 3, name: 'Profile' });
+    expect(phone.compareDocumentPosition(profile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(phone);
+    expect(a.editName).toHaveBeenCalledOnce();
+    cleanup();
+    width = 1000;
+    show({ acts: () => a });
+    const pencils = screen.getAllByRole('button', { name: 'Rename Ulrich the Grey' });
+    expect(pencils).toHaveLength(1);
+    const head = screen.getByRole('heading', { level: 2, name: 'Ulrich the Grey' });
+    expect(head.parentElement!.contains(pencils[0]!)).toBe(true);
+    await user.click(pencils[0]!);
+    expect(a.editName).toHaveBeenCalledTimes(2);
   });
 
   it('what is taken and what is corrected stand in the skills section', async () => {
