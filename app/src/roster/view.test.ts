@@ -326,7 +326,7 @@ describe('the Fallen', () => {
     expect(v.xpLost).toBe(9); // Magda earned 3 beyond her starting 8, each Warrior 2
     expect(v.groups.map((g) => [g.kind, g.unit, g.count])).toEqual([['hero', 'Champion', 1], ['hench', 'Warrior', 3]]);
     const [hero, hench] = v.groups as [typeof v.groups[0], typeof v.groups[0]];
-    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, xpEarned: 3, fell: '', joined: '', equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!) }]);
+    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, xpEarned: 3, fell: '', joined: '', battles: 0, equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!) }]);
     expect(hero.xpEarned).toBe(3);
     // a man with a name of his own is remembered by it; the nameless are counted together
     expect(hench.entries.map((e) => [e.name, e.count, e.xp])).toEqual([['Otto', 1, 2], ['Warrior', 2, 2]]);
@@ -388,5 +388,21 @@ describe('the roster lists its units in the order of the recruit list (#140)', (
     expect(heroes[0]).toBe('capt');
     const hench = v.henchmen.map((h) => s.models.find((m) => m.uid === h.uid)!.uid_def);
     expect(hench).toEqual(sorted(hench));
+  });
+});
+
+describe('the battles a warrior has fought (#166)', () => {
+  it('stand in the views of a warrior, a group and a Hired Sword, 0 before the first one', () => {
+    let s = core.newWarband(data, 'merc');
+    s = core.addUnit(ctx(s), 'capt');
+    s = core.hireHS(ctx(s), 'ogre');
+    s = structuredClone(s);
+    expect(rosterView(data, s).heroes[0]!.battles).toBe(0);
+    s = structuredClone(s); // the view froze it
+    s.models[0]!.battles = 3;
+    s.hired![0]!.battles = 2;
+    const v = rosterView(data, s);
+    expect(v.heroes[0]!.battles).toBe(3);
+    expect(v.hires[0]!.battles).toBe(2);
   });
 });

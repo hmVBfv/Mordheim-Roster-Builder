@@ -79,4 +79,19 @@ describe('the Fallen', () => {
     const models = within(screen.getByRole('region', { name: '1× Champion' })).getByRole('list', { name: 'Fallen models of Champion' });
     expect(within(models).getByText('11 Exp (3 earned in play)')).toBeTruthy();
   });
+
+  it('#166: says after how many battles he fell, where the counter has them', () => {
+    let s = dead();
+    s = structuredClone(s);
+    s.fallen![0]!.m.battles = 4;
+    const f = rosterView(data, s).fallen;
+    expect(f.groups[0]!.entries[0]!.battles).toBe(4);
+    render(<FallenList f={f} />);
+    expect(within(screen.getByRole('region', { name: '1× Champion' })).getByText('Took part in 4 battles')).toBeTruthy();
+  });
+
+  it('#166: says nothing of battles where none was counted', () => {
+    render(<FallenList f={rosterView(data, dead()).fallen} />);
+    expect(screen.queryByText(/Took part in/)).toBeNull();
+  });
 });

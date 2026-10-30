@@ -115,6 +115,8 @@ describe('the post-battle sequence on the save', () => {
     s = grantBattleXp(data, ctx(s), a.local.id);
     a = aftermathView(data, s, 'b-1')!;
     expect(a.xpAwarded).toBe(true);
+    // #166: the same step counts the battle for each who took part (the Captain did, once)
+    expect(s.models.find((m) => m.uid === 1)!.battles).toBe(1);
     // everyone survived; the leader won
     expect(a.pendingXp.filter((x) => x.reason === 'survived the battle')).toHaveLength(4);
     expect(a.pendingXp.filter((x) => x.reason === 'led the winning warband')).toHaveLength(1);
