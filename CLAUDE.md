@@ -34,6 +34,7 @@ changing anything structural.
 | `server/` | Fastify + SQLite API, `roster-cli` | phase 2 (skeleton: health, migrations, snapshots, epoch) |
 | `ops/`, `Dockerfile` | Pi configuration: compose, Caddyfile, systemd, scripts, `install.sh`; the image | phase 2 |
 | `docs/` | concept, architecture, data model, security, operations, UI | now |
+| `changelog/` | one small file per change the players see, shown as "What's new" (ADR 0029) | now |
 
 ## Commands
 
@@ -154,7 +155,9 @@ changing anything structural.
   same commit. A new save key gets a default in `core/src/format/save.ts` and
   a place in `core/src/format/schema.ts`; `FORMAT` rises only with a
   migration. Never rename or remove a key (`test/compat.mjs`).
-  Principle change → new ADR. Notable change → `HISTORY.md` entry (why,
+  A change the players see → its own file `changelog/YYYY-MM-DD-<name>.md` in the same pull request
+  (ADR 0029: `date: …`, then `- New|Changed|Fixed: …`, English, short, no report numbers; none for
+  infrastructure, tests or docs). Principle change → new ADR. Notable change → `HISTORY.md` entry (why,
   including wrong turns); in a run of several reports (`/bugs`) the entries
   go into one separate docs pull request, not into each fix's branch, so the
   pull requests do not conflict on the end of the file.

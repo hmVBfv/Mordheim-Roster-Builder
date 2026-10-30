@@ -61,6 +61,15 @@ for (const theme of THEMES) {
     await expect(page.getByRole('radio', { name: /Parchment/ })).toBeVisible();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-more`);
+    // wish #154: what the updates changed, newest first, in a sheet
+    await page.getByRole('button', { name: "What's new" }).click();
+    const news = page.getByRole('dialog', { name: "What's new" });
+    await expect(news.getByRole('heading', { level: 3 }).first()).toBeVisible();
+    await expect(news.locator('li').first()).toBeVisible();
+    await noSideScroll(page); await tapTargets(page);
+    await shot(page, `${theme}-whats-new`);
+    await news.getByRole('button', { name: 'Close' }).click();
+    await expect(news).toBeHidden();
   });
 }
 

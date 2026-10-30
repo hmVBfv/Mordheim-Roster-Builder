@@ -23,6 +23,7 @@ COPY app/package.json app/
 COPY server/package.json server/
 RUN npm ci --no-audit --no-fund
 COPY data data
+COPY changelog changelog
 COPY core core
 COPY app app
 COPY server server

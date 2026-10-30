@@ -4467,3 +4467,14 @@ said "no restored log line" although the log, printed right below the message, h
 reports the pipe as failed – whether it does depends on how much the log holds and on timing, so it passes most days. Reproduced with a
 fake `docker` that prints 20 000 lines (the old form fails, the new one passes). `log_has` reads the log whole, and the three other
 checks of the same form use it. Pull request: this one.
+## October 30, 2026 — a changelog with every deploy (#154)
+
+Rob confirmed the wish and asked for it to go on with every deploy, not only a one-time list. The point that decides the design is who
+writes the entry: one shared file would be the next `HISTORY.md` – the second pull request of a run always conflicts. So each change
+brings its own small file in `changelog/` (ADR 0029), and the build collects them. The notice under "Reload" has a catch: the running
+version only knows its own changelog, but the player wants to read what the *new* one brings. So the build also writes `changelog.json`,
+and the notice reads it from the network (not in the service worker's precache, `json` is not among its globs – checked in the built
+`sw.js`) and shows what the running version lacks. Offline it simply has no button. The CI checks the form of the files and that they
+carry no report number; that a file comes at all is a rule for `/bugs` and `CLAUDE.md`, not a check – a "changed `app/` without a file"
+test would block the infrastructure pull requests. The last weeks were written from this file's own headings, so they say what the
+players saw, not what was changed. Pull request 277.
