@@ -35,7 +35,7 @@ export function FallenList({ f }: { f: FallenView }) {
                     <span>{e.xp} Exp{e.xpEarned ? ` (${e.xpEarned} earned in play)` : ''}</span>
                     <span>{e.worth} gc lost</span>
                   </span>
-                  {(e.fell || e.joined) && <span className={styles.fallenWhen}>{[e.joined, e.fell].filter(Boolean).map((t) => <span key={t}>{t}</span>)}</span>}
+                  {(e.fell || e.joined || e.battles > 0) && <span className={styles.fallenWhen}>{[e.joined, e.battles > 0 ? `Took part in ${e.battles} ${e.battles === 1 ? 'battle' : 'battles'}` : '', e.fell].filter(Boolean).map((t) => <span key={t}>{t}</span>)}</span>}
                   <span className={styles.fallenGear}>{e.equipment.length ? e.equipment.join(', ') : 'No equipment'}</span>
                 </li>
               ))}

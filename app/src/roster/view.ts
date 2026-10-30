@@ -53,6 +53,8 @@ export interface WarriorView {
   xp: XpView | null;
   advanceDue: boolean;
   missGames: number;
+  /** The battles of a campaign he (or the group) has taken part in (#166). */
+  battles: number;
   stats: StatCell[];
   /** What each stat may reach, for the small line under the profile; none where no race is on file. */
   max: MaxLine | null;
@@ -83,7 +85,7 @@ export interface WarriorView {
 
 export interface HireView {
   key: string; uid: string; name: string; type: string; kind: 'Hired Sword' | 'Dramatis Personae';
-  exp: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[]; max: MaxLine | null;
+  exp: number; /** The battles he has taken part in (#166). */ battles: number; xp: XpView | null; advanceDue: boolean; stats: StatCell[]; max: MaxLine | null;
   rules: Fact[]; skills: Fact[]; spells: Fact[];
   lore: SpellLore | null;
 }
@@ -146,6 +148,8 @@ export interface FallenEntry {
   fell: string;
   /** The round he joined in, when it is known. */
   joined: string;
+  /** The battles he took part in before he fell, where they were counted (#166); 0 where none was, and for a counted group. */
+  battles: number;
 }
 /** The dead of one unit, Heroes and Henchmen apart (a promoted man stays with the Heroes). */
 export interface FallenGroup { key: string; kind: 'hero' | 'hench'; unit: string; count: number; xpTotal: number; xpEarned: number; equipment: string[]; goldLost: number; entries: FallenEntry[] }
@@ -177,7 +181,7 @@ export function fallenView(ctx: core.Ctx): FallenView {
     };
     const entry = (e: core.FallenRecord): FallenEntry => ({
       name: e.m.name || unit, count: 1, xp: Number(e.m.exp) || 0, xpEarned: core.fallenExpEarned(ctx, e), equipment: core.fallenEqAgg(ctx, [e.m]), worth: core.fallenGoldOf(ctx, e),
-      fell: fellOf(e), joined: e.m.joined ? `Joined in round ${e.m.joined}` : '',
+      fell: fellOf(e), joined: e.m.joined ? `Joined in round ${e.m.joined}` : '', battles: Number(e.m.battles) || 0,
     });
     let entries: FallenEntry[];
     if (first.kind === 'hero') entries = grp.map(entry);
@@ -187,7 +191,7 @@ export function fallenView(ctx: core.Ctx): FallenView {
       for (const e of grp) {
         if (named.includes(e)) continue;
         const sig = core.fallenEqSig(e.m);
-        const su = subs.get(sig) ?? { name: unit, count: 0, xp: Number(e.exp) || 0, xpEarned: 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: 0, fell: '', joined: '' };
+        const su = subs.get(sig) ?? { name: unit, count: 0, xp: Number(e.exp) || 0, xpEarned: 0, equipment: core.fallenEqAgg(ctx, [e.m]), worth: 0, fell: '', joined: '', battles: 0 };
         su.count++;
         su.xpEarned += core.fallenExpEarned(ctx, e);
         su.worth += core.fallenGoldOf(ctx, e);
@@ -264,6 +268,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp, null, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
     missGames: Number(m.miss) || 0,
+    battles: Number(m.battles) || 0,
     stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
     max: ((mi) => maxRow(ctx, mi?.label ?? null, mi?.prof))(core.maxInfo(ctx, m)),
     save: core.svShownLabel(ctx, m),
@@ -286,6 +291,7 @@ function hire(ctx: core.Ctx, rec: HireRecord, kind: HireView['kind']): HireView 
   return {
     key: `${kind}:${rec.uid}`, uid: rec.uid, name: rec.name || e.name, type: e.name, kind,
     exp: Number(rec.exp) || 0,
+    battles: Number(rec.battles) || 0,
     xp: hs && adv ? track(core.HS_ADV, 0, core.hsExp(rec), core.HS_XP_MAX, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
     stats: statCells(core.hsEffProfile(rec, e), e.profile),

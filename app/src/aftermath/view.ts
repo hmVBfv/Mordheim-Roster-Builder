@@ -64,8 +64,9 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   };
 }
 
-/** Grants the battle's experience once: +1 to whoever survived, +1 to the leader if it was won (core awardBattleXp), noted on the battle. */
+/** Grants the battle's experience once, and counts the battle for those who took part: +1 to whoever survived, +1 to the leader if it was won (core awardBattleXp), noted on the battle. */
 export function grantBattleXp(data: GameData, ctx: core.Ctx, localId: number): WarbandState {
   const s = core.awardBattleXp(ctx, localId);
-  return core.editBattle(core.ctxOf(data, s), localId, { xpAwarded: true });
+  // the same step counts the battle for each who took part (#166); the button is gone once it was granted, so it is counted once
+  return core.editBattle(core.ctxOf(data, core.countBattle(core.ctxOf(data, s), localId)), localId, { xpAwarded: true });
 }
