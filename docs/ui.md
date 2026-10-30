@@ -429,6 +429,12 @@ Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
 Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
 more“ entfällt (#152, #153).
 
+**What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
+„New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen
+gruppiert, das Neueste oben. In der Meldung „New version available.“ steht zwischen Text und „Reload“ ein kleines „What's new“,
+das nur zeigt, was die neue Version mehr enthält (ihre `changelog.json`, aus dem Netz gelesen, nicht aus dem Cache); ohne Netz oder
+ohne Neues erscheint der Knopf nicht.
+
 **Aufstieg (Advance).** Die Zeilen der Heldentabelle, die einen zweiten Wurf
 verlangen (6: Stärke oder Attacken, 8: Initiative oder Mut, 9: Wunde oder
 Widerstand), fragen nach dem W6 („D6 as rolled“, 1–3 die erste, 4–6 die zweite

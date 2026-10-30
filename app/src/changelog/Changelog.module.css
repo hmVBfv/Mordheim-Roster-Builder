@@ -1,0 +1,28 @@
+.entry h3 {
+  margin: 0 0 var(--space-1);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.entry ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry li {
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--border);
+}
+
+/* what kind of change, at a glance: new things in the accent colour, fixes plain */
+.new {
+  color: var(--accent);
+}
+
+.changed,
+.fixed {
+  color: var(--text-muted);
+}
