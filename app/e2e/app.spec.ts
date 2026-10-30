@@ -1289,6 +1289,28 @@ test('a rule word in the Hire sheet opens its bubble above the sheet', async ({ 
   await shot(page, 'hire-sheet-tip');
 });
 
+/* #163: the (+1) of "12/12(+1)" stands level with the count, not lower. */
+test('the (+1) of the models tile is level with the count', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  await page.getByRole('link', { name: 'Hire', exact: true }).click();
+  await page.getByRole('checkbox', { name: 'Only those this warband may hire' }).uncheck();
+  await page.getByRole('searchbox', { name: 'Find by name or race' }).fill('Halfling Scout');
+  await page.getByRole('list', { name: 'Hired Swords' }).getByRole('button').first().click();
+  await page.locator('dialog[open]').getByRole('button', { name: 'Hire', exact: true }).click();
+  await page.getByRole('link', { name: /‹ The Silver Caravan/ }).click();
+  const tile = page.locator('dl > div', { has: page.getByText('Models', { exact: true }) });
+  await expect(tile.locator('small')).toHaveText('(+1)');
+  const [figure, bonus] = await tile.locator('dd').evaluate((dd) => {
+    const mid = (r: DOMRect) => r.top + r.height / 2;
+    const r = document.createRange();
+    r.selectNodeContents(dd.firstChild!.nextSibling ?? dd.firstChild!);
+    const fig = document.createRange(); fig.selectNodeContents([...dd.childNodes].find((n) => n.nodeType === 3 && /\d/.test(n.textContent ?? ''))!);
+    return [mid(fig.getBoundingClientRect()), mid(dd.querySelector('small')!.getBoundingClientRect())];
+  });
+  expect(Math.abs(bonus! - figure!), 'the (+1) is centred on the figures, within a pixel').toBeLessThanOrEqual(1);
+});
+
 test('one who may not join says why, and cannot be hired', async ({ page }) => {
   await page.goto('./');
   await importSample(page);

@@ -76,6 +76,11 @@
   white-space: nowrap;
 }
 
+/* the (+1) after the models: smaller, but level with the figures, not on their baseline a little low (report #163) */
+.tile dd small {
+  vertical-align: 0.12em;
+}
+
 /* the gold figures are enough: no frame of its own (report #42) */
 .tileGold dd {
   color: var(--gold);
