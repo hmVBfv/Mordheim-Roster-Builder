@@ -223,8 +223,8 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
         <Section title={`Spell list · ${u.lore.name}`} side={u.lore.open > 0 && acts?.learnSpell ? `${u.lore.open} to choose at the start` : undefined}>
           <ul className={styles.lore} aria-label={`Spell list: ${u.lore.name}`}>
             {u.lore.spells.map((sp) => (
-              <li key={sp.name} className={sp.known ? styles.loreKnown : undefined}>
-                <span><b>{sp.name}</b>{sp.diff && <span className={styles.loreDiff}> · cast on {sp.diff}{sp.red > 0 && `(−${sp.red})`}{sp.diff === 'auto' ? '' : '+'}</span>}{sp.known && <span className={styles.loreMark}> · known</span>}</span>
+              <li key={sp.name} className={sp.known ? styles.loreKnown : undefined} data-known={sp.known || undefined}>
+                <span><b>{sp.name}</b>{sp.diff && <span className={styles.loreDiff} data-cast data-known={sp.known || undefined}> · cast on {sp.diff}{sp.red > 0 && `(−${sp.red})`}{sp.diff === 'auto' ? '' : '+'}</span>}{sp.known && <span className={styles.loreMark}> · known</span>}</span>
                 {sp.text && <small>{sp.text}</small>}
                 {!sp.known && u.lore!.open > 0 && acts?.learnSpell && (
                   <button type="button" className={styles.btn} onClick={() => acts.learnSpell!(sp.key)}>{`Choose ${sp.name}`}</button>

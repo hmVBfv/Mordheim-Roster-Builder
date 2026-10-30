@@ -444,6 +444,8 @@ der Export zeigt denselben Wert. In der Zauberliste steht der gedruckte Wert mit
 dem Schritt daneben („cast on 7(−1)+“). In „Advances“ steht jeder Schritt als
 eigener Eintrag „1 easier to cast“ mit eigenem „Remove“, nicht zusammengefasst
 (#150, #151).
+Ein erlernter Zauber steht in der Zauberliste mit leicht getöntem Hintergrund und
+Balken links, sein Castwert als Plakette in der Akzentfarbe (#149).
 
 **Grenzen für Gestaltung und Prüfung.** 360 px ohne Seitwärtsscrollen,
 Tippflächen mindestens 44 px, beide Themes, Screenshots bei 360, 820, 1440 und
