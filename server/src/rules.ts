@@ -20,8 +20,9 @@ import hiredswords from '../../data/hiredswords.json' with { type: 'json' };
 import dramatis from '../../data/dramatis.json' with { type: 'json' };
 import postbattle from '../../data/postbattle.json' with { type: 'json' };
 import bestiary from '../../data/bestiary.json' with { type: 'json' };
+import settings from '../../data/settings.json' with { type: 'json' };
 
-const RAW: RawGameData = { races, equipment, skills, spells, abilities, mutations, injuries, i18n, houserules, marks, sheet, campaign, warbands, hiredswords, dramatis, postbattle, bestiary };
+const RAW: RawGameData = { races, equipment, skills, spells, abilities, mutations, injuries, i18n, houserules, marks, sheet, campaign, warbands, hiredswords, dramatis, postbattle, bestiary, settings };
 
 let data: GameData | null = null;
 

@@ -1,5 +1,7 @@
 /* The search mask of "What can be found" (wish #22): by name or effect, by the characteristic an item touches, by rarity. */
+import * as core from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
+import { data } from '../test/data.ts';
 import type { RareItem } from './equipment.ts';
 import { effectLine, filterRare, gradeOptions, releasedWith, sortRare, sourceKeys, sourceName, sourceOptions, STAT_FILTERS, type SortOrder } from './rareFilter.ts';
 
@@ -113,5 +115,13 @@ describe('the choice by where an item was released', () => {
     expect(releasedWith(MIXED[1]!)).toEqual([]);
     expect(releasedWith(MIXED[2]!)).toEqual(['Border Town Burning', 'Empire in Flames']);
     expect(releasedWith(MIXED[4]!)).toEqual(['A warband\'s own item']);
+  });
+});
+
+/* Wishes #164, #165: the settings are data now (data/settings.json); the names the Trading Post shows must be the data's. */
+describe('the names of the settings', () => {
+  it('are those of data/settings.json, so the list of the "Released with" choice cannot drift from the data', () => {
+    for (const s of data.SETTINGS) expect(sourceName(s.id), s.id).toBe(core.settingName(data, s.id));
+    expect(sourceName('warband')).toBe(core.settingName(data, 'warband'));
   });
 });
