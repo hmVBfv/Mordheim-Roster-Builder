@@ -4478,3 +4478,44 @@ and the notice reads it from the network (not in the service worker's precache, 
 carry no report number; that a file comes at all is a rule for `/bugs` and `CLAUDE.md`, not a check – a "changed `app/` without a file"
 test would block the infrastructure pull requests. The last weeks were written from this file's own headings, so they say what the
 players saw, not what was changed. Pull request 277.
+
+## October 30, 2026 (second run) — bug report in campaigns (#158), the models tile (#163), Magic Gourd (#162), campaign settings (#164, #165), the unit's pencil (#156), What's new (#155), list order (#157), the Fallen (#159–#161)
+
+#158: on a campaign's page of another player's warband the report form had nothing to attach, because it only knew warbands saved on
+the device. The snapshot now reads that warband (`readWarband`) as the campaign shows it to the reporter and the form sends that save;
+a failed read just means no attachment. Pull request 279.
+
+#163: the "(+1)" of "12/12(+1)" sat about 2 px below the count (smaller text on one baseline). Raised by 0.12em; the e2e test measures
+the centres – first try 2 px, now 1 at most. Pull request 280.
+
+#162: the Magic Gourd's text in the data was a paraphrase of heat and thirst rules; Rob gave the text of mordheimer.net (Khemri
+setting, Town Cryer #18, 1b), now in the data as its own commit. "A tooltip is missing" was a second thing: the names under "Rare and
+trading-post items" in the equipment sheet had the text only as `title`, which a phone never shows; they are words with a bubble now.
+All 310 catalogue entries have a rule text (checked), so it was not a missing text. The Trading Post's and the Give-Board's item buttons
+have the same `title`-only text; a tap selects there, so they were left (Rob decides). Pull request 281. One wrong turn: the tool of the
+subagent that was to read mordheimer.net failed on the network; `curl` through the proxy worked.
+
+#164, #165: the data already had `settings`/`source` on 162 of 310 items (the price charts that list them). New: `data/settings.json`
+with the eight settings of mordheimer.net, `core/src/rules/settings.ts` (`itemSources`, `itemInSettings`, `catalogIn`) and tests that
+every named setting is in the file and every page an item was read on names its setting. A campaign does not store its areas yet, and
+nothing filters in the Warband tab or at creation: that is the later report. A finding, not changed (rules data): `core` is on ~100
+items, and 40–57 of them are not on the core price chart (the Magic Gourd, for one), so a "Mordheim only" campaign would still show
+them. Pull request 282. A vitest trap on the way: `node_modules/.vitest-cache` held an old transform of the data loader, so the new file
+was "missing" until it was deleted (only this sandbox).
+
+#156: the first try of #152/#153 gave the name its own line at the top of the first tab; Rob wanted the pencil beside the name, like the
+warband's. It is in the opened row now, to the right of the top line (which keeps room), and the line is gone. Pull request 283.
+
+#155: "What's new" (#154) was too hidden. A button "New" in the header beside "Bug" (from 700 px), a card on Home, and under the update
+notice the first change of the new version with the button. Pull request 284.
+
+#157: "In campaigns" moved up in the Warbands screen, right after the favourites; the planners stay last. The side menu keeps its order.
+Pull request 285.
+
+#159, #160, #161: the Fallen show the unit as the heading ("Hero unit"/"Henchmen unit", N models fallen, experience, gold) with the
+models as a list under it, each with the round it fell in and who took it out (from the casualty), and the round it joined; the
+experience lost stands beside the gold. How many battles a model took part in is not recorded per model, so it is not shown. Round 0
+says "Fell during the setup". Pull request 286.
+
+Changelog (#154) went with the pull requests: each brings its file, and a test merge of all eight branches onto `master` had no
+conflict. Merge order: all independent; 279 to 286 in any order.
