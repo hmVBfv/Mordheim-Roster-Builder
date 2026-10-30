@@ -213,15 +213,20 @@ describe('on a desktop: the list and the selected warrior beside it', () => {
     expect(a.captive).toHaveBeenCalledOnce();
   });
 
-  it('#153: a pencil beside his name renames him – at the top of the first tab on a phone, in the head of the pane on a desktop', async () => {
+  it('#153, #156: a pencil beside his name renames him – in his row on a phone, no row of its own; in the head of the pane on a desktop', async () => {
     const user = userEvent.setup();
     const a = acts({ nameValue: 'Ulrich the Grey' });
     show({ acts: () => a });
+    // a closed row has no pencil: it is there once he is opened
+    expect(screen.queryByRole('button', { name: 'Rename Ulrich the Grey' })).toBeNull();
     await user.click(screen.getByRole('button', { name: /^Ulrich/ }));
     const phone = screen.getByRole('button', { name: 'Rename Ulrich the Grey' });
-    // #152: above his profile, not below the gear
-    const profile = screen.getByRole('heading', { level: 3, name: 'Profile' });
-    expect(phone.compareDocumentPosition(profile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // beside the name in his row, above the tabs – and not a line in the first tab
+    const row = phone.closest('li')!;
+    expect(row.querySelector('[role="tablist"]')).toBeTruthy();
+    expect(phone.compareDocumentPosition(row.querySelector('[role="tablist"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(screen.getByRole('tabpanel')).queryByRole('button', { name: 'Rename Ulrich the Grey' })).toBeNull();
+    expect(screen.getAllByRole('button', { name: 'Rename Ulrich the Grey' })).toHaveLength(1);
     await user.click(phone);
     expect(a.editName).toHaveBeenCalledOnce();
     cleanup();

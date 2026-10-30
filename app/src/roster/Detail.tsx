@@ -138,19 +138,13 @@ function Stepper({ xp, who, group, acts }: { xp: XpView; who: string; group: boo
   );
 }
 
-function Overview({ u, acts, nameLine }: { u: WarriorView | HireView; acts?: UnitActs; nameLine?: boolean }) {
+function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
   const w = isWarrior(u) ? u : null;
   const group = !!w && !w.hero;
   const chips = unitChips(u);
   const togo = u.xp?.next != null && !u.advanceDue ? ` · ${u.xp.next - u.xp.value} to go` : '';
   return (
     <>
-      {acts && nameLine && (
-        <div className={styles.nameLine}>
-          <b>{u.name}</b>
-          <button type="button" className={ui.iconButton} aria-label={`Rename ${u.name}`} onClick={acts.editName}><IconEdit /></button>
-        </div>
-      )}
       {chips.length > 0 && <div className={styles.chips} aria-label="Status">{chips.map((c, i) => <ChipView key={i} chip={c} />)}</div>}
       <Section title="Profile" side={group ? 'same for the whole group' : undefined}>
         <Stats cells={u.stats} save={w?.save} max={u.max} />
@@ -304,8 +298,8 @@ function Story({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
 }
 
 /** One section of the detail by its tab. */
-function Part({ id, u, acts, nameLine }: { id: TabId; u: WarriorView | HireView; acts?: UnitActs; nameLine?: boolean }) {
-  if (id === 'overview') return <Overview u={u} acts={acts} nameLine={nameLine} />;
+function Part({ id, u, acts }: { id: TabId; u: WarriorView | HireView; acts?: UnitActs }) {
+  if (id === 'overview') return <Overview u={u} acts={acts} />;
   if (id === 'gear') return isWarrior(u) ? <Gear w={u} acts={acts} /> : null;
   if (id === 'skills') return <Skills u={u} acts={acts} />;
   return <Story u={u} acts={acts} />;
@@ -324,7 +318,7 @@ export function Detail({ u, acts, tab, headed, id }: { u: WarriorView | HireView
           <span>{u.name !== u.type ? u.type : kind}</span>
         </header>
       )}
-      {shown.map((t) => <Part key={t} id={t} u={u} acts={acts} nameLine={!headed} />)}
+      {shown.map((t) => <Part key={t} id={t} u={u} acts={acts} />)}
     </article>
   );
 }

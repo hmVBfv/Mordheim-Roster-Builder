@@ -204,9 +204,10 @@ for (const theme of THEMES) {
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-warrior-story`);
     await expect(captain.getByRole('textbox', { name: 'Name of this Mercenary Captain' })).toHaveCount(0);
-    // #152, #153: his name stands at the top of the first tab with a pencil, which opens the sheet to name him
+    // #152, #153, #156: a pencil beside his name in his row opens the sheet to name him (no line of its own)
     await unit(page, 'Mercenary Captain', 'Overview');
-    await captain.getByRole('button', { name: 'Rename Mercenary Captain' }).click();
+    await expect(captain.getByRole('button', { name: 'Rename Mercenary Captain' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Rename Mercenary Captain' }).click();
     const naming = page.locator('dialog[open]');
     await naming.getByRole('textbox').fill('Ulrich the Grey');
     await naming.getByRole('textbox').press('Enter');

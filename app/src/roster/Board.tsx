@@ -4,6 +4,8 @@
    the warrior under his row, with tabs; from the width of a desktop he stays
    in a pane beside the list, every section open. The same board shows
    another player's warband, read-only (without `acts`). */
+import { IconEdit } from '../ui/icons.tsx';
+import ui from '../ui/ui.module.css';
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Detail, TAB_LABEL, tabsFor, type TabId, type UnitActs } from './Detail.tsx';
 import { PrintSheet } from './Print.tsx';
@@ -26,7 +28,7 @@ const rowWords = (r: UnitRow): string => [
   r.carries && `Carries ${r.carries}`,
 ].filter(Boolean).join('. ');
 
-function RowView({ r, layout, current, onPick, children }: { r: UnitRow; layout: Layout; current: boolean; onPick: () => void; children?: ReactNode }) {
+function RowView({ r, layout, current, onPick, rename, children }: { r: UnitRow; layout: Layout; current: boolean; onPick: () => void; rename?: () => void; children?: ReactNode }) {
   const stack = layout === 'stack';
   const li = useRef<HTMLLIElement>(null);
   const words = useId();
@@ -58,6 +60,7 @@ function RowView({ r, layout, current, onPick, children }: { r: UnitRow; layout:
         </span>
       </button>
       <span id={words} className="visually-hidden">{rowWords(r)}</span>
+      {stack && current && rename && <button type="button" className={`${ui.iconButton} ${styles.rowPencil}`} aria-label={`Rename ${r.name}`} onClick={rename}><IconEdit /></button>}
       {children}
     </li>
   );
@@ -126,7 +129,7 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
               {g.units.map((u) => {
                 const open = current?.key === u.key;
                 return (
-                  <RowView key={u.key} r={unitRow(u)} layout={layout} current={open} onPick={() => pick(u)}>
+                  <RowView key={u.key} r={unitRow(u)} layout={layout} current={open} onPick={() => pick(u)} rename={acts?.(u).editName}>
                     {stack && open && (
                       <div className={styles.open}>
                         <Tabs ids={tabsFor(u)} tab={shownTab(u)} onTab={setTab} />
