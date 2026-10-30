@@ -4529,3 +4529,11 @@ The wrong turn: the first tag `core` had meant "on the core price chart", and th
 The skills need no marking: the five lists of the data are the rulebook's, name by name (34 of 34). Test fallout: the data audit's
 tooltip-name check had assumed the 47 were core and compared names exactly ("Flying Carpet" for the Magic carpet); it holds now only
 that every item has a rule text. Pull request 288 (stacked on 282: merge 282 first).
+
+#166 and the rulebook's horse: the horse (Rob: "yes") is the core price chart's Riding/Draft Horse as an entry of its own, vanilla, beside the
+two versions of the settings; the parity helper had to learn where legacy puts the size warning, since the new entry shifted the generated
+warbands and one of them showed it. #166, the counter of battles (wish confirmed after #159): a key `battles` on models and hired records,
+counted by a core action `countBattle` that the aftermath's step "Grant the battle's experience" calls once for each battle. Why not inside
+`awardBattleXp`: that action is in the parity walk against legacy, which knows no counter. Who "took part": everyone who does not sit it out;
+the killed in it are counted in their Fallen record, so the Fallen can say after how many battles they fell. The stack: 290 on 286 (Fallen),
+289 on 288 on 282 (settings, vanilla, horse).
