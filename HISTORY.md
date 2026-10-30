@@ -4455,5 +4455,5 @@ script are unchanged. Pull request 274.
 desktop) with a pencil that opens the sheet to name him, like the warband's. Rob asked for both; the field would have been a second
 way to do the same thing. Pull request 275.
 
-Merge order: 269, then 272; 270, then 271; 273, 274 and 275 stand alone. `docs/ui.md` is touched by all but 273's neighbours at
-different places; a test merge of all seven branches onto `master` had no conflict.
+Merge order: 269, then 272; 270, then 271; 273, 274 and 275 stand alone. Several of them add to `docs/ui.md`, each at its own place;
+a test merge of all seven branches onto `master` had no conflict.
