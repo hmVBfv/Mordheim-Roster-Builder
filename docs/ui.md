@@ -429,6 +429,12 @@ Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
 Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
 more“ entfällt (#152, #153).
 
+**Die Gefallenen (#159, #160, #161).** Je Einheit steht die Einheit als Überschrift („Hero unit“ oder „Henchmen unit“), darunter „N models fallen“
+mit Erfahrung und verlorenem Gold, dann die gefallenen Modelle als Liste („Fallen models of …“). Jedes Modell nennt, wo es
+aufgezeichnet wurde, die Runde, in der es fiel, und wer es ausgeschaltet hat, und die Runde, in der es dazukam. Die verlorene
+Erfahrung (die im Spiel verdiente) steht neben dem Gold, in der Zusammenfassung wie in jeder Zeile; jede Zahl bleibt in einem Stück.
+Nicht erfasst ist, an wie vielen Kämpfen ein Modell teilnahm: Die Warband führt dazu keine Zahl je Modell.
+
 **What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
 „New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen
 gruppiert, das Neueste oben. In der Meldung „New version available.“ steht zwischen Text und „Reload“ ein kleines „What's new“,

@@ -326,7 +326,7 @@ describe('the Fallen', () => {
     expect(v.xpLost).toBe(9); // Magda earned 3 beyond her starting 8, each Warrior 2
     expect(v.groups.map((g) => [g.kind, g.unit, g.count])).toEqual([['hero', 'Champion', 1], ['hench', 'Warrior', 3]]);
     const [hero, hench] = v.groups as [typeof v.groups[0], typeof v.groups[0]];
-    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!) }]);
+    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, xpEarned: 3, fell: '', joined: '', equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!) }]);
     expect(hero.xpEarned).toBe(3);
     // a man with a name of his own is remembered by it; the nameless are counted together
     expect(hench.entries.map((e) => [e.name, e.count, e.xp])).toEqual([['Otto', 1, 2], ['Warrior', 2, 2]]);
