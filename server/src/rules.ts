@@ -2,7 +2,7 @@
    the binding totals and changes when a warband is marked (a tag). The
    data files are bundled in (build.mjs), so the image needs no data
    directory; they are read into game data on first use. */
-import { createGameData, ctxOf, loadSave, stageTotals, type GameData, type RawGameData, type StageTotals } from '@mordheim/core';
+import { createGameData, ctxOf, isVanillaWarband as coreIsVanillaWarband, loadSave, stageTotals, type GameData, type RawGameData, type StageTotals } from '@mordheim/core';
 import races from '../../data/races.json' with { type: 'json' };
 import equipment from '../../data/equipment.json' with { type: 'json' };
 import skills from '../../data/skills.json' with { type: 'json' };
@@ -36,3 +36,6 @@ export function totalsOf(save: unknown): StageTotals | null {
   const r = loadSave(gameData(), save);
   return r.ok ? stageTotals(ctxOf(gameData(), r.state)) : null;
 }
+
+/** Is this a warband of the rulebook (grade core)? Only these enter a campaign that plays Vanilla Mordheim (wish #167). */
+export const isVanillaWarband = (wb: unknown): boolean => coreIsVanillaWarband(gameData(), wb);

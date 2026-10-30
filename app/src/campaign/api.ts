@@ -25,7 +25,7 @@ export interface Enrolment {
   districts?: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
-  campaign: { id: string; name: string; round: number; /** A key of the lore, or '' (#66); absent in a view kept from before it. */ place?: string; houseRules: unknown; createdAt: string; updatedAt: string };
+  campaign: { id: string; name: string; round: number; /** A key of the lore, or '' (#66); absent in a view kept from before it. */ place?: string; /** Plays Vanilla Mordheim: only the rulebook (#167); absent in a view kept from before it. */ vanilla?: boolean; houseRules: unknown; createdAt: string; updatedAt: string };
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
@@ -72,7 +72,9 @@ export async function cachedCampaign(id: string): Promise<CampaignView | null> {
 /** Forgets a campaign the user is no longer part of. */
 export const forgetCampaign = (id: string) => db.meta.delete(viewKey(id));
 
-export const startCampaign = (name: string, place = '') => api<CampaignView>('/campaigns', { body: { name, ...(place ? { place } : {}) } }).then(keep());
+export const startCampaign = (name: string, place = '', vanilla = false) => api<CampaignView>('/campaigns', { body: { name, ...(place ? { place } : {}), ...(vanilla ? { vanilla: true } : {}) } }).then(keep());
+/** A leader turns Vanilla Mordheim off, for good (#167); nobody can turn it on for a running campaign. */
+export const endVanilla = (id: string) => api<CampaignView>(`/campaigns/${id}/vanilla`, { method: 'PUT', body: { vanilla: false } }).then(keep());
 export const renameCampaign = (id: string, name: string) => api<CampaignView>(`/campaigns/${id}`, { method: 'PATCH', body: { name } }).then(keep());
 export const setMember = (id: string, userId: string, role: CampaignRole) => api<CampaignView>(`/campaigns/${id}/members/${userId}`, { method: 'PUT', body: { role } }).then(keep());
 export const removeMember = (id: string, userId: string) => api<CampaignView | { left: true }>(`/campaigns/${id}/members/${userId}`, { method: 'DELETE' });

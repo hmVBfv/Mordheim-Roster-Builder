@@ -16,3 +16,12 @@ export function useCampaignName(id: string | null | undefined): string | null {
     return list?.find((x) => x.id === id)?.name ?? null;
   }, [id]) ?? null;
 }
+
+/** Does the campaign play Vanilla Mordheim, as this device last saw it (#167)? false where it does not or is not known. */
+export function useCampaignVanilla(id: string | null | undefined): boolean {
+  return useLiveQuery(async () => {
+    if (!id) return false;
+    const v = (await db.meta.get(ownKey('campaign:', id)))?.value as { campaign?: { vanilla?: boolean } } | undefined;
+    return v?.campaign?.vanilla === true;
+  }, [id]) ?? false;
+}

@@ -6,11 +6,11 @@
    this campaign", ?campaign=<id>): the warband is made as always, free
    under Warbands, and a copy is entered in the campaign at once; the copy
    opens. Campaigns stay apart from the warbands themselves. */
-import { warbandFacts } from '@mordheim/core';
+import { isVanillaWarband, warbandFacts } from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { errorText } from '../account/api.ts';
-import { useCampaignName } from '../campaign/name.ts';
+import { useCampaignName, useCampaignVanilla } from '../campaign/name.ts';
 import { db, type StoredWarband } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { newOwnership } from '../sync/local.ts';
@@ -24,7 +24,9 @@ import { useWarbandFinder, WarbandFinder, WarbandTable } from './WarbandFinder.t
 function Form({ campaignId }: { campaignId: string | null }) {
   const data = useGameData();
   const [made, setMade] = useState<{ id: string; error: string } | null>(null);
-  const facts = useMemo(() => warbandFacts(data), [data]);
+  // a campaign that plays Vanilla Mordheim takes only the warbands of the rulebook (#167)
+  const vanilla = useCampaignVanilla(campaignId);
+  const facts = useMemo(() => warbandFacts(data).filter((f) => !vanilla || isVanillaWarband(data, f.key)), [data, vanilla]);
   const finder = useWarbandFinder(facts);
   const [key, setKey] = useState('');
   const [sub, setSub] = useState<string | null>(null);
@@ -80,6 +82,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
 
   return (
     <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void create(); }}>
+      {vanilla && <p className={ui.muted}>This campaign plays Vanilla Mordheim: only the warbands of the rulebook.</p>}
       <WarbandFinder facts={facts} finder={finder} />
       <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} />
       {choice && choice.subtypes.length > 0 && (
