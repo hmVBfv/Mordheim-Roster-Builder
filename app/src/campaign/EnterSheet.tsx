@@ -5,6 +5,7 @@ import { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
+import { useGameData } from '../game/useGameData.ts';
 import { useWarbands } from '../sync/local.ts';
 import ui from '../ui/ui.module.css';
 import { ruleLabel } from '../roster/house.ts';
@@ -15,13 +16,16 @@ import styles from './Campaign.module.css';
 const Latecomer = lazy(() => import('./Latecomer.tsx').then((m) => ({ default: m.Latecomer })));
 
 /** Entering one of one's own warbands: a copy goes in, the warband stays free. */
-export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown; onDone: (v: CampaignView) => void }) {
+export function EnterSheet({ id, rules, vanilla = false, onDone }: { id: string; rules?: unknown; /** The campaign plays Vanilla Mordheim: only the warbands of the rulebook enter (#167). */ vanilla?: boolean; onDone: (v: CampaignView) => void }) {
   const { ref, open, close } = useSheet();
   const navigate = useNavigate();
   const session = useSession();
   const me = session.status === 'in' ? session.user.id : undefined;
   const mine = (useWarbands() ?? []).filter((w) => w.ownerId === me && !w.campaignId && !w.conflict);
+  const data = useGameData();
   const free = mine.filter((w) => !w.state.planner);
+  // a campaign that plays Vanilla Mordheim takes only the warbands of the rulebook
+  const fits = (w: { wb: string }) => !vanilla || !data || core.isVanillaWarband(data, w.wb);
   // a planner (#77) does not enter as it is: it joins late, measured against the others (Latecomer.tsx)
   const planners = mine.filter((w) => w.state.planner);
   const [chosen, setChosen] = useState('');
@@ -56,8 +60,8 @@ export function EnterSheet({ id, rules, onDone }: { id: string; rules?: unknown;
               <legend className="visually-hidden">Warband</legend>
               {free.map((w) => (
                 <label key={w.id} className={styles.choice}>
-                  <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} onChange={() => { setChosen(w.id); setOwn(''); }} />
-                  <span>{w.name} <small>· {w.wbName}</small></span>
+                  <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} disabled={!fits(w)} onChange={() => { setChosen(w.id); setOwn(''); }} />
+                  <span>{w.name} <small>· {w.wbName}{fits(w) ? '' : ' · not a warband of the rulebook: this campaign plays Vanilla Mordheim'}</small></span>
                 </label>
               ))}
             </fieldset>

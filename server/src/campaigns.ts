@@ -20,7 +20,7 @@ export type EnrolmentStatus = 'pending' | 'active' | 'declined' | 'left';
 
 const iso = (d: Date) => d.toISOString();
 
-export interface CampaignRow { id: string; name: string; round: number; place: string; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
+export interface CampaignRow { id: string; name: string; round: number; place: string; vanilla: number; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
 interface MemberRow { campaign_id: string; user_id: string; role: CampaignRole; joined_at: string; left_at: string | null; added_by: string | null }
 export interface EnrolmentRow {
   id: string; campaign_id: string; warband_id: string; player_id: string; status: EnrolmentStatus; from_round: number | null;
@@ -47,7 +47,7 @@ export interface Enrolment {
   districts: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
-  campaign: { id: string; name: string; round: number; place: string; houseRules: unknown; createdAt: string; updatedAt: string };
+  campaign: { id: string; name: string; round: number; place: string; /** Plays Vanilla Mordheim: only the rulebook (#167). */ vanilla: boolean; houseRules: unknown; createdAt: string; updatedAt: string };
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
@@ -121,7 +121,7 @@ export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): Campai
       ...standing(db, e.warband_id, e.head_rev, house),
     }));
   return {
-    campaign: { id: c.id, name: c.name, round: c.round, place: c.place, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
+    campaign: { id: c.id, name: c.name, round: c.round, place: c.place, vanilla: c.vanilla === 1, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
     role, members, enrolments, battles: listBattles(db, c.id),
   };
 }
@@ -138,14 +138,23 @@ const log = (db: DB, actorId: string, action: string, campaignId: string, target
 
 const touch = (db: DB, campaignId: string, now: Date) => db.prepare('UPDATE campaigns SET updated_at = ? WHERE id = ?').run(iso(now), campaignId);
 
-export function createCampaign(db: DB, c: { name: string; place?: string; by: string }, now: Date): CampaignRow {
+export function createCampaign(db: DB, c: { name: string; place?: string; vanilla?: boolean; by: string }, now: Date): CampaignRow {
   const id = randomUUID();
   db.transaction(() => {
-    db.prepare('INSERT INTO campaigns (id, name, place, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)').run(id, c.name, c.place ?? '', c.by, iso(now), iso(now));
+    db.prepare('INSERT INTO campaigns (id, name, place, vanilla, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)').run(id, c.name, c.place ?? '', c.vanilla ? 1 : 0, c.by, iso(now), iso(now));
     db.prepare("INSERT INTO members (campaign_id, user_id, role, joined_at, added_by) VALUES (?, ?, 'leader', ?, ?)").run(id, c.by, iso(now), c.by);
-    log(db, c.by, 'campaign.create', id, { type: 'campaign', id }, { name: c.name, ...(c.place ? { place: c.place } : {}) }, now);
+    log(db, c.by, 'campaign.create', id, { type: 'campaign', id }, { name: c.name, ...(c.place ? { place: c.place } : {}), ...(c.vanilla ? { vanilla: true } : {}) }, now);
   })();
   return campaignById(db, id)!;
+}
+
+/** A leader turns Vanilla off, for good: a running campaign is never turned to it (wish #167). */
+export function endVanilla(db: DB, c: CampaignRow, by: string, now: Date): void {
+  if (c.vanilla !== 1) return;
+  db.transaction(() => {
+    db.prepare('UPDATE campaigns SET vanilla = 0, updated_at = ? WHERE id = ?').run(iso(now), c.id);
+    log(db, by, 'campaign.vanilla_off', c.id, { type: 'campaign', id: c.id }, {}, now);
+  })();
 }
 
 export function renameCampaign(db: DB, c: CampaignRow, name: string, by: string, now: Date): void {

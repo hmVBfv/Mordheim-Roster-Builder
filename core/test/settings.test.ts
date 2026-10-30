@@ -138,4 +138,12 @@ describe('the vanilla items (#165, audit of 30.10.2026)', () => {
     // the variants of the settings stay what they are: not the rulebook's
     expect(core.itemIsVanilla(item('Riding/Draft Horse (Empire in Flames)'))).toBe(false);
   });
+
+  it('knows the warbands of the rulebook: the six of grade core, and no other', () => {
+    const rulebook = Object.keys(data.WARBANDS).filter((k) => core.isVanillaWarband(data, k)).sort();
+    expect(rulebook).toEqual(['merc', 'possessed', 'skaven', 'sos', 'undead', 'wh']);
+    expect(core.isVanillaWarband(data, 'caravans')).toBe(false);
+    expect(core.isVanillaWarband(data, 'nothing')).toBe(false);
+    expect(core.isVanillaWarband(data, undefined)).toBe(false);
+  });
 });

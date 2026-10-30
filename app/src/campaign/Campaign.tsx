@@ -106,7 +106,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
           <h2 id="c-warbands">Warbands</h2>
           <WarbandRows id={id} view={view} me={me} />
           <div className={ui.row}>
-            {view.role !== 'viewer' && <EnterSheet id={id} rules={view.campaign.houseRules} onDone={onView} />}
+            {view.role !== 'viewer' && <EnterSheet id={id} rules={view.campaign.houseRules} vanilla={!!view.campaign.vanilla} onDone={onView} />}
             <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
           </div>
         </section>
@@ -381,7 +381,7 @@ export function Campaign() {
     <section className={`${ui.page} ${prose ? ui.measure : ''}`}>
       <header>
         <h1>{view.campaign.name}</h1>
-        <p className={ui.muted}>{roundName(view.campaign.round)} · you are {view.role === 'viewer' ? 'watching' : ROLE_NAMES[view.role].toLowerCase()}{place ? ` · ${place}` : ''}</p>
+        <p className={ui.muted}>{roundName(view.campaign.round)} · you are {view.role === 'viewer' ? 'watching' : ROLE_NAMES[view.role].toLowerCase()}{place ? ` · ${place}` : ''}{view.campaign.vanilla ? ' · Vanilla Mordheim' : ''}</p>
       </header>
       {error && <p className={ui.message} role="status">{error} Shown as last seen.</p>}
       {/* on a phone the sections are tabs here; from tablet width on they stand in the side navigation */}

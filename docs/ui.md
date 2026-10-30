@@ -444,6 +444,15 @@ im Schritt „Grant the battle's experience“ der Nachbereitung (`countBattle`,
 Gekauften, der nicht aussetzt („Misses games“); wer in diesem Kampf fiel, steht schon bei den Gefallenen und bekommt ihn dort
 („Took part in N battles“). Eine Henchmen-Gruppe zählt als Ganzes, auch Männer, die später dazukamen.
 
+**Vanilla Mordheim in der Kampagne (#167, Schritt 2, Rob, 30.10.2026).** Beim Start einer Kampagne gibt es das Häkchen „Vanilla Mordheim“
+(nur das Regelbuch: seine Warbands, Gegenstände und Fertigkeiten; „Core“ ist dasselbe), standardmäßig aus. Es lässt sich später nicht
+einschalten; eine laufende Kampagne wird nie auf Vanilla umgestellt. Ein Leiter kann es für immer abschalten: auf „House rules“ steht eine
+Karte „Vanilla Mordheim“ mit „Allow every rule“ (nach einer Rückfrage), für alle anderen nur der Hinweis. Der Überblick der Kampagne nennt
+„Vanilla Mordheim“ unter dem Namen. In eine Vanilla-Kampagne treten nur Warbands des Regelbuchs (Grade core: Mercenaries, Witch Hunters,
+Sisters of Sigmar, Skaven, Undead, Cult of the Possessed) – „Enter a warband“ zeigt die anderen ausgegraut mit dem Grund, „New warband for this
+campaign“ nur die sechs, und der Server weist die anderen mit 400 ab. Die Gegenstände und Fertigkeiten einer Vanilla-Kampagne sind damit noch
+nicht eingeschränkt: das kommt mit den Warbands (Schritt 1).
+
 **What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
 „New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen
 gruppiert, das Neueste oben. In der Meldung „New version available.“ steht zwischen Text und „Reload“ ein kleines „What's new“,

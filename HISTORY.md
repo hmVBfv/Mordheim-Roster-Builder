@@ -4537,3 +4537,15 @@ counted by a core action `countBattle` that the aftermath's step "Grant the batt
 `awardBattleXp`: that action is in the parity walk against legacy, which knows no counter. Who "took part": everyone who does not sit it out;
 the killed in it are counted in their Fallen record, so the Fallen can say after how many battles they fell. The stack: 290 on 286 (Fallen),
 289 on 288 on 282 (settings, vanilla, horse).
+
+## October 31, 2026 — Vanilla Mordheim for a campaign (#167, step 2)
+
+Rob's wish #167 (new warbands restricted to a campaign, Vanilla or Core) came in three steps; he chose to start with the campaign (2), so the
+warbands can take its setting over. Decisions of his: "Core" and Vanilla are the same thing (only what the rulebook has, which narrows the items
+and skills strongly); a running campaign can never be turned to Vanilla, a leader can turn it off, and then it stays off; in a Vanilla campaign
+only Vanilla warbands. A column `campaigns.vanilla` (migration 42), chosen at the start (`POST /campaigns`), turned off by `PUT …/vanilla`
+(409 for `true` on a running one), a check at the entry (400 for a warband that is not of grade core – the six of the rulebook), a card on the
+House rules screen with a confirmation, and the lists of "Enter a warband" and "New warband for this campaign" follow. Not done, on purpose: the
+items and skills of the campaign (that is step 1, the warbands carrying the setting) and the areas (Khemri, Lustria …). One trap on the way: the
+campaign view is also read by the app's offline copy, so `vanilla` is optional in its type (a view kept from before it). #168 (leaders without
+an authenticator) is left for Rob: it changes ADR 0008 and what ADRs 0022 and 0027 say about "leaders with the authenticator".

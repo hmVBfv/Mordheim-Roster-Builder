@@ -17,7 +17,8 @@ import styles from '../roster/House.module.css';
 import trade from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
-import { cachedCampaign, getCampaign, setHouseRules, type CampaignView } from './api.ts';
+import { cachedCampaign, endVanilla, getCampaign, setHouseRules, type CampaignView } from './api.ts';
+import { useSheet } from '../ui/useSheet.ts';
 
 /** The rules as the campaign keeps them: every rule, the notes; the display setting is each player's own. */
 const rulesOf = (s: WarbandState) => {
@@ -25,6 +26,31 @@ const rulesOf = (s: WarbandState) => {
   delete h.showRarity;
   return h;
 };
+
+/* Vanilla Mordheim (#167): the campaign plays only the rulebook. Everybody reads it; a leader can end it – for good: it cannot be switched on again. */
+function VanillaCard({ id, view, setView, lead }: { id: string; view: CampaignView; setView: (v: CampaignView) => void; lead: boolean }) {
+  const { ref, open, close } = useSheet();
+  const [error, setError] = useState<string | null>(null);
+  const go = () => { setError(null); endVanilla(id).then((v) => close(() => setView(v))).catch((e: unknown) => setError(errorText(e))); };
+  return (
+    <section className={ui.card} aria-labelledby="vanilla-h">
+      <h2 id="vanilla-h">Vanilla Mordheim</h2>
+      <p>{view.campaign.name} plays only the rulebook: its warbands, its items and its skills.{lead ? ' A leader can allow every rule; it cannot be switched on again afterwards.' : ''}</p>
+      {lead && <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => { setError(null); open(); }}>Allow every rule</button></div>}
+      <dialog ref={ref} className={ui.sheet} aria-labelledby="vanilla-end-h">
+        <div className={ui.page}>
+          <h2 id="vanilla-end-h">Allow every rule?</h2>
+          <p>{view.campaign.name} stops playing Vanilla Mordheim: every warband, item and skill of the rules is open to it. This cannot be undone: a running campaign is never turned back to Vanilla.</p>
+          {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
+          <div className={ui.actions}>
+            <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Keep Vanilla</button>
+            <button type="button" className={ui.button} onClick={go}>Allow every rule</button>
+          </div>
+        </div>
+      </dialog>
+    </section>
+  );
+}
 
 function Body({ id, view, setView, user }: { id: string; view: CampaignView; setView: (v: CampaignView) => void; user: Me }) {
   const data = useGameData();
@@ -67,6 +93,7 @@ function Body({ id, view, setView, user }: { id: string; view: CampaignView; set
       <p>{lead
         ? `For every warband of ${view.campaign.name}. A change counts from now on: each player takes it over into the warband’s file, and the warband is marked until then.`
         : `${view.campaign.name}’s leaders set these for every warband of the campaign. Everything else is played as written.`}</p>
+      {view.campaign.vanilla && <VanillaCard id={id} view={view} setView={setView} lead={lead} />}
       <dl className={trade.figures}>
         <div><dt>House rules on</dt><dd>{v.count}</dd></div>
         <div><dt>Warbands that differ</dt><dd>{differ.length}</dd></div>

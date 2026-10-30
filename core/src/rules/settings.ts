@@ -46,3 +46,6 @@ export function catalogForCampaign(data: Pick<GameData, 'CATALOG'>, options: { v
 
 /** Is this skill list the rulebook's? Every skill of the five lists is. */
 export const isVanillaSkillList = (data: Pick<GameData, 'VANILLA'>, list: string): boolean => data.VANILLA.skillLists.includes(list);
+
+/** Is this a warband of the rulebook (grade core)? Only these enter, and are made for, a campaign that plays Vanilla Mordheim (wish #167). */
+export const isVanillaWarband = (data: Pick<GameData, 'WARBANDS'>, wb: unknown): boolean => typeof wb === 'string' && data.WARBANDS[wb]?.grade === 'core';
