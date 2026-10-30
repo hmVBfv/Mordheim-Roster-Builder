@@ -82,3 +82,54 @@ describe('both at their maximum: roll again (#145)', () => {
     expect(screen.queryByRole('alert', { hidden: true })).toBeNull();
   });
 });
+
+/** A Wizard of the Merchant Caravans, who can learn a spell instead of a skill. */
+function caster() {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  let s = createWarband(data, 'caravans', null, 'The Grey Company');
+  s = core.addUnit(c(s), 'magician');
+  const view = { ...advanceView(c(s), s.models[0]!.uid)!, key: 1 };
+  const onApply = vi.fn();
+  const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
+  render(<AdvanceSheet dialogRef={ref} close={(after) => after?.()} view={view} onApply={onApply} />);
+  return { d: document.querySelector('dialog')!, onApply, lore: view.spells!.lore };
+}
+
+describe('a new skill or a spell is one choice between two equal kinds (#147)', () => {
+  it('shows "New skill" and "Spell" side by side, the skills first, and swaps the list under them', async () => {
+    const { d, lore } = caster();
+    const user = userEvent.setup();
+    await user.type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '3');
+    const kinds = q(d).getByRole('group', { name: 'What he learns', hidden: true });
+    const [skill, spell] = within(kinds).getAllByRole('button', { hidden: true });
+    expect(skill!.textContent).toBe('New skill');
+    expect(spell!.textContent).toBe(`Spell · ${lore}`);
+    expect(skill!.getAttribute('aria-pressed')).toBe('true');
+    expect(q(d).queryByRole('group', { name: lore, hidden: true })).toBeNull();
+    await user.click(spell!);
+    expect(spell!.getAttribute('aria-pressed')).toBe('true');
+    expect(q(d).getByRole('group', { name: lore, hidden: true })).toBeTruthy();
+    expect(q(d).queryByRole('group', { name: 'Combat', hidden: true })).toBeNull();
+  });
+
+  it('a Hero who casts nothing sees no such choice', async () => {
+    const { d } = sheet();
+    await userEvent.setup().type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '3');
+    expect(q(d).queryByRole('group', { name: 'What he learns', hidden: true })).toBeNull();
+  });
+});
+
+describe('the skills and the spells are lists in columns, not a heap of buttons (#146, #148)', () => {
+  it('sets each list as list items, a spell with its casting value beside its name', async () => {
+    const { d, lore } = caster();
+    const user = userEvent.setup();
+    await user.type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '3');
+    const skills = q(d).getAllByRole('list', { hidden: true }).filter((l) => l.closest('[role=group]'));
+    expect(skills.length).toBeGreaterThan(0);
+    for (const l of skills) for (const li of within(l).getAllByRole('listitem', { hidden: true })) expect(within(li).getAllByRole('button', { hidden: true })).toHaveLength(1);
+    await user.click(within(q(d).getByRole('group', { name: 'What he learns', hidden: true })).getByRole('button', { name: /^Spell/, hidden: true }));
+    const items = within(q(d).getByRole('group', { name: lore, hidden: true })).getAllByRole('listitem', { hidden: true });
+    expect(items.length).toBeGreaterThan(2);
+    for (const li of items) expect(li.textContent).toMatch(/cast on (\d+|auto)\+?/);
+  });
+});

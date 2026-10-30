@@ -22,6 +22,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
   const [roll, setRoll] = useState('');
   const [stat, setStat] = useState<StatKey | null>(null);
   const [die, setDie] = useState('');
+  const [kind, setKind] = useState<'skill' | 'spell'>('skill'); // what a "new skill" roll gives: a skill, or a spell instead
   const [pick, setPick] = useState<string | null>(null); // "skill:…", "spell:…", "reduce:i"
   const [man, setMan] = useState(0);
   const [lists, setLists] = useState<string[]>([]);
@@ -112,24 +113,33 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
             )}
             {row.kind === 'skill' && (
               <>
-                {v.skills.map((g) => (
+                {v.spells && (
+                  <div className={styles.kinds} role="group" aria-label="What he learns">
+                    <button type="button" aria-pressed={kind === 'skill'} onClick={() => { setKind('skill'); setPick(null); }}>New skill</button>
+                    <button type="button" aria-pressed={kind === 'spell'} onClick={() => { setKind('spell'); setPick(null); }}>Spell · {v.spells.lore}</button>
+                  </div>
+                )}
+                {(kind === 'skill' || !v.spells) && v.skills.map((g) => (
                   <div key={g.label} className={styles.skillGroup} role="group" aria-label={g.label}>
                     <span>{g.label}</span>
-                    <div className={styles.pickRow}>
+                    <ul className={styles.pickGrid}>
                       {g.items.map((s) => (
-                        <button key={s.key} type="button" disabled={s.known} title={s.text || undefined} aria-pressed={pick === `skill:${s.key}`} onClick={() => setPick(`skill:${s.key}`)}>{s.name}</button>
+                        <li key={s.key}><button type="button" disabled={s.known} title={s.text || undefined} aria-pressed={pick === `skill:${s.key}`} onClick={() => setPick(`skill:${s.key}`)}>{s.name}</button></li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 ))}
-                {v.spells && (
-                  <div className={styles.skillGroup} role="group" aria-label={`Instead a spell: ${v.spells.lore}`}>
-                    <span>Instead a spell · {v.spells.lore}</span>
-                    <div className={styles.pickRow}>
-                      {v.spells.items.map((s) => s.known
-                        ? <button key={s.key} type="button" title="Known: rolled again, it gets 1 easier to cast" aria-pressed={pick === `reduce:${s.key}`} onClick={() => setPick(`reduce:${s.key}`)}>{s.name} −1</button>
-                        : <button key={s.key} type="button" title={s.text || undefined} aria-pressed={pick === `spell:${s.key}`} onClick={() => setPick(`spell:${s.key}`)}>{s.name}</button>)}
-                    </div>
+                {kind === 'spell' && v.spells && (
+                  <div className={styles.skillGroup} role="group" aria-label={v.spells.lore}>
+                    <ul className={styles.pickGrid}>
+                      {v.spells.items.map((s) => (
+                        <li key={s.key}>
+                          {s.known
+                            ? <button type="button" title="Known: rolled again, it gets 1 easier to cast" aria-pressed={pick === `reduce:${s.key}`} onClick={() => setPick(`reduce:${s.key}`)}>{s.name} −1{s.diff && <small>cast on {s.diff}{s.diff.endsWith('auto') ? '' : '+'}</small>}</button>
+                            : <button type="button" title={s.text || undefined} aria-pressed={pick === `spell:${s.key}`} onClick={() => setPick(`spell:${s.key}`)}>{s.name}{s.diff && <small>cast on {s.diff}{s.diff === 'auto' ? '' : '+'}</small>}</button>}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
                 {pickedText && <p className={styles.text}>{pickedText}</p>}
