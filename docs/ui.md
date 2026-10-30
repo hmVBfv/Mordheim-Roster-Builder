@@ -431,6 +431,11 @@ Steht die genannte Eigenschaft am Maximum, nimmt der Held die andere und die
 Zeile sagt es. Sind beide am Maximum, steht an der Stelle eine Meldung „Roll the
 2D6 again“ mit dem Knopf „Roll again“, der den 2W6 leert; „Apply“ bleibt aus
 (#144, #145).
+Bei „New skill“ stehen Fertigkeiten und – für Zauberer – Zauber als zwei
+gleichwertige Knöpfe nebeneinander („New skill“ / „Spell · Lore“); darunter die
+gewählte Liste. Fertigkeiten und Zauber sind Listen in Spalten gleicher Breite,
+Namen linksbündig; ein Zauber trägt seinen Castwert („cast on 7+“, ein bekannter
+„7 → 6“) (#146, #147, #148).
 
 **Druck.** Das Blatt zum Drucken gibt es nur, solange der Browser druckt
 (`beforeprint` bis `afterprint`): jeder Krieger in voller Länge, ohne Knöpfe.

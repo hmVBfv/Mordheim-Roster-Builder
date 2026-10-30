@@ -44,7 +44,7 @@ export function rowFor(table: AdvRow[], roll: number): AdvRow | null {
   return Number.isInteger(roll) && roll >= 2 && roll <= 12 ? table.find((r) => roll >= r.from && roll <= r.to) ?? null : null;
 }
 
-export interface Choice { key: string; name: string; text: string; known: boolean }
+export interface Choice { key: string; name: string; text: string; known: boolean; /** A spell's casting value as written ("7", "auto"), with the step to come for a known one ("7 → 6"). */ diff?: string }
 export interface ChoiceGroup { label: string; items: Choice[] }
 
 /** What a warrior may take as an advance. */
@@ -78,12 +78,18 @@ function groups(lists: core.SkillGroup[], known: string[]): ChoiceGroup[] {
   }));
 }
 
-function spellChoices(ctx: core.Ctx, lore: string | null, own: boolean, known: { name: string }[]): AdvanceView['spells'] {
+function spellChoices(ctx: core.Ctx, lore: string | null, own: boolean, known: { name: string; red?: number }[]): AdvanceView['spells'] {
   const l = lore ? ctx.data.SPELLS[lore] : undefined;
   if (!l) return null;
   return {
     lore: l.name, own,
-    items: l.spells.filter(([n]) => !String(n).startsWith('▸')).map(([n, t]) => ({ key: n, name: core.spellLabel(n), text: t, known: known.some((s) => s.name === n) })),
+    items: l.spells.filter(([n]) => !String(n).startsWith('▸')).map(([n, t]) => {
+      const mine = known.find((s) => s.name === n);
+      const base = /\((\d+|auto)\)\s*$/i.exec(String(n))?.[1]?.toLowerCase();
+      const now = mine ? core.spellEffDiff(mine) : null;
+      const diff = base == null ? undefined : mine && now != null && now > 2 ? `${now} → ${now - 1}` : base;
+      return { key: n, name: core.spellLabel(n), text: t, known: !!mine, diff };
+    }),
   };
 }
 
