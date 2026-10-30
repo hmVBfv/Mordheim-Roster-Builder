@@ -50,7 +50,7 @@ Game night   Vollbild, aus einer Schlacht heraus (4a2: /campaign/:id/battles/:bi
              auf dem Handy ohne die Leiste unten)
 Profile      Devices · Authenticator · Password
 Admin*       Users · Invites · Reports · Backups
-Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf jeder Seite, öffnet das Blatt „Report a problem“ mit gewählter Art Bug; Account → Your reports; Admin → Reports)
+Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf jeder Seite, öffnet das Blatt „Report a problem“ mit gewählter Art Bug; die Warband in Sicht lässt sich anhängen, auch eine fremde in einer Kampagne, so wie die Kampagne sie zeigt (#158); Account → Your reports; Admin → Reports)
                                   (* nur Leiter bzw. Admin)
 ```
 
