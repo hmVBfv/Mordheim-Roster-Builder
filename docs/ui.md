@@ -409,7 +409,9 @@ Media-Query):
 | `split` | ab 860 px | die Liste und daneben das **Fenster** mit dem gewählten Krieger, alle Abschnitte offen und ohne Reiter; es bleibt beim Scrollen stehen und scrollt in sich; vorgewählt ist der erste Krieger |
 | `triple` | ab 1560 px | wie `split`, dazu eine dritte Spalte „Warband“ mit den Funktionen der Warband (House rules, Districts, Story, Versions, Make a copy; Share, In campaign, Remove) als sichtbare Liste statt ⋯ |
 
-Unter 860 px steht dieselbe Liste „Warband“ unter den Kriegern. Die Arbeitsfläche
+Unter 860 px steht dieselbe Liste „Warband“ unter den Kriegern. Helden und
+Henchmen stehen in der Reihenfolge der Rekrutierungsliste der Warband (Anführer
+zuerst), nicht in der des Anwerbens (#140). Die Arbeitsfläche
 (Shell) wird bis 1920 px breit, auf jeder Seite (früher nur auf dem Roster,
 `.main.wide`); Text und Formulare haben ihre Lesebreite.
 
