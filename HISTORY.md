@@ -4519,3 +4519,13 @@ says "Fell during the setup". Pull request 286.
 
 Changelog (#154) went with the pull requests: each brings its file, and a test merge of all eight branches onto `master` had no
 conflict. Merge order: all independent; 279 to 286 in any order.
+
+#165 (second step, Rob's order after #164: "check item by item", and a Vanilla option, off by default, with a standard campaign that
+has everything): all 310 items against the pages of mordheimer.net. The method that worked: the weapons, armour and equipment pages
+mark each item "Mordheim Rulebook (core)" (65 of them), the core price chart lists 72 rows with a Grade column, and the settings'
+charts list their own. 68 items are the rulebook's (`vanilla: true`); 47 carried `core` only because a setting's chart lists them.
+The wrong turn: the first tag `core` had meant "on the core price chart", and the chart pages of the settings repeat core items, so
+"listed on a chart" and "released with the setting" were mixed up; `core` stands now only where `vanilla` does, and a test says so.
+The skills need no marking: the five lists of the data are the rulebook's, name by name (34 of 34). Test fallout: the data audit's
+tooltip-name check had assumed the 47 were core and compared names exactly ("Flying Carpet" for the Magic carpet); it holds now only
+that every item has a rule text. Pull request 288 (stacked on 282: merge 282 first).
