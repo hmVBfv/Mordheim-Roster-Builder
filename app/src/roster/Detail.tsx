@@ -36,6 +36,8 @@ export interface UnitActs {
   equipSheet?(): void;
   equipLink?: string;
   rename(value: string): void;
+  /** Puts the count of his battles up or down by one (#166); only where a campaign counts them. */
+  battles?(delta: number): void;
   /** Opens the sheet to name him (the pencil beside his name). */
   editName(): void;
   /** The name of the field: "Name of this Mercenary Captain" or "Name of the group". */
@@ -156,6 +158,20 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
             </div>
           )}
           {!acts && <p className={styles.plain}>Exp <b>{u.xp.value}</b>{group ? ' (group)' : ''}</p>}
+          {(u.battles > 0 || acts?.battles) && (
+            <div className={styles.battlesLine}>
+              <span>Battles fought</span>
+              {acts?.battles
+                ? (
+                  <span className={styles.stepper}>
+                    <button type="button" aria-label={`One battle less for ${u.name}`} disabled={u.battles <= 0} onClick={() => acts.battles!(-1)}>−</button>
+                    <b aria-live="polite" aria-atomic="true">{u.battles}</b>
+                    <button type="button" aria-label={`One battle more for ${u.name}`} onClick={() => acts.battles!(1)}>+</button>
+                  </span>
+                )
+                : <b>{u.battles}</b>}
+            </div>
+          )}
           {w && w.expNeeded != null && <p className={styles.plain}>Needs <b>{w.expNeeded}</b> exp for the advances {group ? 'the group has' : 'he has'}.</p>}
         </Section>
       ) : (

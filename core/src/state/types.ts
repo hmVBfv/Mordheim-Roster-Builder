@@ -55,6 +55,8 @@ export interface Model {
   magic?: string;
   /** Games to miss (injuries). */
   miss?: number;
+  /** The battles of a campaign he (or the group) has taken part in, counted when a battle's experience is granted (wish #166). */
+  battles?: number;
   /** Why he misses them, for the chronicle ("Arm Wound …"). */
   missWhy?: string;
   /** Held captive after rolling 61 (Rob, 02.10.2026: captured as a state):
@@ -81,6 +83,8 @@ export interface HireRecord {
   uid: string;
   name?: string;
   exp?: number | string;
+  /** The battles of a campaign he has taken part in (wish #166). */
+  battles?: number;
   skills?: string[];
   spells?: SpellPick[];
   adv?: Partial<Record<StatKey, number | string>>;

@@ -236,8 +236,9 @@ describe('the items of every campaign and grade', () => {
   it('has every item once, with its own tooltip', () => {
     const names = data.CATALOG.map((x) => x.en.toLowerCase());
     expect(new Set(names).size).toBe(names.length);
-    // (an item of the core chart that a setting's chart lists as well keeps the core chart's tooltip, which may name it in the singular)
-    for (const x of found.filter((y) => !y.settings!.includes('core'))) expect(core.itemInfo(data, x.en)?.name, x.en).toBe(x.en);
+    // every item has a rule text of its own, found by its English or its German name (checked for all of them on 30.10.2026, #162); the
+    // tooltip may name it a little differently ("Flying Carpet" for the Magic carpet), so only that it is there is held
+    for (const x of data.CATALOG) expect(core.itemInfo(data, x.en) ?? core.itemInfo(data, x.de), x.en).not.toBeNull();
   });
 
   /* Rob, 22.10.2026: "alle auf Mordheimer gefuehrten Items verfuegbar, ggf. mit Auswahl ueber die Kampagne". Every item of the

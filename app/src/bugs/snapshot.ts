@@ -9,7 +9,11 @@ import { buildContext, readSettings, type ReportContext } from './context.ts';
 import { recentErrors, recentSteps, type CapturedError } from './trail.ts';
 
 /** The warband in view that may be attached, if the reporter wants. */
-export interface AttachableWarband { id: string; name: string; rev: number | null; kb: number }
+export interface AttachableWarband {
+  id: string; name: string; rev: number | null; kb: number;
+  /** A warband seen in a campaign is not on this device: its save is what the campaign showed, read when the form opened (#158). */
+  save?: Record<string, unknown>;
+}
 
 export interface Snapshot {
   pathname: string;
@@ -18,6 +22,20 @@ export interface Snapshot {
   errors: CapturedError[];
   device: string;
   warband: AttachableWarband | null;
+}
+
+/** The warband of another player in a campaign in view, as the campaign shows it to this reporter; null when it cannot be read now. */
+async function campaignWarband(pathname: string): Promise<AttachableWarband | null> {
+  const m = /^\/campaign\/([^/]+)\/warbands\/([^/]+)/.exec(pathname);
+  if (!m || FLAVOUR !== 'campaign') return null;
+  try {
+    const { readWarband } = await import('../campaign/api.ts');
+    const read = await readWarband(m[1]!, m[2]!);
+    const save = (read.draft?.data ?? read.head.data) as Record<string, unknown>;
+    return { id: read.warband.id, name: read.warband.name, rev: read.head.rev, kb: Math.max(1, Math.round(JSON.stringify(save).length / 1024)), save };
+  } catch {
+    return null; // offline or not allowed: the report goes without one
+  }
 }
 
 const inView = (pathname: string, root: 'warbands' | 'campaign') => {
@@ -29,6 +47,7 @@ export async function takeSnapshot(pathname: string, now: Date = new Date()): Pr
   const warbandId = inView(pathname, 'warbands');
   const campaignId = FLAVOUR === 'campaign' ? inView(pathname, 'campaign') : null;
   const rec = warbandId ? await db.warbands.get(warbandId) : undefined;
+  const seen = rec ? null : await campaignWarband(pathname);
   let role: string | null = null;
   let campaignHouse: unknown = null;
   if (campaignId) {
@@ -44,14 +63,14 @@ export async function takeSnapshot(pathname: string, now: Date = new Date()): Pr
       pathname,
       steps: recentSteps(),
       settings: readSettings(role),
-      warbandHouse: rec?.state.house,
+      warbandHouse: rec?.state.house ?? (seen?.save as { house?: unknown } | undefined)?.house,
       campaignHouse,
-      hasWarband: !!rec,
+      hasWarband: !!rec || !!seen,
       hasCampaign: !!campaignId && campaignHouse !== null,
     }),
     errors: recentErrors(),
     device: deviceLabel(),
-    warband: rec ? { id: rec.id, name: rec.name, rev: rec.serverRev ?? null, kb: Math.max(1, Math.round(JSON.stringify(rec.state).length / 1024)) } : null,
+    warband: rec ? { id: rec.id, name: rec.name, rev: rec.serverRev ?? null, kb: Math.max(1, Math.round(JSON.stringify(rec.state).length / 1024)) } : seen,
   };
 }
 

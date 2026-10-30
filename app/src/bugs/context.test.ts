@@ -1,6 +1,6 @@
 /* What goes along with a report without being written: the house rules, the
    sync, the context built from a screen – and nothing a player typed. */
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../db/db.ts';
 import { campaignKey } from '../campaign/api.ts';
 import { data, sampleSave } from '../test/data.ts';
@@ -9,6 +9,7 @@ import { takeSnapshot, warbandCopy } from './snapshot.ts';
 import { note, resetTrail } from './trail.ts';
 
 beforeEach(async () => { await db.warbands.clear(); await db.meta.clear(); resetTrail(); });
+afterEach(() => { vi.unstubAllGlobals(); });
 
 describe('the house rules that go along', () => {
   it('only the ones that differ from the defaults, as plain values, and never the notes', () => {
@@ -61,6 +62,29 @@ describe('the snapshot at the moment of reporting', () => {
     expect(snap.context.houseRules).toEqual({ warband: null, campaign: null });
     expect(snap.context.settings).toMatchObject({ flavour: 'campaign', online: true });
     expect(snap.warband).toBeNull();
+  });
+
+  /* Bug #158 (Rob, 30.10.2026): a warband seen in a campaign is not on this device, so the form offered nothing to attach. */
+  it('offers the warband of a campaign in view, as the campaign shows it to this player', async () => {
+    const save = { ...sampleSave(), name: 'SECRET-NAME warband' };
+    const read = { warband: { id: 'w-9', name: 'SECRET-NAME warband', wbType: save.wb, headRev: 5, campaignId: 'c-1' }, player: { id: 'u-2', displayName: 'Anna' }, status: 'active', head: { rev: 5, data: save, createdAt: '2026-10-17T10:00:00.000Z' }, draft: null, tags: [] };
+    const fetched: string[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => { fetched.push(new URL(String(input), 'http://localhost/').pathname); return new Response(JSON.stringify(read), { headers: { 'content-type': 'application/json' } }); }));
+    const snap = await takeSnapshot('/campaign/c-1/warbands/w-9');
+    expect(fetched).toEqual(['/api/v1/campaigns/c-1/warbands/w-9']);
+    expect(snap.warband).toMatchObject({ id: 'w-9', name: 'SECRET-NAME warband', rev: 5 });
+    expect(snap.warband!.kb).toBeGreaterThan(0);
+    // the copy is what the campaign showed, not something looked up on this device (there is no such warband here)
+    expect(snap.warband!.save).toMatchObject({ wb: save.wb, name: 'SECRET-NAME warband' });
+    expect(JSON.stringify({ context: snap.context, errors: snap.errors, device: snap.device })).not.toMatch(/SECRET/);
+    expect(snap.context.houseRules.warband).toEqual({});
+  });
+
+  it('offers nothing, and still reports, when the campaign cannot be read now', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('offline'); }));
+    const snap = await takeSnapshot('/campaign/c-1/warbands/w-9');
+    expect(snap.warband).toBeNull();
+    expect(snap.pathname).toBe('/campaign/c-1/warbands/w-9');
   });
 
   it('copies the warband as the save the app writes, for a report that attaches it', async () => {
