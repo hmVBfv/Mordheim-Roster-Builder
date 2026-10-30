@@ -13,7 +13,7 @@ const acts = (): UnitActs => ({
   xp: vi.fn(), setXp: vi.fn(), advance: vi.fn(), injury: vi.fn(), captive: vi.fn(), addMan: vi.fn(), man: vi.fn(), lead: vi.fn(),
   equipSheet: vi.fn(), rename: vi.fn(), nameLabel: 'Name', nameValue: '', story: '/story', card: '/card',
   taken: null, chaos: [], leave: { label: 'Remove', run: vi.fn() },
-});
+} as UnitActs); // cast: the test names only what it needs, so a new action does not touch it
 
 beforeEach(() => { Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => 1000 }); });
 afterEach(cleanup);
