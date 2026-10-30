@@ -429,6 +429,8 @@ Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
 Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
 more“ entfällt (#152, #153).
 
+**Seltene Gegenstände im Ausrüstungsblatt (#162).** Der Name steht in „Rare and trading-post items“ wie in „Carried“ als Wort mit Blase, nicht nur als `title`, den ein Handy nie zeigt.
+
 **What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
 „New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen
 gruppiert, das Neueste oben. In der Meldung „New version available.“ steht zwischen Text und „Reload“ ein kleines „What's new“,
