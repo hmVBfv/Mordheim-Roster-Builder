@@ -337,6 +337,21 @@ export interface GameData {
      the new app only – legacy does not load the file). */
   BESTIARY_SOURCE: string;
   BESTIARY: BeastDef[];
+  /* The campaign settings of mordheimer.net (data/settings.json, the new app only; wishes #164, #165). */
+  SETTINGS_SOURCE: string;
+  SETTINGS: SettingDef[];
+}
+
+/** A campaign setting: the area a campaign can play in. `id` is the slug of its page and what an item names in `settings`. */
+export interface SettingDef {
+  id: string;
+  name: string;
+  /** The title mordheimer.net gives it ("The Land of the Dead"). */
+  tagline: string;
+  /** Where it is played. */
+  area: string;
+  url: string;
+  summary: string;
 }
 
 /** An animal or creature of the bestiary: a template for an opponent, never a warband's entry. */
@@ -353,10 +368,10 @@ export interface BeastDef {
   rules: [name: string, text: string][];
 }
 
-/** The data files, in the order legacy data/index.js loads them – and last the one only the new app reads (bestiary). */
+/** The data files, in the order legacy data/index.js loads them – and last the ones only the new app reads (bestiary, settings). */
 export const DATA_FILES = [
   'races', 'equipment', 'skills', 'spells', 'abilities', 'mutations', 'injuries', 'i18n',
-  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle', 'bestiary',
+  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle', 'bestiary', 'settings',
 ] as const;
 export type DataFile = (typeof DATA_FILES)[number];
 

@@ -1,0 +1,29 @@
+{
+  "SETTINGS_SOURCE": "The campaign settings of mordheimer.net (https://mordheimer.net/docs/campaigns/campaign-settings), as kept in the project: the ids are the slugs of its pages and the ones the items of the catalogue name in `settings`. The summaries are the project's own words. The new app only – legacy does not load the file.",
+  "SETTINGS": [
+    { "id": "core", "name": "Core rules", "tagline": "The City of the Damned", "area": "Mordheim, the ruined city",
+      "url": "https://mordheimer.net/docs/trading-post",
+      "summary": "The setting of the rulebook: the ruins of Mordheim, wyrdstone and the warbands that come for it. What the core price chart lists is available in every campaign." },
+    { "id": "border-town-burning", "name": "Border Town Burning", "tagline": "Struggles on the Frontier", "area": "The Empire's frontier near Cathay",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/border-town-burning",
+      "summary": "A frontier town on the edge of the Empire, near the borders of Cathay: caravan raids, hidden objectives, roaming ogres and Chaos-worshipping warbands, with the influence of the Eastern lands." },
+    { "id": "empire-in-flames", "name": "Empire in Flames", "tagline": "The War-Torn Countryside", "area": "Villages, forests and castles of the Empire",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/empire-in-flames",
+      "summary": "The war spreads from the city into the open country: burning buildings, raids on settlements and ambushes in the wilderness instead of fights in ruined streets." },
+    { "id": "khemri", "name": "Khemri", "tagline": "The Land of the Dead", "area": "Nehekhara, the deserts and the ruined necropolis of Khemri",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/khemri",
+      "summary": "Treasure hunters and mercenaries in the scorching deserts of Nehekhara: tombs, sandstorms, undead guardians, extreme heat, quicksand and cursed relics." },
+    { "id": "lustria", "name": "Lustria", "tagline": "Cities of Gold", "area": "The jungles of Lustria",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/lustria",
+      "summary": "Warbands in the steamy jungles of Lustria, lured by gold and ancient artefacts instead of wyrdstone: dangerous terrain, tropical disease, venomous creatures and the Lizardmen." },
+    { "id": "albion", "name": "Albion", "tagline": "Mists and Monoliths", "area": "The misty island of Albion",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/albion",
+      "summary": "An island of eternal fog, standing stones and druidic magic: warbands seek monoliths full of untapped power, against harsh weather, swamps, magical storms and native warriors." },
+    { "id": "the-nemesis-crown", "name": "The Nemesis Crown", "tagline": "The Hunt for Power", "area": "The Great Forest of the Empire",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/the-nemesis-crown",
+      "summary": "A powerful artefact lies buried in the Great Forest: warbands search the dense woods for it, with special movement rules, hidden trails and encounters with beasts and bandits." },
+    { "id": "the-procession-of-morr", "name": "The Procession of Morr", "tagline": "The rising dead", "area": "The Death's Head district of Mordheim",
+      "url": "https://mordheimer.net/docs/campaigns/campaign-settings/the-procession-of-morr",
+      "summary": "A campaign in Mordheim's Death's Head district, once known for its executions and the road to the Temple of Morr: thieves' guilds, death cults and restless spirits among the ruins." }
+  ]
+}

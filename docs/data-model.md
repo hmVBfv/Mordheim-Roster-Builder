@@ -296,3 +296,22 @@ Ständen:
   anpassen.
 - Ab Phase 3 prüft ein Test, dass jede Tabelle aus den Migrationen hier
   vorkommt und umgekehrt.
+
+## 7. Regeldaten: Kampagnen-Settings (Wünsche #164, #165)
+
+`data/settings.json` hält die Settings von mordheimer.net (Core rules, Border Town Burning, Empire in Flames, Khemri,
+Lustria, Albion, The Nemesis Crown, The Procession of Morr): `id` (der Slug ihrer Seite, derselbe Wert, den ein Gegenstand
+in `CATALOG[…].settings` nennt), `name`, `tagline` (der Titel auf der Seite), `area` (wo gespielt wird), `url`, `summary`.
+Nur die neue App liest die Datei (`DATA_FILES`, `GameData.SETTINGS`), die frühere App lädt sie nicht.
+
+Woher ein Gegenstand stammt, sagt `CATALOG[…].settings` und `.source` (die Adressen, auf denen er gelesen wurde):
+kein Eintrag = die Preistabelle des Regelbuchs, `warband:<Seite>` = die Liste einer Warband, sonst die Settings, deren
+Preistabelle ihn führt. `core/src/rules/settings.ts` liest das: `itemSources`, `itemInSettings(item, gespielte)` (die
+Preistabelle des Regelbuchs und die eigenen Gegenstände einer Warband gelten immer), `catalogIn(data, gespielte)`.
+Eine Kampagne speichert noch nicht, in welchen Settings sie spielt; das und das Anwenden im Warband-Tab und bei der
+Erstellung folgen mit einem späteren Wunsch. Ein Test prüft, dass jedes genannte Setting in der Datei steht und dass jeder
+Gegenstand, der auf der Seite eines Settings gelesen wurde, dieses Setting nennt.
+
+Offen (Entscheidung von Rob): Das Kennzeichen `core` steht bei rund 100 Gegenständen, von denen viele (Beispiel Magic Gourd) nicht in
+der Preistabelle des Regelbuchs (https://mordheimer.net/docs/trading-post) stehen. Solange das so ist, bleiben sie in jeder
+Kampagne sichtbar, auch wenn sie nur zu einem Setting gehören.
