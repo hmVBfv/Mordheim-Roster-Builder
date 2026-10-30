@@ -14,16 +14,18 @@ export interface AdvRow {
   kind: 'skill' | 'stat' | 'talent';
   /** The characteristics on offer; with two, the rulebook's D6 or choice decides. */
   stats?: StatKey[];
+  /** A second die decides between the two characteristics: 1–3 the first, 4–6 the second. */
+  d6?: boolean;
   how?: string;
 }
 
 /* Rulebook, Experience – Advances (mordheimer.net, Campaigns – Experience). */
 export const HERO_TABLE: AdvRow[] = [
   { from: 2, to: 5, label: 'New skill', kind: 'skill' },
-  { from: 6, to: 6, label: '+1 Strength or +1 Attack', kind: 'stat', stats: ['S', 'A'], how: 'Roll a D6: 1–3 Strength, 4–6 Attack.' },
+  { from: 6, to: 6, label: '+1 Strength or +1 Attack', kind: 'stat', stats: ['S', 'A'], d6: true, how: 'Roll a D6: 1–3 Strength, 4–6 Attack.' },
   { from: 7, to: 7, label: '+1 Weapon Skill or +1 Ballistic Skill', kind: 'stat', stats: ['WS', 'BS'], how: 'Choose one.' },
-  { from: 8, to: 8, label: '+1 Initiative or +1 Leadership', kind: 'stat', stats: ['I', 'Ld'], how: 'Roll a D6: 1–3 Initiative, 4–6 Leadership.' },
-  { from: 9, to: 9, label: '+1 Wound or +1 Toughness', kind: 'stat', stats: ['W', 'T'], how: 'Roll a D6: 1–3 Wound, 4–6 Toughness.' },
+  { from: 8, to: 8, label: '+1 Initiative or +1 Leadership', kind: 'stat', stats: ['I', 'Ld'], d6: true, how: 'Roll a D6: 1–3 Initiative, 4–6 Leadership.' },
+  { from: 9, to: 9, label: '+1 Wound or +1 Toughness', kind: 'stat', stats: ['W', 'T'], d6: true, how: 'Roll a D6: 1–3 Wound, 4–6 Toughness.' },
   { from: 10, to: 12, label: 'New skill', kind: 'skill' },
 ];
 
