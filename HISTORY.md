@@ -4420,3 +4420,40 @@ arrow of the other fold-outs, since the reporter did not see that they open. #13
 One wrong turn on the way: a `vite preview` of mine, left running on port 4173 after a screenshot script, served an old build to the
 quickbuild flavour of the end-to-end tests and made a new test fail for no reason of its own; and `pkill -f "vite preview"` killed my own
 shell, since the command line contained the words. The scripts now start their server detached and stop it by process group.
+
+## October 30, 2026 — Advance and spells (#144–#151), roster order (#140), admin reports (#141–#143), unit name (#152, #153)
+
+#144, #145: the Heroes' table sends 6, 8 and 9 to a second die ("Roll a D6: 1–3 …, 4–6 …"), but the sheet let the player pick either
+characteristic. The rows now carry a `d6` flag and the sheet asks for the die; at the maximum the other characteristic is taken, as the
+rulebook's note says, and with both at the maximum a notice "Roll the 2D6 again" with a "Roll again" button stands in place of the small
+line under disabled buttons. Only row 7 (WS or BS, "choose one") stays a free choice. No data was touched, the data already said so.
+Pull request 269.
+
+#150, #151: a known spell "easier to cast" changed nothing the player saw – the card kept the printed value in the brackets, the list the
+printed "cast on 7+" – although the export already used the lowered one. The card shows the lowered value, the list "7(−1)+". The list
+of taken advances merged every step into "2 easier to cast"; each step is its own entry now, which needed no change in the save (`red` is
+still a count; the sheet draws one entry per step). Pull request 270. #149 (wish: learned spells and their cast value stand out in the
+list: tint, a bar on the left, the value as a chip) sits on 270's branch because it changes the same line of the list. Pull request 271
+(merge 270 first). Its test first listed every action of `UnitActs` by hand and broke as soon as #153 added one; it casts now.
+
+#146, #147, #148: the new-skill choice was loose chips of every width with "Instead a spell" as a small label below them. A caster picks
+between two equal buttons, "New skill" and "Spell · Lore", and the list of the chosen kind is a grid of equal columns with the names on
+one edge; a spell shows its cast value, a known one the step to come ("7 → 6"). Stacked on #144's branch (the same sheet). Pull request
+272 (merge 269 first).
+
+#140: Heroes and Henchmen stood in the order they were recruited; they follow the warband's recruit list now (sorted stably in
+`rosterView`). Pull request 273.
+
+#141, #143, #142: the admin table gave its short columns the narrowest width and let every cell break anywhere (`overflow-wrap: anywhere`):
+"Open" lost its n, "140" broke after two digits, "Fixed in …" broke after "in". The short columns are `nowrap` now, the title and the area
+give way. A wrong turn: the first test at 760 px failed on a sideways scroll – ten columns with `nowrap` need about 860 px – so the
+card layout runs up to 860 instead of 700. The measure in the test is the lines of the text itself (a button's own box counted as a
+second line). #142 (wish): a report with status "fixed" is read-only in the admin sheet; only the interface, the server and the `/bugs`
+script are unchanged. Pull request 274.
+
+#152, #153: the name of a unit moves from a field at the bottom of "Story & more" to the top of the first tab (the head of the pane on a
+desktop) with a pencil that opens the sheet to name him, like the warband's. Rob asked for both; the field would have been a second
+way to do the same thing. Pull request 275.
+
+Merge order: 269, then 272; 270, then 271; 273, 274 and 275 stand alone. `docs/ui.md` is touched by all but 273's neighbours at
+different places; a test merge of all seven branches onto `master` had no conflict.
