@@ -393,6 +393,7 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'POST /api/v1/campaigns/:id/enrolments/:eid/confirm': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[0]}/confirm`, body: {} }),
       'POST /api/v1/campaigns/:id/enrolments/:eid/decline': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/enrolments/${c.pendingEnrolmentIds[1]}/decline`, body: {} }),
       'POST /api/v1/campaigns/:id/rounds/advance': (c) => ({ method: 'POST', url: `/api/v1/campaigns/${c.ledCampaignId}/rounds/advance`, body: {} }),
+      'PUT /api/v1/campaigns/:id/opening': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/opening`, body: { text: 'The probed ferry.' } }),
       'PUT /api/v1/campaigns/:id/vanilla': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/vanilla`, body: { vanilla: false } }),
       'PUT /api/v1/campaigns/:id/house-rules': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.ledCampaignId}/house-rules`, body: { rules: { freeDagger: true } } }),
       'PUT /api/v1/campaigns/:id/history/:bid': (c) => ({ method: 'PUT', url: `/api/v1/campaigns/${c.historyCampaignId}/history/${randomUUID()}`, body: { round: 2, title: 'The probed mill', outcomes: { [c.historyWarbandId]: 'victory' } } }),

@@ -4549,3 +4549,10 @@ House rules screen with a confirmation, and the lists of "Enter a warband" and "
 items and skills of the campaign (that is step 1, the warbands carrying the setting) and the areas (Khemri, Lustria …). One trap on the way: the
 campaign view is also read by the app's offline copy, so `vanilla` is optional in its type (a view kept from before it). #168 (leaders without
 an authenticator) is left for Rob: it changes ADR 0008 and what ADRs 0022 and 0027 say about "leaders with the authenticator".
+
+#169 (stacked on #167's pull request for the migration number): the opening scene of a campaign, under World. Rob: "take the description text,
+not an introduction of my own". A column `campaigns.opening` (migration 43) and `PUT /campaigns/:id/opening`; empty, the app shows the Lore's
+description of the campaign's place, marked "From the Lore · Khemri"; the leader's sheet starts from the text shown, so the Lore's can be edited,
+and "Use the Lore text" empties theirs. All 120 places have a text, so there is nothing to mark per place beyond that label. Two traps: the
+sheet's text area kept the text in the page while closed (the same thing as the changelog sheet, which a test of another screen had found), so
+the form is only there while it is open; and `useSheet`'s close callback is where the form is taken away.

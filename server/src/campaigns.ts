@@ -20,7 +20,7 @@ export type EnrolmentStatus = 'pending' | 'active' | 'declined' | 'left';
 
 const iso = (d: Date) => d.toISOString();
 
-export interface CampaignRow { id: string; name: string; round: number; place: string; vanilla: number; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
+export interface CampaignRow { id: string; name: string; round: number; place: string; vanilla: number; opening: string; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
 interface MemberRow { campaign_id: string; user_id: string; role: CampaignRole; joined_at: string; left_at: string | null; added_by: string | null }
 export interface EnrolmentRow {
   id: string; campaign_id: string; warband_id: string; player_id: string; status: EnrolmentStatus; from_round: number | null;
@@ -47,7 +47,7 @@ export interface Enrolment {
   districts: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
-  campaign: { id: string; name: string; round: number; place: string; /** Plays Vanilla Mordheim: only the rulebook (#167). */ vanilla: boolean; houseRules: unknown; createdAt: string; updatedAt: string };
+  campaign: { id: string; name: string; round: number; place: string; /** Plays Vanilla Mordheim: only the rulebook (#167). */ vanilla: boolean; /** What a leader wrote of the opening scene; empty: the Lore's text of the place is shown (#169). */ opening: string; houseRules: unknown; createdAt: string; updatedAt: string };
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
@@ -121,7 +121,7 @@ export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): Campai
       ...standing(db, e.warband_id, e.head_rev, house),
     }));
   return {
-    campaign: { id: c.id, name: c.name, round: c.round, place: c.place, vanilla: c.vanilla === 1, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
+    campaign: { id: c.id, name: c.name, round: c.round, place: c.place, vanilla: c.vanilla === 1, opening: c.opening, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
     role, members, enrolments, battles: listBattles(db, c.id),
   };
 }
@@ -146,6 +146,15 @@ export function createCampaign(db: DB, c: { name: string; place?: string; vanill
     log(db, c.by, 'campaign.create', id, { type: 'campaign', id }, { name: c.name, ...(c.place ? { place: c.place } : {}), ...(c.vanilla ? { vanilla: true } : {}) }, now);
   })();
   return campaignById(db, id)!;
+}
+
+/** A leader writes the opening scene of the campaign (empty: the Lore's description of its place stands in for it). */
+export function setOpening(db: DB, c: CampaignRow, text: string, by: string, now: Date): void {
+  if (c.opening === text) return;
+  db.transaction(() => {
+    db.prepare('UPDATE campaigns SET opening = ?, updated_at = ? WHERE id = ?').run(text, iso(now), c.id);
+    log(db, by, 'campaign.opening', c.id, { type: 'campaign', id: c.id }, { chars: text.length }, now);
+  })();
 }
 
 /** A leader turns Vanilla off, for good: a running campaign is never turned to it (wish #167). */

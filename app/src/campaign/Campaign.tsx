@@ -368,7 +368,7 @@ export function Campaign() {
   const content = manage ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
     : warbands ? <WarbandsTab id={id} view={view} me={user.id} onView={setView} />
     : notes ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
-    : world ? <WorldTab id={id} view={view} lead={lead && user.totp} />
+    : world ? <WorldTab id={id} view={view} lead={lead && user.totp} onView={setView} />
     : questions ? <QuestionsTab id={id} view={view} user={user} lead={lead && user.totp} />
     : background ? <BackgroundTab id={id} view={view} />
     : asPlayer ? <AsPlayerTab id={id} view={view} />

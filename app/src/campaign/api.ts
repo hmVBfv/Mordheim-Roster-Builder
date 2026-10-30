@@ -25,7 +25,7 @@ export interface Enrolment {
   districts?: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
-  campaign: { id: string; name: string; round: number; /** A key of the lore, or '' (#66); absent in a view kept from before it. */ place?: string; /** Plays Vanilla Mordheim: only the rulebook (#167); absent in a view kept from before it. */ vanilla?: boolean; houseRules: unknown; createdAt: string; updatedAt: string };
+  campaign: { id: string; name: string; round: number; /** A key of the lore, or '' (#66); absent in a view kept from before it. */ place?: string; /** Plays Vanilla Mordheim: only the rulebook (#167); absent in a view kept from before it. */ vanilla?: boolean; /** What the leaders wrote of the opening scene; empty: the Lore's text of the place stands in (#169). */ opening?: string; houseRules: unknown; createdAt: string; updatedAt: string };
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
@@ -73,6 +73,8 @@ export async function cachedCampaign(id: string): Promise<CampaignView | null> {
 export const forgetCampaign = (id: string) => db.meta.delete(viewKey(id));
 
 export const startCampaign = (name: string, place = '', vanilla = false) => api<CampaignView>('/campaigns', { body: { name, ...(place ? { place } : {}), ...(vanilla ? { vanilla: true } : {}) } }).then(keep());
+/** A leader writes the opening scene of the campaign; empty puts the Lore's text of its place back (#169). */
+export const setOpening = (id: string, text: string) => api<CampaignView>(`/campaigns/${id}/opening`, { method: 'PUT', body: { text } }).then(keep());
 /** A leader turns Vanilla Mordheim off, for good (#167); nobody can turn it on for a running campaign. */
 export const endVanilla = (id: string) => api<CampaignView>(`/campaigns/${id}/vanilla`, { method: 'PUT', body: { vanilla: false } }).then(keep());
 export const renameCampaign = (id: string, name: string) => api<CampaignView>(`/campaigns/${id}`, { method: 'PATCH', body: { name } }).then(keep());
