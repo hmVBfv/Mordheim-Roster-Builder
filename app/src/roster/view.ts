@@ -377,7 +377,9 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
   const ctx = core.ctxOf(data, editableState(data, s));
   const wb = core.warbandDef(ctx);
   const sub = wb?.subtypes?.find((x) => x.key === ctx.s.subtype);
-  const models = ctx.s.models.map((m) => warrior(ctx, m));
+  // in the order of the recruit list, not of the day each was recruited (#140); the sort is stable, so two of a kind keep theirs
+  const at = (id: string) => { const i = wb?.units.findIndex((u) => u.id === id) ?? -1; return i < 0 ? Infinity : i; };
+  const models = [...ctx.s.models].sort((a, b) => at(a.uid_def) - at(b.uid_def)).map((m) => warrior(ctx, m));
   const camp = ctx.s.campaign;
   const heroes = models.filter((w) => w.hero);
   return {

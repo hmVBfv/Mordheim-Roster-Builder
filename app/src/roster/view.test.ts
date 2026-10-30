@@ -375,3 +375,18 @@ describe('the size bonus of a Halfling Scout stands apart from the maximum (#82)
     expect(rosterView(data, s)).toMatchObject({ maxModels: 10, maxBonus: 0 });
   });
 });
+
+describe('the roster lists its units in the order of the recruit list (#140)', () => {
+  it('a Captain recruited last still stands above the Heroes who came before him, and the groups follow the list too', () => {
+    let s = core.newWarband(data, 'merc');
+    for (const id of ['young', 'capt', 'champ', 'warr', 'marks']) s = core.addUnit(ctx(s), id);
+    const v = rosterView(data, s);
+    const order = core.warbandDef(ctx(s))!.units.map((u) => u.id);
+    const sorted = (ids: string[]) => [...ids].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    const heroes = v.heroes.map((h) => s.models.find((m) => m.uid === h.uid)!.uid_def);
+    expect(heroes).toEqual(sorted(heroes));
+    expect(heroes[0]).toBe('capt');
+    const hench = v.henchmen.map((h) => s.models.find((m) => m.uid === h.uid)!.uid_def);
+    expect(hench).toEqual(sorted(hench));
+  });
+});
