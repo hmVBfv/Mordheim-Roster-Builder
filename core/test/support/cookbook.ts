@@ -17,6 +17,10 @@ export function withLegacyMaxWarning(ctx: Ctx, warnings: string[]): string[] {
   const at = warnings.findIndex((w) => w.startsWith('At most '));
   const legacy = count > mx ? `At most ${mx} models allowed (currently ${count}).` : null;
   if (at >= 0) return legacy ? warnings.map((w, i) => (i === at ? legacy : w)) : warnings.filter((_, i) => i !== at);
-  return legacy ? [...warnings, legacy] : warnings;
+  if (!legacy) return warnings;
+  // where legacy has it: after the gold and the minimum, before the warnings about Heroes and the rest (a fixture with another warning after it showed this)
+  let place = 0;
+  while (place < warnings.length && (warnings[place]!.startsWith('Not enough gold') || warnings[place]!.startsWith('At least '))) place++;
+  return [...warnings.slice(0, place), legacy, ...warnings.slice(place)];
 }
 

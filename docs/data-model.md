@@ -308,7 +308,7 @@ Woher ein Gegenstand stammt, sagt `CATALOG[…].vanilla`, `.settings` und `.sour
 
 - `vanilla: true` = im ursprünglichen Regelbuch (auf den Seiten „Mordheim Rulebook (core)“ der Waffen, Rüstungen und der Ausrüstung
   oder in der Kerntabelle der Preise von mordheimer.net). Eine Prüfung Gegenstand für Gegenstand am 30.10.2026 hat 68 von 310
-  gefunden; die übrigen sind aus Settings, Town Cryer oder Listen einer Warband. Fehlt das Feld, ist er nicht im Regelbuch.
+  gefunden, dazu kam danach das Riding/Draft Horse der Kerntabelle (69 von 311); die übrigen sind aus Settings, Town Cryer oder Listen einer Warband. Fehlt das Feld, ist er nicht im Regelbuch.
 - `settings` = die Preistabellen der Settings, die ihn führen (`border-town-burning`, `empire-in-flames`, `khemri`, `lustria` …),
   `warband:<Seite>` = die Liste einer Warband. `core` steht nur noch bei Gegenständen, die auch `vanilla` sind (ein Test hält
   das fest; 47 Gegenstände trugen es zu Unrecht, zum Beispiel der Magic Gourd).
@@ -323,7 +323,8 @@ aus. Eine Kampagne ohne sie ist die Standardkampagne: alle Gegenstände und alle
 Gegenstände mit `vanilla` und die fünf Fertigkeitenlisten des Regelbuchs (Combat, Shooting, Academic, Strength, Speed; die Prüfung
 am 30.10.2026 hat gezeigt, dass jede Fertigkeit dieser Listen die des Regelbuchs ist). Gebiete (Khemri, Lustria …) bleiben
 eine zweite, spätere Einschränkung. Eine Kampagne speichert noch nicht, ob sie Vanilla spielt oder in welchen Gebieten; das und das
-Anwenden im Warband-Tab und bei der Erstellung folgen mit einem späteren Wunsch.
+Anwenden im Warband-Tab und bei der Erstellung folgen mit einem späteren Wunsch. In einer Vanilla-Kampagne gibt es nur Vanilla-Warbands
+(Rob, 30.10.2026); deren eigene Gegenstände sind erlaubt, weil sie zur Warband gehören.
 
 Nicht geprüft und nicht geändert: Fertigkeiten und Gegenstände, die nur eine Warband hat (Sonderfertigkeiten, eigene Listen).
-Die Seiten des Regelbuchs führen ein Riding/Draft Horse (40 gc, Rare 8), das der Katalog nur als Variante je Setting kennt.
+Das Riding/Draft Horse der Kerntabelle (40 gc, Rare 8, nur Menschen) steht seit dem 30.10.2026 als Eintrag des Regelbuchs im Katalog, neben den Varianten je Setting.

@@ -3647,6 +3647,25 @@
    ]
   },
   {
+   "de": "Riding/Draft Horse",
+   "en": "Riding/Draft Horse",
+   "vanilla": true,
+   "cat": "misc",
+   "cost": 40,
+   "rare": "Rare 8",
+   "wb": "Humans only",
+   "only": {
+    "human": true
+   },
+   "settings": [
+    "core"
+   ],
+   "grade": "core",
+   "source": [
+    "https://mordheimer.net/docs/trading-post"
+   ]
+  },
+  {
    "de": "Riding/Draft Horse (Empire in Flames)",
    "en": "Riding/Draft Horse (Empire in Flames)",
    "cat": "misc",
@@ -5078,6 +5097,17 @@
     "name": "Mule",
     "line": "Miscellaneous · 30 gc · Rare 7",
     "text": "A pack/riding animal sold on the Empire in Flames price chart. The page gives no profile of its own; the riding rules (Ride skill, led and unled animals, bolting) are those of Mounted Warriors."
+   }
+  ],
+  [
+   {
+    "__re": "^riding/draft\\ horse$",
+    "__f": "i"
+   },
+   {
+    "name": "Riding/Draft Horse",
+    "line": "Miscellaneous · 40 gc · Rare 8",
+    "text": "A common riding or cart horse (also the draft animal for wagons); for humans only. The core price chart gives no profile of its own: the riding rules (Ride skill, led and unled animals, bolting) are those of Mounted Warriors, the riding bonus the normal +1 armour save for a riding animal, and it has no attacks of its own."
    }
   ],
   [
