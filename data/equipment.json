@@ -22,6 +22,7 @@
   {
    "de": "Axt",
    "en": "Axe",
+   "vanilla": true,
    "cat": "cc",
    "cost": 5,
    "rare": "Common",
@@ -184,6 +185,7 @@
   {
    "de": "Knüppel",
    "en": "Club",
+   "vanilla": true,
    "cat": "cc",
    "cost": 3,
    "rare": "Common",
@@ -192,6 +194,7 @@
   {
    "de": "Dolch",
    "en": "Dagger",
+   "vanilla": true,
    "cat": "cc",
    "cost": 2,
    "rare": "Common",
@@ -238,6 +241,7 @@
   {
    "de": "Zweihandwaffe",
    "en": "Double-handed weapon",
+   "vanilla": true,
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
@@ -275,6 +279,7 @@
   {
    "de": "Kampfklauen (Paar)",
    "en": "Fighting claws",
+   "vanilla": true,
    "cat": "cc",
    "cost": 35,
    "rare": "Rare 7",
@@ -289,6 +294,7 @@
   {
    "de": "Flegel",
    "en": "Flail",
+   "vanilla": true,
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
@@ -322,6 +328,7 @@
   {
    "de": "Gromril-Waffe",
    "en": "Gromril weapon",
+   "vanilla": true,
    "cat": "cc",
    "cost": "4× Preis",
    "rare": "Rare 11",
@@ -337,6 +344,7 @@
   {
    "de": "Hellebarde",
    "en": "Halberd",
+   "vanilla": true,
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
@@ -356,6 +364,7 @@
   {
    "de": "Hammer",
    "en": "Hammer",
+   "vanilla": true,
    "cat": "cc",
    "cost": 3,
    "rare": "Common",
@@ -369,7 +378,6 @@
    "rare": "Rare 10",
    "wb": "",
    "settings": [
-    "core",
     "empire-in-flames"
    ],
    "source": [
@@ -379,6 +387,7 @@
   {
    "de": "Ithilmar-Waffe",
    "en": "Ithilmar weapon",
+   "vanilla": true,
    "cat": "cc",
    "cost": "3× Preis",
    "rare": "Rare 9",
@@ -430,6 +439,7 @@
   {
    "de": "Lanze",
    "en": "Lance",
+   "vanilla": true,
    "cat": "cc",
    "cost": 40,
    "rare": "Rare 8",
@@ -447,6 +457,7 @@
   {
    "de": "Streitkolben",
    "en": "Mace",
+   "vanilla": true,
    "cat": "cc",
    "cost": 3,
    "rare": "Common",
@@ -468,6 +479,7 @@
   {
    "de": "Morgenstern",
    "en": "Morning star",
+   "vanilla": true,
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
@@ -528,7 +540,6 @@
     ]
    },
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -568,6 +579,7 @@
   {
    "de": "Sigmaritischer Kriegshammer",
    "en": "Sigmarite warhammer",
+   "vanilla": true,
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
@@ -581,6 +593,7 @@
   {
    "de": "Speer",
    "en": "Spear",
+   "vanilla": true,
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
@@ -600,6 +613,7 @@
   {
    "de": "Stachelhandschuh",
    "en": "Spiked gauntlet",
+   "vanilla": true,
    "cat": "cc",
    "cost": 15,
    "rare": "Common",
@@ -639,6 +653,7 @@
   {
    "de": "Stahlpeitsche",
    "en": "Steel whip",
+   "vanilla": true,
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
@@ -654,6 +669,7 @@
   {
    "de": "Schwert",
    "en": "Sword",
+   "vanilla": true,
    "cat": "cc",
    "cost": 10,
    "rare": "Common",
@@ -707,6 +723,7 @@
   {
    "de": "Klageklingen (Paar)",
    "en": "Weeping blades",
+   "vanilla": true,
    "cat": "cc",
    "cost": 50,
    "rare": "Rare 9",
@@ -734,6 +751,7 @@
   {
    "de": "Blasrohr",
    "en": "Blowpipe",
+   "vanilla": true,
    "cat": "missile",
    "cost": 25,
    "rare": "Rare 7",
@@ -769,7 +787,6 @@
     ]
    },
    "settings": [
-    "core",
     "lustria"
    ],
    "source": [
@@ -779,6 +796,7 @@
   {
    "de": "Bogen",
    "en": "Bow",
+   "vanilla": true,
    "cat": "missile",
    "cost": 10,
    "rare": "Common",
@@ -798,6 +816,7 @@
   {
    "de": "Armbrust",
    "en": "Crossbow",
+   "vanilla": true,
    "cat": "missile",
    "cost": 25,
    "rare": "Common",
@@ -817,6 +836,7 @@
   {
    "de": "Armbrustpistole",
    "en": "Crossbow pistol",
+   "vanilla": true,
    "cat": "missile",
    "cost": 35,
    "rare": "Rare 9",
@@ -836,6 +856,7 @@
   {
    "de": "Elfenbogen",
    "en": "Elf bow",
+   "vanilla": true,
    "cat": "missile",
    "cost": "35+3D6",
    "rare": "Rare 12",
@@ -867,7 +888,6 @@
     ]
    },
    "settings": [
-    "core",
     "khemri",
     "lustria"
    ],
@@ -879,6 +899,7 @@
   {
    "de": "Langbogen",
    "en": "Long bow",
+   "vanilla": true,
    "cat": "missile",
    "cost": 15,
    "rare": "Common",
@@ -909,6 +930,7 @@
   {
    "de": "Repetierarmbrust",
    "en": "Repeater crossbow",
+   "vanilla": true,
    "cat": "missile",
    "cost": 40,
    "rare": "Rare 8",
@@ -928,6 +950,7 @@
   {
    "de": "Kurzbogen",
    "en": "Short bow",
+   "vanilla": true,
    "cat": "missile",
    "cost": 5,
    "rare": "Common",
@@ -945,6 +968,7 @@
   {
    "de": "Schleuder",
    "en": "Sling",
+   "vanilla": true,
    "cat": "missile",
    "cost": 2,
    "rare": "Common",
@@ -1003,6 +1027,7 @@
   {
    "de": "Wurfmesser",
    "en": "Throwing knives/stars",
+   "vanilla": true,
    "cat": "missile",
    "cost": 15,
    "rare": "Rare 5",
@@ -1024,6 +1049,7 @@
   {
    "de": "Donnerbüchse",
    "en": "Blunderbuss",
+   "vanilla": true,
    "cat": "bp",
    "cost": 30,
    "rare": "Rare 9",
@@ -1102,7 +1128,6 @@
     ]
    },
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -1222,7 +1247,6 @@
     ]
    },
    "settings": [
-    "core",
     "empire-in-flames"
    ],
    "source": [
@@ -1542,7 +1566,6 @@
     ]
    },
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -1578,6 +1601,7 @@
   {
    "de": "Duellpistole",
    "en": "Duelling pistol",
+   "vanilla": true,
    "cat": "bp",
    "cost": "30 (Paar 60)",
    "rare": "Rare 10",
@@ -1608,7 +1632,6 @@
     ]
    },
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -1618,6 +1641,7 @@
   {
    "de": "Handfeuerwaffe",
    "en": "Handgun",
+   "vanilla": true,
    "cat": "bp",
    "cost": 35,
    "rare": "Rare 8",
@@ -1650,6 +1674,7 @@
   {
    "de": "Hochland-Langbüchse",
    "en": "Hunting rifle (Hochland long rifle)",
+   "vanilla": true,
    "cat": "bp",
    "cost": 200,
    "rare": "Rare 11",
@@ -1691,6 +1716,7 @@
   {
    "de": "Pistole",
    "en": "Pistol",
+   "vanilla": true,
    "cat": "bp",
    "cost": "15 (Paar 30)",
    "rare": "Rare 8",
@@ -1788,6 +1814,7 @@
   {
    "de": "Warplock-Pistole",
    "en": "Warplock pistol",
+   "vanilla": true,
    "cat": "bp",
    "cost": "35 (Paar 70)",
    "rare": "Rare 11",
@@ -1802,6 +1829,7 @@
   {
    "de": "Leichte Rüstung",
    "en": "Light armour",
+   "vanilla": true,
    "cat": "armour",
    "cost": 20,
    "rare": "Common",
@@ -1821,6 +1849,7 @@
   {
    "de": "Schwere Rüstung",
    "en": "Heavy armour",
+   "vanilla": true,
    "cat": "armour",
    "cost": 50,
    "rare": "Common",
@@ -1843,7 +1872,6 @@
    "rare": "Common",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -1853,6 +1881,7 @@
   {
    "de": "Schild",
    "en": "Shield",
+   "vanilla": true,
    "cat": "armour",
    "cost": 5,
    "rare": "Common",
@@ -1872,6 +1901,7 @@
   {
    "de": "Buckler",
    "en": "Buckler",
+   "vanilla": true,
    "cat": "armour",
    "cost": 5,
    "rare": "Common",
@@ -1891,6 +1921,7 @@
   {
    "de": "Helm",
    "en": "Helmet",
+   "vanilla": true,
    "cat": "armour",
    "cost": 10,
    "rare": "Common",
@@ -1923,6 +1954,7 @@
   {
    "de": "Ithilmar-Rüstung",
    "en": "Ithilmar armour",
+   "vanilla": true,
    "cat": "armour",
    "cost": 90,
    "rare": "Rare 11",
@@ -1942,6 +1974,7 @@
   {
    "de": "Gromril-Rüstung",
    "en": "Gromril armour",
+   "vanilla": true,
    "cat": "armour",
    "cost": 150,
    "rare": "Rare 11",
@@ -1983,7 +2016,6 @@
    "rare": "Rare 8",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -1993,6 +2025,7 @@
   {
    "de": "Rossharnisch (Barding)",
    "en": "Barding",
+   "vanilla": true,
    "cat": "armour",
    "cost": 80,
    "rare": "Rare 8",
@@ -2025,6 +2058,7 @@
   {
    "de": "Seil & Haken",
    "en": "Rope & hook",
+   "vanilla": true,
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
@@ -2044,6 +2078,7 @@
   {
    "de": "Glücksbringer",
    "en": "Lucky charm",
+   "vanilla": true,
    "cat": "misc",
    "cost": 10,
    "rare": "Rare 6",
@@ -2063,6 +2098,7 @@
   {
    "de": "Laterne",
    "en": "Lantern",
+   "vanilla": true,
    "cat": "misc",
    "cost": 10,
    "rare": "Common",
@@ -2087,7 +2123,6 @@
    "rare": "Common",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning",
     "empire-in-flames"
    ],
@@ -2099,6 +2134,7 @@
   {
    "de": "Netz",
    "en": "Net",
+   "vanilla": true,
    "cat": "misc",
    "cost": 5,
    "rare": "Common",
@@ -2118,6 +2154,7 @@
   {
    "de": "Jagdpfeile",
    "en": "Hunting arrows",
+   "vanilla": true,
    "cat": "misc",
    "cost": "25+1D6",
    "rare": "Rare 8",
@@ -2137,6 +2174,7 @@
   {
    "de": "Geweihtes Wasser",
    "en": "Blessed water",
+   "vanilla": true,
    "cat": "misc",
    "cost": "10+3D6",
    "rare": "Rare 6",
@@ -2161,6 +2199,7 @@
   {
    "de": "Heiliges/Unheiliges Relikt",
    "en": "Holy (unholy) relic",
+   "vanilla": true,
    "cat": "misc",
    "cost": "15+3D6",
    "rare": "Rare 8",
@@ -2180,6 +2219,7 @@
   {
    "de": "Heiliger Foliant",
    "en": "Holy tome",
+   "vanilla": true,
    "cat": "misc",
    "cost": "100+D6×10",
    "rare": "Rare 8",
@@ -2194,6 +2234,7 @@
   {
    "de": "Zauberfoliant",
    "en": "Tome of magic",
+   "vanilla": true,
    "cat": "misc",
    "cost": "200+D6×25",
    "rare": "Rare 12",
@@ -2208,6 +2249,7 @@
   {
    "de": "Bugmans Ale",
    "en": "Bugman's ale",
+   "vanilla": true,
    "cat": "misc",
    "cost": "50+3D6",
    "rare": "Rare 9",
@@ -2230,6 +2272,7 @@
   {
    "de": "Cathay-Seidenkleidung",
    "en": "Cathayan silk clothes",
+   "vanilla": true,
    "alias": [
     "Kathay-Seidenumhang"
    ],
@@ -2248,6 +2291,7 @@
   {
    "de": "Elfenumhang",
    "en": "Elven cloak",
+   "vanilla": true,
    "cat": "misc",
    "cost": "100+D6×10",
    "rare": "Rare 12",
@@ -2264,6 +2308,7 @@
   {
    "de": "Knoblauch",
    "en": "Garlic",
+   "vanilla": true,
    "cat": "misc",
    "cost": 1,
    "rare": "Common",
@@ -2286,6 +2331,7 @@
   {
    "de": "Halbling-Kochbuch",
    "en": "Halfling cookbook",
+   "vanilla": true,
    "cat": "misc",
    "cost": "30+3D6",
    "rare": "Rare 7",
@@ -2314,7 +2360,6 @@
    "rare": "Rare 5",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2329,7 +2374,6 @@
    "rare": "Rare 6",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2344,7 +2388,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2359,7 +2402,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2374,7 +2416,6 @@
    "rare": "Rare 8",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2397,7 +2438,6 @@
    "rare": "Rare 8",
    "wb": "",
    "settings": [
-    "core",
     "empire-in-flames"
    ],
    "source": [
@@ -2407,6 +2447,7 @@
   {
    "de": "Mordheim-Karte",
    "en": "Mordheim map",
+   "vanilla": true,
    "cat": "misc",
    "cost": "20+4D6",
    "rare": "Rare 9",
@@ -2420,7 +2461,6 @@
    "rare": "Rare 5",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2449,7 +2489,6 @@
    "rare": "Rare 10",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2464,7 +2503,6 @@
    "rare": "Rare 8",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2474,6 +2512,7 @@
   {
    "de": "Überlegenes Schwarzpulver",
    "en": "Superior blackpowder",
+   "vanilla": true,
    "cat": "misc",
    "cost": 30,
    "rare": "Rare 11",
@@ -2498,7 +2537,6 @@
    "rare": "Rare 10",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -2521,6 +2559,7 @@
   {
    "de": "Schwarzer Lotus",
    "en": "Black lotus",
+   "vanilla": true,
    "cat": "misc",
    "cost": "10+1D6",
    "rare": "Rare 9",
@@ -2536,6 +2575,7 @@
   {
    "de": "Purpurschatten",
    "en": "Crimson shade",
+   "vanilla": true,
    "cat": "misc",
    "cost": "35+1D6",
    "rare": "Rare 8",
@@ -2556,6 +2596,7 @@
   {
    "de": "Dunkles Gift",
    "en": "Dark venom",
+   "vanilla": true,
    "cat": "misc",
    "cost": "30+2D6",
    "rare": "Rare 8",
@@ -2571,6 +2612,7 @@
   {
    "de": "Heilkräuter",
    "en": "Healing herbs",
+   "vanilla": true,
    "cat": "misc",
    "cost": "20+2D6",
    "rare": "Rare 8",
@@ -2589,6 +2631,7 @@
   {
    "de": "Mad-Cap-Pilze",
    "en": "Mad cap mushrooms",
+   "vanilla": true,
    "cat": "misc",
    "cost": "30+3D6",
    "rare": "Rare 9",
@@ -2605,6 +2648,7 @@
   {
    "de": "Alraunenwurzel",
    "en": "Mandrake root",
+   "vanilla": true,
    "cat": "misc",
    "cost": "25+1D6",
    "rare": "Rare 8",
@@ -2623,6 +2667,7 @@
   {
    "de": "Tränen der Shallaya",
    "en": "Tears of Shallaya",
+   "vanilla": true,
    "cat": "misc",
    "cost": "10+2D6",
    "rare": "Rare 7",
@@ -2761,7 +2806,6 @@
    "rare": "Common",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2776,7 +2820,6 @@
    "rare": "Rare 12",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2791,7 +2834,6 @@
    "rare": "Rare 10",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2806,7 +2848,6 @@
    "rare": "Rare 12",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2821,7 +2862,6 @@
    "rare": "Rare 7",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2836,7 +2876,6 @@
    "rare": "Rare 10",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2851,7 +2890,6 @@
    "rare": "Rare 8",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2866,7 +2904,6 @@
    "rare": "Rare 11",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2881,7 +2918,6 @@
    "rare": "Rare 9",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -2896,7 +2932,6 @@
    "rare": "Rare 10",
    "wb": "(Arabian/Khemri)",
    "settings": [
-    "core",
     "khemri"
    ],
    "source": [
@@ -3256,7 +3291,6 @@
     ]
    },
    "settings": [
-    "core",
     "lustria"
    ],
    "source": [
@@ -3284,7 +3318,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "empire-in-flames"
    ],
    "source": [
@@ -3299,7 +3332,6 @@
    "rare": "Rare 8",
    "wb": "",
    "settings": [
-    "core",
     "empire-in-flames"
    ],
    "source": [
@@ -3330,7 +3362,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3359,7 +3390,6 @@
    "rare": "Common",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3374,7 +3404,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3397,7 +3426,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3412,7 +3440,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3427,7 +3454,6 @@
    "rare": "Rare 7",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3442,7 +3468,6 @@
    "rare": "Rare 7",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3457,7 +3482,6 @@
    "rare": "Common",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3472,7 +3496,6 @@
    "rare": "Rare 6",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3495,7 +3518,6 @@
    "rare": "Rare 10",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3505,6 +3527,7 @@
   {
    "de": "Warhorse",
    "en": "Warhorse",
+   "vanilla": true,
    "cat": "misc",
    "cost": 80,
    "rare": "Rare 11",
@@ -3544,7 +3567,6 @@
    "rare": "Common",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3559,7 +3581,6 @@
    "rare": "Rare 5",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3602,7 +3623,6 @@
    "rare": "Rare 9",
    "wb": "",
    "settings": [
-    "core",
     "border-town-burning"
    ],
    "source": [
@@ -3919,6 +3939,7 @@
   {
    "de": "Wardog",
    "en": "Wardog",
+   "vanilla": true,
    "cat": "misc",
    "cost": "25+2D6",
    "rare": "Rare 10",

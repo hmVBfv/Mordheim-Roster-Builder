@@ -1,5 +1,12 @@
 {
-  "SETTINGS_SOURCE": "The campaign settings of mordheimer.net (https://mordheimer.net/docs/campaigns/campaign-settings), as kept in the project: the ids are the slugs of its pages and the ones the items of the catalogue name in `settings`. The summaries are the project's own words. The new app only – legacy does not load the file.",
+  "SETTINGS_SOURCE": "The campaign settings of mordheimer.net (https://mordheimer.net/docs/campaigns/campaign-settings), as kept in the project: the ids are the slugs of its pages and the ones the items of the catalogue name in `settings`. The summaries are the project's own words. VANILLA is the campaign option that keeps only the original rulebook (audit of 30.10.2026 against the pages marked Mordheim Rulebook (core) and the core price chart). The new app only – legacy does not load the file.",
+  "VANILLA": {
+    "id": "vanilla",
+    "name": "Vanilla Mordheim",
+    "default": false,
+    "summary": "Only what the original rulebook has: its weapons, armour and equipment (the items of the rulebook pages and the core price chart, marked `vanilla` in the catalogue) and its five skill lists. Off by default: a standard campaign has every item and every skill to choose from.",
+    "skillLists": ["combat", "shooting", "academic", "strength", "speed"]
+  },
   "SETTINGS": [
     { "id": "core", "name": "Core rules", "tagline": "The City of the Damned", "area": "Mordheim, the ruined city",
       "url": "https://mordheimer.net/docs/trading-post",
