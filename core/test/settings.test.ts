@@ -87,8 +87,8 @@ describe('the vanilla items (#165, audit of 30.10.2026)', () => {
   const vanilla = data.CATALOG.filter((i) => core.itemIsVanilla(i));
 
   it('are the items of the rulebook: weapons, armour and equipment of its pages and its price chart', () => {
-    expect(vanilla.length).toBe(68);
-    for (const en of ['Axe', 'Dagger', 'Bow', 'Handgun', 'Buckler', 'Garlic', 'Bugman\'s Ale', 'Elven Cloak', 'Lantern', 'Rope & Hook', 'Warhorse', 'Wardog']) {
+    expect(vanilla.length).toBe(69);
+    for (const en of ['Axe', 'Dagger', 'Bow', 'Handgun', 'Buckler', 'Garlic', 'Bugman\'s Ale', 'Elven Cloak', 'Lantern', 'Rope & Hook', 'Warhorse', 'Wardog', 'Riding/Draft Horse']) {
       expect(core.itemIsVanilla(data.CATALOG.find((i) => i.en.toLowerCase() === en.toLowerCase())!), en).toBe(true);
     }
   });
@@ -108,7 +108,7 @@ describe('the vanilla items (#165, audit of 30.10.2026)', () => {
 
   it('make the vanilla catalogue: all of them, nothing else, and none of Khemri', () => {
     const v = core.catalogVanilla(data);
-    expect(v).toHaveLength(68);
+    expect(v).toHaveLength(69);
     expect(v.every((i) => i.vanilla === true)).toBe(true);
     expect(v.some((i) => i.en === 'Magic gourd')).toBe(false);
     expect(v.some((i) => core.itemSources(i).includes('khemri') && !core.itemSources(i).includes('core'))).toBe(false);
@@ -126,6 +126,16 @@ describe('the vanilla items (#165, audit of 30.10.2026)', () => {
     expect(data.VANILLA.name).toBe('Vanilla Mordheim');
     expect(core.catalogForCampaign(data, { vanilla: false })).toHaveLength(data.CATALOG.length);
     expect(core.catalogForCampaign(data, {})).toHaveLength(data.CATALOG.length);
-    expect(core.catalogForCampaign(data, { vanilla: true })).toHaveLength(68);
+    expect(core.catalogForCampaign(data, { vanilla: true })).toHaveLength(69);
+  });
+
+  it('has the rulebook\'s Riding/Draft Horse (core price chart: 40 gc, Rare 8, humans only), beside the variants of the settings', () => {
+    const horse = data.CATALOG.find((i) => i.en === 'Riding/Draft Horse')!;
+    expect(horse).toMatchObject({ cost: 40, rare: 'Rare 8', vanilla: true, grade: 'core', only: { human: true }, settings: ['core'] });
+    expect(horse.source).toEqual(['https://mordheimer.net/docs/trading-post']);
+    expect(core.itemInfo(data, 'Riding/Draft Horse')?.name).toBe('Riding/Draft Horse');
+    expect(core.catalogVanilla(data).map((i) => i.en)).toContain('Riding/Draft Horse');
+    // the variants of the settings stay what they are: not the rulebook's
+    expect(core.itemIsVanilla(item('Riding/Draft Horse (Empire in Flames)'))).toBe(false);
   });
 });
