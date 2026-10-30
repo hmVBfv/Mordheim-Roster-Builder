@@ -419,9 +419,13 @@ warband“), Männer einer Gruppe mit Namen und Entlassen, Sonderregeln; Gear �
 die Liste, „Equipment & rare items“ bzw. der Weg zum Trading Post; Skills &
 injuries – Fertigkeiten, Zauber, Mutationen, Mal des Chaos und Segnungen,
 Verletzungen mit Korrektur, genommene Aufstiege mit Korrektur; Story & more –
-Name, „Story so far“, „Tabletop Simulator card“ und, getrennt, „Out of
+„Story so far“, „Tabletop Simulator card“ und, getrennt, „Out of
 action for good…“ bzw. Entlassen. Die Beschriftungen der Knöpfe und der
 Stepper sind dieselben wie zuvor.
+Der Name einer Einheit steht oben in Overview (am Handy als erste Zeile, am
+Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
+Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
+more“ entfällt (#152, #153).
 
 **Druck.** Das Blatt zum Drucken gibt es nur, solange der Browser druckt
 (`beforeprint` bis `afterprint`): jeder Krieger in voller Länge, ohne Knöpfe.
