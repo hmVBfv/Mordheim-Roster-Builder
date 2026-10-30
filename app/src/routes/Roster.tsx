@@ -182,6 +182,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     return {
       xp: (d) => ed.edit((c) => core.setModelExp(c, w.uid, w.exp + d)),
       setXp: () => { if (w.xp) askExp(w.name, w.xp, (v) => ed.edit((c) => core.setModelExp(c, w.uid, v), `${w.name}: experience ${v}.`)); },
+      ...(v.campaign ? { battles: (d: number) => ed.edit((c) => core.setModelBattles(c, w.uid, Math.max(0, w.battles + d))) } : {}),
       advance: () => openAdvance(w.uid),
       injury: () => injureWarrior(w),
       captive: () => openCaptive(w),

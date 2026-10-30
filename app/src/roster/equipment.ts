@@ -310,7 +310,7 @@ export function searchers(ctx: core.Ctx, de?: string | null): Searcher[] {
   });
 }
 
-export interface RareItem { de: string; name: string; kind: Kind; rarity: number; /** with its unit: "35 gc", "20+1D6 gc" */ price: string; /** what a dice price comes to on average */ avg: number | null; /** lowest and highest a dice price can come to */ range: [number, number] | null; fixed: number | null; text: string; usable: boolean; /** the campaign settings and warbands whose pages list it; none: the core chart */ settings: string[]; /** the grade of the warband it belongs to, where the page says */ grade: string | null }
+export interface RareItem { de: string; name: string; kind: Kind; rarity: number; /** with its unit: "35 gc", "20+1D6 gc" */ price: string; /** what a dice price comes to on average */ avg: number | null; /** lowest and highest a dice price can come to */ range: [number, number] | null; fixed: number | null; text: string; usable: boolean; /** the campaign settings and warbands whose pages list it */ settings: string[]; /** in the original rulebook (`vanilla` of the catalogue) */ vanilla?: boolean; /** the grade of the warband it belongs to, where the page says */ grade: string | null }
 
 /** Rare items the warband may find: those the catalogue keeps for it (or for
     nobody in particular), with whether someone here may carry one. With `everything`, those kept for other warbands as well. */
@@ -323,7 +323,7 @@ export function rareItems(ctx: core.Ctx, everything = false): RareItem[] {
     // what the catalogue keeps for other warbands is listed only when everything is asked for (#27), marked as unusable here
     if (it.only && !allowedSomewhere && !everything) continue;
     const usable = ctx.s.models.some((m) => core.canReceive(ctx, m.uid, { key: it.de, rare: true }).ok);
-    out.push({ de: it.de, name: it.en, kind: KIND_OF[it.cat] ?? 'misc', rarity: r, price: priceText(it.cost), avg: priceAverage(it.cost), range: priceRange(it.cost), fixed: typeof it.cost === 'number' ? it.cost : null, text: itemText(ctx.data, it.en), usable, settings: it.settings ?? [], grade: it.grade ?? null });
+    out.push({ de: it.de, name: it.en, kind: KIND_OF[it.cat] ?? 'misc', rarity: r, price: priceText(it.cost), avg: priceAverage(it.cost), range: priceRange(it.cost), fixed: typeof it.cost === 'number' ? it.cost : null, text: itemText(ctx.data, it.en), usable, settings: it.settings ?? [], vanilla: it.vanilla === true, grade: it.grade ?? null });
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }

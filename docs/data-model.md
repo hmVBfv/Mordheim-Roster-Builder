@@ -48,10 +48,11 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `ledger` | ja | Kassenbuch (V7), ab der ersten Schlacht der Warband: `[{ id, kind: 'open'\|'roster'\|'buy'\|'sell'\|'search'\|'adjust', amount, text, round, uid, item, qty, found }]`. Gold in der Hand = Summe der `amount`. `stash.gold` wird so nachgeführt, dass die Formel der alten App (Schatz − Wert) dasselbe ergibt; die alte App verwirft das Kassenbuch beim Laden und zeigt trotzdem das richtige Gold. Fehlt es, gilt die Rechnung der alten App |
 | `stash.items[]`: `key`, `rare`, `paid` | ja | was der Gegenstand ist (deutscher Listenname oder Katalogschlüssel), ob selten, Preis je Stück; Einträge ohne `key` (alte App, freier Text) bleiben unverändert im Stand; der Trading Post sucht ihren Namen jedes Mal in der Preistabelle und den Listen der Warband (`stashGoods`) und behandelt sie dann wie Einträge mit `key`. Was nirgends steht, lässt sich nur für einen genannten Preis verkaufen (Bericht #31, Rob, 22.10.2026) |
 | `wb`, `subtype`, `name`, `budget`, `models`, `stash`, `fallen`, `hired`, `dp`, `mark`, `house`, `leaderUid`, `goldNow` | nein | wie heute |
-| `models[]`: `uid`, `uid_def`, `name`, `names`, `qty`, `exp`, `adv`, `skills`, `spells`, `inj`, `eq`, `rare`, `mut`, `promoted`, `promoCats`, `xpPaid`, `heirloom`, `caster`, `lore`, `magic`, `miss`, `missWhy` | nein | wie heute |
+| `models[]`: `uid`, `uid_def`, `name`, `names`, `qty`, `exp`, `adv`, `skills`, `spells`, `inj`, `eq`, `rare`, `mut`, `promoted`, `promoCats`, `xpPaid`, `heirloom`, `caster`, `lore`, `magic`, `miss`, `missWhy`, `battles` (Anzahl der Kämpfe einer Kampagne, an denen er oder die Gruppe teilnahm; Wunsch #166, fehlt = 0) | nein | wie heute |
 | `house` | nein | wie heute; seit der Sicherheitsprüfung höchstens 16 KB (als JSON). Schlüssel `startGoldPlus` und `startGoldPct` (Bericht #36, Rob 22.10.2026): das Startgold in drei Formen – für alle gleich (`startGold`, wie bisher), für alle so viel mehr (`startGoldPlus`) oder so viele Prozent mehr (`startGoldPct`, aufgerundet auf den nächsten vollen gc), beides vom eigenen Startgold der Warband aus; jeweils `''` = aus, gelten mehrere, gewinnt die Reihenfolge fest, plus, Prozent (die App lässt nur eine an). Die alte App kennt die beiden neuen Schlüssel nicht und ignoriert sie. Schlüssel `noRacialMax` (Wunsch #106, Rob, 27.10.2026): `true` hebt die Höchstwerte der Rasse beim Steigern auf (`canAdv`, `hsCanAdv`); Henchmen steigern jeden Wert weiterhin nur einmal; Standard `false`, auf dem Export genannt; die alte App kennt auch ihn nicht |
 | `models[].rare[].also` | ja | Aufwertungen einer Art auf weiteren Waffen (Berichte #109/#110, Rob, 28.10.2026): eine Liste `{on, paid}` – die Waffe und der gezahlte Preis je weiterer Kopie; die erste Kopie bleibt in `on`/`paid` des Eintrags, `q` zählt alle. So kann ein Held Schwert und Dolch zu Gromril aufwerten (je Waffe eine Kopie, höchstens so viele, wie er Waffen dieser Art trägt). Fehlt bei einer einzigen Kopie; die Kosten sind `paid` plus die der weiteren (`rareEntryCost`) |
 | `models[].qty`, `models[].eq`, `models[].rare[].q`, `models[].adv`, `hired[].adv`, `hired[].eq`, `stash.items[].qty` | nein | wie heute; seit der Sicherheitsprüfung (09.10.2026) höchstens 1000 je Sache (`MAX_COUNT`), als Zahl oder Text – die Regeln zählen sie einzeln ab. Text, der keine Zahl ist, bleibt erlaubt |
+| `hired[].battles` | nein | wie `models[].battles`: Zahl der Kämpfe einer Kampagne, an denen der Gekaufte teilnahm (Wunsch #166, fehlt = 0) |
 | `hired[]`: `key`, `uid` | nein | wie heute; seit der Sicherheitsprüfung (09.10.2026) nur Buchstaben, Ziffern, `_` und `-`, höchstens 64 Zeichen – das Legacy-Tool setzt beide in HTML ein. Echte Stände haben nie anderes (`hs` + Zeitstempel) |
 | `campaign` | geändert | siehe unten |
 
@@ -296,3 +297,35 @@ Ständen:
   anpassen.
 - Ab Phase 3 prüft ein Test, dass jede Tabelle aus den Migrationen hier
   vorkommt und umgekehrt.
+
+## 7. Regeldaten: Kampagnen-Settings (Wünsche #164, #165)
+
+`data/settings.json` hält die Settings von mordheimer.net (Core rules, Border Town Burning, Empire in Flames, Khemri,
+Lustria, Albion, The Nemesis Crown, The Procession of Morr): `id` (der Slug ihrer Seite, derselbe Wert, den ein Gegenstand
+in `CATALOG[…].settings` nennt), `name`, `tagline` (der Titel auf der Seite), `area` (wo gespielt wird), `url`, `summary`.
+Nur die neue App liest die Datei (`DATA_FILES`, `GameData.SETTINGS`), die frühere App lädt sie nicht.
+
+Woher ein Gegenstand stammt, sagt `CATALOG[…].vanilla`, `.settings` und `.source`:
+
+- `vanilla: true` = im ursprünglichen Regelbuch (auf den Seiten „Mordheim Rulebook (core)“ der Waffen, Rüstungen und der Ausrüstung
+  oder in der Kerntabelle der Preise von mordheimer.net). Eine Prüfung Gegenstand für Gegenstand am 30.10.2026 hat 68 von 310
+  gefunden, dazu kam danach das Riding/Draft Horse der Kerntabelle (69 von 311); die übrigen sind aus Settings, Town Cryer oder Listen einer Warband. Fehlt das Feld, ist er nicht im Regelbuch.
+- `settings` = die Preistabellen der Settings, die ihn führen (`border-town-burning`, `empire-in-flames`, `khemri`, `lustria` …),
+  `warband:<Seite>` = die Liste einer Warband. `core` steht nur noch bei Gegenständen, die auch `vanilla` sind (ein Test hält
+  das fest; 47 Gegenstände trugen es zu Unrecht, zum Beispiel der Magic Gourd).
+- `source` = die Adressen, auf denen er gelesen wurde.
+
+`core/src/rules/settings.ts` liest das: `itemIsVanilla`, `catalogVanilla`, `catalogForCampaign(data, { vanilla })`,
+`itemSources`, `itemInSettings(item, gespielte)` (Gegenstände des Regelbuchs und die eigenen einer Warband gelten dort immer),
+`catalogIn(data, gespielte)`, `isVanillaSkillList`.
+
+**Vanilla Mordheim** (`VANILLA` in `data/settings.json`, Wunsch von Rob, 30.10.2026): eine Option einer Kampagne, standardmäßig
+aus. Eine Kampagne ohne sie ist die Standardkampagne: alle Gegenstände und alle Fertigkeiten sind wählbar. Mit ihr bleiben nur die
+Gegenstände mit `vanilla` und die fünf Fertigkeitenlisten des Regelbuchs (Combat, Shooting, Academic, Strength, Speed; die Prüfung
+am 30.10.2026 hat gezeigt, dass jede Fertigkeit dieser Listen die des Regelbuchs ist). Gebiete (Khemri, Lustria …) bleiben
+eine zweite, spätere Einschränkung. Eine Kampagne speichert noch nicht, ob sie Vanilla spielt oder in welchen Gebieten; das und das
+Anwenden im Warband-Tab und bei der Erstellung folgen mit einem späteren Wunsch. In einer Vanilla-Kampagne gibt es nur Vanilla-Warbands
+(Rob, 30.10.2026); deren eigene Gegenstände sind erlaubt, weil sie zur Warband gehören.
+
+Nicht geprüft und nicht geändert: Fertigkeiten und Gegenstände, die nur eine Warband hat (Sonderfertigkeiten, eigene Listen).
+Das Riding/Draft Horse der Kerntabelle (40 gc, Rare 8, nur Menschen) steht seit dem 30.10.2026 als Eintrag des Regelbuchs im Katalog, neben den Varianten je Setting.

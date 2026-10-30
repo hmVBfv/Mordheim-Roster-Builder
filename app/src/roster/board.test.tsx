@@ -294,3 +294,31 @@ describe('the opened warrior keeps what he is when the list changes', () => {
     expect(screen.getByRole('article', { name: 'Warrior' })).toBeTruthy();
   });
 });
+
+describe('the battles a warrior has fought (#166)', () => {
+  it('stand in his Experience section with a stepper to put right a count that began late, where a campaign counts them', async () => {
+    width = 1000;
+    const user = userEvent.setup();
+    const v = band();
+    const hero = { ...v.heroes[0]!, battles: 3 };
+    const a = acts({ battles: vi.fn() });
+    show({ acts: () => a }, { ...v, heroes: [hero] });
+    const line = screen.getByText('Battles fought').closest('div')!;
+    expect(within(line).getByText('3')).toBeTruthy();
+    await user.click(within(line).getByRole('button', { name: `One battle more for ${hero.name}` }));
+    expect(a.battles).toHaveBeenLastCalledWith(1);
+    await user.click(within(line).getByRole('button', { name: `One battle less for ${hero.name}` }));
+    expect(a.battles).toHaveBeenLastCalledWith(-1);
+  });
+
+  it('are a plain figure for whoever cannot change them, and absent while none is counted and nobody counts', () => {
+    width = 1000;
+    const v = band();
+    show({ acts: undefined }, { ...v, heroes: [{ ...v.heroes[0]!, battles: 2 }] });
+    expect(screen.getByText('Battles fought').closest('div')!.textContent).toMatch(/2/);
+    expect(screen.queryByRole('button', { name: /One battle/ })).toBeNull();
+    cleanup();
+    show({ acts: () => acts() }, { ...v, heroes: [{ ...v.heroes[0]!, battles: 0 }] });
+    expect(screen.queryByText('Battles fought')).toBeNull();
+  });
+});
