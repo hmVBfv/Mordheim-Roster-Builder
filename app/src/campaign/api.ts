@@ -16,7 +16,7 @@ export interface Tag {
 }
 /** archived: filed away by this user for themselves – shown in the list's own section. */
 export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string; archived?: boolean }
-export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string; canLead?: boolean }
+export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string }
 export interface Enrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
   createdAt: string; confirmedAt: string | null; name: string; wbType: string; wbName: string; headRev: number; updatedAt: string; tag: Tag | null;

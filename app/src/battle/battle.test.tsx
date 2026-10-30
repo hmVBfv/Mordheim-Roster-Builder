@@ -250,7 +250,7 @@ describe('opponents in a running battle', () => {
     expect(screen.getByRole('button', { name: '+ Casualty' })).toBeTruthy();
   });
 
-  it('is for leaders with the authenticator only, and only while the battle runs', async () => {
+  it('is for leaders only, with or without the authenticator, and only while the battle runs', async () => {
     // a player
     let srv = server({ totp: true });
     let c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ ...others()[0]!, role: 'leader' }, others()[1]!] });
@@ -259,13 +259,13 @@ describe('opponents in a running battle', () => {
     expect(await screen.findByRole('heading', { name: 'Who fought' })).toBeTruthy();
     expect(screen.queryByRole('heading', { name: /Opponents/ })).toBeNull();
     cleanup(); await db.meta.clear(); // the device kept the first campaign's views under the same ids
-    // a leader without the authenticator
+    // a leader without the authenticator is a leader (ADR 0030)
     srv = server({ totp: false });
     c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
     b = srv.addBattle(c.id);
     at(`/campaign/${c.id}/battles/${b.id}`);
     expect(await screen.findByRole('heading', { name: 'Who fought' })).toBeTruthy();
-    expect(screen.queryByRole('heading', { name: /Opponents/ })).toBeNull();
+    expect(await screen.findByRole('heading', { name: /Opponents/ })).toBeTruthy();
     cleanup(); await db.meta.clear();
     // a leader, the battle closed
     srv = server({ totp: true });

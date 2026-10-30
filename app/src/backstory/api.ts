@@ -1,6 +1,6 @@
 /* The campaign's backstory on the server (phase 4b; server/src/routes-backstory.ts):
    what happened before the campaign came into the app, in sections. Every
-   member reads it; a leader with the authenticator replaces it as a whole.
+   member reads it; a leader replaces it as a whole.
    The last answer is kept on the device (under the account's own key);
    writing needs the connection. */
 import { api, ApiError } from '../account/api.ts';

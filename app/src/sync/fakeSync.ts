@@ -75,7 +75,7 @@ export interface FakeCampaign {
   houseRules?: Record<string, unknown>;
   /** Members who filed it away in their own list (migration 24). */
   archivedBy?: string[];
-  members: { userId: string; displayName: string; username: string; role: FakeRole; canLead: boolean }[];
+  members: { userId: string; displayName: string; username: string; role: FakeRole }[];
   enrolments: FakeEnrolment[];
 }
 
@@ -187,7 +187,7 @@ export function createFakeSync(opts: {
     return {
       campaign: { id: c.id, name: c.name, round: c.round, place: c.place ?? '', houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
       role,
-      members: c.members.map(({ canLead, ...m }) => ({ ...m, joinedAt: c.createdAt, ...(role === 'leader' ? { canLead } : {}) })),
+      members: c.members.map((m) => ({ ...m, joinedAt: c.createdAt })),
       enrolments: c.enrolments.map((e) => ({
         id: e.id, warbandId: e.warbandId, playerId: e.playerId, player: e.player, status: e.status, fromRound: e.fromRound,
         createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
@@ -1090,10 +1090,10 @@ export function createFakeSync(opts: {
   /** A campaign the signed-in user is part of, with other players' warbands entered. */
   const addCampaign = (c: { name: string; place?: string; role?: FakeRole; round?: number; others?: { player: string; data: unknown; role?: FakeRole; pending?: boolean }[] }) => {
     const id = `campaign-${s.campaigns.size + 1}`;
-    const camp: FakeCampaign = { id, name: c.name, ...(c.place ? { place: c.place } : {}), round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader', canLead: true }], enrolments: [] };
+    const camp: FakeCampaign = { id, name: c.name, ...(c.place ? { place: c.place } : {}), round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader' }], enrolments: [] };
     for (const [i, o] of (c.others ?? []).entries()) {
       const userId = `user-${o.player.toLowerCase()}`;
-      if (!camp.members.some((m) => m.userId === userId)) camp.members.push({ userId, username: o.player.toLowerCase(), displayName: o.player, role: o.role ?? 'player', canLead: false });
+      if (!camp.members.some((m) => m.userId === userId)) camp.members.push({ userId, username: o.player.toLowerCase(), displayName: o.player, role: o.role ?? 'player' });
       const d = o.data as { name?: string; wb?: string };
       const e: FakeEnrolment = { id: `${id}-e${i + 1}`, warbandId: `${id}-w${i + 1}`, playerId: userId, player: o.player, status: 'pending', fromRound: null, createdAt: at(), confirmedAt: null, name: d.name ?? '', wbType: String(d.wb), tag: null, data: o.data };
       camp.enrolments.push(e);
@@ -1216,7 +1216,7 @@ export function createFakeSync(opts: {
         else {
           const p = s.people.find((q) => q.id === userId);
           if (!p) return json(400, { error: 'invalid', problem: 'no such player' });
-          c.members.push({ ...p, userId: p.id, role: r, canLead: false });
+          c.members.push({ ...p, userId: p.id, role: r });
         }
         return json(200, view(c));
       }

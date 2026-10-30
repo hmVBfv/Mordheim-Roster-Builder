@@ -1,6 +1,6 @@
 /* Opponents (docs/architecture.md "Endpunkte"): groups of profiles and the
    campaign's own skills. Leaders' own: read and written by the campaign's
-   leaders with the authenticator; the campaign's other members get a 403, an
+   leaders; the campaign's other members get a 403, an
    outsider a 404. Every route names its action, `can()` decides before the
    handler runs. */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';

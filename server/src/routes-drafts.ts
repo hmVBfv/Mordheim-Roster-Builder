@@ -1,6 +1,6 @@
 /* Chapters as drafts (phase 4b5b; docs/architecture.md "Endpunkte"): the
    text of a chapter not yet published. Leaders' own: read, written and
-   published by the campaign's leaders with the authenticator; for the other
+   published by the campaign's leaders; for the other
    members of the campaign it is a 403, for an outsider a 404, and what a
    draft says is in no other answer. Every route names its action, `can()`
    decides before the handler runs. */

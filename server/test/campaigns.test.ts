@@ -43,13 +43,14 @@ async function campaign() {
 }
 
 describe('starting a campaign', () => {
-  it('needs the authenticator; whoever starts it leads it', async () => {
+  it('needs no authenticator (ADR 0030); whoever starts it leads it', async () => {
     const { kai, anna, ids } = await world();
-    expect((await kai('POST', '/campaigns', { name: 'No factor' })).json()).toEqual({ error: 'forbidden' });
+    expect((await kai('POST', '/campaigns', { name: 'No factor' })).statusCode).toBe(201);
     const made = await anna('POST', '/campaigns', { name: '  The Hel   Fenn Campaign ' });
-    expect(made.json()).toMatchObject({ campaign: { name: 'The Hel Fenn Campaign', round: 0 }, role: 'leader', members: [{ userId: ids.anna, role: 'leader', canLead: true }], enrolments: [] });
+    expect(made.json()).toMatchObject({ campaign: { name: 'The Hel Fenn Campaign', round: 0 }, role: 'leader', members: [{ userId: ids.anna, role: 'leader' }], enrolments: [] });
     expect((await anna('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ name: 'The Hel Fenn Campaign', role: 'leader', members: 1, warbands: 0 }] });
-    expect((await kai('GET', '/campaigns')).json()).toEqual({ campaigns: [] });
+    // Kai started one of his own above, and is in none of Anna's
+    expect((await kai('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ name: 'No factor', role: 'leader' }] });
     expect((await anna('POST', '/campaigns', { name: '   ' })).statusCode).toBe(400);
   });
 });
@@ -87,11 +88,11 @@ describe('members', () => {
     // the last leader stays one
     expect((await anna('PUT', `/campaigns/${id}/members/${ids.anna}`, { role: 'player' })).json()).toEqual({ error: 'last_leader' });
     expect((await anna('DELETE', `/campaigns/${id}/members/${ids.anna}`)).json()).toEqual({ error: 'last_leader' });
-    // a leader without the authenticator may read, not lead
+    // a leader without the authenticator leads like any other (ADR 0030)
     await anna('PUT', `/campaigns/${id}/members/${ids.kai}`, { role: 'leader' });
-    expect((await anna('GET', `/campaigns/${id}`)).json()).toMatchObject({ members: [{ userId: ids.anna, canLead: true }, { userId: ids.kai, canLead: false }, { userId: ids.ben, role: 'viewer' }] });
+    expect((await anna('GET', `/campaigns/${id}`)).json()).toMatchObject({ members: [{ userId: ids.anna, role: 'leader' }, { userId: ids.kai, role: 'leader' }, { userId: ids.ben, role: 'viewer' }] });
     expect((await kai('GET', `/campaigns/${id}`)).statusCode).toBe(200);
-    expect((await kai('PUT', `/campaigns/${id}/members/${ids.ben}`, { role: 'player' })).json()).toEqual({ error: 'forbidden' });
+    expect((await kai('PUT', `/campaigns/${id}/members/${ids.ben}`, { role: 'player' })).statusCode).toBe(200);
     // taken out, the campaign is gone for them
     await anna('DELETE', `/campaigns/${id}/members/${ids.ben}`);
     expect((await ben('GET', `/campaigns/${id}`)).statusCode).toBe(404);

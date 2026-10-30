@@ -60,7 +60,7 @@ Regeln, die für alle Rollen gelten:
   bis sie sich öffnen. (Grenze: Wer Zugriff auf die Datenbank hat, könnte sie
   technisch lesen. Das ist dokumentiert und ein Vertrauensmechanismus, keine
   Kryptografie.)
-- Zweiter Faktor (Authenticator-App, TOTP) ist für Admin und Leiter Pflicht.
+- Zweiter Faktor (Authenticator-App, TOTP) ist nur für Admins Pflicht; jeder kann eine Kampagne leiten, mit oder ohne (ADR 0030).
 
 ## 4. Bausteine
 
@@ -355,7 +355,7 @@ aber vollständig und geordnet:
 
 ## 5. Kernabläufe
 
-1. **Einstieg:** Einladungslink → Konto anlegen (Leiter/Admin: Authenticator
+1. **Einstieg:** Einladungslink → Konto anlegen (Admin: Authenticator
    einrichten) → Warband anlegen oder importieren → Kampagne beitreten →
    Leiter bestätigt.
 2. **Spielabend:** Leiter legt Schlacht an und führt das Protokoll; Spieler

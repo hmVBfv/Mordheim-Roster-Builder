@@ -33,14 +33,14 @@ async function table() {
 }
 
 describe('chapter drafts', () => {
-  it('a leader with the authenticator writes one and reads it back, for everyone else it does not exist', async () => {
-    const { anna, ben, kai, lea, vic, rob, base, put, list, chapters } = await table();
+  it('a leader writes one and reads it back, for everyone else it does not exist', async () => {
+    const { anna, kai, lea, vic, rob, base, put, list, chapters } = await table();
     expect(await list()).toEqual([]);
     const { id, res } = await put({ text: 'ZEBRA: die Gräfin zahlt den Fährmann.' });
     expect(res.statusCode).toBe(200);
     expect((res.json() as { draft: Draft }).draft).toMatchObject({ id, refKey: 'battle-1', lang: 'de', title: 'Das Rathaus', text: 'ZEBRA: die Gräfin zahlt den Fährmann.' });
     expect(await list()).toHaveLength(1);
-    for (const who of [ben, kai, lea, vic]) {
+    for (const who of [kai, lea, vic]) {
       const g = await who('GET', base);
       expect(g.statusCode).toBe(403);
       expect(g.body).not.toMatch(/ZEBRA/);

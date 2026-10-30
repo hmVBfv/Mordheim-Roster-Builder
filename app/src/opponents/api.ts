@@ -1,6 +1,6 @@
 /* Opponents on the server (server/src/routes-opponents.ts): groups of
    profiles and the campaign's own skills. Leaders' own – read and written by
-   leaders with the authenticator; for everyone else there is no such thing.
+   leaders; for everyone else there is no such thing.
    The last answer is kept on the device (under the account's own key);
    every change needs the connection. */
 import type { OpponentProfile } from '@mordheim/core';

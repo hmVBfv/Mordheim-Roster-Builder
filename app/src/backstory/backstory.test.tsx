@@ -50,7 +50,7 @@ const SECTIONS = [
 
 describe('reading the backstory', () => {
   it('every member, a viewer too, reads the sections where they stand; nobody but a leader sees how to bring it in', async () => {
-    for (const [role, totp] of [['viewer', true], ['player', true], ['leader', false]] as const) {
+    for (const [role, totp] of [['viewer', true], ['player', true]] as const) {
       const { srv, c } = scene(role, totp);
       srv.backstoryFrom(c.id, SECTIONS);
       at(`/campaign/${c.id}/chronicle`);

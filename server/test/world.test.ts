@@ -65,13 +65,13 @@ describe('reading', () => {
 });
 
 describe('writing', () => {
-  it('only a leader with the authenticator writes; sent twice, it is one; the name can be German, English or both', async () => {
-    const { s, anna, ben, kai, lea, vic, rob, base, faction } = await table();
+  it('only a leader writes; sent twice, it is one; the name can be German, English or both', async () => {
+    const { s, anna, kai, lea, vic, rob, base, faction } = await table();
     const { fid, r } = await faction();
     expect(r.statusCode).toBe(200);
     expect(await anna('PUT', `${base}/factions/${fid}`, { nameEn: 'The Ferrymen', nameDe: 'Die Fährleute', publicStatus: 'hold the Stir crossing' }).then((x) => x.statusCode)).toBe(200);
     expect(s.db.prepare('SELECT count(*) AS n FROM factions').get()).toEqual({ n: 1 });
-    for (const who of [ben, kai, lea, vic]) {
+    for (const who of [kai, lea, vic]) {
       expect((await who('PUT', `${base}/factions/${randomUUID()}`, { nameEn: 'Me too' })).statusCode).toBe(403);
       expect((await who('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'Me too' })).statusCode).toBe(403);
       expect((await who('DELETE', `${base}/factions/${fid}`)).statusCode).toBe(403);
@@ -156,9 +156,9 @@ describe('the values of an NPC', () => {
     expect((await put({ statlineTts: 'x'.repeat(12_001) })).statusCode).toBe(400);
   });
 
-  it('only a leader with the authenticator writes them', async () => {
-    const { ben, kai, base } = await table();
-    for (const who of [ben, kai]) expect((await who('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'Old Marek', named: true, profile: values })).statusCode).toBe(403);
+  it('only a leader writes them', async () => {
+    const { kai, base } = await table();
+    for (const who of [kai]) expect((await who('PUT', `${base}/npcs/${randomUUID()}`, { nameEn: 'Old Marek', named: true, profile: values })).statusCode).toBe(403);
   });
 });
 

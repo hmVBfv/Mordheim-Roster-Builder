@@ -1,6 +1,6 @@
 /* The campaign's style guide on the server (phase 4b4a; server/src/routes-style.ts):
    the writing instructions the AI pack hands to whoever writes the chapter.
-   Leaders' own – read and written by leaders with the authenticator. The last
+   Leaders' own – read and written by leaders. The last
    answer is kept on the device (under the account's own key); writing needs
    the connection. */
 import { api, ApiError } from '../account/api.ts';

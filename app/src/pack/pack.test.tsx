@@ -269,18 +269,18 @@ describe('the AI pack', () => {
     await waitFor(() => expect((within(screen.getByRole('dialog', { name: 'AI pack' })).getByLabelText('The prompt, as it will be copied') as HTMLTextAreaElement).value).toContain('English, present tense.'));
   });
 
-  it('only leaders with the authenticator have it; a player or viewer does not even see the button', async () => {
+  it('only leaders have it; a player or viewer does not even see the button', async () => {
     const { c } = scene('player');
     at(`/campaign/${c.id}/timeline`);
     await screen.findByRole('list', { name: 'Timeline' });
     expect(screen.queryByRole('button', { name: 'AI pack…' })).toBeNull();
   });
 
-  it('a leader without the authenticator is not offered it either', async () => {
+  it('a leader without the authenticator is offered it too (ADR 0030)', async () => {
     const { c } = scene('leader', { totp: false });
     at(`/campaign/${c.id}/timeline`);
     await screen.findByRole('list', { name: 'Timeline' });
-    expect(screen.queryByRole('button', { name: 'AI pack…' })).toBeNull();
+    expect(await screen.findByRole('button', { name: 'AI pack…' })).toBeTruthy();
   });
 
   it('with no battle yet the button waits', async () => {

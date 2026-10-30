@@ -1,6 +1,6 @@
 /* The campaign's style guide in the database (phase 4b4a; concept.md 4.10):
    one text the AI pack hands to whoever writes the chapter. Leaders' own –
-   read and written by the campaign's leaders with the authenticator; for
+   read and written by the campaign's leaders; for
    everyone else it does not exist. The log says that it changed, never what
    it says. */
 import { z } from 'zod';

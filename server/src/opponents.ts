@@ -1,7 +1,7 @@
 /* Opponents in the database (concept.md 4.9, ADR 0002, ADR 0011): groups of
    profiles a leader sets against the warbands, and the campaign's own skills
    with their tooltip text. Leaders' own – read and written by the campaign's
-   leaders with the authenticator; for everyone else they do not exist. The
+   leaders; for everyone else they do not exist. The
    server checks the shape and the sizes and judges nothing about the values:
    a characteristic is what the leader wrote ("3(4)", "D6"). The log carries
    ids, never the words. */

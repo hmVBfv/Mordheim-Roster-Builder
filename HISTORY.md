@@ -4537,3 +4537,14 @@ counted by a core action `countBattle` that the aftermath's step "Grant the batt
 `awardBattleXp`: that action is in the parity walk against legacy, which knows no counter. Who "took part": everyone who does not sit it out;
 the killed in it are counted in their Fallen record, so the Fallen can say after how many battles they fell. The stack: 290 on 286 (Fallen),
 289 on 288 on 282 (settings, vanilla, horse).
+
+## October 31, 2026 — leaders without the authenticator (#168)
+
+Rob decided #168 plainly: the authenticator only for the admin's things of the website; anybody leads a campaign and uses all of it, the hidden
+contents included. ADR 0030 replaces what ADR 0008 (the leader's second factor), 0022 and 0027 ("leaders with the authenticator") said. In the
+code the whole rule sat in one place: `policy.ts` – `campaigns.create` was `totp`, and the target "leader" asked for `role === 'leader' &&
+actor.totp`; every hidden-content endpoint goes through `can()`, so changing those two lines opened them all. The rest was everything that
+had written the old rule down: 19 server tests that kept "Ben, who leads without the authenticator" away (he is a leader now, and the
+tests say so), the leak matrix (the user role may start a campaign), the app's tabs and buttons (`user.totp` in seven places, `canLead` on the
+member list), ten app tests, and the comments and docs. What is lost, and written in the ADR: a stolen password of a leader now reads the hidden
+parts of the campaign. A later option "the authenticator for the leaders of this campaign" is possible, not built.

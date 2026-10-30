@@ -31,7 +31,7 @@ const sections: Section[] = [
 ];
 
 describe('the backstory', () => {
-  it('is empty at first; a leader with the authenticator brings it in, from 0', async () => {
+  it('is empty at first; a leader brings it in, from 0', async () => {
     const { anna, url } = await table();
     expect((await anna('GET', url)).json()).toEqual({ backstory: { sections: [], updatedBy: null, updatedAt: null, seq: 0 } });
     const r = await anna('PUT', url, { sections, baseSeq: 0 });
@@ -43,9 +43,9 @@ describe('the backstory', () => {
   });
 
   it('every member reads it – players and viewers too – an outsider is told it does not exist', async () => {
-    const { anna, ben, kai, vic, rob, url } = await table();
+    const { anna, kai, vic, rob, url } = await table();
     await anna('PUT', url, { sections, baseSeq: 0 });
-    for (const who of [ben, kai, vic]) {
+    for (const who of [kai, vic]) {
       const g = await who('GET', url);
       expect(g.statusCode).toBe(200);
       expect((g.json() as { backstory: Backstory }).backstory.sections).toEqual(sections);
@@ -53,9 +53,9 @@ describe('the backstory', () => {
     expect((await rob('GET', url)).statusCode).toBe(404);
   });
 
-  it('only a leader with the authenticator writes it: a leader without one, a player and a viewer get a 403, an outsider a 404', async () => {
-    const { anna, ben, kai, vic, rob, url } = await table();
-    for (const who of [ben, kai, vic]) expect((await who('PUT', url, { sections, baseSeq: 0 })).statusCode).toBe(403);
+  it('only a leader writes it: a player and a viewer get a 403, an outsider a 404', async () => {
+    const { anna, kai, vic, rob, url } = await table();
+    for (const who of [kai, vic]) expect((await who('PUT', url, { sections, baseSeq: 0 })).statusCode).toBe(403);
     expect((await rob('PUT', url, { sections, baseSeq: 0 })).statusCode).toBe(404);
     expect(((await anna('GET', url)).json() as { backstory: Backstory }).backstory.sections).toEqual([]);
   });

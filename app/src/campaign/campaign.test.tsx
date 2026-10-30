@@ -48,12 +48,12 @@ function server(o: { totp?: boolean } = {}) {
 }
 
 describe('the Campaign tab', () => {
-  it('without a campaign: starting one needs the authenticator', async () => {
+  it('without a campaign: starting one needs no authenticator (ADR 0030)', async () => {
     server();
     at('/campaign');
     expect(await screen.findByText(/You are not part of a campaign yet/)).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Start a campaign' })).toBeNull();
-    expect(screen.getByText(/Starting a campaign needs the authenticator/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Start a campaign' })).toBeTruthy();
+    expect(screen.queryByText(/needs the authenticator/)).toBeNull();
   });
 
   it('with the authenticator a campaign is started, and its starter manages it', async () => {
@@ -468,11 +468,12 @@ describe('Manage', () => {
     await waitFor(() => expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['Summer in SylvaniaPlayer · Setup · 0 warbands']));
   });
 
-  it('a leader without the authenticator is told to set it up', async () => {
+  it('a leader without the authenticator manages the campaign like any other (ADR 0030)', async () => {
     const srv = server();
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign' });
     at(`/campaign/${c.id}/manage`);
-    expect(await screen.findByText(/Leading needs the authenticator/)).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Members' })).toBeTruthy();
+    expect(screen.queryByText(/needs the authenticator/)).toBeNull();
   });
 });
 
