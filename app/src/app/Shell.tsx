@@ -6,6 +6,7 @@ import { startSession, subscribeSession, getSession, useSession } from '../accou
 import { Banner } from '../art/Pixels.tsx';
 import { sceneFor } from '../art/route.ts';
 import { ReportProblem } from '../bugs/ReportProblem.tsx';
+import { WhatsNewHeaderButton } from '../changelog/WhatsNew.tsx';
 import { note, routePattern } from '../bugs/trail.ts';
 import { startSync, stopSync } from '../sync/runner.ts';
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
@@ -84,6 +85,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <header className={styles.header}>
         <Link to={HOME} className={styles.title}>{APP_NAME}</Link>
         <SyncState />
+        <WhatsNewHeaderButton />
         <ReportProblem />
       </header>
       <nav className={styles.nav} aria-label="Main">

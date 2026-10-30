@@ -26,3 +26,47 @@
 .fixed {
   color: var(--text-muted);
 }
+
+/* the header button: beside "Bug", the same quiet look; on a phone the header is full, Home has the card instead */
+.headerButton {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: var(--tap);
+  height: var(--tap);
+  margin: calc(var(--space-2) * -1) 0;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.headerButton:hover,
+.headerButton:focus-visible {
+  color: var(--text);
+}
+
+@media (min-width: 700px) {
+  .headerButton {
+    display: inline-flex;
+  }
+}
+
+.cardList {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.cardList li {
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--accent);
+}

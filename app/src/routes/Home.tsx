@@ -9,6 +9,7 @@ import { HomeOpen } from '../open/HomeOpen.tsx';
 import { Empty } from '../art/Pixels.tsx';
 import ui from '../ui/ui.module.css';
 import { ImportSheet } from './ImportSheet.tsx';
+import { WhatsNewCard } from '../changelog/WhatsNew.tsx';
 import styles from './Home.module.css';
 import { WarbandList } from './WarbandList.tsx';
 import { useFavourites } from './useFavourites.ts';
@@ -28,6 +29,7 @@ export function Home() {
   return (
     <section className={`${ui.page} ${styles.home} ${campaigns ? '' : styles.solo}`}>
       <div className={ui.page}>
+        <WhatsNewCard />
         {campaigns && (
           <div className={ui.card}>
             <h2>Open for you</h2>
