@@ -75,17 +75,18 @@ export function Warbands() {
           <WarbandList warbands={favoured} marks grid favourites={favourites} />
         </Group>
       )}
-      {played.length > 0 && !signedIn && <WarbandList warbands={played} grid />}
-      {played.length > 0 && signedIn && (
-        <Suspense fallback={<WarbandList warbands={played} marks grid />}>
-          <GroupedWarbands warbands={played} notify={notify} favourites={favourites!} />
-        </Suspense>
-      )}
+      {/* the warbands that play in a campaign come right after the favourites, the others and the planners after them (#157) */}
       {inCampaigns.length > 0 && (
         <Group id="campaigns-h" title="In campaigns">
           <p className={ui.muted}>The copies of your warbands that take part in a campaign. They play there; the free warband they came from is above.</p>
           <WarbandList warbands={inCampaigns} marks={signedIn} grid favourites={favourites} />
         </Group>
+      )}
+      {played.length > 0 && !signedIn && <WarbandList warbands={played} grid />}
+      {played.length > 0 && signedIn && (
+        <Suspense fallback={<WarbandList warbands={played} marks grid />}>
+          <GroupedWarbands warbands={played} notify={notify} favourites={favourites!} />
+        </Suspense>
       )}
       {planners.length > 0 && (
         <Group id="planners-h" title="Planners">
