@@ -50,7 +50,7 @@ Game night   Vollbild, aus einer Schlacht heraus (4a2: /campaign/:id/battles/:bi
              auf dem Handy ohne die Leiste unten)
 Profile      Devices · Authenticator · Password
 Admin*       Users · Invites · Reports · Backups
-Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf jeder Seite, öffnet das Blatt „Report a problem“ mit gewählter Art Bug; Account → Your reports; Admin → Reports)
+Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf jeder Seite, öffnet das Blatt „Report a problem“ mit gewählter Art Bug; die Warband in Sicht lässt sich anhängen, auch eine fremde in einer Kampagne, so wie die Kampagne sie zeigt (#158); Account → Your reports; Admin → Reports)
                                   (* nur Leiter bzw. Admin)
 ```
 
@@ -428,6 +428,18 @@ Der Name einer Einheit steht oben in Overview (am Handy als erste Zeile, am
 Desktop im Kopf des Fensters) mit einem Stift daneben, der das Blatt zum
 Benennen öffnet – wie bei der Warband; das Namensfeld ganz unten in „Story &
 more“ entfällt (#152, #153).
+
+**Die Gefallenen (#159, #160, #161).** Je Einheit steht die Einheit als Überschrift („Hero unit“ oder „Henchmen unit“), darunter „N models fallen“
+mit Erfahrung und verlorenem Gold, dann die gefallenen Modelle als Liste („Fallen models of …“). Jedes Modell nennt, wo es
+aufgezeichnet wurde, die Runde, in der es fiel, und wer es ausgeschaltet hat, und die Runde, in der es dazukam. Die verlorene
+Erfahrung (die im Spiel verdiente) steht neben dem Gold, in der Zusammenfassung wie in jeder Zeile; jede Zahl bleibt in einem Stück.
+Nicht erfasst ist, an wie vielen Kämpfen ein Modell teilnahm: Die Warband führt dazu keine Zahl je Modell.
+
+**Zähler der Kämpfe (#166).** Wo die Kampagne die Kämpfe zählt, steht in „Experience“ eine Zeile „Battles fought“: Wer sie nicht
+ändern kann, sieht die Zahl, der Besitzer hat daneben − und +, um einen Stand nachzutragen, der vor dem Zähler begann. Gezählt wird
+im Schritt „Grant the battle's experience“ der Nachbereitung (`countBattle`, einmal je Kampf): +1 für jedes Modell, jede Gruppe und jeden
+Gekauften, der nicht aussetzt („Misses games“); wer in diesem Kampf fiel, steht schon bei den Gefallenen und bekommt ihn dort
+(„Took part in N battles“). Eine Henchmen-Gruppe zählt als Ganzes, auch Männer, die später dazukamen.
 
 **What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
 „New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen

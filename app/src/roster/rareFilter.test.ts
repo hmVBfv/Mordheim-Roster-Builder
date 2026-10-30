@@ -1,5 +1,7 @@
 /* The search mask of "What can be found" (wish #22): by name or effect, by the characteristic an item touches, by rarity. */
+import * as core from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
+import { data } from '../test/data.ts';
 import type { RareItem } from './equipment.ts';
 import { effectLine, filterRare, gradeOptions, releasedWith, sortRare, sourceKeys, sourceName, sourceOptions, STAT_FILTERS, type SortOrder } from './rareFilter.ts';
 
@@ -113,5 +115,31 @@ describe('the choice by where an item was released', () => {
     expect(releasedWith(MIXED[1]!)).toEqual([]);
     expect(releasedWith(MIXED[2]!)).toEqual(['Border Town Burning', 'Empire in Flames']);
     expect(releasedWith(MIXED[4]!)).toEqual(['A warband\'s own item']);
+  });
+});
+
+/* Wishes #164, #165: the settings are data now (data/settings.json); the names the Trading Post shows must be the data's. */
+describe('the names of the settings', () => {
+  it('are those of data/settings.json, so the list of the "Released with" choice cannot drift from the data', () => {
+    for (const s of data.SETTINGS) expect(sourceName(s.id), s.id).toBe(core.settingName(data, s.id));
+    expect(sourceName('warband')).toBe(core.settingName(data, 'warband'));
+    expect(sourceName('other')).toBe(core.settingName(data, 'other'));
+  });
+});
+
+describe('where an item was released, with the vanilla audit (#165)', () => {
+  const at = (settings: string[], vanilla?: boolean) => ({ settings, ...(vanilla === undefined ? {} : { vanilla }) });
+  it('is the core rules for the rulebook\'s items, whatever charts also list them', () => {
+    expect(sourceKeys(at([], true))).toEqual(['core']);
+    expect(sourceKeys(at(['border-town-burning'], true))).toEqual(['core', 'border-town-burning']);
+  });
+  it('is only the settings for an item the rulebook does not have – not the core rules any more', () => {
+    expect(sourceKeys(at(['khemri'], false))).toEqual(['khemri']);
+    expect(releasedWith(at(['khemri'], false))).toEqual(['Khemri']);
+  });
+  it('is "not from the rulebook" for one the data traces to no setting', () => {
+    expect(sourceKeys(at([], false))).toEqual(['other']);
+    expect(releasedWith(at([], false))).toEqual(['Not from the rulebook']);
+    expect(sourceOptions([at([], false), at([], true)]).map(([k]) => k)).toEqual(['core', 'other']);
   });
 });

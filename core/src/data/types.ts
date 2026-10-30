@@ -131,6 +131,8 @@ export interface CatalogItem {
   /** A number, or a string for variable prices ("25+2D6", "+20", "4× Preis"). */
   cost: number | string;
   rare: string;
+  /** In the original rulebook: on its weapons, armour or equipment pages as "Mordheim Rulebook (core)", or on the core price chart. The only test of the vanilla option; absent = not (audit of 30.10.2026). */
+  vanilla?: boolean;
   /** The restriction as written ("Dwarfs only"); a note when `only` is absent. */
   wb: string;
   only?: CatalogOnly;
@@ -337,6 +339,33 @@ export interface GameData {
      the new app only – legacy does not load the file). */
   BESTIARY_SOURCE: string;
   BESTIARY: BeastDef[];
+  /* The campaign settings of mordheimer.net (data/settings.json, the new app only; wishes #164, #165). */
+  SETTINGS_SOURCE: string;
+  VANILLA: VanillaDef;
+  SETTINGS: SettingDef[];
+}
+
+/** The campaign option that keeps only the original rulebook (Rob, 30.10.2026): off unless a campaign switches it on. */
+export interface VanillaDef {
+  id: string;
+  name: string;
+  /** Whether a new campaign starts with it: no. */
+  default: boolean;
+  summary: string;
+  /** The skill lists of the rulebook – every skill of them is the rulebook's. */
+  skillLists: string[];
+}
+
+/** A campaign setting: the area a campaign can play in. `id` is the slug of its page and what an item names in `settings`. */
+export interface SettingDef {
+  id: string;
+  name: string;
+  /** The title mordheimer.net gives it ("The Land of the Dead"). */
+  tagline: string;
+  /** Where it is played. */
+  area: string;
+  url: string;
+  summary: string;
 }
 
 /** An animal or creature of the bestiary: a template for an opponent, never a warband's entry. */
@@ -353,10 +382,10 @@ export interface BeastDef {
   rules: [name: string, text: string][];
 }
 
-/** The data files, in the order legacy data/index.js loads them – and last the one only the new app reads (bestiary). */
+/** The data files, in the order legacy data/index.js loads them – and last the ones only the new app reads (bestiary, settings). */
 export const DATA_FILES = [
   'races', 'equipment', 'skills', 'spells', 'abilities', 'mutations', 'injuries', 'i18n',
-  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle', 'bestiary',
+  'houserules', 'marks', 'sheet', 'campaign', 'warbands', 'hiredswords', 'dramatis', 'postbattle', 'bestiary', 'settings',
 ] as const;
 export type DataFile = (typeof DATA_FILES)[number];
 

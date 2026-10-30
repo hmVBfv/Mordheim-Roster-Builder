@@ -12,22 +12,30 @@ export function FallenList({ f }: { f: FallenView }) {
     <details className={`${ui.card} ${styles.fallenBox}`}>
       <summary className={styles.fallen}>
         <span className={styles.fallenTitle}>Fallen ({f.count})</span>
-        <span className={styles.fallenTotals}>{f.goldLost} gc lost{f.xpLost ? ` · ${f.xpLost} Exp earned in play lost` : ''}</span>
+        <span className={styles.fallenTotals}>
+          <span>{f.goldLost} gc lost</span>
+          {f.xpLost > 0 && <span>{f.xpLost} Exp lost</span>}
+        </span>
       </summary>
-      <p className={ui.muted}>Removed from the warband; their equipment was lost with them.</p>
+      <p className={ui.muted}>Removed from the warband; their equipment was lost with them. Experience lost is what they earned in play.</p>
       <div className={styles.fallenGroups}>
         {f.groups.map((g) => (
           <section key={g.key} className={styles.fallenGroup} aria-label={`${g.count}× ${g.unit}`}>
-            <h3>{g.count}× {g.unit}<small>{g.kind === 'hero' ? 'Hero' : 'Henchmen'}</small></h3>
-            {/* the group's totals only where they add up more than one line */}
-            {(g.entries.length > 1 || g.entries[0]!.count > 1) && (
-              <p className={styles.fallenNote}>{g.xpTotal} Exp{g.xpEarned ? ` (${g.xpEarned} earned in play)` : ''} · {g.goldLost} gc lost</p>
-            )}
-            <ul className={styles.fallenRows}>
+            <h3>{g.unit}<small>{g.kind === 'hero' ? 'Hero unit' : 'Henchmen unit'}</small></h3>
+            <p className={styles.fallenNote}>
+              <span>{g.count} {g.count === 1 ? 'model' : 'models'} fallen</span>
+              <span>{g.xpTotal} Exp{g.xpEarned ? ` (${g.xpEarned} earned in play)` : ''}</span>
+              <span>{g.goldLost} gc lost</span>
+            </p>
+            <ul className={styles.fallenRows} aria-label={`Fallen models of ${g.unit}`}>
               {g.entries.map((e, i) => (
                 <li key={i}>
                   <span className={styles.fallenName}>{e.count > 1 ? `${e.count}× ` : ''}{e.name}</span>
-                  <span className={styles.fallenNums}>{e.xp} Exp · {e.worth} gc</span>
+                  <span className={styles.fallenNums}>
+                    <span>{e.xp} Exp{e.xpEarned ? ` (${e.xpEarned} earned in play)` : ''}</span>
+                    <span>{e.worth} gc lost</span>
+                  </span>
+                  {(e.fell || e.joined || e.battles > 0) && <span className={styles.fallenWhen}>{[e.joined, e.battles > 0 ? `Took part in ${e.battles} ${e.battles === 1 ? 'battle' : 'battles'}` : '', e.fell].filter(Boolean).map((t) => <span key={t}>{t}</span>)}</span>}
                   <span className={styles.fallenGear}>{e.equipment.length ? e.equipment.join(', ') : 'No equipment'}</span>
                 </li>
               ))}

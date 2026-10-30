@@ -110,3 +110,25 @@ export function awardBattleXp(ctx: Ctx, battleId: number | null, opts?: BattleXp
     }
   });
 }
+
+/** Counts a battle for everyone who took part (wish #166): +1 to each model, group and Hired Sword on the roster who did not sit it out
+    (games to miss), and to those killed in it who are already in the Fallen – so they fell after as many battles as they fought, the
+    last one included. Called once for each battle, when its experience is granted. Outside a campaign nothing is counted. */
+export function countBattle(ctx: Ctx, battleId: number | null): WarbandState {
+  return update(ctx, (d) => {
+    const camp = campState(d);
+    if (!camp.on) return;
+    const bat = (camp.battles ?? []).find((b) => b.id === Number(battleId)) as { round?: number } | undefined;
+    const round = bat ? bat.round : camp.round;
+    const bump = (x: { battles?: number }) => { x.battles = (Number(x.battles) || 0) + 1; };
+    for (const m of d.models as Model[]) if ((Number(m.miss) || 0) <= 0) bump(m);
+    for (const h of d.hired ?? []) bump(h);
+    const slain = new Set(((camp.casualties ?? []) as Casualty[]).filter((r) => r.round === round && r.result === 'dead' && r.fallenRef != null).map((r) => r.fallenRef));
+    for (const f of d.fallen ?? []) if (f.id != null && slain.has(f.id)) bump(f.m);
+  });
+}
+
+/** Sets how many battles a model has taken part in, by hand (a warband that played before the counter existed). */
+export function setModelBattles(ctx: Ctx, uid: number, n: unknown): WarbandState {
+  return update(ctx, (d) => { const m = (d.models as Model[]).find((x) => x.uid === uid); if (m) m.battles = Math.max(0, Math.round(Number(n) || 0)); });
+}

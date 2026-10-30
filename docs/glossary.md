@@ -95,6 +95,8 @@ Begriff einführt, trägt ihn hier ein.
 | nur für Helden (Listenzeile) | Heroes only | `{heroes: true}` |
 | einer Warband vorbehalten (Katalog) | – | `CATALOG[…].only`, `catalogAllowed()` |
 | Herkunft eines Gegenstands (Kampagne, Grad, Quelle) | „Released with“, „Warband grade“ (Auswahl in der Suche) | `CATALOG[…].settings` (`core` = die Preistabelle des Regelbuchs, `empire-in-flames`, `border-town-burning`, `khemri`, `lustria` = die Preistabelle dieser Kampagne führt ihn, `warband:<Seite>` = Liste einer Warband), `.grade`, `.source`; `sourceKeys`, `sourceOptions`, `filterRare` |
+| Kampagnen-Setting (Gebiet, in dem eine Kampagne spielt) | Settings: Core rules, Border Town Burning, Empire in Flames, Khemri, Lustria, Albion, The Nemesis Crown, The Procession of Morr | `data/settings.json` (`SETTINGS`, `SettingDef`), `itemSources`, `itemInSettings`, `catalogIn`, `settingName` |
+| Vanilla Mordheim (nur Regelbuch, Option einer Kampagne, standardmäßig aus) | Vanilla Mordheim | `data/settings.json` (`VANILLA`), `CATALOG[…].vanilla`, `itemIsVanilla`, `catalogVanilla`, `catalogForCampaign`, `isVanillaSkillList` |
 | unter anderem Namen dieselbe Ware (Liste ↔ Preistabelle) | – | `CATALOG[…].alias`, `tradeKind()` |
 | nur für eine Variante (Stadt, Stamm) | – | `{sub: ['midd']}` |
 | gesperrter Skill einer Warband | – | `WARBANDS[…].noSkills` |
