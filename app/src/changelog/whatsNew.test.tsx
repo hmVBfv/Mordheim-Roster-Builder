@@ -24,6 +24,8 @@ describe('"What\'s new" is easy to find', () => {
     at('/account');
     const header = (await screen.findByRole('banner')) as HTMLElement;
     const button = within(header).getByRole('button', { name: "What's new" });
+    // a closed sheet carries nothing: the text of thirty changes is not on every screen, for a search of the page or for a test of what else is there
+    expect(document.body.textContent).not.toContain(newest);
     expect(within(header).getByRole('button', { name: 'Report a bug' })).toBeTruthy();
     await user.click(button);
     const sheet = await screen.findByRole('dialog', { name: "What's new", hidden: true });

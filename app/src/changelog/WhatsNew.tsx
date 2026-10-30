@@ -1,6 +1,6 @@
 /* "What's new" where it is seen (wish #155): a button in the header beside "Bug", a card on Home, and the one under More –
    each opens the same sheet with the changes of every update. */
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { SparkIcon } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
 import { useSheet } from '../ui/useSheet.ts';
@@ -16,10 +16,12 @@ export function newestChanges(max = 3) {
 
 function WithSheet({ children }: { children: (open: () => void) => ReactNode }) {
   const { ref, open, close } = useSheet('changelog');
+  // the list is put in the sheet when it is first opened: a closed sheet on every screen would carry the text of all the changes
+  const [opened, setOpened] = useState(false);
   return (
     <>
-      {children(open)}
-      <ChangelogSheet dialogRef={ref} close={close} title="What's new" entries={ENTRIES} />
+      {children(() => { setOpened(true); open(); })}
+      <ChangelogSheet dialogRef={ref} close={close} title="What's new" entries={opened ? ENTRIES : null} />
     </>
   );
 }
