@@ -19,6 +19,7 @@ export const ShieldIcon = (): ReactElement => <svg {...base}><path d="M12 3l8 3v
 
 export const ChevronIcon = (): ReactElement => <svg {...base}><path d="M9 6l6 6-6 6" /></svg>;
 export const IconClose = (): ReactElement => <svg {...base}><path d="M6 6l12 12M18 6L6 18" /></svg>;
+export const SparkIcon = (): ReactElement => <svg {...base}><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" /></svg>;
 export const IconEdit = (): ReactElement => <svg {...base}><path d="M4 20h4l11-11-4-4L4 16z" /><path d="M13 7l4 4" /></svg>;
 /** A beetle, the sign everybody knows for "report a bug" (Rob, 20.10.2026: the flag was not found). */
 export const BugIcon = (): ReactElement => (

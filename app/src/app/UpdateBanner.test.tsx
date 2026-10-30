@@ -49,7 +49,10 @@ describe('UpdateBanner', () => {
   it('offers the changes the new version brings, and only those', async () => {
     serve([fresh, ...ENTRIES]);
     render(<UpdateBanner />);
-    fireEvent.click(await screen.findByRole('button', { name: "What's new" }));
+    const open = await screen.findByRole('button', { name: "What's new" });
+    // #155: the first change is in view under the notice, before anything is opened (not only inside the closed sheet)
+    expect(screen.getAllByText('A thing from the next version.').some((el) => !el.closest('dialog'))).toBe(true);
+    fireEvent.click(open);
     const sheet = await screen.findByRole('dialog', { name: "What's new in the update", hidden: true });
     expect(sheet.textContent).toContain('A thing from the next version.');
     expect(sheet.textContent).not.toContain(ENTRIES[0]!.changes[0]!.text);

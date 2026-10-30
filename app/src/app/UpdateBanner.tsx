@@ -26,10 +26,15 @@ export function UpdateBanner() {
     return (
       <div className={styles.banner} role="status">
         <span>New version available.</span>
-        {news.length > 0 && <button type="button" className={styles.bannerQuiet} onClick={open}>What's new</button>}
         <ChangelogSheet dialogRef={ref} close={close} title="What's new in the update" entries={news} />
         <button type="button" className={styles.bannerAction} onClick={() => { setNeedRefresh(false); void updateServiceWorker(true); }}>Reload</button>
         <button type="button" className={styles.bannerQuiet} onClick={() => setNeedRefresh(false)}>Later</button>
+        {news.length > 0 && (
+          <p className={styles.bannerNews}>
+            <span>{news[0]!.changes[0]!.text}{news.reduce((n, e) => n + e.changes.length, 0) > 1 ? ' …' : ''}</span>
+            <button type="button" className={styles.bannerAction} onClick={open}>What's new</button>
+          </p>
+        )}
       </div>
     );
   }

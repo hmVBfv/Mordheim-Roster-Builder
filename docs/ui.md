@@ -435,6 +435,10 @@ gruppiert, das Neueste oben. In der Meldung „New version available.“ steht z
 das nur zeigt, was die neue Version mehr enthält (ihre `changelog.json`, aus dem Netz gelesen, nicht aus dem Cache); ohne Netz oder
 ohne Neues erscheint der Knopf nicht.
 
+Damit es nicht versteckt ist (#155): ein Knopf „New“ steht im Kopf jeder Seite neben „Bug“ (ab 700 px; am Handy ist der Kopf
+voll), auf Home steht am Handy wie am Desktop eine Karte „What's new“ mit den neuesten Änderungen und „All changes“, und
+unter der Meldung „New version available.“ steht die erste Änderung der neuen Version samt Knopf „What's new“.
+
 **Aufstieg (Advance).** Die Zeilen der Heldentabelle, die einen zweiten Wurf
 verlangen (6: Stärke oder Attacken, 8: Initiative oder Mut, 9: Wunde oder
 Widerstand), fragen nach dem W6 („D6 as rolled“, 1–3 die erste, 4–6 die zweite
