@@ -5991,7 +5991,7 @@
    {
     "name": "Magic Gourd",
     "line": "Miscellaneous · 10 gc · Rare 7",
-    "text": "Never runs dry. The bearer automatically passes any test caused by heat/thirst/desert conditions, and once per battle may drink to remove Knocked Down (stand up immediately)."
+    "text": "The power of the gourd may be used at the end of each battle. It will supply 1D3 units of water. Once the amount of water is determined, roll an additional D6 – on a roll of 6, the gourd's magic is exhausted and it shatters."
    }
   ],
   [
