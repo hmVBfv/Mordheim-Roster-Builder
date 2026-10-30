@@ -8,8 +8,8 @@ const data = loadGameData();
 const item = (en: string) => data.CATALOG.find((x) => x.en === en)!;
 const sourcesOf = (i: core.CatalogItem) => core.itemSources(i);
 /** Items by where they were released. */
-const only = (k: string) => data.CATALOG.filter((i) => sourcesOf(i).every((s) => s === k));
-const rulebook = data.CATALOG.find((i) => !(i.settings ?? []).length)!;
+const only = (k: string) => data.CATALOG.filter((i) => sourcesOf(i).length > 0 && sourcesOf(i).every((s) => s === k));
+const rulebook = data.CATALOG.find((i) => i.en === 'Axe')!;
 const warbandOwn = data.CATALOG.find((i) => (i.settings ?? []).some((s) => s.startsWith('warband:')))!;
 const shared = data.CATALOG.find((i) => sourcesOf(i).includes('core') && sourcesOf(i).includes('khemri'))!;
 
@@ -38,9 +38,10 @@ describe('the settings as data (#164)', () => {
 });
 
 describe('the items of a setting (#165)', () => {
-  it('says where an item was released: the core chart where no setting is named, a warband for its own items', () => {
-    expect(core.itemSources(rulebook)).toEqual(['core']);
-    expect(core.itemSources(item('Magic gourd'))).toEqual(['core', 'khemri']);
+  it('says where an item was released: the rulebook for its items, the settings whose chart lists it, a warband for its own, none where the data traces it nowhere', () => {
+    expect(core.itemSources(rulebook)).toContain('core');
+    expect(core.itemSources(data.CATALOG.find((i) => !i.vanilla && !(i.settings ?? []).length)!)).toEqual([]);
+    expect(core.itemSources(item('Magic gourd'))).toEqual(['khemri']);
     expect(core.itemSources(item('Trade Wagon'))).toEqual(['warband']);
     expect(core.itemSources(warbandOwn)).toEqual(['warband']);
   });
@@ -70,12 +71,61 @@ describe('the items of a setting (#165)', () => {
     expect(core.catalogIn(data, all)).toHaveLength(data.CATALOG.length);
     const mordheim = core.catalogIn(data, ['core']);
     expect(mordheim.length).toBeLessThan(data.CATALOG.length);
-    expect(mordheim.every((i) => sourcesOf(i).some((k) => k === 'core' || k === 'warband'))).toBe(true);
+    expect(mordheim.every((i) => !sourcesOf(i).length || sourcesOf(i).some((k) => k === 'core' || k === 'warband'))).toBe(true);
   });
 
   it('names a setting by its id, and knows only the settings of the data', () => {
     expect(core.settingName(data, 'khemri')).toBe('Khemri');
     expect(core.settingName(data, 'warband')).toBe('A warband\'s own item');
     expect(core.settingName(data, 'somewhere-else')).toBe('Somewhere Else');
+  });
+});
+
+/* The audit of Rob's order of 30.10.2026: every item of the catalogue checked against mordheimer.net – an item is vanilla when the
+   rulebook has it ("Mordheim Rulebook (core)" on the weapons, armour and equipment pages, or the core price chart). */
+describe('the vanilla items (#165, audit of 30.10.2026)', () => {
+  const vanilla = data.CATALOG.filter((i) => core.itemIsVanilla(i));
+
+  it('are the items of the rulebook: weapons, armour and equipment of its pages and its price chart', () => {
+    expect(vanilla.length).toBe(68);
+    for (const en of ['Axe', 'Dagger', 'Bow', 'Handgun', 'Buckler', 'Garlic', 'Bugman\'s Ale', 'Elven Cloak', 'Lantern', 'Rope & Hook', 'Warhorse', 'Wardog']) {
+      expect(core.itemIsVanilla(data.CATALOG.find((i) => i.en.toLowerCase() === en.toLowerCase())!), en).toBe(true);
+    }
+  });
+
+  it('are not the items of a setting or a Town Cryer: the Magic Gourd, the Pike, the Torch, the Sea dragon cloak', () => {
+    for (const en of ['Magic gourd', 'Pike', 'Torch', 'Sea dragon cloak', 'Lamp of the Djinn', 'Wheelbarrow']) {
+      expect(core.itemIsVanilla(item(en)), en).toBe(false);
+    }
+  });
+
+  it('are what `core` stands for: no item carries `core` in its settings without being in the rulebook', () => {
+    const wrong = data.CATALOG.filter((i) => (i.settings ?? []).includes('core') && !i.vanilla).map((i) => i.en);
+    expect(wrong).toEqual([]);
+    const rest = data.CATALOG.filter((i) => i.vanilla && (i.settings ?? []).length && !(i.settings ?? []).includes('core') && !(i.settings ?? []).every((s) => s.startsWith('warband:'))).map((i) => i.en);
+    expect(rest).toEqual([]);
+  });
+
+  it('make the vanilla catalogue: all of them, nothing else, and none of Khemri', () => {
+    const v = core.catalogVanilla(data);
+    expect(v).toHaveLength(68);
+    expect(v.every((i) => i.vanilla === true)).toBe(true);
+    expect(v.some((i) => i.en === 'Magic gourd')).toBe(false);
+    expect(v.some((i) => core.itemSources(i).includes('khemri') && !core.itemSources(i).includes('core'))).toBe(false);
+  });
+
+  it('say how the skills stand: every skill of the five lists is the rulebook\'s, so the vanilla skill lists are those', () => {
+    expect(data.VANILLA.skillLists).toEqual(Object.keys(data.SKILLLISTS));
+    expect(data.VANILLA.skillLists).toEqual(['combat', 'shooting', 'academic', 'strength', 'speed']);
+    for (const k of data.VANILLA.skillLists) expect(core.isVanillaSkillList(data, k), k).toBe(true);
+    expect(core.isVanillaSkillList(data, 'sneaky')).toBe(false);
+  });
+
+  it('keeps vanilla off by default: a standard campaign has every item and every skill to choose from', () => {
+    expect(data.VANILLA.default).toBe(false);
+    expect(data.VANILLA.name).toBe('Vanilla Mordheim');
+    expect(core.catalogForCampaign(data, { vanilla: false })).toHaveLength(data.CATALOG.length);
+    expect(core.catalogForCampaign(data, {})).toHaveLength(data.CATALOG.length);
+    expect(core.catalogForCampaign(data, { vanilla: true })).toHaveLength(68);
   });
 });

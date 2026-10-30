@@ -123,5 +123,23 @@ describe('the names of the settings', () => {
   it('are those of data/settings.json, so the list of the "Released with" choice cannot drift from the data', () => {
     for (const s of data.SETTINGS) expect(sourceName(s.id), s.id).toBe(core.settingName(data, s.id));
     expect(sourceName('warband')).toBe(core.settingName(data, 'warband'));
+    expect(sourceName('other')).toBe(core.settingName(data, 'other'));
+  });
+});
+
+describe('where an item was released, with the vanilla audit (#165)', () => {
+  const at = (settings: string[], vanilla?: boolean) => ({ settings, ...(vanilla === undefined ? {} : { vanilla }) });
+  it('is the core rules for the rulebook\'s items, whatever charts also list them', () => {
+    expect(sourceKeys(at([], true))).toEqual(['core']);
+    expect(sourceKeys(at(['border-town-burning'], true))).toEqual(['core', 'border-town-burning']);
+  });
+  it('is only the settings for an item the rulebook does not have – not the core rules any more', () => {
+    expect(sourceKeys(at(['khemri'], false))).toEqual(['khemri']);
+    expect(releasedWith(at(['khemri'], false))).toEqual(['Khemri']);
+  });
+  it('is "not from the rulebook" for one the data traces to no setting', () => {
+    expect(sourceKeys(at([], false))).toEqual(['other']);
+    expect(releasedWith(at([], false))).toEqual(['Not from the rulebook']);
+    expect(sourceOptions([at([], false), at([], true)]).map(([k]) => k)).toEqual(['core', 'other']);
   });
 });

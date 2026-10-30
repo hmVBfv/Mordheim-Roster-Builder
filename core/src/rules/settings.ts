@@ -3,19 +3,20 @@
    brings with it. Pure: it only reads the catalogue entry and the data. */
 import type { CatalogItem, GameData } from '../data/types.ts';
 
-/** The sources of an item: the settings that list it, `warband` for a warband's own, and `core` for what the core chart has
-    (an item no setting names is the core chart's). */
-export function itemSources(item: Pick<CatalogItem, 'settings'>): string[] {
-  const named = item.settings ?? [];
-  if (!named.length) return ['core'];
+/** The sources of an item: the settings whose price chart lists it, `warband` for a warband's own, and `core` for the rulebook's items
+    (`vanilla`). An item that none of these names comes from a list the data does not trace to a setting: no source. */
+export function itemSources(item: Pick<CatalogItem, 'settings' | 'vanilla'>): string[] {
   const out = new Set<string>();
-  for (const s of named) out.add(s.startsWith('warband:') ? 'warband' : s);
+  if (item.vanilla) out.add('core');
+  for (const s of item.settings ?? []) out.add(s.startsWith('warband:') ? 'warband' : s);
   return [...out];
 }
 
-/** Is the item for a campaign that plays in these settings? What the core chart lists and a warband's own items always are. */
-export function itemInSettings(item: Pick<CatalogItem, 'settings'>, played: readonly string[]): boolean {
-  return itemSources(item).some((k) => k === 'core' || k === 'warband' || played.includes(k));
+/** Is the item for a campaign that plays in these settings? The rulebook's items and a warband's own always are, and so is one that
+    no setting claims; the rest only where one of its settings is played. */
+export function itemInSettings(item: Pick<CatalogItem, 'settings' | 'vanilla'>, played: readonly string[]): boolean {
+  const sources = itemSources(item);
+  return !sources.length || sources.some((k) => k === 'core' || k === 'warband' || played.includes(k));
 }
 
 /** The catalogue as a campaign that plays in these settings has it. */
@@ -28,5 +29,20 @@ const titled = (slug: string) => slug.split('-').map((w) => (w.length > 2 ? w[0]
 /** What a source is called: a setting by its name, `warband` for a warband's own item, anything else by its slug made readable. */
 export function settingName(data: Pick<GameData, 'SETTINGS'>, key: string): string {
   if (key === 'warband') return 'A warband\'s own item';
+  if (key === 'other') return 'Not from the rulebook';
   return data.SETTINGS.find((s) => s.id === key)?.name ?? titled(key);
 }
+
+/** Is the item in the original rulebook (the vanilla option keeps only these)? */
+export const itemIsVanilla = (item: Pick<CatalogItem, 'vanilla'>): boolean => item.vanilla === true;
+
+/** The catalogue of a campaign that plays vanilla: the rulebook's items only. */
+export const catalogVanilla = (data: Pick<GameData, 'CATALOG'>): CatalogItem[] => data.CATALOG.filter(itemIsVanilla);
+
+/** The catalogue as a campaign has it: vanilla (off unless switched on) keeps only the rulebook's items, otherwise every item. */
+export function catalogForCampaign(data: Pick<GameData, 'CATALOG'>, options: { vanilla?: boolean }): CatalogItem[] {
+  return options.vanilla ? catalogVanilla(data) : [...data.CATALOG];
+}
+
+/** Is this skill list the rulebook's? Every skill of the five lists is. */
+export const isVanillaSkillList = (data: Pick<GameData, 'VANILLA'>, list: string): boolean => data.VANILLA.skillLists.includes(list);

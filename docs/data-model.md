@@ -304,14 +304,26 @@ Lustria, Albion, The Nemesis Crown, The Procession of Morr): `id` (der Slug ihre
 in `CATALOG[…].settings` nennt), `name`, `tagline` (der Titel auf der Seite), `area` (wo gespielt wird), `url`, `summary`.
 Nur die neue App liest die Datei (`DATA_FILES`, `GameData.SETTINGS`), die frühere App lädt sie nicht.
 
-Woher ein Gegenstand stammt, sagt `CATALOG[…].settings` und `.source` (die Adressen, auf denen er gelesen wurde):
-kein Eintrag = die Preistabelle des Regelbuchs, `warband:<Seite>` = die Liste einer Warband, sonst die Settings, deren
-Preistabelle ihn führt. `core/src/rules/settings.ts` liest das: `itemSources`, `itemInSettings(item, gespielte)` (die
-Preistabelle des Regelbuchs und die eigenen Gegenstände einer Warband gelten immer), `catalogIn(data, gespielte)`.
-Eine Kampagne speichert noch nicht, in welchen Settings sie spielt; das und das Anwenden im Warband-Tab und bei der
-Erstellung folgen mit einem späteren Wunsch. Ein Test prüft, dass jedes genannte Setting in der Datei steht und dass jeder
-Gegenstand, der auf der Seite eines Settings gelesen wurde, dieses Setting nennt.
+Woher ein Gegenstand stammt, sagt `CATALOG[…].vanilla`, `.settings` und `.source`:
 
-Offen (Entscheidung von Rob): Das Kennzeichen `core` steht bei rund 100 Gegenständen, von denen viele (Beispiel Magic Gourd) nicht in
-der Preistabelle des Regelbuchs (https://mordheimer.net/docs/trading-post) stehen. Solange das so ist, bleiben sie in jeder
-Kampagne sichtbar, auch wenn sie nur zu einem Setting gehören.
+- `vanilla: true` = im ursprünglichen Regelbuch (auf den Seiten „Mordheim Rulebook (core)“ der Waffen, Rüstungen und der Ausrüstung
+  oder in der Kerntabelle der Preise von mordheimer.net). Eine Prüfung Gegenstand für Gegenstand am 30.10.2026 hat 68 von 310
+  gefunden; die übrigen sind aus Settings, Town Cryer oder Listen einer Warband. Fehlt das Feld, ist er nicht im Regelbuch.
+- `settings` = die Preistabellen der Settings, die ihn führen (`border-town-burning`, `empire-in-flames`, `khemri`, `lustria` …),
+  `warband:<Seite>` = die Liste einer Warband. `core` steht nur noch bei Gegenständen, die auch `vanilla` sind (ein Test hält
+  das fest; 47 Gegenstände trugen es zu Unrecht, zum Beispiel der Magic Gourd).
+- `source` = die Adressen, auf denen er gelesen wurde.
+
+`core/src/rules/settings.ts` liest das: `itemIsVanilla`, `catalogVanilla`, `catalogForCampaign(data, { vanilla })`,
+`itemSources`, `itemInSettings(item, gespielte)` (Gegenstände des Regelbuchs und die eigenen einer Warband gelten dort immer),
+`catalogIn(data, gespielte)`, `isVanillaSkillList`.
+
+**Vanilla Mordheim** (`VANILLA` in `data/settings.json`, Wunsch von Rob, 30.10.2026): eine Option einer Kampagne, standardmäßig
+aus. Eine Kampagne ohne sie ist die Standardkampagne: alle Gegenstände und alle Fertigkeiten sind wählbar. Mit ihr bleiben nur die
+Gegenstände mit `vanilla` und die fünf Fertigkeitenlisten des Regelbuchs (Combat, Shooting, Academic, Strength, Speed; die Prüfung
+am 30.10.2026 hat gezeigt, dass jede Fertigkeit dieser Listen die des Regelbuchs ist). Gebiete (Khemri, Lustria …) bleiben
+eine zweite, spätere Einschränkung. Eine Kampagne speichert noch nicht, ob sie Vanilla spielt oder in welchen Gebieten; das und das
+Anwenden im Warband-Tab und bei der Erstellung folgen mit einem späteren Wunsch.
+
+Nicht geprüft und nicht geändert: Fertigkeiten und Gegenstände, die nur eine Warband hat (Sonderfertigkeiten, eigene Listen).
+Die Seiten des Regelbuchs führen ein Riding/Draft Horse (40 gc, Rare 8), das der Katalog nur als Variante je Setting kennt.
