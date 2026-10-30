@@ -65,6 +65,15 @@ function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b
       .catch((err: unknown) => setError(errorText(err)))
       .finally(() => setBusy(false));
   };
+  // a fixed report is finished: the reporter has read "fixed in …", so it is not sorted again (#142)
+  if (bug.status === 'fixed') {
+    return (
+      <div className={ui.page}>
+        <p className={ui.muted}>This fixed report is locked and cannot be changed any more.</p>
+        <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={close}>Close</button></div>
+      </div>
+    );
+  }
   return (
     <form className={ui.page} onSubmit={save}>
       <div className={styles.sorting}>

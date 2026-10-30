@@ -410,6 +410,22 @@ describe('the admin’s reports', () => {
     await waitFor(() => expect(srv.state.bugs[0]).toMatchObject({ status: 'fixed', fixedIn: '3f2a9c1' }));
   });
 
+  it('#142: a fixed report is read-only: no sorting, no Save, only the way to hand it on', async () => {
+    const { srv } = server('admin');
+    seed(srv);
+    const user = userEvent.setup();
+    at('/admin/bugs');
+    await screen.findByRole('table', { name: 'Reports' });
+    await user.selectOptions(screen.getByLabelText('Status'), 'fixed');
+    await user.click(await screen.findByRole('button', { name: 'Open: Old fix' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Old fix' });
+    expect(within(sheet).getByText(/fixed report is locked/i)).toBeTruthy();
+    expect(within(sheet).queryByLabelText('Status')).toBeNull();
+    expect(within(sheet).queryByRole('button', { name: 'Save' })).toBeNull();
+    expect(within(sheet).getByRole('button', { name: 'Copy for Claude' })).toBeTruthy();
+    expect(srv.state.bugs.find((b) => b.title === 'Old fix')).toMatchObject({ status: 'fixed', fixedIn: 'f00dbee' });
+  });
+
   it('a headline stands over the report in the list and the sheet; the words sit below it, folded to a few lines until opened up', async () => {
     const { srv } = server('admin');
     const long = `${'The gold on the sheet is off after the battle. '.repeat(12)}The end.`;

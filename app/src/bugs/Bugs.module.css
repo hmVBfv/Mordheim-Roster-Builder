@@ -216,7 +216,7 @@
   flex: 1 1 140px;
 }
 
-/* the reports as a table: columns from tablet width on, a card per row on a phone (the cells carry
+/* the reports as a table: columns from 860 px on, a card per row below (phone and tablet) (the cells carry
    their column's name in data-label, so nothing scrolls sideways at 360 px) */
 .tableWrap {
   margin-block: var(--space-2);
@@ -244,11 +244,26 @@
   overflow-wrap: anywhere;
 }
 
+/* the short columns never break inside a cell – not the number, not "Fixed in …", not the button (#141, #143);
+   the report's words and the area give way instead */
+@media (min-width: 860px) {
+  .table td[data-label='#'],
+  .table td[data-label='Kind'],
+  .table td[data-label='Status'],
+  .table td[data-label='Severity'],
+  .table td[data-label='Reported'],
+  .table td[data-label='Last change'],
+  .table td[data-label=''] {
+    overflow-wrap: normal;
+    white-space: nowrap;
+  }
+}
+
 .titleCell .flag {
   margin-left: var(--space-1);
 }
 
-@media (max-width: 699px) {
+@media (max-width: 859px) {
   .table thead {
     position: absolute;
     width: 1px;

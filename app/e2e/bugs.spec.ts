@@ -107,4 +107,30 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(sheet).toBeHidden();
     await expect(table.getByRole('row')).toHaveCount(2);
   });
+  test(`the reports table of a desktop keeps its short cells on one line, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    await page.setViewportSize({ width: 860, height: 900 });
+    const srv = await playServer(page, true, { admin: true });
+    srv.bugFrom({ title: 'Gold drifts after the second battle', text: 'x', reporterName: 'Ben', status: 'fixed', fixedIn: '3f2a9c1', severity: 'S1', area: 'gold ledger' });
+    srv.bugFrom({ title: 'The tooltip says five', text: 'y', reporterName: 'Anna', status: 'in_progress', severity: 'S3', kind: 'rules' });
+    srv.bugFrom({ title: 'A third one', text: 'z', reporterName: 'Kai' });
+    await page.goto('admin/bugs');
+    await page.getByLabel('Status').selectOption('all');
+    const table = page.getByRole('table', { name: 'Reports' });
+    await expect(table.getByRole('row')).toHaveCount(4);
+    // #141, #143: the number, kind, status ("Fixed in …"), severity, dates and the button never break inside themselves
+    for (const col of ['#', 'Kind', 'Status', 'Severity', 'Reported', 'Last change', '']) {
+      for (const cell of await table.locator(`td[data-label="${col}"]`).all()) {
+        const lines = await cell.evaluate((el) => {
+          // the lines of the text itself (a button's own box is not a line)
+          const tops = new Set<number>();
+          const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          for (let t = walk.nextNode(); t; t = walk.nextNode()) { const r = document.createRange(); r.selectNodeContents(t); for (const x of r.getClientRects()) tops.add(Math.round(x.top)); }
+          return tops.size;
+        });
+        expect(lines, `column "${col}" stays on one line`).toBeLessThanOrEqual(1);
+      }
+    }
+    await noSideScroll(page);
+  });
 }
