@@ -3,6 +3,7 @@
    app.inject, as a browser on the app's own origin would send them. */
 import type { LightMyRequestResponse } from 'fastify';
 import type { LiveOptions } from '../src/live.ts';
+import type { Notify } from '../src/notify.ts';
 import { createInvite, createSession, createUser, userByName } from '../src/accounts.ts';
 import { hashPassword, type HashCost } from '../src/passwords.ts';
 import { COOKIE } from '../src/routes-accounts.ts';
@@ -26,9 +27,9 @@ export interface Req {
   headers?: Record<string, string>;
 }
 
-export async function startAccounts(opts: { env?: NodeJS.ProcessEnv; live?: Partial<LiveOptions>; closeGraceMs?: number; geo?: (ip: string) => string } = {}) {
+export async function startAccounts(opts: { env?: NodeJS.ProcessEnv; live?: Partial<LiveOptions>; closeGraceMs?: number; geo?: (ip: string) => string; notify?: Notify } = {}) {
   const c = clock();
-  const s = await startServer({ now: c.now, hashCost: FAST, env: { TOTP_KEY, PUBLIC_ORIGIN: ORIGIN, ...opts.env }, ...(opts.live ? { live: opts.live } : {}), ...(opts.geo ? { geo: opts.geo } : {}), ...(opts.closeGraceMs ? { closeGraceMs: opts.closeGraceMs } : {}) });
+  const s = await startServer({ now: c.now, hashCost: FAST, env: { TOTP_KEY, PUBLIC_ORIGIN: ORIGIN, ...opts.env }, ...(opts.live ? { live: opts.live } : {}), ...(opts.geo ? { geo: opts.geo } : {}), ...(opts.notify ? { notify: opts.notify } : {}), ...(opts.closeGraceMs ? { closeGraceMs: opts.closeGraceMs } : {}) });
   const key = parseKey(TOTP_KEY)!;
 
   async function call(r: Req): Promise<LightMyRequestResponse> {

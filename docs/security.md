@@ -68,6 +68,12 @@ Gelegenheitsangriffe sicher abzuwehren.
   von Anfang an möglich. Schriften werden selbst ausgeliefert, nicht von
   Google Fonts geladen.
 
+- **Ein ausgehender Aufruf: ntfy** (Rob, 31.10.2026). Wenn `NTFY_URL` gesetzt ist, schickt der Server bei einer neuen Meldung einen
+  POST an diese Adresse (`https://ntfy.sh/<Kanal>`): Titel und ein Satz, nur dass es eine Meldung gibt und von welcher Art – nie ihr
+  Text, nie ein Name, nie eine Warband. Der Kanalname ist das Geheimnis; die Adresse steht nur in `app.env` und wird nirgends
+  geloggt (auch nicht in Fehlertexten). Der Aufruf wird nicht abgewartet (Zeitgrenze 5 s) und hält nichts auf. Das Browser-CSP (`connect-src 'self'`)
+  betrifft ihn nicht: er geht vom Server aus.
+
 ## 3. Anmeldung
 
 Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,

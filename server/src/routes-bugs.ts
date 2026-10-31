@@ -5,8 +5,9 @@
 import type { FastifyInstance } from 'fastify';
 import { bugByRef, listBugs, myBugs, oneBug, oneOfMine, patchBug, PatchBody, reportBug, ReportBody, STATUSES } from './bugs.ts';
 import type { DB } from './db.ts';
+import type { Notify } from './notify.ts';
 
-export interface BugDeps { db: DB | null; now: () => Date }
+export interface BugDeps { db: DB | null; now: () => Date; notify?: Notify | null }
 
 const problem = (error: { issues: { path: PropertyKey[]; message: string }[] }, what: string) =>
   `not ${what} (${error.issues.slice(0, 2).map((i) => `${i.path.join('.') || '(top)'}: ${i.message}`).join('; ')})`;
@@ -20,6 +21,10 @@ export function registerBugRoutes(app: FastifyInstance, deps: BugDeps): void {
     if (!parsed.success) return reply.code(400).send({ error: 'invalid', problem: problem(parsed.error, 'a report') });
     const r = reportBug(db(), req.actor!.id, parsed.data, deps.now(), req.actor!.isAdmin);
     if (!r.ok) return reply.code(r.status).send({ error: r.error, ...(r.problem ? { problem: r.problem } : {}) });
+    // a message on Rob's phone: that there is one and its kind, never its words; not for the admin's own, and never in the report's way
+    if (r.created && !req.actor!.isAdmin && deps.notify) {
+      try { deps.notify({ title: 'Mordheim: new report', message: `A new ${parsed.data.kind} report is in.` }); } catch { /* the report is saved */ }
+    }
     return reply.code(r.created ? 201 : 200).send({ bug: oneOfMine(r.bug) });
   });
 
