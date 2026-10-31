@@ -41,3 +41,20 @@ test('send to the campaign server: the address once in Settings, then a link tha
   await noSideScroll(page);
   await shot(page, 'export-send-to-server');
 });
+
+test('the rules: from Settings, a chapter at 360 px, and a search that finds hiding by hide', async ({ page }) => {
+  await page.goto('#/settings');
+  await page.getByRole('link', { name: 'Rules', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 2, name: 'Characteristics' })).toBeVisible();
+  await page.getByRole('link', { name: 'Shooting', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 2, name: 'Shooting' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'rules-chapter');
+
+  await page.getByRole('searchbox', { name: 'Search the rules' }).fill('hide');
+  const results = page.getByRole('region', { name: 'Search results' });
+  await expect(results.locator('mark').first()).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'rules-search');
+});

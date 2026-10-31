@@ -1,5 +1,6 @@
 /* The account (campaign app) and the settings of this device. */
 import { lazy, Suspense, useState } from 'react';
+import { Link } from 'react-router';
 import { WhatsNewButton } from '../changelog/WhatsNew.tsx';
 import { cleanServer, getServer, setServer } from '../share/link.ts';
 import { accountLabel } from '../app/nav.ts';
@@ -56,6 +57,7 @@ export function More() {
         {APP_NAME} · version <span title={__APP_VERSION__}>{shownVersion(__APP_VERSION__)}</span>
         {FLAVOUR === 'quickbuild' && ' · warbands stay on this device'}
       </p>
+      <div className={ui.row}><Link to="/rules" className={ui.buttonQuiet}>Rules</Link></div>
       <WhatsNewButton />
     </section>
   );
