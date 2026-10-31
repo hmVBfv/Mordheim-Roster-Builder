@@ -19,6 +19,7 @@ const TradingPost = lazy(() => import('../routes/TradingPost.tsx').then((m) => (
 const Hire = lazy(() => import('../routes/Hire.tsx').then((m) => ({ default: m.Hire })));
 const HouseRules = lazy(() => import('../routes/HouseRules.tsx').then((m) => ({ default: m.HouseRules })));
 const Districts = lazy(() => import('../routes/Districts.tsx').then((m) => ({ default: m.Districts })));
+const Rules = lazy(() => import('../rules/Rules.tsx').then((m) => ({ default: m.Rules })));
 const Story = lazy(() => import('../story/Story.tsx').then((m) => ({ default: m.Story })));
 // accounts: only the campaign app has a server (phase 3g)
 const SignIn = lazy(() => import('../account/SignIn.tsx').then((m) => ({ default: m.SignIn })));
@@ -69,6 +70,7 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/versions" element={<Versions />} />}
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/aftermath/:bid" element={<Aftermath />} />}
           {FLAVOUR === 'campaign' && <Route path="/import" element={<ImportLink />} />}
+          <Route path="/rules" element={<Rules />} />
           <Route path={ACCOUNT} element={<More />} />
           <Route path="/more" element={<Navigate to={ACCOUNT} replace />} />
           {FLAVOUR === 'campaign' && <Route path="/library" element={<Navigate to="/library/ideas" replace />} />}

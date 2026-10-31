@@ -48,7 +48,7 @@ export function resetTrail(): void {
 export const SCREEN_WORDS: ReadonlySet<string> = new Set([
   'warbands', 'new', 'export', 'trade', 'hire', 'house', 'districts', 'story', 'versions', 'aftermath', 'campaign', 'battles', 'house-rules', 'notes', 'sign-in', 'invite', 'reset',
   'admin', 'import', 'more', 'account', 'settings', 'home', 'users', 'invites', 'logins', 'audit', 'bugs', 'reports', 'library', 'ideas', 'locations',
-  'manage', 'timeline', 'chronicle', 'questions', 'world', 'background', 'as-player',
+  'rules', 'manage', 'timeline', 'chronicle', 'questions', 'world', 'background', 'as-player',
 ]);
 
 /** `/warbands/3f2a…/trade` → `/warbands/:id/trade`. */
