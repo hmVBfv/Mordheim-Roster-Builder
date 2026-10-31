@@ -27,7 +27,7 @@ function StartSheet() {
     setBusy(true);
     setError(null);
     try {
-      const v = await startCampaign(name, place, vanilla);
+      const v = await startCampaign(name, vanilla ? 'mordheim' : place, vanilla);
       close(() => void navigate(`/campaign/${v.campaign.id}/manage`));
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   };
@@ -44,8 +44,8 @@ function StartSheet() {
           </label>
           {lore && (
             <label className={ui.field}>
-              <span>Place (optional)</span>
-              <select className={ui.select} value={place} onChange={(e) => setPlace(e.target.value)}>
+              <span>Place{vanilla ? ' (the rulebook is set in Mordheim)' : ' (optional)'}</span>
+              <select className={ui.select} value={vanilla ? 'mordheim' : place} disabled={vanilla} onChange={(e) => setPlace(e.target.value)}>
                 <option value="">No particular place</option>
                 {placeChoices(lore).map((p) => <option key={p.id} value={p.id}>{'\u00A0\u00A0'.repeat(p.depth)}{p.name}</option>)}
               </select>

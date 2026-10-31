@@ -70,6 +70,27 @@ describe('the place of a campaign (#66)', () => {
   });
 });
 
+describe('the place of a Vanilla campaign (#174)', () => {
+  it('is Mordheim, whether the app sends it or not, and nothing else', async () => {
+    const { anna } = await world();
+    const none = await anna('POST', '/campaigns', { name: 'Vanilla without a place', vanilla: true });
+    expect(none.statusCode).toBe(201);
+    expect((none.json() as { campaign: { place: string; vanilla: boolean } }).campaign).toMatchObject({ place: 'mordheim', vanilla: true });
+    const same = await anna('POST', '/campaigns', { name: 'Vanilla in Mordheim', vanilla: true, place: 'mordheim' });
+    expect((same.json() as { campaign: { place: string } }).campaign.place).toBe('mordheim');
+    // another place is refused, and nothing is made
+    const other = await anna('POST', '/campaigns', { name: 'Vanilla elsewhere', vanilla: true, place: 'ostermark' });
+    expect(other.statusCode).toBe(400);
+    expect((await anna('GET', '/campaigns')).json()).toMatchObject({ campaigns: [{ name: 'Vanilla without a place' }, { name: 'Vanilla in Mordheim' }] });
+  });
+
+  it('leaves the place of any other campaign as it is', async () => {
+    const { anna } = await world();
+    const made = await anna('POST', '/campaigns', { name: 'Ostermark, with every item', place: 'ostermark' });
+    expect((made.json() as { campaign: { place: string } }).campaign.place).toBe('ostermark');
+  });
+});
+
 describe('members', () => {
   it('a leader adds players and changes roles; a campaign keeps a leader', async () => {
     const { id, anna, kai, ben, rob, ids } = await campaign();
