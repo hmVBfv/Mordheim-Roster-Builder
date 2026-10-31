@@ -1,6 +1,6 @@
 /* The campaign's style guide (phase 4b4a; docs/architecture.md "Endpunkte"):
    the writing instructions of the AI pack. Leaders' own: read and written by
-   the campaign's leaders with the authenticator; for anybody else the
+   the campaign's leaders; for anybody else the
    campaign's members get a 403 and an outsider a 404. Every route names its
    action, `can()` decides before the handler runs. */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';

@@ -4538,6 +4538,17 @@ counted by a core action `countBattle` that the aftermath's step "Grant the batt
 the killed in it are counted in their Fallen record, so the Fallen can say after how many battles they fell. The stack: 290 on 286 (Fallen),
 289 on 288 on 282 (settings, vanilla, horse).
 
+## October 31, 2026 — leaders without the authenticator (#168)
+
+Rob decided #168 plainly: the authenticator only for the admin's things of the website; anybody leads a campaign and uses all of it, the hidden
+contents included. ADR 0030 replaces what ADR 0008 (the leader's second factor), 0022 and 0027 ("leaders with the authenticator") said. In the
+code the whole rule sat in one place: `policy.ts` – `campaigns.create` was `totp`, and the target "leader" asked for `role === 'leader' &&
+actor.totp`; every hidden-content endpoint goes through `can()`, so changing those two lines opened them all. The rest was everything that
+had written the old rule down: 19 server tests that kept "Ben, who leads without the authenticator" away (he is a leader now, and the
+tests say so), the leak matrix (the user role may start a campaign), the app's tabs and buttons (`user.totp` in seven places, `canLead` on the
+member list), ten app tests, and the comments and docs. What is lost, and written in the ADR: a stolen password of a leader now reads the hidden
+parts of the campaign. A later option "the authenticator for the leaders of this campaign" is possible, not built.
+
 ## October 31, 2026 — Vanilla Mordheim for a campaign (#167, step 2)
 
 Rob's wish #167 (new warbands restricted to a campaign, Vanilla or Core) came in three steps; he chose to start with the campaign (2), so the
@@ -4549,3 +4560,10 @@ House rules screen with a confirmation, and the lists of "Enter a warband" and "
 items and skills of the campaign (that is step 1, the warbands carrying the setting) and the areas (Khemri, Lustria …). One trap on the way: the
 campaign view is also read by the app's offline copy, so `vanilla` is optional in its type (a view kept from before it). #168 (leaders without
 an authenticator) is left for Rob: it changes ADR 0008 and what ADRs 0022 and 0027 say about "leaders with the authenticator".
+
+#169 (stacked on #167's pull request for the migration number): the opening scene of a campaign, under World. Rob: "take the description text,
+not an introduction of my own". A column `campaigns.opening` (migration 43) and `PUT /campaigns/:id/opening`; empty, the app shows the Lore's
+description of the campaign's place, marked "From the Lore · Khemri"; the leader's sheet starts from the text shown, so the Lore's can be edited,
+and "Use the Lore text" empties theirs. All 120 places have a text, so there is nothing to mark per place beyond that label. Two traps: the
+sheet's text area kept the text in the page while closed (the same thing as the changelog sheet, which a test of another screen had found), so
+the form is only there while it is open; and `useSheet`'s close callback is where the form is taken away.

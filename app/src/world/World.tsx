@@ -28,6 +28,7 @@ import { addReputation, LIMITS, nameOf, otherName, putFaction, putNpc, removeFac
 import { bodyOf, draftOf, npcTemplates, type NpcDraft } from './npcDraft.ts';
 import { FromLibrary, NpcsFromLibrary } from './FromLibrary.tsx';
 import { useWorld } from './useWorld.ts';
+import { OpeningScene } from './OpeningScene.tsx';
 import styles from './World.module.css';
 
 const NpcFields = lazy(() => import('./NpcFields.tsx').then((m) => ({ default: m.NpcFields })));
@@ -222,7 +223,7 @@ function Person({ n, lead, online, onEdit, onRemove, onKeep, onCopied }: { n: Np
 
 const LOG_SHOWN = 30;
 
-export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; lead: boolean }) {
+export function WorldTab({ id, view, lead, onView }: { id: string; view: CampaignView; lead: boolean; onView: (v: CampaignView) => void }) {
   const { data, setData, error } = useWorld(id);
   const online = useOnline();
   const [notice, notify] = useNotice();
@@ -271,6 +272,7 @@ export function WorldTab({ id, view, lead }: { id: string; view: CampaignView; l
 
   return (
     <div className={ui.page}>
+      <OpeningScene id={id} view={view} lead={lead} onView={onView} />
       <section className={styles.section} aria-labelledby="w-title">
         <h2 id="w-title">The world</h2>
         <p className={ui.muted}>

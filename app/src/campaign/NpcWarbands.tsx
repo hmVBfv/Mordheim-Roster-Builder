@@ -92,7 +92,7 @@ export function NpcWarbands({ id }: { id: string }) {
   };
 
   if (list === null && problem === null) return null;
-  // not a leader with the authenticator: the server has nothing to say, and nor has this page
+  // not a leader: the server has nothing to say, and nor has this page
   if (list === null) return null;
   return (
     <section className={styles.section} aria-labelledby="w-npc">

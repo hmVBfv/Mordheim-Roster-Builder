@@ -20,7 +20,7 @@ export type EnrolmentStatus = 'pending' | 'active' | 'declined' | 'left';
 
 const iso = (d: Date) => d.toISOString();
 
-export interface CampaignRow { id: string; name: string; round: number; place: string; vanilla: number; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
+export interface CampaignRow { id: string; name: string; round: number; place: string; vanilla: number; opening: string; house_rules: string; created_by: string; created_at: string; updated_at: string; archived_at: string | null; deleted_at: string | null; deleted_by: string | null }
 interface MemberRow { campaign_id: string; user_id: string; role: CampaignRole; joined_at: string; left_at: string | null; added_by: string | null }
 export interface EnrolmentRow {
   id: string; campaign_id: string; warband_id: string; player_id: string; status: EnrolmentStatus; from_round: number | null;
@@ -32,8 +32,7 @@ interface TagRow { id: string; warband_id: string; rev: number; kind: string; ca
 
 /** archived: filed away by this member for themselves (migration 24) – the list shows it in its own section. */
 export interface CampaignSummary { id: string; name: string; round: number; role: CampaignRole; members: number; warbands: number; createdAt: string; archived: boolean }
-/** `canLead` (the authenticator is set up) only for leaders to see. */
-export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string; canLead?: boolean }
+export interface Member { userId: string; displayName: string; username: string; role: CampaignRole; joinedAt: string }
 export interface Tag { id: string; kind: string; rev: number; round: number; battleId: string | null; totals: StageTotals; createdBy: string; createdAt: string }
 export interface Enrolment {
   id: string; warbandId: string; playerId: string; player: string; status: EnrolmentStatus; fromRound: number | null;
@@ -47,7 +46,7 @@ export interface Enrolment {
   districts: { id: string; name: string; hold: string }[];
 }
 export interface CampaignView {
-  campaign: { id: string; name: string; round: number; place: string; /** Plays Vanilla Mordheim: only the rulebook (#167). */ vanilla: boolean; houseRules: unknown; createdAt: string; updatedAt: string };
+  campaign: { id: string; name: string; round: number; place: string; /** Plays Vanilla Mordheim: only the rulebook (#167). */ vanilla: boolean; /** What a leader wrote of the opening scene; empty: the Lore's text of the place is shown (#169). */ opening: string; houseRules: unknown; createdAt: string; updatedAt: string };
   role: CampaignRole;
   members: Member[];
   enrolments: Enrolment[];
@@ -106,10 +105,10 @@ function standing(db: DB, warbandId: string, rev: number, house: unknown): Pick<
 
 export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): CampaignView {
   const house = JSON.parse(c.house_rules) as unknown;
-  const members = (db.prepare(`SELECT m.*, u.display_name, u.username, u.totp_enabled_at FROM members m JOIN users u ON u.id = m.user_id
+  const members = (db.prepare(`SELECT m.*, u.display_name, u.username FROM members m JOIN users u ON u.id = m.user_id
     WHERE m.campaign_id = ? AND m.left_at IS NULL ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'player' THEN 1 ELSE 2 END, u.display_name COLLATE NOCASE`).all(c.id) as
-    (MemberRow & { display_name: string; username: string; totp_enabled_at: string | null })[])
-    .map((m) => ({ userId: m.user_id, displayName: m.display_name, username: m.username, role: m.role, joinedAt: m.joined_at, ...(role === 'leader' ? { canLead: !!m.totp_enabled_at } : {}) }));
+    (MemberRow & { display_name: string; username: string })[])
+    .map((m) => ({ userId: m.user_id, displayName: m.display_name, username: m.username, role: m.role, joinedAt: m.joined_at }));
   const enrolments = (db.prepare(`SELECT e.*, u.display_name AS player, w.name, w.wb_type, w.head_rev, w.updated_at AS w_updated FROM enrolments e
     JOIN users u ON u.id = e.player_id JOIN warbands w ON w.id = e.warband_id
     WHERE e.campaign_id = ? AND e.status IN ('pending', 'active') ORDER BY e.created_at`).all(c.id) as
@@ -121,7 +120,7 @@ export function campaignView(db: DB, c: CampaignRow, role: CampaignRole): Campai
       ...standing(db, e.warband_id, e.head_rev, house),
     }));
   return {
-    campaign: { id: c.id, name: c.name, round: c.round, place: c.place, vanilla: c.vanilla === 1, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
+    campaign: { id: c.id, name: c.name, round: c.round, place: c.place, vanilla: c.vanilla === 1, opening: c.opening, houseRules: house, createdAt: c.created_at, updatedAt: c.updated_at },
     role, members, enrolments, battles: listBattles(db, c.id),
   };
 }
@@ -146,6 +145,15 @@ export function createCampaign(db: DB, c: { name: string; place?: string; vanill
     log(db, c.by, 'campaign.create', id, { type: 'campaign', id }, { name: c.name, ...(c.place ? { place: c.place } : {}), ...(c.vanilla ? { vanilla: true } : {}) }, now);
   })();
   return campaignById(db, id)!;
+}
+
+/** A leader writes the opening scene of the campaign (empty: the Lore's description of its place stands in for it). */
+export function setOpening(db: DB, c: CampaignRow, text: string, by: string, now: Date): void {
+  if (c.opening === text) return;
+  db.transaction(() => {
+    db.prepare('UPDATE campaigns SET opening = ?, updated_at = ? WHERE id = ?').run(text, iso(now), c.id);
+    log(db, by, 'campaign.opening', c.id, { type: 'campaign', id: c.id }, { chars: text.length }, now);
+  })();
 }
 
 /** A leader turns Vanilla off, for good: a running campaign is never turned to it (wish #167). */

@@ -76,7 +76,6 @@ export function warbandEntries(all: StoredWarband[], groups: LibraryWarbandGroup
 
 export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campaign: NavChild[]; admin: NavChild[]; library: NavChild[]; account: NavChild[] } {
   const session = useSession();
-  const totp = session.status === 'in' && session.user.totp;
   const all = useWarbands();
   // the groups of one's own warbands (a signed-in person's), as the device kept them
   const groups = useWarbandGroups(enabled && FLAVOUR === 'campaign' && session.status === 'in').groups;
@@ -96,7 +95,7 @@ export function useNavChildren(enabled: boolean): { warbands: NavChild[]; campai
     account: FLAVOUR === 'campaign' && session.status === 'in' ? ACCOUNT_TABS.map((t) => ({ to: t.to, label: t.label, end: t.end })) : [],
     campaign: entries.map((c) => ({
       to: `/campaign/${c.id}`, label: c.name,
-      ...(c.id === here ? { children: campaignTabs(c.id, open?.role ?? c.role, !!totp) } : {}),
+      ...(c.id === here ? { children: campaignTabs(c.id, open?.role ?? c.role) } : {}),
     })),
   };
 }

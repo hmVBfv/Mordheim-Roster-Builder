@@ -79,13 +79,19 @@ async function bringIn(user: ReturnType<typeof userEvent.setup>, o: { title: str
 }
 
 describe('chapter drafts', () => {
-  it('only a leader with the authenticator has the section; for everybody else nothing is even asked', async () => {
-    for (const [role, totp] of [['player', true], ['viewer', true], ['leader', false]] as const) {
+  it('only a leader has the section, with or without the authenticator (ADR 0030); for everybody else nothing is even asked', async () => {
+    for (const [role, totp] of [['player', true], ['viewer', true]] as const) {
       const { c, srv } = scene(role, { totp });
       at(`/campaign/${c.id}/chronicle`);
       await screen.findByText('No chapter has been published yet.');
       expect(screen.queryByRole('heading', { name: /Drafts/ })).toBeNull();
       expect(srv.state.calls.some((x) => x.includes('chapter-drafts'))).toBe(false);
+      cleanup(); stopSync(); resetSession(); localStorage.clear(); vi.restoreAllMocks();
+    }
+    for (const totp of [true, false]) {
+      const { c } = scene('leader', { totp });
+      at(`/campaign/${c.id}/chronicle`);
+      expect(await screen.findByRole('heading', { name: /Drafts/ })).toBeTruthy();
       cleanup(); stopSync(); resetSession(); localStorage.clear(); vi.restoreAllMocks();
     }
     const { c } = scene('leader');

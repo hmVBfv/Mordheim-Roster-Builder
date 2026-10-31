@@ -85,12 +85,12 @@ describe('asking', () => {
     await waitFor(() => expect(srv.state.questions.get(id)!.status).toBe('open'));
   });
 
-  it('a leader without the authenticator cannot ask – the server would refuse it', async () => {
+  it('a leader without the authenticator can ask like any leader (ADR 0030)', async () => {
     const srv = server({ totp: false });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
     at(`/campaign/${c.id}/questions`);
-    expect(await screen.findByRole('heading', { name: 'Questions for you' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Ask a question' })).toBeNull();
+    expect(await screen.findByRole('heading', { name: 'Questions to players' })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Ask a question' })).toBeTruthy();
   });
 
   it('a viewer has no Questions tab', async () => {

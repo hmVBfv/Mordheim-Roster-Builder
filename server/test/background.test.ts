@@ -39,11 +39,13 @@ async function world() {
 }
 
 describe('the background', () => {
-  it('only a leader with the authenticator reads or writes it; an outsider does not even know the campaign', async () => {
+  it('only a leader reads or writes it; an outsider does not even know the campaign', async () => {
     const { anna, ben, kai, vic, rob, bg, make } = await world();
     const { eid, r } = await make();
     expect(r.statusCode).toBe(200);
-    for (const who of [ben, kai, vic]) {
+    // Ben leads without the authenticator and reads it like Anna (ADR 0030)
+    expect(((await ben('GET', bg)).json() as { entries: unknown[] }).entries).toHaveLength(1);
+    for (const who of [kai, vic]) {
       expect((await who('GET', bg)).json()).toEqual({ error: 'forbidden' });
       expect((await who('GET', `${bg}/${eid}`)).statusCode).toBe(403);
       expect((await who('PUT', `${bg}/${randomUUID()}`, { kind: 'thread', title: 'Me too' })).statusCode).toBe(403);

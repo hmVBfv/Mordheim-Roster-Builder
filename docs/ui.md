@@ -453,6 +453,11 @@ Sisters of Sigmar, Skaven, Undead, Cult of the Possessed) – „Enter a warband
 campaign“ nur die sechs, und der Server weist die anderen mit 400 ab. Die Gegenstände und Fertigkeiten einer Vanilla-Kampagne sind damit noch
 nicht eingeschränkt: das kommt mit den Warbands (Schritt 1).
 
+**Eröffnungsszene (#169).** Ganz oben unter „World“ steht der Abschnitt „Opening scene“: was die Leiter geschrieben haben („Written by the leaders“),
+solange nichts geschrieben ist die Beschreibung des Ortes der Kampagne aus der Lore („From the Lore · Khemri“; alle 120 Orte haben einen Text, ohne
+Ort steht „No opening scene yet.“). Jedes Mitglied liest sie. Ein Leiter hat „Write your own“ (das Blatt beginnt mit dem angezeigten Text, so lässt
+sich der der Lore bearbeiten) und, wo etwas geschrieben ist, „Use the Lore text“, das den eigenen Text leert.
+
 **What's new (#154, ADR 0029).** Jede Änderung, die Spieler sehen, bringt eine Datei in `changelog/` mit (Datum, dann
 „New/Changed/Fixed“-Zeilen, kurz, ohne Nummern). Unter „More“ öffnet „What's new“ ein Blatt mit allen Änderungen, nach Tagen
 gruppiert, das Neueste oben. In der Meldung „New version available.“ steht zwischen Text und „Reload“ ein kleines „What's new“,

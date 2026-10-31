@@ -1,5 +1,5 @@
 # 0008 – Anmeldung nur auf Einladung, TOTP
-Status: angenommen · Datum: 2026-09-27
+Status: angenommen, **die Pflicht für Leiter ersetzt durch [0030](0030-authenticator-for-admins-only.md)** (30.10.2026: nur Admins) · Datum: 2026-09-27
 
 ## Kontext
 Der Server ist aus dem Internet erreichbar. Nutzer sind eine kleine

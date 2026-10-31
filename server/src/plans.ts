@@ -1,7 +1,7 @@
 /* The leaders' plan for a battle (concept.md 4.10): the red thread a leader
    wants the battle and its chapter to follow, kept by the battle's number so
    it can be written before the battle is set up. Leaders' own – read and
-   written by the campaign's leaders with the authenticator; for everyone else
+   written by the campaign's leaders; for everyone else
    it does not exist. An empty text takes the plan out. The log says that it
    changed, never what it says. */
 import { z } from 'zod';
