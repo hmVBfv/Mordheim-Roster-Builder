@@ -1,5 +1,5 @@
 {
-  "//": "The short lore opening of each warband, summarised in our own words from the first paragraphs of its page on mordheimer.net (read 31.10.2026) – never copied. Offered as the default text of a warband's Prologue (the player adopts it with one tap). Not rules data; nothing here is playable. A warband without a page of its own on the site has no entry.",
+  "//": "The short lore opening of each warband, summarised in our own words from the first paragraphs of its page on mordheimer.net (read 31.10.2026) – never copied. Offered as the default text of a warband's Prologue (the player adopts it with one tap). Not rules data; nothing here is playable. Ostermark has only a section of the Mercenaries page, so its entry points at that section.",
   "INTRO": {
     "merc": {
       "text": "Hard men from all over the Empire come to Mordheim for the rewards offered for wyrdstone. Mercenaries hire out to one of three claimants to the imperial throne, Reikland, Middenheim or Marienburg, and each lands its warbands with its own look and character.",
@@ -192,6 +192,10 @@
     "restless": {
       "text": "A Liche is a necromancer who kept his soul and magic after death, but his dead body cannot hold magic for long. He needs dark rituals, often the devouring of a human soul, and a band of undead follows him.",
       "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/restless-dead"
+    },
+    "ostermark": {
+      "text": "Ostermarkers are farmers used to defending their land alone against mercenaries and brigands. Years of isolation and self-reliance have made them hardy fighters who do not give up easily, even when outnumbered.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark"
     }
   }
 }

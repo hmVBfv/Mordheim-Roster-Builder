@@ -7,12 +7,10 @@ type Intro = { text: string; url: string };
 const read = <T>(f: string) => JSON.parse(readFileSync(new URL(`../../data/${f}`, import.meta.url), 'utf8')) as T;
 const intro = read<{ INTRO: Record<string, Intro> }>('warbandintro.json').INTRO;
 const warbands = read<{ WARBANDS: Record<string, unknown> }>('warbands.json').WARBANDS;
-/** A warband that is only a section of the Mercenaries page has no opening of its own. */
-const WITHOUT_PAGE = ['ostermark'];
 
 describe('the warband openings', () => {
-  it('has one for every warband with a page of its own, and none for anything else', () => {
-    for (const k of Object.keys(warbands)) expect(k in intro || WITHOUT_PAGE.includes(k), `${k}: opening`).toBe(true);
+  it('has one for every warband, and none for anything else', () => {
+    for (const k of Object.keys(warbands)) expect(k in intro, `${k}: opening`).toBe(true);
     for (const k of Object.keys(intro)) expect(k in warbands, `${k} is a warband`).toBe(true);
   });
 
@@ -20,7 +18,7 @@ describe('the warband openings', () => {
     for (const [k, e] of Object.entries(intro)) {
       expect(e.text.length, `${k}: text`).toBeGreaterThan(80);
       expect(e.text.length, `${k}: text`).toBeLessThan(500);
-      expect(e.url, k).toMatch(/^https:\/\/mordheimer\.net\/docs\/warbands\/[a-z0-9-]+\/[a-z0-9-]+$/);
+      expect(e.url, k).toMatch(/^https:\/\/mordheimer\.net\/docs\/warbands\/[a-z0-9-]+\/[a-z0-9-]+(#[a-z0-9-]+)?$/);
     }
   });
 });
