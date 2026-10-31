@@ -25,6 +25,8 @@ const UUID = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a
 const body = (props: Record<string, unknown>, required: string[]) => ({ body: { type: 'object', additionalProperties: false, required, properties: props } });
 const NAME = { type: 'string', minLength: 1, maxLength: 80 } as const;
 /** A key of the lore (data/lore.json): lower case, digits and hyphens; empty = no place (#66). */
+/** The key of Mordheim in the lore (data/lore.json): where the rulebook is set. */
+const VANILLA_PLACE = 'mordheim';
 const PLACE = { type: 'string', maxLength: 64, pattern: '^[a-z0-9-]*$' } as const;
 
 export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps): void {
@@ -54,7 +56,11 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     const name = trimmed((req.body as { name: string }).name);
     if (!name) return reply.code(400).send({ error: 'invalid', problem: 'a campaign needs a name' });
     if (campaignNameTaken(db(), req.actor!.id, name, '')) return reply.code(400).send({ error: 'invalid', problem: 'you are in a campaign of this name already' });
-    const c = createCampaign(db(), { name, place: (req.body as { place?: string }).place ?? '', vanilla: (req.body as { vanilla?: boolean }).vanilla === true, by: req.actor!.id }, now());
+    // the rulebook plays in Mordheim: a Vanilla campaign has that place and no other (#174)
+    const vanilla = (req.body as { vanilla?: boolean }).vanilla === true;
+    const asked = (req.body as { place?: string }).place ?? '';
+    if (vanilla && asked && asked !== VANILLA_PLACE) return reply.code(400).send({ error: 'invalid', problem: 'a campaign that plays Vanilla Mordheim plays in Mordheim' });
+    const c = createCampaign(db(), { name, place: vanilla ? VANILLA_PLACE : asked, vanilla, by: req.actor!.id }, now());
     return reply.code(201).send(view(c, 'leader'));
   });
 

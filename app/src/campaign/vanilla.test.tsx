@@ -65,6 +65,27 @@ describe('a campaign that plays Vanilla Mordheim (#167)', () => {
     expect(screen.getByText(/ · Vanilla Mordheim$/)).toBeTruthy();
   });
 
+  it('fixes the place of the campaign to Mordheim while it is ticked, and frees it again when it is not (#174)', async () => {
+    const srv = server({ totp: true });
+    const user = userEvent.setup();
+    at('/campaign');
+    await user.click(await screen.findByRole('button', { name: 'Start a campaign' }));
+    const sheet = screen.getByRole('dialog', { name: 'Start a campaign' });
+    const place = (await within(sheet).findByLabelText(/Place/)) as HTMLSelectElement;
+    expect(place.disabled).toBe(false);
+    await user.selectOptions(place, 'ostermark');
+    await user.click(within(sheet).getByRole('checkbox', { name: /Vanilla Mordheim/ }));
+    expect(place.value).toBe('mordheim');
+    expect(place.disabled).toBe(true);
+    await user.click(within(sheet).getByRole('checkbox', { name: /Vanilla Mordheim/ }));
+    expect(place.disabled).toBe(false);
+    await user.click(within(sheet).getByRole('checkbox', { name: /Vanilla Mordheim/ }));
+    await user.type(within(sheet).getByLabelText('Name of the campaign'), 'The Vanilla Fenn');
+    await user.click(within(sheet).getByRole('button', { name: 'Start it' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Vanilla Fenn' })).toBeTruthy();
+    expect([...srv.state.campaigns.values()].map((c) => c.place)).toEqual(['mordheim']);
+  });
+
   it('is turned off by a leader on the house rules screen, for good, and no switch turns it on', async () => {
     const srv = server({ totp: true });
     srv.addCampaign({ name: 'The Vanilla Fenn', vanilla: true });
