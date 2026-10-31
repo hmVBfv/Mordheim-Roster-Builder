@@ -58,3 +58,15 @@ test('the rules: from Settings, a chapter at 360 px, and a search that finds hid
   await noSideScroll(page);
   await shot(page, 'rules-search');
 });
+
+test('the banner holds still when the window is not in focus, and moves again when it is', async ({ page }) => {
+  await page.goto('#/home');
+  const lights = page.locator('svg [class*="_flicker_"]').first();
+  await expect(lights).toBeAttached();
+  const state = () => lights.evaluate((el) => getComputedStyle(el).animationPlayState);
+  expect(await state()).toBe('running');
+  await page.evaluate(() => { document.hasFocus = () => false; window.dispatchEvent(new Event('blur')); });
+  expect(await state()).toBe('paused');
+  await page.evaluate(() => { document.hasFocus = () => true; window.dispatchEvent(new Event('focus')); });
+  expect(await state()).toBe('running');
+});
