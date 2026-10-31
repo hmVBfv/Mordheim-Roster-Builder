@@ -4,6 +4,7 @@
    user is kept on the device so that offline the app still knows whose it
    is – only the name and flags, never a token (the cookie is HttpOnly). */
 import { useSyncExternalStore } from 'react';
+import { startActivity } from './activity.ts';
 import { api, ApiError, bindAccount, type Me } from './api.ts';
 
 export type Session =
@@ -59,6 +60,8 @@ export function accountId(): string | null {
 
 // every request says whose it is; the server's "another account" means the session changed elsewhere: ask again
 bindAccount(accountId, () => { void refreshSession(); });
+// somebody at the app (changing section, working on a roster) is what "Last seen" is: one quiet request now and then says so (activity.ts)
+if (typeof window !== 'undefined') startActivity(() => { if (accountId()) void api('/auth/me').catch(() => undefined); });
 // another tab signed in or out (it keeps the last user under KEY): ask again
 if (typeof window !== 'undefined') window.addEventListener('storage', (e) => { if (e.key === KEY) void refreshSession(); });
 

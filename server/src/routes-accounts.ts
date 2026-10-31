@@ -8,7 +8,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
   audit, createInvite, createSession, createUser, inviteByToken, listAttempts, listAudit, listOpenInvites, listSessions, listUsers,
   promoteSession, pruneDevices, SESSION_DAYS, recentFailures, recordAttempt, revokeInvite, revokeResetLinks, revokeSession, revokeUserSessions, sessionByToken, setPassword,
-  touchSession, useInvite, userById, userByName, usernameProblem, type UserRow,
+  markActive, touchSession, useInvite, userById, userByName, usernameProblem, type UserRow,
 } from './accounts.ts';
 import type { DB } from './db.ts';
 import { loginBraked, loginFailed } from './log.ts';
@@ -49,6 +49,8 @@ export function readActor(db: DB, req: FastifyRequest, now: Date, renew?: (token
   if (!found) return null;
   const { session, user } = found;
   const prevIp = session.ip;
+  // somebody is at the app, says the app: only then "last seen" moves; a tab that only syncs keeps the session alive and nothing more
+  if (req.headers['x-roster-active'] === '1') markActive(db, session, now);
   if (touchSession(db, session, req.ip, now)) {
     renew?.(token);
     // used from another address than the session last was (checked at most once an hour, as the session is renewed): the admin may want to know

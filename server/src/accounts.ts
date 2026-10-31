@@ -9,6 +9,8 @@ import { notifyAudit } from './live.ts';
 
 /** A device nobody has used for this long is signed out (Rob, 22.10.2026). */
 export const SESSION_DAYS = 30;
+/** "Last seen" is written at most this often. */
+const ACTIVE_EVERY_MIN = 5;
 /** More open devices than this, and those idle for IDLE_DAYS go at the next sign-in. */
 export const DEVICES_KEPT = 5;
 export const IDLE_DAYS = 7;
@@ -71,7 +73,7 @@ export interface UserSummary {
 
 export function listUsers(db: DB, now: Date): UserSummary[] {
   const rows = db.prepare(`
-    SELECT u.*, (SELECT max(last_seen_at) FROM sessions s WHERE s.user_id = u.id) AS last_seen,
+    SELECT u.*, (SELECT max(coalesce(active_at, last_seen_at)) FROM sessions s WHERE s.user_id = u.id) AS last_seen,
            (SELECT count(*) FROM sessions s WHERE s.user_id = u.id AND s.revoked_at IS NULL AND s.expires_at > ? AND s.stage = 'full') AS open_sessions
     FROM users u ORDER BY u.username`).all(iso(now)) as (UserRow & { last_seen: string | null; open_sessions: number })[];
   return rows.map((u) => ({
@@ -84,15 +86,15 @@ export function listUsers(db: DB, now: Date): UserSummary[] {
 
 export interface SessionRow {
   id: string; user_id: string; token_hash: string; stage: 'totp' | 'full'; device_label: string; ip: string;
-  created_at: string; last_seen_at: string; expires_at: string; revoked_at: string | null;
+  created_at: string; last_seen_at: string; /** when somebody was really at the app; null before migration 44 */ active_at: string | null; expires_at: string; revoked_at: string | null;
 }
 
 export function createSession(db: DB, s: { userId: string; stage: 'totp' | 'full'; device: string; ip: string }, now: Date): { id: string; token: string } {
   const id = randomUUID();
   const token = newToken();
   const ttl = s.stage === 'full' ? SESSION_DAYS * DAY : TOTP_STAGE_MINUTES * 60 * 1000;
-  db.prepare('INSERT INTO sessions (id, user_id, token_hash, stage, device_label, ip, created_at, last_seen_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-    .run(id, s.userId, hashToken(token), s.stage, s.device.slice(0, 80), s.ip, iso(now), iso(now), after(now, ttl));
+  db.prepare('INSERT INTO sessions (id, user_id, token_hash, stage, device_label, ip, created_at, last_seen_at, active_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(id, s.userId, hashToken(token), s.stage, s.device.slice(0, 80), s.ip, iso(now), iso(now), iso(now), after(now, ttl));
   return { id, token };
 }
 
@@ -114,10 +116,16 @@ export function touchSession(db: DB, s: SessionRow, ip: string, now: Date): bool
   return true;
 }
 
+/** Somebody is at the app (the request says so): "last seen" moves, at most every five minutes. A tab that only syncs never does. */
+export function markActive(db: DB, s: SessionRow, now: Date): void {
+  if (s.stage !== 'full' || now.getTime() - Date.parse(s.active_at ?? s.last_seen_at) < ACTIVE_EVERY_MIN * 60 * 1000) return;
+  db.prepare('UPDATE sessions SET active_at = ? WHERE id = ?').run(iso(now), s.id);
+}
+
 /** The code was right: the session is a full one now, with a new token. */
 export function promoteSession(db: DB, id: string, now: Date): string {
   const token = newToken();
-  db.prepare("UPDATE sessions SET stage = 'full', token_hash = ?, last_seen_at = ?, expires_at = ? WHERE id = ?").run(hashToken(token), iso(now), after(now, SESSION_DAYS * DAY), id);
+  db.prepare("UPDATE sessions SET stage = 'full', token_hash = ?, last_seen_at = ?, active_at = ?, expires_at = ? WHERE id = ?").run(hashToken(token), iso(now), iso(now), after(now, SESSION_DAYS * DAY), id);
   return token;
 }
 
@@ -149,7 +157,7 @@ export interface SessionSummary { id: string; device: string; createdAt: string;
 
 export function listSessions(db: DB, userId: string, current: string, now: Date): SessionSummary[] {
   const rows = db.prepare("SELECT * FROM sessions WHERE user_id = ? AND revoked_at IS NULL AND expires_at > ? AND stage = 'full' ORDER BY last_seen_at DESC").all(userId, iso(now)) as SessionRow[];
-  return rows.map((s) => ({ id: s.id, device: s.device_label, createdAt: s.created_at, lastSeenAt: s.last_seen_at, current: s.id === current }));
+  return rows.map((s) => ({ id: s.id, device: s.device_label, createdAt: s.created_at, lastSeenAt: s.active_at ?? s.last_seen_at, current: s.id === current }));
 }
 
 /* ---- one-time links ---- */
