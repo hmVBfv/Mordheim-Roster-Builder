@@ -69,7 +69,7 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   deutsch, „What the players may read“, die Lore) und **Lore**: ein schreibgeschützter
   Katalog aus `data/lore.json` (Regionen, Fraktionen, Gruppen der Welt, je mit
   eigener Zusammenfassung und Quelle auf mordheimer.net; nur Einträge mit mehr als
-  einem Nebensatz Lore). Filter All · Regions · Factions · Groups; „Add to Library“
+  einem Nebensatz Lore). Filter All · Regions · Factions · Groups, dazu ein **Suchfeld** (Wunsch #176, Rob, 31.10.2026): jedes Suchwort steht im Namen, deutschen Namen, Status, Text oder in den **Schlagworten** des Eintrags, in jeder Wortform (die Stämme der Regelsuche), Treffer in Name oder Schlagwort zuerst; die Schlagworte (`TAGS` in `data/lore.json`, z. B. `chaos`, `undead`, `dwarfs`) bringen zusammen, was zusammengehört – „Chaos“ findet die Norse auch ohne das Wort im Namen –, und ein Tipp auf ein Schlagwort sucht danach; Filter, Ort und Suche wirken zusammen; „Add to Library“
   kopiert eine Fraktion oder Gruppe als Faction, eine Region als Idea (About:
   Campaign) in die eigene Library; Orte liegen ineinander (die Zeile nennt den Weg, „In
   Ostermark › Mordheim“), Gruppen und Fraktionen nennen, woher sie kommen („From …“), und die

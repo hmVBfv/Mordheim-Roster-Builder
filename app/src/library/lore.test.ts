@@ -4,6 +4,7 @@ import { ancestors, inPlace, placeOptions, type Lore, type LoreEntry } from './l
 
 const e = (id: string, kind: LoreEntry['kind'], extra: Partial<LoreEntry> = {}): LoreEntry => ({ id, kind, name: id.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()), de: '', status: '', text: '', source: [], ...extra });
 const LORE: Lore = {
+  tags: {},
   sources: {},
   entries: [
     e('old-world', 'region'),
@@ -28,7 +29,7 @@ describe('the places of the lore', () => {
   });
 
   it('does not loop on a catalogue that names a place as its own ancestor', () => {
-    const loop: Lore = { sources: {}, entries: [e('a', 'region', { parent: 'b' }), e('b', 'region', { parent: 'a' })] };
+    const loop: Lore = { sources: {}, tags: {}, entries: [e('a', 'region', { parent: 'b' }), e('b', 'region', { parent: 'a' })] };
     expect(ancestors(loop, 'a').length).toBeLessThanOrEqual(2);
   });
 

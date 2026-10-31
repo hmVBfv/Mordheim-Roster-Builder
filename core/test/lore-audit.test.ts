@@ -3,8 +3,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-interface Entry { id: string; kind: string; name: string; de: string; status: string; text: string; source: string[]; parent?: string | null; regions?: string[] }
-const lore = JSON.parse(readFileSync(new URL('../../data/lore.json', import.meta.url), 'utf8')) as { SOURCES: Record<string, { title: string; url: string }>; LORE: Entry[] };
+interface Entry { id: string; kind: string; name: string; de: string; status: string; text: string; source: string[]; parent?: string | null; regions?: string[]; tags?: string[] }
+const lore = JSON.parse(readFileSync(new URL('../../data/lore.json', import.meta.url), 'utf8')) as { SOURCES: Record<string, { title: string; url: string }>; TAGS: Record<string, string>; LORE: Entry[] };
 const byId = new Map(lore.LORE.map((e) => [e.id, e]));
 
 describe('the lore catalogue', () => {
@@ -93,5 +93,34 @@ describe('the lore catalogue', () => {
     for (const id of ['khorne', 'tzeentch', 'nurgle', 'slaanesh']) expect(byId.get(id)?.regions, id).toEqual(['the-chaos-wastes']);
     expect(byId.get('council-of-thirteen')?.kind).toBe('faction');
     expect(byId.get('teutogen-guard')?.regions).toEqual(['middenheim']);
+  });
+});
+
+/* Wish #176 (Rob, 31.10.2026): a search over the Lore finds what belongs together – "Chaos" finds the Norse and the other groups that serve,
+   or fight, Chaos – by tags that are kept in the data, not only by the words an entry happens to use. */
+describe('the tags of the lore', () => {
+  it('come from a closed list, each named once, lower case, with what it stands for', () => {
+    expect(Object.keys(lore.TAGS).length).toBeGreaterThan(10);
+    for (const [k, v] of Object.entries(lore.TAGS)) {
+      expect(k, k).toMatch(/^[a-z]+(-[a-z]+)*$/);
+      expect(v.trim().length, `${k}: what it stands for`).toBeGreaterThan(5);
+    }
+  });
+
+  it('are used only from that list, once each on an entry, in order, and every tag is used', () => {
+    const used = new Set<string>();
+    for (const e of lore.LORE) {
+      const tags = e.tags ?? [];
+      expect(new Set(tags).size, `${e.id}: a tag twice`).toBe(tags.length);
+      expect(tags, `${e.id}: in order`).toEqual([...tags].sort());
+      for (const t of tags) { expect(lore.TAGS[t], `${e.id}: ${t}`).toBeTruthy(); used.add(t); }
+    }
+    for (const t of Object.keys(lore.TAGS)) expect(used.has(t), `${t} is used`).toBe(true);
+  });
+
+  it('put the Norse and the other groups of Chaos under "chaos"', () => {
+    const chaos = new Set(lore.LORE.filter((e) => e.tags?.includes('chaos')).map((e) => e.id));
+    for (const id of ['norse-tribes', 'kurgan-tribes', 'beastmen-herds-of-the-wastes', 'chaos-cultists-of-cathay', 'master-of-the-possessed', 'khorne', 'the-chaos-wastes', 'norsca']) expect(chaos.has(id), id).toBe(true);
+    expect(chaos.has('wood-elves-of-athel-loren')).toBe(false);
   });
 });
