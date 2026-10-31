@@ -59,6 +59,30 @@ describe('the story page', () => {
     await waitFor(async () => expect(core.storyOf(await stored()).prologue).toBe('They came up the river with the last barge.'));
   });
 
+  it('an empty prologue offers the warband\u2019s lore opening, which one tap makes the prologue', async () => {
+    await seed(band());
+    const user = userEvent.setup();
+    at('/warbands/w1/story');
+    const region = await screen.findByRole('region', { name: 'Prologue' });
+    const offer = await within(region).findByRole('group', { name: 'The opening from the setting' });
+    expect(within(offer).getByText(/claimants to the imperial throne/)).toBeTruthy();
+    expect(core.storyOf(await stored()).prologue).toBe('');
+
+    await user.click(within(offer).getByRole('button', { name: 'Use as the prologue' }));
+    await waitFor(async () => expect(core.storyOf(await stored()).prologue).toMatch(/claimants to the imperial throne/));
+    // adopted: it is the prologue now, and the offer is gone
+    expect(within(region).queryByRole('group', { name: 'The opening from the setting' })).toBeNull();
+    expect(within(region).getByText(/claimants to the imperial throne/)).toBeTruthy();
+  });
+
+  it('no offer once a prologue is written', async () => {
+    await seed({ ...band(), story: { prologue: 'Old words.', interludes: {}, explain: {} } } as core.WarbandState);
+    at('/warbands/w1/story');
+    const region = await screen.findByRole('region', { name: 'Prologue' });
+    expect(within(region).getByText('Old words.')).toBeTruthy();
+    expect(within(region).queryByRole('group', { name: 'The opening from the setting' })).toBeNull();
+  });
+
   it('an interlude after the first battle, and none for a round not yet fought', async () => {
     await seed(band());
     const user = userEvent.setup();
