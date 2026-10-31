@@ -4579,3 +4579,21 @@ says so instead, and will fail the day a list from outside the rulebook reaches 
 Personae of other sources (the data does not mark which are in the rulebook), items already owned when a warband enters (they stay), and the
 areas (Khemri, Lustria …). A warband in a Vanilla campaign cannot switch it off before the campaign does; a copy kept after the campaign
 switched it off can.
+
+## October 31, 2026 — Run of #172, #173 and #174 (pull requests 299, 300 and 298)
+
+**#172, "What's new" without the news of one's own campaign.** The change was there, but dated 30.10., the day its changelog file was written, while it
+went live on 31.10.; the card on Home shows the newest day only, so it was hidden under an older day. The fix is a rule of the changelog and not
+only a date: a file is dated by the day the update goes live. Reworded as "New" in the players' words (a campaign of their own, no authenticator),
+and the opening scene, which went live the same day, moved with it. A test pins the entry. Not changed: the entry for the Vanilla campaign (30.10.,
+merged at 23:36 UTC); whether it was on the Pi before the deploy of 31.10. is not known.
+
+**#174, the place of a Vanilla campaign.** Ticking Vanilla Mordheim when a campaign starts now sets its place to Mordheim and locks the field. The
+server does the same (a missing place becomes Mordheim, another one is a 400), because a lock in the form alone is no lock. The place is only ever set
+when the campaign is made, so there was no later change to guard. A wrong turn in the test: the form kept the place chosen before the tick and sent
+it; the form now sends Mordheim whenever Vanilla is ticked.
+
+**#173, Hired Swords and Dramatis Personae for a Vanilla warband.** The data already marks the rulebook's (`src` "Rulebook" for seven Hired Swords,
+grade `core` for four Dramatis Personae), so there was nothing to ask Rob to add to `data/`; I had expected to. A vanilla warband's
+`hireEligibility` and `dpEligibility` block the others with a reason, which the Hire screen already shows. Not done: the areas of a campaign (Khemri,
+Lustria ...), which need a campaign to choose its area and Hired Swords, items and warbands to be filtered by it.
