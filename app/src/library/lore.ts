@@ -1,5 +1,7 @@
 /* The lore catalogue (data/lore.json): regions, factions and groups of the setting, each summarised from
    mordheimer.net with its source. Fetched on first use, so it is not part of the app shell. */
+import { stem, words } from '../rules/search.ts';
+
 export type LoreKind = 'region' | 'faction' | 'group';
 export interface LoreEntry {
   id: string; kind: LoreKind; name: string; de: string; status: string; text: string; source: string[];
@@ -7,8 +9,10 @@ export interface LoreEntry {
   parent?: string | null;
   /** A faction or group: the regions it comes from or is based in. */
   regions?: string[];
+  /** What it belongs with (data/lore.json `TAGS`): a search for "chaos" finds the Norse by it. */
+  tags?: string[];
 }
-export interface Lore { sources: Record<string, { title: string; url: string }>; entries: LoreEntry[] }
+export interface Lore { sources: Record<string, { title: string; url: string }>; /** the tags and what each stands for */ tags: Record<string, string>; entries: LoreEntry[] }
 
 export const LORE_KINDS: { kind: LoreKind; label: string }[] = [
   { kind: 'region', label: 'Regions' },
@@ -16,11 +20,11 @@ export const LORE_KINDS: { kind: LoreKind; label: string }[] = [
   { kind: 'group', label: 'Groups' },
 ];
 
-const file = import.meta.glob<{ SOURCES: Lore['sources']; LORE: LoreEntry[] }>('../../../data/lore.json', { import: 'default' });
+const file = import.meta.glob<{ SOURCES: Lore['sources']; TAGS: Lore['tags']; LORE: LoreEntry[] }>('../../../data/lore.json', { import: 'default' });
 
 let loading: Promise<Lore> | null = null;
 export function loadLore(): Promise<Lore> {
-  loading ??= file['../../../data/lore.json']!().then((d) => ({ sources: d.SOURCES, entries: d.LORE }));
+  loading ??= file['../../../data/lore.json']!().then((d) => ({ sources: d.SOURCES, tags: d.TAGS, entries: d.LORE }));
   return loading;
 }
 
@@ -75,4 +79,19 @@ export function placeLine(e: LoreEntry, lore: Lore): string {
   if (e.kind === 'region') { const up = ancestors(lore, e.id).map((x) => x.name).join(' › '); return up ? `Place: ${up}` : ''; }
   const from = (e.regions ?? []).map(chain).filter(Boolean).join(' · ');
   return from ? `Comes from: ${from}` : '';
+}
+
+/** Does an entry answer a search? Every word of the query is among the words of its name, German name, status, text or tags, in any form
+    (the stems of the Rules search); the entries whose name or tags hold them come first. */
+export function searchLore(entries: LoreEntry[], query: string): LoreEntry[] {
+  const q = words(query).filter((w) => w.length >= 2).map(stem);
+  if (!q.length) return entries;
+  const has = (text: string) => { const w = words(text).map(stem); return (s: string) => w.some((x) => x === s || (Math.min(x.length, s.length) >= 3 && (x.startsWith(s) || s.startsWith(x)))); };
+  const ranked: { e: LoreEntry; first: boolean }[] = [];
+  for (const e of entries) {
+    const head = has(`${e.name} ${e.de} ${(e.tags ?? []).join(' ')}`);
+    const all = has(`${e.name} ${e.de} ${e.status} ${e.text} ${(e.tags ?? []).join(' ')}`);
+    if (q.every(all)) ranked.push({ e, first: q.every(head) });
+  }
+  return [...ranked.filter((r) => r.first), ...ranked.filter((r) => !r.first)].map((r) => r.e);
 }

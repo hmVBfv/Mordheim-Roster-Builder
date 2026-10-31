@@ -184,6 +184,43 @@ describe('the Library: lore', () => {
     expect(within(screen.getByRole('list', { name: 'Lore' })).getByText('The Witch Hunters')).toBeTruthy();
   });
 
+  /* #176: a free search over the lore, with the kind and the place; tags bring together what belongs together. */
+  it('searches by a word, among the kind chosen, and "Chaos" brings the Norse and the other groups of Chaos', async () => {
+    server();
+    const user = userEvent.setup();
+    at('/library/lore');
+    await screen.findByRole('list', { name: 'Lore' });
+    const names = () => within(screen.getByRole('list', { name: 'Lore' })).queryAllByRole('listitem').map((li) => li.querySelector('strong')!.textContent);
+    expect(names().length).toBeGreaterThan(100);
+    await user.click(screen.getByRole('button', { name: 'Groups' }));
+    await user.type(screen.getByRole('searchbox', { name: 'Search the lore' }), 'Chaos');
+    await waitFor(() => expect(names().length).toBeLessThan(40));
+    // the Norse do not say "Chaos" in their name: their tag does
+    expect(names()).toEqual(expect.arrayContaining(['Norse Tribes', 'Kurgan Tribes', 'Beastmen of the Northern Wastes']));
+    expect(names()).not.toContain('Wood Elves of Athel Loren');
+    // only groups, as chosen
+    expect(names()).not.toContain('The Chaos Wastes');
+    await user.click(screen.getByRole('button', { name: 'All' }));
+    await waitFor(() => expect(names()).toContain('The Chaos Wastes'));
+  });
+
+  it('finds by the word of an entry in any form, says when there is nothing, and a tag is a button that searches for it', async () => {
+    server();
+    const user = userEvent.setup();
+    at('/library/lore');
+    const list = await screen.findByRole('list', { name: 'Lore' });
+    await user.type(screen.getByRole('searchbox', { name: 'Search the lore' }), 'zzzz');
+    expect(await screen.findByText(/Nothing in the lore matches/)).toBeTruthy();
+    await user.clear(screen.getByRole('searchbox', { name: 'Search the lore' }));
+    const norse = within(list).getByText('Norse Tribes').closest('li')!;
+    await user.click(within(norse).getByRole('button', { name: 'norse' }));
+    expect((screen.getByRole('searchbox', { name: 'Search the lore' }) as HTMLInputElement).value).toBe('norse');
+    await waitFor(() => expect(within(screen.getByRole('list', { name: 'Lore' })).queryAllByRole('listitem').length).toBeLessThan(30));
+    // what is named or tagged Norse comes first
+    const first = within(screen.getByRole('list', { name: 'Lore' })).getAllByRole('listitem').slice(0, 4).map((li) => li.querySelector('strong')!.textContent);
+    expect(first).toEqual(expect.arrayContaining(['Norse Tribes', 'Norsca']));
+  });
+
   /* #39: places nest and groups come from places. */
   it('shows where a place lies and where a group comes from, and narrows the list to a place and what lies in it', async () => {
     server();

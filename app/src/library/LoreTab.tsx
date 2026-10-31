@@ -1,14 +1,14 @@
 /* The Lore tab of the Library (ADR 0023): the setting's regions, factions and groups as a read-only catalogue
    (data/lore.json). "Add" copies an entry into the person's own Library – a faction or group as a faction, a region
    as an idea about a campaign – where it can be changed freely. */
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useState } from 'react';
 import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import { newId } from '../db/ids.ts';
 import ui from '../ui/ui.module.css';
 import { putFaction, putIdea } from './api.ts';
 import styles from './Library.module.css';
-import { ancestors, inPlace, loadLore, LORE_KINDS, loreText, placeOptions, type Lore, type LoreEntry, type LoreKind } from './lore.ts';
+import { ancestors, inPlace, loadLore, LORE_KINDS, loreText, placeOptions, searchLore, type Lore, type LoreEntry, type LoreKind } from './lore.ts';
 import { useLibrary } from './useLibrary.ts';
 
 export function LoreTab({ notify }: { notify: (t: string) => void }) {
@@ -17,6 +17,8 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
   const [lore, setLore] = useState<Lore | null>(null);
   const [kind, setKind] = useState<LoreKind | null>(null);
   const [place, setPlace] = useState('');
+  const [query, setQuery] = useState('');
+  const asked = useDeferredValue(query.trim());
   const [busy, setBusy] = useState<string | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   useEffect(() => { void loadLore().then(setLore); }, []);
@@ -40,7 +42,7 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
     }
   };
 
-  const shown = lore ? lore.entries.filter((e) => (!kind || e.kind === kind) && inPlace(lore, e, place)) : [];
+  const shown = lore ? searchLore(lore.entries.filter((e) => (!kind || e.kind === kind) && inPlace(lore, e, place)), asked) : [];
   const places = lore ? placeOptions(lore) : [];
   const nameOf = (id: string) => lore?.entries.find((x) => x.id === id)?.name ?? id;
   /** Where an entry lies: a region under what contains it (Ostermark › Mordheim), a group or faction where it comes from. */
@@ -59,6 +61,10 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
           <button key={k.kind} type="button" className={kind === k.kind ? ui.button : ui.buttonQuiet} aria-pressed={kind === k.kind} onClick={() => setKind(k.kind)}>{k.label}</button>
         ))}
       </div>
+      <label className={ui.field}>
+        <span className={ui.muted}>Search the lore</span>
+        <input type="search" className={ui.input} value={query} onChange={(ev) => setQuery(ev.target.value)} autoCapitalize="none" spellCheck={false} enterKeyHint="search" placeholder="chaos, dwarfs, Norse …" />
+      </label>
       {places.length > 0 && (
         <label className={ui.field}><span className={ui.muted}>Place</span>
           <select className={ui.select} value={place} aria-label="Place" onChange={(ev) => setPlace(ev.target.value)}>
@@ -69,6 +75,7 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
       )}
       {(error || problem) && <p className={ui.message} role="status">{problem ?? error}</p>}
       {!lore && <p className={ui.muted}>Loading the lore…</p>}
+      {lore && asked && shown.length === 0 && <p className={ui.muted}>Nothing in the lore matches “{asked}”. A word is found in any form (hide finds hiding); try a tag such as chaos, undead or dwarfs.</p>}
       {lore && (
         <ul className={styles.list} aria-label="Lore">
           {shown.map((e) => {
@@ -82,6 +89,11 @@ export function LoreTab({ notify }: { notify: (t: string) => void }) {
                 {whereLine(e) && <p className={styles.where}>{whereLine(e)}</p>}
                 <p className={styles.excerpt}>{e.status}</p>
                 <p className={styles.excerpt}>{e.text}</p>
+                {e.tags && e.tags.length > 0 && (
+                  <div className={styles.tags} aria-label="Tags">
+                    {e.tags.map((t) => <button key={t} type="button" className={styles.tag} title={lore.tags[t]} onClick={() => setQuery(t)}>{t}</button>)}
+                  </div>
+                )}
                 <div className={styles.sources}>
                   <span>Source</span>
                   {e.source.map((s) => <a key={s} className={styles.source} href={lore.sources[s]!.url} target="_blank" rel="noreferrer noopener">{lore.sources[s]!.title}</a>)}
