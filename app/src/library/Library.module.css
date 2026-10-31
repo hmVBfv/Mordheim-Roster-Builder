@@ -29,5 +29,5 @@
 
 /* what an entry of the lore belongs with: a tap searches for it */
 .tags { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-.tag { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-2); font-size: 0.85rem; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
+.tag { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 0 var(--space-2); font-size: 0.85rem; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
 .tag:hover { color: var(--text); }
