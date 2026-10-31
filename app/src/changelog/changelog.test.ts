@@ -57,3 +57,15 @@ describe('what a newer version holds', () => {
     expect(readJson({ not: 'a list' })).toEqual([]);
   });
 });
+
+describe('what the players were told of the biggest changes', () => {
+  /* The date of a file is the day the change goes live, not the day it was written: an entry dated before the update that carries
+     it hides under an older day, where the card on Home does not show it. A campaign of one's own is such a change (a report of
+     31.10.2026: it was missing from the newest day). */
+  it('says that anybody can start a campaign of their own, as news, on the day it went live', () => {
+    const e = ENTRIES.find((x) => x.changes.some((c) => /own campaign/i.test(c.text) && /authenticator/i.test(c.text)));
+    expect(e, 'an entry about starting one’s own campaign').toBeTruthy();
+    expect(e!.date).toBe('2026-10-31');
+    expect(e!.changes.find((c) => /own campaign/i.test(c.text))!.kind).toBe('New');
+  });
+});
