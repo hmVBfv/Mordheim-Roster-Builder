@@ -168,6 +168,20 @@
   60% { opacity: 0.3; }
 }
 
+/* a window nobody is at (still.ts: not in front, or not in focus) holds them still as well: Chrome draws the whole picture again on
+   every frame, and a window on a second monitor kept the graphics process busy while a video played in another one */
+:global(html[data-still]) .flicker,
+:global(html[data-still]) .flickerLate,
+:global(html[data-still]) .pulse,
+:global(html[data-still]) .twinkle,
+:global(html[data-still]) .rise,
+:global(html[data-still]) .ember,
+:global(html[data-still]) .flyA,
+:global(html[data-still]) .flyB,
+:global(html[data-still]) .drift {
+  animation-play-state: paused;
+}
+
 /* less motion: the same pictures, held still */
 @media (prefers-reduced-motion: reduce) {
   .flicker,
