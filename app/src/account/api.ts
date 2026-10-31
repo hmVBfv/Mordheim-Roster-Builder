@@ -6,6 +6,7 @@
    the dev server without the API). */
 
 import { callPattern, note } from '../bugs/trail.ts';
+import { isActive } from './activity.ts';
 
 /** The signed-in user, as GET /auth/me tells it. */
 export interface Me {
@@ -59,6 +60,8 @@ const whose = (as: string | null | undefined): Record<string, string> => {
   const id = as === undefined ? accountOf() : as;
   return id ? { 'X-Roster-User': id } : {};
 };
+/** Somebody is at the app, not just a tab syncing: the server moves "Last seen" only then (activity.ts). */
+const there = (): Record<string, string> => (isActive() ? { 'X-Roster-Active': '1' } : {});
 
 /** The address of an endpoint, for what the browser fetches itself (a picture in an <img>). */
 export const apiUrl = (path: string) => `${BASE}${path}`;
@@ -80,7 +83,7 @@ async function answer<T>(res: Response): Promise<T> {
 export async function apiBytes<T>(path: string, bytes: ArrayBuffer, type: string, as?: string | null): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type, ...whose(as) }, body: bytes });
+    res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type, ...whose(as), ...there() }, body: bytes });
   } catch {
     note('api', `PUT ${callPattern(path)} → offline`);
     throw new ApiError(0, 'offline');
@@ -98,7 +101,7 @@ export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PU
       method,
       credentials: 'same-origin',
       cache: 'no-store',
-      headers: { ...(write ? { Accept: 'application/json', 'Content-Type': 'application/json' } : { Accept: 'application/json' }), ...whose(init.as) },
+      headers: { ...(write ? { Accept: 'application/json', 'Content-Type': 'application/json' } : { Accept: 'application/json' }), ...whose(init.as), ...there() },
       // a write always carries a JSON body: the server reads nothing else
       ...(write ? { body: JSON.stringify(init.body ?? {}) } : {}),
     });
