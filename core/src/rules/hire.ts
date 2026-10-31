@@ -6,6 +6,9 @@ import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
 import { eqListFor, warbandDef } from './lookup.ts';
 import { adjPrice, dpHireCost, hsHireCost } from './pricing.ts';
+import { isVanillaHire, isVanillaOnly } from './settings.ts';
+
+const NOT_IN_RULEBOOK = 'not in the rulebook, and this warband plays Vanilla Mordheim';
 
 /** Hired Swords gain experience like henchmen: advances at these totals. */
 export const HS_ADV = [2, 5, 9, 14] as const;
@@ -153,7 +156,8 @@ export function hireEligibility(ctx: Ctx, wbKey: string | null = ctx.s.wb, table
   for (const key of Object.keys(table)) {
     const hs = table[key] as HireEntry;
     let ok = true, reason = '';
-    if (wb.none) { ok = false; reason = 'warband hires no Hired Swords'; }
+    if (isVanillaOnly(ctx.s) && !isVanillaHire(hs)) { ok = false; reason = NOT_IN_RULEBOOK; }
+    else if (wb.none) { ok = false; reason = 'warband hires no Hired Swords'; }
     else if (wb.only) {
       const named = !!hs.rule && (hs.rule.type === 'onlyWb' || hs.rule.type === 'only') && (hs.rule.wbs || []).includes(wb.key ?? '');
       if (!wb.only.includes(key) && !named) { ok = false; reason = 'not on this warband’s hire list'; }
@@ -178,7 +182,8 @@ export function dpEligibility(ctx: Ctx, wbKey: string | null = ctx.s.wb): HireEl
     const dp = ctx.data.DRAMATIS[key] as HireEntry;
     let ok = true, reason = '';
     const named = !!dp.rule && (dp.rule.type === 'onlyWb' || dp.rule.type === 'only') && (dp.rule.wbs || []).includes(wb.key ?? '');
-    if (wb.none && !named) { ok = false; reason = 'warband cannot recruit special characters'; }
+    if (isVanillaOnly(ctx.s) && !isVanillaHire(dp)) { ok = false; reason = NOT_IN_RULEBOOK; }
+    else if (wb.none && !named) { ok = false; reason = 'warband cannot recruit special characters'; }
     else if (!hsHireRuleAllows(dp, wb)) { ok = false; reason = 'not available to this warband'; }
     if (!ok) { out.blocked.push({ key, name: dp.name, reason }); continue; }
     out.allowed.push({ key, name: dp.name, hire: dp.hire, upkeep: dp.upkeep, rating: dp.rating });

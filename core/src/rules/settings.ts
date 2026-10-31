@@ -1,7 +1,7 @@
 /* Where an item was released (wishes #164, #165): the core rules' price chart, the price chart of a campaign setting, or the list of
    a warband. A campaign that plays in some areas keeps the items of those – and, always, what the core chart lists and what a warband
    brings with it. Pure: it only reads the catalogue entry and the data. */
-import type { CatalogItem, GameData } from '../data/types.ts';
+import type { CatalogItem, GameData, HireEntry } from '../data/types.ts';
 import type { WarbandState } from '../state/types.ts';
 import type { Ctx } from './context.ts';
 import { update } from '../warband/update.ts';
@@ -66,3 +66,7 @@ export function setVanillaWarband(ctx: Ctx, on: boolean): WarbandState {
   if (on) return asVanillaWarband(ctx);
   return isVanillaOnly(ctx.s) ? update(ctx, (d) => { delete d.vanilla; }) : ctx.s;
 }
+
+/** Is this Hired Sword or Dramatis Persona in the original rulebook (wish #173)? The data says so: a Hired Sword's source is "Rulebook",
+    a Dramatis Persona's grade is core. */
+export const isVanillaHire = (e: Pick<HireEntry, 'src' | 'grade'>): boolean => e.src === 'Rulebook' || e.src === 'Mordheim Rulebook' || e.grade === 'core';
