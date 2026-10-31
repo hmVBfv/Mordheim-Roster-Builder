@@ -20,6 +20,7 @@ import ui from '../ui/ui.module.css';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { FieldsSheet, type Field, type FieldsEdit } from './FieldsSheet.tsx';
+import { loadIntros, type Intro } from './intro.ts';
 import { Life } from './Life.tsx';
 import { CANON_FIELDS, L, peopleOf, PROFILE_FIELDS, PROLOGUE_QUESTIONS, type Person } from './people.ts';
 import styles from './Story.module.css';
@@ -34,6 +35,9 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
   const story = core.storyOf(state);
   const canon = core.canonOf(state);
   const people = useMemo(() => peopleOf(data, state), [data, state]);
+  // what the setting says of this kind of warband, to start the prologue from
+  const [intro, setIntro] = useState<Intro | null>(null);
+  useEffect(() => { let live = true; void loadIntros().then((all) => { if (live) setIntro(all[String(state.wb)] ?? null); }); return () => { live = false; }; }, [state.wb]);
   const round = Number(state.campaign?.round) || 0;
   const written = Object.keys(story.interludes).map(Number);
   const rounds = Array.from({ length: Math.max(round, ...written, 0) }, (_, i) => i + 1).reverse();
@@ -117,6 +121,14 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
           </button>
         </div>
         {story.prologue ? <p className={`${ui.card} ${styles.text}`}>{story.prologue}</p> : <p className={ui.muted}>Not written yet.</p>}
+        {!story.prologue && intro && (
+          <div role="group" aria-label="The opening from the setting" className={ui.card}>
+            <h3>The opening from the setting</h3>
+            <p className={styles.text}>{intro.text}</p>
+            <p className={ui.muted}>Summarised from the warband’s page on mordheimer.net. Take it as it is and rewrite it, or write your own.</p>
+            <button type="button" className={ui.button} onClick={() => save((c) => core.setPrologue(c, intro.text), 'Prologue saved.')}>Use as the prologue</button>
+          </div>
+        )}
         <details className={`${ui.card} ${styles.more}`}>
           <summary>What a prologue answers</summary>
           <ul className={styles.questions}>{PROLOGUE_QUESTIONS.map((q) => <li key={q}>{q}</li>)}</ul>

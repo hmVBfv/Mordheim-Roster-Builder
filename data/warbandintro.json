@@ -1,0 +1,201 @@
+{
+  "//": "The short lore opening of each warband, summarised in our own words from the first paragraphs of its page on mordheimer.net (read 31.10.2026) – never copied. Offered as the default text of a warband's Prologue (the player adopts it with one tap). Not rules data; nothing here is playable. Ostermark has only a section of the Mercenaries page, so its entry points at that section.",
+  "INTRO": {
+    "merc": {
+      "text": "Hard men from all over the Empire come to Mordheim for the rewards offered for wyrdstone. Mercenaries hire out to one of three claimants to the imperial throne, Reikland, Middenheim or Marienburg, and each lands its warbands with its own look and character.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries"
+    },
+    "possessed": {
+      "text": "Ambitious or persecuted men, and the newly mutated, swear themselves to the dark gods of Chaos. After the comet they follow the Shadowlord, who calls himself the new Dark Emperor of the ruined city, and put their trust in the sorcery that makes daemons walk the world.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/cult-of-the-possessed"
+    },
+    "wh": {
+      "text": "The Templars of Sigmar hunt heretics of every kind: witches, sorcerers, mutants and the merely suspicious. Magic is a capital crime in the Empire, and the fall of Mordheim has given the Witch Hunters a fresh, burning mission among the ruins.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/witch-hunters"
+    },
+    "sos": {
+      "text": "Noble families send their troublesome daughters to the convent in Mordheim, where they become priestesses of Sigmar who heal the sick, tend orphans and give counsel. With the city destroyed, the Sisters have taken up arms to bring order back to the ruins.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/sisters-of-sigmar"
+    },
+    "undead": {
+      "text": "The Vampire Counts of Sylvania rule from a gloomy castle, hated by Witch Hunters and shunned by priests. Few spies return from their forests, and the Undead now send servants into Mordheim for wyrdstone and for power.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/undead"
+    },
+    "skaven": {
+      "text": "Beneath the cities of men lives another race, the ratmen of the Skaven, who tunnel under the world and wait for their time. The fall of Mordheim and its wyrdstone has brought them up from the dark in force.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/skaven-eshin"
+    },
+    "woodelf": {
+      "text": "The Wood Elves of Athel Loren are a secretive, isolationist folk who live in harmony with nature and guard their forest. They seldom leave it, and what draws them out to Mordheim is a matter for their own mysterious reasons.",
+      "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/wood-elves-of-athel-loren"
+    },
+    "ostlander": {
+      "text": "Ostland is the emptiest province of the Empire, cut off by forest and mountains and closer to Kislev than to its own countrymen. Its people are poor, tall and hardy, and many a freesword leaves home for Mordheim after one brawl too many.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/ostlander"
+    },
+    "carnival": {
+      "text": "Nobody knows where the Carnival of Chaos came from, perhaps a gypsy caravan that went wrong. It still travels the Empire's backwaters in painted wagons as a troupe of players, and behind the songs and stage plays something far more sinister waits.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/carnival-of-chaos"
+    },
+    "dwarftreasure": {
+      "text": "Proud Dwarfs prize age, wealth and skill. A noble who loses his hold or his honour gathers loyal friends and goes treasure hunting in Mordheim to win back what the Dispossessed lost.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/dwarf-treasure-hunters"
+    },
+    "averland": {
+      "text": "Averland is a prosperous southern province between the Black Mountains and the Worlds Edge Mountains, rich in ore and bordered by old Dwarf holds overrun by Goblins and Skaven. Its warriors come to Mordheim looking for gold and a name.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/averlander"
+    },
+    "orcmob": {
+      "text": "Orcs love fighting and looting above everything, and Mordheim offers plenty of both. An ambitious Warboss leads a mob to the city to prove himself, and would rather ambush other warbands than dig for wyrdstone himself.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/orc-mob"
+    },
+    "beastmen": {
+      "text": "Beastmen are brutish raiders who roam the deep forests around Mordheim with no cities and no order, and kill and plunder wherever they please. They hate organisation and will turn on each other as readily as on their prey.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/beastmen-raiders"
+    },
+    "kislev": {
+      "text": "Kislev lies north-east of the Empire, a land of long winters, timber towns and steppes. It is a hard country that breeds hardy fighters, and some of them cross the border into the ruins of Mordheim.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/kislevites"
+    },
+    "amazons": {
+      "text": "The Amazons are warrior women from across the Great Western Ocean, said to descend from a lost colony. Those in Mordheim have been dragged there in chains and want only one thing: escape.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons"
+    },
+    "amazonslustria": {
+      "text": "The Amazons live on an overgrown island in the river heart of Lustria, ringed with ruins, and drive off invaders from the beaches. Few outsiders have seen them and survived, so their fame rests on exaggerated tales.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons-lustria"
+    },
+    "arabian": {
+      "text": "The desert nomads of Araby wander the edge of the great desert in many tribes, ruled by oases and a strict code of honour. Some come north to search the ruins for relics and wealth.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/arabian-tomb-raiders"
+    },
+    "blackorcs": {
+      "text": "Black Orcs are bigger, smarter and meaner than ordinary Orcs, and seem built rather than born. Since the Storm of Chaos many have wandered the Empire after Grimgor Ironhide, and a band of them is a thing to fear.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/black-orcs"
+    },
+    "bretonnian": {
+      "text": "While the Empire tears itself apart, Bretonnia stays orderly, chivalrous and blessed by the Lady of the Lake. Its knights see Mordheim as a place where virtue has been discarded and come to purge it.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/bretonnian"
+    },
+    "darkelves": {
+      "text": "The Druchii, or Dark Elves, are the cruel kin of the High Elves, feared for slaving, torture and the worship of Khaine. Their raiders roam the known world and have taken their cruelty to Mordheim.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dark-elves"
+    },
+    "dwarfrangers": {
+      "text": "Some old Dwarfs believe the old ways are best and distrust the newfangled gadgets of younger engineers. They travel together with traditional arms, recovering lost treasures and cleansing fallen holds of the vermin that took them.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dwarf-rangers"
+    },
+    "forestgoblins": {
+      "text": "Forest Goblin tribes live deep in the Great Forest, expert at stealth and camouflage. Gold is useless to them as money but they coat their stone weapons with it, and some leaders will send their followers to die just to collect it.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/forest-goblins"
+    },
+    "gunnery": {
+      "text": "Nuln is famous for the finest handguns and war machines in the Empire, and graduates of the Imperial Gunnery School are valued for putting artillery on target. The school trains gunners and maintainers rather than inventing weapons.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/gunnery-school-of-nuln"
+    },
+    "hochland": {
+      "text": "The Storm of Chaos sent many refugees across the border into Talabecland, and tension grew around Talabheim and the river port of Talagaad. Hochland bandits are the hard men who came out of that unrest.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/hochland-bandits"
+    },
+    "hornedhunters": {
+      "text": "Horned Hunters prowl the woods of Talabecland and the Taalbaston, loyal only to Taal, god of nature. They mistrust cities, firearms and science and take pride in their own strength and skill.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/horned-hunters"
+    },
+    "outriders": {
+      "text": "When the Nemesis Crown was said to be found, the provinces of the Empire sent fast riders to scout the Great Forest. They avoid head-on fights and rely on speed and stealth to take the prize and be gone.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/imperial-outriders"
+    },
+    "lizardmen": {
+      "text": "The Lizardmen and their Slann masters once served the Old Ones and still keep to their plans. The coming of the Dry Skins, who raid their temple cities, has shattered their peace.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/lizardmen"
+    },
+    "mootlanders": {
+      "text": "Halflings rarely form warbands, but when they do they march into Mordheim with dreams of iced buns, fizzy drink and kitchens to plunder. The Moot has its own legends of rich, boastful heroes with the bow.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/mootlanders"
+    },
+    "norse": {
+      "text": "Norsca lies far to the north, and its raiders and sea-wolves are among the fiercest fighters of the Old World. Mordheim's wyrdstone and plunder call them south, with wolf-warriors among them.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/norse"
+    },
+    "outlaws": {
+      "text": "Stirwood is a corner of the Great Forest cut off by the River Stir, where outlaws and poachers hide from the law. From there they raid the roads and sometimes the ruins of Mordheim.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/outlaws-of-stirwood-forest"
+    },
+    "pirates": {
+      "text": "Mordheim's rivers carry gold in and wyrdstone out, and pirate captains use the fog and dust to slip their ships in, loot and vanish. Some have even found safe harbours near the city.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/pirates"
+    },
+    "pitfighters": {
+      "text": "Gladiatorial pits across the Empire, from Cutthroat's Haven to the Black Pits by Mordheim, force tough fighters to brawl for a crowd. The best of them take their skill out of the arena and into the ruins.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/pit-fighters"
+    },
+    "skavenpest": {
+      "text": "Clan Pestilens spreads plague and disease for the Horned Rat, with priests and censer-bearers leading a swarm of followers. Their sudden, foul-smelling attacks come out of mist and squeaks in the ruined streets.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/skaven-pestilens"
+    },
+    "tileans": {
+      "text": "Tilea is a wealthy land of rival city-states, pride and trade, and its people are skilled sailors and explorers. Tilean companies come to Mordheim for gold and precious relics.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tileans"
+    },
+    "tombguardians": {
+      "text": "The ancient kingdoms of Nehekhara buried their dead with great care, and the dead still march with rusty weapons and rattling bones. Tomb Guardians are the undying guardians of those burial places.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tomb-guardians"
+    },
+    "shadowwarriors": {
+      "text": "Nagarythe was once a rich Elf kingdom until its rulers turned to Chaos. Those who stayed loyal wage a secret war of shadows against the Witch King and the Dark Elves, and some of them reach Mordheim.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/shadow-warriors"
+    },
+    "sonsofhashut": {
+      "text": "The Chaos Dwarfs of Zharr-Naggrund have ruled slaves for millennia. A Hashut sorcerer who learned of the fall of Mordheim sends his servants after the witchstone and for rivals to defeat.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/sons-of-hashut"
+    },
+    "blackdwarfs": {
+      "text": "Chaos Dwarfs are the warped Dwarfs of Karak Vlag who, sundered from their kin, took the bull god Hashut as their saviour. Their infernal pacts have made them twisted mockeries of what they once were.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/black-dwarfs"
+    },
+    "battlemonks": {
+      "text": "Grand Cathay guards its borders with the Great Bastion, haunted mountains and poisonous deserts, and its monasteries stand on the slopes. Monks from those monasteries have come west, looking for wyrdstone and for trouble.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/battle-monks-of-cathay"
+    },
+    "bretchapel": {
+      "text": "Bretonnian chapels mark places sacred to the Lady of the Lake, where a battle was fought or a Grail Knight died. Knights errant look for fame at these shrines, and some guard the chapel and its pilgrims.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/bretonnian-chapel-guard"
+    },
+    "cppleasures": {
+      "text": "When the Shadowlord demanded loyalty from the hidden Chaos cultists of Mordheim, most knelt willingly. In the upper ranks of the Cult of Pleasure, however, some ambitions were more complex than simple obedience.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/court-of-the-profane-pleasures"
+    },
+    "cavalcade": {
+      "text": "As the year 2000 drew near, three claimants fought a civil war for the imperial throne. This warband is told as a chronicle of that age, as written by the High Matriarch of the Sisters of Sigmar.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/cursed-cavalcade"
+    },
+    "reavers": {
+      "text": "Many expeditions to Lustria have been lost to disease, jungle beasts and Lizardmen, yet the tales of the Cities of Gold still lure more. The toughest, most skilled and most resourceful survivors band together as Reavers.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/lustrian-reavers"
+    },
+    "maneaters": {
+      "text": "Ogres live in herds and tribes in the Mountains of Mourn, but some roam the world as hired muscle to anyone with enough coin. Others prey on the merchants and travellers of the Ivory Road instead.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/maneaters"
+    },
+    "maraudersofchaos": {
+      "text": "Marauders are tribal northmen from the Chaos Wastes who worship forgotten gods and fight endlessly to win their favour. Ambitious chieftains lead warbands south, leaving burned villages behind them.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos"
+    },
+    "caravans": {
+      "text": "Money can be inherited, stolen or earned, and some want it faster than hard work allows. Blackguards, opportunists and hired guards tag along with merchant caravans to far-off lands in the hope of a big score.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans"
+    },
+    "nightgoblins": {
+      "text": "Night Goblins live in dark places and avoid daylight, brewing fungi and poisons in the catacombs beneath Mordheim. Elsewhere they simply spoil whatever they find.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/night-goblins"
+    },
+    "restless": {
+      "text": "A Liche is a necromancer who kept his soul and magic after death, but his dead body cannot hold magic for long. He needs dark rituals, often the devouring of a human soul, and a band of undead follows him.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/restless-dead"
+    },
+    "ostermark": {
+      "text": "Ostermarkers are farmers used to defending their land alone against mercenaries and brigands. Years of isolation and self-reliance have made them hardy fighters who do not give up easily, even when outnumbered.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark"
+    }
+  }
+}
