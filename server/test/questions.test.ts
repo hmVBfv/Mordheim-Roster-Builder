@@ -43,15 +43,15 @@ async function world() {
 }
 
 describe('asking', () => {
-  it('only a leader with the authenticator asks; an outsider does not even know the campaign; sent twice, it is one question', async () => {
-    const { s, u, anna, ben, kai, lea, vic, rob, qs, ask } = await world();
+  it('only a leader asks; an outsider does not even know the campaign; sent twice, it is one question', async () => {
+    const { s, u, anna, kai, lea, vic, rob, qs, ask } = await world();
     const { qid, r, question } = await ask();
     expect(r.statusCode).toBe(200);
     expect(question).toMatchObject({ id: qid, status: 'open', text: WORDS, askedByName: 'anna', toName: 'kai', answerNoteId: null });
     // sent twice (the device could not tell it had arrived): still one
     expect((await anna('PUT', `${qs}/${qid}`, { to: u.kai.id, text: WORDS, battleId: question.battleId })).statusCode).toBe(200);
     expect(s.db.prepare('SELECT count(*) AS n FROM questions').get()).toEqual({ n: 1 });
-    for (const who of [ben, kai, lea, vic]) expect((await who('PUT', `${qs}/${randomUUID()}`, { to: u.kai.id, text: 'Me too' })).statusCode).toBe(403);
+    for (const who of [kai, lea, vic]) expect((await who('PUT', `${qs}/${randomUUID()}`, { to: u.kai.id, text: 'Me too' })).statusCode).toBe(403);
     expect((await rob('PUT', `${qs}/${randomUUID()}`, { to: u.kai.id, text: 'Me too' })).statusCode).toBe(404);
     expect((await rob('GET', qs)).statusCode).toBe(404);
   });
@@ -81,8 +81,8 @@ describe('who sees a question', () => {
     expect((await list(anna)).map((q) => q.id).sort()).toEqual([mine.qid, leas.qid].sort());
     expect((await list(kai)).map((q) => q.id)).toEqual([mine.qid]);
     expect((await list(lea)).map((q) => q.id)).toEqual([leas.qid]);
-    // a leader without the authenticator is not asked, so sees none; a viewer neither
-    expect(await list(ben)).toEqual([]);
+    // a leader without the authenticator is a leader (ADR 0030): he sees every question, as Anna does; a viewer sees none
+    expect((await list(ben)).map((q) => q.id)).toEqual((await list(anna)).map((q) => q.id));
     expect(await list(vic)).toEqual([]);
     // the words are in nobody's answer but theirs
     expect(JSON.stringify(await list(lea))).not.toContain('ZEBRA-QUESTION');
@@ -147,9 +147,9 @@ describe('answering', () => {
     const { anna, ben, lea, vic, rob, qs, ask, notes } = await world();
     const { qid } = await ask();
     const body = () => ({ noteId: randomUUID(), text: 'Not mine to answer.' });
-    // for another player (and a leader without the authenticator, who sees none) it does not exist; a leader is told it is not theirs
+    // for another player it does not exist; a leader (with or without the authenticator, ADR 0030) is told it is not theirs
     expect((await lea('POST', `${qs}/${qid}/answer`, body())).statusCode).toBe(404);
-    expect((await ben('POST', `${qs}/${qid}/answer`, body())).statusCode).toBe(404);
+    expect((await ben('POST', `${qs}/${qid}/answer`, body())).statusCode).toBe(403);
     expect((await anna('POST', `${qs}/${qid}/answer`, body())).statusCode).toBe(403);
     expect((await vic('POST', `${qs}/${qid}/answer`, body())).statusCode).toBe(403);
     expect((await rob('POST', `${qs}/${qid}/answer`, body())).statusCode).toBe(404);

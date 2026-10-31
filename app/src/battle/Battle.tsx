@@ -144,7 +144,7 @@ function GameNight({ cid, bid, user, role, view, setView, error, refresh }: {
   const online = useOnline();
   const outbox = useOutbox(bid, user.id);
   const [notice, notify] = useNotice();
-  const lead = role === 'leader' && user.totp;
+  const lead = role === 'leader';
   const canPropose = role === 'leader' || role === 'player';
   const [turn, setTurn] = useState<number | null>(null);
   const shownTurn = turn ?? view.battle.turn;

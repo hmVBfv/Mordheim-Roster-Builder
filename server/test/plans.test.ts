@@ -34,10 +34,10 @@ describe('the plan for a battle', () => {
     expect(((await anna('GET', url)).json() as { plans: Plan[] }).plans.map((p) => p.round)).toEqual([1, 3]);
   });
 
-  it('is for leaders with the authenticator alone: a leader without one, players and viewers get a 403, an outsider a 404', async () => {
-    const { anna, ben, kai, vic, rob, url } = await table();
+  it('is for leaders alone: players and viewers get a 403, an outsider a 404', async () => {
+    const { anna, kai, vic, rob, url } = await table();
     await anna('PUT', `${url}/2`, { text: 'ZEBRA: the ferryman dies.', baseSeq: 0 });
-    for (const who of [ben, kai, vic]) {
+    for (const who of [kai, vic]) {
       const g = await who('GET', url);
       expect(g.statusCode).toBe(403);
       expect(g.body).not.toMatch(/ZEBRA/);

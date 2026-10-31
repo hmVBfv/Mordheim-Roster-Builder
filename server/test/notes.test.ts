@@ -96,12 +96,13 @@ describe('sealed', () => {
 });
 
 describe('leaders only', () => {
-  it('a leader with the authenticator writes and reads them; players and viewers never get them', async () => {
+  it('a leader writes and reads them; players and viewers never get them', async () => {
     const { bid, anna, ben, kai, vic, notes, url } = await world();
     const n = randomUUID();
     expect((await anna('PUT', url(n), { battleId: bid, text: 'The ferryman is in the Countess’s pay.', visibility: 'leader' })).statusCode).toBe(200);
     expect(await notes(anna)).toMatchObject([{ id: n, visibility: 'leader' }]);
-    for (const who of [kai, vic, ben]) expect(await notes(who)).toEqual([]);
+    for (const who of [kai, vic]) expect(await notes(who)).toEqual([]);
+    expect(await notes(ben)).toMatchObject([{ id: n, visibility: "leader" }]); // a leader without the authenticator is a leader (ADR 0030)
     expect((await kai('PUT', url(randomUUID()), { text: 'For the leader', visibility: 'leader' })).json()).toEqual({ error: 'forbidden' });
     expect((await kai('DELETE', url(n))).statusCode).toBe(404);
   });

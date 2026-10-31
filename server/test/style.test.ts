@@ -25,7 +25,7 @@ async function table() {
 }
 
 describe('the style guide', () => {
-  it('is empty at first, and a leader with the authenticator writes it; the first write starts from 0', async () => {
+  it('is empty at first, and a leader writes it; the first write starts from 0', async () => {
     const { anna, url } = await table();
     expect((await anna('GET', url)).json()).toEqual({ style: { text: '', updatedBy: null, updatedAt: null, seq: 0 } });
     const r = await anna('PUT', url, { text: 'German, past tense, close third person. No dice, no game terms.', baseSeq: 0 });
@@ -36,10 +36,10 @@ describe('the style guide', () => {
     expect(((await anna('GET', url)).json() as { style: Style }).style).toEqual(style);
   });
 
-  it('is for leaders with the authenticator alone: players, viewers and a leader without one get a 403, an outsider a 404', async () => {
-    const { anna, ben, kai, lea, vic, rob, url } = await table();
+  it('is for leaders alone: players and viewers get a 403, an outsider a 404', async () => {
+    const { anna, kai, lea, vic, rob, url } = await table();
     await anna('PUT', url, { text: 'ZEBRA: never name the Countess.', baseSeq: 0 });
-    for (const who of [ben, kai, lea, vic]) {
+    for (const who of [kai, lea, vic]) {
       const g = await who('GET', url);
       expect(g.statusCode).toBe(403);
       expect(g.body).not.toMatch(/ZEBRA/);

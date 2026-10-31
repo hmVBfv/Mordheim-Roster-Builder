@@ -8,7 +8,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
   campaignById, campaignView, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, endVanilla, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
-  removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, tagsOf, type CampaignRole, type CampaignRow,
+  removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, setOpening, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
 import { can, type Action } from './policy.ts';
@@ -93,6 +93,14 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
   });
 
   /** The campaign's house rules (a leader): for every warband in it; a warband whose own differ is marked for everyone. */
+  // the opening scene (#169): a leader writes it, every member reads it in the view; empty puts the Lore's text of the place in its stead
+  app.put('/api/v1/campaigns/:id/opening', { config: { action: 'campaign.manage' }, schema: body({ text: { type: 'string', maxLength: 4000 } }, ['text']) }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.manage');
+    if (!t) return reply;
+    setOpening(db(), t.c, (req.body as { text: string }).text.trim(), req.actor!.id, now());
+    return view(t.c, t.role);
+  });
+
   // Vanilla Mordheim (#167): chosen at the start; a running campaign is never turned to it, a leader can turn it off, and it stays off
   app.put('/api/v1/campaigns/:id/vanilla', { config: { action: 'campaign.manage' }, schema: body({ vanilla: { type: 'boolean' } }, ['vanilla']) }, async (req, reply) => {
     const t = target(req, reply, 'campaign.manage');

@@ -22,9 +22,9 @@
    in it – a member (leader, player or viewer), a player (leader or player),
    or a leader – and the handler asks `can(actor, action, { role })` with the
    actor's role there. Someone outside the campaign is told it does not exist
-   (404); a member without the right gets a 403. A leader must have the
-   authenticator set up (ADR 0008), like an admin; so must whoever starts a
-   campaign, as its first leader. */
+   (404); a member without the right gets a 403. Only an admin must have the
+   authenticator set up (ADR 0030, which replaces ADR 0008's rule for leaders):
+   anybody starts a campaign, as its first leader, and leads it with all of it. */
 
 import type { CampaignRole } from './campaigns.ts';
 
@@ -102,8 +102,8 @@ export const ACTIONS = {
   'share.revoke': { who: 'user', target: 'owner' },
   /** One's campaigns. */
   'campaigns.list': { who: 'user' },
-  /** Starting a campaign, as its first leader – with the authenticator (ADR 0008). */
-  'campaigns.create': { who: 'totp' },
+  /** Starting a campaign, as its first leader – anybody (ADR 0030, Rob, 30.10.2026: the authenticator is for the admin's things). */
+  'campaigns.create': { who: 'user' },
   /** A campaign: its members, the warbands entered and their state – every member (ADR 0002: mechanics open). */
   'campaign.read': { who: 'user', target: 'member' },
   /** A warband entered in the campaign, someone else's included – every member. */
@@ -136,25 +136,25 @@ export const ACTIONS = {
   'world.read': { who: 'user', target: 'member' },
   /** Writing the world: leaders alone, with the authenticator – a leader puts an NPC there when the players may know it exists. */
   'world.write': { who: 'user', target: 'leader' },
-  /** The backstory – what came before the app, told in sections: every member reads it (it is the story the players lived), a leader with the authenticator brings it in. */
+  /** The backstory – what came before the app, told in sections: every member reads it (it is the story the players lived), a leader brings it in. */
   'backstory.read': { who: 'user', target: 'member' },
   'backstory.write': { who: 'user', target: 'leader' },
-  /** The leaders' plan for a battle – the red thread the battle and its chapter should follow: leaders with the authenticator, read and write. */
+  /** The leaders' plan for a battle – the red thread the battle and its chapter should follow: leaders, read and write. */
   'plans.read': { who: 'user', target: 'leader' },
   'plans.write': { who: 'user', target: 'leader' },
   /** Hidden NPC warbands (wish #79): reference and TTS data of the game master, read and written by the campaign's leaders alone, with the authenticator. */
   'npcwarband.read': { who: 'user', target: 'leader' },
   'npcwarband.write': { who: 'user', target: 'leader' },
-  /** Opponents – groups of profiles and the campaign's own skills: leaders with the authenticator, read and write – for the rest they are not there. */
+  /** Opponents – groups of profiles and the campaign's own skills: leaders, read and write – for the rest they are not there. */
   'opponents.read': { who: 'user', target: 'leader' },
   'opponents.write': { who: 'user', target: 'leader' },
-  /** The style guide of the AI pack (phase 4b4a): the campaign's leaders with the authenticator, read and write – for the rest it is not there. */
+  /** The style guide of the AI pack (phase 4b4a): the campaign's leaders, read and write – for the rest it is not there. */
   'style.read': { who: 'user', target: 'leader' },
   'style.write': { who: 'user', target: 'leader' },
-  /** Chapters as drafts (phase 4b5b): the campaign's leaders with the authenticator read, write, publish and throw away – for the rest they are not there. */
+  /** Chapters as drafts (phase 4b5b): the campaign's leaders read, write, publish and throw away – for the rest they are not there. */
   'drafts.read': { who: 'user', target: 'leader' },
   'drafts.write': { who: 'user', target: 'leader' },
-  /** Scenarios (phase 4b3c): every member reads – the released ones; a draft only a leader with the authenticator sees (ADR 0011). */
+  /** Scenarios (phase 4b3c): every member reads – the released ones; a draft only a leader sees (ADR 0011). */
   'scenarios.read': { who: 'user', target: 'member' },
   /** Writing, releasing and taking out a draft: leaders alone, with the authenticator. */
   'scenarios.write': { who: 'user', target: 'leader' },
@@ -199,7 +199,7 @@ export function can(actor: Actor | null, action: Action, target?: Target): boole
   if (!role) return false;
   if (def.target === 'member') return true;
   if (def.target === 'player') return role === 'leader' || role === 'player';
-  return role === 'leader' && actor!.totp;
+  return role === 'leader';
 }
 
 function canAtDoor(actor: Actor | null, def: Def, action: Action): boolean {

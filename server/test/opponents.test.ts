@@ -67,11 +67,11 @@ describe('groups of opponents', () => {
     expect(((await anna('GET', url)).json() as { skills: Skill[] }).skills).toEqual([]);
   });
 
-  it('is for leaders with the authenticator alone; the log carries no names', async () => {
-    const { s, anna, ben, kai, vic, rob, url } = await table();
+  it('is for leaders alone; the log carries no names', async () => {
+    const { s, anna, kai, vic, rob, url } = await table();
     const gid = randomUUID();
     await anna('PUT', `${url}/groups/${gid}`, { name: 'ZEBRA gang', profiles: [{ ...ferryman, name: 'ZEBRA' }], baseSeq: 0 });
-    for (const who of [ben, kai, vic]) {
+    for (const who of [kai, vic]) {
       const g = await who('GET', url);
       expect(g.statusCode).toBe(403);
       expect(g.body).not.toMatch(/ZEBRA/);

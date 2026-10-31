@@ -1,6 +1,6 @@
 /* Chapter drafts on the server (phase 4b5b; server/src/routes-drafts.ts):
    a chapter text before it is published. Leaders' own – read, written,
-   published and discarded by leaders with the authenticator; for everyone
+   published and discarded by leaders; for everyone
    else there is no such thing. The last list is kept on the device (under
    the account's own key); every change needs the connection. */
 import { api, ApiError } from '../account/api.ts';

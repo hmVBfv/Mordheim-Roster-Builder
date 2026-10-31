@@ -73,10 +73,11 @@ export interface FakeCampaign {
   id: string; name: string; round: number; createdAt: string;
   /** A key of the lore (#66). */ place?: string;
   /** Plays Vanilla Mordheim (#167). */ vanilla?: boolean;
+  /** The leaders' opening scene (#169). */ opening?: string;
   houseRules?: Record<string, unknown>;
   /** Members who filed it away in their own list (migration 24). */
   archivedBy?: string[];
-  members: { userId: string; displayName: string; username: string; role: FakeRole; canLead: boolean }[];
+  members: { userId: string; displayName: string; username: string; role: FakeRole }[];
   enrolments: FakeEnrolment[];
 }
 
@@ -186,9 +187,9 @@ export function createFakeSync(opts: {
   const view = (c: FakeCampaign) => {
     const role = roleOf(c)!;
     return {
-      campaign: { id: c.id, name: c.name, round: c.round, place: c.place ?? '', vanilla: !!c.vanilla, houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
+      campaign: { id: c.id, name: c.name, round: c.round, place: c.place ?? '', vanilla: !!c.vanilla, opening: c.opening ?? '', houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
       role,
-      members: c.members.map(({ canLead, ...m }) => ({ ...m, joinedAt: c.createdAt, ...(role === 'leader' ? { canLead } : {}) })),
+      members: c.members.map((m) => ({ ...m, joinedAt: c.createdAt })),
       enrolments: c.enrolments.map((e) => ({
         id: e.id, warbandId: e.warbandId, playerId: e.playerId, player: e.player, status: e.status, fromRound: e.fromRound,
         createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
@@ -1089,12 +1090,12 @@ export function createFakeSync(opts: {
     if (w) { w.campaignId = null; w.seq = next(); }
   };
   /** A campaign the signed-in user is part of, with other players' warbands entered. */
-  const addCampaign = (c: { name: string; place?: string; vanilla?: boolean; role?: FakeRole; round?: number; others?: { player: string; data: unknown; role?: FakeRole; pending?: boolean }[] }) => {
+  const addCampaign = (c: { name: string; place?: string; vanilla?: boolean; opening?: string; role?: FakeRole; round?: number; others?: { player: string; data: unknown; role?: FakeRole; pending?: boolean }[] }) => {
     const id = `campaign-${s.campaigns.size + 1}`;
-    const camp: FakeCampaign = { id, name: c.name, ...(c.place ? { place: c.place } : {}), vanilla: !!c.vanilla, round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader', canLead: true }], enrolments: [] };
+    const camp: FakeCampaign = { id, name: c.name, ...(c.place ? { place: c.place } : {}), vanilla: !!c.vanilla, ...(c.opening ? { opening: c.opening } : {}), round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader' }], enrolments: [] };
     for (const [i, o] of (c.others ?? []).entries()) {
       const userId = `user-${o.player.toLowerCase()}`;
-      if (!camp.members.some((m) => m.userId === userId)) camp.members.push({ userId, username: o.player.toLowerCase(), displayName: o.player, role: o.role ?? 'player', canLead: false });
+      if (!camp.members.some((m) => m.userId === userId)) camp.members.push({ userId, username: o.player.toLowerCase(), displayName: o.player, role: o.role ?? 'player' });
       const d = o.data as { name?: string; wb?: string };
       const e: FakeEnrolment = { id: `${id}-e${i + 1}`, warbandId: `${id}-w${i + 1}`, playerId: userId, player: o.player, status: 'pending', fromRound: null, createdAt: at(), confirmedAt: null, name: d.name ?? '', wbType: String(d.wb), tag: null, data: o.data };
       camp.enrolments.push(e);
@@ -1125,6 +1126,13 @@ export function createFakeSync(opts: {
     const rest = m[2] ?? '';
     const lead = role === 'leader';
     const forbidden = json(403, { error: 'forbidden' });
+    if (method === 'PUT' && rest === '/opening') {
+      if (!lead) return forbidden;
+      const text = String(body.text ?? '').trim();
+      if (text.length > 4000) return json(400, { error: 'invalid' });
+      c.opening = text;
+      return json(200, view(c));
+    }
     if (method === 'PUT' && rest === '/vanilla') {
       if (!lead) return forbidden;
       if (body.vanilla === true && !c.vanilla) return json(409, { error: 'conflict', problem: 'a running campaign cannot be turned to Vanilla Mordheim: it is chosen when the campaign starts' });
@@ -1223,7 +1231,7 @@ export function createFakeSync(opts: {
         else {
           const p = s.people.find((q) => q.id === userId);
           if (!p) return json(400, { error: 'invalid', problem: 'no such player' });
-          c.members.push({ ...p, userId: p.id, role: r, canLead: false });
+          c.members.push({ ...p, userId: p.id, role: r });
         }
         return json(200, view(c));
       }

@@ -55,26 +55,27 @@ async function table() {
 }
 
 describe('a draft', () => {
-  it('is read by a leader with the authenticator alone; for everyone else it does not exist, not even as a number', async () => {
+  it('is read by a leader alone; for everyone else it does not exist, not even as a number', async () => {
     const { anna, ben, kai, lea, vic, rob, base, list, draft } = await table();
     const before = await list(kai);
     expect(before).toEqual({ scenarios: [], seq: 0 });
     const { sid, r } = await draft();
     expect(r.statusCode).toBe(200);
     expect(await list(anna)).toMatchObject({ scenarios: [{ id: sid, title: 'The night at the ferry', body: SECRET, npcStatlines: STATS, visibility: 'leader', playedInBattle: null, releasedAt: null, edited: false }] });
-    // Ben leads without an authenticator: like every leader's right, it needs one
-    for (const who of [ben, kai, lea, vic]) expect(await list(who)).toEqual({ scenarios: [], seq: 0 });
+    // Ben leads without an authenticator and is a leader like Anna (ADR 0030); a player and a viewer read none
+    expect(await list(ben)).toMatchObject({ scenarios: [{ id: sid }] });
+    for (const who of [kai, lea, vic]) expect(await list(who)).toEqual({ scenarios: [], seq: 0 });
     expect((await rob('GET', base)).statusCode).toBe(404);
   });
 
   it('is made by a leader only, with the authenticator; the device names it; sent twice it is one', async () => {
-    const { s, anna, ben, kai, lea, vic, rob, base, draft } = await table();
+    const { s, anna, kai, lea, vic, rob, base, draft } = await table();
     const { sid, r } = await draft();
     expect(await anna('PUT', `${base}/${sid}`, { title: 'The night at the ferry', body: SECRET, npcStatlines: STATS }).then((x) => x.statusCode)).toBe(200);
     expect(s.db.prepare('SELECT count(*) AS n FROM scenarios').get()).toEqual({ n: 1 });
     expect(s.db.prepare('SELECT count(*) AS n FROM scenario_revisions').get()).toEqual({ n: 0 });
     expect((r.json() as { seq: number }).seq).toBeGreaterThan(0);
-    for (const who of [ben, kai, lea, vic]) {
+    for (const who of [kai, lea, vic]) {
       expect((await who('PUT', `${base}/${randomUUID()}`, { title: 'Me too' })).statusCode).toBe(403);
       expect((await who('POST', `${base}/${sid}/release`, { battleId: randomUUID() })).statusCode).toBe(403);
       expect((await who('DELETE', `${base}/${sid}`)).statusCode).toBe(403);
@@ -229,7 +230,7 @@ describe('the log', () => {
   });
 });
 
-/* The NPCs of a scenario (ADR 0022): the leader hides parts of them; after the release everyone but a leader with the authenticator reads a "?" there. */
+/* The NPCs of a scenario (ADR 0022): the leader hides parts of them; after the release everyone but a leader reads a "?" there. */
 const GERHARD = {
   name: 'Gerhard QUOKKA-Voss', type: 'QUOKKA-Hero', profile: { M: '4', WS: 'QUOKKA-9', BS: '3', S: '4', T: '4', W: '3', I: '4', A: '2', Ld: '8' }, sv: '5+',
   skills: [{ name: 'Strongman', text: 'Hits harder.' }], equipment: 'Boat hook', equipmentTips: [{ name: 'Boat hook', text: 'Reach: strikes first.' }], rules: 'QUOKKA kills witnesses', from: { kind: 'hired', key: 'hired/ogre', label: 'QUOKKA Ogre (Rulebook)' },
@@ -272,12 +273,13 @@ describe('the NPCs of a scenario', () => {
     expect(revisionsOf(s.db, sid)[0]!.npcs).toHaveLength(1);
   });
 
-  it('after the release a player, a viewer and a leader without the authenticator read a "?" for every hidden part – and not one hidden word reaches them', async () => {
-    const { anna, ben, kai, lea, vic, base, bid, draft, list } = await table();
+  it('after the release a player, a viewer and a leader without the authenticator are not different: every player and viewer reads a "?" for every hidden part – and not one hidden word reaches them', async () => {
+    const { anna, kai, lea, vic, base, bid, draft, list } = await table();
     const { sid } = await draft({ npcs: [npc({ hidden: ['name', 'WS', 'rules'] })] });
-    for (const who of [kai, vic, ben]) expect((await list(who)).scenarios).toEqual([]); // a draft is nobody else's
+    for (const who of [kai, vic]) expect((await list(who)).scenarios).toEqual([]); // a draft is nobody else's but the leaders'
     await anna('POST', `${base}/${sid}/release`, { battleId: bid });
-    for (const who of [kai, lea, vic, ben]) {
+    // Ben leads without the authenticator and reads what Anna reads (ADR 0030): not in this list of those who read a "?"
+    for (const who of [kai, lea, vic]) {
       const body = JSON.stringify((await who('GET', `${base}`)).json());
       expect(body).not.toMatch(/QUOKKA/);
       expect(body).not.toMatch(/Gerhard|Voss/);

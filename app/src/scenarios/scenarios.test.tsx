@@ -216,7 +216,7 @@ describe('everybody else reads the released ones', () => {
     });
   }
 
-  it('a leader without the authenticator reads like a player: no drafts, nothing to write', async () => {
+  it('a leader without the authenticator reads and writes like any leader (ADR 0030): the drafts, and the button to write one', async () => {
     const srv = server({ totp: false });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
     const b = srv.addBattle(c.id, { title: 'Hel Fenn ferry' });
@@ -224,8 +224,8 @@ describe('everybody else reads the released ones', () => {
     srv.scenarioFrom(c.id, { title: 'The night at the ferry', battleId: b.id });
     at(`/campaign/${c.id}/world`);
     expect(await screen.findByRole('article', { name: 'The night at the ferry' })).toBeTruthy();
-    expect(screen.queryByText(/ZEBRA/)).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Write a scenario' })).toBeNull();
+    expect(await screen.findByText(/ZEBRA/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Write a scenario' })).toBeTruthy();
   });
 
   it('says that nothing has been played yet', async () => {

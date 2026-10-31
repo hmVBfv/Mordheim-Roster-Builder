@@ -1,5 +1,5 @@
 /* Hidden NPC warbands on the server (server/src/routes-npc-warbands.ts): the game master's reference and Tabletop Simulator data.
-   Leaders' own – read and written by leaders with the authenticator; for everyone else there is no such thing. Every change
+   Leaders' own – read and written by leaders; for everyone else there is no such thing. Every change
    needs the connection; nothing is kept on the device. */
 import * as core from '@mordheim/core';
 import { api, ApiError } from '../account/api.ts';

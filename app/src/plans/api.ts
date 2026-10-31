@@ -1,6 +1,6 @@
 /* The leaders' plans for battles on the server (server/src/routes-plans.ts):
    the red thread of a battle, by its number. Leaders' own – read and written
-   by leaders with the authenticator; for everyone else there is no such
+   by leaders; for everyone else there is no such
    thing. The last list is kept on the device (under the account's own key);
    writing needs the connection. */
 import { api, ApiError } from '../account/api.ts';

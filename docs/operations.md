@@ -230,7 +230,7 @@ So kommt sie in die App – erst als **Probelauf auf der Testinstanz**
 (`roster-deploy --staging`; was dort entsteht, ist nach dem nächsten
 nächtlichen Wiederherstellungstest wieder weg), dann genauso produktiv:
 
-1. Der Leiter (mit Authenticator) legt die Kampagne an, nimmt die
+1. Der Leiter legt die Kampagne an, nimmt die
    Mitspieler auf und setzt ihre Hausregeln (Manage → „Set the house
    rules“) – die Kopien, die eintreten, übernehmen sie sofort.
 2. Jeder Spieler importiert seinen aktuellen Stand aus dem Roster Builder
