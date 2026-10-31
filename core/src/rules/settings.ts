@@ -2,6 +2,9 @@
    a warband. A campaign that plays in some areas keeps the items of those – and, always, what the core chart lists and what a warband
    brings with it. Pure: it only reads the catalogue entry and the data. */
 import type { CatalogItem, GameData } from '../data/types.ts';
+import type { WarbandState } from '../state/types.ts';
+import type { Ctx } from './context.ts';
+import { update } from '../warband/update.ts';
 
 /** The sources of an item: the settings whose price chart lists it, `warband` for a warband's own, and `core` for the rulebook's items
     (`vanilla`). An item that none of these names comes from a list the data does not trace to a setting: no source. */
@@ -49,3 +52,17 @@ export const isVanillaSkillList = (data: Pick<GameData, 'VANILLA'>, list: string
 
 /** Is this a warband of the rulebook (grade core)? Only these enter, and are made for, a campaign that plays Vanilla Mordheim (wish #167). */
 export const isVanillaWarband = (data: Pick<GameData, 'WARBANDS'>, wb: unknown): boolean => typeof wb === 'string' && data.WARBANDS[wb]?.grade === 'core';
+
+/** Does this warband play Vanilla Mordheim: only the rulebook's items and skills (wish #167, step 1)? */
+export const isVanillaOnly = (s: Pick<WarbandState, 'vanilla'>): boolean => s.vanilla === true;
+
+/** The warband as one that plays Vanilla Mordheim. Meant for a new one; only a warband of the rulebook (grade core) can, any other is left as it is. */
+export function asVanillaWarband(ctx: Ctx): WarbandState {
+  return isVanillaWarband(ctx.data, ctx.s.wb) ? update(ctx, (d) => { d.vanilla = true; }) : ctx.s;
+}
+
+/** Turns the option on or off; a warband that cannot play Vanilla stays as it is. Off, the key goes (an ordinary warband has none). */
+export function setVanillaWarband(ctx: Ctx, on: boolean): WarbandState {
+  if (on) return asVanillaWarband(ctx);
+  return isVanillaOnly(ctx.s) ? update(ctx, (d) => { delete d.vanilla; }) : ctx.s;
+}

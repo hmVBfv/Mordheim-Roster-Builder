@@ -451,11 +451,12 @@ export function newWarbandChoice(data: GameData, key: string): NewWarbandChoice 
 /* The data marks rule names with <b>; the recruit list shows plain text. */
 const plainNote = (sp: string | undefined) => (sp ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
 
-export function createWarband(data: GameData, key: string, subtype: string | null, name: string, planner = false, trade = false): WarbandState {
+export function createWarband(data: GameData, key: string, subtype: string | null, name: string, planner = false, trade = false, vanilla = false): WarbandState {
   let s = core.newWarband(data, key);
   if (subtype && subtype !== s.subtype) s = core.pickSubtype(core.ctxOf(data, s), subtype);
   if (planner) s = core.asPlanner(core.ctxOf(data, s));
   if (planner && trade) s = core.setPlannerTrade(core.ctxOf(data, s), true);
+  if (vanilla) s = core.asVanillaWarband(core.ctxOf(data, s));
   const nm = name.trim();
   if (nm) s = core.setWarbandName(core.ctxOf(data, s), nm);
   return editableState(data, s);

@@ -300,6 +300,8 @@ export interface WarbandState {
   planner?: boolean;
   /** A planner whose Trading Post is open (wish #89): it trades as a warband after its first battle, without gold limit. */
   plannerTrade?: boolean;
+  /** Plays Vanilla Mordheim (wish #167): only the rulebook's items and skills; see rules/settings.ts. Only a warband of the rulebook (grade core); absent on every other. */
+  vanilla?: boolean;
   /** The gold ledger (V7); absent until the warband's first battle. */
   ledger?: LedgerEntry[];
   [key: string]: unknown;

@@ -157,6 +157,8 @@ export const warbandSaveSchema = z.looseObject({
   planner: z.boolean().optional(),
   /** A planner whose Trading Post is open (wish #89). */
   plannerTrade: z.boolean().optional(),
+  /** Plays Vanilla Mordheim: only the rulebook's items and skills (wish #167). */
+  vanilla: z.boolean().optional(),
   /** The gold ledger (V7), from the warband's first battle on. */
   ledger: z.array(z.looseObject({ id: z.number(), kind: z.enum(['open', 'roster', 'buy', 'sell', 'search', 'adjust']), amount: z.number(), text: z.string(), round: z.number().optional(), uid: z.union([z.number(), z.string()]).optional(), item: z.string().optional(), qty: z.number().optional(), found: z.boolean().optional() })).optional(),
 });

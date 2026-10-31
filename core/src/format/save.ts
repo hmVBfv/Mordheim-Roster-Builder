@@ -27,9 +27,9 @@ export type LoadResult =
 
 /* Keys a save carries at the top level beyond the legacy set: core's uid
    counter, the narrative fields of the new builder, the gold ledger and the
-   planner mark (data-model.md). None needs a default: a save without them is read as the
+   planner mark and the vanilla option (data-model.md). None needs a default: a save without them is read as the
    Roster Builder reads it. */
-const KEPT = ['uidSeq', 'canon', 'story', 'ledger', 'planner', 'plannerTrade'] as const;
+const KEPT = ['uidSeq', 'canon', 'story', 'ledger', 'planner', 'plannerTrade', 'vanilla'] as const;
 
 /** An object with some keys renamed, in their order (data RENAMED: items
     that changed their name). A new name that is already there keeps the

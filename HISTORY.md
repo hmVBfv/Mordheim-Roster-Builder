@@ -4567,3 +4567,15 @@ description of the campaign's place, marked "From the Lore · Khemri"; the leade
 and "Use the Lore text" empties theirs. All 120 places have a text, so there is nothing to mark per place beyond that label. Two traps: the
 sheet's text area kept the text in the page while closed (the same thing as the changelog sheet, which a test of another screen had found), so
 the form is only there while it is open; and `useSheet`'s close callback is where the form is taken away.
+
+## October 31, 2026 — The warband carries Vanilla Mordheim (#167, step 1)
+
+Rob gave step 1 of #167 the go: the warband itself plays Vanilla Mordheim, not only the campaign. A save key `vanilla` (like `planner`), only for a
+warband of the rulebook (grade core, so the six of the rulebook), set when it is made (a tick in "New warband") or on the copy that enters a
+Vanilla campaign; the warband that was entered stays as it is. What it does: the rare items outside the rulebook are not found and not bought
+(`rarityOf` is `null`, `canReceive` says why), which is where the market reads the catalogue. The skills needed no cut at all: the five standard
+lists and the special lists of the six warbands are all the rulebook's, so a filter in `skillListsFor` would have been dead code; a test now
+says so instead, and will fail the day a list from outside the rulebook reaches one of them. Not done, on purpose: Hired Swords and Dramatis
+Personae of other sources (the data does not mark which are in the rulebook), items already owned when a warband enters (they stay), and the
+areas (Khemri, Lustria …). A warband in a Vanilla campaign cannot switch it off before the campaign does; a copy kept after the campaign
+switched it off can.
