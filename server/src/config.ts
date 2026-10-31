@@ -26,6 +26,8 @@ export interface Config {
   geoipDb: string;
   /** The largest database file read, in MB (the reader keeps it all in memory). */
   geoipMaxMb: number;
+  /** NTFY_URL (https://ntfy.sh/<topic>): a message on Rob's phone when a report comes in; its topic is the secret. null: none is sent. */
+  ntfyUrl: string | null;
 }
 
 const LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'];
@@ -53,6 +55,13 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
   }
   const totpKey = parseKey(env.TOTP_KEY);
   if (env.TOTP_KEY && !totpKey) throw new ConfigError('TOTP_KEY must be 32 bytes in base64 (openssl rand -base64 32)');
+  let ntfyUrl: string | null = null;
+  if (env.NTFY_URL) {
+    // the value is not repeated in the message: its topic is the secret
+    const u = ((): URL | null => { try { return new URL(env.NTFY_URL); } catch { return null; } })();
+    if (!u || u.protocol !== 'https:' || u.pathname.length < 2) throw new ConfigError('NTFY_URL must be an https address with a topic');
+    ntfyUrl = u.href;
+  }
   return {
     dataDir: env.DATA_DIR ?? '/data',
     uploadDir: env.UPLOAD_DIR ?? '/uploads',
@@ -66,5 +75,6 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     totpKey,
     geoipDb: env.GEOIP_DB ?? join(env.DATA_DIR ?? '/data', 'geoip', 'city.mmdb'),
     geoipMaxMb: Number(env.GEOIP_MAX_MB) > 0 ? Number(env.GEOIP_MAX_MB) : 64,
+    ntfyUrl,
   };
 }

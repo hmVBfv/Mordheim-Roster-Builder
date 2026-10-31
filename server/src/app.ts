@@ -10,6 +10,7 @@ import type { Config } from './config.ts';
 import type { DB } from './db.ts';
 import type { Health } from './health.ts';
 import { placeOf, type Geo } from './geo.ts';
+import type { Notify } from './notify.ts';
 import { recordMove } from './signins.ts';
 import type { HashCost } from './passwords.ts';
 import { countContainers, MAX_JSON_CONTAINERS } from './json-limits.ts';
@@ -75,6 +76,8 @@ export interface AppDeps {
   hashCost?: HashCost | undefined;
   /** The place of an address (wish #69); null: none known. */
   geo?: Geo | null;
+  /** A notice to Rob's phone when a report comes in; null: none. */
+  notify?: Notify | null;
   files: StaticFiles;
   trustProxy: string[];
   /** false: silent (tests that do not look at the log). */
@@ -221,7 +224,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerPlanRoutes(app, { db, now });
   registerOpponentRoutes(app, { db, now });
   registerDraftRoutes(app, { db, now });
-  registerBugRoutes(app, { db, now });
+  registerBugRoutes(app, { db, now, notify: deps.notify ?? null });
   registerLiveRoutes(app, { hub: db ? createHub(db, now, deps.live) : null });
 
   const serveFile = (req: FastifyRequest, reply: FastifyReply) => {
