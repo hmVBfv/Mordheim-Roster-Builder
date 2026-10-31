@@ -53,7 +53,7 @@ describe('what the server hears', () => {
   const ok = () => new Response('{}', { headers: { 'content-type': 'application/json' } });
 
   it('says "active" on a request while somebody is there, and nothing in the background', async () => {
-    const f = vi.fn(async (_url: string, _init?: RequestInit) => ok());
+    const f = vi.fn<typeof fetch>(async () => ok());
     const headersOf = (i: number) => new Headers(f.mock.calls[i]![1]!.headers);
     vi.stubGlobal('fetch', f);
     startActivity(() => undefined);
