@@ -58,8 +58,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
   let ntfyUrl: string | null = null;
   if (env.NTFY_URL) {
     // the value is not repeated in the message: its topic is the secret
-    let u: URL | null = null;
-    try { u = new URL(env.NTFY_URL); } catch { u = null; }
+    const u = ((): URL | null => { try { return new URL(env.NTFY_URL); } catch { return null; } })();
     if (!u || u.protocol !== 'https:' || u.pathname.length < 2) throw new ConfigError('NTFY_URL must be an https address with a topic');
     ntfyUrl = u.href;
   }
