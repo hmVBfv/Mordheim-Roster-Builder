@@ -15,6 +15,7 @@ import type { CatalogItem, EquipmentEntry, UnitDef } from '../data/types.ts';
 import type { Model, RareHolding, StashItem, WarbandState } from '../state/types.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { catalogAllowed, rareEligibleItems, rareEntryCost } from '../rules/equipment.ts';
+import { isVanillaOnly, itemIsVanilla } from '../rules/settings.ts';
 import { eqListFor, isUpgrade, stripParen, unitDef, warbandDef } from '../rules/lookup.ts';
 import { adjPrice, catalogDefaultPaid } from '../rules/pricing.ts';
 import { memberCount } from '../rules/profile.ts';
@@ -210,6 +211,7 @@ export function canReceive(ctx: Ctx, to: Holder, g: Goods): Verdict {
   const it = catalogItem(ctx, g.key);
   if (!it) return { ok: false, reason: 'not in the catalogue' };
   if (isUpgrade(ctx.data, g.key)) return { ok: false, reason: 'a weapon upgrade stays with its weapon' };
+  if (isVanillaOnly(ctx.s) && !itemIsVanilla(it)) return { ok: false, reason: 'not in the rulebook, and this warband plays Vanilla Mordheim' };
   if (!catalogAllowed(ctx, it, m) || keptFromUnit(ctx, it, m)) return { ok: false, reason: 'kept for other warbands or warriors' };
   if (!rareEligibleItems(ctx, m).some((x) => x.de === g.key)) return { ok: false, reason: `nothing of this kind in the equipment of a ${def.name}` };
   return { ok: true, reason: '' };
@@ -400,7 +402,10 @@ export interface SearchModifier { label: string; value: number; source: string }
     and those without a rarity. A pair's own rarity ("Paar Rare 10") is not
     used here. */
 export function rarityOf(ctx: Ctx, de: string): number | null {
-  const m = /Rare\s+(\d+)/.exec(catalogItem(ctx, de)?.rare ?? '');
+  const it = catalogItem(ctx, de);
+  // a warband that plays Vanilla Mordheim finds only what the rulebook has: the rest is not on offer at all (wish #167)
+  if (it && isVanillaOnly(ctx.s) && !itemIsVanilla(it)) return null;
+  const m = /Rare\s+(\d+)/.exec(it?.rare ?? '');
   return m ? Number(m[1]) : null;
 }
 

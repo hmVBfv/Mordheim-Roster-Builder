@@ -36,13 +36,17 @@ async function onServer(data: GameData, rec: StoredWarband): Promise<StoredWarba
 
 interface Entered { enrolmentId: string; warband: { id: string; createdAt: string; campaignId: string | null }; head: { rev: number; data: unknown }; campaign: CampaignView }
 
-/** The warband as it enters: under the campaign's house rules. */
+/** The warband as it enters: under the campaign's house rules, and playing Vanilla Mordheim where the campaign does (#167). */
 async function underCampaignRules(data: GameData, campaignId: string, s: core.WarbandState, keepOwn: boolean): Promise<core.WarbandState> {
-  if (keepOwn) return s;
   const view = ((await db.meta.get(campaignKey(campaignId)))?.value as CampaignView | undefined) ?? await getCampaign(campaignId);
+  let out = s;
+  if (view.campaign.vanilla && !core.isVanillaOnly(out) && core.isVanillaWarband(data, out.wb)) {
+    out = applyEdit(data, out, (c) => core.asVanillaWarband(c), 'Vanilla Mordheim of the campaign', { gold: 'keep' });
+  }
+  if (keepOwn) return out;
   const rules = view.campaign.houseRules;
-  if (!core.houseDifferences(rules, s.house).length) return s;
-  return applyEdit(data, s, (c) => adoptHouse(c, rules), 'House rules of the campaign', { gold: 'keep' });
+  if (!core.houseDifferences(rules, out.house).length) return out;
+  return applyEdit(data, out, (c) => adoptHouse(c, rules), 'House rules of the campaign', { gold: 'keep' });
 }
 
 /** `keepOwnRules`: the copy keeps the warband's own house rules instead of taking the campaign's (#64); the leaders then see that they differ. */

@@ -33,6 +33,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const [name, setName] = useState('');
   const [planner, setPlanner] = useState(false);
   const [trade, setTrade] = useState(false);
+  const [plain, setPlain] = useState(false);
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const ids = { sub: useId(), name: useId() };
@@ -40,11 +41,13 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const choice = key ? newWarbandChoice(data, key) : null;
   const subtype = choice?.subtypes.find((x) => x.key === sub) ?? choice?.subtypes[0] ?? null;
   const gold = subtype?.gold ?? choice?.gold ?? 0;
+  const fromRulebook = !!choice && isVanillaWarband(data, choice.key);
 
   const create = async () => {
     if (!choice) return;
     setBusy(true);
-    const s = createWarband(data, choice.key, subtype?.key ?? null, name, planner && !campaignId, planner && !campaignId && trade);
+    // a warband made for a Vanilla campaign plays Vanilla; elsewhere a warband of the rulebook may choose it (#167)
+    const s = createWarband(data, choice.key, subtype?.key ?? null, name, planner && !campaignId, planner && !campaignId && trade, !!vanilla || (plain && fromRulebook));
     const now = new Date().toISOString();
     const rec: StoredWarband = {
       id: newId(), name: s.name || choice.name, wb: choice.key, wbName: choice.name,
@@ -108,6 +111,12 @@ function Form({ campaignId }: { campaignId: string | null }) {
         <label className={ui.check}>
           <input type="checkbox" checked={trade} onChange={(e) => setTrade(e.target.checked)} />
           <span><strong>Open the Trading Post</strong> – to get rare items (a search needs no roll, a price you leave empty is the average); it can be switched later under the warband’s menu.</span>
+        </label>
+      )}
+      {fromRulebook && !vanilla && (
+        <label className={ui.check}>
+          <input type="checkbox" checked={plain} onChange={(e) => setPlain(e.target.checked)} />
+          <span><strong>Vanilla Mordheim</strong> – only the rulebook’s items and skills: the Trading Post offers nothing else. It can be switched off later under House rules.</span>
         </label>
       )}
       {choice && !planner && <p className={ui.muted}>Starting gold: {gold} gc.</p>}

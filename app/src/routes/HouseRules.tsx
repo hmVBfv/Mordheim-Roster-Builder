@@ -10,6 +10,7 @@
 import * as core from '@mordheim/core';
 import { Suspense, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { useCampaignVanilla } from '../campaign/name.ts';
 import { useCampaignRules, type CampaignRules } from '../campaign/rules.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { FLAVOUR } from '../flavour.ts';
@@ -75,6 +76,8 @@ function Body({ rec }: { rec: StoredWarband }) {
   const locked = core.tradeLocked(ctx);
   const camp = useCampaignRules(FLAVOUR === 'campaign' ? rec.campaignId : null);
   const inCampaign = FLAVOUR === 'campaign' && !!rec.campaignId;
+  // a warband in a campaign that plays Vanilla stays with it; the campaign's leaders can turn it off (#167)
+  const campaignVanilla = useCampaignVanilla(inCampaign ? rec.campaignId : null);
   // in a campaign its rules count
   const count = inCampaign && camp ? houseView(data, campaignHouseState(data, camp.rules), { campaign: true }).count : v.count;
 
@@ -112,6 +115,16 @@ function Body({ rec }: { rec: StoredWarband }) {
             </section>
           </>
         )}
+
+      {core.isVanillaOnly(ed.state) && (
+        <section className={styles.group} aria-labelledby="hr-vanilla">
+          <h2 id="hr-vanilla">Vanilla Mordheim</h2>
+          <p className={styles.declared}>Only the rulebook’s items and skills: the Trading Post offers nothing else.</p>
+          {campaignVanilla
+            ? <p className={ui.muted}>The campaign plays it, so this warband does too. Once its leaders switch it off, you can too.</p>
+            : <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={() => ed.edit((c) => core.setVanillaWarband(c, false), 'Every item and skill of the catalogue is on offer again.', KEEP)}>Play with every item and skill</button></div>}
+        </section>
+      )}
 
       <section className={styles.group} aria-labelledby="hr-export">
         <h2 id="hr-export">On every export</h2>
