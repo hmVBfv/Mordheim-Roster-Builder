@@ -2,7 +2,7 @@
    before the campaign came into the app, in sections a leader brought in
    from the group's old chronicle. Every member reads it – it is the story the
    players lived, not a secret; hidden things belong in the background, with
-   a rule. A leader with the authenticator replaces it as a whole, from the
+   a rule. A leader replaces it as a whole, from the
    stand the device saw. The log says that it changed and how many sections
    it has, never what it says. */
 import { z } from 'zod';

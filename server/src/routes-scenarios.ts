@@ -1,7 +1,7 @@
 /* Scenarios (phase 4b3c; docs/architecture.md "Endpunkte"): a leaders' own
    scenario, hidden until a leader releases it to a battle. Every member
    reads – what each sees is decided in scenarios.ts for the one who asks
-   (ADR 0011); writing and releasing are for leaders with the authenticator.
+   (ADR 0011); writing and releasing are for leaders.
    Every route names its action, `can()` decides before the handler runs. */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { campaignById, roleIn, type CampaignRole, type CampaignRow } from './campaigns.ts';

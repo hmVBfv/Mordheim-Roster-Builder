@@ -243,7 +243,7 @@ Begriff einführt, trägt ihn hier ein.
 | Modell kopieren | Copy from a model | Vorlagen aus `opponentTemplates` (Spiel), `warriorTemplates` (Krieger der Kampagne) und den NPCs der Welt (`npcTemplate`, Art `npc`); kopiert, nie verknüpft |
 | Öffentlicher Status | Status everyone may read | `public_status` |
 | Szenario | Scenario | Tabelle `scenarios`, Abschnitt im Reiter „World“; das spielbare Paket (Regeln, NPC-Werte im TTS-Format). Der Hintergrund hält Pläne und Ideen (`kind: 'scenario'`) |
-| Entwurf (Szenario) | Draft | `visibility: 'leader'`: nur Leiter mit Authenticator, nicht einmal als Zahl für andere |
+| Entwurf (Szenario) | Draft | `visibility: 'leader'`: nur Leiter, nicht einmal als Zahl für andere |
 | Freigeben (Szenario) | Release | `POST …/scenarios/:sid/release { battleId }`: einer Schlacht zuweisen, danach `public` und nicht zurückzunehmen |
 | NPC-Werte | NPC statlines | `npc_statlines`; der freie Text, den die Spieler ganz lesen; „Copy statlines“ für den TTS-Tisch |
 | NPC eines Szenarios | Scenario NPC | `scenarios.npcs` (JSON, `ScenarioNpc` in `core/src/campaign/scenarioNpc.ts`): die Werte eines NPCs (`NpcProfile`) mit `id`, eigenem Namen und `hidden`; „Add NPCs“ / „Change NPCs“ |

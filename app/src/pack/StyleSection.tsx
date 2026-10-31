@@ -1,7 +1,7 @@
 /* The campaign's style guide (phase 4b4a; concept.md 4.10): the writing
    instructions the AI pack hands to whoever writes the chapter – language,
    tense, voice, what stays out of the prose. A leaders' own text under
-   Manage: read and written by leaders with the authenticator. Writing needs
+   Manage: read and written by leaders. Writing needs
    the connection; the last text is kept on the device. */
 import { useEffect, useId, useRef, useState } from 'react';
 import { errorText } from '../account/api.ts';

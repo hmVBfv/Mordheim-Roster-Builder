@@ -225,18 +225,12 @@ describe('the Background tab', () => {
     expect(await screen.findByText(/Nothing here yet/)).toBeTruthy();
   });
 
-  it('there is no Background for a player, a viewer, or a leader without the authenticator', async () => {
+  it('there is no Background for a player or a viewer; a leader has it, authenticator or not (ADR 0030)', async () => {
     const srv = server({ totp: false });
     const lead = srv.addCampaign({ name: 'Without the authenticator', others: others() });
     at(`/campaign/${lead.id}`);
     expect((await screen.findAllByRole('link', { name: 'Notes' })).length).toBeGreaterThan(0);
-    // the tabs come first from what this device kept of the campaign; the server's answer settles them
-    await waitFor(() => expect(screen.queryByRole('link', { name: /Background/ })).toBeNull());
-    cleanup();
-    // the address alone gets nothing either
-    at(`/campaign/${lead.id}/background`);
-    expect((await screen.findAllByRole('link', { name: 'Notes' })).length).toBeGreaterThan(0);
-    expect(screen.queryByText(/Only campaign leaders see this area/)).toBeNull();
+    expect((await screen.findAllByRole('link', { name: /Background/ })).length).toBeGreaterThan(0);
     cleanup();
 
     const srv2 = server({ totp: true });

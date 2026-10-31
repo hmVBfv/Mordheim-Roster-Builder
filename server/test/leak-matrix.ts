@@ -338,10 +338,10 @@ export const MATRIX: Record<Action, MatrixRow> = {
     fields: same(signedIn, ['campaigns']),
   },
   'campaigns.create': {
-    // the first leader needs the authenticator: the user role has none
-    allowed: ['admin'],
+    // anybody starts one and leads it, authenticator or not (ADR 0030); the admin's probe comes last
+    allowed: ['user', 'admin'],
     routes: { 'POST /api/v1/campaigns': () => ({ method: 'POST', url: '/api/v1/campaigns', body: { name: 'Probing the Hel Fenn' } }) },
-    fields: { admin: VIEW },
+    fields: { user: VIEW, admin: VIEW },
   },
   'campaign.read': {
     allowed: ['user'],

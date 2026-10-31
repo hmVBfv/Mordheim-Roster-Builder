@@ -8,7 +8,7 @@ Stand: 10. Oktober 2026 (nach der Sicherheitsprüfung, [security-review.md](secu
 | --- | --- | --- |
 | Verborgene Erzählung (Hintergrund, versiegelte Notizen) | neugieriger Mitspieler; Fehler in einem Endpunkt; versehentliches Veröffentlichen | Filter nur auf dem Server; Leak-Test-Matrix in der CI; nie in ein Repo |
 | Kampagnendaten | Bug, Bedienfehler, Konto-Übernahme | Versionen statt Überschreiben; Audit-Log; Backups |
-| Konten | Passwort-Raten aus dem Internet | Bremse, Fail2Ban, TOTP für Admin und Leiter |
+| Konten | Passwort-Raten aus dem Internet | Bremse, Fail2Ban, TOTP für Admins (für Leiter freiwillig, ADR 0030) |
 | Der Pi selbst (die übrigen Dienste) | Angriff über den neuen Webdienst | nur 443 offen, App nur auf `127.0.0.1`, Container gehärtet und begrenzt |
 | Der Pi als Ganzes | untergeschobene Betriebsdateien (`install.sh` läuft als root); ein fremdes Image | Klon außerhalb der Agenten-Verzeichnisse, `install.sh` prüft das; `master` nur per Pull Request; Zwei-Faktor-Anmeldung bei GitHub; Deploy nur bewusst per Commit-Tag und nur mit Signatur der CI von `master` (ADR 0017) |
 | Rob selbst | Rückschluss vom öffentlichen Repo auf Person und Heimnetz | keine Hostnamen, Adressen, Kontonamen, Klarnamen oder E-Mail-Adressen im Repo und in den Commits |
@@ -127,8 +127,8 @@ Umgesetzt in Phase 3g (`server/src/routes-accounts.ts`, `accounts.ts`,
     Passwort herein). Verlängert sich die Sitzung, bekommt auch der Cookie
     neue 30 Tage. Eine Passwortänderung, deren Sitzung währenddessen beendet
     wurde, gilt nicht.
-- **Zweiter Faktor (TOTP, Authenticator-App):** Pflicht für Admin und Leiter,
-  optional für Spieler. Beim Einrichten 10 Einmal-Wiederherstellungscodes.
+- **Zweiter Faktor (TOTP, Authenticator-App):** Pflicht nur für Admins (ADR 0030, vorher auch für Leiter),
+  optional für alle anderen. Beim Einrichten 10 Einmal-Wiederherstellungscodes.
   Geht beides verloren, setzt der Admin den Faktor zurück (geloggt); für den
   Admin selbst gibt es den Weg über `roster-cli` auf dem Pi. Ein
   Admin-Konto setzt nur `roster-cli` zurück (Faktor und Reset-Link), nie die
@@ -245,10 +245,9 @@ Recht bekommt 403. `can()` bekommt die Rolle des Handelnden in der Kampagne:
 `campaign.read` und `campaign.warband.read` jedes Mitglied (auch Zuschauer;
 die Mechanik ist offen, ADR 0002, also auch der Entwurf seit der letzten
 Version), `campaign.enrol` Leiter und Spieler (zurückziehen nur die eigene,
-ein Leiter jede), `campaign.manage` nur Leiter mit Authenticator. Eine
-Kampagne anlegen darf nur, wer den Authenticator eingerichtet hat – er wird
-ihr erster Leiter. Ob ein Mitglied den Authenticator hat, sehen nur Leiter
-(`canLead`). Eine eingetragene Warband bleibt die ihres Besitzers: Über
+ein Leiter jede), `campaign.manage` nur Leiter (mit oder ohne Authenticator, ADR 0030). Eine
+Kampagne anlegen darf jedes Konto – es wird
+ihr erster Leiter. Eine eingetragene Warband bleibt die ihres Besitzers: Über
 `/warbands/:id` liest und ändert sie nur er; die anderen lesen sie über die
 Kampagne. Jede Kampagnen-Aktion steht mit `campaign_id` und Sichtbarkeit
 `public` im `audit_log`.

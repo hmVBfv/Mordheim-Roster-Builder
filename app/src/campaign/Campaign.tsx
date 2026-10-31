@@ -161,7 +161,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
   );
 }
 
-function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view: CampaignView; me: string; canLead: boolean; onView: (v: CampaignView) => void; onNotice: (t: string) => void }) {
+function Manage({ id, view, me, onView, onNotice }: { id: string; view: CampaignView; me: string; onView: (v: CampaignView) => void; onNotice: (t: string) => void }) {
   const [name, setName] = useState(view.campaign.name);
   const [people, setPeople] = useState<Person[] | null>(null);
   const [adding, setAdding] = useState('');
@@ -186,9 +186,6 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
   const stillOpen = ofNext.filter((b) => b.status === 'open').length;
   const satOut = view.enrolments.filter((e) => e.status === 'active' && !ofNext.some((b) => (b.warbandIds ?? []).includes(e.warbandId)));
   const outside = (people ?? []).filter((p) => !view.members.some((m) => m.userId === p.id));
-  if (!canLead) {
-    return <p className={ui.message}>Leading needs the authenticator: set it up under Account, then come back.</p>;
-  }
   return (
     <div className={styles.columns}>
       <div className={ui.page}>
@@ -246,7 +243,7 @@ function Manage({ id, view, me, canLead, onView, onNotice }: { id: string; view:
           <ul className={styles.list}>
             {view.members.map((m) => (
               <li key={m.userId} className={styles.member}>
-                <span>{m.displayName}{m.userId === me ? ' (you)' : ''}<small>{m.role === 'leader' && m.canLead === false ? 'leads once the authenticator is set up' : m.username}</small></span>
+                <span>{m.displayName}{m.userId === me ? ' (you)' : ''}<small>{m.username}</small></span>
                 <span className={styles.controls}>
                   <select className={ui.select} aria-label={`Role of ${m.displayName}`} value={m.role} disabled={busy}
                     onChange={(e) => void run(() => setMember(id, m.userId, e.target.value as CampaignRole), `${m.displayName}: ${ROLE_NAMES[e.target.value as CampaignRole]}.`)}>
@@ -362,19 +359,19 @@ export function Campaign() {
   const questions = tab === 'questions' && view.role !== 'viewer';
   const world = tab === 'world';
   const warbands = tab === 'warbands';
-  // the background and the view as a player: leaders with the authenticator only (the server refuses anyone else)
-  const background = tab === 'background' && lead && user.totp;
-  const asPlayer = tab === 'as-player' && lead && user.totp;
-  const content = manage ? <Manage id={id} view={view} me={user.id} canLead={user.totp} onView={setView} onNotice={notify} />
+  // the background and the view as a player: leaders only (the server refuses anyone else)
+  const background = tab === 'background' && lead;
+  const asPlayer = tab === 'as-player' && lead;
+  const content = manage ? <Manage id={id} view={view} me={user.id} onView={setView} onNotice={notify} />
     : warbands ? <WarbandsTab id={id} view={view} me={user.id} onView={setView} />
-    : notes ? <NotesTab id={id} view={view} user={user} lead={lead && user.totp} />
-    : world ? <WorldTab id={id} view={view} lead={lead && user.totp} onView={setView} />
-    : questions ? <QuestionsTab id={id} view={view} user={user} lead={lead && user.totp} />
+    : notes ? <NotesTab id={id} view={view} user={user} lead={lead} />
+    : world ? <WorldTab id={id} view={view} lead={lead} onView={setView} />
+    : questions ? <QuestionsTab id={id} view={view} user={user} lead={lead} />
     : background ? <BackgroundTab id={id} view={view} />
     : asPlayer ? <AsPlayerTab id={id} view={view} />
-    : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead && user.totp} />
-    : chronicle ? <ChronicleTab id={id} view={view} lead={lead && user.totp} />
-    : <Overview id={id} view={view} me={user.id} lead={lead && user.totp} onView={setView} />;
+    : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead} />
+    : chronicle ? <ChronicleTab id={id} view={view} lead={lead} />
+    : <Overview id={id} view={view} me={user.id} lead={lead} onView={setView} />;
   // the tabs of text and forms keep a measure; those of cards and lists (overview, warbands, world) take the whole width
   const prose = manage || notes || timeline || chronicle || questions || background || asPlayer;
   return (
@@ -386,7 +383,7 @@ export function Campaign() {
       {error && <p className={ui.message} role="status">{error} Shown as last seen.</p>}
       {/* on a phone the sections are tabs here; from tablet width on they stand in the side navigation */}
       <nav className={`${styles0.tabs} ${styles.pageTabs}`} aria-label="Campaign">
-        {campaignTabs(id, view.role, user.totp).map((t) => <NavLink key={t.to} to={t.to} end={t.end}>{t.label}</NavLink>)}
+        {campaignTabs(id, view.role).map((t) => <NavLink key={t.to} to={t.to} end={t.end}>{t.label}</NavLink>)}
       </nav>
       {content}
       <div className={ui.row}><Link to="/campaign" className={ui.buttonQuiet}>All campaigns</Link></div>

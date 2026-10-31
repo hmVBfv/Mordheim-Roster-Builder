@@ -2,7 +2,7 @@
    a leader wants it and its chapter to follow – the goal, the turning points,
    where the story should end up. Written by the battle's number, so before
    the battle is set up; the AI pack hands the plan of its battle to the
-   writer as direction. Leaders with the authenticator only; writing needs the
+   writer as direction. Leaders only; writing needs the
    connection, reading works from what the device kept. */
 import { useEffect, useId, useState } from 'react';
 import { Link } from 'react-router';

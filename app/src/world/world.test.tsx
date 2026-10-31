@@ -478,13 +478,13 @@ describe('everybody else reads', () => {
     });
   }
 
-  it('a leader without the authenticator reads, like a player: the server would refuse the rest', async () => {
+  it('a leader without the authenticator writes the world like any leader (ADR 0030)', async () => {
     const srv = server({ totp: false });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: others() });
     stocked(srv, c);
     at(`/campaign/${c.id}/world`);
     expect(await screen.findByRole('article', { name: 'The Ferrymen' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Add a faction' })).toBeNull();
+    expect(await screen.findByRole('button', { name: 'Add a faction' })).toBeTruthy();
   });
 
   it('the World tab is there for everyone, a viewer included', async () => {

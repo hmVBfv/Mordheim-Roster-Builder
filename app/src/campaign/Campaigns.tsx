@@ -1,6 +1,7 @@
 /* The Campaign tab (phase 4a1): the campaigns one is part of – always the list,
    also with a single one (#75) – and starting a new one, which makes its
-   starter the first leader and so needs the authenticator (ADR 0008). */
+   starter the first leader – anybody, the authenticator is for the admin's
+   things (ADR 0030). */
 import { useEffect, useState } from 'react';
 import { useOnAnyCampaign } from '../live/live.ts';
 import { Link, useLocation, useNavigate } from 'react-router';
@@ -12,7 +13,6 @@ import { useSheet } from '../ui/useSheet.ts';
 import { placeChoices, useLore } from './place.ts';
 import { archiveCampaign, cachedCampaigns, listCampaigns, ROLE_NAMES, roundName, startCampaign, type CampaignSummary } from './api.ts';
 import styles from './Campaign.module.css';
-import { ACCOUNT } from '../app/paths.ts';
 
 function StartSheet() {
   const { ref, open, close } = useSheet();
@@ -130,14 +130,7 @@ export function Campaigns() {
           <ul className={`${styles.list} ${styles.listWide}`} aria-label="Archived campaigns">{filed.map(entry)}</ul>
         </section>
       )}
-      {user.totp
-        ? <div className={ui.row}><StartSheet /></div>
-        : (
-          <>
-            <p className={ui.muted}>Starting a campaign needs the authenticator – a leader’s account is worth more to an intruder. Set it up under Account.</p>
-            <div className={ui.row}><Link to={ACCOUNT} className={ui.buttonQuiet}>To the account</Link></div>
-          </>
-        )}
+      <div className={ui.row}><StartSheet /></div>
     </section>
   );
 }

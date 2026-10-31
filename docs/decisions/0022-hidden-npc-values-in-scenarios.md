@@ -1,5 +1,5 @@
 # 0022 – Verborgene Teile bei den NPCs eines Szenarios
-Status: vorgeschlagen · Datum: 2026-10-19 · ergänzt [0002](0002-mechanics-open-narrative-hidden.md), [0011](0011-hidden-data-never-leaves.md)
+Status: vorgeschlagen (Leiter ohne Authenticator seit [0030](0030-authenticator-for-admins-only.md) wie Leiter mit) · Datum: 2026-10-19 · ergänzt [0002](0002-mechanics-open-narrative-hidden.md), [0011](0011-hidden-data-never-leaves.md)
 
 ## Kontext
 Ein Szenario ist bis zur Freigabe nur für Leiter lesbar und danach für alle

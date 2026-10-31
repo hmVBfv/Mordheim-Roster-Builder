@@ -1,5 +1,5 @@
 # 0027 – Versteckte NPC-Warbands: Referenz und TTS-Daten des Spielleiters
-Status: angenommen (Rob, 26.10.2026, Wunsch #79) · Datum: 2026-10-26 · ergänzt [0002](0002-mechanics-open-narrative-hidden.md), [0011](0011-visibility-only-on-the-server.md), [0026](0026-planner-and-catch-up.md)
+Status: angenommen (Rob, 26.10.2026, Wunsch #79; „mit Authenticator“ seit [0030](0030-authenticator-for-admins-only.md) nicht mehr verlangt) · Datum: 2026-10-26 · ergänzt [0002](0002-mechanics-open-narrative-hidden.md), [0011](0011-visibility-only-on-the-server.md), [0026](0026-planner-and-catch-up.md)
 
 ## Kontext
 Ein Leiter will Warbands in die Kampagne legen, die als **Referenz** und als **Tabletop-Simulator-Daten**

@@ -34,11 +34,11 @@ async function world() {
 }
 
 describe('hidden NPC warbands', () => {
-  it('only a leader with the authenticator reads or writes them; an outsider does not even know the campaign', async () => {
-    const { anna, ben, kai, vic, rob, base, body, make } = await world();
+  it('only a leader reads or writes them; an outsider does not even know the campaign', async () => {
+    const { anna, kai, vic, rob, base, body, make } = await world();
     const { wid, r } = await make();
     expect(r.statusCode).toBe(200);
-    for (const who of [ben, kai, vic]) {
+    for (const who of [kai, vic]) {
       expect((await who('GET', base)).json()).toEqual({ error: 'forbidden' });
       expect((await who('GET', `${base}/${wid}`)).statusCode).toBe(403);
       expect((await who('PUT', `${base}/${randomUUID()}`, body('Me too'))).statusCode).toBe(403);

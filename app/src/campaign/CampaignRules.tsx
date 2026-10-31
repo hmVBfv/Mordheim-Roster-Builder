@@ -8,7 +8,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { errorText, type Me } from '../account/api.ts';
+import { errorText } from '../account/api.ts';
 import { useSession } from '../account/session.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { campaignHouseState, declaration, houseView, ruleLabel, setBodyOnly, setGrade, setRule, stepRule } from '../roster/house.ts';
@@ -52,9 +52,9 @@ function VanillaCard({ id, view, setView, lead }: { id: string; view: CampaignVi
   );
 }
 
-function Body({ id, view, setView, user }: { id: string; view: CampaignView; setView: (v: CampaignView) => void; user: Me }) {
+function Body({ id, view, setView }: { id: string; view: CampaignView; setView: (v: CampaignView) => void }) {
   const data = useGameData();
-  const lead = view.role === 'leader' && user.totp;
+  const lead = view.role === 'leader';
   const state = useMemo(() => campaignHouseState(data, view.campaign.houseRules), [data, view.campaign.houseRules]);
   const ctx = useMemo(() => core.ctxOf(data, state), [data, state]);
   const v = houseView(data, state, { campaign: true });
@@ -148,7 +148,7 @@ export function CampaignRules() {
   if (!view || !user) return <section className={ui.page}>{error ? <p className={ui.message} role="alert">{error}</p> : <p className={ui.muted}>Loading…</p>}</section>;
   return (
     <Suspense fallback={<p className={ui.muted}>Loading the rules…</p>}>
-      <Body id={id} view={view} setView={setView} user={user} />
+      <Body id={id} view={view} setView={setView} />
     </Suspense>
   );
 }
