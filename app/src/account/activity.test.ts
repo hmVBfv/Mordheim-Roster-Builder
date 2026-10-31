@@ -53,17 +53,18 @@ describe('what the server hears', () => {
   const ok = () => new Response('{}', { headers: { 'content-type': 'application/json' } });
 
   it('says "active" on a request while somebody is there, and nothing in the background', async () => {
-    const f = vi.fn(async () => ok());
+    const f = vi.fn(async (_url: string, _init?: RequestInit) => ok());
+    const headersOf = (i: number) => new Headers(f.mock.calls[i]![1]!.headers);
     vi.stubGlobal('fetch', f);
     startActivity(() => undefined);
     await api('/sync');
-    expect(new Headers((f.mock.calls[0]![1] as RequestInit).headers).get('x-roster-active')).toBeNull();
+    expect(headersOf(0).get('x-roster-active')).toBeNull();
     document.dispatchEvent(new Event('pointerdown'));
     await api('/sync');
-    expect(new Headers((f.mock.calls[1]![1] as RequestInit).headers).get('x-roster-active')).toBe('1');
+    expect(headersOf(1).get('x-roster-active')).toBe('1');
     visibility('hidden');
     await api('/sync');
-    expect(new Headers((f.mock.calls[2]![1] as RequestInit).headers).get('x-roster-active')).toBeNull();
+    expect(headersOf(2).get('x-roster-active')).toBeNull();
   });
 
   it('keeps one request going while somebody is there: at most every four minutes, none in the background', () => {
