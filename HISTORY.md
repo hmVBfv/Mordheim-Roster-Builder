@@ -4597,3 +4597,19 @@ it; the form now sends Mordheim whenever Vanilla is ticked.
 grade `core` for four Dramatis Personae), so there was nothing to ask Rob to add to `data/`; I had expected to. A vanilla warband's
 `hireEligibility` and `dpEligibility` block the others with a reason, which the Hire screen already shows. Not done: the areas of a campaign (Khemri,
 Lustria ...), which need a campaign to choose its area and Hired Swords, items and warbands to be filtered by it.
+
+## November 1, 2026 — Run of #178 and #177 (pull requests 307 and 308)
+
+**#178, the Library missing offline.** Reported as a wish ("the newest version should work offline too"), and Rob first took the missing Library entry
+for an old version of the app; the report turned out to be a bug in the navigation. The navigation showed Library only for a session that is `in`,
+and offline (or while the server does not answer) the session is `unreachable`, with the person still known on the device. The entry now stays for
+a known person, and Admin does not, because its tools need the server. The other half of the wish, that a new version should become active offline
+without the update tap (`registerType: 'prompt'`), was not touched: it was not the cause, and Rob did not ask for it.
+
+**#177, a problem report written offline.** Kept on the device in the `meta` table (key `bug-outbox:<user>:<id>`, so no new database schema), for the
+person who wrote it, and sent by every round of the sync after the battle outbox, each as its author (`as`), so a device that belongs to another
+account refuses it instead of sending it as theirs. The id of a report comes from the device and the server answers a repeat with the first report,
+so there is no way to send one twice. What the server refuses for good is dropped (it would block the rest for ever); the daily limit and an
+unreachable server wait. A wrong turn in the test: the sync round sent the report at once, as it should, so the test of "Your reports" had to make
+the server refuse reports first. Not done: a notice when a waiting report finally went out (Your reports shows what waits, and the list shows what
+went).
