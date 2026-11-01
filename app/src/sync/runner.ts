@@ -57,6 +57,9 @@ async function round(): Promise<void> {
     // what the game night gathered goes after the warbands (phase 4a2)
     const { flushOutbox } = await import('../battle/outbox.ts');
     await flushOutbox(me);
+    // a problem report written without a connection goes out as well (wish #177)
+    const { flushReports } = await import('../bugs/queue.ts');
+    await flushReports(me);
     const r = await countPending(me);
     if (user !== me) return;
     setStatus({ state: 'idle', waiting: r.waiting, conflicts: r.conflicts, at: new Date().toISOString() });

@@ -15,6 +15,7 @@ import { stopSync } from '../sync/runner.ts';
 import { sampleSave } from '../test/data.ts';
 import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
+import { flushReports, queueReport, waitingReports } from './queue.ts';
 import { resetTrail } from './trail.ts';
 
 const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>);
@@ -184,23 +185,64 @@ describe('reporting a problem', () => {
     expect(srv.state.bugs[0]!.id).not.toBe(srv.state.bugs[1]!.id);
   });
 
-  it('offline the report waits for the connection but can be copied and handed on', async () => {
-    const { srv } = server();
-    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+  it('offline the report is saved on the device and can be copied too; it goes out by itself when the connection is back (wish #177)', async () => {
+    const { srv, me } = server();
+    const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
     const user = userEvent.setup();
     at('/account');
     const form = await openForm(user);
     await user.type(within(form).getByLabelText(/What did you want to do/), 'Sync hangs.');
-    expect((within(form).getByRole('button', { name: 'Send' }) as HTMLButtonElement).disabled).toBe(true);
-    expect(within(form).getByText(/You are offline\. Copy the report now/)).toBeTruthy();
+    expect(within(form).queryByRole('button', { name: 'Send' })).toBeNull();
+    expect(within(form).getByText(/You are offline\. Save the report/)).toBeTruthy();
     await user.click(within(form).getByRole('button', { name: 'Copy the report' }));
     expect(await within(form).findByText(/Copied – paste it into a message to Rob/)).toBeTruthy();
     const text = await navigator.clipboard.readText(); // user-event's own clipboard
     expect(text).toMatch(/^# Problem report: Sync hangs\./);
-    expect(text).toContain('Sync hangs.');
     expect(text).toContain('Screen: /account');
     expect(text).toContain('offline');
+    await user.click(within(form).getByRole('button', { name: 'Save to send later' }));
+    expect(await screen.findByText(/Saved on this device/)).toBeTruthy();
     expect(srv.state.bugs).toEqual([]);
+    expect((await waitingReports(me.id)).map((r) => r.text)).toEqual(['Sync hangs.']);
+    // the connection is back: a round of the sync sends it, once
+    online.mockReturnValue(true);
+    expect(await flushReports(me.id)).toBe(1);
+    expect(srv.state.bugs.map((b) => b.text)).toEqual(['Sync hangs.']);
+    expect(await waitingReports(me.id)).toEqual([]);
+    expect(await flushReports(me.id)).toBe(0);
+  });
+
+  it('when the server does not answer, though the device is online, the report is saved as well and no error stands in its way', async () => {
+    const { srv, me } = server();
+    const f = vi.mocked(fetch);
+    const inner = f.getMockImplementation()!;
+    f.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (new URL(String(input), 'http://localhost/').pathname === '/api/v1/bugs' && init?.method === 'POST') throw new TypeError('Failed to fetch');
+      return inner(input, init);
+    });
+    const user = userEvent.setup();
+    at('/account');
+    const form = await openForm(user);
+    await user.type(within(form).getByLabelText(/What did you want to do/), 'The server is down.');
+    await user.click(within(form).getByRole('button', { name: 'Send' }));
+    expect(await screen.findByText(/Saved on this device/)).toBeTruthy();
+    expect((await waitingReports(me.id)).length).toBe(1);
+    expect(srv.state.bugs).toEqual([]);
+  });
+
+  it('says in Your reports what waits for the connection', async () => {
+    const { me } = server();
+    // the sync would send it at once: here the server does not take reports
+    const f = vi.mocked(fetch);
+    const inner = f.getMockImplementation()!;
+    f.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (new URL(String(input), 'http://localhost/').pathname === '/api/v1/bugs' && init?.method === 'POST') throw new TypeError('Failed to fetch');
+      return inner(input, init);
+    });
+    await queueReport(me.id, { id: '11111111-1111-4111-8111-111111111111', kind: 'bug', title: 'It hangs', text: 'It hangs.', sourceRef: '', appVersion: 'abc1234', device: '', view: '', context: null, jsErrors: [], attach: null });
+    at('/account/reports');
+    expect(await screen.findByText(/1 report waits on this device/)).toBeTruthy();
+    expect(screen.getByText('It hangs')).toBeTruthy();
   });
 
   it('signed out: the report can be copied, not sent', async () => {
