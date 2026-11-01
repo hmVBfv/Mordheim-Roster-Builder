@@ -147,6 +147,27 @@ describe('the side navigation', () => {
     expect(nav.querySelector('#nav-library')).toBeNull();
   });
 
+  /* Report of 1.11.2026: offline the navigation had no Library. The server cannot be reached, but the person is known on this device,
+     and the Library is read from the device: it stays where it was. Admin works on the server only: it goes. */
+  it('keeps Library in the navigation when the server cannot be reached, and leaves Admin out: it needs the server', async () => {
+    wide(true);
+    localStorage.setItem('mordheim-me', JSON.stringify({ ...KAI, isAdmin: true, totp: true }));
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch'); }));
+    at('/home');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect((await within(nav).findByRole('link', { name: 'Library' })).getAttribute('href')).toBe('/library');
+    expect(within(nav).queryByRole('link', { name: 'Admin' })).toBeNull();
+  });
+
+  it('shows no Library where nobody is known', async () => {
+    wide(true);
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch'); }));
+    at('/home');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    await within(nav).findByRole('link', { name: 'Home' });
+    expect(within(nav).queryByRole('link', { name: 'Library' })).toBeNull();
+  });
+
   it('Account opens into the settings and Your reports', async () => {
     wide(true);
     signedIn({ stage: 'full', user: KAI });
