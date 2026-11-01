@@ -53,7 +53,9 @@ function SubList({ items, id }: { items: NavChild[]; id: string }) {
 
 export function Shell({ children }: { children: ReactNode }) {
   const session = useSession();
-  const items = navItems(FLAVOUR, session.status === 'in' && session.user.isAdmin, session.status === 'in');
+  // offline the person is still known on this device, and the Library is read from the device: it stays; Admin works on the server only
+  const known = session.status === 'in' || (session.status === 'unreachable' && !!session.user);
+  const items = navItems(FLAVOUR, session.status === 'in' && session.user.isAdmin, known);
   const side = useSideNav();
   const groups = useNavChildren(side);
   const [opened, setOpened] = useState(readOpen);
