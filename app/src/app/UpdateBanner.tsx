@@ -10,7 +10,7 @@ import styles from './Shell.module.css';
 
 export function UpdateBanner() {
   const { needRefresh: [needRefresh, setNeedRefresh], offlineReady: [offlineReady, setOfflineReady], updateServiceWorker } = useRegisterSW();
-  const { ref, open, close } = useSheet('changelog');
+  const { ref, open, close } = useSheet('changelog', { outside: true });
   // what the new version holds that this one does not (wish #154): its changelog.json is read from the network, never from the cache
   const [news, setNews] = useState<Entry[]>([]);
   useEffect(() => {
