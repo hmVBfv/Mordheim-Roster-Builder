@@ -90,6 +90,7 @@ test('on a desktop the side navigation scrolls by itself when it is taller than 
   await page.mouse.wheel(0, 400);
   await expect.poll(() => nav.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
   expect(await page.evaluate(() => scrollY)).toBe(0);
+});
 
 test('a sheet one only reads closes with a click beside it, one one writes in does not (wish of 1.11.2026)', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 643 });
