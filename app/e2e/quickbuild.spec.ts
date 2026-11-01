@@ -71,6 +71,26 @@ test('the banner holds still when the window is not in focus, and moves again wh
   expect(await state()).toBe('running');
 });
 
+test('on a desktop the side navigation scrolls by itself when it is taller than the window (report of 1.11.2026)', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 643 });
+  await page.goto('#/home');
+  const nav = page.getByRole('navigation', { name: 'Main' });
+  await expect(nav).toBeVisible();
+  // many entries under it, as a person with many warbands has
+  await nav.evaluate((el) => {
+    const ul = el.querySelector('ul')!;
+    for (let i = 0; i < 40; i++) { const li = document.createElement('li'); li.textContent = `A long list of warbands ${i}`; li.style.minHeight = '44px'; ul.append(li); }
+  });
+  const box = await nav.evaluate((el) => ({ h: el.getBoundingClientRect().height, scroll: el.scrollHeight, client: el.clientHeight, overflow: getComputedStyle(el).overflowY, win: innerHeight }));
+  expect(box.h, 'the bar is not taller than the window').toBeLessThanOrEqual(box.win);
+  expect(['auto', 'scroll']).toContain(box.overflow);
+  expect(box.scroll, 'what does not fit is reached by scrolling the bar').toBeGreaterThan(box.client);
+  // the wheel over the bar moves the bar, not the page
+  await nav.hover();
+  await page.mouse.wheel(0, 400);
+  await expect.poll(() => nav.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+
 test('a sheet one only reads closes with a click beside it, one one writes in does not (wish of 1.11.2026)', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 643 });
   await page.goto('#/home');
