@@ -54,7 +54,7 @@ export function MyReports() {
   const { bugs, error } = useMyReports(me);
   // written without a connection, kept on this device, sent by the sync once the server answers (wish #177)
   const waiting = useWaitingReports(session.status === 'in' || session.status === 'unreachable' ? session.user?.id ?? null : null);
-  const { ref, open, close } = useSheet('my-report');
+  const { ref, open, close } = useSheet('my-report', { outside: true });
   const [chosen, setChosen] = useState<MyBug | null>(null);
   const show = (b: MyBug) => { setChosen(b); open(); };
   return (

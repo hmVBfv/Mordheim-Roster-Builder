@@ -15,7 +15,7 @@ export function newestChanges(max = 3) {
 }
 
 function WithSheet({ children }: { children: (open: () => void) => ReactNode }) {
-  const { ref, open, close } = useSheet('changelog');
+  const { ref, open, close } = useSheet('changelog', { outside: true });
   // the list is put in the sheet when it is first opened: a closed sheet on every screen would carry the text of all the changes
   const [opened, setOpened] = useState(false);
   return (

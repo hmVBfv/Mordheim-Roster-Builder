@@ -91,3 +91,23 @@ test('on a desktop the side navigation scrolls by itself when it is taller than 
   await expect.poll(() => nav.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
   expect(await page.evaluate(() => scrollY)).toBe(0);
 });
+
+test('a sheet one only reads closes with a click beside it, one one writes in does not (wish of 1.11.2026)', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 643 });
+  await page.goto('#/home');
+  await page.getByRole('button', { name: "What's new" }).first().click();
+  const sheet = page.getByRole('dialog', { name: "What's new" });
+  await expect(sheet).toBeVisible();
+  // inside its box: it stays; on the backdrop, beside it: it goes
+  const box = (await sheet.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + 12);
+  await expect(sheet).toBeVisible();
+  await page.mouse.click(8, 8);
+  await expect(sheet).toBeHidden();
+
+  await page.getByRole('button', { name: 'Report a bug' }).click();
+  const form = page.getByRole('dialog', { name: 'Report a problem' });
+  await expect(form).toBeVisible();
+  await page.mouse.click(8, 8);
+  await expect(form).toBeVisible();
+});

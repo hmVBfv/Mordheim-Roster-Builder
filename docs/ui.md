@@ -36,7 +36,9 @@ unverändert auf Pages.
 9. **Zurück schließt, was zuletzt aufging.** Die Zurück-Taste (Handy-Taste,
    Geste, Browser) schließt einen offenen Bereich, statt den Bildschirm oder
    die App zu verlassen; wer einen Bereich anders schließt, hinterlässt keinen
-   Schritt im Verlauf (`app/src/ui/useSheet.ts`).
+   Schritt im Verlauf (`app/src/ui/useSheet.ts`). Ein Bereich, den man nur **liest** („What's new“, eine Meldung ansehen), schließt auch
+   mit einem **Klick daneben** (`useSheet(name, { outside: true })`; Wunsch #179, Rob, 1.11.2026); ein Bereich, in den man **schreibt**, nicht:
+   ein versehentlicher Klick würde das Geschriebene wegwerfen.
 
 ## 2. Navigation
 
