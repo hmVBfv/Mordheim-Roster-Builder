@@ -48,7 +48,8 @@ export interface ReportBody {
 const listeners = new Set<() => void>();
 export const onReportSent = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
 
-export const sendReport = (body: ReportBody) => api<{ bug: MyBug }>('/bugs', { body }).then((r) => { for (const l of listeners) l(); return r.bug; });
+export const notifyReportSent = () => { for (const l of listeners) l(); };
+export const sendReport = (body: ReportBody) => api<{ bug: MyBug }>('/bugs', { body }).then((r) => { notifyReportSent(); return r.bug; });
 export const myReports = () => api<{ bugs: MyBug[] }>('/bugs/mine').then((r) => r.bugs);
 
 export type ListFilter = 'open' | 'fixed' | 'all';

@@ -50,7 +50,7 @@ Game night   Vollbild, aus einer Schlacht heraus (4a2: /campaign/:id/battles/:bi
              auf dem Handy ohne die Leiste unten)
 Profile      Devices · Authenticator · Password
 Admin*       Users · Invites · Reports · Backups
-Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf jeder Seite, öffnet das Blatt „Report a problem“ mit gewählter Art Bug; die Warband in Sicht lässt sich anhängen, auch eine fremde in einer Kampagne, so wie die Kampagne sie zeigt (#158); Account → Your reports; Admin → Reports)
+Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf jeder Seite, öffnet das Blatt „Report a problem“ mit gewählter Art Bug; die Warband in Sicht lässt sich anhängen, auch eine fremde in einer Kampagne, so wie die Kampagne sie zeigt (#158); Account → Your reports; Admin → Reports) · **Offline (Wunsch #177, Rob, 1.11.2026):** ohne Verbindung – oder wenn der Server nicht antwortet – heißt der Knopf „Save to send later“: die Meldung wird mit ihren Angaben (Verlauf, Einstellungen, ein angehängtes Warband) im Speicher des Geräts (`meta`, Schlüssel `bug-outbox:<Nutzer>:<id>`) für den, der sie schrieb, abgelegt und von jeder Runde der Synchronisation gesendet (`app/src/bugs/queue.ts`); die ID vom Gerät sorgt dafür, dass es dieselbe Meldung bleibt. Endgültig abgelehnte fallen weg, die Tagesgrenze und „kein Server“ warten weiter; „Your reports“ nennt, was wartet.
                                   (* nur Leiter bzw. Admin)
 ```
 

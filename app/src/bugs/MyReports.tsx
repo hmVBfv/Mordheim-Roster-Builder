@@ -14,6 +14,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import { shownVersion } from '../version.ts';
 import { KIND_NAMES, myReports, onReportSent, type MyBug } from './api.ts';
 import styles from './Bugs.module.css';
+import { useWaitingReports } from './queue.ts';
 import { Words } from './Words.tsx';
 
 /** The status in the reporter's words. */
@@ -51,6 +52,8 @@ export function MyReports() {
   const session = useSession();
   const me = session.status === 'in' ? session.user.id : null;
   const { bugs, error } = useMyReports(me);
+  // written without a connection, kept on this device, sent by the sync once the server answers (wish #177)
+  const waiting = useWaitingReports(session.status === 'in' || session.status === 'unreachable' ? session.user?.id ?? null : null);
   const { ref, open, close } = useSheet('my-report');
   const [chosen, setChosen] = useState<MyBug | null>(null);
   const show = (b: MyBug) => { setChosen(b); open(); };
@@ -59,6 +62,12 @@ export function MyReports() {
       <h1>{accountLabel()}</h1>
       {me && <AccountTabs />}
       {!me && session.status !== 'loading' && <p>Sign in to see your reports. <Link to="/sign-in">Sign in</Link></p>}
+      {waiting.length > 0 && (
+        <div className={ui.card} role="status">
+          <p><strong>{waiting.length === 1 ? '1 report waits on this device' : `${waiting.length} reports wait on this device`}</strong> and goes out by itself as soon as the campaign server answers.</p>
+          <ul aria-label="Waiting to be sent">{waiting.map((w) => <li key={w.id}>{w.title}</li>)}</ul>
+        </div>
+      )}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       {me && bugs && bugs.length === 0 && !error && <p className={ui.muted}>You have not sent a report yet. The Bug button at the top of every screen opens the form.</p>}
       {me && bugs && bugs.length > 0 && (
