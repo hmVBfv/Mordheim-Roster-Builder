@@ -166,6 +166,11 @@
     border-top: 0;
     border-right: 1px solid var(--border);
     min-height: calc(100dvh - 57px);
+    /* the bar sticks under the header: taller than the window, it scrolls by itself, and the wheel over it moves it and not the page
+       (report of 1.11.2026: its end could only be reached by scrolling the page to its end) */
+    max-height: calc(100dvh - 57px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .nav > ul {
