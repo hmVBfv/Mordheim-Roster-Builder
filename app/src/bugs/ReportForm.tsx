@@ -37,7 +37,6 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
   const [copied, setCopied] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
-  const signedIn = FLAVOUR === 'campaign' && session.status === 'in';
   // known on this device, the server out of reach: the report is written now and kept until it can go (wish #177)
   const known = FLAVOUR === 'campaign' ? (session.status === 'in' ? session.user.id : session.status === 'unreachable' ? session.user?.id ?? null : null) : null;
   const wb = FLAVOUR === 'campaign' && known ? snap.warband : null;
