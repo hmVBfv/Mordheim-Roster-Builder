@@ -4613,3 +4613,17 @@ so there is no way to send one twice. What the server refuses for good is droppe
 unreachable server wait. A wrong turn in the test: the sync round sent the report at once, as it should, so the test of "Your reports" had to make
 the server refuse reports first. Not done: a notice when a waiting report finally went out (Your reports shows what waits, and the list shows what
 went).
+
+## November 1, 2026 — Run of #180 and #179 (pull requests 310 and 311)
+
+**#180, the side navigation that could not scroll.** On a desktop the bar sticks under the header (`position: sticky`) with a minimum height and no
+maximum, so a long list (many warbands or campaigns) made it taller than the window, and its end could only be reached by scrolling the page to its
+own end; the wheel over the bar scrolled the page, and the bar only moved once the page was at the bottom. It now has the height of the window below
+the header, its own scrolling, and `overscroll-behavior: contain`, so the wheel over it moves it and not the page. The test is in the browser (a bar
+filled with forty entries at 1366×643: it was 2084 pixels high before) because jsdom has no layout.
+
+**#179, a sheet closed by a click beside it.** Sheets are native modal dialogs, which a click on the backdrop does not close. `useSheet` takes
+`outside: true` and closes when a click lands on the dialog itself and outside its box; a click on its padding lies inside the box and stays. Rob's
+rule, taken from my proposal: only the sheets one reads have it ("What's new" in the header, on Home and under the update notice, and a report one reads
+under Your reports), not those one writes in, where a stray click would throw the words away. The admin's report detail is not one of them: it is where
+a report is sorted. More reading sheets can take the option as they turn up.
