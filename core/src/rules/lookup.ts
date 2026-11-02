@@ -1,6 +1,7 @@
 /* Name and definition lookups (legacy: engine.js unitDef/eqListFor,
    app.js itemFamily/unitFamilies/spellLabel, info.js itemInfo). */
 import type { EquipmentEntry, EquipmentList, GameData, ItemInfo, UnitDef, WarbandDef } from '../data/types.ts';
+import type { Model } from '../state/types.ts';
 import type { Ctx } from './context.ts';
 
 export function warbandDef(ctx: Ctx): WarbandDef | undefined {
@@ -40,6 +41,13 @@ export function itemFamily(data: GameData, name: string): string | null {
   const s = String(name);
   for (const [re, f] of data._FAM) if (re.test(s)) return f;
   return null;
+}
+
+/** The starting gear a man still carries: his unit's `gear` less the pieces he sold (one entry of `gearSold` for each piece). */
+export function unitGear(ctx: Ctx, m: Model | null | undefined): string[] {
+  const def = m ? unitDef(ctx, m.uid_def) : undefined;
+  const sold = [...(m?.gearSold ?? [])];
+  return (def?.gear ?? []).filter((g) => { const i = sold.indexOf(g); if (i < 0) return true; sold.splice(i, 1); return false; });
 }
 
 /** Families present in a unit's starting equipment list and fixed gear. */

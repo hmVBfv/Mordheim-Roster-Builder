@@ -10,7 +10,7 @@ import type { Ctx } from './context.ts';
 import { isPlanner } from './planner.ts';
 import { countOf, goldCurrent, modelsOf, ratioMen, totalHeroes, totalModels, unitMax, warbandMax } from './costs.ts';
 import { eqWeaponLimit } from './equipment.ts';
-import { eqListFor, itemFamily, unitDef, warbandDef } from './lookup.ts';
+import { eqListFor, itemFamily, unitDef, unitGear, warbandDef } from './lookup.ts';
 import { isMarauderSeer, leaderUid } from './profile.ts';
 import { leaderUnitDied } from '../warband/roster.ts';
 
@@ -26,7 +26,7 @@ export function modelHasRanged(ctx: Ctx, m: Model): boolean {
       if ((Number((m.eq ?? {})[nm]) || 0) > 0 && RANGED.includes(itemFamily(ctx.data, nm) as string)) return true;
     }
   }
-  if (def.gear) for (const g of def.gear) if (RANGED.includes(itemFamily(ctx.data, g) as string)) return true;
+  for (const g of unitGear(ctx, m)) if (RANGED.includes(itemFamily(ctx.data, g) as string)) return true;
   const r = m.rare || {};
   for (const de of Object.keys(r)) { const it = ctx.data.CATALOG.find((x) => x.de === de); if (it && (it.cat === 'missile' || it.cat === 'bp')) return true; }
   return false;

@@ -11,7 +11,7 @@ import type { HireRecord, Model } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
 import { dpRatingTotal, hsChosenEq, hsEqParts, hsEquipOn, hsExp, hsRatingTotal } from '../rules/hire.ts';
 import { isHeroModel, totalLarge, totalModels, totalRating } from '../rules/costs.ts';
-import { eqListFor, spellLabel, unitDef } from '../rules/lookup.ts';
+import { eqListFor, spellLabel, unitDef, unitGear } from '../rules/lookup.ts';
 import { aDisp, effProfile, isLeaderModel, maxInfo, noRacialMax } from '../rules/profile.ts';
 import { svLabel, svOfEntry, svOfModel } from '../rules/saves.ts';
 import { enItem, enRules, eqDisplayParts, houseDeviations, markRulesFor, skillText, skillTextFor } from './rulesText.ts';
@@ -111,7 +111,7 @@ export async function buildOfficialSheet(ctx: Ctx, PDFLib: PdfLib, template: Uin
     const out: string[] = [];
     const q = Math.max(1, Number(m.qty) || 1);
     if (!def) return out;
-    if (def.gear) def.gear.forEach((g) => out.push(g));
+    unitGear(ctx, m).forEach((g) => out.push(g));
     if (def.eq) {
       const list = eqListFor(ctx, def) ?? {};
       for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) {

@@ -32,6 +32,8 @@ export interface CarriedRow {
   price: string; free: boolean; text: string; tips: Tip[];
   /** He keeps it: the free dagger is never given away or sold. */
   keep: boolean;
+  /** A piece of what he starts with: what selling it brings now (half its price, from the first battle on), null where trading is closed or the price is not known. */
+  sell?: number | null;
   /** A poison or a drug: lasts one battle, and the line says "Used" for taking it away. */
   used: boolean;
   /** A weapon takes upgrades, and the upgrades it has. */
@@ -118,9 +120,10 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
   const upgrades = Object.keys(ctx.data.UPGRADES).filter((de) => core.isUpgrade(ctx.data, de));
   const out: CarriedRow[] = [];
   // what he starts with (the Lustrian Reavers' Heroes: "Starts with …"): in his price, so no price of its own, and it stays with him
-  (def?.gear ?? []).forEach((nm, i) => {
+  core.unitGear(ctx, m).forEach((nm, i) => {
     out.push({
       id: `s:${nm}:${i}`, key: nm, name: nm, group: core.itemGroup(ctx, nm) ?? 'Starting equipment', from: 'start', price: 'in his price', free: true, keep: true, used: false,
+      sell: core.tradeLocked(ctx) ? core.startGearPrice(ctx, m.uid, nm) : null,
       text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon: false, ups: [], options: [], qty: 1,
     });
   });

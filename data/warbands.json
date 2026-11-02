@@ -7712,6 +7712,8 @@
       "Ld": 7
      },
      "eq": "lrHero",
+     "sv": 4,
+     "svWith": "Masterwork Heavy Armour",
      "gear": [
        "Masterwork Heavy Armour",
        "Bec de Corbin",

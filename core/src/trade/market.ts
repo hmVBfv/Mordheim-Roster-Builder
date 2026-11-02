@@ -16,7 +16,7 @@ import type { Model, RareHolding, StashItem, WarbandState } from '../state/types
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { catalogAllowed, rareEligibleItems, rareEntryCost } from '../rules/equipment.ts';
 import { isVanillaOnly, itemIsVanilla } from '../rules/settings.ts';
-import { eqListFor, isUpgrade, stripParen, unitDef, warbandDef } from '../rules/lookup.ts';
+import { eqListFor, isUpgrade, stripParen, unitDef, unitGear, warbandDef } from '../rules/lookup.ts';
 import { adjPrice, catalogDefaultPaid } from '../rules/pricing.ts';
 import { memberCount } from '../rules/profile.ts';
 import { enItem } from '../export/rulesText.ts';
@@ -355,6 +355,43 @@ export function sellItem(ctx: Ctx, from: Holder, g: Goods, opts: { qty?: number;
     }
     price = opts.price != null ? Math.max(0, Math.round(opts.price)) : sellPrice(c, g, sold, paid);
     bookOn(d, c, 'sell', price, { text: `Sold ${goodsName(c, g)}${sold > 1 ? ` ×${sold}` : ''}`, uid: from === 'stash' ? undefined : from, item: g.key, qty: sold });
+  });
+  return { state, ok: true, reason: '' };
+}
+
+/** What a piece of a unit's starting gear brings: half the price of the item in the catalogue (Rob, 2.11.2026: "only for half the price" –
+    the piece was in the price of the man), for all the pieces of a group together, rounded down, at least 1 gc; null when the catalogue
+    knows no price (a rifle, firepots, a leaf coat), and the player names it. */
+function startGearEach(ctx: Ctx, piece: string): number | null {
+  const norm = (x: string) => x.trim().toLowerCase();
+  const it = ctx.data.CATALOG.find((x) => norm(x.en) === norm(piece) || norm(x.de) === norm(piece));
+  return it ? (commonPrice(ctx, it.de) ?? (rareBasePrice(ctx, it.de) || null)) : null;
+}
+
+/** What the piece would bring now, for all the men of the unit: null when the catalogue knows no price. */
+export function startGearPrice(ctx: Ctx, uid: number, piece: string): number | null {
+  const each = startGearEach(ctx, piece);
+  return each == null ? null : Math.max(1, Math.floor((each * piecesNeeded(ctx, uid)) / 2));
+}
+
+/** Sells a piece of what a unit starts with (the Lustrian Reavers' Heroes: "Starts with …"): from the first battle on, as any trade, for
+    half its price or the price given. The man no longer carries it; the kinds of gear his unit starts with stay what he may look for.
+    A group sells it for all its men. */
+export function sellStartGear(ctx: Ctx, uid: number, piece: string, opts: { price?: number } = {}): Trade {
+  const why = closed(ctx);
+  if (why) return refuse(ctx, why);
+  const m = findModel(ctx.s, uid);
+  if (!m || !unitGear(ctx, m).includes(piece)) return refuse(ctx, 'he does not carry it');
+  const men = piecesNeeded(ctx, uid);
+  const each = startGearEach(ctx, piece);
+  if (each == null && opts.price == null) return refuse(ctx, 'no price is known for it');
+  const s0 = ensureLedger(ctx);
+  const state = update(ctxOf(ctx.data, s0), (d, c) => {
+    const dm = findModel(d, uid);
+    if (!dm) return;
+    dm.gearSold = [...(dm.gearSold ?? []), piece];
+    const price = opts.price != null ? Math.max(0, Math.round(opts.price)) : (startGearPrice(c, uid, piece) ?? 0);
+    bookOn(d, c, 'sell', price, { text: `Sold ${piece}${men > 1 ? ` ×${men}` : ''}`, uid, item: piece, qty: men });
   });
   return { state, ok: true, reason: '' };
 }

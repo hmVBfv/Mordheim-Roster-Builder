@@ -13,12 +13,13 @@ import { createWarband } from './view.ts';
 beforeAll(polyfillDialog);
 afterEach(cleanup);
 
-const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn() };
+const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), sellStart: vi.fn() };
 
-function sheet(wb = 'merc', unit = 'capt') {
+function sheet(wb = 'merc', unit = 'capt', round = 0) {
   const c = (s: core.WarbandState) => core.ctxOf(data, s);
   let s = createWarband(data, wb, null, 'The Grey Company');
   s = core.addUnit(c(s), unit);
+  if (round) { s = structuredClone(s); s.campaign = { ...s.campaign, on: true, round }; }
   const uid = s.models[0]!.uid;
   const view = equipmentView(c(s), uid)!;
   const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
@@ -95,5 +96,21 @@ describe('what a Hero starts with (#181)', () => {
       expect(row[2], `${name} stays`).toBe(true);
     }
     expect(within(carried as HTMLElement).queryByRole('button', { name: /Take .*Masterwork/i, hidden: true })).toBeNull();
+  });
+
+  it('can be sold for half its price once the warband has fought, and not before', async () => {
+    const before = sheet('reavers', 'conqueror');
+    expect(within(before).queryByRole('button', { name: /Sell Masterwork/i, hidden: true })).toBeNull();
+    cleanup();
+    const d = sheet('reavers', 'conqueror', 1);
+    const user = userEvent.setup();
+    const sell = within(d).getByRole('button', { name: 'Sell Masterwork Heavy Armour for 25 gc', hidden: true });
+    await user.click(sell);
+    expect(act.sellStart).toHaveBeenCalledWith('Masterwork Heavy Armour');
+    // a piece the catalogue has no price for is not offered here
+    cleanup();
+    const t = sheet('reavers', 'trapmaster', 1);
+    expect(within(t).getByRole('button', { name: /Sell Heavy Armour for/, hidden: true })).toBeTruthy();
+    expect(within(t).queryByRole('button', { name: /Sell Firepots/, hidden: true })).toBeNull();
   });
 });
