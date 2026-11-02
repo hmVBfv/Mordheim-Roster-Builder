@@ -12,7 +12,7 @@ const add = (s: WarbandState, id: string) => core.addUnit(ctx(s), id);
 const model = (s: WarbandState, id: string) => s.models.find((m) => m.uid_def === id)!;
 const STYLE = 'Orc-Stil (Helm/Dolch/Axt/Schild)';
 const STYLE2 = 'Empire-Stil (Helm/Dolch/Zweihandw./Leichte R.)';
-const style = (s: WarbandState) => s.models.map((m) => ctx(s)).length && core.warbandWarnings(ctx(s)).filter((w) => /fighting style/i.test(w));
+const style = (s: WarbandState) => core.warbandWarnings(ctx(s)).filter((w) => /fighting style/i.test(w));
 
 describe('the dagger of a Pit Fighter', () => {
   it('is the one in his set: it is not offered on its own, to anybody of the warband, and still is to the others', () => {
