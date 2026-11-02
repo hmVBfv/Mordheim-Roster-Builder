@@ -130,6 +130,15 @@ export function warbandWarnings(ctx: Ctx): string[] {
   }
   for (const u of wb.units) { const umx = unitMax(ctx, u); if (umx != null && modelsOf(ctx, u.id) > umx) { const why = ratioReason(ctx, u); w.push(`Too many ${u.name} (max. ${umx})${why ? `: ${why}` : ''}.`); } }
   for (const u of wb.units) if (u.min && modelsOf(ctx, u.id) < u.min) w.push(`At least ${u.min} ${u.name} required (currently ${modelsOf(ctx, u.id)}).`);
+  // a man who picks a fixed kit (a Pit Fighter's fighting style) has to have one – a group man by man; the kits may differ (Pit Fighters, 2.11.2026)
+  for (const m of s.models) {
+    const d = unitDef(ctx, m.uid_def);
+    const list = d?.kit ? eqListFor(ctx, d) : undefined;
+    if (!d || !list) continue;
+    const men = groupSize(d, m);
+    const held = Object.keys(list).reduce((n, cat) => n + (list[cat] ?? []).reduce((k, [nm]) => k + (Number((m.eq ?? {})[nm]) || 0), 0), 0);
+    if (held < men) w.push(`${m.name || d.name}: pick a fighting style – one set of equipment for each man${men > 1 ? ` (${held} of ${men})` : ''}.`);
+  }
   for (const m of s.models) {
     const d = unitDef(ctx, m.uid_def);
     if (d && d.mutReq && (!m.mut || !m.mut.length)) w.push(`${m.name || d.name}: Mutant needs at least 1 mutation.`);
