@@ -4627,3 +4627,28 @@ filled with forty entries at 1366×643: it was 2084 pixels high before) because 
 rule, taken from my proposal: only the sheets one reads have it ("What's new" in the header, on Home and under the update notice, and a report one reads
 under Your reports), not those one writes in, where a stray click would throw the words away. The admin's report detail is not one of them: it is where
 a report is sorted. More reading sheets can take the option as they turn up.
+
+## November 2, 2026 — Run of #182, #183 and #181 (pull requests 313, 314 and 315)
+
+**#182, a second report offline.** My own mistake in #177: the report form is keyed anew after a report went out (`onSent`), and the path that saves a
+report on the device did not say so, so the next press of the beetle showed "Saved" again. Saving now says it too, and the form is keyed by the person
+known on the device and not by whether the server answers, so it does not start anew when the connection comes and goes. The test writes two reports
+in a row offline.
+
+**#183, the fighting style of the Pit Fighters.** The rules (mordheimer.net, Pit Fighters) give a man the choice of one fixed kit – helmet, dagger and
+the rest in one set – with its own shorter lists for the Troll Slayer and the Ogre. Rob's answers: a man has to pick one, and the dagger is the one in
+the set, so it comes out of the things one can buy. Two parts. The dagger: a data restriction (`only.notWb` on the catalogue's Dagger), which both apps
+read, so the parity suite needed nothing. The check: `kit: true` on four units and a warning from `warbandWarnings` when a man (a group man by man; the
+kits may differ) has none. Legacy has no such warning, so that one warning is left out of the parity comparison by its words, in one named support file
+(`fightingStyle.ts`), and written down in `behaviour-changes.md`. A wrong turn: I first looked for a purchase option "Dagger" in the unit's own list
+and found none; it was the catalogue's Dagger, offered to every unit whose list does not hold one of its own.
+
+**#181, equipment that a unit starts with.** Only five units of the whole data carry "Starts with" equipment (the Heroes of the Lustrian Reavers);
+the other thirteen hits of the same words are skills, spells and mutations. The data already had a field for fixed equipment (`gear`, Kroxigor), which
+the card, the exports and the kinds of gear a unit may carry already read, so the fix is data plus one more place that shows it: the equipment sheet,
+where the pieces stand under Carried, free ("in his price", Rob) and staying with the man. Not done, on purpose: the Conqueror's armour save (Masterwork
+Heavy Armour is 4+, the card shows 5+ from the text of his rules); it would be a change in the saves that the parity suite compares. Two wrong turns: the
+first script that put the pieces in the data matched the id "slayer" in another warband (a Dwarf one) and I only saw it because the test for the other
+two units failed; it was reverted and the edit is now limited to the block of the Reavers. And a merge into the branch brought a conflict in
+`behaviour-changes.md`, two rows added at the same place, which I noticed only after I had pushed and opened the pull request; the merge was finished and
+pushed at once.
