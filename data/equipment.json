@@ -198,7 +198,12 @@
    "cat": "cc",
    "cost": 2,
    "rare": "Common",
-   "wb": "1st free",
+   "wb": "1st free; not for Pit Fighters (their dagger is in the style)",
+   "only": {
+    "notWb": [
+     "pitfighters"
+    ]
+   },
    "settings": [
     "core",
     "border-town-burning",

@@ -3,6 +3,7 @@
    read back out of the HTML it drew, and the same from core. Used by
    screens.parity.test.ts on the fixtures and by the walk on its states. */
 import { withLegacyMaxWarning } from '../support/cookbook.ts';
+import { withoutStyleWarnings } from '../support/fightingStyle.ts';
 import { legacyMenuRow, withoutRatioWarnings } from '../support/orcLimits.ts';
 import * as core from '../../src/index.ts';
 import type { Ctx, GameData, WarbandState } from '../../src/index.ts';
@@ -94,7 +95,7 @@ export function coreWarbandOptions(data: GameData): unknown {
 
 export function coreScreens(ctx: Ctx): unknown {
   return {
-    warnings: withoutRatioWarnings(ctx.s.wb, withLegacyMaxWarning(ctx, core.warbandWarnings(ctx))),
+    warnings: withoutStyleWarnings(withoutRatioWarnings(ctx.s.wb, withLegacyMaxWarning(ctx, core.warbandWarnings(ctx)))),
     units: coreUnitList(ctx),
     menu: coreAddMenu(ctx),
     abilities: ctx.s.models.map((m) => coreAbilities(ctx, m)),

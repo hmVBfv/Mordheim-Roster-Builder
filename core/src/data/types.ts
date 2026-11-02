@@ -33,6 +33,8 @@ export interface UnitDef {
   /** The unit hangs on others: at most `per` for each man of the units `of` in the warband (a Hero or a promoted henchman counts one, a group its men); together with `max` (report #46). */
   maxPer?: { per: number; of: string[] };
   min?: number;
+  /** Each man picks one fixed kit from the unit's equipment list (a Pit Fighter's fighting style: helmet, dagger and the rest in one set); a warband with a man lacking one is not legal. */
+  kit?: boolean;
   /** The warband's leader. */
   req?: boolean;
   /** null for entries that are not fighters (Plague Cart, Trade Wagon). */
