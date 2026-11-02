@@ -20,6 +20,8 @@ export interface EquipmentActions {
   upgrade: (de: string, weapon: string, on: boolean) => void;
   /** What was paid for a rare item, set by hand (a price rolled at the table). */
   paid: (de: string, gc: number, slot: number) => void;
+  /** Sells a piece of what he starts with, for half its price (from the first battle on). */
+  sellStart: (piece: string) => void;
 }
 
 function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void }) {
@@ -79,7 +81,9 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                     </span>
                   </td>
                   <td>
-                    {r.keep ? <small className={ui.muted}>stays</small> : r.used ? (
+                    {r.from === 'start' && typeof r.sell === 'number' ? (
+                      <button type="button" className={ui.buttonQuiet} aria-label={`Sell ${r.name} for ${r.sell} gc`} onClick={() => act.sellStart(r.key)}>Sell · {r.sell} gc</button>
+                    ) : r.keep ? <small className={ui.muted}>stays</small> : r.used ? (
                       <button type="button" className={ui.buttonQuiet} aria-label={`${r.name} used`}
                         onClick={() => (r.from === 'list' ? act.qty(r.key, r.qty - 1, r.name) : act.rareQty(r.key, r.qty - 1))}>Used</button>
                     ) : (

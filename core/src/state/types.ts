@@ -43,6 +43,8 @@ export interface Model {
   /** Equipment: German item name → quantity. */
   eq?: Record<string, number | string>;
   rare?: Record<string, RareHolding>;
+  /** Pieces of the unit's starting gear (`gear` in the data) that were sold, one entry for each piece (Rob, 2.11.2026). */
+  gearSold?: string[];
   mut?: string[];
   adv?: Partial<Record<StatKey, number | string>>;
   skills?: string[];

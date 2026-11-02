@@ -7712,6 +7712,13 @@
       "Ld": 7
      },
      "eq": "lrHero",
+     "sv": 4,
+     "svWith": "Masterwork Heavy Armour",
+     "gear": [
+       "Masterwork Heavy Armour",
+       "Bec de Corbin",
+       "Helmet"
+     ],
      "sk": [
       "combat",
       "strength"
@@ -7737,6 +7744,13 @@
       "Ld": 8
      },
      "eq": "lrSlayer",
+     "gear": [
+       "Heavy Armour",
+       "Misericordia",
+       "Sword",
+       "Sword",
+       "Helmet"
+     ],
      "sk": [
       "combat",
       "strength",
@@ -7763,6 +7777,11 @@
       "Ld": 8
      },
      "eq": "lrHero",
+     "gear": [
+       "Heavy Armour",
+       "Spear",
+       "Sword"
+     ],
      "sk": [
       "shooting",
       "strength",
@@ -7789,6 +7808,12 @@
       "Ld": 8
      },
      "eq": "lrHero",
+     "gear": [
+       "Javelins",
+       "Light Armour",
+       "Dagger",
+       "Dagger"
+     ],
      "sk": [
       "shooting",
       "academic",
@@ -7815,6 +7840,13 @@
       "Ld": 8
      },
      "eq": "lrHero",
+     "gear": [
+       "Heavy Armour",
+       "Sword",
+       "Tilean Hunting Rifle (treat as a Hochland Long Rifle)",
+       "Firepots",
+       "Leaf Coat (counts as an Elven Cloak)"
+     ],
      "sk": [
       "combat",
       "shooting",

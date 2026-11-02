@@ -17188,7 +17188,7 @@
   ],
   [
    {
-    "__re": "zweihand|double-?handed",
+    "__re": "zweihand|double-?handed|bec de corbin",
     "__f": "i"
    },
    "twohanded"

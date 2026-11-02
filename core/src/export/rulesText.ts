@@ -9,7 +9,7 @@ import type { Injury, Model } from '../state/types.ts';
 import { houseDefaults, houseRules } from '../state/house.ts';
 import type { Ctx } from '../rules/context.ts';
 import { daggerNameFor, inlineUpgradeActive, upgradeSlots } from '../rules/equipment.ts';
-import { eqListFor, itemInfo, spellLabel, unitDef } from '../rules/lookup.ts';
+import { eqListFor, itemInfo, spellLabel, unitDef, unitGear } from '../rules/lookup.ts';
 import { hsSpecialSkills, isMarauderChief, isMarauderSeer } from '../rules/profile.ts';
 import { keyedInfo, skillKey } from '../rules/abilities.ts';
 
@@ -219,7 +219,7 @@ export function eqSummaryParts(ctx: Ctx, m: Model): string[] {
   const def = unitDef(ctx, m.uid_def);
   const out: string[] = [];
   if (!def) return out;
-  if (def.gear) def.gear.forEach((g) => out.push(g));
+  unitGear(ctx, m).forEach((g) => out.push(g));
   if (def.eq) {
     const list = eqListFor(ctx, def) ?? {};
     for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) {
@@ -242,7 +242,7 @@ export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
   const def = unitDef(ctx, m.uid_def);
   const out: EqDisplayItem[] = [];
   if (!def) return out;
-  if (def.gear) def.gear.forEach((g) => out.push({ label: g, items: [g] }));
+  unitGear(ctx, m).forEach((g) => out.push({ label: g, items: [g] }));
   if (def.eq) {
     const list = eqListFor(ctx, def) ?? {};
     for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) {

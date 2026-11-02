@@ -55,6 +55,8 @@ export interface UnitDef {
   gear?: string[];
   /** A fixed armour save, if the unit has one. */
   sv?: number;
+  /** `sv` comes from this piece of the unit's `gear`: sold, the unit has the save of his other equipment and text. */
+  svWith?: string;
   /** Gains no experience (animals, vehicles). */
   noxp?: boolean;
   /** Skill lists by subtype, instead of `sk`. */

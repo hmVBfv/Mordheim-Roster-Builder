@@ -3,7 +3,7 @@ import type { HireEntry } from '../data/types.ts';
 import type { HireRecord, Model } from '../state/types.ts';
 import type { Ctx } from './context.ts';
 import { hsChosenEq, hsEqParts, hsEquipOn } from './hire.ts';
-import { unitDef } from './lookup.ts';
+import { unitDef, unitGear } from './lookup.ts';
 
 /** Numeric value of a profile entry: "3(4)" → 4 (the bracket is effective),
     "D6" → 6, "—" → null. */
@@ -57,7 +57,8 @@ export function svOfModel(ctx: Ctx, m: Model): number | null {
   const innate = svFromText(def && def.sp);
   const combinable = /combines?\s*with\s*armour|combined with o/i.test((def && def.sp) || '');
   let best = combinable ? svCombine(eqSv, innate) : eqSv == null ? innate : innate == null ? eqSv : Math.min(eqSv, innate);
-  if (def && def.sv != null && (best == null || def.sv < best)) best = def.sv;
+  // `svWith`: the unit's own save is that of a piece of his gear (the Conqueror's masterwork armour, 4+): sold, it goes
+  if (def && def.sv != null && (!def.svWith || unitGear(ctx, m).includes(def.svWith)) && (best == null || def.sv < best)) best = def.sv;
   const sk = (m && m.skills) || [];
   let bonus = 0, base: number | null = null;
   sk.forEach((n) => {
