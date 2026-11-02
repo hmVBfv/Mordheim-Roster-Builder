@@ -212,6 +212,30 @@ describe('reporting a problem', () => {
     expect(await flushReports(me.id)).toBe(0);
   });
 
+  /* #182: after a report saved offline the form was done with, but it stayed: the next press of the beetle showed "Saved" again. */
+  it('offline a second report can be written after the first was saved: the form starts anew, with an id of its own', async () => {
+    const { srv, me } = server();
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    const user = userEvent.setup();
+    at('/account');
+    let form = await openForm(user);
+    await user.type(within(form).getByLabelText(/What did you want to do/), 'First one.');
+    await user.click(within(form).getByRole('button', { name: 'Save to send later' }));
+    expect(await screen.findByText(/Saved on this device/)).toBeTruthy();
+    await user.click(within(form).getByRole('button', { name: 'Done' }));
+    form = await openForm(user);
+    expect(screen.queryByText(/Saved on this device/)).toBeNull();
+    const field = within(form).getByLabelText(/What did you want to do/) as HTMLTextAreaElement;
+    expect(field.value).toBe('');
+    await user.type(field, 'Second one.');
+    await user.click(within(form).getByRole('button', { name: 'Save to send later' }));
+    expect(await screen.findByText(/Saved on this device/)).toBeTruthy();
+    const waiting = await waitingReports(me.id);
+    expect(waiting.map((r) => r.text)).toEqual(['First one.', 'Second one.']);
+    expect(new Set(waiting.map((r) => r.id)).size).toBe(2);
+    expect(srv.state.bugs).toEqual([]);
+  });
+
   it('when the server does not answer, though the device is online, the report is saved as well and no error stands in its way', async () => {
     const { srv, me } = server();
     const f = vi.mocked(fetch);
