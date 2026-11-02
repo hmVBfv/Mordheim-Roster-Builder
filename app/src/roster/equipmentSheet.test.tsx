@@ -15,10 +15,10 @@ afterEach(cleanup);
 
 const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn() };
 
-function sheet() {
+function sheet(wb = 'merc', unit = 'capt') {
   const c = (s: core.WarbandState) => core.ctxOf(data, s);
-  let s = createWarband(data, 'merc', null, 'The Grey Company');
-  s = core.addUnit(c(s), 'capt');
+  let s = createWarband(data, wb, null, 'The Grey Company');
+  s = core.addUnit(c(s), unit);
   const uid = s.models[0]!.uid;
   const view = equipmentView(c(s), uid)!;
   const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
@@ -78,5 +78,22 @@ describe('a rare item names its rules on a tap (#162)', () => {
     const bubble = await within(d).findByRole('tooltip', { hidden: true });
     expect(bubble.textContent).toMatch(/1D3 units of water/);
     expect(bubble.textContent).toMatch(/shatters/);
+  });
+});
+
+/* Report of 2.11.2026: a Hero who "starts with" equipment (the Conqueror of the Lustrian Reavers) carries it from the start; its cost is in
+   his price, so it has none of its own and cannot be sold or given away. */
+describe('what a Hero starts with (#181)', () => {
+  it('is among what he carries, free and staying with him, next to what he buys', () => {
+    const d = sheet('reavers', 'conqueror');
+    const carried = d.querySelector('section[aria-label="Carried"]')!;
+    const rows = [...carried.querySelectorAll('tbody tr')].map((tr) => [tr.querySelector('th')!.textContent, tr.children[1]!.textContent, tr.textContent!.includes('stays')]);
+    for (const name of ['Masterwork Heavy Armour', 'Bec de Corbin', 'Helmet']) {
+      const row = rows.find((r) => (r[0] as string).startsWith(name))!;
+      expect(row, `${name} is carried`).toBeTruthy();
+      expect(row[1], name).toBe('in his price');
+      expect(row[2], `${name} stays`).toBe(true);
+    }
+    expect(within(carried as HTMLElement).queryByRole('button', { name: /Take .*Masterwork/i, hidden: true })).toBeNull();
   });
 });

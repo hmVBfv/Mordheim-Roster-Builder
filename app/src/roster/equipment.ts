@@ -28,7 +28,7 @@ export interface RareRow { de: string; /** Which copy of a weapon upgrade this r
 export interface CarriedRow {
   id: string;
   /** The list item or the catalogue key it stands for, and where taking one away goes. */
-  key: string; name: string; group: string; from: 'list' | 'rare';
+  key: string; name: string; group: string; from: 'list' | 'rare' | 'start';
   price: string; free: boolean; text: string; tips: Tip[];
   /** He keeps it: the free dagger is never given away or sold. */
   keep: boolean;
@@ -117,6 +117,13 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
   const hero = def?.t === 'hero' || !!m.promoted;
   const upgrades = Object.keys(ctx.data.UPGRADES).filter((de) => core.isUpgrade(ctx.data, de));
   const out: CarriedRow[] = [];
+  // what he starts with (the Lustrian Reavers' Heroes: "Starts with …"): in his price, so no price of its own, and it stays with him
+  (def?.gear ?? []).forEach((nm, i) => {
+    out.push({
+      id: `s:${nm}:${i}`, key: nm, name: nm, group: core.itemGroup(ctx, nm) ?? 'Starting equipment', from: 'start', price: 'in his price', free: true, keep: true, used: false,
+      text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon: false, ups: [], options: [], qty: 1,
+    });
+  });
   for (const cat of Object.keys(list)) {
     for (const [nm, pr, fl] of list[cat] ?? []) {
       if (ctx.data.BRACE_HIDE[nm] || (!hero && fl?.heroes)) continue;
