@@ -23,7 +23,8 @@ export function ReportProblem() {
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const { pathname } = useLocation();
   const session = useSession();
-  const who = session.status === 'in' ? session.user.id : '-';
+  // known on this device, the server in reach or not: the form must not start anew when the connection comes and goes
+  const who = session.status === 'in' ? session.user.id : session.status === 'unreachable' ? session.user?.id ?? '-' : '-';
   // a report that went out is done with: the next one starts with an empty form and an id of its own
   const [round, setRound] = useState(0);
   const sent = useRef(false);
