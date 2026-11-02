@@ -69,12 +69,12 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
           id, kind, title: doc.title, text: doc.text, sourceRef: doc.sourceRef, appVersion: __APP_VERSION__, device: doc.device, view: doc.view, context: doc.context, jsErrors: doc.jsErrors,
           attach: copy,
         };
-        if (later && known) { await queueReport(known, body); setPhase('saved'); return; }
+        if (later && known) { await queueReport(known, body); setPhase('saved'); onSent(); return; }
         try {
           await sendReport(body);
         } catch (e) {
           // the server does not answer though the device says it is online: the report waits like any other
-          if (e instanceof ApiError && e.unreachable && known) { await queueReport(known, body); setPhase('saved'); return; }
+          if (e instanceof ApiError && e.unreachable && known) { await queueReport(known, body); setPhase('saved'); onSent(); return; }
           throw e;
         }
         setPhase('sent');

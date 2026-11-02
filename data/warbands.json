@@ -5669,6 +5669,7 @@
       "Ld": 8
      },
      "eq": "pfStyle",
+     "kit": true,
      "sk": [
       "combat",
       "strength",
@@ -5725,6 +5726,7 @@
       "Ld": 7
      },
      "eq": "pfStyle",
+     "kit": true,
      "sk": [
       "combat",
       "strength",
@@ -5778,6 +5780,7 @@
       "Ld": 7
      },
      "eq": "pfStyle",
+     "kit": true,
      "sp": "Pit Fighter."
     },
     {
@@ -5799,6 +5802,7 @@
       "Ld": 7
      },
      "eq": "pfPursuer",
+     "kit": true,
      "sp": "Evade; Pit Fighter."
     }
    ]
