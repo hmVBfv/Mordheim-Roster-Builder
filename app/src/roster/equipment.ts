@@ -16,6 +16,8 @@ const FREE = '(1. gratis)';
 
 /** The rules text of an item, for the tooltip of every entry (V6). */
 export function itemText(data: core.GameData, key: string): string {
+  const parts = itemTip(data, key);
+  if (parts.length > 1) return parts.map((t) => `${t.name}: ${t.text}`).join(' ');
   return core.itemInfo(data, key)?.text ?? core.itemInfo(data, core.enItem(data, key))?.text ?? '';
 }
 

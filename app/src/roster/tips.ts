@@ -36,7 +36,27 @@ const eased = (s: { name: string; red?: number }): string => {
 /** An item by its data key (German, or English). */
 export function itemTip(data: GameData, key: string): Tip[] {
   const en = core.enItem(data, key);
+  const parts = kitParts(data, en);
+  if (parts) return parts;
   return tipOf(core.itemInfo(data, key) ?? core.itemInfo(data, en), en, 'Equipment');
+}
+
+/* A set sold as one line ("Orc kit (helmet/dagger/axe/shield)", the Pit Fighters' styles) names several items; a rule text found for the
+   whole line is the one of whichever word the lookup meets first (#186). So each part gets its own text, in the order the kit names them. */
+const KIT = /^.+? kit \((.+)\)$/i;
+const KIT_WORD: Record<string, string> = { wpn: 'weapon', armor: 'armour' };
+function kitParts(data: GameData, en: string): Tip[] | null {
+  const inside = KIT.exec(en)?.[1];
+  if (!inside) return null;
+  const seen = new Set<string>();
+  const tips: Tip[] = [];
+  for (const raw of inside.split(/\/|\s+or\s+|\s*&\s*/i)) {
+    const part = raw.trim().replace(/^\d+\s+/, '').replace(/\b(wpn|armor)\b/gi, (w) => KIT_WORD[w.toLowerCase()]!);
+    if (!part) continue;
+    const info = core.itemInfo(data, part);
+    for (const t of tipOf(info, part, 'Equipment')) if (!seen.has(t.name)) { seen.add(t.name); tips.push(t); }
+  }
+  return tips.length ? tips : null;
 }
 
 /* The groups of a unit's equipment, in the order of the equipment sheet (#113) and under the names of mordheimer.net's
