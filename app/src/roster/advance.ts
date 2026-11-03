@@ -65,7 +65,9 @@ export interface AdvanceView {
       wizard's lore (core addSpell), as the Roster Builder adds them. */
   spells: { lore: string; own: boolean; items: Choice[] } | null;
   /** A group: who may be promoted, or why none can. */
-  talent: { men: { i: number; name: string }[]; lists: { key: string; name: string }[]; fixed: string[] | null; /** A Prospect: the fallen Heroes whose place he may take (with their gear), and that he may re-roll this result. */ heirs: { id: number; name: string }[]; reroll: boolean } | { why: string } | null;
+  /** A Prospect while a Hero has fallen: whose place he may take, which man, and the two skill lists to choose. */
+  fill?: { heirs: { id: number; name: string }[]; men: { i: number; name: string }[]; lists: { key: string; name: string }[]; unit: string } | null;
+  talent: { men: { i: number; name: string }[]; lists: { key: string; name: string }[]; fixed: string[] | null } | { why: string } | null;
 }
 
 const STATS: StatKey[] = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'];
@@ -121,7 +123,8 @@ function warriorView(ctx: core.Ctx, m: Model): AdvanceView | null {
   }
   // a group: may one of its men be promoted?
   let talent: AdvanceView['talent'];
-  if (def.noPromote || NO_PROMOTION.test(def.sp ?? '')) talent = { why: `a ${def.name} can never become a Hero` };
+  if (def.promotionOnly) talent = { why: `a ${def.name} becomes a Hero only by taking the place of a fallen Hero, never by this result: roll the 2D6 again` };
+  else if (def.noPromote || NO_PROMOTION.test(def.sp ?? '')) talent = { why: `a ${def.name} can never become a Hero` };
   else if (core.totalHeroes(ctx) >= (Number(core.houseRules(ctx.s).heroes) || 6)) talent = { why: 'the warband has all the Heroes it may have: roll again' };
   else {
     let lists = core.availHeroCats(ctx);
@@ -130,12 +133,23 @@ function warriorView(ctx: core.Ctx, m: Model): AdvanceView | null {
       men: core.memberNames(ctx, m).map((name, i) => ({ i, name })),
       lists: lists.map((c) => ({ key: c, name: ctx.data.SKILLLISTS[c]?.name ?? c })),
       fixed: def.promoCatsFixed ? def.promoCatsFixed.map((c) => ctx.data.SKILLLISTS[c]?.name ?? c) : null,
-      heirs: def.promotionOnly ? (ctx.s.fallen ?? []).filter((f) => f.kind === 'hero' && f.heir == null && f.id != null)
-        .map((f) => ({ id: f.id!, name: f.m.name || core.unitDef(ctx, f.m.uid_def)?.name || 'Hero' })) : [],
-      reroll: !!def.promotionOnly,
     };
   }
-  return { ...base, talent };
+  return { ...base, talent, fill: def.promotionOnly ? fillView(ctx, m, def) : null };
+}
+
+/** A Prospect (Promotion Only): a Hero has fallen and one of the group may take his place, at any time. */
+function fillView(ctx: core.Ctx, m: Model, def: core.UnitDef): AdvanceView['fill'] {
+  if (core.totalHeroes(ctx) >= (Number(core.houseRules(ctx.s).heroes) || 6)) return null;
+  const heirs = (ctx.s.fallen ?? []).filter((f) => f.kind === 'hero' && f.heir == null && f.id != null && core.unitDef(ctx, f.m.uid_def)?.t === 'hero')
+    .map((f) => ({ id: f.id!, name: f.m.name || core.unitDef(ctx, f.m.uid_def)?.name || 'Hero' }));
+  if (!heirs.length) return null;
+  return {
+    heirs,
+    men: core.memberNames(ctx, m).map((name, i) => ({ i, name })),
+    lists: core.availHeroCats(ctx).map((c) => ({ key: c, name: ctx.data.SKILLLISTS[c]?.name ?? c })),
+    unit: def.name,
+  };
 }
 
 function hireView(ctx: core.Ctx, rec: HireRecord): AdvanceView | null {

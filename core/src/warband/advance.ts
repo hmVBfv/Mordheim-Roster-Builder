@@ -8,7 +8,7 @@ import { houseRules } from '../state/house.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { goldTreasury, modelUnitCost, totalHeroes } from '../rules/costs.ts';
 import { enItem } from '../export/rulesText.ts';
-import { unitDef, unitGear } from '../rules/lookup.ts';
+import { unitDef } from '../rules/lookup.ts';
 import { canAdv, canBeLeader, hsCanAdv, isMarauderChief, isMarauderSeer, magicOfModel, memberCount, memberName, memberNamed, spellBase } from '../rules/profile.ts';
 import { logEvent } from './log.ts';
 import { findModel, nextModelUid, update, type WarbandDraft } from './update.ts';
@@ -137,18 +137,21 @@ export function promoteHench(ctx: Ctx, uid: number, i?: number | null, text?: st
   });
 }
 
-/** A Prospect takes the place of a fallen Hero ("Promotion Only"; Rob, 2.11.2026): he becomes a Hero with his own profile and experience, takes
-    over everything the fallen Hero carried, and what he carried himself goes to the stash. The Hero's worth was lost with his death, so the
-    gear he hands on is not paid for a second time, and the Prospect's own gear is not paid out. Refused for any other unit, for a record
-    that is not a Hero or already has an heir, and at the Hero limit. */
+/** A Prospect takes the place of a fallen Hero ("Promotion Only"; Rob, 3.11.2026). He becomes that Hero – a Conqueror, no longer a Prospect –
+    with the rules and the equipment of the Hero. His profile stays the Prospect's, with the advances he made as a henchman (`statsOf`), and his
+    experience stays; the fallen Hero's advances are not taken over. What the Prospect carried himself goes to the stash. The fallen Hero's worth
+    was lost with his death, so the gear he hands on is not paid for a second time, and the Prospect's own gear is not paid out. Refused for any
+    other unit, for a record that is not a Hero of this warband or already has an heir, and at the Hero limit. */
 export function promoteProspect(ctx: Ctx, uid: number, fallenId: number, i?: number | null): WarbandState {
   const m0 = findModel(ctx.s, uid);
   const def = m0 ? unitDef(ctx, m0.uid_def) : undefined;
   const rec0 = (ctx.s.fallen ?? []).find((f) => f.id === fallenId);
-  if (!m0 || !def?.promotionOnly || m0.promoted || !rec0 || rec0.kind !== 'hero' || rec0.heir != null) return ctx.s;
+  const heroDef = rec0 ? unitDef(ctx, rec0.m.uid_def) : undefined;
+  if (!m0 || !def?.promotionOnly || m0.promoted || !rec0 || rec0.kind !== 'hero' || rec0.heir != null || heroDef?.t !== 'hero') return ctx.s;
   const idx = i == null ? memberCount(m0) - 1 : Number(i) || 0;
   const who = memberName(ctx, m0, idx);
-  const fell = rec0.m.name || unitDef(ctx, rec0.m.uid_def)?.name || 'a Hero';
+  const named = memberNamed(m0, idx);
+  const fell = rec0.m.name || heroDef.name;
   const s1 = promoteHench(ctx, uid, i, `${who} took the place of ${fell} as a Hero.`);
   if (s1 === ctx.s) return ctx.s;
   const heroUid = s1.models.find((m) => m.promoted && !ctx.s.models.some((o) => o.uid === m.uid))?.uid ?? uid;
@@ -170,13 +173,17 @@ export function promoteProspect(ctx: Ctx, uid: number, fallenId: number, i?: num
     const withOwn = modelUnitCost(c, h);
     for (const [k, q] of Object.entries(h.eq ?? {})) put(k, Number(q) || 0);
     for (const [k, r] of Object.entries(h.rare ?? {})) put(k, Number(r.q) || 0);
+    // he is the Hero now; profile and price stay those of the Prospect
+    h.statsOf = h.uid_def;
+    h.uid_def = rec.m.uid_def;
+    // an unnamed man is just the Hero ("Conqueror"), not "Prospect (Hero)"
+    if (!named && (!h.name || h.name === def.name || h.name === `${def.name} (Hero)`)) delete h.name;
     h.eq = {}; h.rare = {}; h.heirloom = null;
     const bare = modelUnitCost(c, h);
     if (withOwn > bare) stash.gold = Math.max(0, goldTreasury(c) - (withOwn - bare));
     // the fallen Hero's gear comes to him; his worth was already lost with him
     h.eq = copy(rec.m.eq ?? {}); h.rare = copy(rec.m.rare ?? {}); h.heirloom = rec.m.heirloom ?? null;
-    const held = unitGear(c, rec.m);
-    if (held.length) h.gearHeld = [...held];
+    if (rec.m.gearSold?.length) h.gearSold = [...rec.m.gearSold]; else delete h.gearSold;
     const taken = modelUnitCost(c, h) - bare;
     if (taken > 0) stash.gold = goldTreasury(c) + taken;
     rec.heir = h.uid;
