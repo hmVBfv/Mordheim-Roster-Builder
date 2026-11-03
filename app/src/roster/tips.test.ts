@@ -6,7 +6,7 @@ import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data, fixtures } from '../test/data.ts';
-import { hireFacts, warriorFacts } from './tips.ts';
+import { hireFacts, itemTip, warriorFacts } from './tips.ts';
 import { rosterView, type Fact } from './view.ts';
 
 const ctx = (s: WarbandState) => core.ctxOf(data, s);
@@ -246,5 +246,29 @@ describe('the equipment of a unit by mordheimer.net\u2019s kinds (#126, #127)', 
     expect(venom.tips[0]!.line).toMatch(/one use/i);
     const rope = gear('Seil & Haken').find((f) => f.group === 'Miscellaneous equipment')!;
     expect(rope.tips[0]?.line ?? '').not.toMatch(/one use/i);
+  });
+});
+
+describe('a kit sold as one line', () => {
+  it('gives every part its own rule text, in the order the kit names them', () => {
+    const tips = itemTip(data, 'Orc-Stil (Helm/Dolch/Axt/Schild)');
+    expect(tips.map((t) => t.name)).toEqual(['Helmet', 'Dagger', 'Axe', 'Shield']);
+    expect(tips.every((t) => t.text.length > 0)).toBe(true);
+  });
+
+  it('does so for every kit of every list, and each part has its own text', () => {
+    const kits = Object.values(data.LISTS).flatMap((l) => Object.values(l as Record<string, unknown>)).flatMap((g) => (Array.isArray(g) ? g : []))
+      .map((r) => String(r[0])).filter((n) => /-Stil \(/.test(n));
+    expect(kits.length).toBe(6);
+    for (const k of kits) {
+      const tips = itemTip(data, k);
+      expect(tips.length, k).toBeGreaterThanOrEqual(4);
+      expect(new Set(tips.map((t) => t.name)).size, k).toBe(tips.length);
+    }
+  });
+
+  it('leaves a single item and a plain name with its one text', () => {
+    expect(itemTip(data, 'Schwert').map((t) => t.name)).toEqual(['Sword']);
+    expect(itemTip(data, 'Seil & Haken').length).toBeLessThanOrEqual(1);
   });
 });
