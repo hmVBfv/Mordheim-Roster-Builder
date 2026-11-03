@@ -254,11 +254,11 @@ export interface Eligibility { ok: boolean; reason: string }
 
 /** The catalogue rule: a unit may only take an item whose category appears
     in its starting equipment. Miscellaneous items are free for heroes. */
-export function catalogEligible(ctx: Ctx, def: UnitDef | undefined, item: CatalogItem | undefined): Eligibility {
+export function catalogEligible(ctx: Ctx, def: UnitDef | undefined, item: CatalogItem | undefined, held: readonly string[] = []): Eligibility {
   if (!item) return { ok: false, reason: 'unbekannter Gegenstand' };
   if (item.cat === 'misc') return { ok: true, reason: 'Sonstige Ausrüstung – für Helden frei kaufbar (keine Kategorie-Schranke)' };
   const fam = itemFamily(ctx.data, item.de);
-  const have = unitFamilies(ctx, def);
+  const have = unitFamilies(ctx, def, held);
   if (fam === 'upgrade') {
     const ok = ctx.data._CCFAM.some((f) => have.has(f));
     return ok ? { ok: true, reason: 'Aufwertung einer vorhandenen Nahkampfwaffe' } : { ok: false, reason: 'keine aufwertbare Nahkampfwaffe in der Startliste' };
@@ -324,6 +324,6 @@ export function rareEligibleItems(ctx: Ctx, m: Model): CatalogItem[] {
     if (it.cat === 'misc' && !isHero && !h.miscHench && !h.freeMarket) return false;
     if (h.freeMarket) return true;
     if (have.has(stripParen(it.de).toLowerCase())) return false;
-    return catalogEligible(ctx, def, it).ok;
+    return catalogEligible(ctx, def, it, m.gearHeld).ok;
   });
 }

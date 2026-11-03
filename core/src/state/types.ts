@@ -74,6 +74,8 @@ export interface Model {
   xpPaid?: number;
   /** Kislev: the heirloom item bought at half price. */
   heirloom?: string | null;
+  /** Fixed gear taken over from a fallen Hero by a Prospect who took his place: pieces beyond the unit's own `gear`, one entry per piece. */
+  gearHeld?: string[];
   /** The player removed the free dagger. */
   _noDagger?: boolean;
   [key: string]: unknown;
@@ -165,6 +167,8 @@ export interface FallenRecord {
   casualtyId?: number;
   /** The casualty record was created by the death itself. */
   casFromDeath?: boolean;
+  /** The uid of the Prospect who took this Hero's place; his gear went with him. */
+  heir?: number;
   [key: string]: unknown;
 }
 

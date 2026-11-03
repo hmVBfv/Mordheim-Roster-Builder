@@ -116,7 +116,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     if (c.kind === 'spell') return c.own ? core.addSpellFromAdvance(x, id, c.spell) : core.addSpell(x, id, c.spell);
     if (c.kind === 'reduce') return core.spellReduce(x, id, x.s.models.find((m) => m.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
     // The lad's got talent: the man becomes a Hero of his own, with his two lists
-    let s1 = core.promoteHench(x, id, c.man);
+    let s1 = c.place != null ? core.promoteProspect(x, id, c.place, c.man) : core.promoteHench(x, id, c.man);
     const hero = s1.models.find((m) => m.promoted && !x.s.models.some((o) => o.uid === m.uid))?.uid ?? id;
     for (const l of c.lists) s1 = core.togglePromoCat(core.ctxOf(data, s1), hero, l);
     return s1;

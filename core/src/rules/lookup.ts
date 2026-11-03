@@ -47,15 +47,15 @@ export function itemFamily(data: GameData, name: string): string | null {
 export function unitGear(ctx: Ctx, m: Model | null | undefined): string[] {
   const def = m ? unitDef(ctx, m.uid_def) : undefined;
   const sold = [...(m?.gearSold ?? [])];
-  return (def?.gear ?? []).filter((g) => { const i = sold.indexOf(g); if (i < 0) return true; sold.splice(i, 1); return false; });
+  return [...(def?.gear ?? []), ...(m?.gearHeld ?? [])].filter((g) => { const i = sold.indexOf(g); if (i < 0) return true; sold.splice(i, 1); return false; });
 }
 
 /** Families present in a unit's starting equipment list and fixed gear. */
-export function unitFamilies(ctx: Ctx, def: UnitDef | undefined): Set<string> {
+export function unitFamilies(ctx: Ctx, def: UnitDef | undefined, held: readonly string[] = []): Set<string> {
   const set = new Set<string>();
   const list = def && def.eq ? eqListFor(ctx, def) : undefined;
   if (list) for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) { const f = itemFamily(ctx.data, nm); if (f) set.add(f); }
-  if (def && def.gear) def.gear.forEach((nm) => { const f = itemFamily(ctx.data, nm); if (f) set.add(f); });
+  for (const nm of [...(def?.gear ?? []), ...held]) { const f = itemFamily(ctx.data, nm); if (f) set.add(f); }
   return set;
 }
 

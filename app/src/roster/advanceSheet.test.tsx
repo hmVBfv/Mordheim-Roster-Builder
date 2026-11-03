@@ -133,3 +133,27 @@ describe('the skills and the spells are lists in columns, not a heap of buttons 
     for (const li of items) expect(li.textContent).toMatch(/cast on (\d+|auto)\+?/);
   });
 });
+
+describe('a Prospect may take the place of a fallen Hero', () => {
+  it('offers the fallen Heroes, says the result may be re-rolled, and passes the choice on', async () => {
+    const c = (s: core.WarbandState) => core.ctxOf(data, s);
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    const uid = s.models.find((m) => m.uid_def === 'prospect')!.uid;
+    const onApply = vi.fn();
+    const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
+    render(<AdvanceSheet dialogRef={ref} close={(after) => after?.()} view={{ ...advanceView(c(s), uid)!, key: 1 }} onApply={onApply} />);
+    const d = document.querySelector('dialog')!;
+    const user = userEvent.setup();
+    await user.type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '11');
+    expect(q(d).getByText('A Prospect may re-roll this result.', { hidden: true } as never)).toBeTruthy();
+    await user.selectOptions(q(d).getByRole('combobox', { name: /Takes the place of/, hidden: true }), 'Conqueror');
+    const lists = q(d).getByRole('group', { name: 'Skill lists', hidden: true });
+    const buttons = within(lists).getAllByRole('button', { hidden: true });
+    await user.click(buttons[0]!);
+    await user.click(buttons[1]!);
+    await user.click(q(d).getByRole('button', { name: 'Apply', hidden: true }));
+    expect(onApply).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'talent', place: s.fallen![0]!.id }), expect.stringMatching(/took the place of Conqueror/));
+  });
+});

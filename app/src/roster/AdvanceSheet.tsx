@@ -16,7 +16,7 @@ export type AdvanceChoice =
   | { kind: 'skill'; skill: string }
   | { kind: 'spell'; spell: string; own: boolean }
   | { kind: 'reduce'; spell: string }
-  | { kind: 'talent'; man: number; lists: string[] };
+  | { kind: 'talent'; man: number; lists: string[]; /** A Prospect: the fallen Hero whose place he takes, with his gear. */ place?: number };
 
 function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['close']; onApply: (c: AdvanceChoice, text: string) => void; titleId: string }) {
   const [roll, setRoll] = useState('');
@@ -26,6 +26,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
   const [pick, setPick] = useState<string | null>(null); // "skill:…", "spell:…", "reduce:i"
   const [man, setMan] = useState(0);
   const [lists, setLists] = useState<string[]>([]);
+  const [place, setPlace] = useState<number | null>(null);
   const row = rowFor(v.table, Number(roll));
   const open = row?.stats?.filter((k) => v.canRaise[k]) ?? [];
   // a row that says "roll a D6" is decided by the die, not chosen (#144): 1–3 the first, 4–6 the second; at his maximum he takes the other
@@ -53,8 +54,9 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
     if (k === 'reduce') { choice = { kind: 'reduce', spell: rest }; text = `${v.name}: ${v.spells?.items.find((s) => s.key === rest)?.name ?? rest} is 1 easier to cast.`; }
   }
   if (row?.kind === 'talent' && talent && 'men' in talent && talentOk) {
-    choice = { kind: 'talent', man, lists };
-    text = `${talent.men[man]?.name ?? 'One man'} of ${v.name} is a Hero now.`;
+    const heir = place != null ? talent.heirs.find((h) => h.id === place) : undefined;
+    choice = { kind: 'talent', man, lists, ...(heir ? { place: heir.id } : {}) };
+    text = heir ? `${talent.men[man]?.name ?? 'One man'} of ${v.name} took the place of ${heir.name}.` : `${talent.men[man]?.name ?? 'One man'} of ${v.name} is a Hero now.`;
   }
 
   return (
@@ -148,6 +150,17 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
             {row.kind === 'talent' && talent && ('why' in talent ? <p>No: {talent.why}.</p> : (
               <>
                 <p>One man of the group becomes a Hero. He keeps his experience, equipment and increases; the rest of the group rolls again, re-rolling 10–12.</p>
+                {talent.reroll && <p className={ui.muted}>A Prospect may re-roll this result.</p>}
+                {talent.heirs.length > 0 && (
+                  <label className={ui.field}>
+                    <span>Takes the place of</span>
+                    <select value={place ?? ''} onChange={(e) => setPlace(e.target.value === '' ? null : Number(e.target.value))}>
+                      <option value="">No fallen Hero</option>
+                      {talent.heirs.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+                    </select>
+                    <small>He keeps his own profile and experience and takes over the gear of the fallen Hero; what he carried himself goes to the stash.</small>
+                  </label>
+                )}
                 <div className={styles.pickRow} role="group" aria-label="Who">
                   {talent.men.map((m) => <button key={m.i} type="button" aria-pressed={man === m.i} onClick={() => setMan(m.i)}>{m.name}</button>)}
                 </div>
