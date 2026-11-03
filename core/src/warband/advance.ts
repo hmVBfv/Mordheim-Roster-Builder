@@ -5,9 +5,10 @@
 import type { StatKey } from '../data/types.ts';
 import type { HireRecord, Model, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
-import type { Ctx } from '../rules/context.ts';
-import { totalHeroes } from '../rules/costs.ts';
-import { unitDef } from '../rules/lookup.ts';
+import { ctxOf, type Ctx } from '../rules/context.ts';
+import { goldTreasury, modelUnitCost, totalHeroes } from '../rules/costs.ts';
+import { enItem } from '../export/rulesText.ts';
+import { unitDef, unitGear } from '../rules/lookup.ts';
 import { canAdv, canBeLeader, hsCanAdv, isMarauderChief, isMarauderSeer, magicOfModel, memberCount, memberName, memberNamed, spellBase } from '../rules/profile.ts';
 import { logEvent } from './log.ts';
 import { findModel, nextModelUid, update, type WarbandDraft } from './update.ts';
@@ -104,7 +105,7 @@ export function dropMemberName(m: Model, i: number): void {
 
 /** The Lad's Got Talent: member `i` (default: the last) leaves the group as a
     Hero, taking his name with him. Refused at the Hero limit. */
-export function promoteHench(ctx: Ctx, uid: number, i?: number | null): WarbandState {
+export function promoteHench(ctx: Ctx, uid: number, i?: number | null, text?: string): WarbandState {
   const m0 = findModel(ctx.s, uid);
   if (!m0) return ctx.s;
   if (totalHeroes(ctx) >= (Number(houseRules(ctx.s).heroes) || 6)) return ctx.s;
@@ -132,7 +133,53 @@ export function promoteHench(ctx: Ctx, uid: number, i?: number | null): WarbandS
       m.promoCats = def?.promoCatsFixed ? [...def.promoCatsFixed] : m.promoCats || [];
       if (named && !m.name) { m.name = who; delete m.names; }
     }
-    logEvent(d, 'promote', `${who} was promoted to Hero (The Lad's Got Talent).`, { uid: heroUid, name: who, uid_def: m.uid_def, exp: Number(m.exp) || 0 });
+    logEvent(d, 'promote', text ?? `${who} was promoted to Hero (The Lad's Got Talent).`, { uid: heroUid, name: who, uid_def: m.uid_def, exp: Number(m.exp) || 0 });
+  });
+}
+
+/** A Prospect takes the place of a fallen Hero ("Promotion Only"; Rob, 2.11.2026): he becomes a Hero with his own profile and experience, takes
+    over everything the fallen Hero carried, and what he carried himself goes to the stash. The Hero's worth was lost with his death, so the
+    gear he hands on is not paid for a second time, and the Prospect's own gear is not paid out. Refused for any other unit, for a record
+    that is not a Hero or already has an heir, and at the Hero limit. */
+export function promoteProspect(ctx: Ctx, uid: number, fallenId: number, i?: number | null): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  const def = m0 ? unitDef(ctx, m0.uid_def) : undefined;
+  const rec0 = (ctx.s.fallen ?? []).find((f) => f.id === fallenId);
+  if (!m0 || !def?.promotionOnly || m0.promoted || !rec0 || rec0.kind !== 'hero' || rec0.heir != null) return ctx.s;
+  const idx = i == null ? memberCount(m0) - 1 : Number(i) || 0;
+  const who = memberName(ctx, m0, idx);
+  const fell = rec0.m.name || unitDef(ctx, rec0.m.uid_def)?.name || 'a Hero';
+  const s1 = promoteHench(ctx, uid, i, `${who} took the place of ${fell} as a Hero.`);
+  if (s1 === ctx.s) return ctx.s;
+  const heroUid = s1.models.find((m) => m.promoted && !ctx.s.models.some((o) => o.uid === m.uid))?.uid ?? uid;
+  const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
+  return update(ctxOf(ctx.data, s1), (d, c) => {
+    const h = findModel(d, heroUid) as Model;
+    const rec = (d.fallen ?? []).find((f) => f.id === fallenId);
+    if (!rec) return;
+    d.stash = d.stash || { wyrd: 0, gold: null, items: [] };
+    const stash = d.stash;
+    stash.items = stash.items ?? [];
+    const put = (key: string, qty: number) => {
+      if (!(qty > 0)) return;
+      const name = enItem(c.data, key);
+      const ex = stash.items!.find((it) => it.name === name);
+      if (ex) ex.qty += qty; else stash.items!.push({ name, qty });
+    };
+    // his own gear goes to the stash; it is not paid out
+    const withOwn = modelUnitCost(c, h);
+    for (const [k, q] of Object.entries(h.eq ?? {})) put(k, Number(q) || 0);
+    for (const [k, r] of Object.entries(h.rare ?? {})) put(k, Number(r.q) || 0);
+    h.eq = {}; h.rare = {}; h.heirloom = null;
+    const bare = modelUnitCost(c, h);
+    if (withOwn > bare) stash.gold = Math.max(0, goldTreasury(c) - (withOwn - bare));
+    // the fallen Hero's gear comes to him; his worth was already lost with him
+    h.eq = copy(rec.m.eq ?? {}); h.rare = copy(rec.m.rare ?? {}); h.heirloom = rec.m.heirloom ?? null;
+    const held = unitGear(c, rec.m);
+    if (held.length) h.gearHeld = [...held];
+    const taken = modelUnitCost(c, h) - bare;
+    if (taken > 0) stash.gold = goldTreasury(c) + taken;
+    rec.heir = h.uid;
   });
 }
 

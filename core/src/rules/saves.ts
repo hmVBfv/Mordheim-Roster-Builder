@@ -59,6 +59,8 @@ export function svOfModel(ctx: Ctx, m: Model): number | null {
   let best = combinable ? svCombine(eqSv, innate) : eqSv == null ? innate : innate == null ? eqSv : Math.min(eqSv, innate);
   // `svWith`: the unit's own save is that of a piece of his gear (the Conqueror's masterwork armour, 4+): sold, it goes
   if (def && def.sv != null && (!def.svWith || unitGear(ctx, m).includes(def.svWith)) && (best == null || def.sv < best)) best = def.sv;
+  // the masterwork armour gives 4+ to whoever wears it, also a Prospect who took over a fallen Hero's gear
+  if ((m.gearHeld ?? []).includes('Masterwork Heavy Armour') && (best == null || 4 < best)) best = 4;
   const sk = (m && m.skills) || [];
   let bonus = 0, base: number | null = null;
   sk.forEach((n) => {

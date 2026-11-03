@@ -65,6 +65,8 @@ export interface UnitDef {
   profSub?: Record<string, Partial<Record<StatKey, number>>>;
   /** Skill lists a promoted henchman of this type always gets. */
   promoCatsFixed?: string[];
+  /** A Prospect: becomes a Hero only by taking the place of a fallen Hero (Promotion Only). */
+  promotionOnly?: boolean;
   /** Warband skill set not available to this unit. */
   noWbSkills?: boolean;
   /** Extra attack shown as "1+1" (e.g. Saurus bite). */

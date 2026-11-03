@@ -65,7 +65,7 @@ export interface AdvanceView {
       wizard's lore (core addSpell), as the Roster Builder adds them. */
   spells: { lore: string; own: boolean; items: Choice[] } | null;
   /** A group: who may be promoted, or why none can. */
-  talent: { men: { i: number; name: string }[]; lists: { key: string; name: string }[]; fixed: string[] | null } | { why: string } | null;
+  talent: { men: { i: number; name: string }[]; lists: { key: string; name: string }[]; fixed: string[] | null; /** A Prospect: the fallen Heroes whose place he may take (with their gear), and that he may re-roll this result. */ heirs: { id: number; name: string }[]; reroll: boolean } | { why: string } | null;
 }
 
 const STATS: StatKey[] = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'];
@@ -130,6 +130,9 @@ function warriorView(ctx: core.Ctx, m: Model): AdvanceView | null {
       men: core.memberNames(ctx, m).map((name, i) => ({ i, name })),
       lists: lists.map((c) => ({ key: c, name: ctx.data.SKILLLISTS[c]?.name ?? c })),
       fixed: def.promoCatsFixed ? def.promoCatsFixed.map((c) => ctx.data.SKILLLISTS[c]?.name ?? c) : null,
+      heirs: def.promotionOnly ? (ctx.s.fallen ?? []).filter((f) => f.kind === 'hero' && f.heir == null && f.id != null)
+        .map((f) => ({ id: f.id!, name: f.m.name || core.unitDef(ctx, f.m.uid_def)?.name || 'Hero' })) : [],
+      reroll: !!def.promotionOnly,
     };
   }
   return { ...base, talent };

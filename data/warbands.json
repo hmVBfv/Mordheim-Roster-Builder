@@ -7939,6 +7939,7 @@
       "Ld": 7
      },
      "eq": "lrProspect",
+     "promotionOnly": true,
      "sp": "Promotion Only: Re-roll any \"The Lad's Got Talent\" result. A Prospect can only become a Hero through the Promotions rule (replacing a lost Hero); when promoted you may hire a new Prospect."
     }
    ]

@@ -218,6 +218,7 @@ Ergebnis 61, fragt der Ablauf, was unsere Warband mit dem Gefangenen tut
 | Austausch | gegen einen unserer Gefangenen (schließt dessen Eintrag) |
 | töten, neuer Zombie (nur Untote) | ein Zombie mehr im Roster; Ausrüstung in die Truhe |
 | opfern (nur Possessed und Carnival of Chaos) | unser Anführer +1 Erfahrung; Ausrüstung in die Truhe |
+| Prospect nimmt den Platz eines gefallenen Helden ein (Meldung #185, Rob, 02.11.2026) | kannte nur „Lad's Got Talent“; „Promotion Only“ stand nur im Text | neue Aktion `promoteProspect`: der Prospect wird Held mit seinem eigenen Profil und seiner Erfahrung, übernimmt die gesamte Ausrüstung des Gefallenen (auch die feste, `gearHeld`), seine eigene geht ins Lager; die Kasse bleibt gleich, die Ausrüstung wird nicht ein zweites Mal bezahlt. Das Ergebnis „Lad's Got Talent“ darf er neu würfeln (Hinweis im Fenster) | Quelle: mordheimer.net, Lustrian Reavers, „Promotion Only“, und Rob. Neuer Zustand (`gearHeld`, `heir`, `promotionOnly`), die alte App kennt die Aktion nicht, die Parität bleibt. Test: `core/test/prospect-heir.test.ts`. |
 
 Der Gefangene zählt nicht als unser Krieger: Er erhöht weder Rating noch
 Warbandgröße.
@@ -524,4 +525,3 @@ Neue Logik in `core/src/trade/` (`ledger.ts`, `market.ts`), Tests in
 Gründungspreis, ab „After battle 1“ ist die Zeile gesperrt und der
 Gegenstand am Trading Post zu finden. Außerhalb des Kampagnenmodus bleibt
 alles beim Gründungspreis.
-
