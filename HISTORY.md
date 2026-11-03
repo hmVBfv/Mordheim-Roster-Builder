@@ -4652,3 +4652,29 @@ first script that put the pieces in the data matched the id "slayer" in another 
 two units failed; it was reverted and the edit is now limited to the block of the Reavers. And a merge into the branch brought a conflict in
 `behaviour-changes.md`, two rows added at the same place, which I noticed only after I had pushed and opened the pull request; the merge was finished and
 pushed at once.
+
+**#181, the follow-up (Rob, 2.11.2026).** The entry above said the Conqueror's 4+ was left out on purpose. Rob wanted it: Masterwork Heavy Armour is 4+ on
+the card and in the TTS text, and the Reavers may sell what they start with, for half the price. Three pieces. The save is data (`sv: 4` with `svWith`
+naming the armour), so both apps compute it and the parity suite stayed green; sold, the man falls back to the save of what is left. Selling is a new
+action (`sellStartGear`) and a new key (`gearSold`, one entry per piece sold), and everything that read the unit's `gear` now reads what he still has
+(`unitGear`), while the kinds of gear stay with the unit so he can still find and wear the same things. And an audit: a test that every start piece
+belongs to a class the man carries found the Bec de Corbin without one (now two-handed). Not done: a piece without a catalogue price (rifle, Firepots,
+Leaf Coat) has no Sell button, since there is no price to halve. A wrong turn: the first branch run of the check took a conflict in
+`behaviour-changes.md` from the merge of the neighbouring pull request, noticed only after pushing.
+
+**#184, English names (PR 317).** The buy lists showed "Purpurschatten". The data keeps German keys and one table (`EQEN`) turns them into English; 17
+items that a list or a unit's gear can show were not in it. Rob also asked to look for other leftovers. The test reads every name of the lists and of
+the units' gear and fails when a name comes out unchanged although the catalogue knows an English one. The first version of the audit compared with the
+catalogue's spelling and reported dozens (case, plural, rare items that the app names from the catalogue directly); it now looks only at names that
+`enItem` leaves untouched. The item texts and the catalogue had no German left.
+
+**#186, tooltips of a kit (PR 318).** A Pit Fighter set is one line in the list, and the rule text was looked up for the whole line, so the first item
+word that matched won. Rob asked for the general fix, not one for the Pit Fighters: `itemTip` reads the parts of any "X kit (a/b/c)" from the English
+name and gives one tip per part, in order. Only the Pit Fighters have such sets today.
+
+**#185, a Prospect takes a fallen Hero's place (PR 319).** Rob's answers: he takes the gear but not the stats, his own gear goes to the stash, and he may
+re-roll The Lad's Got Talent. `promoteProspect` is built on `promoteHench`: the profile and experience stay with the man; the dead Hero's `eq` and
+`rare` come over, and his fixed gear in `gearHeld` (read by `unitGear`, the kinds of gear and the Masterwork save). The treasury was the delicate part: a
+fallen Hero's worth leaves the treasury at his death, so gear handed on would be charged a second time, and the Prospect's own gear would be paid out
+when it leaves him; both are cancelled in the same step, and the test checks that the gold is the same before and after. The re-roll is a note in the
+advance sheet, not a mechanism. Only a unit with `promotionOnly` (the Prospect) may do it.
