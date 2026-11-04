@@ -210,7 +210,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       }, `${w.name} chose the spell ${core.spellLabel(name)}.`),
       correctInjuries: w.injuries.length || w.missGames ? () => { setInjuriesOf(w.uid); openInjuriesSheet(); } : undefined,
       chaos,
-      outOfAction: w.hero && w.captive == null ? () => injureWarrior(w, '11') : undefined,
+      // a Hero is written off with the D66 on 11, a henchman with the D6 on 1 (#194)
+      outOfAction: w.hero ? (w.captive == null ? () => injureWarrior(w, '11') : undefined) : () => openInjury({ kind: 'hench', uid: w.uid, name: w.name, men: w.men, dice: '1' }),
       leave: w.fought
         ? { label: 'Dismiss – his equipment goes to the stash', run: () => ed.edit((c) => core.dismissWarrior(c, w.uid), `${w.name} dismissed; his equipment is in the stash.`, { gold: 'keep' }) }
         : locked

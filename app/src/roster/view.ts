@@ -290,7 +290,8 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     advanceDue: !!adv?.due,
     missGames: Number(m.miss) || 0,
     battles: Number(m.battles) || 0,
-    stats: statCells(p, def?.profile, p ? core.aDisp(ctx, m, p) : undefined),
+    // marked against the profile he started with: a Prospect who took a Hero's place is compared with the Prospect, not with the Hero
+    stats: statCells(p, core.unitDef(ctx, m.statsOf ?? m.uid_def)?.profile, p ? core.aDisp(ctx, m, p) : undefined),
     max: ((mi) => maxRow(ctx, mi?.label ?? null, mi?.prof))(core.maxInfo(ctx, m)),
     save: core.svShownLabel(ctx, m),
     ...facts,
