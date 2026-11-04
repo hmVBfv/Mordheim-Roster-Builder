@@ -131,6 +131,16 @@ describe('on a phone: a row each, opening under it with tabs', () => {
     expect(screen.getByRole('button', { name: 'Remove from the roster' })).toBeTruthy();
   });
 
+  it('a group of henchmen offers "Out of action for good…" among the ways to leave, as a Hero does', async () => {
+    const user = userEvent.setup();
+    const a = acts({ outOfAction: vi.fn() });
+    show({ acts: () => a });
+    await user.click(screen.getByRole('button', { name: /^Warrior,/ }));
+    await user.click(screen.getByRole('tab', { name: 'Story & more' }));
+    await user.click(screen.getByRole('button', { name: 'Out of action for good…' }));
+    expect(a.outOfAction).toHaveBeenCalledOnce();
+  });
+
   it('a hired one has no gear tab of his own', async () => {
     const user = userEvent.setup();
     show();
