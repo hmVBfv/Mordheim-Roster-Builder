@@ -17,7 +17,7 @@ export function FallenList({ f }: { f: FallenView }) {
           {f.xpLost > 0 && <span>{f.xpLost} Exp lost</span>}
         </span>
       </summary>
-      <p className={ui.muted}>Removed from the warband; their equipment was lost with them. Experience lost is what they earned in play.</p>
+      <p className={ui.muted}>Removed from the warband; their equipment was lost with them, unless a Prospect took their place and it. Experience lost is what they earned in play.</p>
       <div className={styles.fallenGroups}>
         {f.groups.map((g) => (
           <section key={g.key} className={styles.fallenGroup} aria-label={`${g.count}× ${g.unit}`}>
@@ -36,7 +36,7 @@ export function FallenList({ f }: { f: FallenView }) {
                     <span>{e.worth} gc lost</span>
                   </span>
                   {(e.fell || e.joined || e.battles > 0) && <span className={styles.fallenWhen}>{[e.joined, e.battles > 0 ? `Took part in ${e.battles} ${e.battles === 1 ? 'battle' : 'battles'}` : '', e.fell].filter(Boolean).map((t) => <span key={t}>{t}</span>)}</span>}
-                  <span className={styles.fallenGear}>{e.equipment.length ? e.equipment.join(', ') : 'No equipment'}</span>
+                  <span className={styles.fallenGear}>{e.passedOn ? `Gear passed on to ${e.passedOn}` : e.equipment.length ? e.equipment.join(', ') : 'No equipment'}</span>
                 </li>
               ))}
             </ul>

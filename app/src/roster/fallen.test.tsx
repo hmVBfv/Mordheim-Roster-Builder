@@ -38,6 +38,17 @@ describe('the Fallen', () => {
     expect(group.textContent).toMatch(/Dagger/);
   });
 
+  it('says that the gear of a Hero went on to the Prospect who took his place, and does not list it as lost', () => {
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    s = core.promoteProspect(c(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, s.fallen![0]!.id!);
+    render(<FallenList f={rosterView(data, s).fallen} />);
+    const group = screen.getByRole('region', { name: '1× Conqueror' });
+    expect(within(group).getByText('Gear passed on to Conqueror')).toBeTruthy();
+    expect(group.textContent).not.toMatch(/Masterwork Heavy Armour/);
+  });
+
   /* Wishes #159, #160, #161 (Rob, 30.10.2026): what the Fallen say about each one, what is the unit and what are its models, the
      experience lost beside the gold. */
   function dead() {
