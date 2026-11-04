@@ -406,3 +406,24 @@ describe('the battles a warrior has fought (#166)', () => {
     expect(v.hires[0]!.battles).toBe(2);
   });
 });
+
+describe('a Prospect who took a fallen Hero\'s place (profile marks)', () => {
+  const ctx = (s: core.WarbandState) => core.ctxOf(data, s);
+  /** A Conqueror falls and the Prospect takes his place; the Prospect had made one Strength advance as a henchman. */
+  function promoted(adv: boolean): core.WarbandState {
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(ctx(s), id);
+    if (adv) s = core.addAdvance(ctx(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, 'S');
+    s = core.killHero(ctx(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    return core.promoteProspect(ctx(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, s.fallen![0]!.id!);
+  }
+  const changed = (s: core.WarbandState) => rosterView(data, s).heroes.find((h) => h.type === 'Conqueror')!.stats.filter((c) => c.changed).map((c) => c.key);
+
+  it('marks nothing while his profile is the one he started with, though it differs from the Conqueror\'s', () => {
+    expect(changed(promoted(false))).toEqual([]);
+  });
+
+  it('marks only what changed from the Prospect\'s starting profile', () => {
+    expect(changed(promoted(true))).toEqual(['S']);
+  });
+});
