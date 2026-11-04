@@ -134,8 +134,8 @@ describe('the skills and the spells are lists in columns, not a heap of buttons 
   });
 });
 
-describe('a Prospect may take the place of a fallen Hero', () => {
-  it('offers the fallen Heroes, says the result may be re-rolled, and passes the choice on', async () => {
+describe('a Prospect takes the place of a fallen Hero', () => {
+  it('needs no roll: the fallen Hero, two skill lists and "Take his place"', async () => {
     const c = (s: core.WarbandState) => core.ctxOf(data, s);
     let s = createWarband(data, 'reavers', null, '');
     for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
@@ -146,14 +146,26 @@ describe('a Prospect may take the place of a fallen Hero', () => {
     render(<AdvanceSheet dialogRef={ref} close={(after) => after?.()} view={{ ...advanceView(c(s), uid)!, key: 1 }} onApply={onApply} />);
     const d = document.querySelector('dialog')!;
     const user = userEvent.setup();
-    await user.type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '11');
-    expect(q(d).getByText('A Prospect may re-roll this result.', { hidden: true } as never)).toBeTruthy();
+    const take = q(d).getByRole('button', { name: 'Take his place', hidden: true }) as HTMLButtonElement;
+    expect(take.disabled).toBe(true);
     await user.selectOptions(q(d).getByRole('combobox', { name: /Takes the place of/, hidden: true }), 'Conqueror');
-    const lists = q(d).getByRole('group', { name: 'Skill lists', hidden: true });
-    const buttons = within(lists).getAllByRole('button', { hidden: true });
+    const buttons = within(q(d).getByRole('group', { name: 'Skill lists for the Hero', hidden: true })).getAllByRole('button', { hidden: true });
     await user.click(buttons[0]!);
+    expect(take.disabled).toBe(true);
     await user.click(buttons[1]!);
-    await user.click(q(d).getByRole('button', { name: 'Apply', hidden: true }));
-    expect(onApply).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'talent', place: s.fallen![0]!.id }), expect.stringMatching(/took the place of Conqueror/));
+    await user.click(take);
+    expect(onApply).toHaveBeenLastCalledWith({ kind: 'place', place: s.fallen![0]!.id, man: 0, lists: expect.any(Array) }, expect.stringMatching(/took the place of Conqueror/));
+  });
+
+  it('says that the result 11 cannot make a Prospect a Hero', async () => {
+    const c = (s: core.WarbandState) => core.ctxOf(data, s);
+    let s = createWarband(data, 'reavers', null, '');
+    s = core.addUnit(c(s), 'prospect');
+    const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
+    render(<AdvanceSheet dialogRef={ref} close={(after) => after?.()} view={{ ...advanceView(c(s), s.models[0]!.uid)!, key: 1 }} onApply={vi.fn()} />);
+    const d = document.querySelector('dialog')!;
+    await userEvent.setup().type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '11');
+    expect(q(d).getByText(/only by taking the place of a fallen Hero/, { hidden: true } as never)).toBeTruthy();
+    expect((q(d).getByRole('button', { name: 'Apply', hidden: true }) as HTMLButtonElement).disabled).toBe(true);
   });
 });

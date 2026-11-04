@@ -36,7 +36,7 @@ export function netMod(m: Model): Partial<Record<StatKey, number>> {
 /** The profile as it stands: base, subtype changes, advances and injuries.
     String values ("3(4)", "D6") get the change appended ("3(4)+1"). */
 export function effProfile(ctx: Ctx, m: Model): Profile | null {
-  const def = unitDef(ctx, m.uid_def);
+  const def = unitDef(ctx, m.statsOf ?? m.uid_def);
   if (!def || !def.profile) return null;
   const mod = netMod(m);
   const sub = (def.profSub && ctx.s.subtype != null && def.profSub[ctx.s.subtype]) || {};
@@ -86,7 +86,7 @@ export function maxInfo(ctx: Ctx, m: Model): MaxInfo | null {
 /** May this stat still be advanced? Henchmen once per stat; nobody past the
     racial maximum; string base values are not limited. */
 export function canAdv(ctx: Ctx, m: Model, stat: StatKey): boolean {
-  const def = unitDef(ctx, m.uid_def);
+  const def = unitDef(ctx, m.statsOf ?? m.uid_def);
   const base = def && def.profile ? def.profile[stat] : undefined;
   if (typeof base !== 'number') return true;
   if (!isHeroModel(ctx, m) && (Number((m.adv || {})[stat]) || 0) >= 1) return false;

@@ -76,6 +76,8 @@ export interface Model {
   heirloom?: string | null;
   /** Fixed gear taken over from a fallen Hero by a Prospect who took his place: pieces beyond the unit's own `gear`, one entry per piece. */
   gearHeld?: string[];
+  /** A Prospect who took a fallen Hero's place: the unit he was. His profile (with his own advances) and his price stay those of that unit while `uid_def` is the Hero he now is. */
+  statsOf?: string;
   /** The player removed the free dagger. */
   _noDagger?: boolean;
   [key: string]: unknown;

@@ -92,28 +92,28 @@ describe('a group', () => {
     expect('men' in t && t.lists.map((l) => l.key)).toEqual(core.availHeroCats(ctx(s)));
   });
 
-  it('offers a Prospect the fallen Heroes whose place he may take, and says he may re-roll the result', () => {
+  it('never makes a Prospect a Hero by the result: he rolls again, and may take a fallen Hero\'s place instead', () => {
     let s = createWarband(data, 'reavers', null, '');
     for (const id of ['conqueror', 'prospect']) s = core.addUnit(ctx(s), id);
     const prospect = s.models.find((m) => m.uid_def === 'prospect')!.uid;
-    const none = advanceView(ctx(s), prospect)!.talent!;
-    expect('men' in none && none.heirs).toEqual([]);
-    expect('men' in none && none.reroll).toBe(true);
+    const none = advanceView(ctx(s), prospect)!;
+    expect(none.talent).toEqual({ why: expect.stringMatching(/only by taking the place of a fallen Hero/) });
+    expect(none.fill).toBeNull(); // no Hero has fallen yet
     s = core.killHero(ctx(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
-    const t = advanceView(ctx(s), prospect)!.talent!;
-    expect('men' in t && t.heirs.map((h) => h.name)).toEqual(['Conqueror']);
+    const v = advanceView(ctx(s), prospect)!;
+    expect(v.fill!.heirs.map((h) => h.name)).toEqual(['Conqueror']);
+    expect(v.fill!.lists.map((l) => l.key)).toEqual(core.availHeroCats(ctx(s)));
+    expect(v.talent).toEqual({ why: expect.any(String) });
     s = core.promoteProspect(ctx(s), prospect, s.fallen![0]!.id!);
     s = core.addUnit(ctx(s), 'prospect');
-    const p2 = s.models.find((m) => m.uid_def === 'prospect' && !m.promoted)!.uid;
-    const after = advanceView(ctx(s), p2)!.talent!;
-    expect('men' in after && after.heirs).toEqual([]);
+    expect(advanceView(ctx(s), s.models.find((m) => m.uid_def === 'prospect')!.uid)!.fill).toBeNull(); // the place is taken
   });
 
   it('does not offer places to a man who is not a Prospect', () => {
     const { s, warr } = band();
-    const t = advanceView(ctx(s), warr)!.talent!;
-    expect('men' in t && t.heirs).toEqual([]);
-    expect('men' in t && t.reroll).toBe(false);
+    const v = advanceView(ctx(s), warr)!;
+    expect(v.fill).toBeNull();
+    expect(v.talent && 'men' in v.talent).toBe(true);
   });
 
   it('cannot when the warband has all its Heroes', () => {
