@@ -146,6 +146,10 @@ export interface FallenEntry {
   /** The part of it earned in play, which is what the warband lost (#161). */
   xpEarned: number;
   equipment: string[]; worth: number;
+  /** The Prospect who took his place, and with it his gear: it is not lost, so it is not listed (#189). */
+  passedOn?: string;
+  /** His profile as it stood when he fell, with what he had advanced, and his skills and spells; for one model, not for the nameless counted together. */
+  last?: { stats: StatCell[]; skills: string[] };
   /** When and by whom he fell, from the casualty he belongs to; '' for a counted group and where nothing was recorded (#159). */
   fell: string;
   /** The round he joined in, when it is known. */
@@ -181,8 +185,25 @@ export function fallenView(ctx: core.Ctx): FallenView {
       const by = String(cas.attacker?.name ?? '').trim();
       return `${Number(cas.round) > 0 ? `Fell in round ${cas.round}` : 'Fell during the setup'}${by ? ` · taken out by ${by}` : ''}`;
     };
+    // the gear of a Hero whom a Prospect replaced went on with him
+    const gearOf = (e: core.FallenRecord): core.Model[] => (e.heir != null ? [] : [e.m]);
+    const heirName = (e: core.FallenRecord): string | undefined => {
+      if (e.heir == null) return undefined;
+      const h = ctx.s.models.find((x) => x.uid === e.heir);
+      return h ? h.name || core.unitDef(ctx, h.uid_def)?.name || 'a Prospect' : 'a Prospect';
+    };
+    const lastOf = (e: core.FallenRecord): FallenEntry['last'] => {
+      const mc = core.ctxOf(ctx.data, ctx.s);
+      const p = core.effProfile(mc, e.m);
+      return {
+        stats: statCells(p, core.unitDef(mc, e.m.statsOf ?? e.m.uid_def)?.profile, p ? core.aDisp(mc, e.m, p) : undefined),
+        skills: [...(e.m.skills ?? []), ...(e.m.spells ?? []).map((sp) => core.spellLabel(sp.name))],
+      };
+    };
     const entry = (e: core.FallenRecord): FallenEntry => ({
-      name: e.m.name || unit, count: 1, xp: Number(e.m.exp) || 0, xpEarned: core.fallenExpEarned(ctx, e), equipment: core.fallenEqAgg(ctx, [e.m]), worth: core.fallenGoldOf(ctx, e),
+      name: e.m.name || unit, count: 1, xp: Number(e.m.exp) || 0, xpEarned: core.fallenExpEarned(ctx, e), equipment: core.fallenEqAgg(ctx, gearOf(e)), worth: core.fallenGoldOf(ctx, e),
+      ...(e.heir != null ? { passedOn: heirName(e) } : {}),
+      last: lastOf(e),
       fell: fellOf(e), joined: e.m.joined ? `Joined in round ${e.m.joined}` : '', battles: Number(e.m.battles) || 0,
     });
     let entries: FallenEntry[];
@@ -205,7 +226,7 @@ export function fallenView(ctx: core.Ctx): FallenView {
       key, kind: first.kind, unit, count: grp.length,
       xpTotal: grp.reduce((n, e) => n + xpOf(e), 0),
       xpEarned: grp.reduce((n, e) => n + core.fallenExpEarned(ctx, e), 0),
-      equipment: core.fallenEqAgg(ctx, grp.map((e) => e.m)),
+      equipment: core.fallenEqAgg(ctx, grp.flatMap(gearOf)),
       goldLost: grp.reduce((n, e) => n + core.fallenGoldOf(ctx, e), 0),
       entries,
     };

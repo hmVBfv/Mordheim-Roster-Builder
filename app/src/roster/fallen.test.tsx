@@ -38,6 +38,32 @@ describe('the Fallen', () => {
     expect(group.textContent).toMatch(/Dagger/);
   });
 
+  it('opens a Hero\'s last stats and skills under his name', () => {
+    let s = createWarband(data, 'merc', null, 'The Grey Company');
+    s = core.addUnit(c(s), 'champ');
+    s = core.addAdvance(c(s), s.models[0]!.uid, 'WS');
+    s = structuredClone(s);
+    const skill = data.SKILLLISTS.combat!.skills[0]![0];
+    s.models[0]!.skills = [skill];
+    s = core.killHero(c(s), s.models[0]!.uid);
+    render(<FallenList f={rosterView(data, s).fallen} />);
+    const group = screen.getByRole('region', { name: '1× Champion' });
+    const last = within(group).getByText('Last stats and skills').closest('details')!;
+    expect(last.textContent).toContain(`Skills: ${skill}`);
+    expect(within(last).getByRole('img', { name: /^M \S+, WS \S+/ })).toBeTruthy();
+  });
+
+  it('says that the gear of a Hero went on to the Prospect who took his place, and does not list it as lost', () => {
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    s = core.promoteProspect(c(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, s.fallen![0]!.id!);
+    render(<FallenList f={rosterView(data, s).fallen} />);
+    const group = screen.getByRole('region', { name: '1× Conqueror' });
+    expect(within(group).getByText('Gear passed on to Conqueror')).toBeTruthy();
+    expect(group.textContent).not.toMatch(/Masterwork Heavy Armour/);
+  });
+
   /* Wishes #159, #160, #161 (Rob, 30.10.2026): what the Fallen say about each one, what is the unit and what are its models, the
      experience lost beside the gold. */
   function dead() {
