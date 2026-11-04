@@ -1207,6 +1207,25 @@
   font-size: 0.88rem;
 }
 
+/* His last profile and skills (wish): a line that opens, with the profile strip under it */
+.fallenLast {
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+}
+
+.fallenLast > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.fallenLast[open] > summary {
+  color: var(--text);
+}
+
 /* The spell list of a caster's school (#68): one spell a row with its casting value, what it does under it */
 .lore {
   display: grid;

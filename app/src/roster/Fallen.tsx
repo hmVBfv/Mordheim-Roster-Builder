@@ -2,6 +2,7 @@
    that opens it, then the dead by unit – Heroes one by one, henchmen by name
    or counted together – each with his experience, what he carried and what
    he cost the warband. Read-only, on the own roster and on another player's. */
+import { Strip } from './Bits.tsx';
 import type { FallenView } from './view.ts';
 import styles from './Board.module.css';
 import ui from '../ui/ui.module.css';
@@ -36,6 +37,13 @@ export function FallenList({ f }: { f: FallenView }) {
                     <span>{e.worth} gc lost</span>
                   </span>
                   {(e.fell || e.joined || e.battles > 0) && <span className={styles.fallenWhen}>{[e.joined, e.battles > 0 ? `Took part in ${e.battles} ${e.battles === 1 ? 'battle' : 'battles'}` : '', e.fell].filter(Boolean).map((t) => <span key={t}>{t}</span>)}</span>}
+                  {e.last && (
+                    <details className={styles.fallenLast}>
+                      <summary>Last stats and skills</summary>
+                      <Strip cells={e.last.stats} save={null} />
+                      <span>{e.last.skills.length ? `Skills: ${e.last.skills.join(', ')}` : 'No skills'}</span>
+                    </details>
+                  )}
                   <span className={styles.fallenGear}>{e.passedOn ? `Gear passed on to ${e.passedOn}` : e.equipment.length ? e.equipment.join(', ') : 'No equipment'}</span>
                 </li>
               ))}
