@@ -11,7 +11,8 @@ export const STATS = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'] as const;
 /** The Roster Builder keeps a henchman group to five men (core setQty). */
 export const GROUP_MAX = 5;
 
-export interface StatCell { key: string; value: string; changed: boolean }
+/** `tone`: a changed value is better (green) or worse (red) than the one he started with; none where it cannot be compared ("D6", "-"). Every characteristic is better the higher it is. */
+export interface StatCell { key: string; value: string; changed: boolean; tone?: 'better' | 'worse' }
 /** The racial maximum of a warrior or hire (#96): its race and one cell for each of the profile's stats, in that order. */
 export interface MaxLine { label: string; cells: string[] }
 
@@ -219,10 +220,19 @@ const maxLine = (label: string, prof: core.Profile): MaxLine => ({ label, cells:
 const maxRow = (ctx: core.Ctx, label: string | null, prof: core.Profile | null | undefined): MaxLine | null =>
   core.noRacialMax(ctx) ? { label: 'no limit', cells: STATS.map(() => '–') } : label && prof ? maxLine(label, prof) : null;
 
+/** The number a value starts with ("3", "4(5)"); null for "D6" and "-". */
+const lead = (v: unknown): number | null => {
+  if (typeof v === 'number') return v;
+  const m = /^\s*(-?\d+)/.exec(String(v ?? ''));
+  return m ? Number(m[1]) : null;
+};
+
 function statCells(p: Profile | null, base: Profile | null | undefined, attacks?: string | number): StatCell[] {
   return STATS.map((k) => {
     const v = k === 'A' && attacks != null ? attacks : p?.[k];
-    return { key: k, value: show(v), changed: base != null && p != null && String(p[k]) !== String(base[k]) };
+    const changed = base != null && p != null && String(p[k]) !== String(base[k]);
+    const was = base ? lead(base[k]) : null, now = p ? lead(p[k]) : null;
+    return { key: k, value: show(v), changed, ...(changed && was != null && now != null && now !== was ? { tone: now > was ? 'better' as const : 'worse' as const } : {}) };
   });
 }
 

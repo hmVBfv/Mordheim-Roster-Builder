@@ -48,12 +48,17 @@ export function XpLabel({ xp, ready }: { xp: XpView; ready: boolean }) {
 }
 
 /** All nine values of the profile (and the save) in one line. */
+/** The class of a profile value: green where it is better than the start, red where it is worse, bold where it only differs. */
+export function statClass(c: StatCell): string | undefined {
+  return c.tone === 'better' ? styles.better : c.tone === 'worse' ? styles.worse : c.changed ? styles.changed : undefined;
+}
+
 export function Strip({ cells, save }: { cells: StatCell[]; save: string | null }) {
   const all = save != null ? [...cells, { key: 'Sv', value: save, changed: false }] : cells;
   return (
     <span className={styles.strip} style={{ '--n': all.length } as CSSProperties} role="img" aria-label={all.map((c) => `${c.key} ${c.value}`).join(', ')}>
       {all.map((c) => (
-        <span key={c.key} aria-hidden="true" className={c.changed ? styles.changed : undefined}>{c.value}<small>{c.key}</small></span>
+        <span key={c.key} aria-hidden="true" className={statClass(c)}>{c.value}<small>{c.key}</small></span>
       ))}
     </span>
   );

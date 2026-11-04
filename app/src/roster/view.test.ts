@@ -427,3 +427,32 @@ describe('a Prospect who took a fallen Hero\'s place (profile marks)', () => {
     expect(changed(promoted(true))).toEqual(['S']);
   });
 });
+
+describe('stats that differ from the starting profile are marked better or worse', () => {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  const tones = (s: core.WarbandState) => Object.fromEntries(rosterView(data, s).heroes[0]!.stats.filter((x) => x.changed).map((x) => [x.key, x.tone]));
+
+  it('marks an advance as better', () => {
+    let s = createWarband(data, 'merc', null, 'The Grey Company');
+    s = core.addUnit(c(s), 'capt');
+    s = core.addAdvance(c(s), s.models[0]!.uid, 'WS');
+    expect(tones(s)).toEqual({ WS: 'better' });
+  });
+
+  it('marks what an injury took away as worse, next to an advance that is better', () => {
+    let s = createWarband(data, 'merc', null, 'The Grey Company');
+    s = core.addUnit(c(s), 'capt');
+    s = core.addAdvance(c(s), s.models[0]!.uid, 'S');
+    s = structuredClone(s);
+    s.models[0]!.inj = [{ code: '22', name: 'Leg Wound', mod: { M: -1 } }];
+    expect(tones(s)).toEqual({ S: 'better', M: 'worse' });
+  });
+
+  it('marks nothing when the stats are as they started, and a stat below the Hero\'s own is not "worse" for a promoted Prospect', () => {
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    s = core.promoteProspect(c(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, s.fallen![0]!.id!);
+    expect(rosterView(data, s).heroes[0]!.stats.every((x) => !x.changed && x.tone == null)).toBe(true);
+  });
+});

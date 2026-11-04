@@ -502,6 +502,19 @@
   font-weight: 600;
 }
 
+/* better than the start: green; worse: red (a value that only differs keeps the accent) */
+.strip .better,
+.prof .better {
+  color: var(--good);
+  font-weight: 600;
+}
+
+.strip .worse,
+.prof .worse {
+  color: var(--danger);
+  font-weight: 600;
+}
+
 .r3 {
   display: flex;
   align-items: center;
