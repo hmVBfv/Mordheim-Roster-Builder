@@ -108,4 +108,14 @@ describe('a Prospect takes the place of a fallen Hero', () => {
     expect(log.filter((e) => e.type === 'promote').map((e) => e.text).join('\n')).toMatch(/took the place of/);
     expect(log.some((e) => /Got Talent/.test(e.text))).toBe(false);
   });
+
+  it('lists the fallen Heroes a Prospect may replace, and none when he may not', () => {
+    const dead = fallen();
+    const p = model(dead, 'prospect').uid;
+    expect(core.replaceableHeroes(ctx(dead), p).map((r) => r.id)).toEqual([fallenId(dead)]);
+    expect(core.replaceableHeroes(ctx(dead), model(dead, 'slayer').uid)).toEqual([]); // not a Prospect
+    expect(core.replaceableHeroes(ctx(core.setHouseNum(ctx(dead), 'heroes', 1)), p)).toEqual([]); // the warband is full
+    const taken = take(dead);
+    expect(core.replaceableHeroes(ctx(core.addUnit(ctx(taken), 'prospect')), model(core.addUnit(ctx(taken), 'prospect'), 'prospect').uid)).toEqual([]); // the place is taken
+  });
 });
