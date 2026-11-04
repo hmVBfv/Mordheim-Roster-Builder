@@ -2,7 +2,7 @@
 import * as core from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data, fixtures } from '../test/data.ts';
-import { CHIPS_IN_ROW, createWarband, editableState, newWarbandChoice, rosterView, STATS, unitChips, unitRow } from './view.ts';
+import { type FallenGroup, CHIPS_IN_ROW, createWarband, editableState, newWarbandChoice, rosterView, STATS, unitChips, unitRow } from './view.ts';
 
 describe('roster view', () => {
   it.each(fixtures.filter((_, i) => i % 4 === 0).map((f) => [f.label, f] as const))('%s', (_l, f) => {
@@ -326,7 +326,7 @@ describe('the Fallen', () => {
     expect(v.xpLost).toBe(9); // Magda earned 3 beyond her starting 8, each Warrior 2
     expect(v.groups.map((g) => [g.kind, g.unit, g.count])).toEqual([['hero', 'Champion', 1], ['hench', 'Warrior', 3]]);
     const [hero, hench] = v.groups as [typeof v.groups[0], typeof v.groups[0]];
-    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, xpEarned: 3, fell: '', joined: '', battles: 0, equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!) }]);
+    expect(hero.entries).toEqual([{ name: 'Magda', count: 1, xp: 11, xpEarned: 3, fell: '', joined: '', battles: 0, equipment: core.fallenEqAgg(ctx, [ctx.s.fallen![0]!.m]), worth: core.fallenGoldOf(ctx, ctx.s.fallen![0]!), last: expect.any(Object) }]);
     expect(hero.xpEarned).toBe(3);
     // a man with a name of his own is remembered by it; the nameless are counted together
     expect(hench.entries.map((e) => [e.name, e.count, e.xp])).toEqual([['Otto', 1, 2], ['Warrior', 2, 2]]);
@@ -434,5 +434,31 @@ describe('the Fallen when a Prospect took a Hero\'s place', () => {
     expect(g.equipment).toEqual([]);
     expect(v.goldLost).toBe(core.fallenGoldLost(c(s)));
     expect(g.entries[0]!.worth).toBe(core.fallenGoldOf(c(s), s.fallen![0]!));
+  });
+});
+
+describe('the last stats and skills of a fallen model (wish)', () => {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  it('shows the profile as it stood and the skills he had, for a Hero and for a named henchman, not for the nameless counted together', () => {
+    let s = createWarband(data, 'merc', null, 'The Grey Company');
+    for (const id of ['capt', 'warr']) s = core.addUnit(c(s), id);
+    s = core.setQty(c(s), s.models[1]!.uid, 2);
+    s = core.setMemberName(c(s), s.models[1]!.uid, 0, 'Otto');
+    const capt = s.models[0]!.uid;
+    s = core.addAdvance(c(s), capt, 'WS');
+    const skill = data.SKILLLISTS.combat!.skills[0]![0];
+    s = structuredClone(s);
+    s.models[0]!.skills = [skill];
+    s = core.killHero(c(s), capt);
+    s = core.killHenchMember(c(s), s.models[0]!.uid, 0); // Otto
+    s = core.killHenchMember(c(s), s.models[0]!.uid, 0); // the other, nameless
+    const [hero, hench] = rosterView(data, s).fallen.groups as [FallenGroup, FallenGroup];
+    const last = hero.entries[0]!.last!;
+    const base = data.WARBANDS.merc!.units.find((u) => u.id === 'capt')!.profile!;
+    expect(last.stats.map((x) => x.key)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);
+    expect(last.stats.find((x) => x.key === 'WS')).toMatchObject({ value: String((base.WS as number) + 1), changed: true });
+    expect(last.skills).toEqual([skill]);
+    expect(hench.entries.find((e) => e.name === 'Otto')!.last).toBeDefined();
+    expect(hench.entries.find((e) => e.name === 'Warrior')!.last).toBeUndefined();
   });
 });
