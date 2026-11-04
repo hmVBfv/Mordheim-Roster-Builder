@@ -56,6 +56,17 @@ describe('the layout follows the width of the workspace', () => {
   });
 });
 
+describe('one man is "1 man", not "1 men"', () => {
+  it('in the heading of the Henchmen and in the row of a group of one', () => {
+    const v = band();
+    const group = v.henchmen[0]!;
+    show({}, { ...v, henchmen: [{ ...group, count: 1 }] });
+    expect(screen.getByText('1 man')).toBeTruthy();
+    expect(screen.queryByText('1 men')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Warrior, 1 man, Henchman group' })).toBeTruthy();
+  });
+});
+
 describe('on a phone: a row each, opening under it with tabs', () => {
   it('groups the rows, one button each, with the whole profile in a line and nothing open', () => {
     show();

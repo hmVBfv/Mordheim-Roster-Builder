@@ -28,11 +28,14 @@ const rowWords = (r: UnitRow): string => [
   r.carries && `Carries ${r.carries}`,
 ].filter(Boolean).join('. ');
 
+/** "1 man", "2 men". */
+const men = (n: number) => `${n} ${n === 1 ? 'man' : 'men'}`;
+
 function RowView({ r, layout, current, onPick, rename, children }: { r: UnitRow; layout: Layout; current: boolean; onPick: () => void; rename?: () => void; children?: ReactNode }) {
   const stack = layout === 'stack';
   const li = useRef<HTMLLIElement>(null);
   const words = useId();
-  const label = [r.name, r.count != null ? `${r.count} men` : null, r.sub].filter(Boolean).join(', ');
+  const label = [r.name, r.count != null ? men(r.count) : null, r.sub].filter(Boolean).join(', ');
   // an opened row starts under the bars that stay on top
   useEffect(() => { if (stack && current) li.current?.scrollIntoView?.({ block: 'start' }); }, [stack, current]);
   return (
@@ -104,7 +107,7 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
   const [tab, setTab] = useState<TabId>('overview');
   const groups = [
     { id: 'heroes', title: 'Heroes', note: `${v.heroCount} of ${v.heroMax}`, units: v.heroes as Unit[] },
-    { id: 'henchmen', title: 'Henchmen', note: `${v.henchmen.reduce((n, w) => n + w.count, 0)} men`, units: v.henchmen as Unit[] },
+    { id: 'henchmen', title: 'Henchmen', note: men(v.henchmen.reduce((n, w) => n + w.count, 0)), units: v.henchmen as Unit[] },
     { id: 'hires', title: 'Hired Swords & Dramatis Personae', note: '', units: v.hires as Unit[] },
   ].filter((g) => g.units.length);
   const all = groups.flatMap((g) => g.units);
