@@ -164,7 +164,9 @@ export function fallenEqSig(m: Model): string {
 /** Real gold lost with one fallen: the man, his gear and any recruit
     surcharge paid for him. Experience is never priced in. */
 export function fallenGoldOf(ctx: Ctx, e: FallenRecord): number {
-  return (modelUnitCost(ctx, e.m) || 0) + (Number(e.m && e.m.xpPaid) || 0);
+  // a Hero whose place a Prospect took: his gear went on with the Prospect, so only the Hero himself is lost
+  const m = e.heir != null ? { ...e.m, eq: {}, rare: {}, heirloom: null } : e.m;
+  return (modelUnitCost(ctx, m) || 0) + (Number(e.m && e.m.xpPaid) || 0);
 }
 
 export function fallenGoldLost(ctx: Ctx): number {

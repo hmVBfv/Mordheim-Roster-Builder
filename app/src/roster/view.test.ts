@@ -406,3 +406,33 @@ describe('the battles a warrior has fought (#166)', () => {
     expect(v.hires[0]!.battles).toBe(2);
   });
 });
+
+describe('the Fallen when a Prospect took a Hero\'s place', () => {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  function band(): core.WarbandState {
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
+    s = core.setEqQty(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid, 'Schwert', 1);
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    return s;
+  }
+
+  it('lists the gear of a Hero nobody took over, as before', () => {
+    const e = rosterView(data, band()).fallen.groups[0]!.entries[0]!;
+    expect(e.equipment).toContain('Sword');
+    expect(e.equipment).toContain('Masterwork Heavy Armour');
+    expect(e.passedOn).toBeUndefined();
+  });
+
+  it('does not list the gear as lost once he has an heir: it says who has it, and counts only the Hero', () => {
+    let s = band();
+    s = core.promoteProspect(c(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, s.fallen![0]!.id!);
+    const v = rosterView(data, s).fallen;
+    const g = v.groups[0]!;
+    expect(g.entries[0]!.equipment).toEqual([]);
+    expect(g.entries[0]!.passedOn).toBe('Conqueror');
+    expect(g.equipment).toEqual([]);
+    expect(v.goldLost).toBe(core.fallenGoldLost(c(s)));
+    expect(g.entries[0]!.worth).toBe(core.fallenGoldOf(c(s), s.fallen![0]!));
+  });
+});
