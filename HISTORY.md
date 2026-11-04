@@ -4678,3 +4678,13 @@ re-roll The Lad's Got Talent. `promoteProspect` is built on `promoteHench`: the 
 fallen Hero's worth leaves the treasury at his death, so gear handed on would be charged a second time, and the Prospect's own gear would be paid out
 when it leaves him; both are cancelled in the same step, and the test checks that the gold is the same before and after. The re-roll is a note in the
 advance sheet, not a mechanism. Only a unit with `promotionOnly` (the Prospect) may do it.
+
+**#187 and #188, the Prospect is the Hero (PR 321).** My first version of the Prospect's promotion (#185, PR 319) kept him a Prospect with Hero status, and
+let the roll of The Lad's Got Talent promote him. Two reports with the page's text showed it wrong: the promoted Prospect "becomes the hero of the relevant
+type", the Promotions rule is the only way up, and the re-roll is a must. I had read Rob's "not the stats" as "keeps the Prospect's stats", and that was
+half right: the profile stays the Prospect's with his henchman advances, the fallen Hero's advances do not come along, and he is the Conqueror otherwise.
+Rob settled the open points because grade 1c is vague there (experience stays and runs on the Hero scale; the next Prospect replaces him when he falls;
+the place is taken at any time). The model got `statsOf` (the unit whose profile and price he keeps) while `uid_def` is the Hero; the first version's
+`gearHeld` is only read now. The page text was out of reach from the sandbox (the host does not resolve), so the wording came from the report and from a
+search result of the same page. A wrong turn in the check: the changelog line was 224 characters and the test for the files of `changelog/` stopped
+`npm run check`; build, size and e2e had passed in the run before, so only the check was repeated.
