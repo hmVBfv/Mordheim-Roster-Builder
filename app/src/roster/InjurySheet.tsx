@@ -89,7 +89,7 @@ function RollFields({ d, set, env, allowed, label }: { d: RollDraft; set: (d: Ro
 /** Whom the sheet is for. */
 export type InjuryFor =
   | { kind: 'hero'; uid: number; name: string; env: InjuryEnv; by: string | null; dice?: string }
-  | { kind: 'hench'; uid: number; name: string; men: { i: number; name: string }[] }
+  | { kind: 'hench'; uid: number; name: string; men: { i: number; name: string }[]; /** '1': written off as dead without a roll ("Out of action for good"). */ dice?: string }
   | { kind: 'hire'; uid: string; name: string };
 
 function HeroBody({ w, close, onApply, titleId }: { w: Extract<InjuryFor, { kind: 'hero' }>; close: Sheet['close']; onApply: (r: InjuryRoll, text: string) => void; titleId: string }) {
@@ -111,7 +111,8 @@ function HeroBody({ w, close, onApply, titleId }: { w: Extract<InjuryFor, { kind
 }
 
 function D6Body({ w, close, onApply, titleId }: { w: Exclude<InjuryFor, { kind: 'hero' }>; close: Sheet['close']; onApply: (r: InjuryRoll, text: string) => void; titleId: string }) {
-  const [roll, setRoll] = useState('');
+  const preset = w.kind === 'hench' ? w.dice ?? '' : '';
+  const [roll, setRoll] = useState(preset);
   const [man, setMan] = useState(0);
   const inputId = useId();
   const r = Number(roll);
@@ -122,7 +123,8 @@ function D6Body({ w, close, onApply, titleId }: { w: Exclude<InjuryFor, { kind: 
   return (
     <form className={ui.page} onSubmit={(e) => { e.preventDefault(); if (ok) close(() => onApply(w.kind === 'hench' ? { d6: r, member: man } : { d6: r }, text)); }}>
       <div>
-        <h2 id={titleId}>Out of action · {w.name}</h2>
+        <h2 id={titleId}>{preset ? 'Out of action for good' : 'Out of action'} · {w.name}</h2>
+        {preset && <p className={ui.muted}>Dead – or enter 3–6 if it was a mistake.</p>}
         <p className={ui.muted}>{w.kind === 'hire' ? 'A Hired Sword out of action rolls a D6 after the battle, like a Henchman' : 'Each Henchman taken out of action rolls a D6 after the battle'}: 1–2 he is dead, 3–6 he fights on.</p>
       </div>
       {w.kind === 'hench' && w.men.length > 1 && (
