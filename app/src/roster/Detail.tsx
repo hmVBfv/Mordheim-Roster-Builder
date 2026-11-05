@@ -10,7 +10,7 @@ import { IconEdit } from '../ui/icons.tsx';
 import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import type { Taken } from './advance.ts';
-import { ChipView, xpNote } from './Bits.tsx';
+import { ChipView, statClass, xpNote } from './Bits.tsx';
 import { isWarrior, unitChips, type Fact, type HireView, type MaxLine, type StatCell, type WarriorView, type XpView } from './view.ts';
 import styles from './Board.module.css';
 
@@ -67,7 +67,7 @@ function Stats({ cells, save, max }: { cells: StatCell[]; save?: string; max?: M
         </thead>
         <tbody>
           <tr>
-            {cells.map((c) => <td key={c.key} className={c.changed ? styles.changed : undefined}>{c.value}</td>)}
+            {cells.map((c) => <td key={c.key} className={statClass(c)}>{c.value}</td>)}
             {save != null && <td>{save}</td>}
           </tr>
           {max && (

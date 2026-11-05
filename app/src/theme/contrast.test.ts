@@ -22,7 +22,7 @@ const TEXT: [string, string][] = [
   ['text', 'bg'], ['text', 'surface'], ['text', 'surface-2'], ['text', 'hidden-bg'],
   ['text-muted', 'bg'], ['text-muted', 'surface'], ['text-muted', 'surface-2'],
   ['accent', 'bg'], ['accent', 'surface'], ['accent', 'surface-2'], ['accent-ink', 'accent'],
-  ['danger', 'bg'], ['danger', 'surface'], ['gold', 'surface'],
+  ['danger', 'bg'], ['danger', 'surface'], ['danger', 'surface-2'], ['good', 'bg'], ['good', 'surface'], ['good', 'surface-2'], ['gold', 'surface'],
 ];
 const MARKS: [string, string][] = [['focus', 'bg'], ['focus', 'surface'], ['border', 'bg']];
 

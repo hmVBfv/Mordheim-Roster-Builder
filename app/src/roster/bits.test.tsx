@@ -6,7 +6,7 @@ import * as core from '@mordheim/core';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { XpBar } from './Bits.tsx';
+import { Strip, XpBar } from './Bits.tsx';
 import { ModelsTile } from './ModelsTile.tsx';
 import styles from './Board.module.css';
 import { createWarband, rosterView } from './view.ts';
@@ -50,5 +50,19 @@ describe('the Models tile (#82)', () => {
     expect(container.querySelector('dd')!.textContent).toBe('8/12(+1)');
     cleanup();
     expect(render(<ModelsTile models={8} max={12} />).container.querySelector('dd')!.textContent).toBe('8/12');
+  });
+});
+
+describe('the profile strip marks a value better or worse than the start', () => {
+  it('colours a better value green and a worse one red, and leaves the rest alone', () => {
+    const cells = [
+      { key: 'M', value: '4', changed: true, tone: 'worse' as const },
+      { key: 'WS', value: '4', changed: false },
+      { key: 'S', value: '4', changed: true, tone: 'better' as const },
+      { key: 'T', value: 'D6', changed: true },
+    ];
+    const { container } = render(<Strip cells={cells} save={null} />);
+    const spans = [...container.querySelectorAll('[aria-hidden="true"]')];
+    expect(spans.map((e) => e.className)).toEqual([styles.worse, '', styles.better, styles.changed]);
   });
 });
