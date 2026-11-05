@@ -1429,7 +1429,7 @@
   },
   {
    "de": "Echsenschwert",
-   "en": "Lizardman Sword (upgrade)",
+   "en": "Lizardman Sword",
    "cat": "cc",
    "cost": 30,
    "rare": "",
@@ -6700,9 +6700,9 @@
     "__f": "i"
    },
    {
-    "name": "Lizardman Sword (upgrade)",
-    "line": "Close combat · Saurus Slayer · 30 gc",
-    "text": "Upgrades any one Sword: its envenomed edge gives +1 to wound rolls (Poison)."
+    "name": "Lizardman Sword",
+    "line": "Close-combat upgrade · Saurus Slayer · 30 gc",
+    "text": "Upgrade any one Sword into a Lizardman Sword: +1 to wound rolls due to Poison. The weapon keeps its abilities."
    }
   ],
   [
@@ -11635,10 +11635,6 @@
     [
      "Lanze",
      40
-    ],
-    [
-     "Echsenschwert",
-     30
     ]
    ],
    "Fernkampf": [
@@ -17054,6 +17050,25 @@
     "base": 15,
     "wb": [
      "darkelves"
+    ]
+   }
+  },
+  "Echsenschwert": {
+   "en": "Lizardman Sword",
+   "fams": [
+    "sword"
+   ],
+   "heroesOnly": true,
+   "wb": [
+    "reavers"
+   ],
+   "mult": 0,
+   "base": 30,
+   "note": "30 gc; macht ein Schwert des Saurus Slayers zum Echsenschwert",
+   "start": {
+    "base": 30,
+    "wb": [
+     "reavers"
     ]
    }
   },
