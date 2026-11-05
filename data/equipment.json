@@ -6674,6 +6674,17 @@
   ],
   [
    {
+    "__re": "^warhound$|kriegshund",
+    "__f": "i"
+   },
+   {
+    "name": "Warhound",
+    "line": "Miscellaneous equipment · Lustrian Reavers",
+    "text": "Fights like a warband member but is equipment of the Hero who bought it. Never gains experience; the same recovery chance as Henchmen. Counts towards the maximum number of warriors in the warband. A Warhound and a Wardog are the same."
+   }
+  ],
+  [
+   {
     "__re": "echsenhaut-umhang|lizardmen skin cloak",
     "__f": "i"
    },
