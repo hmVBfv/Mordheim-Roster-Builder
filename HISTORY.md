@@ -4688,3 +4688,23 @@ the place is taken at any time). The model got `statsOf` (the unit whose profile
 `gearHeld` is only read now. The page text was out of reach from the sandbox (the host does not resolve), so the wording came from the report and from a
 search result of the same page. A wrong turn in the check: the changelog line was 224 characters and the test for the files of `changelog/` stopped
 `npm run check`; build, size and e2e had passed in the run before, so only the check was repeated.
+
+**The run of 4.11.2026, six reports after the Prospect (PRs 323 to 328).** All six came from using the Prospect of the Lustrian Reavers, so most
+trace back to my rework of the day before.
+
+- **#191, stat marks (PR 324).** The profile card marks what differs from the unit's base; for a promoted Prospect the base was the Hero's, so every
+  stat the two profiles do not share lit up. It now compares with the profile he started with (`statsOf`). I missed it because the tests of PR 321
+  looked at the profile itself and never at the marks.
+- **#193, "1 men" (PR 323).** A helper for the singular in the Henchmen heading and the row of a group.
+- **#189, gear in the Fallen (PR 325).** A Hero whom a Prospect replaced showed his gear as lost and counted its price. `fallenGoldOf` leaves it out
+  for a record with an heir; the list says "passed on". A small trap: the Fallen list also prints a unit's fixed gear (`gear`), so the first test
+  expected only the sword and found the Conqueror's armour as well.
+- **#190, last stats and skills (PR 326, contains 325).** A wish: a fallen Hero or named henchman opens to his last profile and skills. Stacked on
+  #189 because both change the Fallen view.
+- **#194, a henchman dead without a roll (PR 327).** The Hero had "Out of action for good" (the D66 on 11); the henchmen only the Injury sheet with a
+  die to type. The same button opens the D6 sheet with the die on 1. Hired Swords were not asked about and are unchanged.
+- **#192, the place on the Prospect's card (PR 328, contains 327).** A wish: a chip and a button on the Prospect. I put the condition into the core
+  (`replaceableHeroes`) so the action, the sheet, the chip and the button cannot disagree; `promoteProspect` uses it too.
+
+A note on the check: the start-up budget test for a step of experience (100 ms) failed twice on a loaded machine while the check was running next to
+the end-to-end run, and passed alone in 2.5 seconds; it is a timing test and I did not touch it.
