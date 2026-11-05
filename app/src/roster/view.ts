@@ -52,6 +52,8 @@ export interface WarriorView {
   exp: number;
   xp: XpView | null;
   advanceDue: boolean;
+  /** A Prospect while a Hero has fallen whose place he may take (wish): the card says so and offers it. */
+  takePlace: boolean;
   missGames: number;
   /** The battles of a campaign he (or the group) has taken part in (#166). */
   battles: number;
@@ -288,6 +290,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     exp: Number(m.exp) || 0,
     xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp, null, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
+    takePlace: !hero && core.replaceableHeroes(ctx, m.uid).length > 0,
     missGames: Number(m.miss) || 0,
     battles: Number(m.battles) || 0,
     // marked against the profile he started with: a Prospect who took a Hero's place is compared with the Prospect, not with the Hero
@@ -387,6 +390,7 @@ export function unitChips(u: WarriorView | HireView): Chip[] {
   if (!isWarrior(u)) return [];
   const out: Chip[] = [];
   if (u.leader) out.push({ label: 'Leader', tone: 'gold' });
+  if (u.takePlace) out.push({ label: 'Can take a fallen Hero\'s place', tone: 'gold' });
   if (u.promoted) out.push({ label: 'Promoted', tone: 'plain' });
   if (u.captive != null) out.push({ label: u.captive ? `Captive of ${u.captive}` : 'Captive', tone: 'danger' });
   if (u.retire) out.push({ label: 'Blind: must retire', tone: 'danger' });

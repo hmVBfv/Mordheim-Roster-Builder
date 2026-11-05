@@ -407,6 +407,35 @@ describe('the battles a warrior has fought (#166)', () => {
   });
 });
 
+describe('a Prospect while a Hero has fallen (wish)', () => {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  const reavers = () => {
+    let s = createWarband(data, 'reavers', null, '');
+    for (const id of ['conqueror', 'prospect']) s = core.addUnit(c(s), id);
+    return s;
+  };
+  const prospect = (s: core.WarbandState) => rosterView(data, s).henchmen.find((h) => h.type === 'Prospect')!;
+
+  it('can take a place only once a Hero has fallen, and says so in a chip of its own', () => {
+    let s = reavers();
+    expect(prospect(s).takePlace).toBe(false);
+    expect(unitChips(prospect(s)).map((x) => x.label)).not.toContain('Can take a fallen Hero\'s place');
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    expect(prospect(s).takePlace).toBe(true);
+    expect(unitChips(prospect(s))[0]).toEqual({ label: 'Can take a fallen Hero\'s place', tone: 'gold' });
+  });
+
+  it('is not offered to the others, and not once the place is taken', () => {
+    let s = reavers();
+    s = core.addUnit(c(s), 'slayer');
+    s = core.killHero(c(s), s.models.find((m) => m.uid_def === 'conqueror')!.uid);
+    expect(rosterView(data, s).heroes.every((h) => !h.takePlace)).toBe(true);
+    s = core.promoteProspect(c(s), s.models.find((m) => m.uid_def === 'prospect')!.uid, s.fallen![0]!.id!);
+    s = core.addUnit(c(s), 'prospect');
+    expect(prospect(s).takePlace).toBe(false);
+  });
+});
+
 describe('the Fallen when a Prospect took a Hero\'s place', () => {
   const c = (s: core.WarbandState) => core.ctxOf(data, s);
   function band(): core.WarbandState {

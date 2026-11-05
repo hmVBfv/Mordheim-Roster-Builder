@@ -3,7 +3,7 @@
    the same for Hired Swords (legacy app.js incExp … setLeader, addHsAdv …
    addHsSpellFromAdv). Every action returns a new state. */
 import type { StatKey } from '../data/types.ts';
-import type { HireRecord, Model, WarbandState } from '../state/types.ts';
+import type { FallenRecord, HireRecord, Model, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { goldTreasury, modelUnitCost, totalHeroes } from '../rules/costs.ts';
@@ -137,6 +137,15 @@ export function promoteHench(ctx: Ctx, uid: number, i?: number | null, text?: st
   });
 }
 
+/** The fallen Heroes whose place this Prospect may take: none for anybody else, none when the warband has all its Heroes, and not those who
+    already have an heir. The Prospect's card and the advance sheet offer the place on this, so they agree with `promoteProspect`. */
+export function replaceableHeroes(ctx: Ctx, uid: number): FallenRecord[] {
+  const m = findModel(ctx.s, uid);
+  if (!m || m.promoted || !unitDef(ctx, m.uid_def)?.promotionOnly) return [];
+  if (totalHeroes(ctx) >= (Number(houseRules(ctx.s).heroes) || 6)) return [];
+  return (ctx.s.fallen ?? []).filter((f) => f.kind === 'hero' && f.heir == null && f.id != null && unitDef(ctx, f.m.uid_def)?.t === 'hero');
+}
+
 /** A Prospect takes the place of a fallen Hero ("Promotion Only"; Rob, 3.11.2026). He becomes that Hero – a Conqueror, no longer a Prospect –
     with the rules and the equipment of the Hero. His profile stays the Prospect's, with the advances he made as a henchman (`statsOf`), and his
     experience stays; the fallen Hero's advances are not taken over. What the Prospect carried himself goes to the stash. The fallen Hero's worth
@@ -145,9 +154,9 @@ export function promoteHench(ctx: Ctx, uid: number, i?: number | null, text?: st
 export function promoteProspect(ctx: Ctx, uid: number, fallenId: number, i?: number | null): WarbandState {
   const m0 = findModel(ctx.s, uid);
   const def = m0 ? unitDef(ctx, m0.uid_def) : undefined;
-  const rec0 = (ctx.s.fallen ?? []).find((f) => f.id === fallenId);
+  const rec0 = replaceableHeroes(ctx, uid).find((f) => f.id === fallenId);
   const heroDef = rec0 ? unitDef(ctx, rec0.m.uid_def) : undefined;
-  if (!m0 || !def?.promotionOnly || m0.promoted || !rec0 || rec0.kind !== 'hero' || rec0.heir != null || heroDef?.t !== 'hero') return ctx.s;
+  if (!m0 || !def || !rec0 || !heroDef) return ctx.s;
   const idx = i == null ? memberCount(m0) - 1 : Number(i) || 0;
   const who = memberName(ctx, m0, idx);
   const named = memberNamed(m0, idx);

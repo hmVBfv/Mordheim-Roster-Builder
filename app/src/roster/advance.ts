@@ -140,9 +140,7 @@ function warriorView(ctx: core.Ctx, m: Model): AdvanceView | null {
 
 /** A Prospect (Promotion Only): a Hero has fallen and one of the group may take his place, at any time. */
 function fillView(ctx: core.Ctx, m: Model, def: core.UnitDef): AdvanceView['fill'] {
-  if (core.totalHeroes(ctx) >= (Number(core.houseRules(ctx.s).heroes) || 6)) return null;
-  const heirs = (ctx.s.fallen ?? []).filter((f) => f.kind === 'hero' && f.heir == null && f.id != null && core.unitDef(ctx, f.m.uid_def)?.t === 'hero')
-    .map((f) => ({ id: f.id!, name: f.m.name || core.unitDef(ctx, f.m.uid_def)?.name || 'Hero' }));
+  const heirs = core.replaceableHeroes(ctx, m.uid).map((f) => ({ id: f.id!, name: f.m.name || core.unitDef(ctx, f.m.uid_def)?.name || 'Hero' }));
   if (!heirs.length) return null;
   return {
     heirs,

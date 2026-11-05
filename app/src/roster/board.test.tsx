@@ -141,6 +141,17 @@ describe('on a phone: a row each, opening under it with tabs', () => {
     expect(a.outOfAction).toHaveBeenCalledOnce();
   });
 
+  it('a Prospect who can take a fallen Hero\'s place has a button for it on his card, which opens the advance sheet', async () => {
+    const user = userEvent.setup();
+    const a = acts();
+    const v = band();
+    const group = v.henchmen[0]!;
+    show({ acts: () => a }, { ...v, henchmen: [{ ...group, takePlace: true }] });
+    await user.click(screen.getByRole('button', { name: /^Warrior,/ }));
+    await user.click(screen.getByRole('button', { name: 'Take a fallen Hero\'s place' }));
+    expect(a.advance).toHaveBeenCalledOnce();
+  });
+
   it('a hired one has no gear tab of his own', async () => {
     const user = userEvent.setup();
     show();

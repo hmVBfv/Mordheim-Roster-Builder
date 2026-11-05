@@ -179,6 +179,7 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       )}
       {acts && (
         <div className={styles.acts}>
+          {w?.takePlace && <button type="button" className={`${styles.btn} ${styles.gold}`} onClick={acts.advance}>Take a fallen Hero's place</button>}
           {u.xp && <button type="button" className={`${styles.btn} ${u.advanceDue ? styles.gold : ''}`} onClick={acts.advance}>Advance</button>}
           {w?.addMan && (
             <button type="button" className={styles.btn} disabled={'why' in w.addMan} onClick={acts.addMan}>
