@@ -319,6 +319,7 @@ export function rareEligibleItems(ctx: Ctx, m: Model): CatalogItem[] {
   const isHero = def.t === 'hero' || !!m.promoted;
   return ctx.data.CATALOG.filter((it) => {
     if (!catalogAllowed(ctx, it, m)) return false; // kept for other warbands or warriors
+    if (it.startOnly) return false; // bought from the list at the founding, not found later
     if (def.noArmour && it.cat === 'armour') return false;
     if (def.noMissile && (it.cat === 'missile' || it.cat === 'bp')) return false;
     if (def.noHeavy && itemFamily(ctx.data, it.de) === 'heavyarmour') return false;

@@ -22,6 +22,9 @@ const fixtures = generateFixtures(data);
 /* Intended difference (docs/behaviour-changes.md, "Zauberer-Gegenstände"): items for
    spellcasters only are offered to whoever casts from a spell list; legacy knew
    only a `magic` key that no unit has. Left out of the comparison, nothing else. */
+/* Intended difference (docs/behaviour-changes.md, "May buy", #196): an item the catalogue marks `startOnly` is bought from the unit's list at the founding
+   and is no rare item to find; legacy lists it among the rare items, so both sides leave it out. Its own tests: core/test/may-buy-start.test.ts. */
+const startOnlyItems = new Set(data.CATALOG.filter((it) => it.startOnly).map((it) => it.de));
 const casterItems = new Set(data.CATALOG.filter((it) => it.only?.casters).map((it) => it.de));
 let L: Legacy;
 
@@ -196,7 +199,7 @@ function report(c: Calc): Record<string, unknown> {
       surcharge: c.henchRecruitSurcharge(m), recruitCost: c.henchRecruitCost(m), loss: c.lossValueOf(m),
       eqMarket: c.eqMarketValue(m), market: c.modelMarketValue(m), worthAdv: c.worthAdvOf(m),
       sv: c.svOfModel(m), limit: c.eqWeaponLimit(m), heirloom: c.heirloomDiscount(m), rareCost: c.rareCost(m),
-      rareEligible: c.rareEligibleItems(m).map((it) => it.de).filter((de) => !casterItems.has(de)),
+      rareEligible: c.rareEligibleItems(m).map((it) => it.de).filter((de) => !casterItems.has(de) && !startOnlyItems.has(de)),
       weapons,
       upgradesByWeapon: weapons.map((w) => c.weaponUpgradesFor(m, w.nm).map((x) => x.de)),
       upgradeTargets: upgradeKeys.map((de) => c.upgradeTargets(m, de).map((w) => w.nm)),

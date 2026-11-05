@@ -1408,6 +1408,7 @@
    "cost": 10,
    "rare": "",
    "wb": "Reavers (Saurus Slayer)",
+   "startOnly": true,
    "only": {
     "wb": [
      "reavers/slayer"
@@ -1421,6 +1422,7 @@
    "cost": 15,
    "rare": "",
    "wb": "Reavers (Saurus Slayer)",
+   "startOnly": true,
    "only": {
     "wb": [
      "reavers/slayer"
@@ -1447,6 +1449,7 @@
    "cost": 35,
    "rare": "",
    "wb": "Reavers (Saurus Slayer)",
+   "startOnly": true,
    "only": {
     "wb": [
      "reavers/slayer"
@@ -11700,15 +11703,24 @@
     ],
     [
      "Echsenhaut-Umhang",
-     10
+     10,
+     {
+      "start": true
+     }
     ],
     [
      "Schädelmaske",
-     15
+     15,
+     {
+      "start": true
+     }
     ],
     [
      "Slann-Kopfschmuck",
-     35
+     35,
+     {
+      "start": true
+     }
     ]
    ]
   },

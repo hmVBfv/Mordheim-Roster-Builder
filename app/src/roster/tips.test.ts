@@ -272,3 +272,14 @@ describe('a kit sold as one line', () => {
     expect(itemTip(data, 'Seil & Haken').length).toBeLessThanOrEqual(1);
   });
 });
+
+describe('a unit\'s "May buy" is no rule of his card (Saurus Slayer)', () => {
+  it('lists his Duellist rule and nothing called May buy', () => {
+    let s = core.addUnit(core.ctxOf(data, core.newWarband(data, 'reavers')), 'slayer');
+    s = structuredClone(s);
+    const labels = warriorFacts(core.ctxOf(data, s), s.models[0]!).rules.map((f) => f.label);
+    expect(labels).toContain('Duellist');
+    expect(labels).not.toContain('May buy');
+  });
+});
+
