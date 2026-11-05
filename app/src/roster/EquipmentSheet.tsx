@@ -81,7 +81,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                           {r.options.map((o) => <option key={o.de} value={o.de}>{o.name} – {o.price} gc</option>)}
                         </select>
                       )}
-                      {r.weapon && r.free && <small className={ui.muted}>the free dagger is never upgraded</small>}
+                      {r.weapon && r.free && r.from === 'list' && <small className={ui.muted}>the free dagger is never upgraded</small>}
                     </span>
                   </td>
                   <td>

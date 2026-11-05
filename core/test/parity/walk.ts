@@ -11,6 +11,7 @@
  *     core produces with normalizeState(). */
 import { expect } from 'vitest';
 import * as core from '../../src/index.ts';
+import { isFixedOnly } from '../support/fixedWeapons.ts';
 import type { Ctx, GameData, Model, WarbandState } from '../../src/index.ts';
 import { canonOf, data } from '../support/canon.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
@@ -110,14 +111,16 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
       const de = r.pick(pool).de;
       // intended difference ("Aufwertungen auf mehreren Waffen", #110): a weapon upgrade held already goes on a second weapon
       if (m.rare?.[de] && core.isUpgrade(d, de)) return null;
+      // intended difference (docs/behaviour-changes.md, "Echsenschwert", #195): core also puts an upgrade on a unit's fixed weapon; support/fixedWeapons.ts
+      if (core.isUpgrade(d, de)) { const first = core.upgradeTargets(ctx, m, de)[0]; if (first && isFixedOnly(ctx, m, first.nm)) return null; }
       return [`addRare ${m.uid} ${de}`, () => a.addRare(m.uid, de), (c) => core.addRare(c, m.uid, de)];
     }
     case 13: {
       // among the models that carry an upgrade and a weapon to put it on
-      const cands = s.models.filter((x) => Object.keys(x.rare ?? {}).some((de) => d.UPGRADES[de]) && core.eqWeaponsOf(ctx, x).length);
+      const cands = s.models.filter((x) => Object.keys(x.rare ?? {}).some((de) => d.UPGRADES[de]) && ownWeapons(ctx, x).length);
       if (!cands.length) return null;
       const mm = r.pick(cands);
-      const de = r.pick(Object.keys(mm.rare ?? {}).filter((k) => d.UPGRADES[k])), nm = r.pick(core.eqWeaponsOf(ctx, mm)).nm;
+      const de = r.pick(Object.keys(mm.rare ?? {}).filter((k) => d.UPGRADES[k])), nm = r.pick(ownWeapons(ctx, mm)).nm;
       return [`setRareTarget ${mm.uid} ${de} ${nm}`, () => a.setRareTarget(mm.uid, de, nm), (c) => core.setRareTarget(c, mm.uid, de, nm)];
     }
     case 14: { const de = m && r.pick([...Object.keys(m.rare ?? {}), 'Axt']); if (!m || !de) return null; const q = r.pick([0, 1, 2, 11]); if (isArmour(de) && q > 1) return null; return [`setRareQty ${m.uid} ${de}=${q}`, () => a.setRareQty(m.uid, de, q), (c) => core.setRareQty(c, m.uid, de, q)]; }
@@ -133,7 +136,7 @@ export function randomStep(r: Rng, d: GameData, s: WarbandState): Step | null {
     case 18: { if (!m) return null; const nm = r.chance(0.8) && items.length ? r.pick(items) : ''; return [`setHeirloom ${m.uid} ${nm}`, () => a.setHeirloom(m.uid, nm), (c) => core.setHeirloom(c, m.uid, nm)]; }
     case 19: {
       if (!m) return null;
-      const ws = core.eqWeaponsOf(ctx, m);
+      const ws = ownWeapons(ctx, m);
       if (!ws.length) return null;
       const w = r.pick(ws);
       const ups = core.weaponUpgradesFor(ctx, m, w.nm);
@@ -642,6 +645,9 @@ export function fixtureWalks(): Walk[] {
 export const half = <T>(xs: T[], which: 0 | 1): T[] => xs.filter((_, i) => i % 2 === which);
 
 /** Every action the walk can take, as labelled in steps. */
+/** The weapons legacy knows: the ones bought, not the unit's fixed gear (support/fixedWeapons.ts). */
+const ownWeapons = (ctx: core.Ctx, m: core.Model) => core.eqWeaponsOf(ctx, m).filter((w) => !isFixedOnly(ctx, m, w.nm));
+
 export const ACTIONS = ['addUnit', 'removeUnit', 'setName', 'setExp', 'setQty', 'toggleEq', 'setEqQty', 'addRare', 'addRare(again)',
   'setRareTarget', 'setRareQty', 'setRarePaid', 'removeRare', 'toggleMut', 'setHeirloom', 'toggleWeaponUpgrade',
   'setGoldCurrent', 'adjGoldCurrent', 'stashAdj', 'stashSet', 'stashAddItem', 'stashRemItem', 'stashItemQty', 'pickSub',

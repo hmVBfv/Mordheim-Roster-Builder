@@ -1408,6 +1408,7 @@
    "cost": 10,
    "rare": "",
    "wb": "Reavers (Saurus Slayer)",
+   "startOnly": true,
    "only": {
     "wb": [
      "reavers/slayer"
@@ -1421,6 +1422,7 @@
    "cost": 15,
    "rare": "",
    "wb": "Reavers (Saurus Slayer)",
+   "startOnly": true,
    "only": {
     "wb": [
      "reavers/slayer"
@@ -1429,7 +1431,7 @@
   },
   {
    "de": "Echsenschwert",
-   "en": "Lizardman Sword (upgrade)",
+   "en": "Lizardman Sword",
    "cat": "cc",
    "cost": 30,
    "rare": "",
@@ -1447,6 +1449,7 @@
    "cost": 35,
    "rare": "",
    "wb": "Reavers (Saurus Slayer)",
+   "startOnly": true,
    "only": {
     "wb": [
      "reavers/slayer"
@@ -6674,6 +6677,17 @@
   ],
   [
    {
+    "__re": "^warhound$|kriegshund",
+    "__f": "i"
+   },
+   {
+    "name": "Warhound",
+    "line": "Miscellaneous equipment · Lustrian Reavers",
+    "text": "Fights like a warband member but is equipment of the Hero who bought it. Never gains experience; the same recovery chance as Henchmen. Counts towards the maximum number of warriors in the warband. A Warhound and a Wardog are the same."
+   }
+  ],
+  [
+   {
     "__re": "echsenhaut-umhang|lizardmen skin cloak",
     "__f": "i"
    },
@@ -6700,9 +6714,9 @@
     "__f": "i"
    },
    {
-    "name": "Lizardman Sword (upgrade)",
-    "line": "Close combat · Saurus Slayer · 30 gc",
-    "text": "Upgrades any one Sword: its envenomed edge gives +1 to wound rolls (Poison)."
+    "name": "Lizardman Sword",
+    "line": "Close-combat upgrade · Saurus Slayer · 30 gc",
+    "text": "Upgrade any one Sword into a Lizardman Sword: +1 to wound rolls due to Poison. The weapon keeps its abilities."
    }
   ],
   [
@@ -11635,10 +11649,6 @@
     [
      "Lanze",
      40
-    ],
-    [
-     "Echsenschwert",
-     30
     ]
    ],
    "Fernkampf": [
@@ -11704,15 +11714,24 @@
     ],
     [
      "Echsenhaut-Umhang",
-     10
+     10,
+     {
+      "start": true
+     }
     ],
     [
      "Schädelmaske",
-     15
+     15,
+     {
+      "start": true
+     }
     ],
     [
      "Slann-Kopfschmuck",
-     35
+     35,
+     {
+      "start": true
+     }
     ]
    ]
   },
@@ -17054,6 +17073,25 @@
     "base": 15,
     "wb": [
      "darkelves"
+    ]
+   }
+  },
+  "Echsenschwert": {
+   "en": "Lizardman Sword",
+   "fams": [
+    "sword"
+   ],
+   "heroesOnly": true,
+   "wb": [
+    "reavers"
+   ],
+   "mult": 0,
+   "base": 30,
+   "note": "30 gc; macht ein Schwert des Saurus Slayers zum Echsenschwert",
+   "start": {
+    "base": 30,
+    "wb": [
+     "reavers"
     ]
    }
   },

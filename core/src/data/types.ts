@@ -147,6 +147,8 @@ export interface CatalogItem {
   /** The restriction as written ("Dwarfs only"); a note when `only` is absent. */
   wb: string;
   only?: CatalogOnly;
+  /** Bought from the unit's list when the warband is founded and found nowhere else ("May buy": the Saurus Slayer's cloak, mask and headdress). */
+  startOnly?: boolean;
   /** Where the item comes from, for filtering: the campaign settings it is sold in (`core`, `empire-in-flames`, `border-town-burning`, `khemri`, `lustria` …) or `warband:<page>`. Absent on the rulebook's own items. */
   settings?: string[];
   /** A group the price chart sets it in ("Poisons and Drugs"): one battle's use, and then it is gone. */

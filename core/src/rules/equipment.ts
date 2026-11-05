@@ -5,7 +5,7 @@ import type { Model, RareHolding } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
 import { itemHalfActive } from './districts.ts';
-import { eqListFor, isUpgrade, itemFamily, stripParen, unitDef, unitFamilies } from './lookup.ts';
+import { eqListFor, isUpgrade, itemFamily, stripParen, unitDef, unitFamilies, unitGear } from './lookup.ts';
 import { adjPrice } from './pricing.ts';
 import { casterLore } from './profile.ts';
 
@@ -118,7 +118,7 @@ export function upgradeSlots(m: Model, de: string): { on: string | null; paid: n
 export function upgradeFree(ctx: Ctx, m: Model, de: string): WeaponRef[] {
   const used = new Map<string, number>();
   for (const s of upgradeSlots(m, de)) if (s.on) used.set(s.on, (used.get(s.on) ?? 0) + 1);
-  return upgradeTargets(ctx, m, de).filter((w) => (used.get(w.nm) ?? 0) < upgradeRoom(m, w.nm));
+  return upgradeTargets(ctx, m, de).filter((w) => (used.get(w.nm) ?? 0) < upgradeRoom(ctx, m, w.nm));
 }
 
 /** The group the price chart sets an item in ("Poisons and Drugs"), if it names one. */
@@ -132,10 +132,15 @@ export interface WeaponRef { nm: string; price: number; fam: string | null }
 /** Close-combat weapons a model carries (for upgrades). */
 export function eqWeaponsOf(ctx: Ctx, m: Model): WeaponRef[] {
   const def = unitDef(ctx, m.uid_def);
-  if (!def || !def.eq) return [];
-  const list = eqListFor(ctx, def);
+  if (!def) return [];
   const out: WeaponRef[] = [];
+  const list = def.eq ? eqListFor(ctx, def) : undefined;
   if (list?.Nahkampf) for (const [nm, pr] of list.Nahkampf) if (qtyOf(m, nm) > 0) out.push({ nm, price: pr, fam: itemFamily(ctx.data, nm) });
+  // his fixed weapons (the Slayer's swords) take an upgrade as well; they are named as the unit's gear names them
+  for (const g of new Set(unitGear(ctx, m))) {
+    const fam = itemFamily(ctx.data, g);
+    if (fam && ctx.data._CCFAM.includes(fam) && !out.some((w) => w.nm === g)) out.push({ nm: g, price: 0, fam });
+  }
   return out;
 }
 
@@ -146,8 +151,8 @@ export function upgradeTargets(ctx: Ctx, m: Model, de: string): WeaponRef[] {
 }
 
 /** How many copies of an upgrade a weapon of this name can take: one per weapon carried, the free dagger not counted. */
-export function upgradeRoom(m: Model, nm: string): number {
-  return Math.max(0, qtyOf(m, nm) - (nm.indexOf('1. gratis') >= 0 ? 1 : 0));
+export function upgradeRoom(ctx: Ctx, m: Model, nm: string): number {
+  return Math.max(0, qtyOf(m, nm) + unitGear(ctx, m).filter((g) => g === nm).length - (nm.indexOf('1. gratis') >= 0 ? 1 : 0));
 }
 
 /* ---- founding prices ---- */
@@ -245,6 +250,9 @@ export function weaponUpgradesFor(ctx: Ctx, m: Model, nm: string): { de: string;
     if (u.heroesOnly && !isHero) continue;
     if (u.wb && u.wb.indexOf(ctx.s.wb ?? '') < 0) continue;
     if (u.fams.indexOf(fam as string) < 0) continue;
+    // an upgrade the catalogue keeps for one unit (the Slayer's Lizardman Sword) is offered to that unit only
+    const item = ctx.data.CATALOG.find((x) => x.de === de);
+    if (item && !catalogAllowed(ctx, item, m)) continue;
     out.push({ de, u });
   }
   return out;
@@ -311,6 +319,7 @@ export function rareEligibleItems(ctx: Ctx, m: Model): CatalogItem[] {
   const isHero = def.t === 'hero' || !!m.promoted;
   return ctx.data.CATALOG.filter((it) => {
     if (!catalogAllowed(ctx, it, m)) return false; // kept for other warbands or warriors
+    if (it.startOnly) return false; // bought from the list at the founding, not found later
     if (def.noArmour && it.cat === 'armour') return false;
     if (def.noMissile && (it.cat === 'missile' || it.cat === 'bp')) return false;
     if (def.noHeavy && itemFamily(ctx.data, it.de) === 'heavyarmour') return false;
