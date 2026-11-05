@@ -134,11 +134,13 @@ export function eqWeaponsOf(ctx: Ctx, m: Model): WeaponRef[] {
   const def = unitDef(ctx, m.uid_def);
   if (!def) return [];
   const out: WeaponRef[] = [];
-  // his fixed weapons (the Slayer's swords) take an upgrade as well; they are named as the unit's gear names them
-  for (const g of new Set(unitGear(ctx, m))) { const fam = itemFamily(ctx.data, g); if (fam && ctx.data._CCFAM.includes(fam)) out.push({ nm: g, price: 0, fam }); }
-  if (!def.eq) return out;
-  const list = eqListFor(ctx, def);
+  const list = def.eq ? eqListFor(ctx, def) : undefined;
   if (list?.Nahkampf) for (const [nm, pr] of list.Nahkampf) if (qtyOf(m, nm) > 0) out.push({ nm, price: pr, fam: itemFamily(ctx.data, nm) });
+  // his fixed weapons (the Slayer's swords) take an upgrade as well; they are named as the unit's gear names them
+  for (const g of new Set(unitGear(ctx, m))) {
+    const fam = itemFamily(ctx.data, g);
+    if (fam && ctx.data._CCFAM.includes(fam) && !out.some((w) => w.nm === g)) out.push({ nm: g, price: 0, fam });
+  }
   return out;
 }
 

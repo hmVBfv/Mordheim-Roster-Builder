@@ -71,3 +71,10 @@ describe('the Lizardman Sword is an upgrade of a sword', () => {
     expect(held(both.state, uid).rare?.[DE]).toBeUndefined(); // no sword left to carry it
   });
 });
+
+describe('the Lizardman Sword is not a weapon to buy from his list', () => {
+  it('has no row of its own in the Slayer\'s list', () => {
+    const rows = Object.values(data.LISTS.lrSlayer!).flatMap((g) => (Array.isArray(g) ? g.map((r) => r[0]) : []));
+    expect(rows).not.toContain(DE);
+  });
+});
