@@ -7549,6 +7549,9 @@
       "academic",
       "cavalcadeSkills"
      ],
+     "wizardOption": {
+      "cost": 10
+     },
      "sp": "Magical Adept: When hired, you may pay +10 gc to make him a Wizard (uses Lesser Magic, starts with one random spell). Story Teller: Alternatively pay +10 gc to make him a Chronicler (re-roll one extra Exploration die and choose which two dice to keep). Toggle \"caster\" below if upgraded to a Wizard."
     },
     {
@@ -7829,6 +7832,10 @@
       "academic",
       "speed"
      ],
+     "wizardOption": {
+      "cost": 30,
+      "drop": "Light Armour"
+     },
      "sp": "Starts with Javelins, Light Armour and two Daggers. For +30 gc may become a Wizard (uses Lesser Magic, one random spell; if so, remove the starting Light Armour) — toggle \"caster\" below. Silent Hunter: Always counts as Hidden while touching terrain ≥1\" high; shooting does not reveal him (spellcasting does). Surprise attack: Re-roll missed hits against enemies attacked from behind (180° rear arc). Canopy Walker: Automatically passes all climbing, jumping and falling tests."
     },
     {

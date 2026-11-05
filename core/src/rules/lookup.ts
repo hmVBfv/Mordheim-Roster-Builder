@@ -47,7 +47,11 @@ export function itemFamily(data: GameData, name: string): string | null {
 export function unitGear(ctx: Ctx, m: Model | null | undefined): string[] {
   const def = m ? unitDef(ctx, m.uid_def) : undefined;
   const sold = [...(m?.gearSold ?? [])];
-  return [...(def?.gear ?? []), ...(m?.gearHeld ?? [])].filter((g) => { const i = sold.indexOf(g); if (i < 0) return true; sold.splice(i, 1); return false; });
+  // a Hero made a Wizard starts without a piece of it (the Jungle Shadow's Light Armour)
+  const drop = m?.caster ? def?.wizardOption?.drop : undefined;
+  const fixed = [...(def?.gear ?? [])];
+  if (drop && fixed.includes(drop)) fixed.splice(fixed.indexOf(drop), 1);
+  return [...fixed, ...(m?.gearHeld ?? [])].filter((g) => { const i = sold.indexOf(g); if (i < 0) return true; sold.splice(i, 1); return false; });
 }
 
 /** Families present in a unit's starting equipment list and fixed gear. */

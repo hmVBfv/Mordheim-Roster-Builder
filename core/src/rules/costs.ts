@@ -103,7 +103,7 @@ export function modelRating(ctx: Ctx, m: Model): number {
 export function modelUnitCost(ctx: Ctx, m: Model): number {
   const def = unitDef(ctx, m.uid_def);
   if (!def) return 0;
-  return unitBaseCost(ctx, unitDef(ctx, m.statsOf ?? '') ?? def) + eqCost(ctx, m) + mutCost(ctx, m) + rareCost(m) - heirloomDiscount(ctx, m);
+  return unitBaseCost(ctx, unitDef(ctx, m.statsOf ?? '') ?? def) + (m.caster ? def.wizardOption?.cost ?? 0 : 0) + eqCost(ctx, m) + mutCost(ctx, m) + rareCost(m) - heirloomDiscount(ctx, m);
 }
 
 /** What ANOTHER man costs to join this henchman group: 2 gc per experience

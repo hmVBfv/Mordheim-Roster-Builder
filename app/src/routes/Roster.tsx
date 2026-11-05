@@ -172,6 +172,11 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     const bears = !!m?.caster;
     const chaos: UnitActs['chaos'] = [];
     if (mv) chaos.push({ label: mv.label, run: () => { setMutOf(w.uid); openMutSheet(); } });
+    // a Hero who may be made a Wizard for gold: a button for it and for taking it back
+    if (w.wizard) {
+      const on = w.wizard.on, cost = w.wizard.cost;
+      chaos.push({ label: on ? 'No longer a Wizard' : `Make a Wizard · +${cost} gc`, run: () => ed.edit((c) => core.setWizard(c, w.uid, !on), on ? `${w.name} is no Wizard any more.` : `${w.name} is a Wizard now; choose his spell.`) });
+    }
     if (role === 'seer') chaos.push({ label: 'Mark of Chaos…', run: () => { setMarkKey((k) => k + 1); openMarkSheet(); } });
     else if (role === 'chief' && mk) {
       chaos.push({
