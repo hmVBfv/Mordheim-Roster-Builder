@@ -4708,3 +4708,28 @@ trace back to my rework of the day before.
 
 A note on the check: the start-up budget test for a step of experience (100 ms) failed twice on a loaded machine while the check was running next to
 the end-to-end run, and passed alone in 2.5 seconds; it is a timing test and I did not touch it.
+
+**The run of 5.11.2026, five reports on the Lustrian Reavers (PRs 331 to 335).** Rob asked for general rules wherever a report applies to other warbands,
+so most of the work is a data field or a rule with a test over all warbands, not a fix for one unit.
+
+- **#195, the Lizardman Sword (PR 331).** The Slayer's sword was a close-combat item of its own; the rule makes it an upgrade of a sword, like the Dark
+  Elf blade. Easy for the data (`UPGRADES.Echsenschwert`) but not for the code: the Slayer's swords are his fixed `gear`, and an upgrade needs a weapon to
+  sit on, so `eqWeaponsOf`, `upgradeRoom`, the display and the Carried rows now know fixed weapons (the Kroxigor's halberd too). Two things came late:
+  the old row in his list still sold the sword as a weapon (found only when the parity suite failed on a bought sword), and the catalogue's restriction
+  to one unit was not applied to the inline upgrade offers. Legacy knows neither, so there are two named parity exclusions (`support/fixedWeapons.ts`
+  and the action walk).
+- **#196, "May buy" (PR 332, contains 331).** The sentence in the Slayer's rule text showed as a special rule. The items are list rows that hold at the
+  founding (`start`, already used by other warbands) and the catalogue marks them `startOnly` so the Trading Post does not offer them; Rob: only
+  buyable at the start, not in the unit's price. A test over all warbands keeps "May buy:" out of any unit's rules. The Kislev Captain and the
+  Trapmaster have the words in lower case for other mechanisms and are untouched.
+- **#197, the Warhound's tooltip (PR 333).** The Warhound was the only item of any list without an info text; the test over all lists keeps it so.
+  The rare "Wardog" has its own text and the Warhound entry matches only its own name.
+- **#198, War Beasts (PR 334).** The Beastmaster names the units he keeps and how many together (`beasts`, `beastMax`); `unitMax` follows (none without
+  him, two together, each within its own maximum), the equipment sheet has a War Beasts section with price, stats and named abilities, and
+  `addBeast`/`dropBeast`. The Dark Elves' Beastmaster and Cold One Beasthounds use the same rule. A wrong turn: my first insert of the fields went into
+  the Dark Elves' block because both warbands have a unit with the id `beastmaster`; the test of the Reavers data caught it. Legacy has no such limit:
+  the parity tests run on data without the keys (`support/parityData.ts`).
+- **#199, the optional Wizard (PR 335, contains 334).** The Jungle Shadow and the Twisted Scholar were Wizards from the start, because the word is in
+  their rule text. `wizardOption` (price, piece of gear that goes) and `setWizard`; a test over all warbands keeps every such unit on the option. It
+  stacks on #198 because both extend the parity data. The mirrored legacy tests compare unit definitions, so they needed to skip the three core-only
+  keys by name.
