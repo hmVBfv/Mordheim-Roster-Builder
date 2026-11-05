@@ -20,7 +20,7 @@ import { eqListFor, isUpgrade, stripParen, unitDef, unitGear, warbandDef } from 
 import { adjPrice, catalogDefaultPaid } from '../rules/pricing.ts';
 import { memberCount } from '../rules/profile.ts';
 import { enItem } from '../export/rulesText.ts';
-import { dismissMember, removeUnit } from '../warband/roster.ts';
+import { dismissMember, removeUnit, trimUpgrades } from '../warband/roster.ts';
 import { unhireDP, unhireHS } from '../warband/hiring.ts';
 import { findModel, rememberUids, update, type WarbandDraft } from '../warband/update.ts';
 import { bookOn, ensureLedger, keepGold, syncTreasury, tradeLocked } from './ledger.ts';
@@ -393,7 +393,8 @@ export function sellStartGear(ctx: Ctx, uid: number, piece: string, opts: { pric
     const price = opts.price != null ? Math.max(0, Math.round(opts.price)) : (startGearPrice(c, uid, piece) ?? 0);
     bookOn(d, c, 'sell', price, { text: `Sold ${piece}${men > 1 ? ` ×${men}` : ''}`, uid, item: piece, qty: men });
   });
-  return { state, ok: true, reason: '' };
+  // an upgrade that sat on the weapon goes with it
+  return { state: trimUpgrades(ctxOf(ctx.data, state), uid), ok: true, reason: '' };
 }
 
 /** Reallocates an item (V4, post-battle step 9): from a warrior or the

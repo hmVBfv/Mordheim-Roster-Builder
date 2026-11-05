@@ -115,6 +115,18 @@ describe('what a Hero starts with (#181)', () => {
   });
 });
 
+describe('the Saurus Slayer\'s Lizardman Sword is an upgrade of one of his swords', () => {
+  it('is offered on each fixed sword, not on the Misericordia', async () => {
+    const d = sheet('reavers', 'slayer');
+    const swords = within(d).getAllByRole('combobox', { name: 'Upgrade Sword', hidden: true });
+    expect(swords).toHaveLength(2);
+    expect(within(swords[0]!).getByRole('option', { name: 'Lizardman Sword – 30 gc', hidden: true })).toBeTruthy();
+    expect(within(d).queryByRole('combobox', { name: 'Upgrade Misericordia', hidden: true })).toBeNull();
+    await userEvent.setup().selectOptions(swords[0]!, 'Echsenschwert');
+    expect(act.upgrade).toHaveBeenLastCalledWith('Echsenschwert', 'Sword', true);
+  });
+});
+
 describe('the War Beasts section of the Beastmaster', () => {
   it('has its own section with each beast\'s stats and abilities, and buttons to take one on and let one go', async () => {
     const d = sheet('reavers', 'beastmaster');

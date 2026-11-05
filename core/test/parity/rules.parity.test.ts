@@ -13,6 +13,7 @@ import { loadParityData } from '../support/parityData.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { withoutNewHouseKeys } from '../support/canon.ts';
 import { legacyMax } from '../support/cookbook.ts';
+import { isFixedOnly, keptForOtherUnit } from '../support/fixedWeapons.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng } from '../support/random.ts';
 
@@ -21,6 +22,9 @@ const fixtures = generateFixtures(data);
 /* Intended difference (docs/behaviour-changes.md, "Zauberer-Gegenstände"): items for
    spellcasters only are offered to whoever casts from a spell list; legacy knew
    only a `magic` key that no unit has. Left out of the comparison, nothing else. */
+/* Intended difference (docs/behaviour-changes.md, "May buy", #196): an item the catalogue marks `startOnly` is bought from the unit's list at the founding
+   and is no rare item to find; legacy lists it among the rare items, so both sides leave it out. Its own tests: core/test/may-buy-start.test.ts. */
+const startOnlyItems = new Set(data.CATALOG.filter((it) => it.startOnly).map((it) => it.de));
 const casterItems = new Set(data.CATALOG.filter((it) => it.only?.casters).map((it) => it.de));
 let L: Legacy;
 
@@ -70,7 +74,7 @@ function legacyCalc(s: WarbandState): Calc {
     eqMarketValue: (m) => e.eqMarketValue(m), modelMarketValue: (m) => e.modelMarketValue(m), worthAdvOf: (m) => a.worthAdvOf(m),
     svOfModel: (m) => e.svOfModel(m), eqWeaponLimit: (m) => e.eqWeaponLimit(m), heirloomDiscount: (m) => e.heirloomDiscount(m), rareCost: (m) => e.rareCost(m),
     rareEligibleItems: (m) => e.rareEligibleItems(m), eqWeaponsOf: (m) => e.eqWeaponsOf(m),
-    weaponUpgradesFor: (m, nm) => e.weaponUpgradesFor(m, nm), upgradeTargets: (m, de) => e.upgradeTargets(m, de),
+    weaponUpgradesFor: (m, nm) => e.weaponUpgradesFor(m, nm).filter((x: { de: string }) => !keptForOtherUnit(core.ctxOf(data, s), m, x.de)), upgradeTargets: (m, de) => e.upgradeTargets(m, de),
     upgradePaid: (m, de, nm) => e.upgradePaid(m, de, nm), daggerNameFor: (id) => e.daggerNameFor(def(id)),
     freeDaggerEq: (m) => { const c = structuredClone(m); e.ensureFreeDagger(c); return c.eq; },
     isHeroModel: (m) => e.isHeroModel(m), modelRating: (m) => e.modelRating(m), unitMax: (id) => e.unitMax(def(id)),
@@ -130,8 +134,8 @@ function coreCalc(s: WarbandState): Calc {
     henchRecruitSurcharge: (m) => core.henchRecruitSurcharge(ctx, m), henchRecruitCost: (m) => core.henchRecruitCost(ctx, m), lossValueOf: (m) => core.lossValueOf(ctx, m),
     eqMarketValue: (m) => core.eqMarketValue(ctx, m), modelMarketValue: (m) => core.modelMarketValue(ctx, m), worthAdvOf: (m) => core.worthAdvOf(m),
     svOfModel: (m) => core.svOfModel(ctx, m), eqWeaponLimit: (m) => core.eqWeaponLimit(ctx, m), heirloomDiscount: (m) => core.heirloomDiscount(ctx, m), rareCost: (m) => core.rareCost(m),
-    rareEligibleItems: (m) => core.rareEligibleItems(ctx, m), eqWeaponsOf: (m) => core.eqWeaponsOf(ctx, m),
-    weaponUpgradesFor: (m, nm) => core.weaponUpgradesFor(ctx, m, nm), upgradeTargets: (m, de) => core.upgradeTargets(ctx, m, de),
+    rareEligibleItems: (m) => core.rareEligibleItems(ctx, m), eqWeaponsOf: (m) => core.eqWeaponsOf(ctx, m).filter((w) => !isFixedOnly(ctx, m, w.nm)),
+    weaponUpgradesFor: (m, nm) => core.weaponUpgradesFor(ctx, m, nm), upgradeTargets: (m, de) => core.upgradeTargets(ctx, m, de).filter((w) => !isFixedOnly(ctx, m, w.nm)),
     upgradePaid: (m, de, nm) => core.upgradePaid(ctx, m, de, nm), daggerNameFor: (id) => core.daggerNameFor(ctx, def(id)),
     freeDaggerEq: (m) => core.withFreeDagger(ctx, m).eq, isHeroModel: (m) => core.isHeroModel(ctx, m), modelRating: (m) => core.modelRating(ctx, m),
     unitMax: (id) => { const d = def(id); return d ? legacyUnitMax(ctx, d) : undefined; },
@@ -195,7 +199,7 @@ function report(c: Calc): Record<string, unknown> {
       surcharge: c.henchRecruitSurcharge(m), recruitCost: c.henchRecruitCost(m), loss: c.lossValueOf(m),
       eqMarket: c.eqMarketValue(m), market: c.modelMarketValue(m), worthAdv: c.worthAdvOf(m),
       sv: c.svOfModel(m), limit: c.eqWeaponLimit(m), heirloom: c.heirloomDiscount(m), rareCost: c.rareCost(m),
-      rareEligible: c.rareEligibleItems(m).map((it) => it.de).filter((de) => !casterItems.has(de)),
+      rareEligible: c.rareEligibleItems(m).map((it) => it.de).filter((de) => !casterItems.has(de) && !startOnlyItems.has(de)),
       weapons,
       upgradesByWeapon: weapons.map((w) => c.weaponUpgradesFor(m, w.nm).map((x) => x.de)),
       upgradeTargets: upgradeKeys.map((de) => c.upgradeTargets(m, de).map((w) => w.nm)),
