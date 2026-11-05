@@ -242,7 +242,14 @@ export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
   const def = unitDef(ctx, m.uid_def);
   const out: EqDisplayItem[] = [];
   if (!def) return out;
-  unitGear(ctx, m).forEach((g) => out.push({ label: g, items: [g] }));
+  // a fixed weapon shows the upgrade it carries: the first copy of "Sword" the first upgrade on a "Sword", and so on
+  const seen = new Map<string, number>();
+  unitGear(ctx, m).forEach((g) => {
+    const k = seen.get(g) ?? 0;
+    seen.set(g, k + 1);
+    const ups = m.rare ? Object.keys(m.rare).filter((de) => inlineUpgradeActive(ctx, de) && upgradeSlots(m, de).filter((s) => s.on === g).length > k) : [];
+    out.push({ label: g + (ups.length ? ` [${ups.map((de) => enItem(ctx.data, de)).join(', ')}]` : ''), items: [g, ...ups] });
+  });
   if (def.eq) {
     const list = eqListFor(ctx, def) ?? {};
     for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) {

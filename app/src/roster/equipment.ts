@@ -121,12 +121,33 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
   const hero = def?.t === 'hero' || !!m.promoted;
   const upgrades = Object.keys(ctx.data.UPGRADES).filter((de) => core.isUpgrade(ctx.data, de));
   const out: CarriedRow[] = [];
-  // what he starts with (the Lustrian Reavers' Heroes: "Starts with …"): in his price, so no price of its own, and it stays with him
+  // the upgrades a weapon carries (the first plain piece first) and those it could take now
+  const upsOn = (nm: string, plain: number) => upgrades.flatMap((de) => {
+    const slots = core.upgradeSlots(m, de).map((s, slot) => ({ ...s, slot })).filter((s) => s.on === nm);
+    const s = slots[plain];
+    return s ? [{ de, name: ctx.data.CATALOG.find((x) => x.de === de)?.en ?? de, paid: s.paid, slot: s.slot }] : [];
+  });
+  const optionsOn = (nm: string, have: { de: string }[]) => (when.recruit ? [] : upgrades.flatMap((de) => {
+    const it = ctx.data.CATALOG.find((x) => x.de === de);
+    const u = ctx.data.UPGRADES[de];
+    if (!it || !u || have.some((x) => x.de === de) || !(when.free || when.atStart(de))) return [];
+    if ((u.heroesOnly && !hero) || !core.catalogAllowed(ctx, it, m)) return [];
+    if (u.wb && u.wb.indexOf(ctx.s.wb ?? '') < 0) return [];
+    if (!core.upgradeFree(ctx, m, de).some((w) => w.nm === nm)) return [];
+    return [{ de, name: it.en, price: core.upgradePaid(ctx, m, de, nm) }];
+  }));
+  // what he starts with (the Lustrian Reavers' Heroes: "Starts with …"): in his price, so no price of its own, and it stays with him;
+  // a fixed weapon takes an upgrade like any other (the Slayer's swords)
+  const seen = new Map<string, number>();
   core.unitGear(ctx, m).forEach((nm, i) => {
+    const k = seen.get(nm) ?? 0;
+    seen.set(nm, k + 1);
+    const weapon = core.eqWeaponsOf(ctx, m).some((w) => w.nm === nm);
+    const ups = weapon ? upsOn(nm, k) : [];
     out.push({
       id: `s:${nm}:${i}`, key: nm, name: nm, group: core.itemGroup(ctx, nm) ?? 'Starting equipment', from: 'start', price: 'in his price', free: true, keep: true, used: false,
       sell: core.tradeLocked(ctx) ? core.startGearPrice(ctx, m.uid, nm) : null,
-      text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon: false, ups: [], options: [], qty: 1,
+      text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon, ups, options: weapon ? optionsOn(nm, ups) : [], qty: 1,
     });
   });
   for (const cat of Object.keys(list)) {
@@ -138,20 +159,8 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
         const freeOne = nm.includes(FREE) && i === 0;
         // the pieces after the free one, counted from the first: upgrades fill them in turn
         const plain = i - (nm.includes(FREE) ? 1 : 0);
-        const ups = weapon && !freeOne ? upgrades.flatMap((de) => {
-          const slots = core.upgradeSlots(m, de).map((s, slot) => ({ ...s, slot })).filter((s) => s.on === nm);
-          const s = slots[plain];
-          return s ? [{ de, name: ctx.data.CATALOG.find((x) => x.de === de)?.en ?? de, paid: s.paid, slot: s.slot }] : [];
-        }) : [];
-        const options = weapon && !freeOne && !when.recruit ? upgrades.flatMap((de) => {
-          const it = ctx.data.CATALOG.find((x) => x.de === de);
-          const u = ctx.data.UPGRADES[de];
-          if (!it || !u || ups.some((x) => x.de === de) || !(when.free || when.atStart(de))) return [];
-          if ((u.heroesOnly && !hero) || !core.catalogAllowed(ctx, it, m)) return [];
-          if (u.wb && u.wb.indexOf(ctx.s.wb ?? '') < 0) return [];
-          if (!core.upgradeFree(ctx, m, de).some((w) => w.nm === nm)) return [];
-          return [{ de, name: it.en, price: core.upgradePaid(ctx, m, de, nm) }];
-        }) : [];
+        const ups = weapon && !freeOne ? upsOn(nm, plain) : [];
+        const options = weapon && !freeOne ? optionsOn(nm, ups) : [];
         out.push({
           id: `l:${nm}:${i}`, key: nm, name: core.enItem(ctx.data, nm), group: core.itemGroup(ctx, nm) ?? CATS[cat] ?? cat, from: 'list',
           price: freeOne ? 'free' : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, used: core.isConsumable(ctx, nm), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon, ups, options, qty,

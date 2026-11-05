@@ -114,3 +114,16 @@ describe('what a Hero starts with (#181)', () => {
     expect(within(t).queryByRole('button', { name: /Sell Firepots/, hidden: true })).toBeNull();
   });
 });
+
+describe('the Saurus Slayer\'s Lizardman Sword is an upgrade of one of his swords', () => {
+  it('is offered on each fixed sword, not on the Misericordia', async () => {
+    const d = sheet('reavers', 'slayer');
+    const swords = within(d).getAllByRole('combobox', { name: 'Upgrade Sword', hidden: true });
+    expect(swords).toHaveLength(2);
+    expect(within(swords[0]!).getByRole('option', { name: 'Lizardman Sword – 30 gc', hidden: true })).toBeTruthy();
+    expect(within(d).queryByRole('combobox', { name: 'Upgrade Misericordia', hidden: true })).toBeNull();
+    await userEvent.setup().selectOptions(swords[0]!, 'Echsenschwert');
+    expect(act.upgrade).toHaveBeenLastCalledWith('Echsenschwert', 'Sword', true);
+  });
+});
+

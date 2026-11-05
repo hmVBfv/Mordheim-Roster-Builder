@@ -215,7 +215,7 @@ export function trimUpgrades(ctx: Ctx, uid: number): WarbandState {
     if (!isUpgrade(ctx.data, de)) continue;
     for (;;) {
       const m = findModel(s, uid) as Model;
-      const over = upgradeSlots(m, de).map((x) => x.on).filter((w, i, all) => w != null && all.filter((x) => x === w).length > upgradeRoom(m, w));
+      const over = upgradeSlots(m, de).map((x) => x.on).filter((w, i, all) => w != null && all.filter((x) => x === w).length > upgradeRoom(ctxOf(ctx.data, s), m, w));
       if (!over.length) break;
       s = setUpgradeOn(ctxOf(ctx.data, s), uid, de, over[0] as string, false);
     }
