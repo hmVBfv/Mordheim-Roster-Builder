@@ -246,6 +246,19 @@ export function setCaster(ctx: Ctx, uid: number, on: boolean): WarbandState {
   });
 }
 
+/** A Hero who may become a Wizard for gold (the Jungle Shadow, the Twisted Scholar): makes him one or takes it back. A Wizard casts from the
+    warband's own magic and starts with one spell, chosen at the table; no longer a Wizard he forgets it. */
+export function setWizard(ctx: Ctx, uid: number, on: boolean): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  if (!m0 || !unitDef(ctx, m0.uid_def)?.wizardOption || !!m0.caster === !!on) return ctx.s;
+  return update(ctx, (d, c) => {
+    const m = findModel(d, uid) as Model;
+    m.caster = !!on;
+    if (on) m.lore = (c.data.WBEXTRA[c.s.wb ?? ''] as { magic?: string } | undefined)?.magic || m.lore || '';
+    else { m.spells = []; m.lore = ''; }
+  });
+}
+
 /** Changes a caster's lore; a different lore forgets the spells. */
 export function setLore(ctx: Ctx, uid: number, v: string): WarbandState {
   return update(ctx, (d) => {

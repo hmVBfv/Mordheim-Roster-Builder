@@ -52,13 +52,17 @@ function copy<T>(x: T): T {
   try { return structuredClone(x); } catch { return x; }
 }
 
+/* Data keys only core reads; the parity data leaves them out (test/support/parityData.ts), legacy's unit definitions still carry them, so the
+   comparison skips them – these keys by name, nothing else (docs/behaviour-changes.md, #198, #199). */
+const CORE_ONLY_KEYS = new Set(['beasts', 'beastMax', 'wizardOption']);
+
 /* JSON-comparable, with object keys sorted: the two sides build their
    objects in different orders. */
 function stable(v: unknown): unknown {
   const j = JSON.parse(JSON.stringify([v]) ?? '[null]')[0] as unknown;
   const sort = (x: unknown): unknown => {
     if (Array.isArray(x)) return x.map(sort);
-    if (x && typeof x === 'object') return Object.fromEntries(Object.keys(x).sort().map((k) => [k, sort((x as Rec)[k])]));
+    if (x && typeof x === 'object') return Object.fromEntries(Object.keys(x).filter((k) => !CORE_ONLY_KEYS.has(k)).sort().map((k) => [k, sort((x as Rec)[k])]));
     return x;
   };
   return sort(j);

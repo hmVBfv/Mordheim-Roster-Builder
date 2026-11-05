@@ -541,3 +541,25 @@ describe('stats that differ from the starting profile are marked better or worse
     expect(rosterView(data, s).heroes[0]!.stats.every((x) => !x.changed && x.tone == null)).toBe(true);
   });
 });
+
+describe('a Hero who may be made a Wizard for gold (#199)', () => {
+  const c = (s: core.WarbandState) => core.ctxOf(data, s);
+  const shadow = (s: core.WarbandState) => rosterView(data, s).heroes.find((h) => h.type === 'Jungle Shadow')!;
+  it('offers it with its price, shows no spells until he is one, and then the Lesser Magic and no Light Armour', () => {
+    let s = createWarband(data, 'reavers', null, '');
+    s = core.addUnit(c(s), 'shadow');
+    expect(shadow(s).wizard).toEqual({ cost: 30, on: false });
+    expect(shadow(s).lore).toBeNull();
+    expect(shadow(s).equipment.map((f) => f.label)).toContain('Light Armour');
+    s = core.setWizard(c(s), s.models[0]!.uid, true);
+    expect(shadow(s).wizard).toEqual({ cost: 30, on: true });
+    expect(shadow(s).lore?.name).toBe('Lesser Magic');
+    expect(shadow(s).equipment.map((f) => f.label)).not.toContain('Light Armour');
+  });
+
+  it('is not offered to a Hero without the option', () => {
+    let s = createWarband(data, 'reavers', null, '');
+    s = core.addUnit(c(s), 'conqueror');
+    expect(rosterView(data, s).heroes[0]!.wizard).toBeNull();
+  });
+});

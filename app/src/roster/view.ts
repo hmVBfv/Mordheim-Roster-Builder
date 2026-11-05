@@ -53,6 +53,8 @@ export interface WarriorView {
   exp: number;
   xp: XpView | null;
   advanceDue: boolean;
+  /** A Hero who may be made a Wizard for gold (the Jungle Shadow): the price, and whether he is one now; null for anybody else. */
+  wizard: { cost: number; on: boolean } | null;
   /** A Prospect while a Hero has fallen whose place he may take (wish): the card says so and offers it. */
   takePlace: boolean;
   missGames: number;
@@ -300,6 +302,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     exp: Number(m.exp) || 0,
     xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp, null, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
+    wizard: def?.wizardOption ? { cost: def.wizardOption.cost, on: !!m.caster } : null,
     takePlace: !hero && core.replaceableHeroes(ctx, m.uid).length > 0,
     missGames: Number(m.miss) || 0,
     battles: Number(m.battles) || 0,

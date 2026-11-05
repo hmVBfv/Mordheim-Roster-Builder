@@ -121,6 +121,7 @@ export function markLore(ctx: Ctx): string | null {
 export function casterMagic(ctx: Ctx, def: UnitDef): string | null {
   const ex = ctx.data.WBEXTRA[ctx.s.wb ?? ''] as { magic?: string } | undefined;
   if (!ex || !ex.magic || !ctx.data.SPELLS[ex.magic]) return null;
+  if (def.wizardOption) return null; // a Wizard only once he has been made one (`caster`)
   if (def.sp && /\bWizard\b|Prayers of\b|Disciple of Sigmar/i.test(def.sp)) return ex.magic;
   return null;
 }
