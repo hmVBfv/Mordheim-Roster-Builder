@@ -67,6 +67,9 @@ export interface UnitDef {
   promoCatsFixed?: string[];
   /** A Prospect: becomes a Hero only by taking the place of a fallen Hero (Promotion Only). */
   promotionOnly?: boolean;
+  /** A Beastmaster: the units he keeps as War Beasts and how many of them together, for each of him. They are bought in his equipment, and are none without him. */
+  beasts?: string[];
+  beastMax?: number;
   /** Warband skill set not available to this unit. */
   noWbSkills?: boolean;
   /** Extra attack shown as "1+1" (e.g. Saurus bite). */

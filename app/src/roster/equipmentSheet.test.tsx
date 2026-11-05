@@ -13,7 +13,7 @@ import { createWarband } from './view.ts';
 beforeAll(polyfillDialog);
 afterEach(cleanup);
 
-const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), sellStart: vi.fn() };
+const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), sellStart: vi.fn(), addBeast: vi.fn(), dropBeast: vi.fn() };
 
 function sheet(wb = 'merc', unit = 'capt', round = 0) {
   const c = (s: core.WarbandState) => core.ctxOf(data, s);
@@ -114,3 +114,27 @@ describe('what a Hero starts with (#181)', () => {
     expect(within(t).queryByRole('button', { name: /Sell Firepots/, hidden: true })).toBeNull();
   });
 });
+
+describe('the War Beasts section of the Beastmaster', () => {
+  it('has its own section with each beast\'s stats and abilities, and buttons to take one on and let one go', async () => {
+    const d = sheet('reavers', 'beastmaster');
+    const sec = d.querySelector('section[aria-label="War Beasts"]')!;
+    expect(sec).toBeTruthy();
+    expect(within(sec as HTMLElement).getAllByRole('listitem', { hidden: true })).toHaveLength(3);
+    const hound = within(sec as HTMLElement).getByRole('listitem', { name: 'Estalian Warhound', hidden: true });
+    expect(hound.textContent).toMatch(/25 gc/);
+    expect(hound.textContent).toMatch(/0 of 2/);
+    expect(within(hound).getByRole('img', { name: /^M 6, WS 4, BS 0, S 4, T 3, W 1, I 4, A 1, Ld 5/, hidden: true })).toBeTruthy();
+    expect(hound.textContent).toMatch(/Animal/);
+    const user = userEvent.setup();
+    await user.click(within(hound).getByRole('button', { name: 'Add Estalian Warhound', hidden: true }));
+    expect(act.addBeast).toHaveBeenCalledWith('warhound');
+    expect((within(hound).getByRole('button', { name: 'Let Estalian Warhound go', hidden: true }) as HTMLButtonElement).disabled).toBe(true); // none to let go yet
+  });
+
+  it('is not there for a warrior with no beasts', () => {
+    const d = sheet('reavers', 'conqueror');
+    expect(d.querySelector('section[aria-label="War Beasts"]')).toBeNull();
+  });
+});
+

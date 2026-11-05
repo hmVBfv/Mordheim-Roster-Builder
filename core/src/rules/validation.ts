@@ -8,7 +8,7 @@ import type { Model } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
 import { isPlanner } from './planner.ts';
-import { countOf, goldCurrent, modelsOf, ratioMen, totalHeroes, totalModels, unitMax, warbandMax } from './costs.ts';
+import { beastMasterOf, countOf, goldCurrent, modelsOf, ratioMen, totalHeroes, totalModels, unitMax, warbandMax } from './costs.ts';
 import { eqWeaponLimit } from './equipment.ts';
 import { eqListFor, itemFamily, unitDef, unitGear, warbandDef } from './lookup.ts';
 import { isMarauderSeer, leaderUid } from './profile.ts';
@@ -152,6 +152,8 @@ export function warbandWarnings(ctx: Ctx): string[] {
 /** What a unit's limit rests on when it hangs on others (`maxPer`) and they, not its own maximum, set it
     ("at most 2 for each Orc Boss … in the warband (1 now)"); null otherwise (report #51). */
 export function ratioReason(ctx: Ctx, u: UnitDef): string | null {
+  const master = beastMasterOf(ctx, u);
+  if (master) return `${master.name}: up to ${master.beastMax ?? 'any number of'} War Beasts together, none without him`;
   const mp = u.maxPer;
   if (!mp) return null;
   const men = ratioMen(ctx, mp);

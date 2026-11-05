@@ -29,9 +29,22 @@ export function modelsOf(ctx: Ctx, id: string): number {
     (mordheimer.net, the warband pages; report #46). */
 export function unitMax(ctx: Ctx, def: UnitDef): number | null | undefined {
   if (ctx.s.wb === 'maraudersofchaos' && ctx.s.subtype === 'kurgan' && def.id === 'warhound') return null;
+  const master = beastMasterOf(ctx, def);
+  if (master) return Math.max(0, Math.min(def.max ?? Infinity, beastRoom(ctx, master, def.id)));
   const mp = def.maxPer;
   if (!mp) return def.max;
   return Math.min(def.max ?? Infinity, mp.per * ratioMen(ctx, mp));
+}
+
+/** The unit that keeps this one as a War Beast (the Lustrian Reavers' Beastmaster), if any. */
+export function beastMasterOf(ctx: Ctx, def: UnitDef): UnitDef | undefined {
+  return warbandDef(ctx)?.units.find((u) => u.beasts?.includes(def.id));
+}
+
+/** How many of a beast the warband has room for: the masters' places, less the other kinds of beast already there. */
+export function beastRoom(ctx: Ctx, master: UnitDef, id: string): number {
+  const others = (master.beasts ?? []).filter((b) => b !== id).reduce((n, b) => n + modelsOf(ctx, b), 0);
+  return (master.beastMax ?? Infinity) * modelsOf(ctx, master.id) - others;
 }
 
 /** The men a `maxPer` limit counts: a Hero or a promoted henchman one each, a group its men. */

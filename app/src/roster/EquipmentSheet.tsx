@@ -7,6 +7,7 @@ import { useId, useState } from 'react';
 import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import type { useSheet } from '../ui/useSheet.ts';
+import { Strip } from './Bits.tsx';
 import type { EquipmentView } from './equipment.ts';
 import styles from './Roster.module.css';
 
@@ -22,6 +23,9 @@ export interface EquipmentActions {
   paid: (de: string, gc: number, slot: number) => void;
   /** Sells a piece of what he starts with, for half its price (from the first battle on). */
   sellStart: (piece: string) => void;
+  /** Takes on a War Beast of a Beastmaster, or lets one go. */
+  addBeast: (id: string) => void;
+  dropBeast: (id: string) => void;
 }
 
 function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void }) {
@@ -97,6 +101,34 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
           </table>
         )}
       </section>
+      {v.beasts.length > 0 && (
+        <section className={styles.eqGroup} aria-label="War Beasts">
+          <h3>War Beasts</h3>
+          <p className={ui.muted}>They fight beside him and count toward the warband's size. Each has its own place; together there is room for the number below.</p>
+          <ul className={styles.beasts}>
+            {v.beasts.map((b) => (
+              <li key={b.id} aria-label={b.name} className={styles.beast}>
+                <div className={styles.beastHead}>
+                  <b>{b.name}</b>
+                  <span>{b.price} gc</span>
+                  <span>{b.count} of {b.max ?? 'any'}</span>
+                </div>
+                <Strip cells={b.stats} save={null} />
+                {b.rules.length > 0 && (
+                  <dl className={styles.beastRules}>
+                    {b.rules.map((r) => <div key={r.name}><dt>{r.name}</dt><dd>{r.text}</dd></div>)}
+                  </dl>
+                )}
+                {b.why && <small className={ui.muted}>No more: {b.why}.</small>}
+                <div className={ui.actions}>
+                  <button type="button" className={ui.buttonQuiet} aria-label={`Let ${b.name} go`} disabled={b.count === 0} onClick={() => act.dropBeast(b.id)}>−</button>
+                  <button type="button" className={ui.button} aria-label={`Add ${b.name}`} disabled={!b.canAdd} onClick={() => act.addBeast(b.id)}>+ Add · {b.price} gc</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section className={styles.eqGroup} aria-label="Buy from the list">
         <h3 className={styles.eqBuyHead}>Buy from the list</h3>
       {/* the list, one small table for each kind, side by side where there is room (#115) */}

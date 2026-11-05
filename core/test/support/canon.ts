@@ -12,9 +12,9 @@
  *     core produces with normalizeState(). */
 import * as core from '../../src/index.ts';
 import type { WarbandState } from '../../src/index.ts';
-import { loadGameData } from '../../src/node.ts';
+import { loadParityData } from './parityData.ts';
 
-export const data = loadGameData();
+export const data = loadParityData();
 
 type Rec = Record<string, unknown>;
 type IdRef = [holder: Rec, key: string];
