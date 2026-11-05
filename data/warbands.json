@@ -3402,6 +3402,10 @@
       "speed",
       "deSkills"
      ],
+     "beasts": [
+      "coldone"
+     ],
+     "beastMax": 2,
      "sp": "Allows Cold One Beasthounds."
     },
     {
@@ -7787,7 +7791,13 @@
       "strength",
       "speed"
      ],
-     "sp": "Starts with Heavy Armour, Spear and Sword. War Beasts: You may include up to 2 War Beasts (below); within 6\" they may use the Beastmaster's Leadership."
+     "beasts": [
+      "warhound",
+      "monkey",
+      "hawk"
+     ],
+     "beastMax": 2,
+     "sp": "Starts with Heavy Armour, Spear and Sword. War Beasts: You may include up to 2 War Beasts in all (Estalian Warhound, Barbary Monkey, Tilean Hunting Hawk), bought with his equipment; within 6\" they may use the Beastmaster's Leadership."
     },
     {
      "id": "shadow",
@@ -7874,7 +7884,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "War Beast (Beastmaster only); counts toward the warband maximum. 5+ armour save from padded armour and iron collar. Animal: No weapons/armour and never gains Experience; injured exactly as a Henchman (dead on 1-2)."
+     "sp": "War Beast: Beastmaster only; counts toward the warband maximum. Armour save: 5+ from padded armour and iron collar. Animal: No weapons/armour and never gains Experience; injured exactly as a Henchman (dead on 1-2)."
     },
     {
      "id": "monkey",
@@ -7896,7 +7906,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "War Beast (Beastmaster only); counts toward the warband maximum. Nimble: Climbs any sheer surface without Initiative tests, re-rolls failed Diving Charge tests, and may enter buildings. Has a 5+ Ward save against any wound (melee, shooting, magic, falling). Animal: Never gains Experience; injured as a Henchman (dead on 1-2)."
+     "sp": "War Beast: Beastmaster only; counts toward the warband maximum. Nimble: Climbs any sheer surface without Initiative tests, re-rolls failed Diving Charge tests, and may enter buildings. Has a 5+ Ward save against any wound (melee, shooting, magic, falling). Animal: Never gains Experience; injured as a Henchman (dead on 1-2)."
     },
     {
      "id": "hawk",
@@ -7918,7 +7928,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "War Beast (Beastmaster only); counts toward the warband maximum. Part of the equipment: Acts with the Beastmaster and may attack any enemy within 12\" (even out of line of sight, unless Hidden) then returns; it cannot be targeted separately, and does not attack while the Beastmaster is in close combat. Animal: Never gains Experience; injured as a Henchman (dead on 1-2)."
+     "sp": "War Beast: Beastmaster only; counts toward the warband maximum. Part of the equipment: Acts with the Beastmaster and may attack any enemy within 12\" (even out of line of sight, unless Hidden) then returns; it cannot be targeted separately, and does not attack while the Beastmaster is in close combat. Animal: Never gains Experience; injured as a Henchman (dead on 1-2)."
     },
     {
      "id": "prospect",

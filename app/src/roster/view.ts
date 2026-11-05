@@ -250,7 +250,7 @@ const lead = (v: unknown): number | null => {
   return m ? Number(m[1]) : null;
 };
 
-function statCells(p: Profile | null, base: Profile | null | undefined, attacks?: string | number): StatCell[] {
+export function statCells(p: Profile | null, base: Profile | null | undefined, attacks?: string | number): StatCell[] {
   return STATS.map((k) => {
     const v = k === 'A' && attacks != null ? attacks : p?.[k];
     const changed = base != null && p != null && String(p[k]) !== String(base[k]);

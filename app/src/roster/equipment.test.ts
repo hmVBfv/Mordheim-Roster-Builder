@@ -268,3 +268,40 @@ describe('a poison is let go as used (#118)', () => {
     expect(core.goldCurrent(ctx(t))).toBe(gold);
   });
 });
+
+describe('the War Beasts in a Beastmaster\'s equipment (#198)', () => {
+  const reavers = () => {
+    let s = createWarband(data, 'reavers', null, '');
+    s = core.addUnit(ctx(s), 'beastmaster');
+    return s;
+  };
+  const beasts = (s: WarbandState) => equipmentView(ctx(s), s.models.find((m) => m.uid_def === 'beastmaster')!.uid)!.beasts;
+
+  it('lists each beast with its price, stats, abilities and how many he may have', () => {
+    const b = beasts(reavers());
+    expect(b.map((x) => [x.id, x.name, x.price, x.count, x.max])).toEqual([
+      ['warhound', 'Estalian Warhound', 25, 0, 2], ['monkey', 'Barbary Monkey', 40, 0, 1], ['hawk', 'Tilean Hunting Hawk', 30, 0, 1],
+    ]);
+    expect(b[0]!.stats.map((c) => c.key)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);
+    expect(b[0]!.stats.map((c) => c.value)).toEqual(['6', '4', '0', '4', '3', '1', '4', '1', '5']);
+    expect(b[0]!.rules.map((r) => r.name)).toEqual(['War Beast', 'Armour save', 'Animal']);
+    expect(b[1]!.rules.map((r) => r.name)).toEqual(['War Beast', 'Nimble', 'Animal']);
+    expect(b[2]!.rules.map((r) => r.name)).toEqual(['War Beast', 'Part of the equipment', 'Animal']);
+    expect(b.every((x) => x.canAdd && x.why === null)).toBe(true);
+  });
+
+  it('counts the room together: after two beasts none may be added, and the reason is given', () => {
+    let s = reavers();
+    s = core.addBeast(ctx(s), 'warhound');
+    s = core.addBeast(ctx(s), 'hawk');
+    const b = beasts(s);
+    expect(b.map((x) => [x.id, x.count, x.canAdd])).toEqual([['warhound', 1, false], ['monkey', 0, false], ['hawk', 1, false]]);
+    expect(b[1]!.why).toMatch(/up to 2 War Beasts together/);
+  });
+
+  it('is nothing for a warrior who keeps no beasts', () => {
+    let s = createWarband(data, 'reavers', null, '');
+    s = core.addUnit(ctx(s), 'conqueror');
+    expect(equipmentView(ctx(s), s.models[0]!.uid)!.beasts).toEqual([]);
+  });
+});

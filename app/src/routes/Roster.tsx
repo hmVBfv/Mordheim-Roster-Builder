@@ -352,6 +352,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         upgrade: (de, weapon, on) => ed.edit((c) => core.setUpgradeOn(c, eqOf!, de, weapon, on)),
         paid: (de, gc, slot) => ed.edit((c) => core.setRarePaid(c, eqOf!, de, gc, slot), `Paid set to ${gc} gc.`),
         sellStart: (piece) => ed.edit((c) => core.sellStartGear(c, eqOf!, piece).state, `Sold ${piece}.`),
+        addBeast: (id) => ed.edit((c) => core.addBeast(c, id), `${core.unitDef(ctx, id)?.name ?? 'The beast'} taken on.`),
+        dropBeast: (id) => ed.edit((c) => core.dropBeast(c, id), `${core.unitDef(ctx, id)?.name ?? 'The beast'} let go.`),
       }} />
       <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
         onRecruit={(u) => ed.edit((c) => core.recruitUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />

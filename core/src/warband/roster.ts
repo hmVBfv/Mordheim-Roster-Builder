@@ -4,7 +4,7 @@
 import type { Model, StashItem, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
-import { henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
+import { beastMasterOf, henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
 import { withFreeDagger, upgradeBase, upgradeFree, upgradePaid, upgradeRoom, upgradeSlots, upgradeTargets } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
 import { catalogDefaultPaid } from '../rules/pricing.ts';
@@ -58,6 +58,25 @@ export function addUnit(ctx: Ctx, id: string): WarbandState {
     d.models.push(withFreeDagger(c, m));
     logEvent(d, 'recruit', `Recruited ${def.name} (${def.cost || 0} gc).`, { uid: m.uid, name: m.name, uid_def: id, cost: def.cost || 0, grade: def.t === 'hero' ? 'hero' : 'hench' });
   });
+}
+
+/** Takes on a War Beast of a Beastmaster (the Reavers'): one more man of its group, or the group itself; refused where the room is used up. */
+export function addBeast(ctx: Ctx, id: string): WarbandState {
+  const def = unitDef(ctx, id);
+  if (!def || !beastMasterOf(ctx, def)) return ctx.s;
+  const g = ctx.s.models.find((m) => m.uid_def === id && !m.promoted);
+  if (!g) return addUnit(ctx, id);
+  const next = setQty(ctx, g.uid, (Number(g.qty) || 1) + 1);
+  return next.models.find((m) => m.uid === g.uid)?.qty === g.qty ? ctx.s : next;
+}
+
+/** Lets one War Beast go: the group shrinks by one; the last one is removed. */
+export function dropBeast(ctx: Ctx, id: string): WarbandState {
+  const def = unitDef(ctx, id);
+  if (!def || !beastMasterOf(ctx, def)) return ctx.s;
+  const g = ctx.s.models.find((m) => m.uid_def === id && !m.promoted);
+  if (!g) return ctx.s;
+  return (Number(g.qty) || 1) > 1 ? setQty(ctx, g.uid, (Number(g.qty) || 1) - 1) : removeUnit(ctx, g.uid);
 }
 
 /** Removes an entry for good (for a death use the fallen path instead). */

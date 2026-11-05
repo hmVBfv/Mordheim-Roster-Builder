@@ -5,7 +5,7 @@ import * as core from '@mordheim/core';
 import type { CatalogItem, Model, WarbandState } from '@mordheim/core';
 import { priceAverage, priceRange, priceText } from './rarePrice.ts';
 import { itemTip, type Tip } from './tips.ts';
-import { rosterView, type StatCell } from './view.ts';
+import { rosterView, statCells, type StatCell } from './view.ts';
 
 const CATS: Record<string, string> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour', Besonderes: 'Other', 'Besonderes (nur Heldinnen)': 'Other (Heroines only)' };
 export const KINDS = [['all', 'All'], ['cc', 'Close'], ['missile', 'Missile'], ['armour', 'Armour'], ['misc', 'Other']] as const;
@@ -46,6 +46,13 @@ export interface CarriedRow {
   /** How many of the key he has (what the − of this line sets it to, less one). */
   qty: number;
 }
+/** A War Beast a Beastmaster may keep (the Lustrian Reavers', the Dark Elves'): its price, stats and abilities, how many there are and may be. */
+export interface BeastRow {
+  id: string; name: string; price: number; count: number; max: number | null;
+  stats: StatCell[]; rules: { name: string; text: string }[];
+  /** Why no more may be taken on, or null. */
+  why: string | null; canAdd: boolean;
+}
 export interface RareOffer { de: string; name: string; price: string; rarity: string }
 
 export interface EquipmentView {
@@ -55,6 +62,8 @@ export interface EquipmentView {
   groups: ListGroup[];
   rare: RareRow[];
   offer: RareOffer[];
+  /** The War Beasts he keeps (a Beastmaster), none for anybody else. */
+  beasts: BeastRow[];
   /** Everything he carries, one line each, the upgrades on their weapons. */
   carried: CarriedRow[];
   /** One price per man: a henchman group pays for every man. */
@@ -109,7 +118,23 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
     .map((it) => ({ de: it.de, name: it.en, price: typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost), rarity: it.rare || '' }))
     .sort((a, b) => a.name.localeCompare(b.name));
   const carried = carriedRows(ctx, m, { recruit, free, atStart });
-  return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, carried, men: menOf(ctx, m), recruit };
+  return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, beasts: beastRows(ctx, def), carried, men: menOf(ctx, m), recruit };
+}
+
+/** The War Beasts of a unit that keeps them, each with what it costs, what it can do, and the room left for it. */
+function beastRows(ctx: core.Ctx, master: core.UnitDef | undefined): BeastRow[] {
+  return (master?.beasts ?? []).flatMap((id) => {
+    const u = core.unitDef(ctx, id);
+    const st = core.recruitStatus(ctx, id);
+    if (!u || !st) return [];
+    const room = st.atMax ? (core.ratioReason(ctx, u) ?? 'the room is used') : null;
+    return [{
+      id, name: u.name, price: core.unitBaseCost(ctx, u), count: st.count, max: st.max ?? null,
+      stats: u.profile ? statCells(u.profile as core.Profile, null) : [],
+      rules: core.ruleDefs(u.sp ?? '', `Special rule · ${u.name}`).map((r) => ({ name: r.name, text: r.text })),
+      why: room, canAdd: !st.atMax && (st.max == null || st.count < st.max),
+    }];
+  });
 }
 
 /** Everything a warrior carries, a line for each piece: the list items, then the rare ones that are not upgrades; the upgrades

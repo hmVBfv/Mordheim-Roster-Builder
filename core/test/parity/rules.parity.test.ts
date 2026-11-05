@@ -9,7 +9,7 @@ import { legacyUnitMax } from '../support/orcLimits.ts';
 import { beforeAll, describe, expect, it } from 'vitest';
 import * as core from '../../src/index.ts';
 import type { HireEntry, HireRecord, Model, WarbandState } from '../../src/index.ts';
-import { loadGameData } from '../../src/node.ts';
+import { loadParityData } from '../support/parityData.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { withoutNewHouseKeys } from '../support/canon.ts';
 import { legacyMax } from '../support/cookbook.ts';
@@ -17,7 +17,7 @@ import { isFixedOnly, keptForOtherUnit } from '../support/fixedWeapons.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { rng } from '../support/random.ts';
 
-const data = loadGameData();
+const data = loadParityData();
 const fixtures = generateFixtures(data);
 /* Intended difference (docs/behaviour-changes.md, "Zauberer-Gegenstände"): items for
    spellcasters only are offered to whoever casts from a spell list; legacy knew
