@@ -4753,3 +4753,25 @@ so most of the work is a data field or a rule with a test over all warbands, not
 - **#202, the Chaos Dwarfs' armour rule (PR 341).** The rule belongs to the race, not to the armour (Rob). It stood only in the warband's rules, so the
   units it holds for had no word and no tooltip; each now names "Armour:" itself. Left for Rob: the Black Dwarfs' Sorcerer names neither Hard Head
   nor Hard to Kill although the warband's rule says "all except Informers".
+
+**The second run of 6.11.2026, seven reports (PRs 343 to 348).** Rob confirmed all of them, the wishes and the data changes included, and asked
+that the Dwarf rules follow a format valid for every warband, not the wording of one.
+
+- **#211, a dagger twice (PR 343).** A second dagger upgraded to Gromril showed as "2× Dagger" and "Dagger (Gromril)": the upgrade has a line of its
+  own for each weapon it sits on (#109), but the weapon was still counted among the plain copies. The weapon that carries it is now that line, for
+  every weapon of every warband. Legacy counts it twice, so it is a recorded behaviour change, and the parity suite needed two narrow exclusions:
+  the export report leaves out equipment lines, cards, text and fallen tally of a state with such an upgrade, and the mirror leaves out the equipment
+  line of a Tabletop Simulator text that names one. A wrong turn: the first mirror exclusion removed only the counts, which was not enough, since a
+  lone upgraded dagger loses its plain line altogether.
+- **#205, the Skinks' Scaly Skin (PR 344).** The page says Saurus 5+, Skinks 6+, but only the Saurus named the rule, which is what gives a unit the word
+  and the save in its stats. The three Skink units now name "Scaly Skin 6+". A scan of every warband page for natural saves found no other case.
+- **#206, "Skinks" as a rule (PR 345).** The page's two rules, Aquatic and Jungle born, were one sentence under the name "Skinks"; they have their
+  headings and texts now.
+- **#210 and #207, the warband's rules as text (PR 346).** One branch, since both change the same section. The rules are text with name and text, not
+  words to tap, and the unit choice (the "Choice:" line) has a section of its own. The Dwarf warbands had all their rules in one "Dwarf rules" heading
+  (the Treasure Hunters' tag was never closed, which a count of tags did not show since a stray closing tag made them equal), so the data test checks
+  that each tag closes before the next opens. The wording is that of the report for the shared Dwarf rules in both warbands; Rob thought it might
+  belong to the Treasure Hunters rather than the Rangers, which is a line of data if it must differ.
+- **#209, the Start button (PR 347).** The bar sticks above the navigation. A test of the layout needs a real browser, so it is an end-to-end test.
+- **#208, look at the Trading Post (PR 348).** Before the first battle the page shows the rare items with rarity, chance and price and the common items,
+  with no button to buy, search or sell.
