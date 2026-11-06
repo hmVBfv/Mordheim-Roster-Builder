@@ -83,6 +83,19 @@ test('the Look for field of the new-warband filter has a row of its own', async 
   expect(look.width, 'wider than a single field').toBeGreaterThan(race.width * 2);
 });
 
+/* Wish of 6.11.2026: a warband picked from the long list is confirmed without scrolling down to the end of the form: the button stays in view
+   above the navigation, on a phone. */
+test('the new-warband form keeps its Start button in view once a warband is picked', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
+  const start = page.getByRole('button', { name: 'Start the warband' });
+  await expect(start).toBeInViewport({ ratio: 1 });
+  const nav = (await page.locator('nav').first().boundingBox())!;
+  const box = (await start.boundingBox())!;
+  expect(box.y + box.height, 'above the navigation').toBeLessThanOrEqual(nav.y + 0.5);
+});
+
 /* #132: a long warband name stays inside the navigation on a desktop and wraps there, it does not widen the bar and push the arrows. */
 test('a long warband name wraps inside the side navigation', async ({ page }) => {
   await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
