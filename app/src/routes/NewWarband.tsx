@@ -120,7 +120,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
         </label>
       )}
       {choice && !planner && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
-      <div className={ui.actions}>
+      <div className={`${ui.actions} ${ui.stickyActions}`}>
         <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
         <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>
       </div>

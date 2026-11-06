@@ -97,6 +97,22 @@
   justify-content: flex-end;
 }
 
+/* The buttons of a long form stay in view above the navigation, so the form can be finished without scrolling to its end (#209). */
+.stickyActions {
+  position: sticky;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  z-index: 1;
+  padding: var(--space-3) 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 900px) {
+  .stickyActions {
+    bottom: 0;
+  }
+}
+
 .list {
   list-style: none;
   margin: 0;
