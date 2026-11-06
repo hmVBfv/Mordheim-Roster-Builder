@@ -2,16 +2,16 @@
 import * as core from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { data } from '../test/data.ts';
-import { warbandRuleFacts } from './tips.ts';
+import { warbandRuleTexts } from './tips.ts';
 
 describe('the rules of the Lizardmen', () => {
-  const facts = warbandRuleFacts(core.ctxOf(data, core.newWarband(data, 'lizardmen')));
+  const rules = warbandRuleTexts(core.ctxOf(data, core.newWarband(data, 'lizardmen'))).rules;
 
   it('name Aquatic and Jungle born each on their own, not one rule "Skinks"', () => {
-    const labels = facts.map((f) => f.label);
+    const labels = rules.map((r) => r.name);
     expect(labels).toEqual(expect.arrayContaining(['Aquatic', 'Jungle born']));
     expect(labels).not.toContain('Skinks');
-    expect(facts.find((f) => f.label === 'Aquatic')!.tips[0]!.text).toMatch(/water terrain with no penalty.*cover/i);
-    expect(facts.find((f) => f.label === 'Jungle born')!.tips[0]!.text).toMatch(/jungle terrain without penalty/i);
+    expect(rules.find((r) => r.name === 'Aquatic')!.text).toMatch(/water terrain with no penalty.*cover/i);
+    expect(rules.find((r) => r.name === 'Jungle born')!.text).toMatch(/jungle terrain without penalty/i);
   });
 });
