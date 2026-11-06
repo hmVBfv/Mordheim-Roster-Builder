@@ -49,6 +49,20 @@ const SAVE = { wb: 'merc', name: 'The Probes', models: [], format: 2 };
 
 const DENIED = ['sign_in', 'forbidden'];
 
+/** Routes that change something and need no audit entry, with the reason. Anything else that writes must log (#200). */
+const NOT_AUDITED: Record<string, string> = {
+  'POST /api/v1/auth/login': 'a sign-in is recorded in the sign-in log (login_attempts), with the device and the reason',
+  'POST /api/v1/auth/logout': 'ends the caller\'s own session; nothing else changes',
+  'POST /api/v1/auth/totp': 'the second step of a sign-in, recorded in the sign-in log',
+  'POST /api/v1/account/totp/setup': 'draws a secret that is not active until the code is confirmed (that step is logged)',
+  'POST /api/v1/invites/check': 'only reads whether a register link is good',
+  'POST /api/v1/shares/peek': 'only reads what a share code holds',
+  'PUT /api/v1/campaigns/:id/archive': 'each member\'s own tidy-up of his list, not a change of the campaign',
+  'PUT /api/v1/campaigns/:id/vanilla': 'the probe\'s campaign is not Vanilla: nothing changes (turning Vanilla off is logged as campaign.vanilla_off)',
+  'PUT /api/v1/library/:id': 'a private notebook entry of its owner, never shared',
+  'DELETE /api/v1/library/:id': 'a private notebook entry of its owner, never shared',
+};
+
 /** A stream (the live signals): the status, headers and first bytes over a real connection of its own, then hung up on. */
 async function callStream(url: string, token: string | null): Promise<LightMyRequestResponse> {
   const o = await openStream(url, token ? { cookie: `${COOKIE}=${token}` } : {});
@@ -273,11 +287,15 @@ describe('leak-test matrix', () => {
       admin: () => admin.session(),
     };
     const problems: string[] = [];
+    const lastSeq = () => (s.db.prepare('SELECT COALESCE(MAX(seq), 0) AS n FROM audit_log').get() as { n: number }).n;
+    /** The routes that changed something and left no entry in the audit log, whoever called them. */
+    const unlogged = new Set<string>();
     let probes = 0;
     for (const [action, row] of Object.entries(MATRIX) as [Action, (typeof MATRIX)[Action]][]) {
       for (const [route, probe] of Object.entries(row.routes)) {
         for (const role of ROLES) {
           const p = probe(ctx);
+          const seqBefore = lastSeq();
           const res = p.stream
             ? await callStream(`${s.url}${p.url}`, tokenFor[role]())
             : await s.call({ method: p.method, url: p.url, body: p.body, token: tokenFor[role](), ...(p.headers ? { headers: p.headers } : {}) });
@@ -297,6 +315,7 @@ describe('leak-test matrix', () => {
             problems.push(`${where}: turned away (${res.statusCode})`);
             continue;
           }
+          if (p.method !== 'GET' && p.method !== 'HEAD' && res.statusCode < 300 && lastSeq() === seqBefore) unlogged.add(route);
           if (json) {
             const found = walk(json);
             for (const k of found.keys.filter((k) => SECRET_KEYS.includes(k))) problems.push(`${where}: answer carries "${k}"`);
@@ -311,6 +330,8 @@ describe('leak-test matrix', () => {
       }
     }
     expect(problems).toEqual([]);
+    // every change is in the audit log (#200); a route that is not, is named here with the reason
+    expect([...unlogged].sort()).toEqual(Object.keys(NOT_AUDITED).sort());
     expect(probes).toBe(Object.values(MATRIX).reduce((n, r) => n + Object.keys(r.routes).length, 0) * ROLES.length);
   });
 
