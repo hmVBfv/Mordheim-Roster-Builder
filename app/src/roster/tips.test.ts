@@ -284,6 +284,44 @@ describe('a unit\'s "May buy" is no rule of his card (Saurus Slayer)', () => {
 });
 
 
+/* Report of 6.11.2026: the Chaos Dwarfs' rule "never suffer movement penalties for wearing armour" belongs to the Chaos Dwarfs, not to the armour.
+   It stood in the warband's rules only; the units it holds for did not name it, so it had no word and no tooltip on their cards. */
+describe('the Chaos Dwarfs\' armour rule', () => {
+  const rulesOf = (wb: string, unit: string) => {
+    const s = core.addUnit(ctx(core.newWarband(data, wb)), unit);
+    return warriorFacts(ctx(s), s.models[0]!).rules;
+  };
+
+  it('is a word with its text on each unit it holds for', () => {
+    const holds: [string, string][] = [
+      ['sonsofhashut', 'sorcerer'], ['sonsofhashut', 'bull'], ['sonsofhashut', 'champion'], ['sonsofhashut', 'cdwarf'], ['sonsofhashut', 'blunder'],
+      ['blackdwarfs', 'sorcerer'], ['blackdwarfs', 'bull'], ['blackdwarfs', 'gaoler'], ['blackdwarfs', 'cdwarf'],
+    ];
+    for (const [wb, id] of holds) {
+      const armour = rulesOf(wb, id).find((r) => r.label === 'Armour');
+      expect(armour, `${wb}/${id}`).toBeTruthy();
+      expect(armour!.tips[0]!.text, `${wb}/${id}`).toMatch(/never suffers? movement penalties for wearing armour/i);
+    }
+  });
+
+  /* "All warriors except Informers" is an erratum the project accepts (Rob, 6.11.2026): the Sorcerer has Hard Head and Hard to Kill too. */
+  it('goes with Hard Head and Hard to Kill on every Black Dwarf but the Informer', () => {
+    for (const id of ['sorcerer', 'bull', 'gaoler', 'cdwarf']) {
+      expect(rulesOf('blackdwarfs', id).map((r) => r.label), id).toEqual(expect.arrayContaining(['Hard Head', 'Hard to Kill', 'Armour']));
+    }
+    expect(rulesOf('blackdwarfs', 'informer').map((r) => r.label)).not.toEqual(expect.arrayContaining(['Hard Head']));
+  });
+
+  it('is not on the Hobgoblins or the Informers, who are no Chaos Dwarfs', () => {
+    expect(rulesOf('sonsofhashut', 'hobgob').some((r) => r.label === 'Armour')).toBe(false);
+    expect(rulesOf('blackdwarfs', 'informer').some((r) => r.label === 'Armour')).toBe(false);
+  });
+
+  it('is said once on the Bull Centaur, who had it in other words', () => {
+    expect(rulesOf('sonsofhashut', 'bull').filter((r) => /armour|penalt/i.test(r.label))).toHaveLength(1);
+  });
+});
+
 /* Report of 6.11.2026: the Hobgoblin listed "Nobody cares" twice – once as the ability the rules text mentions ("Nobody cares about them"),
    once as the rule his text defines by name ("Nobody cares:"). The Priest of Taal's "Prayers" and "Prayers of Taal" were the same. */
 describe('a rule is listed once', () => {
