@@ -157,7 +157,7 @@ describe('the overview', () => {
     expect(screen.getByText(/^Anna · /)).toBeTruthy();
     expect(screen.getByText(new RegExp(`Start marked .* \\(version 1\\): rating ${totals(anna).rating}`))).toBeTruthy();
     // to read only: a row each, and opened a card without any button to change something
-    const row = (await screen.findAllByRole('button', { expanded: false }))[0]!;
+    const row = (await screen.findAllByRole('button', { expanded: false })).find((b) => b.hasAttribute('aria-describedby'))!; // the first row, not a rule word above them
     await user.click(row);
     const card = await screen.findByRole('article');
     expect(within(card).getAllByRole('columnheader').length).toBeGreaterThan(8);

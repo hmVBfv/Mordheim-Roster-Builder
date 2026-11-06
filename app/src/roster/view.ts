@@ -2,7 +2,7 @@
    the React components so it can be tested without drawing anything. */
 import * as core from '@mordheim/core';
 import type { GameData, HireRecord, Model, Profile, UnitDef, WarbandState } from '@mordheim/core';
-import { hireFacts, warriorFacts, type Fact, type SpellLore } from './tips.ts';
+import { hireFacts, warbandRuleFacts, warriorFacts, type Fact, type SpellLore } from './tips.ts';
 
 export type { Fact, Tip } from './tips.ts';
 
@@ -132,6 +132,8 @@ export interface RosterView {
   maxModels: number;
   /** Of the maximum, what a Halfling Scout or the like adds to the warband's own (#82). */
   maxBonus: number;
+  /** What the warband's page names as rules of the whole warband (#203), each with its text. */
+  warbandRules: Fact[];
   heroes: WarriorView[];
   heroCount: number;
   heroMax: number;
@@ -462,6 +464,7 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
     maxBonus: core.warbandMaxBonus(ctx),
     campaign: camp?.on ? core.roundLabel(camp.round) : null,
     warnings: core.warbandWarnings(ctx),
+    warbandRules: warbandRuleFacts(ctx),
     heroes,
     heroCount: core.totalHeroes(ctx),
     heroMax: heroMaxOf(ctx),
