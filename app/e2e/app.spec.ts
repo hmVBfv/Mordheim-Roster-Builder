@@ -934,7 +934,7 @@ for (const theme of THEMES) {
     await importSample(page);
     await expect(page.locator('[data-layout]')).toHaveAttribute('data-layout', 'triple');
     const pane = (await page.getByRole('complementary', { name: 'Selected warrior' }).boundingBox())!;
-    const warband = (await page.getByRole('heading', { level: 2, name: 'Warband' }).boundingBox())!;
+    const warband = (await page.getByRole('heading', { level: 2, name: 'Warband', exact: true }).boundingBox())!;
     expect(warband.x, 'the warband’s functions are the third column').toBeGreaterThan(pane.x + pane.width);
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-desktop-wide-roster`);

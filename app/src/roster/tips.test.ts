@@ -304,6 +304,14 @@ describe('the Chaos Dwarfs\' armour rule', () => {
     }
   });
 
+  /* "All warriors except Informers" is an erratum the project accepts (Rob, 6.11.2026): the Sorcerer has Hard Head and Hard to Kill too. */
+  it('goes with Hard Head and Hard to Kill on every Black Dwarf but the Informer', () => {
+    for (const id of ['sorcerer', 'bull', 'gaoler', 'cdwarf']) {
+      expect(rulesOf('blackdwarfs', id).map((r) => r.label), id).toEqual(expect.arrayContaining(['Hard Head', 'Hard to Kill', 'Armour']));
+    }
+    expect(rulesOf('blackdwarfs', 'informer').map((r) => r.label)).not.toEqual(expect.arrayContaining(['Hard Head']));
+  });
+
   it('is not on the Hobgoblins or the Informers, who are no Chaos Dwarfs', () => {
     expect(rulesOf('sonsofhashut', 'hobgob').some((r) => r.label === 'Armour')).toBe(false);
     expect(rulesOf('blackdwarfs', 'informer').some((r) => r.label === 'Armour')).toBe(false);
@@ -311,5 +319,37 @@ describe('the Chaos Dwarfs\' armour rule', () => {
 
   it('is said once on the Bull Centaur, who had it in other words', () => {
     expect(rulesOf('sonsofhashut', 'bull').filter((r) => /armour|penalt/i.test(r.label))).toHaveLength(1);
+  });
+});
+
+/* Report of 6.11.2026: the Hobgoblin listed "Nobody cares" twice – once as the ability the rules text mentions ("Nobody cares about them"),
+   once as the rule his text defines by name ("Nobody cares:"). The Priest of Taal's "Prayers" and "Prayers of Taal" were the same. */
+describe('a rule is listed once', () => {
+  const words = (name: string) => core.ruleKey(name).split(' ').map((w) => (w.length > 3 ? w.replace(/s$/, '') : w));
+  const sameStart = (a: string, b: string) => {
+    const x = words(a), y = words(b);
+    const n = Math.min(x.length, y.length);
+    return x.slice(0, n).join(' ') === y.slice(0, n).join(' ');
+  };
+
+  it('for no unit of any warband do two of its rules begin with the same words', () => {
+    const twice: string[] = [];
+    for (const wb of Object.keys(data.WARBANDS)) {
+      for (const u of (data.WARBANDS[wb] as { units: { id: string }[] }).units) {
+        const s = core.addUnit(ctx(core.newWarband(data, wb)), u.id);
+        const m = s.models.at(-1);
+        if (!m) continue;
+        const rules = warriorFacts(ctx(s), m).rules;
+        rules.forEach((a, i) => rules.slice(i + 1).forEach((b) => { if (sameStart(a.label, b.label)) twice.push(`${wb}/${u.id}: ${a.label} / ${b.label}`); }));
+      }
+    }
+    expect(twice).toEqual([]);
+  });
+
+  it('shows the Hobgoblin\'s "Nobody cares" once, with the text of the rule', () => {
+    const s = core.addUnit(ctx(core.newWarband(data, 'sonsofhashut')), 'hobgob');
+    const rules = warriorFacts(ctx(s), s.models[0]!).rules;
+    expect(rules.filter((r) => /^nobody cares/i.test(r.label))).toHaveLength(1);
+    expect(rules.find((r) => /^nobody cares/i.test(r.label))!.tips[0]!.text).toMatch(/half a model/i);
   });
 });

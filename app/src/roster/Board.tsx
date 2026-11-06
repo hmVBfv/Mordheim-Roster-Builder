@@ -5,6 +5,7 @@
    in a pane beside the list, every section open. The same board shows
    another player's warband, read-only (without `acts`). */
 import { IconEdit } from '../ui/icons.tsx';
+import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Detail, TAB_LABEL, tabsFor, type TabId, type UnitActs } from './Detail.tsx';
@@ -125,6 +126,14 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
     <div ref={ref} className={styles.board} data-layout={layout}>
       {printing && <PrintSheet v={v} />}
       <div className={`${styles.list} ${styles.screenOnly}`}>
+        {v.warbandRules.length > 0 && (
+          <section aria-labelledby="board-warband-rules" className={styles.wbRules}>
+            <div className={styles.groupHead}><h2 id="board-warband-rules">Warband rules</h2><span>for the whole warband</span></div>
+            <ul className={styles.chipList}>
+              {v.warbandRules.map((f) => <li key={f.label}><TipWord label={f.label} tips={f.tips} /></li>)}
+            </ul>
+          </section>
+        )}
         {groups.map((g) => (
           <section key={g.id} aria-labelledby={`board-${g.id}`}>
             <div className={styles.groupHead}><h2 id={`board-${g.id}`}>{g.title}</h2>{g.note && <span>{g.note}</span>}</div>

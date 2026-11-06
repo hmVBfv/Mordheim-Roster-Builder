@@ -1300,3 +1300,13 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+/* the warband's own rules, above the units (#203) */
+.wbRules {
+  display: grid;
+  gap: 2px;
+}
+
+.wbRules .groupHead {
+  margin-bottom: 2px;
+}

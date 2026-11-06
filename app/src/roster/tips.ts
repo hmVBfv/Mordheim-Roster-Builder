@@ -100,6 +100,16 @@ function injury(data: GameData, j: core.Injury): Fact {
   return fact((j.name ?? '') + core.injModText(j), row ? tipOf(row, name, `Serious injury · ${row.code}`) : []);
 }
 
+/** A rule name as its words, a plural ignored: "Nobody cares" is "nobody care". */
+const wordsOf = (name: string) => core.ruleKey(name).split(' ').map((w) => (w.length > 3 ? w.replace(/s$/, '') : w));
+
+/** Is `rule` the beginning of `chip`'s name in whole words? ("Nobody cares" of "Nobody cares about them", "Prayers" of "Prayers of Taal":
+    the text defines by a short name what the ability names at length – one rule, not two.) */
+const startsChip = (rule: string, chip: string) => {
+  const r = wordsOf(rule), c = wordsOf(chip);
+  return r.length <= c.length && r.every((w, i) => w === c[i]);
+};
+
 /** The special rules of a warrior or a hired one: the abilities core finds
     in his rules (each in the owner's own wording where he defines it), then
     any other rule his text defines by name. `skip` holds names shown on
@@ -115,11 +125,17 @@ function rules(chips: (ItemInfo & { key: string })[], defs: core.RuleDef[], skip
   }
   for (const d of defs) {
     const k = core.ruleKey(d.name);
-    if (seen.has(k)) continue;
+    if (seen.has(k) || chips.some((c) => startsChip(d.name, c.name))) continue;
     seen.add(k);
     out.push(fact(d.name, tipOf(d, d.name, d.line)));
   }
   return out;
+}
+
+/** The rules the warband's page names for the whole warband or most of it ("Hard Head:", "Slavers:", …), each with its text. */
+export function warbandRuleFacts(ctx: core.Ctx): Fact[] {
+  const wb = core.warbandDef(ctx);
+  return wb?.rules ? core.ruleDefs(wb.rules, `Warband rule \u00b7 ${wb.name}`).map((d) => fact(d.name, tipOf(d, d.name, d.line))) : [];
 }
 
 /** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */
