@@ -380,7 +380,10 @@ describe('the rules of the warband', () => {
 
   it('give the Dwarfs each of their rules on its own, not one "Dwarf rules"', () => {
     const ranger = view('dwarfrangers', 'clansman').warbandRules.map((r) => r.name);
-    expect(ranger).toEqual(['Hard to Kill', 'Hard Head', 'Armour', 'Hate Orcs and Goblins', 'Grudgebearers', 'Incomparable Miners', 'Don’t Trust ‘Em']);
+    expect(ranger).toEqual(['Hard to Kill', 'Hard Head', 'Armour', 'Hate Orcs and Goblins', 'Grudgebearers', 'Incomparable Miners', 'Don’t Trust ‘Em', 'Gromril']);
+    // the page's whole text (mordheimer.net, Dwarf Rangers): what it means for the march and for All Alone tests as well
+    expect(view('dwarfrangers', 'clansman').warbandRules.find((r) => r.name === 'Don’t Trust ‘Em')!.text).toMatch(/stop members of the other from Marching.*All Alone tests.*not friends/);
+    expect(view('dwarfrangers', 'clansman').warbandRules.find((r) => r.name === 'Gromril')!.text).toBe(view('dwarftreasure', 'clansman').warbandRules.find((r) => r.name === 'Gromril')!.text);
     const hunters = view('dwarftreasure', 'clansman').warbandRules.map((r) => r.name);
     expect(hunters).toEqual(['Hard to Kill', 'Hard Head', 'Armour', 'Hate Orcs and Goblins', 'Incomparable Miners', 'Grudgebearers', 'Gromril']);
   });
