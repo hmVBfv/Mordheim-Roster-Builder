@@ -4612,7 +4612,7 @@
    "min": 3,
    "max": 20,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Skink Priest. Max. 1 Saurus Totem Warrior, 2 Skink Great Crests; any number of Skink Braves, max. 4 Saurus Braves (never more than Skink Braves), max. 1 Kroxigor.<br><b>Cold Blooded:</b> Roll 3D6 and pick the lowest 2 for psychology/Rout tests; the warband may never use the Leadership of Saurus or Kroxigor for Rout tests. <b>Scaly Skin:</b> Saurus 5+, Skinks 6+ (cannot be modified below 6; light armour/shield add +1). <b>Armour is rare:</b> Light armour always costs 50 gc. Skinks: Aquatic & Jungle born. <i>Town Cryer #11 version (Lustria).</i>",
+   "rules": "<b>Choice:</b> Exactly 1 Skink Priest. Max. 1 Saurus Totem Warrior, 2 Skink Great Crests; any number of Skink Braves, max. 4 Saurus Braves (never more than Skink Braves), max. 1 Kroxigor.<br><b>Cold Blooded:</b> Roll 3D6 and pick the lowest 2 for psychology/Rout tests; the warband may never use the Leadership of Saurus or Kroxigor for Rout tests. <b>Scaly Skin:</b> Saurus 5+, Skinks 6+ (cannot be modified below 6; light armour/shield add +1). <b>Armour is rare:</b> Light armour always costs 50 gc. <b>Aquatic:</b> Skinks may move through water terrain with no penalty, and count as being in cover whilst they are in the water. <b>Jungle born:</b> All Skinks can move through jungle terrain without penalty. <i>Town Cryer #11 version (Lustria).</i>",
    "units": [
     {
      "id": "skinkpriest",
