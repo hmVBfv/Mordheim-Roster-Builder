@@ -4733,3 +4733,23 @@ so most of the work is a data field or a rule with a test over all warbands, not
   their rule text. `wizardOption` (price, piece of gear that goes) and `setWizard`; a test over all warbands keeps every such unit on the option. It
   stacks on #198 because both extend the parity data. The mirrored legacy tests compare unit definitions, so they needed to skip the three core-only
   keys by name.
+
+**The run of 6.11.2026, five reports (PRs 337 to 341).** All five are independent of each other; none touches the same lines.
+
+- **#200, is everything in the audit log? (PR 337).** The answer is yes: every writing function of the server leaves an entry, and a campaign made by an
+  ordinary user is in the log like any other (the admin sees that and who, not what, of a campaign she is not part of). Instead of a fix there is a guard:
+  the leak-test matrix already calls every route as every role, so it now compares the newest audit entry before and after each successful write and
+  fails for a route that left none, unless the route is named with its reason (sign-in log, read only, a private notebook entry, a personal tidy-up).
+  The first run with an empty list showed exactly those ten and nothing else.
+- **#201, "&amp" in the Chaos Dwarf rules (PR 338).** The data had `&amp;` in five places, written for the legacy page that draws the data as HTML. The
+  new app draws text, so it showed. A bare `&` is right in both, so the data changed, not the code, and a test over every string of every data file keeps
+  entities out. A decoder in the app would have fixed the display and left the legacy page and the next author as they were.
+- **#204, a rule twice (PR 339).** "Nobody cares about them" (the ability the text mentions) and "Nobody cares" (the rule the text defines) were two
+  words for one rule, since only an equal name counted. Scanning every unit of every warband found one more: the Priest of Taal's "Prayers" and
+  "Prayers of Taal". The rule of the text now yields to an ability whose name begins with the same whole words. A wrong turn at first: I looked for the
+  cause in the data, where the rule stands only once.
+- **#203, a section for the warband's rules (PR 340).** All 49 warbands have headed rules on their page, so the section is general, above the units on
+  phone and desktop alike (Rob: at least on the phone). Two old tests picked the first expanded button and hit a rule word; they pick a unit row now.
+- **#202, the Chaos Dwarfs' armour rule (PR 341).** The rule belongs to the race, not to the armour (Rob). It stood only in the warband's rules, so the
+  units it holds for had no word and no tooltip; each now names "Armour:" itself. Left for Rob: the Black Dwarfs' Sorcerer names neither Hard Head
+  nor Hard to Kill although the warband's rule says "all except Informers".
