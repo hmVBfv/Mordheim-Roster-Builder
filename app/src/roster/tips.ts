@@ -132,10 +132,13 @@ function rules(chips: (ItemInfo & { key: string })[], defs: core.RuleDef[], skip
   return out;
 }
 
-/** The rules the warband's page names for the whole warband or most of it ("Hard Head:", "Slavers:", …), each with its text. */
-export function warbandRuleFacts(ctx: core.Ctx): Fact[] {
+/** The warband's page: its unit choice (the "Choice:" line – who it may hire and how many – is no rule a warrior has, #207) and the rules
+    it names for the whole warband or most of it ("Hard Head:", "Slavers:" …), each with its text, as text to read (#210). */
+export function warbandRuleTexts(ctx: core.Ctx): { unitChoice: string | null; rules: { name: string; text: string }[] } {
   const wb = core.warbandDef(ctx);
-  return wb?.rules ? core.ruleDefs(wb.rules, `Warband rule \u00b7 ${wb.name}`).map((d) => fact(d.name, tipOf(d, d.name, d.line))) : [];
+  const defs = wb?.rules ? core.ruleDefs(wb.rules, `Warband rule \u00b7 ${wb.name}`) : [];
+  const choice = defs.find((d) => d.name === 'Choice');
+  return { unitChoice: choice?.text ?? null, rules: defs.filter((d) => d !== choice).map((d) => ({ name: d.name, text: d.text })) };
 }
 
 /** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */
