@@ -453,6 +453,50 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
   );
 }
 
+/* ---- look around before the first battle (wish of 6.11.2026) ---- */
+
+/** What the Trading Post will offer from the first battle on, to look at: the common items with their prices and the rare ones with rarity, chance
+    and price, filtered as in the search – and nothing to buy, search or sell. */
+function Browse({ ctx }: { ctx: core.Ctx }) {
+  const [what, setWhat] = useState<'rare' | 'common'>('rare');
+  const [kind, setKind] = useState<Kind>('all');
+  const [usable, setUsable] = useState(true);
+  const [all, setAll] = useState(false);
+  const shop = useMemo(() => shopItems(ctx), [ctx]);
+  const rare = useMemo(() => rareItems(ctx, true), [ctx]);
+  const [q, setQ] = useState('');
+  const [stat, setStat] = useState<StatFilter | ''>('');
+  const [max, setMax] = useState<number | null>(null);
+  const [sort, setSort] = useState<SortOrder>('name');
+  const [from, setFrom] = useState('');
+  const [grade, setGrade] = useState('');
+  const pool = rare.filter((it) => (kind === 'all' || it.kind === kind) && (!usable || it.usable));
+  const findable = sortRare(filterRare(pool, { q, stat, maxRarity: max, from, grade }), sort);
+  const common = shop.filter((it) => kind === 'all' || it.kind === kind);
+  return (
+    <section className={ui.page} aria-label="Look at the Trading Post">
+      <h2>Look at the Trading Post</h2>
+      <p className={ui.muted}>What it offers from the first battle on – to look at; nothing can be bought, searched for or sold before then.</p>
+      <Seg label="What to look at" value={what} options={[['rare', 'Rare items'], ['common', 'Common items']] as const} onChange={setWhat} />
+      <Seg label="Kind" value={kind} options={KINDS} onChange={setKind} />
+      {what === 'common' ? (
+        <ul className={styles.rows} aria-label="Common items">
+          {common.map((it) => <li key={it.key} className={styles.item} title={it.text || undefined}><span>{it.name}</span><small>{gc(it.price)}</small></li>)}
+        </ul>
+      ) : (
+        <>
+          <label className={styles.check}><input type="checkbox" checked={usable} onChange={(e) => setUsable(e.target.checked)} /> Only what someone here may use</label>
+          <RareMask q={q} stat={stat} max={max} sort={sort} from={from} grade={grade} items={rare} onQ={setQ} onStat={setStat} onMax={setMax} onSort={setSort} onFrom={setFrom} onGrade={setGrade} shown={findable.length} total={pool.length} />
+          <ul className={styles.rows} aria-label="Rare items">
+            {findable.slice(0, all ? undefined : SHORT).map((it) => <li key={it.de} className={`${styles.item} ${styles.rareRow}`} title={it.text || undefined}><RareLine it={it} /></li>)}
+          </ul>
+          {!all && findable.length > SHORT && <button type="button" className={ui.buttonQuiet} onClick={() => setAll(true)}>Show all {findable.length}</button>}
+        </>
+      )}
+    </section>
+  );
+}
+
 function Body({ rec }: { rec: StoredWarband }) {
   const data = useGameData();
   const ed = useEditor(data, rec);
@@ -473,6 +517,7 @@ function Body({ rec }: { rec: StoredWarband }) {
           <p><Link to={`/warbands/${rec.id}`} className={ui.buttonQuiet}>Back to the roster</Link></p>
         </div>
       )}
+      {!locked && <Browse ctx={ctx} />}
       {ed.notice && <UndoToast key={ed.notice.id} text={ed.notice.text} onUndo={ed.undo} onDone={ed.dismiss} />}
     </section>
   );

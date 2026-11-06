@@ -262,6 +262,12 @@ for (const theme of THEMES) {
     // the Trading Post says what applies before the first battle
     await page.getByRole('link', { name: 'Trade' }).click();
     await expect(page.getByText('Until its first battle the warband buys from its lists')).toBeVisible();
+    // and shows what it will offer, rare items with their rarity, nothing to buy yet (wish of 6.11.2026)
+    const look = page.getByRole('region', { name: 'Look at the Trading Post' });
+    await expect(look.getByRole('list', { name: 'Rare items' }).getByText(/^Rare \d+/).first()).toBeVisible();
+    await expect(look.getByRole('button', { name: /^(Buy|Search|Sell|Give)/ })).toHaveCount(0);
+    await look.getByRole('button', { name: 'Common items' }).click();
+    await expect(look.getByRole('list', { name: 'Common items' }).getByRole('listitem').first()).toBeVisible();
   });
 }
 
