@@ -43,7 +43,7 @@ describe('the app', () => {
     const strips = await screen.findAllByRole('img', { name: /^M \S+, WS \S+, BS/ });
     expect(strips).toHaveLength(units);
     expect(screen.queryAllByRole('article')).toHaveLength(0);
-    const first = screen.getAllByRole('button', { expanded: false })[0]!;
+    const first = screen.getAllByRole('button', { expanded: false }).find((b) => b.hasAttribute('aria-describedby'))!; // the first row, not a rule word above them
     await user.click(first);
     const card = await screen.findByRole('article');
     expect(within(card).getAllByRole('columnheader').map((h) => h.textContent).slice(0, 9)).toEqual(['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld']);

@@ -70,7 +70,7 @@ describe('one man is "1 man", not "1 men"', () => {
 describe('on a phone: a row each, opening under it with tabs', () => {
   it('groups the rows, one button each, with the whole profile in a line and nothing open', () => {
     show();
-    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Heroes', 'Henchmen', 'Hired Swords & Dramatis Personae']);
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Warband rules', 'Heroes', 'Henchmen', 'Hired Swords & Dramatis Personae']);
     expect(screen.getByText('1 of 6')).toBeTruthy();
     expect(screen.getByText('2 men')).toBeTruthy();
     const rows = within(screen.getByRole('region', { name: 'Heroes' })).getAllByRole('button');
@@ -357,5 +357,32 @@ describe('the battles a warrior has fought (#166)', () => {
     cleanup();
     show({ acts: () => acts() }, { ...v, heroes: [{ ...v.heroes[0]!, battles: 0 }] });
     expect(screen.queryByText('Battles fought')).toBeNull();
+  });
+});
+
+/* Report of 6.11.2026: the rules of the Chaos Dwarfs hold for the whole warband or most of it; on every unit they drown the card. The warband's
+   own rules get a section above the units, a tap on a rule opens its text. */
+describe('the rules of the warband', () => {
+  const hashut = () => rosterView(data, core.addUnit(ctx(createWarband(data, 'sonsofhashut', null, 'The Sons')), 'cdwarf'));
+
+  it('are listed with their texts, for every warband that has some', () => {
+    const v = hashut();
+    expect(v.warbandRules.map((f) => f.label)).toEqual(['Hard Head', 'Armour', 'Hard to Kill', 'Slavers', 'Uncommon', 'Indentured Servants', 'Hired Swords']);
+    expect(v.warbandRules.find((f) => f.label === 'Armour')!.tips[0]).toMatchObject({ line: 'Warband rule · The Sons of Hashut', text: expect.stringContaining('never suffer movement penalties') });
+    for (const wb of Object.keys(data.WARBANDS)) {
+      expect(rosterView(data, createWarband(data, wb, null, 'x')).warbandRules.length, wb).toBeGreaterThan(0);
+    }
+  });
+
+  it('stand in a section above the first group of units, on a phone and on a desktop', () => {
+    for (const w of [400, 1000]) {
+      width = w;
+      show({}, hashut());
+      const rules = screen.getByRole('region', { name: 'Warband rules' });
+      const heroesOrHench = screen.getByRole('heading', { name: 'Henchmen' });
+      expect(rules.compareDocumentPosition(heroesOrHench) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(within(rules).getByRole('button', { name: 'Armour' })).toBeTruthy();
+      cleanup();
+    }
   });
 });

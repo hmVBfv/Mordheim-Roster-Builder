@@ -122,6 +122,12 @@ function rules(chips: (ItemInfo & { key: string })[], defs: core.RuleDef[], skip
   return out;
 }
 
+/** The rules the warband's page names for the whole warband or most of it ("Hard Head:", "Slavers:", …), each with its text. */
+export function warbandRuleFacts(ctx: core.Ctx): Fact[] {
+  const wb = core.warbandDef(ctx);
+  return wb?.rules ? core.ruleDefs(wb.rules, `Warband rule \u00b7 ${wb.name}`).map((d) => fact(d.name, tipOf(d, d.name, d.line))) : [];
+}
+
 /** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */
 export interface SpellLore { name: string; note: string; /** Starting spells he has still to choose (#81). */ open: number; spells: { key: string; name: string; diff: string; text: string; known: boolean; /** Steps he made it easier to cast (#150); `diff` stays the printed value. */ red: number }[] }
 
