@@ -283,3 +283,33 @@ describe('a unit\'s "May buy" is no rule of his card (Saurus Slayer)', () => {
   });
 });
 
+
+/* Report of 6.11.2026: the Chaos Dwarfs' rule "never suffer movement penalties for wearing armour" belongs to the Chaos Dwarfs, not to the armour.
+   It stood in the warband's rules only; the units it holds for did not name it, so it had no word and no tooltip on their cards. */
+describe('the Chaos Dwarfs\' armour rule', () => {
+  const rulesOf = (wb: string, unit: string) => {
+    const s = core.addUnit(ctx(core.newWarband(data, wb)), unit);
+    return warriorFacts(ctx(s), s.models[0]!).rules;
+  };
+
+  it('is a word with its text on each unit it holds for', () => {
+    const holds: [string, string][] = [
+      ['sonsofhashut', 'sorcerer'], ['sonsofhashut', 'bull'], ['sonsofhashut', 'champion'], ['sonsofhashut', 'cdwarf'], ['sonsofhashut', 'blunder'],
+      ['blackdwarfs', 'sorcerer'], ['blackdwarfs', 'bull'], ['blackdwarfs', 'gaoler'], ['blackdwarfs', 'cdwarf'],
+    ];
+    for (const [wb, id] of holds) {
+      const armour = rulesOf(wb, id).find((r) => r.label === 'Armour');
+      expect(armour, `${wb}/${id}`).toBeTruthy();
+      expect(armour!.tips[0]!.text, `${wb}/${id}`).toMatch(/never suffers? movement penalties for wearing armour/i);
+    }
+  });
+
+  it('is not on the Hobgoblins or the Informers, who are no Chaos Dwarfs', () => {
+    expect(rulesOf('sonsofhashut', 'hobgob').some((r) => r.label === 'Armour')).toBe(false);
+    expect(rulesOf('blackdwarfs', 'informer').some((r) => r.label === 'Armour')).toBe(false);
+  });
+
+  it('is said once on the Bull Centaur, who had it in other words', () => {
+    expect(rulesOf('sonsofhashut', 'bull').filter((r) => /armour|penalt/i.test(r.label))).toHaveLength(1);
+  });
+});

@@ -6663,7 +6663,7 @@
       "academic",
       "chaosDwarfSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Chaos Dwarf Magic — he cannot cast spells while wearing armour. Hard Head. Hard to Kill."
+     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Chaos Dwarf Magic — he cannot cast spells while wearing armour. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "bull",
@@ -6690,7 +6690,7 @@
       "chaosDwarfSkills"
      ],
      "large": true,
-     "sp": "Large Target. Hard Head. Hard to Kill. No movement penalty for wearing armour."
+     "sp": "Large Target. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "champion",
@@ -6717,7 +6717,7 @@
       "strength",
       "chaosDwarfSkills"
      ],
-     "sp": "Hard Head. Hard to Kill."
+     "sp": "Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "cdwarf",
@@ -6738,7 +6738,7 @@
       "Ld": 9
      },
      "eq": "cdHero",
-     "sp": "Hard Head. Hard to Kill."
+     "sp": "Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "blunder",
@@ -6759,7 +6759,7 @@
       "Ld": 9
      },
      "eq": "cdBlunder",
-     "sp": "Hard Head. Hard to Kill. May carry a Chaos Dwarf Blunderbuss."
+     "sp": "Hard Head. Hard to Kill. May carry a Chaos Dwarf Blunderbuss. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "hobgob",
@@ -6820,7 +6820,7 @@
       "strength",
       "blackDwarfSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. He may wear armour but cannot perform rituals while wearing armour, except the Mechanical Suit (made for him) and Chaos armour (which never hinders casting). Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut."
+     "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. He may wear armour but cannot perform rituals while wearing armour, except the Mechanical Suit (made for him) and Chaos armour (which never hinders casting). Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "bull",
@@ -6846,7 +6846,7 @@
       "strength"
      ],
      "large": true,
-     "sp": "Large Target. May never use missile weapons. Hard Head. Hard to Kill. No movement penalty for wearing armour."
+     "sp": "Large Target. May never use missile weapons. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "gaoler",
@@ -6873,7 +6873,7 @@
       "strength",
       "blackDwarfSkills"
      ],
-     "sp": "Nasty Reputation: The dreadful Gaolers cause fear in Humans. Hard Head. Hard to Kill."
+     "sp": "Nasty Reputation: The dreadful Gaolers cause fear in Humans. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     },
     {
      "id": "informer",
@@ -6915,7 +6915,7 @@
       "Ld": 9
      },
      "eq": "bdHero",
-     "sp": "Hard Head. Hard to Kill."
+     "sp": "Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
     }
    ]
   },
