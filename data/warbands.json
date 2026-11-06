@@ -4639,7 +4639,7 @@
       "speed",
       "lizardSkinkSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Uses Lizardman Magic (works like priestly prayers, castable in armour)."
+     "sp": "Scaly Skin 6+. Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Uses Lizardman Magic (works like priestly prayers, castable in armour)."
     },
     {
      "id": "saurustotem",
@@ -4691,7 +4691,8 @@
       "shooting",
       "speed",
       "lizardSkinkSkills"
-     ]
+     ],
+     "sp": "Scaly Skin 6+."
     },
     {
      "id": "skinkbrave",
@@ -4711,7 +4712,8 @@
       "A": 1,
       "Ld": 6
      },
-     "eq": "lizSkinkHen"
+     "eq": "lizSkinkHen",
+     "sp": "Scaly Skin 6+."
     },
     {
      "id": "saurusbrave",
