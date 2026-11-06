@@ -70,7 +70,7 @@ describe('one man is "1 man", not "1 men"', () => {
 describe('on a phone: a row each, opening under it with tabs', () => {
   it('groups the rows, one button each, with the whole profile in a line and nothing open', () => {
     show();
-    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Warband rules', 'Heroes', 'Henchmen', 'Hired Swords & Dramatis Personae']);
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Unit choice', 'Heroes', 'Henchmen', 'Hired Swords & Dramatis Personae']);
     expect(screen.getByText('1 of 6')).toBeTruthy();
     expect(screen.getByText('2 men')).toBeTruthy();
     const rows = within(screen.getByRole('region', { name: 'Heroes' })).getAllByRole('button');
@@ -361,28 +361,63 @@ describe('the battles a warrior has fought (#166)', () => {
 });
 
 /* Report of 6.11.2026: the rules of the Chaos Dwarfs hold for the whole warband or most of it; on every unit they drown the card. The warband's
-   own rules get a section above the units, a tap on a rule opens its text. */
+   own rules get a section above the units. They are text, each rule with its name and what it says, not words to tap (a "Dwarf rules" bubble
+   that held six rules did not fit); the unit choice of the warband stands in a section of its own, as it is no rule a warrior has. */
 describe('the rules of the warband', () => {
-  const hashut = () => rosterView(data, core.addUnit(ctx(createWarband(data, 'sonsofhashut', null, 'The Sons')), 'cdwarf'));
+  const view = (wb: string, unit: string) => rosterView(data, core.addUnit(ctx(createWarband(data, wb, null, 'The Band')), unit));
+  const hashut = () => view('sonsofhashut', 'cdwarf');
 
-  it('are listed with their texts, for every warband that has some', () => {
+  it('are listed one by one with their texts, for every warband that has some', () => {
     const v = hashut();
-    expect(v.warbandRules.map((f) => f.label)).toEqual(['Hard Head', 'Armour', 'Hard to Kill', 'Slavers', 'Uncommon', 'Indentured Servants', 'Hired Swords']);
-    expect(v.warbandRules.find((f) => f.label === 'Armour')!.tips[0]).toMatchObject({ line: 'Warband rule · The Sons of Hashut', text: expect.stringContaining('never suffer movement penalties') });
+    expect(v.warbandRules.map((r) => r.name)).toEqual(['Hard Head', 'Armour', 'Hard to Kill', 'Slavers', 'Uncommon', 'Indentured Servants', 'Hired Swords']);
+    expect(v.warbandRules.find((r) => r.name === 'Armour')!.text).toMatch(/never suffer movement penalties for wearing armour/);
     for (const wb of Object.keys(data.WARBANDS)) {
-      expect(rosterView(data, createWarband(data, wb, null, 'x')).warbandRules.length, wb).toBeGreaterThan(0);
+      const w = rosterView(data, createWarband(data, wb, null, 'x'));
+      expect(w.warbandRules.length + (w.unitChoice ? 1 : 0), wb).toBeGreaterThan(0);
+      for (const r of w.warbandRules) expect(r.text.length, `${wb}: ${r.name}`).toBeGreaterThan(10);
     }
   });
 
-  it('stand in a section above the first group of units, on a phone and on a desktop', () => {
+  it('give the Dwarfs each of their rules on its own, not one "Dwarf rules"', () => {
+    const ranger = view('dwarfrangers', 'clansman').warbandRules.map((r) => r.name);
+    expect(ranger).toEqual(['Hard to Kill', 'Hard Head', 'Armour', 'Hate Orcs and Goblins', 'Grudgebearers', 'Incomparable Miners', 'Don’t Trust ‘Em']);
+    const hunters = view('dwarftreasure', 'clansman').warbandRules.map((r) => r.name);
+    expect(hunters).toEqual(['Hard to Kill', 'Hard Head', 'Armour', 'Hate Orcs and Goblins', 'Incomparable Miners', 'Grudgebearers', 'Gromril']);
+  });
+
+  it('stand as text in a section above the first group of units, on a phone and on a desktop', () => {
     for (const w of [400, 1000]) {
       width = w;
       show({}, hashut());
       const rules = screen.getByRole('region', { name: 'Warband rules' });
-      const heroesOrHench = screen.getByRole('heading', { name: 'Henchmen' });
-      expect(rules.compareDocumentPosition(heroesOrHench) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-      expect(within(rules).getByRole('button', { name: 'Armour' })).toBeTruthy();
+      const henchmen = screen.getByRole('heading', { name: 'Henchmen' });
+      expect(rules.compareDocumentPosition(henchmen) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(within(rules).getByText('Armour')).toBeTruthy();
+      expect(within(rules).getByText(/never suffer movement penalties for wearing armour/)).toBeTruthy();
+      expect(within(rules).queryAllByRole('button')).toHaveLength(0);
       cleanup();
     }
+  });
+});
+
+/* Wish of 6.11.2026: the unit choice ("Exactly 1 Noble. Max. 2 Slayers …") is no ability; it was among the warband's rules and read like a skill. */
+describe('the unit choice of the warband', () => {
+  const view = (wb: string, unit: string) => rosterView(data, core.addUnit(ctx(createWarband(data, wb, null, 'The Band')), unit));
+
+  it('is not one of the rules, but a text of its own', () => {
+    const v = view('dwarftreasure', 'clansman');
+    expect(v.unitChoice).toMatch(/^Exactly 1 Noble\./);
+    expect(v.warbandRules.map((r) => r.name)).not.toContain('Choice');
+    for (const wb of Object.keys(data.WARBANDS)) expect(rosterView(data, createWarband(data, wb, null, 'x')).warbandRules.map((r) => r.name), wb).not.toContain('Choice');
+  });
+
+  it('stands in its own section above the rules, which keep their own', () => {
+    width = 400;
+    show({}, view('dwarftreasure', 'clansman'));
+    const choice = screen.getByRole('region', { name: 'Unit choice' });
+    const rules = screen.getByRole('region', { name: 'Warband rules' });
+    expect(within(choice).getByText(/Exactly 1 Noble/)).toBeTruthy();
+    expect(within(rules).queryByText(/Exactly 1 Noble/)).toBeNull();
+    expect(choice.compareDocumentPosition(rules) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

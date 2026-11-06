@@ -5,7 +5,6 @@
    in a pane beside the list, every section open. The same board shows
    another player's warband, read-only (without `acts`). */
 import { IconEdit } from '../ui/icons.tsx';
-import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Detail, TAB_LABEL, tabsFor, type TabId, type UnitActs } from './Detail.tsx';
@@ -126,12 +125,18 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
     <div ref={ref} className={styles.board} data-layout={layout}>
       {printing && <PrintSheet v={v} />}
       <div className={`${styles.list} ${styles.screenOnly}`}>
+        {v.unitChoice && (
+          <section aria-labelledby="board-unit-choice" className={styles.wbRules}>
+            <div className={styles.groupHead}><h2 id="board-unit-choice">Unit choice</h2></div>
+            <p className={styles.wbChoice}>{v.unitChoice}</p>
+          </section>
+        )}
         {v.warbandRules.length > 0 && (
           <section aria-labelledby="board-warband-rules" className={styles.wbRules}>
             <div className={styles.groupHead}><h2 id="board-warband-rules">Warband rules</h2><span>for the whole warband</span></div>
-            <ul className={styles.chipList}>
-              {v.warbandRules.map((f) => <li key={f.label}><TipWord label={f.label} tips={f.tips} /></li>)}
-            </ul>
+            <dl className={styles.wbRuleList}>
+              {v.warbandRules.map((r) => <div key={r.name}><dt>{r.name}</dt><dd>{r.text}</dd></div>)}
+            </dl>
           </section>
         )}
         {groups.map((g) => (
