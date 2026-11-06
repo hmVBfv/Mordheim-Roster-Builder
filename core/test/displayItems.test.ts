@@ -60,3 +60,31 @@ describe('equipment with its items', () => {
     expect(core.rareDisplayParts(ctx(s), m)).toEqual(core.rareDisplayItems(ctx(s), m).map((x) => x.label));
   });
 });
+
+/* Report of 6.11.2026: a Runesmith with a Gromril Dagger showed "2× Dagger" and "Dagger (Gromril)": the upgraded copy was counted twice. The
+   weapon an upgrade sits on is that line, not one of the plain copies – for every weapon of every warband. */
+describe('a weapon with an upgrade on a line of its own', () => {
+  it('is not counted among the plain copies (the Runesmith\'s free dagger and a Gromril dagger)', () => {
+    let s = core.newWarband(data, 'dwarfrangers');
+    s = core.addUnit(ctx(s), 'runesmith');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 2);
+    s = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    const m = s.models[0]!;
+    expect(core.eqDisplayParts(ctx(s), m)).toEqual(['Dagger']);
+    expect(core.rareDisplayParts(ctx(s), m)).toEqual(['Dagger (Gromril)']);
+  });
+
+  it('leaves the other copies plain, and a weapon only upgraded is not listed twice', () => {
+    let s = core.newWarband(data, 'dwarfrangers');
+    s = core.addUnit(ctx(s), 'runesmith');
+    const uid = s.models[0]!.uid;
+    s = core.setEqQty(ctx(s), uid, 'Dolch (1. gratis)', 3);
+    s = core.setEqQty(ctx(s), uid, 'Schwert', 1);
+    s = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Dolch (1. gratis)', true);
+    s = core.setUpgradeOn(ctx(s), uid, 'Gromril-Waffe', 'Schwert', true);
+    const m = s.models[0]!;
+    expect(core.eqDisplayParts(ctx(s), m)).toEqual(['2× Dagger']);
+    expect(core.rareDisplayParts(ctx(s), m).sort()).toEqual(['Dagger (Gromril)', 'Sword (Gromril)']);
+  });
+});

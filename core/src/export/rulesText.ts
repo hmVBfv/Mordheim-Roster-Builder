@@ -236,6 +236,21 @@ export function eqSummaryParts(ctx: Ctx, m: Model): string[] {
     a tooltip can explain what the words name. */
 export interface EqDisplayItem { label: string; items: string[] }
 
+/** Does this rare entry show as one line for each weapon it sits on ("Dagger (Gromril)", #109)? */
+const linePerWeapon = (ctx: Ctx, de: string, e: NonNullable<Model['rare']>[string]): boolean =>
+  !inlineUpgradeActive(ctx, de) && !!ctx.data.UPGRADES[de]?.mult && !!e.on && (!!e.also || (Number(e.q) || 1) <= 1);
+
+/** How many copies of each weapon carry an upgrade that shows on a line of its own. Those copies are that line, not one of the plain ones
+    (a Dagger and a Gromril Dagger, not "2× Dagger" and a Gromril Dagger). */
+function upgradedCopies(ctx: Ctx, m: Model): Map<string, number> {
+  const n = new Map<string, number>();
+  for (const [de, e] of Object.entries(m.rare ?? {})) {
+    if (!linePerWeapon(ctx, de, e)) continue;
+    for (const slot of upgradeSlots(m, de)) if (slot.on) n.set(slot.on, (n.get(slot.on) ?? 0) + 1);
+  }
+  return n;
+}
+
 /** Fixed gear and list equipment in English, braces of pistols as one, and
     inline weapon upgrades on their weapon. */
 export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
@@ -244,9 +259,11 @@ export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
   if (!def) return out;
   // a fixed weapon shows the upgrade it carries: the first copy of "Sword" the first upgrade on a "Sword", and so on
   const seen = new Map<string, number>();
+  const upgraded = upgradedCopies(ctx, m);
   unitGear(ctx, m).forEach((g) => {
     const k = seen.get(g) ?? 0;
     seen.set(g, k + 1);
+    if (k < (upgraded.get(g) ?? 0)) return;
     const ups = m.rare ? Object.keys(m.rare).filter((de) => inlineUpgradeActive(ctx, de) && upgradeSlots(m, de).filter((s) => s.on === g).length > k) : [];
     out.push({ label: g + (ups.length ? ` [${ups.map((de) => enItem(ctx.data, de)).join(', ')}]` : ''), items: [g, ...ups] });
   });
@@ -254,8 +271,8 @@ export function eqDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
     const list = eqListFor(ctx, def) ?? {};
     for (const cat of Object.keys(list)) for (const [nm] of list[cat] ?? []) {
       if (ctx.data.BRACE_HIDE[nm]) continue;
-      const qty = Number((m.eq ?? {})[nm]) || 0;
-      if (!qty) continue;
+      const qty = (Number((m.eq ?? {})[nm]) || 0) - (upgraded.get(nm) ?? 0);
+      if (qty <= 0) continue;
       const base = nm.replace(' (1. gratis)', '');
       const ups = m.rare ? Object.keys(m.rare).filter((de) => inlineUpgradeActive(ctx, de) && upgradeSlots(m, de).some((s) => s.on === nm)) : [];
       const us = ups.length ? ` [${ups.map((de) => enItem(ctx.data, de)).join(', ')}]` : '';
@@ -282,7 +299,7 @@ export function rareDisplayItems(ctx: Ctx, m: Model): EqDisplayItem[] {
     if (inlineUpgradeActive(ctx, de)) continue;
     const it = ctx.data.CATALOG.find((x) => x.de === de);
     // a weapon upgrade names its weapon, one label per copy: "Dagger (Gromril)" (#109)
-    if (ctx.data.UPGRADES[de]?.mult && r[de]!.on && (r[de]!.also || (Number(r[de]!.q) || 1) <= 1)) {
+    if (linePerWeapon(ctx, de, r[de]!)) {
       const short = (it ? it.en : de).replace(/ weapon$/i, '');
       for (const s of upgradeSlots(m, de)) out.push({ label: s.on ? `${enItem(ctx.data, s.on.replace(' (1. gratis)', ''))} (${short})` : (it ? it.en : de), items: [de] });
       continue;

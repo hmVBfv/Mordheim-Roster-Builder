@@ -9,3 +9,14 @@ export function legacyWeaponNames<T>(v: T): T {
   if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, legacyWeaponNames(x)])) as T;
   return v;
 }
+
+/* Intended difference (docs/behaviour-changes.md, "Aufgewertete Waffe nicht doppelt gezählt", report #211): the copy that carries such an upgrade
+   is not among the plain ones any more ("Dagger" and "Dagger (Gromril)", where legacy has "2× Dagger" and "Gromril weapon"; a lone upgraded
+   dagger is only the upgrade line). In a Tabletop Simulator text that names such an upgrade the equipment line is left out of the comparison,
+   on both sides, and nothing else. */
+export function withoutCounts<T>(v: T): T {
+  if (typeof v === 'string') return (/(Gromril|Ithilmar|Obsidian) weapon/.test(v) ? v.replace(/(\[5ACFFF\]Equipment:\[-\] )[^\n]*/g, '$1…') : v) as T;
+  if (Array.isArray(v)) return v.map(withoutCounts) as T;
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, withoutCounts(x)])) as T;
+  return v;
+}
