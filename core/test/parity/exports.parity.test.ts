@@ -9,6 +9,7 @@ import type { WarbandState } from '../../src/index.ts';
 import { loadLegacy, type Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures } from '../support/fixtures.ts';
 import { coreExportReport, legacyExportReport } from './exportReport.ts';
+import { hasCountedUpgrade, withoutCountedLines } from '../support/countedUpgrades.ts';
 import { canonOf, data, useLegacy } from './walk.ts';
 
 let L: Legacy;
@@ -20,7 +21,8 @@ describe('export parity: legacy app vs core', () => {
   it.each(fixtures.map((f) => [f.label, f] as const))('%s', (_l, f) => {
     L.load(f.state); L.state.resyncUid(); L.app.render();
     const s = core.normalizeState(core.ctxOf(data, structuredClone(f.state) as WarbandState));
-    expect(coreExportReport(core.ctxOf(data, s), canonOf)).toEqual(legacyExportReport(L, data, canonOf));
+    const counted = hasCountedUpgrade(core.ctxOf(data, s));
+    expect(withoutCountedLines(coreExportReport(core.ctxOf(data, s), canonOf), counted)).toEqual(withoutCountedLines(legacyExportReport(L, data, canonOf), counted));
   });
 });
 

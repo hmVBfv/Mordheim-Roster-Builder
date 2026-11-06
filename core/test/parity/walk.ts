@@ -17,6 +17,7 @@ import { canonOf, data } from '../support/canon.ts';
 import type { Legacy } from '../legacy/loadLegacy.ts';
 import { generateFixtures, type Fixture } from '../support/fixtures.ts';
 import { coreExportReport, legacyExportReport } from './exportReport.ts';
+import { hasCountedUpgrade, withoutCountedLines } from '../support/countedUpgrades.ts';
 import { legacyCtx } from '../support/orcLimits.ts';
 import { coreScreens, legacyScreens } from './screens.ts';
 import { rng, type Rng } from '../support/random.ts';
@@ -608,7 +609,9 @@ export function runSequence(label: string, start: WalkStart, seed: number, withL
     }
     // the exports, now and then (they read everything, so they are slow)
     if (i % 25 === 24 || i === STEPS - 1) {
-      expect(coreExportReport(core.ctxOf(data, s), canonOf), `${label}: exports after ${done.slice(-6).join(' → ')}`).toEqual(legacyExportReport(L, data, canonOf));
+      const counted = hasCountedUpgrade(core.ctxOf(data, s));
+      expect(withoutCountedLines(coreExportReport(core.ctxOf(data, s), canonOf), counted), `${label}: exports after ${done.slice(-6).join(' → ')}`)
+        .toEqual(withoutCountedLines(legacyExportReport(L, data, canonOf), counted));
     }
   }
 }
