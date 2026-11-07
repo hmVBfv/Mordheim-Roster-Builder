@@ -1074,7 +1074,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Hunt Master. Max. 2 Waywatchers, max. 1 Forest Mage, any number of Deepwood Scouts and Glade Guard.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> All Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Unforgiving:</b> Will not fight alongside the forces of Chaos; in multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> may hire any Hired Sword that is not Chaotic or evil (no Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.).",
+   "rules": "<b>Choice:</b> Exactly 1 Hunt Master. Max. 2 Waywatchers, max. 1 Forest Mage, any number of Deepwood Scouts and Glade Guard.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> All Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Unforgiving:</b> Will not fight alongside the forces of Chaos; in multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> May hire any Hired Sword except the Chaotic and evil ones (Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.).",
    "units": [
     {
      "id": "hunt",
@@ -1209,7 +1209,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Elder. Max. 2 Blood Brothers, max. 1 Priest of Taal, max. 7 Jaegers, max. 5 Ruffians, max. 1 Ogre, any number of Kinsmen.<br><b>Self-sufficient:</b> may not hire Hired Swords except Ogres.",
+   "rules": "<b>Choice:</b> Exactly 1 Elder. Max. 2 Blood Brothers, max. 1 Priest of Taal, max. 7 Jaegers, max. 5 Ruffians, max. 1 Ogre, any number of Kinsmen.<br><b>Self-sufficient:</b> May hire only these Hired Swords, no others – Ogres.",
    "units": [
     {
      "id": "elder",
@@ -1390,7 +1390,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Carnival Master. Max. 2 Brutes, max. 2 Tainted Ones, max. 2 Plague Bearers, max. 1 Plague Cart, any number of Nurglings and Brethren.<br><b>Tainted:</b> Counts as Possessed for exploration/injuries. No Hired Swords.<br><b>Blessings of Nurgle:</b> May be bought for Tainted Ones only at recruitment; the first is at listed cost, each further Blessing costs double.",
+   "rules": "<b>Choice:</b> Exactly 1 Carnival Master. Max. 2 Brutes, max. 2 Tainted Ones, max. 2 Plague Bearers, max. 1 Plague Cart, any number of Nurglings and Brethren.<br><b>Tainted:</b> Counts as Possessed for exploration/injuries.<br><b>Hired Swords:</b> May hire no Hired Swords.<br><b>Blessings of Nurgle:</b> May be bought for Tainted Ones only at recruitment; the first is at listed cost, each further Blessing costs double.",
    "units": [
     {
      "id": "master",
@@ -1951,7 +1951,7 @@
    "min": 3,
    "max": 20,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity:</b> The warband is subject to Animosity.<br><b>Hired Swords:</b> Only Pit Fighter, Ogre Bodyguard, Warlock.",
+   "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity:</b> The warband is subject to Animosity.<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – Pit Fighter, Ogre Bodyguard, Warlock.",
    "units": [
     {
      "id": "boss",
@@ -2132,7 +2132,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Chief. Max. 1 Shaman, 2 Bestigors, 1 Centigor, 1 Minotaur, 5 Gors, 5 Chaos Hounds; any number of Ungors.<br><b>No Hired Swords:</b> Unless explicitly allowed.",
+   "rules": "<b>Choice:</b> Exactly 1 Chief. Max. 1 Shaman, 2 Bestigors, 1 Centigor, 1 Minotaur, 5 Gors, 5 Chaos Hounds; any number of Ungors.<br><b>Hired Swords:</b> May hire no Hired Swords, unless the Hired Sword's entry explicitly allows the warband.",
    "units": [
     {
      "id": "chief",
@@ -2357,7 +2357,7 @@
      "note": "<b>Hung.</b><br><b>Disloyalty:</b> Max. <b>12</b> warriors instead of 15.<br><b>Affinity with Horses:</b> Warhorses always cost only 40 gc; all Heroes (including promoted henchmen) automatically have \"Ride Warhorse\"; number of mounts unlimited (Border Town Burning)."
     }
    ],
-   "rules": "<b>Tribe:</b> Choose one of the tribes above – Norse, Kurgan or Hung – each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. If lost, +1 per own Hero taken out of action – on 12+ the leader becomes a Chaos Spawn. If won, +1 per enemy the leader took out of action – on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> Only Pit Fighters, Ogres, Norse Shamans, Imperial Assassins (Witches/Warlocks only without the Mark of Arkhar).",
+   "rules": "<b>Tribe:</b> Choose one of the tribes above – Norse, Kurgan or Hung – each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. If lost, +1 per own Hero taken out of action – on 12+ the leader becomes a Chaos Spawn. If won, +1 per enemy the leader took out of action – on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – Pit Fighters, Ogres, Norse Shamans, Imperial Assassins. Witches and Warlocks only without the Mark of Arkhar.",
    "units": [
     {
      "id": "chieftain",
@@ -2539,7 +2539,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br><b>Hired Swords:</b> As Mercenaries.<br><b>Chaos:</b> No alliance with Chaos.<br><b>Hero special items:</b> The Heroes may buy Vodka and the Bear-claw Necklace (rare).<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
+   "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.<br><b>Chaos:</b> No alliance with Chaos.<br><b>Hero special items:</b> The Heroes may buy Vodka and the Bear-claw Necklace (rare).<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
    "units": [
     {
      "id": "capt",
@@ -2743,7 +2743,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Priestess. Max. 2 Champions, 2 Totem Warriors; at least 1 Amazon Warrior, max. 3 Scouts.<br><b>Sacrifice:</b> Captives are handled as by the Cult of the Possessed.<br><b>Not one of us:</b> may never take Hired Swords or Dramatis Personae unless they are Amazons.",
+   "rules": "<b>Choice:</b> Exactly 1 Priestess. Max. 2 Champions, 2 Totem Warriors; at least 1 Amazon Warrior, max. 3 Scouts.<br><b>Sacrifice:</b> Captives are handled as by the Cult of the Possessed.<br><b>Not one of us:</b> May hire only these Hired Swords or Dramatis Personae, no others – the Amazons.",
    "units": [
     {
      "id": "priestess",
@@ -4070,7 +4070,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Bandit Prince. Max. 2 Footpads, 1 Duelist, 1 Huckster; any number of Thugs, max. 4 Looters, max. 2 Blackhearts, max. 2 Poachers, any number of Gutterscum.<br><b>Hired Swords:</b> may hire any Hired Swords allowed to a Human Mercenary warband.<br><b>Powder's Expensive!:</b> Black powder weapons only at the marked-up list prices, and only for the Duelist — henchmen may never buy them.<br><b>Foragers:</b> When determining income, always use the next lower warband-size column (1-3 members still use the first column).<br><b>Know Who To Sell To:</b> When selling equipment, the warband gets half of any random price element in addition to half the basic cost.",
+   "rules": "<b>Choice:</b> Exactly 1 Bandit Prince. Max. 2 Footpads, 1 Duelist, 1 Huckster; any number of Thugs, max. 4 Looters, max. 2 Blackhearts, max. 2 Poachers, any number of Gutterscum.<br><b>Hired Swords:</b> May hire the Hired Swords of a Human Mercenary warband.<br><b>Powder's Expensive!:</b> Black powder weapons only at the marked-up list prices, and only for the Duelist — henchmen may never buy them.<br><b>Foragers:</b> When determining income, always use the next lower warband-size column (1-3 members still use the first column).<br><b>Know Who To Sell To:</b> When selling equipment, the warband gets half of any random price element in addition to half the basic cost.",
    "units": [
     {
      "id": "prince",
@@ -4458,7 +4458,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Knight. Max. 2 Outriders, 2 Scouts; max. 5 Chasseurs, 5 Hussars, 2 Grooms.<br><b>Mounted warband:</b> Every warrior comes with a Riding Horse (included in the cost); the Knight, Outriders and Hussars may upgrade it to a Warhorse for +40 gc. All use the Blazing Saddles cavalry rules (Ride / Combat Riding / Horse Handling).<br><b>Horses:</b> A model without a mount may not take part in the battle. Dead horses must be replaced before any other income is spent (treasures are sold to fund this). Enemies may not target a ridden horse, by missiles or in close combat. Any mounted warrior may always be chosen as a target by a shooter even if others are closer, but the shooter gains no +1 to hit.<br><b>Mounted combat:</b> A mounted warrior may not fight with two close combat weapons (he needs one hand for the reins) and may never use two-handed weapons; a shield or buckler is fine, and a pistol may be fired in the first round of close combat in place of a weapon.<br><b>Dense terrain:</b> Imperial Outriders ignore the normal two-mount warband limit in areas of dense terrain.<br><b>Hired Swords:</b> Only mounted Hired Swords may join — the Freelance Knight (Rulebook) and the Roadwarden (Empire in Flames); the Highwayman keeps his distance and may never be hired.",
+   "rules": "<b>Choice:</b> Exactly 1 Knight. Max. 2 Outriders, 2 Scouts; max. 5 Chasseurs, 5 Hussars, 2 Grooms.<br><b>Mounted warband:</b> Every warrior comes with a Riding Horse (included in the cost); the Knight, Outriders and Hussars may upgrade it to a Warhorse for +40 gc. All use the Blazing Saddles cavalry rules (Ride / Combat Riding / Horse Handling).<br><b>Horses:</b> A model without a mount may not take part in the battle. Dead horses must be replaced before any other income is spent (treasures are sold to fund this). Enemies may not target a ridden horse, by missiles or in close combat. Any mounted warrior may always be chosen as a target by a shooter even if others are closer, but the shooter gains no +1 to hit.<br><b>Mounted combat:</b> A mounted warrior may not fight with two close combat weapons (he needs one hand for the reins) and may never use two-handed weapons; a shield or buckler is fine, and a pistol may be fired in the first round of close combat in place of a weapon.<br><b>Dense terrain:</b> Imperial Outriders ignore the normal two-mount warband limit in areas of dense terrain.<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – the mounted Freelance Knight (Rulebook) and Roadwarden (Empire in Flames). The Highwayman keeps his distance and may never be hired.",
    "units": [
     {
      "id": "ioknight",
@@ -5322,7 +5322,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Bandit Leader. Max. 2 Champions, 1 Cleric (instead of a Champion/Petty Thief), 2 Petty Thieves; max. 7 Marksmen, any number of Outlaws.<br><b>Bow duty:</b> Every warrior carries a bow (no crossbow), only one missile weapon (exception: the Cleric may but need not carry a bow).<br><b>Hired Swords:</b> Bounty Hunter, Wolf-Priest of Ulric, Norse Shaman and Dark Elf Assassin are not available.",
+   "rules": "<b>Choice:</b> Exactly 1 Bandit Leader. Max. 2 Champions, 1 Cleric (instead of a Champion/Petty Thief), 2 Petty Thieves; max. 7 Marksmen, any number of Outlaws.<br><b>Bow duty:</b> Every warrior carries a bow (no crossbow), only one missile weapon (exception: the Cleric may but need not carry a bow).<br><b>Hired Swords:</b> May hire any Hired Sword except Bounty Hunter, Wolf-Priest of Ulric, Norse Shaman and Dark Elf Assassin.",
    "units": [
     {
      "id": "banditleader",
@@ -5476,7 +5476,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Ship's Captain. Max. 2 Mates, 2 Cabin Boys; any number of Crew, max. 7 Gunners, max. 5 Boatswains, max. 5 Swabbies (≤ Crew).<br><b>Swivel Gun:</b> Max. 1 per warband.<br><b>Swabbies:</b> Recruited via special rules (Kidnapped!, Stragglers/Prisoners — starting cost here 0 gc); never more Swabbies than Crew.<br><b>Hired Swords:</b> As Mercenaries, but +20 gc upkeep if Dwarfs and Elves serve together.<br><b>One-off games:</b> Start with two free Swabbies.<br><b>Succession:</b> A Mate takes over if the Captain dies.",
+   "rules": "<b>Choice:</b> Exactly 1 Ship's Captain. Max. 2 Mates, 2 Cabin Boys; any number of Crew, max. 7 Gunners, max. 5 Boatswains, max. 5 Swabbies (≤ Crew).<br><b>Swivel Gun:</b> Max. 1 per warband.<br><b>Swabbies:</b> Recruited via special rules (Kidnapped!, Stragglers/Prisoners — starting cost here 0 gc); never more Swabbies than Crew.<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband, but with +20 gc upkeep if Dwarfs and Elves serve together.<br><b>One-off games:</b> Start with two free Swabbies.<br><b>Succession:</b> A Mate takes over if the Captain dies.",
    "units": [
     {
      "id": "pcaptain",
@@ -5654,7 +5654,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits. If he wins, that fighter gains +2 Experience and the warband gets all the captive's armour and weapons +50 gc. If he loses, roll for the fighter's injury as normal, ignoring Robbed, Captured, Hardened, Sold to the Pits and Survives against the Odds.<br><b>Hired Swords:</b> Pit Fighters may hire any Hired Sword except the Elf Ranger.",
+   "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits. If he wins, that fighter gains +2 Experience and the warband gets all the captive's armour and weapons +50 gc. If he loses, roll for the fighter's injury as normal, ignoring Robbed, Captured, Hardened, Sold to the Pits and Survives against the Odds.<br><b>Hired Swords:</b> May hire any Hired Sword except the Elf Ranger.",
    "units": [
     {
      "id": "pitking",
@@ -6373,7 +6373,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Serpent Priestess. Max. 2 Eagle Warriors, 2 Piranha Warriors; any number of Amazon Warriors (at least 1), max. 3 Jaguar Warriors.<br><b>Isolationists:</b> may re-roll missed attacks in the FIRST round of close combat against Lizardmen and Norse.<br><b>Sacrifice:</b> Captives are handled as by the Cult of the Possessed; sacrificing a captured Lizardman additionally grants a free Enchanted Skins (Skins & Charms).<br><b>Norse Enmity:</b> Against a Norse warband the Amazons fight to the death — reroll the first failed Rout test and may never voluntarily rout unless the leader is Out of Action.<br><b>Not one of us:</b> may never take Hired Swords or Dramatis Personae unless they are Amazons.",
+   "rules": "<b>Choice:</b> Exactly 1 Serpent Priestess. Max. 2 Eagle Warriors, 2 Piranha Warriors; any number of Amazon Warriors (at least 1), max. 3 Jaguar Warriors.<br><b>Isolationists:</b> may re-roll missed attacks in the FIRST round of close combat against Lizardmen and Norse.<br><b>Sacrifice:</b> Captives are handled as by the Cult of the Possessed; sacrificing a captured Lizardman additionally grants a free Enchanted Skins (Skins & Charms).<br><b>Norse Enmity:</b> Against a Norse warband the Amazons fight to the death — reroll the first failed Rout test and may never voluntarily rout unless the leader is Out of Action.<br><b>Not one of us:</b> May hire only these Hired Swords or Dramatis Personae, no others – the Amazons.",
    "units": [
     {
      "id": "serpentpriestess",
@@ -6506,7 +6506,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Shadow Master. Max. 3 Shadow Walkers, 1 Shadow Weaver; any number of Shadow Warriors, any number of Shadow Novices.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Distaste for Poison:</b> warriors may not use poisons of any type.<br><b>Unforgiving:</b> In multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> may hire any Hired Sword that is not Chaotic or evil (no Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.) and no poison-users (no Assassins).",
+   "rules": "<b>Choice:</b> Exactly 1 Shadow Master. Max. 3 Shadow Walkers, 1 Shadow Weaver; any number of Shadow Warriors, any number of Shadow Novices.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Distaste for Poison:</b> warriors may not use poisons of any type.<br><b>Unforgiving:</b> In multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> May hire any Hired Sword except the Chaotic and evil ones (Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.) and the poison-users (Assassins).",
    "units": [
     {
      "id": "shadowmaster",
@@ -6639,7 +6639,7 @@
    "min": 3,
    "max": 14,
    "gold": 500,
-   "rules": "Chaos Dwarf slavers of Hashut. <b>Hard Head:</b> Chaos Dwarfs & Bull Centaurs ignore the special rules of maces, clubs and hammers. <b>Armour:</b> Chaos Dwarfs & Bull Centaurs never suffer movement penalties for wearing armour. <b>Hard to Kill:</b> Chaos Dwarfs & Bull Centaurs are taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Slavers:</b> Captured fighters are never freed — sacrifice them (Apprentice Sorcerer +1 Experience each) or put them to work (+1 wyrdstone each, then D6: 2-6 the captive dies and you keep its equipment; 1 it escapes). <b>Uncommon:</b> Chaos Dwarf recruits cost 1.5× the usual Experience for veterancy (rounding up); Hobgoblins are normal. <b>Indentured Servants:</b> The warband must include at least four Hobgoblins; while below four you may recruit only Hobgoblins. <b>Hired Swords:</b> Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout, plus any \"all may hire\" or those open to Orc & Chaos warbands — never Elves of any sort.",
+   "rules": "Chaos Dwarf slavers of Hashut. <b>Hard Head:</b> Chaos Dwarfs & Bull Centaurs ignore the special rules of maces, clubs and hammers. <b>Armour:</b> Chaos Dwarfs & Bull Centaurs never suffer movement penalties for wearing armour. <b>Hard to Kill:</b> Chaos Dwarfs & Bull Centaurs are taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Slavers:</b> Captured fighters are never freed — sacrifice them (Apprentice Sorcerer +1 Experience each) or put them to work (+1 wyrdstone each, then D6: 2-6 the captive dies and you keep its equipment; 1 it escapes). <b>Uncommon:</b> Chaos Dwarf recruits cost 1.5× the usual Experience for veterancy (rounding up); Hobgoblins are normal. <b>Indentured Servants:</b> The warband must include at least four Hobgoblins; while below four you may recruit only Hobgoblins. <b>Hired Swords:</b> May hire the Hired Swords open to all warbands or to Orc & Chaos warbands, and also these – Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout. Never any Elves of any sort.",
    "units": [
     {
      "id": "sorcerer",
@@ -6795,7 +6795,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "Chaos Dwarf slavers from the Border Town Burning supplement. The following apply to all warriors except Informers. <b>Hard to Kill:</b> Taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Hard Head:</b> Ignore the special rules of clubs, maces, etc. <b>Armour:</b> Never suffer movement penalties for wearing armour. <b>Hired Swords:</b> Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout, plus any \"all may hire\" or those open to Orc & Chaos warbands — never Elves of any sort. The Engine of Chaos and special Chaos Dwarf wargear (Man-catcher, Mechanical Suit, Chaos Armour, Obsidian Weapon) are bought from the Trading Post / rare-item picker.",
+   "rules": "Chaos Dwarf slavers from the Border Town Burning supplement. The following apply to all warriors except Informers. <b>Hard to Kill:</b> Taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Hard Head:</b> Ignore the special rules of clubs, maces, etc. <b>Armour:</b> Never suffer movement penalties for wearing armour. <b>Hired Swords:</b> May hire the Hired Swords open to all warbands or to Orc & Chaos warbands, and also these – Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout. Never any Elves of any sort. <b>Special wargear:</b> The Engine of Chaos and special Chaos Dwarf wargear (Man-catcher, Mechanical Suit, Chaos Armour, Obsidian Weapon) are bought from the Trading Post / rare-item picker.",
    "units": [
     {
      "id": "sorcerer",
@@ -6929,7 +6929,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "Cathayan warrior-monks of the Border Town Burning supplement. <b>Strictures:</b> Dragon Monks and Warrior Monks never wear any kind of armour. <b>Distaste for Poison:</b> Dragon Monks and Warrior Monks may never use any poison or venom. <b>Outsiders:</b> The warband may never hire any Hired Sword or Dramatis Personae unless that entry specifically allows it. Cathayans are Humans and use the Human racial maximum.",
+   "rules": "Cathayan warrior-monks of the Border Town Burning supplement. <b>Strictures:</b> Dragon Monks and Warrior Monks never wear any kind of armour. <b>Distaste for Poison:</b> Dragon Monks and Warrior Monks may never use any poison or venom. <b>Outsiders:</b> May hire no Hired Swords or Dramatis Personae, unless the entry specifically allows the warband. Cathayans are Humans and use the Human racial maximum.",
    "units": [
     {
      "id": "emissary",
@@ -7470,7 +7470,7 @@
    "min": 3,
    "max": 13,
    "gold": 500,
-   "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). May hire no Hired Swords or Dramatis Personae except the Crow Master (and any that specifically allow it). <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\", which is re-rolled once you have captured two Henchmen or hold five Captured Thralls; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
+   "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). <b>Hired Swords:</b> May hire only these Hired Swords or Dramatis Personae, no others – the Crow Master, and any that specifically allow the warband. <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\", which is re-rolled once you have captured two Henchmen or hold five Captured Thralls; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
    "units": [
     {
      "id": "aristocrat",
@@ -7701,7 +7701,7 @@
    "min": 3,
    "max": 10,
    "gold": 500,
-   "rules": "Hardened Old World survivors in Lustria (Tuomas Pirinen). <b>Rare Heroes:</b> You may only ever buy one of each Hero type. Choose any Hero as the Leader. <b>Promotions:</b> When a Hero is lost you cannot rebuy him — instead keep his equipment and promote a Prospect into that role (as a Lad's Got Talent result, with access to two of the warband's Hero skill lists; the new Hero takes one Advance roll immediately and inherits the dead Hero's gear). <b>War Beasts:</b> Beastmaster only; they count toward the maximum warband size and must be bought at creation, but can be replaced if killed. They are animals and do not advance. <b>Hired Swords:</b> Only Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter. <b>Special equipment:</b> Heroes start with special equipment (noted below) that cannot be replaced if lost.",
+   "rules": "Hardened Old World survivors in Lustria (Tuomas Pirinen). <b>Rare Heroes:</b> You may only ever buy one of each Hero type. Choose any Hero as the Leader. <b>Promotions:</b> When a Hero is lost you cannot rebuy him — instead keep his equipment and promote a Prospect into that role (as a Lad's Got Talent result, with access to two of the warband's Hero skill lists; the new Hero takes one Advance roll immediately and inherits the dead Hero's gear). <b>War Beasts:</b> Beastmaster only; they count toward the maximum warband size and must be bought at creation, but can be replaced if killed. They are animals and do not advance. <b>Hired Swords:</b> May hire only these Hired Swords, no others – Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter. <b>Special equipment:</b> Heroes start with special equipment (noted below) that cannot be replaced if lost.",
    "units": [
     {
      "id": "conqueror",
@@ -7971,7 +7971,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "Ogre mercenaries (Border Town Burning). <b>Fear:</b> All Ogres cause fear except Youngbloods. <b>Large:</b> All Ogres are Large Targets (+1 to be hit, may be shot at even if not closest) except Youngbloods and Half-growns. <b>Gluttony:</b> Each Ogre counts as two models when selling wyrdstone/treasure; a captured model (or any own member/animal/mount) may be devoured — reduce the warband's model count by 1 (or 2 for a Large captive), and an Ogre Hero gains XP equal to models eaten. <b>Slow Witted:</b> Ogres need twice the usual XP to advance. <b>Difficult Customers:</b> Ogre Heroes get −1 to find Rare items that are not Ogre-exclusive. <b>Cannibals:</b> may hire no Hired Swords except Halflings and the Ogre Bodyguard. Ogres never use daggers. Uses the Ogre racial maximum.",
+   "rules": "Ogre mercenaries (Border Town Burning). <b>Fear:</b> All Ogres cause fear except Youngbloods. <b>Large:</b> All Ogres are Large Targets (+1 to be hit, may be shot at even if not closest) except Youngbloods and Half-growns. <b>Gluttony:</b> Each Ogre counts as two models when selling wyrdstone/treasure; a captured model (or any own member/animal/mount) may be devoured — reduce the warband's model count by 1 (or 2 for a Large captive), and an Ogre Hero gains XP equal to models eaten. <b>Slow Witted:</b> Ogres need twice the usual XP to advance. <b>Difficult Customers:</b> Ogre Heroes get −1 to find Rare items that are not Ogre-exclusive. <b>Cannibals:</b> May hire only these Hired Swords, no others – Halflings and the Ogre Bodyguard. Ogres never use daggers. Uses the Ogre racial maximum.",
    "units": [
     {
      "id": "captain",
@@ -8128,7 +8128,7 @@
    "min": 3,
    "max": 12,
    "gold": 600,
-   "rules": "Cathay-bound trade caravan (Border Town Burning). <b>Merchant:</b> The Merchant is always the warband Leader. <b>Trade:</b> instead of searching for rare items, the Merchant may sell a rare item stored in the Trade Wagon (roll D6: 1-2 half price, 3-4 full, 5-6 full + half). <b>Open for Business:</b> Any player may send a Hero to the Merchant to buy/sell one item if a price is agreed. <b>Rarity:</b> Any item reduced to Rare 2 or lower (Reputation, Streetwise, …) may be bought as Common. <b>Hired Swords:</b> may hire any available to Mercenaries.",
+   "rules": "Cathay-bound trade caravan (Border Town Burning). <b>Merchant:</b> The Merchant is always the warband Leader. <b>Trade:</b> instead of searching for rare items, the Merchant may sell a rare item stored in the Trade Wagon (roll D6: 1-2 half price, 3-4 full, 5-6 full + half). <b>Open for Business:</b> Any player may send a Hero to the Merchant to buy/sell one item if a price is agreed. <b>Rarity:</b> Any item reduced to Rare 2 or lower (Reputation, Streetwise, …) may be bought as Common. <b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.",
    "units": [
     {
      "id": "merchant",

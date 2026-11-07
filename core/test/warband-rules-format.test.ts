@@ -36,6 +36,6 @@ describe('the rules text of the Lustrian Reavers', () => {
     const d = defs();
     expect(d['War Beasts']).toMatch(/animals and do not advance/);
     expect(d['Special equipment']).toMatch(/special equipment \(noted below\) that cannot be replaced if lost/);
-    expect(d['Hired Swords']).toBe('Only Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter.');
+    expect(d['Hired Swords']).toBe('May hire only these Hired Swords, no others – Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter.');
   });
 });
