@@ -49,6 +49,8 @@ export interface UnitDef {
   large?: boolean;
   vehicle?: boolean;
   noArmour?: boolean;
+  /** Ignores the injury Blinded in one eye (the Augur, already blind): it counts as Full Recovery. */
+  eyeProof?: boolean;
   noMissile?: boolean;
   noHeavy?: boolean;
   /** Fixed gear that counts for the catalogue eligibility rule. */
