@@ -327,10 +327,11 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await expect(cards.nth(2)).toBeVisible();
   await expect(cards.nth(0)).toBeVisible();
   await expect(cards.nth(1)).toBeVisible();
-  const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
-  expect(Math.round(a!.y)).toBe(Math.round(b!.y));
-  expect(b!.x).toBeGreaterThan(a!.x + a!.width - 1);
-  expect(a!.width).toBeLessThan(480);
+  // the board lays itself out again once the window width is known, and a card measured in between is gone (CI of 7.11.2026: the box was null); measure until it holds
+  await expect.poll(async () => {
+    const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
+    return !!a && !!b && Math.round(a.y) === Math.round(b.y) && b.x > a.x + a.width - 1 && a.width < 480;
+  }, { message: 'two cards side by side, each small' }).toBe(true);
   await expect(cards.nth(0).getByLabel('Profile')).toBeVisible();
   await shot(page, 'trade-give-wide');
   await board.getByRole('button', { name: 'Sword' }).first().click();
