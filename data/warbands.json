@@ -1209,7 +1209,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Elder. Max. 2 Blood Brothers, max. 1 Priest of Taal, max. 7 Hunters, max. 5 Ruffians, max. 1 Ogre, any number of Kin.<br><b>Self-sufficient:</b> may not hire Hired Swords except Ogres.",
+   "rules": "<b>Choice:</b> Exactly 1 Elder. Max. 2 Blood Brothers, max. 1 Priest of Taal, max. 7 Jaegers, max. 5 Ruffians, max. 1 Ogre, any number of Kinsmen.<br><b>Self-sufficient:</b> may not hire Hired Swords except Ogres.",
    "units": [
     {
      "id": "elder",
@@ -1390,7 +1390,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Carnival Master. Max. 2 Brutes, max. 2 Tainted Ones, max. 2 Plague Bearers, max. 1 Plague Cart, any number of Nurglings and Brethren.<br><b>Tainted:</b> Counts as Possessed for exploration/injuries. No Hired Swords.<br><b>Blessings of Nurgle</b> may be bought for Tainted Ones only at recruitment; the first is at listed cost, each further Blessing costs double.",
+   "rules": "<b>Choice:</b> Exactly 1 Carnival Master. Max. 2 Brutes, max. 2 Tainted Ones, max. 2 Plague Bearers, max. 1 Plague Cart, any number of Nurglings and Brethren.<br><b>Tainted:</b> Counts as Possessed for exploration/injuries. No Hired Swords.<br><b>Blessings of Nurgle:</b> May be bought for Tainted Ones only at recruitment; the first is at listed cost, each further Blessing costs double.",
    "units": [
     {
      "id": "master",
@@ -1775,7 +1775,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 1 Sergeant, 2 Mountain Hunters, 1 Youngblood; any number of Mountainguard and Marksmen, max. 3 Halfling Scouts.",
+   "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 1 Sergeant, 2 Bergjaegers, 1 Youngblood; any number of Mountainguard and Marksmen, max. 3 Halfling Scouts.",
    "units": [
     {
      "id": "capt",
@@ -1951,7 +1951,7 @@
    "min": 3,
    "max": 20,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity.</b> Hired Swords only: Pit Fighter, Ogre Bodyguard, Warlock.",
+   "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity:</b> The warband is subject to Animosity.<br><b>Hired Swords:</b> Only Pit Fighter, Ogre Bodyguard, Warlock.",
    "units": [
     {
      "id": "boss",
@@ -2132,7 +2132,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Chief. Max. 1 Shaman, 2 Bestigors, 1 Centigor, 1 Minotaur, 5 Gors, 5 Chaos Hounds; any number of Ungors.<br><b>No Hired Swords</b> (unless explicitly allowed).",
+   "rules": "<b>Choice:</b> Exactly 1 Chief. Max. 1 Shaman, 2 Bestigors, 1 Centigor, 1 Minotaur, 5 Gors, 5 Chaos Hounds; any number of Ungors.<br><b>No Hired Swords:</b> Unless explicitly allowed.",
    "units": [
     {
      "id": "chief",
@@ -2357,7 +2357,7 @@
      "note": "<b>Hung.</b><br><b>Disloyalty:</b> Max. <b>12</b> warriors instead of 15.<br><b>Affinity with Horses:</b> Warhorses always cost only 40 gc; all Heroes (including promoted henchmen) automatically have \"Ride Warhorse\"; number of mounts unlimited (Border Town Burning)."
     }
    ],
-   "rules": "<b>Choose a tribe</b> (above): Norse, Kurgan or Hung — each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. Lost: +1 per own Hero taken out of action — on 12+ the leader becomes a Chaos Spawn. Won: +1 per enemy the leader took out of action — on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> Only Pit Fighters, Ogres, Norse Shamans, Imperial Assassins (Witches/Warlocks only without the Mark of Arkhar).",
+   "rules": "<b>Tribe:</b> Choose one above: Norse, Kurgan or Hung — each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. Lost: +1 per own Hero taken out of action — on 12+ the leader becomes a Chaos Spawn. Won: +1 per enemy the leader took out of action — on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> Only Pit Fighters, Ogres, Norse Shamans, Imperial Assassins (Witches/Warlocks only without the Mark of Arkhar).",
    "units": [
     {
      "id": "chieftain",
@@ -2539,7 +2539,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br>Hired Swords as Mercenaries. <b>No alliance with Chaos.</b> Hero special items (rare): Vodka, Bear-claw Necklace.<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
+   "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br><b>Hired Swords:</b> As Mercenaries.<br><b>Chaos:</b> No alliance with Chaos.<br><b>Hero special items:</b> Rare: Vodka, Bear-claw Necklace.<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
    "units": [
     {
      "id": "capt",
@@ -3031,7 +3031,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Black Orc Boss. Max. 2 Black Orcs, 2 Young'uns; any number of Boyz, Shootaz (≤ Boyz), max. 4 Nuttaz, max. 1 Troll.<br>Animosity (Annual 2002: trigger on a D6 roll of 1).<br><b>Let the goons do the work:</b> Black Orcs never ride mounts; only normal Orcs may ride a boar or similar.<br><b>Da Boss is Dead!:</b> If the Boss is killed, a Black Orc always assumes leadership first (regardless of experience) and automatically gains the Oi Behave! skill.",
+   "rules": "<b>Choice:</b> Exactly 1 Black Orc Boss. Max. 2 Black Orcs, 2 Young'uns; any number of Boyz, Shootaz (≤ Boyz), max. 4 Nuttaz, max. 1 Troll.<br><b>Animosity:</b> Annual 2002 version: triggers on a D6 roll of 1.<br><b>Let the goons do the work:</b> Black Orcs never ride mounts; only normal Orcs may ride a boar or similar.<br><b>Da Boss is Dead!:</b> If the Boss is killed, a Black Orc always assumes leadership first (regardless of experience) and automatically gains the Oi Behave! skill.",
    "units": [
     {
      "id": "bboss",
@@ -3715,7 +3715,7 @@
    "min": 3,
    "max": 20,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Chieftain. Max. 4 Braves, 1 Shaman; any number of Forest Goblins, max. 5 Red Toof Boyz, max. 5 Sluggas, max. 1 Gigantic Spider.<br>Animosity. Natives (no penalty in woods).",
+   "rules": "<b>Choice:</b> Exactly 1 Chieftain. Max. 4 Braves, 1 Shaman; any number of Forest Goblins, max. 5 Red Toof Boyz, max. 5 Sluggas, max. 1 Gigantic Spider.<br><b>Animosity:</b> The warband is subject to Animosity.<br><b>Natives:</b> No penalty in woods.",
    "units": [
     {
      "id": "fgchief",
@@ -5821,7 +5821,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Plague Priest. Max. 1 Pestilens Sorcerer, 2 Plague Monks, 2 Monk Initiates; any number of Plague Novices, any number of Giant Rats, max. 1 Rat Ogre.<br>Skaven base rules.",
+   "rules": "<b>Choice:</b> Exactly 1 Plague Priest. Max. 1 Pestilens Sorcerer, 2 Plague Monks, 2 Monk Initiates; any number of Plague Novices, any number of Giant Rats, max. 1 Rat Ogre.<br><b>Skaven:</b> Uses the Skaven base rules.",
    "units": [
     {
      "id": "plaguepriest",
@@ -6027,7 +6027,7 @@
      "note": "<b>Best Equipped:</b> The wealthiest, most experienced human warband in Lustria — starts with 600 gc (a one-off game gives +100 gc; a campaign gives +20%, both 600 from the base 500)."
     }
    ],
-   "rules": "<b>Choose a city</b> (above): Miragliano, Remas or Trantio — each with its own special rules.<br><b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 5 Duellists, max. 7 Marksmen.",
+   "rules": "<b>City:</b> Choose one above: Miragliano, Remas or Trantio — each with its own special rules.<br><b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 5 Duellists, max. 7 Marksmen.",
    "units": [
     {
      "id": "tcaptain",
@@ -7701,7 +7701,7 @@
    "min": 3,
    "max": 10,
    "gold": 500,
-   "rules": "Hardened Old World survivors in Lustria (Tuomas Pirinen). <b>Rare Heroes:</b> You may only ever buy one of each Hero type. Choose any Hero as the Leader. <b>Promotions:</b> When a Hero is lost you cannot rebuy him — instead keep his equipment and promote a Prospect into that role (as a Lad's Got Talent result, with access to two of the warband's Hero skill lists; the new Hero takes one Advance roll immediately and inherits the dead Hero's gear). <b>War Beasts</b> (Beastmaster only) count toward the maximum warband size and must be bought at creation, but can be replaced if killed. <b>Hired Swords:</b> Only Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter. Heroes start with special equipment (noted below) that cannot be replaced if lost. Humans (War Beasts are animals and do not advance).",
+   "rules": "Hardened Old World survivors in Lustria (Tuomas Pirinen). <b>Rare Heroes:</b> You may only ever buy one of each Hero type. Choose any Hero as the Leader. <b>Promotions:</b> When a Hero is lost you cannot rebuy him — instead keep his equipment and promote a Prospect into that role (as a Lad's Got Talent result, with access to two of the warband's Hero skill lists; the new Hero takes one Advance roll immediately and inherits the dead Hero's gear). <b>War Beasts:</b> Beastmaster only; they count toward the maximum warband size and must be bought at creation, but can be replaced if killed. They are animals and do not advance. <b>Hired Swords:</b> Only Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter. <b>Special equipment:</b> Heroes start with special equipment (noted below) that cannot be replaced if lost.",
    "units": [
     {
      "id": "conqueror",
