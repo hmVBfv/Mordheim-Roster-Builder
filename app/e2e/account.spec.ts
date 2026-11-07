@@ -4,7 +4,7 @@
    admin's tools. Runs for the campaign app only (playwright.config.ts);
    app.spec.ts checks that the Quick Build has none of it. */
 import { expect, test, type Page } from '@playwright/test';
-import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
+import { noSideScroll, settledBox, shot, tapTargets, useTheme } from './helpers.ts';
 
 const THEMES = ['chronicle', 'parchment'] as const;
 
@@ -244,7 +244,7 @@ test('the admin on a wide screen: the users in a table, the tools in the side na
   await page.goto('admin/users');
   const table = page.getByRole('table', { name: 'Users' });
   await expect(table.getByRole('row')).toHaveCount(4);
-  const [a, b] = await Promise.all([table.getByRole('row').nth(1).boundingBox(), table.getByRole('row').nth(2).boundingBox()]);
+  const [a, b] = await Promise.all([settledBox(table.getByRole('row').nth(1)), settledBox(table.getByRole('row').nth(2))]);
   // one row under the other, all columns in one line
   expect(b!.y).toBeGreaterThan(a!.y);
   await expect(table.getByRole('columnheader', { name: 'Last seen' })).toBeVisible();

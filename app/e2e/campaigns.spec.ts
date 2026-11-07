@@ -5,7 +5,7 @@
 import { crc32, deflateSync } from 'node:zlib';
 import type { ScenarioNpc } from '@mordheim/core';
 import { expect, test } from '@playwright/test';
-import { noSideScroll, shot, tapTargets, useTheme } from './helpers.ts';
+import { noSideScroll, settledBox, shot, tapTargets, useTheme } from './helpers.ts';
 import { playServer, SAVE, serverWarband } from './play.ts';
 
 let errors: string[] = [];
@@ -72,13 +72,13 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     // a phone: one under the other
     await noSideScroll(page);
     await tapTargets(page);
-    const phone = await Promise.all([0, 1].map((i) => cards.nth(i).boundingBox()));
+    const phone = await Promise.all([0, 1].map((i) => settledBox(cards.nth(i))));
     expect(phone[1]!.y, 'stacked').toBeGreaterThan(phone[0]!.y + phone[0]!.height - 1);
     await shot(page, `${theme}-campaign-warbands`);
     // a desktop: side by side
     await page.setViewportSize({ width: 1440, height: 900 });
     await noSideScroll(page);
-    const wide = await Promise.all([0, 1, 2].map((i) => cards.nth(i).boundingBox()));
+    const wide = await Promise.all([0, 1, 2].map((i) => settledBox(cards.nth(i))));
     expect(Math.abs(wide[0]!.y - wide[1]!.y), 'two side by side').toBeLessThan(2);
     expect(wide[1]!.x, 'to the right').toBeGreaterThan(wide[0]!.x + wide[0]!.width - 1);
     await shot(page, `${theme}-campaign-warbands-desktop`);
@@ -251,7 +251,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
    warbands, the members) to the left from what happened (battles, the map) to
    the right; Home puts the campaigns beside the warbands. */
 const box = async (page: import('@playwright/test').Page, name: string | RegExp) => {
-  const b = await page.getByRole('heading', { name, exact: typeof name === 'string' }).first().boundingBox();
+  const b = await settledBox(page.getByRole('heading', { name, exact: typeof name === 'string' }).first());
   if (!b) throw new Error(`no heading ${String(name)} on the screen`);
   return b;
 };
@@ -277,11 +277,11 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     // the members are a line each, two to a row; an empty map is a small picture, not a poster
     const people = page.getByRole('list', { name: 'Members' }).getByRole('listitem');
     await expect(people).toHaveCount(4);
-    const [p1, p2, p3] = [await people.nth(0).boundingBox(), await people.nth(1).boundingBox(), await people.nth(2).boundingBox()];
+    const [p1, p2, p3] = [await settledBox(people.nth(0)), await settledBox(people.nth(1)), await settledBox(people.nth(2))];
     expect(p1!.height).toBeLessThan(60);
     expect(Math.abs(p1!.y - p2!.y)).toBeLessThan(2);
     expect(p3!.y).toBeGreaterThan(p1!.y + p1!.height - 2);
-    expect((await page.locator('[data-scene="map"]').boundingBox())!.height).toBeLessThan(140);
+    expect((await settledBox(page.locator('[data-scene="map"]')))!.height).toBeLessThan(140);
     await noSideScroll(page);
     await shot(page, `${theme}-campaign-desktop`);
     await page.setViewportSize({ width: 1920, height: 1080 });
@@ -301,7 +301,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(list.getByRole('link')).toHaveText([/The Hel Fenn Campaign\s*Leader · Setup · 1 warband/, /Summer in Sylvania\s*Player · Setup · 0 warbands/]);
     const warbandLinks = page.getByRole('main').getByRole('link').filter({ hasText: /Mercenaries/ });
     await expect(warbandLinks).toHaveCount(3);
-    const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await warbandLinks.nth(0).boundingBox(), await warbandLinks.nth(1).boundingBox(), await warbandLinks.nth(2).boundingBox()];
+    const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await settledBox(warbandLinks.nth(0)), await settledBox(warbandLinks.nth(1)), await settledBox(warbandLinks.nth(2))];
     // the campaigns stand on the right, at the top; the warbands on the left, two to a row
     expect(campaigns.x).toBeGreaterThan(warbands.x + 400);
     expect(campaigns.y).toBeLessThan(warbands.y);
@@ -309,8 +309,8 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(second!.x).toBeGreaterThan(first!.x + 200);
     expect(third!.y).toBeGreaterThan(first!.y + first!.height - 2);
     // the button under the list stands apart from the last card, as the warbands' buttons do
-    const lastCampaign = await list.getByRole('link').last().boundingBox();
-    const allCampaigns = await page.getByRole('link', { name: 'All campaigns' }).boundingBox();
+    const lastCampaign = await settledBox(list.getByRole('link').last());
+    const allCampaigns = await settledBox(page.getByRole('link', { name: 'All campaigns' }));
     expect(allCampaigns!.y - (lastCampaign!.y + lastCampaign!.height)).toBeGreaterThanOrEqual(8);
     await list.getByRole('link').first().click();
     await expect(page).toHaveURL(new RegExp(`/campaign/${c.id}$`));
@@ -521,10 +521,10 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     const pick = sheet.getByRole('list', { name: 'Named NPCs to pick' }); // a tile that is picked reads “✓ Old Marek …”
     await pick.getByRole('button', { name: /Old Marek/ }).click();
     await pick.getByRole('button', { name: /Skritch/ }).click();
-    const box = (await sheet.boundingBox())!;
-    const tiles = (await pick.boundingBox())!;
+    const box = (await settledBox(sheet))!;
+    const tiles = (await settledBox(pick))!;
     expect(tiles.width, 'the tiles use the width of the window').toBeGreaterThan(box.width * 0.8);
-    const [t1, t2] = [(await pick.getByRole('button', { name: /Brother Anselm/ }).boundingBox())!, (await pick.getByRole('button', { name: /Gerhard Voss/ }).boundingBox())!]; // the first two
+    const [t1, t2] = [(await settledBox(pick.getByRole('button', { name: /Brother Anselm/ })))!, (await settledBox(pick.getByRole('button', { name: /Gerhard Voss/ })))!]; // the first two
     expect(Math.abs(t1.y - t2.y), 'tiles in a row').toBeLessThan(2);
     await page.screenshot({ path: `test-results/screens/campaign-${theme}-background-refs-desktop.png` });
     await sheet.getByRole('button', { name: 'Cancel' }).click();
@@ -703,7 +703,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await shot(page, `${theme}-world-npc-card-desktop`);
     await page.getByRole('button', { name: 'Add an NPC' }).click();
     const npc = page.getByRole('dialog', { name: 'Add an NPC' });
-    const box = (await npc.boundingBox())!;
+    const box = (await settledBox(npc))!;
     expect(box.width, 'wider than an ordinary sheet').toBeGreaterThan(1000);
     expect(box.y, 'room above').toBeGreaterThan(20);
     expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
@@ -711,12 +711,12 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await npc.getByLabel('Search every model').fill('ogre');
     const hits = npc.getByRole('list', { name: 'Models found' }).getByRole('listitem');
     await expect(hits.first()).toBeVisible();
-    const [h1, h2] = [(await hits.nth(0).boundingBox())!, (await hits.nth(1).boundingBox())!];
+    const [h1, h2] = [(await settledBox(hits.nth(0)))!, (await settledBox(hits.nth(1)))!];
     expect(Math.abs(h1.y - h2.y), 'two hits to a row').toBeLessThan(2);
     expect(h2.x, 'side by side').toBeGreaterThan(h1.x + h1.width - 1);
     await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-picker-desktop.png` });
     await npc.getByRole('button', { name: /^Copy Ogre Bodyguard \(/ }).click();
-    const grid = (await npc.getByRole('group', { name: 'Characteristics' }).boundingBox())!;
+    const grid = (await settledBox(npc.getByRole('group', { name: 'Characteristics' })))!;
     expect(grid.height, 'the ten characteristics in one row').toBeLessThan(110);
     await page.screenshot({ path: `test-results/screens/campaign-${theme}-world-npc-values-desktop.png` });
     await npc.getByRole('button', { name: 'Cancel' }).click();
@@ -734,17 +734,17 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await page.goto(`campaign/${c.id}/world`);
     await page.getByRole('button', { name: 'Add an NPC' }).click();
     const sheet = page.getByRole('dialog', { name: 'Add an NPC' });
-    const box = (await sheet.boundingBox())!;
+    const box = (await settledBox(sheet))!;
     expect(box.width, 'wide').toBeGreaterThan(800);
     expect(box.y, 'room above').toBeGreaterThan(20);
     expect(900 - (box.y + box.height), 'room below').toBeGreaterThan(20);
     expect(Math.abs(box.x + box.width / 2 - 720), 'centred').toBeLessThan(2);
     // the fields stand two to a row
     await expect(sheet.getByLabel('Name (English)')).toBeVisible(); // the form loads when it opens: measure once it is there
-    const y = async (label: string) => (await sheet.getByLabel(label).boundingBox())!.y;
+    const y = async (label: string) => (await settledBox(sheet.getByLabel(label)))!.y;
     await expect.poll(async () => Math.abs((await y('Faction')) - (await y('Name (English)'))), { message: 'same row' }).toBeLessThan(2);
-    const a = (await sheet.getByLabel('Faction').boundingBox())!;
-    const b = (await sheet.getByLabel('Name (English)').boundingBox())!;
+    const a = (await settledBox(sheet.getByLabel('Faction')))!;
+    const b = (await settledBox(sheet.getByLabel('Name (English)')))!;
     expect(b.x, 'to the right').toBeGreaterThan(a.x + a.width);
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow), 'page behind does not scroll').toBe('hidden');
     await page.screenshot({ path: `test-results/screens/campaign-${theme}-sheet-desktop.png` });
@@ -1005,7 +1005,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     const card = page.getByRole('article', { name: 'The night at the ferry' });
     const tables = card.getByRole('table');
     await expect(tables).toHaveCount(3);
-    const [t1, t2] = [(await tables.nth(0).boundingBox())!, (await tables.nth(1).boundingBox())!];
+    const [t1, t2] = [(await settledBox(tables.nth(0)))!, (await settledBox(tables.nth(1)))!];
     expect(Math.abs(t1.y - t2.y), 'two NPCs to a row').toBeLessThan(2);
     // the title of a fold-out carries a chevron: that it opens can be seen
     const chevron = await card.getByText('Skills, equipment and rules').first().evaluate((el) => { const c = getComputedStyle(el, '::after'); return { content: c.content, width: c.borderRightWidth }; });
@@ -1013,7 +1013,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await shot(page, `${theme}-scenario-npcs-desktop`);
     await card.getByRole('button', { name: 'Change the NPCs of The night at the ferry' }).click();
     const form = page.getByRole('dialog', { name: 'NPCs of The night at the ferry' });
-    const box = (await form.boundingBox())!;
+    const box = (await settledBox(form))!;
     expect(box.width, 'wider than an ordinary sheet').toBeGreaterThan(1000);
     expect(box.y, 'room above').toBeGreaterThan(20);
     await expect(form.getByLabel('Name of the NPC').first()).toBeVisible();
@@ -1046,7 +1046,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`campaign/${c.id}/world`);
     const sideBySide = async (a: ReturnType<typeof page.getByRole>, z: ReturnType<typeof page.getByRole>, what: string) => {
-      const [x, y] = [(await a.boundingBox())!, (await z.boundingBox())!];
+      const [x, y] = [(await settledBox(a))!, (await settledBox(z))!];
       expect(Math.abs(x.y - y.y), `${what}: one row`).toBeLessThan(2);
       const [left, right] = x.x < y.x ? [x, y] : [y, x]; // the order the server lists them in is not the test's business
       expect(right.x, `${what}: side by side`).toBeGreaterThan(left.x + left.width - 1);
@@ -1184,8 +1184,8 @@ test('after the battle: the leader closes it, the player takes it over, goes thr
 
   // on a desktop the sequence and what changed stand side by side
   await page.setViewportSize({ width: 1280, height: 900 });
-  const steps = await page.getByRole('heading', { level: 2, name: 'After the battle' }).boundingBox();
-  const changed = await page.getByRole('heading', { level: 2, name: 'What changed' }).boundingBox();
+  const steps = await settledBox(page.getByRole('heading', { level: 2, name: 'After the battle' }));
+  const changed = await settledBox(page.getByRole('heading', { level: 2, name: 'What changed' }));
   expect(changed!.x).toBeGreaterThan(steps!.x + 200);
   await shot(page, 'aftermath-desktop');
 });
@@ -1779,9 +1779,9 @@ test('on a wide monitor the pages use its width: lists and cards take it, text a
   const width = async (path: string) => {
     await page.goto(path);
     await expect(page.locator('main > section').first()).toBeVisible();
-    return Math.round((await page.locator('main').boundingBox())!.width);
+    return Math.round((await settledBox(page.locator('main')))!.width);
   };
-  const widthOfPage = async () => Math.round((await page.locator('main > section').first().boundingBox())!.width);
+  const widthOfPage = async () => Math.round((await settledBox(page.locator('main > section').first()))!.width);
   // the screens with cards and lists: the whole width the roster has
   for (const path of ['./', 'warbands', `campaign/${c.id}`, `campaign/${c.id}/world`]) {
     expect(await width(path), path).toBeGreaterThanOrEqual(1900);
