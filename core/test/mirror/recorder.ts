@@ -54,7 +54,7 @@ function copy<T>(x: T): T {
 
 /* Data keys only core reads; the parity data leaves them out (test/support/parityData.ts), legacy's unit definitions still carry them, so the
    comparison skips them – these keys by name, nothing else (docs/behaviour-changes.md, #198, #199). */
-const CORE_ONLY_KEYS = new Set(['beasts', 'beastMax', 'wizardOption']);
+const CORE_ONLY_KEYS = new Set(['beasts', 'beastMax', 'wizardOption', 'upgradeOption']);
 
 /* JSON-comparable, with object keys sorted: the two sides build their
    objects in different orders. */

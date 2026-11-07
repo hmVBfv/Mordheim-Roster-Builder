@@ -73,10 +73,10 @@ export interface AdvanceView {
 const STATS: StatKey[] = ['M', 'WS', 'BS', 'S', 'T', 'W', 'I', 'A', 'Ld'];
 const clean = (label: string) => label.replace(/[[\]]/g, '');
 
-function groups(lists: core.SkillGroup[], known: string[]): ChoiceGroup[] {
+function groups(lists: core.SkillGroup[], known: string[], locked: string[] = []): ChoiceGroup[] {
   return lists.map(([label, skills]) => ({
     label: clean(label),
-    items: skills.filter(([n]) => !String(n).startsWith('▸')).map(([n, t]) => ({ key: n, name: n, text: t, known: known.includes(n) })),
+    items: skills.filter(([n]) => !String(n).startsWith('▸') && !locked.includes(n)).map(([n, t]) => ({ key: n, name: n, text: t, known: known.includes(n) })),
   }));
 }
 
@@ -119,7 +119,7 @@ function warriorView(ctx: core.Ctx, m: Model): AdvanceView | null {
   if (hero) {
     const lists = m.promoted ? core.promotedSkillLists(ctx, m) : core.skillListsFor(ctx, def);
     const own = core.magicOfModel(ctx, m);
-    return { ...base, skills: groups(lists, known), spells: spellChoices(ctx, own ?? core.casterLore(ctx, m), !!own, m.spells ?? []) };
+    return { ...base, skills: groups(lists, known, core.lockedSkills(ctx, m)), spells: spellChoices(ctx, own ?? core.casterLore(ctx, m), !!own, m.spells ?? []) };
   }
   // a group: may one of its men be promoted?
   let talent: AdvanceView['talent'];

@@ -382,3 +382,9 @@ export function hsAdvanceStatus(ctx: Ctx, rec: HireRecord, e: HireEntry | null |
   const applied = Object.values(adv).reduce((a: number, v) => a + (Number(v) || 0), 0) + skills.length + spAdv;
   return { earned, applied, due: earned > applied };
 }
+
+/** Skills of a unit's lists that only a man with the unit's upgrade may take (Proven Warrior: the Young'un with Black Orc Blood). */
+export function lockedSkills(ctx: Ctx, m: Model | null | undefined): string[] {
+  if (m?.upgraded) return [];
+  return (warbandDef(ctx)?.units ?? []).flatMap((u) => (u.upgradeOption ? [u.upgradeOption.skill] : []));
+}

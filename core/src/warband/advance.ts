@@ -9,7 +9,7 @@ import { ctxOf, type Ctx } from '../rules/context.ts';
 import { goldTreasury, modelUnitCost, totalHeroes } from '../rules/costs.ts';
 import { enItem } from '../export/rulesText.ts';
 import { unitDef } from '../rules/lookup.ts';
-import { canAdv, canBeLeader, hsCanAdv, isMarauderChief, isMarauderSeer, magicOfModel, memberCount, memberName, memberNamed, spellBase } from '../rules/profile.ts';
+import { canAdv, canBeLeader, hsCanAdv, isMarauderChief, isMarauderSeer, lockedSkills, magicOfModel, memberCount, memberName, memberNamed, spellBase } from '../rules/profile.ts';
 import { logEvent } from './log.ts';
 import { findModel, nextModelUid, update, type WarbandDraft } from './update.ts';
 
@@ -55,21 +55,41 @@ export function addSkill(ctx: Ctx, uid: number, value: string): WarbandState {
   });
 }
 
-/** Learns a skill chosen from a list (never twice). */
+/** Learns a skill chosen from a list (never twice). A skill only an upgraded man may take is refused to the others, and the one an upgrade names
+    makes him what it says: the Young'un with Black Orc Blood who learns Proven Warrior counts as a Black Orc – his rules, equipment and skill
+    lists – while his profile and price stay the Young'un's (`statsOf`). */
 export function addSkillFromList(ctx: Ctx, uid: number, value: string): WarbandState {
   if (!value || value === '—') return ctx.s;
   const m0 = findModel(ctx.s, uid);
-  if (!m0 || (m0.skills || []).includes(value)) return ctx.s;
+  if (!m0 || (m0.skills || []).includes(value) || lockedSkills(ctx, m0).includes(value)) return ctx.s;
   return update(ctx, (d, c) => {
     const m = findModel(d, uid) as Model;
     m.skills = m.skills || [];
     m.skills.push(value);
+    const opt = unitDef(c, m.statsOf ?? m.uid_def)?.upgradeOption;
+    if (m.upgraded && opt && opt.skill === value && !m.statsOf) { m.statsOf = m.uid_def; m.uid_def = opt.becomes; }
     logEvent(d, 'advance', `${nameOf(c, m)} learned ${value}.`, { uid: m.uid, name: nameOf(c, m), uid_def: m.uid_def, skill: value, exp: Number(m.exp) || 0 });
   });
 }
 
 export function removeSkill(ctx: Ctx, uid: number, index: number): WarbandState {
-  return update(ctx, (d) => { const m = findModel(d, uid); if (m && m.skills) m.skills.splice(index, 1); });
+  return update(ctx, (d, c) => {
+    const m = findModel(d, uid);
+    if (!m || !m.skills) return;
+    const [gone] = m.skills.splice(index, 1);
+    // without the skill that made him a Black Orc he is the Young'un again
+    if (m.statsOf && unitDef(c, m.statsOf)?.upgradeOption?.skill === gone) { m.uid_def = m.statsOf; delete m.statsOf; }
+  });
+}
+
+/** Buys the upgrade of a unit (Black Orc Blood of the Young'un, 10 gc) for one man, or takes it back. At most `max` men of the warband have it, and one
+    who has become what it makes him keeps it. */
+export function setUnitUpgrade(ctx: Ctx, uid: number, on: boolean): WarbandState {
+  const m0 = findModel(ctx.s, uid);
+  const def = m0 ? unitDef(ctx, m0.statsOf ?? m0.uid_def) : undefined;
+  if (!m0 || !def?.upgradeOption || !!m0.upgraded === !!on) return ctx.s;
+  if (on ? ctx.s.models.filter((m) => m.upgraded && (m.statsOf ?? m.uid_def) === def.id).length >= def.upgradeOption.max : !!m0.statsOf) return ctx.s;
+  return update(ctx, (d) => { const m = findModel(d, uid) as Model; if (on) m.upgraded = true; else delete m.upgraded; });
 }
 
 /** A promoted henchman picks two of the warband's Hero skill lists. */

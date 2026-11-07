@@ -53,6 +53,8 @@ export interface Model {
   promoted?: boolean;
   /** A hero who learned to cast (house rule / campaign), and his lore. */
   caster?: boolean;
+  /** Has bought the unit's upgrade (`upgradeOption`): Black Orc Blood. */
+  upgraded?: boolean;
   lore?: string;
   magic?: string;
   /** Games to miss (injuries). */
