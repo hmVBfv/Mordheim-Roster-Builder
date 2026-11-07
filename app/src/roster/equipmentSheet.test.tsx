@@ -13,7 +13,7 @@ import { createWarband } from './view.ts';
 beforeAll(polyfillDialog);
 afterEach(cleanup);
 
-const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), sellStart: vi.fn(), addBeast: vi.fn(), dropBeast: vi.fn() };
+const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), sellStart: vi.fn(), addBeast: vi.fn(), dropBeast: vi.fn(), mutation: vi.fn() };
 
 function sheet(wb = 'merc', unit = 'capt', round = 0) {
   const c = (s: core.WarbandState) => core.ctxOf(data, s);
@@ -150,3 +150,32 @@ describe('the War Beasts section of the Beastmaster', () => {
   });
 });
 
+
+/* Wish #224: what a warrior may buy as a mutation (a Mutant, a Tainted One, one with the Mutant skill) is bought in the same Gear sheet, in a category
+   of its own, as well as in the sheet of its own. */
+describe('mutations in the equipment sheet (#224)', () => {
+  it('are a category of their own for a unit that may have them, with a stepper and the price', async () => {
+    const d = sheet('possessed', 'mut');
+    const section = d.querySelector('section[aria-label="Mutations"]')!;
+    expect(section).not.toBeNull();
+    const claw = within(section as HTMLElement).getByText(/Great Claw · 50 gc/, { selector: 'span', exact: false });
+    expect(claw).toBeTruthy();
+    const user = userEvent.setup();
+    await user.click(within(section as HTMLElement).getByRole('button', { name: 'One Great Claw more', hidden: true }));
+    expect(act.mutation).toHaveBeenCalledWith('Große Klaue', 1, 'Great Claw');
+  });
+
+  it('are not offered to a unit that cannot have them', () => {
+    const d = sheet();
+    expect(d.querySelector('section[aria-label="Mutations"]')).toBeNull();
+  });
+
+  it('come after the list and before the rare items', () => {
+    const d = sheet('possessed', 'mut');
+    const mut = d.querySelector('section[aria-label="Mutations"]')!;
+    const buy = d.querySelector('section[aria-label="Buy from the list"]')!;
+    const rare = d.querySelector('section[aria-label="Rare and trading-post items"]')!;
+    expect(buy.compareDocumentPosition(mut) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(mut.compareDocumentPosition(rare) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});

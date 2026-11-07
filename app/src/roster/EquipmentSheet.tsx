@@ -8,6 +8,7 @@ import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import type { useSheet } from '../ui/useSheet.ts';
 import { Strip } from './Bits.tsx';
+import { MutationList } from './ChaosSheets.tsx';
 import type { EquipmentView } from './equipment.ts';
 import styles from './Roster.module.css';
 
@@ -26,6 +27,8 @@ export interface EquipmentActions {
   /** Takes on a War Beast of a Beastmaster, or lets one go. */
   addBeast: (id: string) => void;
   dropBeast: (id: string) => void;
+  /** Sets how many of a mutation (or blessing) he has. */
+  mutation: (key: string, n: number, name: string) => void;
 }
 
 function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; value: number; min?: number; max?: number; onChange: (v: number) => void }) {
@@ -153,6 +156,16 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
         ))}
       </div>
       </section>
+      {v.mutations && (
+        <section className={styles.eqGroup} aria-label="Mutations">
+          <h3>{v.mutations.label}</h3>
+          <p className={ui.muted}>
+            The dearest {v.mutations.one} at its price, every further one costs double. Together: <b>{v.mutations.cost} gc</b>.
+            {v.mutations.locked ? ` He has fought his first battle: ${v.mutations.label.toLowerCase()} are bought only as a warrior is hired.` : ''}
+          </p>
+          <MutationList view={v.mutations} onSet={act.mutation} />
+        </section>
+      )}
       <section className={styles.eqGroup} aria-label="Rare and trading-post items">
         <h3>Rare and trading-post items</h3>
         {v.rare.length > 0 && (

@@ -10,6 +10,24 @@ import styles from './Roster.module.css';
 
 type Sheet = ReturnType<typeof useSheet>;
 
+/** The mutations (or blessings) a warrior may have, a stepper each: in the sheet of their own and in the equipment sheet (#224). */
+export function MutationList({ view, onSet }: { view: MutationView; onSet: (key: string, n: number, name: string) => void }) {
+  return (
+    <ul className={styles.eqList} aria-label={view.label}>
+      {view.items.map((it) => (
+        <li key={it.key} className={styles.eqRow}>
+          <span className={styles.eqName}>{it.name} · {it.price} gc<small>{it.text}{it.more && it.count === 0 && !view.locked ? ` (${it.more})` : ''}</small></span>
+          <span className={styles.stepper}>
+            <button type="button" aria-label={`One ${it.name} less`} disabled={!!it.less} onClick={() => onSet(it.key, it.count - 1, it.name)}>−</button>
+            <span aria-live="polite">{it.count}</span>
+            <button type="button" aria-label={`One ${it.name} more`} disabled={!!it.more} onClick={() => onSet(it.key, it.count + 1, it.name)}>+</button>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function MutationSheet({ dialogRef, close, view, onSet }: {
   dialogRef: Sheet['ref']; close: Sheet['close']; view: MutationView | null;
   onSet: (key: string, n: number, name: string) => void;
@@ -29,18 +47,7 @@ export function MutationSheet({ dialogRef, close, view, onSet }: {
             </p>
             {view.locked && <p className={ui.muted}>He has fought his first battle: {view.label.toLowerCase()} are bought only as a warrior is hired.</p>}
           </div>
-          <ul className={styles.eqList} aria-label={view.label}>
-            {view.items.map((it) => (
-              <li key={it.key} className={styles.eqRow}>
-                <span className={styles.eqName}>{it.name} · {it.price} gc<small>{it.text}{it.more && it.count === 0 && !view.locked ? ` (${it.more})` : ''}</small></span>
-                <span className={styles.stepper}>
-                  <button type="button" aria-label={`One ${it.name} less`} disabled={!!it.less} onClick={() => onSet(it.key, it.count - 1, it.name)}>−</button>
-                  <span aria-live="polite">{it.count}</span>
-                  <button type="button" aria-label={`One ${it.name} more`} disabled={!!it.more} onClick={() => onSet(it.key, it.count + 1, it.name)}>+</button>
-                </span>
-              </li>
-            ))}
-          </ul>
+          <MutationList view={view} onSet={onSet} />
           <p aria-live="polite">Together: <b>{view.cost} gc</b></p>
           <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
         </div>
