@@ -5,7 +5,7 @@ import type { Ctx } from './context.ts';
 import { modelTotalCost, totalSpent } from './costs.ts';
 import { dpHireCost, hsHireCost } from './pricing.ts';
 import { hsUpkeepFor } from './hire.ts';
-import { unitDef, warbandDef } from './lookup.ts';
+import { titleOf, unitDef, warbandDef } from './lookup.ts';
 import { statNum } from './saves.ts';
 
 export interface SummaryRow { name: string; n: number; gold: number | null; title?: string }
@@ -26,7 +26,7 @@ export function unitSummary(ctx: Ctx): UnitSummary {
   const counts: Record<string, { id: string; name: string; promo: boolean; n: number }> = {};
   const order: string[] = [];
   for (const m of s.models) {
-    const d = unitDef(ctx, m.uid_def);
+    const d = unitDef(ctx, titleOf(m));
     if (!d) continue;
     const promo = !!m.promoted && d.t === 'hen' && !d.vehicle;
     const key = (promo ? 'promo:' : '') + d.id;
@@ -40,7 +40,7 @@ export function unitSummary(ctx: Ctx): UnitSummary {
     .sort((a, b) => ((isLead(a) ? 0 : 1) - (isLead(b) ? 0 : 1)) || ((counts[a]!.promo ? 1 : 0) - (counts[b]!.promo ? 1 : 0)) || (listIdx(a) - listIdx(b)));
   const henK = order.filter((k) => { const d = udef(k); return d && d.t === 'hen' && !d.vehicle && !counts[k]!.promo; }).sort((a, b) => listIdx(a) - listIdx(b));
   const vehK = order.filter((k) => { const d = udef(k); return d && d.vehicle; }).sort((a, b) => listIdx(a) - listIdx(b));
-  const goldOf = (k: string) => s.models.filter((m) => m.uid_def === counts[k]!.id && (!!m.promoted) === counts[k]!.promo).reduce((a, m) => a + modelTotalCost(ctx, m), 0);
+  const goldOf = (k: string) => s.models.filter((m) => titleOf(m) === counts[k]!.id && (!!m.promoted) === counts[k]!.promo).reduce((a, m) => a + modelTotalCost(ctx, m), 0);
   const row = (k: string): SummaryRow => ({ name: counts[k]!.name, n: counts[k]!.n, gold: goldOf(k) });
   const prof = (e: HireEntry) => { const p = e.profile ?? {}; return [p.M, p.WS, p.BS, p.S, p.T, p.W, p.I, p.A, p.Ld].join('/'); };
   const hired = (s.hired ?? []).flatMap((h) => {

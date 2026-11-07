@@ -3114,6 +3114,7 @@
       "shooting",
       "blackOrcSkills"
      ],
+     "upgradeOption": { "name": "Black Orc Blood", "cost": 10, "max": 1, "minExp": 25, "skill": "Proven Warrior", "becomes": "borc" },
      "sp": "Black Orc Blood: One Young'un in the warband may be upgraded for 10 gc — this allows him to take the 'Proven Warrior' special skill and become a full Black Orc."
     },
     {

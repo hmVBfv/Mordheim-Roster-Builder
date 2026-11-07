@@ -2,7 +2,7 @@
    the React components so it can be tested without drawing anything. */
 import * as core from '@mordheim/core';
 import type { ChoiceRow, GameData, HireRecord, Model, Profile, UnitDef, WarbandState } from '@mordheim/core';
-import { hireFacts, warbandRuleTexts, warriorFacts, type Fact, type SpellLore } from './tips.ts';
+import { hireFacts, warbandRuleTexts, warriorFacts, type Fact, type SpellLore, type Tip } from './tips.ts';
 
 export type { Fact, Tip } from './tips.ts';
 
@@ -55,6 +55,9 @@ export interface WarriorView {
   advanceDue: boolean;
   /** A Hero who may be made a Wizard for gold (the Jungle Shadow): the price, and whether he is one now; null for anybody else. */
   wizard: { cost: number; on: boolean } | null;
+  /** The upgrade a unit may buy for gold (Black Orc Blood of the Young'un, #217): its name and price, and whether he has it; null where there is none, or where
+      another man has taken the one the warband may have. */
+  upgrade: { name: string; cost: number; on: boolean; /** Why he may not buy it yet (the experience it asks for), else null. */ block: string | null; /** The rule of the skill it opens, for a bubble. */ tips: Tip[] } | null;
   /** A Prospect while a Hero has fallen whose place he may take (wish): the card says so and offers it. */
   takePlace: boolean;
   missGames: number;
@@ -296,8 +299,9 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
   return {
     key: String(m.uid),
     uid: m.uid,
-    name: m.name || def?.name || m.uid_def,
-    type: def?.name ?? m.uid_def,
+    // the Young'un who became a Black Orc with Proven Warrior still has the title of a Young'un
+    name: m.name || titleDef(ctx, m)?.name || m.uid_def,
+    type: titleDef(ctx, m)?.name ?? m.uid_def,
     count, hero,
     promoted: !!m.promoted,
     leader,
@@ -307,6 +311,7 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     xp: adv && !adv.noxp ? track(adv.thresholds, adv.start, adv.xp, null, Math.max(0, adv.earned - adv.applied)) : null,
     advanceDue: !!adv?.due,
     wizard: def?.wizardOption ? { cost: def.wizardOption.cost, on: !!m.caster } : null,
+    upgrade: upgradeOf(ctx, m),
     takePlace: !hero && core.replaceableHeroes(ctx, m.uid).length > 0,
     missGames: Number(m.miss) || 0,
     battles: Number(m.battles) || 0,
@@ -492,6 +497,19 @@ export function newWarbandChoice(data: GameData, key: string): NewWarbandChoice 
 
 /** A fresh roster, as the Roster Builder starts one (chooseWb, then the
     chosen subtype and the name). */
+const titleDef = (ctx: core.Ctx, m: Model) => core.unitDef(ctx, core.titleOf(m));
+
+/** The upgrade a man may buy or give back, if the warband still has one to take. */
+function upgradeOf(ctx: core.Ctx, m: Model): WarriorView['upgrade'] {
+  const def = core.unitDef(ctx, m.statsOf ?? m.uid_def);
+  const opt = def?.upgradeOption;
+  if (!def || !opt) return null;
+  const taken = ctx.s.models.filter((x) => x.upgraded && (x.statsOf ?? x.uid_def) === def.id).length;
+  if (!m.upgraded && taken >= opt.max) return null;
+  const rule = core.skillInfo(ctx.data, opt.skill);
+  return { name: opt.name, cost: opt.cost, on: !!m.upgraded, block: core.upgradeBlock(ctx, m.uid), tips: rule?.text ? [{ name: opt.skill, line: 'Skill · what the upgrade is for', text: rule.text }] : [] };
+}
+
 /* The data marks rule names with <b>; the recruit list shows plain text. */
 const plainNote = (sp: string | undefined) => (sp ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<\/?[a-z][^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
 

@@ -82,3 +82,7 @@ export function isUpgrade(data: GameData, de: string): boolean {
 export function stripParen(s: string): string {
   return String(s).replace(/\s*\([^)]*\)\s*/g, ' ').trim();
 }
+
+/** The unit a man is counted as: his own, but the Young'un who became a Black Orc with Proven Warrior "still retains the title of Young'un", so he counts
+    and is named as one. (A Prospect who took a fallen Hero's place is the Hero: `uid_def`.) */
+export const titleOf = (m: Model): string => (m.upgraded && m.statsOf ? m.statsOf : m.uid_def);

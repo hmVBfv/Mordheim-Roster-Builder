@@ -1344,6 +1344,23 @@
   color: var(--text-muted);
 }
 
+/* a button of the card with what it asks for beside it (an upgrade that waits for experience) */
+.actWith {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.actWith button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.actWhy {
+  color: var(--text-muted);
+}
+
 /* the unit choice as one line a unit, its limit at the end (#214) */
 .wbChoiceList {
   display: grid;

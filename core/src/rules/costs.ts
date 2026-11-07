@@ -6,21 +6,21 @@ import { houseRules } from '../state/house.ts';
 import type { Ctx } from './context.ts';
 import { eqCost, heirloomDiscount, mutCost, rareCost } from './equipment.ts';
 import { dpHireTotal, dpRatingTotal, hsEqTotal, hsHireTotal, hsRatingTotal, hsSizeBonus } from './hire.ts';
-import { unitDef, warbandDef } from './lookup.ts';
+import { titleOf, unitDef, warbandDef } from './lookup.ts';
 import { unitBaseCost } from './pricing.ts';
 
 /** 2 gc per extra experience point for a man joining a blooded henchman group. */
 export const HENCH_XP_GC = 2;
 
 export function countOf(ctx: Ctx, id: string): number {
-  return ctx.s.models.filter((m) => m.uid_def === id).length;
+  return ctx.s.models.filter((m) => titleOf(m) === id).length;
 }
 
 /** Heroes: entries; henchmen: men in the groups (promoted men excluded). */
 export function modelsOf(ctx: Ctx, id: string): number {
   const def = unitDef(ctx, id);
   if (def?.t === 'hero') return countOf(ctx, id);
-  return ctx.s.models.filter((m) => m.uid_def === id && !m.promoted).reduce((s, m) => s + (m.qty || 1), 0);
+  return ctx.s.models.filter((m) => titleOf(m) === id && !m.promoted).reduce((s, m) => s + (m.qty || 1), 0);
 }
 
 /** Maximum of a unit type; Kurgan marauders may take any number of warhounds.
@@ -103,7 +103,7 @@ export function modelRating(ctx: Ctx, m: Model): number {
 export function modelUnitCost(ctx: Ctx, m: Model): number {
   const def = unitDef(ctx, m.uid_def);
   if (!def) return 0;
-  return unitBaseCost(ctx, unitDef(ctx, m.statsOf ?? '') ?? def) + (m.caster ? def.wizardOption?.cost ?? 0 : 0) + eqCost(ctx, m) + mutCost(ctx, m) + rareCost(m) - heirloomDiscount(ctx, m);
+  return unitBaseCost(ctx, unitDef(ctx, m.statsOf ?? '') ?? def) + (m.caster ? def.wizardOption?.cost ?? 0 : 0) + (m.upgraded ? unitDef(ctx, m.statsOf ?? m.uid_def)?.upgradeOption?.cost ?? 0 : 0) + eqCost(ctx, m) + mutCost(ctx, m) + rareCost(m) - heirloomDiscount(ctx, m);
 }
 
 /** What ANOTHER man costs to join this henchman group: 2 gc per experience

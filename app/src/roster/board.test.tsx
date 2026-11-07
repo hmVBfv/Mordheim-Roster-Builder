@@ -426,6 +426,19 @@ describe('the unit choice of the warband', () => {
   });
 });
 
+/* Rob, 7.11.2026: an action of the card that waits for something is greyed out, with what it asks for beside it. */
+describe('an action of the card that is not yet allowed', () => {
+  it('is greyed out, says why, and has the rule to read', () => {
+    width = 1000;
+    show({ acts: () => acts({ chaos: [{ label: 'Black Orc Blood · +10 gc', run: vi.fn(), disabled: true, why: 'Needs 25 experience (he has 0).', tips: [{ name: 'Proven Warrior', line: 'Skill', text: 'May only be taken with 25 experience.' }] }] }) });
+    const card = screen.getByRole('complementary', { name: 'Selected warrior' });
+    const button = within(card).getByRole('button', { name: 'Black Orc Blood · +10 gc' }) as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    expect(within(card).getByText('Needs 25 experience (he has 0).')).toBeTruthy();
+    expect(within(card).getByRole('button', { name: 'Proven Warrior' })).toBeTruthy();
+  });
+});
+
 /* Report of 7.11.2026: "Max. 2 Black Orcs, 2 Young'uns" can be read as "2 Young'uns are needed". Each unit is a line, with its limit in the same words everywhere. */
 describe('the unit choice as lines', () => {
   it('gives each unit its limit at the end of its line, 0–2 where a text said "max."', () => {

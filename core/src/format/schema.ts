@@ -68,6 +68,7 @@ export const modelSchema = z.looseObject({
   promoted: z.boolean().optional(),
   promoCats: z.array(z.string()).optional(),
   caster: z.boolean().optional(),
+  upgraded: z.boolean().optional(),
   lore: z.string().optional(),
   magic: z.string().optional(),
   miss: num.optional(),
