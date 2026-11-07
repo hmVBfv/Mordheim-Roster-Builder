@@ -21,4 +21,12 @@ describe('the Regeneration of a Troll', () => {
       expect(regen.text).toMatch(/Then they roll after the battle as a normal Henchman/);
     });
   }
+
+  /* Rob, 7.11.2026: the Night Goblins' Troll said it never rolls for Injury after a battle, without the exception for flames; the creator overlooked it,
+     the Troll is the same as the others. */
+  it('has no other word of its own on the injury roll after a battle: the Regeneration rule says it', () => {
+    const bad: string[] = [];
+    for (const [wb, w] of Object.entries(data.WARBANDS)) for (const u of w.units) if (/troll/i.test(u.name) && /never rolls? for injury/i.test(String(u.sp))) bad.push(`${wb}/${u.id}`);
+    expect(bad).toEqual([]);
+  });
 });
