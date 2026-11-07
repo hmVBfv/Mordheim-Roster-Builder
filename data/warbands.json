@@ -2357,7 +2357,7 @@
      "note": "<b>Hung.</b><br><b>Disloyalty:</b> Max. <b>12</b> warriors instead of 15.<br><b>Affinity with Horses:</b> Warhorses always cost only 40 gc; all Heroes (including promoted henchmen) automatically have \"Ride Warhorse\"; number of mounts unlimited (Border Town Burning)."
     }
    ],
-   "rules": "<b>Tribe:</b> Choose one above: Norse, Kurgan or Hung — each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. Lost: +1 per own Hero taken out of action — on 12+ the leader becomes a Chaos Spawn. Won: +1 per enemy the leader took out of action — on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> Only Pit Fighters, Ogres, Norse Shamans, Imperial Assassins (Witches/Warlocks only without the Mark of Arkhar).",
+   "rules": "<b>Tribe:</b> Choose one of the tribes above – Norse, Kurgan or Hung – each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. If lost, +1 per own Hero taken out of action – on 12+ the leader becomes a Chaos Spawn. If won, +1 per enemy the leader took out of action – on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> Only Pit Fighters, Ogres, Norse Shamans, Imperial Assassins (Witches/Warlocks only without the Mark of Arkhar).",
    "units": [
     {
      "id": "chieftain",
@@ -2539,7 +2539,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br><b>Hired Swords:</b> As Mercenaries.<br><b>Chaos:</b> No alliance with Chaos.<br><b>Hero special items:</b> Rare: Vodka, Bear-claw Necklace.<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
+   "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br><b>Hired Swords:</b> As Mercenaries.<br><b>Chaos:</b> No alliance with Chaos.<br><b>Hero special items:</b> The Heroes may buy Vodka and the Bear-claw Necklace (rare).<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
    "units": [
     {
      "id": "capt",
@@ -3031,7 +3031,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Black Orc Boss. Max. 2 Black Orcs, 2 Young'uns; any number of Boyz, Shootaz (≤ Boyz), max. 4 Nuttaz, max. 1 Troll.<br><b>Animosity:</b> Annual 2002 version: triggers on a D6 roll of 1.<br><b>Let the goons do the work:</b> Black Orcs never ride mounts; only normal Orcs may ride a boar or similar.<br><b>Da Boss is Dead!:</b> If the Boss is killed, a Black Orc always assumes leadership first (regardless of experience) and automatically gains the Oi Behave! skill.",
+   "rules": "<b>Choice:</b> Exactly 1 Black Orc Boss. Max. 2 Black Orcs, 2 Young'uns; any number of Boyz, Shootaz (≤ Boyz), max. 4 Nuttaz, max. 1 Troll.<br><b>Animosity:</b> Orcs and Goblins enjoy a good scrap, but not always with the right mates. At the start of the Orc player's turn roll a D6 for each Orc or Goblin Henchman that is not in close combat; on a 1 he has taken offence and rolls on the Animosity chart. The Black Orcs use the 2002 Annual version: no Leadership test is taken, Animosity triggers on a roll of 1 on a D6.<br><b>Let the goons do the work:</b> Black Orcs never ride mounts; only normal Orcs may ride a boar or similar.<br><b>Da Boss is Dead!:</b> If the Boss is killed, a Black Orc always assumes leadership first (regardless of experience) and automatically gains the Oi Behave! skill.",
    "units": [
     {
      "id": "bboss",
@@ -3215,7 +3215,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Questing Knight. Max. 2 Knights Errant, max. 3 Squires (never more Squires than Knights); max. 8 Men-at-Arms, any number of Bowmen.<br><b>Blessing of the Lady:</b> Before each battle the leader takes a Ld test. If passed: Enemy models must roll 4+ on a D6 each time they wish to fire a black powder weapon, and any enemy shooting at a Questing Knight or Knight Errant must first roll 4+ to overcome the curse.",
+   "rules": "<b>Choice:</b> Exactly 1 Questing Knight. Max. 2 Knights Errant, max. 3 Squires (never more Squires than Knights); max. 8 Men-at-Arms, any number of Bowmen.<br><b>Blessing of the Lady:</b> Before each battle the leader takes a Ld test. If he passes, enemy models must roll 4+ on a D6 each time they wish to fire a black powder weapon, and any enemy shooting at a Questing Knight or Knight Errant must first roll 4+ to overcome the curse.",
    "units": [
     {
      "id": "paladin",
@@ -5654,7 +5654,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits. Win: that fighter gains +2 Experience and the warband gets all the captive's armour and weapons +50 gc. Lose: roll for the fighter's injury as normal, ignoring Robbed, Captured, Hardened, Sold to the Pits and Survives against the Odds.<br><b>Hired Swords:</b> Pit Fighters may hire any Hired Sword except the Elf Ranger.",
+   "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits. If he wins, that fighter gains +2 Experience and the warband gets all the captive's armour and weapons +50 gc. If he loses, roll for the fighter's injury as normal, ignoring Robbed, Captured, Hardened, Sold to the Pits and Survives against the Odds.<br><b>Hired Swords:</b> Pit Fighters may hire any Hired Sword except the Elf Ranger.",
    "units": [
     {
      "id": "pitking",
@@ -6027,7 +6027,7 @@
      "note": "<b>Best Equipped:</b> The wealthiest, most experienced human warband in Lustria — starts with 600 gc (a one-off game gives +100 gc; a campaign gives +20%, both 600 from the base 500)."
     }
    ],
-   "rules": "<b>City:</b> Choose one above: Miragliano, Remas or Trantio — each with its own special rules.<br><b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 5 Duellists, max. 7 Marksmen.",
+   "rules": "<b>City:</b> Choose one of the cities above – Miragliano, Remas or Trantio – each with its own special rules.<br><b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 5 Duellists, max. 7 Marksmen.",
    "units": [
     {
      "id": "tcaptain",
@@ -6795,7 +6795,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "Chaos Dwarf slavers from the Border Town Burning supplement. The following apply to all warriors except Informers: <b>Hard to Kill:</b> Taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Hard Head:</b> Ignore the special rules of clubs, maces, etc. <b>Armour:</b> Never suffer movement penalties for wearing armour. <b>Hired Swords:</b> Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout, plus any \"all may hire\" or those open to Orc & Chaos warbands — never Elves of any sort. The Engine of Chaos and special Chaos Dwarf wargear (Man-catcher, Mechanical Suit, Chaos Armour, Obsidian Weapon) are bought from the Trading Post / rare-item picker.",
+   "rules": "Chaos Dwarf slavers from the Border Town Burning supplement. The following apply to all warriors except Informers. <b>Hard to Kill:</b> Taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Hard Head:</b> Ignore the special rules of clubs, maces, etc. <b>Armour:</b> Never suffer movement penalties for wearing armour. <b>Hired Swords:</b> Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout, plus any \"all may hire\" or those open to Orc & Chaos warbands — never Elves of any sort. The Engine of Chaos and special Chaos Dwarf wargear (Man-catcher, Mechanical Suit, Chaos Armour, Obsidian Weapon) are bought from the Trading Post / rare-item picker.",
    "units": [
     {
      "id": "sorcerer",
