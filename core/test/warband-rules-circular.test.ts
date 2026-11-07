@@ -27,4 +27,11 @@ describe('the rules of every warband', () => {
       expect(d.text, wb).toMatch(/consult the Animosity chart/);
     }
   });
+
+  it('say of the Pestilens Skaven what they share with the Skaven of the Rulebook, not that they "use the base rules"', () => {
+    const d = core.ruleDefs(data.WARBANDS.skavenpest!.rules, 'x').find((r) => r.name === 'Skaven')!;
+    expect(d.text).toMatch(/equipment lists/);
+    expect(d.text).toMatch(/Clan Eshin/);
+    expect(d.text).not.toMatch(/base rules/);
+  });
 });

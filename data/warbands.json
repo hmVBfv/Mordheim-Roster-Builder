@@ -5821,7 +5821,7 @@
    "min": 3,
    "max": 15,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Plague Priest. Max. 1 Pestilens Sorcerer, 2 Plague Monks, 2 Monk Initiates; any number of Plague Novices, any number of Giant Rats, max. 1 Rat Ogre.<br><b>Skaven:</b> Uses the Skaven base rules.",
+   "rules": "<b>Choice:</b> Exactly 1 Plague Priest. Max. 1 Pestilens Sorcerer, 2 Plague Monks, 2 Monk Initiates; any number of Plague Novices, any number of Giant Rats, max. 1 Rat Ogre.<br><b>Skaven:</b> Picks its equipment from the Skaven equipment lists (the Skaven of Clan Eshin, Core warbands), like the Skaven of the Rulebook.",
    "units": [
     {
      "id": "plaguepriest",
