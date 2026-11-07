@@ -19,6 +19,7 @@ import { FORMAT } from '@mordheim/core';
 import { useGameData } from '../game/useGameData.ts';
 import { createWarband, newWarbandChoice } from '../roster/view.ts';
 import ui from '../ui/ui.module.css';
+import styles from './NewWarband.module.css';
 import { useWarbandFinder, WarbandFinder, WarbandTable } from './WarbandFinder.tsx';
 
 function Form({ campaignId }: { campaignId: string | null }) {
@@ -71,23 +72,9 @@ function Form({ campaignId }: { campaignId: string | null }) {
     void navigate(`/warbands/${open}`, { replace: true });
   };
 
-  if (made && campaignId) {
-    return (
-      <div className={ui.page}>
-        <p className={`${ui.message} ${ui.error}`} role="alert">Your warband is made and under Warbands, but it could not be entered yet: {made.error} Enter it from the campaign later.</p>
-        <div className={ui.row}>
-          <Link to={`/warbands/${made.id}`} className={ui.button} replace>Open the warband</Link>
-          <Link to={`/campaign/${campaignId}`} className={ui.buttonQuiet} replace>To the campaign</Link>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void create(); }}>
-      {vanilla && <p className={ui.muted}>This campaign plays Vanilla Mordheim: only the warbands of the rulebook.</p>}
-      <WarbandFinder facts={facts} finder={finder} />
-      {/* the options of the chosen warband come before the long list, so that choosing never means scrolling to its end */}
+  const fact = facts.find((f) => f.key === key);
+  const options = choice && (
+    <div className={styles.optionsBody}>
       {choice && choice.subtypes.length > 0 && (
         <label className={ui.field} htmlFor={ids.sub}>
           <span>{choice.subtypeLabel?.replace(/:\s*$/, '') || 'Variant'}</span>
@@ -119,8 +106,31 @@ function Form({ campaignId }: { campaignId: string | null }) {
           <span><strong>Vanilla Mordheim</strong> – only the rulebook’s items and skills: the Trading Post offers nothing else. It can be switched off later under House rules.</span>
         </label>
       )}
-      {choice && !planner && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
-      <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} />
+      <p className={ui.muted}>
+        {!planner && <span>Starting gold: {gold} gc. </span>}
+        {fact && <span>Models: {fact.min}–{fact.max}. </span>}
+        {fact && <span>Heroes at the start: up to {fact.heroes}.</span>}
+      </p>
+    </div>
+  );
+
+  if (made && campaignId) {
+    return (
+      <div className={ui.page}>
+        <p className={`${ui.message} ${ui.error}`} role="alert">Your warband is made and under Warbands, but it could not be entered yet: {made.error} Enter it from the campaign later.</p>
+        <div className={ui.row}>
+          <Link to={`/warbands/${made.id}`} className={ui.button} replace>Open the warband</Link>
+          <Link to={`/campaign/${campaignId}`} className={ui.buttonQuiet} replace>To the campaign</Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void create(); }}>
+      {vanilla && <p className={ui.muted}>This campaign plays Vanilla Mordheim: only the warbands of the rulebook.</p>}
+      <WarbandFinder facts={facts} finder={finder} />
+      <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} detail={options} />
       <div className={`${ui.actions} ${ui.stickyActions}`}>
         <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
         <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>

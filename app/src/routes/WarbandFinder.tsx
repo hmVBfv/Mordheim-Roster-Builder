@@ -3,7 +3,7 @@
    Wishes #121–#125 (Rob, 28.10.2026): the filter is always open, the gold and model fields start at the range over all warbands
    (they leave everything in until a player narrows them), and the matches are a table, one row a warband. */
 import { filterWarbands, sortWarbands, type WarbandFact, type WarbandFilter, type WarbandSort } from '@mordheim/core';
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import ui from '../ui/ui.module.css';
 import styles from './WarbandFinder.module.css';
 
@@ -85,9 +85,11 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
 }
 
 /** The warbands that pass the filter, one row each: tap a row to pick it (its radio is hidden but there for the keyboard). With the sort by grade, a heading row opens each grade. */
-export function WarbandTable({ shown, sort, chosen, onChoose }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void }) {
+/** `detail`: what unfolds under the row of the chosen warband (its options), so nothing has to be looked for further down. */
+export function WarbandTable({ shown, sort, chosen, onChoose, detail }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void; detail?: ReactNode }) {
   const byGrade = sort === 'grade';
-  const row = (w: WarbandFact) => (
+  const cols = byGrade ? 6 : 7;
+  const row = (w: WarbandFact) => [
     <tr key={w.key} className={w.key === chosen ? styles.picked : undefined} data-picked={w.key === chosen ? 'true' : undefined} onClick={() => onChoose(w.key)}>
       <td className={styles.pick} data-label="">
         {/* the radio lies invisibly over the name, so a keyboard and a screen reader find the row; a tap anywhere in the row chooses it */}
@@ -102,9 +104,9 @@ export function WarbandTable({ shown, sort, chosen, onChoose }: { shown: Warband
       <td data-label="Max. models">{w.max}</td>
       <td data-label="Heroes">{w.heroes}</td>
       <td data-label="Big creature">{w.large ? 'Yes' : 'No'}</td>
-    </tr>
-  );
-  const cols = byGrade ? 6 : 7;
+    </tr>,
+    ...(w.key === chosen && detail ? [<tr key={`${w.key}-options`} className={styles.options}><td colSpan={cols}>{detail}</td></tr>] : []),
+  ];
   return (
     <div className={styles.tableWrap}>
       <table className={styles.table}>
@@ -115,9 +117,9 @@ export function WarbandTable({ shown, sort, chosen, onChoose }: { shown: Warband
           {byGrade
             ? GRADE_ORDER.flatMap((g) => {
               const here = shown.filter((w) => w.grade === g);
-              return here.length ? [<tr key={`g-${g}`} className={styles.grade}><th colSpan={cols} scope="colgroup">{GRADE_LABELS[g]}</th></tr>, ...here.map(row)] : [];
+              return here.length ? [<tr key={`g-${g}`} className={styles.grade}><th colSpan={cols} scope="colgroup">{GRADE_LABELS[g]}</th></tr>, ...here.flatMap(row)] : [];
             })
-            : shown.map(row)}
+            : shown.flatMap(row)}
         </tbody>
       </table>
     </div>
