@@ -26,3 +26,16 @@ describe('the rules text of every warband', () => {
     expect(bad).toEqual([]);
   });
 });
+
+/* Rob, 7.11.2026: two sentences at the end of the Lustrian Reavers' Hired Swords stood under the wrong rule: the one on the special equipment and the one on
+   the War Beasts, who do not advance. Each stands with its own rule. */
+describe('the rules text of the Lustrian Reavers', () => {
+  const defs = () => Object.fromEntries([...String(data.WARBANDS.reavers!.rules).matchAll(/<b>([^<]*):<\/b>([^<]*)/g)].map((m) => [m[1], m[2]!.trim()]));
+
+  it('keeps the War Beasts\' sentence and the special equipment with their own rules', () => {
+    const d = defs();
+    expect(d['War Beasts']).toMatch(/animals and do not advance/);
+    expect(d['Special equipment']).toMatch(/special equipment \(noted below\) that cannot be replaced if lost/);
+    expect(d['Hired Swords']).toBe('Only Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter.');
+  });
+});
