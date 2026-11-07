@@ -4784,16 +4784,21 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
   about the Leader excepted. The parser has no table of its own: it reads the text, and a test checks every row against the warband's units, which
   found three names that were the text's and not the unit's (Hunters, Kin, Mountain Hunters). The Animosity of the Black Orcs stood without a heading
   and ran into the choice text; nine other warbands had a sentence after a break without a heading, a heading without a colon, or its text in the bold.
-  Three data tests keep that out. The plan to compare the unit choice with the units' `max` fields was dropped: the maxima are not all stated there.
+  Three data tests keep that out. Two sentences at the end of the Reavers' Hired Swords rule belonged to the Heroes' special equipment and to the War
+  Beasts; Rob asked me to place them, and each has its rule now. The plan to compare the unit choice with the units' `max` fields was dropped: the maxima are not all stated there.
 - **#216, a bubble in lower case (PR 352, contains 351).** About 250 texts of the data read "Name: what happens" with a lower case after the colon, so
   the fix is in the display (a capital at the start of every bubble text), not in the data. It stacks on 351 since both change the function that reads
   a warband's rules; I first started it from `master` and had to move it.
 - **#218, the Troll's Regeneration (PR 353).** The ability text lacked the part after the battle; it is the same for every Troll, so the one ability
-  text now has the page's wording and a test reads it on the three Trolls.
+  text now has the page's wording and a test reads it on the three Trolls. The Night Goblins' Troll said on its own that it never rolls for Injury
+  after a battle, without the flame exception; Rob read that as the creator's oversight, so the line is gone and the one rule holds for all.
 - **#217, Black Orc Blood (PR 354).** The upgrade was only text. A unit may offer an upgrade for gold (`upgradeOption`), one man buys it, only he may
-  choose the skill it names, and with it he counts as a Black Orc (`uid_def`) with his own profile and price (`statsOf`, as for the Prospect). Open for
-  Rob: the 25 experience of the skill's text are not checked, and such a Young'un counts against the two Black Orcs. Legacy knows none of it: parity data
-  and mirror leave the field out, like the other options.
+  choose the skill it names, and with it he counts as a Black Orc (`uid_def`) with his own profile and price (`statsOf`, as for the Prospect). A first
+  version did not check the 25 experience of the skill's text and counted him against the two Black Orcs; Rob quoted the whole text of the skill:
+  the upgrade now waits for 25 experience (greyed out, with the rule beside it) and, as the text says, he "still retains the title of Young'un", so he
+  counts and is named as one (`titleOf`). Legacy knows none of it: parity data and mirror leave the field out, like the other options. The pull
+  request contains the unit-choice branch (351), since both add to the end of the same test file and stylesheet; I found that by merging all branches
+  of the run in one place, and made 354 contain 351 so Rob has no conflict.
 - **#212 and #213, the Trading Post to look at (PR 355).** The heading is a titled group as on the Export page (#139), and the rare rows were a grid
   written for buttons, so the list items of the new page had none. A browser test measures both.
 - **#219, the warband list (PR 356).** Favourite and group sit in one row inside the entry's box.
