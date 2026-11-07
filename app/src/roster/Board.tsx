@@ -129,11 +129,21 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
           <section aria-labelledby="board-unit-choice" className={styles.wbRules}>
             <div className={styles.groupHead}><h2 id="board-unit-choice">Unit choice</h2></div>
             {v.unitChoice.rows ? (
-              <ul className={styles.wbChoiceList}>
-                {v.unitChoice.rows.map((r) => (
-                  <li key={r.name}><span>{r.name}{r.note && <small> · {r.note}</small>}</span><b>{r.limit}</b></li>
-                ))}
-              </ul>
+              <>
+                {([['hero', 'Heroes'], ['hench', 'Henchmen']] as const).map(([kind, title]) => {
+                  const rows = v.unitChoice!.rows!.filter((r) => (r.kind ?? 'hench') === kind);
+                  return rows.length > 0 && (
+                    <div key={kind}>
+                      <h3 className={styles.wbChoiceHead}>{title}</h3>
+                      <ul className={styles.wbChoiceList}>
+                        {rows.map((r) => (
+                          <li key={r.name}><span>{r.name}{r.note && <small> · {r.note}</small>}</span><b>{r.limit}</b></li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </>
             ) : <p className={styles.wbChoice}>{v.unitChoice.text}</p>}
           </section>
         )}

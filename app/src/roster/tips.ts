@@ -141,7 +141,7 @@ export function warbandRuleTexts(ctx: core.Ctx): { unitChoice: { text: string; r
   const wb = core.warbandDef(ctx);
   const defs = wb?.rules ? core.ruleDefs(wb.rules, `Warband rule \u00b7 ${wb.name}`) : [];
   const choice = defs.find((d) => d.name === 'Choice');
-  return { unitChoice: choice ? { text: choice.text, rows: core.unitChoice(choice.text) } : null, rules: defs.filter((d) => d !== choice).map((d) => ({ name: d.name, text: upFirst(d.text) })) };
+  return { unitChoice: choice ? { text: choice.text, rows: ((rows) => rows && core.choiceWithKinds(rows, wb?.units ?? []))(core.unitChoice(choice.text)) } : null, rules: defs.filter((d) => d !== choice).map((d) => ({ name: d.name, text: upFirst(d.text) })) };
 }
 
 /** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */

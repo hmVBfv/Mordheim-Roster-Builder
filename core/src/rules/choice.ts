@@ -8,6 +8,8 @@ export interface ChoiceRow {
   limit: string;
   /** What binds the unit besides its number ("never more than Boyz", "only with a Beastmaster"). */
   note: string | null;
+  /** Among the Heroes or the Henchmen of the roster, once read against the warband's units (`choiceWithKinds`). */
+  kind?: 'hero' | 'hench';
 }
 
 type Mode = { kind: 'exact' | 'max' | 'least' | 'any'; n: number };
@@ -62,4 +64,20 @@ export function unitChoice(text: string): ChoiceRow[] | null {
     }
   }
   return rows.length ? rows : null;
+}
+
+/* ---- Heroes and Henchmen (wish of 7.11.2026) ---- */
+
+const words = (n: string): string[] => n.toLowerCase().split(/[^a-z']+/).filter(Boolean).map((w) => w.replace(/['’]/g, '').replace(/men$/, 'man'));
+const sameWord = (a: string, b: string): boolean => { const [s, l] = a.length <= b.length ? [a, b] : [b, a]; return a === b || (l.startsWith(s.slice(0, -1)) && l.length - s.length <= 3); };
+/** The words of one name run in the other, a plural ignored. */
+const within = (x: string[], y: string[]): boolean => y.some((_, i) => x.every((w, j) => y[i + j] !== undefined && sameWord(w, y[i + j]!)));
+
+/** Each row with the place of the unit it names: a Hero or a Henchman. A row naming units of both (a plural that fits two) keeps the first. */
+export function choiceWithKinds(rows: ChoiceRow[], units: readonly { name: string; t?: string }[]): ChoiceRow[] {
+  return rows.map((r) => {
+    const w = words(r.name);
+    const u = units.find((x) => within(w, words(x.name)) || within(words(x.name), w));
+    return u ? { ...r, kind: u.t === 'hero' ? 'hero' : 'hench' } : r;
+  });
 }
