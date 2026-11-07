@@ -271,6 +271,31 @@ for (const theme of THEMES) {
   });
 }
 
+/* Reports of 7.11.2026 on the page to look at the Trading Post before the first battle: its heading sat close to the box above and far from its own
+   text (a titled group: room above, little between title and text), and the rows of the rare items ran criss-cross on a phone (name, then rarity,
+   chance and price in a line under it). */
+test('the Trading Post to look at has a titled group and tidy rows on a phone', async ({ page }) => {
+  test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('./');
+  await importSample(page);
+  await page.getByRole('link', { name: 'Trade' }).click();
+  const look = page.getByRole('region', { name: 'Look at the Trading Post' });
+  const above = (await page.getByText('Until its first battle the warband buys from its lists').locator('xpath=ancestor::div[1]').boundingBox())!;
+  const heading = (await look.getByRole('heading', { name: 'Look at the Trading Post' }).boundingBox())!;
+  const text = (await look.getByText('What it offers from the first battle on').boundingBox())!;
+  expect(heading.y - (above.y + above.height), 'room above the heading').toBeGreaterThan(text.y - (heading.y + heading.height));
+  const row = look.getByRole('list', { name: 'Rare items' }).getByRole('listitem').first();
+  const cells = await row.evaluate((li) => [...li.children].map((c) => { const r = c.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; }));
+  const li = (await row.boundingBox())!;
+  const [name, rarity, chance, price] = cells as { x: number; y: number; w: number; h: number }[];
+  expect(rarity!.y, 'the rarity under the name').toBeGreaterThanOrEqual(name!.y + name!.h - 1);
+  expect(chance!.y, 'chance on the line of the rarity').toBeLessThanOrEqual(rarity!.y + rarity!.h);
+  expect(price!.y, 'price on the same line').toBeLessThanOrEqual(rarity!.y + rarity!.h);
+  expect(rarity!.x, 'starts at the left of the row').toBeLessThan(li.x + 40);
+  expect(name!.x + name!.w, 'the name inside the row').toBeLessThanOrEqual(li.x + li.width + 1);
+});
+
 /* #42: the Gold tile carried a gold frame as well as gold figures; the figures are enough. */
 test('the Gold tile has the frame of the other tiles, only its figures are gold', async ({ page }) => {
   test.skip(test.info().project.name === 'quickbuild', 'the same screen; one run is enough');

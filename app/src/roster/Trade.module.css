@@ -534,7 +534,8 @@
 
 /* a rare item's line: name; rarity, chance, price (cells that do not break); what it does */
 .pick button.rareRow,
-.rows button.rareRow {
+.rows button.rareRow,
+.rows li.rareRow {
   display: grid;
   grid-template-columns: auto auto 1fr;
   grid-template-areas: 'n n n' 'r c p' 'e e e';
@@ -576,7 +577,8 @@
 
 @media (min-width: 720px) {
   .pick button.rareRow,
-  .rows button.rareRow {
+  .rows button.rareRow,
+  .rows li.rareRow {
     grid-template-columns: minmax(0, 1fr) 5.5rem 4.5rem 12rem;
     grid-template-areas: 'n r c p' 'e r c p';
     align-items: center;
