@@ -4775,3 +4775,34 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
 - **#209, the Start button (PR 347).** The bar sticks above the navigation. A test of the layout needs a real browser, so it is an end-to-end test.
 - **#208, look at the Trading Post (PR 348).** Before the first battle the page shows the rare items with rarity, chance and price and the common items,
   with no button to buy, search or sell.
+
+**The run of 7.11.2026, eight reports (PRs 351 to 356).** Rob confirmed all of them, with one condition for the unit choice: the same format in every warband or in none.
+
+- **#214, the unit choice, and #215, rules without a heading (PR 351).** One branch, since both change the Black Orcs' rules text. "Max. 2 Black Orcs,
+  2 Young'uns" reads as if two were needed, so `core/src/rules/choice.ts` reads every warband's text into one row for each unit with its limit in four
+  phrases (exactly 1, 0–2, any number, 1 or more) and the roster lists them – in all warbands, as Rob asked, the one draft whose "choice" is a rule
+  about the Leader excepted. The parser has no table of its own: it reads the text, and a test checks every row against the warband's units, which
+  found three names that were the text's and not the unit's (Hunters, Kin, Mountain Hunters). The Animosity of the Black Orcs stood without a heading
+  and ran into the choice text; nine other warbands had a sentence after a break without a heading, a heading without a colon, or its text in the bold.
+  Three data tests keep that out. Two sentences at the end of the Reavers' Hired Swords rule belonged to the Heroes' special equipment and to the War
+  Beasts; Rob asked me to place them, and each has its rule now. The plan to compare the unit choice with the units' `max` fields was dropped: the maxima are not all stated there.
+- **#216, a bubble in lower case (PR 352, contains 351).** About 250 texts of the data read "Name: what happens" with a lower case after the colon, so
+  the fix is in the display (a capital at the start of every bubble text), not in the data. It stacks on 351 since both change the function that reads
+  a warband's rules; I first started it from `master` and had to move it.
+- **#218, the Troll's Regeneration (PR 353).** The ability text lacked the part after the battle; it is the same for every Troll, so the one ability
+  text now has the page's wording and a test reads it on the three Trolls. The Night Goblins' Troll said on its own that it never rolls for Injury
+  after a battle, without the flame exception; Rob read that as the creator's oversight, so the line is gone and the one rule holds for all.
+- **#217, Black Orc Blood (PR 354).** The upgrade was only text. A unit may offer an upgrade for gold (`upgradeOption`), one man buys it, only he may
+  choose the skill it names, and with it he counts as a Black Orc (`uid_def`) with his own profile and price (`statsOf`, as for the Prospect). A first
+  version did not check the 25 experience of the skill's text and counted him against the two Black Orcs; Rob quoted the whole text of the skill:
+  the upgrade now waits for 25 experience (greyed out, with the rule beside it) and, as the text says, he "still retains the title of Young'un", so he
+  counts and is named as one (`titleOf`). Legacy knows none of it: parity data and mirror leave the field out, like the other options. The pull
+  request contains the unit-choice branch (351), since both add to the end of the same test file and stylesheet; I found that by merging all branches
+  of the run in one place, and made 354 contain 351 so Rob has no conflict.
+- **#212 and #213, the Trading Post to look at (PR 355).** The heading is a titled group as on the Export page (#139), and the rare rows were a grid
+  written for buttons, so the list items of the new page had none. A browser test measures both.
+- **#219, the warband list (PR 356).** Favourite and group sit in one row inside the entry's box.
+- **A wrong turn that cost a CI run on the run of 6.11.** The test of one pull request used a function that another renamed; each was green alone and
+  `master` was red (run 1240, PR 350). This time I merged all branches of the run in one place and ran the whole check on the result before the history:
+  it caught a changelog line of 230 characters that my own check script had hidden – it ran the steps one after the other without stopping at the
+  first failure and only the last step's result was read.
