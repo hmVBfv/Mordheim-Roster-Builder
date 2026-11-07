@@ -17,11 +17,14 @@ export interface Fact { label: string; tips: Tip[]; /** The kind of equipment (c
 /* The data's texts are plain; a stray tag would show as text, so it goes. */
 const plain = (s: unknown) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
+/** A text starts with a capital: the data words many rules as "Name: what happens", some in lower case after the colon (#216). */
+const upFirst = (t: string) => t.replace(/^[a-z]/, (c) => c.toUpperCase());
+
 /** A rule as the data or core describe it: a name, perhaps a line, a text. */
 type RuleText = { name?: unknown; line?: unknown; text?: unknown };
 
 function tipOf(i: RuleText | null | undefined, name: string, line: string): Tip[] {
-  const text = plain(i?.text);
+  const text = upFirst(plain(i?.text));
   return text ? [{ name: plain(i?.name) || name, line: plain(i?.line) || line, text }] : [];
 }
 
@@ -138,7 +141,7 @@ export function warbandRuleTexts(ctx: core.Ctx): { unitChoice: { text: string; r
   const wb = core.warbandDef(ctx);
   const defs = wb?.rules ? core.ruleDefs(wb.rules, `Warband rule \u00b7 ${wb.name}`) : [];
   const choice = defs.find((d) => d.name === 'Choice');
-  return { unitChoice: choice ? { text: choice.text, rows: core.unitChoice(choice.text) } : null, rules: defs.filter((d) => d !== choice).map((d) => ({ name: d.name, text: d.text })) };
+  return { unitChoice: choice ? { text: choice.text, rows: core.unitChoice(choice.text) } : null, rules: defs.filter((d) => d !== choice).map((d) => ({ name: d.name, text: upFirst(d.text) })) };
 }
 
 /** The spell list of a caster's school (#68): every spell with its casting value and what it does, the ones he knows marked. */
@@ -150,7 +153,7 @@ export function loreView(ctx: core.Ctx, lore: string | null, known: { name: stri
   if (!l) return null;
   // a line that starts with ▸ is a heading of the data (the Marks of the Marauders), not a spell
   const spells = l.spells.filter(([n]) => !String(n).startsWith('▸')).map(([n, t]) => ({
-    key: n, name: core.spellLabel(n), diff: /\((\d+|auto)\)\s*$/i.exec(String(n))?.[1]?.toLowerCase() ?? '', text: plain(t), known: known.some((s) => s.name === n), red: Number(known.find((s) => s.name === n)?.red) || 0,
+    key: n, name: core.spellLabel(n), diff: /\((\d+|auto)\)\s*$/i.exec(String(n))?.[1]?.toLowerCase() ?? '', text: upFirst(plain(t)), known: known.some((s) => s.name === n), red: Number(known.find((s) => s.name === n)?.red) || 0,
   }));
   return spells.length ? { name: l.name, note: plain(l.note), open: Math.max(0, start - known.length), spells } : null;
 }
