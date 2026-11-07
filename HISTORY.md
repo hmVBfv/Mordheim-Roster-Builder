@@ -4822,7 +4822,7 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
   fails for a restriction without one. Rules of another name (Self-sufficient, Cannibals, Not one of us, Outsiders, Tolerant) keep their name and
   take the pattern; the loose sentences (Carnival, Cavalcade, Beastmen's "No Hired Swords") are rules "Hired Swords" now.
 
-**The run of 7.11.2026, third part: nine reports (PRs 363–368).**
+**The run of 7.11.2026, third part: nine reports (PRs 363–368 and 370).**
 
 - **#229, the fold-out that looked like text (PR 363).** "What goes along" was a `<details>` whose summary was a flex row, and a flex row loses the
   browser's own triangle. The same was true of about a dozen other fold-outs (Fallen, the admin's reports, the story's prologue, the chapter drafts).
@@ -4842,5 +4842,13 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
   rules stay in one place.
 - **#225, Heroes and Henchmen in the unit choice (PR 368).** The name matching the unit-choice test already had moved into core (`choiceWithKinds`);
   the test now also demands a place for every row of every warband.
-- **#231, not built: the story of each unit from the page.** ADR 0024 allows lore from mordheimer.net only in our own words, which means writing about
-  three hundred short texts; left for Rob to choose between that and a shorter way.
+- **#226, second go (PR 364).** Rob did not want the options moved, he wanted nothing to scroll: they unfold as a panel under the row of the chosen
+  warband (with the starting gold, models and heroes, which follow the variant), and fold up when another is chosen. My first version only moved them
+  above the list, which still shifted the page.
+- **#223, the Skaven line.** "Skaven: Uses the Skaven base rules" is on no page; Rob pointed to the Skaven of Clan Eshin of the Core warbands, whose
+  equipment lists the Pestilens page names, and the rule now says that.
+- **#231, the page's description as the story (PR 370).** Rob chose word for word over our own words, which ADR 0024 had asked for; the ADR carries a
+  note that this is an exception for this one purpose. The descriptions were read from the 49 pages with curl and matched to the units by name:
+  311 of 322 have one, the others have none on their page (the Ostlanders, the Amazon Totem Warrior, the Pit Fighters and a few more). The default
+  is shown and offered in the profile sheet, but never saved as the player's own unless it was changed: the first version saved it with the other
+  fields and an older test of the Library's factions caught that.
