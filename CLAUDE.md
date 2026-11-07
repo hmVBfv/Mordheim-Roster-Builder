@@ -85,6 +85,13 @@ changing anything structural.
   edits to rules data.
 - Rules questions are Rob's call. Propose with a cited source; do not change
   rules data without his OK.
+- **Read mordheimer.net with `curl`, always** (`curl -sSL -m 30 -o <file> <url>`, then
+  strip the tags with a script – the pages are long, the rule text is in the
+  HTML). The built-in fetch tools do not get through from a cloud session. The
+  warband pages are at `https://mordheimer.net/docs/warbands/<grade>/<name>`
+  (`core-warbands`, `grade-1a-warbands`, `grade-1b-warbands`,
+  `grade-1c-warbands`, `grade-2a-warbands`); a wrong grade is a 404, so try the
+  others. Do not wait for Rob to say so.
 
 ## Porting legacy logic into `core/`
 

@@ -84,7 +84,8 @@ in the app.
 
 `kind: rules`: look the rule up in the order `CLAUDE.md` gives (Ultimate FAQ and
 FAQ from Toumas, then mordheimer.net, then the rulebook; mordheimer table values
-with their annotations beat prose). Give Rob what you found with the source cited
+with their annotations beat prose). Read mordheimer.net with `curl` (`CLAUDE.md`,
+Rules authority) – always, without being told. Give Rob what you found with the source cited
 and the change you would make. **Do not change anything in `data/` without his
 OK.** After his OK, the data change is its own commit with the citation in the
 message, and the same steps as below apply.
