@@ -47,16 +47,15 @@ export async function unit(page: Page, name: string, tab?: Tab): Promise<Locator
 
 export interface Box { x: number; y: number; width: number; height: number }
 
-/* The box of an element once it holds still: a board lays itself out again when the window width becomes known, and a box read in between is
-   null or about to change (CI of 7.11.2026: "Cannot read properties of null (reading 'y')"). Reads until two in a row are equal, at most about a
-   second; an element that is not there stays null. */
-export async function settledBox(loc: Locator): Promise<Box | null> {
-  let last: Box | null = null;
+/* The box of an element, read at once; if it is not there at that moment (null while a board lays itself out again once the window width is
+   known – CI of 7.11.2026: "Cannot read properties of null (reading 'y')") read again, for about a second. The first read that has a box is
+   the answer: a wait for the box to hold still would skew two boxes that a test compares, read one after the other, while the page keeps
+   changing under them (the overview's two columns failed by 78 px that way). An element that is not there stays null. */
+export async function boxOf(loc: Locator): Promise<Box | null> {
   for (let i = 0; i < 20; i++) {
     const b = await loc.boundingBox();
-    if (b && last && b.x === last.x && b.y === last.y && b.width === last.width && b.height === last.height) return b;
-    last = b;
+    if (b) return b;
     await loc.page().waitForTimeout(50);
   }
-  return last;
+  return null;
 }

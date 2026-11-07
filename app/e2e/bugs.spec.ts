@@ -2,7 +2,7 @@
    the header of every screen, the form with what goes along, the reporter's
    own list under Account, and the admin's reports. Both themes. */
 import { expect, test } from '@playwright/test';
-import { noSideScroll, settledBox, shot, tapTargets, useTheme } from './helpers.ts';
+import { noSideScroll, boxOf, shot, tapTargets, useTheme } from './helpers.ts';
 import { playServer } from './play.ts';
 
 for (const theme of ['chronicle', 'parchment'] as const) {
@@ -86,8 +86,8 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await shot(page, `${theme}-admin-reports`);
     // #67: the mark of an attached warband is a small pill of one line, not a bubble stretched to the height of the title
     const flag = table.getByText('warband attached');
-    const pill = (await settledBox(flag))!;
-    const card = (await settledBox(table.getByRole('row').nth(2)))!;
+    const pill = (await boxOf(flag))!;
+    const card = (await boxOf(table.getByRole('row').nth(2)))!;
     expect(pill.height).toBeLessThan(32);
     expect(pill.x + pill.width).toBeLessThanOrEqual(card.x + card.width);
     await page.getByRole('button', { name: 'Open: Gold drifts after the second battle' }).click();

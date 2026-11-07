@@ -1,7 +1,7 @@
 /* The Library at 360 px and on a desktop (ADR 0023): the entry in the navigation, an idea written and read, both
    themes. Campaign app only (playwright.config.ts), against the stand-in server (e2e/play.ts). */
 import { expect, test } from '@playwright/test';
-import { noSideScroll, settledBox, shot, tapTargets, useTheme } from './helpers.ts';
+import { noSideScroll, boxOf, shot, tapTargets, useTheme } from './helpers.ts';
 import { playServer, serverWarband } from './play.ts';
 
 for (const theme of ['chronicle', 'parchment'] as const) {
@@ -44,7 +44,7 @@ test('the Library on a wide screen: its tabs stand in the side navigation, the i
   await expect(page.getByRole('navigation', { name: 'Library' })).toBeHidden();
   const cards = page.getByRole('list', { name: 'Ideas' }).getByRole('listitem');
   await expect(cards).toHaveCount(3);
-  const [a, b] = await Promise.all([settledBox(cards.nth(0)), settledBox(cards.nth(1))]);
+  const [a, b] = await Promise.all([boxOf(cards.nth(0)), boxOf(cards.nth(1))]);
   expect(Math.round(a!.y)).toBe(Math.round(b!.y));
   await shot(page, 'library-ideas-desktop');
 });

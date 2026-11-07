@@ -1,7 +1,7 @@
 /* The built app on a phone-sized screen. */
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { noSideScroll, settledBox, shot, tapTargets, unit, useTheme } from './helpers.ts';
+import { noSideScroll, boxOf, shot, tapTargets, unit, useTheme } from './helpers.ts';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
 /* the same warband after its first battle: trading has begun (V4–V7) */
@@ -77,8 +77,8 @@ for (const theme of THEMES) {
 test('the Look for field of the new-warband filter has a row of its own', async ({ page }) => {
   await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
   await page.setViewportSize({ width: 1440, height: 900 });
-  const look = (await settledBox(page.getByLabel('Look for')))!;
-  const race = (await settledBox(page.getByLabel('Race')))!;
+  const look = (await boxOf(page.getByLabel('Look for')))!;
+  const race = (await boxOf(page.getByLabel('Race')))!;
   expect(look.y + look.height, 'above the other fields').toBeLessThanOrEqual(race.y);
   expect(look.width, 'wider than a single field').toBeGreaterThan(race.width * 2);
 });
@@ -91,8 +91,8 @@ test('the new-warband form keeps its Start button in view once a warband is pick
   await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
   const start = page.getByRole('button', { name: 'Start the warband' });
   await expect(start).toBeInViewport({ ratio: 1 });
-  const nav = (await settledBox(page.locator('nav').first()))!;
-  const box = (await settledBox(start))!;
+  const nav = (await boxOf(page.locator('nav').first()))!;
+  const box = (await boxOf(start))!;
   expect(box.y + box.height, 'above the navigation').toBeLessThanOrEqual(nav.y + 0.5);
 });
 
@@ -281,13 +281,13 @@ test('the Trading Post to look at has a titled group and tidy rows on a phone', 
   await importSample(page);
   await page.getByRole('link', { name: 'Trade' }).click();
   const look = page.getByRole('region', { name: 'Look at the Trading Post' });
-  const above = (await settledBox(page.getByText('Until its first battle the warband buys from its lists').locator('xpath=ancestor::div[1]')))!;
-  const heading = (await settledBox(look.getByRole('heading', { name: 'Look at the Trading Post' })))!;
-  const text = (await settledBox(look.getByText('What it offers from the first battle on')))!;
+  const above = (await boxOf(page.getByText('Until its first battle the warband buys from its lists').locator('xpath=ancestor::div[1]')))!;
+  const heading = (await boxOf(look.getByRole('heading', { name: 'Look at the Trading Post' })))!;
+  const text = (await boxOf(look.getByText('What it offers from the first battle on')))!;
   expect(heading.y - (above.y + above.height), 'room above the heading').toBeGreaterThan(text.y - (heading.y + heading.height));
   const row = look.getByRole('list', { name: 'Rare items' }).getByRole('listitem').first();
   const cells = await row.evaluate((li) => [...li.children].map((c) => { const r = c.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; }));
-  const li = (await settledBox(row))!;
+  const li = (await boxOf(row))!;
   const [name, rarity, chance, price] = cells as { x: number; y: number; w: number; h: number }[];
   expect(rarity!.y, 'the rarity under the name').toBeGreaterThanOrEqual(name!.y + name!.h - 1);
   expect(chance!.y, 'chance on the line of the rarity').toBeLessThanOrEqual(rarity!.y + rarity!.h);
@@ -329,7 +329,7 @@ test('the Trading Post on a wide screen: Give is a grid of small cards, pick an 
   await expect(cards.nth(1)).toBeVisible();
   // the board lays itself out again once the window width is known, and a card measured in between is gone (CI of 7.11.2026: the box was null); measure until it holds
   await expect.poll(async () => {
-    const [a, b] = await Promise.all([settledBox(cards.nth(0)), settledBox(cards.nth(1))]);
+    const [a, b] = await Promise.all([boxOf(cards.nth(0)), boxOf(cards.nth(1))]);
     return !!a && !!b && Math.round(a.y) === Math.round(b.y) && b.x > a.x + a.width - 1 && a.width < 480;
   }, { message: 'two cards side by side, each small' }).toBe(true);
   await expect(cards.nth(0).getByLabel('Profile')).toBeVisible();
@@ -944,8 +944,8 @@ for (const theme of THEMES) {
     }
     // the list beside the pane; a row is one table line: name, profile and experience across
     const heroes = page.getByRole('region', { name: 'Heroes' }).getByRole('listitem');
-    const row = (await settledBox(heroes.first()))!;
-    const side = (await settledBox(pane))!;
+    const row = (await boxOf(heroes.first()))!;
+    const side = (await boxOf(pane))!;
     expect(side.x, 'the pane stands beside the list').toBeGreaterThan(row.x + row.width);
     expect(row.height, 'a row is a line or two, not a card').toBeLessThan(90);
     expect(row.width + side.width, 'the width is used').toBeGreaterThan(1000);
@@ -978,8 +978,8 @@ for (const theme of THEMES) {
     await page.goto('./');
     await importSample(page);
     await expect(page.locator('[data-layout]')).toHaveAttribute('data-layout', 'triple');
-    const pane = (await settledBox(page.getByRole('complementary', { name: 'Selected warrior' })))!;
-    const warband = (await settledBox(page.getByRole('heading', { level: 2, name: 'Warband', exact: true })))!;
+    const pane = (await boxOf(page.getByRole('complementary', { name: 'Selected warrior' })))!;
+    const warband = (await boxOf(page.getByRole('heading', { level: 2, name: 'Warband', exact: true })))!;
     expect(warband.x, 'the warband’s functions are the third column').toBeGreaterThan(pane.x + pane.width);
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-desktop-wide-roster`);
@@ -990,7 +990,7 @@ test('the controls are smaller with a mouse than with a finger', async ({ page }
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('./');
   await importSample(page);
-  const recruit = (await settledBox(page.getByRole('button', { name: '+ Recruit' })))!;
+  const recruit = (await boxOf(page.getByRole('button', { name: '+ Recruit' })))!;
   expect(recruit.height).toBeGreaterThanOrEqual(32);
   expect(recruit.height).toBeLessThan(44);
 });
@@ -1258,7 +1258,7 @@ for (const theme of THEMES) {
     await ulrich.getByRole('button', { name: 'Sword', exact: true }).click();
     await expect(tip).toHaveCount(1);
     await expect(tip).toContainText('Parry');
-    const box = (await settledBox(tip))!;
+    const box = (await boxOf(tip))!;
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.x + box.width).toBeLessThanOrEqual(360);
     await noSideScroll(page); await tapTargets(page);
