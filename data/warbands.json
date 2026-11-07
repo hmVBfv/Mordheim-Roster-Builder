@@ -8542,7 +8542,7 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Fear. Stupidity. Large Target. Regeneration (4+; not vs fire). Dumb Monster: Gains no Experience and never rolls for injury after a battle. Always Hungry: 15 gc upkeep after each game (or sacrifice two Goblins/Squigs) or it wanders off. Vomit Attack: Instead of its normal attacks, one automatic Strength 5 hit that ignores armour saves."
+     "sp": "Fear. Stupidity. Large Target. Regeneration (4+; not vs fire). Dumb Monster: Gains no Experience. Always Hungry: 15 gc upkeep after each game (or sacrifice two Goblins/Squigs) or it wanders off. Vomit Attack: Instead of its normal attacks, one automatic Strength 5 hit that ignores armour saves."
     },
     {
      "id": "snotmob",
