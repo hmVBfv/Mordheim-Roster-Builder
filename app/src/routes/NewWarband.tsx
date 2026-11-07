@@ -87,7 +87,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
     <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void create(); }}>
       {vanilla && <p className={ui.muted}>This campaign plays Vanilla Mordheim: only the warbands of the rulebook.</p>}
       <WarbandFinder facts={facts} finder={finder} />
-      <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} />
+      {/* the options of the chosen warband come before the long list, so that choosing never means scrolling to its end */}
       {choice && choice.subtypes.length > 0 && (
         <label className={ui.field} htmlFor={ids.sub}>
           <span>{choice.subtypeLabel?.replace(/:\s*$/, '') || 'Variant'}</span>
@@ -120,6 +120,7 @@ function Form({ campaignId }: { campaignId: string | null }) {
         </label>
       )}
       {choice && !planner && <p className={ui.muted}>Starting gold: {gold} gc.</p>}
+      <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} />
       <div className={`${ui.actions} ${ui.stickyActions}`}>
         <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
         <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>

@@ -159,6 +159,18 @@ describe('a new warband', () => {
     expect(all[0]!.state.subtype).toBe('trantio');
   });
 
+  /* The options of the chosen warband (its variant, the name) sit above the long table of warbands, so choosing one never
+     means scrolling down to the end of the list. */
+  it('shows the variant and the name of the chosen warband above the list, not below it', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('radio', { name: 'Tileans' }));
+    const first = screen.getAllByRole('radio')[0]!;
+    for (const field of [screen.getByRole('combobox', { name: 'City' }), screen.getByRole('textbox', { name: 'Name' })]) {
+      expect(field.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+  });
+
   /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
   it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
     at('/warbands/new');
