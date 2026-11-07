@@ -474,8 +474,8 @@ function Browse({ ctx }: { ctx: core.Ctx }) {
   const findable = sortRare(filterRare(pool, { q, stat, maxRarity: max, from, grade }), sort);
   const common = shop.filter((it) => kind === 'all' || it.kind === kind);
   return (
-    <section className={ui.page} aria-label="Look at the Trading Post">
-      <h2>Look at the Trading Post</h2>
+    <section className={ui.group} aria-label="Look at the Trading Post">
+      <h2 className={ui.groupTitle}>Look at the Trading Post</h2>
       <p className={ui.muted}>What it offers from the first battle on – to look at; nothing can be bought, searched for or sold before then.</p>
       <Seg label="What to look at" value={what} options={[['rare', 'Rare items'], ['common', 'Common items']] as const} onChange={setWhat} />
       <Seg label="Kind" value={kind} options={KINDS} onChange={setKind} />
