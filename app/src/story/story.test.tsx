@@ -159,6 +159,31 @@ describe('a warrior’s life', () => {
     expect(core.profileOf((await stored()).models.find((m) => m.uid === group.uid))).toMatchObject({ voice: 'They sing when they march.' });
   });
 
+  /* Wish of 7.11.2026: the description of a unit on its mordheimer.net page is its story to begin with; the player's own text replaces it. */
+  it('begins with the description of the unit on its page, and an own text replaces it', async () => {
+    const s = band();
+    const capt = s.models[0]!;
+    await seed(s);
+    const user = userEvent.setup();
+    at(`/warbands/w1/story?who=${capt.uid}`);
+    const life = await screen.findByRole('dialog', { name: /Mercenary Captain/ });
+    expect(await within(life).findByText(/^A Mercenary Captain is a tough professional warrior/)).toBeTruthy();
+    expect(within(life).getByText('A few lines about him')).toBeTruthy();
+    expect(within(life).getByText(/from the Mordheim page/)).toBeTruthy();
+    await user.click(within(life).getByRole('button', { name: 'Edit the profile' }));
+    const sheet = await screen.findByRole('dialog', { name: /Mercenary Captain: names, voice, story/ });
+    const field = within(sheet).getByLabelText('A few lines about him') as HTMLTextAreaElement;
+    expect(field.value).toMatch(/^A Mercenary Captain is a tough professional warrior/);
+    // untouched, it is not saved as his own
+    expect(within(sheet).getByRole('button', { name: 'Save' })).toHaveProperty('disabled', true);
+    await user.clear(field);
+    await user.type(field, 'He never speaks of the war.');
+    await user.click(within(sheet).getByRole('button', { name: 'Save' }));
+    await waitFor(async () => expect(core.profileOf((await stored()).models[0]).text).toBe('He never speaks of the war.'));
+    expect(await within(life).findByText('He never speaks of the war.')).toBeTruthy();
+    expect(within(life).queryByText(/from the Mordheim page/)).toBeNull();
+  });
+
   it('every kind of people is listed', async () => {
     await seed(band());
     at('/warbands/w1/story');

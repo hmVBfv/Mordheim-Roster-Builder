@@ -17,27 +17,30 @@ export interface Person {
   sub: string;
   group: Group;
   profile: WarriorProfile;
+  /** What his unit's page says of it (data/unitlore.json): his story until he has written his own; '' where the page says nothing or he is no unit of the warband. */
+  lore: string;
 }
 
-export function peopleOf(data: GameData, s: WarbandState): Person[] {
+/** `lore`: the descriptions of this warband's units by unit id. */
+export function peopleOf(data: GameData, s: WarbandState, lore: Record<string, string> = {}): Person[] {
   const v = rosterView(data, s);
   const ctx = core.ctxOf(data, s);
   const out: Person[] = [];
   const model = (uid: number) => s.models.find((m) => m.uid === uid);
   for (const w of v.heroes) {
     const p = core.profileOf(model(w.uid));
-    out.push({ key: w.key, uid: w.uid, name: w.name, sub: p.title_en || w.type, group: 'hero', profile: p });
+    out.push({ key: w.key, uid: w.uid, name: w.name, sub: p.title_en || w.type, group: 'hero', profile: p, lore: lore[model(w.uid)?.uid_def ?? ''] ?? '' });
   }
-  for (const w of v.henchmen) out.push({ key: w.key, uid: w.uid, name: w.name, sub: `${w.count} × ${w.type}`, group: 'group', profile: core.profileOf(model(w.uid)) });
+  for (const w of v.henchmen) out.push({ key: w.key, uid: w.uid, name: w.name, sub: `${w.count} × ${w.type}`, group: 'group', profile: core.profileOf(model(w.uid)), lore: lore[model(w.uid)?.uid_def ?? ''] ?? '' });
   for (const h of v.hires) {
     const rec = [...(s.hired ?? []), ...(s.dp ?? [])].find((x) => x.uid === h.uid);
     const p = core.profileOf(rec);
-    out.push({ key: h.key, uid: h.uid, name: h.name, sub: p.title_en || h.kind, group: 'hired', profile: p });
+    out.push({ key: h.key, uid: h.uid, name: h.name, sub: p.title_en || h.kind, group: 'hired', profile: p, lore: '' });
   }
   for (const f of s.fallen ?? []) {
     if (f.kind !== 'hero') continue;
     const p = core.profileOf(f.m);
-    out.push({ key: `fallen-${f.id ?? f.m.uid}`, uid: f.m.uid, name: core.modelLabel(ctx, f.m), sub: p.title_en || 'fell', group: 'fallen', profile: p });
+    out.push({ key: `fallen-${f.id ?? f.m.uid}`, uid: f.m.uid, name: core.modelLabel(ctx, f.m), sub: p.title_en || 'fell', group: 'fallen', profile: p, lore: lore[f.m.uid_def] ?? '' });
   }
   return out;
 }
