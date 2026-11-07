@@ -1951,7 +1951,7 @@
    "min": 3,
    "max": 20,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity:</b> The warband is subject to Animosity.<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – Pit Fighter, Ogre Bodyguard, Warlock.",
+   "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity:</b> Orcs and Goblins enjoy nothing more than a good scrap, unfortunately they’re not always very discerning about who they scrap with! To represent this, at the start of the Orc player’s turn, roll a D6 for each Henchman who is either an Orc or a Goblin. A roll of 1 means that the warrior has taken offense to something one of his mates has done or said. Do not roll for models that are engaged in hand-to-hand combat (they’re already scrappin’!). To find out just how offended the model is, roll another D6 and consult the Animosity chart (see the Animosity ability for its three results).<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – Pit Fighter, Ogre Bodyguard, Warlock.",
    "units": [
     {
      "id": "boss",
@@ -3715,7 +3715,7 @@
    "min": 3,
    "max": 20,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Chieftain. Max. 4 Braves, 1 Shaman; any number of Forest Goblins, max. 5 Red Toof Boyz, max. 5 Sluggas, max. 1 Gigantic Spider.<br><b>Animosity:</b> The warband is subject to Animosity.<br><b>Natives:</b> No penalty in woods.",
+   "rules": "<b>Choice:</b> Exactly 1 Chieftain. Max. 4 Braves, 1 Shaman; any number of Forest Goblins, max. 5 Red Toof Boyz, max. 5 Sluggas, max. 1 Gigantic Spider.<br><b>Animosity:</b> Orcs and Goblins enjoy nothing more than a good scrap, unfortunately they’re not always very discerning about who they scrap with! To represent this, at the start of the Orc player’s turn, roll a D6 for each Henchman who is either an Orc or a Goblin. A roll of 1 means that the warrior has taken offense to something one of his mates has done or said. Do not roll for models that are engaged in hand-to-hand combat (they’re already scrappin’!). To find out just how offended the model is, roll another D6 and consult the Animosity chart (see the Animosity ability for its three results).<br><b>Natives:</b> No penalty in woods.",
    "units": [
     {
      "id": "fgchief",
