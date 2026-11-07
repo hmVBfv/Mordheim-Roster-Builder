@@ -8,7 +8,7 @@ const data = loadGameData();
 
 const OPENINGS = [
   /^May hire only these Hired Swords( or Dramatis Personae)?, no others – /,
-  /^May hire any Hired Sword except /,
+  /^May hire any Hired Sword( or Dramatis Personae)? except /,
   /^May hire the Hired Swords of an? /,
   /^May hire the Hired Swords open to /,
   /^May hire no Hired Swords/,
@@ -18,13 +18,13 @@ const OPENINGS = [
 function hireRules() {
   const out: { wb: string; name: string; text: string }[] = [];
   for (const [wb, w] of Object.entries(data.WARBANDS)) {
-    for (const d of core.ruleDefs(w.rules, 'x')) if (/Hired Sword/i.test(d.text) && /\bhire\b|\btake\b/i.test(d.text)) out.push({ wb, name: d.name, text: d.text });
+    for (const d of core.ruleDefs(w.rules, 'x')) if (/Hired Sword/i.test(d.text) && /\bhire\b|\btake\b|\binclude\b/i.test(d.text)) out.push({ wb, name: d.name, text: d.text });
   }
   return out;
 }
 
 describe('the Hired Swords of a warband', () => {
-  it('are restricted in words that cannot be read two ways: one of five openings, in every warband', () => {
+  it('are restricted in words that cannot be read two ways: one of five openings, in every warband (the Dwarfs\' Grudgebearers too)', () => {
     const bad = hireRules().filter((r) => !OPENINGS.some((re) => re.test(r.text))).map((r) => `${r.wb}: ${r.name}: ${r.text.slice(0, 60)}`);
     expect(bad).toEqual([]);
   });
