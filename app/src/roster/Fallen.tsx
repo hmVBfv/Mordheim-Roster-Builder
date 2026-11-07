@@ -11,7 +11,7 @@ export function FallenList({ f }: { f: FallenView }) {
   if (!f.count) return null;
   return (
     <details className={`${ui.card} ${styles.fallenBox}`}>
-      <summary className={styles.fallen}>
+      <summary className={`${styles.fallen} ${ui.fold}`}>
         <span className={styles.fallenTitle}>Fallen ({f.count})</span>
         <span className={styles.fallenTotals}>
           <span>{f.goldLost} gc lost</span>
@@ -39,7 +39,7 @@ export function FallenList({ f }: { f: FallenView }) {
                   {(e.fell || e.joined || e.battles > 0) && <span className={styles.fallenWhen}>{[e.joined, e.battles > 0 ? `Took part in ${e.battles} ${e.battles === 1 ? 'battle' : 'battles'}` : '', e.fell].filter(Boolean).map((t) => <span key={t}>{t}</span>)}</span>}
                   {e.last && (
                     <details className={styles.fallenLast}>
-                      <summary>Last stats and skills</summary>
+                      <summary className={ui.fold}>Last stats and skills</summary>
                       <Strip cells={e.last.stats} save={null} />
                       <span>{e.last.skills.length ? `Skills: ${e.last.skills.join(', ')}` : 'No skills'}</span>
                     </details>

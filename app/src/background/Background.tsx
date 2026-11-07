@@ -235,7 +235,7 @@ function History({ close, detail, error }: { close: () => void; detail: Detail |
             {detail.revisions.map((r) => (
               <li key={r.editedAt + r.editedBy}>
                 <small>Replaced by {r.editedBy} · {stamp(r.editedAt)}</small>
-                <details><summary>{r.snapshot.title ?? 'Untitled'}</summary>
+                <details><summary className={ui.fold}>{r.snapshot.title ?? 'Untitled'}</summary>
                   <p>Truth: {r.snapshot.truth || '–'}</p><p>The players knew: {r.snapshot.playersKnow || '–'}</p>
                 </details>
               </li>
@@ -312,7 +312,7 @@ export function BackgroundTab({ id, view }: { id: string; view: CampaignView }) 
       {kind === 'opponents' && <Suspense fallback={<p className={ui.muted}>Loading the opponents…</p>}><OpponentsSection id={id} warbands={warbands} notify={notify} /></Suspense>}
       {kind !== 'plans' && kind !== 'opponents' && (<>
       <details className={`${ui.card} ${styles.legend}`}>
-        <summary>How much may the story show?</summary>
+        <summary className={ui.fold}>How much may the story show?</summary>
         {(Object.keys(LEVEL_NAMES) as Level[]).map((l) => <div key={l} className={styles.level}><Dots level={l} /><span><b>{LEVEL_NAMES[l]}</b> – {LEVEL_TEXT[l]}</span></div>)}
         <p className={ui.muted}>The AI pack carries these as hard rules; a check marks words from hidden truths in chapter drafts.</p>
       </details>

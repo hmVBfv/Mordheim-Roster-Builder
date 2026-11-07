@@ -225,7 +225,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
               {chosen.attachment && <button type="button" className={ui.buttonQuiet} onClick={() => saveFile(`${fileBase(chosen)}-warband.json`, JSON.stringify(chosen.attachment, null, 2), 'application/json')}>Download the warband</button>}
             </div>
             <details className={styles.details}>
-              <summary>Everything that came with it</summary>
+              <summary className={ui.fold}>Everything that came with it</summary>
               <pre className={styles.preview} tabIndex={0}>{reportText(docOf(chosen))}</pre>
             </details>
           </div>

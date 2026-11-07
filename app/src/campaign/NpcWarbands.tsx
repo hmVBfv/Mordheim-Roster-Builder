@@ -41,7 +41,7 @@ function Entry({ cid, w, data, onChanged, onReplace }: { cid: string; w: NpcList
   return (
     <li>
       <details className={ui.card} onToggle={(e) => { if (e.currentTarget.open) load(); }}>
-        <summary><strong>{w.name}</strong> <small className={ui.muted}>{w.summary.kind} · Value {w.summary.value} gc · Exp {w.summary.exp} · Rating {w.summary.rating} · {w.summary.models} {w.summary.models === 1 ? 'model' : 'models'}</small></summary>
+        <summary className={ui.fold}><strong>{w.name}</strong> <small className={ui.muted}>{w.summary.kind} · Value {w.summary.value} gc · Exp {w.summary.exp} · Rating {w.summary.rating} · {w.summary.models} {w.summary.models === 1 ? 'model' : 'models'}</small></summary>
         <div className={ui.page}>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
           <div className={ui.row}>

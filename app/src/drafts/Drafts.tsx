@@ -245,7 +245,7 @@ function DraftForm({ close, cid, view, draft, online, onSaved }: {
             : <p className={ui.muted}>{typed.trim() ? 'Reading the background…' : 'Paste or write the text, and it is held against the hidden background as you go.'}</p>}
       </div>
       <details>
-        <summary>More about the chapter (optional)</summary>
+        <summary className={ui.fold}>More about the chapter (optional)</summary>
         <div className={styles.more}>
           {([['Chapter label', label, setLabel, 'Chapter 3'], ['Date in the story', icDate, setIcDate, 'Sigmarzeit 2302'], ['Place', place, setPlace, 'The ferry at the Stir']] as const).map(([name, value, set, hint]) => (
             <div key={name} className={ui.field}>
@@ -357,7 +357,7 @@ function ReviewForm({ close, cid, view, draft, chapters, online, onEdit, onPubli
         <h2 id="draft-review-title" lang={draft.lang}>{draft.title}</h2>
       </div>
       <details>
-        <summary>Read the text</summary>
+        <summary className={ui.fold}>Read the text</summary>
         <div className={styles.text} lang={draft.lang}>
           {readText(draft.text).map((p, i) => (p.kind === 'heading'
             ? <h3 key={i}>{p.text}</h3>

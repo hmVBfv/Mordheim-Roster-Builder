@@ -147,7 +147,7 @@ export function OwnPlan({ cid, round }: { cid: string; round: number }) {
       {plan
         ? (
           <details className={styles.plan}>
-            <summary>Your plan for this battle ⚑</summary>
+            <summary className={ui.fold}>Your plan for this battle ⚑</summary>
             <PlanText text={plan.text} />
           </details>
         )
