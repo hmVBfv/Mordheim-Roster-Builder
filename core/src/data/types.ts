@@ -73,8 +73,8 @@ export interface UnitDef {
   /** A Hero who may be made a Wizard for gold (`cost`), losing a piece of his starting gear (`drop`): the Jungle Shadow, the Twisted Scholar. None by default. */
   wizardOption?: { cost: number; drop?: string };
   /** An upgrade the unit may buy for gold (`cost`), for `max` men of the warband: it lets him take the skill `skill`, and with it he counts as `becomes`
-      (his rules, equipment and skill lists; his profile and price stay his own): Black Orc Blood of the Young'un. None by default. */
-  upgradeOption?: { name: string; cost: number; max: number; skill: string; becomes: string };
+      (his rules, equipment and skill lists; his profile, price and title stay his own): Black Orc Blood of the Young'un. None by default. */
+  upgradeOption?: { name: string; cost: number; max: number; /** The experience a man needs to buy it. */ minExp?: number; skill: string; becomes: string };
   /** Warband skill set not available to this unit. */
   noWbSkills?: boolean;
   /** Extra attack shown as "1+1" (e.g. Saurus bite). */

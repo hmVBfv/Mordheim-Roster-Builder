@@ -179,8 +179,8 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
     }
     // the upgrade a unit may buy for gold (Black Orc Blood of the Young'un): a button for it and for giving it back
     if (w.upgrade) {
-      const { name, cost, on } = w.upgrade;
-      chaos.push({ label: on ? `Give up ${name}` : `${name} · +${cost} gc`, run: () => ed.edit((c) => core.setUnitUpgrade(c, w.uid, !on), on ? `${w.name} gives up ${name}.` : `${w.name} has ${name}.`) });
+      const { name, cost, on, block, tips } = w.upgrade;
+      chaos.push({ label: on ? `Give up ${name}` : `${name} · +${cost} gc`, disabled: !on && !!block, why: !on && block ? block : undefined, tips: on ? undefined : tips, run: () => ed.edit((c) => core.setUnitUpgrade(c, w.uid, !on), on ? `${w.name} gives up ${name}.` : `${w.name} has ${name}.`) });
     }
     if (role === 'seer') chaos.push({ label: 'Mark of Chaos…', run: () => { setMarkKey((k) => k + 1); openMarkSheet(); } });
     else if (role === 'chief' && mk) {

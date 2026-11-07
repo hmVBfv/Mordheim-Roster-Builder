@@ -11,6 +11,7 @@ import { TipWord } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import type { Taken } from './advance.ts';
 import { ChipView, statClass, xpNote } from './Bits.tsx';
+import type { Tip } from './tips.ts';
 import { isWarrior, unitChips, type Fact, type HireView, type MaxLine, type StatCell, type WarriorView, type XpView } from './view.ts';
 import styles from './Board.module.css';
 
@@ -53,7 +54,7 @@ export interface UnitActs {
   /** Chooses one of the spells he starts with (#81), by its name in the data. */
   learnSpell?(name: string): void;
   /** Mutations and the Mark: one button each. */
-  chaos: { label: string; run: () => void }[];
+  chaos: { label: string; run: () => void; /** Greyed out, with `tips` beside it saying what is asked (an upgrade that waits for experience). */ disabled?: boolean; tips?: Tip[]; why?: string }[];
   outOfAction?(): void;
   leave: { label: string; run: () => void };
 }
@@ -258,7 +259,13 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       {w && w.mutations.length > 0 && <Section title="Mutations"><Facts items={w.mutations} /></Section>}
       {w && w.mark.length > 0 && <Section title="Mark of Chaos"><Facts items={w.mark} /></Section>}
       {acts && acts.chaos.length > 0 && (
-        <div className={styles.acts}>{acts.chaos.map((c) => <button key={c.label} type="button" className={styles.btn} onClick={c.run}>{c.label}</button>)}</div>
+        <div className={styles.acts}>{acts.chaos.map((c) => (
+          <span key={c.label} className={styles.actWith}>
+            <button type="button" className={styles.btn} disabled={c.disabled} onClick={c.run}>{c.label}</button>
+            {c.why && <small className={styles.actWhy}>{c.why}</small>}
+            {c.tips && c.tips.length > 0 && <TipWord label={c.tips[0]!.name} tips={c.tips} />}
+          </span>
+        ))}</div>
       )}
       {w && (
         <Section title="Injuries">

@@ -87,7 +87,7 @@ export function removeSkill(ctx: Ctx, uid: number, index: number): WarbandState 
 export function setUnitUpgrade(ctx: Ctx, uid: number, on: boolean): WarbandState {
   const m0 = findModel(ctx.s, uid);
   const def = m0 ? unitDef(ctx, m0.statsOf ?? m0.uid_def) : undefined;
-  if (!m0 || !def?.upgradeOption || !!m0.upgraded === !!on) return ctx.s;
+  if (!m0 || !def?.upgradeOption || !!m0.upgraded === !!on || (on && upgradeBlock(ctx, uid))) return ctx.s;
   if (on ? ctx.s.models.filter((m) => m.upgraded && (m.statsOf ?? m.uid_def) === def.id).length >= def.upgradeOption.max : !!m0.statsOf) return ctx.s;
   return update(ctx, (d) => { const m = findModel(d, uid) as Model; if (on) m.upgraded = true; else delete m.upgraded; });
 }
@@ -354,4 +354,16 @@ export function hsSpellReduce(ctx: Ctx, uid: string, index: number, delta: numbe
     sp.red = Math.max(0, (sp.red || 0) + delta);
     if (b != null) sp.red = Math.min(sp.red, b - 2);
   });
+}
+
+
+/** Why a man may not buy the upgrade of his unit yet, or null: the experience its skill asks for ("may only be taken by a Young'un with the Black Orc
+    blood ability and 25 experience"), or that the warband has its one already. */
+export function upgradeBlock(ctx: Ctx, uid: number): string | null {
+  const m = findModel(ctx.s, uid);
+  const opt = m ? unitDef(ctx, m.statsOf ?? m.uid_def)?.upgradeOption : undefined;
+  if (!m || !opt || m.upgraded) return null;
+  const need = opt.minExp ?? 0;
+  if ((Number(m.exp) || 0) < need) return `${opt.name} may be taken by a unit of this kind with ${need} experience (he has ${Number(m.exp) || 0}).`;
+  return null;
 }
