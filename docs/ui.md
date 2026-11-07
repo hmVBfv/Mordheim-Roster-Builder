@@ -393,8 +393,9 @@ Auf dem Handy bleibt die Leiste beim Scrollen oben stehen; am Desktop steht
 sie neben den Kacheln. Nichts davon liegt hinter einem Menü.
 
 **Unit choice und Warband rules (#203, #207, #210).** Über den Gruppen der Krieger stehen, in der Breite der Liste und für jede Warband, zwei
-Abschnitte: **„Unit choice“** (die Zeile „Choice:“ der Warband-Seite – wen sie anwerben darf und wie viele –, ein Text für sich, denn sie ist keine
-Regel, die ein Krieger hat) und **„Warband rules“**: jede Regel, die die Seite mit Namen nennt („Hard Head:“, „Slavers:“ …), als Name mit ihrem
+Abschnitte: **„Unit choice“** (die Zeile „Choice:“ der Warband-Seite – wen sie anwerben darf und wie viele –, keine Regel, die ein Krieger hat: eine Zeile je
+Einheit mit ihrer Grenze am Ende, in jeder Warband mit denselben Worten: „exactly 1“, „0–2“, „any number“, „1 or more“, dazu in Worten, woran die
+Einheit gebunden ist; `core/src/rules/choice.ts`, `core/test/unit-choice.test.ts`) und **„Warband rules“**: jede Regel, die die Seite mit Namen nennt („Hard Head:“, „Slavers:“ …), als Name mit ihrem
 Text darunter, zum Lesen und nicht zum Antippen. So müssen die Chaos Dwarfs die gemeinsamen Regeln nicht bei jeder Einheit wiederholen. Am Handy
 und am Desktop an derselben Stelle. Jede Regel steht in den Daten unter einer eigenen Überschrift (`core/test/warband-rules-text.test.ts`).
 

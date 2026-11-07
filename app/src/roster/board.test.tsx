@@ -409,7 +409,8 @@ describe('the unit choice of the warband', () => {
 
   it('is not one of the rules, but a text of its own', () => {
     const v = view('dwarftreasure', 'clansman');
-    expect(v.unitChoice).toMatch(/^Exactly 1 Noble\./);
+    expect(v.unitChoice!.text).toMatch(/^Exactly 1 Noble\./);
+    expect(v.unitChoice!.rows![0]).toEqual({ name: 'Noble', limit: 'exactly 1', note: null });
     expect(v.warbandRules.map((r) => r.name)).not.toContain('Choice');
     for (const wb of Object.keys(data.WARBANDS)) expect(rosterView(data, createWarband(data, wb, null, 'x')).warbandRules.map((r) => r.name), wb).not.toContain('Choice');
   });
@@ -419,8 +420,19 @@ describe('the unit choice of the warband', () => {
     show({}, view('dwarftreasure', 'clansman'));
     const choice = screen.getByRole('region', { name: 'Unit choice' });
     const rules = screen.getByRole('region', { name: 'Warband rules' });
-    expect(within(choice).getByText(/Exactly 1 Noble/)).toBeTruthy();
-    expect(within(rules).queryByText(/Exactly 1 Noble/)).toBeNull();
+    expect(within(choice).getByText('Noble')).toBeTruthy();
+    expect(within(rules).queryByText('Noble')).toBeNull();
     expect(choice.compareDocumentPosition(rules) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+/* Report of 7.11.2026: "Max. 2 Black Orcs, 2 Young'uns" can be read as "2 Young'uns are needed". Each unit is a line, with its limit in the same words everywhere. */
+describe('the unit choice as lines', () => {
+  it('gives each unit its limit at the end of its line, 0–2 where a text said "max."', () => {
+    width = 400;
+    show({}, rosterView(data, core.addUnit(ctx(createWarband(data, 'blackorcs', null, 'The Band')), 'bboss')));
+    const choice = screen.getByRole('region', { name: 'Unit choice' });
+    const lines = within(choice).getAllByRole('listitem').map((li) => li.textContent);
+    expect(lines).toEqual(['Black Orc Boss' + 'exactly 1', 'Black Orcs' + '0–2', 'Young\'uns' + '0–2', 'Boyz' + 'any number', 'Shootaz · never more than Boyz' + 'any number', 'Nuttaz' + '0–4', 'Troll' + '0–1']);
   });
 });
