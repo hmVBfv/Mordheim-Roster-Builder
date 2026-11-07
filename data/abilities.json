@@ -267,7 +267,7 @@
    {
     "name": "Regeneration",
     "line": "Special rule",
-    "text": "Whenever an enemy inflicts a wound, roll a D6: on a 4+ the wound is ignored. Wounds caused by fire or fire-based magic cannot be regenerated."
+    "text": "Trolls have a unique physiology that allows them to regenerate wounds. Whenever an enemy successfully inflicts a wound on a Troll roll a D6, on a result of 4 or more the wound is ignored and the Troll is unhurt. Trolls may not regenerate wounds caused by fire or fire-based magic. Trolls never roll for Injury after a battle, unless they were taken Out of Action by a Flaming weapon or spell. Then they roll after the battle as a normal Henchman."
    }
   ],
   [
