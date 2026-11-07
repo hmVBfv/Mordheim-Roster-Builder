@@ -23,8 +23,9 @@ export function WarbandList({ warbands, marks = false, grid = false, groups, fav
     <ul className={`${ui.list} ${grid ? ui.listGrid : ''}`}>
       {warbands.map((w) => {
         const fav = !!favourites?.has(w.id);
+        const tools = !!favourites?.toggle || !!groups;
         return (
-        <li key={w.id}>
+        <li key={w.id} className={tools ? ui.listEntry : undefined}>
           <Link to={`/warbands/${w.id}`} className={ui.listLink}>
             {fav && <span className={`${ui.ribbon} ${ui.ribbonFavourite}`} aria-hidden="true"><CometIcon /></span>}
             {w.state.planner && <span className={`${ui.ribbon} ${fav ? ui.ribbonFurther : ''}`} aria-hidden="true">P</span>}
@@ -39,17 +40,21 @@ export function WarbandList({ warbands, marks = false, grid = false, groups, fav
             <small><time dateTime={w.createdAt}>Created {stamp(w.createdAt)}</time></small>
             <small>{w.updatedAt !== w.createdAt ? <time dateTime={w.updatedAt}>Updated {stamp(w.updatedAt)}</time> : <>Updated never</>}</small>
           </Link>
-          {favourites?.toggle && (
-            <button type="button" className={ui.buttonQuiet} aria-pressed={fav} disabled={favourites.disabled}
-              aria-label={fav ? `Take ${w.name} out of the favourites` : `Favourite ${w.name}`} onClick={() => favourites.toggle?.(w.id)}>
-              {fav ? 'Favourite ✓' : 'Favourite'}
-            </button>
-          )}
-          {groups && (
-            <select className={ui.select} aria-label={`Group of ${w.name}`} value={groups.of(w.id)} disabled={groups.disabled} onChange={(e) => groups.assign(w.id, e.target.value)}>
-              <option value="">No group</option>
-              {groups.options.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-            </select>
+          {tools && (
+            <div className={ui.listTools}>
+              {favourites?.toggle && (
+                <button type="button" className={ui.buttonQuiet} aria-pressed={fav} disabled={favourites.disabled}
+                  aria-label={fav ? `Take ${w.name} out of the favourites` : `Favourite ${w.name}`} onClick={() => favourites.toggle?.(w.id)}>
+                  {fav ? 'Favourite ✓' : 'Favourite'}
+                </button>
+              )}
+              {groups && (
+                <select className={ui.select} aria-label={`Group of ${w.name}`} value={groups.of(w.id)} disabled={groups.disabled} onChange={(e) => groups.assign(w.id, e.target.value)}>
+                  <option value="">No group</option>
+                  {groups.options.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
+              )}
+            </div>
           )}
         </li>
         );

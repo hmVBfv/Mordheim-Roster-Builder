@@ -60,3 +60,24 @@ describe('the list of warbands', () => {
     expect(plain!.querySelector(`.${ui.ribbon}`)).toBeNull();
   });
 });
+
+/* Wish of 7.11.2026: the Favourite button and the group choice each took a row of their own under the entry, which broke the tidy list. They sit in one
+   row of their own inside the box of the entry. */
+describe('the controls of a warband in the list', () => {
+  it('stand side by side in one row inside the box of the warband', () => {
+    render(<MemoryRouter><WarbandList warbands={[warband('a', '2026-10-03T12:00:00.000Z', '2026-10-20T12:00:00.000Z')]}
+      favourites={{ has: () => false, toggle: () => {} }} groups={{ options: [{ id: 'g', name: 'Home games' }], of: () => '', assign: () => {}, disabled: false }} /></MemoryRouter>);
+    const entry = screen.getByRole('listitem');
+    const button = within(entry).getByRole('button', { name: /Favourite/ });
+    const select = within(entry).getByRole('combobox', { name: /Group of/ });
+    expect(button.parentElement).toBe(select.parentElement);
+    expect(button.parentElement).not.toBe(entry);
+    expect(entry.className).toContain(ui.listEntry);
+    expect(within(entry).getByRole('link')).toBeTruthy();
+  });
+
+  it('are no extra row where there are none (nobody signed in)', () => {
+    render(<MemoryRouter><WarbandList warbands={[warband('a', '2026-10-03T12:00:00.000Z', '2026-10-20T12:00:00.000Z')]} /></MemoryRouter>);
+    expect(screen.getByRole('listitem').children).toHaveLength(1);
+  });
+});
