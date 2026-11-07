@@ -103,6 +103,10 @@ totp_key=$(grep '^TOTP_KEY=' "$root/app.env")
 staging_key=$(grep '^TOTP_KEY=' "$root/staging.env")
 expect "Docker and the timers wait for the SSD" grep -q "RequiresMountsFor=$mnt" /etc/systemd/system/docker.service.d/ssd.conf /etc/systemd/system/roster-backup.service
 expect "the timers are enabled" systemctl is-enabled --quiet roster-backup.timer roster-restore-test.timer
+# The run lasts minutes, and a timer of the real schedule (the restore test at 03:00 UTC, the backup at 02:30) fired in the middle of a CI run: it took the
+# deploy lock, "roster-deploy drill-migration" was refused as "another roster-deploy is running" at once (exit 1, which that step expects), and the
+# assertions after it failed (run of 7.11.2026). They are enabled, as checked; the test starts their services itself, so they stop firing on their own.
+systemctl stop roster-backup.timer roster-restore-test.timer
 expect "roster-alive waits for Stufe 2" sh -c '! systemctl is-enabled --quiet roster-alive.timer'
 expect "no DynDNS updater without its settings" test ! -e /etc/systemd/system/porkbun-ddns.timer
 

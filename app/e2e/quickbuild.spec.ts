@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { decodeSave } from '../src/share/link.ts';
-import { noSideScroll, shot, tapTargets } from './helpers.ts';
+import { noSideScroll, boxOf, shot, tapTargets } from './helpers.ts';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
 
@@ -99,7 +99,7 @@ test('a sheet one only reads closes with a click beside it, one one writes in do
   const sheet = page.getByRole('dialog', { name: "What's new" });
   await expect(sheet).toBeVisible();
   // inside its box: it stays; on the backdrop, beside it: it goes
-  const box = (await sheet.boundingBox())!;
+  const box = (await boxOf(sheet))!;
   await page.mouse.click(box.x + box.width / 2, box.y + 12);
   await expect(sheet).toBeVisible();
   await page.mouse.click(8, 8);
