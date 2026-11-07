@@ -128,7 +128,13 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
         {v.unitChoice && (
           <section aria-labelledby="board-unit-choice" className={styles.wbRules}>
             <div className={styles.groupHead}><h2 id="board-unit-choice">Unit choice</h2></div>
-            <p className={styles.wbChoice}>{v.unitChoice}</p>
+            {v.unitChoice.rows ? (
+              <ul className={styles.wbChoiceList}>
+                {v.unitChoice.rows.map((r) => (
+                  <li key={r.name}><span>{r.name}{r.note && <small> · {r.note}</small>}</span><b>{r.limit}</b></li>
+                ))}
+              </ul>
+            ) : <p className={styles.wbChoice}>{v.unitChoice.text}</p>}
           </section>
         )}
         {v.warbandRules.length > 0 && (

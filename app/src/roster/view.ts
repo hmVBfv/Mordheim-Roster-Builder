@@ -1,7 +1,7 @@
 /* What the roster screen shows, worked out by core's rules. Kept apart from
    the React components so it can be tested without drawing anything. */
 import * as core from '@mordheim/core';
-import type { GameData, HireRecord, Model, Profile, UnitDef, WarbandState } from '@mordheim/core';
+import type { ChoiceRow, GameData, HireRecord, Model, Profile, UnitDef, WarbandState } from '@mordheim/core';
 import { hireFacts, warbandRuleTexts, warriorFacts, type Fact, type SpellLore } from './tips.ts';
 
 export type { Fact, Tip } from './tips.ts';
@@ -133,7 +133,7 @@ export interface RosterView {
   /** Of the maximum, what a Halfling Scout or the like adds to the warband's own (#82). */
   maxBonus: number;
   /** The warband's unit choice (#207), a text of its own. */
-  unitChoice: string | null;
+  unitChoice: { text: string; rows: ChoiceRow[] | null } | null;
   /** What the warband's page names as rules of the whole warband (#203), each with its text, read as text (#210). */
   warbandRules: { name: string; text: string }[];
   heroes: WarriorView[];
