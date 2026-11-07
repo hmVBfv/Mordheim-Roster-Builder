@@ -4806,3 +4806,18 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
   `master` was red (run 1240, PR 350). This time I merged all branches of the run in one place and ran the whole check on the result before the history:
   it caught a changelog line of 230 characters that my own check script had hidden – it ran the steps one after the other without stopping at the
   first failure and only the last step's result was read.
+
+**The run of 7.11.2026, second part: three reports on the rules texts of the warbands (PR 359).**
+
+- **#220, Animosity under the unit choice of the Orc Mob.** Reported on the version before the deploy of the unit-choice change (351); in the data of
+  that change Animosity is a rule of its own, and the unit choice has seven lines without it. Set to fixed with the merge commit of 351, no code.
+- **#222, Animosity of the Black Orcs as "Annual 2002 version".** My own mistake of the headings (#215): "Animosity: Annual 2002 version: triggers ..."
+  has a colon inside the text, which the roster reads as the heading of another rule. The tests of 351 checked that each heading has a colon, not what
+  the roster reads from the text. A test now compares, for every warband, the rules the roster reads with the headings of the text; it found the same
+  slip in three more of the texts I had changed (tribe, city, Kislev) and in four older ones (Eye of the Gods, the Pit Fighters' fight, the Bretonnian
+  blessing, the Black Dwarfs' intro line, which had swallowed "Hard to Kill" for the whole time). A lesson for such a change: test the reading of the
+  data, not its writing. The Animosity has the words of the Black Orcs' page, with the Annual's version (no Leadership test, a 1 on a D6).
+- **#221, "Hired Swords: Only ..." read two ways.** Rob wanted the same wording in all warbands, so the fix is five fixed openings (only these, any
+  except, those of another warband, those open to ... and also these, none) with the names after them, and a test over the rules of all warbands that
+  fails for a restriction without one. Rules of another name (Self-sufficient, Cannibals, Not one of us, Outsiders, Tolerant) keep their name and
+  take the pattern; the loose sentences (Carnival, Cavalcade, Beastmen's "No Hired Swords") are rules "Hired Swords" now.
