@@ -4821,3 +4821,26 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
   except, those of another warband, those open to ... and also these, none) with the names after them, and a test over the rules of all warbands that
   fails for a restriction without one. Rules of another name (Self-sufficient, Cannibals, Not one of us, Outsiders, Tolerant) keep their name and
   take the pattern; the loose sentences (Carnival, Cavalcade, Beastmen's "No Hired Swords") are rules "Hired Swords" now.
+
+**The run of 7.11.2026, third part: nine reports (PRs 363–368).**
+
+- **#229, the fold-out that looked like text (PR 363).** "What goes along" was a `<details>` whose summary was a flex row, and a flex row loses the
+  browser's own triangle. The same was true of about a dozen other fold-outs (Fallen, the admin's reports, the story's prologue, the chapter drafts).
+  All summaries carry the `fold` class now, and a test reads the sources and fails for a summary without it.
+- **#226, the options at the end of a long list (PR 364).** The variant select came after the table of all warbands. They sit between the filter and
+  the table now; a test compares their place in the page.
+- **#223, Animosity that explained itself (PR 365).** The Orc Mob and the Forest Goblins said "The warband is subject to Animosity." under the heading
+  Animosity. They have the words of their pages now (without the trailing colon before the chart, which the rule reader would take for a heading, as
+  in #222). A test over all warbands rejects a rule that only says it is subject to itself. The Skaven line "Uses the Skaven base rules" is of the
+  same kind; it is not on the page, so it was left for Rob.
+- **#227, #228, #230, the Augur (PR 366).** Blessed Sight was shortened twice (unit and tooltip); the page's words are in both now, and the Matriarch's
+  Leader and Prayers of Sigmar, shortened the same way, too. The `noArmour` flag had only filtered the Trading Post, so her own list still offered
+  armour: `listProblem` refuses it, and the equipment sheet leaves the group out for every unit with the flag. The FAQ page of mordheimer.net states
+  the Augur's eyes outright as RAI, so the flag `eyeProof` turns result 31 into Full Recovery, also inside Multiple Injuries. Whether other texts are
+  shortened in the same way was checked for the Sisters only.
+- **#224, mutations among the gear (PR 367).** One view and one list component for both the sheet of their own and the equipment sheet, so the price
+  rules stay in one place.
+- **#225, Heroes and Henchmen in the unit choice (PR 368).** The name matching the unit-choice test already had moved into core (`choiceWithKinds`);
+  the test now also demands a place for every row of every warband.
+- **#231, not built: the story of each unit from the page.** ADR 0024 allows lore from mordheimer.net only in our own words, which means writing about
+  three hundred short texts; left for Rob to choose between that and a shorter way.
