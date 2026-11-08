@@ -81,7 +81,8 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
   const def = core.unitDef(ctx, m.uid_def);
   const list = core.eqListFor(ctx, def) ?? {};
   const hero = def?.t === 'hero' || !!m.promoted;
-  const groups: ListGroup[] = Object.keys(list).map((cat) => ({
+  // a unit that never wears armour (the Augur) is shown no armour at all
+  const groups: ListGroup[] = Object.keys(list).filter((cat) => !(def?.noArmour && KIND_OF[cat] === 'armour')).map((cat) => ({
     label: CATS[cat] ?? cat,
     rows: (list[cat] ?? [])
       .filter(([, , fl]) => hero || !fl?.heroes)

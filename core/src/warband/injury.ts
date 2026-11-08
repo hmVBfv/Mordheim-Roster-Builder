@@ -156,15 +156,21 @@ function goldOn(d: WarbandDraft, c: Ctx, amount: number, text: string): void {
   }
 }
 
+/** Is he one who ignores Blinded in one eye (the Augur: "RAW yes, but RAI is that Augurs ignore eye wounds")? */
+function eyeProof(ctx: Ctx, m: Model | null | undefined): boolean {
+  return !!m && !!unitDef(ctx, m.uid_def)?.eyeProof;
+}
+
 /** The words a result leaves in the casualty record and the chronicle. */
-export function heroRollText(ctx: Ctx, r: HeroRoll): string {
+export function heroRollText(ctx: Ctx, r: HeroRoll, m?: Model | null): string {
   const name = injName(ctx, r.code);
   const dist = injuryDistricts(ctx);
   if (r.saved === 'morr') return `${name}, but the Temple of Morr returned him: Full Recovery`;
   if (r.saved === 'sigmar') return `${name}, healed in the Temple of Sigmar: Full Recovery`;
   if (r.saved === 'peg') return `${name}, ignored: his Peg Leg`;
+  if (r.code === '31' && eyeProof(ctx, m)) return `${name}, but she is already blind: Full Recovery`;
   switch (r.code) {
-    case '16-21': return `${name}: ${(r.more ?? []).map((x) => heroRollText(ctx, x)).join('; ')}`;
+    case '16-21': return `${name}: ${(r.more ?? []).map((x) => heroRollText(ctx, x, m)).join('; ')}`;
     case '23': return r.d6 === 1 ? 'Arm Wound: arm amputated' : 'Arm Wound: misses the next game';
     case '24': return (r.d6 ?? 0) <= 3 ? 'Madness: Stupidity' : 'Madness: Frenzy';
     case '25': return r.d6 === 1 ? 'Smashed Leg: may not run' : 'Smashed Leg: misses the next game';
@@ -178,7 +184,7 @@ export function heroRollText(ctx: Ctx, r: HeroRoll): string {
       return 'Captured and never returned';
     case '65':
       if (dist.amphitheatre || r.pit?.won) return `Sold to the Pits: won the fight${dist.amphitheatre ? ' (the Amphitheatre)' : ''}, +50 gc, +2 experience`;
-      return `Sold to the Pits: lost the fight, weapons and armour gone; then ${r.pit && !r.pit.won ? heroRollText(ctx, r.pit.then) : '?'}`;
+      return `Sold to the Pits: lost the fight, weapons and armour gone; then ${r.pit && !r.pit.won ? heroRollText(ctx, r.pit.then, m) : '?'}`;
     default: return name;
   }
 }
@@ -191,6 +197,7 @@ function applyHero(d: WarbandDraft, c: Ctx, uid: number, r: HeroRoll, cas: Casua
   const nm = m.name || unitDef(c, m.uid_def)?.name || 'He';
   const dist = injuryDistricts(c);
   if (r.saved) return 'recovered';
+  if (r.code === '31' && eyeProof(c, m)) return 'recovered';
   switch (r.code) {
     case '11-15':
       killHeroOn(d, c, uid, null, cas);
@@ -312,7 +319,7 @@ export function injure(ctx: Ctx, id: number | string, roll: InjuryRoll, opts: In
       const victim = { uid: m.uid, name: m.name || unitDef(c, m.uid_def)?.name || '' };
       const cas = casualtyFor(d, c, m.uid, null, opts.casualtyId ?? null);
       const outcome = applyHero(d, c, m.uid, roll.hero, cas);
-      const r = closeCasualty(d, c, cas, before, victim, outcome, roll.hero.code, heroRollText(c, roll.hero), roll);
+      const r = closeCasualty(d, c, cas, before, victim, outcome, roll.hero.code, heroRollText(c, roll.hero, m), roll);
       const held = findModel(d, id);
       if (held?.captive) held.captive.casualtyId = r ? r.id : null;
     } else {

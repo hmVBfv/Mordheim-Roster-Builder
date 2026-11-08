@@ -902,7 +902,7 @@
    {
     "name": "Blessed Sight",
     "line": "Special (Sisters of Sigmar Augur)",
-    "text": "The blind Augur has second sight: she may re-roll any failed characteristic test and any to-hit roll (close combat or shooting), but must accept the second result. If she is not taken Out of Action, in the exploration phase you may roll two dice for her and keep either.",
+    "text": "An Augur can re-roll any failed characteristic tests (climbing, resisting spells or any other reason), and any rolls to hit in close combat or shooting. You must accept the second result. In addition, an Augur can use her Blessed Sight to help the Sisterhood when they are searching the city for wyrdstone. If the Augur is not put out of action in the battle, you may roll two dice for her in the exploration phase and pick either dice as the result.",
     "own": true
    }
   ],

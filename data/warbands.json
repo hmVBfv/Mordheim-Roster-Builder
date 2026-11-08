@@ -632,7 +632,7 @@
       "speed",
       "sosSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Prayers of Sigmar."
+     "sp": "Leader: Any warband member within 6\" of the Sigmarite Matriarch may use her Leadership characteristic when taking any Leadership tests. Prayers of Sigmar: The Sigmarite Matriarch is a servant of Sigmar and may use the Prayers of Sigmar as detailed in the Magic section and the Sigmarite Matriarchs start with one prayer generated at random. In addition the Sigmarite Matriarchs may learn a new Prayer instead of a new skill."
     },
     {
      "id": "super",
@@ -686,7 +686,8 @@
       "speed",
       "sosSkills"
      ],
-     "sp": "Never wears armour. Blessed Sight: May re-roll dice; bonus when exploring."
+     "sp": "Weapons/Armour: The Augurs may be equipped with weapons chosen from the Sisters of Sigmar Equipment list. They never wear armour. Blessed Sight: An Augur can re-roll any failed characteristic tests (climbing, resisting spells or any other reason), and any rolls to hit in close combat or shooting. You must accept the second result. In addition, an Augur can use her Blessed Sight to help the Sisterhood when they are searching the city for wyrdstone. If the Augur is not put out of action in the battle, you may roll two dice for her in the exploration phase and pick either dice as the result.",
+     "eyeProof": true
     },
     {
      "id": "novice",

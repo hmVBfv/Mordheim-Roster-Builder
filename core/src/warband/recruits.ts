@@ -77,6 +77,8 @@ export function listProblem(ctx: Ctx, uid: number, key: string, qty: number): st
   // the free dagger is never given away or sold unless a rule says so outright (#117)
   if (qty < 1 && key.includes('1. gratis')) return 'the free dagger stays';
   const have = Number(m.eq?.[key]) || 0;
+  // a unit that never wears armour (the Augur) is given none from its list
+  if (qty > have && isArmourRow(ctx, m, key) && unitDef(ctx, m.uid_def)?.noArmour) return 'never wears armour';
   // one helmet, one shield, one suit: armour of the list is had once (#111)
   if (qty > 1 && isArmourRow(ctx, m, key)) return 'one of each kind of armour';
   // a row of his list that is priced for the founding (the Knights Vanguard's Warhorse) is his to buy at that price until his first battle
