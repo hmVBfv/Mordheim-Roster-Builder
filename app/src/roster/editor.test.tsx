@@ -180,6 +180,31 @@ describe('a new warband', () => {
     expect(screen.getAllByRole('textbox', { name: 'Name' })).toHaveLength(1);
   });
 
+  /* Wish of 8.11.2026: a second tap on the chosen warband folds its options up and deselects it. */
+  it('is deselected by a second tap on the chosen warband, which folds its options up', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    const pick = await screen.findByRole('radio', { name: 'Tileans' });
+    await user.click(pick);
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Start the warband' })).toHaveProperty('disabled', false);
+    await user.click(pick);
+    expect(screen.queryByRole('textbox', { name: 'Name' })).toBeNull();
+    expect((pick as HTMLInputElement).checked).toBe(false);
+    expect(screen.getByRole('button', { name: 'Start the warband' })).toHaveProperty('disabled', true);
+    // the name of the row, and a cell beside it, do the same
+    await user.click(screen.getByText('Tileans'));
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+    await user.click(screen.getByText('Tileans'));
+    expect(screen.queryByRole('textbox', { name: 'Name' })).toBeNull();
+    // and a keyboard can do it
+    pick.focus();
+    await user.keyboard(' ');
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
+    await user.keyboard(' ');
+    expect(screen.queryByRole('textbox', { name: 'Name' })).toBeNull();
+  });
+
   /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
   it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
     at('/warbands/new');
