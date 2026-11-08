@@ -139,6 +139,8 @@ export interface RosterView {
   unitChoice: { text: string; rows: ChoiceRow[] | null } | null;
   /** What the warband's page names as rules of the whole warband (#203), each with its text, read as text (#210). */
   warbandRules: { name: string; text: string }[];
+  /** The spells and prayers the warband can learn, and those of the Hired Swords and Dramatis Personae it has hired (#233). */
+  spells: core.SpellSource[];
   heroes: WarriorView[];
   heroCount: number;
   heroMax: number;
@@ -472,6 +474,7 @@ export function rosterView(data: GameData, s: WarbandState): RosterView {
     campaign: camp?.on ? core.roundLabel(camp.round) : null,
     warnings: core.warbandWarnings(ctx),
     ...(({ unitChoice, rules }) => ({ unitChoice, warbandRules: rules }))(warbandRuleTexts(ctx)),
+    spells: core.warbandSpells(ctx),
     heroes,
     heroCount: core.totalHeroes(ctx),
     heroMax: heroMaxOf(ctx),

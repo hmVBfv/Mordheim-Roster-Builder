@@ -284,6 +284,8 @@ export interface SpellList {
   name: string;
   note?: string;
   spells: [name: string, text: string][];
+  /** The line of lore each spell has on its page on mordheimer.net, word for word, by the spell's name without its difficulty (ADR 0024, note of 8.11.2026). */
+  lore?: Record<string, string>;
 }
 
 /** The complete game data, as exported by legacy data/index.js. */
