@@ -89,12 +89,16 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
 export function WarbandTable({ shown, sort, chosen, onChoose, detail }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void; detail?: ReactNode }) {
   const byGrade = sort === 'grade';
   const cols = byGrade ? 6 : 7;
+  // the chosen warband chosen again is let go
+  const toggle = (key: string) => onChoose(key === chosen ? '' : key);
   const row = (w: WarbandFact) => [
-    <tr key={w.key} className={w.key === chosen ? styles.picked : undefined} data-picked={w.key === chosen ? 'true' : undefined} onClick={() => onChoose(w.key)}>
+    <tr key={w.key} className={w.key === chosen ? styles.picked : undefined} data-picked={w.key === chosen ? 'true' : undefined} onClick={(e) => { if (!(e.target as HTMLElement).closest('label')) toggle(w.key); }}>
       <td className={styles.pick} data-label="">
         {/* the radio lies invisibly over the name, so a keyboard and a screen reader find the row; a tap anywhere in the row chooses it */}
         <label className={styles.pickLabel}>
-          <input type="radio" name="warband" value={w.key} aria-label={w.name} checked={w.key === chosen} onChange={() => onChoose(w.key)} />
+          {/* a radio already checked sends no change, so the tap itself chooses or lets go (a second tap folds the options up, #232) */}
+          <input type="radio" name="warband" value={w.key} aria-label={w.name} checked={w.key === chosen} onChange={() => undefined}
+            onClick={() => toggle(w.key)} />
           <span className={styles.name}>{w.name}</span>
         </label>
       </td>
