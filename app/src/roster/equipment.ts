@@ -5,6 +5,7 @@ import * as core from '@mordheim/core';
 import type { CatalogItem, Model, WarbandState } from '@mordheim/core';
 import { priceAverage, priceRange, priceText } from './rarePrice.ts';
 import { itemTip, type Tip } from './tips.ts';
+import { mutationView, type MutationView } from './chaos.ts';
 import { rosterView, statCells, type StatCell } from './view.ts';
 
 const CATS: Record<string, string> = { Nahkampf: 'Close combat', Fernkampf: 'Missile weapons', Rüstung: 'Armour', Besonderes: 'Other', 'Besonderes (nur Heldinnen)': 'Other (Heroines only)' };
@@ -64,6 +65,8 @@ export interface EquipmentView {
   offer: RareOffer[];
   /** The War Beasts he keeps (a Beastmaster), none for anybody else. */
   beasts: BeastRow[];
+  /** The mutations (or blessings) he may buy, a category of Gear of their own; null for a unit that cannot have them (#224). */
+  mutations: MutationView | null;
   /** Everything he carries, one line each, the upgrades on their weapons. */
   carried: CarriedRow[];
   /** One price per man: a henchman group pays for every man. */
@@ -119,7 +122,7 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
     .map((it) => ({ de: it.de, name: it.en, price: typeof it.cost === 'number' ? `${core.catalogDefaultPaid(ctx, it)} gc` : String(it.cost), rarity: it.rare || '' }))
     .sort((a, b) => a.name.localeCompare(b.name));
   const carried = carriedRows(ctx, m, { recruit, free, atStart });
-  return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, beasts: beastRows(ctx, def), carried, men: menOf(ctx, m), recruit };
+  return { uid, name: m.name || def?.name || m.uid_def, groups, rare, offer, beasts: beastRows(ctx, def), mutations: mutationView(ctx, uid), carried, men: menOf(ctx, m), recruit };
 }
 
 /** The War Beasts of a unit that keeps them, each with what it costs, what it can do, and the room left for it. */

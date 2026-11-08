@@ -364,6 +364,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         sellStart: (piece) => ed.edit((c) => core.sellStartGear(c, eqOf!, piece).state, `Sold ${piece}.`),
         addBeast: (id) => ed.edit((c) => core.addBeast(c, id), `${core.unitDef(ctx, id)?.name ?? 'The beast'} taken on.`),
         dropBeast: (id) => ed.edit((c) => core.dropBeast(c, id), `${core.unitDef(ctx, id)?.name ?? 'The beast'} let go.`),
+        mutation: (key, n, name) => ed.edit((c) => core.setMutationCount(c, eqOf!, key, n), undefined, { book: `${eqView?.name ?? ''}: ${name} ×${n}` }),
       }} />
       <RecruitSheet dialogRef={recruitRef} close={closeRecruit} v={v}
         onRecruit={(u) => ed.edit((c) => core.recruitUnit(c, u.id), `Recruited ${u.name} (${u.cost} gc).`)} />
