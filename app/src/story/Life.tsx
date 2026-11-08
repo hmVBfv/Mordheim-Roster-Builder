@@ -83,7 +83,7 @@ export function Life({ data, rec, state, who, onProfile, close }: {
       <p className={ui.muted}>{who.sub}</p>
       {filled.length > 0 && (
         <dl className={styles.profile} aria-label="Profile">
-          {filled.map((f) => <div key={f.key}><dt>{f.label}</dt><dd>{f.value}{f.key === 'text' && !who.profile.text && <small className={ui.muted}> · from the Mordheim page; write your own to replace it</small>}</dd></div>)}
+          {filled.map((f) => <div key={f.key}><dt>{f.label}</dt><dd>{f.value}{f.key === 'text' && !who.profile.text && <small className={ui.muted}> · the warband designer’s description, as on Mordheimer; write your own to replace it</small>}</dd></div>)}
         </dl>
       )}
       {src.loading && <p className={ui.muted}>Looking up what the campaign knows…</p>}
