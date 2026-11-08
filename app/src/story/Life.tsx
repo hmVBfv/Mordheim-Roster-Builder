@@ -71,8 +71,10 @@ export function Life({ data, rec, state, who, onProfile, close }: {
 }) {
   const src = useLifeSources(rec, who.uid);
   const life = useMemo(() => core.lifeOf(data, state, { uid: who.uid, marks: src.marks, notes: src.notes }), [data, state, who.uid, src.marks, src.notes]);
+  // until he has a story of his own, the page's description of his unit stands in its place
+  const shown = { ...who.profile, text: who.profile.text || who.lore };
   const filled = [
-    ...PROFILE_FIELDS.filter((f) => who.profile[f.key as keyof typeof who.profile]).map((f) => ({ key: f.key, label: f.label, value: String(who.profile[f.key as keyof typeof who.profile]) })),
+    ...PROFILE_FIELDS.filter((f) => shown[f.key as keyof typeof shown]).map((f) => ({ key: f.key, label: f.label, value: String(shown[f.key as keyof typeof shown]) })),
     ...(who.profile.faction ? [{ key: 'faction', label: 'Faction', value: who.profile.faction }] : []),
   ];
   return (
@@ -81,7 +83,7 @@ export function Life({ data, rec, state, who, onProfile, close }: {
       <p className={ui.muted}>{who.sub}</p>
       {filled.length > 0 && (
         <dl className={styles.profile} aria-label="Profile">
-          {filled.map((f) => <div key={f.key}><dt>{f.label}</dt><dd>{f.value}</dd></div>)}
+          {filled.map((f) => <div key={f.key}><dt>{f.label}</dt><dd>{f.value}{f.key === 'text' && !who.profile.text && <small className={ui.muted}> · the warband designer’s description, as on Mordheimer; write your own to replace it</small>}</dd></div>)}
         </dl>
       )}
       {src.loading && <p className={ui.muted}>Looking up what the campaign knows…</p>}

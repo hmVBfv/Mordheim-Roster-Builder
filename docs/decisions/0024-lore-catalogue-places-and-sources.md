@@ -37,3 +37,10 @@ im Hintergrund sichtbar werden.
   erreichbar (DNS, Proxy); alle Einträge stammen deshalb von mordheimer.net.
   Orte und Gruppen, zu denen mordheimer.net schweigt (Badlands, Troll Country,
   Nordland, Wissenland, Ind, Südlande, Ogerreiche u. a.), fehlen noch.
+
+## Nachtrag vom 07.11.2026: die Beschreibung der Einheiten wörtlich
+Rob, 07.11.2026 (wish #231): Die Beschreibung, die eine Einheit auf ihrer Seite bei mordheimer.net hat,
+steht **wörtlich** als Voreinstellung ihrer Story („A few lines about him“); der eigene Text der Spieler ersetzt
+sie. Das ist eine Ausnahme von „mit eigenen Worten“ **nur für diesen Zweck**: `data/unitlore.json`, gelesen mit
+curl, mit Kopfzeile, die das sagt; Test `core/test/unitlore.test.ts`. Alles andere (der Lore-Katalog, die
+Eröffnung einer Warband in `data/warbandintro.json`) bleibt in eigenen Worten.

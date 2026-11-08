@@ -21,6 +21,7 @@ import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { FieldsSheet, type Field, type FieldsEdit } from './FieldsSheet.tsx';
 import { loadIntros, type Intro } from './intro.ts';
+import { loadUnitLore } from './unitLore.ts';
 import { Life } from './Life.tsx';
 import { CANON_FIELDS, L, peopleOf, PROFILE_FIELDS, PROLOGUE_QUESTIONS, type Person } from './people.ts';
 import styles from './Story.module.css';
@@ -34,7 +35,10 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
   const state = ed.state;
   const story = core.storyOf(state);
   const canon = core.canonOf(state);
-  const people = useMemo(() => peopleOf(data, state), [data, state]);
+  // what the pages say of each unit: the story of a warrior until his player writes one
+  const [lore, setLore] = useState<Record<string, string>>({});
+  useEffect(() => { let live = true; void loadUnitLore().then((all) => { if (live) setLore(all[String(state.wb)] ?? {}); }); return () => { live = false; }; }, [state.wb]);
+  const people = useMemo(() => peopleOf(data, state, lore), [data, state, lore]);
   // what the setting says of this kind of warband, to start the prologue from
   const [intro, setIntro] = useState<Intro | null>(null);
   useEffect(() => { let live = true; void loadIntros().then((all) => { if (live) setIntro(all[String(state.wb)] ?? null); }); return () => { live = false; }; }, [state.wb]);
@@ -86,12 +90,12 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
       key: profileOf.key,
       title: `${w.name}: names, voice, story`,
       intro: 'Spellings are fixed once here and used everywhere the chronicle names him.',
-      fields: [...PROFILE_FIELDS, ...pick], values: { ...w.profile, faction_id: w.profile.faction_id ?? '' } as Record<string, string>,
+      fields: [...PROFILE_FIELDS, ...pick], values: { ...w.profile, text: w.profile.text || w.lore, faction_id: w.profile.faction_id ?? '' } as Record<string, string>,
       save: (v) => {
         // with a choice the name follows the id; without one (signed out) what the warrior has is left as it is
         const id = pick.length ? (v.faction_id ?? '') : (w.profile.faction_id ?? '');
         const name = factions.find((f) => f.id === id)?.name ?? (id && id === w.profile.faction_id ? (w.profile.faction ?? '') : '');
-        save((c) => core.setProfile(c, w.uid, { ...v, faction: name, faction_id: name ? id : '' }), `${w.name}: profile saved.`);
+        save((c) => core.setProfile(c, w.uid, { ...v, text: v.text === w.lore && !w.profile.text ? '' : v.text, faction: name, faction_id: name ? id : '' }), `${w.name}: profile saved.`);
       },
     };
   })();
