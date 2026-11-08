@@ -125,7 +125,7 @@ export function AuthenticatorRow({ user, onNotice }: { user: Me; onNotice: (t: s
               <QrCode text={step.uri} />
               <div className={ui.row}><a className={ui.buttonQuiet} href={step.uri}>Open in the app</a></div>
               <details>
-                <summary className={styles.summary}>Type the key instead</summary>
+                <summary className={`${styles.summary} ${ui.fold}`}>Type the key instead</summary>
                 <p className={styles.secret}>{step.secret.replace(/(.{4})/g, '$1 ').trim()}</p>
                 <div className={ui.row}>
                   <button type="button" className={ui.buttonQuiet} onClick={() => { void copyText(step.secret).then((ok) => onNotice(ok ? 'Key copied.' : 'Select the key and copy it.')); }}>Copy the key</button>

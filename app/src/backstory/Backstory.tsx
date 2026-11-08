@@ -66,7 +66,7 @@ export function BackstorySection({ id, view, lead }: { id: string; view: Campaig
           {sections.map((s, i) => (
             <li key={`${i}:${s.heading}`}>
               <details className={styles.section}>
-                <summary>{s.heading} <small>{where(s)}</small></summary>
+                <summary className={ui.fold}>{s.heading} <small>{where(s)}</small></summary>
                 <SectionText text={s.text} />
               </details>
             </li>

@@ -147,7 +147,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
         </label>
       )}
       <details className={styles.details} open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
-        <summary>What goes along</summary>
+        <summary className={ui.fold}>What goes along</summary>
         <pre className={styles.preview} tabIndex={0}>{reportText(doc)}</pre>
       </details>
       {why && <p className={ui.muted}>{why}</p>}

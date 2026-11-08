@@ -210,7 +210,7 @@ export function ProfileEditor({ cid, p, own, open, bare = false, locked = [], on
   const Wrap = bare ? 'div' : 'details';
   return (
     <Wrap className={bare ? styles.bare : styles.editor} {...(bare ? {} : { open })}>
-      {!bare && <summary><strong>{p.name || 'New profile'}</strong>{p.count > 1 ? ` ×${p.count}` : ''} <small className={styles.meta}>{p.type}</small></summary>}
+      {!bare && <summary className={ui.fold}><strong>{p.name || 'New profile'}</strong>{p.count > 1 ? ` ×${p.count}` : ''} <small className={styles.meta}>{p.type}</small></summary>}
       {p.from && <p className={styles.meta}>Copied from {p.from.label}</p>}
       {!bare && (
         <div className={styles.head}>

@@ -130,7 +130,7 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
           </div>
         )}
         <details className={`${ui.card} ${styles.more}`}>
-          <summary>What a prologue answers</summary>
+          <summary className={ui.fold}>What a prologue answers</summary>
           <ul className={styles.questions}>{PROLOGUE_QUESTIONS.map((q) => <li key={q}>{q}</li>)}</ul>
         </details>
       </section>

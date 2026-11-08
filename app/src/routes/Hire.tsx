@@ -192,7 +192,7 @@ function Body({ rec }: { rec: StoredWarband }) {
         {rows.length === 0 && <li className={ui.muted}>Nobody fits the filter.</li>}
       </ul>
       <details className={ui.muted}>
-        <summary className={styles.summary}>Grades?</summary>
+        <summary className={`${styles.summary} ${ui.fold}`}>Grades?</summary>
         <p>Core and 1a: the Mordheim rulebook and its official reprints · 1b: Town Cryer and the Annuals, by the Mordheim team · 1c: later official sources · 2a: the community’s proven additions. Which grades a warband plays is a house rule.</p>
       </details>
 
