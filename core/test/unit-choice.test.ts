@@ -50,3 +50,30 @@ describe('the unit choice of a warband', () => {
     expect(missing).toEqual([]);
   });
 });
+
+/* Wish of 7.11.2026: the unit choice divides into Heroes and Henchmen, as the roster does. */
+describe('the unit choice, divided into Heroes and Henchmen', () => {
+  const kinds = (wb: string) => {
+    const def = data.WARBANDS[wb]!;
+    return core.choiceWithKinds(core.unitChoice(choiceText(wb))!, def.units).map((r) => `${r.kind}: ${r.name}`);
+  };
+
+  it('puts each row among the Heroes or the Henchmen by the unit it names', () => {
+    expect(kinds('blackorcs')).toEqual([
+      'hero: Black Orc Boss', 'hero: Black Orcs', 'hero: Young\'uns', 'hench: Boyz', 'hench: Shootaz', 'hench: Nuttaz', 'hench: Troll',
+    ]);
+    expect(kinds('merc')[0]).toBe('hero: Captain');
+    expect(kinds('merc').at(-1)).toBe('hench: Warriors');
+  });
+
+  it('gives every row of every warband a place', () => {
+    const bad: string[] = [];
+    for (const wb of Object.keys(data.WARBANDS)) {
+      const t = choiceText(wb);
+      if (!t || wb === 'cppleasures') continue;
+      for (const r of core.choiceWithKinds(core.unitChoice(t)!, data.WARBANDS[wb]!.units)) if (r.kind !== 'hero' && r.kind !== 'hench') bad.push(`${wb}: ${r.name}`);
+    }
+    expect(bad).toEqual([]);
+  });
+});
+

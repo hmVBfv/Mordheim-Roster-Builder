@@ -410,7 +410,7 @@ describe('the unit choice of the warband', () => {
   it('is not one of the rules, but a text of its own', () => {
     const v = view('dwarftreasure', 'clansman');
     expect(v.unitChoice!.text).toMatch(/^Exactly 1 Noble\./);
-    expect(v.unitChoice!.rows![0]).toEqual({ name: 'Noble', limit: 'exactly 1', note: null });
+    expect(v.unitChoice!.rows![0]).toEqual({ name: 'Noble', limit: 'exactly 1', note: null, kind: 'hero' });
     expect(v.warbandRules.map((r) => r.name)).not.toContain('Choice');
     for (const wb of Object.keys(data.WARBANDS)) expect(rosterView(data, createWarband(data, wb, null, 'x')).warbandRules.map((r) => r.name), wb).not.toContain('Choice');
   });
@@ -449,3 +449,17 @@ describe('the unit choice as lines', () => {
     expect(lines).toEqual(['Black Orc Boss' + 'exactly 1', 'Black Orcs' + '0–2', 'Young\'uns' + '0–2', 'Boyz' + 'any number', 'Shootaz · never more than Boyz' + 'any number', 'Nuttaz' + '0–4', 'Troll' + '0–1']);
   });
 });
+
+/* Wish of 7.11.2026: the unit choice is divided into Heroes and Henchmen, and stays as plain as it was. */
+describe('the unit choice, divided', () => {
+  it('has a list of Heroes and a list of Henchmen, each unit in the one it belongs to', () => {
+    width = 400;
+    show({}, rosterView(data, core.addUnit(ctx(createWarband(data, 'blackorcs', null, 'The Band')), 'bboss')));
+    const choice = screen.getByRole('region', { name: 'Unit choice' });
+    expect(within(choice).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Heroes', 'Henchmen']);
+    const [heroes, hench] = within(choice).getAllByRole('list');
+    expect(within(heroes!).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Black Orc Boss' + 'exactly 1', 'Black Orcs' + '0–2', 'Young\'uns' + '0–2']);
+    expect(within(hench!).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Boyz' + 'any number', 'Shootaz · never more than Boyz' + 'any number', 'Nuttaz' + '0–4', 'Troll' + '0–1']);
+  });
+});
+

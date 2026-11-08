@@ -1394,3 +1394,12 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+.wbChoiceHead {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
