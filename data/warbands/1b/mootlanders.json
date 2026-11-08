@@ -1,0 +1,275 @@
+{
+  "warband": {
+    "name": "Mootlanders",
+    "grade": "1b",
+    "siteRace": "Halfling",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Moot Elder. Max. 1 Master Chef, 3 Halfling Thieves; max. 5 Scouts, any number of Halfling Warriors.<br><b>Puny:</b> When rolling for a Halfling's injury, treat a roll of 2 as 'stunned'. <i>Citadel Journal 36.</i>",
+    "units": [
+      {
+        "id": "mootelder",
+        "t": "hero",
+        "name": "Moot Elder",
+        "cost": 55,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 5,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "mootElder",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. May also buy a pistol (15 gc, family heirloom)."
+      },
+      {
+        "id": "masterchef",
+        "t": "hero",
+        "name": "Master Chef",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 2,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "mootChef",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed"
+        ],
+        "sp": "Inspired Cooking: Halflings within 6\" may re-roll failed to-hit rolls in close combat (once per turn)."
+      },
+      {
+        "id": "halflingthief",
+        "t": "hero",
+        "name": "Halfling Thief",
+        "cost": 25,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "mootHalfling",
+        "sk": [
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "Sneaky: −1 to hit when shot at (cumulative with other modifiers)."
+      },
+      {
+        "id": "halflingwarrior",
+        "t": "hen",
+        "name": "Halfling Warrior",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "mootHalfling"
+      },
+      {
+        "id": "halflingscout",
+        "t": "hen",
+        "name": "Halfling Scout",
+        "cost": 20,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "mootHalfling",
+        "sp": "Keen Eyesight: Spots hidden enemies at twice his Initiative in inches."
+      }
+    ]
+  },
+  "race": "halfling",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "mootHalfling": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Kochtopf-Helm",
+          8
+        ]
+      ]
+    },
+    "mootElder": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Pistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Kochtopf-Helm",
+          8
+        ]
+      ]
+    },
+    "mootChef": {
+      "Nahkampf": [
+        [
+          "Küchenmesser",
+          2
+        ],
+        [
+          "Hackbeil",
+          3
+        ],
+        [
+          "Schöpfkelle",
+          2
+        ],
+        [
+          "Fleischklopfer",
+          3
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Halflings rarely form warbands, but when they do they march into Mordheim with dreams of iced buns, fizzy drink and kitchens to plunder. The Moot has its own legends of rich, boastful heroes with the bow.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/mootlanders"
+  },
+  "unitLore": {
+    "mootelder": "A Halfling Moot Elder is the bravest, toughest, and obviously fattest Halfling in the Warband. He is as greatly respected by the Halfling people as his skill with the bow, their principle weapon.",
+    "masterchef": "Any wise Halfling Moot Elder will persuade a Halfling Master Chef into joining his Warband. The better the Halflings fight, the more food the Chef cooks for them!",
+    "halflingthief": "Halfling Thieves are often employed by warbands to sneak into enemy camps and steal any stash they can get their sticky little hands on.",
+    "halflingwarrior": "Halflings may not be the best warriors around, but they are brave to the point of insanity and masters of the Bow.",
+    "halflingscout": "Halflings produce some of the best Scouts in the Old World, almost rivalling the expert Wood Elves in this field."
+  }
+}

@@ -1,0 +1,503 @@
+{
+  "warband": {
+    "name": "Court of the Profane Pleasures",
+    "grade": "1c",
+    "siteRace": "Chaos",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Draft / work-in-progress:</b> Slaaneshi pleasure-cult by Tuomas Pirinen (unofficial); no official skill table was ever published — the skill lists below are placeholders.<br><b>Choice:</b> At least one Hero must act as Leader (pick any); you may hire only one of each Hero type. <b>Corruption of the Mind and Flesh:</b> When any model dies you may pay 1 wyrdstone to graft one of its characteristics onto a Slaaneshi Beastman, Cultist or Hound (one Hero then cannot search the rare market that post-battle). <b>Mutations:</b> Any Hero may buy ONE of Extra Arm, Tentacle or Great Claw at recruitment (see Cult of the Possessed mutations). Humans; Beastmen use the Beastman maximum.",
+    "units": [
+      {
+        "id": "whipmaster",
+        "t": "hero",
+        "name": "Slaaneshi Whipmaster",
+        "cost": 70,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "cppWhip",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Agony and Ecstasy: Armed with a Hedonist Whip he may spend one attack to scourge a friendly model within 3\" (auto-hit, +1 to wound, roll injuries normally); in reward he doubles his Toughness until he fails an Ld test at the start of one of his turns. Pain and Pleasure: Whenever he suffers an unsaved wound he is subject to Frenzy until the end of his next turn (not negated by being knocked down or stunned)."
+      },
+      {
+        "id": "danseuse",
+        "t": "hero",
+        "name": "Slaaneshi Danseuse",
+        "cost": 70,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "cppHero",
+        "noArmour": true,
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ],
+        "sp": "Never wears armour. Strange Allure: An enemy wishing to attack her in melee or with a missile must first pass a Leadership test; on a failure it must re-roll any successful hits."
+      },
+      {
+        "id": "merchant",
+        "t": "hero",
+        "name": "Slaaneshi Flesh Merchant",
+        "cost": 65,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "cppHero",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Pound of Flesh: Before the battle a Wretch may be carried as a \"meat shield\" — when the Merchant would suffer a wound, the Wretch is taken out of action instead (it can still attack in melee, has no base and cannot be targeted; lost if the Merchant dies). Cruel Fate: Any captives gained may be turned into Wretches for free."
+      },
+      {
+        "id": "priest",
+        "t": "hero",
+        "name": "Slaaneshi Priest of Obscene",
+        "cost": 50,
+        "exp": 6,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "cppHero",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Wizard: Uses the Chaos Rituals spell list. Flesh Reserve: Before the battle a Wretch may be carried as a \"sacrificial pawn\" — when the Priest fails to cast a spell he may sacrifice the Wretch to re-roll the casting (it can still attack in melee, has no base and cannot be targeted; lost if the Priest dies)."
+      },
+      {
+        "id": "devout",
+        "t": "hero",
+        "name": "Slaaneshi Devout",
+        "cost": 65,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "cppHero",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Fluctuating Form: At the start of the battle and each Recovery phase (if not in close combat) choose Male (+1 WS, S, T, A) or Female (+1 BS, +2 I, +2 Ld, +2 M). Immune to Psychology and All Alone tests."
+      },
+      {
+        "id": "hound",
+        "t": "hen",
+        "name": "Slaaneshi Chaos Hound",
+        "cost": 15,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 7,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 3
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal: Cannot use equipment, weapons or armour, and never gains Experience."
+      },
+      {
+        "id": "beast",
+        "t": "hen",
+        "name": "Slaaneshi Beastman",
+        "cost": 35,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "cppHen",
+        "desc": "A Beastman of Slaanesh — more agile and humanlike than common Gors."
+      },
+      {
+        "id": "cultist",
+        "t": "hen",
+        "name": "Cultist",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "cppHen",
+        "sp": "A depraved member of the pleasure court."
+      },
+      {
+        "id": "wretch",
+        "t": "hen",
+        "name": "Slaaneshi Wretch",
+        "cost": 10,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "cppWretch",
+        "sp": "Slaves to Darkness: Immune to all psychology and All Alone tests while within 6\" of a friendly Hero. Wretches can never become Heroes — if \"The Lad's Got Talent\" is rolled and then rolled again, the model instead takes a Serious Injury (rolled at once, as a Hero)."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "chaosRituals"
+  },
+  "race": "human",
+  "unitRace": {
+    "beast": "gor",
+    "hound": null
+  },
+  "hire": {
+    "align": "evil",
+    "none": true
+  },
+  "lists": {
+    "cppHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hedonisten-Peitsche",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          15
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ],
+        [
+          "Armbrustpistole",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Purpurschatten",
+          35
+        ]
+      ]
+    },
+    "cppWhip": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hedonisten-Peitsche",
+          15
+        ],
+        [
+          "Slaaneshi-Fangstange",
+          30
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          15
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ],
+        [
+          "Armbrustpistole",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Purpurschatten",
+          35
+        ]
+      ]
+    },
+    "cppHen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          15
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ],
+        [
+          "Armbrustpistole",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Purpurschatten",
+          35
+        ]
+      ]
+    },
+    "cppWretch": {
+      "Nahkampf": [
+        [
+          "Dolch",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "When the Shadowlord demanded loyalty from the hidden Chaos cultists of Mordheim, most knelt willingly. In the upper ranks of the Cult of Pleasure, however, some ambitions were more complex than simple obedience.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/court-of-the-profane-pleasures"
+  },
+  "unitLore": {
+    "whipmaster": "Whipmasters are experts at applying pain and pleasure on their enemies and their own depraved companions in equal measure. Pain and Pleasure are closely intertwined, and both are held as holy in the eyes of Slaanesh.",
+    "danseuse": "These dervishes of depravity dance and carouse in honor of Slaanesh in the streets of Mordheim. Their enthralling moves often freeze even hardened warriors while they slowly slice their enchanted victims to quivering shreds.",
+    "merchant": "Flesh Merchants are tasked with selling, trading and using the poor unfortunates that are captured or lured into the service of the Prince of Chaos.",
+    "priest": "Priests of Slaanesh practice corrupt and profane magic and rituals. They often cut themselves in order to bring themselves to the brink of ecstasy that powers their sorcery.",
+    "devout": "Devout are possessed by Slaanesh to the level that their flesh molds according to the whims of the Prince of Corruption. Their physical form flickers between the extremes of feminine and masculine.",
+    "hound": "Hounds of Slaanesh are sinuous, lithe and beautiful, yet unsettling and repulsive to see at the same time.",
+    "beast": "Beastmen of Slaanesh tend to be more agile and slight of build than those of other Chaos gods, and they exhibit more humanlike qualities than full Gors.",
+    "cultist": "Members of the pleasure court offer their body to the Prince of Corruption. Their lustful deeds and the use of drugs have driven them to the brink of insanity.",
+    "wretch": "Your warband may include any number of Wretches — humans enslaved by the false promises of the Prince of Chaos. They live to sacrifice their lives for the Prince of Chaos."
+  }
+}

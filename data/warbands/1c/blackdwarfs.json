@@ -1,0 +1,534 @@
+{
+  "warband": {
+    "name": "Black Dwarfs",
+    "grade": "1c",
+    "siteRace": "Chaos Dwarf",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "Chaos Dwarf slavers from the Border Town Burning supplement. The following apply to all warriors except Informers. <b>Hard to Kill:</b> Taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Hard Head:</b> Ignore the special rules of clubs, maces, etc. <b>Armour:</b> Never suffer movement penalties for wearing armour. <b>Hired Swords:</b> May hire the Hired Swords open to all warbands or to Orc & Chaos warbands, and also these – Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout. Never any Elves of any sort. <b>Special wargear:</b> The Engine of Chaos and special Chaos Dwarf wargear (Man-catcher, Mechanical Suit, Chaos Armour, Obsidian Weapon) are bought from the Trading Post / rare-item picker.",
+    "units": [
+      {
+        "id": "sorcerer",
+        "t": "hero",
+        "name": "Sorcerer",
+        "cost": 85,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "bdSorc",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "blackDwarfSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Rituals of Hashut. He may wear armour but cannot perform rituals while wearing armour, except the Mechanical Suit (made for him) and Chaos armour (which never hinders casting). Priest: Starts with two rituals — the Sacrificial Ritual plus one more randomly generated from the Rituals of Hashut. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "bull",
+        "t": "hero",
+        "name": "Bull Centaur",
+        "cost": 100,
+        "exp": 10,
+        "max": 1,
+        "profile": {
+          "M": 8,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 2,
+          "Ld": 9
+        },
+        "eq": "bdBull",
+        "sk": [
+          "combat",
+          "strength"
+        ],
+        "large": true,
+        "sp": "Large Target. May never use missile weapons. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "gaoler",
+        "t": "hero",
+        "name": "Gaoler",
+        "cost": 50,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "bdGaoler",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "blackDwarfSkills"
+        ],
+        "sp": "Nasty Reputation: The dreadful Gaolers cause fear in Humans. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "informer",
+        "t": "hen",
+        "name": "Informer",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bdInformer",
+        "sp": "Drudgery: Informers may never become Heroes (re-roll \"The Lad's Got Talent\"). They are not subject to the Chaos Dwarf special rules (Hard Head, Hard to Kill, Armour)."
+      },
+      {
+        "id": "cdwarf",
+        "t": "hen",
+        "name": "Chaos Dwarf",
+        "cost": 40,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "bdHero",
+        "sp": "Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "ritualsHashut"
+  },
+  "race": "dwarf",
+  "unitRace": {
+    "bull": "bullcentaurbd",
+    "informer": "human"
+  },
+  "hire": {
+    "align": "evil",
+    "dwarf": true,
+    "only": [
+      "ogre",
+      "pitfighter",
+      "warlock",
+      "imperialassassin",
+      "hobgoblinscout"
+    ],
+    "noElfHS": true
+  },
+  "lists": {
+    "bdHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Engine of Chaos",
+          125,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "bdSorc": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Mechanischer Anzug",
+          175,
+          {
+            "start": true
+          }
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Engine of Chaos",
+          125,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "bdGaoler": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Stahlpeitsche",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Fangstange",
+          25
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Engine of Chaos",
+          125,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "bdBull": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Engine of Chaos",
+          125,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "bdInformer": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "blackDwarfSkills": {
+      "name": "Chaos Dwarf Skills (Black Dwarfs)",
+      "note": "Sorcerer & Gaolers (instead of one of the standard tables).",
+      "skills": [
+        [
+          "Extra Tough",
+          "After a game in which he was taken out of action, the Hero may re-roll once on the Serious Injury chart; the second result stands even if worse."
+        ],
+        [
+          "Chaos Engineer",
+          "+3 when searching for Chaos Armour (incl. Mechanical Suits) or Obsidian Weapons, which he can craft himself; he ignores the Rarity and Gift of Chaos special rules. He may never wear Chaos Armour."
+        ],
+        [
+          "Thick Skull",
+          "3+ save on a D6 to avoid being stunned (a stun becomes knocked down). With a helmet this is 2+ and replaces the normal helmet rule."
+        ],
+        [
+          "Resource Hunter",
+          "When rolling on the Exploration chart at the end of a game, the Hero may modify one dice by +1/−1."
+        ],
+        [
+          "Tyrant",
+          "Leader only. The leader may re-roll a failed Rout test (as long as he is not knocked down or stunned); the new result stands even if worse. If the leader is taken out of action the warband must make an immediate Rout test."
+        ],
+        [
+          "True Grit",
+          "When rolling on the Injury table for this Hero, treat 1-3 as knocked down, 4-5 as stunned and only 6 as out of action."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Chaos Dwarfs are the warped Dwarfs of Karak Vlag who, sundered from their kin, took the bull god Hashut as their saviour. Their infernal pacts have made them twisted mockeries of what they once were.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/black-dwarfs"
+  },
+  "unitLore": {
+    "sorcerer": "It is the Priests of Hashut who administrate insidious edicts on behalf of the Chaos Dwarf race. This includes orchestrating trade agreements with the savage Northmen and Ogre tribes. From out of the Dark Lands they frequently lead warbands to plunder the Silk Road.",
+    "bull": "Bull Centaurs are keen witted creatures with the upper torso of a Chaos Dwarf and the body of a bull. They are the most favoured disciples to the Father of Darkness. In his divine image these mutated centauroids are fewer in number than Chaos Dwarfs, more powerful and swifter in battle.",
+    "gaoler": "Of all the Black Dwarfs it is the wicked Gaolers who are the most infamous. The minds of these merciless fiends are bent on inflicting pain and their repulsive methods strike fear into the hearts of men. Gaolers delight in the torture of their prisoners for whom death never comes quick enough.",
+    "informer": "For those imprisoned in the foundries of Zharr- Naggrund, the fires of industry burn night and day. There is little reward for a spy, only deceitful promises of freedom. Lies are enough to motivate these treacherous informants into betraying their own kind for small dispensations.",
+    "cdwarf": "These resentful creatures toil in the forges of their city stronghold. To boost the production of weapons and Chaos armour in the foundries they set out on expeditions armed with blunderbusses to bolster the labour force kept shackled in pits beneath the earth."
+  }
+}

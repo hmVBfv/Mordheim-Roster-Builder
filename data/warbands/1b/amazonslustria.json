@@ -1,0 +1,323 @@
+{
+  "warband": {
+    "name": "Amazons (Lustria)",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Serpent Priestess. Max. 2 Eagle Warriors, 2 Piranha Warriors; any number of Amazon Warriors (at least 1), max. 3 Jaguar Warriors.<br><b>Isolationists:</b> may re-roll missed attacks in the FIRST round of close combat against Lizardmen and Norse.<br><b>Sacrifice:</b> Captives are handled as by the Cult of the Possessed; sacrificing a captured Lizardman additionally grants a free Enchanted Skins (Skins & Charms).<br><b>Norse Enmity:</b> Against a Norse warband the Amazons fight to the death — reroll the first failed Rout test and may never voluntarily rout unless the leader is Out of Action.<br><b>Not one of us:</b> May hire only these Hired Swords or Dramatis Personae, no others – the Amazons.",
+    "units": [
+      {
+        "id": "serpentpriestess",
+        "t": "hero",
+        "name": "Serpent Priestess",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "amazLHeroine",
+        "sk": [
+          "combat",
+          "academic",
+          "speed",
+          "amazonSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard (Amazon Rituals, 1 random)."
+      },
+      {
+        "id": "eaglewarrior",
+        "t": "hero",
+        "name": "Eagle Warrior",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amazLHeroine",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "amazonSkills"
+        ]
+      },
+      {
+        "id": "piranhawarrior",
+        "t": "hero",
+        "name": "Piranha Warrior",
+        "cost": 30,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amazLHeroine",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "amazonSkills"
+        ],
+        "sp": ""
+      },
+      {
+        "id": "amazonwarrior",
+        "t": "hen",
+        "name": "Amazon Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amazLHench"
+      },
+      {
+        "id": "jaguarwarrior",
+        "t": "hen",
+        "name": "Jaguar Warrior",
+        "cost": 30,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amazLJaguar",
+        "sp": "One with the Jungle: Moves through jungle/wood terrain without any movement penalty."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "amazonRituals",
+    "skills": "amazonSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "neutral",
+    "none": true
+  },
+  "lists": {
+    "amazLHeroine": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Starblade",
+          15
+        ],
+        [
+          "Starsword",
+          30
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Sunstaff (Lustria)",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Enchanted Skins",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Amulet of the Moon",
+          50
+        ],
+        [
+          "Healing Herbs",
+          35
+        ]
+      ]
+    },
+    "amazLHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Sunstaff (Lustria)",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Enchanted Skins",
+          20
+        ]
+      ]
+    },
+    "amazLJaguar": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          5
+        ],
+        [
+          "Bolas",
+          5
+        ],
+        [
+          "Javelins",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Sunstaff (Lustria)",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Enchanted Skins",
+          20
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Amazons live on an overgrown island in the river heart of Lustria, ringed with ruins, and drive off invaders from the beaches. Few outsiders have seen them and survived, so their fame rests on exaggerated tales.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons-lustria"
+  },
+  "unitLore": {
+    "serpentpriestess": "The Serpent Priestesses are part of the religious sisterhood that rules Amazon society. They are powerful sorceresses and their word is law. The younger, more junior members of the Serpent totem often gather war parties and search for Slann artefacts and also conduct the ritual sacrifices of captured enemies.",
+    "eaglewarrior": "The Eagle Warriors are veterans that have participated in dozens of war parties over the years. They have adopted the totem of the great eagle that reflects their great might in combat. Their exotic headdresses are made from these holy birds of the Lizardmen.",
+    "piranhawarrior": "The Piranha Warriors prefer ranged weapons and are often found ahead of an Amazon Warband. They are the only Amazons to use a great seashell horn to warn the warband of approaching enemies.",
+    "amazonwarrior": "Every Amazon Woman is trained in the ways of warfare and is hardened by a life in the unforgiving nature of their jungle environment. They are skilled in fighting with a variety of different weapons including the legendary claws of the Old Ones.",
+    "jaguarwarrior": "The Jaguars are known for their exceptional speed and agility. They are the protectors of the Amazon tribes living far away and keeping any invaders at bay. They are especially adept at hunting Skinks and Sauruses, their most common foe. Jaguars' favoured method of attack is to steal away in the foliage becoming part of the jungle itself and waiting for the perfect moment to strike."
+  }
+}

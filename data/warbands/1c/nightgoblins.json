@@ -1,0 +1,335 @@
+{
+  "warband": {
+    "name": "Night Goblins",
+    "grade": "1c",
+    "siteRace": "Night Goblin",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "rules": "Cave-dwelling Night Goblins (Terry Maltman). <b>Animosity:</b> At the start of each turn roll a D6 — on a 1 the warband squabbles and does nothing else that turn. Only Night Goblins are affected (not Trolls, Squigs, Snotlings or Fanatics). <b>Hate Stunties:</b> Night Goblins hate Dwarfs (Fanatics are too far gone to be affected). Goblins use the Goblin racial maximum.",
+    "units": [
+      {
+        "id": "bigboss",
+        "t": "hero",
+        "name": "Big Boss",
+        "cost": 45,
+        "exp": 17,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ngList",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "ngSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Subject to Animosity and hates Dwarfs."
+      },
+      {
+        "id": "shaman",
+        "t": "hero",
+        "name": "Night Goblin Shaman",
+        "cost": 50,
+        "exp": 10,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ngList",
+        "sk": [
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "Wizard: Uses the Waaagh! Magic spell list. Subject to Animosity and hates Dwarfs."
+      },
+      {
+        "id": "boss",
+        "t": "hero",
+        "name": "Boss",
+        "cost": 25,
+        "exp": 6,
+        "max": 4,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ngList",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "ngSkills"
+        ],
+        "sp": "Subject to Animosity and hates Dwarfs."
+      },
+      {
+        "id": "nightgob",
+        "t": "hen",
+        "name": "Night Goblin",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ngList",
+        "sp": "Subject to Animosity and hates Dwarfs."
+      },
+      {
+        "id": "fanatic",
+        "t": "hen",
+        "name": "Fanatic",
+        "cost": 20,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ngFanatic",
+        "noxp": true,
+        "sp": "Addict: Must buy Mad Cap Mushrooms before each game or he stays home foaming. Mushroom Brain: Gains no Experience. Looney: Subject to Frenzy and must test for permanent damage after the battle. Frantic: Always strikes first, ignoring weapon and Initiative modifiers. Not affected by Animosity or Hate Stunties."
+      },
+      {
+        "id": "squig",
+        "t": "hen",
+        "name": "Cave Squig",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "maxPer": {
+          "per": 1,
+          "of": [
+            "nightgob"
+          ]
+        },
+        "profile": {
+          "M": "2D6",
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal (gains no Experience). Movement: Roll 2D6\" to move; never runs or charges, but contacting an enemy counts as a charge. Minderz: Must stay within 6\" of a Goblin or it goes wild (moves 2D6\" randomly, out of control). You may never field more Cave Squigs than Night Goblins."
+      },
+      {
+        "id": "troll",
+        "t": "hen",
+        "name": "Troll",
+        "cost": 200,
+        "exp": 0,
+        "max": 1,
+        "large": true,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 1,
+          "S": 5,
+          "T": 4,
+          "W": 3,
+          "I": 1,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Fear. Stupidity. Large Target. Regeneration (4+; not vs fire). Dumb Monster: Gains no Experience. Always Hungry: 15 gc upkeep after each game (or sacrifice two Goblins/Squigs) or it wanders off. Vomit Attack: Instead of its normal attacks, one automatic Strength 5 hit that ignores armour saves."
+      },
+      {
+        "id": "snotmob",
+        "t": "hen",
+        "name": "Snotling Mob",
+        "cost": 10,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Bought as a mob of 5 (10 gc each, max 5). Pointy stick: Counts as a dagger (enemy +1 armour save). Mob: Must stay within 1\" and fight together. Weedy: When wounded, knocked down on 1, stunned on 2-3, out of action on 4-6. Dodgy: 6+ dodge save vs shooting. Insignificant: The whole mob counts as a single model for Rout tests, warband size and income."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "waaagh"
+  },
+  "race": "goblin",
+  "unitRace": {
+    "squig": null,
+    "troll": null,
+    "snotmob": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "orcsgoblins"
+    ],
+    "only": [
+      "pitfighter",
+      "ogre",
+      "warlock",
+      "blackorcoverseer",
+      "goblinlanternbearer"
+    ]
+  },
+  "lists": {
+    "ngList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "ngFanatic": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Eisenkugel & Kette",
+          15
+        ],
+        [
+          "Death-Cap-Dolche",
+          25
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Mad cap mushrooms",
+          25
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "ngSkills": {
+      "name": "Night Goblin Special Skills",
+      "note": "Night Goblin Heroes (instead of any standard list).",
+      "skills": [
+        [
+          "Ded Shooty",
+          "Adds +6\" to the range of any missile weapon he uses (nets excluded)."
+        ],
+        [
+          "Sneaky Git",
+          "Big Boss only. After all other deployment, he may move D3 of his warband members."
+        ],
+        [
+          "Infiltrate",
+          "Set up after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both sides infiltrate, roll D6 each — lowest sets up first."
+        ],
+        [
+          "Netter",
+          "'Chuck and charge': Declare a net charge and throw a net at the target. If it hits and the target fails to escape, the target counts as knocked down and the Goblin completes the charge; otherwise it is a failed charge (stop 1\" away)."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Night Goblins live in dark places and avoid daylight, brewing fungi and poisons in the catacombs beneath Mordheim. Elsewhere they simply spoil whatever they find.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/night-goblins"
+  },
+  "unitLore": {
+    "bigboss": "Like all greenskins Night Goblin society is ruled by the biggest and meanest of the tribe. Goblins have one advantage over their larger cousins - they are cunning too. To climb to position of Big Boss the goblin must be sneaky and backstabbing as well as the biggest and best.",
+    "shaman": "Despite their smaller size, Night Goblin Shamans are every bit as powerful as their Orc cousins. They can summon the power of the Waaagh generated by their fighting comrades and call on Gork and Mork for their supernatural assistance.",
+    "boss": "Like all greenskins Night Goblin society is ruled by the biggest and meanest of the tribe. Goblins have one advantage over their larger cousins - they are cunning too. To climb to position of Big Boss the goblin must be sneaky and backstabbing as well as the biggest and best.",
+    "nightgob": "Individually Night Goblins are weak and cowardly but together they make a force to be reckoned with. Preferring to attack in large numbers they are adept at hit and run tactics and can take down foes much stronger than themselves.",
+    "fanatic": "The caves where Night Goblins live are rich in various forms of fungi. The goblins are able to make use of these and even cultivate some of them. Best known are the Madcap mushrooms. These drive anyone who eats them into a frothing fighting frenzy. Some of the Night Goblins are deliberately fed large quantities of Madcap mushrooms to turn them into crazed killing machines. Often seen on open battlefields wielding a huge ball and chain they adopt slightly safer weapons in the narrow streets of Mordheim.",
+    "squig": "Goblins raise the deadly Cave Squigs. These creatures are a curious blend of animal and fungus, and are composed mostly of teeth, horns, and a nasty temperament.",
+    "troll": "Trolls are not intelligent enough to recognize the value of gold, but large amounts of food can often instill a certain loyalty in them.",
+    "snotmob": "Wherever there are greenskins you will find Snotlings. Any Goblin warband will attract a number of them. Snotlings perform the same function for Goblins as Goblins serve for Orcs. They provide someone smaller to slap around."
+  }
+}

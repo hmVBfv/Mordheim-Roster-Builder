@@ -1,0 +1,439 @@
+{
+  "warband": {
+    "name": "Black Orcs",
+    "grade": "1b",
+    "siteRace": "Orcs & Goblins",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Black Orc Boss. Max. 2 Black Orcs, 2 Young'uns; any number of Boyz, Shootaz (≤ Boyz), max. 4 Nuttaz, max. 1 Troll.<br><b>Animosity:</b> Orcs and Goblins enjoy a good scrap, but not always with the right mates. At the start of the Orc player's turn roll a D6 for each Orc or Goblin Henchman that is not in close combat; on a 1 he has taken offence and rolls on the Animosity chart. The Black Orcs use the 2002 Annual version: no Leadership test is taken, Animosity triggers on a roll of 1 on a D6.<br><b>Let the goons do the work:</b> Black Orcs never ride mounts; only normal Orcs may ride a boar or similar.<br><b>Da Boss is Dead!:</b> If the Boss is killed, a Black Orc always assumes leadership first (regardless of experience) and automatically gains the Oi Behave! skill.",
+    "units": [
+      {
+        "id": "bboss",
+        "t": "hero",
+        "name": "Black Orc Boss",
+        "cost": 90,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "blackorc",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "blackOrcSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Black Orc save 6+. Oi Behave!: if a Henchman fails Animosity within 6\", the Boss may slap him — one automatic hit at a chosen Strength; if the Henchman stays standing, add that Strength to his Animosity Effect roll."
+      },
+      {
+        "id": "borc",
+        "t": "hero",
+        "name": "Black Orc",
+        "cost": 60,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "blackorc",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "blackOrcSkills"
+        ],
+        "sp": "Black Orc save 6+ (combines with armour)."
+      },
+      {
+        "id": "young",
+        "t": "hero",
+        "name": "Young'un",
+        "cost": 25,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "blackorcHench",
+        "sk": [
+          "combat",
+          "shooting",
+          "blackOrcSkills"
+        ],
+        "upgradeOption": {
+          "name": "Black Orc Blood",
+          "cost": 10,
+          "max": 1,
+          "minExp": 25,
+          "skill": "Proven Warrior",
+          "becomes": "borc"
+        },
+        "sp": "Black Orc Blood: One Young'un in the warband may be upgraded for 10 gc — this allows him to take the 'Proven Warrior' special skill and become a full Black Orc."
+      },
+      {
+        "id": "boyz",
+        "t": "hen",
+        "name": "Orc Boyz",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "boHenchB",
+        "sp": "Animosity."
+      },
+      {
+        "id": "shootaz",
+        "t": "hen",
+        "name": "Orc Shootaz",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "maxPer": {
+          "per": 1,
+          "of": [
+            "boyz"
+          ]
+        },
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "boHenchS",
+        "sp": "Animosity. (Number ≤ Boyz)"
+      },
+      {
+        "id": "nuttaz",
+        "t": "hen",
+        "name": "Orc Nuttaz",
+        "cost": 40,
+        "exp": 0,
+        "max": 4,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "boHenchB",
+        "noArmour": true,
+        "noMissile": true,
+        "sp": "Unstable: Does not suffer Animosity. Crazy: Automatically passes all Leadership-based tests; may never learn Academic skills if promoted. Savage: Must run/charge maximum distance towards the nearest visible enemy (friends do not block sight); fights with +1 extra Attack (not on profile); may never use armour or missile weapons; never Leader; may not use his Ld for Rout tests unless the last models on the board."
+      },
+      {
+        "id": "botroll",
+        "t": "hen",
+        "name": "Troll",
+        "cost": 200,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 1,
+          "S": 5,
+          "T": 4,
+          "W": 3,
+          "I": 1,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Fear. Stupidity. Large Target. Regeneration (4+, not vs fire; no post-battle injury roll unless taken out by a flaming attack). Vomit Attack: May replace all attacks with one automatic S5 hit that ignores armour saves. Always Hungry: 20 gc upkeep after each game — or the Troll counts as 2 members for only 5 gc (max size effectively 11). Dumb Monster: Gains no experience."
+      }
+    ]
+  },
+  "extra": {
+    "skills": "blackOrcSkills"
+  },
+  "race": "blackorc",
+  "unitRace": {
+    "bboss": "blackorc",
+    "borc": "blackorc",
+    "young": "orc",
+    "boyz": "orc",
+    "shootaz": "orc",
+    "nuttaz": "orc",
+    "botroll": "orc"
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "orcsgoblins"
+    ],
+    "only": [
+      "pitfighter",
+      "ogre",
+      "warlock",
+      "blackorcoverseer",
+      "goblinlanternbearer"
+    ]
+  },
+  "lists": {
+    "blackorc": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Choppa",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "blackorcHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Choppa",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "boHenchB": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Choppa",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "boHenchS": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Choppa",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Black Orcs are bigger, smarter and meaner than ordinary Orcs, and seem built rather than born. Since the Storm of Chaos many have wandered the Empire after Grimgor Ironhide, and a band of them is a thing to fear.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/black-orcs"
+  },
+  "unitLore": {
+    "bboss": "Amongst some of the toughest of the tough, a Black Orc Boss has fought in numerous battles and proven to the gods just how truly powerful they can become. Taking a warband is the start of their ambitions as they will seek victories to meld the Boyz into larger and larger warbands until they have a Horde at their beck and call.",
+    "borc": "Amongst some of the toughest of the tough, a Black Orc Boss has fought in numerous battles and proven to the gods just how truly powerful they can become. Taking a warband is the start of their ambitions as they will seek victories to meld the Boyz into larger and larger warbands until they have a Horde at their beck and call.",
+    "young": "Keen eager and, above all, green recruits to any warband, these lads haven’t seen anywhere near as much action as the others in the warband and they’re plenty keen to get in there and do some damage. Of course one day, they know it’ll be their warband.",
+    "boyz": "No warband would be complete without the warm bodies to makeup the number and thus the Boyz are essential, purely because the Black Orcs need someone to kick around when they can’t find anything else to do it too.",
+    "shootaz": "Not all Orcs enjoy getting into a fight straight away. Some are hunters, tracking prey and shooting it down from a distance, others recognise that sometimes you need to soften up a really tough foe from a distance before moving in to finish them off. This is the closest Orcs come to outright cowardice.",
+    "nuttaz": "These are Orcs who have been left a little bit… unstable by the Storm of Chaos. They ain’t right in the head, I tell you, especially by Orc standards. Eventually they’ll kill themselves, but only after they’ve killed everyone else.",
+    "botroll": "Trolls are not intelligent enough to recognise the value of gold, but large amounts of food can often instil a certain loyalty in them. Black Orc Boss like having Trolls in their bands because it’s good to have someone who’ll follow any order, no matter how stupid or suicidal."
+  }
+}

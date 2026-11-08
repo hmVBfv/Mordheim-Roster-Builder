@@ -1,0 +1,407 @@
+{
+  "warband": {
+    "name": "Hochland Bandits",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Bandit Prince. Max. 2 Footpads, 1 Duelist, 1 Huckster; any number of Thugs, max. 4 Looters, max. 2 Blackhearts, max. 2 Poachers, any number of Gutterscum.<br><b>Hired Swords:</b> May hire the Hired Swords of a Human Mercenary warband.<br><b>Powder's Expensive!:</b> Black powder weapons only at the marked-up list prices, and only for the Duelist — henchmen may never buy them.<br><b>Foragers:</b> When determining income, always use the next lower warband-size column (1-3 members still use the first column).<br><b>Know Who To Sell To:</b> When selling equipment, the warband gets half of any random price element in addition to half the basic cost.",
+    "units": [
+      {
+        "id": "prince",
+        "t": "hero",
+        "name": "Bandit Prince",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "banditEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "banditSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "footpad",
+        "t": "hero",
+        "name": "Footpad",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "banditEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "banditSkills"
+        ],
+        "sp": "Concealment: An enemy charging a Footpad he cannot see (not Hidden) takes his Initiative test at −1, and a roll of 6 always fails; when detecting a HIDING Footpad, enemies halve their Initiative for the range check."
+      },
+      {
+        "id": "duelist",
+        "t": "hero",
+        "name": "Duelist",
+        "cost": 45,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "banditDuelist",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "banditSkills"
+        ],
+        "sp": "Swordmaster: Parries succeed on a roll EQUAL to or over the enemy's to-hit roll (needs a parry weapon). Weapon Knowledge: The Duelist list is only his starting gear — he may use ANY close combat or missile weapon the warband gets hold of."
+      },
+      {
+        "id": "huckster",
+        "t": "hero",
+        "name": "Huckster",
+        "cost": 40,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 2,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "banditCoward",
+        "sk": [
+          "combat",
+          "academic",
+          "banditSkills"
+        ],
+        "sp": "Convincing Manner: Enemies charging a warband member within 12\" of the Huckster must first pass a Ld test or stand (failed charge); models with Stupidity and animals are immune. Slick Operator: Between games roll a D6 — on 2-6 the warband gains 2D6 gc, on 1 the Huckster misses the next game (may not be combined with the Banditry skill)."
+      },
+      {
+        "id": "thug",
+        "t": "hen",
+        "name": "Thug",
+        "cost": 30,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "banditEq"
+      },
+      {
+        "id": "looter",
+        "t": "hen",
+        "name": "Looter",
+        "cost": 25,
+        "exp": 0,
+        "max": 4,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "banditCoward",
+        "sp": "Looting the Dead: After the battle, for each warrior (from ANY warband, own included) removed from his roster, roll a D6 per Looter — on 4+ the Bandit player keeps all of that warrior's equipment (each warrior lootable only once)."
+      },
+      {
+        "id": "blackheart",
+        "t": "hen",
+        "name": "Blackheart",
+        "cost": 35,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "banditEq",
+        "sp": "Hardened (immune to fear/all alone)."
+      },
+      {
+        "id": "poacher",
+        "t": "hen",
+        "name": "Poacher",
+        "cost": 35,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "banditPoacher",
+        "sp": "Trailblazers: The warband may REROLL one D6 in the Exploration phase for each Poacher."
+      },
+      {
+        "id": "gutterscum",
+        "t": "hen",
+        "name": "Gutterscum",
+        "cost": 10,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "banditCoward",
+        "noxp": true,
+        "sp": "Utterly Inept (gains no experience)."
+      }
+    ]
+  },
+  "extra": {
+    "skills": "banditSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "banditEq": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfäxte",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "banditDuelist": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Rapier",
+          15
+        ],
+        [
+          "Main Gauche",
+          7
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          20
+        ],
+        [
+          "Pistolenpaar",
+          40
+        ],
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          10
+        ]
+      ]
+    },
+    "banditCoward": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ]
+      ]
+    },
+    "banditPoacher": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Storm of Chaos sent many refugees across the border into Talabecland, and tension grew around Talabheim and the river port of Talagaad. Hochland bandits are the hard men who came out of that unrest.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/hochland-bandits"
+  },
+  "unitLore": {
+    "footpad": "Footpads specialize in sneaking behind their target (or ‘mark’) and taking him while he is unaware of their presence (preferably from behind…in the dark). While out in the open a Footpad fights no better than any other warrior, if given the opportunity to surprise his enemy, a Footpad can often be a dangerous opponent indeed.",
+    "duelist": "It is inevitable that sometimes heated arguments just cannot be settled peacefully. On such occasions an injured party may decide that his honor cannot be restored with anything less than his enemy’s blood, and challenges his opponent to a duel. Among the rich and powerful in the cities of the Empire, life is often considered more important than personal honour, and a third party is hired to stand in for the challenged. A professional warrior who specializes in standing in on these occasions is known as a Duelist. Being a Duelist can prove quite a lucrative, if somewhat short, career. Many families take offense to a trained fighter cutting their kin down in the street, and will hire killers of their own to exact revenge. A situation such as this will often result in a Duelist joining a party of wandering brigands for a time, taking a short ‘vacation’ from life in the city until things cool down a bit…",
+    "huckster": "Among the cities of the humans there are those who find that they have a natural gift for convincing others to help them in their endeavors. Typically very intelligent and possessing a silver tongue, a huckster can convince a man that the stones in his hand are really magical beans, or that ownership of a nearby bridge is the answer to his dreams. Often quite well-todo until their victims track them down, hucksters often find a Bandit warband offers them considerably more security than life alone.",
+    "thug": "Brawn without brains. Those stronger than their fellows are often drawn to a life of banditry, as it is an easy way for them to earn a living. Many a town bully has found that he has been, quite by accident, training himself for a life of crime.",
+    "looter": "Not all members of a Bandit warband find close-up fighting enjoyable. Many are cowards who make their living off of shooting a victim from afar and then stripping the body for anything that can be sold.",
+    "blackheart": "Rapists and killers, Blackhearts are truly soulless individuals who represent the worst elements of any society. Such cruel and evil beings have usually seen the worst life has to offer and revel in it. Most Blackhearts have severely anti-social tendencies, so a Bandit warband will never be found with more than one or two of these depraved creatures.",
+    "poacher": "While most members of a Bandit warband are hardened criminals, some are just individuals who were down on their luck for one reason or another, and were forced to resort to poaching the local lord’s game. While these individuals may not have the same temperment or lack of morals as the rest of the warband, they are usually hunted just as relentlessly. While they often find most of their fellows distasteful (to say the least!) poachers are so useful to the warband that they are usually given more slack than anyone else. After all, a band of outlaws needs places to hide and food to eat, and Poachers know where the best of both are to be found…",
+    "gutterscum": "Gutterscum are the lowest of the low — those whose laziness or other vices have driven them to a life they are utterly unsuited for. They often make up the bulk of a Bandit Warband, as the slums of most cities are filled with those desperate enough to view a life of preying on their fellow man and fleeing from the authorities as an opportunity to improve their lot."
+  }
+}

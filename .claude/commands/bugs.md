@@ -87,7 +87,8 @@ FAQ from Toumas, then mordheimer.net, then the rulebook; mordheimer table values
 with their annotations beat prose). Read mordheimer.net with `curl` (`CLAUDE.md`,
 Rules authority) – always, without being told. Give Rob what you found with the source cited
 and the change you would make. **Do not change anything in `data/` without his
-OK.** After his OK, the data change is its own commit with the citation in the
+OK.** A warband's data is one file, `data/warbands/<grade>/<key>.json`; after changing it run `npm run data`
+(`CLAUDE.md`, Repository layout). After his OK, the data change is its own commit with the citation in the
 message, and the same steps as below apply.
 
 ## 4. Fix a bug

@@ -1,0 +1,276 @@
+{
+  "warband": {
+    "name": "Arabian Tomb Raiders",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Sheikh. Max. 2 Champions, 1 Mystic; any number of Nomad Warriors, max. 2 Bedouins, max. 5 Slaves.<br><b>Hate Undead:</b> All Araby Nomad Heroes hate every Undead model.",
+    "units": [
+      {
+        "id": "sheikh",
+        "t": "hero",
+        "name": "Sheikh",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "arabWarrior",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "arabSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "achampion",
+        "t": "hero",
+        "name": "Champion",
+        "cost": 40,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "arabWarrior",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "arabSkills"
+        ]
+      },
+      {
+        "id": "mystic",
+        "t": "hero",
+        "name": "Nomadic Mystic",
+        "cost": 40,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "arabWarrior",
+        "sk": [
+          "academic",
+          "speed",
+          "arabSkills"
+        ],
+        "sp": "Wizard: Uses Elementalism (the four elements — earth, wind, fire, water); starts with one random spell."
+      },
+      {
+        "id": "bedouin",
+        "t": "hen",
+        "name": "Bedouin",
+        "cost": 35,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "arabWarrior",
+        "sp": "Desert Trader: +1 when the warband rolls to find Rare equipment; only +1 even with two Bedouins."
+      },
+      {
+        "id": "nomad",
+        "t": "hen",
+        "name": "Nomad Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "arabWarrior"
+      },
+      {
+        "id": "slave",
+        "t": "hen",
+        "name": "Slave",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "arabSlave",
+        "sp": "Life of Slavery: May gain experience, but on a Lad's got Talent roll the Sheikh executes the slave (remove from roster); the rest of the group re-rolls the advance."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "elementalMagic",
+    "skills": "arabSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "arabWarrior": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert (Scimitar)",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Tufenk",
+          15
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "arabSlave": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Katar",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The desert nomads of Araby wander the edge of the great desert in many tribes, ruled by oases and a strict code of honour. Some come north to search the ruins for relics and wealth.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/arabian-tomb-raiders"
+  },
+  "unitLore": {
+    "sheikh": "The Sheikh is the undisputed leader of the warband. The Sheikh is a hardened warrior living in the burning hell of the desert and having to constantly fight off bandits, members of other rival tribes, and of course, the evil Undead. He is often also the head of the tribe, respected and trusted by his fellow tribesmen. To all the Nomads, the Sheikh’s word is law, and they obey without question, such is their custom. Only very rarely will another member of the tribe, who is of noble birth, challenge the Sheikh’s leadership and then single combat is fought to determine who has the divine right to lead the tribe.",
+    "achampion": "Noble relatives of the Sheikh’s family are fanatically loyal to him and give him the necessary support and muscle when needed. The Champion keeps the rest of the Warband in line, disciplines those who have offended the Sheikh, divides up the booty (after the Sheikh has taken his chosen share, of course), and tells tall tales by the fireside to ensure the warband’s morale and respect for him. Needless to say, the Champion needs to be a tough fighter if he is to lead by example.",
+    "mystic": "In the distant past, the Arabians were renowned for their studies in the magical arts, whether they were originally taught by the Elves, as were the men of the Old World, is not known. The wisemen of Araby have mastered a strange aspect of color magic, known as Elementalism, which is based on the four primary elements: earth, wind, fire, and water. Unlike the flamboyant and fabulously wealthy sorcerers of the cities, the mystics of the nomadic tribes are more shamanic and are revered by their fellow tribesmen. These scholars are an integral part of the tribe and take a great part in guiding and motivating the tribe as a whole.",
+    "bedouin": "Bedouins are nomadic tribesmen who live on the outskirts of tribal life as the tribesmen themselves do with the rest of civilization. Loners by nature, they are experts in desert craft and make excellent scouts and guides for their tribe or outsiders who are willing to pay enough for their services.",
+    "nomad": "All the males of the tribe are warriors first and foremost; some may be talented in the crafts of weaving or weapon smithing, but all are brought up from an early age in the use of weapons, primarily the bow and the scimitar. These people are hardy, being used to living in the harsh conditions of the desert. They are also a very superstitious people, and their trust is very hard to gain, especially for outsiders. Many are members of the Sheikh\u0000’s extended family, and their loyalty is unquestioned.",
+    "slave": "Slavery is rife in Araby, and indeed the slave markets of Al-Haikk or Lashiek are a testament to this. Many Old Worlders look upon the Arabians with a great deal of contempt and see them as nothing more than barbarians. Nomads look upon slaves as nothing more than a commodity. Most slaves are those taken captive from other tribes, and theirs is a short and often brutal existence. When it comes to battle, they are unmotivated and make poor fighters."
+  }
+}

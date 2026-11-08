@@ -1,0 +1,394 @@
+{
+  "warband": {
+    "name": "Tileans",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "subtypeLabel": "City: ",
+    "subtypes": [
+      {
+        "key": "miragliano",
+        "name": "Miragliano",
+        "gold": 500,
+        "note": "<b>Crossbow Experts:</b> Miraglean Heroes get +1 to hit when using crossbows; Marksmen get +1 to hit with any missile weapon.<br><b>Hatred (Skaven):</b> All Miragleans hate Skaven (the red pox of 1812) — Hired Swords do not benefit.<br><b>Hired Swords:</b> A Miraglean warband may not hire Skaven Hired Swords."
+      },
+      {
+        "key": "remas",
+        "name": "Remas",
+        "gold": 500,
+        "note": "<b>Kindred Hatred (Dark Elves):</b> A Remasen warband fights to the death against Dark Elves — may re-roll one failed Rout test when fighting them (must keep the second roll).<br><b>Superior Leadership:</b> Captain, Champions and Youngbloods have +1 Leadership (applied automatically to their profiles).<br><b>Hired Swords:</b> A Remasen warband may not hire Dark Elf Hired Swords."
+      },
+      {
+        "key": "trantio",
+        "name": "Trantio",
+        "gold": 600,
+        "note": "<b>Best Equipped:</b> The wealthiest, most experienced human warband in Lustria — starts with 600 gc (a one-off game gives +100 gc; a campaign gives +20%, both 600 from the base 500)."
+      }
+    ],
+    "rules": "<b>City:</b> Choose one of the cities above – Miragliano, Remas or Trantio – each with its own special rules.<br><b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 5 Duellists, max. 7 Marksmen.",
+    "units": [
+      {
+        "id": "tcaptain",
+        "t": "hero",
+        "name": "Captain",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "tileanEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "profSub": {
+          "remas": {
+            "Ld": 1
+          }
+        },
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "tchamp",
+        "t": "hero",
+        "name": "Champion",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "tileanEq",
+        "skSub": {
+          "miragliano": [
+            "combat",
+            "shooting",
+            "speed"
+          ],
+          "remas": [
+            "combat",
+            "academic",
+            "strength"
+          ],
+          "trantio": [
+            "combat",
+            "shooting",
+            "speed"
+          ]
+        },
+        "profSub": {
+          "remas": {
+            "Ld": 1
+          }
+        }
+      },
+      {
+        "id": "tyoung",
+        "t": "hero",
+        "name": "Youngblood",
+        "cost": 15,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "tileanEq",
+        "skSub": {
+          "miragliano": [
+            "shooting",
+            "strength",
+            "speed"
+          ],
+          "remas": [
+            "combat",
+            "academic",
+            "speed"
+          ],
+          "trantio": [
+            "combat",
+            "shooting",
+            "strength"
+          ]
+        },
+        "profSub": {
+          "remas": {
+            "Ld": 1
+          }
+        }
+      },
+      {
+        "id": "twarrior",
+        "t": "hen",
+        "name": "Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "tileanEq"
+      },
+      {
+        "id": "tduellist",
+        "t": "hen",
+        "name": "Duellist",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "tileanEq",
+        "sp": "Cloak & Dagger (counts as a buckler in close combat)."
+      },
+      {
+        "id": "tmarks",
+        "t": "hen",
+        "name": "Marksman",
+        "cost": 25,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "tileanMarks"
+      }
+    ]
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "tileanEq": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Pike",
+          12
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Rapier",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    },
+    "tileanMarks": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Hunting Rifle",
+          200
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Tilea is a wealthy land of rival city-states, pride and trade, and its people are skilled sailors and explorers. Tilean companies come to Mordheim for gold and precious relics.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tileans"
+  },
+  "unitLore": {
+    "tcaptain": "A Tilean Captain is a tough professional soldier and has more often than not fought for years in the regular inter city-state conflicts of his homeland. These men are used to the carnage and suffering of the battlefield and seek to claim riches in the new world.",
+    "tchamp": "Champions are often the trusted sergeants of the warband captain and are entrusted with ensuring the iron-hard discipline necessary to keep a warband together in a foreign land.",
+    "tyoung": "These are young fighters who are still inexperienced but eager for the untold riches that Lustria has to offer.",
+    "twarrior": "These are the grim, veteran soldiers that usually make up the mercenary armies of the warring Dukes of the Tilean City States.",
+    "tduellist": "Tilea is famous for its many vendettas from the rich noble houses down to even the poorest families. The notorious cloak and dagger duellists of the darkened alleys of Tilea find their way to the remotest parts of the world selling their unique killing abilities to the mercenary companies.",
+    "tmarks": "Tileans are renowned as experts with the crossbow and these soldiers are the missile backbone of the warband. In a savage and merciless world it pays well to be able to despatch your foe from a distance."
+  }
+}

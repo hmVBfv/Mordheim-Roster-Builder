@@ -1,0 +1,403 @@
+{
+  "warband": {
+    "name": "Maneaters",
+    "grade": "1c",
+    "siteRace": "Ogre",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "Ogre mercenaries (Border Town Burning). <b>Fear:</b> All Ogres cause fear except Youngbloods. <b>Large:</b> All Ogres are Large Targets (+1 to be hit, may be shot at even if not closest) except Youngbloods and Half-growns. <b>Gluttony:</b> Each Ogre counts as two models when selling wyrdstone/treasure; a captured model (or any own member/animal/mount) may be devoured — reduce the warband's model count by 1 (or 2 for a Large captive), and an Ogre Hero gains XP equal to models eaten. <b>Slow Witted:</b> Ogres need twice the usual XP to advance. <b>Difficult Customers:</b> Ogre Heroes get −1 to find Rare items that are not Ogre-exclusive. <b>Cannibals:</b> May hire only these Hired Swords, no others – Halflings and the Ogre Bodyguard. Ogres never use daggers. Uses the Ogre racial maximum.",
+    "units": [
+      {
+        "id": "captain",
+        "t": "hero",
+        "name": "Captain",
+        "cost": 145,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "large": true,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "mOgreCapt",
+        "sk": [
+          "combat",
+          "strength",
+          "ogreSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Large Target and causes Fear. Ogres carry no free dagger and never fight with daggers."
+      },
+      {
+        "id": "youngblood",
+        "t": "hero",
+        "name": "Youngblood",
+        "cost": 45,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 2,
+          "I": 2,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "mOgre",
+        "sk": [
+          "combat",
+          "strength",
+          "ogreSkills"
+        ],
+        "sp": "Young Ogre: Does NOT cause Fear and is NOT a Large Target. No free dagger."
+      },
+      {
+        "id": "guide",
+        "t": "hero",
+        "name": "Mountain Guide",
+        "cost": 145,
+        "exp": 8,
+        "max": 1,
+        "large": true,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "mGuide",
+        "sk": [
+          "combat",
+          "strength",
+          "ogreSkills"
+        ],
+        "sp": "Large Target and causes Fear. Ranger: If not put out of action, roll two dice for Exploration and pick one (not a re-roll). Loner: Immune to all All Alone tests, never claims a Gnoblar, and may never be the warband Leader. No free dagger."
+      },
+      {
+        "id": "bull",
+        "t": "hen",
+        "name": "Bull",
+        "cost": 140,
+        "exp": 0,
+        "max": 2,
+        "large": true,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 2,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 2,
+          "A": 3,
+          "Ld": 7
+        },
+        "eq": "mOgre",
+        "sp": "Large Target and causes Fear. Bull Charge: When charging may make a single attack at +1 to hit instead of its normal attacks; if it hits, the target is automatically knocked down. No free dagger."
+      },
+      {
+        "id": "halfgrown",
+        "t": "hen",
+        "name": "Half-grown",
+        "cost": 85,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 2,
+          "S": 4,
+          "T": 4,
+          "W": 2,
+          "I": 2,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": "mOgre",
+        "sp": "Causes Fear but is NOT a Large Target. No free dagger."
+      },
+      {
+        "id": "sabretusk",
+        "t": "hen",
+        "name": "Sabretusk",
+        "cost": 125,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 8,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 2,
+          "I": 4,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Requires a Mountain Guide (caged if none is in the warband). Trained: May use the Guide's Leadership within 6\". Feral Instinct: At the start of your turn it must pass an Ld test or the opponent moves it this turn (it may even charge friendly models). Ignored: Out-of-action Sabretusks are not counted for Rout tests. Causes Fear. Animal: Never gains Experience."
+      }
+    ]
+  },
+  "race": "ogre",
+  "unitRace": {
+    "sabretusk": null
+  },
+  "hire": {
+    "align": "neutral",
+    "only": [
+      "halfling",
+      "halflingthief",
+      "ogre",
+      "chaoscentaur",
+      "hobgoblinscout"
+    ]
+  },
+  "lists": {
+    "mOgre": {
+      "Nahkampf": [
+        [
+          "Cleaver",
+          5
+        ],
+        [
+          "Ogerkeule",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Eisenfaust",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Handmörser",
+          70
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Gnoblar-Kämpfer",
+          15
+        ],
+        [
+          "Lookout-Gnoblar",
+          20
+        ],
+        [
+          "Luck-Gnoblar",
+          25
+        ],
+        [
+          "Sword-Gnoblar",
+          30
+        ]
+      ]
+    },
+    "mOgreCapt": {
+      "Nahkampf": [
+        [
+          "Cleaver",
+          5
+        ],
+        [
+          "Ogerkeule",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Eisenfaust",
+          15
+        ],
+        [
+          "Kathay-Langschwert",
+          75
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Handmörser",
+          70
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Gnoblar-Kämpfer",
+          15
+        ],
+        [
+          "Lookout-Gnoblar",
+          20
+        ],
+        [
+          "Luck-Gnoblar",
+          25
+        ],
+        [
+          "Sword-Gnoblar",
+          30
+        ]
+      ]
+    },
+    "mGuide": {
+      "Nahkampf": [
+        [
+          "Cleaver",
+          5
+        ],
+        [
+          "Ogerkeule",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Harpunenarmbrust",
+          50
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "ogreSkills": {
+      "name": "Ogres Special Skills",
+      "note": "Maneaters Heroes (instead of the standard lists).",
+      "skills": [
+        [
+          "Master of Arms",
+          "The Ogre may wield a Difficult to Use weapon and a hand weapon at the same time (but not two Difficult to Use weapons)."
+        ],
+        [
+          "Crude Belch",
+          "May unleash thunderous fumes on all enemies engaged with him: those that fail an Ld test suffer −1 to hit for the turn. He must wait until a new enemy engages him before doing it again."
+        ],
+        [
+          "Maneater",
+          "Immediately learn one skill from the Shooting or Academic lists (once only; not available to the Mountain Guide)."
+        ],
+        [
+          "Bull Charge",
+          "When charging, may make a single attack at +1 to hit instead of his normal attacks; if it hits, the target is automatically knocked down."
+        ],
+        [
+          "Dog of War",
+          "Leader only. The warband may hire Hired Swords available to Mercenaries; if the leader dies, all such Hired Swords are removed."
+        ],
+        [
+          "Bellowing Roar",
+          "Leader only. Re-roll the first failed Rout test of each battle."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Ogres live in herds and tribes in the Mountains of Mourn, but some roam the world as hired muscle to anyone with enough coin. Others prey on the merchants and travellers of the Ivory Road instead.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/maneaters"
+  },
+  "unitLore": {
+    "captain": "A retinue of Maneaters is captained by a brutish mercenary driven by his lust to gather wealth, experience and exotic wargear. He maintains order in his company by issuing threats and bribes or using violence.",
+    "youngblood": "When Ogre calves meet outsiders for the first time, they’re not quite so menacing. Strange encounters in the wilderness pose a great many threats for them to overcome.",
+    "guide": "Youthful hunters leave their tribe to sate wanderlust or a rumbling gut. Isolated in mountainous territories they exist to track challenging prey through hostile conditions. Eventually the tribal ties of scouts are severed. With no loyalty they may choose to follow herds as they wish.",
+    "bull": "Reckless young Bulls are nothing more than wanderers who recognize the strength of the Captain. They care only to fill their stomachs and don’t realize that one day they shall become learned and well travelled Maneaters.",
+    "halfgrown": "Any underdeveloped Ogres risk meeting a sticky end. These half-grown brutes are slain at the hands of traditionalist tyrants as runts represent weakness in the tribe. Migrating renegades will seek refuge in a weaker herd or take up arms in their exile for whoever keeps them.",
+    "sabretusk": "Sabretusks are agile, giant felines with tusks jutting from their lower jaw. It is common for a young hunter to keep a Sabretusk or two around to help sniff out his next meal."
+  }
+}

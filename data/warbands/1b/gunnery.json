@@ -1,0 +1,513 @@
+{
+  "warband": {
+    "name": "Gunnery School of Nuln",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Senior Gunnery Officer. Max. 1 Instructor, 1 Senior Student, 2 Underclassmen; any number of Sons of the Guns, max. 7 Marksmen, max. 5 Pistoliers.<br><b>Impeccable Care:</b> Black powder weapons ALWAYS at the reduced list prices (also later purchases); +2 on rare rolls to find any black powder weapon.<br><b>Properly Used:</b> With the optional Misfire rules, on a roll of 1 roll again — on 3+ the misfire is ignored (shot misses, weapon does not explode).<br><b>Proud To A Fault:</b> Members NEVER use non-black-powder missile weapons (does not apply to Hired Swords/Dramatis Personae).",
+    "units": [
+      {
+        "id": "sgo",
+        "t": "hero",
+        "name": "Senior Gunnery Officer",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "gsnSchool",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader (12\"): friendly models within 12\" may use his Leadership for Ld tests. Hunter: Has the Hunter skill (see the Shooting skills)."
+      },
+      {
+        "id": "instructor",
+        "t": "hero",
+        "name": "Instructor",
+        "cost": 45,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "gsnInstr",
+        "sk": [
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "Expert Weaponsmith: While in the warband, all pistol weapons get +3\" range and all other black powder weapons +6\". Chooses equipment from BOTH the School and the Marksman list."
+      },
+      {
+        "id": "student",
+        "t": "hero",
+        "name": "Senior Student",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "gsnSchool",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed"
+        ]
+      },
+      {
+        "id": "underclass",
+        "t": "hero",
+        "name": "Underclassman",
+        "cost": 20,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "gsnSchool",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ]
+      },
+      {
+        "id": "sons",
+        "t": "hen",
+        "name": "Sons of the Guns",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "gsnSchool"
+      },
+      {
+        "id": "gmarks",
+        "t": "hen",
+        "name": "Marksman",
+        "cost": 30,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "gsnMarks",
+        "sp": "Quick Reload: Has the Hunter skill (see the Shooting skills); no additional effect from taking Hunter again if promoted."
+      },
+      {
+        "id": "pistolier",
+        "t": "hen",
+        "name": "Pistolier",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "gsnSchool",
+        "sp": "Crack Shot: When using pistols in close combat, may re-roll any missed to-hit rolls in the first round of combat."
+      }
+    ]
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "gsnSchool": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          10
+        ],
+        [
+          "Pistolenpaar",
+          20
+        ],
+        [
+          "Doppelläufige Pistole",
+          20
+        ],
+        [
+          "Duellpistole",
+          20
+        ],
+        [
+          "DL-Duellpistole",
+          35
+        ],
+        [
+          "Handfeuerwaffe",
+          25
+        ],
+        [
+          "DL-Handfeuerwaffe",
+          45
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Superior Black Powder",
+          25
+        ]
+      ]
+    },
+    "gsnMarks": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          10
+        ],
+        [
+          "Pistolenpaar",
+          20
+        ],
+        [
+          "Doppelläufige Pistole",
+          20
+        ],
+        [
+          "Repetierpistole",
+          25
+        ],
+        [
+          "Donnerbüchse",
+          20
+        ],
+        [
+          "Handfeuerwaffe",
+          25
+        ],
+        [
+          "DL-Handfeuerwaffe",
+          45
+        ],
+        [
+          "Repetier-Handfeuerwaffe",
+          50
+        ],
+        [
+          "Jagdgewehr",
+          100
+        ],
+        [
+          "Hand-Mörser",
+          70
+        ],
+        [
+          "Tauben-Bomben",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Superior Black Powder",
+          25
+        ]
+      ]
+    },
+    "gsnInstr": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          10
+        ],
+        [
+          "Pistolenpaar",
+          20
+        ],
+        [
+          "Doppelläufige Pistole",
+          20
+        ],
+        [
+          "Duellpistole",
+          20
+        ],
+        [
+          "DL-Duellpistole",
+          35
+        ],
+        [
+          "Repetierpistole",
+          25
+        ],
+        [
+          "Donnerbüchse",
+          20
+        ],
+        [
+          "Handfeuerwaffe",
+          25
+        ],
+        [
+          "DL-Handfeuerwaffe",
+          45
+        ],
+        [
+          "Jagdgewehr",
+          100
+        ],
+        [
+          "Repetier-Handfeuerwaffe",
+          50
+        ],
+        [
+          "Hand-Mörser",
+          70
+        ],
+        [
+          "Tauben-Bomben",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Superior Black Powder",
+          25
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Nuln is famous for the finest handguns and war machines in the Empire, and graduates of the Imperial Gunnery School are valued for putting artillery on target. The school trains gunners and maintainers rather than inventing weapons.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/gunnery-school-of-nuln"
+  },
+  "unitLore": {
+    "sgo": "A veteran of many excursions, extremely skilled and a deadly foe, these Officers have seen a lot of action, sometimes a little too much for some, and have partially retired from the front line to teach. They enjoy these little ‘days out’.",
+    "instructor": "The gunners of Nuln are the most respected in the Old World. They are in charge of keeping up the mighty Empire war machines such as the great cannons. They are well educated and extensively trained, but not yet too battle-hardened, so these excursions give them field experience, even in the smallest things.",
+    "student": "The upperclassmen at the school are well acquainted with the forms of combat and mechanics used by the Empire. The years of using pistols and firing cannons has given them plenty of experience with weaponry and this is not their first excursion into the wilds of the Empire. It is likely to be their last before they graduate.",
+    "underclass": "This is the first excursion for these freshmen, who have had maybe only months of training and shooting. Most will see this as a chance to escape the stuffy halls of academia and go hunting for pleasure. The brighter ones will realise that this is a true test of their dedication and knowledge.",
+    "sons": "Orphans left on the doorsteps of the school, well cared for and trained to take care of the constructs as apprentices and assistants. Many go on to form gun crews for the cannons taken into battle and some even rise as far as commanding such crews. For the most part they remain a background element to the successful workings of any cannon or black powder weapon and have become an essential part of the school. On the excursions, Sons of the Guns provide a much-needed set of arms to carry provisions and spare powder, as well as providing much needed additional firepower in a fight.",
+    "gmarks": "It is said that some of the finest marksmen in the Empire have graduated from the Gunnery School, though many backwoodsmen in Hochland disagree. Certainly compared to their rural counterparts, Marksmen show more proficiency over a wider range of black powder weapons, even the Long Rifle.",
+    "pistolier": "Part of any student’s tutoring involves learning pistols and pistol maintenance and many become crack shots with repeated practice. Sadly they do not devote as much time to learning from the other parts of the curriculum and often graduate through money and luck, returning home to show off their skills, drifting into the army as Pistoliers or Outriders."
+  }
+}

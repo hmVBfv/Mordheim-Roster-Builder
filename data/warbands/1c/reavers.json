@@ -1,0 +1,548 @@
+{
+  "warband": {
+    "name": "Lustrian Reavers",
+    "grade": "1c",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 10,
+    "gold": 500,
+    "rules": "Hardened Old World survivors in Lustria (Tuomas Pirinen). <b>Rare Heroes:</b> You may only ever buy one of each Hero type. Choose any Hero as the Leader. <b>Promotions:</b> When a Hero is lost you cannot rebuy him — instead keep his equipment and promote a Prospect into that role (as a Lad's Got Talent result, with access to two of the warband's Hero skill lists; the new Hero takes one Advance roll immediately and inherits the dead Hero's gear). <b>War Beasts:</b> Beastmaster only; they count toward the maximum warband size and must be bought at creation, but can be replaced if killed. They are animals and do not advance. <b>Hired Swords:</b> May hire only these Hired Swords, no others – Ogre Bodyguard, Dwarf Trollslayer, Tilean Marksman or Big Game Hunter. <b>Special equipment:</b> Heroes start with special equipment (noted below) that cannot be replaced if lost.",
+    "units": [
+      {
+        "id": "conqueror",
+        "t": "hero",
+        "name": "Conqueror",
+        "cost": 150,
+        "exp": 24,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 2,
+          "I": 3,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": "lrHero",
+        "sv": 4,
+        "svWith": "Masterwork Heavy Armour",
+        "gear": [
+          "Masterwork Heavy Armour",
+          "Bec de Corbin",
+          "Helmet"
+        ],
+        "sk": [
+          "combat",
+          "strength"
+        ],
+        "sp": "Starts with Masterwork Heavy Armour, Bec de Corbin and a Helmet. Survivor: Cannot be taken Out of Action unless already Knocked Down or Stunned (if standing when it would go Out of Action, treat as Stunned instead). The first time he rolls \"Dead\" on the Serious Injury chart, treat it as Multiple Injuries instead (once only)."
+      },
+      {
+        "id": "slayer",
+        "t": "hero",
+        "name": "Saurus Slayer",
+        "cost": 135,
+        "exp": 20,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "lrSlayer",
+        "gear": [
+          "Heavy Armour",
+          "Misericordia",
+          "Sword",
+          "Sword",
+          "Helmet"
+        ],
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Starts with Heavy Armour, Misericordia, two Swords and a Helmet. Duellist: When fighting a single opponent in melee he may re-roll missed hits on the first turn, whether he charged or was charged."
+      },
+      {
+        "id": "beastmaster",
+        "t": "hero",
+        "name": "Reaver Beastmaster",
+        "cost": 90,
+        "exp": 20,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "lrHero",
+        "gear": [
+          "Heavy Armour",
+          "Spear",
+          "Sword"
+        ],
+        "sk": [
+          "shooting",
+          "strength",
+          "speed"
+        ],
+        "beasts": [
+          "warhound",
+          "monkey",
+          "hawk"
+        ],
+        "beastMax": 2,
+        "sp": "Starts with Heavy Armour, Spear and Sword. War Beasts: You may include up to 2 War Beasts in all (Estalian Warhound, Barbary Monkey, Tilean Hunting Hawk), bought with his equipment; within 6\" they may use the Beastmaster's Leadership."
+      },
+      {
+        "id": "shadow",
+        "t": "hero",
+        "name": "Jungle Shadow",
+        "cost": 90,
+        "exp": 20,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "lrHero",
+        "gear": [
+          "Javelins",
+          "Light Armour",
+          "Dagger",
+          "Dagger"
+        ],
+        "sk": [
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "wizardOption": {
+          "cost": 30,
+          "drop": "Light Armour"
+        },
+        "sp": "Starts with Javelins, Light Armour and two Daggers. For +30 gc may become a Wizard (uses Lesser Magic, one random spell; if so, remove the starting Light Armour) — toggle \"caster\" below. Silent Hunter: Always counts as Hidden while touching terrain ≥1\" high; shooting does not reveal him (spellcasting does). Surprise attack: Re-roll missed hits against enemies attacked from behind (180° rear arc). Canopy Walker: Automatically passes all climbing, jumping and falling tests."
+      },
+      {
+        "id": "trapmaster",
+        "t": "hero",
+        "name": "Trapmaster",
+        "cost": 140,
+        "exp": 17,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "lrHero",
+        "gear": [
+          "Heavy Armour",
+          "Sword",
+          "Tilean Hunting Rifle (treat as a Hochland Long Rifle)",
+          "Firepots",
+          "Leaf Coat (counts as an Elven Cloak)"
+        ],
+        "sk": [
+          "combat",
+          "shooting",
+          "academic"
+        ],
+        "sp": "Starts with Heavy Armour, Sword, a Tilean Hunting Rifle (treat as a Hochland Long Rifle), Firepots and a Leaf Coat (counts as an Elven Cloak). Deadeye: No penalty for shooting at long range. Traps: Starts with 1 Trap and may buy up to 5 more at 5 gc each (one use; place real+false counters within 3\", a model within 2\" flips one — a real trap deals D3 S5 hits, no criticals)."
+      },
+      {
+        "id": "warhound",
+        "t": "hen",
+        "name": "Estalian Warhound",
+        "cost": 25,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "War Beast: Beastmaster only; counts toward the warband maximum. Armour save: 5+ from padded armour and iron collar. Animal: No weapons/armour and never gains Experience; injured exactly as a Henchman (dead on 1-2)."
+      },
+      {
+        "id": "monkey",
+        "t": "hen",
+        "name": "Barbary Monkey",
+        "cost": 40,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 2,
+          "Ld": 6
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "War Beast: Beastmaster only; counts toward the warband maximum. Nimble: Climbs any sheer surface without Initiative tests, re-rolls failed Diving Charge tests, and may enter buildings. Has a 5+ Ward save against any wound (melee, shooting, magic, falling). Animal: Never gains Experience; injured as a Henchman (dead on 1-2)."
+      },
+      {
+        "id": "hawk",
+        "t": "hen",
+        "name": "Tilean Hunting Hawk",
+        "cost": 30,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 12,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "War Beast: Beastmaster only; counts toward the warband maximum. Part of the equipment: Acts with the Beastmaster and may attack any enemy within 12\" (even out of line of sight, unless Hidden) then returns; it cannot be targeted separately, and does not attack while the Beastmaster is in close combat. Animal: Never gains Experience; injured as a Henchman (dead on 1-2)."
+      },
+      {
+        "id": "prospect",
+        "t": "hen",
+        "name": "Prospect",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "lrProspect",
+        "promotionOnly": true,
+        "sp": "Promotion Only: Re-roll any \"The Lad's Got Talent\" result. A Prospect can only become a Hero through the Promotions rule (replacing a lost Hero); when promoted you may hire a new Prospect."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "lesserMagic"
+  },
+  "race": "human",
+  "unitRace": {
+    "warhound": null,
+    "monkey": null,
+    "hawk": null
+  },
+  "hire": {
+    "align": "neutral",
+    "only": [
+      "ogre",
+      "trollslayer",
+      "tileanmarksman",
+      "beasthunter"
+    ]
+  },
+  "lists": {
+    "lrHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Misericordia",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Lanze",
+          40
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Javelin",
+          10
+        ],
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Blasrohr",
+          15
+        ],
+        [
+          "Pistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          10
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Seil & Haken",
+          5
+        ],
+        [
+          "Purpurschatten",
+          35
+        ],
+        [
+          "Dunkles Gift",
+          30
+        ],
+        [
+          "Netz",
+          5
+        ],
+        [
+          "Warhorse",
+          80
+        ],
+        [
+          "Warhound",
+          20
+        ]
+      ]
+    },
+    "lrSlayer": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Misericordia",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Lanze",
+          40
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Javelin",
+          10
+        ],
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Blasrohr",
+          15
+        ],
+        [
+          "Pistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          10
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Seil & Haken",
+          5
+        ],
+        [
+          "Purpurschatten",
+          35
+        ],
+        [
+          "Dunkles Gift",
+          30
+        ],
+        [
+          "Netz",
+          5
+        ],
+        [
+          "Warhorse",
+          80
+        ],
+        [
+          "Warhound",
+          20
+        ],
+        [
+          "Echsenhaut-Umhang",
+          10,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Schädelmaske",
+          15,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Slann-Kopfschmuck",
+          35,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "lrProspect": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          10
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Many expeditions to Lustria have been lost to disease, jungle beasts and Lizardmen, yet the tales of the Cities of Gold still lure more. The toughest, most skilled and most resourceful survivors band together as Reavers.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/lustrian-reavers"
+  },
+  "unitLore": {
+    "conqueror": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "slayer": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "beastmaster": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "shadow": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "trapmaster": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "warhound": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "monkey": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "hawk": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands.",
+    "prospect": "Conquerors are behemoths of men, unstoppable giants wearing the nigh-impenetrable Estalian Masterwork armour and wielding the dreaded Bec de Corbin. They are incredibly tough to take out in battle, but their dedication to the skills at arms means they are often sullen and morose loners who do not work well with others, and despise newcomers to their warbands."
+  }
+}

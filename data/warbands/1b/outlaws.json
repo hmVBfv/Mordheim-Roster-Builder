@@ -1,0 +1,356 @@
+{
+  "warband": {
+    "name": "Outlaws of Stirwood Forest",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Bandit Leader. Max. 2 Champions, 1 Cleric (instead of a Champion/Petty Thief), 2 Petty Thieves; max. 7 Marksmen, any number of Outlaws.<br><b>Bow duty:</b> Every warrior carries a bow (no crossbow), only one missile weapon (exception: the Cleric may but need not carry a bow).<br><b>Hired Swords:</b> May hire any Hired Sword except Bounty Hunter, Wolf-Priest of Ulric, Norse Shaman and Dark Elf Assassin.",
+    "units": [
+      {
+        "id": "banditleader",
+        "t": "hero",
+        "name": "Bandit Leader",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "outlawEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "ochampion",
+        "t": "hero",
+        "name": "Champion",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "outlawEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength"
+        ]
+      },
+      {
+        "id": "ocleric",
+        "t": "hero",
+        "name": "Cleric",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "outlawEq",
+        "sk": [
+          "academic"
+        ],
+        "sp": "Disciple of Sigmar: Starts a campaign knowing one of the Prayers of Sigmar (toggle him as a caster to pick it). As with a Witch-Hunter's Warrior-Priest he may learn neither Sorcery nor Arcane Lore. May wear armour, since Prayers are not Spells. Exempt from Bow Duty: He may carry a bow but need not."
+      },
+      {
+        "id": "pettythief",
+        "t": "hero",
+        "name": "Petty Thief",
+        "cost": 20,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "outlawEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ]
+      },
+      {
+        "id": "omarksman",
+        "t": "hen",
+        "name": "Marksman",
+        "cost": 25,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "outlawMark"
+      },
+      {
+        "id": "outlaw",
+        "t": "hen",
+        "name": "Outlaw",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "outlawHen"
+      }
+    ]
+  },
+  "extra": {
+    "magic": "prayersSigmar"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "outlawEq": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Stab/Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          30
+        ],
+        [
+          "Forest Cloak",
+          50
+        ]
+      ]
+    },
+    "outlawMark": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Stab/Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          30
+        ]
+      ]
+    },
+    "outlawHen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Stab/Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Stirwood is a corner of the Great Forest cut off by the River Stir, where outlaws and poachers hide from the law. From there they raid the roads and sometimes the ruins of Mordheim.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/outlaws-of-stirwood-forest"
+  },
+  "unitLore": {
+    "banditleader": "A Bandit Leader is a professional cutthroat, a hardened criminal. His presence along the shadowy forest tracks of Stirwood has often meant the untimely demise of many a passing traveller. Other Outlaws will follow him, inspired as much by his ruthlessness as by his prowess.",
+    "ochampion": "All groups of Outlaws will often have a few who are more experienced than others. Loyal to their Leader they are usually rewarded with the choicest pickings of any loot.",
+    "ocleric": "Your warband may include up to one Cleric, but he can only be taken instead of either a Champion or a Petty Thief. A Cleric would usually spend most of his time alone in the forest in contemplation of his devotion to Sigmar. However, some will see that Sigmar’s work can also be achieved by the purging of all that is corrupt from the Empire. Many will, therefore, willingly join in the activities of groups of outlaws. Their knowledge of healing is often valued by other members.",
+    "pettythief": "Many youths who are caught by the City Guards in the act of thieving are compelled to flee the city and take up a place among the trees of Stirwood Forest. Although young, they are still keen enough to prove their worth to their fellow outlaws.",
+    "omarksman": "These are the best archers in the group and their skill with the bow is legendary. They are more than capable of picking off any enemy before they get too close.",
+    "outlaw": "These warriors form the basis of any group of bandits. Ruthless to the core, any of these would be more than happy to slip a sharp knife between somebody’s ribs for the promise of just a few groats."
+  }
+}

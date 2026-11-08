@@ -1,0 +1,358 @@
+{
+  "warband": {
+    "name": "Bretonnian Knights",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Questing Knight. Max. 2 Knights Errant, max. 3 Squires (never more Squires than Knights); max. 8 Men-at-Arms, any number of Bowmen.<br><b>Blessing of the Lady:</b> Before each battle the leader takes a Ld test. If he passes, enemy models must roll 4+ on a D6 each time they wish to fire a black powder weapon, and any enemy shooting at a Questing Knight or Knight Errant must first roll 4+ to overcome the curse.",
+    "units": [
+      {
+        "id": "paladin",
+        "t": "hero",
+        "name": "Questing Knight",
+        "cost": 80,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "bretKnight",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "bretSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Knight's Virtue: Never panics and breaks from combat; no Leadership test for being All Alone."
+      },
+      {
+        "id": "errant",
+        "t": "hero",
+        "name": "Knight Errant",
+        "cost": 50,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bretKnight",
+        "sk": [
+          "combat",
+          "speed",
+          "bretSkills"
+        ],
+        "sp": "Knight's Virtue: A chivalrous warrior superior to ordinary men — never panics or breaks from combat, and never has to take an All Alone test. May not ride a warhorse unless the Questing Knight also rides one."
+      },
+      {
+        "id": "squire",
+        "t": "hero",
+        "name": "Squire",
+        "cost": 15,
+        "exp": 0,
+        "max": 3,
+        "maxPer": {
+          "per": 1,
+          "of": [
+            "paladin",
+            "errant"
+          ]
+        },
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "bretSquire",
+        "sk": [
+          "combat",
+          "strength",
+          "bretSkills"
+        ],
+        "noWbSkills": true,
+        "sp": "May not ride a horse unless the Questing Knight and all Knights Errant ride warhorses."
+      },
+      {
+        "id": "maa",
+        "t": "hen",
+        "name": "Men-at-Arms",
+        "cost": 25,
+        "exp": 0,
+        "max": 8,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bretMaa"
+      },
+      {
+        "id": "bowmen",
+        "t": "hen",
+        "name": "Bowman",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "bretBow"
+      }
+    ]
+  },
+  "extra": {
+    "skills": "bretSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "bretKnight": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Warhorse",
+          80
+        ]
+      ]
+    },
+    "bretSquire": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Pferd",
+          40
+        ]
+      ]
+    },
+    "bretMaa": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "bretBow": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Axt",
+          5
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "While the Empire tears itself apart, Bretonnia stays orderly, chivalrous and blessed by the Lady of the Lake. Its knights see Mordheim as a place where virtue has been discarded and come to purge it.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/bretonnian"
+  },
+  "unitLore": {
+    "paladin": "A Questing Knight is an extremely tough and virtuous individual, who fights to uphold the traditions of honour and to serve the Lady of the Lake. Injustice and the persecution of the weak are his enemies, whilst courage and valour are his companions. It is no wonder then that many a Questing Knight will journey to Mordheim.",
+    "errant": "Knight Errant are the sons of nobles, eager to prove their mettle by feats of arms, and earn their place amongst the Knights of the Realm of Bretonnia. To do this they must perform valorous deed, so they will often accompany a Questing Knight on his spiritual journey in the hope of adventure and honour.",
+    "squire": "Knights are served by their Squires, commoners who ride to the hunt with their master, and who accompany him to war. They are chosen from the fittest and youngest of a Knight’s retinue, and they are trained and schooled by the knight himself. If a squire performs some great deed or service to his master he may even be raised to the ranks of knighthood!",
+    "maa": "Men-at-arms are the soldiery of Bretonnia. Every Knight maintains a retinue when he is a lord of a domain, and upon embarking on a quest, this retinue may join him on his journey. Men-at-arms are determined warriors, ready to fight for honour and justice as much as the Questing Knight they follow.",
+    "bowmen": "Bowmen are common folk who regularly practice archery at the village butts so as to be ready to repel raiders from their humble cottages, fields and vineyards. When a Knight sets off on a quest it is not uncommon for a handful of bowmen to be inspired to bravery and join the Knight on his journey."
+  }
+}

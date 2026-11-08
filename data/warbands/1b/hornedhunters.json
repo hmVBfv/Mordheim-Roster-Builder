@@ -1,0 +1,311 @@
+{
+  "warband": {
+    "name": "Horned Hunters",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Horned Hunter. Max. 1 Priest of Taal, 3 Initiates; max. 5 Drunken Gang, any number of Zealots, max. 5 Warhounds.<br><b>Woodcraft:</b> Followers of Taal move through any difficult terrain without suffering movement penalties.",
+    "units": [
+      {
+        "id": "hhunter",
+        "t": "hero",
+        "name": "Horned Hunter",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "hhHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "hornedHunterSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Hang the Bandit!: hates all Bandits and Outlaws (follows the Hatred rules against them)."
+      },
+      {
+        "id": "taalpriest",
+        "t": "hero",
+        "name": "Priest of Taal",
+        "cost": 45,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "hhHero",
+        "noHeavy": true,
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed",
+          "hornedHunterSkills"
+        ],
+        "sp": "Prayers: Uses the Prayers of Taal (works like priestly prayers). Strictures: May never wear heavy armour (light armour, helmet and shield are allowed — mordheimer clarification)."
+      },
+      {
+        "id": "initiate",
+        "t": "hero",
+        "name": "Initiate",
+        "cost": 40,
+        "exp": 8,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "hhHero",
+        "noArmour": true,
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "hornedHunterSkills"
+        ],
+        "sp": "Infiltrator: Always set up after the opposing warband, anywhere out of sight and more than 12\" from any enemy (if both sides infiltrate, roll off — lowest sets up first). Hang the Bandit!: hates all Bandits and Outlaws. Strictures: May never wear armour."
+      },
+      {
+        "id": "drunken",
+        "t": "hen",
+        "name": "Drunken Gang",
+        "cost": 30,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "hhHench",
+        "sp": "Drunk: Automatically passes Leadership tests."
+      },
+      {
+        "id": "zealot",
+        "t": "hen",
+        "name": "Zealot",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "hhHench",
+        "noArmour": true,
+        "sp": "No armour."
+      },
+      {
+        "id": "hhwarhound",
+        "t": "hen",
+        "name": "Warhound",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal (gains no experience)."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "prayersTaal",
+    "skills": "hornedHunterSkills"
+  },
+  "race": "human",
+  "unitRace": {
+    "hhwarhound": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "beastmen"
+    ]
+  },
+  "lists": {
+    "hhHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          5
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Toughened Leathers",
+          5
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          20
+        ],
+        [
+          "Blessed Stag Hide",
+          40
+        ],
+        [
+          "Trip Wire",
+          15
+        ]
+      ]
+    },
+    "hhHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          5
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Toughened Leathers",
+          5
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Horned Hunters prowl the woods of Talabecland and the Taalbaston, loyal only to Taal, god of nature. They mistrust cities, firearms and science and take pride in their own strength and skill.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/horned-hunters"
+  },
+  "unitLore": {
+    "hhunter": "The Horned Hunters are deeply zealous and shun the city of Talabheim. They safeguard pilgrims from the predations of bandits and hunt down dangerous beasts and the Mutants that flout Taal’s will.",
+    "taalpriest": "It is said that every priest of Taal is born during the darkest phase of the moon. A few Priests are ordained by their hierarchs to live in the wilderness, following the Path of Taal. They are guardians of wild places and those who wander them. To the creatures of Chaos lurking in the woods, they are terrors.",
+    "initiate": "Part of their initiation into this group is to undergo extensive tattooing, covering their chest and face. These feral hunters serve as masterful scouts.",
+    "drunken": "The militia is a hodgepodge of trusted citizens, woodsmen, and hunters that band together in times of need. Ancient law dictates all able-bodied men must muster when summoned by the Hunters Council in times of war. Though how many come depends on the amount of Rotfire moonshine consumed the night before. For this reason the army commonly refers to them as the ‘Drunken Gang’. Despite its malign reputation, the militia is capable, made up of rugged and dependable Talabeclanders.",
+    "zealot": "While they lack the fiery rhetoric of most zealots, Taal’s followers are still fervent in their beliefs. They give up much in the way of a material life. They shun normal clothing and armour and wear animal skins, loincloths or less.",
+    "hhwarhound": "Horned Hunters often keep packs of ferocious hunting dogs. With their huge jaws and powerful bite, they are perfect for hunting down (and tearing apart) any bandits, beasts and mutants."
+  }
+}

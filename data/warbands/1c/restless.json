@@ -1,0 +1,335 @@
+{
+  "warband": {
+    "name": "The Restless Dead",
+    "grade": "1c",
+    "siteRace": "Undead",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "Liche-led undead (Border Town Burning).<br><b>Undead:</b> All undead Cause Fear, are Immune to Psychology and Poison, treat stunned as knocked down (No Pain), and — except the Liche, Necromancer and Scarecrow — may not run.<br><b>Bone Goliath:</b> The warband has access to this unique Hired Sword, bought during warband creation (not in this builder).<br><b>Racial maxima:</b> Liche & Grave Guard/Wight use their own maxima; the Necromancer uses the Human maximum.",
+    "units": [
+      {
+        "id": "liche",
+        "t": "hero",
+        "name": "Liche",
+        "cost": 125,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 2,
+          "T": 2,
+          "W": 4,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "rdLiche",
+        "sk": [
+          "academic",
+          "restlessSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Necromancy (Restless Dead) and starts with two random spells. Carries no non-magical weapons (no penalty) but may wear armour. Cause Fear. Immune to Psychology (never leaves combat) and Poison. No Pain (stunned → knocked down). Eternal: May ignore any Serious Injury except \"Killed\" by taking a permanent −1 starting Wound (a \"Killed\" result costs −D3 starting Wounds; 0 or less = Killed). Feed Upon Magic: Between battles, consume D3 Treasures for a permanent +1 starting Wound (not if he searched rare items or went out of action last battle). Warrior Wizard: May wear armour and cast. Advancement: A +1 Wound advance may be swapped for a new skill."
+      },
+      {
+        "id": "necromancer",
+        "t": "hero",
+        "name": "Necromancer",
+        "cost": 40,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "rdList",
+        "sk": [
+          "academic",
+          "speed",
+          "restlessSkills"
+        ],
+        "sp": "Wizard: Uses Necromancy (Restless Dead), starting with one of the spells the Liche knows. Apprentices: May only know spells the Liche knows (until the Liche dies, then learns freely). Gofer: When searching for rare items, roll 3D6 and pick the two highest."
+      },
+      {
+        "id": "graveguard",
+        "t": "hero",
+        "name": "Grave Guard",
+        "cost": 35,
+        "exp": 6,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "rdList",
+        "sk": [
+          "combat",
+          "strength"
+        ],
+        "sp": "Wight Blades: Any close-combat \"to hit\" roll of 6 wounds automatically (roll to wound only to check for a critical). Cause Fear. Immune to Psychology and Poison. No Pain. May not Run (but may charge). No deal: May not search for rare items."
+      },
+      {
+        "id": "zombie",
+        "t": "hen",
+        "name": "Zombie",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 1,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "No weapons or armour. Cause Fear. May not run (but may charge). Immune to Psychology and Poison. No Pain. No Brain: Gains no Experience."
+      },
+      {
+        "id": "skeleton",
+        "t": "hen",
+        "name": "Skeleton",
+        "cost": 20,
+        "exp": 0,
+        "max": 8,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "rdList",
+        "noxp": true,
+        "sp": "Cause Fear. May not run (but may charge). Immune to Psychology and Poison. No Pain. No Brain: Gains no Experience."
+      },
+      {
+        "id": "wight",
+        "t": "hen",
+        "name": "Wight",
+        "cost": 30,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "rdList",
+        "sp": "Cause Fear. May not run (but may charge). Immune to Psychology and Poison. No Pain. May gain Experience; if promoted to a Hero it gains Wight Blades, must take the Combat and Strength skill lists, and (like Grave Guards) may not search for rare items."
+      },
+      {
+        "id": "scarecrow",
+        "t": "hen",
+        "name": "Scarecrow",
+        "cost": 65,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 2,
+          "Ld": 10
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Cause Fear. Immune to Psychology and Poison. No Pain. No Brain (no Experience). No Substance: Counts as Toughness 6 against shooting and magic missiles and is immune to shooting criticals (fire attacks deal damage normally). Flammable: Takes double damage from fire and catches fire on a 3+. Construct: May re-roll any Injury result except wounds caused by fire. Animated Construct: Controlled by the Liche or Necromancer (note which); each may control only one, so two Scarecrows need both. If its controller loses a wound, he must pass an unmodified Ld test or the Scarecrow is immediately taken out of action."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "necromancyRD"
+  },
+  "race": "human",
+  "unitRace": {
+    "liche": "liche",
+    "necromancer": "human",
+    "graveguard": "graveguard",
+    "wight": "graveguard",
+    "zombie": null,
+    "skeleton": null,
+    "scarecrow": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "undead"
+    ],
+    "only": [
+      "bonegoliath",
+      "graverobber"
+    ]
+  },
+  "lists": {
+    "rdList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ]
+    },
+    "rdLiche": {
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "restlessSkills": {
+      "name": "Restless Dead Special Skills",
+      "note": "Liche & Necromancer (instead of standard lists).",
+      "skills": [
+        [
+          "Corpse Bomb",
+          "Secretly nominate one Zombie as a Corpse Bomb. If it charges or is charged it detonates: all models within D6\" take D3 Strength 4 hits, and the Zombie is destroyed. Corpse Bombs killed by shooting do not detonate. Only one at a time (Liche and Necromancer may both take this skill)."
+        ],
+        [
+          "Deathspeaker",
+          "At the start of the battle deploy D3 Zombies for free. They do not count toward the maximum warband size (but add to rating), cannot be Corpse Bombs and last only for the battle."
+        ],
+        [
+          "Wraith Touch",
+          "Instead of his normal attacks, make one unarmed Wraith Touch: If it hits it wounds automatically. A Liche that wounds with it regains one lost wound (not above its starting total); Necromancers do not. No effect on the Possessed or Undead."
+        ],
+        [
+          "Forbidden Rite",
+          "If the hero did not search for rare items in the last exploration phase, he starts the next battle with a pool of D3+1 modifiers (+1) he may add to his casting rolls, as many at a time as he wishes."
+        ],
+        [
+          "Summoner",
+          "The maximum warband size is increased by 1."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "A Liche is a necromancer who kept his soul and magic after death, but his dead body cannot hold magic for long. He needs dark rituals, often the devouring of a human soul, and a band of undead follows him.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/restless-dead"
+  },
+  "unitLore": {
+    "liche": "A Liche is a powerful undead sorcerer. They journey north in a desperate bid to regain their power in the Realm of Chaos after a crippling defeat. Liches are fanatical in their struggle to hang on to their pitiful existence, especially when this close to being forever banished from the realm of the living.",
+    "necromancer": "Necromancers who travel with Liches are apprentices to the dark arts of Necromancy. They are the only living thing that a Liche will tolerate in his proximity!",
+    "graveguard": "Grave Guards were once the finest warriors, hand selected by their masters for their martial skill and bravery, who fell in battle many centuries ago. They are now slaves to their necromantic masters in restless undeath.",
+    "zombie": "Zombies are the most common of the undead: creatures animated by the will of their Necromantic masters to be slaves in their undeath.",
+    "skeleton": "The remains of ancient soldiers lie restless in their graves in the Northern Wastes. It only takes a mere whisper from the Necromancer to command them from their slumber and again into loyal service as mindless undead warriors.",
+    "wight": "Wights were formerly great champions among men, now reduced to shambling bodyguards. They resemble skeletons, but are far better armed and armoured and retain a substantial amount of their old combat prowess.",
+    "scarecrow": "Some sorcerors have been known to create horrible unliving forms that are impervious to pain and notoriously difficult to stop. In order to maintain secrecy, a cunning wizard disguises their twisted supernatural bodyguard as something more common. With its ordinary appearance the golem is granted enough freedom to move around undetected. These lanky constructs are fashioned from straw to resemble scarecrows used by farmers to frighten birds away from crops. No one gives them so much as a passing glance... that is, until they begin to move!"
+  }
+}

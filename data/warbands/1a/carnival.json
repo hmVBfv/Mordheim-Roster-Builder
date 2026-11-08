@@ -1,0 +1,275 @@
+{
+  "warband": {
+    "name": "Carnival of Chaos",
+    "grade": "1a",
+    "siteRace": "Chaos Human/Demon",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Carnival Master. Max. 2 Brutes, max. 2 Tainted Ones, max. 2 Plague Bearers, max. 1 Plague Cart, any number of Nurglings and Brethren.<br><b>Tainted:</b> Counts as Possessed for exploration/injuries.<br><b>Hired Swords:</b> May hire no Hired Swords.<br><b>Blessings of Nurgle:</b> May be bought for Tainted Ones only at recruitment; the first is at listed cost, each further Blessing costs double.",
+    "units": [
+      {
+        "id": "master",
+        "t": "hero",
+        "name": "Carnival Master",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "carnival",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Uses Nurgle Rituals."
+      },
+      {
+        "id": "brute",
+        "t": "hero",
+        "name": "Brute",
+        "cost": 60,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": "carnivalBrute",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Starts with the Strongman skill."
+      },
+      {
+        "id": "tainted",
+        "t": "hero",
+        "name": "Tainted One",
+        "cost": 25,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "carnival",
+        "mut": "nurgle",
+        "mutReq": true,
+        "sk": [
+          "combat",
+          "speed"
+        ],
+        "sp": "Must start with at least one Blessing of Nurgle (+ cost)."
+      },
+      {
+        "id": "plaguebearer",
+        "t": "hen",
+        "name": "Plague Bearer",
+        "cost": 50,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 4,
+          "A": 2,
+          "Ld": 10
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Daemon: Gains no experience. Fear. Immune to psychology/poison. Cloud of Flies, Stream of Corruption, Daemonic Aura 5+. Daemonic Instability: If taken out of action, banished on a D6 roll of 1-3 (do not roll for injury); if the warband routs, each Plague Bearer must pass a Leadership test or count as destroyed."
+      },
+      {
+        "id": "nurgling",
+        "t": "hen",
+        "name": "Nurgling",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 0,
+          "S": 3,
+          "T": 2,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 10
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Daemon (swarm, any number). Gains no experience. Immune to psychology/poison. Cloud of Flies: Close combat opponents suffer −1 to hit. Daemonic Aura 5+. Daemonic Instability: If taken out of action, banished on a D6 roll of 1-3 (do not roll for injury); if the warband routs, each Nurgling must pass a Leadership test or count as destroyed."
+      },
+      {
+        "id": "cbreth",
+        "t": "hen",
+        "name": "Brethren",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "carnival"
+      },
+      {
+        "id": "cart",
+        "t": "hen",
+        "name": "Plague Cart",
+        "cost": 120,
+        "exp": 0,
+        "max": 1,
+        "profile": null,
+        "eq": null,
+        "noxp": true,
+        "sp": "Plague Cart: Increases the maximum number of warriors by +2. Plague Bearers and Nurglings may re-roll Leadership tests for Instability and add +1 to their Injury tests if taken out of action. Guardian: Part of the cart; never dismounts, cannot be injured unless the cart is destroyed, never gains experience; his attacks cause Nurgle’s Rot. Immune to Psychology: The Plague Cart and Guardian are Daemonic.",
+        "attached": [
+          {
+            "label": "Cart",
+            "profile": {
+              "M": "—",
+              "WS": "—",
+              "BS": "—",
+              "S": "—",
+              "T": 8,
+              "W": 4,
+              "I": "—",
+              "A": "—",
+              "Ld": "—"
+            },
+            "note": "The cart body — Toughness 8, 4 Wounds."
+          },
+          {
+            "label": "Wheel",
+            "profile": {
+              "M": "—",
+              "WS": "—",
+              "BS": "—",
+              "S": "—",
+              "T": 6,
+              "W": 1,
+              "I": "—",
+              "A": "—",
+              "Ld": "—"
+            },
+            "note": "Each wheel Toughness 6, 1 Wound."
+          },
+          {
+            "label": "Horse",
+            "profile": {
+              "M": 8,
+              "WS": "—",
+              "BS": "—",
+              "S": 3,
+              "T": 3,
+              "W": 1,
+              "I": 3,
+              "A": "—",
+              "Ld": "—"
+            },
+            "note": "The horse that pulls the cart."
+          },
+          {
+            "label": "Guardian",
+            "profile": {
+              "M": "—",
+              "WS": 3,
+              "BS": "—",
+              "S": 3,
+              "T": 3,
+              "W": "—",
+              "I": 3,
+              "A": 1,
+              "Ld": "—"
+            },
+            "note": "Bonded to the cart; his attacks cause Nurgle’s Rot."
+          }
+        ]
+      }
+    ]
+  },
+  "extra": {
+    "magic": "nurgleRituals"
+  },
+  "race": "human",
+  "unitRace": {
+    "plaguebearer": null,
+    "nurgling": null,
+    "tainted": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "carnival"
+    ]
+  },
+  "lists": {
+    "carnivalBrute": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Nobody knows where the Carnival of Chaos came from, perhaps a gypsy caravan that went wrong. It still travels the Empire's backwaters in painted wagons as a troupe of players, and behind the songs and stage plays something far more sinister waits.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/carnival-of-chaos"
+  },
+  "unitLore": {
+    "master": "These lead the diabolical Carnivals of Chaos. They are the chosen of Nurgle and wield sorcerous powers gifted to them by their pestilential god. The Master is a power-crazed individual that leads his coven of Daemonic entertainers throughout the backwaters of the Empire, tainting villages and settlements with disease. To the backward peasantry of the Empire’s rural settlements, the Master comes across as an exotic and charismatic showman bringing outlandish entertainment into their otherwise dreary lives. It is the Carnival Master’s cunning and clever enchantments that help to keep his minions one step ahead of the patrols of the many Witch Hunter bands that rove the land.",
+    "brute": "These are a very specific type of mutant that have had their constitution bolstered by the unnatural vitality of the Lord of Decay. Nurgle’s foul attention has transformed what were once men into massive, statuesque creatures rippling with diseased muscles and a supernatural vigour. Brutes are immensely strong individuals and their part in the masquerade that is the Carnival of Chaos is as strongmen performing feats of strength to entertain the crowds. They are nearly always hooded in the nature of executioners for although their bodies appear outwardly strong and healthy, their faces are often riddled with disease and are half-decayed. In battle, they wield huge hammers and flails with reckless abandon, whirling them around their heads like children’s toys.",
+    "tainted": "(+Cost of Blessings of Nurgle) The Tainted Ones are those that are most blessed and favoured of Father Nurgle. They hold a position of great importance within the hierarchy of the Carnival. They are often heavily robed and protected by powerful enchantments, for beneath their robes are unspeakable horrors. The bodies of the Tainted Ones are so wracked with disease and mutation that it is unsafe for even the other mortal members of the warband to touch their bare skin. Ironically, they take the most prestigious role in the Carnival – the fool. The Tainted Ones leap and prance about the audience, dressed as jesters, when the Carnival is performing, laughing and joking with the gathered throng infecting them with their multitude of horrendous maladies. These twisted creatures are exceptionally dangerous opponents in combat too, for it is said that they carry the dreaded and incurable Nurgle’s Rot.",
+    "plaguebearer": "Plague Bearers are daemons of the Chaos god Nurgle, also known as the Lord of Decay. They can be identified by their cyclopean faces and horrifically decayed bodies. Their entrails hang from tattered holes in their grey-green, poxridden flesh and the aura of death and decay surrounds them. They are sometimes known as the Tallymen of Plagues or Maggotkin and are highly revered by the mortal members of the warband. As with all Daemons they can never be killed or destroyed for good so long as the power of their god prevails. However, their presence in the mortal world is tenuous and can only be maintained for long periods by Dark Magic and sacrifice. In the Carnival, the Plague Bearers revel in their showy roles as stage actors and players, dressing in filth encrusted but ostentatious doublet and hose.",
+    "nurgling": "Nurglings are tiny Daemons of Nurgle and are viewed by other followers of the pus god as akin to his beloved children. They are like rotten boils with legs and razor sharp teeth, that pick and tear and infect their foes with filth-encrusted claws. Nurglings are generally more of a nuisance in a fight than any real threat but in sufficient numbers can overwhelm even the toughest of warriors. Nurglings are mischievous little bundles of filth and pus and take great delight in their part in the Carnival of Chaos, not only as musicians but also as fools and slapstick comedians. Nurglings often befriend the children of each village they visit, only revealing their foul identity to their terrified victims at the final stage of ‘Nurgle’s Great Play’.",
+    "cbreth": "Brethren are the crazed and devoted followers of Nurgle the Lord of Decay. They have totally embraced the philosophy of the great Lord of Decay and the path of damnation is the road that they have chosen. Most brethren are infected with foul diseases and some have even started to decay. Their faces are covered in warts and boils and other lesser gifts of their lord. In the Carnival, the Brethren take on all of the minor roles: stagehands, puppeteers, etc.",
+    "cart": "Looking for the rules regarding the Plague Cart? To find the rules around the wagon mechanic, check wagons . The Plague Cart is the embodiment of Nurgle and the core of the Carnival of Chaos. Bedecked in the colourful, garish finery of the coaches of travelling players and thespians, the Cart easily draws the eyes of the dull and bland peasantry of the villages. However, the canvas is tattered and rotten, the frame splintered and bent, the metalwork pitted and rusted and the steeds rotted and dank. Few mortals have ever seen the interior of one of these most sinister of vehicles for it is only the Carnival Master and his Daemonic minions that are permitted entry. It is rumoured that these ramshackle wagons contain a pentagram daubed with dark runes of incredible potency that actually creates a portal to the realms of Chaos and the dwelling place of great Nurgle himself."
+  }
+}

@@ -1,0 +1,458 @@
+{
+  "warband": {
+    "name": "Averlanders",
+    "grade": "1a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 1 Sergeant, 2 Bergjaegers, 1 Youngblood; any number of Mountainguard and Marksmen, max. 3 Halfling Scouts.",
+    "units": [
+      {
+        "id": "capt",
+        "t": "hero",
+        "name": "Captain",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "avMountain",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "serg",
+        "t": "hero",
+        "name": "Sergeant",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "avMountain",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ]
+      },
+      {
+        "id": "berg",
+        "t": "hero",
+        "name": "Bergjaeger",
+        "cost": 35,
+        "exp": 4,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "avScout",
+        "sk": [
+          "shooting",
+          "speed"
+        ],
+        "sp": "Set Traps: Instead of doing anything else in a turn, may set a trap (a marker). A model moving within 2\" of it rolls a D6: on a 3+ the trap is triggered and it suffers a Strength 4 hit. The marker is removed either way."
+      },
+      {
+        "id": "young",
+        "t": "hero",
+        "name": "Youngblood",
+        "cost": 15,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "avMountain",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ]
+      },
+      {
+        "id": "mountain",
+        "t": "hen",
+        "name": "Mountainguard",
+        "cost": 30,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "avMountain"
+      },
+      {
+        "id": "marks",
+        "t": "hen",
+        "name": "Marksman",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "avMarksman"
+      },
+      {
+        "id": "halfling",
+        "t": "hen",
+        "name": "Halfling Scout",
+        "cost": 20,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "avHalfling",
+        "sp": "Weak: May not choose Strength skills when advancing."
+      }
+    ]
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "avMountain": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "avMarksman": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Jagdgewehr",
+          200
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "avScout": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    },
+    "avHalfling": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Averland is a prosperous southern province between the Black Mountains and the Worlds Edge Mountains, rich in ore and bordered by old Dwarf holds overrun by Goblins and Skaven. Its warriors come to Mordheim looking for gold and a name.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/averlander"
+  },
+  "unitLore": {
+    "capt": "The Captain of a mercenary warband is typically a middleaged veteran soldier of the Imperial army, most likely he was a sergeant or other petty officer. The survival of a mercenary warband relies more on the wit and experience of its captain, than on how good a fighter he is. It’s all too common that an inexperienced captain will lead his men into an ambush, or lead them on a long journey with no food or supplies. Being a successful captain means that your men will follow you to hell and back, and plenty of gold crowns and feasting. A captain that fails in his duty to keep his men alive and well fed will at best find himself deserted and worst end up with a knife in his back.",
+    "serg": "Some captains are merchants or nobles that are looking for a chance at making some extra money. The brighter captains hire the service of a veteran as his sergeant, and leave all the practical decision to him. A veteran can be recognised by his many battle-scars and the cynicism that marks a soldier of the army.",
+    "berg": "The Bergjaeger are trappers and rangers from the mountains that surround the Black Fire pass. They are experts at moving silently through terrain and are used as scouts. In addition they make good use of animal traps to delay or divide a group of enemies. Bergjager are not professional soldiers and rely more on stealth and cunning than a strong sword-arm to survive.",
+    "young": "Although Empire armies are comprised of mature men there are plenty of jobs for youths as there is always a demand for extra help in the kitchens or as fetchers. Some of these youths actually join a band of mercenaries or regiment in pursuit of a romantic dream of fame and adventure. Some are herdsmen who hoped to find an easier way of filling their belly than the hard and uncertain business of looking after animals, not to mention that its quite dull!",
+    "mountain": "The Mountainguard is the famous garrison of the Black Fire Pass that has repelled countless greenskin invasion attempts. Their traditional uniform is yellow and black and it’s a merit in the Averland armey to have served a few years at the mountain-pass. The Mountain guard train both with the traditional Imperial weapons, the halberd and the sword, and with the crossbow and bow. Veterans are often employed by mercenary warbands who know that their presence will certainly boost their chances in the battles to come. Some of these veterans advance to become sergeants or even captains themselves. There are a few warbands that consists solely of Mountainguard veterans, often from the same regiment or the survivors of a great battle.",
+    "marks": "Being a Marksmen is not as simple as picking up a bow and try to hit your enemies. A Marksman has to train for years to master his chosen weapon, Imperial enlisters often visit archery competitions to try and enlist a couple of expert archers. Some Marksmen are trained with black powder weapons instead of the traditional bow or crossbow. Marksmen often own their own weapons, as the cost of a handgun is as high as hiring the Marksman himself! Thus the Marksmen are not forced to do as much hard labour as the militia.",
+    "halfling": "Averland is neighbour to the Moot, the Halfling province. In 1707 the Orc Warlord Gorbad Ironclaw invaded through the Black Fire pass and the Moot was devastated. Ever since then the Moot urge their gamekeepers to serve at least a few years in the garrison that guard the pass. If another warlord tries to invade the Moot, they will meet the fierce resistance of the Halflings in the mountain Pass."
+  }
+}

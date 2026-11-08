@@ -1,0 +1,301 @@
+{
+  "warband": {
+    "name": "Forest Goblins",
+    "grade": "1b",
+    "siteRace": "Goblin",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Chieftain. Max. 4 Braves, 1 Shaman; any number of Forest Goblins, max. 5 Red Toof Boyz, max. 5 Sluggas, max. 1 Gigantic Spider.<br><b>Animosity:</b> Orcs and Goblins enjoy nothing more than a good scrap, unfortunately they’re not always very discerning about who they scrap with! To represent this, at the start of the Orc player’s turn, roll a D6 for each Henchman who is either an Orc or a Goblin. A roll of 1 means that the warrior has taken offense to something one of his mates has done or said. Do not roll for models that are engaged in hand-to-hand combat (they’re already scrappin’!). To find out just how offended the model is, roll another D6 and consult the Animosity chart (see the Animosity ability for its three results).<br><b>Natives:</b> No penalty in woods.",
+    "units": [
+      {
+        "id": "fgchief",
+        "t": "hero",
+        "name": "Chieftain",
+        "cost": 50,
+        "exp": 17,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "fgHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. May Ride: With the optional mount rules the Chieftain may ride a Giant Spider or the warband's Gigantic Spider — on the Gigantic Spider he gains +1 armour save, moves at its rate of 6, and shooting hits the Chieftain on 1-2, the spider on 3-6."
+      },
+      {
+        "id": "fgbrave",
+        "t": "hero",
+        "name": "Brave",
+        "cost": 20,
+        "exp": 6,
+        "max": 4,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "fgHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ],
+        "sp": "Animosity. May remove his Animosity instead of taking a skill when he earns one."
+      },
+      {
+        "id": "fgshaman",
+        "t": "hero",
+        "name": "Shaman",
+        "cost": 20,
+        "exp": 6,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "fgHero",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Wizard: Forest Goblin Magic (starts with 1)."
+      },
+      {
+        "id": "fgoblin",
+        "t": "hen",
+        "name": "Forest Goblin",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "fgHench",
+        "sp": "Animosity."
+      },
+      {
+        "id": "redtoof",
+        "t": "hen",
+        "name": "Red Toof Boyz",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "fgHench",
+        "sp": "Frenzy: Subject to frenzy (tribal jewellery — cannot be removed). Animosity: Subject to Animosity, but immune to it while starting the turn within charge range of an enemy."
+      },
+      {
+        "id": "slugga",
+        "t": "hen",
+        "name": "Slugga",
+        "cost": 20,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "fgHench",
+        "sp": "Animosity. Sluggas: May throw thrown weapons up to three times per shooting phase (may not be combined with Quick Shot if promoted)."
+      },
+      {
+        "id": "gspider",
+        "t": "hen",
+        "name": "Gigantic Spider",
+        "cost": 200,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 5,
+          "T": 5,
+          "W": 3,
+          "I": 4,
+          "A": 2,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Fear. Large Target: May always be shot at even if not the closest target. Poisonous: When it wounds, roll injuries with 1 = knocked down, 2-4 = stunned, 5-6 = out of action. Nonsentient: Subject to Stupidity (not while ridden by the Chieftain, who directs it); never gains experience (animal); may climb as normal. Native: Moves through woods without penalty. Uses no weapons or armour. May be ridden by the Chieftain."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "forestGoblinMagic"
+  },
+  "race": "forestgoblin",
+  "unitRace": {
+    "gspider": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "orcsgoblins"
+    ],
+    "only": [
+      "pitfighter",
+      "ogre",
+      "warlock",
+      "blackorcoverseer",
+      "goblinlanternbearer"
+    ]
+  },
+  "lists": {
+    "fgHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          5
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Boss Pole",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Blasrohr",
+          25
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ]
+    },
+    "fgHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          5
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Blasrohr",
+          25
+        ],
+        [
+          "Wurfwaffen",
+          15
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Forest Goblin tribes live deep in the Great Forest, expert at stealth and camouflage. Gold is useless to them as money but they coat their stone weapons with it, and some leaders will send their followers to die just to collect it.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/forest-goblins"
+  },
+  "unitLore": {
+    "fgchief": "Forest Goblins are usually led by the biggest, strongest, and most cunning Goblin in the band. This Chieftain routinely comes up with ways to drive off the Old World invaders, and collect gold for Mork and Gork.",
+    "fgbrave": "Forest Goblin Braves are just a tad more intelligent than their peers, and aid the Chieftain in directing them in battle. This does not improve their temperament, however, since they are as prone to infighting as their henchmen.",
+    "fgshaman": "Shamans use the power of the Waaagh to direct the might of G’rrk and M’rrk against their foes. Usually found scrounging up mysterious animal parts instead of gold, most other Goblins agree that ‘dey is odd’.",
+    "fgoblin": "Forest Goblin warriors form the rank and file of a Goblin warband. They use their natural talents to harass their enemies while keeping out of sight in the dense foliage.",
+    "redtoof": "Of all the various factions that comprise the Forest Goblins, the infamous Red Toof tribe is the most feared. They are elite shock troops, valued by Chieftains for their berserk rage in battle.",
+    "slugga": "Sluggas practice the art of throwing various objects until they can hurl several projectiles in a split second. This makes them useful for distracting enemies with a hail of heavy stones.",
+    "gspider": "Gigantic Spiders are best avoided when encountered in the wild, due to their deadly poison and huge size. When urged into fighting by Forest Goblin beastmasters, they become doubly dangerous and much harder to evade."
+  }
+}

@@ -1,0 +1,344 @@
+{
+  "warband": {
+    "name": "Orc Mob",
+    "grade": "1a",
+    "siteRace": "Orcs & Goblins",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Boss. Max. 1 Shaman, 2 Big 'Uns; any number of Orc Boyz; Goblins (at most 2 per Orc in the warband), max. 5 Cave Squigs (never more than the Goblins), max. 1 Troll.<br><b>Animosity:</b> Orcs and Goblins enjoy nothing more than a good scrap, unfortunately they’re not always very discerning about who they scrap with! To represent this, at the start of the Orc player’s turn, roll a D6 for each Henchman who is either an Orc or a Goblin. A roll of 1 means that the warrior has taken offense to something one of his mates has done or said. Do not roll for models that are engaged in hand-to-hand combat (they’re already scrappin’!). To find out just how offended the model is, roll another D6 and consult the Animosity chart (see the Animosity ability for its three results).<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – Pit Fighter, Ogre Bodyguard, Warlock.",
+    "units": [
+      {
+        "id": "boss",
+        "t": "hero",
+        "name": "Orc Boss",
+        "cost": 80,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "orcList",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "orcSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "shaman",
+        "t": "hero",
+        "name": "Orc Shaman",
+        "cost": 40,
+        "exp": 10,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "orcList",
+        "noArmour": true,
+        "sk": [
+          "strength",
+          "orcSkills"
+        ],
+        "sp": "Wizard: Uses Waaagh! Magic. Never wears armour."
+      },
+      {
+        "id": "bigun",
+        "t": "hero",
+        "name": "Orc Big 'Un",
+        "cost": 40,
+        "exp": 15,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "orcList",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "orcSkills"
+        ]
+      },
+      {
+        "id": "boyz",
+        "t": "hen",
+        "name": "Orc Boyz",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "orcList",
+        "sp": "Animosity."
+      },
+      {
+        "id": "goblin",
+        "t": "hen",
+        "name": "Goblin",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "maxPer": {
+          "per": 2,
+          "of": [
+            "boss",
+            "shaman",
+            "bigun",
+            "boyz"
+          ]
+        },
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "goblinList",
+        "sp": "Animosity. <b>Not Orcs:</b> Orcs expect little from non-Orcs — when testing whether the warband must take a Rout test, each Goblin or Cave Squig taken out of action counts as only HALF a model. <b>Runts:</b> Killed on a “The Lad’s Got Talent” result (too mouthy) — he may never become a Hero."
+      },
+      {
+        "id": "squig",
+        "t": "hen",
+        "name": "Cave Squig",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "maxPer": {
+          "per": 1,
+          "of": [
+            "goblin"
+          ]
+        },
+        "profile": {
+          "M": "2D6",
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal (gains no experience). Move 2D6\". Must stay within 6\" of a Goblin, otherwise it goes wild. <b>Not Orcs:</b> When testing whether the warband must take a Rout test, each Cave Squig taken out of action counts as only HALF a model."
+      },
+      {
+        "id": "troll",
+        "t": "hen",
+        "name": "Troll",
+        "cost": 200,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 1,
+          "S": 5,
+          "T": 4,
+          "W": 3,
+          "I": 1,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Fear. Stupidity. Large Target. Regeneration (4+). Vomit Attack (S5). Always Hungry: 15 gc upkeep after each game, or the Boss sacrifices two Goblin Warriors or Cave Squigs; otherwise it wanders off. Gains no experience."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "waaagh",
+    "skills": "orcSkills"
+  },
+  "race": "orc",
+  "unitRace": {
+    "goblin": "goblin",
+    "squig": "goblin",
+    "troll": "orc"
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "orcsgoblins"
+    ],
+    "only": [
+      "pitfighter",
+      "ogre",
+      "warlock",
+      "blackorcoverseer",
+      "goblinlanternbearer"
+    ]
+  },
+  "lists": {
+    "orcList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben/Knüppel",
+          3
+        ],
+        [
+          "Streitaxt",
+          5
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "goblinList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Eisenkugel & Kette",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Squig-Treiber",
+          15
+        ],
+        [
+          "Mad-Cap-Pilze",
+          25
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Orcs love fighting and looting above everything, and Mordheim offers plenty of both. An ambitious Warboss leads a mob to the city to prove himself, and would rather ambush other warbands than dig for wyrdstone himself.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/orc-mob"
+  },
+  "unitLore": {
+    "boss": "An Orc Boss is a tough and brutal warrior, who will throw his lads into any fight that he thinks he can profit from. He is the strongest, toughest and most barbaric member of the warband and if any of his Boyz think otherwise, the band may soon find itself with one less member!",
+    "shaman": "Orc Shamans are outcasts from Orc society. They are gifted by the Orc gods Gork and Mork with powers they can neither understand nor completely control. Many join roaming Orc warbands where they are no longer shunned for their abilities, but respected for them.",
+    "bigun": "Orc society is a savage hierarchy where only the toughest survive and rise through the ranks (often atop the bodies of other challengers). Big ’Uns are such rising stars, and they carry out the orders of the Orc Boss. If the Boss ever falls, it is up to the Big ’Uns to decide on a new leader (usually through personal combat).",
+    "boyz": "Orc Boyz are savage and tough. They fear nothing that they can get their bare hands on, though they are even more ignorant and superstitious than most other beings in the Warhammer world. They form the core of any Orc warband.",
+    "goblin": "Goblins are often used as cannon fodder (as well as a food source in lean times!) by their larger Orc cousins. They are usually not as well equipped as Orc Boyz, having to make do with whatever the Orcs do not want or cannot use.",
+    "squig": "Goblins raise the deadly Cave Squigs. These creatures are a curious blend of animal and fungus, and are composed mostly of teeth, horns, and a nasty temperament.",
+    "troll": "Trolls are not intelligent enough to recognize the value of gold, but large amounts of food can often instill a certain loyalty in them."
+  }
+}

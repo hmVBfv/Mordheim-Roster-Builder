@@ -1,12 +1,54 @@
 {
  "PENDING_1A": [],
  "UNITRACE": {
-  "undead/vamp": "vampire",
-  "undead/ghoul": "ghoul",
   "possessed/poss": "possessed",
   "possessed/beast": "gor",
+  "wh/hound": null,
+  "undead/vamp": "vampire",
+  "undead/ghoul": "ghoul",
+  "undead/wolf": null,
+  "skaven/ogre": null,
+  "ostlander/ogre": "ogre",
+  "carnival/plaguebearer": null,
+  "carnival/nurgling": null,
+  "carnival/tainted": null,
+  "orcmob/goblin": "goblin",
+  "orcmob/squig": "goblin",
+  "orcmob/troll": "orc",
+  "beastmen/centigor": null,
+  "beastmen/hound": null,
+  "beastmen/minotaur": null,
+  "maraudersofchaos/condemned": null,
+  "maraudersofchaos/warhound": null,
+  "maraudersofchaos/spawn": null,
+  "kislev/bear": null,
+  "blackorcs/bboss": "blackorc",
+  "blackorcs/borc": "blackorc",
+  "blackorcs/young": "orc",
+  "blackorcs/boyz": "orc",
+  "blackorcs/shootaz": "orc",
+  "blackorcs/nuttaz": "orc",
+  "blackorcs/botroll": "orc",
+  "darkelves/coldone": null,
+  "forestgoblins/gspider": null,
+  "hornedhunters/hhwarhound": null,
+  "lizardmen/skinkpriest": "skink",
+  "lizardmen/greatcrest": "skink",
+  "lizardmen/skinkbrave": "skink",
+  "lizardmen/saurustotem": "saurus",
+  "lizardmen/saurusbrave": "saurus",
+  "lizardmen/kroxigor": "saurus",
+  "norse/wulfen": null,
+  "norse/wolf": null,
+  "ostermark/owardog": null,
   "pitfighters/trollslayer": "dwarf",
   "pitfighters/ogrepit": "ogre",
+  "skavenpest/ratogre": null,
+  "tombguardians/lichepriest": "lichepriest",
+  "tombguardians/acolyte": "lichepriest",
+  "tombguardians/skeletonwarrior": "graveguard",
+  "tombguardians/tombguardian": "graveguard",
+  "tombguardians/tombscorpion": "graveguard",
   "sonsofhashut/bull": "bullcentaur",
   "sonsofhashut/hobgob": "hobgoblin",
   "blackdwarfs/bull": "bullcentaurbd",
@@ -30,49 +72,7 @@
   "restless/wight": "graveguard",
   "restless/zombie": null,
   "restless/skeleton": null,
-  "restless/scarecrow": null,
-  "wh/hound": null,
-  "ostlander/ogre": "ogre",
-  "undead/wolf": null,
-  "skaven/ogre": null,
-  "skavenpest/ratogre": null,
-  "carnival/plaguebearer": null,
-  "carnival/nurgling": null,
-  "beastmen/centigor": null,
-  "beastmen/hound": null,
-  "beastmen/minotaur": null,
-  "kislev/bear": null,
-  "darkelves/coldone": null,
-  "forestgoblins/gspider": null,
-  "hornedhunters/hhwarhound": null,
-  "norse/wulfen": null,
-  "norse/wolf": null,
-  "ostermark/owardog": null,
-  "carnival/tainted": null,
-  "maraudersofchaos/condemned": null,
-  "maraudersofchaos/warhound": null,
-  "maraudersofchaos/spawn": null,
-  "orcmob/goblin": "goblin",
-  "orcmob/squig": "goblin",
-  "orcmob/troll": "orc",
-  "blackorcs/bboss": "blackorc",
-  "blackorcs/borc": "blackorc",
-  "blackorcs/young": "orc",
-  "blackorcs/boyz": "orc",
-  "blackorcs/shootaz": "orc",
-  "blackorcs/nuttaz": "orc",
-  "blackorcs/botroll": "orc",
-  "lizardmen/skinkpriest": "skink",
-  "lizardmen/greatcrest": "skink",
-  "lizardmen/skinkbrave": "skink",
-  "lizardmen/saurustotem": "saurus",
-  "lizardmen/saurusbrave": "saurus",
-  "lizardmen/kroxigor": "saurus",
-  "tombguardians/lichepriest": "lichepriest",
-  "tombguardians/acolyte": "lichepriest",
-  "tombguardians/skeletonwarrior": "graveguard",
-  "tombguardians/tombguardian": "graveguard",
-  "tombguardians/tombscorpion": "graveguard"
+  "restless/scarecrow": null
  },
  "WARBANDS": {
   "merc": {
@@ -2063,7 +2063,15 @@
      "cost": 15,
      "exp": 0,
      "max": null,
-     "maxPer": { "per": 2, "of": ["boss", "shaman", "bigun", "boyz"] },
+     "maxPer": {
+      "per": 2,
+      "of": [
+       "boss",
+       "shaman",
+       "bigun",
+       "boyz"
+      ]
+     },
      "profile": {
       "M": 4,
       "WS": 2,
@@ -2085,7 +2093,12 @@
      "cost": 15,
      "exp": 0,
      "max": 5,
-     "maxPer": { "per": 1, "of": ["goblin"] },
+     "maxPer": {
+      "per": 1,
+      "of": [
+       "goblin"
+      ]
+     },
      "profile": {
       "M": "2D6",
       "WS": 4,
@@ -3115,7 +3128,14 @@
       "shooting",
       "blackOrcSkills"
      ],
-     "upgradeOption": { "name": "Black Orc Blood", "cost": 10, "max": 1, "minExp": 25, "skill": "Proven Warrior", "becomes": "borc" },
+     "upgradeOption": {
+      "name": "Black Orc Blood",
+      "cost": 10,
+      "max": 1,
+      "minExp": 25,
+      "skill": "Proven Warrior",
+      "becomes": "borc"
+     },
      "sp": "Black Orc Blood: One Young'un in the warband may be upgraded for 10 gc — this allows him to take the 'Proven Warrior' special skill and become a full Black Orc."
     },
     {
@@ -3146,7 +3166,12 @@
      "cost": 25,
      "exp": 0,
      "max": null,
-     "maxPer": { "per": 1, "of": ["boyz"] },
+     "maxPer": {
+      "per": 1,
+      "of": [
+       "boyz"
+      ]
+     },
      "profile": {
       "M": 4,
       "WS": 3,
@@ -3279,7 +3304,13 @@
      "cost": 15,
      "exp": 0,
      "max": 3,
-     "maxPer": { "per": 1, "of": ["paladin", "errant"] },
+     "maxPer": {
+      "per": 1,
+      "of": [
+       "paladin",
+       "errant"
+      ]
+     },
      "profile": {
       "M": 4,
       "WS": 2,
@@ -4725,7 +4756,12 @@
      "exp": 0,
      "max": 4,
      "bite": 1,
-     "maxPer": { "per": 1, "of": ["skinkbrave"] },
+     "maxPer": {
+      "per": 1,
+      "of": [
+       "skinkbrave"
+      ]
+     },
      "profile": {
       "M": 4,
       "WS": 3,
@@ -5630,7 +5666,12 @@
      "cost": 0,
      "exp": 0,
      "max": 5,
-     "maxPer": { "per": 1, "of": ["crew"] },
+     "maxPer": {
+      "per": 1,
+      "of": [
+       "crew"
+      ]
+     },
      "profile": {
       "M": 4,
       "WS": 2,
@@ -7726,9 +7767,9 @@
      "sv": 4,
      "svWith": "Masterwork Heavy Armour",
      "gear": [
-       "Masterwork Heavy Armour",
-       "Bec de Corbin",
-       "Helmet"
+      "Masterwork Heavy Armour",
+      "Bec de Corbin",
+      "Helmet"
      ],
      "sk": [
       "combat",
@@ -7756,11 +7797,11 @@
      },
      "eq": "lrSlayer",
      "gear": [
-       "Heavy Armour",
-       "Misericordia",
-       "Sword",
-       "Sword",
-       "Helmet"
+      "Heavy Armour",
+      "Misericordia",
+      "Sword",
+      "Sword",
+      "Helmet"
      ],
      "sk": [
       "combat",
@@ -7789,9 +7830,9 @@
      },
      "eq": "lrHero",
      "gear": [
-       "Heavy Armour",
-       "Spear",
-       "Sword"
+      "Heavy Armour",
+      "Spear",
+      "Sword"
      ],
      "sk": [
       "shooting",
@@ -7826,10 +7867,10 @@
      },
      "eq": "lrHero",
      "gear": [
-       "Javelins",
-       "Light Armour",
-       "Dagger",
-       "Dagger"
+      "Javelins",
+      "Light Armour",
+      "Dagger",
+      "Dagger"
      ],
      "sk": [
       "shooting",
@@ -7862,11 +7903,11 @@
      },
      "eq": "lrHero",
      "gear": [
-       "Heavy Armour",
-       "Sword",
-       "Tilean Hunting Rifle (treat as a Hochland Long Rifle)",
-       "Firepots",
-       "Leaf Coat (counts as an Elven Cloak)"
+      "Heavy Armour",
+      "Sword",
+      "Tilean Hunting Rifle (treat as a Hochland Long Rifle)",
+      "Firepots",
+      "Leaf Coat (counts as an Elven Cloak)"
      ],
      "sk": [
       "combat",
@@ -8507,7 +8548,12 @@
      "cost": 15,
      "exp": 0,
      "max": 5,
-     "maxPer": { "per": 1, "of": ["nightgob"] },
+     "maxPer": {
+      "per": 1,
+      "of": [
+       "nightgob"
+      ]
+     },
      "profile": {
       "M": "2D6",
       "WS": 4,
@@ -8747,6 +8793,9 @@
   }
  },
  "WBEXTRA": {
+  "merc": {
+   "magic": "lesserMagic"
+  },
   "possessed": {
    "magic": "chaosRituals"
   },
@@ -8764,8 +8813,19 @@
    "magic": "hornedRat",
    "skills": "skavenSkills"
   },
-  "merc": {
-   "magic": "lesserMagic"
+  "woodelf": {
+   "magic": "woodlandIncantations",
+   "skills": "weSkills"
+  },
+  "ostlander": {
+   "magic": "prayersTaal",
+   "skills": "ostlanderSkills"
+  },
+  "carnival": {
+   "magic": "nurgleRituals"
+  },
+  "dwarftreasure": {
+   "skills": "dthSkills"
   },
   "orcmob": {
    "magic": "waaagh",
@@ -8775,27 +8835,30 @@
    "magic": "beastLore",
    "skills": "beastmenSkills"
   },
-  "ostlander": {
-   "magic": "prayersTaal",
-   "skills": "ostlanderSkills"
+  "maraudersofchaos": {
+   "magic": "marauderChaos",
+   "skills": "marauderSkills"
   },
-  "carnival": {
-   "magic": "nurgleRituals"
+  "amazons": {
+   "magic": "amazonRituals"
   },
   "arabian": {
    "magic": "elementalMagic",
    "skills": "arabSkills"
   },
-  "dwarftreasure": {
-   "skills": "dthSkills"
+  "blackorcs": {
+   "skills": "blackOrcSkills"
   },
-  "dwarfrangers": {
-   "magic": "dwarfRunes",
-   "skills": "dthSkills"
+  "bretonnian": {
+   "skills": "bretSkills"
   },
   "darkelves": {
    "magic": "darkElfMagic",
    "skills": "deSkills"
+  },
+  "dwarfrangers": {
+   "magic": "dwarfRunes",
+   "skills": "dthSkills"
   },
   "forestgoblins": {
    "magic": "forestGoblinMagic"
@@ -8803,16 +8866,28 @@
   "hochland": {
    "skills": "banditSkills"
   },
-  "outlaws": {
-   "magic": "prayersSigmar"
-  },
   "hornedhunters": {
    "magic": "prayersTaal",
    "skills": "hornedHunterSkills"
   },
+  "outriders": {
+   "skills": "cavalrySkills"
+  },
   "lizardmen": {
    "magic": "lizardmenMagic",
    "skills": "lizardSkills"
+  },
+  "norse": {
+   "skills": "norseSkills"
+  },
+  "outlaws": {
+   "magic": "prayersSigmar"
+  },
+  "pirates": {
+   "skills": "pirateSkills"
+  },
+  "pitfighters": {
+   "skills": "pitSkills"
   },
   "skavenpest": {
    "magic": "hornedRat",
@@ -8822,9 +8897,6 @@
    "magic": "lichePriest",
    "skills": "tgSkills"
   },
-  "amazons": {
-   "magic": "amazonRituals"
-  },
   "amazonslustria": {
    "magic": "amazonRituals",
    "skills": "amazonSkills"
@@ -8832,32 +8904,6 @@
   "shadowwarriors": {
    "magic": "shadowMagic",
    "skills": "swSkills"
-  },
-  "norse": {
-   "skills": "norseSkills"
-  },
-  "pirates": {
-   "skills": "pirateSkills"
-  },
-  "bretonnian": {
-   "skills": "bretSkills"
-  },
-  "woodelf": {
-   "magic": "woodlandIncantations",
-   "skills": "weSkills"
-  },
-  "pitfighters": {
-   "skills": "pitSkills"
-  },
-  "blackorcs": {
-   "skills": "blackOrcSkills"
-  },
-  "outriders": {
-   "skills": "cavalrySkills"
-  },
-  "maraudersofchaos": {
-   "magic": "marauderChaos",
-   "skills": "marauderSkills"
   },
   "sonsofhashut": {
    "magic": "chaosDwarfMagic"
@@ -8889,39 +8935,43 @@
  },
  "WBRACE": {
   "merc": "human",
+  "possessed": "human",
   "wh": "human",
   "sos": "human",
+  "undead": "human",
+  "skaven": "skaven",
+  "woodelf": "elf",
   "ostlander": "human",
+  "carnival": "human",
+  "dwarftreasure": "dwarf",
   "averland": "human",
+  "orcmob": "orc",
+  "beastmen": "gor",
   "maraudersofchaos": "human",
   "kislev": "human",
   "amazons": "human",
-  "amazonslustria": "human",
   "arabian": "human",
+  "blackorcs": "blackorc",
   "bretonnian": "human",
+  "darkelves": "elf",
+  "dwarfrangers": "dwarf",
+  "forestgoblins": "forestgoblin",
   "gunnery": "human",
   "hochland": "human",
+  "hornedhunters": "human",
   "outriders": "human",
+  "lizardmen": "saurus",
+  "mootlanders": "halfling",
   "norse": "human",
   "ostermark": "human",
   "outlaws": "human",
   "pirates": "human",
   "pitfighters": "human",
-  "tileans": "human",
-  "carnival": "human",
-  "hornedhunters": "human",
-  "possessed": "human",
-  "undead": "human",
-  "skaven": "skaven",
   "skavenpest": "skaven",
-  "dwarftreasure": "dwarf",
-  "dwarfrangers": "dwarf",
-  "woodelf": "elf",
-  "darkelves": "elf",
+  "tileans": "human",
+  "tombguardians": "tomblord",
+  "amazonslustria": "human",
   "shadowwarriors": "elf",
-  "beastmen": "gor",
-  "forestgoblins": "forestgoblin",
-  "mootlanders": "halfling",
   "sonsofhashut": "dwarf",
   "blackdwarfs": "dwarf",
   "battlemonks": "human",
@@ -8932,10 +8982,9459 @@
   "maneaters": "ogre",
   "caravans": "human",
   "nightgoblins": "goblin",
-  "restless": "human",
-  "orcmob": "orc",
-  "blackorcs": "blackorc",
-  "lizardmen": "saurus",
-  "tombguardians": "tomblord"
+  "restless": "human"
+ },
+ "WBHIRE": {
+  "merc": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "possessed": {
+   "align": "evil",
+   "tags": [
+    "possessed"
+   ]
+  },
+  "wh": {
+   "align": "good",
+   "tags": [
+    "wh"
+   ]
+  },
+  "sos": {
+   "align": "good",
+   "tags": [
+    "sos"
+   ]
+  },
+  "undead": {
+   "align": "evil",
+   "tags": [
+    "undead"
+   ]
+  },
+  "skaven": {
+   "align": "evil",
+   "tags": [
+    "skaven"
+   ]
+  },
+  "woodelf": {
+   "align": "neutral",
+   "tags": [
+    "goodElves"
+   ],
+   "elf": true,
+   "noChaosHS": true
+  },
+  "ostlander": {
+   "align": "good",
+   "only": [
+    "ogre"
+   ]
+  },
+  "carnival": {
+   "align": "evil",
+   "tags": [
+    "carnival"
+   ]
+  },
+  "dwarftreasure": {
+   "align": "good",
+   "dwarf": true,
+   "noElfHS": true
+  },
+  "averland": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "orcmob": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "beastmen": {
+   "align": "evil",
+   "tags": [
+    "beastmen"
+   ]
+  },
+  "maraudersofchaos": {
+   "align": "evil",
+   "only": [
+    "pitfighter",
+    "ogre",
+    "norseshaman",
+    "imperialassassin",
+    "warlock",
+    "witch",
+    "chaoscentaur",
+    "chaosfury"
+   ]
+  },
+  "kislev": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "amazons": {
+   "align": "neutral",
+   "none": true
+  },
+  "arabian": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "blackorcs": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "bretonnian": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "darkelves": {
+   "align": "evil",
+   "elf": true,
+   "tags": [
+    "goodElves"
+   ]
+  },
+  "dwarfrangers": {
+   "align": "good",
+   "dwarf": true,
+   "noElfHS": true
+  },
+  "forestgoblins": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "gunnery": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "hochland": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "hornedhunters": {
+   "align": "evil",
+   "tags": [
+    "beastmen"
+   ]
+  },
+  "outriders": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ],
+   "only": [
+    "freelancer",
+    "roadwarden"
+   ]
+  },
+  "lizardmen": {
+   "align": "neutral",
+   "only": [
+    "chameleonskink"
+   ]
+  },
+  "mootlanders": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "norse": {
+   "align": "neutral",
+   "tags": [
+    "merc"
+   ]
+  },
+  "ostermark": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "outlaws": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "pirates": {
+   "align": "neutral",
+   "tags": [
+    "merc"
+   ]
+  },
+  "pitfighters": {
+   "align": "neutral",
+   "except": [
+    "elfranger"
+   ]
+  },
+  "skavenpest": {
+   "align": "evil",
+   "tags": [
+    "skaven"
+   ]
+  },
+  "tileans": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "tombguardians": {
+   "align": "evil",
+   "tags": [
+    "undead"
+   ]
+  },
+  "amazonslustria": {
+   "align": "neutral",
+   "none": true
+  },
+  "shadowwarriors": {
+   "align": "neutral",
+   "elf": true,
+   "tags": [
+    "goodElves"
+   ],
+   "noChaosHS": true
+  },
+  "sonsofhashut": {
+   "align": "evil",
+   "dwarf": true,
+   "only": [
+    "ogre",
+    "pitfighter",
+    "warlock",
+    "imperialassassin",
+    "hobgoblinscout"
+   ],
+   "noElfHS": true
+  },
+  "blackdwarfs": {
+   "align": "evil",
+   "dwarf": true,
+   "only": [
+    "ogre",
+    "pitfighter",
+    "warlock",
+    "imperialassassin",
+    "hobgoblinscout"
+   ],
+   "noElfHS": true
+  },
+  "battlemonks": {
+   "align": "neutral",
+   "only": [
+    "cathayanmerchant",
+    "ninja",
+    "pyromaniac",
+    "swordsmith"
+   ]
+  },
+  "bretchapel": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "cppleasures": {
+   "align": "evil",
+   "none": true
+  },
+  "cavalcade": {
+   "align": "evil",
+   "none": true
+  },
+  "reavers": {
+   "align": "neutral",
+   "only": [
+    "ogre",
+    "trollslayer",
+    "tileanmarksman",
+    "beasthunter"
+   ]
+  },
+  "maneaters": {
+   "align": "neutral",
+   "only": [
+    "halfling",
+    "halflingthief",
+    "ogre",
+    "chaoscentaur",
+    "hobgoblinscout"
+   ]
+  },
+  "caravans": {
+   "align": "good",
+   "tags": [
+    "merc"
+   ]
+  },
+  "nightgoblins": {
+   "align": "evil",
+   "tags": [
+    "orcsgoblins"
+   ],
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "blackorcoverseer",
+    "goblinlanternbearer"
+   ]
+  },
+  "restless": {
+   "align": "evil",
+   "tags": [
+    "undead"
+   ],
+   "only": [
+    "bonegoliath",
+    "graverobber"
+   ]
+  }
+ },
+ "LISTS": {
+  "merc": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Wolfsumhang",
+     10,
+     {
+      "heroes": true,
+      "sub": [
+       "midd"
+      ]
+     }
+    ]
+   ]
+  },
+  "marksman": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Jagdgewehr",
+     200
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "possessed": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     15
+    ],
+    [
+     "Kurzbogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "wh": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Armbrustpistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "zealot": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "sos": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Sigmaritischer Kriegshammer",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Stahlpeitsche",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes (nur Heldinnen)": [
+    [
+     "Heiliger Foliant",
+     120
+    ],
+    [
+     "Geweihtes Wasser",
+     10
+    ],
+    [
+     "Heilige Reliquie",
+     15
+    ]
+   ]
+  },
+  "undead": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "ostlander": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "carnival": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     10
+    ],
+    [
+     "Bogen",
+     15
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "beastmen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Streitaxt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "darksouls": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "flagellant": {
+   "Nahkampf": [
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ]
+  },
+  "skavenHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Klageklingen (Paar)",
+     50
+    ],
+    [
+     "Kampfklauen (Paar)",
+     35
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ],
+    [
+     "Wurfsterne",
+     15
+    ],
+    [
+     "Blasrohr",
+     25
+    ],
+    [
+     "Warpschloss-Pistole",
+     35
+    ],
+    [
+     "Warpschloss-Pistolenpaar",
+     70
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "skavenHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "weHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Ithilmar-Schwert",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Speer",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Zweihandwaffe",
+     30,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Elfenbogen",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Ithilmar-Rüstung",
+     60,
+     {
+      "start": true
+     }
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Elfenumhang",
+     75
+    ],
+    [
+     "Elfenwein",
+     50
+    ],
+    [
+     "Jagdpfeile",
+     35
+    ]
+   ]
+  },
+  "weScout": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Elfenbogen",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Elfenumhang",
+     75
+    ],
+    [
+     "Elfenwein",
+     50
+    ],
+    [
+     "Jagdpfeile",
+     35
+    ]
+   ]
+  },
+  "ostRuffian": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "ostJaeger": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Doppelläufige Pistole",
+     30
+    ],
+    [
+     "Doppelläufiges Pistolenpaar",
+     60
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Jagdgewehr",
+     200
+    ],
+    [
+     "Doppelläufiges Jagdgewehr",
+     300
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "ostOgre": {
+   "Nahkampf": [
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "carnivalBrute": {
+   "Nahkampf": [
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Flegel",
+     10
+    ]
+   ]
+  },
+  "dwarfWarrior": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zwergenaxt",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Gromril-Rüstung",
+     75,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "dwarfThunderer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "avMountain": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Morgenstern",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "avMarksman": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Jagdgewehr",
+     200
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "avScout": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     35
+    ]
+   ]
+  },
+  "avHalfling": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "orcList": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben/Knüppel",
+     3
+    ],
+    [
+     "Streitaxt",
+     5
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "goblinList": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Eisenkugel & Kette",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Squig-Treiber",
+     15
+    ],
+    [
+     "Mad-Cap-Pilze",
+     25
+    ]
+   ]
+  },
+  "ungorList": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Streitaxt",
+     5
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "marChaosHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Barbed Whip",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Great Axe",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse",
+     40,
+     {
+      "sub": [
+       "hung"
+      ]
+     }
+    ]
+   ]
+  },
+  "marChaosHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Wurfäxte",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "kislevWarrior": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Wurfmesser",
+     15
+    ],
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "streltsi": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "amHeroine": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Klaue der Alten",
+     30
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Sonnenstab",
+     50
+    ],
+    [
+     "Sonnenhandschuh",
+     40
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Amulett des Mondes",
+     50
+    ],
+    [
+     "Heilkräuter",
+     35
+    ]
+   ]
+  },
+  "amHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ]
+  },
+  "amScout": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     5
+    ],
+    [
+     "Wurfspeere",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ]
+  },
+  "arabWarrior": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert (Scimitar)",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Tufenk",
+     15
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "arabSlave": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Katar",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "blackorc": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Choppa",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "blackorcHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Choppa",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "boHenchB": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Choppa",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "boHenchS": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Choppa",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "bretKnight": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Lanze",
+     20
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Warhorse",
+     80
+    ]
+   ]
+  },
+  "bretSquire": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Pferd",
+     40
+    ]
+   ]
+  },
+  "bretMaa": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "bretBow": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Axt",
+     5
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "de": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Repetierarmbrust",
+     35
+    ],
+    [
+     "Armbrustpistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Seedrachenumhang",
+     50
+    ],
+    [
+     "Dunkles Gift",
+     15,
+     {
+      "heroes": true
+     }
+    ]
+   ]
+  },
+  "deBeast": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Beastlash",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Repetierarmbrust",
+     35
+    ],
+    [
+     "Armbrustpistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Seedrachenumhang",
+     50
+    ],
+    [
+     "Dunkles Gift",
+     15,
+     {
+      "heroes": true
+     }
+    ]
+   ]
+  },
+  "deShades": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Repetierarmbrust",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "dwarfRanger": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Zwergenaxt",
+     15
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Gromril-Rüstung",
+     75,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "dwarfRangerXbow": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "fgHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     5
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Boss Pole",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Blasrohr",
+     25
+    ],
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "fgHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     5
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Blasrohr",
+     25
+    ],
+    [
+     "Wurfwaffen",
+     15
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "gsnSchool": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     10
+    ],
+    [
+     "Pistolenpaar",
+     20
+    ],
+    [
+     "Doppelläufige Pistole",
+     20
+    ],
+    [
+     "Duellpistole",
+     20
+    ],
+    [
+     "DL-Duellpistole",
+     35
+    ],
+    [
+     "Handfeuerwaffe",
+     25
+    ],
+    [
+     "DL-Handfeuerwaffe",
+     45
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Superior Black Powder",
+     25
+    ]
+   ]
+  },
+  "gsnMarks": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     10
+    ],
+    [
+     "Pistolenpaar",
+     20
+    ],
+    [
+     "Doppelläufige Pistole",
+     20
+    ],
+    [
+     "Repetierpistole",
+     25
+    ],
+    [
+     "Donnerbüchse",
+     20
+    ],
+    [
+     "Handfeuerwaffe",
+     25
+    ],
+    [
+     "DL-Handfeuerwaffe",
+     45
+    ],
+    [
+     "Repetier-Handfeuerwaffe",
+     50
+    ],
+    [
+     "Jagdgewehr",
+     100
+    ],
+    [
+     "Hand-Mörser",
+     70
+    ],
+    [
+     "Tauben-Bomben",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Superior Black Powder",
+     25
+    ]
+   ]
+  },
+  "gsnInstr": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     10
+    ],
+    [
+     "Pistolenpaar",
+     20
+    ],
+    [
+     "Doppelläufige Pistole",
+     20
+    ],
+    [
+     "Duellpistole",
+     20
+    ],
+    [
+     "DL-Duellpistole",
+     35
+    ],
+    [
+     "Repetierpistole",
+     25
+    ],
+    [
+     "Donnerbüchse",
+     20
+    ],
+    [
+     "Handfeuerwaffe",
+     25
+    ],
+    [
+     "DL-Handfeuerwaffe",
+     45
+    ],
+    [
+     "Jagdgewehr",
+     100
+    ],
+    [
+     "Repetier-Handfeuerwaffe",
+     50
+    ],
+    [
+     "Hand-Mörser",
+     70
+    ],
+    [
+     "Tauben-Bomben",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Superior Black Powder",
+     25
+    ]
+   ]
+  },
+  "banditEq": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Wurfäxte",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "banditDuelist": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Rapier",
+     15
+    ],
+    [
+     "Main Gauche",
+     7
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     20
+    ],
+    [
+     "Pistolenpaar",
+     40
+    ],
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     10
+    ]
+   ]
+  },
+  "banditCoward": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ]
+   ]
+  },
+  "banditPoacher": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "hhHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     5
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Toughened Leathers",
+     5
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     20
+    ],
+    [
+     "Blessed Stag Hide",
+     40
+    ],
+    [
+     "Trip Wire",
+     15
+    ]
+   ]
+  },
+  "hhHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     5
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Toughened Leathers",
+     5
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "ioKnight": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Lanze",
+     40
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Ithilmar-Rüstung",
+     90
+    ],
+    [
+     "Gromril-Rüstung",
+     150
+    ],
+    [
+     "Barding",
+     80
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse (Upgrade)",
+     40
+    ]
+   ]
+  },
+  "ioOutrider": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Lanze",
+     40
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Ithilmar-Rüstung",
+     90
+    ],
+    [
+     "Gromril-Rüstung",
+     150
+    ],
+    [
+     "Barding",
+     80
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse (Upgrade)",
+     40
+    ]
+   ]
+  },
+  "ioChasseur": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Lanze",
+     40
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Ithilmar-Rüstung",
+     90
+    ],
+    [
+     "Gromril-Rüstung",
+     150
+    ],
+    [
+     "Barding",
+     80
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "ioScout": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Lanze",
+     40
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Wurfmesser",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Ithilmar-Rüstung",
+     90
+    ],
+    [
+     "Gromril-Rüstung",
+     150
+    ],
+    [
+     "Barding",
+     80
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "lizSaurus": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Knochenhelm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Übergroße Kiefer",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ]
+   ]
+  },
+  "lizSkinkPr": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bolas",
+     5
+    ],
+    [
+     "Javelin",
+     10
+    ],
+    [
+     "Wurfmesser",
+     15
+    ],
+    [
+     "Blasrohr",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Knochenhelm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Giftdrüsen",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Dunkles Gift für Geschosse",
+     20,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Schwarzer Lotus für Geschosse",
+     10,
+     {
+      "heroes": true
+     }
+    ]
+   ]
+  },
+  "lizSkink": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bolas",
+     5
+    ],
+    [
+     "Javelin",
+     10
+    ],
+    [
+     "Wurfmesser",
+     15
+    ],
+    [
+     "Blasrohr",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Giftdrüsen",
+     40,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Mal der Alten",
+     50,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Dunkles Gift für Geschosse",
+     20,
+     {
+      "heroes": true
+     }
+    ],
+    [
+     "Schwarzer Lotus für Geschosse",
+     10,
+     {
+      "heroes": true
+     }
+    ]
+   ]
+  },
+  "lizSkinkHen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bolas",
+     5
+    ],
+    [
+     "Javelin",
+     10
+    ],
+    [
+     "Wurfmesser",
+     15
+    ],
+    [
+     "Blasrohr",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Reptiliengift",
+     5
+    ]
+   ]
+  },
+  "mootHalfling": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ],
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Kochtopf-Helm",
+     8
+    ]
+   ]
+  },
+  "mootElder": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ],
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Pistole",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Kochtopf-Helm",
+     8
+    ]
+   ]
+  },
+  "mootChef": {
+   "Nahkampf": [
+    [
+     "Küchenmesser",
+     2
+    ],
+    [
+     "Hackbeil",
+     3
+    ],
+    [
+     "Schöpfkelle",
+     2
+    ],
+    [
+     "Fleischklopfer",
+     3
+    ]
+   ]
+  },
+  "norseHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Wurfäxte",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "norseHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Wurfäxte",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "norseHunter": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Javelin",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "outlawEq": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     30
+    ],
+    [
+     "Forest Cloak",
+     50
+    ]
+   ]
+  },
+  "outlawMark": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     30
+    ]
+   ]
+  },
+  "outlawHen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Stab/Knüppel",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "pirateEq": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer/Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Boat Hook",
+     8
+    ],
+    [
+     "Cat O'Nine Tails",
+     8
+    ],
+    [
+     "Cutlass (Schwert)",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Belaying Pin",
+     3
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Toughened Leathers",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "pirateHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer/Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Boat Hook",
+     8
+    ],
+    [
+     "Cutlass (Schwert)",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Belaying Pin",
+     3
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Toughened Leathers",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "pirateGunner": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer/Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Cutlass (Schwert)",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Swivel Gun",
+     65
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Toughened Leathers",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Swivel Gun: Ball Shot",
+     5
+    ],
+    [
+     "Swivel Gun: Chain Shot",
+     2
+    ],
+    [
+     "Swivel Gun: Grape Shot",
+     2
+    ]
+   ]
+  },
+  "pirateSwab": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer/Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Boat Hook",
+     8
+    ],
+    [
+     "Cutlass (Schwert)",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Belaying Pin",
+     3
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Toughened Leathers",
+     5
+    ]
+   ]
+  },
+  "pfStyle": {
+   "Besonderes": [
+    [
+     "Orc-Stil (Helm/Dolch/Axt/Schild)",
+     20
+    ],
+    [
+     "Untoten-Stil (Helm/Dolch/Stachelh./Schwert)",
+     35
+    ],
+    [
+     "Empire-Stil (Helm/Dolch/Zweihandw./Leichte R.)",
+     45
+    ],
+    [
+     "Chaos-Stil (Helm/Dolch/Flegel/Schild/Leichte R.)",
+     50
+    ]
+   ]
+  },
+  "pfPursuer": {
+   "Besonderes": [
+    [
+     "Skink-Stil (Helm/Dolch/Dreizack o. Javelins/Netz o. Buckler)",
+     25
+    ],
+    [
+     "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)",
+     30
+    ]
+   ]
+  },
+  "pfOgre": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Stachelhandschuh",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "pfSlayer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Zwergenaxt",
+     15
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Stachelhandschuh",
+     15
+    ]
+   ]
+  },
+  "skvpHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Disease Dagger",
+     15
+    ],
+    [
+     "Censer",
+     40
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "skvpHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "tileanEq": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Pike",
+     12
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Rapier",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ]
+  },
+  "tileanMarks": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Hunting Rifle",
+     200
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "tgUndead": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "tgLord": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Nehekharan-Javelin",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Asp-Pfeile",
+     10
+    ]
+   ]
+  },
+  "tgLiche": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Stab",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Schlangenstab",
+     30
+    ]
+   ]
+  },
+  "tgAcolyte": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Stab",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ]
+   ]
+  },
+  "amazLHeroine": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Starblade",
+     15
+    ],
+    [
+     "Starsword",
+     30
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Sunstaff (Lustria)",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Enchanted Skins",
+     20
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Amulet of the Moon",
+     50
+    ],
+    [
+     "Healing Herbs",
+     35
+    ]
+   ]
+  },
+  "amazLHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Sunstaff (Lustria)",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Enchanted Skins",
+     20
+    ]
+   ]
+  },
+  "amazLJaguar": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     5
+    ],
+    [
+     "Bolas",
+     5
+    ],
+    [
+     "Javelins",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Sunstaff (Lustria)",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Enchanted Skins",
+     20
+    ]
+   ]
+  },
+  "swHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Ithilmar-Schwert",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Speer",
+     20,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ],
+    [
+     "Ithilmar-Zweihandwaffe",
+     30,
+     {
+      "start": true,
+      "later": "Ithilmar-Waffe"
+     }
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Elfenbogen",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Ithilmar-Rüstung",
+     60,
+     {
+      "start": true
+     }
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Standarte von Nagarythe",
+     75,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Kriegshorn von Nagarythe",
+     25,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Elfenumhang",
+     75
+    ],
+    [
+     "Elfenwein",
+     50,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Elfenrunensteine",
+     50,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "swEq": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Elfenbogen",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Elfenumhang",
+     75
+    ]
+   ]
+  },
+  "cdHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Zharr-Obsidianwaffe",
+     30,
+     {
+      "start": true
+     }
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "cdBlunder": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Donnerbüchse",
+     40
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "cdHobgob": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Vergiftete Dolche",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ]
+   ]
+  },
+  "bdHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Engine of Chaos",
+     125,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "bdSorc": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Mechanischer Anzug",
+     175,
+     {
+      "start": true
+     }
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Engine of Chaos",
+     125,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "bdGaoler": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Stahlpeitsche",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Fangstange",
+     25
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Engine of Chaos",
+     125,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "bdBull": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Engine of Chaos",
+     125,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "bdInformer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "bmSoldier": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Drachenschwert",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "bmEmissary": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Drachenschwert",
+     20
+    ],
+    [
+     "Kathay-Langschwert",
+     75
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Kathay-Seidenumhang",
+     40
+    ],
+    [
+     "Pferd",
+     30
+    ]
+   ]
+  },
+  "bmOfficer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Drachenschwert",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ],
+    [
+     "Handfeuerwaffe",
+     35
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ]
+  },
+  "bmMonk": {
+   "Nahkampf": [
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Kampfstab",
+     15
+    ],
+    [
+     "Drachenschwert",
+     20
+    ],
+    [
+     "Kettenstäbe",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Angelhaken",
+     10
+    ],
+    [
+     "Wurfsterne",
+     15
+    ]
+   ]
+  },
+  "bmPeasant": {
+   "Nahkampf": [],
+   "Fernkampf": [],
+   "Rüstung": []
+  },
+  "bcKnight": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Breitschwert",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Lanze",
+     20
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Kiteschild",
+     10
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Barding",
+     30
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse",
+     80
+    ],
+    [
+     "Lucky charm",
+     10
+    ]
+   ]
+  },
+  "bcQuesting": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Breitschwert",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Flegel",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Kiteschild",
+     10
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Barding",
+     30
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Warhorse",
+     80
+    ],
+    [
+     "Lucky charm",
+     10
+    ]
+   ]
+  },
+  "bcDamsel": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Kurzschwert",
+     7
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Pferd",
+     40
+    ]
+   ]
+  },
+  "bcPilgrim": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Kurzschwert",
+     7
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Gral-Reliquie",
+     25
+    ]
+   ]
+  },
+  "bcBow": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Kurzschwert",
+     7
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "bcSquire": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Kurzschwert",
+     7
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Pferd",
+     40
+    ]
+   ]
+  },
+  "cppHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hedonisten-Peitsche",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     15
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ],
+    [
+     "Armbrustpistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Purpurschatten",
+     35
+    ]
+   ]
+  },
+  "cppWhip": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hedonisten-Peitsche",
+     15
+    ],
+    [
+     "Slaaneshi-Fangstange",
+     30
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     15
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ],
+    [
+     "Armbrustpistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Purpurschatten",
+     35
+    ]
+   ]
+  },
+  "cppHen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Bogen",
+     15
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ],
+    [
+     "Armbrustpistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Purpurschatten",
+     35
+    ]
+   ]
+  },
+  "cppWretch": {
+   "Nahkampf": [
+    [
+     "Dolch",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ]
+  },
+  "ccArist": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Misericordia",
+     5
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Eberspeer",
+     30
+    ],
+    [
+     "Lanze",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Kathay-Seidenpanzer",
+     15
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Überlegenes Schwarzpulver",
+     30
+    ],
+    [
+     "Nightmare",
+     30,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Raubvogel",
+     30
+    ]
+   ]
+  },
+  "ccHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Misericordia",
+     5
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Lanze",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Langbogen",
+     15
+    ],
+    [
+     "Duellpistole",
+     25
+    ],
+    [
+     "Duellpistolenpaar",
+     50
+    ],
+    [
+     "Hochland-Langbüchse",
+     200
+    ],
+    [
+     "Donnerbüchse",
+     30
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Überlegenes Schwarzpulver",
+     30
+    ]
+   ]
+  },
+  "ccPiper": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Misericordia",
+     5
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Lanze",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Duellpistole",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "ccThrall": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ],
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "lrHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Misericordia",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Lanze",
+     40
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Javelin",
+     10
+    ],
+    [
+     "Wurfmesser",
+     15
+    ],
+    [
+     "Blasrohr",
+     15
+    ],
+    [
+     "Pistole",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     10
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Seil & Haken",
+     5
+    ],
+    [
+     "Purpurschatten",
+     35
+    ],
+    [
+     "Dunkles Gift",
+     30
+    ],
+    [
+     "Netz",
+     5
+    ],
+    [
+     "Warhorse",
+     80
+    ],
+    [
+     "Warhound",
+     20
+    ]
+   ]
+  },
+  "lrSlayer": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Misericordia",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Lanze",
+     40
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Javelin",
+     10
+    ],
+    [
+     "Wurfmesser",
+     15
+    ],
+    [
+     "Blasrohr",
+     15
+    ],
+    [
+     "Pistole",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     10
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Buckler",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Seil & Haken",
+     5
+    ],
+    [
+     "Purpurschatten",
+     35
+    ],
+    [
+     "Dunkles Gift",
+     30
+    ],
+    [
+     "Netz",
+     5
+    ],
+    [
+     "Warhorse",
+     80
+    ],
+    [
+     "Warhound",
+     20
+    ],
+    [
+     "Echsenhaut-Umhang",
+     10,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Schädelmaske",
+     15,
+     {
+      "start": true
+     }
+    ],
+    [
+     "Slann-Kopfschmuck",
+     35,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "lrProspect": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schild",
+     10
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "mOgre": {
+   "Nahkampf": [
+    [
+     "Cleaver",
+     5
+    ],
+    [
+     "Ogerkeule",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Eisenfaust",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Handmörser",
+     70
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Gnoblar-Kämpfer",
+     15
+    ],
+    [
+     "Lookout-Gnoblar",
+     20
+    ],
+    [
+     "Luck-Gnoblar",
+     25
+    ],
+    [
+     "Sword-Gnoblar",
+     30
+    ]
+   ]
+  },
+  "mOgreCapt": {
+   "Nahkampf": [
+    [
+     "Cleaver",
+     5
+    ],
+    [
+     "Ogerkeule",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Morgenstern",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Eisenfaust",
+     15
+    ],
+    [
+     "Kathay-Langschwert",
+     75
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Handmörser",
+     70
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Gnoblar-Kämpfer",
+     15
+    ],
+    [
+     "Lookout-Gnoblar",
+     20
+    ],
+    [
+     "Luck-Gnoblar",
+     25
+    ],
+    [
+     "Sword-Gnoblar",
+     30
+    ]
+   ]
+  },
+  "mGuide": {
+   "Nahkampf": [
+    [
+     "Cleaver",
+     5
+    ],
+    [
+     "Ogerkeule",
+     10
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Harpunenarmbrust",
+     50
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "mcHero": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Rapier",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Kathay-Seidenumhang",
+     40
+    ]
+   ]
+  },
+  "mcKnight": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Rapier",
+     15
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Drachenschwert",
+     20
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Pistolenpaar",
+     30
+    ],
+    [
+     "Duellpistole",
+     30
+    ],
+    [
+     "Duellpistolenpaar",
+     60
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Kathay-Seidenumhang",
+     40
+    ],
+    [
+     "Warhorse",
+     40,
+     {
+      "start": true
+     }
+    ]
+   ]
+  },
+  "mcHench": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Pike",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "mcHenchM": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "mcCathay": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Drachenschwert",
+     20
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "ngList": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ]
+   ]
+  },
+  "ngFanatic": {
+   "Nahkampf": [
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Eisenkugel & Kette",
+     15
+    ],
+    [
+     "Death-Cap-Dolche",
+     25
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Mad cap mushrooms",
+     25
+    ]
+   ]
+  },
+  "rdList": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ]
+  },
+  "rdLiche": {
+   "Rüstung": [
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ],
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ]
+   ]
+  }
+ },
+ "SKILLSETS": {
+  "amazonSkills": {
+   "name": "Amazon Skills",
+   "note": "Amazon Heroines (instead of the standard skill tables).",
+   "skills": [
+    [
+     "Skink Hunter",
+     "Always strikes first in the first close-combat round against Skinks (regardless of who charged)."
+    ],
+    [
+     "Elixir of Life",
+     "May re-roll one out-of-action roll after the battle (the second result stands)."
+    ],
+    [
+     "Mesmerising Dance",
+     "Enemy in base contact: Ld test at the start of each turn, otherwise it cannot attack (defence only). Useless against Lizardmen/Undead."
+    ],
+    [
+     "Savage Fury",
+     "+1 A when charging; immune to charm effects and fear."
+    ],
+    [
+     "Concealment",
+     "Hidden in jungle terrain: Enemies halve the distance at which they can spot her."
+    ]
+   ]
+  },
+  "tgSkills": {
+   "name": "Tomb Guardian Additional Skills",
+   "note": "Warband-specific additional skill (Academic).",
+   "skills": [
+    [
+     "Drive Chariot (Academic)",
+     "Chariots are very difficult to control and a warrior must have this skill to drive a chariot effectively in combat. A charioteer without this skill cannot charge. The Tomb Lord may learn it although it is Academic (Mordheimer inconsistency, played by intent: he is the obvious charioteer)."
+    ]
+   ]
+  },
+  "pitSkills": {
+   "name": "Pit Fighter Skills",
+   "note": "Pit Fighter Heroes (instead of the standard tables).",
+   "skills": [
+    [
+     "Bulging Biceps",
+     "Ignores the heavy-weapon penalty entirely — the Strength bonus (e.g. morning star) applies in every round."
+    ],
+    [
+     "Force of Will",
+     "On going OOA: Toughness test (−1 each subsequent round). On success he stands up and fights on (a 2nd OOA is final)."
+    ],
+    [
+     "Arms Master",
+     "Ignores all \"difficult to use\" rules — may e.g. combine a morning star + buckler, or two morning stars."
+    ],
+    [
+     "Body Slam",
+     "Instead of a normal charge, a shoulder slam: one attack at +1 S, +1 to hit, no weapon bonuses, criticals on 5+."
+    ],
+    [
+     "Grizzled Veteran",
+     "Immune to all psychology."
+    ]
+   ]
+  },
+  "cavalrySkills": {
+   "name": "Riding / Cavalry Skills",
+   "note": "Mounted warriors (e.g. Imperial Outriders) with the Ride skill.",
+   "skills": [
+    [
+     "Cavalry Commander",
+     "Mounted leader: Leadership radius +6\" (in addition to other bonuses)."
+    ],
+    [
+     "Trick Riding",
+     "Shooting against him −1; requires an Initiative test (otherwise loss of control). Not with heavy armour/shield/missile weapons."
+    ],
+    [
+     "Combat Riding",
+     "When charging an unmounted enemy: one extra S4 attack."
+    ],
+    [
+     "Evade",
+     "Always strikes first in close combat against dismounted enemies."
+    ],
+    [
+     "Running Dismount",
+     "Ride up to the mount's movement, then dismount at once (counts as a diving charge from 2\")."
+    ],
+    [
+     "Athletic Mount",
+     "Mount within 2\" and immediately make a full move/charge."
+    ],
+    [
+     "Horse Archer",
+     "Shoots at full gallop and in a 360° arc (additional −1 to hit)."
+    ],
+    [
+     "Mounted Combat Master",
+     "Against mounted enemies: A wounded enemy model gets +1 on its \"Whoa Boy!\" table."
+    ]
+   ]
+  },
+  "dthSkills": {
+   "name": "Dwarf Special Skills",
+   "note": "Dwarf Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Master of Blades (Combat Master)",
+     "When using a weapon with the Parry rule he parries on an equal or higher roll (not just higher). With two parrying weapons he may parry up to two attacks; with two Dwarf axes he may re-roll failed parries."
+    ],
+    [
+     "Extra Tough",
+     "When rolling on the Heroes' Serious Injury chart after being taken out of action, the dice may be re-rolled once (the second result must be accepted, even if worse)."
+    ],
+    [
+     "Resource Hunter",
+     "When rolling on the Exploration chart at the end of a game, he may modify one dice by +1/−1."
+    ],
+    [
+     "True Grit",
+     "When rolling on the Injury table for this Hero, 1–3 = knocked down, 4–5 = stunned, 6 = out of action."
+    ],
+    [
+     "Thick Skull",
+     "3+ save on a D6 to avoid being stunned (treat as knocked down instead). With a helmet this save is 2+ (replaces the normal helmet rule)."
+    ]
+   ]
+  },
+  "arabSkills": {
+   "name": "Arab Special Skills",
+   "note": "Arab Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Sand Worm",
+     "Can bury himself in sand and become almost undetectable: may hide in open ground. Cannot be used inside buildings."
+    ],
+    [
+     "Hit and Run",
+     "May run and shoot, but suffers −2 to hit instead of the −1 to hit for moving."
+    ],
+    [
+     "Weather Tolerant",
+     "Weather conditions such as heat no longer affect this model."
+    ]
+   ]
+  },
+  "bretSkills": {
+   "name": "Bretonnian Special Skills (Virtues)",
+   "note": "Bretonnian Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Virtue of Purity",
+     "His purity of heart resists enemy magic: any spell cast against the Knight is dispelled on a D6 roll of 4+."
+    ],
+    [
+     "Virtue of Valour",
+     "Against a model with a higher Strength than himself, he may re-roll any failed to-hit rolls in close combat."
+    ],
+    [
+     "Virtue of Discipline",
+     "Once per game, if he is not out of action, stunned or knocked down, you may re-roll a failed Rout test."
+    ],
+    [
+     "Virtue of Noble Disdain",
+     "Contempt for dishonourable weapons: subject to Hatred of all enemies armed with shooting weapons."
+    ],
+    [
+     "Virtue of Impetuous",
+     "Eager to get to grips: May add +D3\" to his move when charging (roll each time before moving)."
+    ]
+   ]
+  },
+  "deSkills": {
+   "name": "Dark Elf Special Skills",
+   "note": "Dark Elf Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Fury of Khaine",
+     "May make a 4\" follow-up move if he takes all of his opponents out of action."
+    ],
+    [
+     "Powerful Build",
+     "May choose skills from the Strength table from now on. The Sorceress may never take this skill; no more than two warriors in the warband may have it at one time."
+    ],
+    [
+     "Fey Quickness",
+     "Avoids melee or missile attacks on a roll of 6; with Step Aside or Dodge this improves to 4+ in the relevant area."
+    ],
+    [
+     "Infiltration",
+     "Exactly the same as the Skaven skill."
+    ],
+    [
+     "Master of Poisons",
+     "If the Hero doesn't search for rare items, he may make D3−1 doses of Dark Venom instead (must be used in the next battle; cannot be sold or traded)."
+    ]
+   ]
+  },
+  "weSkills": {
+   "name": "Wood Elf Special Skills",
+   "note": "Wood Elf Heroes with the Special skill list may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Fey",
+     "An understanding of magic: 4+ saving throw against hostile magic."
+    ],
+    [
+     "Elven Luck",
+     "The Elven gods favour him: Once per game he may re-roll any failed roll."
+    ],
+    [
+     "Excellent Sight (skill)",
+     "Can spot hidden enemy models up to 2× his Initiative in inches away."
+    ],
+    [
+     "Seeker",
+     "Expert tracker: May modify the result of one exploration die by +/−1. Only one Elven Hero may possess this skill."
+    ],
+    [
+     "Infiltration",
+     "Always deployed last, anywhere out of sight of the enemy. If both players infiltrate, roll D6 — lowest deploys first."
+    ]
+   ]
+  },
+  "skavenSkills": {
+   "name": "Skaven Special Skills",
+   "note": "Skaven Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Black Hunger",
+     "Declare at the start of his turn: +1 attack and +D3\" total move for the duration of his own turn, but suffers D3 S3 hits with no armour save at the end of the turn."
+    ],
+    [
+     "Tail Fighting",
+     "May wield a shield, knife or sword with his tail: an extra attack with the appropriate weapon, or a +1 bonus to his armour save."
+    ],
+    [
+     "Wall Runner",
+     "Needs no Initiative test when climbing walls and other sheer surfaces."
+    ],
+    [
+     "Infiltration",
+     "Always placed after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both players infiltrate, roll D6 — lowest sets up first."
+    ],
+    [
+     "Art of Silent Death",
+     "Fights with bare paws without penalties and counts as having two weapons (+1 attack); causes critical hits on a To Wound roll of 5–6. With Fighting Claws: +2 attacks instead of +1."
+    ]
+   ]
+  },
+  "pestilensSkills": {
+   "name": "Clan Pestilens Special Skills",
+   "note": "Members of Clan Pestilens may choose these skills instead of the standard ones.",
+   "skills": [
+    [
+     "Black Hunger",
+     "As the Skaven skill: +1 attack and +D3\" move for his turn; D3 S3 hits (no save) at the end of the turn."
+    ],
+    [
+     "Censer Bearer",
+     "Requires Black Hunger. Gains Frenzy; the only weapon he may use in close combat is a censer."
+    ],
+    [
+     "Rotten Body",
+     "Immune to poisons and diseases; if taken out of combat by a failed censer test he does not roll for injuries (recovers automatically)."
+    ],
+    [
+     "Contagious",
+     "Requires Rotten Body. A model that takes the bearer out of action in close combat must take a Toughness test (D6): if the roll is higher than its Toughness it suffers an automatic wound (a 6 always wounds). Undead/Possessed never test."
+    ],
+    [
+     "Ignore Pain",
+     "Requires the Resilient skill. Treats Stunned injuries as Knocked Down."
+    ]
+   ]
+  },
+  "slayerSkills": {
+   "name": "Troll Slayer Skills",
+   "note": "Dwarf Slayers may use this list as well as any standard skill tables available to them.",
+   "skills": [
+    [
+     "Ferocious Charge",
+     "May double his attacks in the turn he charges; suffers −1 to hit that turn."
+    ],
+    [
+     "Monster Slayer",
+     "Always wounds any opponent on a roll of 4+, regardless of Toughness (unless his own Strength would mean a lower roll is needed)."
+    ],
+    [
+     "Berserker",
+     "+1 to his close-combat to-hit rolls during the turn he charges."
+    ]
+   ]
+  },
+  "pirateSkills": {
+   "name": "Pirate Special Skills",
+   "note": "Pirate Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Sea Shanty Singer",
+     "At the start of his close-combat phase he may burst into song: one opponent in base contact must pass a Ld test or lose 1 Attack that turn. No effect on Undead or other non-living creatures (e.g. Possessed)."
+    ],
+    [
+     "Sea Legs",
+     "If he Falls, he may ignore the D3 hits on a single roll of 4+. If knocked down or stunned within 1\" of a precipice, he may re-roll the Initiative test to avoid falling."
+    ],
+    [
+     "Cutlass Master",
+     "With a Sword he parries already on an equal roll (not just higher) — but only when not in the open (in cover, in a building, or within 2\" of a terrain feature)."
+    ],
+    [
+     "Booming Voice",
+     "Captain only: Once per turn, one pirate within 8\" who failed a test to flee combat (or to stop fleeing) may re-roll it. The Captain must be on his feet and not in close combat himself."
+    ],
+    [
+     "Hardy Constitution",
+     "May ignore any Critical Hit on a roll of 5+ (the wound is then treated as normal)."
+    ],
+    [
+     "Swashbuckler",
+     "At the end of any close-combat phase while in base contact with enemies, he may take a Ld test: If passed, he makes a normal move away (no run/charge) without the enemy striking blows."
+    ]
+   ]
+  },
+  "norseSkills": {
+   "name": "Norse Special Skills",
+   "note": "Norse Heroes with the Special skill list may use this list instead of the normal ones.",
+   "skills": [
+    [
+     "Shield Master",
+     "When armed with a shield he may parry with it in addition to getting the 6+ save."
+    ],
+    [
+     "Berserk Charge",
+     "When armed with an axe or double-handed weapon, he may re-roll all failed to-hit rolls when he charges."
+    ],
+    [
+     "Crushing Blow",
+     "No enemy may parry an attack made by this hero — it strikes with such power that it pushes right through a buckler or sword."
+    ],
+    [
+     "Battle Tongue",
+     "Leader only: Models within 12\" may use his Leadership (instead of the normal 6\")."
+    ],
+    [
+     "Barbarian Courage",
+     "Never needs to take All Alone tests and may re-roll failed Fear tests."
+    ]
+   ]
+  },
+  "swSkills": {
+   "name": "Shadow Warrior Special Skills",
+   "note": "Shadow Warrior Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Infiltration",
+     "Exactly the same as the Skaven skill: Always placed after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both players infiltrate, roll D6 — lowest sets up first."
+    ],
+    [
+     "See in Shadows",
+     "May always roll to charge opponents he cannot see (instead of the normal 4\"), as long as he has the movement to reach them."
+    ],
+    [
+     "Hide in Shadows",
+     "An enemy attempting to detect him while he is Hidden must halve its Initiative before measuring the distance."
+    ],
+    [
+     "Sniper",
+     "If Hidden, may shoot or cast spells and remain Hidden. If the target is not taken out of action, it tests against its Initiative — on a success the Sniper is spotted and no longer hidden."
+    ],
+    [
+     "Powerful Build",
+     "May choose skills from the Strength table from now on. Not for Shadow Weavers; only two members of the warband may ever have this skill at one time."
+    ],
+    [
+     "Master of Runes",
+     "Shadow Weaver only: +1 to his Dispel roll with Elven Runestones. May also inscribe one warrior's gear with runes: that warrior may re-roll a single failed armour save or Parry once per battle (must be redone after each battle)."
+    ]
+   ]
+  },
+  "sosSkills": {
+   "name": "Sisters of Sigmar Special Skills",
+   "note": "Sisters of Sigmar may use this list instead of the standard skill lists.",
+   "skills": [
+    [
+     "Sign of Sigmar",
+     "Possessed or Undead opponents lose their first attack against the Sister in the first round of close combat (down to a minimum of 1)."
+    ],
+    [
+     "Protection of Sigmar",
+     "Any spell which would affect her is nullified on a D6 roll of 4+. A nullified spell does not affect any other models either."
+    ],
+    [
+     "Utter Determination",
+     "Matriarch only: May re-roll any failed Rout tests."
+    ],
+    [
+     "Righteous Fury",
+     "Hates all Skaven, Undead, Possessed, Beastmen, Dark Elves and any other evil warband (and all models in them). Non-Chaos humans who merely kill and loot are not included."
+    ],
+    [
+     "Absolute Faith",
+     "May re-roll any Fear tests and does not have to test if fighting alone against several opponents."
+    ]
+   ]
+  },
+  "ostlanderSkills": {
+   "name": "Ostlander Special Skills",
+   "note": "Ostlander Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Bull Rush",
+     "When charging, may attempt to knock down the opponent instead of his normal attacks: one to-hit roll at +1; no wound roll — on a hit the opposing model is Knocked Down."
+    ],
+    [
+     "Foul Odour",
+     "Reeks of alcohol: All living enemies (not Undead/Possessed) are at −1 to hit him in close combat. May not carry open flames; fire attacks against him are at +1 Strength."
+    ],
+    [
+     "Taunt",
+     "In the shooting phase, instead of shooting/casting: one visible enemy (LOS rules as shooting) takes a Ld test — if failed it must spend its next movement phase trying to get into close combat with the taunter."
+    ],
+    [
+     "Animal Friendship",
+     "'Normal' animals never attack him; up to two wardogs he owns do not count against the warband's maximum size."
+    ],
+    [
+     "Blood Oath",
+     "Leader only: May re-roll a single Rout test once per game."
+    ]
+   ]
+  },
+  "beastmenSkills": {
+   "name": "Beastmen Special Skills",
+   "note": "Beastmen Heroes may use this list instead of the standard skill lists available to them.",
+   "skills": [
+    [
+     "Shaggy Hide",
+     "The Beastman's massively shaggy hide acts as armour: 6+ armour save that can be combined with other armour as normal."
+    ],
+    [
+     "Mutant",
+     "The Beastman may buy one mutation (see the Possessed mutations)."
+    ],
+    [
+     "Fearless",
+     "Immune to fear and All Alone tests."
+    ],
+    [
+     "Horned One",
+     "Mighty horns: May make an additional attack with his basic Strength in a turn he charges."
+    ],
+    [
+     "Bellowing Roar",
+     "Beastman Chief only: May re-roll any failed Rout tests."
+    ],
+    [
+     "Manhater",
+     "Affected by the rules of hatred when fighting any Human warbands."
+    ]
+   ]
+  },
+  "orcSkills": {
+   "name": "Orc Special Skills",
+   "note": "Orc Heroes (Orc Mob) may use this list instead of any standard list available to them.",
+   "skills": [
+    [
+     "'Ard 'Ead",
+     "Special 3+ save on a D6 to avoid being stunned (treat as knocked down instead). With a helmet this save is 2+ (replaces the normal helmet rule)."
+    ],
+    [
+     "Waaagh!",
+     "Expert at bulldozing charges: May add +D3\" to his charge range."
+    ],
+    [
+     "'Ere We Go!",
+     "May ignore Fear tests when charging."
+    ],
+    [
+     "Da Cunnin' Plan",
+     "Boss only. The warband may re-roll any failed Rout test as long as the Boss is not out of action."
+    ],
+    [
+     "Well 'Ard",
+     "Thick, dark-green skin (possibly Black Orc blood): may add +1 to any armour saves."
+    ],
+    [
+     "'Eadbasher",
+     "Massive strength, aims at heads: any knocked down results the Orc causes in close combat count as stunned instead."
+    ]
+   ]
+  },
+  "blackOrcSkills": {
+   "name": "Black Orc Special Skills",
+   "note": "Black Orc Heroes may use this list instead of the standard skill lists available to them.",
+   "skills": [
+    [
+     "Proven Warrior",
+     "This young warrior has proven himself worthy of his Black Orc heritage. This skill may only be taken by a Young'un with the Black Orc blood ability and 25 experience. Once he gains this skill, the model is now considered a full Black Orc Warrior (yet still retains the title of Young'un). He follows all the rules for Black Orcs and uses their equipment list and has access to the same skill lists as a Black Orc."
+    ],
+    [
+     "'Ard 'Ead",
+     "Special 3+ save on a D6 to avoid being stunned (treat as knocked down instead). With a helmet this save is 2+ (replaces the normal helmet rule)."
+    ],
+    [
+     "Waaagh!",
+     "May add +D3\" to his charge range."
+    ],
+    [
+     "'Ere We Go!",
+     "May ignore Fear tests when charging."
+    ],
+    [
+     "Da Cunnin' Plan",
+     "Boss only. The warband may re-roll any failed Rout test as long as the Boss is not out of action."
+    ],
+    [
+     "'Eadbasher",
+     "Any knocked down results the Orc causes in close combat count as stunned instead."
+    ]
+   ]
+  },
+  "hornedHunterSkills": {
+   "name": "Horned Hunter Special Skills",
+   "note": "Horned Hunter Heroes may use this list instead of any standard list available to them.",
+   "skills": [
+    [
+     "Master Trapper",
+     "Masterful trap setter: Trip wire range extends to 4\"; traps set by him trigger on 2+."
+    ],
+    [
+     "Infiltration",
+     "Always placed after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both players infiltrate, roll D6 — lowest sets up first."
+    ],
+    [
+     "Foul Odour",
+     "Reeks of alcohol and sweat: All living enemies (not Undead/Possessed) are at −1 to hit him in close combat. He may not carry open flames; fire attacks against him are at +1 Strength."
+    ],
+    [
+     "Animal Friendship",
+     "'Normal' animals (warhorses, warhounds, etc.) will never attack him; up to two wardogs he owns do not count against the warband's maximum size."
+    ],
+    [
+     "Pathfinder",
+     "Roll one additional D6 during the exploration phase. A warband may only contain one pathfinder."
+    ],
+    [
+     "Hide in Shadows",
+     "Crouches unseen in any cover: Enemies must halve their Initiative when attempting to find him while he is Hidden."
+    ]
+   ]
+  },
+  "marauderSkills": {
+   "name": "Marauder Skills",
+   "note": "Marauders of Chaos Heroes (instead of the standard skill tables).",
+   "skills": [
+    [
+     "Chosen of Chaos",
+     "The Hero counts as a Chaos Warrior: Uses the maximum profile for Warriors of Chaos (M4 WS8 BS8 S5 T5 W3 I8 A5 Ld9) and the Hero equipment list."
+    ],
+    [
+     "Tattooed Body",
+     "Leader only. The \"Eye of the Gods\" effect (Spawn/Mark) occurs already on 10+ (Norse leaders 11+)."
+    ],
+    [
+     "Sweeping Blow",
+     "If the Hero takes an enemy OOA with a double-handed weapon, he may immediately make an additional attack against another model in base contact. Requires Strongman."
+    ],
+    [
+     "Mutant",
+     "The Hero buys a mutation (see Possessed mutations). May be taken more than once. With the Mark of Onogal, a Blessing of Nurgle instead (except the Mark of Nurgle)."
+    ],
+    [
+     "Heart of the Warrior",
+     "Leader only. May re-roll failed Rout tests and is immune to fear and all-alone tests."
+    ]
+   ]
+  },
+  "banditSkills": {
+   "name": "Bandit Special Skills",
+   "note": "Hochland Bandit Heroes may use this list instead of any standard skill tables available to them.",
+   "skills": [
+    [
+     "Banditry",
+     "Instead of searching for rare equipment between games, roll a D6: 2-6 = D6+1 gold to the stash; on a 1 the robbery goes wrong (roll on the Serious Injury table as if taken Out of Action). Cannot be combined with the Huckster's Slick Operator."
+    ],
+    [
+     "Hide in Shadows",
+     "An enemy trying to detect this warrior while he is Hidden must halve his Initiative (round up) before measuring the spotting distance."
+    ],
+    [
+     "Jump Back",
+     "If in close combat (and not knocked down/stunned) at the start of his Movement phase, the warrior may make an Initiative test to leave combat: success moves him 1\" away (free) and he may then act normally; failure means he strikes last that round."
+    ],
+    [
+     "Sniper",
+     "While Hiding, the warrior may shoot or cast spells and still remain Hidden — not when firing a black-powder weapon."
+    ],
+    [
+     "Throw Voice",
+     "If an enemy tries to detect the Hidden bandit, roll a D6: on 4+ he stays undetected and Hidden."
+    ]
+   ]
+  },
+  "lizardSkinkSkills": {
+   "name": "Lizardmen Skills (Skinks)",
+   "note": "Skink Heroes may use this list instead of a standard list.",
+   "skills": [
+    [
+     "Infiltration",
+     "Expert at sneaking up on his prey: may set up anywhere on the table but no closer than 12\" to an enemy, and must start the game in hiding."
+    ],
+    [
+     "Great Hunter",
+     "Adept at making the most of cover: an additional −1 to hit the Skink while he is in cover (i.e. −2 in total)."
+    ]
+   ]
+  },
+  "lizardSaurusSkills": {
+   "name": "Lizardmen Skills (Saurus)",
+   "note": "Saurus Heroes may use this list instead of a standard list.",
+   "skills": [
+    [
+     "Bellowing Battle Roar",
+     "His roar is so deafening that enemy models in base contact suffer −1 to hit in the first round of combat against him."
+    ],
+    [
+     "Toughened Hide",
+     "Years of battle have hardened his hide: he is only taken out of action on a 6+."
+    ]
+   ]
+  },
+  "chaosDwarfSkills": {
+   "name": "Chaos Dwarf Skills",
+   "note": "Apprentice Sorcerer, Champions & Bull Centaur (instead of one of the standard tables).",
+   "skills": [
+    [
+     "True Grit",
+     "When rolling on the Injury table for this warrior, treat 1-3 as knocked down, 4-5 as stunned and only 6 as out of action."
+    ],
+    [
+     "Extra Tough",
+     "After the battle the warrior may re-roll one of his Serious Injury results; the second result stands."
+    ],
+    [
+     "Unlimited Hatred",
+     "The warrior Hates all enemies (re-roll missed to-hit rolls in the first turn of every close combat)."
+    ],
+    [
+     "Thick Skull",
+     "3+ save on a D6 to avoid being stunned (a stun becomes knocked down instead). With a helmet this save is 2+ and replaces the normal helmet rule."
+    ]
+   ]
+  },
+  "blackDwarfSkills": {
+   "name": "Chaos Dwarf Skills (Black Dwarfs)",
+   "note": "Sorcerer & Gaolers (instead of one of the standard tables).",
+   "skills": [
+    [
+     "Extra Tough",
+     "After a game in which he was taken out of action, the Hero may re-roll once on the Serious Injury chart; the second result stands even if worse."
+    ],
+    [
+     "Chaos Engineer",
+     "+3 when searching for Chaos Armour (incl. Mechanical Suits) or Obsidian Weapons, which he can craft himself; he ignores the Rarity and Gift of Chaos special rules. He may never wear Chaos Armour."
+    ],
+    [
+     "Thick Skull",
+     "3+ save on a D6 to avoid being stunned (a stun becomes knocked down). With a helmet this is 2+ and replaces the normal helmet rule."
+    ],
+    [
+     "Resource Hunter",
+     "When rolling on the Exploration chart at the end of a game, the Hero may modify one dice by +1/−1."
+    ],
+    [
+     "Tyrant",
+     "Leader only. The leader may re-roll a failed Rout test (as long as he is not knocked down or stunned); the new result stands even if worse. If the leader is taken out of action the warband must make an immediate Rout test."
+    ],
+    [
+     "True Grit",
+     "When rolling on the Injury table for this Hero, treat 1-3 as knocked down, 4-5 as stunned and only 6 as out of action."
+    ]
+   ]
+  },
+  "battleMonkSkills": {
+   "name": "Battle Monk Skills",
+   "note": "Emissary & Dragon Monks (instead of a standard table). The Emissary may only ever pick Warmonger.",
+   "skills": [
+    [
+     "Energy Focus",
+     "If fighting unarmed, the Hero may reduce his Attacks by −1 to gain +1 Strength in close combat. He may sacrifice any number of attacks this way."
+    ],
+    [
+     "Lightning Speed",
+     "The monk may triple his Movement when running or charging, and may run even when there are enemy models within 8\"."
+    ],
+    [
+     "Leap of Faith",
+     "Cannot be intercepted while charging. He may escape from combat by leaping away without an Ld test and may declare a leaping charge in the same turn."
+    ],
+    [
+     "Human Shield",
+     "If two or more models are in close combat with the monk, he may pass an Initiative test (after the first attacks, before the second) to grab the first model as a shield — the second model's attacks are then directed at that grabbed model instead."
+    ],
+    [
+     "Warmonger",
+     "The Emissary may take an Ld test before the battle; if passed, D3+1 Raging Peasants join for that game (may exceed the maximum). Each Peasant is then subject to Hatred for the battle."
+    ]
+   ]
+  },
+  "chapelKnightSkills": {
+   "name": "Knightly Skills",
+   "note": "Bretonnian Chapel Guard Knights (instead of the standard tables).",
+   "skills": [
+    [
+     "Renowned Virtue",
+     "The Knight may learn one Virtue from the Bretonnian Knight Virtues list. Renowned Virtue may only be taken once."
+    ],
+    [
+     "Questing Vow",
+     "Questing Knight only. When charging, charged by, or in combat with a fear-causing enemy, he may re-roll any one Leadership test (including Rout tests), accepting the second result."
+    ],
+    [
+     "Shield Bash",
+     "Each turn the Knight may make one extra attack with a shield or kite shield, made at −1 Strength and treated as a club."
+    ],
+    [
+     "Bulging Muscles",
+     "The Knight keeps the +1/+2 Strength bonus from Flails and Morning Stars after the first round of combat."
+    ],
+    [
+     "Untiring",
+     "Ignores movement penalties for wearing armour while on foot. Strength, axes, critical hits and similar modifiers cannot reduce his armour save below 5+, nor can it be ignored by any non-magical means."
+    ]
+   ]
+  },
+  "cavalcadeSkills": {
+   "name": "Cursed Cavalcade Special Skills",
+   "note": "Cursed Cavalcade Heroes may use these skills instead of any of the standard skill tables available to them.",
+   "skills": [
+    [
+     "Noblesse Oblige",
+     "Immune to fear, and stomps knocked-down opponents with his iron-shod boots: one additional attack at his own Strength against knocked-down opponents."
+    ],
+    [
+     "Torturer",
+     "Any model wounded (and not saved) in close combat by this Hero loses 1 point of Strength permanently for the rest of the battle."
+    ],
+    [
+     "Duelist",
+     "At the end of each close combat phase, the Duelist may force a non-large opponent he fights one-on-one to pass a Strength test or be pushed 2\" in a direction of the Duelist’s choice."
+    ]
+   ]
+  },
+  "ogreSkills": {
+   "name": "Ogres Special Skills",
+   "note": "Maneaters Heroes (instead of the standard lists).",
+   "skills": [
+    [
+     "Master of Arms",
+     "The Ogre may wield a Difficult to Use weapon and a hand weapon at the same time (but not two Difficult to Use weapons)."
+    ],
+    [
+     "Crude Belch",
+     "May unleash thunderous fumes on all enemies engaged with him: those that fail an Ld test suffer −1 to hit for the turn. He must wait until a new enemy engages him before doing it again."
+    ],
+    [
+     "Maneater",
+     "Immediately learn one skill from the Shooting or Academic lists (once only; not available to the Mountain Guide)."
+    ],
+    [
+     "Bull Charge",
+     "When charging, may make a single attack at +1 to hit instead of his normal attacks; if it hits, the target is automatically knocked down."
+    ],
+    [
+     "Dog of War",
+     "Leader only. The warband may hire Hired Swords available to Mercenaries; if the leader dies, all such Hired Swords are removed."
+    ],
+    [
+     "Bellowing Roar",
+     "Leader only. Re-roll the first failed Rout test of each battle."
+    ]
+   ]
+  },
+  "merchantSkills": {
+   "name": "Merchant Special Skills",
+   "note": "Merchant Caravans Merchant (instead of the standard lists).",
+   "skills": [
+    [
+     "Bribery",
+     "Whenever a Rout test is required, the Merchant may pay 5 gc per non-Hero member still in the game; if he does, one already-out-of-action member does not count for that Rout test. Repeatable while gold lasts."
+    ],
+    [
+     "Dubious Income",
+     "If the Merchant was not taken out of action, before the trading phase he may take an Ld test: On a pass the warband gains 1 gc per Experience point the Merchant has; on a fail it loses up to that amount."
+    ],
+    [
+     "Wholesale",
+     "If not taken out of action, the Merchant may search for D3+1 rare items after each battle instead of one."
+    ],
+    [
+     "Deal Breaker",
+     "+1 on the roll to see what an item fetches when selling via the Trade special rule."
+    ],
+    [
+     "Connected",
+     "Instead of searching for rare items, the Merchant may visit the black market for special items (Dispel Scroll, Lesser Artefact, Magical Artefact, Magical Scroll); such items can never be sold back."
+    ]
+   ]
+  },
+  "ngSkills": {
+   "name": "Night Goblin Special Skills",
+   "note": "Night Goblin Heroes (instead of any standard list).",
+   "skills": [
+    [
+     "Ded Shooty",
+     "Adds +6\" to the range of any missile weapon he uses (nets excluded)."
+    ],
+    [
+     "Sneaky Git",
+     "Big Boss only. After all other deployment, he may move D3 of his warband members."
+    ],
+    [
+     "Infiltrate",
+     "Set up after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both sides infiltrate, roll D6 each — lowest sets up first."
+    ],
+    [
+     "Netter",
+     "'Chuck and charge': Declare a net charge and throw a net at the target. If it hits and the target fails to escape, the target counts as knocked down and the Goblin completes the charge; otherwise it is a failed charge (stop 1\" away)."
+    ]
+   ]
+  },
+  "restlessSkills": {
+   "name": "Restless Dead Special Skills",
+   "note": "Liche & Necromancer (instead of standard lists).",
+   "skills": [
+    [
+     "Corpse Bomb",
+     "Secretly nominate one Zombie as a Corpse Bomb. If it charges or is charged it detonates: all models within D6\" take D3 Strength 4 hits, and the Zombie is destroyed. Corpse Bombs killed by shooting do not detonate. Only one at a time (Liche and Necromancer may both take this skill)."
+    ],
+    [
+     "Deathspeaker",
+     "At the start of the battle deploy D3 Zombies for free. They do not count toward the maximum warband size (but add to rating), cannot be Corpse Bombs and last only for the battle."
+    ],
+    [
+     "Wraith Touch",
+     "Instead of his normal attacks, make one unarmed Wraith Touch: If it hits it wounds automatically. A Liche that wounds with it regains one lost wound (not above its starting total); Necromancers do not. No effect on the Possessed or Undead."
+    ],
+    [
+     "Forbidden Rite",
+     "If the hero did not search for rare items in the last exploration phase, he starts the next battle with a pool of D3+1 modifiers (+1) he may add to his casting rolls, as many at a time as he wishes."
+    ],
+    [
+     "Summoner",
+     "The maximum warband size is increased by 1."
+    ]
+   ]
+  }
  }
 }

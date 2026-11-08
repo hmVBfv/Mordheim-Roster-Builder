@@ -1,0 +1,268 @@
+{
+  "warband": {
+    "name": "Beastmen Raiders",
+    "grade": "1a",
+    "siteRace": "Beastmen",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Chief. Max. 1 Shaman, 2 Bestigors, 1 Centigor, 1 Minotaur, 5 Gors, 5 Chaos Hounds; any number of Ungors.<br><b>Hired Swords:</b> May hire no Hired Swords, unless the Hired Sword's entry explicitly allows the warband.",
+    "units": [
+      {
+        "id": "chief",
+        "t": "hero",
+        "name": "Beastman Chief",
+        "cost": 65,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "beastmen",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "beastmenSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "shaman",
+        "t": "hero",
+        "name": "Beastman Shaman",
+        "cost": 45,
+        "exp": 11,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "beastmen",
+        "noArmour": true,
+        "sk": [
+          "combat",
+          "speed",
+          "beastmenSkills"
+        ],
+        "sp": "Wizard: Uses Chaos Rituals. Never wears armour."
+      },
+      {
+        "id": "bestigor",
+        "t": "hero",
+        "name": "Bestigor",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "beastmen",
+        "sk": [
+          "combat",
+          "strength",
+          "beastmenSkills"
+        ]
+      },
+      {
+        "id": "centigor",
+        "t": "hero",
+        "name": "Centigor",
+        "cost": 80,
+        "exp": 8,
+        "max": 1,
+        "bite": 1,
+        "profile": {
+          "M": 8,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "beastmen",
+        "sk": [
+          "combat",
+          "strength",
+          "beastmenSkills"
+        ],
+        "sp": "Drunk (test for stupidity/frenzy each turn). Woodland-dweller. Trample: +1 attack with no weapon bonuses."
+      },
+      {
+        "id": "ungor",
+        "t": "hen",
+        "name": "Ungor",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ungorList",
+        "sp": "Lowest of the low: Can never become a Hero."
+      },
+      {
+        "id": "gor",
+        "t": "hen",
+        "name": "Gor",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "beastmen"
+      },
+      {
+        "id": "hound",
+        "t": "hen",
+        "name": "Chaos Hound",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 7,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal: Gains no experience. No weapons/armour."
+      },
+      {
+        "id": "minotaur",
+        "t": "hen",
+        "name": "Minotaur",
+        "cost": 200,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 4,
+          "A": 3,
+          "Ld": 8
+        },
+        "eq": "beastmen",
+        "large": true,
+        "noPromote": true,
+        "sp": "Fear. Bloodgreed: If it takes all its enemies out of action in hand-to-hand, it becomes frenzied on a D6 roll of 4+. Animal: May gain experience but may never become a Hero. Large Target."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "beastLore",
+    "skills": "beastmenSkills"
+  },
+  "race": "gor",
+  "unitRace": {
+    "centigor": null,
+    "hound": null,
+    "minotaur": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "beastmen"
+    ]
+  },
+  "lists": {
+    "ungorList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Streitaxt",
+          5
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Beastmen are brutish raiders who roam the deep forests around Mordheim with no cities and no order, and kill and plunder wherever they please. They hate organisation and will turn on each other as readily as on their prey.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/beastmen-raiders"
+  },
+  "unitLore": {
+    "chief": "Beastmen chieftains have gained their position through sheer brutality. He leads the Beastmen to Mordheim to gather the Chaos Stones to his Herdstone.",
+    "shaman": "Beastmen Shamans are prophets of the Dark Gods, and the most respected of all the Beastmen.",
+    "bestigor": "Bestigors are the largest type of Beastmen, the great horned warriors of the Beastmen warbands. They are massive creatures with an inhuman resistance of pain.",
+    "centigor": "A Centigor is a disturbing cross between a horse or oxen and Beastman. Being quadruped grants them great strength and speed whilst their humanoid upper torsos allow them to wield weapons. These beastcentaurs are powerful creatures but they are not particularly agile or dexterous.",
+    "ungor": "Ungor are the most numerous of the Beastmen. They are small, spiteful creatures, but dangerous in large masses.",
+    "gor": "Gor are nearly as numerous as Ungor but are larger and more brutish.",
+    "hound": "Chaos Hounds are titanic, mastiff-like creatures which are insanely dangerous in combat.",
+    "minotaur": "Minotaurs are gigantic, bull-headed Beastmen. Fearsome and powerful, any Beastmen Chief will try to recruit a Minotaur into his warband if possible."
+  }
+}

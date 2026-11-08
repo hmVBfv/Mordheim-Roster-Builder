@@ -53,6 +53,10 @@
       "text": "Beastmen are brutish raiders who roam the deep forests around Mordheim with no cities and no order, and kill and plunder wherever they please. They hate organisation and will turn on each other as readily as on their prey.",
       "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/beastmen-raiders"
     },
+    "maraudersofchaos": {
+      "text": "Marauders are tribal northmen from the Chaos Wastes who worship forgotten gods and fight endlessly to win their favour. Ambitious chieftains lead warbands south, leaving burned villages behind them.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos"
+    },
     "kislev": {
       "text": "Kislev lies north-east of the Empire, a land of long winters, timber towns and steppes. It is a hard country that breeds hardy fighters, and some of them cross the border into the ruins of Mordheim.",
       "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/kislevites"
@@ -60,10 +64,6 @@
     "amazons": {
       "text": "The Amazons are warrior women from across the Great Western Ocean, said to descend from a lost colony. Those in Mordheim have been dragged there in chains and want only one thing: escape.",
       "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons"
-    },
-    "amazonslustria": {
-      "text": "The Amazons live on an overgrown island in the river heart of Lustria, ringed with ruins, and drive off invaders from the beaches. Few outsiders have seen them and survived, so their fame rests on exaggerated tales.",
-      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons-lustria"
     },
     "arabian": {
       "text": "The desert nomads of Araby wander the edge of the great desert in many tribes, ruled by oases and a strict code of honour. Some come north to search the ruins for relics and wealth.",
@@ -117,6 +117,10 @@
       "text": "Norsca lies far to the north, and its raiders and sea-wolves are among the fiercest fighters of the Old World. Mordheim's wyrdstone and plunder call them south, with wolf-warriors among them.",
       "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/norse"
     },
+    "ostermark": {
+      "text": "Ostermarkers are farmers used to defending their land alone against mercenaries and brigands. Years of isolation and self-reliance have made them hardy fighters who do not give up easily, even when outnumbered.",
+      "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark"
+    },
     "outlaws": {
       "text": "Stirwood is a corner of the Great Forest cut off by the River Stir, where outlaws and poachers hide from the law. From there they raid the roads and sometimes the ruins of Mordheim.",
       "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/outlaws-of-stirwood-forest"
@@ -140,6 +144,10 @@
     "tombguardians": {
       "text": "The ancient kingdoms of Nehekhara buried their dead with great care, and the dead still march with rusty weapons and rattling bones. Tomb Guardians are the undying guardians of those burial places.",
       "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tomb-guardians"
+    },
+    "amazonslustria": {
+      "text": "The Amazons live on an overgrown island in the river heart of Lustria, ringed with ruins, and drive off invaders from the beaches. Few outsiders have seen them and survived, so their fame rests on exaggerated tales.",
+      "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons-lustria"
     },
     "shadowwarriors": {
       "text": "Nagarythe was once a rich Elf kingdom until its rulers turned to Chaos. Those who stayed loyal wage a secret war of shadows against the Witch King and the Dark Elves, and some of them reach Mordheim.",
@@ -177,10 +185,6 @@
       "text": "Ogres live in herds and tribes in the Mountains of Mourn, but some roam the world as hired muscle to anyone with enough coin. Others prey on the merchants and travellers of the Ivory Road instead.",
       "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/maneaters"
     },
-    "maraudersofchaos": {
-      "text": "Marauders are tribal northmen from the Chaos Wastes who worship forgotten gods and fight endlessly to win their favour. Ambitious chieftains lead warbands south, leaving burned villages behind them.",
-      "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos"
-    },
     "caravans": {
       "text": "Money can be inherited, stolen or earned, and some want it faster than hard work allows. Blackguards, opportunists and hired guards tag along with merchant caravans to far-off lands in the hope of a big score.",
       "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans"
@@ -192,10 +196,6 @@
     "restless": {
       "text": "A Liche is a necromancer who kept his soul and magic after death, but his dead body cannot hold magic for long. He needs dark rituals, often the devouring of a human soul, and a band of undead follows him.",
       "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/restless-dead"
-    },
-    "ostermark": {
-      "text": "Ostermarkers are farmers used to defending their land alone against mercenaries and brigands. Years of isolation and self-reliance have made them hardy fighters who do not give up easily, even when outnumbered.",
-      "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark"
     }
   }
 }

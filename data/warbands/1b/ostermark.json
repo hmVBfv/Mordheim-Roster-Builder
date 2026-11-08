@@ -1,0 +1,258 @@
+{
+  "warband": {
+    "name": "Ostermarkers",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 2 Champions, 2 Youngbloods; any number of Warriors, max. 7 Marksmen, max. 5 Swordsmen.<br><b>Hardy:</b> Heroes & henchmen may re-roll one failed Ld test for 'All Alone' and Rout (must accept the second roll). The Captain may take a Wardog.<br><b>Skills:</b> Ostermark was published without a skill table; by later clarification the warband uses the skill table of one of the other Mercenary options. Choose it when founding the warband — it holds for all its Champions and Youngbloods.",
+    "units": [
+      {
+        "id": "ocaptain",
+        "t": "hero",
+        "name": "Captain",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "merc",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Hardy."
+      },
+      {
+        "id": "ochamp",
+        "t": "hero",
+        "name": "Champion",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "merc",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed"
+        ],
+        "sp": "Hardy.",
+        "skSub": {
+          "skReik": [
+            "combat",
+            "shooting",
+            "strength"
+          ],
+          "skMidd": [
+            "combat",
+            "strength",
+            "speed"
+          ],
+          "skMari": [
+            "combat",
+            "shooting",
+            "speed"
+          ]
+        }
+      },
+      {
+        "id": "oyoung",
+        "t": "hero",
+        "name": "Youngblood",
+        "cost": 15,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "merc",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed"
+        ],
+        "sp": "Hardy.",
+        "skSub": {
+          "skReik": [
+            "combat",
+            "shooting",
+            "speed"
+          ],
+          "skMidd": [
+            "combat",
+            "strength",
+            "speed"
+          ],
+          "skMari": [
+            "combat",
+            "shooting",
+            "speed"
+          ]
+        }
+      },
+      {
+        "id": "owarrior",
+        "t": "hen",
+        "name": "Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "merc",
+        "sp": "Hardy."
+      },
+      {
+        "id": "omarks",
+        "t": "hen",
+        "name": "Marksman",
+        "cost": 25,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "marksman",
+        "sp": "Hardy."
+      },
+      {
+        "id": "oswords",
+        "t": "hen",
+        "name": "Swordsman",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "merc",
+        "sp": "Expert Swordsman. Hardy."
+      },
+      {
+        "id": "owardog",
+        "t": "hen",
+        "name": "Wardog (Captain)",
+        "cost": 25,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal (gains no experience). Only 1, with the Captain."
+      }
+    ],
+    "subtypeLabel": "Skill table as: ",
+    "subtypes": [
+      {
+        "key": "skReik",
+        "name": "Reikland",
+        "gold": 500,
+        "note": "Champions: Combat, Shooting, Strength. Youngbloods: Combat, Shooting, Speed. (Skill table only — the Reikland city rules do not apply.)"
+      },
+      {
+        "key": "skMidd",
+        "name": "Middenheim",
+        "gold": 500,
+        "note": "Champions and Youngbloods: Combat, Strength, Speed. (Skill table only — the Middenheim city rules do not apply.)"
+      },
+      {
+        "key": "skMari",
+        "name": "Marienburg",
+        "gold": 500,
+        "note": "Champions and Youngbloods: Combat, Shooting, Speed. (Skill table only — the Marienburg city rules do not apply.)"
+      }
+    ]
+  },
+  "race": "human",
+  "unitRace": {
+    "owardog": null
+  },
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "intro": {
+    "text": "Ostermarkers are farmers used to defending their land alone against mercenaries and brigands. Years of isolation and self-reliance have made them hardy fighters who do not give up easily, even when outnumbered.",
+    "url": "https://mordheimer.net/docs/warbands/core-warbands/mercenaries#ostermark"
+  },
+  "unitLore": {
+    "ocaptain": "A Mercenary Captain is a tough professional warrior, a man who will fight for anyone or against anything so long as the price is right. Mordheim offers such a man the chance to become rich beyond his dreams, though at great risk. But as ruthlessness and lack of mercy and pity are the hallmarks of a successful Mercenary Captain, it is no wonder that they flock to Mordheim.",
+    "ochamp": "In any Mercenary warband there is one warrior who is bigger, stronger (and often uglier) than his comrades. These men are called Champions (or berserkers, first swordsmen and various other names). Champions are amongst the toughest and the best fighters in the warband. They often answer challenges issued to the warband and, after the Captain, they get the pick of any equipment and loot.",
+    "oyoung": "These are young fighters who are still inexperienced, but eager to win their spurs in the savage fighting in and around the ruins of Mordheim.",
+    "owarrior": "These dogs of war are grim, seasoned fighters, fearing no man as long as they have their weapons and armour. They form the core of any Mercenary warband.",
+    "omarks": "The archers and hunters of the Old World are famed for their skill, and it is said that they can hit a coin from 300 paces with a long bow. In the savage street fights of Mordheim they snipe at the enemy from the windows of ruined buildings and pick out enemy leaders with their arrows.",
+    "oswords": "Swordsmen are professional warriors, experts at taking on and beating several opponents at once. They are much sought after by warband leaders, as their skills are ideally suited for fighting in Mordheim."
+  }
+}

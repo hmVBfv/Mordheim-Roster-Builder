@@ -1,0 +1,570 @@
+{
+  "warband": {
+    "name": "The Cursed Cavalcade",
+    "grade": "1c",
+    "siteRace": "Chaos",
+    "min": 3,
+    "max": 13,
+    "gold": 500,
+    "rules": "Masked, cursed nobles of Mordheim (Tuomas Pirinen). <b>Foolish Nobleness:</b> Counts as an Evil warband (like the Cult of the Possessed for all game effects, e.g. result 333). <b>Hired Swords:</b> May hire only these Hired Swords or Dramatis Personae, no others – the Crow Master, and any that specifically allow the warband. <b>Capture!:</b> If a Hero takes an enemy Human Henchman Out of Action with a Misericordia and you have fewer than 5 Captured Thralls, on a 5+ the model is captured; enemy Heroes only via \"61 - Captured!\", which is re-rolled once you have captured two Henchmen or hold five Captured Thralls; max 2 captures per game. <b>The Throne of Worms:</b> For each captive, roll D6 instead of Serious Injuries — 1-2 destroyed, 3-5 you gain a Captured Thrall, 6 sacrificed (a random Hero +1 XP). <b>Cursed Masks:</b> Each Hero may take one mask free at warband creation (one of each kind only); afterwards masks may be bought (see the rare-item picker). Humans (animals do not advance).",
+    "units": [
+      {
+        "id": "aristocrat",
+        "t": "hero",
+        "name": "Aristocrat",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "ccArist",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed",
+          "cavalcadeSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Expert Horseman: Has the Ride (Nightmare) skill."
+      },
+      {
+        "id": "companion",
+        "t": "hero",
+        "name": "Companion",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ccHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "cavalcadeSkills"
+        ],
+        "sp": "Expert Swordsman: Every Companion has the Expert Swordsman skill."
+      },
+      {
+        "id": "scholar",
+        "t": "hero",
+        "name": "Twisted Scholar",
+        "cost": 25,
+        "exp": 4,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ccHero",
+        "sk": [
+          "academic",
+          "cavalcadeSkills"
+        ],
+        "wizardOption": {
+          "cost": 10
+        },
+        "sp": "Magical Adept: When hired, you may pay +10 gc to make him a Wizard (uses Lesser Magic, starts with one random spell). Story Teller: Alternatively pay +10 gc to make him a Chronicler (re-roll one extra Exploration die and choose which two dice to keep). Toggle \"caster\" below if upgraded to a Wizard."
+      },
+      {
+        "id": "piper",
+        "t": "hero",
+        "name": "Cursed Piper",
+        "cost": 40,
+        "exp": 6,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ccPiper",
+        "sk": [
+          "academic",
+          "cavalcadeSkills"
+        ],
+        "sp": "Plays an instrument one-handed: may not use an off-hand weapon, double-handed weapon, brace of pistols, bows or crossbows. Danse Macabre: In the shooting phase, target one enemy within 6\" who must pass an Ld test or be controlled (moved anywhere, even out of combat or off heights); it tests Ld each recovery phase to break free and meanwhile cannot shoot, charge, cast or attack. Only one victim at a time."
+      },
+      {
+        "id": "thrall",
+        "t": "hen",
+        "name": "Thrall",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ccThrall",
+        "sp": "The lowest rank of the Cavalcade."
+      },
+      {
+        "id": "capturedthrall",
+        "t": "hen",
+        "name": "Captured Thrall",
+        "cost": 0,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ccThrall",
+        "noxp": true,
+        "sp": "Gained through the Throne of Worms (not bought). Do not count toward the maximum number of models (raising the cap from 13 to 18) and cannot be dismissed. Not really clever: Cannot earn Experience or gain advances."
+      },
+      {
+        "id": "bear",
+        "t": "hen",
+        "name": "Great Bear",
+        "cost": 140,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 0,
+          "S": 5,
+          "T": 5,
+          "W": 2,
+          "I": 3,
+          "A": 2,
+          "Ld": 6
+        },
+        "eq": null,
+        "large": true,
+        "noxp": true,
+        "sp": "Large Target. Maddened With Pain: As soon as it suffers a single wound it gains an additional Attack. Animal: Uses no weapons or armour and never gains Experience."
+      },
+      {
+        "id": "beast",
+        "t": "hen",
+        "name": "Wild Beast",
+        "cost": 45,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 2,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Charge: +1 Attack on the first turn of close combat when it charges. Animal: Uses no weapons or armour and never gains Experience."
+      },
+      {
+        "id": "ape",
+        "t": "hen",
+        "name": "Fighting Ape",
+        "cost": 95,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 2,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Cymbals: May be given a pair of Cymbals (+15 gc) — enemies within 6\" suffer −1 BS and −1 Ld. Agile: Has Scale Sheer Surfaces, Acrobat and Dodge, and may make a diving charge from up to 10\" high. Animal: Never gains Experience but may climb and enter buildings normally."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "lesserMagic"
+  },
+  "race": "human",
+  "unitRace": {
+    "bear": null,
+    "beast": null,
+    "ape": null
+  },
+  "hire": {
+    "align": "evil",
+    "none": true
+  },
+  "lists": {
+    "ccArist": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Misericordia",
+          5
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Eberspeer",
+          30
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Kathay-Seidenpanzer",
+          15
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Überlegenes Schwarzpulver",
+          30
+        ],
+        [
+          "Nightmare",
+          30,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Raubvogel",
+          30
+        ]
+      ]
+    },
+    "ccHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Misericordia",
+          5
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Überlegenes Schwarzpulver",
+          30
+        ]
+      ]
+    },
+    "ccPiper": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Misericordia",
+          5
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Duellpistole",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "ccThrall": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "cavalcadeSkills": {
+      "name": "Cursed Cavalcade Special Skills",
+      "note": "Cursed Cavalcade Heroes may use these skills instead of any of the standard skill tables available to them.",
+      "skills": [
+        [
+          "Noblesse Oblige",
+          "Immune to fear, and stomps knocked-down opponents with his iron-shod boots: one additional attack at his own Strength against knocked-down opponents."
+        ],
+        [
+          "Torturer",
+          "Any model wounded (and not saved) in close combat by this Hero loses 1 point of Strength permanently for the rest of the battle."
+        ],
+        [
+          "Duelist",
+          "At the end of each close combat phase, the Duelist may force a non-large opponent he fights one-on-one to pass a Strength test or be pushed 2\" in a direction of the Duelist’s choice."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "As the year 2000 drew near, three claimants fought a civil war for the imperial throne. This warband is told as a chronicle of that age, as written by the High Matriarch of the Sisters of Sigmar.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/cursed-cavalcade"
+  },
+  "unitLore": {
+    "aristocrat": "The Warbands of the Cavalcade are led by one of the fallen nobles that were part of the inner circle of Count Steinhardt. The Aristocrat might have been a castellan, a knight or a baron or even one of the sons or daughters of Count Steinhardt himself. Bitter, haughty, and cruel, they wear opulent masks to hide the burns of the comet that will never heal.",
+    "companion": "Many men-at-arms, Judicial Champions, Duelists and Knights of lower orders who followed Count Steinhardt in the path of depravity and were cursed along with their master. They now have one last chance to regain their dream of ruling the Empire: to gather slivers of the Comet and make it whole once more. Though they all know it is akin to finding a needle in a haystack for a thousand time, their pride and the knowledge that they may never return to the fold of Sigmar drives them on.",
+    "scholar": "Count Steinhardt initiated many wise men and scholars of Ostmark into the secrets of the Cavalcade. Now these twisted philosophers, blasphemous sages and sadistic physicians who've turned their skills into torture have been cursed alongside with their master, and travel to the ruins of Mordheim desperately looking for Wyrdstone shards in order to heal the Black Heart of the Comet.",
+    "piper": "Many of the great thespians, flutists, and other entertainers were easily lured into the fold of Count Steinhardt. They are now compelled by their curse to play the tune of Danse Macabre as the Cavalcade fights with the scavengers of Mordheim for the scraps of Wyrdstone.",
+    "thrall": "These are the miserable men and women brought to the catacombs forced to sit on the Throne of Worms and judged to be worthy to serve the true rulers of Mordheim. They are initiated to the very lowest ranks of the warbands, forced to sleep in the worst cages and animal pits, they wear metal masks just like the rest of the Warband, but far simpler and cruder in design, until they finally prove their worth.",
+    "capturedthrall": "These are the miserable men and women brought to the catacombs forced to sit on the Throne of Worms and judged to be worthy to serve the true rulers of Mordheim. They are initiated to the very lowest ranks of the warbands, forced to sleep in the worst cages and animal pits, they wear metal masks just like the rest of the Warband, but far simpler and cruder in design, until they finally prove their worth.",
+    "bear": "These huge beasts captured from the vast forests of the Empire are prized as the jewels of Count Steinhardt's menagerie. Goaded to fight with humans as part of the dark ritual to summon the comet, and corrupted by the flame of the Black Heart, they are extremely dangerous creatures, especially if their blood is drawn.",
+    "beast": "These can be Wild Cats from the deep jungles of the south or far-off Lustria, Wild Boars captured by hunters of Ostermark, or some other exotic animal bred for battle.",
+    "ape": "Brought from the far-off lands to the menageries of the Imperial nobles, these man-like creatures have been trained by their keepers to attack."
+  }
+}
