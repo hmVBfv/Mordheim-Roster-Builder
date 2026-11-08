@@ -1,0 +1,331 @@
+{
+  "warband": {
+    "name": "Dwarf Rangers",
+    "grade": "1b",
+    "siteRace": "Dwarf",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Runesmith. Max. 1 Apprentice, 2 Troll Slayers; max. 5 Longbeards, any number of Clansmen, max. 5 Crossbowmen, any number of Beardlings.<br><b>Hard to Kill:</b> Dwarfs are tough, resilient individuals who can only be taken out of action on a roll of 6 instead of 5-6 when rolling on the Injury chart. Treat a roll of 1-2 as knocked down, 3-5 as stunned, and 6 as out of action. <b>Hard Head:</b> Dwarfs ignore the special rules for maces, clubs, etc. They are not easy to knock out! <b>Armour:</b> Dwarfs never suffer movement penalties for wearing armour. <b>Hate Orcs and Goblins:</b> All Dwarfs hate Orcs and Goblins. See the psychology section of the Mordheim rules for details on the effects of hatred. <b>Grudgebearers:</b> May hire any Hired Sword or Dramatis Personae except Elves of any kind. Dwarfs hold an ancient grudge against Elves from the days when the two races fought for supremacy in the Old World. <b>Incomparable Miners:</b> Dwarfs spend much of their lives underground searching for precious minerals, and they are the best in the world at this kind of work. In the city of Mordheim they apply similar skills to the search for wyrdstone. When checking for wyrdstone at the end of a game, add +1 to the number of pieces found for a Dwarf warband.<br><b>Don’t Trust ‘Em:</b> While Ranger Warbands are free to ally with other Dwarf warbands in multi-player games, their point of view is so different that they do not trust them fully. Members of a Dwarf Rangers warband are never considered ‘friendly models’ to other dwarfs and vice versa. This means that members of one warband WILL stop members of the other from Marching, they won’t keep each other from taking All Alone tests, etc. They don’t count as enemy models and may split any treasure found at the end of the game as normal, but the two bands are not friends, make no mistake!<br><b>Gromril:</b> Weapons cost only 3× at warband creation (later 4×, Rare 11).",
+    "units": [
+      {
+        "id": "runesmith",
+        "t": "hero",
+        "name": "Runesmith",
+        "cost": 85,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 3,
+          "WS": 5,
+          "BS": 4,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 10
+        },
+        "eq": "dwarfRanger",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "dthSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Inscribe Runes: Knows 1 random minor rune; before each game roll 2D6 ≥ difficulty to inscribe it on one item (fumble on 2 destroys the item); may learn new runes instead of skills. Rune bonuses do not stack with other magic items."
+      },
+      {
+        "id": "apprentice",
+        "t": "hero",
+        "name": "Apprentice Runesmith",
+        "cost": 40,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 3,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "dwarfRanger",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "dthSkills"
+        ],
+        "sp": "Extra Set of Hands: While in the warband, the Runesmith may inscribe runes on two items before each game instead of one.",
+        "noArmour": true
+      },
+      {
+        "id": "rslayer",
+        "t": "hero",
+        "name": "Troll Slayer",
+        "cost": 50,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfRanger",
+        "noArmour": true,
+        "noMissile": true,
+        "sk": [
+          "combat",
+          "strength",
+          "slayerSkills",
+          "dthSkills"
+        ],
+        "sp": "Deathwish: Completely immune to all psychology and never tests for fighting alone."
+      },
+      {
+        "id": "longbeard",
+        "t": "hen",
+        "name": "Longbeard",
+        "cost": 50,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 3,
+          "WS": 5,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfRanger",
+        "sp": "Stubborn: May reroll any failed Leadership test (never reroll a reroll)."
+      },
+      {
+        "id": "clansman",
+        "t": "hen",
+        "name": "Clansman",
+        "cost": 40,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfRanger"
+      },
+      {
+        "id": "crossbow",
+        "t": "hen",
+        "name": "Crossbowman",
+        "cost": 40,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfRangerXbow"
+      },
+      {
+        "id": "rbeardling",
+        "t": "hen",
+        "name": "Beardling",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 3,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "dwarfRanger"
+      }
+    ],
+    "noSkills": [
+      "Arcane Lore"
+    ]
+  },
+  "extra": {
+    "magic": "dwarfRunes",
+    "skills": "dthSkills"
+  },
+  "race": "dwarf",
+  "hire": {
+    "align": "good",
+    "dwarf": true,
+    "noElfHS": true
+  },
+  "lists": {
+    "dwarfRanger": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Zwergenaxt",
+          15
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Gromril-Rüstung",
+          75,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "dwarfRangerXbow": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Some old Dwarfs believe the old ways are best and distrust the newfangled gadgets of younger engineers. They travel together with traditional arms, recovering lost treasures and cleansing fallen holds of the vermin that took them.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/dwarf-rangers"
+  },
+  "unitLore": {
+    "runesmith": "Dwarf Runesmiths are champions of the old ways. ‘If it was good enough for my ancestors, it’s good enough for me!’ is a popular saying. Fresh out of their decades-long apprenticeships, these Runesmith’s are normally on a quest to prove this saying and so will gather together a party of like-minded individuals to seek out lost treasures of their ancestors to confirm this adherence to the traditional ways.",
+    "apprentice": "Dwarf Runesmiths are champions of the old ways. ‘If it was good enough for my ancestors, it’s good enough for me!’ is a popular saying. Fresh out of their decades-long apprenticeships, these Runesmith’s are normally on a quest to prove this saying and so will gather together a party of like-minded individuals to seek out lost treasures of their ancestors to confirm this adherence to the traditional ways.",
+    "rslayer": "While it may seem that Troll Slayers shouldn’t fit in with the rest of a Runic Ranger warband, make no mistake – they are strict adherents to tradition and the old ways! Indeed they usually find it easier to get along with the more traditional minded Dwarfs than other dwarfs, who Slayers feel lack determination and the insight to see what the true problems are with their race.",
+    "longbeard": "Tested Dwarf veterans who’ve fought in hundreds of battle over their long lives, Longbeards are typically more than willing to support an expedition to prove what they’ve said all along – the old ways are best!",
+    "clansman": "There are many Dwarfs who see the ‘wisdom’ in reliance on the old ways. Most of these Dwarf warriors venerate Runesmiths and are honoured to be chosen as part of an expedition including one.",
+    "crossbow": "More Dwarfs who see the old ways as best use the older crossbow instead of the newer (and very unreliable to their eyes) handguns. If their ancestors had wanted them to use black powder weapons, they would have developed them generations ago.",
+    "rbeardling": "Many of the proponents of the old ways are older members of Dwarf community. However there are still youngsters who believe and they often accompany a Runic warband to lend a hand as needed to the respected oldsters. More spry than their fellows, they are often used as scouts, roaming ahead of the rest to spy the land and observe enemy activity."
+  }
+}

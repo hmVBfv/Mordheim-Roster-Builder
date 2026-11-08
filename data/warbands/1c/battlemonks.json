@@ -1,0 +1,432 @@
+{
+  "warband": {
+    "name": "Battle Monks of Cathay",
+    "grade": "1c",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "Cathayan warrior-monks of the Border Town Burning supplement. <b>Strictures:</b> Dragon Monks and Warrior Monks never wear any kind of armour. <b>Distaste for Poison:</b> Dragon Monks and Warrior Monks may never use any poison or venom. <b>Outsiders:</b> May hire no Hired Swords or Dramatis Personae, unless the entry specifically allows the warband. Cathayans are Humans and use the Human racial maximum.",
+    "units": [
+      {
+        "id": "emissary",
+        "t": "hero",
+        "name": "Emissary",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "bmEmissary",
+        "sk": [
+          "shooting",
+          "academic",
+          "speed",
+          "battleMonkSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Ride Horse: Trained to ride Horses. Decree: If the Emissary dies, a new one must be hired before any other warrior or equipment is bought; he then reclaims leadership. From the special skills he may only ever pick Warmonger."
+      },
+      {
+        "id": "officer",
+        "t": "hero",
+        "name": "Officer",
+        "cost": 40,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bmOfficer",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed"
+        ],
+        "sp": "Equipped with weapons from the Soldier list; no armour.",
+        "desc": "A decorated soldier and custodian of Imperial law."
+      },
+      {
+        "id": "dragon",
+        "t": "hero",
+        "name": "Dragon Monk",
+        "cost": 55,
+        "exp": 15,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "bmMonk",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed",
+          "battleMonkSkills"
+        ],
+        "noArmour": true,
+        "sp": "Never wears armour. Unarmed: No penalties whatsoever and +1 Attack when fighting unarmed. Art of Silent Death: When fighting unarmed, scores a critical hit on a to-wound roll of 5-6 instead of 6 (with a quarter staff, only the unarmed attacks crit on 5+)."
+      },
+      {
+        "id": "soldier",
+        "t": "hen",
+        "name": "Soldier",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bmSoldier",
+        "sp": "Trained border guards and local militia."
+      },
+      {
+        "id": "warmonk",
+        "t": "hen",
+        "name": "Warrior Monk",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bmMonk",
+        "noArmour": true,
+        "sp": "Never wears armour. Unarmed: No penalties whatsoever and +1 Attack when fighting unarmed."
+      },
+      {
+        "id": "peasant",
+        "t": "hen",
+        "name": "Raging Peasant",
+        "cost": 10,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "bmPeasant",
+        "sp": "Fights unarmed without penalty. Simple folk: Never gains Experience. Mob: +1 Leadership for each other friendly Peasant within 3\"; does not benefit from the Leader rule. Ignored: Peasants out of action are not counted for Rout tests. Downtrodden: When wounded, do not roll for injury — the model is immediately taken out of action."
+      }
+    ]
+  },
+  "race": "human",
+  "hire": {
+    "align": "neutral",
+    "only": [
+      "cathayanmerchant",
+      "ninja",
+      "pyromaniac",
+      "swordsmith"
+    ]
+  },
+  "lists": {
+    "bmSoldier": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Drachenschwert",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "bmEmissary": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Drachenschwert",
+          20
+        ],
+        [
+          "Kathay-Langschwert",
+          75
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Kathay-Seidenumhang",
+          40
+        ],
+        [
+          "Pferd",
+          30
+        ]
+      ]
+    },
+    "bmOfficer": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Drachenschwert",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ]
+    },
+    "bmMonk": {
+      "Nahkampf": [
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Kampfstab",
+          15
+        ],
+        [
+          "Drachenschwert",
+          20
+        ],
+        [
+          "Kettenstäbe",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Angelhaken",
+          10
+        ],
+        [
+          "Wurfsterne",
+          15
+        ]
+      ]
+    },
+    "bmPeasant": {
+      "Nahkampf": [],
+      "Fernkampf": [],
+      "Rüstung": []
+    }
+  },
+  "skillSets": {
+    "battleMonkSkills": {
+      "name": "Battle Monk Skills",
+      "note": "Emissary & Dragon Monks (instead of a standard table). The Emissary may only ever pick Warmonger.",
+      "skills": [
+        [
+          "Energy Focus",
+          "If fighting unarmed, the Hero may reduce his Attacks by −1 to gain +1 Strength in close combat. He may sacrifice any number of attacks this way."
+        ],
+        [
+          "Lightning Speed",
+          "The monk may triple his Movement when running or charging, and may run even when there are enemy models within 8\"."
+        ],
+        [
+          "Leap of Faith",
+          "Cannot be intercepted while charging. He may escape from combat by leaping away without an Ld test and may declare a leaping charge in the same turn."
+        ],
+        [
+          "Human Shield",
+          "If two or more models are in close combat with the monk, he may pass an Initiative test (after the first attacks, before the second) to grab the first model as a shield — the second model's attacks are then directed at that grabbed model instead."
+        ],
+        [
+          "Warmonger",
+          "The Emissary may take an Ld test before the battle; if passed, D3+1 Raging Peasants join for that game (may exceed the maximum). Each Peasant is then subject to Hatred for the battle."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Grand Cathay guards its borders with the Great Bastion, haunted mountains and poisonous deserts, and its monasteries stand on the slopes. Monks from those monasteries have come west, looking for wyrdstone and for trouble.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/battle-monks-of-cathay"
+  },
+  "unitLore": {
+    "emissary": "An official delegate of the Dragon Throne is sent to each border town from Weijin. His orders are to ensure that the Emperor's decrees are being upheld.",
+    "officer": "The Officer is the highest ranking member of his division, a decorated soldier dispatched as custodian to administer Imperial law throughout the district.",
+    "dragon": "Dragon Monks are close to reaching mental and physical perfection. The most skilled martial artists among each brotherhood have mastered the Way of the Dragon, a fighting style which Cathayan monks are renowned for even far beyond their borders.",
+    "soldier": "Comprising trained fighters and local militia, the border guards form a solid patrol to defend the borderlands against invading tribes and other dangers.",
+    "warmonk": "The Battle Monks from Cathay are experts in fighting unarmed. Brothers combine open-hand tactics with specialist weapons training to create a shrouded force of lethal warriors."
+  }
+}

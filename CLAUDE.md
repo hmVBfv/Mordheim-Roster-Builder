@@ -28,7 +28,7 @@ changing anything structural.
 | Path | What | Status |
 | --- | --- | --- |
 | `index.html`, `js/`, `build.js`, `test/` | legacy app (vanilla JS, live on Pages) | frozen (Rob, 03.10.2026): stays on Pages until the campaign runs in the new app (4a), no more changes |
-| `data/` | audited rules data (JSON) | single source for legacy and new code |
+| `data/` | audited rules data (JSON) | single source for legacy and new code. A warband's data is **one file**, `data/warbands/<grade>/<key>.json` (ADR 0031): edit that, then `npm run data` makes `warbands.json`, `warbandintro.json`, `unitlore.json` – never edit those by hand (a test fails if they differ) |
 | `core/` | shared logic, TypeScript, no DOM | phase 1 |
 | `app/` | React 19 PWA, flavours `campaign` and `quickbuild` | phase 1 |
 | `server/` | Fastify + SQLite API, `roster-cli` | phase 2 (skeleton: health, migrations, snapshots, epoch) |
@@ -66,6 +66,7 @@ changing anything structural.
 - `npm run bugs -- list|show N|set N …|fixture N` reads and sorts problem reports
   through the bug token (see the `/bugs` command); needs `ROSTER_URL` and the
   token as a network secret of the cloud environment, or `ROSTER_BUG_TOKEN`.
+- `npm run data` — rewrites the files the game reads from `data/warbands/` after you changed a warband's file (also `npm run data -- check`).
 - `npm run sanitize-save -- <save.json | export.txt>` cleans a real save into
   `core/test/saves/`, where the parity suite picks it up.
 - CI (`.github/workflows/ci.yml`) runs the same on every push.

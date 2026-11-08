@@ -1,0 +1,503 @@
+{
+  "warband": {
+    "name": "Imperial Outriders",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Knight. Max. 2 Outriders, 2 Scouts; max. 5 Chasseurs, 5 Hussars, 2 Grooms.<br><b>Mounted warband:</b> Every warrior comes with a Riding Horse (included in the cost); the Knight, Outriders and Hussars may upgrade it to a Warhorse for +40 gc. All use the Blazing Saddles cavalry rules (Ride / Combat Riding / Horse Handling).<br><b>Horses:</b> A model without a mount may not take part in the battle. Dead horses must be replaced before any other income is spent (treasures are sold to fund this). Enemies may not target a ridden horse, by missiles or in close combat. Any mounted warrior may always be chosen as a target by a shooter even if others are closer, but the shooter gains no +1 to hit.<br><b>Mounted combat:</b> A mounted warrior may not fight with two close combat weapons (he needs one hand for the reins) and may never use two-handed weapons; a shield or buckler is fine, and a pistol may be fired in the first round of close combat in place of a weapon.<br><b>Dense terrain:</b> Imperial Outriders ignore the normal two-mount warband limit in areas of dense terrain.<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – the mounted Freelance Knight (Rulebook) and Roadwarden (Empire in Flames). The Highwayman keeps his distance and may never be hired.",
+    "units": [
+      {
+        "id": "ioknight",
+        "t": "hero",
+        "name": "Knight",
+        "cost": 85,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "ioKnight",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Ride. Riding horse; warhorse upgrade +40."
+      },
+      {
+        "id": "ioout",
+        "t": "hero",
+        "name": "Outrider",
+        "cost": 65,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ioOutrider",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength"
+        ],
+        "sp": "Ride. Riding horse; warhorse +40."
+      },
+      {
+        "id": "ioscoutu",
+        "t": "hero",
+        "name": "Scout",
+        "cost": 45,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ioScout",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ],
+        "sp": "Ride. Riding horse."
+      },
+      {
+        "id": "chasseur",
+        "t": "hen",
+        "name": "Chasseur",
+        "cost": 55,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ioChasseur",
+        "sp": "Ride. Riding horse."
+      },
+      {
+        "id": "hussar",
+        "t": "hen",
+        "name": "Hussar",
+        "cost": 60,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ioKnight",
+        "sp": "Ride, Combat Riding. Riding horse; warhorse +40."
+      },
+      {
+        "id": "groom",
+        "t": "hen",
+        "name": "Groom",
+        "cost": 50,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ioScout",
+        "sp": "Ride, Horse Handling. Riding horse."
+      }
+    ]
+  },
+  "extra": {
+    "skills": "cavalrySkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ],
+    "only": [
+      "freelancer",
+      "roadwarden"
+    ]
+  },
+  "lists": {
+    "ioKnight": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Lanze",
+          40
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Ithilmar-Rüstung",
+          90
+        ],
+        [
+          "Gromril-Rüstung",
+          150
+        ],
+        [
+          "Barding",
+          80
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Warhorse (Upgrade)",
+          40
+        ]
+      ]
+    },
+    "ioOutrider": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Lanze",
+          40
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Ithilmar-Rüstung",
+          90
+        ],
+        [
+          "Gromril-Rüstung",
+          150
+        ],
+        [
+          "Barding",
+          80
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Warhorse (Upgrade)",
+          40
+        ]
+      ]
+    },
+    "ioChasseur": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Lanze",
+          40
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Hochland-Langbüchse",
+          200
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Ithilmar-Rüstung",
+          90
+        ],
+        [
+          "Gromril-Rüstung",
+          150
+        ],
+        [
+          "Barding",
+          80
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "ioScout": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Lanze",
+          40
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Ithilmar-Rüstung",
+          90
+        ],
+        [
+          "Gromril-Rüstung",
+          150
+        ],
+        [
+          "Barding",
+          80
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "When the Nemesis Crown was said to be found, the provinces of the Empire sent fast riders to scout the Great Forest. They avoid head-on fights and rely on speed and stealth to take the prize and be gone.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/imperial-outriders"
+  },
+  "unitLore": {
+    "ioknight": "Knights who show the greatest potential are often chosen to lead small bands on quests into dangerous territory in order to prove their worth.",
+    "ioout": "Usually the offspring of nobility, Outriders are often cocksure young guns and confident in the saddle. Eager to earn their spurs they readily sign up for dangerous missions requiring speed, stealth and bravery.",
+    "ioscoutu": "Accustomed to riding fast over long distances, Empire couriers are an obvious choice to include in raids into the wilder lands. Less experienced at fighting, they need to learn quickly or risk falling at the wayside.",
+    "chasseur": "Skilled at firing a range of Blackpowder weapons from the saddle, these men are regarded as the finest young prospects of the Empire’s armies. Chasseurs provide vital missile cover for the band.",
+    "hussar": "Selected for their combat skills, these grizzled warriors pack a hard punch as the Outriders charge.",
+    "groom": "Unskilled in the ways of war, nevertheless these young men have an empathy with the steeds. Grooms have a vital part to play in their party."
+  }
+}

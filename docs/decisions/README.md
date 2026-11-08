@@ -49,3 +49,4 @@ Status: angenommen · Datum: JJJJ-MM-TT
 | [0028](0028-images-from-master-only.md) | Images nur von master veröffentlichen, alte Branch-Images wöchentlich löschen, jeder Branch nur einmal testen (angenommen, ersetzt Teile von 0009, 0017) |
 | [0029](0029-changelog-per-change.md) | Changelog: eine kleine Datei je Änderung in `changelog/`, mit dem Build ausgeliefert, „What's new“ unter „Reload“ und in More (angenommen) |
 | [0030](0030-authenticator-for-admins-only.md) | Der Authenticator nur für Admins; jeder kann eine Kampagne leiten, auch mit den versteckten Inhalten (angenommen, ersetzt Teile von 0008, 0022, 0027) |
+| [0031](0031-one-file-per-warband.md) | Die Daten einer Warband in einer Datei, nach Grade geordnet (`data/warbands/<grade>/<key>.json`); die Dateien, die das Spiel liest, werden daraus gemacht (`npm run data`) (angenommen) |

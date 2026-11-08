@@ -1,0 +1,368 @@
+{
+  "warband": {
+    "name": "Marauders of Chaos",
+    "grade": "1c",
+    "siteRace": "Chaos Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "subtypeLabel": "Tribe: ",
+    "subtypes": [
+      {
+        "key": "norse",
+        "name": "Norse",
+        "gold": 500,
+        "note": "<b>Norse.</b><br><b>Reavers:</b> +1 when searching for rare items (post-game sequence).<br><b>Pantheon:</b> The \"Eye of the Gods\" (Spawn/Mark) only triggers on <b>13+</b> instead of 12+."
+      },
+      {
+        "key": "kurgan",
+        "name": "Kurgan",
+        "gold": 500,
+        "note": "<b>Kurgan.</b><br><b>Pedigree:</b> Any number of Warhounds of Chaos (not just max. 5).<br><b>Bone Bows:</b> Heroes and Chaos Marauder henchmen may carry bows (10 gc, common).<br><b>Difficult Customers:</b> −1 when searching for rare items — except Great Axe and Barbed Whip."
+      },
+      {
+        "key": "hung",
+        "name": "Hung",
+        "gold": 500,
+        "note": "<b>Hung.</b><br><b>Disloyalty:</b> Max. <b>12</b> warriors instead of 15.<br><b>Affinity with Horses:</b> Warhorses always cost only 40 gc; all Heroes (including promoted henchmen) automatically have \"Ride Warhorse\"; number of mounts unlimited (Border Town Burning)."
+      }
+    ],
+    "rules": "<b>Tribe:</b> Choose one of the tribes above – Norse, Kurgan or Hung – each with its own special rules.<br><b>Choice:</b> Exactly 1 Chieftain. Max. 1 Seer, 1 Condemned, 2 Champions; any number of Chaos Marauders; max. 5 Warhounds (Kurgan: Any number); max. 1 Spawn.<br><b>Eye of the Gods:</b> Roll 2D6 after each battle. If lost, +1 per own Hero taken out of action – on 12+ the leader becomes a Chaos Spawn. If won, +1 per enemy the leader took out of action – on 12+ a Mark of the Dark Gods (Serpent/Crow/Eagle/Arkhar/Undivided). With \"Tattooed Body\" already on 10+ (Norse 11+); pure Norse tribe 13+.<br><b>Hired Swords:</b> May hire only these Hired Swords, no others – Pit Fighters, Ogres, Norse Shamans, Imperial Assassins. Witches and Warlocks only without the Mark of Arkhar.",
+    "units": [
+      {
+        "id": "chieftain",
+        "t": "hero",
+        "name": "Marauder Chieftain",
+        "cost": 95,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 5,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "marChaosHero",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "marauderSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "seer",
+        "t": "hero",
+        "name": "Seer",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "marChaosHero",
+        "noArmour": true,
+        "sk": [
+          "combat",
+          "academic",
+          "marauderSkills"
+        ],
+        "sp": "Wizard: Uses Chaos magic via a Mark (Serpent/Crow/Eagle/Arkhar/Chaos Undivided), chosen when hired. Weapons only, no armour."
+      },
+      {
+        "id": "champion",
+        "t": "hero",
+        "name": "Champion",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "marChaosHero",
+        "sk": [
+          "combat",
+          "strength",
+          "marauderSkills"
+        ]
+      },
+      {
+        "id": "condemned",
+        "t": "hero",
+        "name": "Condemned",
+        "cost": 55,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": "D6",
+          "BS": 3,
+          "S": "D6",
+          "T": "D6",
+          "W": 1,
+          "I": 4,
+          "A": "D3",
+          "Ld": 7
+        },
+        "eq": null,
+        "sk": [
+          "strength",
+          "speed",
+          "marauderSkills"
+        ],
+        "sp": "Fear. Inconsistency: WS, S, T and A are variable and re-rolled every turn. Fate: Fights without penalties; at 90 experience with values still variable he becomes a Chaos Spawn. (No equipment until values are fixed.)"
+      },
+      {
+        "id": "marauder",
+        "t": "hen",
+        "name": "Chaos Marauder",
+        "cost": 35,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "marChaosHench"
+      },
+      {
+        "id": "warhound",
+        "t": "hen",
+        "name": "Warhound of Chaos",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 7,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal: Gains no experience. No weapons/armour."
+      },
+      {
+        "id": "spawn",
+        "t": "hen",
+        "name": "Spawn of Chaos",
+        "cost": 180,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": "2D6",
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 5,
+          "W": 3,
+          "I": 2,
+          "A": "D6+1",
+          "Ld": 10
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Fear. Large Target. Special movement: 2D6\" straight ahead (contact counts as a charge). Variable attacks (re-rolled each close-combat phase). Immune to all psychology. Gains no experience."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "marauderChaos",
+    "skills": "marauderSkills"
+  },
+  "race": "human",
+  "unitRace": {
+    "condemned": null,
+    "warhound": null,
+    "spawn": null
+  },
+  "hire": {
+    "align": "evil",
+    "only": [
+      "pitfighter",
+      "ogre",
+      "norseshaman",
+      "imperialassassin",
+      "warlock",
+      "witch",
+      "chaoscentaur",
+      "chaosfury"
+    ]
+  },
+  "lists": {
+    "marChaosHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Barbed Whip",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Great Axe",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Warhorse",
+          40,
+          {
+            "sub": [
+              "hung"
+            ]
+          }
+        ]
+      ]
+    },
+    "marChaosHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfäxte",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Marauders are tribal northmen from the Chaos Wastes who worship forgotten gods and fight endlessly to win their favour. Ambitious chieftains lead warbands south, leaving burned villages behind them.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/marauders-of-chaos"
+  },
+  "unitLore": {
+    "chieftain": "The Chieftain is the brutish head of the warband. He leads his tribe in their constant warfare and bloodshed in an attempt to win the approval of their fickle gods.",
+    "seer": "A Seer is the Chieftain’s advisor as their god tells them his will through the Seer's visions and dreams. The other tribesmen see the Seer's attunement to their gods as a great gift that is to be equally respected and feared.",
+    "champion": "Champions are the strongest and most battle hardened warriors in the tribe. They fight constantly waiting for the day when they can finally be judged by their god as being worthy of his service.",
+    "condemned": "A servant of a dark god who was foolish enough to turn away from his patron is forever condemned. If the traitor turns to another god for aid then they are often spared death, but suffer a fate many times worse. The servant suffers constant mutations at the hands of their old god but maintains vestiges of his humanity as his new god compensates for the mutations by restoring or altering the form of the servant. It is all in vain, as the unwitting servant eventually becomes a plaything of both gods who use the servant's body and soul as a contest of wills between themselves, completely uncaring of the condemned servant's fate.",
+    "marauder": "Marauders are wild uncivilized barbarians who seek battles and bloodshed. They form the majority of the chieftain’s retinue.",
+    "warhound": "Warhounds of Chaos are titanic, mastiff-like creatures which are insanely dangerous in combat.",
+    "spawn": "Spawns of Chaos are former Chaos Champions who have been too heavily gifted by their gods and become terrifying mutants."
+  }
+}

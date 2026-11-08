@@ -1,0 +1,343 @@
+{
+  "warband": {
+    "name": "Ostlanders",
+    "grade": "1a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Elder. Max. 2 Blood Brothers, max. 1 Priest of Taal, max. 7 Jaegers, max. 5 Ruffians, max. 1 Ogre, any number of Kinsmen.<br><b>Self-sufficient:</b> May hire only these Hired Swords, no others – Ogres.",
+    "units": [
+      {
+        "id": "elder",
+        "t": "hero",
+        "name": "Elder",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "ostlander",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "ostlanderSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "blood",
+        "t": "hero",
+        "name": "Blood Brother",
+        "cost": 35,
+        "exp": 12,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ostlander",
+        "sk": [
+          "combat",
+          "strength",
+          "ostlanderSkills"
+        ]
+      },
+      {
+        "id": "taal",
+        "t": "hero",
+        "name": "Priest of Taal",
+        "cost": 45,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ostlander",
+        "noHeavy": true,
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed",
+          "ostlanderSkills"
+        ],
+        "sp": "Prayers of Taal. May not wear heavy armour."
+      },
+      {
+        "id": "kin",
+        "t": "hen",
+        "name": "Kinsman",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ostlander"
+      },
+      {
+        "id": "jaeger",
+        "t": "hen",
+        "name": "Jaeger",
+        "cost": 25,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ostJaeger"
+      },
+      {
+        "id": "ruffian",
+        "t": "hen",
+        "name": "Ruffian",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 10
+        },
+        "eq": "ostRuffian",
+        "sp": "Drunk: Automatically passes all Leadership tests; never the leader; no missile weapons."
+      },
+      {
+        "id": "ogre",
+        "t": "hen",
+        "name": "Ogre",
+        "cost": 160,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 2,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 10
+        },
+        "eq": "ostOgre",
+        "large": true,
+        "promoCatsFixed": [
+          "combat",
+          "strength"
+        ],
+        "sp": "Fear. Large Target. Slow-witted: Needs twice the experience for each advance (counts advances at half value). If promoted via The Lad's Got Talent, may only choose Combat and Strength skills."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "prayersTaal",
+    "skills": "ostlanderSkills"
+  },
+  "race": "human",
+  "unitRace": {
+    "ogre": "ogre"
+  },
+  "hire": {
+    "align": "good",
+    "only": [
+      "ogre"
+    ]
+  },
+  "lists": {
+    "ostRuffian": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "ostJaeger": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Doppelläufige Pistole",
+          30
+        ],
+        [
+          "Doppelläufiges Pistolenpaar",
+          60
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Jagdgewehr",
+          200
+        ],
+        [
+          "Doppelläufiges Jagdgewehr",
+          300
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "ostOgre": {
+      "Nahkampf": [
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Ostland is the emptiest province of the Empire, cut off by forest and mountains and closer to Kislev than to its own countrymen. Its people are poor, tall and hardy, and many a freesword leaves home for Mordheim after one brawl too many.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/ostlander"
+  },
+  "unitLore": {
+    "elder": "In Ostland, the oldest (or more often biggest) man in the village is given the title ‘Elder’. His word is greatly respected and only at his urging would the manhood of an entre village pack up and travel to Mordheim to seek their fortune.",
+    "blood": "Ostland villages are usually composed of a single extended family. Everyone is everyone else's uncle, cousin or brother (and sometimes their own!). Rather than trying to keep all of these relations straight, the most respected men in the village (aside from the Elder) are referred to simply as Blood-brothers.",
+    "taal": "It is said that every priest of Taal is born during the darkest phase of the moon. Those who are accepted into the service of Taal are loners by nature and spend their time wandering the untamed forests of the Northern Empire. It is unclear why the priests of the forest have begun to join bands of Ostlanders in their delvings into the ruined city of Mordheim — for the servants of Taal keep their own counsel. Suffice to say that the Forest-God is clearly building a strong presence both in and around the darkened ruins as more animals begin to fill the surrounding forests...",
+    "jaeger": "Some Ostlander men choose not to marry but instead spend their time alone in the forests of the Old World. While these rangers do not share the close family bonds of a typical Ostlander blood-kin they are well respected for their knowledge of the woods and their rugged determination. Poor Jaeger usually wield a simple home-made bow but it is every jaeger’s dream to one day own a blackpowder weapon and hunting rifle, especially double-barrelled versions, as these are a sign of great prestige amongst the hunters of the deep woods.",
+    "ruffian": "Although every Ostlander loves his ale, a few men in every village take this love to extremes. Never sober and rarely conscious, these buffoons stagger their way through the streets of Mordheim yelling slurred insults at whomever they meet, committing petty acts of vandalism and generally making a mess of things. This comic behaviour is often misconstrued into a false belief that they are harmless, a belief that many live to regret. Fuelled by vast quantities of booze these are very dangerous, unpredictable men indeed who will shove a broken bottle into your face as soon as laugh heartily and burst into song!",
+    "ogre": "It is said that every priest of Taal is born during the darkest phase of the moon. Those who are accepted into the service of Taal are loners by nature and spend their time wandering the untamed forests of the Northern Empire. It is unclear why the priests of the forest have begun to join bands of Ostlanders in their delvings into the ruined city of Mordheim — for the servants of Taal keep their own counsel. Suffice to say that the Forest-God is clearly building a strong presence both in and around the darkened ruins as more animals begin to fill the surrounding forests..."
+  }
+}

@@ -1,0 +1,233 @@
+{
+  "warband": {
+    "name": "Cult of the Possessed",
+    "grade": "core",
+    "siteRace": "Chaos Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Magister. Max. 2 Possessed, max. 2 Mutants, max. 5 Darksouls, max. 3 Beastmen, any number of Brethren.",
+    "units": [
+      {
+        "id": "mag",
+        "t": "hero",
+        "name": "Magister",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "possessed",
+        "sk": [
+          "combat",
+          "academic",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Uses Chaos Rituals."
+      },
+      {
+        "id": "poss",
+        "t": "hero",
+        "name": "Possessed",
+        "cost": 90,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 2,
+          "I": 4,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": null,
+        "mut": "chaos",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Fear. No weapons/armour. May take mutations (+ cost)."
+      },
+      {
+        "id": "mut",
+        "t": "hero",
+        "name": "Mutant",
+        "cost": 25,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "possessed",
+        "mut": "chaos",
+        "mutReq": true,
+        "sk": [
+          "combat",
+          "speed"
+        ],
+        "sp": "Must start with at least one mutation."
+      },
+      {
+        "id": "breth",
+        "t": "hen",
+        "name": "Brethren",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "possessed"
+      },
+      {
+        "id": "beast",
+        "t": "hen",
+        "name": "Beastman",
+        "cost": 45,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 2,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "darksouls"
+      },
+      {
+        "id": "dark",
+        "t": "hen",
+        "name": "Darksoul",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "darksouls",
+        "sp": "Crazed: Automatically passes all Leadership tests."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "chaosRituals"
+  },
+  "race": "human",
+  "unitRace": {
+    "poss": "possessed",
+    "beast": "gor"
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "possessed"
+    ]
+  },
+  "lists": {
+    "darksouls": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Ambitious or persecuted men, and the newly mutated, swear themselves to the dark gods of Chaos. After the comet they follow the Shadowlord, who calls himself the new Dark Emperor of the ruined city, and put their trust in the sorcery that makes daemons walk the world.",
+    "url": "https://mordheimer.net/docs/warbands/core-warbands/cult-of-the-possessed"
+  },
+  "unitLore": {
+    "mag": "Magisters lead the covens of the Possessed. They have been granted magical powers by their patron gods. They are fanatical followers of the Dark gods, utterly dedicated to bringing Chaos to the world.",
+    "poss": "The Possessed have committed the greatest of heresies: they have given their bodies to Daemons. As a result, they are nightmarish creatures, a melding of flesh, metal and black magic. Inside them lives a supernatural thing of evil, a Daemon from the dark reaches of the Realm of Chaos. The powerful spirit of a Daemon can meld several creatures together, be they men or animals, into a multi-faceted horror. These monstrous Possessed are perhaps the most dangerous of the creatures of Mordheim, and certainly the most loathsome and dreadful.",
+    "mut": "Mutants are revered as the favoured ones of the Dark gods, their physical disfigurements marking out the vileness of their soul. They come in many shapes and sizes, each more bizarre than the next.",
+    "breth": "Brethren are the crazed human followers of the cults of the dark gods, eager to descend into damnation. Their vile deeds and unspeakable acts have driven them to the brink of insanity.",
+    "beast": "Beastmen are mutated monstrosities that infest the forests of the Empire: massive horned creatures with an inhuman resistance to pain. The destruction of Mordheim brought many Beastmen into the ruined city to prey upon the survivors. They readily ally with the Magisters of the Possessed warbands.",
+    "dark": "Darksouls are men who have been driven insane by the daemonic possession which became all too common after the destruction of Mordheim. The Daemons have left the bodies of these men, but their minds have been scarred by the horror of the experience. Their insane strength makes Darksouls dangerous fighters. The Cultists regard them as holy men, and let them work out their unreasoning rage in battle. In their tortured minds the Darksouls believe themselves to be Daemons. They wear leering daemonic masks and garb themselves in armour and clothing resembling the scaled skin of Daemons."
+  }
+}

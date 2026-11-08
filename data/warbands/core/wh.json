@@ -1,0 +1,201 @@
+{
+  "warband": {
+    "name": "Witch Hunters",
+    "grade": "core",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Captain. Max. 1 Warrior Priest, max. 3 Witch Hunters, max. 5 Flagellants, max. 5 Warhounds, any number of Zealots.",
+    "units": [
+      {
+        "id": "capt",
+        "t": "hero",
+        "name": "Witch Hunter Captain",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "wh",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Burn the Witch!: hates all spellcasters."
+      },
+      {
+        "id": "priest",
+        "t": "hero",
+        "name": "Warrior Priest",
+        "cost": 40,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "wh",
+        "sk": [
+          "combat",
+          "academic",
+          "strength"
+        ],
+        "sp": "Prayers of Sigmar."
+      },
+      {
+        "id": "hunter",
+        "t": "hero",
+        "name": "Witch Hunter",
+        "cost": 25,
+        "exp": 8,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "wh",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "Burn the Witch!: hates all spellcasters."
+      },
+      {
+        "id": "zealot",
+        "t": "hen",
+        "name": "Zealot",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "zealot"
+      },
+      {
+        "id": "flag",
+        "t": "hen",
+        "name": "Flagellant",
+        "cost": 40,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 10
+        },
+        "eq": "flagellant",
+        "sp": "Fanatical: Automatically passes all Leadership tests; never the leader; never missile weapons."
+      },
+      {
+        "id": "hound",
+        "t": "hen",
+        "name": "Warhound",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal: Gains no experience. No weapons/armour."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "prayersSigmar"
+  },
+  "race": "human",
+  "unitRace": {
+    "hound": null
+  },
+  "hire": {
+    "align": "good",
+    "tags": [
+      "wh"
+    ]
+  },
+  "lists": {
+    "flagellant": {
+      "Nahkampf": [
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Templars of Sigmar hunt heretics of every kind: witches, sorcerers, mutants and the merely suspicious. Magic is a capital crime in the Empire, and the fall of Mordheim has given the Witch Hunters a fresh, burning mission among the ruins.",
+    "url": "https://mordheimer.net/docs/warbands/core-warbands/witch-hunters"
+  },
+  "unitLore": {
+    "capt": "Driven by fanaticism, Witch Hunter Captains are obsessed with cleansing Mordheim and bringing the justice of Sigmar to all. Carrying the edict of the Grand Theogonist himself, they have the divine right to judge and execute warlocks, witches, Chaos worshippers… in fact all who dare to oppose them.",
+    "priest": "Many powerful fighting men have come from the ranks of the faithful. The Priests of Sigmar are no exception, and the military wing of the cult is feared and respected throughout the Empire. The Grand Theogonist himself has granted the Warrior-Priests an edict to cleanse Mordheim of Chaos filth. With fire burning in their eyes, the Warrior-Priests stride into battle, chanting aloud the Deus Sigmar, the praise of the patron god of the Empire.",
+    "hunter": "Driven by fanaticism, Witch Hunter Captains are obsessed with cleansing Mordheim and bringing the justice of Sigmar to all. Carrying the edict of the Grand Theogonist himself, they have the divine right to judge and execute warlocks, witches, Chaos worshippers… in fact all who dare to oppose them.",
+    "zealot": "When a man loses his family, home and all he cared for, religion is often the last refuge left to him. Such men become wandering pilgrims, bitter and dangerous fanatics who are prepared to avenge their loss at any cost. These men are called Zealots. Zealots have forsaken their former lives and exist only to destroy evil and the minions of Chaos. Whilst they might have been peasants and craftsmen before, and thus may not be as dangerous in a fight as seasoned mercenaries, their determination and fanaticism should not be underestimated. Witch Hunters find ready allies in their ranks, and many a band of Zealots is led by Witch Hunters.",
+    "flag": "Flagellants are fanatics and madmen obsessed with the end of the world. They are often men who have lost their families to war or the ravages of nature, and have also lost their minds. With insane persistence, they travel the length and breadth of the Empire, preaching their view of the end of the world. With their rousing speeches, Witch Hunters can muster these dangerous lunatics to fight in the streets of Mordheim, where no sane man dares tread. Flagellants are extremely dangerous opponents in close combat, for they have the strength of madmen, and their bodies have become inured to pain because of self-mutilation.",
+    "hound": "Witch Hunters often keep packs of ferocious hunting dogs. With their huge jaws and powerful bite, they are perfect for hunting down (and tearing apart) any heretics, mutants, deviants and witches."
+  }
+}

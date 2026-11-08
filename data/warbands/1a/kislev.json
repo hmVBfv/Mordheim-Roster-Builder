@@ -1,0 +1,412 @@
+{
+  "warband": {
+    "name": "Kislevites",
+    "grade": "1a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Druzhina Captain. Max. 1 Bear Tamer, 1 Esaul, 2 Youths; any number of Warriors and Cossacks; max. 3 Streltsi; max. 1 Trained Bear (only with a Bear Tamer).<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.<br><b>Chaos:</b> No alliance with Chaos.<br><b>Hero special items:</b> The Heroes may buy Vodka and the Bear-claw Necklace (rare).<br><b>RAW:</b> Esaul, Bear Tamer and Youths may only take <i>weapons</i> from the list (no armour).",
+    "units": [
+      {
+        "id": "capt",
+        "t": "hero",
+        "name": "Druzhina Captain",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "kislevWarrior",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Heirloom: May buy 1 item at half price when founding the warband (if lost, must be replaced at 150% — until then −1 to all tests and to-hit rolls)."
+      },
+      {
+        "id": "tamer",
+        "t": "hero",
+        "name": "Bear Tamer",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "noArmour": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "kislevWarrior",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Bear Handler: Allows recruiting a Trained Bear."
+      },
+      {
+        "id": "esaul",
+        "t": "hero",
+        "name": "Esaul",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "noArmour": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "kislevWarrior",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ]
+      },
+      {
+        "id": "youth",
+        "t": "hero",
+        "name": "Youth",
+        "cost": 15,
+        "exp": 0,
+        "max": 2,
+        "noArmour": true,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "kislevWarrior",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ]
+      },
+      {
+        "id": "warrior",
+        "t": "hen",
+        "name": "Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "kislevWarrior"
+      },
+      {
+        "id": "cossack",
+        "t": "hen",
+        "name": "Cossack",
+        "cost": 30,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "kislevWarrior",
+        "sp": "Hates all Chaos warriors."
+      },
+      {
+        "id": "streltsi",
+        "t": "hen",
+        "name": "Streltsi",
+        "cost": 25,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "streltsi",
+        "sp": "Gun rest: +1 to hit with handgun + halberd if he did not move. The only ones allowed a handgun."
+      },
+      {
+        "id": "bear",
+        "t": "hen",
+        "name": "Trained Bear",
+        "cost": 125,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 5,
+          "T": 5,
+          "W": 2,
+          "I": 2,
+          "A": 2,
+          "Ld": 6
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Large Target. Stupidity (auto-passed within 6\" of the Bear Tamer; may only ever use the Tamer's Ld, never the leader's). Fear. Bear Hug. Fiercely Loyal: While the bear is not out of action, the Tamer treats Sold to the Pits/Robbed/Captured as Full Recovery. Animal: Gains no experience. Only usable if the Bear Tamer takes part."
+      }
+    ]
+  },
+  "race": "human",
+  "unitRace": {
+    "bear": null
+  },
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "kislevWarrior": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "streltsi": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Kislev lies north-east of the Empire, a land of long winters, timber towns and steppes. It is a hard country that breeds hardy fighters, and some of them cross the border into the ruins of Mordheim.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/kislevites"
+  },
+  "unitLore": {
+    "capt": "Druzhina are the minor nobles of Kislev. During times of war these nobles form their own regiments in a Kislevite army, and they look most impressive with their ancient armour and weapons, as most of these prized artefacts are handed down from father to son. Druzhina are rich enough to afford their own horse and battlegear, and they must be ready to fight for the Tzar when called upon. In return for this they are allowed to own land and are given a break on their annual taxes.",
+    "tamer": "Since ancient times, bears have featured in Kislevite myths and legends. Kislevites have a deep respect for these mighty beasts, and gather to see the trained specimens that accompany travelling circuses. The powerful men that train these bears are known simply as Bear Tamers, and the best of them are widely renowned amongst the people of Kislev. Bears can be trained for martial purposes as well, and Bear Tamers are often recruited into the armies of Kislev, where they enjoy a special status among the soldiery.",
+    "esaul": "Esaul is an ancient Cossack term that means ‘Best Warrior’, and was traditionally given to the most powerful fighter in the tribe. The word has survived the generations, and today it is an honorary title given by a chieftain to his personal champion, though it is also used by Gospodar warriors as a more familiar term for an experienced veteran. Most Kislevite cities contain at least one grizzled veteran amongst the ranks of their professional soldiery who has been affectionately labelled ‘Esaul’ by his men.",
+    "youth": "Strong, strapping lads from the countryside often join a band of daring adventurers to make their fortune.",
+    "warrior": "The Gospodar tribe make up the bulk of the people of Kislev, and they are generally considered the most civilised of the peoples of this harsh realm. Gospodars are people of large stature with blonde or red hair. Their women are well known throughout the Old World for their fair-skinned beauty. Gospodar women have the same rights as men, and are allowed to rise to positions of power; in fact the most powerful of the legendary Ice Mages of Kislev are all female!",
+    "cossack": "Cossacks are nomadic tribesmen who live in the far north of Kislev. They are always the first to encounter any Chaos invaders from the north, and so have long fostered a bitter enmity with the servants of Chaos. Cossacks are renowned for their riding skills, and their favoured weapons are the scimitar (sword) and spear.",
+    "streltsi": "Firearms were first introduced to Kislev by Prince Boydinov of Erengrad. Though very popular among his people, the prince was considered quite eccentric (it was he that invented the mad game called Kislevite Roulette). Despite initial superstition as time past handguns have been accepted as essential weapons of war. In his legacy the prince had a large portion of his wealth set aside for the establishment and upkeep of a regiment of handgunners. The regiment continues to this day and its members are known as Streltsi. Soldiers from other cities in Kislev, most notably the capital, are sent here to train in the use of firearms with the Streltsi. In addition to their knowledge of handguns Streltsi are also trained to use a small halberd called the berdiche. In fact the berdiche and handgun are the most widely recognised symbols of the Streltsi. In combat Streltsi are able to use their berdiches as rests for their handguns, increasing their accuracy and making for a deadly weapon combination.",
+    "bear": "Bear Tamers often bring one of their sacred bears with them when they prepare to enter battle. These great beasts respect little, and it takes years for a human to win their trust and obedience. The effort to train one of these creatures is well worth it however, as one cannot hope for a more loyal friend or useful ally when things turn bad."
+  }
+}

@@ -1,0 +1,584 @@
+{
+  "warband": {
+    "name": "Merchant Caravans",
+    "grade": "1c",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 600,
+    "rules": "Cathay-bound trade caravan (Border Town Burning). <b>Merchant:</b> The Merchant is always the warband Leader. <b>Trade:</b> instead of searching for rare items, the Merchant may sell a rare item stored in the Trade Wagon (roll D6: 1-2 half price, 3-4 full, 5-6 full + half). <b>Open for Business:</b> Any player may send a Hero to the Merchant to buy/sell one item if a price is agreed. <b>Rarity:</b> Any item reduced to Rare 2 or lower (Reputation, Streetwise, …) may be bought as Common. <b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.",
+    "units": [
+      {
+        "id": "merchant",
+        "t": "hero",
+        "name": "Merchant",
+        "cost": 50,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "mcHero",
+        "sk": [
+          "shooting",
+          "academic",
+          "merchantSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. He is always the warband leader; if he is lost, a new leader becomes a Merchant for all purposes (or buy an Apprentice to take over)."
+      },
+      {
+        "id": "apprentice",
+        "t": "hero",
+        "name": "Apprentice",
+        "cost": 15,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "mcHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed"
+        ],
+        "sp": "May take over as Merchant/Leader if the Merchant is lost and no other model can."
+      },
+      {
+        "id": "knight",
+        "t": "hero",
+        "name": "Knights Vanguard",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mcKnight",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Lightning Reflexes: When charged, strikes first (compare Initiative against chargers who also strike first). Ride Warhorse: Trained to ride a Warhorse. Hireling: Paid by the Merchant — may never become the warband Leader."
+      },
+      {
+        "id": "magician",
+        "t": "hero",
+        "name": "Magician",
+        "cost": 40,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "mcHero",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Wizard: Uses the Lesser Magic spell list. Hireling: Paid by the Merchant — may never become the warband Leader."
+      },
+      {
+        "id": "sellsword",
+        "t": "hen",
+        "name": "Sell-sword",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mcHench",
+        "desc": "Caravan bodyguard — roguish escort hired to protect the goods and their paymaster."
+      },
+      {
+        "id": "marksman",
+        "t": "hen",
+        "name": "Marksman",
+        "cost": 30,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mcHenchM",
+        "sp": "Tilean crossbow specialist."
+      },
+      {
+        "id": "blackguard",
+        "t": "hen",
+        "name": "Blackguard",
+        "cost": 35,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mcCathay",
+        "sp": "Strongman: May use a double-handed weapon without the \"strike last\" penalty. Unreliable Hirelings: May never become Heroes — re-roll any \"The Lad's Got Talent\" result."
+      },
+      {
+        "id": "wagon",
+        "t": "hen",
+        "name": "Trade Wagon",
+        "cost": 180,
+        "exp": 0,
+        "max": 1,
+        "min": 1,
+        "req": true,
+        "noxp": true,
+        "vehicle": true,
+        "profile": null,
+        "eq": null,
+        "attached": [
+          {
+            "label": "Cart",
+            "icon": "🛒",
+            "profile": {
+              "M": "—",
+              "WS": "—",
+              "BS": "—",
+              "S": "—",
+              "T": 8,
+              "W": 4,
+              "I": "—",
+              "A": "—",
+              "Ld": "—"
+            },
+            "note": "The wagon body — Toughness 8, 4 Wounds."
+          },
+          {
+            "label": "Wheel ×4",
+            "icon": "⚙️",
+            "profile": {
+              "M": "—",
+              "WS": "—",
+              "BS": "—",
+              "S": "—",
+              "T": 6,
+              "W": 1,
+              "I": "—",
+              "A": "—",
+              "Ld": "—"
+            },
+            "note": "Four wheels, each Toughness 6, 1 Wound."
+          },
+          {
+            "label": "Draft Horse ×2",
+            "icon": "🐎",
+            "profile": {
+              "M": 8,
+              "WS": 1,
+              "BS": 0,
+              "S": 3,
+              "T": 3,
+              "W": 1,
+              "I": 3,
+              "A": 0,
+              "Ld": 5
+            },
+            "note": "Two draft horses pull the wagon (included in the price)."
+          }
+        ],
+        "sp": "<b>Wagon (Empire in Flames):</b> Cannot charge, climb, hide, run or flee; may turn up to 45° at the end of its move. One model must drive (and may do nothing else while moving); one may ride shotgun and take over if the driver falls.<br><b>Movement (by load):</b> 1 model (driver) M10 · 2-3 M8 · 4-6 M6. Apply the lash for +D6\" (on a 1, roll Out of Control).<br><b>Shooting from it:</b> Crew fire with a 360° arc at −1 to hit (moving surface). <b>Shooting at it:</b> +1 to hit (large target); on a hit roll Location — 1-2 a draft horse, 3 a crew member, 4-5 chassis (T8, 4W), 6 wheel (T6, 1W).<br><b>Collisions:</b> Wagon vs wagon = both take D3 S7 hits; models in the path roll under their Initiative or take a S4 hit (out-of-action models are hit automatically). On any collision a D6 roll of 1 forces an Out of Control test.<br><b>Combat (stationary):</b> Charge and strike the part in contact. Chassis and wheels are hit automatically. <b>Crew:</b> Count as defending an obstacle — a 6 is required to hit them regardless of Weapon Skill; if a crew member is taken Out of Action, an attacker may board the wagon next turn. Draft horses may be attacked normally or cut free on a 2+.<br><b>Combat (moving):</b> may be charged (this does not halt it); roll Location and the crew still need a 6 to hit — attack from the side or rear (the front risks being run down). Fighters injured while aboard must pass an Initiative test or fall off.<br><b>Boarding:</b> Board a stationary wagon by moving into contact; boarding a moving wagon needs an Initiative test (fail = D3 hits at Strength equal to half the wagon's speed).<br><b>Storage:</b> Holds the warband's stored equipment and treasures (not gold) — lost if the wagon is destroyed. <b>Reputation:</b> +1 to find Rare items per five different rare items stored. <b>Abandoned:</b> If you fail a Rout test with no driver, the wagon and its contents fall to the enemy."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "lesserMagic"
+  },
+  "race": "human",
+  "unitRace": {
+    "wagon": null
+  },
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "mcHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Rapier",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Kathay-Seidenumhang",
+          40
+        ]
+      ]
+    },
+    "mcKnight": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Rapier",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Drachenschwert",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Kathay-Seidenumhang",
+          40
+        ],
+        [
+          "Warhorse",
+          40,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "mcHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Pike",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "mcHenchM": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "mcCathay": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Drachenschwert",
+          20
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "merchantSkills": {
+      "name": "Merchant Special Skills",
+      "note": "Merchant Caravans Merchant (instead of the standard lists).",
+      "skills": [
+        [
+          "Bribery",
+          "Whenever a Rout test is required, the Merchant may pay 5 gc per non-Hero member still in the game; if he does, one already-out-of-action member does not count for that Rout test. Repeatable while gold lasts."
+        ],
+        [
+          "Dubious Income",
+          "If the Merchant was not taken out of action, before the trading phase he may take an Ld test: On a pass the warband gains 1 gc per Experience point the Merchant has; on a fail it loses up to that amount."
+        ],
+        [
+          "Wholesale",
+          "If not taken out of action, the Merchant may search for D3+1 rare items after each battle instead of one."
+        ],
+        [
+          "Deal Breaker",
+          "+1 on the roll to see what an item fetches when selling via the Trade special rule."
+        ],
+        [
+          "Connected",
+          "Instead of searching for rare items, the Merchant may visit the black market for special items (Dispel Scroll, Lesser Artefact, Magical Artefact, Magical Scroll); such items can never be sold back."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Money can be inherited, stolen or earned, and some want it faster than hard work allows. Blackguards, opportunists and hired guards tag along with merchant caravans to far-off lands in the hope of a big score.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/merchant-caravans"
+  },
+  "unitLore": {
+    "merchant": "Only the bravest – or most greedy fools – among merchants travel north to trade with the barbaric Norse tribes that dwell in the icy wastes. Others risk their lives on the Silk Road before reaching the safe haven of the Sentinels. From this trading post, the road forks. The Spice Route leads south to the Land of a Thousand Gods. The Ivory Road leads on east through uncountable dangerous tribes of warring Marauders and Hobgoblins, not to mention the many terrors encountered in the Ogre kingdoms.",
+    "apprentice": "Less than desirable duties must be diligently fulfilled during an apprenticeship with a merchant – packing mules, carrying crates, or driving the wagon.",
+    "knight": "Serving as the vanguard for a merchant's escort are former knights. Imperials, Bretonnians who used to own land and servants of their own, or ronins from the east. Nipponese and Cathayans alike will fight for fair pay in the service of merchants. All are well-traveled enough to be equipped with the finest arms forged by the swordsmiths of Grand Cathay.",
+    "magician": "Often warlocks, alchemists, and sorcerers seek the protection of an influential merchant to escape the stakes of the fanatical Witch Hunters. As part of his escort, they secretly continue their forbidden studies incognito. Opportunities arise to test the results of their ability on the raiding creatures of the Wastes.",
+    "sellsword": "Well aware of the attraction his caravan holds for highwaymen and raiding parties, the merchant keeps bodyguards. These roguish adventurers ensure that both the goods and their paymaster survive the journey undamaged. Sell-swords are the unfortunate scoundrels that earn their living as caravan escorts.",
+    "marksman": "The marksmen from Tilea are well renowned for their excellent skills in the use of crossbows.",
+    "blackguard": "In the outer Cathayan cities, a wealthy foreign trader is showered with offers from fortune-seeking outcasts. These mercenaries who dream of leaving their homes for wealth and fame bring strange weapons and fighting styles with them to join the merchant caravan.",
+    "wagon": "Availability: Common, Merchant Caravans only The many vulnerable items such as Cathayan jewels, spices and silk cloths are stored in the Trade Cart."
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "warband": {
+    "name": "Skaven",
+    "grade": "core",
+    "siteRace": "Skaven",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Assassin Adept. Max. 1 Eshin Sorcerer, max. 2 Black Skaven, max. 2 Night Runners (Heroes), max. 1 Rat Ogre, any number of Verminkin and Giant Rats.",
+    "units": [
+      {
+        "id": "adept",
+        "t": "hero",
+        "name": "Assassin Adept",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "skavenHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "skavenSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Perfect Killer: An additional −1 to enemy armour saves (shooting & close combat)."
+      },
+      {
+        "id": "sorc",
+        "t": "hero",
+        "name": "Eshin Sorcerer",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "skavenHero",
+        "sk": [
+          "academic",
+          "speed",
+          "skavenSkills"
+        ],
+        "sp": "Wizard: Magic of the Horned Rat."
+      },
+      {
+        "id": "black",
+        "t": "hero",
+        "name": "Black Skaven",
+        "cost": 40,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "skavenHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "skavenSkills"
+        ]
+      },
+      {
+        "id": "runner",
+        "t": "hero",
+        "name": "Night Runner",
+        "cost": 20,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": "skavenHench",
+        "sk": [
+          "combat",
+          "shooting",
+          "skavenSkills"
+        ]
+      },
+      {
+        "id": "vermin",
+        "t": "hen",
+        "name": "Verminkin",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "skavenHench"
+      },
+      {
+        "id": "rat",
+        "t": "hen",
+        "name": "Giant Rat",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "No equipment. Gains no experience."
+      },
+      {
+        "id": "ogre",
+        "t": "hen",
+        "name": "Rat Ogre",
+        "cost": 210,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 3,
+          "S": 5,
+          "T": 5,
+          "W": 3,
+          "I": 4,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Fear. Stupidity (unless a Skaven Hero is within 6\"). Large Target. Gains no experience. (Rating 20)"
+      }
+    ]
+  },
+  "extra": {
+    "magic": "hornedRat",
+    "skills": "skavenSkills"
+  },
+  "race": "skaven",
+  "unitRace": {
+    "ogre": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "skaven"
+    ]
+  },
+  "lists": {
+    "skavenHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Klageklingen (Paar)",
+          50
+        ],
+        [
+          "Kampfklauen (Paar)",
+          35
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ],
+        [
+          "Wurfsterne",
+          15
+        ],
+        [
+          "Blasrohr",
+          25
+        ],
+        [
+          "Warpschloss-Pistole",
+          35
+        ],
+        [
+          "Warpschloss-Pistolenpaar",
+          70
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "skavenHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Beneath the cities of men lives another race, the ratmen of the Skaven, who tunnel under the world and wait for their time. The fall of Mordheim and its wyrdstone has brought them up from the dark in force.",
+    "url": "https://mordheimer.net/docs/warbands/core-warbands/skaven-eshin"
+  },
+  "unitLore": {
+    "adept": "The Nightmaster of Clan Eshin has sent the Assassin to collect precious wyrdstone. Success means many breeders, wealth and a better position amongst the clan. Failure, on the other hand, is best not contemplated…",
+    "sorc": "The Sorcerers of Clan Eshin are black magicians who manufacture the enchanted weapons of the Assassins. Though their power is slight compared to the Warlocks of Clan Skryre or the mighty Grey Seer, their black sorcery is still potent.",
+    "black": "Black Skaven are the most powerful fighters of Clan Eshin: blackfurred killers trained in the martial arts of their clan. In Mordheim they excel at ambushing and assassinating man-things.",
+    "runner": "Night Runners are the young apprentices of Clan Eshin. Recently initiated into the secrets of the clan, they make up for their lack of knowledge with their ambition and energy.",
+    "vermin": "Verminkin are the Clanrats of Clan Eshin. The strongest amongst them are initiated into the secrets of the clans and begin their training to become Assassins, the most feared warriors of the Skaven warbands. All the Clanrats of Clan Eshin dream of rising to the status of an Assassin one day.",
+    "rat": "Giant Rats are the creation of the Clan Moulder trainees. They are mutated monstrosities the size of dogs. They fight alongside the Skaven, overpowering their opponents by sheer weight of numbers.",
+    "ogre": "These horrible monsters are much in demand as bodyguards to important Skaven."
+  }
+}

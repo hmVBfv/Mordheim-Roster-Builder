@@ -1,0 +1,1292 @@
+{
+  "lists": {
+    "merc": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Duellpistole",
+          25
+        ],
+        [
+          "Duellpistolenpaar",
+          50
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Wolfsumhang",
+          10,
+          {
+            "heroes": true,
+            "sub": [
+              "midd"
+            ]
+          }
+        ]
+      ]
+    },
+    "marksman": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Jagdgewehr",
+          200
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "possessed": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          15
+        ],
+        [
+          "Kurzbogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "wh": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Armbrustpistole",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "zealot": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "sos": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Sigmaritischer Kriegshammer",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Stahlpeitsche",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes (nur Heldinnen)": [
+        [
+          "Heiliger Foliant",
+          120
+        ],
+        [
+          "Geweihtes Wasser",
+          10
+        ],
+        [
+          "Heilige Reliquie",
+          15
+        ]
+      ]
+    },
+    "undead": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "ostlander": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "carnival": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          10
+        ],
+        [
+          "Bogen",
+          15
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "beastmen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Streitaxt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "amazonSkills": {
+      "name": "Amazon Skills",
+      "note": "Amazon Heroines (instead of the standard skill tables).",
+      "skills": [
+        [
+          "Skink Hunter",
+          "Always strikes first in the first close-combat round against Skinks (regardless of who charged)."
+        ],
+        [
+          "Elixir of Life",
+          "May re-roll one out-of-action roll after the battle (the second result stands)."
+        ],
+        [
+          "Mesmerising Dance",
+          "Enemy in base contact: Ld test at the start of each turn, otherwise it cannot attack (defence only). Useless against Lizardmen/Undead."
+        ],
+        [
+          "Savage Fury",
+          "+1 A when charging; immune to charm effects and fear."
+        ],
+        [
+          "Concealment",
+          "Hidden in jungle terrain: Enemies halve the distance at which they can spot her."
+        ]
+      ]
+    },
+    "tgSkills": {
+      "name": "Tomb Guardian Additional Skills",
+      "note": "Warband-specific additional skill (Academic).",
+      "skills": [
+        [
+          "Drive Chariot (Academic)",
+          "Chariots are very difficult to control and a warrior must have this skill to drive a chariot effectively in combat. A charioteer without this skill cannot charge. The Tomb Lord may learn it although it is Academic (Mordheimer inconsistency, played by intent: he is the obvious charioteer)."
+        ]
+      ]
+    },
+    "pitSkills": {
+      "name": "Pit Fighter Skills",
+      "note": "Pit Fighter Heroes (instead of the standard tables).",
+      "skills": [
+        [
+          "Bulging Biceps",
+          "Ignores the heavy-weapon penalty entirely — the Strength bonus (e.g. morning star) applies in every round."
+        ],
+        [
+          "Force of Will",
+          "On going OOA: Toughness test (−1 each subsequent round). On success he stands up and fights on (a 2nd OOA is final)."
+        ],
+        [
+          "Arms Master",
+          "Ignores all \"difficult to use\" rules — may e.g. combine a morning star + buckler, or two morning stars."
+        ],
+        [
+          "Body Slam",
+          "Instead of a normal charge, a shoulder slam: one attack at +1 S, +1 to hit, no weapon bonuses, criticals on 5+."
+        ],
+        [
+          "Grizzled Veteran",
+          "Immune to all psychology."
+        ]
+      ]
+    },
+    "cavalrySkills": {
+      "name": "Riding / Cavalry Skills",
+      "note": "Mounted warriors (e.g. Imperial Outriders) with the Ride skill.",
+      "skills": [
+        [
+          "Cavalry Commander",
+          "Mounted leader: Leadership radius +6\" (in addition to other bonuses)."
+        ],
+        [
+          "Trick Riding",
+          "Shooting against him −1; requires an Initiative test (otherwise loss of control). Not with heavy armour/shield/missile weapons."
+        ],
+        [
+          "Combat Riding",
+          "When charging an unmounted enemy: one extra S4 attack."
+        ],
+        [
+          "Evade",
+          "Always strikes first in close combat against dismounted enemies."
+        ],
+        [
+          "Running Dismount",
+          "Ride up to the mount's movement, then dismount at once (counts as a diving charge from 2\")."
+        ],
+        [
+          "Athletic Mount",
+          "Mount within 2\" and immediately make a full move/charge."
+        ],
+        [
+          "Horse Archer",
+          "Shoots at full gallop and in a 360° arc (additional −1 to hit)."
+        ],
+        [
+          "Mounted Combat Master",
+          "Against mounted enemies: A wounded enemy model gets +1 on its \"Whoa Boy!\" table."
+        ]
+      ]
+    },
+    "dthSkills": {
+      "name": "Dwarf Special Skills",
+      "note": "Dwarf Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Master of Blades (Combat Master)",
+          "When using a weapon with the Parry rule he parries on an equal or higher roll (not just higher). With two parrying weapons he may parry up to two attacks; with two Dwarf axes he may re-roll failed parries."
+        ],
+        [
+          "Extra Tough",
+          "When rolling on the Heroes' Serious Injury chart after being taken out of action, the dice may be re-rolled once (the second result must be accepted, even if worse)."
+        ],
+        [
+          "Resource Hunter",
+          "When rolling on the Exploration chart at the end of a game, he may modify one dice by +1/−1."
+        ],
+        [
+          "True Grit",
+          "When rolling on the Injury table for this Hero, 1–3 = knocked down, 4–5 = stunned, 6 = out of action."
+        ],
+        [
+          "Thick Skull",
+          "3+ save on a D6 to avoid being stunned (treat as knocked down instead). With a helmet this save is 2+ (replaces the normal helmet rule)."
+        ]
+      ]
+    },
+    "arabSkills": {
+      "name": "Arab Special Skills",
+      "note": "Arab Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Sand Worm",
+          "Can bury himself in sand and become almost undetectable: may hide in open ground. Cannot be used inside buildings."
+        ],
+        [
+          "Hit and Run",
+          "May run and shoot, but suffers −2 to hit instead of the −1 to hit for moving."
+        ],
+        [
+          "Weather Tolerant",
+          "Weather conditions such as heat no longer affect this model."
+        ]
+      ]
+    },
+    "bretSkills": {
+      "name": "Bretonnian Special Skills (Virtues)",
+      "note": "Bretonnian Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Virtue of Purity",
+          "His purity of heart resists enemy magic: any spell cast against the Knight is dispelled on a D6 roll of 4+."
+        ],
+        [
+          "Virtue of Valour",
+          "Against a model with a higher Strength than himself, he may re-roll any failed to-hit rolls in close combat."
+        ],
+        [
+          "Virtue of Discipline",
+          "Once per game, if he is not out of action, stunned or knocked down, you may re-roll a failed Rout test."
+        ],
+        [
+          "Virtue of Noble Disdain",
+          "Contempt for dishonourable weapons: subject to Hatred of all enemies armed with shooting weapons."
+        ],
+        [
+          "Virtue of Impetuous",
+          "Eager to get to grips: May add +D3\" to his move when charging (roll each time before moving)."
+        ]
+      ]
+    },
+    "deSkills": {
+      "name": "Dark Elf Special Skills",
+      "note": "Dark Elf Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Fury of Khaine",
+          "May make a 4\" follow-up move if he takes all of his opponents out of action."
+        ],
+        [
+          "Powerful Build",
+          "May choose skills from the Strength table from now on. The Sorceress may never take this skill; no more than two warriors in the warband may have it at one time."
+        ],
+        [
+          "Fey Quickness",
+          "Avoids melee or missile attacks on a roll of 6; with Step Aside or Dodge this improves to 4+ in the relevant area."
+        ],
+        [
+          "Infiltration",
+          "Exactly the same as the Skaven skill."
+        ],
+        [
+          "Master of Poisons",
+          "If the Hero doesn't search for rare items, he may make D3−1 doses of Dark Venom instead (must be used in the next battle; cannot be sold or traded)."
+        ]
+      ]
+    },
+    "weSkills": {
+      "name": "Wood Elf Special Skills",
+      "note": "Wood Elf Heroes with the Special skill list may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Fey",
+          "An understanding of magic: 4+ saving throw against hostile magic."
+        ],
+        [
+          "Elven Luck",
+          "The Elven gods favour him: Once per game he may re-roll any failed roll."
+        ],
+        [
+          "Excellent Sight (skill)",
+          "Can spot hidden enemy models up to 2× his Initiative in inches away."
+        ],
+        [
+          "Seeker",
+          "Expert tracker: May modify the result of one exploration die by +/−1. Only one Elven Hero may possess this skill."
+        ],
+        [
+          "Infiltration",
+          "Always deployed last, anywhere out of sight of the enemy. If both players infiltrate, roll D6 — lowest deploys first."
+        ]
+      ]
+    },
+    "skavenSkills": {
+      "name": "Skaven Special Skills",
+      "note": "Skaven Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Black Hunger",
+          "Declare at the start of his turn: +1 attack and +D3\" total move for the duration of his own turn, but suffers D3 S3 hits with no armour save at the end of the turn."
+        ],
+        [
+          "Tail Fighting",
+          "May wield a shield, knife or sword with his tail: an extra attack with the appropriate weapon, or a +1 bonus to his armour save."
+        ],
+        [
+          "Wall Runner",
+          "Needs no Initiative test when climbing walls and other sheer surfaces."
+        ],
+        [
+          "Infiltration",
+          "Always placed after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both players infiltrate, roll D6 — lowest sets up first."
+        ],
+        [
+          "Art of Silent Death",
+          "Fights with bare paws without penalties and counts as having two weapons (+1 attack); causes critical hits on a To Wound roll of 5–6. With Fighting Claws: +2 attacks instead of +1."
+        ]
+      ]
+    },
+    "pestilensSkills": {
+      "name": "Clan Pestilens Special Skills",
+      "note": "Members of Clan Pestilens may choose these skills instead of the standard ones.",
+      "skills": [
+        [
+          "Black Hunger",
+          "As the Skaven skill: +1 attack and +D3\" move for his turn; D3 S3 hits (no save) at the end of the turn."
+        ],
+        [
+          "Censer Bearer",
+          "Requires Black Hunger. Gains Frenzy; the only weapon he may use in close combat is a censer."
+        ],
+        [
+          "Rotten Body",
+          "Immune to poisons and diseases; if taken out of combat by a failed censer test he does not roll for injuries (recovers automatically)."
+        ],
+        [
+          "Contagious",
+          "Requires Rotten Body. A model that takes the bearer out of action in close combat must take a Toughness test (D6): if the roll is higher than its Toughness it suffers an automatic wound (a 6 always wounds). Undead/Possessed never test."
+        ],
+        [
+          "Ignore Pain",
+          "Requires the Resilient skill. Treats Stunned injuries as Knocked Down."
+        ]
+      ]
+    },
+    "slayerSkills": {
+      "name": "Troll Slayer Skills",
+      "note": "Dwarf Slayers may use this list as well as any standard skill tables available to them.",
+      "skills": [
+        [
+          "Ferocious Charge",
+          "May double his attacks in the turn he charges; suffers −1 to hit that turn."
+        ],
+        [
+          "Monster Slayer",
+          "Always wounds any opponent on a roll of 4+, regardless of Toughness (unless his own Strength would mean a lower roll is needed)."
+        ],
+        [
+          "Berserker",
+          "+1 to his close-combat to-hit rolls during the turn he charges."
+        ]
+      ]
+    },
+    "pirateSkills": {
+      "name": "Pirate Special Skills",
+      "note": "Pirate Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Sea Shanty Singer",
+          "At the start of his close-combat phase he may burst into song: one opponent in base contact must pass a Ld test or lose 1 Attack that turn. No effect on Undead or other non-living creatures (e.g. Possessed)."
+        ],
+        [
+          "Sea Legs",
+          "If he Falls, he may ignore the D3 hits on a single roll of 4+. If knocked down or stunned within 1\" of a precipice, he may re-roll the Initiative test to avoid falling."
+        ],
+        [
+          "Cutlass Master",
+          "With a Sword he parries already on an equal roll (not just higher) — but only when not in the open (in cover, in a building, or within 2\" of a terrain feature)."
+        ],
+        [
+          "Booming Voice",
+          "Captain only: Once per turn, one pirate within 8\" who failed a test to flee combat (or to stop fleeing) may re-roll it. The Captain must be on his feet and not in close combat himself."
+        ],
+        [
+          "Hardy Constitution",
+          "May ignore any Critical Hit on a roll of 5+ (the wound is then treated as normal)."
+        ],
+        [
+          "Swashbuckler",
+          "At the end of any close-combat phase while in base contact with enemies, he may take a Ld test: If passed, he makes a normal move away (no run/charge) without the enemy striking blows."
+        ]
+      ]
+    },
+    "norseSkills": {
+      "name": "Norse Special Skills",
+      "note": "Norse Heroes with the Special skill list may use this list instead of the normal ones.",
+      "skills": [
+        [
+          "Shield Master",
+          "When armed with a shield he may parry with it in addition to getting the 6+ save."
+        ],
+        [
+          "Berserk Charge",
+          "When armed with an axe or double-handed weapon, he may re-roll all failed to-hit rolls when he charges."
+        ],
+        [
+          "Crushing Blow",
+          "No enemy may parry an attack made by this hero — it strikes with such power that it pushes right through a buckler or sword."
+        ],
+        [
+          "Battle Tongue",
+          "Leader only: Models within 12\" may use his Leadership (instead of the normal 6\")."
+        ],
+        [
+          "Barbarian Courage",
+          "Never needs to take All Alone tests and may re-roll failed Fear tests."
+        ]
+      ]
+    },
+    "swSkills": {
+      "name": "Shadow Warrior Special Skills",
+      "note": "Shadow Warrior Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Infiltration",
+          "Exactly the same as the Skaven skill: Always placed after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both players infiltrate, roll D6 — lowest sets up first."
+        ],
+        [
+          "See in Shadows",
+          "May always roll to charge opponents he cannot see (instead of the normal 4\"), as long as he has the movement to reach them."
+        ],
+        [
+          "Hide in Shadows",
+          "An enemy attempting to detect him while he is Hidden must halve its Initiative before measuring the distance."
+        ],
+        [
+          "Sniper",
+          "If Hidden, may shoot or cast spells and remain Hidden. If the target is not taken out of action, it tests against its Initiative — on a success the Sniper is spotted and no longer hidden."
+        ],
+        [
+          "Powerful Build",
+          "May choose skills from the Strength table from now on. Not for Shadow Weavers; only two members of the warband may ever have this skill at one time."
+        ],
+        [
+          "Master of Runes",
+          "Shadow Weaver only: +1 to his Dispel roll with Elven Runestones. May also inscribe one warrior's gear with runes: that warrior may re-roll a single failed armour save or Parry once per battle (must be redone after each battle)."
+        ]
+      ]
+    },
+    "sosSkills": {
+      "name": "Sisters of Sigmar Special Skills",
+      "note": "Sisters of Sigmar may use this list instead of the standard skill lists.",
+      "skills": [
+        [
+          "Sign of Sigmar",
+          "Possessed or Undead opponents lose their first attack against the Sister in the first round of close combat (down to a minimum of 1)."
+        ],
+        [
+          "Protection of Sigmar",
+          "Any spell which would affect her is nullified on a D6 roll of 4+. A nullified spell does not affect any other models either."
+        ],
+        [
+          "Utter Determination",
+          "Matriarch only: May re-roll any failed Rout tests."
+        ],
+        [
+          "Righteous Fury",
+          "Hates all Skaven, Undead, Possessed, Beastmen, Dark Elves and any other evil warband (and all models in them). Non-Chaos humans who merely kill and loot are not included."
+        ],
+        [
+          "Absolute Faith",
+          "May re-roll any Fear tests and does not have to test if fighting alone against several opponents."
+        ]
+      ]
+    },
+    "ostlanderSkills": {
+      "name": "Ostlander Special Skills",
+      "note": "Ostlander Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Bull Rush",
+          "When charging, may attempt to knock down the opponent instead of his normal attacks: one to-hit roll at +1; no wound roll — on a hit the opposing model is Knocked Down."
+        ],
+        [
+          "Foul Odour",
+          "Reeks of alcohol: All living enemies (not Undead/Possessed) are at −1 to hit him in close combat. May not carry open flames; fire attacks against him are at +1 Strength."
+        ],
+        [
+          "Taunt",
+          "In the shooting phase, instead of shooting/casting: one visible enemy (LOS rules as shooting) takes a Ld test — if failed it must spend its next movement phase trying to get into close combat with the taunter."
+        ],
+        [
+          "Animal Friendship",
+          "'Normal' animals never attack him; up to two wardogs he owns do not count against the warband's maximum size."
+        ],
+        [
+          "Blood Oath",
+          "Leader only: May re-roll a single Rout test once per game."
+        ]
+      ]
+    },
+    "beastmenSkills": {
+      "name": "Beastmen Special Skills",
+      "note": "Beastmen Heroes may use this list instead of the standard skill lists available to them.",
+      "skills": [
+        [
+          "Shaggy Hide",
+          "The Beastman's massively shaggy hide acts as armour: 6+ armour save that can be combined with other armour as normal."
+        ],
+        [
+          "Mutant",
+          "The Beastman may buy one mutation (see the Possessed mutations)."
+        ],
+        [
+          "Fearless",
+          "Immune to fear and All Alone tests."
+        ],
+        [
+          "Horned One",
+          "Mighty horns: May make an additional attack with his basic Strength in a turn he charges."
+        ],
+        [
+          "Bellowing Roar",
+          "Beastman Chief only: May re-roll any failed Rout tests."
+        ],
+        [
+          "Manhater",
+          "Affected by the rules of hatred when fighting any Human warbands."
+        ]
+      ]
+    },
+    "orcSkills": {
+      "name": "Orc Special Skills",
+      "note": "Orc Heroes (Orc Mob) may use this list instead of any standard list available to them.",
+      "skills": [
+        [
+          "'Ard 'Ead",
+          "Special 3+ save on a D6 to avoid being stunned (treat as knocked down instead). With a helmet this save is 2+ (replaces the normal helmet rule)."
+        ],
+        [
+          "Waaagh!",
+          "Expert at bulldozing charges: May add +D3\" to his charge range."
+        ],
+        [
+          "'Ere We Go!",
+          "May ignore Fear tests when charging."
+        ],
+        [
+          "Da Cunnin' Plan",
+          "Boss only. The warband may re-roll any failed Rout test as long as the Boss is not out of action."
+        ],
+        [
+          "Well 'Ard",
+          "Thick, dark-green skin (possibly Black Orc blood): may add +1 to any armour saves."
+        ],
+        [
+          "'Eadbasher",
+          "Massive strength, aims at heads: any knocked down results the Orc causes in close combat count as stunned instead."
+        ]
+      ]
+    },
+    "blackOrcSkills": {
+      "name": "Black Orc Special Skills",
+      "note": "Black Orc Heroes may use this list instead of the standard skill lists available to them.",
+      "skills": [
+        [
+          "Proven Warrior",
+          "This young warrior has proven himself worthy of his Black Orc heritage. This skill may only be taken by a Young'un with the Black Orc blood ability and 25 experience. Once he gains this skill, the model is now considered a full Black Orc Warrior (yet still retains the title of Young'un). He follows all the rules for Black Orcs and uses their equipment list and has access to the same skill lists as a Black Orc."
+        ],
+        [
+          "'Ard 'Ead",
+          "Special 3+ save on a D6 to avoid being stunned (treat as knocked down instead). With a helmet this save is 2+ (replaces the normal helmet rule)."
+        ],
+        [
+          "Waaagh!",
+          "May add +D3\" to his charge range."
+        ],
+        [
+          "'Ere We Go!",
+          "May ignore Fear tests when charging."
+        ],
+        [
+          "Da Cunnin' Plan",
+          "Boss only. The warband may re-roll any failed Rout test as long as the Boss is not out of action."
+        ],
+        [
+          "'Eadbasher",
+          "Any knocked down results the Orc causes in close combat count as stunned instead."
+        ]
+      ]
+    },
+    "hornedHunterSkills": {
+      "name": "Horned Hunter Special Skills",
+      "note": "Horned Hunter Heroes may use this list instead of any standard list available to them.",
+      "skills": [
+        [
+          "Master Trapper",
+          "Masterful trap setter: Trip wire range extends to 4\"; traps set by him trigger on 2+."
+        ],
+        [
+          "Infiltration",
+          "Always placed after the opposing warband, anywhere out of sight and more than 12\" from any enemy. If both players infiltrate, roll D6 — lowest sets up first."
+        ],
+        [
+          "Foul Odour",
+          "Reeks of alcohol and sweat: All living enemies (not Undead/Possessed) are at −1 to hit him in close combat. He may not carry open flames; fire attacks against him are at +1 Strength."
+        ],
+        [
+          "Animal Friendship",
+          "'Normal' animals (warhorses, warhounds, etc.) will never attack him; up to two wardogs he owns do not count against the warband's maximum size."
+        ],
+        [
+          "Pathfinder",
+          "Roll one additional D6 during the exploration phase. A warband may only contain one pathfinder."
+        ],
+        [
+          "Hide in Shadows",
+          "Crouches unseen in any cover: Enemies must halve their Initiative when attempting to find him while he is Hidden."
+        ]
+      ]
+    },
+    "marauderSkills": {
+      "name": "Marauder Skills",
+      "note": "Marauders of Chaos Heroes (instead of the standard skill tables).",
+      "skills": [
+        [
+          "Chosen of Chaos",
+          "The Hero counts as a Chaos Warrior: Uses the maximum profile for Warriors of Chaos (M4 WS8 BS8 S5 T5 W3 I8 A5 Ld9) and the Hero equipment list."
+        ],
+        [
+          "Tattooed Body",
+          "Leader only. The \"Eye of the Gods\" effect (Spawn/Mark) occurs already on 10+ (Norse leaders 11+)."
+        ],
+        [
+          "Sweeping Blow",
+          "If the Hero takes an enemy OOA with a double-handed weapon, he may immediately make an additional attack against another model in base contact. Requires Strongman."
+        ],
+        [
+          "Mutant",
+          "The Hero buys a mutation (see Possessed mutations). May be taken more than once. With the Mark of Onogal, a Blessing of Nurgle instead (except the Mark of Nurgle)."
+        ],
+        [
+          "Heart of the Warrior",
+          "Leader only. May re-roll failed Rout tests and is immune to fear and all-alone tests."
+        ]
+      ]
+    },
+    "banditSkills": {
+      "name": "Bandit Special Skills",
+      "note": "Hochland Bandit Heroes may use this list instead of any standard skill tables available to them.",
+      "skills": [
+        [
+          "Banditry",
+          "Instead of searching for rare equipment between games, roll a D6: 2-6 = D6+1 gold to the stash; on a 1 the robbery goes wrong (roll on the Serious Injury table as if taken Out of Action). Cannot be combined with the Huckster's Slick Operator."
+        ],
+        [
+          "Hide in Shadows",
+          "An enemy trying to detect this warrior while he is Hidden must halve his Initiative (round up) before measuring the spotting distance."
+        ],
+        [
+          "Jump Back",
+          "If in close combat (and not knocked down/stunned) at the start of his Movement phase, the warrior may make an Initiative test to leave combat: success moves him 1\" away (free) and he may then act normally; failure means he strikes last that round."
+        ],
+        [
+          "Sniper",
+          "While Hiding, the warrior may shoot or cast spells and still remain Hidden — not when firing a black-powder weapon."
+        ],
+        [
+          "Throw Voice",
+          "If an enemy tries to detect the Hidden bandit, roll a D6: on 4+ he stays undetected and Hidden."
+        ]
+      ]
+    }
+  }
+}

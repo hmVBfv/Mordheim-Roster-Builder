@@ -1,0 +1,305 @@
+{
+  "warband": {
+    "name": "Pit Fighters",
+    "grade": "1b",
+    "siteRace": "All",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Pit King. Max. 1 Dwarf Troll Slayer, 2 Veterans, 1 Ogre; max. 7 Pursuers, any number of Pit Fighters.<br><b>Pit Fighter skill:</b> All warriors have it (+1 WS and +1 A when fighting in ruins, buildings or the pit).<br><b>Bulging Biceps:</b> A Pit Fighter with this special skill ignores the whole 'heavy' weapon penalty, and its Strength bonus then applies in EVERY close-combat round (e.g. a morning star gives +1 Strength every turn, not just the first).<br><b>Fighting styles:</b> Weapons and armour are not chosen freely — each Man Pit Fighter picks one fixed fighting-style kit (Troll Slayer and Ogre have their own limited list).<br><b>Free the Slaves:</b> Pit Fighters hate all slavers and never sell captured opponents to them.<br><b>In the Pit:</b> A captured enemy may instead be made to fight a warband member in the pits. If he wins, that fighter gains +2 Experience and the warband gets all the captive's armour and weapons +50 gc. If he loses, roll for the fighter's injury as normal, ignoring Robbed, Captured, Hardened, Sold to the Pits and Survives against the Odds.<br><b>Hired Swords:</b> May hire any Hired Sword except the Elf Ranger.",
+    "units": [
+      {
+        "id": "pitking",
+        "t": "hero",
+        "name": "Pit King",
+        "cost": 80,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 4,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "pfStyle",
+        "kit": true,
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "pitSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Pit Fighter."
+      },
+      {
+        "id": "trollslayer",
+        "t": "hero",
+        "name": "Dwarf Troll Slayer",
+        "cost": 50,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "pfSlayer",
+        "noArmour": true,
+        "noMissile": true,
+        "sk": [
+          "combat",
+          "strength",
+          "slayerSkills",
+          "pitSkills"
+        ],
+        "sp": "Pit Fighter skill. Death Wish (immune to all psychology). Hard to Kill (only taken out of action on a 6). Hard Head (ignores mace/club concussion). Hates Orcs & Goblins. Grudgebearers: Leaves the warband if any Elf is hired. May never use missile weapons or armour."
+      },
+      {
+        "id": "pitveteran",
+        "t": "hero",
+        "name": "Pit Veteran",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pfStyle",
+        "kit": true,
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "pitSkills"
+        ],
+        "sp": "Pit Fighter."
+      },
+      {
+        "id": "ogrepit",
+        "t": "hen",
+        "name": "Ogre Pit Fighter",
+        "cost": 165,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 2,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": "pfOgre",
+        "large": true,
+        "promoCatsFixed": [
+          "combat",
+          "strength"
+        ],
+        "sp": "Pit Fighter skill. Fear. Large Target. Slow-witted: Needs twice the experience for each advance. If promoted via The Lad's Got Talent, may only choose Combat, Strength and Pit Fighter Special Skills."
+      },
+      {
+        "id": "pitfighter",
+        "t": "hen",
+        "name": "Pit Fighter",
+        "cost": 35,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pfStyle",
+        "kit": true,
+        "sp": "Pit Fighter."
+      },
+      {
+        "id": "pursuer",
+        "t": "hen",
+        "name": "Pursuer",
+        "cost": 25,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pfPursuer",
+        "kit": true,
+        "sp": "Evade; Pit Fighter."
+      }
+    ]
+  },
+  "extra": {
+    "skills": "pitSkills"
+  },
+  "race": "human",
+  "unitRace": {
+    "trollslayer": "dwarf",
+    "ogrepit": "ogre"
+  },
+  "hire": {
+    "align": "neutral",
+    "except": [
+      "elfranger"
+    ]
+  },
+  "lists": {
+    "pfStyle": {
+      "Besonderes": [
+        [
+          "Orc-Stil (Helm/Dolch/Axt/Schild)",
+          20
+        ],
+        [
+          "Untoten-Stil (Helm/Dolch/Stachelh./Schwert)",
+          35
+        ],
+        [
+          "Empire-Stil (Helm/Dolch/Zweihandw./Leichte R.)",
+          45
+        ],
+        [
+          "Chaos-Stil (Helm/Dolch/Flegel/Schild/Leichte R.)",
+          50
+        ]
+      ]
+    },
+    "pfPursuer": {
+      "Besonderes": [
+        [
+          "Skink-Stil (Helm/Dolch/Dreizack o. Javelins/Netz o. Buckler)",
+          25
+        ],
+        [
+          "Witch-Elf-Stil (Helm/Dolch/2 Schwerter o. Speer & Netz)",
+          30
+        ]
+      ]
+    },
+    "pfOgre": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Stachelhandschuh",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "pfSlayer": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Zwergenaxt",
+          15
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Stachelhandschuh",
+          15
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Gladiatorial pits across the Empire, from Cutthroat's Haven to the Black Pits by Mordheim, force tough fighters to brawl for a crowd. The best of them take their skill out of the arena and into the ruins.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/pit-fighters"
+  },
+  "unitLore": {
+    "pitveteran": "Pit fighter veterans are experienced fighters who carry out the orders of the Pit King with ruthless efficiency. These men ensure that the warband is held together with iron-hard discipline and always keep a watchful eye on the Pit King’s back lest an over ambitious fellow pit fighter gets any ideas.",
+    "ogrepit": "Pit fighters are close combat specialists armed with a variety of weapons and armour. Usually they are fairly heavily armoured and equipped with sword and shield, although sometimes they will be skilled in the use of two-handed weapons.",
+    "pitfighter": "Pit fighters are close combat specialists armed with a variety of weapons and armour. Usually they are fairly heavily armoured and equipped with sword and shield, although sometimes they will be skilled in the use of two-handed weapons.",
+    "pursuer": "Pursuers are a special martial type of pit fighter often used for ‘warm-up fights’ before the main show. These men are usually lightly armed with spears, nets and javelins with which they harry their enemies in a hit and run style of warfare. This style of fighting dates back to ancient times in Tilea when gladiators, as they were known in the Tilean tongue, would fight in massive stone arenas to huge crowds of citizens baying for blood."
+  }
+}

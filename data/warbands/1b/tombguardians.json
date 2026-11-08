@@ -1,0 +1,372 @@
+{
+  "warband": {
+    "name": "Tomb Guardians (Khemri)",
+    "grade": "1b",
+    "siteRace": "Undead",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Tomb Lord. Max. 1 Liche Priest, 2 Acolytes; any number of Skeleton Warriors, max. 2 Tomb Guardians, max. 3 Tomb Scorpions.<br><b>Undead:</b> Fear, immune to psychology, No Pain (stunned counts as knocked down), may not run, immune to poison.<br><b>Home Ground:</b> +1 die in the Exploration phase, in every campaign setting (Mordheimer lists the scope as unclear; played by intent — without it the warband is very weak).<br><b>No Brain:</b> Skeletons never gain experience (Tomb Lord, Liche Priest, Acolytes and Tomb Guardians do).<br><b>Do not Drink:</b> Undead need no food or water; living animals with the warband follow the water rules as normal.",
+    "units": [
+      {
+        "id": "tomblord",
+        "t": "hero",
+        "name": "Tomb Lord",
+        "cost": 150,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 5,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "tgLord",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "tgSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Undead. Flammable (fire = double wounds). Does not learn new skills — rather 'remembers' those he knew in life."
+      },
+      {
+        "id": "lichepriest",
+        "t": "hero",
+        "name": "Liche Priest",
+        "cost": 55,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "tgLiche",
+        "noArmour": true,
+        "sk": [
+          "academic",
+          "tgSkills"
+        ],
+        "sp": "Wizard: Uses Mortuary Cult Scrolls. Undead: Follows all Undead rules. Weapons only, no armour (interferes with spellcasting)."
+      },
+      {
+        "id": "acolyte",
+        "t": "hero",
+        "name": "Acolyte",
+        "cost": 20,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "tgAcolyte",
+        "sk": [
+          "combat",
+          "academic",
+          "tgSkills"
+        ],
+        "sp": "Undead: Follows all Undead rules."
+      },
+      {
+        "id": "skeletonwarrior",
+        "t": "hen",
+        "name": "Skeleton Warrior",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "tgUndead",
+        "noxp": true,
+        "sp": "Undead, gains no experience."
+      },
+      {
+        "id": "tombguardian",
+        "t": "hen",
+        "name": "Tomb Guardian",
+        "cost": 30,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "tgUndead",
+        "sp": "Undead: Follows all Undead rules. Gains experience: The original source explicitly notes Tomb Guards DO gain experience (Mordheimer: Use the Tomb Lord maximum characteristics)."
+      },
+      {
+        "id": "tombscorpion",
+        "t": "hen",
+        "name": "Tomb Scorpion",
+        "cost": 15,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 5,
+          "WS": 2,
+          "BS": 0,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Living, Animal (gains no experience), poison sting (as Black Lotus)."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "lichePriest",
+    "skills": "tgSkills"
+  },
+  "race": "tomblord",
+  "unitRace": {
+    "lichepriest": "lichepriest",
+    "acolyte": "lichepriest",
+    "skeletonwarrior": "graveguard",
+    "tombguardian": "graveguard",
+    "tombscorpion": "graveguard"
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "undead"
+    ]
+  },
+  "lists": {
+    "tgUndead": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "tgLord": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Nehekharan-Javelin",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Asp-Pfeile",
+          10
+        ]
+      ]
+    },
+    "tgLiche": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Stab",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Schlangenstab",
+          30
+        ]
+      ]
+    },
+    "tgAcolyte": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Stab",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The ancient kingdoms of Nehekhara buried their dead with great care, and the dead still march with rusty weapons and rattling bones. Tomb Guardians are the undying guardians of those burial places.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/tomb-guardians"
+  },
+  "unitLore": {
+    "tomblord": "The legions of the dead are led by Tomb Lords, trusted officers and captains in the Nehekharan armies. But not all Tomb Lords were soldiers in life and some were the great engineers and artisans who constructed the Necropolises and were granted mummification for their accomplishments.",
+    "lichepriest": "The Mortuary Cult perfected their magic over a thousand years until the Cult could cheat death itself. The priests now hold a unique kind of power, standing by the Tomb King's side - they alone are able to invoke the power that allows the Tomb King's armies to march to war.",
+    "acolyte": "The Mortuary Cult has been a very large influential priesthood in the Land of the Dead for centuries. Acolytes to the Cult have to study long and hard (even beyond death!) before they can assume the mantle of Liche Priest. During their apprenticeship to the Liche Priests, Acolytes have to perorm all of the menial tasks as well as protect their masters from harm.",
+    "skeletonwarrior": "With the coming of Nagash and his great ritual, the inhabitants of the Necropolises were brought back to the land of the living. The kings and lords once more command their legions, but this time the legions are made up of skeletons rather than living soldiers.",
+    "tombguardian": "As the kings and lords were awakened, so too were their bodyguards, the Tomb Guards; faithful in death as they were in life. Often armed with the best armour and weapons, they are always at their lord's side.",
+    "tombscorpion": "Vast nests of scorpions infest the ancient Necropolises of Khemri, dwelling in the dark cracks and niches of the tombs, aggressively defending their home. Liche Priests can summon these poisonous creatures and direct them to attack any invaders."
+  }
+}

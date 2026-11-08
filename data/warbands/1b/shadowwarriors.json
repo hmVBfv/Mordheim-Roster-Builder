@@ -1,0 +1,328 @@
+{
+  "warband": {
+    "name": "Shadow Warriors",
+    "grade": "1b",
+    "siteRace": "High Elf",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Shadow Master. Max. 3 Shadow Walkers, 1 Shadow Weaver; any number of Shadow Warriors, any number of Shadow Novices.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Distaste for Poison:</b> warriors may not use poisons of any type.<br><b>Unforgiving:</b> In multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> May hire any Hired Sword except the Chaotic and evil ones (Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.) and the poison-users (Assassins).",
+    "units": [
+      {
+        "id": "shadowmaster",
+        "t": "hero",
+        "name": "Shadow Master",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 5,
+          "WS": 5,
+          "BS": 5,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "swHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed",
+          "swSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "shadowwalker",
+        "t": "hero",
+        "name": "Shadow Walker",
+        "cost": 45,
+        "exp": 12,
+        "max": 3,
+        "profile": {
+          "M": 5,
+          "WS": 5,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "swHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "swSkills"
+        ]
+      },
+      {
+        "id": "shadowweaver",
+        "t": "hero",
+        "name": "Shadow Weaver",
+        "cost": 55,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "swHero",
+        "sk": [
+          "combat",
+          "academic",
+          "speed",
+          "swSkills"
+        ],
+        "sp": "Wizard: Uses Shadow Magic. May be equipped with weapons AND armour, but may not cast spells while wearing armour."
+      },
+      {
+        "id": "shadowwarrior",
+        "t": "hen",
+        "name": "Shadow Warrior",
+        "cost": 35,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "swEq"
+      },
+      {
+        "id": "shadownovice",
+        "t": "hen",
+        "name": "Shadow Novice",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "swEq"
+      }
+    ]
+  },
+  "extra": {
+    "magic": "shadowMagic",
+    "skills": "swSkills"
+  },
+  "race": "elf",
+  "hire": {
+    "align": "neutral",
+    "elf": true,
+    "tags": [
+      "goodElves"
+    ],
+    "noChaosHS": true
+  },
+  "lists": {
+    "swHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Ithilmar-Schwert",
+          20,
+          {
+            "start": true,
+            "later": "Ithilmar-Waffe"
+          }
+        ],
+        [
+          "Ithilmar-Speer",
+          20,
+          {
+            "start": true,
+            "later": "Ithilmar-Waffe"
+          }
+        ],
+        [
+          "Ithilmar-Zweihandwaffe",
+          30,
+          {
+            "start": true,
+            "later": "Ithilmar-Waffe"
+          }
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Elfenbogen",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Ithilmar-Rüstung",
+          60,
+          {
+            "start": true
+          }
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Standarte von Nagarythe",
+          75,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Kriegshorn von Nagarythe",
+          25,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Elfenumhang",
+          75
+        ],
+        [
+          "Elfenwein",
+          50,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Elfenrunensteine",
+          50,
+          {
+            "start": true
+          }
+        ]
+      ]
+    },
+    "swEq": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Elfenbogen",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Elfenumhang",
+          75
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Nagarythe was once a rich Elf kingdom until its rulers turned to Chaos. Those who stayed loyal wage a secret war of shadows against the Witch King and the Dark Elves, and some of them reach Mordheim.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/shadow-warriors"
+  },
+  "unitLore": {
+    "shadowmaster": "Shadow Master is a very honourable title among the warriors of the Shadow Elves… it is given to one who has fought in the shadow war for so long that he rules the darkness that he fights from. Often a member of the former Nagarythe nobility, the captain of a Shadow Warrior Warband is known by the honourable title ‘Shadow Master’. These proud and strong-willed warriors often gather a small band of their followers and seek a life away from the hesitant charity and distasteful stares of Ulthuan.",
+    "shadowwalker": "One step down from the title of Shadow Master is Shadow Walker. A walker in the shadows is considered to have made friends with the darkness, and while he does not command it, it gives him aid when asked. Shadow Walkers are seasoned veterans in the war against the Dark Elves. They are skilled trackers and hunters, and the most trusted lieutenants of the Warband’s captain, the Shadow Master.",
+    "shadowweaver": "All High Elves have some aptitude for magic, and those with the greatest aptitude are taught how to bend the Winds of Magic to their will. Shadow Weavers are the mages of Nagarythe. Due to the nature of their unending war against the Dark Elves, the mages of Nagarythe tend to specialise in magics that use shadows to conceal their presence and confound their enemies. In fact the title Shadow Weaver comes from the nature of their magic… like a talented tailor, the Shadow Weaver takes the threads of shadow and fashions them into shapes and forms of his choosing.",
+    "shadowwarrior": "Most of the warriors in the Shadow Warrior Warband are veterans of at least one battle, and all have lost loved ones to the depravity of the Dark Elves.",
+    "shadownovice": "Most of the warriors in the Shadow Warrior Warband are veterans of at least one battle, and all have lost loved ones to the depravity of the Dark Elves."
+  }
+}

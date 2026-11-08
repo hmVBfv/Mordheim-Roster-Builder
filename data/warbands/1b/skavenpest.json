@@ -1,0 +1,312 @@
+{
+  "warband": {
+    "name": "Skaven of Clan Pestilens",
+    "grade": "1b",
+    "siteRace": "Skaven",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Plague Priest. Max. 1 Pestilens Sorcerer, 2 Plague Monks, 2 Monk Initiates; any number of Plague Novices, any number of Giant Rats, max. 1 Rat Ogre.<br><b>Skaven:</b> Picks its equipment from the Skaven equipment lists (the Skaven of Clan Eshin, Core warbands), like the Skaven of the Rulebook.",
+    "units": [
+      {
+        "id": "plaguepriest",
+        "t": "hero",
+        "name": "Plague Priest",
+        "cost": 85,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "skvpHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "pestilensSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "pestsorcerer",
+        "t": "hero",
+        "name": "Pestilens Sorcerer",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "skvpHero",
+        "sk": [
+          "academic",
+          "speed",
+          "pestilensSkills"
+        ],
+        "sp": "Wizard (Magic of the Horned Rat)."
+      },
+      {
+        "id": "plaguemonk",
+        "t": "hero",
+        "name": "Plague Monk",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "skvpHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "pestilensSkills"
+        ]
+      },
+      {
+        "id": "monkinitiate",
+        "t": "hero",
+        "name": "Monk Initiate",
+        "cost": 20,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 2,
+          "BS": 3,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": "skvpHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "pestilensSkills"
+        ]
+      },
+      {
+        "id": "plaguenovice",
+        "t": "hen",
+        "name": "Plague Novice",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "skvpHench"
+      },
+      {
+        "id": "giantrat",
+        "t": "hen",
+        "name": "Giant Rat",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Animal (gains no experience)."
+      },
+      {
+        "id": "ratogre",
+        "t": "hen",
+        "name": "Rat Ogre",
+        "cost": 210,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 3,
+          "S": 5,
+          "T": 5,
+          "W": 3,
+          "I": 4,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "large": true,
+        "sp": "Fear, Stupidity (unless a Skaven Hero is within 6\"), Large Target, gains no experience."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "hornedRat",
+    "skills": "pestilensSkills"
+  },
+  "race": "skaven",
+  "unitRace": {
+    "ratogre": null
+  },
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "skaven"
+    ]
+  },
+  "lists": {
+    "skvpHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Disease Dagger",
+          15
+        ],
+        [
+          "Censer",
+          40
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "skvpHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Clan Pestilens spreads plague and disease for the Horned Rat, with priests and censer-bearers leading a swarm of followers. Their sudden, foul-smelling attacks come out of mist and squeaks in the ruined streets.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/skaven-pestilens"
+  },
+  "unitLore": {
+    "plaguepriest": "The Plague Priest is one of the most disgusting disciples of the corrupted Clan Pestilens brotherhood. As leader of a small band of devoted to the Clan, the contagion and the wide spreading of diseases are his main goals in the streets of Mordheim.",
+    "pestsorcerer": "The Pestilens Sorcerer is a twisted alchemist, always looking for new and more terrible forms of contagion, under the vigilant supervision of his dreadful master, the Horned Rat.",
+    "plaguemonk": "The Plague Monks are among the most fanatic and dangerous members of Clan Pestilens, to them is usually given the honour to chant the Liturgicus Infecticus in combat.",
+    "monkinitiate": "The Monk Initiates are young skavens devoted to the Clan Pestilens discipline, waiting to be promoted as true Plague Monks.",
+    "plaguenovice": "They are the lower rank of Clan Pestilens. They infest the Mordheim streets, coming just before the terrible Plague Monks and their clouds of pestilential fumes. Dream of every Plague Novice is to be chosen someday to be a Monk, and to be given the privilege of chanting the Liturgicus Infecticus.",
+    "giantrat": "Giant contagious rats follow the Clan Pestilens during its battles.",
+    "ratogre": "These terrible monsters are often chosen as personal bodyguards by Skaven of higher ranks."
+  }
+}

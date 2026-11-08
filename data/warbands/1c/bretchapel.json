@@ -1,0 +1,565 @@
+{
+  "warband": {
+    "name": "Bretonnian Chapel Guard",
+    "grade": "1c",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "Fan-made Bretonnian warband (based on Tom Merrigan's Bretonnians). <b>Chivalry:</b> Knights may never use any missile weapon (except Holy Water), nor any drug or poison, nor learn spells (prayers are allowed). <b>Lord's Boon:</b> Each Knight may, on purchase, start with ONE of a Warhorse, Light Armour OR Heavy Armour at half cost — it can never be traded, given away or sold, and is removed from the warband if the Knight dies. <b>Virtue of Purity:</b> Knights may never voluntarily break from combat unless knocked down, and are immune to All Alone and similar mundane effects (magical fear effects still work). Bretonnians use the Human racial maximum.",
+    "units": [
+      {
+        "id": "questing",
+        "t": "hero",
+        "name": "Questing Knight",
+        "cost": 75,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "bcQuesting",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed",
+          "chapelKnightSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Knight: Subject to Chivalry, Lord's Boon and Virtue of Purity. Ride: Starts with the Ride Warhorse skill. Vow of Poverty: May not take a Lance. Uses no missile weapons and learns no spells."
+      },
+      {
+        "id": "damsel",
+        "t": "hero",
+        "name": "Damsel",
+        "cost": 35,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bcDamsel",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Prayercaster: Uses the Prayers of the Lady (Lady's Prayers) and starts with one prayer; she may learn more as a wizard does. Prayers are not spells."
+      },
+      {
+        "id": "errant",
+        "t": "hero",
+        "name": "Knight Errant",
+        "cost": 35,
+        "exp": 8,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bcKnight",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "chapelKnightSkills"
+        ],
+        "sp": "Knight: Subject to Chivalry, Lord's Boon and Virtue of Purity. Vain: May not wear a helmet. Impetuous: If not in combat and it did not charge this turn, it must charge a viable standing enemy in range (auto-passing psychology for that charge; you may take an Ld test to act normally instead). Uses no missile weapons."
+      },
+      {
+        "id": "squire",
+        "t": "hen",
+        "name": "Squire",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bcSquire",
+        "sp": "Knighthood: On \"The Lad's Got Talent\" you may keep him a Squire (choose two of Combat/Academic/Strength/Speed) or promote him to a Knight Errant (gains Knight/Vain/Impetuous, switches to the Knight list, no missile weapons — this may exceed the 3-Knight-Errant limit). A Squire may ride a horse only if the Questing Knight and every Knight Errant ride warhorses."
+      },
+      {
+        "id": "pilgrim",
+        "t": "hen",
+        "name": "Battle Pilgrim",
+        "cost": 30,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "bcPilgrim",
+        "sp": "Low Caste: Advances normally but re-rolls \"The Lad's Got Talent\" and may never become a Hero. Hatred: Hates all enemies. Stubborn: Re-roll all failed Leadership tests once, accepting the second result. Holy Relics: May carry a Holy Relic (henchman exception); a Pilgrim with one gains Frenzy (and is then immune to Hatred) and, if needed, splits off into his own henchman group."
+      },
+      {
+        "id": "bowman",
+        "t": "hen",
+        "name": "Bowman",
+        "cost": 15,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": "bcBow",
+        "sp": "Low Caste: Advances normally but re-rolls \"The Lad's Got Talent\" and may never become a Hero."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "ladysPrayers"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "bcKnight": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Breitschwert",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Kiteschild",
+          10
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Barding",
+          30
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Warhorse",
+          80
+        ],
+        [
+          "Lucky charm",
+          10
+        ]
+      ]
+    },
+    "bcQuesting": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Breitschwert",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Kiteschild",
+          10
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Barding",
+          30
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Warhorse",
+          80
+        ],
+        [
+          "Lucky charm",
+          10
+        ]
+      ]
+    },
+    "bcDamsel": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Kurzschwert",
+          7
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Pferd",
+          40
+        ]
+      ]
+    },
+    "bcPilgrim": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Kurzschwert",
+          7
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Gral-Reliquie",
+          25
+        ]
+      ]
+    },
+    "bcBow": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Kurzschwert",
+          7
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "bcSquire": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Kurzschwert",
+          7
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Pferd",
+          40
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "chapelKnightSkills": {
+      "name": "Knightly Skills",
+      "note": "Bretonnian Chapel Guard Knights (instead of the standard tables).",
+      "skills": [
+        [
+          "Renowned Virtue",
+          "The Knight may learn one Virtue from the Bretonnian Knight Virtues list. Renowned Virtue may only be taken once."
+        ],
+        [
+          "Questing Vow",
+          "Questing Knight only. When charging, charged by, or in combat with a fear-causing enemy, he may re-roll any one Leadership test (including Rout tests), accepting the second result."
+        ],
+        [
+          "Shield Bash",
+          "Each turn the Knight may make one extra attack with a shield or kite shield, made at −1 Strength and treated as a club."
+        ],
+        [
+          "Bulging Muscles",
+          "The Knight keeps the +1/+2 Strength bonus from Flails and Morning Stars after the first round of combat."
+        ],
+        [
+          "Untiring",
+          "Ignores movement penalties for wearing armour while on foot. Strength, axes, critical hits and similar modifiers cannot reduce his armour save below 5+, nor can it be ignored by any non-magical means."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Bretonnian chapels mark places sacred to the Lady of the Lake, where a battle was fought or a Grail Knight died. Knights errant look for fame at these shrines, and some guard the chapel and its pilgrims.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/bretonnian-chapel-guard"
+  },
+  "unitLore": {
+    "questing": "Questing Knights are devout nobles who have forsaken property in order to search for the Holy Grail, the sacred artifact of the lady of the lake. They seek out the deadliest of foes, in order to make themselves worthy of the lady.",
+    "damsel": "Raised by the worshippers of the Lady from a very early age, the Damsels travel the country of Bretonnia, aiding the great dukedoms in times of war. Their ways are mysterious, and are regarded more reverently than any other females in the land.",
+    "errant": "Knights Errant are brash, bold young knights, who are filled with more guts than healthy fear.  They are often poorer nobles, wearing outdated second-hand armour, which was granted to them by a generous donor. They seek to prove their worth, in honour of their benefactors, their ladies fair, and their own egos.",
+    "squire": "Knights are served by their Squires, who are often poorer relations or illegitimate offspring.  They are trained and schooled by the knight himself. If a squire performs some great deed or service to his master he may even be raised to the ranks of knighthood!",
+    "pilgrim": "Battle Pilgrims are zealous peasants that will guard the remains of a dead Grail Knight, and keep vigil over any chapel that houses it. If the chapel is secured by a heavy watch, small numbers of the pilgrims will allow themselves to follow a Questing Knight in his journeys, as he secures the forests and glen around the gravesite.",
+    "bowman": "Peasant Bowmen are inbred serfs recruited by local lords. They may be the last remaining property to a Questing Knight, or perhaps they were loaned by the local lord. Whatever the origin, their lack of bravery is balanced by their skill with a long bow."
+  }
+}

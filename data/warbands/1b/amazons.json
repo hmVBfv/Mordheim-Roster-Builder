@@ -1,0 +1,293 @@
+{
+  "warband": {
+    "name": "Amazons (Mordheim)",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Priestess. Max. 2 Champions, 2 Totem Warriors; at least 1 Amazon Warrior, max. 3 Scouts.<br><b>Sacrifice:</b> Captives are handled as by the Cult of the Possessed.<br><b>Not one of us:</b> May hire only these Hired Swords or Dramatis Personae, no others – the Amazons.",
+    "units": [
+      {
+        "id": "priestess",
+        "t": "hero",
+        "name": "Priestess",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "amHeroine",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Amazon Rituals (starts with one ritual chosen at random)."
+      },
+      {
+        "id": "champion",
+        "t": "hero",
+        "name": "Champion",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amHeroine",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ]
+      },
+      {
+        "id": "totem",
+        "t": "hero",
+        "name": "Totem Warrior",
+        "cost": 30,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amHeroine",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Frenzy."
+      },
+      {
+        "id": "amwarrior",
+        "t": "hen",
+        "name": "Amazon Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "min": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amHench"
+      },
+      {
+        "id": "amscout",
+        "t": "hen",
+        "name": "Scout",
+        "cost": 30,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "amScout",
+        "sp": "Stealthy: Double deployment distance, starts hidden."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "amazonRituals"
+  },
+  "race": "human",
+  "hire": {
+    "align": "neutral",
+    "none": true
+  },
+  "lists": {
+    "amHeroine": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Klaue der Alten",
+          30
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Sonnenstab",
+          50
+        ],
+        [
+          "Sonnenhandschuh",
+          40
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Amulett des Mondes",
+          50
+        ],
+        [
+          "Heilkräuter",
+          35
+        ]
+      ]
+    },
+    "amHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    },
+    "amScout": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          5
+        ],
+        [
+          "Wurfspeere",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Amazons are warrior women from across the Great Western Ocean, said to descend from a lost colony. Those in Mordheim have been dragged there in chains and want only one thing: escape.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/amazons"
+  },
+  "unitLore": {
+    "priestess": "Priestesses are part of the religious sisterhood that rules Amazon society. They are powerful sorceresses and their word is law. The younger, more junior members of the Priestesshood often gather war parties to search for Slann artifacts and also conduct the ritual sacrifices of captured enemies.",
+    "champion": "Champions are veterans that have participated in dozens of war parties over the years. They are the right-hand girls to the Priestesses and also act as their bodyguards. They are skilled in fighting with a variety of different weapons including the legendary claws of the Old Ones.",
+    "amwarrior": "Every Amazon woman is trained in the ways of warfare from birth and is hardened by a life in the unforgiving nature of their jungle environment. On the shattered streets of Mordheim, things are hardly that different as they have just traded the dense jungle undergrowth for broken buildings and rubble.",
+    "amscout": "Scouts are known for their exceptional speed and agility. They are just at home stealthily picking their way through the rubble strewn streets of the City of the Damned and hiding in the ruins setting up ambushes."
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "warband": {
+    "name": "Pirates",
+    "grade": "1b",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Ship's Captain. Max. 2 Mates, 2 Cabin Boys; any number of Crew, max. 7 Gunners, max. 5 Boatswains, max. 5 Swabbies (≤ Crew).<br><b>Swivel Gun:</b> Max. 1 per warband.<br><b>Swabbies:</b> Recruited via special rules (Kidnapped!, Stragglers/Prisoners — starting cost here 0 gc); never more Swabbies than Crew.<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband, but with +20 gc upkeep if Dwarfs and Elves serve together.<br><b>One-off games:</b> Start with two free Swabbies.<br><b>Succession:</b> A Mate takes over if the Captain dies.",
+    "units": [
+      {
+        "id": "pcaptain",
+        "t": "hero",
+        "name": "Ship's Captain",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "pirateEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "pirateSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership for Ld tests."
+      },
+      {
+        "id": "mate",
+        "t": "hero",
+        "name": "Ship's Mate",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pirateEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "pirateSkills"
+        ]
+      },
+      {
+        "id": "cabinboy",
+        "t": "hero",
+        "name": "Cabin Boy",
+        "cost": 15,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "pirateEq",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "pirateSkills"
+        ]
+      },
+      {
+        "id": "crew",
+        "t": "hen",
+        "name": "Crew",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pirateHench"
+      },
+      {
+        "id": "pgunner",
+        "t": "hen",
+        "name": "Gunner",
+        "cost": 25,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pirateGunner",
+        "sp": "Swivel Gun max. 1/warband; the bearer operates alone."
+      },
+      {
+        "id": "boatswain",
+        "t": "hen",
+        "name": "Boatswain",
+        "cost": 32,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "pirateHench",
+        "sp": "Starts with Rope & Hook; Expert Riggers."
+      },
+      {
+        "id": "swabbie",
+        "t": "hen",
+        "name": "Swabbie",
+        "cost": 0,
+        "exp": 0,
+        "max": 5,
+        "maxPer": {
+          "per": 1,
+          "of": [
+            "crew"
+          ]
+        },
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "pirateSwab",
+        "noxp": true,
+        "sp": "Special recruitment; gains no experience; Rabble. They ain’t true pirates: Swabbies who are running away or out of action do not count towards the need to take a Rout test. Blimey, they got away: If the warband routs, Swabbies who have already left the table are never seen again."
+      }
+    ]
+  },
+  "extra": {
+    "skills": "pirateSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "neutral",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "pirateEq": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer/Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Boat Hook",
+          8
+        ],
+        [
+          "Cat O'Nine Tails",
+          8
+        ],
+        [
+          "Cutlass (Schwert)",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Belaying Pin",
+          3
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Toughened Leathers",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "pirateHench": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer/Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Boat Hook",
+          8
+        ],
+        [
+          "Cutlass (Schwert)",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Belaying Pin",
+          3
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Toughened Leathers",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "pirateGunner": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer/Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Cutlass (Schwert)",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Donnerbüchse",
+          30
+        ],
+        [
+          "Duellpistole",
+          30
+        ],
+        [
+          "Duellpistolenpaar",
+          60
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Swivel Gun",
+          65
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Toughened Leathers",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Swivel Gun: Ball Shot",
+          5
+        ],
+        [
+          "Swivel Gun: Chain Shot",
+          2
+        ],
+        [
+          "Swivel Gun: Grape Shot",
+          2
+        ]
+      ]
+    },
+    "pirateSwab": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer/Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Boat Hook",
+          8
+        ],
+        [
+          "Cutlass (Schwert)",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Belaying Pin",
+          3
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Toughened Leathers",
+          5
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Mordheim's rivers carry gold in and wyrdstone out, and pirate captains use the fog and dust to slip their ships in, loot and vanish. Some have even found safe harbours near the city.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/pirates"
+  },
+  "unitLore": {
+    "pcaptain": "Only the roughest toughest sea dog can rise to become captain of his own ship. A good Captain has to be bold and decisive in combat, and a forceful personality to hold together his unruly followers. Though often elected by the Crew, he must command their respect and fear, and more importantly ensure their continued loyalty with plenty of gold!",
+    "mate": "Each ship has several Mates to serve under the Captain and ensure his orders are carried out properly. They also keep a careful eye on him as well for any signs of weakness or hoarding from the Crew, as each Mate would love nothing more than to become Captain himself one day. Until that day though they readily obey his commands, oversee the Crew and the ship, and stand with their Captain ready to plunder and ravage any ships they find.",
+    "cabinboy": "The lure of the sea often calls many young men to leave their boring lives behind and take up the exciting life of a pirate. Some are the youngest sons of nobles who know they will never inherit, or whose families have fallen to disgrace or poverty. Others are simple farmboys yearning for the open sea and adventure. All though, show some glimmer of talent which the Captain decides is enough to allow them to serve as Cabin Boys, where they can learn not only the basics of seamanship but also the more important lessons of how to run a pirate ship. Assuming the live through the years of training, they will go on to become feared Captains of their own!",
+    "crew": "The backbone to the ship, the crew are drawn together by the lure of the sea as well as the lure of plunder! As sailors, crewmen are experts in seamanship and ship operations. As pirates, they also quickly become proficient in swordplay and in using a variety of weapons especially pistols. It is said a good pirate crewman needs to know how to read the skies, weather, and winds, but most importantly the moods of his Captain!",
+    "pgunner": "✏️ Gunners tend the artillery and ammunition of the ship. Their keen knowledge of blackpowder weapons is essential to prevent the potential disaster of a cannon bursting, overheating, or recoiling out of control. In battle, Gunners oversee the banks of cannon, and on land they tend to be armed with the best pistols and other blackpowder weapons from the ship’s stores.",
+    "boatswain": "Boatswains (or Bosons as they are often called) are responsible aboard the vessel for the upkeep of the rigging, the hundreds of lines and cables throughout the ship which keep the sails operating properly. They are experts at moving throughout the ship’s maze of ropes, swinging from one yardarm to another to ensure the overall soundness of the rigging. In the ruins of Mordheim, these same skills serve them well in moving throughout the building wreckage and craters which litter the former city."
+  }
+}

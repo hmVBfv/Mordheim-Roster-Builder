@@ -4852,3 +4852,13 @@ that the Dwarf rules follow a format valid for every warband, not the wording of
   311 of 322 have one, the others have none on their page (the Ostlanders, the Amazon Totem Warrior, the Pit Fighters and a few more). The default
   is shown and offered in the profile sheet, but never saved as the player's own unless it was changed: the first version saved it with the other
   fields and an older test of the Library's factions caught that.
+
+**8.11.2026: the data of a warband in one file (ADR 0031).** Rob asked that the information on a warband – rules, profiles, the opening, the
+descriptions – not be spread over dozens of files. The rules, units and profiles of a warband, its opening, the description of each unit, its
+hire rule and the equipment lists and skill sets only it uses are one file now, `data/warbands/<grade>/<key>.json`; what several warbands use is in
+`_shared.json`. The files the game reads are made from them (`npm run data`), so the legacy app, the core, the app and the server did not have to
+change: they merge the data files by key and do not care in which file a key stands. The first idea, to put everything into `warbands.json`, would
+have made every start download the descriptions and bundled them into the legacy app. Checked before the old files were cut: the merged data is
+identical key by key (only the order of the keys in some maps changed), and a test fails when a made file differs from its sources, so a change in
+the wrong file is not lost silently. Left for later: the abilities and the catalogue items that name warbands (`wb`, `only.wb`), because their order
+decides which one applies.

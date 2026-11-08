@@ -1,0 +1,527 @@
+{
+  "warband": {
+    "name": "Lizardmen",
+    "grade": "1b",
+    "siteRace": "Lizardmen",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Skink Priest. Max. 1 Saurus Totem Warrior, 2 Skink Great Crests; any number of Skink Braves, max. 4 Saurus Braves (never more than Skink Braves), max. 1 Kroxigor.<br><b>Cold Blooded:</b> Roll 3D6 and pick the lowest 2 for psychology/Rout tests; the warband may never use the Leadership of Saurus or Kroxigor for Rout tests. <b>Scaly Skin:</b> Saurus 5+, Skinks 6+ (cannot be modified below 6; light armour/shield add +1). <b>Armour is rare:</b> Light armour always costs 50 gc. <b>Aquatic:</b> Skinks may move through water terrain with no penalty, and count as being in cover whilst they are in the water. <b>Jungle born:</b> All Skinks can move through jungle terrain without penalty. <i>Town Cryer #11 version (Lustria).</i>",
+    "units": [
+      {
+        "id": "skinkpriest",
+        "t": "hero",
+        "name": "Skink Priest",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "lizSkinkPr",
+        "sk": [
+          "academic",
+          "speed",
+          "lizardSkinkSkills"
+        ],
+        "sp": "Scaly Skin 6+. Leader: Friendly models within 6\" may use his Leadership for Ld tests. Wizard: Uses Lizardman Magic (works like priestly prayers, castable in armour)."
+      },
+      {
+        "id": "saurustotem",
+        "t": "hero",
+        "name": "Saurus Totem Warrior",
+        "cost": 60,
+        "exp": 11,
+        "max": 1,
+        "bite": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "lizSaurus",
+        "sk": [
+          "combat",
+          "strength",
+          "lizardSaurusSkills"
+        ],
+        "sp": "Scaly Skin 5+. Bite attack: +1 extra attack at own Strength (no weapon penalty, always strikes last)."
+      },
+      {
+        "id": "greatcrest",
+        "t": "hero",
+        "name": "Skink Great Crest",
+        "cost": 30,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "lizSkink",
+        "sk": [
+          "shooting",
+          "speed",
+          "lizardSkinkSkills"
+        ],
+        "sp": "Scaly Skin 6+."
+      },
+      {
+        "id": "skinkbrave",
+        "t": "hen",
+        "name": "Skink Brave",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "lizSkinkHen",
+        "sp": "Scaly Skin 6+."
+      },
+      {
+        "id": "saurusbrave",
+        "t": "hen",
+        "name": "Saurus Brave",
+        "cost": 40,
+        "exp": 0,
+        "max": 4,
+        "bite": 1,
+        "maxPer": {
+          "per": 1,
+          "of": [
+            "skinkbrave"
+          ]
+        },
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 1,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "lizSaurus",
+        "sp": "Scaly Skin 5+. Bite attack: +1 extra attack at own Strength (always strikes last). (Number ≤ Skink Braves)"
+      },
+      {
+        "id": "kroxigor",
+        "t": "hen",
+        "name": "Kroxigor",
+        "cost": 200,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 5,
+          "T": 4,
+          "W": 3,
+          "I": 1,
+          "A": 3,
+          "Ld": 8
+        },
+        "eq": null,
+        "gear": [
+          "Hellebarde"
+        ],
+        "noxp": true,
+        "large": true,
+        "sp": "Halberd only. Scaly 4+, Aquatic, Fear, Large Target, Animal (gains no experience)."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "lizardmenMagic",
+    "skills": "lizardSkills"
+  },
+  "race": "saurus",
+  "unitRace": {
+    "skinkpriest": "skink",
+    "greatcrest": "skink",
+    "skinkbrave": "skink",
+    "saurustotem": "saurus",
+    "saurusbrave": "saurus",
+    "kroxigor": "saurus"
+  },
+  "hire": {
+    "align": "neutral",
+    "only": [
+      "chameleonskink"
+    ]
+  },
+  "lists": {
+    "lizSaurus": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Knochenhelm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Übergroße Kiefer",
+          40,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Mal der Alten",
+          50,
+          {
+            "heroes": true
+          }
+        ]
+      ]
+    },
+    "lizSkinkPr": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bolas",
+          5
+        ],
+        [
+          "Javelin",
+          10
+        ],
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Blasrohr",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Knochenhelm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Giftdrüsen",
+          40,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Mal der Alten",
+          50,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Dunkles Gift für Geschosse",
+          20,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Schwarzer Lotus für Geschosse",
+          10,
+          {
+            "heroes": true
+          }
+        ]
+      ]
+    },
+    "lizSkink": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bolas",
+          5
+        ],
+        [
+          "Javelin",
+          10
+        ],
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Blasrohr",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Giftdrüsen",
+          40,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Mal der Alten",
+          50,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Dunkles Gift für Geschosse",
+          20,
+          {
+            "heroes": true
+          }
+        ],
+        [
+          "Schwarzer Lotus für Geschosse",
+          10,
+          {
+            "heroes": true
+          }
+        ]
+      ]
+    },
+    "lizSkinkHen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bolas",
+          5
+        ],
+        [
+          "Javelin",
+          10
+        ],
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Blasrohr",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Reptiliengift",
+          5
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "lizardSkinkSkills": {
+      "name": "Lizardmen Skills (Skinks)",
+      "note": "Skink Heroes may use this list instead of a standard list.",
+      "skills": [
+        [
+          "Infiltration",
+          "Expert at sneaking up on his prey: may set up anywhere on the table but no closer than 12\" to an enemy, and must start the game in hiding."
+        ],
+        [
+          "Great Hunter",
+          "Adept at making the most of cover: an additional −1 to hit the Skink while he is in cover (i.e. −2 in total)."
+        ]
+      ]
+    },
+    "lizardSaurusSkills": {
+      "name": "Lizardmen Skills (Saurus)",
+      "note": "Saurus Heroes may use this list instead of a standard list.",
+      "skills": [
+        [
+          "Bellowing Battle Roar",
+          "His roar is so deafening that enemy models in base contact suffer −1 to hit in the first round of combat against him."
+        ],
+        [
+          "Toughened Hide",
+          "Years of battle have hardened his hide: he is only taken out of action on a 6+."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Lizardmen and their Slann masters once served the Old Ones and still keep to their plans. The coming of the Dry Skins, who raid their temple cities, has shattered their peace.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1b-warbands/lizardmen"
+  },
+  "unitLore": {
+    "skinkpriest": "The Warband leader will be one of the handpicked Skink Priests renowned for their reliability. The nature of his mission is to observe the dry skin plunderers and only react if they stray too close to a hidden chamber within the ruined city. The Skink Priest must be able to make the delicate decision of when to attack and when not to. Skink Priests are easily recognisable as they paint their skins with colourful mystic symbols associated with their god. Priests of Chotec for instance have winged serpents drawn upon their bodies, whilst those of Sotek use snake tattoos.",
+    "saurustotem": "When a Saurus warrior has killed twenty foes he is accepted into one of the three Warrior Totems, Eagle, Jaguar or Alligator. He must then go and kill the animal of his new Totem to prove his worthiness to join. Upon attaining the status of Totem Warrior he is recruited by the Skink Priests to join in forays into the ruined temples.",
+    "greatcrest": "Great Crests, as they are known, are the leaders of many raiding parties and have become skilled at scouting, tracking, ambushing and skirmishing. Their skin is more varied in colour than normal Skinks so they blend in with the jungle more effectively. They also wear leaves or cover themselves in mud to further blend in. They function as leaders and patrol the jungles reporting of the arrival of a new ship laden with plunderers. They lay ambushes or provide a covering hail of arrows and javelins while a hit and run war band retreats back into the jungle.",
+    "skinkbrave": "Many Skinks dwell in the deepest jungles and trackless swamps of Lustria. These Skink braves are fast, agile and intelligent. Although they lack the brute force and sheer aggression of the Saurus they are good at shooting volleys of arrows or javelins. They lack the staying power of the Saurus, because they switch between reckless audacity and sudden panic, this may be due to their very short memories. As soon as a group of Skinks flee out of immediate danger they are likely to forget the experience and regroup for another reckless attack.",
+    "saurusbrave": "Saurus have thick, horny, scaly hides which protect them as natural armour. Saurus are sufficiently intelligent to understand clear and simple commands. They make excellent warriors but they are not much good at anything else. They are extremely stubborn and are very hard to shift in battle. They are very ferocious creatures and will rip at an enemy until they are slain.",
+    "kroxigor": "Kroxigor resemble Saurus but are much bigger and are far more powerful creatures. They are not very intelligent and their speech is limited to a blood-curling roar. They are strong and mainly used for construction goaded into working by the nimble Skinks."
+  }
+}

@@ -1,0 +1,306 @@
+{
+  "warband": {
+    "name": "Wood Elves of Athel Loren",
+    "grade": "2a",
+    "siteRace": "Wood Elf",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Hunt Master. Max. 2 Waywatchers, max. 1 Forest Mage, any number of Deepwood Scouts and Glade Guard.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> All Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Unforgiving:</b> Will not fight alongside the forces of Chaos; in multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> May hire any Hired Sword except the Chaotic and evil ones (Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.).",
+    "units": [
+      {
+        "id": "hunt",
+        "t": "hero",
+        "name": "Hunt Master",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 5,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "weHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed",
+          "weSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "way",
+        "t": "hero",
+        "name": "Waywatcher",
+        "cost": 40,
+        "exp": 12,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "weHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "weSkills"
+        ],
+        "sp": "Sharpshooter: May shoot while hidden (5+ to stay hidden). Camouflage: Requires an extra Initiative test to be spotted."
+      },
+      {
+        "id": "mage",
+        "t": "hero",
+        "name": "Forest Mage",
+        "cost": 55,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "weHero",
+        "sk": [
+          "shooting",
+          "academic",
+          "speed",
+          "weSkills"
+        ],
+        "sp": "Wizard: Uses Woodland Incantations."
+      },
+      {
+        "id": "scout",
+        "t": "hen",
+        "name": "Deepwood Scout",
+        "cost": 35,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "weScout",
+        "sp": "Crossfire: If several scouts shoot at the same target, +1 to the injury roll."
+      },
+      {
+        "id": "glade",
+        "t": "hen",
+        "name": "Glade Guard",
+        "cost": 30,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "weScout"
+      }
+    ]
+  },
+  "extra": {
+    "magic": "woodlandIncantations",
+    "skills": "weSkills"
+  },
+  "race": "elf",
+  "hire": {
+    "align": "neutral",
+    "tags": [
+      "goodElves"
+    ],
+    "elf": true,
+    "noChaosHS": true
+  },
+  "lists": {
+    "weHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Ithilmar-Schwert",
+          20,
+          {
+            "start": true,
+            "later": "Ithilmar-Waffe"
+          }
+        ],
+        [
+          "Ithilmar-Speer",
+          20,
+          {
+            "start": true,
+            "later": "Ithilmar-Waffe"
+          }
+        ],
+        [
+          "Ithilmar-Zweihandwaffe",
+          30,
+          {
+            "start": true,
+            "later": "Ithilmar-Waffe"
+          }
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Elfenbogen",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Ithilmar-Rüstung",
+          60,
+          {
+            "start": true
+          }
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Elfenumhang",
+          75
+        ],
+        [
+          "Elfenwein",
+          50
+        ],
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    },
+    "weScout": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ],
+        [
+          "Elfenbogen",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Elfenumhang",
+          75
+        ],
+        [
+          "Elfenwein",
+          50
+        ],
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Wood Elves of Athel Loren are a secretive, isolationist folk who live in harmony with nature and guard their forest. They seldom leave it, and what draws them out to Mordheim is a matter for their own mysterious reasons.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/wood-elves-of-athel-loren"
+  },
+  "unitLore": {
+    "hunt": "A Hunt Master’s marksmanship shames even that of other Wood Elves. They can pick out a single enemy from a seething mass of troops and place the one perfect shot that brings the target, lifeless, to the ground. Yet the Hunt Master finds no reason to exult in the application of his skills — after all, what prey could hope to escape one who has dedicated his entire life to the hunter's art.",
+    "way": "Waywatchers are silent sentinels, the guardians of the paths leading into Athel Loren. They are masters of concealment, and can lie unmoving and unnoticed for days on end before springing an ambush on a startled and unfortunate prey.",
+    "mage": "Wood Elven Mages are specialist wizards in the ways of Nature. All their spells are fed from the earth's energy.",
+    "scout": "Deepwood Scouts hold the responsibility of patrolling those areas of the forest deemed too dangerous for Glade Guard to enter. To tread such paths, an Elf must be invisible not only to a predator’s sight, but to his other senses also - no easy matter when contending with otherworldly creatures to whom an Elf’s soul manifests as a brightly burning light.",
+    "glade": "The Glade Guards forms the very core of Athel Loren's armies. In time of need, every Wood Elf can answer the call to defend their forest home, for all are trained in the arts of the longbow as soon as they can hold one."
+  }
+}

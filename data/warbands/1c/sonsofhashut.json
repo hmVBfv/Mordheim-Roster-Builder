@@ -1,0 +1,364 @@
+{
+  "warband": {
+    "name": "The Sons of Hashut",
+    "grade": "1c",
+    "siteRace": "Chaos Dwarf",
+    "min": 3,
+    "max": 14,
+    "gold": 500,
+    "rules": "Chaos Dwarf slavers of Hashut. <b>Hard Head:</b> Chaos Dwarfs & Bull Centaurs ignore the special rules of maces, clubs and hammers. <b>Armour:</b> Chaos Dwarfs & Bull Centaurs never suffer movement penalties for wearing armour. <b>Hard to Kill:</b> Chaos Dwarfs & Bull Centaurs are taken out of action only on a 6 (Injury 1-2 = knocked down, 3-5 = stunned, 6 = OOA). <b>Slavers:</b> Captured fighters are never freed — sacrifice them (Apprentice Sorcerer +1 Experience each) or put them to work (+1 wyrdstone each, then D6: 2-6 the captive dies and you keep its equipment; 1 it escapes). <b>Uncommon:</b> Chaos Dwarf recruits cost 1.5× the usual Experience for veterancy (rounding up); Hobgoblins are normal. <b>Indentured Servants:</b> The warband must include at least four Hobgoblins; while below four you may recruit only Hobgoblins. <b>Hired Swords:</b> May hire the Hired Swords open to all warbands or to Orc & Chaos warbands, and also these – Ogre Bodyguard, Pit Fighter, Warlock, Imperial Assassin, Hobgoblin Scout. Never any Elves of any sort.",
+    "units": [
+      {
+        "id": "sorcerer",
+        "t": "hero",
+        "name": "Apprentice Sorcerer",
+        "cost": 85,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "cdHero",
+        "sk": [
+          "combat",
+          "academic",
+          "chaosDwarfSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership. Wizard: Uses Chaos Dwarf Magic — he cannot cast spells while wearing armour. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "bull",
+        "t": "hero",
+        "name": "Bull Centaur",
+        "cost": 75,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 7,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 2,
+          "Ld": 9
+        },
+        "eq": "cdHero",
+        "sk": [
+          "combat",
+          "strength",
+          "chaosDwarfSkills"
+        ],
+        "large": true,
+        "sp": "Large Target. Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "champion",
+        "t": "hero",
+        "name": "Chaos Dwarf Champion",
+        "cost": 50,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 3,
+          "WS": 5,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "cdHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "chaosDwarfSkills"
+        ],
+        "sp": "Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "cdwarf",
+        "t": "hen",
+        "name": "Chaos Dwarf Warrior",
+        "cost": 40,
+        "exp": 0,
+        "max": 6,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "cdHero",
+        "sp": "Hard Head. Hard to Kill. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "blunder",
+        "t": "hen",
+        "name": "Chaos Dwarf Blunderbusser",
+        "cost": 40,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "cdBlunder",
+        "sp": "Hard Head. Hard to Kill. May carry a Chaos Dwarf Blunderbuss. Armour: Never suffers movement penalties for wearing armour."
+      },
+      {
+        "id": "hobgob",
+        "t": "hen",
+        "name": "Hobgoblin",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "min": 4,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "cdHobgob",
+        "sp": "Skinny: On a Serious Injury roll of 1-3 the Hobgoblin leaves the warband. Nobody cares: Counts as half a model when making Rout tests. Cannot be promoted to Hero."
+      }
+    ]
+  },
+  "extra": {
+    "magic": "chaosDwarfMagic"
+  },
+  "race": "dwarf",
+  "unitRace": {
+    "bull": "bullcentaur",
+    "hobgob": "hobgoblin"
+  },
+  "hire": {
+    "align": "evil",
+    "dwarf": true,
+    "only": [
+      "ogre",
+      "pitfighter",
+      "warlock",
+      "imperialassassin",
+      "hobgoblinscout"
+    ],
+    "noElfHS": true
+  },
+  "lists": {
+    "cdHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Zharr-Obsidianwaffe",
+          30,
+          {
+            "start": true
+          }
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "cdBlunder": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Donnerbüchse",
+          40
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "cdHobgob": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Vergiftete Dolche",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "skillSets": {
+    "chaosDwarfSkills": {
+      "name": "Chaos Dwarf Skills",
+      "note": "Apprentice Sorcerer, Champions & Bull Centaur (instead of one of the standard tables).",
+      "skills": [
+        [
+          "True Grit",
+          "When rolling on the Injury table for this warrior, treat 1-3 as knocked down, 4-5 as stunned and only 6 as out of action."
+        ],
+        [
+          "Extra Tough",
+          "After the battle the warrior may re-roll one of his Serious Injury results; the second result stands."
+        ],
+        [
+          "Unlimited Hatred",
+          "The warrior Hates all enemies (re-roll missed to-hit rolls in the first turn of every close combat)."
+        ],
+        [
+          "Thick Skull",
+          "3+ save on a D6 to avoid being stunned (a stun becomes knocked down instead). With a helmet this save is 2+ and replaces the normal helmet rule."
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "The Chaos Dwarfs of Zharr-Naggrund have ruled slaves for millennia. A Hashut sorcerer who learned of the fall of Mordheim sends his servants after the witchstone and for rivals to defeat.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1c-warbands/sons-of-hashut"
+  },
+  "unitLore": {
+    "sorcerer": "Having served one of the powerful sorcerer lords of Zharr-Naggrund, the apprentices are eager to prove their worth and knowledge in the savage streets of Mordheim. Their sole ambition is to reach the level of their masters.",
+    "bull": "Bull Centaurs are Hashut’s chosen ones and are famous for being powerful and very dangerous adversaries. It is considered a great honor to include these allies in a band of Chaos Dwarfs.",
+    "champion": "They are the warriors favored by the sorcerer’s apprentices. They are excellent fighters and trustworthy sergeants."
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "warband": {
+    "name": "Dwarf Treasure Hunters",
+    "grade": "1a",
+    "siteRace": "Dwarf",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Noble. Max. 1 Engineer, max. 2 Slayers, max. 5 Thunderers, any number of Clansmen and Beardlings.<br><b>Hard to Kill:</b> Dwarfs are tough, resilient individuals who can only be taken out of action on a roll of 6 instead of 5-6 when rolling on the Injury chart. Treat a roll of 1-2 as knocked down, 3-5 as stunned, and 6 as out of action. <b>Hard Head:</b> Dwarfs ignore the special rules for maces, clubs, etc. They are not easy to knock out! <b>Armour:</b> Dwarfs never suffer movement penalties for wearing armour. <b>Hate Orcs and Goblins:</b> All Dwarfs hate Orcs and Goblins. See the psychology section of the Mordheim rules for details on the effects of hatred. <b>Incomparable Miners:</b> Dwarfs spend much of their lives underground searching for precious minerals, and they are the best in the world at this kind of work. In the city of Mordheim they apply similar skills to the search for wyrdstone. When checking for wyrdstone at the end of a game, add +1 to the number of pieces found for a Dwarf warband. <b>Grudgebearers:</b> May hire any Hired Sword or Dramatis Personae except Elves of any kind. Dwarfs hold an ancient grudge against Elves from the days when the two races fought for supremacy in the Old World. <b>Gromril:</b> Weapons cost only 3× at warband creation (later 4×, Rare 11).",
+    "units": [
+      {
+        "id": "noble",
+        "t": "hero",
+        "name": "Dwarf Noble",
+        "cost": 85,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 3,
+          "WS": 5,
+          "BS": 4,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfWarrior",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "dthSkills"
+        ],
+        "sp": "Leader: Friendly models within 6\" may use his Leadership."
+      },
+      {
+        "id": "engineer",
+        "t": "hero",
+        "name": "Engineer",
+        "cost": 50,
+        "exp": 10,
+        "max": 1,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfThunderer",
+        "sk": [
+          "combat",
+          "shooting",
+          "dthSkills"
+        ],
+        "sp": "Master Weaponsmith: Increases the range of the warband's basic missile weapons (+3\" pistols / +6\" crossbows & handguns) while he takes part."
+      },
+      {
+        "id": "slayer",
+        "t": "hero",
+        "name": "Troll Slayer",
+        "cost": 50,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfWarrior",
+        "noArmour": true,
+        "noMissile": true,
+        "sk": [
+          "combat",
+          "strength",
+          "slayerSkills",
+          "dthSkills"
+        ],
+        "sp": "Death Wish: Immune to psychology. No armour/missile weapons. Slayer skills."
+      },
+      {
+        "id": "clansman",
+        "t": "hen",
+        "name": "Clansman",
+        "cost": 40,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfWarrior"
+      },
+      {
+        "id": "thunderer",
+        "t": "hen",
+        "name": "Thunderer",
+        "cost": 40,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 3,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwarfThunderer"
+      },
+      {
+        "id": "beardling",
+        "t": "hen",
+        "name": "Beardling",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 3,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 2,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "dwarfWarrior"
+      }
+    ]
+  },
+  "extra": {
+    "skills": "dthSkills"
+  },
+  "race": "dwarf",
+  "hire": {
+    "align": "good",
+    "dwarf": true,
+    "noElfHS": true
+  },
+  "lists": {
+    "dwarfWarrior": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zwergenaxt",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Gromril-Rüstung",
+          75,
+          {
+            "start": true
+          }
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "dwarfThunderer": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Pistolenpaar",
+          30
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "intro": {
+    "text": "Proud Dwarfs prize age, wealth and skill. A noble who loses his hold or his honour gathers loyal friends and goes treasure hunting in Mordheim to win back what the Dispossessed lost.",
+    "url": "https://mordheimer.net/docs/warbands/grade-1a-warbands/dwarf-treasure-hunters"
+  },
+  "unitLore": {
+    "noble": "Dwarf Nobles are fortune seekers who have recruited a band of like-minded Dwarfs and set off from their stronghold in search of riches. A Dwarf Noble is well respected by the members of his warband. Often he is a member of one of the noble families of the lost Dwarf strongholds, dreaming of collecting enough treasure to restore the former glory of the Dwarf Kingdoms.",
+    "engineer": "Dwarf Engineers are respected members of Dwarf society. It is they who design and build the complex war machines and devices which have made the Dwarfs famous.",
+    "slayer": "Troll Slayers are members of the morbid Dwarf cult obsessed with seeking an honourable death in combat. Having committed some unforgivable crime or been dishonoured in some way, a Dwarf will forsake his home and wander off to die fighting the enemies of Dwarfkind. Troll Slayers are insanely dangerous individuals, psychopathic and violent. There are however few better fighters in the Known World, so they are much sought after by Dwarf treasure hunters.",
+    "clansman": "These are Dwarf warriors in their prime: tough, stubborn and brave warriors who can be relied on to hold their own against any foe.",
+    "thunderer": "Dwarf Thunderers are experts at using missile weapons. Many an Orc or Goblin has died by the sting of a crossbow bolt or a roaring handgun bullet shot by a Dwarf Thunderer.",
+    "beardling": "These are young Dwarfs who have joined the retinue of an experienced Dwarf treasure hunter hoping to make their fortune."
+  }
+}

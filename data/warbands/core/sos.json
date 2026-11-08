@@ -1,0 +1,159 @@
+{
+  "warband": {
+    "name": "Sisters of Sigmar",
+    "grade": "core",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "rules": "<b>Choice:</b> Exactly 1 Matriarch. Max. 3 Sister Superiors, max. 1 Augur, max. 10 Novices, any number of Sisters.",
+    "units": [
+      {
+        "id": "matri",
+        "t": "hero",
+        "name": "Sigmarite Matriarch",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "sos",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed",
+          "sosSkills"
+        ],
+        "sp": "Leader: Any warband member within 6\" of the Sigmarite Matriarch may use her Leadership characteristic when taking any Leadership tests. Prayers of Sigmar: The Sigmarite Matriarch is a servant of Sigmar and may use the Prayers of Sigmar as detailed in the Magic section and the Sigmarite Matriarchs start with one prayer generated at random. In addition the Sigmarite Matriarchs may learn a new Prayer instead of a new skill."
+      },
+      {
+        "id": "super",
+        "t": "hero",
+        "name": "Sister Superior",
+        "cost": 35,
+        "exp": 8,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "sos",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed",
+          "sosSkills"
+        ]
+      },
+      {
+        "id": "augur",
+        "t": "hero",
+        "name": "Augur",
+        "cost": 25,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "sos",
+        "noArmour": true,
+        "sk": [
+          "academic",
+          "speed",
+          "sosSkills"
+        ],
+        "sp": "Weapons/Armour: The Augurs may be equipped with weapons chosen from the Sisters of Sigmar Equipment list. They never wear armour. Blessed Sight: An Augur can re-roll any failed characteristic tests (climbing, resisting spells or any other reason), and any rolls to hit in close combat or shooting. You must accept the second result. In addition, an Augur can use her Blessed Sight to help the Sisterhood when they are searching the city for wyrdstone. If the Augur is not put out of action in the battle, you may roll two dice for her in the exploration phase and pick either dice as the result.",
+        "eyeProof": true
+      },
+      {
+        "id": "novice",
+        "t": "hen",
+        "name": "Novice",
+        "cost": 15,
+        "exp": 0,
+        "max": 10,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "sos"
+      },
+      {
+        "id": "sister",
+        "t": "hen",
+        "name": "Sigmarite Sister",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "sos"
+      }
+    ]
+  },
+  "extra": {
+    "magic": "prayersSigmar",
+    "skills": "sosSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "sos"
+    ]
+  },
+  "intro": {
+    "text": "Noble families send their troublesome daughters to the convent in Mordheim, where they become priestesses of Sigmar who heal the sick, tend orphans and give counsel. With the city destroyed, the Sisters have taken up arms to bring order back to the ruins.",
+    "url": "https://mordheimer.net/docs/warbands/core-warbands/sisters-of-sigmar"
+  },
+  "unitLore": {
+    "matri": "The Sigmarite Matriarchs, of whom there is an inner circle of twelve, are answerable to the High Matriarch of the temple. Each must lead a warband of Sisters in frequent searches of the city in order to purge the ruins. Matriarchs are driven by a zealous devotion to the Cult of Sigmar and a relentless determination to redeem the Sisterhood in His eyes.",
+    "super": "Each of the Sisters Superior is a long-serving priestess of the Cult of Sigmar, well versed in the rituals of the temple and an example to the younger Sisters and Novices. The Sisters Superior are entrusted with maintaining the faith and fervour of the order. Any peril or foe that may lurk in the ruins of Mordheim is as nothing compared to the wrath of a Sister Superior.",
+    "augur": "The blind Augurs of the Sisterhood are blessed beyond their comrades. By giving up their sight they have gained something far more, second sight – a gift from their patron god. Only a very few are marked this way, and they are greatly revered by the Sisterhood. Unlike the rest of the priestesses, they shave their heads, save for a single long braid.",
+    "novice": "By tradition, the Sisters draw their recruits only from the most noble houses of the Empire, and families consider it a great honour to have their daughter accepted into the order. Only maidens of noble lineage can be relied upon to have the devotion to duty and innate sense of honour. Few though the recruits may be, they must endure several years as Novices during which time their devotion will be tested to the full. All are eager to prove themselves worthy to be the handmaidens of Sigmar.",
+    "sister": "Sigmarite Sisters know that their entire order is shamed in the eyes of their Lord Sigmar. Every one of them is sworn upon His altar to pacify the city and thereby redeem themselves. Whatever the perils and horrors that stand in their way, they will be overcome!"
+  }
+}
