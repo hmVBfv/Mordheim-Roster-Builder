@@ -44,3 +44,10 @@ steht **wörtlich** als Voreinstellung ihrer Story („A few lines about him“)
 sie. Das ist eine Ausnahme von „mit eigenen Worten“ **nur für diesen Zweck**: `data/unitlore.json`, gelesen mit
 curl, mit Kopfzeile, die das sagt; Test `core/test/unitlore.test.ts`. Alles andere (der Lore-Katalog, die
 Eröffnung einer Warband in `data/warbandintro.json`) bleibt in eigenen Worten.
+
+## Nachtrag vom 08.11.2026: die Lore-Zeile der Zauber wörtlich
+Rob, 08.11.2026 (wish #233): Die Zeile, die jeder Zauber auf den Magie-Seiten von mordheimer.net vor seinem Regeltext hat
+(„The Shaman’s howling invigorates the ladz …“), steht **wörtlich** bei dem Zauber, in `data/spells.json` (`lore`, nach dem Namen
+ohne Schwierigkeit). Dieselbe Ausnahme wie bei den Einheiten-Beschreibungen, nur für diesen Zweck; gelesen mit curl,
+geprüft von `core/test/spellbook.test.ts`. Zauber, deren Seite keine Zeile hat (Lady’s Prayers, Lizardman Magic), und Listen, die es
+auf mordheimer.net nicht gibt (Dwarf Minor Runes, Woodland Incantations), bleiben ohne.

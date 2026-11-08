@@ -463,3 +463,43 @@ describe('the unit choice, divided', () => {
   });
 });
 
+/* Wish of 8.11.2026: next to the unit choice and the warband rules, a box that folds out lists the spells and prayers the warband can learn,
+   each with the lore line of its page; a Hired Sword's school stands there only while he is hired. */
+describe('the box of spells and prayers', () => {
+  const view = (wb: string, unit: string) => rosterView(data, core.addUnit(ctx(createWarband(data, wb, null, 'The Band')), unit));
+
+  it('is a fold-out with its own heading, closed, after the unit choice and the warband rules', () => {
+    width = 400;
+    show({}, view('nightgoblins', 'nightgob'));
+    const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLDetailsElement;
+    expect(box).not.toBeNull();
+    expect(box.open).toBe(false);
+    expect(within(box).getByText('Spells and prayers').tagName).toBe('SUMMARY');
+    const rules = screen.getByRole('region', { name: 'Warband rules' });
+    expect(rules.compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('names the school, each spell with its difficulty, its effect and its lore line', () => {
+    width = 400;
+    show({}, view('nightgoblins', 'nightgob'));
+    const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLElement;
+    expect(within(box).getByText('Waaagh! Magic')).toBeTruthy();
+    const ledz = within(box).getByText("Led'z go").closest('li')!;
+    expect(ledz.textContent).toMatch(/9/);
+    expect(within(ledz).getByText('The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.')).toBeTruthy();
+    expect(ledz.textContent).toMatch(/strikes first in close combat/);
+  });
+
+  it('is not there for a warband whose units cast nothing, and shows a Hired Sword\'s school only while he is hired', () => {
+    width = 400;
+    show({}, view('merc', 'capt'));
+    expect(document.querySelector('details[aria-label="Spells and prayers"]')).toBeNull();
+    cleanup();
+    const hired = { ...core.addUnit(ctx(createWarband(data, 'merc', null, 'The Band')), 'capt'), hired: [{ key: 'warlock', uid: 'h1' }] };
+    show({}, rosterView(data, hired));
+    const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLElement;
+    expect(within(box).getByText('Warlock · Hired Sword')).toBeTruthy();
+    expect(within(box).getByText('Lesser Magic')).toBeTruthy();
+  });
+});
+

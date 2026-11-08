@@ -155,6 +155,33 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
             </dl>
           </section>
         )}
+        {v.spells.length > 0 && (
+          <details className={styles.wbSpells} aria-label="Spells and prayers">
+            <summary className={ui.fold}>Spells and prayers</summary>
+            {v.spells.map((src) => (
+              <div key={src.label ?? 'warband'} className={styles.wbSpellSource}>
+                {src.label && <h3 className={styles.wbChoiceHead}>{src.label}</h3>}
+                {src.schools.map((sch) => (
+                  <section key={sch.key} aria-label={sch.name}>
+                    <h4 className={styles.wbSchool}>{sch.name}</h4>
+                    {sch.note && <p className={styles.wbSpellNote}>{sch.note}</p>}
+                    <ul className={styles.wbSpellList}>
+                      {sch.spells.map((sp) => sp.heading
+                        ? <li key={sp.name} className={styles.wbSpellHeading}>{sp.name}</li>
+                        : (
+                          <li key={sp.name}>
+                            <b>{sp.name}</b>{sp.difficulty && <small> · difficulty {sp.difficulty}</small>}
+                            {sp.lore && <em className={styles.wbSpellLore}>{sp.lore}</em>}
+                            <span>{sp.text}</span>
+                          </li>
+                        ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            ))}
+          </details>
+        )}
         {groups.map((g) => (
           <section key={g.id} aria-labelledby={`board-${g.id}`}>
             <div className={styles.groupHead}><h2 id={`board-${g.id}`}>{g.title}</h2>{g.note && <span>{g.note}</span>}</div>
