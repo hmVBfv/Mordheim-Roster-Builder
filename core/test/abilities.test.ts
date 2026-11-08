@@ -67,6 +67,11 @@ describe('abilities: the rule as this unit defines it', () => {
     const a = abilities('nightgoblins', 'nightgob');
     expect(tip(chip(a, 'Animosity')!.key)?.text).toMatch(/Only Night Goblins are affected/);
   });
+
+  it('Forest Goblins, like the Orc Mob, get the Animosity of their page, not the Night Goblins\' squabble', () => {
+    const a = abilities('forestgoblins', 'fgbrave');
+    expect(tip(chip(a, 'Animosity')!.key)?.text).toMatch(/roll a D6 for each Henchman who is either an Orc or a Goblin/);
+  });
 });
 
 describe('abilities: no chip for a rule the unit only mentions', () => {
