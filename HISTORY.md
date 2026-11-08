@@ -4862,3 +4862,15 @@ have made every start download the descriptions and bundled them into the legacy
 identical key by key (only the order of the keys in some maps changed), and a test fails when a made file differs from its sources, so a change in
 the wrong file is not lost silently. Left for later: the abilities and the catalogue items that name warbands (`wb`, `only.wb`), because their order
 decides which one applies.
+
+**The run of 8.11.2026: two wishes on the new-warband and warband screens (PRs 372, 373).**
+
+- **#232, a second tap on the chosen warband (PR 372).** A radio that is checked sends no change when it is tapped again, so the choice could not be
+  let go. The toggle is in the tap itself, on the radio that lies over the name and on the other cells of the row; the label is left out of the row's
+  handler, because a tap on a label sends a second click to its radio and the choice would have been made and unmade at once.
+- **#233, the box of spells and prayers (PR 373).** The lore line of a spell is not on the warband pages but on the magic pages
+  (`/docs/magic/...`), in an `<em>` after the difficulty; read from the HTML, since the text of the pages alone cannot tell a lore line from the
+  first line of the rules. 133 lines in 21 schools, word for word (Rob), put in `data/spells.json` as a map beside the spells so that no consumer of
+  the spell tuples had to change. Three pages use `h2` instead of `h3`, which first showed as three schools without any line; one spell has another
+  name on its page (Black Blade of Khaine, Flamesword at the same difficulty and effect). The box is worked out from the roster, so the school of a
+  Hired Sword or Dramatis Personae is there while he is, and goes with him. Hired Swords whose school is not in our data (Djed'hi) show nothing.
