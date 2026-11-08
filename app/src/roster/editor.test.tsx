@@ -159,6 +159,27 @@ describe('a new warband', () => {
     expect(all[0]!.state.subtype).toBe('trantio');
   });
 
+  /* The options of the chosen warband (its variant, the name, what it starts with) unfold right under its row in the list, so that
+     choosing one never means scrolling elsewhere, and the figures change with the variant. */
+  it('unfolds the variant, the name and the starting figures under the row of the chosen warband', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    const pick = await screen.findByRole('radio', { name: 'Tileans' });
+    expect(screen.queryByRole('combobox', { name: 'City' })).toBeNull();
+    await user.click(pick);
+    const row = pick.closest('tr')!;
+    const panel = row.nextElementSibling as HTMLElement;
+    expect(within(panel).getByRole('combobox', { name: 'City' })).toBeTruthy();
+    expect(within(panel).getByRole('textbox', { name: 'Name' })).toBeTruthy();
+    const trantio = data.WARBANDS.tileans!.subtypes!.find((x) => x.key === 'trantio')!;
+    await user.selectOptions(within(panel).getByRole('combobox', { name: 'City' }), 'trantio');
+    expect(within(panel).getByText(`Starting gold: ${trantio.gold} gc.`)).toBeTruthy();
+    expect(within(panel).getByText(/^Heroes at the start: up to \d/)).toBeTruthy();
+    // choosing another folds the first one up
+    await user.click(screen.getByRole('radio', { name: 'Mercenaries' }));
+    expect(screen.getAllByRole('textbox', { name: 'Name' })).toHaveLength(1);
+  });
+
   /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
   it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
     at('/warbands/new');

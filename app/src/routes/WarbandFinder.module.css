@@ -120,6 +120,17 @@
   font-weight: 600;
 }
 
+/* the options of the chosen warband, unfolded under its row */
+.table tbody tr.options {
+  background: var(--surface-2);
+  box-shadow: inset 4px 0 0 var(--accent);
+  font-weight: 400;
+}
+
+.table tbody tr.options td {
+  padding: var(--space-2) var(--space-3);
+}
+
 @media (max-width: 699px) {
   .table thead {
     position: absolute;
@@ -156,6 +167,12 @@
   .table td.pick {
     grid-column: 1 / -1;
     font-size: 1em;
+  }
+
+  .table tr.options td {
+    grid-column: 1 / -1;
+    font-size: 1em;
+    padding: var(--space-2) 0;
   }
 
   .table td[data-label]:not([data-label=''])::before {
