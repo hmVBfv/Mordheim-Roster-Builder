@@ -261,6 +261,37 @@ describe('a new warband', () => {
     expect(screen.getByText('Gold')).toBeTruthy();
   });
 
+  /* Wish of 8.11.2026: the list of warbands shows the spell school of each, filters by it, says "None" where there is no caster, and a tap on
+     a school names its spells and what they do (no lore). */
+  it('shows the spell school of each warband, "None" where it has no caster, and filters by it', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await screen.findByRole('radio', { name: 'Night Goblins' });
+    const rowOf = (name: string) => screen.getByRole('radio', { name }).closest('tr')!;
+    expect(within(rowOf('Night Goblins')).getByText('Waaagh! Magic')).toBeTruthy();
+    expect(within(rowOf('Mercenaries')).getByText('None')).toBeTruthy();
+    expect(screen.getAllByRole('columnheader', { name: 'Magic' }).length).toBe(1);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Magic' }), 'waaagh');
+    const names = screen.getAllByRole('radio').map((r) => r.getAttribute('aria-label'));
+    expect(names.sort()).toEqual(['Night Goblins', 'Orc Mob']);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Magic' }), 'none');
+    expect(screen.queryByRole('radio', { name: 'Night Goblins' })).toBeNull();
+    expect(screen.getByRole('radio', { name: 'Mercenaries' })).toBeTruthy();
+  });
+
+  it('opens the spells of a school on a tap, with their effects and without lore, and does not choose the warband', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await screen.findByRole('radio', { name: 'Night Goblins' });
+    await user.click(within(screen.getByRole('radio', { name: 'Night Goblins' }).closest('tr')!).getByRole('button', { name: 'Waaagh! Magic' }));
+    const bubble = await screen.findByRole('tooltip');
+    expect(bubble.textContent).toMatch(/Led'z go/);
+    expect(bubble.textContent).toMatch(/Difficulty 9/);
+    expect(bubble.textContent).toMatch(/strikes first in close combat/);
+    expect(bubble.textContent).not.toMatch(/howling invigorates/);
+    expect((screen.getByRole('radio', { name: 'Night Goblins' }) as HTMLInputElement).checked).toBe(false);
+  });
+
   it('is offered on Home and on the list of warbands', async () => {
     at('/');
     expect((await screen.findByRole('link', { name: 'New warband' })).getAttribute('href')).toBe('/warbands/new');

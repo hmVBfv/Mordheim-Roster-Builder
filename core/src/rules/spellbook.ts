@@ -51,9 +51,14 @@ function schoolKeysOf(ctx: Ctx, def: UnitDef): string[] {
   return out;
 }
 
+/** The keys of the schools the units of the warband cast from. */
+export function ownSchoolKeys(ctx: Ctx): string[] {
+  return [...new Set((warbandDef(ctx)?.units ?? []).flatMap((u) => schoolKeysOf(ctx, u)))];
+}
+
 export function warbandSpells(ctx: Ctx): SpellSource[] {
   const out: SpellSource[] = [];
-  const keys = [...new Set((warbandDef(ctx)?.units ?? []).flatMap((u) => schoolKeysOf(ctx, u)))];
+  const keys = ownSchoolKeys(ctx);
   const own = keys.map((k) => schoolOf(ctx, k)).filter((x): x is SpellSchool => !!x);
   if (own.length) out.push({ label: null, schools: own });
   for (const [list, kind, recs] of [[ctx.data.HIREDSWORDS, 'Hired Sword', ctx.s.hired ?? []], [ctx.data.DRAMATIS, 'Dramatis Personae', ctx.s.dp ?? []]] as const) {

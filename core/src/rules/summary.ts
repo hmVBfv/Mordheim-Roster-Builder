@@ -2,6 +2,9 @@
    renderSidebar, warbandOptions, passNameFilter, passStatFilter). */
 import type { GameData, HireEntry } from '../data/types.ts';
 import type { Ctx } from './context.ts';
+import { ctxOf } from './context.ts';
+import { ownSchoolKeys } from './spellbook.ts';
+import { newWarband } from '../warband/update.ts';
 import { modelTotalCost, totalSpent } from './costs.ts';
 import { dpHireCost, hsHireCost } from './pricing.ts';
 import { hsUpkeepFor } from './hire.ts';
@@ -86,6 +89,8 @@ export interface WarbandFact {
   heroes: number;
   /** A big creature among its units (Kroxigor, Minotaur …). */
   large: boolean;
+  /** The spell schools its own casters cast from (keys into SPELLS); none where it has no caster of its own. */
+  schools: string[];
 }
 
 export function warbandFacts(data: GameData): WarbandFact[] {
@@ -96,6 +101,7 @@ export function warbandFacts(data: GameData): WarbandFact[] {
       key, name: wb.name, grade: (wb.grade as string) || 'core', race: String(wb.siteRace ?? ''),
       gold: Math.min(...golds), goldMax: Math.max(...golds), min: Number(wb.min) || 0, max: Number(wb.max) || 0,
       heroes: Math.min(6, heroes), large: wb.units.some((u) => !!u.large),
+      schools: ownSchoolKeys(ctxOf(data, newWarband(data, key))),
     };
   });
 }
@@ -103,6 +109,8 @@ export function warbandFacts(data: GameData): WarbandFact[] {
 export interface WarbandFilter {
   q?: string; race?: string; grade?: string; heroes?: number | ''; large?: '' | 'with' | 'without';
   goldFrom?: number | ''; goldTo?: number | ''; sizeFrom?: number | ''; sizeTo?: number | '';
+  /** A spell school's key, 'none' for a warband without a caster of its own, '' for any. */
+  magic?: string;
 }
 
 const given = (v: number | '' | undefined): v is number => typeof v === 'number' && !Number.isNaN(v);
@@ -122,6 +130,8 @@ export function filterWarbands(list: WarbandFact[], f: WarbandFilter): WarbandFa
     if (given(f.goldTo) && w.gold > f.goldTo) return false;
     if (given(f.sizeFrom) && w.max < f.sizeFrom) return false;
     if (given(f.sizeTo) && w.max > f.sizeTo) return false;
+    if (f.magic === 'none' && w.schools.length) return false;
+    if (f.magic && f.magic !== 'none' && !w.schools.includes(f.magic)) return false;
     return true;
   });
 }
