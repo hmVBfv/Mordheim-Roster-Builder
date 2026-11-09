@@ -205,6 +205,35 @@ describe('a new warband', () => {
     expect(screen.queryByRole('textbox', { name: 'Name' })).toBeNull();
   });
 
+  /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
+  it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
+    await user.click(screen.getByRole('checkbox', { name: /A planner/ }));
+    expect(screen.queryByText(/Starting gold/)).toBeNull();
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'The Late Company');
+    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'The Late Company' })).toBeTruthy();
+    expect((await db.warbands.toArray())[0]!.state.planner).toBe(true);
+    expect(screen.getByText(/· Planner/)).toBeTruthy();
+    expect(screen.getByText('Value')).toBeTruthy();
+    expect(screen.queryByText('Gold')).toBeNull();
+    expect(screen.getByText(/A planner: no gold limit, and advances without experience/)).toBeTruthy();
+  });
+
+  it('is an ordinary warband unless asked', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
+    expect((screen.getByRole('checkbox', { name: /A planner/ }) as HTMLInputElement).checked).toBe(false);
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Plain');
+    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Plain' })).toBeTruthy();
+    expect((await db.warbands.toArray())[0]!.state.planner).toBeUndefined();
+    expect(screen.getByText('Gold')).toBeTruthy();
+  });
+
   /* Wish of 8.11.2026: the list of warbands shows the spell school of each, filters by it, says "None" where there is no caster, and a tap on
      a school names its spells and what they do (no lore). */
   it('shows the spell school of each warband, "None" where it has no caster, and filters by it', async () => {
@@ -234,35 +263,6 @@ describe('a new warband', () => {
     expect(bubble.textContent).toMatch(/strikes first in close combat/);
     expect(bubble.textContent).not.toMatch(/howling invigorates/);
     expect((screen.getByRole('radio', { name: 'Night Goblins' }) as HTMLInputElement).checked).toBe(false);
-  });
-
-  /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
-  it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
-    at('/warbands/new');
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
-    await user.click(screen.getByRole('checkbox', { name: /A planner/ }));
-    expect(screen.queryByText(/Starting gold/)).toBeNull();
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'The Late Company');
-    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'The Late Company' })).toBeTruthy();
-    expect((await db.warbands.toArray())[0]!.state.planner).toBe(true);
-    expect(screen.getByText(/· Planner/)).toBeTruthy();
-    expect(screen.getByText('Value')).toBeTruthy();
-    expect(screen.queryByText('Gold')).toBeNull();
-    expect(screen.getByText(/A planner: no gold limit, and advances without experience/)).toBeTruthy();
-  });
-
-  it('is an ordinary warband unless asked', async () => {
-    at('/warbands/new');
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
-    expect((screen.getByRole('checkbox', { name: /A planner/ }) as HTMLInputElement).checked).toBe(false);
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Plain');
-    await user.click(screen.getByRole('button', { name: 'Start the warband' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Plain' })).toBeTruthy();
-    expect((await db.warbands.toArray())[0]!.state.planner).toBeUndefined();
-    expect(screen.getByText('Gold')).toBeTruthy();
   });
 
   it('is offered on Home and on the list of warbands', async () => {
