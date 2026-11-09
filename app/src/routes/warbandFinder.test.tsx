@@ -107,10 +107,10 @@ describe('finding a warband to start', () => {
   });
 
   /* Wishes #130, #133: Race and a Yes/No big-creature column last; the filter's fields in the order of the columns; a row is chosen by tapping it. */
-  it('has the columns Warband, Race, Gold, Max. models, Heroes, Magic, Big creature, in that order (#130)', () => {
+  it('has the columns Warband, Race, Gold, Max. models, Heroes, School of magic, Big creature, in that order (#130)', () => {
     render(<Harness />);
     const head = screen.getByRole('table').querySelector('thead')!;
-    expect(within(head as HTMLElement).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Warband', 'Race', 'Gold', 'Max. models', 'Heroes', 'Magic', 'Big creature']);
+    expect(within(head as HTMLElement).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Warband', 'Race', 'Gold', 'Max. models', 'Heroes', 'School of magic', 'Big creature']);
   });
 
   it('shows the race and a plain Yes or No for a big creature in each row (#130)', () => {
@@ -136,7 +136,7 @@ describe('finding a warband to start', () => {
 
   it('lists the filter fields in the order of the columns (#133)', () => {
     render(<Harness />);
-    const order = ['Look for', 'Race', 'Grade', 'Gold from', 'Max. models from', 'Heroes at the start', 'Magic', /Big creature/, 'Sort by'];
+    const order = ['Look for', 'Race', 'Grade', 'Gold from', 'Max. models from', 'Heroes at the start', 'School of magic', /Big creature/, 'Sort by'];
     const fields = order.map((l) => screen.getByLabelText(l));
     fields.slice(1).forEach((f, i) => {
       expect(fields[i]!.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING, `${String(order[i + 1])} after ${String(order[i])}`).toBeTruthy();
@@ -147,7 +147,7 @@ describe('finding a warband to start', () => {
 /* Several schools in the Magic cell stand one under the other, never side by side: the cell is narrow on a phone. */
 describe('the Magic column with more than one school', () => {
   it('puts each school on a line of its own, without a comma', () => {
-    const two = { ...facts.find((f) => f.key === 'merc')!, schools: ['waaagh', 'lesserMagic'] };
+    const two = { ...facts.find((f) => f.key === 'merc')!, schools: ['waaagh', 'lesserMagic'], families: ['waaagh', 'lesserMagic'] };
     const info = { waaagh: { name: 'Waaagh! Magic', tips: [] }, lesserMagic: { name: 'Lesser Magic', tips: [] } };
     render(<WarbandTable shown={[two]} sort="grade" chosen="" onChoose={() => undefined} schoolInfo={info} />);
     const cell = screen.getByText('Waaagh! Magic').closest('td')!;

@@ -283,6 +283,8 @@ export interface SkillList {
 export interface SpellList {
   name: string;
   note?: string;
+  /** The school this one is made from, for the warband it is made for (the Marauders' Chaos Magic is Chaos Rituals): listed under that school on New warband. Prayers have none: each is a school of its own. */
+  family?: string;
   spells: [name: string, text: string][];
   /** The line of lore each spell has on its page on mordheimer.net, word for word, by the spell's name without its difficulty (ADR 0024, note of 8.11.2026). */
   lore?: Record<string, string>;
