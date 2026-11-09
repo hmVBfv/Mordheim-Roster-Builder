@@ -3,7 +3,9 @@ import { lazy, Suspense, useState } from 'react';
 import { Link } from 'react-router';
 import { WhatsNewButton } from '../changelog/WhatsNew.tsx';
 import { cleanServer, getServer, setServer } from '../share/link.ts';
+import { useSession } from '../account/session.ts';
 import { accountLabel } from '../app/nav.ts';
+import { RULES } from '../app/paths.ts';
 import { APP_NAME, FLAVOUR } from '../flavour.ts';
 import { setChoice, THEME_CHOICES, useThemeChoice } from '../theme/theme.ts';
 import { shownVersion } from '../version.ts';
@@ -35,6 +37,8 @@ function CampaignServer() {
 
 export function More() {
   const choice = useThemeChoice();
+  const session = useSession();
+  const inAccount = FLAVOUR === 'campaign' && session.status === 'in';
   const theme = (
     <fieldset className={`${ui.card} ${styles.themes}`}>
       <legend>Theme</legend>
@@ -57,8 +61,9 @@ export function More() {
         {APP_NAME} · version <span title={__APP_VERSION__}>{shownVersion(__APP_VERSION__)}</span>
         {FLAVOUR === 'quickbuild' && ' · warbands stay on this device'}
       </p>
-      <div className={ui.row}><Link to="/rules" className={ui.buttonQuiet}>Rules</Link></div>
-      <WhatsNewButton />
+      {/* signed in, Rules are a tab of the Library and What's new one of Account; the others keep them here */}
+      {!inAccount && <div className={ui.row}><Link to={RULES} className={ui.buttonQuiet}>Rules</Link></div>}
+      {!inAccount && <WhatsNewButton />}
     </section>
   );
 }

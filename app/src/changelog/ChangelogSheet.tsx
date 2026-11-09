@@ -18,12 +18,10 @@ function days(entries: Entry[]): { date: string; changes: Entry['changes'] }[] {
   return out;
 }
 
-export function ChangelogSheet({ dialogRef, close, title, entries }: { dialogRef: Sheet['ref']; close: Sheet['close']; title: string; /** null: the sheet is not opened yet and holds nothing */ entries: Entry[] | null }) {
-  const id = useId();
+/** The changes, a heading for each day. */
+export function ChangelogList({ entries }: { entries: Entry[] }) {
   return (
-    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
-      {entries && <div className={ui.page}>
-        <h2 id={id}>{title}</h2>
+    <>
         {entries.length === 0 && <p className={ui.muted}>Nothing listed yet.</p>}
         {days(entries).map((d) => (
           <section key={d.date} className={styles.entry}>
@@ -33,6 +31,17 @@ export function ChangelogSheet({ dialogRef, close, title, entries }: { dialogRef
             </ul>
           </section>
         ))}
+    </>
+  );
+}
+
+export function ChangelogSheet({ dialogRef, close, title, entries }: { dialogRef: Sheet['ref']; close: Sheet['close']; title: string; /** null: the sheet is not opened yet and holds nothing */ entries: Entry[] | null }) {
+  const id = useId();
+  return (
+    <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
+      {entries && <div className={ui.page}>
+        <h2 id={id}>{title}</h2>
+        <ChangelogList entries={entries} />
         <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>
       </div>}
     </dialog>

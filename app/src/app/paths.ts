@@ -5,3 +5,6 @@ import { FLAVOUR } from '../flavour.ts';
 export const HOME = '/home';
 export const ACCOUNT = FLAVOUR === 'campaign' ? '/account' : '/settings';
 export const MY_REPORTS = `${ACCOUNT}/reports`;
+export const WHATS_NEW = `${ACCOUNT}/whats-new`;
+/** The rulebook: a tab of the Library in the campaign app (Rob, 8.11.2026), a page of its own in the Quick Build, which has no Library. */
+export const RULES = FLAVOUR === 'campaign' ? '/library/rules' : '/rules';

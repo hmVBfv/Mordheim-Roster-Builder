@@ -142,7 +142,7 @@ describe('the side navigation', () => {
     const nav = screen.getByRole('navigation', { name: 'Main' });
     expect((await within(nav).findByRole('link', { name: 'Library' })).getAttribute('href')).toBe('/library');
     const list = await waitForList(nav, 'nav-library');
-    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Ideas', '/library/ideas'], ['Factions', '/library/factions'], ['NPCs', '/library/npcs'], ['Groups', '/library/groups'], ['Scenarios', '/library/scenarios'], ['Locations', '/library/locations'], ['Lore', '/library/lore']]);
+    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Ideas', '/library/ideas'], ['Factions', '/library/factions'], ['NPCs', '/library/npcs'], ['Groups', '/library/groups'], ['Scenarios', '/library/scenarios'], ['Locations', '/library/locations'], ['Lore', '/library/lore'], ['Rules', '/library/rules']]);
     await user.click(within(nav).getByRole('button', { name: 'Close Library' }));
     expect(nav.querySelector('#nav-library')).toBeNull();
   });
@@ -175,7 +175,7 @@ describe('the side navigation', () => {
     at('/account/reports');
     const nav = screen.getByRole('navigation', { name: 'Main' });
     const list = await waitForList(nav, 'nav-account');
-    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Settings', '/account'], ['Your reports', '/account/reports']]);
+    expect(within(list).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Settings', '/account'], ['Your reports', '/account/reports'], ["What's new", '/account/whats-new']]);
     await user.click(within(nav).getByRole('button', { name: 'Close Account' }));
     expect(nav.querySelector('#nav-account')).toBeNull();
   });

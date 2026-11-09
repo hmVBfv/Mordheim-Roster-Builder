@@ -30,7 +30,8 @@ function BlockView({ b, query = '' }: { b: Block; query?: string }) {
   );
 }
 
-export function Rules() {
+/** `base`: where the chapters are linked; `embedded`: inside the Library, which has the heading and the way back. */
+export function Rules({ base = '/rules', embedded = false }: { base?: string; embedded?: boolean } = {}) {
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
   const [params] = useSearchParams();
   const [query, setQuery] = useState('');
@@ -57,8 +58,8 @@ export function Rules() {
   return (
     <section className={`${ui.page} ${ui.measure}`}>
       <div>
-        <Link to={ACCOUNT} className={trade.back}>‹ {ACCOUNT === '/account' ? 'Account' : 'Settings'}</Link>
-        <h1>Rules</h1>
+        {!embedded && <Link to={ACCOUNT} className={trade.back}>‹ {ACCOUNT === '/account' ? 'Account' : 'Settings'}</Link>}
+        {embedded ? <h2>Rules</h2> : <h1>Rules</h1>}
         <p className={ui.muted}>The rulebook, word for word. Charts and diagrams are pictures on the original pages.</p>
       </div>
       <label className={ui.field}>
@@ -67,7 +68,7 @@ export function Rules() {
       </label>
       <nav aria-label="Chapters" className={styles.chapters}>
         {(chapters ?? []).map((c) => (
-          <NavLink key={c.id} to={`/rules?c=${c.id}`} end className={() => (!asked && current?.id === c.id ? `${styles.chapter} ${styles.on}` : styles.chapter)} aria-current={!asked && current?.id === c.id ? 'page' : undefined}>{c.title}</NavLink>
+          <NavLink key={c.id} to={`${base}?c=${c.id}`} end className={() => (!asked && current?.id === c.id ? `${styles.chapter} ${styles.on}` : styles.chapter)} aria-current={!asked && current?.id === c.id ? 'page' : undefined}>{c.title}</NavLink>
         ))}
       </nav>
 
@@ -78,7 +79,7 @@ export function Rules() {
           <p className={ui.muted}>{total === 0 ? 'Nothing found. Words match by their stem: hide finds hiding.' : `${total} ${total === 1 ? 'place' : 'places'} in ${results.length} ${results.length === 1 ? 'chapter' : 'chapters'}.`}</p>
           {results.map(({ chapter, hits }) => (
             <div key={chapter.id}>
-              <h2><Link to={`/rules?c=${chapter.id}`} onClick={() => setQuery('')}>{chapter.title}</Link></h2>
+              <h2><Link to={`${base}?c=${chapter.id}`} onClick={() => setQuery('')}>{chapter.title}</Link></h2>
               <ul className={styles.hits}>
                 {hits.map((h, i) => (
                   <li key={i} className={ui.card}>
