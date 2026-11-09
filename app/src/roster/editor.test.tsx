@@ -271,13 +271,33 @@ describe('a new warband', () => {
     const rowOf = (name: string) => screen.getByRole('radio', { name }).closest('tr')!;
     expect(within(rowOf('Night Goblins')).getByText('Waaagh! Magic')).toBeTruthy();
     expect(within(rowOf('Mercenaries')).getByText('None')).toBeTruthy();
-    expect(screen.getAllByRole('columnheader', { name: 'Magic' }).length).toBe(1);
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Magic' }), 'waaagh');
+    expect(screen.getAllByRole('columnheader', { name: 'School of magic' }).length).toBe(1);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'School of magic' }), 'waaagh');
     const names = screen.getAllByRole('radio').map((r) => r.getAttribute('aria-label'));
-    expect(names.sort()).toEqual(['Night Goblins', 'Orc Mob']);
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Magic' }), 'none');
+    expect(names.sort()).toEqual(['Forest Goblins', 'Night Goblins', 'Orc Mob']);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'School of magic' }), 'none');
     expect(screen.queryByRole('radio', { name: 'Night Goblins' })).toBeNull();
     expect(screen.getByRole('radio', { name: 'Mercenaries' })).toBeTruthy();
+  });
+
+  /* Report of 9.11.2026: a school made for one warband is listed under the school it belongs to; prayers stay schools of their own. */
+  it('lists a school made for a warband under its parent school, and each prayer as a school of its own', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await screen.findByRole('radio', { name: 'The Restless Dead' });
+    const rowOf = (name: string) => screen.getByRole('radio', { name }).closest('tr')!;
+    expect(within(rowOf('The Restless Dead')).getByText('Necromancy')).toBeTruthy();
+    expect(within(rowOf('Marauders of Chaos')).getByText('Chaos Rituals')).toBeTruthy();
+    expect(within(rowOf('Sisters of Sigmar')).getByText('Prayers of Sigmar')).toBeTruthy();
+    expect(within(rowOf('Ostlanders')).getByText('Prayers of Taal')).toBeTruthy();
+    const filter = screen.getByRole('combobox', { name: 'School of magic' });
+    const options = within(filter).getAllByRole('option').map((o) => o.textContent);
+    expect(options).toContain('Necromancy');
+    expect(options).not.toContain('Necromancy (Restless Dead)');
+    expect(options).toContain('Prayers of Sigmar');
+    expect(options).toContain('Prayers of Taal');
+    await user.selectOptions(filter, 'necromancy');
+    expect(screen.getAllByRole('radio').map((r) => r.getAttribute('aria-label')).sort()).toEqual(['The Restless Dead', 'Undead']);
   });
 
   it('opens the spells of a school on a tap, with their effects and without lore, and does not choose the warband', async () => {
