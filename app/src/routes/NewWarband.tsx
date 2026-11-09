@@ -89,21 +89,21 @@ function Form({ campaignId }: { campaignId: string | null }) {
           placeholder={choice?.name ?? 'The name of your warband'} onChange={(e) => setName(e.target.value)} />
       </label>
       {!campaignId && (
-        <label className={ui.check}>
+        <label className={`${ui.check} ${styles.option}`}>
           <input type="checkbox" checked={planner} onChange={(e) => setPlanner(e.target.checked)} />
-          <span><strong>A planner</strong> – to see what a strong late-game warband looks like: no gold limit (its value is shown), advances without experience (the experience they would need is shown). It does not take part in a campaign.</span>
+          <span><strong>A planner</strong><small>To see what a strong late-game warband looks like: no gold limit (its value is shown), advances without experience (the experience they would need is shown). It does not take part in a campaign.</small></span>
         </label>
       )}
       {!campaignId && planner && (
-        <label className={ui.check}>
+        <label className={`${ui.check} ${styles.option}`}>
           <input type="checkbox" checked={trade} onChange={(e) => setTrade(e.target.checked)} />
-          <span><strong>Open the Trading Post</strong> – to get rare items (a search needs no roll, a price you leave empty is the average); it can be switched later under the warband’s menu.</span>
+          <span><strong>Open the Trading Post</strong><small>To get rare items (a search needs no roll, a price you leave empty is the average); it can be switched later under the warband’s menu.</small></span>
         </label>
       )}
       {fromRulebook && !vanilla && (
-        <label className={ui.check}>
+        <label className={`${ui.check} ${styles.option}`}>
           <input type="checkbox" checked={plain} onChange={(e) => setPlain(e.target.checked)} />
-          <span><strong>Vanilla Mordheim</strong> – only the items and skills of the rulebook (Core): the Trading Post offers nothing else. Only Core warbands can play it. It can be switched off later under House rules.</span>
+          <span><strong>Vanilla Mordheim</strong><small>Only the items and skills of the rulebook (Core): the Trading Post offers nothing else. Only Core warbands can play it. It can be switched off later under House rules.</small></span>
         </label>
       )}
       {choice && !fromRulebook && !vanilla && <p className={ui.muted}>Vanilla Mordheim (the rulebook, Core) is only for Core warbands.</p>}
