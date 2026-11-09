@@ -374,7 +374,7 @@ describe('following a report', () => {
     expect(screen.queryByRole('region', { name: 'Your reports' })).toBeNull();
     expect(screen.queryByText('Gold drifts')).toBeNull();
     const tabs = screen.getByRole('navigation', { name: 'Account' });
-    expect(within(tabs).getAllByRole('link').map((a) => a.textContent)).toEqual(['Settings', 'Your reports']);
+    expect(within(tabs).getAllByRole('link').map((a) => a.textContent)).toEqual(['Settings', 'Your reports', "What's new"]);
     await user.click(within(tabs).getByRole('link', { name: 'Your reports' }));
     expect(await screen.findByRole('table', { name: 'Your reports' })).toBeTruthy();
     expect(screen.getByText('Gold drifts')).toBeTruthy();
