@@ -4874,3 +4874,22 @@ decides which one applies.
   the spell tuples had to change. Three pages use `h2` instead of `h3`, which first showed as three schools without any line; one spell has another
   name on its page (Black Blade of Khaine, Flamesword at the same difficulty and effect). The box is worked out from the roster, so the school of a
   Hired Sword or Dramatis Personae is there while he is, and goes with him. Hired Swords whose school is not in our data (Djed'hi) show nothing.
+
+**The run of 9.11.2026: six reports on the new-warband, warband and navigation screens (PRs 375–380).**
+
+- **#234 (PR 375), the dot before the difficulty.** The difficulty already had a line of its own in the list of spells, so the dot was a stray mark;
+  it is "Difficulty 9" on its own line.
+- **#235 (PR 376), the unit choice and the warband rules fold.** Both are `<details>` like the box of spells, closed to begin with. Tests that looked
+  the sections up as regions look the fold-outs up by name now. This contains #234, because both change the same test of the spell box; a trial merge
+  of all branches found the conflict before Rob could.
+- **#238 and #239 (PRs 377, 378), the options of a new warband.** "The rulebook" of the Vanilla option now says Core and who can play it; the
+  other warbands are told why they have no such choice. The options are smaller (the checkbox of the report form, the description in the muted small
+  text). #239 contains #238: the same lines.
+- **#237 (PR 379), the school on New warband.** A Magic column and filter in the order of the columns (a test of an earlier report demands that), the
+  school's spells in a bubble without lore, "None" where there is no caster. The facts use the derivation of the spell box, and a test compares both for
+  every warband. Its tests were first put at the same place in `editor.test.tsx` as those of #239, which conflicts when both are merged one after the
+  other; they were moved.
+- **#236 (PR 380), Rules and What's new.** Rules are the last tab of the Library, What's new the third of Account. The Library is for signed-in
+  readers, but the rulebook should be readable by everybody, so its tab is open to a reader without an account, who also keeps the buttons on the
+  Account page; so does the Quick Build. The first trial merge found a test of the reports page that lists the tabs of Account, which a subset run
+  of the branch had not covered: run the whole of `npm run check` before pushing.
