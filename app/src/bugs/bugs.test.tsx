@@ -364,6 +364,27 @@ describe('following a report', () => {
     expect(sheet.textContent).not.toMatch(/S2|gold ledger/);
   });
 
+  /* Report of 9.11.2026: "Your reports" was sometimes blank until a reload. While the list is on its way the page says so, and where the server does
+     not answer it says that too, with a way to ask again – it is never an empty page. */
+  it('says that it is loading while the list is on its way, and offers to try again when the server does not answer', async () => {
+    const { srv } = server();
+    srv.bugFrom({ reporterId: KAI.id, reporterName: 'Kai', title: 'Gold drifts', text: 'x', status: 'new' });
+    const real = globalThis.fetch;
+    let hang = true;
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => (hang && String(input).includes('/bugs/mine') ? new Promise<Response>(() => undefined) : real(input, init))));
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
+    at('/account/reports');
+    expect(await screen.findByText('Loading your reports …')).toBeTruthy();
+    await vi.advanceTimersByTimeAsync(9000);
+    expect(await screen.findByText(/does not answer/)).toBeTruthy();
+    hang = false;
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Gold drifts')).toBeTruthy();
+    expect(screen.queryByText(/does not answer/)).toBeNull();
+    vi.useRealTimers();
+  });
+
   it('a tab of its own: Account has Your reports beside it, and the settings do not grow with the reports', async () => {
     const { srv, me } = server();
     srv.bugFrom({ reporterId: me.id, reporterName: 'Kai', title: 'Gold drifts', text: 'x', status: 'new' });

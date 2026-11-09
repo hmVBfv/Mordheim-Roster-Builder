@@ -29,29 +29,42 @@ export function statusWords(b: Pick<MyBug, 'status' | 'fixedIn'>): string {
   }
 }
 
+/** How long the list may be on its way before the page says the server does not answer (report of 9.11.2026: it was blank until a reload). */
+const SLOW_MS = 8000;
+
 /** The reporter's own reports; a report sent from the sheet appears here at once. */
-function useMyReports(me: string | null): { bugs: MyBug[] | null; error: string | null } {
+function useMyReports(me: string | null): { bugs: MyBug[] | null; error: string | null; again: () => void } {
   const [bugs, setBugs] = useState<MyBug[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [round, setRound] = useState(0);
   useEffect(() => {
     if (!me) return;
     let live = true;
+    let asked = 0;
+    let slow: ReturnType<typeof setTimeout> | undefined;
     const load = () => {
+      const mine = ++asked;
+      clearTimeout(slow);
+      // an answer that does not come is told, not waited for in silence; a late answer still counts
+      slow = setTimeout(() => { if (live && mine === asked) setError((e) => e ?? 'The campaign server does not answer. Try again in a moment.'); }, SLOW_MS);
       myReports()
-        .then((r) => { if (live) { setBugs(r); setError(null); } })
-        .catch((e: unknown) => { if (live) setError(errorText(e)); });
+        .then((r) => { if (live) { clearTimeout(slow); setBugs(r); setError(null); } })
+        .catch((e: unknown) => { if (live) { clearTimeout(slow); setError(errorText(e)); } });
     };
     load();
     const off = onReportSent(load);
-    return () => { live = false; off(); };
-  }, [me]);
-  return { bugs, error };
+    // coming back to the page (a phone that slept) asks again
+    const visible = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', visible);
+    return () => { live = false; clearTimeout(slow); off(); document.removeEventListener('visibilitychange', visible); };
+  }, [me, round]);
+  return { bugs, error, again: () => { setError(null); setRound((r) => r + 1); } };
 }
 
 export function MyReports() {
   const session = useSession();
   const me = session.status === 'in' ? session.user.id : null;
-  const { bugs, error } = useMyReports(me);
+  const { bugs, error, again } = useMyReports(me);
   // written without a connection, kept on this device, sent by the sync once the server answers (wish #177)
   const waiting = useWaitingReports(session.status === 'in' || session.status === 'unreachable' ? session.user?.id ?? null : null);
   const { ref, open, close } = useSheet('my-report', { outside: true });
@@ -68,7 +81,13 @@ export function MyReports() {
           <ul aria-label="Waiting to be sent">{waiting.map((w) => <li key={w.id}>{w.title}</li>)}</ul>
         </div>
       )}
-      {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
+      {me && !bugs && !error && <p className={ui.muted} role="status">Loading your reports …</p>}
+      {error && (
+        <div className={`${ui.message} ${ui.error}`} role="alert">
+          <p>{error}</p>
+          <div className={ui.row}><button type="button" className={ui.buttonQuiet} onClick={again}>Try again</button></div>
+        </div>
+      )}
       {me && bugs && bugs.length === 0 && !error && <p className={ui.muted}>You have not sent a report yet. The Bug button at the top of every screen opens the form.</p>}
       {me && bugs && bugs.length > 0 && (
         <div className={accountStyles.tableWrap}>
