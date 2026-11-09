@@ -485,7 +485,10 @@ describe('the box of spells and prayers', () => {
     const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLElement;
     expect(within(box).getByText('Waaagh! Magic')).toBeTruthy();
     const ledz = within(box).getByText("Led'z go").closest('li')!;
-    expect(ledz.textContent).toMatch(/9/);
+    // the difficulty has a line of its own, without a dot in front of it
+    const difficulty = within(ledz).getByText('Difficulty 9');
+    expect(difficulty.tagName).toBe('SMALL');
+    expect(ledz.textContent).not.toMatch(/·/);
     expect(within(ledz).getByText('The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.')).toBeTruthy();
     expect(ledz.textContent).toMatch(/strikes first in close combat/);
   });
