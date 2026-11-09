@@ -61,6 +61,12 @@ export interface WarriorView {
   /** A Prospect while a Hero has fallen whose place he may take (wish): the card says so and offers it. */
   takePlace: boolean;
   missGames: number;
+  /** Kept out of battles until switched back (marked by hand). */
+  sitsOut: boolean;
+  /** The unit(s) he depends on, by name ("Beastmaster", "Liche or Necromancer"), or '' where he depends on nobody. */
+  follows: string;
+  /** Why he is not in the next battle – marked, hurt, or left behind by the unit he depends on – or null where he takes part (wish of 9.11.2026). */
+  away: { text: string; /** Marked on him, as against staying behind with another unit. */ own: boolean } | null;
   /** The battles of a campaign he (or the group) has taken part in (#166). */
   battles: number;
   stats: StatCell[];
@@ -316,6 +322,9 @@ function warrior(ctx: core.Ctx, m: Model): WarriorView {
     upgrade: upgradeOf(ctx, m),
     takePlace: !hero && core.replaceableHeroes(ctx, m.uid).length > 0,
     missGames: Number(m.miss) || 0,
+    sitsOut: !!m.sitsOut,
+    follows: (def?.needs ?? []).map((id) => core.unitDef(ctx, id)?.name ?? id).join(' or '),
+    away: ((pt) => (pt.takesPart ? null : { text: pt.text, own: pt.own }))(core.participation(ctx, m)),
     battles: Number(m.battles) || 0,
     // marked against the profile he started with: a Prospect who took a Hero's place is compared with the Prospect, not with the Hero
     stats: statCells(p, core.unitDef(ctx, m.statsOf ?? m.uid_def)?.profile, p ? core.aDisp(ctx, m, p) : undefined),
@@ -403,6 +412,8 @@ export interface UnitRow {
   chipsMore: number;
   /** Equipment and special rules in one line ("" when he carries nothing). */
   carries: string;
+  /** Not in the next battle: the row is greyed out. */
+  away: boolean;
 }
 
 export const CHIPS_IN_ROW = 4;
@@ -418,7 +429,7 @@ export function unitChips(u: WarriorView | HireView): Chip[] {
   if (u.promoted) out.push({ label: 'Promoted', tone: 'plain' });
   if (u.captive != null) out.push({ label: u.captive ? `Captive of ${u.captive}` : 'Captive', tone: 'danger' });
   if (u.retire) out.push({ label: 'Blind: must retire', tone: 'danger' });
-  if (u.missGames > 0) out.push({ label: `Misses ${u.missGames} game${u.missGames > 1 ? 's' : ''}`, tone: 'danger' });
+  if (u.away) out.push({ label: u.away.text, tone: u.away.own ? 'danger' : 'plain' });
   for (const f of u.injuries) out.push({ label: f.label, tone: 'danger' });
   return out;
 }
@@ -433,6 +444,7 @@ export function unitRow(u: WarriorView | HireView): UnitRow {
       stats: u.stats, save: u.save, xp: u.xp, exp: u.exp, ready: u.advanceDue,
       chips: chips.slice(0, CHIPS_IN_ROW), chipsMore: Math.max(0, chips.length - CHIPS_IN_ROW),
       carries: [...u.equipment, ...u.rules].map((f) => f.label).join(' · '),
+      away: !!u.away,
     };
   }
   return {
@@ -441,6 +453,7 @@ export function unitRow(u: WarriorView | HireView): UnitRow {
     stats: u.stats, save: null, xp: u.xp, exp: u.exp, ready: u.advanceDue,
     chips: [], chipsMore: 0,
     carries: u.rules.map((f) => f.label).join(' · '),
+    away: false,
   };
 }
 

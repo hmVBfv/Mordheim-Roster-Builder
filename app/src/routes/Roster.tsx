@@ -218,6 +218,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         const m = c.s.models.find((x) => x.uid === w.uid);
         return m && core.magicOfModel(c, m) ? core.addSpellFromAdvance(c, w.uid, name) : core.addSpell(c, w.uid, name);
       }, `${w.name} chose the spell ${core.spellLabel(name)}.`),
+      participation: (v) => ed.edit((c) => core.setParticipation(c, w.uid, v), v.sitsOut ? `${w.name} stays out of battles until switched back.` : v.miss > 0 ? `${w.name} misses the next ${v.miss === 1 ? 'battle' : `${v.miss} battles`}.` : `${w.name} takes part again.`),
       correctInjuries: w.injuries.length || w.missGames ? () => { setInjuriesOf(w.uid); openInjuriesSheet(); } : undefined,
       chaos,
       // a Hero is written off with the D66 on 11, a henchman with the D6 on 1 (#194)

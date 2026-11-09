@@ -49,6 +49,8 @@ export interface UnitDef {
   large?: boolean;
   vehicle?: boolean;
   noArmour?: boolean;
+  /** The units it depends on (ids): it takes part in a battle only with one of them on the roster who takes part himself (the Beasthounds and the Beastmaster). */
+  needs?: string[];
   /** Ignores the injury Blinded in one eye (the Augur, already blind): it counts as Full Recovery. */
   eyeProof?: boolean;
   noMissile?: boolean;

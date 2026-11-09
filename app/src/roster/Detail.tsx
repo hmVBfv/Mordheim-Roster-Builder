@@ -51,6 +51,8 @@ export interface UnitActs {
   taken: Taken | null;
   correctTaken?(): void;
   correctInjuries?(): void;
+  /** Marks him as missing the next N battles (0: takes part) and/or staying out until switched back. */
+  participation?(v: { miss: number; sitsOut: boolean }): void;
   /** Chooses one of the spells he starts with (#81), by its name in the data. */
   learnSpell?(name: string): void;
   /** Mutations and the Mark: one button each. */
@@ -139,6 +141,34 @@ function Stepper({ xp, who, group, acts }: { xp: XpView; who: string; group: boo
   );
 }
 
+/** Whether he takes part in the next battle: what it says, and – where he can be edited – three buttons and a count, small enough for a phone. */
+function NextBattles({ w, acts }: { w: WarriorView; acts?: UnitActs }) {
+  const set = acts?.participation;
+  const mode = w.sitsOut ? 'until' : w.missGames > 0 ? 'count' : 'takes';
+  return (
+    <Section title="Next battles">
+      <p className={styles.plain} aria-live="polite">{w.away?.text ?? 'Takes part in the next battle'}</p>
+      {w.follows && <p className={styles.empty}>He follows the {w.follows}: he takes part only with him on the roster.</p>}
+      {set && (
+        <div role="group" aria-label="Next battles" className={styles.partRow}>
+          <button type="button" className={styles.btn} aria-pressed={mode === 'takes'} onClick={() => set({ miss: 0, sitsOut: false })}>Takes part</button>
+          <button type="button" className={styles.btn} aria-pressed={mode === 'count'} onClick={() => set({ miss: Math.max(1, w.missGames), sitsOut: false })}>
+            {w.missGames > 0 && !w.sitsOut ? `Misses next ${w.missGames === 1 ? 'battle' : `${w.missGames} battles`}` : 'Misses next battle'}
+          </button>
+          <button type="button" className={styles.btn} aria-pressed={mode === 'until'} onClick={() => set({ miss: 0, sitsOut: true })}>Until switched back</button>
+          {mode === 'count' && (
+            <span className={styles.stepper}>
+              <button type="button" aria-label="One battle less" onClick={() => set({ miss: w.missGames - 1, sitsOut: false })}>−</button>
+              <b aria-live="polite" aria-atomic="true">{w.missGames}</b>
+              <button type="button" aria-label="One battle more" onClick={() => set({ miss: w.missGames + 1, sitsOut: false })}>+</button>
+            </span>
+          )}
+        </div>
+      )}
+    </Section>
+  );
+}
+
 function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
   const w = isWarrior(u) ? u : null;
   const group = !!w && !w.hero;
@@ -178,6 +208,7 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       ) : (
         <p className={styles.empty}>Gains no experience.</p>
       )}
+      {w && (w.away || w.follows || acts?.participation) && <NextBattles w={w} acts={acts} />}
       {acts && (
         <div className={styles.acts}>
           {w?.takePlace && <button type="button" className={`${styles.btn} ${styles.gold}`} onClick={acts.advance}>Take a fallen Hero's place</button>}
@@ -270,7 +301,7 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       {w && (
         <Section title="Injuries">
           <Facts items={mine} empty="No lasting injuries." />
-          {(w.missGames > 0 || w.retire) && <p className={styles.plain}>{[w.missGames > 0 && `Misses ${w.missGames} game${w.missGames > 1 ? 's' : ''}`, w.retire && 'Blind in both eyes: must retire'].filter(Boolean).join(' · ')}</p>}
+          {w.retire && <p className={styles.plain}>Blind in both eyes: must retire</p>}
           {acts?.correctInjuries && <div className={styles.acts}><button type="button" className={styles.btn} onClick={acts.correctInjuries}>Injuries – correct</button></div>}
         </Section>
       )}

@@ -46,7 +46,7 @@ function RowView({ r, layout, current, onPick, rename, children }: { r: UnitRow;
     if (Math.abs(moved) > 1) window.scrollBy(0, moved);
   }, [stack, current]);
   return (
-    <li ref={li} className={styles.row} data-kind={r.kind} data-open={stack && current} aria-current={!stack && current ? 'true' : undefined}>
+    <li ref={li} className={styles.row} data-kind={r.kind} data-open={stack && current} data-away={r.away || undefined} aria-current={!stack && current ? 'true' : undefined}>
       <button type="button" className={styles.rowBtn} aria-label={label} aria-describedby={words}
         aria-expanded={stack ? current : undefined} aria-pressed={stack ? undefined : current}
         onClick={() => { tapped.current = li.current?.getBoundingClientRect().top ?? null; onPick(); }}>

@@ -275,17 +275,19 @@ describe('the row of a warrior in the list', () => {
 
   it('puts what sets him apart in chips, the danger ones marked, and counts those that do not fit', () => {
     const hero = band().heroes[0]!;
-    const all = { ...hero, leader: true, promoted: true, captive: 'Anna', missGames: 2, retire: true, injuries: [{ label: 'Leg Wound', tips: [] }] };
+    const all = { ...hero, leader: true, promoted: true, captive: 'Anna', missGames: 2, away: { text: 'Misses next 2 battles', own: true }, retire: true, injuries: [{ label: 'Leg Wound', tips: [] }] };
     expect(unitChips(all)).toEqual([
       { label: 'Leader', tone: 'gold' }, { label: 'Promoted', tone: 'plain' }, { label: 'Captive of Anna', tone: 'danger' },
-      { label: 'Blind: must retire', tone: 'danger' }, { label: 'Misses 2 games', tone: 'danger' }, { label: 'Leg Wound', tone: 'danger' },
+      { label: 'Blind: must retire', tone: 'danger' }, { label: 'Misses next 2 battles', tone: 'danger' }, { label: 'Leg Wound', tone: 'danger' },
     ]);
     const row = unitRow(all);
     expect(row.chips).toHaveLength(CHIPS_IN_ROW);
     expect(row.chipsMore).toBe(2);
     expect(unitChips({ ...hero, leader: false, captive: '' }).map((c) => c.label)).toEqual(['Captive']);
     expect(unitChips({ ...hero, leader: false })).toEqual([]);
-    expect(unitChips({ ...hero, leader: false, missGames: 1 }).map((c) => c.label)).toEqual(['Misses 1 game']);
+    expect(unitChips({ ...hero, leader: false, missGames: 1, away: { text: 'Misses next battle', own: true } }).map((c) => c.label)).toEqual(['Misses next battle']);
+    // a unit that stays behind with its master is marked less sharply than one who is hurt
+    expect(unitChips({ ...hero, leader: false, away: { text: 'Stays behind: no Beastmaster in the warband', own: false } })).toEqual([{ label: 'Stays behind: no Beastmaster in the warband', tone: 'plain' }]);
   });
 });
 
@@ -563,3 +565,36 @@ describe('a Hero who may be made a Wizard for gold (#199)', () => {
     expect(rosterView(data, s).heroes[0]!.wizard).toBeNull();
   });
 });
+
+/* Wish of 9.11.2026: a unit that misses a battle, or stays behind with its master, is marked in its row, and counts in the rating all the same. */
+describe('who stays out of the next battle, in the view', () => {
+  const dark = () => {
+    let s = createWarband(data, 'darkelves', null, 'The Black Ark');
+    for (const u of ['highborn', 'beastmaster', 'coldone']) s = core.addUnit(core.ctxOf(data, s), u);
+    return s;
+  };
+  const named = (v: ReturnType<typeof rosterView>, type: string) => [...v.heroes, ...v.henchmen].find((w) => w.type === type)!;
+
+  it('says nothing of a unit that takes part', () => {
+    const v = rosterView(data, dark());
+    expect(named(v, 'Beastmaster').away).toBeNull();
+    expect(unitRow(named(v, 'Cold One Beasthound')).away).toBe(false);
+  });
+
+  it('marks the Beastmaster who misses a battle and the Beasthounds that stay behind with him', () => {
+    const s0 = dark();
+    const s = core.setParticipation(core.ctxOf(data, s0), s0.models.find((m) => m.uid_def === 'beastmaster')!.uid, { miss: 1 });
+    const v = rosterView(data, s);
+    expect(named(v, 'Beastmaster').away).toEqual({ text: 'Misses next battle', own: true });
+    expect(named(v, 'Cold One Beasthound').away).toEqual({ text: 'Stays behind: the Beastmaster misses the battle', own: false });
+    expect(unitRow(named(v, 'Cold One Beasthound')).away).toBe(true);
+    expect(unitChips(named(v, 'Beastmaster'))[0]).toEqual({ label: 'Misses next battle', tone: 'danger' });
+  });
+
+  it('shows a rating that does not change for it', () => {
+    const s0 = dark();
+    const s = core.setParticipation(core.ctxOf(data, s0), s0.models.find((m) => m.uid_def === 'beastmaster')!.uid, { miss: 3, sitsOut: true });
+    expect(rosterView(data, s).rating).toBe(rosterView(data, s0).rating);
+  });
+});
+
