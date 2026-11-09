@@ -4893,3 +4893,27 @@ decides which one applies.
   readers, but the rulebook should be readable by everybody, so its tab is open to a reader without an account, who also keeps the buttons on the
   Account page; so does the Quick Build. The first trial merge found a test of the reports page that lists the tabs of Account, which a subset run
   of the branch had not covered: run the whole of `npm run check` before pushing.
+
+**The run of 9.11.2026: seven reports on the roster, the lists of New warband and the account (PRs 383–389).**
+
+- **#245, the Cold One Beasthounds (PR 383).** The unit had one shortened line for each of its five rules and no Beastmaster rule. Rob agreed to the
+  page's words for all five; the rule says the beasts stay away from a battle the Beastmaster cannot take part in, which #246 then made something the
+  roster knows.
+- **#244, the page that jumped (PR 384).** Opening a row scrolled it to the top (a deliberate `scrollIntoView`), and opening another while one was open
+  moved it up as the first closed. Both left the tapped stats elsewhere. The row keeps its place now: the page scrolls by what the row moved.
+- **#242, "Your reports" blank (PR 385).** Not reproduced. The tab showed nothing while the request was on the way and nothing at all when it never
+  came back, and every lazy page had an empty Suspense fallback. Now it says "Loading", tells after eight seconds that the server does not answer and
+  offers "Try again", and asks again when the page becomes visible; a page being fetched says "Loading …" after a moment. A first changelog line was
+  241 characters; the changelog test caught it, but only after I had committed – the check had been chained with `;` and its failure went by.
+- **#240 (PR 386).** The note I added under #238 for the warbands that cannot play Vanilla was noise; it is gone.
+- **#243 (PR 387).** The heading of the list on Home.
+- **#241, schools under their parent (PR 388).** Rob: prayers stay schools of their own (the Prayers of Sigmar are nothing like the Prayers of Taal),
+  the rest groups. `family` in `spells.json` names the parent of a school made for one warband; the facts keep the true school (the box of spells
+  names it) and add the family the list and the filter use. The column and the filter are "School of magic".
+- **#246, missing battles (PR 389, contains #245 and #244).** Rob: "misses next battle / next N battles", they still count in the rating, look at
+  every dependency. The count injuries use (`miss`) is the count; "until switched back" is a new key (`sitsOut`). Dependants are derived from `needs`
+  on the unit, set only where a page says the unit cannot be used without its master: the Beasthounds (Beastmaster), the Scarecrows (Liche or
+  Necromancer), the Sabretusks (Mountain Guide) and the Wolves (Wulfen). Left out, and said so: the Reavers' War Beasts (their page only has them use
+  the Beastmaster's Leadership) and the horses of the Imperial Outriders (a mount is equipment). On a phone the three buttons wrap and the count stays
+  beside them. This pull request contains #245 and #244 because the three change the same unit and the same file of tests; a trial merge of all
+  branches found it, and it had to be merged into the branch with the data conflict resolved by hand.

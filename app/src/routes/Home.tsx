@@ -37,7 +37,7 @@ export function Home() {
           </div>
         )}
         <div>
-          <h2>Your warbands</h2>
+          <h2>Your latest warbands</h2>
           {recent && recent.length > 0 ? <WarbandList warbands={recent} grid favourites={session.status === 'in' ? { has: fav.has } : undefined} /> : recent && <Empty scene="camp" title="No warband yet.">Start one below, or bring one in from the Roster Builder.</Empty>}
         </div>
         <div className={ui.row}>

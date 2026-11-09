@@ -172,7 +172,7 @@ export function InjuriesSheet({ dialogRef, close, name, injuries, miss, onRemove
     <dialog ref={dialogRef} className={ui.sheet} aria-labelledby={id}>
       <div className={ui.page}>
         <h2 id={id}>Injuries · {name}</h2>
-        <p className={ui.muted}>To take back an injury entered by mistake. Games he misses count down as he sits them out.</p>
+        <p className={ui.muted}>To take back an injury entered by mistake. Battles he misses count down as he sits them out.</p>
         {injuries.length === 0 && <p className={ui.muted}>No lasting injuries.</p>}
         <ul className={styles.eqList}>
           {injuries.map((j, i) => (
@@ -185,9 +185,9 @@ export function InjuriesSheet({ dialogRef, close, name, injuries, miss, onRemove
         <div className={ui.row}>
           <span>Misses</span>
           <span className={styles.stepper}>
-            <button type="button" aria-label={`One game less for ${name}`} disabled={miss <= 0} onClick={() => onMiss(-1)}>−</button>
-            <span aria-live="polite">{miss} game{miss === 1 ? '' : 's'}</span>
-            <button type="button" aria-label={`One game more for ${name}`} onClick={() => onMiss(1)}>+</button>
+            <button type="button" aria-label={`One battle less for ${name}`} disabled={miss <= 0} onClick={() => onMiss(-1)}>−</button>
+            <span aria-live="polite">{miss} battle{miss === 1 ? '' : 's'}</span>
+            <button type="button" aria-label={`One battle more for ${name}`} onClick={() => onMiss(1)}>+</button>
           </span>
         </div>
         <div className={ui.actions}><button type="button" className={ui.buttonQuiet} onClick={() => close()}>Close</button></div>

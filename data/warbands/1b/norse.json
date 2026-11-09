@@ -176,7 +176,10 @@
         },
         "eq": null,
         "noxp": true,
-        "sp": "Animal (gains no experience). Only usable with a Wulfen (Pack Leader)."
+        "sp": "Animal (gains no experience). Only usable with a Wulfen (Pack Leader).",
+        "needs": [
+          "wulfen"
+        ]
       }
     ]
   },

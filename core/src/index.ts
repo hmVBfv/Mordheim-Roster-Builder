@@ -62,6 +62,7 @@ export * from './rules/validation.ts';
 export * from './rules/abilities.ts';
 export * from './rules/choice.ts';
 export * from './rules/spellbook.ts';
+export * from './rules/participation.ts';
 export * from './rules/summary.ts';
 export * from './trade/ledger.ts';
 export * from './trade/market.ts';

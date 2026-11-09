@@ -100,6 +100,7 @@
   },
   "marauderChaos": {
    "name": "Chaos Magic (Marauders)",
+   "family": "chaosRituals",
    "note": "The Seer chooses a Mark when hired; the Mark determines his magic. All options below. (Bloodfather = not a wizard.)",
    "spells": [
     [
@@ -193,6 +194,7 @@
   },
   "markTchar": {
    "name": "Mark of Tchar (Tzeentch)",
+   "family": "chaosRituals",
    "note": "Mark of Tchar the Eagle — the Changer of Ways.",
    "spells": [
     [
@@ -231,6 +233,7 @@
   },
   "markShornaal": {
    "name": "Mark of Shornaal (Slaanesh)",
+   "family": "chaosRituals",
    "note": "Mark of Shornaal the Serpent — pleasure-magic of the Dark Prince.",
    "spells": [
     [
@@ -269,6 +272,7 @@
   },
   "markOnogal": {
    "name": "Mark of Onogal (Nurgle)",
+   "family": "chaosRituals",
    "note": "Mark of Onogal the Crow — Nurgle Rituals (spell 1 is Touch of Onogal). The bearer is immune to poison.",
    "spells": [
     [
@@ -345,6 +349,7 @@
   },
   "ritualsHashut": {
    "name": "Rituals of Hashut",
+   "family": "chaosDwarfMagic",
    "note": "Black Dwarfs Sorcerer. Starts with two rituals — the Sacrificial Ritual plus one randomly generated.",
    "spells": [
     [
@@ -456,6 +461,7 @@
   },
   "necromancyRD": {
    "name": "Necromancy (Restless Dead)",
+   "family": "necromancy",
    "note": "The Restless Dead Liche & Necromancer only — a revised Necromancy list.",
    "spells": [
     [
@@ -912,6 +918,7 @@
   },
   "forestGoblinMagic": {
    "name": "Forest Goblin Magic",
+   "family": "waaagh",
    "note": "Forest Goblin Shaman.",
    "spells": [
     [
@@ -955,6 +962,7 @@
   },
   "nurgleRituals": {
    "name": "Nurgle Rituals",
+   "family": "chaosRituals",
    "note": "Carnival Master. (Mutations/Blessings: See the separate tool options.)",
    "spells": [
     [

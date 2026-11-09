@@ -3555,7 +3555,10 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Fear. Scaly skin 6+. Animal (gains no experience). Only with a Beastmaster. Stupidity: May use the basic Leadership of the Beastmaster if within 6\" of him, never the leader’s. If the Beastmaster dies, the beasts escape and are removed from the roster."
+     "sp": "Animals: Cold One Beasthounds are animals and all animal rules apply to them, they never gain experience. Beastmaster: Cold One Beasthounds are nasty viscous brutes that are barely kept under control. If the Beastmaster dies the beasts will immediately escape from the warband and they are removed from the warband roster. If the Beastmaster is unable to participate in a battle, then neither will the beasts. Stupidity: Cold One Beasthounds may use the basic Leadership of the Beastmaster if they are within 6\" of him. They may never use the Leadership of the warband leader, nor may they benefit from the Beastmaster’s increased Leadership if he is within 6\" of the leader. Scaly Skin: Cold One Beasthounds have tough scaly skin, and are considered to have a 6+ armour save. This save cannot be modified beyond 6 due to strength modifiers but any result of ‘no save’ on the Critical Hit chart will negate the unmodified 6+ save. Fear: Cold One Beasthounds cause Fear.",
+     "needs": [
+      "beastmaster"
+     ]
     }
    ]
   },
@@ -5114,7 +5117,10 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Animal (gains no experience). Only usable with a Wulfen (Pack Leader)."
+     "sp": "Animal (gains no experience). Only usable with a Wulfen (Pack Leader).",
+     "needs": [
+      "wulfen"
+     ]
     }
    ]
   },
@@ -8159,7 +8165,10 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Requires a Mountain Guide (caged if none is in the warband). Trained: May use the Guide's Leadership within 6\". Feral Instinct: At the start of your turn it must pass an Ld test or the opponent moves it this turn (it may even charge friendly models). Ignored: Out-of-action Sabretusks are not counted for Rout tests. Causes Fear. Animal: Never gains Experience."
+     "sp": "Requires a Mountain Guide (caged if none is in the warband). Trained: May use the Guide's Leadership within 6\". Feral Instinct: At the start of your turn it must pass an Ld test or the opponent moves it this turn (it may even charge friendly models). Ignored: Out-of-action Sabretusks are not counted for Rout tests. Causes Fear. Animal: Never gains Experience.",
+     "needs": [
+      "guide"
+     ]
     }
    ]
   },
@@ -8787,7 +8796,11 @@
      },
      "eq": null,
      "noxp": true,
-     "sp": "Cause Fear. Immune to Psychology and Poison. No Pain. No Brain (no Experience). No Substance: Counts as Toughness 6 against shooting and magic missiles and is immune to shooting criticals (fire attacks deal damage normally). Flammable: Takes double damage from fire and catches fire on a 3+. Construct: May re-roll any Injury result except wounds caused by fire. Animated Construct: Controlled by the Liche or Necromancer (note which); each may control only one, so two Scarecrows need both. If its controller loses a wound, he must pass an unmodified Ld test or the Scarecrow is immediately taken out of action."
+     "sp": "Cause Fear. Immune to Psychology and Poison. No Pain. No Brain (no Experience). No Substance: Counts as Toughness 6 against shooting and magic missiles and is immune to shooting criticals (fire attacks deal damage normally). Flammable: Takes double damage from fire and catches fire on a 3+. Construct: May re-roll any Injury result except wounds caused by fire. Animated Construct: Controlled by the Liche or Necromancer (note which); each may control only one, so two Scarecrows need both. If its controller loses a wound, he must pass an unmodified Ld test or the Scarecrow is immediately taken out of action.",
+     "needs": [
+      "liche",
+      "necromancer"
+     ]
     }
    ]
   }

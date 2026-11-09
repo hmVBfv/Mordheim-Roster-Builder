@@ -421,6 +421,16 @@ export function removeInjury(ctx: Ctx, uid: number, index: number): WarbandState
 }
 
 /** Games to miss, up or down (never below 0). */
+/** Marks him as missing the next `miss` battles (0: takes part) and/or staying out until switched back. Whatever is not given stays as it is. */
+export function setParticipation(ctx: Ctx, uid: number, v: { miss?: number; sitsOut?: boolean }): WarbandState {
+  if (!findModel(ctx.s, uid)) return ctx.s;
+  return update(ctx, (d) => {
+    const m = findModel(d, uid) as Model;
+    if (v.miss !== undefined) { m.miss = Math.max(0, Math.round(Number(v.miss) || 0)); if (!m.miss) delete m.missWhy; }
+    if (v.sitsOut !== undefined) { if (v.sitsOut) m.sitsOut = true; else delete m.sitsOut; }
+  });
+}
+
 export function adjustMiss(ctx: Ctx, uid: number, delta: number): WarbandState {
   return update(ctx, (d) => { const m = findModel(d, uid); if (m) m.miss = Math.max(0, (Number(m.miss) || 0) + delta); });
 }

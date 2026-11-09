@@ -170,7 +170,11 @@
         },
         "eq": null,
         "noxp": true,
-        "sp": "Cause Fear. Immune to Psychology and Poison. No Pain. No Brain (no Experience). No Substance: Counts as Toughness 6 against shooting and magic missiles and is immune to shooting criticals (fire attacks deal damage normally). Flammable: Takes double damage from fire and catches fire on a 3+. Construct: May re-roll any Injury result except wounds caused by fire. Animated Construct: Controlled by the Liche or Necromancer (note which); each may control only one, so two Scarecrows need both. If its controller loses a wound, he must pass an unmodified Ld test or the Scarecrow is immediately taken out of action."
+        "sp": "Cause Fear. Immune to Psychology and Poison. No Pain. No Brain (no Experience). No Substance: Counts as Toughness 6 against shooting and magic missiles and is immune to shooting criticals (fire attacks deal damage normally). Flammable: Takes double damage from fire and catches fire on a 3+. Construct: May re-roll any Injury result except wounds caused by fire. Animated Construct: Controlled by the Liche or Necromancer (note which); each may control only one, so two Scarecrows need both. If its controller loses a wound, he must pass an unmodified Ld test or the Scarecrow is immediately taken out of action.",
+        "needs": [
+          "liche",
+          "necromancer"
+        ]
       }
     ]
   },

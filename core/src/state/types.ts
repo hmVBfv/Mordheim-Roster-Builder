@@ -57,8 +57,10 @@ export interface Model {
   upgraded?: boolean;
   lore?: string;
   magic?: string;
-  /** Games to miss (injuries). */
+  /** Games to miss (injuries, or marked by hand). */
   miss?: number;
+  /** Stays out of battles until switched back (marked by hand): no count to tick down. */
+  sitsOut?: boolean;
   /** The battles of a campaign he (or the group) has taken part in, counted when a battle's experience is granted (wish #166). */
   battles?: number;
   /** Why he misses them, for the chronicle ("Arm Wound …"). */

@@ -3,7 +3,7 @@
 import type { GameData, HireEntry } from '../data/types.ts';
 import type { Ctx } from './context.ts';
 import { ctxOf } from './context.ts';
-import { ownSchoolKeys } from './spellbook.ts';
+import { ownSchoolKeys, schoolRoot } from './spellbook.ts';
 import { newWarband } from '../warband/update.ts';
 import { modelTotalCost, totalSpent } from './costs.ts';
 import { dpHireCost, hsHireCost } from './pricing.ts';
@@ -91,6 +91,8 @@ export interface WarbandFact {
   large: boolean;
   /** The spell schools its own casters cast from (keys into SPELLS); none where it has no caster of its own. */
   schools: string[];
+  /** The schools it is listed under: those above, each as its parent school where it has one (the list on New warband, #241). */
+  families: string[];
 }
 
 export function warbandFacts(data: GameData): WarbandFact[] {
@@ -101,7 +103,7 @@ export function warbandFacts(data: GameData): WarbandFact[] {
       key, name: wb.name, grade: (wb.grade as string) || 'core', race: String(wb.siteRace ?? ''),
       gold: Math.min(...golds), goldMax: Math.max(...golds), min: Number(wb.min) || 0, max: Number(wb.max) || 0,
       heroes: Math.min(6, heroes), large: wb.units.some((u) => !!u.large),
-      schools: ownSchoolKeys(ctxOf(data, newWarband(data, key))),
+      ...(() => { const schools = ownSchoolKeys(ctxOf(data, newWarband(data, key))); return { schools, families: [...new Set(schools.map((k) => schoolRoot(data, k)))] }; })(),
     };
   });
 }
@@ -130,8 +132,8 @@ export function filterWarbands(list: WarbandFact[], f: WarbandFilter): WarbandFa
     if (given(f.goldTo) && w.gold > f.goldTo) return false;
     if (given(f.sizeFrom) && w.max < f.sizeFrom) return false;
     if (given(f.sizeTo) && w.max > f.sizeTo) return false;
-    if (f.magic === 'none' && w.schools.length) return false;
-    if (f.magic && f.magic !== 'none' && !w.schools.includes(f.magic)) return false;
+    if (f.magic === 'none' && w.families.length) return false;
+    if (f.magic && f.magic !== 'none' && !w.families.includes(f.magic)) return false;
     return true;
   });
 }
