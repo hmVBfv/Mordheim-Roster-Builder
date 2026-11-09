@@ -122,9 +122,42 @@ message, and the same steps as below apply.
    your reasoning, not your plan. Fix what it finds; do not argue with it. The
    pull request names the verdict.
 8. Push the branch, open the pull request yourself (German body: what changes for
-   the players, then the attribution lines). Wait for the CI to be green.
+   the players, then the attribution lines). Wait for the CI to be green; a red
+   CI is not the end of it, see "A red test" below.
 9. Tell Rob in German, one step at a time: the link, and that after merging he
    runs `roster-deploy` on the Pi.
+
+### A red test (Rob, 09.11.2026)
+
+A test that fails – on your own check, on the trial merge, or in the CI of a pull
+request – is looked at at once, not reported and left. You may fix it and run it
+again **without asking**, but only where the rest of the change should work:
+
+1. **Read the failure first** (`gh api repos/<repo>/actions/jobs/<id>/logs`, the
+   check-runs of the head commit) and decide which of three it is:
+   - **a real regression** your change caused: fix the code, not the test;
+   - **a test that does not hold any more by design** (a heading, a label, a list
+     of tabs the change moved on purpose): change the test to the new, intended
+     behaviour – never weaken an assertion so that it passes;
+   - **a flaky test** (it passes on a rerun or alone, or fails by a timing, an
+     order or a leak between tests, as the unrelated e2e overview and the Vanilla
+     enrolment tests did): find the cause, reproduce it under load (many runs at
+     once, `--repeat-each` with `--workers`), and fix the *test* so that it waits
+     for what it measures or ends what it starts. A retry, a longer timeout or a
+     skip is not a fix unless the cause really is only the time.
+2. A test fix that belongs to your change goes into its branch; one that has
+   nothing to do with it (a flaky test of another area) goes into a pull request
+   of its own, `fix/flaky-<what>`, so that the report's pull request stays about
+   the report. Say so in the pull request.
+3. Then run the failed jobs again (`gh api -X POST …/actions/runs/<id>/rerun-failed-jobs`)
+   or push the fix, and look at the result. **At most two rounds** for one failure:
+   if it is still red, stop, leave the branch as it is, and tell Rob what you saw
+   and what you tried.
+4. **Stop and ask** where fixing the test would hide a real problem: the failure
+   shows wrong data, a leak, a changed rule, or you cannot say why it fails. A rule
+   or a test you do not understand is not "fixed" by making it pass.
+5. Say in the final list which red tests you fixed, how (code, test, flaky) and
+   in which pull request; the rerun's result counts only when you have seen it.
 
 ## 5. After Rob says "gemergt und deployed"
 
@@ -170,7 +203,8 @@ For several numbers or `all`:
    branch, one pull request (except reports with one cause, see 2).
 5. Do not wait for Rob to merge between reports. Do not wait for the CI of one
    pull request before starting the next, but look at every pull request's CI at
-   the end and report one that is red.
+   the end; one that is red is dealt with as "A red test" says (section 4), and
+   only what stays red after that is reported.
 6. If a report fails (the test cannot reproduce it, the fix grows beyond the
    report, the check stays red): stop that report, set it back to `confirmed`
    with nothing half-done on the branch (delete it unpushed), say why in the
