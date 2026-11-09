@@ -169,6 +169,11 @@
     font-size: 1em;
   }
 
+  /* the schools take the width of the card, one under the other, so that a long name does not have to fit a third of it */
+  .table td.magic {
+    grid-column: 1 / -1;
+  }
+
   .table tr.options td {
     grid-column: 1 / -1;
     font-size: 1em;

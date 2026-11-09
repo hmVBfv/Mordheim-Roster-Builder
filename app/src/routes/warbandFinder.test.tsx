@@ -143,3 +143,18 @@ describe('finding a warband to start', () => {
     });
   });
 });
+
+/* Several schools in the Magic cell stand one under the other, never side by side: the cell is narrow on a phone. */
+describe('the Magic column with more than one school', () => {
+  it('puts each school on a line of its own, without a comma', () => {
+    const two = { ...facts.find((f) => f.key === 'merc')!, schools: ['waaagh', 'lesserMagic'] };
+    const info = { waaagh: { name: 'Waaagh! Magic', tips: [] }, lesserMagic: { name: 'Lesser Magic', tips: [] } };
+    render(<WarbandTable shown={[two]} sort="grade" chosen="" onChoose={() => undefined} schoolInfo={info} />);
+    const cell = screen.getByText('Waaagh! Magic').closest('td')!;
+    expect(cell.textContent).toBe('Waaagh! MagicLesser Magic');
+    const lines = [...cell.children];
+    expect(lines.map((l) => l.textContent)).toEqual(['Waaagh! Magic', 'Lesser Magic']);
+    expect(lines.every((l) => l.tagName === 'DIV')).toBe(true);
+  });
+});
+

@@ -121,7 +121,7 @@ export function WarbandTable({ shown, sort, chosen, onChoose, detail, schoolInfo
       <td data-label="Magic" className={styles.magic}>
         {w.schools.length === 0
           ? <span className={ui.muted}>None</span>
-          : w.schools.map((k, i) => <span key={k}>{i > 0 && ', '}<TipWord label={schoolInfo[k]?.name ?? k} tips={schoolInfo[k]?.tips ?? []} /></span>)}
+          : w.schools.map((k) => <div key={k}><TipWord label={schoolInfo[k]?.name ?? k} tips={schoolInfo[k]?.tips ?? []} /></div>)}
       </td>
       <td data-label="Big creature">{w.large ? 'Yes' : 'No'}</td>
     </tr>,
