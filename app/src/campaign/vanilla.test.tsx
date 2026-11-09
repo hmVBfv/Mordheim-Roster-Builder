@@ -180,6 +180,9 @@ describe('a campaign that plays Vanilla Mordheim (#167)', () => {
     expect(screen.getByText(/plays Vanilla Mordheim/)).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Start the warband' }));
     await waitFor(async () => expect((await db.warbands.toArray()).filter((r) => !r.campaignId).map((r) => r.state.vanilla)).toEqual([true]));
+    // the warband is entered in the campaign a moment later – here the campaign is not on the server, so it says it could not: wait for the answer, or
+    // the request arrives at the server of the next test (it did, under load, and that test counted two enrolments)
+    expect(await screen.findByText(/could not be entered yet/)).toBeTruthy();
   });
 
   it('the copy of a warband that enters a Vanilla campaign plays Vanilla; the warband itself stays as it is', async () => {
