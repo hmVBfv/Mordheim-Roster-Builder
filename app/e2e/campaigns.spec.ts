@@ -306,7 +306,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(warbandLinks).toHaveCount(3);
     // measure and judge together until the layout holds (see the campaign overview above)
     await expect(async () => {
-      const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await boxOf(warbandLinks.nth(0)), await boxOf(warbandLinks.nth(1)), await boxOf(warbandLinks.nth(2))];
+      const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your latest warbands'), await boxOf(warbandLinks.nth(0)), await boxOf(warbandLinks.nth(1)), await boxOf(warbandLinks.nth(2))];
       // the campaigns stand on the right, at the top; the warbands on the left, two to a row
       expect(campaigns.x).toBeGreaterThan(warbands.x + 400);
       expect(campaigns.y).toBeLessThan(warbands.y);

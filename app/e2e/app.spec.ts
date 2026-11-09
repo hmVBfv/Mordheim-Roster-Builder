@@ -38,7 +38,7 @@ for (const theme of THEMES) {
     await useTheme(page, theme);
     await page.goto('./');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
-    await expect(page.getByRole('heading', { name: 'Your warbands' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your latest warbands' })).toBeVisible();
     await expect(page.getByTitle('Saved on this device')).toBeVisible();
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-home`);
@@ -870,7 +870,7 @@ test('Back closes the import sheet and stays on the screen', async ({ page }) =>
   await page.waitForFunction(() => !(history.state as { mordheimSheet?: boolean } | null)?.mordheimSheet);
   await page.goBack();
   await expect(page).toHaveURL(home);
-  await expect(page.getByRole('heading', { name: 'Your warbands' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your latest warbands' })).toBeVisible();
 });
 
 test('after an import, Back returns to where the import began, not to the sheet', async ({ page }) => {

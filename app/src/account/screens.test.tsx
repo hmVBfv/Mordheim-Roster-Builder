@@ -45,7 +45,7 @@ describe('signing in', () => {
     await user.click(screen.getByRole('button', { name: 'Use the app’s code' }));
     await user.type(screen.getByLabelText('Code from your authenticator app'), '123456');
     // signed in without being sent from anywhere: Home (#76); the account is one tap away
-    expect(await screen.findByRole('heading', { name: 'Your warbands' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Your latest warbands' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Home' }).getAttribute('aria-current')).toBe('page');
     await user.click(screen.getByRole('link', { name: 'Account' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Account' })).toBeTruthy();
@@ -85,7 +85,7 @@ describe('signing in', () => {
     await user.keyboard('12345');
     expect(sent()).toEqual(['123457']);
     await user.keyboard('6');
-    expect(await screen.findByRole('heading', { name: 'Your warbands' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Your latest warbands' })).toBeTruthy();
     expect(sent()).toEqual(['123457', '123456']);
   });
 
@@ -95,7 +95,7 @@ describe('signing in', () => {
     at('/sign-in');
     await user.click(await screen.findByLabelText('Code from your authenticator app'));
     await user.paste('123 456');
-    expect(await screen.findByRole('heading', { name: 'Your warbands' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Your latest warbands' })).toBeTruthy();
     expect(sent()).toEqual(['123 456']);
   });
 
@@ -107,7 +107,7 @@ describe('signing in', () => {
     await user.type(screen.getByLabelText('One of your recovery codes'), 'abcd-efgh');
     expect(sent()).toEqual([]);
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
-    expect(await screen.findByRole('heading', { name: 'Your warbands' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Your latest warbands' })).toBeTruthy();
     expect(sent()).toEqual(['abcd-efgh']);
   });
 
