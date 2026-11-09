@@ -591,6 +591,8 @@ describe('missing a battle', () => {
     await user.click(screen.getByRole('button', { name: /^Cold One Beasthound/ }));
     expect(within(card()).getAllByText('Stays behind: the Beastmaster misses the battle').length).toBeGreaterThan(0);
     expect(within(card()).getByText(/He follows the Beastmaster/)).toBeTruthy();
+  });
+});
 
 /* Report of 9.11.2026: opening a unit on a phone moved the page – the row one had tapped was no longer where it was. The row stays where the finger
    is: the page is only scrolled by as much as the row moved (another open row closing above it). */
