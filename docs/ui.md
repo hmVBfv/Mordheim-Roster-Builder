@@ -241,6 +241,12 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   (Titel, Art, Stand in den Worten des Meldenden, gesendet, letzte Änderung) und
   verlängern die Einstellungen nicht mehr. Nie der Schweregrad, nie die
   technischen Angaben.
+- **„What's new“ und „Rules“ (Rob, 08.11.2026, Wunsch #236):** beide waren am Fuß von
+  Account versteckt. **What's new** ist der dritte Reiter von Account (`/account/whats-new`),
+  **Rules** der letzte Reiter der Library (`/library/rules`; die alte Adresse `/rules` führt
+  dorthin und behält das Kapitel). Die Regeln liest auch, wer nicht angemeldet ist: sein
+  Account-Bildschirm behält die beiden Knöpfe. Der Quick Build hat keine Library und keine
+  Reiter; seine Einstellungen behalten beide.
 - **Seitenleiste mit Unterpunkten (Rob, 19.10.2026: „aufklappbare
   Unterreiter“):** ab 900 px öffnen sich Warbands und Campaign in ihre
   Einträge – unter Warbands zuerst, wo es sie gibt, die **Überschriften** (klein, gesperrt, keine Seite) **Planners**, **In campaigns** und je eine für die eigenen Gruppen, jede mit ihren Warbands darunter (Wunsch #91, #92, #93, Rob, 26.10.2026; die Überschrift springt zu ihrem Abschnitt der Liste, `/warbands?show=planners|campaigns|group-<id>`, und ist nie als „hier“ markiert; eine neue oder gelöschte Gruppe, auch eine Warband darin, erscheint sofort, ohne Neuladen – jeder Schreibvorgang der Library meldet sich bei den anderen Bildschirmen), darunter unter **Free warbands** die freien Warbands ohne Gruppe (je Überschrift höchstens die sechs zuletzt geänderten; gibt es weder Planner noch Kampagnen-Warbands noch Gruppen, steht statt dessen die schlichte Liste der sechs zuletzt geänderten) und zuletzt „+ New warband“, unter Campaign die eigenen Kampagnen im Spiel (archivierte

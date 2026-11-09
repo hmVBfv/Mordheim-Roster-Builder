@@ -8,5 +8,6 @@ export const LIBRARY_TABS = [
   { key: 'scenarios', label: 'Scenarios' },
   { key: 'locations', label: 'Locations' },
   { key: 'lore', label: 'Lore' },
+  { key: 'rules', label: 'Rules' },
 ] as const;
 export type LibraryTab = (typeof LIBRARY_TABS)[number]['key'];

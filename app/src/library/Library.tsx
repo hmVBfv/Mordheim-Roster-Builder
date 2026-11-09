@@ -24,6 +24,7 @@ import { ScenariosTab } from './ScenariosTab.tsx';
 import { LIBRARY_TABS } from './tabs.ts';
 import { factionsOf, useLibrary } from './useLibrary.ts';
 
+const Rules = lazy(() => import('../rules/Rules.tsx').then((m) => ({ default: m.Rules })));
 const GroupsTab = lazy(() => import('./GroupsTab.tsx').then((m) => ({ default: m.GroupsTab })));
 
 function IdeaForm({ idea, items, online, close, onSaved, onRemoved }: {
@@ -284,6 +285,16 @@ export function Library() {
   const [notice, notify] = useNotice();
   const user = session.status === 'in' ? session.user : null;
   if (session.status === 'loading') return <section className={ui.page}><h1>Library</h1></section>;
+  // the rulebook is read by anybody: it is no part of what is kept with an account
+  if (!user && tab === 'rules') {
+    return (
+      <section className={ui.page}>
+        <h1>Library</h1>
+        <nav className={`${accountStyles.tabs} ${accountStyles.sideTabs}`} aria-label="Library"><NavLink to="/library/rules">Rules</NavLink></nav>
+        <Suspense fallback={<p className={ui.muted}>Loading …</p>}><Rules base="/library/rules" embedded /></Suspense>
+      </section>
+    );
+  }
   if (!user) {
     return (
       <section className={ui.page}>
@@ -307,6 +318,7 @@ export function Library() {
       {tab === 'scenarios' && <ScenariosTab notify={notify} />}
       {tab === 'locations' && <LocationsTab notify={notify} />}
       {tab === 'lore' && <LoreTab notify={notify} />}
+      {tab === 'rules' && <Suspense fallback={<p className={ui.muted}>Loading …</p>}><Rules base="/library/rules" embedded /></Suspense>}
       {notice}
     </section>
   );

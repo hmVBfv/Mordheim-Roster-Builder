@@ -2,9 +2,9 @@
    answers every path with the app (browser history); the Quick Build lives
    on GitHub Pages, which cannot, so it keeps the route after a "#". */
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, HashRouter, Navigate, Route, Routes } from 'react-router';
+import { BrowserRouter, HashRouter, Navigate, Route, Routes, useLocation } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
-import { ACCOUNT, HOME, MY_REPORTS } from './paths.ts';
+import { ACCOUNT, HOME, MY_REPORTS, WHATS_NEW } from './paths.ts';
 import { Home } from '../routes/Home.tsx';
 import { More } from '../routes/More.tsx';
 import { Placeholder } from '../routes/Placeholder.tsx';
@@ -26,6 +26,7 @@ const SignIn = lazy(() => import('../account/SignIn.tsx').then((m) => ({ default
 const LinkAccept = lazy(() => import('../account/LinkAccept.tsx').then((m) => ({ default: m.LinkAccept })));
 const Admin = lazy(() => import('../account/Admin.tsx').then((m) => ({ default: m.Admin })));
 const Library = lazy(() => import('../library/Library.tsx').then((m) => ({ default: m.Library })));
+const WhatsNewPage = lazy(() => import('../changelog/WhatsNewPage.tsx').then((m) => ({ default: m.WhatsNewPage })));
 const MyReports = lazy(() => import('../bugs/MyReports.tsx').then((m) => ({ default: m.MyReports })));
 // warbands on the server (phase 3h)
 const Versions = lazy(() => import('../routes/Versions.tsx').then((m) => ({ default: m.Versions })));
@@ -70,18 +71,26 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/versions" element={<Versions />} />}
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/aftermath/:bid" element={<Aftermath />} />}
           {FLAVOUR === 'campaign' && <Route path="/import" element={<ImportLink />} />}
-          <Route path="/rules" element={<Rules />} />
+          {/* the rulebook is a tab of the Library in the campaign app; the old address leads there */}
+          {FLAVOUR === 'campaign' ? <Route path="/rules" element={<RulesRedirect />} /> : <Route path="/rules" element={<Rules />} />}
           <Route path={ACCOUNT} element={<More />} />
           <Route path="/more" element={<Navigate to={ACCOUNT} replace />} />
           {FLAVOUR === 'campaign' && <Route path="/library" element={<Navigate to="/library/ideas" replace />} />}
           {FLAVOUR === 'campaign' && <Route path="/library/:tab" element={<Library />} />}
           {FLAVOUR === 'campaign' && <Route path={MY_REPORTS} element={<MyReports />} />}
+          {FLAVOUR === 'campaign' && <Route path={WHATS_NEW} element={<WhatsNewPage />} />}
           {FLAVOUR === 'campaign' && <Route path="/more/reports" element={<Navigate to={MY_REPORTS} replace />} />}
           <Route path="*" element={<Placeholder title="Not found" text="There is nothing at this address." />} />
         </Routes>
       </Suspense>
     </Shell>
   );
+}
+
+/** /rules?c=… to the Library tab, keeping the chapter. */
+function RulesRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/library/rules${search}`} replace />;
 }
 
 export function App() {

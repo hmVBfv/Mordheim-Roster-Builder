@@ -43,7 +43,7 @@ describe('the Library: ideas', () => {
     server();
     at('/library');
     expect(await screen.findByRole('heading', { level: 1, name: 'Library' })).toBeTruthy();
-    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Scenarios', 'Locations', 'Lore']);
+    expect(within(screen.getByRole('navigation', { name: 'Library' })).getAllByRole('link').map((a) => a.textContent)).toEqual(['Ideas', 'Factions', 'NPCs', 'Groups', 'Scenarios', 'Locations', 'Lore', 'Rules']);
     expect(await screen.findByText(/No ideas yet/)).toBeTruthy();
   });
 
