@@ -41,7 +41,7 @@ describe('the side navigation', () => {
     at('/warbands');
     const header = screen.getByRole('banner');
     await user.click(within(header).getByRole('link', { name: 'Mordheim Campaign' }));
-    expect(await screen.findByRole('heading', { name: 'Your warbands' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'Your latest warbands' })).toBeTruthy();
   });
 
   it('Warbands opens into one’s newest warbands and a new one, and closes again; the choice stays on the device', async () => {
