@@ -32,7 +32,7 @@ describe('the schools in the facts of a warband', () => {
 describe('the filter by school', () => {
   it('passes the warbands of a school, or those with none', () => {
     const waaagh = core.filterWarbands(facts, { magic: 'waaagh' }).map((f) => f.key).sort();
-    expect(waaagh).toEqual(['nightgoblins', 'orcmob']);
+    expect(waaagh).toEqual(['forestgoblins', 'nightgoblins', 'orcmob']);
     const none = core.filterWarbands(facts, { magic: 'none' });
     expect(none.every((f) => f.schools.length === 0)).toBe(true);
     expect(none.map((f) => f.key)).toContain('merc');

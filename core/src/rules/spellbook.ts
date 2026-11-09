@@ -51,6 +51,13 @@ function schoolKeysOf(ctx: Ctx, def: UnitDef): string[] {
   return out;
 }
 
+/** The school a school is listed under: its parent where it is made for one warband, else itself. */
+export function schoolRoot(data: { SPELLS: Record<string, { family?: string }> }, key: string): string {
+  let k = key;
+  for (let i = 0; i < 5 && data.SPELLS[k]?.family; i++) k = data.SPELLS[k]!.family as string;
+  return k;
+}
+
 /** The keys of the schools the units of the warband cast from. */
 export function ownSchoolKeys(ctx: Ctx): string[] {
   return [...new Set((warbandDef(ctx)?.units ?? []).flatMap((u) => schoolKeysOf(ctx, u)))];

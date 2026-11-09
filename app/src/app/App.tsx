@@ -2,6 +2,7 @@
    answers every path with the app (browser history); the Quick Build lives
    on GitHub Pages, which cannot, so it keeps the route after a "#". */
 import { lazy, Suspense } from 'react';
+import { LoadingLate } from '../ui/Loading.tsx';
 import { BrowserRouter, HashRouter, Navigate, Route, Routes, useLocation } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
 import { ACCOUNT, HOME, MY_REPORTS, WHATS_NEW } from './paths.ts';
@@ -42,7 +43,7 @@ const CampaignRules = lazy(() => import('../campaign/CampaignRules.tsx').then((m
 export function AppRoutes() {
   return (
     <Shell>
-      <Suspense fallback={null}>
+      <Suspense fallback={<LoadingLate />}>
         <Routes>
           <Route path="/" element={<Navigate to={HOME} replace />} />
           <Route path={HOME} element={<Home />} />
