@@ -591,6 +591,41 @@ describe('missing a battle', () => {
     await user.click(screen.getByRole('button', { name: /^Cold One Beasthound/ }));
     expect(within(card()).getAllByText('Stays behind: the Beastmaster misses the battle').length).toBeGreaterThan(0);
     expect(within(card()).getByText(/He follows the Beastmaster/)).toBeTruthy();
+
+/* Report of 9.11.2026: opening a unit on a phone moved the page – the row one had tapped was no longer where it was. The row stays where the finger
+   is: the page is only scrolled by as much as the row moved (another open row closing above it). */
+describe('opening a row on a phone', () => {
+  it('does not jump to the row, and scrolls by what the row moved so that it stays under the finger', async () => {
+    width = 400;
+    const scrollIntoView = vi.fn();
+    const scrollBy = vi.fn();
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    window.scrollBy = scrollBy as unknown as typeof window.scrollBy;
+    // an open row sits 180 px higher than it was: the row that was open above it has closed
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      const top = this.tagName === 'LI' && this.dataset.open === 'true' ? 120 : 300;
+      return { top, bottom: top + 80, left: 0, right: 400, width: 400, height: 80, x: 0, y: top, toJSON: () => ({}) };
+    });
+    const user = userEvent.setup();
+    show();
+    await user.click(screen.getByRole('button', { name: 'Ulrich the Grey, Mercenary Captain' }));
+    expect(scrollIntoView).not.toHaveBeenCalled();
+    expect(scrollBy).toHaveBeenCalledWith(0, -180);
+    rect.mockRestore();
+  });
+
+  it('leaves the page alone where the row did not move', async () => {
+    width = 400;
+    const scrollBy = vi.fn();
+    window.scrollBy = scrollBy as unknown as typeof window.scrollBy;
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      return { top: 300, bottom: 380, left: 0, right: 400, width: 400, height: 80, x: 0, y: 300, toJSON: () => ({}) };
+    });
+    const user = userEvent.setup();
+    show();
+    await user.click(screen.getByRole('button', { name: 'Ulrich the Grey, Mercenary Captain' }));
+    expect(scrollBy).not.toHaveBeenCalled();
+    rect.mockRestore();
   });
 });
 

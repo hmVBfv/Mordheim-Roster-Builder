@@ -6,7 +6,7 @@
    another player's warband, read-only (without `acts`). */
 import { IconEdit } from '../ui/icons.tsx';
 import ui from '../ui/ui.module.css';
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Detail, TAB_LABEL, tabsFor, type TabId, type UnitActs } from './Detail.tsx';
 import { PrintSheet } from './Print.tsx';
 import { ChipView, Strip, XpBar, XpLabel, xpWords } from './Bits.tsx';
@@ -36,12 +36,20 @@ function RowView({ r, layout, current, onPick, rename, children }: { r: UnitRow;
   const li = useRef<HTMLLIElement>(null);
   const words = useId();
   const label = [r.name, r.count != null ? men(r.count) : null, r.sub].filter(Boolean).join(', ');
-  // an opened row starts under the bars that stay on top
-  useEffect(() => { if (stack && current) li.current?.scrollIntoView?.({ block: 'start' }); }, [stack, current]);
+  // the row one taps stays where the finger is (report of 9.11.2026): where it moves – the row that was open above it closes – the page follows by as much
+  const tapped = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const before = tapped.current;
+    tapped.current = null;
+    if (!stack || !current || before == null || !li.current) return;
+    const moved = li.current.getBoundingClientRect().top - before;
+    if (Math.abs(moved) > 1) window.scrollBy(0, moved);
+  }, [stack, current]);
   return (
     <li ref={li} className={styles.row} data-kind={r.kind} data-open={stack && current} data-away={r.away || undefined} aria-current={!stack && current ? 'true' : undefined}>
       <button type="button" className={styles.rowBtn} aria-label={label} aria-describedby={words}
-        aria-expanded={stack ? current : undefined} aria-pressed={stack ? undefined : current} onClick={onPick}>
+        aria-expanded={stack ? current : undefined} aria-pressed={stack ? undefined : current}
+        onClick={() => { tapped.current = li.current?.getBoundingClientRect().top ?? null; onPick(); }}>
         <span className={styles.r1}>
           <span className={styles.who}>
             <span className={styles.nm}>{r.name}{r.count != null && <span className={styles.count}> ×{r.count}</span>}</span>
