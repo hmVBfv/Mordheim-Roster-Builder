@@ -218,6 +218,20 @@ describe('a new warband', () => {
     expect(screen.getByText(/Vanilla Mordheim \(the rulebook, Core\) is only for Core warbands/)).toBeTruthy();
   });
 
+  /* Wish of 8.11.2026: the options of a new warband (Planner, the Trading Post, Vanilla Mordheim) are smaller, in sizes the site already uses:
+     the checkbox of the report form, the name of the option over its description in the muted small text. */
+  it('shows its options compactly: the name, and the description under it in small text', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
+    await user.click(screen.getByRole('checkbox', { name: /A planner/ }));
+    for (const name of [/A planner/, /Open the Trading Post/, /Vanilla Mordheim/]) {
+      const label = screen.getByRole('checkbox', { name }).closest('label')!;
+      expect(label.className, String(name)).toMatch(/option/);
+      expect(label.querySelector('strong')!.parentElement!.querySelector('small')!.textContent!.length, String(name)).toBeGreaterThan(40);
+    }
+  });
+
   /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
   it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
     at('/warbands/new');
