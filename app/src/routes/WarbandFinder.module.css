@@ -186,3 +186,8 @@
     display: block;
   }
 }
+
+/* the spell school of a warband: a word that opens the bubble, kept apart from the numbers beside it */
+.magic {
+  min-width: 8rem;
+}

@@ -4,6 +4,8 @@
    (they leave everything in until a player narrows them), and the matches are a table, one row a warband. */
 import { filterWarbands, sortWarbands, type WarbandFact, type WarbandFilter, type WarbandSort } from '@mordheim/core';
 import { useId, useMemo, useState, type ReactNode } from 'react';
+import { TipWord } from '../ui/Tip.tsx';
+import type { TipEntry } from '../ui/Tip.tsx';
 import ui from '../ui/ui.module.css';
 import styles from './WarbandFinder.module.css';
 
@@ -32,12 +34,16 @@ export function useWarbandFinder(facts: WarbandFact[]) {
   return { filter, setFilter: (f: WarbandFilter | null) => setFilter(f ?? range), sort, setSort, shown, active };
 }
 
-export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder: ReturnType<typeof useWarbandFinder> }) {
+/** A spell school as the list names it: its name, and its spells with their effects (no lore) for the bubble. */
+export interface SchoolInfo { name: string; tips: TipEntry[] }
+
+export function WarbandFinder({ facts, finder, schoolInfo }: { facts: WarbandFact[]; finder: ReturnType<typeof useWarbandFinder>; schoolInfo: Record<string, SchoolInfo> }) {
   const { filter, setFilter, sort, setSort, shown, active } = finder;
   const id = useId();
   const races = useMemo(() => [...new Set(facts.map((f) => f.race).filter(Boolean))].sort(), [facts]);
   const grades = useMemo(() => Object.keys(GRADE_NAMES).filter((g) => facts.some((f) => f.grade === g)), [facts]);
   const set = (patch: Partial<WarbandFilter>) => setFilter({ ...filter, ...patch });
+  const schools = useMemo(() => [...new Set(facts.flatMap((f) => f.schools))].map((key) => ({ key, name: schoolInfo[key]?.name ?? key })).sort((a, b) => a.name.localeCompare(b.name)), [facts, schoolInfo]);
   return (
     <section className={styles.finder} aria-label="Find a warband">
       <div className={styles.grid}>
@@ -67,6 +73,11 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
           <select className={ui.select} value={String(filter.heroes ?? '')} onChange={(e) => set({ heroes: num(e.target.value) })}>
             <option value="">Any</option>{[4, 5, 6].map((n) => <option key={n} value={n}>Up to {n}</option>)}
           </select></label>
+        <label className={ui.field}><span>Magic</span>
+          <select className={ui.select} value={filter.magic ?? ''} onChange={(e) => set({ magic: e.target.value })}>
+            <option value="">Either way</option><option value="none">No caster of its own</option>
+            {schools.map((s) => <option key={s.key} value={s.key}>{s.name}</option>)}
+          </select></label>
         <label className={ui.field}><span>Big creature</span>
           <select className={ui.select} title="A big creature among its units: Kroxigor, Minotaur …" value={filter.large ?? ''} onChange={(e) => set({ large: e.target.value as WarbandFilter['large'] })}>
             <option value="">Either way</option><option value="with">Has one</option><option value="without">Has none</option>
@@ -86,13 +97,13 @@ export function WarbandFinder({ facts, finder }: { facts: WarbandFact[]; finder:
 
 /** The warbands that pass the filter, one row each: tap a row to pick it (its radio is hidden but there for the keyboard). With the sort by grade, a heading row opens each grade. */
 /** `detail`: what unfolds under the row of the chosen warband (its options), so nothing has to be looked for further down. */
-export function WarbandTable({ shown, sort, chosen, onChoose, detail }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void; detail?: ReactNode }) {
+export function WarbandTable({ shown, sort, chosen, onChoose, detail, schoolInfo }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void; detail?: ReactNode; schoolInfo: Record<string, SchoolInfo> }) {
   const byGrade = sort === 'grade';
-  const cols = byGrade ? 6 : 7;
+  const cols = byGrade ? 7 : 8;
   // the chosen warband chosen again is let go
   const toggle = (key: string) => onChoose(key === chosen ? '' : key);
   const row = (w: WarbandFact) => [
-    <tr key={w.key} className={w.key === chosen ? styles.picked : undefined} data-picked={w.key === chosen ? 'true' : undefined} onClick={(e) => { if (!(e.target as HTMLElement).closest('label')) toggle(w.key); }}>
+    <tr key={w.key} className={w.key === chosen ? styles.picked : undefined} data-picked={w.key === chosen ? 'true' : undefined} onClick={(e) => { if (!(e.target as HTMLElement).closest('label, button')) toggle(w.key); }}>
       <td className={styles.pick} data-label="">
         {/* the radio lies invisibly over the name, so a keyboard and a screen reader find the row; a tap anywhere in the row chooses it */}
         <label className={styles.pickLabel}>
@@ -107,6 +118,11 @@ export function WarbandTable({ shown, sort, chosen, onChoose, detail }: { shown:
       <td data-label="Gold">{w.gold === w.goldMax ? w.gold : `${w.gold}–${w.goldMax}`} gc</td>
       <td data-label="Max. models">{w.max}</td>
       <td data-label="Heroes">{w.heroes}</td>
+      <td data-label="Magic" className={styles.magic}>
+        {w.schools.length === 0
+          ? <span className={ui.muted}>None</span>
+          : w.schools.map((k, i) => <span key={k}>{i > 0 && ', '}<TipWord label={schoolInfo[k]?.name ?? k} tips={schoolInfo[k]?.tips ?? []} /></span>)}
+      </td>
       <td data-label="Big creature">{w.large ? 'Yes' : 'No'}</td>
     </tr>,
     ...(w.key === chosen && detail ? [<tr key={`${w.key}-options`} className={styles.options}><td colSpan={cols}>{detail}</td></tr>] : []),
@@ -115,7 +131,7 @@ export function WarbandTable({ shown, sort, chosen, onChoose, detail }: { shown:
     <div className={styles.tableWrap}>
       <table className={styles.table}>
         <thead><tr>
-          <th scope="col">Warband</th><th scope="col">Race</th>{!byGrade && <th scope="col">Grade</th>}<th scope="col">Gold</th><th scope="col">Max. models</th><th scope="col">Heroes</th><th scope="col">Big creature</th>
+          <th scope="col">Warband</th><th scope="col">Race</th>{!byGrade && <th scope="col">Grade</th>}<th scope="col">Gold</th><th scope="col">Max. models</th><th scope="col">Heroes</th><th scope="col">Magic</th><th scope="col">Big creature</th>
         </tr></thead>
         <tbody>
           {byGrade

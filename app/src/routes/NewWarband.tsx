@@ -20,7 +20,7 @@ import { useGameData } from '../game/useGameData.ts';
 import { createWarband, newWarbandChoice } from '../roster/view.ts';
 import ui from '../ui/ui.module.css';
 import styles from './NewWarband.module.css';
-import { useWarbandFinder, WarbandFinder, WarbandTable } from './WarbandFinder.tsx';
+import { useWarbandFinder, WarbandFinder, WarbandTable, type SchoolInfo } from './WarbandFinder.tsx';
 
 function Form({ campaignId }: { campaignId: string | null }) {
   const data = useGameData();
@@ -29,6 +29,8 @@ function Form({ campaignId }: { campaignId: string | null }) {
   const vanilla = useCampaignVanilla(campaignId);
   const facts = useMemo(() => warbandFacts(data).filter((f) => !vanilla || isVanillaWarband(data, f.key)), [data, vanilla]);
   const finder = useWarbandFinder(facts);
+  // each school with its spells and what they do, for the bubble on its name (no lore)
+  const schoolInfo = useMemo<Record<string, SchoolInfo>>(() => Object.fromEntries(Object.entries(data.SPELLS).map(([key, school]) => [key, { name: school.name, tips: school.spells.filter(([n]) => !n.startsWith('▸')).map(([full, text]) => ({ name: full.replace(/\s*\([^)]*\)\s*$/, ''), line: /\(([^)]*)\)\s*$/.test(full) ? `Difficulty ${/\(([^)]*)\)\s*$/.exec(full)![1]}` : 'Spell', text })) }])), [data]);
   const [key, setKey] = useState('');
   const [sub, setSub] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -129,8 +131,8 @@ function Form({ campaignId }: { campaignId: string | null }) {
   return (
     <form className={ui.page} onSubmit={(e) => { e.preventDefault(); void create(); }}>
       {vanilla && <p className={ui.muted}>This campaign plays Vanilla Mordheim: only the warbands of the rulebook.</p>}
-      <WarbandFinder facts={facts} finder={finder} />
-      <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} detail={options} />
+      <WarbandFinder facts={facts} finder={finder} schoolInfo={schoolInfo} />
+      <WarbandTable shown={listed} sort={finder.sort} chosen={key} onChoose={(k) => { setKey(k); setSub(null); }} detail={options} schoolInfo={schoolInfo} />
       <div className={`${ui.actions} ${ui.stickyActions}`}>
         <Link to={campaignId ? `/campaign/${campaignId}` : '/warbands'} className={ui.buttonQuiet}>Cancel</Link>
         <button type="submit" className={ui.button} disabled={!choice || busy}>Start the warband</button>
