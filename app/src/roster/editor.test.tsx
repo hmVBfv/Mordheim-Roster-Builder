@@ -215,7 +215,8 @@ describe('a new warband', () => {
     expect(box.closest('label')!.textContent).toMatch(/Only Core warbands can play it/);
     await user.click(await screen.findByRole('radio', { name: 'Skaven of Clan Pestilens' }));
     expect(screen.queryByRole('checkbox', { name: /Vanilla Mordheim/ })).toBeNull();
-    expect(screen.getByText(/Vanilla Mordheim \(the rulebook, Core\) is only for Core warbands/)).toBeTruthy();
+    // a warband that cannot play it is not told so: the option is simply not there (report of 9.11.2026)
+    expect(screen.queryByText(/is only for Core warbands/)).toBeNull();
   });
 
   /* Wish of 8.11.2026: the options of a new warband (Planner, the Trading Post, Vanilla Mordheim) are smaller, in sizes the site already uses:
