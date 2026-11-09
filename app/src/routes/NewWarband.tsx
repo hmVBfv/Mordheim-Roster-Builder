@@ -108,7 +108,6 @@ function Form({ campaignId }: { campaignId: string | null }) {
           <span><strong>Vanilla Mordheim</strong><small>Only the items and skills of the rulebook (Core): the Trading Post offers nothing else. Only Core warbands can play it. It can be switched off later under House rules.</small></span>
         </label>
       )}
-      {choice && !fromRulebook && !vanilla && <p className={ui.muted}>Vanilla Mordheim (the rulebook, Core) is only for Core warbands.</p>}
       <p className={ui.muted}>
         {!planner && <span>Starting gold: {gold} gc. </span>}
         {fact && <span>Models: {fact.min}–{fact.max}. </span>}
