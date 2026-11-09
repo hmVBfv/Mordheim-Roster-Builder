@@ -103,9 +103,10 @@ function Form({ campaignId }: { campaignId: string | null }) {
       {fromRulebook && !vanilla && (
         <label className={ui.check}>
           <input type="checkbox" checked={plain} onChange={(e) => setPlain(e.target.checked)} />
-          <span><strong>Vanilla Mordheim</strong> – only the rulebook’s items and skills: the Trading Post offers nothing else. It can be switched off later under House rules.</span>
+          <span><strong>Vanilla Mordheim</strong> – only the items and skills of the rulebook (Core): the Trading Post offers nothing else. Only Core warbands can play it. It can be switched off later under House rules.</span>
         </label>
       )}
+      {choice && !fromRulebook && !vanilla && <p className={ui.muted}>Vanilla Mordheim (the rulebook, Core) is only for Core warbands.</p>}
       <p className={ui.muted}>
         {!planner && <span>Starting gold: {gold} gc. </span>}
         {fact && <span>Models: {fact.min}–{fact.max}. </span>}

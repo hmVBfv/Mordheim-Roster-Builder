@@ -205,6 +205,19 @@ describe('a new warband', () => {
     expect(screen.queryByRole('textbox', { name: 'Name' })).toBeNull();
   });
 
+  /* A report of 8.11.2026: "the rulebook" in the Vanilla option means the Core warbands, and only they can choose it. */
+  it('says that the rulebook of the Vanilla option is Core, and that only Core warbands can choose it', async () => {
+    at('/warbands/new');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('radio', { name: 'Mercenaries' }));
+    const box = screen.getByRole('checkbox', { name: /Vanilla Mordheim/ });
+    expect(box.closest('label')!.textContent).toMatch(/rulebook \(Core\)/);
+    expect(box.closest('label')!.textContent).toMatch(/Only Core warbands can play it/);
+    await user.click(await screen.findByRole('radio', { name: 'Skaven of Clan Pestilens' }));
+    expect(screen.queryByRole('checkbox', { name: /Vanilla Mordheim/ })).toBeNull();
+    expect(screen.getByText(/Vanilla Mordheim \(the rulebook, Core\) is only for Core warbands/)).toBeTruthy();
+  });
+
   /* Wish #77: a planner is started from the same form, and says so everywhere it differs. */
   it('can be a planner: no gold limit, its value instead of gold, the experience its advances need', async () => {
     at('/warbands/new');
