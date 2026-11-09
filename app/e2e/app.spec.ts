@@ -732,7 +732,7 @@ for (const theme of THEMES) {
     await noSideScroll(page); await tapTargets(page);
     await shot(page, `${theme}-injury-arm`);
     await sheet.getByRole('button', { name: 'Apply' }).click();
-    await expect(magda).toContainText('Misses 1 game');
+    await expect(magda).toContainText('Misses next battle');
 
     // Multiple Injuries: two more, one of them a lost pit fight with its own roll
     const ulrich = await unit(page, 'Ulrich the Grey');

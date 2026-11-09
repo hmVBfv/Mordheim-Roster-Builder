@@ -181,7 +181,10 @@
         },
         "eq": null,
         "noxp": true,
-        "sp": "Fear. Scaly skin 6+. Animal (gains no experience). Only with a Beastmaster. Stupidity: May use the basic Leadership of the Beastmaster if within 6\" of him, never the leader’s. If the Beastmaster dies, the beasts escape and are removed from the roster."
+        "sp": "Fear. Scaly skin 6+. Animal (gains no experience). Only with a Beastmaster. Stupidity: May use the basic Leadership of the Beastmaster if within 6\" of him, never the leader’s. If the Beastmaster dies, the beasts escape and are removed from the roster.",
+        "needs": [
+          "beastmaster"
+        ]
       }
     ]
   },

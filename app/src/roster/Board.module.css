@@ -1455,3 +1455,32 @@
   padding: var(--space-1) 0 0;
   font-weight: 600;
 }
+
+/* a unit that is not in the next battle (it misses it, or stays behind with its master): greyed out, still readable, still in the rating */
+.row[data-away='true'] {
+  opacity: 0.68;
+  filter: grayscale(0.55);
+}
+
+.row[data-away='true'][data-open='true'] {
+  opacity: 1;
+  filter: none;
+}
+
+/* whether he takes part: three buttons that wrap on a phone, and a count beside them while he misses battles */
+.partRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.partRow .btn[aria-pressed='true'] {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.partRow .stepper {
+  margin-left: auto;
+}

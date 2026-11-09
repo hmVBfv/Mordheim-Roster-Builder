@@ -72,6 +72,7 @@ export const modelSchema = z.looseObject({
   lore: z.string().optional(),
   magic: z.string().optional(),
   miss: num.optional(),
+  sitsOut: z.boolean().optional(),
   missWhy: z.string().optional(),
   joined: num.optional(),
   battles: num.optional(),

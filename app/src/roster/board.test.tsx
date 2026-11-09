@@ -29,7 +29,7 @@ function acts(over: Partial<UnitActs> = {}): UnitActs {
   return {
     xp: vi.fn(), setXp: vi.fn(), advance: vi.fn(), injury: vi.fn(), captive: vi.fn(), addMan: vi.fn(), man: vi.fn(), lead: vi.fn(),
     equipSheet: vi.fn(), rename: vi.fn(), editName: vi.fn(), nameLabel: 'Name of this Mercenary Captain', nameValue: '', story: '/story', card: '/card',
-    taken: null, chaos: [], leave: { label: 'Remove from the roster', run: vi.fn() }, ...over,
+    taken: null, chaos: [], participation: vi.fn(), leave: { label: 'Remove from the roster', run: vi.fn() }, ...over,
   };
 }
 
@@ -170,7 +170,7 @@ describe('on a desktop: the list and the selected warrior beside it', () => {
     const pane = screen.getByRole('complementary', { name: 'Selected warrior' });
     const card = within(pane).getByRole('article', { name: 'Ulrich the Grey' });
     expect(within(card).getAllByRole('heading', { level: 3 }).map((h) => h.textContent!.replace(/(Equipment|Experience|Advances taken).*/, '$1'))).toEqual([
-      'Profile', 'Experience', 'Special rules', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Story and table', 'Leaving the warband',
+      'Profile', 'Experience', 'Next battles', 'Special rules', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Story and table', 'Leaving the warband',
     ]);
     expect(screen.queryByRole('tablist')).toBeNull();
     const first = screen.getByRole('button', { name: /^Ulrich/ });
@@ -531,6 +531,66 @@ describe('the fold-outs of the warband screen', () => {
     await user.click(within(box('Unit choice')).getByText('Unit choice'));
     expect((box('Unit choice') as HTMLDetailsElement).open).toBe(true);
     expect(within(box('Unit choice')).getAllByRole('listitem').length).toBeGreaterThan(5);
+  });
+});
+
+/* Wish of 9.11.2026: a unit can be marked as missing the next battle, the next N, or staying out until switched back; it is greyed out, and the card
+   says so and has the controls – small enough for a phone. */
+describe('missing a battle', () => {
+  const darkBand = (miss = 0) => {
+    let s = createWarband(data, 'darkelves', null, 'The Black Ark');
+    for (const u of ['highborn', 'beastmaster', 'coldone']) s = core.addUnit(ctx(s), u);
+    const beastmaster = s.models.find((m) => m.uid_def === 'beastmaster')!.uid;
+    if (miss) s = core.setParticipation(ctx(s), beastmaster, { miss });
+    return rosterView(data, s);
+  };
+  const card = () => screen.getByRole('complementary', { name: 'Selected warrior' });
+
+  it('greys out the row of a unit that is away, and of the unit that stays behind with it', () => {
+    width = 400;
+    show({}, darkBand(1));
+    const rows = [...document.querySelectorAll('li[data-away="true"]')];
+    expect(rows.map((r) => r.querySelector('button')!.getAttribute('aria-label')?.split(',')[0]).sort()).toEqual(['Beastmaster', 'Cold One Beasthound']);
+    expect(within(rows[0] as HTMLElement).getAllByText(/Misses next battle|Stays behind/).length).toBeGreaterThan(0);
+  });
+
+  it('has the controls in the card: takes part, misses, until switched back', async () => {
+    width = 1000;
+    const act = vi.fn();
+    const user = userEvent.setup();
+    show({ acts: () => acts({ participation: act }) }, darkBand(0));
+    await user.click(screen.getByRole('button', { name: /^Beastmaster/ }));
+    const group = within(card()).getByRole('group', { name: 'Next battles' });
+    expect(within(card()).getByText('Takes part in the next battle')).toBeTruthy();
+    expect(within(group).getByRole('button', { name: 'Takes part' }).getAttribute('aria-pressed')).toBe('true');
+    await user.click(within(group).getByRole('button', { name: 'Misses next battle' }));
+    expect(act).toHaveBeenLastCalledWith({ miss: 1, sitsOut: false });
+    await user.click(within(group).getByRole('button', { name: 'Until switched back' }));
+    expect(act).toHaveBeenLastCalledWith({ miss: 0, sitsOut: true });
+  });
+
+  it('counts the battles with a stepper while he misses them', async () => {
+    width = 1000;
+    const act = vi.fn();
+    const user = userEvent.setup();
+    show({ acts: () => acts({ participation: act }) }, darkBand(2));
+    await user.click(screen.getByRole('button', { name: /^Beastmaster/ }));
+    const group = within(card()).getByRole('group', { name: 'Next battles' });
+    expect(within(card()).getAllByText('Misses next 2 battles').length).toBeGreaterThan(0);
+    expect(within(group).getByRole('button', { name: 'Misses next 2 battles' }).getAttribute('aria-pressed')).toBe('true');
+    await user.click(within(group).getByRole('button', { name: 'One battle more' }));
+    expect(act).toHaveBeenLastCalledWith({ miss: 3, sitsOut: false });
+    await user.click(within(group).getByRole('button', { name: 'One battle less' }));
+    expect(act).toHaveBeenLastCalledWith({ miss: 1, sitsOut: false });
+  });
+
+  it('tells a unit that stays behind why, and that it follows its master', async () => {
+    width = 1000;
+    const user = userEvent.setup();
+    show({ acts: () => acts({ participation: vi.fn() }) }, darkBand(1));
+    await user.click(screen.getByRole('button', { name: /^Cold One Beasthound/ }));
+    expect(within(card()).getAllByText('Stays behind: the Beastmaster misses the battle').length).toBeGreaterThan(0);
+    expect(within(card()).getByText(/He follows the Beastmaster/)).toBeTruthy();
   });
 });
 

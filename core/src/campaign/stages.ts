@@ -167,6 +167,12 @@ function recordSitOutsOn(d: WarbandDraft, c: Ctx, round: unknown): void {
   if ((Number(round) || 0) < 1) return;
   for (const m of d.models as Model[]) {
     const n = Number(m.miss) || 0;
+    // one kept away until he is switched back sits the battle out without a count to tick down
+    if (n <= 0 && m.sitsOut) {
+      const who = m.name || unitDef(c, m.uid_def)?.name;
+      logEventAt(d, round, 'missed', `${who} sat out the battle (not taking part).`, { uid: m.uid, name: who, uid_def: m.uid_def });
+      continue;
+    }
     if (n <= 0) continue;
     const who = m.name || unitDef(c, m.uid_def)?.name;
     const why = m.missWhy || (m.inj || []).map((j) => (j.name || j.code) as string).filter((x) => /old battle wound/i.test(x))[0];

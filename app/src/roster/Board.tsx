@@ -39,7 +39,7 @@ function RowView({ r, layout, current, onPick, rename, children }: { r: UnitRow;
   // an opened row starts under the bars that stay on top
   useEffect(() => { if (stack && current) li.current?.scrollIntoView?.({ block: 'start' }); }, [stack, current]);
   return (
-    <li ref={li} className={styles.row} data-kind={r.kind} data-open={stack && current} aria-current={!stack && current ? 'true' : undefined}>
+    <li ref={li} className={styles.row} data-kind={r.kind} data-open={stack && current} data-away={r.away || undefined} aria-current={!stack && current ? 'true' : undefined}>
       <button type="button" className={styles.rowBtn} aria-label={label} aria-describedby={words}
         aria-expanded={stack ? current : undefined} aria-pressed={stack ? undefined : current} onClick={onPick}>
         <span className={styles.r1}>

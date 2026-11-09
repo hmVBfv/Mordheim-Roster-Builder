@@ -152,7 +152,10 @@
         },
         "eq": null,
         "noxp": true,
-        "sp": "Requires a Mountain Guide (caged if none is in the warband). Trained: May use the Guide's Leadership within 6\". Feral Instinct: At the start of your turn it must pass an Ld test or the opponent moves it this turn (it may even charge friendly models). Ignored: Out-of-action Sabretusks are not counted for Rout tests. Causes Fear. Animal: Never gains Experience."
+        "sp": "Requires a Mountain Guide (caged if none is in the warband). Trained: May use the Guide's Leadership within 6\". Feral Instinct: At the start of your turn it must pass an Ld test or the opponent moves it this turn (it may even charge friendly models). Ignored: Out-of-action Sabretusks are not counted for Rout tests. Causes Fear. Animal: Never gains Experience.",
+        "needs": [
+          "guide"
+        ]
       }
     ]
   },
