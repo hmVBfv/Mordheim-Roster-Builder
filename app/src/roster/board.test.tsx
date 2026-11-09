@@ -39,6 +39,9 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); width = 0; });
 
+/** A fold-out of the warband screen by its name: the unit choice, the warband rules, the spells and prayers. */
+const box = (name: string) => document.querySelector(`details[aria-label="${name}"]`) as HTMLElement;
+
 const show = (props: Partial<React.ComponentProps<typeof Board>> = {}, v = band()) =>
   render(<MemoryRouter><Board v={v} acts={() => acts()} {...props} /></MemoryRouter>);
 
@@ -70,7 +73,7 @@ describe('one man is "1 man", not "1 men"', () => {
 describe('on a phone: a row each, opening under it with tabs', () => {
   it('groups the rows, one button each, with the whole profile in a line and nothing open', () => {
     show();
-    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Unit choice', 'Heroes', 'Henchmen', 'Hired Swords & Dramatis Personae']);
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Heroes', 'Henchmen', 'Hired Swords & Dramatis Personae']);
     expect(screen.getByText('1 of 6')).toBeTruthy();
     expect(screen.getByText('2 men')).toBeTruthy();
     const rows = within(screen.getByRole('region', { name: 'Heroes' })).getAllByRole('button');
@@ -392,7 +395,7 @@ describe('the rules of the warband', () => {
     for (const w of [400, 1000]) {
       width = w;
       show({}, hashut());
-      const rules = screen.getByRole('region', { name: 'Warband rules' });
+      const rules = box('Warband rules');
       const henchmen = screen.getByRole('heading', { name: 'Henchmen' });
       expect(rules.compareDocumentPosition(henchmen) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
       expect(within(rules).getByText('Armour')).toBeTruthy();
@@ -418,8 +421,8 @@ describe('the unit choice of the warband', () => {
   it('stands in its own section above the rules, which keep their own', () => {
     width = 400;
     show({}, view('dwarftreasure', 'clansman'));
-    const choice = screen.getByRole('region', { name: 'Unit choice' });
-    const rules = screen.getByRole('region', { name: 'Warband rules' });
+    const choice = box('Unit choice');
+    const rules = box('Warband rules');
     expect(within(choice).getByText('Noble')).toBeTruthy();
     expect(within(rules).queryByText('Noble')).toBeNull();
     expect(choice.compareDocumentPosition(rules) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -444,7 +447,7 @@ describe('the unit choice as lines', () => {
   it('gives each unit its limit at the end of its line, 0–2 where a text said "max."', () => {
     width = 400;
     show({}, rosterView(data, core.addUnit(ctx(createWarband(data, 'blackorcs', null, 'The Band')), 'bboss')));
-    const choice = screen.getByRole('region', { name: 'Unit choice' });
+    const choice = box('Unit choice');
     const lines = within(choice).getAllByRole('listitem').map((li) => li.textContent);
     expect(lines).toEqual(['Black Orc Boss' + 'exactly 1', 'Black Orcs' + '0–2', 'Young\'uns' + '0–2', 'Boyz' + 'any number', 'Shootaz · never more than Boyz' + 'any number', 'Nuttaz' + '0–4', 'Troll' + '0–1']);
   });
@@ -455,7 +458,7 @@ describe('the unit choice, divided', () => {
   it('has a list of Heroes and a list of Henchmen, each unit in the one it belongs to', () => {
     width = 400;
     show({}, rosterView(data, core.addUnit(ctx(createWarband(data, 'blackorcs', null, 'The Band')), 'bboss')));
-    const choice = screen.getByRole('region', { name: 'Unit choice' });
+    const choice = box('Unit choice');
     expect(within(choice).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Heroes', 'Henchmen']);
     const [heroes, hench] = within(choice).getAllByRole('list');
     expect(within(heroes!).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Black Orc Boss' + 'exactly 1', 'Black Orcs' + '0–2', 'Young\'uns' + '0–2']);
@@ -471,20 +474,20 @@ describe('the box of spells and prayers', () => {
   it('is a fold-out with its own heading, closed, after the unit choice and the warband rules', () => {
     width = 400;
     show({}, view('nightgoblins', 'nightgob'));
-    const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLDetailsElement;
-    expect(box).not.toBeNull();
-    expect(box.open).toBe(false);
-    expect(within(box).getByText('Spells and prayers').tagName).toBe('SUMMARY');
-    const rules = screen.getByRole('region', { name: 'Warband rules' });
-    expect(rules.compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const spellBox = box('Spells and prayers') as HTMLDetailsElement;
+    expect(spellBox).not.toBeNull();
+    expect(spellBox.open).toBe(false);
+    expect(within(spellBox).getByText('Spells and prayers').tagName).toBe('SUMMARY');
+    const rules = box('Warband rules');
+    expect(rules.compareDocumentPosition(spellBox) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('names the school, each spell with its difficulty, its effect and its lore line', () => {
     width = 400;
     show({}, view('nightgoblins', 'nightgob'));
-    const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLElement;
-    expect(within(box).getByText('Waaagh! Magic')).toBeTruthy();
-    const ledz = within(box).getByText("Led'z go").closest('li')!;
+    const spellBox = box('Spells and prayers');
+    expect(within(spellBox).getByText('Waaagh! Magic')).toBeTruthy();
+    const ledz = within(spellBox).getByText("Led'z go").closest('li')!;
     expect(ledz.textContent).toMatch(/9/);
     expect(within(ledz).getByText('The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.')).toBeTruthy();
     expect(ledz.textContent).toMatch(/strikes first in close combat/);
@@ -497,9 +500,34 @@ describe('the box of spells and prayers', () => {
     cleanup();
     const hired = { ...core.addUnit(ctx(createWarband(data, 'merc', null, 'The Band')), 'capt'), hired: [{ key: 'warlock', uid: 'h1' }] };
     show({}, rosterView(data, hired));
-    const box = document.querySelector('details[aria-label="Spells and prayers"]') as HTMLElement;
-    expect(within(box).getByText('Warlock · Hired Sword')).toBeTruthy();
-    expect(within(box).getByText('Lesser Magic')).toBeTruthy();
+    const spellBox = box('Spells and prayers');
+    expect(within(spellBox).getByText('Warlock · Hired Sword')).toBeTruthy();
+    expect(within(spellBox).getByText('Lesser Magic')).toBeTruthy();
+  });
+});
+
+/* Wish of 9.11.2026: the unit choice and the warband rules fold like the box of spells and prayers, closed to begin with and visibly so. */
+describe('the fold-outs of the warband screen', () => {
+  it('are three, all closed to begin with, each with a summary that has the chevron', () => {
+    width = 400;
+    show({}, rosterView(data, core.addUnit(ctx(createWarband(data, 'orcmob', null, 'The Band')), 'shaman')));
+    for (const name of ['Unit choice', 'Warband rules', 'Spells and prayers']) {
+      const d = box(name) as HTMLDetailsElement;
+      expect(d, name).not.toBeNull();
+      expect(d.open, name).toBe(false);
+      const summary = d.querySelector(':scope > summary')!;
+      expect(summary.textContent).toBe(name);
+      expect(summary.className).toMatch(/fold/);
+    }
+  });
+
+  it('open to the same lists as before', async () => {
+    width = 400;
+    const user = userEvent.setup();
+    show({}, rosterView(data, core.addUnit(ctx(createWarband(data, 'blackorcs', null, 'The Band')), 'bboss')));
+    await user.click(within(box('Unit choice')).getByText('Unit choice'));
+    expect((box('Unit choice') as HTMLDetailsElement).open).toBe(true);
+    expect(within(box('Unit choice')).getAllByRole('listitem').length).toBeGreaterThan(5);
   });
 });
 
