@@ -265,23 +265,26 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     srv.addBattle(c.id, { title: 'The Well at Dusk' });
     await page.goto(`campaign/${c.id}`);
     await expect(page.getByRole('list', { name: 'Battles' }).getByRole('link')).toHaveCount(1);
-    const [warbands, members, battles, map] = [await box(page, 'Warbands'), await box(page, 'Members'), await box(page, 'Battles'), await box(page, 'The map')];
-    // who: one under the other on the left …
-    expect(Math.abs(members.x - warbands.x)).toBeLessThan(2);
-    expect(members.y).toBeGreaterThan(warbands.y + 150);
-    // … what happened: beside them on the right, the map under the battles
-    expect(battles.x).toBeGreaterThan(warbands.x + 300);
-    expect(Math.abs(battles.y - warbands.y)).toBeLessThan(4);
-    expect(Math.abs(map.x - battles.x)).toBeLessThan(2);
-    expect(map.y).toBeGreaterThan(battles.y + 100);
-    // the members are a line each, two to a row; an empty map is a small picture, not a poster
-    const people = page.getByRole('list', { name: 'Members' }).getByRole('listitem');
-    await expect(people).toHaveCount(4);
-    const [p1, p2, p3] = [await boxOf(people.nth(0)), await boxOf(people.nth(1)), await boxOf(people.nth(2))];
-    expect(p1!.height).toBeLessThan(60);
-    expect(Math.abs(p1!.y - p2!.y)).toBeLessThan(2);
-    expect(p3!.y).toBeGreaterThan(p1!.y + p1!.height - 2);
-    expect((await boxOf(page.locator('[data-scene="map"]')))!.height).toBeLessThan(140);
+    // the layout may still settle for a moment on a slow runner: measure and judge together until it holds
+    await expect(async () => {
+      const [warbands, members, battles, map] = [await box(page, 'Warbands'), await box(page, 'Members'), await box(page, 'Battles'), await box(page, 'The map')];
+      // who: one under the other on the left …
+      expect(Math.abs(members.x - warbands.x)).toBeLessThan(2);
+      expect(members.y).toBeGreaterThan(warbands.y + 150);
+      // … what happened: beside them on the right, the map under the battles
+      expect(battles.x).toBeGreaterThan(warbands.x + 300);
+      expect(Math.abs(battles.y - warbands.y)).toBeLessThan(4);
+      expect(Math.abs(map.x - battles.x)).toBeLessThan(2);
+      expect(map.y).toBeGreaterThan(battles.y + 100);
+      // the members are a line each, two to a row; an empty map is a small picture, not a poster
+      const people = page.getByRole('list', { name: 'Members' }).getByRole('listitem');
+      await expect(people).toHaveCount(4);
+      const [p1, p2, p3] = [await boxOf(people.nth(0)), await boxOf(people.nth(1)), await boxOf(people.nth(2))];
+      expect(p1!.height).toBeLessThan(60);
+      expect(Math.abs(p1!.y - p2!.y)).toBeLessThan(2);
+      expect(p3!.y).toBeGreaterThan(p1!.y + p1!.height - 2);
+      expect((await boxOf(page.locator('[data-scene="map"]')))!.height).toBeLessThan(140);
+    }).toPass({ timeout: 10_000 });
     await noSideScroll(page);
     await shot(page, `${theme}-campaign-desktop`);
     await page.setViewportSize({ width: 1920, height: 1080 });
@@ -301,17 +304,20 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(list.getByRole('link')).toHaveText([/The Hel Fenn Campaign\s*Leader · Setup · 1 warband/, /Summer in Sylvania\s*Player · Setup · 0 warbands/]);
     const warbandLinks = page.getByRole('main').getByRole('link').filter({ hasText: /Mercenaries/ });
     await expect(warbandLinks).toHaveCount(3);
-    const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await boxOf(warbandLinks.nth(0)), await boxOf(warbandLinks.nth(1)), await boxOf(warbandLinks.nth(2))];
-    // the campaigns stand on the right, at the top; the warbands on the left, two to a row
-    expect(campaigns.x).toBeGreaterThan(warbands.x + 400);
-    expect(campaigns.y).toBeLessThan(warbands.y);
-    expect(Math.abs(first!.y - second!.y)).toBeLessThan(2);
-    expect(second!.x).toBeGreaterThan(first!.x + 200);
-    expect(third!.y).toBeGreaterThan(first!.y + first!.height - 2);
-    // the button under the list stands apart from the last card, as the warbands' buttons do
-    const lastCampaign = await boxOf(list.getByRole('link').last());
-    const allCampaigns = await boxOf(page.getByRole('link', { name: 'All campaigns' }));
-    expect(allCampaigns!.y - (lastCampaign!.y + lastCampaign!.height)).toBeGreaterThanOrEqual(8);
+    // measure and judge together until the layout holds (see the campaign overview above)
+    await expect(async () => {
+      const [campaigns, warbands, first, second, third] = [await box(page, 'Campaigns'), await box(page, 'Your warbands'), await boxOf(warbandLinks.nth(0)), await boxOf(warbandLinks.nth(1)), await boxOf(warbandLinks.nth(2))];
+      // the campaigns stand on the right, at the top; the warbands on the left, two to a row
+      expect(campaigns.x).toBeGreaterThan(warbands.x + 400);
+      expect(campaigns.y).toBeLessThan(warbands.y);
+      expect(Math.abs(first!.y - second!.y)).toBeLessThan(2);
+      expect(second!.x).toBeGreaterThan(first!.x + 200);
+      expect(third!.y).toBeGreaterThan(first!.y + first!.height - 2);
+      // the button under the list stands apart from the last card, as the warbands' buttons do
+      const lastCampaign = await boxOf(list.getByRole('link').last());
+      const allCampaigns = await boxOf(page.getByRole('link', { name: 'All campaigns' }));
+      expect(allCampaigns!.y - (lastCampaign!.y + lastCampaign!.height)).toBeGreaterThanOrEqual(8);
+    }).toPass({ timeout: 10_000 });
     await list.getByRole('link').first().click();
     await expect(page).toHaveURL(new RegExp(`/campaign/${c.id}$`));
     await expect(page.getByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeVisible();
