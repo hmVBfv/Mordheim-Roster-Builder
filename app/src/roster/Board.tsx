@@ -171,7 +171,7 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
                         ? <li key={sp.name} className={styles.wbSpellHeading}>{sp.name}</li>
                         : (
                           <li key={sp.name}>
-                            <b>{sp.name}</b>{sp.difficulty && <small> · difficulty {sp.difficulty}</small>}
+                            <b>{sp.name}</b>{sp.difficulty && <small>Difficulty {sp.difficulty}</small>}
                             {sp.lore && <em className={styles.wbSpellLore}>{sp.lore}</em>}
                             <span>{sp.text}</span>
                           </li>

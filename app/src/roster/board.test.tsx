@@ -488,7 +488,10 @@ describe('the box of spells and prayers', () => {
     const spellBox = box('Spells and prayers');
     expect(within(spellBox).getByText('Waaagh! Magic')).toBeTruthy();
     const ledz = within(spellBox).getByText("Led'z go").closest('li')!;
-    expect(ledz.textContent).toMatch(/9/);
+    // the difficulty has a line of its own, without a dot in front of it
+    const difficulty = within(ledz).getByText('Difficulty 9');
+    expect(difficulty.tagName).toBe('SMALL');
+    expect(ledz.textContent).not.toMatch(/·/);
     expect(within(ledz).getByText('The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.')).toBeTruthy();
     expect(ledz.textContent).toMatch(/strikes first in close combat/);
   });
