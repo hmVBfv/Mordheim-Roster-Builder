@@ -126,8 +126,8 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
       {printing && <PrintSheet v={v} />}
       <div className={`${styles.list} ${styles.screenOnly}`}>
         {v.unitChoice && (
-          <section aria-labelledby="board-unit-choice" className={styles.wbRules}>
-            <div className={styles.groupHead}><h2 id="board-unit-choice">Unit choice</h2></div>
+          <details className={styles.wbSpells} aria-label="Unit choice">
+            <summary className={ui.fold}>Unit choice</summary>
             {v.unitChoice.rows ? (
               <>
                 {([['hero', 'Heroes'], ['hench', 'Henchmen']] as const).map(([kind, title]) => {
@@ -145,15 +145,16 @@ export function Board({ v, acts, after, panel, printing }: BoardProps) {
                 })}
               </>
             ) : <p className={styles.wbChoice}>{v.unitChoice.text}</p>}
-          </section>
+          </details>
         )}
         {v.warbandRules.length > 0 && (
-          <section aria-labelledby="board-warband-rules" className={styles.wbRules}>
-            <div className={styles.groupHead}><h2 id="board-warband-rules">Warband rules</h2><span>for the whole warband</span></div>
+          <details className={styles.wbSpells} aria-label="Warband rules">
+            <summary className={ui.fold}>Warband rules</summary>
+            <p className={styles.wbSpellNote}>For the whole warband.</p>
             <dl className={styles.wbRuleList}>
               {v.warbandRules.map((r) => <div key={r.name}><dt>{r.name}</dt><dd>{r.text}</dd></div>)}
             </dl>
-          </section>
+          </details>
         )}
         {v.spells.length > 0 && (
           <details className={styles.wbSpells} aria-label="Spells and prayers">
