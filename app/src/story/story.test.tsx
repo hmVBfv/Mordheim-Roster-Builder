@@ -169,7 +169,11 @@ describe('a warrior’s life', () => {
     const life = await screen.findByRole('dialog', { name: /Mercenary Captain/ });
     expect(await within(life).findByText(/^A Mercenary Captain is a tough professional warrior/)).toBeTruthy();
     expect(within(life).getByText('A few lines about him')).toBeTruthy();
-    expect(within(life).getByText(/the warband designer’s description, as on Mordheimer/)).toBeTruthy();
+    // the note is a line of its own under the text, not run on behind a dot (report of 10.11.2026)
+    const note = within(life).getByText(/warband designer’s description, as on Mordheimer/);
+    expect(note.tagName).toBe('SMALL');
+    expect(note.textContent).not.toMatch(/^\s*·/);
+    expect(note.parentElement!.firstChild!.textContent).toMatch(/^A Mercenary Captain is a tough professional warrior/);
     await user.click(within(life).getByRole('button', { name: 'Edit the profile' }));
     const sheet = await screen.findByRole('dialog', { name: /Mercenary Captain: names, voice, story/ });
     const field = within(sheet).getByLabelText('A few lines about him') as HTMLTextAreaElement;
@@ -181,7 +185,7 @@ describe('a warrior’s life', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Save' }));
     await waitFor(async () => expect(core.profileOf((await stored()).models[0]).text).toBe('He never speaks of the war.'));
     expect(await within(life).findByText('He never speaks of the war.')).toBeTruthy();
-    expect(within(life).queryByText(/the warband designer’s description, as on Mordheimer/)).toBeNull();
+    expect(within(life).queryByText(/warband designer’s description, as on Mordheimer/)).toBeNull();
   });
 
   it('every kind of people is listed', async () => {

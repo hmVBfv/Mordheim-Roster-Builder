@@ -61,7 +61,7 @@ export function EnterSheet({ id, rules, vanilla = false, onDone }: { id: string;
               {free.map((w) => (
                 <label key={w.id} className={styles.choice}>
                   <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} disabled={!fits(w)} onChange={() => { setChosen(w.id); setOwn(''); }} />
-                  <span>{w.name} <small>· {w.wbName}{fits(w) ? '' : ' · not a warband of the rulebook: this campaign plays Vanilla Mordheim'}</small></span>
+                  <span>{w.name}<small className={ui.noteLine}>{w.wbName}</small>{!fits(w) && <small className={ui.noteLine}>Not a warband of the rulebook: this campaign plays Vanilla Mordheim.</small>}</span>
                 </label>
               ))}
             </fieldset>
@@ -72,7 +72,7 @@ export function EnterSheet({ id, rules, vanilla = false, onDone }: { id: string;
               {planners.map((w) => (
                 <label key={w.id} className={styles.choice}>
                   <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} onChange={() => { setChosen(w.id); setOwn(''); }} />
-                  <span>{w.name} <small>· {w.wbName} · planner</small></span>
+                  <span>{w.name}<small className={ui.noteLine}>{w.wbName} · planner</small></span>
                 </label>
               ))}
             </fieldset>
@@ -89,11 +89,11 @@ export function EnterSheet({ id, rules, vanilla = false, onDone }: { id: string;
               <p className={ui.muted}>This warband has house rules of its own ({[...new Set(ownRules.map((k) => ruleLabel(k === 'rangedCap' ? 'rangedCapOn' : k)))].join(', ')}) that differ from the campaign’s. What should the copy do?</p>
               <label className={styles.choice}>
                 <input type="radio" name="enter-own" checked={own === 'campaign'} onChange={() => setOwn('campaign')} />
-                <span>Take the campaign’s rules <small>· its own are left behind in the copy</small></span>
+                <span>Take the campaign’s rules<small className={ui.noteLine}>Its own are left behind in the copy.</small></span>
               </label>
               <label className={styles.choice}>
                 <input type="radio" name="enter-own" checked={own === 'own'} onChange={() => setOwn('own')} />
-                <span>Keep its own rules <small>· the leaders see that they differ</small></span>
+                <span>Keep its own rules<small className={ui.noteLine}>The leaders see that they differ.</small></span>
               </label>
             </fieldset>
           )}

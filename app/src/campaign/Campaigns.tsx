@@ -53,7 +53,7 @@ function StartSheet() {
           )}
           <label className={styles.choice}>
             <input type="checkbox" checked={vanilla} onChange={(e) => setVanilla(e.target.checked)} />
-            <span>Vanilla Mordheim <small>· only the rulebook: its warbands, its items and its skills. It cannot be switched on later; a leader can switch it off for good.</small></span>
+            <span>Vanilla Mordheim<small className={ui.noteLine}>Only the rulebook: its warbands, its items and its skills. It cannot be switched on later; a leader can switch it off for good.</small></span>
           </label>
           {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
           <div className={ui.actions}>

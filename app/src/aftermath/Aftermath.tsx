@@ -322,7 +322,7 @@ function MarkSection({ data, rec, state, view, cid, round, toRoll, onMarked, not
   return (
     <section aria-labelledby="am-changes" className={ui.page}>
       <h2 id="am-changes">What changed</h2>
-      {before && <p className={ui.muted}>Since {before.label}{mark ? '' : ' · a preview; nothing is marked yet'}.</p>}
+      {before && <p className={ui.muted}>Since {before.label}.{mark ? '' : <small className={ui.noteLine}>A preview; nothing is marked yet.</small>}</p>}
       <BeforeAfter view={view} only={rec.id} />
       {beforeError && <p className={ui.message} role="status">The comparison needs the campaign server: {beforeError}</p>}
       {before && (

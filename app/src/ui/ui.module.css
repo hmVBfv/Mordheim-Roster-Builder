@@ -543,3 +543,11 @@ details[open] > .fold::after {
   height: 1.5rem;
   flex: none;
 }
+
+/* a note that explains: a line of its own under the text it belongs to, never run on after it behind a dot */
+.noteLine {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.85em;
+  font-weight: 400;
+}
