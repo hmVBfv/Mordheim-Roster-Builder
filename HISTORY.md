@@ -4918,14 +4918,14 @@ decides which one applies.
   beside them. This pull request contains #245 and #244 because the three change the same unit and the same file of tests; a trial merge of all
   branches found it, and it had to be merged into the branch with the data conflict resolved by hand.
 
-**The run of 10.11.2026: two reports on the stories (PRs 393 and 394 as numbered by GitHub, see the list of pull requests).**
+**The run of 10.11.2026: two reports on the stories (PRs 393, 394).**
 
-- **#248, notes behind a dot.** The note under the default story of a unit ("the warband designer's description …") was my own slip of #231: a `<small>` with
+- **#248, notes behind a dot (PR 393).** The note under the default story of a unit ("the warband designer's description …") was my own slip of #231: a `<small>` with
   a dot in front, run on after the text. Rob asked for the same slip anywhere else, so a source scan looks for a `<small>` or a string that begins with
   a dot and runs on in four words or more. It found nine more: the Vanilla option of a new campaign, three notes in the sheet that enters a warband,
   the heading of the NPC warbands, the Aftermath preview, the Quick Build's settings. They are lines of their own under a shared `noteLine` style. Two
   places stay one line on purpose and are named in the test: a warband's row (type · planner · only on this device) and an item's.
-- **#247, the default story of a warband.** Rob wanted the whole original and nothing shorter, a cut-off sentence at the end excepted. The Lore of a page
+- **#247, the default story of a warband (PR 394).** Rob wanted the whole original and nothing shorter, a cut-off sentence at the end excepted. The Lore of a page
   is a collapsible block (`<details>` with the summary "Lore"), not a heading; the first attempt looked for a heading and found one page in 49. The
   Mercenaries and Ostermark have no such block. The Orc Mob's lore ends in "… the following special rules:", which is no lore and is left out. The
   texts are 280 to 14 000 characters; the page's own line breaks are joined, the paragraphs set apart by an empty line. The text is a card above the
