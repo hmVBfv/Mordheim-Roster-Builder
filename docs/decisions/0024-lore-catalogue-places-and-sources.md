@@ -51,3 +51,10 @@ Rob, 08.11.2026 (wish #233): Die Zeile, die jeder Zauber auf den Magie-Seiten vo
 ohne Schwierigkeit). Dieselbe Ausnahme wie bei den Einheiten-Beschreibungen, nur für diesen Zweck; gelesen mit curl,
 geprüft von `core/test/spellbook.test.ts`. Zauber, deren Seite keine Zeile hat (Lady’s Prayers, Lizardman Magic), und Listen, die es
 auf mordheimer.net nicht gibt (Dwarf Minor Runes, Woodland Incantations), bleiben ohne.
+
+## Nachtrag vom 10.11.2026: der Standard-Prolog einer Warband wörtlich
+Rob, 10.11.2026 (Wunsch #247): Der Vorschlag für den Prolog einer Warband (`intro` in `data/warbands/<grade>/<key>.json`,
+`data/warbandintro.json`) ist der **Lore-Abschnitt ihrer Seite bei mordheimer.net, vollständig und wörtlich**; ein Satz, der nur
+in die Regeln überleitet („…the following special rules:“), gehört nicht dazu. Bei den Mercenaries und Ostermark, deren Seite keinen
+eigenen Lore-Abschnitt hat, ist es der Einleitungsabsatz beziehungsweise der Absatz zu Ostermark. Dieselbe Ausnahme wie bei den
+Beschreibungen der Einheiten und den Lore-Zeilen der Zauber; `core/test/warbandintro.test.ts` prüft Quelle, Länge und Ende.

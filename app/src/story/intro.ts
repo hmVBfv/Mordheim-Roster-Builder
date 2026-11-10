@@ -1,4 +1,4 @@
-/* The lore opening of a warband (data/warbandintro.json): a few lines on who they are, summarised from mordheimer.net, offered as
+/* The lore opening of a warband (data/warbandintro.json): the lore of the warband’s page on mordheimer.net, word for word, offered as
    the default text of the Prologue. Fetched on first use, so it is not part of the app shell. */
 export interface Intro { text: string; url: string }
 
