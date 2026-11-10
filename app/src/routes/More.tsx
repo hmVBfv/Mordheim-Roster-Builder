@@ -59,7 +59,7 @@ export function More() {
       {FLAVOUR === 'quickbuild' && theme}
       <p className={`${ui.muted} ${styles.version}`}>
         {APP_NAME} · version <span title={__APP_VERSION__}>{shownVersion(__APP_VERSION__)}</span>
-        {FLAVOUR === 'quickbuild' && ' · warbands stay on this device'}
+        {FLAVOUR === 'quickbuild' && <small className={ui.noteLine}>Warbands stay on this device.</small>}
       </p>
       {/* signed in, Rules are a tab of the Library and What's new one of Account; the others keep them here */}
       {!inAccount && <div className={ui.row}><Link to={RULES} className={ui.buttonQuiet}>Rules</Link></div>}

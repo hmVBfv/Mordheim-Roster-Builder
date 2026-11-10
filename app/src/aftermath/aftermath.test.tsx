@@ -118,7 +118,9 @@ describe('the aftermath of one’s warband', () => {
     // what changed since the start, and the mark
     const list = await screen.findByRole('list', { name: 'Changes' });
     expect(within(list).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toContain('Mercenary Captain');
-    expect(screen.getByText(/Since its start \(version 1\) · a preview/)).toBeTruthy();
+    expect(screen.getByText(/^Since its start \(version 1\)\./)).toBeTruthy();
+    // the note that it is a preview is a line of its own, not run on behind a dot
+    expect(screen.getByText('A preview; nothing is marked yet.').tagName).toBe('SMALL');
     await user.click(screen.getByRole('button', { name: 'Looks right – mark after battle 1' }));
     expect(await screen.findByText(/✓ Marked after battle 1 – version 2/)).toBeTruthy();
     const e = srv.state.campaigns.get(c.id)!.enrolments.find((x) => x.warbandId === mine)!;

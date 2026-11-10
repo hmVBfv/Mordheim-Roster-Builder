@@ -96,7 +96,8 @@ export function NpcWarbands({ id }: { id: string }) {
   if (list === null) return null;
   return (
     <section className={styles.section} aria-labelledby="w-npc">
-      <h2 id="w-npc">NPC warbands <small className={ui.muted}>· only leaders see these</small></h2>
+      <h2 id="w-npc">NPC warbands</h2>
+      <p className={ui.muted}>Only leaders see these.</p>
       <p className={ui.muted}>Warbands of the game master: reference and Tabletop Simulator data. No gold limit; what they own, the experience their advances need and their rating are shown. No other member sees them, and they take no part in the campaign.</p>
       {problem && <p className={`${ui.message} ${ui.error}`} role="alert">{problem}</p>}
       {list.length === 0 && <p className={ui.muted}>None yet.</p>}
