@@ -65,14 +65,16 @@ describe('the story page', () => {
     at('/warbands/w1/story');
     const region = await screen.findByRole('region', { name: 'Prologue' });
     const offer = await within(region).findByRole('group', { name: 'The opening from the setting' });
-    expect(within(offer).getByText(/claimants to the imperial throne/)).toBeTruthy();
+    expect(within(offer).getByText(/unremitting war/)).toBeTruthy();
+    // it says what it is: the page's own words
+    expect(within(offer).getByText(/word for word/)).toBeTruthy();
     expect(core.storyOf(await stored()).prologue).toBe('');
 
     await user.click(within(offer).getByRole('button', { name: 'Use as the prologue' }));
-    await waitFor(async () => expect(core.storyOf(await stored()).prologue).toMatch(/claimants to the imperial throne/));
+    await waitFor(async () => expect(core.storyOf(await stored()).prologue).toMatch(/unremitting war/));
     // adopted: it is the prologue now, and the offer is gone
     expect(within(region).queryByRole('group', { name: 'The opening from the setting' })).toBeNull();
-    expect(within(region).getByText(/claimants to the imperial throne/)).toBeTruthy();
+    expect(within(region).getByText(/unremitting war/)).toBeTruthy();
   });
 
   it('no offer once a prologue is written', async () => {

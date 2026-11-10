@@ -129,7 +129,7 @@ function StoryBody({ rec }: { rec: StoredWarband }) {
           <div role="group" aria-label="The opening from the setting" className={ui.card}>
             <h3>The opening from the setting</h3>
             <p className={styles.text}>{intro.text}</p>
-            <p className={ui.muted}>Summarised from the warband’s page on mordheimer.net. Take it as it is and rewrite it, or write your own.</p>
+            <p className={ui.muted}>The lore of the warband’s page on mordheimer.net, word for word. Take it as it is and rewrite it, or write your own.</p>
             <button type="button" className={ui.button} onClick={() => save((c) => core.setPrologue(c, intro.text), 'Prologue saved.')}>Use as the prologue</button>
           </div>
         )}
