@@ -80,6 +80,10 @@ describe('the Campaign tab', () => {
     // optional: starts without a place, the choice is a region of the lore
     const place = await within(sheet).findByLabelText('Place (optional)');
     expect((place as HTMLSelectElement).value).toBe('');
+    // a place below another names it, and nothing is pushed in with blanks before the name (report of 11.11.2026)
+    const labels = within(place).getAllByRole('option').map((o) => o.textContent ?? '');
+    expect(labels).toContain('Ostermark › Mordheim');
+    expect(labels.every((l) => l === l.trim() && !/^[\s\u00A0]/.test(l))).toBe(true);
     await user.selectOptions(place, 'mordheim');
     await user.click(within(sheet).getByRole('button', { name: 'Start it' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();

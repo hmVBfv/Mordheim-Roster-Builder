@@ -47,7 +47,7 @@ function StartSheet() {
               <span>Place{vanilla ? ' (the rulebook is set in Mordheim)' : ' (optional)'}</span>
               <select className={ui.select} value={vanilla ? 'mordheim' : place} disabled={vanilla} onChange={(e) => setPlace(e.target.value)}>
                 <option value="">No particular place</option>
-                {placeChoices(lore).map((p) => <option key={p.id} value={p.id}>{'\u00A0\u00A0'.repeat(p.depth)}{p.name}</option>)}
+                {placeChoices(lore).map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
               </select>
             </label>
           )}
