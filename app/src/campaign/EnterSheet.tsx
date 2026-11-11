@@ -12,6 +12,7 @@ import { ruleLabel } from '../roster/house.ts';
 import { useSheet } from '../ui/useSheet.ts';
 import type { CampaignView } from './api.ts';
 import styles from './Campaign.module.css';
+import { WarbandStamps } from '../routes/WarbandStamps.tsx';
 
 const Latecomer = lazy(() => import('./Latecomer.tsx').then((m) => ({ default: m.Latecomer })));
 
@@ -61,7 +62,7 @@ export function EnterSheet({ id, rules, vanilla = false, onDone }: { id: string;
               {free.map((w) => (
                 <label key={w.id} className={styles.choice}>
                   <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} disabled={!fits(w)} onChange={() => { setChosen(w.id); setOwn(''); }} />
-                  <span>{w.name}<small className={ui.noteLine}>{w.wbName}</small>{!fits(w) && <small className={ui.noteLine}>Not a warband of the rulebook: this campaign plays Vanilla Mordheim.</small>}</span>
+                  <span>{w.name}<small className={ui.noteLine}>{w.wbName}</small><span className={styles.stamps}><WarbandStamps w={w} copy /></span>{!fits(w) && <small className={ui.noteLine}>Not a warband of the rulebook: this campaign plays Vanilla Mordheim.</small>}</span>
                 </label>
               ))}
             </fieldset>
@@ -72,7 +73,7 @@ export function EnterSheet({ id, rules, vanilla = false, onDone }: { id: string;
               {planners.map((w) => (
                 <label key={w.id} className={styles.choice}>
                   <input type="radio" name="enter-warband" value={w.id} checked={chosen === w.id} onChange={() => { setChosen(w.id); setOwn(''); }} />
-                  <span>{w.name}<small className={ui.noteLine}>{w.wbName} · planner</small></span>
+                  <span>{w.name}<small className={ui.noteLine}>{w.wbName} · planner</small><span className={styles.stamps}><WarbandStamps w={w} copy /></span></span>
                 </label>
               ))}
             </fieldset>

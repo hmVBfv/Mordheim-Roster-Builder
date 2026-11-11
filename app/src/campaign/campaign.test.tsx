@@ -93,6 +93,32 @@ describe('the Campaign tab', () => {
     expect(await screen.findByText('Setup · Mordheim')).toBeTruthy();
   });
 
+  /* Report of 11.11.2026: two warbands of one name – one made here, one that came back free from another campaign – looked the same in the sheet that
+     enters a warband. Each says when it was made and last changed, and which is a copy. */
+  it('tells two warbands of one name apart in the sheet that enters a warband: when each was made and changed, and which is a copy', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
+    await db.warbands.add(record({ id: 'a', name: 'The Silver Caravan', createdAt: '2026-10-03T12:00:00.000Z', updatedAt: '2026-10-20T12:00:00.000Z' }));
+    await db.warbands.add(record({ id: 'b', name: 'The Silver Caravan', createdAt: '2026-11-02T12:00:00.000Z', updatedAt: '2026-11-02T12:00:00.000Z', origin: 'copy' }));
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Enter a warband' }));
+    const sheet = screen.getByRole('dialog', { name: 'Enter a warband' });
+    const rows = within(sheet).getAllByRole('radio').map((r) => r.closest('label')!);
+    expect(rows).toHaveLength(2);
+    // the newest comes first; which is which is told by what each says
+    const texts = rows.map((r) => r.textContent ?? '');
+    const first = texts.find((x) => /Created 3 Oct/.test(x))!;
+    const second = texts.find((x) => /Created 2 Nov/.test(x))!;
+    expect(first).toBeTruthy();
+    expect(second).toBeTruthy();
+    expect(first).not.toBe(second);
+    expect(first).toMatch(/Created 3 Oct, .*Updated 20 Oct, /);
+    expect(second).toMatch(/Created 2 Nov, .*Updated never/);
+    expect(second).toMatch(/A copy/);
+    expect(first).not.toMatch(/A copy/);
+  });
+
   it('the Campaign tab always shows the list, also with a single campaign (#75)', async () => {
     const srv = server();
     srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
