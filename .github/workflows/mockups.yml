@@ -28,6 +28,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: '22', cache: npm }
       - run: npm ci
+      - name: Public Ubuntu archive for apt
+        run: .github/scripts/public-apt-archive.sh
       - name: Browser for Playwright
         run: npx playwright install --with-deps chromium
         working-directory: app
