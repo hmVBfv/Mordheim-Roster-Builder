@@ -48,15 +48,17 @@ export function ancestors(lore: Lore, id: string): LoreEntry[] {
 }
 
 /** Every place for a choice, each directly under what contains it, the depth to indent by. */
-export function placeOptions(lore: Lore): { id: string; name: string; depth: number }[] {
+export function placeOptions(lore: Lore): { id: string; name: string; depth: number; /** What a picker shows: the place, after the one it lies in – "Ostermark › Mordheim" – never with blanks before it. */ label: string }[] {
   const regions = lore.entries.filter((e) => e.kind === 'region');
   const known = new Set(regions.map((r) => r.id));
   const kids = (parent: string | null) => regions.filter((r) => (r.parent && known.has(r.parent) ? r.parent : null) === parent).sort((a, b) => a.name.localeCompare(b.name));
-  const out: { id: string; name: string; depth: number }[] = [];
+  const out: { id: string; name: string; depth: number; label: string }[] = [];
+  const byId = new Map(regions.map((r) => [r.id, r]));
   const walk = (parent: string | null, depth: number, seen: Set<string>) => {
     for (const r of kids(parent)) {
       if (seen.has(r.id)) continue;
-      out.push({ id: r.id, name: r.name, depth });
+      const up = parent ? byId.get(parent)?.name : undefined;
+      out.push({ id: r.id, name: r.name, depth, label: up ? `${up} › ${r.name}` : r.name });
       walk(r.id, depth + 1, new Set([...seen, r.id]));
     }
   };

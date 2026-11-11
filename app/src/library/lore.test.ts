@@ -49,3 +49,16 @@ describe('the places of the lore', () => {
     expect(LORE.entries.every((x) => inPlace(LORE, x, ''))).toBe(true);
   });
 });
+
+/* Report of 11.11.2026: a place below another was shown in the picker with spaces before its name, which looked pushed in once it was chosen. Each
+   place names what it lies in instead, and has no leading space. */
+describe('the label of a place in a picker', () => {
+  it('names the place it lies in, and has no space or blank in front', () => {
+    const by = Object.fromEntries(placeOptions(LORE).map((p) => [p.id, p.label]));
+    expect(by.norsca).toBe('Norsca');
+    expect(by.ostermark).toBe('The empire › Ostermark');
+    expect(by.mordheim).toBe('Ostermark › Mordheim');
+    expect(placeOptions(LORE).every((p) => p.label === p.label.trim() && !/^[\s\u00A0]/.test(p.label))).toBe(true);
+  });
+});
+
