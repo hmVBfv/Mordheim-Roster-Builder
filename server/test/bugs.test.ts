@@ -318,11 +318,17 @@ describe('a report that carries the campaign (wish 253)', () => {
     expect(((await rob('GET', '/bugs?status=all')).json() as { bugs: unknown[] }).bugs).toHaveLength(2);
   });
 
-  it('a member who has left, or whose campaign is gone, may not attach it', async () => {
+  it('a member who has left may not attach it', async () => {
     const { s, k, l, id, report } = await campaignWorld();
     const lia = (s.db.prepare("SELECT id FROM users WHERE username = 'lia'").get() as { id: string }).id;
     expect((await k('DELETE', `/campaigns/${id}/members/${lia}`)).statusCode).toBeLessThan(300);
     expect((await l('POST', '/bugs', report({ attachCampaign: id }))).statusCode).toBe(403);
+  });
+
+  it('nor may a member of a campaign that was deleted', async () => {
+    const { k, v, id, report } = await campaignWorld();
+    expect((await k('DELETE', `/campaigns/${id}`, { name: 'The Hel Fenn Campaign' })).statusCode).toBeLessThan(300);
+    expect((await v('POST', '/bugs', report({ attachCampaign: id }))).statusCode).toBe(403);
   });
 
   it('carries only what every member sees: who is in the campaign now and the warbands that are entered, not those who left', async () => {

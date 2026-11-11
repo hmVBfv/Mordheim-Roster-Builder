@@ -54,6 +54,20 @@ describe('the reports that wait', () => {
     expect((await waitingReports('kai')).map((r) => r.id)).toEqual(['22222222-2222-4222-8222-222222222222']);
   });
 
+  it('lose only the attached campaign, not the words, when the member has left it by the time they go (wish 253)', async () => {
+    const sent: Record<string, unknown>[] = [];
+    vi.stubGlobal('fetch', vi.fn(async (_u: RequestInfo | URL, init?: RequestInit) => {
+      const b = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      sent.push(b);
+      return b.attachCampaign ? json(403, { error: 'forbidden' }) : json(201, { bug });
+    }));
+    await queueReport('kai', body('11111111-1111-4111-8111-111111111111', { attachCampaign: 'c-1', text: 'The round is wrong.' }));
+    expect(await flushReports('kai')).toBe(1);
+    expect(await waitingReports('kai')).toEqual([]);
+    expect(sent.map((b) => b.attachCampaign ?? null)).toEqual(['c-1', null]); // refused with it, sent without it
+    expect(sent[1]).toMatchObject({ id: '11111111-1111-4111-8111-111111111111', text: 'The round is wrong.' });
+  });
+
   it('are not sent as another account: the server refuses it and they wait for their author', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(409, { error: 'other_user' })));
     await queueReport('kai', body('11111111-1111-4111-8111-111111111111'));
