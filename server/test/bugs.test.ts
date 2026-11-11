@@ -3,6 +3,7 @@
    nobody else reads any. A warband travels along only when the reporter
    ticks it, and is dropped when the report is closed. */
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MAX_ATTACHMENT, MAX_PER_DAY } from '../src/bugs.ts';
 import { startAccounts } from './accounts-helpers.ts';
@@ -256,5 +257,80 @@ describe('problem reports', () => {
     expect(JSON.stringify(mine)).not.toMatch(/ZEBRA/);
     expect(mine.find((e) => e.action === 'bug.report')!.payload).toEqual({ kind: 'bug', attached: true });
     expect(s.db.prepare("SELECT count(*) AS n FROM audit_log WHERE action LIKE 'bug.%' AND visibility = 'admin'").get()).toEqual({ n: 2 });
+  });
+});
+
+describe('a report that carries the campaign (wish 253)', () => {
+  const SAVE = JSON.parse(readFileSync(new URL('../../app/e2e/fixtures/silver-caravan.json', import.meta.url), 'utf8')) as Record<string, unknown>;
+
+  /** Kai leads, Lia plays, Vic watches; Ben is outside. Hidden words sit in the background, the notes and the battle's title. */
+  async function campaignWorld() {
+    const { s, u, rob, report } = await table();
+    const kai = await s.user('kai', { totp: true }), lia = await s.user('lia'), vic = await s.user('vic');
+    const as = (x: { session: () => string }) => {
+      const token = x.session();
+      return (method: 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE', url: string, body?: unknown) => s.call({ method, url: `/api/v1${url}`, body: body ?? (method === 'GET' ? undefined : {}), token });
+    };
+    const k = as(kai), l = as(lia), v = as(vic), ben = as(u.ben);
+    const id = ((await k('POST', '/campaigns', { name: 'The Hel Fenn Campaign' })).json() as { campaign: { id: string } }).campaign.id;
+    await k('PUT', `/campaigns/${id}/members/${lia.id}`, { role: 'player' });
+    await k('PUT', `/campaigns/${id}/members/${vic.id}`, { role: 'viewer' });
+    const wid = randomUUID();
+    await k('POST', `/campaigns/${id}/enrolments`, { warbandId: wid, data: SAVE });
+    await k('POST', `/campaigns/${id}/battles`, { id: randomUUID(), title: 'BATTLE-TITLE-ZEBRA', warbandIds: [wid] });
+    await k('PUT', `/campaigns/${id}/background/${randomUUID()}`, { kind: 'thread', title: 'BACKGROUND-ZEBRA', truth: 'TRUTH-ZEBRA', status: 'active', reveal: 'hint' });
+    const detail = async (bugId: string) => ((await rob('GET', `/bugs/${bugId}`)).json() as { bug: Record<string, unknown> }).bug;
+    return { s, k, l, v, ben, rob, id, wid, report, detail };
+  }
+
+  it('a leader attaches the structure: members, warbands, battles, round, house rules – and nothing narrative', async () => {
+    const { k, rob, id, report, detail } = await campaignWorld();
+    const body = report({ attachCampaign: id });
+    const res = await k('POST', '/bugs', body);
+    expect(res.statusCode).toBe(201);
+    const bug = await detail(body.id);
+    const att = bug.campaignAttachment as { campaign: Record<string, unknown>; members: { name: string; role: string }[]; warbands: Record<string, unknown>[]; battles: Record<string, unknown>[] };
+    expect(att.campaign).toMatchObject({ id, name: 'The Hel Fenn Campaign', round: expect.any(Number) as number });
+    expect(att.members.map((m) => `${m.name}:${m.role}`).sort()).toEqual(['kai:leader', 'lia:player', 'vic:viewer']);
+    expect(att.warbands).toHaveLength(1);
+    expect(att.battles).toHaveLength(1);
+    expect(bug).toMatchObject({ campaignAttached: true });
+    // no words of the story: not the battle's title, not the background, not the warband's save
+    const text = JSON.stringify(att);
+    for (const hidden of ['BATTLE-TITLE-ZEBRA', 'BACKGROUND-ZEBRA', 'TRUTH-ZEBRA']) expect(text).not.toContain(hidden);
+    expect(Object.keys(att.warbands[0]!).sort()).toEqual(['fromRound', 'id', 'name', 'player', 'rev', 'status', 'type']); // a name and a place in the campaign, not the save
+    expect(((await rob('GET', '/bugs?status=all')).json() as { bugs: { campaignAttached: boolean }[] }).bugs[0]!.campaignAttached).toBe(true);
+  });
+
+  it('only a leader of that campaign may attach it; a player, a viewer, an outsider or a made-up id is refused and no report is made', async () => {
+    const { l, v, ben, rob, id, report } = await campaignWorld();
+    for (const who of [l, v, ben]) {
+      const body = report({ attachCampaign: id });
+      const res = await who('POST', '/bugs', body);
+      expect(res.statusCode).toBe(403);
+      expect(res.json()).toEqual({ error: 'forbidden' });
+    }
+    expect((await ben('POST', '/bugs', report({ attachCampaign: randomUUID() }))).statusCode).toBe(403);
+    expect((await ben('POST', '/bugs', report({ attachCampaign: 'not-an-id' }))).statusCode).toBe(400);
+    expect(((await rob('GET', '/bugs?status=all')).json() as { bugs: unknown[] }).bugs).toEqual([]);
+  });
+
+  it('a report without it carries none, and the reporter never reads it back', async () => {
+    const { k, id, report, detail } = await campaignWorld();
+    const plain = report();
+    await k('POST', '/bugs', plain);
+    expect(await detail(plain.id)).toMatchObject({ campaignAttached: false, campaignAttachment: null });
+    const withIt = report({ attachCampaign: id });
+    const sent = await k('POST', '/bugs', withIt);
+    expect(JSON.stringify(sent.json())).not.toContain('Hel Fenn');
+    expect(JSON.stringify((await k('GET', '/bugs/mine')).json())).not.toContain('Hel Fenn');
+  });
+
+  it('closing the report lets go of it, as of the warband copy', async () => {
+    const { k, rob, id, report, detail } = await campaignWorld();
+    const body = report({ attachCampaign: id });
+    await k('POST', '/bugs', body);
+    await rob('PATCH', `/bugs/${body.id}`, { status: 'closed' });
+    expect(await detail(body.id)).toMatchObject({ campaignAttached: false, campaignAttachment: null });
   });
 });

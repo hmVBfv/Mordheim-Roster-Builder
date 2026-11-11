@@ -30,6 +30,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
   const [sourceRef, setSourceRef] = useState('');
   const [details, setDetails] = useState(true);
   const [attach, setAttach] = useState(false);
+  const [attachCampaign, setAttachCampaign] = useState(false);
   // one id for this report: sending it again after a failure is still one report
   const [id] = useState(newId);
   const [phase, setPhase] = useState<'writing' | 'sending' | 'sent' | 'saved'>('writing');
@@ -40,6 +41,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
   // known on this device, the server out of reach: the report is written now and kept until it can go (wish #177)
   const known = FLAVOUR === 'campaign' ? (session.status === 'in' ? session.user.id : session.status === 'unreachable' ? session.user?.id ?? null : null) : null;
   const wb = FLAVOUR === 'campaign' && known ? snap.warband : null;
+  const campaign = FLAVOUR === 'campaign' && known ? snap.campaign : null;
   const written = text.trim().length > 0;
 
   const doc: ReportDoc = {
@@ -47,6 +49,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
     appVersion: __APP_VERSION__, device: details ? snap.device : '', view: details ? snap.context.screen : '', createdAt: null,
     context: details ? snap.context : null, jsErrors: details ? snap.errors : [],
     attached: attach && wb ? { warbandId: wb.id, rev: wb.rev, bytes: wb.kb * 1024 } : null,
+    campaign: attachCampaign && campaign ? campaign : null,
   };
 
   const why = FLAVOUR === 'quickbuild' ? 'The Quick Build has no campaign server. Copy the report and send it to Rob.'
@@ -68,6 +71,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
         const body: ReportBody = {
           id, kind, title: doc.title, text: doc.text, sourceRef: doc.sourceRef, appVersion: __APP_VERSION__, device: doc.device, view: doc.view, context: doc.context, jsErrors: doc.jsErrors,
           attach: copy,
+          ...(attachCampaign && campaign ? { attachCampaign: campaign.id } : {}),
         };
         if (later && known) { await queueReport(known, body); setPhase('saved'); onSent(); return; }
         try {
@@ -144,6 +148,12 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
         <label className={styles.check}>
           <input type="checkbox" checked={attach} onChange={(e) => setAttach(e.target.checked)} />
           <span>Attach “{wb.name}” as {wb.save ? 'the campaign shows it to you' : 'it is on this device'}<small>About {wb.kb} KB, with its names and story. Only Rob and Claude read it, and it is dropped when the report is closed.</small></span>
+        </label>
+      )}
+      {campaign && (
+        <label className={styles.check}>
+          <input type="checkbox" checked={attachCampaign} onChange={(e) => setAttachCampaign(e.target.checked)} />
+          <span>Attach the structure of “{campaign.name}”<small>Members, warbands, battles, round and house rules – no notes, no background, no story. Only Rob and Claude read it, and it is dropped when the report is closed.</small></span>
         </label>
       )}
       <details className={styles.details} open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>

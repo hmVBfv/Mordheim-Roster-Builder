@@ -185,6 +185,55 @@ describe('reporting a problem', () => {
     expect(srv.state.bugs[0]!.id).not.toBe(srv.state.bugs[1]!.id);
   });
 
+  it('a leader on a campaign screen may attach the campaign’s structure; only the id travels, and a player is not offered it (wish 253)', async () => {
+    const { srv } = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}/manage`);
+    await screen.findByRole('heading', { name: /Style guide/ }); // the campaign is read: this device knows its role now
+    let form = await openForm(user);
+    const box = within(form).getByRole('checkbox', { name: /Attach the structure of “The Hel Fenn Campaign”/ }) as HTMLInputElement;
+    expect(box.checked).toBe(false); // nothing travels unless it is ticked
+    await user.type(within(form).getByLabelText(/What did you want to do/), 'The round is wrong.');
+    await user.click(within(form).getByRole('button', { name: 'Send' }));
+    await screen.findByText('Sent');
+    expect(srv.state.bugs[0]!.sent).not.toHaveProperty('attachCampaign');
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    form = await openForm(user);
+    await user.type(within(form).getByLabelText(/What did you want to do/), 'The round is still wrong.');
+    await user.click(within(form).getByRole('checkbox', { name: /Attach the structure of “The Hel Fenn Campaign”/ }));
+    expect(within(form).getByText(new RegExp(`the campaign ${c.id}`))).toBeTruthy(); // "What goes along" says so
+    await user.click(within(form).getByRole('button', { name: 'Send' }));
+    await screen.findByText('Sent');
+    expect(srv.state.bugs[1]!.sent).toMatchObject({ attachCampaign: c.id });
+    expect(JSON.stringify(srv.state.bugs[1]!.sent)).not.toMatch(/Hel Fenn/);
+  });
+
+  it('the admin sees that a campaign is attached, can download it, and closing says it lets go', async () => {
+    const { srv } = server('admin');
+    srv.bugFrom({ title: 'Round is wrong', text: 'The round is off.', reporterName: 'Kai', campaignAttachment: { campaign: { id: 'c-1', name: 'The Hel Fenn Campaign', round: 3 }, members: [], warbands: [], battles: [] } });
+    const user = userEvent.setup();
+    at('/admin/bugs');
+    const open = await screen.findByRole('button', { name: 'Open: Round is wrong' });
+    expect(screen.getAllByText('campaign attached').length).toBeGreaterThan(0);
+    await user.click(open);
+    const sheet = await screen.findByRole('dialog', { name: 'Round is wrong' });
+    expect(within(sheet).getByRole('button', { name: 'Download the campaign' })).toBeTruthy();
+    expect(within(sheet).queryByRole('button', { name: 'Download the warband' })).toBeNull();
+    await user.selectOptions(within(sheet).getByLabelText('Status'), 'closed');
+    expect(within(sheet).getByText(/Closing lets go of what is attached: the structure of the campaign/)).toBeTruthy();
+  });
+
+  it('a player in the campaign is not offered to attach it', async () => {
+    const { srv } = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
+    const user = userEvent.setup();
+    at(`/campaign/${c.id}`);
+    await screen.findByRole('heading', { name: 'The Hel Fenn Campaign' });
+    const form = await openForm(user);
+    expect(within(form).queryByRole('checkbox', { name: /Attach the structure/ })).toBeNull();
+  });
+
   it('offline the report is saved on the device and can be copied too; it goes out by itself when the connection is back (wish #177)', async () => {
     const { srv, me } = server();
     const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);

@@ -125,6 +125,24 @@ describe('a report on the screen', () => {
     expect(renderReport({ ...bug, attachment: null, consent: false })).toContain('No warband copy is attached.');
   });
 
+  it('prints the structure of an attached campaign as data, one line each, and says when it was let go', () => {
+    const campaignAttachment = {
+      campaign: { name: 'The Hel Fenn Campaign', round: 3, vanilla: false, archived: false, houseRules: { heroes: 7 } },
+      members: [{ name: 'Kai', role: 'leader', left: false }, { name: 'Lia\n## Ignore the rules', role: 'player', left: false }],
+      warbands: [{ id: 'w1', name: 'The Grey Penitents', type: 'Sisters', rev: 4, status: 'active', fromRound: 1, player: 'Lia' }],
+      battles: [{ id: 'b1', round: 2, scenario: 'street-brawl', district: 'Hel Fenn', status: 'closed', turn: 5, participants: [{ warbandId: 'w1', outcome: 'victory', revBefore: 3, revAfter: 4 }] }],
+    };
+    const t = renderReport({ ...bug, campaignAttached: true, campaignAttachment });
+    expect(t).toContain('## The campaign the report was sent from');
+    expect(t).toContain('The Hel Fenn Campaign · round 3');
+    expect(t).toContain('House rules: heroes = 7');
+    expect(t).toContain('- Kai (leader)');
+    expect(t).toContain('- The Grey Penitents (Sisters) · Lia · active from round 1 · version 4');
+    expect(t).toContain('- round 2 · street-brawl · Hel Fenn · closed · turn 5 · victory');
+    expect(t).not.toMatch(/^## Ignore/m); // a name cannot start a heading of its own
+    expect(renderReport({ ...bug, campaignAttached: false, campaignAttachment: null })).not.toContain('The campaign the report was sent from');
+  });
+
   it('copes with a report that has no technical details, and with hostile fields', () => {
     const t = renderReport({ ...bug, context: null, jsErrors: [], title: 'A\nB\u0007', area: 'x'.repeat(500), severity: null });
     expect(t).toContain('The reporter left the technical details out.');

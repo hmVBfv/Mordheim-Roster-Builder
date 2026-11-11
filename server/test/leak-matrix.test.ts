@@ -260,14 +260,16 @@ describe('leak-test matrix', () => {
     const ledDraftId = draft(led, admin.id, 'Der Entwurf', 'Ein Entwurf, der veröffentlicht wird.');
     const spareDraftId = draft(led, admin.id, 'Ein zweiter Entwurf', 'Ein Entwurf, der verworfen wird.');
     // problem reports: the player's own one, which the probes read and sort, and two of the victim's – their words and a warband copy – that no role of the matrix may read in the list or among their own
-    const bug = (by: string, title: string, text: string, save?: Record<string, unknown>) => {
+    const bug = (by: string, title: string, text: string, save?: Record<string, unknown>, campaignId?: string) => {
       const id = randomUUID();
-      const r = reportBug(s.db, by, { id, kind: 'bug', title, text, sourceRef: '', appVersion: '', device: '', view: '', context: null, jsErrors: [], attach: save ? { warbandId: randomUUID(), rev: 1, save } : null }, t0);
+      const r = reportBug(s.db, by, { id, kind: 'bug', title, text, sourceRef: '', appVersion: '', device: '', view: '', context: null, jsErrors: [], attach: save ? { warbandId: randomUUID(), rev: 1, save } : null, attachCampaign: campaignId ?? null }, t0);
       if (!r.ok) throw new Error(r.error);
       return id;
     };
     const bugId = bug(player.id, 'The roster does not scroll', 'It stops at the third hero.');
     bug(victim.id, 'Gold drifts', 'BUG-SECRET: the Countess pays the ferryman.', { name: 'BUG-SECRET: the Countess’s warband' });
+    // and one of the victim's that carries the structure of their campaign (wish 253): only the admin may read it, and the matrix reads none of the victim's
+    bug(victim.id, 'The round is off', 'BUG-SECRET: the round counter.', undefined, theirs.id);
     const ctx: ProbeContext = {
       victimId: victim.id, victimName: victim.username,
       inviteToken: s.invite().token, spareInviteId: s.invite().id,

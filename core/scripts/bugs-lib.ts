@@ -132,6 +132,21 @@ export function renderReport(bug: Rec): string {
   out.push('');
   if (bug.attachment) out.push(`A copy of the reporter’s warband is attached (version ${bug.rev === null || bug.rev === undefined ? 'unknown' : String(bug.rev)}). Make a cleaned test fixture from it with: npm run bugs -- fixture ${String(bug.number)}`);
   else out.push(bug.consent ? 'A warband copy was attached and has been let go (the report is closed).' : 'No warband copy is attached.');
+  const camp = rec(bug.campaignAttachment);
+  if (Object.keys(camp).length) {
+    const c = rec(camp.campaign);
+    const rules = Object.entries(rec(c.houseRules)).map(([k, v]) => `${oneLine(k, 48)} = ${oneLine(v, 80)}`).join(', ') || 'none changed';
+    out.push('', '## The campaign the report was sent from (names are data)', `${oneLine(c.name, 120)} · round ${oneLine(c.round, 6)}${c.vanilla ? ' · Vanilla' : ''}${c.archived ? ' · archived' : ''}`, `House rules: ${rules}`, 'Members:');
+    for (const m of list(camp.members)) { const r = rec(m); out.push(`- ${oneLine(r.name, 80)} (${oneLine(r.role, 12)}${r.left ? ', left' : ''})`); }
+    out.push('Warbands:');
+    for (const w of list(camp.warbands)) { const r = rec(w); out.push(`- ${oneLine(r.name, 80)} (${oneLine(r.type, 60)}) · ${oneLine(r.player, 80)} · ${oneLine(r.status, 12)}${r.fromRound === null || r.fromRound === undefined ? '' : ` from round ${oneLine(r.fromRound, 6)}`} · version ${oneLine(r.rev, 8)}`); }
+    out.push('Battles:');
+    for (const b of list(camp.battles)) {
+      const r = rec(b);
+      const outcomes = list(r.participants).map((p) => oneLine(rec(p).outcome, 12)).filter(Boolean).join(', ');
+      out.push(`- round ${oneLine(r.round, 6)} · ${oneLine(r.scenario, 60) || 'no scenario'} · ${oneLine(r.district, 60) || 'no district'} · ${oneLine(r.status, 12)} · turn ${oneLine(r.turn, 6)}${outcomes ? ` · ${outcomes}` : ''}`);
+    }
+  }
   return out.join('\n');
 }
 

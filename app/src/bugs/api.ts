@@ -21,12 +21,12 @@ export interface MyBug { id: string; /** What people say: "bug 7". */ number: nu
 /** One line of the admin's list. */
 export interface BugSummary {
   id: string; /** What people say: "bug 7", and what a fix's commit names (`Fix #7`). */ number: number; reporterId: string; reporterName: string; kind: BugKind; title: string; status: BugStatus; severity: Severity | null; area: string; /** The admin's short heading over the report; empty until one is written. */ headline: string;
-  appVersion: string; view: string; fixedIn: string; consent: boolean; attached: boolean; createdAt: string; updatedAt: string;
+  appVersion: string; view: string; fixedIn: string; consent: boolean; attached: boolean; campaignAttached: boolean; createdAt: string; updatedAt: string;
 }
 
 /** The admin's whole report. */
 export interface BugDetail extends BugSummary {
-  text: string; sourceRef: string; device: string; jsErrors: CapturedError[]; context: ReportContext | null; warbandId: string | null; rev: number | null; attachment: Record<string, unknown> | null;
+  text: string; sourceRef: string; device: string; jsErrors: CapturedError[]; context: ReportContext | null; warbandId: string | null; rev: number | null; attachment: Record<string, unknown> | null; campaignAttachment: Record<string, unknown> | null;
 }
 
 /** What a report sends (server/src/bugs.ts ReportBody). */
@@ -42,6 +42,8 @@ export interface ReportBody {
   context: ReportContext | null;
   jsErrors: CapturedError[];
   attach: { warbandId: string; rev: number | null; save: Record<string, unknown> } | null;
+  /** A leader's tick: the id of the campaign whose structure the server attaches (wish 253). */
+  attachCampaign?: string | null;
 }
 
 /** Whoever shows the reporter's own list wants to know when a report went out. */
