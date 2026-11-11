@@ -69,6 +69,11 @@
   margin: 0;
 }
 
+/* the text under a heading is at the section's gap, not at the browser's margin on top of it (it sat further from its heading than the block above did) */
+.section > p {
+  margin: 0;
+}
+
 /* a member: name and role on one line, the role's select beside */
 .member {
   display: flex;
