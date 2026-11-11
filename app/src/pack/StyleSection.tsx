@@ -8,6 +8,8 @@ import { errorText } from '../account/api.ts';
 import { useOnline } from '../app/SyncState.tsx';
 import campaign from '../campaign/Campaign.module.css';
 import ui from '../ui/ui.module.css';
+import styles from './StyleChips.module.css';
+import { CHIP_GROUPS, isOn, toggleChip } from './styleChips.ts';
 import { cachedStyle, getStyle, MAX_STYLE, putStyle, staleStyle, type Style } from './api.ts';
 
 const EMPTY: Style = { text: '', updatedBy: null, updatedAt: null, seq: 0 };
@@ -66,6 +68,24 @@ export function StyleSection({ id }: { id: string }) {
         <textarea id={`${ids}-t`} className={`${ui.textarea} ${ui.writing}`} rows={6} value={text} maxLength={MAX_STYLE} disabled={!loaded && !message}
           placeholder="German, past tense, close third person. No dice, no game terms." onChange={(e) => { typed.current = true; setText(e.target.value); setMessage(null); }} />
       </div>
+      <details className={styles.chips}>
+        <summary className={ui.fold}>Quick choices</summary>
+        {CHIP_GROUPS.map((g) => (
+          <div key={g.key} className={styles.chipGroup} role="group" aria-label={g.title}>
+            <span className={styles.chipTitle}>{g.title}</span>
+            {g.options.map((o) => {
+              const on = isOn(text, o);
+              return (
+                <button key={o.line} type="button" className={`${styles.pick} ${on ? styles.pickOn : ''}`} aria-pressed={on}
+                  disabled={!loaded && !message}
+                  onClick={() => { typed.current = true; setText(toggleChip(text, g, o).slice(0, MAX_STYLE)); setMessage(null); }}>
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </details>
       {message && <p className={`${ui.message} ${message.error ? ui.error : ''}`} role={message.error ? 'alert' : 'status'}>{message.text}</p>}
       <div className={ui.row}>
         <button type="button" className={ui.button} disabled={!online || busy || !changed} onClick={save}>Save the style</button>

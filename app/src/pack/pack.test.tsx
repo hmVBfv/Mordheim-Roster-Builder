@@ -312,6 +312,33 @@ describe('the style guide', () => {
     expect(save.hasAttribute('disabled')).toBe(true);
   });
 
+  it('quick choices sit in a closed fold and write lines into the text, which the leader can still edit', async () => {
+    const srv = server({ totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [{ player: 'Anna', data: saveOf('The Grey Penitents') }] });
+    const user = userEvent.setup();
+    manage(c.id);
+    const box = (await screen.findByLabelText('Instructions for the writer')) as HTMLTextAreaElement;
+    await waitFor(() => expect(box.disabled).toBe(false));
+    const fold = screen.getByText('Quick choices').closest('details')!;
+    expect(fold.open).toBe(false); // the page stays calm until asked
+    await user.click(screen.getByText('Quick choices'));
+    const german = screen.getByRole('button', { name: 'German' });
+    expect(german.getAttribute('aria-pressed')).toBe('false');
+    await user.click(german);
+    expect(box.value).toBe('Language: German.');
+    expect(german.getAttribute('aria-pressed')).toBe('true');
+    await user.click(screen.getByRole('button', { name: 'English' }));
+    expect(box.value).toBe('Language: English.'); // one language, not two
+    await user.click(screen.getByRole('button', { name: 'No dice' }));
+    await user.click(screen.getByRole('button', { name: 'No game terms' }));
+    expect(box.value.split('\n')).toEqual(['Language: English.', 'Keep out: dice.', 'Keep out: game terms.']);
+    await user.click(screen.getByRole('button', { name: 'No dice' }));
+    expect(box.value).not.toMatch(/dice/);
+    await user.click(screen.getByRole('button', { name: 'Save the style' }));
+    expect(await screen.findByText('Style guide saved.')).toBeTruthy();
+    expect(srv.state.styles.get(c.id)!.text).toBe('Language: English.\nKeep out: game terms.');
+  });
+
   it('shows what is there, and what the leader has typed is not overwritten by what arrives', async () => {
     const srv = server({ totp: true });
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others: [{ player: 'Anna', data: saveOf('The Grey Penitents') }] });
