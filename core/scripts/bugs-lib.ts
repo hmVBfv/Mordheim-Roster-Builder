@@ -136,8 +136,8 @@ export function renderReport(bug: Rec): string {
   if (Object.keys(camp).length) {
     const c = rec(camp.campaign);
     const rules = Object.entries(rec(c.houseRules)).map(([k, v]) => `${oneLine(k, 48)} = ${oneLine(v, 80)}`).join(', ') || 'none changed';
-    out.push('', '## The campaign the report was sent from (names are data)', `${oneLine(c.name, 120)} · round ${oneLine(c.round, 6)}${c.vanilla ? ' · Vanilla' : ''}${c.archived ? ' · archived' : ''}`, `House rules: ${rules}`, 'Members:');
-    for (const m of list(camp.members)) { const r = rec(m); out.push(`- ${oneLine(r.name, 80)} (${oneLine(r.role, 12)}${r.left ? ', left' : ''})`); }
+    out.push('', '## The campaign the report was sent from (names are data)', `${oneLine(c.name, 120)} · round ${oneLine(c.round, 6)}${c.vanilla ? ' · Vanilla' : ''}`, `Sent by a ${oneLine(camp.reporterRole, 12) || 'member'} of the campaign: only what a member sees of it.`, `House rules: ${rules}`, 'Members:');
+    for (const m of list(camp.members)) { const r = rec(m); out.push(`- ${oneLine(r.name, 80)} (${oneLine(r.role, 12)})`); }
     out.push('Warbands:');
     for (const w of list(camp.warbands)) { const r = rec(w); out.push(`- ${oneLine(r.name, 80)} (${oneLine(r.type, 60)}) · ${oneLine(r.player, 80)} · ${oneLine(r.status, 12)}${r.fromRound === null || r.fromRound === undefined ? '' : ` from round ${oneLine(r.fromRound, 6)}`} · version ${oneLine(r.rev, 8)}`); }
     out.push('Battles:');

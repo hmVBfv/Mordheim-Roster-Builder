@@ -22,7 +22,7 @@ export interface Snapshot {
   errors: CapturedError[];
   device: string;
   warband: AttachableWarband | null;
-  /** The campaign in view, offered for attaching its structure – only to a leader of it (wish 253). The server builds it; only the id travels. */
+  /** The campaign in view, offered for attaching its structure – to any member of it, as they see it (wish 253). The server builds it; only the id travels. */
   campaign: { id: string; name: string } | null;
 }
 
@@ -58,7 +58,7 @@ export async function takeSnapshot(pathname: string, now: Date = new Date()): Pr
     const view = (await db.meta.get(campaignKey(campaignId)))?.value as { role?: string; campaign?: { name?: string; houseRules?: unknown } } | undefined;
     role = view?.role ?? null;
     campaignHouse = view?.campaign?.houseRules ?? null;
-    if (role === 'leader' && view?.campaign?.name) campaign = { id: campaignId, name: view.campaign.name };
+    if (role && view?.campaign?.name) campaign = { id: campaignId, name: view.campaign.name };
   }
   return {
     pathname,

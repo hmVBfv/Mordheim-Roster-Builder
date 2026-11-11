@@ -185,7 +185,7 @@ describe('reporting a problem', () => {
     expect(srv.state.bugs[0]!.id).not.toBe(srv.state.bugs[1]!.id);
   });
 
-  it('a leader on a campaign screen may attach the campaign’s structure; only the id travels, and a player is not offered it (wish 253)', async () => {
+  it('a member on a campaign screen may attach the campaign’s structure; only the id travels (wish 253)', async () => {
     const { srv } = server();
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'leader' });
     const user = userEvent.setup();
@@ -224,14 +224,20 @@ describe('reporting a problem', () => {
     expect(within(sheet).getByText(/Closing lets go of what is attached: the structure of the campaign/)).toBeTruthy();
   });
 
-  it('a player in the campaign is not offered to attach it', async () => {
+  it('a player or a viewer is offered the campaign too, with the words that say it is only what they see', async () => {
     const { srv } = server();
-    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
     const user = userEvent.setup();
-    at(`/campaign/${c.id}`);
-    await screen.findByRole('heading', { name: 'The Hel Fenn Campaign' });
-    const form = await openForm(user);
-    expect(within(form).queryByRole('checkbox', { name: /Attach the structure/ })).toBeNull();
+    for (const role of ['player', 'viewer'] as const) {
+      const c = srv.addCampaign({ name: `Campaign of the ${role}`, role });
+      const view = at(`/campaign/${c.id}`);
+      await screen.findByRole('heading', { name: `Campaign of the ${role}` });
+      const form = await openForm(user);
+      const box = within(form).getByRole('checkbox', { name: new RegExp(`Attach the structure of “Campaign of the ${role}”`) }) as HTMLInputElement;
+      expect(box.checked).toBe(false);
+      expect(within(form).getByText(/as you see them/)).toBeTruthy();
+      await user.click(within(form).getByRole('button', { name: 'Cancel' }));
+      view.unmount();
+    }
   });
 
   it('offline the report is saved on the device and can be copied too; it goes out by itself when the connection is back (wish #177)', async () => {

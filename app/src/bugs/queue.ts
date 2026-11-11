@@ -38,7 +38,13 @@ export function flushReports(userId: string): Promise<number> {
     try {
       for (const body of await waitingReports(userId)) {
         try {
-          await api('/bugs', { body, as: userId });
+          try {
+            await api('/bugs', { body, as: userId });
+          } catch (e) {
+            // the member left the campaign while the report waited: the words still go, without the structure
+            if (!(e instanceof ApiError && e.code === 'forbidden' && body.attachCampaign)) throw e;
+            await api('/bugs', { body: { ...body, attachCampaign: null }, as: userId });
+          }
         } catch (e) {
           // not there, signed out, or the device belongs to another account now: it waits for its author, and so does everything after it
           if (e instanceof ApiError && (e.unreachable || e.code === 'sign_in' || e.code === 'other_user')) break;
