@@ -4932,3 +4932,12 @@ decides which one applies.
   prologue: it is long for the Cursed Cavalcade, and that is what was asked for.
 - **A wrong turn in the working, not in the code:** a failing check was followed by a commit because the steps were chained with `;`. The commit stayed
   local and the check was repeated before anything was pushed; the chain uses `&&` now.
+
+**The run of 11.11.2026: six reports on the campaign screens (PRs 396–401).**
+
+- **#249, the place picker (PR 396).** The picker indented sub-places with non-breaking spaces, which read as noise on a phone. Each option now names its parent ("Region › Place"). The test was written together with the fix and never seen red; noted, not ideal.
+- **#250, headings on Manage (PR 397).** The cause was the browser's default paragraph margin inside the grid sections (measured 16 px above, 26 px below the heading). A measuring e2e test pins "closer to its text than to the block above".
+- **#254, the role as a chip (PR 398).** The role is a chip at the end of the status line; leaders get a flag and the gold colour. The member list's flag is `aria-hidden`, so the test reads "Anna⚑ Leader".
+- **#252, warbands of one name (PR 399).** Created/updated stamps and an "A copy" marker, one shared component for the list and the enter sheet. First test attempt assumed row order (newest comes first); it now finds rows by content. Stacked on #254 because both append to `Campaign.module.css`; the trial merge showed a conflict seam that swallowed a closing brace, so the stack was rebased instead of patched in the merge.
+- **#251, style guide chips (PR 400).** A closed "Quick choices" fold with seven kinds of chip. The text stays the only truth: a chip is on when its line is in it, so hand edits keep working. Rob asked for more kinds than first proposed but a calm page; hence one fold and one row per kind.
+- **#253, campaign structure on a report (PR 401).** Only the id travels; the server checks the leader role and builds the structure itself, so the client cannot smuggle anything in and no narrative field can slip through. Reviewed by the reviewer agent (APPROVE). Its suggestion of a matrix probe was not taken, as the matrix works on whole role sets; the refusals are tested in `bugs.test.ts`.
