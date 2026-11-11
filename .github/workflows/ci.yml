@@ -97,6 +97,8 @@ jobs:
         env: { APP_VERSION: '${{ github.sha }}' }
       - name: Size budget (docs/ui.md)
         run: npm run size -w app
+      - name: Public Ubuntu archive for apt
+        run: .github/scripts/public-apt-archive.sh
       - name: Browser for Playwright
         run: npx playwright install --with-deps chromium
         working-directory: app
@@ -153,6 +155,8 @@ jobs:
           ROSTER_TAG=test docker compose -f "$RUNNER_TEMP/rendered/compose.yaml" config -q
       - name: Caddy with its hardening on 443, keeping the app's own CSP
         run: sudo ops/test/caddy.sh
+      - name: Public Ubuntu archive for apt
+        run: .github/scripts/public-apt-archive.sh
       - name: Tools for the ops test
         timeout-minutes: 8
         run: |
