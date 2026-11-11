@@ -86,7 +86,7 @@ describe('the history of a running campaign', () => {
     await user.selectOptions(within(next).getByRole('combobox', { name: /Die Silberne Karavane/ }), '-');
     await user.click(within(next).getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('Battle 2 is in the history.')).toBeTruthy();
-    expect(screen.getByText(/After battle 2 · you are leader/)).toBeTruthy();
+    expect(screen.getByText('After battle 2')).toBeTruthy();
     expect(within(screen.getByRole('list', { name: 'Battles before the app' })).getAllByRole('listitem').map((x) => x.textContent)).toEqual([
       'Battle 1 · Das Urteil im Nebel12 June 2026 · Die Silberne Karavane · Rangvald\'s ReaversChange',
       'Battle 2Rangvald\'s ReaversChange',
@@ -99,7 +99,7 @@ describe('the history of a running campaign', () => {
     expect((within(change).getByRole('combobox', { name: /Die Silberne Karavane/ }) as HTMLSelectElement).value).toBe('-');
     await user.click(within(change).getByRole('button', { name: 'Take it out' }));
     expect(await screen.findByText('Taken out of the history.')).toBeTruthy();
-    expect(screen.getByText(/After battle 1 · you are leader/)).toBeTruthy();
+    expect(screen.getByText('After battle 1')).toBeTruthy();
   });
 
   it('with notes about it, taking it out is asked once more; then they go with it (report #35)', async () => {

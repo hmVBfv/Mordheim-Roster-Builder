@@ -310,3 +310,23 @@
 .grant { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); }
 .grant small { color: var(--text-muted); }
 .grantStep { display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+
+/* a leader's chip is marked: the accent and the flag in front of the name */
+.leaderChip {
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* the line under the name of a campaign: where it stands, and at the end of the line what one is in it */
+.statusLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.statusLine .chip {
+  margin-left: auto;
+}

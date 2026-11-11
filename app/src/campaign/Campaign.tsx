@@ -20,6 +20,7 @@ import {
   type CampaignRole, type CampaignView,
 } from './api.ts';
 import styles from './Campaign.module.css';
+import { RoleChip } from './RoleChip.tsx';
 import { campaignTabs } from './tabs.ts';
 import { EnterSheet } from './EnterSheet.tsx';
 import { usePlaceName } from './place.ts';
@@ -116,7 +117,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
             {view.members.map((m) => (
               <li key={m.userId} className={styles.crewMember}>
                 <span>{m.displayName}</span>
-                <span className={styles.chip}>{ROLE_NAMES[m.role]}</span>
+                <RoleChip role={m.role} />
               </li>
             ))}
           </ul>
@@ -378,7 +379,10 @@ export function Campaign() {
     <section className={`${ui.page} ${prose ? ui.measure : ''}`}>
       <header>
         <h1>{view.campaign.name}</h1>
-        <p className={ui.muted}>{roundName(view.campaign.round)} · you are {view.role === 'viewer' ? 'watching' : ROLE_NAMES[view.role].toLowerCase()}{place ? ` · ${place}` : ''}{view.campaign.vanilla ? ' · Vanilla Mordheim' : ''}</p>
+        <p className={`${ui.muted} ${styles.statusLine}`}>
+          <span>{[roundName(view.campaign.round), place, view.campaign.vanilla ? 'Vanilla Mordheim' : null].filter(Boolean).join(' · ')}</span>
+          <RoleChip role={view.role} />
+        </p>
       </header>
       {error && <p className={ui.message} role="status">{error} Shown as last seen.</p>}
       {/* on a phone the sections are tabs here; from tablet width on they stand in the side navigation */}
