@@ -89,6 +89,25 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Report of 11.11.2026 (as #139 for the Export page): on Manage every heading sits closer to its own text than to the block above it. */
+test('the headings of Manage sit closer to their text than to the block above', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  const srv = await playServer(page, true, { totp: true });
+  const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
+  await page.goto(`campaign/${c.id}/manage`);
+  await expect(page.getByRole('heading', { name: 'Waiting for a leader' })).toBeVisible();
+  const gaps = await page.evaluate(() => [...document.querySelectorAll('main h2, main h3')].flatMap((h) => {
+    const r = h.getBoundingClientRect();
+    const above = h.closest('section, form')?.previousElementSibling ?? h.previousElementSibling;
+    const below = h.nextElementSibling;
+    // the first heading of a column has nothing above it, a heading with nothing under it nothing below
+    if (!above || !below || h.closest('dialog')) return [];
+    return [{ title: h.textContent, up: Math.round(r.top - above.getBoundingClientRect().bottom), down: Math.round(below.getBoundingClientRect().top - r.bottom) }];
+  }));
+  expect(gaps.length).toBeGreaterThan(5);
+  for (const g of gaps) expect(g.up, `${g.title}: room above ${g.up}, room below ${g.down}`).toBeGreaterThan(g.down);
+});
+
 test('a leader manages: confirms a warband, adds someone, changes a role', async ({ page }) => {
   const srv = await playServer(page, true, { totp: true });
   const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', others });
