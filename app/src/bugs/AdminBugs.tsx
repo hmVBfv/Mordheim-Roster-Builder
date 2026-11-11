@@ -30,6 +30,7 @@ export function docOf(b: BugDetail): ReportDoc {
     reporter: b.reporterName, status: STATUS_NAMES[b.status].toLowerCase(), severity: b.severity, area: b.area, fixedIn: b.fixedIn ? shownVersion(b.fixedIn) : '',
     context: b.context, jsErrors: b.jsErrors, consent: b.consent,
     attached: b.attachment ? { warbandId: b.warbandId ?? '', rev: b.rev, bytes: JSON.stringify(b.attachment).length } : null,
+    campaign: b.campaignAttachment ? { id: String((b.campaignAttachment.campaign as { id?: string } | undefined)?.id ?? ''), name: String((b.campaignAttachment.campaign as { name?: string } | undefined)?.name ?? '') } : null,
   };
 }
 
@@ -42,7 +43,7 @@ function Flags({ b }: { b: BugSummary }) {
       <span className={`${styles.flag} ${b.status === 'fixed' ? styles.good : ''}`}>{STATUS_NAMES[b.status]}{b.status === 'fixed' && b.fixedIn ? ` in ${shownVersion(b.fixedIn)}` : ''}</span>
       {b.severity && <span className={`${styles.flag} ${b.severity === 'S1' ? styles.flagS1 : ''}`}>{b.severity}</span>}
       {b.area && <span className={styles.flag}>{b.area}</span>}
-      {b.attached && <span className={styles.flag}>warband attached</span>}
+      {b.attached && <span className={styles.flag}>warband attached</span>}{b.campaignAttached && <span className={styles.flag}>campaign attached</span>}
     </div>
   );
 }
@@ -111,7 +112,7 @@ function Sorter({ bug, onSaved, onNotice, close }: { bug: BugDetail; onSaved: (b
           </label>
         )}
       </div>
-      {(status === 'closed' || status === 'duplicate') && bug.attachment && <p className={ui.muted}>Closing lets go of the copy of the warband.</p>}
+      {(status === 'closed' || status === 'duplicate') && (bug.attachment || bug.campaignAttachment) && <p className={ui.muted}>Closing lets go of what is attached: {bug.attachment && bug.campaignAttachment ? 'the warband and the campaign' : bug.attachment ? 'the copy of the warband' : 'the structure of the campaign'}.</p>}
       {error && <p className={`${ui.message} ${ui.error}`} role="alert">{error}</p>}
       <div className={ui.actions}>
         <button type="button" className={ui.buttonQuiet} onClick={close}>Close</button>
@@ -194,7 +195,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
                   <td data-label="#">{b.number}</td>
                   <td data-label="Report" className={styles.titleCell}>
                     <strong>{b.headline || b.title}</strong>
-                    {b.attached && <span className={styles.flag}>warband attached</span>}
+                    {b.attached && <span className={styles.flag}>warband attached</span>}{b.campaignAttached && <span className={styles.flag}>campaign attached</span>}
                   </td>
                   <td data-label="Kind">{KIND_NAMES[b.kind]}</td>
                   <td data-label="Status"><span className={b.status === 'fixed' ? styles.good : undefined}>{STATUS_NAMES[b.status]}</span>{b.status === 'fixed' && b.fixedIn ? ` in ${shownVersion(b.fixedIn)}` : ''}</td>
@@ -223,6 +224,7 @@ export function AdminBugs({ onNotice }: { onNotice: (t: string) => void }) {
               <button type="button" className={ui.button} onClick={copy}>Copy for Claude</button>
               <button type="button" className={ui.buttonQuiet} onClick={() => saveFile(`${fileBase(chosen)}.md`, reportText(docOf(chosen)), 'text/markdown')}>Download the report</button>
               {chosen.attachment && <button type="button" className={ui.buttonQuiet} onClick={() => saveFile(`${fileBase(chosen)}-warband.json`, JSON.stringify(chosen.attachment, null, 2), 'application/json')}>Download the warband</button>}
+              {chosen.campaignAttachment && <button type="button" className={ui.buttonQuiet} onClick={() => saveFile(`${fileBase(chosen)}-campaign.json`, JSON.stringify(chosen.campaignAttachment, null, 2), 'application/json')}>Download the campaign</button>}
             </div>
             <details className={styles.details}>
               <summary className={ui.fold}>Everything that came with it</summary>

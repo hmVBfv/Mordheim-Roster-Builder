@@ -57,6 +57,14 @@ describe('the snapshot at the moment of reporting', () => {
     expect(snap.warband).toBeNull();
   });
 
+  it('offers the campaign for attaching only to a leader of it (wish 253)', async () => {
+    await db.meta.put({ key: campaignKey('c-1'), value: { role: 'leader', campaign: { name: 'The Hel Fenn Campaign', houseRules: {} } } });
+    await db.meta.put({ key: campaignKey('c-2'), value: { role: 'player', campaign: { name: 'Not yours to attach', houseRules: {} } } });
+    expect((await takeSnapshot('/campaign/c-1/world')).campaign).toEqual({ id: 'c-1', name: 'The Hel Fenn Campaign' });
+    expect((await takeSnapshot('/campaign/c-2/world')).campaign).toBeNull();
+    expect((await takeSnapshot('/account')).campaign).toBeNull();
+  });
+
   it('is fine where there is nothing in view', async () => {
     const snap = await takeSnapshot('/account');
     expect(snap.context.houseRules).toEqual({ warband: null, campaign: null });

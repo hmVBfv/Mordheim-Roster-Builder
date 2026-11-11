@@ -111,7 +111,7 @@ export interface FakeScenario {
 export interface FakeBug {
   id: string; number: number; reporterId: string; reporterName: string; kind: 'bug' | 'wish' | 'rules'; title: string; text: string; sourceRef: string;
   status: 'new' | 'confirmed' | 'in_progress' | 'fixed' | 'closed' | 'duplicate'; severity: 'S1' | 'S2' | 'S3' | 'S4' | null; area: string; headline: string; fixedIn: string;
-  appVersion: string; device: string; view: string; context: unknown; jsErrors: unknown[]; warbandId: string | null; rev: number | null; consent: boolean; attachment: unknown;
+  appVersion: string; device: string; view: string; context: unknown; jsErrors: unknown[]; warbandId: string | null; rev: number | null; consent: boolean; attachment: unknown; campaignAttachment?: unknown;
   createdAt: string; updatedAt: string;
   /** The body as it was sent. */
   sent: Record<string, unknown>;
@@ -1322,9 +1322,9 @@ export function createFakeSync(opts: {
   const bugMine = (b: FakeBug) => ({ id: b.id, number: b.number, headline: b.headline, kind: b.kind, title: b.title, text: b.text, sourceRef: b.sourceRef, status: b.status, fixedIn: b.fixedIn, createdAt: b.createdAt, updatedAt: b.updatedAt });
   const bugSummary = (b: FakeBug) => ({
     id: b.id, number: b.number, reporterId: b.reporterId, reporterName: b.reporterName, kind: b.kind, title: b.title, status: b.status, severity: b.severity, area: b.area, headline: b.headline, appVersion: b.appVersion, view: b.view,
-    fixedIn: b.fixedIn, consent: b.consent, attached: b.attachment !== null, createdAt: b.createdAt, updatedAt: b.updatedAt,
+    fixedIn: b.fixedIn, consent: b.consent, attached: b.attachment !== null, campaignAttached: b.campaignAttachment != null, createdAt: b.createdAt, updatedAt: b.updatedAt,
   });
-  const bugDetail = (b: FakeBug) => ({ ...bugSummary(b), text: b.text, sourceRef: b.sourceRef, device: b.device, jsErrors: b.jsErrors, context: b.context, warbandId: b.warbandId, rev: b.rev, attachment: b.attachment });
+  const bugDetail = (b: FakeBug) => ({ ...bugSummary(b), text: b.text, sourceRef: b.sourceRef, device: b.device, jsErrors: b.jsErrors, context: b.context, warbandId: b.warbandId, rev: b.rev, attachment: b.attachment, campaignAttachment: b.campaignAttachment ?? null });
   const bugFrom = (x: Partial<FakeBug> & { title: string; text: string }): FakeBug => {
     const b: FakeBug = {
       id: `bug-${s.bugs.length + 1}`, number: s.bugs.length + 1, reporterId: 'user-ben', reporterName: 'Ben', kind: 'bug', sourceRef: '', status: 'new', severity: null, area: '', headline: '', fixedIn: '', appVersion: 'abc1234', device: 'Firefox on Android', view: '/warbands/:id',
@@ -1361,7 +1361,7 @@ export function createFakeSync(opts: {
         const next = { ...b, ...(body as Partial<FakeBug>) };
         if (next.status === 'fixed' && !String(next.fixedIn).trim()) return json(400, { error: 'invalid', problem: 'a fixed report names the version it is fixed in' });
         Object.assign(b, body, { updatedAt: at() });
-        if (b.status === 'closed' || b.status === 'duplicate') b.attachment = null;
+        if (b.status === 'closed' || b.status === 'duplicate') { b.attachment = null; b.campaignAttachment = null; }
         return json(200, { bug: bugDetail(b) });
       }
     }
