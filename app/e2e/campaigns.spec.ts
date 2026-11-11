@@ -1392,7 +1392,7 @@ test('the history: a leader records a battle before the app; the warband that fo
   await shot(page, 'campaign-history-new');
   await sheet.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Battle 1 · Das Urteil im Nebel is in the history.')).toBeVisible();
-  await expect(page.getByText(/After battle 1 · you are leader/)).toBeVisible();
+  await expect(page.getByText('After battle 1', { exact: true })).toBeVisible();
   await expect(page.getByRole('list', { name: 'Battles before the app' })).toContainText('12 June 2026 · Clan Skrittle · The Silver Caravan');
   await noSideScroll(page);
   await tapTargets(page);

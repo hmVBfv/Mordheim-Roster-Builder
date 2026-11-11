@@ -66,7 +66,13 @@ describe('the Campaign tab', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Start it' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('aria-current')).toBe('page');
-    expect(screen.getByText('Setup · you are leader')).toBeTruthy();
+    // what the campaign is at stands under the name; the role is a marked chip at the end of the line, a flag for a leader (report of 11.11.2026)
+    const line = screen.getByText('Setup').closest('p')!;
+    expect(line.textContent).not.toMatch(/you are/);
+    const chip = within(line).getByText('Leader').closest('[data-role]') as HTMLElement;
+    expect(chip.getAttribute('data-role')).toBe('leader');
+    expect(chip.textContent).toBe('⚑ Leader');
+    expect(line.lastElementChild).toBe(chip);
     expect([...srv.state.campaigns.values()].map((c) => c.name)).toEqual(['The Hel Fenn Campaign']);
   });
 
@@ -84,7 +90,7 @@ describe('the Campaign tab', () => {
     await user.click(within(sheet).getByRole('button', { name: 'Start it' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeTruthy();
     expect([...srv.state.campaigns.values()].map((c) => c.place)).toEqual(['mordheim']);
-    expect(await screen.findByText(/Setup · you are leader · Mordheim/)).toBeTruthy();
+    expect(await screen.findByText('Setup · Mordheim')).toBeTruthy();
   });
 
   it('the Campaign tab always shows the list, also with a single campaign (#75)', async () => {
@@ -149,7 +155,7 @@ describe('the overview', () => {
       `The Grey PenitentsAnna · Mercenaries · Rating ${totals(anna).rating}✓ Start`,
       'Clan SkrittleBen · MercenariesWaiting for a leader',
     ]);
-    expect(within(screen.getByRole('list', { name: 'Members' })).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['KaiPlayer', 'AnnaLeader', 'BenPlayer']);
+    expect(within(screen.getByRole('list', { name: 'Members' })).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['KaiPlayer', 'Anna⚑ Leader', 'BenPlayer']);
     expect(screen.queryByRole('link', { name: 'Manage' })).toBeNull();
 
     await user.click(within(list).getAllByRole('link')[0]!);
