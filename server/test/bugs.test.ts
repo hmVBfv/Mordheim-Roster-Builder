@@ -302,17 +302,45 @@ describe('a report that carries the campaign (wish 253)', () => {
     expect(((await rob('GET', '/bugs?status=all')).json() as { bugs: { campaignAttached: boolean }[] }).bugs[0]!.campaignAttached).toBe(true);
   });
 
-  it('only a leader of that campaign may attach it; a player, a viewer, an outsider or a made-up id is refused and no report is made', async () => {
-    const { l, v, ben, rob, id, report } = await campaignWorld();
-    for (const who of [l, v, ben]) {
+  it('any current member may attach it – a player and a viewer too – and carries who they were; an outsider or a made-up id is refused and no report is made', async () => {
+    const { l, v, ben, rob, id, report, detail } = await campaignWorld();
+    for (const [who, role] of [[l, 'player'], [v, 'viewer']] as const) {
       const body = report({ attachCampaign: id });
-      const res = await who('POST', '/bugs', body);
-      expect(res.statusCode).toBe(403);
-      expect(res.json()).toEqual({ error: 'forbidden' });
+      expect((await who('POST', '/bugs', body)).statusCode).toBe(201);
+      expect(((await detail(body.id)).campaignAttachment as { reporterRole: string }).reporterRole).toBe(role);
     }
+    const out = report({ attachCampaign: id });
+    const res = await ben('POST', '/bugs', out);
+    expect(res.statusCode).toBe(403);
+    expect(res.json()).toEqual({ error: 'forbidden' });
     expect((await ben('POST', '/bugs', report({ attachCampaign: randomUUID() }))).statusCode).toBe(403);
     expect((await ben('POST', '/bugs', report({ attachCampaign: 'not-an-id' }))).statusCode).toBe(400);
-    expect(((await rob('GET', '/bugs?status=all')).json() as { bugs: unknown[] }).bugs).toEqual([]);
+    expect(((await rob('GET', '/bugs?status=all')).json() as { bugs: unknown[] }).bugs).toHaveLength(2);
+  });
+
+  it('a member who has left, or whose campaign is gone, may not attach it', async () => {
+    const { s, k, l, id, report } = await campaignWorld();
+    const lia = (s.db.prepare("SELECT id FROM users WHERE username = 'lia'").get() as { id: string }).id;
+    expect((await k('DELETE', `/campaigns/${id}/members/${lia}`)).statusCode).toBeLessThan(300);
+    expect((await l('POST', '/bugs', report({ attachCampaign: id }))).statusCode).toBe(403);
+  });
+
+  it('carries only what every member sees: who is in the campaign now and the warbands that are entered, not those who left', async () => {
+    const { s, k, l, v, id, wid, report, detail } = await campaignWorld();
+    const lia = (s.db.prepare("SELECT id FROM users WHERE username = 'lia'").get() as { id: string }).id;
+    // Lia enters a warband and then leaves: she and her warband are gone from what the campaign shows
+    const lw = randomUUID();
+    expect((await l('POST', `/campaigns/${id}/enrolments`, { warbandId: lw, data: SAVE })).statusCode).toBeLessThan(300);
+    await k('DELETE', `/campaigns/${id}/members/${lia}`);
+    const body = report({ attachCampaign: id });
+    await v('POST', '/bugs', body);
+    const att = (await detail(body.id)).campaignAttachment as { members: { name: string }[]; warbands: { id: string }[] };
+    expect(att.members.map((m) => m.name).sort()).toEqual(['kai', 'vic']);
+    expect(att.warbands.map((w) => w.id)).toEqual([wid]);
+    // and it is exactly what the campaign shows this viewer
+    const shown = (await v('GET', `/campaigns/${id}`)).json() as { members: { displayName: string }[]; enrolments: { warbandId: string }[] };
+    expect(att.members.map((m) => m.name).sort()).toEqual(shown.members.map((m) => m.displayName).sort());
+    expect(att.warbands.map((w) => w.id).sort()).toEqual(shown.enrolments.map((e) => e.warbandId).sort());
   });
 
   it('a report without it carries none, and the reporter never reads it back', async () => {

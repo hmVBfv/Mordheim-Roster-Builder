@@ -609,8 +609,9 @@ GitHub Pages im kostenlosen Plan). Daraus folgt:
   nie Namen, Titel, Notizen oder Tokens, die jemand eingegeben hat; das
   Formular zeigt ihn vor dem Senden. Die Warband liegt nur mit dem Haken des
   Meldenden dabei, als Kopie zum Meldezeitpunkt, und wird beim Schließen oder
-  als Duplikat gelöscht. Ebenso der Aufbau einer Kampagne (Wunsch 253): nur ein
-  Leader dieser Kampagne darf ihn anhängen (sonst 403, auch bei erfundener Id),
+  als Duplikat gelöscht. Ebenso der Aufbau einer Kampagne (Wunsch 253): jedes
+  aktuelle Mitglied darf ihn anhängen, aber nur mit dem, was jedes Mitglied liest
+  (kein Ausgetretener, nichts Beendetes; sonst 403, auch bei erfundener Id),
   geschickt wird nur die Id, den Inhalt liest der Server selbst – Mitglieder,
   Warbands, Kämpfe, Runde, Hausregeln, nie Notizen, Hintergrund, Eröffnung,
   Kampftitel oder Warband-Inhalt –, und er wird mit der Meldung gelöscht. Eine Meldung reicht dem Admin nie mehr Rechte an

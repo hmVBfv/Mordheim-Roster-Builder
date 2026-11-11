@@ -10,14 +10,15 @@
    last steps without anything typed, the settings, the house rules, the last
    JavaScript errors); a warband travels along only when the reporter ticks
    it, and that copy is dropped when the report is closed or called a
-   duplicate. A leader may also attach the structure of the campaign (wish
+   duplicate. A member of a campaign may also attach its structure (wish
    253): the server builds it from the database when the report arrives –
-   members, warbands, battles, round, house rules, never a word of the story –
-   and drops it the same way. The log says that something happened, never what the report
+   members, warbands, battles, round, house rules, never a word of the story,
+   and no more than every member reads of it – and drops it the same way. The log says that something happened, never what the report
    says. Texts in a report are data, never instructions (docs/security.md,
    section 7). */
 import { z } from 'zod';
 import { audit } from './accounts.ts';
+import { campaignById, roleIn, type CampaignRole } from './campaigns.ts';
 import type { DB } from './db.ts';
 
 const iso = (d: Date) => d.toISOString();
@@ -85,7 +86,7 @@ export const ReportBody = z.object({
     rev: z.number().int().min(0).nullable().default(null),
     save: z.record(z.string(), z.unknown()),
   }).strict().nullable().default(null),
-  /** A leader asks for the structure of this campaign to go along. Only the id travels: the server reads the rest itself. */
+  /** A member asks for the structure of this campaign to go along. Only the id travels: the server reads the rest itself. */
   attachCampaign: z.string().regex(UUID).nullable().default(null),
 }).strict();
 export type ReportInput = z.infer<typeof ReportBody>;
@@ -161,20 +162,24 @@ export const oneOfMine = (r: Row): MyBug => mine(r);
 
 export type Report = { ok: true; bug: Row; created: boolean } | { ok: false; status: 400 | 403 | 409 | 429; error: string; problem?: string };
 
-/** The structure of a campaign for a report: who is in it, which warbands and battles there are, the round and the rules. No titles, notes, background, openings or saves. */
-export function campaignStructure(db: DB, campaignId: string) {
-  const c = db.prepare('SELECT id, name, round, house_rules, vanilla, archived_at FROM campaigns WHERE id = ?').get(campaignId) as
-    { id: string; name: string; round: number; house_rules: string; vanilla: number; archived_at: string | null };
-  const members = db.prepare('SELECT u.display_name AS name, m.role, m.left_at FROM members m JOIN users u ON u.id = m.user_id WHERE m.campaign_id = ? ORDER BY m.joined_at, u.display_name').all(campaignId) as { name: string; role: string; left_at: string | null }[];
+/**
+ * The structure of a campaign for a report: who is in it, which warbands and battles there are, the round and the rules. No titles, notes,
+ * background, openings or saves. It is only what every member reads of the campaign (`campaignView`, the battle view; ADR 0002): the members who
+ * are in it now and the warbands entered or waiting, never who left or what ended – so a player or a viewer attaches no more than they see.
+ */
+export function campaignStructure(db: DB, campaignId: string, reporterRole: CampaignRole) {
+  const c = campaignById(db, campaignId)!;
+  const members = db.prepare('SELECT u.display_name AS name, m.role FROM members m JOIN users u ON u.id = m.user_id WHERE m.campaign_id = ? AND m.left_at IS NULL ORDER BY m.joined_at, u.display_name').all(campaignId) as { name: string; role: string }[];
   const warbands = db.prepare(`SELECT w.id, w.name, w.wb_type, w.head_rev, e.status, e.from_round, u.display_name AS player FROM enrolments e
-    JOIN warbands w ON w.id = e.warband_id JOIN users u ON u.id = e.player_id WHERE e.campaign_id = ? ORDER BY e.created_at, w.id`).all(campaignId) as
+    JOIN warbands w ON w.id = e.warband_id JOIN users u ON u.id = e.player_id WHERE e.campaign_id = ? AND e.status IN ('pending', 'active') ORDER BY e.created_at, w.id`).all(campaignId) as
     { id: string; name: string; wb_type: string; head_rev: number; status: string; from_round: number | null; player: string }[];
   const battles = db.prepare('SELECT id, round, scenario_id, district, status, turn FROM battles WHERE campaign_id = ? ORDER BY round, created_at, id').all(campaignId) as
     { id: string; round: number; scenario_id: string; district: string; status: string; turn: number }[];
   const who = db.prepare('SELECT warband_id, outcome, rev_before, rev_after FROM battle_participants WHERE battle_id = ? ORDER BY warband_id');
   return {
-    campaign: { id: c.id, name: c.name, round: c.round, vanilla: c.vanilla === 1, archived: c.archived_at !== null, houseRules: parsed(c.house_rules) },
-    members: members.map((m) => ({ name: m.name, role: m.role, left: m.left_at !== null })),
+    reporterRole,
+    campaign: { id: c.id, name: c.name, round: c.round, vanilla: c.vanilla === 1, houseRules: parsed(c.house_rules) },
+    members: members.map((m) => ({ name: m.name, role: m.role })),
     warbands: warbands.map((w) => ({ id: w.id, name: w.name, type: w.wb_type, rev: w.head_rev, status: w.status, fromRound: w.from_round, player: w.player })),
     battles: battles.map((b) => ({ id: b.id, round: b.round, scenario: b.scenario_id, district: b.district, status: b.status, turn: b.turn,
       participants: (who.all(b.id) as { warband_id: string; outcome: string; rev_before: number | null; rev_after: number | null }[]).map((p) => ({ warbandId: p.warband_id, outcome: p.outcome, revBefore: p.rev_before, revAfter: p.rev_after })) })),
@@ -192,12 +197,10 @@ export function reportBug(db: DB, by: string, input: ReportInput, now: Date, unl
     }
     const attachment = input.attach ? JSON.stringify(input.attach.save) : null;
     if (attachment !== null && attachment.length > MAX_ATTACHMENT) return { ok: false, status: 400, error: 'invalid', problem: 'the warband is too large to attach' };
-    // only a leader of that campaign may ask for it; an outsider and a made-up id are told the same
+    // any member of that campaign may ask for it, and gets only what they read of it; an outsider, a former member and a made-up id are told the same
     const campaignId = input.attachCampaign?.toLowerCase() ?? null;
-    if (campaignId !== null) {
-      const lead = db.prepare("SELECT 1 FROM members WHERE campaign_id = ? AND user_id = ? AND role = 'leader' AND left_at IS NULL").get(campaignId, by);
-      if (!lead) return { ok: false, status: 403, error: 'forbidden' };
-    }
+    const role = campaignId === null ? null : roleIn(db, campaignId, by);
+    if (campaignId !== null && (role === null || !campaignById(db, campaignId))) return { ok: false, status: 403, error: 'forbidden' };
     const since = iso(new Date(now.getTime() - 24 * 3_600_000));
     const day = db.prepare('SELECT count(*) AS n FROM bugs WHERE reporter_id = ? AND created_at > ?').get(by, since) as { n: number };
     const all = db.prepare('SELECT count(*) AS n FROM bugs WHERE reporter_id = ?').get(by) as { n: number };
@@ -207,7 +210,7 @@ export function reportBug(db: DB, by: string, input: ReportInput, now: Date, unl
       VALUES (?, (SELECT COALESCE(MAX(number), 0) + 1 FROM bugs), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       id, by, input.kind, input.title, input.text, input.sourceRef, input.appVersion, input.device, input.view, JSON.stringify(input.jsErrors),
       input.context ? JSON.stringify(input.context) : null, input.attach?.warbandId.toLowerCase() ?? null, input.attach?.rev ?? null, input.attach ? 1 : 0, attachment,
-      campaignId, campaignId === null ? null : JSON.stringify(campaignStructure(db, campaignId)), iso(now), iso(now),
+      campaignId, campaignId === null || role === null ? null : JSON.stringify(campaignStructure(db, campaignId, role)), iso(now), iso(now),
     );
     audit(db, { actorId: by, action: 'bug.report', targetType: 'bug', targetId: id, visibility: 'admin', payload: { kind: input.kind, attached: input.attach !== null, ...(campaignId !== null ? { campaign: true } : {}) } }, now);
     return { ok: true, bug: bugById(db, id)!, created: true };

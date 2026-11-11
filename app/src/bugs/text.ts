@@ -89,7 +89,7 @@ export function reportText(r: ReportDoc): string {
   out.push('## Warband copy', '');
   if (r.attached) out.push(`Attached: the warband ${r.attached.warbandId}${r.attached.rev !== null ? `, built on version ${r.attached.rev}` : ''}, as it was on the reporter’s device (${Math.max(1, Math.round(r.attached.bytes / 1024))} KB). It travels as a separate file – clean it with \`npm run sanitize-save\` before it goes into a test.`);
   else out.push(r.consent ? 'It was attached and has been let go since the report was closed.' : 'None attached.');
-  if (r.campaign) out.push('', `Attached: the structure of the campaign ${r.campaign.id} – members, warbands, battles, round and house rules, never notes, the background or any story. The server reads it when the report arrives.`);
+  if (r.campaign) out.push('', `Attached: the structure of the campaign ${r.campaign.id} – members, warbands, battles, round and house rules as the reporter sees them, never notes, the background or any story. The server reads it when the report arrives.`);
   out.push('');
   return out.join('\n');
 }

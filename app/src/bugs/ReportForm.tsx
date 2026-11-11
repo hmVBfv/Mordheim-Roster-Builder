@@ -153,7 +153,7 @@ export function ReportForm({ snap, close, onSent }: { snap: Snapshot; close: () 
       {campaign && (
         <label className={styles.check}>
           <input type="checkbox" checked={attachCampaign} onChange={(e) => setAttachCampaign(e.target.checked)} />
-          <span>Attach the structure of “{campaign.name}”<small>Members, warbands, battles, round and house rules – no notes, no background, no story. Only Rob and Claude read it, and it is dropped when the report is closed.</small></span>
+          <span>Attach the structure of “{campaign.name}”<small>Members, warbands, battles, round and house rules, as you see them – no notes, no background, no story, nothing hidden from you. Only Rob and Claude read it, and it is dropped when the report is closed.</small></span>
         </label>
       )}
       <details className={styles.details} open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
