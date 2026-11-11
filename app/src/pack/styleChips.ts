@@ -19,6 +19,13 @@ export const CHIP_GROUPS: ChipGroup[] = [
   { key: 'tense', title: 'Tense', options: pick('Tense', [['Past', 'past tense'], ['Present', 'present tense']]) },
   { key: 'voice', title: 'Voice', options: pick('Voice', [['Close third', 'close third person'], ['First person', 'first person'], ['Narrator', 'an omniscient narrator']]) },
   { key: 'tone', title: 'Tone', options: pick('Tone', [['Grim', 'grim and bleak'], ['Gritty', 'gritty and earthy'], ['Epic', 'epic and heroic'], ['Dry humour', 'dry, dark humour']]) },
+  {
+    key: 'focus', title: 'Focus', many: true,
+    options: [
+      ['Battle', 'the fighting, move by move'], ['Roleplay', 'the characters, their talk and their choices'], ['Scenario theme', 'the theme and mood of the scenario'],
+      ['World', 'the city and its places'], ['Aftermath', 'the consequences: wounds, loot, rumours'],
+    ].map(([label, what]) => ({ label: label!, line: `Focus: ${what}.` })),
+  },
   { key: 'violence', title: 'Violence', options: pick('Violence', [['Restrained', 'restrained, hinted at'], ['Graphic', 'graphic and brutal']]) },
   { key: 'length', title: 'Length', options: pick('Length', [['Short', 'short, a few paragraphs'], ['Medium', 'a page or two'], ['Long', 'long and detailed']]) },
   {

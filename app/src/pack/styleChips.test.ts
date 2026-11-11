@@ -5,7 +5,7 @@ const group = (key: string) => CHIP_GROUPS.find((g) => g.key === key)!;
 
 describe('the style chips', () => {
   it('offers several kinds, each with a few options', () => {
-    expect(CHIP_GROUPS.map((g) => g.key)).toEqual(['language', 'tense', 'voice', 'tone', 'violence', 'length', 'out']);
+    expect(CHIP_GROUPS.map((g) => g.key)).toEqual(['language', 'tense', 'voice', 'tone', 'focus', 'violence', 'length', 'out']);
     for (const g of CHIP_GROUPS) expect(g.options.length).toBeGreaterThanOrEqual(2);
   });
 
@@ -30,6 +30,16 @@ describe('the style chips', () => {
     const text = toggleChip(toggleChip('', tense, a!), tense, b!);
     expect(text).toBe(b!.line);
     expect(isOn(text, a!)).toBe(false);
+  });
+
+  it('the focus can combine several emphases: battle, roleplay, the scenario’s theme', () => {
+    const focus = group('focus');
+    expect(focus.many).toBe(true);
+    expect(focus.options.map((o) => o.label)).toEqual(expect.arrayContaining(['Battle', 'Roleplay', 'Scenario theme']));
+    const [a, b] = focus.options;
+    const text = toggleChip(toggleChip('', focus, a!), focus, b!);
+    expect(text.split('\n')).toEqual([a!.line, b!.line]);
+    expect(isOn(text, a!) && isOn(text, b!)).toBe(true);
   });
 
   it('a many-choice kind (what stays out) stacks its lines', () => {
