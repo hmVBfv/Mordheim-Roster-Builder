@@ -75,6 +75,26 @@ describe('the spell texts keep what the page says (bug 256)', () => {
     }
   });
 
+  it('Dark Elf Magic is the page\'s list: the names and difficulties, and the Doombolt with its range and its leap', () => {
+    expect(data.SPELLS.darkElfMagic!.spells.map(([n]) => n)).toEqual(['Doombolt (9)', 'Word of Pain (8)', 'Soul Stealer (9)', 'Flamesword (8)', 'Deathspasm (10)', 'Witch Flight (7)']);
+    expect(text('darkElfMagic', 'Doombolt')).toMatch(/18" range and causes a Strength 5 hit.*next closest model within 6" is also hit on a 4\+/);
+    expect(text('darkElfMagic', 'Flamesword')).toMatch(/\+2 bonus to the users Strength.*ignore armour saves/);
+    expect(text('darkElfMagic', 'Deathspasm')).toMatch(/closest enemy model.*knocked down/);
+    expect(data.SPELLS.darkElfMagic!.lore!.Flamesword).toMatch(/twisted black flames/);
+  });
+
+  it('the Dwarf Rangers\' runes and the Wood Elves\' incantations carry the pages\' full words', () => {
+    expect(text('dwarfRunes', 'Rune of Warding')).toMatch(/4\+ save vs\. spells.*belt, armband.*1 gc/);
+    expect(data.SPELLS.dwarfRunes!.note).toMatch(/roll of 2.*destroyed/s);
+    expect(text('woodlandIncantations', 'Song of Thorns')).toMatch(/If no plants are present wooden chips fly.*2D6 S1 hits, range 8"/);
+    expect(text('woodlandIncantations', 'Song of the Sun')).toMatch(/scorching desert.*within 18"/);
+  });
+
+  it('the Beastmen Shaman casts the Chaos Rituals, as the page says, not a list of his own', () => {
+    expect(data.WBEXTRA.beastmen!.magic).toBe('chaosRituals');
+    expect(data.SPELLS.beastLore).toBeUndefined();
+  });
+
   it('the notes of three lists say who may cast from them', () => {
     expect(data.SPELLS.chaosRituals!.note).toMatch(/Daemons, Beastmen/);
     expect(data.SPELLS.amazonRituals!.note).toMatch(/Priestess/);

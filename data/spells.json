@@ -2,7 +2,7 @@
  "SPELLS": {
   "dwarfRunes": {
    "name": "Dwarf Minor Runes",
-   "note": "Runesmith (Dwarf Rangers). Before each game he may inscribe one known rune on an item carried by a warband member (two items with an Apprentice): roll 2D6 ≥ difficulty = item gains the bonus for that game; a roll of 2 destroys the item. New runes may be learned instead of skills on advances. Jealousy of Runes: Rune bonuses never stack with other magical item bonuses.",
+   "note": "Runesmith (Dwarf Rangers); the leader is a younger Runesmith who knows one of these minor runes. Before each game he may inscribe one known rune on an item carried by a warband member (two items with an Apprentice): roll 2D6 — on the rune's difficulty or more the item gains the bonus FOR THAT GAME, any other failure gives no bonus. A roll of 2 is a fumble: the item is destroyed and removed from the warrior's list (it may be replaced before the game if the warband has the gold). New runes may be learned instead of skills on advances. The Jealousy of Runes: bonuses from runes are not cumulative with magical bonuses from other items — a Rune of Stone on a shield and another on armour do not add up to +2, nor does a rune combine with magic armour that adds +1 to the Armour Save.",
    "spells": [
     [
      "Rune of Stone (8)",
@@ -14,19 +14,19 @@
     ],
     [
      "Rune of Speed (7)",
-     "Initiative doubled while using this weapon."
+     "Initiative doubled on the weapon."
     ],
     [
      "Rune of Warding (8)",
-     "Special 4+ save vs. spells affecting the bearer (on belt/armband; replace cost 1 gc)."
+     "Special 4+ save vs. spells affecting the target (placed on belt, armband, etc.). Cost to replace: 1 gc."
     ],
     [
      "Rune of Accuracy (9)",
-     "+1 to hit with this weapon."
+     "+1 to hit with the weapon."
     ],
     [
      "Rune of Striding (8)",
-     "+1 Movement (on boots/belt; replace cost 1 gc)."
+     "+1 Movement (placed on boots, belt, etc.). Cost to replace: 1 gc."
     ]
    ]
   },
@@ -36,27 +36,27 @@
    "spells": [
     [
      "Song of Thorns (8)",
-     "Victim within 8\" suffers 2D6 Strength 1 hits (branches or flying wood chips strike the foe)."
+     "Branches strike out to the foe under influence of the singer cadence. If no plants are present wooden chips fly at the victim, as if they want to be thorns… Victim suffers 2D6 S1 hits, range 8\"."
     ],
     [
      "Murmuring of the Wind (7)",
-     "The caster may move anywhere within 12\"; if he moves into base contact it counts as a charge."
+     "Very softly the wind increases around the caster and takes him wherever he wants. Caster may move anywhere within 12\", if he gets into HtH it counts as a charge."
     ],
     [
      "The Rain Song (9)",
-     "Everything except Wood Elves within 6\" of the caster suffers −1 to hit and −1 Initiative until the start of the caster's next magic phase."
+     "The air around the caster becomes moist and it starts to rain, until it looks like a major downpour… Everything, except Woodelves, within 6\" of the caster suffers −1 to hit and suffers −1 Initiative. This lasts until the beginning of the caster's next magic phase."
     ],
     [
      "Lyrics of Feral Infatuation (8)",
-     "Any animal or monster must pass a Leadership test (on its own Ld) to attack; if it fails it does nothing that turn — not even fighting back if attacked."
+     "This soothing song seems to calm even the most ferocious monsters and sends them into a lethargic state. Any animal or monster has to pass a Ld-test, on his own Ld, in order to attack an opponent. If it fails it will do nothing else that turn, not even fighting back if attacked."
     ],
     [
      "Song of the Sun (6)",
-     "Target within 18\" is −1 Movement until the caster's next magic phase and must take a test; if it fails it suffers a Strength 4 hit."
+     "While the caster sings his victim believes he is in a scorching desert. His movement slows and throat becomes parched. The target must be within 18\" and is −1M until the caster's next magic phase, he also must make a test, if he fails, he suffers a S4 hit."
     ],
     [
      "Eagle's Cry (8)",
-     "All Wood Elves within 6\" gain +1 to hit and +1 on the critical hit table until the start of the caster's next magic phase."
+     "The caster utters a melodious cry, which sounds like a great eagle. This inspires the elves so much they gain the legendary sight of Thuarindir. All Wood elves within 6\" gain +1 to hit and +1 on the critical hit table. This lasts until the beginning of the caster's next magic phase."
     ]
    ]
   },
@@ -774,40 +774,40 @@
   },
   "darkElfMagic": {
    "name": "Dark Elf Magic",
-   "note": "Dark Elf Sorceress (Druchii).",
+   "note": "Dark Elf Sorceress (Druchii). She may not cast spells while wearing armour.",
    "spells": [
     [
-     "Doombolt (8)",
-     "Enemy in sight within 10\": one S4 hit. On a wound the bolt leaps to the next model within 4\" (on a 4+, each −1 S) until no targets remain or S drops to 1. Armour saves as normal."
+     "Doombolt (9)",
+     "The bolt of doom may be targeted at any enemy model in line of sight. The Doombolt has an 18\" range and causes a Strength 5 hit. If the target model is wounded, then the next closest model within 6\" is also hit on a 4+, at −1 Strength than the previous hit. The bolt will keep leaping until there are no more targets within range or until its Strength drops to a one. Each model can only be hit by a bolt once per turn. Take armour saves as normal."
     ],
     [
-     "Word of Pain (9)",
-     "Enemy within 12\": must re-roll successful close-combat/shooting hits and wound rolls; to charge it must first pass a Ld test. Until the next Dark Elf turn."
+     "Word of Pain (8)",
+     "The spell may be cast at an enemy model within 12\". The victim must re-roll all successful hand to hand or missile attacks and all to wound rolls. If the victim wishes to charge, he must pass a successful Leadership test first. Lasts until the beginning of the next Dark Elf turn."
     ],
     [
      "Soul Stealer (9)",
-     "Touch: To-hit roll against a model in base contact; on success one wound with no armour save, Sorceress +1 W (max. +1 over profile, lost after the battle)."
+     "Once successfully cast, the Sorceress has to make a to hit roll against a model in base contact. If the attack is successful and her opponent is struck, he suffers a wound with no armour save possible. The Sorceress feeds on this life-force and adds one wound to her profile. Note: the Sorceress can never have more then one extra wound from the use of this spell and the extra wound is lost at the end of the battle."
     ],
     [
-     "Black Blade of Khaine (8)",
-     "An ally's close-combat weapon within 6\": +2 S, ignores armour, counts as magical. Until the Sorceress's next shooting phase."
+     "Flamesword (8)",
+     "The Sorceress may choose the hand-to-hand combat weapon of a member of her warband within 6\" to be engulfed in flames. A weapon with these flames acts as a normal weapon of its type, but also adds a +2 bonus to the users Strength. Hits inflicted from the weapon ignore armour saves. Lasts until the Sorceress' next shooting phase."
     ],
     [
-     "Deathspasm (9)",
-     "Nearest enemy within 6\": test on ≤ Toughness (D6) or roll on the injury table. If the target goes OOA, the Sorceress is immediately knocked down (no Jump Up)."
+     "Deathspasm (10)",
+     "The Deathspasm has a range of 6\" and must be cast on the closest enemy model. The affected model must roll on the injury chart. If successfully cast, the casting Sorceress is immediately knocked down."
     ],
     [
      "Witch Flight (7)",
-     "Move up to 12\" immediately, may charge; against a fleeing enemy 1 automatic hit, then it flees again."
+     "The Sorceress may immediately move anywhere within 12\", and may count as charging. If she engages a fleeing enemy in the close combat phase she will score 1 automatic hit and then the opponent will flee again."
     ]
    ],
    "lore": {
     "Doombolt": "Whispering an ancient incantation the Sorceress conjures a bolt of pure dark energy and unleashes it from her outstretched hand.",
     "Word of Pain": "The Sorceress calls the curse of the Witch King down on his enemy reducing their willingness to fight.",
-    "Soul Stealer": "At the Sorceress’s touch, the essence of life is drained from her enemy and absorbed into her body giving him renewed strength and vigour.",
+    "Soul Stealer": "At the Sorceress's touch, the essence of life is drained from her enemy and absorbed into her body giving him renewed strength and vigour.",
+    "Flamesword": "Summoning Dark Magic the Sorceress engulfs a weapon in twisted black flames.",
     "Deathspasm": "The Sorceress channels Dark Magic into her enemy, causing him to writhe in excruciating pain.",
-    "Witch Flight": "The Sorceress bends the winds of magic to her will and flies through the air.",
-    "Black Blade of Khaine": "Summoning Dark Magic the Sorceress engulfs a weapon in twisted black flames."
+    "Witch Flight": "The Sorceress bends the winds of magic to her will and flies through the air."
    }
   },
   "prayersTaal": {
@@ -998,11 +998,6 @@
     "Scabrous Hide": "The Master’s skin becomes tough and leathery like that of his patron god.",
     "Nurgle's Rot": "The Master bestows the blessing of the Plague God upon his foe."
    }
-  },
-  "beastLore": {
-   "name": "Chaos Rituals (Bray Shaman)",
-   "note": "Beastmen Shaman. Detailed effects to follow.",
-   "spells": []
   }
  }
 }
