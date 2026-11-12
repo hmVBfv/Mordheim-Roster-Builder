@@ -1075,7 +1075,7 @@
    "min": 3,
    "max": 12,
    "gold": 500,
-   "rules": "<b>Choice:</b> Exactly 1 Hunt Master. Max. 2 Waywatchers, max. 1 Forest Mage, any number of Deepwood Scouts and Glade Guard.<br><b>Hate Dark Elves:</b> All warriors (except Hired Swords) hate Dark Elves.<br><b>Excellent Sight:</b> All Elves spot Hidden enemies from twice as far away (twice their Initiative in inches).<br><b>Unforgiving:</b> Will not fight alongside the forces of Chaos; in multiplayer games may never ally with a Chaotic warband (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> May hire any Hired Sword except the Chaotic and evil ones (Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.).",
+   "rules": "<b>Choice:</b> Exactly 1 Hunt Master. Max. 2 Waywatchers, max. 1 Forest Mage, any number of Deepwood Scouts and Glade Guard.<br><b>Hate Dark Elves:</b> All warriors in a Wood Elves Warband (excluding any Hired Swords) have an unyielding Hatred for Dark Elves.<br><b>Excellent Sight:</b> Elves have eyesight unmatched by mere humans. All the Elves in a Wood Elf Warband can spot Hidden enemies from twice as far away as other warriors (i.e. twice their Initiative in inches).<br><b>Unforgiving:</b> In addition to their hatred of their corrupt kin, the folk of Athal Loren will not fight alongside the forces of Chaos. In multiplayer games, a Wood Elf warband may never forge an alliance with any Warband of a chaotic nature (Possessed, Skaven, Beastmen, Dark Elves, etc.).<br><b>Tolerant:</b> May hire any Hired Sword except the Chaotic and evil ones (Skaven, Possessed, Beastmen, Dark Elves, Undead, etc.). Due to their outsider status in the world, the Elves of Athel Loren have learned to stifle their distaste for 'lesser races', and have even been known to work alongside them from time to time.",
    "units": [
     {
      "id": "hunt",
@@ -1104,7 +1104,7 @@
       "speed",
       "weSkills"
      ],
-     "sp": "Leader: Friendly models within 6\" may use his Leadership."
+     "sp": "Leader: Any warrior within 6\" of the Hunt Master may use his Leadership value when taking Leadership tests."
     },
     {
      "id": "way",
@@ -1131,7 +1131,7 @@
       "speed",
       "weSkills"
      ],
-     "sp": "Sharpshooter: May shoot while hidden (5+ to stay hidden). Camouflage: Requires an extra Initiative test to be spotted."
+     "sp": "Sniper: Due to their years of training Waywatchers can shoot while keeping almost invisible. This allows the character to shoot while hiding. After the shot roll a D6, on a 5+ no one noticed where the arrow came from. Camouflage: Waywatchers are experts at camouflage. They wear cloaks of green, brown or grey which are made from leaves sewn together. By painting their faces and bodies with green and brown paint they are almost invisible when hiding. When a Waywatcher is hidden, each enemy model has to make an additional I test to spot them."
     },
     {
      "id": "mage",
@@ -1158,7 +1158,7 @@
       "speed",
       "weSkills"
      ],
-     "sp": "Wizard: Uses Woodland Incantations."
+     "sp": "Wizard: The Forest Mage is a Wizard and may use the Woodland Incantations spell list."
     },
     {
      "id": "scout",
@@ -1179,7 +1179,7 @@
       "Ld": 8
      },
      "eq": "weScout",
-     "sp": "Crossfire: If several scouts shoot at the same target, +1 to the injury roll."
+     "sp": "Crossfire: If more than one scout henchman shoots at the same target, they get +1 on the injury roll."
     },
     {
      "id": "glade",
@@ -24080,27 +24080,27 @@
   },
   "weSkills": {
    "name": "Wood Elf Special Skills",
-   "note": "Wood Elf Heroes with the Special skill list may use this list instead of any standard skill tables available to them.",
+   "note": "Wood Elf Heroes with the Special skill available to them may choose to use the following Skill list instead of any of the standard Skill tables available to them.",
    "skills": [
     [
      "Fey",
-     "An understanding of magic: 4+ saving throw against hostile magic."
+     "The Wood Elf has a certain understanding of magic and therefore gets a saving throw of 4+ against hostile magic."
     ],
     [
      "Elven Luck",
-     "The Elven gods favour him: Once per game he may re-roll any failed roll."
+     "The Elven Gods favour the Wood Elf. Once per game, he may reroll any failed roll."
     ],
     [
      "Excellent Sight (skill)",
-     "Can spot hidden enemy models up to 2× his Initiative in inches away."
+     "By training his eyesight for years the Wood Elf can spot hidden enemy models up to 2 x I inch away. (The page notes that this is likely an oversight, as it is already part of their special rules.)"
     ],
     [
      "Seeker",
-     "Expert tracker: May modify the result of one exploration die by +/−1. Only one Elven Hero may possess this skill."
+     "Being an expert Tracker, the Wood Elf is able to spot even hidden treasures. He may modify the result of one exploration die by +/- 1. Only one Elven Hero may possess this skill!"
     ],
     [
      "Infiltration",
-     "Always deployed last, anywhere out of sight of the enemy. If both players infiltrate, roll D6 — lowest deploys first."
+     "The Wood Elf is an expert in infiltrating behind enemy lines. Therefore he is always deployed last, anywhere out of sight of the enemy. If both players have infiltrate, roll 1d6. Lowest roll deploys first."
     ]
    ]
   },
