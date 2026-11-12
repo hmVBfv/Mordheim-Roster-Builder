@@ -3,6 +3,7 @@
    on GitHub Pages, which cannot, so it keeps the route after a "#". */
 import { lazy, Suspense } from 'react';
 import { LoadingLate } from '../ui/Loading.tsx';
+import { ErrorBoundary } from '../ui/ErrorBoundary.tsx';
 import { BrowserRouter, HashRouter, Navigate, Route, Routes, useLocation } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
 import { ACCOUNT, HOME, MY_REPORTS, WHATS_NEW } from './paths.ts';
@@ -41,8 +42,10 @@ const Aftermath = lazy(() => import('../aftermath/Aftermath.tsx').then((m) => ({
 const CampaignRules = lazy(() => import('../campaign/CampaignRules.tsx').then((m) => ({ default: m.CampaignRules })));
 
 export function AppRoutes() {
+  const { pathname } = useLocation();
   return (
     <Shell>
+      <ErrorBoundary resetKey={pathname}>
       <Suspense fallback={<LoadingLate />}>
         <Routes>
           <Route path="/" element={<Navigate to={HOME} replace />} />
@@ -84,6 +87,7 @@ export function AppRoutes() {
           <Route path="*" element={<Placeholder title="Not found" text="There is nothing at this address." />} />
         </Routes>
       </Suspense>
+      </ErrorBoundary>
     </Shell>
   );
 }
