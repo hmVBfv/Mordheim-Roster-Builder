@@ -365,6 +365,24 @@ Details und Felder: [data-model.md](data-model.md). Rechte:
 | Zeitleisten-Position | letzte Verschiebung gewinnt, jede wird geloggt |
 | Hintergrund | nur Leiter; letzte Fassung gewinnt, Revisionen bleiben |
 
+### Der Ersatzserver der Tests und sein Vertrag
+
+Rund zwanzig Testdateien der App und die Playwright-Specs reden nicht mit dem
+echten Server, sondern mit einem Ersatz im Speicher
+(`app/src/sync/fakeSync.ts`, `createFakeSync`), der die Regeln der
+Server-Routen von Hand nachbildet. Damit er nicht unbemerkt abweicht, schickt
+`server/test/contract/` dieselbe Abfolge von Anfragen an den echten Server
+(Fastify, SQLite im Speicher) und an den Ersatz und vergleicht Status und
+Antwort (`driver.ts`: `compare`). Felder, die bei jedem Lauf anders sind (Zeiten,
+Zähler, Epoche, der Wortlaut einer Fehlermeldung), stehen namentlich in
+`VOLATILE` und werden auf ihren Typ geprüft, nicht übersprungen; eine
+bekannte, begründete Abweichung steht im dritten Argument von `compare` und
+lässt den Test fehlschlagen, sobald sie nicht mehr vorkommt. **Gibt es einen
+Unterschied, gibt der Ersatz nach** (der Server ist die Wahrheit); ein
+App-Test, der dadurch rot wird, hat einen echten Fehler der App gefunden.
+Bereiche mit Vertragstest: Warbands und Sync (`warbands.contract.test.ts`).
+Ein neuer Bereich des Ersatzes bekommt seinen Vertragstest, ehe er benutzt wird.
+
 ## 7. Auslieferung
 
 **CI (GitHub Actions), bei jedem Push:**
