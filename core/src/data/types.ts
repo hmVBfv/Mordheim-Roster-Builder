@@ -310,7 +310,7 @@ export interface GameData {
   UPGRADES: Record<string, UpgradeDef>;
   /** Items that changed their name, per warband: old → new, in the equipment
       bought from the list (`eq`) and at the Trading Post (`rare`). */
-  RENAMED: Record<string, { eq?: Record<string, string>; rare?: Record<string, string> }>;
+  RENAMED: Record<string, { eq?: Record<string, string>; rare?: Record<string, string>; /** A learned spell is stored as "Name (difficulty)": the old string → the new one. */ spells?: Record<string, string> }>;
   _ALLCC: string[];
   _CCFAM: string[];
   /** Item-name patterns → weapon/armour family (null = no family). */
