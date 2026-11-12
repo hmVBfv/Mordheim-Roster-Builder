@@ -399,6 +399,14 @@ Text. Das Mockup `docs/mockups/roster-v2.html` (PR #70) ist der Entwurf; die
 App setzt es um (`app/src/roster/Board.tsx`, `Detail.tsx`, `Panel.tsx`,
 `Board.module.css`). Dieselbe Liste zeigt auch die Warband eines Mitspielers,
 nur lesend (`CampaignWarband`, ohne Aktionen).
+**Rating über die Schlachten (Plan P7, 12.11.2026):** die Seite einer Warband in der Kampagne
+zeigt unter den Kacheln eine kleine **Linie** des Ratings über die Marken (Start, nach jeder Schlacht; eine
+übersprungene Runde behält die Zahl). Gezeichnet als SVG ohne Bibliothek (`app/src/ui/Sparkline.tsx`, Reihe aus
+`ratingSeries`): 2 px Linie in der Akzentfarbe, Punkte von 8 px mit einem Ring in der Flächenfarbe, eine leise Grundlinie, der
+letzte Wert direkt beschriftet, ein Tooltip an jedem Punkt, die Überschrift nennt Anfang, Ende und Änderung, und hinter
+**„The numbers“** steht dieselbe Reihe als Tabelle (kein Bild nötig). Eine Reihe braucht zwei Marken; vorher steht dort nichts.
+Nicht gebaut: die Linie in der Kachel „Rating“ des eigenen Rosters und ein Vergleich aller Warbands der Kampagne – beide
+brauchen die Marken aller Warbands auf einmal (heute eine Anfrage je Warband).
 
 **Kopf.** Name der Warband (mit Stift zum Umbenennen), eine Zeile mit Typ,
 Stufe und – falls an – „⚖ N house rules“, vier Kacheln (Gold, Rating, Models

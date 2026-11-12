@@ -1,0 +1,74 @@
+.figure {
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.title {
+  font-weight: 600;
+}
+
+/* values and labels wear text colours; the series colour is only the line and its points */
+.muted {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  margin-top: var(--space-2);
+}
+
+.base {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.dot {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.value {
+  fill: var(--text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.table {
+  margin-top: var(--space-2);
+  color: var(--text-muted);
+}
+
+.table table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.table th,
+.table td {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 400;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
