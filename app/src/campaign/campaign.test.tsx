@@ -135,7 +135,7 @@ describe('the Campaign tab', () => {
     at('/campaign');
     // what the device remembered shows first; the server's list follows
     const list = await screen.findByRole('list', { name: 'Your campaigns' });
-    await waitFor(() => expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['The Hel Fenn CampaignPlayer · Setup · 0 warbands', 'Summer in SylvaniaViewer · After battle 3 · 0 warbands']));
+    await waitFor(() => expect(within(list).getAllByRole('link').map((a) => a.textContent)).toEqual(['Summer in SylvaniaViewer · After battle 3 · 0 warbands', 'The Hel Fenn CampaignPlayer · Setup · 0 warbands']));
   });
 
   /* Rob, 19.10.2026: every player files campaigns away in their own list, in a section of its own. */
@@ -185,7 +185,7 @@ describe('the overview', () => {
       `The Grey PenitentsAnna · Mercenaries · Rating ${totals(anna).rating}✓ Start`,
       'Clan SkrittleBen · MercenariesWaiting for a leader',
     ]);
-    expect(within(screen.getByRole('list', { name: 'Members' })).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['KaiPlayer', 'Anna⚑ Leader', 'BenPlayer']);
+    expect(within(screen.getByRole('list', { name: 'Members' })).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Anna⚑ Leader', 'BenPlayer', 'KaiPlayer']); // leaders first, then players, each by name: as the server lists them
     expect(screen.queryByRole('link', { name: 'Manage' })).toBeNull();
 
     await user.click(within(list).getAllByRole('link')[0]!);

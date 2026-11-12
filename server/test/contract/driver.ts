@@ -25,30 +25,33 @@ export interface Outcome { status: number; body: unknown }
 
 /** Fields that differ from run to run, with the type they must have on both sides. */
 export const VOLATILE: Record<string, 'time' | 'number' | 'string'> = {
-  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time',
+  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time',
   seq: 'number', cursor: 'number', epoch: 'string',
   // the server's wording of a refusal comes from its schema checker; the fake only has to refuse with some
   problem: 'string',
 };
 /** A share code as shown: K7M2-Q9XD. */
 const SHARE_CODE = /^[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}$/;
+/** Ids the server makes up for itself, by where they stand: the mark (tag) of a warband. */
+const VOLATILE_IDS = [/\.tags?(\[\d+\])?\.id$/, /\.enrolments\[\d+\]\.tag\.id$/];
 const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 /** An answer with its volatile fields replaced by their type (a null stays null: whether a value is there is part of the contract). */
-export function normalize(v: unknown, volatile: Record<string, string> = VOLATILE, refs: Refs = {}): unknown {
+export function normalize(v: unknown, volatile: Record<string, string> = VOLATILE, refs: Refs = {}, path = ''): unknown {
   if (typeof v === 'string') {
     const named = Object.entries(refs).find(([, value]) => value === v);
     return named ? `{${named[0]}}` : SHARE_CODE.test(v) ? '<code>' : v;
   }
-  if (Array.isArray(v)) return v.map((x) => normalize(x, volatile, refs));
+  if (Array.isArray(v)) return v.map((x, i) => normalize(x, volatile, refs, `${path}[${i}]`));
   if (v && typeof v === 'object') {
     return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => {
+      if (typeof x === 'string' && VOLATILE_IDS.some((re) => re.test(`${path}.${k}`))) return [k, '<id>'];
       const kind = volatile[k];
       if (kind && x !== null && x !== undefined) {
         const ok = kind === 'time' ? typeof x === 'string' && TIME.test(x) : typeof x === kind;
         return [k, ok ? `<${kind}>` : `<NOT A ${kind.toUpperCase()}: ${JSON.stringify(x)}>`];
       }
-      return [k, normalize(x, volatile, refs)];
+      return [k, normalize(x, volatile, refs, `${path}.${k}`)];
     }));
   }
   return v;
