@@ -884,27 +884,27 @@
     },
     "weSkills": {
       "name": "Wood Elf Special Skills",
-      "note": "Wood Elf Heroes with the Special skill list may use this list instead of any standard skill tables available to them.",
+      "note": "Wood Elf Heroes with the Special skill available to them may choose to use the following Skill list instead of any of the standard Skill tables available to them.",
       "skills": [
         [
           "Fey",
-          "An understanding of magic: 4+ saving throw against hostile magic."
+          "The Wood Elf has a certain understanding of magic and therefore gets a saving throw of 4+ against hostile magic."
         ],
         [
           "Elven Luck",
-          "The Elven gods favour him: Once per game he may re-roll any failed roll."
+          "The Elven Gods favour the Wood Elf. Once per game, he may reroll any failed roll."
         ],
         [
           "Excellent Sight (skill)",
-          "Can spot hidden enemy models up to 2× his Initiative in inches away."
+          "By training his eyesight for years the Wood Elf can spot hidden enemy models up to 2 x I inch away. (The page notes that this is likely an oversight, as it is already part of their special rules.)"
         ],
         [
           "Seeker",
-          "Expert tracker: May modify the result of one exploration die by +/−1. Only one Elven Hero may possess this skill."
+          "Being an expert Tracker, the Wood Elf is able to spot even hidden treasures. He may modify the result of one exploration die by +/- 1. Only one Elven Hero may possess this skill!"
         ],
         [
           "Infiltration",
-          "Always deployed last, anywhere out of sight of the enemy. If both players infiltrate, roll D6 — lowest deploys first."
+          "The Wood Elf is an expert in infiltrating behind enemy lines. Therefore he is always deployed last, anywhere out of sight of the enemy. If both players have infiltrate, roll 1d6. Lowest roll deploys first."
         ]
       ]
     },

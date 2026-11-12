@@ -329,6 +329,72 @@
    "I": 7,
    "A": 4,
    "Ld": 9
+  },
+  "druchii": {
+   "M": 5,
+   "WS": 7,
+   "BS": 7,
+   "S": 4,
+   "T": 3,
+   "W": 3,
+   "I": 9,
+   "A": 4,
+   "Ld": 10
+  },
+  "necrarch": {
+   "M": 6,
+   "WS": 4,
+   "BS": 4,
+   "S": 6,
+   "T": 6,
+   "W": 4,
+   "I": 9,
+   "A": 3,
+   "Ld": 10
+  },
+  "ogrehunter": {
+   "M": 6,
+   "WS": 6,
+   "BS": 4,
+   "S": 5,
+   "T": 5,
+   "W": 5,
+   "I": 4,
+   "A": 5,
+   "Ld": 9
+  },
+  "gnoblar": {
+   "M": 4,
+   "WS": 5,
+   "BS": 6,
+   "S": 3,
+   "T": 4,
+   "W": 3,
+   "I": 6,
+   "A": 4,
+   "Ld": 7
+  },
+  "snotling": {
+   "M": 4,
+   "WS": 4,
+   "BS": 4,
+   "S": 3,
+   "T": 3,
+   "W": 2,
+   "I": 9,
+   "A": 4,
+   "Ld": 6
+  },
+  "wolfman": {
+   "M": 6,
+   "WS": 4,
+   "BS": 3,
+   "S": 5,
+   "T": 4,
+   "W": 3,
+   "I": 7,
+   "A": 4,
+   "Ld": 8
   }
  },
  "RACELABEL": {
@@ -361,7 +427,13 @@
   "ungor": "Ungor",
   "centigor": "Centigor",
   "minotaur": "Minotaur",
-  "werecreature": "Werwesen"
+  "werecreature": "Werwesen",
+  "druchii": "Druchii",
+  "necrarch": "Necrarch",
+  "ogrehunter": "Oger (Hunting Party)",
+  "gnoblar": "Gnoblar",
+  "snotling": "Snotling",
+  "wolfman": "Werwolf"
  },
  "RACE_EN": {
   "human": "Human",
@@ -393,6 +465,12 @@
   "ungor": "Ungor",
   "centigor": "Centigor",
   "minotaur": "Minotaur",
-  "werecreature": "Werecreature"
+  "werecreature": "Werecreature",
+  "druchii": "Druchii",
+  "necrarch": "Necrarch Vampire",
+  "ogrehunter": "Ogre (Hunting Party)",
+  "gnoblar": "Gnoblar",
+  "snotling": "Snotling",
+  "wolfman": "Wolfman"
  }
 }

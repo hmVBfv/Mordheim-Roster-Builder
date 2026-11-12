@@ -1,0 +1,322 @@
+{
+  "warband": {
+    "name": "Vampire Hunters of Sylvania",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "units": [
+      {
+        "id": "vampirehun",
+        "t": "hero",
+        "name": "Vampire Hunter",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "vhHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "vhSkills"
+        ],
+        "sp": "Leader: Any models in the warband within 6\" of the Vampire Hunter may use his Leadership instead of their own. Stake the Vampire!: A Vampire Hunter Hates Vampires. They must always move towards a Vampire on the field (if he can see them) unless he can shoot (in which case he may choose)."
+      },
+      {
+        "id": "priestofmo",
+        "t": "hero",
+        "name": "Priest of Morr",
+        "cost": 35,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "vhPriest",
+        "sk": [
+          "academic",
+          "speed",
+          "vhSkills"
+        ],
+        "sp": "Prayers of Morr: May perform the Funerary Rites, using the rules for Magic. As priests of Morr seldom engage in martial activities, they may only be armed with a Dagger and a Scythe as weapons. Priests of Morr may never wear Armour. Loner: Few people care to spend any length of time in the company of a priest of Morr — even when it is their duty to do so. As such, a priest of Morr is used to being alone and probably prefers it that way. Priests of Morr do not suffer from the All Alone rules. Funerary Rites: Priests of Morr are not wizards, however they do have numerous Funerary Rites which they may perform. As such, priests of Morr may randomly choose a Funerary Rite listed on the following page.",
+        "noArmour": true
+      },
+      {
+        "id": "slayer",
+        "t": "hero",
+        "name": "Slayer",
+        "cost": 25,
+        "exp": 8,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "vhHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "vhSkills"
+        ],
+        "sp": "Stake the Vampire!: A Slayer Hates Vampires. They must always move towards a Vampire on the field (if he can see them) unless he can shoot (in which case he may choose)."
+      },
+      {
+        "id": "villager",
+        "t": "hen",
+        "name": "Villager",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "vhVillager"
+      },
+      {
+        "id": "pilgrim",
+        "t": "hen",
+        "name": "Pilgrim",
+        "cost": 40,
+        "exp": 0,
+        "max": 4,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 10
+        },
+        "eq": "vhPilgrim",
+        "sp": "Fanatical: A Pilgrim of Pain believes that the end of the world is nigh should the undead threat not be stopped. As such, nothing holds any terror for them in the mortal world. Pilgrims automatically pass any leadership-based tests they are required to take. A Pilgrim may never become a Warband leader. Blunt: Due to bludgeoning weapons having a much more profound effect upon the undead, Pilgrims ignore all bladed and ranged weapons in favor of maces, hammers and staffs. The only exception to this is the silver-tip stake, for it's incredible destructive powers against Vampires."
+      },
+      {
+        "id": "wolfhound",
+        "t": "hen",
+        "name": "Wolfhound",
+        "cost": 15,
+        "exp": 0,
+        "max": 4,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Jaws and brutality. A Wolfhound never use nor need weapons or armour. Animal: Wolfhounds are animals and thus do not gain experience."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Vampire Hunter, max. 1 Priest of Morr, max. 3 Slayers; any number of Villagers, max. 4 Pilgrims, max. 4 Wolfhounds.<br><b>Hired Swords:</b> May hire the Hired Swords of a Human Mercenary warband. Vampire Hunters accept nearly all aid that is available."
+  },
+  "extra": {
+    "skills": "vhSkills",
+    "magic": "funeraryRites"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "vhHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Scythe (Vampire Hunters Of Sylvania)",
+          10
+        ],
+        [
+          "Silver-tip Stake",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Armbrustpistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Geweihtes Wasser",
+          10
+        ],
+        [
+          "Blessed Bolts",
+          25
+        ],
+        [
+          "Heiliges/Unheiliges Relikt",
+          15
+        ],
+        [
+          "Throat Guard",
+          10
+        ]
+      ]
+    },
+    "vhPilgrim": {
+      "Nahkampf": [
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Silver-tip Stake",
+          10
+        ]
+      ]
+    },
+    "vhVillager": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ]
+    },
+    "vhPriest": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Scythe (Vampire Hunters Of Sylvania)",
+          10
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "vampirehun": "Driven by a need to cleanse the night, a Vampire Hunter gathers a group of solemn and battle-ready men to combat the most evil and powerful of those that dwell in the darkness. Blood-thirsters beware...",
+    "priestofmo": "Only a Priest of Morr can truly put to rest the reign of undeath. While sword and club may curtail them, a devotee of Morr can truly free the tortured souls of the dead.",
+    "slayer": "While not yet fully accredited Vampire Hunters, these Slayers prowl the night in search of a great kill that will propel them into the esteemed order. They often band together with famous (or infamous) Vampire Hunters in the hopes of finding honor and glory.",
+    "villager": "Roused by grand speeches given to them by the Hunters and Slayers, these common men and women pick up what weapons they can to help reclaim their lives from the night. More often than not, they do not return, but that does not stop others from following in their footsteps.",
+    "pilgrim": "Through incredible pain and suffering a new cult was borne. The members of the Dark Shroud call to those who have lost all to the overlords of the night. These pilgrims of pain, also known as fanatics or zealous madmen, flock to the Slayers in hopes of bringing about an end to the reign of the Undead.",
+    "wolfhound": "These noble beasts serve as loyal protectors and savage hunters. Trained from birth, they can smell the undead from miles away and will fight to the death to protect their masters."
+  },
+  "intro": {
+    "text": "Death comes for each man. Nowheres is this more evident than the lands of Sylvania. The tyrannical reign of the Von Carsteins has held sway for generations, keeping man and beast cowering indoors once darkness falls. It is a dismal life that is lead in Sylvania, however it is often not over when death comes calling. Too often are loved ones laid to rest, only to have nothing but open graves remaining come morning. The dead do not sleep easily in the cursed soil, and oft are the times when ones weary bones are called into dark service. The dead stalk the living as horrors wander the streets at night. Even the short and bleak days do not provide solace as the more desperate of Sylvanian stock raid for what they can take with strength of arms. Several have tried to escape, and very few have succeeded. Fewer still are those that return with hopes of liberating their countrymen from the iron-grasp of the von Carsteins and their court of nightmares. These determined men of iron bring with them those trained in the arts of dealing with the undead. Even priests of the god Morr come to Sylvania, hoping to cleanse the tainted hand that rules her. Here is what sends ghouls scampering back into their filthy holes. They are the ones who leave nothing but smoldering piles of ash in their wake. Here is what causes vampires to pause. These are the Slayers, the Vampire Hunters of Sylvania.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/vampire-hunters-of-sylvania"
+  },
+  "skillSets": {
+    "vhSkills": {
+      "name": "Vampire Hunters of Sylvania Special Skills",
+      "note": "Vampire Hunters and Slayers may use the following skill list instead of the standard skill lists. The Priest of Morr may choose Blessing of Morr and Thirst for Vengeance as well as his normal skills. Iron Will: Such is the work of Slayers that there is little room for hesitation. When the opportunity arises, one must be able to strike! As such, the warrior is hardened and immune to Fear. Righteous Aura: Carrying many talismans from various gods, the warrior heads into battle assured of victory. Possessed or Undead opponents lose their first attack against the warrior in the first round of hand-to-hand combat (down to a minimum of 1). Thirst for Vengeance: The warrior Hates all undead. In his quest for revenge, he gains +1 attack in a turn where he has charged. Blessing of Morr: The warrior has the Death god's blessing in his work. Add +1 to all injury rolls against the undead. Touch of Darkness: Long has the Slayer been dealing in death. Perhaps too long. Due to his heightened intuition, he ignores darkness penalties.",
+      "skills": []
+    }
+  },
+  "unitRace": {
+    "wolfhound": null
+  }
+}

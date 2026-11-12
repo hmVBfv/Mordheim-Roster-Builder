@@ -1,0 +1,581 @@
+{
+  "warband": {
+    "name": "Order of the Mare",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "units": [
+      {
+        "id": "paragon",
+        "t": "hero",
+        "name": "Paragon",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "omParagon",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Any warrior within 6\" of the Questing knight may use his Leadership value when taking Leadership tests. Knight's virtue: The Paragon follows the rules of Knight's virtue. Vow of poverty: The Paragon may not use a Lance.",
+        "req": true
+      },
+      {
+        "id": "dameofthem",
+        "t": "hero",
+        "name": "Dame of the Mare",
+        "cost": 55,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "omDame",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "The Dame of the Mare comes equipped with an ancient armour that may never be removed, traded or stolen. It does not prevent spell casting, and provides a 5+ save that cannot be modified, but doesn't work against magical attacks. She may otherwise be equipped from the Dame equipment list. Prayers of the Mare: The Dame of the Mare may use prayers from the Blessings of the Mare list. She starts with one randomly determined prayer.",
+        "req": true
+      },
+      {
+        "id": "gallant",
+        "t": "hero",
+        "name": "Gallant",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "omFootmanRedeemedKn",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Knight's virtue: The Gallant follows the rules of Knight's virtue."
+      },
+      {
+        "id": "esquiresse",
+        "t": "hero",
+        "name": "Esquiresse",
+        "cost": 15,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "omArcherEsquiresse",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ]
+      },
+      {
+        "id": "pilgrim",
+        "t": "hen",
+        "name": "Pilgrim",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "omFootmanPilgrim",
+        "sp": "Hatred: Pilgrims are so devout to the Dame of the Mare that they hate all and any enemies that defy her. Peasants: While devout and loyal, pilgrims are simple peasants with no ambition other than following their chosen saint, as such may never become heroes. Reroll any The Lad's Got Talent results."
+      },
+      {
+        "id": "bowmen",
+        "t": "hen",
+        "name": "Bowman",
+        "cost": 20,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "omArcher"
+      },
+      {
+        "id": "redeemedkn",
+        "t": "hen",
+        "name": "Redeemed Knight",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "omFootmanRedeemedKn",
+        "sp": "Knight's virtue: Redeemed knights follow the rules of Knight's virtue."
+      },
+      {
+        "id": "companionf",
+        "t": "hen",
+        "name": "Companion Filly",
+        "cost": 45,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 8,
+          "WS": 4,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 2,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "The Filly fights with its hooves, and suffers no penalty for fighting unarmed. It is clad in odd-looking covering like were they from bygone times, yet it shimmers with a spectral gleam. The covering provides the beast with a 5+ save that cannot be modified, but doesn't work against magical attacks. The filly may never take any equipment, except for the covering it already carries. Horse: The filly is an animal and thus does not gain any experience. Additionally it follows the movement rules for mounted warriors."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Paragon. Exactly 1 Dame of the Mare, max. 1 Gallant, max. 2 Esquiresses; any number of Pilgrims, max. 7 Bowmen, max. 5 Redeemed Knights, max. 1 Companion Filly.<br><b>Knight’s virtue:</b> A knight is a chivalrous warrior who is superior to ordinary warriors. He will never panic and break from combat and so does not have to pass a Leadership test for being all alone.<br><b>Hired Swords:</b> Order of the Mare warbands have access to the same hired swords as a mercenary warband would.<br><b>Horse and rider:</b> Because the knights of Bretonnia are typically mounted on horseback, the Paragon and the Gallant may buy a single horse or warhorse each at half the normal price upon recruitment.<br><b>Blessings of the Mare (list):</b> 1. Unnerving gaze Difficulty — 7 The Dame of the Mare, with her daunting gaze, petrifies her adversaries and renders them hesitant to act against her. All attacks targeting the Dame in hand-to-hand combat are at −1 to hit. Furthermore, all enemy models that are in base contact with the Dame must strike last, no matter their target. The effects of the spell lasts until the beginning of the Order of the Mare player's next Shooting phase. 2. Phantom hoof Difficulty — 9 The Dame channels a spectral force to deliver a distant and impactful strike, akin to a horse's kick. Target any enemy warrior within 6\" of the Dame, that model suffers a Strength 5 hit with the concussion special rule. 3. Dame's inspiration Difficulty — 7 Infused with equine fervour, the Dame enhances her striking power and agility, allowing a relentless onslaught in the heat of battle. The Dame's attacks in combat gain +1 to hit and +1 to their Strength. The Dame must test, by rolling the prayer's difficulty or greater on 2D6, at the start of each of her turns to see if the effect remains in play. 4. Thirst for valour Difficulty — 8 The Dame ignites one of her allies (it can't be herself) within 12\" with inspiration and an insatiable thirst for glory and honour in the name of the Prophetess of the Mare. The target warrior is now frenzied. Only one warrior can be affected by this spell at a time, if the Dame chooses a new warrior the former target loses their frenzy. 5. Aura of dauntlessness Difficulty — 10 The Dame says a prayer to bestow unwavering courage upon her entire retinue, empowering them to face adversity with resolute bravery and unyielding determination on the battlefield. For the duration of the battle, the save provided by Dame's and friendly Companion fillies' special armour save is increased by 1. The rest of the warband gains a special unmodifiable 6+ save against all non-magical attacks, this save is in addition to (and taken after) any other saves they may have. 6. The Dame's charger Difficulty — 8 Eerie lights engulf the Dame who suddenly sits upon a spectral steed from ancient history: this counts as her becoming mounted on a warhorse with a modified statline. It will remain in play until the end of the game or until the Dame is dismounted. The Spectral charger offers no armour save like other mounts, but increases the special save from the Dame's own armour by 1. In addition, the Spectral charger is such a ghastly apparition that it and its rider cause fear. 8: WS 4, BS 0, S 4, T 4, W 1, I 4, A 2, Ld 7.<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband."
+  },
+  "extra": {
+    "magic": "blessingsMare"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "omFootman": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "omArcher": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "omDame": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ]
+    },
+    "omFootmanPilgrim": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "omFootmanRedeemedKn": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Rossharnisch (Barding)",
+          30
+        ],
+        [
+          "Warhorse",
+          80
+        ]
+      ]
+    },
+    "omArcherEsquiresse": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Riding/Draft Horse",
+          40
+        ]
+      ]
+    },
+    "omParagon": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Morgenstern",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Rossharnisch (Barding)",
+          30
+        ],
+        [
+          "Warhorse",
+          80
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "paragon": "A Questing knight that forsake property for the Lady of the Lake's Grail and went on a journey to confront lethal adversaries to prove his worth. During the noble quest the knight met the inspiring Prophetess of the Mare, who recognised him as a gallant above others. She dubbed the knight her champion - a paragon of chivalry that will take up arms for her cause and thus find his true path.",
+    "dameofthem": "Shrouded in mystery, yet noble and stalwart, a Dame of the Mare is an inspiring sight. Her armour hints at the ancient days of Gilles le Breton, but where she has attained it is a mystery. Subtle arcane energies dance around her fingertips. Awe-inspiring and enigmatic, she blends nobility with an otherworldly duty, leaving all who encounter her captivated by the spell of her presence.",
+    "gallant": "A young knight errant, brimming with boldness and youthful zeal, emerged from humble origins as the former squire of the Questing knight. Clad in the outdated armour of his generous benefactor, he seeks to prove worthiness in honour of the Dame of the Mare, the mystical maid that elevated him to knighthood and blessed him with unbelievable strength and courage.",
+    "esquiresse": "Young girls, aspiring to damehood. Clad in modest attire they serve their knights, learning combat, chivalry, and battle intricacies. Originally recruited by the Dames of the Mare, these young girls are eager to prove their worthiness for future damehood under their esteemed mentors.",
+    "pilgrim": "Peasants and simple folk that forsake their old lives to follow the Paragon and the mysterious Dame of the Mare on the long journey to Mordheim.",
+    "bowmen": "Seasoned archers that serve in their lords’ ranks as ranged support, wielding longbows with precision. Such weaponry and skill is especially useful on long journeys in stranger lands; and as such, bound by duty, archers in service of the knights of the retinue follow them to whatever end.",
+    "redeemedkn": "Formerly degraded knights with a new purpose in service to the Prophetess of the Mare. Clad in worn, yet dignified, armour, they march with resilience and newfound zeal. Sworn to her cause, they conceal past colours and symbols, donning hoods in humble devotion.",
+    "companionf": "A devout beast that follows wherever the Dame of the Mare treads. The animal is noble and pure; yet there is an otherworldly presence about it. What is more is that the horse seems to be of a breed no one in the warband has seen before. Some notice that it highly resembles the horses on paintings and in histories of old; Noble and untamed, yet as strong as any trained warhorse but with twice the ferocity. Perchance is this one of the last individuals of the breed of horses that brave knights rode on in the very days of Gilles le Breton, the breed that lay the foundation of the extraordinary steeds that one can find only in Bretonnia to this day?"
+  },
+  "intro": {
+    "text": "From the woodlands of eastern Bretonnia, and from every village and town within a day’s ride from the Forest of Loren, echoes the rumours of the Mare witch. A crone of the dark arts according to some, but revered as the Prophetess of the Mare to her increasing number of followers. Claiming to be the heir of ancient heroes from the days of Gilles Le Breton, she sees it her right to restore honour to once-shunned knights. Eager to restore their honour the knights swear allegiance to her, as they once did to their former lords or even the Lady of the Lake. The latter, known now as Paragons, are given a new purpose by the Prophetess of the Mare, leading them on a quest for wyrdstones in Mordheim. Journeying alongside the Paragons on their hunt for the curious artefacts are a unique gathering of warriors known as the Dames of the Mare.\n\nThe Prophetess appoints these Dames to her retinues, each possessing peculiar powers that some might label as witchcraft. Despite their unconventional abilities, the Paragons, beguiled by the Mare Witch, overlook the mystical nature of their allies. Despite the Bretonnian tradition, typically distrustful of such magic, the knights are so entranced by the noble and inspiring Dames of the Mare that they willingly dismiss such reservations.\n\nA distinctive practice among the Dames involves the premature elevation of promising squires. These young warriors, granted extraordinary strength and courage, become knights errant and form a crucial bond with the Paragons whom they join on their long journey to the City of the Damned. In an unexpected turn, the Dames replace the elevated squires with young girls, initiating them into the mysterious order of the Dames of the Mare.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/order-of-the-mare"
+  },
+  "unitRace": {
+    "companionf": null
+  }
+}

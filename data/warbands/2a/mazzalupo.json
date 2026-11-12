@@ -1,0 +1,401 @@
+{
+  "warband": {
+    "name": "Mazzalupo",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "units": [
+      {
+        "id": "wanderingk",
+        "t": "hero",
+        "name": "Wandering Knight",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "mzWanderingkni",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Weapons/armour: a Wandering knight may be equipped with weapons and armour chosen from the Wandering knight Equipment list. SPECIAL RULES Leader: Any models in the warband within 6\" of the Wandering knight may use the Wandering knight's Leadership instead of their own. Riding (horse): The Wandering knight has the Riding (horses) skill. Commands: the Wandering knight can issue Commands to his comrades; he knows one at creation and can acquire others the same way new spells are learned. Animals, allies, dramatis personae, and hired swords cannot be targeted by Commands. Unless explicitly specified, the Wandering knight is not affected by the Commands. The Wandering knight does not count as a wizard and Commands do not count as spells but are cast following the rules for Magic. If the Wandering knight dies, the new warband Captain gains the Commands ability starting with a random Command."
+      },
+      {
+        "id": "masteroffi",
+        "t": "hero",
+        "name": "Master of Finance",
+        "cost": 25,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mzMasteroffina",
+        "sk": [
+          "shooting",
+          "academic"
+        ],
+        "sp": "Weapons/armour: a Master of finances may be equipped with weapons and armour chosen from the Master of finances Equipment list. SPECIAL RULES Corruption: Masters of finances are not good fighters but they are certainly skilled at convincing the enemy to leave them alone. When hit in close combat but before rolling to wound, the player controlling the Mazzalupo warband can give 5 gold crowns to the opponent for each model that hit the Master of finances. If it does, the corrupted model must reroll a successful attack roll. Each model cannot reroll more than one attack in this way, but multiple models can be bribed with 5 gold crowns each. Models immune to Psychology cannot be corrupted. Haggle: The Master of finances has made handling money his life's work and knows every trick to get the most profit from every trade. The Master of finances has the Haggle skill."
+      },
+      {
+        "id": "fallennobl",
+        "t": "hero",
+        "name": "Fallen Noble",
+        "cost": 40,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mzWanderingkni",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Weapons/armour: a Fallen noble may be equipped with weapons and armour chosen from the Fallen noble Equipment list. SPECIAL RULES Indolent: Fallen nobles are resistant to orders and consider themselves of higher rank than any Wandering knight, although they often follow them out of laziness. Fallen nobles can never be the target of a Wandering knight's Commands. Riding (horse): The Fallen nobles have the Riding (horses) skill. Ye give way: When the Fallen noble declares a charge against a Hero, they may challenge the target to yield the way. If the opponent refuses the challenge, the Fallen Noble cannot charge that model but may continue their turn normally, even declaring a new challenge; the warrior who refused the challenge suffers a −1 to hit in hand-to-hand combat, non-cumulative, until the end of the game. If the opponent accepts, the combat proceeds normally, but no other warrior may join the fight, although both models can still suffer area effects and be the target of spells. If the Fallen Noble manages to put the challenged opponent out of action, they gain a +1 to hit in hand-to-hand and a +1 S, non-cumulative, until the end of the game."
+      },
+      {
+        "id": "squire",
+        "t": "hero",
+        "name": "Squire",
+        "cost": 20,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "mzMasteroffina",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed"
+        ],
+        "sp": "Working as a Squire represents, for many boys and girls—often orphans or runaways—an alternative to a life on the streets often involving with petty thefts, brawls, and subterfuges. This way, as a Squire, they can instead be fully involved in petty thefts, brawls, and subterfuges. Weapons/armour: a Squire may be equipped with weapons and armour chosen from the Squire Equipment list. SPECIAL RULES Petty thief: Squires have a background that taught them to get by with thefts and scams. If, at the end of the game, the Squire was not taken out of action, roll 1d6. On a result of 5+, subtract one Wyrdstone shard from a randomly determined opposing warband and add it to your reserve."
+      },
+      {
+        "id": "sheepherde",
+        "t": "hen",
+        "name": "Sheepherder",
+        "cost": 30,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mzSheepherdera",
+        "sp": "Weapons/armour: a Sheepherder may be equipped with weapons and armour chosen from the Sheepherder Equipment list."
+      },
+      {
+        "id": "churl",
+        "t": "hen",
+        "name": "Churl",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "mzSheepherdera",
+        "sp": "Weapons/armour: a Churl may be equipped with weapons and armour chosen from the Churls Equipment list."
+      },
+      {
+        "id": "blacksheep",
+        "t": "hen",
+        "name": "Black Sheep",
+        "cost": 10,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "none. SPECIAL RULES Stupidity: a Black sheep is subject to stupidity unless a Sheepherder is within 6\" of it. Animals: Black sheep are animals and do not gain experience. Butcher's meat: Black sheep can be ignored by the opponent when determining the closest target in the Shooting phase. At the same time, the Mazzalupo warriors can shoot at enemy models if they are engaged in hand-to-hand combat exclusively against Black sheep, randomly determining which of all models engaged in combat is hit. Mountain animals: Black sheep can climb up and down following normal rules despite being animals."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Wandering Knight, max. 1 Master of Finance, max. 2 Fallen Nobles, max. 1 Squire, max. 2 Sheepherders; any number of Churls, max. 5 Black Sheep.<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.<br><b>Commands:</b> During the recovery phase, if the Wandering knight is not knocked down, stunned, or out of action, he may shout a Command instead of running. Commands affect friendly models within 6\" that can hear him (not stunned or knocked down). Models may only benefit from one Command per turn. Raise our insignia! — Difficulty — 6 Encouraging the Squire to raise a handkerchief in the army's colours, the Mazzalupo regain courage, united under the same banner. This Command can only be issued to the Squire if it is within 12\" and is not fleeing, knocked down, stunned, or taken out of action. Until the beginning of the next Shooting phase, every model of the Mazzalupo warband, including the Wandering knight, who has line of sight to the Squire can reroll failed Leadership tests, including the warband's Rout test. Move, ye miscreant! — Difficulty — 6 The booming voice of the Knight Errant urges even the most slothful of the Mazzalupo to spring into action. A single Mazzalupo warrior within 6\" of the Wandering knight may immediately move again up to its maximum Movement distance. If this moves them into base contact with an enemy model, they count as charging. Follow me, mine pugnacious ones! — Difficulty: 8 With heroic demeanour, the Wandering knight rallies his men and bolsters their fighting spirit. Members of the Mazzalupo warband within 4\" of the Wandering knight gain a +1 bonus to hit in hand-to-hand combat until the end of the turn. Be on guard, my brave ones! — Difficulty: 7 A true commander knows the importance of caution and teaches his comrades that there is no shame in fleeing from a fight, only wisdom. Choose a member of the Mazzalupo warband within 12\" that is engaged in hand-to-hand combat. That model can immediately move away from the combat up to the maximum distance allowed by their Movement value but cannot come into contact with other enemy models. Pay them no heed! — Difficulty — 6 Ever watchful of battlefield developments, the Knight Errant issues orders on which targets are the highest priority. Choose a Mazzalupo model within 12\". Until the next Shooting phase, the model can target any enemy warrior even if they are not the closest. Art thou ready to die fighting? — Difficulty: 8 The Wandering knight appeals to the tenacity of his men to withstand the enemy's blows. Every Mazzalupo model within 4\", including the Wandering knight, can only be taken out of action on a roll of 6 until the next Mazzalupo turn.<br><b>Horses:</b> Fallen nobles may not ride a horse unless the Wandering Knight of the warband is riding a horse."
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "mzWanderingkni": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Lanze",
+          20
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Riding/Draft Horse",
+          40
+        ]
+      ]
+    },
+    "mzMasteroffina": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "mzSheepherdera": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Morgenstern",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Bearcloak",
+          10
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "wanderingk": "Wandering knights are skilled warriors always looking for feats that are worthy of the great qualities they believe they possess. Often presumptuous and opinionated, they refer to Bretonnian chivalric ideals, but reinterpret them with a pragmatic spirit that many would define as Tilean.",
+    "masteroffi": "Usually decrepit, greedy and miserly people, the Masters of finance are an essential element of every Mazzalupo warband, since money represents the main link between its members. Although they are not great fighters, as accountants they can nevertheless provide important support to the warband.",
+    "fallennobl": "It often happens that fallen nobles, illegitimate children, disgraced princes, and scions rejected by their families, destined to wander aimlessly, join Mazzalupo warbands to try to give purpose to their existence or simply to spend it in company. Although often indolent and accustomed to the easy life of the past, they have nonetheless received a military education and can be formidable opponents in a duel.",
+    "squire": "Working as a Squire represents, for many boys and girls—often orphans or runaways—an alternative to a life on the streets often involving with petty thefts, brawls, and subterfuges. This way, as a Squire, they can instead be fully involved in petty thefts, brawls, and subterfuges. If, at the end of the game, the Squire was not taken out of action, roll 1d6. On a result of 5+, subtract one Wyrdstone shard from a randomly determined opposing warband and add it to your reserve.",
+    "sheepherde": "Accustomed to the company of animals, both their sheep and the wolves and bears that try to eat them, the Sheepherders are rough and coarse individuals, always characterized by a strong odour.",
+    "churl": "Places like the Empire and Tilea are full of people who have not found their place in the world and live on the fringes of society: vagabonds, inhabitants of no man's lands, or even simple country folk resistant to urban life and incapable of learning a job. They are all united by survival instinct and a lack of knowledge of any ethical, moral, and especially chivalrous rules. These individuals, derogatorily called \"Churls,\" are shunned by everyone... except for the Mazzalupo warbands, for whom they represent a cheap and valuable resource.",
+    "blacksheep": "Occasionally, in a flock, black-fleeced sheep are born that cannot produce milk. Despite being useless, it is said that slaughtering a black sheep brings bad luck, as does driving them away or abandoning them. Therefore, many Sheepherders have found a clever way to exploit these unfortunate animals: they use them in battle to hinder the enemy. Apparently, this does not count as killing them, so the curse is avoided."
+  },
+  "intro": {
+    "text": "“What city might that be?” asked Bellincione the sheepherder, peering at the black walls of the city cut in half by a dark river and surrounded by small camps. “It be surely Nuln... or Averheim... or e’en Waldenhof... or another place I know not” Menardo replied confidently, riding his steed. “Let us go beyond!” added Griffolino, the old Master\n\nof finances, fearfully. “Wherefore?” Menardo replied with a stern and surprised look. “My liege, there riseth a sinis- ter smoke, and we hear wailing from every quarter” “Ruffians and knaves! The men under my command fear neither\n\nrain nor sun, fire nor wind! We shall enter that city where castles, riches, and fair maidens await us. Now follow me, mine fighters! And when I say ‘follow me, mine fighters,’ ye must follow and fight. Elsewise, we might as well tarry here and twiddle our thumbs.” And so they set off toward Mordheim.\n\nIt is said that many years ago, a large Black Wolf brought death and destruction to a small village in Tilea. The inhabitants, determined to rid themselves of the wolf, hired a wandering knight who recruited other followers gathered along the way: a fallen noble, a squire, a master of finances, sheepherders, and some churls: an improbable bunch that, despite appearances, managed to track down and finally kill the wolf. Since then, that small army became legendary and, partly out of tradition and partly out of superstition, has been imitated many times. This type of formation has proven effective in multiple situations, and in Tilea, these types of bands are known as Mazzalupo.\n\nThe Mazzalupo are small bands of vagabonds, ragtag, knaves, tricksters, and rogues, more or less skilled in combat but certainly very competent in the art of survival, held together by the desire to find some treasure or accomplish a feat that earns them the recognition of some lord. To try to achieve this aspiration, they roam the continent far and wide in search of the opportunity of their lives.\n\nDuring these wanderings, some Mazzalupo venture to Mordheim seeking fortune out of recklessness, bravado, or often simply because they are lost.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/mazzalupo"
+  },
+  "unitRace": {
+    "blacksheep": null
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "warband": {
+    "name": "Sorcerous Society",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "units": [
+      {
+        "id": "magus",
+        "t": "hero",
+        "name": "Magus",
+        "cost": 75,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "ssList",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Leader: Any models in the warband within 6\" of the Magus may use his Leadership instead of their own. Wizard: The Magus is a powerful wizard and may randomly generate two spells from any one Elemental list, or from the Lesser Magic list found in the Core Rulebook."
+      },
+      {
+        "id": "companion",
+        "t": "hero",
+        "name": "Companion",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "ssList",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength"
+        ],
+        "sp": "Don't look at me!: A Companion does not command the respect that a wizard does. As a result the Companion may never become the Leader of a warband and his Leadership may never be used for any Leadership tests except his own. This includes Rout Tests after the Leader has been taken Out of Action. Body Guard: If the Companion is within 2 inches of a Wizard and not involved in Hand to Hand combat, he will take all missile fire and intercept any charges directed at the Wizard. If this requires that the model be moved, it is done so immediately, even if out of sequence or if it forces the model to move further than usually allowed in one turn. Note that the Companion must have a logical path to accomplish this goal; if he is within 2\" of a Wizard but on a lower floor in a building, he will be unable to protect him in this manner."
+      },
+      {
+        "id": "mage",
+        "t": "hero",
+        "name": "Mage",
+        "cost": 35,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ssList",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Wizard: The Mage is a wizard, and may randomly generate a spell from any one Elemental list, or from the Lesser Magic list found in the Core Rulebook. Respect your betters: A Mage may never have more spells than the Leader. If a Mage has more spells than the leader he will immediately be challenged to a Wizard's Duel. Have another player take control of the Leader for this match. The loser of the duel must leave the warband."
+      },
+      {
+        "id": "untrained",
+        "t": "hen",
+        "name": "Untrained",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ssList",
+        "sp": "Here, hold this: Untrained may be equipped with special items (like holy relics or lucky charms). Harnessed: Should an Untrained roll a \"Lads Got Talent\" roll, they immediately gain the \"Wizard\" skill. They may choose to either forgo their additional advancement and randomly generate a spell, or may roll as the Hero advancement dictates."
+      },
+      {
+        "id": "grunt",
+        "t": "hen",
+        "name": "Grunt",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ssList",
+        "sp": "Prove that Talent!: If \"Lads Got Talent\" is rolled the individual Grunt can either become a mundane Hero or may choose to become a \"Grunt Untrained\" instead. Therefore, a Grunt who rolls two \"Lads got Talent\" may become a wizard."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Magus, max. 2 Companions, max. 2 Mages, max. 5 Untrained; any number of Grunts.<br><b>Keep it secret, keep it safe!:</b> A Sorcerous Society warband may never have a Hired Sword or Dramatis Personae with the Wizard ability save for the High Elf Mage. Otherwise they may use any other Hired Sword as a Human Mercenary Warband.<br><b>The Vagaries of Magic:</b> Members of the Sorcerous Society are using powerful and sometimes little known spells. As a result they are susceptible to the chaotic lure of magic. If a Wizard in the Sorcerous Society Warband rolls a natural 2 (two 1's) when rolling for a spell than they must roll on the Magical Failure Table. Table used with permission from the Border Town Burning Suppliment. 2: Result Aaarrgh! The powers of Chaos take over the helpless wizard as he horribly mutates to a Spawn of Chaos. Remove the wizard from your roster.; 3: Result Gglbddlh: The wizard is now stupid. Roll a D6 after the battle — on a score of 2+ the effect ends.; 4: Result Magical Shutdown: The wizard cannot cast any spells for the duration of this battle.; 5-6: Result Uh-oh! The spell has been cast successfully — upon the wizard himself! Any additional decisions are made by the wizard's left player.; 7: Result Pooh, nothing at all! Except for the spell's failure there are no further consequences.; 8-9: Result Magical Explosion: The wizard is thrown D6\" in a random direction and then lands knocked down.; 10 — 11: Result Magical jam: The wizard cannot cast a spell in his next shooting phase. Missile weapons may be used as normal, of course.; 12: Result Wait, what's that? The uncontrollable powers of Chaos cause the wizard to mutate. After a moment of horror the transmutation ends. You may choose a free Mutation for the wizard chosen from the Possessed's Mutations chart (Mordheim Rulebook page 76)."
+  },
+  "extra": {
+    "magic": "sorcerousMagic"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "ssList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Wizard's Staff",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Vertrauter",
+          20
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "magus": "There is always one who stands above the rest in a group. Within a Wizarding warband, that one is the Magus. Be it because of superior skill, force of will or charisma, the Magus is the unquestioned leader of the band, and his word carries the weight of absolute power.",
+    "companion": "Sometimes a special bond will develop between a wizard and a mundane individual. This could be due to the awe-inspiring power the wizard possesses, or perhaps the mage showed some kindness. These people are referred to as Wizards Companions. Such is the bond between the two that a Companion will often go above and beyond what one person would typically do for another.",
+    "mage": "Mages, Sorcerers, Witches, Hedge Wizards; call them what you will, these are men and women of uncanny power. Self-taught, they definitely posses the spark of magic, and with the proper experience and tutelage, there is no telling the might they may one day command.",
+    "untrained": "In his travels a Magus may encounter a town or settlement that has a peculiar individual who is shunned or ridiculed for their differences. Oftentimes these individuals are imbued with natural magical talents that are unharnessed and unpredictable. Although life on the road with a Magus and his companions is hard, the promise of someday becoming a powerful wizard is far better than enduring the taunts and tortures of ignorant townsfolk.",
+    "grunt": "Somebody has to cook the food and watch the camp while the wizard sleeps. All mundane tasks of day to day living fall to the Grunts. These common folk are invaluable for the protection and services they provide. While some aspire to be like their masters, most are happy to live their life in service to them."
+  },
+  "intro": {
+    "text": "Even prior to the twin-tailed comet crashing into the city of Mordheim, practitioners of the magical arts were held with suspicion, fear and even hatred. This came to a head in the years between 1982 and 1991 of the Imperial Calendar when the state sanctioned cults of Sigmar and Ulric took to persecuting wizards in what became known as the “Wizard Wars”. As a result many law-abiding wizards were forced to flee or go into hiding. The study of magic continues to be circumspect. To this day Witch Hunters, so called Templars of Sigmar, search the cities, towns and villages of the Empire trying to uproot those that practice “arts most vile”. Secret societies of Sorcerers were formed to protect the teachings and practices brought down through the ages. Some among the societies are sent out to seek out abandoned artifacts, collect materials needed for the continued study of magic, root out evil spell casters and practitioners of vile Necromantic or Chaos Rites and Rituals as well as engage in other perilous task that must be accomplished to ensure the preservation of their art.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/sorcerous-society"
+  }
+}

@@ -1,0 +1,411 @@
+{
+  "warband": {
+    "name": "Protectorate of Sigmar",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "units": [
+      {
+        "id": "warriorpri",
+        "t": "hero",
+        "name": "Warrior Priest",
+        "cost": 80,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "psList",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed"
+        ],
+        "sp": "Leader: Any models in the warband within 6\" of the Warrior Priest may use his Leadership instead of their own. Prayers of Sigmar: The Warrior Priest has studied the Prayers of Sigmar , and as such begins with one randomly generated prayer. See the Magic section."
+      },
+      {
+        "id": "templar",
+        "t": "hero",
+        "name": "Templar",
+        "cost": 45,
+        "exp": 12,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "psList",
+        "sk": [
+          "combat",
+          "strength",
+          "speed"
+        ],
+        "sp": "Zealous: Strong is the devotion of the Templar. The model hates any model belonging to a chaotic warband. This includes Skaven, Possessed, Carnival of Chaos, Beastmen and any warband that has a Daemon in it."
+      },
+      {
+        "id": "acolyte",
+        "t": "hero",
+        "name": "Acolyte",
+        "cost": 25,
+        "exp": 2,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "psList",
+        "sk": [
+          "combat",
+          "academic",
+          "strength",
+          "speed"
+        ]
+      },
+      {
+        "id": "huntsman",
+        "t": "hero",
+        "name": "Huntsman",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "psHuntsman",
+        "sk": [
+          "combat",
+          "shooting"
+        ],
+        "sp": "(Takes place of one Templar) Beastmaster: A Huntsman is naturally attuned to the earth and beasts around him. Any animal in the warband may use the Huntsman Leadership characteristic if it is within 6\" of him. Any hostile beast must make a successful Ld Test to charge the Huntsman."
+      },
+      {
+        "id": "archer",
+        "t": "hen",
+        "name": "Archer",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "psHenchmen"
+      },
+      {
+        "id": "crusader",
+        "t": "hen",
+        "name": "Crusader",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "psHenchmen"
+      },
+      {
+        "id": "hound",
+        "t": "hen",
+        "name": "Hound",
+        "cost": 15,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Jaws and Brutality. A Hound never uses nor needs weapons or armour, and suffers no penalty for doing so. Animals: Hounds are animals, and thus gain no experience. Devoted: Trained since pups, these Hounds are devoted beyond what a typical master could expect. A Hound may re-roll a failed Leadership check if within 12\" of the Warrior Priest."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Warrior Priest, max. 2 Templars, max. 2 Acolytes, max. 1 Huntsman, max. 5 Archers, max. 5 Crusaders, max. 5 Hounds.<br><b>Death of a Leader:</b> Should the Warrior Priest fall, the Acolyte with the most experience takes up the Mantle of Leader. Transfer all benefits of the Warrior Priest class to the Acolyte, and change his title accordingly. He does not immediately gain a Prayer, as that requires study and experience. With his next advance, he may choose to either take a prayer from the list, or roll for an advancement. All subsequent advancements are done as per the regular rules. Once promoted, the Acolyte becomes a Warrior Priest, thus freeing the Warband to hire another Acolyte."
+  },
+  "extra": {
+    "skills": "psSkills",
+    "magic": "prayersSigmar"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "wh"
+    ]
+  },
+  "lists": {
+    "psHuntsman": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Blessed Bolts",
+          25
+        ]
+      ]
+    },
+    "psList": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Sigmaritischer Kriegshammer",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Shield of Sigmar",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Geweihtes Wasser",
+          5
+        ],
+        [
+          "Blessed Bolts",
+          25
+        ],
+        [
+          "Heiliges/Unheiliges Relikt",
+          15
+        ]
+      ]
+    },
+    "psHenchmen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "warriorpri": "Determined to bring Mordheim back within the realm of the Church, the Grand Theogonist sends forth his faithful. The Warrior Priest, strong of both arm and faith, is the natural choice to lead such a band.",
+    "templar": "Knighted, these warriors don the dark robes of the Templar. Sworn to protect the Holy Bringers of Truth and Justice, they willingly place themselves well within dangers reach to further the crusade of the Church.",
+    "acolyte": "Recent additions to the church, these young men are sent to assist the Warrior Priest in his duties. Seen as a great honor to accompany an accomplished field commander, the Acolytes yearn for battle, hoping to prove themselves worthy servants of Sigmar.",
+    "huntsman": "Due to the wild and harsh conditions on the road to Mordheim, the Church often seeks out the aid of those familiar with the way. A Huntsman is well versed in the ways of the wilderness, and eagerly offer up their services to those of the cloth.",
+    "archer": "Trained in that art of ranged death, the Archers offer up a hail of arrows to any foolish enough to stand in the path of righteousness.",
+    "crusader": "Dedicated to bringing the word of Sigmar to all, the long arm of the Church is composed of many Crusaders. Brave and stalwart men, they march under the colored banners of their Protectorate, ready to bring justice to the Empire.",
+    "hound": "Nearly as loyal to the Warrior Priest as Acolytes, these specially trained canines are raised to sniff out evil. Once detected, there is little that will stop them from sinking their teeth in and rending it to shreds."
+  },
+  "intro": {
+    "text": "The Church of Sigmar has long played an active role in the protection of the Empire. Warrior Priests have marched with Generals to purge the lands of Greenskin invasions, and they have stood as stalwart defenders when the storms of chaos blew in from the north. Each high ranking Warrior Priest has an entourage of warriors that form his personal guard, and these groups are known as the Protectorate of Sigmar. In times of relative peace, these bands of men look inwards to the Empire to resolve issues that have too long been ignored. Such a time is now, and such a place is Mordheim. With evil seething out from every pour, Mordheim lies in ruin and awaits for the Holy to bring her back into the light. While the Grand Theogonist has endorsed the Witch Hunters to gather the rabble to smoke out any who follow chaos, it is the Protectorate who have his full blessing. As such, he sends these bands of highly trained men into the clutches of insanity to bring forth Sigmars justice.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/protectorate-of-sigmar"
+  },
+  "skillSets": {
+    "psSkills": {
+      "name": "Protectorate of Sigmar Special Skills",
+      "note": "Protectorate Heroes with access to Special Skills may use the following list:",
+      "skills": [
+        [
+          "Protection of Sigmar",
+          "The pious has been blessed by the Church. Any spell which would affect him is nullified on a D6 roll of 4+. Note that if the spell is nullified it will not affect any other models either."
+        ],
+        [
+          "Unshakeable Faith",
+          "Such is the faith of the warrior that there is little room for doubt or hesitation in his actions. When the opportunity arises to smite evil, one must be able to strike! As such, the warrior is hardened and immune to Fear."
+        ],
+        [
+          "Utter Determination",
+          "Only the Warrior Priest may have this skill, which allows him to re-roll any failed Rout tests."
+        ],
+        [
+          "Rousing Sermon",
+          "Only the Warrior Priest may have this skill. The Warrior Priest bellows his prayers to Sigmar, beseeching his protector to lend he and his men the strength to forge onwards. A Rousing Sermon must be declared at the beginning of a player's turn. The Warrior Priest and all friendly models within 6\" gain +1 attack during that Hand to Hand combat phase. There may only be one Rousing Sermon per game."
+        ],
+        [
+          "Sigmar’s Guidance",
+          "With the blessed hand of Sigmar guiding his aim, the warrior lets loose his arrow. He may freely choose his target, and not only the closest enemy when declaring ranged attacks."
+        ]
+      ]
+    }
+  },
+  "unitRace": {
+    "hound": null
+  }
+}

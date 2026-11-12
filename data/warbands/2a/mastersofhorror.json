@@ -1,0 +1,320 @@
+{
+  "warband": {
+    "name": "Masters of Horror",
+    "grade": "2a",
+    "siteRace": "Universal Monsters",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "units": [
+      {
+        "id": "madscienti",
+        "t": "hero",
+        "name": "Mad Scientist",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "mhHero",
+        "sk": [
+          "academic",
+          "speed",
+          "mhSkills"
+        ],
+        "sp": "Leader: Any models in the warband within 6\" of the Mad Scientist may use his Leadership value. Immune to Psychology: Mad Scientists are not affected by psychology (such as fear) due to the shattered state of their minds."
+      },
+      {
+        "id": "thrall",
+        "t": "hero",
+        "name": "Thrall",
+        "cost": 70,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mhHero",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "mhSkills"
+        ],
+        "sp": "Cause Fear: Vampires are terrifying Undead creatures and therefore cause Fear. Immune to Psychology: Vampires are not affected by psychology (such as fear) and never leave combat. Immune to Poison: Vampires are not affected by any poison. No Pain: Vampires treat a Stunned result on the Injury chart as Knocked Down."
+      },
+      {
+        "id": "wolfman",
+        "t": "hero",
+        "name": "Wolfman",
+        "cost": 65,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 2,
+          "I": 2,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": null,
+        "sp": "A werewolf cannot bear equipment. They attack with tooth and claw,and suffer no penalties for doing so."
+      },
+      {
+        "id": "hunchback",
+        "t": "hero",
+        "name": "Hunchback",
+        "cost": 25,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "mhHero",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "mhSkills"
+        ]
+      },
+      {
+        "id": "zomby",
+        "t": "hen",
+        "name": "Zombie",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 1,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Zombies never carry any equipment, and do not suffer any penalties for this. Cause Fear: Zombies are terrifying Undead creatures and therefore cause Fear. May not Run: Zombies are slow Undead creatures and may not run (but may charge normally). Immune to Psychology: Zombies are not affected by psychology. Immune to Poison: Zombies are immune to poisons. No Pain: Zombies treat Stunned results on the Injury table as Knocked Down. No Brain: Zombies do not gain experience."
+      },
+      {
+        "id": "fleshconst",
+        "t": "hen",
+        "name": "Flesh Construct",
+        "cost": 80,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 5,
+          "W": 2,
+          "I": 2,
+          "A": 2,
+          "Ld": 6
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Flesh Constructs do not use weapons, and suffer no penalties. Cause Fear: Flesh Constructs are terrifying Undead creatures and therefore cause Fear. Immune to Psychology: Flesh Constructs are not affected by psychology. Immune to Poison: Flesh Constructs are immune to poisons. No Pain: Flesh Constructs treat Stunned results as Knocked Down. A Bit Unhinged: Flesh Constructs do not gain experience normally. They must make a successful Leadership test in order to gain the experience for surviving the game; dead brains can only be expected to learn so much, after all. Its only a flesh wound: When a Flesh Construct is taken OOA, roll on the Henchmen Injury table as normal. On a roll of 1-2, the player is able to repair the damage to the golem for D6x5gc (to represent the time and effort it takes to obtain new parts). If the warband is unable to pay for the extra part immediately, the Construct is not able to participate in the next battle. It will remain on the roster until abandoned or repaired. Cannot Run: After being pieced together from various stiffs, ones legs are often, well, stiff. Constructs may still charge normally."
+      },
+      {
+        "id": "thebitten",
+        "t": "hen",
+        "name": "Bitten",
+        "cost": 40,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "mhBitten",
+        "sp": "Transform: Roll a D6 each turn and consult the following. Once transformed, the Bitten cast off all equipment (save for a dagger) and suffer no penalties for fighting unarmed. 1: Madness: your Bitten suffers from Stupidity this turn. If Transformed, they revert to human form. 2 to 5: Act as normal 6: Transformed: your Bitten gains Frenzy and Sprint. This lasts until a 1 is rolled. Transformed do not roll when in combat."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Mad Scientist, max. 1 Thrall, max. 1 Wolfman, max. 2 Hunchbacks; any number of Zombies, max. 1 Flesh Construct, max. 3 Bitten.<br><b>Hired Swords:</b> May hire the Hired Swords of an Undead warband.<br><b>No Promotion:</b> Neither Zombies nor Flesh Constructs may become Heroes through Lads Got Talent.<br><b>Wolfman Maximum Characteristics:</b> Maximum characteristics of the Wolfman: M 6, WS 4, BS 3, S 5, T 4, W 3, I 7, A 4, Ld 8."
+  },
+  "extra": {
+    "skills": "mhSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "undead"
+    ]
+  },
+  "lists": {
+    "mhHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "mhBitten": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "madscienti": "Insane and twisted, the Mad Scientist strives to improve the world around him... often with horrifying results. Bent on achieving his goals, he drags his madness into reality through his experiments.",
+    "thrall": "Mere shadows of the Lords of Sylvania, the Thrall is the lowest form of Vampire. Subdued by the Scientist, the Thrall exists solely for the bloodletting of battle.",
+    "wolfman": "Wolfmen are miserable men cursed with lycanthropy. Bestial, at the mercy of their carnal desires, they stalk the night searching for prey.",
+    "hunchback": "Lowly beings, the Hunchbacks serve the Scientist with his crazy endeavors. Deceptively agile and loyal despite their appearance.",
+    "zomby": "Often used for menial labour, these meat puppets offer protection for the Mad Scientist.",
+    "fleshconst": "Twisted beings torn from the nightmares of men. These beasts are powered by insane science.",
+    "thebitten": "Slaves to the disease that courses through their veins, the Bitten serve their dark masters in both their human and bestial forms."
+  },
+  "intro": {
+    "text": "Lightning flashes across the dark sky as cackling arises from a ruined tower. \"It's Alive!\" echoes across the dead woods that surround the crumbling edifice before the thunder pounces and swallows it whole. The heavy door is drawn aside by a dwarf-like man, as he quickly makes way for his Master and his latest creation. Stumbling on ever-still legs, the monstrous being sets foot upon the soft mossy earth, leaving large impressions in its wake.\n\nInsane giggling follows it, as the once-acclaimed Scientist follows his golem, armed with his deranged intellect and arsenal of mutated fiends. He seeks to bring pain and suffering to those who cast him out of Altdorf, but to do so he'll need wyrdstone to power his inventions. Off to Mordheim they move...",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/masters-of-horror"
+  },
+  "skillSets": {
+    "mhSkills": {
+      "name": "Masters of Horror Special Skills",
+      "note": "The following skill list may be used by the Mad Scientist instead of the standard skill lists. Lunatic is available to all Heroes.",
+      "skills": [
+        [
+          "Surgeon",
+          "The Mad Scientist can attempt to operate upon an injured minion. Reroll one dice of a single injury roll. You must accept the second roll."
+        ],
+        [
+          "Alchemist",
+          "The Mad Scientist fancies himself an alchemist and brews all sorts of concoctions and potions to guzzle down prior to battle. Roll a D6 at game-start and consult the following table"
+        ],
+        [
+          "Apt Revitalist",
+          "The Mad Scientist has gone above and beyond the understanding of most men, and has gained the ability to recreate life from death. Simply animating meat-puppets who parody life has bored him; he has moved on to reanimating dead cells. Any zombies within the warband now gain exp as normal human henchmen."
+        ],
+        [
+          "Lunatic",
+          "Giving in to ones insanity is quite rewarding. The model causes Fear and may reroll any Leadership Test."
+        ]
+      ]
+    }
+  },
+  "unitRace": {
+    "thrall": "vampire",
+    "wolfman": "wolfman",
+    "zomby": null,
+    "fleshconst": null
+  }
+}

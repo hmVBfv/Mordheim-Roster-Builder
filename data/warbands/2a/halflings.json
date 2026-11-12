@@ -1,0 +1,541 @@
+{
+  "warband": {
+    "name": "Halflings",
+    "grade": "2a",
+    "siteRace": "Halfling",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "units": [
+      {
+        "id": "halflingel",
+        "t": "hero",
+        "name": "Halfling Elder",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 5,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "hfElder",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed",
+          "hfSkills"
+        ],
+        "sp": "Leader: Any warrior within 6\" of the Elder may use his Leadership when taking a Leadership test."
+      },
+      {
+        "id": "halflingco",
+        "t": "hero",
+        "name": "Halfling Cook",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "hfCook",
+        "sk": [
+          "strength",
+          "speed",
+          "hfSkills"
+        ],
+        "sp": "Master Chef: Halfling Cooks have a vast range of knowledge when and it comes to culinary matters, and their food is often more filling and favorable then that of hapless no-talent human chef! To represent his masterful cooking talent role one D6. On a 5+ the cook has managed to make a little food go a long way and when selling Treasure or Wyrdstone the warband is considered to be one size lower. Any role below a 5+ does not represent the chef's inability to conjure up some delicious food, it just means he ate all the excess food before his other companions got there!"
+      },
+      {
+        "id": "halflingth",
+        "t": "hero",
+        "name": "Halfling Thief",
+        "cost": 30,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "hfHalflingthie",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "hfSkills"
+        ],
+        "sp": "Infiltrator: He may always be placed on the battlefield after enemy warband(s), and can be placed anywheres on the table as long as it is out of sight of the opposing warband and at least 12\" away from any enemy model. If more than one model has infiltrate, roll-off to see who places first. Pick Locks: When testing to open a locked door, a Halfling Thief needs only make a successful Initiative test. Cutpurse: A Halfling Thief makes a living of \"finding\" things others have \"lost\". If the Halfling Thief took part in a battle, and was not taken OOA, then the warband gains +1 Treasure on top of what they would normally find."
+      },
+      {
+        "id": "halflingyo",
+        "t": "hero",
+        "name": "Halfling Youth",
+        "cost": 10,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "hfYouth",
+        "sk": [
+          "shooting",
+          "speed",
+          "hfSkills"
+        ]
+      },
+      {
+        "id": "halflingsc",
+        "t": "hen",
+        "name": "Halfling Scout",
+        "cost": 20,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 2,
+          "T": 2,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "hfScout"
+      },
+      {
+        "id": "halflingwa",
+        "t": "hen",
+        "name": "Halfling Warrior",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "hfWarrior"
+      },
+      {
+        "id": "piggy",
+        "t": "hen",
+        "name": "Piggy",
+        "cost": 20,
+        "exp": 0,
+        "max": 4,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 0,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "sp": "None! Apart from their vicious tempers Piggies don't use weapons and can fight without penalties. Animals: Piggies are animals and never gain experience.",
+        "noxp": true
+      },
+      {
+        "id": "villageogr",
+        "t": "hen",
+        "name": "Village Ogre",
+        "cost": 140,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 2,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 7
+        },
+        "eq": "hfVillageogre",
+        "sp": "Fear: Ogre-kin are large and brutish creatures that cause Fear. Large: Ogre-kin are huge, lumbering creatures and therefor make tempting targets for archers. Any target may shoot at an Ogre, even if he is not the closest model. Skills: An Ogre-kin who becomes a Hero may only choose from Combat and Strength skill-lists. Slow Witted: Ogre-kin are not the brightest creatures about. They earn experience at half-rate. Protective: The Ogre is content with his pay and more importantly, his meals. He will therefor scare off any other Ogre that may attempt to join the warband. Once a Village Ogre is purchased, Ogre Bodyguards will not join the warband, and should one have been hired prior to the Village Ogres arrival, he will move on."
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Halfling Elder, max. 1 Halfling Cook, max. 1 Halfling Thief, max. 2 Halfling Youths, max. 7 Halfling Scouts, max. 5 Halfling Warriors, max. 4 Piggies, max. 1 Village Ogre.<br><b>Pretty much human:</b> May hire the Hired Swords of a Human Mercenary warband. Halflings are pretty much human and therefore may hire any hired sword available to human mercenaries.<br><b>Too Big:</b> Halflings may never use Long bows, Elf Bows, Handguns, Long Rifles or Blunderbusses even if they gain an advance roll that would allow them to do so. Such big weapons aren't built for such tiny hands!<br><b>Halfling Items:</b> Halflings do not gain any bonuses from having Halfling items (such as the Halfling Cookbook) because they already know all the knowledge that can be obtained from such things."
+  },
+  "extra": {
+    "skills": "hfSkills"
+  },
+  "race": "halfling",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "hfHalflingthie": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrustpistole",
+          35
+        ],
+        [
+          "Pistole",
+          25
+        ],
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Seil & Haken",
+          5
+        ],
+        [
+          "Dietriche",
+          10
+        ]
+      ]
+    },
+    "hfVillageogre": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "hfElder": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    },
+    "hfCook": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Fleischklopfer",
+          3
+        ],
+        [
+          "Hackbeil",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Kochtopf-Helm",
+          10
+        ]
+      ]
+    },
+    "hfYouth": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    },
+    "hfScout": {
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    },
+    "hfWarrior": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "halflingel": "Occasionally Halfling Elders tire of the responsibility of taking care of a village. They wish they were young again, so they could eat ten meals a day and get as merry as they used to be! To reclaim their lost youth they will go to extreme lengths, even if that means going off into the wilderness on a grand and wild adventure!",
+    "halflingco": "Halfling Cooks dream of only one thing: gourmet food! To find such exquisite gastronomic delights they will often venture outside of their homely towns and villages to find those things they love: rare herbs and spices, mouth-watering meats, delectable deserts, fragrant fruit... (the list goes on and on!). Of course, chopping veggies as the speed of light while keeping ones fingers takes tireless training. While they may not be as handy with a sling or bow as many other halflings, their skill with a blade is unsurpassed!",
+    "halflingth": "Halfling thieves are often lured out of their villages by the prospect of all the useful and pretty things they could \"borrow\" from people. Just think, if they can \"acquire\" so many items within the confines of a small village, who knows what they could \"find\" when set loose upon the world!",
+    "halflingyo": "Having heard such tales as \"Tinkle Witherson and the Golden Boots\" and \"Little Gumblewort's Big Adventure\" young halflings aspire to become like these famed halfling heroes. They will do anything, ANYTHING, to become a glorious hero; even if that means missing a meal or two!",
+    "halflingsc": "Most Halflings are expected to do some military service. Some protect the Moot from the rare attacks of Orcs and Goblins, others simply patrol the peaceful roads that lead elsewhere. While most are happy to sit back once their duty is fulfilled, others sign on to a warband and roam the countryside, searching for adventure.",
+    "halflingwa": "Stocky brutes (by halfling standards, anyways) halfling warriors live for the excitement garnered by adventure.",
+    "piggy": "Only Halflings know how vicious a cornered piggy can be. When provoked they can even eat a small Halfling whole! And of course if the food runs short then guess who's for dinner...",
+    "villageogr": "Halflings and Ogres have one thing in common: FOOD! Although they me seem like a bit of an odd pairing, Ogres are often lured from the hills by the opportunity to sample the local delicacies of the Moot. If Elders ever need protection then the Ogres are the ones to call upon to provide that extra bit of brute force and muscle!"
+  },
+  "intro": {
+    "text": "Halflings are mostly a peaceful race, wishing nothing more than to eat (especially eat!), drink and be merry. They live in closely-knit communities and they are rarely troubled by other races. Sitting comfortably under an evening sun, one would most often see a halfling sitting reclined under a tree, munching, smoking and laughing. As they generally keep to themselves and avoid trouble, most halflings live long, peaceful lives. Some halflings however cannot find peace in such a familiar atmosphere and they seek adventures like those in the stories they were told when they were young. Every so often a village Elder succumbs to this wanderlust, and when his unrest becomes unbearable he rounds up a group of other like-minded halflings to head out and change the world.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/halflings"
+  },
+  "skillSets": {
+    "hfSkills": {
+      "name": "Halfling special skills",
+      "note": "All Halflings may choose from the following special skills.",
+      "skills": [
+        [
+          "quiet as a mouse",
+          "The halfling as adept at staying as quiet as a mouse whilst hiding. Enemy warriors must use half their initiative value in inches (rounded down) when trying to detect this hidden halfling."
+        ],
+        [
+          "crude belch",
+          "Having eaten a meal or six, this halfling may release a withering belch to distract his enemies. During the first round of hand to hand combat the halfling can release his noxious fumes upon all enemies within base contact. All enemies effected must take a leadership test. If the leadership test is failed then the putrid odor has severely affected the warrior's fighting ability and he must miss his first attack (regardless of whether he has only one attack or not)."
+        ],
+        [
+          "wizened halfling (leaders only)",
+          "This old halfling is greatly respected by the other members of the warband and they never question his word. All halflings may also re-roll any failed leadership test when within 6\" of the leader as well as using his leadership for both tests."
+        ],
+        [
+          "stealthy (halfling thieves only)",
+          "The Halfling Thief can hide even after running, and can run while within 8\" of enemy models if he starts and ends his move hidden."
+        ],
+        [
+          "skilled huntsman",
+          "The halfling has been hunting things ever since he was young (the more food he has, the better!) and has become well adapted to firing as silently and discreetly as possible. To represent this a Halfling may try and fire a ranged weapon and remain hidden. When shooting from hiding roll D6. On a 3+ the Halfling has managed to keep his actions inconspicuous to the eye of the enemy and may remain hidden that turn. Note this skill may not be combined with black powder weapons, they are just too noisy!"
+        ],
+        [
+          "layers of fat",
+          "The Halfling has gained mountains of flab during his vast experience of eating fine foods and his thick bulk could swallow a sword whole! The Halfling always has a basic saving throw of 6 regardless of the enemy warrior's strength and on top of any armour he already wears."
+        ],
+        [
+          "shifty",
+          "The halfling has long-been skirting in the shadows, avoiding unwanted attention. So nimble is he that he may surprise even those who believe they've got them dead-to-rights. The halfling gains a bonus attack when charged that strikes first."
+        ]
+      ]
+    }
+  },
+  "unitRace": {
+    "piggy": null,
+    "villageogr": "ogre"
+  }
+}

@@ -1,0 +1,528 @@
+{
+  "warband": {
+    "name": "Nipponese Expedition",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "units": [
+      {
+        "id": "hatamoto",
+        "t": "hero",
+        "name": "Hatamoto",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "npNipponnoble",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "npSkills"
+        ],
+        "sp": "Leader: Any warrior within 6\" of the Hatamoto may use his Leadership when taking a Leadership test. Ride: The Hatamoto has the Ride skill as detailed in the Blazing Saddles article."
+      },
+      {
+        "id": "vimtomage",
+        "t": "hero",
+        "name": "Vim-To Mage",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": null,
+        "sk": [
+          "academic",
+          "speed",
+          "npSkills"
+        ],
+        "sp": "See Tenants of the Order Tenants of the Order: The Order of the Vim-To strictly enforces a vow of Poverty, meaning with the exception of a walking staff (club) and a dagger the Vim-To Mage may never have any equipment. Arcane Vim-Toist: This model is the spiritual and magical leader of the Nippon Warband, they can cast Vim-Toist Magic (Arabian Elemental Magic) and start the game with one spell from this discipline learned."
+      },
+      {
+        "id": "shinobi",
+        "t": "hero",
+        "name": "Shinobi",
+        "cost": 70,
+        "exp": 15,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "npShinobi",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "npSkills"
+        ],
+        "sp": "Infiltration: A Shinobi with this skill is always placed on the battlefield after the opposing warband and can be placed anywhere on the table as long as it is out of sight of the opposing warband and more than 12\" away from any enemy model. If both players have models that infiltrate, roll a D6 for each, and the lowest roll sets up first. Loner: Shinobi may never become the leader of the warband."
+      },
+      {
+        "id": "retainer",
+        "t": "hero",
+        "name": "Retainer",
+        "cost": 40,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "npNipponnoble",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "npSkills"
+        ],
+        "sp": "Ride: A Retainer has the Ride skill as detailed in the Blazing Saddles article."
+      },
+      {
+        "id": "ashigaru",
+        "t": "hen",
+        "name": "Ashigaru",
+        "cost": 20,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "npNipponwarrio",
+        "sp": "Wall of Steel: Even the most lowly of Ashigaru is a veteran of hours of drill, and because of this If wielding a spear you may choose to wield it two-handed, in which case the spear gains the parry special rule."
+      },
+      {
+        "id": "onnabushi",
+        "t": "hen",
+        "name": "Onnabushi",
+        "cost": 30,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "npNipponwarrio",
+        "sp": "Wardens of the Castle: Traditionally responsible for the defense of the homeland while the men are at war, the onnabushi have gained a gruesome reputation for urban warfare, while inside buildings or ruins., then gain the fear ability. It's a good idea to define which bits of your terrain collection count as 'buildings or ruins' at the start of a battle to avoid confusion later."
+      },
+      {
+        "id": "warriormon",
+        "t": "hen",
+        "name": "Warrior Monk",
+        "cost": 30,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "npWarriormonk"
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Hatamoto, max. 1 Vim-To Mage, max. 1 Shinobi, max. 2 Retainers; any number of Ashigaru, max. 2 Onnabushi, max. 3 Warrior Monks.<br><b>Hired Swords:</b> A Nippon warband is allowed the same selection of Hired Swords as Human Mercenary warbands.<br><b>Strategic Minded:</b> A Nipponese warband must rely on its battlefield experience so far from home. They may choose to rout after suffering 1 fewer casualty than normal.<br><b>Hired Swords:</b> May hire the Hired Swords of a Human Mercenary warband."
+  },
+  "extra": {
+    "skills": "npSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc"
+    ]
+  },
+  "lists": {
+    "npNipponwarrio": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Katana",
+          20
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Kanabo",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Sashimono",
+          15
+        ]
+      ]
+    },
+    "npNipponnoble": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Katana",
+          20
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Kanabo",
+          15
+        ],
+        [
+          "Kathay-Langschwert",
+          75
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Handfeuerwaffe",
+          35
+        ],
+        [
+          "Pistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Sashimono",
+          15
+        ],
+        [
+          "Horo",
+          10
+        ],
+        [
+          "Rossharnisch (Barding)",
+          30
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Riding/Draft Horse",
+          40
+        ],
+        [
+          "Warhorse",
+          80
+        ]
+      ]
+    },
+    "npShinobi": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Katana",
+          20
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Kusarigama",
+          20
+        ],
+        [
+          "Kampfklauen (Paar)",
+          35
+        ],
+        [
+          "Schwertbrecher",
+          30
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Blasrohr",
+          25
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Krähenfüße",
+          15
+        ],
+        [
+          "Blitzpulver",
+          25
+        ],
+        [
+          "Dietriche",
+          15
+        ],
+        [
+          "Seil & Haken",
+          5
+        ],
+        [
+          "Trip Wire",
+          15
+        ]
+      ]
+    },
+    "npWarriormonk": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Katana",
+          20
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Kanabo",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Sashimono",
+          15
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "hatamoto": "A Nipponese Hatamoto, draped in the shadows of whispered legends and clad in the weight of ancestral duty, commands their warband through the labyrinthine streets of Mordheim with a silent determination. Their presence, like a flickering lantern in the darkness, guides their followers with a subtle yet undeniable authority, weaving a tapestry of strategy and cunning amidst the ever-shifting tides of fortune, as they seek to uncover the secrets buried within the city's cursed embrace.",
+    "vimtomage": "Cloaked in robes adorned with mystical sigils and bearing the weight of ancient knowledge, moves through the shadowed alleyways of Mordheim with a quiet intensity. Their arcane mastery, a fusion of ancient rituals and whispered incantations shapes the very fabric of reality, weaving spells of power and deception to manipulate the city's twisted fate. In their hands, the forces of magic become a weapon and a shield, as they navigate the perilous streets in pursuit of forbidden truths and hidden treasures.",
+    "shinobi": "A silent shadow amidst the chaos of Mordheim, moves with the fluid grace of a whispering breeze and the deadly precision of a coiled serpent. Clad in garments woven from the darkness itself, they slip unnoticed through the city's labyrinthine streets, their every movement a testament to their mastery of stealth and subterfuge. With blades honed to razor-sharp perfection and eyes that miss nothing, they serve as both unseen assassins and silent sentinels, their allegiance bought with coin or bound by oath as they navigate the treacherous paths of intrigue and betrayal that define the cursed city's existence.",
+    "retainer": "A Nipponese Retainer, bound by duty and fueled by youthful vigor, walks the path of honor alongside their master, the Hatamoto, in the twisted streets of Mordheim. Clad in armor adorned with the colors of their lord's house and wielding a blade untested by the trials of battle, they march with unyielding resolve, eager to prove themselves worthy of their station. Though lacking in experience, their loyalty burns bright, a beacon of unwavering fidelity amidst the darkness that shrouds the cursed city, as they strive to uphold the honor of their lord and carve out a legacy worthy of remembrance.",
+    "ashigaru": "Donning weathered armor and wielding a spear worn from countless skirmishes, marches stoically alongside their comrades in the Warband led by the Hatamoto through the desolate streets of Mordheim. Theirs is a life bound by duty and forged in the crucible of adversity, their resolve unshaken by the horrors that lurk within the cursed city. Though lacking in the refinement of the samurai, their loyalty to their lord is unwavering, their spirits tempered by the hardships of war as they stand as the stalwart defenders of their lord's honor amidst the chaos of battle.",
+    "onnabushi": "An Onnabushi, a warrior maiden of untamed spirit and unyielding resolve, strides through the grim streets of Mordheim with a grace born of both beauty and ferocity. Clad in armor adorned with the symbols of her clan and wielding a blade that sings with the echoes of ancient battles, she is a beacon of strength and defiance in a world consumed by darkness. Though her path may be fraught with peril, her spirit remains unbroken, her loyalty to her cause and her comrades unwavering as she stands as a living testament to the indomitable spirit of the Nipponese warrior tradition amidst the chaos of the cursed city.",
+    "warriormon": "A warrior monk, their demeanor serene yet their fists as swift as the wind, traverses the twisted streets of Mordheim with a tranquil purpose. Draped in simple robes that conceal the strength of their disciplined form, they embody the balance of body and spirit, wielding martial prowess honed through years of rigorous training. Theirs is a path of enlightenment and martial mastery, as they seek not only to vanquish the darkness that threatens the city but also to transcend the chaos, their every action a testament to the harmony of mind, body, and soul amidst the turmoil of the cursed streets."
+  },
+  "intro": {
+    "text": "In the shadowed alleys of Mordheim, a Nipponese warband emerges, their presence a testament to the enduring spirit of a distant land amidst the crumbling ruins of a cursed city. Led by a Hatamoto, their leader, adorned in the colors and symbols of their clan, they march with purpose through the chaos, their warriors, from seasoned samurai to humble Ashigaru, united in their quest. Bound by duty and honor, they have ventured far from their homeland, drawn to Mordheim by whispers of ancient relics and forbidden knowledge hidden amidst the city's depths. Yet, beyond mere material gain, they seek to carve out a place of honor amidst the darkness, to prove their worth in the crucible of battle, and to honor the legacy of their ancestors in this treacherous land of opportunity and peril.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/nipponese-expedition"
+  },
+  "skillSets": {
+    "npSkills": {
+      "name": "Nippon Special Skills",
+      "note": "Nippon Warband members may choose to use the following skill list instead of the standard skill lists.",
+      "skills": [
+        [
+          "Death before Dishonor",
+          "Defiance echoes through the ruins as a Nipponese warrior stares into the abyss of defeat. Once per grim engagement, when fate decrees their demise in the swirling melee, they unleash a final barrage of strikes before the void claims them. If these last, desperate blows fell an adversary, the warrior defies death's grasp, standing amidst the carnage with but a single thread of life remaining. If this model would be removed from the battlefield as the result of a close combat attack, before removing it make a single close combat attack with them as normal."
+        ],
+        [
+          "Night Fighter",
+          "Stealth is their ally, the cloak of darkness their refuge. Skulking amidst the rubble, this shadow-clad warrior remains unseen, a specter haunting the twilight. Beyond the reach of distant foes, concealed behind shattered remnants of once-majestic edifices, they evade the enemy's gaze, a predator in the gloom. This Skill may only be taken by the Shinobi. This model is able to run while remaining hidden, as per hiding rules"
+        ],
+        [
+          "Iaijutsu",
+          "Swift as the striking serpent, the Nipponese warrior answers the call to arms with deadly precision. When the enemy's charge shatters the silence, they retaliate with a lightning-quick strike, their blade singing the song of vengeance. In that fleeting moment, the strike-first rule bends to their will, delivering swift retribution to those who dare to assail them. When this model is charged they gain +1A that they may only use against the charger. This additional attack will 'strike first'. If the wielder is simultaneously charged by two or more opponents they will still only receive a total of +1A. These attacks are resolved at the Strength value of the model, with no further modifiers."
+        ],
+        [
+          "Last Stand",
+          "Alone they stand, surrounded by the whispers of the fallen and the specters of despair. Yet, in the face of overwhelming odds, the spirit of the Nipponese warrior remains unbroken. When the tempest of fear threatens to engulf them, they steel themselves against its icy grip. The solitary warrior defies the darkness, their resolve unyielding, bolstered by the ghosts of fallen comrades. If this model would normally take an all-alone test, it may be re-rolled, in addition, at the start of this models turn, if it is 6\" away from friendly models, it can choose to have +1 to WS or BS until the start of its next turn."
+        ],
+        [
+          "Tea Ceremony",
+          "Amidst the ruins, this warrior's serene rituals grant solace and insight. Forgoing treasure, they invest in reflection, seeking growth with a calming cup. After a battle, if this hero survives and did not go out of action, they can forgo searching for rare items and spends 10 gold crowns representing the cost of preparations for the tea ceremony. Then, Choose any other hero, and roll a D6. on a 3+, the chosen hero gains an Experience point from the introspective nature of the ceremony."
+        ],
+        [
+          "Blessed by the Kami",
+          "In the crucible of war, the favor of the divine grants protection to the faithful. Blessed by unseen forces, the Nipponese warrior defies the jaws of death itself. With the whispered blessings of the Kami, they rise from the brink of oblivion, their wounds miraculously mended, their spirit unbroken by the ravages of fate. When rolling on the Heroes Serious Injury chart for this Hero after a game in which he has been taken out of action, the dice may be re-rolled once. The result of this second dice roll must be accepted, even if it is a worse result."
+        ]
+      ]
+    }
+  }
+}

@@ -63,9 +63,9 @@ describe('a unit that depends on another', () => {
     expect(part(s, 'coldone').takesPart).toBe(true);
   });
 
-  it('is one of four in the data, each with a page that says so: Beasthounds, Scarecrows, Sabretusks and Wolves', () => {
+  it('is one of five in the data, each with a page that says so: Beasthounds, Slavehounds, Scarecrows, Sabretusks and Wolves', () => {
     const needs = Object.entries(data.WARBANDS).flatMap(([wb, w]) => w.units.filter((u) => u.needs).map((u) => `${wb}/${u.id}:${u.needs}`));
-    expect(needs.sort()).toEqual(['darkelves/coldone:beastmaster', 'maneaters/sabretusk:guide', 'norse/wolf:wulfen', 'restless/scarecrow:liche,necromancer']);
+    expect(needs.sort()).toEqual(['darkelves/coldone:beastmaster', 'druchii/slavehound:beastmaster', 'maneaters/sabretusk:guide', 'norse/wolf:wulfen', 'restless/scarecrow:liche,necromancer']);
   });
 
   it('is satisfied by either of two possible masters (the Scarecrow: the Liche or the Necromancer)', () => {

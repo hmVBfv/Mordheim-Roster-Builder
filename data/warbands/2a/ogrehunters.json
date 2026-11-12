@@ -1,0 +1,408 @@
+{
+  "warband": {
+    "name": "Ogre Hunting Party",
+    "grade": "2a",
+    "siteRace": "Ogre/Gnoblar",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "units": [
+      {
+        "id": "ogrehunter",
+        "t": "hero",
+        "name": "Ogre Hunter",
+        "cost": 145,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 3,
+          "I": 3,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": "ohOgre",
+        "sk": [
+          "combat",
+          "strength",
+          "ohSkills"
+        ],
+        "sp": "A Ogre Hunter may be equipped with weapons and armour chosen from the Ogres equipment list. Unlike other models Ogres don't have free daggers, even though they might carry one reserved for eating, the most sacred activity in their life. Ogres never fight with daggers in close combat. Leader: Any warrior within 6\" of the Ogre Hunter may use his Leadership when taking Ld tests. Huuuuge: Ogres are big, massive and frightening creatures. All ogre models cause fear. All ogres are Large targets. Ogres also ignore all alone tests. An ogre can never have Ithilmar or Gromril or heavy armour - they don't make it in such sizes! All ogres have a warband rating of 20 plus experience (instead of 5). Slow Witted: Although Ogres are capable of earning experience and bettering themselves they are not the smartest of creatures. Ogres only improve at half the rate of everyone else. They must earn twice the usual number of experience points to gain an advance. Don't Fight with Eating Knives: Ogres don't use daggers for fighting, just for eating. They don't carry them on the battlefield. If forced to, by losing a weapon or not carrying any weapon, they will fight unarmed. But since their physical strength the −1S penalty does not apply, but the +1 enemy armour save still does. They may make more than one unarmed attack, depending on their Attacks value. Note that you cannot combine this unarmed attack with another weapon, so it doesn't count as an additional attack like the dagger would. It can only be made if the ogre doesn't have any other weapons at his disposal. Lazy: An Ogre Hunter is far too preoccupied with Hunting to worry about pretty stones—that's a Gnoblar's job! If any of your Gnoblar heroes are able to search for wyrdstone or Rare Items, the Ogre Hunter does not add an exploration dice or search; they may only explore and search if all other gnoblar heroes are unable to (ex. Taken out of action). Central Figure: The gnoblars flock around the Ogre Hunter, and take strength from his presence. If he is taken out of action during a game, the warband is automatically at Rout level, regardless of the number of casualties. Sabre Trainer: See Special Skills.",
+        "large": true
+      },
+      {
+        "id": "trapper",
+        "t": "hero",
+        "name": "Trapper",
+        "cost": 30,
+        "exp": 8,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 4,
+          "S": 2,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "ohGnoblarTrapper",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "ohSkills"
+        ],
+        "sp": "Weapons and armour chosen from the Gnoblar equipment list. Veteran Tracker: A trapper starts with ONE of the following Special Skills: Infiltration (max 1), Set Traps, Netter, or Scent Hound. You must choose this skill upon the hero's purchase. See the Special Skills rules for details."
+      },
+      {
+        "id": "sabrebaite",
+        "t": "hero",
+        "name": "Sabre-Baiter",
+        "cost": 20,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 2,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ohGnoblarTrapper",
+        "sk": [
+          "combat",
+          "speed",
+          "ohSkills"
+        ],
+        "sp": "Weapons and armour chosen from the Gnoblar equipment list. Bait: Whenever a model declares a charge against a Sabre-baiter, he may immediately move 1D6\" in the opposite direction of the charger. This may cause him to move outside of the charger's charge range, in which case, the charge failed. You may only use this ability once per turn, and only if the Baiter isn't knocked down, stunned, or in hand-to-hand combat. If the charging model is a Sabretusk, you may move the baiter 2D6\" instead, and may maneuver around any models in your path (potentially causing the Sabretusk to charge someone else!)."
+      },
+      {
+        "id": "gnoblarfig",
+        "t": "hen",
+        "name": "Gnoblar Fighter",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 2,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ohGnoblar",
+        "sp": "Weapons and armour chosen from the Gnoblar equipment list. Bicker: (see above)"
+      },
+      {
+        "id": "flinger",
+        "t": "hen",
+        "name": "Flinger",
+        "cost": 20,
+        "exp": 0,
+        "max": 7,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 2,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ohGnoblarFlinger",
+        "sp": "Weapons and armour chosen from the Gnoblar equipment list. Bicker: (see above) Scrap Slinger: A Flinger may throw 3 pieces of Sharp Stuff every turn, instead of the normal 1. (This does not combo with Knife Thrower, nor apply to throwing knives)."
+      },
+      {
+        "id": "sabretuskc",
+        "t": "hen",
+        "name": "Sabretusk Cub",
+        "cost": 50,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "sp": "Tusks and primal ferocity! Fear: Sabretusks are huge feline predators and thus cause fear. Animals: Sabretusks are animals, and don't gain experience. Untamed: Sabretusks don't bicker. However, at the start of each turn, roll 1D6 for each Sabretusk not in combat. On a 1, it does not move normally this turn. Instead, it moves 3D6\" to the nearest non-sabretusk model; this counts as a charge. If it charges another member of your warband this way, after combat, move it 1\" away. Charge: Sabretusks are slavering creatures that overpower their opponents when they charge. Sabretusks fight with 2 attacks instead of 1 during the turn they charge. Tough Hide: Sabretusks have a natural 5+ armour save.",
+        "noxp": true
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Ogre Hunter, max. 3 Trappers, max. 1 Sabre-Baiter; any number of Gnoblar Fighters, max. 7 Flingers, max. 3 Sabretusk Cubs.<br><b>Greenskins:</b> Unlike Goblins, Gnoblars do not tend to work closely with Orcs. However, for all intents and purposes, they count as 'Greenskins'. They do not suffer Animosity, but suffer the rule known as 'Bicker' (see below.)<br><b>Bicker:</b> At the start of your turn, at the end of the Recovery phase, roll 1D6 for each Gnoblar henchmen that is not in combat: on a roll of 1, it does nothing but issue insults at the nearest Gnoblar. It may not move, shoot, or cast magic this turn. Once a Gnoblar henchmen gains \"That Lad's Got Talent\", he loses the rule for Bicker, having put such childish games behind him.<br><b>Ideas Above Their Station:</b> If the Ogre Hunter is killed, the Gnoblar with the highest leadership takes over as leader (or, if tied, the Gnoblar with the highest experience takes over). A replacement Ogre Hunter may be purchased, in which case he becomes the new leader.<br><b>Distasteful Company:</b> May hire only these Hired Swords, no others – Hobgoblin Scout, Gnoblar Botcher, Ninja Gnoblar. Most hired swords will refuse to work for the Ogres or Gnoblars, as they know that they are just as likely to eat them as fight with them. If your warband does not contain an Ogre Hunter for any reason, you may hire an Ogre Bodyguard and/or Ogre Slave Master; however, if you rehire another Ogre Hunter, all other Ogres must leave the warband.<br><b>Characteristic Increase:</b> Characteristics for warriors may not be increased beyond the maximum limits shown on the following profile. Ogre — M 6, WS 6, BS 4, S 5, T 5, W 5, I 4, A 5, Ld 9; Gnoblar — M 4, WS 5, BS 6, S 3, T 4, W 3, I 6, A 4, Ld 7."
+  },
+  "extra": {
+    "skills": "ohSkills"
+  },
+  "race": "gnoblar",
+  "hire": {
+    "align": "neutral",
+    "only": [
+      "hobgoblinscout",
+      "ninjagnoblar"
+    ]
+  },
+  "lists": {
+    "ohOgre": {
+      "Nahkampf": [
+        [
+          "Hackbeil",
+          5
+        ],
+        [
+          "Ogerkeule",
+          10
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Harpunenarmbrust",
+          50
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "ohGnoblar": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Hackbeil",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Sharp Stuff",
+          3
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Seil & Haken",
+          5
+        ]
+      ]
+    },
+    "ohGnoblarTrapper": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Hackbeil",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Sharp Stuff",
+          3
+        ],
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Seil & Haken",
+          5
+        ],
+        [
+          "Pigback Mount",
+          50
+        ]
+      ]
+    },
+    "ohGnoblarFlinger": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Hackbeil",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Sharp Stuff",
+          3
+        ],
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Seil & Haken",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "ogrehunter": "An Ogre Hunter is the nucleus around which the warband gathers. He maintains order in his company by issuing threats and bribes or using violence.",
+    "trapper": "Trappers are seasoned gnoblars who have spent several years trapping in the wild. They’ve lasted longer than most due to their wits, keener senses, or pure grit.",
+    "sabrebaite": "A Sabre-baiter is a professional decoy, with experience luring in fearsome foes (before running like hell).",
+    "gnoblarfig": "The best fighters in the whole mass of Gnoblars... which, of course, is a relative term.",
+    "flinger": "Flingers are the Gnoblars who are either too incompetent to wave their sharp sticks in the air without letting go of them, or are smart enough to know that the Fighters always die first.",
+    "sabretuskc": "Sabretusks are agile, giant felines with tusks jutting from their lower jaw. It is common for a young hunter to keep a Sabretusk or two around to help sniff out his next meal."
+  },
+  "intro": {
+    "text": "Ogre Hunters are solitary figures who wander the mountains. They remain aloof from other Ogres, either by preference or forced into exile. Their favorite companions are animals, like young Sabretusk cubs. Their least favorite companions are gnoblar trappers, which sometimes flock around an Ogre Hunter. They offer to carry the hunter’s many weapons and provide him with snacks, in hopes that he will not hurt them too much. Like the Hunter, the trappers wrap themselves in pelts to protect themselves from the cold mountain air.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/ogre-hunting-party"
+  },
+  "skillSets": {
+    "ohSkills": {
+      "name": "Ogre Hunting Party Special Skills",
+      "note": "Crude Belch: Ogres and Gnoblars eat almost anything. Consequences are to be expected from those inconsiderate enough to consume a rich meal before battle. A Hero with this 'condition' may unleash his noxious fumes on all enemies engaged in close combat. Those that do not pass a Ld test suffer a −1 'to hit' modifier for the turn. The Hero must wait until a new enemy engages him in combat before he relieves himself again. Scent Hound: The Ogre or Gnoblar has the keen nose of an expert tracker. The hero spots Hidden enemies from two times as far away as other warriors (ie, twice his Initiative value in inches). Sabre Trainer: Whenever a Sabretusk cub rolls a 1 for Untamed, if it started the turn within 6\" of this hero, you may move the cub 3D6\" towards any model within 12\" of it that it can see (instead of towards the nearest model). Maneater (Ogres only): Ogre Hunters shun the companies of others, but they do travel far and wide, observing other the customs and skills of other cultures from afar . This Ogre may immediately learn one skill from the Shooting or Academic skill lists. This skill may be taken only once. Ogres only. Bull Charge (Ogres only): Ogres learn to use their vast bulk in a charge, trampling the enemy to the ground. When charging, an Ogre with this skill may attempt a single attack with a +1 'to hit' modifier rather than making his normal attacks. If successful the enemy model is automatically knocked down. Ogres only. Bellowing Roar (Leader only): An Ogre leader expects challenges to his authority. One of the best ways to suppress a mutineer in the ranks is to give his ear drums a good pounding. This skill may only be taken by the warband leader, allowing him to reroll the first failed Rout test. Ogres only. Set Traps (Gnoblars only): Trappers are experts at dropping snares. A Trapper may set a trap if he spends a turn doing nothing else (he may not set traps if he's just recovered from being Knocked Down). Place a marker in base contact with the Trapper. When another model, friend or foe, moves within 2\" of the marker he risks setting off the trap: roll a D6. On a score of 3+ he has triggered the trap and suffers a S4 hit (note that the Trapper won't trigger his own traps). If the trap did not wound the model, the injured model has multiple wounds, or it didn't trigger, the 'victim' may finish his move- However, if the model was knocked Down or Stunned, place him 2\" from the marker. Regardless whether the trap was triggered or not, the marker is removed. Gnoblar only. Infiltration (Gnoblars only): A Gnoblar with this skill is always placed on the battlefield after the opposing warband and can be placed anywhere on the table as long as it is out of sight of the opposing warband and more than 12\" away from any enemy model. If both players have models which infiltrate, roll a D6 for each, and the lowest roll sets up first. Gnoblar only. Netter (Gnoblars only): Each game, the hero starts with 3 Nets. These may not be sold, traded, or given to another warrior- if not used during the game, they assumed to be stashed away or fallen apart. The next game, the hero will start with 3 nets, without penalty or cost. Gnoblar only.",
+      "skills": []
+    }
+  },
+  "unitRace": {
+    "ogrehunter": "ogrehunter",
+    "sabretuskc": null
+  }
+}

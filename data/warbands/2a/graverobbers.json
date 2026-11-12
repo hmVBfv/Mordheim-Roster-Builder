@@ -1,0 +1,322 @@
+{
+  "warband": {
+    "name": "Grave Robbers",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "units": [
+      {
+        "id": "graver",
+        "t": "hero",
+        "name": "Graver",
+        "cost": 60,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "grHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "grSkills"
+        ]
+      },
+      {
+        "id": "graverobbe",
+        "t": "hero",
+        "name": "Grave Robber",
+        "cost": 25,
+        "exp": 4,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "grHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "speed",
+          "grSkills"
+        ]
+      },
+      {
+        "id": "juniormedi",
+        "t": "hero",
+        "name": "Junior Medic",
+        "cost": 40,
+        "exp": 2,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "grHero",
+        "sk": [
+          "academic",
+          "speed",
+          "grSkills"
+        ],
+        "sp": "Sawbones: You can re-roll the Serious Injury result for one friendly Hero. The second result stands. You may not use this ability if the Junior Medic was taken Out of Action during the battle."
+      },
+      {
+        "id": "lookout",
+        "t": "hero",
+        "name": "Lookout",
+        "cost": 15,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "grHero",
+        "sk": [
+          "shooting",
+          "speed",
+          "grSkills"
+        ]
+      },
+      {
+        "id": "thug",
+        "t": "hen",
+        "name": "Thug",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "grHenchmen"
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Graver, max. 2 Grave Robbers, max. 1 Junior Medic, max. 2 Lookouts; any number of Thugs.<br><b>Grave Goods:</b> Grave Robbers gain +1 Gold Crown for each enemy model taken Out of Action in the Exploration Phase (once per battle).<br><b>Shady Reputation:</b> May hire any Hired Sword except Bounty Hunter, Roadwarden, Law-Enforcer, Holy Man or any Follower of Morr.<br><b>Undead Foes:</b> Grave Robbers hate Undead models."
+  },
+  "extra": {
+    "skills": "grSkills"
+  },
+  "race": "human",
+  "hire": {
+    "align": "neutral",
+    "except": [
+      "bountyhunter",
+      "roadwarden",
+      "priestofmorr"
+    ]
+  },
+  "lists": {
+    "grHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Pry Bar",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Armbrust",
+          25
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Hooded Lantern and Rig",
+          15
+        ],
+        [
+          "Surgeon's Journal",
+          80
+        ],
+        [
+          "Finger Pendant",
+          15
+        ]
+      ]
+    },
+    "grHenchmen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "graver": "Having plied the grim trade for many years and survived, the Graver stalks the shadows of night seeking riches. He has borne witness to terrors that would leave most men insane and has had many brushes with the law. Commanding a band of less experienced robbers through a mixture of fear and respect, he has developed a cynical attitude to life, cracking black jokes that make most people go pale.",
+    "graverobbe": "Those who decide to make a living by robbing graves are not pleasant individuals. Distrustful that strangers might report them to the law, disrespectful of the gods and brave enough to ignore superstitions, these loathsome men defile the final resting places of the deceased in search of treasure. They can put up a fight if needed, especially when the dead decide to struggle for what is rightfully theirs.",
+    "juniormedi": "Those learning the art of medicine in the Empire are hampered by the restrictions that surround the study of corpses. Many students risk lawful punishment and steal the freshly-deceased from cemeteries. Because schooling in medicine is expensive, such individuals often perpetuate the act for monetary gain.",
+    "lookout": "During the lengthy process of opening and looting a grave, there is a need of someone to stand and take watch. Such a task is often entrusted to the youngest member of the band, likely an orphaned whelp that does not possess the constitution to look into coffins.",
+    "thug": "Grave robbers have hired henchmen for the purpose of carrying the loot and assisting in physical tasks such as unsealing crypts. Men capable of such dirty work are easily found amongst cutthroats and bandits that dwell within the murky embrace of Sylvania."
+  },
+  "intro": {
+    "text": "Some men are callous enough to steal the treasures buried with the dead. Such a sacrilegious thing is punished heavily, thus grave robbers are constantly on the run from the law. Such evil men are sought wherever they may try to hide, but few lawmen dare chase these villains into Sylvania.\n\nOnce in the dark and cursed lands, few criminals return. Some because they perish within its terrible claws, but others because they find their trade much more pliable. With graves literally emptying themselves, who is to stop one from liberating the riches within?\n\nNot only riches, but the corpses that do remain dead are sought at a good price. While practitioners of dark arts have need for human remains, they are also valuable for students of medicine. Experienced groups of grave robbers are often so accustomed to death and hardened that they venture to Sylvania to loot the crypts of those who live after death.\n\nShould the living dead not need it, then those unscrupulous men will definitely put it to better use.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/grave-robbers"
+  },
+  "skillSets": {
+    "grSkills": {
+      "name": "Grave Robbers Special Skills",
+      "note": "Grave Robber Heroes with access to Special skills may choose from the following list instead of any standard skill tables.",
+      "skills": [
+        [
+          "Darkstalker",
+          "The warrior is accustomed to darkness and has almost cat-like sight. Ignores All Alone tests and may double his Initiative when looking for Hidden models."
+        ],
+        [
+          "Instinctual Violence",
+          "Having experienced countless encounters with the Undead, this warrior is hardened to terror. When charged by any Undead models, he does not have to take a Fear test. Additionally, he may nominate one of his attacks to Strike First."
+        ],
+        [
+          "De-animator",
+          "The warrior is adept at fighting animated corpses. He ignores the No Pain rule for Undead and may stun them as normal."
+        ],
+        [
+          "Hardy Constitution",
+          "Veteran of many grave-robbing escapades, the warrior is completely immune to all diseases and poisons."
+        ],
+        [
+          "Body Dealer",
+          "This warrior is skilled at salvaging the bodies of the dead for profit. On a 4+, you may recover the body (and gear) of a friendly model slain in the Serious Injury phase. You may also attempt to do the same for enemy models by comparing Initiative rolls between the Body Dealer and enemy leader (or their most experienced model). On a tie, nothing is recovered; if the enemy wins, your Body Dealer is captured."
+        ]
+      ]
+    }
+  }
+}

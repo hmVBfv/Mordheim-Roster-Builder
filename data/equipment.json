@@ -2349,7 +2349,8 @@
      "undead",
      "restless",
      "tombguardians",
-     "carnival"
+     "carnival",
+     "necrarchs"
     ]
    },
    "settings": [
@@ -4183,7 +4184,9 @@
    "wb": "Druchii Hero equipment list",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "druchii"
+    ]
    },
    "settings": [
     "warband:druchii"
@@ -4202,7 +4205,9 @@
    "wb": "Any Druchii hero may use a close-combat weapon with a Darksteel blade",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "druchii"
+    ]
    },
    "settings": [
     "warband:druchii"
@@ -4220,7 +4225,9 @@
    "rare": "Rare 5",
    "wb": "Common for Slayers, Rare 5 for non-Slayers",
    "only": {
-    "wb": []
+    "wb": [
+     "slayercult"
+    ]
    },
    "settings": [
     "warband:dwarf-slayer-cult"
@@ -4238,7 +4245,9 @@
    "rare": "Rare 9",
    "wb": "Slayers only (Doomseeker's weapon); 30 gc per pair",
    "only": {
-    "wb": []
+    "wb": [
+     "slayercult"
+    ]
    },
    "settings": [
     "warband:dwarf-slayer-cult"
@@ -4257,7 +4266,9 @@
    "wb": "Heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "graverobbers"
+    ]
    },
    "settings": [
     "warband:grave-robbers"
@@ -4275,7 +4286,9 @@
    "rare": "Special",
    "wb": "Grave Robbers only",
    "only": {
-    "wb": []
+    "wb": [
+     "graverobbers"
+    ]
    },
    "settings": [
     "warband:grave-robbers"
@@ -4294,7 +4307,9 @@
    "wb": "Heroes only (for the Medic)",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "graverobbers"
+    ]
    },
    "settings": [
     "warband:grave-robbers"
@@ -4313,7 +4328,9 @@
    "wb": "Grave Robbers only; heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "graverobbers"
+    ]
    },
    "settings": [
     "warband:grave-robbers"
@@ -4332,7 +4349,9 @@
    "wb": "Masters of Horror only; heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "mastersofhorror"
+    ]
    },
    "settings": [
     "warband:masters-of-horror"
@@ -4351,7 +4370,9 @@
    "wb": "Masters of Horror only; heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "mastersofhorror"
+    ]
    },
    "settings": [
     "warband:masters-of-horror"
@@ -4370,7 +4391,9 @@
    "wb": "Masters of Horror only; heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "mastersofhorror"
+    ]
    },
    "settings": [
     "warband:masters-of-horror"
@@ -4388,7 +4411,9 @@
    "rare": "Special",
    "wb": "Sheepherders and Churls list; a Sheepherder pays 10 gc and must roll his Strength or less on a D6 to slay the bear (no test when starting the warband)",
    "only": {
-    "wb": []
+    "wb": [
+     "mazzalupo"
+    ]
    },
    "settings": [
     "warband:mazzalupo"
@@ -4407,7 +4432,9 @@
    "wb": "Necrarch only; heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "necrarchs"
+    ]
    },
    "settings": [
     "warband:necrarchs-the-soul-stealers"
@@ -4426,7 +4453,9 @@
    "wb": "Heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "necrarchs"
+    ]
    },
    "settings": [
     "warband:necrarchs-the-soul-stealers"
@@ -4444,7 +4473,9 @@
    "rare": "Common",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "nippon"
+    ]
    },
    "settings": [
     "warband:nipponese-expedition"
@@ -4462,7 +4493,9 @@
    "rare": "Common",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "nippon"
+    ]
    },
    "settings": [
     "warband:nipponese-expedition"
@@ -4480,7 +4513,9 @@
    "rare": "Rare 6",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "nippon"
+    ]
    },
    "settings": [
     "warband:nipponese-expedition"
@@ -4498,7 +4533,9 @@
    "rare": "Rare 8",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "nippon"
+    ]
    },
    "settings": [
     "warband:nipponese-expedition"
@@ -4516,7 +4553,9 @@
    "rare": "Special",
    "wb": "Nippon Warrior, Noble, Shinobi and Warrior Monk lists",
    "only": {
-    "wb": []
+    "wb": [
+     "nippon"
+    ]
    },
    "settings": [
     "warband:nipponese-expedition"
@@ -4534,7 +4573,9 @@
    "rare": "Common",
    "wb": "Gnoblars only",
    "only": {
-    "wb": []
+    "wb": [
+     "ogrehunters"
+    ]
    },
    "settings": [
     "warband:ogre-hunting-party"
@@ -4553,7 +4594,9 @@
    "wb": "Gnoblar heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "ogrehunters"
+    ]
    },
    "settings": [
     "warband:ogre-hunting-party"
@@ -4572,7 +4615,9 @@
    "wb": "Heroes only (Protectorate list); the Huntsman may also buy them",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "protectorate"
+    ]
    },
    "settings": [
     "warband:protectorate-of-sigmar"
@@ -4591,7 +4636,9 @@
    "wb": "Heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "protectorate"
+    ]
    },
    "settings": [
     "warband:protectorate-of-sigmar"
@@ -4609,7 +4656,9 @@
    "rare": "Rare 8",
    "wb": "Clan Moulder only; Packmaster or Apprentices only; priced in Warp Tokens",
    "only": {
-    "wb": []
+    "wb": [
+     "moulder"
+    ]
    },
    "settings": [
     "warband:skaven-of-clan-moulder"
@@ -4627,7 +4676,9 @@
    "rare": "Rare 9",
    "wb": "Clan Moulder only; Packmaster or Apprentices only; priced in Warp Tokens",
    "only": {
-    "wb": []
+    "wb": [
+     "moulder"
+    ]
    },
    "settings": [
     "warband:skaven-of-clan-moulder"
@@ -4645,7 +4696,9 @@
    "rare": "Rare 11",
    "wb": "Clan Moulder only; priced in Warp Tokens",
    "only": {
-    "wb": []
+    "wb": [
+     "moulder"
+    ]
    },
    "settings": [
     "warband:skaven-of-clan-moulder"
@@ -4663,7 +4716,9 @@
    "rare": "Common",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "snotlings"
+    ]
    },
    "settings": [
     "warband:snotlings"
@@ -4681,7 +4736,9 @@
    "rare": "Common",
    "wb": "Snotling warband only; free",
    "only": {
-    "wb": []
+    "wb": [
+     "snotlings"
+    ]
    },
    "settings": [
     "warband:snotlings"
@@ -4699,7 +4756,9 @@
    "rare": "Common",
    "wb": "Snotling warband only",
    "only": {
-    "wb": []
+    "wb": [
+     "snotlings"
+    ]
    },
    "settings": [
     "warband:snotlings"
@@ -4717,7 +4776,9 @@
    "rare": "Rare 8",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "snotlings"
+    ]
    },
    "settings": [
     "warband:snotlings"
@@ -4735,7 +4796,9 @@
    "rare": "Common",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "sorcerous"
+    ]
    },
    "settings": [
     "warband:sorcerous-society"
@@ -4753,7 +4816,9 @@
    "rare": "Special",
    "wb": "Strigany only (designed for the Domnu)",
    "only": {
-    "wb": []
+    "wb": [
+     "strigos"
+    ]
    },
    "settings": [
     "warband:survivors-of-strigos"
@@ -4772,7 +4837,9 @@
    "wb": "Heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "strigos"
+    ]
    },
    "settings": [
     "warband:survivors-of-strigos"
@@ -4791,7 +4858,9 @@
    "wb": "Heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "strigos"
+    ]
    },
    "settings": [
     "warband:survivors-of-strigos"
@@ -4810,7 +4879,9 @@
    "wb": "Heroes only",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "strigos"
+    ]
    },
    "settings": [
     "warband:survivors-of-strigos"
@@ -4828,7 +4899,9 @@
    "rare": "Common",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "vampirehunters"
+    ]
    },
    "settings": [
     "warband:vampire-hunters-of-sylvania"
@@ -4846,7 +4919,9 @@
    "rare": "Special",
    "wb": "Priests of Morr",
    "only": {
-    "wb": []
+    "wb": [
+     "dreamwalkers"
+    ]
    },
    "settings": [
     "warband:dreamwalkers-cult-of-morr"
@@ -4864,7 +4939,9 @@
    "rare": "Common",
    "wb": "",
    "only": {
-    "wb": []
+    "wb": [
+     "vampirehunters"
+    ]
    },
    "settings": [
     "warband:vampire-hunters-of-sylvania"
@@ -4883,7 +4960,9 @@
    "wb": "Heroes only (Slayers)",
    "only": {
     "heroes": true,
-    "wb": []
+    "wb": [
+     "vampirehunters"
+    ]
    },
    "settings": [
     "warband:vampire-hunters-of-sylvania"
@@ -5094,7 +5173,16 @@
   "Schädelmaske": "Skull Mask",
   "Eisenfaust": "Iron Fist",
   "Handmörser": "Hand-held mortar",
-  "Stachelhandschuh": "Spiked gauntlet"
+  "Stachelhandschuh": "Spiked gauntlet",
+  "Schwarzer Lotus": "Black lotus",
+  "Dietriche": "Lock picks",
+  "Heiliges/Unheiliges Relikt": "Holy (unholy) relic",
+  "Rossharnisch (Barding)": "Barding",
+  "Schwertbrecher": "Sword breaker",
+  "Krähenfüße": "Caltrops",
+  "Blitzpulver": "Flash powder",
+  "Warplock-Pistole": "Warplock pistol",
+  "Vertrauter": "Familiar"
  },
  "GSN_BRACE": {
   "Doppelläufige Pistole": 35,
@@ -8879,7 +8967,8 @@
     "mult": 3,
     "wb": [
      "dwarftreasure",
-     "dwarfrangers"
+     "dwarfrangers",
+     "slayercult"
     ]
    },
    "always": {
