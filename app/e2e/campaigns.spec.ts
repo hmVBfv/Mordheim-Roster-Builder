@@ -346,6 +346,33 @@ for (const theme of ['chronicle', 'parchment'] as const) {
   });
 }
 
+/* Plan P7: another player's warband shows its rating over the marks as a small line, readable in both themes, with the numbers behind it. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`a warband in a campaign shows its rating over the battles, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [others[0]!] });
+    const e = c.enrolments[0]!;
+    const start = e.tags![0]!;
+    const marks = [14, 9, 31].map((plus, i) => ({ ...start, id: `tag-after-${i + 1}`, kind: 'after_battle' as const, round: i + 1, createdAt: `2026-10-0${i + 5}T12:00:00.000Z`, totals: { ...start.totals, rating: start.totals.rating + plus } }));
+    e.tags = [start, ...marks];
+    e.tag = marks.at(-1)!;
+    await page.goto(`./campaign/${c.id}/warbands/${e.warbandId}`);
+    const fig = page.getByRole('figure', { name: /Rating over the battles/ });
+    await expect(fig).toBeVisible();
+    await expect(fig.getByRole('img')).toBeVisible();
+    // the line and its points are drawn, and the last value is written beside them
+    await expect(fig.locator('circle')).toHaveCount(4);
+    const box = (await boxOf(fig.getByRole('img')))!;
+    expect(box.width).toBeGreaterThan(250);
+    await noSideScroll(page);
+    await fig.scrollIntoViewIfNeeded();
+    await fig.getByText('The numbers').click();
+    await expect(fig.getByRole('row')).toHaveCount(5);
+    await fig.screenshot({ path: `test-results/screens/${test.info().project.name}-${theme}-rating-line.png` });
+  });
+}
+
 /* The game night (phase 4a2). */
 for (const theme of ['chronicle', 'parchment'] as const) {
   test(`the game night: a leader writes the protocol, in ${theme}`, async ({ page }) => {

@@ -11,6 +11,8 @@ import { stamp } from '../account/time.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { FallenList } from '../roster/Fallen.tsx';
 import { Board } from '../roster/Board.tsx';
+import { Sparkline } from '../ui/Sparkline.tsx';
+import { ratingSeries } from './ratingSeries.ts';
 import board from '../roster/Board.module.css';
 import { usePrinting } from '../roster/Print.tsx';
 import { rosterView } from '../roster/view.ts';
@@ -39,6 +41,7 @@ function Body({ id, read }: { id: string; read: Read }) {
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
       </header>
+      <Sparkline title="Rating over the battles" unit="rating" points={ratingSeries(read.tags)} />
       <p className={`${ui.card} ${ui.muted}`}>
         {read.status === 'pending' ? 'Entered, waiting for a leader. ' : ''}
         {start ? `Start marked ${stamp(start.createdAt)} (version ${start.rev}): rating ${start.totals.rating}, ${start.totals.gold} gc, ${start.totals.models} models. ` : ''}

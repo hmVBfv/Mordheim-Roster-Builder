@@ -192,6 +192,8 @@ describe('the overview', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'The Grey Penitents' })).toBeTruthy();
     expect(screen.getByText(/^Anna · /)).toBeTruthy();
     expect(screen.getByText(new RegExp(`Start marked .* \\(version 1\\): rating ${totals(anna).rating}`))).toBeTruthy();
+    // one mark so far: no line yet (plan P7: a line needs two points)
+    expect(screen.queryByRole('figure', { name: /Rating over the battles/ })).toBeNull();
     // to read only: a row each, and opened a card without any button to change something
     const row = (await screen.findAllByRole('button', { expanded: false })).find((b) => b.hasAttribute('aria-describedby'))!; // the first row, not a rule word above them
     await user.click(row);
@@ -413,6 +415,22 @@ describe('the overview', () => {
     expect(screen.getAllByRole('link', { name: /Sons of Trantio/ }).map((a) => a.textContent)).toEqual(expect.arrayContaining([
       expect.stringMatching(/· in The Hel Fenn Campaign(Created|$)/), expect.not.stringMatching(/in The Hel Fenn/),
     ]));
+  });
+
+  /* Plan P7: the marks of another player's warband, drawn as the rating over the battles. */
+  it('draws the rating of a warband over its marks, with the numbers behind it', async () => {
+    const srv = server();
+    const anna = saveOf('The Grey Penitents');
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: anna, role: 'leader' }] });
+    const e = c.enrolments[0]!;
+    const start = e.tags![0]!;
+    const after = { ...start, id: 'tag-after-1', kind: 'after_battle' as const, round: 1, createdAt: '2026-10-05T12:00:00.000Z', totals: { ...start.totals, rating: start.totals.rating + 14 } };
+    e.tags = [start, after];
+    e.tag = after;
+    at(`/campaign/${c.id}/warbands/${e.warbandId}`);
+    const fig = await screen.findByRole('figure', { name: /Rating over the battles/ });
+    expect(fig.textContent).toContain(`${start.totals.rating} → ${start.totals.rating + 14} rating (+14)`);
+    expect(within(fig).getByRole('img').getAttribute('aria-label')).toBe(`Rating over the battles: Start ${start.totals.rating}, After battle 1 ${start.totals.rating + 14}.`);
   });
 
   it('a new warband for the campaign without the connection: made, and entered later', async () => {
