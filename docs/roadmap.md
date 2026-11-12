@@ -1,9 +1,25 @@
 # Fahrplan
 
-Stand: 2. Oktober 2026
+Stand: 12. November 2026 (Phasen bis 19. Oktober beschrieben, danach der Abschnitt „Seit dem 19. Oktober“; Arbeitsplan: [plan-2026-11.md](plan-2026-11.md))
 
 Jede Phase endet mit einer Abnahme durch Rob. Eine Phase beginnt erst, wenn die
 vorige abgenommen ist; Ausnahmen werden hier vermerkt.
+
+## Offen für die Abnahme
+
+Was noch aussteht, bevor die Phasen als abgenommen gelten (Stand 12.11.2026):
+
+| Phase | Offen | Wer |
+| --- | --- | --- |
+| 1d | echte Speicherstände der laufenden Kampagne für die Parität (`npm run sanitize-save`, `core/test/saves/`) | Rob |
+| 1f | Prüfung der Mockups auf dem Handy | Rob |
+| 2, Stufe 3 | Rollback-Übung, SSD-Übung, Wiederherstellungstest drei Nächte in Folge grün; der SD-Klon ist zurückgestellt | Rob |
+| 3f | Umstellung von Pages auf den Quick Build, Szenarien der Legacy-Tests als eigene `core/`-Tests; erst wenn die Gruppe ihre Kampagne in der neuen App spielt (Rob, 03.10.2026) – siehe P13 im Arbeitsplan | Rob entscheidet |
+| 4a5 | Probelauf der Übernahme der laufenden Kampagne auf der Testinstanz | Rob |
+
+Erfüllt seit dem letzten Stand: die Abnahme von **4c** (ein echter Bug lief von
+der Meldung bis „fixed in <version>“ – inzwischen über 250 Meldungen, die
+meisten im Lauf von `/bugs`).
 
 ## Phase 0 – Doku und Entscheidungen
 
@@ -429,6 +445,43 @@ trennt „wer“ von „was geschah“, Mitglieder eine Zeile je Person, leere T
 mit kleinem Bild). Ab 1920 px bleibt der Inhalt bei 1320 px (nur das Roster
 ist breiter). **Danach, je ein eigener Pull Request:** die übrigen
 Bildschirme – Rob entscheidet die Reihenfolge.
+
+## Seit dem 19. Oktober
+
+Ein Verweis auf das Entwicklungstagebuch ([HISTORY.md](../HISTORY.md)) und auf
+die Änderungsdateien in [`changelog/`](../changelog/), kein zweites Tagebuch.
+Seit dem 19.10. arbeiten Rob und die Gruppe mit der App; fast alles Folgende
+kam aus Meldungen (`/bugs`) und Wünschen.
+
+- **Bibliothek** (21.10.): Ideen, Lore, NPCs, Szenarien, Gegnergruppen und
+  Gruppen von Warbands je Konto, mit Ordnern und Favoriten (ADR 0023, 0024).
+- **Gegner und Hintergrund** (19.–21.10.): Gegnergruppen, NPC-Werte mit
+  verborgenen Teilen (ADR 0022), verborgene NPC-Warbands (ADR 0027), Orte,
+  Quellen und Lore.
+- **Trading Post** (21.–26.10.): Suchmaske, Sortierung, Preise als Spanne,
+  Katalog je Kampagne und Grad, Gegenstände unter zwei Namen, Planer und
+  Nachholen (ADR 0026).
+- **Meldungen** (20.10.–12.11.): Überschrift je Meldung, `/bugs` für mehrere
+  Meldungen, Meldung ohne Netz, Kampagne an der Meldung (Struktur aus dem, was
+  das Mitglied sieht), Bug-Token (ADR 0019).
+- **Changelog** (30.10., ADR 0029): „What’s new“, eine Datei je sichtbarer
+  Änderung.
+- **Vanilla Mordheim** (31.10.): eine Kampagne und eine Warband ohne die
+  neueren Erweiterungen.
+- **Regeln und Daten** (Nov.): Warband-Regeln als Text mit Überschriften,
+  Aufstellung (Heroes/Henchmen), Spells-Box, Prospects und Gefallene,
+  Kriegsbestien, Fehlen von Schlachten (`misses`), eine Datei je Warband
+  (ADR 0031).
+- **Zauber vollständig** (11.11.): alle Zaubertexte samt FAQ und Errata nach
+  mordheimer.net, Dark-Elf-, Zwergen-, Woodland- und Beastmen-Magie;
+  Stilvorgaben-Chips für das KI-Paket.
+- **Grad 2a** (12.11.): alle 18 fehlenden Warbands, Wood Elves neu geprüft,
+  Rassenmaxima als hartes Limit samt neuen Rassen. Damit gibt es **67
+  Warbands** (Core 6, 1a 7, 1b 23, 1c 12, 2a 19).
+- **Betrieb**: Abhängigkeitsprüfung wöchentlich, Laufzeit der CI verkürzt,
+  Runner-Umstellung des Paketspiegels (PR 404).
+
+Der Stand der Zahlen: 104 Änderungsdateien, rund 1100 Tests in der App.
 
 ## Phase 5 – Extras
 
