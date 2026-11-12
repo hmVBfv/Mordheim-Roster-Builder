@@ -83,6 +83,36 @@ test('the Look for field of the new-warband filter has a row of its own', async 
   expect(look.width, 'wider than a single field').toBeGreaterThan(race.width * 2);
 });
 
+/* #259: the bubble of a school with many spells is taller than a phone screen; it stays inside the screen and scrolls in itself, a swipe on it
+   does not close it, and a tap beside it does. */
+test('the tooltip of a long school of magic scrolls inside itself on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 420 });
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  const words = page.locator('main button[data-tip]');
+  const tip = page.getByRole('tooltip');
+  await words.first().waitFor();
+  let found = false;
+  for (let i = 0; i < Math.min(await words.count(), 40) && !found; i++) {
+    await words.nth(i).scrollIntoViewIfNeeded();
+    await words.nth(i).click();
+    found = await tip.evaluate((e) => e.scrollHeight > e.clientHeight + 1).catch(() => false);
+    if (!found) await page.keyboard.press('Escape');
+  }
+  expect(found, 'a school with so many spells that it does not fit').toBe(true);
+  const box = (await boxOf(tip))!;
+  expect(box.y, 'inside the screen, top').toBeGreaterThanOrEqual(0);
+  expect(box.y + box.height, 'inside the screen, bottom').toBeLessThanOrEqual(420);
+  await tip.evaluate((e) => { e.scrollTop = 0; });
+  // a swipe on the bubble scrolls it, and it stays
+  await tip.dispatchEvent('pointerdown');
+  await tip.evaluate((e) => { e.scrollTop = 200; });
+  await expect(tip).toBeVisible();
+  expect(await tip.evaluate((e) => e.scrollTop)).toBeGreaterThan(0);
+  await shot(page, 'tip-scrolling');
+  await page.keyboard.press('Escape');
+  await expect(tip).toHaveCount(0);
+});
+
 /* Wish of 6.11.2026: a warband picked from the long list is confirmed without scrolling down to the end of the form: the button stays in view
    above the navigation, on a phone. */
 test('the new-warband form keeps its Start button in view once a warband is picked', async ({ page }) => {

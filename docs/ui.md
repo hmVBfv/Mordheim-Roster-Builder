@@ -28,6 +28,9 @@ unverändert auf Pages.
    steht nicht im Weg (Rob, 28.09.2026): Er verschwindet nach 5 Sekunden, lässt
    sich sofort wegtippen (✕), und nur seine Knöpfe fangen Tipps ab – was unter
    dem Text liegt, bleibt bedienbar.
+   Das gilt auch für die Tooltip-Blase eines Wortes (Meldung #259, 12.11.2026): eine lange Zauberliste
+   ist höher als der Platz und lässt sich dann **in der Blase wischen**; nur eine solche Blase fängt Berührungen ab, eine
+   kurze lässt sie durch, und ein Tipp daneben schließt sie wie bisher.
 7. **Englische Oberfläche.** Spielbegriffe wie in den Regeln (Warband, Out of
    Action, Hired Sword). Zweisprachig sind nur Kanon-Felder (Namen, Titel)
    und die Texte, die Spieler selbst schreiben.

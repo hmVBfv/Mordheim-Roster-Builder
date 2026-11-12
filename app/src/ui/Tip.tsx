@@ -33,13 +33,22 @@ const EDGE = 8;
 const GAP = 6;
 
 /** Places the bubble under the word, or over it when there is no room
-    below, and never past the edges of the screen. */
+    below, and never past the edges of the screen. A bubble taller than the
+    room on either side takes the larger room and scrolls inside (#259); only
+    then does it take touches – a short one still lets taps through. */
 function place(word: HTMLElement, bubble: HTMLElement) {
   const r = word.getBoundingClientRect();
-  const w = bubble.offsetWidth, h = bubble.offsetHeight;
-  const below = r.bottom + GAP + h <= window.innerHeight - EDGE || r.top - GAP - h < EDGE;
-  bubble.style.top = `${Math.round(below ? r.bottom + GAP : r.top - GAP - h)}px`;
+  bubble.style.maxHeight = '';
+  const w = bubble.offsetWidth, natural = bubble.offsetHeight;
+  const below = window.innerHeight - r.bottom - GAP - EDGE;
+  const above = r.top - GAP - EDGE;
+  const under = natural <= below || (natural > above && below >= above);
+  const room = under ? below : above;
+  if (natural > room) bubble.style.maxHeight = `${Math.max(0, Math.floor(room))}px`;
+  const h = bubble.offsetHeight;
+  bubble.style.top = `${Math.round(under ? r.bottom + GAP : r.top - GAP - h)}px`;
   bubble.style.left = `${Math.round(Math.min(Math.max(EDGE, r.left), Math.max(EDGE, window.innerWidth - w - EDGE)))}px`;
+  bubble.style.pointerEvents = bubble.scrollHeight > bubble.clientHeight + 1 ? 'auto' : '';
 }
 
 function TipButton({ label, tips }: { label: string; tips: readonly TipEntry[] }) {
@@ -53,9 +62,14 @@ function TipButton({ label, tips }: { label: string; tips: readonly TipEntry[] }
 
   useLayoutEffect(() => {
     if (!open) { pinned.current = false; return; }
-    const follow = () => { if (word.current && bubble.current) place(word.current, bubble.current); };
+    const follow = (e?: Event) => {
+      // scrolling inside the bubble is not the page moving
+      if (e?.target instanceof Node && bubble.current?.contains(e.target)) return;
+      if (word.current && bubble.current) place(word.current, bubble.current);
+    };
     follow();
-    const away = (e: PointerEvent) => { if (!word.current?.contains(e.target as Node)) setOpen(null); };
+    // a touch on the bubble (it scrolls) or on its word is not "elsewhere"
+    const away = (e: PointerEvent) => { if (!word.current?.contains(e.target as Node) && !bubble.current?.contains(e.target as Node)) setOpen(null); };
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(null); };
     document.addEventListener('pointerdown', away, true);
     document.addEventListener('keydown', key);
