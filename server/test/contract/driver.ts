@@ -46,6 +46,8 @@ export function normalize(v: unknown, volatile: Record<string, string> = VOLATIL
   if (v && typeof v === 'object') {
     return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => {
       if (typeof x === 'string' && VOLATILE_IDS.some((re) => re.test(`${path}.${k}`))) return [k, '<id>'];
+      // when a battle was played: a moment for a battle of the app, a day the leader gave for one of the history – only the moment varies
+      if (k === 'playedAt' && typeof x === 'string' && TIME.test(x)) return [k, '<time>'];
       const kind = volatile[k];
       if (kind && x !== null && x !== undefined) {
         const ok = kind === 'time' ? typeof x === 'string' && TIME.test(x) : typeof x === kind;

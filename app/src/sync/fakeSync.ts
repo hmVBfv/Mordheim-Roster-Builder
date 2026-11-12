@@ -35,7 +35,7 @@ export interface FakePicture {
   caption: string; visibility: 'public' | 'leader'; stored: boolean; createdAt: string; updatedAt: string; seq: number; deleted?: boolean; data?: Uint8Array;
 }
 export interface FakeBattle {
-  id: string; campaignId: string; round: number; title: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
+  id: string; campaignId: string; round: number; title: string; district: string; /** as the leader set it up or changed it */ scenario?: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
   participants: { warbandId: string; outcome: string; /** the version confirmed for the battle, by whom and when, and the numbers frozen with it */ confirm?: { rev: number; by: string; at: string; totals: unknown } }[];
   entries: FakeEntry[];
   proposals: FakeProposal[];
@@ -138,6 +138,8 @@ export function createFakeSync(opts: {
   /** What changed between two saves, as the server's core finds and explains it. */
   changes?: (before: unknown, after: unknown, battle: { id: string; round: number }) => FakeChange[];
   districtName?: (id: string) => string;
+  /** Whether a district id exists in the game's data; without it every one does. */
+  districtOk?: (id: string) => boolean;
 } = {}) {
   const me = opts.me ?? { id: 'u1', username: 'kai', displayName: ME_NAME };
   const totalsOf = opts.totals ?? (() => NO_TOTALS);
@@ -231,7 +233,7 @@ export function createFakeSync(opts: {
     .map((t) => [e.warbandId, { tagId: t.id, rev: t.rev, totals: t.totals, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }])));
   const battleView = (b: FakeBattle) => ({
     battle: {
-      id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: b.closedAt ?? null,
+      id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: b.scenario ?? '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: b.closedAt ?? null,
       takenOver: !!b.takenOver, playedAt: b.playedAt ?? (b.takenOver ? null : b.createdAt),
     },
     seq: b.seq,
@@ -320,13 +322,14 @@ export function createFakeSync(opts: {
   };
   const noteRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
     if (method === 'GET' && rest === '/notes' && query.get('as') === 'player') {
-      const asNobody = (n: FakeNote) => (n.visibility === 'leader' ? null : noteFor({ ...n, authorId: '' }, 'player'));
+      const asNobody = (n: FakeNote) => { if (n.visibility === 'leader') return null; const v = noteFor({ ...n, authorId: '' }, 'player'); return v && { ...v, authorId: n.authorId }; };
       return json(200, { notes: [...s.notes.values()].filter((n) => n.campaignId === c.id && !n.deleted).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map(asNobody).filter(Boolean), seq: notesSeq(c.id) });
     }
     if (method === 'GET' && rest === '/notes') {
       const seq = notesSeq(c.id);
       const since = query.get('since');
-      if (since !== null && Number(since) >= seq) return json(200, { unchanged: true, seq });
+      // exactly the number the device has: a higher one means something it saw is hidden now (a public note turned leaders')
+      if (since !== null && Number(since) === seq) return json(200, { unchanged: true, seq });
       return json(200, { notes: [...s.notes.values()].filter((n) => n.campaignId === c.id).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map((n) => noteFor(n, role)).filter(Boolean), seq });
     }
     const m = rest.match(/^\/notes\/([^/]+)$/);
@@ -334,6 +337,14 @@ export function createFakeSync(opts: {
     if (role === 'viewer') return json(403, { error: 'forbidden' });
     const cur = s.notes.get(m[1]!);
     if (method === 'PUT') {
+      if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'a note is named by its device id' });
+      // the fields of a note as the server's schema reads them (server/src/notes.ts NoteBody)
+      const bad = Object.keys(body).find((k) => !['battleId', 'turn', 'kind', 'text', 'lang', 'visibility', 'mentions', 'protocolEntryId'].includes(k))
+        ?? (typeof body.text !== 'string' || !body.text.trim() || body.text.trim().length > 20_000 ? 'text' : null)
+        ?? (body.kind !== undefined && !['general', 'scene', 'quote', 'dice', 'hook'].includes(String(body.kind)) ? 'kind' : null)
+        ?? (body.visibility !== undefined && !['public', 'sealed', 'leader'].includes(String(body.visibility)) ? 'visibility' : null)
+        ?? (body.turn !== undefined && body.turn !== null && (!Number.isInteger(body.turn) || (body.turn as number) < 1 || (body.turn as number) > 99) ? 'turn' : null);
+      if (bad) return json(400, { error: 'invalid', problem: `not a note (${bad}: invalid)` });
       if (cur?.deleted) return json(409, { error: 'removed' });
       if (body.visibility === 'leader' && role !== 'leader') return json(403, { error: 'forbidden' });
       if (cur && cur.authorId !== me.id && role !== 'leader') return json(403, { error: 'forbidden' });
@@ -947,26 +958,51 @@ export function createFakeSync(opts: {
     return json(200, { position });
   };
 
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /** The battles that were taken out, by id: a device that sends one again is told so (server/src/battles.ts wasRemoved). */
+  const removedBattles = new Set<string>();
+  const battleLabel = (round: number, title: string) => `Battle ${round}${title.trim() ? ` · ${title.trim()}` : ''}`;
+  const battleTitleTaken = (c: FakeCampaign, round: number, title: string, exceptId: string) => [...s.battles.values()].some((x) => x.campaignId === c.id && x.round === round && x.id !== exceptId && nameKey(x.title) === nameKey(title));
+  /** An entry of the protocol as the server's schemas read it (server/src/battles.ts checkEntry): only the shape. */
+  const entryProblem = (kind: unknown, payload: unknown, fought: string[]): string | null => {
+    const p = payload as Record<string, unknown> | null;
+    const named = (x: unknown) => !!x && typeof x === 'object' && typeof (x as { name?: unknown }).name === 'string' && ((x as { name: string }).name.trim().length > 0);
+    if (!p || typeof p !== 'object') return `not a ${String(kind)} (payload: expected object)`;
+    if (kind === 'event') {
+      if (Object.keys(p).some((k) => k !== 'text') || typeof p.text !== 'string' || !p.text.trim() || p.text.trim().length > 1000) return 'not a event (text: invalid)';
+      return null;
+    }
+    if (Object.keys(p).some((k) => !['victim', 'attacker', 'note'].includes(k)) || !named(p.victim) || (p.attacker !== null && !named(p.attacker))) return 'not a casualty (victim: invalid)';
+    for (const side of [p.victim, p.attacker] as ({ warbandId?: string } | null)[]) if (side?.warbandId && !fought.includes(side.warbandId)) return 'a warband named there did not fight this battle';
+    return null;
+  };
   const battleRoutes = (c: FakeCampaign, role: FakeRole, method: string, rest: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
     const lead = role === 'leader';
     if (rest === '/battles') {
       if (method === 'GET') return json(200, { battles: [...s.battles.values()].filter((b) => b.campaignId === c.id).map(battleSummary) });
       if (method === 'POST') {
         if (!lead) return json(403, { error: 'forbidden' });
+        if (typeof body.id !== 'string' || !Array.isArray(body.warbandIds) || (body.round !== undefined && (!Number.isInteger(body.round) || (body.round as number) < 1 || (body.round as number) > 999))) return json(400, { error: 'bad_request' });
         const id = String(body.id);
         const there = s.battles.get(id);
-        if (there) return json(200, battleView(there));
-        const ws = (body.warbandIds as string[] | undefined) ?? [];
+        if (there) return json(there.campaignId === c.id ? 200 : 409, there.campaignId === c.id ? battleView(there) : { error: 'exists' });
+        if (removedBattles.has(id)) return json(409, { error: 'removed' });
+        const ws = [...new Set((body.warbandIds as string[]))];
         if (!ws.length) return json(400, { error: 'invalid', problem: 'a battle needs a warband that fought it' });
+        if (ws.some((w) => c.enrolments.find((e) => e.warbandId === w)?.status !== 'active')) return json(400, { error: 'invalid', problem: 'only warbands entered and confirmed in the campaign fight its battles' });
+        if (body.district && opts.districtOk && !opts.districtOk(String(body.district))) return json(400, { error: 'invalid', problem: 'no such district' });
         const round = body.round === undefined ? c.round + 1 : Number(body.round);
         const h = Math.max(0, ...[...s.battles.values()].filter((x) => x.campaignId === c.id && x.takenOver).map((x) => x.round));
         if (round <= h) return json(400, { error: 'invalid', problem: `round ${round} was played before the app (its history ends with battle ${h})` });
+        const title = String(body.title ?? '').trim();
+        if (battleTitleTaken(c, round, title, id)) return json(400, { error: 'invalid', problem: `${battleLabel(round, title)} exists already${title ? '' : ': give this one a title of its own'}` });
         // a number beyond the next: the campaign comes to the round before it (server/src/aftermath.ts comeToRound)
         if (round - 1 > c.round) c.round = round - 1;
         const b = addBattle(c.id, { title: String(body.title ?? ''), warbandIds: ws, round });
         s.battles.delete(b.id);
         b.id = id;
         b.district = String(body.district ?? '');
+        b.scenario = String(body.scenario ?? '').trim();
         s.battles.set(id, b);
         return json(201, battleView(b));
       }
@@ -983,6 +1019,10 @@ export function createFakeSync(opts: {
     let x: RegExpMatchArray | null;
     if (method === 'PUT' && (x = sub.match(/^\/proposals\/([^/]+)$/))) {
       if (role === 'viewer') return json(403, { error: 'forbidden' });
+      if (!UUID_RE.test(x[1]!)) return json(400, { error: 'invalid', problem: 'a proposal is named by its device id' });
+      if (b.status === 'closed') return json(409, { error: 'closed' });
+      if (typeof body.text !== 'string' || !body.text.trim() || body.text.trim().length > 1000) return json(400, { error: 'invalid', problem: 'a correction needs its text' });
+      if (body.entryId && !b.entries.some((e) => e.id === body.entryId && !e.deleted)) return json(400, { error: 'invalid', problem: 'no such entry in this battle' });
       const cur = b.proposals.find((p) => p.id === x![1]);
       if (cur) { if (cur.status !== 'open') return json(409, { error: 'decided' }); cur.payload = { text: String(body.text) }; }
       else b.proposals.push({ id: x[1]!, targetType: body.entryId ? 'protocol_entry' : 'battle', targetId: String(body.entryId ?? b.id), authorId: me.id, author: me.displayName, payload: { text: String(body.text) }, status: 'open', decidedBy: null, createdAt: at() });
@@ -1000,7 +1040,7 @@ export function createFakeSync(opts: {
       // a warband another player entered here has only its entered data (version 1)
       const w = s.warbands.get(wid);
       const v = w ? w.versions.find((q) => q.rev === Number(body.rev)) : Number(body.rev) === 1 ? { rev: 1, data: e.data } : undefined;
-      if (!v) return json(404, { error: 'not_found' });
+      if (!v) return json(404, { error: 'not_found', problem: 'no such version' });
       part.confirm = { rev: v.rev, by: me.displayName, at: at(), totals: totalsOf(v.data) };
       b.seq = next();
       return json(200, battleView(b));
@@ -1031,6 +1071,7 @@ export function createFakeSync(opts: {
       if (b.status !== 'closed') { b.status = 'closed'; b.closedAt = at(); b.seq = next(); }
       return json(200, battleView(b));
     }
+    if (method === 'DELETE' && sub === '' && b.status === 'closed') return json(409, { error: 'closed', problem: 'a closed battle stays: it is part of the story and of the marks' });
     if (b.status === 'closed') return json(409, { error: 'closed' });
     if (method === 'DELETE' && sub === '') {
       // what is written for it holds it back, unless the leader takes it out with it (?content=1; server/src/battles.ts)
@@ -1038,22 +1079,29 @@ export function createFakeSync(opts: {
       if (written.length && query.get('content') !== '1') return json(409, { error: 'in_use', problem: 'notes, pictures or other things of the campaign belong to this battle' });
       for (const n of written) { n.deleted = true; n.text = ''; n.battleId = null; n.seq = next(); }
       s.battles.delete(b.id);
+      removedBattles.add(b.id);
       return json(200, { removed: true });
     }
     if (method === 'PATCH' && sub === '') {
+      const outcomes = Object.entries((body.outcomes as Record<string, string> | undefined) ?? {}).map(([w, o]) => [w.toLowerCase(), o] as const);
+      if (outcomes.some(([w]) => !b.participants.some((q) => q.warbandId === w))) return json(400, { error: 'invalid', problem: 'an outcome for a warband that did not fight' });
+      if (body.district && opts.districtOk && !opts.districtOk(String(body.district))) return json(400, { error: 'invalid', problem: 'no such district' });
+      if (body.title !== undefined && battleTitleTaken(c, b.round, String(body.title).trim(), b.id)) return json(400, { error: 'invalid', problem: `${battleLabel(b.round, String(body.title))} exists already${String(body.title).trim() ? '' : ': give this one a title of its own'}` });
       if (body.turn !== undefined) b.turn = Number(body.turn);
-      if (body.title !== undefined) b.title = String(body.title);
-      for (const [w, o] of Object.entries((body.outcomes as Record<string, string> | undefined) ?? {})) {
-        const p = b.participants.find((q) => q.warbandId === w);
-        if (!p) return json(400, { error: 'invalid', problem: 'an outcome for a warband that did not fight' });
-        p.outcome = o;
-      }
+      if (body.title !== undefined) b.title = String(body.title).trim();
+      if (body.scenario !== undefined) b.scenario = String(body.scenario).trim();
+      if (body.district !== undefined) b.district = String(body.district);
+      for (const [w, o] of outcomes) b.participants.find((q) => q.warbandId === w)!.outcome = o;
       b.seq = next();
       return json(200, battleView(b));
     }
     if ((x = sub.match(/^\/protocol\/([^/]+)$/))) {
       const cur = b.entries.find((e) => e.id === x![1]);
       if (method === 'PUT') {
+        if (!['casualty', 'event'].includes(String(body.kind)) || !Number.isInteger(body.turn) || !body.payload || typeof body.payload !== 'object') return json(400, { error: 'bad_request' });
+        if (!UUID_RE.test(x[1]!)) return json(400, { error: 'invalid', problem: 'an entry is named by its device id' });
+        const problem = entryProblem(body.kind, body.payload, b.participants.map((q) => q.warbandId));
+        if (problem) return json(400, { error: 'invalid', problem });
         if (cur?.deleted) return json(409, { error: 'removed' });
         const e = { turn: Number(body.turn), kind: body.kind as FakeEntry['kind'], payload: body.payload };
         if (cur) Object.assign(cur, e, { updatedAt: at() });
