@@ -1,0 +1,552 @@
+{
+  "warband": {
+    "name": "Druchii",
+    "grade": "2a",
+    "siteRace": "Dark Elf",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "units": [
+      {
+        "id": "noble",
+        "t": "hero",
+        "name": "Noble",
+        "cost": 75,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 5,
+          "WS": 5,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "drHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "speed",
+          "drSkills"
+        ],
+        "sp": "Leader: Any models in the warband within 6\" of the Noble may use his Leadership instead of their own."
+      },
+      {
+        "id": "sorceress",
+        "t": "hero",
+        "name": "Sorceress",
+        "cost": 45,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "drHero",
+        "sk": [
+          "academic",
+          "speed",
+          "drSkills"
+        ],
+        "sp": "A Sorceress may be armed with weapons and armour chosen from the Druchii Heroes Equipment list, but may not cast spells if wearing armour. Wizard: The Dark Elf Sorceress is a wizard and uses Dark Magic, detailed below."
+      },
+      {
+        "id": "beastmaste",
+        "t": "hero",
+        "name": "Beastmaster",
+        "cost": 40,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "drHeroBeastmaste",
+        "sk": [
+          "combat",
+          "speed",
+          "drSkills"
+        ],
+        "sp": "Slavehounds: The Beastmaster may be accompanied by up to three Slavehounds. These are bought as henchmen and follow all rules listed for them.",
+        "beasts": [
+          "slavehound"
+        ],
+        "beastMax": 3
+      },
+      {
+        "id": "lordling",
+        "t": "hero",
+        "name": "Lordling",
+        "cost": 45,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "drHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "drSkills"
+        ]
+      },
+      {
+        "id": "corsair",
+        "t": "hen",
+        "name": "Corsair",
+        "cost": 35,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "drCorsair",
+        "sp": "Corsairs may be armed with weapons and armour chosen from the Corsairs Equipment list. In addition, they may wear Sea Dragon Cloaks even though they are not Heroes."
+      },
+      {
+        "id": "shade",
+        "t": "hen",
+        "name": "Shade",
+        "cost": 35,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "drShades",
+        "sp": "Natural Stealth: If a Shade is Hidden, enemy models halve their Initiative value for determining if they can detect it or not."
+      },
+      {
+        "id": "witchelve",
+        "t": "hen",
+        "name": "Witch Elve",
+        "cost": 45,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "drWitchelves",
+        "sp": "Frenzy: Witch Elves, being intent on proving their battle prowess in Khaela Mensha Khaine's all-seeing gaze, follow the Frenzy special rule. Maibd Poison: Witch Elves often anoint their weapons in various poisons, for both martial and religious purposes. They are able to prepare their poisons and they know where to get needed ingredients. As a result, a warband, containing Witch Elves, may purchase Black Lotus as Common item for reduced price of 5 gc per dose. However, Black Lotus, purchased in such a way, may only be used by Witch Elves. The poison must be used in the next battle and cannot be sold or traded to other warbands."
+      },
+      {
+        "id": "slavehound",
+        "t": "hen",
+        "name": "Slavehound",
+        "cost": 25,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 7,
+          "WS": 4,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Slavehounds are animals and do not need any weapons, save their claws and massive jaws. Animals: Slavehounds are animals, and all animal rules apply to them. They never gain experience. Beastmaster: Slavehounds are vicious creatures that are barely kept under control by their Beastmaster. As long as Beastmaster is not knocked down, stunned or out of action, Slavehounds may use his Leadership instead of their own for any Leadership test, provided that the Beastmaster is within 6\" of the Slavehound in question. But, since Beastmaster is the only authority they respect, they cannot use Leadership of warband Leader. Consequently, if the Beastmaster is unable to participate in a battle, then neither will the beasts. If the warband does not contain a Beastmaster, there is no one able to control Slavehounds, so they have to stay in warband's camp (and when feeding time comes, it has to be done from a safe distance). Pack Work: Slavehounds are trained to detect hiding slaves and show them to their masters. If a Slavehound knows about enemy model (has a line of sight, has unhidden it etc.), the Beastmaster and all other slavehounds of the same warband can declare charge on this model even if they do not see it. No Initiative roll is necessary.",
+        "needs": [
+          "beastmaster"
+        ]
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Noble, max. 1 Sorceress, max. 1 Beastmaster, max. 2 Lordlings; any number of Corsairs, max. 5 Shades, max. 3 Witch Elves, max. 3 Slavehounds.<br><b>Kindred Hatred:</b> Dark Elves Hate any High Elf warriors including High Elf Hired Swords.<br><b>Fey Acuity:</b> During the Exploration phase when checking for artifacts or wyrdstone at the end of the game, add +1 to the number of pieces found by a Dark Elf warband, as long as at least one hero was searching.<br><b>Disdain:</b> Dark Elves may never use black powder weapons, as they find them too crude, noisy and unreliable.<br><b>Slavers:</b> In case of finding prisoners (roll of \"333\" during Exploration phase) Druchii may follow the rules for Skaven.<br><b>Maximum Characteristics:</b>  M 5 WS 7 BS 7 S 4 T 3 W 3 I 9 A 4 Ld 10."
+  },
+  "extra": {
+    "skills": "drSkills",
+    "magic": "druchiiMagic"
+  },
+  "race": "elf",
+  "hire": {
+    "align": "evil",
+    "elf": true,
+    "tags": [
+      "goodElves"
+    ]
+  },
+  "lists": {
+    "drHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Draich",
+          25
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Repetierarmbrust",
+          20
+        ],
+        [
+          "Armbrustpistole",
+          35
+        ],
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Seedrachen-Umhang",
+          30
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Dunkles Gift",
+          15
+        ]
+      ]
+    },
+    "drCorsair": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Repetierarmbrust",
+          20
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Seedrachen-Umhang",
+          30
+        ]
+      ]
+    },
+    "drShades": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Repetierarmbrust",
+          20
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ]
+    },
+    "drWitchelves": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Schwarzer Lotus",
+          5
+        ]
+      ]
+    },
+    "drHeroBeastmaste": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Draich",
+          25
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Beastlash",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Repetierarmbrust",
+          20
+        ],
+        [
+          "Armbrustpistole",
+          35
+        ],
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Seedrachen-Umhang",
+          30
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Dunkles Gift",
+          15
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "noble": "Dark Elf leaders are typically drawn from the Dark Elf nobility and lead the warband in search of gold, slaves and arcane artifacts to bring home to Naggaroth. They are cold and ruthless killers and they command the respect of their troops through assassination and terror. They have attained their position of leadership by eliminating those rivals who stood in their way and through their remarkable cunning, they are dangerous foes who embody the merciless traits of the Druchii race.",
+    "sorceress": "Dark Elves are strange in that apart from the fell Witch King there are no other male sorcerers — all the other practitioners of magic in the Dark Elf race are female. It is rumoured that any males who do develop an affinity for magic amongst the Dark Elves are immediately put to death to prevent the fulfilling of some dark prophecy. Dark Elf Sorceresses are mysterious, raven-haired beauties who are grudgingly respected even by the powerful Nobles, and their services are high in demand.",
+    "beastmaste": "Whereas the High Elves have a great affinity with Dragons and Griffons and other noble creatures, their malevolent kin have infamous Beastmasters, Dark Elves of particularly cruel renown who breed many vicious beasts and lead them into combat. Unlike the High Elves who treat their beasts as companions, the Dark Elf Beastmasters are very spiteful masters.",
+    "lordling": "Lordlings are would-be commanders of the Druchii forces, and often serve under a Noble as page or lieutenant. Lordlings accompany raiding parties to the Old World to further their career, seeking to acquire fame, riches and status in the Witch King's court.",
+    "corsair": "The Dark Elves are cruel and fierce fighters. This is especially true of the Corsairs – the Black Ark Raiders. They are skilled with sword and axe, as well as the repeater crossbow, the distinct missile weapon of the Dark Elves. Whenever Druchii ships reach foreign shores, the Corsairs are the first to launch raiding parties.",
+    "shade": "The stealthy Dark Elf Shades rely on their repeater crossbows to harass and snipe at the enemy, rather than engaging them head on, as ambush is their preferred style of fighting. These Shades are young and inexperienced scouts that see the expeditions to the Old World as a valuable training opportunity.",
+    "witchelve": "Witch Elves are the lethally beautiful followers of Khaine, the Bloody-Handed god of murder, vengeance and war. Those amongst the devoted who seek to become full-fledged priestesses of Khaine and learn His holy canons are sent on missions for the Temple, to prove their worth in the eyes of their god, and also serve to spy upon those Nobles who are temporarily out of the King's grasp.",
+    "slavehound": "The Dark Elves capture and breed many exotic creatures to fight for them, and fights between pets are often staged as a form of entertainment amongst the Dark Elves. Myriads of such animals can be discovered in the Chaos Wastes. Among them is the Slavehound, a fierce breed of wild hounds that resemble wolves more than dogs. The Dark Elves capture and train these creatures to help them in their slave hunting missions all over the Warhammer World."
+  },
+  "intro": {
+    "text": "There are none living who know the ways of the elves, save perhaps the mighty lizard-priests of the South whose knowledge and power is rumoured to grow far beyond that even of the High Mages of the College of Magic of Altdorf. Those few elves who roam the lands of the Empire are mysterious, their ways impenetrable to us.\n\nThere are those who, like Finubar the Proud, openly declare themselves Manfriend and help defend our glorious Empire from the encroaching forces of Chaos - too few of them, unfortunately. Of those, we know what they would have us know - their history and that of their families, and a little of the history of their land - the fabled island of Ulthuan.\n\nThere are those who stalk the night, warriors who come cloaked in darkness and wielding bows, the death in their eyes revealed in their prey as their life is snuffed out like a candle atop Brass Keep by one, well-placed arrow shot - of those we know little, save that they name themselves \"Shadow warriors of Nagarythe\" and, as their kindred of Ulthuan reassure us, they seek to do us no harm.\n\nThere are those who protect the forests, defending them from touch of Chaos and Man alike. There are also rumours of a fourth breed of elves - a grim race, ruthless and sadistic. They come at night in their low ships with sails of midnight-black, craving the poison that lurks within the now-ruins of Mordheim, the Wyrdstone of which all those who go to the Cursed City and return speak. They leave no witnesses, taking prisoner those who are able-bodied enough to toil under them in slavery, murdering the others.\n\nOf course, such nonsense is only that - rumours, and nonsense, the delusional affabulations of crazed minds that have seen the taint of Chaos from too close. It may be that some elves are more ruthless than others, but they are just that - elves, and their ways are closed to us.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/druchii"
+  },
+  "skillSets": {
+    "drSkills": {
+      "name": "Druchii Special Skills",
+      "note": "Druchii Heroes may use the following Special Skills in addition to any normally available to them:",
+      "skills": [
+        [
+          "Frenzied Charge",
+          "The Dark Elf is infused with an intense raging thirst for blood and is a whirlwind in hand-to-hand combat, moving from opponent to opponent. The Druchii may make a 4\" follow up move if they take all of their opponents out of action. If the elf comes into contact with another enemy, this starts a new combat. This new combat takes place in the following turn and the model counts as charging."
+        ],
+        [
+          "Fey Quickness",
+          "Few can ever hope to match an Elf's inhuman quickness and agility. An Elf with Fey Quickness can avoid melee or missile attacks on a roll of 6. If the Elf also has Step Aside or Dodge, this will increase to a 4+ in the relevant area. For example, an Elf with Fey Quickness and Step Aside avoids melee attacks on a 4+ and missile attacks on a 6."
+        ],
+        [
+          "Infiltration",
+          "The Dark Elf can Infiltrate. This skill is identical to the Skaven skill."
+        ],
+        [
+          "Poisoner",
+          "The Dark Elf is proficient in concocting different poisons. If the Hero doesn't search for rare items, he may make D2 doses of Dark Venom instead. The poison must be used in the next battle and cannot be sold or traded to other warbands as the Dark Elves guard their secrets very carefully."
+        ],
+        [
+          "Marksman of Naggaroth",
+          "Eyes of this hero are so keen and hands so steady that he can completely omit the penalty for long range if using a crossbow type weapon. Further, if he did not move this turn, he can shoot from repeater crossbow twice per turn without penalty or three times per turn with −1 penalty to hit."
+        ],
+        [
+          "Will to Survive",
+          "Naggaroth is a harsh land with harsh inhabitants and weaklings are shown no mercy. This elf is able to survive by pure strength of will. If the model gets out of action and result of the Serious Injuries roll is death, make a Leadership test against unmodified Ld of the model (no holy relics etc.). If you succeed, the model will survive but will miss D3 battles instead."
+        ],
+        [
+          "Keen Sight",
+          "There are numerous legends detailing the excellent eyesight of the Elves, both Druchii and Asur kin. This elf can spot Hidden enemies from twice as far away than normal warriors (i.e. twice his Initiative value in inches)."
+        ]
+      ]
+    }
+  }
+}

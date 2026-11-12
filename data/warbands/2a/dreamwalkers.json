@@ -1,0 +1,484 @@
+{
+  "warband": {
+    "name": "Dreamwalkers (Cult of Morr)",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "units": [
+      {
+        "id": "dreamer",
+        "t": "hero",
+        "name": "Dreamer",
+        "cost": 70,
+        "exp": 20,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "dwHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "dwSkills"
+        ],
+        "sp": "Leader: Any warrior within 6\" of the Dreamer may use his Leadership instead of his own. Choosen Of Morr: See the special rules section for more information. Guiding Dream: At the beginning of each battle, the Dreamer must roll D6 and consult the Guiding Dream table to discover what kind of vision Morr is sending him."
+      },
+      {
+        "id": "priestofmo",
+        "t": "hero",
+        "name": "Priest of Morr",
+        "cost": 35,
+        "exp": 8,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 9
+        },
+        "eq": "dwPriest",
+        "sk": [
+          "academic",
+          "speed",
+          "dwSkills"
+        ],
+        "sp": "Prayers of Morr: May perform the Funerary Rites, using the rules for Magic. As priests of Morr seldom engage in martial activities, they may only be armed with a Dagger and a Scythe as a weapon. Priests Of Morr may never wear armour. Skills: Priest Of Morr may choose skills from the Academic and Speed skills list, or they may randomly determine a new funerary from the Funerary Rites list. Loner: Few people care to spend any length of time in the company of a priest of Morr - even when it is their duty to do so. As such, a priest of Morr is used to being alone and probably prefers it that way. Priests of Morr do not suffer from the all alone rules. Funerary Rites: Priests of Morr are not wizards by any means, however, they do have numerous Funerary Rites , which they may perform. As such, priests of Morr may choose a Funerary Rite, using the rules for Magic. See the Magic section for details.",
+        "noArmour": true
+      },
+      {
+        "id": "blackguard",
+        "t": "hero",
+        "name": "Black Guard of Morr",
+        "cost": 55,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "dwHero",
+        "sk": [
+          "combat",
+          "shooting",
+          "speed",
+          "dwSkills"
+        ],
+        "sp": "A Black Guard may be armed with weapons and armour chosen from the Dreamwalkers Equipment list. If using the optional rules for mounted models or the Blazing Saddles expanded mounted rules, the Black Guard may ride a Warhorse, paying its cost. If so increasing their save by one while mounted as normal. Silent Guardian: If a Black Guard has been declared Hidden, enemies must take an Initiative test to spot them. And never suffer movement penalties for wearing armour."
+      },
+      {
+        "id": "theandanti",
+        "t": "hero",
+        "name": "Andanti",
+        "cost": 40,
+        "exp": 6,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "dwAndanti",
+        "sk": [
+          "combat",
+          "shooting",
+          "strength",
+          "dwSkills"
+        ],
+        "sp": "Estalian Tecnique: The Andanti may parry using his rapier and Main Gauche if he can roll under his weapon skill as opposed to over his opponent's highest hit roll as per the normal rules. Andanti Knowledge: Their secret knowledge passed from member to member makes them skilled fighters against vampires. When fighting a vampire they get +1 to hit in close combat."
+      },
+      {
+        "id": "deathshead",
+        "t": "hen",
+        "name": "Death's Head of Ostermark",
+        "cost": 40,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 4,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "dwDeathsHead",
+        "sp": "Expert Halberdier: Death's Heads are so skilled with their weapons that they may combat carrying his halberd in one hand and shield at the other."
+      },
+      {
+        "id": "morrworshw",
+        "t": "hen",
+        "name": "Morr Worshipper",
+        "cost": 25,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "dwWorshipper"
+      }
+    ],
+    "rules": "<b>Choice:</b> Max. 1 Dreamer. Exactly 1 Priest of Morr, max. 2 Black Guards of Morr, max. 1 Andanti, max. 5 Death's Heads of Ostermark; any number of Morr Worshippers.<br><b>Morr's Enemies:</b> They steal from his kingdom, violate its protection for personal gain, disturb the rest of the dead, and flout Morr's authority. Such is the faith of the followers of Morr in their god and in his protection, that in order to fulfill the destiny that their god entrusts to them, they do not feel any fear when fighting both vampires and necromancers and their undead followers, torn from the kingdom of Morr by the dark magic of their masters.<br><b>Chosen of Morr:</b> A Priest of Morr must ALWAYS certify that each dreamer is genuine, not a heretic...or worse! which means that he must prove through a ritual that the dreamer's dreams truly come from Morr and are not the product of necromantic magic or the corruption of chaos. When creating a band of dreamwalkers, the Priest of Morr must roll a D6. If you get a +4, you can hire the Dreamer; Otherwise, the Priest of Morr rejects him, through the necessary ritual he learns that the dreams of that dreamer do not come from Morr. Then the priest himself will take leadership of the warband to fulfill Morr's will. (in game effects the priest of Morr will be considered the Leader). They will be able to try to find (hire) a new genuine Morr Dreamer again after their next battle... paying their costs normally. If the priest finds a genuine dreamer, he will give him the leadership of the band. (For game purposes the Dreamer will be considered the leader, until he dies, in which case leadership will revert to the priest again. Once a band has a genuine Dreamer and he or she dies, they will not be able to hire another one again.)<br><b>Hired Swords:</b> May hire the Hired Swords of a Human Mercenary warband, Witch Hunters or Sisters of Sigmar, but none of a Necromantic or Chaotic nature.<br><b>Alliances:</b> In multiplayer games, a Dreamwalkers warband may never forge an alliance with any Warband of a Necromantic or Chaotic nature (Undead, Possessed, Skaven, Beastmen, Dark Elves etc.)<br><b>Hate Undead:</b> Vampires, necromancers, are Morr's ultimate enemies: they steal from his kingdom, violate his protection for their own benefit, and flout his authority. All heroes in a Dreamwalkers Warband hate all vampires, necromancers and undead.<br><b>New skills:</b> When a hero from a band of Dreamwalkers gains a new skill on an advance roll, they have the same restrictions as witch hunters and sisters of sigmar when choosing skills from the skill list described in the Mordheim rulebook.<br><b>Guiding Dream:</b> At the beginning of each battle, the Dreamer must roll D6 and consult the table below to find out what type of action Morr sends him. D6 Result 1 — Disturbing Vision — The vision of the previous night is clear, but incomplete. That worries the dreamer too much and he feels very tired the next day. The dreamer suffers a −1\" Movement penalty. 2-3 — Vision of Truth: Morr shows the dreamer the combat tactics of his enemy and images of himself defeating his enemy with accurate blows to their weak points, which makes it easier for the dreamer to land his blows against them. Designate one of your opponent's heroes as a target. The dreamer gets a +1 to hit this model. 4-5 — Empowering Vision: Morr sends a vision to the dreamer in which he sees himself in the heat of battle fighting against his enemies without ever failing and emerging victorious despite his wounds, which imbues the dreamer with great strength. Designate one of your opponent's heroes as a target. The dreamer has +1 Strength when fighting this model. 6 — Infuriating Vision: Morr shows the dreamer the face of his enemy, this gives the dreamer a clear vision of his goal and an inexhaustible determination to finish him off. Designate one of your opponent's heroes as a target. The dreamer will have Frenzy against this model. The hero has a dream related to a specific action that Morr wants you to perform. These dreams are always perfectly clear, but never complete. It will never be explained in them why Morr wants you to act that way. In visions you usually appear performing a specific action in a specific place and at a specific time, and in some way you will know what the place is called and where it is, as well as the exact date you must be there (even if it is not obvious). You have no control over the content of the dream, and there are no guarantees that you will survive to fulfill Morr's assignment."
+  },
+  "extra": {
+    "skills": "dwSkills",
+    "magic": "funeraryRites"
+  },
+  "race": "human",
+  "hire": {
+    "align": "good",
+    "tags": [
+      "merc",
+      "wh",
+      "sos"
+    ]
+  },
+  "lists": {
+    "dwHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Pistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "dwPriest": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Scythe (Dreamwalkers Cult Of Morr)",
+          10
+        ]
+      ]
+    },
+    "dwAndanti": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Rapier",
+          15
+        ],
+        [
+          "Main Gauche",
+          7
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Pistole",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "dwWorshipper": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    },
+    "dwDeathsHead": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "dreamer": "The dreams that Morr send to the Dreamer of a band are their most immediate motivation.The Dreamer will always pay absolute attention to the Messages that Morr sends him indicating where the corruption of the undead and their necromancer and vampire masters is in order to find and destroy them. These abominations are numerous throughout Ostermark and especially in Mordheim.",
+    "priestofmo": "Dressed in the plain black robes of their faith, the priests of Morr have come to Mordheim to insure the souls of those who have died safe passage and, more importantly, that the dead remain as such.",
+    "blackguard": "Silent, obsidian-clad wardens of death, the Black Guard of Morr stand watch against the terrors of the night across all the Old World. Encased head to toe in all-enclosing lacquered black plate armour worked with the signs of raven & rose.",
+    "theandanti": "The Andanti are a hereditary order of secretive Vampire hunters who consider themselves chosen by Morr to be his holy warriors.",
+    "deathshead": "The halberdiers known as the Death's Heads were founded during the Vampire Wars. They began in the town of Essen, (Ostermark) during the rule of Vlad von Carstein. In order to protect their identities, the first Death's Heads wore skulls as masks.",
+    "morrworshw": "Morr Worshwishpers are citizens from all regions of the Empire, united by their devotion to Morr,the God of Death. Some of Morr's most faithful followers join the warband of a dreamer of Morr until the end of their days to fulfill the will that his god sends to the dreamer through his dreams to eradicate the necromantic and vampire plague of the old world."
+  },
+  "intro": {
+    "text": "The Dreamwalkers hunt Undead and necromancers across the Old World. They are all servants of Morr, and believe that the God sends dreams to guide them to evils that must be crushed. Most bands of Dreamwalkers are formed around a Priest of Morr or a Dreamer, and the Temples of that God support the group.\n\nOnly people with a particular devotion to Morr are allowed to join the group, and only those willing to devote much of their time to rooting out and destroying the Undead want to. As a result, it is not a large organisation, but its members are very dedicated. The members of the Dreamwalkers are all Morrians of Imperial stock who are dedicated to fighting the Undead menace. The group is overwhelmingly Human, because Morr is not a popular God with other races.\n\nThe dreamers are the skeleton of the organisation, holding together each band. They are also somewhat more diverse in background than other members, because Morr can send prophetic dreams to anyone. As noted below, a Priest of Morr must certify each dreamer as genuine, which means that prejudice has an effect. The group has never excluded women, though it has gone through periods of discouraging them; at present, however, women are treated fairly equally as candidates. It is also heavily middle class. In part, this reflects the popularity of different Gods within various social levels. However, dedication to destroying Undead requires a certain distance from the struggle to survive, which tends to exclude the lower class, and it is socially very difficult for Imperial nobles to distance themselves from the popular Cult of Sigmar. There are numerous exceptions, of course, but most members were raised in relative prosperity.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/dreamwalkers-cult-of-morr"
+  },
+  "skillSets": {
+    "dwSkills": {
+      "name": "Dreamwalkers Special Skills",
+      "note": "Dreamwalkers Heroes with access to Special Skills may use the following list:",
+      "skills": [
+        [
+          "Inspiring Presence:",
+          "When a Dreamer proves to be a brave leader and truly chosen of Morr, his followers will follow their dreamer to death with unwavering courage. To represent this, Morr Worshwishpers can use the dreamer's lead if they are 12\" away instead of the usual 6\". (Only for Dreamer)."
+        ],
+        [
+          "Fanatical:",
+          "The dreamwalkers are convinced that they are the chosen ones to carry out Morr's will and eradicate the necromantic plague of the old world. Once per game, if the Dreamer is not out of action, stunned or knocked down, you may re-roll a failed rout test. (Only for Dreamer)."
+        ],
+        [
+          "Inured to Horror:",
+          "Only the true faithful followers of Morr know and accept death and become inured to horror. The model is immune to Fear, and need never take All Alone tests."
+        ],
+        [
+          "Blessed by Morr:",
+          "The hero has been blessed by Morr and has his protection against the magic that his enemies cast against him. Any spell that could affect the model is nullified with a D6 roll of +4 when fighting the undead. Note that if the spell is nullified, it does not affect this model, but it does affect any other model as it normally would."
+        ]
+      ]
+    }
+  }
+}

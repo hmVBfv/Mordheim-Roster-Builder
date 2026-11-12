@@ -269,11 +269,13 @@ describe('the items of every campaign and grade', () => {
     expect(by('Giant Spider (Border Town Burning)')).toMatchObject({ cost: 100, rare: 'Rare 11' });
   });
 
-  it('keeps what a warband the app does not have may carry out of everybody\'s reach', () => {
+  /* Wish 258 (Rob, 12.11.2026): the app has every grade 2a warband now, so the items of their pages belong to them – none is kept out of
+     everybody's reach any more. */
+  it('gives the items of a grade 2a warband to that warband, which the app has', () => {
     const mine = Object.keys(data.WARBANDS);
     for (const x of found.filter((y) => y.settings!.every((s) => s.startsWith('warband:')) && y.grade === '2a')) {
-      expect(x.only?.wb, x.en).toEqual([]);
-      for (const k of mine) expect(x.only!.wb!.some((e) => e.split('/')[0] === k), `${x.en} / ${k}`).toBe(false);
+      expect(x.only?.wb?.length, x.en).toBeGreaterThan(0);
+      for (const k of x.only!.wb!) expect(mine, `${x.en} / ${k}`).toContain(k.split('/')[0]);
     }
   });
 });

@@ -1,0 +1,330 @@
+{
+  "warband": {
+    "name": "Necrarchs (the Soul Stealers)",
+    "grade": "2a",
+    "siteRace": "Undead",
+    "min": 3,
+    "max": 15,
+    "gold": 500,
+    "units": [
+      {
+        "id": "necrarchva",
+        "t": "hero",
+        "name": "Necrarch Vampire",
+        "cost": 110,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 2,
+          "I": 6,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "ncHero",
+        "sk": [
+          "academic",
+          "strength",
+          "speed",
+          "ncSkills"
+        ],
+        "sp": "Leader: Any models in the warband within 6 inches of the Necrarch Vampire may use his Leadership instead of their own. Cause Fear: Vampires are terrifying Undead creatures and thus cause Fear. Wizard: Necrarch Vampires have one spell randomly generated from the Necromancy spell list. Immune to Psychology: Vampires are not affected by psychology (such as fear) and never leave combat. Immune to Poison: Vampires are not affected by any poison. No Pain: Vampires treat a Stunned result on the Injury chart as Knocked Down."
+      },
+      {
+        "id": "thrall",
+        "t": "hero",
+        "name": "Thrall",
+        "cost": 60,
+        "exp": 8,
+        "max": 1,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 4,
+          "T": 4,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ncHero",
+        "sk": [
+          "academic",
+          "strength",
+          "speed",
+          "ncSkills"
+        ],
+        "sp": "Cause Fear: Vampires are terrifying Undead creatures and therefore cause Fear. Immune to Psychology: Vampires are not affected by psychology (such as fear) and never leave combat. Immune to Poison: Vampires are not affected by any poison. No Pain: Vampires treat a Stunned result on the Injury chart as Knocked Down."
+      },
+      {
+        "id": "acolyte",
+        "t": "hero",
+        "name": "Acolyte",
+        "cost": 35,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ncHenchmen",
+        "sk": [
+          "academic",
+          "speed"
+        ],
+        "sp": "Acolytes may equip themselves with weapons and armour from the Henchmen equipment list. Vassal: The Acolyte has given himself over to his dark lord. At a whim, the Necrarch can see what the Acolyte sees, hear what he hears, and even speak through his slave. As long as the Necrarch has line of sight to an Acolyte, and the Acolyte is not engaged in hand-to-hand combat, he may use it as a casting point for a spell. Upon a critical failure of a casting (rolling double 1's) regardless of skills such as Mind Focus or the like, the Acolyte must roll on the Injury table and add +1."
+      },
+      {
+        "id": "skeletalwa",
+        "t": "hen",
+        "name": "Skeletal Warrior",
+        "cost": 20,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "ncHenchmen",
+        "sp": "Cause Fear: Skeletal Warriors are terrifying Undead creatures and therefore cause Fear. May not Run: Skeletal Warriors are slow Undead creatures and may not run (but may charge normally). Immune to Psychology: Skeletal Warriors are not affected by psychology. Immune to Poison: Skeletal Warriors are immune to poisons. No Pain: Skeletal Warriors treat Stunned results as Knocked Down. No Brain: Skeletal Warriors do not gain experience."
+      },
+      {
+        "id": "zomby",
+        "t": "hen",
+        "name": "Zombie",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 1,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Zombies never carry any equipment, and do not suffer any penalties for this. Cause Fear: Zombies are terrifying Undead creatures and therefore cause Fear. May not Run: Zombies are slow Undead creatures and may not run (but may charge normally). Immune to Psychology: Zombies are not affected by psychology. Immune to Poison: Zombies are immune to poisons. No Pain: Zombies treat Stunned results on the Injury table as Knocked Down. No Brain: Zombies do not gain experience."
+      },
+      {
+        "id": "abominatio",
+        "t": "hen",
+        "name": "Abomination",
+        "cost": 190,
+        "exp": 0,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 5,
+          "W": 3,
+          "I": 2,
+          "A": 3,
+          "Ld": 5
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Abominations do not employ weapons, and suffer no penalties for doing so. Cause Fear: Abominations are terrifying Undead creatures and thus cause Fear. Immune to Psychology: Abominations are not affected by psychology. Immune to Poison: Abominations are immune to poisons. No Pain: Abominations treat Stunned results as Knocked Down. No Brain: Abominations do not gain experience. Large Target: Abominations are Large Targets as defined in the shooting rules. Powered: A Necrarch has placed a shard of wyrdstone in the Abomination to bring it life. Should the Abomination be removed from combat, the model who took it down receives a shard of wyrdstone. A new shard is then needed to re-animate the Abomination. Spare Parts: Thanks to the dark magics of their lords and the manner of their construction, Abominations ignore rolls of 1&2 on the post battle Injury Table; they cannot be destroyed."
+      },
+      {
+        "id": "waif",
+        "t": "hen",
+        "name": "Waif",
+        "cost": 20,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "ncHenchmen"
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Necrarch Vampire, max. 1 Thrall, max. 3 Acolytes, max. 5 Skeletal Warriors; any number of Zombies, max. 1 Abomination, max. 5 Waifs.<br><b>Death of the Leader:</b> Should the Necrarch perish, the Thrall shall pick up the mantle of Leader and all conferred bonuses shall be transferred to him. He may immediately roll on the spell list for one spell. You cannot hire another Necrarch, but you may create another Thrall from your current list of Acolyte Heroes. They will retain their current stat-line, but shall gain the benefits of being undead: Immune to Poison & Psychology, causes Fear & suffers No Pain. Should both Necrarch and Thrall be destroyed at once, the evil magics that bind the warband together fade, and all turns to dust.<br><b>Racial Maximum:</b> Necrarch Vampire — M 6, WS 4, BS 4, S 6, T 6, W 4, I 9, A 3, Ld 10."
+  },
+  "extra": {
+    "skills": "ncSkills",
+    "magic": "necrarchMagic"
+  },
+  "race": "human",
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "undead"
+    ]
+  },
+  "lists": {
+    "ncHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Staff of Damnation",
+          25
+        ],
+        [
+          "Heiliges/Unheiliges Relikt",
+          15
+        ],
+        [
+          "Damned Book",
+          45
+        ]
+      ]
+    },
+    "ncHenchmen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "necrarchva": "Ancient and purely evil, the Necrarch exists solely to destroy life. As Mordheim has fallen into the grasp of insanity, the Necrarch Vampires converge upon its ripe bounty so that they may benefit from the demise of the living.",
+    "thrall": "Taken into the fold due to their promise with the dark arts, Thralls serve their masters with undying devotion. While lesser Vampires, they still possess great speed and strength, and the ability to possibly overthrow the shadow of their undead lords.",
+    "acolyte": "Chosen from the wretched stock available to them, the Necrarchs elevate a select few to the position of Acolyte. These individuals provide aid within the tower itself, be it with experiments or the preparation of sacrifices.",
+    "skeletalwa": "Dragged from the grave, these unfortunate warriors serve their dark lords. Marching relentlessly, they draw close to Mordheim, a city as welcoming as any to warriors such as they.",
+    "zomby": "Zombies are the most common of the Undead: creatures animated by the will of their Necromantic masters. Reinforced by their dark magics, a Necrarch’s zombie minions are much more menacing.",
+    "abominatio": "Vile constructs, these twisted beings are torn from the nightmares of men. Made from looted graves, these beasts are powered by the dark magic of their Lords and the wyrdstone found in and around Mordheim.",
+    "waif": "Waifs are the most miserable of human specimens. They are deformed and rejected individuals, shunned by even their fellow man. Vampires often recruit waifs as their servants and treat them with surprising kindness. As a result, waifs are often fanatically loyal to their undead overlords and will do anything to serve and protect them."
+  },
+  "intro": {
+    "text": "With the destruction of Lahmia the kingdom of Vampires came to an end and the Great Library was burned to the ground. The accumulated knowledge of the ancient Nehekhara was destroyed and many of the disciples of W'soran died in the flames, reluctant to abandon their work. Unfortunately for the world, a handful of Necrarchs fled and survived the pursuit of the armies of the kings of Numas and Zandri, taking with them books, scrolls and other fragments of the dark lore that Nagash had created. They scattered all over the world and hid themselves to patiently wait for the death of their enemies and continue their studies. They built tall towers from where they could study the stars and defend themselves if attacked. News has since spread to these remote strongholds and hidden alcoves of the events occurring in Mordheim, a city ripe for the taking. With the dead calling them forth, the archmages of the Vampire line descend with their minions upon the cursed city to claim its riches, from both those who are dead and those that soon shall be..",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/necrarchs-the-soul-stealers"
+  },
+  "skillSets": {
+    "ncSkills": {
+      "name": "Necrarchs Special Skills",
+      "note": "Necrarch Vampire and Thrall Heroes with access to Special Skills may use the following list:",
+      "skills": [
+        [
+          "Pupil of Nagash",
+          "Delving further into the evil teachings of Nagash, the Necrarch Vampire brings greater darkness to the realm of the living. He may roll immediately on the Scrolls of Nagash for a spell, and choose to do so again instead of a future Skill."
+        ],
+        [
+          "Master of the Black Arts",
+          "Such is the power of the Necrarch that the range of all his magical workings is extended by half-again."
+        ],
+        [
+          "Pull of Undeath",
+          "So strong is the center of undeath within the Necrarch that he may save his constructs around him from their demise. As long as the Necrarch is within 4 inches of an undead henchman, they may only be taken Out of Action on a roll of a natural 6. Available only to the Leader."
+        ]
+      ]
+    }
+  }
+}

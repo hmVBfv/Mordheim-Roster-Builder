@@ -1,0 +1,348 @@
+{
+  "warband": {
+    "name": "Skaven of Clan Moulder",
+    "grade": "2a",
+    "siteRace": "Skaven",
+    "min": 3,
+    "max": 20,
+    "gold": 500,
+    "units": [
+      {
+        "id": "packmaster",
+        "t": "hero",
+        "name": "Packmaster",
+        "cost": 75,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 4,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 5,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "cmHeroes",
+        "sk": [
+          "combat",
+          "shooting",
+          "academic",
+          "strength",
+          "speed",
+          "cmSkills"
+        ],
+        "sp": "Leader: any warrior within 6\" of the Packmaster may use his Leadership when taking Ld tests. Master Handler: Packmasters are experts at handling all manner of twisted creatures. They have access to the Goading system detailed below, plus begin any one-off game or campaign with the Ride Wolf Rat skill and one additional Beast Handling skill (choose either Giant Rats or Wolf Rats). Poke 'em in the squidgy bits: Packmasters are trained to take full advantage of the tools of Clan Moulder's trade. If so equipped, they can gain the beneficial effects of both the Beastwhip and the Thingcatcher during a Goading attempt."
+      },
+      {
+        "id": "stormvermi",
+        "t": "hero",
+        "name": "Stormvermin",
+        "cost": 40,
+        "exp": 8,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 4,
+          "BS": 3,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": "cmHeroes",
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "cmSkills"
+        ]
+      },
+      {
+        "id": "apprentice",
+        "t": "hero",
+        "name": "Apprentice",
+        "cost": 25,
+        "exp": 4,
+        "max": 2,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "cmHeroes",
+        "sk": [
+          "combat",
+          "academic",
+          "speed",
+          "cmSkills"
+        ],
+        "sp": "Novice Handler: an Apprentice has access to the Goading system detailed below, but can only use the beneficial effect of either a Beastwhip or a Thingcatcher during a Goad, not both. Heir to Power: if the Packmaster is slain, one of the Apprentices must be chosen to succeed him as Leader. They are treated as a Packmaster in all respects from that moment on, and a new Apprentice may be hired to take their place. If the Packmaster and all Apprentices die at once, or if there are no Apprentices in the warband when the Packmaster dies, the warband disbands as none of the remaining Heroes has the skill to keep the beasts in line."
+      },
+      {
+        "id": "clanrat",
+        "t": "hen",
+        "name": "Clanrat",
+        "cost": 20,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 5,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 5
+        },
+        "eq": "cmHenchmen"
+      },
+      {
+        "id": "giantrat",
+        "t": "hen",
+        "name": "Giant Rat",
+        "cost": 15,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 6,
+          "WS": 2,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "None, Giant Rats never use any armour or weapons. Pack Size: you may recruit as many Giant Rats as you wish subject to the warband's maximum number of models. Experience: Giant Rats are animals and so do not gain Experience."
+      },
+      {
+        "id": "wolfrat",
+        "t": "hen",
+        "name": "Wolf Rat",
+        "cost": 30,
+        "exp": 0,
+        "max": 3,
+        "profile": {
+          "M": 9,
+          "WS": 3,
+          "BS": 0,
+          "S": 4,
+          "T": 3,
+          "W": 1,
+          "I": 4,
+          "A": 1,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "None, Wolf Rats never use any armour or weapons. Poisoned Attack: the mouths of Wolf Rats fester with any number of poxes and corrosive agents, their attacks are considered to be Strength 4 but do not modify armour saves. Experience: Wolf Rats are animals and so do not gain Experience."
+      },
+      {
+        "id": "ratogre",
+        "t": "hen",
+        "name": "Rat Ogre",
+        "cost": 200,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 3,
+          "S": 5,
+          "T": 5,
+          "W": 3,
+          "I": 4,
+          "A": 3,
+          "Ld": 4
+        },
+        "eq": null,
+        "noxp": true,
+        "sp": "Jaws, claws, and brute force! Rat Ogres can never use weapons or armour. Fear: Rat Ogres are so terrifying they cause Fear. Stupidity: A Rat Ogre is subject to Stupidity unless a Clan Moulder Hero is within 6\" of it. Experience: Rat Ogres do not gain experience. Large Target: Rat Ogres are Large Targets as defined in the Shooting rules. It's Alive!: Moulder Rat Ogres are twisted creatures ever subject to the cruel curiosity of their masters. When hired each Rat Ogre must purchase a single Mutation from the list in the Mordheim Rulebook at the listed price (see Possessed Warband section). Hard to handle: Rat Ogres can only be bought individually, they never form a Henchmen Group even if you hire more than one.",
+        "large": true
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Packmaster, max. 2 Stormvermin, max. 2 Apprentices, max. 5 Clanrats; any number of Giant Rats, max. 3 Wolf Rats, max. 2 Rat Ogres.<br><b>Packmasters and Goading:</b> Clan Moulder Packmasters and Apprentices have access to a unique system known as \"Goading,\" allowing them to whip their beasts into a frenzy with special effects based on success. See the Goading section for details.<br><b>Mutations:</b> Certain models may purchase Mutations from the Possessed Warband list in the Mordheim Rulebook.<br><b>Animal Limitations:</b> Giant Rats, Wolf Rats, and Rat Ogres do not gain Experience unless otherwise stated.<br><b>Clan Moulder Only:</b> Equipment and certain skills marked as \"Clan Moulder only\" may not be used by any other warbands.<br><b>Goading:</b> With the right combination of knowledge, equipment and, unusually for Skaven, courage, the twisted creations of Clan Moulder can be driven to even greater heights than even their twisted biological alchemy can achieve. Goading shares some similarities with Spellcasting, but does not function in quite the same way. Goading attempts are made at the very beginning of the Moulder turn, before any movement takes place. The Packmaster and his Apprentices can each attempt to Goad any single model or henchman group of beasts — those being Giant Rats, Wolf Rats, or Rat Ogres — from their own Warband who are within 6\" of them when the turn begins. Note that in order to Goad a henchman group, at least half of its members must be within 6\". To do so, they must pass a difficulty check in the same manner as if they were attempting to cast a spell or prayer, i.e., they must roll equal to or greater than the Difficulty rating on 2D6 to succeed, the difference being that the level of difficulty is determined by what type of creature they are attempting to Goad: If the test is successful, roll a D6 and consult the table below — note that in the event the test is passed with a roll of double 6s, you may instead select which effect is applied rather than rolling. If the Difficulty check is failed however, the beast or group which was the target of the Goading attempt has become confused and must immediately take a Stupidity test as described in the Mordheim Rulebook — in the event that the test is failed with a roll of double 1s, the beast or group instead become enraged and turn on their erstwhile master, immediately move them into base contact with the character who attempted to Goad and resolve a single attack against him from each of however many beasts he was targeting — the beast or group returns to the Moulder player's control at the beginning of his next turn. • Giant Rat — Difficulty 6 • Wolf Rat — Difficulty 8 • Rat Ogre — Difficulty 10 Goading Results Chart: 1-2 \"Yelp\" — The beast has been struck in some tender parts of its nethers and lets out a strangled cry before rushing forward. The beast or group must run during the Movement phase, may do so at up to triple normal movement rather than double, and will do so even if there are enemy models within 8\" when they begin the move. 3-4 \"Growl\" — The pain of the lash angers the beast and it seeks a target on which to vent its rage. If an enemy is within Line of Sight of the beast or group, they must attempt to Charge it (if there are multiple enemies in LoS, the Moulder player may choose which is the target/s), and will do so at triple their normal movement rather than double. All the normal rules for charges apply, save that the beast/s are moving so rapidly they cannot be Intercepted. 5-6 \"Roar!\" — Whatever you did, it worked! The beast or group are considered subject to Frenzy and Hatred (of all models in the opposing warband) until the beginning of the next Moulder turn."
+  },
+  "extra": {
+    "skills": "cmSkills"
+  },
+  "race": "skaven",
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "skaven"
+    ]
+  },
+  "lists": {
+    "cmHeroes": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Flegel",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Beastwhip",
+          25
+        ],
+        [
+          "Thingcatcher",
+          20
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ],
+        [
+          "Warplock-Pistole",
+          35
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    },
+    "cmHenchmen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Knüppel",
+          3
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Schleuder",
+          2
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "packmaster": "Packmasters are experts at goading their charges - ferocious, half-mad creatures who can turn and attack with no warning. For this reason Packmasters are themselves cagey and fierce warriors for, if they are not, they quickly end up as another meal for their merciless packs.",
+    "stormvermi": "The Stormvermin of Clan Moulder are especially savage in battle, for as the saying goes; \"failure is the fastest shortcut into a Rat Ogre's belly\".",
+    "apprentice": "Clan Moulder Apprentices learn quickly, or perish even moreso.",
+    "clanrat": "Many Clanrats of Clan Moulder aspire to join the ranks of the Packmasters, others yearn to grow strong enough and big enough to become part of the Stormvermin elite, but the hard truth is that for most, their choice is between death in battle, or death at the hands of their leaders when supplies of fodder run low.",
+    "giantrat": "Giant Rats are creations of the twisted genius of the Skaven. They are mutated monstrosities the size of dogs. Many Packmasters consider their packs of Giant Rats to be superior troops to Clanrats, given the propensity of the latter for \"misinterpreting\" which direction they were ordered to advance in.",
+    "wolfrat": "An aberrant and savage amalgamation of wolf and rat, the exact origin of the Skaven's Wolf Rat packs is unknown, but that has not stood in the way of Clan Moulder exploiting them for a myriad of uses, from hunting beasts to mounts.",
+    "ratogre": "Rat Ogres are perhaps Clan Moulder's most infamous creation. Unnatural monstrosities capable of almost limitless brutality and destruction, the sale of Rat Ogre packs to the Warlord Clans or to important Skaven leaders as bodyguards is the foundation of the Clan's immense wealth. The very best of their breed, however, are almost never for sale to outsiders, even for many times their own weight in warpstone. Instead these mutated fiends guard the holdings and person of the Master Moulders who created them, or are sent out with their other servants to do their bidding."
+  },
+  "intro": {
+    "text": "From the North they come, creeping forth from that place of twisted madness known to their kind as Hell Pit. Deformed beasts driven before the lashes of cruel masters, ever searching for new sources of raw materials for their bizarre experiments and new enemies against whom to test their latest creations.\n\nSecond only in wealth and prestige to Clan Skryre, Clan Moulder is a powerful force in Skaven society. Like Clan Skryre before them the roots of Moulder's power lies in the production of weapons which are highly sought-after by the other clans. But there the resemblance ends. For, unlike the Warlock Engineers, the adepts of Clan Moulder are not concerned with the crafting of metals and other non-living substances, but with the crafting of living weapons from muscle, sinew, and bone.\n\nThey are beast masters, capable by means of cruelty of breaking the most recalcitrant of animals to their wills or, equally, turning even the most timid of beasts into violent killers. For their leaders, the Master Moulders of Clan Moulder, are far more than simple animal trainers. They are vile architects of the flesh, skilled in using warpstone to create all manner of mutant monstrosities.\n\nIt is said that to the Master Moulders all living things, even the strangest and most horrifying of monsters, are viewed as nothing more than subjects for future experiments. Refusing to bow to the limits of nature, and forever seeking to outdo their own previous accomplishments, they send their Packmasters out far and wide to search for and capture creatures which may be of use to them. Trolls, manticores, wyverns, chimeras, all manner of giant insects - monsters that would elicit nothing but fear and horror in any sane creature - are regarded by the Master Moulders in much the same way as a child sees a new toy. For with each new captured creature, each new monster, comes the hope that the Master Moulders will create some new and ferocious beast of war.\n\nBy dint of their use of warpstone and their own unholy skills, they can mould flesh as easily as others might mould clay, mutating some creatures into new and terrifying shapes, crossbreeding others, implanting new organs and limbs to still others. In their gruesome work, the only boundaries the Master Moulders need face are the limits of their own fevered imaginations. And the imagination of a Master Moulder is a thing that respects little in the way of bounds.\n\nTo Mordheim, they come for warpstone. To the great wastelands of Chaos, they come to seek terrible new creatures. To the warrens beneath the cities of men, they come to further their intrigues against mankind and their rivals in Skavendom. But, always and everywhere, their ghastly work continues.\n\nPlease note that this warband has been designed to work in concert with the updated Blazing Saddles rules from the 2002 Mordheim Annual. While it can be used without them, it would likely be overcosted.",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/skaven-of-clan-moulder"
+  },
+  "skillSets": {
+    "cmSkills": {
+      "name": "Skaven of Clan Moulder Special Skills",
+      "note": "Clan Moulder heroes may choose to use the folowing Skill list instead of any of the standard Skill tables available to them.",
+      "skills": [
+        [
+          "Black Hunger",
+          "The Skaven can draw upon the dreaded Black Hunger, the fighting frenzy which gives him unnatural strength and speed but can ravage him from the inside. The Clan Moulder Hero may declare at the beginning of his turn that he is using this skill. The Hero may add +1 attack and +D3\" to the total move on his profile for the duration of his own turn, but will suffer D3 S3 hits with no armour save possible at the end of the turn."
+        ],
+        [
+          "Beastkin",
+          "*A Clan Moulder hero with this skill has developed such an affinity for the horrific creatures under their dominion that the range at which any Beast/Animal Handling skills operate is doubled to 12\". This applies to any and all such skills the character has and any they take in future."
+        ],
+        [
+          "Hypnotic Musk",
+          "The Hero has a scent that is particularly compelling to animals of all kinds, inspiring within them a desire to obey him. Any animal or beast from an opposing warband wishing to charge him must pass a Leadership test to do so unless said charge is the result of Goading. Mounts are assumed to be sufficiently under the control of their riders as to make them immune to the effect."
+        ],
+        [
+          "Subjugator of Mankind",
+          "The Hero has become so adept with the Thingcatcher that even intelligent and nimble creatures such as Humans cannot escape him. If a Hero with this skill and equipped with a Thingcatcher takes an opposing model out of action, do not roll for injuries post-battle, instead treat the enemy as if they'd rolled Captured on the Serious Injuries chart. Large creatures such as Ogres cannot be caught in this way, but animals can."
+        ],
+        [
+          "Twistkin",
+          "* Stormvermin only Accidental exposure to raw warpstone or the experimental attentions - welcome or otherwise - of a Clan Moulder superior has resulted in this Hero developing some monstrous but useful mutation. Upon taking this skill the Hero must buy a Mutation from the list in the Mordheim Rulebook (see Possessed Warband) at half the listed cost."
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,324 @@
+{
+  "warband": {
+    "name": "Survivors of Strigos",
+    "grade": "2a",
+    "siteRace": "Human",
+    "min": 3,
+    "max": 12,
+    "gold": 500,
+    "units": [
+      {
+        "id": "strigoivam",
+        "t": "hero",
+        "name": "Strigoi Vampire",
+        "cost": 115,
+        "exp": 20,
+        "max": 1,
+        "req": true,
+        "profile": {
+          "M": 6,
+          "WS": 4,
+          "BS": 4,
+          "S": 4,
+          "T": 4,
+          "W": 2,
+          "I": 6,
+          "A": 2,
+          "Ld": 8
+        },
+        "eq": null,
+        "sk": [
+          "combat",
+          "strength",
+          "speed",
+          "stSkills"
+        ],
+        "sp": "A Strigoi Vampire may not wield any weapons, as it relies upon brute strength, tooth and claw. They do not suffer from any penalties for fighting unarmed. Leader: Any models in the warband within 6\" of the Strigoi Vampire may use his Leadership instead of their own. Kindred Hatred: A Strigoi Vampire Hates vampires of other blood-lines. Cause Fear: Vampires are terrifying Undead creatures and therefore cause Fear. Immune to Psychology: Vampires are not affected by psychology (such as fear) and never leave combat. Immune to Poison: Vampires are not affected by any poison. No Pain: Vampires treat a Stunned result on the Injury chart as Knocked Down."
+      },
+      {
+        "id": "seer",
+        "t": "hero",
+        "name": "Seer",
+        "cost": 40,
+        "exp": 12,
+        "max": 1,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "stHero",
+        "sk": [
+          "academic",
+          "speed",
+          "stSkills"
+        ],
+        "sp": "Seeker: Due to their premonitions, Seers who partake in a battle, and are not taken Out of Action may modify a single exploration dice by +/- 1. Wizard: Seers have one spell randomly generated from the Charms & Hexes spell list."
+      },
+      {
+        "id": "domnu",
+        "t": "hero",
+        "name": "Domnu",
+        "cost": 30,
+        "exp": 4,
+        "max": 3,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 8
+        },
+        "eq": "stHero",
+        "sk": [
+          "combat",
+          "strength",
+          "stSkills"
+        ],
+        "sp": "Child of Darkness: Borne of the night, Domnu are steadfast and loyal servants of the Strigoi. They are immune to the Spooky special rule for Sylvania. Gypsy Ward: Possessing an innate resistance to magic, the Domnu has a special save of 5+ versus magical attacks."
+      },
+      {
+        "id": "strigany",
+        "t": "hen",
+        "name": "Strigany",
+        "cost": 25,
+        "exp": 0,
+        "max": 5,
+        "profile": {
+          "M": 4,
+          "WS": 3,
+          "BS": 3,
+          "S": 3,
+          "T": 3,
+          "W": 1,
+          "I": 3,
+          "A": 1,
+          "Ld": 7
+        },
+        "eq": "stHenchman"
+      },
+      {
+        "id": "ghoul",
+        "t": "hen",
+        "name": "Ghoul",
+        "cost": 40,
+        "exp": 0,
+        "max": null,
+        "profile": {
+          "M": 4,
+          "WS": 2,
+          "BS": 2,
+          "S": 3,
+          "T": 4,
+          "W": 1,
+          "I": 3,
+          "A": 2,
+          "Ld": 5
+        },
+        "eq": null,
+        "sp": "Ghouls never carry any equipment, apart from a few bones which they use as primitive weapons. Cause Fear: Ghouls are twisted and repulsive creatures and therefore cause Fear."
+      },
+      {
+        "id": "giantbat",
+        "t": "hen",
+        "name": "Giant Bat",
+        "cost": 40,
+        "exp": 0,
+        "max": 2,
+        "profile": {
+          "M": 6,
+          "WS": 3,
+          "BS": 0,
+          "S": 3,
+          "T": 3,
+          "W": 2,
+          "I": 3,
+          "A": 1,
+          "Ld": 6
+        },
+        "eq": null,
+        "sp": "Jaws and brutality. Animals: Giant Bats are animals and thus do not gain experience. Flying: Giant Bats fly through the night air, and thus do not need to climb or leap over gaps, even if their movement phase ends with them over open air. Large: Giant Bats are Large creatures. Sonic: Giant Bats use sonic vibrations to navigate the dark of night. No Line of Sight is needed for a charge.",
+        "noxp": true,
+        "large": true
+      }
+    ],
+    "rules": "<b>Choice:</b> Exactly 1 Strigoi Vampire, max. 1 Seer, max. 3 Domnu, max. 5 Strigany; any number of Ghouls, max. 2 Giant Bats.<br><b>Undead Leader:</b> The Strigoi Vampire is the only Undead model in the warband. The warband does not disband if the Strigoi is killed, though it may not hire a new one.<br><b>Hired Swords:</b> May hire the Hired Swords of an Undead warband."
+  },
+  "extra": {
+    "skills": "stSkills",
+    "magic": "strigosMagic"
+  },
+  "race": "human",
+  "hire": {
+    "align": "evil",
+    "tags": [
+      "undead"
+    ]
+  },
+  "lists": {
+    "stHero": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Hellebarde",
+          10
+        ],
+        [
+          "Chest Talon",
+          15
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfmesser",
+          15
+        ],
+        [
+          "Bogen",
+          10
+        ],
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Helm",
+          10
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Black Gold Wristbands",
+          35
+        ],
+        [
+          "Ring of Strigos",
+          20
+        ],
+        [
+          "Heiliges/Unheiliges Relikt",
+          15
+        ],
+        [
+          "Cursed Book",
+          50
+        ]
+      ]
+    },
+    "stHenchman": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Streitkolben",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Wurfmesser",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schild",
+          5
+        ]
+      ]
+    }
+  },
+  "unitLore": {
+    "strigoivam": "Insanely jealous of the other blood-lines, a Strigoi Vampire seeks nothing but to sow death and sorrow. Massive brutes, these Hunters of the Night fear nothing, and look to destroy the von Carstein hold over Sylvania as retribution for the persecution they have endured.",
+    "seer": "Seers, Fortune Tellers, Witches. They are known by many names, and yet the Seers of the Strigany have a special aptitude when it comes to dealing with the future. Using various devices, be they cards or crystal balls, the Seers help guide their lost people across vast expanses.",
+    "domnu": "Children of darkness, the Domnu serve the Strigoi Vampires with absolute loyalty. Guarding him during the day, and bringing sacrifices by night, these damned men live for the death wrought by their master.",
+    "strigany": "A nomadic people, the Strigany band together to form their mobile family. With little left in the world for them, they follow their master's quest for vengeance with resigned acceptance.",
+    "ghoul": "Ghouls are the descendants of evil and insane men who ate the flesh of the dead. When the lean and hungry times of famine come upon the Old World, the most depraved and destitute took to feasting on corpses to survive.",
+    "giantbat": "Also known as Vampire Bats, the blood drinking bats of the Old World grow to monstrous proportions. They are nightmarish predators of the dark, silent and deadly. They exist solely on the blood of the living, that of Men being their favorite."
+  },
+  "intro": {
+    "text": "The long-ago destruction of Mourkain scattered a people to the wind. These now nomadic people, known as Strigany, travel through the human kingdoms in small caravans and live off the land. Their legends still remember the golden-age when the 'undying king' was reigning over a rich and powerful Strigos, and they prophecise that one day he will return and guide his people to reclaim their ancient land. That undying king was Ushoran, the patriarch of the Strigoi Vampire line. Now a degenerated mass of muscle and fang, Strigoi Vampires feed off the recently dead, often hiding in graveyards to dig out the corpses of the just buried to drink their cold blood. Their physical appearance reflects their miserable condition, as they have turned into hunched and disgusting monstrosities. Ghouls flock to these lonely creatures, forming grotesque courts around them. Grave robbers, those vile men who gather on battlefields to steal from the bodies of the fallen have learned all too well that they must do their deeds before nightfall. With darkness, different kinds of scavengers always fall on these places of death. Swarms of ghouls led by massive, fast and deadly night hunters: Strigoi Vampires.\n\nIt is little wonder that the peoples of the Old World refer to the Strigoi as the 'Ghoul Kings'. The same superstitious people accuse the wandering Strigany of being in contact with these dangerous creatures, of worshiping and serving them. Others are sure that the Strigany help the Strigoi vampires to move from town to town in their caravans. These rumors, usually false, have cost the the Strigany dearly, since they are often persecuted and killed for no other reason that this reputation. A few fortunate bands do have a protector, and when the mob approaches to deal their justice to the Strigany, the bloody feast begins...",
+    "url": "https://mordheimer.net/docs/warbands/grade-2a-warbands/survivors-of-strigos"
+  },
+  "skillSets": {
+    "stSkills": {
+      "name": "Survivors of Strigos Special Skills",
+      "note": "Heroes with access to Special Skills may choose from the following lists:",
+      "skills": [
+        [
+          "Strigoi Vampire Only",
+          "The following skill list may be used by the Strigoi Vampire instead of the standard lists. Iron Sinews: After death the Vampire's muscles grow far greater than they ever could have in his mortal life. The Strigoi becomes a beast of pure muscular power. Add +1S to the Vampire's profile. Great Thirster: Such is the appetite of this beast that he must feed almost constantly. Once the taste of blood has touched his lips, there is little that can stop the Vampire from drinking again. Once the Vampire takes a model Out of Action, treat him as Frenzied. This effect remains until he is Knocked Down, Stunned, or taken Out of Action. Curse of the Revenant: So strong is the desire for some to continue living that they defy death. Once a Vampire has taken the Great Thirster special skill, he may choose the Curse of the Revenant. This skill allows the Vampire to regenerate lost wounds on a D6 roll of 5+. Only one wound may be recovered in this fashion per turn. Dark Arts: The Strigoi has retained some of its former magical aptitude. He may choose Arcane Lore as an advance, and immediately roll for a spell on the Dark Arts table below. Subsequent spells may be chosen instead of skills."
+        ],
+        [
+          "Strigany Heroes Only",
+          "The following skill list may be used by Strigany Heroes instead of the standard lists. Strigoi Vampires may not use this list. Light Fingers: Gypsies are apt to find things that others have lost. Should a Hero with this skill take an enemy model Out of Action, they will find an extra piece of Wyrdstone. Only one piece of treasure may be found in this manner per game. Practiced Arm: Such is the skill with which the Gypsy can launch throwing knives that he can throw two of them per turn. These missiles must be at the same target and gain +1 to their injury rolls to represent the skill with which they were aimed."
+        ]
+      ]
+    }
+  }
+}

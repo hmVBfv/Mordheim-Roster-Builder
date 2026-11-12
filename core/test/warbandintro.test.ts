@@ -10,7 +10,8 @@ const warbands = read<{ WARBANDS: Record<string, unknown> }>('warbands.json').WA
 
 describe('the warband openings', () => {
   it('has one for every warband, and none for anything else', () => {
-    for (const k of Object.keys(warbands)) expect(k in intro, `${k}: opening`).toBe(true);
+    // the Snotlings' page (2b) has only rules, no lore (Wish 258)
+    for (const k of Object.keys(warbands).filter((x) => x !== 'snotlings')) expect(k in intro, `${k}: opening`).toBe(true);
     for (const k of Object.keys(intro)) expect(k in warbands, `${k} is a warband`).toBe(true);
   });
 
