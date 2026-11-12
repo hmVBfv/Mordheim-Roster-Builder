@@ -208,7 +208,6 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       ) : (
         <p className={styles.empty}>Gains no experience.</p>
       )}
-      {w && (w.away || w.follows || acts?.participation) && <NextBattles w={w} acts={acts} />}
       {acts && (
         <div className={styles.acts}>
           {w?.takePlace && <button type="button" className={`${styles.btn} ${styles.gold}`} onClick={acts.advance}>Take a fallen Hero's place</button>}
@@ -239,6 +238,7 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
         </Section>
       )}
       {u.rules.length > 0 && <Section title="Special rules"><Facts items={u.rules} chips /></Section>}
+      {w && (w.away || w.follows || acts?.participation) && <NextBattles w={w} acts={acts} />}
     </>
   );
 }
