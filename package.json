@@ -20,6 +20,7 @@
     "test:app": "npm test -w app",
     "data": "node core/scripts/warband-data.ts",
     "sanitize-save": "node core/scripts/sanitize-save.ts",
+    "audit": "node core/scripts/audit-warband.ts",
     "bugs": "NODE_USE_ENV_PROXY=1 NODE_NO_WARNINGS=1 node core/scripts/bugs.ts",
     "test:server": "npm test -w server"
   },
