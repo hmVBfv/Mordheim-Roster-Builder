@@ -130,7 +130,7 @@
           "A": 1,
           "Ld": 7
         },
-        "eq": "psList"
+        "eq": "psHenchmen"
       },
       {
         "id": "crusader",
@@ -150,7 +150,7 @@
           "A": 1,
           "Ld": 7
         },
-        "eq": "psList"
+        "eq": "psHenchmen"
       },
       {
         "id": "hound",
@@ -296,6 +296,70 @@
         [
           "Heiliges/Unheiliges Relikt",
           15
+        ]
+      ]
+    },
+    "psHenchmen": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Hammer",
+          3
+        ],
+        [
+          "Axt",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Speer",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Armbrust",
+          25
+        ],
+        [
+          "Pistole",
+          15
+        ],
+        [
+          "Langbogen",
+          15
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Schwere Rüstung",
+          50
+        ],
+        [
+          "Schild",
+          5
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Helm",
+          10
         ]
       ]
     }

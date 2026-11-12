@@ -26,7 +26,7 @@
           "A": 1,
           "Ld": 9
         },
-        "eq": "hfAdventurer",
+        "eq": "hfElder",
         "sk": [
           "combat",
           "shooting",
@@ -54,7 +54,7 @@
           "A": 1,
           "Ld": 8
         },
-        "eq": "hfAdventurer",
+        "eq": "hfCook",
         "sk": [
           "strength",
           "speed",
@@ -107,7 +107,7 @@
           "A": 1,
           "Ld": 7
         },
-        "eq": "hfAdventurer",
+        "eq": "hfYouth",
         "sk": [
           "shooting",
           "speed",
@@ -132,7 +132,7 @@
           "A": 1,
           "Ld": 8
         },
-        "eq": "hfAdventurer"
+        "eq": "hfScout"
       },
       {
         "id": "halflingwa",
@@ -152,7 +152,7 @@
           "A": 1,
           "Ld": 8
         },
-        "eq": "hfAdventurer"
+        "eq": "hfWarrior"
       },
       {
         "id": "piggy",
@@ -211,64 +211,6 @@
     ]
   },
   "lists": {
-    "hfAdventurer": {
-      "Nahkampf": [
-        [
-          "Dolch (1. gratis)",
-          2
-        ],
-        [
-          "Fleischklopfer",
-          3
-        ],
-        [
-          "Hackbeil",
-          5
-        ],
-        [
-          "Schwert",
-          10
-        ],
-        [
-          "Zweihandwaffe",
-          15
-        ],
-        [
-          "Speer",
-          10
-        ]
-      ],
-      "Fernkampf": [
-        [
-          "Kurzbogen",
-          5
-        ],
-        [
-          "Bogen",
-          10
-        ]
-      ],
-      "Rüstung": [
-        [
-          "Leichte Rüstung",
-          20
-        ],
-        [
-          "Buckler",
-          5
-        ],
-        [
-          "Kochtopf-Helm",
-          10
-        ]
-      ],
-      "Besonderes": [
-        [
-          "Jagdpfeile",
-          35
-        ]
-      ]
-    },
     "hfHalflingthie": {
       "Nahkampf": [
         [
@@ -360,6 +302,184 @@
         [
           "Helm",
           10
+        ]
+      ]
+    },
+    "hfElder": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    },
+    "hfCook": {
+      "Nahkampf": [
+        [
+          "Dolch (1. gratis)",
+          2
+        ],
+        [
+          "Fleischklopfer",
+          3
+        ],
+        [
+          "Hackbeil",
+          5
+        ],
+        [
+          "Schwert",
+          10
+        ],
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ],
+        [
+          "Kochtopf-Helm",
+          10
+        ]
+      ]
+    },
+    "hfYouth": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ]
+    },
+    "hfScout": {
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ],
+        [
+          "Bogen",
+          10
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
+        ]
+      ],
+      "Besonderes": [
+        [
+          "Jagdpfeile",
+          35
+        ]
+      ]
+    },
+    "hfWarrior": {
+      "Nahkampf": [
+        [
+          "Zweihandwaffe",
+          15
+        ],
+        [
+          "Speer",
+          10
+        ]
+      ],
+      "Fernkampf": [
+        [
+          "Kurzbogen",
+          5
+        ]
+      ],
+      "Rüstung": [
+        [
+          "Leichte Rüstung",
+          20
+        ],
+        [
+          "Buckler",
+          5
         ]
       ]
     }

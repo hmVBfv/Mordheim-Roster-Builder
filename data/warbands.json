@@ -9175,7 +9175,7 @@
      ]
     }
    ],
-   "rules": "<b>Choice:</b> Exactly 1 Noble, max. 1 Sorceress, max. 1 Beastmaster, max. 2 Lordlings; any number of Corsairs, max. 5 Shades, max. 3 Witch Elves, max. 3 Slavehounds.<br><b>Kindred Hatred:</b> Dark Elves Hate any High Elf warriors including High Elf Hired Swords.<br><b>Fey Acuity:</b> During the Exploration phase when checking for artifacts or wyrdstone at the end of the game, add +1 to the number of pieces found by a Dark Elf warband, as long as at least one hero was searching.<br><b>Disdain:</b> Dark Elves may never use black powder weapons, as they find them too crude, noisy and unreliable.<br><b>Slavers:</b> In case of finding prisoners (roll of \"333\" during Exploration phase) Druchii may follow the rules for Skaven.<br><b>Maximum Characteristics:</b>  M 5 WS 7 BS 7 S 4 T 3 W 3 I 9 A 4 Ld 10."
+   "rules": "<b>Choice:</b> Exactly 1 Noble, max. 1 Sorceress, max. 1 Beastmaster, max. 2 Lordlings; any number of Corsairs, max. 5 Shades, max. 3 Witch Elves, max. 3 Slavehounds.<br><b>Kindred Hatred:</b> Dark Elves Hate any High Elf warriors including High Elf Hired Swords.<br><b>Fey Acuity:</b> During the Exploration phase when checking for artifacts or wyrdstone at the end of the game, add +1 to the number of pieces found by a Dark Elf warband, as long as at least one hero was searching.<br><b>Disdain:</b> Dark Elves may never use black powder weapons, as they find them too crude, noisy and unreliable.<br><b>Slavers:</b> In case of finding prisoners (roll of \"333\" during Exploration phase) Druchii may follow the rules for Skaven.<br><b>Maximum Characteristics:</b>  M 5 WS 7 BS 7 S 4 T 3 W 3 I 9 A 4 Ld 10.<br><b>Naggaroth Prices:</b> The starred prices in the equipment lists represent the lower rarity of these items in Naggaroth. When purchasing them in Mordheim, Dark Elf warbands pay the same prices as other warbands and must roll to find them as normal. No roll is necessary to find these items when first starting a Dark Elf warband.<br><b>Promoted Henchmen:</b> Henchmen promoted to Heroes still select their equipment from their henchmen-class table. They do not get access to the Heroes' equipment."
   },
   "slayercult": {
    "name": "Dwarf Slayer Cult",
@@ -9497,7 +9497,7 @@
       "A": 1,
       "Ld": 9
      },
-     "eq": "hfAdventurer",
+     "eq": "hfElder",
      "sk": [
       "combat",
       "shooting",
@@ -9525,7 +9525,7 @@
       "A": 1,
       "Ld": 8
      },
-     "eq": "hfAdventurer",
+     "eq": "hfCook",
      "sk": [
       "strength",
       "speed",
@@ -9578,7 +9578,7 @@
       "A": 1,
       "Ld": 7
      },
-     "eq": "hfAdventurer",
+     "eq": "hfYouth",
      "sk": [
       "shooting",
       "speed",
@@ -9603,7 +9603,7 @@
       "A": 1,
       "Ld": 8
      },
-     "eq": "hfAdventurer"
+     "eq": "hfScout"
     },
     {
      "id": "halflingwa",
@@ -9623,7 +9623,7 @@
       "A": 1,
       "Ld": 8
      },
-     "eq": "hfAdventurer"
+     "eq": "hfWarrior"
     },
     {
      "id": "piggy",
@@ -10026,7 +10026,7 @@
      "sp": "none. SPECIAL RULES Stupidity: a Black sheep is subject to stupidity unless a Sheepherder is within 6\" of it. Animals: Black sheep are animals and do not gain experience. Butcher's meat: Black sheep can be ignored by the opponent when determining the closest target in the Shooting phase. At the same time, the Mazzalupo warriors can shoot at enemy models if they are engaged in hand-to-hand combat exclusively against Black sheep, randomly determining which of all models engaged in combat is hit. Mountain animals: Black sheep can climb up and down following normal rules despite being animals."
     }
    ],
-   "rules": "<b>Choice:</b> Exactly 1 Wandering Knight, max. 1 Master of Finance, max. 2 Fallen Nobles, max. 1 Squire, max. 2 Sheepherders; any number of Churls, max. 5 Black Sheep.<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.<br><b>Commands:</b> During the recovery phase, if the Wandering knight is not knocked down, stunned, or out of action, he may shout a Command instead of running. Commands affect friendly models within 6\" that can hear him (not stunned or knocked down). Models may only benefit from one Command per turn. Raise our insignia! — Difficulty — 6 Encouraging the Squire to raise a handkerchief in the army's colours, the Mazzalupo regain courage, united under the same banner. This Command can only be issued to the Squire if it is within 12\" and is not fleeing, knocked down, stunned, or taken out of action. Until the beginning of the next Shooting phase, every model of the Mazzalupo warband, including the Wandering knight, who has line of sight to the Squire can reroll failed Leadership tests, including the warband's Rout test. Move, ye miscreant! — Difficulty — 6 The booming voice of the Knight Errant urges even the most slothful of the Mazzalupo to spring into action. A single Mazzalupo warrior within 6\" of the Wandering knight may immediately move again up to its maximum Movement distance. If this moves them into base contact with an enemy model, they count as charging. Follow me, mine pugnacious ones! — Difficulty: 8 With heroic demeanour, the Wandering knight rallies his men and bolsters their fighting spirit. Members of the Mazzalupo warband within 4\" of the Wandering knight gain a +1 bonus to hit in hand-to-hand combat until the end of the turn. Be on guard, my brave ones! — Difficulty: 7 A true commander knows the importance of caution and teaches his comrades that there is no shame in fleeing from a fight, only wisdom. Choose a member of the Mazzalupo warband within 12\" that is engaged in hand-to-hand combat. That model can immediately move away from the combat up to the maximum distance allowed by their Movement value but cannot come into contact with other enemy models. Pay them no heed! — Difficulty — 6 Ever watchful of battlefield developments, the Knight Errant issues orders on which targets are the highest priority. Choose a Mazzalupo model within 12\". Until the next Shooting phase, the model can target any enemy warrior even if they are not the closest. Art thou ready to die fighting? — Difficulty: 8 The Wandering knight appeals to the tenacity of his men to withstand the enemy's blows. Every Mazzalupo model within 4\", including the Wandering knight, can only be taken out of action on a roll of 6 until the next Mazzalupo turn."
+   "rules": "<b>Choice:</b> Exactly 1 Wandering Knight, max. 1 Master of Finance, max. 2 Fallen Nobles, max. 1 Squire, max. 2 Sheepherders; any number of Churls, max. 5 Black Sheep.<br><b>Hired Swords:</b> May hire the Hired Swords of a Mercenary warband.<br><b>Commands:</b> During the recovery phase, if the Wandering knight is not knocked down, stunned, or out of action, he may shout a Command instead of running. Commands affect friendly models within 6\" that can hear him (not stunned or knocked down). Models may only benefit from one Command per turn. Raise our insignia! — Difficulty — 6 Encouraging the Squire to raise a handkerchief in the army's colours, the Mazzalupo regain courage, united under the same banner. This Command can only be issued to the Squire if it is within 12\" and is not fleeing, knocked down, stunned, or taken out of action. Until the beginning of the next Shooting phase, every model of the Mazzalupo warband, including the Wandering knight, who has line of sight to the Squire can reroll failed Leadership tests, including the warband's Rout test. Move, ye miscreant! — Difficulty — 6 The booming voice of the Knight Errant urges even the most slothful of the Mazzalupo to spring into action. A single Mazzalupo warrior within 6\" of the Wandering knight may immediately move again up to its maximum Movement distance. If this moves them into base contact with an enemy model, they count as charging. Follow me, mine pugnacious ones! — Difficulty: 8 With heroic demeanour, the Wandering knight rallies his men and bolsters their fighting spirit. Members of the Mazzalupo warband within 4\" of the Wandering knight gain a +1 bonus to hit in hand-to-hand combat until the end of the turn. Be on guard, my brave ones! — Difficulty: 7 A true commander knows the importance of caution and teaches his comrades that there is no shame in fleeing from a fight, only wisdom. Choose a member of the Mazzalupo warband within 12\" that is engaged in hand-to-hand combat. That model can immediately move away from the combat up to the maximum distance allowed by their Movement value but cannot come into contact with other enemy models. Pay them no heed! — Difficulty — 6 Ever watchful of battlefield developments, the Knight Errant issues orders on which targets are the highest priority. Choose a Mazzalupo model within 12\". Until the next Shooting phase, the model can target any enemy warrior even if they are not the closest. Art thou ready to die fighting? — Difficulty: 8 The Wandering knight appeals to the tenacity of his men to withstand the enemy's blows. Every Mazzalupo model within 4\", including the Wandering knight, can only be taken out of action on a roll of 6 until the next Mazzalupo turn.<br><b>Horses:</b> Fallen nobles may not ride a horse unless the Wandering Knight of the warband is riding a horse."
   },
   "necrarchs": {
    "name": "Necrarchs (the Soul Stealers)",
@@ -11030,7 +11030,7 @@
       "A": 1,
       "Ld": 7
      },
-     "eq": "psList"
+     "eq": "psHenchmen"
     },
     {
      "id": "crusader",
@@ -11050,7 +11050,7 @@
       "A": 1,
       "Ld": 7
      },
-     "eq": "psList"
+     "eq": "psHenchmen"
     },
     {
      "id": "hound",
@@ -11133,7 +11133,7 @@
       "A": 1,
       "Ld": 6
      },
-     "eq": "cmHeroes",
+     "eq": "cmStormvermin",
      "sk": [
       "combat",
       "strength",
@@ -21174,7 +21174,10 @@
    "Fernkampf": [
     [
      "Repetierarmbrust",
-     20
+     20,
+     {
+      "start": true
+     }
     ],
     [
      "Armbrustpistole",
@@ -21240,7 +21243,10 @@
    "Fernkampf": [
     [
      "Repetierarmbrust",
-     20
+     20,
+     {
+      "start": true
+     }
     ]
    ],
    "Rüstung": [
@@ -21284,7 +21290,10 @@
    "Fernkampf": [
     [
      "Repetierarmbrust",
-     20
+     20,
+     {
+      "start": true
+     }
     ],
     [
      "Bogen",
@@ -21380,7 +21389,10 @@
    "Fernkampf": [
     [
      "Repetierarmbrust",
-     20
+     20,
+     {
+      "start": true
+     }
     ],
     [
      "Armbrustpistole",
@@ -21692,64 +21704,6 @@
     ]
    ]
   },
-  "hfAdventurer": {
-   "Nahkampf": [
-    [
-     "Dolch (1. gratis)",
-     2
-    ],
-    [
-     "Fleischklopfer",
-     3
-    ],
-    [
-     "Hackbeil",
-     5
-    ],
-    [
-     "Schwert",
-     10
-    ],
-    [
-     "Zweihandwaffe",
-     15
-    ],
-    [
-     "Speer",
-     10
-    ]
-   ],
-   "Fernkampf": [
-    [
-     "Kurzbogen",
-     5
-    ],
-    [
-     "Bogen",
-     10
-    ]
-   ],
-   "Rüstung": [
-    [
-     "Leichte Rüstung",
-     20
-    ],
-    [
-     "Buckler",
-     5
-    ],
-    [
-     "Kochtopf-Helm",
-     10
-    ]
-   ],
-   "Besonderes": [
-    [
-     "Jagdpfeile",
-     35
-    ]
-   ]
-  },
   "hfHalflingthie": {
    "Nahkampf": [
     [
@@ -21841,6 +21795,184 @@
     [
      "Helm",
      10
+    ]
+   ]
+  },
+  "hfElder": {
+   "Nahkampf": [
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     35
+    ]
+   ]
+  },
+  "hfCook": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Fleischklopfer",
+     3
+    ],
+    [
+     "Hackbeil",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Kochtopf-Helm",
+     10
+    ]
+   ]
+  },
+  "hfYouth": {
+   "Nahkampf": [
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ]
+  },
+  "hfScout": {
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ],
+    [
+     "Bogen",
+     10
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
+    ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     35
+    ]
+   ]
+  },
+  "hfWarrior": {
+   "Nahkampf": [
+    [
+     "Zweihandwaffe",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Kurzbogen",
+     5
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Buckler",
+     5
     ]
    ]
   },
@@ -23258,6 +23390,70 @@
     ]
    ]
   },
+  "psHenchmen": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Hammer",
+     3
+    ],
+    [
+     "Axt",
+     5
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Speer",
+     10
+    ],
+    [
+     "Zweihandwaffe",
+     15
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Armbrust",
+     25
+    ],
+    [
+     "Pistole",
+     15
+    ],
+    [
+     "Langbogen",
+     15
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
   "cmHeroes": {
    "Nahkampf": [
     [
@@ -23362,6 +23558,70 @@
     ],
     [
      "Schild",
+     5
+    ],
+    [
+     "Helm",
+     10
+    ]
+   ]
+  },
+  "cmStormvermin": {
+   "Nahkampf": [
+    [
+     "Dolch (1. gratis)",
+     2
+    ],
+    [
+     "Streitkolben",
+     3
+    ],
+    [
+     "Knüppel",
+     3
+    ],
+    [
+     "Schwert",
+     10
+    ],
+    [
+     "Hellebarde",
+     10
+    ],
+    [
+     "Flegel",
+     15
+    ],
+    [
+     "Speer",
+     10
+    ]
+   ],
+   "Fernkampf": [
+    [
+     "Schleuder",
+     2
+    ],
+    [
+     "Warplock-Pistole",
+     35
+    ]
+   ],
+   "Rüstung": [
+    [
+     "Leichte Rüstung",
+     20
+    ],
+    [
+     "Schwere Rüstung",
+     50
+    ],
+    [
+     "Schild",
+     5
+    ],
+    [
+     "Buckler",
      5
     ],
     [

@@ -207,7 +207,7 @@
         ]
       }
     ],
-    "rules": "<b>Choice:</b> Exactly 1 Noble, max. 1 Sorceress, max. 1 Beastmaster, max. 2 Lordlings; any number of Corsairs, max. 5 Shades, max. 3 Witch Elves, max. 3 Slavehounds.<br><b>Kindred Hatred:</b> Dark Elves Hate any High Elf warriors including High Elf Hired Swords.<br><b>Fey Acuity:</b> During the Exploration phase when checking for artifacts or wyrdstone at the end of the game, add +1 to the number of pieces found by a Dark Elf warband, as long as at least one hero was searching.<br><b>Disdain:</b> Dark Elves may never use black powder weapons, as they find them too crude, noisy and unreliable.<br><b>Slavers:</b> In case of finding prisoners (roll of \"333\" during Exploration phase) Druchii may follow the rules for Skaven.<br><b>Maximum Characteristics:</b>  M 5 WS 7 BS 7 S 4 T 3 W 3 I 9 A 4 Ld 10."
+    "rules": "<b>Choice:</b> Exactly 1 Noble, max. 1 Sorceress, max. 1 Beastmaster, max. 2 Lordlings; any number of Corsairs, max. 5 Shades, max. 3 Witch Elves, max. 3 Slavehounds.<br><b>Kindred Hatred:</b> Dark Elves Hate any High Elf warriors including High Elf Hired Swords.<br><b>Fey Acuity:</b> During the Exploration phase when checking for artifacts or wyrdstone at the end of the game, add +1 to the number of pieces found by a Dark Elf warband, as long as at least one hero was searching.<br><b>Disdain:</b> Dark Elves may never use black powder weapons, as they find them too crude, noisy and unreliable.<br><b>Slavers:</b> In case of finding prisoners (roll of \"333\" during Exploration phase) Druchii may follow the rules for Skaven.<br><b>Maximum Characteristics:</b>  M 5 WS 7 BS 7 S 4 T 3 W 3 I 9 A 4 Ld 10.<br><b>Naggaroth Prices:</b> The starred prices in the equipment lists represent the lower rarity of these items in Naggaroth. When purchasing them in Mordheim, Dark Elf warbands pay the same prices as other warbands and must roll to find them as normal. No roll is necessary to find these items when first starting a Dark Elf warband.<br><b>Promoted Henchmen:</b> Henchmen promoted to Heroes still select their equipment from their henchmen-class table. They do not get access to the Heroes' equipment."
   },
   "extra": {
     "skills": "drSkills",
@@ -252,7 +252,10 @@
       "Fernkampf": [
         [
           "Repetierarmbrust",
-          20
+          20,
+          {
+            "start": true
+          }
         ],
         [
           "Armbrustpistole",
@@ -318,7 +321,10 @@
       "Fernkampf": [
         [
           "Repetierarmbrust",
-          20
+          20,
+          {
+            "start": true
+          }
         ]
       ],
       "Rüstung": [
@@ -362,7 +368,10 @@
       "Fernkampf": [
         [
           "Repetierarmbrust",
-          20
+          20,
+          {
+            "start": true
+          }
         ],
         [
           "Bogen",
@@ -458,7 +467,10 @@
       "Fernkampf": [
         [
           "Repetierarmbrust",
-          20
+          20,
+          {
+            "start": true
+          }
         ],
         [
           "Armbrustpistole",

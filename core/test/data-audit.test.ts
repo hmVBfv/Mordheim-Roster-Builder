@@ -117,7 +117,7 @@ describe('other warbands', () => {
   });
   it('Dwarfs: gromril armour at 75 gc and gromril weapons at three times the price only when founding', () => {
     for (const l of ['dwarfWarrior', 'dwarfRanger']) expect(row(l, 'Gromril-Rüstung')).toEqual(['Gromril-Rüstung', 75, { start: true }]);
-    expect(data.UPGRADES['Gromril-Waffe']).toMatchObject({ mult: 4, start: { mult: 3, wb: ['dwarftreasure', 'dwarfrangers'] } });
+    expect(data.UPGRADES['Gromril-Waffe']).toMatchObject({ mult: 4, start: { mult: 3, wb: ['dwarftreasure', 'dwarfrangers', 'slayercult'] } });
     expect(data.UPGRADES['Dark-Elf-Klinge']).toMatchObject({ base: 20, start: { base: 15, wb: ['darkelves'] } });
   });
   it('Mercenaries: the Wolfcloak in the list of Middenheim Heroes only; Hung: warhorses at 40 gc', () => {
