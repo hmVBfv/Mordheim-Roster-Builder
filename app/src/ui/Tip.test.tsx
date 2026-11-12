@@ -1,9 +1,9 @@
 /* The bubble behind a word on a card (Rob, 02.10.2026: "essential"): a tap
    opens it, a tap anywhere, Esc or another word closes it, one at a time; a
    mouse resting on the word opens it too. */
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TipWord } from './Tip.tsx';
 
 const SWORD = [{ name: 'Sword', line: 'Close combat', text: 'Parry: when hit, roll a D6.' }];
@@ -65,6 +65,49 @@ describe('a word with its rules', () => {
     await user.click(fear);
     await user.unhover(fear);
     expect(screen.getByRole('tooltip')).toBeTruthy();
+  });
+
+  /* #259: a long list of spells is taller than the screen. A swipe on the bubble must scroll it, not close it; a tap beside it still closes. */
+  describe('a bubble taller than the room it has (#259)', () => {
+    const tall = [{ name: 'Spells', line: 'List', text: 'Many spells.' }];
+
+    it('stays open when the bubble itself is touched, and a tap beside it closes it', async () => {
+      const user = userEvent.setup();
+      card();
+      await user.click(screen.getByRole('button', { name: 'Sword' }));
+      fireEvent.pointerDown(screen.getByRole('tooltip'));
+      expect(screen.getByRole('tooltip')).toBeTruthy();
+      fireEvent.pointerDown(screen.getByRole('button', { name: 'Advance' }));
+      expect(screen.queryByRole('tooltip')).toBeNull();
+    });
+
+    it('is placed again when the window resizes or the page scrolls, and not when the bubble scrolls', async () => {
+      const user = userEvent.setup();
+      card();
+      await user.click(screen.getByRole('button', { name: 'Sword' }));
+      const tip = screen.getByRole('tooltip');
+      tip.style.top = '1px';
+      fireEvent(tip, new Event('scroll'));
+      expect(tip.style.top).toBe('1px');
+      fireEvent(window, new Event('resize'));
+      expect(tip.style.top).not.toBe('1px');
+    });
+
+    it('takes touches only when it has something to scroll, so a short bubble still lets taps through', async () => {
+      const user = userEvent.setup();
+      const heights = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(900);
+      const client = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(400);
+      render(<TipWord label="Lore" tips={tall} />);
+      await user.click(screen.getByRole('button', { name: 'Lore' }));
+      expect(screen.getByRole('tooltip').style.pointerEvents).toBe('auto');
+      cleanup();
+      heights.mockReturnValue(400);
+      render(<TipWord label="Lore" tips={tall} />);
+      await user.click(screen.getByRole('button', { name: 'Lore' }));
+      expect(screen.getByRole('tooltip').style.pointerEvents).toBe('');
+      heights.mockRestore();
+      client.mockRestore();
+    });
   });
 
   it('a word without rules is just a word', () => {

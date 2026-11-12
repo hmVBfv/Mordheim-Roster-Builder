@@ -443,6 +443,11 @@
   font-size: 0.92rem;
   line-height: 1.35;
   pointer-events: none;
+  /* a long list scrolls inside the bubble (#259); Tip.tsx lowers max-height to the room there is and lets touches in only then */
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .tipBubble small {
