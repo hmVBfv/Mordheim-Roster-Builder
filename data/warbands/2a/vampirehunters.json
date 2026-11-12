@@ -315,5 +315,8 @@
       "note": "Vampire Hunters and Slayers may use the following skill list instead of the standard skill lists. The Priest of Morr may choose Blessing of Morr and Thirst for Vengeance as well as his normal skills. Iron Will: Such is the work of Slayers that there is little room for hesitation. When the opportunity arises, one must be able to strike! As such, the warrior is hardened and immune to Fear. Righteous Aura: Carrying many talismans from various gods, the warrior heads into battle assured of victory. Possessed or Undead opponents lose their first attack against the warrior in the first round of hand-to-hand combat (down to a minimum of 1). Thirst for Vengeance: The warrior Hates all undead. In his quest for revenge, he gains +1 attack in a turn where he has charged. Blessing of Morr: The warrior has the Death god's blessing in his work. Add +1 to all injury rolls against the undead. Touch of Darkness: Long has the Slayer been dealing in death. Perhaps too long. Due to his heightened intuition, he ignores darkness penalties.",
       "skills": []
     }
+  },
+  "unitRace": {
+    "wolfhound": null
   }
 }

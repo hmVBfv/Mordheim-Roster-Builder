@@ -2,7 +2,7 @@
   "warband": {
     "name": "Masters of Horror",
     "grade": "2a",
-    "siteRace": "Human",
+    "siteRace": "Universal Monsters",
     "min": 3,
     "max": 12,
     "gold": 500,
@@ -310,5 +310,11 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "thrall": "vampire",
+    "wolfman": "wolfman",
+    "zomby": null,
+    "fleshconst": null
   }
 }

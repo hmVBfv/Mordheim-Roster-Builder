@@ -2,7 +2,7 @@
   "warband": {
     "name": "Survivors of Strigos",
     "grade": "2a",
-    "siteRace": "Human",
+    "siteRace": "Vampire",
     "min": 3,
     "max": 12,
     "gold": 500,
@@ -320,5 +320,10 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "strigoivam": "vampire",
+    "ghoul": "ghoul",
+    "giantbat": null
   }
 }

@@ -326,5 +326,12 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "necrarchva": "necrarch",
+    "thrall": "vampire",
+    "skeletalwa": null,
+    "zomby": null,
+    "abominatio": null
   }
 }

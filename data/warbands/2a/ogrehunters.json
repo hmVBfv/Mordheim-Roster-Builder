@@ -2,7 +2,7 @@
   "warband": {
     "name": "Ogre Hunting Party",
     "grade": "2a",
-    "siteRace": "Ogre",
+    "siteRace": "Ogre/Gnoblar",
     "min": 3,
     "max": 20,
     "gold": 500,
@@ -158,7 +158,7 @@
   "extra": {
     "skills": "ohSkills"
   },
-  "race": "ogre",
+  "race": "gnoblar",
   "hire": {
     "align": "neutral",
     "only": [
@@ -400,5 +400,9 @@
       "note": "Crude Belch: Ogres and Gnoblars eat almost anything. Consequences are to be expected from those inconsiderate enough to consume a rich meal before battle. A Hero with this 'condition' may unleash his noxious fumes on all enemies engaged in close combat. Those that do not pass a Ld test suffer a −1 'to hit' modifier for the turn. The Hero must wait until a new enemy engages him in combat before he relieves himself again. Scent Hound: The Ogre or Gnoblar has the keen nose of an expert tracker. The hero spots Hidden enemies from two times as far away as other warriors (ie, twice his Initiative value in inches). Sabre Trainer: Whenever a Sabretusk cub rolls a 1 for Untamed, if it started the turn within 6\" of this hero, you may move the cub 3D6\" towards any model within 12\" of it that it can see (instead of towards the nearest model). Maneater (Ogres only): Ogre Hunters shun the companies of others, but they do travel far and wide, observing other the customs and skills of other cultures from afar . This Ogre may immediately learn one skill from the Shooting or Academic skill lists. This skill may be taken only once. Ogres only. Bull Charge (Ogres only): Ogres learn to use their vast bulk in a charge, trampling the enemy to the ground. When charging, an Ogre with this skill may attempt a single attack with a +1 'to hit' modifier rather than making his normal attacks. If successful the enemy model is automatically knocked down. Ogres only. Bellowing Roar (Leader only): An Ogre leader expects challenges to his authority. One of the best ways to suppress a mutineer in the ranks is to give his ear drums a good pounding. This skill may only be taken by the warband leader, allowing him to reroll the first failed Rout test. Ogres only. Set Traps (Gnoblars only): Trappers are experts at dropping snares. A Trapper may set a trap if he spends a turn doing nothing else (he may not set traps if he's just recovered from being Knocked Down). Place a marker in base contact with the Trapper. When another model, friend or foe, moves within 2\" of the marker he risks setting off the trap: roll a D6. On a score of 3+ he has triggered the trap and suffers a S4 hit (note that the Trapper won't trigger his own traps). If the trap did not wound the model, the injured model has multiple wounds, or it didn't trigger, the 'victim' may finish his move- However, if the model was knocked Down or Stunned, place him 2\" from the marker. Regardless whether the trap was triggered or not, the marker is removed. Gnoblar only. Infiltration (Gnoblars only): A Gnoblar with this skill is always placed on the battlefield after the opposing warband and can be placed anywhere on the table as long as it is out of sight of the opposing warband and more than 12\" away from any enemy model. If both players have models which infiltrate, roll a D6 for each, and the lowest roll sets up first. Gnoblar only. Netter (Gnoblars only): Each game, the hero starts with 3 Nets. These may not be sold, traded, or given to another warrior- if not used during the game, they assumed to be stashed away or fallen apart. The next game, the hero will start with 3 nets, without penalty or cost. Gnoblar only.",
       "skills": []
     }
+  },
+  "unitRace": {
+    "ogrehunter": "ogrehunter",
+    "sabretuskc": null
   }
 }

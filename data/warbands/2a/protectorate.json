@@ -404,5 +404,8 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "hound": null
   }
 }

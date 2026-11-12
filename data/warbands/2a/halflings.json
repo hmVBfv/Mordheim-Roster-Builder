@@ -533,5 +533,9 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "piggy": null,
+    "villageogr": "ogre"
   }
 }

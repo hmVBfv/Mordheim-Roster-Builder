@@ -203,7 +203,7 @@
     "skills": "snSkills",
     "magic": "snotlingMagic"
   },
-  "race": "goblin",
+  "race": "snotling",
   "hire": {
     "align": "evil",
     "none": true
@@ -427,5 +427,8 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "bulliedgob": "goblin"
   }
 }

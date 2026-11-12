@@ -408,5 +408,10 @@
         ]
       ]
     }
+  },
+  "unitRace": {
+    "giantrat": null,
+    "wolfrat": null,
+    "ratogre": null
   }
 }
