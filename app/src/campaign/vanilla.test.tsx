@@ -17,6 +17,7 @@ import { ownKey } from '../account/owner.ts';
 import { data, sampleSave } from '../test/data.ts';
 import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
+import { unfoldGrades } from '../test/unfoldGrades.ts';
 
 const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>);
 const T0 = '2026-10-05T10:00:00.000Z';
@@ -143,6 +144,7 @@ describe('a campaign that plays Vanilla Mordheim (#167)', () => {
     await db.meta.put({ key: ownKey('campaign:', 'campaign-1'), value: { campaign: { id: 'campaign-1', name: 'The Plain Fenn', vanilla: false } } });
     at('/warbands/new?campaign=campaign-1');
     await screen.findByRole('heading', { level: 1 });
+    await unfoldGrades(userEvent.setup());
     expect((await screen.findAllByRole('radio')).length).toBeGreaterThan(30);
     expect(screen.queryByText(/Vanilla Mordheim/)).toBeNull();
   });
@@ -152,6 +154,7 @@ describe('a campaign that plays Vanilla Mordheim (#167)', () => {
     server();
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     await user.click(await screen.findByRole('radio', { name: 'Tileans' }));
     expect(screen.queryByRole('checkbox', { name: /Vanilla Mordheim/ })).toBeNull();
     await user.click(screen.getByRole('radio', { name: 'Mercenaries' }));

@@ -1,7 +1,7 @@
 /* The built app on a phone-sized screen. */
 import { readFileSync } from 'node:fs';
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { noSideScroll, boxOf, shot, tapTargets, unit, useTheme } from './helpers.ts';
+import { noSideScroll, boxOf, shot, tapTargets, unfoldGrades, unit, useTheme } from './helpers.ts';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
 /* the same warband after its first battle: trading has begun (V4–V7) */
@@ -88,16 +88,13 @@ test('the Look for field of the new-warband filter has a row of its own', async 
 test('the tooltip of a long school of magic scrolls inside itself on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 420 });
   await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
-  const words = page.locator('main button[data-tip]');
   const tip = page.getByRole('tooltip');
-  await words.first().waitFor();
-  let found = false;
-  for (let i = 0; i < Math.min(await words.count(), 40) && !found; i++) {
-    await words.nth(i).scrollIntoViewIfNeeded();
-    await words.nth(i).click();
-    found = await tip.evaluate((e) => e.scrollHeight > e.clientHeight + 1).catch(() => false);
-    if (!found) await page.keyboard.press('Escape');
-  }
+  // the school is shown on the card of the chosen warband (the others are two lines, P6); the first of the list is a caster
+  await page.getByRole('table').getByRole('radio').first().check();
+  const school = page.locator('tr[data-picked="true"] td[data-label="School of magic"] button[data-tip]').first();
+  await school.scrollIntoViewIfNeeded();
+  await school.click();
+  const found = await tip.evaluate((e) => e.scrollHeight > e.clientHeight + 1);
   expect(found, 'a school with so many spells that it does not fit').toBe(true);
   const box = (await boxOf(tip))!;
   expect(box.y, 'inside the screen, top').toBeGreaterThanOrEqual(0);
@@ -113,11 +110,44 @@ test('the tooltip of a long school of magic scrolls inside itself on a phone', a
   await expect(tip).toHaveCount(0);
 });
 
+/* Plan P6: 67 warbands are a long page on a phone. The grades fold, Core open to begin with; a card that is not the chosen one is two lines;
+   the chosen one shows all the list knows of it. */
+test('the new-warband list is short on a phone: grades fold, cards are small, the chosen one shows everything', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 700 });
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  const table = page.getByRole('table');
+  await expect(table.getByRole('radio').first()).toBeVisible();
+  const closed = page.locator('table th[scope="colgroup"] button[aria-expanded="false"]');
+  await expect(closed).toHaveCount(4);
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  expect(height, 'the page with only Core open').toBeLessThan(3200);
+  // a card that is not chosen: no heroes, no school, no big creature
+  const first = table.locator('tr:has(input[type="radio"])').first();
+  // (the cells carry their column's name in data-label; the name on screen is drawn by CSS)
+  await expect(first.locator('td[data-label="Race"]')).toBeVisible();
+  await expect(first.locator('td[data-label="Heroes"]')).toBeHidden();
+  await expect(first.locator('td[data-label="School of magic"]')).toBeHidden();
+  await expect(first.locator('td[data-label="Big creature"]')).toBeHidden();
+  await shot(page, 'new-warband-folded');
+  await closed.first().click();
+  await expect(closed).toHaveCount(3);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(height);
+  // the chosen warband shows all of it
+  await table.getByRole('radio').first().check();
+  const picked = table.locator('tr[data-picked="true"]');
+  await expect(picked.locator('td[data-label="Heroes"]')).toBeVisible();
+  await expect(picked.locator('td[data-label="School of magic"]')).toBeVisible();
+  await expect(picked.locator('td[data-label="Big creature"]')).toBeVisible();
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'new-warband-picked');
+});
+
 /* Wish of 6.11.2026: a warband picked from the long list is confirmed without scrolling down to the end of the form: the button stays in view
    above the navigation, on a phone. */
 test('the new-warband form keeps its Start button in view once a warband is picked', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 640 });
   await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await unfoldGrades(page);
   await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
   const start = page.getByRole('button', { name: 'Start the warband' });
   await expect(start).toBeInViewport({ ratio: 1 });
@@ -130,6 +160,7 @@ test('the new-warband form keeps its Start button in view once a warband is pick
 test('a long warband name wraps inside the side navigation', async ({ page }) => {
   await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
   await page.setViewportSize({ width: 1440, height: 900 });
+  await unfoldGrades(page);
   await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
   await page.getByRole('textbox', { name: 'Name' }).fill('The Ever So Very Long Named Merchants of the Stirwood Road and All Their Friends');
   await page.getByRole('button', { name: 'Start the warband' }).click();
@@ -165,6 +196,7 @@ test('a Wizard shows the spells of his school on his card', async ({ page }) => 
   await page.goto('./');
   await page.getByRole('link', { name: 'Warbands' }).click();
   await page.getByRole('link', { name: 'New warband' }).click();
+  await unfoldGrades(page);
   await page.getByRole('radio', { name: 'Merchant Caravans', exact: true }).check();
   await page.getByRole('textbox', { name: 'Name' }).fill('The Silver Caravan');
   await page.getByRole('button', { name: 'Start the warband' }).click();

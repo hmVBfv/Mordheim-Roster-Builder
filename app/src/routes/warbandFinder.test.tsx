@@ -18,17 +18,20 @@ function Harness() {
   return (
     <>
       <WarbandFinder facts={facts} finder={finder} schoolInfo={{}} />
-      <WarbandTable shown={finder.shown} sort={finder.sort} chosen={chosen} onChoose={setChosen} schoolInfo={{}} />
+      <WarbandTable shown={finder.shown} sort={finder.sort} chosen={chosen} onChoose={setChosen} schoolInfo={{}} filtered={finder.active} />
       <p aria-label="Chosen">{chosen}</p>
     </>
   );
 }
+/** Fold out every grade that is closed (plan P6: Core is open to begin with, the others closed). */
+const unfoldAll = async (user: ReturnType<typeof userEvent.setup>) => { for (const b of screen.queryAllByRole('button', { expanded: false })) await user.click(b); };
 const shown = () => within(screen.getByRole('table')).getAllByRole('radio').map((r) => r.getAttribute('aria-label'));
 
 describe('finding a warband to start', () => {
   it('shows all of them until a filter is set, then narrows by the fields and counts', async () => {
     const user = userEvent.setup();
     render(<Harness />);
+    await unfoldAll(user);
     expect(shown()).toHaveLength(facts.length);
     await user.selectOptions(screen.getByLabelText('Heroes at the start'), '6');
     const six = facts.filter((f) => f.heroes === 6).length;
@@ -37,7 +40,28 @@ describe('finding a warband to start', () => {
     await user.selectOptions(screen.getByLabelText(/Big creature/), 'with');
     expect(shown().length).toBeLessThanOrEqual(six);
     await user.click(screen.getByRole('button', { name: 'Clear filter' }));
+    // the grades fold again as they were (Core open, the rest closed) once there is no filter
+    await unfoldAll(user);
     expect(shown()).toHaveLength(facts.length);
+  });
+
+  /* Plan P6: 67 warbands are a long page on a phone; each grade is a section that folds out, Core open to begin with. */
+  it('folds the grades: Core open, the others closed, each with its count; a filter, or the warband chosen, opens what it concerns', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    const core = facts.filter((f) => f.grade === 'core').length;
+    expect(shown()).toHaveLength(core);
+    const heads = screen.getAllByRole('button', { expanded: false }).map((b) => b.textContent);
+    expect(heads).toEqual(['1a', '1b', '1c', '2a'].map((g) => expect.stringMatching(new RegExp(`^Grade ${g} — .*${facts.filter((f) => f.grade === g).length}$`))));
+    expect(screen.getByRole('button', { expanded: true }).textContent).toMatch(new RegExp(`^Core — official${core}$`));
+    await user.click(screen.getByRole('button', { name: /^Grade 2a/ }));
+    expect(shown()).toHaveLength(core + facts.filter((f) => f.grade === '2a').length);
+    await user.click(screen.getByRole('button', { name: /^Grade 2a/ }));
+    expect(shown()).toHaveLength(core);
+    // a filter shows every match and has nothing to fold
+    await user.type(screen.getByLabelText('Look for'), 'merc');
+    expect(screen.queryAllByRole('button', { expanded: false })).toHaveLength(0);
+    expect(shown()).toContain('Mercenaries');
   });
 
   it('finds by name and says when none fits', async () => {
@@ -64,7 +88,8 @@ describe('finding a warband to start', () => {
     expect(screen.getByLabelText('Look for')).toBeTruthy();
   });
 
-  it('starts with the lowest and highest gold and model count of all warbands, which leaves everything in (#123, #124)', () => {
+  it('starts with the lowest and highest gold and model count of all warbands, which leaves everything in (#123, #124)', async () => {
+    const user = userEvent.setup();
     render(<Harness />);
     const golds = facts.flatMap((f) => [f.gold, f.goldMax]);
     const sizes = facts.map((f) => f.max);
@@ -72,6 +97,7 @@ describe('finding a warband to start', () => {
     expect((screen.getByLabelText('Gold to') as HTMLInputElement).value).toBe(String(Math.max(...golds)));
     expect((screen.getByLabelText('Max. models from') as HTMLInputElement).value).toBe(String(Math.min(...sizes)));
     expect((screen.getByLabelText('Max. models to') as HTMLInputElement).value).toBe(String(Math.max(...sizes)));
+    await unfoldAll(user);
     expect(shown()).toHaveLength(facts.length);
     expect(screen.queryByRole('button', { name: 'Clear filter' })).toBeNull();
   });
@@ -87,6 +113,7 @@ describe('finding a warband to start', () => {
     expect(shown().length).toBeLessThan(facts.length);
     await user.click(screen.getByRole('button', { name: 'Clear filter' }));
     expect((screen.getByLabelText('Gold to') as HTMLInputElement).value).toBe(String(Math.max(...facts.flatMap((f) => [f.gold, f.goldMax]))));
+    await unfoldAll(user);
     expect(shown()).toHaveLength(facts.length);
   });
 

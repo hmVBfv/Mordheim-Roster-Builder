@@ -59,3 +59,11 @@ export async function boxOf(loc: Locator): Promise<Box | null> {
   }
   return null;
 }
+
+/** On "New warband" each grade of the list is a section that folds out, Core open to begin with (plan P6): open the ones that are closed. */
+export async function unfoldGrades(page: Page) {
+  // the list is there once Core's first radio is
+  await page.getByRole('table').getByRole('radio').first().waitFor();
+  const closed = page.locator('table th[scope="colgroup"] button[aria-expanded="false"]');
+  while (await closed.count()) await closed.first().click();
+}
