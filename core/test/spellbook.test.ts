@@ -20,7 +20,7 @@ describe('the spells of a warband', () => {
     expect(schoolsOf(s)).toEqual([[null, ['waaagh']]]);
     const ledz = core.warbandSpells(ctx(s))[0]!.schools[0]!.spells[0]!;
     expect(ledz).toMatchObject({ name: "Led'z go", difficulty: '9', lore: 'The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.' });
-    expect(ledz.text).toMatch(/strikes first in close combat/);
+    expect(ledz.text).toMatch(/Any Orc or Goblin within 4" of the Shaman will automatically strike first in hand-to-hand combat/); // the page's own wording (bug 256)
   });
 
   it('are listed whether or not the caster is on the roster yet: it is what the warband can learn', () => {

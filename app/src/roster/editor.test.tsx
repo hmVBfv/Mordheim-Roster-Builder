@@ -308,7 +308,7 @@ describe('a new warband', () => {
     const bubble = await screen.findByRole('tooltip');
     expect(bubble.textContent).toMatch(/Led'z go/);
     expect(bubble.textContent).toMatch(/Difficulty 9/);
-    expect(bubble.textContent).toMatch(/strikes first in close combat/);
+    expect(bubble.textContent).toMatch(/strike first in hand-to-hand combat/);
     expect(bubble.textContent).not.toMatch(/howling invigorates/);
     expect((screen.getByRole('radio', { name: 'Night Goblins' }) as HTMLInputElement).checked).toBe(false);
   });

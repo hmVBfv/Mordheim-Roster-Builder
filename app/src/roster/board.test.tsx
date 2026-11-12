@@ -493,7 +493,7 @@ describe('the box of spells and prayers', () => {
     expect(difficulty.tagName).toBe('SMALL');
     expect(ledz.textContent).not.toMatch(/·/);
     expect(within(ledz).getByText('The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.')).toBeTruthy();
-    expect(ledz.textContent).toMatch(/strikes first in close combat/);
+    expect(ledz.textContent).toMatch(/strike first in hand-to-hand combat/);
   });
 
   it('is not there for a warband whose units cast nothing, and shows a Hired Sword\'s school only while he is hired', () => {
