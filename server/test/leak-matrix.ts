@@ -12,15 +12,26 @@
    the "admin" role is not part of, and in one the admin leads – so every
    campaign action is tried by a member, a member without the right (403)
    and an outsider (404), the admin included (no special access).
-   Visibility of hidden content joins with notes and the background. */
+   Visibility of hidden content joins with notes and the background. Three
+   more roles (viewer, leader, outsider) are not listed per row: see
+   ExtraRole. */
 import { randomUUID } from 'node:crypto';
 import type { Action } from '../src/policy.ts';
 
 /** anonymous: no cookie; pending: password right, code due; user: signed in;
     admin: signed in, admin, authenticator set up. (An admin without the
     authenticator is checked on its own in leak-matrix.test.ts.) */
-export type Role = 'anonymous' | 'pending' | 'user' | 'admin';
-export const ROLES: Role[] = ['anonymous', 'pending', 'user', 'admin'];
+export type BaseRole = 'anonymous' | 'pending' | 'user' | 'admin';
+/** Roles whose rights each row lists by hand (`allowed`, `fields`). */
+export const BASE_ROLES: BaseRole[] = ['anonymous', 'pending', 'user', 'admin'];
+/** Roles a row does not list: their rights follow from the action's kind in policy.ts and from where the probe is aimed (see `expected()` in
+    leak-matrix.test.ts), so a new action or probe needs no extra line for them – and a handler that lets one of them through where it must not
+    fails the test (AUTHZ-7, plan P4). viewer: a viewer in every campaign of the matrix and the owner of nothing; leader: a signed-in user
+    without the admin's rights who leads the admin's campaigns and is no member of the victim's; outsider: signed in, in no campaign, owns nothing. */
+export type ExtraRole = 'viewer' | 'leader' | 'outsider';
+export const EXTRA_ROLES: ExtraRole[] = ['viewer', 'leader', 'outsider'];
+export type Role = BaseRole | ExtraRole;
+export const ROLES: Role[] = [...BASE_ROLES, ...EXTRA_ROLES];
 
 /** What a probe may refer to: accounts and links made for the test. */
 export interface ProbeContext {
