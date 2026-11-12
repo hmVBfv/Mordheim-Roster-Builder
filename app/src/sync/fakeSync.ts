@@ -126,6 +126,7 @@ export interface FakeShare {
 const ME_NAME = 'Kai';
 /** Seven days from the moment it is made, as on the server: a fixed date ran out on 11 Oct 2026, and every share in the tests counted as expired from then on. */
 const shareExpires = () => new Date(Date.now() + 7 * 24 * 3600_000).toISOString();
+const LIBRARY_KINDS = ['idea', 'faction', 'npc', 'group', 'scenario', 'warband_group', 'location', 'warband_favourites'];
 const CODES = ['K7M2Q9XD', 'H4TR8WNP', 'Z3FB6YCM'];
 
 const NO_TOTALS: FakeTotals = { rating: 0, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 };
@@ -1320,7 +1321,7 @@ export function createFakeSync(opts: {
     s.warbands.set(id, w);
     sh.uses++;
     if (!sh.code) { sh.answeredAt = at(); sh.accepted = true; }
-    return json(201, { warband: meta(w), head: w.versions[0] });
+    return json(201, { warband: meta(w), head: versionView(w.versions[0]!, true) });
   };
 
   /* ---- problem reports (4c1) ---- */
@@ -1390,6 +1391,9 @@ export function createFakeSync(opts: {
         if (there && there.owner !== me.id) return json(409, { error: 'exists' });
         if (there?.deletedAt) return json(409, { error: 'removed' });
         const b = body as { kind: string; name: string; body: unknown; baseSeq?: number };
+        // the kinds and the name as the server checks them (server/src/library.ts); what is inside a body is the server's to check
+        if (!LIBRARY_KINDS.includes(b.kind)) return json(400, { error: 'bad_request' });
+        if (typeof b.name !== 'string' || b.name.trim().length < 1 || b.name.trim().length > 120) return json(400, { error: 'invalid', problem: 'a name of 1 to 120 characters' });
         if (!there) {
           const item = { id, owner: me.id, kind: b.kind, name: b.name, body: b.body, createdAt: at(), updatedAt: at(), deletedAt: null, seq: next() };
           s.library.set(id, item);
@@ -1408,11 +1412,12 @@ export function createFakeSync(opts: {
     }
     if (method === 'GET' && path === '/people') return json(200, { people: s.people });
     if (method === 'GET' && path === '/shares') {
-      return json(200, { incoming: s.shares.filter((x) => x.toId === 'me' && open(x)).map(summary), outgoing: s.shares.filter((x) => x.mine).map(summary) });
+      return json(200, { incoming: s.shares.filter((x) => x.toId === 'me' && open(x)).reverse().map(summary), outgoing: s.shares.filter((x) => x.mine).reverse().map(summary) });
     }
     if (method === 'POST' && path === '/shares') {
       const d = body.data as { name?: string; wb?: string } | undefined;
-      if (!d || typeof d.wb !== 'string') return json(400, { error: 'invalid', problem: 'not a save' });
+      if (!d || typeof d !== 'object') return json(400, { error: 'bad_request' });
+      if (typeof d.wb !== 'string') return json(400, { error: 'invalid', problem: 'not a save' });
       const to = body.to ? s.people.find((p) => p.id === body.to) : undefined;
       if (body.to && !to) return json(400, { error: 'invalid', problem: 'no such player to send it to' });
       const code = to ? null : CODES[s.shares.filter((x) => x.code).length % CODES.length]!;

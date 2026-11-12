@@ -4,29 +4,43 @@
    compared by its type, never skipped; whatever else differs is listed by path. The fake is the one that gives way (docs/architecture.md). */
 import { createFakeSync } from '../../../app/src/sync/fakeSync.ts';
 
+export type Refs = Record<string, string>;
+
 export interface Step {
   /** What the step shows, in the failure message. */
   name: string;
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  /** Below /api/v1, with its query. */
+  /** Below /api/v1, with its query. `{name}` is the reference of that name on the side that sends it (an id the side made up). */
   url: string;
+  /** A string that is exactly `{name}` becomes the reference, at any depth. */
   body?: Record<string, unknown>;
+  /** Keep a field of the answer as a reference: name → path ("share.id"). */
+  capture?: Refs;
+  /** A step that is not compared: somebody else does something, which each side does its own way, and may add references. */
+  elsewhere?: boolean;
+  /** Both sides must answer 2xx (a setup step through the API). */
 }
 
 export interface Outcome { status: number; body: unknown }
 
 /** Fields that differ from run to run, with the type they must have on both sides. */
 export const VOLATILE: Record<string, 'time' | 'number' | 'string'> = {
-  createdAt: 'time', updatedAt: 'time', archivedAt: 'time',
+  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time',
   seq: 'number', cursor: 'number', epoch: 'string',
   // the server's wording of a refusal comes from its schema checker; the fake only has to refuse with some
   problem: 'string',
 };
+/** A share code as shown: K7M2-Q9XD. */
+const SHARE_CODE = /^[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}$/;
 const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 /** An answer with its volatile fields replaced by their type (a null stays null: whether a value is there is part of the contract). */
-export function normalize(v: unknown, volatile: Record<string, string> = VOLATILE): unknown {
-  if (Array.isArray(v)) return v.map((x) => normalize(x, volatile));
+export function normalize(v: unknown, volatile: Record<string, string> = VOLATILE, refs: Refs = {}): unknown {
+  if (typeof v === 'string') {
+    const named = Object.entries(refs).find(([, value]) => value === v);
+    return named ? `{${named[0]}}` : SHARE_CODE.test(v) ? '<code>' : v;
+  }
+  if (Array.isArray(v)) return v.map((x) => normalize(x, volatile, refs));
   if (v && typeof v === 'object') {
     return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => {
       const kind = volatile[k];
@@ -34,7 +48,7 @@ export function normalize(v: unknown, volatile: Record<string, string> = VOLATIL
         const ok = kind === 'time' ? typeof x === 'string' && TIME.test(x) : typeof x === kind;
         return [k, ok ? `<${kind}>` : `<NOT A ${kind.toUpperCase()}: ${JSON.stringify(x)}>`];
       }
-      return [k, normalize(x, volatile)];
+      return [k, normalize(x, volatile, refs)];
     }));
   }
   return v;
@@ -55,29 +69,70 @@ export function differences(a: unknown, b: unknown, path = ''): string[] {
   return [`${path || '(answer)'}: ${JSON.stringify(a)?.slice(0, 120)} ≠ ${JSON.stringify(b)?.slice(0, 120)}`];
 }
 
+/** One of the two servers, as a scenario drives it. */
+export interface Side {
+  refs: Refs;
+  run(step: Step, url: string, body: Record<string, unknown> | undefined): Promise<Outcome>;
+  /** What somebody else does in an `elsewhere` step. */
+  elsewhere?(step: Step): Promise<void> | void;
+}
+
+const substitute = (v: unknown, refs: Refs): unknown => {
+  if (typeof v === 'string') {
+    const exact = /^\{(\w+)\}$/.exec(v);
+    if (exact) {
+      if (!(exact[1]! in refs)) throw new Error(`no reference "${exact[1]}"`);
+      return refs[exact[1]!];
+    }
+    return v;
+  }
+  if (Array.isArray(v)) return v.map((x) => substitute(x, refs));
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v as object).map(([k, x]) => [k, substitute(x, refs)]));
+  return v;
+};
+const inUrl = (url: string, refs: Refs) => url.replace(/\{(\w+)\}/g, (_, n: string) => { if (!(n in refs)) throw new Error(`no reference "${n}"`); return refs[n]!; });
+const at = (v: unknown, path: string): unknown => path.split('.').reduce<unknown>((x, k) => (x && typeof x === 'object' ? (x as Record<string, unknown>)[k] : undefined), v);
+
 /** The fake, called as the app calls the server. */
-export function fakeSide(opts: Parameters<typeof createFakeSync>[0] = {}) {
+export function fakeSide(opts: Parameters<typeof createFakeSync>[0] = {}, refs: Refs = {}, elsewhere?: (fake: ReturnType<typeof createFakeSync>, step: Step, refs: Refs) => void): Side & { fake: ReturnType<typeof createFakeSync> } {
   const fake = createFakeSync(opts);
   return {
-    fake,
-    async run(step: Step): Promise<Outcome> {
-      const url = new URL(step.url, 'http://fake');
-      const res = fake.handle(step.method ?? (step.body ? 'POST' : 'GET'), url.pathname, url.searchParams, step.body ?? {});
+    fake, refs,
+    async run(step, urlText, body) {
+      const url = new URL(urlText, 'http://fake');
+      const res = fake.handle(step.method ?? (body ? 'POST' : 'GET'), url.pathname, url.searchParams, body ?? {});
       const text = await res.text();
       return { status: res.status, body: text ? JSON.parse(text) as unknown : null };
     },
+    elsewhere: elsewhere ? (step) => elsewhere(fake, step, refs) : undefined,
   };
 }
 
-/** What a scenario found: one line per difference, "step: where: server ≠ fake". */
-export async function compare(steps: Step[], server: (s: Step) => Promise<Outcome>, fake: (s: Step) => Promise<Outcome>, known: Record<string, string> = {}): Promise<{ found: string[]; unused: string[] }> {
+/** What a scenario found: one line per difference, "step: where: server ≠ fake". A `known` entry ("step | path") is a difference that is meant, with
+    the reason as its value; one that no longer shows is reported as unused. */
+export async function compare(steps: Step[], server: Side, fake: Side, known: Record<string, string> = {}): Promise<{ found: string[]; unused: string[] }> {
   const found: string[] = [];
   const used = new Set<string>();
   for (const step of steps) {
-    const [s, f] = [await server(step), await fake(step)];
+    if (step.elsewhere) {
+      await server.elsewhere?.(step);
+      await fake.elsewhere?.(step);
+      continue;
+    }
+    const outcomes: Outcome[] = [];
+    for (const side of [server, fake]) {
+      const out = await side.run(step, inUrl(step.url, side.refs), step.body ? substitute(step.body, side.refs) as Record<string, unknown> : undefined);
+      for (const [name, path] of Object.entries(step.capture ?? {})) {
+        const v = at(out.body, path);
+        if (typeof v === 'string') side.refs[name] = v;
+        else found.push(`${step.name}: nothing to capture as "${name}" at ${path} (${side === server ? 'server' : 'fake'})`);
+      }
+      outcomes.push(out);
+    }
+    const [s, f] = outcomes as [Outcome, Outcome];
     const lines = [
       ...(s.status === f.status ? [] : [`status: server ${s.status} ≠ fake ${f.status}`]),
-      ...differences(normalize(s.body), normalize(f.body)).map((d) => d.replace(' ≠ ', ' (server) ≠ (fake) ')),
+      ...differences(normalize(s.body, VOLATILE, server.refs), normalize(f.body, VOLATILE, fake.refs)).map((d) => d.replace(' ≠ ', ' (server) ≠ (fake) ')),
     ];
     for (const l of lines) {
       const key = `${step.name} | ${l.split(':')[0]}`;
@@ -86,4 +141,17 @@ export async function compare(steps: Step[], server: (s: Step) => Promise<Outcom
     }
   }
   return { found, unused: Object.keys(known).filter((k) => !used.has(k)) };
+}
+
+/** The real server for a scenario: requests through app.inject with the session of the signed-in user; `before` runs ahead of each (the clock). */
+export function serverSide(call: (r: { method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; url: string; body?: unknown; token?: string | null }) => Promise<{ statusCode: number; body: string; json(): unknown }>, token: string, refs: Refs = {}, before: () => void = () => undefined, elsewhere?: (step: Step, refs: Refs) => Promise<void>): Side {
+  return {
+    refs,
+    async run(step, url, body) {
+      before();
+      const res = await call({ method: step.method ?? (body ? 'POST' : 'GET'), url: `/api/v1${url}`, ...(body ? { body } : {}), token });
+      return { status: res.statusCode, body: res.body ? res.json() : null };
+    },
+    elsewhere: elsewhere ? (step) => elsewhere(step, refs) : undefined,
+  };
 }
