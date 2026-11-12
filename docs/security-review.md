@@ -87,7 +87,7 @@ hoch (Daten verraten oder Dienst dauerhaft weg), mittel, niedrig, Info.
 | AUTHZ-4 | Jede `seq` ist der serverweite Zähler: ein Angemeldeter sieht, wie viel insgesamt geschrieben wird | Info | bewusst offen: nur Aktivität, kein Inhalt |
 | AUTHZ-5 | `copiedFrom` einer eingetragenen Warband nannte allen Mitgliedern die ID der privaten | Info | behoben: nur der Besitzer |
 | AUTHZ-6 | Eine Warband, die die Kampagne verlassen hat, zeigt in Schlachten und Zeitleiste ihren späteren Namen | niedrig | später: den Namen beim Markieren einfrieren (braucht eine Migration) |
-| AUTHZ-7 | Die Leak-Matrix kennt keine Zuschauer, Leiter und Admin-Mitglieder bei verborgenen Inhalten und prüft nur oberste Felder | Info | später: eigene Aufgabe vor 4b; die Befunde dieser Prüfung haben jetzt eigene Tests |
+| AUTHZ-7 | Die Leak-Matrix kennt keine Zuschauer, Leiter und Admin-Mitglieder bei verborgenen Inhalten und prüft nur oberste Felder | Info | behoben (12.11.2026, Plan P4): die Matrix probiert jede Route auch als Zuschauer in allen Kampagnen, als Leiter ohne Admin-Rechte (leitet die Kampagnen des Admins, ist in der des Opfers kein Mitglied) und als Fremder. Deren Rechte stehen nicht je Zeile, sondern folgen aus der Art der Aktion (`policy.ts`) und der Kampagne, auf die die Probe zielt (`expected()`); sie werden mit dem verglichen, was der Handler wirklich tut. Die Merkwörter werden schon überall in der Antwort gesucht, nicht nur in obersten Feldern; erlaubte Felder stehen weiter nur für die obersten. Gefunden wurde kein Leck |
 
 ### Die App im Browser (`security-visibility`)
 

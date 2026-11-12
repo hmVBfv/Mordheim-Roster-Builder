@@ -28,7 +28,8 @@ import { putPlan } from '../src/plans.ts';
 import { putStyle } from '../src/style.ts';
 import { reportBug } from '../src/bugs.ts';
 import { addReputation, putFaction, putNpc } from '../src/world.ts';
-import { MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ProbeContext, type Role } from './leak-matrix.ts';
+import { EXTRA_ROLES, MATRIX, PNG, ROLES, SECRET_KEYS, SECRET_VALUES, type ExtraRole, type ProbeContext, type Role } from './leak-matrix.ts';
+import type { CampaignRole } from '../src/campaigns.ts';
 import { startServer } from './helpers.ts';
 
 /** Every key and string value of an answer, at any depth. */
@@ -162,6 +163,19 @@ describe('leak-test matrix', () => {
     // a campaign the admin's probe deletes
     const doomed = createCampaign(s.db, { name: 'The Admin’s Doomed Campaign', by: admin.id }, t0);
     setMember(s.db, doomed.id, player.id, 'player', admin.id, t0);
+    // the three roles a row does not list (ExtraRole): a viewer in every campaign, a leader of the admin's, a stranger
+    const viewer = await s.user('viewer');
+    const leader = await s.user('leader');
+    const outsider = await s.user('outsider');
+    const memberOf: Record<ExtraRole, Map<string, CampaignRole>> = { viewer: new Map(), leader: new Map(), outsider: new Map() };
+    for (const [c, by] of [[theirs, victim.id], [led, admin.id], [taken, admin.id], [doomed, admin.id]] as const) {
+      expect(setMember(s.db, c.id, viewer.id, 'viewer', by, t0)).toBe(true);
+      memberOf.viewer.set(c.id, 'viewer');
+    }
+    for (const c of [led, taken, doomed]) {
+      expect(setMember(s.db, c.id, leader.id, 'leader', admin.id, t0)).toBe(true);
+      memberOf.leader.set(c.id, 'leader');
+    }
     // published chapters, one in each campaign
     const chapter = (c: { id: string }, by: string) => {
       const chid = randomUUID();
@@ -287,16 +301,45 @@ describe('leak-test matrix', () => {
       pending: () => pendingOne.session('totp'),
       user: () => player.session(),
       admin: () => admin.session(),
+      viewer: () => viewer.session(),
+      leader: () => leader.session(),
+      outsider: () => outsider.session(),
+    };
+    /** What an extra role may do with a probe, from the action's kind (policy.ts) and the campaign the probe is aimed at. Written out here, not
+        taken from can(): the answer is compared with what the handler really does. A new kind of target fails here until it is added. */
+    const expected = (role: ExtraRole, action: Action, url: string): boolean => {
+      const def = ACTIONS[action] as { who: string; target?: string };
+      if (def.who === 'public') return true;
+      if (def.who === 'pending' || def.who === 'admin') return false; // none of the extra roles is between password and code, or an admin
+      if (def.who !== 'user') throw new Error(`${action}: unknown kind "${def.who}"`);
+      if (!def.target) return true;
+      if (def.target === 'owner') return false; // they own nothing the probes touch
+      const id = /\/campaigns\/([0-9a-f-]{36})/.exec(url)?.[1];
+      if (!id) throw new Error(`${action}: the probe ${url} names no campaign`);
+      const mine = memberOf[role].get(id);
+      if (!mine) return false;
+      if (def.target === 'member') return true;
+      if (def.target === 'player') return mine === 'leader' || mine === 'player';
+      if (def.target === 'leader') return mine === 'leader';
+      throw new Error(`${action}: unknown target "${def.target}"`);
     };
     const problems: string[] = [];
     const lastSeq = () => (s.db.prepare('SELECT COALESCE(MAX(seq), 0) AS n FROM audit_log').get() as { n: number }).n;
     /** The routes that changed something and left no entry in the audit log, whoever called them. */
     const unlogged = new Set<string>();
     let probes = 0;
+    /** Allowed writes of the leader that are not sent: the admin has just done them in the same campaign (a spare thing taken out is gone for the
+        next caller), and the leader's right to them is the admin's. Their refusals and every read are checked. */
+    const notSent: string[] = [];
+    const extraDecisions: Record<ExtraRole, { allowed: number; refused: number }> = { viewer: { allowed: 0, refused: 0 }, leader: { allowed: 0, refused: 0 }, outsider: { allowed: 0, refused: 0 } };
     for (const [action, row] of Object.entries(MATRIX) as [Action, (typeof MATRIX)[Action]][]) {
       for (const [route, probe] of Object.entries(row.routes)) {
         for (const role of ROLES) {
           const p = probe(ctx);
+          const extra = (EXTRA_ROLES as Role[]).includes(role);
+          const mayDo = extra ? expected(role as ExtraRole, action, p.url) : row.allowed.includes(role);
+          if (extra) extraDecisions[role as ExtraRole][mayDo ? 'allowed' : 'refused']++;
+          if (role === 'leader' && mayDo && p.method !== 'GET' && p.method !== 'HEAD' && /\/campaigns\//.test(p.url)) { notSent.push(`${route} (${action})`); probes++; continue; }
           const seqBefore = lastSeq();
           const res = p.stream
             ? await callStream(`${s.url}${p.url}`, tokenFor[role]())
@@ -308,7 +351,7 @@ describe('leak-test matrix', () => {
           const owned = !!(ACTIONS[action] as { target?: string }).target;
           const denied = ((res.statusCode === 401 || res.statusCode === 403) && DENIED.includes(String(json?.error)))
             || (owned && res.statusCode === 404 && json?.error === 'not_found');
-          if (!row.allowed.includes(role)) {
+          if (!mayDo) {
             if (!denied) problems.push(`${where}: expected to be turned away, got ${res.statusCode} ${res.body.slice(0, 80)}`);
             else if (Object.keys(json!).join() !== 'error') problems.push(`${where}: a refusal says more than the error: ${res.body}`);
             continue;
@@ -317,13 +360,14 @@ describe('leak-test matrix', () => {
             problems.push(`${where}: turned away (${res.statusCode})`);
             continue;
           }
-          if (p.method !== 'GET' && p.method !== 'HEAD' && res.statusCode < 300 && lastSeq() === seqBefore) unlogged.add(route);
+          if (!extra && p.method !== 'GET' && p.method !== 'HEAD' && res.statusCode < 300 && lastSeq() === seqBefore) unlogged.add(route);
           if (json) {
             const found = walk(json);
             for (const k of found.keys.filter((k) => SECRET_KEYS.includes(k))) problems.push(`${where}: answer carries "${k}"`);
             for (const v of found.values.filter((v) => SECRET_VALUES.some((re) => re.test(v)))) problems.push(`${where}: answer carries a secret value ${v.slice(0, 12)}…`);
             if (res.statusCode < 300) {
-              const allowed = row.fields?.[role];
+              // an extra role is shown what the same action shows a player, else what it shows the admin, else everybody
+              const allowed = row.fields?.[role] ?? (extra ? row.fields?.user ?? row.fields?.admin ?? row.fields?.anonymous : undefined);
               if (!allowed) problems.push(`${where}: no fields listed for a JSON answer`);
               else for (const k of Object.keys(json).filter((k) => !allowed.includes(k))) problems.push(`${where}: field "${k}" is not in the matrix`);
             }
@@ -335,6 +379,13 @@ describe('leak-test matrix', () => {
     // every change is in the audit log (#200); a route that is not, is named here with the reason
     expect([...unlogged].sort()).toEqual(Object.keys(NOT_AUDITED).sort());
     expect(probes).toBe(Object.values(MATRIX).reduce((n, r) => n + Object.keys(r.routes).length, 0) * ROLES.length);
+    // the decisions the three extra roles were held to are not all one way: each is let through somewhere and turned away somewhere
+    for (const r of EXTRA_ROLES) {
+      expect(extraDecisions[r].allowed, `${r} allowed`).toBeGreaterThan(5);
+      expect(extraDecisions[r].refused, `${r} refused`).toBeGreaterThan(20);
+    }
+    // the leader's unsent writes are all writes aimed at a campaign the leader leads, and there are some
+    expect(notSent.length).toBeGreaterThan(10);
   });
 
   it('an admin without the authenticator may only look after the own account', async () => {
