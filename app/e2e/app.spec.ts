@@ -154,6 +154,12 @@ test('a Wizard shows the spells of his school on his card', async ({ page }) => 
   await expect(list.getByRole('button', { name: /^Choose / })).toHaveCount(0);
   await noSideScroll(page);
   await list.scrollIntoViewIfNeeded();
+  // #255: in the known row the casting value chip sits on the line of the name, after it – not pushed off it by a dot
+  const known = list.getByRole('listitem').filter({ hasText: 'known' });
+  const nameBox = (await known.locator('b').first().boundingBox())!;
+  const chipBox = (await known.locator('[data-cast]').boundingBox())!;
+  expect(Math.abs(chipBox.y + chipBox.height / 2 - (nameBox.y + nameBox.height / 2))).toBeLessThan(6);
+  expect(chipBox.x).toBeGreaterThanOrEqual(nameBox.x + nameBox.width);
   await shot(page, 'wizard-spell-list');
 });
 
