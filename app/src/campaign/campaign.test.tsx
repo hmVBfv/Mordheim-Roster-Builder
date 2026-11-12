@@ -18,6 +18,7 @@ import { stopSync } from '../sync/runner.ts';
 import { data, sampleSave } from '../test/data.ts';
 import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
+import { unfoldGrades } from '../test/unfoldGrades.ts';
 
 const at = (path: string) => render(<MemoryRouter initialEntries={[path]}><AppRoutes /></MemoryRouter>);
 const T0 = '2026-10-05T10:00:00.000Z';
@@ -391,6 +392,7 @@ describe('the overview', () => {
     expect(within(sheet).queryByRole('button', { name: 'Enter a copy' })).toBeNull();
     await user.click(within(sheet).getByRole('button', { name: 'New warband for this campaign' }));
     expect(await screen.findByText(/For The Hel Fenn Campaign: the warband is yours under Warbands/)).toBeTruthy();
+    await unfoldGrades(user);
     await user.click(await screen.findByRole('radio', { name: 'Tileans' }));
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Sons of Trantio');
     await user.click(screen.getByRole('button', { name: 'Start the warband' }));
@@ -420,6 +422,7 @@ describe('the overview', () => {
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });
     const user = userEvent.setup();
     at(`/warbands/new?campaign=${c.id}`);
+    await unfoldGrades(user);
     await user.click(await screen.findByRole('radio', { name: 'Tileans' }));
     srv.state.down = true;
     const fetchNow = globalThis.fetch;

@@ -173,6 +173,12 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Titel** wie auf den anderen Seiten (Platz über dem Block, wenig zwischen Titel und Text; vorher saß die Überschrift näher am Block
   darüber als an ihrem Text). Die Karten unter „Tabletop Simulator“ haben die **Leiste mit dem Pfeil** der anderen Aufklappfelder (`ui.fold`),
   damit man sieht, dass man sie öffnen kann (`app/src/roster/TtsCard.tsx`).
+- **Die Liste ist kurz (Plan P6, 12.11.2026):** bei 67 Warbands war „New warband“ auf dem Handy rund 14 000 px lang. Mit der Sortierung nach Stufe ist jede
+  Stufe ein **Abschnitt, den man auf- und zuklappt** (Knopf mit Name, Anzahl und Pfeil, mindestens 44 px hoch): **Core ist offen, die anderen sind zu**;
+  ein benutzter Filter zeigt alle Treffer (dann gibt es nichts zuzuklappen), und die Stufe der gewählten Warband bleibt offen. Auf dem Handy ist eine
+  Karte, die nicht gewählt ist, **zwei Zeilen** (Name; Rasse, Gold, Modelle); Helden, Schule und großes Wesen zeigt nur die **gewählte** Karte. Am Desktop
+  bleibt die Tabelle, die Optionen der gewählten Warband klappen weiter unter ihrer Zeile auf. Tests, die eine Warband einer anderen Stufe wählen, klappen
+  erst auf (`app/src/test/unfoldGrades.ts`, `unfoldGrades` in `app/e2e/helpers.ts`).
 - **Eine Warband finden (Wunsch #116, Rob, 28.10.2026; umgebaut mit #121–#125, Rob, 28.10.2026):** unter „New warband“ steht
   **„Find a warband“** immer offen (nicht einklappbar) über der **Tabelle** der passenden Warbands. Filter: Name („Look for“, eine eigene Zeile über den anderen Feldern, Meldung #134),
   Rasse, Grade, **Heldenzahl zum Start** (was die Heldeneinheiten der Warband zusammen erlauben, höchstens 6: „Up to 4/5/6“), ein

@@ -13,6 +13,7 @@ import { polyfillDialog } from '../test/dialog.ts';
 import { loadScreens, SCREENS_MS } from '../test/screens.ts';
 import { nextStamp, savedFields } from './useEditor.ts';
 import { createWarband } from './view.ts';
+import { unfoldGrades } from '../test/unfoldGrades.ts';
 
 const NOW = '2026-10-02T10:00:00.000Z';
 
@@ -144,6 +145,7 @@ describe('a new warband', () => {
   it('is chosen by warband, variant and name, and opens empty with its gold', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     const pick = await screen.findByRole('radio', { name: 'Tileans' });
     expect(screen.getByRole('button', { name: 'Start the warband' })).toHaveProperty('disabled', true);
     await user.click(pick);
@@ -164,6 +166,7 @@ describe('a new warband', () => {
   it('unfolds the variant, the name and the starting figures under the row of the chosen warband', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     const pick = await screen.findByRole('radio', { name: 'Tileans' });
     expect(screen.queryByRole('combobox', { name: 'City' })).toBeNull();
     await user.click(pick);
@@ -184,6 +187,7 @@ describe('a new warband', () => {
   it('is deselected by a second tap on the chosen warband, which folds its options up', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     const pick = await screen.findByRole('radio', { name: 'Tileans' });
     await user.click(pick);
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeTruthy();
@@ -213,6 +217,7 @@ describe('a new warband', () => {
     const box = screen.getByRole('checkbox', { name: /Vanilla Mordheim/ });
     expect(box.closest('label')!.textContent).toMatch(/rulebook \(Core\)/);
     expect(box.closest('label')!.textContent).toMatch(/Only Core warbands can play it/);
+    await unfoldGrades(user);
     await user.click(await screen.findByRole('radio', { name: 'Skaven of Clan Pestilens' }));
     expect(screen.queryByRole('checkbox', { name: /Vanilla Mordheim/ })).toBeNull();
     // a warband that cannot play it is not told so: the option is simply not there (report of 9.11.2026)
@@ -267,6 +272,7 @@ describe('a new warband', () => {
   it('shows the spell school of each warband, "None" where it has no caster, and filters by it', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     await screen.findByRole('radio', { name: 'Night Goblins' });
     const rowOf = (name: string) => screen.getByRole('radio', { name }).closest('tr')!;
     expect(within(rowOf('Night Goblins')).getByText('Waaagh! Magic')).toBeTruthy();
@@ -284,6 +290,7 @@ describe('a new warband', () => {
   it('lists a school made for a warband under its parent school, and each prayer as a school of its own', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     await screen.findByRole('radio', { name: 'The Restless Dead' });
     const rowOf = (name: string) => screen.getByRole('radio', { name }).closest('tr')!;
     expect(within(rowOf('The Restless Dead')).getByText('Necromancy')).toBeTruthy();
@@ -303,6 +310,7 @@ describe('a new warband', () => {
   it('opens the spells of a school on a tap, with their effects and without lore, and does not choose the warband', async () => {
     at('/warbands/new');
     const user = userEvent.setup();
+    await unfoldGrades(user);
     await screen.findByRole('radio', { name: 'Night Goblins' });
     await user.click(within(screen.getByRole('radio', { name: 'Night Goblins' }).closest('tr')!).getByRole('button', { name: 'Waaagh! Magic' }));
     const bubble = await screen.findByRole('tooltip');

@@ -81,6 +81,49 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* a grade is a button that folds its warbands in and out: the label, how many, and a chevron that turns */
+.gradeButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 var(--space-2);
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gradeButton:disabled {
+  cursor: default;
+}
+
+.gradeButton:not(:disabled)::after {
+  content: '';
+  order: 3;
+  width: 0.5em;
+  height: 0.5em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+
+.gradeButton[aria-expanded='true']:not(:disabled)::after {
+  transform: rotate(45deg);
+}
+
+.gradeCount {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
 .table tbody tr:not(.grade) {
   cursor: pointer;
 }
@@ -150,6 +193,7 @@
   .table tr:not(.grade) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    column-gap: var(--space-2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--surface);
@@ -172,6 +216,14 @@
   /* the schools take the width of the card, one under the other, so that a long name does not have to fit a third of it */
   .table td.magic {
     grid-column: 1 / -1;
+  }
+
+  /* a card that is not the chosen one is two lines: the name, and race, gold and models; what else the list knows (heroes, school, big creature)
+     is for the chosen one (plan P6) */
+  .table tr:not(.grade):not(.picked) td[data-label='Heroes'],
+  .table tr:not(.grade):not(.picked) td.magic,
+  .table tr:not(.grade):not(.picked) td[data-label='Big creature'] {
+    display: none;
   }
 
   .table tr.options td {

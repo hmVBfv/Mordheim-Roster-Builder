@@ -97,8 +97,11 @@ export function WarbandFinder({ facts, finder, schoolInfo }: { facts: WarbandFac
 
 /** The warbands that pass the filter, one row each: tap a row to pick it (its radio is hidden but there for the keyboard). With the sort by grade, a heading row opens each grade. */
 /** `detail`: what unfolds under the row of the chosen warband (its options), so nothing has to be looked for further down. */
-export function WarbandTable({ shown, sort, chosen, onChoose, detail, schoolInfo }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void; detail?: ReactNode; schoolInfo: Record<string, SchoolInfo> }) {
+export function WarbandTable({ shown, sort, chosen, onChoose, detail, schoolInfo, filtered = false }: { shown: WarbandFact[]; sort: WarbandSort; chosen: string; onChoose: (key: string) => void; detail?: ReactNode; schoolInfo: Record<string, SchoolInfo>; filtered?: boolean }) {
   const byGrade = sort === 'grade';
+  // with the sort by grade each grade is a section a player folds out: Core is open to begin with, the others closed (67 warbands are a long page on a phone);
+  // a filter in use, or the warband chosen, opens what it concerns (plan P6)
+  const [unfolded, setUnfolded] = useState<Record<string, boolean>>({ core: true });
   const cols = byGrade ? 7 : 8;
   // the chosen warband chosen again is let go
   const toggle = (key: string) => onChoose(key === chosen ? '' : key);
@@ -137,7 +140,20 @@ export function WarbandTable({ shown, sort, chosen, onChoose, detail, schoolInfo
           {byGrade
             ? GRADE_ORDER.flatMap((g) => {
               const here = shown.filter((w) => w.grade === g);
-              return here.length ? [<tr key={`g-${g}`} className={styles.grade}><th colSpan={cols} scope="colgroup">{GRADE_LABELS[g]}</th></tr>, ...here.flatMap(row)] : [];
+              if (!here.length) return [];
+              const open = filtered || unfolded[g] === true || here.some((w) => w.key === chosen);
+              const head = (
+                <tr key={`g-${g}`} className={styles.grade}>
+                  <th colSpan={cols} scope="colgroup">
+                    {/* a filter in use shows every match, so there is nothing to fold then */}
+                    <button type="button" className={styles.gradeButton} aria-expanded={open} disabled={filtered}
+                      onClick={() => setUnfolded((u) => ({ ...u, [g]: !open }))}>
+                      <span>{GRADE_LABELS[g]}</span><span className={styles.gradeCount}>{here.length}</span>
+                    </button>
+                  </th>
+                </tr>
+              );
+              return open ? [head, ...here.flatMap(row)] : [head];
             })
             : shown.flatMap(row)}
         </tbody>
