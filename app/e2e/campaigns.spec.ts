@@ -320,7 +320,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     srv.addCampaign({ name: 'Summer in Sylvania', role: 'player' });
     await page.goto('./');
     const list = page.getByRole('list', { name: 'Your campaigns' });
-    await expect(list.getByRole('link')).toHaveText([/The Hel Fenn Campaign\s*Leader · Setup · 1 warband/, /Summer in Sylvania\s*Player · Setup · 0 warbands/]);
+    await expect(list.getByRole('link')).toHaveText([/Summer in Sylvania\s*Player · Setup · 0 warbands/, /The Hel Fenn Campaign\s*Leader · Setup · 1 warband/]); // the newest first, as the server lists them
     const warbandLinks = page.getByRole('main').getByRole('link').filter({ hasText: /Mercenaries/ });
     await expect(warbandLinks).toHaveCount(3);
     // measure and judge together until the layout holds (see the campaign overview above)
@@ -337,7 +337,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
       const allCampaigns = await boxOf(page.getByRole('link', { name: 'All campaigns' }));
       expect(allCampaigns!.y - (lastCampaign!.y + lastCampaign!.height)).toBeGreaterThanOrEqual(8);
     }).toPass({ timeout: 10_000 });
-    await list.getByRole('link').first().click();
+    await list.getByRole('link').last().click();
     await expect(page).toHaveURL(new RegExp(`/campaign/${c.id}$`));
     await expect(page.getByRole('heading', { level: 1, name: 'The Hel Fenn Campaign' })).toBeVisible();
     await page.goBack();

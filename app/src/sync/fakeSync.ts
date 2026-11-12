@@ -77,6 +77,8 @@ export interface FakeCampaign {
   houseRules?: Record<string, unknown>;
   /** Members who filed it away in their own list (migration 24). */
   archivedBy?: string[];
+  /** The last time a change was made to it (the server lists the campaigns by that). */
+  touched?: number;
   members: { userId: string; displayName: string; username: string; role: FakeRole }[];
   enrolments: FakeEnrolment[];
 }
@@ -195,7 +197,7 @@ export function createFakeSync(opts: {
     return {
       campaign: { id: c.id, name: c.name, round: c.round, place: c.place ?? '', vanilla: !!c.vanilla, opening: c.opening ?? '', houseRules: c.houseRules ?? {}, createdAt: c.createdAt, updatedAt: c.createdAt },
       role,
-      members: c.members.map((m) => ({ ...m, joinedAt: c.createdAt })),
+      members: [...c.members].sort((a, b) => ['leader', 'player', 'viewer'].indexOf(a.role) - ['leader', 'player', 'viewer'].indexOf(b.role) || a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase())).map((m) => ({ ...m, joinedAt: c.createdAt })),
       enrolments: c.enrolments.map((e) => ({
         id: e.id, warbandId: e.warbandId, playerId: e.playerId, player: e.player, status: e.status, fromRound: e.fromRound,
         createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
@@ -1081,12 +1083,12 @@ export function createFakeSync(opts: {
     const w = s.warbands.get(e.warbandId);
     return w ? w.versions.find((v) => v.rev === w.headRev)!.data : e.data;
   };
-  const confirm = (c: FakeCampaign, e: FakeEnrolment) => {
+  const confirm = (c: FakeCampaign, e: FakeEnrolment, by: string = me.displayName) => {
     e.status = 'active';
     e.fromRound = c.round;
     e.confirmedAt = at();
     const w = s.warbands.get(e.warbandId);
-    e.tag = { id: `tag-${e.id}`, kind: 'start', rev: w?.headRev ?? 1, round: c.round, battleId: null, totals: totalsOf(dataOf(e)), createdBy: me.displayName, createdAt: at() };
+    e.tag = { id: `tag-${e.id}`, kind: 'start', rev: w?.headRev ?? 1, round: c.round, battleId: null, totals: totalsOf(dataOf(e)), createdBy: by, createdAt: at() };
     e.tags = [e.tag];
     if (w) w.seq = next();
   };
@@ -1096,8 +1098,10 @@ export function createFakeSync(opts: {
     if (w) { w.campaignId = null; w.seq = next(); }
   };
   /** A campaign the signed-in user is part of, with other players' warbands entered. */
+  let campaignCount = 0;
   const addCampaign = (c: { name: string; place?: string; vanilla?: boolean; opening?: string; role?: FakeRole; round?: number; others?: { player: string; data: unknown; role?: FakeRole; pending?: boolean }[] }) => {
-    const id = `campaign-${s.campaigns.size + 1}`;
+    // a counter of its own: a campaign that was deleted must not hand its id to the next
+    const id = `campaign-${++campaignCount}`;
     const camp: FakeCampaign = { id, name: c.name, ...(c.place ? { place: c.place } : {}), vanilla: !!c.vanilla, ...(c.opening ? { opening: c.opening } : {}), round: c.round ?? 0, createdAt: at(), members: [{ userId: me.id, username: me.username, displayName: me.displayName, role: c.role ?? 'leader' }], enrolments: [] };
     for (const [i, o] of (c.others ?? []).entries()) {
       const userId = `user-${o.player.toLowerCase()}`;
@@ -1105,23 +1109,30 @@ export function createFakeSync(opts: {
       const d = o.data as { name?: string; wb?: string };
       const e: FakeEnrolment = { id: `${id}-e${i + 1}`, warbandId: `${id}-w${i + 1}`, playerId: userId, player: o.player, status: 'pending', fromRound: null, createdAt: at(), confirmedAt: null, name: d.name ?? '', wbType: String(d.wb), tag: null, data: o.data };
       camp.enrolments.push(e);
-      if (!o.pending) confirm(camp, e);
+      // a leader of the campaign confirms it (the signed-in user only where they lead)
+      if (!o.pending) confirm(camp, e, camp.members.find((m) => m.role === 'leader')?.displayName);
     }
     s.campaigns.set(id, camp);
     return camp;
   };
 
+  /** A campaign of this name among those the signed-in user is in (and has not filed away): two names are the same when they differ only in case or in spaces (server/src/names.ts). */
+  const nameKey = (x: string) => x.trim().replace(/\s+/g, ' ').toLowerCase();
+  const nameTakenAmongMine = (name: string, exceptId: string) => [...s.campaigns.values()].some((x) => x.id !== exceptId && roleOf(x) && !x.archivedBy?.includes(me.id) && nameKey(x.name) === nameKey(name));
   const campaignRoutes = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown>): Response | null => {
     if (path === '/campaigns') {
       if (method === 'GET') {
-        return json(200, { campaigns: [...s.campaigns.values()].filter((c) => roleOf(c)).map((c) => ({ id: c.id, name: c.name, round: c.round, role: roleOf(c), members: c.members.length, warbands: c.enrolments.filter((e) => e.status === 'active').length, createdAt: c.createdAt, archived: (c.archivedBy ?? []).includes(me.id) })) });
+        return json(200, { campaigns: [...s.campaigns.values()].reverse().sort((a, b) => (b.touched ?? 0) - (a.touched ?? 0)).filter((c) => roleOf(c)).map((c) => ({ id: c.id, name: c.name, round: c.round, role: roleOf(c), members: c.members.length, warbands: c.enrolments.filter((e) => e.status === 'active').length, createdAt: c.createdAt, archived: (c.archivedBy ?? []).includes(me.id) })) });
       }
       if (method === 'POST') {
         const name = String(body.name ?? '').trim().replace(/\s+/g, ' ');
+        if (typeof body.name !== 'string' || body.name.length < 1 || body.name.length > 80 || (body.place !== undefined && !/^[a-z0-9-]{0,64}$/.test(String(body.place)))) return json(400, { error: 'bad_request' });
         if (!name) return json(400, { error: 'invalid', problem: 'a campaign needs a name' });
-        const place = String(body.place ?? '');
-        if (!/^[a-z0-9-]*$/.test(place)) return json(400, { error: 'invalid' });
-        return json(201, view(addCampaign({ name, place, vanilla: body.vanilla === true })));
+        if (nameTakenAmongMine(name, '')) return json(400, { error: 'invalid', problem: 'you are in a campaign of this name already' });
+        const vanilla = body.vanilla === true;
+        const asked = String(body.place ?? '');
+        if (vanilla && asked && asked !== 'mordheim') return json(400, { error: 'invalid', problem: 'a campaign that plays Vanilla Mordheim plays in Mordheim' });
+        return json(201, view(addCampaign({ name, place: vanilla ? 'mordheim' : asked, vanilla })));
       }
     }
     const m = path.match(/^\/campaigns\/([^/]+)(\/.*)?$/);
@@ -1130,6 +1141,7 @@ export function createFakeSync(opts: {
     const role = c ? roleOf(c) : null;
     if (!c || !role) return json(404, { error: 'not_found' });
     const rest = m[2] ?? '';
+    if (method !== 'GET') c.touched = next();
     const lead = role === 'leader';
     const forbidden = json(403, { error: 'forbidden' });
     if (method === 'PUT' && rest === '/opening') {
@@ -1202,14 +1214,26 @@ export function createFakeSync(opts: {
       c.round = nextRound;
       return json(200, view(c));
     }
-    if (method === 'PATCH' && rest === '') { if (!lead) return forbidden; c.name = String(body.name).trim(); return json(200, view(c)); }
+    if (method === 'PATCH' && rest === '') {
+      if (!lead) return forbidden;
+      if (typeof body.name !== 'string' || body.name.length < 1 || body.name.length > 80) return json(400, { error: 'bad_request' });
+      const name = body.name.trim().replace(/\s+/g, ' ');
+      if (!name) return json(400, { error: 'invalid', problem: 'a campaign needs a name' });
+      if (name !== c.name && nameTakenAmongMine(name, c.id)) return json(400, { error: 'invalid', problem: 'you are in a campaign of this name already' });
+      c.name = name;
+      return json(200, view(c));
+    }
     if ((x0 = rest.match(/^\/history\/([^/]+)$/))) {
       if (!lead) return forbidden;
       if (method === 'PUT') {
+        // as the server's PastBattleBody reads it (server/src/history.ts)
+        if (!Number.isInteger(body.round) || (body.round as number) < 1 || (body.round as number) > 99 || !body.outcomes || typeof body.outcomes !== 'object') return json(400, { error: 'invalid', problem: 'not a battle of the history (round: out of range)' });
         const r = pastBattle(c.id, { ...(body as { round: number; outcomes: Record<string, string> }), id: x0[1]! });
         return typeof r === 'string' ? json(409, { error: r }) : json(200, view(c));
       }
       if (method === 'DELETE') {
+        const there = s.battles.get(x0[1]!);
+        if (!there || there.campaignId !== c.id) return json(404, { error: 'not_found' });
         if ([...s.battles.values()].some((b) => b.campaignId === c.id && !b.takenOver)) return json(409, { error: 'history_closed' });
         const written = [...s.notes.values()].filter((n) => n.battleId === x0![1] && !n.deleted);
         if (written.length && query.get('content') !== '1') return json(409, { error: 'in_use', problem: 'notes or pictures belong to this battle' });
@@ -1221,7 +1245,15 @@ export function createFakeSync(opts: {
     }
     if (method === 'PUT' && rest === '/house-rules') {
       if (!lead) return forbidden;
-      c.houseRules = { ...effectiveHouse(body.rules), showRarity: false } as unknown as Record<string, unknown>;
+      if (!body.rules || typeof body.rules !== 'object') return json(400, { error: 'bad_request' });
+      // the server reads only the rules it knows (server/src/rules-body); anything else is refused
+      const known = new Set(Object.keys(effectiveHouse({})));
+      const stray = Object.keys(body.rules as object).filter((k) => !known.has(k));
+      if (stray.length) return json(400, { error: 'invalid', problem: `not house rules (${stray[0]}: unknown)` });
+      // as the server (setHouseRules): rules that change nothing and no new notes leave what is stored as it is
+      const next = { ...effectiveHouse(body.rules), showRarity: false };
+      const was = c.houseRules ?? {};
+      if (houseDifferences(was, next).length || (effectiveHouse(was).notes ?? '') !== next.notes) c.houseRules = next as unknown as Record<string, unknown>;
       return json(200, view(c));
     }
     let x: RegExpMatchArray | null;
@@ -1231,13 +1263,14 @@ export function createFakeSync(opts: {
       const leaders = c.members.filter((p) => p.role === 'leader').length;
       const cur = c.members.find((p) => p.userId === userId);
       if (method === 'PUT') {
+        if (!['leader', 'player', 'viewer'].includes(String(body.role))) return json(400, { error: 'bad_request' });
         const r = body.role as FakeRole;
         if (cur?.role === 'leader' && r !== 'leader' && leaders <= 1) return json(409, { error: 'last_leader' });
         if (cur) cur.role = r;
         else {
           const p = s.people.find((q) => q.id === userId);
           if (!p) return json(400, { error: 'invalid', problem: 'no such player' });
-          c.members.push({ ...p, userId: p.id, role: r });
+          c.members.push({ userId: p.id, username: p.username, displayName: p.displayName, role: r });
         }
         return json(200, view(c));
       }
@@ -1250,9 +1283,13 @@ export function createFakeSync(opts: {
     }
     if (method === 'POST' && rest === '/enrolments') {
       if (role === 'viewer') return forbidden;
+      if (typeof body.warbandId !== 'string' || !body.data || typeof body.data !== 'object') return json(400, { error: 'bad_request' });
       const id = String(body.warbandId);
+      const d = body.data as { name?: string; wb?: string; planner?: unknown; models?: unknown };
+      if (typeof d.wb !== 'string' || !Array.isArray(d.models)) return json(400, { error: 'invalid', problem: 'not a warband save' });
+      // a planner is for planning: it does not enter a campaign as it is
+      if (d.planner === true) return json(400, { error: 'invalid', problem: 'a planner does not enter a campaign' });
       if (s.warbands.has(id)) return json(409, { error: 'exists' });
-      const d = body.data as { name?: string; wb?: string };
       const from = body.copiedFrom as FakeWarband['copiedFrom'] | undefined;
       const own = from && s.warbands.has(from.id) ? from : null;
       const w: FakeWarband = { id, headRev: 1, versions: [{ rev: 1, data: body.data, createdAt: at(), source: own ? 'copy' : 'import', note: `entered in ${c.name}` }], archivedAt: null, seq: next(), draft: null, copiedFrom: own, createdAt: at(), campaignId: c.id };
@@ -1260,7 +1297,7 @@ export function createFakeSync(opts: {
       const e: FakeEnrolment = { id: `${c.id}-e${c.enrolments.length + 1}-${id.slice(0, 4)}`, warbandId: id, playerId: me.id, player: me.displayName, status: 'pending', fromRound: null, createdAt: at(), confirmedAt: null, name: d.name ?? '', wbType: String(d.wb), tag: null };
       c.enrolments.push(e);
       if (lead) confirm(c, e);
-      return json(201, { enrolmentId: e.id, warband: meta(w), head: w.versions[0], campaign: view(c) });
+      return json(201, { enrolmentId: e.id, warband: meta(w), head: versionView(w.versions[0]!, true), campaign: view(c) });
     }
     if ((x = rest.match(/^\/enrolments\/([^/]+)(\/confirm|\/decline)?$/))) {
       const e = c.enrolments.find((q) => q.id === x![1]);
@@ -1281,7 +1318,7 @@ export function createFakeSync(opts: {
       return json(200, {
         warband: w ? meta(w) : { id: e.warbandId, name: e.name, wbType: e.wbType, headRev: 1, copiedFrom: null, createdAt: e.createdAt, updatedAt: e.createdAt, archivedAt: null, campaignId: c.id },
         player: { id: e.playerId, displayName: e.player }, status: e.status,
-        head: { rev: w?.headRev ?? 1, data: dataOf(e), createdAt: e.createdAt, source: 'import', note: '', format: 2, appVersion: '', createdBy: e.player, bytes: 0 },
+        head: w ? versionView(headOf(w)!, true) : { rev: 1, data: dataOf(e), createdAt: e.createdAt, source: 'import', note: `entered in ${c.name}`, format: 2, appVersion: '', createdBy: e.player.toLowerCase(), bytes: JSON.stringify(dataOf(e)).length },
         draft: w?.draft && w.draft.baseRev === w.headRev ? { data: w.draft.data, updatedAt: w.draft.updatedAt } : null,
         tags: (e.tags ?? []).filter((t) => !t.supersededBy).map((t) => ({ ...publicTag(t), changes: t.changes ?? [] })),
       });

@@ -65,8 +65,9 @@ describe('Home: campaigns', () => {
     at('/');
     const list = await within(await screen.findByRole('region', { name: 'Campaigns' })).findByRole('list', { name: 'Your campaigns' });
     const rows = within(list).getAllByRole('link');
-    expect(rows.map((r) => r.textContent)).toEqual(['The Hel Fenn CampaignLeader · Setup · 2 warbands', 'Summer in SylvaniaPlayer · After battle 2 · 0 warbands']);
-    expect(rows.map((r) => r.getAttribute('href'))).toEqual([`/campaign/${a.id}`, `/campaign/${b.id}`]);
+    // the newest first, as the server lists them (the contract test in server/test/contract)
+    expect(rows.map((r) => r.textContent)).toEqual(['Summer in SylvaniaPlayer · After battle 2 · 0 warbands', 'The Hel Fenn CampaignLeader · Setup · 2 warbands']);
+    expect(rows.map((r) => r.getAttribute('href'))).toEqual([`/campaign/${b.id}`, `/campaign/${a.id}`]);
     expect(within(list).queryByText(/Old Feud/)).toBeNull();
     // the list of all of them, with the archive, stays one tap away – it must not jump into a lone campaign
     expect(within(screen.getByRole('region', { name: 'Campaigns' })).getByRole('link', { name: 'All campaigns' }).getAttribute('href')).toBe('/campaign');
