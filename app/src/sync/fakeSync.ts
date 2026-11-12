@@ -180,7 +180,12 @@ export function createFakeSync(opts: {
   const at = () => new Date(Date.UTC(2026, 9, 4, 12, 0, s.seq)).toISOString();
   const next = () => ++s.seq;
   const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
-  const meta = (w: FakeWarband) => ({ id: w.id, name: '', wbType: '', headRev: w.headRev, copiedFrom: w.copiedFrom, createdAt: w.createdAt, updatedAt: at(), archivedAt: w.archivedAt, campaignId: w.campaignId ?? null });
+  /** What the server keeps beside a version: the name (at most 120 characters) and the warband's type, read from the save (server/src/warbands.ts). */
+  const headOf = (w: FakeWarband) => w.versions.find((v) => v.rev === w.headRev);
+  const saveWords = (w: FakeWarband) => { const d = headOf(w)?.data as { name?: unknown; wb?: unknown } | undefined; return { name: typeof d?.name === 'string' ? d.name.slice(0, 120) : '', wbType: typeof d?.wb === 'string' ? d.wb : '' }; };
+  /** A version as the server answers: its numbers and who made it, the save itself only where asked. */
+  const versionView = (v: FakeVersion, withData: boolean) => ({ rev: v.rev, format: 2, appVersion: '', source: v.source, createdBy: me.username, createdAt: v.createdAt, note: v.note ?? '', bytes: JSON.stringify(v.data).length, ...(withData ? { data: v.data } : {}) });
+  const meta = (w: FakeWarband) => ({ id: w.id, ...saveWords(w), headRev: w.headRev, copiedFrom: w.copiedFrom, createdAt: w.createdAt, updatedAt: at(), archivedAt: w.archivedAt, campaignId: w.campaignId ?? null });
 
   /* ---- campaigns ---- */
   const roleOf = (c: FakeCampaign) => c.members.find((m) => m.userId === me.id)?.role ?? null;
@@ -787,7 +792,7 @@ export function createFakeSync(opts: {
     const cur = s.pictures.get(m[1]!);
     if (method === 'GET' && m[2]) {
       if (!cur || !pictureFor(cur, role) || !cur.data) return json(404, { error: 'not_found' });
-      return new Response(new Blob([cur.data as BlobPart], { type: cur.mime }), { status: 200, headers: { 'content-type': cur.mime } });
+      return new Response(new Blob([cur.data] as ConstructorParameters<typeof Blob>[0], { type: cur.mime }), { status: 200, headers: { 'content-type': cur.mime } });
     }
     if (role === 'viewer') return json(403, { error: 'forbidden' });
     if (method === 'PUT' && !m[2]) {
@@ -1431,17 +1436,28 @@ export function createFakeSync(opts: {
     }
     if (method === 'GET' && path === '/sync') {
       const cursor = Number(query.get('cursor') ?? 0);
-      const changed = [...s.warbands.values()].filter((w) => w.seq > cursor || (w.draft?.seq ?? 0) > cursor);
+      // in the order of their last change, as the server answers
+      const changed = [...s.warbands.values()].filter((w) => w.seq > cursor || (w.draft?.seq ?? 0) > cursor).sort((a, b) => a.seq - b.seq);
       return json(200, {
         epoch: s.epoch, cursor: s.seq,
-        warbands: changed.map((w) => ({ ...meta(w), head: w.archivedAt ? null : w.versions.find((v) => v.rev === w.headRev), draft: w.archivedAt ? null : w.draft })),
+        warbands: changed.map((w) => ({ ...meta(w), head: w.archivedAt ? null : versionView(headOf(w)!, true), draft: w.archivedAt ? null : w.draft })),
       });
     }
+    // one's own warbands, the newest change first; `archived=1` the removed ones
+    if (method === 'GET' && path === '/warbands') {
+      const removed = query.get('archived') === '1';
+      return json(200, { warbands: [...s.warbands.values()].filter((w) => !!w.archivedAt === removed).sort((a, b) => b.seq - a.seq).map(meta) });
+    }
     if (method === 'POST' && path === '/warbands') {
+      if (typeof body.id !== 'string' || !body.data || typeof body.data !== 'object' || typeof body.source !== 'string') return json(400, { error: 'bad_request' });
       const id = String(body.id);
       const ex = s.warbands.get(id);
       if (ex) return JSON.stringify(ex.versions[0]!.data) === JSON.stringify(body.data) ? json(200, { warband: meta(ex), rev: 1 }) : json(409, { error: 'exists' });
-      const w: FakeWarband = { id, headRev: 1, versions: [{ rev: 1, data: body.data, createdAt: at(), source: String(body.source) }], archivedAt: null, seq: next(), draft: null, copiedFrom: (body.copiedFrom as FakeWarband['copiedFrom']) ?? null, createdAt: at() };
+      if (body.source === 'copy') {
+        const from = s.warbands.get(String((body.copiedFrom as { id?: string } | undefined)?.id));
+        if (!from || !from.versions.some((v) => v.rev === (body.copiedFrom as { rev?: number }).rev)) return json(400, { error: 'invalid', problem: 'a copy names a warband and version of your own' });
+      }
+      const w: FakeWarband = { id, headRev: 1, versions: [{ rev: 1, data: body.data, createdAt: at(), source: String(body.source), note: String(body.note ?? '') }], archivedAt: null, seq: next(), draft: null, copiedFrom: (body.copiedFrom as FakeWarband['copiedFrom']) ?? null, createdAt: at() };
       s.warbands.set(id, w);
       return json(201, { warband: meta(w), rev: 1 });
     }
@@ -1449,11 +1465,11 @@ export function createFakeSync(opts: {
       const w = s.warbands.get(m[1]!);
       if (!w) return json(404, { error: 'not_found' });
       const rest = m[2] ?? '';
-      if (method === 'GET' && rest === '') return json(200, { warband: meta(w), head: w.versions.find((v) => v.rev === w.headRev), draft: w.draft });
-      if (method === 'GET' && rest === '/versions') return json(200, { versions: [...w.versions].reverse().map((v) => ({ rev: v.rev, format: 2, appVersion: '', source: v.source, createdBy: 'kai', createdAt: v.createdAt, note: v.note ?? '', bytes: JSON.stringify(v.data).length })) });
+      if (method === 'GET' && rest === '') return json(200, { warband: meta(w), head: versionView(headOf(w)!, true), draft: w.draft });
+      if (method === 'GET' && rest === '/versions') return json(200, { versions: [...w.versions].reverse().map((v) => versionView(v, false)) });
       if (method === 'GET' && rest.startsWith('/versions/')) {
         const v = w.versions.find((x) => x.rev === Number(rest.slice(10)));
-        return v ? json(200, { version: { ...v, format: 2, createdBy: 'kai', note: v.note ?? '' } }) : json(404, { error: 'not_found' });
+        return v ? json(200, { version: versionView(v, true) }) : json(404, { error: 'not_found' });
       }
       if (method === 'POST' && rest === '/versions') {
         if (w.archivedAt) return json(409, { error: 'archived' });
@@ -1466,10 +1482,12 @@ export function createFakeSync(opts: {
       }
       if (method === 'PUT' && rest === '/autosave') {
         if (w.archivedAt) return json(409, { error: 'archived' });
+        if (Number(body.baseRev) > w.headRev) return json(400, { error: 'invalid', problem: 'no such version to build on' });
         if (w.draft && !body.force && w.draft.seq !== (body.afterSeq ?? null)) return json(409, { error: 'draft_conflict', draft: w.draft });
         w.draft = { baseRev: Number(body.baseRev), data: body.data, device: String(body.device ?? ''), updatedAt: at(), seq: next() };
         return json(200, { seq: w.draft.seq });
       }
+      if (method === 'DELETE' && rest === '/autosave') { const dropped = !!w.draft; w.draft = null; return json(200, { dropped }); }
       if (method === 'DELETE' && rest === '') {
         if (w.campaignId) return json(409, { error: 'enrolled' });
         w.archivedAt = at(); w.seq = next(); return json(200, { warband: meta(w) });
