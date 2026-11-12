@@ -1,7 +1,7 @@
 /* Contract, area 1: one's own warbands and the sync (server/src/routes-warbands.ts ↔ app/src/sync/fakeSync.ts). Plan P5. */
 import { describe, expect, it } from 'vitest';
 import { startAccounts } from '../accounts-helpers.ts';
-import { compare, fakeSide, type Step } from './driver.ts';
+import { compare, fakeSide, serverSide, type Step } from './driver.ts';
 
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';
@@ -51,14 +51,9 @@ describe('contract: warbands and sync', () => {
     const s = await startAccounts();
     const me = await s.user('kai');
     const token = me.session();
-    const server = async (step: Step) => {
-      // a second between requests: the server orders by the time of the last change, the fake by its counter
-      s.clock.advance(1000);
-      const res = await s.call({ method: step.method ?? (step.body ? 'POST' : 'GET'), url: `/api/v1${step.url}`, ...(step.body ? { body: step.body } : {}), token });
-      return { status: res.statusCode, body: res.body ? res.json() as unknown : null };
-    };
-    const fake = fakeSide();
-    const { found, unused } = await compare(WARBAND_STEPS, server, (st) => fake.run(st));
+    // a second between requests: the server orders by the time of the last change, the fake by its counter
+    const server = serverSide((r) => s.call(r), token, {}, () => s.clock.advance(1000));
+    const { found, unused } = await compare(WARBAND_STEPS, server, fakeSide());
     expect(found).toEqual([]);
     expect(unused).toEqual([]);
   });

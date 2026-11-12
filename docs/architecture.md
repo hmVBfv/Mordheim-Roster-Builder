@@ -380,7 +380,7 @@ bekannte, begründete Abweichung steht im dritten Argument von `compare` und
 lässt den Test fehlschlagen, sobald sie nicht mehr vorkommt. **Gibt es einen
 Unterschied, gibt der Ersatz nach** (der Server ist die Wahrheit); ein
 App-Test, der dadurch rot wird, hat einen echten Fehler der App gefunden.
-Bereiche mit Vertragstest: Warbands und Sync (`warbands.contract.test.ts`).
+Bereiche mit Vertragstest: Warbands und Sync (`warbands.contract.test.ts`); Personen, Teilen und Bibliothek (`shares.contract.test.ts`). Was jemand anderes tut (eine Kopie an den Angemeldeten schicken), macht jede Seite auf ihre Art: auf dem Server über die API mit dessen Sitzung, im Ersatz mit `shareFrom` & Co. (`elsewhere`-Schritte). Der Inhalt eines Bibliothekseintrags wird nur vom Server geprüft und ergänzt; die Probe schickt ihn deshalb vollständig.
 Ein neuer Bereich des Ersatzes bekommt seinen Vertragstest, ehe er benutzt wird.
 
 ## 7. Auslieferung

@@ -64,11 +64,12 @@ describe('Share… on the roster', () => {
     expect((await within(sheet).findByLabelText('Share code')).textContent).toBe('K7M2-Q9XD');
     expect(within(sheet).getByText(/enters it under Warbands → “Enter a share code”/)).toBeTruthy();
     const open = await within(sheet).findByRole('list');
+    // the newest first, as the server lists them (the contract test in server/test/contract)
     expect(within(open).getAllByRole('listitem').map((li) => li.textContent)).toEqual([
-      expect.stringMatching(/^The Silver Caravanto Ben · until/),
       expect.stringMatching(/^The Silver Caravancode · taken 0× · until/),
+      expect.stringMatching(/^The Silver Caravanto Ben · until/),
     ]);
-    await user.click(within(within(open).getAllByRole('listitem')[1]!).getByRole('button', { name: 'Take back' }));
+    await user.click(within(within(open).getAllByRole('listitem')[0]!).getByRole('button', { name: 'Take back' }));
     expect(await screen.findByText('Taken back.')).toBeTruthy();
     expect(srv.state.shares[1]!.revokedAt).toBeTruthy();
     expect(await within(sheet).findAllByRole('listitem')).toHaveLength(1);
@@ -104,9 +105,9 @@ describe('a copy sent to you', () => {
     const user = userEvent.setup();
     at('/');
     const list = await screen.findByRole('list', { name: 'Sent to you' });
-    expect(within(list).getAllByRole('listitem').map((li) => li.textContent?.replace(/a copy.*$/, ''))).toEqual(['Ben sent you The Ardent Caravan', 'Rob sent you Rob’s Spare']);
+    expect(within(list).getAllByRole('listitem').map((li) => li.textContent?.replace(/a copy.*$/, ''))).toEqual(['Rob sent you Rob’s Spare', 'Ben sent you The Ardent Caravan']);
 
-    await user.click(within(within(list).getAllByRole('listitem')[1]!).getByRole('button', { name: 'Decline' }));
+    await user.click(within(within(list).getAllByRole('listitem')[0]!).getByRole('button', { name: 'Decline' }));
     expect(await within(list).findAllByRole('listitem')).toHaveLength(1);
     expect(srv.state.shares[1]).toMatchObject({ accepted: false });
 
@@ -125,7 +126,7 @@ describe('a copy sent to you', () => {
     at('/warbands');
     const list = await screen.findByRole('list', { name: 'Sent to you' });
     expect(within(list).getAllByRole('listitem')).toHaveLength(2);
-    await user.click(within(within(list).getAllByRole('listitem')[1]!).getByRole('button', { name: 'Decline' }));
+    await user.click(within(within(list).getAllByRole('listitem')[0]!).getByRole('button', { name: 'Decline' }));
     expect(await within(list).findAllByRole('listitem')).toHaveLength(1);
     await user.click(within(list).getByRole('button', { name: 'Take it' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'The Ardent Caravan' })).toBeTruthy();
