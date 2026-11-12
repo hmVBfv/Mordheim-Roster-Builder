@@ -1269,6 +1269,14 @@
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
 }
 
+/* the head of a row is a line: name, casting value, and "known" – spaced by the gap, not run on with dots (#255) */
+.loreHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
 .loreDiff[data-known] {
   padding: 1px var(--space-2);
   border-radius: var(--radius);

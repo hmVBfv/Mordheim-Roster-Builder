@@ -37,4 +37,22 @@ describe('the spell list marks what the caster has learned (#149)', () => {
     expect(cast.textContent).toMatch(/cast on \d\(−1\)\+/);
     expect(rows.filter((r) => r.querySelector('[data-cast][data-known="true"]'))).toHaveLength(1);
   });
+
+  /* Bug 255 (Rob, 12.11.2026): the dot that ran the casting value on after the name sat inside the green chip and pushed it off the line. The
+     chip holds the casting value and nothing else; the row's head is laid out as a line, not as text with dots. */
+  it('keeps the casting value chip free of a dot, and the head of a row free of separators', () => {
+    let s = createWarband(data, 'caravans', null, 'The Grey Company');
+    s = core.addUnit(ctx(s), 'magician');
+    s = structuredClone(s);
+    const wiz = s.models[0]!;
+    const school = core.casterLore(ctx(s), wiz)!;
+    const name = data.SPELLS[school]!.spells.find(([n]) => /\(\d+\)\s*$/.test(String(n)))![0];
+    wiz.spells = [{ name, red: 0 }];
+    render(<MemoryRouter><Board v={rosterView(data, s)} acts={acts} /></MemoryRouter>);
+    const rows = within(screen.getByRole('list', { name: /^Spell list:/ })).getAllByRole('listitem');
+    const casts = rows.map((r) => r.querySelector('[data-cast]')).filter((c): c is Element => c !== null);
+    expect(casts.length).toBeGreaterThan(0);
+    for (const c of casts) expect(c.textContent).toMatch(/^cast on (\d+|auto)(\(−\d+\))?\+?$/); // nothing before it, no dot
+    for (const r of rows) expect(r.querySelector(':scope > span')!.textContent).not.toContain('·'); // no dot in the head of the row
+  });
 });
