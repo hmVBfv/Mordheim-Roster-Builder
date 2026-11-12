@@ -208,7 +208,6 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
       ) : (
         <p className={styles.empty}>Gains no experience.</p>
       )}
-      {w && (w.away || w.follows || acts?.participation) && <NextBattles w={w} acts={acts} />}
       {acts && (
         <div className={styles.acts}>
           {w?.takePlace && <button type="button" className={`${styles.btn} ${styles.gold}`} onClick={acts.advance}>Take a fallen Hero's place</button>}
@@ -239,6 +238,7 @@ function Overview({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
         </Section>
       )}
       {u.rules.length > 0 && <Section title="Special rules"><Facts items={u.rules} chips /></Section>}
+      {w && (w.away || w.follows || acts?.participation) && <NextBattles w={w} acts={acts} />}
     </>
   );
 }
@@ -277,7 +277,7 @@ function Skills({ u, acts }: { u: WarriorView | HireView; acts?: UnitActs }) {
           <ul className={styles.lore} aria-label={`Spell list: ${u.lore.name}`}>
             {u.lore.spells.map((sp) => (
               <li key={sp.name} className={sp.known ? styles.loreKnown : undefined} data-known={sp.known || undefined}>
-                <span><b>{sp.name}</b>{sp.diff && <span className={styles.loreDiff} data-cast data-known={sp.known || undefined}> · cast on {sp.diff}{sp.red > 0 && `(−${sp.red})`}{sp.diff === 'auto' ? '' : '+'}</span>}{sp.known && <span className={styles.loreMark}> · known</span>}</span>
+                <span className={styles.loreHead}><b>{sp.name}</b>{sp.diff && <span className={styles.loreDiff} data-cast data-known={sp.known || undefined}>cast on {sp.diff}{sp.red > 0 && `(−${sp.red})`}{sp.diff === 'auto' ? '' : '+'}</span>}{sp.known && <span className={styles.loreMark}>known</span>}</span>
                 {sp.text && <small>{sp.text}</small>}
                 {!sp.known && u.lore!.open > 0 && acts?.learnSpell && (
                   <button type="button" className={styles.btn} onClick={() => acts.learnSpell!(sp.key)}>{`Choose ${sp.name}`}</button>

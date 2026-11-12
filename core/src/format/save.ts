@@ -45,6 +45,19 @@ function renameKeys<T>(o: Record<string, T>, map: Record<string, string> | undef
   return out;
 }
 
+/** The spells a model has learned, under their new names (data RENAMED `spells`, bug 256): a learned spell is stored as its name with the
+    difficulty in brackets, so a changed value is a new name. The reductions stay with the spell; one that is already there under the new name wins. */
+function renameSpells(spells: NonNullable<Model['spells']>, map: Record<string, string>): NonNullable<Model['spells']> {
+  if (!spells.some((x) => map[x.name])) return spells;
+  const out: NonNullable<Model['spells']> = [];
+  for (const x of spells) {
+    const name = map[x.name] ?? x.name;
+    if (out.some((y) => y.name === name)) continue;
+    out.push(name === x.name ? x : { ...x, name });
+  }
+  return out;
+}
+
 /** Loads a parsed save. Refuses only what cannot be a warband of a known
     type; everything else loads, with defaults filled in, and departures from
     the schema are reported as notes. */
@@ -76,7 +89,7 @@ export function loadSave(data: GameData, raw: unknown): LoadResult {
     if (!m.skills) m.skills = [];
     if (!m.inj) m.inj = [];
     if (!m.spells) m.spells = [];
-    if (renamed) { m.eq = renameKeys(m.eq, renamed.eq); if (m.rare) m.rare = renameKeys(m.rare, renamed.rare); }
+    if (renamed) { m.eq = renameKeys(m.eq, renamed.eq); if (m.rare) m.rare = renameKeys(m.rare, renamed.rare); if (renamed.spells) m.spells = renameSpells(m.spells, renamed.spells); }
   }
   // Saved gold is adopted verbatim: gold in hand = goldNow, whatever the
   // models would re-price to now. Older saves without it keep the treasury.

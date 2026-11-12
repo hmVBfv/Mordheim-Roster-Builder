@@ -9287,6 +9287,14 @@
    "rare": {
     "Banner von Nagarythe": "Standarte von Nagarythe"
    }
+  },
+  "darkelves": {
+   "spells": {
+    "Doombolt (8)": "Doombolt (9)",
+    "Word of Pain (9)": "Word of Pain (8)",
+    "Deathspasm (9)": "Deathspasm (10)",
+    "Black Blade of Khaine (8)": "Flamesword (8)"
+   }
   }
  }
 }

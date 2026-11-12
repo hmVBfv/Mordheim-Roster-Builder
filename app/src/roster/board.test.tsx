@@ -170,7 +170,7 @@ describe('on a desktop: the list and the selected warrior beside it', () => {
     const pane = screen.getByRole('complementary', { name: 'Selected warrior' });
     const card = within(pane).getByRole('article', { name: 'Ulrich the Grey' });
     expect(within(card).getAllByRole('heading', { level: 3 }).map((h) => h.textContent!.replace(/(Equipment|Experience|Advances taken).*/, '$1'))).toEqual([
-      'Profile', 'Experience', 'Next battles', 'Special rules', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Story and table', 'Leaving the warband',
+      'Profile', 'Experience', 'Special rules', 'Next battles', 'Equipment', 'Skills', 'Injuries', 'Advances taken', 'Story and table', 'Leaving the warband',
     ]);
     expect(screen.queryByRole('tablist')).toBeNull();
     const first = screen.getByRole('button', { name: /^Ulrich/ });
@@ -493,7 +493,7 @@ describe('the box of spells and prayers', () => {
     expect(difficulty.tagName).toBe('SMALL');
     expect(ledz.textContent).not.toMatch(/·/);
     expect(within(ledz).getByText('The Shaman’s howling invigorates the ladz to fight even harder for Gork and Mork.')).toBeTruthy();
-    expect(ledz.textContent).toMatch(/strikes first in close combat/);
+    expect(ledz.textContent).toMatch(/strike first in hand-to-hand combat/);
   });
 
   it('is not there for a warband whose units cast nothing, and shows a Hired Sword\'s school only while he is hired', () => {

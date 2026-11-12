@@ -1,6 +1,6 @@
 /* The built app on a phone-sized screen. */
 import { readFileSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { noSideScroll, boxOf, shot, tapTargets, unit, useTheme } from './helpers.ts';
 
 const SAVE = readFileSync(new URL('./fixtures/silver-caravan.json', import.meta.url), 'utf8');
@@ -154,6 +154,12 @@ test('a Wizard shows the spells of his school on his card', async ({ page }) => 
   await expect(list.getByRole('button', { name: /^Choose / })).toHaveCount(0);
   await noSideScroll(page);
   await list.scrollIntoViewIfNeeded();
+  // #255: in the known row the casting value chip sits on the line of the name, after it – not pushed off it by a dot
+  const known = list.getByRole('listitem').filter({ hasText: 'known' });
+  const nameBox = (await known.locator('b').first().boundingBox())!;
+  const chipBox = (await known.locator('[data-cast]').boundingBox())!;
+  expect(Math.abs(chipBox.y + chipBox.height / 2 - (nameBox.y + nameBox.height / 2))).toBeLessThan(6);
+  expect(chipBox.x).toBeGreaterThanOrEqual(nameBox.x + nameBox.width);
   await shot(page, 'wizard-spell-list');
 });
 
@@ -715,6 +721,27 @@ for (const theme of THEMES) {
     await expect(ulrich).toContainText(name);
   });
 }
+
+/* Wish 257 (Rob, 12.11.2026): the three choices of "Next battles" were as big as buttons that do something, and wrapped over several lines.
+   They are one calm row of small choices now, set apart from the buttons of the card. */
+test('Next battles is one small row of choices, not three big buttons', async ({ page }) => {
+  await page.goto('./');
+  await importSample(page);
+  const ulrich = await unit(page, 'Ulrich the Grey', 'Overview');
+  const group = ulrich.getByRole('group', { name: 'Next battles' });
+  await group.scrollIntoViewIfNeeded();
+  const boxes = await Promise.all((await group.getByRole('button').all()).map((b) => boxOf(b)));
+  expect(boxes).toHaveLength(3);
+  const ys = boxes.map((b) => b!.y);
+  expect(Math.max(...ys) - Math.min(...ys), 'the three choices share one line').toBeLessThan(3);
+  const font = async (l: Locator) => l.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  const choice = await font(group.getByRole('button').first());
+  const action = await font(ulrich.getByRole('button', { name: 'Advance' }));
+  expect(choice, 'smaller type than a button that does something').toBeLessThan(action);
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'next-battles-choices');
+});
 
 /* Phase 3c: injuries as rolled, with the follow-ups the chart asks for (V1). */
 for (const theme of THEMES) {

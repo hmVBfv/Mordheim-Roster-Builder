@@ -1269,6 +1269,14 @@
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
 }
 
+/* the head of a row is a line: name, casting value, and "known" – spaced by the gap, not run on with dots (#255) */
+.loreHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
 .loreDiff[data-known] {
   padding: 1px var(--space-2);
   border-radius: var(--radius);
@@ -1468,19 +1476,48 @@
 }
 
 /* whether he takes part: three buttons that wrap on a phone, and a count beside them while he misses battles */
+/* "Next battles" (#257): one small row of choices, joined like a switch – not three buttons that do something. The type is smaller and
+   the choices share the width; the height stays a finger's (docs/ui.md §5). */
 .partRow {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.partRow .btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 var(--space-2);
+  border-radius: 0;
+  font-size: 0.85rem;
+  line-height: 1.15;
+  text-align: center;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.partRow .btn + .btn {
+  margin-left: -1px;
+}
+
+.partRow .btn:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.partRow .btn:nth-child(3) {
+  border-radius: 0 var(--radius) var(--radius) 0;
 }
 
 .partRow .btn[aria-pressed='true'] {
+  position: relative;
   background: var(--surface-2);
   border-color: var(--accent);
+  color: var(--text);
   font-weight: 600;
 }
 
 .partRow .stepper {
-  margin-left: auto;
+  flex: 0 0 100%;
+  justify-content: center;
 }

@@ -2,7 +2,7 @@
  "SPELLS": {
   "dwarfRunes": {
    "name": "Dwarf Minor Runes",
-   "note": "Runesmith (Dwarf Rangers). Before each game he may inscribe one known rune on an item carried by a warband member (two items with an Apprentice): roll 2D6 ≥ difficulty = item gains the bonus for that game; a roll of 2 destroys the item. New runes may be learned instead of skills on advances. Jealousy of Runes: Rune bonuses never stack with other magical item bonuses.",
+   "note": "Runesmith (Dwarf Rangers); the leader is a younger Runesmith who knows one of these minor runes. Before each game he may inscribe one known rune on an item carried by a warband member (two items with an Apprentice): roll 2D6 — on the rune's difficulty or more the item gains the bonus FOR THAT GAME, any other failure gives no bonus. A roll of 2 is a fumble: the item is destroyed and removed from the warrior's list (it may be replaced before the game if the warband has the gold). New runes may be learned instead of skills on advances. The Jealousy of Runes: bonuses from runes are not cumulative with magical bonuses from other items — a Rune of Stone on a shield and another on armour do not add up to +2, nor does a rune combine with magic armour that adds +1 to the Armour Save.",
    "spells": [
     [
      "Rune of Stone (8)",
@@ -14,19 +14,19 @@
     ],
     [
      "Rune of Speed (7)",
-     "Initiative doubled while using this weapon."
+     "Initiative doubled on the weapon."
     ],
     [
      "Rune of Warding (8)",
-     "Special 4+ save vs. spells affecting the bearer (on belt/armband; replace cost 1 gc)."
+     "Special 4+ save vs. spells affecting the target (placed on belt, armband, etc.). Cost to replace: 1 gc."
     ],
     [
      "Rune of Accuracy (9)",
-     "+1 to hit with this weapon."
+     "+1 to hit with the weapon."
     ],
     [
      "Rune of Striding (8)",
-     "+1 Movement (on boots/belt; replace cost 1 gc)."
+     "+1 Movement (placed on boots, belt, etc.). Cost to replace: 1 gc."
     ]
    ]
   },
@@ -36,57 +36,57 @@
    "spells": [
     [
      "Song of Thorns (8)",
-     "Victim within 8\" suffers 2D6 Strength 1 hits (branches or flying wood chips strike the foe)."
+     "Branches strike out to the foe under influence of the singer cadence. If no plants are present wooden chips fly at the victim, as if they want to be thorns… Victim suffers 2D6 S1 hits, range 8\"."
     ],
     [
      "Murmuring of the Wind (7)",
-     "The caster may move anywhere within 12\"; if he moves into base contact it counts as a charge."
+     "Very softly the wind increases around the caster and takes him wherever he wants. Caster may move anywhere within 12\", if he gets into HtH it counts as a charge."
     ],
     [
      "The Rain Song (9)",
-     "Everything except Wood Elves within 6\" of the caster suffers −1 to hit and −1 Initiative until the start of the caster's next magic phase."
+     "The air around the caster becomes moist and it starts to rain, until it looks like a major downpour… Everything, except Woodelves, within 6\" of the caster suffers −1 to hit and suffers −1 Initiative. This lasts until the beginning of the caster's next magic phase."
     ],
     [
      "Lyrics of Feral Infatuation (8)",
-     "Any animal or monster must pass a Leadership test (on its own Ld) to attack; if it fails it does nothing that turn — not even fighting back if attacked."
+     "This soothing song seems to calm even the most ferocious monsters and sends them into a lethargic state. Any animal or monster has to pass a Ld-test, on his own Ld, in order to attack an opponent. If it fails it will do nothing else that turn, not even fighting back if attacked."
     ],
     [
      "Song of the Sun (6)",
-     "Target within 18\" is −1 Movement until the caster's next magic phase and must take a test; if it fails it suffers a Strength 4 hit."
+     "While the caster sings his victim believes he is in a scorching desert. His movement slows and throat becomes parched. The target must be within 18\" and is −1M until the caster's next magic phase, he also must make a test, if he fails, he suffers a S4 hit."
     ],
     [
      "Eagle's Cry (8)",
-     "All Wood Elves within 6\" gain +1 to hit and +1 on the critical hit table until the start of the caster's next magic phase."
+     "The caster utters a melodious cry, which sounds like a great eagle. This inspires the elves so much they gain the legendary sight of Thuarindir. All Wood elves within 6\" gain +1 to hit and +1 on the critical hit table. This lasts until the beginning of the caster's next magic phase."
     ]
    ]
   },
   "chaosRituals": {
    "name": "Chaos Rituals",
-   "note": "Magister of the Cult of the Possessed.",
+   "note": "Magister of the Cult of the Possessed; also used by Daemons, Beastmen and a Marauders of Chaos Seer with the Mark of Chaos Undivided.",
    "spells": [
     [
      "Vision of Torment (10)",
-     "The nearest enemy within 6\" is stunned (if it cannot be stunned: knocked down)."
+     "This spell has a range of 6\" and must be cast on the closest enemy model. If the Chaos Mage is in hand-to-hand combat, he must choose his target from those in base contact with him. The affected model is immediately stunned. If the model cannot be stunned it is knocked down instead."
     ],
     [
      "Eye of God (7)",
-     "Once per battle; a model within 6\": D6 — 1 = OOA; 2-5 = +1 to one characteristic; 6 = +1 to all characteristics (for the battle)."
+     "You may use the Eye of God successfully only once per battle. Choose any single model within 6\", friend or foe. Roll a D6 to see what happens to the affected model. D6: 1 = The wrath of the gods descends upon the target. The model is taken out of action immediately. He does not have to roll on the Serious Injury chart after the battle though; 2-5 = The model gains +1 to any one of his characteristics during this battle (chosen by the player who cast the spell); 6 = The model gains +1 to all of its characteristics for the duration of the battle."
     ],
     [
      "Dark Blood (8)",
-     "Range 8\": D3 S5 hits on the first model. The caster rolls for injury on himself (OOA→stunned)."
+     "This attack has a range of 8\" and causes D3 S5 hits. It hits the first model in its path. After using this spell the Chaos Mage must roll on the Injury table for himself to see how dangerous the wound is, though treat the out of action result as stunned instead."
     ],
     [
      "Lure of Chaos (9)",
-     "Nearest enemy within 12\": compare Ld+D6 of both sides; if the Magister wins, he controls the model."
+     "The spell has a range of 12\" and must be cast on the closest enemy model. Roll a D6 and add the Chaos Mage's Leadership to the score. Then roll a D6 and add the target's Leadership to the score. If the Chaos Mage beats his opponent's score he gains control of the model until the model passes a Leadership test in his own recovery phase. The model may not commit suicide, but can attack models on his own side, and will not fight warriors from the Chaos Mage's warband. If he was engaged in hand-to-hand combat with any warriors of the Chaos Mage's warband, they will immediately move 1\" apart. FAQ: Neither the caster nor the target may use a Leader's Leadership for this contest. The controlled model acts in the controlling player's own turn, so it can shoot at once if it has a missile weapon. The spell has no set end: the Magister may cast it again (also on other models) and control several models at once."
     ],
     [
      "Wings of Darkness (7)",
-     "Move up to 12\" immediately — even into base contact (counts as a charge)."
+     "The Chaos Mage may immediately move anywhere within 12\", including into base contact with an enemy, in which case he counts as charging. If he engages a fleeing enemy, in the close combat phase he will score one automatic hit and then his opponent will flee again (if he survives)."
     ],
     [
      "Word of Pain (7)",
-     "All within 3\" (friend & foe): 1 S3 hit each, no armour save."
+     "All models within 3\" of the Chaos Mage, friend or foe, suffer one S3 hit. No armour saves are allowed. FAQ: Spells that cause direct damage, such as this one, never cause critical hits."
     ]
    ],
    "lore": {
@@ -109,27 +109,27 @@
     ],
     [
      "Tchar's Blessing (auto)",
-     "Before the game, once only. The Seer cannot cast spells this battle; afterwards +D3 Experience if not taken out of action."
+     "This spell must be used before the game and may only be used once. The Seer may not cast spells in the following battle. After the game he gains D3 Experience points if he wasn't taken out of action."
     ],
     [
      "Dispel Magic (7)",
-     "Ends all currently active spell effects."
+     "The Seer ends all effects of currently active spells."
     ],
     [
      "Foresight (10)",
-     "Before the game, once only. Choose a warband: One randomly determined Hero of it must miss the next game (spellcasters/priests immune)."
+     "This spell must be used before the game and may only be used once. Choose a warband. One randomly determined Hero of that warband must miss the following game. Models that are capable of casting spells or prayers are immune to this effect."
     ],
     [
      "Wrath of the Great Eagle (9)",
-     "Enemy within 12\": hit with Strength equal to the difference between the Seer's and the model's Experience (max. 10). If the victim has more Experience, the Seer is hit instead. Armour saves as normal."
+     "Choose one enemy model within 12\". The model is hit with a Strength equal to the difference of the Seer's Experience points and the model's Experience (to a maximum of 10). Armour saves are taken as normal. If the victim has more Experience points than the Seer, the latter is hit instead."
     ],
     [
      "Tchar's Reward (8)",
-     "+1 to any one stat per 10 Experience the Seer has (each stat only once). Lasts until the end of the Seer's next shooting phase and may be re-cast then."
+     "The Seer gets +1 on any one stat per 10 Experience points he has. Each stat may be increased only once through this spell. The power of Tchar's Reward lasts until the end of the Seer's next shooting phase and can be re-cast in that phase. FAQ: When the temporary Wound is lost after the Seer has been wounded, he must roll on the Injury chart (unless the spell is cast again): ending the spell counts as losing his last Wound. Increasing Wounds with this spell is generally a bad idea."
     ],
     [
      "Slave to Chaos (9)",
-     "Range 12\": one S2 hit, no armour save. If taken out of action, roll for Serious Injuries at once; if it dies, replace it with a Horror of Tzeentch until the end of the game. If the Seer is stunned/OOA the Horror disappears."
+     "This spell has a range of 12\" and causes one Strength 2 hit with no armour save. If the model is taken out of action roll for Serious Injuries immediately. If they die replace the killed warrior with a Horror of Tzeentch (see Bestiary for rules) until the end of the game. If the Seer is stunned or taken out of action the Horror disappears into the Realm of Chaos."
     ],
     [
      "▸ Mark of Shornaal the Serpent — Shornaal Rituals",
@@ -137,27 +137,27 @@
     ],
     [
      "Delicious Suffering (8)",
-     "All models within 3\" (friend & foe, except the Seer): Ld test or knocked down."
+     "All models (friend and foe, except for the Seer) within 3\" must pass a Ld test or are knocked down."
     ],
     [
      "Dance of the Serpent (8)",
-     "Enemy models not immune to psychology suffer −1 to hit against him in close combat. Lasts until the start of the Seer's next shooting phase."
+     "All enemy models that are not immune to psychology suffer a −1 'to hit' against him in close combat. The Dance lasts until the beginning of the Seer's next shooting phase."
     ],
     [
      "Endless Torment (9)",
-     "Enemy within 8\": from now on it rolls −1 for injury after its Recovery phase. The Seer can do nothing else but end the spell at the start of his turn; if attacked in close combat he is hit automatically and the spell breaks."
+     "Choose one enemy model within 8\". From now on the model must roll for injury −1 after its Recovery phase. For the duration of the Torment the Seer can do nothing else but end the spell at the beginning of his turn and if attacked in close combat, he is hit automatically and the spell breaks."
     ],
     [
      "Mystify (8)",
-     "Enemy within 8\": Initiative reduced to 1, always strikes last (even when charging or armed with a spear). Until the target passes a Ld test in its recovery phase."
+     "Target enemy model within 8\" will have their Initiative value reduced to 1 and will always strike last in close combat, even if they charge an opponent or are armed with a spear or pike and are charged themselves. This spell lasts until the target passes a Ld test during the recovery phase."
     ],
     [
      "A Thousand Voices (8)",
-     "Enemy within 12\": Ld −(D3+1) (min. 2) if not immune to psychology. A Ld test at the start of its turn ends it; also breaks if the Seer loses a wound. One model at a time."
+     "Choose one enemy model within 12\". For the duration of the spell the model reduces its Ld by D3 +1 (to a minimum of 2) if it is not immune to psychology. The model must pass a Ld test at the beginning of its turn to end the spell. The spell breaks also when the Seer loses a wound. A Thousand Voices can only enchant one model at a time."
     ],
     [
      "Shornaal's Temptation (7)",
-     "Enemy within 8\" (not immune to psychology): Ld test or the Seer gains control of it. One model at a time; if the Seer is hit, Ld test or the spell ends."
+     "Choose one enemy model within 8\" that is not immune to psychology. The model must pass a Ld test. If the model fails, then the Seer gains control over the model. The player may attempt to regain control at the beginning of his turn by passing a Ld test. Shornaal's Temptation can only enchant one model at a time. If the Seer is hit whether by a missile or in close combat he must pass a Ld test or the spell ends. FAQ: A Necromancer who fails the test comes under the caster's control and any Scarecrow bond is broken at once (the Scarecrow is taken out of action); a Liche is immune to psychology and passes automatically. Chained cases: if Seer 1 controls warrior X and Seer 2 then tempts Seer 1, Seer 1's earlier control ends, Seer 1 comes under Seer 2's control and X returns to its original controller."
     ],
     [
      "▸ Mark of Onogal the Crow — Nurgle Rituals",
@@ -165,7 +165,7 @@
     ],
     [
      "Touch of Onogal (10)",
-     "Against one of the Seer's close-combat opponents: If he takes it out of action in the following close-combat phase, roll for Serious Injuries at once; if it dies permanently, replace it with a Nurgle Plague Bearer under the Seer's control until the end of the game (max. 1 at a time)."
+     "This spell can be used against one of the Seer's close combat opponents. If he takes the model out of action in the following hand-to-hand combat phase, that player rolls for Serious Injuries immediately. If the model dies permanently, replace it with a Nurgle Plague Bearer (see Bestiary for rules) for the rest of the game under the Seer's control. If the Seer is stunned or taken out of action the Plague Bearer disappears into the Realm of Chaos. Note that only one Plague Bearer can be created at a time."
     ],
     [
      "▸ Mark of Arkhar the Dog — Bloodfather",
@@ -199,27 +199,27 @@
    "spells": [
     [
      "Tchar's Blessing (auto)",
-     "Before the game, once only. The caster cannot cast spells this battle; afterwards +D3 Experience if not taken out of action."
+     "This spell must be used before the game and may only be used once. The Seer may not cast spells in the following battle. After the game he gains D3 Experience points if he wasn't taken out of action."
     ],
     [
      "Dispel Magic (7)",
-     "Ends all currently active spell effects."
+     "The Seer ends all effects of currently active spells."
     ],
     [
      "Foresight (10)",
-     "Before the game, once only. Choose a warband: One randomly determined Hero of it must miss the next game (spellcasters/priests immune)."
+     "This spell must be used before the game and may only be used once. Choose a warband. One randomly determined Hero of that warband must miss the following game. Models that are capable of casting spells or prayers are immune to this effect."
     ],
     [
      "Wrath of the Great Eagle (9)",
-     "Enemy within 12\": hit with Strength equal to the difference between the caster's and the model's Experience (max. 10). If the victim has more Experience, the caster is hit instead. Armour saves as normal."
+     "Choose one enemy model within 12\". The model is hit with a Strength equal to the difference of the Seer's Experience points and the model's Experience (to a maximum of 10). Armour saves are taken as normal. If the victim has more Experience points than the Seer, the latter is hit instead."
     ],
     [
      "Tchar's Reward (8)",
-     "+1 to any one stat per 10 Experience the caster has (each stat only once). Lasts until the end of the caster's next shooting phase and may be re-cast then."
+     "The Seer gets +1 on any one stat per 10 Experience points he has. Each stat may be increased only once through this spell. The power of Tchar's Reward lasts until the end of the Seer's next shooting phase and can be re-cast in that phase. FAQ: When the temporary Wound is lost after the Seer has been wounded, he must roll on the Injury chart (unless the spell is cast again): ending the spell counts as losing his last Wound. Increasing Wounds with this spell is generally a bad idea."
     ],
     [
      "Slave to Chaos (9)",
-     "Range 12\": one S2 hit, no armour save. If taken out of action, roll for Serious Injuries at once; if it dies, replace it with a Horror of Tzeentch until the end of the game. If the caster is stunned/OOA the Horror disappears."
+     "This spell has a range of 12\" and causes one Strength 2 hit with no armour save. If the model is taken out of action roll for Serious Injuries immediately. If they die replace the killed warrior with a Horror of Tzeentch (see Bestiary for rules) until the end of the game. If the Seer is stunned or taken out of action the Horror disappears into the Realm of Chaos."
     ]
    ],
    "lore": {
@@ -238,27 +238,27 @@
    "spells": [
     [
      "Delicious Suffering (8)",
-     "All models within 3\" (friend & foe, except the caster): Ld test or knocked down."
+     "All models (friend and foe, except for the Seer) within 3\" must pass a Ld test or are knocked down."
     ],
     [
      "Dance of the Serpent (8)",
-     "Enemy models not immune to psychology suffer −1 to hit against him in close combat. Lasts until the start of the caster's next shooting phase."
+     "All enemy models that are not immune to psychology suffer a −1 'to hit' against him in close combat. The Dance lasts until the beginning of the Seer's next shooting phase."
     ],
     [
      "Endless Torment (9)",
-     "Enemy within 8\": from now on it rolls −1 for injury after its Recovery phase. The caster can do nothing else but end the spell at the start of his turn; if attacked in close combat he is hit automatically and the spell breaks."
+     "Choose one enemy model within 8\". From now on the model must roll for injury −1 after its Recovery phase. For the duration of the Torment the Seer can do nothing else but end the spell at the beginning of his turn and if attacked in close combat, he is hit automatically and the spell breaks."
     ],
     [
      "Mystify (8)",
-     "Enemy within 8\": Initiative reduced to 1, always strikes last (even when charging or armed with a spear). Until the target passes a Ld test in its recovery phase."
+     "Target enemy model within 8\" will have their Initiative value reduced to 1 and will always strike last in close combat, even if they charge an opponent or are armed with a spear or pike and are charged themselves. This spell lasts until the target passes a Ld test during the recovery phase."
     ],
     [
      "A Thousand Voices (8)",
-     "Enemy within 12\": Ld −(D3+1) (min. 2) if not immune to psychology. A Ld test at the start of its turn ends it; also breaks if the caster loses a wound. One model at a time."
+     "Choose one enemy model within 12\". For the duration of the spell the model reduces its Ld by D3 +1 (to a minimum of 2) if it is not immune to psychology. The model must pass a Ld test at the beginning of its turn to end the spell. The spell breaks also when the Seer loses a wound. A Thousand Voices can only enchant one model at a time."
     ],
     [
      "Shornaal's Temptation (7)",
-     "Enemy within 8\" (not immune to psychology): Ld test or the caster gains control of it. One model at a time; if the caster is hit, Ld test or the spell ends."
+     "Choose one enemy model within 8\" that is not immune to psychology. The model must pass a Ld test. If the model fails, then the Seer gains control over the model. The player may attempt to regain control at the beginning of his turn by passing a Ld test. Shornaal's Temptation can only enchant one model at a time. If the Seer is hit whether by a missile or in close combat he must pass a Ld test or the spell ends. FAQ: A Necromancer who fails the test comes under the caster's control and any Scarecrow bond is broken at once (the Scarecrow is taken out of action); a Liche is immune to psychology and passes automatically. Chained cases: if Seer 1 controls warrior X and Seer 2 then tempts Seer 1, Seer 1's earlier control ends, Seer 1 comes under Seer 2's control and X returns to its original controller."
     ]
    ],
    "lore": {
@@ -277,27 +277,27 @@
    "spells": [
     [
      "Touch of Onogal (10)",
-     "Against one of the caster's close-combat opponents: if he takes it out of action in the following close-combat phase, roll for Serious Injuries at once; if it dies permanently, replace it with a Nurgle Plague Bearer under the caster's control until the end of the game (max. 1 at a time)."
+     "This spell can be used against one of the Seer's close combat opponents. If he takes the model out of action in the following hand-to-hand combat phase, that player rolls for Serious Injuries immediately. If the model dies permanently, replace it with a Nurgle Plague Bearer (see Bestiary for rules) for the rest of the game under the Seer's control. If the Seer is stunned or taken out of action the Plague Bearer disappears into the Realm of Chaos. Note that only one Plague Bearer can be created at a time."
     ],
     [
      "Buboes (7)",
-     "Range 8\", one enemy warrior: Toughness test or lose a Wound, no armour save."
+     "This spell has a range of 8\" and affects a single enemy warrior. The warrior must pass a Toughness test or lose a Wound. No Armour saves are allowed."
     ],
     [
      "Stench of Nurgle (8)",
-     "Range 6\", all living creatures (friend & foe): each enemy passes a Toughness test or loses an Attack until its next turn."
+     "This spell has a range of 6\" and affects all living creatures — friend or foe. Each enemy warrior in range must pass a Toughness test or lose an Attack until their next turn."
     ],
     [
      "Pestilence (10)",
-     "All enemy models within 12\": one S3 hit each, no armour save."
+     "All enemy models within 12\" of the Master suffer a Strength 3 hit. No Armour saves are allowed."
     ],
     [
      "Scabrous Hide (8)",
-     "The caster gains a 2+ armour save (replaces any normal save) until the beginning of his next shooting phase."
+     "The Master has an armour save of 2+ which replaces any normal Armour save. The Scabrous Hide lasts until the beginning of his next Shooting phase."
     ],
     [
      "Nurgle's Rot (9)",
-     "All enemies in base contact: Toughness test or contract Nurgle's Rot."
+     "All enemy models in base contact with the Master must immediately test against their Toughness or contract Nurgle's Rot (see Nurgle's Rot)."
     ]
    ],
    "lore": {
@@ -315,27 +315,27 @@
    "spells": [
     [
      "Spectre of Hashut (9)",
-     "The enemy model nearest to the sorcerer within 10\" is automatically stunned."
+     "Designate the enemy miniature closest to the wizard's miniature within 10\". That miniature is automatically stunned."
     ],
     [
      "Stone Statue (9)",
-     "Enemy within 12\" and line of sight: for this turn and the next it can do nothing; if attacked in close combat it is hit automatically; anyone shooting at it gets +1 to hit."
+     "Choose an enemy miniature that is within 12\" of you and is in your line of sight. For the rest of the turn and the following turn, the miniature will not be able to do anything. If attacked in melee, the miniature will suffer an automatic hit. If it is shot, the miniature that shoots at it will get a +1 bonus on hit."
     ],
     [
      "Fireball (7)",
-     "Range 16\", line of sight: the target takes one automatic Strength 4 hit."
+     "This spell has a range of 16\" and requires line of sight. The target receives an automatic hit of strength 4."
     ],
     [
      "Vanish (7)",
-     "The sorcerer immediately moves up to 6\" in any direction and may enter or leave close combat without penalty; entering combat counts as a charge."
+     "The wizard may immediately make a move of up to 6\" in any direction and may enter or leave combat without penalty. If he enters combat, he is considered to be making a charge move."
     ],
     [
      "Eruption (8)",
-     "All models within 4\" (friend & foe) take one automatic Strength 4 hit. The sorcerer may not cast next turn and suffers −1 Toughness."
+     "All miniatures within a distance of up to 4\" (friend or foe) suffer an automatic hit of Strength 4. After resolving the effects of this hit, the sorcerer will not be able to cast any more spells until the next turn and will suffer a −1 to his Toughness attribute."
     ],
     [
      "Eye of Hashut (6)",
-     "Once per battle. Friendly model within 12\", roll D6 (Hobgoblins −1): 1 = out of action (no injury roll); 2-5 = +1 to one attribute; 6 = +1 to all attributes (rest of the game)."
+     "Choose a friendly miniature within 12\" and roll 1D6. Hobgoblins always subtract 1 from the result. You may use the Eye of Hashut successfully only once per battle. 1D6: 1 = Hashut does not trust you. The miniature is immediately out of action, although it will not roll on the serious injury table during the post-battle sequence; 2-5 = Hashut trusts you. The miniature adds +1 to one of its attributes for the rest of the game; 6 = Hashut favors you. The miniature adds +1 to all attributes for the rest of the game."
     ]
    ],
    "lore": {
@@ -354,31 +354,31 @@
    "spells": [
     [
      "Sacrificial Ritual (10)",
-     "The Sorcerer must be in base contact with an Engine of Chaos. Remove one captive from the Engine (and its warband's roster) as a sacrifice; he may sacrifice further captives before rolling, each lowering the difficulty by −1. The Sorcerer gains +D3 Experience."
+     "The Chaos Dwarf Sorcerer must be in contact with an Engine of Chaos in order to successfully cast this spell. As the ritual requires the sacrifice of a mortal, remove one captive model from the Engine of Chaos and its starting warband's roster. The Sorcerer may sacrifice additional captives to lower the spell's difficulty by −1 per sacrifice. These models must be sacrificed before rolling for Difficulty. The Chaos Dwarf Sorcerer gains +D3 Experience."
     ],
     [
      "Spirit of Hashut (9)",
-     "Draw a line 18\" from the Sorcerer; every model the line crosses suffers one Strength 4 hit."
+     "The player draws a line 18\" from the Sorcerer. All models crossed by the line, suffer one S4 hit."
     ],
     [
      "Bellow of Doom (8)",
-     "All models in base contact with the Sorcerer must immediately pass a Leadership test or break from combat and run."
+     "All models engaged in base contact with the sorcerer must make an immediate Ld test or break from combat and run."
     ],
     [
      "Fumes of Azgorh (7)",
-     "Range 8\": every model in the path is hit on a D6 of 4+, suffering a Strength 4 hit with no armour save allowed."
+     "The spell has a range of 8\", hitting all models in its path on a D6 score of 4+. Any model hit suffers a S4 hit, roll to wound as normal. No armour saves allowed."
     ],
     [
      "Flickering Hide (10)",
-     "Cast on the Sorcerer or a model within 6\": it negates one wound on a 4+, and any model that hits it in close combat suffers one Strength 3 hit per hit scored. Lasts until the start of the Sorcerer's next shooting phase."
+     "The Sorcerer may cast this spell upon himself or any one model within 6\". The flaming hide will negate any one wound suffered on a D6 roll of 4+. In hand-to-hand combat, any model which hits the flaming hide will suffer one S3 hit for each hit scored. The Flaming Hide lasts until the beginning of the Sorcerer's next shooting phase."
     ],
     [
      "Lava Flow (7)",
-     "The Sorcerer moves 12\" in any direction, even into combat (counts as a charge); he may only reappear on or below ground level."
+     "The Sorcerer may move 12\" in any direction, even into combat, counting as a charge. However, due to the nature of this spell the Sorcerer may only reappear on or below the ground."
     ],
     [
      "Earthquake (9)",
-     "All models within 3\" (friend & foe) must roll equal to or under their Initiative or suffer D3 Strength 4 hits."
+     "All models within 3\" of the Sorcerer, friend or foe alike, must roll equal to or under their Initiative or suffer D3 S4 hits."
     ]
    ],
    "lore": {
@@ -397,27 +397,27 @@
    "spells": [
     [
      "Lady's Favors (auto)",
-     "All your Heroes count as having Lucky Charms this battle (ignore the first hit against them on a 4+). A Hero who already owns a Lucky Charm may instead re-roll a failed Lucky Charm save."
+     "All your heroes count as having Lucky Charms for this battle and ignore the first hit against them on a D6 roll of 4+. If they already own Lucky Charms, they may reroll a failed Lucky Charm save, accepting the second result."
     ],
     [
      "Blessed Protection (8)",
-     "The Damsel and any Bretonnians within 6\" gain an unmodified 4+ ward save against spells and prayers. Each shooting phase roll a D6 — on a 1-2 the prayer dissipates."
+     "The Damsel and any Bretonnians within 6\" of her gain an unmodified ward save of 4+ against the effects of spells or prayers. Test each shooting phase: on a roll of 1 or 2, the spell dissipates."
     ],
     [
      "Swiftstride (7)",
-     "Pick a friendly hero or henchman within 12\" (including herself) that charged or failed a charge this turn: it gains +1 to hit until the end of the turn, and if not in combat may make an extra 1D6\" move toward an enemy (counts as a charge if it reaches base contact)."
+     "The damsel may pick a friendly hero or henchman (including herself) within 12\" that charged or failed a charge this turn. That warrior gains +1 to hit on all attacks they make until the end of the turn. In addition, if they are not in combat, they may make an additional move of 1D6\" towards an enemy (if they move into base contact with an enemy, this counts as a charge)."
     ],
     [
      "Lady's Scorn (5)",
-     "Anyone trying to shoot at the Damsel must first pass a Leadership test or cannot fire this turn (includes pistols and template weapons whose path she is in). Lasts until the end of the game."
+     "Anyone attempting to shoot at the Damsel must first pass a Leadership test, or else they are unable to fire this turn. This includes Silver Arrows, Crossbow Pistols, Hand-to-Hand Pistols, and Template shot weapons that she is within the path of (like Blunderbusses.) This spell lasts until the end of the game."
     ],
     [
      "Elixir of Life (7)",
-     "One model within 4\" of the Damsel (including herself) is restored to its full Wounds; any friendly models within 4\" that are stunned or knocked down immediately stand up and fight on."
+     "Any one model within 4\" of the Damsel (including herself) may be healed. The warrior is restored to his full quota of Wounds. In addition, if any friendly models within 4\" are stunned or knocked down, they immediately come to their senses, stand up, and continue fighting as normal."
     ],
     [
      "Guiding Vision (6)",
-     "Pick a friendly hero or henchman within 8\": until the start of your next shooting phase it may re-roll one die roll and add +1 or −1 to the result."
+     "The Damsel picks a friendly hero or henchman within 8\". Until the start of your next shooting phase, that warrior may re-roll one die roll they make and add +1 or −1 to the result."
     ]
    ]
   },
@@ -427,27 +427,27 @@
    "spells": [
     [
      "Hammer of Sigmar (7)",
-     "+2 S in close combat, all hits cause double damage; re-test each shooting phase."
+     "The wielder gains +2 Strength in hand-to-hand combat and all hits he inflicts cause double damage (e.g., 2 wounds instead of 1). The Priest must test each shooting phase he wants to use the Hammer. FAQ: The Hammer can be maintained for many turns while the Priest casts other prayers; if he fails to maintain it he may not try to cast it again in the same shooting phase. Its hits can cause critical hits. An additional hand weapon, buckler or shield may be used alongside it; it cannot be cast and maintained twice."
     ],
     [
      "Hearts of Steel (8)",
-     "Allies within 8\" immune to fear & all-alone; the whole warband +1 to rout tests (until the caster is KD/stunned/OOA)."
+     "Any allied warriors within 8\" of the warrior become immune to fear and all alone tests. In addition, the whole warband gains +1 to any Rout tests they have to make. The effects of this spell last until the caster is knocked down, stunned or put out of action. If cast again the effects are not cumulative, i.e., the maximum bonus to Rout tests remains +1."
     ],
     [
      "Soulfire (9)",
-     "All enemies within 4\": S3 hits with no armour save (Undead/Possessed: S5)."
+     "All enemy models within 4\" of the servant of Sigmar suffer a Strength 3 hit. No armour saves are allowed. The servants of darkness and Chaos are especially susceptible to Sigmar's holy power. Undead and Possessed models in range suffer a Strength 5 hit instead. FAQ: It affects models above and below the Priest as well: the range is a sphere."
     ],
     [
      "Shield of Faith (6)",
-     "Priest immune to all spells; in each recovery phase on 1-2 the shield ends."
+     "The Priest is immune to all spells. Roll at the beginning of each turn in the recovery phase. On a roll of 1 or 2 the shield disappears."
     ],
     [
      "Healing Hand (5)",
-     "A model within 2\" (including himself) restored to full wounds; stunned/knocked-down allies within 2\" stand up."
+     "Any one model within 2\" of the Priest (including himself) may be healed. The warrior is restored to his full quota of Wounds. In addition, if any friendly models within 2\" are stunned or knocked down, they immediately come to their senses, stand up, and continue fighting as normal."
     ],
     [
      "Armour of Righteousness (9)",
-     "2+ armour save, causes fear & immune to fear (until the next shooting phase)."
+     "The Priest has an armour save of 2+ which replaces his normal armour save. In addition, he causes fear in his enemies and is therefore immune to fear himself. The power of the Armour of Righteousness lasts until the beginning of the Priest's next Shooting phase."
     ]
    ],
    "lore": {
@@ -466,31 +466,31 @@
    "spells": [
     [
      "Spell of Awakening (auto)",
-     "If an enemy Hero is killed (opponent rolls 11-15 on the Serious Injury chart after the battle), raise him as a Zombie in your service. He keeps his characteristics, weapons and armour but may not use equipment or skills, may not run, forms his own Henchman group and gains no Experience."
+     "If an enemy Hero is killed (i.e. your opponent rolls 11-15 on the serious injury chart after the battle), then the sorcerer may raise him to fight as a Zombie in his servitude. The dead Hero retains his characteristics and all his weapons and armour but may not use any equipment or skills. He may no longer run, counts as a Henchmen group on his own and does not gain additional experience."
     ],
     [
      "Lifestealer (10)",
-     "Choose a model within 6\": it suffers a wound (no saves) and the caster gains an extra wound for the battle. A Necromancer may exceed his maximum Wounds; a Liche may only restore lost wounds. No effect on the Possessed or Undead."
+     "Choose a single model within 6\". The target suffers a wound, (no saves allowed) and the sorcerer gains an extra wound for the duration of the battle. This may take the Wounds of a Necromancer above their original maximum value, but a Liche may only restore lost wounds. This spell will not affect the Possessed or any Undead models."
     ],
     [
      "Reanimation (5)",
-     "One Zombie that went out of action during the last close-combat phase returns within 6\" of the caster (not directly into combat). May instead restore 1 lost Wound to a Grave Guard or Wight. Cannot revive Scarecrows, Grave Guards, Wights or Skeletons taken out of action."
+     "One Zombie that went out of action during the last hand to hand combat phase immediately returns to battle. Place the model within 6\" of the sorcerer. The model cannot be placed straight into hand to hand combat with an enemy model. This spell can be used on Grave Guards and Wights to restore 1 lost wound (should they have more than one). This cannot be used to bring Scarecrows, Grave Guards, Wights and Skeletons back to life if they are taken out of action the way Zombies can."
     ],
     [
      "Spell of Doom (9)",
-     "Choose an enemy within 12\": it must roll equal to or under its Strength on a D6 or you roll on the Injury table to see what happens to it."
+     "Choose one enemy model within 12\". The model must immediately roll equal to or less than his Strength on a D6 or the dead emerging from the earth will rend him with supernatural power. If he fails, you may roll on the Injury table to see what happens to the unfortunate warrior."
     ],
     [
      "Call of Vanhel (6)",
-     "A single Zombie, Skeleton, Wight or Grave Guard within 6\" may immediately move again up to its full Movement (a move into base contact counts as a charge) and auto-passes any Initiative tests during that move."
+     "A single Zombie, Skeleton, Wight or Grave Guard within 6\" of the caster may immediately move again up to its maximum movement distance. If this moves them into base contact with an enemy model then it counts as charging. The targeted Zombie, Skeleton, Wight or Grave Guard will automatically pass Initiative tests needed to be made during this extra movement."
     ],
     [
      "Deathly Visage (6)",
-     "Necromancers only. The Necromancer causes Fear for the rest of the battle and is himself immune to Fear. The one exception to the Apprentice rule — a Necromancer may choose this if the Liche knows Living Horror."
+     "The Necromancer causes fear in his enemies for the duration of the battle and is likewise immune to fear. This spell is the one exception to the Apprentice rule that Necromancers must usually follow when in a Liche warband. A Necromancer may choose this spell if the Liche has the spell Horror."
     ],
     [
      "Living Horror (8)",
-     "Liche only. Choose a model within 8\" and roll D6+3: if it equals or beats the target's Leadership, it suffers a Wound (no saves); if it survives, it may not move, shoot or cast next turn unless it passes a Leadership test. No effect on the Possessed, Undead, or anything immune to Fear."
+     "You may choose one model within 8\" of the Liche and roll D6+3. If this score is equal to or greater than the Leadership of the target model, then that model suffers a Wound, no armour saves allowed. If this wounds the target and they still have Wounds remaining, then that target may not move, shoot or cast spells during their next turn unless they pass a Leadership test. This spell will not affect the Possessed, Undead, or any model that is immune to fear."
     ]
    ],
    "lore": {
@@ -509,27 +509,27 @@
    "spells": [
     [
      "Lifestealer (10)",
-     "A model within 6\" suffers a wound (no save); the Necromancer +1 W for the battle. Not against Undead/Possessed."
+     "You may choose a single model within 6\". The target suffers a wound (no save allowed) and the Necromancer gains an extra wound for the duration of the battle. This may take the Necromancer's Wounds above his original maximum value. This spell will not affect the Possessed or any Undead models."
     ],
     [
      "Re-animation (5)",
-     "A Zombie that went OOA in the last close-combat/shooting phase returns within 6\"."
+     "One Zombie that went out of action during the last hand-to-hand combat or Shooting phase immediately returns to the battle. Place the model within 6\" of the Necromancer. The model cannot be placed straight into hand-to-hand combat with an enemy model."
     ],
     [
      "Death Vision (6)",
-     "The Necromancer causes fear for the battle."
+     "The Necromancer causes fear in his enemies for the duration of the battle."
     ],
     [
      "Spell of Doom (9)",
-     "Enemy within 12\": Strength test or roll on the injury table."
+     "Choose one enemy model within 12\". The model must immediately roll equal to or less than his Strength on a D6 or the dead emerging from the earth will rend him with supernatural power. If he fails, you may roll on the Injury table to see what happens to the unfortunate warrior."
     ],
     [
      "Call of Vanhel (6)",
-     "A Zombie/Dire Wolf within 6\" immediately moves again (charge possible)."
+     "A single Zombie or Dire Wolf within 6\" of the Necromancer may immediately move again up to its maximum Movement distance (i.e., 9\" in the case of Dire Wolves). If this moves them into base contact with an enemy model, they count as charging."
     ],
     [
      "Spell of Awakening (Auto)",
-     "Raise a slain enemy hero as a Zombie into your own service."
+     "If an enemy Hero is killed (i.e., your opponent rolls 11-15 on the Serious Injury chart after the battle) then the Necromancer may raise him to fight as a Zombie in his servitude. The dead Hero retains his characteristics and all his weapons and armour but may not use any other equipment or skills. He may no longer run, counts as a Henchman group on his own, and may not gain additional experience. This spell always succeeds (rules for Henchmen and experience are described later). The new Zombie follows all the normal Zombie rules (immune to poison, causes fear) except for retaining his profile, weapons and armour. FAQ: The new Zombie counts 5 points plus the experience it has gained towards the warband rating. It has no skills and loses holy or special weapons (e.g. a Sister Superior's Sigmarite warhammers); weapons with a built-in poison effect, such as Skaven weeping blades, keep it. Skaven can be raised as Zombies too."
     ]
    ],
    "lore": {
@@ -547,27 +547,27 @@
    "spells": [
     [
      "Warpfire (8)",
-     "Range 8\": D3 S4 hits on the target + 1 S3 hit on each model within 2\"."
+     "The spell has a range of 8\", hitting the first model in its path. The spell causes D3 Strength 4 hits on its target, and one Strength 3 hit on each model within 2\" of the target."
     ],
     [
      "Children of the Horned Rat (Auto)",
-     "Before the battle: Summon D3 Giant Rats within 6\" (once per battle)."
+     "This spell must be used before the game, and may only be used once. When cast, the spell summons D3 Giant Rats, which are placed within 6\" of the Sorcerer. The Sorcerer may cast this spell successfully only once per battle, and the rats disappear after the battle. They do not count towards the maximum size of the Skaven warband."
     ],
     [
      "Gnawdoom (7)",
-     "2D6 S1 hits on a model within 8\"."
+     "The Gnawdoom causes 2D6 Strength 1 hits on a single model within 8\" of the caster."
     ],
     [
      "Black Fury (8)",
-     "Charge an enemy within 12\"; +2 A & +1 S this turn."
+     "The Sorcerer may immediately charge any enemy model within 12\" (ignoring any terrain and interposing models) and gains 2 extra Attacks and +1 Strength during this turn's hand-to-hand combat phase only."
     ],
     [
      "Eye of the Warp (8)",
-     "All models in base contact: Ld test or S3 hit + flee 2D6\"."
+     "All standing models in base contact with the Sorcerer must take an immediate Leadership test. If they fail, they each suffer a Strength 3 hit and must run 2D6\" directly away from the Sorcerer, exactly as if they had lost their nerve when fighting against more than one opponent."
     ],
     [
      "Sorcerer's Curse (6)",
-     "A model within 12\" must re-roll successful armour saves & hits in the coming phases."
+     "The spell has a range of 12\" and affects a single model within range. The target must re-roll any successful armour saves and to hit rolls during the Skaven hand-to-hand phase and his own next shooting and hand-to-hand combat phases."
     ]
    ],
    "lore": {
@@ -585,27 +585,27 @@
    "spells": [
     [
      "Fires of U'Zhul (7)",
-     "Range 18\": one S4 hit on the first model in the path."
+     "The fireball has a range of 18\" and causes one Strength 4 hit. It strikes the first model in its path. Armour saves are taken as normal (i.e., with −1 modifier)."
     ],
     [
      "Flight of Zimmeran (7)",
-     "Move up to 12\" immediately — even into base contact (counts as a charge)."
+     "The wizard may immediately move anywhere within 12\", including into base contact with an enemy, in which case he counts as charging. If he engages a fleeing enemy in the close combat phase he will score 1 automatic hit and then his opponent will flee again (if he survives). FAQ: This is a magical effect, not Movement as the movement rules define it, so the wizard may use it to leave close combat."
     ],
     [
      "Dread of Aramar (7)",
-     "Model within 12\": Ld test or flee 2D6\". Not against fear-immune models."
+     "A single model within 12\" of the wizard must pass a Leadership test or flee 2D6\" directly away from him. If he flees, he must test at the start of each of his own movement phases and will continue to flee until he passes a test. Note that this spell does not affect Undead or any model immune to fear."
     ],
     [
      "Silver Arrows of Arha (7)",
-     "D6+2 arrows, range 24\", each S3 (not in close combat)."
+     "Unlike other spells, this cannot be cast whilst in hand-to-hand combat. The spell summons D6+2 arrows which the wizard can use to shoot against one enemy model. The arrows have a range of 24\". Use the wizard's own Ballistic Skill to determine whether he hits or not, but ignore movement, range and cover penalties. The arrows cause one S3 hit each. FAQ: The arrows may be shot even after running; the intent is that the spell works regardless of the usual movement penalty."
     ],
     [
      "Luck of Shemtek (6)",
-     "Re-roll all your own failed rolls until your next turn."
+     "The wizard may re-roll all his failed dice rolls, though the second results stand. The effect lasts until the beginning of his own next turn."
     ],
     [
      "Sword of Rezhebel (8)",
-     "+1 A, +2 S, +2 WS; at the start of each turn make a Ld test, otherwise the sword vanishes."
+     "The sword gives the wizard +1 Attack, +2 Strength and +2 Weapon Skill. Take a Leadership test at the beginning of each of the wizard's own turns. If the test fails, the sword disappears. FAQ: A second hand weapon, buckler or shield may be used alongside the sword. The spell cannot be cast and maintained twice."
     ]
    ],
    "lore": {
@@ -623,27 +623,27 @@
    "spells": [
     [
      "Pool of Shadow (7)",
-     "The Weaver and all models within 6\" may hide as if in cover (even after running); they count as in cover against shooting. Ends if an enemy enters the area, otherwise lasts until the next turn."
+     "This spell allows the mage and all allies within 6\" to Hide, exactly as if there were a wall or other obstruction between them and their enemies. They may Hide even after marching. This Hiding is disrupted if any enemy enters the area of effect. In addition, all affected count as being in cover against enemy shooting. This spell lasts until the start of the Shadow Weaver's next turn."
     ],
     [
      "The Living Shadows (7)",
-     "Enemy within 12\" and within 2\" of a wall: one S4 hit, no armour save."
+     "The Shadow Weaver may cast this spell at any enemy model within 12\" of him and within 2\" of a wall. The target suffers a single Strength 4 hit with no armour saves."
     ],
     [
      "Wings of Night (6)",
-     "Castable only within 2\" of a wall: immediately move up to 12\" to another spot within 2\" of a wall; on contact counts as a charge."
+     "This spell may only be cast if the Shadow Weaver is within 2\" of a wall. He is instantly moved up to 12\" to a place that is also within 2\" of a wall. If moved into contact with an enemy model, the Shadow Weaver counts as charging in the first round."
     ],
     [
      "Cloak of Darkness (7)",
-     "The Weaver counts as concealed — as long as he does not attack (cast/shoot/fight) he cannot be attacked. May intercept; ends as soon as he attacks."
+     "The Shadow Weaver is effectively concealed from enemy sight. As long as he does not attack (cast spells, shoot, or engage in close combat) any enemy models, he may not be attacked. He may intercept as normal if the player controlling him wishes, but he does not have to do so (and if he does not, enemy warriors may charge past him of course). The spell lasts until the Shadow Weaver attacks an enemy model. Note that a model engaged in close combat with an enemy warrior may never choose to not attack."
     ],
     [
      "Shadowbind (9)",
-     "Enemy within 24\" and 2\" of a wall: may not move until it passes a Strength test on 2D6 at the start of its turn. Ends if the Weaver is wounded/casts another spell. Attacks against it count as against a stunned model."
+     "The Shadow Weaver may cast this spell at any enemy model within 24\" of him and 2\" of a wall. The target may not move unless it first passes a Strength test on 1D6+1 at the start of his turn (before the Recovery Phase). This spell lasts until the Shadow Weaver suffers a Wound or attempts to cast another spell. If attacked while affected by this spell, treat the target exactly as if he were Stunned."
     ],
     [
      "Shield of Shadow (7)",
-     "The Weaver or a member within 12\": 5+ armour save (not modified by Strength), until the Weaver's next turn."
+     "The Shadow Weaver may cast this spell on himself or a member of his warband within 12\". The target receives an armour save of 5+ that is not modified by the attacker's Strength. The spell lasts until the start of the Shadow Weaver's next turn."
     ]
    ],
    "lore": {
@@ -657,31 +657,31 @@
   },
   "amazonRituals": {
    "name": "Amazon Rituals",
-   "note": "Amazon (Serpent) Priestess.",
+   "note": "Serpent Priestess (Amazons of Lustria) and Priestess (Amazons of Mordheim).",
    "spells": [
     [
      "Singing Wind (8)",
-     "Each model within 10\" is \"held\" until the next Amazon turn: No movement/shooting/casting, only defence; always strikes last in close combat."
+     "The goddess appears in the form of singing motes and dancing lights that will entrance and 'hold' any model within 10\" until the start of the Amazon player's next turn. The model cannot move, shoot, or cast spells, but may defend itself in hand-to-hand combat. Models affected by this ritual automatically go last in combat."
     ],
     [
      "Serpent's Strength (9)",
-     "Allies within 8\" of the Priestess (including herself): +1 S until the end of the next turn. Cannot be cast while she is in close combat; the effect persists if she then enters combat."
+     "All friendly models close to the Priestess will be charged with a frantic energy until the end of their next turn. During this time any model within 8\" of the Priestess (including herself) will add +1 to their Strength. The ritual cannot be cast if the Priestess is in close combat during her Shooting phase. The effects will continue after the ritual is cast if the Priestess enters combat."
     ],
     [
      "Wendala's Maelstrom (7)",
-     "A storm within 18\" of the Priestess: Enemy shooting −1 to hit, until the next Amazon turn."
+     "The storm extends out from the Priestess 18\". All attempts to shoot missile weapons by the enemy will be at −1 to hit. The ritual lasts up until the start of the Amazon player's next turn."
     ],
     [
      "Shield of Thorns (7)",
-     "Cocoon of thorns: The Priestess is immune to shooting & magic. Attackers may charge, but in the first close-combat round neither they nor she score hits. Not castable in close combat."
+     "The ritual produces a cocoon of thorns all about the Priestess, making her immune to ranged or magical attacks. Any models wishing to charge the Priestess can do so but the thorns negate any strikes by the Priestess and her enemies in the first round of combat. The Priestess cannot cast this ritual while in hand-to-hand combat."
     ],
     [
      "The Living Jungle (6)",
-     "A model within 12\" is swarmed by snakes/spiders/insects: 1D6 S2 hits, no armour save (ward only); no dodge."
+     "Pick one model within 12\". The model is suddenly swarmed by a savage mix of snakes, spiders and insects, most of them poisonous. The afflicted model takes 1D6 Strength 2 hits with no armour saves allowed apart from Ward saves. You cannot use a dodge save against a swarm."
     ],
     [
      "Siren's Dreams (7)",
-     "Enemies within 12\": all Ld tests of the enemy warband −1 until the end of its next turn. Lizardmen & Undead immune."
+     "The song is so beautiful and mesmerising that it momentarily distracts the Amazon's enemies within 12\" such that all Ld tests for the opposing warband are made at −1 until the end of the opposing player's next turn. Lizardmen and Undead are immune to the effects of this ritual."
     ]
    ],
    "lore": {
@@ -699,27 +699,27 @@
    "spells": [
     [
      "Menkare's Scroll of Urgency (6)",
-     "A Skeleton Soldier within 6\" may immediately move again up to its full movement (4\"); on base contact this counts as a charge."
+     "A single Skeleton Soldier within 6\" may immediately move again up to its maximum Movement distance, i.e., 4\". If this takes the model into base contact with an enemy model, it counts as charging."
     ],
     [
      "Horrebe's Curse of the Mummy (8)",
-     "A model in base contact with a Mummy (= the Tomb Lord) and within 18\" of the priest: −1 to hit, −1 to wound, −1 armour save, until the next Tomb Guardian shooting phase."
+     "The target must be in base-to-base contact with a Mummy and within 18\" of the Liche Priest. If the spell is cast successfully, the enemy model has a −1 penalty on all to hit and to wound rolls, and on all armour saves. This lasts until the start of the next Tomb Guardian Shooting phase."
     ],
     [
      "Tawosret's Scroll of Tomb Dust (7)",
-     "A warrior within 12\" is automatically knocked down (choking on sand). Living models only."
+     "Range 12\". The warrior is automatically knocked down as he chokes on the sand. This spell only affects a living model."
     ],
     [
      "Neferre's Scroll of Quaking Horror (7)",
-     "A warrior within 12\": Ld test or flee 2D6\" directly away from the priest; keeps fleeing each movement phase until it rallies. No effect on Undead/psychology-immune models."
+     "Target: a warrior within 12\". The model must pass a Leadership test or flee 2D6\" directly away from the Liche Priest. The warrior will continue to flee in each Movement phase until he makes a successful Rally test in the Recovery phase. This spell has no effect on Undead models or models that are immune to psychology."
     ],
     [
      "Merneptah's Scroll of the Scarab Song (7)",
-     "A model within 8\": 2D6 S1 hits; for the rest of the shooting phase it may not be shot at or fight/be fought in close combat (move it 1\" out of combat). Unless actually injured it counts as having just stood up next turn."
+     "A single model within 8\" of the Liche Priest suffers 2D6 Strength 1 hits. In addition, that model may not be shot at for the rest of the Tomb Guards Shooting phase, nor may he fight or be fought in hand-to-hand combat. If the model is already in hand-to-hand combat, move him 1\" away from the combat as he staggers about in agony. Unless he suffers an actual injury the warrior counts as having just stood up in the next turn."
     ],
     [
      "Djedre's Summonation of the Vengeful Dead (5)",
-     "Bring back a Skeleton Soldier that went out of action — set it up within 6\" of the priest."
+     "The Liche Priest may re-animate a Skeleton Soldier that went out of action during the last turn. Place the model anywhere within 6\" of the Liche Priest, but not straight into hand-to-hand combat with an enemy model."
     ]
    ],
    "lore": {
@@ -736,27 +736,27 @@
    "spells": [
     [
      "Riding the Wind (6)",
-     "At the start of the movement phase: move anywhere within 12+D6\" (ignoring terrain); counts as movement; not into base contact; may shoot afterwards (−1)."
+     "This spell is cast at the beginning of the caster's Movement phase. The caster may move up to 12+D6\" anywhere on the battlefield, ignoring any intervening terrain; this counts as the caster's movement for that turn. This spell may not be used to move the caster into base contact with an enemy warrior, but the caster may shoot as normal (with a −1 penalty for having moved)."
     ],
     [
      "Skin of Stone (7)",
-     "An ally within 6\": +2 armour save, −1 Initiative. Maintained each turn (caster within 6\" + difficulty test); only one model at a time."
+     "This spell may be cast on any friendly warrior within 6\". The target gains +2 to his armour save but suffers a −1 penalty to Initiative. The spell may be maintained each turn, providing the affected warrior remains within 6\" of the caster and the caster can pass a Difficulty test. If the caster is more than 6\" away from the affected warrior in the Recovery phase, the spell cannot be maintained and wears off. Only one warrior may be affected by a Stone Skin spell at any one time, although the caster is free to cast other spells while maintaining the Stone Skin."
     ],
     [
      "Burning Hand (8)",
-     "At the start of the close-combat phase: sacrifice all attacks for one hand attack at S5, 2 wounds; on a hit of 4+ the target catches fire. One round."
+     "This spell is cast at the beginning of the Combat phase. The caster may sacrifice all of his normal attacks to make one hand-to-hand attack at Strength 5, causing 2 wounds. If the enemy warrior is successfully hit, he is set on fire on a roll of 4+. This spell lasts for one round only."
     ],
     [
      "Quicksand (6)",
-     "On a model within 6\": floods a 3\" area around the target. All within: Strength test or unable to move; in close combat may only defend. Until the caster's next recovery phase."
+     "This spell is cast at any warrior within 6\". The water floods the area for 3\" around the targeted warrior. The effect lasts until the beginning of the caster's next Recovery phase. All warriors within the quicksand must pass a Strength test or be unable to move. Warriors in combat cannot attack but may defend themselves."
     ],
     [
      "Storm of Magic (9)",
-     "Target within 12\": one S5 hit, armour saves as normal."
+     "The caster may target any warrior within 12\". If the spell is successfully cast, the target is struck by a bolt of energy and takes one S5 hit. Armour saves may be taken as normal."
     ],
     [
      "Blessing of the Elements (6)",
-     "After the battle: Re-roll any one dice or shift it by +1/−1. Not possible if the caster went out of action."
+     "In the post-battle sequence, the player may re-roll any one dice or modify one dice by +1/−1. If the caster was taken out of action, this spell may not be cast."
     ]
    ],
    "lore": {
@@ -774,69 +774,69 @@
   },
   "darkElfMagic": {
    "name": "Dark Elf Magic",
-   "note": "Dark Elf Sorceress (Druchii).",
+   "note": "Dark Elf Sorceress (Druchii). She may not cast spells while wearing armour.",
    "spells": [
     [
-     "Doombolt (8)",
-     "Enemy in sight within 10\": one S4 hit. On a wound the bolt leaps to the next model within 4\" (on a 4+, each −1 S) until no targets remain or S drops to 1. Armour saves as normal."
+     "Doombolt (9)",
+     "The bolt of doom may be targeted at any enemy model in line of sight. The Doombolt has an 18\" range and causes a Strength 5 hit. If the target model is wounded, then the next closest model within 6\" is also hit on a 4+, at −1 Strength than the previous hit. The bolt will keep leaping until there are no more targets within range or until its Strength drops to a one. Each model can only be hit by a bolt once per turn. Take armour saves as normal."
     ],
     [
-     "Word of Pain (9)",
-     "Enemy within 12\": must re-roll successful close-combat/shooting hits and wound rolls; to charge it must first pass a Ld test. Until the next Dark Elf turn."
+     "Word of Pain (8)",
+     "The spell may be cast at an enemy model within 12\". The victim must re-roll all successful hand to hand or missile attacks and all to wound rolls. If the victim wishes to charge, he must pass a successful Leadership test first. Lasts until the beginning of the next Dark Elf turn."
     ],
     [
      "Soul Stealer (9)",
-     "Touch: To-hit roll against a model in base contact; on success one wound with no armour save, Sorceress +1 W (max. +1 over profile, lost after the battle)."
+     "Once successfully cast, the Sorceress has to make a to hit roll against a model in base contact. If the attack is successful and her opponent is struck, he suffers a wound with no armour save possible. The Sorceress feeds on this life-force and adds one wound to her profile. Note: the Sorceress can never have more then one extra wound from the use of this spell and the extra wound is lost at the end of the battle."
     ],
     [
-     "Black Blade of Khaine (8)",
-     "An ally's close-combat weapon within 6\": +2 S, ignores armour, counts as magical. Until the Sorceress's next shooting phase."
+     "Flamesword (8)",
+     "The Sorceress may choose the hand-to-hand combat weapon of a member of her warband within 6\" to be engulfed in flames. A weapon with these flames acts as a normal weapon of its type, but also adds a +2 bonus to the users Strength. Hits inflicted from the weapon ignore armour saves. Lasts until the Sorceress' next shooting phase."
     ],
     [
-     "Deathspasm (9)",
-     "Nearest enemy within 6\": test on ≤ Toughness (D6) or roll on the injury table. If the target goes OOA, the Sorceress is immediately knocked down (no Jump Up)."
+     "Deathspasm (10)",
+     "The Deathspasm has a range of 6\" and must be cast on the closest enemy model. The affected model must roll on the injury chart. If successfully cast, the casting Sorceress is immediately knocked down."
     ],
     [
      "Witch Flight (7)",
-     "Move up to 12\" immediately, may charge; against a fleeing enemy 1 automatic hit, then it flees again."
+     "The Sorceress may immediately move anywhere within 12\", and may count as charging. If she engages a fleeing enemy in the close combat phase she will score 1 automatic hit and then the opponent will flee again."
     ]
    ],
    "lore": {
     "Doombolt": "Whispering an ancient incantation the Sorceress conjures a bolt of pure dark energy and unleashes it from her outstretched hand.",
     "Word of Pain": "The Sorceress calls the curse of the Witch King down on his enemy reducing their willingness to fight.",
-    "Soul Stealer": "At the Sorceress’s touch, the essence of life is drained from her enemy and absorbed into her body giving him renewed strength and vigour.",
+    "Soul Stealer": "At the Sorceress's touch, the essence of life is drained from her enemy and absorbed into her body giving him renewed strength and vigour.",
+    "Flamesword": "Summoning Dark Magic the Sorceress engulfs a weapon in twisted black flames.",
     "Deathspasm": "The Sorceress channels Dark Magic into her enemy, causing him to writhe in excruciating pain.",
-    "Witch Flight": "The Sorceress bends the winds of magic to her will and flies through the air.",
-    "Black Blade of Khaine": "Summoning Dark Magic the Sorceress engulfs a weapon in twisted black flames."
+    "Witch Flight": "The Sorceress bends the winds of magic to her will and flies through the air."
    }
   },
   "prayersTaal": {
    "name": "Prayers of Taal",
-   "note": "Priest of Taal (Horned Hunters). Works like priestly prayers; the priest never wears armour.",
+   "note": "Priest of Taal (Ostlander Mercenaries, Horned Hunters). Works like Prayers of Sigmar; the priest wears no Heavy Armour (the unit entry allows Light Armour, a helmet and a shield).",
    "spells": [
     [
      "Stag's Leap (7)",
-     "Move up to 9\" immediately, even into base contact (counts as a charge, +1 S in the first round). Against a fleeing enemy: One automatic hit at +1 S, then it flees again."
+     "The Priest of Taal may immediately move anywhere within 9\" including into base contact with the enemy, in which case he counts as charging and gains a +1 Strength to his first round of attacks. If he engages a fleeing enemy, in the close combat phase he will score one automatic hit at +1 Strength and then his opponent will flee again (if he survives)."
     ],
     [
      "Blessed Ale (5)",
-     "Heal a model within 2\" (including himself) to full wounds; living enemies (not Undead/Possessed) within 2\" lose 1 Attack in the next close-combat round."
+     "Drinking a flask of Taal-blessed ale (the priest is assumed to carry as many flasks as are needed) may heal any one model within 2\" of the Priest (including himself). The warrior is restored to his full quota of Wounds. In addition, any living enemy models (not Undead or Possessed) within 2\" of the Priest will lose 1 Attack during the next round of combat due to the potent fumes of the ale."
     ],
     [
      "Bear's Paw (7)",
-     "Priest or an ally within 6\": +2 S until the priest's next turn."
+     "The Priest invokes the blessing of Taal on himself or a single friendly model within 6\". The target receives a bonus of +2 to his Strength until the Priest's next turn."
     ],
     [
      "Earthshudder (9)",
-     "On a building within 4\": enemies touching it each take 1 S3 hit; the building collapses (models on it count as having fallen), the terrain is removed."
+     "The spell is cast on a single building within 4\". Any enemy models touching the building will suffer a single S3 hit. In addition the building will collapse and any models on it will count as having fallen to the ground (for example a model falling 5\" to the tabletop must pass two Initiative tests to avoid taking D3 S5 hits.) Remove the terrain feature from the board for the rest of the game."
     ],
     [
      "Tanglefoot (8)",
-     "All models (friend & foe, except your own Zealots) within 12\" move at half speed until the next shooting phase."
+     "Plants, vines and even small trees burst forth from the earth, hindering all those who attempt to move through them. All models (friend as well as foe) with the exception of Ostlander Jaeger, and friendly Horned Hunter Zealots within 12\" of the Priest can only move at 1/2 speed until the next shooting phase."
     ],
     [
      "Summon Squirrels (7)",
-     "An enemy within 12\": 2D6 S1 hits, no armour saves."
+     "With this spell the Priest invokes the wrath of the Lord of Beasts, summoning forth dozens upon dozens of enraged squirrels. The furious rodents assault one enemy within 12\" of the Priest, crawling inside the warrior's clothing and armour, pelting him with nuts and causing numerous tiny bites and welts. The target suffers 2D6 Strength 1 hits. No armour saves allowed."
     ]
    ],
    "lore": {
@@ -854,27 +854,27 @@
    "spells": [
     [
      "Chotec's Wrath (8)",
-     "Lightning on the nearest enemy within 10\": one S5 hit; +1 S and +1 to the injury roll if the target wears armour."
+     "A lightning bolt shoots from the sky above and strikes the closest enemy model within 10\" of the Skink Priest, causing a single Strength 5 hit. However add +1 to the Strength and +1 to the roll on the injury table if the model is wearing armour like light armour, heavy armour, Ithilmar armour or Gromril armour."
     ],
     [
      "Sotec's Blessing (7)",
-     "A model within 6\" (or himself): D6 — 1-2 = +1 BS/+1 to hit in close combat; 3-4 = +1 T; 5-6 = +1 M & I. Until stunned/OOA; only one model at a time."
+     "This spell may be cast on a single model within 6\" of the Skink Priest or on himself. Roll a D6 to determine the blessing. The effects remain in play until the Priest or the model is Stunned or taken Out of Action. Only a single model may be affected by the blessing at any given time. D6: 1-2 = +1 BS or +1 to hit in close combat; 3-4 = Toughness +1; 5-6 = Movement and Initiative +1."
     ],
     [
      "Huanchi's Stealth (7)",
-     "All Skinks within 6\" (incl. the priest) in cover may immediately hide — even after running or shooting."
+     "The spell affects all Skinks within 6\" of the Skink Priest, including himself, and allows any model that is in cover to immediately to go into hiding. A model may go into hiding even if they ran in the movement phase or has already shot with a missile weapon."
     ],
     [
      "The Old Ones' Protection (6)",
-     "Priest & Lizardmen within 4\": 4+ ward save against spells/prayers. Until the priest goes out of action."
+     "The Skink Priest and any Lizardmen within 4\" of him gain a save of 4+ against the effects of spells or prayers. This spell remains in play until the Skink Priest is taken Out of Action."
     ],
     [
      "Tinci's Rage (8)",
-     "A Lizardman within 6\" (or himself): Frenzy + +1 S. Until stunned/OOA; Ld test at the start of the turn to maintain."
+     "A single Lizardman within 6\" of the Skink Priest or himself, is overtaken by rage and follows the rules for Frenzy, in addition he gains +1 Strength. This spell remains in play until the Skink Priest or the model is Stunned or is taken Out of Action. At the beginning of the turn the Skink priest must pass a Leadership roll in order to keep the spell going. Only a single model may be affected by the blessing at any given time, but the Skink Priest can choose to release the spell at the beginning of his turn if he wish to attempt to recast it on another model later in the shooting phase."
     ],
     [
      "Itzl's Speed (7)",
-     "A Lizardman within 6\" (or himself): an extra sprint up to 4\" (counts as running; not after shooting; no charge)."
+     "A single Lizardman model within 6\" of the Skink Priest or himself, may make an additional sprint of movement and move up to 4\". This counts, as running and a model may not move if he has already fired with a missile weapon. He may not charge with this extra move."
     ]
    ]
   },
@@ -884,27 +884,27 @@
    "spells": [
     [
      "Led'z go (9)",
-     "Any Orc or Goblin within 4\" of the Shaman automatically strikes first in close combat, regardless of circumstances. Lasts until the caster is knocked down/stunned/OOA."
+     "Any Orc or Goblin within 4\" of the Shaman will automatically strike first in hand-to-hand combat regardless of other circumstances. The spell only lasts until the caster is knocked down, stunned or taken out of action."
     ],
     [
      "Oi! Gerroff! (7)",
-     "Range 8\": move any enemy model D6\" directly away from the Shaman. If it collides with a model/building, both take 1 S3 hit. May not be cast on models in close combat."
+     "Range 8\". Moves any enemy model within range D6\" directly away from the Shaman. If the target collides with another model or a building, both suffer 1 S3 hit. Note: Very handy for dropping people from high buildings with. May not be cast on models in hand-to-hand combat."
     ],
     [
      "Zzap! (9)",
-     "Range 12\": D3 S4 hits on the closest enemy, no armour save."
+     "Range 12\". Causes D3 S4 hits on the closest enemy target, with no armour saves allowed."
     ],
     [
      "Fooled Ya! (6)",
-     "No enemy may charge the Shaman during their next turn. If he is in close combat, he may immediately move 4\" away."
+     "No enemy may charge the Shaman during their next turn. If the Shaman is engaged in hand-to-hand combat he may immediately move 4\" away."
     ],
     [
      "Clubba (7)",
-     "A huge ectoplasmic club: Counts as a club with +2 S and gives +1 Attack. Lasts until the Shaman suffers a wound."
+     "The ectoplasmic club counts as a normal club with +2 Strength bonus and gives the Shaman +1 attack as well. This spell lasts until the Shaman suffers a wound."
     ],
     [
      "Fire of Gork (8)",
-     "Range 12\": two bolts, each D3 S3 hits — both at the closest enemy, or split between the two closest."
+     "Range 12\". Each of the two bolts causes D3 S3 hits; the bolts can either be fired both at the closest enemy target or split between the two closest enemy targets."
     ]
    ],
    "lore": {
@@ -923,27 +923,27 @@
    "spells": [
     [
      "Wind of Gork (6)",
-     "Range 12\": the first model in the path rolls under its Toughness or takes a S2 hit and is automatically knocked down."
+     "A blast of foul flatulence signals Gork's wrath. Range: 12\". The first model in its path must roll under its Toughness or take a S2 hit and be knocked down automatically."
     ],
     [
      "Gaze of Mork (8)",
-     "Range 12\": D3 S3 hits on the first model in the path."
+     "Range 12\". D3 S3 hits strike the first model in their path."
     ],
     [
      "'Eadbanger (8)",
-     "Range 6\": fire bolts equal to the number of the Shaman's Attacks, Strength equal to the Shaman's Toughness, on the first model in the path. Then roll a D6: on a 1 the Shaman goes out of action."
+     "Range 6\". Fire bolts equal to the number of the Shaman's Attacks. Resolve with Strength equal to the Shaman's Toughness at the first model in their path. After the bolts effects are resolved, roll a die. On a 1 the Shaman has drawn upon too much power. The Shaman collapses and goes out of action."
     ],
     [
      "Leap of Waaagh! (7)",
-     "The Shaman or any Goblin within 3\" may be moved up to 12\"; if this brings them into close combat, they count as charging."
+     "The Shaman or any other Goblin within 3\" may be moved up to 12\". If this move brings them into close combat, they count as charging in the close combat phase."
     ],
     [
      "Idol of Gork (8)",
-     "+1 WS, +1 S, +1 A until the Shaman takes a wound."
+     "The Shaman gains +1 WS, +1 S, and +1 A. This enhancement lasts until the Shaman takes a wound."
     ],
     [
      "'Ere we go! (8)",
-     "All friendly models within 6\" of the Shaman treat stunned results on the injury table as knocked down. Lasts until the Shaman takes a wound."
+     "All friendly models within 6\" of the Shaman treat stunned results on the injury table as knocked down instead. The effects last until the Shaman takes a wound."
     ]
    ],
    "lore": {
@@ -967,27 +967,27 @@
    "spells": [
     [
      "Daemonic Vigour (8)",
-     "Plague Bearers/Nurglings within 8\": Daemonic Aura save 5+→4+ until the beginning of their next turn."
+     "Any Plague Bearers or Nurglings within 8\" of the Master increase their Daemonic Aura save from 5+ to 4+ until the beginning of their next turn."
     ],
     [
      "Buboes (7)",
-     "Range 8\", one enemy warrior: Toughness test or lose a Wound, no armour save."
+     "This spell has a range of 8\" and affects a single enemy warrior. The warrior must pass a Toughness test or lose a Wound. No Armour saves are allowed."
     ],
     [
      "Stench of Nurgle (8)",
-     "Range 6\", all living creatures (friend & foe): each enemy passes a Toughness test or loses an Attack until its next turn."
+     "This spell has a range of 6\" and affects all living creatures — friend or foe. Each enemy warrior in range must pass a Toughness test or lose an Attack until their next turn."
     ],
     [
      "Pestilence (10)",
-     "All enemy models within 12\": one S3 hit each, no armour save."
+     "All enemy models within 12\" of the Master suffer a Strength 3 hit. No Armour saves are allowed."
     ],
     [
      "Scabrous Hide (8)",
-     "The Master gains a 2+ armour save (replaces any normal save) until the beginning of his next shooting phase."
+     "The Master has an armour save of 2+ which replaces any normal Armour save. The Scabrous Hide lasts until the beginning of his next Shooting phase."
     ],
     [
      "Nurgle's Rot (9)",
-     "All enemies in base contact: Toughness test or contract Nurgle's Rot."
+     "All enemy models in base contact with the Master must immediately test against their Toughness or contract Nurgle's Rot."
     ]
    ],
    "lore": {
@@ -998,11 +998,6 @@
     "Scabrous Hide": "The Master’s skin becomes tough and leathery like that of his patron god.",
     "Nurgle's Rot": "The Master bestows the blessing of the Plague God upon his foe."
    }
-  },
-  "beastLore": {
-   "name": "Chaos Rituals (Bray Shaman)",
-   "note": "Beastmen Shaman. Detailed effects to follow.",
-   "spells": []
   },
   "druchiiMagic": {
    "name": "Dark Magic (Druchii)",
