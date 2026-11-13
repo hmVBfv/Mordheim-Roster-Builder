@@ -24,7 +24,7 @@ export function itemText(data: core.GameData, key: string): string {
 
 /* ---- a warrior's list, while the warband is founded ---- */
 
-export interface ListRow { key: string; name: string; price: number; qty: number; /** The least the stepper goes to: the free dagger stays (#117). */ min: number; free: boolean; text: string; /** What a tap on the name shows: its kind and strength, its special rules (#136). */ tips: Tip[]; /** Why no more may be taken from the list, or ''. */ more: string }
+export interface ListRow { key: string; name: string; price: number; /** A price with dice: "D6", "3D6" – the price is its base (Rob, 13.11.2026). */ dice?: string; qty: number; /** The least the stepper goes to: the free dagger stays (#117). */ min: number; free: boolean; text: string; /** What a tap on the name shows: its kind and strength, its special rules (#136). */ tips: Tip[]; /** Why no more may be taken from the list, or ''. */ more: string }
 export interface ListGroup { label: string; rows: ListRow[] }
 export interface RareRow { de: string; /** Which copy of a weapon upgrade this row is (0 for the first, and for items that are not upgrades). */ slot: number; name: string; q: number; /** Most the stepper goes to: armour is had once. */ max: number; paid: number; upgrade: boolean; on: string | null; targets: { key: string; name: string }[]; text: string; /** What a tap on the name shows (#162): a `title` alone is never seen on a phone. */ tips: Tip[] }
 /** One thing he carries – every one on a line of its own, never "2×" (#115). */
@@ -46,6 +46,8 @@ export interface CarriedRow {
   options: { de: string; name: string; price: number }[];
   /** How many of the key he has (what the − of this line sets it to, less one). */
   qty: number;
+  /** A list item with a dice price: the dice, the range of the total, and what was entered for this piece (null: not yet, it counts at its base price). */
+  dice?: { label: string; min: number; max: number; index: number; paid: number | null };
 }
 /** A War Beast a Beastmaster may keep (the Lustrian Reavers', the Dark Elves'): its price, stats and abilities, how many there are and may be. */
 export interface BeastRow {
@@ -90,9 +92,9 @@ export function equipmentView(ctx: core.Ctx, uid: number): EquipmentView | null 
     rows: (list[cat] ?? [])
       .filter(([, , fl]) => hero || !fl?.heroes)
       .filter(([nm]) => !ctx.data.BRACE_HIDE[nm])
-      .map(([nm, pr]) => {
+      .map(([nm, pr, fl]) => {
         const qty = Number(m.eq?.[nm]) || 0;
-        return { key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), qty, min: nm.includes(FREE) ? 1 : 0, free: nm.includes(FREE), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), more: core.listProblem(ctx, uid, nm, qty + 1) };
+        return { key: nm, name: core.enItem(ctx.data, nm), price: core.adjPrice(ctx, nm, pr), ...(core.dicePrice(pr, fl) ? { dice: String(fl?.dice) } : {}), qty, min: nm.includes(FREE) ? 1 : 0, free: nm.includes(FREE), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), more: core.listProblem(ctx, uid, nm, qty + 1) };
       }),
   })).filter((g) => g.rows.length);
   // one row for an item; a weapon upgrade has one row for every weapon it sits on (reports #109, #110)
@@ -190,9 +192,13 @@ function carriedRows(ctx: core.Ctx, m: Model, when: { recruit: boolean; free: bo
         const plain = i - (nm.includes(FREE) ? 1 : 0);
         const ups = weapon && !freeOne ? upsOn(nm, plain) : [];
         const options = weapon && !freeOne ? optionsOn(nm, ups) : [];
+        // a price with dice: the total entered for this piece, or its base and the dice still to roll
+        const range = core.dicePrice(pr, fl);
+        const entered = range ? core.pieceTotals(m, nm, core.adjPrice(ctx, nm, pr), qty)[i]!.paid : null;
         out.push({
           id: `l:${nm}:${i}`, key: nm, name: core.enItem(ctx.data, nm), group: core.itemGroup(ctx, nm) ?? CATS[cat] ?? cat, from: 'list',
-          price: freeOne ? 'free' : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, used: core.isConsumable(ctx, nm), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon, ups, options, qty,
+          ...(range ? { dice: { label: String(fl?.dice), min: range.min, max: range.max, index: i, paid: entered } } : {}),
+          price: freeOne ? 'free' : range ? (entered !== null ? `${entered} gc` : `${core.adjPrice(ctx, nm, pr)} gc + ${fl?.dice}`) : `${core.adjPrice(ctx, nm, pr)} gc`, free: freeOne, keep: freeOne, used: core.isConsumable(ctx, nm), text: itemText(ctx.data, nm), tips: itemTip(ctx.data, nm), weapon, ups, options, qty,
         });
       }
     }

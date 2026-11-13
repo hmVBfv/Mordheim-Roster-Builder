@@ -8,6 +8,7 @@ import { itemHalfActive } from './districts.ts';
 import { eqListFor, isUpgrade, itemFamily, stripParen, unitDef, unitFamilies, unitGear } from './lookup.ts';
 import { adjPrice } from './pricing.ts';
 import { casterLore } from './profile.ts';
+import { diceItemCost, dicePrice } from './dicePrice.ts';
 
 const qtyOf = (m: Model, nm: string): number => Number((m.eq ?? {})[nm]) || 0;
 
@@ -31,10 +32,12 @@ export function eqCost(ctx: Ctx, m: Model): number {
   let c = 0;
   const list = eqListFor(ctx, def) ?? {};
   const h = houseRules(ctx.s);
-  for (const cat of Object.keys(list)) for (const [nm, pr] of list[cat] ?? []) {
+  for (const cat of Object.keys(list)) for (const [nm, pr, flags] of list[cat] ?? []) {
     const qty = qtyOf(m, nm);
     if (!qty) continue;
     const price = adjPrice(ctx, nm, pr);
+    // a price with dice: each piece at what was entered for it, else at its base
+    if (dicePrice(pr, flags)) { c += diceItemCost(m, nm, price, qty); continue; }
     const brace = ctx.data.GSN_BRACE[nm];
     if (nm.startsWith('Dolch')) { if (!h.freeDagger) c += Math.max(0, qty - 1) * price; }
     else if (ctx.s.wb === 'gunnery' && brace && qty >= 2) { const pairs = Math.floor(qty / 2); c += pairs * adjPrice(ctx, nm, brace) + (qty % 2) * price; }

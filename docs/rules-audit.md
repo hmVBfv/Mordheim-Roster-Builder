@@ -412,3 +412,28 @@ Ich habe die Regeltexte aller 67 Warbands nach Sätzen durchsucht, die eine Zahl
 | Guiding Dream, Goading, Commands, Slayer Rites, Transform | verschiedene 2a | nur im Spiel oder Auswahl beim Aufstieg | Text |
 
 **Vorschlag:** kein allgemeiner Regel-Interpreter. Wenn überhaupt, ein kleines Feld am Regel-Eintrag nur für **„zählt als“** (n Modelle für die Höchstzahl, die Rout-Zählung und die Kosten) – das sind drei der Zeilen oben (Thrall, Troll, Shoota Team) und gehört zu `core/src/rules/` (Höchstzahl und Worth). Ob sich das lohnt, ist deine Entscheidung; ein ADR schreibe ich erst danach. Die übrigen bleiben Text. (P11 hängt an P9: die Daten der Einheiten sollen vorher stimmen.)
+
+## J. Robs Entscheidungen zu G, H und I (13.11.2026) und was daraus wurde
+
+Rob: „Ice Magic streichen. Würfelpreise bei Start Equipment sollten ein Feld zum Eintragen haben (nur mit erlaubter Range, aber immer Gesamtpreis) und mit
+Option zum Würfeln. Beim Rest gehe mit deinen Vorschlägen.“ Umgesetzt:
+
+- **Gestrichen:** `iceMagic` und `blessingsLady` aus `data/spells.json` (beide leer und von keiner Warband benutzt). **Korrektur zu H1:** „Lady’s Prayers“ gab es
+  schon (`ladysPrayers`, sechs Gebete, von der Damsel der Chapel Guard benutzt, in den Daten mit denselben Namen und Schwierigkeiten wie auf der Seite); neu
+  aufzunehmen war nichts.
+- **Würfelpreis:** Masters of Horror: Chainsaw Sword und Electric Trident (15 + D6 gc), Repeater Pistol (25 + 3D6 gc) stehen jetzt in der Heldenliste, und
+  jede Zeile mit `dice` hat im Roster je Stück ein Feld für den Gesamtpreis (nur im erlaubten Bereich) und einen Knopf „Roll“ ([ui.md](ui.md),
+  [data-model.md](data-model.md): `models[].eqPaid`). Ohne eingetragenen Preis zählt das Stück zur Basis, wie in der alten App.
+- **Aus G eingearbeitet:** Halflings: Hunting Arrows (35 gc) in der Liste des Cook; Skaven of Clan Moulder: Club aus der Heldenliste gestrichen; Dwarf Slayer
+  Cult: „Hammer“ gestrichen (die Seite führt „Mace/Hammer“ als einen Gegenstand, die Daten hatten Streitkolben und Hammer), Dwarf Axe (15 gc) beim Rememberer;
+  Wood Elves: Ithilmar armour (60 gc) in der Liste des Scout; Druchii: die Einheit heißt **Witch Elf**; Snotling Wheelo: Bewegung `D6` (die Seite zeigt „*“ und
+  sagt „1D6 Zoll“; die 4 in den Daten war ein Platzhalter).
+- **Nichts zu ändern war bei** Order of the Mare (die Seite hat eine Liste „Footman“ mit Hinweisen „nur Pilgrims“, die Daten haben dafür eine Liste je Einheit
+  und führen Spear, Halberd und Bow bei den Pilgrims) und den Snotlings (die Seite nennt den Dolch „Dagger/Pointy Stick“ und den Kiesel „Pebble“; die Daten
+  „Pointy Stick“ und „Small Pebble“ sind dieselben Gegenstände). Die Namen aus der Tabelle „Nur anders benannt“ bleiben, wie die Kataloge sie führen.
+- **Hired Swords:** Druchii: die offizielle Liste der Seite als `only` (Pit Fighter, Ogre Bodyguard, Warlock, Imperial Assassin, Tilean Marksman,
+  Highwayman); die inoffiziellen Namen nur nach deinem OK. Sorcerous Society: `except` für die Hired Swords, die Wizard sind (Warlock, Witch, Dark Mage, Fallen
+  Sister); der High Elf Mage bleibt erlaubt. Die Ausnahme für Dramatis Personae mit Wizard fehlt noch.
+- **P11 („zählt als“):** zurückgestellt bis zum Abschalten der alten App (P13). Beim Versuch am Captured Thrall (`noCount`, zählt nicht zur Höchstzahl)
+  bricht die Parität bei der Cavalcade, weil die alte App ihn mitzählt; eine Ausnahme je Wanderung wäre breit. Ohne die alte App ist es ein kleines Feld
+  ohne Ausnahme.

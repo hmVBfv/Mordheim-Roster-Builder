@@ -163,7 +163,7 @@
       {
         "id": "witchelve",
         "t": "hen",
-        "name": "Witch Elve",
+        "name": "Witch Elf",
         "cost": 45,
         "exp": 0,
         "max": 3,
@@ -217,8 +217,13 @@
   "hire": {
     "align": "evil",
     "elf": true,
-    "tags": [
-      "goodElves"
+    "only": [
+      "pitfighter",
+      "ogre",
+      "warlock",
+      "imperialassassin",
+      "tileanmarksman",
+      "highwayman"
     ]
   },
   "lists": {

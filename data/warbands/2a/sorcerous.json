@@ -137,6 +137,12 @@
     "align": "good",
     "tags": [
       "merc"
+    ],
+    "except": [
+      "warlock",
+      "witch",
+      "darkmage",
+      "fallensister"
     ]
   },
   "lists": {

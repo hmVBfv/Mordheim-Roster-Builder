@@ -15,7 +15,7 @@ export type Profile = Partial<Record<StatKey, number | string>>;
     (the catalogue item, by default the row's own name). `heroes`: only
     Heroes may take it, though the list is shared with Henchmen. `sub`: only
     for these variants of the warband (Middenheim, Hung …). */
-export interface EntryFlags { start?: boolean; later?: string; heroes?: boolean; sub?: string[] }
+export interface EntryFlags { start?: boolean; later?: string; heroes?: boolean; sub?: string[]; /** a price with dice: "D6", "2D6", "3D6" (the row's price is the base; src/rules/dicePrice.ts) */ dice?: string }
 /** One entry of an equipment list: [German item name, price in gc, marks]. */
 export type EquipmentEntry = [name: string, price: number, flags?: EntryFlags];
 /** An equipment list by category: "Nahkampf", "Fernkampf", "Rüstung", "Besonderes", … */

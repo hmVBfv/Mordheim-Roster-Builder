@@ -274,6 +274,13 @@
         [
           "Leichte Rüstung",
           20
+        ],
+        [
+          "Ithilmar-Rüstung",
+          60,
+          {
+            "start": true
+          }
         ]
       ],
       "Besonderes": [

@@ -42,6 +42,8 @@ export interface Model {
   exp?: number | string;
   /** Equipment: German item name → quantity. */
   eq?: Record<string, number | string>;
+  /** What each piece of a list item with a dice price cost, in total (src/rules/dicePrice.ts): item → one number per piece. */
+  eqPaid?: Record<string, number[]>;
   rare?: Record<string, RareHolding>;
   /** Pieces of the unit's starting gear (`gear` in the data) that were sold, one entry for each piece (Rob, 2.11.2026). */
   gearSold?: string[];

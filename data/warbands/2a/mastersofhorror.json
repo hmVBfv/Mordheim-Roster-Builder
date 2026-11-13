@@ -216,6 +216,20 @@
         [
           "Zweihandwaffe",
           15
+        ],
+        [
+          "Chainsaw Sword",
+          15,
+          {
+            "dice": "D6"
+          }
+        ],
+        [
+          "Electric Trident",
+          15,
+          {
+            "dice": "D6"
+          }
         ]
       ],
       "Fernkampf": [
@@ -226,6 +240,13 @@
         [
           "Kurzbogen",
           5
+        ],
+        [
+          "Repeater Pistol (Masters of Horror)",
+          25,
+          {
+            "dice": "3D6"
+          }
         ]
       ],
       "Rüstung": [
