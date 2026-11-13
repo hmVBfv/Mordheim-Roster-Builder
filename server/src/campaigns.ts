@@ -330,6 +330,25 @@ export function endEnrolment(db: DB, e: EnrolmentRow, status: 'declined' | 'left
   })();
 }
 
+/** The rating of every warband of a campaign over its marks (the start, after each battle, a round sat out): mechanics, so every member reads them
+    (ADR 0002). A warband that left is in it under the name it had when it left (AUTHZ-6); `active` says whether it is in the campaign now. */
+export interface RatingPoint { round: number; kind: string; rating: number; at: string }
+export interface WarbandRatings { warbandId: string; name: string; active: boolean; points: RatingPoint[] }
+export function campaignRatings(db: DB, campaignId: string): WarbandRatings[] {
+  const rows = db.prepare(`SELECT t.warband_id, coalesce(t.warband_name, w.name) AS name, t.kind, t.round, t.created_at, json_extract(t.totals, '$.rating') AS rating,
+      EXISTS (SELECT 1 FROM enrolments e WHERE e.campaign_id = t.campaign_id AND e.warband_id = t.warband_id AND e.status IN ('pending', 'active')) AS active
+    FROM tags t JOIN warbands w ON w.id = t.warband_id WHERE t.campaign_id = ? AND t.superseded_by IS NULL ORDER BY t.warband_id, t.round, t.created_at`).all(campaignId) as
+    { warband_id: string; name: string; kind: string; round: number; created_at: string; rating: number | null; active: number }[];
+  const by = new Map<string, WarbandRatings>();
+  for (const r of rows) {
+    if (typeof r.rating !== 'number') continue;
+    const w = by.get(r.warband_id) ?? { warbandId: r.warband_id, name: r.name, active: !!r.active, points: [] };
+    w.points.push({ round: r.round, kind: r.kind, rating: r.rating, at: r.created_at });
+    by.set(r.warband_id, w);
+  }
+  return [...by.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+}
+
 /** What each active warband of a campaign has by now, for the catch-up of a warband that joins late (wish #77): the rating and
     the value (all it owns at list prices plus its gold in hand) of its latest mark, and the closed battles it fought. No names:
     the mechanics are open to every member, and who is who stays with the campaign. */

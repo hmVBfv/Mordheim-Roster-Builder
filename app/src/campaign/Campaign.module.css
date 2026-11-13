@@ -346,3 +346,10 @@
   color: var(--text-muted);
   font-size: 0.85em;
 }
+
+/* a small line for each warband, side by side where there is room (plan P7) */
+.lines {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}

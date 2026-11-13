@@ -435,6 +435,24 @@ describe('the overview', () => {
     expect(within(fig).getByRole('img').getAttribute('aria-label')).toBe(`Rating over the battles: Start ${start.totals.rating}, After battle 1 ${start.totals.rating + 14}.`);
   });
 
+  /* Plan P7, part 2: every warband's line on the overview, and the own warband's line on its roster. */
+  it('draws a line for each warband on the overview, the ones with two marks', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }, { player: 'Ben', data: saveOf('Clan Skrittle') }] });
+    const [anna, ben] = c.enrolments as [(typeof c.enrolments)[number], (typeof c.enrolments)[number]];
+    const start = anna.tags![0]!;
+    const after = { ...start, id: 'tag-after-1', kind: 'after_battle' as const, round: 1, createdAt: '2026-10-05T12:00:00.000Z', totals: { ...start.totals, rating: start.totals.rating + 20 } };
+    anna.tags = [start, after];
+    anna.tag = after;
+    expect(ben.tags).toHaveLength(1);
+    at(`/campaign/${c.id}`);
+    const fig = await screen.findByRole('figure', { name: /The Grey Penitents/ });
+    expect(fig.textContent).toContain(`${start.totals.rating} → ${start.totals.rating + 20} rating (+20)`);
+    // one mark is no line
+    expect(screen.queryByRole('figure', { name: /Clan Skrittle/ })).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Rating over the battles' })).toBeTruthy();
+  });
+
   it('a new warband for the campaign without the connection: made, and entered later', async () => {
     const srv = server();
     const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player' });

@@ -410,8 +410,11 @@ zeigt unter den Kacheln eine kleine **Linie** des Ratings über die Marken (Star
 `ratingSeries`): 2 px Linie in der Akzentfarbe, Punkte von 8 px mit einem Ring in der Flächenfarbe, eine leise Grundlinie, der
 letzte Wert direkt beschriftet, ein Tooltip an jedem Punkt, die Überschrift nennt Anfang, Ende und Änderung, und hinter
 **„The numbers“** steht dieselbe Reihe als Tabelle (kein Bild nötig). Eine Reihe braucht zwei Marken; vorher steht dort nichts.
-Nicht gebaut: die Linie in der Kachel „Rating“ des eigenen Rosters und ein Vergleich aller Warbands der Kampagne – beide
-brauchen die Marken aller Warbands auf einmal (heute eine Anfrage je Warband).
+**Teil 2 (13.11.2026):** der Server liefert die Reihen aller Warbands der Kampagne auf einmal (`GET /campaigns/:id/ratings`). Die **Übersicht** der
+Kampagne zeigt unter „Warbands“ den Abschnitt **„Rating over the battles“** mit einer kleinen Linie je Warband (nebeneinander, wo Platz ist; eine Warband mit
+weniger als zwei Marken hat keine), und das **eigene Roster** einer Warband in einer Kampagne zeigt dieselbe Linie unter dem Kopf. Bewusst **eine Linie je
+Karte** statt eines Diagramms mit allen Linien: ein Vergleich in einer Grafik bräuchte Farben je Warband, eine Legende und eine geprüfte Palette, und die Linien
+lassen sich nebeneinander ebenso vergleichen.
 
 **Kopf.** Name der Warband (mit Stift zum Umbenennen), eine Zeile mit Typ,
 Stufe und – falls an – „⚖ N house rules“, vier Kacheln (Gold, Rating, Models
