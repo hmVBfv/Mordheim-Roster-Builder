@@ -94,6 +94,9 @@ export const archiveCampaign = (id: string, archived: boolean) => api<{ archived
 export const setHouseRules = (id: string, rules: Record<string, unknown>) => api<CampaignView>(`/campaigns/${id}/house-rules`, { method: 'PUT', body: { rules } }).then(keep());
 /** Moves the campaign on (a leader), once the battles of the next round are closed; who fought none sat it out. */
 export const advanceRound = (id: string) => api<CampaignView>(`/campaigns/${id}/rounds/advance`, { body: {} }).then(keep());
+/** The rating of each warband of a campaign over its marks (server/src/campaigns.ts campaignRatings). */
+export interface WarbandRatings { warbandId: string; name: string; active: boolean; points: { round: number; kind: string; rating: number; at: string }[] }
+export const readRatings = (id: string) => api<{ ratings: WarbandRatings[] }>(`/campaigns/${id}/ratings`);
 export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/campaigns/${id}/warbands/${wid}`);
 
 /** A battle of the campaign's history (phase 4a5): played before the app, recorded afterwards by a leader. `outcomes`: who fought, and how it ended for them ('' not known). */

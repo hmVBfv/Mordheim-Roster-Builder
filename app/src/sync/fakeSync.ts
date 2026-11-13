@@ -1219,6 +1219,14 @@ export function createFakeSync(opts: {
     if (rest.startsWith('/notes')) return noteRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/attachments')) return pictureRoutes(c, role, method, rest, query, body);
     if (rest.startsWith('/timeline') || rest.startsWith('/chapters')) return timelineRoutes(c, role, method, rest, body);
+    // the rating of each warband over its marks (server/src/campaigns.ts campaignRatings); one that left is gone from the fake, with its marks
+    if (method === 'GET' && rest === '/ratings') {
+      const ratings = c.enrolments.filter((e) => (e.tags ?? []).some((t) => !t.supersededBy)).map((e) => ({
+        warbandId: e.warbandId, name: saveWords(s.warbands.get(e.warbandId) ?? { versions: [{ rev: 1, data: e.data }], headRev: 1 } as unknown as FakeWarband).name || e.name, active: true,
+        points: [...(e.tags ?? [])].filter((t) => !t.supersededBy).sort((a, b) => a.round - b.round || a.createdAt.localeCompare(b.createdAt)).map((t) => ({ round: t.round, kind: t.kind, rating: t.totals.rating, at: t.createdAt })),
+      })).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      return json(200, { ratings });
+    }
     // what the others have by now: the yardstick of a warband that joins late (server/src/campaigns.ts catchUpPeers)
     if (method === 'GET' && rest === '/catchup') {
       const peers = c.enrolments.filter((e) => e.status === 'active' && e.tag).map((e) => ({

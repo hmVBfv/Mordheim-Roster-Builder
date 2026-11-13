@@ -25,7 +25,7 @@ export interface Outcome { status: number; body: unknown }
 
 /** Fields that differ from run to run, with the type they must have on both sides. */
 export const VOLATILE: Record<string, 'time' | 'number' | 'string'> = {
-  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time',
+  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time', at: 'time',
   seq: 'number', cursor: 'number', epoch: 'string',
   // the server's wording of a refusal comes from its schema checker; the fake only has to refuse with some
   problem: 'string',

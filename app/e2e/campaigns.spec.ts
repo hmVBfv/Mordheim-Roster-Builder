@@ -370,6 +370,14 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await fig.getByText('The numbers').click();
     await expect(fig.getByRole('row')).toHaveCount(5);
     await fig.screenshot({ path: `test-results/screens/${test.info().project.name}-${theme}-rating-line.png` });
+    // and the overview of the campaign draws the same line for the warband
+    await page.goto(`./campaign/${c.id}`);
+    const line = page.getByRole('figure', { name: /The Grey Penitents/ });
+    await expect(line).toBeVisible();
+    await expect(line.locator('circle')).toHaveCount(4);
+    await noSideScroll(page);
+    await line.scrollIntoViewIfNeeded();
+    await shot(page, `${theme}-rating-lines-overview`);
   });
 }
 

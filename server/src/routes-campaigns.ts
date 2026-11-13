@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
-  campaignById, campaignView, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, endVanilla, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
+  campaignById, campaignView, campaignRatings, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, endVanilla, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
   removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, setOpening, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
@@ -191,6 +191,13 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
     return { peers: catchUpPeers(db(), t.c.id), round: t.c.round };
+  });
+
+  // the rating of each warband over its marks (plan P7): mechanics, every member reads it
+  app.get('/api/v1/campaigns/:id/ratings', { config: { action: 'campaign.read' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.read');
+    if (!t) return reply;
+    return { ratings: campaignRatings(db(), t.c.id) };
   });
 
   /** An open enrolment of this campaign, named by the route. */
