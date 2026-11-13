@@ -107,6 +107,7 @@ Schon vorhanden und weiterzuverwenden:
 | N12 | Schritte 6–9: Übersichten und Rückweg | mittel | N2 | – |
 | N13 | Schritt 10: Bilanz der Runde, für alle lesbar | mittel | N4–N10 | – |
 | N14 | Anschluss an die Statistik (P14) | klein | N13, P14 Stufe 1 | – |
+| N15 | *Idee, nicht eingeplant:* Würfe aus Tabletop Simulator (Abschnitt 6) | groß | N5, eigenes ADR | ja |
 
 Empfohlene Reihenfolge: N0 → N1 → N2, danach in beliebiger Folge N3, N4, N5,
 N9, N10, N11, N12; N6–N8 nach N5; N13 und N14 zuletzt.
@@ -570,3 +571,131 @@ Diagramme der Statistik bekommen diese Reihen.
 6. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
    Protokoll, oder sollen App-Würfe für die anderen Mitglieder eigens
    sichtbar sein (z. B. in der Bilanz, N13)? Vorschlag: Vermerk in der Bilanz.
+
+## 6. Idee für später: Würfe aus Tabletop Simulator (N15)
+
+**Nur festgehalten, nicht eingeplant** (Rob, 13.11.2026). Wird erst nach N5
+sinnvoll und braucht vorher ein eigenes ADR (neuer Zugang von außen).
+
+### Was TTS hergibt
+
+Geprüft an <https://api.tabletopsimulator.com> am 13.11.2026:
+
+- Skripte (Lua) im Tisch: `onObjectRandomize(object, player_color)` meldet
+  jeden Wurf samt Spielerfarbe; `object.resting` sagt, wann der Würfel liegt,
+  `object.getValue()` die Augenzahl. `onObjectEnterZone`/`onObjectLeaveZone`
+  für eine Zone, `setLock`, `addTag`/`hasTag`, `createButton`, `spawnObject`,
+  `randomize()` (würfelt per Skript, mit sichtbarer Physik), `onSave` (Zustand
+  des Skripts bleibt im Spielstand).
+- Nach außen: `WebRequest.get/post/custom` mit eigenen Kopfzeilen. Skripte
+  laufen beim **Host** des Tisches – nur sein Rechner spricht mit dem Server.
+- Eine Logdatei mit Würfen (wie das Combat Log von WoW) gibt es **nicht**.
+
+### Leitgedanke: die App führt, der Tisch würfelt
+
+Niemand tippt Würfe ab und niemand springt zwischen Feldern. Die App weiß aus
+`core`, welcher Wurf als Nächster fällig ist (Verletzung von X, Folgewurf,
+Erkundung mit N Würfeln, Veteranen 2D6, Seltenheit). Daraus entsteht eine
+**Wurfliste**; der Tisch arbeitet sie der Reihe nach ab. Am Ende steht in der
+App alles vorausgefüllt zur Durchsicht – „Take it“ bleibt beim Spieler, und
+alles ist rücknehmbar wie sonst.
+
+### Am Tisch: eine Schale je Warband
+
+Das Skript stellt nach dem Koppeln je teilnehmender Warband eine
+**Würfelschale** auf (Zone mit Rand, beschriftet mit dem Namen der Warband):
+
+1. **Anzeige:** über der Schale steht der fällige Wurf: „Hans – Serious
+   Injury (D66)“, darunter „2 of 7“.
+2. **Würfel:** die Schale legt genau die nötigen Würfel hinein (4 weiße für
+   die Erkundung; für D66 einen **roten Zehner** und einen **weißen Einer**,
+   am Tag erkannt). Andere Würfel in der Schale zählen nicht.
+3. **Würfeln:** Knopf „Roll“ an der Schale (ruft `randomize()` für ihre
+   Würfel) oder von Hand aufnehmen und werfen – beides ist echte, für alle
+   sichtbare Physik.
+4. **Ergebnis:** liegen alle Würfel (`resting`) **in** der Schale, liest das
+   Skript sie, sperrt sie (`setLock`) und zeigt groß „5 · 5 · 3 · 1“ mit
+   „✓ Take“ und „↺ Again“. Nach „✓“ geht der Wurf an den Server, die Schale
+   zeigt den nächsten.
+5. **Wer:** die Schale gehört zur Warband; wer geworfen hat (Farbe und Name
+   des Spielers) wird mitgeschrieben.
+
+### Zuordnung: welcher Wurf ist welcher?
+
+- **Über die Wurfliste, nicht über Raten.** Ein Wurf gehört zu der Anfrage,
+  die die Schale gerade zeigt (`requestId`). Anzahl und Art der Würfel müssen
+  zur Anfrage passen, sonst meldet die Schale „needs 4 dice – 3 in the tray“.
+- **Folgewürfe** (Multiple Injuries, Arm Wound D6, Ort mit Tabelle aus N7)
+  erzeugt die App aus dem Ergebnis sofort als nächste Anfrage – der Spieler
+  bleibt am Tisch.
+- **Regel-Wiederholungen** (Wyrdstone Hunter, Karte, ±1 des Elf Rangers aus
+  N6) wählt der Spieler in der App; daraus wird die Anfrage „Re-roll die 3“:
+  die Schale hält die übrigen Würfel gesperrt und gibt nur den einen frei.
+- **Würfe ohne Anfrage** (jemand würfelt einfach in der Schale) landen im
+  **Eingang** der Warband; neben jedem Wurffeld der App steht dann „Use last
+  roll from TTS“. Das ist zugleich die einfache erste Ausbaustufe.
+
+### Versehentliche und ungültige Würfe
+
+- Es zählt nur, was **in der Schale**, **bei offener Anfrage** und **bestätigt**
+  ist. Ein angestoßener Würfel irgendwo auf dem Tisch ist nie ein Wurf.
+- Nach dem Liegen sind die Würfel gesperrt – Anrempeln ändert nichts mehr.
+- Schräg liegende Würfel (Neigung über einer Schwelle) weist die Schale ab:
+  „cocked – roll again“.
+- „↺ Again“ verwirft den Wurf, **aber er bleibt im Wurfprotokoll** stehen
+  („verworfen: 3 · 4, von Rob“). Vertrauen entsteht durch Sichtbarkeit, nicht
+  durch Sperren – wie am echten Tisch („any dice rolls must be seen“).
+- In der App ist ein TTS-Wurf ein **Vorschlag** im Feld, mit Herkunft
+  („from TTS, rolled by Rob, 21:14“). Übernommen wird er erst mit „Take it“;
+  danach gilt das normale Undo.
+
+### Koppeln ohne Geheimnis im Mod
+
+Der Mod aus dem Workshop enthält **kein** Token (jeder könnte es lesen):
+
+1. In der App auf der Seite der Schlacht: „Connect a TTS table“ → ein
+   Einmal-Code (sechs Zeichen, zehn Minuten gültig).
+2. Der Host tippt ihn im Tisch ein; das Skript tauscht ihn gegen ein
+   **Tisch-Token** und merkt es sich im Spielstand (`onSave`).
+3. Das Tisch-Token darf nur drei Dinge, nur für diese Schlacht: Teilnehmer
+   lesen (Namen der Warbands – Mechanik, offen nach ADR 0002), offene
+   Wurfanfragen lesen, Würfe melden. Es läuft mit dem Markieren der Schlacht
+   oder nach wenigen Tagen ab und ist in der App widerrufbar. Vorbild:
+   Bug-Token (ADR 0019).
+
+### Server und App
+
+- Tabelle `roll_requests` (Schlacht, Warband, Schritt, Beschriftung, Würfel,
+  Status `open | rolled | discarded | taken`, Ergebnis, wer, wann) – kurzlebig,
+  nach dem Markieren nur noch das Protokoll.
+- Endpunkte: Koppeln (Code erzeugen, Code einlösen – streng begrenzt gegen
+  Raten), `GET` offene Anfragen und `POST` Wurf mit dem Tisch-Token; für
+  Mitglieder: Anfrage anlegen (nur für die eigene Warband), Würfe lesen. Alles
+  über `can()`, in Leak-Matrix und Vertragstest.
+- Der Tisch fragt alle zwei Sekunden nach offenen Anfragen, ohne gekoppelte
+  offene Schlacht gar nicht (Last für den Pi vernachlässigbar). Die App
+  erfährt Würfe über den vorhandenen Ereignis-Kanal (`/events`).
+- `Rolled.by` aus N0 bekommt den dritten Wert `'tts'` (neben `'entered'` und
+  `'app'`); Spieler und Zeit stehen dabei.
+- Ohne TTS ändert sich nichts: eintragen oder in der App würfeln bleibt.
+
+### Ausbaustufen
+
+1. **Eingang:** Schale meldet bestätigte Würfe, die App bietet „Use last roll
+   from TTS“ am Feld an. Kleinster Schnitt, schon nützlich.
+2. **Wurfliste:** Anfragen aus der App, Anzeige und passende Würfel an der
+   Schale, Folgewürfe von selbst.
+3. **Wurfprotokoll der Runde** in der Bilanz (N13): jeder Wurf, auch der
+   verworfene, für alle Mitglieder lesbar.
+
+### Offen
+
+- Der Mod selbst: eigenes kleines Skript zum Einfügen in den vorhandenen
+  Mordheim-Tisch (Global oder ein Objekt „Dice tray“ zum Abspeichern) – wo es
+  liegt und wie es getestet wird (Lua lässt sich hier nicht in der CI fahren;
+  der Server-Teil schon, gegen aufgezeichnete Anfragen).
+- Würfe **während** der Schlacht (Verletzungswurf im Spiel, Rout-Test) sind
+  bewusst nicht Teil der Idee: das Protokoll der Schlacht hält Ausfälle fest,
+  keine Würfel.
+- Ob „✓ Take“ an der Schale nach einigen Sekunden von selbst gilt (schneller)
+  oder immer geklickt wird (sicherer) – Einstellung je Tisch.
