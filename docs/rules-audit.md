@@ -371,3 +371,44 @@ mit einem Vorschlag, **je Zeile Robs Entscheidung**.
 
 Nicht geprüft (das Werkzeug kann es noch nicht): Sonderregeln, Fertigkeitstexte, die Zauberlisten und der Text der Einleitungen; die Hired Swords,
 die jede Warband anheuern darf, stehen in P10.
+## H. Lücken aus dem 2a-Lauf (Plan P10, 12.11.2026) – Fragen an Rob
+
+Aus Pull Request 409 blieben drei Punkte offen. Nachgesehen auf mordheimer.net; **geändert ist nichts**, jede Zeile ist Robs Entscheidung.
+
+### H1. Zauberlisten ohne Inhalt
+
+| Liste in `data/spells.json` | Befund | Vorschlag |
+| --- | --- | --- |
+| **Blessings of the Lady** (leer, von keiner Warband benutzt; Notiz „Paladin (Bretonnian)“) | Auf der Seite gibt es `…/docs/magic/ladys-prayers` („Lady’s Prayers“): sechs Gebete mit vollem Text (Lady’s Favors, Blessed Protection, Swiftstride, Lady’s Scorn, Elixir of Life, Guiding Vision), benutzt von der **Chapel Guard Damsel** der Bretonnen – nicht vom Paladin. Eine Liste „Blessings of the Lady“ steht nicht dort. | Die Liste als **„Lady’s Prayers“** mit den sechs Texten aufnehmen (wie die anderen Gebetslisten, mit den FAQ-Anmerkungen der Seite) und der Damsel zuordnen; die leere Liste „Blessings of the Lady“ streichen. Frage: Hat der Paladin der Bretonnen eine eigene Liste? Dann bitte die Quelle nennen. |
+| **Ice Magic** (leer, unbenutzt; Notiz „Ice Maiden (Kislev)“) | Unter `/docs/magic/` gibt es keine Seite „Ice Magic“; auch die Seiten der Warbands von Kislev nennen sie nicht unter den gefundenen Adressen. | Entweder **streichen** (keine Quelle, keine Warband) oder du nennst die Seite, dann wie oben mit vollen Texten. |
+
+### H2. Hired Swords der neuen Warbands
+
+Die Daten setzen die Regel „darf anheuern“ als Menge (`tags`: `merc`, `wh`, `sos`, `undead`, `skaven`, `goodElves` …; oder `only`/`except`/`none`). Die Seiten sagen in den meisten Fällen dasselbe in Worten – das stimmt mit den Daten überein. **Nicht belegt oder abweichend:**
+
+| Warband | Seite | Daten | Vorschlag |
+| --- | --- | --- | --- |
+| Skaven of Clan Moulder, Necrarchs, Outlaws of Stirwood Forest | sagt nichts zu Hired Swords | `skaven` / `undead` / `merc` (nach Analogie gesetzt) | so lassen und in der Warband vermerken, dass die Seite schweigt; oder du entscheidest anders |
+| Druchii | „darf nur anheuern“: Pit Fighter, Ogre Bodyguard, Warlock, Imperial Assassin, Tilean Marksman, Highwayman; inoffiziell Duelist, Witch, Emissary of Chaos, Human Scout, Old Prospector u. a. | Menge `goodElves` | die Liste der Seite als `only` eintragen (offizielle; die inoffiziellen nur nach deinem OK) |
+| Sorcerous Society | keine Hired Swords oder Dramatis Personae mit der Fähigkeit Wizard, außer dem High Elf Mage; sonst wie Mercenaries | `merc` | Ausnahme „kein Wizard außer High Elf Mage“ in den Daten ergänzen (heute nur der Text) |
+| Dreamwalkers | wie Mercenaries, Witch Hunters und Sisters, nicht nekromantisch oder chaotisch | `merc`, `wh`, `sos` | so lassen; Ausschluss „nekromantisch/chaotisch“ prüfen |
+
+### H3. Gegenstände mit offenem Preis
+
+Das sind keine Lücken des Katalogs, sondern Gegenstände mit Würfelpreis (z. B. 15 + D6 gc), die in den **Startlisten** fehlen, weil dort ein fester Preis stehen muss. Die Fälle der 2a-Warbands (Chainsaw Sword, Electric Trident, Repeater Pistol bei den Masters of Horror; Beastlash und Hunting Arrows) stehen in Abschnitt G mit dem Vorschlag, sie **mit Würfelpreis** aufzunehmen, wie der Trading Post ihn schon rechnet. Frage: Gilt der Würfelpreis auch beim Gründen (Startliste) oder nur danach (Trading Post)? Ich schlage vor: nur danach, bei der Gründung der Durchschnitt (aufgerundet), wie bei den Raritäten.
+
+## I. Regeln mit Wirkung (Plan P11, Schritt 1) – die Liste, vor jedem ADR
+
+Ich habe die Regeltexte aller 67 Warbands nach Sätzen durchsucht, die eine Zahl dauerhaft ändern (Wert, Rettungswurf, Zählung der Modelle, Startrang, Preis). Fast alles sind **Regeln für das Spiel selbst** (+1 Stärke bis Spielende, Führungswert im Umkreis, Treffer auf einen Wagen): Sie ändern das Roster nie und bleiben Text. Was das Roster betrifft, sind es wenige Fälle:
+
+| Regel | Warband | Wirkung auf das Roster | Heute |
+| --- | --- | --- | --- |
+| Captured Thrall | Cavalcade | zählt nicht zur Höchstzahl der Modelle (13 → bis 18), kann nicht entlassen werden | Text |
+| Troll: Always Hungry | Black Orcs | 20 gc Unterhalt nach dem Spiel, oder zählt als 2 Mitglieder für 5 gc (Höchstzahl faktisch 11) | Text |
+| Goblin / Cave Squig: Not Orcs | Orc Mob | zählt für den Rout-Test nur als halbes Modell | Text |
+| Not Orcs, Snotling Shoota Team | Orc Mob, Snotlings | die Gruppe zählt als ein Modell (Shoota Team) | Text |
+| Wheelo: Upgrades | Snotlings | steigt nach der Heldentabelle auf, nicht „That Lad’s Got Talent“, kein Wert mehr als einmal erhöht | Text |
+| Bullied Goblin | Snotlings | +1 Führungswert je 2 Snotlings in 6 Zoll (höchstens 10) – nur im Spiel | Text |
+| Guiding Dream, Goading, Commands, Slayer Rites, Transform | verschiedene 2a | nur im Spiel oder Auswahl beim Aufstieg | Text |
+
+**Vorschlag:** kein allgemeiner Regel-Interpreter. Wenn überhaupt, ein kleines Feld am Regel-Eintrag nur für **„zählt als“** (n Modelle für die Höchstzahl, die Rout-Zählung und die Kosten) – das sind drei der Zeilen oben (Thrall, Troll, Shoota Team) und gehört zu `core/src/rules/` (Höchstzahl und Worth). Ob sich das lohnt, ist deine Entscheidung; ein ADR schreibe ich erst danach. Die übrigen bleiben Text. (P11 hängt an P9: die Daten der Einheiten sollen vorher stimmen.)
