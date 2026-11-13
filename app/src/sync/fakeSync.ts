@@ -454,6 +454,12 @@ export function createFakeSync(opts: {
     const cur = s.questions.get(m[1]!);
     if (method === 'PUT' && !m[2]) {
       if (role !== 'leader') return json(403, { error: 'forbidden' });
+      if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'a question is named by its device id' });
+      // the fields of a question as the server's schema reads them (server/src/questions.ts QuestionBody)
+      const bad = Object.keys(body).find((k) => !['to', 'text', 'battleId', 'status'].includes(k))
+        ?? (typeof body.to !== 'string' ? 'to' : null) ?? (typeof body.text !== 'string' || !body.text.trim() || body.text.trim().length > 2000 ? 'text' : null)
+        ?? (body.status !== undefined && !['open', 'withdrawn'].includes(String(body.status)) ? 'status' : null);
+      if (bad) return json(400, { error: 'invalid', problem: `not a question (${bad}: invalid)` });
       const to = c.members.find((x) => x.userId === body.to);
       if (!to || to.role === 'viewer') return json(400, { error: 'invalid', problem: 'a question is asked of a leader or a player of this campaign' });
       const fields = { text: String(body.text).trim(), battleId: (body.battleId as string | null) ?? null };
@@ -529,7 +535,19 @@ export function createFakeSync(opts: {
       return json(200, { ...worldOf(c.id), removed: was });
     }
     if (method !== 'PUT') return json(404, { error: 'not_found' });
+    // as the server reads it (server/src/routes-world.ts, world.ts): the id is a device id, the fields are the schema's, the name is not taken
+    const what = kind === 'factions' ? 'a faction' : kind === 'npcs' ? 'an NPC' : 'a reputation event';
+    if (!UUID_RE.test(id)) return json(400, { error: 'invalid', problem: `${what} is named by its device id` });
+    const allowed = kind === 'factions' ? ['nameDe', 'nameEn', 'publicStatus'] : kind === 'npcs' ? ['factionId', 'nameDe', 'nameEn', 'publicStatus', 'statlineTts', 'named', 'profile'] : ['warbandId', 'factionId', 'delta', 'reason', 'battleId'];
+    const stray = Object.keys(body).find((k) => !allowed.includes(k));
+    if (stray) return json(400, { error: 'invalid', problem: `not ${what} (${stray}: unknown)` });
     if (cur?.deleted) return json(409, { error: 'removed' });
+    if (kind !== 'reputation') {
+      const keyOf = (x: unknown) => String(x ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+      const wanted = new Set([keyOf(body.nameEn), keyOf(body.nameDe)].filter(Boolean));
+      const rows = (kind === 'factions' ? [...s.factions.values()] : [...s.npcs.values()]).filter((x) => x.campaignId === c.id && !x.deleted && x.id !== id);
+      if (wanted.size && rows.some((x) => wanted.has(keyOf(x.nameEn)) || wanted.has(keyOf(x.nameDe)))) return json(400, { error: 'invalid', problem: `${what} of this name exists already` });
+    }
     const named = (b: Record<string, unknown>) => String(b.nameDe ?? '').trim() !== '' || String(b.nameEn ?? '').trim() !== '';
     if (kind === 'factions') {
       if (!named(body)) return json(400, { error: 'invalid', problem: 'not a faction (nameEn: a name, in German or English)' });
@@ -638,7 +656,8 @@ export function createFakeSync(opts: {
     if (role !== 'leader') return json(403, { error: 'forbidden' });
     if (method === 'GET') return json(200, { style: styleOf(c.id) });
     if (method !== 'PUT') return json(404, { error: 'not_found' });
-    if (typeof body.text !== 'string' || body.text.length > 10_000) return json(400, { error: 'invalid', problem: 'not a style guide (text: too big)' });
+    const stray = Object.keys(body).find((k) => k !== 'text' && k !== 'baseSeq');
+    if (stray || typeof body.text !== 'string' || body.text.length > 10_000) return json(400, { error: 'invalid', problem: `not a style guide (${stray ?? 'text'}: invalid)` });
     const cur = styleOf(c.id);
     if (cur.text === body.text && cur.seq !== 0) return json(200, { style: cur });
     if (cur.seq !== Number(body.baseSeq ?? 0)) return json(409, { error: 'stale', current: cur });
@@ -740,7 +759,8 @@ export function createFakeSync(opts: {
     const m = /^\/plans\/(\d+)$/.exec(rest);
     if (!m || method !== 'PUT') return json(404, { error: 'not_found' });
     const round = Number(m[1]);
-    if (round < 1 || round > 999 || typeof body.text !== 'string' || body.text.length > 20_000) return json(400, { error: 'invalid', problem: 'not a plan' });
+    if (round < 1 || round > 999) return json(400, { error: 'bad_request' });
+    if (typeof body.text !== 'string' || body.text.length > 20_000) return json(400, { error: 'invalid', problem: 'not a plan' });
     const text = body.text.trim() ? body.text : '';
     const cur = planOf(c.id, round);
     if (cur.text === text) return json(200, { plan: cur });
