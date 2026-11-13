@@ -25,7 +25,7 @@ export interface Outcome { status: number; body: unknown }
 
 /** Fields that differ from run to run, with the type they must have on both sides. */
 export const VOLATILE: Record<string, 'time' | 'number' | 'string'> = {
-  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time',
+  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time', at: 'time', releasedAt: 'time',
   seq: 'number', cursor: 'number', epoch: 'string',
   // the server's wording of a refusal comes from its schema checker; the fake only has to refuse with some
   problem: 'string',
@@ -48,6 +48,8 @@ export function normalize(v: unknown, volatile: Record<string, string> = VOLATIL
       if (typeof x === 'string' && VOLATILE_IDS.some((re) => re.test(`${path}.${k}`))) return [k, '<id>'];
       // when a battle was played: a moment for a battle of the app, a day the leader gave for one of the history – only the moment varies
       if (k === 'playedAt' && typeof x === 'string' && TIME.test(x)) return [k, '<time>'];
+      // the day a chapter was published is the day it was done: different on the server's clock and the fake's
+      if (k === 'publishedOn' && typeof x === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x)) return [k, '<day>'];
       const kind = volatile[k];
       if (kind && x !== null && x !== undefined) {
         const ok = kind === 'time' ? typeof x === 'string' && TIME.test(x) : typeof x === kind;

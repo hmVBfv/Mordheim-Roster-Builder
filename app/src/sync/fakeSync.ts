@@ -400,6 +400,7 @@ export function createFakeSync(opts: {
     }
     const snapshot = (e: FakeBackground) => ({ kind: e.kind, title: e.title, truth: e.truth, playersKnow: e.playersKnow, status: e.status, reveal: e.reveal, hintLimits: e.hintLimits, revealFromBattle: e.revealFromBattle, refs: e.refs, battleId: e.battleId });
     if (method === 'POST' && m[2]) {
+      if (!['hint', 'revealed'].includes(String(body.level)) || typeof body.text !== 'string' || !body.text.trim() || !UUID_RE.test(String(body.noteId))) return json(400, { error: 'invalid', problem: 'not a reveal (level, text or note id)' });
       if (!cur || cur.deleted) return json(404, { error: 'not_found' });
       const noteId = String(body.noteId);
       if (cur.lastReveal?.noteId === noteId) return json(200, { entry: bgView(cur), note: noteId, seq: bgSeq(c.id) });
@@ -415,6 +416,9 @@ export function createFakeSync(opts: {
       return json(200, { entry: bgView(cur), note: noteId, seq: bgSeq(c.id) });
     }
     if (method === 'PUT') {
+      if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'an entry is named by its device id' });
+      if (!['thread', 'figure', 'place', 'scenario', 'gm_note'].includes(String(body.kind)) || typeof body.title !== 'string' || !body.title.trim()) return json(400, { error: 'invalid', problem: 'not a background entry (kind or title)' });
+      if ([...s.background.values()].some((x) => x.campaignId === c.id && !x.deleted && x.id !== m[1] && nameKey(x.title) === nameKey(String(body.title)))) return json(400, { error: 'invalid', problem: 'an entry of this title exists already' });
       const fields = { kind: String(body.kind), title: String(body.title), truth: String(body.truth ?? ''), playersKnow: String(body.playersKnow ?? ''), status: String(body.status ?? 'planned'), reveal: String(body.reveal ?? 'hidden'), hintLimits: String(body.hintLimits ?? ''), revealFromBattle: (body.revealFromBattle as string | null) ?? null, refs: (body.refs as unknown[]) ?? [], battleId: (body.battleId as string | null) ?? null };
       if (!cur) {
         s.background.set(m[1]!, { id: m[1]!, campaignId: c.id, ...fields, updatedBy: me.displayName, createdAt: at(), updatedAt: at(), seq: next(), lastReveal: null, revisions: [] });
@@ -616,10 +620,13 @@ export function createFakeSync(opts: {
       return answer(cur);
     }
     if (method !== 'PUT' || m[2]) return json(404, { error: 'not_found' });
-    if (cur?.deleted) return json(409, { error: 'removed' });
-    if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
+    if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'a scenario is named by its device id' });
     const title = String(body.title ?? '').trim();
     if (!title) return json(400, { error: 'invalid', problem: 'not a scenario (title: too small)' });
+    if (cur?.deleted) return json(409, { error: 'removed' });
+    if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
+    // a title another scenario of the campaign has (case and spaces aside) is taken (server/src/names.ts)
+    if ([...s.scenarios.values()].some((x) => x.campaignId === c.id && !x.deleted && x.id !== m[1] && nameKey(x.title) === nameKey(title))) return json(400, { error: 'invalid', problem: 'a scenario of this title exists already' });
     const sent = Array.isArray(body.npcs) ? (body.npcs as ScenarioNpc[]) : [];
     if (sent.length > 30) return json(400, { error: 'invalid', problem: 'not a scenario (npcs: too many)' });
     if (new Set(sent.map((n) => n.id)).size !== sent.length) return json(400, { error: 'invalid', problem: 'not a scenario (npcs: one id twice)' });
@@ -886,7 +893,7 @@ export function createFakeSync(opts: {
     if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
     if (method === 'PUT' && !m[2]) {
       if (typeof body.title !== 'string' || !body.title.trim() || typeof body.text !== 'string' || !body.text || body.text.length > 200_000) return json(400, { error: 'invalid', problem: 'not a chapter draft (title or text)' });
-      if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(String(body.refKey)) || !['de', 'en'].includes(String(body.lang))) return json(400, { error: 'invalid', problem: 'not a chapter draft (refKey or lang)' });
+      if (!['prologue', 'battle', 'interlude', 'chapter'].includes(String(body.kind)) || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(String(body.refKey)) || !['de', 'en'].includes(String(body.lang))) return json(400, { error: 'invalid', problem: 'not a chapter draft (refKey or lang)' });
       const fields = { refKey: String(body.refKey), kind: String(body.kind), lang: body.lang as 'de' | 'en', title: String(body.title).trim(), label: String(body.label ?? ''), icDate: String(body.icDate ?? ''), place: String(body.place ?? ''), victor: String(body.victor ?? ''), text: body.text };
       if (!cur) {
         if (draftsOf(c.id).length >= 100) return json(409, { error: 'full' });
