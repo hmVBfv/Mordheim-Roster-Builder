@@ -96,13 +96,13 @@ Schon vorhanden und weiterzuverwenden:
 | N1 | Tabellen: Daten, Komponente, Regelübersicht | mittel | – | – |
 | N2 | Rahmen der Seite: Fortschritt, Ergebnis je Schritt | mittel | N0 | – |
 | N3 | Schritt 1 Verletzungen: Übersicht | klein | N1, N2 | – |
-| N4 | Schritt 2 Erfahrung: Tabelle je Krieger, Underdog, Szenario | mittel | N0–N2 | Frage 1 |
+| N4 | Schritt 2 Erfahrung: Tabelle je Krieger, Underdog, Szenario | mittel | N0–N2 | – (entschieden) |
 | N5 | Schritt 3 Erkundung: Würfel, Splitter, Ort erkennen | mittel | N0–N2 | – |
-| N6 | Erkundung: Zusatzwürfel, Wiederholungen, ±1 | mittel | N5 | Frage 3 |
-| N7 | Erkundung: die 30 Orte als Daten und Rechner | groß | N5 | Frage 4 |
+| N6 | Erkundung: Zusatzwürfel, Wiederholungen, ±1 | mittel | N5 | offene Frage 2 |
+| N7 | Erkundung: die 30 Orte als Daten und Rechner | groß | N5 | Liste der „dämonenartigen“ Warbands |
 | N8 | Erkundung: Orte in der Oberfläche, Funde verbuchen | groß | N7 | – |
-| N9 | Schritt 4 Wyrdstone: Preistabelle, Hauptbuch | klein | N0–N2 | Frage 5 |
-| N10 | Sold der Hired Swords | mittel | N0–N2 | Frage 2 |
+| N9 | Schritt 4 Wyrdstone: Preistabelle, Sonderregeln, Hauptbuch | mittel | N0–N2 | offene Frage 3 |
+| N10 | Sold der Hired Swords | mittel | N0–N2 | offene Frage 1 |
 | N11 | Schritt 5 Veteranen im Schritt | klein | N2 | – |
 | N12 | Schritte 6–9: Übersichten und Rückweg | mittel | N2 | – |
 | N13 | Schritt 10: Bilanz der Runde, für alle lesbar | mittel | N4–N10 | – |
@@ -245,7 +245,7 @@ getrennt und gedämpft („Their player rolls for them“).
 
 ### N4 – Schritt 2 Erfahrung: Tabelle je Krieger, Underdog, Szenario
 
-- [ ] erledigt · **Rob entscheidet Frage 1**
+- [ ] erledigt · Underdog entschieden (Abschnitt 5)
 
 **Regel:** `…/docs/tools#2-allocate-experience`, `…/docs/campaigns/experience`
 (Underdogs: Bonus **je teilnehmendem Kämpfer** nach Unterschied der Ratings).
@@ -263,8 +263,11 @@ getrennt und gedämpft („Their player rolls for them“).
    Grund). Ohne die Optionen bleibt alles wie heute (Parität).
 3. App: das eigene und die gegnerischen Ratings stehen in `view.participants[].beforeTotals`;
    Vorschlag des Bonus daraus, änderbar (Feld 0–5), mit der Underdog-Tabelle
-   daneben (eigene Zeile hervorgehoben). Fehlt `beforeTotals`: Feld leer,
-   Hinweis.
+   daneben (eigene Zeile hervorgehoben). **Regel (Rob, 13.11.2026):** direkter
+   Vergleich je Paar; bei mehr als zwei Warbands zählt für jede Warband der
+   **größte** Rating-Unterschied zu einer höher bewerteten Gegnerin. Die Tabelle
+   zeigt je Gegnerin den Unterschied und den Bonus, der größte ist markiert.
+   Fehlt `beforeTotals`: Feld leer, Hinweis.
 4. Tabelle: Krieger | Überlebt | Anführer | Ausschalter | Underdog | Szenario
    (Eingabe je Zeile, dazu „for all“) | Summe | Erfahrung vorher → nachher |
    „Advance!“ wo eine Schwelle überschritten wird. Ein Knopf „Grant and write
@@ -319,7 +322,7 @@ rücknehmbar; Changelog.
 
 ### N6 – Erkundung: Zusatzwürfel, Wiederholungen, ±1
 
-- [ ] erledigt · **Rob entscheidet Frage 3**
+- [ ] erledigt · **Rob entscheidet** (offene Frage 2)
 
 **Ziel:** was Fertigkeiten, Ausrüstung und Hired Swords an der Erkundung
 ändern, steht als Daten da und wird angeboten – nicht erzwungen.
@@ -350,7 +353,7 @@ durch den Elf Ranger) lässt sich so nachspielen; Changelog.
 
 ### N7 – Erkundung: die 30 Orte als Daten und Rechner
 
-- [ ] erledigt · **Rob entscheidet Frage 4**
+- [ ] erledigt · Warband-Zweige entschieden (Abschnitt 5), Liste der dämonenartigen Warbands vorlegen
 
 **Regel:** `…/docs/campaigns/income#exploration-chart` und die 30 Abschnitte
 darunter, dazu `#magical-artefacts-table`. Volltext lesen, nicht die Kurzform.
@@ -372,8 +375,11 @@ darunter, dazu `#magical-artefacts-table`. Volltext lesen, nicht die Kurzform.
    je Zeile ein Wurf „4+“), `test` (Toughness/Leadership eines gewählten
    Helden, mit `auto` für Warbands, die automatisch bestehen), `choice`
    (Graveyard, Fighting Arena, The Pit), `warband` (Zweige für Skaven,
-   Possessed, Undead, Sisters of Sigmar, Witch Hunters – über die vorhandenen
-   Warband-Merkmale, nicht über Namen im Code), `lasting` (Vorteile, die
+   Possessed, Undead, Sisters of Sigmar, Witch Hunters – über Merkmale des
+   Warband-Kopfes, nicht über Namen im Code: Undead = `siteRace` „Undead“,
+   Skaven = `siteRace` „Skaven“, Possessed = „dämonenartig“, ein neues Merkmal
+   `demonic`, das Rob zuerst für Possessed und Carnival bestätigt; alles andere
+   „anyone else“), `lasting` (Vorteile, die
    bleiben oder später wirken: Entrance to the Catacombs, Returning a Favour,
    Straggler, Catacombs, Alchemist’s Laboratory, Jewelsmith, Graveyard-Hass).
    Gegenstände mit ihren Schlüsseln aus `equipment.json` (Test: jeder existiert).
@@ -423,7 +429,7 @@ mit Gold, einer mit Gegenständen, bei 360 px.
 
 ### N9 – Schritt 4 Wyrdstone: Preistabelle, Hauptbuch
 
-- [ ] erledigt · **Rob entscheidet Frage 5**
+- [ ] erledigt · **Rob entscheidet** (offene Frage 3)
 
 **Regel:** `…/docs/tools#4-sell-wyrdstone`, `…/docs/campaigns/income#selling-wyrdstone`
 (einmal je Nachspiel; Preis für das ganze Los nach Größe der Warband).
@@ -437,6 +443,16 @@ nur als „Changed by hand“: eine eigene Buchung mit `source: 'wyrdstone'` –
 Verhalten für die alte App unverändert, sonst Eintrag in
 `docs/behaviour-changes.md`.
 
+**Sonderregeln des Verkaufs** (Fundstellen und Wortlaut: Abschnitt 5, nach
+Robs Freigabe): Core `sellingSize(ctx)` → `{ models, band, adjustments[] }`
+mit den Anpassungen der Größe (Ogre zählt doppelt, Koch und *Victuals* eine
+Stufe kleiner, Mob als ein Modell, Troll als zwei) und `wyrdPrice(ctx, n, size)`
+nimmt die angepasste Größe (Parameter gibt es schon). Der Preis des *Cathayan
+Merchant* (W6 → ±2W6/+3W6) kommt als eigener Wurf mit „eintragen oder
+würfeln“ hinzu und steht als eigene Zeile im `Find`. Die Oberfläche zeigt über
+der Preistabelle, wie die Größe zustande kommt, jede Anpassung mit Quelle und
+einzeln abschaltbar. `warbandSize` bleibt für das Roster unverändert (Parität).
+
 **Tests:** Buchung und Rücknahme mit Hauptbuch; Komponente (Hervorhebung).
 
 **Abnahme:** Preis ist vor dem Verkauf in der Tabelle abzulesen; die Einnahme
@@ -444,7 +460,7 @@ ist als Wyrdstone-Verkauf auswertbar; Changelog.
 
 ### N10 – Sold der Hired Swords
 
-- [ ] erledigt · **Rob entscheidet Frage 2**
+- [ ] erledigt · **Rob entscheidet** (offene Frage 1)
 
 **Regel:** `…/docs/campaigns/hired-swords#hire-fee`: nach jeder Schlacht, die er
 mitkämpft, **auch der ersten**, ist der Sold fällig, wenn er bleiben soll; ist
@@ -551,24 +567,65 @@ Diagramme der Statistik bekommen diese Reihen.
 
 **Abnahme:** die Statistik trennt Gold, Wyrdstone und Fundwert je Runde.
 
-## 5. Fragen an Rob (vor N0)
+## 5. Entscheidungen und offene Fragen
 
-1. **Underdog bei mehr als zwei Warbands:** gegen welches Rating wird
-   gerechnet? Vorschlag: gegen das **höchste gegnerische** Rating (RAW nennt nur
-   „an enemy warband with a higher rating“); die Mehrspieler-Regeln auf
-   mordheimer vorher nachlesen und zitieren.
-2. **Sold:** wo in der Folge? Vorschlag: Unterpunkt nach Schritt 4 (Geld ist
+### Von Rob entschieden (13.11.2026)
+
+1. **Underdog-Bonus:** immer im **direkten Vergleich** der Schlacht. Bei mehr
+   als zwei Warbands wird je **Paar** verglichen; für jede Warband zählt der
+   **größte** Unterschied zu einer höher bewerteten Gegnerin
+   (`underdogBonus(max über Gegner (Rating Gegner − eigenes Rating))`, Tabelle
+   `PB_UNDERDOG`; ist keine Gegnerin höher, gibt es nichts). Die Ratings kommen
+   aus `beforeTotals` der Teilnehmer (Stand vor der Schlacht).
+2. **Warband-Zweige der Orte (N7):** „Undead“ = jede Warband mit
+   `siteRace: "Undead"` (heute Tomb Guardians, Restless Dead, Necrarchs, Undead;
+   **nicht** die Strigoi mit `siteRace: "Vampire"` – Rückfrage bei N7).
+   „Possessed“ = alles Dämonenartige: die Warbands mit Dämonen im `siteRace`
+   (heute Possessed – `Chaos Human` – und Carnival – `Chaos Human/Demon`; in
+   N7 über ein **Merkmal** im Warband-Kopf, z. B. `demonic: true`, nicht über
+   Namen im Code, und Rob die Liste vorlegen). „Skaven“ = `siteRace: "Skaven"`
+   (Core, Pestilens, Moulder). Alles andere ist „anyone else“.
+3. **Wyrdstone-Verkauf, Sonderregeln:** geprüft, siehe unten.
+
+### Sonderregeln für Erkundung und Verkauf (Fundstellen in `data/`, 13.11.2026)
+
+Die Regeln wirken auf die **Größe der Warband** (Spalte der Preistabelle), auf
+den **Preis** oder auf die **Zahl der Splitter**. Heute rechnet nur
+`warbandSize` (Modelle + Hired Swords + Dramatis Personae); keine der folgenden
+Regeln ist umgesetzt.
+
+| Wirkung | Quelle | Regel |
+| --- | --- | --- |
+| Größe +1 Modell je Ogre | Maneaters (`1c/maneaters.json`, Ability *Gluttony*) | „Each Ogre counts as two models when selling wyrdstone or treasure“, mindestens als eines; gefressene Gefangene senken die Zahl um 1 (Large: 2) |
+| Größe eine Stufe kleiner | Halflings, Koch (*Master Chef*, `2a/halflings.json`) | W6 5+: beim Verkauf von Treasure **oder Wyrdstone** gilt die Warband als eine Größe kleiner |
+| Größe eine Stufe kleiner | Gegenstand *Victuals* (8 gc, Common; `data/equipment.json`) | „after a battle when selling treasures: one size band smaller (never below 1–3 models). Any number may be used.“ – gilt dem Wortlaut nach nur für **Treasure**, nicht für Wyrdstone → Rob, ob auch Wyrdstone |
+| Größe: Mob = 1 Modell | Snotlings, Night Goblins (*Insignificant*, `abilities.json`, `nightgoblins.json`) | „counts as a single model for … maximum warband size and income“ |
+| Größe: Troll = 2 Modelle | Black Orcs (*Always Hungry*, `1b/blackorcs.json`) | 20 gc Sold nach jeder Schlacht **oder** der Troll zählt als 2 Mitglieder für nur 5 gc – wirkt auf die Größe |
+| Preis ±2W6/+3W6 | Hired Sword *Cathayan Merchant* (Border Town Burning; `hiredswords.json`, *Stone Cutter*) | W6 bei jedem Verkauf: 1–2 verliere 2W6 gc, 3–5 gewinne 2W6 gc, 6 gewinne 3W6 gc |
+| Splitter +1 | Dark Elves / Druchii (*Fey Acuity*, `2a/druchii.json`) | beim Erkunden +1 gefundenes Stück, wenn mindestens ein Held sucht (**Erkundung**, nicht Verkauf) |
+| Splitter +1 | Strigoi-Fertigkeit *Light Fingers* (`2a/strigos.json`) | ein Held mit der Fertigkeit, der einen Gegner ausschaltet, findet ein Stück Wyrdstone extra; höchstens eines je Spiel |
+| Würfel ±1, Wiederholung, Zusatzwürfel | siehe N6 | Elf Ranger, Pathfinder, Karten, Talismane … (Erkundung) |
+| Sold in Wyrdstone | Dramatis Personae (`dramatis.json`: Nicodemus 1 Splitter zum Anheuern und 1 nach jeder Schlacht; Luthor verliert bei W6 = 1 einen Splitter) | wirkt auf den **Stash** nach dem Verkauf, nicht auf den Preis |
+| Gold bedeutet etwas anderes | Sisters of Sigmar, Skaven, Undead (mordheimer, Income) | Regelwert der Währung, keine Rechenregel – nur Beschriftung („favour“, „warp tokens“) |
+
+Ergebnis: **ja, es gibt solche Regeln**, auch für den Verkauf. Sie gehören in
+N9 (Preis und Größe) und N6 (Erkundung); Vorschlag: nach der Freigabe als
+Daten am Eintrag (`income: { sizeBand?: -1, models?: +1, perOgre?: … }`, über
+P11 `effects`, wenn es dann läuft), in der Oberfläche als **sichtbare Zeile
+über der Preistabelle** („Size for selling: 9 models (3 Ogres count double),
+band 7–9; Victuals ×1 → band 4–6“), jede Anpassung mit Namen der Quelle und
+ausschaltbar, damit niemand etwas Stilles verliert.
+
+### Noch offen
+
+1. **Sold:** wo in der Folge? Vorschlag: Unterpunkt nach Schritt 4 (Geld ist
    dann da), Dramatis Personae ebenso.
-3. **Erkundung, Sonderregeln:** die Tabelle aus N6 (welche Fertigkeit, welcher
-   Gegenstand, welcher Hired Sword wie wirkt) – freigeben oder ändern.
-4. **Orte mit Warband-Zweigen:** gelten „Undead“, „Possessed“, „Skaven“ nur für
-   die genannten Warbands des Regelbuchs oder auch für verwandte (z. B. weitere
-   Untoten-Warbands)? Vorschlag: RAW – nur die genannten; alles andere „anyone
-   else“.
-5. **Wyrdstone-Verkauf:** gibt es Warbands mit eigener Einkommensregel, die
-   hier berücksichtigt werden sollen? N9 legt dazu die Fundstellen aus
-   `data/warbands/` vor.
-6. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
+2. **Erkundung, Sonderregeln:** die Tabelle aus N6 – freigeben oder ändern.
+3. **Verkaufs-Sonderregeln:** Victuals auch für Wyrdstone? Wirken Master Chef
+   und Victuals zusammen (zwei Stufen)? Snotlings/Night Goblins als *ein*
+   Modell auch beim Verkauf (Wortlaut „income“)? Strigoi (`Vampire`) als
+   „Undead“ für die Orte?
+4. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
    Protokoll, oder sollen App-Würfe für die anderen Mitglieder eigens
    sichtbar sein (z. B. in der Bilanz, N13)? Vorschlag: Vermerk in der Bilanz.
 
