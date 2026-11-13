@@ -326,3 +326,48 @@ diese 18 Namen (deutsch und englisch) haben einen anderen Text bekommen,
 sonst keiner. Nebenwirkung: Der Reiterhammer ist zweihändig, wie seine
 Regel sagt, und zählt so auch beim Wert. Test: „a special weapon is not
 mistaken for the plain one“.
+
+## G. Abgleich der Warbands von Grad 2a (Plan P9, 12.11.2026)
+
+Die 18 Warbands von Grad 2a (und die Wood Elves) kamen aus einem Importer und wurden nicht Zeile für Zeile gegengelesen. Dafür gibt es jetzt
+ein Werkzeug, das bleibt: `npm run audit -- <warband>|all [--grade 2a] [--cache <dir>]` (`core/scripts/audit-warband.ts`, Logik und Test
+in `audit-lib.ts` und `core/test/audit-warband.test.ts`). Es liest die Seite von mordheimer.net mit `curl` (nach `--cache`, nie ins Repo),
+legt sie neben die Datei der Warband (`data/warbands/<grad>/<key>.json`) und nennt **nur die Abweichungen**: Eckdaten der Warband (Mindestzahl,
+Startgold, Höchstzahl), je Einheit Preis, Werte und Startrang, die Rassenmaxima, die Tabelle der Fertigkeitslisten, und je Ausrüstungsliste
+Gegenstände und Preise. Es ändert nichts: Was eine Abweichung heißt, entscheidet Rob; ohne sein OK kommt nichts in `data/`.
+
+**Ergebnis (12.11.2026):** 49 Befunde in 19 Warbands, keiner bei den Werten der Einheiten (bis auf eine), den Eckdaten, den Rassenmaxima und
+den Fertigkeitstabellen. Alle Befunde stehen bei den Ausrüstungslisten und den Namen. Ein Teil ist nur **anders benannt**; der Rest ist unten
+mit einem Vorschlag, **je Zeile Robs Entscheidung**.
+
+### Nur anders benannt (kein Eingriff nötig, wenn der Katalogname gelten soll)
+
+| Warband | Seite | Daten |
+| --- | --- | --- |
+| Grave Robbers | Hooded Lantern & Rig | Hooded Lantern and Rig |
+| Halflings | Meat Cleaver (Axe), Cooking Pot (Helmet), Rope and hook | Cleaver, Cooking pot helmet, Rope & hook |
+| Mazzalupo, Nipponese Expedition, Order of the Mare (Archer) | Horse | Riding/Draft Horse (Border Town Burning) |
+| Necrarchs, Survivors of Strigos | Unholy Relic | Holy (unholy) relic |
+| Vampire Hunters | Holy Water | Blessed water |
+| Order of the Mare, Protectorate of Sigmar | Longbow | Long bow |
+| Nipponese Expedition (Shinobi) | Blow Pipe, Shuriken (Throwing Stars), Lockpicks, Tripwire | Blowpipe, Throwing knives/stars, Lock picks, Trip wire |
+| Dwarf Slayer Cult | Throwing Axes | Throwing Axe |
+| Druchii | Witch Elves (Einheit) | „Witch Elve“ – der Name der Einheit ist falsch geschrieben; Vorschlag: **Witch Elf** |
+| Dreamwalkers | Morr Worshwishpers (Einheit) | Morr Worshipper – ein Tippfehler der Seite; die Daten sind richtig |
+
+### Zur Entscheidung
+
+| Warband | Befund | Seite | Daten | Vorschlag |
+| --- | --- | --- | --- | --- |
+| Snotlings | Snotling Wheelo: Bewegung | M 0 | M 4 | Seite prüfen (das Rad hat evtl. eine eigene Regel für die Bewegung); sonst Daten auf 0 |
+| Snotlings | Pebble (Free!) fehlt in den Listen; Pointy Stick (2 gc) und Small Pebble (0 gc) stehen in den Daten, nicht auf der Seite | – | – | Pebble aufnehmen; Pointy Stick und Small Pebble streichen oder die Quelle nennen |
+| Halflings | Hunting Arrows (35 gc) fehlen in der Liste des Cook | 35 gc | fehlt | aufnehmen |
+| Masters of Horror | Chainsaw Sword, Electric Trident (15 + D6 gc), Repeater Pistol (25 + 3D6 gc) fehlen in der Heldenliste | Preis mit Würfel | fehlt | als Gegenstand mit Würfelpreis aufnehmen (der Trading Post kennt Würfelpreise, Meldung #29) |
+| Skaven of Clan Moulder | Club (3 gc) steht in der Heldenliste, nicht auf der Seite | – | 3 gc | streichen |
+| Dwarf Slayer Cult | Hammer (3 gc) in den Listen von Slayer, Doomseeker und Rememberer, nicht auf der Seite; Dwarf Axe (nur Dwarf, 15 gc) fehlt beim Rememberer | – | – | Hammer streichen, Dwarf Axe aufnehmen |
+| Order of the Mare | Spear, Halberd, Bow (nur Pilgrims) fehlen in der Liste „Footman“, Horse (nur Esquiresses) in der Liste „Archer“ | je 10 gc, 10 gc, 10 gc, 40 gc | fehlt | als Gegenstände mit Einschränkung aufnehmen |
+| Wood Elves | Ithilmar armour (60 gc) fehlt in der Liste des Scout | 60 gc | fehlt | aufnehmen |
+| Nipponese Expedition | die Namen der Gegenstände (oben) – wenn die Seite gelten soll | | | Namen nach der Seite, Katalog entsprechend |
+
+Nicht geprüft (das Werkzeug kann es noch nicht): Sonderregeln, Fertigkeitstexte, die Zauberlisten und der Text der Einleitungen; die Hired Swords,
+die jede Warband anheuern darf, stehen in P10.
