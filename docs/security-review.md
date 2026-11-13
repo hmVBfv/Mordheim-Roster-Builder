@@ -100,7 +100,7 @@ hoch (Daten verraten oder Dienst dauerhaft weg), mittel, niedrig, Info.
 | CLIENT-5 | Der Quick Build nahm jede `http://`-Adresse als Server | niedrig | behoben: `http` nur im Heimnetz. Später, wenn der Quick Build online geht: eigener Ursprung statt `<user>.github.io`, Schutz vor Einbetten |
 | CLIENT-6 | Einladungs- und Reset-Links bleiben im Browserverlauf | Info | bewusst offen: kurze Laufzeit, einmal gültig |
 | CLIENT-7 | = OPS-5 | – | behoben |
-| CLIENT-8 | IDs aus Adresse und Parametern gehen ungeprüft in API-Pfade | Info | später: als UUID prüfen; kein ausnutzbarer Weg gefunden |
+| CLIENT-8 | IDs aus Adresse und Parametern gehen ungeprüft in API-Pfade | Info | behoben (13.11.2026, Plan P12): jeder Abschnitt eines API-Pfads muss ein schlichtes Wort oder eine Id sein (`safePath` in `app/src/account/api.ts`): kein `..`, kein leerer Abschnitt, kein Schrägstrich, Prozentzeichen, Leerzeichen oder `#`; geprüft vor dem Senden. Bewusst nicht „UUID“: die Ersatzserver der Tests und die Wörter der Routen sind es nicht |
 
 ### Eingaben und Ressourcen (`security-ops`)
 

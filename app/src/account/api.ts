@@ -64,7 +64,17 @@ const whose = (as: string | null | undefined): Record<string, string> => {
 const there = (): Record<string, string> => (isActive() ? { 'X-Roster-Active': '1' } : {});
 
 /** The address of an endpoint, for what the browser fetches itself (a picture in an <img>). */
-export const apiUrl = (path: string) => `${BASE}${path}`;
+/** A path of the API as it may go to the server (security review CLIENT-8): ids and words from an address or a field go into it, so every segment must be
+    a plain word or id – never "..", an empty segment, a slash, a backslash, a percent sign or anything else that could lead somewhere the caller did not
+    mean. The query (after "?") is the caller's own fixed words. Throws before anything is sent. */
+export function safePath(path: string): string {
+  const [route, ...query] = path.split('?');
+  const bad = !route!.startsWith('/') || route!.slice(1).split('/').some((seg) => !/^[\w~:@-][\w.~:@-]*$/.test(seg) || seg === '..') || query.join('?').includes('#');
+  if (bad) throw new ApiError(0, 'bad_path');
+  return path;
+}
+
+export const apiUrl = (path: string) => `${BASE}${safePath(path)}`;
 
 /** The server's answer as JSON, or the error it means. */
 async function answer<T>(res: Response): Promise<T> {
@@ -83,7 +93,7 @@ async function answer<T>(res: Response): Promise<T> {
 export async function apiBytes<T>(path: string, bytes: ArrayBuffer, type: string, as?: string | null): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type, ...whose(as), ...there() }, body: bytes });
+    res = await fetch(apiUrl(path), { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', 'Content-Type': type, ...whose(as), ...there() }, body: bytes });
   } catch {
     note('api', `PUT ${callPattern(path)} → offline`);
     throw new ApiError(0, 'offline');
@@ -97,7 +107,7 @@ export async function api<T>(path: string, init: { method?: 'GET' | 'POST' | 'PU
   const write = method !== 'GET';
   let res: Response;
   try {
-    res = await fetch(`${BASE}${path}`, {
+    res = await fetch(apiUrl(path), {
       method,
       credentials: 'same-origin',
       cache: 'no-store',
