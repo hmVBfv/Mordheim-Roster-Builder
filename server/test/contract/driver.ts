@@ -16,6 +16,8 @@ export interface Step {
   body?: Record<string, unknown>;
   /** Keep a field of the answer as a reference: name → path ("share.id"). */
   capture?: Refs;
+  /** The bytes of a file, sent as they are with their type (a picture); the answer to a file is compared as its type and length. */
+  raw?: { type: string; bytes: Uint8Array };
   /** A step that is not compared: somebody else does something, which each side does its own way, and may add references. */
   elsewhere?: boolean;
   /** Both sides must answer 2xx (a setup step through the API). */
@@ -25,7 +27,7 @@ export interface Outcome { status: number; body: unknown }
 
 /** Fields that differ from run to run, with the type they must have on both sides. */
 export const VOLATILE: Record<string, 'time' | 'number' | 'string'> = {
-  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time',
+  createdAt: 'time', updatedAt: 'time', archivedAt: 'time', expiresAt: 'time', answeredAt: 'time', revokedAt: 'time', deletedAt: 'time', joinedAt: 'time', confirmedAt: 'time', closedAt: 'time', at: 'time', releasedAt: 'time', movedAt: 'time',
   seq: 'number', cursor: 'number', epoch: 'string',
   // the server's wording of a refusal comes from its schema checker; the fake only has to refuse with some
   problem: 'string',
@@ -33,7 +35,7 @@ export const VOLATILE: Record<string, 'time' | 'number' | 'string'> = {
 /** A share code as shown: K7M2-Q9XD. */
 const SHARE_CODE = /^[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}$/;
 /** Ids the server makes up for itself, by where they stand: the mark (tag) of a warband. */
-const VOLATILE_IDS = [/\.tags?(\[\d+\])?\.id$/, /\.enrolments\[\d+\]\.tag\.id$/];
+const VOLATILE_IDS = [/\.tags?(\[\d+\])?\.id$/, /\.enrolments\[\d+\]\.tag\.id$/, /\.marks\[\d+\]\.id$/];
 const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 /** An answer with its volatile fields replaced by their type (a null stays null: whether a value is there is part of the contract). */
@@ -45,9 +47,11 @@ export function normalize(v: unknown, volatile: Record<string, string> = VOLATIL
   if (Array.isArray(v)) return v.map((x, i) => normalize(x, volatile, refs, `${path}[${i}]`));
   if (v && typeof v === 'object') {
     return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => {
-      if (typeof x === 'string' && VOLATILE_IDS.some((re) => re.test(`${path}.${k}`))) return [k, '<id>'];
+      if (typeof x === 'string' && (k === 'tagId' || VOLATILE_IDS.some((re) => re.test(`${path}.${k}`)))) return [k, '<id>'];
       // when a battle was played: a moment for a battle of the app, a day the leader gave for one of the history – only the moment varies
       if (k === 'playedAt' && typeof x === 'string' && TIME.test(x)) return [k, '<time>'];
+      // the day a chapter was published is the day it was done: different on the server's clock and the fake's
+      if (k === 'publishedOn' && typeof x === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x)) return [k, '<day>'];
       const kind = volatile[k];
       if (kind && x !== null && x !== undefined) {
         const ok = kind === 'time' ? typeof x === 'string' && TIME.test(x) : typeof x === kind;
@@ -105,7 +109,9 @@ export function fakeSide(opts: Parameters<typeof createFakeSync>[0] = {}, refs: 
     fake, refs,
     async run(step, urlText, body) {
       const url = new URL(urlText, 'http://fake');
-      const res = fake.handle(step.method ?? (body ? 'POST' : 'GET'), url.pathname, url.searchParams, body ?? {});
+      const res = fake.handle(step.method ?? (body || step.raw ? 'POST' : 'GET'), url.pathname, url.searchParams, step.raw ? { raw: step.raw.bytes, type: step.raw.type } : body ?? {});
+      const type = res.headers.get('content-type') ?? '';
+      if (!type.startsWith('application/json')) { const bytes = (await res.arrayBuffer()).byteLength; return { status: res.status, body: bytes ? { file: type.split(';')[0], bytes } : null }; }
       const text = await res.text();
       return { status: res.status, body: text ? JSON.parse(text) as unknown : null };
     },
@@ -149,12 +155,14 @@ export async function compare(steps: Step[], server: Side, fake: Side, known: Re
 }
 
 /** The real server for a scenario: requests through app.inject with the session of the signed-in user; `before` runs ahead of each (the clock). */
-export function serverSide(call: (r: { method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; url: string; body?: unknown; token?: string | null }) => Promise<{ statusCode: number; body: string; json(): unknown }>, token: string, refs: Refs = {}, before: () => void = () => undefined, elsewhere?: (step: Step, refs: Refs) => Promise<void>): Side {
+export function serverSide(call: (r: { method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; url: string; body?: unknown; token?: string | null; headers?: Record<string, string> }) => Promise<{ statusCode: number; body: string; rawPayload: Buffer; headers: Record<string, unknown>; json(): unknown }>, token: string, refs: Refs = {}, before: () => void = () => undefined, elsewhere?: (step: Step, refs: Refs) => Promise<void>): Side {
   return {
     refs,
     async run(step, url, body) {
       before();
-      const res = await call({ method: step.method ?? (body ? 'POST' : 'GET'), url: `/api/v1${url}`, ...(body ? { body } : {}), token });
+      const res = await call({ method: step.method ?? (body || step.raw ? 'POST' : 'GET'), url: `/api/v1${url}`, ...(step.raw ? { body: Buffer.from(step.raw.bytes), headers: { 'content-type': step.raw.type } } : body ? { body } : {}), token });
+      const type = String(res.headers['content-type'] ?? '');
+      if (!type.startsWith('application/json')) { const n = res.rawPayload.length; return { status: res.statusCode, body: n ? { file: type.split(';')[0], bytes: n } : null }; }
       return { status: res.statusCode, body: res.body ? res.json() : null };
     },
     elsewhere: elsewhere ? (step) => elsewhere(step, refs) : undefined,

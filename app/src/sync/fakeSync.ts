@@ -36,7 +36,7 @@ export interface FakePicture {
 }
 export interface FakeBattle {
   id: string; campaignId: string; round: number; title: string; district: string; /** as the leader set it up or changed it */ scenario?: string; status: 'open' | 'closed'; turn: number; createdAt: string; seq: number;
-  participants: { warbandId: string; outcome: string; /** the version confirmed for the battle, by whom and when, and the numbers frozen with it */ confirm?: { rev: number; by: string; at: string; totals: unknown } }[];
+  participants: { warbandId: string; outcome: string; /** the head version when the battle was set up (what goes in until one is confirmed) */ headAtSetup?: number; /** the version confirmed for the battle, by whom and when, and the numbers frozen with it */ confirm?: { rev: number; by: string; at: string; totals: unknown } }[];
   entries: FakeEntry[];
   proposals: FakeProposal[];
   closedAt?: string | null;
@@ -188,6 +188,8 @@ export function createFakeSync(opts: {
   /** What the server keeps beside a version: the name (at most 120 characters) and the warband's type, read from the save (server/src/warbands.ts). */
   const headOf = (w: FakeWarband) => w.versions.find((v) => v.rev === w.headRev);
   const saveWords = (w: FakeWarband) => { const d = headOf(w)?.data as { name?: unknown; wb?: unknown } | undefined; return { name: typeof d?.name === 'string' ? d.name.slice(0, 120) : '', wbType: typeof d?.wb === 'string' ? d.wb : '' }; };
+  /** What a warband is called now – the server joins the warband's own name; one that is only entered (another player's) has the name it came with. */
+  const liveName = (warbandId: string, fallback: string) => { const w = s.warbands.get(warbandId); return w ? saveWords(w).name : fallback; };
   /** A version as the server answers: its numbers and who made it, the save itself only where asked. */
   const versionView = (v: FakeVersion, withData: boolean) => ({ rev: v.rev, format: 2, appVersion: '', source: v.source, createdBy: me.username, createdAt: v.createdAt, note: v.note ?? '', bytes: JSON.stringify(v.data).length, ...(withData ? { data: v.data } : {}) });
   const meta = (w: FakeWarband) => ({ id: w.id, ...saveWords(w), headRev: w.headRev, copiedFrom: w.copiedFrom, createdAt: w.createdAt, updatedAt: at(), archivedAt: w.archivedAt, campaignId: w.campaignId ?? null });
@@ -202,7 +204,7 @@ export function createFakeSync(opts: {
       members: [...c.members].sort((a, b) => ['leader', 'player', 'viewer'].indexOf(a.role) - ['leader', 'player', 'viewer'].indexOf(b.role) || a.displayName.toLowerCase().localeCompare(b.displayName.toLowerCase())).map((m) => ({ ...m, joinedAt: c.createdAt })),
       enrolments: c.enrolments.map((e) => ({
         id: e.id, warbandId: e.warbandId, playerId: e.playerId, player: e.player, status: e.status, fromRound: e.fromRound,
-        createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
+        createdAt: e.createdAt, confirmedAt: e.confirmedAt, name: liveName(e.warbandId, e.name), wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, tag: e.tag && publicTag(e.tag),
         headRev: s.warbands.get(e.warbandId)?.headRev ?? 1, updatedAt: c.createdAt,
         ...standing(c, e),
       })),
@@ -221,7 +223,7 @@ export function createFakeSync(opts: {
   /* ---- battles ---- */
   const nameOf = (warbandId: string) => [...s.campaigns.values()].flatMap((c) => c.enrolments).find((e) => e.warbandId === warbandId);
   const battleSummary = (b: FakeBattle) => {
-    const ws = b.participants.map((p) => ({ id: p.warbandId, name: nameOf(p.warbandId)?.name ?? '' })).sort((x, y) => x.name.localeCompare(y.name));
+    const ws = b.participants.map((p) => ({ id: p.warbandId, name: liveName(p.warbandId, nameOf(p.warbandId)?.name ?? '') })).sort((x, y) => x.name.localeCompare(y.name));
     return {
       id: b.id, round: b.round, title: b.title, status: b.status, turn: b.turn, warbands: ws.map((w) => w.name), warbandIds: ws.map((w) => w.id), marked: Object.keys(marksOf(b)), confirmed: b.participants.filter((p) => p.confirm).map((p) => p.warbandId), createdAt: b.createdAt, closedAt: b.closedAt ?? null,
       takenOver: !!b.takenOver, playedAt: b.playedAt ?? (b.takenOver ? null : b.createdAt),
@@ -241,8 +243,8 @@ export function createFakeSync(opts: {
       const e = nameOf(p.warbandId)!;
       const head = s.warbands.get(p.warbandId)?.headRev ?? 1;
       return {
-        warbandId: p.warbandId, name: e.name, wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, playerId: e.playerId, player: e.player, outcome: p.outcome,
-        revBefore: p.confirm?.rev ?? 1, confirmedAt: p.confirm?.at ?? null, confirmedBy: p.confirm?.by ?? null, beforeTotals: p.confirm?.totals ?? null, headRev: head,
+        warbandId: p.warbandId, name: liveName(p.warbandId, e.name), wbType: e.wbType, wbName: opts.wbName?.(e.wbType) ?? e.wbType, playerId: e.playerId, player: e.player, outcome: p.outcome,
+        revBefore: p.confirm?.rev ?? p.headAtSetup ?? 1, confirmedAt: p.confirm?.at ?? null, confirmedBy: p.confirm?.by ?? null, beforeTotals: p.confirm?.totals ?? null, headRev: head,
       };
     }),
     entries: b.entries.filter((e) => !e.deleted).sort((x, y) => x.turn - y.turn || x.createdAt.localeCompare(y.createdAt)).map((e) => ({ id: e.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt, updatedAt: e.updatedAt })),
@@ -254,7 +256,7 @@ export function createFakeSync(opts: {
     const c = s.campaigns.get(campaignId)!;
     const b: FakeBattle = {
       id: `00000000-0000-4000-8000-${String(s.battles.size + 1).padStart(12, '0')}`, campaignId, round: o.round ?? c.round + 1, title: o.title ?? '', district: '', status: 'open', turn: 1, createdAt: at(), seq: next(),
-      participants: (o.warbandIds ?? c.enrolments.filter((e) => e.status === 'active').map((e) => e.warbandId)).map((warbandId) => ({ warbandId, outcome: '' })),
+      participants: (o.warbandIds ?? c.enrolments.filter((e) => e.status === 'active').map((e) => e.warbandId)).map((warbandId) => ({ warbandId, outcome: '', headAtSetup: s.warbands.get(warbandId)?.headRev ?? 1 })),
       entries: [], proposals: [],
     };
     s.battles.set(b.id, b);
@@ -400,6 +402,7 @@ export function createFakeSync(opts: {
     }
     const snapshot = (e: FakeBackground) => ({ kind: e.kind, title: e.title, truth: e.truth, playersKnow: e.playersKnow, status: e.status, reveal: e.reveal, hintLimits: e.hintLimits, revealFromBattle: e.revealFromBattle, refs: e.refs, battleId: e.battleId });
     if (method === 'POST' && m[2]) {
+      if (!['hint', 'revealed'].includes(String(body.level)) || typeof body.text !== 'string' || !body.text.trim() || !UUID_RE.test(String(body.noteId))) return json(400, { error: 'invalid', problem: 'not a reveal (level, text or note id)' });
       if (!cur || cur.deleted) return json(404, { error: 'not_found' });
       const noteId = String(body.noteId);
       if (cur.lastReveal?.noteId === noteId) return json(200, { entry: bgView(cur), note: noteId, seq: bgSeq(c.id) });
@@ -415,6 +418,9 @@ export function createFakeSync(opts: {
       return json(200, { entry: bgView(cur), note: noteId, seq: bgSeq(c.id) });
     }
     if (method === 'PUT') {
+      if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'an entry is named by its device id' });
+      if (!['thread', 'figure', 'place', 'scenario', 'gm_note'].includes(String(body.kind)) || typeof body.title !== 'string' || !body.title.trim()) return json(400, { error: 'invalid', problem: 'not a background entry (kind or title)' });
+      if ([...s.background.values()].some((x) => x.campaignId === c.id && !x.deleted && x.id !== m[1] && nameKey(x.title) === nameKey(String(body.title)))) return json(400, { error: 'invalid', problem: 'an entry of this title exists already' });
       const fields = { kind: String(body.kind), title: String(body.title), truth: String(body.truth ?? ''), playersKnow: String(body.playersKnow ?? ''), status: String(body.status ?? 'planned'), reveal: String(body.reveal ?? 'hidden'), hintLimits: String(body.hintLimits ?? ''), revealFromBattle: (body.revealFromBattle as string | null) ?? null, refs: (body.refs as unknown[]) ?? [], battleId: (body.battleId as string | null) ?? null };
       if (!cur) {
         s.background.set(m[1]!, { id: m[1]!, campaignId: c.id, ...fields, updatedBy: me.displayName, createdAt: at(), updatedAt: at(), seq: next(), lastReveal: null, revisions: [] });
@@ -616,10 +622,13 @@ export function createFakeSync(opts: {
       return answer(cur);
     }
     if (method !== 'PUT' || m[2]) return json(404, { error: 'not_found' });
-    if (cur?.deleted) return json(409, { error: 'removed' });
-    if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
+    if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'a scenario is named by its device id' });
     const title = String(body.title ?? '').trim();
     if (!title) return json(400, { error: 'invalid', problem: 'not a scenario (title: too small)' });
+    if (cur?.deleted) return json(409, { error: 'removed' });
+    if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
+    // a title another scenario of the campaign has (case and spaces aside) is taken (server/src/names.ts)
+    if ([...s.scenarios.values()].some((x) => x.campaignId === c.id && !x.deleted && x.id !== m[1] && nameKey(x.title) === nameKey(title))) return json(400, { error: 'invalid', problem: 'a scenario of this title exists already' });
     const sent = Array.isArray(body.npcs) ? (body.npcs as ScenarioNpc[]) : [];
     if (sent.length > 30) return json(400, { error: 'invalid', problem: 'not a scenario (npcs: too many)' });
     if (new Set(sent.map((n) => n.id)).size !== sent.length) return json(400, { error: 'invalid', problem: 'not a scenario (npcs: one id twice)' });
@@ -830,6 +839,14 @@ export function createFakeSync(opts: {
     }
     if (role === 'viewer') return json(403, { error: 'forbidden' });
     if (method === 'PUT' && !m[2]) {
+      if (!UUID_RE.test(m[1]!)) return json(400, { error: 'invalid', problem: 'a picture is named by its device id' });
+      // the fields of a picture as the server's schema reads them (server/src/attachments.ts AttachmentBody)
+      const stray = Object.keys(body).find((k) => !['battleId', 'turn', 'mime', 'bytes', 'width', 'height', 'caption', 'visibility'].includes(k));
+      const bad = stray ?? (!['image/png', 'image/jpeg', 'image/webp'].includes(String(body.mime)) ? 'mime' : null)
+        ?? (!Number.isInteger(body.bytes) || (body.bytes as number) < 1 ? 'bytes' : null) ?? (!Number.isInteger(body.width) || !Number.isInteger(body.height) ? 'size' : null)
+        ?? (body.visibility !== undefined && !['public', 'leader'].includes(String(body.visibility)) ? 'visibility' : null);
+      if (bad) return json(400, { error: 'invalid', problem: `not a picture (${bad}: invalid)` });
+      if (body.battleId && !s.battles.get(String(body.battleId))) return json(400, { error: 'invalid', problem: 'no such battle in this campaign' });
       if (cur?.deleted) return json(409, { error: 'removed' });
       if (body.visibility === 'leader' && role !== 'leader') return json(403, { error: 'forbidden' });
       if (cur && cur.uploaderId !== me.id) return json(403, { error: 'forbidden' });
@@ -842,6 +859,7 @@ export function createFakeSync(opts: {
       if (!cur || !pictureFor(cur, role)) return json(404, { error: 'not_found' });
       if (cur.uploaderId !== me.id) return json(403, { error: 'forbidden' });
       const raw = body.raw as Uint8Array | undefined;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(String(body.type))) return json(415, { error: 'bad_request' });
       if (body.type !== cur.mime || !raw || raw.byteLength !== cur.bytes) return json(400, { error: 'invalid', problem: 'not the picture announced' });
       Object.assign(cur, { stored: true, data: raw, updatedAt: at(), seq: next() });
       return json(200, { attachment: pictureView(cur), seq: picturesSeq(c.id) });
@@ -886,7 +904,7 @@ export function createFakeSync(opts: {
     if (cur && cur.campaignId !== c.id) return json(409, { error: 'exists' });
     if (method === 'PUT' && !m[2]) {
       if (typeof body.title !== 'string' || !body.title.trim() || typeof body.text !== 'string' || !body.text || body.text.length > 200_000) return json(400, { error: 'invalid', problem: 'not a chapter draft (title or text)' });
-      if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(String(body.refKey)) || !['de', 'en'].includes(String(body.lang))) return json(400, { error: 'invalid', problem: 'not a chapter draft (refKey or lang)' });
+      if (!['prologue', 'battle', 'interlude', 'chapter'].includes(String(body.kind)) || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(String(body.refKey)) || !['de', 'en'].includes(String(body.lang))) return json(400, { error: 'invalid', problem: 'not a chapter draft (refKey or lang)' });
       const fields = { refKey: String(body.refKey), kind: String(body.kind), lang: body.lang as 'de' | 'en', title: String(body.title).trim(), label: String(body.label ?? ''), icDate: String(body.icDate ?? ''), place: String(body.place ?? ''), victor: String(body.victor ?? ''), text: body.text };
       if (!cur) {
         if (draftsOf(c.id).length >= 100) return json(409, { error: 'full' });
@@ -945,7 +963,13 @@ export function createFakeSync(opts: {
         s.positions.delete(`chapter:${ch.id}`);
         return json(200, { removed: true });
       }
-      if (chapters.some((x) => x.refKey === body.refKey && x.id !== cm[1])) return json(409, { error: 'exists' });
+      // a chapter as the server's schema reads it (server/src/chapters.ts ChapterBody)
+      if (!UUID_RE.test(cm[1]!)) return json(400, { error: 'invalid', problem: 'no such chapter' });
+      const stray = Object.keys(body).find((k) => !['refKey', 'kind', 'publishedOn', 'de', 'en', 'place'].includes(k));
+      const bad = stray ?? (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(String(body.refKey)) ? 'refKey' : null) ?? (!['prologue', 'battle', 'interlude', 'chapter'].includes(String(body.kind)) ? 'kind' : null)
+        ?? (!body.de && !body.en ? '(top)' : null) ?? (body.publishedOn != null && !/^\d{4}-\d{2}-\d{2}$/.test(String(body.publishedOn)) ? 'publishedOn' : null);
+      if (bad) return json(400, { error: 'invalid', problem: `not a chapter (${bad}: invalid)` });
+      if (chapters.some((x) => x.refKey === body.refKey && x.id !== cm[1])) return json(409, { error: 'exists', problem: 'a chapter of this key exists already' });
       const place = body.place as { segment: string; pos: string } | undefined;
       if (!ch && !place) return json(400, { error: 'invalid', problem: 'a new chapter needs its place in the story' });
       const next: FakeChapter = {
@@ -961,14 +985,17 @@ export function createFakeSync(opts: {
       return json(200, {
         positions: [...s.positions.values()].filter((p) => p.campaignId === c.id && visible(p.itemType, p.itemId)).map((p) => ({ itemType: p.itemType, itemId: p.itemId, segment: p.segment, pos: p.pos, movedBy: p.movedBy, movedAt: p.movedAt })),
         entries: battles.flatMap((b) => b.entries.filter((e) => !e.deleted).map((e) => ({ id: e.id, battleId: b.id, turn: e.turn, kind: e.kind, payload: e.payload, author: e.author, createdAt: e.createdAt }))),
-        outcomes: battles.flatMap((b) => b.participants.map((p) => ({ battleId: b.id, warbandId: p.warbandId, name: nameOf(p.warbandId)?.name ?? '', outcome: p.outcome }))),
-        marks: c.enrolments.flatMap((e) => (e.tags ?? []).filter((t) => !t.supersededBy).map((t) => ({ id: t.id, warbandId: e.warbandId, warband: e.name, kind: t.kind, round: t.round, battleId: t.battleId, rev: t.rev, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }))),
+        outcomes: battles.flatMap((b) => b.participants.map((p) => ({ battleId: b.id, warbandId: p.warbandId, name: liveName(p.warbandId, nameOf(p.warbandId)?.name ?? ''), outcome: p.outcome }))),
+        marks: c.enrolments.flatMap((e) => (e.tags ?? []).filter((t) => !t.supersededBy).map((t) => ({ id: t.id, warbandId: e.warbandId, warband: liveName(e.warbandId, e.name), kind: t.kind, round: t.round, battleId: t.battleId, rev: t.rev, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }))),
         chapters: chapters.sort((x, y) => (x.publishedOn ?? '').localeCompare(y.publishedOn ?? '')).map(summary),
       });
     }
-    const m = rest.match(/^\/timeline\/(note|picture|entry|chapter)\/([^/]+)$/);
+    const m = rest.match(/^\/timeline\/([^/]+)\/([^/]+)$/);
     if (!m || method !== 'PUT') return null;
     if (role === 'viewer') return json(403, { error: 'forbidden' });
+    // the block and the place as the server reads them: a known type, a device id, a segment and a position and nothing else
+    if (typeof body.segment !== 'string' || typeof body.pos !== 'string' || Object.keys(body).some((k) => k !== 'segment' && k !== 'pos')) return json(400, { error: 'bad_request' });
+    if (!['note', 'picture', 'entry', 'chapter'].includes(m[1]!) || !UUID_RE.test(m[2]!)) return json(400, { error: 'invalid', problem: 'no such block' });
     const block = visible(m[1]!, m[2]!) as { authorId?: string; uploaderId?: string } | null;
     if (!block) return json(404, { error: 'not_found' });
     const owner = block.authorId ?? block.uploaderId ?? null;
@@ -1073,7 +1100,7 @@ export function createFakeSync(opts: {
       const e = c.enrolments.find((q) => q.warbandId === w.id);
       if (!e || !b.participants.some((p) => p.warbandId === w.id)) return json(400, { error: 'invalid', problem: 'this warband did not fight the battle' });
       const v = w.versions.find((q) => q.rev === Number(body.rev));
-      if (!v) return json(404, { error: 'not_found' });
+      if (!v) return json(404, { error: 'not_found', problem: 'no such version' });
       const confirmedRev = b.participants.find((p) => p.warbandId === w.id)?.confirm?.rev;
       if (confirmedRev !== undefined && v.rev < confirmedRev) return json(409, { error: 'older' });
       const before = [...(e.tags ?? [])].reverse().find((t) => !t.supersededBy && t.round < b.round);
@@ -1469,6 +1496,9 @@ export function createFakeSync(opts: {
       if (!b) return json(404, { error: 'not_found' });
       if (method === 'GET') return json(200, { bug: bugDetail(b) });
       if (method === 'PATCH') {
+        // the values the server accepts for a status and a severity (server/src/bugs.ts)
+        if (body.status !== undefined && !['new', 'confirmed', 'in_progress', 'fixed', 'closed', 'duplicate'].includes(String(body.status))) return json(400, { error: 'invalid', problem: 'no such status' });
+        if (body.severity !== undefined && body.severity !== null && !['S1', 'S2', 'S3', 'S4'].includes(String(body.severity))) return json(400, { error: 'invalid', problem: 'no such severity' });
         const next = { ...b, ...(body as Partial<FakeBug>) };
         if (next.status === 'fixed' && !String(next.fixedIn).trim()) return json(400, { error: 'invalid', problem: 'a fixed report names the version it is fixed in' });
         Object.assign(b, body, { updatedAt: at() });
