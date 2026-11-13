@@ -323,6 +323,9 @@ export function endEnrolment(db: DB, e: EnrolmentRow, status: 'declined' | 'left
     db.prepare('UPDATE enrolments SET status = ?, ended_by = ?, ended_at = ? WHERE id = ?').run(status, by, iso(now), e.id);
     const seq = log(db, by, status === 'declined' ? 'enrolment.decline' : 'enrolment.leave', e.campaign_id, { type: 'warband', id: e.warband_id }, { enrolment: e.id }, now);
     setWarbandCampaign(db, e.warband_id, null, seq);
+    // what its owner calls it from now on is theirs: the battles and marks of this campaign keep the name it has now (AUTHZ-6)
+    db.prepare('UPDATE battle_participants SET warband_name = (SELECT name FROM warbands WHERE id = ?) WHERE warband_id = ? AND battle_id IN (SELECT id FROM battles WHERE campaign_id = ?)').run(e.warband_id, e.warband_id, e.campaign_id);
+    db.prepare('UPDATE tags SET warband_name = (SELECT name FROM warbands WHERE id = ?) WHERE warband_id = ? AND campaign_id = ?').run(e.warband_id, e.warband_id, e.campaign_id);
     touch(db, e.campaign_id, now);
   })();
 }

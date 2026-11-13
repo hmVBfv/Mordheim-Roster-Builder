@@ -69,14 +69,14 @@ export function campaignEntries(db: DB, campaignId: string) {
 
 /** Who fought each battle of the campaign, and how it ended for them. */
 export function campaignOutcomes(db: DB, campaignId: string) {
-  return (db.prepare(`SELECT p.battle_id, p.warband_id, w.name, p.outcome FROM battle_participants p JOIN battles b ON b.id = p.battle_id JOIN warbands w ON w.id = p.warband_id
-    WHERE b.campaign_id = ? ORDER BY w.name COLLATE NOCASE`).all(campaignId) as { battle_id: string; warband_id: string; name: string; outcome: string }[])
+  return (db.prepare(`SELECT p.battle_id, p.warband_id, coalesce(p.warband_name, w.name) AS name, p.outcome FROM battle_participants p JOIN battles b ON b.id = p.battle_id JOIN warbands w ON w.id = p.warband_id
+    WHERE b.campaign_id = ? ORDER BY coalesce(p.warband_name, w.name) COLLATE NOCASE`).all(campaignId) as { battle_id: string; warband_id: string; name: string; outcome: string }[])
     .map((p) => ({ battleId: p.battle_id, warbandId: p.warband_id, name: p.name, outcome: p.outcome }));
 }
 
 /** The marks of the campaign's warbands that stand, with how many changes each froze. */
 export function campaignMarks(db: DB, campaignId: string) {
-  return (db.prepare(`SELECT t.id, t.warband_id, t.kind, t.round, t.battle_id, t.rev, t.created_at, w.name,
+  return (db.prepare(`SELECT t.id, t.warband_id, t.kind, t.round, t.battle_id, t.rev, t.created_at, coalesce(t.warband_name, w.name) AS name,
       (SELECT count(*) FROM changes x WHERE x.tag_id = t.id) AS n, (SELECT count(*) FROM changes x WHERE x.tag_id = t.id AND x.unexplained = 1) AS u
     FROM tags t JOIN warbands w ON w.id = t.warband_id WHERE t.campaign_id = ? AND t.superseded_by IS NULL ORDER BY t.round, t.created_at`).all(campaignId) as
     { id: string; warband_id: string; kind: string; round: number; battle_id: string | null; rev: number; created_at: string; name: string; n: number; u: number }[])

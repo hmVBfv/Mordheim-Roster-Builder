@@ -99,7 +99,7 @@ export const participantIds = (db: DB, battleId: string) => (db.prepare('SELECT 
 
 export function listBattles(db: DB, campaignId: string): BattleSummary[] {
   const rows = db.prepare('SELECT * FROM battles WHERE campaign_id = ? ORDER BY round, created_at').all(campaignId) as BattleRow[];
-  const names = db.prepare('SELECT w.id, w.name FROM battle_participants p JOIN warbands w ON w.id = p.warband_id WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE');
+  const names = db.prepare('SELECT w.id, coalesce(p.warband_name, w.name) AS name FROM battle_participants p JOIN warbands w ON w.id = p.warband_id WHERE p.battle_id = ? ORDER BY coalesce(p.warband_name, w.name) COLLATE NOCASE');
   const marked = db.prepare("SELECT warband_id FROM tags WHERE battle_id = ? AND kind = 'after_battle' AND superseded_by IS NULL ORDER BY created_at");
   const confirmed = db.prepare('SELECT warband_id FROM battle_participants WHERE battle_id = ? AND before_confirmed_at IS NOT NULL ORDER BY warband_id');
   return rows.map((b) => {
@@ -114,9 +114,9 @@ export function listBattles(db: DB, campaignId: string): BattleSummary[] {
 }
 
 export function battleView(db: DB, b: BattleRow): BattleView {
-  const participants = (db.prepare(`SELECT p.*, w.name, w.wb_type, w.owner_id, w.head_rev, u.display_name, c.display_name AS confirmer FROM battle_participants p
+  const participants = (db.prepare(`SELECT p.*, coalesce(p.warband_name, w.name) AS name, w.wb_type, w.owner_id, w.head_rev, u.display_name, c.display_name AS confirmer FROM battle_participants p
     JOIN warbands w ON w.id = p.warband_id JOIN users u ON u.id = w.owner_id LEFT JOIN users c ON c.id = p.before_confirmed_by
-    WHERE p.battle_id = ? ORDER BY w.name COLLATE NOCASE`).all(b.id) as
+    WHERE p.battle_id = ? ORDER BY coalesce(p.warband_name, w.name) COLLATE NOCASE`).all(b.id) as
     { warband_id: string; rev_before: number | null; outcome: Outcome; name: string; wb_type: string; owner_id: string; display_name: string;
       head_rev: number; before_confirmed_at: string | null; confirmer: string | null; before_totals: string | null }[])
     .map((p) => ({
