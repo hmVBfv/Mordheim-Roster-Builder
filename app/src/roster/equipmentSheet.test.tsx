@@ -13,7 +13,7 @@ import { createWarband } from './view.ts';
 beforeAll(polyfillDialog);
 afterEach(cleanup);
 
-const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), sellStart: vi.fn(), addBeast: vi.fn(), dropBeast: vi.fn(), mutation: vi.fn() };
+const act: EquipmentActions = { qty: vi.fn(), addRare: vi.fn(), rareQty: vi.fn(), upgrade: vi.fn(), paid: vi.fn(), listPaid: vi.fn(), sellStart: vi.fn(), addBeast: vi.fn(), dropBeast: vi.fn(), mutation: vi.fn() };
 
 function sheet(wb = 'merc', unit = 'capt', round = 0) {
   const c = (s: core.WarbandState) => core.ctxOf(data, s);
@@ -177,5 +177,43 @@ describe('mutations in the equipment sheet (#224)', () => {
     const rare = d.querySelector('section[aria-label="Rare and trading-post items"]')!;
     expect(buy.compareDocumentPosition(mut) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(mut.compareDocumentPosition(rare) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+/* Rob, 13.11.2026: an item with a dice price in the list takes the total paid for each piece, only within what the dice allow, or a roll. */
+describe('an item with a dice price in the list', () => {
+  function horror() {
+    const c = (s: core.WarbandState) => core.ctxOf(data, s);
+    let s = createWarband(data, 'mastersofhorror', null, 'The Probes');
+    s = core.addUnit(c(s), 'madscienti');
+    const uid = s.models[0]!.uid;
+    s = core.setListQty(c(s), uid, 'Chainsaw Sword', 1);
+    const ref = { current: null } as React.RefObject<HTMLDialogElement | null>;
+    render(<EquipmentSheet dialogRef={ref} close={() => {}} view={equipmentView(c(s), uid)!} act={act} />);
+    return document.querySelector('dialog')!;
+  }
+
+  it('shows its price as the base and the dice, until a total is entered', () => {
+    const d = horror();
+    expect(d.textContent).toContain('15 gc + D6');
+    expect(d.textContent).toContain('15 + D6 gc');
+    expect(d.textContent).toContain('not rolled yet: counted at 15 gc');
+  });
+
+  it('takes a total only within the range, and rolls the dice at a tap', async () => {
+    const user = userEvent.setup();
+    const d = horror();
+    vi.mocked(act.listPaid).mockClear();
+    const field = within(d).getByLabelText('Paid for Chainsaw Sword, 16 to 21 gc', { selector: 'input' }) as HTMLInputElement;
+    expect([field.min, field.max]).toEqual(['16', '21']);
+    await user.type(field, '99');
+    await user.tab();
+    expect(act.listPaid).toHaveBeenCalledWith('Chainsaw Sword', 0, 21);
+    vi.mocked(act.listPaid).mockClear();
+    await user.click(within(d).getByRole('button', { name: 'Roll D6 for Chainsaw Sword', hidden: true }));
+    const [key, index, gc] = vi.mocked(act.listPaid).mock.calls[0]!;
+    expect([key, index]).toEqual(['Chainsaw Sword', 0]);
+    expect(gc).toBeGreaterThanOrEqual(16);
+    expect(gc).toBeLessThanOrEqual(21);
   });
 });

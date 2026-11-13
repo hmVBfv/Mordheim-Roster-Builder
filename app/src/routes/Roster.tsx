@@ -362,6 +362,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
         rareQty: (de, q) => ed.edit((c) => core.setRareQty(c, eqOf!, de, q)),
         upgrade: (de, weapon, on) => ed.edit((c) => core.setUpgradeOn(c, eqOf!, de, weapon, on)),
         paid: (de, gc, slot) => ed.edit((c) => core.setRarePaid(c, eqOf!, de, gc, slot), `Paid set to ${gc} gc.`),
+        listPaid: (key, index, gc) => ed.edit((c) => core.setListPaid(c, eqOf!, key, index, gc), `Paid set to ${gc} gc.`),
         sellStart: (piece) => ed.edit((c) => core.sellStartGear(c, eqOf!, piece).state, `Sold ${piece}.`),
         addBeast: (id) => ed.edit((c) => core.addBeast(c, id), `${core.unitDef(ctx, id)?.name ?? 'The beast'} taken on.`),
         dropBeast: (id) => ed.edit((c) => core.dropBeast(c, id), `${core.unitDef(ctx, id)?.name ?? 'The beast'} let go.`),

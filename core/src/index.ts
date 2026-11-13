@@ -11,6 +11,7 @@ export * from './rules/districts.ts';
 export * from './rules/pricing.ts';
 export * from './rules/hire.ts';
 export * from './rules/equipment.ts';
+export * from './rules/dicePrice.ts';
 export * from './rules/costs.ts';
 export * from './rules/worth.ts';
 export * from './rules/planner.ts';

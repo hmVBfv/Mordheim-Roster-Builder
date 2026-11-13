@@ -9,7 +9,7 @@ import ui from '../ui/ui.module.css';
 import type { useSheet } from '../ui/useSheet.ts';
 import { Strip } from './Bits.tsx';
 import { MutationList } from './ChaosSheets.tsx';
-import type { EquipmentView } from './equipment.ts';
+import type { CarriedRow, EquipmentView } from './equipment.ts';
 import styles from './Roster.module.css';
 
 type Sheet = ReturnType<typeof useSheet>;
@@ -22,6 +22,8 @@ export interface EquipmentActions {
   upgrade: (de: string, weapon: string, on: boolean) => void;
   /** What was paid for a rare item, set by hand (a price rolled at the table). */
   paid: (de: string, gc: number, slot: number) => void;
+  /** What one piece of a list item with a dice price cost, in total (the range is the dice's; a roll is made here and passed in). */
+  listPaid: (key: string, index: number, gc: number) => void;
   /** Sells a piece of what he starts with, for half its price (from the first battle on). */
   sellStart: (piece: string) => void;
   /** Takes on a War Beast of a Beastmaster, or lets one go. */
@@ -38,6 +40,25 @@ function Stepper({ label, value, min = 0, max = 9, onChange }: { label: string; 
       <button type="button" aria-label={`One ${label} less`} disabled={value <= min} onClick={() => onChange(value - 1)}>−</button>
       <span aria-live="polite">{value}</span>
       <button type="button" aria-label={`One ${label} more`} disabled={value >= max} onClick={() => onChange(value + 1)}>+</button>
+    </span>
+  );
+}
+
+/** The total paid for one piece with a dice price: a field that takes only what the dice allow, and a button that rolls them (the roll is made here: the rules take the number). */
+function DicePaid({ name, d, onSet }: { name: string; d: NonNullable<CarriedRow['dice']>; onSet: (gc: number) => void }) {
+  const n = Number(/^(\d*)D6$/i.exec(d.label)?.[1] || 1);
+  const base = d.min - n;
+  return (
+    <span className={styles.dicePaid}>
+      <label>
+        <small>Paid, total ({d.min}–{d.max} gc)</small>
+        <input key={d.paid ?? 'none'} className={ui.input} type="number" inputMode="numeric" min={d.min} max={d.max} defaultValue={d.paid ?? ''} placeholder={String(d.min)}
+          aria-label={`Paid for ${name}, ${d.min} to ${d.max} gc`}
+          onBlur={(e) => { if (e.target.value === '') return; const v = Math.round(Number(e.target.value)); if (v !== d.paid) onSet(Math.min(d.max, Math.max(d.min, Number.isFinite(v) ? v : d.min))); }} />
+      </label>
+      <button type="button" className={ui.buttonQuiet} aria-label={`Roll ${d.label} for ${name}`}
+        onClick={() => { let sum = 0; for (let i = 0; i < n; i++) sum += 1 + Math.floor(Math.random() * 6); onSet(base + sum); }}>Roll {d.label}</button>
+      {d.paid === null && <small className={ui.muted}>not rolled yet: counted at {base} gc</small>}
     </span>
   );
 }
@@ -63,7 +84,10 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
               {v.carried.map((r) => (
                 <tr key={r.id}>
                   <th scope="row" className={styles.eqName}><TipWord label={r.name} tips={r.tips} /><small>{r.group}</small></th>
-                  <td className={styles.eqPrice}>{r.price}</td>
+                  <td className={styles.eqPrice}>
+                    {r.price}
+                    {r.dice && <DicePaid name={r.name} d={r.dice} onSet={(gc) => act.listPaid(r.key, r.dice!.index, gc)} />}
+                  </td>
                   <td>
                     <span className={styles.eqUpgrade}>
                       {r.ups.map((u) => (
@@ -147,7 +171,7 @@ function Body({ v, act, close, titleId }: { v: EquipmentView; act: EquipmentActi
                     <TipWord label={r.name} tips={r.tips} />
                     {r.more && r.qty === 0 && <small>{r.more}</small>}
                   </th>
-                  <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : `${r.price} gc${per}`}</td>
+                  <td className={styles.eqPrice}>{r.free ? `first free, then ${r.price} gc` : r.dice ? `${r.price} + ${r.dice} gc${per}` : `${r.price} gc${per}`}</td>
                   <td><Stepper label={r.name} value={r.qty} min={r.min} max={r.more ? r.qty : 9} onChange={(q) => act.qty(r.key, q, r.name)} /></td>
                 </tr>
               ))}

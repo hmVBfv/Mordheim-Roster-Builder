@@ -767,11 +767,6 @@
     "Blessing of the Elements": "The caster calls on the elements of the desert and draws upon the fortune they can bestow."
    }
   },
-  "blessingsLady": {
-   "name": "Blessings of the Lady",
-   "note": "Paladin (Bretonnian). Prayers of the Lady of the Lake — details to follow.",
-   "spells": []
-  },
   "darkElfMagic": {
    "name": "Dark Elf Magic",
    "note": "Dark Elf Sorceress (Druchii). She may not cast spells while wearing armour.",
@@ -954,11 +949,6 @@
     "Idol of Gork": "Swirling energy crackles around the Shaman, giving him the appearance of a huge orc hero.",
     "'Ere we go!": "The Shaman and nearby Goblins become filled with the essence of the Waaagh!"
    }
-  },
-  "iceMagic": {
-   "name": "Ice Magic",
-   "note": "Ice Maiden (Kislev). Detailed effects to follow.",
-   "spells": []
   },
   "nurgleRituals": {
    "name": "Nurgle Rituals",

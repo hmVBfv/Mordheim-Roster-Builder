@@ -1,12 +1,14 @@
 /* Building a roster: warband, subtype, units, equipment, rare items,
    mutations, gold and stash (legacy app.js pickSub, addUnit … toggleMut,
    stash*, setGoldCurrent). Every action returns a new state. */
+import type { EquipmentEntry } from '../data/types.ts';
 import type { Model, StashItem, WarbandState } from '../state/types.ts';
 import { houseRules } from '../state/house.ts';
 import { ctxOf, type Ctx } from '../rules/context.ts';
 import { beastMasterOf, henchRecruitSurcharge, modelsOf, totalSpent, unitMax, goldCurrent } from '../rules/costs.ts';
 import { withFreeDagger, upgradeBase, upgradeFree, upgradePaid, upgradeRoom, upgradeSlots, upgradeTargets } from '../rules/equipment.ts';
 import { eqListFor, isUpgrade, unitDef, warbandDef } from '../rules/lookup.ts';
+import { clampPaid, dicePrice } from '../rules/dicePrice.ts';
 import { catalogDefaultPaid } from '../rules/pricing.ts';
 import { logEvent } from './log.ts';
 import { fixPersonas } from './normalize.ts';
@@ -156,6 +158,28 @@ export function setEqQty(ctx: Ctx, uid: number, nm: string, qty: unknown): Warba
     const q = Math.max(0, Math.min(9, Number(qty) || 0));
     m.eq = m.eq ?? {};
     if (q <= 0) delete m.eq[nm]; else m.eq[nm] = q;
+    // the prices entered for pieces that are gone go with them
+    if (m.eqPaid?.[nm]) { if (q <= 0) delete m.eqPaid[nm]; else m.eqPaid[nm] = m.eqPaid[nm]!.slice(0, q); if (!Object.keys(m.eqPaid).length) delete m.eqPaid; }
+  });
+}
+
+/** Enters what one piece of a list item with a dice price cost, in total (Rob, 13.11.2026): clamped into the range the dice allow. The piece must
+    exist; the pieces before it that have no price yet are fixed at the base price so that the numbers stay with their pieces. A roll is the caller's. */
+export function setListPaid(ctx: Ctx, uid: number, nm: string, index: number, gc: unknown): WarbandState {
+  const m0 = ctx.s.models.find((x) => x.uid === uid);
+  const def = m0 && unitDef(ctx, m0.uid_def);
+  const list = def && eqListFor(ctx, def);
+  const entry = list ? Object.values(list).flat().find((e: EquipmentEntry) => e[0] === nm) : undefined;
+  const range = entry && dicePrice(entry[1], entry[2]);
+  const qty = Number((m0?.eq ?? {})[nm]) || 0;
+  if (!range || !entry || !Number.isInteger(index) || index < 0 || index >= qty) return ctx.s;
+  return update(ctx, (d) => {
+    const m = findModel(d, uid);
+    if (!m) return;
+    const have = (m.eqPaid = m.eqPaid ?? {})[nm] ?? [];
+    for (let i = have.length; i < qty; i++) have[i] = entry[1];
+    have[index] = clampPaid(range, gc);
+    m.eqPaid[nm] = have.slice(0, qty);
   });
 }
 

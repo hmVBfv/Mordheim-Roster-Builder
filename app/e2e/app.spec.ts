@@ -142,6 +142,34 @@ test('the new-warband list is short on a phone: grades fold, cards are small, th
   await shot(page, 'new-warband-picked');
 });
 
+/* Rob, 13.11.2026: an item of a list with a dice price (the Masters of Horror's Chainsaw Sword, 15 + D6 gc) takes the total paid, only within the range
+   the dice allow, or a roll; the gold follows what is entered. */
+test('a list item with a dice price takes the total paid, within its range, or a roll', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(test.info().project.name === 'quickbuild' ? '#/warbands/new' : 'warbands/new');
+  await unfoldGrades(page);
+  await page.getByRole('radio', { name: 'Masters of Horror', exact: true }).check();
+  await page.getByRole('button', { name: 'Start the warband' }).click();
+  await page.getByRole('button', { name: /^\+ Recruit/ }).click();
+  await page.getByRole('dialog', { name: /Recruit/ }).getByRole('button', { name: /Mad Scientist/ }).click();
+  await page.keyboard.press('Escape');
+  await (await unit(page, 'Mad Scientist', 'Gear')).getByRole('button', { name: /Equipment & rare items/ }).click();
+  const sheet = page.getByRole('dialog', { name: /Equipment/ });
+  await sheet.getByRole('button', { name: 'One Chainsaw Sword more' }).click();
+  const field = sheet.getByLabel('Paid for Chainsaw Sword, 16 to 21 gc');
+  await expect(sheet.getByText('not rolled yet: counted at 15 gc')).toBeVisible();
+  await field.fill('99');
+  await field.blur();
+  await expect(field).toHaveValue('21');
+  await expect(sheet.getByText('not rolled yet')).toHaveCount(0);
+  await sheet.getByRole('button', { name: 'Roll D6 for Chainsaw Sword' }).click();
+  const rolled = Number(await field.inputValue());
+  expect(rolled).toBeGreaterThanOrEqual(16);
+  expect(rolled).toBeLessThanOrEqual(21);
+  await noSideScroll(page); await tapTargets(page);
+  await shot(page, 'dice-price-sheet');
+});
+
 /* Wish of 6.11.2026: a warband picked from the long list is confirmed without scrolling down to the end of the form: the button stays in view
    above the navigation, on a phone. */
 test('the new-warband form keeps its Start button in view once a warband is picked', async ({ page }) => {

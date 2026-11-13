@@ -173,6 +173,11 @@ Report a bug       überall erreichbar (Käfer mit dem Wort „Bug“ im Kopf je
   Titel** wie auf den anderen Seiten (Platz über dem Block, wenig zwischen Titel und Text; vorher saß die Überschrift näher am Block
   darüber als an ihrem Text). Die Karten unter „Tabletop Simulator“ haben die **Leiste mit dem Pfeil** der anderen Aufklappfelder (`ui.fold`),
   damit man sieht, dass man sie öffnen kann (`app/src/roster/TtsCard.tsx`).
+- **Würfelpreis in der Liste (Rob, 13.11.2026):** hat ein Gegenstand der Liste einen Preis mit Würfeln (Masters of Horror: Chainsaw Sword und Electric
+  Trident 15 + D6 gc, Repeater Pistol 25 + 3D6 gc), steht in den Listen „15 + D6 gc“; unter „Carried“ hat **jedes Stück** ein Feld **„Paid, total (16–21 gc)“**
+  – immer der Gesamtpreis, nur im Bereich, den die Würfel erlauben (ein anderer Wert wird in ihn hineingezogen) – und einen Knopf **„Roll D6“**, der würfelt und
+  die Zahl einträgt. Solange nichts eingetragen ist, zählt das Stück zur Basis und die Zeile sagt „not rolled yet: counted at 15 gc“. Das Gold folgt dem
+  eingetragenen Preis (`eqPaid`, [data-model.md](data-model.md)).
 - **Die Liste ist kurz (Plan P6, 12.11.2026):** bei 67 Warbands war „New warband“ auf dem Handy rund 14 000 px lang. Mit der Sortierung nach Stufe ist jede
   Stufe ein **Abschnitt, den man auf- und zuklappt** (Knopf mit Name, Anzahl und Pfeil, mindestens 44 px hoch): **Core ist offen, die anderen sind zu**;
   ein benutzter Filter zeigt alle Treffer (dann gibt es nichts zuzuklappen), und die Stufe der gewählten Warband bleibt offen. Auf dem Handy ist eine

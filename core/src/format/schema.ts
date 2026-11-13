@@ -59,6 +59,7 @@ export const modelSchema = z.looseObject({
   qty: count.optional(),
   exp: num.optional(),
   eq: z.record(z.string(), count).optional(),
+  eqPaid: z.record(z.string(), z.array(num)).optional(),
   rare: z.record(z.string(), z.looseObject({ q: count, paid: num.optional(), on: z.string().optional(), also: z.array(z.looseObject({ on: z.string(), paid: num.optional() })).optional() })).optional(),
   mut: z.array(z.string()).optional(),
   adv: stats.optional(),

@@ -9156,7 +9156,7 @@
     {
      "id": "witchelve",
      "t": "hen",
-     "name": "Witch Elve",
+     "name": "Witch Elf",
      "cost": 45,
      "exp": 0,
      "max": 3,
@@ -11446,7 +11446,7 @@
      "exp": 0,
      "max": 1,
      "profile": {
-      "M": 4,
+      "M": "D6",
       "WS": 2,
       "BS": 2,
       "S": 4,
@@ -12562,8 +12562,13 @@
   "druchii": {
    "align": "evil",
    "elf": true,
-   "tags": [
-    "goodElves"
+   "only": [
+    "pitfighter",
+    "ogre",
+    "warlock",
+    "imperialassassin",
+    "tileanmarksman",
+    "highwayman"
    ]
   },
   "slayercult": {
@@ -12648,6 +12653,12 @@
    "align": "good",
    "tags": [
     "merc"
+   ],
+   "except": [
+    "warlock",
+    "witch",
+    "darkmage",
+    "fallensister"
    ]
   },
   "strigos": {
@@ -13648,6 +13659,13 @@
     [
      "Leichte Rüstung",
      20
+    ],
+    [
+     "Ithilmar-Rüstung",
+     60,
+     {
+      "start": true
+     }
     ]
    ],
    "Besonderes": [
@@ -21468,10 +21486,6 @@
      3
     ],
     [
-     "Hammer",
-     3
-    ],
-    [
      "Axt",
      5
     ],
@@ -21508,12 +21522,12 @@
      3
     ],
     [
-     "Hammer",
-     3
-    ],
-    [
      "Axt",
      5
+    ],
+    [
+     "Zwergenaxt",
+     15
     ],
     [
      "Schwert",
@@ -21569,10 +21583,6 @@
     ],
     [
      "Streitkolben",
-     3
-    ],
-    [
-     "Hammer",
      3
     ],
     [
@@ -21911,6 +21921,12 @@
      "Kochtopf-Helm",
      10
     ]
+   ],
+   "Besonderes": [
+    [
+     "Jagdpfeile",
+     35
+    ]
    ]
   },
   "hfYouth": {
@@ -22030,6 +22046,20 @@
     [
      "Zweihandwaffe",
      15
+    ],
+    [
+     "Chainsaw Sword",
+     15,
+     {
+      "dice": "D6"
+     }
+    ],
+    [
+     "Electric Trident",
+     15,
+     {
+      "dice": "D6"
+     }
     ]
    ],
    "Fernkampf": [
@@ -22040,6 +22070,13 @@
     [
      "Kurzbogen",
      5
+    ],
+    [
+     "Repeater Pistol (Masters of Horror)",
+     25,
+     {
+      "dice": "3D6"
+     }
     ]
    ],
    "Rüstung": [
@@ -23487,10 +23524,6 @@
     ],
     [
      "Streitkolben",
-     3
-    ],
-    [
-     "Knüppel",
      3
     ],
     [
