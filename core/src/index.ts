@@ -38,6 +38,7 @@ export * from './campaign/chronicle.ts';
 export * from './campaign/stages.ts';
 export * from './campaign/postbattle.ts';
 export * from './campaign/analysis.ts';
+export * from './campaign/stats.ts';
 export * from './campaign/file.ts';
 export * from './campaign/forms.ts';
 export * from './campaign/opponents.ts';
