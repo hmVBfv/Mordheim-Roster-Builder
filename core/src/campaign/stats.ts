@@ -24,8 +24,19 @@ export interface StageMetrics {
   /** Wyrdstone shards in the stash, and all ever found (stash plus sold). */
   wyrd: number;
   wyrdFound: number;
-  /** Gold made by selling wyrdstone and goods. */
+  /** Gold made, in total and by source: wyrdstone sold, goods sold, and other
+      bookings in the warband's favour (adjustments: rewards, booty). */
   income: number;
+  incomeWyrd: number;
+  incomeGoods: number;
+  incomeOther: number;
+  /** Gold paid out of the ledger, by kind. */
+  spentBuy: number;
+  spentSearch: number;
+  /** Items: pieces in the stash, and rare items – carried by warriors, and in the stash. */
+  stashItems: number;
+  rareCarried: number;
+  rareStash: number;
 }
 
 const num = (x: unknown): number => Number(x) || 0;
@@ -44,7 +55,9 @@ export function stageMetrics(ctx: Ctx): StageMetrics {
   const sold = Object.values(((s.campaign as { postbattle?: Record<string, PostBattleState> } | undefined)?.postbattle) ?? {})
     .map((p) => p?.wyrd).filter((w) => w && w.done);
   const wyrd = num(s.stash?.wyrd);
-  const ledgerSales = (s.ledger ?? []).filter((e) => e.kind === 'sell' && num(e.amount) > 0).reduce((t, e) => t + num(e.amount), 0);
+  const book = (kind: string, sign: 1 | -1) => (s.ledger ?? []).filter((e) => e.kind === kind && sign * num(e.amount) > 0)
+    .reduce((t, e) => t + sign * num(e.amount), 0);
+  const incomeWyrd = sold.reduce((t, w) => t + num(w?.gc), 0), incomeGoods = book('sell', 1), incomeOther = book('adjust', 1);
   return {
     value: warbandWorth(ctx),
     gold: goldCurrent(ctx),
@@ -54,6 +67,10 @@ export function stageMetrics(ctx: Ctx): StageMetrics {
     lost: (s.fallen ?? []).reduce((t, f) => t + num(f.lostValue), 0),
     wyrd,
     wyrdFound: wyrd + sold.reduce((t, w) => t + num(w?.shards), 0),
-    income: ledgerSales + sold.reduce((t, w) => t + num(w?.gc), 0),
+    income: incomeWyrd + incomeGoods + incomeOther, incomeWyrd, incomeGoods, incomeOther,
+    spentBuy: book('buy', -1), spentSearch: book('search', -1),
+    stashItems: (s.stash?.items ?? []).reduce((t, it) => t + (num(it.qty) || 1), 0),
+    rareCarried: s.models.reduce((t, m) => t + Object.keys(m.rare ?? {}).length, 0),
+    rareStash: (s.stash?.items ?? []).filter((it) => it.rare).reduce((t, it) => t + (num(it.qty) || 1), 0),
   };
 }

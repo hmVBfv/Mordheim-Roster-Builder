@@ -36,11 +36,12 @@ describe('stageMetrics', () => {
 
   it('adds the stash to wealth, and sold wyrdstone to what was found and earned', () => {
     const s = edit(warband(), (d) => {
-      d.stash = { wyrd: 2, gold: null, items: [{ name: 'Sword', qty: 2, paid: 10 }] };
+      d.stash = { wyrd: 2, gold: null, items: [{ name: 'Sword', qty: 2, paid: 10 }, { name: 'Ghost Dust', qty: 1, rare: true, paid: 40 }] };
+      d.ledger = [{ id: 1, kind: 'sell', amount: 25, text: 'x' }, { id: 2, kind: 'adjust', amount: 15, text: 'y' }, { id: 3, kind: 'buy', amount: -30, text: 'z' }, { id: 4, kind: 'search', amount: -10, text: 'w' }];
       d.campaign = { on: true, postbattle: { 1: { done: {}, wyrd: { done: true, shards: 3, gc: 90, size: 5 } } } } as WarbandState['campaign'];
     });
     const m = core.stageMetrics(ctx(s));
-    expect(m).toMatchObject({ stash: 20, wyrd: 2, wyrdFound: 5, income: 90 });
-    expect(m.wealth).toBe(core.goldTreasury(ctx(s)) + 20);
+    expect(m).toMatchObject({ stash: 60, stashItems: 3, rareStash: 1, wyrd: 2, wyrdFound: 5, income: 130, incomeWyrd: 90, incomeGoods: 25, incomeOther: 15, spentBuy: 30, spentSearch: 10 });
+    expect(m.wealth).toBe(core.goldTreasury(ctx(s)) + 60);
   });
 });
