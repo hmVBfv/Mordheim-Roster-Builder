@@ -446,7 +446,8 @@ Verhalten für die alte App unverändert, sonst Eintrag in
 **Sonderregeln des Verkaufs** (Fundstellen und Wortlaut: Abschnitt 5, nach
 Robs Freigabe): Core `sellingSize(ctx)` → `{ models, band, adjustments[] }`
 mit den Anpassungen der Größe (Ogre zählt doppelt, Koch und *Victuals* eine
-Stufe kleiner, Mob als ein Modell, Troll als zwei) und `wyrdPrice(ctx, n, size)`
+Stufe kleiner – *Victuals* nur bei Treasure, je verbrauchtem Stück, stapelt
+mit dem Koch, Untergrenze 1–3 –, Mob als ein Modell, Troll als zwei) und `wyrdPrice(ctx, n, size)`
 nimmt die angepasste Größe (Parameter gibt es schon). Der Preis des *Cathayan
 Merchant* (W6 → ±2W6/+3W6) kommt als eigener Wurf mit „eintragen oder
 würfeln“ hinzu und steht als eigene Zeile im `Find`. Die Oberfläche zeigt über
@@ -578,8 +579,9 @@ Diagramme der Statistik bekommen diese Reihen.
    `PB_UNDERDOG`; ist keine Gegnerin höher, gibt es nichts). Die Ratings kommen
    aus `beforeTotals` der Teilnehmer (Stand vor der Schlacht).
 2. **Warband-Zweige der Orte (N7):** „Undead“ = jede Warband mit
-   `siteRace: "Undead"` (heute Tomb Guardians, Restless Dead, Necrarchs, Undead;
-   **nicht** die Strigoi mit `siteRace: "Vampire"` – Rückfrage bei N7).
+   `siteRace: "Undead"` (heute Tomb Guardians, Restless Dead, Necrarchs, Undead).
+   **Ein Vampir ist nicht Undead** (Rob, 14.11.2026): die Strigoi mit
+   `siteRace: "Vampire"` gehören nicht dazu und sind „anyone else“.
    „Possessed“ = alles Dämonenartige: die Warbands mit Dämonen im `siteRace`
    (heute Possessed – `Chaos Human` – und Carnival – `Chaos Human/Demon`; in
    N7 über ein **Merkmal** im Warband-Kopf, z. B. `demonic: true`, nicht über
@@ -598,7 +600,7 @@ Regeln ist umgesetzt.
 | --- | --- | --- |
 | Größe +1 Modell je Ogre | Maneaters (`1c/maneaters.json`, Ability *Gluttony*) | „Each Ogre counts as two models when selling wyrdstone or treasure“, mindestens als eines; gefressene Gefangene senken die Zahl um 1 (Large: 2) |
 | Größe eine Stufe kleiner | Halflings, Koch (*Master Chef*, `2a/halflings.json`) | W6 5+: beim Verkauf von Treasure **oder Wyrdstone** gilt die Warband als eine Größe kleiner |
-| Größe eine Stufe kleiner | Gegenstand *Victuals* (8 gc, Common; `data/equipment.json`) | „after a battle when selling treasures: one size band smaller (never below 1–3 models). Any number may be used.“ – gilt dem Wortlaut nach nur für **Treasure**, nicht für Wyrdstone → Rob, ob auch Wyrdstone |
+| Größe eine Stufe kleiner | Gegenstand *Victuals* (8 gc, Common; `data/equipment.json`) | „after a battle when selling treasures: one size band smaller (never below 1–3 models). Any number may be used.“ – **nur Treasure**, nicht Wyrdstone (Rob, 14.11.2026). Regelwortlaut: „A warband may use as many victuals as they wish, but note that the warband size cannot be considered lower than 1-3 models.“ Jedes verbrauchte Stück senkt die Stufe um eine; Untergrenze 1–3 |
 | Größe: Mob = 1 Modell | Snotlings, Night Goblins (*Insignificant*, `abilities.json`, `nightgoblins.json`) | „counts as a single model for … maximum warband size and income“ |
 | Größe: Troll = 2 Modelle | Black Orcs (*Always Hungry*, `1b/blackorcs.json`) | 20 gc Sold nach jeder Schlacht **oder** der Troll zählt als 2 Mitglieder für nur 5 gc – wirkt auf die Größe |
 | Preis ±2W6/+3W6 | Hired Sword *Cathayan Merchant* (Border Town Burning; `hiredswords.json`, *Stone Cutter*) | W6 bei jedem Verkauf: 1–2 verliere 2W6 gc, 3–5 gewinne 2W6 gc, 6 gewinne 3W6 gc |
@@ -616,15 +618,20 @@ P11 `effects`, wenn es dann läuft), in der Oberfläche als **sichtbare Zeile
 band 7–9; Victuals ×1 → band 4–6“), jede Anpassung mit Namen der Quelle und
 ausschaltbar, damit niemand etwas Stilles verliert.
 
+Entschieden am 14.11.2026 (Rob): **Victuals zählt nur für Treasure**, nicht
+für Wyrdstone. Es **stapelt** mit *Master Chef* bei Treasure (beide senken die
+Größenstufe, die Regeln lassen mehrere Victuals ausdrücklich zu; nie unter
+1–3 Modelle). Bei Wyrdstone wirkt nur *Master Chef*. Die Oberfläche fragt bei
+Treasure, wie viele Victuals verbraucht werden (Stücke im Stash, werden
+abgezogen). Ein Vampir ist nicht Undead.
+
 ### Noch offen
 
 1. **Sold:** wo in der Folge? Vorschlag: Unterpunkt nach Schritt 4 (Geld ist
    dann da), Dramatis Personae ebenso.
 2. **Erkundung, Sonderregeln:** die Tabelle aus N6 – freigeben oder ändern.
-3. **Verkaufs-Sonderregeln:** Victuals auch für Wyrdstone? Wirken Master Chef
-   und Victuals zusammen (zwei Stufen)? Snotlings/Night Goblins als *ein*
-   Modell auch beim Verkauf (Wortlaut „income“)? Strigoi (`Vampire`) als
-   „Undead“ für die Orte?
+3. **Verkaufs-Sonderregeln:** Snotlings/Night Goblins als *ein* Modell auch
+   beim Verkauf (Wortlaut „income“)?
 4. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
    Protokoll, oder sollen App-Würfe für die anderen Mitglieder eigens
    sichtbar sein (z. B. in der Bilanz, N13)? Vorschlag: Vermerk in der Bilanz.
