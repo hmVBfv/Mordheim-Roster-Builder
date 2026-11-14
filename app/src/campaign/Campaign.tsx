@@ -38,6 +38,7 @@ import { openItems } from '../open/items.ts';
 import { OpenList } from '../open/OpenList.tsx';
 import { QuestionsTab } from '../questions/Questions.tsx';
 import { useQuestions } from '../questions/useQuestions.ts';
+import { RatingLines } from './RatingLines.tsx';
 import { useWarbands } from '../sync/local.ts';
 import { requestSync } from '../sync/runner.ts';
 import { WorldTab } from '../world/World.tsx';
@@ -111,6 +112,7 @@ function Overview({ id, view, me, lead, onView }: { id: string; view: CampaignVi
             <Link to={`/campaign/${id}/house-rules`} className={ui.buttonQuiet}>House rules</Link>
           </div>
         </section>
+        <RatingLines id={id} />
         <section className={styles.section} aria-labelledby="c-members">
           <h2 id="c-members">Members</h2>
           <ul className={styles.crew} aria-label="Members">
