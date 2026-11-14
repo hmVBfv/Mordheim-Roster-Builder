@@ -293,6 +293,28 @@ export interface SpellList {
 }
 
 /** The complete game data, as exported by legacy data/index.js. */
+/** One thing that changes the exploration roll: where it comes from and what it allows. Each is used once in a post-battle sequence. */
+export interface ExploreRule {
+  id: string;
+  name: string;
+  /** A Hero's skill, an item he carries, a Hired Sword the warband has, or a district it holds (at least `tier`). */
+  from: { skill?: string; item?: string; hs?: string; district?: string; tier?: 'foothold' | 'control' };
+  /** Extra dice to roll. */
+  dice?: number;
+  /** Dice that may be re-rolled (the second result stands); 6 = all. */
+  reroll?: number;
+  /** Dice that may be changed by 1 up or down. */
+  adjust?: number;
+  /** Dice to discard of those rolled. */
+  drop?: number;
+  /** Only while its bearer was not taken out of action in the battle. */
+  needs?: 'notOOA';
+  text: string;
+  src: string;
+  /** Lower-case pieces of the sentences in the data this rule models; a test holds them against the data. */
+  match: string[];
+}
+
 export interface GameData {
   MAXPROF: Record<string, Profile>;
   RACELABEL: Record<string, string>;
@@ -359,6 +381,14 @@ export interface GameData {
   PB_ADVANCE_NOTES: string[];
   PB_EXPLORE_SHARDS: [total: string, shards: number][];
   PB_LOCATIONS: [dice: string, name: string, text: string][];
+  /* Underdog bonus (Campaigns: Experience): [from, to (null = no upper limit), bonus] by the difference in warband rating. */
+  PB_UNDERDOG: [from: number, to: number | null, bonus: number][];
+  /* The ten steps in the rulebook's order: [key, what it asks] (N1; the title and link are core's PB_STEPS). */
+  PB_SEQUENCE: [key: string, text: string][];
+  /* What skills, items, Hired Swords and districts change in the exploration roll (N6): extra dice, re-rolls, +/-1, dice to discard. */
+  PB_EXPLORE_RULES: ExploreRule[];
+  /* The mentions of exploration in the data that PB_EXPLORE_RULES does not model: a lower-case piece of the sentence and the reason. A test finds every mention in the data and wants it in one list or the other. */
+  PB_EXPLORE_EXCEPTIONS: [needle: string, why: string][];
   /* Animals and creatures for leaders' opponent profiles (data/bestiary.json;
      the new app only – legacy does not load the file). */
   BESTIARY_SOURCE: string;

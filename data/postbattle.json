@@ -64,5 +64,403 @@
   ["4 4 4 4 4 4", "Slaughtered warband", "3D6×5 gc and D6 daggers, and roll for each: D3 light armour 4+ · heavy armour 5+ · Mordheim map 4+ · D3 halberds 5+ · D3 swords 3+ · D3 shields 2+ · D3 bows 4+ · D3 helmets 2+."],
   ["5 5 5 5 5 5", "Fighting arena", "A training manual: sell it for 100 gc, or a Hero studies it — Combat skills from now on, and his WS may rise one point above its racial maximum."],
   ["6 6 6 6 6 6", "Noble's villa", "D6: 1–2 D6×10 gc · 3–4 D6 vials of Crimson Shade · 5–6 a magical artefact."]
+ ],
+ "PB_UNDERDOG": [
+  [0, 50, 0],
+  [51, 75, 1],
+  [76, 100, 2],
+  [101, 150, 3],
+  [151, 300, 4],
+  [301, null, 5]
+ ],
+ "PB_SEQUENCE": [
+  ["injuries", "Every warrior taken out of action rolls on the Serious Injuries chart: Heroes a D66, Henchmen a D6."],
+  ["experience", "Heroes and Henchmen groups gain experience for the battle, with the underdog bonus; then any advance rolls."],
+  ["exploration", "One D6 for each Hero not taken out of action, one more for a win; the total gives the shards found, doubles or better an unusual location."],
+  ["wyrdstone", "Sell wyrdstone once per sequence; the price is for the whole lot and depends on the size of the warband."],
+  ["veterans", "Roll 2D6: the experience of the veterans available for hire this round."],
+  ["rare", "A Hero not taken out of action may look for one rare item (2D6 against its rarity); what he finds goes into the stash."],
+  ["dramatis", "Look for a Dramatis Persona if you want to hire one."],
+  ["recruits", "Hire new recruits with their free dagger and buy common items, in any order and as often as you like."],
+  ["equipment", "Swap equipment between models as you wish, provided they may use it."],
+  ["rating", "Update the warband rating. You are ready to fight again."]
+ ],
+ "PB_EXPLORE_RULES": [
+  {
+   "id": "wyrdstonehunter",
+   "name": "Wyrdstone Hunter",
+   "from": {
+    "skill": "Wyrdstone Hunter"
+   },
+   "reroll": 1,
+   "text": "Re-roll one die on the Exploration chart (second result stands).",
+   "src": "skills.json, Academic skills",
+   "match": [
+    "re-roll one die on the exploration chart"
+   ]
+  },
+  {
+   "id": "resourcehunter",
+   "name": "Resource Hunter",
+   "from": {
+    "skill": "Resource Hunter"
+   },
+   "adjust": 1,
+   "text": "When rolling on the Exploration chart at the end of a game, the Hero may modify one dice by +1/−1.",
+   "src": "skills of the Dwarf and Black Dwarf Heroes",
+   "match": [
+    "at the end of a game, he may modify one dice by",
+    "at the end of a game, the hero may modify one dice by"
+   ]
+  },
+  {
+   "id": "seeker",
+   "name": "Seeker",
+   "from": {
+    "skill": "Seeker"
+   },
+   "adjust": 1,
+   "text": "He may modify the result of one exploration die by +/- 1 (Wood Elf; only one Elven Hero may have this skill).",
+   "src": "skills of the Wood Elf Heroes",
+   "match": [
+    "he may modify the result of one exploration die by"
+   ]
+  },
+  {
+   "id": "compass",
+   "name": "Compass",
+   "from": {
+    "item": "Compass"
+   },
+   "reroll": 6,
+   "text": "The warband may re-roll the dice when rolling on the Exploration chart (must accept the second result).",
+   "src": "equipment.json, Compass",
+   "match": [
+    "may re-roll the dice when rolling on the exploration chart"
+   ]
+  },
+  {
+   "id": "treasuremap",
+   "name": "Treasure Map",
+   "from": {
+    "item": "Treasure Map"
+   },
+   "dice": 1,
+   "text": "One use. Grants the warband a large bonus in the Exploration phase (roll an extra die and add it), then the map is spent.",
+   "src": "equipment.json, Treasure Map",
+   "match": [
+    "grants the warband a large bonus in the exploration phase"
+   ]
+  },
+  {
+   "id": "nehekharanmap",
+   "name": "Map of Nehekhara",
+   "from": {
+    "item": "Map of Nehekhara"
+   },
+   "dice": 1,
+   "reroll": 1,
+   "text": "Grants +1 die in the Exploration phase and lets the warband re-roll one Exploration die per game.",
+   "src": "equipment.json, Map of Nehekhara",
+   "match": [
+    "grants +1 die in the exploration phase"
+   ]
+  },
+  {
+   "id": "warpstoneamulet",
+   "name": "Warpstone Amulet",
+   "from": {
+    "item": "Warpstone Amulet"
+   },
+   "reroll": 1,
+   "needs": "notOOA",
+   "text": "Re-roll a single die when searching for wyrdstone, if not out of action at game end.",
+   "src": "equipment.json, Warpstone Amulet",
+   "match": [
+    "a single die when searching for wyrdstone"
+   ]
+  },
+  {
+   "id": "tarot",
+   "name": "Tarot cards",
+   "from": {
+    "item": "Tarot cards"
+   },
+   "adjust": 1,
+   "text": "Before each game the Hero takes a Leadership test. Passed: change one exploration die by 1 up or down (even if he goes out of action).",
+   "src": "equipment.json, Tarot cards",
+   "match": [
+    "change one exploration die by 1 up or down"
+   ]
+  },
+  {
+   "id": "pendulum",
+   "name": "Wyrdstone pendulum",
+   "from": {
+    "item": "Wyrdstone pendulum"
+   },
+   "reroll": 1,
+   "needs": "notOOA",
+   "text": "If the Hero was not taken out of action, he tests Leadership after the battle: passed — re-roll one die in the exploration phase (that die may not be re-rolled again).",
+   "src": "equipment.json, Wyrdstone pendulum",
+   "match": [
+    "re-roll one die in the exploration phase (that die may not"
+   ]
+  },
+  {
+   "id": "elfranger",
+   "name": "Elf Ranger",
+   "from": {
+    "hs": "elfranger"
+   },
+   "adjust": 1,
+   "text": "When rolling on the Exploration chart he lets you modify one dice roll by -1/+1.",
+   "src": "hiredswords.json, Elf Ranger (Seeker)",
+   "match": [
+    "when rolling on the exploration chart he lets you modify one dice roll"
+   ]
+  },
+  {
+   "id": "kislevranger",
+   "name": "Kislevite Ranger",
+   "from": {
+    "hs": "kislevranger"
+   },
+   "adjust": 1,
+   "needs": "notOOA",
+   "text": "If she did not go out of action she may modify one Exploration die by +/-1.",
+   "src": "hiredswords.json, Kislevite Ranger (Seeker)",
+   "match": [
+    "she may modify one exploration die by"
+   ]
+  },
+  {
+   "id": "dwarfpathfinder",
+   "name": "Dwarf Pathfinder",
+   "from": {
+    "hs": "dwarfpathfinder"
+   },
+   "dice": 1,
+   "drop": 1,
+   "text": "A warband with a Dwarf Pathfinder may roll one MORE dice than normal in the Exploration phase and discard one die of the player's choice.",
+   "src": "hiredswords.json, Dwarf Pathfinder (Explorer)",
+   "match": [
+    "roll one more dice than normal in the exploration phase"
+   ]
+  },
+  {
+   "id": "pathfinder",
+   "name": "Pathfinder",
+   "from": {
+    "hs": "pathfinder"
+   },
+   "reroll": 1,
+   "needs": "notOOA",
+   "text": "If he was not taken out of action you may re-roll one Exploration die.",
+   "src": "hiredswords.json, Pathfinder (Knowledge of Myths and Legends)",
+   "match": [
+    "you may re-roll one exploration die, keeping"
+   ]
+  },
+  {
+   "id": "tombrobber",
+   "name": "Tomb Robber",
+   "from": {
+    "hs": "tombrobber"
+   },
+   "adjust": 1,
+   "text": "He allows the warband to modify a single Exploration die by -1/+1.",
+   "src": "hiredswords.json, Tomb Robber (Explorer)",
+   "match": [
+    "allows the warband to modify a single exploration die"
+   ]
+  },
+  {
+   "id": "beggar",
+   "name": "Beggar",
+   "from": {
+    "hs": "beggar"
+   },
+   "dice": 1,
+   "needs": "notOOA",
+   "text": "At the end of each battle in which he was not put out of action, he adds an EXTRA Exploration die to your pool.",
+   "src": "hiredswords.json, Beggar (Scrounge)",
+   "match": [
+    "adds an extra exploration die to your pool"
+   ]
+  },
+  {
+   "id": "imperialtactician",
+   "name": "Imperial Tactician",
+   "from": {
+    "hs": "imperialtactician"
+   },
+   "reroll": 1,
+   "text": "The warband may re-roll one Exploration die.",
+   "src": "hiredswords.json, Imperial Tactician",
+   "match": [
+    "the warband may re-roll one exploration die."
+   ]
+  },
+  {
+   "id": "execsquare",
+   "name": "Executioner's Square",
+   "from": {
+    "district": "execsquare",
+    "tier": "control"
+   },
+   "dice": 1,
+   "text": "Roll one extra dice in the Exploration Procedure.",
+   "src": "campaign.json, Executioner's Square",
+   "match": [
+    "roll one extra dice in the exploration procedure"
+   ]
+  },
+  {
+   "id": "poorquarter",
+   "name": "Poor Quarter",
+   "from": {
+    "district": "poorquarter",
+    "tier": "control"
+   },
+   "dice": 1,
+   "text": "Roll one extra dice in the Exploration Procedure.",
+   "src": "campaign.json, Poor Quarter",
+   "match": [
+    "roll one extra dice in the exploration procedure"
+   ]
+  },
+  {
+   "id": "cityhall",
+   "name": "City Hall",
+   "from": {
+    "district": "cityhall",
+    "tier": "foothold"
+   },
+   "adjust": 1,
+   "text": "During the Exploration Procedure, you may modify one dice by +1 or -1.",
+   "src": "campaign.json, City Hall",
+   "match": [
+    "during the exploration procedure, you may modify one dice by"
+   ]
+  }
+ ],
+ "PB_EXPLORE_EXCEPTIONS": [
+  [
+   "details in the unit text",
+   "Scout: only says it helps in the exploration phase; the details are in each unit's text"
+  ],
+  [
+   "roll two dice for her in the exploration phase",
+   "Augur (Sisters of Sigmar): two dice for one, pick either – tied to the unit; modelled with the unit effects (P11)"
+  ],
+  [
+   "roll two dice for exploration and pick one",
+   "Mountain Guide and the Maneaters' Ranger: two dice for one, pick one – tied to the unit (P11)"
+  ],
+  [
+   "exploration (hochland poacher)",
+   "Hochland Poacher: the line of the ability (P11)"
+  ],
+  [
+   "for each poacher who took part",
+   "Trailblazers: one re-roll for each Poacher who took part – a count of units (P11)"
+  ],
+  [
+   "reroll one d6 in the exploration phase for each poacher",
+   "Hochland Poacher: same as Trailblazers (P11)"
+  ],
+  [
+   "choose which two of the dice to keep",
+   "Chronicler (Twisted Scholar): a second rule on top of the six-dice rule (P11)"
+  ],
+  [
+   "choose which two dice to keep",
+   "Chronicler (Cavalcade): same as above (P11)"
+  ],
+  [
+   "maximum amount of gold or equipment at a location",
+   "districts: a rule of the places found (N7, N8)"
+  ],
+  [
+   "may change a found location to the pit",
+   "the district of the Pit: a rule of the places found (N7, N8)"
+  ],
+  [
+   "mordheim guide",
+   "Luthor the Looter: his own die and consultation (a Dramatis Persona's own roll)"
+  ],
+  [
+   "re-roll one exploration die; search for a rare item",
+   "Aksho Akhash: one of two things, chosen after the battle (a Dramatis Persona's own choice)"
+  ],
+  [
+   "re-roll one die in the next exploration",
+   "Mordheim map: a D6 table when it is bought, not a fixed allowance"
+  ],
+  [
+   "one die in the exploration phase instead",
+   "Rabbit's foot: only 'if it was not used' in the battle – a roll the app does not see"
+  ],
+  [
+   "real map (one extra exploration dice)",
+   "Dwarf Treasure Hunter: a D6 table of its own on his hunt for a map"
+  ],
+  [
+   "in the exploration phase, if not taken out of action, he loots",
+   "Grave Robber: a 2D6 table of its own"
+  ],
+  [
+   "add +3 to the total of the wyrdstone dice roll",
+   "Goblin Lantern Bearer: changes the total, not the dice – needs an effect of its own (P11)"
+  ],
+  [
+   "counts as possessed for exploration/injuries",
+   "Carnival: a warband rule about which table applies (N7)"
+  ],
+  [
+   "add +1 to the number of pieces found for a dwarf warband",
+   "Dwarf warbands: +1 to the shards found, not a die – an effect of its own (P11)"
+  ],
+  [
+   "+1 die in the exploration phase, in every campaign setting",
+   "Tomb Guardians: a warband rule, an extra die (P11, effects)"
+  ],
+  [
+   "did not search for rare items in the last exploration phase",
+   "Restless Dead skill: a bonus to casting, not to the exploration"
+  ],
+  [
+   "during the exploration phase when checking for artifacts",
+   "Dark Elves (Fey Acuity): +1 to the pieces found while a hero searches (P11)"
+  ],
+  [
+   "taken out of action in the exploration phase",
+   "Grave Robbers (Grave Goods): gold for each enemy taken out of action – not the roll"
+  ],
+  [
+   "does not add an exploration dice",
+   "Ogre Hunter: he adds no die (a limit, P11)"
+  ],
+  [
+   "do not gain exploration dice",
+   "Slayer Cult: no dice after a defeat (a limit, P11)"
+  ],
+  [
+   "always roll an additional one exploration dice",
+   "Snotlings: a warband rule, an extra die (P11, effects)"
+  ],
+  [
+   "modify a single exploration dice by +/- 1",
+   "Strigoi Seer: a unit special (P11, effects)"
+  ],
+  [
+   "extra piece of wyrdstone",
+   "Strigoi skill Light Fingers: a shard for a Hero who takes an enemy out of action – not the roll (N9)"
+  ],
+  [
+   "roll one additional d6 during the exploration phase",
+   "Pathfinder: a unit special, one per warband (P11, effects)"
+  ]
  ]
 }
