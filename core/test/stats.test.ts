@@ -45,3 +45,38 @@ describe('stageMetrics', () => {
     expect(m.wealth).toBe(core.goldTreasury(ctx(s)) + 60);
   });
 });
+
+describe('stageMetrics with the post-battle record (N14)', () => {
+  function played(): WarbandState {
+    let s = { ...warband(), campaign: { on: true, round: 1, districts: {} } } as WarbandState;
+    s = core.openLedger(ctx(s));
+    s = { ...s, hired: [{ key: 'elfranger', uid: 'hs0' }] } as WarbandState;
+    s = core.stashAdjust(ctx(s), 'wyrd', 3);
+    s = core.sellWyrdstone(ctx(s), 1, 3);
+    s = core.payUpkeep(ctx(s), 1, ['hs0']);
+    // a place: Market Hall, gold 9
+    s = core.applyLocation(ctx(s), 1, { key: '5 5 5', answers: { 's.0.d.0': 9 } });
+    return s;
+  }
+
+  it('splits the income by source from the finds, and keeps the places’ gold out of “other”', () => {
+    const s = played();
+    const m = core.stageMetrics(ctx(s));
+    const sale = (s.campaign as { postbattle: Record<string, { wyrd: { gc: number } }> }).postbattle['1']!.wyrd.gc;
+    expect(m).toMatchObject({ incomeWyrd: sale, incomeLocations: 9, incomeScenario: 0, incomeGoods: 0, incomeOther: 0 });
+    expect(m.income).toBe(sale + 9);
+    expect(m.upkeepPaid).toBe(core.hsUpkeepFor(ctx(s), 'elfranger'));
+  });
+
+  it('the worth of what was found is the list price of the items', () => {
+    let s = { ...warband(), campaign: { on: true, round: 1, districts: {} } } as WarbandState;
+    s = core.applyLocation(ctx(s), 1, { key: '2 2 2', answers: { 's.0': 1 } });
+    const m = core.stageMetrics(ctx(s));
+    expect(m.lootValue).toBe(data.CATALOG.find((c) => c.en === 'Sword')!.cost);
+  });
+
+  it('a round without a record (an older one) is read from its sale alone, as before', () => {
+    const s = edit(warband(), (d) => { d.campaign = { on: true, postbattle: { 1: { done: {}, wyrd: { done: true, shards: 2, gc: 60, size: 5 } } } } as WarbandState['campaign']; });
+    expect(core.stageMetrics(ctx(s))).toMatchObject({ incomeWyrd: 60, incomeLocations: 0, upkeepPaid: 0, lootValue: 0, income: 60 });
+  });
+});
