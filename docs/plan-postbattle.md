@@ -92,7 +92,7 @@ Schon vorhanden und weiterzuverwenden:
 
 | Nr. | Paket | Größe | Braucht | Rob entscheidet |
 | --- | --- | --- | --- | --- |
-| N0 | ADR und Datenmodell „Nachspiel als Protokoll“ | klein | – | ja (Fragen in Abschnitt 5) |
+| N0 | ADR und Datenmodell „Nachspiel als Protokoll“ | klein | – | – (entschieden) |
 | N1 | Tabellen: Daten, Komponente, Regelübersicht | mittel | – | – |
 | N2 | Rahmen der Seite: Fortschritt, Ergebnis je Schritt | mittel | N0 | – |
 | N3 | Schritt 1 Verletzungen: Übersicht | klein | N1, N2 | – |
@@ -116,7 +116,7 @@ N9, N10, N11, N12; N6–N8 nach N5; N13 und N14 zuletzt.
 
 ### N0 – ADR und Datenmodell „Nachspiel als Protokoll“
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n0`)
 
 **Ziel:** festlegen, *was* das Nachspiel speichert, bevor ein Schritt gebaut
 wird. Bisher gilt (Kommentar in `postbattle.ts`): „A guided checklist, not a
@@ -631,11 +631,8 @@ Sonderregeln** aus der Tabelle von N6 sind freigegeben; **Snotling- und
 Night-Goblin-Mobs** zählen auch bei der Spaltenwahl der Wyrdstone-Preistabelle
 und beim Treasure-Verkauf als **ein** Modell.
 
-### Noch offen
-
-1. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
-   Protokoll, oder sollen App-Würfe für die anderen Mitglieder eigens
-   sichtbar sein (z. B. in der Bilanz, N13)? Vorschlag: Vermerk in der Bilanz.
+Zuletzt (14.11.2026, Rob): Der Vermerk „rolled in the app“ in der Bilanz
+(N13) genügt.
 
 ## 6. Idee für später: Würfe aus Tabletop Simulator (N15)
 
