@@ -6,6 +6,7 @@ import type { CampaignState, WarbandState } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
 import type { GameData } from '../data/types.ts';
 import { goldTreasury, isHeroModel } from '../rules/costs.ts';
+import { bookOn } from '../trade/ledger.ts';
 import { unitDef } from '../rules/lookup.ts';
 import { campState, logEvent } from '../warband/log.ts';
 import { update, type WarbandDraft } from '../warband/update.ts';
@@ -43,7 +44,7 @@ export const PB_STEPS: readonly (readonly [string, string, string])[] = [
 ];
 export const PB_ORDER: readonly string[] = PB_STEPS.map((s) => s[0]);
 
-export interface WyrdSale { done: boolean; shards: number; gc: number; size: number }
+export interface WyrdSale { done: boolean; shards: number; gc: number; size: number; /** The price band used (0 = 1–3 warriors …), where it was lowered (N9). */ band?: number; /** What a Hired Sword changed the price by (the Cathayan Merchant). */ adjust?: number }
 /** A roll made for a step, with where it came from (ADR 0032): typed in from
     the table, or rolled in the app. `value` holds one number per die. */
 export interface Rolled { value: number[]; by: 'entered' | 'app' }
@@ -192,6 +193,13 @@ export function warbandSize(ctx: Ctx): number {
   return n;
 }
 
+/** The price of selling `shards` at a given size: the models counted and the band of the price chart (which may be lower than the models give). */
+export function priceAt(_ctx: Ctx, shards: unknown, size: { models: number; band: number }): number {
+  const n = Math.max(1, Math.min(8, Number(shards) || 1));
+  const band = Math.max(0, Math.min(WYRD_BANDS.length - 1, size.band));
+  return (WYRD_PRICE[n - 1] as readonly number[])[band] as number;
+}
+
 export function wyrdPrice(ctx: Ctx, shards: unknown, size?: number | null): number {
   const n = Math.max(1, Math.min(8, Number(shards) || 1));
   const band = wyrdSizeBand(size == null ? warbandSize(ctx) : size);
@@ -227,9 +235,16 @@ export function setPostBattleStep(ctx: Ctx, step: string, on: boolean, round?: n
   });
 }
 
-/** Sells wyrdstone once per sequence: the gold goes to the treasury, the
-    shards leave the stash, and the sale is recorded so it can be undone. */
-export function sellWyrdstone(ctx: Ctx, round: number | null | undefined, shards: unknown): WarbandState {
+export interface SellOptions {
+  /** The size to sell at (N9): the models counted and the price band, which special rules may lower. */
+  size?: { models: number; band: number };
+  /** A Hired Sword's change of the price (the Cathayan Merchant), in gc, with the words for the record. */
+  adjust?: { gc: number; text: string };
+}
+
+/** Sells wyrdstone once per sequence: the gold goes to the treasury (a booking naming its origin when the ledger is kept), the shards leave
+    the stash, and the sale is recorded – with a find – so it can be undone. */
+export function sellWyrdstone(ctx: Ctx, round: number | null | undefined, shards: unknown, opts: SellOptions = {}): WarbandState {
   const r = round == null ? pbRound(ctx) : round;
   const sold = (ctx.s.campaign as { postbattle?: Record<string, PostBattleState> } | undefined)?.postbattle?.[r]?.wyrd;
   if (sold && sold.done) return ctx.s;
@@ -238,17 +253,22 @@ export function sellWyrdstone(ctx: Ctx, round: number | null | undefined, shards
   if (have < 1 || n < 1) return ctx.s;
   return update(ctx, (d, c) => {
     const st = postbattleOn(d, c, r);
-    const size = warbandSize(c);
-    const gc = wyrdPrice(c, n, size);
+    const models = opts.size?.models ?? warbandSize(c);
+    const base = opts.size ? priceAt(c, n, opts.size) : wyrdPrice(c, n, models);
+    const adj = opts.adjust ? Math.round(opts.adjust.gc) : 0;
+    const gc = Math.max(0, base + adj);
     d.stash = d.stash || { wyrd: 0, gold: null, items: [] };
-    d.stash.gold = goldTreasury(c) + gc;
+    const text = `Sold ${n} wyrdstone shard${n === 1 ? '' : 's'} for ${gc} gc${adj ? ` (${opts.adjust!.text})` : ''}.`;
+    if (Array.isArray(d.ledger)) { const e = bookOn(d, c, 'adjust', gc, { text }); if (e) e.source = 'wyrdstone'; }
+    else d.stash.gold = goldTreasury(c) + gc;
     d.stash.wyrd = have - n;
-    st.wyrd = { done: true, shards: n, gc, size };
-    logEvent(d, 'income', `Sold ${n} wyrdstone shard${n === 1 ? '' : 's'} for ${gc} gc.`, { round });
+    st.wyrd = { done: true, shards: n, gc, size: models, ...(opts.size ? { band: opts.size.band } : {}), ...(adj ? { adjust: adj } : {}) };
+    st.finds = [...(st.finds ?? []).filter((f) => f.source !== 'wyrdstone'), { id: (st.finds ?? []).reduce((m, f) => Math.max(m, f.id), 0) + 1, kind: 'gold', source: 'wyrdstone', amount: gc, text }];
+    logEvent(d, 'income', text, { round });
   });
 }
 
-/** Takes a sale back: the gold leaves the treasury, the shards return. */
+/** Takes a sale back: the gold leaves the treasury (a booking that cancels it, with the ledger), the shards return, the find goes. */
 export function undoWyrdstoneSale(ctx: Ctx, round?: number | null): WarbandState {
   const r = round == null ? pbRound(ctx) : round;
   const w = (ctx.s.campaign as { postbattle?: Record<string, PostBattleState> } | undefined)?.postbattle?.[r]?.wyrd;
@@ -256,8 +276,10 @@ export function undoWyrdstoneSale(ctx: Ctx, round?: number | null): WarbandState
   return update(ctx, (d, c) => {
     const st = postbattleOn(d, c, r);
     d.stash = d.stash || { wyrd: 0, gold: null, items: [] };
-    d.stash.gold = Math.max(0, goldTreasury(c) - (Number(w.gc) || 0));
+    if (Array.isArray(d.ledger)) { const e = bookOn(d, c, 'adjust', -(Number(w.gc) || 0), { text: 'Wyrdstone sale taken back' }); if (e) e.source = 'wyrdstone'; }
+    else d.stash.gold = Math.max(0, goldTreasury(c) - (Number(w.gc) || 0));
     d.stash.wyrd = (Number(d.stash.wyrd) || 0) + (Number(w.shards) || 0);
     st.wyrd = null;
+    st.finds = (st.finds ?? []).filter((f) => f.source !== 'wyrdstone');
   });
 }

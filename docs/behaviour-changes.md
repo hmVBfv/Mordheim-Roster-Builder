@@ -544,3 +544,11 @@ Regelbuch, Campaigns – Experience, „Underdogs“, und auf der Tools-Seite vo
 `PB_UNDERDOG`), `underdogAgainst` (der größte Unterschied zu einer höher bewerteten Gegnerin, Rob 13.11.2026), `battleXpPlan` (die
 Tabelle vor dem Vergeben). Tests: `core/test/battle-xp.test.ts`. Keine Paritätsausnahme nötig, weil die Läufe der Parität die Angaben
 nicht setzen.
+
+## Nachspiel als Protokoll (ADR 0032, Rob, 14.11.2026)
+
+Eine Runde des Nachspiels (`campaign.postbattle[round]`) hält in core mehr fest als in der alten App: `explore`, `xp`, `upkeep`, `finds`,
+`location` (Würfe, Funde mit Herkunft, der genommene Ort), beim Wyrdstone-Verkauf `band` und `adjust`, dazu `campaign.perks`. Die alte App
+kennt nichts davon und lässt es beim Laden und Speichern unberührt. **Der Vergleich der Parität lässt genau diese Schlüssel aus**
+(`CORE_ONLY_POSTBATTLE` in `core/test/support/canon.ts`, `campaign.perks`; nichts sonst). Das Verhalten von `sellWyrdstone` ohne Optionen ist
+das der alten App; bei geführtem Kassenbuch (nur core) ist der Verkauf eine Buchung mit Herkunft.

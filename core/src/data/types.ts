@@ -47,6 +47,8 @@ export interface UnitDef {
   /** Mutation set key ('chaos' | 'nurgle'). */
   mut?: string;
   large?: boolean;
+  /** A mob counts as a single model when income is worked out (Snotling and Night Goblin mobs). */
+  mob?: boolean;
   vehicle?: boolean;
   noArmour?: boolean;
   /** The units it depends on (ids): it takes part in a battle only with one of them on the roster who takes part himself (the Beasthounds and the Beastmaster). */
