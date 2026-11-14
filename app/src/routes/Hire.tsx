@@ -9,6 +9,7 @@
 import * as core from '@mordheim/core';
 import { Fragment, Suspense, useId, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { useAftermathBack } from '../aftermath/back.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { filterRows, gradesOf, hireDetail, hireFigures, hireRows, type HireKind, type HireOrder, type HireRow } from '../roster/hire.ts';
@@ -130,11 +131,12 @@ function Body({ rec }: { rec: StoredWarband }) {
   const may = all.filter((r) => !r.why).length;
   const fig = hireFigures(ctx);
   const name = ed.state.name || data.WARBANDS[ed.state.wb as string]?.name || 'Warband';
+  const back = useAftermathBack(rec.id);
 
   return (
     <section className={ui.page}>
       <div ref={top} className={styles.top}>
-        <Link to={`/warbands/${rec.id}`} className={trade.back}>‹ {name}</Link>
+        <Link to={back?.to ?? `/warbands/${rec.id}`} className={trade.back}>{back?.label ?? `‹ ${name}`}</Link>
         <h1>Hire</h1>
       </div>
       <dl className={trade.figures}>
