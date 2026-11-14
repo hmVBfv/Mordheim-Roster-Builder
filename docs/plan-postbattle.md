@@ -399,7 +399,7 @@ Oberfläche; Zitate im Commit.
 
 ### N8 – Erkundung: Orte in der Oberfläche, Funde verbuchen
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n8`; die Hinweise „Jewelsmith“ und „Returning a Favour“ stehen als Dauerhaftes in der Liste „Standing advantages“; ihre Wirkung beim Suchen und beim Sold folgt mit N10/N12)
 
 **Umsetzung:**
 

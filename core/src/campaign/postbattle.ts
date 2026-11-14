@@ -65,6 +65,10 @@ export interface Find {
   worth?: number;
   /** The warrior concerned (model uid, or a Hired Sword's uid). */
   uid?: number | string;
+  /** The held experience entry (xp ledger id) a find of kind 'exp' made, so it can be taken back. */
+  xpId?: number;
+  /** A place did something to a Hero: he misses the next game, or is lost for good. */
+  act?: 'miss' | 'lose';
   text: string;
 }
 
@@ -77,6 +81,8 @@ export interface PostBattleState {
   xp?: { underdog?: number; scenario?: { uid: number | string; amount: number; reason: string }[] };
   upkeep?: { paid: { uid: string; gc: number }[]; dismissed: string[] };
   finds?: Find[];
+  /** The place of the Exploration chart taken this round (N8) and the answers it was resolved with. */
+  location?: { key: string; answers: Record<string, number | number[] | boolean | string> };
   [key: string]: unknown;
 }
 

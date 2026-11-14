@@ -248,7 +248,25 @@ export interface LogEntry {
   [key: string]: unknown;
 }
 
+/** A lasting advantage or duty the warband won (N8): from a place of the Exploration chart, kept until used (or for good, if unique). */
+export interface Perk {
+  id: string;
+  text: string;
+  /** The round and the place it came from. */
+  round: number;
+  key: string;
+  uid?: number;
+  /** Never used up: the Entrance to the Catacombs gives its re-roll every time. */
+  unique?: boolean;
+  /** What it changes in the exploration roll (extra dice, re-rolls, dice to discard). */
+  explore?: { dice?: number; reroll?: number; drop?: number };
+  /** Used (a one-off advantage). */
+  used?: boolean;
+}
+
 export interface CampaignState {
+  /** Lasting advantages won at places of the Exploration chart (N8). */
+  perks?: Perk[];
   on?: boolean;
   round?: number;
   districts?: Record<string, DistrictHold>;

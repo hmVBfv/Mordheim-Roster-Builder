@@ -132,11 +132,11 @@ export function resolveLocation(ctx: Ctx, key: string, answers: Record<string, A
         const n = amountOf(e.gold, id, 'Gold found');
         if (n == null) return;
         if (e.as) values[String(e.as)] = typeof e.gold === 'string' && dice(e.gold) ? (answers[id] as Answer) : n;
-        out.finds.push({ kind: 'gold', source, amount: n, text: text || `${n} gc found.` });
+        out.finds.push({ kind: 'gold', source, amount: n, text: text ? `${n} gc – ${text}` : `${n} gc found.` });
       } else if ('wyrd' in e) {
         const n = amountOf(e.wyrd, id, 'Shards of wyrdstone found');
         if (n == null) return;
-        out.finds.push({ kind: 'wyrd', source, amount: n, text: text || `${n} shard${n === 1 ? '' : 's'} of wyrdstone found.` });
+        out.finds.push({ kind: 'wyrd', source, amount: n, text: text ? `${n} shard${n === 1 ? '' : 's'} – ${text}` : `${n} shard${n === 1 ? '' : 's'} of wyrdstone found.` });
       } else if ('item' in e) {
         const n = amountOf(e.qty ?? 1, id, 'How many');
         if (n == null) return;

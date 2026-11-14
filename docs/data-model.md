@@ -141,6 +141,15 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   beantwortet ist – die Funde (`LocFind`) und Dauerhaftes (`LocPerk`); es würfelt nie. Der Katalog der sechs magischen Artefakte steht in
   `PB_ARTEFACTS`. Warband-Merkmale: Undead = `siteRace` „Undead“ (ein Vampir ist es nicht), Skaven = `siteRace` „Skaven“, Possessed =
   das neue Merkmal `demonic` im Warband-Kopf (heute Possessed und Carnival).
+
+  **Einen Ort nehmen (N8):** `applyLocation(ctx, round, { key, answers, pick?, spread? })` bucht, was `resolveLocation` fand – Gold in die
+  Schatzkammer (bei geführtem Kassenbuch als Buchung `adjust` mit `source: 'location:<Ort>'`), Splitter und Gegenstände in den Stash
+  (Katalog-Gegenstand mit `key`, `paid: 0`, `source`; Edelsteine mit `gem: true` und `value`), Erfahrung gehalten (`xpId` am Fund),
+  Dauerhaftes in `campaign.perks` (`{ id, text, round, key, uid?, unique?, explore?, used? }`), eine Krankheit als `miss`, ein Verlust im
+  Pit als Tod – und legt die Funde mit Herkunft in `postbattle[round].finds` und `postbattle[round].location` (`{ key, answers }`).
+  Ein Ort je Runde. `undoLocation` nimmt alles zurück (nicht den Tod eines Helden: das macht das Rückgängig des Editors).
+  Perks mit `explore` erscheinen in `exploreAllowances` als `perk:<id>`: der Eingang zu den Katakomben (`unique`) gibt jedes Mal eine
+  Wiederholung, der Einblick des Streuners einmal einen Würfel mehr (`used`).
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist

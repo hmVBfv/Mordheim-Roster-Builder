@@ -34,6 +34,10 @@ export interface AftermathView {
   rating: number;
   gold: number;
   /** What the experience step recorded for this round (the underdog bonus and the scenario's points), once it was granted. */
+  /** The place of the Exploration chart taken this round (N8): its key and what it brought, if taken. */
+  locationRecord: { key: string; finds: core.Find[] } | null;
+  /** Lasting advantages the warband holds (N8). */
+  perks: core.Perk[];
   /** The exploration recorded for this round (N5), if any. */
   exploreRecord: core.PostBattleState['explore'] | null;
   xpRecord: { underdog: number; scenario: { uid: number | string; amount: number; reason: string }[] } | null;
@@ -94,6 +98,8 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
     },
     rating,
     gold: core.goldCurrent(ctx),
+    locationRecord: pb.location ? { key: pb.location.key, finds: (pb.finds ?? []).filter((f) => f.source === `location:${pb.location!.key}`) } : null,
+    perks: (s.campaign?.perks ?? []) as core.Perk[],
     exploreRecord: pb.explore ?? null,
     xpRecord: (pb.xp ? { underdog: Number(pb.xp.underdog) || 0, scenario: pb.xp.scenario ?? [] } : null),
   };

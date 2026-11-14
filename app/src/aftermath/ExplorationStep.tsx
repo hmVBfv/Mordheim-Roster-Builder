@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { RulesTable } from '../ui/RulesTable.tsx';
 import ui from '../ui/ui.module.css';
 import styles from './Aftermath.module.css';
+import { LocationCard } from './LocationCard.tsx';
 import { locationGroups, shardsTable } from './tables.ts';
 import type { AftermathView } from './view.ts';
 
@@ -90,6 +91,15 @@ export function ExplorationStep({ a, data, acts }: { a: AftermathView; data: Gam
             <button type="button" className={ui.buttonQuiet} onClick={() => acts.edit((c) => core.clearExploration(c, a.round), 'Exploration taken back.')}>Take it back</button>
           </div>
         </div>
+      )}
+
+      {rec?.location && <LocationCard a={a} data={data} acts={acts} keyOfPlace={rec.location} />}
+      {!rec?.location && a.locationRecord && <LocationCard a={a} data={data} acts={acts} keyOfPlace={a.locationRecord.key} />}
+      {a.perks.length > 0 && (
+        <details className={styles.tables}>
+          <summary className={ui.fold}>Standing advantages ({a.perks.length})</summary>
+          <ul className={styles.plain}>{a.perks.map((p, i) => <li key={i}>{p.text}{p.used ? ' (used)' : ''}</li>)}</ul>
+        </details>
       )}
 
       {allowances.length > 0 && (

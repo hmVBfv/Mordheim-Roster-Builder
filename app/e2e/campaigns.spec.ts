@@ -1226,6 +1226,9 @@ test('after the battle: the leader closes it, the player takes it over, goes thr
   await shot(page, 'aftermath-exploration');
   await page.getByRole('button', { name: /^Record: \d+ shards? into the stash$/ }).click();
   await expect(page.getByText('✓ Explored:')).toBeVisible();
+  // every die a 3: three 3s (or four) – an unusual place, taken and shown with what it brought
+  await expect(page.getByText(/^An unusual place:/).first()).toBeVisible();
+  await shot(page, 'aftermath-place');
   // the shards of the roll go back, and the stash is corrected by hand to the two this test sells
   await page.getByRole('button', { name: 'Take it back' }).click();
   await page.getByText('Correct the stash by hand').click();
