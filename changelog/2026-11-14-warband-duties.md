@@ -1,2 +1,2 @@
 date: 2026-11-14
-- New: A phase for warband rules that need a choice after each battle: the Troll's "Always Hungry" – pay, count as two members, sacrifice two, or let him go.
+- New: One phase after selling wyrdstone for what the warband owes: Hired Sword upkeep and rules like the Troll's "Always Hungry" – pay, count as two, sacrifice two, or let him go.

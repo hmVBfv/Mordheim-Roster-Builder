@@ -767,7 +767,7 @@ Der Mod aus dem Workshop enthält **kein** Token (jeder könnte es lesen):
 
 Der Troll der Black Orcs („Always Hungry“: 20 gc Sold – oder zählt als zwei Mitglieder für 5 gc) war in N9 nur eine Korrektur von Hand.
 Rob: Für solche Regeln gehört **eine eigene Phase** in das Nachspiel, in der sie geprüft und gewählt werden, mit Folgen; am Maximum würde
-der Troll es überschreiten – dann zahlen oder jemanden entlassen. **Umgesetzt (N15, Branch `feat/postbattle-n15`):** Phase „Warband duties“
+der Troll es überschreiten – dann zahlen oder jemanden entlassen. **Umgesetzt (N15, Branch `feat/postbattle-n15`):** Phase „Upkeep and duties“ (gemeinsam mit dem Sold der Hired Swords aus N10, Rob 14.11.2026)
 nach dem Verkauf von Wyrdstone, Daten `PB_DUTIES` (Black Orcs, Orc Mob, Night Goblins), Kern `core/src/campaign/duties.ts`, Oberfläche
 `DutiesStep`. Nicht dabei: weitere Regeln dieser Art (z. B. „Eye of the Gods“ der Maraudiere: 2D6 nach jeder Schlacht) – sie lassen sich als
 weitere Einträge der Phase anfügen, sobald Rob ihre Folgen nennt.

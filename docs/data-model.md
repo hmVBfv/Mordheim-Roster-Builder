@@ -163,7 +163,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   dazu `upkeepNote`, wenn er nicht in Gold bezahlt wird). `payUpkeep(ctx, round, uids, { free? })` nimmt das Gold (mit Kassenbuch eine
   Buchung mit `source: 'upkeep'`) und hält `upkeep.paid: [{ uid, gc }]` und je einen Fund mit Herkunft `upkeep` fest (`amount` negativ);
   `undoUpkeep` gibt es zurück; `dismissUpkeep` schickt einen Söldner weg (`dismissHire`) und hält `upkeep.dismissed` fest. Ein zu
-  kleiner Schatz ist keine Sperre: `upkeepProblem` warnt.
+  kleiner Schatz ist keine Sperre: `upkeepProblem` warnt. In der App steht der Sold in derselben Phase wie die Pflichten der Warband (Rob, 14.11.2026): „Upkeep and duties“ nach dem Verkauf von Wyrdstone.
 
   **Bilanz der Runde (N13):** `postBattleSummary(ctx, round)` rechnet aus dem Spielstand allein: Verletzungen (eigene Ausfälle der Runde),
   Erfahrung (mit Underdog und Szenario), die Erkundung, Wyrdstone gefunden/verkauft/im Stash, Einnahmen je Quelle (`wyrdstone`, Orte,
@@ -172,8 +172,8 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   `tags.summary` ein (Migration 47) und liefert sie in `marks[warbandId].summary` der Schlacht – für jedes Mitglied lesbar (Mechanik ist
   offen, ADR 0002); ein späteres Speichern ändert sie nicht, ein zweites Markieren ersetzt sie.
 
-  **Pflichten der Warband (Rob, 14.11.2026):** Regeln, die nach jeder Schlacht eine Wahl verlangen, sind eine Phase für sich (in der App nach
-  dem Verkauf von Wyrdstone, nur für eine Warband, die eine hat; `PB_STEPS` bleibt unverändert, die Phase ist `postbattle[round].duties`
+  **Pflichten der Warband (Rob, 14.11.2026):** Regeln, die nach jeder Schlacht eine Wahl verlangen, sind eine Phase für sich (in der App eine Phase mit dem Sold der Hired Swords, nach
+  dem Verkauf von Wyrdstone, nur für eine Warband, die Pflichten oder Söldner hat; `PB_STEPS` bleibt unverändert, die Phase ist `postbattle[round].duties`
   `{ resolved: [{ id, option, gc }], done? }`). `PB_DUTIES` (`data/postbattle.json`): der **Troll** der Black Orcs (20 gc, oder zählt als zwei
   Mitglieder für 5 gc, oder geht), des Orc Mob und der Night Goblins (15 gc, oder zwei Goblins/Cave Squigs geopfert, oder er geht).
   `dutiesDue` zeigt je Weg Preis, Verfügbarkeit und Grund; **am Maximum** ist „zählt als zwei“ nicht wählbar (der Troll würde es überschreiten):
