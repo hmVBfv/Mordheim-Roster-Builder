@@ -69,8 +69,8 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
     );
     case 'experience': return <ExperienceStep a={a} data={data} acts={acts} underdog={acts.underdog} rosterLink={`${roster}${from}`} />;
     case 'exploration': return <ExplorationStep a={a} data={data} acts={acts} />;
-    case 'wyrdstone': return <><WyrdStep a={a} data={data} acts={acts} /><UpkeepSection a={a} acts={acts} /></>;
-    case 'duties': return <DutiesStep a={a} acts={acts} />;
+    case 'wyrdstone': return <WyrdStep a={a} data={data} acts={acts} />;
+    case 'duties': return <><UpkeepSection a={a} acts={acts} /><DutiesStep a={a} acts={acts} /></>;
     case 'veterans': return <VeteransStep acts={acts} recruitLink={`${roster}${from}`} />;
     case 'rare': return <RareStep a={a} ctx={acts.ctx} tradeLink={`${roster}/trade${from}`} />;
     case 'dramatis': return <DramatisStep ctx={acts.ctx} hireLink={`${roster}/hire${from}`} />;

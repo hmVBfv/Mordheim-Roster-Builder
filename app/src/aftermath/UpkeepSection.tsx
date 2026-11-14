@@ -26,7 +26,7 @@ export function UpkeepSection({ a, acts }: { a: AftermathView; acts: UpkeepActs 
 
   return (
     <section className={styles.scenario} aria-labelledby="am-upkeep">
-      <h4 id="am-upkeep">Upkeep of Hired Swords and Dramatis Personae</h4>
+      <h3 id="am-upkeep">Upkeep of Hired Swords and Dramatis Personae</h3>
       <p className={ui.muted}>After each battle he fights, the first included, his upkeep is paid if he is to stay. One you no longer need costs nothing.</p>
       <RulesTable caption="Upkeep due" head={['Name', 'Upkeep', 'Now']} rowHeads={false}
         rows={due.map((l) => [l.name, `${l.gc} gc${l.note ? ` – ${l.note}` : ''}`, l.paid ? '✓ paid' : 'due'])} />

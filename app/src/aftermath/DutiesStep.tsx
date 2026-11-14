@@ -102,8 +102,7 @@ export function DutiesStep({ a, acts }: { a: AftermathView; acts: DutyActs }) {
   const due = core.dutiesDue(acts.ctx, a.round);
   return (
     <>
-      <p>Some warbands have a rule that asks for a choice after each battle. Settle it here, before you hire or buy: what you choose has consequences – gold, the warband’s size, who stays.</p>
-      {due.length === 0 && <p className={ui.muted}>This warband has no such duty.</p>}
+      {due.length > 0 && <p>Some warbands have a rule that asks for a choice after each battle. Settle it here, before you hire or buy: what you choose has consequences – gold, the warband’s size, who stays.</p>}
       {due.map((d) => <Duty key={d.id} d={d} ctx={acts.ctx} acts={acts} round={a.round} />)}
       {due.some((d) => !d.resolved) && <p className={styles.warn}>{due.filter((d) => !d.resolved).length} still to settle.</p>}
     </>
