@@ -5,8 +5,9 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WarbandStatistics } from '../campaign/api.ts';
+import { Compare } from './Compare.tsx';
 import { LineChart } from './LineChart.tsx';
-import { METRICS, fmt, markLabel, metricOf, niceScale, seriesOf } from './metrics.ts';
+import { METRICS, fmt, latestOf, markLabel, metricOf, niceScale, seriesOf, toCsv } from './metrics.ts';
 
 afterEach(() => cleanup());
 const pt = (round: number, kind: string, metrics: Record<string, number>) => ({ round, kind, at: `2026-10-0${round + 1}T10:00:00.000Z`, metrics });
@@ -108,5 +109,31 @@ describe('the chart', () => {
     expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Warband', 'Start', 'R1', 'R2']);
     const rows = within(table).getAllByRole('row').slice(1).map((r) => within(r).getAllByRole('cell').map((c) => c.textContent));
     expect(rows).toEqual([['100', '130', '150'], ['90', '–', '90'], ['70', '–', '–']]);
+  });
+});
+
+describe('compare and export', () => {
+  it('the latest value for each warband', () => {
+    expect([...latestOf(STATS, 'rating')]).toEqual([['a', 150], ['b', 90], ['c', 70]]);
+    expect([...latestOf(STATS, 'income')]).toEqual([['a', 140]]);
+  });
+
+  it('writes every number as CSV, one row for each mark, quoting names and keeping formulas out', () => {
+    const csv = toCsv([{ warbandId: 'x', name: '=Evil, "Band"', active: true, points: [pt(0, 'start', { rating: 100 }), pt(1, 'after_battle', { rating: 120, income: 5 })] }]);
+    const lines = csv.trim().split('\n');
+    expect(lines[0]!.startsWith('warband,round,mark,rating,')).toBe(true);
+    expect(lines[1]!.startsWith('"\'=Evil, ""Band""",0,Start,100,')).toBe(true);
+    expect(lines).toHaveLength(3);
+    expect(lines[2]!.split(',').length).toBe(lines[0]!.split(',').length + 1); // the quoted comma of the name is not a column
+  });
+
+  it('compares two warbands: both values and the difference, a number only one has shown with a dash', async () => {
+    render(<Compare list={STATS} />);
+    const table = screen.getByRole('table');
+    const row = (name: string) => within(within(table).getByRole('rowheader', { name }).closest('tr')!).getAllByRole('cell').map((c) => c.textContent);
+    expect(row('Warband rating')).toEqual(['150', '90', '+60']);
+    expect(row('Income, total')).toEqual(['140 gc', '–', '–']);
+    await userEvent.setup().selectOptions(screen.getByLabelText('Second'), 'c');
+    expect(row('Warband rating')).toEqual(['150', '70', '+80']);
   });
 });

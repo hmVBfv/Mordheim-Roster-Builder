@@ -10,6 +10,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { resetSession, signedIn } from '../account/session.ts';
 import { ME as KAI } from '../account/testServer.ts';
 import { AppRoutes } from '../app/App.tsx';
+import { OwnRatingLine } from './RatingLines.tsx';
 import { db, type StoredWarband } from '../db/db.ts';
 import { newId } from '../db/ids.ts';
 import { readSave, syncOnce } from '../sync/engine.ts';
@@ -433,6 +434,22 @@ describe('the overview', () => {
     const fig = await screen.findByRole('figure', { name: /Rating over the battles/ });
     expect(fig.textContent).toContain(`${start.totals.rating} → ${start.totals.rating + 14} rating (+14)`);
     expect(within(fig).getByRole('img').getAttribute('aria-label')).toBe(`Rating over the battles: Start ${start.totals.rating}, After battle 1 ${start.totals.rating + 14}.`);
+  });
+
+  /* Plan P14: the line on the own roster can show any number the marks carry, not only the rating. */
+  it('lets the roster line show another number than the rating', async () => {
+    const srv = server();
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [{ player: 'Anna', data: saveOf('The Grey Penitents'), role: 'leader' }] });
+    const e = c.enrolments[0]!;
+    const start = { ...e.tags![0]!, metrics: { wealth: 100 } };
+    const after = { ...start, id: 'tag-after-1', kind: 'after_battle' as const, round: 1, createdAt: '2026-10-05T12:00:00.000Z', totals: { ...start.totals, rating: start.totals.rating + 14 }, metrics: { wealth: 160 } };
+    e.tags = [start, after];
+    e.tag = after;
+    render(<OwnRatingLine campaignId={c.id} warbandId={e.warbandId} />);
+    await screen.findByRole('figure', { name: /Rating over the battles/ });
+    await userEvent.setup().selectOptions(screen.getByLabelText('Show over the battles'), 'wealth');
+    const fig = await screen.findByRole('figure', { name: /Total gold value incl\. stash over the battles/ });
+    expect(fig.textContent).toContain('100 → 160 gc (+60)');
   });
 
   /* Plan P7, part 2: every warband's line on the overview, and the own warband's line on its roster. */
