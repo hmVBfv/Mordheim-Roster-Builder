@@ -2,7 +2,7 @@
    them. Reading works offline; nothing here is computed. */
 import { Fragment, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, useSearchParams } from 'react-router';
-import { ACCOUNT } from '../app/paths.ts';
+import { ACCOUNT, POST_BATTLE_RULES } from '../app/paths.ts';
 import trade from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
 import { loadRules, type Block, type Chapter } from './data.ts';
@@ -61,6 +61,7 @@ export function Rules({ base = '/rules', embedded = false }: { base?: string; em
         {!embedded && <Link to={ACCOUNT} className={trade.back}>‹ {ACCOUNT === '/account' ? 'Account' : 'Settings'}</Link>}
         {embedded ? <h2>Rules</h2> : <h1>Rules</h1>}
         <p className={ui.muted}>The rulebook, word for word. Charts and diagrams are pictures on the original pages.</p>
+        <p><Link to={POST_BATTLE_RULES} className={ui.buttonQuiet}>After the battle: the ten steps and their tables</Link></p>
       </div>
       <label className={ui.field}>
         <span>Search the rules</span>

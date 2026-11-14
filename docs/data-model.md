@@ -110,6 +110,37 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   optional): `{ roll, spent }` – der Veteranenwurf der Runde (2W6) und wie
   viel Erfahrung neue Männer davon schon mitgebracht haben (`core`
   `setVeteransRoll`, `addMen`).
+  Neu mit ADR 0032, alle Felder optional (ältere Runden haben nur `done` und
+  `wyrd` und werden nicht nachgerechnet): `explore`: `{ rolled, kept, total,
+  shards, location, used? }` – die Erkundungswürfel (`rolled`: `{ value:
+  number[], by: 'entered' | 'app' }`), die gewählten (höchstens sechs), ihre
+  Summe, die gefundenen Splitter und der Ort als Schlüssel von `PB_LOCATIONS`
+  (`'5 5'`) oder `null`; `xp`: `{ underdog?, scenario?: [{ uid, amount,
+  reason }] }`; `upkeep`: `{ paid: [{ uid, gc }], dismissed: [uid] }`;
+  `finds`: `[{ id, kind: 'gold'|'wyrd'|'item'|'exp'|'note', source, amount?,
+  item?, qty?, worth?, uid?, text }]` – was ein Schritt gebracht oder gekostet
+  hat, mit Herkunft (`source`: `explore`, `location:<Ort>`, `scenario`,
+  `wyrdstone`, `upkeep` …); `id` je Runde eindeutig und nie wiederverwendet.
+  `ledger[]` und `stash.items[]` tragen dieselbe optionale `source`.
+  **Erkundung (N5):** `recordExploration(ctx, round, { rolled, kept?, by })` schreibt `explore` (die Würfel, die gewählten – höchstens
+  sechs, vorgeschlagen die besten –, die Summe, `shards`, `location`), legt die Splitter in den Stash und einen `Find` mit
+  `source: 'explore'` an; ein zweiter Wurf ersetzt den ersten. `clearExploration` nimmt beides zurück. `exploreShards`, `exploreMultiple`
+  (zahlreichste Gruppe, bei gleich großen die höhere Augenzahl) und `exploreResult` sind rein.
+  **Was die Erkundung verändert (N6):** `PB_EXPLORE_RULES` (`data/postbattle.json`) nennt Fertigkeiten, Gegenstände, Hired Swords und
+  Bezirke, die Würfel dazugeben (`dice`), Wiederholungen (`reroll`, 6 = alle), ±1 (`adjust`) oder abzulegende Würfel (`drop`) geben,
+  je mit `needs: 'notOOA'`, Quelle (`src`) und `match` (Satzteile der Daten). `exploreAllowances(ctx, round)` findet, was die Warband
+  hat; `recordExploration` bekommt `used` (Ids, je höchstens einmal), und `explore.used` hält sie fest. `PB_EXPLORE_EXCEPTIONS` nennt
+  jede Erwähnung der Erkundung in den Daten, die nicht abgebildet ist, mit Grund; `core/test/explore-allowances.test.ts` liest die Daten
+  und verlangt für jeden Satz über die Erkundung einen Eintrag in der einen oder der anderen Liste (und meldet veraltete Einträge).
+
+  **Die dreißig Orte (N7):** `PB_LOCATION_RULES` (`data/postbattle.json`, Schlüssel wie `PB_LOCATIONS`, z. B. `'5 5 5'`) beschreibt jeden Ort
+  als Schritte: Fragen an den Spieler (`q`: `roll` mit Würfeln und Tabelle, `pass` für einen Test, `hero`, `choice`), `do` (Gold,
+  Splitter, Gegenstände aus dem Katalog, Edelsteine, Erfahrung, Dauerhaftes `perk`, Hinweise, `miss`/`lose` für einen Helden),
+  `by` (Zweige nach Warband-Merkmal: Skaven, Possessed, Undead, Sisters, Witch Hunters, sonst `else`), `if` und `each` (je ein Wurf „4+“).
+  `resolveLocation(ctx, key, answers)` geht die Schritte mit den bisherigen Antworten durch und gibt die nächste Frage oder – wenn alles
+  beantwortet ist – die Funde (`LocFind`) und Dauerhaftes (`LocPerk`); es würfelt nie. Der Katalog der sechs magischen Artefakte steht in
+  `PB_ARTEFACTS`. Warband-Merkmale: Undead = `siteRace` „Undead“ (ein Vampir ist es nicht), Skaven = `siteRace` „Skaven“, Possessed =
+  das neue Merkmal `demonic` im Warband-Kopf (heute Possessed und Carnival).
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
