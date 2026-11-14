@@ -322,7 +322,7 @@ rücknehmbar; Changelog.
 
 ### N6 – Erkundung: Zusatzwürfel, Wiederholungen, ±1
 
-- [ ] erledigt · Tabelle der Sonderregeln freigegeben (Rob, 14.11.2026; sie wird in N6 trotzdem noch einmal mit allen Fundstellen vorgelegt)
+- [x] erledigt (Branch `feat/postbattle-n6`; abgebildet sind 19 Quellen – Fertigkeiten, Gegenstände, Hired Swords, Bezirke; 29 Erwähnungen stehen mit Grund als Ausnahmen: Einheiten- und Warbandregeln, Änderungen von Summe oder Splittern und Würfel eigener Art warten auf P11 und N7–N9) · Tabelle der Sonderregeln freigegeben (Rob, 14.11.2026; sie wird in N6 trotzdem noch einmal mit allen Fundstellen vorgelegt)
 
 **Ziel:** was Fertigkeiten, Ausrüstung und Hired Swords an der Erkundung
 ändern, steht als Daten da und wird angeboten – nicht erzwungen.

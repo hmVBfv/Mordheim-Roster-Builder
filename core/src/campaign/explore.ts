@@ -5,10 +5,12 @@
    (ADR 0032) and can be taken back. */
 import type { WarbandState } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
-import type { GameData } from '../data/types.ts';
+import type { ExploreRule, GameData } from '../data/types.ts';
+import { isHeroModel } from '../rules/costs.ts';
+import { itemInfo } from '../rules/lookup.ts';
 import { logEvent } from '../warband/log.ts';
 import { update } from '../warband/update.ts';
-import { postbattleOn, type Find, type PostBattleState, type Rolled } from './postbattle.ts';
+import { pbHeroesOOA, postbattleOn, type Find, type PostBattleState, type Rolled } from './postbattle.ts';
 
 /** At most six dice are picked out of all the dice rolled, even where more are allowed. */
 export const EXPLORE_DICE_MAX = 6;
@@ -51,11 +53,62 @@ export function exploreResult(data: GameData, kept: readonly number[]): ExploreR
 }
 
 export interface ExploreInput {
+  /** The allowances used (ids of PB_EXPLORE_RULES), each at most once. */
+  used?: readonly string[];
   /** Every die rolled. */
   rolled: readonly number[];
   /** The dice kept (at most six); by default the best six. */
   kept?: readonly number[];
   by: Rolled['by'];
+}
+
+/** One thing the warband may use in this exploration, found on the roster. */
+export interface Allowance {
+  id: string;
+  name: string;
+  /** Where it comes from, in words ("skill of Hans", "Beggar", "district"). */
+  from: string;
+  dice: number;
+  reroll: number;
+  adjust: number;
+  drop: number;
+  text: string;
+}
+
+/** What skills, items, Hired Swords and districts let the warband do in this round's exploration (N6): extra dice, re-rolls, +/-1, dice to
+    discard. Only what is on the roster, and – where the rule says so – only while its bearer was not taken out of action. Each is used once
+    in a sequence; which ones were used is kept with the roll. */
+export function exploreAllowances(ctx: Ctx, round: number): Allowance[] {
+  const s = ctx.s;
+  const ooa = pbHeroesOOA(ctx, round);
+  const out: Allowance[] = [];
+  const named = (m: { name?: string; uid_def: string }) => m.name || ctx.data.WARBANDS[s.wb as string]?.units.find((u) => u.id === m.uid_def)?.name || m.uid_def;
+  const heroes = s.models.filter((m) => isHeroModel(ctx, m) && !ooa.has(m.uid));
+  const carried = (m: (typeof s.models)[number], want: string): boolean =>
+    [...Object.keys(m.eq ?? {}), ...Object.keys(m.rare ?? {})].some((k) => (itemInfo(ctx.data, k)?.name ?? k).toLowerCase() === want.toLowerCase());
+  for (const r of ctx.data.PB_EXPLORE_RULES) {
+    let from: string | null = null;
+    if (r.from.skill) {
+      const h = heroes.find((m) => (m.skills ?? []).some((x) => x.toLowerCase() === r.from.skill!.toLowerCase()));
+      if (h) from = `skill of ${named(h)}`;
+    } else if (r.from.item) {
+      const h = s.models.find((m) => isHeroModel(ctx, m) && carried(m, r.from.item!) && (r.needs !== 'notOOA' || !ooa.has(m.uid)));
+      if (h) from = `${r.name} of ${named(h)}`;
+    } else if (r.from.hs) {
+      const h = (s.hired ?? []).find((x) => x.key === r.from.hs);
+      if (h && (r.needs !== 'notOOA' || !ooaOf(ctx, round).has(String(h.uid)))) from = r.name;
+    } else if (r.from.district) {
+      const hold = (s.campaign?.districts ?? {})[r.from.district];
+      if (hold === 'control' || (r.from.tier === 'foothold' && hold === 'foothold')) from = `district: ${r.name}`;
+    }
+    if (from) out.push({ id: r.id, name: r.name, from, dice: r.dice ?? 0, reroll: r.reroll ?? 0, adjust: r.adjust ?? 0, drop: r.drop ?? 0, text: r.text });
+  }
+  return out;
+}
+
+/** The warriors of this round put out of action, by uid as text: a Hired Sword's uid is a text, a model's a number. */
+function ooaOf(ctx: Ctx, round: number): Set<string> {
+  return new Set([...pbHeroesOOA(ctx, round)].map(String).concat((ctx.s.campaign?.casualties ?? []).filter((c) => c.round === round && c.victim?.uid != null).map((c) => String(c.victim.uid))));
 }
 
 const isDie = (d: unknown): d is number => Number.isInteger(d) && (d as number) >= 1 && (d as number) <= 6;
@@ -82,6 +135,11 @@ export function explorationProblem(ctx: Ctx, round: number, input: ExploreInput)
     if (i < 0) return 'A kept die was not rolled.';
     pool.splice(i, 1);
   }
+  const used = input.used ?? [];
+  if (new Set(used).size !== used.length) return 'An allowance can be used once.';
+  const have = new Set(exploreAllowances(ctx, round).map((x) => x.id));
+  const stray = used.find((u) => !have.has(u));
+  if (stray) return `The warband has no allowance “${stray}” for this exploration.`;
   const before = roundRec(ctx.s, round)?.explore;
   if (before && (Number(ctx.s.stash?.wyrd) || 0) < before.shards) return `The ${before.shards} shards of the first roll are no longer all in the stash: put them back, then roll again.`;
   return null;
@@ -111,7 +169,7 @@ export function recordExploration(ctx: Ctx, round: number, input: ExploreInput):
     d.stash = d.stash ?? { wyrd: 0, gold: null, items: [] };
     d.stash.wyrd = (Number(d.stash.wyrd) || 0) + result.shards;
     const text = `Explored with ${kept.join(', ')} (${result.total}): ${result.shards} shard${result.shards === 1 ? '' : 's'}${result.location ? `, an unusual place (${result.location})` : ''}.`;
-    rec.explore = { rolled: { value: [...input.rolled], by: input.by }, kept, total: result.total, shards: result.shards, location: result.location };
+    rec.explore = { rolled: { value: [...input.rolled], by: input.by }, kept, total: result.total, shards: result.shards, location: result.location, ...(input.used?.length ? { used: [...input.used] } : {}) };
     rec.finds = [...(rec.finds ?? []), { id: nextFindId(rec.finds ?? []), kind: 'wyrd', source: 'explore', amount: result.shards, text: `Found ${result.shards} shard${result.shards === 1 ? '' : 's'} exploring.` } satisfies Find];
     logEvent(d, 'explore', text, { round });
   });
