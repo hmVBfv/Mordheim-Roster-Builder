@@ -106,7 +106,16 @@ describe('the aftermath of one’s warband', () => {
     await user.click(within(roll).getByRole('button', { name: 'Apply' }));
     expect(await screen.findByText('Nothing left to roll.')).toBeTruthy();
     expect(casualties.textContent).toMatch(/Champion recovered fully/);
+    // where we are, and the tables of the step at hand without leaving the page (N2)
+    expect(screen.getByText('Step 1 of 10: Injuries')).toBeTruthy();
+    expect(within(screen.getByRole('list', { name: 'Steps' })).getAllByRole('button')).toHaveLength(10);
+    await user.click(within(document.getElementById('am-step-injuries')!).getByText('Tables'));
+    expect(screen.getByRole('table', { name: 'Heroes: Serious Injuries (D66)' })).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Done – next step' }));
+    // the result of a done step stays, the step can be read again
+    expect(screen.getByText('Step 2 of 10: Experience')).toBeTruthy();
+    expect(screen.getByLabelText('Injuries: result').textContent).toBe('1 of 1 rolled');
+    expect(screen.getByRole('button', { name: '1. Injuries, done' })).toBeTruthy();
 
     // 2. experience: granted once, then written onto the roster
     await user.click(await screen.findByRole('button', { name: 'Grant the battle’s experience' }));
@@ -114,6 +123,13 @@ describe('the aftermath of one’s warband', () => {
     expect(screen.getByRole('button', { name: '✓ Battle experience granted' })).toHaveProperty('disabled', true);
     await user.click(screen.getByRole('button', { name: 'Write it onto the roster' }));
     await waitFor(async () => expect((await db.warbands.get(mine))!.state.models.find((m) => m.uid === 1)!.exp).toBe(43));
+
+    // a step that sends you elsewhere carries the way back: veterans lead to Hire and return to this aftermath (N2)
+    for (const step of ['experience', 'exploration', 'wyrdstone']) {
+      await user.click(within(document.getElementById(`am-step-${step}`)!).getByRole('button', { name: 'Done – next step' }));
+    }
+    expect(screen.getByText('Step 5 of 10: Available veterans')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Hire' }).getAttribute('href')).toBe(`/warbands/${mine}/hire?from=${b.id}`);
 
     // what changed since the start, and the mark
     const list = await screen.findByRole('list', { name: 'Changes' });

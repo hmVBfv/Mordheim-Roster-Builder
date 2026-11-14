@@ -199,7 +199,7 @@ e2e-Screenshot der Übersicht bei 360 px und Desktop, beide Themes.
 
 ### N2 – Rahmen der Seite: Fortschritt, Ergebnis je Schritt
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n2`; Punkt 1 teilweise: `Steps.tsx` und `MarkSection.tsx` sind ausgelagert, ein Schritt je Datei kommt, wo ein Schritt wächst)
 
 **Ziel:** die Seite zeigt auf einen Blick, wo man steht und was jeder
 erledigte Schritt gebracht hat. Heute klappt ein erledigter Schritt zu und

@@ -8,7 +8,7 @@ import type { Casualty, GameData, WarbandState } from '@mordheim/core';
 import { rosterView } from '../roster/view.ts';
 import { localBattle, type LocalBattle } from './takeover.ts';
 
-export interface StepView { key: string; title: string; link: string; done: boolean; active: boolean; locked: boolean }
+export interface StepView { key: string; title: string; link: string; done: boolean; active: boolean; locked: boolean; /** What the step has brought so far, in a few words; null while there is nothing to say. */ summary: string | null }
 export interface CasualtyView { id: number; text: string; result: string; ours: boolean; uid: number | null; hero: boolean; open: boolean }
 
 export interface AftermathView {
@@ -29,6 +29,27 @@ export interface AftermathView {
   gold: number;
 }
 
+/** The result line of each step, from the save: what it has brought so far (N2). Null where there is nothing to say yet. */
+function stepSummaries(ctx: core.Ctx, round: number, o: { casualties: CasualtyView[]; xpAwarded: boolean; pendingXp: number; shards: number; sold: core.WyrdSale | null; rating: number }): Record<string, string | null> {
+  const ours = o.casualties.filter((c) => c.ours);
+  const rolled = ours.filter((c) => c.result !== 'pending').length;
+  const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const bookings = (ctx.s.ledger ?? []).filter((e) => e.round === round);
+  const searches = bookings.filter((e) => e.kind === 'search');
+  const buys = bookings.filter((e) => e.kind === 'buy');
+  const vet = core.veteransOf(ctx);
+  return {
+    injuries: ours.length === 0 ? 'No casualties' : `${rolled} of ${ours.length} rolled`,
+    experience: !o.xpAwarded ? null : o.pendingXp > 0 ? `${plural(o.pendingXp, 'point')} held` : 'Written onto the roster',
+    exploration: o.shards > 0 ? `${plural(o.shards, 'shard')} in the stash` : null,
+    wyrdstone: o.sold ? `Sold ${plural(o.sold.shards, 'shard')} for ${o.sold.gc} gc` : null,
+    veterans: vet ? `Roll ${vet.roll}, ${vet.spent} used` : null,
+    rare: searches.length ? `${plural(searches.length, 'search')}, ${searches.filter((e) => e.found).length} found` : null,
+    recruits: buys.length ? `${plural(buys.length, 'purchase')} for ${-buys.reduce((n, e) => n + e.amount, 0)} gc` : null,
+    rating: `Rating ${o.rating}`,
+  };
+}
+
 /** The battle's aftermath on the save – null until the battle is taken over. */
 export function aftermathView(data: GameData, s: WarbandState, battleId: string): AftermathView | null {
   const local = localBattle(s, battleId);
@@ -37,7 +58,6 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   const round = Number(local.round) || 0;
   const pb = core.postbattleState(ctx, round);
   const active = core.pbActiveStep(ctx, round);
-  const steps = core.PB_STEPS.map(([key, title, link], i) => ({ key, title, link, done: !!pb.done[key], active: i === active, locked: i > active }));
   const cas: Casualty[] = (s.campaign?.casualties ?? []).filter((c) => c.battleId === local.id);
   const casualties = cas.map((c) => {
     const ours = core.casualtyIsOurs(c);
@@ -47,6 +67,9 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   const v = rosterView(data, s);
   const size = core.warbandSize(ctx);
   const ex = core.pbExploreDice(ctx, round);
+  const rating = core.totalRating(ctx);
+  const summaries = stepSummaries(ctx, round, { casualties, xpAwarded: !!local.xpAwarded, pendingXp: core.pendingXp(ctx).length ? core.pendingXp(ctx).reduce((n, x) => n + x.amount, 0) : 0, shards: Number(s.stash?.wyrd) || 0, sold: pb.wyrd?.done ? pb.wyrd : null, rating });
+  const steps = core.PB_STEPS.map(([key, title, link], i) => ({ key, title, link, done: !!pb.done[key], active: i === active, locked: i > active, summary: summaries[key] ?? null }));
   return {
     local, round, steps, casualties,
     toRoll: casualties.filter((c) => c.open).length,
@@ -59,7 +82,7 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
       shards: Number(s.stash?.wyrd) || 0, size, band: core.WYRD_BANDS[core.wyrdSizeBand(size)]?.[1] ?? '',
       sold: pb.wyrd?.done ? pb.wyrd : null, price: (n: number) => core.wyrdPrice(ctx, n, size),
     },
-    rating: core.totalRating(ctx),
+    rating,
     gold: core.goldCurrent(ctx),
   };
 }
