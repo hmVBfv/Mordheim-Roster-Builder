@@ -82,11 +82,16 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   const ex = core.pbExploreDice(ctx, round);
   const rating = core.totalRating(ctx);
   const summaries = stepSummaries(ctx, round, { casualties, xpAwarded: !!local.xpAwarded, pendingXp: core.pendingXp(ctx).length ? core.pendingXp(ctx).reduce((n, x) => n + x.amount, 0) : 0, shards: Number(s.stash?.wyrd) || 0, sold: pb.wyrd?.done ? pb.wyrd : null, rating });
-  // the duties of the warband (Always Hungry …) are a phase of their own after the wyrdstone sale – only for a warband that has one
+  // the duties of the warband (Always Hungry …) and the upkeep of its Hired Swords and Dramatis Personae are one phase after the wyrdstone sale:
+  // what the warband owes after the battle, and what it chooses about it – only for a warband that has either
   const duties = core.dutiesDue(ctx, round);
+  const upkeep = core.upkeepDue(ctx, round);
   const order: { key: string; title: string; link: string }[] = core.PB_STEPS.map(([key, title, link]) => ({ key, title, link }));
-  if (duties.length) order.splice(order.findIndex((x) => x.key === 'wyrdstone') + 1, 0, { key: 'duties', title: 'Warband duties', link: core.PB_LINK.wyrdstone });
-  summaries.duties = duties.length ? `${duties.filter((d) => d.resolved).length} of ${duties.length} settled` : null;
+  if (duties.length || upkeep.length) order.splice(order.findIndex((x) => x.key === 'wyrdstone') + 1, 0, { key: 'duties', title: upkeep.length && duties.length ? 'Upkeep and duties' : duties.length ? 'Warband duties' : 'Upkeep', link: core.PB_LINK.wyrdstone });
+  summaries.duties = [
+    duties.length ? `${duties.filter((d) => d.resolved).length} of ${duties.length} duties settled` : null,
+    upkeep.length ? `upkeep ${upkeep.filter((u) => u.paid).length} of ${upkeep.length} paid` : null,
+  ].filter(Boolean).join(' · ') || null;
   const doneOf = (k: string) => (k === 'duties' ? !!pb.duties?.done : !!pb.done[k]);
   const firstOpen = order.findIndex((x) => !doneOf(x.key));
   const at = firstOpen < 0 ? order.length : firstOpen;
