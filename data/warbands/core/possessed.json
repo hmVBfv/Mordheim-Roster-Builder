@@ -3,6 +3,7 @@
     "name": "Cult of the Possessed",
     "grade": "core",
     "siteRace": "Chaos Human",
+    "demonic": true,
     "min": 3,
     "max": 15,
     "gold": 500,
