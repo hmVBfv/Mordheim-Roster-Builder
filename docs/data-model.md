@@ -171,6 +171,15 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   und Rating, Gold und Modelle vor (Snapshot der Stufe davor) und nach. Der Server friert sie beim Markieren („after battle N“) in
   `tags.summary` ein (Migration 47) und liefert sie in `marks[warbandId].summary` der Schlacht – für jedes Mitglied lesbar (Mechanik ist
   offen, ADR 0002); ein späteres Speichern ändert sie nicht, ein zweites Markieren ersetzt sie.
+
+  **Pflichten der Warband (Rob, 14.11.2026):** Regeln, die nach jeder Schlacht eine Wahl verlangen, sind eine Phase für sich (in der App nach
+  dem Verkauf von Wyrdstone, nur für eine Warband, die eine hat; `PB_STEPS` bleibt unverändert, die Phase ist `postbattle[round].duties`
+  `{ resolved: [{ id, option, gc }], done? }`). `PB_DUTIES` (`data/postbattle.json`): der **Troll** der Black Orcs (20 gc, oder zählt als zwei
+  Mitglieder für 5 gc, oder geht), des Orc Mob und der Night Goblins (15 gc, oder zwei Goblins/Cave Squigs geopfert, oder er geht).
+  `dutiesDue` zeigt je Weg Preis, Verfügbarkeit und Grund; **am Maximum** ist „zählt als zwei“ nicht wählbar (der Troll würde es überschreiten):
+  zahlen oder zuerst jemanden entlassen. `resolveDuty` bucht das Gold (`source: 'duty:<id>'`), setzt `Model.countsTwo` (zählt in
+  `totalModels` doppelt, beim Verkauf von Wyrdstone als Zeile `troll`) oder entlässt (`dismissWarrior`, `dismissMan`); `undoDuty` nimmt
+  Zahlung und Doppelzählung zurück, `setDutiesDone` schließt die Phase.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist

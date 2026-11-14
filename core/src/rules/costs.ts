@@ -188,7 +188,7 @@ export function totalModels(ctx: Ctx): number {
   return ctx.s.models.reduce((s, m) => {
     const d = unitDef(ctx, m.uid_def);
     if (d && d.vehicle) return s;
-    return s + (d && d.t === 'hen' ? Number(m.qty) : 1);
+    return s + (d && d.t === 'hen' ? Number(m.qty) : 1) + (m.countsTwo ? 1 : 0);
   }, 0);
 }
 

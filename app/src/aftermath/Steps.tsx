@@ -8,6 +8,7 @@ import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
 import { BalanceStep } from './BalanceStep.tsx';
 import { DramatisStep, EquipmentStep, RareStep, RecruitsStep } from './BuyingSteps.tsx';
+import { DutiesStep } from './DutiesStep.tsx';
 import { ExperienceStep } from './ExperienceStep.tsx';
 import { ExplorationStep } from './ExplorationStep.tsx';
 import { UpkeepSection } from './UpkeepSection.tsx';
@@ -69,6 +70,7 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
     case 'experience': return <ExperienceStep a={a} data={data} acts={acts} underdog={acts.underdog} rosterLink={`${roster}${from}`} />;
     case 'exploration': return <ExplorationStep a={a} data={data} acts={acts} />;
     case 'wyrdstone': return <><WyrdStep a={a} data={data} acts={acts} /><UpkeepSection a={a} acts={acts} /></>;
+    case 'duties': return <DutiesStep a={a} acts={acts} />;
     case 'veterans': return <VeteransStep acts={acts} recruitLink={`${roster}${from}`} />;
     case 'rare': return <RareStep a={a} ctx={acts.ctx} tradeLink={`${roster}/trade${from}`} />;
     case 'dramatis': return <DramatisStep ctx={acts.ctx} hireLink={`${roster}/hire${from}`} />;
@@ -131,14 +133,14 @@ export function Steps({ a, data, wid, acts }: { a: AftermathView; data: GameData
                 <StepBody k={s.key} a={a} data={data} wid={wid} acts={acts} />
                 <StepTables k={s.key} a={a} data={data} />
                 <div className={ui.row}>
-                  <button type="button" className={ui.buttonQuiet} onClick={() => acts.edit((c) => core.setPostBattleStep(c, s.key, true, a.round))}>Done – next step</button>
+                  <button type="button" className={ui.buttonQuiet} onClick={() => acts.edit((c) => (s.key === 'duties' ? core.setDutiesDone(c, a.round, true) : core.setPostBattleStep(c, s.key, true, a.round)))}>Done – next step</button>
                 </div>
               </div>
             )}
             {s.done && <StepTables k={s.key} a={a} data={data} />}
             {s.done && s.key === lastDone && (
               <div className={ui.row}>
-                <button type="button" className={ui.buttonQuiet} onClick={() => acts.edit((c) => core.setPostBattleStep(c, s.key, false, a.round))}>Back to this step</button>
+                <button type="button" className={ui.buttonQuiet} onClick={() => acts.edit((c) => (s.key === 'duties' ? core.setDutiesDone(c, a.round, false) : core.setPostBattleStep(c, s.key, false, a.round)))}>Back to this step</button>
               </div>
             )}
           </li>

@@ -71,7 +71,6 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   const ctx = core.ctxOf(data, s);
   const round = Number(local.round) || 0;
   const pb = core.postbattleState(ctx, round);
-  const active = core.pbActiveStep(ctx, round);
   const cas: Casualty[] = (s.campaign?.casualties ?? []).filter((c) => c.battleId === local.id);
   const casualties = cas.map((c) => {
     const ours = core.casualtyIsOurs(c);
@@ -83,7 +82,15 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   const ex = core.pbExploreDice(ctx, round);
   const rating = core.totalRating(ctx);
   const summaries = stepSummaries(ctx, round, { casualties, xpAwarded: !!local.xpAwarded, pendingXp: core.pendingXp(ctx).length ? core.pendingXp(ctx).reduce((n, x) => n + x.amount, 0) : 0, shards: Number(s.stash?.wyrd) || 0, sold: pb.wyrd?.done ? pb.wyrd : null, rating });
-  const steps = core.PB_STEPS.map(([key, title, link], i) => ({ key, title, link, done: !!pb.done[key], active: i === active, locked: i > active, summary: summaries[key] ?? null }));
+  // the duties of the warband (Always Hungry …) are a phase of their own after the wyrdstone sale – only for a warband that has one
+  const duties = core.dutiesDue(ctx, round);
+  const order: { key: string; title: string; link: string }[] = core.PB_STEPS.map(([key, title, link]) => ({ key, title, link }));
+  if (duties.length) order.splice(order.findIndex((x) => x.key === 'wyrdstone') + 1, 0, { key: 'duties', title: 'Warband duties', link: core.PB_LINK.wyrdstone });
+  summaries.duties = duties.length ? `${duties.filter((d) => d.resolved).length} of ${duties.length} settled` : null;
+  const doneOf = (k: string) => (k === 'duties' ? !!pb.duties?.done : !!pb.done[k]);
+  const firstOpen = order.findIndex((x) => !doneOf(x.key));
+  const at = firstOpen < 0 ? order.length : firstOpen;
+  const steps = order.map(({ key, title, link }, i) => ({ key, title, link, done: doneOf(key), active: i === at, locked: i > at, summary: summaries[key] ?? null }));
   return {
     local, round, steps, casualties,
     toRoll: casualties.filter((c) => c.open).length,
