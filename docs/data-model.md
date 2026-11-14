@@ -110,6 +110,22 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   optional): `{ roll, spent }` – der Veteranenwurf der Runde (2W6) und wie
   viel Erfahrung neue Männer davon schon mitgebracht haben (`core`
   `setVeteransRoll`, `addMen`).
+  Neu mit ADR 0032, alle Felder optional (ältere Runden haben nur `done` und
+  `wyrd` und werden nicht nachgerechnet): `explore`: `{ rolled, kept, total,
+  shards, location, used? }` – die Erkundungswürfel (`rolled`: `{ value:
+  number[], by: 'entered' | 'app' }`), die gewählten (höchstens sechs), ihre
+  Summe, die gefundenen Splitter und der Ort als Schlüssel von `PB_LOCATIONS`
+  (`'5 5'`) oder `null`; `xp`: `{ underdog?, scenario?: [{ uid, amount,
+  reason }] }`; `upkeep`: `{ paid: [{ uid, gc }], dismissed: [uid] }`;
+  `finds`: `[{ id, kind: 'gold'|'wyrd'|'item'|'exp'|'note', source, amount?,
+  item?, qty?, worth?, uid?, text }]` – was ein Schritt gebracht oder gekostet
+  hat, mit Herkunft (`source`: `explore`, `location:<Ort>`, `scenario`,
+  `wyrdstone`, `upkeep` …); `id` je Runde eindeutig und nie wiederverwendet.
+  `ledger[]` und `stash.items[]` tragen dieselbe optionale `source`.
+  **Erkundung (N5):** `recordExploration(ctx, round, { rolled, kept?, by })` schreibt `explore` (die Würfel, die gewählten – höchstens
+  sechs, vorgeschlagen die besten –, die Summe, `shards`, `location`), legt die Splitter in den Stash und einen `Find` mit
+  `source: 'explore'` an; ein zweiter Wurf ersetzt den ersten. `clearExploration` nimmt beides zurück. `exploreShards`, `exploreMultiple`
+  (zahlreichste Gruppe, bei gleich großen die höhere Augenzahl) und `exploreResult` sind rein.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
