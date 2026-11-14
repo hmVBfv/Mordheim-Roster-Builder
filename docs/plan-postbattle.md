@@ -486,7 +486,7 @@ entlassen ist – als Hinweis, nicht als Sperre; Changelog.
 
 ### N11 – Schritt 5 Veteranen im Schritt
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n11`)
 
 **Regel:** `…/docs/campaigns/trading#new-recruits-and-existing-henchmen-groups`
 (2D6 = Erfahrung, die neue Männer zusammen mitbringen dürfen; +2 gc je Punkt).
