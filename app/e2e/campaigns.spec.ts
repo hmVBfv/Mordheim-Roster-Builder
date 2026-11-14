@@ -251,7 +251,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await page.goto(`campaign/${c.id}/timeline`);
     const nav = page.getByRole('navigation', { name: 'Main' });
     const sections = nav.getByRole('list', { name: 'The Hel Fenn Campaign: sections' });
-    await expect(sections.getByRole('link')).toHaveText(['Overview', 'Warbands', 'Notes', 'Timeline', 'Chronicle', 'World', 'Questions', 'Background ⚑', 'Manage']);
+    await expect(sections.getByRole('link')).toHaveText(['Overview', 'Warbands', 'Notes', 'Timeline', 'Chronicle', 'Statistics', 'World', 'Questions', 'Background ⚑', 'Manage']);
     await expect(sections.getByRole('link', { name: 'Timeline' })).toHaveAttribute('aria-current', 'page');
     await expect(nav.getByRole('link', { name: 'Summer in Sylvania' })).toBeVisible();
     // the campaign's own tabs are the phone's: here the side carries them
@@ -378,6 +378,41 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await line.scrollIntoViewIfNeeded();
     await shot(page, `${theme}-rating-lines-overview`);
+  });
+}
+
+/* Plan P14: the Statistics tab – every warband over the marks in one chart, readable in both themes at 360 px, with the numbers behind it. */
+for (const theme of ['chronicle', 'parchment'] as const) {
+  test(`the statistics tab draws all warbands in one chart, in ${theme}`, async ({ page }) => {
+    await useTheme(page, theme);
+    const srv = await playServer(page, true, { totp: true });
+    const c = srv.addCampaign({ name: 'The Hel Fenn Campaign', role: 'player', others: [others[0]!, { player: 'Cid', data: { ...SAVE, name: 'The Resting Band' } }] });
+    const base = { rating: 100, spent: 300, models: 5, heroes: 2, gold: 80, fallen: 0, value: 380, stash: 0, wealth: 380, exp: 20, heroExp: 20, lost: 0, wyrd: 0, wyrdFound: 0, income: 0, incomeWyrd: 0, incomeLocations: 0, incomeScenario: 0, incomeGoods: 0, incomeOther: 0, upkeepPaid: 0, lootValue: 0, spentBuy: 0, spentSearch: 0, stashItems: 0, rareCarried: 0, rareStash: 0 };
+    c.enrolments.forEach((e, k) => {
+      const start = e.tags![0]!;
+      const marks = [1, 2, 3].map((n) => ({ ...start, id: `tag-${k}-${n}`, kind: 'after_battle' as const, round: n, createdAt: `2026-10-0${n + 4}T12:00:00.000Z`, totals: { ...start.totals, rating: 100 + k * 10 + n * (12 + k * 5) }, metrics: { ...base, rating: 100 + k * 10 + n * (12 + k * 5), wealth: 380 + n * (40 + 25 * k), exp: 20 + n * (6 + k), income: n * (30 + 20 * k) } }));
+      e.tags = [{ ...start, metrics: base }, ...marks];
+      e.tag = marks.at(-1)!;
+    });
+    await page.goto(`./campaign/${c.id}/statistics`);
+    const fig = page.getByRole('figure', { name: /Warband rating/ });
+    await expect(fig).toBeVisible();
+    expect(c.enrolments.length).toBe(2);
+    await expect(fig.getByRole('img').locator('polyline')).toHaveCount(2);
+    await expect(fig.getByRole('list', { name: 'Warbands' }).getByRole('button')).toHaveCount(2);
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-statistics`);
+    // another number: the total gold value, with the numbers behind it
+    await page.getByLabel('Show').selectOption('wealth');
+    const wealth = page.getByRole('figure', { name: /Total gold value incl. stash/ });
+    await expect(wealth).toBeVisible();
+    await wealth.getByRole('button', { name: 'The numbers' }).click();
+    await expect(wealth.getByRole('table').getByRole('row')).toHaveCount(3);
+    await wealth.getByRole('button', { name: /Penitents/ }).click();
+    await expect(wealth.getByRole('img').locator('polyline')).toHaveCount(1);
+    await noSideScroll(page);
+    await shot(page, `${theme}-statistics-wealth`);
   });
 }
 

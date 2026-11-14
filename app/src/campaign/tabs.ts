@@ -16,6 +16,7 @@ export function campaignTabs(id: string, role: CampaignRole): CampaignTab[] {
     { to: at('/notes'), label: 'Notes' },
     { to: at('/timeline'), label: 'Timeline' },
     { to: at('/chronicle'), label: 'Chronicle' },
+    { to: at('/statistics'), label: 'Statistics' },
     { to: at('/world'), label: 'World' },
     ...(role !== 'viewer' ? [{ to: at('/questions'), label: 'Questions' }] : []),
     ...(lead ? [{ to: at('/background'), label: 'Background ⚑' }] : []),

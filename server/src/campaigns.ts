@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { listBattles, type BattleSummary } from './battles.ts';
 import type { DB } from './db.ts';
-import { gameData, totalsOf } from './rules.ts';
+import { gameData, metricsOf, totalsOf } from './rules.ts';
 import { createWarband, versionOf, warbandById, type WarbandRow } from './warbands.ts';
 
 export const ROLES = ['leader', 'player', 'viewer'] as const;
@@ -344,6 +344,34 @@ export function campaignRatings(db: DB, campaignId: string): WarbandRatings[] {
     if (typeof r.rating !== 'number') continue;
     const w = by.get(r.warband_id) ?? { warbandId: r.warband_id, name: r.name, active: !!r.active, points: [] };
     w.points.push({ round: r.round, kind: r.kind, rating: r.rating, at: r.created_at });
+    by.set(r.warband_id, w);
+  }
+  return [...by.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+}
+
+/** What a statistics chart plots (plan P14): for each warband of the campaign, the numbers of every mark – worth, wealth, experience, wyrdstone,
+    income by source … – in the order of the rounds. Mechanics, open to every member (ADR 0002); no notes, no names but the warband's.
+    The numbers are core's `stageMetrics` of the marked version, frozen in the tag on the first read (a tag points at one version, and versions
+    only grow: ADR 0003). */
+export interface StatPoint { round: number; kind: string; at: string; metrics: Record<string, number> }
+export interface WarbandStatistics { warbandId: string; name: string; active: boolean; points: StatPoint[] }
+export function campaignStatistics(db: DB, campaignId: string): WarbandStatistics[] {
+  const rows = db.prepare(`SELECT t.id, t.warband_id, t.rev, t.metrics, t.totals, coalesce(t.warband_name, w.name) AS name, t.kind, t.round, t.created_at,
+      EXISTS (SELECT 1 FROM enrolments e WHERE e.campaign_id = t.campaign_id AND e.warband_id = t.warband_id AND e.status IN ('pending', 'active')) AS active
+    FROM tags t JOIN warbands w ON w.id = t.warband_id WHERE t.campaign_id = ? AND t.superseded_by IS NULL ORDER BY t.warband_id, t.round, t.created_at`).all(campaignId) as
+    { id: string; warband_id: string; rev: number; metrics: string | null; totals: string; name: string; kind: string; round: number; created_at: string; active: number }[];
+  const freeze = db.prepare('UPDATE tags SET metrics = ? WHERE id = ?');
+  const by = new Map<string, WarbandStatistics>();
+  for (const r of rows) {
+    let metrics = r.metrics ? (JSON.parse(r.metrics) as Record<string, number>) : null;
+    if (!metrics) {
+      metrics = metricsOf(versionOf(db, r.warband_id, r.rev)?.data) as Record<string, number> | null;
+      if (!metrics) continue;
+      freeze.run(JSON.stringify(metrics), r.id);
+    }
+    const w = by.get(r.warband_id) ?? { warbandId: r.warband_id, name: r.name, active: !!r.active, points: [] };
+    // the numbers frozen since the beginning (rating, spent, models, heroes, gold, fallen) come with them: one place for a chart to read
+    w.points.push({ round: r.round, kind: r.kind, at: r.created_at, metrics: { ...(JSON.parse(r.totals) as Record<string, number>), ...metrics } });
     by.set(r.warband_id, w);
   }
   return [...by.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));

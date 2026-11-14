@@ -3,7 +3,7 @@
    (that part is set up by each side its own way: `elsewhere`). */
 import { describe, expect, it } from 'vitest';
 import { startAccounts } from '../accounts-helpers.ts';
-import { gameData, totalsOf } from '../../src/rules.ts';
+import { gameData, metricsOf, totalsOf } from '../../src/rules.ts';
 import { compare, fakeSide, serverSide, type Refs, type Step } from './driver.ts';
 
 const SAVE = { wb: 'merc', name: 'The Probes', models: [], format: 2 };
@@ -45,11 +45,13 @@ export const CAMPAIGN_STEPS: Step[] = [
   { name: 'remove the entered warband from my list', method: 'DELETE', url: `/warbands/${W(1)}` },
   { name: 'catch up', url: '/campaigns/{c1}/catchup' },
   { name: 'ratings', url: '/campaigns/{c1}/ratings' },
+  { name: 'statistics', url: '/campaigns/{c1}/statistics' },
   { name: 'confirm what is confirmed', url: '/campaigns/{c1}/enrolments/{e1}/confirm', body: {} },
   { name: 'decline what is confirmed', url: '/campaigns/{c1}/enrolments/{e1}/decline', body: {} },
   { name: 'house rules', method: 'PUT', url: '/campaigns/{c1}/house-rules', body: { rules: {} } },
   { name: 'house rules that are none', method: 'PUT', url: '/campaigns/{c1}/house-rules', body: { rules: { nonsense: 5 } } },
   { name: 'ratings of a campaign there is not', url: `/campaigns/${W(7)}/ratings` },
+  { name: 'statistics of a campaign there is not', url: `/campaigns/${W(7)}/statistics` },
   { name: 'the first battle of the history', method: 'PUT', url: `/campaigns/{c1}/history/${B1}`, body: { round: 1, title: 'The ferry', playedOn: '2026-05-01', outcomes: { [W(1)]: 'victory' } } },
   { name: 'a battle of the history that does not fit', method: 'PUT', url: `/campaigns/{c1}/history/${B1}`, body: { round: 0, outcomes: {} } },
   { name: 'read after the history', url: '/campaigns/{c1}' },
@@ -78,6 +80,7 @@ export const CAMPAIGN_STEPS: Step[] = [
   { name: 'try to confirm my own', url: '/campaigns/{c2}/enrolments/{e3}/confirm', body: {} },
   { name: 'the leader’s warband', url: '/campaigns/{c2}/warbands/{bw}' },
   { name: 'ratings of the other campaign', url: '/campaigns/{c2}/ratings' },
+  { name: 'statistics of the other campaign', url: '/campaigns/{c2}/statistics' },
   { name: 'withdraw mine', method: 'DELETE', url: '/campaigns/{c2}/enrolments/{e3}' },
   { name: 'withdraw it again', method: 'DELETE', url: '/campaigns/{c2}/enrolments/{e3}' },
   { name: 'try to withdraw the leader’s', method: 'DELETE', url: '/campaigns/{c2}/enrolments/{be}' },
@@ -111,6 +114,7 @@ describe('contract: campaigns', () => {
     });
     const fake = fakeSide({
       me: { id: 'u1', username: 'kai', displayName: 'Kai' },
+      metrics: (save) => metricsOf(save),
       totals: (save) => { const t = totalsOf(save); return { rating: t?.rating ?? 0, spent: t?.spent ?? 0, models: t?.models ?? 0, heroes: t?.heroes ?? 0, gold: t?.gold ?? 0, fallen: t?.fallen ?? 0 }; },
       wbName: (wb) => (gameData().WARBANDS as Record<string, { name?: string }>)[wb]?.name ?? wb,
     }, fakeRefs, (f, _step, r) => {

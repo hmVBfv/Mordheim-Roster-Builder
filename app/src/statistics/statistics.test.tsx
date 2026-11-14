@@ -1,0 +1,112 @@
+/* The statistics (plan P14): the series of a number over the marks, the axis, and the chart – legend, switching lines off, the crosshair with a
+   tooltip by keyboard, and the numbers as a table. */
+import { cleanup, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
+import { afterEach, describe, expect, it } from 'vitest';
+import type { WarbandStatistics } from '../campaign/api.ts';
+import { LineChart } from './LineChart.tsx';
+import { METRICS, fmt, markLabel, metricOf, niceScale, seriesOf } from './metrics.ts';
+
+afterEach(() => cleanup());
+const pt = (round: number, kind: string, metrics: Record<string, number>) => ({ round, kind, at: `2026-10-0${round + 1}T10:00:00.000Z`, metrics });
+const STATS: WarbandStatistics[] = [
+  { warbandId: 'a', name: 'The Grey Penitents', active: true, points: [pt(0, 'start', { rating: 100, income: 0 }), pt(1, 'after_battle', { rating: 130, income: 60 }), pt(2, 'after_battle', { rating: 150, income: 140 })] },
+  { warbandId: 'b', name: 'Clan Skrittle', active: true, points: [pt(0, 'start', { rating: 90 }), pt(2, 'sat_out', { rating: 90 })] },
+  { warbandId: 'c', name: 'The Left Band', active: false, points: [pt(0, 'start', { rating: 70 })] },
+];
+
+describe('the numbers', () => {
+  it('every metric has words, a group and a unit, and a key once', () => {
+    expect(new Set(METRICS.map((m) => m.key)).size).toBe(METRICS.length);
+    for (const m of METRICS) { expect(m.label.length).toBeGreaterThan(3); expect(m.about.length, m.key).toBeGreaterThan(10); }
+    expect(metricOf('wealth').label).toBe('Total gold value incl. stash');
+    expect(metricOf('nonsense').key).toBe(METRICS[0]!.key);
+  });
+
+  it('names a mark on the axis', () => {
+    expect(markLabel('start', 0)).toBe('Start');
+    expect(markLabel('after_battle', 2)).toBe('After battle 2');
+    expect(markLabel('sat_out', 3)).toBe('Round 3, sat out');
+  });
+
+  it('the series of one number: in the order of the rounds, a mark without the number left out, a warband without any dropped', () => {
+    const s = seriesOf(STATS, 'income');
+    expect(s.map((x) => [x.name, x.points.map((p) => p.value)])).toEqual([['The Grey Penitents', [0, 60, 140]]]);
+    const r = seriesOf(STATS, 'rating');
+    expect(r.map((x) => x.points.map((p) => p.label))).toEqual([['Start', 'After battle 1', 'After battle 2'], ['Start', 'Round 2, sat out'], ['Start']]);
+  });
+
+  it('the axis starts at zero and ends at a clean number above the highest', () => {
+    expect(niceScale([100, 150])).toMatchObject({ min: 0, max: 150 });
+    expect(niceScale([0, 0])).toMatchObject({ min: 0 });
+    expect(niceScale([-30, 40]).min).toBeLessThan(0);
+    expect(niceScale([3, 7]).ticks.at(-1)).toBeGreaterThanOrEqual(7);
+  });
+
+  it('writes a number with its unit', () => {
+    expect(fmt(60, 'gc')).toBe('60 gc');
+    expect(fmt(4, '')).toBe('4');
+    expect(fmt(2.5, '')).toBe('2.5');
+  });
+});
+
+function Harness({ key_ = 'rating' }: { key_?: string }) {
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  return <LineChart metric={metricOf(key_)} series={seriesOf(STATS, key_)} hidden={hidden} onToggle={(w) => setHidden((h) => { const n = new Set(h); if (n.has(w)) n.delete(w); else n.add(w); return n; })} />;
+}
+
+describe('the chart', () => {
+  it('has a legend entry for each warband, a line for each, and a description of the whole', () => {
+    render(<Harness />);
+    const legend = screen.getByRole('list', { name: 'Warbands' });
+    expect(within(legend).getAllByRole('button').map((b) => b.textContent)).toEqual(['The Grey Penitents', 'Clan Skrittle', 'The Left Band (left)']);
+    const img = screen.getByRole('img');
+    expect(img.querySelectorAll('polyline')).toHaveLength(3);
+    expect(img.getAttribute('aria-label')).toMatch(/The Grey Penitents: Start 100, After battle 1 130, After battle 2 150/);
+  });
+
+  it('switching a line off removes it without repainting the others', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    const colourOf = (name: string) => screen.getByRole('img').querySelectorAll('polyline')[['The Grey Penitents', 'Clan Skrittle', 'The Left Band'].indexOf(name)]?.getAttribute('stroke');
+    const third = colourOf('The Left Band');
+    await user.click(screen.getByRole('button', { name: 'The Grey Penitents' }));
+    expect(screen.getByRole('button', { name: 'The Grey Penitents' }).getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByRole('img').querySelectorAll('polyline')).toHaveLength(2);
+    // the legend kept its order and colours: the third warband is still the third colour
+    expect(screen.getByRole('img').querySelectorAll('polyline')[1]!.getAttribute('stroke')).toBe(third);
+  });
+
+  it('all lines off says so', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    for (const b of within(screen.getByRole('list', { name: 'Warbands' })).getAllByRole('button')) await user.click(b);
+    expect(screen.getByText('All lines are switched off.')).toBeTruthy();
+  });
+
+  it('the arrow keys move a crosshair with a tooltip of every shown warband', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    screen.getByRole('img').focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('status').textContent).toMatch(/Start.*The Grey Penitents: 100.*Clan Skrittle: 90.*The Left Band: 70/);
+    await user.keyboard('{ArrowRight}{ArrowRight}');
+    const tip = screen.getByRole('status').textContent!;
+    expect(tip).toMatch(/Round 2/);
+    expect(tip).toMatch(/The Grey Penitents: 150/);
+    expect(tip).not.toMatch(/The Left Band/); // it has no mark in round 2
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('the numbers are a table with a row for each warband and a column for each round', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(screen.getByRole('button', { name: 'The numbers' }));
+    const table = screen.getByRole('table');
+    expect(within(table).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Warband', 'Start', 'R1', 'R2']);
+    const rows = within(table).getAllByRole('row').slice(1).map((r) => within(r).getAllByRole('cell').map((c) => c.textContent));
+    expect(rows).toEqual([['100', '130', '150'], ['90', '–', '90'], ['70', '–', '–']]);
+  });
+});
