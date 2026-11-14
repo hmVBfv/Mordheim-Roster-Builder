@@ -5,7 +5,7 @@
    (ADR 0032) and can be taken back. */
 import type { WarbandState } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
-import type { ExploreRule, GameData } from '../data/types.ts';
+import type { GameData } from '../data/types.ts';
 import { isHeroModel } from '../rules/costs.ts';
 import { itemInfo } from '../rules/lookup.ts';
 import { logEvent } from '../warband/log.ts';
