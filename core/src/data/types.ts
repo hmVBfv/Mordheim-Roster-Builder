@@ -359,6 +359,10 @@ export interface GameData {
   PB_ADVANCE_NOTES: string[];
   PB_EXPLORE_SHARDS: [total: string, shards: number][];
   PB_LOCATIONS: [dice: string, name: string, text: string][];
+  /* Underdog bonus (Campaigns: Experience): [from, to (null = no upper limit), bonus] by the difference in warband rating. */
+  PB_UNDERDOG: [from: number, to: number | null, bonus: number][];
+  /* The ten steps in the rulebook's order: [key, what it asks] (N1; the title and link are core's PB_STEPS). */
+  PB_SEQUENCE: [key: string, text: string][];
   /* Animals and creatures for leaders' opponent profiles (data/bestiary.json;
      the new app only – legacy does not load the file). */
   BESTIARY_SOURCE: string;

@@ -164,7 +164,7 @@ die neuen Felder; `node test/run.mjs` bleibt grün).
 
 ### N1 – Tabellen: Daten, Komponente, Regelübersicht
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n1`; die Übersicht liegt unter `RULES/post-battle`, `app/src/aftermath/PostBattleRules.tsx`)
 
 **Ziel:** jede Tabelle des Nachspiels sauber in der App, aus Daten.
 
