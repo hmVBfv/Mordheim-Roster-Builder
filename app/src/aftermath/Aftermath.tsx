@@ -32,6 +32,7 @@ import { useSheet } from '../ui/useSheet.ts';
 import { FieldsSheet, type FieldsEdit } from '../story/FieldsSheet.tsx';
 import type { ChangeLine } from './changes.ts';
 import { MarkSection } from './MarkSection.tsx';
+import { underdogOf } from './underdog.ts';
 import { Steps } from './Steps.tsx';
 import styles from './Aftermath.module.css';
 import { takeOverBattle } from './takeover.ts';
@@ -151,7 +152,7 @@ function AftermathBody({ rec, bid }: { rec: StoredWarband; bid: string }) {
       )}
       {view && fought && view.battle.status === 'closed' && !view.battle.takenOver && a && (
         <div className={styles.columns}>
-          <Steps a={a} data={data} wid={rec.id} acts={{ edit: ed.edit, roll }} />
+          <Steps a={a} data={data} wid={rec.id} acts={{ ctx, underdog: underdogOf(data, view, rec.id), edit: ed.edit, roll }} />
           <MarkSection data={data} rec={rec} state={ed.state} view={view} cid={cid!} round={a.round} toRoll={a.toRoll} onMarked={b.reload} notify={notify} onExplain={explain} />
         </div>
       )}

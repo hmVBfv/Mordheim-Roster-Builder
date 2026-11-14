@@ -1212,9 +1212,11 @@ test('after the battle: the leader closes it, the player takes it over, goes thr
   await shot(page, 'aftermath-injuries');
   await page.getByRole('button', { name: 'Done – next step' }).click();
   // experience
-  await page.getByRole('button', { name: 'Grant the battle’s experience' }).click();
-  await expect(page.getByRole('list', { name: 'Experience held' })).toContainText('Ulrich the Grey +1');
-  await page.getByRole('button', { name: 'Write it onto the roster' }).click();
+  await expect(page.getByRole('table', { name: 'Experience of the battle' })).toContainText('Ulrich the Grey');
+  await noSideScroll(page);
+  await shot(page, 'aftermath-experience');
+  await page.getByRole('button', { name: 'Grant and write onto the roster' }).click();
+  await expect(page.getByText('✓ Battle experience granted.')).toBeVisible();
   await page.getByRole('button', { name: 'Done – next step' }).click();
   // exploration: two shards found
   await page.getByRole('button', { name: 'One shard more' }).click();

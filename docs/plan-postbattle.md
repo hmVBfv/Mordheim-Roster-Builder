@@ -245,7 +245,7 @@ getrennt und gedämpft („Their player rolls for them“).
 
 ### N4 – Schritt 2 Erfahrung: Tabelle je Krieger, Underdog, Szenario
 
-- [ ] erledigt · Underdog entschieden (Abschnitt 5)
+- [x] erledigt (Branch `feat/postbattle-n4`; Punkt 5, die Steigerung auf dieser Seite, bleibt beim Roster: „Roll it on the roster“ mit Rückweg – `AdvanceSheet` ist am Roster-Zustand aufgehängt und kommt mit N12) · Underdog entschieden (Abschnitt 5)
 
 **Regel:** `…/docs/tools#2-allocate-experience`, `…/docs/campaigns/experience`
 (Underdogs: Bonus **je teilnehmendem Kämpfer** nach Unterschied der Ratings).
