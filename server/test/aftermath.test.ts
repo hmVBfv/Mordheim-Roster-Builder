@@ -92,6 +92,24 @@ describe('marking a warband after the battle', () => {
     expect(read.tags.map((t) => [t.kind, t.changes.length])).toEqual([['start', 0], ['after_battle', m.changes.length]]);
   });
 
+  it('the balance of the round is frozen with the mark (N13): everyone reads it, and it does not move when the warband is saved again', async () => {
+    const { bid, url, caravan, anna, kai, ben } = await world();
+    await anna('POST', `${url}/close`);
+    const after = afterBattle(bid) as Record<string, unknown> & { campaign: Record<string, unknown>; stash?: Record<string, unknown> };
+    after.stash = { wyrd: 0, gold: null, items: [] };
+    after.campaign.postbattle = { 1: { done: {}, wyrd: null, explore: { rolled: { value: [5, 5, 3], by: 'app' }, kept: [5, 5, 3], total: 13, shards: 3, location: '5 5' }, finds: [{ id: 1, kind: 'wyrd', source: 'explore', amount: 3, text: 'Found 3 shards exploring.' }] } };
+    const one = (await kai('POST', `/warbands/${caravan}/versions`, { baseRev: 1, data: after })).json() as { rev: number };
+    await kai('POST', `${url}/marks`, { warbandId: caravan, rev: one.rev });
+    const frozen = ((await ben('GET', url)).json() as { marks: Record<string, { summary: { round: number; exploration: unknown; finds: unknown[]; wyrd: unknown } | null }> }).marks[caravan]!.summary;
+    expect(frozen).toMatchObject({ round: 1, exploration: { total: 13, shards: 3, location: '5 5', by: 'app', dice: 3 }, wyrd: { found: 3 } });
+    expect(frozen!.finds).toHaveLength(1);
+    // saved again after the mark, without marking: the frozen balance stays
+    const next = structuredClone(after);
+    (next.campaign.postbattle as Record<string, Record<string, unknown>>)['1']!.finds = [];
+    await kai('POST', `/warbands/${caravan}/versions`, { baseRev: one.rev, data: next });
+    expect(((await anna('GET', url)).json() as { marks: Record<string, { summary: unknown }> }).marks[caravan]!.summary).toEqual(frozen);
+  });
+
   it('marked again, the newer mark corrects the earlier, which stays', async () => {
     const { s, bid, url, caravan, anna, kai } = await world();
     await anna('POST', `${url}/close`);

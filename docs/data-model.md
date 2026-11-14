@@ -110,6 +110,67 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   optional): `{ roll, spent }` – der Veteranenwurf der Runde (2W6) und wie
   viel Erfahrung neue Männer davon schon mitgebracht haben (`core`
   `setVeteransRoll`, `addMen`).
+  Neu mit ADR 0032, alle Felder optional (ältere Runden haben nur `done` und
+  `wyrd` und werden nicht nachgerechnet): `explore`: `{ rolled, kept, total,
+  shards, location, used? }` – die Erkundungswürfel (`rolled`: `{ value:
+  number[], by: 'entered' | 'app' }`), die gewählten (höchstens sechs), ihre
+  Summe, die gefundenen Splitter und der Ort als Schlüssel von `PB_LOCATIONS`
+  (`'5 5'`) oder `null`; `xp`: `{ underdog?, scenario?: [{ uid, amount,
+  reason }] }`; `upkeep`: `{ paid: [{ uid, gc }], dismissed: [uid] }`;
+  `finds`: `[{ id, kind: 'gold'|'wyrd'|'item'|'exp'|'note', source, amount?,
+  item?, qty?, worth?, uid?, text }]` – was ein Schritt gebracht oder gekostet
+  hat, mit Herkunft (`source`: `explore`, `location:<Ort>`, `scenario`,
+  `wyrdstone`, `upkeep` …); `id` je Runde eindeutig und nie wiederverwendet.
+  `ledger[]` und `stash.items[]` tragen dieselbe optionale `source`.
+  **Erkundung (N5):** `recordExploration(ctx, round, { rolled, kept?, by })` schreibt `explore` (die Würfel, die gewählten – höchstens
+  sechs, vorgeschlagen die besten –, die Summe, `shards`, `location`), legt die Splitter in den Stash und einen `Find` mit
+  `source: 'explore'` an; ein zweiter Wurf ersetzt den ersten. `clearExploration` nimmt beides zurück. `exploreShards`, `exploreMultiple`
+  (zahlreichste Gruppe, bei gleich großen die höhere Augenzahl) und `exploreResult` sind rein.
+  **Was die Erkundung verändert (N6):** `PB_EXPLORE_RULES` (`data/postbattle.json`) nennt Fertigkeiten, Gegenstände, Hired Swords und
+  Bezirke, die Würfel dazugeben (`dice`), Wiederholungen (`reroll`, 6 = alle), ±1 (`adjust`) oder abzulegende Würfel (`drop`) geben,
+  je mit `needs: 'notOOA'`, Quelle (`src`) und `match` (Satzteile der Daten). `exploreAllowances(ctx, round)` findet, was die Warband
+  hat; `recordExploration` bekommt `used` (Ids, je höchstens einmal), und `explore.used` hält sie fest. `PB_EXPLORE_EXCEPTIONS` nennt
+  jede Erwähnung der Erkundung in den Daten, die nicht abgebildet ist, mit Grund; `core/test/explore-allowances.test.ts` liest die Daten
+  und verlangt für jeden Satz über die Erkundung einen Eintrag in der einen oder der anderen Liste (und meldet veraltete Einträge).
+
+  **Die dreißig Orte (N7):** `PB_LOCATION_RULES` (`data/postbattle.json`, Schlüssel wie `PB_LOCATIONS`, z. B. `'5 5 5'`) beschreibt jeden Ort
+  als Schritte: Fragen an den Spieler (`q`: `roll` mit Würfeln und Tabelle, `pass` für einen Test, `hero`, `choice`), `do` (Gold,
+  Splitter, Gegenstände aus dem Katalog, Edelsteine, Erfahrung, Dauerhaftes `perk`, Hinweise, `miss`/`lose` für einen Helden),
+  `by` (Zweige nach Warband-Merkmal: Skaven, Possessed, Undead, Sisters, Witch Hunters, sonst `else`), `if` und `each` (je ein Wurf „4+“).
+  `resolveLocation(ctx, key, answers)` geht die Schritte mit den bisherigen Antworten durch und gibt die nächste Frage oder – wenn alles
+  beantwortet ist – die Funde (`LocFind`) und Dauerhaftes (`LocPerk`); es würfelt nie. Der Katalog der sechs magischen Artefakte steht in
+  `PB_ARTEFACTS`. Warband-Merkmale: Undead = `siteRace` „Undead“ (ein Vampir ist es nicht), Skaven = `siteRace` „Skaven“, Possessed =
+  das neue Merkmal `demonic` im Warband-Kopf (heute Possessed und Carnival).
+
+  **Einen Ort nehmen (N8):** `applyLocation(ctx, round, { key, answers, pick?, spread? })` bucht, was `resolveLocation` fand – Gold in die
+  Schatzkammer (bei geführtem Kassenbuch als Buchung `adjust` mit `source: 'location:<Ort>'`), Splitter und Gegenstände in den Stash
+  (Katalog-Gegenstand mit `key`, `paid: 0`, `source`; Edelsteine mit `gem: true` und `value`), Erfahrung gehalten (`xpId` am Fund),
+  Dauerhaftes in `campaign.perks` (`{ id, text, round, key, uid?, unique?, explore?, used? }`), eine Krankheit als `miss`, ein Verlust im
+  Pit als Tod – und legt die Funde mit Herkunft in `postbattle[round].finds` und `postbattle[round].location` (`{ key, answers }`).
+  Ein Ort je Runde. `undoLocation` nimmt alles zurück (nicht den Tod eines Helden: das macht das Rückgängig des Editors).
+  Perks mit `explore` erscheinen in `exploreAllowances` als `perk:<id>`: der Eingang zu den Katakomben (`unique`) gibt jedes Mal eine
+  Wiederholung, der Einblick des Streuners einmal einen Würfel mehr (`used`).
+
+  **Verkauf von Wyrdstone und Treasure (N9):** `sellingSize(ctx, { kind, chef?, victuals?, manual? })` gibt die Größe, bei der der Preis
+  gelesen wird: Ogres der Maneaters zählen doppelt (`large`), ein Mob (`mob: true` an der Einheit) als ein Modell, der Halfling Cook
+  (Master Chef, ein W6 von 5+) senkt die Preisstufe um eine, Victuals nur bei Treasure je Stück um eine (nie unter 1–3), dazu eine
+  Korrektur von Hand – jede Anpassung steht in `lines`. `priceAt` liest die Tabelle, `merchantAdjust` rechnet den Wurf des Cathayan
+  Merchant ein. `sellWyrdstone(ctx, round, shards, { size?, adjust? })` bucht mit geführtem Kassenbuch eine Buchung `adjust` mit
+  `source: 'wyrdstone'`, hält `wyrd: { …, band?, adjust? }` und einen Fund mit Herkunft `wyrdstone` fest; `undoWyrdstoneSale` macht alles
+  rückgängig. Ohne Optionen verkauft es wie die alte App.
+
+  **Sold (N10):** `upkeepDue(ctx, round)` listet je Hired Sword und Dramatis Persona den Sold (`hsUpkeepFor`, `DRAMATIS[key].upkeep`,
+  dazu `upkeepNote`, wenn er nicht in Gold bezahlt wird). `payUpkeep(ctx, round, uids, { free? })` nimmt das Gold (mit Kassenbuch eine
+  Buchung mit `source: 'upkeep'`) und hält `upkeep.paid: [{ uid, gc }]` und je einen Fund mit Herkunft `upkeep` fest (`amount` negativ);
+  `undoUpkeep` gibt es zurück; `dismissUpkeep` schickt einen Söldner weg (`dismissHire`) und hält `upkeep.dismissed` fest. Ein zu
+  kleiner Schatz ist keine Sperre: `upkeepProblem` warnt.
+
+  **Bilanz der Runde (N13):** `postBattleSummary(ctx, round)` rechnet aus dem Spielstand allein: Verletzungen (eigene Ausfälle der Runde),
+  Erfahrung (mit Underdog und Szenario), die Erkundung, Wyrdstone gefunden/verkauft/im Stash, Einnahmen je Quelle (`wyrdstone`, Orte,
+  Szenario, Waren, sonstige), Ausgaben je Art (Sold, Käufe, Suchen, Rekruten), alle Funde mit Herkunft, den Wert der gefundenen Gegenstände
+  und Rating, Gold und Modelle vor (Snapshot der Stufe davor) und nach. Der Server friert sie beim Markieren („after battle N“) in
+  `tags.summary` ein (Migration 47) und liefert sie in `marks[warbandId].summary` der Schlacht – für jedes Mitglied lesbar (Mechanik ist
+  offen, ADR 0002); ein späteres Speichern ändert sie nicht, ein zweites Markieren ersetzt sie.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
@@ -153,7 +214,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
 | `warband_shares` | `id`, `from_user`, `to_user`, `code_hash`, `warband_id`, `name`, `wb_type`, `data`, `created_at`, `expires_at`, `answered_at`, `accepted`, `uses`, `revoked_at` | seit Migration 4: eine Warband teilen (Rob, 05.10.2026), immer als Kopie. Entweder an einen Nutzer (`to_user`, einmal annehmen oder ablehnen) oder als Code (`code_hash`, nur der Hash; mehrfach einlösbar, `uses` zählt). `data` ist die Warband beim Teilen (höchstens 2 MB), geleert (`''`), sobald sie niemand mehr nehmen kann (beantwortet, zurückgenommen, abgelaufen); `warband_id` nur zur Anzeige beim Absender. 7 Tage gültig, zurücknehmbar |
 | `code_attempts` | `id`, `user_id`, `ip`, `at` | falsche Teilen-Codes, für die Bremse (10 in 15 Minuten je Nutzer); einen Tag aufbewahrt |
 | `warband_autosaves` | `warband_id`, `user_id`, `base_rev`, `data`, `device`, `updated_at`, `seq` | ein Platz je Nutzer und Warband (Entwurf seit der letzten Version); eine neue Version desselben Nutzers leert ihn. Ein anderes Gerät desselben Nutzers überschreibt ihn nur, wenn es ihn gesehen hat (`afterSeq`) oder ausdrücklich (`force`). Im `audit_log` steht je Entwurf nur der letzte Eintrag (`warband.autosave`); die Admin-Ansicht zeigt Entwürfe nicht |
-| `tags` | `id`, `warband_id`, `rev`, `kind` (`start` · `after_battle` · `sat_out`), `campaign_id`, `battle_id`, `round`, `totals` (JSON, eingefroren), `created_by`, `created_at`, `superseded_by` | seit Migration 5. Korrektur = neuer Tag, alter bekommt `superseded_by`. `totals` rechnet der Server mit `core` (`stageTotals`: `rating`, `spent`, `models`, `heroes`, `gold`, `fallen` – dieselben Kennzahlen wie die Stufen-Snapshots der alten App), nie neu berechnet. `start` entsteht, wenn ein Leiter die Einschreibung bestätigt, auf der dann neuesten Version; `after_battle` setzt der Spieler auf eine Version seiner Wahl, sobald die Schlacht geschlossen ist (`battle_participants.rev_after`); `sat_out` setzt der Server beim Weiterschalten der Runde für jede eingetragene Warband ohne Schlacht in dieser Runde, auf ihre neueste Version. Eine Vorgeschichte (4a5, `battles.taken_over`) setzt `start` auf ihre letzte Runde: ein neuer Tag auf derselben Version mit denselben Kennzahlen, der alte bekommt `superseded_by`; `warband_name` (Migration 46, AUTHZ-6: der Name der Warband in dem Augenblick, in dem sie die Kampagne verlässt; vorher leer, dann zeigt die Kampagne ihren heutigen Namen) |
+| `tags` | `id`, `warband_id`, `rev`, `kind` (`start` · `after_battle` · `sat_out`), `campaign_id`, `battle_id`, `round`, `totals` (JSON, eingefroren), `summary` (JSON, eingefroren, nur `after_battle`: die Bilanz der Runde, N13), `created_by`, `created_at`, `superseded_by` | seit Migration 5. Korrektur = neuer Tag, alter bekommt `superseded_by`. `totals` rechnet der Server mit `core` (`stageTotals`: `rating`, `spent`, `models`, `heroes`, `gold`, `fallen` – dieselben Kennzahlen wie die Stufen-Snapshots der alten App), nie neu berechnet. `start` entsteht, wenn ein Leiter die Einschreibung bestätigt, auf der dann neuesten Version; `after_battle` setzt der Spieler auf eine Version seiner Wahl, sobald die Schlacht geschlossen ist (`battle_participants.rev_after`); `sat_out` setzt der Server beim Weiterschalten der Runde für jede eingetragene Warband ohne Schlacht in dieser Runde, auf ihre neueste Version. Eine Vorgeschichte (4a5, `battles.taken_over`) setzt `start` auf ihre letzte Runde: ein neuer Tag auf derselben Version mit denselben Kennzahlen, der alte bekommt `superseded_by`; `warband_name` (Migration 46, AUTHZ-6: der Name der Warband in dem Augenblick, in dem sie die Kampagne verlässt; vorher leer, dann zeigt die Kampagne ihren heutigen Namen) |
 | `changes` | `id`, `tag_id`, `warband_id`, `battle_id`, `seq_in_tag`, `kind`, `uid`, `change_key`, `payload` (JSON), `event_ref`, `unexplained` | seit Migration 8; eingefroren beim Markieren „After battle N“ (siehe Abschnitt 4): der Server vergleicht mit `core` (`diffWarbands`, `reconcile`) die markierte Version mit der Version der vorigen Markierung und gleicht mit Log und Verlusten dieser Schlacht im Speicherstand ab (ADR 0016). `uid`: Krieger-`uid` oder die eines Hired Sword; `payload` mit dem Namen. Eine zweite Markierung derselben Schlacht ersetzt die erste (`superseded_by`), die alte bleibt |
 
 ### Kampagne

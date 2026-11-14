@@ -10,8 +10,10 @@
 import type { Casualty, Model, WarbandState, XpEntry } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
 import { canEarnXp, modelLabel } from '../rules/casualties.ts';
+import { isHeroModel } from '../rules/costs.ts';
 import { unitDef } from '../rules/lookup.ts';
 import { leaderUid } from '../rules/profile.ts';
+import { postbattleOn } from '../campaign/postbattle.ts';
 import { campState, logEvent, nextLogId } from './log.ts';
 import { update, type WarbandDraft } from './update.ts';
 
@@ -81,6 +83,10 @@ export interface BattleXpOptions {
   winningLeader?: number;
   /** Did we win? Default: read from the battle's outcome. */
   won?: boolean | null;
+  /** The underdog bonus for each warrior who fought (Campaigns: Experience); 0 or absent: none. */
+  underdog?: number;
+  /** Points the scenario gives to named warriors, each with its reason. */
+  scenario?: { uid: number | string; amount: number; reason: string }[];
 }
 
 /** The post-battle award for one battle: +survives to every Hero and
@@ -108,6 +114,59 @@ export function awardBattleXp(ctx: Ctx, battleId: number | null, opts?: BattleXp
       const lm = lu != null ? (d.models as Model[]).find((x) => x.uid === lu) : null;
       if (lm && (Number(lm.miss) || 0) <= 0) grantXpOn(d, c, lu, o.winningLeader, 'led the winning warband', round);
     }
+    // the underdog bonus and the scenario's points (N4): only when asked for, so a call without them is what it always was
+    const under = Math.max(0, Math.floor(Number(o.underdog) || 0));
+    const scen = (o.scenario ?? []).filter((x) => Number(x.amount) > 0 && String(x.reason ?? '').trim());
+    if (under > 0) {
+      for (const m of d.models as Model[]) {
+        if ((Number(m.miss) || 0) > 0) continue;
+        if (slain.has(m.uid) && (Number(m.qty) || 1) <= 1) continue;
+        grantXpOn(d, c, m.uid, under, `underdog (+${under})`, round);
+      }
+    }
+    for (const x of scen) grantXpOn(d, c, x.uid, x.amount, x.reason, round);
+    if (under > 0 || scen.length) {
+      const rec = postbattleOn(d, c, Number(round) || 0);
+      rec.xp = { underdog: under, scenario: scen.map((x) => ({ uid: x.uid, amount: Number(x.amount), reason: String(x.reason) })) };
+    }
+  });
+}
+
+/** One warrior's line of the experience table. */
+export interface XpPlanRow {
+  uid: number; name: string; hero: boolean;
+  survives: number; leader: number; kills: number; underdog: number; scenario: number; total: number;
+  /** Sits the battle out (games to miss): no points. */
+  sitsOut: boolean;
+  /** Slain in the battle: no points. */
+  dead: boolean;
+}
+
+/** What the battle's experience comes to for each warrior, by the same rules as awardBattleXp: the table the player reads before granting
+    it. `kills` are the points already held for enemies he put out of action. */
+export function battleXpPlan(ctx: Ctx, battleId: number | null, opts: BattleXpOptions = {}): XpPlanRow[] {
+  const camp = ctx.s.campaign ?? {};
+  const o = { survives: 1, winningLeader: 1, won: null as boolean | null, ...opts };
+  const bat = (camp.battles ?? []).find((b) => b.id === Number(battleId)) as { round?: number; outcome?: string } | undefined;
+  const round = bat ? bat.round : camp.round;
+  const won = o.won != null ? !!o.won : (bat ? /victor/i.test(bat.outcome || '') : false);
+  const slain = new Set(((camp.casualties ?? []) as Casualty[])
+    .filter((r) => r.round === round && r.result === 'dead' && r.victim.uid != null)
+    .map((r) => r.victim.uid));
+  const lu = leaderUid(ctx);
+  const under = Math.max(0, Math.floor(Number(o.underdog) || 0));
+  const heldNow = (camp.xp ?? []).filter((x) => !x.applied && x.round === round);
+  return ctx.s.models.map((m) => {
+    const sitsOut = (Number(m.miss) || 0) > 0;
+    const dead = slain.has(m.uid) && (Number(m.qty) || 1) <= 1;
+    const earns = canEarnXp(ctx, m);
+    const fights = earns && !sitsOut && !dead;
+    const survives = fights ? o.survives : 0;
+    const leader = earns && won && lu === m.uid && !sitsOut ? o.winningLeader : 0;
+    const underdog = fights ? under : 0;
+    const scenario = earns ? (o.scenario ?? []).filter((x) => Number(x.uid) === m.uid && Number(x.amount) > 0 && String(x.reason ?? '').trim()).reduce((n, x) => n + Number(x.amount), 0) : 0;
+    const kills = heldNow.filter((x) => x.uid === m.uid && /^put .* out of action/.test(x.reason)).reduce((n, x) => n + x.amount, 0);
+    return { uid: m.uid, name: modelLabel(ctx, m), hero: isHeroModel(ctx, m), survives, leader, kills, underdog, scenario, total: survives + leader + kills + underdog + scenario, sitsOut, dead };
   });
 }
 

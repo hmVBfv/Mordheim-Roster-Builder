@@ -22,7 +22,7 @@ export interface Participant {
   confirmedAt?: string | null; confirmedBy?: string | null; beforeTotals?: unknown; headRev?: number;
 }
 /** A warband marked "after battle N" (phase 4a4): its version, and how many changes were frozen with it. */
-export interface Mark { tagId: string; rev: number; totals: unknown; changes: number; unexplained: number; createdAt: string }
+export interface Mark { tagId: string; rev: number; totals: unknown; /** The balance of the round, frozen with the mark (N13); null for an older mark. */ summary?: unknown; changes: number; unexplained: number; createdAt: string }
 export interface BattleView {
   battle: {
     id: string; campaignId: string; round: number; title: string; scenario: string; district: string; status: 'open' | 'closed'; turn: number; createdAt: string; updatedAt: string; closedAt: string | null;

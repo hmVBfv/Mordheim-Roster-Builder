@@ -124,13 +124,21 @@ export const campaignSchema = z.looseObject({
   on: z.boolean().optional(),
   round: z.number().optional(),
   districts: z.record(z.string(), z.string()).optional(),
+  perks: z.array(z.looseObject({ id: z.string(), text: z.string(), round: z.number(), key: z.string(), uid: z.number().optional(), unique: z.boolean().optional(), used: z.boolean().optional() })).optional(),
   log: z.array(logEntrySchema).optional(),
   // serverId: the campaign server's battle it was taken over from; xpAwarded: its experience granted once (phase 4a4, ADR 0016)
   battles: z.array(z.looseObject({ id: z.number(), serverId: z.string().optional(), xpAwarded: z.boolean().optional() })).optional(),
   casualties: z.array(casualtySchema).optional(),
   xp: z.array(z.looseObject({ id: z.number(), uid: z.number(), amount: z.number() })).optional(),
   snapshots: z.record(z.string(), z.unknown()).optional(),
-  postbattle: z.record(z.string(), z.unknown()).optional(),
+  postbattle: z.record(z.string(), z.looseObject({
+    done: z.record(z.string(), z.boolean()).optional(),
+    wyrd: z.unknown().optional(),
+    explore: z.looseObject({ rolled: z.looseObject({ value: z.array(z.number()), by: z.enum(['entered', 'app']) }), kept: z.array(z.number()), total: z.number(), shards: z.number(), location: z.string().nullable() }).optional(),
+    xp: z.looseObject({ underdog: z.number().optional(), scenario: z.array(z.looseObject({ uid: z.union([z.number(), z.string()]), amount: z.number(), reason: z.string() })).optional() }).optional(),
+    upkeep: z.looseObject({ paid: z.array(z.looseObject({ uid: z.string(), gc: z.number() })), dismissed: z.array(z.string()) }).optional(),
+    finds: z.array(z.looseObject({ id: z.number(), kind: z.enum(['gold', 'wyrd', 'item', 'exp', 'note']), source: z.string(), amount: z.number().optional(), item: z.string().optional(), qty: z.number().optional(), worth: z.number().optional(), uid: z.union([z.number(), z.string()]).optional(), text: z.string() })).optional(),
+  })).optional(),
   logSeq: z.number().optional(),
 });
 
@@ -145,7 +153,7 @@ export const warbandSaveSchema = z.looseObject({
   models: z.array(modelSchema),
   hired: z.array(hireRecordSchema).optional(),
   dp: z.array(hireRecordSchema).optional(),
-  stash: z.looseObject({ wyrd: num.optional(), gold: num.nullable().optional(), items: z.array(z.looseObject({ name: z.string(), qty: count, key: z.string().optional(), rare: z.boolean().optional(), paid: num.optional() })).optional() }).optional(),
+  stash: z.looseObject({ wyrd: num.optional(), gold: num.nullable().optional(), items: z.array(z.looseObject({ name: z.string(), qty: count, key: z.string().optional(), rare: z.boolean().optional(), paid: num.optional(), source: z.string().optional() })).optional() }).optional(),
   // a few settings; every campaign view reads them of every warband entered (independent review of INPUT-3)
   house: z.record(z.string(), z.unknown()).refine((v) => JSON.stringify(v).length <= 16_384, { message: 'at most 16 KB' }).optional(),
   campaign: campaignSchema.optional(),
@@ -163,7 +171,7 @@ export const warbandSaveSchema = z.looseObject({
   /** Plays Vanilla Mordheim: only the rulebook's items and skills (wish #167). */
   vanilla: z.boolean().optional(),
   /** The gold ledger (V7), from the warband's first battle on. */
-  ledger: z.array(z.looseObject({ id: z.number(), kind: z.enum(['open', 'roster', 'buy', 'sell', 'search', 'adjust']), amount: z.number(), text: z.string(), round: z.number().optional(), uid: z.union([z.number(), z.string()]).optional(), item: z.string().optional(), qty: z.number().optional(), found: z.boolean().optional() })).optional(),
+  ledger: z.array(z.looseObject({ id: z.number(), kind: z.enum(['open', 'roster', 'buy', 'sell', 'search', 'adjust']), amount: z.number(), text: z.string(), round: z.number().optional(), uid: z.union([z.number(), z.string()]).optional(), item: z.string().optional(), qty: z.number().optional(), found: z.boolean().optional(), source: z.string().optional() })).optional(),
 });
 
 export const campaignFileSchema = z.looseObject({
