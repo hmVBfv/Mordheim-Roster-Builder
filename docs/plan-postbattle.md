@@ -98,11 +98,11 @@ Schon vorhanden und weiterzuverwenden:
 | N3 | Schritt 1 Verletzungen: Übersicht | klein | N1, N2 | – |
 | N4 | Schritt 2 Erfahrung: Tabelle je Krieger, Underdog, Szenario | mittel | N0–N2 | – (entschieden) |
 | N5 | Schritt 3 Erkundung: Würfel, Splitter, Ort erkennen | mittel | N0–N2 | – |
-| N6 | Erkundung: Zusatzwürfel, Wiederholungen, ±1 | mittel | N5 | offene Frage 2 |
+| N6 | Erkundung: Zusatzwürfel, Wiederholungen, ±1 | mittel | N5 | – (Tabelle freigegeben) |
 | N7 | Erkundung: die 30 Orte als Daten und Rechner | groß | N5 | Liste der „dämonenartigen“ Warbands |
 | N8 | Erkundung: Orte in der Oberfläche, Funde verbuchen | groß | N7 | – |
-| N9 | Schritt 4 Wyrdstone: Preistabelle, Sonderregeln, Hauptbuch | mittel | N0–N2 | offene Frage 3 |
-| N10 | Sold der Hired Swords | mittel | N0–N2 | offene Frage 1 |
+| N9 | Schritt 4 Wyrdstone: Preistabelle, Sonderregeln, Hauptbuch | mittel | N0–N2 | – (entschieden) |
+| N10 | Sold der Hired Swords | mittel | N0–N2 | – (entschieden) |
 | N11 | Schritt 5 Veteranen im Schritt | klein | N2 | – |
 | N12 | Schritte 6–9: Übersichten und Rückweg | mittel | N2 | – |
 | N13 | Schritt 10: Bilanz der Runde, für alle lesbar | mittel | N4–N10 | – |
@@ -322,7 +322,7 @@ rücknehmbar; Changelog.
 
 ### N6 – Erkundung: Zusatzwürfel, Wiederholungen, ±1
 
-- [ ] erledigt · **Rob entscheidet** (offene Frage 2)
+- [ ] erledigt · Tabelle der Sonderregeln freigegeben (Rob, 14.11.2026; sie wird in N6 trotzdem noch einmal mit allen Fundstellen vorgelegt)
 
 **Ziel:** was Fertigkeiten, Ausrüstung und Hired Swords an der Erkundung
 ändern, steht als Daten da und wird angeboten – nicht erzwungen.
@@ -429,7 +429,7 @@ mit Gold, einer mit Gegenständen, bei 360 px.
 
 ### N9 – Schritt 4 Wyrdstone: Preistabelle, Hauptbuch
 
-- [ ] erledigt · **Rob entscheidet** (offene Frage 3)
+- [ ] erledigt · Sonderregeln entschieden (Abschnitt 5)
 
 **Regel:** `…/docs/tools#4-sell-wyrdstone`, `…/docs/campaigns/income#selling-wyrdstone`
 (einmal je Nachspiel; Preis für das ganze Los nach Größe der Warband).
@@ -443,7 +443,7 @@ nur als „Changed by hand“: eine eigene Buchung mit `source: 'wyrdstone'` –
 Verhalten für die alte App unverändert, sonst Eintrag in
 `docs/behaviour-changes.md`.
 
-**Sonderregeln des Verkaufs** (Fundstellen und Wortlaut: Abschnitt 5, nach
+**Sonderregeln beim Verkauf von Wyrdstone und Treasure** (Fundstellen und Wortlaut: Abschnitt 5, nach
 Robs Freigabe): Core `sellingSize(ctx)` → `{ models, band, adjustments[] }`
 mit den Anpassungen der Größe (Ogre zählt doppelt, Koch und *Victuals* eine
 Stufe kleiner – *Victuals* nur bei Treasure, je verbrauchtem Stück, stapelt
@@ -461,7 +461,7 @@ ist als Wyrdstone-Verkauf auswertbar; Changelog.
 
 ### N10 – Sold der Hired Swords
 
-- [ ] erledigt · **Rob entscheidet** (offene Frage 1)
+- [ ] erledigt · Platz entschieden: Unterpunkt nach Schritt 4
 
 **Regel:** `…/docs/campaigns/hired-swords#hire-fee`: nach jeder Schlacht, die er
 mitkämpft, **auch der ersten**, ist der Sold fällig, wenn er bleiben soll; ist
@@ -587,9 +587,9 @@ Diagramme der Statistik bekommen diese Reihen.
    N7 über ein **Merkmal** im Warband-Kopf, z. B. `demonic: true`, nicht über
    Namen im Code, und Rob die Liste vorlegen). „Skaven“ = `siteRace: "Skaven"`
    (Core, Pestilens, Moulder). Alles andere ist „anyone else“.
-3. **Wyrdstone-Verkauf, Sonderregeln:** geprüft, siehe unten.
+3. **Verkauf von Wyrdstone und Treasure, Sonderregeln:** geprüft, siehe unten. „Verkauf“ meint nie den von Einheiten; die Sonderregeln ändern nur, wie viele Modelle für die Spalte der Preistabelle zählen.
 
-### Sonderregeln für Erkundung und Verkauf (Fundstellen in `data/`, 13.11.2026)
+### Sonderregeln für Erkundung und den Verkauf von Wyrdstone und Treasure (Fundstellen in `data/`, 13.11.2026)
 
 Die Regeln wirken auf die **Größe der Warband** (Spalte der Preistabelle), auf
 den **Preis** oder auf die **Zahl der Splitter**. Heute rechnet nur
@@ -599,7 +599,7 @@ Regeln ist umgesetzt.
 | Wirkung | Quelle | Regel |
 | --- | --- | --- |
 | Größe +1 Modell je Ogre | Maneaters (`1c/maneaters.json`, Ability *Gluttony*) | „Each Ogre counts as two models when selling wyrdstone or treasure“, mindestens als eines; gefressene Gefangene senken die Zahl um 1 (Large: 2) |
-| Größe eine Stufe kleiner | Halflings, Koch (*Master Chef*, `2a/halflings.json`) | W6 5+: beim Verkauf von Treasure **oder Wyrdstone** gilt die Warband als eine Größe kleiner |
+| Größe eine Stufe kleiner | Halflings, Koch (*Master Chef*, `2a/halflings.json`) | W6 5+: beim Verkauf von Treasure **oder Wyrdstone** (nicht von Einheiten) gilt die Warband als eine Größe kleiner |
 | Größe eine Stufe kleiner | Gegenstand *Victuals* (8 gc, Common; `data/equipment.json`) | „after a battle when selling treasures: one size band smaller (never below 1–3 models). Any number may be used.“ – **nur Treasure**, nicht Wyrdstone (Rob, 14.11.2026). Regelwortlaut: „A warband may use as many victuals as they wish, but note that the warband size cannot be considered lower than 1-3 models.“ Jedes verbrauchte Stück senkt die Stufe um eine; Untergrenze 1–3 |
 | Größe: Mob = 1 Modell | Snotlings, Night Goblins (*Insignificant*, `abilities.json`, `nightgoblins.json`) | „counts as a single model for … maximum warband size and income“ |
 | Größe: Troll = 2 Modelle | Black Orcs (*Always Hungry*, `1b/blackorcs.json`) | 20 gc Sold nach jeder Schlacht **oder** der Troll zählt als 2 Mitglieder für nur 5 gc – wirkt auf die Größe |
@@ -610,7 +610,7 @@ Regeln ist umgesetzt.
 | Sold in Wyrdstone | Dramatis Personae (`dramatis.json`: Nicodemus 1 Splitter zum Anheuern und 1 nach jeder Schlacht; Luthor verliert bei W6 = 1 einen Splitter) | wirkt auf den **Stash** nach dem Verkauf, nicht auf den Preis |
 | Gold bedeutet etwas anderes | Sisters of Sigmar, Skaven, Undead (mordheimer, Income) | Regelwert der Währung, keine Rechenregel – nur Beschriftung („favour“, „warp tokens“) |
 
-Ergebnis: **ja, es gibt solche Regeln**, auch für den Verkauf. Sie gehören in
+Ergebnis: **ja, es gibt solche Regeln**, auch für den Verkauf von Wyrdstone und Treasure. Sie gehören in
 N9 (Preis und Größe) und N6 (Erkundung); Vorschlag: nach der Freigabe als
 Daten am Eintrag (`income: { sizeBand?: -1, models?: +1, perOgre?: … }`, über
 P11 `effects`, wenn es dann läuft), in der Oberfläche als **sichtbare Zeile
@@ -625,14 +625,15 @@ Größenstufe, die Regeln lassen mehrere Victuals ausdrücklich zu; nie unter
 Treasure, wie viele Victuals verbraucht werden (Stücke im Stash, werden
 abgezogen). Ein Vampir ist nicht Undead.
 
+Entschieden am 14.11.2026 (Rob) zu den letzten Fragen: **Sold** als
+Unterpunkt nach Schritt 4 (Dramatis Personae ebenso); die **Erkundungs-
+Sonderregeln** aus der Tabelle von N6 sind freigegeben; **Snotling- und
+Night-Goblin-Mobs** zählen auch bei der Spaltenwahl der Wyrdstone-Preistabelle
+und beim Treasure-Verkauf als **ein** Modell.
+
 ### Noch offen
 
-1. **Sold:** wo in der Folge? Vorschlag: Unterpunkt nach Schritt 4 (Geld ist
-   dann da), Dramatis Personae ebenso.
-2. **Erkundung, Sonderregeln:** die Tabelle aus N6 – freigeben oder ändern.
-3. **Verkaufs-Sonderregeln:** Snotlings/Night Goblins als *ein* Modell auch
-   beim Verkauf (Wortlaut „income“)?
-4. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
+1. **In der App gewürfelt:** reicht der Vermerk „rolled in the app“ im
    Protokoll, oder sollen App-Würfe für die anderen Mitglieder eigens
    sichtbar sein (z. B. in der Bilanz, N13)? Vorschlag: Vermerk in der Bilanz.
 
