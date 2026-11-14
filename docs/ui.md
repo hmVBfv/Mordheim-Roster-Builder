@@ -478,7 +478,7 @@ Wie viele Kämpfe ein Modell mitmachte, zählt seit Wunsch #166 die Warband (Abs
 
 **Zähler der Kämpfe (#166).** Wo die Kampagne die Kämpfe zählt, steht in „Experience“ eine Zeile „Battles fought“: Wer sie nicht
 ändern kann, sieht die Zahl, der Besitzer hat daneben − und +, um einen Stand nachzutragen, der vor dem Zähler begann. Gezählt wird
-im Schritt „Grant the battle's experience“ der Nachbereitung (`countBattle`, einmal je Kampf): +1 für jedes Modell, jede Gruppe und jeden
+im Schritt „Experience“ der Nachbereitung, mit „Grant and write onto the roster“ (`countBattle`, einmal je Kampf): +1 für jedes Modell, jede Gruppe und jeden
 Gekauften, der nicht aussetzt („Misses games“); wer in diesem Kampf fiel, steht schon bei den Gefallenen und bekommt ihn dort
 („Took part in N battles“). Eine Henchmen-Gruppe zählt als Ganzes, auch Männer, die später dazukamen.
 
@@ -692,3 +692,10 @@ Diese Liste steht auch in `CLAUDE.md`.
 - [ ] Hinweise versperren nichts (kurz, wegtippbar, Tipps gehen durch)
 - [ ] Am Desktop wird die Breite genutzt
 - [ ] Playwright-Screenshot des Bildschirms aktualisiert und angesehen
+
+**Erfahrung der Nachbereitung (N4, 14.11.2026).** Der Schritt „Experience“ zeigt eine Tabelle je Krieger: überlebt, Anführer des
+Siegers, Ausschaltungen, Underdog-Bonus, Szenario-Punkte (eigene Eingabe mit Grund, auch „Set for all“), Summe und Erfahrung vorher →
+nachher. Der Underdog-Bonus wird aus den beim Bestätigen eingefrorenen Ratings der Teilnehmer vorgeschlagen (`underdogOf`) und ist
+änderbar; fehlt ein Rating, steht eine Warnung und der Spieler trägt ihn ein. Ein Knopf, „Grant and write onto the roster“, vergibt und
+schreibt (`awardBattleXp` mit `underdog` und `scenario`, danach `applyBattleResults`); der Bonus und die Szenario-Punkte stehen danach
+in `campaign.postbattle[round].xp`.

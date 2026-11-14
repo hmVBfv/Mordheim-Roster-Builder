@@ -6,6 +6,7 @@ import { StashSection } from '../roster/StashSection.tsx';
 import * as core from '@mordheim/core';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { useAftermathBack } from '../aftermath/back.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { FallenList } from '../roster/Fallen.tsx';
@@ -255,10 +256,12 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const actsOf = (u: WarriorView | HireView): UnitActs => ('hero' in u ? warriorActs(u) : hireActs(u));
   const stash = locked ? (ctx.s.stash?.items ?? []).reduce((n, it) => n + (Number(it.qty) || 0), 0) : 0;
   const shareOn = FLAVOUR === 'campaign' && session.status === 'in';
+  const aftermath = useAftermathBack(rec.id);
 
   return (
     <section className={board.page}>
       <header className={board.head}>
+        {aftermath && <Link to={aftermath.to} className={ui.buttonQuiet}>{aftermath.label}</Link>}
         <div className={board.titleRow}>
           <h1>{v.name}</h1>
           <button type="button" className={ui.iconButton} aria-label="Rename the warband"
