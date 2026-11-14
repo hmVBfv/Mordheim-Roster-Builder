@@ -348,3 +348,46 @@
   min-height: var(--tap);
   text-align: center;
 }
+
+.recorded {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.recorded p {
+  margin: 0;
+}
+
+.dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.die {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+}
+
+.die input[type='text'] {
+  width: 3.5rem;
+  min-height: var(--tap);
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.dieNo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.keep {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+}

@@ -286,7 +286,7 @@ Underdog und Szenario; Changelog; `docs/ui.md` (Abschnitt bei Zeile 481).
 
 ### N5 – Schritt 3 Erkundung: Würfel, Splitter, Ort erkennen
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n5`)
 
 **Regel:** `…/docs/campaigns/income` (Exploration procedure, Rolling
 multiples): ein W6 je Held, der nicht ausgeschaltet wurde, einer mehr bei Sieg,

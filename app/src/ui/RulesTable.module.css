@@ -6,5 +6,5 @@
 .table thead th { background: var(--accent-soft, #8882); }
 .table tbody th { font-weight: 600; white-space: nowrap; }
 /* the row or column that is the warband's own */
-.mine { background: var(--accent, #8884); font-weight: 600; }
+.mine { background: var(--accent, #8884); color: var(--accent-ink, inherit); font-weight: 600; }
 .source { display: inline-flex; align-items: center; min-height: 44px; }

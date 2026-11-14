@@ -34,6 +34,8 @@ export interface AftermathView {
   rating: number;
   gold: number;
   /** What the experience step recorded for this round (the underdog bonus and the scenario's points), once it was granted. */
+  /** The exploration recorded for this round (N5), if any. */
+  exploreRecord: core.PostBattleState['explore'] | null;
   xpRecord: { underdog: number; scenario: { uid: number | string; amount: number; reason: string }[] } | null;
 }
 
@@ -92,6 +94,7 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
     },
     rating,
     gold: core.goldCurrent(ctx),
+    exploreRecord: pb.explore ?? null,
     xpRecord: (pb.xp ? { underdog: Number(pb.xp.underdog) || 0, scenario: pb.xp.scenario ?? [] } : null),
   };
 }

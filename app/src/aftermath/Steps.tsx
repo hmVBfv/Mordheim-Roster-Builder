@@ -9,6 +9,7 @@ import styles from './Aftermath.module.css';
 import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
 import { ExperienceStep } from './ExperienceStep.tsx';
+import { ExplorationStep } from './ExplorationStep.tsx';
 import type { UnderdogView } from './underdog.ts';
 import type { AftermathView, CasualtyView } from './view.ts';
 import { WyrdPrices } from './WyrdPrices.tsx';
@@ -74,21 +75,7 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
       </>
     );
     case 'experience': return <ExperienceStep a={a} data={data} acts={acts} underdog={acts.underdog} rosterLink={`${roster}${from}`} />;
-    case 'exploration': return (
-      <>
-        <p>
-          Roll <strong>{a.explore.capped}</strong> {a.explore.capped === 1 ? 'die' : 'dice'}: one for each Hero not taken out of action
-          {a.explore.searching.length ? ` (${a.explore.searching.join(', ')})` : ''}{a.explore.winDie ? ', one for the win' : ''}{a.explore.base > 6 ? ', six at most' : ''} – dice from skills and equipment come on top.
-          Total them and read the Exploration chart; doubles or better find a special location.
-        </p>
-        <div className={styles.stepper}>
-          <span>Wyrdstone in the stash</span>
-          <button type="button" className={ui.buttonQuiet} aria-label="One shard less" disabled={a.wyrd.shards <= 0} onClick={() => acts.edit((c) => core.stashAdjust(c, 'wyrd', -1))}>−</button>
-          <span aria-live="polite">{a.wyrd.shards}</span>
-          <button type="button" className={ui.buttonQuiet} aria-label="One shard more" onClick={() => acts.edit((c) => core.stashAdjust(c, 'wyrd', 1))}>+</button>
-        </div>
-      </>
-    );
+    case 'exploration': return <ExplorationStep a={a} data={data} acts={acts} />;
     case 'wyrdstone': {
       const n = Math.max(1, Math.min(a.wyrd.shards, sell || a.wyrd.shards));
       return (

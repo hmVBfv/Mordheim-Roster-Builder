@@ -1219,6 +1219,16 @@ test('after the battle: the leader closes it, the player takes it over, goes thr
   await expect(page.getByText('✓ Battle experience granted.')).toBeVisible();
   await page.getByRole('button', { name: 'Done – next step' }).click();
   // exploration: two shards found
+  // the dice: every die a 3 – the shards follow from the total, the roll is recorded and the shards are in the stash
+  for (const die of await page.getByRole('textbox', { name: /^Die \d+$/ }).all()) await die.fill('3');
+  await expect(page.getByText(/→ \d+ shards?\./).first()).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'aftermath-exploration');
+  await page.getByRole('button', { name: /^Record: \d+ shards? into the stash$/ }).click();
+  await expect(page.getByText('✓ Explored:')).toBeVisible();
+  // the shards of the roll go back, and the stash is corrected by hand to the two this test sells
+  await page.getByRole('button', { name: 'Take it back' }).click();
+  await page.getByText('Correct the stash by hand').click();
   await page.getByRole('button', { name: 'One shard more' }).click();
   await page.getByRole('button', { name: 'One shard more' }).click();
   await page.getByRole('button', { name: 'Done – next step' }).click();
