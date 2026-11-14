@@ -4,9 +4,10 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WarbandStatistics } from '../campaign/api.ts';
+import type { WarbandStatistics, WarbandWarriors } from '../campaign/api.ts';
 import { Compare } from './Compare.tsx';
 import { LineChart } from './LineChart.tsx';
+import { warriorSeries } from './WarriorStatistics.tsx';
 import { METRICS, fmt, latestOf, markLabel, metricOf, niceScale, seriesOf, toCsv, withBattles } from './metrics.ts';
 
 afterEach(() => cleanup());
@@ -144,5 +145,20 @@ describe('battles fought', () => {
     expect(a!.points.map((p) => p.metrics.battles)).toEqual([0, 1, 2]);
     expect(b!.points.map((p) => p.metrics.battles)).toEqual([0, 0]);
     expect(seriesOf(withBattles(STATS), 'battles').map((s) => s.points.at(-1)!.value)).toEqual([2, 0, 0]);
+  });
+});
+
+describe('warriors', () => {
+  const W: WarbandWarriors = {
+    warbandId: 'a', name: 'The Grey Penitents', active: true,
+    points: [
+      { round: 0, kind: 'start', at: '2026-10-01T10:00:00.000Z', warriors: [{ uid: 1, label: 'Brother Anselm', unit: 'Captain', hero: true, exp: 20 }, { uid: 2, label: 'Zealots', unit: 'Zealots', hero: false, exp: 0 }], fallen: [] },
+      { round: 1, kind: 'after_battle', at: '2026-10-05T10:00:00.000Z', warriors: [{ uid: 1, label: 'Brother Anselm', unit: 'Captain', hero: true, exp: 24 }], fallen: [{ unit: 'Zealots', count: 2 }] },
+    ],
+  };
+  it('one line for each roster entry over the marks it was on', () => {
+    const s = warriorSeries(W);
+    expect(s.map((x) => [x.name, x.points.map((p) => p.value)])).toEqual([['Brother Anselm', [20, 24]], ['Zealots', [0]]]);
+    expect(s[0]!.points.map((p) => p.label)).toEqual(['Start', 'After battle 1']);
   });
 });

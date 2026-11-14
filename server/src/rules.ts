@@ -2,7 +2,7 @@
    the binding totals and changes when a warband is marked (a tag). The
    data files are bundled in (build.mjs), so the image needs no data
    directory; they are read into game data on first use. */
-import { createGameData, ctxOf, isVanillaWarband as coreIsVanillaWarband, loadSave, postBattleSummary, stageMetrics, stageTotals, type GameData, type RawGameData, type StageTotals } from '@mordheim/core';
+import { createGameData, ctxOf, isVanillaWarband as coreIsVanillaWarband, loadSave, postBattleSummary, stageMetrics, stageTotals, warriorMetrics, type GameData, type RawGameData, type StageTotals } from '@mordheim/core';
 import races from '../../data/races.json' with { type: 'json' };
 import equipment from '../../data/equipment.json' with { type: 'json' };
 import skills from '../../data/skills.json' with { type: 'json' };
@@ -35,6 +35,12 @@ export function gameData(): GameData {
 export function metricsOf(save: unknown): unknown {
   const r = loadSave(gameData(), save);
   return r.ok ? stageMetrics(ctxOf(gameData(), r.state)) : null;
+}
+
+/** Experience per roster entry and the dead by unit of a stored save (P14, stage 4), or null when core cannot read it. */
+export function warriorsOf(save: unknown): unknown {
+  const r = loadSave(gameData(), save);
+  return r.ok ? warriorMetrics(ctxOf(gameData(), r.state)) : null;
 }
 
 /** The balance of a post-battle round of a stored save as core computes it (N13), or null when core cannot read it. */

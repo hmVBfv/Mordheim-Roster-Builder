@@ -367,6 +367,7 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id/catchup': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/catchup` }),
       'GET /api/v1/campaigns/:id/ratings': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/ratings` }),
       'GET /api/v1/campaigns/:id/statistics': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/statistics` }),
+      'GET /api/v1/campaigns/:id/statistics/warriors': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/statistics/warriors` }),
       'GET /api/v1/campaigns/:id/statistics/battles': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/statistics/battles` }),
       'GET /api/v1/campaigns/:id/chapters/:chid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/chapters/${c.chapterId}` }),
     },

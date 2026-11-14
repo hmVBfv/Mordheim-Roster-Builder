@@ -80,3 +80,23 @@ describe('stageMetrics with the post-battle record (N14)', () => {
     expect(core.stageMetrics(ctx(s))).toMatchObject({ incomeWyrd: 60, incomeLocations: 0, upkeepPaid: 0, lootValue: 0, income: 60 });
   });
 });
+
+describe('warriorMetrics', () => {
+  it('lists the experience of each roster entry and counts the dead by unit', () => {
+    const s = warband(); const hero = s.models.find((x) => core.isHeroModel(ctx(s), x))!;
+    const t = edit(s, (d) => {
+      d.models.find((x) => x.uid === hero.uid)!.exp = 12;
+      d.fallen = [{ kind: 'hero', m: { ...hero, exp: 5 } }, { kind: 'hero', m: { ...hero, exp: 9 } }];
+    });
+    const w = core.warriorMetrics(ctx(t));
+    expect(w.warriors.find((x) => x.uid === hero.uid)).toMatchObject({ exp: 12, hero: true });
+    expect(w.warriors.length).toBe(s.models.length);
+    expect(w.fallen).toEqual([{ unit: core.unitDef(ctx(t), hero.uid_def)!.name, count: 2 }]);
+  });
+
+  it('is empty for a warband without deaths and does not change the state', () => {
+    const s = warband(); const frozen = JSON.stringify(s);
+    expect(core.warriorMetrics(ctx(s)).fallen).toEqual([]);
+    expect(JSON.stringify(s)).toBe(frozen);
+  });
+});

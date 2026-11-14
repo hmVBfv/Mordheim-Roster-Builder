@@ -57,7 +57,7 @@ export interface FakeTotals { rating: number; spent: number; models: number; her
 export interface FakeChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
 export interface FakeTag {
   id: string; kind: 'start' | 'after_battle' | 'sat_out'; rev: number; round: number; battleId: string | null; totals: FakeTotals; createdBy: string; createdAt: string;
-  changes?: FakeChange[]; supersededBy?: string; /** The balance of the round, frozen with the mark (N13). */ summary?: unknown; /** The numbers for the statistics (P14). */ metrics?: unknown;
+  changes?: FakeChange[]; supersededBy?: string; /** The balance of the round, frozen with the mark (N13). */ summary?: unknown; /** The numbers for the statistics (P14). */ metrics?: unknown; /** Experience per warrior and the dead by unit at the mark (P14, stage 4). */ warriors?: unknown;
 }
 export interface FakeEnrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
@@ -134,7 +134,7 @@ const CODES = ['K7M2Q9XD', 'H4TR8WNP', 'Z3FB6YCM'];
 const NO_TOTALS: FakeTotals = { rating: 0, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 };
 
 export function createFakeSync(opts: {
-  me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; /** The balance of the round frozen with a mark (N13), as the server computes it from the marked version. */ summary?: (save: unknown, round: number) => unknown; /** The numbers of a mark for the statistics (P14), as the server computes them from the marked version. */ metrics?: (save: unknown) => unknown; wbName?: (wb: string) => string;
+  me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; /** The balance of the round frozen with a mark (N13), as the server computes it from the marked version. */ summary?: (save: unknown, round: number) => unknown; /** The numbers of a mark for the statistics (P14), as the server computes them from the marked version. */ metrics?: (save: unknown) => unknown; /** Experience per warrior and the dead by unit of a mark (P14, stage 4). */ warriors?: (save: unknown) => unknown; wbName?: (wb: string) => string;
   /** What changed between two saves, as the server's core finds and explains it. */
   changes?: (before: unknown, after: unknown, battle: { id: string; round: number }) => FakeChange[];
   districtName?: (id: string) => string;
@@ -1106,7 +1106,7 @@ export function createFakeSync(opts: {
       const before = [...(e.tags ?? [])].reverse().find((t) => !t.supersededBy && t.round < b.round);
       if (!before) return json(409, { error: 'no_start' });
       const changes = opts.changes?.(w.versions.find((q) => q.rev === before.rev)!.data, v.data, { id: b.id, round: b.round }) ?? [];
-      const tag: FakeTag = { id: `tag-${b.id}-${w.id}-${next()}`, kind: 'after_battle', rev: v.rev, round: b.round, battleId: b.id, totals: totalsOf(v.data), metrics: opts.metrics?.(v.data), summary: opts.summary ? opts.summary(v.data, b.round) : null, createdBy: me.displayName, createdAt: at(), changes };
+      const tag: FakeTag = { id: `tag-${b.id}-${w.id}-${next()}`, kind: 'after_battle', rev: v.rev, round: b.round, battleId: b.id, totals: totalsOf(v.data), metrics: opts.metrics?.(v.data), warriors: opts.warriors?.(v.data), summary: opts.summary ? opts.summary(v.data, b.round) : null, createdBy: me.displayName, createdAt: at(), changes };
       for (const t of e.tags ?? []) if (t.battleId === b.id && t.kind === 'after_battle' && !t.supersededBy) t.supersededBy = tag.id;
       e.tags = [...(e.tags ?? []), tag];
       e.tag = tag;
@@ -1183,7 +1183,7 @@ export function createFakeSync(opts: {
     e.fromRound = c.round;
     e.confirmedAt = at();
     const w = s.warbands.get(e.warbandId);
-    e.tag = { id: `tag-${e.id}`, kind: 'start', rev: w?.headRev ?? 1, round: c.round, battleId: null, totals: totalsOf(dataOf(e)), metrics: opts.metrics?.(dataOf(e)), createdBy: by, createdAt: at() };
+    e.tag = { id: `tag-${e.id}`, kind: 'start', rev: w?.headRev ?? 1, round: c.round, battleId: null, totals: totalsOf(dataOf(e)), metrics: opts.metrics?.(dataOf(e)), warriors: opts.warriors?.(dataOf(e)), createdBy: by, createdAt: at() };
     e.tags = [e.tag];
     if (w) w.seq = next();
   };
@@ -1282,6 +1282,14 @@ export function createFakeSync(opts: {
       })).filter((w) => w.points.length > 0).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
       return json(200, { statistics });
     }
+    // experience per warrior and the dead by unit at every mark (server/src/campaigns.ts campaignWarriorStats)
+    if (method === 'GET' && rest === '/statistics/warriors') {
+      const warbands = c.enrolments.map((e) => ({
+        warbandId: e.warbandId, name: saveWords(s.warbands.get(e.warbandId) ?? { versions: [{ rev: 1, data: e.data }], headRev: 1 } as unknown as FakeWarband).name || e.name, active: true,
+        points: [...(e.tags ?? [])].filter((t) => !t.supersededBy && t.warriors != null).sort((a, b) => a.round - b.round || a.createdAt.localeCompare(b.createdAt)).map((t) => ({ round: t.round, kind: t.kind, at: t.createdAt, ...(t.warriors as object) })),
+      })).filter((w) => w.points.length > 0).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      return json(200, { warbands });
+    }
     // the battles by warband for the statistics (server/src/campaigns.ts campaignBattleStats)
     if (method === 'GET' && rest === '/statistics/battles') {
       const name = (e: (typeof c.enrolments)[number]) => saveWords(s.warbands.get(e.warbandId) ?? { versions: [{ rev: 1, data: e.data }], headRev: 1 } as unknown as FakeWarband).name || e.name;
@@ -1350,7 +1358,7 @@ export function createFakeSync(opts: {
       const fought = new Set(battles.flatMap((b) => b.participants.map((p) => p.warbandId)));
       for (const e of c.enrolments.filter((q) => q.status === 'active' && !fought.has(q.warbandId))) {
         const w = s.warbands.get(e.warbandId);
-        const t: FakeTag = { id: `tag-sat-${e.id}-${nextRound}`, kind: 'sat_out', rev: w?.headRev ?? 1, round: nextRound, battleId: null, totals: totalsOf(dataOf(e)), metrics: opts.metrics?.(dataOf(e)), createdBy: me.displayName, createdAt: at() };
+        const t: FakeTag = { id: `tag-sat-${e.id}-${nextRound}`, kind: 'sat_out', rev: w?.headRev ?? 1, round: nextRound, battleId: null, totals: totalsOf(dataOf(e)), metrics: opts.metrics?.(dataOf(e)), warriors: opts.warriors?.(dataOf(e)), createdBy: me.displayName, createdAt: at() };
         e.tags = [...(e.tags ?? []), t];
         e.tag = t;
       }

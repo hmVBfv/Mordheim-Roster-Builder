@@ -5,6 +5,7 @@ import { Sparkline } from '../ui/Sparkline.tsx';
 import { saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
 import { Compare } from './Compare.tsx';
+import { WarriorStatistics } from './WarriorStatistics.tsx';
 import { BattleStatistics } from './BattleStatistics.tsx';
 import { LineChart } from './LineChart.tsx';
 import { GROUPS, METRICS, fmt, metricOf, seriesOf, toCsv } from './metrics.ts';
@@ -38,6 +39,7 @@ export function StatisticsTab({ id }: { id: string }) {
         ))}
       </div>
       <Compare list={list} />
+      <WarriorStatistics id={id} />
       <BattleStatistics id={id} />
       <p className={ui.muted}>Each number is as it stood at a mark: the start, after each battle, a round sat out. Latest: {series.map((s) => `${s.name} ${fmt(s.points.at(-1)!.value, metric.unit)}`).join(' · ')}.</p>
       <button type="button" className={`${ui.buttonQuiet} ${styles.export}`} onClick={() => saveFile('statistics.csv', toCsv(list), 'text/csv;charset=utf-8')}>Download all numbers (CSV)</button>

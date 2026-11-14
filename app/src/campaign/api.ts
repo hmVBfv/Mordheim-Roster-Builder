@@ -100,6 +100,10 @@ export interface WarbandRatings { warbandId: string; name: string; active: boole
 export type StatMetrics = Record<string, number>;
 export interface WarbandStatistics { warbandId: string; name: string; active: boolean; points: { round: number; kind: string; at: string; metrics: StatMetrics }[] }
 export const readStatistics = (id: string) => api<{ statistics: WarbandStatistics[] }>(`/campaigns/${id}/statistics`);
+/** Experience per roster entry and the dead by unit at each mark (server/src/campaigns.ts campaignWarriorStats). */
+export interface WarriorMark { round: number; kind: string; at: string; warriors: { uid: number; label: string; unit: string; hero: boolean; exp: number }[]; fallen: { unit: string; count: number }[] }
+export interface WarbandWarriors { warbandId: string; name: string; active: boolean; points: WarriorMark[] }
+export const readWarriorStats = (id: string) => api<{ warbands: WarbandWarriors[] }>(`/campaigns/${id}/statistics/warriors`);
 /** The battles by warband (server/src/campaigns.ts campaignBattleStats): how each ended for it, casualties dealt and taken, and who dealt the most. */
 export interface BattleStats { warbandId: string; name: string; active: boolean; battles: number; victory: number; defeat: number; draw: number; routed: number; inflicted: number; suffered: number }
 export interface Killer { warbandId: string; warband: string; name: string; count: number }

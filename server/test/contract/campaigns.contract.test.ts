@@ -3,7 +3,7 @@
    (that part is set up by each side its own way: `elsewhere`). */
 import { describe, expect, it } from 'vitest';
 import { startAccounts } from '../accounts-helpers.ts';
-import { gameData, metricsOf, totalsOf } from '../../src/rules.ts';
+import { gameData, metricsOf, totalsOf, warriorsOf } from '../../src/rules.ts';
 import { compare, fakeSide, serverSide, type Refs, type Step } from './driver.ts';
 
 const SAVE = { wb: 'merc', name: 'The Probes', models: [], format: 2 };
@@ -46,6 +46,7 @@ export const CAMPAIGN_STEPS: Step[] = [
   { name: 'catch up', url: '/campaigns/{c1}/catchup' },
   { name: 'ratings', url: '/campaigns/{c1}/ratings' },
   { name: 'statistics', url: '/campaigns/{c1}/statistics' },
+  { name: 'statistics by warrior', url: '/campaigns/{c1}/statistics/warriors' },
   { name: 'confirm what is confirmed', url: '/campaigns/{c1}/enrolments/{e1}/confirm', body: {} },
   { name: 'decline what is confirmed', url: '/campaigns/{c1}/enrolments/{e1}/decline', body: {} },
   { name: 'house rules', method: 'PUT', url: '/campaigns/{c1}/house-rules', body: { rules: {} } },
@@ -115,6 +116,7 @@ describe('contract: campaigns', () => {
     const fake = fakeSide({
       me: { id: 'u1', username: 'kai', displayName: 'Kai' },
       metrics: (save) => metricsOf(save),
+      warriors: (save) => warriorsOf(save),
       totals: (save) => { const t = totalsOf(save); return { rating: t?.rating ?? 0, spent: t?.spent ?? 0, models: t?.models ?? 0, heroes: t?.heroes ?? 0, gold: t?.gold ?? 0, fallen: t?.fallen ?? 0 }; },
       wbName: (wb) => (gameData().WARBANDS as Record<string, { name?: string }>)[wb]?.name ?? wb,
     }, fakeRefs, (f, _step, r) => {
