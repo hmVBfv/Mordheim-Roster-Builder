@@ -158,6 +158,12 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   Merchant ein. `sellWyrdstone(ctx, round, shards, { size?, adjust? })` bucht mit geführtem Kassenbuch eine Buchung `adjust` mit
   `source: 'wyrdstone'`, hält `wyrd: { …, band?, adjust? }` und einen Fund mit Herkunft `wyrdstone` fest; `undoWyrdstoneSale` macht alles
   rückgängig. Ohne Optionen verkauft es wie die alte App.
+
+  **Sold (N10):** `upkeepDue(ctx, round)` listet je Hired Sword und Dramatis Persona den Sold (`hsUpkeepFor`, `DRAMATIS[key].upkeep`,
+  dazu `upkeepNote`, wenn er nicht in Gold bezahlt wird). `payUpkeep(ctx, round, uids, { free? })` nimmt das Gold (mit Kassenbuch eine
+  Buchung mit `source: 'upkeep'`) und hält `upkeep.paid: [{ uid, gc }]` und je einen Fund mit Herkunft `upkeep` fest (`amount` negativ);
+  `undoUpkeep` gibt es zurück; `dismissUpkeep` schickt einen Söldner weg (`dismissHire`) und hält `upkeep.dismissed` fest. Ein zu
+  kleiner Schatz ist keine Sperre: `upkeepProblem` warnt.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist

@@ -9,6 +9,7 @@ import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
 import { ExperienceStep } from './ExperienceStep.tsx';
 import { ExplorationStep } from './ExplorationStep.tsx';
+import { UpkeepSection } from './UpkeepSection.tsx';
 import { WyrdStep } from './WyrdStep.tsx';
 import type { UnderdogView } from './underdog.ts';
 import type { AftermathView, CasualtyView } from './view.ts';
@@ -75,7 +76,7 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
     );
     case 'experience': return <ExperienceStep a={a} data={data} acts={acts} underdog={acts.underdog} rosterLink={`${roster}${from}`} />;
     case 'exploration': return <ExplorationStep a={a} data={data} acts={acts} />;
-    case 'wyrdstone': return <WyrdStep a={a} data={data} acts={acts} />;
+    case 'wyrdstone': return <><WyrdStep a={a} data={data} acts={acts} /><UpkeepSection a={a} acts={acts} /></>;
     case 'veterans': return <Go text="Roll 2D6: new recruits may bring experience up to that total between them." links={[[`${roster}/hire${from}`, 'Hire']]} />;
     case 'rare': return <Go text="A Hero not taken out of action may look for one rare item: 2D6 against its rarity. What he finds is bought at the Trading Post." links={[[`${roster}/trade${from}`, 'Trading Post']]} />;
     case 'dramatis': return <Go text="A Dramatis Persona may be found, if the warband may hire one and can pay." links={[[`${roster}/hire${from}`, 'Hire']]} />;
