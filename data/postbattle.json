@@ -64,5 +64,1706 @@
   ["4 4 4 4 4 4", "Slaughtered warband", "3D6×5 gc and D6 daggers, and roll for each: D3 light armour 4+ · heavy armour 5+ · Mordheim map 4+ · D3 halberds 5+ · D3 swords 3+ · D3 shields 2+ · D3 bows 4+ · D3 helmets 2+."],
   ["5 5 5 5 5 5", "Fighting arena", "A training manual: sell it for 100 gc, or a Hero studies it — Combat skills from now on, and his WS may rise one point above its racial maximum."],
   ["6 6 6 6 6 6", "Noble's villa", "D6: 1–2 D6×10 gc · 3–4 D6 vials of Crimson Shade · 5–6 a magical artefact."]
+ ],
+ "PB_UNDERDOG": [
+  [0, 50, 0],
+  [51, 75, 1],
+  [76, 100, 2],
+  [101, 150, 3],
+  [151, 300, 4],
+  [301, null, 5]
+ ],
+ "PB_SEQUENCE": [
+  ["injuries", "Every warrior taken out of action rolls on the Serious Injuries chart: Heroes a D66, Henchmen a D6."],
+  ["experience", "Heroes and Henchmen groups gain experience for the battle, with the underdog bonus; then any advance rolls."],
+  ["exploration", "One D6 for each Hero not taken out of action, one more for a win; the total gives the shards found, doubles or better an unusual location."],
+  ["wyrdstone", "Sell wyrdstone once per sequence; the price is for the whole lot and depends on the size of the warband."],
+  ["veterans", "Roll 2D6: the experience of the veterans available for hire this round."],
+  ["rare", "A Hero not taken out of action may look for one rare item (2D6 against its rarity); what he finds goes into the stash."],
+  ["dramatis", "Look for a Dramatis Persona if you want to hire one."],
+  ["recruits", "Hire new recruits with their free dagger and buy common items, in any order and as often as you like."],
+  ["equipment", "Swap equipment between models as you wish, provided they may use it."],
+  ["rating", "Update the warband rating. You are ready to fight again."]
+ ],
+ "PB_EXPLORE_RULES": [
+  {
+   "id": "wyrdstonehunter",
+   "name": "Wyrdstone Hunter",
+   "from": {
+    "skill": "Wyrdstone Hunter"
+   },
+   "reroll": 1,
+   "text": "Re-roll one die on the Exploration chart (second result stands).",
+   "src": "skills.json, Academic skills",
+   "match": [
+    "re-roll one die on the exploration chart"
+   ]
+  },
+  {
+   "id": "resourcehunter",
+   "name": "Resource Hunter",
+   "from": {
+    "skill": "Resource Hunter"
+   },
+   "adjust": 1,
+   "text": "When rolling on the Exploration chart at the end of a game, the Hero may modify one dice by +1/−1.",
+   "src": "skills of the Dwarf and Black Dwarf Heroes",
+   "match": [
+    "at the end of a game, he may modify one dice by",
+    "at the end of a game, the hero may modify one dice by"
+   ]
+  },
+  {
+   "id": "seeker",
+   "name": "Seeker",
+   "from": {
+    "skill": "Seeker"
+   },
+   "adjust": 1,
+   "text": "He may modify the result of one exploration die by +/- 1 (Wood Elf; only one Elven Hero may have this skill).",
+   "src": "skills of the Wood Elf Heroes",
+   "match": [
+    "he may modify the result of one exploration die by"
+   ]
+  },
+  {
+   "id": "compass",
+   "name": "Compass",
+   "from": {
+    "item": "Compass"
+   },
+   "reroll": 6,
+   "text": "The warband may re-roll the dice when rolling on the Exploration chart (must accept the second result).",
+   "src": "equipment.json, Compass",
+   "match": [
+    "may re-roll the dice when rolling on the exploration chart"
+   ]
+  },
+  {
+   "id": "treasuremap",
+   "name": "Treasure Map",
+   "from": {
+    "item": "Treasure Map"
+   },
+   "dice": 1,
+   "text": "One use. Grants the warband a large bonus in the Exploration phase (roll an extra die and add it), then the map is spent.",
+   "src": "equipment.json, Treasure Map",
+   "match": [
+    "grants the warband a large bonus in the exploration phase"
+   ]
+  },
+  {
+   "id": "nehekharanmap",
+   "name": "Map of Nehekhara",
+   "from": {
+    "item": "Map of Nehekhara"
+   },
+   "dice": 1,
+   "reroll": 1,
+   "text": "Grants +1 die in the Exploration phase and lets the warband re-roll one Exploration die per game.",
+   "src": "equipment.json, Map of Nehekhara",
+   "match": [
+    "grants +1 die in the exploration phase"
+   ]
+  },
+  {
+   "id": "warpstoneamulet",
+   "name": "Warpstone Amulet",
+   "from": {
+    "item": "Warpstone Amulet"
+   },
+   "reroll": 1,
+   "needs": "notOOA",
+   "text": "Re-roll a single die when searching for wyrdstone, if not out of action at game end.",
+   "src": "equipment.json, Warpstone Amulet",
+   "match": [
+    "a single die when searching for wyrdstone"
+   ]
+  },
+  {
+   "id": "tarot",
+   "name": "Tarot cards",
+   "from": {
+    "item": "Tarot cards"
+   },
+   "adjust": 1,
+   "text": "Before each game the Hero takes a Leadership test. Passed: change one exploration die by 1 up or down (even if he goes out of action).",
+   "src": "equipment.json, Tarot cards",
+   "match": [
+    "change one exploration die by 1 up or down"
+   ]
+  },
+  {
+   "id": "pendulum",
+   "name": "Wyrdstone pendulum",
+   "from": {
+    "item": "Wyrdstone pendulum"
+   },
+   "reroll": 1,
+   "needs": "notOOA",
+   "text": "If the Hero was not taken out of action, he tests Leadership after the battle: passed — re-roll one die in the exploration phase (that die may not be re-rolled again).",
+   "src": "equipment.json, Wyrdstone pendulum",
+   "match": [
+    "re-roll one die in the exploration phase (that die may not"
+   ]
+  },
+  {
+   "id": "elfranger",
+   "name": "Elf Ranger",
+   "from": {
+    "hs": "elfranger"
+   },
+   "adjust": 1,
+   "text": "When rolling on the Exploration chart he lets you modify one dice roll by -1/+1.",
+   "src": "hiredswords.json, Elf Ranger (Seeker)",
+   "match": [
+    "when rolling on the exploration chart he lets you modify one dice roll"
+   ]
+  },
+  {
+   "id": "kislevranger",
+   "name": "Kislevite Ranger",
+   "from": {
+    "hs": "kislevranger"
+   },
+   "adjust": 1,
+   "needs": "notOOA",
+   "text": "If she did not go out of action she may modify one Exploration die by +/-1.",
+   "src": "hiredswords.json, Kislevite Ranger (Seeker)",
+   "match": [
+    "she may modify one exploration die by"
+   ]
+  },
+  {
+   "id": "dwarfpathfinder",
+   "name": "Dwarf Pathfinder",
+   "from": {
+    "hs": "dwarfpathfinder"
+   },
+   "dice": 1,
+   "drop": 1,
+   "text": "A warband with a Dwarf Pathfinder may roll one MORE dice than normal in the Exploration phase and discard one die of the player's choice.",
+   "src": "hiredswords.json, Dwarf Pathfinder (Explorer)",
+   "match": [
+    "roll one more dice than normal in the exploration phase"
+   ]
+  },
+  {
+   "id": "pathfinder",
+   "name": "Pathfinder",
+   "from": {
+    "hs": "pathfinder"
+   },
+   "reroll": 1,
+   "needs": "notOOA",
+   "text": "If he was not taken out of action you may re-roll one Exploration die.",
+   "src": "hiredswords.json, Pathfinder (Knowledge of Myths and Legends)",
+   "match": [
+    "you may re-roll one exploration die, keeping"
+   ]
+  },
+  {
+   "id": "tombrobber",
+   "name": "Tomb Robber",
+   "from": {
+    "hs": "tombrobber"
+   },
+   "adjust": 1,
+   "text": "He allows the warband to modify a single Exploration die by -1/+1.",
+   "src": "hiredswords.json, Tomb Robber (Explorer)",
+   "match": [
+    "allows the warband to modify a single exploration die"
+   ]
+  },
+  {
+   "id": "beggar",
+   "name": "Beggar",
+   "from": {
+    "hs": "beggar"
+   },
+   "dice": 1,
+   "needs": "notOOA",
+   "text": "At the end of each battle in which he was not put out of action, he adds an EXTRA Exploration die to your pool.",
+   "src": "hiredswords.json, Beggar (Scrounge)",
+   "match": [
+    "adds an extra exploration die to your pool"
+   ]
+  },
+  {
+   "id": "imperialtactician",
+   "name": "Imperial Tactician",
+   "from": {
+    "hs": "imperialtactician"
+   },
+   "reroll": 1,
+   "text": "The warband may re-roll one Exploration die.",
+   "src": "hiredswords.json, Imperial Tactician",
+   "match": [
+    "the warband may re-roll one exploration die."
+   ]
+  },
+  {
+   "id": "execsquare",
+   "name": "Executioner's Square",
+   "from": {
+    "district": "execsquare",
+    "tier": "control"
+   },
+   "dice": 1,
+   "text": "Roll one extra dice in the Exploration Procedure.",
+   "src": "campaign.json, Executioner's Square",
+   "match": [
+    "roll one extra dice in the exploration procedure"
+   ]
+  },
+  {
+   "id": "poorquarter",
+   "name": "Poor Quarter",
+   "from": {
+    "district": "poorquarter",
+    "tier": "control"
+   },
+   "dice": 1,
+   "text": "Roll one extra dice in the Exploration Procedure.",
+   "src": "campaign.json, Poor Quarter",
+   "match": [
+    "roll one extra dice in the exploration procedure"
+   ]
+  },
+  {
+   "id": "cityhall",
+   "name": "City Hall",
+   "from": {
+    "district": "cityhall",
+    "tier": "foothold"
+   },
+   "adjust": 1,
+   "text": "During the Exploration Procedure, you may modify one dice by +1 or -1.",
+   "src": "campaign.json, City Hall",
+   "match": [
+    "during the exploration procedure, you may modify one dice by"
+   ]
+  }
+ ],
+ "PB_EXPLORE_EXCEPTIONS": [
+  [
+   "details in the unit text",
+   "Scout: only says it helps in the exploration phase; the details are in each unit's text"
+  ],
+  [
+   "roll two dice for her in the exploration phase",
+   "Augur (Sisters of Sigmar): two dice for one, pick either – tied to the unit; modelled with the unit effects (P11)"
+  ],
+  [
+   "roll two dice for exploration and pick one",
+   "Mountain Guide and the Maneaters' Ranger: two dice for one, pick one – tied to the unit (P11)"
+  ],
+  [
+   "exploration (hochland poacher)",
+   "Hochland Poacher: the line of the ability (P11)"
+  ],
+  [
+   "for each poacher who took part",
+   "Trailblazers: one re-roll for each Poacher who took part – a count of units (P11)"
+  ],
+  [
+   "reroll one d6 in the exploration phase for each poacher",
+   "Hochland Poacher: same as Trailblazers (P11)"
+  ],
+  [
+   "choose which two of the dice to keep",
+   "Chronicler (Twisted Scholar): a second rule on top of the six-dice rule (P11)"
+  ],
+  [
+   "choose which two dice to keep",
+   "Chronicler (Cavalcade): same as above (P11)"
+  ],
+  [
+   "maximum amount of gold or equipment at a location",
+   "districts: a rule of the places found (N7, N8)"
+  ],
+  [
+   "may change a found location to the pit",
+   "the district of the Pit: a rule of the places found (N7, N8)"
+  ],
+  [
+   "mordheim guide",
+   "Luthor the Looter: his own die and consultation (a Dramatis Persona's own roll)"
+  ],
+  [
+   "re-roll one exploration die; search for a rare item",
+   "Aksho Akhash: one of two things, chosen after the battle (a Dramatis Persona's own choice)"
+  ],
+  [
+   "re-roll one die in the next exploration",
+   "Mordheim map: a D6 table when it is bought, not a fixed allowance"
+  ],
+  [
+   "one die in the exploration phase instead",
+   "Rabbit's foot: only 'if it was not used' in the battle – a roll the app does not see"
+  ],
+  [
+   "real map (one extra exploration dice)",
+   "Dwarf Treasure Hunter: a D6 table of its own on his hunt for a map"
+  ],
+  [
+   "in the exploration phase, if not taken out of action, he loots",
+   "Grave Robber: a 2D6 table of its own"
+  ],
+  [
+   "add +3 to the total of the wyrdstone dice roll",
+   "Goblin Lantern Bearer: changes the total, not the dice – needs an effect of its own (P11)"
+  ],
+  [
+   "counts as possessed for exploration/injuries",
+   "Carnival: a warband rule about which table applies (N7)"
+  ],
+  [
+   "add +1 to the number of pieces found for a dwarf warband",
+   "Dwarf warbands: +1 to the shards found, not a die – an effect of its own (P11)"
+  ],
+  [
+   "+1 die in the exploration phase, in every campaign setting",
+   "Tomb Guardians: a warband rule, an extra die (P11, effects)"
+  ],
+  [
+   "did not search for rare items in the last exploration phase",
+   "Restless Dead skill: a bonus to casting, not to the exploration"
+  ],
+  [
+   "during the exploration phase when checking for artifacts",
+   "Dark Elves (Fey Acuity): +1 to the pieces found while a hero searches (P11)"
+  ],
+  [
+   "taken out of action in the exploration phase",
+   "Grave Robbers (Grave Goods): gold for each enemy taken out of action – not the roll"
+  ],
+  [
+   "does not add an exploration dice",
+   "Ogre Hunter: he adds no die (a limit, P11)"
+  ],
+  [
+   "do not gain exploration dice",
+   "Slayer Cult: no dice after a defeat (a limit, P11)"
+  ],
+  [
+   "always roll an additional one exploration dice",
+   "Snotlings: a warband rule, an extra die (P11, effects)"
+  ],
+  [
+   "modify a single exploration dice by +/- 1",
+   "Strigoi Seer: a unit special (P11, effects)"
+  ],
+  [
+   "extra piece of wyrdstone",
+   "Strigoi skill Light Fingers: a shard for a Hero who takes an enemy out of action – not the roll (N9)"
+  ],
+  [
+   "roll one additional d6 during the exploration phase",
+   "Pathfinder: a unit special, one per warband (P11, effects)"
+  ]
+ ],
+ "PB_LOCATION_RULES": {
+  "1 1": [
+   {
+    "q": "hero",
+    "as": "h",
+    "label": "Which Hero searches the well?"
+   },
+   {
+    "q": "pass",
+    "label": "Roll a D6: is it equal to or lower than his Toughness?",
+    "pass": [
+     {
+      "do": [
+       {
+        "wyrd": 1
+       }
+      ]
+     }
+    ],
+    "fail": [
+     {
+      "do": [
+       {
+        "miss": "h",
+        "text": "swallowed tainted water: misses the next game"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "2 2": [
+   {
+    "do": [
+     {
+      "gold": "D6",
+      "as": "loot",
+      "text": "Loot of the ransacked shop"
+     }
+    ]
+   },
+   {
+    "if": {
+     "as": "loot",
+     "eq": 1
+    },
+    "do": [
+     {
+      "item": "Lucky charm",
+      "qty": 1,
+      "text": "A Lucky Charm among the rubble"
+     }
+    ]
+   }
+  ],
+  "3 3": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1,
+       2
+      ],
+      "do": [
+       {
+        "gold": "D6",
+        "text": "Coins on the corpse"
+       }
+      ]
+     },
+     {
+      "on": [
+       3
+      ],
+      "do": [
+       {
+        "item": "Dagger",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       4
+      ],
+      "do": [
+       {
+        "item": "Axe",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "item": "Sword",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "item": "Light armour",
+        "qty": 1
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "4 4": [
+   {
+    "by": "warband",
+    "skaven": [
+     {
+      "do": [
+       {
+        "gold": "2D6",
+        "text": "Sold the straggler to Clan Eshin"
+       }
+      ]
+     }
+    ],
+    "possessed": [
+     {
+      "do": [
+       {
+        "xp": 1,
+        "to": "leader",
+        "text": "Sacrificed the straggler"
+       }
+      ]
+     }
+    ],
+    "undead": [
+     {
+      "do": [
+       {
+        "note": "The man is killed: a Zombie joins the warband at no cost (add it on the roster)."
+       }
+      ]
+     }
+    ],
+    "else": [
+     {
+      "do": [
+       {
+        "perk": "straggler",
+        "text": "Insight into the city: next time you roll on the Exploration chart, roll one die more and discard any one die.",
+        "explore": {
+         "dice": 1,
+         "drop": 1
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "5 5": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1,
+       2
+      ],
+      "do": [
+       {
+        "item": "Mordheim map",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       3,
+       4
+      ],
+      "do": [
+       {
+        "gold": "2D6",
+        "text": "A purse"
+       }
+      ]
+     },
+     {
+      "on": [
+       5,
+       6
+      ],
+      "do": [
+       {
+        "item": "Sword",
+        "qty": 1,
+        "worthMult": 2,
+        "text": "Jewelled sword (worth twice a normal one)"
+       },
+       {
+        "item": "Dagger",
+        "qty": 1,
+        "worthMult": 2,
+        "text": "Jewelled dagger (worth twice a normal one)"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "6 6": [
+   {
+    "do": [
+     {
+      "gold": "D6",
+      "text": "Loot amidst the ruins"
+     }
+    ]
+   }
+  ],
+  "1 1 1": [
+   {
+    "q": "pass",
+    "label": "The leader takes a Leadership test: passed?",
+    "auto": [
+     "undead",
+     "witchhunters",
+     "sisters"
+    ],
+    "pass": [
+     {
+      "do": [
+       {
+        "gold": "4D6",
+        "text": "Wines and ales sold"
+       }
+      ]
+     }
+    ],
+    "fail": [
+     {
+      "do": [
+       {
+        "gold": "D6",
+        "text": "Alcohol left when the men reach the encampment"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "2 2 2": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1
+      ],
+      "do": [
+       {
+        "item": "Sword",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       2
+      ],
+      "do": [
+       {
+        "item": "Double-handed weapon",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       3
+      ],
+      "do": [
+       {
+        "item": "Flail",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       4
+      ],
+      "do": [
+       {
+        "item": "Halberd",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "item": "Lance",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "gold": "2D6",
+        "text": "Metal, added to the treasury"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "3 3 3": [
+   {
+    "by": "warband",
+    "possessed": [
+     {
+      "do": [
+       {
+        "xp": "D3",
+        "to": "heroes",
+        "text": "Sacrificed the prisoners (distributed among the Heroes)"
+       }
+      ]
+     }
+    ],
+    "undead": [
+     {
+      "do": [
+       {
+        "note": "The prisoners are killed: D3 Zombies join at no cost (add them on the roster)."
+       }
+      ]
+     }
+    ],
+    "skaven": [
+     {
+      "do": [
+       {
+        "gold": "3D6",
+        "text": "Prisoners sold into slavery"
+       }
+      ]
+     }
+    ],
+    "else": [
+     {
+      "do": [
+       {
+        "gold": "2D6",
+        "text": "Reward for escorting the prisoners out of the city"
+       },
+       {
+        "note": "One of the prisoners wishes to join: you may add a new Henchman to a human Henchman group if you can pay for his weapons and armour."
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "4 4 4": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1,
+       2
+      ],
+      "do": [
+       {
+        "item": "Short bow",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       3
+      ],
+      "do": [
+       {
+        "item": "Bow",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       4
+      ],
+      "do": [
+       {
+        "item": "Long bow",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "item": "Hunting arrows",
+        "qty": 1,
+        "text": "Quiver of hunting arrows"
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "item": "Crossbow",
+        "qty": "D3"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "5 5 5": [
+   {
+    "do": [
+     {
+      "gold": "2D6",
+      "text": "Several items from the market hall"
+     }
+    ]
+   }
+  ],
+  "6 6 6": [
+   {
+    "do": [
+     {
+      "perk": "favour",
+      "text": "Any one Hired Sword (available to your warband) fights the next battle for you free of charge; after it he leaves, or you pay his upkeep as normal."
+     }
+    ]
+   }
+  ],
+  "1 1 1 1": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1
+      ],
+      "do": [
+       {
+        "item": "Blunderbuss",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       2
+      ],
+      "do": [
+       {
+        "item": "Pistol",
+        "qty": 2,
+        "text": "Brace of pistols"
+       }
+      ]
+     },
+     {
+      "on": [
+       3
+      ],
+      "do": [
+       {
+        "item": "Duelling pistol",
+        "qty": 2,
+        "text": "Brace of duelling pistols"
+       }
+      ]
+     },
+     {
+      "on": [
+       4
+      ],
+      "do": [
+       {
+        "item": "Handgun",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "item": "Superior blackpowder",
+        "qty": "D3",
+        "text": "Flasks of superior blackpowder"
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "item": "Hunting rifle (Hochland long rifle)",
+        "qty": 1
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "2 2 2 2": [
+   {
+    "do": [
+     {
+      "gold": "3D6",
+      "text": "Loot from the shrine"
+     }
+    ]
+   },
+   {
+    "by": "warband",
+    "sisters": [
+     {
+      "do": [
+       {
+        "perk": "blessed-weapon",
+        "text": "One weapon (your choice) is blessed: it always wounds Undead and Possessed models on a 2+."
+       }
+      ]
+     }
+    ],
+    "witchhunters": [
+     {
+      "do": [
+       {
+        "perk": "blessed-weapon",
+        "text": "One weapon (your choice) is blessed: it always wounds Undead and Possessed models on a 2+."
+       }
+      ]
+     }
+    ],
+    "else": []
+   }
+  ],
+  "3 3 3 3": [
+   {
+    "do": [
+     {
+      "gold": "3D6",
+      "text": "Loot from the townhouse"
+     }
+    ]
+   }
+  ],
+  "4 4 4 4": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1,
+       2
+      ],
+      "do": [
+       {
+        "item": [
+         "Shield",
+         "Buckler"
+        ],
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       3
+      ],
+      "do": [
+       {
+        "item": "Helmet",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       4
+      ],
+      "do": [
+       {
+        "item": "Light armour",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "item": "Heavy armour",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "item": "Ithilmar armour",
+        "qty": 1
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "5 5 5 5": [
+   {
+    "by": "warband",
+    "witchhunters": [
+     {
+      "do": [
+       {
+        "xp": "D6",
+        "to": "heroes",
+        "text": "Sealed the graves (distributed among the Heroes)"
+       }
+      ]
+     }
+    ],
+    "sisters": [
+     {
+      "do": [
+       {
+        "xp": "D6",
+        "to": "heroes",
+        "text": "Sealed the graves (distributed among the Heroes)"
+       }
+      ]
+     }
+    ],
+    "else": [
+     {
+      "do": [
+       {
+        "gold": "D6*10",
+        "text": "Loot from the crypts and graves"
+       },
+       {
+        "perk": "graveyard-hate",
+        "text": "The next time you play against Sisters of Sigmar or Witch Hunters, the whole enemy warband hates all the models of your warband. Note it on the roster."
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "6 6 6 6": [
+   {
+    "do": [
+     {
+      "perk": "catacombs-battle",
+      "text": "In the next battle position up to three fighters (not Rat Ogres or the Possessed) anywhere at ground level; they are set up at the end of your first turn, more than 8\" from any enemy."
+     }
+    ]
+   }
+  ],
+  "1 1 1 1 1": [
+   {
+    "do": [
+     {
+      "gold": "D6*10",
+      "text": "Found in the Moneylender's house"
+     }
+    ]
+   }
+  ],
+  "2 2 2 2 2": [
+   {
+    "do": [
+     {
+      "gold": "3D6",
+      "text": "Loot from the laboratory"
+     }
+    ]
+   },
+   {
+    "q": "hero",
+    "as": "h",
+    "label": "Which Hero studies the notebook?",
+    "optional": true
+   },
+   {
+    "if": {
+     "as": "h",
+     "set": true
+    },
+    "do": [
+     {
+      "perk": "alchemist-notebook",
+      "hero": "h",
+      "text": "He may choose Academic skills whenever he gains a new skill, in addition to those normally available to him."
+     }
+    ]
+   }
+  ],
+  "3 3 3 3 3": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1,
+       2
+      ],
+      "do": [
+       {
+        "gem": "Quartz stones",
+        "value": "D6*5",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       3,
+       4
+      ],
+      "do": [
+       {
+        "gem": "Amethyst",
+        "value": 20,
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "gem": "Necklace",
+        "value": 50,
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "gem": "Ruby",
+        "value": "D6*15",
+        "qty": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "do": [
+     {
+      "note": "If the warband does not sell the gems, one Hero may keep them: +1 to the rolls for locating rare items."
+     }
+    ]
+   }
+  ],
+  "4 4 4 4 4": [
+   {
+    "q": "roll",
+    "expr": "2D6",
+    "dice": true,
+    "as": "r",
+    "label": "Roll 2D6 for the valuables (each die, in order)"
+   },
+   {
+    "if": {
+     "as": "r",
+     "double": true
+    },
+    "do": [
+     {
+      "perk": "freetrader",
+      "text": "Instead of money: the symbol of the Order of Freetraders. A Hero who has it gains the Haggle skill."
+     }
+    ],
+    "else": [
+     {
+      "do": [
+       {
+        "gold": "r*5",
+        "text": "Valuables sold"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "5 5 5 5 5": [
+   {
+    "do": [
+     {
+      "wyrd": "D3"
+     }
+    ]
+   },
+   {
+    "q": "pass",
+    "label": "Leadership test against the leader's Leadership: passed?",
+    "pass": [
+     {
+      "do": [
+       {
+        "note": "A wardog that guarded the building joins the warband (add it on the roster)."
+       }
+      ]
+     }
+    ],
+    "fail": []
+   }
+  ],
+  "6 6 6 6 6": [
+   {
+    "do": [
+     {
+      "perk": "catacombs-entrance",
+      "unique": true,
+      "text": "From now on you may re-roll one die when you roll on the Exploration chart. Further entrances do not add re-rolls.",
+      "explore": {
+       "reroll": 1
+      }
+     }
+    ]
+   }
+  ],
+  "1 1 1 1 1 1": [
+   {
+    "q": "hero",
+    "as": "h",
+    "label": "Which Hero do you send to search the Pit?",
+    "optional": true
+   },
+   {
+    "if": {
+     "as": "h",
+     "set": true
+    },
+    "do": [],
+    "then": [
+     {
+      "q": "roll",
+      "expr": "D6",
+      "label": "Roll a D6",
+      "table": [
+       {
+        "on": [
+         1
+        ],
+        "do": [
+         {
+          "lose": "h",
+          "text": "Devoured by the guardians of the Pit and never seen again"
+         }
+        ]
+       },
+       {
+        "on": [
+         2,
+         3,
+         4,
+         5,
+         6
+        ],
+        "do": [
+         {
+          "wyrd": "D6+1"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "2 2 2 2 2 2": [
+   {
+    "do": [
+     {
+      "gold": "5D6*5",
+      "text": "The chest's gold"
+     }
+    ]
+   },
+   {
+    "each": [
+     {
+      "on": 4,
+      "do": [
+       {
+        "wyrd": "D3"
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "item": "Holy (unholy) relic",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "item": "Heavy armour",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": 4,
+      "do": [
+       {
+        "gem": "Gems",
+        "value": "10",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "item": "Elven cloak",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "item": "Holy tome",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "artefact": true
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "3 3 3 3 3 3": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1
+      ],
+      "do": [
+       {
+        "item": "Double-handed weapon",
+        "qty": "D3",
+        "text": "Double-handed axes"
+       }
+      ]
+     },
+     {
+      "on": [
+       2
+      ],
+      "do": [
+       {
+        "item": "Heavy armour",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": [
+       3
+      ],
+      "do": [
+       {
+        "item": "Gromril weapon",
+        "qty": 1,
+        "text": "Gromril axe"
+       }
+      ]
+     },
+     {
+      "on": [
+       4
+      ],
+      "do": [
+       {
+        "item": "Gromril weapon",
+        "qty": 1,
+        "text": "Gromril hammer"
+       }
+      ]
+     },
+     {
+      "on": [
+       5
+      ],
+      "do": [
+       {
+        "item": "Gromril weapon",
+        "qty": 1,
+        "text": "Double-handed gromril axe"
+       }
+      ]
+     },
+     {
+      "on": [
+       6
+      ],
+      "do": [
+       {
+        "item": "Gromril armour",
+        "qty": 1
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "4 4 4 4 4 4": [
+   {
+    "do": [
+     {
+      "gold": "3D6*5",
+      "text": "Gold of the slaughtered warband"
+     },
+     {
+      "item": "Dagger",
+      "qty": "D6"
+     }
+    ]
+   },
+   {
+    "each": [
+     {
+      "on": 4,
+      "do": [
+       {
+        "item": "Light armour",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "item": "Heavy armour",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": 4,
+      "do": [
+       {
+        "item": "Mordheim map",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "on": 5,
+      "do": [
+       {
+        "item": "Halberd",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": 3,
+      "do": [
+       {
+        "item": "Sword",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": 2,
+      "do": [
+       {
+        "item": "Shield",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": 4,
+      "do": [
+       {
+        "item": "Bow",
+        "qty": "D3"
+       }
+      ]
+     },
+     {
+      "on": 2,
+      "do": [
+       {
+        "item": "Helmet",
+        "qty": "D3"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "5 5 5 5 5 5": [
+   {
+    "q": "choice",
+    "as": "c",
+    "label": "A training manual: sell it, or let a Hero read it?",
+    "options": [
+     {
+      "id": "sell",
+      "label": "Sell it for 100 gc"
+     },
+     {
+      "id": "read",
+      "label": "A Hero reads it"
+     }
+    ]
+   },
+   {
+    "if": {
+     "as": "c",
+     "is": "sell"
+    },
+    "do": [
+     {
+      "gold": 100,
+      "text": "Training manual sold"
+     }
+    ]
+   },
+   {
+    "if": {
+     "as": "c",
+     "is": "read"
+    },
+    "then": [
+     {
+      "q": "hero",
+      "as": "h",
+      "label": "Which Hero reads the manual?"
+     },
+     {
+      "do": [
+       {
+        "perk": "combat-manual",
+        "hero": "h",
+        "text": "He may choose Combat skills whenever he gains a new skill, and his WS may rise one point above his racial maximum."
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "6 6 6 6 6 6": [
+   {
+    "q": "roll",
+    "expr": "D6",
+    "label": "Roll a D6",
+    "table": [
+     {
+      "on": [
+       1,
+       2
+      ],
+      "do": [
+       {
+        "gold": "D6*10",
+        "text": "Items and money from the villa"
+       }
+      ]
+     },
+     {
+      "on": [
+       3,
+       4
+      ],
+      "do": [
+       {
+        "item": "Crimson shade",
+        "qty": "D6",
+        "text": "Vials of Crimson Shade"
+       }
+      ]
+     },
+     {
+      "on": [
+       5,
+       6
+      ],
+      "do": [
+       {
+        "artefact": true
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "PB_ARTEFACTS": [
+  [
+   "The Boots and Rope of Pieter",
+   "The wearer moves normally on any terrain, including vertical surfaces, adding horizontal and vertical distance with no Initiative test (except across gaps)."
+  ],
+  [
+   "The Count of Ventimiglia's Misericordia",
+   "A dagger treated as a sword; opponents it wounds are stunned on 1-3 (Undead knocked down) and put out of action on 4-6."
+  ],
+  [
+   "Att'la's Plate Mail",
+   "Gromril armour with three runes: immune to spells, moves through solid objects, one extra wound (even above the racial maximum)."
+  ],
+  [
+   "Bow of Seeking",
+   "An Elven bow that always hits on 2+, arrows count as hunting arrows, any enemy in sight may be picked, Dwarfs draw its arrows; it cannot shoot Elves."
+  ],
+  [
+   "Executioner's Hood",
+   "The wearer is always frenzied, +1 Strength in close combat, never leaves combat, and attacks stunned or knocked-down models nearby, even his own side."
+  ],
+  [
+   "All-seeing Eye of Numas",
+   "The bearer sees all models, rolls two dice after the battle on the Exploration chart (pick one), and has an extra 6+ save against shooting and close combat."
+  ]
  ]
 }

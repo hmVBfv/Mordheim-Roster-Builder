@@ -4,6 +4,7 @@
    the rulebook's order; the wyrdstone sale only reads a price from a table. */
 import type { CampaignState, WarbandState } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
+import type { GameData } from '../data/types.ts';
 import { goldTreasury, isHeroModel } from '../rules/costs.ts';
 import { unitDef } from '../rules/lookup.ts';
 import { campState, logEvent } from '../warband/log.ts';
@@ -43,7 +44,47 @@ export const PB_STEPS: readonly (readonly [string, string, string])[] = [
 export const PB_ORDER: readonly string[] = PB_STEPS.map((s) => s[0]);
 
 export interface WyrdSale { done: boolean; shards: number; gc: number; size: number }
-export interface PostBattleState { done: Record<string, boolean>; wyrd: WyrdSale | null; [key: string]: unknown }
+/** A roll made for a step, with where it came from (ADR 0032): typed in from
+    the table, or rolled in the app. `value` holds one number per die. */
+export interface Rolled { value: number[]; by: 'entered' | 'app' }
+
+/** One thing a step brought in or cost, with its origin (ADR 0032): the
+    statistics and the round's balance are made from these. */
+export interface Find {
+  /** Unique within the round's `finds`; never reused. */
+  id: number;
+  kind: 'gold' | 'wyrd' | 'item' | 'exp' | 'note';
+  /** Where it came from: 'explore', 'location:<key>', 'scenario', 'wyrdstone', 'upkeep', … */
+  source: string;
+  /** Gold, shards or experience; negative when it cost something. */
+  amount?: number;
+  /** The stash key of an item (as StashItem.key) and how many. */
+  item?: string;
+  qty?: number;
+  /** List price of one piece in gc, for the value of what was found. */
+  worth?: number;
+  /** The warrior concerned (model uid, or a Hired Sword's uid). */
+  uid?: number | string;
+  /** The held experience entry (xp ledger id) a find of kind 'exp' made, so it can be taken back. */
+  xpId?: number;
+  /** A place did something to a Hero: he misses the next game, or is lost for good. */
+  act?: 'miss' | 'lose';
+  text: string;
+}
+
+/** What a round's post-battle sequence has recorded. Every field but `done` and `wyrd` is new in ADR 0032 and optional:
+    older rounds hold only those two and are never recalculated. */
+export interface PostBattleState {
+  done: Record<string, boolean>;
+  wyrd: WyrdSale | null;
+  explore?: { rolled: Rolled; kept: number[]; total: number; shards: number; location: string | null; used?: string[] };
+  xp?: { underdog?: number; scenario?: { uid: number | string; amount: number; reason: string }[] };
+  upkeep?: { paid: { uid: string; gc: number }[]; dismissed: string[] };
+  finds?: Find[];
+  /** The place of the Exploration chart taken this round (N8) and the answers it was resolved with. */
+  location?: { key: string; answers: Record<string, number | number[] | boolean | string> };
+  [key: string]: unknown;
+}
 
 /** The round the sequence belongs to: the latest battle's, else the current stage. */
 export function pbRound(ctx: Ctx): number {
@@ -126,6 +167,24 @@ export function wyrdSizeBand(n: unknown): number {
   return WYRD_BANDS.length - 1;
 }
 
+/** The experience a warrior earns for fighting a warband that rates this much higher than his own (Campaigns: Experience, Underdogs);
+    nothing when the enemy is not higher. */
+export function underdogBonus(data: GameData, difference: number): number {
+  const d = Number(difference) || 0;
+  if (d <= 0) return 0;
+  for (const [from, to, bonus] of data.PB_UNDERDOG) if (d >= from && (to == null || d <= to)) return bonus;
+  return 0;
+}
+
+/** The bonus of one warband against several (Rob, 13.11.2026): each opponent is compared on its own, and the warband takes the largest
+    gap to a higher-rated one. `own` and `others` are warband ratings. */
+export function underdogAgainst(data: GameData, own: number, others: readonly number[]): number {
+  let best = 0;
+  for (const r of others) best = Math.max(best, underdogBonus(data, (Number(r) || 0) - (Number(own) || 0)));
+  return best;
+}
+
+
 /** Models the warband fields, Hired Swords included: mouths to feed. */
 export function warbandSize(ctx: Ctx): number {
   let n = ctx.s.models.reduce((s, m) => { const d = unitDef(ctx, m.uid_def); return s + ((d && d.t === 'hen') ? (Number(m.qty) || 1) : 1); }, 0);
@@ -141,7 +200,8 @@ export function wyrdPrice(ctx: Ctx, shards: unknown, size?: number | null): numb
 
 /* ---- the post-battle sequence ---- */
 
-function postbattleOn(d: WarbandDraft, c: Ctx, round?: number | null): PostBattleState {
+/** The round's record on a draft, made if it is not there yet. */
+export function postbattleOn(d: WarbandDraft, c: Ctx, round?: number | null): PostBattleState {
   const camp = campState(d) as CampaignState & { postbattle?: Record<string, PostBattleState> };
   if (!camp.postbattle) camp.postbattle = {};
   const r = round == null ? pbRound(c) : round;
