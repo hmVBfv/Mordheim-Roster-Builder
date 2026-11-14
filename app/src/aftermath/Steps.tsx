@@ -6,6 +6,7 @@ import ui from '../ui/ui.module.css';
 import styles from './Aftermath.module.css';
 import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
+import { BalanceStep } from './BalanceStep.tsx';
 import { DramatisStep, EquipmentStep, RareStep, RecruitsStep } from './BuyingSteps.tsx';
 import { ExperienceStep } from './ExperienceStep.tsx';
 import { ExplorationStep } from './ExplorationStep.tsx';
@@ -73,7 +74,7 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
     case 'dramatis': return <DramatisStep ctx={acts.ctx} hireLink={`${roster}/hire${from}`} />;
     case 'recruits': return <RecruitsStep a={a} ctx={acts.ctx} rosterLink={`${roster}${from}`} tradeLink={`${roster}/trade${from}`} />;
     case 'equipment': return <EquipmentStep ctx={acts.ctx} rosterLink={`${roster}${from}`} tradeLink={`${roster}/trade${from}`} />;
-    case 'rating': return <p>Warband rating for the next battle: <strong>{a.rating}</strong>.</p>;
+    case 'rating': return <BalanceStep ctx={acts.ctx} round={a.round} />;
     default: return null;
   }
 }
