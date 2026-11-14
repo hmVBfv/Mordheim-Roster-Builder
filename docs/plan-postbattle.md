@@ -503,7 +503,7 @@ Roster.
 
 ### N12 – Schritte 6–9: Übersichten und Rückweg
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n12`; „Search“ je Zeile öffnet den Trading Post ohne vorgewählten Helden: der Trading Post nimmt keinen Helden per Adresse)
 
 **Regeln:** `…/docs/tools#6-…` bis `#9-…`, `…/docs/campaigns/trading#availability`
 (ein Wurf je Held, der nicht ausgeschaltet wurde; ein Gegenstand je Erfolg).
