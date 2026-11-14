@@ -7,6 +7,7 @@
 import * as core from '@mordheim/core';
 import { Suspense, useId, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { useAftermathBack } from '../aftermath/back.ts';
 import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
@@ -503,10 +504,11 @@ function Body({ rec }: { rec: StoredWarband }) {
   const ctx = useMemo(() => core.ctxOf(data, ed.state), [data, ed.state]);
   const locked = core.tradeLocked(ctx);
   const name = ed.state.name || data.WARBANDS[ed.state.wb as string]?.name || 'Warband';
+  const back = useAftermathBack(rec.id);
   return (
     <section className={ui.page}>
       <div>
-        <Link to={`/warbands/${rec.id}`} className={styles.back}>‹ {name}</Link>
+        <Link to={back?.to ?? `/warbands/${rec.id}`} className={styles.back}>{back?.label ?? `‹ ${name}`}</Link>
         <h1>Trading Post</h1>
       </div>
       {locked ? <Locked ed={ed} ctx={ctx} /> : (
