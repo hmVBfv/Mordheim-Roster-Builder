@@ -1202,17 +1202,21 @@ test('after the battle: the leader closes it, the player takes it over, goes thr
   await page.getByRole('button', { name: 'Take it over' }).click();
 
   // injuries
-  const casualties = page.getByRole('list', { name: 'Casualties' });
+  const casualties = page.getByRole('table', { name: 'Your casualties' });
   await casualties.getByRole('button', { name: 'Roll' }).click();
   const roll = page.getByRole('dialog', { name: 'Serious injury · Magda' });
   await roll.getByLabel('D66 as rolled').fill('45');
   await roll.getByRole('button', { name: 'Apply' }).click();
   await expect(page.getByText('Nothing left to roll.')).toBeVisible();
+  await noSideScroll(page);
+  await shot(page, 'aftermath-injuries');
   await page.getByRole('button', { name: 'Done – next step' }).click();
   // experience
-  await page.getByRole('button', { name: 'Grant the battle’s experience' }).click();
-  await expect(page.getByRole('list', { name: 'Experience held' })).toContainText('Ulrich the Grey +1');
-  await page.getByRole('button', { name: 'Write it onto the roster' }).click();
+  await expect(page.getByRole('table', { name: 'Experience of the battle' })).toContainText('Ulrich the Grey');
+  await noSideScroll(page);
+  await shot(page, 'aftermath-experience');
+  await page.getByRole('button', { name: 'Grant and write onto the roster' }).click();
+  await expect(page.getByText('✓ Battle experience granted.')).toBeVisible();
   await page.getByRole('button', { name: 'Done – next step' }).click();
   // exploration: two shards found
   await page.getByRole('button', { name: 'One shard more' }).click();
@@ -1250,7 +1254,7 @@ test('the aftermath in parchment', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'Open for you' })).toBeVisible();
   await page.goto(`warbands/${mine}/aftermath/${b.id}`);
   await page.getByRole('button', { name: 'Take it over' }).click();
-  await expect(page.getByRole('list', { name: 'Casualties' })).toContainText('Magda was put out of action');
+  await expect(page.getByRole('table', { name: 'Your casualties' })).toContainText('Magda');
   await noSideScroll(page);
   await shot(page, 'parchment-aftermath');
 });
