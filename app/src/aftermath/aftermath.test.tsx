@@ -4,7 +4,7 @@
    changes frozen as core finds them; then a leader moves the campaign on.
    Against the stand-in server (sync/fakeSync.ts), which computes the
    changes with core as the server does. */
-import { FORMAT, ctxOf, stageTotals, writeSave } from '@mordheim/core';
+import { FORMAT, ctxOf, postBattleSummary, stageTotals, writeSave } from '@mordheim/core';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -37,7 +37,7 @@ afterEach(async () => { cleanup(); stopSync(); resetSession(); localStorage.clea
 /** The stand-in server behind fetch, signed in as Kai, who leads with the authenticator. */
 function server() {
   const me = { ...KAI, totp: true };
-  const srv = createFakeSync({ me: { id: KAI.id, username: KAI.username, displayName: KAI.displayName }, totals, changes, wbName: (wb) => data.WARBANDS[wb]?.name ?? wb });
+  const srv = createFakeSync({ me: { id: KAI.id, username: KAI.username, displayName: KAI.displayName }, totals, changes, summary: (save, round) => postBattleSummary(ctxOf(data, readSave(data, save)!), round), wbName: (wb) => data.WARBANDS[wb]?.name ?? wb });
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(input), 'http://localhost/');
     const path = url.pathname.replace(/^\/api\/v1/, '');
@@ -95,25 +95,43 @@ describe('the aftermath of one’s warband', () => {
     // what is taken over, shown first
     expect((await screen.findByRole('list', { name: 'From the protocol' })).textContent).toBe('Champion (The Silver Caravan) out of action – by someone of Clan Skrittle.');
     await user.click(screen.getByRole('button', { name: 'Take it over' }));
-    const casualties = await screen.findByRole('list', { name: 'Casualties' });
-    expect(casualties.textContent).toMatch(/Champion was put out of action by Clan Skrittle \(Mercenaries\) — at the ferry\./);
+    const casualties = await screen.findByRole('table', { name: 'Your casualties' });
+    expect(casualties.textContent).toMatch(/Champion.*out of action by Clan Skrittle \(Mercenaries\)/);
     expect((await db.warbands.get(mine))!.state.campaign).toMatchObject({ round: 1, battles: [{ serverId: b.id, outcome: 'Victory' }] });
 
     // 1. injuries: the Champion rolls on the chart
-    await user.click(within(casualties).getByRole('button', { name: 'Roll' }));
+    await user.click(within(casualties).getByRole('button', { name: 'Roll for Champion' }));
     const roll = screen.getByRole('dialog', { name: 'Serious injury · Champion' });
     await user.type(within(roll).getByLabelText('D66 as rolled'), '45');
     await user.click(within(roll).getByRole('button', { name: 'Apply' }));
     expect(await screen.findByText('Nothing left to roll.')).toBeTruthy();
-    expect(casualties.textContent).toMatch(/Champion recovered fully/);
+    expect(casualties.textContent).toMatch(/Champion.*41-55.*Recovered/);
+    // where we are, and the tables of the step at hand without leaving the page (N2)
+    expect(screen.getByText('Step 1 of 10: Injuries')).toBeTruthy();
+    expect(within(screen.getByRole('list', { name: 'Steps' })).getAllByRole('button')).toHaveLength(10);
+    await user.click(within(document.getElementById('am-step-injuries')!).getByText('Tables'));
+    expect(screen.getByRole('table', { name: 'Heroes: Serious Injuries (D66)' })).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Done – next step' }));
+    // the result of a done step stays, the step can be read again
+    expect(screen.getByText('Step 2 of 10: Experience')).toBeTruthy();
+    expect(screen.getByLabelText('Injuries: result').textContent).toBe('1 of 1 rolled');
+    expect(screen.getByRole('button', { name: '1. Injuries, done' })).toBeTruthy();
 
     // 2. experience: granted once, then written onto the roster
-    await user.click(await screen.findByRole('button', { name: 'Grant the battle’s experience' }));
-    expect((await screen.findByRole('list', { name: 'Experience held' })).textContent).toMatch(/Mercenary Captain \+1/);
-    expect(screen.getByRole('button', { name: '✓ Battle experience granted' })).toHaveProperty('disabled', true);
-    await user.click(screen.getByRole('button', { name: 'Write it onto the roster' }));
+    // the table of the battle's points is read before anything is granted
+    const xp = await screen.findByRole('table', { name: 'Experience of the battle' });
+    const captain = within(xp).getByRole('row', { name: /Mercenary Captain/ });
+    expect(within(captain).getAllByRole('cell').map((c) => c.textContent)).toContain('42 → 43');
+    await user.click(screen.getByRole('button', { name: 'Grant and write onto the roster' }));
+    expect(await screen.findByText('✓ Battle experience granted.')).toBeTruthy();
     await waitFor(async () => expect((await db.warbands.get(mine))!.state.models.find((m) => m.uid === 1)!.exp).toBe(43));
+
+    // a step that sends you elsewhere carries the way back: veterans lead to Hire and return to this aftermath (N2)
+    for (const step of ['experience', 'exploration', 'wyrdstone']) {
+      await user.click(within(document.getElementById(`am-step-${step}`)!).getByRole('button', { name: 'Done – next step' }));
+    }
+    expect(screen.getByText('Step 5 of 10: Available veterans')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Add men on the roster' }).getAttribute('href')).toBe(`/warbands/${mine}?from=${b.id}`);
 
     // what changed since the start, and the mark
     const list = await screen.findByRole('list', { name: 'Changes' });
@@ -123,6 +141,8 @@ describe('the aftermath of one’s warband', () => {
     expect(screen.getByText('A preview; nothing is marked yet.').tagName).toBe('SMALL');
     await user.click(screen.getByRole('button', { name: 'Looks right – mark after battle 1' }));
     expect(await screen.findByText(/✓ Marked after battle 1 – version 2/)).toBeTruthy();
+    // the balance of the round is frozen with the mark and read beside the before and after (N13)
+    expect(srv.state.campaigns.get(c.id)!.enrolments.find((x) => x.warbandId === mine)!.tag!.summary).toMatchObject({ round: 1, income: { total: expect.any(Number) } });
     const e = srv.state.campaigns.get(c.id)!.enrolments.find((x) => x.warbandId === mine)!;
     expect(e.tag).toMatchObject({ kind: 'after_battle', rev: 2, round: 1, battleId: b.id });
     expect(e.tag!.changes).toEqual(expect.arrayContaining([expect.objectContaining({ kind: 'experience', name: 'Mercenary Captain', unexplained: false })]));
@@ -137,7 +157,7 @@ describe('the aftermath of one’s warband', () => {
     const user = userEvent.setup();
     at(`/warbands/${mine}/aftermath/${b.id}`);
     await user.click(await screen.findByRole('button', { name: 'Take it over' }));
-    await screen.findByRole('list', { name: 'Casualties' });
+    await screen.findByRole('table', { name: 'Your casualties' });
     // a characteristic risen with no advance rolled: a change nothing in the chronicle explains
     const rec = (await db.warbands.get(mine))!;
     // (written as if from another tab: a change newer than the screen's own wins)
