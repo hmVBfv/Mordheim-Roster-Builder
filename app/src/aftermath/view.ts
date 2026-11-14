@@ -9,7 +9,13 @@ import { rosterView } from '../roster/view.ts';
 import { localBattle, type LocalBattle } from './takeover.ts';
 
 export interface StepView { key: string; title: string; link: string; done: boolean; active: boolean; locked: boolean; /** What the step has brought so far, in a few words; null while there is nothing to say. */ summary: string | null }
-export interface CasualtyView { id: number; text: string; result: string; ours: boolean; uid: number | null; hero: boolean; open: boolean }
+export interface CasualtyView {
+  id: number; text: string; result: string; ours: boolean; uid: number | null; hero: boolean; open: boolean;
+  /** The victim's name, the roll as it was made ('' while pending) and what it means (core's wording of the result). */
+  name: string; roll: string; meaning: string;
+  /** Who put him out of action, with his warband ('' if unknown). */
+  by: string;
+}
 
 export interface AftermathView {
   local: LocalBattle;
@@ -62,7 +68,7 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
   const casualties = cas.map((c) => {
     const ours = core.casualtyIsOurs(c);
     const onRoster = ours && s.models.some((m) => m.uid === c.victim.uid);
-    return { id: c.id, text: core.casualtyText(ctx, c), result: c.result, ours, uid: c.victim.uid ?? null, hero: core.casualtyIsHero(ctx, c), open: ours && onRoster && c.result === 'pending' };
+    return { id: c.id, text: core.casualtyText(ctx, c), result: c.result, name: c.victim.name || 'a warrior', roll: c.code ?? '', meaning: c.detail || '', by: c.attacker.name ? `${c.attacker.name}${c.attacker.wb ? ` (${core.wbName(ctx, c.attacker.wb)})` : ''}` : '', ours, uid: c.victim.uid ?? null, hero: core.casualtyIsHero(ctx, c), open: ours && onRoster && c.result === 'pending' };
   });
   const v = rosterView(data, s);
   const size = core.warbandSize(ctx);

@@ -295,3 +295,37 @@
 .step {
   min-width: 0;
 }
+
+/* the casualties as a table: it scrolls inside its own box, never the page */
+.scroll {
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.casualties {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.casualties caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: var(--space-1);
+}
+
+.casualties th,
+.casualties td {
+  border: 1px solid var(--border);
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.casualties small {
+  display: block;
+  color: var(--text-muted);
+}
+
+.casualties td:nth-child(2) {
+  white-space: nowrap;
+}

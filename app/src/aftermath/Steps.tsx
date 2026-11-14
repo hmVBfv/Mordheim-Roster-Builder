@@ -13,13 +13,29 @@ import { WyrdPrices } from './WyrdPrices.tsx';
 
 const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
-function CasualtyRow({ c, onRoll }: { c: CasualtyView; onRoll: () => void }) {
+const RESULT_NAME: Record<string, string> = { pending: 'To roll', recovered: 'Recovered', injured: 'Injured', dead: 'Dead' };
+
+/** The casualties of the battle in a table: who, the roll, the result and what it means; our open ones have their "Roll" button. The other
+    players' casualties are theirs to roll – listed apart. */
+function CasualtyTable({ rows, caption, onRoll }: { rows: CasualtyView[]; caption: string; onRoll?: (c: CasualtyView) => void }) {
+  if (rows.length === 0) return null;
   return (
-    <li className={styles.casualty}>
-      <span>{c.text}{!c.ours && <small> Their player rolls for them.</small>}</span>
-      {c.open && <button type="button" className={ui.button} onClick={onRoll}>Roll</button>}
-      {c.ours && !c.open && c.result !== 'pending' && <span className={styles.done}>✓</span>}
-    </li>
+    <div className={styles.scroll} tabIndex={0} role="region" aria-label={caption}>
+      <table className={styles.casualties}>
+        <caption>{caption}</caption>
+        <thead><tr><th scope="col">Warrior</th><th scope="col">Roll</th><th scope="col">Result</th><th scope="col">Action</th></tr></thead>
+        <tbody>
+          {rows.map((c) => (
+            <tr key={c.id}>
+              <th scope="row">{c.name}{c.by ? <small>out of action by {c.by}</small> : null}</th>
+              <td>{c.roll || '–'}</td>
+              <td>{RESULT_NAME[c.result] ?? c.result}{c.meaning && c.result !== 'pending' ? <small> {c.meaning}</small> : null}</td>
+              <td>{onRoll && c.open ? <button type="button" className={ui.button} aria-label={`Roll for ${c.name}`} onClick={() => onRoll(c)}>Roll</button> : c.ours && c.result !== 'pending' ? <span className={styles.done} role="img" aria-label="rolled">✓</span> : null}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -47,9 +63,8 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
       <>
         <p>Heroes taken out of action roll a D66 on the Serious Injuries chart; Henchmen a D6 – 1–2 the man is dead, 3–6 he fights on.</p>
         {a.casualties.length === 0 && <p className={ui.muted}>No casualties in this battle.</p>}
-        <ul className={styles.plain} aria-label="Casualties">
-          {a.casualties.map((c) => <CasualtyRow key={c.id} c={c} onRoll={() => acts.roll(c)} />)}
-        </ul>
+        <CasualtyTable rows={a.casualties.filter((c) => c.ours)} caption="Your casualties" onRoll={acts.roll} />
+        <CasualtyTable rows={a.casualties.filter((c) => !c.ours)} caption="The others’ casualties – their players roll for them" />
         {a.toRoll > 0 ? <p className={styles.warn}>{a.toRoll} still to roll.</p> : <p className={ui.muted}>Nothing left to roll.</p>}
       </>
     );
