@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Sparkline } from '../ui/Sparkline.tsx';
 import ui from '../ui/ui.module.css';
+import { BattleStatistics } from './BattleStatistics.tsx';
 import { LineChart } from './LineChart.tsx';
 import { GROUPS, METRICS, fmt, metricOf, seriesOf } from './metrics.ts';
 import styles from './Statistics.module.css';
@@ -34,6 +35,7 @@ export function StatisticsTab({ id }: { id: string }) {
           <Sparkline key={s.warbandId} title={s.name} unit={metric.unit} points={s.points.map((p) => ({ label: p.label, value: p.value }))} />
         ))}
       </div>
+      <BattleStatistics id={id} />
       <p className={ui.muted}>Each number is as it stood at a mark: the start, after each battle, a round sat out. Latest: {series.map((s) => `${s.name} ${fmt(s.points.at(-1)!.value, metric.unit)}`).join(' · ')}.</p>
     </div>
   );

@@ -1282,6 +1282,38 @@ export function createFakeSync(opts: {
       })).filter((w) => w.points.length > 0).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
       return json(200, { statistics });
     }
+    // the battles by warband for the statistics (server/src/campaigns.ts campaignBattleStats)
+    if (method === 'GET' && rest === '/statistics/battles') {
+      const name = (e: (typeof c.enrolments)[number]) => saveWords(s.warbands.get(e.warbandId) ?? { versions: [{ rev: 1, data: e.data }], headRev: 1 } as unknown as FakeWarband).name || e.name;
+      const by = new Map(c.enrolments.map((e) => [e.warbandId, { warbandId: e.warbandId, name: name(e), active: true, battles: 0, victory: 0, defeat: 0, draw: 0, routed: 0, inflicted: 0, suffered: 0 }]));
+      const killers = new Map<string, { warbandId: string; warband: string; name: string; count: number }>();
+      for (const b of [...s.battles.values()].filter((x) => x.campaignId === c.id && x.status === 'closed')) {
+        for (const p of b.participants) {
+          const w = by.get(p.warbandId);
+          if (!w) continue;
+          w.battles++;
+          if (p.outcome === 'victory' || p.outcome === 'defeat' || p.outcome === 'draw' || p.outcome === 'routed') w[p.outcome]++;
+        }
+        for (const e of b.entries.filter((x) => !x.deleted && x.kind === 'casualty')) {
+          const pl = e.payload as { victim?: { warbandId?: string }; attacker?: { warbandId?: string; name?: string; env?: boolean } | null };
+          const victim = pl.victim?.warbandId ? by.get(pl.victim.warbandId) : undefined;
+          if (victim) victim.suffered++;
+          const a = pl.attacker;
+          const attacker = a && !a.env && a.warbandId ? by.get(a.warbandId) : undefined;
+          if (a && attacker) {
+            attacker.inflicted++;
+            const k = `${a.warbandId}:${a.name ?? ''}`;
+            const cur = killers.get(k) ?? { warbandId: a.warbandId!, warband: attacker.name, name: String(a.name ?? ''), count: 0 };
+            cur.count++;
+            killers.set(k, cur);
+          }
+        }
+      }
+      return json(200, {
+        warbands: [...by.values()].filter((w) => w.battles > 0).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })),
+        killers: [...killers.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)).slice(0, 10),
+      });
+    }
     // what the others have by now: the yardstick of a warband that joins late (server/src/campaigns.ts catchUpPeers)
     if (method === 'GET' && rest === '/catchup') {
       const peers = c.enrolments.filter((e) => e.status === 'active' && e.tag).map((e) => ({

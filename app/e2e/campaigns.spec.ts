@@ -400,6 +400,7 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     expect(c.enrolments.length).toBe(2);
     await expect(fig.getByRole('img').locator('polyline')).toHaveCount(2);
     await expect(fig.getByRole('list', { name: 'Warbands' }).getByRole('button')).toHaveCount(2);
+    await expect(page.getByRole('heading', { level: 2, name: 'Battles' }).or(page.getByText(/No battle is closed yet/))).toBeVisible();
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-statistics`);
