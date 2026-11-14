@@ -6,6 +6,7 @@ export interface MetricDef { key: string; label: string; group: string; unit: st
 
 export const METRICS: MetricDef[] = [
   { key: 'rating', label: 'Warband rating', group: 'Strength', unit: '', about: 'The rating of the warband at each mark.' },
+  { key: 'battles', label: 'Battles fought', group: 'Strength', unit: '', about: 'The battles the warband took part in so far; a round sat out does not count.' },
   { key: 'value', label: 'Warband value', group: 'Strength', unit: 'gc', about: 'The worth of men, gear and advances at list prices.' },
   { key: 'models', label: 'Models', group: 'Strength', unit: '', about: 'The men on the roster.' },
   { key: 'heroes', label: 'Heroes', group: 'Strength', unit: '', about: 'The Heroes on the roster.' },
@@ -97,4 +98,14 @@ export function toCsv(stats: WarbandStatistics[]): string {
     }
   }
   return rows.map((r) => r.map(cell).join(',')).join('\n') + '\n';
+}
+
+/** Adds `battles` to every mark: the battles the warband fought up to it, counted from its own marks (one 'after battle' mark each; a round sat out or a start is none). */
+export function withBattles(stats: WarbandStatistics[]): WarbandStatistics[] {
+  return stats.map((w) => {
+    const order = [...w.points].sort((a, b) => a.round - b.round || a.at.localeCompare(b.at));
+    let n = 0;
+    const count = new Map(order.map((p) => [p, (n += p.kind === 'after_battle' ? 1 : 0)]));
+    return { ...w, points: w.points.map((p) => ({ ...p, metrics: { ...p.metrics, battles: count.get(p)! } })) };
+  });
 }
