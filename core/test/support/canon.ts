@@ -60,6 +60,10 @@ function canon(s: unknown): unknown {
 /* Intended difference (docs/behaviour-changes.md, "Nachspiel als Protokoll", ADR 0032): the keys of a post-battle round only core writes. */
 const CORE_ONLY_POSTBATTLE = ['explore', 'xp', 'upkeep', 'finds', 'location'];
 
+/* Intended difference (docs/behaviour-changes.md, "Goldverluste in der Statistik"): chronicle events that change gold carry the cause and the amount in
+   their data, for the statistics; legacy writes the same text without them. */
+const CORE_ONLY_LOG_DATA = ['cause', 'gold'];
+
 /* Everything but the chronicle ids. */
 function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: { uid: string }[] }): Rec {
   delete c.uidSeq;
@@ -68,6 +72,7 @@ function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: 
   const camp = c.campaign;
   if (camp) {
     delete camp.logSeq;
+    for (const e of (camp.log as Rec[] | undefined) ?? []) for (const k of CORE_ONLY_LOG_DATA) if (e.data && typeof e.data === 'object') delete (e.data as Rec)[k];
     const nFallen = ((c.fallen as unknown[] | undefined) ?? []).length;
     for (const r of (camp.casualties as Rec[] | undefined) ?? []) {
       delete r.fallenRef;

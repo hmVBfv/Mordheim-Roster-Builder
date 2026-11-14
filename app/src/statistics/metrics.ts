@@ -20,13 +20,18 @@ export const METRICS: MetricDef[] = [
   { key: 'exp', label: 'Experience, whole warband', group: 'Experience', unit: '', about: 'The experience of all warriors, the fallen included.' },
   { key: 'heroExp', label: 'Experience, Heroes', group: 'Experience', unit: '', about: 'The experience of the Heroes alone.' },
   { key: 'fallen', label: 'Fallen', group: 'Losses', unit: '', about: 'Warriors who have fallen.' },
-  { key: 'lost', label: 'Loss value', group: 'Losses', unit: 'gc', about: 'What the fallen took with them, in gold.' },
+  { key: 'lostTotal', label: 'Total gold lost', group: 'Losses', unit: 'gc', about: 'All gold lost: the fallen\'s gear, gear stripped without a death, ransoms and losses at places.' },
+  { key: 'lost', label: 'Loss value: the fallen', group: 'Losses', unit: 'gc', about: 'What the fallen took with them, in gold.' },
+  { key: 'lostGear', label: 'Loss: gear stripped', group: 'Losses', unit: 'gc', about: 'Gear lost without a death: Robbed, a lost pit fight.' },
+  { key: 'lostRansom', label: 'Loss: ransoms paid', group: 'Losses', unit: 'gc', about: 'Gold paid to get a captured Hero back.' },
+  { key: 'lostLocations', label: 'Loss: places and scenarios', group: 'Losses', unit: 'gc', about: 'Gold lost to places of the Exploration chart and to scenarios.' },
   { key: 'wyrd', label: 'Wyrdstone in the stash', group: 'Wyrdstone', unit: '', about: 'Shards held at the mark.' },
   { key: 'wyrdFound', label: 'Wyrdstone found', group: 'Wyrdstone', unit: '', about: 'Shards found so far: held plus sold.' },
   { key: 'income', label: 'Income, total', group: 'Income', unit: 'gc', about: 'Gold made from the game so far, all sources.' },
   { key: 'incomeWyrd', label: 'Income: wyrdstone sold', group: 'Income', unit: 'gc', about: 'Gold from selling wyrdstone.' },
   { key: 'incomeLocations', label: 'Income: places found', group: 'Income', unit: 'gc', about: 'Gold from the places of the Exploration chart.' },
   { key: 'incomeScenario', label: 'Income: scenarios', group: 'Income', unit: 'gc', about: 'Gold from scenarios.' },
+  { key: 'incomePit', label: 'Income: pit fights', group: 'Income', unit: 'gc', about: 'Gold from pit fights won (Sold to the Pits).' },
   { key: 'incomeGoods', label: 'Income: goods sold', group: 'Income', unit: 'gc', about: 'Gold from selling goods.' },
   { key: 'incomeOther', label: 'Income: other', group: 'Income', unit: 'gc', about: 'Other bookings in the warband’s favour without an origin.' },
   { key: 'lootValue', label: 'Value of found items', group: 'Income', unit: 'gc', about: 'The list price of the items the aftermath steps found.' },
@@ -106,6 +111,7 @@ export function withBattles(stats: WarbandStatistics[]): WarbandStatistics[] {
     const order = [...w.points].sort((a, b) => a.round - b.round || a.at.localeCompare(b.at));
     let n = 0;
     const count = new Map(order.map((p) => [p, (n += p.kind === 'after_battle' ? 1 : 0)]));
-    return { ...w, points: w.points.map((p) => ({ ...p, metrics: { ...p.metrics, battles: count.get(p)! } })) };
+    // a mark frozen before the losses were told apart has only the fallen's: its total is that, so the line does not start in the middle
+    return { ...w, points: w.points.map((p) => ({ ...p, metrics: { ...p.metrics, battles: count.get(p)!, ...(p.metrics.lostTotal === undefined && typeof p.metrics.lost === 'number' ? { lostTotal: p.metrics.lost } : {}) } })) };
   });
 }

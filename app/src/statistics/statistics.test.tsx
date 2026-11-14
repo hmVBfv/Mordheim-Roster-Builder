@@ -161,4 +161,11 @@ describe('warriors', () => {
     expect(s.map((x) => [x.name, x.points.map((p) => p.value)])).toEqual([['Brother Anselm', [20, 24]], ['Zealots', [0]]]);
     expect(s[0]!.points.map((p) => p.label)).toEqual(['Start', 'After battle 1']);
   });
+
+  it('a mark frozen before the losses were told apart gets its total from the fallen\'s', () => {
+    const old = withBattles([{ warbandId: 'x', name: 'X', active: true, points: [pt(0, 'start', { lost: 30 })] }]);
+    expect(old[0]!.points[0]!.metrics.lostTotal).toBe(30);
+    const now = withBattles([{ warbandId: 'x', name: 'X', active: true, points: [pt(0, 'start', { lost: 30, lostTotal: 80 })] }]);
+    expect(now[0]!.points[0]!.metrics.lostTotal).toBe(80);
+  });
 });
