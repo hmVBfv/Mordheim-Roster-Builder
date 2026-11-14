@@ -6,7 +6,7 @@ import { LoadingLate } from '../ui/Loading.tsx';
 import { ErrorBoundary } from '../ui/ErrorBoundary.tsx';
 import { BrowserRouter, HashRouter, Navigate, Route, Routes, useLocation } from 'react-router';
 import { FLAVOUR } from '../flavour.ts';
-import { ACCOUNT, HOME, MY_REPORTS, WHATS_NEW } from './paths.ts';
+import { ACCOUNT, HOME, MY_REPORTS, POST_BATTLE_RULES, WHATS_NEW } from './paths.ts';
 import { Home } from '../routes/Home.tsx';
 import { More } from '../routes/More.tsx';
 import { Placeholder } from '../routes/Placeholder.tsx';
@@ -14,6 +14,7 @@ import { Warbands } from '../routes/Warbands.tsx';
 import { Shell } from './Shell.tsx';
 
 // the roster needs the rules: loaded when first opened
+const PostBattleRules = lazy(() => import('../aftermath/PostBattleRules.tsx').then((m) => ({ default: m.PostBattleRules })));
 const Roster = lazy(() => import('../routes/Roster.tsx').then((m) => ({ default: m.Roster })));
 const NewWarband = lazy(() => import('../routes/NewWarband.tsx').then((m) => ({ default: m.NewWarband })));
 const Export = lazy(() => import('../routes/Export.tsx').then((m) => ({ default: m.Export })));
@@ -76,6 +77,7 @@ export function AppRoutes() {
           {FLAVOUR === 'campaign' && <Route path="/warbands/:id/aftermath/:bid" element={<Aftermath />} />}
           {FLAVOUR === 'campaign' && <Route path="/import" element={<ImportLink />} />}
           {/* the rulebook is a tab of the Library in the campaign app; the old address leads there */}
+          <Route path={POST_BATTLE_RULES} element={<PostBattleRules />} />
           {FLAVOUR === 'campaign' ? <Route path="/rules" element={<RulesRedirect />} /> : <Route path="/rules" element={<Rules />} />}
           <Route path={ACCOUNT} element={<More />} />
           <Route path="/more" element={<Navigate to={ACCOUNT} replace />} />
